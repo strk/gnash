@@ -31,7 +31,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the TextFieldAutoSize Class
-void TextFieldAutoSize_class_init(as_object& where);
+void textfieldautosize_class_init(as_object& where);
 
 /// Return a TextFieldAutoSize instance
 std::auto_ptr<as_object> init_text_field_auto_size_instance();

@@ -911,7 +911,7 @@ get_flash_geom_matrix_constructor(const fn_call& /*fn*/)
 }
 
 // extern 
-void Matrix_class_init(as_object& where)
+void matrix_class_init(as_object& where)
 {
     // This is going to be the Matrix "class"/"function"
     // in the 'where' package

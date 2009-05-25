@@ -1,0 +1,239 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+EVENTSdir = $(includedir)/gnash
+
+EVENTS_SOURCES = flash/events/events_pkg.cpp
+EVENTS_HEADERS = flash/events/events_pkg.h
+
+if BUILD_ACTIVITYEVENT_AS3
+EVENTS_SOURCES += flash/events/ActivityEvent_as.cpp
+EVENTS_HEADERS += flash/events/ActivityEvent_as.h
+endif
+
+if BUILD_ASYNCERROREVENT_AS3
+EVENTS_SOURCES += flash/events/AsyncErrorEvent_as.cpp
+EVENTS_HEADERS += flash/events/AsyncErrorEvent_as.h
+endif
+
+if BUILD_BROWSERINVOKEEVENT_AS3
+EVENTS_SOURCES += flash/events/BrowserInvokeEvent_as.cpp
+EVENTS_HEADERS += flash/events/BrowserInvokeEvent_as.h
+endif
+
+if BUILD_CONTEXTMENUEVENT_AS3
+EVENTS_SOURCES += flash/events/ContextMenuEvent_as.cpp
+EVENTS_HEADERS += flash/events/ContextMenuEvent_as.h
+endif
+
+if BUILD_DRMAUTHENTICATEEVENT_AS3
+EVENTS_SOURCES += flash/events/DRMAuthenticateEvent_as.cpp
+EVENTS_HEADERS += flash/events/DRMAuthenticateEvent_as.h
+endif
+
+if BUILD_DRMERROREVENT_AS3
+EVENTS_SOURCES += flash/events/DRMErrorEvent_as.cpp
+EVENTS_HEADERS += flash/events/DRMErrorEvent_as.h
+endif
+
+if BUILD_DRMSTATUSEVENT_AS3
+EVENTS_SOURCES += flash/events/DRMStatusEvent_as.cpp
+EVENTS_HEADERS += flash/events/DRMStatusEvent_as.h
+endif
+
+if BUILD_DATAEVENT_AS3
+EVENTS_SOURCES += flash/events/DataEvent_as.cpp
+EVENTS_HEADERS += flash/events/DataEvent_as.h
+endif
+
+if BUILD_ERROREVENT_AS3
+EVENTS_SOURCES += flash/events/ErrorEvent_as.cpp
+EVENTS_HEADERS += flash/events/ErrorEvent_as.h
+endif
+
+if BUILD_EVENTDISPATCHER_AS3
+EVENTS_SOURCES += flash/events/EventDispatcher_as.cpp
+EVENTS_HEADERS += flash/events/EventDispatcher_as.h
+endif
+
+if BUILD_EVENTPHASE_AS3
+EVENTS_SOURCES += flash/events/EventPhase_as.cpp
+EVENTS_HEADERS += flash/events/EventPhase_as.h
+endif
+
+if BUILD_EVENT_AS3
+EVENTS_SOURCES += flash/events/Event_as.cpp
+EVENTS_HEADERS += flash/events/Event_as.h
+endif
+
+if BUILD_FILELISTEVENT_AS3
+EVENTS_SOURCES += flash/events/FileListEvent_as.cpp
+EVENTS_HEADERS += flash/events/FileListEvent_as.h
+endif
+
+if BUILD_FOCUSEVENT_AS3
+EVENTS_SOURCES += flash/events/FocusEvent_as.cpp
+EVENTS_HEADERS += flash/events/FocusEvent_as.h
+endif
+
+if BUILD_FULLSCREENEVENT_AS3
+EVENTS_SOURCES += flash/events/FullScreenEvent_as.cpp
+EVENTS_HEADERS += flash/events/FullScreenEvent_as.h
+endif
+
+if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
+EVENTS_SOURCES += flash/events/HTMLUncaughtScriptExceptionEvent_as.cpp
+EVENTS_HEADERS += flash/events/HTMLUncaughtScriptExceptionEvent_as.h
+endif
+
+if BUILD_HTTPSTATUSEVENT_AS3
+EVENTS_SOURCES += flash/events/HTTPStatusEvent_as.cpp
+EVENTS_HEADERS += flash/events/HTTPStatusEvent_as.h
+endif
+
+if BUILD_IEVENTDISPATCHER_AS3
+EVENTS_SOURCES += flash/events/IEventDispatcher_as.cpp
+EVENTS_HEADERS += flash/events/IEventDispatcher_as.h
+endif
+
+if BUILD_IMEEVENT_AS3
+EVENTS_SOURCES += flash/events/IMEEvent_as.cpp
+EVENTS_HEADERS += flash/events/IMEEvent_as.h
+endif
+
+if BUILD_IOERROREVENT_AS3
+EVENTS_SOURCES += flash/events/IOErrorEvent_as.cpp
+EVENTS_HEADERS += flash/events/IOErrorEvent_as.h
+endif
+
+if BUILD_INVOKEEVENT_AS3
+EVENTS_SOURCES += flash/events/InvokeEvent_as.cpp
+EVENTS_HEADERS += flash/events/InvokeEvent_as.h
+endif
+
+if BUILD_KEYBOARDEVENT_AS3
+EVENTS_SOURCES += flash/events/KeyboardEvent_as.cpp
+EVENTS_HEADERS += flash/events/KeyboardEvent_as.h
+endif
+
+if BUILD_MOUSEEVENT_AS3
+EVENTS_SOURCES += flash/events/MouseEvent_as.cpp
+EVENTS_HEADERS += flash/events/MouseEvent_as.h
+endif
+
+if BUILD_NATIVEDRAGEVENT_AS3
+EVENTS_SOURCES += flash/events/NativeDragEvent_as.cpp
+EVENTS_HEADERS += flash/events/NativeDragEvent_as.h
+endif
+
+if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
+EVENTS_SOURCES += flash/events/NativeWindowBoundsEvent_as.cpp
+EVENTS_HEADERS += flash/events/NativeWindowBoundsEvent_as.h
+endif
+
+if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
+EVENTS_SOURCES += flash/events/NativeWindowDisplayStateEvent_as.cpp
+EVENTS_HEADERS += flash/events/NativeWindowDisplayStateEvent_as.h
+endif
+
+if BUILD_NETSTATUSEVENT_AS3
+EVENTS_SOURCES += flash/events/NetStatusEvent_as.cpp
+EVENTS_HEADERS += flash/events/NetStatusEvent_as.h
+endif
+
+if BUILD_OUTPUTPROGRESSEVENT_AS3
+EVENTS_SOURCES += flash/events/OutputProgressEvent_as.cpp
+EVENTS_HEADERS += flash/events/OutputProgressEvent_as.h
+endif
+
+if BUILD_PROGRESSEVENT_AS3
+EVENTS_SOURCES += flash/events/ProgressEvent_as.cpp
+EVENTS_HEADERS += flash/events/ProgressEvent_as.h
+endif
+
+if BUILD_SQLERROREVENT_AS3
+EVENTS_SOURCES += flash/events/SQLErrorEvent_as.cpp
+EVENTS_HEADERS += flash/events/SQLErrorEvent_as.h
+endif
+
+if BUILD_SQLEVENT_AS3
+EVENTS_SOURCES += flash/events/SQLEvent_as.cpp
+EVENTS_HEADERS += flash/events/SQLEvent_as.h
+endif
+
+if BUILD_SQLUPDATEEVENT_AS3
+EVENTS_SOURCES += flash/events/SQLUpdateEvent_as.cpp
+EVENTS_HEADERS += flash/events/SQLUpdateEvent_as.h
+endif
+
+if BUILD_SCREENMOUSEEVENT_AS3
+EVENTS_SOURCES += flash/events/ScreenMouseEvent_as.cpp
+EVENTS_HEADERS += flash/events/ScreenMouseEvent_as.h
+endif
+
+if BUILD_SECURITYERROREVENT_AS3
+EVENTS_SOURCES += flash/events/SecurityErrorEvent_as.cpp
+EVENTS_HEADERS += flash/events/SecurityErrorEvent_as.h
+endif
+
+if BUILD_STATUSEVENT_AS3
+EVENTS_SOURCES += flash/events/StatusEvent_as.cpp
+EVENTS_HEADERS += flash/events/StatusEvent_as.h
+endif
+
+if BUILD_SYNCEVENT_AS3
+EVENTS_SOURCES += flash/events/SyncEvent_as.cpp
+EVENTS_HEADERS += flash/events/SyncEvent_as.h
+endif
+
+if BUILD_TEXTEVENT_AS3
+EVENTS_SOURCES += flash/events/TextEvent_as.cpp
+EVENTS_HEADERS += flash/events/TextEvent_as.h
+endif
+
+if BUILD_TIMEREVENT_AS3
+EVENTS_SOURCES += flash/events/TimerEvent_as.cpp
+EVENTS_HEADERS += flash/events/TimerEvent_as.h
+endif
+
+libgnashasobjs_la_SOURCES += $(EVENTS_SOURCES)
+noinst_HEADERS +=  $(EVENTS_HEADERS) eventsclasses.h
+
+# Build a header file that contains a generated array of *_init()
+# functions for the classes that are configured for this build, as
+# that could be a subset of the entire class library for this namespace.
+eventsclasses.h: Makefile
+	-@echo "Generating header file for events classes..."
+	-@header=eventsclasses.h; \
+	$(RM) $${header}; \
+	echo "// Generated by Makefile, don't hand edit!" > $${header}; \
+	echo "#ifndef GNASH_ASOBJ3_EVENTS_H" >> $${header}; \
+	echo "#define GNASH_ASOBJ3_EVENTS_H 1" >> $${header}; \
+	echo "#include <sharedlib.h>" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
+	# drop the first node, which is always the top level package ;\
+	sources="`echo $(EVENTS_SOURCES) | cut -d ' ' -f 2-`"; \
+	for i in $${sources}; do \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
+	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
+	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
+	done; \
+	echo '	0' >> $${header}; \
+	echo '};' >> $${header}; \
+	echo "#endif // end of GNASH_ASOBJ3_EVENTS_H" >> $${header};
+
+BUILT_SOURCES += eventsclasses.h

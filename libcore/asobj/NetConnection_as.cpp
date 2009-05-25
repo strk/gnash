@@ -1234,3 +1234,7 @@ netconnection_addHeader(const fn_call& fn)
 
 } // end of gnash namespace
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

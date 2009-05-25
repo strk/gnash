@@ -364,7 +364,7 @@ get_flash_external_external_interface_constructor(const fn_call& /*fn*/)
 
 
 // extern 
-void ExternalInterface_class_init(as_object& where)
+void externalinterface_class_init(as_object& where)
 {
     // Register _global.Point
     string_table& st = where.getVM().getStringTable();

@@ -32,7 +32,7 @@ class as_function;
 class as_object;
 
 /// Initialize the global Point class
-void Point_class_init(as_object& global);
+void point_class_init(as_object& global);
 
 /// Return a Point instance (in case the core lib needs it)
 boost::intrusive_ptr<as_object> init_Point_instance();

@@ -24,7 +24,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global GlowFilter class
-void GlowFilter_class_init(as_object& global);
+void glowfilter_class_init(as_object& global);
 
 } // end of gnash namespace
 

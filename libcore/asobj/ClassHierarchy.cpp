@@ -300,14 +300,13 @@ static const ClassHierarchy::nativeClass knownClasses[] =
         NS_UNKNOWN, 5 },
 	{ Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_MEDIA, 5 },
-	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT,
+	{ xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_NET, 5 },
 	{ Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ XML_as::init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ XMLNode_as::init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT,
+	{ XML_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_XML, 5 },
-	{ Mouse_as::init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI,
-        5 },
+	{ Mouse_as::init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
         NS_GLOBAL, 5 },
@@ -326,7 +325,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
         NSV::NS_FLASH_NET, 5 },
 	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL,
         6 },
-	{ LocalConnection_as::init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT,
+	{ LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION, NSV::CLASS_OBJECT,
         NS_GLOBAL, 6 },
 	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT,
         NSV::NS_ADOBE_UTILS, 6 },
@@ -334,16 +333,17 @@ static const ClassHierarchy::nativeClass knownClasses[] =
         NSV::NS_FLASH_NET, 6 },
 	{ NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_NET, 6 },
-	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT,
+	{ contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_UI, 7 },
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
         NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT,
-        NS_GLOBAL, 5 },
+          NSV::NS_FLASH_ACCESSIBILITY, 5 },
 	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
-	{ TextFieldAutoSize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
+	{ textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
         NSV::CLASS_OBJECT, NS_GLOBAL, 9 }
+//  { function_name, name key, super name key, lowest version },
 
 // These classes are all implicitly constructed; that is, it is not necessary for
 // the class name to be used to construct the class, so they must always be available.
@@ -415,4 +415,9 @@ operator<<(std::ostream& os, const ClassHierarchy::extensionClass& c)
 	return os;
 }
 
-} /* namespace gnash */
+} // end of namespace gnash
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

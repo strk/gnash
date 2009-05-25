@@ -24,7 +24,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global ConvolutionFilter class
-void ConvolutionFilter_class_init(as_object& global);
+void convolutionfilter_class_init(as_object& global);
 
 } // end of gnash namespace
 

@@ -18,12 +18,20 @@
 
 AUTOMAKE_OPTIONS = 
 
-# if the compiler has broken flaot support when optimized
+VPATH += $(srcdir)/flash
+
+# if the compiler has broken float support when optimized
 if BROKEN_FLOAT
 AM_CXXFLAGS = -ffloat-store
 endif
 
-noinst_LTLIBRARIES = libgnashasobjs.la 
+# The built sources get filled in by each subdirectory's .am
+# Makefile fragment. These are the geerated headers that contain
+# the array of function pointers to each _init() function in each
+# class. The header file is generated at build time.
+BUILT_SOURCES =
+
+pkglib_LTLIBRARIES = libgnashasobjs.la 
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
@@ -32,6 +40,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
@@ -40,9 +49,7 @@ AM_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(FREETYPE2_CFLAGS) \
-	$(NULL)
-
+	$(FREETYPE2_CFLAGS)
 
 libgnashasobjs_la_SOURCES = \
 	AsBroadcaster.cpp \
@@ -67,7 +74,6 @@ libgnashasobjs_la_SOURCES = \
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
 	Number_as.cpp \
-	Object.cpp \
 	PlayHead.cpp \
 	Selection_as.cpp \
 	SharedObject_as.cpp\
@@ -81,36 +87,7 @@ libgnashasobjs_la_SOURCES = \
 	XML_as.cpp \
 	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
-	flash/display/BitmapData_as.cpp \
-	flash/display_pkg.cpp \
-	flash/external/ExternalInterface_as.cpp \
-	flash/external_pkg.cpp \
-        flash/filters/BevelFilter_as.cpp \
-        flash/filters/BitmapFilter_as.cpp \
-        flash/filters/DisplacementMapFilter_as.cpp \
-        flash/filters/BlurFilter_as.cpp \
-	flash/filters/ColorMatrixFilter_as.cpp \
-	flash/filters/ConvolutionFilter_as.cpp \
-	flash/filters/DropShadowFilter_as.cpp \
-	flash/filters/GlowFilter_as.cpp \
-	flash/filters/GradientBevelFilter_as.cpp \
-	flash/filters/GradientGlowFilter_as.cpp \
-	flash/filters_pkg.cpp \
-	flash/geom/ColorTransform_as.cpp \
-	flash/geom/Matrix_as.cpp \
-	flash/geom_pkg.cpp \
-	flash/geom/Point_as.cpp \
-	flash/geom/Rectangle_as.cpp \
-	flash/geom/Transform_as.cpp \
-	flash/net/FileReference_as.cpp \
-	flash/net/FileReferenceList_as.cpp \
-	flash/net_pkg.cpp \
-	flash_pkg.cpp \
-	flash/text_pkg.cpp \
-	flash/text/TextFieldAutoSize_as.cpp \
-	flash/text/TextRenderer_as.cpp \
-	LoadableObject.cpp \
-	$(NULL)
+	LoadableObject.cpp
 
 noinst_HEADERS = \
 	AsBroadcaster.h \
@@ -135,7 +112,6 @@ noinst_HEADERS = \
 	NetConnection_as.h	\
 	NetStream_as.h \
 	Number_as.h \
-	Object.h \
 	PlayHead.h \
 	Selection_as.h \
 	SharedObject_as.h \
@@ -148,41 +124,17 @@ noinst_HEADERS = \
 	XML_as.h \
 	XMLSocket_as.h \
 	XMLNode_as.h \
-	flash/display/BitmapData_as.h \
-	flash/display_pkg.h \
-	flash/external/ExternalInterface_as.h \
-	flash/external_pkg.h \
-        flash/filters/BevelFilter_as.h \
-        flash/filters/BitmapFilter_as.h \
-        flash/filters/DisplacementMapFilter_as.h \
-        flash/filters/BlurFilter_as.h \
-	flash/filters/ColorMatrixFilter_as.h \
-	flash/filters/ConvolutionFilter_as.h \
-	flash/filters/DropShadowFilter_as.h \
-	flash/filters/GlowFilter_as.h \
-	flash/filters/GradientBevelFilter_as.h \
-	flash/filters/GradientGlowFilter_as.h \
-	flash/filters_pkg.h \
-	flash/geom/ColorTransform_as.h \
-	flash/geom/Matrix_as.h \
-	flash/geom_pkg.h \
-	flash/geom/Point_as.h \
-	flash/geom/Rectangle_as.h \
-	flash/geom/Transform_as.h \
-	flash/net/FileReference_as.h \
-	flash/net/FileReferenceList_as.h \
-	flash/net_pkg.h \
-	flash_pkg.h \
-	flash/text_pkg.h \
-	flash/text/TextFieldAutoSize_as.h \
-	flash/text/TextRenderer_as.h \
-	LoadableObject.h \
-	$(NULL)
+	LoadableObject.h
+
+libgnashasobjs_la_SOURCES += $(srcdir)/flash/Object.cpp
+noinst_HEADERS += $(srcdir)/flash/Object.h
 
 EXTENSIONS_API = \
 	Array_as.h \
 	Key_as.h \
 	$(NULL)
+
+CLEANFILES = *classes.h
 
 if SDKINSTALL
 noinst_HEADERS += $(EXTENSIONS_API)
@@ -193,6 +145,7 @@ endif
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE
@@ -209,6 +162,40 @@ AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
 				$(SDL_LIBS)
 endif
+
+# These makefile fragments build the ActionScript library for
+# Gnash, and supports both AS2 as well as AS3, so we always
+# want to build.
+include $(srcdir)/flash/accessibility/accessibility.am
+include $(srcdir)/flash/data/data.am
+include $(srcdir)/flash/desktop/desktop.am
+include $(srcdir)/flash/display/display.am
+include $(srcdir)/flash/errors/errors.am
+include $(srcdir)/flash/events/events.am
+include $(srcdir)/flash/external/external.am
+include $(srcdir)/flash/filesystem/filesystem.am
+include $(srcdir)/flash/filters/filters.am
+include $(srcdir)/flash/geom/geom.am
+include $(srcdir)/flash/html/html.am
+include $(srcdir)/flash/media/media.am
+include $(srcdir)/flash/net/net.am
+include $(srcdir)/flash/printing/printing.am
+include $(srcdir)/flash/sampler/sampler.am
+include $(srcdir)/flash/security/security.am
+include $(srcdir)/flash/system/system.am
+include $(srcdir)/flash/text/text.am
+include $(srcdir)/flash/utils/utils.am
+include $(srcdir)/flash/ui/ui.am
+include $(srcdir)/flash/xml/xml.am
+
+libgnashasobjs_la_SOURCES += \
+	flash/flash_pkg.cpp \
+	$(NULL)
+
+noinst_HEADERS += \
+	flash/flash_pkg.h \
+	flash/flashclasses.h \
+	$(NULL)
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 

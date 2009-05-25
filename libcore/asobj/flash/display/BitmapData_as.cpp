@@ -237,7 +237,7 @@ getFlashDisplayBitmapDataConstructor()
 
 
 // extern 
-void BitmapData_class_init(as_object& where)
+void bitmapdata_class_init(as_object& where)
 {
 
     string_table& st = where.getVM().getStringTable();

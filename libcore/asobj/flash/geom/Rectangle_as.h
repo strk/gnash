@@ -31,7 +31,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global Rectangle class
-void Rectangle_class_init(as_object& global);
+void rectangle_class_init(as_object& global);
 
 /// Return a Rectangle instance (in case the core lib needs it)
 boost::intrusive_ptr<as_object> init_Rectangle_instance();

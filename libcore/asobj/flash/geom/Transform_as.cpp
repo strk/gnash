@@ -412,7 +412,7 @@ get_flash_geom_transform_constructor(const fn_call& /*fn*/)
 }
 
 // extern 
-void Transform_class_init(as_object& where)
+void transform_class_init(as_object& where)
 {
 	// This is going to be the Transform "class"/"function"
 	// in the 'where' package

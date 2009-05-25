@@ -31,7 +31,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global ExternalInterface class
-void ExternalInterface_class_init(as_object& global);
+void externalinterface_class_init(as_object& global);
 
 /// Return a ExternalInterface instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_ExternalInterface_instance();

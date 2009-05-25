@@ -30,6 +30,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la
 	$(top_builddir)/libmedia/libgnashsound.la \
+	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
 	$(NULL)
 
 ## WARNING: make sure GLIB_LIBS appears first
@@ -61,10 +62,10 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/libsound \
         -DLOCALEDIR=\"$(localedir)\" \
-		$(PTHREAD_CFLAGS) \
-		$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
+	$(BOOST_CFLAGS) \
         $(MYSQL_CFLAGS) \
-		$(NULL)
+	$(NULL)
 
 if WIN32
   GNASH_LIBS += -lintl -lz -lws2_32
@@ -76,11 +77,11 @@ if USE_FFMPEG_ENGINE
  GNASH_LIBS += $(FFMPEG_LIBS)
 endif
 
-#if USE_GST_ENGINE
+if USE_GST_ENGINE
  AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
-#endif
+endif
 
 bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper 
 #check_PROGRAMS = gdebug.swf

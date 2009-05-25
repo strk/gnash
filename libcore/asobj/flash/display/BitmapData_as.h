@@ -117,7 +117,7 @@ private:
 
 
 /// Initialize the global BitmapData class
-void BitmapData_class_init(as_object& global);
+void bitmapdata_class_init(as_object& global);
 
 as_function* getFlashDisplayBitmapDataConstructor();
 

@@ -79,7 +79,7 @@ private:
 
 
 /// Initialize the global ColorTransform class
-void ColorTransform_class_init(as_object& global);
+void colortransform_class_init(as_object& global);
 
 /// Return a ColorTransform instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_ColorTransform_instance();

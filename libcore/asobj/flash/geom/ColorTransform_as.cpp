@@ -390,7 +390,7 @@ ColorTransform_as::ColorTransform_as(double rm, double gm,
 }
 
 // extern 
-void ColorTransform_class_init(as_object& where)
+void colortransform_class_init(as_object& where)
 {
     // This is the ColorTransform "class"/"function"
     // in the 'where' package

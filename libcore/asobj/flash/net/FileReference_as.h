@@ -31,7 +31,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global FileReference class
-void FileReference_class_init(as_object& global);
+void filereference_class_init(as_object& global);
 
 /// Return a FileReference instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_FileReference_instance();

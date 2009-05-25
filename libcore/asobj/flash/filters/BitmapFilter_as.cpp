@@ -44,7 +44,7 @@ public:
 
 
 void
-BitmapFilter_class_init(as_object& global)
+bitmapfilter_class_init(as_object& global)
 {
     string_table& st = global.getVM().getStringTable();
     

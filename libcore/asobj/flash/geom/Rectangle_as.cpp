@@ -659,7 +659,7 @@ boost::intrusive_ptr<as_object> init_Rectangle_instance()
 }
 
 // extern 
-void Rectangle_class_init(as_object& where)
+void rectangle_class_init(as_object& where)
 {
 	// Register _global.Rectangle
 	string_table& st = where.getVM().getStringTable();

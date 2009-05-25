@@ -24,7 +24,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global DropShadowFilter class
-void DropShadowFilter_class_init(as_object& global);
+void dropshadowfilter_class_init(as_object& global);
 
 } // end of gnash namespace
 

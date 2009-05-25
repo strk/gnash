@@ -31,7 +31,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global TextRenderer class
-void TextRenderer_class_init(as_object& global);
+void textrenderer_class_init(as_object& global);
 
 /// Return a TextRenderer instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_TextRenderer_instance();

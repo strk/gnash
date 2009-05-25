@@ -33,6 +33,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/asobj \
+	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libcore/vm \
@@ -129,7 +130,7 @@ libgnashcore_la_SOURCES = \
 if ENABLE_AVM2
 libgnashcore_la_SOURCES += \
 	abc_function.cpp \
-	asMethod.cpp
+	asMethod.cpp \
 	$(NULL)
 endif
 

@@ -25,13 +25,14 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/asobj \
+	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/parser \
-    -I$(top_srcdir)/libbase \
-    -I$(top_srcdir)/libamf \
-    -I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-    -I$(top_srcdir)/libltdl \
+	-I$(top_srcdir)/libltdl \
 	$(GLIB_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -53,28 +54,28 @@ libgnashvm_la_SOURCES += \
 	$(NULL)
 endif
 
-noinst_HEADERS =		\
-	ASHandlers.h		\
-	CodeStream.h		\
-	asName.h			\
-	ActionExec.h		\
-	ExecutableCode.h	\
-	action.h		\
-	with_stack_entry.h 	\
+noinst_HEADERS = \
+	ASHandlers.h \
+	CodeStream.h \
+	asName.h \
+	ActionExec.h \
+	ExecutableCode.h \
+	action.h \
+	with_stack_entry.h \
 	$(NULL)
 
 EXTENSIONS_API = \
-	fn_call.h		\
+	fn_call.h \
 	CallStack.h \
-	SafeStack.h			\
-	VM.h			\
-	Machine.h			\
+	SafeStack.h \
+	VM.h \
+	Machine.h \
 	$(NULL)
-	
+
 if ENABLE_AVM2
 noinst_HEADERS += \
-	asName.h			\
-	CodeStream.h		\
+	asName.h \
+	CodeStream.h \
 	Machine.h \
 	$(NULL)
 endif

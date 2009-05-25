@@ -75,7 +75,7 @@ BlurFilter_as::registerCtor(as_object& global)
 }
 
 void
-BlurFilter_class_init(as_object& global)
+blurfilter_class_init(as_object& global)
 {
     BlurFilter_as::registerCtor(global);
 }

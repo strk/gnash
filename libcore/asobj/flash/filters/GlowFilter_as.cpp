@@ -86,7 +86,7 @@ GlowFilter_as::registerCtor(as_object& global) {
 }
 
 void
-GlowFilter_class_init(as_object& global)
+glowfilter_class_init(as_object& global)
 {
     GlowFilter_as::registerCtor(global);
 }
