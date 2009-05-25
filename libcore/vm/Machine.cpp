@@ -648,7 +648,8 @@ Machine::execute()
                 ///  a -- an object
                 /// Stack Out:
                 ///  .
-                /// Do: If a >= b move by jump in stream, as ABC_ACTION_JUMP does.
+                /// Do: If a >= b move by jump in stream, as ABC_ACTION_JUMP
+                /// does.
                 case SWF::ABC_ACTION_IFGE:
                 {
                     bool truth;
@@ -665,10 +666,12 @@ Machine::execute()
                 ///  a -- an object
                 /// Stack Out:
                 ///  .
-                /// Do: If a == b (strictly), move by jump in stream, as ABC_ACTION_JUMP
+                /// Do: If a == b (strictly), move by jump in stream, as
+                /// ABC_ACTION_JUMP
                 case SWF::ABC_ACTION_IFSTRICTEQ:
                 {
-                    bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
+                    bool truth = abstractEquality(mStack.top(1), mStack.top(0),
+                            true);
                     mStack.drop(2);
                     JUMPIF(truth);
                     break;
@@ -751,6 +754,7 @@ Machine::execute()
                 /// If 0x1C, start a new base if the previous one was global.
                 case SWF::ABC_ACTION_PUSHWITH:
                 {
+                    log_unimpl("ABC_ACTION_PUSHWITH");
                     // A scope object is just a regular object.
             // 		ENSURE_OBJECT(mStack.top(0));
             // 		as_object *a = mStack.top(0).to_object().get();
@@ -779,14 +783,7 @@ Machine::execute()
                 ///  shallower than the base's depth.
                 case SWF::ABC_ACTION_POPSCOPE:
                 {
-                    log_unimpl("ABC_ACTION_POPSCOPE");
                     pop_scope_stack();
-                    // 	Scope &s = mScopeStack.pop();
-                    // 	mScopeStack.setDownstop(s.mHeightAfterPop);
-                    // 	if (mScopeStack.empty())
-                    // 		mCurrentScope = NULL;
-                    // 	else
-                    // 		mCurrentScope = mScopeStack.top(0).mScope;
                     break;
                 }
 
