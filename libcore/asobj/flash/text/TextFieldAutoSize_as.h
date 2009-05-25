@@ -41,4 +41,4 @@ as_object* getTextFieldAutoSizeInterface();
 
 }
 
-#endif // GNASH_TEXTFIELDAUTOSIZE_AS_H
+#endif // GNASH_INT_AS_H

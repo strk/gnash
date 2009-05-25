@@ -93,7 +93,8 @@ DefineShapeTag::display(const DisplayObject& inst) const
 
 void
 DefineShapeTag::markReachableResources() const
-{}
+{
+}
 
 } // namespace SWF
 } // namespace gnash

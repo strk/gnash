@@ -1896,6 +1896,14 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 }
 
 bool
+MovieClip::trackAsMenu()
+{
+    as_value track;
+    string_table& st = _vm.getStringTable();
+    return (get_member(st.find("trackAsMenu"), &track) && track.to_bool());
+}
+
+bool
 MovieClip::mouseEnabled() const
 {
     if ( ! isEnabled() ) return false;

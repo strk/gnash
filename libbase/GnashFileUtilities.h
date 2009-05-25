@@ -35,6 +35,7 @@
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <dirent.h>
+# include <cerrno>
 #else
 #include <io.h>
 #define dup _dup
@@ -49,8 +50,16 @@ namespace gnash {
     /// On non-POSIX systems, just create the directory.
     inline int mkdirUserPermissions(const std::string& dirname)
     {
-#if !defined(_WIN32) && !defined(_MSC_VER)
+#if !defined(_WIN32) && !defined(_MSC_VER) && !defined(__amigaos4__)
         return mkdir(dirname.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+#elif defined(__amigaos4__)
+      // on AmigaOS4 if you try to create a directory that is an assign or a drive
+      // you will receive an EINVAL instead of EEXIST and so will force it
+      int ret = 0;
+      ret =  mkdir(dirname.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+      if (errno == EINVAL)
+          errno = EEXIST;
+      return ret;
 #else
         return mkdir(dirname.c_str());
 #endif

@@ -836,10 +836,6 @@ as_object::instanceOf(as_object* ctor)
 {
 //#define GNASH_DEBUG_INSTANCE_OF 1
 
-        if (!ctor) {
-            log_error("%s: ctor shouldn't be zero!", __PRETTY_FUNCTION__);
-             return false;
-        }
 	as_value protoVal;
 	if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal) )
 	{

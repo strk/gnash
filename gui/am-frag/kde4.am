@@ -38,6 +38,14 @@ kde4_gnash_SOURCES = $(GUI_SRCS) GuiKde4.cpp
 kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 kde4_gnash_LDADD = $(MYSQL_LIBS) $(GNASH_LIBS) $(AM_LDFLAGS) $(KDE4_LIBS)
 
+if BUILD_OGL_RENDERER
+kde4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+kde4_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+	$(QT4_LIBS) $(OGL_LIBS) -lQtOpenGL
+kde4_gnash_SOURCES += Kde4GlueOgl.cpp Kde4GlueOgl.h \
+	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
+endif                           # BUILD_OGL_RENDERER
+
 if BUILD_AGG_RENDERER
 kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \

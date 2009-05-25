@@ -15,39 +15,50 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_KDE4_GLUE_H
-#define GNASH_KDE4_GLUE_H
+#ifndef GNASH_KDE4_AGG_GLUE_H
+#define GNASH_KDE4_AGG_GLUE_H
+
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h"
-#include <QWidget>
+#include "Kde4Glue.h"
+
+#include <QImage>
+#include <boost/scoped_array.hpp>
+#include <QPainter>
 #include "snappingrange.h"
 
+class QRect;
 
 namespace gnash
 {
 
-class Kde4Glue
+class Kde4OglGlue : public Kde4Glue
 {
   public:
-    Kde4Glue() : _drawing_area(NULL) {}
-    virtual ~Kde4Glue() { }
-    virtual bool init(int argc, char **argv[]) = 0;
+    Kde4OglGlue();
+    ~Kde4OglGlue();
+    
+    bool init(int argc, char **argv[]);
+    void prepDrawingArea(QWidget *drawing_area);
+    render_handler* createRenderHandler();
+    void render();
+    void render(const QRect& updateRect);
 
-    virtual void prepDrawingArea(QWidget *drawing_area) = 0;
-    virtual render_handler* createRenderHandler() = 0;
-    virtual void render() = 0;
-    virtual void render(const QRect& updateRect) = 0;
-    virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}
-    virtual void resize(int, int) {}
-    virtual void initBuffer(int, int) {}
-  protected:
-    QWidget     *_drawing_area;
+  private:
+    int _width;
+    int _height;
+    boost::scoped_array<unsigned char> _offscreenbuf;
+    render_handler* _renderer; // We don't own this pointer.
+    std::auto_ptr<QImage> _image;
+    std::auto_ptr<QPainter> _painter;
 };
 
-} // namespace gnash
+
+
+
+}
 
 #endif

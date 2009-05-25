@@ -35,6 +35,7 @@ class as_object;
 class abc_block;
 class asName;
 class Property;
+class CodeStream;
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
@@ -295,12 +296,16 @@ private:
 		print_scope_stack();
 	}
 
-	boost::intrusive_ptr<as_object> pop_scope_stack(){
-		log_abc("Poping value off the scope stack.  There will be %u items left.",mScopeStack.size()-1);
+	boost::intrusive_ptr<as_object> pop_scope_stack() {
+		log_abc("Popping value off the scope stack.  There will be "
+                "%u items left.",mScopeStack.size()-1);
 		return mScopeStack.pop();
 	}
-	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth){
-		log_abc("Geting value from scope stack %u from the bottom.",depth | 0x0);
+
+	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth)
+        const {
+		log_abc("Getting value from scope stack %u from the bottom.",
+                depth | 0x0);
 		return mScopeStack.value(depth);
 	}
 

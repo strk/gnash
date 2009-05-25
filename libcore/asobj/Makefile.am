@@ -165,7 +165,7 @@ endif
 
 # These makefile fragments build the ActionScript library for
 # Gnash, and supports both AS2 as well as AS3, so we always
-# want to build it,.
+# want to build.
 include $(srcdir)/flash/accessibility/accessibility.am
 include $(srcdir)/flash/data/data.am
 include $(srcdir)/flash/desktop/desktop.am

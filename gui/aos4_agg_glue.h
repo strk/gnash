@@ -47,15 +47,22 @@ namespace gnash
     	void 			 render(int minx, int miny, int maxx, int maxy);
 	    void 			 setInvalidatedRegions(const InvalidatedRanges& ranges);
 		struct Window 	*getWindow(void);
+		void			 setFullscreen();
+		void			 unsetFullscreen();
 		void 			 resize(int width, int height);
+		void 			 saveOrigiginalDimension(int width, int height);
 	 private:
     	geometry::Range2d<int> _validbounds;
 	    std::vector< geometry::Range2d<int> > _drawbounds;
     	unsigned char   	*_offscreenbuf;
 	    render_handler  	*_agg_renderer;
     	struct Window   	*_window;
-    	int 			 	 _width;
+    	struct Screen		*_screen;
+		bool 				 _fullscreen;
+		int 			 	 _width;
+    	int 			 	 _orig_width;
 	    int				 	 _height;
+	    int				 	 _orig_height;
     	int				 	 _stride;
 		int				 	 _btype;
 		RGBFTYPE		 	 _ftype;

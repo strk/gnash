@@ -1,6 +1,6 @@
 // FileReference_as.cpp:  ActionScript "FileReference" class, for Gnash.
 //
-//   Copyright (C) 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,208 +21,232 @@
 #include "gnashconfig.h"
 #endif
 
-#include "net/FileReference_as.h"
+#include "FileReference_as.h"
+#include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "Object.h" // for AS inheritance
+#include "VM.h" // for addStatics
+
+#include <sstream>
 
 namespace gnash {
 
-// Forward declarations
-namespace {
-    as_value filereference_cancel(const fn_call& fn);
-    as_value filereference_download(const fn_call& fn);
-    as_value filereference_upload(const fn_call& fn);
-    as_value filereference_complete(const fn_call& fn);
-    as_value filereference_httpStatus(const fn_call& fn);
-    as_value filereference_ioError(const fn_call& fn);
-    as_value filereference_open(const fn_call& fn);
-    as_value filereference_progress(const fn_call& fn);
-    as_value filereference_securityError(const fn_call& fn);
-    as_value filereference_select(const fn_call& fn);
-    as_value filereference_uploadCompleteData(const fn_call& fn);
-    as_value filereference_ctor(const fn_call& fn);
-    void attachFileReferenceInterface(as_object& o);
-    void attachFileReferenceStaticInterface(as_object& o);
-    as_object* getFileReferenceInterface();
+static as_value FileReference_addListener(const fn_call& fn);
+static as_value FileReference_browse(const fn_call& fn);
+static as_value FileReference_cancel(const fn_call& fn);
+static as_value FileReference_download(const fn_call& fn);
+static as_value FileReference_removeListener(const fn_call& fn);
+static as_value FileReference_upload(const fn_call& fn);
+static as_value FileReference_creationDate_getset(const fn_call& fn);
+static as_value FileReference_creator_getset(const fn_call& fn);
+static as_value FileReference_modificationDate_getset(const fn_call& fn);
+static as_value FileReference_name_getset(const fn_call& fn);
+static as_value FileReference_size_getset(const fn_call& fn);
+static as_value FileReference_type_getset(const fn_call& fn);
 
-}
 
-// extern (used by Global.cpp)
-void filereference_class_init(as_object& global)
-{
-    static boost::intrusive_ptr<builtin_function> cl;
+as_value FileReference_ctor(const fn_call& fn);
 
-    if (!cl) {
-        cl = new builtin_function(&filereference_ctor, getFileReferenceInterface());
-        attachFileReferenceStaticInterface(*cl);
-    }
-
-    // Register _global.FileReference
-    global.init_member("FileReference", cl.get());
-}
-
-namespace {
-
-void
+static void
 attachFileReferenceInterface(as_object& o)
 {
-    o.init_member("cancel", new builtin_function(filereference_cancel));
-    o.init_member("download", new builtin_function(filereference_download));
-    o.init_member("upload", new builtin_function(filereference_upload));
-    o.init_member("cancel", new builtin_function(filereference_cancel));
-    o.init_member("complete", new builtin_function(filereference_complete));
-    o.init_member("httpStatus", new builtin_function(filereference_httpStatus));
-    o.init_member("ioError", new builtin_function(filereference_ioError));
-    o.init_member("open", new builtin_function(filereference_open));
-    o.init_member("progress", new builtin_function(filereference_progress));
-    o.init_member("securityError", new builtin_function(filereference_securityError));
-    o.init_member("select", new builtin_function(filereference_select));
-    o.init_member("uploadCompleteData", new builtin_function(filereference_uploadCompleteData));
+    o.init_member("addListener", new builtin_function(FileReference_addListener));
+    o.init_member("browse", new builtin_function(FileReference_browse));
+    o.init_member("cancel", new builtin_function(FileReference_cancel));
+    o.init_member("download", new builtin_function(FileReference_download));
+    o.init_member("removeListener", new builtin_function(FileReference_removeListener));
+    o.init_member("upload", new builtin_function(FileReference_upload));
+    o.init_property("creationDate", FileReference_creationDate_getset, FileReference_creationDate_getset);
+    o.init_property("creator", FileReference_creator_getset, FileReference_creator_getset);
+    o.init_property("modificationDate", FileReference_modificationDate_getset, FileReference_modificationDate_getset);
+    o.init_property("name", FileReference_name_getset, FileReference_name_getset);
+    o.init_property("size", FileReference_size_getset, FileReference_size_getset);
+    o.init_property("type", FileReference_type_getset, FileReference_type_getset);
 }
 
-void
-attachFileReferenceStaticInterface(as_object& o)
+static void
+attachFileReferenceStaticProperties(as_object& /*o*/)
 {
-
+   
 }
 
-as_object*
+static as_object*
 getFileReferenceInterface()
 {
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFileReferenceInterface(*o);
-    }
-    return o.get();
+	static boost::intrusive_ptr<as_object> o;
+
+	if ( ! o )
+	{
+		// TODO: check if this class should inherit from Object
+		//       or from a different class
+		o = new as_object(getObjectInterface());
+		VM::get().addStatic(o.get());
+
+		attachFileReferenceInterface(*o);
+
+	}
+
+	return o.get();
 }
+
+class FileReference_as: public as_object
+{
+
+public:
+
+	FileReference_as()
+		:
+		as_object(getFileReferenceInterface())
+	{}
+
+	// override from as_object ?
+	//std::string get_text_value() const { return "FileReference"; }
+
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
+
+
+static as_value
+FileReference_addListener(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_browse(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_cancel(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_download(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_removeListener(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_upload(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_creationDate_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_creator_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_modificationDate_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_name_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_size_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_type_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+
 
 as_value
-filereference_cancel(const fn_call& fn)
+FileReference_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
+	boost::intrusive_ptr<as_object> obj = new FileReference_as;
+
+	if ( fn.nargs )
+	{
+		std::stringstream ss;
+		fn.dump_args(ss);
+		LOG_ONCE( log_unimpl("FileReference(%s): %s", ss.str(), _("arguments discarded")) );
+	}
+
+	return as_value(obj.get()); // will keep alive
 }
 
-as_value
-filereference_download(const fn_call& fn)
+// extern 
+void filereference_class_init(as_object& where)
 {
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
+	// This is going to be the FileReference "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&FileReference_ctor, getFileReferenceInterface());
+	attachFileReferenceStaticProperties(*cl);
+
+	// Register _global.FileReference
+	where.init_member("FileReference", cl.get());
 }
 
-as_value
-filereference_upload(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_complete(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_httpStatus(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_ioError(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_open(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_progress(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_securityError(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_select(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_uploadCompleteData(const fn_call& fn)
-{
-    boost::intrusive_ptr<FileReference_as> ptr =
-        ensureType<FileReference_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-filereference_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new FileReference_as;
-
-    return as_value(obj.get()); // will keep alive
-}
-
-} // anonymous namespace 
-} // gnash namespace
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
-
+} // end of gnash namespace

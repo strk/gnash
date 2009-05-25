@@ -53,10 +53,8 @@ public:
 	T& top(StackSize i)
 	{
 
-		if (i >= size()) 
-			throw StackException();
+		if (i >= size()) throw StackException();
 		StackSize offset = mEnd - i;
-		//log_debug("top(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
@@ -64,33 +62,26 @@ public:
 	/// bottommost value.
 	T& value(StackSize i)
 	{
-		if (i >= size())
-			throw StackException();
+		if (i >= size()) throw StackException();
 
 		StackSize offset = mDownstop + i + 2;
-		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
 	const T& value(StackSize i) const
 	{
-		if (i >= size())
-			throw StackException();
+		if (i >= size()) throw StackException();
 
 		StackSize offset = mDownstop + i + 2;
-		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
-
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
 	/// Assign a value to given index counting from bottom.
 	void assign(StackSize i, T val)
 	{ 
-		if (i >= size())
-			throw StackException();
+		if (i >= size()) throw StackException();
 
 		StackSize offset = mDownstop + i + 2;
-		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		mData[offset >> mChunkShift][offset & mChunkMod] = val;
 	}
 
@@ -98,20 +89,33 @@ public:
 	/// previously given, it just sets the top for pop, push, and top
 	/// operations.
 	void drop(StackSize i)
-	{ if (i > size()) throw StackException(); mEnd -= i; }
+    {
+        if (i > size()) throw StackException();
+        mEnd -= i;
+    }
 
 	/// Drop all stack elements reguardless of the "downstop"
 	void clear()
-	{ mDownstop=0; mEnd=1; }
+	{
+        mDownstop = 0;
+        mEnd = 1;
+    }
 
 	/// Put a new value onto the top of the stack.  The value will be
 	/// copied.
 	void push(const T t)
-	{ grow(1); top(0) = t; }
+	{
+        grow(1);
+        top(0) = t;
+    }
 
 	/// Pop the top of the stack.
 	T& pop()
-	{	T& ret = top(0); drop(1); return ret; }
+	{
+        T& ret = top(0);
+        drop(1);
+        return ret;
+    }
 
 	/// Grow by i entries. Normally this is 1, but there might be sometime
 	/// when you need more than that.
@@ -121,7 +125,7 @@ public:
 		StackSize n = size()+i;
 		while (available < n)
 		{
-//			log_debug("Increasing size of the real stack: %d.",mData.size());
+            //log_debug("Increasing size of the real stack: %d.",mData.size());
 			mData.push_back(new T[1 << mChunkShift]);
 			available += 1 << mChunkShift;
 		}
@@ -130,10 +134,12 @@ public:
 
 	/// Gives the size of the stack which is currently accessible.
 	StackSize getDownstop() const 
-	{ return mDownstop; }
+	{
+        return mDownstop;
+    }
 
 	/// Alias for getDownstop()
-	StackSize size() const { return mEnd - mDownstop - 1; /*mEnd is one past end*/ }
+	StackSize size() const { return mEnd - mDownstop - 1; }
 
 	/// Is the stack empty to us? (Check totalSize() != for actually empty)
 	bool empty() const { return size() == 0; }
@@ -142,12 +148,19 @@ public:
 	/// to simulate multiple stacks with a single stack, as in function
 	/// calling. Returns the old downstop for restoring it using setDownstop.
 	StackSize fixDownstop() 
-	{ StackSize ret = mDownstop; mDownstop = mEnd-1; return ret; }
+	{
+        StackSize ret = mDownstop;
+        mDownstop = mEnd - 1;
+        return ret;
+    }
 
 	/// Makes the stack read to a depth of 'i'. This cannot be more than
 	/// totalSize()
 	void setDownstop(StackSize i)
-	{ if (i > mEnd) throw StackException(); mDownstop = i; }
+	{
+        if (i > mEnd) throw StackException();
+        mDownstop = i;
+    }
 
 	/// The total size of the stack. This is not what can be read. That
 	/// value is given by size()
@@ -160,17 +173,18 @@ public:
 	/// Set the total size and local size of the stack, for restoring a
 	/// stack through unknown changes.
 	void setAllSizes(StackSize total, StackSize downstop)
-	{ mEnd = total + 1; mDownstop = downstop; }
+	{
+        mEnd = total + 1;
+        mDownstop = downstop;
+    }
 
 	/// Default constructor.
-	SafeStack() : mData(), mDownstop(0), mEnd(1)
-	{ /**/ }
+	SafeStack() : mData(), mDownstop(0), mEnd(1) {}
 
 	/// Delete the allocated data. 
 	~SafeStack()
 	{
-		for (StackSize i = 0; i < mData.size(); ++i)
-			delete [] mData[i];
+		for (StackSize i = 0; i < mData.size(); ++i) delete [] mData[i];
 	}
 
 private:
@@ -184,4 +198,4 @@ private:
 };
 
 } // namespace gnash
-#endif /* GNASH_SAFESTACK_H */
+#endif 

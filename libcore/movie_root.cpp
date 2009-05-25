@@ -1017,20 +1017,23 @@ movie_root::advance()
 
     try {
 
-	    if ((now - _lastMovieAdvancement) >= _movieAdvancementDelay)
+        int elapsed = now - _lastMovieAdvancement;
+	    if (elapsed >= _movieAdvancementDelay)
 	    {
             advanced = true;
 		    advanceMovie();
-		    // setting to 'now' discards time spent on actual rendering and
-		    // action processing.
-		    // if rendering and action processing takes too much time
-		    // we'll always be late here, so FPS will effectively be
-		    // slower. Might add a check here allowing a tolerance
-		    // and printing a warnign when we're later then tolerated...
-		    //
-		    _lastMovieAdvancement = now; // or _vm.getTime(); ?
+
+		    // To catch-up lateness we pretend we advanced when 
+            // was time for it. 
+            // NOTE:
+            //   now - _lastMovieAdvancement
+            // gives you actual lateness in milliseconds
+            //
+            _lastMovieAdvancement += _movieAdvancementDelay;
 
 	    }
+
+        //log_debug("Latenss: %d", now-_lastMovieAdvancement);
         
         executeAdvanceCallbacks();
 	    

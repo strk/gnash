@@ -138,14 +138,19 @@ RcInitFile::loadFiles()
     // Check the default system location
     std::string loadfile = SYSCONFDIR;
 
-#ifndef __OS2__ 
+#if !defined(__OS2__ ) && ! defined(__amigaos4__)
     // On OS/2 only look in %HOME%
     loadfile.append("/gnashrc");
     parseFile(loadfile);
 #endif
     
     // Check the users home directory
-    char *home = std::getenv("HOME");
+#ifndef __amigaos4__
+        char *home = std::getenv("HOME");
+#else
+		//on AmigaOS we have a GNASH: assign that point to program dir
+        char *home = "/gnash";
+#endif
     if (home) {
         loadfile = home;
         loadfile.append("/.gnashrc");

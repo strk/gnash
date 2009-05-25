@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Kde4Gui.h'
 **
-** Created: Sun Apr 12 21:07:39 2009
+** Created: Fri May 22 20:44:55 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -47,7 +47,7 @@ static const char qt_meta_stringdata_gnash__DrawingWidget[] = {
 };
 
 const QMetaObject gnash::DrawingWidget::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_gnash__DrawingWidget,
+    { &BaseWidget::staticMetaObject, qt_meta_stringdata_gnash__DrawingWidget,
       qt_meta_data_gnash__DrawingWidget, 0 }
 };
 
@@ -61,12 +61,12 @@ void *gnash::DrawingWidget::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_gnash__DrawingWidget))
         return static_cast<void*>(const_cast< DrawingWidget*>(this));
-    return QWidget::qt_metacast(_clname);
+    return BaseWidget::qt_metacast(_clname);
 }
 
 int gnash::DrawingWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWidget::qt_metacall(_c, _id, _a);
+    _id = BaseWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
