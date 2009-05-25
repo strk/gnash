@@ -254,7 +254,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
     int num_line_bits = (num_bits & 0x0F);
     
     IF_VERBOSE_PARSE(
-        log_parse(_("  ShapeRecord(%s): fillbits = %d, nlinebits = %d"),
+        log_parse(_("  ShapeRecord(%s): fillbits %d, linebits %d"),
             tag, num_fill_bits, num_line_bits);
     );
     
@@ -487,7 +487,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
                 current_path.setLineStyle(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(
-                    log_parse(_("  Shape_read: line = %d"), 
+                    log_parse(_("ShapeRecord: line %d"), 
                         current_path.getLineStyle());
                 )
 #endif
@@ -503,7 +503,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
                     continue;
                 }
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  Shape read: more fill styles"));
+                    log_parse(_("ShapeRecord: more fill styles"));
                 );
     
                 // Store the current path if any.
@@ -547,7 +547,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
     
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  Shape read: curved edge   = "
+                    log_parse(_("ShapeRecord: curved edge "
                             "%d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
                 );
 #endif
@@ -589,7 +589,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
     
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                     log_parse(_("  Shape_read: straight edge = "
+                     log_parse(_("ShapeRecord: straight edge "
                              "%d %d - %d %d"), x, y, x + dx, y + dy);
                 );
 #endif
@@ -614,7 +614,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
         computeBounds(computedBounds, _paths, _lineStyles, m->get_version());
         if ( computedBounds != m_bounds )
         {
-            log_debug("Shape DisplayObject read for tag %d contained embedded "
+            log_debug("Shape object read for tag %d contained embedded "
                     "bounds %s, while we computed bounds %s",
                     tag, m_bound, computedBounds);
         }
