@@ -46,6 +46,11 @@ static as_value
 int_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new int_as_object();
+
+    if ( fn.nargs )
+    {
+        LOG_ONCE( log_unimpl("Arguments passed to int() ctor unhandled") );
+    }
 	
 	return as_value(obj.get()); // will keep alive
 }
