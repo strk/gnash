@@ -163,9 +163,9 @@ libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
 				$(SDL_LIBS)
 endif
 
-if ENABLE_AVM2
-
-# These classes are in the flash namespace
+# These makefile fragments build the ActionScript library for
+# Gnash, and supports both AS2 as well as AS3, so we always
+# want to build it,.
 include $(srcdir)/flash/accessibility/accessibility.am
 include $(srcdir)/flash/data/data.am
 include $(srcdir)/flash/desktop/desktop.am
@@ -196,8 +196,6 @@ noinst_HEADERS += \
 	flash/flash_pkg.h \
 	flash/flashclasses.h \
 	$(NULL)
-
-endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
