@@ -66,6 +66,7 @@ check(Bitmap.prototype.hasOwnProperty("transparent"));
 
 check(!Bitmap.prototype.hasOwnProperty('loadBitmap'));
 check(Bitmap.hasOwnProperty('loadBitmap'));
+
 //-------------------------------------------------------------
 // Test constructor
 //-------------------------------------------------------------
@@ -146,6 +147,50 @@ check_equals(bmp.height, undefined);
 bmp = new Bitmap(-1, 10, false, 0xff);
 xcheck_equals(bmp, undefined);
 check_equals(bmp.height, undefined);
+
+// --------------------
+// setPixel, setPixel32
+// --------------------
+
+tr = new Bitmap(30, 30, true);
+ntr = new Bitmap(30, 30, false);
+
+tr.setPixel32(2, 2, 0x44);
+check_equals(tr.getPixel(2, 2), 0x00);
+check_equals(tr.getPixel32(2, 2), 0);
+
+// Premultiplication?
+tr.setPixel32(2, 2, 0x220000aa);
+check_equals(tr.getPixel(2, 2), 0xac);
+check_equals(tr.getPixel32(2, 2), 0x220000ac);
+
+tr.setPixel32(2, 2, 0xff0000aa);
+check_equals(tr.getPixel(2, 2), 0xaa);
+check_equals(tr.getPixel32(2, 2), -16777046);
+
+tr.setPixel(3, 3, 0xff);
+check_equals(tr.getPixel(3, 3), 0xff);
+check_equals(tr.getPixel32(3, 3), -16776961);
+
+tr.setPixel32(4, 4, 0x44444444);
+check_equals(tr.getPixel(4, 4), 0x434343);
+check_equals(tr.getPixel32(4, 4), 0x44434343);
+
+tr.setPixel32(4, 4, 0x10101010);
+check_equals(tr.getPixel(4, 4), 0x101010);
+check_equals(tr.getPixel32(4, 4), 0x10101010);
+
+tr.setPixel32(4, 4, 0x43434343);
+check_equals(tr.getPixel(4, 4), 0x444444);
+check_equals(tr.getPixel32(4, 4), 0x43444444);
+
+ntr.setPixel(5, 5, 0xff);
+check_equals(ntr.getPixel(5, 5), 0xff);
+check_equals(ntr.getPixel32(5, 5), -16776961);
+
+ntr.setPixel32(6, 6, 0x44444444);
+check_equals(ntr.getPixel(6, 6), 0x444444);
+check_equals(ntr.getPixel32(6, 6), -12303292);
 
 // floodFill
 bmp = new Bitmap(20, 20, false);
