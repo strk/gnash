@@ -86,6 +86,8 @@ public:
 
 	bool mouseEnabled() const { return true; }
 
+    virtual bool trackAsMenu();
+
 	// called from keypress listener only
 	bool on_event(const event_id& id);
 

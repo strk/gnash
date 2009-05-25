@@ -60,6 +60,11 @@ public:
     ///             events
 	virtual bool mouseEnabled() const = 0;
 
+    /// ActionScript property of Buttons and MovieClips altering mouse handling
+    virtual bool trackAsMenu() {
+        return false;
+    }
+
     /// Allow extraction of static text.
     //
     /// Default returns 0, implemented only for DefineText though
