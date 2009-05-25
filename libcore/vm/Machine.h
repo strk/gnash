@@ -35,6 +35,7 @@ class as_object;
 class abc_block;
 class asName;
 class Property;
+class CodeStream;
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
