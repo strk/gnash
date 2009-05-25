@@ -525,7 +525,8 @@ BitmapData_scroll(const fn_call& fn)
 as_value
 BitmapData_setPixel(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -534,7 +535,8 @@ BitmapData_setPixel(const fn_call& fn)
 as_value
 BitmapData_setPixel32(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -552,12 +554,14 @@ BitmapData_threshold(const fn_call& fn)
 as_value
 BitmapData_height(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 
     // Read-only
     if (fn.nargs) return as_value();
     
-    // Returns the immutable height of the bitmap or -1 if dispose() has been called.
+    // Returns the immutable height of the bitmap or -1 if dispose() has
+    // been called.
     if (ptr->getBitmapData().empty()) return -1;
 	return as_value(ptr->getHeight());
 }
@@ -598,7 +602,8 @@ BitmapData_rectangle(const fn_call& fn)
 as_value
 BitmapData_transparent(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -611,7 +616,8 @@ BitmapData_transparent(const fn_call& fn)
 as_value
 BitmapData_width(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -626,7 +632,8 @@ BitmapData_width(const fn_call& fn)
 as_value
 BitmapData_loadBitmap(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -644,8 +651,7 @@ as_value
 BitmapData_ctor(const fn_call& fn)
 {
 
-	if ( fn.nargs < 2)
-	{
+	if (fn.nargs < 2) {
 	    // TODO: should fail if not enough arguments are passed.
         return as_value();
 	}
@@ -684,15 +690,18 @@ attachBitmapDataInterface(as_object& o)
 {
     o.init_member("applyFilter", new builtin_function(BitmapData_applyFilter));
     o.init_member("clone", new builtin_function(BitmapData_clone));
-    o.init_member("colorTransform", new builtin_function(BitmapData_colorTransform));
+    o.init_member("colorTransform", new builtin_function(
+                BitmapData_colorTransform));
     o.init_member("copyChannel", new builtin_function(BitmapData_copyChannel));
     o.init_member("copyPixels", new builtin_function(BitmapData_copyPixels));
     o.init_member("dispose", new builtin_function(BitmapData_dispose));
     o.init_member("draw", new builtin_function(BitmapData_draw));
     o.init_member("fillRect", new builtin_function(BitmapData_fillRect));
     o.init_member("floodFill", new builtin_function(BitmapData_floodFill));
-    o.init_member("generateFilterRect", new builtin_function(BitmapData_generateFilterRect));
-    o.init_member("getColorBoundsRect", new builtin_function(BitmapData_getColorBoundsRect));
+    o.init_member("generateFilterRect", new builtin_function(
+                BitmapData_generateFilterRect));
+    o.init_member("getColorBoundsRect", new builtin_function(
+                BitmapData_getColorBoundsRect));
     o.init_member("getPixel", new builtin_function(BitmapData_getPixel));
     o.init_member("getPixel32", new builtin_function(BitmapData_getPixel32));
     o.init_member("hitTest", new builtin_function(BitmapData_hitTest));
@@ -700,14 +709,16 @@ attachBitmapDataInterface(as_object& o)
     o.init_member("noise", new builtin_function(BitmapData_noise));
     o.init_member("paletteMap", new builtin_function(BitmapData_paletteMap));
     o.init_member("perlinNoise", new builtin_function(BitmapData_perlinNoise));
-    o.init_member("pixelDissolve", new builtin_function(BitmapData_pixelDissolve));
+    o.init_member("pixelDissolve", new builtin_function(
+                BitmapData_pixelDissolve));
     o.init_member("scroll", new builtin_function(BitmapData_scroll));
     o.init_member("setPixel", new builtin_function(BitmapData_setPixel));
     o.init_member("setPixel32", new builtin_function(BitmapData_setPixel32));
     o.init_member("threshold", new builtin_function(BitmapData_threshold));
     o.init_property("height", BitmapData_height, BitmapData_height);
     o.init_property("rectangle", BitmapData_rectangle, BitmapData_rectangle);
-    o.init_property("transparent", BitmapData_transparent, BitmapData_transparent);
+    o.init_property("transparent", BitmapData_transparent,
+            BitmapData_transparent);
     o.init_property("width", BitmapData_width, BitmapData_width);
 
 }
@@ -724,15 +735,11 @@ getBitmapDataInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
 
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
+	if (!o) {
 		o = new as_object(getObjectInterface());
 		VM::get().addStatic(o.get());
 
 		attachBitmapDataInterface(*o);
-
 	}
 
 	return o.get();
