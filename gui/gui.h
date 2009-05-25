@@ -475,6 +475,7 @@ private:
     
 #ifdef GNASH_FPS_DEBUG
     unsigned int fps_counter;
+
     float fps_rate_min, fps_rate_max;   
 
     // Number of calls to fpsCounterTick, which is also
@@ -489,6 +490,9 @@ private:
     ///
     float fps_timer_interval;
     
+    /// Number of frames rendering of which was dropped
+    unsigned int frames_dropped;
+
     /// \brief
     /// Should be called on every frame advance (including inter-frames caused
     /// by mouse events).
@@ -498,12 +502,6 @@ private:
     void fpsCounterTick();
 
 #endif // def GNASH_FPS_DEBUG
-
-#ifdef SKIP_RENDERING_IF_LATE
-    /// Estimated max number of milliseconds required for a call to ::display
-    /// This should be incremented everytime we take more
-    boost::uint32_t estimatedDisplayTime;
-#endif // SKIP_RENDERING_IF_LATE
 
     VariableMap _flashVars;
 

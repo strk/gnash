@@ -39,10 +39,6 @@
 #include <cstring>
 #include <algorithm> // std::max, std::min
 
-#ifdef SKIP_RENDERING_IF_LATE
-#include "WallClockTimer.h"
-#endif
-
 /// Define this to make sure each frame is fully rendered from ground up
 /// even if no motion has been detected in the movie.
 //#define FORCE_REDRAW 1
@@ -95,10 +91,8 @@ Gui::Gui() :
     ,fps_counter_total(0)
     ,fps_timer(0)
     ,fps_timer_interval(0.0)
+    ,frames_dropped(0)
 #endif
-#ifdef SKIP_RENDERING_IF_LATE
-    ,estimatedDisplayTime(0) // milliseconds (will grow later..)
-#endif // SKIP_RENDERING_IF_LATE
     ,_movieDef(0)
     ,_stage(0)
     ,_stopped(false)
@@ -143,10 +137,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,fps_counter_total(0)    
     ,fps_timer(0)
     ,fps_timer_interval(0.0)
+    ,frames_dropped(0)
 #endif        
-#ifdef SKIP_RENDERING_IF_LATE
-    ,estimatedDisplayTime(0) // milliseconds (will grow later..)
-#endif // SKIP_RENDERING_IF_LATE
     ,_movieDef(0)
     ,_stage(0)
     ,_stopped(false)
@@ -174,7 +166,8 @@ Gui::~Gui()
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG
     if ( fps_timer_interval ) {
-        std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+        std::cerr << "Total frame advances/drops: "
+                  << fps_counter_total << "/" << frames_dropped << std::endl;
     }
 #endif
 }
@@ -935,10 +928,6 @@ Gui::advanceMovie()
   
 
 
-#ifdef SKIP_RENDERING_IF_LATE
-	WallClockTimer advanceTimer;
-#endif // SKIP_RENDERING_IF_LATE
-
 	gnash::movie_root* m = _stage;
 	
 // Define REVIEW_ALL_FRAMES to have *all* frames
@@ -964,47 +953,29 @@ Gui::advanceMovie()
 
 
 
+    // TODO: ask stage about doDisplay ?
+    // - if it didn't advance might need to check updateAfterEvent
+    bool doDisplay = true;
+
 #ifdef SKIP_RENDERING_IF_LATE
-
-	boost::uint32_t advanceTime = advanceTimer.elapsed(); // in milliseconds !
-
-	boost::uint32_t timeSlot = _interval; // milliseconds between advance calls 
-
-	if ( advanceTime+gui->estimatedDisplayTime < timeSlot )
-	{
-		advanceTimer.restart();
-		display(m);
-		boost::uint32_t displayTime = advanceTimer.elapsed();
-
-		if ( displayTime > estimatedDisplayTime)
-		{
-
-			// Don't update estimatedDisplayTime if it's bigger then 
-            // timeSlot*0.8
-			if (  displayTime < timeSlot*0.8 )
-			{
-				// TODO: check for absurdly high values, like we can't set
-				//       estimatedDisplayTime to a value higher then FPS, or
-				//       we'll simply never display...
-				estimatedDisplayTime = displayTime;
-			}
-		}
-	}
-	else
-	{
-		log_debug("We're unable to keep up with FPS speed: "
-			"advanceTime was %u + estimatedDisplayTime (%u) "
-			"== %u, over a timeSlot of %u",
-			advanceTime, estimatedDisplayTime,
-			advanceTime+estimatedDisplayTime, timeSlot);
-		// TODO: increment a counter, we don't want to skip too many frames
-	}
-#else // ndef SKIP_RENDERING_IF_LATE
-
-	display(m);
-
+    // We want to skip rendering IFF it's time to advance again.
+    // We'll ask the stage about it
+    if ( _stage->timeToNextFrame() <= 0 )
+    {
+        if ( doDisplay ) // or should it be if advanced ?
+        {
+            // TODO: take note of a frame drop (count them)
+            //log_debug("Frame rendering dropped due to being late");
+#ifdef GNASH_FPS_DEBUG
+            ++frames_dropped;
+#endif
+        }
+        doDisplay = false;
+    }
 #endif // ndef SKIP_RENDERING_IF_LATE
-	
+
+	if (doDisplay) display(m);
+
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
@@ -1226,9 +1197,11 @@ Gui::fpsCounterTick()
     //log_debug("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
     std::cerr << boost::format("Effective frame rate: %0.2f fps "
                                "(min %0.2f, avg %0.2f, max %0.2f, "
-                               "%u frames in %0.1f secs total)") % rate %
+                               "%u frames in %0.1f secs total, "
+                               "dropped %u)") % rate %
                                fps_rate_min % avg % fps_rate_max %
-                               fps_counter_total % secs_total << std::endl;
+                               fps_counter_total % secs_total %
+                               frames_dropped << std::endl;
       
     fps_counter = 0;
     fps_timer = current_timer;

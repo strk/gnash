@@ -1084,6 +1084,13 @@ movie_root::advanceMovie()
     assert(testInvariant());
 }
 
+int
+movie_root::timeToNextFrame() const
+{
+    unsigned int now = _vm.getTime();
+    int elapsed = now - _lastMovieAdvancement;
+    return _movieAdvancementDelay - elapsed;
+}
 
 void
 movie_root::display()

@@ -369,6 +369,14 @@ public:
     ///
     bool advance();
 
+    /// \brief
+    /// Return the number of milliseconds available before
+    /// it's time to advance the timeline again.
+    //
+    /// Return value can be negative if we're late...
+    ///
+    int timeToNextFrame() const;
+
     /// Entry point for movie advancement
     //
     /// This function does:
