@@ -527,8 +527,23 @@ BitmapData_setPixel(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (fn.nargs < 3) {
+        return as_value();
+    }
+
+    double x = fn.arg(0).to_number();
+    double y = fn.arg(1).to_number();
+    if (x < 0 || y < 0) return as_value();
+    if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
+        return as_value();
+    }
+
+    // Ignore any transparency here.
+    boost::uint32_t color = fn.arg(2).to_int() & 0xffffff;
+
+    ptr->setPixel(x, y, color);
+
 	return as_value();
 }
 
@@ -537,15 +552,31 @@ BitmapData_setPixel32(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (fn.nargs < 3) {
+        return as_value();
+    }
+
+    double x = fn.arg(0).to_number();
+    double y = fn.arg(1).to_number();
+    if (x < 0 || y < 0) return as_value();
+    if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
+        return as_value();
+    }
+
+    // TODO: multiply.
+    boost::uint32_t color = fn.arg(2).to_int();
+
+    ptr->setPixel32(x, y, color);
+
 	return as_value();
 }
 
 as_value
 BitmapData_threshold(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();

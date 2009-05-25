@@ -55,9 +55,27 @@ public:
     {
         return _bitmapData;
     }
-    
-    // Returns an unsigned int representation of the pixel
-    // at (x, y) either with or without transparency.
+ 
+    /// Set a specified pixel to the specified color.
+    //
+    /// Callers must make sure the pixel is in range. Retains transparency
+    /// (which is opaque, for non-transparent BitmapData objects).
+    void setPixel(int x, int y, boost::uint32_t color) {
+        const BitmapArray::size_type index = x * _width + y;
+        _bitmapData[index] = (_bitmapData[index] & 0xff000000) | color;
+    }
+
+    /// Set a specified pixel to the specified color.
+    //
+    /// Callers must make sure the pixel is in range. Set to opaque for
+    /// non-transparent BitmapData objects
+    void setPixel32(int x, int y, boost::uint32_t color) {
+        _bitmapData[x * _width + y] = _transparent ? color : color | 0xff000000;
+    }
+
+
+    /// Returns an unsigned int representation of the pixel
+    /// at (x, y) either with or without transparency.
     boost::int32_t getPixel(int x, int y, bool transparency) const;
 
     void update(const boost::uint8_t* data);
