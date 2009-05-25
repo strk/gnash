@@ -30,10 +30,10 @@ asMethod::asMethod()
     :
     _methodID(0),
     _prototype(0),
-    _bodyLength(0),
-    _isNative(false),
 	_minArguments(0),
 	_maxArguments(0),
+    _bodyLength(0),
+    _isNative(false),
     _implementation(0),
     _flags(0),
     _body(0),
