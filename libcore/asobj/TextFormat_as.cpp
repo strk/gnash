@@ -555,9 +555,9 @@ as_object*
 getTextFormatInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
+	if (!o) {
 		o = new as_object(getObjectInterface());
+        VM::get().addStatic(o.get());
 		attachTextFormatInterface(*o);
 	}
 	return o.get();
