@@ -22,7 +22,7 @@ namespace gnash {
 
 class as_object;
 
-void flash_samplar_package_init(as_object& pkg);
+void flash_sampler_package_init(as_object& pkg);
 
 } // end of gnash namespace
 
