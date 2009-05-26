@@ -87,7 +87,8 @@ libgnashasobjs_la_SOURCES = \
 	XML_as.cpp \
 	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
-	LoadableObject.cpp
+	LoadableObject.cpp \
+	Object.cpp
 
 noinst_HEADERS = \
 	AsBroadcaster.h \
@@ -124,10 +125,8 @@ noinst_HEADERS = \
 	XML_as.h \
 	XMLSocket_as.h \
 	XMLNode_as.h \
-	LoadableObject.h
-
-libgnashasobjs_la_SOURCES += $(srcdir)/flash/Object.cpp
-noinst_HEADERS += $(srcdir)/flash/Object.h
+	LoadableObject.h \
+	Object.h
 
 EXTENSIONS_API = \
 	Array_as.h \
