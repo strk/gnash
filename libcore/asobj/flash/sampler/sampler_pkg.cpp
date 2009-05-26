@@ -29,7 +29,7 @@
 #include "StackFrame_as.h"
 
 #include "sampler_pkg.h"
-#include "samplerclasses.h"
+#include "flashclasses.h"
 
 namespace gnash {
 
