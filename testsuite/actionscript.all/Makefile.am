@@ -90,6 +90,7 @@ ASTESTS =			\
 	Error.as		\
 	ExternalInterface.as	\
 	Function.as		\
+	flash.as		\
 	Global.as		\
 	HitTest.as		\
 	Inheritance.as		\
