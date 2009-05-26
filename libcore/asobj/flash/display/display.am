@@ -42,7 +42,7 @@ endif
 
 # if BUILD_BITMAP_AS3
 # DISPLAY_SOURCES += flash/display/Bitmap_as.cpp
-# DISPLAY_HEADERS += flash/display/Bitmap_as.h
+DISPLAY_HEADERS += flash/display/Bitmap_as.h
 # endif
 
 if BUILD_BLENDMODE_AS3
@@ -127,7 +127,7 @@ endif
 
 # FIXME: already exists
 # DISPLAY_SOURCES += flash/display/MovieClip_as.cpp
-# DISPLAY_HEADERS += flash/display/MovieClip_as.h
+DISPLAY_HEADERS += flash/display/MovieClip_as.h
 # endif
 
 if BUILD_NATIVEMENUITEM_AS3
@@ -228,7 +228,7 @@ endif
 # FIXME: already exists
 # if BUILD_STAGE_AS3
 # DISPLAY_SOURCES += flash/display/Stage_as.cpp
-# DISPLAY_HEADERS += flash/display/Stage_as.h
+DISPLAY_HEADERS += flash/display/Stage_as.h
 # endif
 
 libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES)

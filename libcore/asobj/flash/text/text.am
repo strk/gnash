@@ -81,10 +81,10 @@ TEXT_HEADERS += flash/text/TextFieldType_as.h
 endif
 
 # FIXME: already exists
-# if BUILD_TEXTFIELD_AS3
+if BUILD_TEXTFIELD_AS3
 # TEXT_SOURCES += flash/text/TextField_as.cpp
-# TEXT_HEADERS += flash/text/TextField_as.h
-# endif
+TEXT_HEADERS += flash/text/TextField_as.h
+endif
 
 if BUILD_TEXTFORMATALIGN_AS3
 TEXT_SOURCES += flash/text/TextFormatAlign_as.cpp
@@ -92,10 +92,10 @@ TEXT_HEADERS += flash/text/TextFormatAlign_as.h
 endif
 
 # FIXME: already exists
-# if BUILD_TEXTFORMAT_AS3
+if BUILD_TEXTFORMAT_AS3
 # TEXT_SOURCES += flash/text/TextFormat_as.cpp
-# TEXT_HEADERS += flash/text/TextFormat_as.h
-# endif
+TEXT_HEADERS += flash/text/TextFormat_as.h
+endif
 
 if BUILD_TEXTLINEMETRICS_AS3
 TEXT_SOURCES += flash/text/TextLineMetrics_as.cpp
@@ -108,10 +108,10 @@ TEXT_HEADERS += flash/text/TextRenderer_as.h
 endif
 
 # FIXME: already exists
-# if BUILD_TEXTSNAPSHOT_AS3
+if BUILD_TEXTSNAPSHOT_AS3
 # TEXT_SOURCES += flash/text/TextSnapshot_as.cpp
-# TEXT_HEADERS += flash/text/TextSnapshot_as.h
-# endif
+TEXT_HEADERS += flash/text/TextSnapshot_as.h
+endif
 
 libgnashasobjs_la_SOURCES += $(TEXT_SOURCES)
 noinst_HEADERS +=  $(TEXT_HEADERS) textclasses.h

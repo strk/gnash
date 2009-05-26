@@ -20,20 +20,20 @@ ACCESSIBILITYdir = $(includedir)/gnash
 ACCESSIBILITY_SOURCES = flash/accessibility/accessibility_pkg.cpp
 ACCESSIBILITY_HEADERS = flash/accessibility/accessibility_pkg.h
 
-# if BUILD_ACCIMPL_AS3
+if BUILD_ACCIMPL_AS3
 # ACCESSIBILITY_SOURCES += flash/accessibility/AccImpl_as.cpp
 # ACCESSIBILITY_HEADERS += flash/accessibility/AccImpl_as.h
-# endif
+endif
 
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
 ACCESSIBILITY_SOURCES += flash/accessibility/AccessibilityProperties_as.cpp
 ACCESSIBILITY_HEADERS += flash/accessibility/AccessibilityProperties_as.h
 endif
 
-# if BUILD_ACCESSIBILITY_AS3
+if BUILD_ACCESSIBILITY_AS3
 # ACCESSIBILITY_SOURCES += flash/accessibility/Accessibility_as.cpp
-# ACCESSIBILITY_HEADERS += flash/accessibility/Accessibility_as.h
-# endif
+ACCESSIBILITY_HEADERS += flash/accessibility/Accessibility_as.h
+endif
 
 libgnashasobjs_la_SOURCES += $(ACCESSIBILITY_SOURCES)
 noinst_HEADERS +=  $(ACCESSIBILITY_HEADERS) accessibilityclasses.h

@@ -31,10 +31,10 @@ UI_HEADERS += flash/ui/ContextMenuItem_as.h
 endif
 
 # FIXME: already exists
-# if BUILD_CONTEXTMENU_AS3
+if BUILD_CONTEXTMENU_AS3
 # UI_SOURCES += flash/ui/ContextMenu_as.cpp
-# UI_HEADERS += flash/ui/ContextMenu_as.h
-# endif
+UI_HEADERS += flash/ui/ContextMenu_as.h
+endif
 
 if BUILD_KEYLOCATION_AS3
 UI_SOURCES += flash/ui/KeyLocation_as.cpp
@@ -46,10 +46,10 @@ UI_SOURCES += flash/ui/Keyboard_as.cpp
 UI_HEADERS += flash/ui/Keyboard_as.h
 endif
 
-# if BUILD_MOUSE_AS3
+if BUILD_MOUSE_AS3
 # UI_SOURCES += flash/ui/Mouse_as.cpp
-# UI_HEADERS += flash/ui/Mouse_as.h
-# endif
+UI_HEADERS += flash/ui/Mouse_as.h
+endif
 
 libgnashasobjs_la_SOURCES += $(UI_SOURCES)
 noinst_HEADERS +=  $(UI_HEADERS) uiclasses.h

@@ -61,10 +61,10 @@ SYSTEM_HEADERS += flash/system/Security_as.h
 endif
 
 # FIXME: already exists
-# if BUILD_SYSTEM_AS3
+if BUILD_SYSTEM_AS3
 # SYSTEM_SOURCES += flash/system/System_as.cpp
-# SYSTEM_HEADERS += flash/system/System_as.h
-# endif
+SYSTEM_HEADERS += flash/system/System_as.h
+endif
 
 libgnashasobjs_la_SOURCES += $(SYSTEM_SOURCES)
 noinst_HEADERS +=  $(SYSTEM_HEADERS) systemclasses.h

@@ -45,20 +45,20 @@ NET_SOURCES += flash/net/IDynamicPropertyWriter_as.cpp
 NET_HEADERS += flash/net/IDynamicPropertyWriter_as.h
 endif
 
-# if BUILD_LOCALCONNECTION_AS3
+if BUILD_LOCALCONNECTION_AS3
 # NET_SOURCES += flash/net/LocalConnection_as.cpp
-# NET_HEADERS += flash/net/LocalConnection_as.h
-# endif
+NET_HEADERS += flash/net/LocalConnection_as.h
+endif
 
-# if BUILD_NETCONNECTION_AS3
+if BUILD_NETCONNECTION_AS3
 # NET_SOURCES += flash/net/NetConnection_as.cpp
-# NET_HEADERS += flash/net/NetConnection_as.h
-# endif
+NET_HEADERS += flash/net/NetConnection_as.h
+endif
 
-# if BUILD_NETSTREAM_AS3
+if BUILD_NETSTREAM_AS3
 # NET_SOURCES += flash/net/NetStream_as.cpp
-# NET_HEADERS += flash/net/NetStream_as.h
-# endif
+NET_HEADERS += flash/net/NetStream_as.h
+endif
 
 if BUILD_OBJECTENCODING_AS3
 NET_SOURCES += flash/net/ObjectEncoding_as.cpp
@@ -75,21 +75,21 @@ NET_SOURCES += flash/net/SharedObjectFlushStatus_as.cpp
 NET_HEADERS += flash/net/SharedObjectFlushStatus_as.h
 endif
 
-# FIXME: already exists
-# if BUILD_SHAREDOBJECT_AS3
+FIXME: already exists
+if BUILD_SHAREDOBJECT_AS3
 # NET_SOURCES += flash/net/SharedObject_as.cpp
-# NET_HEADERS += flash/net/SharedObject_as.h
-# endif
+NET_HEADERS += flash/net/SharedObject_as.h
+endif
 
 if BUILD_SOCKET_AS3
 NET_SOURCES += flash/net/Socket_as.cpp
 NET_HEADERS += flash/net/Socket_as.h
 endif
 
-# if BUILD_URLLOADERDATAFORMAT_AS3
+if BUILD_URLLOADERDATAFORMAT_AS3
 # NET_SOURCES += flash/net/URLLoaderDataFormat_as.cpp
-# NET_HEADERS += flash/net/URLLoaderDataFormat_as.h
-# endif
+NET_HEADERS += flash/net/URLLoaderDataFormat_as.h
+endif
 
 if BUILD_URLLOADER_AS3
 NET_SOURCES += flash/net/URLLoader_as.cpp
@@ -111,26 +111,26 @@ NET_SOURCES += flash/net/URLRequestMethod_as.cpp
 NET_HEADERS += flash/net/URLRequestMethod_as.h
 endif
 
-# if BUILD_URLREQUEST_AS3
+if BUILD_URLREQUEST_AS3
 # NET_SOURCES += flash/net/URLRequest_as.cpp
-# NET_HEADERS += flash/net/URLRequest_as.h
-# endif
+NET_HEADERS += flash/net/URLRequest_as.h
+endif
 
 if BUILD_URLSTREAM_AS3
 NET_SOURCES += flash/net/URLStream_as.cpp
 NET_HEADERS += flash/net/URLStream_as.h
 endif
 
-# if BUILD_URLVARIABLES_AS3
+if BUILD_URLVARIABLES_AS3
 # NET_SOURCES += flash/net/URLVariables_as.cpp
-# NET_HEADERS += flash/net/URLVariables_as.h
-# endif
+NET_HEADERS += flash/net/URLVariables_as.h
+endif
 
 # FIXME: already exists
-# if BUILD_XMLSOCKET_AS3
+if BUILD_XMLSOCKET_AS3
 # NET_SOURCES += flash/net/XMLSocket_as.cpp
-# NET_HEADERS += flash/net/XMLSocket_as.h
-# endif
+NET_HEADERS += flash/net/XMLSocket_as.h
+endif
 
 libgnashasobjs_la_SOURCES  += $(NET_SOURCES)
 noinst_HEADERS +=  $(NET_HEADERS) netclasses.h
