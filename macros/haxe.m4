@@ -47,6 +47,17 @@ AC_DEFUN([AC_PATH_HAXE], [
     AC_PATH_PROG(HAXE, haxe, ,[${pathlist}])
   fi
 
+  if test x"$HAXE" != "x"; then
+    HAXE_VERSION=`$HAXE -help | grep ^Haxe | awk '{print $'3'}'`
+    major=`echo $HAXE_VERSION | cut -d '.' -f 1`
+    minor=`echo $HAXE_VERSION | cut -d '.' -f 2`
+    dnl
+    dnl FIXME: we need 2.00 or higher
+    dnl        1.19 was tested as failing to build some testcases
+    dnl        preventing 'make check' from completing
+    dnl
+  fi
+
   if test x"$HAXE" != "x" -a x"$HAXE_CLASSPATH" = "x"; then
     # cross your fingers !
     if test -d "`dirname ${HAXE}`/std"; then
