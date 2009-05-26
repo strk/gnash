@@ -1,4 +1,4 @@
-// samplar_pkg.cpp:  ActionScript "flash.samplar" package, for Gnash.
+// sampler_pkg.cpp:  ActionScript "flash.sampler" package, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -29,30 +29,30 @@
 #include "StackFrame_as.h"
 
 #include "sampler_pkg.h"
-#include "samplarclasses.h"
+#include "samplerclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_samplar_package(const fn_call& /*fn*/)
+get_flash_sampler_package(const fn_call& /*fn*/)
 {
-	log_debug("Loading flash.samplar package");
+	log_debug("Loading flash.sampler package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
+	while (asclasses[++i] != 0) {
 	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+    }
 
 	return pkg;
 }
 
 void
-flash_samplar_package_init(as_object& where)
+flash_sampler_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("samplar"), get_flash_samplar_package);
+	where.init_destructive_property(st.find("sampler"), get_flash_sampler_package);
 }
 
 

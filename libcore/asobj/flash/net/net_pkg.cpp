@@ -70,7 +70,11 @@ void
 flash_net_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("net"), get_flash_net_package);
+
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+	where.init_destructive_property(st.find("net"),
+			get_flash_net_package, flags);
 }
 
 
