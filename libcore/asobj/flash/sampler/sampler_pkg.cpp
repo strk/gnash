@@ -41,9 +41,9 @@ get_flash_sampler_package(const fn_call& /*fn*/)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
+	while (asclasses[++i] != 0) {
 	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+    }
 
 	return pkg;
 }
