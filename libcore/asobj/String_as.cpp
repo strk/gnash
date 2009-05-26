@@ -310,7 +310,7 @@ string_slice(const fn_call& fn)
 
     size_t retlen = end - start;
 
-    log_debug("start: %d, end: %d, retlen: %d", start, end, retlen);
+    //log_debug("start: %d, end: %d, retlen: %d", start, end, retlen);
 
     return as_value(utf8::encodeCanonicalString(
                 wstr.substr(start, retlen), version));
