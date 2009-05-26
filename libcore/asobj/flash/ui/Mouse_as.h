@@ -28,12 +28,12 @@ class Mouse_as
 public:
     /// Register native functions with the VM
     static void registerNative(as_object& global);
-
-    /// Initialize the global Mouse class
-    static void init(as_object& global);
 };
 
-} // end of gnash namespace
+void mouse_class_init(as_object& where);
+
+} // gnash namespace
+
 
 #endif
 

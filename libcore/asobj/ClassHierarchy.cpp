@@ -40,7 +40,7 @@
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
-#include "Mouse_as.h"
+#include "flash/ui/Mouse_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
@@ -306,7 +306,8 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ XML_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_XML, 5 },
-	{ Mouse_as::init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
+	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI,
+        5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
         NS_GLOBAL, 5 },

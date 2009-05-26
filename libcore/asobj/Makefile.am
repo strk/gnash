@@ -70,7 +70,6 @@ libgnashasobjs_la_SOURCES = \
 	LocalConnection_as.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
-	Mouse_as.cpp \
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
 	Number_as.cpp \
@@ -108,7 +107,6 @@ noinst_HEADERS = \
 	LoadVars_as.h \
 	LocalConnection_as.h\
 	Microphone.h \
-	Mouse_as.h	\
 	MovieClipLoader.h \
 	NetConnection_as.h	\
 	NetStream_as.h \
