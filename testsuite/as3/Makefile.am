@@ -24,11 +24,10 @@ endif
 
 # These will get executed and parsed for test output
 SANE_AS3TESTS = \
-	basic.as \
-	namespaces.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
+	basic.as \
 	$(NULL)
 
 AS3TESTS=$(SANE_AS3TESTS) $(BOGUS_AS3TESTS)
