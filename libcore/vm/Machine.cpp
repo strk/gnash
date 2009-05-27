@@ -800,6 +800,15 @@ Machine::execute()
                     as_object *obj = mStack.top(1).to_object().get();
                     const boost::uint32_t index =
                         mStack.top(0).to_number<boost::uint32_t>();
+                    
+                    if (!obj) {
+                        // TODO: check what to do here.
+                        log_debug("ABC_ACTION_NEXTNAME: expecting object on "
+                                "stack, got %s", mStack.top(1));
+                        mStack.drop(2);
+                        break;
+                    }
+                    
                     mStack.drop(1);
                     const Property *b = obj->getByIndex(index);
                     if (b) mStack.top(0) = mST.value(b->getName());
@@ -824,6 +833,7 @@ Machine::execute()
                     boost::uint32_t index =
                         mStack.top(0).to_number<boost::uint32_t>();
                     mStack.drop(1);
+                    assert(obj);
                     mStack.top(0) = obj->nextIndex(index);
                     break;
                 }
@@ -996,14 +1006,16 @@ Machine::execute()
                 ///  ns -- Namespace object from namespace_pool[index]
                 case SWF::ABC_ACTION_PUSHNAMESPACE:
                 {
-                    asNamespace *ns = pool_namespace(mStream->read_V32(), mPoolObject);
+                    asNamespace *ns = pool_namespace(mStream->read_V32(),
+                            mPoolObject);
                     mStack.grow(1);
                     mStack.top(0) = *ns;
                     break;
                 }
 
                 /// 0x32 ABC_ACTION_HASNEXT2
-                /// Stream: V32 frame location 'objloc' | V32 frame location 'indexloc'
+                /// Stream: V32 frame location 'objloc' | V32 frame location
+                /// 'indexloc'
                 /// Stack Out:
                 ///  truth -- True if frame[objloc] has key/val pair after
                 ///   frame[indexloc], following delegates (__proto__) objects
@@ -1011,8 +1023,8 @@ Machine::execute()
                 /// Frame:
                 ///  Change at objloc to object which possessed next value.
                 ///  Change at indexloc to index (as object) of the next value.
-                /// N.B.: A value of '0' for indexloc initializes to the first logical
-                /// property.
+                /// N.B.: A value of '0' for indexloc initializes to the
+                /// first logical property.
                 case SWF::ABC_ACTION_HASNEXT2:
                 {
                     boost::int32_t oindex = mStream->read_V32();
@@ -1020,17 +1032,24 @@ Machine::execute()
                     as_value &objv = mRegisters[oindex];
                     as_value &indexv = mRegisters[iindex];
                     log_abc("Index is %u",indexv.to_number());
-                    //	ENSURE_OBJECT(objv);
-                    //	ENSURE_NUMBER(indexv);
+                    
                     as_object *obj = objv.to_object().get();
+                    if (!obj) {
+                        // TODO: Check what to do here.
+                        log_error("ABC_ACTION_HASNEXT2: expecting object in "
+                                "register %d, got %s", oindex, objv);
+                        // Stack is unchanged, so just break?
+                        break;
+                    }
+                    
                     boost::uint32_t index = indexv.to_number<boost::uint32_t>();
-                    log_abc("Object is %s index is %u",objv.toDebugString(),index);
-                    as_object *owner = NULL;
+                    log_abc("Object is %s index is %u", objv.toDebugString(),
+                            index);
+
+                    as_object *owner = 0;
                     int next = obj->nextIndex(index, &owner);
                     log_abc("Next index is %d",next);
-                    //	mStack.grow(1);
                     if (next) {
-                        //	mStack.top(0).set_bool(true);
                         push_stack(true);
                         if (owner) mRegisters[oindex] = owner;
                         else mRegisters[oindex].set_null();
