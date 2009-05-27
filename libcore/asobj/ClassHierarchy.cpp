@@ -343,8 +343,6 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT,
           NSV::NS_FLASH_ACCESSIBILITY, 5 },
 	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
-	{ textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
-        NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
 	{ namespace_class_init, NSV::CLASS_NAMESPACE, NSV::CLASS_OBJECT,
         NS_GLOBAL, 9 }
 //  { function_name, name key, super name key, lowest version },

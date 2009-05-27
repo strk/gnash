@@ -29,43 +29,31 @@
 #include <sstream>
 
 namespace gnash {
-void attachTextFieldAutoSizeInterface(as_object& o);
 
-class text_field_auto_size_as_object : public as_object
+// Forward declarations   
+namespace {
+    void attachTextFieldAutoSizeInterface(as_object& o);
+    as_object* getTextFieldAutoSizeInterface();
+}
+
+// extern
+void
+textfieldautosize_class_init(as_object& where)
 {
+	where.init_member("TextFieldAutoSize", getTextFieldAutoSizeInterface());
+}
 
-public:
-
-	text_field_auto_size_as_object()
-		:
-		as_object()
-	{
-	}
-
-};
+namespace {
 
 as_object*
 getTextFieldAutoSizeInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
+	if (!o) {
 		o = new as_object(getObjectInterface());
 		attachTextFieldAutoSizeInterface(*o);
 	}
 	return o.get();
-}
-
-// extern
-void textfieldautosize_class_init(as_object& where)
-{
-	where.init_member("TextFieldAutoSize", getTextFieldAutoSizeInterface());
-}
-
-std::auto_ptr<as_object>
-init_text_field_auto_size_instance()
-{
-	return std::auto_ptr<as_object>(new text_field_auto_size_as_object);
 }
 
 void
@@ -77,5 +65,5 @@ attachTextFieldAutoSizeInterface(as_object& o)
 	o.init_member("NONE", as_value("none"));
 }
 
-
-}
+} // anonymous namespace
+} // gnash namespace

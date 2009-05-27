@@ -24,20 +24,12 @@
 #ifndef GNASH_TEXTFIELDAUTOSIZE_H
 #define GNASH_TEXTFIELDAUTOSIZE_H
 
-#include <memory> // for auto_ptr
-
 namespace gnash {
 
 class as_object;
 
 /// Initialize the TextFieldAutoSize Class
 void textfieldautosize_class_init(as_object& where);
-
-/// Return a TextFieldAutoSize instance
-std::auto_ptr<as_object> init_text_field_auto_size_instance();
-
-as_object* getTextFieldAutoSizeInterface();
-
 
 }
 
