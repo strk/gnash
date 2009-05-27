@@ -228,9 +228,9 @@ typedef unsigned long long uintmax_t;
 # define	MALLOC_DECOMMIT
 #endif  /* end of WIN32 */
 
-// #ifdef HAVE_PTHREADS
+#ifdef HAVE_PTHREADS
 # include <pthread.h>
-// #endif
+#endif
 
 #ifndef WIN32
 # include <sys/cdefs.h>
