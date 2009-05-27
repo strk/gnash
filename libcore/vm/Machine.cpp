@@ -1569,28 +1569,29 @@ Machine::execute()
             /// 0x5A ABC_ACTION_NEWCATCH
             /// Stream: V32 'catch_id'
             /// Stack Out:
-            ///  vtable -- vtable suitable to catch an exception of type in catch_id.
+            ///  vtable -- vtable suitable to catch an exception of type in
+            ///         catch_id.
             /// NB: Need more information on how exceptions are set up.
                 case SWF::ABC_ACTION_NEWCATCH:
                 {
                     // TODO: Decide if we need this. (Might be a no-op.)
                     break;
                 }
-            /// 0x5D ABC_ACTION_FINDPROPSTRICT
-            /// 0x5E ABC_ACTION_FINDPROPERTY
-            /// Stream: V32 'name_id'
-            /// Stack In:
-            ///  [ns [n]] -- Namespace stuff
-            /// Stack Out:
-            ///  owner -- object which owns property given by looking up the name_id.
-            ///  0x5D is the undefined object if not found
-            ///  0x5E throws a ReferenceError if not found
+                /// 0x5D ABC_ACTION_FINDPROPSTRICT
+                /// 0x5E ABC_ACTION_FINDPROPERTY
+                /// Stream: V32 'name_id'
+                /// Stack In:
+                ///  [ns [n]] -- Namespace stuff
+                /// Stack Out:
+                ///  owner -- object which owns property given by looking
+                ///  up the name_id.
+                ///  0x5D is the undefined object if not found
+                ///  0x5E throws a ReferenceError if not found
                 case SWF::ABC_ACTION_FINDPROPSTRICT:
                 case SWF::ABC_ACTION_FINDPROPERTY:
                 {
-            //		boost::uint32_t property_name = mStream->read_V32();
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
-                    find_prop_strict(a);
+                    as_value ret = find_prop_strict(a);
             /*		mStack.drop(completeName(a));
                     as_object *owner;
                     Property *b = mCurrentScope->findProperty(a.getABCName(), 
@@ -1631,9 +1632,8 @@ Machine::execute()
                 
                     as_value val = find_prop_strict(a);
 
-                    pop_stack();
-
-                    push_stack(val);
+                    log_abc("GETLEX: found value %s", val);
+                    mStack.top(0) = val;
 
                     break;
                 }
@@ -3002,7 +3002,7 @@ Machine::find_prop_strict(asName multiname) {
     std::auto_ptr<as_environment::ScopeStack> envStack ( getScopeStack() );
 	val = env.get_variable(path, *envStack, &target);
 
-	push_stack(as_value(target));	
+	push_stack(target);	
 	mScopeStack.pop();
 	return val;
 }
