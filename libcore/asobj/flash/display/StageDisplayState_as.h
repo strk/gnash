@@ -24,34 +24,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
+namespace gnash {
 
 // Forward declarations
 class as_object;
-
-namespace gnash {
-namespace {
-    as_object* getStageDisplayStateInterface();
-}
-
-class StageDisplayState_as: public as_object
-{
-
-public:
-
-    StageDisplayState_as()
-        :
-        as_object(getStageDisplayStateInterface())
-    {}
-
-};
 
 /// Initialize the global StageDisplayState class
 void stagedisplaystate_class_init(as_object& global);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_STAGEDISPLAYSTATE_H
 #endif
 
 // local Variables:
