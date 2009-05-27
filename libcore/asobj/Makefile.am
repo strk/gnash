@@ -76,6 +76,7 @@ libgnashasobjs_la_SOURCES = \
 	PlayHead.cpp \
 	Selection_as.cpp \
 	SharedObject_as.cpp\
+	Namespace_as.cpp \
 	Sound_as.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
@@ -124,6 +125,7 @@ noinst_HEADERS = \
 	XMLSocket_as.h \
 	XMLNode_as.h \
 	LoadableObject.h \
+	Namespace_as.h \
 	Object.h
 
 EXTENSIONS_API = \

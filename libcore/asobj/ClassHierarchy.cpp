@@ -40,6 +40,7 @@
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
+#include "Namespace_as.h"
 #include "flash/ui/Mouse_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
@@ -343,7 +344,9 @@ static const ClassHierarchy::nativeClass knownClasses[] =
           NSV::NS_FLASH_ACCESSIBILITY, 5 },
 	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
 	{ textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
-        NSV::CLASS_OBJECT, NS_GLOBAL, 9 }
+        NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
+	{ namespace_class_init, NSV::CLASS_NAMESPACE, NSV::CLASS_OBJECT,
+        NS_GLOBAL, 9 }
 //  { function_name, name key, super name key, lowest version },
 
 // These classes are all implicitly constructed; that is, it is not necessary for

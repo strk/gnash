@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ_ERROR_H
-#define GNASH_ASOBJ_ERROR_H
+#ifndef GNASH_ASOBJ_NAMESPACE_H
+#define GNASH_ASOBJ_NAMESPACE_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -29,8 +29,8 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global Error class
-void Error_class_init(as_object& global);
+void namespace_class_init(as_object& global);
 
-} // end of gnash namespace
+} // gnash namespace
 
 #endif
