@@ -1912,13 +1912,14 @@ Machine::execute()
 
                     break;
                 }
-            /// 0x6E ABC_ACTION_GETGLOBALSLOT
-            /// Stream: V32 'slot_index + 1'
-            /// Stack In:
-            ///  .
-            /// Stack Out:
-            ///  slot -- globals.slots[slot_index]
-            /// NB: Deprecated
+
+                /// 0x6E ABC_ACTION_GETGLOBALSLOT
+                /// Stream: V32 'slot_index + 1'
+                /// Stack In:
+                ///  .
+                /// Stack Out:
+                ///  slot -- globals.slots[slot_index]
+                /// NB: Deprecated
                 case SWF::ABC_ACTION_GETGLOBALSLOT:
                 {
                     boost::uint32_t sindex = mStream->read_V32();
@@ -1929,14 +1930,15 @@ Machine::execute()
                     //TODO: mStack.top(0) = mGlobal.getSlot(sindex);
                     break;
                 }
-            /// 0x6F ABC_ACTION_SETGLOBALSLOT
-            /// Stream: V32 'slot_index + 1'
-            /// Stack In:
-            ///  value -- The value to be placed into the slot.
-            /// Stack Out:
-            ///  .
-            /// Do: globals[slot_index] = value
-            /// NB: Deprecated
+
+                /// 0x6F ABC_ACTION_SETGLOBALSLOT
+                /// Stream: V32 'slot_index + 1'
+                /// Stack In:
+                ///  value -- The value to be placed into the slot.
+                /// Stack Out:
+                ///  .
+                /// Do: globals[slot_index] = value
+                /// NB: Deprecated
                 case SWF::ABC_ACTION_SETGLOBALSLOT:
                 {
                     boost::uint32_t sindex = mStream->read_V32();
@@ -1946,92 +1948,88 @@ Machine::execute()
                     //TODO: mGlobal.setSlot(sindex, mStack.pop());
                     break;
                 }
-            /// 0x70 ABC_ACTION_CONVERT_S
-            /// Stack In:
-            ///  value -- An object
-            /// Stack Out:
-            ///  str_value -- value as a string
+
+                /// 0x70 ABC_ACTION_CONVERT_S
+                /// Stack In:
+                ///  value -- An object
+                /// Stack Out:
+                ///  str_value -- value as a string
                 case SWF::ABC_ACTION_CONVERT_S:
-                {
                     mStack.top(0) = mStack.top(0).to_string();
                     break;
-                }
-            /// 0x71 ABC_ACTION_ESC_XELEM
-            /// Stack In:
-            ///  value -- An object to be escaped
-            /// Stack Out:
-            ///  str_value -- value as a string, escaped suitably for an XML element.
+
+                /// 0x71 ABC_ACTION_ESC_XELEM
+                /// Stack In:
+                ///  value -- An object to be escaped
+                /// Stack Out:
+                ///  str_value -- value as a string, escaped suitably for
+                ///         an XML element.
                 case SWF::ABC_ACTION_ESC_XELEM:
-                {
-                    //TODO: mStack.top(0) = mStack.top(0).to_escaped_xml_element();
+                    log_unimpl("ABC_ACTION_ESC_XELEM");
+                    //TODO: set mStack.top(0) to an escaped string.
                     break;
-                }
-            /// 0x72 ABC_ACTION_ESC_XATTR
-            /// Stack In:
-            ///  value -- An object to be escaped
-            /// Stack Out:
-            ///  str_value -- value as a string, escaped suitably for an XML attribute.
+
+                /// 0x72 ABC_ACTION_ESC_XATTR
+                /// Stack In:
+                ///  value -- An object to be escaped
+                /// Stack Out:
+                ///  str_value -- value as a string, escaped suitably for an
+                ///     XML attribute.
                 case SWF::ABC_ACTION_ESC_XATTR:
-                {
-                    //TODO: mStack.top(0) = mStack.top(0).to_escaped_xml_attribute();
+                    log_unimpl("ABC_ACTION_ESC_XATTR");
+                    //TODO: set mStack.top(0) to an escaped string.
                     break;
-                }
-            /// 0x73 ABC_ACTION_CONVERT_I
-            /// 0x83 ABC_ACTION_COERCE_I (deprecated)
-            /// Stack In:
-            ///  value -- An object to be converted to Integer
-            /// Stack Out:
-            ///  int_value -- value as an integer object
+
+                /// 0x73 ABC_ACTION_CONVERT_I
+                /// 0x83 ABC_ACTION_COERCE_I (deprecated)
+                /// Stack In:
+                ///  value -- An object to be converted to Integer
+                /// Stack Out:
+                ///  int_value -- value as an integer object
                 case SWF::ABC_ACTION_CONVERT_I:
                 case SWF::ABC_ACTION_COERCE_I:
-                {
-                    as_value val = pop_stack();
-                    val.to_int();
-                    push_stack(val);
+                    mStack.top(0) = mStack.top(0).to_int();
                     break;
-                }
-            /// 0x74 ABC_ACTION_CONVERT_U
-            /// 0x88 ABC_ACTION_COERCE_U (deprecated)
-            /// Stack In:
-            ///  value -- An object to be converted to unsigned integer
-            /// Stack Out:
-            ///  int_value -- value as an unsigned integer object
+
+                /// 0x74 ABC_ACTION_CONVERT_U
+                /// 0x88 ABC_ACTION_COERCE_U (deprecated)
+                /// Stack In:
+                ///  value -- An object to be converted to unsigned integer
+                /// Stack Out:
+                ///  int_value -- value as an unsigned integer object
                 case SWF::ABC_ACTION_CONVERT_U:
                 case SWF::ABC_ACTION_COERCE_U:
-                {
                     mStack.top(0) = mStack.top(0).to_number<unsigned int>();
                     break;
-                }
-            /// 0x75 ABC_ACTION_CONVERT_D
-            /// 0x84 ABC_ACTION_COERCE_D (deprecated)
-            /// Stack In:
-            ///  value -- An object to be converted to a double
-            /// Stack Out:
-            ///  double_value -- value as a double object
+
+                /// 0x75 ABC_ACTION_CONVERT_D
+                /// 0x84 ABC_ACTION_COERCE_D (deprecated)
+                /// Stack In:
+                ///  value -- An object to be converted to a double
+                /// Stack Out:
+                ///  double_value -- value as a double object
                 case SWF::ABC_ACTION_CONVERT_D:
                 case SWF::ABC_ACTION_COERCE_D:
-                {
-                    push_stack(pop_stack().to_number());
+                    mStack.top(0) = mStack.top(0).to_number();
                     break;
-                }
-            /// 0x76 ABC_ACTION_CONVERT_B
-            /// 0x81 ABC_ACTION_COERCE_B (deprecated)
-            /// Stack In:
-            ///  value -- An object to be converted to a boolean
-            /// Stack Out:
-            ///  bool_value -- value as a boolean object
+
+                /// 0x76 ABC_ACTION_CONVERT_B
+                /// 0x81 ABC_ACTION_COERCE_B (deprecated)
+                /// Stack In:
+                ///  value -- An object to be converted to a boolean
+                /// Stack Out:
+                ///  bool_value -- value as a boolean object
                 case SWF::ABC_ACTION_CONVERT_B:
                 case SWF::ABC_ACTION_COERCE_B:
-                {
-                    mStack.top(0).set_bool(mStack.top(0).to_bool());
+                    mStack.top(0) = mStack.top(0).to_bool();
                     break;
-                }
-            /// 0x77 ABC_ACTION_CONVERT_O
-            /// Stack In:
-            ///  obj -- An object
-            /// Stack Out:
-            ///  obj -- An object
-            /// Do: If obj is Undefined or Null, throw TypeError
+
+                /// 0x77 ABC_ACTION_CONVERT_O
+                /// Stack In:
+                ///  obj -- An object
+                /// Stack Out:
+                ///  obj -- An object
+                /// Do: If obj is Undefined or Null, throw TypeError
                 case SWF::ABC_ACTION_CONVERT_O:
                 {
                     mStack.top(0) = mStack.top(0).to_object().get();
@@ -2039,71 +2037,87 @@ Machine::execute()
                         throw ASTypeError();
                     break;
                 }
-            /// 0x78 ABC_ACTION_CHECKFILTER
-            /// Stack In:
-            ///  obj -- An object
-            /// Stack Out:
-            ///  obj -- An object
-            /// Do: If obj is not XML based, throw TypeError
+
+                /// 0x78 ABC_ACTION_CHECKFILTER
+                /// Stack In:
+                ///  obj -- An object
+                /// Stack Out:
+                ///  obj -- An object
+                /// Do: If obj is not XML based, throw TypeError
                 case SWF::ABC_ACTION_CHECKFILTER:
                 {
-                    if (!mStack.top(0).is_object() || !mStack.top(0).to_object()->isXML())
+                    if (!mStack.top(0).is_object() ||
+                            !mStack.top(0).to_object()->isXML())
                         throw ASTypeError();
                     break;
                 }
-            /// 0x80 ABC_ACTION_COERCE
-            /// Stream: V32 'name_index'
-            /// Stack In:
-            ///  [ns [n]] -- Possibly name/namespace stuff
-            ///  obj -- An object to be converted
-            /// Stack Out:
-            ///  coerced_obj -- The object as the desired (resolve)'name_index' type.
+
+                /// 0x80 ABC_ACTION_COERCE
+                /// Stream: V32 'name_index'
+                /// Stack In:
+                ///  [ns [n]] -- Possibly name/namespace stuff
+                ///  obj -- An object to be converted
+                /// Stack Out:
+                ///  coerced_obj -- The object as the desired (resolve)
+                //      'name_index' type.
                 case SWF::ABC_ACTION_COERCE:
                 {
+                    // TODO: handle runtime names?
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
-                    as_value value = pop_stack();
 
-                    //TODO: Actually coerce the value.
-            //		if (value.is_null()) {
-            //			as_value new_type = get_property_value(a);
-            //			value->
-            //			push_stack(new_type);
-            //		}
-            //		else{
-                        push_stack(value);
-            //		}
+                    as_value value = mStack.top(0);
+                    log_unimpl("ABC_ACTION_COERCE");
+                    log_abc("COERCE: object for conversion is %s, "
+                            "desired type %s", value,
+                            mST.value(a.getGlobalName()));
+
+                    // Examples of desired type: "Sprite" "Button",
+                    // "GlobalListener", "Object".
+                    // Tamarin seems to look up the traits of the
+                    // target type. If it's a builtin type (boolean, number,
+                    // string, in, uint, object, "any") it succeeds. 
+                    // Otherwise check null or undefined and do something.
+                    // Otherwise look at the type traits of the original. If
+                    // these traits contain the expected interface, return the
+                    // original value. Otherwise throw error.
                     break;
                 }
-            /// 0x82 ABC_ACTION_COERCE_A
-            /// Stack In:
-            ///  obj -- An object to be converted
-            /// Stack Out:
-            ///  obj
-            /// Do: Nothing. (The 'a' is for atom, and it's unclear if anything is needed.)
+                /// 0x82 ABC_ACTION_COERCE_A
+                /// Stack In:
+                ///  obj -- An object to be converted
+                /// Stack Out:
+                ///  obj
+                /// Do: Nothing. (The 'a' is for atom, and it's unclear
+                /// if anything is needed.)
                 case SWF::ABC_ACTION_COERCE_A:
                 {
                     break;
                 }
-            /// 0x85 ABC_ACTION_COERCE_S
-            /// Stack In:
-            ///  obj -- An object to be converted
-            /// Stack Out:
-            ///  str_obj -- obj as string. nullString object if obj is Null or Undefined
+
+                /// 0x85 ABC_ACTION_COERCE_S
+                /// Stack In:
+                ///  obj -- An object to be converted
+                /// Stack Out:
+                ///  str_obj -- obj as string. nullString object if obj is
+                ///  Null or Undefined
                 case SWF::ABC_ACTION_COERCE_S:
                 {
-                    if (mStack.top(0).is_undefined() || mStack.top(0).is_null())
+                    if (mStack.top(0).is_undefined() ||
+                            mStack.top(0).is_null()) {
                         mStack.top(0) = "";
-                    else
-                        mStack.top(0) = mStack.top(0).to_string();
+                    }
+                    else mStack.top(0) = mStack.top(0).to_string();
                     break;
                 }
-            /// 0x86 ABC_ACTION_ASTYPE
-            /// Stream: V32 'name_index'
-            /// Stack In:
-            ///  [ns [n]] -- Possible namespace stuff
-            ///  obj -- An object to be checked
-            /// Stack Out:
-            ///  cobj -- obj if obj is of type (resolve)'name_index', otherwise Null
+
+                /// 0x86 ABC_ACTION_ASTYPE
+                /// Stream: V32 'name_index'
+                /// Stack In:
+                ///  [ns [n]] -- Possible namespace stuff
+                ///  obj -- An object to be checked
+                /// Stack Out:
+                ///  cobj -- obj if obj is of type (resolve)'name_index',
+                ///     otherwise Null
                 case SWF::ABC_ACTION_ASTYPE:
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
@@ -2112,12 +2126,14 @@ Machine::execute()
                     push_stack(value);
                     break;
                 }
-            /// 0x87 ABC_ACTION_ASTYPELATE
-            /// Stack In:
-            ///  valid -- The object whose type is to be matched
-            ///  obj -- An object to be checked
-            /// Stack Out:
-            ///  cobj -- obj if type of obj conforms to valid, otherwise Null
+
+                /// 0x87 ABC_ACTION_ASTYPELATE
+                /// Stack In:
+                ///  valid -- The object whose type is to be matched
+                ///  obj -- An object to be checked
+                /// Stack Out:
+                ///  cobj -- obj if type of obj conforms to valid, otherwise
+                ///     Null
                 case SWF::ABC_ACTION_ASTYPELATE:
                 {
                     as_value type = pop_stack();
