@@ -428,7 +428,7 @@ abc_block::read_version()
 {
 	// Minor version, major version.
 	mVersion = (mS->read_u16()) | (mS->read_u16() << 16);
-	log_error(_("Abc Version: %d.%d"), (mVersion & 0xFFFF0000) >> 16, 
+	log_debug(_("Abc Version: %d.%d"), (mVersion & 0xFFFF0000) >> 16, 
 		(mVersion & 0x0000FFFF));
 	return true;
 }

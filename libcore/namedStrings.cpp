@@ -190,6 +190,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "LoadVars", NSV::CLASS_LOAD_VARS ),
 	string_table::svt( "LocalConnection", NSV::CLASS_LOCALCONNECTION ),
 	string_table::svt( "CustomActions", NSV::CLASS_CUSTOM_ACTIONS ),
+	string_table::svt( "Namespace", NSV::CLASS_NAMESPACE ),
 	string_table::svt( "NetConnection", NSV::CLASS_NET_CONNECTION ),
 	string_table::svt( "NetStream", NSV::CLASS_NET_STREAM ),
 	string_table::svt( "ContextMenu", NSV::CLASS_CONTEXTMENU ),
