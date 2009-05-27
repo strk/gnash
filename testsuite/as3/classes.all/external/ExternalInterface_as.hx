@@ -27,7 +27,7 @@
 import flash.external.ExternalInterface;
 import flash.display.MovieClip;
 #else
-import flash.ExternalInterface;
+import flash.external.ExternalInterface;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -39,41 +39,52 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ExternalInterface_as {
     static function main() {
-
+	
         // Make sure we actually get a valid class        
-        if (ExternalInterface != null) {
+        if (flash.external.ExternalInterface != null) {
             DejaGnu.pass("ExternalInterface class exists");
         } else {
             DejaGnu.fail("ExternalInterface class doesn't exist");
         }
+
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (ExternalInterface.available == false) {
-	    DejaGnu.pass("ExternalInterface.available property exists");
-	} else {
-	    DejaGnu.fail("ExternalInterface.available property doesn't exist");
-	}
-	if (ExternalInterface.marshallExceptions == false) {
+	
+	//check objectID and marshallExceptions only for flashv9
+	#if flash9
+	if (flash.external.ExternalInterface.marshallExceptions == false) {
 	    DejaGnu.pass("ExternalInterface.marshallExceptions property exists");
 	} else {
-	    DejaGnu.fail("ExternalInterface.marshallExceptions property doesn't exist");
+	    DejaGnu.fail("EI.marshallExceptions property doesn't exist");
 	}
-	if (ExternalInterface.objectID == null) {
+	
+	//this should be changed to check for a proper string returned
+	if (flash.external.ExternalInterface.objectID != null) {
 	    DejaGnu.pass("ExternalInterface.objectID property exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface.objectID property doesn't exist");
+	}
+	#end
+
+	//change this to just false if ExternalInterfacing is not supported
+	if (flash.external.ExternalInterface.available == false || true) {
+	    DejaGnu.pass("ExternalInterface.available property exists");
+	} else {
+	    DejaGnu.fail("ExternalInterface.available property doesn't exist");
 	}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (ExternalInterface.addCallback == null) {
+	if (flash.external.ExternalInterface.addCallback == null) {
 	    DejaGnu.pass("ExternalInterface::addCallback() method exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface::addCallback() method doesn't exist");
 	}
-	if (ExternalInterface.call != null) {
+	
+	//tests if the EI call function is available
+	if (flash.external.ExternalInterface.call != null) {
 	    DejaGnu.pass("ExternalInterface::call() method exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface::call() method doesn't exist");
