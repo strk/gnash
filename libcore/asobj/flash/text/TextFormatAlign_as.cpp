@@ -26,63 +26,38 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h"
+
+/// TextFormatAlign is an AVM2-only class containing constants.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value textformatalign_ctor(const fn_call& fn);
-    void attachTextFormatAlignInterface(as_object& o);
     void attachTextFormatAlignStaticInterface(as_object& o);
-    as_object* getTextFormatAlignInterface();
-
 }
 
 // extern (used by Global.cpp)
 void textformatalign_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> obj =
+        new as_object(getObjectInterface());
 
-    if (!cl) {
-        cl = new builtin_function(&textformatalign_ctor, getTextFormatAlignInterface());
-        attachTextFormatAlignStaticInterface(*cl);
-    }
+    attachTextFormatAlignStaticInterface(*obj);
 
     // Register _global.TextFormatAlign
-    global.init_member("TextFormatAlign", cl.get());
+    global.init_member("TextFormatAlign", obj.get());
 }
 
 namespace {
 
 void
-attachTextFormatAlignInterface(as_object& o)
-{
-}
-
-void
 attachTextFormatAlignStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getTextFormatAlignInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachTextFormatAlignInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-textformatalign_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new TextFormatAlign_as;
-
-    return as_value(obj.get()); // will keep alive
+    o.init_member("CENTER", "center");
+    o.init_member("JUSTIFY", "justify");
+    o.init_member("LEFT", "left");
+    o.init_member("RIGHT", "right");
 }
 
 } // anonymous namespace 

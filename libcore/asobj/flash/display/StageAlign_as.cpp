@@ -29,6 +29,8 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h"
 
+/// StageAlign is an AVM2-only class
+
 namespace gnash {
 
 // Forward declarations
@@ -40,7 +42,9 @@ namespace {
 void
 stagealign_class_init(as_object& where)
 {
-    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    static boost::intrusive_ptr<as_object> obj =
+        new as_object(getObjectInterface());
+
     attachStageAlignStaticInterface(*obj);
 
     where.init_member("StageAlign", obj.get());

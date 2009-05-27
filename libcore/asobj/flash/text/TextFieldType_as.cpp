@@ -26,63 +26,35 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h"
+
+/// TextFieldType is an AVM2-only class
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value textfieldtype_ctor(const fn_call& fn);
-    void attachTextFieldTypeInterface(as_object& o);
     void attachTextFieldTypeStaticInterface(as_object& o);
-    as_object* getTextFieldTypeInterface();
-
 }
 
-// extern (used by Global.cpp)
-void textfieldtype_class_init(as_object& global)
+// extern
+void
+textfieldtype_class_init(as_object& where)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> obj =
+        new as_object(getObjectInterface());
 
-    if (!cl) {
-        cl = new builtin_function(&textfieldtype_ctor, getTextFieldTypeInterface());
-        attachTextFieldTypeStaticInterface(*cl);
-    }
-
-    // Register _global.TextFieldType
-    global.init_member("TextFieldType", cl.get());
+    attachTextFieldTypeStaticInterface(*obj);
+	where.init_member("TextFieldType", obj.get());
 }
 
 namespace {
 
 void
-attachTextFieldTypeInterface(as_object& o)
-{
-}
-
-void
 attachTextFieldTypeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getTextFieldTypeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachTextFieldTypeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-textfieldtype_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new TextFieldType_as;
-
-    return as_value(obj.get()); // will keep alive
+    o.init_member("DYNAMIC", "dynamic");
+    o.init_member("INPUT", "input");
 }
 
 } // anonymous namespace 

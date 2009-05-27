@@ -28,30 +28,11 @@
 
 namespace gnash {
 
-// Forward declarations
-class as_object;
-namespace {
-    as_object* getTextFormatAlignInterface();
-}
-
-class TextFormatAlign_as: public as_object
-{
-
-public:
-
-    TextFormatAlign_as()
-        :
-        as_object(getTextFormatAlignInterface())
-    {}
-
-};
-
 /// Initialize the global TextFormatAlign class
 void textformatalign_class_init(as_object& global);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_TEXTFORMATALIGN_H
 #endif
 
 // local Variables:

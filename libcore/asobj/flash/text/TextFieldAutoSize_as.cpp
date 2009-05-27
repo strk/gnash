@@ -22,39 +22,29 @@
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
 #include "Object.h"
-
 #include "log.h"
 
-#include <string>
-#include <sstream>
+/// TextFieldAutoSize is an AVM2-only class
 
 namespace gnash {
 
 // Forward declarations   
 namespace {
     void attachTextFieldAutoSizeInterface(as_object& o);
-    as_object* getTextFieldAutoSizeInterface();
 }
 
 // extern
 void
 textfieldautosize_class_init(as_object& where)
 {
-	where.init_member("TextFieldAutoSize", getTextFieldAutoSizeInterface());
+    static boost::intrusive_ptr<as_object> obj =
+        new as_object(getObjectInterface());
+
+    attachTextFieldAutoSizeInterface(*obj);
+	where.init_member("TextFieldAutoSize", obj.get());
 }
 
 namespace {
-
-as_object*
-getTextFieldAutoSizeInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if (!o) {
-		o = new as_object(getObjectInterface());
-		attachTextFieldAutoSizeInterface(*o);
-	}
-	return o.get();
-}
 
 void
 attachTextFieldAutoSizeInterface(as_object& o)
