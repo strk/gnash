@@ -1577,6 +1577,7 @@ Machine::execute()
                     // TODO: Decide if we need this. (Might be a no-op.)
                     break;
                 }
+
                 /// 0x5D ABC_ACTION_FINDPROPSTRICT
                 /// 0x5E ABC_ACTION_FINDPROPERTY
                 /// Stream: V32 'name_id'
@@ -1592,6 +1593,8 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     as_value ret = find_prop_strict(a);
+
+
             /*		mStack.drop(completeName(a));
                     as_object *owner;
                     Property *b = mCurrentScope->findProperty(a.getABCName(), 
@@ -1684,24 +1687,26 @@ Machine::execute()
                     object->set_member(name, value, ns, false);
                     break;
                 }
-            /// 0x62 ABC_ACTION_GETLOCAL
-            /// Stream: V32 'frame_index'
-            /// Frame: value at frame_index is needed
-            /// Stack Out:
-            ///  value
+
+                /// 0x62 ABC_ACTION_GETLOCAL
+                /// Stream: V32 'frame_index'
+                /// Frame: value at frame_index is needed
+                /// Stack Out:
+                ///  value
                 case SWF::ABC_ACTION_GETLOCAL:
                 {
                     boost::uint32_t index = mStream->read_V32();
                     push_stack(get_register(index));
                     break;
                 }
-            /// 0x63 ABC_ACTION_SETLOCAL
-            /// Stream: V32 'frame_index'
-            /// Frame: obj at frame_index is set to value
-            /// Stack In:
-            ///  value
-            /// Stack Out:
-            ///  .
+
+                /// 0x63 ABC_ACTION_SETLOCAL
+                /// Stream: V32 'frame_index'
+                /// Frame: obj at frame_index is set to value
+                /// Stack In:
+                ///  value
+                /// Stack Out:
+                ///  .
                 case SWF::ABC_ACTION_SETLOCAL:
                 {
                     boost::uint32_t index = mStream->read_V32();
@@ -1709,20 +1714,22 @@ Machine::execute()
                     mRegisters[index] = pop_stack();
                     break;
                 }
-            /// 0x64 ABC_ACTION_GETGLOBALSCOPE
-            /// Stack Out:
-            ///  global -- The global scope object
+
+                /// 0x64 ABC_ACTION_GETGLOBALSCOPE
+                /// Stack Out:
+                ///  global -- The global scope object
                 case SWF::ABC_ACTION_GETGLOBALSCOPE:
                 {
-                    //TODO: Use get_scope_stack here.
+                    // TODO: Use get_scope_stack here.
                     push_stack(as_value(mScopeStack.value(0).get()));
-            //		print_stack();
+                    //print_stack();
                     break;
                 }
-            /// 0x65 ABC_ACTION_GETSCOPEOBJECT
-            /// Stream: S8 'depth'
-            /// Stack Out:
-            ///  scope -- The scope object at depth
+
+                /// 0x65 ABC_ACTION_GETSCOPEOBJECT
+                /// Stream: S8 'depth'
+                /// Stack Out:
+                ///  scope -- The scope object at depth
                 case SWF::ABC_ACTION_GETSCOPEOBJECT:
                 {
                     boost::uint8_t depth = mStream->read_u8();
