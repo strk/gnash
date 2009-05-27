@@ -1354,31 +1354,31 @@ Machine::execute()
                 /// Stream: V32 'arg_count'
                 /// Stack In:
                 ///  argN ... arg1 -- the arg_count arguments
-                ///  obj -- the object whose super's constructor should be invoked
+                ///  obj -- the object whose super's constructor should be
+                ///         invoked
                 /// Stack Out:
                 ///  .
                 case SWF::ABC_ACTION_CONSTRUCTSUPER:
                 {
                     boost::uint32_t argc = mStream->read_V32();
-                    log_abc("There are %u arguments.",argc);
                     get_args(argc);
                     
                     as_object* obj = mStack.top(argc).to_object().get();
                     as_object* super = obj ? obj->get_super() : 0;
-                    log_abc("CONSTRUCTSUPER: object is: %s, args: %s", mStack.top(argc),
-                            argc);
+                    log_abc("CONSTRUCTSUPER: object is: %s, args: %s",
+                            mStack.top(argc), argc);
 
                     if (!super) {
-                        log_error("No super found in CONSTRUCTSUPER!");
+                        log_error("ABC_ACTION_CONSTRUCTSUPER: No super found");
                         throw ASException();
                     }
                     as_function *func = super->get_constructor();
                     if (!func) {
-                        log_abc("Super(%s) has no constructor in CONSTRUCTSUPER!");
+                        log_abc("CONSTRUCTSUPER: %s has no constructor");
                     }
-                    // 'obj' is the 'this' for the call, we ignore the return, there are
-                    // argc arguments, and we drop all of the arguments plus 'obj' from
-                    // the stack.
+                    // 'obj' is the 'this' for the call, we ignore the
+                    // return, there are argc arguments, and we drop all
+                    // of the arguments plus 'obj' from the stack.
                     pushCall(func, super, mIgnoreReturn, argc, -1);
 
                     break;
@@ -3071,7 +3071,6 @@ Machine::print_scope_stack()
 std::auto_ptr<std::vector<as_value> >
 Machine::get_args(unsigned int argc)
 {
-	log_abc("There are %u args",argc);
 	std::auto_ptr<std::vector<as_value> > args = 
         std::auto_ptr<std::vector<as_value> >(new std::vector<as_value>);
 	args->resize(argc);
