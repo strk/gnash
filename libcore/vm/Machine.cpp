@@ -1354,31 +1354,31 @@ Machine::execute()
                 /// Stream: V32 'arg_count'
                 /// Stack In:
                 ///  argN ... arg1 -- the arg_count arguments
-                ///  obj -- the object whose super's constructor should be invoked
+                ///  obj -- the object whose super's constructor should be
+                ///         invoked
                 /// Stack Out:
                 ///  .
                 case SWF::ABC_ACTION_CONSTRUCTSUPER:
                 {
                     boost::uint32_t argc = mStream->read_V32();
-                    log_abc("There are %u arguments.",argc);
                     get_args(argc);
                     
                     as_object* obj = mStack.top(argc).to_object().get();
                     as_object* super = obj ? obj->get_super() : 0;
-                    log_abc("CONSTRUCTSUPER: object is: %s, args: %s", mStack.top(argc),
-                            argc);
+                    log_abc("CONSTRUCTSUPER: object is: %s, args: %s",
+                            mStack.top(argc), argc);
 
                     if (!super) {
-                        log_error("No super found in CONSTRUCTSUPER!");
+                        log_error("ABC_ACTION_CONSTRUCTSUPER: No super found");
                         throw ASException();
                     }
                     as_function *func = super->get_constructor();
                     if (!func) {
-                        log_abc("Super(%s) has no constructor in CONSTRUCTSUPER!");
+                        log_abc("CONSTRUCTSUPER: %s has no constructor");
                     }
-                    // 'obj' is the 'this' for the call, we ignore the return, there are
-                    // argc arguments, and we drop all of the arguments plus 'obj' from
-                    // the stack.
+                    // 'obj' is the 'this' for the call, we ignore the
+                    // return, there are argc arguments, and we drop all
+                    // of the arguments plus 'obj' from the stack.
                     pushCall(func, super, mIgnoreReturn, argc, -1);
 
                     break;
@@ -1577,6 +1577,7 @@ Machine::execute()
                     // TODO: Decide if we need this. (Might be a no-op.)
                     break;
                 }
+
                 /// 0x5D ABC_ACTION_FINDPROPSTRICT
                 /// 0x5E ABC_ACTION_FINDPROPERTY
                 /// Stream: V32 'name_id'
@@ -1592,6 +1593,8 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     as_value ret = find_prop_strict(a);
+
+
             /*		mStack.drop(completeName(a));
                     as_object *owner;
                     Property *b = mCurrentScope->findProperty(a.getABCName(), 
@@ -1684,24 +1687,26 @@ Machine::execute()
                     object->set_member(name, value, ns, false);
                     break;
                 }
-            /// 0x62 ABC_ACTION_GETLOCAL
-            /// Stream: V32 'frame_index'
-            /// Frame: value at frame_index is needed
-            /// Stack Out:
-            ///  value
+
+                /// 0x62 ABC_ACTION_GETLOCAL
+                /// Stream: V32 'frame_index'
+                /// Frame: value at frame_index is needed
+                /// Stack Out:
+                ///  value
                 case SWF::ABC_ACTION_GETLOCAL:
                 {
                     boost::uint32_t index = mStream->read_V32();
                     push_stack(get_register(index));
                     break;
                 }
-            /// 0x63 ABC_ACTION_SETLOCAL
-            /// Stream: V32 'frame_index'
-            /// Frame: obj at frame_index is set to value
-            /// Stack In:
-            ///  value
-            /// Stack Out:
-            ///  .
+
+                /// 0x63 ABC_ACTION_SETLOCAL
+                /// Stream: V32 'frame_index'
+                /// Frame: obj at frame_index is set to value
+                /// Stack In:
+                ///  value
+                /// Stack Out:
+                ///  .
                 case SWF::ABC_ACTION_SETLOCAL:
                 {
                     boost::uint32_t index = mStream->read_V32();
@@ -1709,20 +1714,22 @@ Machine::execute()
                     mRegisters[index] = pop_stack();
                     break;
                 }
-            /// 0x64 ABC_ACTION_GETGLOBALSCOPE
-            /// Stack Out:
-            ///  global -- The global scope object
+
+                /// 0x64 ABC_ACTION_GETGLOBALSCOPE
+                /// Stack Out:
+                ///  global -- The global scope object
                 case SWF::ABC_ACTION_GETGLOBALSCOPE:
                 {
-                    //TODO: Use get_scope_stack here.
+                    // TODO: Use get_scope_stack here.
                     push_stack(as_value(mScopeStack.value(0).get()));
-            //		print_stack();
+                    //print_stack();
                     break;
                 }
-            /// 0x65 ABC_ACTION_GETSCOPEOBJECT
-            /// Stream: S8 'depth'
-            /// Stack Out:
-            ///  scope -- The scope object at depth
+
+                /// 0x65 ABC_ACTION_GETSCOPEOBJECT
+                /// Stream: S8 'depth'
+                /// Stack Out:
+                ///  scope -- The scope object at depth
                 case SWF::ABC_ACTION_GETSCOPEOBJECT:
                 {
                     boost::uint8_t depth = mStream->read_u8();
@@ -1804,36 +1811,52 @@ Machine::execute()
 
                     as_object* object = object_val.to_object().get();
                     if (!object) {
-                        IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't initialize a property of a value that doesn't cast to an object (%s)."),
-                            object_val);
-                        )		
+                        log_abc("INITPROPERTY: expecting object on stack, "
+                                "got %s", object_val);
                     }
-                    else{
-                        object->set_member(a.getGlobalName(),v,false);
+                    else {
+                        object->set_member(a.getGlobalName(), v, false);
                     }
                     break;
                 }
-            /// 0x6A ABC_ACTION_DELETEPROPERTY
-            /// Stream: V32 'name_id'
-            /// Stack In:
-            ///  [ns [n]] -- Namespace stuff
-            ///  obj -- The object whose property should be deleted.
-            /// Stack Out:
-            ///  truth -- True if property was deleted or did not exist, else False.
+
+                /// 0x6A ABC_ACTION_DELETEPROPERTY
+                /// Stream: V32 'name_id'
+                /// Stack In:
+                ///  [ns [n]] -- Namespace stuff
+                ///  obj -- The object whose property should be deleted.
+                /// Stack Out:
+                ///  truth -- True if property was deleted or did not exist,
+                ///           else False.
                 case SWF::ABC_ACTION_DELETEPROPERTY:
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     mStack.drop(completeName(a));
-                    //mStack.top(0) = mStack.top(0).deleteProperty(a);
+                    as_object* obj = mStack.top(0).to_object().get();
+
+                    if (!obj) {
+                        // TODO: what here?
+                        log_abc("DELETEPROPERTY: expecting object on stack, "
+                                "got %s", mStack.top(0));
+                        break;
+                    }
+
+                    // Look in the global namespace if there is none specified.
+                    asNamespace* n = a.getNamespace();
+                    const string_table::key ns = n ? n->getURI() : 0;
+                    const string_table::key prop = a.getGlobalName();
+
+                    const bool deleted = obj->delProperty(prop, ns).second;
+                    mStack.top(0) = deleted;
                     break;
                 }
-            /// 0x6C ABC_ACTION_GETSLOT
-            /// Stream: V32 'slot_index + 1'
-            /// Stack In:
-            ///  obj -- The object which owns the desired slot.
-            /// Stack Out:
-            ///  slot -- obj.slots[slot_index]
+
+                /// 0x6C ABC_ACTION_GETSLOT
+                /// Stream: V32 'slot_index + 1'
+                /// Stack In:
+                ///  obj -- The object which owns the desired slot.
+                /// Stack Out:
+                ///  slot -- obj.slots[slot_index]
                 case SWF::ABC_ACTION_GETSLOT:
                 {
                     as_value val;
@@ -1842,19 +1865,21 @@ Machine::execute()
 
                     object->get_member_slot(sindex + 1, &val);
 
-                    log_abc("object has value %s at real_slot=%u abc_slot=%u",val.toDebugString(),sindex + 1, sindex);
+                    log_abc("object has value %s at real_slot=%u abc_slot=%u",
+                            val, sindex + 1, sindex);
                     push_stack(val);
                     
                     break;
                 }
-            /// 0x6D ABC_ACTION_SETSLOT
-            /// Stream: V32 'slot_index + 1'
-            /// Stack In:
-            ///  value -- The value intended for the slot.
-            ///  obj -- The object whose slot should be set.
-            /// Stack Out:
-            ///  .
-            /// Do: obj.slots[slot_index] = value
+
+                /// 0x6D ABC_ACTION_SETSLOT
+                /// Stream: V32 'slot_index + 1'
+                /// Stack In:
+                ///  value -- The value intended for the slot.
+                ///  obj -- The object whose slot should be set.
+                /// Stack Out:
+                ///  .
+                /// Do: obj.slots[slot_index] = value
                 case SWF::ABC_ACTION_SETSLOT:
                 {
                     boost::uint32_t sindex = mStream->read_V32();
@@ -3071,7 +3096,6 @@ Machine::print_scope_stack()
 std::auto_ptr<std::vector<as_value> >
 Machine::get_args(unsigned int argc)
 {
-	log_abc("There are %u args",argc);
 	std::auto_ptr<std::vector<as_value> > args = 
         std::auto_ptr<std::vector<as_value> >(new std::vector<as_value>);
 	args->resize(argc);
