@@ -27,62 +27,39 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "Object.h"
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value stagealign_ctor(const fn_call& fn);
-    void attachStageAlignInterface(as_object& o);
     void attachStageAlignStaticInterface(as_object& o);
-    as_object* getStageAlignInterface();
-
 }
 
 // extern (used by Global.cpp)
-void stagealign_class_init(as_object& global)
+void
+stagealign_class_init(as_object& where)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    attachStageAlignStaticInterface(*obj);
 
-    if (!cl) {
-        cl = new builtin_function(&stagealign_ctor, getStageAlignInterface());
-        attachStageAlignStaticInterface(*cl);
-    }
-
-    // Register _global.StageAlign
-    global.init_member("StageAlign", cl.get());
+    where.init_member("StageAlign", obj.get());
 }
 
 namespace {
 
 void
-attachStageAlignInterface(as_object& o)
-{
-}
-
-void
 attachStageAlignStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getStageAlignInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachStageAlignInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-stagealign_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new StageAlign_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: flags
+    o.init_member("BOTTOM", "B");
+    o.init_member("BOTTOM_LEFT", "BL");
+    o.init_member("BOTTOM_RIGHT", "BR");
+    o.init_member("LEFT", "L");
+    o.init_member("RIGHT", "R");
+    o.init_member("TOP", "T");
+    o.init_member("TOP_LEFT", "TL");
+    o.init_member("TOP_RIGHT", "TR");
 }
 
 } // anonymous namespace 

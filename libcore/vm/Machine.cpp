@@ -1619,11 +1619,12 @@ Machine::execute()
                     // TODO
                     break;
                 }
-            /// 0x60 ABC_ACTION_GETLEX
-            /// Stream: V32 'name_id' (no ns expansion)
-            /// Stack Out:
-            ///  property -- The result of 0x5D (ABC_ACTION_FINDPROPSTRICT)
-            ///   + 0x66 (ABC_ACTION_GETPROPERTY)
+
+                /// 0x60 ABC_ACTION_GETLEX
+                /// Stream: V32 'name_id' (no ns expansion)
+                /// Stack Out:
+                ///  property -- The result of 0x5D (ABC_ACTION_FINDPROPSTRICT)
+                ///   + 0x66 (ABC_ACTION_GETPROPERTY)
                 case SWF::ABC_ACTION_GETLEX:
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
@@ -1636,21 +1637,24 @@ Machine::execute()
 
                     break;
                 }
-            ///  ABC_ACTION_SETPROPERTY
-            /// Stream: V32 'name_id'
-            /// Stack In:
-            ///  value -- The value to be used
-            ///  [ns [n]] -- Namespace stuff
-            ///      OR
-            ///  [key] -- Key name for property. Will not have both Namespace and key.
-            ///  obj -- The object whose property is to be set
-            /// Stack Out:
-            ///  .
-            /// NB: If the name at name_id is completely qualified, neither a namespace
-            /// nor a key is needed.  If the name_id refers to a name with a runtime
-            /// namespace, then this will be used.  If neither of those is true and
-            /// obj is a dictionary and key is a name, then the name_id is discarded and
-            /// key/value is set in the dictionary obj instead.
+                ///  ABC_ACTION_SETPROPERTY
+                /// Stream: V32 'name_id'
+                /// Stack In:
+                ///  value -- The value to be used
+                ///  [ns [n]] -- Namespace stuff
+                ///      OR
+                ///  [key] -- Key name for property. Will not have both
+                ///          Namespace and key.
+                ///  obj -- The object whose property is to be set
+                /// Stack Out:
+                ///  .
+                /// NB: If the name at name_id is completely qualified,
+                ///     neither a namespace nor a key is needed.  If the
+                ///     name_id refers to a name with a runtime
+                ///     namespace, then this will be used.  If neither of
+                ///     those is true and obj is a dictionary and key is
+                ///     a name, then the name_id is discarded and key/value
+                ///     is set in the dictionary obj instead.
                 case SWF::ABC_ACTION_SETPROPERTY:
                 {
                     as_value value = pop_stack();
@@ -1661,12 +1665,12 @@ Machine::execute()
                     // TODO: If multiname is runtime we need to also pop
                     // namespace and name values off the stack.
                     if (a.flags() == asName::KIND_MultinameL) {
+                        log_abc("SETPROPERTY: name is a late runtime "
+                                "multiname");
                         as_value nameValue = pop_stack();
                         name = mST.find(nameValue.to_string());
                     }
-                    else{
-                        name = a.getGlobalName();
-                    }
+                    else name = a.getGlobalName();
 
                     as_value val = pop_stack();
                     as_object *object = val.to_object().get();

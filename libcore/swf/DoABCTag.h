@@ -41,9 +41,9 @@ class DoABCTag : public ControlTag
 {
 public:
 
-    virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
+    virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
-		VM& vm = VM::get();
+		VM& vm = m->getVM();
 		log_debug("getting machine.");
 		Machine *mach = vm.getMachine();
 		as_object* global = vm.getGlobal();
@@ -51,12 +51,7 @@ public:
         mABC->prepare(mach);
 
 		log_debug("Begin execute abc_block.");
-//		log_debug("Getting entry script.");
-//		asClass* start_script = a.mScripts.back();
-//		log_debug("Getting constructor.");
-//		asMethod* method = start_script->getConstructor();
-//		log_debug("Loding code stream.");
-		mach->initMachine(mABC,global);
+		mach->initMachine(mABC, global);
 		log_debug("Executing machine...");
 		mach->execute();
 	}
