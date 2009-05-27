@@ -1325,6 +1325,40 @@ NetStream_as::advanceState()
     // by all available consumers
     _playHead.advanceIfConsumed();
 
+    // As of bug #26687 we discovered that 
+    // an FLV containing only audio with consecutive
+    // frames performing a jump of more then an hour
+    // result in a jump-forward of the playhead (NetStream.time)
+    // w/out waiting for the whole time gap to elapse
+    //
+    // We'll then perform the jump with this conditions:
+    //  1: there are no video frames yet
+    //  2: the audio buffer is empty, to avoid buffer overrun conditions
+    //  3: input audio frames exist with a timestamp in the future
+    //
+    if ( ! m_parser->getVideoInfo() ) 
+    {
+        // FIXME: use services of BufferedAudioStreamer for this
+        boost::mutex::scoped_lock lock(_audioStreamer._audioQueueMutex);
+        bool emptyAudioQueue = _audioStreamer._audioQueue.empty();
+        lock.unlock();
+
+        if ( emptyAudioQueue )
+        {
+            boost::uint64_t nextTimestamp;
+            if ( m_parser->nextAudioFrameTimestamp(nextTimestamp) )
+            {
+                log_debug("Moving NetStream playhead "
+                          "from timestamp %d to timestamp %d "
+                          "as there are no video frames yet, "
+                          "audio buffer is empty and next audio "
+                          "frame timestamp is there (see bug #26687)",
+                          _playHead.getPosition(), nextTimestamp);
+                _playHead.seekTo(nextTimestamp);
+            }
+        }
+    }
+
     media::MediaParser::OrderedMetaTags tags;
 
     m_parser->fetchMetaTags(tags, _playHead.getPosition());
