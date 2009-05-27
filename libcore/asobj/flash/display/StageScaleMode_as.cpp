@@ -27,62 +27,35 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "Object.h"
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value stagescalemode_ctor(const fn_call& fn);
-    void attachStageScaleModeInterface(as_object& o);
     void attachStageScaleModeStaticInterface(as_object& o);
     as_object* getStageScaleModeInterface();
-
 }
 
-// extern (used by Global.cpp)
-void stagescalemode_class_init(as_object& global)
+void
+stagescalemode_class_init(as_object& where)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    attachStageScaleModeStaticInterface(*obj);
 
-    if (!cl) {
-        cl = new builtin_function(&stagescalemode_ctor, getStageScaleModeInterface());
-        attachStageScaleModeStaticInterface(*cl);
-    }
-
-    // Register _global.StageScaleMode
-    global.init_member("StageScaleMode", cl.get());
+    where.init_member("StageScaleMode", obj.get());
 }
+
 
 namespace {
 
 void
-attachStageScaleModeInterface(as_object& o)
-{
-}
-
-void
 attachStageScaleModeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getStageScaleModeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachStageScaleModeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-stagescalemode_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new StageScaleMode_as;
-
-    return as_value(obj.get()); // will keep alive
+    o.init_member("EXACT_FIT", "exactFit");
+    o.init_member("NO_BORDER", "noBorder");
+    o.init_member("NO_SCALE", "noScale");
+    o.init_member("SHOW_ALL", "showAll");
 }
 
 } // anonymous namespace 

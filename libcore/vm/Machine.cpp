@@ -1027,28 +1027,31 @@ Machine::execute()
                 /// first logical property.
                 case SWF::ABC_ACTION_HASNEXT2:
                 {
-                    boost::int32_t oindex = mStream->read_V32();
-                    boost::int32_t iindex = mStream->read_V32();
-                    as_value &objv = mRegisters[oindex];
-                    as_value &indexv = mRegisters[iindex];
-                    log_abc("Index is %u",indexv.to_number());
+                    const boost::int32_t oindex = mStream->read_V32();
+                    const boost::int32_t iindex = mStream->read_V32();
+
+                    as_value& objv = mRegisters[oindex];
+                    const as_value& indexv = mRegisters[iindex];
                     
+                    log_abc("HASNEXT2: Object is %s, index is %d",
+                            objv, indexv);
+
                     as_object *obj = objv.to_object().get();
                     if (!obj) {
                         // TODO: Check what to do here.
                         log_error("ABC_ACTION_HASNEXT2: expecting object in "
                                 "register %d, got %s", oindex, objv);
-                        // Stack is unchanged, so just break?
+                        // Stack is unchanged, so just break? Or push false?
+                        // Or throw?
                         break;
                     }
                     
                     boost::uint32_t index = indexv.to_number<boost::uint32_t>();
-                    log_abc("Object is %s index is %u", objv.toDebugString(),
-                            index);
 
                     as_object *owner = 0;
                     int next = obj->nextIndex(index, &owner);
-                    log_abc("Next index is %d",next);
+                    log_abc("HASNEXT2: Next index is %d", next);
+
                     if (next) {
                         push_stack(true);
                         if (owner) mRegisters[oindex] = owner;
@@ -1655,8 +1658,8 @@ Machine::execute()
                     string_table::key name = 0;
 
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
-                    // TODO: If multiname is runtime we need to also pop namespace
-                    // and name values of the stack.
+                    // TODO: If multiname is runtime we need to also pop
+                    // namespace and name values off the stack.
                     if (a.flags() == asName::KIND_MultinameL) {
                         as_value nameValue = pop_stack();
                         name = mST.find(nameValue.to_string());
@@ -1669,8 +1672,8 @@ Machine::execute()
                     as_object *object = val.to_object().get();
 
                     if (!object) {
-                        log_error("Expected object on stack, but none found (%s)!",
-                                val);
+                        log_error("ABC_ACTION_SETPROPERTY: expecting object "
+                                "on stack, got %s!", val);
                         break;
                     }
 
@@ -1723,64 +1726,76 @@ Machine::execute()
                     print_scope_stack();
                     break;
                 }
-            /// 0x66 ABC_ACTION_GETPROPERTY
-            /// Stream: V32 'name_id'
-            /// Stack In:
-            ///  [ns [n]] -- Namespace stuff
-            ///      OR
-            ///  [key] -- Key name for property. Will not have both Namespace and key.
-            ///  obj -- The object whose property is to be retrieved
-            /// Stack Out:
-            ///  prop -- The requested property.
-            /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
+                
+                /// 0x66 ABC_ACTION_GETPROPERTY
+                /// Stream: V32 'name_id'
+                /// Stack In:
+                ///  [ns [n]] -- Namespace stuff
+                ///      OR
+                ///  [key] -- Key name for property. Will not have both
+                ///           Namespace and key.
+                ///  obj -- The object whose property is to be retrieved
+                /// Stack Out:
+                ///  prop -- The requested property.
+                /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of
+                ///     ns/key.
                 case SWF::ABC_ACTION_GETPROPERTY:
                 {
-                    as_value prop;
                     string_table::key ns = 0;
                     string_table::key name = 0;
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
-                    //TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
+                    // TODO: If multiname is runtime we need to also pop
+                    // namespace and name values of the stack.
                     if (a.flags() == asName::KIND_MultinameL) {
                         as_value nameValue = pop_stack();
                         name = mST.find(nameValue.to_string());
                     }
-                    else {
-                        name = a.getGlobalName();
-                    }
+                    else name = a.getGlobalName();
 
                     as_value object_val = pop_stack();
-
                     as_object* object = object_val.to_object().get();
+                    
                     if (!object) {
-                        IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't get a property of a value that doesn't "
-                                "cast to an object (%s)."), object_val);
-                        )
+                        log_debug(_("ABC_ACTION_GETPROPERTY: expecting "
+                                    "object on stack, got %s."), object_val);
+                        push_stack(as_value());
+                        break;
                     }
-                    else{
-                        object->get_member(name, &prop, ns);
+                    
+                    as_value prop;
+                    
+                    const bool found = object->get_member(name, &prop, ns);
+                    if (!found) {
+                        log_abc("GETPROPERTY: property %s not found",
+                                mST.value(name));
+                    }
+                    else {
+                        log_abc("GETPROPERTY: property %s is %s",
+                                mST.value(name), prop);
                     }
 
                     push_stack(prop);
-
                     break;
                 }
-            /// 0x68 ABC_ACTION_INITPROPERTY
-            /// Stream V32 'name_id'
-            /// Stack In:
-            ///  value -- The value to be put into the property.
-            ///  [ns [n]] -- Namespace stuff
-            ///  obj -- The object whose property is to be initialized
-            /// Stack Out:
-            ///  .
-            /// Do:
-            ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
+
+                /// 0x68 ABC_ACTION_INITPROPERTY
+                /// Stream V32 'name_id'
+                /// Stack In:
+                ///  value -- The value to be put into the property.
+                ///  [ns [n]] -- Namespace stuff
+                ///  obj -- The object whose property is to be initialized
+                /// Stack Out:
+                ///  .
+                /// Do:
+                ///  Set obj::(resolve)'name_id' to value, set bindings
+                /// from the context.
                 case SWF::ABC_ACTION_INITPROPERTY:
                 {
                     boost::uint32_t index = mStream->read_V32();
                     asName a = pool_name(index, mPoolObject);
                     as_value v = pop_stack();
-                    //TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
+                    // TODO: If multiname is a runtime mutiname we need to also
+                    // pop name and namespace values.
                     as_value object_val = pop_stack();
 
                     as_object* object = object_val.to_object().get();
