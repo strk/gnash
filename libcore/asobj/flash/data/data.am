@@ -110,7 +110,6 @@ dataclasses.h: Makefile
 	echo "#define GNASH_ASOBJ_FLASH_DATA_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
 	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	# drop the first node, which is always the top level package ;\
 	sources="`echo $(DATA_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
