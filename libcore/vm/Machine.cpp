@@ -1811,36 +1811,52 @@ Machine::execute()
 
                     as_object* object = object_val.to_object().get();
                     if (!object) {
-                        IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't initialize a property of a value that doesn't cast to an object (%s)."),
-                            object_val);
-                        )		
+                        log_abc("INITPROPERTY: expecting object on stack, "
+                                "got %s", object_val);
                     }
-                    else{
-                        object->set_member(a.getGlobalName(),v,false);
+                    else {
+                        object->set_member(a.getGlobalName(), v, false);
                     }
                     break;
                 }
-            /// 0x6A ABC_ACTION_DELETEPROPERTY
-            /// Stream: V32 'name_id'
-            /// Stack In:
-            ///  [ns [n]] -- Namespace stuff
-            ///  obj -- The object whose property should be deleted.
-            /// Stack Out:
-            ///  truth -- True if property was deleted or did not exist, else False.
+
+                /// 0x6A ABC_ACTION_DELETEPROPERTY
+                /// Stream: V32 'name_id'
+                /// Stack In:
+                ///  [ns [n]] -- Namespace stuff
+                ///  obj -- The object whose property should be deleted.
+                /// Stack Out:
+                ///  truth -- True if property was deleted or did not exist,
+                ///           else False.
                 case SWF::ABC_ACTION_DELETEPROPERTY:
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     mStack.drop(completeName(a));
-                    //mStack.top(0) = mStack.top(0).deleteProperty(a);
+                    as_object* obj = mStack.top(0).to_object().get();
+
+                    if (!obj) {
+                        // TODO: what here?
+                        log_abc("DELETEPROPERTY: expecting object on stack, "
+                                "got %s", mStack.top(0));
+                        break;
+                    }
+
+                    // Look in the global namespace if there is none specified.
+                    asNamespace* n = a.getNamespace();
+                    const string_table::key ns = n ? n->getURI() : 0;
+                    const string_table::key prop = a.getGlobalName();
+
+                    const bool deleted = obj->delProperty(prop, ns).second;
+                    mStack.top(0) = deleted;
                     break;
                 }
-            /// 0x6C ABC_ACTION_GETSLOT
-            /// Stream: V32 'slot_index + 1'
-            /// Stack In:
-            ///  obj -- The object which owns the desired slot.
-            /// Stack Out:
-            ///  slot -- obj.slots[slot_index]
+
+                /// 0x6C ABC_ACTION_GETSLOT
+                /// Stream: V32 'slot_index + 1'
+                /// Stack In:
+                ///  obj -- The object which owns the desired slot.
+                /// Stack Out:
+                ///  slot -- obj.slots[slot_index]
                 case SWF::ABC_ACTION_GETSLOT:
                 {
                     as_value val;
@@ -1849,19 +1865,21 @@ Machine::execute()
 
                     object->get_member_slot(sindex + 1, &val);
 
-                    log_abc("object has value %s at real_slot=%u abc_slot=%u",val.toDebugString(),sindex + 1, sindex);
+                    log_abc("object has value %s at real_slot=%u abc_slot=%u",
+                            val, sindex + 1, sindex);
                     push_stack(val);
                     
                     break;
                 }
-            /// 0x6D ABC_ACTION_SETSLOT
-            /// Stream: V32 'slot_index + 1'
-            /// Stack In:
-            ///  value -- The value intended for the slot.
-            ///  obj -- The object whose slot should be set.
-            /// Stack Out:
-            ///  .
-            /// Do: obj.slots[slot_index] = value
+
+                /// 0x6D ABC_ACTION_SETSLOT
+                /// Stream: V32 'slot_index + 1'
+                /// Stack In:
+                ///  value -- The value intended for the slot.
+                ///  obj -- The object whose slot should be set.
+                /// Stack Out:
+                ///  .
+                /// Do: obj.slots[slot_index] = value
                 case SWF::ABC_ACTION_SETSLOT:
                 {
                     boost::uint32_t sindex = mStream->read_V32();
