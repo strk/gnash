@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getStaticTextInterface();
-}
-
-class StaticText_as: public as_object
-{
-
-public:
-
-    StaticText_as()
-        :
-        as_object(getStaticTextInterface())
-    {}
-
-};
 
 /// Initialize the global StaticText class
 void statictext_class_init(as_object& global);

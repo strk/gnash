@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getCSMSettingsInterface();
-}
-
-class CSMSettings_as: public as_object
-{
-
-public:
-
-    CSMSettings_as()
-        :
-        as_object(getCSMSettingsInterface())
-    {}
-
-};
 
 /// Initialize the global CSMSettings class
 void csmsettings_class_init(as_object& global);

@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextFieldInterface();
-}
-
-class TextField_as: public as_object
-{
-
-public:
-
-    TextField_as()
-        :
-        as_object(getTextFieldInterface())
-    {}
-
-};
 
 /// Initialize the global TextField class
 void textfield_class_init(as_object& global);

@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextSnapshotInterface();
-}
-
-class TextSnapshot_as: public as_object
-{
-
-public:
-
-    TextSnapshot_as()
-        :
-        as_object(getTextSnapshotInterface())
-    {}
-
-};
 
 /// Initialize the global TextSnapshot class
 void textsnapshot_class_init(as_object& global);

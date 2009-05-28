@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextLineMetricsInterface();
-}
-
-class TextLineMetrics_as: public as_object
-{
-
-public:
-
-    TextLineMetrics_as()
-        :
-        as_object(getTextLineMetricsInterface())
-    {}
-
-};
 
 /// Initialize the global TextLineMetrics class
 void textlinemetrics_class_init(as_object& global);

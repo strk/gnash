@@ -43,6 +43,17 @@ namespace {
 
 }
 
+class StyleSheet_as : public as_object
+{
+
+public:
+
+    StyleSheet_as()
+        :
+        as_object(getStyleSheetInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void stylesheet_class_init(as_object& global)
 {

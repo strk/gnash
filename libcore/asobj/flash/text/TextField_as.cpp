@@ -59,6 +59,17 @@ namespace {
 
 }
 
+class TextField_as : public as_object
+{
+
+public:
+
+    TextField_as()
+        :
+        as_object(getTextFieldInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void textfield_class_init(as_object& global)
 {
