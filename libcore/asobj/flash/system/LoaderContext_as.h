@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getLoaderContextInterface();
-}
-
-class LoaderContext_as: public as_object
-{
-
-public:
-
-    LoaderContext_as()
-        :
-        as_object(getLoaderContextInterface())
-    {}
-
-};
 
 /// Initialize the global LoaderContext class
 void loadercontext_class_init(as_object& global);

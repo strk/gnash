@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getCapabilitiesInterface();
-}
-
-class Capabilities_as: public as_object
-{
-
-public:
-
-    Capabilities_as()
-        :
-        as_object(getCapabilitiesInterface())
-    {}
-
-};
 
 /// Initialize the global Capabilities class
 void capabilities_class_init(as_object& global);

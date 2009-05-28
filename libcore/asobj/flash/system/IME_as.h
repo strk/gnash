@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIMEInterface();
-}
-
-class IME_as: public as_object
-{
-
-public:
-
-    IME_as()
-        :
-        as_object(getIMEInterface())
-    {}
-
-};
 
 /// Initialize the global IME class
 void ime_class_init(as_object& global);

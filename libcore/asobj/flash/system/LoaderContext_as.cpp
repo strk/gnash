@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class LoaderContext_as : public as_object
+{
+
+public:
+
+    LoaderContext_as()
+        :
+        as_object(getLoaderContextInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void loadercontext_class_init(as_object& global)
 {

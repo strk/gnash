@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSecurityInterface();
-}
-
-class Security_as: public as_object
-{
-
-public:
-
-    Security_as()
-        :
-        as_object(getSecurityInterface())
-    {}
-
-};
 
 /// Initialize the global Security class
 void security_class_init(as_object& global);

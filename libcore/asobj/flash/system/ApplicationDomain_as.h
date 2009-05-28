@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getApplicationDomainInterface();
-}
-
-class ApplicationDomain_as: public as_object
-{
-
-public:
-
-    ApplicationDomain_as()
-        :
-        as_object(getApplicationDomainInterface())
-    {}
-
-};
 
 /// Initialize the global ApplicationDomain class
 void applicationdomain_class_init(as_object& global);

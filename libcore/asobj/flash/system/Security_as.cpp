@@ -46,6 +46,17 @@ namespace {
 
 }
 
+class Security_as : public as_object
+{
+
+public:
+
+    Security_as()
+        :
+        as_object(getSecurityInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void security_class_init(as_object& global)
 {
