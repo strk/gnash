@@ -96,11 +96,6 @@ NET_SOURCES += flash/net/URLLoader_as.cpp
 NET_HEADERS += flash/net/URLLoader_as.h
 endif
 
-if BUILD_URLREQUESTDEFAULTS_AS3
-NET_SOURCES += flash/net/URLRequestDefaults_as.cpp
-NET_HEADERS += flash/net/URLRequestDefaults_as.h
-endif
-
 if BUILD_URLREQUESTHEADER_AS3
 NET_SOURCES += flash/net/URLRequestHeader_as.cpp
 NET_HEADERS += flash/net/URLRequestHeader_as.h
