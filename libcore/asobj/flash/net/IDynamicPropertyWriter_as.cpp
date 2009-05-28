@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class IDynamicPropertyWriter_as : public as_object
+{
+
+public:
+
+    IDynamicPropertyWriter_as()
+        :
+        as_object(getIDynamicPropertyWriterInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void idynamicpropertywriter_class_init(as_object& global)
 {

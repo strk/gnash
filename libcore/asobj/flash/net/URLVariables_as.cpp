@@ -40,6 +40,17 @@ namespace {
 
 }
 
+class URLVariables_as : public as_object
+{
+
+public:
+
+    URLVariables_as()
+        :
+        as_object(getURLVariablesInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void urlvariables_class_init(as_object& global)
 {

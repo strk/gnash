@@ -45,6 +45,17 @@ namespace {
 
 }
 
+class XMLSocket_as : public as_object
+{
+
+public:
+
+    XMLSocket_as()
+        :
+        as_object(getXMLSocketInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void xmlsocket_class_init(as_object& global)
 {

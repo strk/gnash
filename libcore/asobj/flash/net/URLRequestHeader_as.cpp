@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class URLRequestHeader_as : public as_object
+{
+
+public:
+
+    URLRequestHeader_as()
+        :
+        as_object(getURLRequestHeaderInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void urlrequestheader_class_init(as_object& global)
 {

@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getObjectEncodingInterface();
-}
-
-class ObjectEncoding_as: public as_object
-{
-
-public:
-
-    ObjectEncoding_as()
-        :
-        as_object(getObjectEncodingInterface())
-    {}
-
-};
 
 /// Initialize the global ObjectEncoding class
 void objectencoding_class_init(as_object& global);

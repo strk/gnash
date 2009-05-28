@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIDynamicPropertyOutputInterface();
-}
-
-class IDynamicPropertyOutput_as: public as_object
-{
-
-public:
-
-    IDynamicPropertyOutput_as()
-        :
-        as_object(getIDynamicPropertyOutputInterface())
-    {}
-
-};
 
 /// Initialize the global IDynamicPropertyOutput class
 void idynamicpropertyoutput_class_init(as_object& global);

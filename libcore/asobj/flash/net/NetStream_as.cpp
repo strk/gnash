@@ -59,6 +59,17 @@ namespace {
 
 }
 
+class NetStream_as : public as_object
+{
+
+public:
+
+    NetStream_as()
+        :
+        as_object(getNetStreamInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void netstream_class_init(as_object& global)
 {

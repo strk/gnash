@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getURLRequestInterface();
-}
-
-class URLRequest_as: public as_object
-{
-
-public:
-
-    URLRequest_as()
-        :
-        as_object(getURLRequestInterface())
-    {}
-
-};
 
 /// Initialize the global URLRequest class
 void urlrequest_class_init(as_object& global);

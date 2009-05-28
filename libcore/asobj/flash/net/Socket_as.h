@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSocketInterface();
-}
-
-class Socket_as: public as_object
-{
-
-public:
-
-    Socket_as()
-        :
-        as_object(getSocketInterface())
-    {}
-
-};
 
 /// Initialize the global Socket class
 void socket_class_init(as_object& global);

@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getURLLoaderDataFormatInterface();
-}
-
-class URLLoaderDataFormat_as: public as_object
-{
-
-public:
-
-    URLLoaderDataFormat_as()
-        :
-        as_object(getURLLoaderDataFormatInterface())
-    {}
-
-};
 
 /// Initialize the global URLLoaderDataFormat class
 void urlloaderdataformat_class_init(as_object& global);

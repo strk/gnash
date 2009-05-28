@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getXMLSocketInterface();
-}
-
-class XMLSocket_as: public as_object
-{
-
-public:
-
-    XMLSocket_as()
-        :
-        as_object(getXMLSocketInterface())
-    {}
-
-};
 
 /// Initialize the global XMLSocket class
 void xmlsocket_class_init(as_object& global);

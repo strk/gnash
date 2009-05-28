@@ -60,6 +60,17 @@ namespace {
 
 }
 
+class URLStream_as : public as_object
+{
+
+public:
+
+    URLStream_as()
+        :
+        as_object(getURLStreamInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void urlstream_class_init(as_object& global)
 {

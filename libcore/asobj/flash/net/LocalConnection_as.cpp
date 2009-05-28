@@ -46,6 +46,17 @@ namespace {
 
 }
 
+class LocalConnection_as : public as_object
+{
+
+public:
+
+    LocalConnection_as()
+        :
+        as_object(getLocalConnectionInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void localconnection_class_init(as_object& global)
 {

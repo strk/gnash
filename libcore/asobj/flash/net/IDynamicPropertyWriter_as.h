@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIDynamicPropertyWriterInterface();
-}
-
-class IDynamicPropertyWriter_as: public as_object
-{
-
-public:
-
-    IDynamicPropertyWriter_as()
-        :
-        as_object(getIDynamicPropertyWriterInterface())
-    {}
-
-};
 
 /// Initialize the global IDynamicPropertyWriter class
 void idynamicpropertywriter_class_init(as_object& global);
