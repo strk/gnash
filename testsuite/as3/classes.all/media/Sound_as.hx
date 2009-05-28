@@ -23,18 +23,15 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+//NOTE: this is a test suite only for flash versions > 9. For ealier
+//versions of flash, please use the internal test with ming.
+
 #if flash9
 import flash.media.ID3Info;
 import flash.media.Sound;
 import flash.media.SoundLoaderContext;
 import flash.media.SoundChannel;
 import flash.display.MovieClip;
-#else
-import flash.ID3Info;
-import flash.Sound;
-import flash.SoundLoaderContext;
-import flash.SoundChannel;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
