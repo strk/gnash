@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class Font_as : public as_object
+{
+
+public:
+
+    Font_as()
+        :
+        as_object(getFontInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void font_class_init(as_object& global)
 {

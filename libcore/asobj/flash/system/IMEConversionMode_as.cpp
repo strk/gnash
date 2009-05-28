@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class IMEConversionMode_as : public as_object
+{
+
+public:
+
+    IMEConversionMode_as()
+        :
+        as_object(getIMEConversionModeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void imeconversionmode_class_init(as_object& global)
 {

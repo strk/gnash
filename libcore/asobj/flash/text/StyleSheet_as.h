@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getStyleSheetInterface();
-}
-
-class StyleSheet_as: public as_object
-{
-
-public:
-
-    StyleSheet_as()
-        :
-        as_object(getStyleSheetInterface())
-    {}
-
-};
 
 /// Initialize the global StyleSheet class
 void stylesheet_class_init(as_object& global);

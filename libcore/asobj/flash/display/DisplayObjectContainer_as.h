@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getDisplayObjectContainerInterface();
-}
-
-class DisplayObjectContainer_as: public as_object
-{
-
-public:
-
-    DisplayObjectContainer_as()
-        :
-        as_object(getDisplayObjectContainerInterface())
-    {}
-
-};
 
 /// Initialize the global DisplayObjectContainer class
 void displayobjectcontainer_class_init(as_object& global);

@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSharedObjectFlushStatusInterface();
-}
-
-class SharedObjectFlushStatus_as: public as_object
-{
-
-public:
-
-    SharedObjectFlushStatus_as()
-        :
-        as_object(getSharedObjectFlushStatusInterface())
-    {}
-
-};
 
 /// Initialize the global SharedObjectFlushStatus class
 void sharedobjectflushstatus_class_init(as_object& global);

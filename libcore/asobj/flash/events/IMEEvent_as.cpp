@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class IMEEvent_as : public as_object
+{
+
+public:
+
+    IMEEvent_as()
+        :
+        as_object(getIMEEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void imeevent_class_init(as_object& global)
 {

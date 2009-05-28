@@ -51,6 +51,17 @@ namespace {
 
 }
 
+class MouseEvent_as : public as_object
+{
+
+public:
+
+    MouseEvent_as()
+        :
+        as_object(getMouseEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void mouseevent_class_init(as_object& global)
 {

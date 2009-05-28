@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class NetStatusEvent_as : public as_object
+{
+
+public:
+
+    NetStatusEvent_as()
+        :
+        as_object(getNetStatusEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void netstatusevent_class_init(as_object& global)
 {

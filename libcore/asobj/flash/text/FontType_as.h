@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getFontTypeInterface();
-}
-
-class FontType_as: public as_object
-{
-
-public:
-
-    FontType_as()
-        :
-        as_object(getFontTypeInterface())
-    {}
-
-};
 
 /// Initialize the global FontType class
 void fonttype_class_init(as_object& global);

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SoundTransform_as : public as_object
+{
+
+public:
+
+    SoundTransform_as()
+        :
+        as_object(getSoundTransformInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void soundtransform_class_init(as_object& global)
 {

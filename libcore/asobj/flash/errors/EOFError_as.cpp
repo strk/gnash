@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class EOFError_as : public as_object
+{
+
+public:
+
+    EOFError_as()
+        :
+        as_object(getEOFErrorInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void eoferror_class_init(as_object& global)
 {

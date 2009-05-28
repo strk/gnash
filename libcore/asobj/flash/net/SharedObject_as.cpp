@@ -50,6 +50,17 @@ namespace {
 
 }
 
+class SharedObject_as : public as_object
+{
+
+public:
+
+    SharedObject_as()
+        :
+        as_object(getSharedObjectInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void sharedobject_class_init(as_object& global)
 {

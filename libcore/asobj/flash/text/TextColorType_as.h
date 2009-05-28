@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextColorTypeInterface();
-}
-
-class TextColorType_as: public as_object
-{
-
-public:
-
-    TextColorType_as()
-        :
-        as_object(getTextColorTypeInterface())
-    {}
-
-};
 
 /// Initialize the global TextColorType class
 void textcolortype_class_init(as_object& global);

@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class SyncEvent_as : public as_object
+{
+
+public:
+
+    SyncEvent_as()
+        :
+        as_object(getSyncEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void syncevent_class_init(as_object& global)
 {

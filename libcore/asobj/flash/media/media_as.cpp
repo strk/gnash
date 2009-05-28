@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class media_as : public as_object
+{
+
+public:
+
+    media_as()
+        :
+        as_object(getmediaInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void media_class_init(as_object& global)
 {

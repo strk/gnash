@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getScriptTimeoutErrorInterface();
-}
-
-class ScriptTimeoutError_as: public as_object
-{
-
-public:
-
-    ScriptTimeoutError_as()
-        :
-        as_object(getScriptTimeoutErrorInterface())
-    {}
-
-};
 
 /// Initialize the global ScriptTimeoutError class
 void scripttimeouterror_class_init(as_object& global);

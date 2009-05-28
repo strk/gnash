@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SpreadMethod_as : public as_object
+{
+
+public:
+
+    SpreadMethod_as()
+        :
+        as_object(getSpreadMethodInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void spreadmethod_class_init(as_object& global)
 {

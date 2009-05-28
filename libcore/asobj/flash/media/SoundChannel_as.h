@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSoundChannelInterface();
-}
-
-class SoundChannel_as: public as_object
-{
-
-public:
-
-    SoundChannel_as()
-        :
-        as_object(getSoundChannelInterface())
-    {}
-
-};
 
 /// Initialize the global SoundChannel class
 void soundchannel_class_init(as_object& global);

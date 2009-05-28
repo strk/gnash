@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getPixelSnappingInterface();
-}
-
-class PixelSnapping_as: public as_object
-{
-
-public:
-
-    PixelSnapping_as()
-        :
-        as_object(getPixelSnappingInterface())
-    {}
-
-};
 
 /// Initialize the global PixelSnapping class
 void pixelsnapping_class_init(as_object& global);

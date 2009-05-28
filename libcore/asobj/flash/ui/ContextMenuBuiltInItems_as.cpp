@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class ContextMenuBuiltInItems_as : public as_object
+{
+
+public:
+
+    ContextMenuBuiltInItems_as()
+        :
+        as_object(getContextMenuBuiltInItemsInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void contextmenubuiltinitems_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class KeyLocation_as : public as_object
+{
+
+public:
+
+    KeyLocation_as()
+        :
+        as_object(getKeyLocationInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void keylocation_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Endian_as : public as_object
+{
+
+public:
+
+    Endian_as()
+        :
+        as_object(getEndianInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void endian_class_init(as_object& global)
 {

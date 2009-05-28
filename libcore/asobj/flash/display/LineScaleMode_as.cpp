@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class LineScaleMode_as : public as_object
+{
+
+public:
+
+    LineScaleMode_as()
+        :
+        as_object(getLineScaleModeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void linescalemode_class_init(as_object& global)
 {

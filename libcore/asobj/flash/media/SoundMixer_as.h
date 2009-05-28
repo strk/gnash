@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSoundMixerInterface();
-}
-
-class SoundMixer_as: public as_object
-{
-
-public:
-
-    SoundMixer_as()
-        :
-        as_object(getSoundMixerInterface())
-    {}
-
-};
 
 /// Initialize the global SoundMixer class
 void soundmixer_class_init(as_object& global);

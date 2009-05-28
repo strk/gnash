@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class InterpolationMethod_as : public as_object
+{
+
+public:
+
+    InterpolationMethod_as()
+        :
+        as_object(getInterpolationMethodInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void interpolationmethod_class_init(as_object& global)
 {

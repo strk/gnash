@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class ActivityEvent_as : public as_object
+{
+
+public:
+
+    ActivityEvent_as()
+        :
+        as_object(getActivityEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void activityevent_class_init(as_object& global)
 {

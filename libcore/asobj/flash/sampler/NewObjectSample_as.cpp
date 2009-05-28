@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class NewObjectSample_as : public as_object
+{
+
+public:
+
+    NewObjectSample_as()
+        :
+        as_object(getNewObjectSampleInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void newobjectsample_class_init(as_object& global)
 {

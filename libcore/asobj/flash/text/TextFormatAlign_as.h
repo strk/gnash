@@ -24,9 +24,10 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
+
+class as_object;
 
 /// Initialize the global TextFormatAlign class
 void textformatalign_class_init(as_object& global);

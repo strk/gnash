@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class URLRequestMethod_as : public as_object
+{
+
+public:
+
+    URLRequestMethod_as()
+        :
+        as_object(getURLRequestMethodInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void urlrequestmethod_class_init(as_object& global)
 {

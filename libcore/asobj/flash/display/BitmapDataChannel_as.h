@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getBitmapDataChannelInterface();
-}
-
-class BitmapDataChannel_as: public as_object
-{
-
-public:
-
-    BitmapDataChannel_as()
-        :
-        as_object(getBitmapDataChannelInterface())
-    {}
-
-};
 
 /// Initialize the global BitmapDataChannel class
 void bitmapdatachannel_class_init(as_object& global);

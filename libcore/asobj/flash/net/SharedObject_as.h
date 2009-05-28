@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSharedObjectInterface();
-}
-
-class SharedObject_as: public as_object
-{
-
-public:
-
-    SharedObject_as()
-        :
-        as_object(getSharedObjectInterface())
-    {}
-
-};
 
 /// Initialize the global SharedObject class
 void sharedobject_class_init(as_object& global);

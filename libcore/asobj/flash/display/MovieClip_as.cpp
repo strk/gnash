@@ -46,6 +46,17 @@ namespace {
 
 }
 
+class MovieClip_as : public as_object
+{
+
+public:
+
+    MovieClip_as()
+        :
+        as_object(getMovieClipInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void movieclip_class_init(as_object& global)
 {

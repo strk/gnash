@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class FullScreenEvent_as : public as_object
+{
+
+public:
+
+    FullScreenEvent_as()
+        :
+        as_object(getFullScreenEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void fullscreenevent_class_init(as_object& global)
 {

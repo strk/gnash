@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class ActionScriptVersion_as : public as_object
+{
+
+public:
+
+    ActionScriptVersion_as()
+        :
+        as_object(getActionScriptVersionInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void actionscriptversion_class_init(as_object& global)
 {

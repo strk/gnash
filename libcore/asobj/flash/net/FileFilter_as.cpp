@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class FileFilter_as : public as_object
+{
+
+public:
+
+    FileFilter_as()
+        :
+        as_object(getFileFilterInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void filefilter_class_init(as_object& global)
 {

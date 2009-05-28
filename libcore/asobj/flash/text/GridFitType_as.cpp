@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class GridFitType_as : public as_object
+{
+
+public:
+
+    GridFitType_as()
+        :
+        as_object(getGridFitTypeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void gridfittype_class_init(as_object& global)
 {

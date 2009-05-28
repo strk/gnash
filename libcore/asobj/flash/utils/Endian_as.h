@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getEndianInterface();
-}
-
-class Endian_as: public as_object
-{
-
-public:
-
-    Endian_as()
-        :
-        as_object(getEndianInterface())
-    {}
-
-};
 
 /// Initialize the global Endian class
 void endian_class_init(as_object& global);

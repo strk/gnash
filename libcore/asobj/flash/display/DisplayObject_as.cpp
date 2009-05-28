@@ -50,6 +50,17 @@ namespace {
 
 }
 
+class DisplayObject_as : public as_object
+{
+
+public:
+
+    DisplayObject_as()
+        :
+        as_object(getDisplayObjectInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void displayobject_class_init(as_object& global)
 {

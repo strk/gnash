@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIDataInputInterface();
-}
-
-class IDataInput_as: public as_object
-{
-
-public:
-
-    IDataInput_as()
-        :
-        as_object(getIDataInputInterface())
-    {}
-
-};
 
 /// Initialize the global IDataInput class
 void idatainput_class_init(as_object& global);

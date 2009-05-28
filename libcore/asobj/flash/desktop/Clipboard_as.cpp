@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Clipboard_as : public as_object
+{
+
+public:
+
+    Clipboard_as()
+        :
+        as_object(getClipboardInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void clipboard_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class DeleteObjectSample_as : public as_object
+{
+
+public:
+
+    DeleteObjectSample_as()
+        :
+        as_object(getDeleteObjectSampleInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void deleteobjectsample_class_init(as_object& global)
 {

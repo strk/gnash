@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIOErrorInterface();
-}
-
-class IOError_as: public as_object
-{
-
-public:
-
-    IOError_as()
-        :
-        as_object(getIOErrorInterface())
-    {}
-
-};
 
 /// Initialize the global IOError class
 void ioerror_class_init(as_object& global);

@@ -51,6 +51,17 @@ namespace {
 
 }
 
+class DisplayObjectContainer_as : public as_object
+{
+
+public:
+
+    DisplayObjectContainer_as()
+        :
+        as_object(getDisplayObjectContainerInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void displayobjectcontainer_class_init(as_object& global)
 {

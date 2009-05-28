@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class ContextMenu_as : public as_object
+{
+
+public:
+
+    ContextMenu_as()
+        :
+        as_object(getContextMenuInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void contextmenu_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Accessibility_as : public as_object
+{
+
+public:
+
+    Accessibility_as()
+        :
+        as_object(getAccessibilityInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void accessibility_class_init(as_object& global)
 {

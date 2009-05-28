@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getErrorEventInterface();
-}
-
-class ErrorEvent_as: public as_object
-{
-
-public:
-
-    ErrorEvent_as()
-        :
-        as_object(getErrorEventInterface())
-    {}
-
-};
 
 /// Initialize the global ErrorEvent class
 void errorevent_class_init(as_object& global);

@@ -67,6 +67,17 @@ namespace {
 
 }
 
+class ByteArray_as : public as_object
+{
+
+public:
+
+    ByteArray_as()
+        :
+        as_object(getByteArrayInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void bytearray_class_init(as_object& global)
 {

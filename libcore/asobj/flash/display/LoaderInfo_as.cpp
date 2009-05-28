@@ -46,6 +46,17 @@ namespace {
 
 }
 
+class LoaderInfo_as : public as_object
+{
+
+public:
+
+    LoaderInfo_as()
+        :
+        as_object(getLoaderInfoInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void loaderinfo_class_init(as_object& global)
 {

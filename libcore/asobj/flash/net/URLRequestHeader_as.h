@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getURLRequestHeaderInterface();
-}
-
-class URLRequestHeader_as: public as_object
-{
-
-public:
-
-    URLRequestHeader_as()
-        :
-        as_object(getURLRequestHeaderInterface())
-    {}
-
-};
 
 /// Initialize the global URLRequestHeader class
 void urlrequestheader_class_init(as_object& global);

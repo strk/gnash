@@ -43,6 +43,17 @@ namespace {
 
 }
 
+class KeyboardEvent_as : public as_object
+{
+
+public:
+
+    KeyboardEvent_as()
+        :
+        as_object(getKeyboardEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void keyboardevent_class_init(as_object& global)
 {

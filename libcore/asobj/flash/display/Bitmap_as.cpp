@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Bitmap_as : public as_object
+{
+
+public:
+
+    Bitmap_as()
+        :
+        as_object(getBitmapInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void bitmap_class_init(as_object& global)
 {

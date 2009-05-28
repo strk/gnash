@@ -47,6 +47,17 @@ namespace {
 
 }
 
+class Camera_as : public as_object
+{
+
+public:
+
+    Camera_as()
+        :
+        as_object(getCameraInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void camera_class_init(as_object& global)
 {

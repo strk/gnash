@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getID3InfoInterface();
-}
-
-class ID3Info_as: public as_object
-{
-
-public:
-
-    ID3Info_as()
-        :
-        as_object(getID3InfoInterface())
-    {}
-
-};
 
 /// Initialize the global ID3Info class
 void id3info_class_init(as_object& global);

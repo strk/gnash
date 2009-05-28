@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SecurityPanel_as : public as_object
+{
+
+public:
+
+    SecurityPanel_as()
+        :
+        as_object(getSecurityPanelInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void securitypanel_class_init(as_object& global)
 {

@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getMovieClipInterface();
-}
-
-class MovieClip_as: public as_object
-{
-
-public:
-
-    MovieClip_as()
-        :
-        as_object(getMovieClipInterface())
-    {}
-
-};
 
 /// Initialize the global MovieClip class
 void movieclip_class_init(as_object& global);

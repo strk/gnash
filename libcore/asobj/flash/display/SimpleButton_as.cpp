@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SimpleButton_as : public as_object
+{
+
+public:
+
+    SimpleButton_as()
+        :
+        as_object(getSimpleButtonInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void simplebutton_class_init(as_object& global)
 {

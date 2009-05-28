@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Responder_as : public as_object
+{
+
+public:
+
+    Responder_as()
+        :
+        as_object(getResponderInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void responder_class_init(as_object& global)
 {
