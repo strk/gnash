@@ -35,56 +35,6 @@ DESKTOP_SOURCES += flash/desktop/Clipboard_as.cpp
 DESKTOP_HEADERS += flash/desktop/Clipboard_as.h
 endif
 
-if BUILD_DOCKICON_AS3
-DESKTOP_SOURCES += flash/desktop/DockIcon_as.cpp
-DESKTOP_HEADERS += flash/desktop/DockIcon_as.h
-endif
-
-if BUILD_ICON_AS3
-DESKTOP_SOURCES += flash/desktop/Icon_as.cpp
-DESKTOP_HEADERS += flash/desktop/Icon_as.h
-endif
-
-if BUILD_INTERACTIVEICON_AS3
-DESKTOP_SOURCES += flash/desktop/InteractiveIcon_as.cpp
-DESKTOP_HEADERS += flash/desktop/InteractiveIcon_as.h
-endif
-
-if BUILD_NATIVEAPPLICATION_AS3
-DESKTOP_SOURCES += flash/desktop/NativeApplication_as.cpp
-DESKTOP_HEADERS += flash/desktop/NativeApplication_as.h
-endif
-
-if BUILD_NATIVEDRAGACTIONS_AS3
-DESKTOP_SOURCES += flash/desktop/NativeDragActions_as.cpp
-DESKTOP_HEADERS += flash/desktop/NativeDragActions_as.h
-endif
-
-if BUILD_NATIVEDRAGMANAGER_AS3
-DESKTOP_SOURCES += flash/desktop/NativeDragManager_as.cpp
-DESKTOP_HEADERS += flash/desktop/NativeDragManager_as.h
-endif
-
-if BUILD_NATIVEDRAGOPTIONS_AS3
-DESKTOP_SOURCES += flash/desktop/NativeDragOptions_as.cpp
-DESKTOP_HEADERS += flash/desktop/NativeDragOptions_as.h
-endif
-
-if BUILD_NOTIFICATIONTYPE_AS3
-DESKTOP_SOURCES += flash/desktop/NotificationType_as.cpp
-DESKTOP_HEADERS += flash/desktop/NotificationType_as.h
-endif
-
-if BUILD_SYSTEMTRAYICON_AS3
-DESKTOP_SOURCES += flash/desktop/SystemTrayIcon_as.cpp
-DESKTOP_HEADERS += flash/desktop/SystemTrayIcon_as.h
-endif
-
-if BUILD_UPDATER_AS3
-DESKTOP_SOURCES += flash/desktop/Updater_as.cpp
-DESKTOP_HEADERS += flash/desktop/Updater_as.h
-endif
-
 libgnashasobjs_la_SOURCES += $(DESKTOP_SOURCES)
 noinst_HEADERS +=  $(DESKTOP_HEADERS) desktopclasses.h
 
