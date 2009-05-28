@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class PrintJobOrientation_as : public as_object
+{
+
+public:
+
+    PrintJobOrientation_as()
+        :
+        as_object(getPrintJobOrientationInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void printjoborientation_class_init(as_object& global)
 {

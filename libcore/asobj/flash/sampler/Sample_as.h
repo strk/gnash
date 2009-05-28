@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSampleInterface();
-}
-
-class Sample_as: public as_object
-{
-
-public:
-
-    Sample_as()
-        :
-        as_object(getSampleInterface())
-    {}
-
-};
 
 /// Initialize the global Sample class
 void sample_class_init(as_object& global);

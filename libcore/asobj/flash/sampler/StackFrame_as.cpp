@@ -42,6 +42,17 @@ namespace {
 
 }
 
+class StackFrame_as : public as_object
+{
+
+public:
+
+    StackFrame_as()
+        :
+        as_object(getStackFrameInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void stackframe_class_init(as_object& global)
 {

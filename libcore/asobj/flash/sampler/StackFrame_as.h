@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getStackFrameInterface();
-}
-
-class StackFrame_as: public as_object
-{
-
-public:
-
-    StackFrame_as()
-        :
-        as_object(getStackFrameInterface())
-    {}
-
-};
 
 /// Initialize the global StackFrame class
 void stackframe_class_init(as_object& global);

@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getPrintJobOrientationInterface();
-}
-
-class PrintJobOrientation_as: public as_object
-{
-
-public:
-
-    PrintJobOrientation_as()
-        :
-        as_object(getPrintJobOrientationInterface())
-    {}
-
-};
 
 /// Initialize the global PrintJobOrientation class
 void printjoborientation_class_init(as_object& global);
