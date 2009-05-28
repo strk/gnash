@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getBitmapFilterTypeInterface();
-}
-
-class BitmapFilterType_as: public as_object
-{
-
-public:
-
-    BitmapFilterType_as()
-        :
-        as_object(getBitmapFilterTypeInterface())
-    {}
-
-};
 
 /// Initialize the global BitmapFilterType class
 void bitmapfiltertype_class_init(as_object& global);

@@ -39,6 +39,18 @@ namespace {
 
 }
 
+class BitmapFilterQuality_as : public as_object
+{
+
+public:
+
+    BitmapFilterQuality_as()
+        :
+        as_object(getBitmapFilterQualityInterface())
+    {}
+
+};
+
 // extern (used by Global.cpp)
 void bitmapfilterquality_class_init(as_object& global)
 {

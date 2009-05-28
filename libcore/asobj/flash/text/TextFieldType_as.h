@@ -24,16 +24,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
+
+class as_object;
 
 /// Initialize the global TextFieldType class
 void textfieldtype_class_init(as_object& global);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_TEXTFIELDTYPE_H
 #endif
 
 // local Variables:

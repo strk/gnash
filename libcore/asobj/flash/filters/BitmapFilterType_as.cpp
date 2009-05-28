@@ -39,6 +39,18 @@ namespace {
 
 }
 
+class BitmapFilterType_as : public as_object
+{
+
+public:
+
+    BitmapFilterType_as()
+        :
+        as_object(getBitmapFilterTypeInterface())
+    {}
+
+};
+
 // extern (used by Global.cpp)
 void bitmapfiltertype_class_init(as_object& global)
 {

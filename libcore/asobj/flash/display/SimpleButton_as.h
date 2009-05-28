@@ -24,7 +24,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
