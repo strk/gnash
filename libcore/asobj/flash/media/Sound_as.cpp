@@ -46,6 +46,17 @@ namespace {
 
 }
 
+class Sound_as : public as_object
+{
+
+public:
+
+    Sound_as()
+        :
+        as_object(getSoundInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void sound_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class ID3Info_as : public as_object
+{
+
+public:
+
+    ID3Info_as()
+        :
+        as_object(getID3InfoInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void id3info_class_init(as_object& global)
 {

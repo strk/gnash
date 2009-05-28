@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SoundLoaderContext_as : public as_object
+{
+
+public:
+
+    SoundLoaderContext_as()
+        :
+        as_object(getSoundLoaderContextInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void soundloadercontext_class_init(as_object& global)
 {
