@@ -24,34 +24,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
-
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getClipboardFormatsInterface();
-}
-
-class ClipboardFormats_as: public as_object
-{
-
-public:
-
-    ClipboardFormats_as()
-        :
-        as_object(getClipboardFormatsInterface())
-    {}
-
-};
 
 /// Initialize the global ClipboardFormats class
 void clipboardformats_class_init(as_object& global);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_CLIPBOARDFORMATS_H
 #endif
 
 // local Variables:

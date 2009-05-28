@@ -24,34 +24,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
-
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getClipboardTransferModeInterface();
-}
-
-class ClipboardTransferMode_as: public as_object
-{
-
-public:
-
-    ClipboardTransferMode_as()
-        :
-        as_object(getClipboardTransferModeInterface())
-    {}
-
-};
 
 /// Initialize the global ClipboardTransferMode class
 void clipboardtransfermode_class_init(as_object& global);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_CLIPBOARDTRANSFERMODE_H
 #endif
 
 // local Variables:
