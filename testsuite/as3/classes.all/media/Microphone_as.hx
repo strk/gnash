@@ -52,27 +52,49 @@ class Microphone_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.activityLevel == 0) {
+	if (Type.typeof(x1.activityLevel) == ValueType.TFloat) {
 	    DejaGnu.pass("Microphone::activityLevel property exists");
 	} else {
 	    DejaGnu.fail("Microphone::activityLevel property doesn't exist");
 	}
-	if (x1.gain == 0) {
+	
+	//FIXME: this will need to be implemented if speex codec is supported
+	//FIXME: it would be nice if this analyzed the string to see if it is
+	//a supported codec
+	//if (Type.typeof(x1.codec) == ValueType.TObject)  {
+	//	DejaGnu.pass("Microphone::codec property exists");
+	//} else {
+	//	DejaGnu.fail("Microphone::codec property doesn't exist");
+	//}
+	//if (Type.typeof(x1.encodeQuality) == ValueType.TInt)  {
+	//	DejaGnu.pass("Microphone::encodeQuality (speex) property exists");
+	//} else {
+	//	DejaGnu.fail("Microphone::encodeQuality (speex) property doesn't exist");
+	//}
+	//if (Type.typeof(x1.framesPerPacket) == ValueType.TInt) {
+	//	DejaGnu.pass("Microphone::framesPerPacket (speex) property exists");
+	//} else {
+	//	DejaGnu.fail("Microphone::framesPerPacket (speex) property doesn't exist");
+	//}
+	
+	
+	if (Type.typeof(x1.gain) == ValueType.TFloat) {
 	    DejaGnu.pass("Microphone::gain property exists");
 	} else {
 	    DejaGnu.fail("Microphone::gain property doesn't exist");
 	}
-	if (x1.index == 0) {
+	if (Type.typeof(x1.index) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::index property exists");
 	} else {
 	    DejaGnu.fail("Microphone::index property doesn't exist");
 	}
-	if (x1.muted == false) {
+	if (x1.muted == (false || true)) {
 	    DejaGnu.pass("Microphone::muted property exists");
 	} else {
 	    DejaGnu.fail("Microphone::muted property doesn't exist");
 	}
-	if (x1.name == null) {
+	//FIXME: it would be nice if this parsed and checked the name string
+	if (Type.typeof(x1.name) == ValueType.TObject) {
 	    DejaGnu.pass("Microphone::name property exists");
 	} else {
 	    DejaGnu.fail("Microphone::name property doesn't exist");
@@ -83,27 +105,27 @@ class Microphone_as {
 // 	} else {
 // 	    DejaGnu.fail("Microphone::names property doesn't exist");
 // 	}
-	if (x1.rate == 0) {
+	if (Type.typeof(x1.rate) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::rate property exists");
 	} else {
 	    DejaGnu.fail("Microphone::rate property doesn't exist");
 	}
-	if (x1.silenceLevel == 0) {
+	if (Type.typeof(x1.silenceLevel) == ValueType.TFloat) {
 	    DejaGnu.pass("Microphone::silenceLevel property exists");
 	} else {
 	    DejaGnu.fail("Microphone::silenceLevel property doesn't exist");
 	}
-	if (x1.silenceTimeout == 0) {
+	if (Type.typeof(x1.silenceTimeout) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::silenceTimeout property exists");
 	} else {
 	    DejaGnu.fail("Microphone::silenceTimeout property doesn't exist");
 	}
-	if (x1.soundTransform == SoundTransform) {
+	if (Type.typeof(x1.soundTransform) == Type.typeof(SoundTransform)) {
 	    DejaGnu.pass("Microphone::soundTransform property exists");
 	} else {
 	    DejaGnu.fail("Microphone::soundTransform property doesn't exist");
 	}
-	if (x1.useEchoSuppression == false) {
+	if (x1.useEchoSuppression == (true || false)) {
 	    DejaGnu.pass("Microphone::useEchoSuppression property exists");
 	} else {
 	    DejaGnu.fail("Microphone::useEchoSuppression property doesn't exist");
@@ -112,17 +134,17 @@ class Microphone_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.setLoopBack == null) {
+	if (Type.typeof(x1.setLoopBack) == ValueType.TFunction) {
 	    DejaGnu.pass("Microphone::setLoopBack() method exists");
 	} else {
 	    DejaGnu.fail("Microphone::setLoopBack() method doesn't exist");
 	}
-	if (x1.setSilenceLevel == null) {
+	if (Type.typeof(x1.setSilenceLevel) == ValueType.TFunction) {
 	    DejaGnu.pass("Microphone::setSilenceLevel() method exists");
 	} else {
 	    DejaGnu.fail("Microphone::setSilenceLevel() method doesn't exist");
 	}
-	if (x1.setUseEchoSuppression == null) {
+	if (Type.typeof(x1.setUseEchoSuppression) == ValueType.TFunction) {
 	    DejaGnu.pass("Microphone::setUseEchoSuppression() method exists");
 	} else {
 	    DejaGnu.fail("Microphone::setUseEchoSuppression() method doesn't exist");
