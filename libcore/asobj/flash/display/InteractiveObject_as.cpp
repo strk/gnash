@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class InteractiveObject_as : public as_object
+{
+
+public:
+
+    InteractiveObject_as()
+        :
+        as_object(getInteractiveObjectInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void interactiveobject_class_init(as_object& global)
 {

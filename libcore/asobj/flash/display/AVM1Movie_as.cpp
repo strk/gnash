@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class AVM1Movie_as : public as_object
+{
+
+public:
+
+    AVM1Movie_as()
+        :
+        as_object(getAVM1MovieInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void avm1movie_class_init(as_object& global)
 {

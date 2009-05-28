@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getGraphicsInterface();
-}
-
-class Graphics_as: public as_object
-{
-
-public:
-
-    Graphics_as()
-        :
-        as_object(getGraphicsInterface())
-    {}
-
-};
 
 /// Initialize the global Graphics class
 void graphics_class_init(as_object& global);

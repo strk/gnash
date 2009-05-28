@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getCapsStyleInterface();
-}
-
-class CapsStyle_as: public as_object
-{
-
-public:
-
-    CapsStyle_as()
-        :
-        as_object(getCapsStyleInterface())
-    {}
-
-};
 
 /// Initialize the global CapsStyle class
 void capsstyle_class_init(as_object& global);

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class PixelSnapping_as : public as_object
+{
+
+public:
+
+    PixelSnapping_as()
+        :
+        as_object(getPixelSnappingInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void pixelsnapping_class_init(as_object& global)
 {

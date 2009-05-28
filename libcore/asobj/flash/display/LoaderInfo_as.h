@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getLoaderInfoInterface();
-}
-
-class LoaderInfo_as: public as_object
-{
-
-public:
-
-    LoaderInfo_as()
-        :
-        as_object(getLoaderInfoInterface())
-    {}
-
-};
 
 /// Initialize the global LoaderInfo class
 void loaderinfo_class_init(as_object& global);

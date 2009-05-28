@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getActionScriptVersionInterface();
-}
-
-class ActionScriptVersion_as: public as_object
-{
-
-public:
-
-    ActionScriptVersion_as()
-        :
-        as_object(getActionScriptVersionInterface())
-    {}
-
-};
 
 /// Initialize the global ActionScriptVersion class
 void actionscriptversion_class_init(as_object& global);

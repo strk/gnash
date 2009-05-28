@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class IBitmapDrawable_as : public as_object
+{
+
+public:
+
+    IBitmapDrawable_as()
+        :
+        as_object(getIBitmapDrawableInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void ibitmapdrawable_class_init(as_object& global)
 {

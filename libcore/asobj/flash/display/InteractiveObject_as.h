@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getInteractiveObjectInterface();
-}
-
-class InteractiveObject_as: public as_object
-{
-
-public:
-
-    InteractiveObject_as()
-        :
-        as_object(getInteractiveObjectInterface())
-    {}
-
-};
 
 /// Initialize the global InteractiveObject class
 void interactiveobject_class_init(as_object& global);

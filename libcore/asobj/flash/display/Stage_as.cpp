@@ -52,6 +52,17 @@ namespace {
 
 }
 
+class Stage_as : public as_object
+{
+
+public:
+
+    Stage_as()
+        :
+        as_object(getStageInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void stage_class_init(as_object& global)
 {

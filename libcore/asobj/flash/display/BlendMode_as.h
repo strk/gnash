@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getBlendModeInterface();
-}
-
-class BlendMode_as: public as_object
-{
-
-public:
-
-    BlendMode_as()
-        :
-        as_object(getBlendModeInterface())
-    {}
-
-};
 
 /// Initialize the global BlendMode class
 void blendmode_class_init(as_object& global);

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Shape_as : public as_object
+{
+
+public:
+
+    Shape_as()
+        :
+        as_object(getShapeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void shape_class_init(as_object& global)
 {

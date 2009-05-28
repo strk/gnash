@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getGradientTypeInterface();
-}
-
-class GradientType_as: public as_object
-{
-
-public:
-
-    GradientType_as()
-        :
-        as_object(getGradientTypeInterface())
-    {}
-
-};
 
 /// Initialize the global GradientType class
 void gradienttype_class_init(as_object& global);

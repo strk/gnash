@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getSimpleButtonInterface();
-}
-
-class SimpleButton_as: public as_object
-{
-
-public:
-
-    SimpleButton_as()
-        :
-        as_object(getSimpleButtonInterface())
-    {}
-
-};
 
 /// Initialize the global SimpleButton class
 void simplebutton_class_init(as_object& global);

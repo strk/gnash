@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getSpriteInterface();
-}
-
-class Sprite_as: public as_object
-{
-
-public:
-
-    Sprite_as()
-        :
-        as_object(getSpriteInterface())
-    {}
-
-};
 
 /// Initialize the global Sprite class
 void sprite_class_init(as_object& global);

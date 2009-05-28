@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getStageScaleModeInterface();
-}
-
-class StageScaleMode_as: public as_object
-{
-
-public:
-
-    StageScaleMode_as()
-        :
-        as_object(getStageScaleModeInterface())
-    {}
-
-};
 
 /// Initialize the global StageScaleMode class
 void stagescalemode_class_init(as_object& global);

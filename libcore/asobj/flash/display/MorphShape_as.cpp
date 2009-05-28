@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class MorphShape_as : public as_object
+{
+
+public:
+
+    MorphShape_as()
+        :
+        as_object(getMorphShapeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void morphshape_class_init(as_object& global)
 {

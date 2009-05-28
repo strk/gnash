@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getInterpolationMethodInterface();
-}
-
-class InterpolationMethod_as: public as_object
-{
-
-public:
-
-    InterpolationMethod_as()
-        :
-        as_object(getInterpolationMethodInterface())
-    {}
-
-};
 
 /// Initialize the global InterpolationMethod class
 void interpolationmethod_class_init(as_object& global);

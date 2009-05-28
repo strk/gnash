@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getDisplayObjectInterface();
-}
-
-class DisplayObject_as: public as_object
-{
-
-public:
-
-    DisplayObject_as()
-        :
-        as_object(getDisplayObjectInterface())
-    {}
-
-};
 
 /// Initialize the global DisplayObject class
 void displayobject_class_init(as_object& global);

@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getStageInterface();
-}
-
-class Stage_as: public as_object
-{
-
-public:
-
-    Stage_as()
-        :
-        as_object(getStageInterface())
-    {}
-
-};
 
 /// Initialize the global Stage class
 void stage_class_init(as_object& global);

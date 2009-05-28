@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getShapeInterface();
-}
-
-class Shape_as: public as_object
-{
-
-public:
-
-    Shape_as()
-        :
-        as_object(getShapeInterface())
-    {}
-
-};
 
 /// Initialize the global Shape class
 void shape_class_init(as_object& global);

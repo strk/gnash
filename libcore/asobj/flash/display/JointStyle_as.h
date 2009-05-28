@@ -30,21 +30,6 @@
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getJointStyleInterface();
-}
-
-class JointStyle_as: public as_object
-{
-
-public:
-
-    JointStyle_as()
-        :
-        as_object(getJointStyleInterface())
-    {}
-
-};
 
 /// Initialize the global JointStyle class
 void jointstyle_class_init(as_object& global);
