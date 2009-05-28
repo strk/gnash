@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getAccessibilityPropertiesInterface();
-}
-
-class AccessibilityProperties_as: public as_object
-{
-
-public:
-
-    AccessibilityProperties_as()
-        :
-        as_object(getAccessibilityPropertiesInterface())
-    {}
-
-};
 
 /// Initialize the global AccessibilityProperties class
 void accessibilityproperties_class_init(as_object& global);
