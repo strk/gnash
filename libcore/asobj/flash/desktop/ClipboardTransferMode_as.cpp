@@ -26,63 +26,35 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h"
+
+// Added to the Flash Player 10 API from AIR.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value clipboardtransfermode_ctor(const fn_call& fn);
-    void attachClipboardTransferModeInterface(as_object& o);
     void attachClipboardTransferModeStaticInterface(as_object& o);
-    as_object* getClipboardTransferModeInterface();
-
 }
 
 // extern (used by Global.cpp)
-void clipboardtransfermode_class_init(as_object& global)
+void
+clipboardtransfermode_class_init(as_object& where)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&clipboardtransfermode_ctor, getClipboardTransferModeInterface());
-        attachClipboardTransferModeStaticInterface(*cl);
-    }
-
-    // Register _global.ClipboardTransferMode
-    global.init_member("ClipboardTransferMode", cl.get());
+    static as_object* obj = new as_object(getObjectInterface());
+    attachClipboardTransferModeStaticInterface(*obj);
+    where.init_member("ClipboardTransferMode", obj);
 }
 
 namespace {
 
 void
-attachClipboardTransferModeInterface(as_object& o)
-{
-}
-
-void
 attachClipboardTransferModeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getClipboardTransferModeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachClipboardTransferModeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-clipboardtransfermode_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new ClipboardTransferMode_as;
-
-    return as_value(obj.get()); // will keep alive
+    o.init_member("CLONE_ONLY", "cloneOnly");
+    o.init_member("CLONE_PREFERRED", "clonePreferred");
+    o.init_member("ORIGINAL_ONLY", "originalOnly");
+    o.init_member("ORIGINAL_PREFERRED", "originalPreferred");
 }
 
 } // anonymous namespace 
