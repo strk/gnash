@@ -39,8 +39,13 @@ import DejaGnu;
 // file passed to haxe will have after the preprocessing step
 class Camera_as {
     static function main() {
-        var x1:Camera = Camera.getCamera();
-        
+        #if flash9
+		var x1:Camera = Camera.getCamera();
+        #end
+		#if !flash9
+		var x1:Camera = Camera.get();
+		#end
+		
         // Make sure we actually get a valid class        
         if (x1 != null) {
             DejaGnu.pass("Camera class exists");
@@ -130,7 +135,7 @@ class Camera_as {
 	} else {
 	    DejaGnu.fail("Camera::width property doesn't exist");
 	}
-
+	#end
 	#if !flash9
 	if (Type.typeof(x1.activityLevel) == ValueType.TFloat) {
 	    DejaGnu.pass("Camera::activityLevel property exists");
@@ -178,11 +183,6 @@ class Camera_as {
 	    DejaGnu.pass("Camera::motionLevel property exists");
 	} else {
 	    DejaGnu.fail("Camera::motionLevel property doesn't exist");
-	}
-	if (Type.typeof(x1.motionTimeout) == ValueType.TFloat) {
-	    DejaGnu.pass("Camera::motionTimeout property exists");
-	} else {
-	    DejaGnu.fail("Camera::motionTimeout property doesn't exist");
 	}
 	if (x1.muted == (false || true)) {
 	    DejaGnu.pass("Camera::muted property exists");
@@ -249,7 +249,7 @@ class Camera_as {
 	}
 	//FIXME: we should add tests to check that Events in this class are
 	//being properly handled.
-	
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
