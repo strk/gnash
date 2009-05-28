@@ -42,6 +42,17 @@ namespace {
 
 }
 
+class DataEvent_as : public as_object
+{
+
+public:
+
+    DataEvent_as()
+        :
+        as_object(getDataEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void dataevent_class_init(as_object& global)
 {

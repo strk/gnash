@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getKeyboardEventInterface();
-}
-
-class KeyboardEvent_as: public as_object
-{
-
-public:
-
-    KeyboardEvent_as()
-        :
-        as_object(getKeyboardEventInterface())
-    {}
-
-};
 
 /// Initialize the global KeyboardEvent class
 void keyboardevent_class_init(as_object& global);

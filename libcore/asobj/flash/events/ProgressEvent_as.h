@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getProgressEventInterface();
-}
-
-class ProgressEvent_as: public as_object
-{
-
-public:
-
-    ProgressEvent_as()
-        :
-        as_object(getProgressEventInterface())
-    {}
-
-};
 
 /// Initialize the global ProgressEvent class
 void progressevent_class_init(as_object& global);

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class ScriptTimeoutError_as : public as_object
+{
+
+public:
+
+    ScriptTimeoutError_as()
+        :
+        as_object(getScriptTimeoutErrorInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void scripttimeouterror_class_init(as_object& global)
 {

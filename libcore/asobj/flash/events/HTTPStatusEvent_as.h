@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getHTTPStatusEventInterface();
-}
-
-class HTTPStatusEvent_as: public as_object
-{
-
-public:
-
-    HTTPStatusEvent_as()
-        :
-        as_object(getHTTPStatusEventInterface())
-    {}
-
-};
 
 /// Initialize the global HTTPStatusEvent class
 void httpstatusevent_class_init(as_object& global);

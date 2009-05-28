@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSyncEventInterface();
-}
-
-class SyncEvent_as: public as_object
-{
-
-public:
-
-    SyncEvent_as()
-        :
-        as_object(getSyncEventInterface())
-    {}
-
-};
 
 /// Initialize the global SyncEvent class
 void syncevent_class_init(as_object& global);

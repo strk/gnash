@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class StatusEvent_as : public as_object
+{
+
+public:
+
+    StatusEvent_as()
+        :
+        as_object(getStatusEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void statusevent_class_init(as_object& global)
 {

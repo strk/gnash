@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getActivityEventInterface();
-}
-
-class ActivityEvent_as: public as_object
-{
-
-public:
-
-    ActivityEvent_as()
-        :
-        as_object(getActivityEventInterface())
-    {}
-
-};
 
 /// Initialize the global ActivityEvent class
 void activityevent_class_init(as_object& global);

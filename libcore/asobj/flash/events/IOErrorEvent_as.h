@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIOErrorEventInterface();
-}
-
-class IOErrorEvent_as: public as_object
-{
-
-public:
-
-    IOErrorEvent_as()
-        :
-        as_object(getIOErrorEventInterface())
-    {}
-
-};
 
 /// Initialize the global IOErrorEvent class
 void ioerrorevent_class_init(as_object& global);

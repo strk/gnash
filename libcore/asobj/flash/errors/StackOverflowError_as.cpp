@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class StackOverflowError_as : public as_object
+{
+
+public:
+
+    StackOverflowError_as()
+        :
+        as_object(getStackOverflowErrorInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void stackoverflowerror_class_init(as_object& global)
 {

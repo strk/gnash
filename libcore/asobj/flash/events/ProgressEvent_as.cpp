@@ -42,6 +42,17 @@ namespace {
 
 }
 
+class ProgressEvent_as : public as_object
+{
+
+public:
+
+    ProgressEvent_as()
+        :
+        as_object(getProgressEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void progressevent_class_init(as_object& global)
 {

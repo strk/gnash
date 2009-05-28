@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getEOFErrorInterface();
-}
-
-class EOFError_as: public as_object
-{
-
-public:
-
-    EOFError_as()
-        :
-        as_object(getEOFErrorInterface())
-    {}
-
-};
 
 /// Initialize the global EOFError class
 void eoferror_class_init(as_object& global);

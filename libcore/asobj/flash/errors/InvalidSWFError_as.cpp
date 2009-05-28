@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class InvalidSWFError_as : public as_object
+{
+
+public:
+
+    InvalidSWFError_as()
+        :
+        as_object(getInvalidSWFErrorInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void invalidswferror_class_init(as_object& global)
 {

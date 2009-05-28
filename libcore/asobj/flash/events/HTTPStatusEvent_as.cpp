@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class HTTPStatusEvent_as : public as_object
+{
+
+public:
+
+    HTTPStatusEvent_as()
+        :
+        as_object(getHTTPStatusEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void httpstatusevent_class_init(as_object& global)
 {

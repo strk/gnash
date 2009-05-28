@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextEventInterface();
-}
-
-class TextEvent_as: public as_object
-{
-
-public:
-
-    TextEvent_as()
-        :
-        as_object(getTextEventInterface())
-    {}
-
-};
 
 /// Initialize the global TextEvent class
 void textevent_class_init(as_object& global);
