@@ -40,21 +40,6 @@ EVENTS_SOURCES += flash/events/ContextMenuEvent_as.cpp
 EVENTS_HEADERS += flash/events/ContextMenuEvent_as.h
 endif
 
-if BUILD_DRMAUTHENTICATEEVENT_AS3
-EVENTS_SOURCES += flash/events/DRMAuthenticateEvent_as.cpp
-EVENTS_HEADERS += flash/events/DRMAuthenticateEvent_as.h
-endif
-
-if BUILD_DRMERROREVENT_AS3
-EVENTS_SOURCES += flash/events/DRMErrorEvent_as.cpp
-EVENTS_HEADERS += flash/events/DRMErrorEvent_as.h
-endif
-
-if BUILD_DRMSTATUSEVENT_AS3
-EVENTS_SOURCES += flash/events/DRMStatusEvent_as.cpp
-EVENTS_HEADERS += flash/events/DRMStatusEvent_as.h
-endif
-
 if BUILD_DATAEVENT_AS3
 EVENTS_SOURCES += flash/events/DataEvent_as.cpp
 EVENTS_HEADERS += flash/events/DataEvent_as.h
@@ -80,11 +65,6 @@ EVENTS_SOURCES += flash/events/Event_as.cpp
 EVENTS_HEADERS += flash/events/Event_as.h
 endif
 
-if BUILD_FILELISTEVENT_AS3
-EVENTS_SOURCES += flash/events/FileListEvent_as.cpp
-EVENTS_HEADERS += flash/events/FileListEvent_as.h
-endif
-
 if BUILD_FOCUSEVENT_AS3
 EVENTS_SOURCES += flash/events/FocusEvent_as.cpp
 EVENTS_HEADERS += flash/events/FocusEvent_as.h
@@ -93,11 +73,6 @@ endif
 if BUILD_FULLSCREENEVENT_AS3
 EVENTS_SOURCES += flash/events/FullScreenEvent_as.cpp
 EVENTS_HEADERS += flash/events/FullScreenEvent_as.h
-endif
-
-if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
-EVENTS_SOURCES += flash/events/HTMLUncaughtScriptExceptionEvent_as.cpp
-EVENTS_HEADERS += flash/events/HTMLUncaughtScriptExceptionEvent_as.h
 endif
 
 if BUILD_HTTPSTATUSEVENT_AS3
@@ -135,54 +110,14 @@ EVENTS_SOURCES += flash/events/MouseEvent_as.cpp
 EVENTS_HEADERS += flash/events/MouseEvent_as.h
 endif
 
-if BUILD_NATIVEDRAGEVENT_AS3
-EVENTS_SOURCES += flash/events/NativeDragEvent_as.cpp
-EVENTS_HEADERS += flash/events/NativeDragEvent_as.h
-endif
-
-if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
-EVENTS_SOURCES += flash/events/NativeWindowBoundsEvent_as.cpp
-EVENTS_HEADERS += flash/events/NativeWindowBoundsEvent_as.h
-endif
-
-if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
-EVENTS_SOURCES += flash/events/NativeWindowDisplayStateEvent_as.cpp
-EVENTS_HEADERS += flash/events/NativeWindowDisplayStateEvent_as.h
-endif
-
 if BUILD_NETSTATUSEVENT_AS3
 EVENTS_SOURCES += flash/events/NetStatusEvent_as.cpp
 EVENTS_HEADERS += flash/events/NetStatusEvent_as.h
 endif
 
-if BUILD_OUTPUTPROGRESSEVENT_AS3
-EVENTS_SOURCES += flash/events/OutputProgressEvent_as.cpp
-EVENTS_HEADERS += flash/events/OutputProgressEvent_as.h
-endif
-
 if BUILD_PROGRESSEVENT_AS3
 EVENTS_SOURCES += flash/events/ProgressEvent_as.cpp
 EVENTS_HEADERS += flash/events/ProgressEvent_as.h
-endif
-
-if BUILD_SQLERROREVENT_AS3
-EVENTS_SOURCES += flash/events/SQLErrorEvent_as.cpp
-EVENTS_HEADERS += flash/events/SQLErrorEvent_as.h
-endif
-
-if BUILD_SQLEVENT_AS3
-EVENTS_SOURCES += flash/events/SQLEvent_as.cpp
-EVENTS_HEADERS += flash/events/SQLEvent_as.h
-endif
-
-if BUILD_SQLUPDATEEVENT_AS3
-EVENTS_SOURCES += flash/events/SQLUpdateEvent_as.cpp
-EVENTS_HEADERS += flash/events/SQLUpdateEvent_as.h
-endif
-
-if BUILD_SCREENMOUSEEVENT_AS3
-EVENTS_SOURCES += flash/events/ScreenMouseEvent_as.cpp
-EVENTS_HEADERS += flash/events/ScreenMouseEvent_as.h
 endif
 
 if BUILD_SECURITYERROREVENT_AS3
