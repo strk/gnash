@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTimerInterface();
-}
-
-class Timer_as: public as_object
-{
-
-public:
-
-    Timer_as()
-        :
-        as_object(getTimerInterface())
-    {}
-
-};
 
 /// Initialize the global Timer class
 void timer_class_init(as_object& global);

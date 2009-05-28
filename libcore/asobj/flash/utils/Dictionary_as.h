@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getDictionaryInterface();
-}
-
-class Dictionary_as: public as_object
-{
-
-public:
-
-    Dictionary_as()
-        :
-        as_object(getDictionaryInterface())
-    {}
-
-};
 
 /// Initialize the global Dictionary class
 void dictionary_class_init(as_object& global);

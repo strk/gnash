@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getByteArrayInterface();
-}
-
-class ByteArray_as: public as_object
-{
-
-public:
-
-    ByteArray_as()
-        :
-        as_object(getByteArrayInterface())
-    {}
-
-};
 
 /// Initialize the global ByteArray class
 void bytearray_class_init(as_object& global);

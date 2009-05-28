@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIExternalizableInterface();
-}
-
-class IExternalizable_as: public as_object
-{
-
-public:
-
-    IExternalizable_as()
-        :
-        as_object(getIExternalizableInterface())
-    {}
-
-};
 
 /// Initialize the global IExternalizable class
 void iexternalizable_class_init(as_object& global);

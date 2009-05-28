@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getProxyInterface();
-}
-
-class Proxy_as: public as_object
-{
-
-public:
-
-    Proxy_as()
-        :
-        as_object(getProxyInterface())
-    {}
-
-};
 
 /// Initialize the global Proxy class
 void proxy_class_init(as_object& global);

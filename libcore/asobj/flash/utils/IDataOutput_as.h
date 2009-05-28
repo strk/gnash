@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIDataOutputInterface();
-}
-
-class IDataOutput_as: public as_object
-{
-
-public:
-
-    IDataOutput_as()
-        :
-        as_object(getIDataOutputInterface())
-    {}
-
-};
 
 /// Initialize the global IDataOutput class
 void idataoutput_class_init(as_object& global);

@@ -43,6 +43,17 @@ namespace {
 
 }
 
+class Timer_as : public as_object
+{
+
+public:
+
+    Timer_as()
+        :
+        as_object(getTimerInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void timer_class_init(as_object& global)
 {

@@ -52,6 +52,17 @@ namespace {
 
 }
 
+class IDataInput_as : public as_object
+{
+
+public:
+
+    IDataInput_as()
+        :
+        as_object(getIDataInputInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void idatainput_class_init(as_object& global)
 {
