@@ -65,11 +65,6 @@ DISPLAY_SOURCES += flash/display/DisplayObject_as.cpp
 DISPLAY_HEADERS += flash/display/DisplayObject_as.h
 endif
 
-if BUILD_FOCUSDIRECTION_AS3
-DISPLAY_SOURCES += flash/display/FocusDirection_as.cpp
-DISPLAY_HEADERS += flash/display/FocusDirection_as.h
-endif
-
 if BUILD_FRAMELABEL_AS3
 DISPLAY_SOURCES += flash/display/FrameLabel_as.cpp
 DISPLAY_HEADERS += flash/display/FrameLabel_as.h

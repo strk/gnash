@@ -30,11 +30,6 @@ EVENTS_SOURCES += flash/events/AsyncErrorEvent_as.cpp
 EVENTS_HEADERS += flash/events/AsyncErrorEvent_as.h
 endif
 
-if BUILD_BROWSERINVOKEEVENT_AS3
-EVENTS_SOURCES += flash/events/BrowserInvokeEvent_as.cpp
-EVENTS_HEADERS += flash/events/BrowserInvokeEvent_as.h
-endif
-
 if BUILD_CONTEXTMENUEVENT_AS3
 EVENTS_SOURCES += flash/events/ContextMenuEvent_as.cpp
 EVENTS_HEADERS += flash/events/ContextMenuEvent_as.h
@@ -93,11 +88,6 @@ endif
 if BUILD_IOERROREVENT_AS3
 EVENTS_SOURCES += flash/events/IOErrorEvent_as.cpp
 EVENTS_HEADERS += flash/events/IOErrorEvent_as.h
-endif
-
-if BUILD_INVOKEEVENT_AS3
-EVENTS_SOURCES += flash/events/InvokeEvent_as.cpp
-EVENTS_HEADERS += flash/events/InvokeEvent_as.h
 endif
 
 if BUILD_KEYBOARDEVENT_AS3

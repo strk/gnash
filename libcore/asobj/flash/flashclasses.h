@@ -32,14 +32,13 @@
 #include "net/net_pkg.h"
 #include "printing/printing_pkg.h"
 #include "sampler/sampler_pkg.h"
-#include "security/security_pkg.h"
 #include "system/system_pkg.h"
 #include "text/text_pkg.h"
 #include "ui/ui_pkg.h"
 #include "utils/utils_pkg.h"
 #include "xml/xml_pkg.h"
 
-#include <sharedlib.h>
+#include "sharedlib.h"
 
 namespace gnash {
 
