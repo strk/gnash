@@ -29,8 +29,6 @@
 #include "IllegalOperationError_as.h"
 #include "InvalidSWFError_as.h"
 #include "MemoryError_as.h"
-#include "SQLErrorOperation_as.h"
-#include "SQLError_as.h"
 #include "ScriptTimeoutError_as.h"
 #include "StackOverflowError_as.h"
 

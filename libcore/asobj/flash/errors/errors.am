@@ -47,16 +47,6 @@ ERRORS_SOURCES += flash/errors/MemoryError_as.cpp
 ERRORS_HEADERS += flash/errors/MemoryError_as.h
 endif
 
-if BUILD_SQLERROROPERATION_AS3
-ERRORS_SOURCES += flash/errors/SQLErrorOperation_as.cpp
-ERRORS_HEADERS += flash/errors/SQLErrorOperation_as.h
-endif
-
-if BUILD_SQLERROR_AS3
-ERRORS_SOURCES += flash/errors/SQLError_as.cpp
-ERRORS_HEADERS += flash/errors/SQLError_as.h
-endif
-
 if BUILD_SCRIPTTIMEOUTERROR_AS3
 ERRORS_SOURCES += flash/errors/ScriptTimeoutError_as.cpp
 ERRORS_HEADERS += flash/errors/ScriptTimeoutError_as.h

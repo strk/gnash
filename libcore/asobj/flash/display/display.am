@@ -65,11 +65,6 @@ DISPLAY_SOURCES += flash/display/DisplayObject_as.cpp
 DISPLAY_HEADERS += flash/display/DisplayObject_as.h
 endif
 
-if BUILD_FOCUSDIRECTION_AS3
-DISPLAY_SOURCES += flash/display/FocusDirection_as.cpp
-DISPLAY_HEADERS += flash/display/FocusDirection_as.h
-endif
-
 if BUILD_FRAMELABEL_AS3
 DISPLAY_SOURCES += flash/display/FrameLabel_as.cpp
 DISPLAY_HEADERS += flash/display/FrameLabel_as.h
@@ -130,41 +125,6 @@ endif
 DISPLAY_HEADERS += flash/display/MovieClip_as.h
 # endif
 
-if BUILD_NATIVEMENUITEM_AS3
-DISPLAY_SOURCES += flash/display/NativeMenuItem_as.cpp
-DISPLAY_HEADERS += flash/display/NativeMenuItem_as.h
-endif
-
-if BUILD_NATIVEMENU_AS3
-DISPLAY_SOURCES += flash/display/NativeMenu_as.cpp
-DISPLAY_HEADERS += flash/display/NativeMenu_as.h
-endif
-
-if BUILD_NATIVEWINDOWDISPLAYSTATE_AS3
-DISPLAY_SOURCES += flash/display/NativeWindowDisplayState_as.cpp
-DISPLAY_HEADERS += flash/display/NativeWindowDisplayState_as.h
-endif
-
-if BUILD_NATIVEWINDOWINITOPTIONS_AS3
-DISPLAY_SOURCES += flash/display/NativeWindowInitOptions_as.cpp
-DISPLAY_HEADERS += flash/display/NativeWindowInitOptions_as.h
-endif
-
-if BUILD_NATIVEWINDOWRESIZE_AS3
-DISPLAY_SOURCES += flash/display/NativeWindowResize_as.cpp
-DISPLAY_HEADERS += flash/display/NativeWindowResize_as.h
-endif
-
-if BUILD_NATIVEWINDOWTYPE_AS3
-DISPLAY_SOURCES += flash/display/NativeWindowType_as.cpp
-DISPLAY_HEADERS += flash/display/NativeWindowType_as.h
-endif
-
-if BUILD_NATIVEWINDOW_AS3
-DISPLAY_SOURCES += flash/display/NativeWindow_as.cpp
-DISPLAY_HEADERS += flash/display/NativeWindow_as.h
-endif
-
 if BUILD_PIXELSNAPPING_AS3
 DISPLAY_SOURCES += flash/display/PixelSnapping_as.cpp
 DISPLAY_HEADERS += flash/display/PixelSnapping_as.h
@@ -178,11 +138,6 @@ endif
 if BUILD_SCENE_AS3
 DISPLAY_SOURCES += flash/display/Scene_as.cpp
 DISPLAY_HEADERS += flash/display/Scene_as.h
-endif
-
-if BUILD_SCREEN_AS3
-DISPLAY_SOURCES += flash/display/Screen_as.cpp
-DISPLAY_HEADERS += flash/display/Screen_as.h
 endif
 
 if BUILD_SHAPE_AS3

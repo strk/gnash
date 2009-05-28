@@ -38,14 +38,11 @@ get_flash_accessibility_package(const fn_call& /*fn*/)
 	log_debug("Loading flash.accessibility package");
 	as_object *pkg = new as_object(getObjectInterface());
 
-#if 0	      // FIXME: why is asclasses undefined ? Do we have more
-	// than one Accessibility header block ?
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
+	while (asclasses[++i] != 0) {
 	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
-#endif
+    }
 
 	return pkg;
 }

@@ -44,13 +44,11 @@ get_flash_system_package(const fn_call& /*fn*/)
 	log_debug("Loading flash.system package");
 	as_object *pkg = new as_object(getObjectInterface());
         
-#if 0         // FIXME: why is asclasses undefined ?
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
+	while (asclasses[++i] != 0) {
 	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
-#endif
+    }
         
 	return pkg;
 }

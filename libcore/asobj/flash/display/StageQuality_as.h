@@ -24,34 +24,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
-
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getStageQualityInterface();
-}
-
-class StageQuality_as: public as_object
-{
-
-public:
-
-    StageQuality_as()
-        :
-        as_object(getStageQualityInterface())
-    {}
-
-};
 
 /// Initialize the global StageQuality class
 void stagequality_class_init(as_object& global);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_STAGEQUALITY_H
 #endif
 
 // local Variables:
