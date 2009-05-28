@@ -25,11 +25,6 @@ UTILS_SOURCES += flash/utils/ByteArray_as.cpp
 UTILS_HEADERS += flash/utils/ByteArray_as.h
 endif
 
-if BUILD_COMPRESSIONALGORITHM_AS3
-UTILS_SOURCES += flash/utils/CompressionAlgorithm_as.cpp
-UTILS_HEADERS += flash/utils/CompressionAlgorithm_as.h
-endif
-
 if BUILD_DICTIONARY_AS3
 UTILS_SOURCES += flash/utils/Dictionary_as.cpp
 UTILS_HEADERS += flash/utils/Dictionary_as.h

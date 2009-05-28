@@ -56,7 +56,6 @@ static gnash::SharedLib::initentry *asclasses[] = {
     flash_media_package_init,
     flash_printing_package_init,
     flash_sampler_package_init,
-    flash_security_package_init,
     flash_ui_package_init,
     flash_utils_package_init,
     flash_xml_package_init,

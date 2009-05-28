@@ -175,7 +175,6 @@ include $(srcdir)/flash/media/media.am
 include $(srcdir)/flash/net/net.am
 include $(srcdir)/flash/printing/printing.am
 include $(srcdir)/flash/sampler/sampler.am
-include $(srcdir)/flash/security/security.am
 include $(srcdir)/flash/system/system.am
 include $(srcdir)/flash/text/text.am
 include $(srcdir)/flash/utils/utils.am
