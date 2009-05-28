@@ -73,3 +73,11 @@ vars2.txt
 
 	Text files containing variable assignments.
 
+audio_timewarp.flv
+
+	A cut-down version of a stream downloaded from StreamTheWorld
+	radio for bug report http://savannah.gnu.org/bugs/?26687
+	The characteristic of this FLV is that two consecutive
+	audio frames have a timestamp difference of over an hour.
+	Gnash used to wait the whole time before proceeding, which
+	was wrong.
