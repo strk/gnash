@@ -164,16 +164,13 @@ endif
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.
 include $(srcdir)/flash/accessibility/accessibility.am
-include $(srcdir)/flash/data/data.am
 include $(srcdir)/flash/desktop/desktop.am
 include $(srcdir)/flash/display/display.am
 include $(srcdir)/flash/errors/errors.am
 include $(srcdir)/flash/events/events.am
 include $(srcdir)/flash/external/external.am
-include $(srcdir)/flash/filesystem/filesystem.am
 include $(srcdir)/flash/filters/filters.am
 include $(srcdir)/flash/geom/geom.am
-include $(srcdir)/flash/html/html.am
 include $(srcdir)/flash/media/media.am
 include $(srcdir)/flash/net/net.am
 include $(srcdir)/flash/printing/printing.am

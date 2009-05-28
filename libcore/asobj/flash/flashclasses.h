@@ -28,7 +28,6 @@
 #include "external/external_pkg.h"
 #include "filters/filters_pkg.h"
 #include "geom/geom_pkg.h"
-#include "html/html_pkg.h"
 #include "media/media_pkg.h"
 #include "net/net_pkg.h"
 #include "printing/printing_pkg.h"
@@ -54,7 +53,6 @@ static gnash::SharedLib::initentry *asclasses[] = {
     flash_desktop_package_init,
     flash_errors_package_init,
     flash_events_package_init,
-    flash_html_package_init,
     flash_media_package_init,
     flash_printing_package_init,
     flash_sampler_package_init,
