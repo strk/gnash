@@ -21,7 +21,6 @@
 // These headers include the prototypes of all the *_init functions
 // for each class.
 #include "accessibility/accessibility_pkg.h"
-#include "data/data_pkg.h"
 #include "desktop/desktop_pkg.h"
 #include "display/display_pkg.h"
 #include "errors/errors_pkg.h"
@@ -62,7 +61,6 @@ static gnash::SharedLib::initentry *asclasses[] = {
     flash_printing_package_init,
     flash_sampler_package_init,
     flash_security_package_init,
-    flash_data_package_init,
     flash_ui_package_init,
     flash_utils_package_init,
     flash_xml_package_init,
