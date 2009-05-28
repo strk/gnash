@@ -30,21 +30,6 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getXMLNodeInterface();
-}
-
-class XMLNode_as: public as_object
-{
-
-public:
-
-    XMLNode_as()
-        :
-        as_object(getXMLNodeInterface())
-    {}
-
-};
 
 /// Initialize the global XMLNode class
 void xmlnode_class_init(as_object& global);

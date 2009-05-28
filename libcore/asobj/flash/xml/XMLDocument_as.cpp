@@ -42,6 +42,17 @@ namespace {
 
 }
 
+class XMLDocument_as : public as_object
+{
+
+public:
+
+    XMLDocument_as()
+        :
+        as_object(getXMLDocumentInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void xmldocument_class_init(as_object& global)
 {
