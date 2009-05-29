@@ -42,7 +42,7 @@ namespace gst {
 std::auto_ptr<MediaParser>
 MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
-	std::auto_ptr<MediaParser> parser;
+    std::auto_ptr<MediaParser> parser;
 
     try
     {
@@ -52,8 +52,8 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
         }
         else
         {
-			parser.reset(new MediaParserGst(stream));
-		}
+            parser.reset(new MediaParserGst(stream));
+        }
     }
     catch (GnashException& ex)
     {
@@ -62,53 +62,55 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
         assert(!parser.get());
     }
 
-	return parser;
+    return parser;
 }
 
 std::auto_ptr<VideoDecoder>
 MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 {
-	if ( info.type != FLASH )
-	{
-		ExtraInfoGst* extrainfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
-		if (!extrainfo) {
-			log_error(_("Wrong arguments given to GST VideoDecoder"));
-			return std::auto_ptr<VideoDecoder>(0);
-		}
-		return std::auto_ptr<VideoDecoder>(new VideoDecoderGst(extrainfo->caps));
-	}
-	videoCodecType format = static_cast<videoCodecType>(info.codec);
-	int width = info.width;
-	int height = info.height;
+    if (info.type != FLASH) {
 
-	boost::uint8_t* extradata = 0;
-	size_t datasize = 0;
+        ExtraInfoGst* extrainfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
 
-	ExtraVideoInfoFlv* extrainfo = dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get());
-	if (extrainfo) {
-		extradata = extrainfo->data.get();
+	if (!extrainfo) {
+            log_error(_("Wrong arguments given to GST VideoDecoder"));
+            return std::auto_ptr<VideoDecoder>();
+        }
+        return std::auto_ptr<VideoDecoder>(
+			new VideoDecoderGst(extrainfo->caps));
+    }
+    videoCodecType format = static_cast<videoCodecType>(info.codec);
+    int width = info.width;
+    int height = info.height;
+
+    boost::uint8_t* extradata = 0;
+    size_t datasize = 0;
+
+    ExtraVideoInfoFlv* extrainfo = dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get());
+    if (extrainfo) {
+        extradata = extrainfo->data.get();
                 datasize = extrainfo->size;
-	}
+    }
 
-	std::auto_ptr<VideoDecoder> ret( new VideoDecoderGst(format, width, height, extradata, datasize) );
-	return ret;
+    std::auto_ptr<VideoDecoder> ret( new VideoDecoderGst(format, width, height, extradata, datasize) );
+    return ret;
 }
 
 std::auto_ptr<AudioDecoder>
 MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 {
-	std::auto_ptr<AudioDecoder> ret;
+    std::auto_ptr<AudioDecoder> ret;
 
 #ifdef DECODING_SPEEX
-	if (info.codec == AUDIO_CODEC_SPEEX) {
-		assert(info.type == FLASH);
-		ret.reset(new AudioDecoderSpeex);
-	} else
+    if (info.codec == AUDIO_CODEC_SPEEX) {
+        assert(info.type == FLASH);
+        ret.reset(new AudioDecoderSpeex);
+    } else
 #endif
-	{
+    {
         try
         {
-		    ret.reset(new AudioDecoderGst(info));
+            ret.reset(new AudioDecoderGst(info));
         }
         catch (MediaException& ex)
         {
@@ -128,9 +130,9 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
             }
         }
     
-	}
+    }
 
-	return ret;
+    return ret;
 }
 
 std::auto_ptr<VideoConverter>

@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __MEDIAPARSER_GST_H__
-#define __MEDIAPARSER_GST_H__
+#ifndef GNASH_MEDIAPARSER_GST_H
+#define GNASH_MEDIAPARSER_GST_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -45,7 +45,8 @@ namespace media {
 namespace gst {
 
 /// Class to hold extra info found in any stream by the parser.
-struct ExtraInfoGst : public AudioInfo::ExtraInfo, VideoInfo::ExtraInfo, boost::noncopyable
+struct ExtraInfoGst : public AudioInfo::ExtraInfo, VideoInfo::ExtraInfo,
+	boost::noncopyable
 {
     ExtraInfoGst(GstCaps* gstcaps)
     :
