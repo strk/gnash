@@ -25,6 +25,7 @@
 #include "SWFStream.h" // for inlines
 #include "abc_block.h"
 #include "Machine.h"
+#include "VM.h"
 
 // Forward declarations
 namespace gnash {
@@ -34,9 +35,33 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
+namespace {
+
+/// Switch the execution context to AVM2, and make sure it's
+/// switched back again even when there's an exception.
+class AVM2Switcher
+{
+public:
+    AVM2Switcher(VM& vm)
+        :
+        _vm(vm)
+    {
+        _vm.setAVMVersion(VM::AVM2);
+    }
+
+    ~AVM2Switcher()
+    {
+        _vm.setAVMVersion(VM::AVM1);
+    }
+private:
+    VM& _vm;
+};
+
+}
+
 /// SWF Tag DoABC (72)
 //
-///
+/// Execute an ABC tag. This is AVM2 bytecode.
 class DoABCTag : public ControlTag
 {
 public:
@@ -44,7 +69,11 @@ public:
     virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
 		VM& vm = m->getVM();
-		log_debug("getting machine.");
+        
+        // This automatically switches back again when we leave this scope.
+        AVM2Switcher sw(vm);
+
+        log_debug("getting machine.");
 		Machine *mach = vm.getMachine();
 		as_object* global = vm.getGlobal();
 		
