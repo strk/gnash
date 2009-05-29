@@ -40,16 +40,20 @@
 namespace gnash {
 
 static as_value
-get_flash_media_package(const fn_call& /*fn*/)
+get_flash_media_package(const fn_call& fn)
 {
-	log_debug("Loading flash.media package");
+    // This package is AS3 only!
+    assert(isAS3(fn.getVM()));
+
+	log_debug("Loading AVM2 flash.media package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
+	while (as3classes[i]) {
 	    as3classes[i](*pkg);
-	} while (as3classes[++i] != 0);
+        ++i;
+    }
 
 	return pkg;
 }

@@ -32,16 +32,20 @@
 namespace gnash {
 
 static as_value
-get_flash_external_package(const fn_call& /*fn*/)
+get_flash_external_package(const fn_call& fn)
 {
-	log_debug("Loading flash.external package");
-	as_object *pkg = new as_object(getObjectInterface());
+    const bool as3 = isAS3(fn.getVM());
+    // This package is identical for AS2 and AS3 (as far as we know)
+	log_debug("Loading %s flash.external package", as3 ? "AVM2" : "AVM1");
+	
+    as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
+	while (as3classes[i]) {
 	    as3classes[i](*pkg);
-	} while (as3classes[++i] != 0);
+        ++i;
+	} 
 
 	return pkg;
 }
