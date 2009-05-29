@@ -42,7 +42,17 @@
 
 namespace gnash {
 
-static gnash::SharedLib::initentry *asclasses[] = {
+static gnash::SharedLib::initentry* as2classes[] = {
+    flash_text_package_init,
+    flash_display_package_init,
+    flash_filters_package_init,
+    flash_geom_package_init,
+    flash_net_package_init,
+    flash_external_package_init,
+    0
+};
+
+static gnash::SharedLib::initentry* as3classes[] = {
     flash_text_package_init,
     flash_display_package_init,
     flash_filters_package_init,
