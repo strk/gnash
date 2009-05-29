@@ -1,4 +1,4 @@
-/ URLLoaderDataFormat_as.cpp:  ActionScript "URLLoaderDataFormat" class, for Gnash.
+// URLLoaderDataFormat_as.cpp:  ActionScript "URLLoaderDataFormat" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.net.URLLoaderDataFormat class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value urlloaderdataformat_ctor(const fn_call& fn);
-    void attachURLLoaderDataFormatInterface(as_object& o);
     void attachURLLoaderDataFormatStaticInterface(as_object& o);
-    as_object* getURLLoaderDataFormatInterface();
-
 }
 
-class URLLoaderDataFormat_as : public as_object
-{
-
-public:
-
-    URLLoaderDataFormat_as()
-        :
-        as_object(getURLLoaderDataFormatInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void urlloaderdataformat_class_init(as_object& global)
+void
+urlloaderdataformat_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&urlloaderdataformat_ctor, getURLLoaderDataFormatInterface());
-        attachURLLoaderDataFormatStaticInterface(*cl);
-    }
-
-    // Register _global.URLLoaderDataFormat
-    global.init_member("URLLoaderDataFormat", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachURLLoaderDataFormatStaticInterface(*o);
+    global.init_member("URLLoaderDataFormat", o);
 }
 
 namespace {
 
 void
-attachURLLoaderDataFormatInterface(as_object& o)
-{
-}
-
-void
 attachURLLoaderDataFormatStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getURLLoaderDataFormatInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachURLLoaderDataFormatInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-urlloaderdataformat_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new URLLoaderDataFormat_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 

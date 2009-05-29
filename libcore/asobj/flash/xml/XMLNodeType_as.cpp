@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.xml.XMLNodeType class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value xmlnodetype_ctor(const fn_call& fn);
-    void attachXMLNodeTypeInterface(as_object& o);
     void attachXMLNodeTypeStaticInterface(as_object& o);
-    as_object* getXMLNodeTypeInterface();
-
 }
 
-class XMLNodeType_as : public as_object
-{
-
-public:
-
-    XMLNodeType_as()
-        :
-        as_object(getXMLNodeTypeInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void xmlnodetype_class_init(as_object& global)
+void
+xmlnodetype_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&xmlnodetype_ctor, getXMLNodeTypeInterface());
-        attachXMLNodeTypeStaticInterface(*cl);
-    }
-
-    // Register _global.XMLNodeType
-    global.init_member("XMLNodeType", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachXMLNodeTypeStaticInterface(*o);
+    global.init_member("XMLNodeType", o);
 }
 
 namespace {
 
 void
-attachXMLNodeTypeInterface(as_object& o)
-{
-}
-
-void
 attachXMLNodeTypeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getXMLNodeTypeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachXMLNodeTypeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-xmlnodetype_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new XMLNodeType_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 

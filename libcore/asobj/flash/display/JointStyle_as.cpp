@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.display.JointStyle class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value jointstyle_ctor(const fn_call& fn);
-    void attachJointStyleInterface(as_object& o);
     void attachJointStyleStaticInterface(as_object& o);
-    as_object* getJointStyleInterface();
-
 }
 
-class JointStyle_as : public as_object
-{
-
-public:
-
-    JointStyle_as()
-        :
-        as_object(getJointStyleInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void jointstyle_class_init(as_object& global)
+void
+jointstyle_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&jointstyle_ctor, getJointStyleInterface());
-        attachJointStyleStaticInterface(*cl);
-    }
-
-    // Register _global.JointStyle
-    global.init_member("JointStyle", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachJointStyleStaticInterface(*o);
+    global.init_member("JointStyle", o);
 }
 
 namespace {
 
 void
-attachJointStyleInterface(as_object& o)
-{
-}
-
-void
 attachJointStyleStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getJointStyleInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachJointStyleInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-jointstyle_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new JointStyle_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 
