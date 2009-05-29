@@ -189,9 +189,8 @@ endif
 DISPLAY_HEADERS += flash/display/Stage_as.h
 # endif
 
-libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES)
-libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES_AS2)
-noinst_HEADERS +=  $(DISPLAY_HEADERS) displayclasses.h
+libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES) $(DISPLAY_SOURCES_AS2)
+noinst_HEADERS +=  $(DISPLAY_HEADERS) $(DISPLAY_HEADERS_AS2) displayclasses.h
 
 # Build a header file that contains a generated array of *_init()
 # functions for the classes that are configured for this build, as
