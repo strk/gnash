@@ -242,9 +242,36 @@ inline bool abstractEquality(const as_value& a, const as_value& b,
 	break;																	\
 }														  /* end of JUMPIF */
 
+namespace {
+
+/// Switch the execution context to AVM2, and make sure it's
+/// switched back again even when there's an exception.
+class AVM2Switcher
+{
+public:
+    AVM2Switcher(VM& vm)
+        :
+        _vm(vm)
+    {
+        _vm.setAVMVersion(VM::AVM2);
+    }
+
+    ~AVM2Switcher()
+    {
+        _vm.setAVMVersion(VM::AVM1);
+    }
+private:
+    VM& _vm;
+};
+
+}
+
 void
 Machine::execute()
 {
+
+    // This automatically switches back again when we leave this scope.
+    AVM2Switcher avm2(_vm);
 
 	for (;;) {
 		std::size_t opStart = mStream->tellg();
