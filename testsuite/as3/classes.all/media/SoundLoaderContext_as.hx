@@ -23,6 +23,8 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+// NOTE: works for flash v.9 and greater only!
+
 import flash.media.SoundLoaderContext;
 import flash.display.MovieClip;
 import flash.Lib;
@@ -45,12 +47,12 @@ class SoundLoaderContext_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.bufferTime == 0) {
+	if (Type.typeof(x1.bufferTime) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundLoaderContext::bufferTime property exists");
 	} else {
 	    DejaGnu.fail("SoundLoaderContext::bufferTime property doesn't exist");
 	}
-	if (x1.checkPolicyFile == false) {
+	if (x1.checkPolicyFile == (true || false)) {
 	    DejaGnu.pass("SoundLoaderContext::checkPolicyFile property exists");
 	} else {
 	    DejaGnu.fail("SoundLoaderContext::checkPolicyFile property doesn't exist");
@@ -59,11 +61,11 @@ class SoundLoaderContext_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (x1.SoundLoaderContext == false) {
-// 	    DejaGnu.pass("SoundLoaderContext::SoundLoaderContext() method exists");
-// 	} else {
-// 	    DejaGnu.fail("SoundLoaderContext::SoundLoaderContext() method doesn't exist");
-// 	}
+ 	if (Type.typeof(x1.SoundLoaderContext) == ValueType.TObject) {
+ 	    DejaGnu.pass("SoundLoaderContext::SoundLoaderContext() method exists");
+ 	} else {
+ 	    DejaGnu.fail("SoundLoaderContext::SoundLoaderContext() method doesn't exist");
+ 	}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
