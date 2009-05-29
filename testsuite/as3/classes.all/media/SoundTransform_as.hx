@@ -83,15 +83,6 @@ class SoundTransform_as {
 	    DejaGnu.fail("SoundTransform::volume property doesn't exist");
 	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
- 	if (Type.typeof(x1.SoundTransform) == ValueType.TFunction) {
- 	    DejaGnu.pass("SoundTransform::SoundTransform() method exists");
- 	} else {
- 	    DejaGnu.fail("SoundTransform::SoundTransform() method doesn't exist");
- 	}
-
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
