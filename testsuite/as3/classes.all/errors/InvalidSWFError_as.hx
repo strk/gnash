@@ -26,9 +26,6 @@
 #if flash9
 import flash.errors.InvalidSWFError;
 import flash.display.MovieClip;
-#else
-import flash.InvalidSWFError;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class InvalidSWFError_as {
     static function main() {
-        var x1:InvalidSWFError = new InvalidSWFError();
+        #if !flash9
+		DejaGnu.note("This is not a valid class except for Flash 9 and above");
+		#end
+		#if flash9
+		var x1:InvalidSWFError = new InvalidSWFError();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -48,7 +49,7 @@ class InvalidSWFError_as {
             DejaGnu.fail("InvalidSWFError class doesn't exist");
         }
 
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

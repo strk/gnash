@@ -26,9 +26,6 @@
 #if flash9
 import flash.errors.ScriptTimeoutError;
 import flash.display.MovieClip;
-#else
-import flash.ScriptTimeoutError;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ScriptTimeoutError_as {
     static function main() {
-        var x1:ScriptTimeoutError = new ScriptTimeoutError();
+        #if !flash9
+		DejaGnu.note("This is not a valid class except for Flash 9 and above");
+		#end
+		#if flash9
+		var x1:ScriptTimeoutError = new ScriptTimeoutError();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -47,11 +48,7 @@ class ScriptTimeoutError_as {
         } else {
             DejaGnu.fail("ScriptTimeoutError class doesn't exist");
         }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
