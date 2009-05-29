@@ -32,6 +32,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -53,14 +54,14 @@ class ExternalInterface_as {
 	
 	//check objectID and marshallExceptions only for flashv9
 	#if flash9
-	if (flash.external.ExternalInterface.marshallExceptions == false) {
+	if (Type.typeof(flash.external.ExternalInterface.marshallExceptions) == ValueType.TBool) {
 	    DejaGnu.pass("ExternalInterface.marshallExceptions property exists");
 	} else {
 	    DejaGnu.fail("EI.marshallExceptions property doesn't exist");
 	}
 	
 	//this should be changed to check for a proper string returned
-	if (flash.external.ExternalInterface.objectID != null) {
+	if (Std.is(flash.external.ExternalInterface.objectID, String)) {
 	    DejaGnu.pass("ExternalInterface.objectID property exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface.objectID property doesn't exist");
@@ -68,7 +69,7 @@ class ExternalInterface_as {
 	#end
 
 	//change this to just false if ExternalInterfacing is not supported
-	if (flash.external.ExternalInterface.available == false || true) {
+	if (Type.typeof(flash.external.ExternalInterface.available) == ValueType.TBool) {
 	    DejaGnu.pass("ExternalInterface.available property exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface.available property doesn't exist");
@@ -77,14 +78,14 @@ class ExternalInterface_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (flash.external.ExternalInterface.addCallback == null) {
+	if (Type.typeof(flash.external.ExternalInterface.addCallback) == ValueType.TFunction) {
 	    DejaGnu.pass("ExternalInterface::addCallback() method exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface::addCallback() method doesn't exist");
 	}
 	
 	//tests if the EI call function is available
-	if (flash.external.ExternalInterface.call != null) {
+	if (Type.typeof(flash.external.ExternalInterface.call) == ValueType.TFunction) {
 	    DejaGnu.pass("ExternalInterface::call() method exists");
 	} else {
 	    DejaGnu.fail("ExternalInterface::call() method doesn't exist");

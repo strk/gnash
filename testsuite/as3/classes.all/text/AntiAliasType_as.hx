@@ -27,7 +27,7 @@
 import flash.text.AntiAliasType;
 import flash.display.MovieClip;
 #else
-import flash.AntiAliasType;
+import flash.TextField;
 import flash.MovieClip;
 #end
 import flash.Lib;
