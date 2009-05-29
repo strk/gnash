@@ -27,11 +27,12 @@
 import flash.filters.ConvolutionFilter;
 import flash.display.MovieClip;
 #else
-import flash.ConvolutionFilter;
+import flash.filters.ConvolutionFilter;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -50,47 +51,47 @@ class ConvolutionFilter_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.alpha == 0) {
+	if (Type.typeof(x1.alpha) == ValueType.TFloat) {
 	    DejaGnu.pass("ConvolutionFilter.alpha property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.alpha property doesn't exist");
 	}
-	if (x1.bias == 0) {
+	if (Type.typeof(x1.bias) == ValueType.TFloat) {
 	    DejaGnu.pass("ConvolutionFilter.bias property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.bias property doesn't exist");
 	}
-	if (x1.clamp == false) {
+	if (Type.typeof(x1.clamp) == ValueType.TBool) {
 	    DejaGnu.pass("ConvolutionFilter.clamp property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.clamp property doesn't exist");
 	}
-	if (x1.color == uint) {
+	if (Type.typeof(x1.color) == ValueType.TFloat) {
 	    DejaGnu.pass("ConvolutionFilter.color property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.color property doesn't exist");
 	}
-	if (x1.divisor == 0) {
+	if (Type.typeof(x1.divisor) == ValueType.TFloat) {
 	    DejaGnu.pass("ConvolutionFilter.divisor property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.divisor property doesn't exist");
 	}
-	if (x1.matrix == 0) {
+	if (Std.is(x1.matrix, Array)) {
 	    DejaGnu.pass("ConvolutionFilter.matrix property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.matrix property doesn't exist");
 	}
-	if (x1.matrixX == 0) {
+	if (Type.typeof(x1.matrixX) == ValueType.TFloat) {
 	    DejaGnu.pass("ConvolutionFilter.matrixX property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.matrixX property doesn't exist");
 	}
-	if (x1.matrixY == 0) {
+	if (Type.typeof(x1.matrixY) == ValueType.TFloat) {
 	    DejaGnu.pass("ConvolutionFilter.matrixY property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.matrixY property doesn't exist");
 	}
-	if (x1.preserveAlpha == false) {
+	if (Type.typeof(x1.preserveAlpha) == ValueType.TBool) {
 	    DejaGnu.pass("ConvolutionFilter.preserveAlpha property exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter.preserveAlpha property doesn't exist");
@@ -99,12 +100,7 @@ class ConvolutionFilter_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.ConvolutionFilter == 0) {
-	    DejaGnu.pass("ConvolutionFilter::ConvolutionFilter() method exists");
-	} else {
-	    DejaGnu.fail("ConvolutionFilter::ConvolutionFilter() method doesn't exist");
-	}
-	if (x1.clone == BitmapFilter) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("ConvolutionFilter::clone() method exists");
 	} else {
 	    DejaGnu.fail("ConvolutionFilter::clone() method doesn't exist");

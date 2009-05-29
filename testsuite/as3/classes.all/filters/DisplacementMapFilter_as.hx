@@ -26,12 +26,17 @@
 #if flash9
 import flash.filters.DisplacementMapFilter;
 import flash.display.MovieClip;
+import flash.display.BitmapData;
+import flash.geom.Point;
 #else
-import flash.DisplacementMapFilter;
+import flash.filters.DisplacementMapFilter;
 import flash.MovieClip;
+import flash.BitmapData;
+import flash.geom.Point;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -50,47 +55,47 @@ class DisplacementMapFilter_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.alpha == 0) {
+	if (Type.typeof(x1.alpha) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplacementMapFilter.alpha property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.alpha property doesn't exist");
 	}
-	if (x1.color == uint) {
+	if (Type.typeof(x1.color) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplacementMapFilter.color property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.color property doesn't exist");
 	}
-	if (x1.componentX == uint) {
+	if (Type.typeof(x1.componentX) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplacementMapFilter.componentX property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.componentX property doesn't exist");
 	}
-	if (x1.componentY == uint) {
+	if (Type.typeof(x1.componentY) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplacementMapFilter.componentY property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.componentY property doesn't exist");
 	}
-	if (x1.mapBitmap == BitmapData) {
+	if (Std.is(x1.mapBitmap, BitmapData)) {
 	    DejaGnu.pass("DisplacementMapFilter.mapBitmap property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.mapBitmap property doesn't exist");
 	}
-	if (x1.mapPoint == Point) {
+	if (Std.is(x1.mapPoint, Point)) {
 	    DejaGnu.pass("DisplacementMapFilter.mapPoint property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.mapPoint property doesn't exist");
 	}
-	if (x1.mode == null) {
+	if (Std.is(x1.mode, String)) {
 	    DejaGnu.pass("DisplacementMapFilter.mode property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.mode property doesn't exist");
 	}
-	if (x1.scaleX == 0) {
+	if (Type.typeof(x1.scaleX) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplacementMapFilter.scaleX property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.scaleX property doesn't exist");
 	}
-	if (x1.scaleY == 0) {
+	if (Type.typeof(x1.scaleY) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplacementMapFilter.scaleY property exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter.scaleY property doesn't exist");
@@ -99,12 +104,7 @@ class DisplacementMapFilter_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.DisplacementMapFilter == 0) {
-	    DejaGnu.pass("DisplacementMapFilter::DisplacementMapFilter() method exists");
-	} else {
-	    DejaGnu.fail("DisplacementMapFilter::DisplacementMapFilter() method doesn't exist");
-	}
-	if (x1.clone == BitmapFilter) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("DisplacementMapFilter::clone() method exists");
 	} else {
 	    DejaGnu.fail("DisplacementMapFilter::clone() method doesn't exist");

@@ -27,7 +27,7 @@
 import flash.filters.DropShadowFilter;
 import flash.display.MovieClip;
 #else
-import flash.DropShadowFilter;
+import flash.filters.DropShadowFilter;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -50,57 +50,57 @@ class DropShadowFilter_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.alpha == 0) {
+	if (Type.typeof(x1.alpha) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.alpha property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.alpha property doesn't exist");
 	}
-	if (x1.angle == 0) {
+	if (Type.typeof(x1.angle) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.angle property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.angle property doesn't exist");
 	}
-	if (x1.blurX == 0) {
+	if (Type.typeof(x1.blurX) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.blurX property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.blurX property doesn't exist");
 	}
-	if (x1.blurY == 0) {
+	if (Type.typeof(x1.blurY) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.blurY property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.blurY property doesn't exist");
 	}
-	if (x1.color == uint) {
+	if (Type.typeof(x1.color) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.color property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.color property doesn't exist");
 	}
-	if (x1.distance == 0) {
+	if (Type.typeof(x1.distance) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.distance property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.distance property doesn't exist");
 	}
-	if (x1.hideObject == false) {
+	if (Type.typeof(x1.hideObject) == ValueType.TBool) {
 	    DejaGnu.pass("DropShadowFilter.hideObject property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.hideObject property doesn't exist");
 	}
-	if (x1.inner == false) {
+	if (Type.typeof(x1.inner) == ValueType.TBool) {
 	    DejaGnu.pass("DropShadowFilter.inner property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.inner property doesn't exist");
 	}
-	if (x1.knockout == false) {
+	if (Type.typeof(x1.knockout) == ValueType.TBool) {
 	    DejaGnu.pass("DropShadowFilter.knockout property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.knockout property doesn't exist");
 	}
-	if (x1.quality == 0) {
+	if (Type.typeof(x1.quality) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.quality property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.quality property doesn't exist");
 	}
-	if (x1.strength == 0) {
+	if (Type.typeof(x1.strength) == ValueType.TFloat) {
 	    DejaGnu.pass("DropShadowFilter.strength property exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter.strength property doesn't exist");
@@ -109,12 +109,7 @@ class DropShadowFilter_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.DropShadowFilter == false) {
-	    DejaGnu.pass("DropShadowFilter::DropShadowFilter() method exists");
-	} else {
-	    DejaGnu.fail("DropShadowFilter::DropShadowFilter() method doesn't exist");
-	}
-	if (x1.clone == BitmapFilter) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("DropShadowFilter::clone() method exists");
 	} else {
 	    DejaGnu.fail("DropShadowFilter::clone() method doesn't exist");
