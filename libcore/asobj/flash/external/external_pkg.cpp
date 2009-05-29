@@ -36,29 +36,29 @@ get_flash_external_package(const fn_call& fn)
 {
     const bool as3 = isAS3(fn.getVM());
     // This package is identical for AS2 and AS3 (as far as we know)
-	log_debug("Loading %s flash.external package", as3 ? "AVM2" : "AVM1");
-	
+    log_debug("Loading %s flash.external package", as3 ? "AVM2" : "AVM1");
+    
     as_object *pkg = new as_object(getObjectInterface());
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-	while (as3classes[i]) {
-	    as3classes[i](*pkg);
+    // Call the [objectname]_init() function for each class.
+    int i = 0;
+    while (as3classes[i]) {
+        as3classes[i](*pkg);
         ++i;
-	} 
+    } 
 
-	return pkg;
+    return pkg;
 }
 
 void
 flash_external_package_init(as_object& where)
 {
-	string_table& st = where.getVM().getStringTable();
+    string_table& st = where.getVM().getStringTable();
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("external"),
-			get_flash_external_package, flags);
+    where.init_destructive_property(st.find("external"),
+            get_flash_external_package, flags);
 }
 
 
