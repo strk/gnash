@@ -26,15 +26,14 @@
 #if flash9
 import flash.desktop.Clipboard;
 import flash.display.MovieClip;
-#else
-import flash.Clipboard;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
+
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Clipboard_as {
@@ -50,12 +49,12 @@ class Clipboard_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.formats == 0) {
+	if (Std.is(x1.formats, Array)) {
 	    DejaGnu.pass("Clipboard::formats property exists");
 	} else {
 	    DejaGnu.fail("Clipboard::formats property doesn't exist");
 	}
-	if (x1.generalClipboard == Clipboard) {
+	if (Type.typeof(x1.generalClipboard) == ValueType.TObject) {
 	    DejaGnu.pass("Clipboard::generalClipboard property exists");
 	} else {
 	    DejaGnu.fail("Clipboard::generalClipboard property doesn't exist");
@@ -64,37 +63,32 @@ class Clipboard_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.Clipboard == Clipboard) {
-	    DejaGnu.pass("Clipboard::Clipboard() method exists");
-	} else {
-	    DejaGnu.fail("Clipboard::Clipboard() method doesn't exist");
-	}
-	if (x1.clear == null) {
+	if (Type.typeof(x1.clear) == ValueType.TFunction) {
 	    DejaGnu.pass("Clipboard::clear() method exists");
 	} else {
 	    DejaGnu.fail("Clipboard::clear() method doesn't exist");
 	}
-	if (x1.clearData == null) {
+	if (Type.typeof(x1.clearData) == ValueType.TFunction) {
 	    DejaGnu.pass("Clipboard::clearData() method exists");
 	} else {
 	    DejaGnu.fail("Clipboard::clearData() method doesn't exist");
 	}
-	if (x1.getData == Object) {
+	if (Type.typeof(x1.getData) == ValueType.TFunction) {
 	    DejaGnu.pass("Clipboard::getData() method exists");
 	} else {
 	    DejaGnu.fail("Clipboard::getData() method doesn't exist");
 	}
-	if (x1.hasFormat == false) {
+	if (Type.typeof(x1.hasFormat)== ValueType.TFunction) {
 	    DejaGnu.pass("Clipboard::hasFormat() method exists");
 	} else {
 	    DejaGnu.fail("Clipboard::hasFormat() method doesn't exist");
 	}
-	if (x1.setData == false) {
+	if (Type.typeof(x1.setData) == ValueType.TFunction) {
 	    DejaGnu.pass("Clipboard::setData() method exists");
 	} else {
 	    DejaGnu.fail("Clipboard::setData() method doesn't exist");
 	}
-	if (x1.setDataHandler == false) {
+	if (Type.typeof(x1.setDataHandler) == ValueType.TFunction) {
 	    DejaGnu.pass("Clipboard::setDataHandler() method exists");
 	} else {
 	    DejaGnu.fail("Clipboard::setDataHandler() method doesn't exist");
