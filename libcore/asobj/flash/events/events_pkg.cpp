@@ -62,8 +62,8 @@ get_flash_events_package(const fn_call& /*fn*/)
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 	do {
-	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+	    as3classes[i](*pkg);
+	} while (as3classes[++i] != 0);
 
 	return pkg;
 }

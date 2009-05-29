@@ -40,8 +40,8 @@ get_flash_accessibility_package(const fn_call& /*fn*/)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (asclasses[++i] != 0) {
-	    asclasses[i](*pkg);
+	while (as3classes[++i] != 0) {
+	    as3classes[i](*pkg);
     }
 
 	return pkg;
