@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class CSMSettings_as : public as_object
+{
+
+public:
+
+    CSMSettings_as()
+        :
+        as_object(getCSMSettingsInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void csmsettings_class_init(as_object& global)
 {

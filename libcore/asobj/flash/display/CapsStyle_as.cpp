@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class CapsStyle_as : public as_object
+{
+
+public:
+
+    CapsStyle_as()
+        :
+        as_object(getCapsStyleInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void capsstyle_class_init(as_object& global)
 {

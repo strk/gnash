@@ -48,6 +48,17 @@ namespace {
 
 }
 
+class Proxy_as : public as_object
+{
+
+public:
+
+    Proxy_as()
+        :
+        as_object(getProxyInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void proxy_class_init(as_object& global)
 {

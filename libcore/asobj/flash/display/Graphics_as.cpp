@@ -52,6 +52,17 @@ namespace {
 
 }
 
+class Graphics_as : public as_object
+{
+
+public:
+
+    Graphics_as()
+        :
+        as_object(getGraphicsInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void graphics_class_init(as_object& global)
 {

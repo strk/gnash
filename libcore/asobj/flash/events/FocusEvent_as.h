@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getFocusEventInterface();
-}
-
-class FocusEvent_as: public as_object
-{
-
-public:
-
-    FocusEvent_as()
-        :
-        as_object(getFocusEventInterface())
-    {}
-
-};
 
 /// Initialize the global FocusEvent class
 void focusevent_class_init(as_object& global);

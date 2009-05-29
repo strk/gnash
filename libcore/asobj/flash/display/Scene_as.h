@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getSceneInterface();
-}
-
-class Scene_as: public as_object
-{
-
-public:
-
-    Scene_as()
-        :
-        as_object(getSceneInterface())
-    {}
-
-};
 
 /// Initialize the global Scene class
 void scene_class_init(as_object& global);

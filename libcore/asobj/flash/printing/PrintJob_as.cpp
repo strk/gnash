@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class PrintJob_as : public as_object
+{
+
+public:
+
+    PrintJob_as()
+        :
+        as_object(getPrintJobInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void printjob_class_init(as_object& global)
 {

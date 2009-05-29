@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Scene_as : public as_object
+{
+
+public:
+
+    Scene_as()
+        :
+        as_object(getSceneInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void scene_class_init(as_object& global)
 {

@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class SecurityErrorEvent_as : public as_object
+{
+
+public:
+
+    SecurityErrorEvent_as()
+        :
+        as_object(getSecurityErrorEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void securityerrorevent_class_init(as_object& global)
 {

@@ -38,6 +38,7 @@
 const char* mediadir=".";
 char filename[256];
 char filename2[256];
+char filename3[256];
 
 
 int
@@ -67,6 +68,7 @@ main(int argc, char** argv)
 	
   sprintf(filename, "%s/square.flv", mediadir);
   sprintf(filename2, "%s/square.ogg", mediadir);
+  sprintf(filename3, "%s/audio_timewarp.flv", mediadir);
 
   // Some online examples...
   //
@@ -98,6 +100,7 @@ main(int argc, char** argv)
 	"stream.bytesTotal = 'string';"
 	"check_equals ( typeof(stream.bytesTotal), 'number' );"
 	"stream2 = new NetStream(nc);"
+	"stream3 = new NetStream(nc);"
 	, OUTPUT_VERSION);
 
   sprintf(buffer_b,
@@ -166,13 +169,14 @@ main(int argc, char** argv)
 	"};"
 	"stream.play('%s');"
 	"stream2.play('%s');"
+	"stream3.play('%s');"
 	"stream.pause(true);" 
 	"stream.paused=true;"
 	"_root.metadataNotified=0;"
 	"_root.startNotified=0;"
 	"_root.stopNotified=0;"
 	"stop();",
-	filename, filename2);
+	filename, filename2, filename3);
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
@@ -203,6 +207,11 @@ main(int argc, char** argv)
   item = SWFMovie_add(mo, (SWFBlock)stream);
   SWFDisplayItem_moveTo(item, 400, 0);
   SWFDisplayItem_setName(item, "video2");
+
+  stream = newSWFVideoStream();
+  SWFVideoStream_setDimension(stream, video_width, video_height);
+  item = SWFMovie_add(mo, (SWFBlock)stream);
+  SWFDisplayItem_setName(item, "video3");
 
   a = newSWFAction(buffer_a);
   if(a == NULL) return -1;
@@ -314,6 +323,7 @@ main(int argc, char** argv)
 
   add_actions(mo, "video.attachVideo(stream);"); 
   add_actions(mo, "video2.attachVideo(stream2);"); 
+  add_actions(mo, "video3.attachVideo(stream3);"); 
   
   check_equals(mo, "video.height", "0");
   check_equals(mo, "video.width", "0");
@@ -660,9 +670,7 @@ main(int argc, char** argv)
 		" check_equals(info.duration, 'changed');" // can be overridden
 		" delete info.duration;"
 		" check(!info.hasOwnProperty('duration'), 'metadata duration can be deleted');"
-
 		" _root.note('1. Press \"p\" key');"
-
 		"};"
 		));
 
@@ -670,6 +678,14 @@ main(int argc, char** argv)
 
   check_equals(mo, "video.height", "96");
   check_equals(mo, "video.width", "128");
+
+
+  // See https://savannah.gnu.org/bugs/?26687
+  SWFMovie_add(mo, (SWFBlock)newSWFAction(
+  //"note('VM.time:'+getTimer()+' stream3.time:'+stream3.time);"
+  "check(stream3.time > 4150, 'stream3.time '+stream3.time+' > 4150');"
+  ));
+
 
   //add_actions(mo, "note('This is an OGG stream, so the Adobe player "
   //    "will fail the next two tests.');");
@@ -680,7 +696,7 @@ main(int argc, char** argv)
   check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(182); stop(); end_of_test=true;"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(183); stop(); end_of_test=true;"));
 
   SWFMovie_nextFrame(mo);
 

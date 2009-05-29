@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class StaticText_as : public as_object
+{
+
+public:
+
+    StaticText_as()
+        :
+        as_object(getStaticTextInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void statictext_class_init(as_object& global)
 {

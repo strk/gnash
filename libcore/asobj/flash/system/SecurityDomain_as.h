@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSecurityDomainInterface();
-}
-
-class SecurityDomain_as: public as_object
-{
-
-public:
-
-    SecurityDomain_as()
-        :
-        as_object(getSecurityDomainInterface())
-    {}
-
-};
 
 /// Initialize the global SecurityDomain class
 void securitydomain_class_init(as_object& global);

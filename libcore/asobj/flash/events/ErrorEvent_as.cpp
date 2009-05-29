@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class ErrorEvent_as : public as_object
+{
+
+public:
+
+    ErrorEvent_as()
+        :
+        as_object(getErrorEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void errorevent_class_init(as_object& global)
 {

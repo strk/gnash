@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Sample_as : public as_object
+{
+
+public:
+
+    Sample_as()
+        :
+        as_object(getSampleInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void sample_class_init(as_object& global)
 {

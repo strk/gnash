@@ -43,6 +43,17 @@ namespace {
 
 }
 
+class IEventDispatcher_as : public as_object
+{
+
+public:
+
+    IEventDispatcher_as()
+        :
+        as_object(getIEventDispatcherInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void ieventdispatcher_class_init(as_object& global)
 {

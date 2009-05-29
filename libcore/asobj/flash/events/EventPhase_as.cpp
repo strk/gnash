@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class EventPhase_as : public as_object
+{
+
+public:
+
+    EventPhase_as()
+        :
+        as_object(getEventPhaseInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void eventphase_class_init(as_object& global)
 {

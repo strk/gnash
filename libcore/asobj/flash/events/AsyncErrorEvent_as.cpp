@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class AsyncErrorEvent_as : public as_object
+{
+
+public:
+
+    AsyncErrorEvent_as()
+        :
+        as_object(getAsyncErrorEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void asyncerrorevent_class_init(as_object& global)
 {

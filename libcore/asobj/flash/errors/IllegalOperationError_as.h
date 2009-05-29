@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getIllegalOperationErrorInterface();
-}
-
-class IllegalOperationError_as: public as_object
-{
-
-public:
-
-    IllegalOperationError_as()
-        :
-        as_object(getIllegalOperationErrorInterface())
-    {}
-
-};
 
 /// Initialize the global IllegalOperationError class
 void illegaloperationerror_class_init(as_object& global);

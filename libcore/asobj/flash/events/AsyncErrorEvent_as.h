@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getAsyncErrorEventInterface();
-}
-
-class AsyncErrorEvent_as: public as_object
-{
-
-public:
-
-    AsyncErrorEvent_as()
-        :
-        as_object(getAsyncErrorEventInterface())
-    {}
-
-};
 
 /// Initialize the global AsyncErrorEvent class
 void asyncerrorevent_class_init(as_object& global);

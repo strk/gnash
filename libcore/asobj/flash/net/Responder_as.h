@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getResponderInterface();
-}
-
-class Responder_as: public as_object
-{
-
-public:
-
-    Responder_as()
-        :
-        as_object(getResponderInterface())
-    {}
-
-};
 
 /// Initialize the global Responder class
 void responder_class_init(as_object& global);

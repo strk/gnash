@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getPrintJobOptionsInterface();
-}
-
-class PrintJobOptions_as: public as_object
-{
-
-public:
-
-    PrintJobOptions_as()
-        :
-        as_object(getPrintJobOptionsInterface())
-    {}
-
-};
 
 /// Initialize the global PrintJobOptions class
 void printjoboptions_class_init(as_object& global);

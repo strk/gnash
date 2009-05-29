@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class Dictionary_as : public as_object
+{
+
+public:
+
+    Dictionary_as()
+        :
+        as_object(getDictionaryInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void dictionary_class_init(as_object& global)
 {

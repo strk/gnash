@@ -42,6 +42,17 @@ namespace {
 
 }
 
+class TextEvent_as : public as_object
+{
+
+public:
+
+    TextEvent_as()
+        :
+        as_object(getTextEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void textevent_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class FontStyle_as : public as_object
+{
+
+public:
+
+    FontStyle_as()
+        :
+        as_object(getFontStyleInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void fontstyle_class_init(as_object& global)
 {

@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class BitmapDataChannel_as : public as_object
+{
+
+public:
+
+    BitmapDataChannel_as()
+        :
+        as_object(getBitmapDataChannelInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void bitmapdatachannel_class_init(as_object& global)
 {

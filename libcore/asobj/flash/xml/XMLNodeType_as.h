@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getXMLNodeTypeInterface();
-}
-
-class XMLNodeType_as: public as_object
-{
-
-public:
-
-    XMLNodeType_as()
-        :
-        as_object(getXMLNodeTypeInterface())
-    {}
-
-};
 
 /// Initialize the global XMLNodeType class
 void xmlnodetype_class_init(as_object& global);

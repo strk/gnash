@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class GradientType_as : public as_object
+{
+
+public:
+
+    GradientType_as()
+        :
+        as_object(getGradientTypeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void gradienttype_class_init(as_object& global)
 {

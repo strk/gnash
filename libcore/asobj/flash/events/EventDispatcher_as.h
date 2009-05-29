@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getEventDispatcherInterface();
-}
-
-class EventDispatcher_as: public as_object
-{
-
-public:
-
-    EventDispatcher_as()
-        :
-        as_object(getEventDispatcherInterface())
-    {}
-
-};
 
 /// Initialize the global EventDispatcher class
 void eventdispatcher_class_init(as_object& global);

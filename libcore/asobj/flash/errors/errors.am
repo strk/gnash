@@ -47,16 +47,6 @@ ERRORS_SOURCES += flash/errors/MemoryError_as.cpp
 ERRORS_HEADERS += flash/errors/MemoryError_as.h
 endif
 
-if BUILD_SQLERROROPERATION_AS3
-ERRORS_SOURCES += flash/errors/SQLErrorOperation_as.cpp
-ERRORS_HEADERS += flash/errors/SQLErrorOperation_as.h
-endif
-
-if BUILD_SQLERROR_AS3
-ERRORS_SOURCES += flash/errors/SQLError_as.cpp
-ERRORS_HEADERS += flash/errors/SQLError_as.h
-endif
-
 if BUILD_SCRIPTTIMEOUTERROR_AS3
 ERRORS_SOURCES += flash/errors/ScriptTimeoutError_as.cpp
 ERRORS_HEADERS += flash/errors/ScriptTimeoutError_as.h
@@ -82,7 +72,6 @@ errorsclasses.h: Makefile
 	echo "#define GNASH_ASOBJ_FLASH_ERRORS_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
 	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	# drop the first node, which is always the top level package ;\
 	sources="`echo $(ERRORS_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

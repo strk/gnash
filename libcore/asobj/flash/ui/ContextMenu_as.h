@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getContextMenuInterface();
-}
-
-class ContextMenu_as: public as_object
-{
-
-public:
-
-    ContextMenu_as()
-        :
-        as_object(getContextMenuInterface())
-    {}
-
-};
 
 /// Initialize the global ContextMenu class
 void contextmenu_class_init(as_object& global);

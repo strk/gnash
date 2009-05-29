@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class SoundMixer_as : public as_object
+{
+
+public:
+
+    SoundMixer_as()
+        :
+        as_object(getSoundMixerInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void soundmixer_class_init(as_object& global)
 {

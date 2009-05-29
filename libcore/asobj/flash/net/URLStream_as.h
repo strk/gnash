@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getURLStreamInterface();
-}
-
-class URLStream_as: public as_object
-{
-
-public:
-
-    URLStream_as()
-        :
-        as_object(getURLStreamInterface())
-    {}
-
-};
 
 /// Initialize the global URLStream class
 void urlstream_class_init(as_object& global);

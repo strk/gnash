@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class XMLNodeType_as : public as_object
+{
+
+public:
+
+    XMLNodeType_as()
+        :
+        as_object(getXMLNodeTypeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void xmlnodetype_class_init(as_object& global)
 {

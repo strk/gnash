@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class ObjectEncoding_as : public as_object
+{
+
+public:
+
+    ObjectEncoding_as()
+        :
+        as_object(getObjectEncodingInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void objectencoding_class_init(as_object& global)
 {

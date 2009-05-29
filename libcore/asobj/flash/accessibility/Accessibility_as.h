@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getAccessibilityInterface();
-}
-
-class Accessibility_as: public as_object
-{
-
-public:
-
-    Accessibility_as()
-        :
-        as_object(getAccessibilityInterface())
-    {}
-
-};
 
 /// Initialize the global Accessibility class
 void accessibility_class_init(as_object& global);

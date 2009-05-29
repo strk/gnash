@@ -44,6 +44,17 @@ namespace {
 
 }
 
+class FocusEvent_as : public as_object
+{
+
+public:
+
+    FocusEvent_as()
+        :
+        as_object(getFocusEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void focusevent_class_init(as_object& global)
 {

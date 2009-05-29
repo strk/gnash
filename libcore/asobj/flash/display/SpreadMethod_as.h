@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getSpreadMethodInterface();
-}
-
-class SpreadMethod_as: public as_object
-{
-
-public:
-
-    SpreadMethod_as()
-        :
-        as_object(getSpreadMethodInterface())
-    {}
-
-};
 
 /// Initialize the global SpreadMethod class
 void spreadmethod_class_init(as_object& global);

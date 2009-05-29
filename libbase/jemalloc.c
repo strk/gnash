@@ -160,7 +160,7 @@
 # define MALLOC_DSS 
 #endif
 
-#ifdef LINUX
+#ifdef LINUX_HOST
 # define	_GNU_SOURCE /* For mremap(2). */
 # define	issetugid() 0
 # if 0 /* Enable in order to test decommit code on Linux. */
@@ -253,7 +253,7 @@ typedef unsigned long long uintmax_t;
 # ifndef SIZE_T_MAX
 #  define SIZE_T_MAX	SIZE_MAX
 # endif
-# if defined(DARWIN) || defined(LINUX)
+# if defined(DARWIN) || defined(LINUX_HOST)
 #  define _pthread_self pthread_self
 #  define _pthread_mutex_init pthread_mutex_init
 #  define _pthread_mutex_trylock pthread_mutex_trylock
@@ -533,7 +533,7 @@ static bool malloc_initialized = false;
 /* No init lock for Windows. */
 #elif defined(DARWIN)
 static malloc_mutex_t init_lock = {OS_SPINLOCK_INIT};
-#elif defined(LINUX)
+#elif defined(LINUX_HOST)
 static malloc_mutex_t init_lock = PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP;
 #elif defined(USE_JEMALLOC)
 static malloc_mutex_t init_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -1027,7 +1027,7 @@ const char	*_malloc_options
 = "A10n2F"
 #elif (defined(DARWIN))
 = "AP10n"
-#elif (defined(LINUX))
+#elif (defined(LINUX_HOST))
 = "A10n2F"
 #endif
 ;
@@ -1209,7 +1209,7 @@ malloc_mutex_init(malloc_mutex_t *mutex)
 			return (true);
 #elif defined(DARWIN)
 	mutex->lock = OS_SPINLOCK_INIT;
-#elif defined(LINUX)
+#elif defined(LINUX_HOST)
 	pthread_mutexattr_t attr;
 	if (pthread_mutexattr_init(&attr) != 0)
 		return (true);
@@ -1271,7 +1271,7 @@ malloc_spin_init(malloc_spinlock_t *lock)
 			return (true);
 #elif defined(DARWIN)
 	lock->lock = OS_SPINLOCK_INIT;
-#elif defined(LINUX)
+#elif defined(LINUX_HOST)
 	pthread_mutexattr_t attr;
 	if (pthread_mutexattr_init(&attr) != 0)
 		return (true);
@@ -4686,7 +4686,7 @@ malloc_ncpus(void)
 
 	return (ret);
 }
-#elif (defined(LINUX))
+#elif (defined(LINUX_HOST))
 #include <fcntl.h>
 
 static inline unsigned

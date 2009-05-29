@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSecurityPanelInterface();
-}
-
-class SecurityPanel_as: public as_object
-{
-
-public:
-
-    SecurityPanel_as()
-        :
-        as_object(getSecurityPanelInterface())
-    {}
-
-};
 
 /// Initialize the global SecurityPanel class
 void securitypanel_class_init(as_object& global);

@@ -72,6 +72,17 @@ namespace {
 
 }
 
+class Event_as : public as_object
+{
+
+public:
+
+    Event_as()
+        :
+        as_object(getEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void event_class_init(as_object& global)
 {

@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getNewObjectSampleInterface();
-}
-
-class NewObjectSample_as: public as_object
-{
-
-public:
-
-    NewObjectSample_as()
-        :
-        as_object(getNewObjectSampleInterface())
-    {}
-
-};
 
 /// Initialize the global NewObjectSample class
 void newobjectsample_class_init(as_object& global);

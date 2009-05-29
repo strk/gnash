@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getURLVariablesInterface();
-}
-
-class URLVariables_as: public as_object
-{
-
-public:
-
-    URLVariables_as()
-        :
-        as_object(getURLVariablesInterface())
-    {}
-
-};
 
 /// Initialize the global URLVariables class
 void urlvariables_class_init(as_object& global);

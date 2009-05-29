@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class TextFormat_as : public as_object
+{
+
+public:
+
+    TextFormat_as()
+        :
+        as_object(getTextFormatInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void textformat_class_init(as_object& global)
 {

@@ -25,11 +25,6 @@ UTILS_SOURCES += flash/utils/ByteArray_as.cpp
 UTILS_HEADERS += flash/utils/ByteArray_as.h
 endif
 
-if BUILD_COMPRESSIONALGORITHM_AS3
-UTILS_SOURCES += flash/utils/CompressionAlgorithm_as.cpp
-UTILS_HEADERS += flash/utils/CompressionAlgorithm_as.h
-endif
-
 if BUILD_DICTIONARY_AS3
 UTILS_SOURCES += flash/utils/Dictionary_as.cpp
 UTILS_HEADERS += flash/utils/Dictionary_as.h
@@ -80,7 +75,6 @@ utilsclasses.h: Makefile
 	echo "#define GNASH_ASOBJ_FLASH_UTILS_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
 	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	# drop the first node, which is always the top level package ;\
 	sources="`echo $(UTILS_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

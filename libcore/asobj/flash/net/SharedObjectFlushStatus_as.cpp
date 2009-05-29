@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SharedObjectFlushStatus_as : public as_object
+{
+
+public:
+
+    SharedObjectFlushStatus_as()
+        :
+        as_object(getSharedObjectFlushStatusInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void sharedobjectflushstatus_class_init(as_object& global)
 {

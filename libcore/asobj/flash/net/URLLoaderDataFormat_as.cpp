@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class URLLoaderDataFormat_as : public as_object
+{
+
+public:
+
+    URLLoaderDataFormat_as()
+        :
+        as_object(getURLLoaderDataFormatInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void urlloaderdataformat_class_init(as_object& global)
 {

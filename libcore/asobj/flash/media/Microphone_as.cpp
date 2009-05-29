@@ -44,6 +44,17 @@ namespace {
 
 }
 
+class Microphone_as : public as_object
+{
+
+public:
+
+    Microphone_as()
+        :
+        as_object(getMicrophoneInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void microphone_class_init(as_object& global)
 {

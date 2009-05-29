@@ -46,6 +46,17 @@ namespace {
 
 }
 
+class NetConnection_as : public as_object
+{
+
+public:
+
+    NetConnection_as()
+        :
+        as_object(getNetConnectionInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void netconnection_class_init(as_object& global)
 {

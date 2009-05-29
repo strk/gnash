@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getLoaderInterface();
-}
-
-class Loader_as: public as_object
-{
-
-public:
-
-    Loader_as()
-        :
-        as_object(getLoaderInterface())
-    {}
-
-};
 
 /// Initialize the global Loader class
 void loader_class_init(as_object& global);

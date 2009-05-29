@@ -50,6 +50,17 @@ namespace {
 
 }
 
+class IDataOutput_as : public as_object
+{
+
+public:
+
+    IDataOutput_as()
+        :
+        as_object(getIDataOutputInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void idataoutput_class_init(as_object& global)
 {

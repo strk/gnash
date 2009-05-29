@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getKeyboardInterface();
-}
-
-class Keyboard_as: public as_object
-{
-
-public:
-
-    Keyboard_as()
-        :
-        as_object(getKeyboardInterface())
-    {}
-
-};
 
 /// Initialize the global Keyboard class
 void keyboard_class_init(as_object& global);

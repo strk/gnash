@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class TextLineMetrics_as : public as_object
+{
+
+public:
+
+    TextLineMetrics_as()
+        :
+        as_object(getTextLineMetricsInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void textlinemetrics_class_init(as_object& global)
 {

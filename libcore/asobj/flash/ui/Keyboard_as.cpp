@@ -90,6 +90,17 @@ namespace {
 
 }
 
+class Keyboard_as : public as_object
+{
+
+public:
+
+    Keyboard_as()
+        :
+        as_object(getKeyboardInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void keyboard_class_init(as_object& global)
 {

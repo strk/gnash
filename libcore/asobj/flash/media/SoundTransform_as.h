@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSoundTransformInterface();
-}
-
-class SoundTransform_as: public as_object
-{
-
-public:
-
-    SoundTransform_as()
-        :
-        as_object(getSoundTransformInterface())
-    {}
-
-};
 
 /// Initialize the global SoundTransform class
 void soundtransform_class_init(as_object& global);

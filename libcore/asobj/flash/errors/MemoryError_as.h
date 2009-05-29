@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getMemoryErrorInterface();
-}
-
-class MemoryError_as: public as_object
-{
-
-public:
-
-    MemoryError_as()
-        :
-        as_object(getMemoryErrorInterface())
-    {}
-
-};
 
 /// Initialize the global MemoryError class
 void memoryerror_class_init(as_object& global);

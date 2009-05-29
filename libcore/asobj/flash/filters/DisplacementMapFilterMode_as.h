@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getDisplacementMapFilterModeInterface();
-}
-
-class DisplacementMapFilterMode_as: public as_object
-{
-
-public:
-
-    DisplacementMapFilterMode_as()
-        :
-        as_object(getDisplacementMapFilterModeInterface())
-    {}
-
-};
 
 /// Initialize the global DisplacementMapFilterMode class
 void displacementmapfiltermode_class_init(as_object& global);

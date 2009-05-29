@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextDisplayModeInterface();
-}
-
-class TextDisplayMode_as: public as_object
-{
-
-public:
-
-    TextDisplayMode_as()
-        :
-        as_object(getTextDisplayModeInterface())
-    {}
-
-};
 
 /// Initialize the global TextDisplayMode class
 void textdisplaymode_class_init(as_object& global);

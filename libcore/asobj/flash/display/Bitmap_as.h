@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
-namespace {
-    as_object* getBitmapInterface();
-}
-
-class Bitmap_as: public as_object
-{
-
-public:
-
-    Bitmap_as()
-        :
-        as_object(getBitmapInterface())
-    {}
-
-};
 
 /// Initialize the global Bitmap class
 void bitmap_class_init(as_object& global);

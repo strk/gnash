@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class MemoryError_as : public as_object
+{
+
+public:
+
+    MemoryError_as()
+        :
+        as_object(getMemoryErrorInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void memoryerror_class_init(as_object& global)
 {

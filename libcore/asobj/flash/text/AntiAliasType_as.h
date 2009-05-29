@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getAntiAliasTypeInterface();
-}
-
-class AntiAliasType_as: public as_object
-{
-
-public:
-
-    AntiAliasType_as()
-        :
-        as_object(getAntiAliasTypeInterface())
-    {}
-
-};
 
 /// Initialize the global AntiAliasType class
 void antialiastype_class_init(as_object& global);

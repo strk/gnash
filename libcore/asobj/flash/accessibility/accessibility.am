@@ -20,11 +20,6 @@ ACCESSIBILITYdir = $(includedir)/gnash
 ACCESSIBILITY_SOURCES = flash/accessibility/accessibility_pkg.cpp
 ACCESSIBILITY_HEADERS = flash/accessibility/accessibility_pkg.h
 
-if BUILD_ACCIMPL_AS3
-# ACCESSIBILITY_SOURCES += flash/accessibility/AccImpl_as.cpp
-# ACCESSIBILITY_HEADERS += flash/accessibility/AccImpl_as.h
-endif
-
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
 ACCESSIBILITY_SOURCES += flash/accessibility/AccessibilityProperties_as.cpp
 ACCESSIBILITY_HEADERS += flash/accessibility/AccessibilityProperties_as.h
@@ -50,7 +45,6 @@ accessibilityclasses.h: Makefile
 	echo "#define GNASH_ASOBJ_FLASH_ACCESSIBILITY_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
 	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	# drop the first node, which is always the top level package ;\
 	sources="`echo $(ACCESSIBILITY_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

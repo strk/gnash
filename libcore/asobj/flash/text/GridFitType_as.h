@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getGridFitTypeInterface();
-}
-
-class GridFitType_as: public as_object
-{
-
-public:
-
-    GridFitType_as()
-        :
-        as_object(getGridFitTypeInterface())
-    {}
-
-};
 
 /// Initialize the global GridFitType class
 void gridfittype_class_init(as_object& global);

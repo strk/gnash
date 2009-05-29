@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getLocalConnectionInterface();
-}
-
-class LocalConnection_as: public as_object
-{
-
-public:
-
-    LocalConnection_as()
-        :
-        as_object(getLocalConnectionInterface())
-    {}
-
-};
 
 /// Initialize the global LocalConnection class
 void localconnection_class_init(as_object& global);

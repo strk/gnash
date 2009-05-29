@@ -40,6 +40,17 @@ namespace {
 
 }
 
+class IExternalizable_as : public as_object
+{
+
+public:
+
+    IExternalizable_as()
+        :
+        as_object(getIExternalizableInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void iexternalizable_class_init(as_object& global)
 {

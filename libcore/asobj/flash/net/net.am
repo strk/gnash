@@ -96,11 +96,6 @@ NET_SOURCES += flash/net/URLLoader_as.cpp
 NET_HEADERS += flash/net/URLLoader_as.h
 endif
 
-if BUILD_URLREQUESTDEFAULTS_AS3
-NET_SOURCES += flash/net/URLRequestDefaults_as.cpp
-NET_HEADERS += flash/net/URLRequestDefaults_as.h
-endif
-
 if BUILD_URLREQUESTHEADER_AS3
 NET_SOURCES += flash/net/URLRequestHeader_as.cpp
 NET_HEADERS += flash/net/URLRequestHeader_as.h
@@ -147,7 +142,6 @@ netclasses.h: Makefile
 	echo "#define GNASH_ASOBJ_FLASH_NET_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
 	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	# drop the first node, which is always the top level package ;\
 	sources="`echo $(NET_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

@@ -40,6 +40,17 @@ namespace {
 
 }
 
+class ApplicationDomain_as : public as_object
+{
+
+public:
+
+    ApplicationDomain_as()
+        :
+        as_object(getApplicationDomainInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void applicationdomain_class_init(as_object& global)
 {

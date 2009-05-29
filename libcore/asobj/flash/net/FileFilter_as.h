@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getFileFilterInterface();
-}
-
-class FileFilter_as: public as_object
-{
-
-public:
-
-    FileFilter_as()
-        :
-        as_object(getFileFilterInterface())
-    {}
-
-};
 
 /// Initialize the global FileFilter class
 void filefilter_class_init(as_object& global);

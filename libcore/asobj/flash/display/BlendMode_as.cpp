@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class BlendMode_as : public as_object
+{
+
+public:
+
+    BlendMode_as()
+        :
+        as_object(getBlendModeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void blendmode_class_init(as_object& global)
 {

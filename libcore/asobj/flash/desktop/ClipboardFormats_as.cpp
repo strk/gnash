@@ -26,63 +26,35 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h"
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value clipboardformats_ctor(const fn_call& fn);
-    void attachClipboardFormatsInterface(as_object& o);
     void attachClipboardFormatsStaticInterface(as_object& o);
-    as_object* getClipboardFormatsInterface();
-
 }
 
 // extern (used by Global.cpp)
-void clipboardformats_class_init(as_object& global)
+void
+clipboardformats_class_init(as_object& where)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
 
-    if (!cl) {
-        cl = new builtin_function(&clipboardformats_ctor, getClipboardFormatsInterface());
-        attachClipboardFormatsStaticInterface(*cl);
-    }
-
-    // Register _global.ClipboardFormats
-    global.init_member("ClipboardFormats", cl.get());
+    static as_object* obj = new as_object(getObjectInterface());
+    attachClipboardFormatsStaticInterface(*obj);
+    where.init_member("ClipboardFormats", obj);
 }
 
 namespace {
 
 void
-attachClipboardFormatsInterface(as_object& o)
-{
-}
-
-void
 attachClipboardFormatsStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getClipboardFormatsInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachClipboardFormatsInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-clipboardformats_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new ClipboardFormats_as;
-
-    return as_value(obj.get()); // will keep alive
+    // These were introduced to the Flash Player 10 API. AIR has 3 more
+    // constants.
+    o.init_member("HTML_FORMAT", "air:html");
+    o.init_member("RICH_TEXT_FORMAT", "air:rtf");
+    o.init_member("TEXT_FORMAT", "air:text");
 }
 
 } // anonymous namespace 

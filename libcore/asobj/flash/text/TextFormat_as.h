@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getTextFormatInterface();
-}
-
-class TextFormat_as: public as_object
-{
-
-public:
-
-    TextFormat_as()
-        :
-        as_object(getTextFormatInterface())
-    {}
-
-};
 
 /// Initialize the global TextFormat class
 void textformat_class_init(as_object& global);

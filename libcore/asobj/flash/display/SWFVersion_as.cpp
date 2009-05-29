@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class SWFVersion_as : public as_object
+{
+
+public:
+
+    SWFVersion_as()
+        :
+        as_object(getSWFVersionInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void swfversion_class_init(as_object& global)
 {

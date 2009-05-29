@@ -24,27 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "fn_call.h"
 
 namespace gnash {
 
 // Forward declarations
 class as_object;
-namespace {
-    as_object* getSystemInterface();
-}
-
-class System_as: public as_object
-{
-
-public:
-
-    System_as()
-        :
-        as_object(getSystemInterface())
-    {}
-
-};
 
 /// Initialize the global System class
 void system_class_init(as_object& global);

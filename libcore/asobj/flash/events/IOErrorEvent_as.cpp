@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class IOErrorEvent_as : public as_object
+{
+
+public:
+
+    IOErrorEvent_as()
+        :
+        as_object(getIOErrorEventInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void ioerrorevent_class_init(as_object& global)
 {

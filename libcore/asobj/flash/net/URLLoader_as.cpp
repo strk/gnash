@@ -47,6 +47,17 @@ namespace {
 
 }
 
+class URLLoader_as : public as_object
+{
+
+public:
+
+    URLLoader_as()
+        :
+        as_object(getURLLoaderInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void urlloader_class_init(as_object& global)
 {

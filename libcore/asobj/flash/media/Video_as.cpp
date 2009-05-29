@@ -41,6 +41,17 @@ namespace {
 
 }
 
+class Video_as : public as_object
+{
+
+public:
+
+    Video_as()
+        :
+        as_object(getVideoInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void video_class_init(as_object& global)
 {

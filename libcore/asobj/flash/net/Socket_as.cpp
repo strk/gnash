@@ -71,6 +71,17 @@ namespace {
 
 }
 
+class Socket_as : public as_object
+{
+
+public:
+
+    Socket_as()
+        :
+        as_object(getSocketInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void socket_class_init(as_object& global)
 {

@@ -25,7 +25,6 @@
 #include "MovieClip.h"
 
 #include "ByteArray_as.h"
-#include "CompressionAlgorithm_as.h"
 #include "Dictionary_as.h"
 #include "Endian_as.h"
 #include "IDataInput_as.h"

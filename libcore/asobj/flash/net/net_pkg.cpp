@@ -38,7 +38,6 @@
 #include "Socket_as.h"
 #include "URLLoaderDataFormat_as.h"
 #include "URLLoader_as.h"
-#include "URLRequestDefaults_as.h"
 #include "URLRequestHeader_as.h"
 #include "URLRequestMethod_as.h"
 #include "URLRequest_as.h"

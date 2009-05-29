@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class TextDisplayMode_as : public as_object
+{
+
+public:
+
+    TextDisplayMode_as()
+        :
+        as_object(getTextDisplayModeInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void textdisplaymode_class_init(as_object& global)
 {

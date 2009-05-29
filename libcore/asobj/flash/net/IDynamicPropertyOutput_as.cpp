@@ -39,6 +39,17 @@ namespace {
 
 }
 
+class IDynamicPropertyOutput_as : public as_object
+{
+
+public:
+
+    IDynamicPropertyOutput_as()
+        :
+        as_object(getIDynamicPropertyOutputInterface())
+    {}
+};
+
 // extern (used by Global.cpp)
 void idynamicpropertyoutput_class_init(as_object& global)
 {
