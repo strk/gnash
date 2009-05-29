@@ -2066,7 +2066,7 @@ Machine::execute()
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
 
                     as_value value = mStack.top(0);
-                    log_unimpl("ABC_ACTION_COERCE");
+                    LOG_ONCE(log_unimpl("ABC_ACTION_COERCE"));
                     log_abc("COERCE: object for conversion is %s, "
                             "desired type %s", value,
                             mST.value(a.getGlobalName()));
