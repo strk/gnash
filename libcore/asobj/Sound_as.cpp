@@ -232,7 +232,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
         return;
     }
 
-    // TODO: use associated DisplayObject's _soundbuftime, if any
+    // TODO: use global _soundbuftime
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
     if ( isStreaming )
