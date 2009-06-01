@@ -25,13 +25,15 @@
 
 #if flash9
 import flash.system.IME;
+import flash.system.IMEConversionMode;
 import flash.display.MovieClip;
 #else
-import flash.IME;
-import flash.MovieClip;
+//import flash.IME;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -41,13 +43,16 @@ class IME_as {
     static function main() {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (IME.conversionMode == null) {
+
+#if flash9
+//Si
+/*	if (Type.typeof(IME.conversionMode) == TNull ) {
 	    DejaGnu.pass("IME.conversionMode property exists");
 	} else {
 	    DejaGnu.fail("IME.conversionMode property doesn't exist");
 	}
-	if (IME.enabled == false) {
+*/
+	if (Type.typeof (IME.enabled) == TBool) {
 	    DejaGnu.pass("IME.enabled property exists");
 	} else {
 	    DejaGnu.fail("IME.enabled property doesn't exist");
@@ -56,18 +61,24 @@ class IME_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (IME.doConversion == null) {
+
+//Si
+//Check these two methods!
+
+	if (Type.typeof(IME.doConversion) == TFunction) {
 	    DejaGnu.pass("IME::doConversion() method exists");
 	} else {
 	    DejaGnu.fail("IME::doConversion() method doesn't exist");
 	}
-	if (IME.setCompositionString == null) {
+	if (Type.typeof(IME.setCompositionString) == TFunction) {
 	    DejaGnu.pass("IME::setCompositionString() method exists");
 	} else {
 	    DejaGnu.fail("IME::setCompositionString() method doesn't exist");
 	}
 
         // Call this after finishing all tests. It prints out the totals.
+#end
+
         DejaGnu.done();
     }
 }

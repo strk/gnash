@@ -27,8 +27,8 @@
 import flash.system.SecurityDomain;
 import flash.display.MovieClip;
 #else
-import flash.SecurityDomain;
-import flash.MovieClip;
+//import flash.SecurityDomain;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,14 +39,17 @@ import DejaGnu;
 // Class must be named with the _as3 suffix, as that's the same name as the file.
 class SecurityDomain_as {
     static function main() {
-
+#if flash9
         // Make sure we actually get a valid class        
-        if (SecurityDomain.currentDomain != null) {
+//	DejaGnu.note("Type " + Type.typeof(SecurityDomain.currentDomain) );
+//	DejaGnu.note("Type " + Type.typeof(SecurityDomain) );
+		 
+	if (Type.typeof(SecurityDomain)==TObject && SecurityDomain.currentDomain != null ) {
             DejaGnu.pass("SecurityDomain class exists");
         } else {
             DejaGnu.fail("SecurityDomain class doesn't exist");
         }
-
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

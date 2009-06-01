@@ -27,11 +27,12 @@
 import flash.system.Capabilities;
 import flash.display.MovieClip;
 #else
-import flash.Capabilities;
-import flash.MovieClip;
+//import flash.Capabilities;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,8 +40,11 @@ import DejaGnu;
 // Class must be named with the _as3 suffix, as that's the same name as the file.
 class Capabilities_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (Capabilities != null) {
+        // Make sure we actually get a valid class
+#if flash9
+//Si:
+//Check the Capabilities        
+	if (Type.typeof(Capabilities) == TObject ) {	      
             DejaGnu.pass("Capabilities class exists");
         } else {
             DejaGnu.fail("Capabilities class doesn't exist");
@@ -48,160 +52,185 @@ class Capabilities_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Capabilities.avHardwareDisable == false) {
+
+//Si:
+//Check the properties:
+	
+//	DejaGnu.note("ME1 " + Type.typeof(Capabilities._internal) );
+//	DejaGnu.note("ME2 " + Type.typeof(Capabilities.screenDPI) );
+//	Capabilities._internal=0;
+
+
+//Si:
+//I do not know how to check the UInt!
+//This check is ignored right now!
+/*
+	if (Std.is(Capabilities._internal,UInt) ) { 
+	    DejaGnu.pass("Capabilities._internal property exists");
+	} else {
+	    DejaGnu.fail("Capabilities._internal property doesn't exist");
+	}
+*/
+
+	if (Type.typeof(Capabilities.avHardwareDisable) == TBool) {
 	    DejaGnu.pass("Capabilities.avHardwareDisable property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.avHardwareDisable property doesn't exist");
 	}
-	if (Capabilities.hasAccessibility == false) {
+	if (Type.typeof(Capabilities.hasAccessibility) == TBool) {
 	    DejaGnu.pass("Capabilities.hasAccessibility property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasAccessibility property doesn't exist");
 	}
-	if (Capabilities.hasAudio == false) {
+	if (Type.typeof(Capabilities.hasAudio) == TBool) {
 	    DejaGnu.pass("Capabilities.hasAudio property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasAudio property doesn't exist");
 	}
-	if (Capabilities.hasAudioEncoder == false) {
+	if (Type.typeof(Capabilities.hasAudioEncoder) == TBool) {
 	    DejaGnu.pass("Capabilities.hasAudioEncoder property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasAudioEncoder property doesn't exist");
 	}
-	if (Capabilities.hasEmbeddedVideo == false) {
+	if (Type.typeof(Capabilities.hasEmbeddedVideo ) == TBool) {
 	    DejaGnu.pass("Capabilities.hasEmbeddedVideo property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasEmbeddedVideo property doesn't exist");
 	}
-	if (Capabilities.hasIME == false) {
+	if (Type.typeof(Capabilities.hasIME ) == TBool) {
 	    DejaGnu.pass("Capabilities.hasIME property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasIME property doesn't exist");
 	}
-	if (Capabilities.hasMP3 == false) {
+	if (Type.typeof(Capabilities.hasMP3) == TBool) {
 	    DejaGnu.pass("Capabilities.hasMP3 property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasMP3 property doesn't exist");
 	}
-	if (Capabilities.hasPrinting == false) {
+	if (Type.typeof(Capabilities.hasPrinting ) == TBool) {
 	    DejaGnu.pass("Capabilities.hasPrinting property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasPrinting property doesn't exist");
 	}
-	if (Capabilities.hasScreenBroadcast == false) {
+	if (Type.typeof(Capabilities.hasScreenBroadcast) == TBool) {
 	    DejaGnu.pass("Capabilities.hasScreenBroadcast property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasScreenBroadcast property doesn't exist");
 	}
-	if (Capabilities.hasScreenPlayback == false) {
+	if (Type.typeof(Capabilities.hasScreenPlayback ) == TBool) {
 	    DejaGnu.pass("Capabilities.hasScreenPlayback property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasScreenPlayback property doesn't exist");
 	}
-	if (Capabilities.hasStreamingAudio == false) {
+	if (Type.typeof(Capabilities.hasStreamingAudio ) == TBool) {
 	    DejaGnu.pass("Capabilities.hasStreamingAudio property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasStreamingAudio property doesn't exist");
 	}
-	if (Capabilities.hasStreamingVideo == false) {
+	if (Type.typeof(Capabilities.hasStreamingVideo) == TBool) {
 	    DejaGnu.pass("Capabilities.hasStreamingVideo property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasStreamingVideo property doesn't exist");
 	}
-	if (Capabilities.hasTLS == false) {
+	if (Type.typeof(Capabilities.hasTLS) == TBool) {
 	    DejaGnu.pass("Capabilities.hasTLS property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasTLS property doesn't exist");
 	}
-	if (Capabilities.hasVideoEncoder == false) {
+	if (Type.typeof(Capabilities.hasVideoEncoder) == TBool) {
 	    DejaGnu.pass("Capabilities.hasVideoEncoder property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.hasVideoEncoder property doesn't exist");
 	}
-	if (Capabilities.isDebugger == false) {
+	if (Type.typeof(Capabilities.isDebugger) == TBool) {
 	    DejaGnu.pass("Capabilities.isDebugger property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.isDebugger property doesn't exist");
 	}
+
+//Si:
+//Not defined in haxe:
 // 	if (Capabilities.isEmbeddedInAcrobat == false) {
 // 	    DejaGnu.pass("Capabilities.isEmbeddedInAcrobat property exists");
 // 	} else {
 // 	    DejaGnu.fail("Capabilities.isEmbeddedInAcrobat property doesn't exist");
 // 	}
-	if (Capabilities.language == null) {
+	if (Std.is(Capabilities.language,String) ) {
 	    DejaGnu.pass("Capabilities.language property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.language property doesn't exist");
 	}
+
 // AIR only
 // 	if (Capabilities.languages == 0) {
 // 	    DejaGnu.pass("Capabilities.languages property exists");
 // 	} else {
 // 	    DejaGnu.fail("Capabilities.languages property doesn't exist");
 // 	}
-	if (Capabilities.localFileReadDisable == false) {
+
+//Si:
+//Keep check other files
+	if (Type.typeof(Capabilities.localFileReadDisable )== TBool) {
 	    DejaGnu.pass("Capabilities.localFileReadDisable property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.localFileReadDisable property doesn't exist");
 	}
-	if (Capabilities.manufacturer == null) {
+	if (Std.is(Capabilities.manufacturer,String) ) {
 	    DejaGnu.pass("Capabilities.manufacturer property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.manufacturer property doesn't exist");
 	}
-	if (Capabilities.os == null) {
+	if (Std.is(Capabilities.os,String) ) {
 	    DejaGnu.pass("Capabilities.os property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.os property doesn't exist");
 	}
-	if (Capabilities.pixelAspectRatio == 0) {
+	if (Std.is(Capabilities.pixelAspectRatio, Float) ) {
 	    DejaGnu.pass("Capabilities.pixelAspectRatio property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.pixelAspectRatio property doesn't exist");
 	}
-	if (Capabilities.playerType == null) {
+	if (Std.is(Capabilities.playerType,String) ) {
 	    DejaGnu.pass("Capabilities.playerType property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.playerType property doesn't exist");
 	}
-	if (Capabilities.screenColor == null) {
+	if (Std.is(Capabilities.screenColor, String) ) {
 	    DejaGnu.pass("Capabilities.screenColor property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.screenColor property doesn't exist");
 	}
-	if (Capabilities.screenDPI == 0) {
+	if ( Std.is(Capabilities.screenDPI,Float) ) {
 	    DejaGnu.pass("Capabilities.screenDPI property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.screenDPI property doesn't exist");
 	}
-	if (Capabilities.screenResolutionX == 0) {
+	if ( Std.is(Capabilities.screenResolutionX,Float) ) {
 	    DejaGnu.pass("Capabilities.screenResolutionX property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.screenResolutionX property doesn't exist");
 	}
-	if (Capabilities.screenResolutionY == 0) {
+	if ( Std.is(Capabilities.screenResolutionY, Float) ) {
 	    DejaGnu.pass("Capabilities.screenResolutionY property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.screenResolutionY property doesn't exist");
 	}
-	if (Capabilities.serverString == null) {
+	if (Std.is( Capabilities.serverString,String) ) {
 	    DejaGnu.pass("Capabilities.serverString property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.serverString property doesn't exist");
 	}
-	if (Capabilities.version == null) {
+	if (Std.is(Capabilities.version,String) ) {
 	    DejaGnu.pass("Capabilities.version property exists");
 	} else {
 	    DejaGnu.fail("Capabilities.version property doesn't exist");
 	}
 
-	if (Capabilities.avHardwareDisable == false) {
-	    DejaGnu.pass("Capabilities.avHardwareDisable property exists");
-	} else {
-	    DejaGnu.fail("Capabilities.avHardwareDisable property doesn't exist");
-	}
         // Call this after finishing all tests. It prints out the totals.
+
         DejaGnu.done();
+#else
+#end
     }
 }
 

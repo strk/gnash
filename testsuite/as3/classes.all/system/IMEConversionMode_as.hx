@@ -27,11 +27,12 @@
 import flash.system.IMEConversionMode;
 import flash.display.MovieClip;
 #else
-import flash.IMEConversionMode;
-import flash.MovieClip;
+//import flash.IMEConversionMode;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,56 +40,63 @@ import DejaGnu;
 // Class must be named with the _as3 suffix, as that's the same name as the file.
 class IMEConversionMode_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (IMEConversionMode.ALPHANUMERIC_FULL	 != null) {
+#if flash9  
+      // Make sure we actually get a valid class        
+//	DejaGnu.note("ME1 "+ Type.typeof(IMEConversionMode.ALPHANUMERIC_FULL) );
+
+//Si:
+//Check the following enumeration!
+
+
+        if (Std.is(IMEConversionMode.ALPHANUMERIC_FULL , String) ) {
             DejaGnu.pass("IMEConversionMode.ALPHANUMERIC_FULL constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.ALPHANUMERIC_FULL constant doesn't exist");
         }
 
-        if (IMEConversionMode.ALPHANUMERIC_HALF	 != null) {
+        if (Std.is(IMEConversionMode.ALPHANUMERIC_HALF, String) )  {
             DejaGnu.pass("IMEConversionMode.ALPHANUMERIC_HALF constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.ALPHANUMERIC_HALF constant doesn't exist");
         }
 
-        if (IMEConversionMode.CHINESE	 != null) {
+        if (Std.is(IMEConversionMode.CHINESE, String) )  {
             DejaGnu.pass("IMEConversionMode.CHINESE constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.CHINESE constant doesn't exist");
         }
 
-        if (IMEConversionMode.JAPANESE_HIRAGANA	 != null) {
+        if (Std.is(IMEConversionMode.JAPANESE_HIRAGANA	, String) )  {
             DejaGnu.pass("IMEConversionMode.JAPANESE_HIRAGANA constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.JAPANESE_HIRAGANA constant doesn't exist");
         }
 
-        if (IMEConversionMode.JAPANESE_KATAKANA_FULL != null) {
+        if (Std.is(IMEConversionMode.JAPANESE_KATAKANA_FULL , String) )  {
             DejaGnu.pass("IMEConversionMode.JAPANESE_KATAKANA_FULL constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.JAPANESE_KATAKANA_FULL constant doesn't exist");
         }
 
-        if (IMEConversionMode.JAPANESE_KATAKANA_HALF != null) {
+        if (Std.is(IMEConversionMode.JAPANESE_KATAKANA_HALF , String) )  {
             DejaGnu.pass("IMEConversionMode.JAPANESE_KATAKANA_HALF constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.JAPANESE_KATAKANA_HALF constant doesn't exist");
         }
 
-        if (IMEConversionMode.KOREAN != null) {
+        if (Std.is(IMEConversionMode.KOREAN , String) ) {
             DejaGnu.pass("IMEConversionMode.KOREAN constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.KOREAN constant doesn't exist");
         }
-
-        if (IMEConversionMode.UNKNOWN != null) {
+        if (Std.is(IMEConversionMode.UNKNOWN , String) )  {
             DejaGnu.pass("IMEConversionModeUNKNOWN. constant exists");
         } else {
             DejaGnu.fail("IMEConversionMode.UNKNOWN constant doesn't exist");
         }
 
         // Call this after finishing all tests. It prints out the totals.
+#end
         DejaGnu.done();
     }
 }

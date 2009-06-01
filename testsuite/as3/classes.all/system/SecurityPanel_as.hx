@@ -26,12 +26,15 @@
 #if flash9
 import flash.system.SecurityPanel;
 import flash.display.MovieClip;
-#else
-import flash.SecurityPanel;
-import flash.MovieClip;
-#end
+
 import flash.Lib;
 import Type;
+
+#end
+
+//import flash.SecurityPanel;
+//import flash.MovieClip;
+
 
 // import our testing API
 import DejaGnu;
@@ -40,12 +43,14 @@ import DejaGnu;
 class SecurityPanel_as {
     static function main() {
 
+#if flash9
         // Make sure we actually get a valid class        
-        if (SecurityPanel != null) {
+        if (Type.typeof(SecurityPanel)==TObject && SecurityPanel != null) {
             DejaGnu.pass("SecurityPanel class exists");
         } else {
             DejaGnu.fail("SecurityPanel class doesn't exist");
         }
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

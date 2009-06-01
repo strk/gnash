@@ -23,6 +23,10 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+// There are several event handlers there, we will fix them later.
+
+
+
 #if flash9
 import flash.net.LocalConnection;
 import flash.display.MovieClip;
@@ -30,8 +34,10 @@ import flash.display.MovieClip;
 import flash.LocalConnection;
 import flash.MovieClip;
 #end
+
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -41,12 +47,31 @@ class LocalConnection_as {
     static function main() {
         var x1:LocalConnection = new LocalConnection();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+        // Make sure we actually get a valid class 
+
+//	DejaGnu.note("Type of x1: "   + Type.typeof(x1));    // TObject       
+
+//      This is test 1
+
+//	DejaGnu.note( "LocalConnection type is" + Type.typeof(LocalConnection) );
+//	DejaGnu.note( "x1 type is" + Type.typeof(x1) );
+		
+#if flash9
+//	DejaGnu.note( "LocalConnection type of v9 is" + Type.typeof(LocalConnection) );
+	if (Type.typeof(LocalConnection) == ValueType.TObject && x1 != null) {
             DejaGnu.pass("LocalConnection class exists");
         } else {
             DejaGnu.fail("LocalConnection class doesn't exist");
         }
+#else
+//	DejaGnu.note( "LocalConnection type of v8 is" + Type.typeof(LocalConnection) );
+	if (Type.typeof(x1) == ValueType.TObject && x1 != null) {
+            DejaGnu.pass("LocalConnection class exists");
+        } else {
+            DejaGnu.fail("LocalConnection class doesn't exist");
+        }
+#end
+ 
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
@@ -55,40 +80,112 @@ class LocalConnection_as {
 // 	} else {
 // 	    DejaGnu.fail("LocalConnection.client property doesn't exist");
 // 	}
-	if (x1.domain == null) {
+
+//Si modified May 27
+//This is test 2
+//	DejaGnu.note("ME1 "   + Type.typeof(String));
+//	DejaGnu.note("ME2 "   + Type.typeof(x1.domain));	
+//	if (Type.typeof(x1.domain)== Type.typeof(String));		
+#if flash9
+	if (Std.is(x1.domain,String) ) {
 	    DejaGnu.pass("LocalConnection.domain property exists");
 	} else {
 	    DejaGnu.fail("LocalConnection.domain property doesn't exist");
 	}
+#else
+        if (Type.typeof(x1.domain) == TFunction  ){
+	    DejaGnu.pass("LocalConnection.domain property exists");
+	} else {
+	    DejaGnu.fail("LocalConnection.domain property doesn't exist");
+	}
+#end
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.allowDomain == null) {
+
+
+//Si modified May 27
+//This is test 3
+#if flash9
+	if (Type.typeof(x1.allowDomain) == ValueType.TFunction ) {
 	    DejaGnu.pass("LocalConnection::allowDomain() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::allowDomain() method doesn't exist");
 	}
-	if (x1.allowInsecureDomain == null) {
+#else
+	DejaGnu.note("Warning! A event handler here: allowDomain"   + Type.typeof(x1.allowDomain)); 
+	if (Type.typeof(x1.allowDomain) == ValueType.TNull) {
+	    DejaGnu.pass("LocalConnection::allowDomain() method exists");
+	} else {
+	    DejaGnu.fail("LocalConnection::allowDomain() method doesn't exist");
+	}
+#end
+
+//Si modified May 27
+//This is test 4
+#if flash9
+	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowInsecureDomain() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::allowInsecureDomain() method doesn't exist");
 	}
-	if (x1.close == null) {
+#else
+	DejaGnu.note("Warning! A event handler here: allosDa "   + Type.typeof(x1.allowInsecureDomain));
+	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TNull) {
+	    DejaGnu.pass("LocalConnection::allowInsecureDomain() method exists");
+	} else {
+	    DejaGnu.fail("LocalConnection::allowInsecureDomain() method doesn't exist");
+	}
+#end
+
+//Si modified May 27
+//This is test 5
+#if flash9
+        if (Type.typeof(x1.close) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::close() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::close() method doesn't exist");
 	}
-	if (x1.connect == null) {
+#else
+	if (Type.typeof(x1.close) == ValueType.TFunction) {
+	    DejaGnu.pass("LocalConnection::close() method exists");
+	} else {
+	    DejaGnu.fail("LocalConnection::close() method doesn't exist");
+	}
+#end
+
+//Si modified May 27
+//This is test 6
+#if flash9
+	if (Type.typeof(x1.connect) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::connect() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::connect() method doesn't exist");
 	}
-	if (x1.send == null) {
+#else
+        if (Type.typeof(x1.connect) == ValueType.TFunction) {
+	    DejaGnu.pass("LocalConnection::connect() method exists");
+	} else {
+	    DejaGnu.fail("LocalConnection::connect() method doesn't exist");
+	}
+#end
+
+//Si modified May 27
+//This is test 7
+#if flash9
+	if (Type.typeof(x1.send) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::send() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::send() method doesn't exist");
 	}
+#else
+	if (Type.typeof(x1.send) == ValueType.TFunction) {
+	    DejaGnu.pass("LocalConnection::send() method exists");
+	} else {
+	    DejaGnu.fail("LocalConnection::send() method doesn't exist");
+	}
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

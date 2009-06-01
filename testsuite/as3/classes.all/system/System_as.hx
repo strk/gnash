@@ -53,37 +53,54 @@ class System_as {
 // 	} else {
 // 	    DejaGnu.fail("System.ime property doesn't exist");
 // 	}
+
 #if flash9
-	if (System.totalMemory == 0) {
+	DejaGnu.note("Warning! Type of exit "   + Type.typeof(System.exit));
+        DejaGnu.note("Warning! Type of gc "   + Type.typeof(System.gc) );
+      	DejaGnu.note("Warning! Type of pause "   + Type.typeof(System.pause) );
+	DejaGnu.note("Warning! Type of resume" + Type.typeof(System.resume) );
+	DejaGnu.note("Warning! type of setClipboard "   + Type.typeof(System.setClipboard));
+#end
+
+//Test System.totalMemory
+#if flash9
+	if (Type.typeof(System.totalMemory) == ValueType.TInt) {
 	    DejaGnu.pass("System.totalMemory property exists");
 	} else {
 	    DejaGnu.fail("System.totalMemory property doesn't exist");
 	}
-#end
-	
-#if flash6
-	if (System.exactSettings == false) {
-	    DejaGnu.pass("System.exactSettings property exists");
-	} else {
-	    DejaGnu.fail("System.exactSettings property doesn't exist");
-	}
-	if (System.useCodepage == false) {
-	    DejaGnu.pass("System.useCodepage property exists");
-	} else {
-	    DejaGnu.fail("System.useCodepage property doesn't exist");
-	}
-#end
+#end	
+
+// Test of useCodePage or useCodepage
 #if flash9
-	if (System.useCodePage == false) {
+	if (Type.typeof(System.useCodePage) == ValueType.TBool) {
+	    DejaGnu.pass("System.useCodePage property exists");
+	} else {
+	    DejaGnu.fail("System.useCodePage property doesn't exist");
+	}
+#else
+	if (Type.typeof(System.useCodepage) == ValueType.TBool) {
 	    DejaGnu.pass("System.useCodePage property exists");
 	} else {
 	    DejaGnu.fail("System.useCodePage property doesn't exist");
 	}
 #end
+
+	if (Type.typeof(System.setClipboard) == TFunction) {
+	    DejaGnu.pass("System::setClipboard() method exists");
+	} else {
+	    DejaGnu.fail("System::setClipboard() method doesn't exist");
+	}
+
 	
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
+// is primarily useful only to test completeness of the API implementation
+
+
+// Si: I am not sure if these four functions are well defined!!!!!!
+// They are claimed. 
+// They may never be implemented!
 #if flash9
 	if (System.exit == null) {
 	    DejaGnu.pass("System::exit() method exists");
@@ -107,18 +124,31 @@ class System_as {
 	}
 #end
 
-#if flash6
-	if (System.setClipboard == null) {
-	    DejaGnu.pass("System::setClipboard() method exists");
+#if flash9
+#else
+	if (Type.typeof(System.exactSettings) == ValueType.TBool) {
+	    DejaGnu.pass("System.exactSettings property exists");
 	} else {
-	    DejaGnu.fail("System::setClipboard() method doesn't exist");
+	    DejaGnu.fail("System.exactSettings property doesn't exist");
 	}
-
-	if (System.showSettings == null) {
+	
+	if (Type.typeof(System.showSettings) == ValueType.TFunction) {
 	    DejaGnu.pass("System::showSettings() method exists");
 	} else {
 	    DejaGnu.fail("System::showSettings() method doesn't exist");
 	}
+
+//Si:
+//onStatus is a dynamic function only used in the old version!
+//The return type is TNULL 
+//It should exist!
+
+	if (Type.typeof(System.onStatus) == ValueType.TNull) {
+	    DejaGnu.pass("System::onStatus() method exists");
+	} else {
+	    DejaGnu.fail("System::onStatus() method doesn't exist");
+	}
+
 #end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

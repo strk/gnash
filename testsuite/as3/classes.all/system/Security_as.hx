@@ -24,14 +24,17 @@
 //  DejaGnu.hx header file for the testing framework support.
 
 #if flash9
-import flash.system.Security;
 import flash.display.MovieClip;
 #else
-import flash.Security;
 import flash.MovieClip;
 #end
+
 import flash.Lib;
 import Type;
+
+//Si: Modified
+import Std;
+import flash.system.Security;
 
 // import our testing API
 import DejaGnu;
@@ -41,7 +44,7 @@ class Security_as {
     static function main() {
 
         // Make sure we actually get a valid class        
-        if (Security != null) {
+        if (Type.typeof(Security)==TObject) {
             DejaGnu.pass("Security class exists");
         } else {
             DejaGnu.fail("Security class doesn't exist");
@@ -49,67 +52,103 @@ class Security_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Security.exactSettings == false) {
+
+// Test exactSettings
+// For all versions
+
+#if flash9
+	if (Type.typeof(Security.exactSettings) == TBool) {
 	    DejaGnu.pass("Security.exactSettings property exists");
 	} else {
 	    DejaGnu.fail("Security.exactSettings property doesn't exist");
 	}
-	if (Security.sandboxType == null) {
+#end
+
+#if flash8
+	DejaGnu.note( "Security.sandboxType may be not defined right? " + Type.typeof(Security.sandboxType) );
+//Si:
+//Can not pass the test here!
+//The Security.sandboxType is not well defined for flash8
+
+//	if (Std.is(Security.sandboxType, String) ) {
+	if (Type.typeof(Security.sandboxType)==TNull ) {
 	    DejaGnu.pass("Security.sandboxType property exists");
 	} else {
 	    DejaGnu.fail("Security.sandboxType property doesn't exist");
 	}
+#end
+
+#if flash9
+	if (Std.is(Security.sandboxType, String) ) {
+	    DejaGnu.pass("Security.sandboxType property exists");
+	} else {
+	    DejaGnu.fail("Security.sandboxType property doesn't exist");
+	}
+#end
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Security.allowDomain == null) {
+	
+
+	if (Type.typeof(Security.allowDomain) == TFunction) {
 	    DejaGnu.pass("Security::allowDomain() method exists");
 	} else {
 	    DejaGnu.fail("Security::allowDomain() method doesn't exist");
 	}
-	if (Security.allowInsecureDomain == null) {
+	if (Type.typeof(Security.allowInsecureDomain) == TFunction) {
 	    DejaGnu.pass("Security::allowInsecureDomain() method exists");
 	} else {
 	    DejaGnu.fail("Security::allowInsecureDomain() method doesn't exist");
 	}
-	if (Security.loadPolicyFile != null) {
+	if (Type.typeof(Security.loadPolicyFile) == TFunction) {
 	    DejaGnu.pass("Security::loadPolicyFile() method exists");
 	} else {
 	    DejaGnu.fail("Security::loadPolicyFile() method doesn't exist");
 	}
-	if (Security.showSettings != null) {
+
+#if flash9
+	if (Type.typeof(Security.showSettings)==TFunction) {
 	    DejaGnu.pass("Security::showSettings() method exists");
 	} else {
 	    DejaGnu.fail("Security::showSettings() method doesn't exist");
 	}
+#end
+
 // AIR only
 // 	if (Security.APPLICATION == null) {
 // 	    DejaGnu.pass("Security::APPLICATION() method exists");
 // 	} else {
 // 	    DejaGnu.fail("Security::APPLICATION() method doesn't exist");
 // 	}
-	if (Security.LOCAL_TRUSTED != null) {
-	    DejaGnu.pass("Security::LOCAL_TRUSTED() method exists");
+
+#if flash9
+	if (Std.is(Security.LOCAL_TRUSTED,String) ) {
+	    DejaGnu.pass("Security::LOCAL_TRUSTED() property exists");
 	} else {
-	    DejaGnu.fail("Security::LOCAL_TRUSTED() method doesn't exist");
+	    DejaGnu.fail("Security::LOCAL_TRUSTED() property doesn't exist");
 	}
-	if (Security.LOCAL_WITH_FILE != null) {
-	    DejaGnu.pass("Security::LOCAL_WITH_FILE() method exists");
+	if (Std.is(Security.LOCAL_WITH_FILE,String) ) {
+	    DejaGnu.pass("Security::LOCAL_WITH_FILE() property exists");
 	} else {
 	    DejaGnu.fail("Security::LOCAL_WITH_FILE() method doesn't exist");
 	}
-	if (Security.LOCAL_WITH_NETWORK != null) {
-	    DejaGnu.pass("Security::LOCAL() method exists");
+	if (Std.is(Security.LOCAL_WITH_NETWORK,String) ) {
+	    DejaGnu.pass("Security::LOCAL_WITH_NETWORK() property exists");
 	} else {
-	    DejaGnu.fail("Security::LOCAL() method doesn't exist");
+	    DejaGnu.fail("Security::LOCAL_WITH_NETWORK() property doesn't exist");
 	}
-	if (Security.REMOTE != null) {
-	    DejaGnu.pass("Security::REMOTE() method exists");
+	if (Std.is(Security.REMOTE,String)) {
+	    DejaGnu.pass("Security::REMOTE() property exists");
 	} else {
-	    DejaGnu.fail("Security::REMOTE() method doesn't exist");
+	    DejaGnu.fail("Security::REMOTE() property doesn't exist");
 	}
-
+	if (Type.typeof(Security.disableAVM1Loading) == TBool ){
+	    DejaGnu.pass("Security::disableAVM1Loading property xists");
+	} else {
+	    DejaGnu.fail("Security::disableAVM1Loading property doesn't exist");
+	}
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
