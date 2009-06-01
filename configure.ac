@@ -3056,7 +3056,8 @@ if test x"$testsuite" = x"yes"; then
       echo "        HAXE is $HAXE"
       echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
     else
-      echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
+      echo "        WARNING: You need to have the HAXE compiler package " >&4
+      echo "                 version 2.00 or hither installed" >&4
       echo "                 to run some of the tests in Gnash testsuite." >&4
       echo "                 You can install it from http://haxe.org" >&4
       echo "                 or .deb users: apt-get install haxe" >&4

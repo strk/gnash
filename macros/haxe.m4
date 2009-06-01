@@ -48,14 +48,22 @@ AC_DEFUN([AC_PATH_HAXE], [
   fi
 
   if test x"$HAXE" != "x"; then
+    AC_MSG_CHECKING([for HAXE version])
     HAXE_VERSION=`$HAXE -help | grep ^Haxe | awk '{print $'3'}'`
+    AC_MSG_RESULT([${HAXE_VERSION}])
+
     major=`echo $HAXE_VERSION | cut -d '.' -f 1`
     minor=`echo $HAXE_VERSION | cut -d '.' -f 2`
+
     dnl
-    dnl FIXME: we need 2.00 or higher
-    dnl        1.19 was tested as failing to build some testcases
-    dnl        preventing 'make check' from completing
+    dnl we need 2.00 or higher
+    dnl 1.19 was tested as failing to build some testcases
+    dnl preventing 'make check' from completing
     dnl
+    if test $major -lt 2; then
+        AC_MSG_WARN([Haxe ${HAXE_VERSION} is too old to be used])
+        unset HAXE
+    fi
   fi
 
   if test x"$HAXE" != "x" -a x"$HAXE_CLASSPATH" = "x"; then
