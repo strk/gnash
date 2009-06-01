@@ -30,16 +30,28 @@ class as_value;
 class as_object;
 
 static as_value
-get_flash_package(const fn_call& /*fn*/)
+get_flash_package(const fn_call& fn)
 {
-	log_debug("Loading flash.flash package");
-         as_object *pkg = new as_object(getObjectInterface());
+    bool as3 = isAS3(fn.getVM());
+	log_debug("Loading %s flash package", as3 ? "AVM2" : "AVM1");
+    
+    as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
- 	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+
+    if (as3) {
+        while (as3classes[i]) {
+            as3classes[i](*pkg);
+            ++i;
+        }
+    }
+    else {
+        while (as2classes[i]) {
+            as2classes[i](*pkg);
+            ++i;
+        }
+    }
 
 	return pkg;
 }

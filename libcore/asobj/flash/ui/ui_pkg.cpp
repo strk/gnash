@@ -36,16 +36,20 @@
 namespace gnash {
 
 static as_value
-get_flash_ui_package(const fn_call& /*fn*/)
+get_flash_ui_package(const fn_call& fn)
 {
-	log_debug("Loading flash.ui package");
+    // This package is AS3 only!
+    assert(isAS3(fn.getVM()));
+
+	log_debug("Loading AVM2 flash.ui package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
-	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+	while (as3classes[i]) {
+	    as3classes[i](*pkg);
+        ++i;
+	} 
 
 	return pkg;
 }

@@ -115,15 +115,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(894); // SWF6
+	check_totals(897); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(911); // SWF7
+	check_totals(914); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1003); // SWF8+
+	check_totals(1006); // SWF8+
 #endif
 
 	play();
@@ -501,6 +501,19 @@ xcheck_equals(_soundbuftime, 4);
 mc._soundbuftime = "string";
 xcheck_equals(mc._soundbuftime, 4);
 xcheck_equals(_soundbuftime, 4);
+
+#if OUTPUT_VERSION >= 6
+
+ // _soundbuftime points to the same value, is not MovieClip-specific
+ mc._soundbuftime = 10;
+ check_equals(mc._soundbuftime, 10);
+ mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
+ check_equals(mc2._soundbuftime, 10);
+ mc2._soundbuftime = 20;
+ check_equals(mc._soundbuftime, 20);
+ mc2.unloadMovie();
+
+#endif
 
 
 //----------------------------------------------

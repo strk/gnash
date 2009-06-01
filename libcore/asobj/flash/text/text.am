@@ -20,6 +20,9 @@ TEXTdir = $(includedir)/gnash
 TEXT_SOURCES = flash/text/text_pkg.cpp
 TEXT_HEADERS = flash/text/text_pkg.h
 
+TEXT_SOURCES_AS2 = 
+TEXT_HEADERS_AS2 = 
+
 if BUILD_ANTIALIASTYPE_AS3
 TEXT_SOURCES += flash/text/AntiAliasType_as.cpp
 TEXT_HEADERS += flash/text/AntiAliasType_as.h
@@ -103,8 +106,8 @@ TEXT_HEADERS += flash/text/TextLineMetrics_as.h
 endif
 
 if BUILD_TEXTRENDERER_AS3
-TEXT_SOURCES += flash/text/TextRenderer_as.cpp
-TEXT_HEADERS += flash/text/TextRenderer_as.h
+TEXT_SOURCES_AS2 += flash/text/TextRenderer_as.cpp
+TEXT_HEADERS_AS2 += flash/text/TextRenderer_as.h
 endif
 
 # FIXME: already exists
@@ -113,8 +116,8 @@ if BUILD_TEXTSNAPSHOT_AS3
 TEXT_HEADERS += flash/text/TextSnapshot_as.h
 endif
 
-libgnashasobjs_la_SOURCES += $(TEXT_SOURCES)
-noinst_HEADERS +=  $(TEXT_HEADERS) textclasses.h
+libgnashasobjs_la_SOURCES += $(TEXT_SOURCES) $(TEXT_SOURCES_AS2)
+noinst_HEADERS +=  $(TEXT_HEADERS) $(TEXT_HEADERS_AS2) textclasses.h
 
 # Build a header file that contains a generated array of *_init()
 # functions for the classes that are configured for this build, as
@@ -127,8 +130,17 @@ textclasses.h: Makefile
 	echo "#ifndef GNASH_ASOBJ_FLASH_TEXT_H" >> $${header}; \
 	echo "#define GNASH_ASOBJ_FLASH_TEXT_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
-	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	sources="`echo $(TEXT_SOURCES) | cut -d ' ' -f 2-`"; \
+	echo "static gnash::SharedLib::initentry *as3classes[] = {" >> $${header}; \
+	sources="`echo $(TEXT_SOURCES) $(TEXT_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
+	for i in $${sources}; do \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
+	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
+	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
+	done; \
+	echo '	0' >> $${header}; \
+	echo '};' >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as2classes[] = {" >> $${header}; \
+	sources="`echo $(TEXT_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \

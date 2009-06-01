@@ -33,25 +33,31 @@
 namespace gnash {
 
 static as_value
-get_flash_printing_package(const fn_call& /*fn*/)
+get_flash_printing_package(const fn_call& fn)
 {
-	log_debug("Loading flash.printing package");
-	as_object *pkg = new as_object(getObjectInterface());
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-	do {
-	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+    // This package is AS3 only!
+    assert(isAS3(fn.getVM()));
 
-	return pkg;
+    log_debug("Loading AVM2 flash.printing package");
+    as_object *pkg = new as_object(getObjectInterface());
+
+    // Call the [objectname]_init() function for each class.
+    int i = 0;
+    while (as3classes[i]) {
+        as3classes[i](*pkg);
+        ++i;
+    }
+
+    return pkg;
 }
 
 void
 flash_printing_package_init(as_object& where)
 {
-	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("printing"), get_flash_printing_package);
+    string_table& st = where.getVM().getStringTable();
+    where.init_destructive_property(st.find("printing"),
+            get_flash_printing_package);
 }
 
 

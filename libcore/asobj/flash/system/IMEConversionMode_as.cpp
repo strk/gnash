@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.system.IMEConversionMode class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value imeconversionmode_ctor(const fn_call& fn);
-    void attachIMEConversionModeInterface(as_object& o);
     void attachIMEConversionModeStaticInterface(as_object& o);
-    as_object* getIMEConversionModeInterface();
-
 }
 
-class IMEConversionMode_as : public as_object
-{
-
-public:
-
-    IMEConversionMode_as()
-        :
-        as_object(getIMEConversionModeInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void imeconversionmode_class_init(as_object& global)
+void
+imeconversionmode_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&imeconversionmode_ctor, getIMEConversionModeInterface());
-        attachIMEConversionModeStaticInterface(*cl);
-    }
-
-    // Register _global.IMEConversionMode
-    global.init_member("IMEConversionMode", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachIMEConversionModeStaticInterface(*o);
+    global.init_member("IMEConversionMode", o);
 }
 
 namespace {
 
 void
-attachIMEConversionModeInterface(as_object& o)
-{
-}
-
-void
 attachIMEConversionModeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getIMEConversionModeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIMEConversionModeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-imeconversionmode_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new IMEConversionMode_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 

@@ -84,34 +84,20 @@ public:
 /// For the moment, it will be a singleton, providing one-time
 /// initialization.
 ///
-class DSOEXPORT VM : boost::noncopyable {
+class DSOEXPORT VM : boost::noncopyable
+{
 
 public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
-	SafeStack<as_value>& getStack()
-	{
-		return _stack;
-	}
-
-	CallStack& getCallStack()
-	{
-		return _callStack;
-	}
-
-    /// Get the VM clock
-    //
-    /// NOTE: this clock should drive all internal operations
-    /// but maybe accessing it trough VM isn't the best idea.
-    /// TODO: consider making this accessible trough RunInfo
-    /// instead.
-    ///
-    VirtualClock& getClock() {
-        return _clock;
-    }
-
-	/// \brief
+    enum AVMVersion
+    {
+        AVM1,
+        AVM2
+    };
+	
+    /// \brief
 	/// Initialize the virtual machine singleton with the given
 	/// movie definition and return a reference to it.
 	//
@@ -129,6 +115,25 @@ public:
 	///	Virtual clock used as system time.
 	///
 	static VM& init(int version, movie_root& root, VirtualClock& clock);
+
+	SafeStack<as_value>& getStack() {
+		return _stack;
+	}
+
+	CallStack& getCallStack() {
+		return _callStack;
+	}
+
+    /// Get the VM clock
+    //
+    /// NOTE: this clock should drive all internal operations
+    /// but maybe accessing it trough VM isn't the best idea.
+    /// TODO: consider making this accessible trough RunInfo
+    /// instead.
+    ///
+    VirtualClock& getClock() {
+        return _clock;
+    }
 
 	/// Return true if the singleton VM has been initialized
 	static bool isInitialized();
@@ -161,6 +166,15 @@ public:
 
 	/// Set SWF version of the currently executing code
 	void setSWFVersion(int v);
+
+    AVMVersion getAVMVersion() const {
+        return _avmVersion;
+    }
+
+    /// Set the version of the currently executing VM.
+    void setAVMVersion(AVMVersion v) {
+        _avmVersion = v;
+    }
 
 	/// Get the number of milliseconds since VM was started
 	unsigned long int getTime() const;
@@ -329,7 +343,24 @@ private:
 	/// Library of SharedObjects. Owned by the VM.
     std::auto_ptr<SharedObjectLibrary> _shLib;
 
+    /// The currently executing machine
+    //
+    /// This is a hack like switching the SWF version, but without this
+    /// there is no way for AS functions to know which version of the
+    /// virtual machine called them. This is necessary e.g. for initializing
+    /// the correct object prototypes etc.
+    AVMVersion _avmVersion;
+
 };
+
+/// Check whether the currently executing code is AS3 (ABC)
+//
+/// This is a non-member, non-friend function for better encapsulation.
+/// TODO: drop these when there is a better design!
+inline bool
+isAS3(const VM& vm) {
+    return vm.getAVMVersion() == VM::AVM2;
+}
 
 } // namespace gnash
 

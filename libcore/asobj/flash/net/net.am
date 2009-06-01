@@ -20,19 +20,22 @@ NETdir = $(includedir)/gnash
 NET_SOURCES = flash/net/net_pkg.cpp
 NET_HEADERS = flash/net/net_pkg.h
 
+NET_SOURCES_AS2 = 
+NET_HEADERS_AS2 = 
+
 if BUILD_FILEFILTER_AS3
 NET_SOURCES += flash/net/FileFilter_as.cpp
 NET_HEADERS += flash/net/FileFilter_as.h
 endif
 
 if BUILD_FILEREFERENCELIST_AS3
-NET_SOURCES += flash/net/FileReferenceList_as.cpp
-NET_HEADERS += flash/net/FileReferenceList_as.h
+NET_SOURCES_AS2 += flash/net/FileReferenceList_as.cpp
+NET_HEADERS_AS2 += flash/net/FileReferenceList_as.h
 endif
 
 if BUILD_FILEREFERENCE_AS3
-NET_SOURCES += flash/net/FileReference_as.cpp
-NET_HEADERS += flash/net/FileReference_as.h
+NET_SOURCES_AS2 += flash/net/FileReference_as.cpp
+NET_HEADERS_AS2 += flash/net/FileReference_as.h
 endif
 
 if BUILD_IDYNAMICPROPERTYOUTPUT_AS3
@@ -127,8 +130,8 @@ if BUILD_XMLSOCKET_AS3
 NET_HEADERS += flash/net/XMLSocket_as.h
 endif
 
-libgnashasobjs_la_SOURCES  += $(NET_SOURCES)
-noinst_HEADERS +=  $(NET_HEADERS) netclasses.h
+libgnashasobjs_la_SOURCES  += $(NET_SOURCES) $(NET_SOURCES_AS2)
+noinst_HEADERS +=  $(NET_HEADERS) $(NET_HEADERS_AS2) netclasses.h
 
 # Build a header file that contains a generated array of *_init()
 # functions for the classes that are configured for this build, as
@@ -141,8 +144,17 @@ netclasses.h: Makefile
 	echo "#ifndef GNASH_ASOBJ_FLASH_NET_H" >> $${header}; \
 	echo "#define GNASH_ASOBJ_FLASH_NET_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
-	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
-	sources="`echo $(NET_SOURCES) | cut -d ' ' -f 2-`"; \
+	echo "static gnash::SharedLib::initentry *as3classes[] = {" >> $${header}; \
+	sources="`echo $(NET_SOURCES) $(NET_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
+	for i in $${sources}; do \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
+	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
+	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
+	done; \
+	echo '	0' >> $${header}; \
+	echo '};' >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as2classes[] = {" >> $${header}; \
+	sources="`echo $(NET_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \

@@ -34,15 +34,19 @@
 namespace gnash {
 
 static as_value
-get_flash_sampler_package(const fn_call& /*fn*/)
+get_flash_sampler_package(const fn_call& fn)
 {
-	log_debug("Loading flash.sampler package");
+
+    /// This package is AS2 only!
+    assert(isAS3(fn.getVM()));
+
+	log_debug("Loading AVM2 flash.sampler package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (asclasses[++i] != 0) {
-	    asclasses[i](*pkg);
+	while (as3classes[++i] != 0) {
+	    as3classes[i](*pkg);
     }
 
 	return pkg;

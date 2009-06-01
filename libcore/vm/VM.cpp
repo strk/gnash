@@ -100,7 +100,8 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 #endif
 	_clock(clock),
 	_stack(),
-    _shLib(new SharedObjectLibrary(*this))
+    _shLib(new SharedObjectLibrary(*this)),
+    _avmVersion(AVM1)
 {
 	_clock.restart();
 }
