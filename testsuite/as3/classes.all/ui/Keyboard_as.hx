@@ -64,8 +64,8 @@ class Keyboard_as {
 			
 			//check < flash9 methods
 			#if !flash9
-			//this appears that it should be supported, but is not currently
-			//supported by haxe
+			//this appears that it should be supported, but not currently
+			//(fixed on haxe cvs)
 			//if (Type.typeof(Key.isAccessible) == ValueType.TFunction){
 			//	DejaGnu.pass("Key::isAccessible() method exists");
 			//} else {
