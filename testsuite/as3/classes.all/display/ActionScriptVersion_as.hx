@@ -26,9 +26,6 @@
 #if flash9
 import flash.display.ActionScriptVersion;
 import flash.display.MovieClip;
-#else
-import flash.ActionScriptVersion;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,17 +36,17 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ActionScriptVersion_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (ActionScriptVersion.ACTIONSCRIPT2 || ActionScriptVersion.ACTIONSCRIPT3) {
+        #if !flash9
+		DejaGnu.note("This is only a valid class in AS3 compatible players");
+		#end
+		#if flash9
+		// Make sure we actually get a valid class        
+        if (ActionScriptVersion.ACTIONSCRIPT2 == 2 && ActionScriptVersion.ACTIONSCRIPT3 == 3) {
             DejaGnu.pass("ActionScriptVersion class exists");
         } else {
             DejaGnu.fail("ActionScriptVersion lass doesn't exist");
         }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

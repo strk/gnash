@@ -23,12 +23,12 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
-#if flash9
+
+// NOTE: this only works with flash v.9 and above
+
+#if flash9 || !flash
 import flash.desktop.ClipboardFormats;
 import flash.display.MovieClip;
-#else
-import flash.ClipboardFormats;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +39,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ClipboardFormats_as {
     static function main() {
-        var x1:ClipboardFormats = new ClipboardFormats();
+        #if !flash9
+		DejaGnu.note("This does not apply to lower than flash v9");
+		#end
+		
+		var x1:ClipboardFormats = new ClipboardFormats();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -51,7 +55,42 @@ class ClipboardFormats_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+		#if flash9
+		if (ClipboardFormats.HTML_FORMAT == "air:html") {
+			DejaGnu.pass("ClipboardFormats::HTML_FORMAT properly exists");
+		} else {
+			DejaGnu.fail("ClipboardFormats::HTML_FORMAT string is not right");
+		}
+		
+		if (ClipboardFormats.RICH_TEXT_FORMAT == "air:rtf") {
+			DejaGnu.pass("ClipboardFormats::RICH_TEXT_FORMAT properly exists");
+		} else {
+			DejaGnu.fail("ClipboardFormats::RICH_TEXT_FORMAT string is not right");
+		}
+		
+		if (ClipboardFormats.TEXT_FORMAT == "air:text") {
+			DejaGnu.pass("ClipboardFormats::TEXT_FORMAT properly exists");
+		} else {
+			DejaGnu.fail("ClipboardFormats::TEXT_FORMAT string is not right");
+		}
+		#end
+		#if !flash
+		if (ClipboardFormats.BITMAP_FORMAT == "air:bitmap") {
+			DejaGnu.pass("ClipboardFormats::BITMAP_FORMAT properly exists");
+		} else {
+			DejaGnu.fail("ClipboardFormats::BITMAP_FORMAT string is not right");
+		}
+		if (ClipboardFormats.FILE_LIST_FORMAT == "air:file list") {
+			DejaGnu.pass("ClipboardFormats::FILE_LIST_FORMAT properly exists");
+		} else {
+			DejaGnu.fail("ClipboardFormats::FILE_LIST_FORMAT string is not right");
+		}
+		if (ClipboardFormats.URL_FORMAT == "air:url") {
+			DejaGnu.pass("ClipboardFormats::URL_FORMAT properly exists");
+		} else {
+			DejaGnu.fail("ClipboardFormats::URL_FORMAT string is not right");
+		}
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

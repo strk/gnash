@@ -26,20 +26,26 @@
 #if flash9
 import flash.display.FrameLabel;
 import flash.display.MovieClip;
-#else
-import flash.FrameLabel;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
 
+//NOTE: this was implemented in AS3 and is only valid for flash v.9 and greater
+
+
 // import our testing API
 import DejaGnu;
+import Std;
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class FrameLabel_as {
     static function main() {
-        var x1:FrameLabel = new FrameLabel("Hello World", 0);
+        #if !flash9
+			DejaGnu.note("This is only a valid test for AS3 and greater.");
+		#end
+		#if flash9
+		var x1:FrameLabel = new FrameLabel("Test Label", 15);
+		var x2:FrameLabel = new FrameLabel("This is a longer test label", 200);
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,23 +56,27 @@ class FrameLabel_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.frame == 0) {
+	if ((x1.frame == 15) && (Type.typeof(x1.frame) == ValueType.TInt)) {
 	    DejaGnu.pass("FrameLabel::frame property exists");
 	} else {
 	    DejaGnu.fail("FrameLabel::frame property doesn't exist");
 	}
-	if (x1.name == null) {
+	if (Std.is(x1.name, String) && (x1.name == "Test Label")) {
 	    DejaGnu.pass("FrameLabel::name property exists");
 	} else {
 	    DejaGnu.fail("FrameLabel::name property doesn't exist");
 	}
-
-	if (x1.frame == 0) {
-	    DejaGnu.pass("FrameLabel::frame property exists");
+	if (x2.frame == 200) {
+		DejaGnu.pass("FrameLabel::frame property exists");
 	} else {
-	    DejaGnu.fail("FrameLabel::frame property doesn't exist");
+		DejaGnu.fail("FrameLabel::frame is returning the wrong value");
 	}
-
+	if (x2.name == "This is a longer test label") {
+		DejaGnu.pass("FrameLabel::name is returning the correct string");
+	} else {
+		DejaGnu.fail("FrameLabel::name is returning the wrong string");
+	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

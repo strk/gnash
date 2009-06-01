@@ -26,9 +26,6 @@
 #if flash9
 import flash.desktop.ClipboardTransferMode;
 import flash.display.MovieClip;
-#else
-import flash.ClipboardTransferMode;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -51,6 +48,26 @@ class ClipboardTransferMode_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+		if (ClipboardTransferMode.CLONE_ONLY == "cloneOnly") {
+			DejaGnu.pass("ClipboardTransferMode::CLONE_ONLY properly exists");
+		} else {
+			DejaGnu.fail("ClipboardTransferMode::CLONE_ONLY string is not right");
+		}
+		if (ClipboardTransferMode.CLONE_PREFERRED == "clonePreferred") {
+			DejaGnu.pass("ClipboardTransferMode::CLONE_Preferred properly exists");
+		} else {
+			DejaGnu.fail("ClipboardTransferMode::CLONE_Preferred string is not right");
+		}
+		if (ClipboardTransferMode.ORIGINAL_ONLY == "originalOnly") {
+			DejaGnu.pass("ClipboardTransferMode::ORIGINAL_ONLY properly exists");
+		} else {
+			DejaGnu.fail("ClipboardTransferMode::ORIGINAL_ONLY string is not right");
+		}
+		if (ClipboardTransferMode.ORIGINAL_PREFERRED == "originalPreferred") {
+			DejaGnu.pass("ClipboardTransferMode::ORIGINAL_PREFERRED properly exists");
+		} else {
+			DejaGnu.fail("ClipboardTransferMode::CLONE_PREFERRED string is not right");
+		}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
