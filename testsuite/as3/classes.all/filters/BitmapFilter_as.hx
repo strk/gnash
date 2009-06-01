@@ -27,7 +27,7 @@
 import flash.filters.BitmapFilter;
 import flash.display.MovieClip;
 #else
-import flash.BitmapFilter;
+import flash.filters.BitmapFilter;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -47,10 +47,6 @@ class BitmapFilter_as {
         } else {
             DejaGnu.fail("BitmapFilter class doesn't exist");
         }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

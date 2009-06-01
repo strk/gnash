@@ -23,11 +23,13 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+#if flash9
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 import flash.display.MovieClip;
 import flash.Lib;
 import Type;
+#end
 
 import DejaGnu;
 
@@ -35,7 +37,12 @@ import DejaGnu;
 // file passed to haxe will have after the preprocessing step
 class SoundChannel_as {
     static function main() {
-        var x1:SoundChannel = new SoundChannel();
+        #if !flash9
+		DejaGnu.note("This test is not valid for flash v < 9. Run internal ming test.");
+		#end
+		
+		#if flash9
+		var x1:SoundChannel = new SoundChannel();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -46,22 +53,22 @@ class SoundChannel_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.leftPeak == 0) {
+	if (Type.typeof(x1.leftPeak) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundChannel::leftPeak property exists");
 	} else {
 	    DejaGnu.fail("SoundChannel::leftPeak property doesn't exist");
 	}
-	if (x1.position == 0) {
+	if (Type.typeof(x1.position) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundChannel::position property exists");
 	} else {
 	    DejaGnu.fail("SoundChannel::position property doesn't exist");
 	}
-	if (x1.rightPeak == 0) {
+	if (Type.typeof(x1.rightPeak) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundChannel::rightPeak property exists");
 	} else {
 	    DejaGnu.fail("SoundChannel::rightPeak property doesn't exist");
 	}
-	if (x1.soundTransform == SoundTransform) {
+	if (Type.typeof(x1.soundTransform) == ValueType.TObject) {
 	    DejaGnu.pass("SoundChannel::soundTransform property exists");
 	} else {
 	    DejaGnu.fail("SoundChannel::soundTransform property doesn't exist");
@@ -70,12 +77,12 @@ class SoundChannel_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.stop == null) {
+	if (Type.typeof(x1.stop) == ValueType.TFunction) {
 	    DejaGnu.pass("SoundChannel::stop() method exists");
 	} else {
 	    DejaGnu.fail("SoundChannel::stop() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

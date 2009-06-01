@@ -26,19 +26,21 @@
 #if flash9
 import flash.errors.SQLError;
 import flash.display.MovieClip;
-#else
-import flash.SQLError;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class SQLError_as {
-    static function main() {
+    #if !flash9
+	DejaGnu.note("This is not a valid class except for Flash 9 and above");
+	#end
+	#if flash9
+	static function main() {
         var x1:SQLError = new SQLError();
 
         // Make sure we actually get a valid class        
@@ -50,22 +52,22 @@ class SQLError_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.detailArguments == 0) {
+	if (Std.is(x1.detailArguments, Array)) {
 	    DejaGnu.pass("SQLError.detailArguments property exists");
 	} else {
 	    DejaGnu.fail("SQLError.detailArguments property doesn't exist");
 	}
-	if (x1.detailID == 0) {
+	if (Type.typeof(x1.detailID) == ValueType.TInt) {
 	    DejaGnu.pass("SQLError.detailID property exists");
 	} else {
 	    DejaGnu.fail("SQLError.detailID property doesn't exist");
 	}
-	if (x1.details == null) {
+	if (Std.is(x1.details, String)) {
 	    DejaGnu.pass("SQLError.details property exists");
 	} else {
 	    DejaGnu.fail("SQLError.details property doesn't exist");
 	}
-	if (x1.operation == null) {
+	if (Std.is(x1.operation, String)) {
 	    DejaGnu.pass("SQLError.operation property exists");
 	} else {
 	    DejaGnu.fail("SQLError.operation property doesn't exist");
@@ -74,17 +76,17 @@ class SQLError_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.SQLError == 0) {
+	if (Type.typeof(x1.SQLError) == ValueType.TFunction) {
 	    DejaGnu.pass("SQLError::SQLError() method exists");
 	} else {
 	    DejaGnu.fail("SQLError::SQLError() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("SQLError::toString() method exists");
 	} else {
 	    DejaGnu.fail("SQLError::toString() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

@@ -23,23 +23,24 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+// NOTE: the ID3 reader tag class was only implemented for flash 9 and
+// above so this test is only valid for said versions.
+
 #if flash9
 import flash.media.ID3Info;
 import flash.display.MovieClip;
-#else
-import flash.ID3Info;
-import flash.MovieClip;
-#end
 import flash.Lib;
+#end
 import Type;
-
+import Std;
 import DejaGnu;
 
 // Class must be named with the PP prefix, as that's the name the
 // file passed to haxe will have after the preprocessing step
 class ID3Info_as {
     static function main() {
-        var x1:ID3Info = new ID3Info();
+        #if flash9
+		var x1:ID3Info = new ID3Info();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,49 +51,54 @@ class ID3Info_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.album == null) {
+	//FIXME: these all should make sure that the class can handle attempted
+	// buffer overflow attacks in ID3 tags (parse the string)
+	if (Std.is(x1.album, String)) {
 	    DejaGnu.pass("ID3Info::album property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::album property doesn't exist");
 	}
-	if (x1.artist == null) {
+	if (Std.is(x1.artist, String)) {
 	    DejaGnu.pass("ID3Info::artist property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::artist property doesn't exist");
 	}
-	if (x1.comment == null) {
+	if (Std.is(x1.comment, String)) {
 	    DejaGnu.pass("ID3Info::comment property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::comment property doesn't exist");
 	}
-	if (x1.genre == null) {
+	if (Std.is(x1.genre, String)) {
 	    DejaGnu.pass("ID3Info::genre property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::genre property doesn't exist");
 	}
-	if (x1.songName == null) {
+	if (Std.is(x1.songName, String)) {
 	    DejaGnu.pass("ID3Info::songName property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::songName property doesn't exist");
 	}
-	if (x1.track == null) {
+	if (Std.is(x1.track, String)) {
 	    DejaGnu.pass("ID3Info::track property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::track property doesn't exist");
 	}
-	if (x1.year == null) {
+	if (Std.is(x1.year, String)) {
 	    DejaGnu.pass("ID3Info::year property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::year property doesn't exist");
 	}
 
-	if (x1.album == null) {
+	if (Std.is(x1.album, String)) {
 	    DejaGnu.pass("ID3Info::album property exists");
 	} else {
 	    DejaGnu.fail("ID3Info::album property doesn't exist");
 	}
-
-        // Call this after finishing all tests. It prints out the totals.
+#end
+#if !flash9
+	DejaGnu.note("This test is only valid for flashv9 and above. run the ming test");
+#end
+		// Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
 }
