@@ -74,14 +74,14 @@ get_flash_display_package(const fn_call& fn)
 	int i = 0;
 
     if (as3) {
-        while (as3classes[i]) {
-            as3classes[i](*pkg);
+        while (as3displayclasses[i]) {
+            as3displayclasses[i](*pkg);
             ++i;
         }
     }
     else {
-        while (as2classes[i]) {
-            as2classes[i](*pkg);
+        while (as2displayclasses[i]) {
+            as2displayclasses[i](*pkg);
             ++i;
         }
     }

@@ -44,8 +44,8 @@ get_flash_printing_package(const fn_call& fn)
 
     // Call the [objectname]_init() function for each class.
     int i = 0;
-    while (as3classes[i]) {
-        as3classes[i](*pkg);
+    while (as3printingclasses[i]) {
+        as3printingclasses[i](*pkg);
         ++i;
     }
 

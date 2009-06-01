@@ -130,7 +130,7 @@ textclasses.h: Makefile
 	echo "#ifndef GNASH_ASOBJ_FLASH_TEXT_H" >> $${header}; \
 	echo "#define GNASH_ASOBJ_FLASH_TEXT_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
-	echo "static gnash::SharedLib::initentry *as3classes[] = {" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as3textclasses[] = {" >> $${header}; \
 	sources="`echo $(TEXT_SOURCES) $(TEXT_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
@@ -139,7 +139,7 @@ textclasses.h: Makefile
 	done; \
 	echo '	0' >> $${header}; \
 	echo '};' >> $${header}; \
-	echo "static gnash::SharedLib::initentry *as2classes[] = {" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as2textclasses[] = {" >> $${header}; \
 	sources="`echo $(TEXT_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

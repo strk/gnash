@@ -59,14 +59,14 @@ get_flash_text_package(const fn_call& fn)
 	int i = 0;
 
     if (as3) {
-        while (as3classes[i]) {
-            as3classes[i](*pkg);
+        while (as3textclasses[i]) {
+            as3textclasses[i](*pkg);
             ++i;
         }
     }
     else {
-        while (as2classes[i]) {
-            as2classes[i](*pkg);
+        while (as2textclasses[i]) {
+            as2textclasses[i](*pkg);
             ++i;
         }
     }

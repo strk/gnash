@@ -46,8 +46,8 @@ get_flash_ui_package(const fn_call& fn)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (as3classes[i]) {
-	    as3classes[i](*pkg);
+	while (as3uiclasses[i]) {
+	    as3uiclasses[i](*pkg);
         ++i;
 	} 
 
