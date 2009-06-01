@@ -506,11 +506,11 @@ xcheck_equals(_soundbuftime, 4);
 
  // _soundbuftime points to the same value, is not MovieClip-specific
  mc._soundbuftime = 10;
- check_equals(mc._soundbuftime, 10);
+ xcheck_equals(mc._soundbuftime, 10);
  mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
- check_equals(mc2._soundbuftime, 10);
+ xcheck_equals(mc2._soundbuftime, 10);
  mc2._soundbuftime = 20;
- check_equals(mc._soundbuftime, 20);
+ xcheck_equals(mc._soundbuftime, 20);
  mc2.unloadMovie();
 
 #endif
