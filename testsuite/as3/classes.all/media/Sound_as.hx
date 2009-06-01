@@ -33,17 +33,20 @@ import flash.media.SoundLoaderContext;
 import flash.media.SoundChannel;
 import flash.display.MovieClip;
 #end
+#if !flash9
+import flash.Sound;
+#end
 import flash.Lib;
 import Type;
-
+import Std;
 import DejaGnu;
 
 // Class must be named with the PP prefix, as that's the name the
 // file passed to haxe will have after the preprocessing step
 class Sound_as {
     static function main() {
-        var x1:Sound = new Sound();
-
+        #if flash9
+		var x1:Sound = new Sound();
         // Make sure we actually get a valid class        
         if (x1 != null) {
             DejaGnu.pass("Sound class exists");
@@ -53,32 +56,32 @@ class Sound_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.bytesLoaded == 0) {
+	if (Std.is(x1.bytesLoaded, Float)) {
 	    DejaGnu.pass("Sound::bytesLoaded property exists");
 	} else {
 	    DejaGnu.fail("Sound::bytesLoaded property doesn't exist");
 	}
-	if (x1.bytesTotal == 0) {
+	if (Std.is(x1.bytesTotal, Int)) {
 	    DejaGnu.pass("Sound::bytesTotal property exists");
 	} else {
 	    DejaGnu.fail("Sound::bytesTotal property doesn't exist");
 	}
-	if (x1.id3 == ID3Info) {
+	if (Std.is(x1.id3, ID3Info)) {
 	    DejaGnu.pass("Sound::id3 property exists");
 	} else {
 	    DejaGnu.fail("Sound::id3 property doesn't exist");
 	}
-	if (x1.isBuffering == false) {
+	if (Type.typeof(x1.isBuffering) == ValueType.TBool) {
 	    DejaGnu.pass("Sound::isBuffering property exists");
 	} else {
 	    DejaGnu.fail("Sound::isBuffering property doesn't exist");
 	}
-	if (x1.length == 0) {
+	if (Std.is(x1.length, Int)) {
 	    DejaGnu.pass("Sound::length property exists");
 	} else {
 	    DejaGnu.fail("Sound::length property doesn't exist");
 	}
-	if (x1.url == null) {
+	if (Std.is(Std.string(x1.url), String)) {
 	    DejaGnu.pass("Sound::url property exists");
 	} else {
 	    DejaGnu.fail("Sound::url property doesn't exist");
@@ -87,27 +90,99 @@ class Sound_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (x1.Sound == SoundLoaderContext) {
-// 	    DejaGnu.pass("Sound::Sound() method exists");
-// 	} else {
-// 	    DejaGnu.fail("Sound::Sound() method doesn't exist");
-// 	}
-	if (x1.close == null) {
+
+	if (Type.typeof(x1.close) == ValueType.TFunction) {
 	    DejaGnu.pass("Sound::close() method exists");
 	} else {
 	    DejaGnu.fail("Sound::close() method doesn't exist");
 	}
-	if (x1.load == null) {
+	if (Type.typeof(x1.load) == ValueType.TFunction) {
 	    DejaGnu.pass("Sound::load() method exists");
 	} else {
 	    DejaGnu.fail("Sound::load() method doesn't exist");
 	}
-// 	if (x1.play == SoundChannel) {
-// 	    DejaGnu.pass("Sound::play() method exists");
-// 	} else {
-// 	    DejaGnu.fail("Sound::play() method doesn't exist");
-// 	}
-
+ 	if (Type.typeof(x1.play) == ValueType.TFunction) {
+ 	    DejaGnu.pass("Sound::play() method exists");
+ 	} else {
+ 	    DejaGnu.fail("Sound::play() method doesn't exist");
+ 	}
+	#end
+	#if !flash9
+		
+		var x2:Sound = new Sound();
+	//check properties
+	if (Std.is(x2.duration, Float)) {
+	    DejaGnu.pass("Sound::duration property exists");
+	} else {
+	    DejaGnu.fail("Sound::duration property doesn't exist");
+	}
+	if (Std.is(x2.position, Float)) {
+		DejaGnu.pass("Sound::position property exists");
+	} else {
+		DejaGnu.fail("Sound::position property exists");
+	}
+	//check methods
+	if (Type.typeof(x2.attachSound) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::attachSound() method exists");
+	} else {
+	    DejaGnu.fail("Sound::attachSound() method doesn't exist");
+	}
+	if (Type.typeof(x2.getBytesLoaded) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::getBytesLoaded() method exists");
+	} else {
+	    DejaGnu.fail("Sound::getBytesLoaded() method doesn't exist");
+	}
+	if (Type.typeof(x2.getBytesTotal) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::getBytesTotal() method exists");
+	} else {
+	    DejaGnu.fail("Sound::getBytesTotal() method doesn't exist");
+	}
+	if (Type.typeof(x2.getPan) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::getPan() method exists");
+	} else {
+	    DejaGnu.fail("Sound::getPan() method doesn't exist");
+	}
+	if (Type.typeof(x2.getTransform) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::getTransform() method exists");
+	} else {
+	    DejaGnu.fail("Sound::getTransform() method doesn't exist");
+	}
+	if (Type.typeof(x2.getVolume) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::getVolume() method exists");
+	} else {
+	    DejaGnu.fail("Sound::getVolume() method doesn't exist");
+	}
+	if (Type.typeof(x2.loadSound) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::loadSound() method exists");
+	} else {
+	    DejaGnu.fail("Sound::loadSound() method doesn't exist");
+	}
+	if (Type.typeof(x2.setPan) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::setPan() method exists");
+	} else {
+	    DejaGnu.fail("Sound::setPan() method doesn't exist");
+	}
+	if (Type.typeof(x2.setTransform) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::setTransform() method exists");
+	} else {
+	    DejaGnu.fail("Sound::setTransform() method doesn't exist");
+	}
+	if (Type.typeof(x2.setVolume) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::setVolume() method exists");
+	} else {
+	    DejaGnu.fail("Sound::setVolume() method doesn't exist");
+	}
+	if (Type.typeof(x2.start) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::start() method exists");
+	} else {
+	    DejaGnu.fail("Sound::start() method doesn't exist");
+	}
+	if (Type.typeof(x2.stop) == ValueType.TFunction) {
+	    DejaGnu.pass("Sound::stop() method exists");
+	} else {
+	    DejaGnu.fail("Sound::stop() method doesn't exist");
+	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
