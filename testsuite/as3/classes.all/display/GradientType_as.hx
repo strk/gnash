@@ -32,6 +32,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,15 +40,18 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class GradientType_as {
     static function main() {
-
+		
+		var x1 = new GradientType;
+		
+		DejaGnu.note("out1: " + Type.getClass(x1));
         // Make sure we actually get a valid class        
-        if (GradientType.LINEAR != null) {
+        if ( Std.is(GradientType.LINEAR, Enum) && Std.String(GradientType.LINEAER)=="linear" ) {
             DejaGnu.pass("GradientType.LINEAR constant exists");
         } else {
             DejaGnu.fail("GradientType.LINEAR constant doesn't exist");
         }
 
-        if (GradientType.RADIAL != null) {
+        if (Std.is(GradientType.RADIAL, Enum) && Std.String(GradientType.RADIAL)=="radial") {
             DejaGnu.pass("GradientTypee.RADIAL constant exists");
         } else {
             DejaGnu.fail("GradientTypee.RADIAL constant doesn't exist");
