@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.display.PixelSnapping class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value pixelsnapping_ctor(const fn_call& fn);
-    void attachPixelSnappingInterface(as_object& o);
     void attachPixelSnappingStaticInterface(as_object& o);
-    as_object* getPixelSnappingInterface();
-
 }
 
-class PixelSnapping_as : public as_object
-{
-
-public:
-
-    PixelSnapping_as()
-        :
-        as_object(getPixelSnappingInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void pixelsnapping_class_init(as_object& global)
+void
+pixelsnapping_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&pixelsnapping_ctor, getPixelSnappingInterface());
-        attachPixelSnappingStaticInterface(*cl);
-    }
-
-    // Register _global.PixelSnapping
-    global.init_member("PixelSnapping", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachPixelSnappingStaticInterface(*o);
+    global.init_member("PixelSnapping", o);
 }
 
 namespace {
 
 void
-attachPixelSnappingInterface(as_object& o)
-{
-}
-
-void
 attachPixelSnappingStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getPixelSnappingInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachPixelSnappingInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-pixelsnapping_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new PixelSnapping_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 

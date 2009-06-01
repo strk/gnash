@@ -33,7 +33,49 @@ for (i in flash) {
 };
 check_equals(r, "external,net,geom,filters,display,text,");
 
-totals(1);
+check_equals(flash.external.toString(), "[object Object]");
+check_equals(flash.net.toString(), "[object Object]");
+check_equals(flash.geom.toString(), "[object Object]");
+check_equals(flash.filters.toString(), "[object Object]");
+check_equals(flash.display.toString(), "[object Object]");
+check_equals(flash.text.toString(), "[object Object]");
+
+// Check that AS3 packages are not available here.
+check_equals(flash.ui.toString(), undefined);
+check_equals(flash.accessibility.toString(), undefined);
+check_equals(flash.desktop.toString(), undefined);
+check_equals(flash.errors.toString(), undefined);
+check_equals(flash.events.toString(), undefined);
+check_equals(flash.media.toString(), undefined);
+check_equals(flash.printing.toString(), undefined);
+check_equals(flash.sampler.toString(), undefined);
+check_equals(flash.system.toString(), undefined);
+check_equals(flash.utils.toString(), undefined);
+check_equals(flash.xml.toString(), undefined);
+
+ASSetPropFlags(_global.flash, null, 6, true);
+
+r = "";
+for (i in flash) {
+    r += i + ",";
+};
+
+// Gnash has no constructor, but otherwise okay.
+xcheck_equals(r, "external,net,geom,filters,display,text,__proto__,constructor,");
+check_equals(flash.ui.toString(), undefined);
+check_equals(flash.accessibility.toString(), undefined);
+check_equals(flash.desktop.toString(), undefined);
+check_equals(flash.errors.toString(), undefined);
+check_equals(flash.events.toString(), undefined);
+check_equals(flash.media.toString(), undefined);
+check_equals(flash.printing.toString(), undefined);
+check_equals(flash.sampler.toString(), undefined);
+check_equals(flash.system.toString(), undefined);
+check_equals(flash.utils.toString(), undefined);
+check_equals(flash.xml.toString(), undefined);
+
+
+totals(30);
 
 #endif
 

@@ -33,15 +33,19 @@
 namespace gnash {
 
 static as_value
-get_flash_accessibility_package(const fn_call& /*fn*/)
+get_flash_accessibility_package(const fn_call& fn)
 {
-	log_debug("Loading flash.accessibility package");
+    // This package is AS3 only!
+    assert(isAS3(fn.getVM()));
+
+	log_debug("Loading AVM2 flash.accessibility package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (asclasses[++i] != 0) {
-	    asclasses[i](*pkg);
+	while (as3classes[i]) {
+	    as3classes[i](*pkg);
+        ++i;
     }
 
 	return pkg;

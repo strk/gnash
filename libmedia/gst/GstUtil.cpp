@@ -100,7 +100,7 @@ GstElement* GstUtil::get_audiosink_element()
 bool
 GstUtil::check_missing_plugins(GstCaps* caps)
 {
-    GstElementFactory * factory = swfdec_gst_get_element_factory (caps);
+    GstElementFactory * factory = swfdec_gst_get_element_factory(caps);
 
     if (factory) {
         gst_object_unref(factory);
@@ -116,7 +116,7 @@ GstUtil::check_missing_plugins(GstCaps* caps)
                     " Will try anyway, but expect failure."));
     }
 
-    char* detail = gst_missing_decoder_installer_detail_new (caps);
+    char* detail = gst_missing_decoder_installer_detail_new(caps);
     if (!detail) {
         log_error(_("Missing plugin, but failed to convert it to gst"
                     " missing plugin detail."));
@@ -138,7 +138,8 @@ GstUtil::check_missing_plugins(GstCaps* caps)
         return true;
     }
 #else
-    log_error(_("Missing plugin, but plugin installation not available."));
+    log_error(_("Missing plugin, but automatic plugin installation not "
+                "available."));
 #endif
 
     return false;

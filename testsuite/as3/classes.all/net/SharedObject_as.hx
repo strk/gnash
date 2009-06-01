@@ -23,7 +23,7 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
-#error
+//#error
 //FIXME: This test produces a Segmentation Fault
 
 #if flash9

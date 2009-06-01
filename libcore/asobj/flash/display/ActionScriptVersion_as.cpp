@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.display.ActionScriptVersion class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value actionscriptversion_ctor(const fn_call& fn);
-    void attachActionScriptVersionInterface(as_object& o);
     void attachActionScriptVersionStaticInterface(as_object& o);
-    as_object* getActionScriptVersionInterface();
-
 }
 
-class ActionScriptVersion_as : public as_object
-{
-
-public:
-
-    ActionScriptVersion_as()
-        :
-        as_object(getActionScriptVersionInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void actionscriptversion_class_init(as_object& global)
+void
+actionscriptversion_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&actionscriptversion_ctor, getActionScriptVersionInterface());
-        attachActionScriptVersionStaticInterface(*cl);
-    }
-
-    // Register _global.ActionScriptVersion
-    global.init_member("ActionScriptVersion", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachActionScriptVersionStaticInterface(*o);
+    global.init_member("ActionScriptVersion", o);
 }
 
 namespace {
 
 void
-attachActionScriptVersionInterface(as_object& o)
-{
-}
-
-void
 attachActionScriptVersionStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getActionScriptVersionInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachActionScriptVersionInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-actionscriptversion_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new ActionScriptVersion_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 

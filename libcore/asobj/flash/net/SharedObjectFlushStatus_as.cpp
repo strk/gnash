@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.net.SharedObjectFlushStatus class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value sharedobjectflushstatus_ctor(const fn_call& fn);
-    void attachSharedObjectFlushStatusInterface(as_object& o);
     void attachSharedObjectFlushStatusStaticInterface(as_object& o);
-    as_object* getSharedObjectFlushStatusInterface();
-
 }
 
-class SharedObjectFlushStatus_as : public as_object
-{
-
-public:
-
-    SharedObjectFlushStatus_as()
-        :
-        as_object(getSharedObjectFlushStatusInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void sharedobjectflushstatus_class_init(as_object& global)
+void
+sharedobjectflushstatus_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&sharedobjectflushstatus_ctor, getSharedObjectFlushStatusInterface());
-        attachSharedObjectFlushStatusStaticInterface(*cl);
-    }
-
-    // Register _global.SharedObjectFlushStatus
-    global.init_member("SharedObjectFlushStatus", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachSharedObjectFlushStatusStaticInterface(*o);
+    global.init_member("SharedObjectFlushStatus", o);
 }
 
 namespace {
 
 void
-attachSharedObjectFlushStatusInterface(as_object& o)
-{
-}
-
-void
 attachSharedObjectFlushStatusStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getSharedObjectFlushStatusInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSharedObjectFlushStatusInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-sharedobjectflushstatus_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new SharedObjectFlushStatus_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 

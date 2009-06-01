@@ -25,6 +25,7 @@
 #include "SWFStream.h" // for inlines
 #include "abc_block.h"
 #include "Machine.h"
+#include "VM.h"
 
 // Forward declarations
 namespace gnash {
@@ -36,7 +37,7 @@ namespace SWF {
 
 /// SWF Tag DoABC (72)
 //
-///
+/// Execute an ABC tag. This is AVM2 bytecode.
 class DoABCTag : public ControlTag
 {
 public:
@@ -44,7 +45,8 @@ public:
     virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
 		VM& vm = m->getVM();
-		log_debug("getting machine.");
+        
+        log_debug("getting machine.");
 		Machine *mach = vm.getMachine();
 		as_object* global = vm.getGlobal();
 		

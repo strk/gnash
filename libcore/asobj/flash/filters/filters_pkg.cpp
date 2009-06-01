@@ -45,14 +45,17 @@ namespace gnash {
 static as_value
 get_flash_filters_package(const fn_call& /*fn*/)
 {
+
+    // TODO: there are differences between AS2 and AS3 here.
+
 	log_debug("Loading flash.filters package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 	do {
-	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+	    as3classes[i](*pkg);
+	} while (as3classes[++i] != 0);
 
 	return pkg;
 }

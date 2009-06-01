@@ -36,16 +36,21 @@
 namespace gnash {
 
 static as_value
-get_flash_geom_package(const fn_call& /*fn*/)
+get_flash_geom_package(const fn_call& fn)
 {
-	log_debug("Loading flash.geom package");
+    const bool as3 = isAS3(fn.getVM());
+
+    // The classes in this package are all both AS2 and AS3 (as far as we
+    // know).
+	log_debug("Loading %s flash.geom package", as3 ? "AVM2" : "AVM1");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	do {
-	    asclasses[i](*pkg);
-	} while (asclasses[++i] != 0);
+	while (as3classes[i]) {
+	    as3classes[i](*pkg);
+        ++i;
+    }
 
 	return pkg;
 }

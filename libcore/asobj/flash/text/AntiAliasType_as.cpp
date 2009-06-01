@@ -25,75 +25,34 @@
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "Object.h" 
+
+/// The flash.text.AntiAliasType class is AS3 only. It enumerates
+/// constants for use in other classes.
 
 namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value antialiastype_ctor(const fn_call& fn);
-    void attachAntiAliasTypeInterface(as_object& o);
     void attachAntiAliasTypeStaticInterface(as_object& o);
-    as_object* getAntiAliasTypeInterface();
-
 }
 
-class AntiAliasType_as : public as_object
-{
-
-public:
-
-    AntiAliasType_as()
-        :
-        as_object(getAntiAliasTypeInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void antialiastype_class_init(as_object& global)
+void
+antialiastype_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&antialiastype_ctor, getAntiAliasTypeInterface());
-        attachAntiAliasTypeStaticInterface(*cl);
-    }
-
-    // Register _global.AntiAliasType
-    global.init_member("AntiAliasType", cl.get());
+    static as_object* o = new as_object(getObjectInterface());
+    attachAntiAliasTypeStaticInterface(*o);
+    global.init_member("AntiAliasType", o);
 }
 
 namespace {
 
 void
-attachAntiAliasTypeInterface(as_object& o)
-{
-}
-
-void
 attachAntiAliasTypeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getAntiAliasTypeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachAntiAliasTypeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-antialiastype_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new AntiAliasType_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: add constants here.
 }
 
 } // anonymous namespace 
