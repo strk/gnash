@@ -24,6 +24,10 @@
 # include "gnashconfig.h"
 #endif
 
+#ifdef SOLARIS
+# include <ieeefp.h> // for finite()
+#endif
+
 #include <cmath>
 #include <algorithm>
 #include <boost/cstdint.hpp>
