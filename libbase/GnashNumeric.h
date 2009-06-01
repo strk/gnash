@@ -24,7 +24,7 @@
 # include "gnashconfig.h"
 #endif
 
-#ifdef SOLARIS
+#ifdef SOLARIS_HOST
 # include <ieeefp.h> // for finite()
 #endif
 
