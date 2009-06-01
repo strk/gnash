@@ -23,13 +23,14 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+
+//NOTE: this is a new class for as3 (flash v. and >)
+
+
 #if flash9
 import flash.media.SoundTransform;
 import flash.media.SoundChannel;
 import flash.display.MovieClip;
-#else
-import flash.SoundTransform;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -51,45 +52,36 @@ class SoundTransform_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.leftToLeft == 0) {
+	if (Type.typeof(x1.leftToLeft) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundTransform::leftToLeft property exists");
 	} else {
 	    DejaGnu.fail("SoundTransform::leftToLeft property doesn't exist");
 	}
-	if (x1.leftToRight == 0) {
+	if (Type.typeof(x1.leftToRight) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundTransform::leftToRight property exists");
 	} else {
 	    DejaGnu.fail("SoundTransform::leftToRight property doesn't exist");
 	}
-	if (x1.pan == 0) {
+	if (Type.typeof(x1.pan) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundTransform::pan property exists");
 	} else {
 	    DejaGnu.fail("SoundTransform::pan property doesn't exist");
 	}
-	if (x1.rightToLeft == 0) {
+	if (Type.typeof(x1.rightToLeft) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundTransform::rightToLeft property exists");
 	} else {
 	    DejaGnu.fail("SoundTransform::rightToLeft property doesn't exist");
 	}
-	if (x1.rightToRight == 0) {
+	if (Type.typeof(x1.rightToRight) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundTransform::rightToRight property exists");
 	} else {
 	    DejaGnu.fail("SoundTransform::rightToRight property doesn't exist");
 	}
-	if (x1.volume == 0) {
+	if (Type.typeof(x1.volume) == ValueType.TFloat) {
 	    DejaGnu.pass("SoundTransform::volume property exists");
 	} else {
 	    DejaGnu.fail("SoundTransform::volume property doesn't exist");
 	}
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.SoundTransform == 0) {
-// 	    DejaGnu.pass("SoundTransform::SoundTransform() method exists");
-// 	} else {
-// 	    DejaGnu.fail("SoundTransform::SoundTransform() method doesn't exist");
-// 	}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

@@ -27,11 +27,12 @@
 import flash.filters.GradientGlowFilter;
 import flash.display.MovieClip;
 #else
-import flash.GradientGlowFilter;
+import flash.filters.GradientGlowFilter;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -50,57 +51,57 @@ class GradientGlowFilter_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.alphas == 0) {
+	if (Std.is(x1.alphas, Array)) {
 	    DejaGnu.pass("GradientGlowFilter.alphas property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.alphas property doesn't exist");
 	}
-	if (x1.angle == 0) {
+	if (Type.typeof(x1.angle) == ValueType.TFloat) {
 	    DejaGnu.pass("GradientGlowFilter.angle property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.angle property doesn't exist");
 	}
-	if (x1.blurX == 0) {
+	if (Type.typeof(x1.blurX) == ValueType.TFloat) {
 	    DejaGnu.pass("GradientGlowFilter.blurX property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.blurX property doesn't exist");
 	}
-	if (x1.blurY == 0) {
+	if (Type.typeof(x1.blurY) == ValueType.TFloat) {
 	    DejaGnu.pass("GradientGlowFilter.blurY property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.blurY property doesn't exist");
 	}
-	if (x1.colors == 0) {
+	if (Std.is(x1.colors, Array)) {
 	    DejaGnu.pass("GradientGlowFilter.colors property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.colors property doesn't exist");
 	}
-	if (x1.distance == 0) {
+	if (Type.typeof(x1.distance) == ValueType.TFloat) {
 	    DejaGnu.pass("GradientGlowFilter.distance property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.distance property doesn't exist");
 	}
-	if (x1.knockout == false) {
+	if (Type.typeof(x1.knockout) == ValueType.TBool) {
 	    DejaGnu.pass("GradientGlowFilter.knockout property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.knockout property doesn't exist");
 	}
-	if (x1.quality == 0) {
+	if (Type.typeof(x1.quality) == ValueType.TInt) {
 	    DejaGnu.pass("GradientGlowFilter.quality property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.quality property doesn't exist");
 	}
-	if (x1.ratios == 0) {
+	if (Std.is(x1.ratios, Array)) {
 	    DejaGnu.pass("GradientGlowFilter.ratios property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.ratios property doesn't exist");
 	}
-	if (x1.strength == 0) {
+	if (Type.typeof(x1.strength) == ValueType.TFloat) {
 	    DejaGnu.pass("GradientGlowFilter.strength property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.strength property doesn't exist");
 	}
-	if (x1.type == null) {
+	if (Std.is(x1.type, String)) {
 	    DejaGnu.pass("GradientGlowFilter.type property exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter.type property doesn't exist");
@@ -109,12 +110,7 @@ class GradientGlowFilter_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.GradientGlowFilter == false) {
-	    DejaGnu.pass("GradientGlowFilter::GradientGlowFilter() method exists");
-	} else {
-	    DejaGnu.fail("GradientGlowFilter::GradientGlowFilter() method doesn't exist");
-	}
-	if (x1.clone == BitmapFilter) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("GradientGlowFilter::clone() method exists");
 	} else {
 	    DejaGnu.fail("GradientGlowFilter::clone() method doesn't exist");

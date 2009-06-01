@@ -27,7 +27,7 @@
 import flash.filters.BlurFilter;
 import flash.display.MovieClip;
 #else
-import flash.BlurFilter;
+import flash.filters.BlurFilter;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -50,17 +50,17 @@ class BlurFilter_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.blurX == 0) {
+	if (Type.typeof(x1.blurX) == ValueType.TFloat) {
 	    DejaGnu.pass("BlurFilter.blurX property exists");
 	} else {
 	    DejaGnu.fail("BlurFilter.blurX property doesn't exist");
 	}
-	if (x1.blurY == 0) {
+	if (Type.typeof(x1.blurY) == ValueType.TFloat) {
 	    DejaGnu.pass("BlurFilter.blurY property exists");
 	} else {
 	    DejaGnu.fail("BlurFilter.blurY property doesn't exist");
 	}
-	if (x1.quality == 0) {
+	if (Type.typeof(x1.quality) == ValueType.TInt) {
 	    DejaGnu.pass("BlurFilter.quality property exists");
 	} else {
 	    DejaGnu.fail("BlurFilter.quality property doesn't exist");
@@ -69,12 +69,7 @@ class BlurFilter_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.BlurFilter == 0) {
-	    DejaGnu.pass("BlurFilter::BlurFilter() method exists");
-	} else {
-	    DejaGnu.fail("BlurFilter::BlurFilter() method doesn't exist");
-	}
-	if (x1.clone == BitmapFilter) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("BlurFilter::clone() method exists");
 	} else {
 	    DejaGnu.fail("BlurFilter::clone() method doesn't exist");

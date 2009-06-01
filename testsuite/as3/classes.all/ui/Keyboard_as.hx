@@ -30,6 +30,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -41,12 +42,12 @@ class Keyboard_as {
 			// Tests to see if all the properties exist. All these do is test for
 			// existance of a property, and don't test the functionality at all. This
 			// is primarily useful only to test completeness of the API implementation.
-				if (Keyboard.capsLock == false || true) {
+				if (Type.typeof(Keyboard.capsLock) == ValueType.TBool) {
 					DejaGnu.pass("Keyboard.capsLock property exists");
 				} else {
 					DejaGnu.fail("Keyboard.capsLock property doesn't exist");
 				}
-				if (Keyboard.numLock == false || true) {
+				if (Type.typeof(Keyboard.numLock) == ValueType.TBool) {
 					DejaGnu.pass("Keyboard.numLock property exists");
 				} else {
 					DejaGnu.fail("Keyboard.numLock property doesn't exist");
@@ -142,7 +143,7 @@ class Keyboard_as {
 				} else {
 					DejaGnu.fail("Keyboard::C() method doesn't exist");
 				}
-				if (Keyboard.CharCodeStrings == 0) {
+				if (Std.is(Keyboard.CharCodeStrings, Array)) {
 					DejaGnu.pass("Keyboard::CharCodeStrings() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::CharCodeStrings() method doesn't exist");
@@ -177,17 +178,12 @@ class Keyboard_as {
 				} else {
 					DejaGnu.fail("Keyboard::F() method doesn't exist");
 				}
-				if (Keyboard.G == 71) {
-					DejaGnu.pass("Keyboard::G() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::G() method doesn't exist");
-				}
 				if (Keyboard.H == 72) {
 					DejaGnu.pass("Keyboard::H() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::H() method doesn't exist");
 				}
-				if (Keyboard.I == 0) {
+				if (Keyboard.I == 73) {
 					DejaGnu.pass("Keyboard::I() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::I() method doesn't exist");
@@ -202,492 +198,179 @@ class Keyboard_as {
 				} else {
 					DejaGnu.fail("Keyboard::K() method doesn't exist");
 				}
-				if (Keyboard.BEGIN) {
+				//if this keeps failing for no apparent reason check to see if
+				//the return value is any string
+				if (Keyboard.BEGIN == "Begin") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.BREAK) {
+				if (Keyboard.BREAK == "Break") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.CLEARDISPLAY) {
+				if (Keyboard.CLEARDISPLAY == "ClrDsp") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.CLEARLINE) {
+				if (Keyboard.CLEARLINE == "ClrLn") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.DELETE) {
+				if (Keyboard.DELETE == "Delete") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.DELETECHAR) {
+				if (Keyboard.DELETECHAR == "DelChr") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.DELETELINE) {
+				if (Keyboard.DELETELINE == "DelLn") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.DOWNARROW) {
+				if (Keyboard.DOWNARROW == "Down") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.END) {
+				if (Keyboard.END == "End") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.EXECUTE) {
+				if (Keyboard.EXECUTE == "Exec") {
 					DejaGnu.pass("Keyboard::KEYNAME() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
 				}
-				if (Keyboard.F1) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F10) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F11) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F12) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F13) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F14) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F15) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F16) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F17) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F18) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F19) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F2) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F20) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F21) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F22) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F23) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F24) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F25) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F26) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F27) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F28) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F29) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F3) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F30) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F31) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F32) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F33) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F34) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F35) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F4) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F5) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F6) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F7) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F8) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.F9) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.FIND) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.HELP) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.HOME) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.INSERT) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.INSERTCHAR) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.INSERTLINE) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.LEFTARROW) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.MENU) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.MODESWITCH) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.NEXT) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.PAGEDOWN) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.PAGEUP) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.PAUSE) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.PREV) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.PRINT) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.PRINTSCREEN) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.REDO) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.RESET) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.RIGHTARROW) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.SCROLLLOCK) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.SELECT) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.STOP) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.SYSREQ) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.SYSTEM) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.UNDO) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.UPARROW) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.USER) {
-					DejaGnu.pass("Keyboard::KEYNAME() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::KEYNAME() method doesn't exist");
-				}
-				if (Keyboard.L == 0) {
+				if (Keyboard.L == 76) {
 					DejaGnu.pass("Keyboard::L() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::L() method doesn't exist");
 				}
-				if (Keyboard.LEFT == 0) {
-					DejaGnu.pass("Keyboard::LEFT() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::LEFT() method doesn't exist");
-				}
-				if (Keyboard.LEFTBRACKET == 0) {
+				if (Keyboard.LEFTBRACKET == 219) {
 					DejaGnu.pass("Keyboard::LEFTBRACKET() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::LEFTBRACKET() method doesn't exist");
 				}
-				if (Keyboard.M == 0) {
+				if (Keyboard.M == 77) {
 					DejaGnu.pass("Keyboard::M() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::M() method doesn't exist");
 				}
-				if (Keyboard.MINUS == 0) {
+				if (Keyboard.MINUS == 189) {
 					DejaGnu.pass("Keyboard::MINUS() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::MINUS() method doesn't exist");
 				}
-				if (Keyboard.N == 0) {
+				if (Keyboard.N == 78) {
 					DejaGnu.pass("Keyboard::N() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::N() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 0) {
+				if (Keyboard.NUMBER_0 == 48) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 1) {
+				if (Keyboard.NUMBER_1 == 49) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 2) {
+				if (Keyboard.NUMBER_2 == 50) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 3) {
+				if (Keyboard.NUMBER_3 == 51) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 4) {
+				if (Keyboard.NUMBER_4 == 52) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 5) {
+				if (Keyboard.NUMBER_5 == 53) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 6) {
+				if (Keyboard.NUMBER_6 == 54) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 7) {
+				if (Keyboard.NUMBER_7 == 55) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 8) {
+				if (Keyboard.NUMBER_8 == 56) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMBER == 9) {
+				if (Keyboard.NUMBER_9 == 57) {
 					DejaGnu.pass("Keyboard::NUMBER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMBER() method doesn't exist");
 				}
-				if (Keyboard.NUMPAD == 0) {
+				if (Keyboard.NUMPAD == 21) {
 					DejaGnu.pass("Keyboard::NUMPAD() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMPAD() method doesn't exist");
 				}
-				if (Keyboard.O == 0) {
+				if (Keyboard.O == 79) {
 					DejaGnu.pass("Keyboard::O() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::O() method doesn't exist");
 				}
-				if (Keyboard.P == 0) {
+				if (Keyboard.P == 80) {
 					DejaGnu.pass("Keyboard::P() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::P() method doesn't exist");
 				}
-				if (Keyboard.PERIOD == 0) {
+				if (Keyboard.PERIOD == 190) {
 					DejaGnu.pass("Keyboard::PERIOD() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::PERIOD() method doesn't exist");
 				}
-				if (Keyboard.Q == 0) {
+				if (Keyboard.Q == 81) {
 					DejaGnu.pass("Keyboard::Q() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::Q() method doesn't exist");
 				}
-				if (Keyboard.QUOTE == 0) {
+				if (Keyboard.QUOTE == 222) {
 					DejaGnu.pass("Keyboard::QUOTE() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::QUOTE() method doesn't exist");
 				}
-				if (Keyboard.R == 0) {
+				if (Keyboard.R == 82) {
 					DejaGnu.pass("Keyboard::R() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::R() method doesn't exist");
 				}
-				if (Keyboard.RIGHTBRACKET == 0) {
+				if (Keyboard.RIGHTBRACKET == 221) {
 					DejaGnu.pass("Keyboard::RIGHTBRACKET() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::RIGHTBRACKET() method doesn't exist");
 				}
-				if (Keyboard.S == 0) {
+				if (Keyboard.S == 83) {
 					DejaGnu.pass("Keyboard::S() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::S() method doesn't exist");
 				}
-				if (Keyboard.SEMICOLON == 0) {
+				if (Keyboard.SEMICOLON == 186) {
 					DejaGnu.pass("Keyboard::SEMICOLON() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::SEMICOLON() method doesn't exist");
@@ -697,397 +380,392 @@ class Keyboard_as {
 				} else {
 					DejaGnu.fail("Keyboard::SLASH() method doesn't exist");
 				}
-				if (Keyboard.STRING_BEGIN) {
+				if (Std.is(Keyboard.STRING_BEGIN, String) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_BREAK) {
+				if (Std.is(Keyboard.STRING_BREAK, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_CLEARDISPLAY) {
+				if (Std.is(Keyboard.STRING_CLEARDISPLAY, String) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_CLEARLINE) {
+				if (Std.is(Keyboard.STRING_CLEARLINE, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_DELETE) {
+				if (Std.is(Keyboard.STRING_DELETE, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_DELETECHAR) {
+				if (Std.is(Keyboard.STRING_DELETECHAR, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_DELETELINE) {
+				  if (Std.is(Keyboard.STRING_DELETELINE, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_DOWNARROW) {
+				  if (Std.is(Keyboard.STRING_DOWNARROW, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_END) {
+				  if (Std.is(Keyboard.STRING_END, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_EXECUTE) {
+				  if (Std.is(Keyboard.STRING_EXECUTE, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F1) {
+				  if (Std.is(Keyboard.STRING_F1, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F10) {
+				  if (Std.is(Keyboard.STRING_F10, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F11) {
+				  if (Std.is(Keyboard.STRING_F11, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F12) {
+				  if (Std.is(Keyboard.STRING_F12, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F13) {
+				  if (Std.is(Keyboard.STRING_F13, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F14) {
+				  if (Std.is(Keyboard.STRING_F14, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F15) {
+				  if (Std.is(Keyboard.STRING_F15, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F16) {
+				  if (Std.is(Keyboard.STRING_F16, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F17) {
+				  if (Std.is(Keyboard.STRING_F17, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F18) {
+				  if (Std.is(Keyboard.STRING_F18, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F19) {
+				  if (Std.is(Keyboard.STRING_F19, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F2) {
+				  if (Std.is(Keyboard.STRING_F2, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F20) {
+				  if (Std.is(Keyboard.STRING_F20, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F21) {
+				  if (Std.is(Keyboard.STRING_F21, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F22) {
+				  if (Std.is(Keyboard.STRING_F22, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F23) {
+				  if (Std.is(Keyboard.STRING_F23, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F24) {
+				  if (Std.is(Keyboard.STRING_F24, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F25) {
+				  if (Std.is(Keyboard.STRING_F25, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F26) {
+				  if (Std.is(Keyboard.STRING_F26, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F27) {
+				  if (Std.is(Keyboard.STRING_F27, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F28) {
+				  if (Std.is(Keyboard.STRING_F28, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F29) {
+				  if (Std.is(Keyboard.STRING_F29, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F3) {
+				  if (Std.is(Keyboard.STRING_F3, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F30) {
+				  if (Std.is(Keyboard.STRING_F30, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F31) {
+				  if (Std.is(Keyboard.STRING_F31, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F32) {
+				  if (Std.is(Keyboard.STRING_F32, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F33) {
+				  if (Std.is(Keyboard.STRING_F33, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F34) {
+				  if (Std.is(Keyboard.STRING_F34, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F35) {
+				  if (Std.is(Keyboard.STRING_F35, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F4) {
+				  if (Std.is(Keyboard.STRING_F4, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F5) {
+				  if (Std.is(Keyboard.STRING_F5, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F6) {
+				  if (Std.is(Keyboard.STRING_F6, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F7) {
+				  if (Std.is(Keyboard.STRING_F7, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F8) {
+				  if (Std.is(Keyboard.STRING_F8, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_F9) {
+				  if (Std.is(Keyboard.STRING_F9, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_FIND) {
+				  ifStd.is( (Keyboard.STRING_FIND, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_HELP) {
+				  if (Std.is(Keyboard.STRING_HELP, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_HOME) {
+				  if (Std.is(Keyboard.STRING_HOME, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_INSERT) {
+				  if (Std.is(Keyboard.STRING_INSERT, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_INSERTCHAR) {
+				  if (Std.is(Keyboard.STRING_INSERTCHAR, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_INSERTLINE) {
+				  if (Std.is(Keyboard.STRING_INSERTLINE, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_LEFTARROW) {
+				  if (Std.is(Keyboard.STRING_LEFTARROW, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_MENU) {
+				  if (Std.is(Keyboard.STRING_MENU, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_MODESWITCH) {
+				  if (Std.is(Keyboard.STRING_MODESWITCH, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_NEXT) {
+				  if (Std.is(Keyboard.STRING_NEXT, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_PAGEDOWN) {
+				  if (Std.is(Keyboard.STRING_PAGEDOWN, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_PAGEUP) {
+				  if (Std.is(Keyboard.STRING_PAGEUP, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_PAUSE) {
+				  if (Std.is(Keyboard.STRING_PAUSE, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_PREV) {
+				  if (Std.is(Keyboard.STRING_PREV, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_PRINT) {
+				  if (Std.is(Keyboard.STRING_PRINT, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_PRINTSCREEN) {
+				  if (Std.is(Keyboard.STRING_PRINTSCREEN, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_REDO) {
+				  if (Std.is(Keyboard.STRING_REDO, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_RESET) {
+				  if (Std.is(Keyboard.STRING_RESET, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_RIGHTARROW) {
+				  if (Std.is(Keyboard.STRING_RIGHTARROW, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_SCROLLLOCK) {
+				  if (Std.is(Keyboard.STRING_SCROLLLOCK, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_SELECT) {
+				  if (Std.is(Keyboard.STRING_SELECT, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_STOP) {
+				  if (Std.is(Keyboard.STRING_STOP, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.STRING_SYSREQ) {
+				  if (Std.is(Keyboard.STRING_SYSREQ, String)) {
 					DejaGnu.pass("Keyboard::STRING() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
 				}
-				if (Keyboard.SYSTEM) {
-					DejaGnu.pass("Keyboard::SYSTEM() method exists");
-				} else {
-					DejaGnu.fail("Keyboard::STRING() method doesn't exist");
-				}
-				if (Keyboard.UNDO) {
+				  if (Std.is(Keyboard.UNDO, String)) {
 					DejaGnu.pass("Keyboard::UNDO() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::UNDO() method doesn't exist");
 				}
-				if (Keyboard.UPARROW) {
+				  if (Std.is(Keyboard.UPARROW, String)) {
 					DejaGnu.pass("Keyboard::UPARROW() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::(UPARROW) method doesn't exist");
 				}
-				if (Keyboard.USER) {
+				  if (Std.is(Keyboard.USER, String)) {
 					DejaGnu.pass("Keyboard::USER() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::USER() method doesn't exist");
 				}
-				if (Keyboard.T == 0) {
+				if (Keyboard.T == 84) {
 					DejaGnu.pass("Keyboard::T() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::T() method doesn't exist");
 				}
-				 if (Keyboard.U == 0) {
+				 if (Keyboard.U == 85) {
 					DejaGnu.pass("Keyboard::U() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::U() method doesn't exist");
 				}
-				if (Keyboard.V == 0) {
+				if (Keyboard.V == 86) {
 					DejaGnu.pass("Keyboard::V() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::V() method doesn't exist");
 				}
-				if (Keyboard.W == 0) {
+				if (Keyboard.W == 87) {
 					DejaGnu.pass("Keyboard::W() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::W() method doesn't exist");
 				}
-				if (Keyboard.X == 0) {
+				  if (Keyboard.X == 88) {
 					DejaGnu.pass("Keyboard::X() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::X() method doesn't exist");
 				}
-				if (Keyboard.Y == 0) {
+				if (Keyboard.Y == 89) {
 					DejaGnu.pass("Keyboard::Y() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::Y() method doesn't exist");
 				}
-				if (Keyboard.Z == 0) {
+				if (Keyboard.Z == 90) {
 					DejaGnu.pass("Keyboard::Z() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::Z() method doesn't exist");
@@ -1279,7 +957,7 @@ class Keyboard_as {
 				} else {
 					DejaGnu.fail("Keyboard::NUMPAD() method doesn't exist");
 				}
-				if (Keyboard.NUMPAD_DIVIDE == 109) {
+				if (Keyboard.NUMPAD_DIVIDE == 111) {
 					DejaGnu.pass("Keyboard::NUMPAD() method exists");
 				} else {
 					DejaGnu.fail("Keyboard::NUMPAD() method doesn't exist");
@@ -1336,7 +1014,7 @@ class Keyboard_as {
 				}
 		#end
 		//checking old classes
-		#if (!flash9 && !!flash)
+		#if (!flash9)
 				if (Key.BACKSPACE == 8) {
 					DejaGnu.pass("Key::BACKSPACE() method exists");
 				} else {
@@ -1386,6 +1064,21 @@ class Keyboard_as {
 					DejaGnu.pass("Key::INSERT() method exists");
 				} else {
 					DejaGnu.fail("Key::INSERT() method doesn't exist");
+				}
+				if (Key.LEFT == 37) {
+					DejaGnu.pass("Key::LEFT() method exists");
+				} else {
+					DejaGnu.fail("Key::LEFT() method doesn't exist");
+				}
+				if (Key.PGDN == 34) {
+					DejaGnu.pass("Key::PGDN() method exists");
+				} else {
+					DejaGnu.fail("Key::PGDN() method doesn't exist");
+				}
+				if (Key.PGUP == 33) {
+					DejaGnu.pass("Key::PGUP() method exists");
+				} else {
+					DejaGnu.fail("Key::PGUP() method doesn't exist");
 				}
 				if (Key.RIGHT == 39) {
 					DejaGnu.pass("Key::RIGHT() method exists");

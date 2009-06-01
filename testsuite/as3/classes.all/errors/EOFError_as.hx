@@ -26,9 +26,6 @@
 #if flash9
 import flash.errors.EOFError;
 import flash.display.MovieClip;
-#else
-import flash.EOFError;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class EOFError_as {
     static function main() {
-        var x1:EOFError = new EOFError();
+        #if !flash9
+		DejaGnu.note("this class didn't exist before flash 9");
+		#end
+		
+		#if flash9
+		var x1:EOFError = new EOFError();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -47,11 +49,8 @@ class EOFError_as {
         } else {
             DejaGnu.fail("EOFError class doesn't exist");
         }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		#end
+		
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

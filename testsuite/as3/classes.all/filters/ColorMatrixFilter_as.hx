@@ -27,11 +27,12 @@
 import flash.filters.ColorMatrixFilter;
 import flash.display.MovieClip;
 #else
-import flash.ColorMatrixFilter;
+import flash.filters.ColorMatrixFilter;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -50,7 +51,7 @@ class ColorMatrixFilter_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.matrix == 0) {
+	if (Std.is(x1.matrix, Array)) {
 	    DejaGnu.pass("ColorMatrixFilter.matrix property exists");
 	} else {
 	    DejaGnu.fail("ColorMatrixFilter.matrix property doesn't exist");
@@ -59,12 +60,7 @@ class ColorMatrixFilter_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.ColorMatrixFilter == 0) {
-	    DejaGnu.pass("ColorMatrixFilter::ColorMatrixFilter() method exists");
-	} else {
-	    DejaGnu.fail("ColorMatrixFilter::ColorMatrixFilter() method doesn't exist");
-	}
-	if (x1.clone == BitmapFilter) {
+	if (Type.TypeOf(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("ColorMatrixFilter::clone() method exists");
 	} else {
 	    DejaGnu.fail("ColorMatrixFilter::clone() method doesn't exist");

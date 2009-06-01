@@ -23,13 +23,12 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+// Note: only works with flash v9 and above
+
 #if flash9
 import flash.media.SoundMixer;
 import flash.media.SoundTransform;
 import flash.display.MovieClip;
-#else
-import flash.SoundMixer;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -43,12 +42,12 @@ class SoundMixer_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (SoundMixer.bufferTime == 0) {
+	if (Type.typeof(SoundMixer.bufferTime) == ValueType.TInt) {
 	    DejaGnu.pass("SoundMixer::bufferTime property exists");
 	} else {
 	    DejaGnu.fail("SoundMixer::bufferTime property doesn't exist");
 	}
-	if (SoundMixer.soundTransform == SoundTransform) {
+	if (Type.typeof(SoundMixer.soundTransform) == ValueType.TObject) {
 	    DejaGnu.pass("SoundMixer::soundTransform property exists");
 	} else {
 	    DejaGnu.fail("SoundMixer::soundTransform property doesn't exist");
@@ -57,17 +56,17 @@ class SoundMixer_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (SoundMixer.areSoundsInaccessible == null) {
+	if (Type.typeof(SoundMixer.areSoundsInaccessible) == ValueType.TFunction) {
 	    DejaGnu.pass("SoundMixer::areSoundsInaccessible() method exists");
 	} else {
 	    DejaGnu.fail("SoundMixer::areSoundsInaccessible() method doesn't exist");
 	}
-	if (SoundMixer.computeSpectrum == null) {
+	if (Type.typeof(SoundMixer.computeSpectrum) == ValueType.TFunction) {
 	    DejaGnu.pass("SoundMixer::computeSpectrum() method exists");
 	} else {
 	    DejaGnu.fail("SoundMixer::computeSpectrum() method doesn't exist");
 	}
-	if (SoundMixer.stopAll == null) {
+	if (Type.typeof(SoundMixer.stopAll) == ValueType.TFunction) {
 	    DejaGnu.pass("SoundMixer::stopAll() method exists");
 	} else {
 	    DejaGnu.fail("SoundMixer::stopAll() method doesn't exist");

@@ -26,9 +26,6 @@
 #if flash9
 import flash.filters.BitmapFilterQuality;
 import flash.display.MovieClip;
-#else
-import flash.BitmapFilterQuality;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class BitmapFilterQuality_as {
     static function main() {
-        var x1:BitmapFilterQuality = new BitmapFilterQuality();
+        #if !flash9
+		DejaGnu.note("This is only valid for Flash v9 and greater.");
+		#end
+		#if flash9
+		var x1:BitmapFilterQuality = new BitmapFilterQuality();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -47,11 +48,7 @@ class BitmapFilterQuality_as {
         } else {
             DejaGnu.fail("BitmapFilterQuality class doesn't exist");
         }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
