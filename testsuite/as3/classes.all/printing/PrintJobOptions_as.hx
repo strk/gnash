@@ -27,8 +27,8 @@
 import flash.printing.PrintJobOptions;
 import flash.display.MovieClip;
 #else
-import flash.PrintJobOptions;
-import flash.MovieClip;
+//import flash.PrintJobOptions;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,22 +39,30 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class PrintJobOptions_as {
     static function main() {
+
+#if !flash9
+		DejaGnu.note("PrintJobOptions does not exist prior to flash9");
+
+#else
         var x1:PrintJobOptions = new PrintJobOptions();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("PrintJobOptions class exists");
-        } else {
-            DejaGnu.fail("PrintJobOptions class doesn't exist");
-        }
+        // Make sure we actually get a valid class
+		if (x1 != null) {
+				   DejaGnu.pass("PrintJobOptions class exists");
+			   } else {
+				   DejaGnu.fail("PrintJobOptions class doesn't exist");
+			   }       
+			   
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.printAsBitmap == false) {
+	if (Type.typeof(x1.printAsBitmap) == ValueType.TBool) {
 	    DejaGnu.pass("PrintJobOptions.printAsBitmap property exists");
 	} else {
 	    DejaGnu.fail("PrintJobOptions.printAsBitmap property doesn't exist");
 	}
+	
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

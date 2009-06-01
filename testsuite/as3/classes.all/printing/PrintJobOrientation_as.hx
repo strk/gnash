@@ -27,11 +27,12 @@
 import flash.printing.PrintJobOrientation;
 import flash.display.MovieClip;
 #else
-import flash.PrintJobOrientation;
-import flash.MovieClip;
+//import flash.PrintJobOrientation;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,6 +40,10 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class PrintJobOrientation_as {
     static function main() {
+
+#if !flash9
+		DejaGnu.note("PrintJobOrientation does not exist in versions prior to flash9");
+#else
 
         // Make sure we actually get a valid class        
         if (PrintJobOrientation != null) {
@@ -50,7 +55,19 @@ class PrintJobOrientation_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+		if (Std.is(PrintJobOrientation.LANDSCAPE, String) && Std.string(PrintJobOrientation.LANDSCAPE)=="landscape" ) {
+			DejaGnu.pass("PrintJobOrientation::LANDSCAPE constant exists");
+		} else {
+			DejaGnu.fail("PrintJobOrientation::LANDSCAPE constant does not exist");
+		}
+		
+		if (Std.is(PrintJobOrientation.PORTRAIT, String) && Std.string(PrintJobOrientation.PORTRAIT)=="portrait" ) {
+			DejaGnu.pass("PrintJobOrientation::LANDSCAPE constant exists");
+		} else {
+			DejaGnu.fail("PrintJobOrientation::LANDSCAPE constant does not exist");
+		}
 
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

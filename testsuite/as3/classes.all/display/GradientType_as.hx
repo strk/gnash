@@ -27,8 +27,8 @@
 import flash.display.GradientType;
 import flash.display.MovieClip;
 #else
-import flash.GradientType;
-import flash.MovieClip;
+//import flash.GradientType;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
