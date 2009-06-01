@@ -32,6 +32,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -40,18 +41,26 @@ import DejaGnu;
 class GradientType_as {
     static function main() {
 
+#if !flash9
+		DejaGnu.note("GradientType does not exist in versions prior to flash9");
+
+#else		
+		
+		//DejaGnu.note("out1: " + Type.getClassFields(GradientType));
         // Make sure we actually get a valid class        
-        if (GradientType.LINEAR != null) {
+        if ( Std.is(GradientType.LINEAR, String) && Std.string(GradientType.LINEAR)=="linear" ) {
             DejaGnu.pass("GradientType.LINEAR constant exists");
         } else {
             DejaGnu.fail("GradientType.LINEAR constant doesn't exist");
         }
 
-        if (GradientType.RADIAL != null) {
+        if (Std.is(GradientType.RADIAL, String) && Std.string(GradientType.RADIAL)=="radial") {
             DejaGnu.pass("GradientTypee.RADIAL constant exists");
         } else {
             DejaGnu.fail("GradientTypee.RADIAL constant doesn't exist");
         }
+
+#end
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This

@@ -23,6 +23,15 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+// These tests were in the ming test files, but have not yet been included
+// in the haxe cases
+// Possible internal tests that need to be written
+// check_equals (typeof(Accessibility.__proto__), 'object');
+// check_equals (Accessibility.__proto__, Object.prototype);
+// sendEvent may be a function that is undocumented in the Adobe specs
+// check_equals ( typeof(Accessibility.sendEvent), 'function' );
+// check(Accessibility.hasOwnProperty("sendEvent"));
+
 #if flash9
 import flash.accessibility.Accessibility;
 import flash.display.MovieClip;
@@ -59,13 +68,24 @@ class Accessibility_as {
    	DejaGnu.note("ME5 "   + Type.getClassName(Accessibility));
    	DejaGnu.note("ME6 "   + Type.getClassFields(Accessibility)[0]);
 	
-	if (Accessibility.active == false) {
+	if (Type.typeof(Accessibility.active) == ValueType.TBool) {
 	    DejaGnu.pass("Accessibility::active property exists");
 	} else {
 	    DejaGnu.fail("Accessibility::active property doesn't exist");
 	}
+
+	// Test for existence of updateProperties method
+	// updateProperties throws error if Capabilities.hasAccessability == false
+	if ( flash.system.Capabilities.hasAccessibility != false ) {
+		if (Accessibility.updateProperties() != null) {
+	    	    DejaGnu.pass("Accessibility::updateProperties() method exists");
+		} else {
+	    	    DejaGnu.fail("Accessibility::updateProperties() method doesn't exist");
+		}
+ 	}
+	
 #else
-  	DejaGnu.note("ME1 "   + Type.typeof(Accessibility.isActive));	
+  	DejaGnu.note("ME1 "   + Type.typeof(Accessibility.isActive()));	
   	DejaGnu.note("ME2 "   + Type.getClass(Accessibility.isActive));
   	DejaGnu.note("ME3 "   + Std.string(Accessibility.isActive));
   	DejaGnu.note("ME4 "   + Std.is(Accessibility.isActive,ValueType.TFunction));
@@ -74,26 +94,30 @@ class Accessibility_as {
   	DejaGnu.note("ME7 "   + Reflect.isFunction(Accessibility.isActive));
   	DejaGnu.note("ME8 "   + Reflect.isObject(Accessibility.isActive));
 
- 	if (Accessibility.isActive() == false) {
+ 	if (Type.typeof(Accessibility.isActive) == ValueType.TFunction) {
  	    DejaGnu.pass("Accessibility::isActive method exists");
  	} else {
  	    DejaGnu.fail("Accessibility::isActive method doesn't exist");
  	}
-#end
+	
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	DejaGnu.note("ME1A "   + Type.typeof(Accessibility.updateProperties()));
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (Accessibility.updateProperties() != null) {
+	if (Type.typeof(Accessibility.updateProperties) == ValueType.TFunction) {
 	    DejaGnu.pass("Accessibility::updateProperties() method exists");
 	} else {
 	    DejaGnu.fail("Accessibility::updateProperties() method doesn't exist");
 	}
 
+#end	
+	
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
 }
+
 
 // local Variables:
 // mode: C++
