@@ -24,8 +24,8 @@
 //  DejaGnu.hx header file for the testing framework support.
 #if flash9
 import flash.display.MovieClip;
-import flash.geom.Matrix3D;
-import flash.geom.PerspectiveProjection;
+//import flash.geom.Matrix3D;
+//import flash.geom.PerspectiveProjection;
 #end
 #if flash8
 import flash.MovieClip;
@@ -88,21 +88,21 @@ class Transform_as {
  	    DejaGnu.fail("Transform.concatenatedMatrix property doesn't exist");
  	}
 #if flash10
-	if (Std.is(x1.matrix3D, Matrix3D)) {
- 	    DejaGnu.pass("Transform.matrix3D property exists");
- 	} else {
- 	    DejaGnu.fail("Transform.matrix3D property doesn't exist");
- 	}
- 	if (Std.is(x1.perspectiveProjection, PerspectiveProjection)) {
- 	    DejaGnu.pass("Transform.perspectiveProjection property exists");
- 	} else {
- 	    DejaGnu.fail("Transform.perspectiveProjection property doesn't exist");
- 	}
- 	if (Type.typeof(x1.getRelativeMatrix3D) == ValueType.TFunction) {
- 	    DejaGnu.pass("Transform.getRelativeMatrix3D method exists");
- 	} else {
- 	    DejaGnu.fail("Transform.getRelativeMatrix3D method doesn't exist");
- 	}
+//	if (Std.is(x1.matrix3D, Matrix3D)) {
+// 	    DejaGnu.pass("Transform.matrix3D property exists");
+// 	} else {
+// 	    DejaGnu.fail("Transform.matrix3D property doesn't exist");
+// 	}
+// 	if (Std.is(x1.perspectiveProjection, PerspectiveProjection)) {
+// 	    DejaGnu.pass("Transform.perspectiveProjection property exists");
+// 	} else {
+// 	    DejaGnu.fail("Transform.perspectiveProjection property doesn't exist");
+// 	}
+// 	if (Type.typeof(x1.getRelativeMatrix3D) == ValueType.TFunction) {
+// 	    DejaGnu.pass("Transform.getRelativeMatrix3D method exists");
+// 	} else {
+// 	    DejaGnu.fail("Transform.getRelativeMatrix3D method doesn't exist");
+// 	}
 #end
  	if (Std.is(x1.matrix, Matrix)) {
  	    DejaGnu.pass("Transform.matrix property exists");

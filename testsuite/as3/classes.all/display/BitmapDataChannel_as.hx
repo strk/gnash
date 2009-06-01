@@ -26,9 +26,6 @@
 #if flash9
 import flash.display.BitmapDataChannel;
 import flash.display.MovieClip;
-#else
-import flash.BitmapDataChannel;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,26 +36,27 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class BitmapDataChannel_as {
     static function main() {
+#if flash9
         // Make sure we actually get a valid class        
-        if (BitmapDataChannel.ALPHA != null) {
+        if (BitmapDataChannel.ALPHA == 8) {
             DejaGnu.pass("BitmapDataChannel.ALPHA class exists");
         } else {
             DejaGnu.fail("BitmapDataChannel.ALPHA lass doesn't exist");
         }
 
-        if (BitmapDataChannel.RED != null) {
+        if (BitmapDataChannel.RED == 4) {
             DejaGnu.pass("BitmapDataChannel.RED class exists");
         } else {
             DejaGnu.fail("BitmapDataChannel.RED lass doesn't exist");
         }
 
-        if (BitmapDataChannel.BLUE != null) {
+        if (BitmapDataChannel.BLUE == 2) {
             DejaGnu.pass("BitmapDataChannel.BLUE class exists");
         } else {
             DejaGnu.fail("BitmapDataChannel.BLUE lass doesn't exist");
         }
 
-        if (BitmapDataChannel.GREEN != null) {
+        if (BitmapDataChannel.GREEN == 1) {
             DejaGnu.pass("BitmapDataChannel.GREEN class exists");
         } else {
             DejaGnu.fail("BitmapDataChannel.GREEN lass doesn't exist");
@@ -70,6 +68,9 @@ class BitmapDataChannel_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#else
+	DejaGnu.note("This class (BitmapDataChannel) is only available in flash9");
+#end
     }
 }
 
