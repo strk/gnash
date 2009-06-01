@@ -26,23 +26,29 @@
 #if flash9
 import flash.display.Scene;
 import flash.display.MovieClip;
-#else
-import flash.Scene;
-import flash.MovieClip;
+import flash.display.FrameLabel;
 #end
 import flash.Lib;
 import Type;
 
 // import our testing API
 import DejaGnu;
+import Std;
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Scene_as {
     static function main() {
-        var x1:Scene = new Scene("Foo", null, 0);
+        #if !flash9
+			DejaGnu.note("This test is only valid for AS3 -- flash v.9 and higher");
+		#end
+		#if flash9
+		var x1:FrameLabel = new FrameLabel("Label 1", 5);
+		var x2:FrameLabel = new FrameLabel("Label 2", 25);
+		var x3:FrameLabel = new FrameLabel("Label 3", 100);
+		var x4:Scene = new Scene("My New Scene", [x1,x2,x3], 200);
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (x4 != null) {
             DejaGnu.pass("Scene class exists");
         } else {
             DejaGnu.fail("Scene lass doesn't exist");
@@ -50,23 +56,25 @@ class Scene_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.name == null) {
-	    DejaGnu.pass("Scene::name property exists");
+	if ((Std.is(x4.name, String)) && (Std.string(x4.name) == "My New Scene")) {
+	    DejaGnu.pass("Scene::name has correct type and string");
 	} else {
-	    DejaGnu.fail("Scene::name property doesn't exist");
+	    DejaGnu.fail("Scene::name property doesn't exist (either value type is wrong or name changed from what's expected");
 	}
-	if (x1.numFrames == 0) {
-	    DejaGnu.pass("Scene::numFrames property exists");
+	if ((Type.typeof(x4.numFrames) == ValueType.TInt) && (x4.numFrames == 200)) {
+	    DejaGnu.pass("Scene::numFrames has correct type and value.");
 	} else {
-	    DejaGnu.fail("Scene::numFrames property doesn't exist");
-	}
+	    DejaGnu.fail("Scene::numFrames either has wrong type or value changed from what's expected.");
+	}	
+ 	if (Std.is(x4.labels, Array) && (x4.labels[0].name == "Label 1") && (x4.labels[0].frame == 5)
+	&& (x4.labels[1].name == "Label 2") && (x4.labels[1].frame == 25) && (x4.labels[2].name == "Label 3")
+	&& (x4.labels[2].frame == 100)){
+ 	    DejaGnu.pass("Scene::labels array has correct values and type");
+ 	} else {
+ 	    DejaGnu.fail("Scene::labels property has something wrong, check values");
+ 	}
 
-// FIXME: should be an array	
-// 	if (x1.labels == 0) {
-// 	    DejaGnu.pass("Scene::labels property exists");
-// 	} else {
-// 	    DejaGnu.fail("Scene::labels property doesn't exist");
-// 	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

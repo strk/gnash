@@ -31,6 +31,7 @@ import flash.media.SoundTransform;
 import flash.display.MovieClip;
 import flash.Lib;
 import Type;
+import Std;
 #end
 
 import DejaGnu;
@@ -52,7 +53,7 @@ class Microphone_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Type.typeof(x1.activityLevel) == ValueType.TFloat) {
+	if (Std.is(x1.activityLevel, Float)) {
 	    DejaGnu.pass("Microphone::activityLevel property exists");
 	} else {
 	    DejaGnu.fail("Microphone::activityLevel property doesn't exist");
@@ -78,7 +79,7 @@ class Microphone_as {
 	//}
 	
 	
-	if (Type.typeof(x1.gain) == ValueType.TFloat) {
+	if (Std.is(x1.gain, Float)) {
 	    DejaGnu.pass("Microphone::gain property exists");
 	} else {
 	    DejaGnu.fail("Microphone::gain property doesn't exist");
@@ -88,29 +89,30 @@ class Microphone_as {
 	} else {
 	    DejaGnu.fail("Microphone::index property doesn't exist");
 	}
-	if (x1.muted == (false || true)) {
+	if (Type.typeof(x1.muted) == ValueType.TBool) {
 	    DejaGnu.pass("Microphone::muted property exists");
 	} else {
 	    DejaGnu.fail("Microphone::muted property doesn't exist");
 	}
 	//FIXME: it would be nice if this parsed and checked the name string
-	if (Type.typeof(x1.name) == ValueType.TObject) {
+	if (Std.is(x1.name, String)) {
 	    DejaGnu.pass("Microphone::name property exists");
 	} else {
 	    DejaGnu.fail("Microphone::name property doesn't exist");
 	}
-// FIXME: this returns an array
-// 	if (x1.names == 0) {
-// 	    DejaGnu.pass("Microphone::names property exists");
-// 	} else {
-// 	    DejaGnu.fail("Microphone::names property doesn't exist");
-// 	}
+ //FIXME: once implmented, put in some dummy entries here and test for
+ //   the proper names
+ //	if (Std.is(x1.names, Array)) {
+ //	    DejaGnu.pass("Microphone::names property exists");
+ //	} else {
+ //	    DejaGnu.fail("Microphone::names property doesn't exist");
+ //	}
 	if (Type.typeof(x1.rate) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::rate property exists");
 	} else {
 	    DejaGnu.fail("Microphone::rate property doesn't exist");
 	}
-	if (Type.typeof(x1.silenceLevel) == ValueType.TFloat) {
+	if (Std.is(x1.silenceLevel, Float)) {
 	    DejaGnu.pass("Microphone::silenceLevel property exists");
 	} else {
 	    DejaGnu.fail("Microphone::silenceLevel property doesn't exist");
@@ -120,12 +122,12 @@ class Microphone_as {
 	} else {
 	    DejaGnu.fail("Microphone::silenceTimeout property doesn't exist");
 	}
-	if (Type.typeof(x1.soundTransform) == Type.typeof(SoundTransform)) {
+	if (Std.is(x1.soundTransform, SoundTransform)) {
 	    DejaGnu.pass("Microphone::soundTransform property exists");
 	} else {
 	    DejaGnu.fail("Microphone::soundTransform property doesn't exist");
 	}
-	if (x1.useEchoSuppression == (true || false)) {
+	if (Type.typeof(x1.useEchoSuppression) == ValueType.TBool) {
 	    DejaGnu.pass("Microphone::useEchoSuppression property exists");
 	} else {
 	    DejaGnu.fail("Microphone::useEchoSuppression property doesn't exist");

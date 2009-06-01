@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.URLLoaderDataFormat;
 import flash.display.MovieClip;
-#else
-import flash.URLLoaderDataFormat;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,26 +37,29 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLLoaderDataFormat_as {
     static function main() {
-
+		#if !flash9
+			DejaGnu.note("This class is only valid for AS3 (flash 9 and greater)");
+		#end
+		#if flash9
         // Make sure we actually get a valid class        
-        if (URLLoaderDataFormat.BINARY != null) {
+        if (Std.is(URLLoaderDataFormat.BINARY, String) && (Std.string(URLLoaderDataFormat.BINARY) == "binary")) {
             DejaGnu.pass("URLLoaderDataFormat.BINARY constant exists");
         } else {
             DejaGnu.fail("URLLoaderDataFormat.BINARY constant doesn't exist");
         }
 
-        if (URLLoaderDataFormat.TEXT != null) {
+        if (Std.is(URLLoaderDataFormat.TEXT, String) && (Std.string(URLLoaderDataFormat.TEXT) == "text")) {
             DejaGnu.pass("URLLoaderDataFormat.TEXT constant exists");
         } else {
             DejaGnu.fail("URLLoaderDataFormat.TEXT constant doesn't exist");
         }
 
-        if (URLLoaderDataFormat.VARIABLES != null) {
+        if (Std.is(URLLoaderDataFormat.VARIABLES, String) && (Std.string(URLLoaderDataFormat.VARIABLES) == "variables")) {
             DejaGnu.pass("URLLoaderDataFormat.VARIABLES constant exists");
         } else {
             DejaGnu.fail("URLLoaderDataFormat.VARIABLES constant doesn't exist");
         }
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
