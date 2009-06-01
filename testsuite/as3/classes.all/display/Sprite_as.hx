@@ -26,12 +26,14 @@
 #if flash9
 import flash.display.Sprite;
 import flash.display.MovieClip;
-#else
-import flash.Sprite;
-import flash.MovieClip;
+import flash.display.DisplayObject;
+import flash.display.Graphics;
+import flash.media.SoundTransform;
+import flash.geom.Rectangle;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +41,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Sprite_as {
     static function main() {
+#if flash9
         var x1:Sprite = new Sprite();
+        var x2:Sprite = new Sprite();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, Sprite)) {
             DejaGnu.pass("Sprite class exists");
         } else {
             DejaGnu.fail("Sprite lass doesn't exist");
@@ -50,32 +54,36 @@ class Sprite_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.buttonMode == false) {
+	if (Std.is(x1.buttonMode, Bool)) {
 	    DejaGnu.pass("Sprite::buttonMode property exists");
 	} else {
 	    DejaGnu.fail("Sprite::buttonMode property doesn't exist");
 	}
-// 	if (x1.dropTarget == dropTarget) {
+//FIXME:dropTarget will be tested more extensively later.
+//	var r1:Rectangle = new Rectangle(0,0,10,10);
+//	x1.dropTarget = r1;
+// 	if (Std.is(x1.dropTarget, DisplayObject)) {
 // 	    DejaGnu.pass("Sprite::dropTarget property exists");
 // 	} else {
 // 	    DejaGnu.fail("Sprite::dropTarget property doesn't exist");
 // 	}
-// 	if (x1.graphics == graphics) {
-// 	    DejaGnu.pass("Sprite::graphics property exists");
-// 	} else {
-// 	    DejaGnu.fail("Sprite::graphics property doesn't exist");
-// 	}
-// 	if (x1.hitArea == hitArea) {
-// 	    DejaGnu.pass("Sprite::hitArea property exists");
-// 	} else {
-// 	    DejaGnu.fail("Sprite::hitArea property doesn't exist");
-// 	}
-// 	if (x1.soundTransform == SoundTransform) {
-// 	    DejaGnu.pass("Sprite::soundTransform property exists");
-// 	} else {
-// 	    DejaGnu.fail("Sprite::soundTransform property doesn't exist");
-// 	}
-	if (x1.useHandCursor == false) {
+ 	if (Std.is(x1.graphics, Graphics)) {
+ 	    DejaGnu.pass("Sprite::graphics property exists");
+ 	} else {
+ 	    DejaGnu.fail("Sprite::graphics property doesn't exist");
+ 	}
+ 	x1.hitArea = x2;
+ 	if (Std.is(x1.hitArea, Sprite)) {
+ 	    DejaGnu.pass("Sprite::hitArea property exists");
+ 	} else {
+ 	    DejaGnu.fail("Sprite::hitArea property doesn't exist");
+ 	}
+ 	if (Std.is(x1.soundTransform, SoundTransform)) {
+ 	    DejaGnu.pass("Sprite::soundTransform property exists");
+ 	} else {
+ 	    DejaGnu.fail("Sprite::soundTransform property doesn't exist");
+ 	}
+	if (Std.is(x1.useHandCursor, Bool)) {
 	    DejaGnu.pass("Sprite::useHandCursor property exists");
 	} else {
 	    DejaGnu.fail("Sprite::useHandCursor property doesn't exist");
@@ -84,12 +92,12 @@ class Sprite_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.startDrag == null) {
+	if (Type.typeof(x1.startDrag) == ValueType.TFunction) {
 	    DejaGnu.pass("Sprite::startDrag() method exists");
 	} else {
 	    DejaGnu.fail("Sprite::startDrag() method doesn't exist");
 	}
-	if (x1.stopDrag == null) {
+	if (Type.typeof(x1.stopDrag) == ValueType.TFunction) {
 	    DejaGnu.pass("Sprite::stopDrag() method exists");
 	} else {
 	    DejaGnu.fail("Sprite::stopDrag() method doesn't exist");
@@ -97,6 +105,7 @@ class Sprite_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#end
     }
 }
 

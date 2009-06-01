@@ -23,19 +23,17 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
-//#error
-//FIXME: This test produces a Segmentation Fault
 
 #if flash9
 import flash.net.SharedObject;
 import flash.display.MovieClip;
 #else
-import flash.SharedObject;
 import flash.MovieClip;
+import flash.SharedObject;
 #end
 import flash.Lib;
 import Type;
-import StdTypes;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -43,52 +41,53 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class SharedObject_as {
     static function main() {
-        var x1:SharedObject = new SharedObject();
-//		var c:Dynamic = ;
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+#if flash9
+        var x1:SharedObject = SharedObject.getLocal("sharedobjecttest");
+#else
+		var x1:SharedObject = SharedObject.getLocal("sharedobjecttest"); 
+#end         
+        if (Std.is(x1, SharedObject)) {
             DejaGnu.pass("SharedObject class exists");
         } else {
             DejaGnu.fail("SharedObject class doesn't exist");
         }
+        DejaGnu.note("SharedObject type is "+Type.typeof(x1));
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
 #if flash9
-//FIXME: TClass not understood by test programmer
-// 	if (Type.typeof(x1.client) == ValueType.TClass(c)) {
-// 	    DejaGnu.pass("SharedObject.client property exists");
-// 	} else {
-// 	    DejaGnu.fail("SharedObject.client property doesn't exist");
-// 	}
+ 	if (Std.is(x1.client, Dynamic)) {
+ 	    DejaGnu.pass("SharedObject.client property exists");
+ 	} else {
+ 	    DejaGnu.fail("SharedObject.client property doesn't exist");
+ 	}
 //FIXME:  Field fps cannot be accessed for reading
 // 	if (Type.typeof(x1.fps) == ValueType.TFloat) {
 // 	    DejaGnu.pass("SharedObject.fps property exists");
 // 	} else {
 // 	    DejaGnu.fail("SharedObject.fps property doesn't exist");
 // 	}
-	if (Type.typeof(x1.objectEncoding) == ValueType.TInt) {
+	if (Std.is(x1.objectEncoding, Int)) {
 	    DejaGnu.pass("SharedObject.objectEncoding property exists");
 	} else {
 	    DejaGnu.fail("SharedObject.objectEncoding property doesn't exist");
 	}
-	if (Type.typeof(x1.size) == ValueType.TInt) {
+	if (Std.is(x1.size, Int)) {
 	    DejaGnu.pass("SharedObject.size property exists");
 	} else {
 	    DejaGnu.fail("SharedObject.size property doesn't exist");
 	}
-	if (Type.typeof(SharedObject.defaultObjectEncoding) == ValueType.TInt) {
+	if (Std.is(SharedObject.defaultObjectEncoding, Int)) {
 	    DejaGnu.pass("SharedObject.defaultObjectEncoding property exists");
 	} else {
 	    DejaGnu.fail("SharedObject.defaultObjectEncoding property doesn't exist");
 	}
 #end
-//FIXME
-// 	if (Type.typeof(x1.data) == ValueType.TClass(c)) {
-// 	    DejaGnu.pass("SharedObject.data property exists");
-// 	} else {
-// 	    DejaGnu.fail("SharedObject.data property doesn't exist");
-// 	}
+ 	if (Std.is(x1.data, Dynamic)) {
+ 	    DejaGnu.pass("SharedObject.data property exists");
+ 	} else {
+ 	    DejaGnu.fail("SharedObject.data property doesn't exist");
+ 	}
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
@@ -117,6 +116,7 @@ class SharedObject_as {
 	} else {
 	    DejaGnu.fail("SharedObject::send() method doesn't exist");
 	}
+#if flash9
 	if (Type.typeof(x1.setDirty) == ValueType.TFunction) {
 	    DejaGnu.pass("SharedObject::setDirty() method exists");
 	} else {
@@ -127,6 +127,7 @@ class SharedObject_as {
 	} else {
 	    DejaGnu.fail("SharedObject::setProperty() method doesn't exist");
 	}
+#end
  	if (Type.typeof(SharedObject.getLocal) == ValueType.TFunction) {
  	    DejaGnu.pass("SharedObject::getLocal() method exists");
  	} else {

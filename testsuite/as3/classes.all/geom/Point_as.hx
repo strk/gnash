@@ -31,6 +31,7 @@ import flash.MovieClip;
 import flash.geom.Point;
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -40,33 +41,28 @@ class Point_as {
     static function main() {
 #if flash9
 	var x1:Point = new Point();
-    if (x1 != null) {
-		DejaGnu.pass("Point class exists");
-	} else {
-		DejaGnu.fail("Point class doesn't exist");
-	}
 #else
 	var x1:Point<Int> = new Point(0,0);
-    if (Type.typeof(x1) == ValueType.TObject) {
+#end
+	if (Std.is(x1, Point)) {
 		DejaGnu.pass("Point class exists");
 	} else {
 		DejaGnu.fail("Point class doesn't exist");
 	}
-#end
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Type.typeof(x1.length) == ValueType.TInt) {
+	if (Std.is(x1.length, Int)) {
 	    DejaGnu.pass("Point.length property exists");
 	} else {
 	    DejaGnu.fail("Point.length property doesn't exist");
 	}
-	if (Type.typeof(x1.x) == ValueType.TInt) {
+	if (Std.is(x1.x, Int)) {
 	    DejaGnu.pass("Point.x property exists");
 	} else {
 	    DejaGnu.fail("Point.x property doesn't exist");
 	}
-	if (Type.typeof(x1.y) == ValueType.TInt) {
+	if (Std.is(x1.y, Int)) {
 	    DejaGnu.pass("Point.y property exists");
 	} else {
 	    DejaGnu.fail("Point.y property doesn't exist");

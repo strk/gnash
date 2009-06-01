@@ -26,12 +26,11 @@
 #if flash9
 import flash.display.Shape;
 import flash.display.MovieClip;
-#else
-import flash.Shape;
-import flash.MovieClip;
+import flash.display.Graphics;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +38,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Shape_as {
     static function main() {
+#if flash9
         var x1:Shape = new Shape();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, Shape)) {
             DejaGnu.pass("Shape class exists");
         } else {
             DejaGnu.fail("Shape lass doesn't exist");
@@ -50,14 +50,15 @@ class Shape_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (x1.graphics == graphics) {
-// 	    DejaGnu.pass("Shape::graphics property exists");
-// 	} else {
-// 	    DejaGnu.fail("Shape::graphics property doesn't exist");
-// 	}
+ 	if (Std.is(x1.graphics, Graphics)) {
+ 	    DejaGnu.pass("Shape::graphics property exists");
+ 	} else {
+ 	    DejaGnu.fail("Shape::graphics property doesn't exist");
+ 	}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#end
     }
 }
 

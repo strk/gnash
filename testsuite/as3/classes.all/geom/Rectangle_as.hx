@@ -25,13 +25,19 @@
 
 #if flash9
 import flash.display.MovieClip;
-#else
+#end
+#if flash8
 import flash.MovieClip;
 #end
+#if !flash6
+#if !flash7
 import flash.geom.Rectangle;
 import flash.geom.Point;
+#end
+#end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,16 +45,15 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Rectangle_as {
     static function main() {
+#if !flash6
+#if !flash7
 #if flash9
         var x1:Rectangle = new Rectangle();
-		var p1:Point = new Point();
 #else
-		var i:Int=7;
-		var x1:Rectangle<Int> = new Rectangle(i,i,i,i);
-		var p1:Point<Int> = new Point(i,i);
+		var x1:Rectangle<Int> = new Rectangle(1,1,1,1);
 #end
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, Rectangle)) {
             DejaGnu.pass("Rectangle class exists");
         } else {
             DejaGnu.fail("Rectangle class doesn't exist");
@@ -56,63 +61,57 @@ class Rectangle_as {
 	// Tests to see if all the properties exist. All these do is test for
 	// existance of a property, and don't test the functionality at all. This
 	// is primarily useful only to test completeness of the API implementation.
-		if (Type.typeof(x1.bottom) == ValueType.TInt) {
+		if (Std.is(x1.bottom, Int)) {
 			DejaGnu.pass("Rectangle.bottom property exists");
 		} else {
 			DejaGnu.fail("Rectangle.bottom property doesn't exist");
 		}
-//FIXME: TClass([class Point]) != TClass([class Point])
-//	 	if (Type.typeof(x1.bottomRight) == Type.typeof(p1)) {
-//	 	    DejaGnu.pass("Rectangle.bottomRight property exists");
-//	 	} else {
-//	 	    DejaGnu.fail("Rectangle.bottomRight property doesn't exist");
-//	 	}
-		DejaGnu.note("Type of x1.bottomRight = "+Type.typeof(x1.bottomRight));
-		DejaGnu.note("Type of p1 = "+Type.typeof(p1));
-		DejaGnu.note("These types are not equal");
-		if (Type.typeof(x1.height) == ValueType.TInt) {
+	 	if (Std.is(x1.bottomRight, Point)) {
+	 	    DejaGnu.pass("Rectangle.bottomRight property exists");
+	 	} else {
+	 	    DejaGnu.fail("Rectangle.bottomRight property doesn't exist");
+	 	}
+		if (Std.is(x1.height, Int)) {
 			DejaGnu.pass("Rectangle.height property exists");
 		} else {
 			DejaGnu.fail("Rectangle.height property doesn't exist");
 		}
-		if (Type.typeof(x1.left) == ValueType.TInt) {
+		if (Std.is(x1.left, Int)) {
 			DejaGnu.pass("Rectangle.left property exists");
 		} else {
 			DejaGnu.fail("Rectangle.left property doesn't exist");
 		}
-		if (Type.typeof(x1.right) == ValueType.TInt) {
+		if (Std.is(x1.right, Int)) {
 			DejaGnu.pass("Rectangle.right property exists");
 		} else {
 			DejaGnu.fail("Rectangle.right property doesn't exist");
 		}
-//FIXME: TClass([class Point]) != TClass([class Point])
-//	 	if (Type.typeof(x1.size) == Type.typeof(p1)) {
-//	 	    DejaGnu.pass("Rectangle.size property exists");
-//	 	} else {
-//	 	    DejaGnu.fail("Rectangle.size property doesn't exist");
-//	 	}
-		if (Type.typeof(x1.top) == ValueType.TInt) {
+	 	if (Std.is(x1.size, Point)) {
+	 	    DejaGnu.pass("Rectangle.size property exists");
+	 	} else {
+	 	    DejaGnu.fail("Rectangle.size property doesn't exist");
+	 	}
+		if (Std.is(x1.top, Int)) {
 			DejaGnu.pass("Rectangle.top property exists");
 		} else {
 			DejaGnu.fail("Rectangle.top property doesn't exist");
 		}
-//FIXME: TClass([class Point]) != TClass([class Point])
-//	 	if (Type.typeof(x1.topLeft) == Type.typeof(p1)) {
-//	 	    DejaGnu.pass("Rectangle.topLeft property exists");
-//	 	} else {
-//	 	    DejaGnu.fail("Rectangle.topLeft property doesn't exist");
-//	 	}
-		if (Type.typeof(x1.width) == ValueType.TInt) {
+	 	if (Std.is(x1.topLeft, Point)) {
+	 	    DejaGnu.pass("Rectangle.topLeft property exists");
+	 	} else {
+	 	    DejaGnu.fail("Rectangle.topLeft property doesn't exist");
+	 	}
+		if (Std.is(x1.width, Int)) {
 			DejaGnu.pass("Rectangle.width property exists");
 		} else {
 			DejaGnu.fail("Rectangle.width property doesn't exist");
 		}
-		if (Type.typeof(x1.x) == ValueType.TInt) {
+		if (Std.is(x1.x, Int)) {
 			DejaGnu.pass("Rectangle.x property exists");
 		} else {
 			DejaGnu.fail("Rectangle.x property doesn't exist");
 		}
-		if (Type.typeof(x1.y) == ValueType.TInt) {
+		if (Std.is(x1.y, Int)) {
 			DejaGnu.pass("Rectangle.y property exists");
 		} else {
 			DejaGnu.fail("Rectangle.y property doesn't exist");
@@ -121,7 +120,6 @@ class Rectangle_as {
 	// Tests to see if all the methods exist. All these do is test for
 	// existance of a method, and don't test the functionality at all. This
 	// is primarily useful only to test completeness of the API implementation.
-		//Test constructor existance
 	 	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	 	    DejaGnu.pass("Rectangle::clone() method exists");
 	 	} else {
@@ -209,6 +207,14 @@ class Rectangle_as {
 
 	    // Call this after finishing all tests. It prints out the totals.
 	    DejaGnu.done();
+#end
+#end
+#if flash6
+	DejaGnu.note("This class (Rectangle) is not available in Flash6");
+#end
+#if flash7
+	DejaGnu.note("This class (Rectangle) is not available in Flash7");
+#end
     }
 }
 

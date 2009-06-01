@@ -24,14 +24,14 @@
 //  DejaGnu.hx header file for the testing framework support.
 
 #if flash9
-import flash.geom.Matrix;
 import flash.display.MovieClip;
 #else
-import flash.Matrix;
 import flash.MovieClip;
 #end
+import flash.geom.Matrix;
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -42,7 +42,7 @@ class Matrix_as {
         var x1:Matrix = new Matrix();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, Matrix)) {
             DejaGnu.pass("Matrix class exists");
         } else {
             DejaGnu.fail("Matrix class doesn't exist");
@@ -50,32 +50,32 @@ class Matrix_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.a == 0) {
+	if (Std.is(x1.a, Float)) {
 	    DejaGnu.pass("Matrix.a property exists");
 	} else {
 	    DejaGnu.fail("Matrix.a property doesn't exist");
 	}
-	if (x1.b == 0) {
+	if (Std.is(x1.b, Float)) {
 	    DejaGnu.pass("Matrix.b property exists");
 	} else {
 	    DejaGnu.fail("Matrix.b property doesn't exist");
 	}
-	if (x1.c == 0) {
+	if (Std.is(x1.c, Float)) {
 	    DejaGnu.pass("Matrix.c property exists");
 	} else {
 	    DejaGnu.fail("Matrix.c property doesn't exist");
 	}
-	if (x1.d == 0) {
+	if (Std.is(x1.d, Float)) {
 	    DejaGnu.pass("Matrix.d property exists");
 	} else {
 	    DejaGnu.fail("Matrix.d property doesn't exist");
 	}
-	if (x1.tx == 0) {
+	if (Std.is(x1.tx, Float)) {
 	    DejaGnu.pass("Matrix.tx property exists");
 	} else {
 	    DejaGnu.fail("Matrix.tx property doesn't exist");
 	}
-	if (x1.ty == 0) {
+	if (Std.is(x1.ty, Float)) {
 	    DejaGnu.pass("Matrix.ty property exists");
 	} else {
 	    DejaGnu.fail("Matrix.ty property doesn't exist");
@@ -89,57 +89,57 @@ class Matrix_as {
 // 	} else {
 // 	    DejaGnu.fail("Matrix::clone() method doesn't exist");
 // 	}
-	if (x1.concat == null) {
+	if (Type.typeof(x1.concat) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::concat() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::concat() method doesn't exist");
 	}
-	if (x1.createBox == null) {
+	if (Type.typeof(x1.createBox) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::createBox() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::createBox() method doesn't exist");
 	}
-	if (x1.createGradientBox == null) {
+	if (Type.typeof(x1.createGradientBox) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::createGradientBox() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::createGradientBox() method doesn't exist");
 	}
-// 	if (x1.deltaTransformPoint == Point) {
-// 	    DejaGnu.pass("Matrix::deltaTransformPoint() method exists");
-// 	} else {
-// 	    DejaGnu.fail("Matrix::deltaTransformPoint() method doesn't exist");
-// 	}
-	if (x1.identity == null) {
+ 	if (Type.typeof(x1.deltaTransformPoint) == ValueType.TFunction) {
+ 	    DejaGnu.pass("Matrix::deltaTransformPoint() method exists");
+ 	} else {
+ 	    DejaGnu.fail("Matrix::deltaTransformPoint() method doesn't exist");
+ 	}
+	if (Type.typeof(x1.identity) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::identity() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::identity() method doesn't exist");
 	}
-	if (x1.invert == null) {
+	if (Type.typeof(x1.invert) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::invert() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::invert() method doesn't exist");
 	}
-	if (x1.rotate == null) {
+	if (Type.typeof(x1.rotate) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::rotate() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::rotate() method doesn't exist");
 	}
-	if (x1.scale == null) {
+	if (Type.typeof(x1.scale) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::scale() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::scale() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::toString() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::toString() method doesn't exist");
 	}
-// 	if (x1.transformPoint == Point) {
-// 	    DejaGnu.pass("Matrix::transformPoint() method exists");
-// 	} else {
-// 	    DejaGnu.fail("Matrix::transformPoint() method doesn't exist");
-// 	}
-	if (x1.translate == null) {
+ 	if (Type.typeof(x1.transformPoint) == ValueType.TFunction) {
+ 	    DejaGnu.pass("Matrix::transformPoint() method exists");
+ 	} else {
+ 	    DejaGnu.fail("Matrix::transformPoint() method doesn't exist");
+ 	}
+	if (Type.typeof(x1.translate) == ValueType.TFunction) {
 	    DejaGnu.pass("Matrix::translate() method exists");
 	} else {
 	    DejaGnu.fail("Matrix::translate() method doesn't exist");

@@ -25,13 +25,15 @@
 
 #if flash9
 import flash.display.Bitmap;
+import flash.display.BitmapData;
 import flash.display.MovieClip;
+import flash.display.PixelSnapping;
 #else
-import flash.Bitmap;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +41,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Bitmap_as {
     static function main() {
+#if flash9
         var x1:Bitmap = new Bitmap();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, Bitmap)) {
             DejaGnu.pass("Bitmap class exists");
         } else {
             DejaGnu.fail("Bitmap lass doesn't exist");
@@ -50,12 +53,20 @@ class Bitmap_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.pixelSnapping == null) {
+	var d1:BitmapData = new BitmapData(20, 30, false, 0xeeddee);
+	x1.bitmapData = d1;
+	if (Std.is(x1.bitmapData, BitmapData)) {
+	    DejaGnu.pass("Bitmap::bitmapData property exists");
+	} else {
+	    DejaGnu.fail("Bitmap::bitmapData property doesn't exist");
+	}
+	DejaGnu.note(""+Type.typeof(x1.bitmapData));
+	if (Std.is(x1.pixelSnapping, String)) {
 	    DejaGnu.pass("Bitmap::pixelSnapping property exists");
 	} else {
 	    DejaGnu.fail("Bitmap::pixelSnapping property doesn't exist");
 	}
-	if (x1.smoothing == false) {
+	if (Std.is(x1.smoothing, Bool)) {
 	    DejaGnu.pass("Bitmap::smoothing property exists");
 	} else {
 	    DejaGnu.fail("Bitmap::smoothing property doesn't exist");
@@ -67,6 +78,7 @@ class Bitmap_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#end
     }
 }
 
