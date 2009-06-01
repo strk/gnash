@@ -40,22 +40,27 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class GradientType_as {
     static function main() {
+
+#if !flash9
+		DejaGnu.note("GradientType does not exist in versions prior to flash9");
+
+#else		
 		
-		var x1 = new GradientType;
-		
-		DejaGnu.note("out1: " + Type.getClass(x1));
+		//DejaGnu.note("out1: " + Type.getClassFields(GradientType));
         // Make sure we actually get a valid class        
-        if ( Std.is(GradientType.LINEAR, Enum) && Std.String(GradientType.LINEAER)=="linear" ) {
+        if ( Std.is(GradientType.LINEAR, String) && Std.string(GradientType.LINEAR)=="linear" ) {
             DejaGnu.pass("GradientType.LINEAR constant exists");
         } else {
             DejaGnu.fail("GradientType.LINEAR constant doesn't exist");
         }
 
-        if (Std.is(GradientType.RADIAL, Enum) && Std.String(GradientType.RADIAL)=="radial") {
+        if (Std.is(GradientType.RADIAL, String) && Std.string(GradientType.RADIAL)=="radial") {
             DejaGnu.pass("GradientTypee.RADIAL constant exists");
         } else {
             DejaGnu.fail("GradientTypee.RADIAL constant doesn't exist");
         }
+
+#end
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
