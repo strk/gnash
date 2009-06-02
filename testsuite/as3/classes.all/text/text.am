@@ -17,7 +17,7 @@
 
 TEXTdir = $(srcdir)/text
 
-TEXT_TESTS = text/text_pkg.swf
+TEXT_TESTS = 
 
 if BUILD_ANTIALIASTYPE_AS3
 TEXT_TESTS += text/AntiAliasType_as.swf

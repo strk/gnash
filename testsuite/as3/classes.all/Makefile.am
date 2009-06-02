@@ -60,7 +60,7 @@ include $(srcdir)/printing/printing.am
 # # HAXE doesn't appear to support the Security classes
 # # include $(srcdir)/security/security.am
 include $(srcdir)/system/system.am
-# # include $(srcdir)/text/text.am
+include $(srcdir)/text/text.am
 include $(srcdir)/ui/ui.am
 # # include $(srcdir)/utils/utils.am
 include $(srcdir)/xml/xml.am
