@@ -56,13 +56,13 @@ include $(srcdir)/geom/geom.am
 include $(srcdir)/media/media.am
 include $(srcdir)/net/net.am
 include $(srcdir)/printing/printing.am
-# # include $(srcdir)/sampler/sampler.am
+include $(srcdir)/sampler/sampler.am
 # # HAXE doesn't appear to support the Security classes
 # # include $(srcdir)/security/security.am
 include $(srcdir)/system/system.am
-# # include $(srcdir)/text/text.am
+include $(srcdir)/text/text.am
 include $(srcdir)/ui/ui.am
-# # include $(srcdir)/utils/utils.am
+include $(srcdir)/utils/utils.am
 include $(srcdir)/xml/xml.am
 
 #/usr/bin/haxe -swf-version 9 -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all/media -swf Sound_as3.swf -main Sound_as3.hx

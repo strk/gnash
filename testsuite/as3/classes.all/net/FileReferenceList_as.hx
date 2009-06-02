@@ -26,12 +26,15 @@
 #if flash9
 import flash.net.FileReferenceList;
 import flash.display.MovieClip;
-#else
-import flash.FileReferenceList;
+import flash.events.Event;
+#end
+#if flash8
+import flash.net.FileReferenceList;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +42,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class FileReferenceList_as {
     static function main() {
-        var x1:FileReferenceList = new FileReferenceList();
+        #if !(flash8 || flash9)
+			DejaGnu.note("this is not valid for this version of flash (only 8 and higher)");
+		#end
+		#if flash9
+		var x1:FileReferenceList = new FileReferenceList();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,29 +57,50 @@ class FileReferenceList_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// FIXME: returns an array
-// 	if (x1.fileList == 0) {
-// 	    DejaGnu.pass("FileReferenceList.fileList property exists");
-// 	} else {
-// 	    DejaGnu.fail("FileReferenceList.fileList property doesn't exist");
-// 	}
+	
+	//FIXME: This opens a dialog box which populates the array x1.fileList, we need
+	//to figure out how to make this dialog go away (cancel) immediately.
+	//x1.browse();
+	
+	//if (Std.is(x1.fileList, Array)) {
+ 	//    DejaGnu.pass("FileReferenceList.fileList property exists");
+ 	//} else {
+ 	//    DejaGnu.fail("FileReferenceList.fileList property doesn't exist");
+ 	//}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (x1.FileReferenceList == FileReferenceList) {
-// 	    DejaGnu.pass("FileReferenceList::FileReferenceList() method exists");
-// 	} else {
-// 	    DejaGnu.fail("FileReferenceList::FileReferenceList() method doesn't exist");
-// 	}
-
-// FIXME: returns an array
-// 	if (x1.browse == false) {
-// 	    DejaGnu.pass("FileReferenceList::browse() method exists");
-// 	} else {
-// 	    DejaGnu.fail("FileReferenceList::browse() method doesn't exist");
-// 	}
-
+ 	if (Type.typeof(x1.browse) == ValueType.TFunction) {
+ 	    DejaGnu.pass("FileReferenceList::browse() method exists");
+ 	} else {
+ 	    DejaGnu.fail("FileReferenceList::browse() method doesn't exist");
+ 	}
+	#end
+	#if flash8
+		var x2:FileReferenceList = new FileReferenceList();
+	
+	if (Std.is(x2.fileList, Array)){
+		DejaGnu.pass("Filelist property exists");
+	} else {
+		DejaGnu.fail("Filelist doesn't properly exist");
+	}
+	if (Type.typeof(x2.addListener) == ValueType.TFunction){
+		DejaGnu.pass("addListener method exists");
+	} else {
+		DejaGnu.fail("addListener method doesn't exist");
+	}
+	if (Type.typeof(x2.browse) == ValueType.TFunction) {
+		DejaGnu.pass("browse method exists");
+	} else {
+		DejaGnu.fail("browse method doesn't exist");
+	}
+	if (Type.typeof(x2.removeListener) == ValueType.TFunction){
+		DejaGnu.pass("removeListener method exists");
+	} else {
+		DejaGnu.fail("removeListener method doesn't exist");
+	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

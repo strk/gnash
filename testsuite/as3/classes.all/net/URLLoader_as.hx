@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.URLLoader;
 import flash.display.MovieClip;
-#else
-import flash.URLLoader;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLLoader_as {
     static function main() {
-        var x1:URLLoader = new URLLoader();
+        #if !flash9
+			DejaGnu.note("this test is incompatible with this version of flash");
+		#end
+		#if flash9
+		var x1:URLLoader = new URLLoader();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,22 +52,17 @@ class URLLoader_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.bytesLoaded == 0) {
+	if (Std.is(x1.bytesLoaded, Float)) {
 	    DejaGnu.pass("URLLoader.bytesLoaded property exists");
 	} else {
 	    DejaGnu.fail("URLLoader.bytesLoaded property doesn't exist");
 	}
-	if (x1.bytesTotal == 0) {
+	if (Std.is(x1.bytesTotal, Float)) {
 	    DejaGnu.pass("URLLoader.bytesTotal property exists");
 	} else {
 	    DejaGnu.fail("URLLoader.bytesTotal property doesn't exist");
 	}
-	if (x1.data == 0) {
-	    DejaGnu.pass("URLLoader.data property exists");
-	} else {
-	    DejaGnu.fail("URLLoader.data property doesn't exist");
-	}
-	if (x1.dataFormat == null) {
+	if (Std.is(x1.dataFormat, String)) {
 	    DejaGnu.pass("URLLoader.dataFormat property exists");
 	} else {
 	    DejaGnu.fail("URLLoader.dataFormat property doesn't exist");
@@ -79,22 +76,22 @@ class URLLoader_as {
 // 	} else {
 // 	    DejaGnu.fail("URLLoader::URLLoader() method doesn't exist");
 // 	}
-	if (x1.addEventListener == null) {
+	if (Type.typeof(x1.addEventListener) == ValueType.TFunction) {
 	    DejaGnu.pass("URLLoader::addEventListener() method exists");
 	} else {
 	    DejaGnu.fail("URLLoader::addEventListener() method doesn't exist");
 	}
-	if (x1.close == null) {
+	if (Type.typeof(x1.close) == ValueType.TFunction) {
 	    DejaGnu.pass("URLLoader::close() method exists");
 	} else {
 	    DejaGnu.fail("URLLoader::close() method doesn't exist");
 	}
-	if (x1.load == null) {
+	if (Type.typeof(x1.load) == ValueType.TFunction) {
 	    DejaGnu.pass("URLLoader::load() method exists");
 	} else {
 	    DejaGnu.fail("URLLoader::load() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

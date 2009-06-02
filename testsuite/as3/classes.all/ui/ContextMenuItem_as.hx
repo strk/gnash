@@ -29,9 +29,11 @@ import flash.display.MovieClip;
 #else
 import flash.ContextMenuItem;
 import flash.MovieClip;
+import flash.ContextMenu;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +41,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ContextMenuItem_as {
     static function main() {
-        var x1:ContextMenuItem = new ContextMenuItem();
+        #if flash9
+		var x1:ContextMenuItem = new ContextMenuItem("Caption", false, true, true);
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,22 +53,66 @@ class ContextMenuItem_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.caption == null) {
+	if (Std.is(x1.caption, String) && (Std.string(x1.caption) == "Caption")) {
 	    DejaGnu.pass("ContextMenuItem.caption property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuItem.caption property doesn't exist");
 	}
-	if (x1.separatorBefore == false) {
+	if (Type.typeof(x1.separatorBefore) == ValueType.TBool) {
 	    DejaGnu.pass("ContextMenuItem.separatorBefore property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuItem.separatorBefore property doesn't exist");
 	}
-	if (x1.visible == false) {
+	if (Type.typeof(x1.visible) == ValueType.TBool) {
 	    DejaGnu.pass("ContextMenuItem.visible property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuItem.visible property doesn't exist");
 	}
-
+//FIXME: test methods (not implemented in haxe)
+//	if (Type.typeof(x1.clone) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::clone method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::clone method exists");
+//	}
+//	if (Type.typeof(x1.systemClearMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemClearMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemClearMenuItem method exists");
+//	}
+//	if (Type.typeof(x1.systemCopyLinkMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemCopyLinkMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemCopyLinkMenuItem method exists");
+//	}
+//	if (Type.typeof(x1.systemCopyMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemCopyMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemCopyMenuItem method exists");
+//	}
+//	if (Type.typeof(x1.systemCutMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemCutMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemCutMenuItem method exists");
+//	}
+//	if (Type.typeof(x1.systemOpenLinkMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemLinkMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemLinkMenuItem method exists");
+//	}
+//	if (Type.typeof(x1.systemPasteMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemPasteMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemPasteMenuItem method exists");
+//	}
+//	if (Type.typeof(x1.systemSelectAllMenuItem) == ValueType.TFunction) {
+//		DejaGnu.pass("ContextMenuItem::systemSelectAllMenuItem method exists");
+//	} else {
+//		DejaGnu.fail("ContextMenuItem::systemSelectAllMenuItem method exists");
+//	}
+	#end
+	#if (flash7 || flash8)
+		DejaGnu.note("Use the ContextMenu_as test to make sure this is working");
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

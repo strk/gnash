@@ -26,12 +26,10 @@
 #if flash9
 import flash.utils.ByteArray;
 import flash.display.MovieClip;
-#else
-import flash.ByteArray;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ByteArray_as {
     static function main() {
-        var x1:ByteArray = new ByteArray();
+        #if !flash9
+			DejaGnu.note("This is not applicable to this version of flash");
+		#end
+		#if flash9
+		var x1:ByteArray = new ByteArray();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,32 +52,32 @@ class ByteArray_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.bytesAvailable == uint) {
+	if (Std.is(x1.bytesAvailable, Float)) {
 	    DejaGnu.pass("ByteArray.bytesAvailable property exists");
 	} else {
 	    DejaGnu.fail("ByteArray.bytesAvailable property doesn't exist");
 	}
-	if (x1.defaultObjectEncoding == uint) {
+	if (Std.is(ByteArray.defaultObjectEncoding, Float)) {
 	    DejaGnu.pass("ByteArray.defaultObjectEncoding property exists");
 	} else {
 	    DejaGnu.fail("ByteArray.defaultObjectEncoding property doesn't exist");
 	}
-	if (x1.endian == null) {
+	if (Std.is(x1.endian, String)) {
 	    DejaGnu.pass("ByteArray.endian property exists");
 	} else {
 	    DejaGnu.fail("ByteArray.endian property doesn't exist");
 	}
-	if (x1.length == uint) {
+	if (Std.is(x1.length, Float)) {
 	    DejaGnu.pass("ByteArray.length property exists");
 	} else {
 	    DejaGnu.fail("ByteArray.length property doesn't exist");
 	}
-	if (x1.objectEncoding == uint) {
+	if (Std.is(x1.objectEncoding, Float)) {
 	    DejaGnu.pass("ByteArray.objectEncoding property exists");
 	} else {
 	    DejaGnu.fail("ByteArray.objectEncoding property doesn't exist");
 	}
-	if (x1.position == uint) {
+	if (Std.is(x1.position, Float)) {
 	    DejaGnu.pass("ByteArray.position property exists");
 	} else {
 	    DejaGnu.fail("ByteArray.position property doesn't exist");
@@ -84,157 +86,152 @@ class ByteArray_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.ByteArray == ByteArray) {
-	    DejaGnu.pass("ByteArray::ByteArray() method exists");
-	} else {
-	    DejaGnu.fail("ByteArray::ByteArray() method doesn't exist");
-	}
-	if (x1.compress == null) {
+	if (Type.typeof(x1.compress) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::compress() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::compress() method doesn't exist");
 	}
-	if (x1.readBoolean == false) {
+	if ((Type.typeof(x1.readBoolean) == ValueType.TFunction)) {
 	    DejaGnu.pass("ByteArray::readBoolean() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readBoolean() method doesn't exist");
 	}
-	if (x1.readByte == 0) {
+	if (Type.typeof(x1.readByte) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readByte() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readByte() method doesn't exist");
 	}
-	if (x1.readBytes == null) {
+	if (Type.typeof(x1.readBytes) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readBytes() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readBytes() method doesn't exist");
 	}
-	if (x1.readDouble == 0) {
+	if (Type.typeof(x1.readDouble) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readDouble() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readDouble() method doesn't exist");
 	}
-	if (x1.readFloat == 0) {
+	if (Type.typeof(x1.readFloat) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readFloat() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readFloat() method doesn't exist");
 	}
-	if (x1.readInt == 0) {
+	if (Type.typeof(x1.readInt) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readInt() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readInt() method doesn't exist");
 	}
-	if (x1.readMultiByte == null) {
+	if (Type.typeof(x1.readMultiByte) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readMultiByte() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readMultiByte() method doesn't exist");
 	}
-	if (x1.readObject == *) {
+	if (Type.typeof(x1.readObject) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readObject() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readObject() method doesn't exist");
 	}
-	if (x1.readShort == 0) {
+	if (Type.typeof(x1.readShort) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readShort() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readShort() method doesn't exist");
 	}
-	if (x1.readUnsignedByte == 0) {
+	if (Type.typeof(x1.readUnsignedByte) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readUnsignedByte() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readUnsignedByte() method doesn't exist");
 	}
-	if (x1.readUnsignedInt == 0) {
+	if (Type.typeof(x1.readUnsignedInt) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readUnsignedInt() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readUnsignedInt() method doesn't exist");
 	}
-	if (x1.readUnsignedShort == 0) {
+	if (Type.typeof(x1.readUnsignedShort) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readUnsignedShort() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readUnsignedShort() method doesn't exist");
 	}
-	if (x1.readUTF == null) {
+	if (Type.typeof(x1.readUTF) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readUTF() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readUTF() method doesn't exist");
 	}
-	if (x1.readUTFBytes == null) {
+	if (Type.typeof(x1.readUTFBytes) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::readUTFBytes() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::readUTFBytes() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::toString() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::toString() method doesn't exist");
 	}
-	if (x1.uncompress == null) {
+	if (Type.typeof(x1.uncompress) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::uncompress() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::uncompress() method doesn't exist");
 	}
-	if (x1.writeBoolean == null) {
+	if (Type.typeof(x1.writeBoolean) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeBoolean() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeBoolean() method doesn't exist");
 	}
-	if (x1.writeByte == null) {
+	if (Type.typeof(x1.writeByte) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeByte() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeByte() method doesn't exist");
 	}
-	if (x1.writeBytes == null) {
+	if (Type.typeof(x1.writeBytes) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeBytes() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeBytes() method doesn't exist");
 	}
-	if (x1.writeDouble == null) {
+	if (Type.typeof(x1.writeDouble) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeDouble() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeDouble() method doesn't exist");
 	}
-	if (x1.writeFloat == null) {
+	if (Type.typeof(x1.writeFloat) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeFloat() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeFloat() method doesn't exist");
 	}
-	if (x1.writeInt == null) {
+	if (Type.typeof(x1.writeInt) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeInt() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeInt() method doesn't exist");
 	}
-	if (x1.writeMultiByte == null) {
+	if (Type.typeof(x1.writeMultiByte) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeMultiByte() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeMultiByte() method doesn't exist");
 	}
-	if (x1.writeObject == null) {
+	if (Type.typeof(x1.writeObject) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeObject() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeObject() method doesn't exist");
 	}
-	if (x1.writeShort == null) {
+	if (Type.typeof(x1.writeShort) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeShort() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeShort() method doesn't exist");
 	}
-	if (x1.writeUnsignedInt == null) {
+	if (Type.typeof(x1.writeUnsignedInt) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeUnsignedInt() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeUnsignedInt() method doesn't exist");
 	}
-	if (x1.writeUTF == null) {
+	if (Type.typeof(x1.writeUTF) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeUTF() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeUTF() method doesn't exist");
 	}
-	if (x1.writeUTFBytes == null) {
+	if (Type.typeof(x1.writeUTFBytes) == ValueType.TFunction) {
 	    DejaGnu.pass("ByteArray::writeUTFBytes() method exists");
 	} else {
 	    DejaGnu.fail("ByteArray::writeUTFBytes() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
