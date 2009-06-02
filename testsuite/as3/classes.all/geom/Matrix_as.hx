@@ -25,10 +25,13 @@
 
 #if flash9
 import flash.display.MovieClip;
-#else
+#end
+#if flash8
 import flash.MovieClip;
 #end
+#if !(flash6 || flash7)
 import flash.geom.Matrix;
+#end
 import flash.Lib;
 import Type;
 import Std;
@@ -39,6 +42,7 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Matrix_as {
     static function main() {
+#if !(flash6 || flash7)
         var x1:Matrix = new Matrix();
 
         // Make sure we actually get a valid class        
@@ -147,6 +151,9 @@ class Matrix_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#else
+    DejaGnu.note("This class (Matrix) is only available in flash8 and flash9");
+#end
     }
 }
 

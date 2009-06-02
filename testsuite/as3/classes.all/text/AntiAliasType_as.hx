@@ -26,9 +26,6 @@
 #if flash9
 import flash.text.AntiAliasType;
 import flash.display.MovieClip;
-#else
-import flash.AntiAliasType;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,21 +36,44 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class AntiAliasType_as {
     static function main() {
-        var x1:AntiAliasType = new AntiAliasType();
+#if flash9
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("AntiAliasType class exists");
+		if (AntiAliasType.ADVANCED != null) {
+            DejaGnu.pass("AntiAliasType.ADVANCED class exists");
+            if (Std.is(AntiAliasType.ADVANCED, String)) {
+            	DejaGnu.pass("AntiAliasType.ADVANCED is a String");
+            	if (Std.string(AntiAliasType.ADVANCED) == "advanced") {
+            		DejaGnu.pass("AntiAliasType.ADVANCED is the correct string (advanced)");
+            	} else {
+            		DejaGnu.fail("AntiAliasType.ADVANCED is not the correct string (Should be advanced, but is "+AntiAliasType.ADVANCED+")");
+            	}
+            } else {
+            	DejaGnu.fail("AntiAliasType.ADVANCED is not a string. Instead, it is a "+Type.typeof(AntiAliasType.ADVANCED));
+            }
         } else {
-            DejaGnu.fail("AntiAliasType class doesn't exist");
+            DejaGnu.fail("AntiAliasType.ADVANCED class doesn't exist");
         }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
+        if (AntiAliasType.NORMAL != null) {
+            DejaGnu.pass("AntiAliasType.NORMAL class exists");
+            if (Std.is(AntiAliasType.NORMAL, String)) {
+            	DejaGnu.pass("AntiAliasType.NORMAL is a String");
+            	if (Std.string(AntiAliasType.NORMAL) == "normal") {
+            		DejaGnu.pass("AntiAliasType.NORMAL is the correct string (normal)");
+            	} else {
+            		DejaGnu.fail("AntiAliasType.NORMAL is not the correct string (Should be normal, but is "+AntiAliasType.NORMAL+")");
+            	}
+            } else {
+            	DejaGnu.fail("AntiAliasType.NORMAL is not a string. Instead, it is a "+Type.typeof(AntiAliasType.NORMAL));
+            }
+        } else {
+            DejaGnu.fail("AntiAliasType.NORMAL doesn't exist");
+        }
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#else
+	DejaGnu.note("This class (AntiAliasType) is only available in flash9");
+#end
     }
 }
 
