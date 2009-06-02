@@ -56,7 +56,7 @@ include $(srcdir)/geom/geom.am
 include $(srcdir)/media/media.am
 include $(srcdir)/net/net.am
 include $(srcdir)/printing/printing.am
-include $(srcdir)/sampler/sampler.am
+# # include $(srcdir)/sampler/sampler.am
 # # HAXE doesn't appear to support the Security classes
 # # include $(srcdir)/security/security.am
 include $(srcdir)/system/system.am
