@@ -169,10 +169,12 @@ public:
         return m_parent.get();
     }
 
-    /// for extern movie
+    /// Set the parent of this DisplayObject
+    //
+    /// In AS3, DisplayObjects may be created before being attached to 
+    /// a parent. In AS2, this is only used for external movies
     void set_parent(DisplayObject* parent)
     {
-        assert(_origTarget.empty());
         m_parent = parent;
     }
 

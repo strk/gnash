@@ -2267,11 +2267,32 @@ MovieClip::unload()
     return shouldKeepAlive;
 }
 
+DisplayObject*
+MovieClip::removeChild(DisplayObject* obj)
+{
+    _displayList.removeDisplayObject(obj);
+    obj->set_parent(0);
+    return obj;
+}
+
+DisplayObject*
+MovieClip::removeChildAt(int index)
+{
+    DisplayObject* obj = _displayList.removeDisplayObjectAt(index);
+    if (obj) obj->set_parent(0);
+
+    return obj;
+}
 
 DisplayObject*
 MovieClip::addChild(DisplayObject* obj)
 {
+    // TODO: should be a DisplayObjectContainer; remove dynamic_cast.
+    MovieClip* parent = dynamic_cast<MovieClip*>(obj->get_parent());
+    if (parent) parent->removeChild(obj);
+
     _displayList.addDisplayObject(obj);
+    obj->set_parent(this);
     return obj;
 }
 
@@ -2279,7 +2300,12 @@ MovieClip::addChild(DisplayObject* obj)
 DisplayObject*
 MovieClip::addChildAt(DisplayObject* obj, int index)
 {
+    // TODO: should be a DisplayObjectContainer; remove dynamic_cast.
+    MovieClip* parent = dynamic_cast<MovieClip*>(obj->get_parent());
+    if (parent) parent->removeChild(obj);
+    
     _displayList.insertDisplayObject(obj, index);
+    obj->set_parent(this);
     return obj;
 }
 

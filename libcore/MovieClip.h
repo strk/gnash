@@ -128,6 +128,27 @@ public:
 
     virtual ~MovieClip();
 
+    /// Remove the DisplayObject at the specified depth.
+    //
+    /// TODO: should be a function of DisplayObjectContainer
+    /// This is the implementation of the AS3-only method
+    /// DisplayObjectContainer.removeChildAt().
+    //
+    /// @param index    The depth from which to remove a DisplayObject.
+    /// @return         The removed DisplayObject (reflects the AS return)
+    virtual DisplayObject* removeChildAt(int index);
+    
+    /// Remove the specified child DisplayObject.
+    //
+    /// TODO: should be a function of DisplayObjectContainer
+    /// This is the implementation of the AS3-only method
+    /// DisplayObjectContainer.removeChild(), but can also be used for
+    /// AS2.
+    //
+    /// @param obj      The DisplayObject to remove.
+    /// @return         The removed DisplayObject (reflects the AS return)
+    virtual DisplayObject* removeChild(DisplayObject* obj);
+    
     /// Add a child DisplayObject at the next suitable index (AS2: depth).
     //
     /// TODO: should be a function of DisplayObjectContainer
