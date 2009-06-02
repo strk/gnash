@@ -45,8 +45,8 @@ get_flash_sampler_package(const fn_call& fn)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (as3classes[++i] != 0) {
-	    as3classes[i](*pkg);
+	while (as3samplerclasses[++i] != 0) {
+	    as3samplerclasses[i](*pkg);
     }
 
 	return pkg;

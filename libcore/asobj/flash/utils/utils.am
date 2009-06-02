@@ -74,7 +74,7 @@ utilsclasses.h: Makefile
 	echo "#ifndef GNASH_ASOBJ_FLASH_UTILS_H" >> $${header}; \
 	echo "#define GNASH_ASOBJ_FLASH_UTILS_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
-	echo "static gnash::SharedLib::initentry *as3classes[] = {" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as3utilsclasses[] = {" >> $${header}; \
 	sources="`echo $(UTILS_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

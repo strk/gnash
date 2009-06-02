@@ -49,8 +49,8 @@ get_flash_utils_package(const fn_call& fn)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (as3classes[i]) {
-	    as3classes[i](*pkg);
+	while (as3utilsclasses[i]) {
+	    as3utilsclasses[i](*pkg);
         ++i;
     }
 

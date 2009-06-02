@@ -42,8 +42,8 @@ get_flash_external_package(const fn_call& fn)
 
     // Call the [objectname]_init() function for each class.
     int i = 0;
-    while (as3classes[i]) {
-        as3classes[i](*pkg);
+    while (as3externalclasses[i]) {
+        as3externalclasses[i](*pkg);
         ++i;
     } 
 

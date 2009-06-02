@@ -45,8 +45,8 @@ get_flash_xml_package(const fn_call& fn)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-	while (as3classes[i]) {
-	    as3classes[i](*pkg);
+	while (as3xmlclasses[i]) {
+	    as3xmlclasses[i](*pkg);
         ++i;
 	} 
 

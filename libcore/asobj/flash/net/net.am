@@ -144,7 +144,7 @@ netclasses.h: Makefile
 	echo "#ifndef GNASH_ASOBJ_FLASH_NET_H" >> $${header}; \
 	echo "#define GNASH_ASOBJ_FLASH_NET_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
-	echo "static gnash::SharedLib::initentry *as3classes[] = {" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as3netclasses[] = {" >> $${header}; \
 	sources="`echo $(NET_SOURCES) $(NET_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
@@ -153,7 +153,7 @@ netclasses.h: Makefile
 	done; \
 	echo '	0' >> $${header}; \
 	echo '};' >> $${header}; \
-	echo "static gnash::SharedLib::initentry *as2classes[] = {" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *as2netclasses[] = {" >> $${header}; \
 	sources="`echo $(NET_SOURCES_AS2) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
 	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \

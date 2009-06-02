@@ -62,14 +62,14 @@ get_flash_net_package(const fn_call& fn)
 	int i = 0;
 
     if (as3) {
-        while (as3classes[i]) {
-            as3classes[i](*pkg);
+        while (as3netclasses[i]) {
+            as3netclasses[i](*pkg);
             ++i;
         }
     }
     else {
-        while (as2classes[i]) {
-            as2classes[i](*pkg);
+        while (as2netclasses[i]) {
+            as2netclasses[i](*pkg);
             ++i;
         }
     }

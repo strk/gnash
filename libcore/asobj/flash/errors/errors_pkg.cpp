@@ -48,8 +48,8 @@ get_flash_errors_package(const fn_call& fn)
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
-    while (as3classes[i]) {
-	    as3classes[i](*pkg);
+    while (as3errorsclasses[i]) {
+	    as3errorsclasses[i](*pkg);
         ++i;
     }
 
