@@ -32,6 +32,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -42,34 +43,37 @@ class XMLSocket_as {
         var x1:XMLSocket = new XMLSocket();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, XMLSocket)) {
             DejaGnu.pass("XMLSocket class exists");
         } else {
             DejaGnu.fail("XMLSocket class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.connected == false) {
+
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	#if flash9
+	if (Type.typeof(x1.connected)==TBool) {
 	    DejaGnu.pass("XMLSocket.connected property exists");
 	} else {
 	    DejaGnu.fail("XMLSocket.connected property doesn't exist");
 	}
+	#end
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.close == null) {
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.close)==TFunction) {
 	    DejaGnu.pass("XMLSocket::close() method exists");
 	} else {
 	    DejaGnu.fail("XMLSocket::close() method doesn't exist");
 	}
-	if (x1.connect == null) {
+	if (Type.typeof(x1.connect)==TFunction) {
 	    DejaGnu.pass("XMLSocket::connect() method exists");
 	} else {
 	    DejaGnu.fail("XMLSocket::connect() method doesn't exist");
 	}
-	if (x1.send == null) {
+	if (Type.typeof(x1.send)==TFunction) {
 	    DejaGnu.pass("XMLSocket::send() method exists");
 	} else {
 	    DejaGnu.fail("XMLSocket::send() method doesn't exist");

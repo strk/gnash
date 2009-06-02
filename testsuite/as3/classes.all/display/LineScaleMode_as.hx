@@ -27,7 +27,6 @@
 import flash.display.LineScaleMode;
 import flash.display.MovieClip;
 #else
-import flash.LineScaleMode;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -39,26 +38,24 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class LineScaleMode_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if ( LineScaleMode.HORIZONTAL != null) {
+
+	#if flash9
+        if (Type.typeof(LineScaleMode.HORIZONTAL)!= TNull) {
             DejaGnu.pass("LineScaleMode.HORIZONTAL constant exists");
         } else {
             DejaGnu.fail("LineScaleMode.HORIZONTAL constant doesn't exist");
         }
-
-        if ( LineScaleMode.NONE != null) {
+        if (Type.typeof(LineScaleMode.NONE) != TNull) {
             DejaGnu.pass("LineScaleMode.NONE constant exists");
         } else {
             DejaGnu.fail("LineScaleMode.NONE constant doesn't exist");
         }
-
-        if ( LineScaleMode.NORMAL != null) {
+        if (Type.typeof(LineScaleMode.NORMAL) != TNull) {
             DejaGnu.pass("LineScaleMode.NORMAL constant exists");
         } else {
             DejaGnu.fail("LineScaleMode.NORMAL constant doesn't exist");
         }
-
-        if ( LineScaleMode.VERTICAL != null) {
+        if (Type.typeof(LineScaleMode.VERTICAL) != TNull) {
             DejaGnu.pass("LineScaleMode.VERTICAL constant exists");
         } else {
             DejaGnu.fail("LineScaleMode.VERTICAL constant doesn't exist");
@@ -66,6 +63,7 @@ class LineScaleMode_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

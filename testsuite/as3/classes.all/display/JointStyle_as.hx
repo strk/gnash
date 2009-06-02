@@ -27,7 +27,6 @@
 import flash.display.JointStyle;
 import flash.display.MovieClip;
 #else
-import flash.JointStyle;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -39,20 +38,21 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class JointStyle_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (JointStyle.BEVEL != null) {
+
+	#if flash9
+        if (Type.typeof(JointStyle.BEVEL)!= null) {
             DejaGnu.pass("JointStyle.BEVEL constant exists");
         } else {
             DejaGnu.fail("JointStyle .BEVEL constant doesn't exist");
         }
 
-        if (JointStyle.MITER != null) {
+        if (Type.typeof(JointStyle.MITER)!= null) {
             DejaGnu.pass("JointStyle.MITER constant exists");
         } else {
             DejaGnu.fail("JointStyle.MITER constant doesn't exist");
         }
 
-        if (JointStyle.ROUND != null) {
+        if (Type.typeof(JointStyle.ROUND)!= null) {
             DejaGnu.pass("JointStyle.ROUND constant exists");
         } else {
             DejaGnu.fail("JointStyle.ROUND constant doesn't exist");
@@ -60,6 +60,7 @@ class JointStyle_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

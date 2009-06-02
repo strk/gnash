@@ -27,7 +27,6 @@
 import flash.display.StageDisplayState;
 import flash.display.MovieClip;
 #else
-import flash.StageDisplayState;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -40,32 +39,33 @@ import DejaGnu;
 class StageDisplayState_as {
     static function main() {
 
-        // Make sure we actually get a valid class        
-        if (StageDisplayState.FULL_SCREEN != null) {
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	
+	#if flash9
+	if (Type.typeof(StageDisplayState.FULL_SCREEN)!=TNull) {     
             DejaGnu.pass("StageDisplayState.FULL_SCREEN constant exists");
         } else {
             DejaGnu.fail("StageDisplayState.FULL_SCREEN constant doesn't exist");
         }
 
-// This constant is AIR only
-//         if (StageDisplayState.FULL_SCREEN_INTERACTIVE != null) {
-//             DejaGnu.pass("StageDisplayState.FULL_SCREEN_INTERACTIVE constant exists");
-//         } else {
-//             DejaGnu.fail("StageDisplayState.FULL_SCREEN_INTERACTIVE constant doesn't exist");
-//         }
+	// This constant is AIR only
+	//	   if (Type.typeof(StageDisplayState.FULL_SCREEN_INTERACTIVE)!=TNull) {
+	//             DejaGnu.pass("StageDisplayState.FULL_SCREEN_INTERACTIVE constant exists");
+	//         } else {
+	//             DejaGnu.fail("StageDisplayState.FULL_SCREEN_INTERACTIVE constant doesn't exist");
+	//         }
 
-        if (StageDisplayState.NORMAL != null) {
+	if (Type.typeof(StageDisplayState.NORMAL)!=TNull) {
             DejaGnu.pass("StageDisplayState.NORMAL constant exists");
         } else {
             DejaGnu.fail("StageDisplayState.NORMAL constant doesn't exist");
         }
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

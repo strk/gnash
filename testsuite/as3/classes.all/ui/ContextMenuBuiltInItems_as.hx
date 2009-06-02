@@ -27,11 +27,11 @@
 import flash.ui.ContextMenuBuiltInItems;
 import flash.display.MovieClip;
 #else
-import flash.ContextMenuBuiltInItems;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +39,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ContextMenuBuiltInItems_as {
     static function main() {
+	#if flash9
         var x1:ContextMenuBuiltInItems = new ContextMenuBuiltInItems();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+        // Make sure we actually get a valid class    
+	if (Std.is(x1, ContextMenuBuiltInItems)) {    
             DejaGnu.pass("ContextMenuBuiltInItems class exists");
         } else {
             DejaGnu.fail("ContextMenuBuiltInItems class doesn't exist");
@@ -50,42 +51,42 @@ class ContextMenuBuiltInItems_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.forwardAndBack == false) {
+	if (Std.is(x1.forwardAndBack, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.forwardAndBack property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.forwardAndBack property doesn't exist");
 	}
-	if (x1.loop == false) {
+	if (Std.is(x1.loop, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.loop property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.loop property doesn't exist");
 	}
-	if (x1.play == false) {
+	if (Std.is(x1.play, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.play property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.play property doesn't exist");
 	}
-	if (x1.print == false) {
+	if (Std.is(x1.print, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.print property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.print property doesn't exist");
 	}
-	if (x1.quality == false) {
+	if (Std.is(x1.quality, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.quality property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.quality property doesn't exist");
 	}
-	if (x1.rewind == false) {
+	if (Std.is(x1.rewind, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.rewind property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.rewind property doesn't exist");
 	}
-	if (x1.save == false) {
+	if (Std.is(x1.save, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.save property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.save property doesn't exist");
 	}
-	if (x1.zoom == false) {
+	if (Std.is(x1.zoom, Bool)) {
 	    DejaGnu.pass("ContextMenuBuiltInItems.zoom property exists");
 	} else {
 	    DejaGnu.fail("ContextMenuBuiltInItems.zoom property doesn't exist");
@@ -93,6 +94,7 @@ class ContextMenuBuiltInItems_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

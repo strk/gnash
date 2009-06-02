@@ -24,14 +24,17 @@
 //  DejaGnu.hx header file for the testing framework support.
 
 #if flash9
-import flash.ui.ContextMenu;
 import flash.display.MovieClip;
+import flash.ui.ContextMenuBuiltInItems;
+import flash.ui.ContextMenu;
 #else
-import flash.ContextMenu;
 import flash.MovieClip;
+import flash.ContextMenu;
+//import flash.ContextMenuBuiltInItems;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,47 +42,40 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ContextMenu_as {
     static function main() {
+	
+	#if flash9
         var x1:ContextMenu = new ContextMenu();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+        // Make sure we actually get a valid class 
+	if (Std.is(x1, ContextMenu)) {       
             DejaGnu.pass("ContextMenu class exists");
         } else {
             DejaGnu.fail("ContextMenu class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.builtInItems == builtInItems) {
+
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Std.is(x1.builtInItems, ContextMenuBuiltInItems)) {	
 	    DejaGnu.pass("ContextMenu.builtInItems property exists");
 	} else {
 	    DejaGnu.fail("ContextMenu.builtInItems property doesn't exist");
 	}
-	if (x1.customItems == 0) {
+	if (Std.is(x1.customItems, Array)) {
 	    DejaGnu.pass("ContextMenu.customItems property exists");
 	} else {
 	    DejaGnu.fail("ContextMenu.customItems property doesn't exist");
 	}
-	if (x1.items == 0) {
-	    DejaGnu.pass("ContextMenu.items property exists");
-	} else {
-	    DejaGnu.fail("ContextMenu.items property doesn't exist");
-	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.ContextMenu == ContextMenu) {
-	    DejaGnu.pass("ContextMenu::ContextMenu() method exists");
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.clone)==ValueType.TFunction) {
+ 	    DejaGnu.pass("ContextMenu::clone() method exists");
 	} else {
-	    DejaGnu.fail("ContextMenu::ContextMenu() method doesn't exist");
+	    DejaGnu.fail("ContextMenu::clone() method doesn't exist");
 	}
-	if (x1.display == null) {
-	    DejaGnu.pass("ContextMenu::display() method exists");
-	} else {
-	    DejaGnu.fail("ContextMenu::display() method doesn't exist");
-	}
-	if (x1.hideBuiltInItems == null) {
+	if (Type.typeof(x1.hideBuiltInItems)==ValueType.TFunction) {
 	    DejaGnu.pass("ContextMenu::hideBuiltInItems() method exists");
 	} else {
 	    DejaGnu.fail("ContextMenu::hideBuiltInItems() method doesn't exist");
@@ -87,6 +83,7 @@ class ContextMenu_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

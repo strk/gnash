@@ -26,12 +26,13 @@
 #if flash9
 import flash.display.Loader;
 import flash.display.MovieClip;
+import flash.display.LoaderInfo;
 #else
-import flash.Loader;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,52 +40,54 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Loader_as {
     static function main() {
+
+	#if flash9
         var x1:Loader = new Loader();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+        // Make sure we actually get a valid class     
+	if (Std.is(x1, Loader)) {   
             DejaGnu.pass("Loader class exists");
         } else {
             DejaGnu.fail("Loader lass doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.content == content) {
-// 	    DejaGnu.pass("Loader::content property exists");
-// 	} else {
-// 	    DejaGnu.fail("Loader::content property doesn't exist");
-// 	}
-// 	if (x1.contentLoaderInfo == contentLoaderInfo) {
-// 	    DejaGnu.pass("Loader::contentLoaderInfo property exists");
-// 	} else {
-// 	    DejaGnu.fail("Loader::contentLoaderInfo property doesn't exist");
-// 	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.Loader == Loader) {
-// 	    DejaGnu.pass("Loader::Loader() method exists");
-// 	} else {
-// 	    DejaGnu.fail("Loader::Loader() method doesn't exist");
-// 	}
-	if (x1.close == null) {
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+
+	// FIXME: cannot set content to load, can only get content, so test this 
+	// later 
+	/*if (Std.is(x1.content, DisplayObject)) {
+ 	    DejaGnu.pass("Loader::content property exists");
+ 	} else {
+ 	    DejaGnu.fail("Loader::content property doesn't exist");
+	}*/
+
+	if (Std.is(x1.contentLoaderInfo, LoaderInfo)) {
+	    DejaGnu.pass("Loader::contentLoaderInfo property exists");
+ 	} else {
+ 	    DejaGnu.fail("Loader::contentLoaderInfo property doesn't exist");
+ 	}
+
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.close)==TFunction) {
 	    DejaGnu.pass("Loader::close() method exists");
 	} else {
 	    DejaGnu.fail("Loader::close() method doesn't exist");
 	}
-	if (x1.load == null) {
+	if (Type.typeof(x1.load)==TFunction) {
 	    DejaGnu.pass("Loader::load() method exists");
 	} else {
 	    DejaGnu.fail("Loader::load() method doesn't exist");
 	}
-	if (x1.loadBytes == null) {
+	if (Type.typeof(x1.loadBytes)==TFunction) {
 	    DejaGnu.pass("Loader::loadBytes() method exists");
 	} else {
 	    DejaGnu.fail("Loader::loadBytes() method doesn't exist");
 	}
-	if (x1.unload == null) {
+	if (Type.typeof(x1.unload)==TFunction) {
 	    DejaGnu.pass("Loader::unload() method exists");
 	} else {
 	    DejaGnu.fail("Loader::unload() method doesn't exist");
@@ -92,6 +95,7 @@ class Loader_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

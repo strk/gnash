@@ -27,11 +27,11 @@
 import flash.display.PixelSnapping;
 import flash.display.MovieClip;
 #else
-import flash.PixelSnapping;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -40,31 +40,31 @@ import DejaGnu;
 class PixelSnapping_as {
     static function main() {
 
-        // Make sure we actually get a valid class        
-        if (PixelSnapping.ALWAYS != null) {
+// Tests to see if all the properties exist. All these do is test for
+// existance of a property, and don't test the functionality at all. This
+// is primarily useful only to test completeness of the API implementation.
+	#if flash9
+	if (Type.typeof(PixelSnapping.ALWAYS) != TNull) {
             DejaGnu.pass("PixelSnapping.ALWAYS constant exists");
         } else {
             DejaGnu.fail("PixelSnapping.ALWAYSconstant doesn't exist");
         }
 
-        if (PixelSnapping.AUTO != null) {
+        if (Type.typeof(PixelSnapping.AUTO) != TNull) {
             DejaGnu.pass("PixelSnapping.AUTO constant exists");
         } else {
             DejaGnu.fail("PixelSnapping.AUTO doesn't exist");
         }
 
-        if (PixelSnapping.NEVER != null) {
+        if (Type.typeof(PixelSnapping.NEVER) != TNull) {
             DejaGnu.pass("PixelSnapping.NEVER constant exists");
         } else {
             DejaGnu.fail("PixelSnapping.NEVER doesn't exist");
         }
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

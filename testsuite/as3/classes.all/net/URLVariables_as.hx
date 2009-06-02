@@ -27,11 +27,11 @@
 import flash.net.URLVariables;
 import flash.display.MovieClip;
 #else
-import flash.URLVariables;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,21 +39,20 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLVariables_as {
     static function main() {
+	
+	#if flash9
         var x1:URLVariables = new URLVariables();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, URLVariables)) {
             DejaGnu.pass("URLVariables class exists");
         } else {
             DejaGnu.fail("URLVariables class doesn't exist");
         }
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 
