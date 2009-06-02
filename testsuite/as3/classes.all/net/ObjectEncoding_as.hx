@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.ObjectEncoding;
 import flash.display.MovieClip;
-#else
-import flash.ObjectEncoding;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,8 +37,10 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ObjectEncoding_as {
     static function main() {
-        // Make sure we actually get a valid class        
-
+	#if !flash9
+		DejaGnu.note("this test is not valid for this version of flash.");
+	#end
+	#if flash9
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
@@ -49,17 +49,17 @@ class ObjectEncoding_as {
 	} else {
 	    DejaGnu.fail("ObjectEncoding::AMF0() constant doesn't exist");
 	}
-	if (ObjectEncoding.AMF3 == 0) {
+	if (ObjectEncoding.AMF3 == 3) {
 	    DejaGnu.pass("ObjectEncoding::AMF3() constant exists");
 	} else {
 	    DejaGnu.fail("ObjectEncoding::AMF3() constant doesn't exist");
 	}
-	if (ObjectEncoding.DEFAULT == 0) {
+	if (ObjectEncoding.DEFAULT == 3) {
 	    DejaGnu.pass("ObjectEncoding::DEFAULT() constant exists");
 	} else {
 	    DejaGnu.fail("ObjectEncoding::DEFAULT() constant doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

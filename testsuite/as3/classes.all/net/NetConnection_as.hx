@@ -32,6 +32,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,83 +40,107 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class NetConnection_as {
     static function main() {
-        var x1:NetConnection = new NetConnection();
+        #if flash9
+		DejaGnu.note("NOTE: this test is not currently working with Adobe Flash v.9");
+		DejaGnu.note("      due to new security regulations in flash 9. we need to have");
+		DejaGnu.note("      a server we can check this against to ensure netconnect works");
+		#end
+		//var x1:NetConnection = new NetConnection();
+		//x1.connect("http://ubuntu");
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("NetConnection class exists");
-        } else {
-            DejaGnu.fail("NetConnection class doesn't exist");
-        }
+        //if (x1 != null) {
+        //    DejaGnu.pass("NetConnection class exists");
+        //} else {
+        //    DejaGnu.fail("NetConnection class doesn't exist");
+        //}
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (x1.client == Object) {
-// 	    DejaGnu.pass("NetConnection.client property exists");
-// 	} else {
-// 	    DejaGnu.fail("NetConnection.client property doesn't exist");
-// 	}
-	if (x1.connected == false) {
-	    DejaGnu.pass("NetConnection.connected property exists");
-	} else {
-	    DejaGnu.fail("NetConnection.connected property doesn't exist");
-	}
-	if (x1.connectedProxyType == null) {
-	    DejaGnu.pass("NetConnection.connectedProxyType property exists");
-	} else {
-	    DejaGnu.fail("NetConnection.connectedProxyType property doesn't exist");
-	}
+ 	//if (Type.typeof(x1.client) == ValueType.TObject) {
+ 	//    DejaGnu.pass("NetConnection.client property exists");
+ 	//} else {
+ 	//    DejaGnu.fail("NetConnection.client property doesn't exist");
+	//}
+	//if (Std.is(x1.connected, Bool)) {
+	//    DejaGnu.pass("NetConnection.connected property exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection.connected property doesn't exist");
+	//}
+	//may need to be null
+	//if (Std.is(x1.connectedProxyType, String)) {
+	//    DejaGnu.pass("NetConnection.connectedProxyType property exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection.connectedProxyType property doesn't exist");
+	//}
 // FIXME: Cannot access static field defaultObjectEncoding from a class instance
 // 	if (x1.defaultObjectEncoding == 0) {
 // 	    DejaGnu.pass("NetConnection.defaultObjectEncoding property exists");
 // 	} else {
 // 	    DejaGnu.fail("NetConnection.defaultObjectEncoding property doesn't exist");
 // 	}
-	if (x1.objectEncoding == 0) {
-	    DejaGnu.pass("NetConnection.objectEncoding property exists");
-	} else {
-	    DejaGnu.fail("NetConnection.objectEncoding property doesn't exist");
-	}
-	if (x1.proxyType == null) {
-	    DejaGnu.pass("NetConnection.proxyType property exists");
-	} else {
-	    DejaGnu.fail("NetConnection.proxyType property doesn't exist");
-	}
-	if (x1.uri == null) {
-	    DejaGnu.pass("NetConnection.uri property exists");
-	} else {
-	    DejaGnu.fail("NetConnection.uri property doesn't exist");
-	}
-	if (x1.usingTLS == false) {
-	    DejaGnu.pass("NetConnection.usingTLS property exists");
-	} else {
-	    DejaGnu.fail("NetConnection.usingTLS property doesn't exist");
-	}
+	//if (Std.is(x1.objectEncoding, Float)) {
+	//    DejaGnu.pass("NetConnection.objectEncoding property exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection.objectEncoding property doesn't exist");
+	//}
+	//if (Std.is(x1.proxyType, String)) {
+	//   DejaGnu.pass("NetConnection.proxyType property exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection.proxyType property doesn't exist");
+	//}
+	//if (Std.is(x1.uri, String)) {
+	//    DejaGnu.pass("NetConnection.uri property exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection.uri property doesn't exist");
+	//}
+	//if (Std.is(x1.usingTLS, Bool)) {
+	//    DejaGnu.pass("NetConnection.usingTLS property exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection.usingTLS property doesn't exist");
+	//}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.addHeader == null) {
-	    DejaGnu.pass("NetConnection::addHeader() method exists");
-	} else {
-	    DejaGnu.fail("NetConnection::addHeader() method doesn't exist");
-	}
-	if (x1.call == null) {
-	    DejaGnu.pass("NetConnection::call() method exists");
-	} else {
-	    DejaGnu.fail("NetConnection::call() method doesn't exist");
-	}
-	if (x1.close == null) {
-	    DejaGnu.pass("NetConnection::close() method exists");
-	} else {
-	    DejaGnu.fail("NetConnection::close() method doesn't exist");
-	}
-	if (x1.connect == null) {
-	    DejaGnu.pass("NetConnection::connect() method exists");
-	} else {
-	    DejaGnu.fail("NetConnection::connect() method doesn't exist");
-	}
-
+	//if (Type.typeof(x1.addHeader) == ValueType.TFunction) {
+	//    DejaGnu.pass("NetConnection::addHeader() method exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection::addHeader() method doesn't exist");
+	//}
+	//if (Type.typeof(x1.call) == ValueType.TFunction) {
+	//    DejaGnu.pass("NetConnection::call() method exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection::call() method doesn't exist");
+	//}
+	//if (Type.typeof(x1.close) == ValueType.TFunction) {
+	//    DejaGnu.pass("NetConnection::close() method exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection::close() method doesn't exist");
+	//}
+	//if (Type.typeof(x1.connect) == ValueType.TFunction) {
+	//    DejaGnu.pass("NetConnection::connect() method exists");
+	//} else {
+	//    DejaGnu.fail("NetConnection::connect() method doesn't exist");
+	//}
+	#if (flash7 || flash8)
+		DejaGnu.note("this test requires that localhost:80 is open to connect to, use Apache");
+		
+		var x2:NetConnection = new NetConnection();
+        
+		// Make sure we actually get a valid class        
+        if (x2 != null) {
+            DejaGnu.pass("NetConnection class exists");
+        } else {
+            DejaGnu.fail("NetConnection class doesn't exist");
+        }
+		if(x2.connect("http://localhost:80") == false) {
+			DejaGnu.pass("NetConnection::connect successful!");
+		} else {
+			DejaGnu.fail("NetConnection::connect failed! (do you have localhost:80 open?)");
+		}
+		
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.URLRequestMethod;
 import flash.display.MovieClip;
-#else
-import flash.URLRequestMethod;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,16 +37,19 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLRequestMethod_as {
     static function main() {
-
+	#if !flash9
+		DejaGnu.note("this is not valid for this version of flash");
+	#end
+	#if flash9
         // Make sure we actually get a valid class
-// FIXME: commented out constants are all AIR only	
+// FIXME: commented out constants are all AIR only	(not implemented in haxe)
 //         if (URLRequestMethod.DELETE != null) {
 //             DejaGnu.pass("URLRequestMethod.DELETE constant exists");
 //         } else {
 //             DejaGnu.fail("URLRequestMethod.DELETE constant doesn't exist");
 //         }
 
-        if (URLRequestMethod.GET != null) {
+        if (Std.string(URLRequestMethod.GET) == "GET") {
             DejaGnu.pass("URLRequestMethod.GET constant exists");
         } else {
             DejaGnu.fail("URLRequestMethod.GET constant doesn't exist");
@@ -66,7 +67,7 @@ class URLRequestMethod_as {
 //             DejaGnu.fail("URLRequestMethod.OPTIONS constant doesn't exist");
 //         }
 
-        if (URLRequestMethod.POST != null) {
+        if (Std.string(URLRequestMethod.POST) == "POST") {
             DejaGnu.pass("URLRequestMethod.POST constant exists");
         } else {
             DejaGnu.fail("URLRequestMethod.POST constant doesn't exist");
@@ -77,7 +78,7 @@ class URLRequestMethod_as {
 //         } else {
 //             DejaGnu.fail("URLRequestMethod.PUT constant doesn't exist");
 //         }
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
