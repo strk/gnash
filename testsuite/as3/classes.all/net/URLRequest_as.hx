@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.URLRequest;
 import flash.display.MovieClip;
-#else
-import flash.URLRequest;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLRequest_as {
     static function main() {
-        var x1:URLRequest = new URLRequest();
+        #if !flash9
+			DejaGnu.note("this test does not apply to this version of flash");
+		#end
+		#if flash9
+		var x1:URLRequest = new URLRequest("http://www.google.com");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,70 +52,67 @@ class URLRequest_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
-// FIXME: commented out constants are all AIR only	
- // 	if (x1.authenticate == false) {
+	//unimplemented in haxe (AIR only)
+// 	if (Std.is(x1.authenticate, Bool)) {
 // 	    DejaGnu.pass("URLRequest.authenticate property exists");
 // 	} else {
 // 	    DejaGnu.fail("URLRequest.authenticate property doesn't exist");
 // 	}
-// 	if (x1.cacheResponse == false) {
+// 	if (Std.is(x1.cacheResponse, Bool)) {
 // 	    DejaGnu.pass("URLRequest.cacheResponse property exists");
 // 	} else {
 // 	    DejaGnu.fail("URLRequest.cacheResponse property doesn't exist");
 // 	}
+	//these should be changed away from null once the class is implemented
+	//to be the true content type and desired data to be pulled.
 	if (x1.contentType == null) {
 	    DejaGnu.pass("URLRequest.contentType property exists");
 	} else {
 	    DejaGnu.fail("URLRequest.contentType property doesn't exist");
 	}
-// 	if (x1.data == Object) {
-// 	    DejaGnu.pass("URLRequest.data property exists");
-// 	} else {
-// 	    DejaGnu.fail("URLRequest.data property doesn't exist");
-// 	}
-	if (x1.digest == null) {
-	    DejaGnu.pass("URLRequest.digest property exists");
-	} else {
-	    DejaGnu.fail("URLRequest.digest property doesn't exist");
-	}
-// 	if (x1.followRedirects == false) {
-// 	    DejaGnu.pass("URLRequest.followRedirects property exists");
-// 	} else {
-// 	    DejaGnu.fail("URLRequest.followRedirects property doesn't exist");
-// 	}
-// 	if (x1.manageCookies == false) {
-// 	    DejaGnu.pass("URLRequest.manageCookies property exists");
-// 	} else {
-// 	    DejaGnu.fail("URLRequest.manageCookies property doesn't exist");
-// 	}
-	if (x1.method == null) {
+ 	if (x1.data == null) {
+ 	    DejaGnu.pass("URLRequest.data property exists");
+ 	} else {
+ 	    DejaGnu.fail("URLRequest.data property doesn't exist");
+ 	}
+	//unimplemented in haxe (AIR only)
+ 	//if (Std.is(x1.followRedirects, Bool)) {
+ 	//    DejaGnu.pass("URLRequest.followRedirects property exists");
+ 	//} else {
+ 	//    DejaGnu.fail("URLRequest.followRedirects property doesn't exist");
+ 	//}
+ 	//if (Std.is(x1.manageCookies, Bool)) {
+ 	//    DejaGnu.pass("URLRequest.manageCookies property exists");
+ 	//} else {
+ 	//   DejaGnu.fail("URLRequest.manageCookies property doesn't exist");
+ 	//}
+	if (Std.is(x1.method, String)) {
 	    DejaGnu.pass("URLRequest.method property exists");
 	} else {
 	    DejaGnu.fail("URLRequest.method property doesn't exist");
 	}
-// FIXME: returns an array
-// 	if (x1.requestHeaders == 0) {
-// 	    DejaGnu.pass("URLRequest.requestHeaders property exists");
-// 	} else {
-// 	    DejaGnu.fail("URLRequest.requestHeaders property doesn't exist");
-// 	}
-	if (x1.url == null) {
+ 	if (Std.is(x1.requestHeaders, Array)) {
+ 	    DejaGnu.pass("URLRequest.requestHeaders property exists");
+ 	} else {
+ 	    DejaGnu.fail("URLRequest.requestHeaders property doesn't exist");
+ 	}
+	if (Std.is(x1.url, String)) {
 	    DejaGnu.pass("URLRequest.url property exists");
 	} else {
 	    DejaGnu.fail("URLRequest.url property doesn't exist");
 	}
-// 	if (x1.useCache == false) {
-// 	    DejaGnu.pass("URLRequest.useCache property exists");
-// 	} else {
-// 	    DejaGnu.fail("URLRequest.useCache property doesn't exist");
-// 	}
-// 	if (x1.userAgent == null) {
-// 	    DejaGnu.pass("URLRequest.userAgent property exists");
-// 	} else {
-// 	    DejaGnu.fail("URLRequest.userAgent property doesn't exist");
-// 	}
-
+	//unimplemented in haxe (AIR only) 	
+	//if (Std.is(x1.useCache, Bool)) {
+ 	//    DejaGnu.pass("URLRequest.useCache property exists");
+	//} else {
+ 	//    DejaGnu.fail("URLRequest.useCache property doesn't exist");
+ 	//}
+	//if (Std.is(x1.userAgent, String)) {
+ 	//    DejaGnu.pass("URLRequest.userAgent property exists");
+ 	//} else {
+ 	//    DejaGnu.fail("URLRequest.userAgent property doesn't exist");
+ 	//}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

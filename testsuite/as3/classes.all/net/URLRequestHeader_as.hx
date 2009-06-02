@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.URLRequestHeader;
 import flash.display.MovieClip;
-#else
-import flash.URLRequestHeader;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLRequestHeader_as {
     static function main() {
-        var x1:URLRequestHeader = new URLRequestHeader();
+        #if !flash9
+			DejaGnu.note("this test is not valid with this version of flash");
+		#end
+		#if flash9
+		var x1:URLRequestHeader = new URLRequestHeader("Test Name", "Test Value");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,17 +52,17 @@ class URLRequestHeader_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.name == null) {
+	if (Std.is(x1.name, String) && (Std.string(x1.name) == "Test Name")) {
 	    DejaGnu.pass("URLRequestHeader.name property exists");
 	} else {
 	    DejaGnu.fail("URLRequestHeader.name property doesn't exist");
 	}
-	if (x1.value == null) {
+	if (Std.is(x1.value, String) && (Std.string(x1.value) == "Test Value")) {
 	    DejaGnu.pass("URLRequestHeader.value property exists");
 	} else {
 	    DejaGnu.fail("URLRequestHeader.value property doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
