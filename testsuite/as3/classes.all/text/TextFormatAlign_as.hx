@@ -27,8 +27,8 @@
 import flash.text.TextFormatAlign;
 import flash.display.MovieClip;
 #else
-import flash.TextFormatAlign;
-import flash.MovieClip;
+//import flash.TextFormatAlign;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,18 +39,41 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextFormatAlign_as {
     static function main() {
-        var x1:TextFormatAlign = new TextFormatAlign();
+
+#if flash9
+//        var x1:TextFormatAlign = new TextFormatAlign();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Type.typeof(TextFormatAlign)==TObject) {
             DejaGnu.pass("TextFormatAlign class exists");
         } else {
             DejaGnu.fail("TextFormatAlign class doesn't exist");
+        }
+	if (Std.is(TextFormatAlign.CENTER,String) ) {
+            DejaGnu.pass("TextFormatAlign CENTER exists");
+        } else {
+            DejaGnu.fail("TextFormatAlign CENTER doesn't exist");
+        }
+	if (Std.is(TextFormatAlign.JUSTIFY,String) ){
+            DejaGnu.pass("TextFormatAlign JUSTIFY exists");
+        } else {
+            DejaGnu.fail("TextFormatAlign JUSTIFY doesn't exist");
+        }
+	if (Std.is(TextFormatAlign.LEFT,String) ){
+            DejaGnu.pass("TextFormatAlign LEFT exists");
+        } else {
+            DejaGnu.fail("TextFormatAlign LEFT doesn't exist");
+        }
+	if (Std.is(TextFormatAlign.RIGHT,String) ){
+            DejaGnu.pass("TextFormatAlign RIGHT exists");
+        } else {
+            DejaGnu.fail("TextFormatAlign RIGHT doesn't exist");
         }
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

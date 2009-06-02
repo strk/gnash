@@ -25,13 +25,17 @@
 
 #if flash9
 import flash.text.TextField;
+import flash.text.AntiAliasType;
 import flash.display.MovieClip;
+import flash.text.TextFormat;
+import flash.text.StyleSheet;
 #else
 import flash.TextField;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +43,16 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextField_as {
     static function main() {
-        var x1:TextField = new TextField();
 
+#if flash9
+        var x1:TextField = new TextField();
+#else
+	var x1:TextField;
+#end
+
+#if flash9
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Type.typeof(TextField)==TObject && x1 != null) {
             DejaGnu.pass("TextField class exists");
         } else {
             DejaGnu.fail("TextField class doesn't exist");
@@ -50,295 +60,343 @@ class TextField_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.alwaysShowSelection == false) {
+
+	if (Type.typeof(x1.alwaysShowSelection) == TBool) {
 	    DejaGnu.pass("TextField.alwaysShowSelection property exists");
 	} else {
 	    DejaGnu.fail("TextField.alwaysShowSelection property doesn't exist");
 	}
-	if (x1.antiAliasType == null) {
+	if (Std.is(x1.antiAliasType,String) ) {
 	    DejaGnu.pass("TextField.antiAliasType property exists");
 	} else {
 	    DejaGnu.fail("TextField.antiAliasType property doesn't exist");
 	}
-	if (x1.autoSize == null) {
+	if (Std.is(x1.antiAliasType,String) ) {
+	    DejaGnu.pass("TextField.antiAliasType property exists");
+	} else {
+	    DejaGnu.fail("TextField.antiAliasType property doesn't exist");
+	}
+	if (Std.is(x1.autoSize,String) ) {
 	    DejaGnu.pass("TextField.autoSize property exists");
 	} else {
 	    DejaGnu.fail("TextField.autoSize property doesn't exist");
 	}
-	if (x1.background == false) {
+	if (Type.typeof(x1.background) == TBool) {
 	    DejaGnu.pass("TextField.background property exists");
 	} else {
 	    DejaGnu.fail("TextField.background property doesn't exist");
 	}
-	if (x1.backgroundColor == uint) {
+	if (Std.is(x1.backgroundColor,Float) ) {
 	    DejaGnu.pass("TextField.backgroundColor property exists");
 	} else {
 	    DejaGnu.fail("TextField.backgroundColor property doesn't exist");
 	}
-	if (x1.border == false) {
+	if (Type.typeof(x1.border) == TBool) {
 	    DejaGnu.pass("TextField.border property exists");
 	} else {
 	    DejaGnu.fail("TextField.border property doesn't exist");
 	}
-	if (x1.borderColor == uint) {
+	if (Std.is(x1.borderColor,Float) ) {
 	    DejaGnu.pass("TextField.borderColor property exists");
 	} else {
 	    DejaGnu.fail("TextField.borderColor property doesn't exist");
 	}
-	if (x1.bottomScrollV == 0) {
+	if (Std.is(x1.bottomScrollV,Float) ) {
 	    DejaGnu.pass("TextField.bottomScrollV property exists");
 	} else {
 	    DejaGnu.fail("TextField.bottomScrollV property doesn't exist");
 	}
-	if (x1.caretIndex == 0) {
+	if (Std.is(x1.caretIndex,Int) ) {
 	    DejaGnu.pass("TextField.caretIndex property exists");
 	} else {
 	    DejaGnu.fail("TextField.caretIndex property doesn't exist");
 	}
-	if (x1.condenseWhite == false) {
+	if (Type.typeof(x1.condenseWhite)== TBool) {
 	    DejaGnu.pass("TextField.condenseWhite property exists");
 	} else {
 	    DejaGnu.fail("TextField.condenseWhite property doesn't exist");
 	}
-	if (x1.contextMenu == NativeMenu) {
-	    DejaGnu.pass("TextField.contextMenu property exists");
-	} else {
-	    DejaGnu.fail("TextField.contextMenu property doesn't exist");
-	}
-	if (x1.defaultTextFormat == defaultTextFormat) {
+	if (Std.is(x1.defaultTextFormat,TextFormat) ) {
 	    DejaGnu.pass("TextField.defaultTextFormat property exists");
 	} else {
 	    DejaGnu.fail("TextField.defaultTextFormat property doesn't exist");
 	}
-	if (x1.displayAsPassword == false) {
+	if (Type.typeof(x1.displayAsPassword) == TBool) {
 	    DejaGnu.pass("TextField.displayAsPassword property exists");
 	} else {
 	    DejaGnu.fail("TextField.displayAsPassword property doesn't exist");
 	}
-	if (x1.embedFonts == false) {
+	if (Type.typeof(x1.embedFonts) == TBool) {
 	    DejaGnu.pass("TextField.embedFonts property exists");
 	} else {
 	    DejaGnu.fail("TextField.embedFonts property doesn't exist");
 	}
-	if (x1.gridFitType == null) {
+	if (Std.is(x1.gridFitType,String) ) {
 	    DejaGnu.pass("TextField.gridFitType property exists");
 	} else {
 	    DejaGnu.fail("TextField.gridFitType property doesn't exist");
 	}
-	if (x1.htmlText == null) {
+	if (Std.is(x1.htmlText,String) ) {
 	    DejaGnu.pass("TextField.htmlText property exists");
 	} else {
 	    DejaGnu.fail("TextField.htmlText property doesn't exist");
 	}
-	if (x1.length == 0) {
+	if (Std.is(x1.length,Int) ) {
 	    DejaGnu.pass("TextField.length property exists");
 	} else {
 	    DejaGnu.fail("TextField.length property doesn't exist");
 	}
-	if (x1.maxChars == 0) {
+	if (Std.is(x1.maxChars,Int) ) {
 	    DejaGnu.pass("TextField.maxChars property exists");
 	} else {
 	    DejaGnu.fail("TextField.maxChars property doesn't exist");
 	}
-	if (x1.maxScrollH == 0) {
+	if (Std.is(x1.maxScrollH,Int) ) {
 	    DejaGnu.pass("TextField.maxScrollH property exists");
 	} else {
 	    DejaGnu.fail("TextField.maxScrollH property doesn't exist");
 	}
-	if (x1.maxScrollV == 0) {
+	if (Std.is(x1.maxScrollV,Int) ) {
 	    DejaGnu.pass("TextField.maxScrollV property exists");
 	} else {
 	    DejaGnu.fail("TextField.maxScrollV property doesn't exist");
 	}
-	if (x1.mouseWheelEnabled == false) {
+	if (Type.typeof(x1.mouseWheelEnabled) == TBool) {
 	    DejaGnu.pass("TextField.mouseWheelEnabled property exists");
 	} else {
 	    DejaGnu.fail("TextField.mouseWheelEnabled property doesn't exist");
 	}
-	if (x1.multiline == false) {
+	if (Type.typeof(x1.multiline)==TBool ) {
 	    DejaGnu.pass("TextField.multiline property exists");
 	} else {
 	    DejaGnu.fail("TextField.multiline property doesn't exist");
 	}
-	if (x1.numLines == 0) {
+	if (Std.is(x1.numLines,Int) ) {
 	    DejaGnu.pass("TextField.numLines property exists");
 	} else {
 	    DejaGnu.fail("TextField.numLines property doesn't exist");
 	}
-	if (x1.restrict == null) {
-	    DejaGnu.pass("TextField.restrict property exists");
-	} else {
-	    DejaGnu.fail("TextField.restrict property doesn't exist");
-	}
-	if (x1.scrollH == 0) {
+//	if (Std.is(x1.restrict,String) ) {
+//	    DejaGnu.pass("TextField.restrict property exists");
+//	} else {
+//	    DejaGnu.fail("TextField.restrict property doesn't exist");
+//	}
+
+	if (Std.is(x1.scrollH,Int) ) {
 	    DejaGnu.pass("TextField.scrollH property exists");
 	} else {
 	    DejaGnu.fail("TextField.scrollH property doesn't exist");
 	}
-	if (x1.scrollV == 0) {
+	if (Std.is(x1.scrollV,Int) ) {
 	    DejaGnu.pass("TextField.scrollV property exists");
 	} else {
 	    DejaGnu.fail("TextField.scrollV property doesn't exist");
 	}
-	if (x1.selectable == false) {
+	if (Type.typeof(x1.selectable)==TBool ) {
 	    DejaGnu.pass("TextField.selectable property exists");
 	} else {
 	    DejaGnu.fail("TextField.selectable property doesn't exist");
 	}
-	if (x1.selectionBeginIndex == 0) {
+	if (Std.is(x1.selectionBeginIndex,Int) ) {
 	    DejaGnu.pass("TextField.selectionBeginIndex property exists");
 	} else {
 	    DejaGnu.fail("TextField.selectionBeginIndex property doesn't exist");
 	}
-	if (x1.selectionEndIndex == 0) {
+	if (Std.is(x1.selectionEndIndex,Int) ) {
 	    DejaGnu.pass("TextField.selectionEndIndex property exists");
 	} else {
 	    DejaGnu.fail("TextField.selectionEndIndex property doesn't exist");
-	}
-	if (x1.sharpness == 0) {
+	}	
+	if (Std.is(x1.sharpness,Float) ) {
 	    DejaGnu.pass("TextField.sharpness property exists");
 	} else {
 	    DejaGnu.fail("TextField.sharpness property doesn't exist");
 	}
-	if (x1.styleSheet == styleSheet) {
+
+//Si:
+//I initialized the StylsSheet at first
+//Then check the type of it.
+//It works fine now!
+//	DejaGnu.note("TYPE " + Type.typeof(x1.styleSheet));
+	var newStyle:StyleSheet = new StyleSheet();
+	x1.styleSheet=newStyle;
+	if (Std.is(x1.styleSheet,StyleSheet) ) {
 	    DejaGnu.pass("TextField.styleSheet property exists");
 	} else {
 	    DejaGnu.fail("TextField.styleSheet property doesn't exist");
 	}
-	if (x1.text == null) {
+	if (Std.is(x1.text,String) ) {
 	    DejaGnu.pass("TextField.text property exists");
 	} else {
 	    DejaGnu.fail("TextField.text property doesn't exist");
 	}
-	if (x1.textColor == uint) {
+	if (Std.is(x1.textColor,Int) ) {
 	    DejaGnu.pass("TextField.textColor property exists");
 	} else {
 	    DejaGnu.fail("TextField.textColor property doesn't exist");
 	}
-	if (x1.textHeight == 0) {
+	if (Std.is(x1.textHeight,Float) ) {
 	    DejaGnu.pass("TextField.textHeight property exists");
 	} else {
 	    DejaGnu.fail("TextField.textHeight property doesn't exist");
 	}
-	if (x1.textWidth == 0) {
+	if (Std.is(x1.textWidth,Float) ) {
 	    DejaGnu.pass("TextField.textWidth property exists");
 	} else {
 	    DejaGnu.fail("TextField.textWidth property doesn't exist");
 	}
-	if (x1.thickness == 0) {
+	if (Std.is(x1.thickness,Float) ){
 	    DejaGnu.pass("TextField.thickness property exists");
 	} else {
 	    DejaGnu.fail("TextField.thickness property doesn't exist");
 	}
-	if (x1.type == null) {
+	if (Std.is(x1.type,String) ) {
 	    DejaGnu.pass("TextField.type property exists");
 	} else {
 	    DejaGnu.fail("TextField.type property doesn't exist");
 	}
-	if (x1.useRichTextClipboard == false) {
+	if (Type.typeof(x1.useRichTextClipboard) == TBool) {
 	    DejaGnu.pass("TextField.useRichTextClipboard property exists");
 	} else {
 	    DejaGnu.fail("TextField.useRichTextClipboard property doesn't exist");
 	}
-	if (x1.wordWrap == false) {
+	if (Type.typeof(x1.wordWrap)== TBool) {
 	    DejaGnu.pass("TextField.wordWrap property exists");
 	} else {
 	    DejaGnu.fail("TextField.wordWrap property doesn't exist");
 	}
+#else
+#end
+
+
+//Si:
+//This one is not defined in Haxe
+
+//	if (x1.contextMenu == NativeMenu) {
+//	    DejaGnu.pass("TextField.contextMenu property exists");
+//	} else {
+//	    DejaGnu.fail("TextField.contextMenu property doesn't exist");
+//	}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.TextField == TextField) {
-	    DejaGnu.pass("TextField::TextField() method exists");
-	} else {
-	    DejaGnu.fail("TextField::TextField() method doesn't exist");
-	}
-	if (x1.appendText == null) {
+#if flash9
+//	if (Type.typeof(x1.TextField)==TFunction) {
+//	    DejaGnu.pass("TextField::TextField() method exists");
+//	} else {
+//	    DejaGnu.fail("TextField::TextField() method doesn't exist");
+//	}
+	if (Type.typeof(x1.appendText)==TFunction) {
 	    DejaGnu.pass("TextField::appendText() method exists");
 	} else {
 	    DejaGnu.fail("TextField::appendText() method doesn't exist");
 	}
-	if (x1.getCharBoundaries == Rectangle) {
+	if (Type.typeof(x1.getCharBoundaries )==TFunction) {
 	    DejaGnu.pass("TextField::getCharBoundaries() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getCharBoundaries() method doesn't exist");
 	}
-	if (x1.getCharIndexAtPoint == 0) {
+	if (Type.typeof(x1.getCharIndexAtPoint)==TFunction) {
 	    DejaGnu.pass("TextField::getCharIndexAtPoint() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getCharIndexAtPoint() method doesn't exist");
 	}
-	if (x1.getFirstCharInParagraph == 0) {
+	if (Type.typeof(x1.getFirstCharInParagraph)==TFunction) {
 	    DejaGnu.pass("TextField::getFirstCharInParagraph() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getFirstCharInParagraph() method doesn't exist");
 	}
-	if (x1.getImageReference == DisplayObject) {
+	if (Type.typeof(x1.getImageReference )==TFunction) {
 	    DejaGnu.pass("TextField::getImageReference() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getImageReference() method doesn't exist");
 	}
-	if (x1.getLineIndexAtPoint == 0) {
+	if (Type.typeof(x1.getLineIndexAtPoint )==TFunction) {
 	    DejaGnu.pass("TextField::getLineIndexAtPoint() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getLineIndexAtPoint() method doesn't exist");
 	}
-	if (x1.getLineIndexOfChar == 0) {
+	if (Type.typeof(x1.getLineIndexOfChar)==TFunction) {
 	    DejaGnu.pass("TextField::getLineIndexOfChar() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getLineIndexOfChar() method doesn't exist");
 	}
-	if (x1.getLineLength == 0) {
+	if (Type.typeof(x1.getLineLength)==TFunction) {
 	    DejaGnu.pass("TextField::getLineLength() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getLineLength() method doesn't exist");
 	}
-	if (x1.getLineMetrics == TextLineMetrics) {
+	if (Type.typeof(x1.getLineMetrics)==TFunction) {
 	    DejaGnu.pass("TextField::getLineMetrics() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getLineMetrics() method doesn't exist");
 	}
-	if (x1.getLineOffset == 0) {
+	if (Type.typeof(x1.getLineOffset)==TFunction) {
 	    DejaGnu.pass("TextField::getLineOffset() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getLineOffset() method doesn't exist");
 	}
-	if (x1.getLineText == null) {
+	if (Type.typeof(x1.getLineText)==TFunction) {
 	    DejaGnu.pass("TextField::getLineText() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getLineText() method doesn't exist");
 	}
-	if (x1.getParagraphLength == 0) {
+	if (Type.typeof(x1.getParagraphLength)==TFunction) {
 	    DejaGnu.pass("TextField::getParagraphLength() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getParagraphLength() method doesn't exist");
 	}
-	if (x1.getTextFormat == TextFormat) {
+	if (Type.typeof(x1.getRawText )==TFunction) {
+	    DejaGnu.pass("TextField::getRawText() method exists");
+	} else {
+	    DejaGnu.fail("TextField::getRawText() method doesn't exist");
+	}
+	if (Type.typeof(x1.getTextFormat )==TFunction) {
 	    DejaGnu.pass("TextField::getTextFormat() method exists");
 	} else {
 	    DejaGnu.fail("TextField::getTextFormat() method doesn't exist");
 	}
-	if (x1.replaceSelectedText == null) {
+	if (Type.typeof(x1.getTextRuns )==TFunction) {
+	    DejaGnu.pass("TextField::getTextRuns() method exists");
+	} else {
+	    DejaGnu.fail("TextField::getTexRuns() method doesn't exist");
+	}
+
+	if (Type.typeof(x1.getXMLText )==TFunction) {
+	    DejaGnu.pass("TextField::getXMLText() method exists");
+	} else {
+	    DejaGnu.fail("TextField::getXMLText() method doesn't exist");
+	}
+	if (Type.typeof(x1.insertXMLText )==TFunction) {
+	    DejaGnu.pass("TextField::insertXMLText() method exists");
+	} else {
+	    DejaGnu.fail("TextField::insertXMLText() method doesn't exist");
+	}	
+
+
+	if (Type.typeof(x1.replaceSelectedText )==TFunction) {
 	    DejaGnu.pass("TextField::replaceSelectedText() method exists");
 	} else {
 	    DejaGnu.fail("TextField::replaceSelectedText() method doesn't exist");
 	}
-	if (x1.replaceText == null) {
+	if (Type.typeof(x1.replaceText)==TFunction) {
 	    DejaGnu.pass("TextField::replaceText() method exists");
 	} else {
 	    DejaGnu.fail("TextField::replaceText() method doesn't exist");
 	}
-	if (x1.setSelection == null) {
+	if (Type.typeof(x1.setSelection )==TFunction) {
 	    DejaGnu.pass("TextField::setSelection() method exists");
 	} else {
 	    DejaGnu.fail("TextField::setSelection() method doesn't exist");
 	}
-	if (x1.setTextFormat == null) {
+	if (Type.typeof(x1.setTextFormat )==TFunction) {
 	    DejaGnu.pass("TextField::setTextFormat() method exists");
 	} else {
 	    DejaGnu.fail("TextField::setTextFormat() method doesn't exist");
 	}
+#else
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
