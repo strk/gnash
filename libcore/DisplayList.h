@@ -73,7 +73,6 @@ public:
     /// Output operator
 	friend std::ostream& operator<< (std::ostream&, const DisplayList&);
 
-
 	/// \brief
 	/// Place a new DisplayObject at the specified depth,
 	/// replacing any existing DisplayObject at the same depth.
@@ -93,7 +92,8 @@ public:
 	///
     /// @param initObj
     /// an object to initialize the new DisplayObject's properties with.
-	void placeDisplayObject(DisplayObject* ch, int depth, as_object* initObj = 0);
+	void placeDisplayObject(DisplayObject* ch, int depth,
+            as_object* initObj = 0);
 
 	/// \brief
 	/// Replace the old DisplayObject at the specified depth with
@@ -202,6 +202,28 @@ public:
 	///	If true the given DisplayObject would replace any
 	///	pre-existing DisplayObject at the same depth.
 	void add(DisplayObject* ch, bool replace);
+
+    /// Inserts a DisplayObject at the specified index (depth)
+    //
+    /// If a DisplayObject is already at that index, it is moved up.
+    /// This implements AS3 DisplayObjectContainer.addChildAt().
+    //
+    /// @param obj      The DisplayObject to insert. This should already be
+    ///                 removed from any other DisplayLists. It should not be
+    ///                 the owner of this DisplayList or any parent of that
+    ///                 owner.
+    /// @param index    The index at which to insert the DisplayObject.
+    void insertDisplayObject(DisplayObject* obj, int index);
+
+    /// Adds a DisplayObject at the top of the DisplayList.
+    //
+    /// This implements AS3 DisplayObjectContainer.addChild().
+    //
+    /// @param obj      The DisplayObject to insert. This should already be
+    ///                 removed from any other DisplayLists. It should not be
+    ///                 the owner of this DisplayList or any parent of that
+    ///                 owner.
+    void addDisplayObject(DisplayObject* obj);
 
 	/// \brief
 	/// Display the referenced DisplayObjects.

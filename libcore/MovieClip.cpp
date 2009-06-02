@@ -2267,6 +2267,22 @@ MovieClip::unload()
     return shouldKeepAlive;
 }
 
+
+DisplayObject*
+MovieClip::addChild(DisplayObject* obj)
+{
+    _displayList.addDisplayObject(obj);
+    return obj;
+}
+
+
+DisplayObject*
+MovieClip::addChildAt(DisplayObject* obj, int index)
+{
+    _displayList.insertDisplayObject(obj, index);
+    return obj;
+}
+
 bool
 MovieClip::loadMovie(const URL& url, const std::string* postdata)
 {
