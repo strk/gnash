@@ -25,13 +25,16 @@
 
 #if flash9
 import flash.display.SimpleButton;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
+import flash.media.SoundTransform;
+import flash.display.Shape;
 #else
-import flash.SimpleButton;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +42,18 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class SimpleButton_as {
     static function main() {
+	
+	#if flash9
         var x1:SimpleButton = new SimpleButton();
+	var x2:DisplayObject = new Shape();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+	x1.downState = x2;
+	x1.hitTestState = x2;
+	x1.overState = x2;
+	x1.upState = x2;
+	
+        // Make sure we actually get a valid class  
+	if (Std.is(x1, SimpleButton)) {      
             DejaGnu.pass("SimpleButton class exists");
         } else {
             DejaGnu.fail("SimpleButton lass doesn't exist");
@@ -50,42 +61,42 @@ class SimpleButton_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (x1.downState == downState) {
-// 	    DejaGnu.pass("SimpleButton::downState property exists");
-// 	} else {
-// 	    DejaGnu.fail("SimpleButton::downState property doesn't exist");
-// 	}
-	if (x1.enabled == false) {
+	if (Std.is(x1.downState, DisplayObject)) {
+ 	    DejaGnu.pass("SimpleButton::downState property exists");
+ 	} else {
+ 	    DejaGnu.fail("SimpleButton::downState property doesn't exist");
+ 	}
+	if (Std.is(x1.enabled, Bool)) {
 	    DejaGnu.pass("SimpleButton::enabled property exists");
 	} else {
 	    DejaGnu.fail("SimpleButton::enabled property doesn't exist");
 	}
-// 	if (x1.hitTestState == hitTestState) {
-// 	    DejaGnu.pass("SimpleButton::hitTestState property exists");
-// 	} else {
-// 	    DejaGnu.fail("SimpleButton::hitTestState property doesn't exist");
-// 	}
-// 	if (x1.overState == overState) {
-// 	    DejaGnu.pass("SimpleButton::overState property exists");
-// 	} else {
-// 	    DejaGnu.fail("SimpleButton::overState property doesn't exist");
-// 	}
-// 	if (x1.soundTransform == SoundTransform) {
-// 	    DejaGnu.pass("SimpleButton::soundTransform property exists");
-// 	} else {
-// 	    DejaGnu.fail("SimpleButton::soundTransform property doesn't exist");
-// 	}
-	if (x1.trackAsMenu == false) {
+	if (Std.is(x1.hitTestState, DisplayObject)) {
+ 	    DejaGnu.pass("SimpleButton::hitTestState property exists");
+ 	} else {
+ 	    DejaGnu.fail("SimpleButton::hitTestState property doesn't exist");
+ 	}
+ 	if (Std.is(x1.overState, DisplayObject)) {
+ 	    DejaGnu.pass("SimpleButton::overState property exists");
+ 	} else {
+ 	    DejaGnu.fail("SimpleButton::overState property doesn't exist");
+ 	}
+	if (Std.is(x1.soundTransform, SoundTransform)) {
+ 	    DejaGnu.pass("SimpleButton::soundTransform property exists");
+ 	} else {
+ 	    DejaGnu.fail("SimpleButton::soundTransform property doesn't exist");
+ 	}
+	if (Std.is(x1.trackAsMenu, Bool)) {
 	    DejaGnu.pass("SimpleButton::trackAsMenu property exists");
 	} else {
 	    DejaGnu.fail("SimpleButton::trackAsMenu property doesn't exist");
 	}
-// 	if (x1.upState == upState) {
-// 	    DejaGnu.pass("SimpleButton::upState property exists");
-// 	} else {
-// 	    DejaGnu.fail("SimpleButton::upState property doesn't exist");
-// 	}
-	if (x1.useHandCursor == false) {
+ 	if (Std.is(x1.upState, DisplayObject)) {
+ 	    DejaGnu.pass("SimpleButton::upState property exists");
+ 	} else {
+ 	    DejaGnu.fail("SimpleButton::upState property doesn't exist");
+ 	}
+	if (Std.is(x1.useHandCursor, Bool)) {
 	    DejaGnu.pass("SimpleButton::useHandCursor property exists");
 	} else {
 	    DejaGnu.fail("SimpleButton::useHandCursor property doesn't exist");
@@ -102,6 +113,7 @@ class SimpleButton_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

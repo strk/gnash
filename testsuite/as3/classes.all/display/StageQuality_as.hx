@@ -27,7 +27,6 @@
 import flash.display.StageQuality;
 import flash.display.MovieClip;
 #else
-import flash.StageQuality;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -40,37 +39,37 @@ import DejaGnu;
 class StageQuality_as {
     static function main() {
 
-        // Make sure we actually get a valid class        
-        if (StageQuality.BEST != null) {
+// Tests to see if all the properties exist. All these do is test for
+// existance of a property, and don't test the functionality at all. This
+// is primarily useful only to test completeness of the API implementation.
+	#if flash9
+        if (Type.typeof(StageQuality.BEST)!= null) {
             DejaGnu.pass("StageQuality.BEST constant exists");
         } else {
             DejaGnu.fail("StageQuality.BEST constant doesn't exist");
         }
 
-        if (StageQuality.HIGH != null) {
+        if (Type.typeof(StageQuality.HIGH)!= null) {
             DejaGnu.pass("StageQuality.HIGH constant exists");
         } else {
             DejaGnu.fail("StageQuality.HIGH constant doesn't exist");
         }
 
-        if (StageQuality.LOW != null) {
+        if (Type.typeof(StageQuality.LOW)!= null) {
             DejaGnu.pass("StageQuality.LOW constant exists");
         } else {
             DejaGnu.fail("StageQuality.LOW constant doesn't exist");
         }
 
-        if (StageQuality.MEDIUM != null) {
+        if (Type.typeof(StageQuality.MEDIUM)!= null) {
             DejaGnu.pass("StageQuality.MEDIUM constant exists");
         } else {
             DejaGnu.fail("StageQuality.MEDIUM constant doesn't exist");
         }
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

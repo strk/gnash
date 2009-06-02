@@ -27,11 +27,11 @@
 import flash.display.StageAlign;
 import flash.display.MovieClip;
 #else
-import flash.StageAlign;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,50 +39,47 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StageAlign_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (StageAlign.BOTTOM != null) {
+
+// Tests to see if all the properties exist. All these do is test for
+// existance of a property, and don't test the functionality at all. This
+// is primarily useful only to test completeness of the API implementation.
+	#if flash9    
+	if (Type.typeof(StageAlign.BOTTOM)!=TNull) {	
             DejaGnu.pass("StageAlign.BOTTOM constant exists");
         } else {
             DejaGnu.fail("StageAlign.BOTTOM constant doesn't exist");
         }
-
-        if (StageAlign.BOTTOM_LEFT != null) {
+	if (Type.typeof(StageAlign.BOTTOM_LEFT)!=TNull) {
             DejaGnu.pass("StageAlign.BOTTOM_LEFT constant exists");
         } else {
             DejaGnu.fail("StageAlign.BOTTOM_LEFT constant doesn't exist");
         }
-
-        if (StageAlign.BOTTOM_RIGHT != null) {
+	if (Type.typeof(StageAlign.BOTTOM_RIGHT)!=TNull) {
             DejaGnu.pass("StageAlign.BOTTOM_RIGHT constant exists");
         } else {
             DejaGnu.fail("StageAlign.BOTTOM_RIGHT constant doesn't exist");
         }
-
-	if (StageAlign.LEFT != null) {
+	if (Type.typeof(StageAlign.LEFT)!=TNull) {
             DejaGnu.pass("StageAlign.LEFT constant exists");
         } else {
             DejaGnu.fail("StageAlign.LEFT constant doesn't exist");
         }
-
-        if (StageAlign.RIGHT != null) {
+	if (Type.typeof(StageAlign.RIGHT)!=TNull) {
             DejaGnu.pass("StageAlign.RIGHT constant exists");
         } else {
             DejaGnu.fail("StageAlign.RIGHT constant doesn't exist");
         }
-
-        if (StageAlign.TOP != null) {
+	if (Type.typeof(StageAlign.TOP)!=TNull) {
             DejaGnu.pass("StageAlign.TOP constant exists");
         } else {
             DejaGnu.fail("StageAlign.TOP constant doesn't exist");
         }
-
-	if (StageAlign.TOP_LEFT != null) {
+	if (Type.typeof(StageAlign.TOP_LEFT)!=TNull) {
             DejaGnu.pass("StageAlign.TOP_LEFT constant exists");
         } else {
             DejaGnu.fail("StageAlign.TOP_LEFT constant doesn't exist");
         }
-
-        if (StageAlign.TOP_RIGHT != null) {
+	if (Type.typeof(StageAlign.TOP_RIGHT)!=TNull) {
             DejaGnu.pass("StageAlign.TOP_RIGHT constant exists");
         } else {
             DejaGnu.fail("StageAlign.TOP_RIGHT constant doesn't exist");
@@ -90,6 +87,7 @@ class StageAlign_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

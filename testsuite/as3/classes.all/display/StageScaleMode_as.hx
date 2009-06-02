@@ -27,7 +27,6 @@
 import flash.display.StageScaleMode;
 import flash.display.MovieClip;
 #else
-import flash.StageScaleMode;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -39,26 +38,30 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StageScaleMode_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (StageScaleMode.EXACT_FIT != null) {
+
+// Tests to see if all the properties exist. All these do is test for
+// existance of a property, and don't test the functionality at all. This
+// is primarily useful only to test completeness of the API implementation.
+	#if flash9
+        if (Type.typeof(StageScaleMode.EXACT_FIT)!= null) {
             DejaGnu.pass("StageScaleMode.EXACT_FIT constant exists");
         } else {
             DejaGnu.fail("StageScaleMode.EXACT_FIT constant doesn't exist");
         }
 
-        if (StageScaleMode.NO_BORDER != null) {
+        if (Type.typeof(StageScaleMode.NO_BORDER)!= null) {
             DejaGnu.pass("StageScaleMode.NO_BORDER constant exists");
         } else {
             DejaGnu.fail("StageScaleMode.NO_BORDER constant doesn't exist");
         }
 
-        if (StageScaleMode.NO_SCALE != null) {
+        if (Type.typeof(StageScaleMode.NO_SCALE)!= null) {
             DejaGnu.pass("StageScaleMode.NO_SCALE constant exists");
         } else {
             DejaGnu.fail("StageScaleMode.NO_SCALE constant doesn't exist");
         }
 
-        if (StageScaleMode.SHOW_ALL != null) {
+        if (Type.typeof(StageScaleMode.SHOW_ALL)!= null) {
             DejaGnu.pass("StageScaleMode.SHOW_ALL constant exists");
         } else {
             DejaGnu.fail("StageScaleMode.SHOW_ALL constant doesn't exist");
@@ -66,6 +69,7 @@ class StageScaleMode_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

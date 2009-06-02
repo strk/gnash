@@ -27,7 +27,6 @@
 import flash.display.SpreadMethod;
 import flash.display.MovieClip;
 #else
-import flash.SpreadMethod;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -39,20 +38,24 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class SpreadMethod_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (SpreadMethod.PAD != null) {
+
+// Tests to see if all the properties exist. All these do is test for
+// existance of a property, and don't test the functionality at all. This
+// is primarily useful only to test completeness of the API implementation.
+	#if flash9
+        if (Type.typeof(SpreadMethod.PAD)!= null) {
             DejaGnu.pass("SpreadMethod.PAD constantexists");
         } else {
             DejaGnu.fail("SpreadMethod.PAD constant doesn't exist");
         }
 
-        if (SpreadMethod.REFLECT != null) {
+        if (Type.typeof(SpreadMethod.REFLECT)!= null) {
             DejaGnu.pass("SpreadMethod.REFLECT.constantexists");
         } else {
             DejaGnu.fail("SpreadMethod.REFLECT.constant doesn't exist");
         }
 
-        if (SpreadMethod.REPEAT != null) {
+        if (Type.typeof(SpreadMethod.REPEAT)!= null) {
             DejaGnu.pass("SpreadMethod.REPEAT constantexists");
         } else {
             DejaGnu.fail("SpreadMethod.REPEAT constant doesn't exist");
@@ -60,6 +63,7 @@ class SpreadMethod_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 
