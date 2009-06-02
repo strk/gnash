@@ -27,11 +27,12 @@
 import flash.text.FontStyle;
 import flash.display.MovieClip;
 #else
-import flash.FontStyle;
-import flash.MovieClip;
+//import flash.FontStyle;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,19 +40,36 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class FontStyle_as {
     static function main() {
-        var x1:FontStyle = new FontStyle();
+		
+#if !flash9
+		DejaGnu.note("FontStyle does not exist in versions prior to flash9");
+#else
+        
+		//FontStyle contains constants used be TextRenderer
+		//constants BOLD, BOLD_ITALIC, ITALIC, REGULAR
+		if (Std.is(FontStyle.BOLD, String) && (Std.string(FontStyle.BOLD) == "bold")) {
+			DejaGnu.pass("FontStyle::BOLD property exists");
+		} else {
+			DejaGnu.fail("FontStyle::BOLD property does not exist");
+		}
+		if (Std.is(FontStyle.BOLD_ITALIC, String) && (Std.string(FontStyle.BOLD_ITALIC) == "boldItalic")) {
+			DejaGnu.pass("FontStyle::BOLD_ITALIC property exists");
+		} else {
+			DejaGnu.fail("FontStyle::BOLD_ITALIC property does not exist");
+		}
+		if (Std.is(FontStyle.ITALIC, String) && (Std.string(FontStyle.ITALIC) == "italic")) {
+			DejaGnu.pass("FontStyle::ITALIC property exists");
+		} else {
+			DejaGnu.fail("FontStyle::ITALIC property does not exist");
+		}
+		if (Std.is(FontStyle.REGULAR, String) && (Std.string(FontStyle.REGULAR) == "regular")) {
+			DejaGnu.pass("FontStyle::REGULAR property exists");
+		} else {
+			DejaGnu.fail("FontStyle::REGULAR property does not exist");
+		}
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("FontStyle class exists");
-        } else {
-            DejaGnu.fail("FontStyle class doesn't exist");
-        }
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

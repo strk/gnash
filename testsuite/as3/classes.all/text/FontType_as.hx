@@ -27,11 +27,12 @@
 import flash.text.FontType;
 import flash.display.MovieClip;
 #else
-import flash.FontType;
-import flash.MovieClip;
+//import flash.FontType;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,19 +40,22 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class FontType_as {
     static function main() {
-        var x1:FontType = new FontType();
+		
+#if !flash9
+		DejaGnu.note("FontType does not exist in versions prior to flash9");
+#else
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("FontType class exists");
-        } else {
-            DejaGnu.fail("FontType class doesn't exist");
-        }
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		if (Std.is(FontType.DEVICE, String) && Std.string(FontType.DEVICE) == "device") {
+			DejaGnu.pass("FontType::DEVICE property exists");
+		} else {
+			DejaGnu.fail("FontType::DEVICE property does no exist");
+		}
+		if (Std.is(FontType.EMBEDDED, String) && Std.string(FontType.EMBEDDED) == "embedded") {
+			DejaGnu.pass("FontType::EMBEDDED property exists");
+		} else {
+			DejaGnu.fail("FontType::EMBEDDED property does no exist");
+		}
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

@@ -25,6 +25,7 @@
 
 #if flash9
 import flash.printing.PrintJob;
+import flash.printing.PrintJobOrientation;
 import flash.display.MovieClip;
 #else
 import flash.PrintJob;
@@ -32,6 +33,7 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -47,55 +49,79 @@ class PrintJob_as {
         } else {
             DejaGnu.fail("PrintJob class doesn't exist");
         }
+		
+
+// Tests to see if all the methods exist. All these do is test for
+// existance of a method, and don't test the functionality at all. This
+// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.addPage) == ValueType.TFunction) {
+	    DejaGnu.pass("PrintJob::addPage() method exists");
+	} else {
+	    DejaGnu.fail("PrintJob::addPage() method doesn't exist");
+	}
+	if (Type.typeof(x1.send) == ValueType.TFunction) {
+	    DejaGnu.pass("PrintJob::send() method exists");
+	} else {
+	    DejaGnu.fail("PrintJob::send() method doesn't exist");
+	}
+	
+ 	if (Type.typeof(x1.start) == ValueType.TFunction) {
+ 	    DejaGnu.pass("PrintJob::start() method exists");
+		//need to run x1.start() to populate the properties
+		x1.start();
+ 	} else {
+ 	    DejaGnu.fail("PrintJob::start() method doesn't exist");	 	
+	}
+
+
+
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.orientation == null) {
+
+// These properties don't exist until after a call to PrintJob.start in flash9	
+
+	DejaGnu.note("Orientation type: " + Type.typeof(x1.orientation));
+	DejaGnu.note("x1.orientation: " + Std.string(x1.orientation));
+	DejaGnu.note("Orientation class: " + Type.getClass(x1.orientation));
+	//DejaGnu.note("Orientation type" + Type.getClassName(x1.orientation));
+
+#if flash9
+	//not sure why this is returning type TNull test may be incorrect
+	if ( Type.typeof(x1.orientation) == ValueType.TNull) {
 	    DejaGnu.pass("PrintJob.orientation property exists");
 	} else {
 	    DejaGnu.fail("PrintJob.orientation property doesn't exist");
 	}
-	if (x1.pageHeight == 0) {
+#else
+	if ( (x1.orientation == "portrait") || x1.orientation == "landscape") {
+	    DejaGnu.pass("PrintJob.orientation property exists");
+	} else {
+	    DejaGnu.fail("PrintJob.orientation property doesn't exist");
+	}
+#end
+
+	if (Type.typeof(x1.pageHeight) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.pageHeight property exists");
 	} else {
 	    DejaGnu.fail("PrintJob.pageHeight property doesn't exist");
 	}
-	if (x1.pageWidth == 0) {
+	if (Type.typeof(x1.pageWidth) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.pageWidth property exists");
 	} else {
 	    DejaGnu.fail("PrintJob.pageWidth property doesn't exist");
 	}
-	if (x1.paperHeight == 0) {
+	if (Type.typeof(x1.paperHeight) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.paperHeight property exists");
 	} else {
 	    DejaGnu.fail("PrintJob.paperHeight property doesn't exist");
 	}
-	if (x1.paperWidth == 0) {
+	if (Type.typeof(x1.paperWidth) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.paperWidth property exists");
 	} else {
 	    DejaGnu.fail("PrintJob.paperWidth property doesn't exist");
 	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.addPage == null) {
-	    DejaGnu.pass("PrintJob::addPage() method exists");
-	} else {
-	    DejaGnu.fail("PrintJob::addPage() method doesn't exist");
-	}
-	if (x1.send == null) {
-	    DejaGnu.pass("PrintJob::send() method exists");
-	} else {
-	    DejaGnu.fail("PrintJob::send() method doesn't exist");
-	}
-
-// FIXME: returns void	
-// 	if (x1.start == false) {
-// 	    DejaGnu.pass("PrintJob::start() method exists");
-// 	} else {
-// 	    DejaGnu.fail("PrintJob::start() method doesn't exist");
-// 	}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
