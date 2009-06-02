@@ -26,9 +26,11 @@
 #if flash9
 import flash.text.Font;
 import flash.display.MovieClip;
+import flash.text.FontStyle;
+import flash.text.FontType;
 #else
-import flash.Font;
-import flash.MovieClip;
+//import flash.Font;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,6 +41,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Font_as {
     static function main() {
+
+#if !flash9
+		DejaGnu.note("The Font class does not exist in versions prior to flash9");
+#else
+		
         var x1:Font = new Font();
 
         // Make sure we actually get a valid class        
@@ -47,20 +54,26 @@ class Font_as {
         } else {
             DejaGnu.fail("Font class doesn't exist");
         }
+		
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.fontName == null) {
+
+	//Need to get a font so that the properties arent't Null
+	var fonts:Array<Dynamic> = Font.enumerateFonts(true);
+	x1 = fonts[0];
+	
+	if (Std.is(x1.fontName, String)) {
 	    DejaGnu.pass("Font.fontName property exists");
 	} else {
 	    DejaGnu.fail("Font.fontName property doesn't exist");
 	}
-	if (x1.fontStyle == null) {
+	if (Std.is(x1.fontStyle, String)) {
 	    DejaGnu.pass("Font.fontStyle property exists");
 	} else {
 	    DejaGnu.fail("Font.fontStyle property doesn't exist");
 	}
-	if (x1.fontType == null) {
+	if (Std.is(x1.fontType, String)) {
 	    DejaGnu.pass("Font.fontType property exists");
 	} else {
 	    DejaGnu.fail("Font.fontType property doesn't exist");
@@ -69,22 +82,26 @@ class Font_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.enumerateFonts == 0) {
+
+	//enumerateFonts is a static method
+	if (Type.typeof(Font.enumerateFonts) == ValueType.TFunction) {
 	    DejaGnu.pass("Font::enumerateFonts() method exists");
 	} else {
 	    DejaGnu.fail("Font::enumerateFonts() method doesn't exist");
 	}
-	if (x1.hasGlyphs == false) {
+	if (Type.typeof(x1.hasGlyphs) == ValueType.TFunction) {
 	    DejaGnu.pass("Font::hasGlyphs() method exists");
 	} else {
 	    DejaGnu.fail("Font::hasGlyphs() method doesn't exist");
 	}
-	if (x1.registerFont == null) {
+	//registerFont is a static method
+	if (Type.typeof(Font.registerFont) == ValueType.TFunction) {
 	    DejaGnu.pass("Font::registerFont() method exists");
 	} else {
 	    DejaGnu.fail("Font::registerFont() method doesn't exist");
 	}
 
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
