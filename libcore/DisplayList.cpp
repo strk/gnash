@@ -493,16 +493,31 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
 
 }
 
-/// Inserts a DisplayObject at the specified index (depth)
-//
-/// If a DisplayObject is already at that index, it is moved up.
-/// This implements AS3 DisplayObjectContainer.addChildAt().
-//
-/// @param obj      The DisplayObject to insert. This should already be
-///                 removed from any other DisplayLists. It should not be
-///                 the owner of this DisplayList or any parent of that
-///                 owner.
-/// @param index    The index at which to insert the DisplayObject.
+DisplayObject*
+DisplayList::removeDisplayObjectAt(int index)
+{
+    container_type::iterator it =
+        std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
+                DepthEquals(index));
+
+    if (it == _charsByDepth.end()) return 0;
+   
+    DisplayObject* obj = it->get();
+    _charsByDepth.erase(it);
+    return obj;
+}
+
+void
+DisplayList::removeDisplayObject(DisplayObject* obj)
+{
+    container_type::iterator it = std::find(_charsByDepth.begin(),
+            _charsByDepth.end(), obj);
+    
+    if (it != _charsByDepth.end()) {
+        _charsByDepth.erase(it);
+    }
+}
+
 void
 DisplayList::insertDisplayObject(DisplayObject* obj, int index)
 {
@@ -535,14 +550,6 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
 
 }
 
-/// Adds a DisplayObject at the top of the DisplayList.
-//
-/// This implements AS3 DisplayObjectContainer.addChild().
-//
-/// @param obj      The DisplayObject to insert. This should already be
-///                 removed from any other DisplayLists. It should not be
-///                 the owner of this DisplayList or any parent of that
-///                 owner.
 void
 DisplayList::addDisplayObject(DisplayObject* obj)
 {

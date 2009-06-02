@@ -203,6 +203,23 @@ public:
 	///	pre-existing DisplayObject at the same depth.
 	void add(DisplayObject* ch, bool replace);
 
+    /// Removes the specified DisplayObject
+    //
+    /// Other DisplayObjects are left untouched.
+    /// This implements AS3 DisplayObjectContainer.removeChild().
+    //
+    /// @param obj      The DisplayObject to remove.
+    void removeDisplayObject(DisplayObject* obj);
+
+    /// Removes the DisplayObject at the specified index
+    //
+    /// Other DisplayObjects are left untouched.
+    /// This implements AS3 DisplayObjectContainer.removeChildAt().
+    //
+    /// @param index    The index from which to remove the DisplayObject.
+    /// @return         The DisplayObject removed, or 0 if none was removed.
+    DisplayObject* removeDisplayObjectAt(int index);
+
     /// Inserts a DisplayObject at the specified index (depth)
     //
     /// If a DisplayObject is already at that index, it is moved up.
