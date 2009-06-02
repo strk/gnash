@@ -206,7 +206,8 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 }
 
 void
-DisplayList::placeDisplayObject(DisplayObject* ch, int depth, as_object* initObj)
+DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
+        as_object* initObj)
 {
     assert(!ch->unloaded());
     ch->set_invalidated();
@@ -265,8 +266,8 @@ DisplayList::add(DisplayObject* ch, bool replace)
 }
 
 void
-DisplayList::replaceDisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
-	bool use_old_matrix)
+DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
+        bool use_old_cxform, bool use_old_matrix)
 {
     testInvariant();
 
@@ -275,13 +276,6 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth, bool use_old_cxf
 
     ch->set_invalidated();
     ch->set_depth(depth);
-
-    // NOTE: currently, ::restart also cleans up all
-    // property, which include __proto__ !!
-    // For this reason I commented it out. Since no tests in
-    // the testsuite are failing
-    // I'm not sure what does this break. Udo: do you remember ? --strk;
-    // ch->restart();
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
@@ -498,7 +492,89 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     testInvariant();
 
 }
-    
+
+/// Inserts a DisplayObject at the specified index (depth)
+//
+/// If a DisplayObject is already at that index, it is moved up.
+/// This implements AS3 DisplayObjectContainer.addChildAt().
+//
+/// @param obj      The DisplayObject to insert. This should already be
+///                 removed from any other DisplayLists. It should not be
+///                 the owner of this DisplayList or any parent of that
+///                 owner.
+/// @param index    The index at which to insert the DisplayObject.
+void
+DisplayList::insertDisplayObject(DisplayObject* obj, int index)
+{
+    testInvariant();
+
+    assert(!obj->unloaded());
+
+    obj->set_invalidated();
+    obj->set_depth(index);
+
+    // Find the first index greater than or equal to the required index
+    container_type::iterator it =
+        std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
+            DepthGreaterOrEqual(index));
+        
+    // Insert the DisplayObject before that position
+    _charsByDepth.insert(it, obj);
+
+    // Shift depths upwards until no depths are duplicated. No DisplayObjects
+    // are removed!
+    while (it != _charsByDepth.end() && (*it)->get_depth() == index) {
+        (*it)->set_depth(index + 1);
+        ++index, ++it;
+    }
+
+    // Give life to this instance
+    obj->stagePlacementCallback();
+
+    testInvariant();
+
+}
+
+/// Adds a DisplayObject at the top of the DisplayList.
+//
+/// This implements AS3 DisplayObjectContainer.addChild().
+//
+/// @param obj      The DisplayObject to insert. This should already be
+///                 removed from any other DisplayLists. It should not be
+///                 the owner of this DisplayList or any parent of that
+///                 owner.
+void
+DisplayList::addDisplayObject(DisplayObject* obj)
+{
+    testInvariant();
+
+    assert(!obj->unloaded());
+
+    obj->set_invalidated();
+
+    int index;
+
+    if (_charsByDepth.empty()) {
+        index = 0;
+    }
+    else {
+        container_type::const_reverse_iterator it = _charsByDepth.rbegin();
+        index = (*it)->get_depth() + 1;
+    }
+
+    obj->set_depth(index);
+
+    // Insert the DisplayObject at the end
+    _charsByDepth.insert(_charsByDepth.end(), obj);
+
+    // Give life to this instance
+    obj->stagePlacementCallback();
+
+    testInvariant();
+
+}
+
+
 bool
 DisplayList::unload()
 {

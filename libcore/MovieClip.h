@@ -128,6 +128,29 @@ public:
 
     virtual ~MovieClip();
 
+    /// Add a child DisplayObject at the next suitable index (AS2: depth).
+    //
+    /// TODO: should be a function of DisplayObjectContainer
+    /// This is the implementation of the AS3-only method
+    /// DisplayObjectContainer.addChild(), but can also be used for
+    /// AS2.
+    //
+    /// @param obj      The DisplayObject to add.
+    /// @return         The added DisplayObject (reflects the AS return)
+    virtual DisplayObject* addChild(DisplayObject* obj);
+
+    /// Add a child DisplayObject at the specified index (AS2: depth).
+    //
+    /// TODO: should be a function of DisplayObjectContainer
+    /// This is the implementation of the AS3-only method
+    /// DisplayObjectContainer.addChild(), but can also be used for
+    /// AS2.
+    //
+    /// @param obj      The DisplayObject to add.
+    /// @param index    The index (depth) at which to add the DisplayObject.
+    /// @return         The added DisplayObject (reflects the AS return)
+    virtual DisplayObject* addChildAt(DisplayObject* obj, int index);
+
     // Return the originating SWF
     virtual Movie* get_root() const;
 
