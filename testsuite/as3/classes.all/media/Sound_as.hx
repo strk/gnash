@@ -35,6 +35,7 @@ import flash.display.MovieClip;
 #end
 #if !flash9
 import flash.Sound;
+import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -106,6 +107,7 @@ class Sound_as {
  	} else {
  	    DejaGnu.fail("Sound::play() method doesn't exist");
  	}
+
 	#end
 	#if !flash9
 		
@@ -181,6 +183,200 @@ class Sound_as {
 	    DejaGnu.pass("Sound::stop() method exists");
 	} else {
 	    DejaGnu.fail("Sound::stop() method doesn't exist");
+	}
+	
+	//testing constructor and check return of inspectors
+	var s1:Sound = new Sound();
+	if (Std.is(s1, Sound)) {
+		DejaGnu.pass("sound() constructor returns the correct object type");
+	} else {
+		DejaGnu.fail("sound() constructor is not returning a object of type Sound");
+	}
+	
+	if (Std.string(s1.getPan()) == "undefined") {
+		DejaGnu.pass("Sound::getPan is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getPan is not returning undefined as expected.");
+	}
+	if (Std.string(s1.getTransform()) == "undefined") {
+		DejaGnu.pass("Sound::getTransform is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getTransform is not returning undefined as expected.");
+	}
+	if ((s1.getVolume() == 100) && (Std.is(s1.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct default level (100)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct default level (should be 100)");
+	}
+	
+	//set new volume level and check that it has changed
+	s1.setVolume(95);
+	if ((s1.getVolume() == 95) && (Std.is(s1.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct new level (95)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct new level (should now be 95)");
+	}
+	//check more functions return vals here
+	if (Std.string(s1.getBytesLoaded()) == "undefined") {
+		DejaGnu.pass("Sound::getBytesLoaded is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getBytesLoaded is not returning undefined as expected.");
+	}
+	if (Std.string(s1.getBytesTotal()) == "undefined") {
+		DejaGnu.pass("Sound::getBytesTotal is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getBytesTotal is not returning undefined as expected.");
+	}
+	if (Std.string(s1.getPan()) == "undefined") {
+		DejaGnu.pass("Sound::getPan is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getPan is not returning undefined as expected.");
+	}
+	if (Std.is(s1.checkPolicyFile, Bool)) {
+		DejaGnu.pass("Sound::checkPolicyFile is properly returning a boolean.");
+	} else {
+		DejaGnu.xfail("Sound::checkPolicyFile is not returning a boolean as expected.");
+	}
+	
+	//use construcor taking a movieclip and check return of all inspectors
+		var s2:Sound = new Sound(flash.Lib._root);
+	if (Std.is(s2, Sound)) {
+		DejaGnu.pass("sound() constructor returns the correct object type with a movieclip object");
+	} else {
+		DejaGnu.fail("sound() constructor is not returning a object of type Sound when instantiated with movieclip object");
+	}
+	if (Std.string(s2.getPan()) == "undefined") {
+		DejaGnu.pass("Sound::getPan is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getPan is not returning undefined as expected.");
+	}
+	if (Std.string(s2.getTransform()) == "undefined") {
+		DejaGnu.pass("Sound::getTransform is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getTransform is not returning undefined as expected.");
+	}
+	if ((s2.getVolume() == 100) && (Std.is(s2.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct default level (100)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct default level (should be 100)");
+	}
+	if (Std.string(s2.getBytesLoaded()) == "undefined") {
+		DejaGnu.pass("Sound::getBytesLoaded is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getBytesLoaded is not returning undefined as expected.");
+	}
+	if (Std.string(s2.getBytesTotal()) == "undefined") {
+		DejaGnu.pass("Sound::getBytesTotal is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getBytesTotal is not returning undefined as expected.");
+	}
+	if (Std.string(s2.getPan()) == "undefined") {
+		DejaGnu.pass("Sound::getPan is properly returning undefined.");
+	} else {
+		DejaGnu.fail("Sound::getPan is not returning undefined as expected.");
+	}
+	if (Std.is(s2.checkPolicyFile, Bool)) {
+		DejaGnu.pass("Sound::checkPolicyFile is properly returning a boolean.");
+	} else {
+		DejaGnu.xfail("Sound::checkPolicyFile is not returning a boolean as expected.");
+	}
+	//test constructor with bad argument
+	var s3:Sound = new Sound(33);
+	
+	if (Std.is(s2, Sound)) {
+		DejaGnu.pass("sound() constructor returns the correct object type with a bad argument");
+	} else {
+		DejaGnu.fail("sound() constructor is not returning a object of type Sound when instantiated with bad argument");
+	}
+	if (Std.string(s3.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	
+	//test association of Sound to characters
+	var s1a:Sound = new Sound();
+	var s1b:Sound = new Sound();
+	if ((s1a.getVolume() == 95) && (Std.is(s1a.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct level (95)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct new level (should be 95)");
+	}
+	s1b.setVolume(76);
+	if ((s1b.getVolume() == 76) && (Std.is(s1b.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct new level (76)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct new level (should now be 76)");
+	}
+	
+	//test association of Sound to characters with bad constructor args
+	var s1c:Sound = new Sound(54);
+	var s1d:Sound = new Sound(54);
+	if (Std.string(s1c.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	if (Std.string(s1d.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	s1c.setVolume(54);
+	if (Std.string(s1c.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	if (Std.string(s1d.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	var s1e:Sound = new Sound(null);
+	if ((s1e.getVolume() == 76) && (Std.is(s1e.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct new level (76)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct new level (should now be 76)");
+	}
+	
+	//Test constructor with invalid argument (of type Object)
+	var o = {property : 0}; //this is a dummy object
+	var s1g:Sound = new Sound(o);
+	var s1h:Sound = new Sound(o);
+	if (Std.string(s1g.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	if (Std.string(s1h.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	s1g.setVolume(54);
+	if (Std.string(s1g.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	if (Std.string(s1h.getVolume()) == "undefined") {
+		DejaGnu.pass("getVolume is working correctly with bad constructor argument");
+	} else {
+		DejaGnu.fail("getVolume is not working as it should with bad constructor argument");
+	}
+	
+	var s2:Sound = new Sound(flash.Lib._root);
+	var s3:Sound = new Sound(flash.Lib._root);
+	if ((s2.getVolume() == 100) && (Std.is(s2.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct default level (100)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct default level (should be 100)");
+	}
+	if ((s3.getVolume() == 100) && (Std.is(s3.getVolume, Int))) {
+		DejaGnu.pass("Sound::getVolume has the correct default level (100)");
+	} else {
+		DejaGnu.fail("Sound::getVolume doesn't have the correct default level (should be 100)");
 	}
 	#end
         // Call this after finishing all tests. It prints out the totals.
