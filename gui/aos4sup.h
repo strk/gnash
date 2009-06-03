@@ -81,6 +81,7 @@ public:
 	virtual bool showMouse(bool show);
 	virtual void setFullscreen();
 	virtual void unsetFullscreen();
+	virtual void showAboutDialog();
 private:
    	geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
@@ -96,6 +97,7 @@ private:
     static key::code os4_to_gnash_key(struct IntuiMessage *imsg);
     static int os4_to_gnash_modifier(int state);
 	double OS4_GetTicks();
+	void PrintMsg( CONST_STRPTR text );
 	void TimerExit(void);
 	bool TimerInit(void);
 	void TimerReset(uint32 microDelay);

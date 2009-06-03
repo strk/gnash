@@ -21,8 +21,15 @@
 #endif
 
 #include <cstdio>
+
+#include <proto/asl.h>
 #include <proto/keymap.h>
+#include <proto/requester.h>
+
 #include <libraries/keymap.h>
+
+#include <classes/window.h>
+#include <classes/requester.h>
 
 #include "gnash.h"
 #include "log.h"
@@ -31,9 +38,13 @@
 #include <getopt.h>
 
 
-// Use 3MB of stack.. just to be safe
-__attribute__ ((used)) static const char *stackcookie = "$STACK: 3000000";
+// Use 4MB of stack.. just to be safe
+__attribute__ ((used)) static const char *stackcookie = "$STACK: 4000000";
 __attribute__ ((used)) static const char *version     = "$VER: Gnash 0.8.5 for AmigaOS4 (" __DATE__ ")";
+
+extern struct NewMenu nm[];
+
+#define RESET_TIME 20 * 1000 //25fps
 
 using namespace std;
 
@@ -68,12 +79,6 @@ AOS4Gui::~AOS4Gui()
 void
 AOS4Gui::TimerExit(void)
 {
-	if (_port)
-	{
-		IExec->FreeSysObject(ASOT_PORT, _port);
-		_port = 0;
-	}
-
 	if (_timerio)
 	{
 		if (!IExec->CheckIO((struct IORequest *)_timerio))
@@ -81,6 +86,12 @@ AOS4Gui::TimerExit(void)
 			IExec->AbortIO((struct IORequest *)_timerio);
 			IExec->WaitIO((struct IORequest *)_timerio);
 		}
+	}
+
+	if (_port)
+	{
+		IExec->FreeSysObject(ASOT_PORT, _port);
+		_port = 0;
 	}
 
 	if (_timerio && _timerio->Request.io_Device)
@@ -112,7 +123,7 @@ AOS4Gui::TimerInit(void)
 
 	if (!_timerio) return FALSE;
 
-	if (!IExec->OpenDevice("timer.device", UNIT_VBLANK, (struct IORequest *)
+	if (!IExec->OpenDevice("timer.device", UNIT_MICROHZ, (struct IORequest *)
 		_timerio, 0))
 	{
 		ITimer = (struct TimerIFace *)IExec->GetInterface((struct Library *)
@@ -143,12 +154,14 @@ AOS4Gui::run()
     int button_state_old = -1;
 	struct IntuiMessage *imsg = NULL;
 	uint32 sigMask;
-    uint32_t movie_time = 0;
+    uint32_t movie_time = OS4_GetTicks();
 	int mod = 0;
 	key::code code;
 	uint32 new_width = _width, new_height = _height;
-
-	TimerReset(10 * 100);
+    ULONG menucode;
+	struct FileRequester *AmigaOS_FileRequester = NULL;
+	
+	TimerReset(RESET_TIME);
 
     while (true)
     {
@@ -173,12 +186,13 @@ AOS4Gui::run()
 			int delay = movie_time - OS4_GetTicks();
 			if (delay > 0)
 			{
-				IDOS->Delay(delay/10);
+				printf("delay:%d\n",delay);
+				usleep(delay);
 			}
 
-			Gui::advance_movie(this);
 			movie_time += _interval;        // Time next frame should be displayed
-			TimerReset(10 * 100);
+			Gui::advance_movie(this);
+			TimerReset(RESET_TIME); 			// 20fps
 	    }
 	    else if (sigGot & SIGBREAKF_CTRL_C)
 	    {
@@ -191,6 +205,120 @@ AOS4Gui::run()
 			{
 				switch(imsg->Class)
 				{
+	                case IDCMP_MENUPICK:
+						if (imsg->IDCMPWindow == _window) IExec->ReplyMsg ((struct Message *)imsg);
+    	                menucode = imsg->Code;
+        	            if (menucode != MENUNULL)
+            	        {
+                	        while (menucode != MENUNULL)
+                    	    {
+								struct Menu* _local_menu = _glue.getMenu();
+								if (_local_menu)
+								{
+	                        	    struct MenuItem  *item = IIntuition->ItemAddress(_local_menu,menucode);
+
+    	            	            switch (MENUNUM(menucode))
+        	            	        {
+            	            	        case 0:  /* First menu */
+    	        	                        switch (ITEMNUM(menucode))
+        	        	                    {
+            	        	                    /* Other cases here */
+												case 0:
+													AmigaOS_FileRequester = (struct FileRequester *)IAsl->AllocAslRequest(ASL_FileRequest, NULL);
+													if (AmigaOS_FileRequester)
+													{
+														char SWFFile[1024];
+														BOOL result;
+														
+														result = IAsl->AslRequestTags( AmigaOS_FileRequester,
+															ASLFR_TitleText,        "Choose a video",
+															ASLFR_DoMultiSelect,    FALSE,
+															ASLFR_RejectIcons,      TRUE,
+															ASLFR_DoPatterns,		TRUE,
+															ASLFR_InitialPattern,	(ULONG)"(#?.swf)",
+												    		ASLFR_InitialDrawer,    "PROGDIR:",
+															TAG_DONE);
+															
+														if (result == TRUE)
+														{
+															strcpy(SWFFile, AmigaOS_FileRequester->fr_Drawer);
+															if (strlen(SWFFile) && !(SWFFile[strlen(SWFFile) - 1] == ':' || SWFFile[strlen(SWFFile) - 1] == '/'))
+															    strcat (SWFFile, "/");
+															strcat (SWFFile, AmigaOS_FileRequester->fr_File);
+
+														    log_error (_("Attempting to open file %s.\n"
+															               "NOTE: the file open functionality is not yet implemented!"),
+																	       SWFFile);
+
+														}
+														IAsl->FreeAslRequest(AmigaOS_FileRequester);
+													}
+													else
+														log_error (_("Cannot open File Requester!\n"));
+												break;
+    		                                    case 6:  /* Quit */
+        		                                    return true;
+            		                            break;
+                	    	                }
+                    		            break;
+                    		            case 1:
+                    		            break;
+                    		            case 2:
+    	        	                        switch (ITEMNUM(menucode))
+        	        	                    {
+        	        	                    	case 0:	/* Force redraw */
+													refreshView();
+												break;
+												case 1:	/* Toggle Fullscreen */
+													toggleFullscreen();
+												break;
+												case 2:	/* Show updated ranges */
+													showUpdatedRegions(!showUpdatedRegions());
+
+													if (showUpdatedRegions())
+														nm[13].nm_Flags = MENUTOGGLE|CHECKIT|CHECKED;
+													else
+														nm[13].nm_Flags = MENUTOGGLE|CHECKIT;
+    
+													// refresh to clear the remaining red lines...
+													if (!showUpdatedRegions()) refreshView();
+												break;
+											}
+                    		            break;
+                    		            case 3:
+    	        	                        switch (ITEMNUM(menucode))
+        	        	                    {
+    		                                    case 0:  /* Play */
+													play();
+            		                            break;
+    		                                    case 1:  /* Pause */
+													pause();
+            		                            break;
+    		                                    case 2:  /* Stop */
+													stop();
+            		                            break;
+    		                                    case 4:  /* Restart */
+													restart();
+            		                            break;
+                	    	                }
+                    		            break;
+                    		            case 4:
+    	        	                        switch (ITEMNUM(menucode))
+        	        	                    {
+    		                                    case 0:  /* About Dialog */
+													showAboutDialog();
+											}
+                    		            break;
+                    	    	    }
+
+		                            /* Handle multiple selection */
+    		                        menucode = item->NextSelect;
+	                    	    }
+	                    	    else
+	                    	    	break; /* No menu no party! */
+    	                	}
+    	                }
+                    break;
 					case IDCMP_CLOSEWINDOW:
 						if (imsg->IDCMPWindow == _window) IExec->ReplyMsg ((struct Message *)imsg);
         	    	    return true;
@@ -270,8 +398,6 @@ AOS4Gui::setTimeout(unsigned int timeout)
 bool
 AOS4Gui::init(int argc, char **argv[])
 {
-    GNASH_REPORT_FUNCTION;
-
 	struct ExecBase *sysbase = (struct ExecBase*) IExec->Data.LibBase;
 
 	struct Library *timer = (struct Library *)IExec->FindName(&sysbase->DeviceList, "timer.device");
@@ -279,14 +405,6 @@ AOS4Gui::init(int argc, char **argv[])
 
 	/* Set up reference time. */
 	ITimer->GetSysTime(&os4timer_starttime);
-
-    int c;
-    while ((c = getopt (argc, *argv, "m:c")) != -1) {
-        switch (c) {
-        case 'c':
-            disableCoreTrap();
-        }
-    }
 
     _glue.init(argc, argv);
 
@@ -518,6 +636,48 @@ AOS4Gui::OS4_GetTicks()
 	ITimer->SubTime(&cur, &os4timer_starttime);
 
 	return cur.Seconds * 1000 + cur.Microseconds / 1000;
+}
+
+void
+AOS4Gui::PrintMsg( CONST_STRPTR text )
+{
+	Object *reqobj;
+
+	reqobj = IIntuition->NewObject( IRequester->REQUESTER_GetClass(), NULL,
+            REQ_Type,       REQTYPE_INFO,
+			REQ_TitleText,  "Gnash",
+            REQ_BodyText,   text,
+            REQ_Image,      REQIMAGE_INFO,
+            REQ_GadgetText, "Abort",
+            TAG_END
+        );
+
+	if ( reqobj )
+	{
+		IIntuition->IDoMethod( reqobj, RM_OPENREQ, NULL, NULL, NULL, TAG_END );
+		IIntuition->DisposeObject( reqobj );
+	}
+}
+
+void
+AOS4Gui::showAboutDialog(void)
+{
+	CONST_STRPTR about = "Gnash is the GNU SWF Player based on GameSWF.\n"
+    					"\nRenderer: "
+    					RENDERER_CONFIG
+    					"\nGUI: "
+					    "AmigaOS4"
+					    "\nMedia: "
+    					MEDIA_CONFIG" "
+#ifdef HAVE_FFMPEG_AVCODEC_H
+    					"\nBuilt against ffmpeg version: "
+    					LIBAVCODEC_IDENT
+#endif
+						"\n\nCopyright (C) 2005, 2006, 2007, "
+            			"2008, 2009 The Free Software Foundation"
+						"\n\nAmigaOS4 Version by Andrea Palmatè - http://www.amigasoft.net";
+
+	PrintMsg(about);
 }
 
 } // namespace gnash

@@ -27,6 +27,7 @@
 #include <proto/Picasso96API.h>
 #include <proto/layers.h>
 #include <proto/dos.h>
+#include <proto/gadtools.h>
 
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 #include <vector>
@@ -47,6 +48,7 @@ namespace gnash
     	void 			 render(int minx, int miny, int maxx, int maxy);
 	    void 			 setInvalidatedRegions(const InvalidatedRanges& ranges);
 		struct Window 	*getWindow(void);
+		struct Menu 	*getMenu(void);
 		void			 setFullscreen();
 		void			 unsetFullscreen();
 		void 			 resize(int width, int height);
@@ -65,6 +67,7 @@ namespace gnash
 	    int				 	 _orig_height;
     	int				 	 _stride;
 		int				 	 _btype;
+		struct Menu 		*_menu;
 		RGBFTYPE		 	 _ftype;
 	};
 }
