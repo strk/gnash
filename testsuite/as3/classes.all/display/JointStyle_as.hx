@@ -40,18 +40,25 @@ class JointStyle_as {
     static function main() {
 
 	#if flash9
+   	// Make sure we actually get a valid class        
+	if (Type.typeof(JointStyle)==TObject) {
+	    DejaGnu.pass("JointStyle class exists.");
+	} else {
+	    DejaGnu.fail("JointStyle class doesn't exist");
+	}
+
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
         if (Type.typeof(JointStyle.BEVEL)!= null) {
             DejaGnu.pass("JointStyle.BEVEL constant exists");
         } else {
             DejaGnu.fail("JointStyle .BEVEL constant doesn't exist");
         }
-
         if (Type.typeof(JointStyle.MITER)!= null) {
             DejaGnu.pass("JointStyle.MITER constant exists");
         } else {
             DejaGnu.fail("JointStyle.MITER constant doesn't exist");
         }
-
         if (Type.typeof(JointStyle.ROUND)!= null) {
             DejaGnu.pass("JointStyle.ROUND constant exists");
         } else {

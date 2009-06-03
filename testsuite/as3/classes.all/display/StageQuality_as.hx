@@ -39,28 +39,31 @@ import DejaGnu;
 class StageQuality_as {
     static function main() {
 
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
 	#if flash9
+   	// Make sure we actually get a valid class        
+	if (Type.typeof(StageQuality)==TObject) {
+	    DejaGnu.pass("StageQuality class exists.");
+	} else {
+	    DejaGnu.fail("StageQuality class doesn't exist");
+	}
+
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
         if (Type.typeof(StageQuality.BEST)!= null) {
             DejaGnu.pass("StageQuality.BEST constant exists");
         } else {
             DejaGnu.fail("StageQuality.BEST constant doesn't exist");
         }
-
         if (Type.typeof(StageQuality.HIGH)!= null) {
             DejaGnu.pass("StageQuality.HIGH constant exists");
         } else {
             DejaGnu.fail("StageQuality.HIGH constant doesn't exist");
         }
-
         if (Type.typeof(StageQuality.LOW)!= null) {
             DejaGnu.pass("StageQuality.LOW constant exists");
         } else {
             DejaGnu.fail("StageQuality.LOW constant doesn't exist");
         }
-
         if (Type.typeof(StageQuality.MEDIUM)!= null) {
             DejaGnu.pass("StageQuality.MEDIUM constant exists");
         } else {

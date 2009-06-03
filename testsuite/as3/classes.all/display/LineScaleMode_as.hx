@@ -40,6 +40,15 @@ class LineScaleMode_as {
     static function main() {
 
 	#if flash9
+   	// Make sure we actually get a valid class        
+	if (Type.typeof(LineScaleMode)==TObject) {
+	    DejaGnu.pass("LineScaleMode class exists.");
+	} else {
+	    DejaGnu.fail("LineScaleMode class doesn't exist");
+	}
+
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
         if (Type.typeof(LineScaleMode.HORIZONTAL)!= TNull) {
             DejaGnu.pass("LineScaleMode.HORIZONTAL constant exists");
         } else {

@@ -27,11 +27,11 @@
 import flash.utils.Proxy;
 import flash.display.MovieClip;
 #else
-import flash.Proxy;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +39,11 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Proxy_as {
     static function main() {
+	#if flash9
         var x1:Proxy = new Proxy();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, Proxy)) {
             DejaGnu.pass("Proxy class exists");
         } else {
             DejaGnu.fail("Proxy class doesn't exist");
@@ -54,6 +55,7 @@ class Proxy_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

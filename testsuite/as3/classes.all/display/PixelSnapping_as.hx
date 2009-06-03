@@ -40,10 +40,16 @@ import DejaGnu;
 class PixelSnapping_as {
     static function main() {
 
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
 	#if flash9
+   	// Make sure we actually get a valid class        
+	if (Type.typeof(PixelSnapping)==TObject) {
+	    DejaGnu.pass("PixelSnapping class exists.");
+	} else {
+	    DejaGnu.fail("PixelSnapping class doesn't exist");
+	}
+
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
 	if (Type.typeof(PixelSnapping.ALWAYS) != TNull) {
             DejaGnu.pass("PixelSnapping.ALWAYS constant exists");
         } else {

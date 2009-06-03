@@ -40,10 +40,16 @@ import DejaGnu;
 class StageAlign_as {
     static function main() {
 
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
 	#if flash9    
+   	// Make sure we actually get a valid class        
+	if (Type.typeof(StageAlign)==TObject) {
+	    DejaGnu.pass("StageAlign class exists.");
+	} else {
+	    DejaGnu.fail("StageAlign class doesn't exist");
+	}
+
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
 	if (Type.typeof(StageAlign.BOTTOM)!=TNull) {	
             DejaGnu.pass("StageAlign.BOTTOM constant exists");
         } else {

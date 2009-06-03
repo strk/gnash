@@ -38,30 +38,33 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StageDisplayState_as {
     static function main() {
-
-	// Tests to see if all the methods exist. All these do is test for
-	// existance of a method, and don't test the functionality at all. This
-	// is primarily useful only to test completeness of the API implementation.
 	
 	#if flash9
+   	// Make sure we actually get a valid class        
+	if (Type.typeof(StageDisplayState)==TObject) {
+	    DejaGnu.pass("StageDisplayState class exists.");
+	} else {
+	    DejaGnu.fail("StageDisplayState class doesn't exist");
+	}
+
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
 	if (Type.typeof(StageDisplayState.FULL_SCREEN)!=TNull) {     
             DejaGnu.pass("StageDisplayState.FULL_SCREEN constant exists");
         } else {
             DejaGnu.fail("StageDisplayState.FULL_SCREEN constant doesn't exist");
         }
-
+	if (Type.typeof(StageDisplayState.NORMAL)!=TNull) {
+            DejaGnu.pass("StageDisplayState.NORMAL constant exists");
+        } else {
+            DejaGnu.fail("StageDisplayState.NORMAL constant doesn't exist");
+        }
 	// This constant is AIR only
 	//	   if (Type.typeof(StageDisplayState.FULL_SCREEN_INTERACTIVE)!=TNull) {
 	//             DejaGnu.pass("StageDisplayState.FULL_SCREEN_INTERACTIVE constant exists");
 	//         } else {
 	//             DejaGnu.fail("StageDisplayState.FULL_SCREEN_INTERACTIVE constant doesn't exist");
 	//         }
-
-	if (Type.typeof(StageDisplayState.NORMAL)!=TNull) {
-            DejaGnu.pass("StageDisplayState.NORMAL constant exists");
-        } else {
-            DejaGnu.fail("StageDisplayState.NORMAL constant doesn't exist");
-        }
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

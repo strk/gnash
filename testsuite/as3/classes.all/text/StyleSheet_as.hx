@@ -27,11 +27,11 @@
 import flash.text.StyleSheet;
 import flash.display.MovieClip;
 #else
-import flash.StyleSheet;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,6 +39,7 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StyleSheet_as {
     static function main() {
+	#if flash9
         var x1:StyleSheet = new StyleSheet();
 
         // Make sure we actually get a valid class        
@@ -47,51 +48,50 @@ class StyleSheet_as {
         } else {
             DejaGnu.fail("StyleSheet class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.styleNames == 0) {
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Std.is(x1.styleNames, Dynamic)) {
 	    DejaGnu.pass("StyleSheet.styleNames property exists");
 	} else {
 	    DejaGnu.fail("StyleSheet.styleNames property doesn't exist");
 	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.StyleSheet == StyleSheet) {
-	    DejaGnu.pass("StyleSheet::StyleSheet() method exists");
-	} else {
-	    DejaGnu.fail("StyleSheet::StyleSheet() method doesn't exist");
-	}
-	if (x1.clear == null) {
-	    DejaGnu.pass("StyleSheet::clear() method exists");
-	} else {
-	    DejaGnu.fail("StyleSheet::clear() method doesn't exist");
-	}
-	if (x1.getStyle == Object) {
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.getStyle)==ValueType.TFunction) {
 	    DejaGnu.pass("StyleSheet::getStyle() method exists");
 	} else {
 	    DejaGnu.fail("StyleSheet::getStyle() method doesn't exist");
 	}
-	if (x1.parseCSS == null) {
-	    DejaGnu.pass("StyleSheet::parseCSS() method exists");
-	} else {
-	    DejaGnu.fail("StyleSheet::parseCSS() method doesn't exist");
-	}
-	if (x1.setStyle == null) {
+	if (Type.typeof(x1.setStyle)==ValueType.TFunction) {
 	    DejaGnu.pass("StyleSheet::setStyle() method exists");
 	} else {
 	    DejaGnu.fail("StyleSheet::setStyle() method doesn't exist");
 	}
-	if (x1.transform == TextFormat) {
+	if (Type.typeof(x1.clear)==ValueType.TFunction) {
+	    DejaGnu.pass("StyleSheet::clear() method exists");
+	} else {
+	    DejaGnu.fail("StyleSheet::clear() method doesn't exist");
+	}
+	
+	if (Type.typeof(x1.parseCSS)==ValueType.TFunction) {
+	    DejaGnu.pass("StyleSheet::parseCSS() method exists");
+	} else {
+	    DejaGnu.fail("StyleSheet::parseCSS() method doesn't exist");
+	}
+	
+	if (Type.typeof(x1.transform)==ValueType.TFunction) {
 	    DejaGnu.pass("StyleSheet::transform() method exists");
 	} else {
 	    DejaGnu.fail("StyleSheet::transform() method doesn't exist");
+	    DejaGnu.note("transform: " + Type.typeof(x1.transform));
 	}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

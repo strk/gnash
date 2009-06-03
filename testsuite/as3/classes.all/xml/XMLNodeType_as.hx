@@ -27,11 +27,11 @@
 import flash.xml.XMLNodeType;
 import flash.display.MovieClip;
 #else
-import flash.XMLNodeType;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,14 +39,24 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class XMLNodeType_as {
     static function main() {
-        // Make sure we actually get a valid class        
-        if (XMLNodeType.ELEMENT_NODE != null) {
+
+	#if flash9
+	// Make sure we actually get a valid class        
+	if (Type.typeof(XMLNodeType)==TObject) {
+	    DejaGnu.pass("XMLNodeType class exists.");
+	} else {
+	    DejaGnu.fail("XMLNodeType class doesn't exist");
+	}
+
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(XMLNodeType.ELEMENT_NODE)!=ValueType.TNull) {
             DejaGnu.pass("XMLNodeType.ELEMENT_NODE constant exists");
         } else {
             DejaGnu.fail("XMLNodeType.ELEMENT_NODE constant doesn't exist");
         }
-
-        if (XMLNodeType.TEXT_NODE != null) {
+        if (Type.typeof(XMLNodeType.TEXT_NODE)!=ValueType.TNull) {
             DejaGnu.pass("XMLNodeType.TEXT_NODE constant exists");
         } else {
             DejaGnu.fail("XMLNodeType.TEXT_NODE constant doesn't exist");
@@ -54,6 +64,7 @@ class XMLNodeType_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

@@ -28,11 +28,11 @@ import flash.xml.XMLNode;
 import flash.xml.XMLNodeType;
 import flash.display.MovieClip;
 #else
-import flash.XMLNode;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -40,115 +40,122 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class XMLNode_as {
     static function main() {
-        var x1:XMLNode = new XMLNode(XMLNodeType.ELEMENT_NODE, null);
-
+	#if flash9
+        var x1:XMLNode = new XMLNode(XMLNodeType.ELEMENT_NODE, null);	
+	
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Std.is(x1, XMLNode)) {
             DejaGnu.pass("XMLNode class exists");
         } else {
             DejaGnu.fail("XMLNode class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.attributes == Object) {
-// 	    DejaGnu.pass("XMLNode.attributes property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode.attributes property doesn't exist");
-// 	}
-// FIXME: returns an array
-// 	if (x1.childNodes == 0) {
-// 	    DejaGnu.pass("XMLNode.childNodes property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode.childNodes property doesn't exist");
-// 	}
-	if (x1.localName == null) {
+
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+
+	// Need to fix the below four properties.  Do not know how to create a parent
+	// node in order to test them.
+	if (Std.is(x1.attributes, Dynamic)) {
+	    DejaGnu.pass("XMLNode.attributes property exists");
+ 	} else {
+	    DejaGnu.fail("XMLNode.attributes property doesn't exist");
+ 	}
+	if (Std.is(x1.childNodes, Array)) {
+	    DejaGnu.pass("XMLNode.childNodes property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLNode.childNodes property doesn't exist");
+ 	}
+	if (Type.typeof(x1.localName)==ValueType.TNull) {
 	    DejaGnu.pass("XMLNode.localName property exists");
 	} else {
 	    DejaGnu.fail("XMLNode.localName property doesn't exist");
 	}
-	if (x1.namespaceURI == null) {
+	if (Type.typeof(x1.namespaceURI)==ValueType.TNull) {
 	    DejaGnu.pass("XMLNode.namespaceURI property exists");
 	} else {
 	    DejaGnu.fail("XMLNode.namespaceURI property doesn't exist");
 	}
-	if (x1.nextSibling == x1.nextSibling) {
+	// FIXME
+	/*if (Std.is(x1.nextSibling, XMLNode)) {
 	    DejaGnu.pass("XMLNode.nextSibling property exists");
 	} else {
 	    DejaGnu.fail("XMLNode.nextSibling property doesn't exist");
-	}
-	if (x1.nodeName == null) {
+	    DejaGnu.note("nextSibling: " + Type.typeof(x1.nextSibling));
+	}*/
+	if (Type.typeof(x1.nodeName)==ValueType.TNull) {
 	    DejaGnu.pass("XMLNode.nodeName property exists");
 	} else {
 	    DejaGnu.fail("XMLNode.nodeName property doesn't exist");
 	}
-// FIXME: Int should be flash.xml.XMLNodeType
-// 	if (x1.nodeType == 0) {
-// 	    DejaGnu.pass("XMLNode.nodeType property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode.nodeType property doesn't exist");
-// 	}
-	if (x1.nodeValue == null) {
+	// FIXME
+	/*if (Std.is(x1.nodeType, XMLNodeType)) {
+ 	    DejaGnu.pass("XMLNode.nodeType property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLNode.nodeType property doesn't exist");
+	}*/
+	if (Type.typeof(x1.nodeValue)==ValueType.TNull) {
 	    DejaGnu.pass("XMLNode.nodeValue property exists");
 	} else {
 	    DejaGnu.fail("XMLNode.nodeValue property doesn't exist");
 	}
-// 	if (x1.parentNode == parentNode) {
-// 	    DejaGnu.pass("XMLNode.parentNode property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode.parentNode property doesn't exist");
-// 	}
+	// FIXME
+	/*if (Std.is(x1.parentNode, XMLNode)) {
+ 	    DejaGnu.pass("XMLNode.parentNode property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLNode.parentNode property doesn't exist");
+	}*/
 	if (x1.prefix == null) {
 	    DejaGnu.pass("XMLNode.prefix property exists");
 	} else {
 	    DejaGnu.fail("XMLNode.prefix property doesn't exist");
 	}
-// 	if (x1.previousSibling == previousSibling) {
-// 	    DejaGnu.pass("XMLNode.previousSibling property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode.previousSibling property doesn't exist");
-// 	}
+	// FIXME
+	/*if (Type.typeof(x1.previousSibling)==ValueType.TNull) {
+ 	    DejaGnu.pass("XMLNode.previousSibling property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLNode.previousSibling property doesn't exist");
+ 	}*/
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.appendChild == null) {
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.appendChild)==ValueType.TFunction) {
 	    DejaGnu.pass("XMLNode::appendChild() method exists");
 	} else {
 	    DejaGnu.fail("XMLNode::appendChild() method doesn't exist");
 	}
-// 	if (x1.cloneNode == XMLNode) {
-// 	    DejaGnu.pass("XMLNode::cloneNode() method exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode::cloneNode() method doesn't exist");
-// 	}
-	if (x1.getNamespaceForPrefix == null) {
+	if (Type.typeof(x1.cloneNode)==ValueType.TFunction) {
+ 	    DejaGnu.pass("XMLNode::cloneNode() method exists");
+	} else {
+ 	    DejaGnu.fail("XMLNode::cloneNode() method doesn't exist");
+ 	}
+	if (Type.typeof(x1.getNamespaceForPrefix)==ValueType.TFunction) {
 	    DejaGnu.pass("XMLNode::getNamespaceForPrefix() method exists");
 	} else {
 	    DejaGnu.fail("XMLNode::getNamespaceForPrefix() method doesn't exist");
 	}
-	if (x1.getPrefixForNamespace == null) {
+	if (Type.typeof(x1.getPrefixForNamespace)==ValueType.TFunction) {
 	    DejaGnu.pass("XMLNode::getPrefixForNamespace() method exists");
 	} else {
 	    DejaGnu.fail("XMLNode::getPrefixForNamespace() method doesn't exist");
 	}
-// FIXME:  Bool should be Void -> Bool
-// 	if (x1.hasChildNodes == false) {
-// 	    DejaGnu.pass("XMLNode::hasChildNodes() method exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLNode::hasChildNodes() method doesn't exist");
-// 	}
-	if (x1.insertBefore == null) {
+	if (Type.typeof(x1.hasChildNodes)==TFunction) {
+	    DejaGnu.pass("XMLNode::hasChildNodes() method exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLNode::hasChildNodes() method doesn't exist");
+ 	}
+	if (Type.typeof(x1.insertBefore)==TFunction) {
 	    DejaGnu.pass("XMLNode::insertBefore() method exists");
 	} else {
 	    DejaGnu.fail("XMLNode::insertBefore() method doesn't exist");
 	}
-	if (x1.removeNode == null) {
+	if (Type.typeof(x1.removeNode)==TFunction) {
 	    DejaGnu.pass("XMLNode::removeNode() method exists");
 	} else {
 	    DejaGnu.fail("XMLNode::removeNode() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString)==TFunction) {
 	    DejaGnu.pass("XMLNode::toString() method exists");
 	} else {
 	    DejaGnu.fail("XMLNode::toString() method doesn't exist");
@@ -156,6 +163,7 @@ class XMLNode_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 
