@@ -27,22 +27,35 @@
 import flash.sampler.Sample;
 import flash.display.MovieClip;
 #else
-import flash.Sample;
-import flash.MovieClip;
+//import flash.Sample;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
 
+
+//Si:
+//Warning!
+//No construct! We have not checked anything yet for this class!
+
+
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Sample_as {
     static function main() {
-        var x1:Sample = new Sample();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+#if flash9
+//        var x1:Sample;
+
+//	DejaGnu.note( "Video type:" + Type.typeof(Sample) );
+//	DejaGnu.note( "x1 type is" + Type.typeof(x1) );
+
+        // Make sure we actually get a valid class       
+ 
+        if (Type.typeof(Sample) == TObject ) {
             DejaGnu.pass("Sample class exists");
         } else {
             DejaGnu.fail("Sample class doesn't exist");
@@ -53,6 +66,7 @@ class Sample_as {
 // is primarily useful only to test completeness of the API implementation.
 
         // Call this after finishing all tests. It prints out the totals.
+#end
         DejaGnu.done();
     }
 }

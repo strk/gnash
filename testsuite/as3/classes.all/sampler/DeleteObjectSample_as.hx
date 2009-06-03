@@ -27,8 +27,8 @@
 import flash.sampler.DeleteObjectSample;
 import flash.display.MovieClip;
 #else
-import flash.DeleteObjectSample;
-import flash.MovieClip;
+//import flash.DeleteObjectSample;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -54,8 +54,12 @@ class DeleteObjectSample_as {
 //         } else {
 //             DejaGnu.fail("DeleteObjectSample.size constant doesn't exist");
 //         }
-
         // Call this after finishing all tests. It prints out the totals.
+
+
+//Si:
+//Warning!
+//No construct! We have not checked anything yet for this class!
         DejaGnu.done();
     }
 }
@@ -64,4 +68,3 @@ class DeleteObjectSample_as {
 // mode: C++
 // indent-tabs-mode: t
 // End:
-
