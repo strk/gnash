@@ -24,11 +24,8 @@
 //  DejaGnu.hx header file for the testing framework support.
 
 #if flash9
-import flash.utils.CompressionAlgorithm;
+//import flash.utils.CompressionAlgorithm;
 import flash.display.MovieClip;
-#else
-import flash.CompressionAlgorithm;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,19 +36,25 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class CompressionAlgorithm_as {
     static function main() {
-        var x1:CompressionAlgorithm = new CompressionAlgorithm();
+        #if !flash9
+			DejaGnu.note("this is not a valid test for this version of flash");
+		#end
+		#if flash9
+			DejaGnu.note("this is unimplemented in haxe, no tests will be conducted");
+		
+		//var x1:CompressionAlgorithm = new CompressionAlgorithm();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("CompressionAlgorithm class exists");
-        } else {
-            DejaGnu.fail("CompressionAlgorithm class doesn't exist");
-        }
+        //if (x1 != null) {
+        //    DejaGnu.pass("CompressionAlgorithm class exists");
+        //} else {
+        //    DejaGnu.fail("CompressionAlgorithm class doesn't exist");
+        //}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
