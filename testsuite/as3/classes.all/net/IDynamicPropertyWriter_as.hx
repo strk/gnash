@@ -25,13 +25,10 @@
 
 #if flash9
 import flash.net.IDynamicPropertyWriter;
-import flash.display.MovieClip;
-#else
-import flash.IDynamicPropertyWriter;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +36,9 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class IDynamicPropertyWriter_as {
     static function main() {
+#if flash9
 
+	DejaGnu.note("This class is an interface");
         // Make sure we actually get a valid class        
 //         if (IDynamicPropertyWriter.writeDynamicProperties() != null) {
 //             DejaGnu.pass("IDynamicPropertyWriter class exists");
@@ -53,6 +52,9 @@ class IDynamicPropertyWriter_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#else
+	DejaGnu.note("This class (IDynamicPropertyWriter) is only available in flash9");
+#end
     }
 }
 
