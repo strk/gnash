@@ -27,8 +27,8 @@
 import flash.text.TextDisplayMode;
 import flash.display.MovieClip;
 #else
-import flash.TextDisplayMode;
-import flash.MovieClip;
+//import flash.TextDisplayMode;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,20 +39,43 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextDisplayMode_as {
     static function main() {
-        var x1:TextDisplayMode = new TextDisplayMode();
+        //var x1:TextDisplayMode = new TextDisplayMode();
 
+//Si:
+//Check the following:
+
+#if flash9
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Type.typeof(TextDisplayMode) == TObject) {
             DejaGnu.pass("TextDisplayMode class exists");
         } else {
             DejaGnu.fail("TextDisplayMode class doesn't exist");
         }
 
+	if (Std.is(TextDisplayMode.CRT,String) ) {
+            DejaGnu.pass("TextDisplayMode CRT exists");
+        } else {
+            DejaGnu.fail("TextDisplayMode CRT doesn't exist");
+        }
+
+	if (Std.is(TextDisplayMode.DEFAULT,String) ) {
+            DejaGnu.pass("TextDisplayMode DEFAULT exists");
+        } else {
+            DejaGnu.fail("TextDisplayMode DEFAULT doesn't exist");
+        }
+
+	if (Std.is(TextDisplayMode.LCD,String) ) {
+            DejaGnu.pass("TextDisplayMode LCD exists");
+        } else {
+            DejaGnu.fail("TextDisplayMode LCd doesn't exist");
+        }
+
+
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
         // Call this after finishing all tests. It prints out the totals.
+#end
         DejaGnu.done();
     }
 }

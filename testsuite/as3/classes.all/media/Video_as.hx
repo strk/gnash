@@ -32,63 +32,140 @@ import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // Class must be named with the PP prefix, as that's the name the
 // file passed to haxe will have after the preprocessing step
 class Video_as {
     static function main() {
-        var x1:Video = new Video();
 
+//Si:
+//Check the existence
+
+#if flash9
+        var x1:Video = new Video();       
+	DejaGnu.note( "Video type:" + Type.typeof(Video) );
+	DejaGnu.note( "x1 type is" + Type.typeof(x1) );
+#else 
+	 var x1:Video;
+#end	
+
+
+#if flash9
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Type.typeof(Video) == TObject && x1!= null) {
             DejaGnu.pass("Video class exists");
         } else {
             DejaGnu.fail("Video lass doesn't exist");
         }
+#else	
+        // Make sure we actually get a valid class        
+        if (Type.typeof(Video) == TObject) {
+            DejaGnu.pass("Video class exists");
+        } else {
+            DejaGnu.fail("Video lass doesn't exist");
+        }
+#end
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.deblocking == 0) {
+
+#if flash9
+	if (Std.is(x1.deblocking,Int) ) {
 	    DejaGnu.pass("Video::deblocking property exists");
 	} else {
 	    DejaGnu.fail("Video::deblocking property doesn't exist");
 	}
-	if (x1.smoothing == false) {
+	if (Std.is(x1.smoothing,Bool)) {
 	    DejaGnu.pass("Video::smoothing property exists");
 	} else {
 	    DejaGnu.fail("Video::smoothing property doesn't exist");
 	}
-	if (x1.videoHeight == 0) {
+	if (Std.is(x1.videoHeight,Int) ) {
 	    DejaGnu.pass("Video::videoHeight property exists");
 	} else {
 	    DejaGnu.fail("Video::videoHeight property doesn't exist");
 	}
-	if (x1.videoWidth == 0) {
+	if (Std.is(x1.videoWidth,Int ) ) {
 	    DejaGnu.pass("Video::videoWidth property exists");
 	} else {
 	    DejaGnu.fail("Video::videoWidth property doesn't exist");
 	}
+#else
+
+
+//Si
+//Fixme: Do not checked!
+/*
+	if (Std.is(x1.deblocking,Float) ) {
+	    DejaGnu.pass("Video::deblocking property exists");
+	} else {
+	    DejaGnu.fail("Video::deblocking property doesn't exist");
+	}
+	if (Std.is(x1.smoothing,Bool)) {
+	    DejaGnu.pass("Video::smoothing property exists");
+	} else {
+	    DejaGnu.fail("Video::smoothing property doesn't exist");
+	}
+	if (Std.is(x1.height,Float) ) {
+	    DejaGnu.pass("Video::videoHeight property exists");
+	} else {
+	    DejaGnu.fail("Video::videoHeight property doesn't exist");
+	}
+	if (Std.is(x1.width,Float ) ) {
+	    DejaGnu.pass("Video::videoWidth property exists");
+	} else {
+	    DejaGnu.fail("Video::videoWidth property doesn't exist");
+	}
+*/
+
+#end
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.attachCamera == null) {
+
+#if flash9	
+	if (Type.typeof(x1.attachCamera) == ValueType.TFunction) {
 	    DejaGnu.pass("Video::attachCamera() method exists");
 	} else {
 	    DejaGnu.fail("Video::attachCamera() method doesn't exist");
 	}
-	if (x1.attachNetStream == null) {
+	if (Type.typeof(x1.attachNetStream) == ValueType.TFunction) {
 	    DejaGnu.pass("Video::attachNetStream() method exists");
 	} else {
 	    DejaGnu.fail("Video::attachNetStream() method doesn't exist");
 	}
-	if (x1.clear == null) {
+	if (Type.typeof(x1.clear) == ValueType.TFunction) {
+	    DejaGnu.pass("Video::clear() method exists");
+	} else {
+	    DejaGnu.fail("Video::clear() method doesn't exist");
+	}
+#else
+/*
+	if (Type.typeof(Video.attachVideo) == ValueType.TFunction) {
+	    DejaGnu.pass("Video::attachCamera() method exists");
+	} else {
+	    DejaGnu.fail("Video::attachCamera() method doesn't exist");
+	}
+
+	if (Type.typeof(Video.clear) == ValueType.TFunction) {
 	    DejaGnu.pass("Video::clear() method exists");
 	} else {
 	    DejaGnu.fail("Video::clear() method doesn't exist");
 	}
 
+	if (Type.typeof(Video.attachNetStream) == ValueType.TFunction) {
+	    DejaGnu.pass("Video::attachNetStream() method exists");
+	} else {
+	    DejaGnu.fail("Video::attachNetStream() method doesn't exist");
+	}
+
+*/
+#end
+
         // Call this after finishing all tests. It prints out the totals.
+
         DejaGnu.done();
     }
 }

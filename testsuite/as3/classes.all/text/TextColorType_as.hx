@@ -27,8 +27,8 @@
 import flash.text.TextColorType;
 import flash.display.MovieClip;
 #else
-import flash.TextColorType;
-import flash.MovieClip;
+//import flash.TextColorType;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,15 +39,31 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextColorType_as {
     static function main() {
-        var x1:TextColorType = new TextColorType();
+//        var x1:TextColorType = new TextColorType();
 
+
+//Si:
+//Check the followings:
+#if flash9
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Type.typeof(TextColorType)== TObject) {
             DejaGnu.pass("TextColorType class exists");
         } else {
             DejaGnu.fail("TextColorType class doesn't exist");
         }
 
+	if (Std.is(TextColorType.DARK_COLOR,String) ) {
+            DejaGnu.pass("TextColorType DARK_COLOR exists");
+        } else {
+            DejaGnu.fail("TextColorType DARK_COLOR doesn't exist");
+        }
+	if (Std.is(TextColorType.LIGHT_COLOR,String) ) {
+            DejaGnu.pass("TextColorType LIGHT_COLOR exists");
+        } else {
+            DejaGnu.fail("TextColorType LIGHT_COLOR doesn't exist");
+        }
+
+#end
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
