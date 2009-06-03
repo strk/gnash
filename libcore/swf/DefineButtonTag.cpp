@@ -334,6 +334,19 @@ ButtonRecord::instantiate(Button* button, bool name) const
 }
 
 bool
+ButtonRecord::hasState(Button::MouseState st) const
+{
+    switch (st)
+    {
+        case Button::MOUSESTATE_UP: return _up;
+        case Button::MOUSESTATE_DOWN: return _down;
+        case Button::MOUSESTATE_OVER: return _over;
+        case Button::MOUSESTATE_HIT: return _hitTest;
+        default: return false;
+    }
+}
+
+bool
 ButtonRecord::read(SWFStream& in, TagType t,
         movie_definition& m, unsigned long endPos)
 {

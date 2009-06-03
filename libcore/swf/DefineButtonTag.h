@@ -71,17 +71,10 @@ public:
 
     /// Check if this ButtonRecord has a DisplayObject for a particular state
     //
-    /// @param state    The state to test for.
-    bool hasState(Button::MouseState st) const {
-        switch (st)
-        {
-            case Button::MOUSESTATE_UP: return _up;
-            case Button::MOUSESTATE_DOWN: return _down;
-            case Button::MOUSESTATE_OVER: return _over;
-            case Button::MOUSESTATE_HIT: return _hitTest;
-            default: return false;
-        }
-    }
+    /// @param state    The Button::MouseState to test for.
+    /// @return         Whether the ButtonRecord should be used for that
+    ///                 Button::MouseState.
+    bool hasState(Button::MouseState st) const;
 
     /// Read an RGB cxform for this record.
     //
