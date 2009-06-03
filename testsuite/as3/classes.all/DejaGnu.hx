@@ -134,39 +134,38 @@ class DejaGnu {
     
     static function xtrace(msg) {
         tf.text += msg + "\n";
-#if flash9
+//#if flash9
         flash.Lib.trace(msg);
-#else	
-		untyped flash.Boot.__trace(msg,position);
-#end
+//#else	
+//		untyped flash.Boot.__trace(msg,position);
+//#end
     }
 
     static function untested(msg) {
-#if flash9
+//#if flash9
         flash.Lib.trace("UNTESTED: "+msg);
-#else	
-		untyped flash.Boot.__trace("UNTESTED: "+msg,position);
-#end
+//#else	
+//		untyped flash.Boot.__trace("UNTESTED: "+msg,position);
+//#end
     }
 
     static function unresolved(msg) {
+//#if flash9
         flash.Lib.trace("UNRESOLVED: "+msg);
-#if flash9
-        flash.Lib.trace("UNRESOLVED: "+msg);
-#else	
-		untyped flash.Boot.__trace("UNRESOLVED: "+msg,position);
-#end
+//#else	
+//		untyped flash.Boot.__trace("UNRESOLVED: "+msg,position);
+//#end
     }
     
     static public function done() {
         printtotals();
-#if flash9
+//#if flash9
         flash.Lib.trace("__END_OF_TEST__");
-#else	
-		untyped flash.Boot.__trace("__END_OF_TEST__",position);
+//#else	
+//		untyped flash.Boot.__trace("__END_OF_TEST__",position);
 		//untyped flash.Boot.__trace(""+flash.Lib._root._width,position);
 		//flash.Lib.current._width = 800;
-#end
+//#end
 	
 	//loadMovie('fscommand:quit', _root);
     }
