@@ -44,21 +44,25 @@ class Array_as {
 // in array in versions earlier than 6. Since Haxe does not support flash
 // versions prior to 6, these will be commented out until a later date
 
-	DejaGnu.note("typeof: Array = " + Type.typeof(Array));
-	DejaGnu.note("class fields: " + Type.getClassFields(Array));
-	DejaGnu.note("Instance fields: " + Type.getInstanceFields(Array));
 	//array does not yet have any constants in haxe
 	//DejaGnu.note("value of CASEINSENSITIVE" + Array.CASEINSENSITIVE);
 	
 
 	//test for existance of common methods
-	var x1 = new Array<String>();
+	var x1:Array<String> = new Array();
+	x1[0] = "one";
+	x1[1] = "two";
+	x1[2] = "three";
 	
+	DejaGnu.note("typeof: Array = " + Type.typeof(Array));
+	DejaGnu.note("class fields: " + Type.getClassFields(Array));
+	DejaGnu.note("Instance fields: " + Type.getInstanceFields(Array));
 	
 	//not working as expected
 	DejaGnu.note("Object Fields = " + Reflect.fields(x1));
 	//check_equals ( Array.CASEINSENSITIVE , 1 );
-	if (untyped x1.CASEINSENSITIVE == 1) {
+	DejaGnu.note("const: " + Std.string(untyped x1.CASEINSENSITIVE));
+	if ( untyped x1.CASEINSENSITIVE == 1 ) {
 		DejaGnu.pass("");
 	} else {
 		DejaGnu.fail("");
@@ -129,12 +133,6 @@ class Array_as {
 		DejaGnu.pass("Array::splice method exists");
 	} else {
 		DejaGnu.fail("Array::splice method does not exist");
-	}
-	
-	if (Type.typeof(x1.toString) == ValueType.TFunction) {
-		DejaGnu.pass("Array::toString method exists");
-	} else {
-		DejaGnu.fail("Array::toString method does not exist");
 	}
 	
 	if (Type.typeof(x1.unshift) == ValueType.TFunction) {
@@ -227,9 +225,16 @@ class Array_as {
 		DejaGnu.fail("Array::toLocaleString method does not exist");
 	}
 	
+	//  Need to test for toString function
+	//  so far haven't figured out how to do this in flash9
 	
 #else
 
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
+		DejaGnu.pass("Array::toString method exists");
+	} else {
+		DejaGnu.fail("Array::toString method does not exist");
+	}
 	
 #end
 //Note: All these (to end of file) will need to be migrated to Haxe

@@ -27,11 +27,12 @@
 import flash.text.GridFitType;
 import flash.display.MovieClip;
 #else
-import flash.GridFitType;
-import flash.MovieClip;
+//import flash.GridFitType;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,19 +40,27 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class GridFitType_as {
     static function main() {
-        var x1:GridFitType = new GridFitType();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("GridFitType class exists");
-        } else {
-            DejaGnu.fail("GridFitType class doesn't exist");
-        }
+#if !flash9
+		DejaGnu.note("The GridFitType class does not exist in versions prior to flash9");
+#else
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		if (Std.is(GridFitType.NONE, String) && Std.string(GridFitType.NONE) == "none") {
+			DejaGnu.pass("GridFitType.NONE property exists");
+		} else {
+			DejaGnu.fail("GridFitType.NONE property does not exist");
+		}
+		if (Std.is(GridFitType.PIXEL, String) && Std.string(GridFitType.PIXEL) == "pixel") {
+			DejaGnu.pass("GridFitType.PIXEL property exists");
+		} else {
+			DejaGnu.fail("GridFitType.PIXEL property does not exist");
+		}
+		if (Std.is(GridFitType.SUBPIXEL, String) && Std.string(GridFitType.SUBPIXEL) == "subpixel") {
+			DejaGnu.pass("GridFitType.SUBPIXEL property exists");
+		} else {
+			DejaGnu.fail("GridFitType.SUBPIXEL property does not exist");
+		}
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

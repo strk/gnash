@@ -27,11 +27,12 @@
 import flash.text.StaticText;
 import flash.display.MovieClip;
 #else
-import flash.StaticText;
-import flash.MovieClip;
+//import flash.StaticText;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,24 +40,20 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StaticText_as {
     static function main() {
-        var x1:StaticText = new StaticText();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("StaticText class exists");
-        } else {
-            DejaGnu.fail("StaticText class doesn't exist");
-        }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.text == null) {
-	    DejaGnu.pass("StaticText.text property exists");
-	} else {
-	    DejaGnu.fail("StaticText.text property doesn't exist");
-	}
+#if !flash9
+	DejaGnu.note("The StaticText class does not exist in versions prior to flash9");
+#else
 
-	if (x1.text == null) {
+		var x1:StaticText = new StaticText();
+		
+		if (Std.is(x1.text, String) ) {
+			DejaGnu.pass("StaticText.text property exists");
+		} else {
+			DejaGnu.fail("StaticText.text property does not exist");
+		}
+
+#end     
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
