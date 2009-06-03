@@ -22,6 +22,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"
+#include "DisplayObject.h"
 #include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"
 #include "swf.h"

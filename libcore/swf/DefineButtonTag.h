@@ -31,18 +31,17 @@
 #include "DefineButtonSoundTag.h"
 #include "swf.h"
 #include "Button.h"
-#include "DisplayObject.h"
 
 #include <boost/scoped_ptr.hpp>
-#include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include <boost/cstdint.hpp> 
 #include <memory>
 
 // Forward declarations
 namespace gnash {
-	class MovieClip;
 	class movie_definition;
 	class event_id;
-	class SWFStream; // for read signatures
+	class SWFStream;
+	class DisplayObject;
 }
 
 namespace gnash {
