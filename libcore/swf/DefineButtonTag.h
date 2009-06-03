@@ -30,17 +30,18 @@
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 #include "DefineButtonSoundTag.h"
 #include "swf.h"
+#include "Button.h"
 
 #include <boost/scoped_ptr.hpp>
-#include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include <boost/cstdint.hpp> 
 #include <memory>
 
 // Forward declarations
 namespace gnash {
-	class MovieClip;
-	class movie_definition;
-	class event_id;
-	class SWFStream; // for read signatures
+    class movie_definition;
+    class event_id;
+    class SWFStream;
+    class DisplayObject;
 }
 
 namespace gnash {
@@ -51,129 +52,144 @@ namespace SWF {
 class ButtonRecord
 {
 
-private:
-
-	/// SWF8 and above can have a number of filters
-	/// associated with button records
-	//
-	/// Currently unused by Gnash.
-	///
-	Filters _filters;
-
-	/// SWF8 and above can have a blend mode
-	/// associated with button records.
-	//
-	/// Currently unused by Gnash.
-	///
-	boost::uint8_t _blendMode;
-
-// TODO: make private, provide accessors 
 public:
 
-	bool	m_hit_test;
-	bool	m_down;
-	bool	m_over;
-	bool	m_up;
-	int	_id;
+    ButtonRecord()
+        :
+        _definitionTag(0)
+    {
+    }
 
-	// Who owns this ?
-	DefinitionTag* m_DefinitionTag;
+    /// Create a DisplayObject from a ButtonRecord.
+    //
+    /// @param name     Whether the created DisplayObject requires its own
+    ///                 instance name.
+    /// @param button   The button to which the DisplayObject will belong.
+    /// @return         A new DisplayObject. This should never be 0.
+    DisplayObject* instantiate(Button* button, bool name = true) const;
 
-	int	m_button_layer;
-	SWFMatrix	m_button_matrix;
-	cxform	m_button_cxform;
+    /// Check if this ButtonRecord has a DisplayObject for a particular state
+    //
+    /// @param state    The Button::MouseState to test for.
+    /// @return         Whether the ButtonRecord should be used for that
+    ///                 Button::MouseState.
+    bool hasState(Button::MouseState st) const;
 
+    /// Read an RGB cxform for this record.
+    //
+    /// Cxform is stored in a different tag for SWF2 Buttons
+    /// (DEFINEBUTTON tag)
+    void readRGBTransform(SWFStream& in) {
+        _cxform.read_rgb(in);
+    }
 
-public:
-
-	ButtonRecord()
-		:
-		m_DefinitionTag(0)
-	{
-	}
-
-	/// Read a button record from the SWF stream.
-	//
-	/// Return true if we read a record; false if this is a null
-	///
-	/// @param endPos
-	///	Last stream offset available for a valid read
-	///
-	bool read(SWFStream& in, TagType t, movie_definition& m,
+    /// Read a ButtonRecord from the SWF stream.
+    //
+    /// Return true if we read a record; false if this is a null
+    ///
+    /// @param endPos
+    ///    Last stream offset available for a valid read
+    ///
+    bool read(SWFStream& in, TagType t, movie_definition& m,
             unsigned long endPos);
-
-	/// Return true if the button_record is valid
-	//
-	/// A button record is invalid if it refers to a DisplayObject
-	/// which has not been defined.
-	bool is_valid();
+    
+    /// Return true if the ButtonRecord is valid
+    //
+    /// A ButtonRecord is invalid if it refers to a DisplayObject
+    /// which has not been defined.
+    bool valid() const {
+        return (_definitionTag);
+    }
 
 #ifdef GNASH_USE_GC
-	/// Mark all reachable resources (for GC)
-	//
-	/// Reachable resources are:
-	///  - m_DefinitionTag (??) what's it !?
-	///
-	void markReachableResources() const
-	{
-		if ( m_DefinitionTag ) m_DefinitionTag->setReachable();
-	}
+    void markReachableResources() const {
+        if (_definitionTag) _definitionTag->setReachable();
+    }
 #endif // GNASH_USE_GC
 
+private:
+
+    /// SWF8 and above can have a number of filters
+    /// associated with button records
+    //
+    /// Currently unused by Gnash.
+    Filters _filters;
+
+    /// SWF8 and above can have a blend mode
+    /// associated with button records.
+    //
+    /// Currently unused by Gnash.
+    boost::uint8_t _blendMode;
+
+    bool _hitTest;
+    bool _down;
+    bool _over;
+    bool _up;
+    int    _id;
+
+    // This is a GC resource, so not owned by anyone.
+    const DefinitionTag* _definitionTag;
+
+    int    _buttonLayer;
+
+    SWFMatrix _matrix;
+
+    cxform _cxform;
+
 };
-	
+    
 /// A class for parsing an ActionRecord.
 class ButtonAction
 {
 public:
 
-	// TODO: define ownership of list elements !!
-	action_buffer m_actions;
+    // TODO: define ownership of list elements !!
+    action_buffer _actions;
 
-	/// @param endPos
-	///	One past last valid-to-read byte position
-	///
-	/// @param mdef
-	///	The movie_definition this button action was read from
-	///
-	///
-	ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
+    /// @param endPos
+    ///    One past last valid-to-read byte position
+    ///
+    /// @param mdef
+    ///    The movie_definition this button action was read from
+    ///
+    ///
+    ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
             movie_definition& mdef);
 
-	/// Return true if this action should be triggered by the given event.
-	bool triggeredBy(const event_id& ev) const;
+    /// Return true if this action should be triggered by the given event.
+    bool triggeredBy(const event_id& ev) const;
 
-	/// Return true if this action is triggered by a keypress
-	bool triggeredByKeyPress() const
-	{
-		return (m_conditions & KEYPRESS);
-	}
+    /// Return true if this action is triggered by a keypress
+    bool triggeredByKeyPress() const
+    {
+        return (_conditions & KEYPRESS);
+    }
 
 private:
 
-	/// Return the keycode triggering this action
-	//
-	/// Return 0 if no key is supposed to trigger us
-	///
-	int getKeyCode() const
-	{
-		return (m_conditions & KEYPRESS) >> 9;
-	}
+    /// Return the keycode triggering this action
+    //
+    /// Return 0 if no key is supposed to trigger us
+    ///
+    int getKeyCode() const
+    {
+        return (_conditions & KEYPRESS) >> 9;
+    }
 
-	enum condition
-	{
-		IDLE_TO_OVER_UP = 1 << 0,
-		OVER_UP_TO_IDLE = 1 << 1,
-		OVER_UP_TO_OVER_DOWN = 1 << 2,
-		OVER_DOWN_TO_OVER_UP = 1 << 3,
-		OVER_DOWN_TO_OUT_DOWN = 1 << 4,
-		OUT_DOWN_TO_OVER_DOWN = 1 << 5,
-		OUT_DOWN_TO_IDLE = 1 << 6,
-		IDLE_TO_OVER_DOWN = 1 << 7,
-		OVER_DOWN_TO_IDLE = 1 << 8,
-		KEYPRESS = 0xFE00  // highest 7 bits
-	};
-	int	m_conditions;
+    enum condition
+    {
+        IDLE_TO_OVER_UP = 1 << 0,
+        OVER_UP_TO_IDLE = 1 << 1,
+        OVER_UP_TO_OVER_DOWN = 1 << 2,
+        OVER_DOWN_TO_OVER_UP = 1 << 3,
+        OVER_DOWN_TO_OUT_DOWN = 1 << 4,
+        OUT_DOWN_TO_OVER_DOWN = 1 << 5,
+        OUT_DOWN_TO_IDLE = 1 << 6,
+        IDLE_TO_OVER_DOWN = 1 << 7,
+        OVER_DOWN_TO_IDLE = 1 << 8,
+        KEYPRESS = 0xFE00  // highest 7 bits
+    };
+    int    _conditions;
 
 };
 
@@ -186,13 +202,13 @@ public:
     static void loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& r);
 
-	typedef std::vector<ButtonRecord> ButtonRecords; 
-	typedef std::vector<ButtonAction*> ButtonActions;
+    typedef std::vector<ButtonRecord> ButtonRecords; 
+    typedef std::vector<ButtonAction*> ButtonActions;
 
-	virtual ~DefineButtonTag();
+    virtual ~DefineButtonTag();
 
-	/// Create a mutable instance of our definition.
-	DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
+    /// Create a mutable instance of our definition.
+    DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
 
     /// Access the ButtonRecords directly. Used for modifying the
     /// Cxform by a DefineButtonCxform tag.
@@ -221,77 +237,79 @@ public:
         return _soundTag->getSound(index);
     }
 
-	/// \brief
-	/// Return version of the SWF containing
-	/// this button definition.
-	int getSWFVersion() const;
+    /// Return version of the SWF containing this button definition.
+    int getSWFVersion() const;
 
-	bool hasKeyPressHandler() const;
+    /// Whether to track this button as a menu.
+    bool trackAsMenu() const {
+        return _trackAsMenu;
+    }
 
-	/// Invoke a functor for each action triggered by given event
-	//
-	/// The functor will be passed a const action_buffer&
-	/// and is not expected to return anything.
-	///
-	template <class E>
-	void forEachTrigger(const event_id& ev, E& f) const
-	{
-		for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
-		{
-			const ButtonAction& ba = *(_buttonActions[i]);
-			if ( ba.triggeredBy(ev) ) f(ba.m_actions);
-		}
-	}
-	
+    bool hasKeyPressHandler() const;
+
+    /// Invoke a functor for each action triggered by given event
+    //
+    /// The functor will be passed a const action_buffer&
+    /// and is not expected to return anything.
+    ///
+    template <class E>
+    void forEachTrigger(const event_id& ev, E& f) const
+    {
+        for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
+        {
+            const ButtonAction& ba = *(_buttonActions[i]);
+            if ( ba.triggeredBy(ev) ) f(ba._actions);
+        }
+    }
+    
 protected:
 
 #ifdef GNASH_USE_GC
-	/// Mark all reachable resources (for GC)
-	//
-	/// Reachable resources are:
-	///  - button records (m_button_records)
-	///  - button sound definition (m_sound)
-	///
-	void markReachableResources() const
-	{
-		assert(isReachable());
-		for (ButtonRecords::const_iterator i = _buttonRecords.begin(),
+    /// Mark all reachable resources (for GC)
+    //
+    /// Reachable resources are:
+    ///  - button records (_button_records)
+    ///  - button sound definition (_sound)
+    ///
+    void markReachableResources() const
+    {
+        assert(isReachable());
+        for (ButtonRecords::const_iterator i = _buttonRecords.begin(),
                 e = _buttonRecords.end(); i!=e; ++i)
-		{
-			i->markReachableResources();
-		}
+        {
+            i->markReachableResources();
+        }
 
-		if (_soundTag) _soundTag->markReachableResources();
-	}
+        if (_soundTag) _soundTag->markReachableResources();
+    }
 #endif // GNASH_USE_GC
-
 
 private:
 
     /// DefineButton2Tag::loader also needs to create a DefineButtonTag.
     friend class DefineButton2Tag;
 
-	/// Construct a DefineButtonTag (DefinitionTag)
+    /// Construct a DefineButtonTag (DefinitionTag)
     //
     /// This can only be constructed using a loader() function.
-	DefineButtonTag(SWFStream& in, movie_definition& m, TagType tag);
+    DefineButtonTag(SWFStream& in, movie_definition& m, TagType tag);
 
-	/// Read a DEFINEBUTTON tag
-	void readDefineButtonTag(SWFStream& in, movie_definition& m);
+    /// Read a DEFINEBUTTON tag
+    void readDefineButtonTag(SWFStream& in, movie_definition& m);
 
-	/// Read a DEFINEBUTTON2 tag
-	void readDefineButton2Tag(SWFStream& in, movie_definition& m);
+    /// Read a DEFINEBUTTON2 tag
+    void readDefineButton2Tag(SWFStream& in, movie_definition& m);
 
     boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
-	ButtonRecords _buttonRecords;
-	ButtonActions _buttonActions;
+    ButtonRecords _buttonRecords;
+    ButtonActions _buttonActions;
 
-	/// Currently set but unused (and also unaccessible)
-	bool m_menu;
+    /// Whether to enable the trackAsMenu property.
+    bool _trackAsMenu;
 
-	/// The movie definition containing definition of this button
-	movie_definition& _movieDef;
+    /// The movie definition containing definition of this button
+    movie_definition& _movieDef;
 };
 
 /// A class for parsing a DefineButton2 tag.
@@ -307,7 +325,7 @@ public:
 };
 
 }
-}	// end namespace gnash
+}    // end namespace gnash
 
 
 #endif // GNASH_BUTTON_CHARACTER_DEF_H

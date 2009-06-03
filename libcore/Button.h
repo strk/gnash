@@ -30,7 +30,6 @@
 
 // Forward declarations.
 namespace gnash {
-	class MovieClip;
     namespace SWF {
         class DefineButtonTag;
     }
@@ -46,16 +45,17 @@ class Button : public InteractiveObject
 public:
 
 	typedef std::vector<DisplayObject*> DisplayObjects;
+	typedef std::vector<const DisplayObject*> ConstDisplayObjects;
 	
     /// A container for holding the id of active button records.
     typedef std::set<int> ActiveRecords;
 
 	enum mouse_flags
 	{
-		IDLE = 0,
+		FLAG_IDLE = 0,
 		FLAG_OVER = 1,
 		FLAG_DOWN = 2,
-		OVER_DOWN = FLAG_OVER|FLAG_DOWN,
+		OVER_DOWN = FLAG_OVER | FLAG_DOWN,
 
 		// aliases
 		OVER_UP = FLAG_OVER,
@@ -64,10 +64,10 @@ public:
 
 	enum MouseState
 	{
-		UP = 0,
-		DOWN,
-		OVER,
-		HIT
+		MOUSESTATE_UP = 0,
+		MOUSESTATE_DOWN,
+		MOUSESTATE_OVER,
+		MOUSESTATE_HIT
 	};
 
 	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
@@ -116,10 +116,6 @@ public:
 
     virtual bool handleFocus();
 
-	//
-	// ActionScript overrides
-	//
-
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 	
 	virtual rect getBounds() const;
@@ -134,8 +130,8 @@ public:
 	/// This callback will:
 	///
 	/// (1) Register this button instance as a live DisplayObject
-	/// (2) Setup the state DisplayObjects calling stagePlacementCallback on all [WRONG]
-	///
+	/// (2) Setup the state DisplayObjects calling stagePlacementCallback
+    /// on all [WRONG]
 	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	/// Properly unload contained DisplayObjects
@@ -146,7 +142,8 @@ public:
 
 #ifdef USE_SWFTREE
 	// Override to append button DisplayObjects info, see dox in DisplayObject.h
-	virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
+	virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
+            InfoTree::iterator it);
 #endif
 
 protected:
@@ -155,7 +152,7 @@ protected:
 	/// Mark reachabe resources (for the GC)
 	//
 	/// These are:
-	///	- this char's definition (m_def)
+	///	- this char's definition (_def)
 	///	- the vector of state DisplayObjects (_stateCharacters)
 	///	- the vector of hit DisplayObjects (_hitCharacters)
 	///
@@ -164,9 +161,9 @@ protected:
 
 private:
 
-	int	m_last_mouse_flags, m_mouse_flags;
+	int	_lastMouseFlags, _mouseFlags;
 
-	MouseState m_mouse_state;
+	MouseState _mouseState;
     
     const boost::intrusive_ptr<const SWF::DefineButtonTag> _def;
 
@@ -184,8 +181,7 @@ private:
 	/// @param includeUnloaded
 	///	If true, include unloaded but still reachable chars in the records slot.
 	///
-	void getActiveCharacters(std::vector<DisplayObject*>& list,
-			bool includeUnloaded=false);
+	void getActiveCharacters(DisplayObjects& list, bool includeUnloaded=false);
 
     /// Returns all DisplayObjects that are active based on the current state.
     //
@@ -193,7 +189,7 @@ private:
     /// modified.
     ///
     /// @param list     The container to push unmodifiable DisplayObjects into.
-	void getActiveCharacters(std::vector<const DisplayObject*>& list) const;
+	void getActiveCharacters(ConstDisplayObjects& list) const;
 
 	/// Returns all DisplayObjects (record nums) that should be active on
     /// the given state.
@@ -214,7 +210,7 @@ private:
 	///	Name to match, search is case sensitive for SWF7 and higher,
 	///     case insensitive up to SWF6.
 	///
-	DisplayObject * getChildByName(const std::string& name);
+	DisplayObject* getChildByName(const std::string& name);
 
 	/// \brief
 	/// Return version of the SWF containing

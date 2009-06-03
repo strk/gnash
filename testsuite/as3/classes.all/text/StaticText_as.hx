@@ -61,7 +61,7 @@ class StaticText_as {
         DejaGnu.done();
     }
 }
-
+}
 // local Variables:
 // mode: C++
 // indent-tabs-mode: t

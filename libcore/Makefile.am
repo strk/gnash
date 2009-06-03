@@ -60,6 +60,7 @@ libgnashcore_la_SOURCES = \
 	as_function.cpp	\
 	as_object.cpp \
 	as_value.cpp \
+	DisplayObjectContainer.cpp \
 	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
@@ -229,6 +230,7 @@ EXTENSIONS_API = \
 	Movie.h \
 	RunInfo.h \
 	gnash.h	\
+	DisplayObjectContainer.h \
 	DisplayObject.h \
 	MovieClip.h \
 	StreamProvider.h \
