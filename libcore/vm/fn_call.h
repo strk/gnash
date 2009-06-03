@@ -25,6 +25,7 @@
 #include "as_environment.h" // for inlines (arg)
 #include "as_object.h" // for dtor visibility by boost::intrusive_ptr
 #include "smart_ptr.h"
+#include "VM.h"
 
 #include <cassert> // for inlines (arg)
 #include <ostream> // for inlines (dump_args)
@@ -207,10 +208,20 @@ private:
 
 };
 
+/// Check whether the currently executing code is AS3 (ABC)
+//
+/// This is a non-member, non-friend function for better encapsulation.
+/// TODO: drop these when there is a better design!
+inline bool
+isAS3(const fn_call& fn)
+{
+    return fn.getVM().getAVMVersion() == VM::AVM2;
+}
+
 } // namespace gnash
 
 
-#endif // _GNASH_FN_CALL_H_
+#endif 
 
 
 // Local Variables:

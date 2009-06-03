@@ -20,6 +20,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_environment.h"
 #include "MovieClip.h"
+#include "movie_root.h"
 #include "as_value.h"
 #include "VM.h"
 #include "log.h"

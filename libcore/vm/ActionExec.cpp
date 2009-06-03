@@ -28,12 +28,12 @@
 #include "log.h"
 #include "VM.h"
 #include "GnashException.h"
-
+#include "DisplayObject.h"
+#include "movie_root.h"
 #include "swf.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
 #include "debugger.h"
-//#include "WallClockTimer.h" // will probably be used for scriptTimeout
 
 #include <sstream>
 #include <string>

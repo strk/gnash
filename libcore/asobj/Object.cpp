@@ -18,6 +18,8 @@
 //
 
 #include "Object.h"
+#include "Movie.h"
+#include "DisplayObject.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" // for inheritance

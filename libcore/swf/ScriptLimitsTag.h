@@ -20,6 +20,7 @@
 
 #include "swf.h" // for TagType definition
 #include "SWFStream.h" // for inlines
+#include "movie_root.h"
 #include "movie_definition.h"
 
 namespace gnash {

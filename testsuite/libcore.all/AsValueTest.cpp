@@ -21,18 +21,6 @@
 
 #ifdef HAVE_DEJAGNU_H
 
-#include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <iostream>
-#include <boost/shared_ptr.hpp>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <log.h>
-#include <iostream>
-#include <string>
 #include "VM.h"
 #include "DummyMovieDefinition.h"
 #include "DummyCharacter.h"
@@ -47,6 +35,19 @@
 #include "amf.h"
 #include "element.h"
 #include "GnashNumeric.h"
+#include "movie_root.h"
+#include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <iostream>
+#include <boost/shared_ptr.hpp>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <log.h>
+#include <iostream>
+#include <string>
 
 using namespace amf;
 using namespace gnash;

@@ -22,6 +22,7 @@
 #include "PropertyList.h"
 #include "DummyMovieDefinition.h"
 #include "VM.h"
+#include "movie_root.h"
 #include "as_object.h" // need to set as owner of PropertyList
 #include "as_value.h"
 #include "log.h"

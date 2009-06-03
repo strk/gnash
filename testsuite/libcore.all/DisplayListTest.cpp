@@ -20,6 +20,7 @@
 #endif
 
 #include "DisplayList.h"
+#include "movie_root.h"
 #include "as_value.h"
 #include "DisplayObject.h"
 #include "log.h"

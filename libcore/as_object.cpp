@@ -26,6 +26,8 @@
 #include "as_object.h"
 #include "as_function.h"
 #include "as_environment.h" // for enumerateProperties
+#include "movie_root.h" // for enumerateProperties
+#include "event_id.h" // for enumerateProperties
 #include "Property.h" // for findGetterSetter
 #include "VM.h"
 #include "GnashException.h"

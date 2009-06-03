@@ -24,6 +24,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
+#include "movie_root.h"
 #include "MovieClip.h"
 #include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)

@@ -32,14 +32,14 @@
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#include "Movie.h"
+#include "movie_root.h"
 #include "gtk_glue_agg_xv.h"
 #include "VideoConverter.h"
 #include "VM.h"
 
 #include <cerrno>
-
 #include <gdk/gdkx.h>
-
 #include <sys/ipc.h>
 #include <sys/shm.h>
 

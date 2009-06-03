@@ -22,6 +22,7 @@
 
 #include "string_table.h"
 #include "VM.h"
+#include "fn_call.h"
 #include "MovieClip.h"
 
 #include "ExternalInterface_as.h"
@@ -34,7 +35,7 @@ namespace gnash {
 static as_value
 get_flash_external_package(const fn_call& fn)
 {
-    const bool as3 = isAS3(fn.getVM());
+    const bool as3 = isAS3(fn);
     // This package is identical for AS2 and AS3 (as far as we know)
     log_debug("Loading %s flash.external package", as3 ? "AVM2" : "AVM1");
     

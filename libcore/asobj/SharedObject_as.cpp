@@ -28,6 +28,7 @@
 #include "amf.h"
 #include "element.h"
 #include "sol.h"
+#include "movie_root.h"
 #include "SharedObject_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"

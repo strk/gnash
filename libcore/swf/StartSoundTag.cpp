@@ -19,6 +19,7 @@
 
 #include "StartSoundTag.h"
 #include "SWFStream.h"
+#include "movie_root.h"
 #include "movie_definition.h"
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample

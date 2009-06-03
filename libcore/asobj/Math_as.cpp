@@ -28,10 +28,6 @@
 //
 
 
-#include <cmath>
-#include <string>
-#include <boost/random.hpp>
-
 #include "VM.h" // get random generator
 #include "fn_call.h"
 #include "Math_as.h"
@@ -39,6 +35,10 @@
 #include "builtin_function.h" 
 #include "Object.h" // for getObjectInterface
 #include "GnashNumeric.h"
+
+#include <cmath>
+#include <string>
+#include <boost/random.hpp>
 
 namespace gnash {
 
@@ -63,7 +63,8 @@ namespace {
 }
 
 
-void registerMathNative(as_object& proto)
+void
+registerMathNative(as_object& proto)
 {
     VM& vm = proto.getVM();
     

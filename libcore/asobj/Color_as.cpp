@@ -30,6 +30,7 @@
 #include "Object.h" // for getObjectInterface
 #include "cxform.h" // for composition
 #include "VM.h"
+#include "MovieClip.h"
 
 #include <sstream>
 
