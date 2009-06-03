@@ -27,8 +27,8 @@
 import flash.sampler.StackFrame;
 import flash.display.MovieClip;
 #else
-import flash.StackFrame;
-import flash.MovieClip;
+//import flash.StackFrame;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,14 +39,14 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StackFrame_as {
     static function main() {
-        var x1:StackFrame = new StackFrame();
+//        var x1:StackFrame = new StackFrame();
 
         // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("StackFrame class exists");
-        } else {
-            DejaGnu.fail("StackFrame class doesn't exist");
-        }
+//        if (x1 != null) {
+//          DejaGnu.pass("StackFrame class exists");
+//	    } else {
+//	      DejaGnu.fail("StackFrame class doesn't exist");
+//	}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This

@@ -27,11 +27,12 @@
 import flash.sampler.NewObjectSample;
 import flash.display.MovieClip;
 #else
-import flash.NewObjectSample;
-import flash.MovieClip;
+//import flash.NewObjectSample;
+//import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,10 +40,16 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class NewObjectSample_as {
     static function main() {
-        var x1:NewObjectSample = new NewObjectSample();
+//       var x1:NewObjectSample= new NewObjectSample();
 
+
+//Si:
+//Warning!
+//No construct! We have not checked anything yet for this class!
+
+#if flash9
         // Make sure we actually get a valid class        
-        if (x1 != null) {
+        if (Type.typeof(NewObjectSample)==TObject) {
             DejaGnu.pass("NewObjectSample class exists");
         } else {
             DejaGnu.fail("NewObjectSample class doesn't exist");
@@ -51,7 +58,14 @@ class NewObjectSample_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.id == 0) {
+/*
+	DejaGnu.note( "x1 id is" + Type.typeof(NewObjectSample.id) );
+	DejaGnu.note( "x1 stack is" + Type.typeof(NewObjectSample.stack) );
+	DejaGnu.note( "x1 time is" + Type.typeof(NewObjectSample.time) );
+	DejaGnu.note( "x1 type is" + Type.typeof(NewObjectSample.type) );
+*/
+/*
+	if (Std.is(x1.id,Float) ) {
 	    DejaGnu.pass("NewObjectSample::id() method exists");
 	} else {
 	    DejaGnu.fail("NewObjectSample::id() method doesn't exist");
@@ -66,11 +80,13 @@ class NewObjectSample_as {
 	} else {
 	    DejaGnu.fail("NewObjectSample::time() method doesn't exist");
 	}
-	if (x1.type == Class) {
+	if (Type.typeof(x1.type) == Class) {
 	    DejaGnu.pass("NewObjectSample::type() method exists");
 	} else {
 	    DejaGnu.fail("NewObjectSample::type() method doesn't exist");
 	}
+*/
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
