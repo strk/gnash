@@ -30,6 +30,7 @@
 import flash.display.MovieClip;
 #else
 import flash.MovieClip;
+import flash.TextField;
 #end
 import flash.Lib;
 import Type;
@@ -54,25 +55,52 @@ class AsBroadcaster_as {
 	
 	// The following tests should be valid for flash6, 7, 8
 
-	if (Type.typeof(AsBroadcaster) == ValueType.TFunction) {
+	if (Type.typeof(untyped AsBroadcaster) == ValueType.TFunction) {
 	    DejaGnu.pass("AsBroadcaster class exists");
 	} else {
 	    DejaGnu.fail("AsBroadcaster class does not exist");
 	}
 
-	DejaGnu.note("typeof (prototype) "   + Type.typeof(AsBroadcaster.prototype));
-	DejaGnu.note("typeof (initialize) "   + Type.typeof(AsBroadcaster.initialize));
+	DejaGnu.note("typeof (prototype) "   + Type.typeof(untyped AsBroadcaster.prototype));
+	DejaGnu.note("typeof (initialize) "   + Type.typeof(untyped AsBroadcaster.initialize));
 
-	if (Type.typeof(AsBroadcaster.prototype) == ValueType.TObject) {
-		DejaGnu.pass("AsBroadcaster::prototype exists");
+	if (Type.typeof(untyped AsBroadcaster.prototype) == ValueType.TObject) {
+		DejaGnu.pass("The AsBroadcaster prototype exists");
 	} else {
-		DejaGnu.fail("AsBroadcaster::prototype is does not exist");
+		DejaGnu.fail("The AsBroadcaster prototype is does not exist");
 	}
-
-	if (Type.typeof(AsBroadcaster.initialize) == ValueType.TFunction) {
-		DejaGnu.pass("AsBroadcaster::initialize exists");
+	if (Type.typeof(untyped AsBroadcaster.initialize) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.initialize function exists");
 	} else {
-		DejaGnu.fail("AsBroadcaster::initialize does not exist");
+		DejaGnu.fail("AsBroadcaster.initialize function does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.addListener) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.addListener function exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.addListener function does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.broadcastMessage) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.broadcastMessage function exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.broadcastMessage function does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.removeListener) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.removeListener function exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.removeListener function does not exist");
+	}
+	
+	var obj = { f : function() { trace("Hi There!");} };
+	var event:String = "f";
+
+	DejaGnu.note("typeof (initialize) "   + Type.typeof(untyped AsBroadcaster.initialize));
+	DejaGnu.note("Note 1: "   + Type.typeof(untyped AsBroadcaster.addListener(obj)));
+	DejaGnu.note("Note 2: "   + Type.typeof(untyped AsBroadcaster.__proto__));
+	
+	if (Type.typeof(untyped AsBroadcaster.addListener(obj)) == ValueType.TBool) {
+		DejaGnu.pass("AsBroadcaster.addListener() returns Boolean");
+	} else {
+		DejaGnu.fail("AsBroadcaster.addListener() does not return Boolean");
 	}
 
 /*
