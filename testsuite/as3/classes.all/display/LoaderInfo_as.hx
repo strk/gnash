@@ -21,17 +21,26 @@
 //
 
 // This test case must be processed by CPP before compiling to include the
-//  DejaGnu.hx header file for the testing framework support.
+// DejaGnu.hx header file for the testing framework support.
 
 #if flash9
+import flash.display.DisplayObject;
+import flash.display.Loader;
 import flash.display.LoaderInfo;
 import flash.display.MovieClip;
+import flash.display.SWFVersion;
+import flash.events.Event;
+import flash.events.EventDispatcher;
+import flash.events.IOErrorEvent;
+import flash.net.URLRequest;
+import flash.system.ApplicationDomain;
+import flash.utils.ByteArray;
 #else
-import flash.LoaderInfo;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,134 +48,165 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class LoaderInfo_as {
     static function main() {
-        var x1:LoaderInfo = new LoaderInfo();
+	
+	#if flash9
+	var loader:Loader = new Loader();
+	//var loader = new flash.display.Loader();
+	var x1 = loader.contentLoaderInfo;
+	loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, function(e) {
+		trace(e);
+	});
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("LoaderInfo class exists");
-        } else {
-            DejaGnu.fail("LoaderInfo lass doesn't exist");
-        }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (ActionScriptVersion == 0) {
-// 	    DejaGnu.pass("LoaderInfo::actionScriptVersion property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::actionScriptVersion property doesn't exist");
-// 	}
-// 	if (x1.applicationDomain == applicationDomain) {
-// 	    DejaGnu.pass("LoaderInfo::applicationDomain property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::applicationDomain property doesn't exist");
-// 	}
-// 	if (x1.bytes == ByteArray) {
-// 	    DejaGnu.pass("LoaderInfo::bytes property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::bytes property doesn't exist");
-// 	}
-	if (x1.bytesLoaded == 0) {
-	    DejaGnu.pass("LoaderInfo::bytesLoaded property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::bytesLoaded property doesn't exist");
-	}
-	if (x1.bytesTotal == 0) {
-	    DejaGnu.pass("LoaderInfo::bytesTotal property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::bytesTotal property doesn't exist");
-	}
-	if (x1.childAllowsParent == false) {
-	    DejaGnu.pass("LoaderInfo::childAllowsParent property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::childAllowsParent property doesn't exist");
-	}
-// 	if (x1.childSandboxBridge == Object) {
-// 	    DejaGnu.pass("LoaderInfo::childSandboxBridge property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::childSandboxBridge property doesn't exist");
-// 	}
-// 	if (x1.content == content) {
-// 	    DejaGnu.pass("LoaderInfo::content property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::content property doesn't exist");
-// 	}
-	if (x1.contentType == null) {
-	    DejaGnu.pass("LoaderInfo::contentType property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::contentType property doesn't exist");
-	}
-	if (x1.frameRate == 0) {
-	    DejaGnu.pass("LoaderInfo::frameRate property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::frameRate property doesn't exist");
-	}
-	if (x1.height == 0) {
-	    DejaGnu.pass("LoaderInfo::height property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::height property doesn't exist");
-	}
-// 	if (x1.loader == loader) {
-// 	    DejaGnu.pass("LoaderInfo::loader property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::loader property doesn't exist");
-// 	}
-	if (x1.loaderURL == null) {
-	    DejaGnu.pass("LoaderInfo::loaderURL property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::loaderURL property doesn't exist");
-	}
-// 	if (x1.parameters == Object) {
-// 	    DejaGnu.pass("LoaderInfo::parameters property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::parameters property doesn't exist");
-// 	}
-	if (x1.parentAllowsChild == false) {
-	    DejaGnu.pass("LoaderInfo::parentAllowsChild property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::parentAllowsChild property doesn't exist");
-	}
-// 	if (x1.parentSandboxBridge == Object) {
-// 	    DejaGnu.pass("LoaderInfo::parentSandboxBridge property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::parentSandboxBridge property doesn't exist");
-// 	}
-	if (x1.sameDomain == false) {
-	    DejaGnu.pass("LoaderInfo::sameDomain property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::sameDomain property doesn't exist");
-	}
-// 	if (x1.sharedEvents == EventDispatcher) {
-// 	    DejaGnu.pass("LoaderInfo::sharedEvents property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::sharedEvents property doesn't exist");
-// 	}
-// 	if (x1.SWFVersion == 0) {
-// 	    DejaGnu.pass("LoaderInfo::swfVersion property exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::swfVersion property doesn't exist");
-// 	}
-	if (x1.url == null) {
-	    DejaGnu.pass("LoaderInfo::url property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::url property doesn't exist");
-	}
-	if (x1.width == 0) {
-	    DejaGnu.pass("LoaderInfo::width property exists");
-	} else {
-	    DejaGnu.fail("LoaderInfo::width property doesn't exist");
-	}
+	loader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(e) {
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.getLoaderInfoByDefinition == LoaderInfo) {
-// 	    DejaGnu.pass("LoaderInfo::getLoaderInfoByDefinition() method exists");
-// 	} else {
-// 	    DejaGnu.fail("LoaderInfo::getLoaderInfoByDefinition() method doesn't exist");
-// 	}
+		// Make sure we actually get a valid class        
+		if (Std.is(x1, LoaderInfo)) {
+ 		    DejaGnu.pass("LoaderInfo class exists");
+        	} else {
+                    DejaGnu.fail("LoaderInfo lass doesn't exist");
+        	}
 
-        // Call this after finishing all tests. It prints out the totals.
-        DejaGnu.done();
+		// Tests to see if all the properties exist. All these do is test for
+		// existance of a property, and don't test the functionality at all. This
+		// is primarily useful only to test completeness of the API implementation.
+		if (Std.is(x1.actionScriptVersion, Int)) {
+	 	    DejaGnu.pass("LoaderInfo::actionScriptVersion property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::actionScriptVersion property doesn't exist");
+	 	}
+	 	if (Std.is(x1.applicationDomain, ApplicationDomain)) {
+	 	    DejaGnu.pass("LoaderInfo::applicationDomain property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::applicationDomain property doesn't exist");
+	 	}
+		// Cannot test
+	 	/*if (Std.is(x1.bytes, Array)) {
+	 	    DejaGnu.pass("LoaderInfo::bytes property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::bytes property doesn't exist");
+	 	}*/
+		if (Std.is(x1.bytesLoaded, Int)) {
+		    DejaGnu.pass("LoaderInfo::bytesLoaded property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::bytesLoaded property doesn't exist");
+		}
+		if (Std.is(x1.bytesTotal, Int)) {
+		    DejaGnu.pass("LoaderInfo::bytesTotal property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::bytesTotal property doesn't exist");
+		}
+		if (Std.is(x1.childAllowsParent, Bool)) {
+		    DejaGnu.pass("LoaderInfo::childAllowsParent property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::childAllowsParent property doesn't exist");
+		}
+		if (Std.is(x1.content, DisplayObject)) {
+	 	    DejaGnu.pass("LoaderInfo::content property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::content property doesn't exist");
+	 	}
+		if (Type.typeof(x1.contentType)!=ValueType.TNull) {
+		    DejaGnu.pass("LoaderInfo::contentType property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::contentType property doesn't exist");
+		}
+		if (Std.is(x1.frameRate, Int)) {
+		    DejaGnu.pass("LoaderInfo::frameRate property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::frameRate property doesn't exist");
+		}
+		if (Std.is(x1.height, Int)) {
+		    DejaGnu.pass("LoaderInfo::height property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::height property doesn't exist");
+		}
+	 	if (Std.is(x1.loader, Loader)) {
+	 	    DejaGnu.pass("LoaderInfo::loader property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::loader property doesn't exist");
+	 	}
+		if (Type.typeof(x1.loaderURL)!=ValueType.TNull) {
+		    DejaGnu.pass("LoaderInfo::loaderURL property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::loaderURL property doesn't exist");
+		}
+	 	if (Std.is(x1.parameters, Dynamic)) {
+	 	    DejaGnu.pass("LoaderInfo::parameters property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::parameters property doesn't exist");
+	 	}
+		if (Std.is(x1.parentAllowsChild, Bool)) {
+		    DejaGnu.pass("LoaderInfo::parentAllowsChild property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::parentAllowsChild property doesn't exist");
+		}
+		if (Std.is(x1.sameDomain, Bool)) {
+		    DejaGnu.pass("LoaderInfo::sameDomain property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::sameDomain property doesn't exist");
+		}
+	 	if (Std.is(x1.sharedEvents, EventDispatcher)) {
+	 	    DejaGnu.pass("LoaderInfo::sharedEvents property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::sharedEvents property doesn't exist");
+	 	}
+		// For older versions (FP<9), the swfVersion returned type int.  However
+		// for new versions (FP>=9) it returned the class SWFVersion.  This test
+		// to see which version the swf is.  
+		if (Type.typeof(x1.swfVersion)==ValueType.TInt) { 
+			if (Std.is(x1.swfVersion, Int)) {
+			    DejaGnu.pass("LoaderInfo::swfVersion property exists");
+			} else {
+			    DejaGnu.fail("LoaderInfo::swfVersion property doesn't exist");
+			}
+		} else {
+			if (Std.is(x1.swfVersion, SWFVersion)) {
+			    DejaGnu.pass("LoaderInfo::swfVersion property exists");
+			} else {
+			    DejaGnu.fail("LoaderInfo::swfVersion property doesn't exist");
+			}
+		}
+		if (Type.typeof(x1.url)!=ValueType.TNull) {
+		    DejaGnu.pass("LoaderInfo::url property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::url property doesn't exist");
+		}
+		if (Std.is(x1.width, Int)) {
+		    DejaGnu.pass("LoaderInfo::width property exists");
+		} else {
+		    DejaGnu.fail("LoaderInfo::width property doesn't exist");
+		}
+		// childSandboxBridge property only available in the AIR runtime. Not tested
+	 	/*if (x1.childSandboxBridge == Object) {
+	 	    DejaGnu.pass("LoaderInfo::childSandboxBridge property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::childSandboxBridge property doesn't exist");
+	 	}*/
+		// parentSandboxBridge property only available in the AIR runtime. Not tested
+	 	/*if (x1.parentSandboxBridge == Object) {
+	 	    DejaGnu.pass("LoaderInfo::parentSandboxBridge property exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::parentSandboxBridge property doesn't exist");
+	 	}*/
+
+		// Tests to see if all the methods exist. All these do is test for
+		// existance of a method, and don't test the functionality at all. This
+		// is primarily useful only to test completeness of the API implementation.
+
+		// FIXME: method doesn't exist (maybe haXe problem)
+	 	if (Type.typeof(LoaderInfo.getLoaderInfoByDefinition)==TFunction) {
+	 	    DejaGnu.pass("LoaderInfo::getLoaderInfoByDefinition() method exists");
+	 	} else {
+	 	    DejaGnu.fail("LoaderInfo::getLoaderInfoByDefinition() method doesn't exist");
+	 	}
+	       
+		DejaGnu.done();
+	});
+	
+	// Specify file where .swf resides
+	loader.load(new URLRequest("/home/sharad/Desktop/cubes.swf"));
+	
+	#end
     }
 }
 
