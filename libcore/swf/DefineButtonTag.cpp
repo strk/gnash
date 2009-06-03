@@ -42,12 +42,12 @@ namespace SWF {
 ButtonAction::ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
         movie_definition& mdef)
 	:
-	m_actions(mdef)
+	_actions(mdef)
 {
 	// Read condition flags.
 	if (t == SWF::DEFINEBUTTON)
 	{
-		m_conditions = OVER_DOWN_TO_OVER_UP;
+		_conditions = OVER_DOWN_TO_OVER_UP;
 	}
 	else
 	{
@@ -62,16 +62,16 @@ ButtonAction::ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
 			return;
 		}
 		in.ensureBytes(2);
-		m_conditions = in.read_u16();
+		_conditions = in.read_u16();
 	}
 
 	IF_VERBOSE_PARSE (
 	    log_parse(_("   button actions for conditions 0x%x"),
-            m_conditions); // @@ need more info about which actions
+            _conditions); // @@ need more info about which actions
 	);
 
 	// Read actions.
-	m_actions.read(in, endPos);
+	_actions.read(in, endPos);
 }
 
 bool
@@ -79,13 +79,13 @@ ButtonAction::triggeredBy(const event_id& ev) const
 {
 	switch ( ev.id() )
 	{
-		case event_id::ROLL_OVER: return m_conditions & IDLE_TO_OVER_UP;
-		case event_id::ROLL_OUT: return m_conditions & OVER_UP_TO_IDLE;
-		case event_id::PRESS: return m_conditions & OVER_UP_TO_OVER_DOWN;
-		case event_id::RELEASE: return m_conditions & OVER_DOWN_TO_OVER_UP;
-		case event_id::DRAG_OUT: return m_conditions & OVER_DOWN_TO_OUT_DOWN;
-		case event_id::DRAG_OVER: return m_conditions & OUT_DOWN_TO_OVER_DOWN;
-		case event_id::RELEASE_OUTSIDE: return m_conditions & OUT_DOWN_TO_IDLE;
+		case event_id::ROLL_OVER: return _conditions & IDLE_TO_OVER_UP;
+		case event_id::ROLL_OUT: return _conditions & OVER_UP_TO_IDLE;
+		case event_id::PRESS: return _conditions & OVER_UP_TO_OVER_DOWN;
+		case event_id::RELEASE: return _conditions & OVER_DOWN_TO_OVER_UP;
+		case event_id::DRAG_OUT: return _conditions & OVER_DOWN_TO_OUT_DOWN;
+		case event_id::DRAG_OVER: return _conditions & OUT_DOWN_TO_OVER_DOWN;
+		case event_id::RELEASE_OUTSIDE: return _conditions & OUT_DOWN_TO_IDLE;
 		case event_id::KEY_PRESS:
 		{
 			int keycode = getKeyCode();
@@ -99,12 +99,6 @@ ButtonAction::triggeredBy(const event_id& ev) const
 //
 // ButtonRecord
 //
-
-bool
-ButtonRecord::is_valid()
-{
-	return (m_DefinitionTag != NULL);
-}
 
 static std::string
 computeButtonStatesString(int flags)
@@ -133,25 +127,21 @@ ButtonRecord::read(SWFStream& in, TagType t,
 
 	in.ensureBytes(1);
 	int	flags = in.read_u8();
-	if (flags == 0)
-	{
-		return false;
-	}
+	if (!flags) return false;
 
 	// Upper 4 bits are:
 	//
-	//   ButtonReserved = readBits (f, 2);
 	bool buttonHasBlendMode = flags & (1<<5); 
 	bool buttonHasFilterList = flags & (1<<4);
-	m_hit_test = flags & (1<<3); // 8 ? true : false;
-	m_down     = flags & (1<<2); // 4 ? true : false;
-	m_over     = flags & (1<<1); // 2 ? true : false;
-	m_up       = flags & (1<<0); // 1 ? true : false;
+	_hitTest = flags & (1<<3);
+	_down = flags & (1<<2);
+	_over = flags & (1<<1); 
+	_up = flags & (1<<0); 
 
-	if (in.tell()+2 > endPos)
-	{
+	if (in.tell() + 2 > endPos) {
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("   premature end of button record input stream, can't read DisplayObject id"));
+		log_swferror(_("   premature end of button record input stream, "
+                "can't read DisplayObject id"));
 		);
 		return false;
 	}
@@ -159,56 +149,50 @@ ButtonRecord::read(SWFStream& in, TagType t,
 	_id = in.read_u16();
 
 	// Get DisplayObject definition now (safer)
-	m_DefinitionTag = m.getDefinitionTag(_id);
+	_definitionTag = m.getDefinitionTag(_id);
 
 	// If no DisplayObject with given ID is found in the movie
 	// definition, we print an error, but keep parsing.
-	if (!m_DefinitionTag)
-	{
+	if (!_definitionTag) {
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   button record for states [%s] refer to "
 			"DisplayObject with id %d, which is not found "
 			"in the chars dictionary"), computeButtonStatesString(flags), _id);
 		);
 	}
-	else
-	{
+	else {
 		IF_VERBOSE_PARSE(
 		log_parse(_("   button record for states [%s] contain "
 			"DisplayObject %d (%s)"), computeButtonStatesString(flags),
-            _id, typeName(*m_DefinitionTag));
+            _id, typeName(*_definitionTag));
 		);
 	}
 
-	if (in.tell()+2 > endPos)
-	{
+	if (in.tell()+2 > endPos) {
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("   premature end of button record input stream, can't read button layer (depth?)"));
+		log_swferror(_("   premature end of button record input stream, "
+                "can't read button layer (depth?)"));
 		);
 		return false;
 	}
 	in.ensureBytes(2);
-	m_button_layer = in.read_u16();
+	_buttonLayer = in.read_u16();
 
     // SWFMatrix::read() checks the length of the stream
-	m_button_matrix.read(in);
+	_matrix.read(in);
 
-	if (t == SWF::DEFINEBUTTON2)
-	{
-		// cxform::read_rgba() checks the length of the stream.
-		m_button_cxform.read_rgba(in);
+	if (t == SWF::DEFINEBUTTON2) {
+		_cxform.read_rgba(in);
 	}
 
-	if ( buttonHasFilterList )
-	{
+	if (buttonHasFilterList) {
 		filter_factory::read(in, true, &_filters);
 		LOG_ONCE(
 			log_unimpl("Button filters"); 
 		);
 	}
 
-	if (buttonHasBlendMode)
-	{
+	if (buttonHasBlendMode) {
 		in.ensureBytes(1);
         _blendMode = in.read_u8();
 		LOG_ONCE(
@@ -305,22 +289,20 @@ DefineButtonTag::readDefineButtonTag(SWFStream& in, movie_definition& m)
 
 		// SAFETY CHECK:
 		// if the ButtonRecord is corrupted, discard it
-		if ( r.is_valid() )
-		{
-			_buttonRecords.push_back(r);
-		}
+		if (r.valid()) _buttonRecords.push_back(r);
 	}
 
-	if ( in.tell() >= endTagPos )
-	{
+	if (in.tell() >= endTagPos) {
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("Premature end of DEFINEBUTTON tag, won't read actions"));
+		log_swferror(_("Premature end of DEFINEBUTTON tag, "
+                "won't read actions"));
 		);
 		return;
 	}
 
 	// Read actions.
-	_buttonActions.push_back(new ButtonAction(in, SWF::DEFINEBUTTON, endTagPos, m));
+	_buttonActions.push_back(new ButtonAction(in, SWF::DEFINEBUTTON,
+                endTagPos, m));
 
 }
 
@@ -333,8 +315,8 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
 	// Read the menu flag
 	// (this is a single bit, the other 7 bits are reserved)
-	m_menu = in.read_u8() != 0;
-	if ( m_menu ) LOG_ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
+	_menu = in.read_u8() != 0;
+	if (_menu) LOG_ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
 
 	// Read the action offset
 	unsigned button_2_action_offset = in.read_u16();
@@ -345,7 +327,8 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 	if ( next_action_pos > tagEndPosition )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("Next Button2 actionOffset (%u) points past the end of tag (%lu)"),
+		log_swferror(_("Next Button2 actionOffset (%u) points past "
+                "the end of tag (%lu)"),
 			button_2_action_offset, tagEndPosition);
 		);
 		return;
@@ -368,7 +351,7 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
 		// SAFETY CHECK:
 		// if the ButtonRecord is corrupted, discard it
-		if ( r.is_valid() )
+		if ( r.valid() )
 		{
 			_buttonRecords.push_back(r);
 		}

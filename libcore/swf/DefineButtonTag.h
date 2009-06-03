@@ -30,6 +30,8 @@
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 #include "DefineButtonSoundTag.h"
 #include "swf.h"
+#include "Button.h"
+#include "DisplayObject.h"
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
@@ -51,48 +53,56 @@ namespace SWF {
 class ButtonRecord
 {
 
-private:
-
-	/// SWF8 and above can have a number of filters
-	/// associated with button records
-	//
-	/// Currently unused by Gnash.
-	///
-	Filters _filters;
-
-	/// SWF8 and above can have a blend mode
-	/// associated with button records.
-	//
-	/// Currently unused by Gnash.
-	///
-	boost::uint8_t _blendMode;
-
-// TODO: make private, provide accessors 
-public:
-
-	bool	m_hit_test;
-	bool	m_down;
-	bool	m_over;
-	bool	m_up;
-	int	_id;
-
-	// Who owns this ?
-	DefinitionTag* m_DefinitionTag;
-
-	int	m_button_layer;
-	SWFMatrix	m_button_matrix;
-	cxform	m_button_cxform;
-
-
 public:
 
 	ButtonRecord()
 		:
-		m_DefinitionTag(0)
+		_definitionTag(0)
 	{
 	}
 
-	/// Read a button record from the SWF stream.
+    /// Create a DisplayObject from a ButtonRecord.
+    //
+    /// @param name     Whether the created DisplayObject requires its own
+    ///                 instance name.
+    /// @param button   The button to which the DisplayObject will belong.
+    /// @return         A new DisplayObject. This should never be 0.
+    DisplayObject* instantiate(Button* button, bool name = true) const {
+        assert(button);
+        assert(_definitionTag);
+        DisplayObject* o = _definitionTag->createDisplayObject(button, _id);
+        o->setMatrix(_matrix, true);
+        o->set_cxform(_cxform);
+        o->set_depth(_buttonLayer + DisplayObject::staticDepthOffset + 1);
+        if (name && o->wantsInstanceName()) {
+            o->set_name(button->getNextUnnamedInstanceName());
+        }
+        return o;
+    }
+
+    /// Check if this ButtonRecord has a DisplayObject for a particular state
+    //
+    /// @param state    The state to test for.
+    bool hasState(Button::MouseState st) const {
+        switch (st)
+        {
+            case Button::MOUSESTATE_UP: return _up;
+            case Button::MOUSESTATE_DOWN: return _down;
+            case Button::MOUSESTATE_OVER: return _over;
+            case Button::MOUSESTATE_HIT: return _hitTest;
+            default: return false;
+        }
+    }
+
+    /// Read an RGB cxform for this record.
+    //
+    /// Cxform is stored in a different tag for SWF2 Buttons
+    /// (DEFINEBUTTON tag)
+    void readRGBTransform(SWFStream& in) {
+        _cxform.read_rgb(in);
+    }
+
+	/// Read a ButtonRecord from the SWF stream.
 	//
 	/// Return true if we read a record; false if this is a null
 	///
@@ -101,24 +111,49 @@ public:
 	///
 	bool read(SWFStream& in, TagType t, movie_definition& m,
             unsigned long endPos);
-
-	/// Return true if the button_record is valid
+    
+    /// Return true if the ButtonRecord is valid
 	//
-	/// A button record is invalid if it refers to a DisplayObject
+	/// A ButtonRecord is invalid if it refers to a DisplayObject
 	/// which has not been defined.
-	bool is_valid();
+	bool valid() const {
+        return (_definitionTag);
+    }
 
 #ifdef GNASH_USE_GC
-	/// Mark all reachable resources (for GC)
-	//
-	/// Reachable resources are:
-	///  - m_DefinitionTag (??) what's it !?
-	///
-	void markReachableResources() const
-	{
-		if ( m_DefinitionTag ) m_DefinitionTag->setReachable();
+	void markReachableResources() const {
+		if (_definitionTag) _definitionTag->setReachable();
 	}
 #endif // GNASH_USE_GC
+
+private:
+
+	/// SWF8 and above can have a number of filters
+	/// associated with button records
+	//
+	/// Currently unused by Gnash.
+	Filters _filters;
+
+	/// SWF8 and above can have a blend mode
+	/// associated with button records.
+	//
+	/// Currently unused by Gnash.
+	boost::uint8_t _blendMode;
+
+	bool _hitTest;
+	bool _down;
+	bool _over;
+	bool _up;
+	int	_id;
+
+    // This is a GC resource, so not owned by anyone.
+	const DefinitionTag* _definitionTag;
+
+	int	_buttonLayer;
+
+	SWFMatrix _matrix;
+
+	cxform _cxform;
 
 };
 	
@@ -128,7 +163,7 @@ class ButtonAction
 public:
 
 	// TODO: define ownership of list elements !!
-	action_buffer m_actions;
+	action_buffer _actions;
 
 	/// @param endPos
 	///	One past last valid-to-read byte position
@@ -146,7 +181,7 @@ public:
 	/// Return true if this action is triggered by a keypress
 	bool triggeredByKeyPress() const
 	{
-		return (m_conditions & KEYPRESS);
+		return (_conditions & KEYPRESS);
 	}
 
 private:
@@ -157,7 +192,7 @@ private:
 	///
 	int getKeyCode() const
 	{
-		return (m_conditions & KEYPRESS) >> 9;
+		return (_conditions & KEYPRESS) >> 9;
 	}
 
 	enum condition
@@ -173,7 +208,7 @@ private:
 		OVER_DOWN_TO_IDLE = 1 << 8,
 		KEYPRESS = 0xFE00  // highest 7 bits
 	};
-	int	m_conditions;
+	int	_conditions;
 
 };
 
@@ -239,7 +274,7 @@ public:
 		for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
 		{
 			const ButtonAction& ba = *(_buttonActions[i]);
-			if ( ba.triggeredBy(ev) ) f(ba.m_actions);
+			if ( ba.triggeredBy(ev) ) f(ba._actions);
 		}
 	}
 	
@@ -249,8 +284,8 @@ protected:
 	/// Mark all reachable resources (for GC)
 	//
 	/// Reachable resources are:
-	///  - button records (m_button_records)
-	///  - button sound definition (m_sound)
+	///  - button records (_button_records)
+	///  - button sound definition (_sound)
 	///
 	void markReachableResources() const
 	{
@@ -288,7 +323,7 @@ private:
 	ButtonActions _buttonActions;
 
 	/// Currently set but unused (and also unaccessible)
-	bool m_menu;
+	bool _menu;
 
 	/// The movie definition containing definition of this button
 	movie_definition& _movieDef;

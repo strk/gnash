@@ -883,6 +883,9 @@ public:
     virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
             InfoTree::iterator it);
 #endif
+    
+    /// Used to assign a name to unnamed instances
+    static std::string getNextUnnamedInstanceName();
 
     enum BlendMode
     {
@@ -1052,9 +1055,6 @@ protected:
             string_table::key key) const;
 
     void set_event_handlers(const Events& copyfrom);
-
-    /// Used to assign a name to unnamed instances
-    static std::string getNextUnnamedInstanceName();
 
     /// Name of this DisplayObject (if any)
     std::string _name;

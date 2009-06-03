@@ -298,9 +298,9 @@ Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
         int id)
     :
     InteractiveObject(parent, id),
-    m_last_mouse_flags(IDLE),
-    m_mouse_flags(IDLE),
-    m_mouse_state(UP),
+    _lastMouseFlags(FLAG_IDLE),
+    _mouseFlags(FLAG_IDLE),
+    _mouseState(MOUSESTATE_UP),
     _def(def)
 {
 
@@ -376,7 +376,7 @@ void
 Button::display()
 {
 
-    std::vector<DisplayObject*> actChars;
+    DisplayObjects actChars;
     getActiveCharacters(actChars);
 
     // TODO: by keeping chars sorted by depth we'd avoid the sort on display
@@ -403,8 +403,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // Check our active and visible children first
     //-------------------------------------------------
 
-    typedef std::vector<DisplayObject*> Chars;
-    Chars actChars;
+    DisplayObjects actChars;
     getActiveCharacters(actChars);
 
     if ( ! actChars.empty() )
@@ -415,8 +414,8 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         point  p(x, y);
         m.invert().transform(p);
 
-        for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend();
-                it!=itE; ++it)
+        for (DisplayObjects::reverse_iterator it = actChars.rbegin(),
+                itE=actChars.rend(); it!=itE; ++it)
         {
             DisplayObject* ch = *it;
             if ( ! ch->visible() ) continue;
@@ -466,27 +465,27 @@ Button::mouseEvent(const event_id& event)
         return;
     }
 
-    MouseState new_state = m_mouse_state;
+    MouseState new_state = _mouseState;
   
     // Set our mouse state (so we know how to render).
     switch (event.id())
     {
         case event_id::ROLL_OUT:
         case event_id::RELEASE_OUTSIDE:
-            new_state = UP;
+            new_state = MOUSESTATE_UP;
             break;
 
         case event_id::RELEASE:
         case event_id::ROLL_OVER:
         case event_id::DRAG_OUT:
         case event_id::MOUSE_UP:
-            new_state = OVER;
+            new_state = MOUSESTATE_OVER;
             break;
 
         case event_id::PRESS:
         case event_id::DRAG_OVER:
         case event_id::MOUSE_DOWN:
-            new_state = DOWN;
+            new_state = MOUSESTATE_DOWN;
             break;
 
         default:
@@ -587,16 +586,14 @@ Button::mouseEvent(const event_id& event)
     // Call conventional attached method.
     boost::intrusive_ptr<as_function> method =
         getUserDefinedEventHandler(event.functionKey());
-    if ( method )
-    {
+    if (method) {
         mr.pushAction(method, this, movie_root::apDOACTION);
     }
 }
 
 
 void
-Button::getActiveCharacters(
-        std::vector<const DisplayObject*>& list) const
+Button::getActiveCharacters(ConstDisplayObjects& list) const
 {
     list.clear();
 
@@ -610,8 +607,7 @@ Button::getActiveCharacters(
 
 
 void 
-Button::getActiveCharacters(
-        std::vector<DisplayObject*>& list, bool includeUnloaded)
+Button::getActiveCharacters(DisplayObjects& list, bool includeUnloaded)
 {
     list.clear();
 
@@ -636,19 +632,12 @@ Button::get_active_records(ActiveRecords& list, MouseState state)
             e = br.end(); i != e; ++i, ++index)
     {
         const ButtonRecord& rec =*i;
-
-        if ((state == UP && rec.m_up)
-            || (state == DOWN && rec.m_down)
-            || (state == OVER && rec.m_over)
-            || (state == HIT && rec.m_hit_test))
-        {
-            list.insert(index);
-        }
+        if (rec.hasState(state)) list.insert(index);
     }
 }
 
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
-static void dump(std::vector< DisplayObject* >& chars, std::stringstream& ss)
+static void dump(Button::DisplayObjects& chars, std::stringstream& ss)
 {
     for (size_t i=0, e=chars.size(); i<e; ++i)
     {
@@ -670,7 +659,7 @@ static void dump(std::vector< DisplayObject* >& chars, std::stringstream& ss)
 void
 Button::set_current_state(MouseState new_state)
 {
-    if (new_state == m_mouse_state)
+    if (new_state == _mouseState)
         return;
         
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
@@ -732,38 +721,14 @@ Button::set_current_state(MouseState new_state)
                 oldch = NULL;
             }
 
-            if ( ! oldch )
-            {
+            if (!oldch) {
                 // Not there, instantiate
-                const SWF::ButtonRecord& bdef = _def->buttonRecords()[i];
-
-                const SWFMatrix& mat = bdef.m_button_matrix;
-                const cxform& cx = bdef.m_button_cxform;
-                int ch_depth = bdef.m_button_layer + 
-                    DisplayObject::staticDepthOffset + 1;
-                int ch_id = bdef._id;
-
-                DisplayObject* ch = bdef.m_DefinitionTag->createDisplayObject(
-                        this, ch_id);
-                ch->setMatrix(mat, true); // update caches
-                ch->set_cxform(cx); 
-                ch->set_depth(ch_depth); 
-                assert(ch->get_parent() == this);
-
-                // no way to specify a name for button chars anyway...
-                assert(ch->get_name().empty()); 
-
-                if ( ch->wantsInstanceName() )
-                {
-                    //std::string instance_name = getNextUnnamedInstanceName();
-                    ch->set_name(getNextUnnamedInstanceName());
-                }
-
+                const SWF::ButtonRecord& rec = _def->buttonRecords()[i];
+                DisplayObject* ch = rec.instantiate(this);
+                
                 set_invalidated();
-
                 _stateCharacters[i] = ch;
-                ch->stagePlacementCallback(); // give this DisplayObject a life
-
+                ch->stagePlacementCallback(); 
             }
         }
     }
@@ -776,19 +741,12 @@ Button::set_current_state(MouseState new_state)
 #endif
 
     // Remember current state
-    m_mouse_state=new_state;
+    _mouseState=new_state;
      
 }
 
-//
-// ActionScript overrides
-//
-
-
-
 void 
-Button::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+Button::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
 
     // Not visible anyway
@@ -796,7 +754,7 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges,
 
     ranges.add(m_old_invalidated_ranges);  
 
-    std::vector<DisplayObject*> actChars;
+    DisplayObjects actChars;
     getActiveCharacters(actChars);
     std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::add_invalidated_bounds, _1,
@@ -809,10 +767,10 @@ Button::getBounds() const
 {
     rect allBounds;
 
-    typedef std::vector<const DisplayObject*> CharVect;
-    CharVect actChars;
+    typedef std::vector<const DisplayObject*> Chars;
+    Chars actChars;
     getActiveCharacters(actChars);
-    for(CharVect::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
+    for(Chars::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
     {
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
@@ -827,13 +785,13 @@ Button::getBounds() const
 bool
 Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    typedef std::vector<const DisplayObject*> CharVect;
-    CharVect actChars;
+    typedef std::vector<const DisplayObject*> Chars;
+    Chars actChars;
     getActiveCharacters(actChars);
-    for(CharVect::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
+    for(Chars::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
     {
         const DisplayObject* ch = *i;
-        if ( ch->pointInShape(x,y) ) return true;
+        if (ch->pointInShape(x,y)) return true;
     }
     return false; 
 }
@@ -895,26 +853,13 @@ Button::stagePlacementCallback(as_object* initObj)
 
     // Instantiate the hit DisplayObjects
     ActiveRecords hitChars;
-    get_active_records(hitChars, HIT);
+    get_active_records(hitChars, MOUSESTATE_HIT);
     for (ActiveRecords::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
     {
-        const SWF::ButtonRecord& bdef = _def->buttonRecords()[*i];
+        const SWF::ButtonRecord& rec = _def->buttonRecords()[*i];
 
-        const SWFMatrix& mat = bdef.m_button_matrix;
-        const cxform& cx = bdef.m_button_cxform;
-        int ch_depth = bdef.m_button_layer+DisplayObject::staticDepthOffset+1;
-        int ch_id = bdef._id;
-
-        DisplayObject* ch =
-            bdef.m_DefinitionTag->createDisplayObject(this, ch_id);
-        ch->setMatrix(mat, true);  // update caches
-    
-        // TODO: who cares about color, depth etc.
-        ch->set_cxform(cx); 
-        ch->set_depth(ch_depth);
-        assert(ch->get_parent() == this);
-        assert(ch->get_name().empty()); 
-
+        // These should not be named!
+        DisplayObject* ch = rec.instantiate(this, false);
         _hitCharacters.push_back(ch);
     }
 
@@ -927,31 +872,15 @@ Button::stagePlacementCallback(as_object* initObj)
 
     // Instantiate the default state DisplayObjects 
     ActiveRecords upChars;
-    get_active_records(upChars, UP);
+    get_active_records(upChars, MOUSESTATE_UP);
 
-    for (ActiveRecords::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
+    for (ActiveRecords::iterator i = upChars.begin(), e=upChars.end();
+            i != e; ++i)
     {
         int rno = *i;
-        const SWF::ButtonRecord& bdef = _def->buttonRecords()[rno];
+        const SWF::ButtonRecord& rec = _def->buttonRecords()[rno];
 
-        const SWFMatrix& mat = bdef.m_button_matrix;
-        const cxform& cx = bdef.m_button_cxform;
-        int ch_depth = bdef.m_button_layer+DisplayObject::staticDepthOffset+1;
-        int ch_id = bdef._id;
-
-        DisplayObject* ch = bdef.m_DefinitionTag->createDisplayObject(
-                this, ch_id);
-        ch->setMatrix(mat, true);  // update caches
-        ch->set_cxform(cx); 
-        ch->set_depth(ch_depth); 
-        assert(ch->get_parent() == this);
-        assert(ch->get_name().empty()); 
-
-        if ( ch->wantsInstanceName() )
-        {
-            //std::string instance_name = getNextUnnamedInstanceName();
-            ch->set_name(getNextUnnamedInstanceName());
-        }
+        DisplayObject* ch = rec.instantiate(this);
 
         _stateCharacters[rno] = ch;
         ch->stagePlacementCallback(); // give this DisplayObject a life
@@ -1187,13 +1116,16 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     InfoTree::iterator selfIt = DisplayObject::getMovieInfo(tr, it);
     std::ostringstream os;
 
-    std::vector<DisplayObject*> actChars;
+    DisplayObjects actChars;
     getActiveCharacters(actChars, true);
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    os << actChars.size() << " active DisplayObjects for state " << mouseStateName(m_mouse_state);
-    InfoTree::iterator localIter = tr.append_child(selfIt, StringPair(_("Button state"), os.str()));        
-    std::for_each(actChars.begin(), actChars.end(), boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
+    os << actChars.size() << " active DisplayObjects for state " <<
+        mouseStateName(_mouseState);
+    InfoTree::iterator localIter = tr.append_child(selfIt,
+            StringPair(_("Button state"), os.str()));        
+    std::for_each(actChars.begin(), actChars.end(),
+            boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
 
     return selfIt;
 
@@ -1205,10 +1137,10 @@ Button::mouseStateName(MouseState s)
 {
     switch (s)
     {
-        case UP: return "UP";
-        case DOWN: return "DOWN";
-        case OVER: return "OVER";
-        case HIT: return "HIT";
+        case MOUSESTATE_UP: return "UP";
+        case MOUSESTATE_DOWN: return "DOWN";
+        case MOUSESTATE_OVER: return "OVER";
+        case MOUSESTATE_HIT: return "HIT";
         default: return "UNKNOWN (error?)";
     }
 }

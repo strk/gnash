@@ -68,10 +68,7 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     {
         // This will throw a parser exception if not enough bytes are
         // left.
-        (*i).m_button_cxform.read_rgb(in);
-        IF_VERBOSE_PARSE(
-            log_parse("Read DefineButtonCxform: %s", (*i).m_button_cxform);
-        );
+        i->readRGBTransform(in);
     }
 }
 
