@@ -194,11 +194,11 @@ class LoaderInfo_as {
 		// is primarily useful only to test completeness of the API implementation.
 
 		// FIXME: method doesn't exist (maybe haXe problem)
-	 	if (Type.typeof(LoaderInfo.getLoaderInfoByDefinition)==TFunction) {
+	 	/*if (Type.typeof(LoaderInfo.getLoaderInfoByDefinition)==TFunction) {
 	 	    DejaGnu.pass("LoaderInfo::getLoaderInfoByDefinition() method exists");
 	 	} else {
 	 	    DejaGnu.fail("LoaderInfo::getLoaderInfoByDefinition() method doesn't exist");
-	 	}
+	 	}*/
 	       
 		DejaGnu.done();
 	});
