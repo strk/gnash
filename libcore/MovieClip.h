@@ -28,16 +28,11 @@
 #include "ControlTag.h"
 #include "movie_definition.h" // for inlines
 #include "DisplayList.h" // DisplayList 
-#include "InteractiveObject.h"
-#include "log.h"
+#include "DisplayObjectContainer.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
 #include "Range2d.h"
 #include "dsodefs.h" // for DSOEXPORT
-
-#ifdef USE_SWFTREE
-# include "tree.hh"
-#endif
 
 #include <vector>
 #include <list>
@@ -64,6 +59,8 @@ namespace gnash
 
 /// A MovieClip is a container for DisplayObjects.
 //
+/// TODO: This class should inherit from Sprite
+//
 /// In AS3 is it distinguished from a Sprite by having a timeline, i.e.
 /// more than one frame. In AS2, there is no Sprite class.
 //
@@ -83,7 +80,7 @@ namespace gnash
 /// (Movie) containing either the definition or the code from
 /// which the MovieClip was created. The _url member and SWF version are
 /// dependent on the _swf. Exports are also sought in this Movie.
-class MovieClip : public InteractiveObject 
+class MovieClip : public DisplayObjectContainer 
 {
 
 public:
@@ -127,50 +124,6 @@ public:
             DisplayObject* parent, int id);
 
     virtual ~MovieClip();
-
-    /// Remove the DisplayObject at the specified depth.
-    //
-    /// TODO: should be a function of DisplayObjectContainer
-    /// This is the implementation of the AS3-only method
-    /// DisplayObjectContainer.removeChildAt().
-    //
-    /// @param index    The depth from which to remove a DisplayObject.
-    /// @return         The removed DisplayObject (reflects the AS return)
-    virtual DisplayObject* removeChildAt(int index);
-    
-    /// Remove the specified child DisplayObject.
-    //
-    /// TODO: should be a function of DisplayObjectContainer
-    /// This is the implementation of the AS3-only method
-    /// DisplayObjectContainer.removeChild(), but can also be used for
-    /// AS2.
-    //
-    /// @param obj      The DisplayObject to remove.
-    /// @return         The removed DisplayObject (reflects the AS return)
-    virtual DisplayObject* removeChild(DisplayObject* obj);
-    
-    /// Add a child DisplayObject at the next suitable index (AS2: depth).
-    //
-    /// TODO: should be a function of DisplayObjectContainer
-    /// This is the implementation of the AS3-only method
-    /// DisplayObjectContainer.addChild(), but can also be used for
-    /// AS2.
-    //
-    /// @param obj      The DisplayObject to add.
-    /// @return         The added DisplayObject (reflects the AS return)
-    virtual DisplayObject* addChild(DisplayObject* obj);
-
-    /// Add a child DisplayObject at the specified index (AS2: depth).
-    //
-    /// TODO: should be a function of DisplayObjectContainer
-    /// This is the implementation of the AS3-only method
-    /// DisplayObjectContainer.addChild(), but can also be used for
-    /// AS2.
-    //
-    /// @param obj      The DisplayObject to add.
-    /// @param index    The index (depth) at which to add the DisplayObject.
-    /// @return         The added DisplayObject (reflects the AS return)
-    virtual DisplayObject* addChildAt(DisplayObject* obj, int index);
 
     // Return the originating SWF
     virtual Movie* get_root() const;
@@ -826,12 +779,6 @@ public:
     /// Getter-setter for MovieClip._lockroot
     static as_value lockroot_getset(const fn_call& fn);
 
-#ifdef USE_SWFTREE
-    // Override to append display list info, see dox in DisplayObject.h
-    virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
-            InfoTree::iterator it);
-#endif
-    
     /// \brief
     /// Return version of the SWF definition of this instance
     /// as been parsed from.
@@ -1008,9 +955,6 @@ private:
 
     /// The SWF that this MovieClip belongs to.
     Movie* _swf;
-
-    /// Current Display List contents.
-    DisplayList _displayList;
 
     /// The canvas for dynamic drawing
     DynamicShape _drawable;

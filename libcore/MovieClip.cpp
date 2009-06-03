@@ -60,11 +60,8 @@
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
 #include "GnashNumeric.h"
-#include "Shape.h"
-
-#ifdef USE_SWFTREE
-# include "tree.hh"
-#endif
+#include "InteractiveObject.h"
+#include "DisplayObjectContainer.h"
 
 #include <vector>
 #include <string>
@@ -482,7 +479,7 @@ private:
 MovieClip::MovieClip(const movie_definition* const def, Movie* r,
         DisplayObject* parent, int id)
     :
-    InteractiveObject(parent, id),
+    DisplayObjectContainer(parent, id),
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
@@ -2267,47 +2264,6 @@ MovieClip::unload()
     return shouldKeepAlive;
 }
 
-DisplayObject*
-MovieClip::removeChild(DisplayObject* obj)
-{
-    _displayList.removeDisplayObject(obj);
-    obj->set_parent(0);
-    return obj;
-}
-
-DisplayObject*
-MovieClip::removeChildAt(int index)
-{
-    DisplayObject* obj = _displayList.removeDisplayObjectAt(index);
-    if (obj) obj->set_parent(0);
-
-    return obj;
-}
-
-DisplayObject*
-MovieClip::addChild(DisplayObject* obj)
-{
-    // TODO: should be a DisplayObjectContainer; remove dynamic_cast.
-    MovieClip* parent = dynamic_cast<MovieClip*>(obj->get_parent());
-    if (parent) parent->removeChild(obj);
-
-    _displayList.addDisplayObject(obj);
-    obj->set_parent(this);
-    return obj;
-}
-
-
-DisplayObject*
-MovieClip::addChildAt(DisplayObject* obj, int index)
-{
-    // TODO: should be a DisplayObjectContainer; remove dynamic_cast.
-    MovieClip* parent = dynamic_cast<MovieClip*>(obj->get_parent());
-    if (parent) parent->removeChild(obj);
-    
-    _displayList.insertDisplayObject(obj, index);
-    obj->set_parent(this);
-    return obj;
-}
 
 bool
 MovieClip::loadMovie(const URL& url, const std::string* postdata)
@@ -2436,7 +2392,6 @@ MovieClip::loadVariables(const std::string& urlstr,
 
 }
 
-/*private*/
 void
 MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
 {
@@ -2747,50 +2702,6 @@ MovieClip::setPlayState(PlayState s)
     _playState = s;
 }
 
-#ifdef USE_SWFTREE
-
-class MovieInfoVisitor
-{
-
-    DisplayObject::InfoTree& _tr;
-    DisplayObject::InfoTree::iterator _it;
-
-public:
-    MovieInfoVisitor(DisplayObject::InfoTree& tr,
-            DisplayObject::InfoTree::iterator it)
-        :
-        _tr(tr),
-        _it(it)
-    {}
-
-    void operator() (DisplayObject* ch)
-    {
-        // Should we still print these?
-        //if ( ch->unloaded() ) return; 
-
-        ch->getMovieInfo(_tr, _it);
-    }
-};
-
-DisplayObject::InfoTree::iterator 
-MovieClip::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
-{
-    InfoTree::iterator selfIt = DisplayObject::getMovieInfo(tr, it);
-    std::ostringstream os;
-    os << _displayList.size();
-    InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Children"), os.str()));            
-    //localIter = tr.append_child(localIter, StringPair("child1", "fake"));
-    //localIter = tr.append_child(localIter, StringPair("child2", "fake"));
-
-    MovieInfoVisitor v(tr, localIter);
-    _displayList.visitAll(v);
-
-    return selfIt;
-
-}
-
-#endif // USE_SWFTREE
 
 void
 movieclip_class_init(as_object& global)
