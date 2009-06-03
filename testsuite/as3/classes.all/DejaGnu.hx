@@ -23,6 +23,7 @@ import flash.text.TextField;
 #else
 import flash.TextField;
 #end
+import haxe.PosInfos;
 
 class DejaGnu {
     static var passed = 0;
@@ -31,6 +32,7 @@ class DejaGnu {
     static var xfailed = 0;
     static var untest = 0;
     static var unresolve = 0;
+    static var position:PosInfos;
 
     // This is a trick to force our 'init' function
     // to be automatically called at the start of the movie.
@@ -51,6 +53,10 @@ class DejaGnu {
         //flash.Lib.current.createTextField("textout", 99, 10, 10, 500, 500);
 	flash.Lib.current.addChild(tf);
 #else
+	flash.Lib._root.createNewTextField("tf",10,0,0,300,300);
+	tf.multiline = true;
+	tf.wordWrap = true;
+	tf.autoSize = "left";
 //  	tf = new flash.TextField();
 // 	tf.autoSize = flash.TextFieldAutoSize.LEFT;
 #end
@@ -128,20 +134,40 @@ class DejaGnu {
     
     static function xtrace(msg) {
         tf.text += msg + "\n";
+#if flash9
         flash.Lib.trace(msg);
+#else	
+		untyped flash.Boot.__trace(msg,position);
+#end
     }
 
     static function untested(msg) {
+#if flash9
         flash.Lib.trace("UNTESTED: "+msg);
+#else	
+		untyped flash.Boot.__trace("UNTESTED: "+msg,position);
+#end
     }
 
     static function unresolved(msg) {
         flash.Lib.trace("UNRESOLVED: "+msg);
+#if flash9
+        flash.Lib.trace("UNRESOLVED: "+msg);
+#else	
+		untyped flash.Boot.__trace("UNRESOLVED: "+msg,position);
+#end
     }
     
     static public function done() {
         printtotals();
-	flash.Lib.trace("__END_OF_TEST__");
+#if flash9
+        flash.Lib.trace("__END_OF_TEST__");
+#else	
+		untyped flash.Boot.__trace("__END_OF_TEST__",position);
+		//untyped flash.Boot.__trace(""+flash.Lib._root._width,position);
+		//flash.Lib.current._width = 800;
+#end
+	
 	//loadMovie('fscommand:quit', _root);
     }
 }

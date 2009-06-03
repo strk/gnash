@@ -26,9 +26,6 @@
 #if flash9
 import flash.utils.IDataOutput;
 import flash.display.MovieClip;
-#else
-import flash.IDataOutput;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,94 +36,92 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class IDataOutput_as {
     static function main() {
-        var x1:IDataOutput = new IDataOutput();
-
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("IDataOutput class exists");
-        } else {
-            DejaGnu.fail("IDataOutput class doesn't exist");
-        }
+#if flash9
+DejaGnu.note("This class is an interface");
+DejaGnu.note("Implementors: ByteArray, FileStream, Socket");
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.endian == null) {
-	    DejaGnu.pass("IDataOutput.endian property exists");
-	} else {
-	    DejaGnu.fail("IDataOutput.endian property doesn't exist");
-	}
-	if (x1.objectEncoding == uint) {
-	    DejaGnu.pass("IDataOutput.objectEncoding property exists");
-	} else {
-	    DejaGnu.fail("IDataOutput.objectEncoding property doesn't exist");
-	}
+//	if (x1.endian == null) {
+//	    DejaGnu.pass("IDataOutput.endian property exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput.endian property doesn't exist");
+//	}
+//	if (x1.objectEncoding == uint) {
+//	    DejaGnu.pass("IDataOutput.objectEncoding property exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput.objectEncoding property doesn't exist");
+//	}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.writeBoolean == null) {
-	    DejaGnu.pass("IDataOutput::writeBoolean() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeBoolean() method doesn't exist");
-	}
-	if (x1.writeByte == null) {
-	    DejaGnu.pass("IDataOutput::writeByte() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeByte() method doesn't exist");
-	}
-	if (x1.writeBytes == null) {
-	    DejaGnu.pass("IDataOutput::writeBytes() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeBytes() method doesn't exist");
-	}
-	if (x1.writeDouble == null) {
-	    DejaGnu.pass("IDataOutput::writeDouble() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeDouble() method doesn't exist");
-	}
-	if (x1.writeFloat == null) {
-	    DejaGnu.pass("IDataOutput::writeFloat() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeFloat() method doesn't exist");
-	}
-	if (x1.writeInt == null) {
-	    DejaGnu.pass("IDataOutput::writeInt() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeInt() method doesn't exist");
-	}
-	if (x1.writeMultiByte == null) {
-	    DejaGnu.pass("IDataOutput::writeMultiByte() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeMultiByte() method doesn't exist");
-	}
-	if (x1.writeObject == null) {
-	    DejaGnu.pass("IDataOutput::writeObject() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeObject() method doesn't exist");
-	}
-	if (x1.writeShort == null) {
-	    DejaGnu.pass("IDataOutput::writeShort() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeShort() method doesn't exist");
-	}
-	if (x1.writeUnsignedInt == null) {
-	    DejaGnu.pass("IDataOutput::writeUnsignedInt() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeUnsignedInt() method doesn't exist");
-	}
-	if (x1.writeUTF == null) {
-	    DejaGnu.pass("IDataOutput::writeUTF() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeUTF() method doesn't exist");
-	}
-	if (x1.writeUTFBytes == null) {
-	    DejaGnu.pass("IDataOutput::writeUTFBytes() method exists");
-	} else {
-	    DejaGnu.fail("IDataOutput::writeUTFBytes() method doesn't exist");
-	}
+//	if (x1.writeBoolean == null) {
+//	    DejaGnu.pass("IDataOutput::writeBoolean() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeBoolean() method doesn't exist");
+//	}
+//	if (x1.writeByte == null) {
+//	    DejaGnu.pass("IDataOutput::writeByte() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeByte() method doesn't exist");
+//	}
+//	if (x1.writeBytes == null) {
+//	    DejaGnu.pass("IDataOutput::writeBytes() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeBytes() method doesn't exist");
+//	}
+//	if (x1.writeDouble == null) {
+//	    DejaGnu.pass("IDataOutput::writeDouble() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeDouble() method doesn't exist");
+//	}
+//	if (x1.writeFloat == null) {
+//	    DejaGnu.pass("IDataOutput::writeFloat() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeFloat() method doesn't exist");
+//	}
+//	if (x1.writeInt == null) {
+//	    DejaGnu.pass("IDataOutput::writeInt() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeInt() method doesn't exist");
+//	}
+//	if (x1.writeMultiByte == null) {
+//	    DejaGnu.pass("IDataOutput::writeMultiByte() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeMultiByte() method doesn't exist");
+//	}
+//	if (x1.writeObject == null) {
+//	    DejaGnu.pass("IDataOutput::writeObject() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeObject() method doesn't exist");
+//	}
+//	if (x1.writeShort == null) {
+//	    DejaGnu.pass("IDataOutput::writeShort() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeShort() method doesn't exist");
+//	}
+//	if (x1.writeUnsignedInt == null) {
+//	    DejaGnu.pass("IDataOutput::writeUnsignedInt() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeUnsignedInt() method doesn't exist");
+//	}
+//	if (x1.writeUTF == null) {
+//	    DejaGnu.pass("IDataOutput::writeUTF() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeUTF() method doesn't exist");
+//	}
+//	if (x1.writeUTFBytes == null) {
+//	    DejaGnu.pass("IDataOutput::writeUTFBytes() method exists");
+//	} else {
+//	    DejaGnu.fail("IDataOutput::writeUTFBytes() method doesn't exist");
+//	}
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+#else
+	DejaGnu.note("This class (IDataOutput) is only available in flash9");
+#end
     }
 }
 
