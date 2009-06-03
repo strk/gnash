@@ -26,12 +26,10 @@
 #if flash9
 import flash.net.URLStream;
 import flash.display.MovieClip;
-#else
-import flash.URLStream;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,123 +37,122 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class URLStream_as {
     static function main() {
-        var x1:URLStream = new URLStream();
-
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("URLStream class exists");
-        } else {
-            DejaGnu.fail("URLStream class doesn't exist");
-        }
+        #if !flash9
+			DejaGnu.note("this test is not valid for this version of flash");
+		#end
+		#if flash9
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.bytesAvailable == 0) {
-	    DejaGnu.pass("URLStream.bytesAvailable property exists");
-	} else {
-	    DejaGnu.fail("URLStream.bytesAvailable property doesn't exist");
-	}
-	if (x1.connected == false) {
-	    DejaGnu.pass("URLStream.connected property exists");
-	} else {
-	    DejaGnu.fail("URLStream.connected property doesn't exist");
-	}
-	if (x1.endian == null) {
-	    DejaGnu.pass("URLStream.endian property exists");
-	} else {
-	    DejaGnu.fail("URLStream.endian property doesn't exist");
-	}
-	if (x1.objectEncoding == 0) {
-	    DejaGnu.pass("URLStream.objectEncoding property exists");
-	} else {
-	    DejaGnu.fail("URLStream.objectEncoding property doesn't exist");
-	}
-
+	//	var x1:URLStream = new URLStream();
+	
+	//if (Std.is(x1.bytesAvailable, Float)) {
+	//    DejaGnu.pass("URLStream.bytesAvailable property exists");
+	//} else {
+	//    DejaGnu.fail("URLStream.bytesAvailable property doesn't exist");
+	//}
+	//if (Type.typeof(x1.connected) == ValueType.TBool) {
+	//    DejaGnu.pass("URLStream.connected property exists");
+	//} else {
+	//    DejaGnu.fail("URLStream.connected property doesn't exist");
+	//}
+	//if (Std.is(x1.endian, String)) {
+	//    DejaGnu.pass("URLStream.endian property exists");
+	//} else {
+	//    DejaGnu.fail("URLStream.endian property doesn't exist");
+	//}
+	//if (Std.is(x1.objectEncoding, Float)) {
+	//    DejaGnu.pass("URLStream.objectEncoding property exists");
+	//} else {
+	//    DejaGnu.fail("URLStream.objectEncoding property doesn't exist");
+	//}
+	#end
+#if !flash
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.close == null) {
+	if (URLStream.close == null) {
 	    DejaGnu.pass("URLStream::close() method exists");
 	} else {
 	    DejaGnu.fail("URLStream::close() method doesn't exist");
 	}
-	if (x1.load == null) {
+	if (URLStream.load == null) {
 	    DejaGnu.pass("URLStream::load() method exists");
 	} else {
 	    DejaGnu.fail("URLStream::load() method doesn't exist");
 	}
 // FIXME: these all return void
-// 	if (x1.readBoolean == false) {
+// 	if (URLStream.readBoolean == false) {
 // 	    DejaGnu.pass("URLStream::readBoolean() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readBoolean() method doesn't exist");
 // 	}
-// 	if (x1.readByte == 0) {
+// 	if (URLStream.readByte == 0) {
 // 	    DejaGnu.pass("URLStream::readByte() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readByte() method doesn't exist");
 // 	}
-// 	if (x1.readBytes == null) {
+// 	if (URLStream.readBytes == null) {
 // 	    DejaGnu.pass("URLStream::readBytes() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readBytes() method doesn't exist");
 // 	}
-// 	if (x1.readDouble == 0) {
+// 	if (URLStream.readDouble == 0) {
 // 	    DejaGnu.pass("URLStream::readDouble() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readDouble() method doesn't exist");
 // 	}
-// 	if (x1.readFloat == 0) {
+// 	if (URLStream.readFloat == 0) {
 // 	    DejaGnu.pass("URLStream::readFloat() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readFloat() method doesn't exist");
 // 	}
-// 	if (x1.readInt == 0) {
+// 	if (URLStream.readInt == 0) {
 // 	    DejaGnu.pass("URLStream::readInt() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readInt() method doesn't exist");
 // 	}
-// 	if (x1.readMultiByte == null) {
+// 	if (URLStream.readMultiByte == null) {
 // 	    DejaGnu.pass("URLStream::readMultiByte() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readMultiByte() method doesn't exist");
 // 	}
-// 	if (x1.readObject == 0) {
+// 	if (URLStream.readObject == 0) {
 // 	    DejaGnu.pass("URLStream::readObject() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readObject() method doesn't exist");
 // 	}
-// 	if (x1.readShort == 0) {
+// 	if (URLStream.readShort == 0) {
 // 	    DejaGnu.pass("URLStream::readShort() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readShort() method doesn't exist");
 // 	}
-// 	if (x1.readUnsignedByte == 0) {
+// 	if (URLStream.readUnsignedByte == 0) {
 // 	    DejaGnu.pass("URLStream::readUnsignedByte() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readUnsignedByte() method doesn't exist");
 // 	}
-// 	if (x1.readUnsignedInt == 0) {
+// 	if (URLStream.readUnsignedInt == 0) {
 // 	    DejaGnu.pass("URLStream::readUnsignedInt() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readUnsignedInt() method doesn't exist");
 // 	}
-// 	if (x1.readUnsignedShort == 0) {
+// 	if (URLStream.readUnsignedShort == 0) {
 // 	    DejaGnu.pass("URLStream::readUnsignedShort() method exists");
 // 	} else {
 // 	    DejaGnu.fail("URLStream::readUnsignedShort() method doesn't exist");
 // 	}
-	if (x1.readUTF == null) {
+	if (URLStream.readUTF == null) {
 	    DejaGnu.pass("URLStream::readUTF() method exists");
 	} else {
 	    DejaGnu.fail("URLStream::readUTF() method doesn't exist");
 	}
-	if (x1.readUTFBytes == null) {
+	if (URLStream.readUTFBytes == null) {
 	    DejaGnu.pass("URLStream::readUTFBytes() method exists");
 	} else {
 	    DejaGnu.fail("URLStream::readUTFBytes() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
