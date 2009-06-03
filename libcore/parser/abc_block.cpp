@@ -47,7 +47,8 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		asClass *pType;
 		if (_typeIndex) {
 			log_abc("Trait type is %s", 
-                    pBlock->_stringPool[pBlock->_multinamePool[_typeIndex].getABCName()]);
+                pBlock->_stringPool[
+                    pBlock->_multinamePool[_typeIndex].getABCName()]);
 			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
 		}
 		else {
@@ -58,12 +59,17 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
 			return false;
 		}
+
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
 		if (!_hasValue) {
-			_value = as_value((as_object*)0); // NULL value, right ?
+            as_object* null = 0;
+			_value = null; 
 		}
-		log_abc("Adding property=%s with value=%s slot=%u", pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
+
+		log_abc("Adding property=%s with value=%s slot=%u",
+                pBlock->_stringPool[_name], _value, _slotID);
+
 		pClass->addValue(_globalName, _namespace, _slotID, pType, 
 			_value, _kind == KIND_CONST, do_static);
 		break;
