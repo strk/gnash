@@ -26,6 +26,12 @@
 #if flash9
 import flash.text.AntiAliasType;
 import flash.display.MovieClip;
+<<<<<<< TREE
+=======
+#else
+import flash.TextField;
+import flash.MovieClip;
+>>>>>>> MERGE-SOURCE
 #end
 import flash.Lib;
 import Type;

@@ -26,12 +26,10 @@
 #if flash9
 import flash.accessibility.AccessibilityProperties;
 import flash.display.MovieClip;
-#else
-import flash.AccessibilityProperties;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class AccessibilityProperties_as {
     static function main() {
-        var x1:AccessibilityProperties = new AccessibilityProperties();
+        #if !flash9
+		DejaGnu.note("this is not applicable to this test case. in earlier versions of flash you should call flash.accessibility.updateproperties().");
+		#end
+		
+		#if flash9
+		var x1:AccessibilityProperties = new AccessibilityProperties();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,37 +53,37 @@ class AccessibilityProperties_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.description == null) {
+	if (Std.is(x1.description, String)) {
 	    DejaGnu.pass("AccessibilityProperties::description property exists");
 	} else {
 	    DejaGnu.fail("AccessibilityProperties::description property doesn't exist");
 	}
-	if (x1.forceSimple == false) {
+	if (Type.typeof(x1.forceSimple) == ValueType.TBool) {
 	    DejaGnu.pass("AccessibilityProperties::forceSimple property exists");
 	} else {
 	    DejaGnu.fail("AccessibilityProperties::forceSimple property doesn't exist");
 	}
-	if (x1.name == null) {
+	if (Std.is(x1.name, String)) {
 	    DejaGnu.pass("AccessibilityProperties::name property exists");
 	} else {
 	    DejaGnu.fail("AccessibilityProperties::name property doesn't exist");
 	}
-	if (x1.noAutoLabeling == false) {
+	if (Type.typeof(x1.noAutoLabeling) == ValueType.TBool) {
 	    DejaGnu.pass("AccessibilityProperties::noAutoLabeling property exists");
 	} else {
 	    DejaGnu.fail("AccessibilityProperties::noAutoLabeling property doesn't exist");
 	}
-	if (x1.shortcut == null) {
+	if (Std.is(x1.shortcut, String)) {
 	    DejaGnu.pass("AccessibilityProperties::shortcut property exists");
 	} else {
 	    DejaGnu.fail("AccessibilityProperties::shortcut property doesn't exist");
 	}
-	if (x1.silent == false) {
+	if (Std.is(x1.silent, String)) {
 	    DejaGnu.pass("AccessibilityProperties::silent property exists");
 	} else {
 	    DejaGnu.fail("AccessibilityProperties::silent property doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
