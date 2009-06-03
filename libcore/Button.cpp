@@ -324,8 +324,8 @@ Button::trackAsMenu()
     // TODO: check whether the AS or the tag value takes precedence.
     as_value track;
     string_table& st = _vm.getStringTable();
-    if (get_member(st.find("trackAsMenu"), &track) && track.to_bool()) {
-        return true;
+    if (get_member(st.find("trackAsMenu"), &track)) {
+        return track.to_bool();
     }
     if (_def) return _def->trackAsMenu();
     return false;
