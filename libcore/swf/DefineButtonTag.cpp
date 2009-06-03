@@ -148,9 +148,9 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
     in.ensureBytes(1 + 2); // flags + actions offset
 
     // Read the menu flag
-    // (this is a single bit, the other 7 bits are reserved)
+    // (this is a single bit, the first 7 bits are reserved)
     const boost::uint8_t flags = in.read_u8();
-    _trackAsMenu = flags & (1 << 7);
+    _trackAsMenu = flags & (1 << 0);
     if (_trackAsMenu) {
         LOG_ONCE(log_unimpl("DefineButton2: trackAsMenu"));
     }

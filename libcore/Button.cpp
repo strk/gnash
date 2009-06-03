@@ -341,12 +341,10 @@ Button::isEnabled()
 }
 
 
-// called from Key listener only
-// (the above line is wrong, it's also called with onConstruct, for instance)
 bool
 Button::on_event(const event_id& id)
 {
-    if ( unloaded() )
+    if (unloaded())
     {
         // We dont' respond to events while unloaded
         // See bug #22982
