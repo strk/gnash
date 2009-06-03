@@ -21,6 +21,7 @@
 #include "as_object.h"
 #include "string_table.h"
 #include "VM.h"
+#include "fn_call.h"
 #include "MovieClip.h"
 
 #include "BevelFilter_as.h"

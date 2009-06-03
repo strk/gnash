@@ -27,6 +27,7 @@
 #include "render.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
+#include "movie_root.h"
 #include "VM.h"
 #include "Object.h"
 #include "MediaHandler.h" // for setting up embedded video decoder 

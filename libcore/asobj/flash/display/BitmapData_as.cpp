@@ -22,6 +22,7 @@
 #endif
 
 #include "BitmapData_as.h"
+#include "MovieClip.h"
 #include "GnashImage.h"
 #include "Bitmap.h"
 #include "flash/geom/Rectangle_as.h" // for BitmapData.rectangle

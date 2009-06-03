@@ -26,6 +26,7 @@
 #include "GnashException.h"
 #include "as_environment.h"
 #include "fn_call.h"
+#include "event_id.h"
 #include "VM.h"
 #include "StringPredicates.h"
 #include "namedStrings.h"

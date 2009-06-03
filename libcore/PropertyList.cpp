@@ -23,9 +23,8 @@
 
 #include "PropertyList.h"
 #include "Property.h" 
-
+#include "as_environment.h"
 #include "log.h"
-
 #include "as_function.h"
 #include "as_value.h" // for enumerateValues
 #include "VM.h" // For string_table

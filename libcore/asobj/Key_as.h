@@ -22,7 +22,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance
-#include "fn_call.h"
 #include "GnashKey.h" // for key::code
 #include "dsodefs.h"
 #include <bitset>

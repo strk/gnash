@@ -29,6 +29,7 @@
 #include <boost/bind.hpp>
 
 #include "VM.h"
+#include "movie_root.h"
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"

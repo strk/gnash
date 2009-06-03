@@ -21,6 +21,7 @@
 #include "as_object.h"
 #include "string_table.h"
 #include "VM.h"
+#include "fn_call.h"
 #include "MovieClip.h"
 
 #include "ContextMenuBuiltInItems_as.h"
@@ -39,7 +40,7 @@ static as_value
 get_flash_ui_package(const fn_call& fn)
 {
     // This package is AS3 only!
-    assert(isAS3(fn.getVM()));
+    assert(isAS3(fn));
 
 	log_debug("Loading AVM2 flash.ui package");
 	as_object *pkg = new as_object(getObjectInterface());

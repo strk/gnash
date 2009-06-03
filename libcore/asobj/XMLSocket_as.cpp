@@ -27,6 +27,7 @@
 #include "XML_as.h"
 #include "XMLSocket_as.h"
 #include "as_function.h"
+#include "movie_root.h"
 #include "fn_call.h"
 #include "VM.h"
 #include "builtin_function.h" // for setting timer, should likely avoid that..

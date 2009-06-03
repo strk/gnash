@@ -28,6 +28,7 @@
 #include "MediaParser.h"
 #include "MediaHandler.h"
 #include "sound_definition.h" // for sound_sample
+#include "movie_root.h"
 #include "movie_definition.h"
 #include "fn_call.h"
 #include "GnashException.h"

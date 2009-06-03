@@ -24,6 +24,7 @@
 #include "StreamProvider.h"
 #include "URL.h"
 #include "namedStrings.h"
+#include "movie_root.h"
 #include "VM.h"
 #include "builtin_function.h"
 #include "utf8.h"

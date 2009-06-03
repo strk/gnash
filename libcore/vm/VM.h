@@ -23,22 +23,26 @@
 #include "gnashconfig.h"
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "movie_root.h" // for composition
-#include "GC.h" // for ineritance of VmGcRoot
-#include "string_table.h" // for the string table
+#include "smart_ptr.h" 
+#include "GC.h"
+#include "string_table.h"
+#include "SafeStack.h"
+#include "CallStack.h"
 
-#include <memory> // for auto_ptr
+#include <memory> 
 #include <locale>
-#include <boost/cstdint.hpp> // for cstdints 
+#include <boost/cstdint.hpp> 
 #include <boost/random.hpp>
 #include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
-	class movie_definition;
+	class VM;
+	class fn_call;
+	class movie_root;
 	class builtin_function;
     class SharedObjectLibrary;
+	class as_value;
 	class as_object;
 	class Machine;
 	class VirtualClock;
@@ -51,17 +55,12 @@ class ClassHierarchy;
 /// A GC root used to mark all reachable collectable pointers
 class VmGcRoot : public GcRoot 
 {
-	VM& _vm;
-
 public:
-
-	VmGcRoot(VM& vm)
-		:
-		_vm(vm)
-	{
-	}
-
+	VmGcRoot(VM& vm) : _vm(vm) {}
 	virtual void markReachableResources() const;
+
+private:
+    VM& _vm;
 };
 
 /// The virtual machine
@@ -352,15 +351,6 @@ private:
     AVMVersion _avmVersion;
 
 };
-
-/// Check whether the currently executing code is AS3 (ABC)
-//
-/// This is a non-member, non-friend function for better encapsulation.
-/// TODO: drop these when there is a better design!
-inline bool
-isAS3(const VM& vm) {
-    return vm.getAVMVersion() == VM::AVM2;
-}
 
 } // namespace gnash
 

@@ -22,6 +22,7 @@
 
 #include "string_table.h"
 #include "VM.h"
+#include "fn_call.h"
 #include "MovieClip.h"
 
 #include "ColorTransform_as.h"
@@ -38,7 +39,7 @@ namespace gnash {
 static as_value
 get_flash_geom_package(const fn_call& fn)
 {
-    const bool as3 = isAS3(fn.getVM());
+    const bool as3 = isAS3(fn);
 
     // The classes in this package are all both AS2 and AS3 (as far as we
     // know).

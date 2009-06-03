@@ -19,6 +19,7 @@
 
 #include "string_table.h"
 #include "VM.h"
+#include "fn_call.h"
 
 #include "Object.h" // for getObjectInterface
 #include "flash_pkg.h"
@@ -32,7 +33,7 @@ class as_object;
 static as_value
 get_flash_package(const fn_call& fn)
 {
-    bool as3 = isAS3(fn.getVM());
+    bool as3 = isAS3(fn);
 	log_debug("Loading %s flash package", as3 ? "AVM2" : "AVM1");
     
     as_object *pkg = new as_object(getObjectInterface());

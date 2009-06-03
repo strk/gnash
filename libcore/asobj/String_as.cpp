@@ -29,6 +29,7 @@
 #include "Array_as.h"
 #include "as_value.h"
 #include "GnashException.h"
+#include "movie_definition.h" 
 #include "VM.h" 
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"

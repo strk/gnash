@@ -21,6 +21,7 @@
 #include "as_object.h"
 #include "string_table.h"
 #include "VM.h"
+#include "fn_call.h"
 #include "MovieClip.h"
 
 #include "AntiAliasType_as.h"
@@ -50,7 +51,7 @@ namespace gnash {
 static as_value
 get_flash_text_package(const fn_call& fn)
 {
-    bool as3 = isAS3(fn.getVM());
+    bool as3 = isAS3(fn);
 	log_debug("Loading %s flash.text package", as3 ? "AVM2" : "AVM1");
     
     as_object *pkg = new as_object(getObjectInterface());

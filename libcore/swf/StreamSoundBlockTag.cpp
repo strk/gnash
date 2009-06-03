@@ -18,6 +18,7 @@
 
 #include "StreamSoundBlockTag.h"
 #include "sound_handler.h" 
+#include "movie_root.h"
 #include "movie_definition.h" // for addControlTag
 #include "MovieClip.h" // for execute
 #include "SoundInfo.h" // for loader

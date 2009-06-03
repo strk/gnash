@@ -25,6 +25,7 @@
 #include "action.h" // for call_method
 #include "as_value.h"
 #include "as_object.h" // for inheritance
+#include "movie_root.h"
 #include "fn_call.h"
 #include "as_function.h"
 #include "MovieClip.h"
