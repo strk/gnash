@@ -45,6 +45,7 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
         TagType tag)
     :
     _soundTag(0),
+    _trackAsMenu(false),
     _movieDef(m)
 {
     switch (tag)
@@ -148,8 +149,11 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
     // Read the menu flag
     // (this is a single bit, the other 7 bits are reserved)
-    _menu = in.read_u8() != 0;
-    if (_menu) LOG_ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
+    const boost::uint8_t flags = in.read_u8();
+    _trackAsMenu = flags & (1 << 7);
+    if (_trackAsMenu) {
+        LOG_ONCE(log_unimpl("DefineButton2: trackAsMenu"));
+    }
 
     // Read the action offset
     unsigned button_2_action_offset = in.read_u16();

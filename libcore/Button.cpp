@@ -307,8 +307,7 @@ Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
     set_prototype(getButtonInterface());
 
     // check up presence Key events
-    if ( _def->hasKeyPressHandler() )
-    {
+    if (_def->hasKeyPressHandler()) {
         _vm.getRoot().add_key_listener(this);
     }
 
@@ -322,9 +321,14 @@ Button::~Button()
 bool
 Button::trackAsMenu()
 {
+    // TODO: check whether the AS or the tag value takes precedence.
     as_value track;
     string_table& st = _vm.getStringTable();
-    return (get_member(st.find("trackAsMenu"), &track) && track.to_bool());
+    if (get_member(st.find("trackAsMenu"), &track) && track.to_bool()) {
+        return true;
+    }
+    if (_def) return _def->trackAsMenu();
+    return false;
 }
 
 bool 

@@ -237,10 +237,13 @@ public:
         return _soundTag->getSound(index);
     }
 
-    /// \brief
-    /// Return version of the SWF containing
-    /// this button definition.
+    /// Return version of the SWF containing this button definition.
     int getSWFVersion() const;
+
+    /// Whether to track this button as a menu.
+    bool trackAsMenu() const {
+        return _trackAsMenu;
+    }
 
     bool hasKeyPressHandler() const;
 
@@ -281,7 +284,6 @@ protected:
     }
 #endif // GNASH_USE_GC
 
-
 private:
 
     /// DefineButton2Tag::loader also needs to create a DefineButtonTag.
@@ -303,8 +305,8 @@ private:
     ButtonRecords _buttonRecords;
     ButtonActions _buttonActions;
 
-    /// Currently set but unused (and also unaccessible)
-    bool _menu;
+    /// Whether to enable the trackAsMenu property.
+    bool _trackAsMenu;
 
     /// The movie definition containing definition of this button
     movie_definition& _movieDef;
