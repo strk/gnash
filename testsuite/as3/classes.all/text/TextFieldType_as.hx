@@ -21,13 +21,13 @@
 //
 
 // This test case must be processed by CPP before compiling to include the
-//  DejaGnu.hx header file for the testing framework support.
+// DejaGnu.hx header file for the testing framework support.
 
 #if flash9
 import flash.text.TextFieldType;
 import flash.display.MovieClip;
+import flash.text.TextField;
 #else
-import flash.TextFieldType;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -39,21 +39,31 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextFieldType_as {
     static function main() {
-        var x1:TextFieldType = new TextFieldType();
 
+	#if flash9
         // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("TextFieldType class exists");
-        } else {
-            DejaGnu.fail("TextFieldType class doesn't exist");
-        }
+	if (Type.typeof(TextFieldType)==TObject) {
+	    DejaGnu.pass("TextFieldType class exists.");
+	} else {
+	    DejaGnu.fail("TextFieldType class doesn't exist");
+	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
+	if (Type.typeof(TextFieldType.DYNAMIC)!=null) {        
+            DejaGnu.pass("TextFieldType.DYNAMIC constant exists.");
+        } else {
+            DejaGnu.fail("TextFieldType.DYNAMIC constant doesn't exist");
+        }     
+        if (Type.typeof(TextFieldType.INPUT)!=null) {        
+            DejaGnu.pass("TextFieldType.INPUT constant exists.");
+        } else {
+            DejaGnu.fail("TextFieldType.INPUT constant doesn't exist");
+        } 
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

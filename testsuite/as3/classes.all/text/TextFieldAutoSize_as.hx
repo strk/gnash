@@ -27,11 +27,11 @@
 import flash.text.TextFieldAutoSize;
 import flash.display.MovieClip;
 #else
-import flash.TextFieldAutoSize;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,21 +39,41 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextFieldAutoSize_as {
     static function main() {
-        var x1:TextFieldAutoSize = new TextFieldAutoSize();
-
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("TextFieldAutoSize class exists");
-        } else {
-            DejaGnu.fail("TextFieldAutoSize class doesn't exist");
+	#if flash9
+	// Make sure we actually get a valid class        
+	if (Type.typeof(TextFieldAutoSize)==TObject) {
+	    DejaGnu.pass("TextFieldAutoSize class exists.");
+	} else {
+	    DejaGnu.fail("TextFieldAutoSIze class doesn't exist.");
         }
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
+	
+	// Tests to see if all the constants exist. All these do is test for
+	// existance of a constants, and don't test the functionality at all. 
+	if (Type.typeof(TextFieldAutoSize.CENTER)!=null) {        
+            DejaGnu.pass("TextFieldAutoSize.CENTER constant exists.");
+        } else {
+            DejaGnu.fail("TextFieldAutoSize.CENTER constant doesn't exist");
+        }
+	if (Type.typeof(TextFieldAutoSize.LEFT)!=null) {
+            DejaGnu.pass("TextFieldAutoSize.LEFT constant exists.");
+        } else {
+            DejaGnu.fail("TextFieldAutoSize.LEFT constant doesn't exist");
+        }
+	if (Type.typeof(TextFieldAutoSize.NONE)!=null) {        
+            DejaGnu.pass("TextFieldAutoSize.NONE constant exists.");
+        } else {
+            DejaGnu.fail("TextFieldAutoSize.NONE constant doesn't exist");
+        }
+	if (Type.typeof(TextFieldAutoSize.RIGHT)!=null) {        
+            DejaGnu.pass("TextFieldAutoSize.RIGHT constant exists.");
+        } else {
+            DejaGnu.fail("TextFieldAutoSize.RIGHT constant doesn't exist");
+        }
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 

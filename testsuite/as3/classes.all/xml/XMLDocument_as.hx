@@ -27,11 +27,11 @@
 import flash.xml.XMLDocument;
 import flash.display.MovieClip;
 #else
-import flash.XMLDocument;
 import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,57 +39,59 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class XMLDocument_as {
     static function main() {
+	#if flash9
         var x1:XMLDocument = new XMLDocument();
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
+        // Make sure we actually get a valid class    
+	if (Std.is(x1, XMLDocument)) {    
             DejaGnu.pass("XMLDocument class exists");
         } else {
             DejaGnu.fail("XMLDocument class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.docTypeDecl == Object) {
-// 	    DejaGnu.pass("XMLDocument.docTypeDecl property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLDocument.docTypeDecl property doesn't exist");
-// 	}
-// 	if (x1.idMap == Object) {
-// 	    DejaGnu.pass("XMLDocument.idMap property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLDocument.idMap property doesn't exist");
-// 	}
-	if (x1.ignoreWhite == false) {
+
+	// Tests to see if all the properties exist. All these do is test for
+	// existance of a property, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	if (Std.is(x1.docTypeDecl, Dynamic)) {	
+ 	    DejaGnu.pass("XMLDocument.docTypeDecl property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLDocument.docTypeDecl property doesn't exist");
+ 	}
+	if (Std.is(x1.idMap, Dynamic)) {
+ 	    DejaGnu.pass("XMLDocument.idMap property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLDocument.idMap property doesn't exist");
+ 	}
+	if (Std.is(x1.ignoreWhite, Bool)) {
 	    DejaGnu.pass("XMLDocument.ignoreWhite property exists");
 	} else {
 	    DejaGnu.fail("XMLDocument.ignoreWhite property doesn't exist");
 	}
-// 	if (x1.xmlDecl == Object) {
-// 	    DejaGnu.pass("XMLDocument.xmlDecl property exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLDocument.xmlDecl property doesn't exist");
-// 	}
+	if (Std.is(x1.xmlDecl, Dynamic)) {
+ 	    DejaGnu.pass("XMLDocument.xmlDecl property exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLDocument.xmlDecl property doesn't exist");
+ 	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-// 	if (x1.createElement == XMLNode) {
-// 	    DejaGnu.pass("XMLDocument::createElement() method exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLDocument::createElement() method doesn't exist");
-// 	}
-// 	if (x1.createTextNode == XMLNode) {
-// 	    DejaGnu.pass("XMLDocument::createTextNode() method exists");
-// 	} else {
-// 	    DejaGnu.fail("XMLDocument::createTextNode() method doesn't exist");
-// 	}
-	if (x1.parseXML == null) {
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+ 	if (Type.typeof(x1.createElement)==TFunction) {
+ 	    DejaGnu.pass("XMLDocument::createElement() method exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLDocument::createElement() method doesn't exist");
+ 	}
+ 	if (Type.typeof(x1.createTextNode)==TFunction) {
+ 	    DejaGnu.pass("XMLDocument::createTextNode() method exists");
+ 	} else {
+ 	    DejaGnu.fail("XMLDocument::createTextNode() method doesn't exist");
+ 	}
+	if (Type.typeof(x1.parseXML)==TFunction) {
 	    DejaGnu.pass("XMLDocument::parseXML() method exists");
 	} else {
 	    DejaGnu.fail("XMLDocument::parseXML() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString)==TFunction) {
 	    DejaGnu.pass("XMLDocument::toString() method exists");
 	} else {
 	    DejaGnu.fail("XMLDocument::toString() method doesn't exist");
@@ -97,6 +99,7 @@ class XMLDocument_as {
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
+	#end
     }
 }
 
