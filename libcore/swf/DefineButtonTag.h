@@ -67,18 +67,7 @@ public:
     ///                 instance name.
     /// @param button   The button to which the DisplayObject will belong.
     /// @return         A new DisplayObject. This should never be 0.
-    DisplayObject* instantiate(Button* button, bool name = true) const {
-        assert(button);
-        assert(_definitionTag);
-        DisplayObject* o = _definitionTag->createDisplayObject(button, _id);
-        o->setMatrix(_matrix, true);
-        o->set_cxform(_cxform);
-        o->set_depth(_buttonLayer + DisplayObject::staticDepthOffset + 1);
-        if (name && o->wantsInstanceName()) {
-            o->set_name(button->getNextUnnamedInstanceName());
-        }
-        return o;
-    }
+    DisplayObject* instantiate(Button* button, bool name = true) const;
 
     /// Check if this ButtonRecord has a DisplayObject for a particular state
     //
