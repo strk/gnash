@@ -1530,14 +1530,16 @@ Machine::execute()
                     push_stack(as_value(mCurrentFunction));
                     break;
                 }
-            /// 0x58 ABC_ACTION_NEWCLASS
-            /// Stream: V32 'class_id'
-            /// Stack In:
-            ///  obj -- An object to be turned into a class. Its super is constructed.
-            /// Stack Out:
-            ///  class -- The newly made class, made from obj and the information at
-            ///   cinits_pool[class_id]
-            /// NB: This depends on scope and scope base (to determine lifetime(?))
+                /// 0x58 ABC_ACTION_NEWCLASS
+                /// Stream: V32 'class_id'
+                /// Stack In:
+                ///  obj -- An object to be turned into a class. Its super
+                ///     is constructed.
+                /// Stack Out:
+                ///  class -- The newly made class, made from obj and the "
+                ///     "information at cinits_pool[class_id]
+                /// NB: This depends on scope and scope base (to determine
+                ///     lifetime(?))
                 case SWF::ABC_ACTION_NEWCLASS:
                 {
                     boost::uint32_t cid = mStream->read_V32();
@@ -1560,14 +1562,19 @@ Machine::execute()
                     new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,
                             as_value(static_constructor), 0);
                     
-                    as_function* constructor = c->getConstructor()->getPrototype();
-                    new_class->init_member(NSV::PROP_CONSTRUCTOR, as_value(constructor), 0);
-                    push_stack(as_value(new_class));
+                    as_function* constructor =
+                        c->getConstructor()->getPrototype();
+                    new_class->init_member(NSV::PROP_CONSTRUCTOR,
+                            constructor, 0);
+                    push_stack(new_class);
 
-                    // Call the class's static constructor (which may be undefined).
+                    // Call the class's static constructor (which may be 
+                    // undefined).
                     as_environment env = as_environment(_vm);
-                    as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu, 0);
-                    as_value value = call_method(property, env, new_class, get_args(0));
+                    as_value property = new_class->getMember(
+                            NSV::PROP_uuCONSTRUCTORuu, 0);
+                    as_value value = call_method(property, env, new_class,
+                            get_args(0));
 
                     break;
                 }
