@@ -29,6 +29,7 @@
 #include "render.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#include "render_handler_cairo.h"
 #include "SystemClock.h"
 #include "log.h"
 #include "rc.h"
@@ -371,7 +372,7 @@ GnashPlayer::setRenderer(const std::string& r)
 #endif
 #ifdef RENDERER_CAIRO
     if (r == "Cairo") {
-        _renderer = (gnash::renderer::cairo::create_renderer(); 
+        _renderer = gnash::renderer::cairo::create_handler(); 
     }
 #endif 
 #ifdef RENDERER_OPENGL
