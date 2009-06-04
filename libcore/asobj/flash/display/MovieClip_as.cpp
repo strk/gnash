@@ -42,9 +42,8 @@ namespace gnash {
 namespace {
 
     void attachMovieClipAS2Interface(as_object& o);
-    //void attachMovieClipAS2Properties(DisplayObject& o);
-    //as_object* getMovieClipAS2Interface();
 
+    as_value movieclip_as2_ctor(const fn_call& fn);
     as_value movieclip_transform(const fn_call& fn);
     as_value movieclip_scale9Grid(const fn_call& fn);
     as_value movieclip_attachVideo(const fn_call& fn);
@@ -53,7 +52,6 @@ namespace {
     as_value movieclip_unloadMovie(const fn_call& fn);
     as_value movieclip_loadMovie(const fn_call& fn);
     as_value movieclip_getURL(const fn_call& fn);
-    as_value movieclip_ctor(const fn_call& fn);
     as_value movieclip_attachBitmap(const fn_call& fn);
     as_value movieclip_beginBitmapFill(const fn_call& fn);
     as_value movieclip_createEmptyMovieClip(const fn_call& fn);
@@ -113,6 +111,7 @@ namespace {
     // =============================================
 
     void attachMovieClipAS3Interface(as_object& o);
+    as_value movieclip_as3_ctor(const fn_call& fn);
     as_value movieclip_nextScene(const fn_call& fn);
     as_value movieclip_prevScene(const fn_call& fn);
 
@@ -127,8 +126,9 @@ movieclip_class_init(as_object& where)
         static boost::intrusive_ptr<builtin_function> cl;
 
         if (!cl) {
-            cl = new builtin_function(&movieclip_ctor,
+            cl = new builtin_function(&movieclip_as3_ctor,
                     getMovieClipAS3Interface());
+
             where.getVM().addStatic(cl.get());
         }
         
@@ -139,7 +139,9 @@ movieclip_class_init(as_object& where)
     static boost::intrusive_ptr<builtin_function> cl;
 
     if (!cl) {
-        cl = new builtin_function(&movieclip_ctor, getMovieClipAS2Interface());
+        cl = new builtin_function(&movieclip_as2_ctor,
+                getMovieClipAS2Interface());
+
         where.getVM().addStatic(cl.get());
     }
 
@@ -205,7 +207,6 @@ registerMovieClipNative(as_object& global)
 void
 attachMovieClipAS2Properties(DisplayObject& o)
 {
-    //int target_version = o.getVM().getSWFVersion();
 
     // This is a normal property, can be overridden, deleted and enumerated
     // See swfdec/test/trace/movieclip-version-#.swf for why we only
@@ -2503,8 +2504,11 @@ movieclip_attachBitmap(const fn_call& fn)
 
 
 as_value
-movieclip_ctor(const fn_call& /* fn */)
+movieclip_as2_ctor(const fn_call& fn)
 {
+
+    assert(!isAS3(fn));
+
     boost::intrusive_ptr<as_object> clip = 
         new as_object(getMovieClipAS2Interface());
 
@@ -2623,6 +2627,19 @@ movieclip_transform(const fn_call& fn)
 // =======================
 // AS3 interface
 // =======================
+
+as_value
+movieclip_as3_ctor(const fn_call& fn)
+{
+
+    assert(isAS3(fn));
+
+    boost::intrusive_ptr<as_object> clip = 
+        new as_object(getMovieClipAS3Interface());
+
+    return as_value(clip.get());
+}
+
 
 void
 attachMovieClipAS3Interface(as_object& o)

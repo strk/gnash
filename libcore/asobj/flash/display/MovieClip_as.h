@@ -40,7 +40,7 @@ as_object* getMovieClipAS3Interface();
 /// Register ASNative MovieClip methods (AS2 only).
 void registerMovieClipNative(as_object& global);
 
-// TODO: these are used by MovieClip's ctor, but really shouldn't be.
+/// Used by MovieClip's ctor to attach properties to MovieClip instances.
 void attachMovieClipAS2Properties(DisplayObject& d);
 
 /// Get an as_object with the AS2 MovieClip interface.
