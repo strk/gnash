@@ -1667,6 +1667,8 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                 
+                    // This pushes a value onto the stack, but it seems
+                    // we don't need it.
                     as_value val = find_prop_strict(a);
 
                     log_abc("GETLEX: found value %s", val);
@@ -3044,8 +3046,11 @@ Machine::Machine(VM& vm)
 }
 
 as_value
-Machine::find_prop_strict(asName multiname) {
-	
+Machine::find_prop_strict(asName multiname)
+{
+    
+    log_abc("Looking for property %s", mST.value(multiname.getGlobalName()));
+
 	as_value val;
 	mScopeStack.push(mGlobalObject);
 	for (size_t i = 0; i < mScopeStack.size(); ++i)
@@ -3065,16 +3070,17 @@ Machine::find_prop_strict(asName multiname) {
 		}
 	}
 
-	log_abc("Cannot find property in scope stack.  Trying again using "
-            "as_environment.");
-	as_object *target = NULL;
+	as_object* target = 0;
 	as_environment env = as_environment(_vm);
 	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
 	std::string ns = mPoolObject->stringPoolAt(
             multiname.getNamespace()->getAbcURI());
-	std::string path = ns.size() == 0 ? name : ns + "." + name;
+	std::string path = ns.empty() ? name : ns + "." + name;
+	
+    log_abc("Failed to find property in scope stack. Looking for %s in "
+            "as_environment", path);
 
-    std::auto_ptr<as_environment::ScopeStack> envStack ( getScopeStack() );
+    std::auto_ptr<as_environment::ScopeStack> envStack (getScopeStack());
 	val = env.get_variable(path, *envStack, &target);
 
 	push_stack(target);	
