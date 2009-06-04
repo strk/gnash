@@ -57,6 +57,7 @@ gnash_la_LIBADD = \
 
 if BUILD_OGL_RENDERER
 RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_gtkglext.cpp
+INCLUDES += $(GLEXT_CFLAGS)
 endif
 if BUILD_AGG_RENDERER
 RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_agg.cpp

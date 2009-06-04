@@ -59,6 +59,7 @@ static void gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocat
 static gboolean gnash_canvas_expose_event(GtkWidget *widget, GdkEventExpose *event);
 static gboolean gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event);
 static void gnash_canvas_realize(GtkWidget *widget);
+static void gnash_canvas_after_realize(GtkWidget *widget);
 
 GtkWidget *
 gnash_canvas_new ()
@@ -89,6 +90,9 @@ gnash_canvas_init(GnashCanvas *canvas)
     canvas->renderer = NULL;
 
     gtk_widget_set_double_buffered(GTK_WIDGET(canvas), FALSE);
+
+    g_signal_connect_after(G_OBJECT(canvas), "realize",
+                           G_CALLBACK(gnash_canvas_after_realize), NULL);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -175,12 +179,19 @@ gnash_canvas_realize(GtkWidget *widget)
     // TODO: find a way to make 'glue' use independent from actual renderer in use
     canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
 #endif
+}
+
+static void
+gnash_canvas_after_realize(GtkWidget *widget)
+{
+    GNASH_REPORT_FUNCTION;
+    GnashCanvas *canvas = GNASH_CANVAS(widget);
 
     canvas->renderer = canvas->glue->createRenderHandler();
     set_render_handler(canvas->renderer);
 
     canvas->glue->setRenderHandlerSize(widget->allocation.width,
-                                       widget->allocation.height);
+                                        widget->allocation.height);
 }
 
 void
