@@ -988,9 +988,6 @@ private:
     bool _lockroot;
 };
 
-/// Initialize the global MovieClip class
-void movieclip_class_init(as_object& global);
-
 } // end of namespace gnash
 
 #endif // GNASH_SPRITE_INSTANCE_H

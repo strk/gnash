@@ -25,17 +25,29 @@
 #endif
 
 
+namespace gnash {
+
 // Forward declarations
 class as_object;
-
-namespace gnash {
+class DisplayObject;
 
 /// Initialize the global MovieClip class
 void movieclip_class_init(as_object& global);
 
+/// Get an as_object with the AS3 MovieClip interface.
+as_object* getMovieClipAS3Interface();
+
+/// Register ASNative MovieClip methods (AS2 only).
+void registerMovieClipNative(as_object& global);
+
+// TODO: these are used by MovieClip's ctor, but really shouldn't be.
+void attachMovieClipAS2Properties(DisplayObject& d);
+
+/// Get an as_object with the AS2 MovieClip interface.
+as_object* getMovieClipAS2Interface();
+
 } // gnash namespace
 
-// GNASH_ASOBJ3_MOVIECLIP_H
 #endif
 
 // local Variables:

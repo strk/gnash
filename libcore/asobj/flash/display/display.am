@@ -124,7 +124,7 @@ DISPLAY_HEADERS += flash/display/MorphShape_as.h
 endif
 
 # FIXME: already exists
-# DISPLAY_SOURCES += flash/display/MovieClip_as.cpp
+DISPLAY_SOURCES += flash/display/MovieClip_as.cpp
 DISPLAY_HEADERS += flash/display/MovieClip_as.h
 # endif
 

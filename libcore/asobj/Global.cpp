@@ -46,6 +46,7 @@
 #include "XML_as.h"
 #include "XMLSocket_as.h"
 #include "flash/ui/Mouse_as.h"
+#include "flash/display/MovieClip_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
@@ -69,7 +70,6 @@
 #include "flash_pkg.h"
 
 #include "fn_call.h"
-#include "MovieClip.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>
@@ -884,6 +884,7 @@ registerNatives(as_object& global)
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
 
+    registerMovieClipNative(global);
     registerSelectionNative(global);
     registerColorNative(global);
     registerMathNative(global);

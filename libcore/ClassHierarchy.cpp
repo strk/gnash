@@ -42,6 +42,7 @@
 #include "Math_as.h"
 #include "Namespace_as.h"
 #include "flash/ui/Mouse_as.h"
+#include "flash/display/MovieClip_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
