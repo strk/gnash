@@ -266,6 +266,30 @@ private:
 
 }
 
+Machine::Machine(VM& vm)
+        :
+        mStack(),
+        mRegisters(),
+        mScopeStack(),
+        mStream(0),
+        mST(vm.getStringTable()),
+        mDefaultXMLNamespace(0),
+        mCurrentScope(0),
+        mGlobalScope(0),
+        mDefaultThis(0),
+        mThis(0),
+        mGlobalObject(0),
+        mGlobalReturn(),
+        mIgnoreReturn(),
+        mIsAS3(false),
+        mExitWithReturn(false),
+        mPoolObject(0),
+        mCurrentFunction(0),
+        _vm(vm),
+        mCH(_vm.getClassHierarchy())
+{
+}
+
 void
 Machine::execute()
 {
@@ -1530,14 +1554,16 @@ Machine::execute()
                     push_stack(as_value(mCurrentFunction));
                     break;
                 }
-            /// 0x58 ABC_ACTION_NEWCLASS
-            /// Stream: V32 'class_id'
-            /// Stack In:
-            ///  obj -- An object to be turned into a class. Its super is constructed.
-            /// Stack Out:
-            ///  class -- The newly made class, made from obj and the information at
-            ///   cinits_pool[class_id]
-            /// NB: This depends on scope and scope base (to determine lifetime(?))
+                /// 0x58 ABC_ACTION_NEWCLASS
+                /// Stream: V32 'class_id'
+                /// Stack In:
+                ///  obj -- An object to be turned into a class. Its super
+                ///     is constructed.
+                /// Stack Out:
+                ///  class -- The newly made class, made from obj and the "
+                ///     "information at cinits_pool[class_id]
+                /// NB: This depends on scope and scope base (to determine
+                ///     lifetime(?))
                 case SWF::ABC_ACTION_NEWCLASS:
                 {
                     boost::uint32_t cid = mStream->read_V32();
@@ -1560,14 +1586,19 @@ Machine::execute()
                     new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,
                             as_value(static_constructor), 0);
                     
-                    as_function* constructor = c->getConstructor()->getPrototype();
-                    new_class->init_member(NSV::PROP_CONSTRUCTOR, as_value(constructor), 0);
-                    push_stack(as_value(new_class));
+                    as_function* constructor =
+                        c->getConstructor()->getPrototype();
+                    new_class->init_member(NSV::PROP_CONSTRUCTOR,
+                            constructor, 0);
+                    push_stack(new_class);
 
-                    // Call the class's static constructor (which may be undefined).
+                    // Call the class's static constructor (which may be 
+                    // undefined).
                     as_environment env = as_environment(_vm);
-                    as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu, 0);
-                    as_value value = call_method(property, env, new_class, get_args(0));
+                    as_value property = new_class->getMember(
+                            NSV::PROP_uuCONSTRUCTORuu, 0);
+                    as_value value = call_method(property, env, new_class,
+                            get_args(0));
 
                     break;
                 }
@@ -1660,6 +1691,8 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                 
+                    // This pushes a value onto the stack, but it seems
+                    // we don't need it.
                     as_value val = find_prop_strict(a);
 
                     log_abc("GETLEX: found value %s", val);
@@ -1792,9 +1825,12 @@ Machine::execute()
 
                     as_value object_val = pop_stack();
                     as_object* object = object_val.to_object().get();
-                    
+                   
+                    log_abc(_("ABC_ACTION_GETPROPERTY: Looking for property "
+                            "%s of object %s"), mST.value(name), object_val);
+
                     if (!object) {
-                        log_debug(_("ABC_ACTION_GETPROPERTY: expecting "
+                        log_abc(_("ABC_ACTION_GETPROPERTY: expecting "
                                     "object on stack, got %s."), object_val);
                         push_stack(as_value());
                         break;
@@ -3005,40 +3041,16 @@ Machine::instantiateClass(std::string className, as_object* global)
 	mScopeStack.clear();
 	mRegisters[0] = as_value(global);
 	executeCodeblock(ctor->getBody());
-}
 
-Machine::Machine(VM& vm)
-        :
-        mStack(),
-        mRegisters(),
-        mScopeStack(),
-        mStream(0),
-        mST(vm.getStringTable()),
-        mDefaultXMLNamespace(0),
-        mCurrentScope(0),
-        mGlobalScope(0),
-        mDefaultThis(0),
-        mThis(0),
-        mGlobalObject(0),
-        mGlobalReturn(),
-        mIgnoreReturn(),
-        mIsAS3(false),
-        mExitWithReturn(false),
-        mPoolObject(0),
-        mCurrentFunction(0),
-        _vm(vm),
-        mCH(_vm.getClassHierarchy())
-{
-	//Local registers should be initialized at the beginning of each function call, but
-	//we don't currently parse the number of local registers for each function.
-//	mRegisters.resize(16);
-//	mST = new string_table();
-//	mST = ST;
+    log_debug("Finished instantiating class %s", className);
 }
 
 as_value
-Machine::find_prop_strict(asName multiname) {
-	
+Machine::find_prop_strict(asName multiname)
+{
+    
+    log_abc("Looking for property %s", mST.value(multiname.getGlobalName()));
+
 	as_value val;
 	mScopeStack.push(mGlobalObject);
 	for (size_t i = 0; i < mScopeStack.size(); ++i)
@@ -3058,16 +3070,17 @@ Machine::find_prop_strict(asName multiname) {
 		}
 	}
 
-	log_abc("Cannot find property in scope stack.  Trying again using "
-            "as_environment.");
-	as_object *target = NULL;
+	as_object* target = 0;
 	as_environment env = as_environment(_vm);
 	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
 	std::string ns = mPoolObject->stringPoolAt(
             multiname.getNamespace()->getAbcURI());
-	std::string path = ns.size() == 0 ? name : ns + "." + name;
+	std::string path = ns.empty() ? name : ns + "." + name;
+	
+    log_abc("Failed to find property in scope stack. Looking for %s in "
+            "as_environment", path);
 
-    std::auto_ptr<as_environment::ScopeStack> envStack ( getScopeStack() );
+    std::auto_ptr<as_environment::ScopeStack> envStack (getScopeStack());
 	val = env.get_variable(path, *envStack, &target);
 
 	push_stack(target);	
