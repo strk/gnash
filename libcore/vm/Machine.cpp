@@ -1182,13 +1182,14 @@ Machine::execute()
                     pushCall(f, NULL, mStack.top(argc), argc, 0);
                     break;
                 }
-            /// 0x43 ABC_ACTION_CALLMETHOD
-            /// Stream: V32 'method_id + 1' | V32 'arg_count'
-            /// Stack In:
-            ///  argN ... arg1 -- the arg_count arguments to pass
-            ///  obj -- the object to be called
-            /// Stack Out:
-            ///  value -- the value returned by obj::'method_id'(arg1, ..., argN)
+                /// 0x43 ABC_ACTION_CALLMETHOD
+                /// Stream: V32 'method_id + 1' | V32 'arg_count'
+                /// Stack In:
+                ///  argN ... arg1 -- the arg_count arguments to pass
+                ///  obj -- the object to be called
+                /// Stack Out:
+                ///  value -- the value returned by obj::'method_id'(arg1,
+                ///         ..., argN)
                 case SWF::ABC_ACTION_CALLMETHOD:
                 {
                     boost::uint32_t dispatch_id = mStream->read_V32() - 1;
@@ -1295,11 +1296,10 @@ Machine::execute()
                     as_value result;
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     boost::uint32_t argc = mStream->read_V32();
-                    std::auto_ptr< std::vector<as_value> > args = get_args(argc);
-                    //TODO: If multiname is runtime also pop namespace and/or name values.
-                    
+                    std::auto_ptr<std::vector<as_value> > args = get_args(argc);
+ 
                     if (a.isRuntime()) {
-                        log_unimpl("ABC_ACTION_CALL* with runtime multiname");
+                        mStack.drop(completeName(a));
                     }
 
                     as_value object_val = pop_stack();
@@ -1307,31 +1307,31 @@ Machine::execute()
                     as_object *object = object_val.to_object().get();
                     if (!object) {
                         IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't call a method of a value that doesn't "
-                                "cast to an object (%s)."),
+                        log_aserror(_("Can't call a method of a value that "
+                                "doesn't cast to an object (%s)."),
                             object_val);
                         )
                     }
                     else {
 
-                        as_value property = object->getMember(a.getGlobalName(), 0);
+                        as_value property = object->getMember(
+                                a.getGlobalName(), 0);
                     
                         if (!property.is_undefined() && !property.is_null()) {
                             log_abc("Calling method %s on object %s",
-                                    property.toDebugString(),object_val.toDebugString());
+                                    property, object_val);
                             as_environment env = as_environment(_vm);
                             result = call_method(property,env,object,args);
 
                         }
                         else {
                             IF_VERBOSE_ASCODING_ERRORS(
-                            log_aserror(_("Property '%s' of object '%s' is '%s', "
-                                    "cannot call as method"),
+                            log_aserror(_("Property '%s' of object '%s' is "
+                                    "'%s', cannot call as method"),
                                     mPoolObject->stringPoolAt(a.getABCName()),
                                     object_val, property);
                             )
                         }
-
                     }
                     
                     if (opcode == SWF::ABC_ACTION_CALLPROPERTY) {
