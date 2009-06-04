@@ -48,10 +48,10 @@ class AsBroadcaster_as {
     //Look at the Actionscript 2 migration document from adobe to find the new methods
 
 #else
-	//NOTE
-	// Haxe does not provide support for flash version proir to flash 6
-	// However, AsBroadcaster works slightly differently in flash1-5.
-	// In those versions AsBroadcaster does not provide prototype or initialize
+	// NOTE: Haxe does not provide support for flash version proir to flash 6
+	//     However, AsBroadcaster works slightly differently in flash1-5.
+	//     In those versions AsBroadcaster does not provide prototype or
+	//     initialize
 	
 	// The following tests should be valid for flash6, 7, 8
 
@@ -61,71 +61,114 @@ class AsBroadcaster_as {
 	    DejaGnu.fail("AsBroadcaster class does not exist");
 	}
 
-	DejaGnu.note("typeof (prototype) "   + Type.typeof(untyped AsBroadcaster.prototype));
-	DejaGnu.note("typeof (initialize) "   + Type.typeof(untyped AsBroadcaster.initialize));
-
+	//Testing for prototype
 	if (Type.typeof(untyped AsBroadcaster.prototype) == ValueType.TObject) {
-		DejaGnu.pass("The AsBroadcaster prototype exists");
+		DejaGnu.pass("The AsBroadcaster prototype property exists");
 	} else {
-		DejaGnu.fail("The AsBroadcaster prototype is does not exist");
+		DejaGnu.fail("The AsBroadcaster prototype property does not exist");
 	}
-	if (Type.typeof(untyped AsBroadcaster.initialize) == ValueType.TFunction) {
-		DejaGnu.pass("AsBroadcaster.initialize function exists");
+	if (Type.typeof(untyped AsBroadcaster.__proto__) == ValueType.TObject) {
+		DejaGnu.pass("The AsBroadcaster __proto__ property exists");
 	} else {
-		DejaGnu.fail("AsBroadcaster.initialize function does not exist");
+		DejaGnu.fail("The AsBroadcaster __proto__ property does not exist");
 	}
-	if (Type.typeof(untyped AsBroadcaster.addListener) == ValueType.TFunction) {
-		DejaGnu.pass("AsBroadcaster.addListener function exists");
-	} else {
-		DejaGnu.fail("AsBroadcaster.addListener function does not exist");
-	}
-	if (Type.typeof(untyped AsBroadcaster.broadcastMessage) == ValueType.TFunction) {
-		DejaGnu.pass("AsBroadcaster.broadcastMessage function exists");
-	} else {
-		DejaGnu.fail("AsBroadcaster.broadcastMessage function does not exist");
-	}
-	if (Type.typeof(untyped AsBroadcaster.removeListener) == ValueType.TFunction) {
-		DejaGnu.pass("AsBroadcaster.removeListener function exists");
-	} else {
-		DejaGnu.fail("AsBroadcaster.removeListener function does not exist");
-	}
+	
 	
 	var obj = { f : function() { trace("Hi There!");} };
+	var target = { x1 : "testing" };
 	var event:String = "f";
-
-	DejaGnu.note("typeof (initialize) "   + Type.typeof(untyped AsBroadcaster.initialize));
-	DejaGnu.note("Note 1: "   + Type.typeof(untyped AsBroadcaster.addListener(obj)));
-	DejaGnu.note("Note 2: "   + Type.typeof(untyped AsBroadcaster.__proto__));
 	
+	
+	//Testing for initialize()
+	if (untyped AsBroadcaster.hasOwnProperty('initialize')) {
+		DejaGnu.pass("AsBroadcaster.initialize property exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.initialize property does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.initialize) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.initialize is a function");
+	} else {
+		DejaGnu.fail("AsBroadcaster.initialize is not a function");
+	}
+	if (! untyped AsBroadcaster.prototype.hasOwnProperty('initialize')) {
+		DejaGnu.pass("AsBroadcaster.initialize was not inherited from the superclass");
+	} else {
+		DejaGnu.fail("AsBroadcaster.initialize was inherited from the superclass");
+	}
+	if (Type.typeof(untyped AsBroadcaster.initialize(target)) == ValueType.TNull) {
+		DejaGnu.pass("AsBroadcaster.initialize() is a void function");
+	} else {
+		DejaGnu.fail("AsBroadcaster.initialize() is not a void function");
+	}
+	
+	//Testing for addListener()
+	if (untyped AsBroadcaster.hasOwnProperty('addListener')) {
+		DejaGnu.pass("AsBroadcaster.addListener property exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.addListener property does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.addListener) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.addListener is a function");
+	} else {
+		DejaGnu.fail("AsBroadcaster.addListener is not a function");
+	}
 	if (Type.typeof(untyped AsBroadcaster.addListener(obj)) == ValueType.TBool) {
 		DejaGnu.pass("AsBroadcaster.addListener() returns Boolean");
 	} else {
 		DejaGnu.fail("AsBroadcaster.addListener() does not return Boolean");
 	}
+	
+	//Testing for broadcastMessage()
+	if (untyped AsBroadcaster.hasOwnProperty('broadcastMessage')) {
+		DejaGnu.pass("AsBroadcaster.broadcastMessage property exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.broadcastMessage property does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.broadcastMessage) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.broadcastMessage is a function");
+	} else {
+		DejaGnu.fail("AsBroadcaster.broadcastMessage is not a function");
+	}
+	if (Type.typeof(untyped AsBroadcaster.broadcastMessage(event)) == ValueType.TNull) {
+		DejaGnu.pass("AsBroadcaster.broadcastMessage is a void function");
+	} else {
+		DejaGnu.fail("AsBroadcaster.broadcastMessage is not a void function");
+	}
+	
+	//Testing for removeListener
+	if (untyped AsBroadcaster.hasOwnProperty('removeListener')) {
+		DejaGnu.pass("AsBroadcaster.broadcastMessage property exists");
+	} else {
+		DejaGnu.fail("AsBroadcaster.broadcastMessage property does not exist");
+	}
+	if (Type.typeof(untyped AsBroadcaster.removeListener) == ValueType.TFunction) {
+		DejaGnu.pass("AsBroadcaster.removeListener is a function");
+	} else {
+		DejaGnu.fail("AsBroadcaster.removeListener is not a function");
+	}
+	if (Type.typeof(untyped AsBroadcaster.removeListener(obj)) == ValueType.TBool) {
+		DejaGnu.pass("AsBroadcaster.removeListener() returns Boolean");
+	} else {
+		DejaGnu.fail("AsBroadcaster.removeListener() does not return Boolean");
+	}
+	
+	
+
+	DejaGnu.note("typeof (initialize) "   + Type.typeof(untyped AsBroadcaster.initialize));
+	DejaGnu.note("Note 1: "   + Type.typeof(untyped AsBroadcaster.addListener(obj)));
+	DejaGnu.note("Note 2: "   + Type.typeof(untyped AsBroadcaster.__proto__));
+	
+	
+	//Testing to make sure new object is empty
+	var myObj = { };
+	DejaGnu.note("Note 3: " + Type.typeof(untyped myObj._listeners));
+	DejaGnu.note("Note 4: " + Type.typeof(untyped myObj.addListener));
+	DejaGnu.note("Note 5: " + Type.typeof(untyped myObj.removeLitener));
+	
 
 /*
-	if (Type.typeof(AsBroadcaster) == ValueType.TFunction) {
-		DejaGnu.pass("AsBroadcaster class exists");
-	} else {
-		DejaGnu.fail("AsBroadcaster class does not exist");
-	}
-check_equals(typeof(AsBroadcaster.prototype), 'object'); 
-check_equals(AsBroadcaster.__proto__, Function.prototype); 
-check_equals(typeof(AsBroadcaster.initialize), 'function');
-check(AsBroadcaster.hasOwnProperty('initialize'));
-check(!AsBroadcaster.prototype.hasOwnProperty('initialize'));
-
-// These functions are available as AsBroadcaster "statics"
-// and a lookup should be issued by 'initalize' so that overridden
-// functions are attached to the initialized object rather then
-// the original one (from swfdec/test/trace/asbroadcaster-override.as)
-check_equals(typeof(AsBroadcaster.addListener), 'function');
-check(AsBroadcaster.hasOwnProperty('addListener'));
-check_equals(typeof(AsBroadcaster.removeListener), 'function');
-check(AsBroadcaster.hasOwnProperty('removeListener'));
-check_equals(typeof(AsBroadcaster.broadcastMessage), 'function');
-check(AsBroadcaster.hasOwnProperty('broadcastMessage'));
-
+// not sure if this can be tested because AsBroadcaster does not exist in haxe
+// There is no way to access the constructor
 bc = new AsBroadcaster;
 check_equals(typeof(bc), 'object');
 check(bc instanceof AsBroadcaster);
