@@ -62,7 +62,7 @@ public:
     //
     /// @param index    The depth from which to remove a DisplayObject.
     /// @return         The removed DisplayObject (reflects the AS return)
-    virtual DisplayObject* removeChildAt(int index);
+    DisplayObject* removeChildAt(int index);
     
     /// Remove the specified child DisplayObject.
     //
@@ -73,7 +73,7 @@ public:
     //
     /// @param obj      The DisplayObject to remove.
     /// @return         The removed DisplayObject (reflects the AS return)
-    virtual DisplayObject* removeChild(DisplayObject* obj);
+    DisplayObject* removeChild(DisplayObject* obj);
     
     /// Add a child DisplayObject at the next suitable index (AS2: depth).
     //
@@ -84,7 +84,7 @@ public:
     //
     /// @param obj      The DisplayObject to add.
     /// @return         The added DisplayObject (reflects the AS return)
-    virtual DisplayObject* addChild(DisplayObject* obj);
+    DisplayObject* addChild(DisplayObject* obj);
 
     /// Add a child DisplayObject at the specified index (AS2: depth).
     //
@@ -96,7 +96,11 @@ public:
     /// @param obj      The DisplayObject to add.
     /// @param index    The index (depth) at which to add the DisplayObject.
     /// @return         The added DisplayObject (reflects the AS return)
-    virtual DisplayObject* addChildAt(DisplayObject* obj, int index);
+    DisplayObject* addChildAt(DisplayObject* obj, int index);
+
+    size_t numChildren() const {
+        return _displayList.size();
+    }
 
 #ifdef USE_SWFTREE
     // Override to append display list info, see dox in DisplayObject.h

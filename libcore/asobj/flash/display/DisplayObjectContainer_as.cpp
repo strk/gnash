@@ -33,6 +33,7 @@ namespace gnash {
 // Forward declarations
 namespace {
     as_value displayobjectcontainer_addChildAt(const fn_call& fn);
+    as_value displayobjectcontainer_addChild(const fn_call& fn);
     as_value displayobjectcontainer_areInaccessibleObjectsUnderPoint(
             const fn_call& fn);
     as_value displayobjectcontainer_contains(const fn_call& fn);
@@ -45,6 +46,7 @@ namespace {
     as_value displayobjectcontainer_setChildIndex(const fn_call& fn);
     as_value displayobjectcontainer_swapChildren(const fn_call& fn);
     as_value displayobjectcontainer_swapChildrenAt(const fn_call& fn);
+    as_value displayobjectcontainer_numChildren(const fn_call& fn);
     as_value displayobjectcontainer_ctor(const fn_call& fn);
     void attachDisplayObjectContainerInterface(as_object& o);
 }
@@ -86,6 +88,8 @@ attachDisplayObjectContainerInterface(as_object& o)
 {
     o.init_member("addChildAt", new builtin_function(
                 displayobjectcontainer_addChildAt));
+    o.init_member("addChild", new builtin_function(
+                displayobjectcontainer_addChild));
     o.init_member("areInaccessibleObjectsUnderPoint", new builtin_function(
                 displayobjectcontainer_areInaccessibleObjectsUnderPoint));
     o.init_member("contains", new builtin_function(
@@ -108,17 +112,107 @@ attachDisplayObjectContainerInterface(as_object& o)
                 displayobjectcontainer_swapChildren));
     o.init_member("swapChildrenAt", new builtin_function(
                 displayobjectcontainer_swapChildrenAt));
+    o.init_member("numChildren", new builtin_function(
+                displayobjectcontainer_numChildren));
 }
 
+
+as_value
+displayobjectcontainer_addChild(const fn_call& fn)
+{
+    boost::intrusive_ptr<DisplayObjectContainer> ptr =
+        ensureType<DisplayObjectContainer>(fn.this_ptr);
+
+    as_value ret;
+
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("addChild(): %s", _("missing arguments"));
+        );
+        return ret;
+    }
+
+    if (fn.nargs > 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("addChild(%s): %s", ss.str(), _("ignoring args after "
+                "the first"));
+        );
+    }
+
+    as_object* objArg = fn.arg(0).to_object().get();
+    if (!objArg) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("addChild(%s): first arg doesn't cast to an object",
+            ss.str());
+        );
+        return ret;
+    }
+
+    DisplayObject* ch = objArg->toDisplayObject();
+    if (!ch) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("addChild(%s): first arg doesn't cast to a "
+            "DisplayObject", ss.str());
+        );
+        return ret;
+    }
+
+    return as_value(ptr->addChild(ch));
+}
 
 as_value
 displayobjectcontainer_addChildAt(const fn_call& fn)
 {
     boost::intrusive_ptr<DisplayObjectContainer> ptr =
         ensureType<DisplayObjectContainer>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
+
+    as_value ret;
+
+    if (fn.nargs < 2) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("addChildAt(): %s", _("missing arguments"));
+        );
+        return ret;
+    }
+
+    if (fn.nargs > 2) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("addChildAt(%s): %s", ss.str(), _("ignoring args after "
+                "the second"));
+        );
+    }
+
+    as_object* objArg = fn.arg(0).to_object().get();
+    if (!objArg) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("addChildAt(%s): first arg doesn't cast to an object",
+            ss.str());
+        );
+        return ret;
+    }
+
+    DisplayObject* ch = objArg->toDisplayObject();
+    if (!ch) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("addChildAt(%s): first arg doesn't cast to a "
+            "DisplayObject", ss.str());
+        );
+        return ret;
+    }
+
+    int depth = fn.arg(1).to_number();
+
+    std::stringstream ss; fn.dump_args(ss);
+    log_debug("TESTING: addChildAt(%s)", ss.str());
+    
+    return as_value(ptr->addChildAt(ch, depth));
+
 }
 
 as_value
@@ -159,6 +253,14 @@ displayobjectcontainer_getChildByName(const fn_call& fn)
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
+}
+
+as_value
+displayobjectcontainer_numChildren(const fn_call& fn)
+{
+    boost::intrusive_ptr<DisplayObjectContainer> ptr =
+        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    return as_value(ptr->numChildren());
 }
 
 as_value
@@ -234,6 +336,9 @@ displayobjectcontainer_swapChildrenAt(const fn_call& fn)
 as_value
 displayobjectcontainer_ctor(const fn_call& fn)
 {
+    // This should never be called during AS2 execution!
+    assert(isAS3(fn));
+
     log_unimpl("Attempt to construct a DisplayObjectContainer should throw"
             "an exception!");
     return as_value();
