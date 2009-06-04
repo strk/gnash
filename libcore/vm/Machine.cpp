@@ -266,6 +266,30 @@ private:
 
 }
 
+Machine::Machine(VM& vm)
+        :
+        mStack(),
+        mRegisters(),
+        mScopeStack(),
+        mStream(0),
+        mST(vm.getStringTable()),
+        mDefaultXMLNamespace(0),
+        mCurrentScope(0),
+        mGlobalScope(0),
+        mDefaultThis(0),
+        mThis(0),
+        mGlobalObject(0),
+        mGlobalReturn(),
+        mIgnoreReturn(),
+        mIsAS3(false),
+        mExitWithReturn(false),
+        mPoolObject(0),
+        mCurrentFunction(0),
+        _vm(vm),
+        mCH(_vm.getClassHierarchy())
+{
+}
+
 void
 Machine::execute()
 {
@@ -1801,9 +1825,12 @@ Machine::execute()
 
                     as_value object_val = pop_stack();
                     as_object* object = object_val.to_object().get();
-                    
+                   
+                    log_abc(_("ABC_ACTION_GETPROPERTY: Looking for property "
+                            "%s of object %s"), mST.value(name), object_val);
+
                     if (!object) {
-                        log_debug(_("ABC_ACTION_GETPROPERTY: expecting "
+                        log_abc(_("ABC_ACTION_GETPROPERTY: expecting "
                                     "object on stack, got %s."), object_val);
                         push_stack(as_value());
                         break;
@@ -3014,35 +3041,8 @@ Machine::instantiateClass(std::string className, as_object* global)
 	mScopeStack.clear();
 	mRegisters[0] = as_value(global);
 	executeCodeblock(ctor->getBody());
-}
 
-Machine::Machine(VM& vm)
-        :
-        mStack(),
-        mRegisters(),
-        mScopeStack(),
-        mStream(0),
-        mST(vm.getStringTable()),
-        mDefaultXMLNamespace(0),
-        mCurrentScope(0),
-        mGlobalScope(0),
-        mDefaultThis(0),
-        mThis(0),
-        mGlobalObject(0),
-        mGlobalReturn(),
-        mIgnoreReturn(),
-        mIsAS3(false),
-        mExitWithReturn(false),
-        mPoolObject(0),
-        mCurrentFunction(0),
-        _vm(vm),
-        mCH(_vm.getClassHierarchy())
-{
-	//Local registers should be initialized at the beginning of each function call, but
-	//we don't currently parse the number of local registers for each function.
-//	mRegisters.resize(16);
-//	mST = new string_table();
-//	mST = ST;
+    log_debug("Finished instantiating class %s", className);
 }
 
 as_value
