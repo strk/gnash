@@ -31,7 +31,7 @@ XML_HEADERS += flash/xml/XMLNodeType_as.h
 endif
 
 if BUILD_XMLNODE_AS3
-# XML_SOURCES += flash/xml/XMLNode_as.cpp
+XML_SOURCES += flash/xml/XMLNode_as.cpp
 XML_HEADERS += flash/xml/XMLNode_as.h
 endif
 

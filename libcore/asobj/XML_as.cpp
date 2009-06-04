@@ -28,7 +28,7 @@
 #include "fn_call.h"
 
 #include "LoadableObject.h"
-#include "XMLNode_as.h"
+#include "xml/XMLNode_as.h"
 #include "XML_as.h"
 #include "builtin_function.h"
 #include "VM.h"

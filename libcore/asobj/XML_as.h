@@ -19,7 +19,7 @@
 #define GNASH_ASOBJ_XML_H
 
 #include "LoadableObject.h"
-#include "XMLNode_as.h"
+#include "xml/XMLNode_as.h"
 #include "log.h"
 #include "dsodefs.h"
 #include "StringPredicates.h"

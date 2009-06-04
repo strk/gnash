@@ -64,7 +64,7 @@
 #include "builtin_function.h"
 #include "XMLSocket_as.h"
 #include "XML_as.h"
-#include "XMLNode_as.h"
+#include "xml/XMLNode_as.h"
 #include "asClass.h"
 #include "flash/text/TextFieldAutoSize_as.h"
 
