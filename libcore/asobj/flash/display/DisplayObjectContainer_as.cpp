@@ -112,8 +112,8 @@ attachDisplayObjectContainerInterface(as_object& o)
                 displayobjectcontainer_swapChildren));
     o.init_member("swapChildrenAt", new builtin_function(
                 displayobjectcontainer_swapChildrenAt));
-    o.init_member("numChildren", new builtin_function(
-                displayobjectcontainer_numChildren));
+    o.init_readonly_property("numChildren",
+            displayobjectcontainer_numChildren);
 }
 
 
