@@ -139,6 +139,7 @@ public:
 		return NULL;
 	}
 	
+    virtual void incrementLoadedFrames() {}
 
 	/// Return the list of execute tags for given frame number
 	//

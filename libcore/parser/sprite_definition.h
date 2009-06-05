@@ -28,7 +28,6 @@
 #include "log.h"
 #include "rect.h"
 #include "StringPredicates.h" // StringNoCaseLessThan
-#include "TagLoadersTable.h"
 
 // Forward declarations
 namespace gnash {
@@ -86,6 +85,10 @@ public:
 	{
 		return registeredClass.get();
 	}
+
+    virtual void incrementLoadedFrames() {
+        ++m_loading_frame;
+    }
 
 	// overload from movie_definition
 	virtual float	get_width_pixels() const { return 1; }
@@ -245,11 +248,6 @@ private:
 
 	void read(SWFStream& in, const RunInfo& runInfo);
 
-	/// Tags loader table.
-	//
-	/// TODO: make it a static member, specific to sprite_definition
-	SWF::TagLoadersTable& _tag_loaders;
-
 	/// Top-level movie definition
 	/// (the definition read from SWF stream)
 	movie_definition& m_movie_def;
@@ -267,8 +265,6 @@ private:
 
 	// Number of frames completely parsed 
 	size_t m_loading_frame;
-
-
 
 	// See dox in movie_definition.h
 	virtual void add_frame_name(const std::string& name);

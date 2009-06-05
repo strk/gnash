@@ -27,6 +27,7 @@
 #include "as_function.h" // for dtor visibility
 #include "SWFStream.h" // for use
 #include "GnashAlgorithm.h"
+#include "SWFParser.h"
 
 #include <vector>
 #include <string>
@@ -65,7 +66,7 @@ sprite_definition::~sprite_definition()
 void
 sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 {
-    unsigned long tag_end = in.get_tag_end_position();
+    const size_t tag_end = in.get_tag_end_position();
 
     in.ensureBytes(2);
     m_frame_count = in.read_u16();
@@ -76,69 +77,9 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 
 	m_loading_frame = 0;
 
-	while (in.tell() < tag_end) {
+    SWFParser parser(in, this, runInfo);
 
-		SWF::TagType tag = in.open_tag();
-
-		SWF::TagLoadersTable::loader_function lf = 0;
-
-		if (tag == SWF::END) {
-
-			if (in.tell() != tag_end) {
-                IF_VERBOSE_MALFORMED_SWF(
-                    // Safety break, so we don't read past
-                    // the end of the  movie.
-                    log_swferror(_("Hit end tag, "
-                        "before the advertised DEFINESPRITE end; "
-                        "stopping for safety."));
-                    );
-				in.close_tag();
-                break;
-			}
-		}
-
-		else if (tag == SWF::SHOWFRAME) {
-			// show frame tag -- advance to the next frame.
-            ++m_loading_frame;
-
-			IF_VERBOSE_PARSE (
-				log_parse(_("  show_frame %d/%d"
-					" (sprite)"),
-					m_loading_frame,
-					m_frame_count);
-		    	);
-
-			if (m_loading_frame == m_frame_count) {
-
-				// better break then sorry
-				in.close_tag();
-				if (in.open_tag() != SWF::END)
-				{
-					IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("last SHOWFRAME of a "
-                            "DEFINESPRITE tag "
-                            "isn't followed by an END."
-                            " Stopping for safety."));
-                    );
-					in.close_tag();
-					return;
-				}
-			}
-		}
-		else if (_tag_loaders.get(tag, &lf)) {
-		    // call the tag loader.  The tag loader should add
-		    // DisplayObjects or tags to the movie data structure.
-		    (*lf)(in, tag, *this, runInfo);
-		}
-		else {
-			// no tag loader for this tag type.
-			// FIXME, should this be a log_swferror instead?
-                    log_error(_("*** no tag loader for type %d (sprite)"),
-                              tag);
-		}
-
-		in.close_tag();
-	}
+    parser.read(tag_end - in.tell());
 
     if (m_frame_count > m_loading_frame) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -178,8 +119,6 @@ sprite_definition::get_labeled_frame(const std::string& label,
 sprite_definition::sprite_definition(movie_definition& m, SWFStream& in, 
         const RunInfo& runInfo)
 	:
-	// FIXME: use a class-static TagLoadersTable for sprite_definition
-	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0),

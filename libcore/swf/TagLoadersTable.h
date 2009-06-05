@@ -57,7 +57,7 @@ public:
 	//
 	/// @return false if no loader is associated with the tag.
 	///
-	bool get(TagType t, loader_function* lf);
+	bool get(TagType t, loader_function* lf) const;
 
 	/// \brief
 	/// Register a loader for the specified SWF::TagType.
