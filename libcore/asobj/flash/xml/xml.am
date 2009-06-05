@@ -31,7 +31,7 @@ XML_HEADERS += flash/xml/XMLNodeType_as.h
 endif
 
 if BUILD_XMLNODE_AS3
-# XML_SOURCES += flash/xml/XMLNode_as.cpp
+XML_SOURCES += flash/xml/XMLNode_as.cpp
 XML_HEADERS += flash/xml/XMLNode_as.h
 endif
 
@@ -50,11 +50,16 @@ xmlclasses.h: Makefile
 	echo "#define GNASH_ASOBJ_FLASH_XML_H 1" >> $${header}; \
 	echo "#include \"sharedlib.h\"" >> $${header}; \
 	echo "static gnash::SharedLib::initentry *as3xmlclasses[] = {" >> $${header}; \
-	sources="`echo $(XML_SOURCES) | cut -d ' ' -f 2-`"; \
-	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
+	oldway=`grep -l "_class_init" $(srcdir)/flash/xml/*_as.h`; \
+	newway=`grep -l "void init" $(srcdir)/flash/xml/*_as.h`; \
+	for i in $${oldway}; do \
+	  item=`basename $$i | sed -e 's:\_as.h::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
+	done; \
+	for i in $${newway}; do \
+	  item=`basename $$i | sed -e 's:\_as.h::'`; \
+	  echo "	gnash::$${item}_as::init,"  >> $${header}; \
 	done; \
 	echo '	0' >> $${header}; \
 	echo '};' >> $${header}; \
