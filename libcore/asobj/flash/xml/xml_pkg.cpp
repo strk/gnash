@@ -44,8 +44,15 @@ get_flash_xml_package(const fn_call& fn)
 	log_debug("Loading AVM2 flash.xml package");
 	as_object *pkg = new as_object(getObjectInterface());
 
-	// Call the [objectname]_init() function for each class.
+	// Call the [objectname]_init() function for each AS2 class.
 	int i = 0;
+	while (as2xmlclasses[i]) {
+	    as2xmlclasses[i](*pkg);
+        ++i;
+	} 
+
+	// Call the [objectname]_init() function for each AS3 class.
+	i = 0;
 	while (as3xmlclasses[i]) {
 	    as3xmlclasses[i](*pkg);
         ++i;
