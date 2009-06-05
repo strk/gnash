@@ -25,7 +25,7 @@ public:
         _runInfo(runInfo),
         _bytesLoaded(0),
         _tagOpen(false),
-        _endRead(0),
+        _endRead(_stream.tell()),
         _nextTagEnd(0)
 
     {

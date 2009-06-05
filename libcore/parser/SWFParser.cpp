@@ -39,6 +39,7 @@ SWFParser::read(std::streamsize bytes)
     _endRead += bytes;
 
     while (_stream.tell() != _endRead) {
+        log_debug("Pos: %d, end %d", _stream.tell(), _endRead);
 
         try {
 

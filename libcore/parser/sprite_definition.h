@@ -87,6 +87,10 @@ public:
 		return registeredClass.get();
 	}
 
+    virtual size_t incrementLoadedFrames() {
+        return ++m_loading_frame;
+    }
+
 	// overload from movie_definition
 	virtual float	get_width_pixels() const { return 1; }
 
@@ -267,8 +271,6 @@ private:
 
 	// Number of frames completely parsed 
 	size_t m_loading_frame;
-
-
 
 	// See dox in movie_definition.h
 	virtual void add_frame_name(const std::string& name);
