@@ -49,7 +49,6 @@ class SWFParser
 public:
     SWFParser(SWFStream& in, movie_definition* md, const RunInfo& runInfo)
         :
-        _tagLoaders(SWF::TagLoadersTable::getInstance()),
         _stream(in),
         _md(md),
         _runInfo(runInfo),
@@ -86,8 +85,6 @@ private:
     size_t openTag();
 
     void closeTag();
-
-    SWF::TagLoadersTable& _tagLoaders;
 
     SWFStream& _stream;
     

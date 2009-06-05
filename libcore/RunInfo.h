@@ -20,6 +20,7 @@
 #ifndef GNASH_RUN_INFO_H
 #define GNASH_RUN_INFO_H
 
+#include "TagLoadersTable.h"
 #include "StreamProvider.h"
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -51,7 +52,8 @@ public:
     ///                 construction.
     RunInfo(const std::string& baseURL)
         :
-        _baseURL(baseURL)
+        _baseURL(baseURL),
+        _tagLoaders(SWF::TagLoadersTable::getInstance())
     {
     }
 
@@ -98,6 +100,10 @@ public:
         return _soundHandler.get();
     }
 
+    const SWF::TagLoadersTable& tagLoaders() const {
+        return _tagLoaders;
+    }
+
 private:
 
     const std::string _baseURL;
@@ -105,6 +111,8 @@ private:
     boost::shared_ptr<StreamProvider> _streamProvider;
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
+
+    const SWF::TagLoadersTable& _tagLoaders;
 
 };
 

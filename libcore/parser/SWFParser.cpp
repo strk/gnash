@@ -57,6 +57,8 @@ SWFParser::read(std::streamsize bytes)
     // we may read more than the size passed.
     _endRead += bytes;
 
+    const SWF::TagLoadersTable& tagLoaders = _runInfo.tagLoaders();
+
     while (_bytesRead < _endRead) {
         
         const size_t startPos = _stream.tell();
@@ -90,7 +92,7 @@ SWFParser::read(std::streamsize bytes)
                 IF_VERBOSE_PARSE(log_parse("SHOWFRAME tag"));
                 _md->incrementLoadedFrames();
             }
-            else if (_tagLoaders.get(_tag, &lf)) {
+            else if (tagLoaders.get(_tag, &lf)) {
                 // call the tag loader.  The tag loader should add
                 // DisplayObjects or tags to the movie data structure.
                 lf(_stream, _tag, *_md, _runInfo);

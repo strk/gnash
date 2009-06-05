@@ -29,12 +29,12 @@ namespace gnash {
 namespace SWF {
 
 bool
-TagLoadersTable::get(SWF::TagType t, loader_function* lf)
+TagLoadersTable::get(SWF::TagType t, loader_function* lf) const
 {
-	container::iterator it = _tag_loaders.find(t);
+	container::const_iterator it = _tag_loaders.find(t);
 
 	// no loader found for the specified tag
-	if ( it == _tag_loaders.end() ) return false;
+	if (it == _tag_loaders.end()) return false;
 
 	// copy loader_function to the given pointer
 	*lf = it->second;
