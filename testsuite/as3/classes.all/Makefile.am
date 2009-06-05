@@ -38,7 +38,7 @@ HAXE_FLAGS = -cp $(srcdir)
 # include $(srcdir)/fl/video/video.am
 
 # These classes are in the flash namespace
-# #include $(srcdir)/accessibility/accessibility.am
+include $(srcdir)/accessibility/accessibility.am
 
 # These classes are for AIR only, not flash
 # include $(srcdir)/data/data.am

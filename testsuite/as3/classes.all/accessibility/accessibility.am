@@ -26,11 +26,11 @@ ACCESSIBILITY_TESTS =
 # endif
 
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
-ACCESSIBILITY_TESTS += accessibility/AccessibilityProperties_as3.swf
+ACCESSIBILITY_TESTS += accessibility/AccessibilityProperties_as.swf
 endif
 
 if BUILD_ACCESSIBILITY_AS3
-ACCESSIBILITY_TESTS += accessibility/Accessibility_as3.swf
+ACCESSIBILITY_TESTS += accessibility/Accessibility_as.swf
 endif
 
 check_SCRIPTS += $(ACCESSIBILITY_TESTS)
