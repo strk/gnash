@@ -498,17 +498,20 @@ SWFMovieDefinition::read_all_swf()
 
     SWFParser parser(*_str, this, _runInfo);
 
-    while (parser.bytesLoaded() < _swf_end_pos)
-    {
-        if (_loadingCanceled)
-        {
+    const size_t startPos = _str->tell();
+    size_t left = _swf_end_pos - startPos;
+
+    while (left) {
+
+        if (_loadingCanceled) {
             log_debug("Loading thread cancelation requested, "
                     "returning from read_all_swf");
             return;
         }
-        const size_t left = _swf_end_pos - parser.bytesLoaded();
         if (!parser.read(std::min<size_t>(left, 65535))) break;
-        setBytesLoaded(parser.bytesLoaded());
+        
+        left -= parser.bytesRead();
+        setBytesLoaded(startPos + parser.bytesRead());
     }
 
 	// Make sure we won't leave any pending writers

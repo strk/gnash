@@ -38,8 +38,9 @@ SWFParser::read(std::streamsize bytes)
     // we may read more than the size passed.
     _endRead += bytes;
 
-    while (_stream.tell() != _endRead) {
-        log_debug("Pos: %d, end %d", _stream.tell(), _endRead);
+    while (_bytesRead < _endRead) {
+        
+        const size_t startPos = _stream.tell();
 
         try {
 
@@ -47,7 +48,7 @@ SWFParser::read(std::streamsize bytes)
             // how many bytes are needed. The size reported by the
             // tag seems to be the value used, even when it's wrong.
             if (!_tagOpen) {
-                _nextTagEnd = openTag();
+                _nextTagEnd = openTag() - startPos;
             }
          
             // Check if we are now supposed to read enough bytes to get to the
@@ -85,12 +86,13 @@ SWFParser::read(std::streamsize bytes)
 
         }
         catch (const ParserException& e) {
-            // Log and continue parsing...
+            // We continue parsing so that single malformed tags don't
+            // prevent reading subsequent tags.
             log_error(_("Parsing exception: %s"), e.what());
         }
 
         if (_tagOpen) closeTag();
-        _bytesLoaded = _stream.tell();
+        _bytesRead += (_stream.tell() - startPos);
     }
 
     return true;

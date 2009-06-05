@@ -23,22 +23,22 @@ public:
         _stream(in),
         _md(md),
         _runInfo(runInfo),
-        _bytesLoaded(0),
+        _bytesRead(0),
         _tagOpen(false),
-        _endRead(_stream.tell()),
+        _endRead(0),
         _nextTagEnd(0)
 
     {
     }
 
-    size_t bytesLoaded() const {
-        return _bytesLoaded;
+    size_t bytesRead() const {
+        return _bytesRead;
     }
 
     /// Parse a specified number of bytes from the stream.
     //
     /// This always stops at the end of the stream.
-    bool read(std::streamsize bytes = 0);
+    bool read(std::streamsize bytes);
     
 private:
 
@@ -54,7 +54,7 @@ private:
     
     const RunInfo& _runInfo;
     
-    size_t _bytesLoaded;
+    size_t _bytesRead;
     
     bool _tagOpen;
     
