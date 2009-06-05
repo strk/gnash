@@ -573,20 +573,36 @@ GtkGui::quit()
     gtk_main_quit();
 }
 
+/*private*/
 void
-GtkGui::setInterval(unsigned int interval)
+GtkGui::startAdvanceTimer()
 {
-    _interval = interval;
-    if (_advanceSourceTimer)
-    {
-        g_source_remove(_advanceSourceTimer);
-    }
+    stopAdvanceTimer();
     
     _advanceSourceTimer = g_timeout_add_full(G_PRIORITY_LOW, _interval,
             (GSourceFunc)advance_movie, this, NULL);
 
     log_debug("Advance interval timer set to %d ms (~ %d FPS)",
             _interval, 1000/_interval);
+}
+
+/*private*/
+void
+GtkGui::stopAdvanceTimer()
+{
+    if (_advanceSourceTimer)
+    {
+        g_source_remove(_advanceSourceTimer);
+        _advanceSourceTimer = 0;
+    }
+}
+
+void
+GtkGui::setInterval(unsigned int interval)
+{
+    _interval = interval;
+
+    startAdvanceTimer();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2043,6 +2059,8 @@ GtkGui::stopHook()
     if (_resumeButton) {
         gtk_box_pack_start(GTK_BOX(_vbox), _resumeButton, FALSE, FALSE, 0);
     }
+
+    stopAdvanceTimer();
 }
 
 void
@@ -2052,6 +2070,8 @@ GtkGui::playHook()
     if (_resumeButton) {
         gtk_container_remove(GTK_CONTAINER(_vbox), _resumeButton);
     }
+
+    startAdvanceTimer();
 }
 
 

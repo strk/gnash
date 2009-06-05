@@ -182,6 +182,10 @@ private:
     void playHook();
 
     guint _advanceSourceTimer;
+
+    void startAdvanceTimer();
+
+    void stopAdvanceTimer();
 };
 
 } // namespace gnash
