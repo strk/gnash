@@ -51,7 +51,6 @@ namespace {
     bool namespaceMatches(
             const PropertyList::SortedPropertyList::value_type& val,
             const std::string& ns);    
-	//FIXME: these should be changed to the proper return type & arguments
     as_value xmlnode_new(const fn_call& fn);
     as_value xmlnode_nodeName(const fn_call& fn);
     as_value xmlnode_nodeValue(const fn_call& fn);
@@ -80,15 +79,6 @@ namespace {
     as_object* getXMLNodeInterface();
 }
 
-//should be declared in header file
-//class XMLNode_as : public as_object
-//{
-//public:
-//    XMLNode_as();
-//    ~XMLNode_as();
-//};
-
-//ADDED//
 XMLNode_as::XMLNode_as()
 	: as_object(getXMLNodeInterface()),
     	  _parent(0),
@@ -1001,8 +991,6 @@ xmlnode_ctor(const fn_call& fn)
 
     return as_value(obj.get()); // will keep alive
 }
-	
-////END ADD
 } // anonymous namespace 
 } // gnash namespace
 // local Variables:
