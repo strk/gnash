@@ -26,7 +26,7 @@ ACCESSIBILITY_HEADERS += flash/accessibility/AccessibilityProperties_as.h
 endif
 
 if BUILD_ACCESSIBILITY_AS3
-# ACCESSIBILITY_SOURCES += flash/accessibility/Accessibility_as.cpp
+ACCESSIBILITY_SOURCES += flash/accessibility/Accessibility_as.cpp
 ACCESSIBILITY_HEADERS += flash/accessibility/Accessibility_as.h
 endif
 
