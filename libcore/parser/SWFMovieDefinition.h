@@ -52,9 +52,6 @@ namespace gnash {
     class movie_root;
 	class MovieClip;
 	class SWFMovie;
-	namespace SWF {
-		class TagLoadersTable;
-	}
     class RunInfo;
     class Font;
 }
@@ -427,9 +424,6 @@ private:
 
 	/// Mutex protecting _dictionary
 	mutable boost::mutex _dictionaryMutex;
-
-	/// Tags loader table
-	SWF::TagLoadersTable& _tag_loaders;
 
 	typedef std::map<int, boost::intrusive_ptr<Font> > FontMap;
 	FontMap m_fonts;

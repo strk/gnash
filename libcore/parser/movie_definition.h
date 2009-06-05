@@ -139,6 +139,7 @@ public:
 		return NULL;
 	}
 	
+    virtual size_t incrementLoadedFrames() { return 0; }
 
 	/// Return the list of execute tags for given frame number
 	//

@@ -47,6 +47,7 @@ AM_CPPFLAGS = \
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
 	BitmapMovieDefinition.cpp \
+	SWFParser.cpp \
 	SWFMovieDefinition.cpp \
 	sound_definition.cpp \
 	sprite_definition.cpp
@@ -60,6 +61,7 @@ noinst_HEADERS = \
 	action_buffer.h \
 	BitmapMovieDefinition.h \
 	movie_definition.h \
+	SWFParser.h \
 	SWFMovieDefinition.h \
 	sound_definition.h \
 	sprite_definition.h

@@ -34,12 +34,12 @@
 #include "VM.h"
 #include "log.h"
 #include "SWFMovie.h"
-#include "swf/TagLoadersTable.h"
 #include "GnashException.h" // for parser exception
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include "ExportableResource.h"
 #include "GnashAlgorithm.h"
+#include "SWFParser.h"
 
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
@@ -140,46 +140,6 @@ MovieLoader::start()
     return true;
 }
 
-//
-// some utility stuff
-//
-
-/// Log the contents of the current tag, in hex to the output strream
-static void	dumpTagBytes(SWFStream& in, std::ostream& os)
-{
-    const std::streamsize rowlength = 16;
-    os << std::endl;
-    
-    // This decremented until we reach the end of the stream.
-    std::streamsize toRead = in.get_tag_end_position() - in.tell();
-    in.ensureBytes(toRead);
-
-    unsigned char buf[rowlength];    
-    while (toRead)
-    {
-        // Read in max row length or remainder of stream.
-        const std::streamsize thisRow = 
-            std::min<std::streamsize>(toRead, rowlength);
-        
-        const std::streamsize got = 
-            in.read(reinterpret_cast<char*>(&buf), thisRow);
-        
-        // Check that we read all the bytes we expected.
-        if (got < thisRow)
-        {
-            throw ParserException(_("Unexpected end of stream while reading"));
-        }
-        
-        // Stream once as hex
-        os << std::left << std::setw(3 * rowlength) << hexify(buf, got, false);
-        
-        // and once as ASCII
-        os << "| " << hexify(buf, got, true) << std::endl;
-
-        toRead -= got;
-    }
-}
-
 
 //
 // SWFMovieDefinition
@@ -187,8 +147,6 @@ static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 
 SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
 	:
-	// FIXME: use a class-static TagLoadersTable for SWFMovieDefinition
-	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_frame_rate(30.0f),
 	m_frame_count(0u),
 	m_version(0),
@@ -538,9 +496,9 @@ SWFMovieDefinition::read_all_swf()
 	assert( ! _loader.isSelfThread() );
 #endif
 
-	SWFStream &str = *_str;
+    SWFParser parser(*_str, this, _runInfo);
 
-    while (str.tell() < _swf_end_pos)
+    while (parser.bytesLoaded() < _swf_end_pos)
     {
         if (_loadingCanceled)
         {
@@ -548,93 +506,19 @@ SWFMovieDefinition::read_all_swf()
                     "returning from read_all_swf");
             return;
         }
-
-        bool tagOpened=false;
-
-        try {
-
-            SWF::TagType tag = str.open_tag();
-            tagOpened=true;
-
-parse_tag:
-
-            if (tag == SWF::END) {
-                if (str.tell() != _swf_end_pos) {
-		    		IF_VERBOSE_MALFORMED_SWF(
-                        // Safety break, so we don't read past
-                        // the end of the  movie.
-                        log_swferror(_("Hit stream-end tag, "
-                            "but not at the advertised SWF end; "
-                            "stopping for safety."));
-                        )
-                        break;
-                }
-            }
-
-            SWF::TagLoadersTable::loader_function lf = NULL;
-
-            if (tag == SWF::SHOWFRAME)
-            {
-                // show frame tag -- advance to the next frame.
-
-                IF_VERBOSE_PARSE(
-                    log_parse("  show_frame");
-                );
-
-                size_t floaded = incrementLoadedFrames();
-                if (floaded == m_frame_count)
-                {
-                    str.close_tag();
-                    tagOpened=false;
-                    tag = str.open_tag();
-                    tagOpened=true;
-                    if (tag != SWF::END )
-                    {
-                        IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("last expected SHOWFRAME "
-                            "in SWF stream '%s' isn't "
-                            "followed by an END (%d)."),
-                            get_url(), tag);
-                        );
-                    }
-                    goto parse_tag;
-                }
-
-            }
-            else if (_tag_loaders.get(tag, &lf)) {
-                // call the tag loader.  The tag loader should add
-                // DisplayObjects or tags to the movie data structure.
-                lf(str, tag, *this, _runInfo);
-            }
-            else {
-                // no tag loader for this tag type.
-                log_error(_("*** no tag loader for type %d (movie)"), tag);
-                IF_VERBOSE_PARSE(
-                    std::ostringstream ss;
-                    dumpTagBytes(str, ss);
-                    log_error("tag dump follows: %s", ss.str());
-                );
-            }
-
-        }
-        catch (const ParserException& e) {
-            // Log and continue parsing...
-            log_error(_("Parsing exception: %s"), e.what());
-        }
-
-        if ( tagOpened ) str.close_tag();
-
-        setBytesLoaded(str.tell());
+        const size_t left = _swf_end_pos - parser.bytesLoaded();
+        if (!parser.read(std::min<size_t>(left, 65535))) break;
+        setBytesLoaded(parser.bytesLoaded());
     }
 
 	// Make sure we won't leave any pending writers
 	// on any eventual fd-based IOChannel.
-	str.consumeInput();
+	_str->consumeInput();
     
     // Set bytesLoaded to the current stream position unless it's greater
     // than the reported length. TODO: should we be trying to continue
     // parsing after an exception?
-    setBytesLoaded(std::min<size_t>(str.tell(), _swf_end_pos));
+    setBytesLoaded(std::min<size_t>(_str->tell(), _swf_end_pos));
 
 	size_t floaded = get_loading_frame();
 	if (!m_playlist[floaded].empty())
