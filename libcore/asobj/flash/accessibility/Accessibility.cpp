@@ -22,6 +22,7 @@
 #endif
 
 #include "accessibility/Accessibility_as.h"
+#include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
@@ -29,6 +30,8 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
+
+#include <sstream>
 
 namespace gnash {
 
@@ -73,7 +76,7 @@ getAccessibilityInterface()
 }
 
 // extern (used by Global.cpp)
-void accessibility_class_init(as_object& global)
+void Accessibility_class_init(as_object& global)
 {
     boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
     attachAccessibilityInterface(*obj);
@@ -81,7 +84,7 @@ void accessibility_class_init(as_object& global)
 }
 
 as_value
-accessibility_ctor(const fn_call& /* fn */)
+Accessibility_ctor(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<as_object> obj = new Accessibility_as;

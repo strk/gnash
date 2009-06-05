@@ -51,9 +51,9 @@ AM_CPPFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(FREETYPE2_CFLAGS)
 
+#	Accessibility_as.cpp 
 libgnashasobjs_la_SOURCES = \
 	AsBroadcaster.cpp \
-	Accessibility_as.cpp \
 	Array_as.cpp \
 	Boolean_as.cpp \
 	Camera.cpp \
@@ -89,9 +89,9 @@ libgnashasobjs_la_SOURCES = \
 	LoadableObject.cpp \
 	Object.cpp
 
+#	Accessibility_as.h 
 noinst_HEADERS = \
 	AsBroadcaster.h \
-	Accessibility_as.h \
 	Boolean_as.h \
 	Camera.h \
 	Color_as.h	\

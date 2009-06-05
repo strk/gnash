@@ -22,11 +22,12 @@
 #endif
 
 #include "accessibility/Accessibility_as.h"
+#include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h" // for AS inheritance
 
 namespace gnash {
 
@@ -37,6 +38,10 @@ namespace {
     void attachAccessibilityStaticInterface(as_object& o);
     as_object* getAccessibilityInterface();
 
+    as_value Accessibility_isActive(const fn_call& fn);
+    as_value Accessibility_active(const fn_call& fn);
+    as_value Accessibility_updateProperties(const fn_call& fn);
+    as_value Accessibility_sendEvent(const fn_call& fn);
 }
 
 class Accessibility_as : public as_object
@@ -53,15 +58,11 @@ public:
 // extern (used by Global.cpp)
 void accessibility_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
 
-    if (!cl) {
-        cl = new builtin_function(&accessibility_ctor, getAccessibilityInterface());
-        attachAccessibilityStaticInterface(*cl);
-    }
-
+    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    attachAccessibilityInterface(*obj);
     // Register _global.Accessibility
-    global.init_member("Accessibility", cl.get());
+    global.init_member("Accessibility", obj.get());
 }
 
 namespace {
@@ -69,6 +70,21 @@ namespace {
 void
 attachAccessibilityInterface(as_object& o)
 {
+    const int flags = as_prop_flags::dontDelete
+                | as_prop_flags::readOnly;
+
+    const VM& vm = o.getVM();
+    // For swf v9 or greater, the isActive() method has been changed to a
+    // the property "active".
+    if ( vm.getSWFVersion() >= 9 ) {
+	o.init_member("active", new builtin_function(Accessibility_active), flags);
+    } else {
+	o.init_member("isActive", new builtin_function(Accessibility_isActive), flags);
+	o.init_member("sendEvent", new builtin_function(Accessibility_sendEvent), flags);
+    }
+    
+    o.init_member("updateProperties", new builtin_function(Accessibility_updateProperties), flags);
+
 }
 
 void
@@ -94,6 +110,47 @@ accessibility_ctor(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = new Accessibility_as;
 
     return as_value(obj.get()); // will keep alive
+}
+
+
+as_value
+Accessibility_isActive(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+as_value
+Accessibility_active(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+    
+// 	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+// 	UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value(false);
+}
+
+as_value
+Accessibility_updateProperties(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
+}
+
+as_value
+Accessibility_sendEvent(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 } // anonymous namespace 

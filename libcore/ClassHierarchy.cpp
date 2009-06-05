@@ -22,7 +22,7 @@
 #include "as_function.h" // for function_class_init
 #include "Button.h"
 #include "AsBroadcaster.h"
-#include "Accessibility_as.h"
+#include "flash/accessibility/Accessibility_as.h"
 #include "Boolean_as.h"
 #include "Camera.h"
 #include "Color_as.h"
@@ -340,7 +340,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
         NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT,
+	{ accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT,
           NSV::NS_FLASH_ACCESSIBILITY, 5 },
 	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
 	{ namespace_class_init, NSV::CLASS_NAMESPACE, NSV::CLASS_OBJECT,
