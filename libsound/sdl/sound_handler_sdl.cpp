@@ -95,16 +95,36 @@ SDL_sound_handler::initAudio()
     //512 - not enough for  videostream
     audioSpec.samples = 2048;   
 
+    openAudio();
+
+}
+
+void
+SDL_sound_handler::openAudio()
+{
+    if ( _audioOpened ) return; // nothing to do
+
     if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
             boost::format fmt = boost::format(
             _("Unable to open SDL audio: %s"))
             % SDL_GetError();
         throw SoundException(fmt.str());
     }
+
+    _audioOpened = true;
+}
+
+void
+SDL_sound_handler::closeAudio()
+{
+    SDL_CloseAudio();
+    _audioOpened = false;
 }
 
 
 SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
+    :
+    _audioOpened(false)
 {
 
     initAudio();
@@ -124,6 +144,8 @@ SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
 }
 
 SDL_sound_handler::SDL_sound_handler()
+    :
+    _audioOpened(false)
 {
     initAudio();
 }
@@ -414,6 +436,24 @@ SDL_sound_handler::is_muted() const
 {
     boost::mutex::scoped_lock lock(_mutedMutex);
     return sound_handler::is_muted();
+}
+
+void
+SDL_sound_handler::pause() 
+{
+    closeAudio();
+
+    sound_handler::pause();
+}
+
+void
+SDL_sound_handler::unpause() 
+{
+    openAudio();
+
+    if ( hasInputStreams() ) SDL_PauseAudio(0);
+
+    sound_handler::unpause();
 }
 
 } // gnash.sound namespace 

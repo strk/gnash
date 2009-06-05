@@ -51,6 +51,12 @@ private:
 
     /// Initialize audio card
     void initAudio();
+
+    void openAudio();
+
+    void closeAudio();
+
+    bool _audioOpened;
     
     /// Mutex for making sure threads doesn't mess things up
     boost::mutex _mutex;
@@ -142,6 +148,14 @@ public:
     // See dox in sound_handler.h
     // overridden to serialize access to the _muted member
     virtual bool is_muted() const;
+
+    // See dox in sound_handler.h
+    // overridden to close audio card
+    virtual void pause();
+
+    // See dox in sound_handler.h
+    // overridden to open audio card
+    virtual void unpause();
 
     // See dox in sound_handler.h
     virtual unsigned int get_duration(int sound_handle);
