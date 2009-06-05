@@ -499,7 +499,11 @@ SWFMovieDefinition::read_all_swf()
     SWFParser parser(*_str, this, _runInfo);
 
     const size_t startPos = _str->tell();
+    assert (startPos <= _swf_end_pos);
+
     size_t left = _swf_end_pos - startPos;
+
+    const size_t chunkSize = 65535;
 
     while (left) {
 
@@ -508,7 +512,7 @@ SWFMovieDefinition::read_all_swf()
                     "returning from read_all_swf");
             return;
         }
-        if (!parser.read(std::min<size_t>(left, 65535))) break;
+        if (!parser.read(std::min<size_t>(left, chunkSize))) break;
         
         left -= parser.bytesRead();
         setBytesLoaded(startPos + parser.bytesRead());
@@ -553,7 +557,7 @@ SWFMovieDefinition::get_loading_frame() const
 	return _frames_loaded;
 }
 
-size_t
+void
 SWFMovieDefinition::incrementLoadedFrames()
 {
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
@@ -584,7 +588,6 @@ SWFMovieDefinition::incrementLoadedFrames()
 		_frame_reached_condition.notify_all();
 	}
 
-	return _frames_loaded;
 }
 
 void

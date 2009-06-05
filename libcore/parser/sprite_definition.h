@@ -87,8 +87,8 @@ public:
 		return registeredClass.get();
 	}
 
-    virtual size_t incrementLoadedFrames() {
-        return ++m_loading_frame;
+    virtual void incrementLoadedFrames() {
+        ++m_loading_frame;
     }
 
 	// overload from movie_definition

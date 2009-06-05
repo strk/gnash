@@ -521,7 +521,7 @@ private:
 	///
 	/// @return the new value of _frames_loaded
 	///
-	size_t incrementLoadedFrames();
+	virtual void incrementLoadedFrames();
 
 	/// Set number of bytes loaded from input stream
 	//
