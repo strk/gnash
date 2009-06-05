@@ -119,8 +119,6 @@ sprite_definition::get_labeled_frame(const std::string& label,
 sprite_definition::sprite_definition(movie_definition& m, SWFStream& in, 
         const RunInfo& runInfo)
 	:
-	// FIXME: use a class-static TagLoadersTable for sprite_definition
-	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0),

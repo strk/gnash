@@ -28,7 +28,6 @@
 #include "log.h"
 #include "rect.h"
 #include "StringPredicates.h" // StringNoCaseLessThan
-#include "TagLoadersTable.h"
 
 // Forward declarations
 namespace gnash {
@@ -248,11 +247,6 @@ public:
 private:
 
 	void read(SWFStream& in, const RunInfo& runInfo);
-
-	/// Tags loader table.
-	//
-	/// TODO: make it a static member, specific to sprite_definition
-	SWF::TagLoadersTable& _tag_loaders;
 
 	/// Top-level movie definition
 	/// (the definition read from SWF stream)
