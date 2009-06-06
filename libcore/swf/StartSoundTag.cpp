@@ -87,10 +87,6 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
         else
         {
 
-            if (_soundInfo.noMultiple) {
-                log_unimpl("TESTING: syncNoMultiple flag in StartSound tag");
-            }
-
             //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
 
             const sound::SoundEnvelopes* env = 
