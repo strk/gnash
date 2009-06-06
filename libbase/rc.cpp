@@ -623,7 +623,12 @@ RcInitFile::updateFile()
     else
     {
         // Check the users home directory    
+#ifndef __amigaos4__
         char *home = std::getenv("HOME");
+#else
+		//on AmigaOS we have a GNASH: assign that point to program dir
+        char *home = "/gnash";
+#endif
         if (home) {
             writefile = home;
             writefile.append("/.gnashrc");
