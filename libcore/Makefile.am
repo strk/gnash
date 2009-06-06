@@ -17,7 +17,7 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = parser vm # asobj/
+SUBDIRS = parser vm
 
 # noinst_LTLIBRARIES = libserver.la 
 pkglib_LTLIBRARIES = libgnashcore.la
@@ -260,6 +260,7 @@ EXTENSIONS_API = \
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.
 include $(srcdir)/asobj/flash.am
+libgnashcore_la_SOURCES += $(libgnashasobjs_la_SOURCES)
 
 if SDKINSTALL
 noinst_HEADERS += $(EXTENSIONS_API)
@@ -274,7 +275,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
-	libgnashasobjs.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \
