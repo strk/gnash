@@ -18,8 +18,8 @@
 XMLdir = $(includedir)/gnash
 
 # This variable contains all classes in AS2 and AS3
-XML_SOURCES = flash/xml/xml_pkg.cpp
-XML_HEADERS = flash/xml/xml_pkg.h
+XML_SOURCES = asobj/flash/xml/xml_pkg.cpp
+XML_HEADERS = asobj/flash/xml/xml_pkg.h
 
 # This variable contains the classes only in AS3
 XML_SOURCES_AS3 = 
@@ -28,18 +28,18 @@ XML_HEADERS_AS3 =
 # ActionScript 2 has the XML class, which has been renamed in
 # ActionScript 3 to XMLDocument. They are the same class though.
 if BUILD_XMLDOCUMENT_AS3
-XML_SOURCES += flash/xml/XMLDocument_as.cpp
-XML_HEADERS += flash/xml/XMLDocument_as.h
+XML_SOURCES += asobj/flash/xml/XMLDocument_as.cpp
+XML_HEADERS += asobj/flash/xml/XMLDocument_as.h
 endif
 
 if BUILD_XMLNODETYPE_AS3
-XML_SOURCES_AS3 += flash/xml/XMLNodeType_as.cpp
-XML_HEADERS_AS3 += flash/xml/XMLNodeType_as.h
+XML_SOURCES_AS3 += asobj/flash/xml/XMLNodeType_as.cpp
+XML_HEADERS_AS3 += asobj/flash/xml/XMLNodeType_as.h
 endif
 
 if BUILD_XMLNODE_AS3
-XML_SOURCES += flash/xml/XMLNode_as.cpp
-XML_HEADERS += flash/xml/XMLNode_as.h
+XML_SOURCES += asobj/flash/xml/XMLNode_as.cpp
+XML_HEADERS += asobj/flash/xml/XMLNode_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(XML_SOURCES) $(XML_SOURCES_AS3)

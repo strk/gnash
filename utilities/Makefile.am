@@ -30,7 +30,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
-	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
+	$(top_builddir)/libcore/libgnashasobjs.la \
 	$(NULL)
 
 ## WARNING: make sure GLIB_LIBS appears first

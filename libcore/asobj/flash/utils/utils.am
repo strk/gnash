@@ -17,47 +17,47 @@
 
 UTILSdir = $(includedir)/gnash
 
-UTILS_SOURCES = flash/utils/utils_pkg.cpp
-UTILS_HEADERS = flash/utils/utils_pkg.h
+UTILS_SOURCES = asobj/flash/utils/utils_pkg.cpp
+UTILS_HEADERS = asobj/flash/utils/utils_pkg.h
 
 if BUILD_BYTEARRAY_AS3
-UTILS_SOURCES += flash/utils/ByteArray_as.cpp
-UTILS_HEADERS += flash/utils/ByteArray_as.h
+UTILS_SOURCES += asobj/flash/utils/ByteArray_as.cpp
+UTILS_HEADERS += asobj/flash/utils/ByteArray_as.h
 endif
 
 if BUILD_DICTIONARY_AS3
-UTILS_SOURCES += flash/utils/Dictionary_as.cpp
-UTILS_HEADERS += flash/utils/Dictionary_as.h
+UTILS_SOURCES += asobj/flash/utils/Dictionary_as.cpp
+UTILS_HEADERS += asobj/flash/utils/Dictionary_as.h
 endif
 
 if BUILD_ENDIAN_AS3
-UTILS_SOURCES += flash/utils/Endian_as.cpp
-UTILS_HEADERS += flash/utils/Endian_as.h
+UTILS_SOURCES += asobj/flash/utils/Endian_as.cpp
+UTILS_HEADERS += asobj/flash/utils/Endian_as.h
 endif
 
 if BUILD_IDATAINPUT_AS3
-UTILS_SOURCES += flash/utils/IDataInput_as.cpp
-UTILS_HEADERS += flash/utils/IDataInput_as.h
+UTILS_SOURCES += asobj/flash/utils/IDataInput_as.cpp
+UTILS_HEADERS += asobj/flash/utils/IDataInput_as.h
 endif
 
 if BUILD_IDATAOUTPUT_AS3
-UTILS_SOURCES += flash/utils/IDataOutput_as.cpp
-UTILS_HEADERS += flash/utils/IDataOutput_as.h
+UTILS_SOURCES += asobj/flash/utils/IDataOutput_as.cpp
+UTILS_HEADERS += asobj/flash/utils/IDataOutput_as.h
 endif
 
 if BUILD_IEXTERNALIZABLE_AS3
-UTILS_SOURCES += flash/utils/IExternalizable_as.cpp
-UTILS_HEADERS += flash/utils/IExternalizable_as.h
+UTILS_SOURCES += asobj/flash/utils/IExternalizable_as.cpp
+UTILS_HEADERS += asobj/flash/utils/IExternalizable_as.h
 endif
 
 if BUILD_PROXY_AS3
-UTILS_SOURCES += flash/utils/Proxy_as.cpp
-UTILS_HEADERS += flash/utils/Proxy_as.h
+UTILS_SOURCES += asobj/flash/utils/Proxy_as.cpp
+UTILS_HEADERS += asobj/flash/utils/Proxy_as.h
 endif
 
 if BUILD_TIMER_AS3
-UTILS_SOURCES += flash/utils/Timer_as.cpp
-UTILS_HEADERS += flash/utils/Timer_as.h
+UTILS_SOURCES += asobj/flash/utils/Timer_as.cpp
+UTILS_HEADERS += asobj/flash/utils/Timer_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(UTILS_SOURCES)

@@ -17,176 +17,176 @@
 
 DISPLAYdir = $(includedir)/gnash
 
-DISPLAY_SOURCES = flash/display/display_pkg.cpp
-DISPLAY_HEADERS = flash/display/display_pkg.h
+DISPLAY_SOURCES = asobj/flash/display/display_pkg.cpp
+DISPLAY_HEADERS = asobj/flash/display/display_pkg.h
 
 DISPLAY_SOURCES_AS2 =
 DISPLAY_HEADERS_AS2 =
 
 if BUILD_AVM1MOVIE_AS3
-DISPLAY_SOURCES += flash/display/AVM1Movie_as.cpp
-DISPLAY_HEADERS += flash/display/AVM1Movie_as.h
+DISPLAY_SOURCES += asobj/flash/display/AVM1Movie_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/AVM1Movie_as.h
 endif
 
 if BUILD_ACTIONSCRIPTVERSION_AS3
-DISPLAY_SOURCES += flash/display/ActionScriptVersion_as.cpp
-DISPLAY_HEADERS += flash/display/ActionScriptVersion_as.h
+DISPLAY_SOURCES += asobj/flash/display/ActionScriptVersion_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/ActionScriptVersion_as.h
 endif
 
 if BUILD_BITMAPDATACHANNEL_AS3
-DISPLAY_SOURCES += flash/display/BitmapDataChannel_as.cpp
-DISPLAY_HEADERS += flash/display/BitmapDataChannel_as.h
+DISPLAY_SOURCES += asobj/flash/display/BitmapDataChannel_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/BitmapDataChannel_as.h
 endif
 
 if BUILD_BITMAPDATA_AS3
-DISPLAY_SOURCES_AS2 += flash/display/BitmapData_as.cpp
-DISPLAY_HEADERS_AS2 += flash/display/BitmapData_as.h
+DISPLAY_SOURCES_AS2 += asobj/flash/display/BitmapData_as.cpp
+DISPLAY_HEADERS_AS2 += asobj/flash/display/BitmapData_as.h
 endif
 
 # if BUILD_BITMAP_AS3
-# DISPLAY_SOURCES += flash/display/Bitmap_as.cpp
-DISPLAY_HEADERS += flash/display/Bitmap_as.h
+# DISPLAY_SOURCES += asobj/flash/display/Bitmap_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Bitmap_as.h
 # endif
 
 if BUILD_BLENDMODE_AS3
-DISPLAY_SOURCES += flash/display/BlendMode_as.cpp
-DISPLAY_HEADERS += flash/display/BlendMode_as.h
+DISPLAY_SOURCES += asobj/flash/display/BlendMode_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/BlendMode_as.h
 endif
 
 if BUILD_CAPSSTYLE_AS3
-DISPLAY_SOURCES += flash/display/CapsStyle_as.cpp
-DISPLAY_HEADERS += flash/display/CapsStyle_as.h
+DISPLAY_SOURCES += asobj/flash/display/CapsStyle_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/CapsStyle_as.h
 endif
 
 if BUILD_DISPLAYOBJECTCONTAINER_AS3
-DISPLAY_SOURCES += flash/display/DisplayObjectContainer_as.cpp
-DISPLAY_HEADERS += flash/display/DisplayObjectContainer_as.h
+DISPLAY_SOURCES += asobj/flash/display/DisplayObjectContainer_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/DisplayObjectContainer_as.h
 endif
 
 if BUILD_DISPLAYOBJECT_AS3
-DISPLAY_SOURCES += flash/display/DisplayObject_as.cpp
-DISPLAY_HEADERS += flash/display/DisplayObject_as.h
+DISPLAY_SOURCES += asobj/flash/display/DisplayObject_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/DisplayObject_as.h
 endif
 
 if BUILD_FRAMELABEL_AS3
-DISPLAY_SOURCES += flash/display/FrameLabel_as.cpp
-DISPLAY_HEADERS += flash/display/FrameLabel_as.h
+DISPLAY_SOURCES += asobj/flash/display/FrameLabel_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/FrameLabel_as.h
 endif
 
 if BUILD_GRADIENTTYPE_AS3
-DISPLAY_SOURCES += flash/display/GradientType_as.cpp
-DISPLAY_HEADERS += flash/display/GradientType_as.h
+DISPLAY_SOURCES += asobj/flash/display/GradientType_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/GradientType_as.h
 endif
 
 if BUILD_GRAPHICS_AS3
-DISPLAY_SOURCES += flash/display/Graphics_as.cpp
-DISPLAY_HEADERS += flash/display/Graphics_as.h
+DISPLAY_SOURCES += asobj/flash/display/Graphics_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Graphics_as.h
 endif
 
 if BUILD_IBITMAPDRAWABLE_AS3
-DISPLAY_SOURCES += flash/display/IBitmapDrawable_as.cpp
-DISPLAY_HEADERS += flash/display/IBitmapDrawable_as.h
+DISPLAY_SOURCES += asobj/flash/display/IBitmapDrawable_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/IBitmapDrawable_as.h
 endif
 
 if BUILD_INTERACTIVEOBJECT_AS3
-DISPLAY_SOURCES += flash/display/InteractiveObject_as.cpp
-DISPLAY_HEADERS += flash/display/InteractiveObject_as.h
+DISPLAY_SOURCES += asobj/flash/display/InteractiveObject_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/InteractiveObject_as.h
 endif
 
 if BUILD_INTERPOLATIONMETHOD_AS3
-DISPLAY_SOURCES += flash/display/InterpolationMethod_as.cpp
-DISPLAY_HEADERS += flash/display/InterpolationMethod_as.h
+DISPLAY_SOURCES += asobj/flash/display/InterpolationMethod_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/InterpolationMethod_as.h
 endif
 
 if BUILD_JOINTSTYLE_AS3
-DISPLAY_SOURCES += flash/display/JointStyle_as.cpp
-DISPLAY_HEADERS += flash/display/JointStyle_as.h
+DISPLAY_SOURCES += asobj/flash/display/JointStyle_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/JointStyle_as.h
 endif
 
 if BUILD_LINESCALEMODE_AS3
-DISPLAY_SOURCES += flash/display/LineScaleMode_as.cpp
-DISPLAY_HEADERS += flash/display/LineScaleMode_as.h
+DISPLAY_SOURCES += asobj/flash/display/LineScaleMode_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/LineScaleMode_as.h
 endif
 
 if BUILD_LOADERINFO_AS3
-DISPLAY_SOURCES += flash/display/LoaderInfo_as.cpp
-DISPLAY_HEADERS += flash/display/LoaderInfo_as.h
+DISPLAY_SOURCES += asobj/flash/display/LoaderInfo_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/LoaderInfo_as.h
 endif
 
 if BUILD_LOADER_AS3
-DISPLAY_SOURCES += flash/display/Loader_as.cpp
-DISPLAY_HEADERS += flash/display/Loader_as.h
+DISPLAY_SOURCES += asobj/flash/display/Loader_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Loader_as.h
 endif
 
 if BUILD_MORPHSHAPE_AS3
-DISPLAY_SOURCES += flash/display/MorphShape_as.cpp
-DISPLAY_HEADERS += flash/display/MorphShape_as.h
+DISPLAY_SOURCES += asobj/flash/display/MorphShape_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/MorphShape_as.h
 endif
 
 # FIXME: already exists
-# DISPLAY_SOURCES += flash/display/MovieClip_as.cpp
-DISPLAY_HEADERS += flash/display/MovieClip_as.h
+# DISPLAY_SOURCES += asobj/flash/display/MovieClip_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/MovieClip_as.h
 # endif
 
 if BUILD_PIXELSNAPPING_AS3
-DISPLAY_SOURCES += flash/display/PixelSnapping_as.cpp
-DISPLAY_HEADERS += flash/display/PixelSnapping_as.h
+DISPLAY_SOURCES += asobj/flash/display/PixelSnapping_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/PixelSnapping_as.h
 endif
 
 if BUILD_SWFVERSION_AS3
-DISPLAY_SOURCES += flash/display/SWFVersion_as.cpp
-DISPLAY_HEADERS += flash/display/SWFVersion_as.h
+DISPLAY_SOURCES += asobj/flash/display/SWFVersion_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/SWFVersion_as.h
 endif
 
 if BUILD_SCENE_AS3
-DISPLAY_SOURCES += flash/display/Scene_as.cpp
-DISPLAY_HEADERS += flash/display/Scene_as.h
+DISPLAY_SOURCES += asobj/flash/display/Scene_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Scene_as.h
 endif
 
 if BUILD_SHAPE_AS3
-DISPLAY_SOURCES += flash/display/Shape_as.cpp
-DISPLAY_HEADERS += flash/display/Shape_as.h
+DISPLAY_SOURCES += asobj/flash/display/Shape_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Shape_as.h
 endif
 
 if BUILD_SIMPLEBUTTON_AS3
-DISPLAY_SOURCES += flash/display/SimpleButton_as.cpp
-DISPLAY_HEADERS += flash/display/SimpleButton_as.h
+DISPLAY_SOURCES += asobj/flash/display/SimpleButton_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/SimpleButton_as.h
 endif
 
 if BUILD_SPREADMETHOD_AS3
-DISPLAY_SOURCES += flash/display/SpreadMethod_as.cpp
-DISPLAY_HEADERS += flash/display/SpreadMethod_as.h
+DISPLAY_SOURCES += asobj/flash/display/SpreadMethod_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/SpreadMethod_as.h
 endif
 
 if BUILD_SPRITE_AS3
-DISPLAY_SOURCES += flash/display/Sprite_as.cpp
-DISPLAY_HEADERS += flash/display/Sprite_as.h
+DISPLAY_SOURCES += asobj/flash/display/Sprite_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Sprite_as.h
 endif
 
 if BUILD_STAGEALIGN_AS3
-DISPLAY_SOURCES += flash/display/StageAlign_as.cpp
-DISPLAY_HEADERS += flash/display/StageAlign_as.h
+DISPLAY_SOURCES += asobj/flash/display/StageAlign_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/StageAlign_as.h
 endif
 
 if BUILD_STAGEDISPLAYSTATE_AS3
-DISPLAY_SOURCES += flash/display/StageDisplayState_as.cpp
-DISPLAY_HEADERS += flash/display/StageDisplayState_as.h
+DISPLAY_SOURCES += asobj/flash/display/StageDisplayState_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/StageDisplayState_as.h
 endif
 
 if BUILD_STAGEQUALITY_AS3
-DISPLAY_SOURCES += flash/display/StageQuality_as.cpp
-DISPLAY_HEADERS += flash/display/StageQuality_as.h
+DISPLAY_SOURCES += asobj/flash/display/StageQuality_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/StageQuality_as.h
 endif
 
 if BUILD_STAGESCALEMODE_AS3
-DISPLAY_SOURCES += flash/display/StageScaleMode_as.cpp
-DISPLAY_HEADERS += flash/display/StageScaleMode_as.h
+DISPLAY_SOURCES += asobj/flash/display/StageScaleMode_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/StageScaleMode_as.h
 endif
 
 # FIXME: already exists
 # if BUILD_STAGE_AS3
-# DISPLAY_SOURCES += flash/display/Stage_as.cpp
-DISPLAY_HEADERS += flash/display/Stage_as.h
+# DISPLAY_SOURCES += asobj/flash/display/Stage_as.cpp
+DISPLAY_HEADERS += asobj/flash/display/Stage_as.h
 # endif
 
 libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES) $(DISPLAY_SOURCES_AS2)

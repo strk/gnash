@@ -17,38 +17,38 @@
 
 UIdir = $(includedir)/gnash
 
-UI_SOURCES = flash/ui/ui_pkg.cpp
-UI_HEADERS = flash/ui/ui_pkg.h
+UI_SOURCES = asobj/flash/ui/ui_pkg.cpp
+UI_HEADERS = asobj/flash/ui/ui_pkg.h
 
 if BUILD_CONTEXTMENUBUILTINITEMS_AS3
-UI_SOURCES += flash/ui/ContextMenuBuiltInItems_as.cpp
-UI_HEADERS += flash/ui/ContextMenuBuiltInItems_as.h
+UI_SOURCES += asobj/flash/ui/ContextMenuBuiltInItems_as.cpp
+UI_HEADERS += asobj/flash/ui/ContextMenuBuiltInItems_as.h
 endif
 
 if BUILD_CONTEXTMENUITEM_AS3
-UI_SOURCES += flash/ui/ContextMenuItem_as.cpp
-UI_HEADERS += flash/ui/ContextMenuItem_as.h
+UI_SOURCES += asobj/flash/ui/ContextMenuItem_as.cpp
+UI_HEADERS += asobj/flash/ui/ContextMenuItem_as.h
 endif
 
 # FIXME: already exists
 if BUILD_CONTEXTMENU_AS3
-# UI_SOURCES += flash/ui/ContextMenu_as.cpp
-UI_HEADERS += flash/ui/ContextMenu_as.h
+# UI_SOURCES += asobj/flash/ui/ContextMenu_as.cpp
+UI_HEADERS += asobj/flash/ui/ContextMenu_as.h
 endif
 
 if BUILD_KEYLOCATION_AS3
-UI_SOURCES += flash/ui/KeyLocation_as.cpp
-UI_HEADERS += flash/ui/KeyLocation_as.h
+UI_SOURCES += asobj/flash/ui/KeyLocation_as.cpp
+UI_HEADERS += asobj/flash/ui/KeyLocation_as.h
 endif
 
 if BUILD_KEYBOARD_AS3
-UI_SOURCES += flash/ui/Keyboard_as.cpp
-UI_HEADERS += flash/ui/Keyboard_as.h
+UI_SOURCES += asobj/flash/ui/Keyboard_as.cpp
+UI_HEADERS += asobj/flash/ui/Keyboard_as.h
 endif
 
 if BUILD_MOUSE_AS3
-UI_SOURCES += flash/ui/Mouse_as.cpp
-UI_HEADERS += flash/ui/Mouse_as.h
+UI_SOURCES += asobj/flash/ui/Mouse_as.cpp
+UI_HEADERS += asobj/flash/ui/Mouse_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(UI_SOURCES)

@@ -17,122 +17,122 @@
 
 EVENTSdir = $(includedir)/gnash
 
-EVENTS_SOURCES = flash/events/events_pkg.cpp
-EVENTS_HEADERS = flash/events/events_pkg.h
+EVENTS_SOURCES = asobj/flash/events/events_pkg.cpp
+EVENTS_HEADERS = asobj/flash/events/events_pkg.h
 
 if BUILD_ACTIVITYEVENT_AS3
-EVENTS_SOURCES += flash/events/ActivityEvent_as.cpp
-EVENTS_HEADERS += flash/events/ActivityEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/ActivityEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/ActivityEvent_as.h
 endif
 
 if BUILD_ASYNCERROREVENT_AS3
-EVENTS_SOURCES += flash/events/AsyncErrorEvent_as.cpp
-EVENTS_HEADERS += flash/events/AsyncErrorEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/AsyncErrorEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/AsyncErrorEvent_as.h
 endif
 
 if BUILD_CONTEXTMENUEVENT_AS3
-EVENTS_SOURCES += flash/events/ContextMenuEvent_as.cpp
-EVENTS_HEADERS += flash/events/ContextMenuEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/ContextMenuEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/ContextMenuEvent_as.h
 endif
 
 if BUILD_DATAEVENT_AS3
-EVENTS_SOURCES += flash/events/DataEvent_as.cpp
-EVENTS_HEADERS += flash/events/DataEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/DataEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/DataEvent_as.h
 endif
 
 if BUILD_ERROREVENT_AS3
-EVENTS_SOURCES += flash/events/ErrorEvent_as.cpp
-EVENTS_HEADERS += flash/events/ErrorEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/ErrorEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/ErrorEvent_as.h
 endif
 
 if BUILD_EVENTDISPATCHER_AS3
-EVENTS_SOURCES += flash/events/EventDispatcher_as.cpp
-EVENTS_HEADERS += flash/events/EventDispatcher_as.h
+EVENTS_SOURCES += asobj/flash/events/EventDispatcher_as.cpp
+EVENTS_HEADERS += asobj/flash/events/EventDispatcher_as.h
 endif
 
 if BUILD_EVENTPHASE_AS3
-EVENTS_SOURCES += flash/events/EventPhase_as.cpp
-EVENTS_HEADERS += flash/events/EventPhase_as.h
+EVENTS_SOURCES += asobj/flash/events/EventPhase_as.cpp
+EVENTS_HEADERS += asobj/flash/events/EventPhase_as.h
 endif
 
 if BUILD_EVENT_AS3
-EVENTS_SOURCES += flash/events/Event_as.cpp
-EVENTS_HEADERS += flash/events/Event_as.h
+EVENTS_SOURCES += asobj/flash/events/Event_as.cpp
+EVENTS_HEADERS += asobj/flash/events/Event_as.h
 endif
 
 if BUILD_FOCUSEVENT_AS3
-EVENTS_SOURCES += flash/events/FocusEvent_as.cpp
-EVENTS_HEADERS += flash/events/FocusEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/FocusEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/FocusEvent_as.h
 endif
 
 if BUILD_FULLSCREENEVENT_AS3
-EVENTS_SOURCES += flash/events/FullScreenEvent_as.cpp
-EVENTS_HEADERS += flash/events/FullScreenEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/FullScreenEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/FullScreenEvent_as.h
 endif
 
 if BUILD_HTTPSTATUSEVENT_AS3
-EVENTS_SOURCES += flash/events/HTTPStatusEvent_as.cpp
-EVENTS_HEADERS += flash/events/HTTPStatusEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/HTTPStatusEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/HTTPStatusEvent_as.h
 endif
 
 if BUILD_IEVENTDISPATCHER_AS3
-EVENTS_SOURCES += flash/events/IEventDispatcher_as.cpp
-EVENTS_HEADERS += flash/events/IEventDispatcher_as.h
+EVENTS_SOURCES += asobj/flash/events/IEventDispatcher_as.cpp
+EVENTS_HEADERS += asobj/flash/events/IEventDispatcher_as.h
 endif
 
 if BUILD_IMEEVENT_AS3
-EVENTS_SOURCES += flash/events/IMEEvent_as.cpp
-EVENTS_HEADERS += flash/events/IMEEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/IMEEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/IMEEvent_as.h
 endif
 
 if BUILD_IOERROREVENT_AS3
-EVENTS_SOURCES += flash/events/IOErrorEvent_as.cpp
-EVENTS_HEADERS += flash/events/IOErrorEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/IOErrorEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/IOErrorEvent_as.h
 endif
 
 if BUILD_KEYBOARDEVENT_AS3
-EVENTS_SOURCES += flash/events/KeyboardEvent_as.cpp
-EVENTS_HEADERS += flash/events/KeyboardEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/KeyboardEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/KeyboardEvent_as.h
 endif
 
 if BUILD_MOUSEEVENT_AS3
-EVENTS_SOURCES += flash/events/MouseEvent_as.cpp
-EVENTS_HEADERS += flash/events/MouseEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/MouseEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/MouseEvent_as.h
 endif
 
 if BUILD_NETSTATUSEVENT_AS3
-EVENTS_SOURCES += flash/events/NetStatusEvent_as.cpp
-EVENTS_HEADERS += flash/events/NetStatusEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/NetStatusEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/NetStatusEvent_as.h
 endif
 
 if BUILD_PROGRESSEVENT_AS3
-EVENTS_SOURCES += flash/events/ProgressEvent_as.cpp
-EVENTS_HEADERS += flash/events/ProgressEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/ProgressEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/ProgressEvent_as.h
 endif
 
 if BUILD_SECURITYERROREVENT_AS3
-EVENTS_SOURCES += flash/events/SecurityErrorEvent_as.cpp
-EVENTS_HEADERS += flash/events/SecurityErrorEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/SecurityErrorEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/SecurityErrorEvent_as.h
 endif
 
 if BUILD_STATUSEVENT_AS3
-EVENTS_SOURCES += flash/events/StatusEvent_as.cpp
-EVENTS_HEADERS += flash/events/StatusEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/StatusEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/StatusEvent_as.h
 endif
 
 if BUILD_SYNCEVENT_AS3
-EVENTS_SOURCES += flash/events/SyncEvent_as.cpp
-EVENTS_HEADERS += flash/events/SyncEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/SyncEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/SyncEvent_as.h
 endif
 
 if BUILD_TEXTEVENT_AS3
-EVENTS_SOURCES += flash/events/TextEvent_as.cpp
-EVENTS_HEADERS += flash/events/TextEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/TextEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/TextEvent_as.h
 endif
 
 if BUILD_TIMEREVENT_AS3
-EVENTS_SOURCES += flash/events/TimerEvent_as.cpp
-EVENTS_HEADERS += flash/events/TimerEvent_as.h
+EVENTS_SOURCES += asobj/flash/events/TimerEvent_as.cpp
+EVENTS_HEADERS += asobj/flash/events/TimerEvent_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(EVENTS_SOURCES)
