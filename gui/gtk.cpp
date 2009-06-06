@@ -602,7 +602,7 @@ GtkGui::setInterval(unsigned int interval)
 {
     _interval = interval;
 
-    startAdvanceTimer();
+    if ( ! isStopped() ) startAdvanceTimer();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
