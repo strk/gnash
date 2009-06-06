@@ -112,11 +112,6 @@ public:
                      unsigned int sample_count, int handle_id);
 
     // See dox in sound_handler.h
-    virtual void playSound(int id, int loops, int secsOffset,
-                    long start, const SoundEnvelopes* env,
-                    bool allowMultiple);
-
-    // See dox in sound_handler.h
     virtual void    stop_sound(int sound_handle);
 
     // See dox in sound_handler.h
@@ -163,9 +158,6 @@ public:
     // See dox in sound_handler.h
     virtual unsigned int tell(int sound_handle);
     
-    // See dox in sound_handler.h
-    virtual InputStream* attach_aux_streamer(aux_streamer_ptr ptr, void* owner);
-
     // See dox in sound_handler.h
     // Overridden to unpause SDL audio
     void plugInputStream(std::auto_ptr<InputStream> in);

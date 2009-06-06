@@ -609,5 +609,20 @@ sound_handler::reset()
     sound_handler::stop_all_sounds();
 }
 
+InputStream*
+sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
+{
+    assert(owner);
+    assert(ptr);
+
+    std::auto_ptr<InputStream> newStreamer ( new AuxStream(ptr, owner) );
+
+    InputStream* ret = newStreamer.get();
+
+    plugInputStream(newStreamer);
+
+    return ret;
+}
+
 } // gnash.sound namespace 
 } // namespace gnash

@@ -305,8 +305,7 @@ public:
     ///
     /// @see unplugInputStream
 	///
-	virtual InputStream* attach_aux_streamer(aux_streamer_ptr ptr, void* udata)
-	{ ptr=ptr; /*unused*/ udata=udata; /*unused*/ return 0; } 
+	virtual InputStream* attach_aux_streamer(aux_streamer_ptr ptr, void* udata);
 
 	/// Unplug an external InputStream from the mixer
 	//

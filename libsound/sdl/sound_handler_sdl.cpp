@@ -201,16 +201,6 @@ SDL_sound_handler::fill_stream_data(unsigned char* data,
 
 
 void
-SDL_sound_handler::playSound(int id, int loops, int offSecs,
-        long startPos, const SoundEnvelopes* env, bool allowMulti)
-{
-    boost::mutex::scoped_lock lock(_mutex);
-    // WARNING: playSound might trigger another lock of _mutex here (check me)
-    sound_handler::playSound(id, loops, offSecs, startPos, env, allowMulti);
-}
-
-
-void
 SDL_sound_handler::stop_sound(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
@@ -253,24 +243,6 @@ SDL_sound_handler::get_sound_info(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
-}
-
-InputStream*
-SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
-{
-    // TODO: move to base class !!
-
-    boost::mutex::scoped_lock lock(_mutex);
-    assert(owner);
-    assert(ptr);
-
-    std::auto_ptr<InputStream> newStreamer ( new AuxStream(ptr, owner) );
-
-    InputStream* ret = newStreamer.get();
-
-    plugInputStream(newStreamer);
-
-    return ret;
 }
 
 unsigned int
@@ -407,9 +379,11 @@ SDL_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
 void
 SDL_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 {
-    // TODO: lock the mutex once attach_aux_streamer is in the base class
+    boost::mutex::scoped_lock lock(_mutex);
 
     sound_handler::plugInputStream(newStreamer);
+
+    lock.unlock(); // we need to unlock before unpausing (right?)
 
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
     log_debug("Unpausing SDL Audio...");
