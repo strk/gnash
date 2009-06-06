@@ -21,6 +21,8 @@
 #endif
 
 #include <cstdio>
+#include "gnash.h"
+#include "rc.h"
 
 #include <proto/asl.h>
 #include <proto/keymap.h>
@@ -31,9 +33,9 @@
 #include <classes/window.h>
 #include <classes/requester.h>
 
-#include "gnash.h"
 #include "log.h"
 #include "aos4sup.h"
+#include "aos4_gnash_prefs.h"
 
 #include <getopt.h>
 
@@ -43,6 +45,11 @@ __attribute__ ((used)) static const char *stackcookie = "$STACK: 4000000";
 __attribute__ ((used)) static const char *version     = "$VER: Gnash 0.8.5 for AmigaOS4 (" __DATE__ ")";
 
 extern struct NewMenu nm[];
+extern Object *win;
+extern struct MsgPort *AppPort;
+extern Object *Objects[OBJ_NUM];
+
+#define GAD(x) (struct Gadget *)Objects[x]
 
 #define RESET_TIME 20 * 1000 //25fps
 
@@ -160,7 +167,7 @@ AOS4Gui::run()
 	uint32 new_width = _width, new_height = _height;
     ULONG menucode;
 	struct FileRequester *AmigaOS_FileRequester = NULL;
-	
+
 	TimerReset(RESET_TIME);
 
     while (true)
@@ -168,7 +175,7 @@ AOS4Gui::run()
 		struct Window *_window = _glue.getWindow();
 		if (!_window)
 			return false;
-			
+
 	    if (_timeout && OS4_GetTicks() >= _timeout)
     	{
         	break;
@@ -229,7 +236,7 @@ AOS4Gui::run()
 													{
 														char SWFFile[1024];
 														BOOL result;
-														
+
 														result = IAsl->AslRequestTags( AmigaOS_FileRequester,
 															ASLFR_TitleText,        "Choose a video",
 															ASLFR_DoMultiSelect,    FALSE,
@@ -238,7 +245,7 @@ AOS4Gui::run()
 															ASLFR_InitialPattern,	(ULONG)"(#?.swf)",
 												    		ASLFR_InitialDrawer,    "PROGDIR:",
 															TAG_DONE);
-															
+
 														if (result == TRUE)
 														{
 															strcpy(SWFFile, AmigaOS_FileRequester->fr_Drawer);
@@ -262,6 +269,167 @@ AOS4Gui::run()
                 	    	                }
                     		            break;
                     		            case 1:
+    	        	                        switch (ITEMNUM(menucode))
+        	        	                    {
+        	        	                    	case 0:	/* Show Preferences */
+													struct Window 		*PrefsWindow;
+													struct GnashPrefs	*stored_prefs;
+
+													if ((AppPort = IExec->CreateMsgPort()) )
+													{
+														stored_prefs = ReadPrefs();
+														win = make_window(stored_prefs);
+
+														if ((PrefsWindow = RA_OpenWindow(win)))
+														{
+															uint32
+																sigmask     = 0,
+																siggot      = 0,
+																result      = 0;
+															uint16
+																code        = 0;
+															BOOL
+																done        = FALSE;
+															ULONG iValue;
+															ULONG sValue;
+															std::string tmp;
+															
+														    RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
+															
+															/* Due an undiscovered bug in my code (?) the string values must be set AFTER the window is created and opened */
+															/* Don't ask me why.. */
+															IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_LOGFILENAME_VALUE),	PrefsWindow, NULL, STRINGA_TextVal,stored_prefs->logfilename,	TAG_DONE);
+															IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_SHAREDOBJDIR_VALUE),	PrefsWindow, NULL, STRINGA_TextVal,stored_prefs->sharedobjdir,	TAG_DONE);
+															IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_MEDIASAVEDIR_VALUE),	PrefsWindow, NULL, STRINGA_TextVal,stored_prefs->savemediadir,	TAG_DONE);
+															IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_PLAYERVERSION_VALUE),	PrefsWindow, NULL, STRINGA_TextVal,stored_prefs->playerversion,	TAG_DONE);
+															IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_OS_VALUE),			PrefsWindow, NULL, STRINGA_TextVal,stored_prefs->detectedos,	TAG_DONE);
+															IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_URLOPENER_VALUE),		PrefsWindow, NULL, STRINGA_TextVal,stored_prefs->urlopener,		TAG_DONE);
+
+															IIntuition->GetAttr(WINDOW_SigMask, win, &sigmask);
+															while (!done)
+															{
+																siggot = IExec->Wait(sigmask | SIGBREAKF_CTRL_C);
+																if (siggot & SIGBREAKF_CTRL_C) done = TRUE;
+																while ((result = RA_HandleInput(win, &code)))
+																{
+																	switch(result & WMHI_CLASSMASK)
+																	{
+																		case WMHI_CLOSEWINDOW:
+																			done = TRUE;
+																			break;
+																		case WMHI_GADGETUP:
+																			switch (result & WMHI_GADGETMASK)
+																			{
+																				case OBJ_SCROLLER:
+																					char value[5];
+																					sprintf(value, "%d", code);
+																					IIntuition->RefreshSetGadgetAttrs(GAD(OBJ_SCROLLER_VALUE), PrefsWindow, NULL, GA_Text, value,TAG_DONE);
+																				break;
+																				case OBJ_CANCEL:
+																					done=TRUE;
+																				break;
+																				case OBJ_OK:
+																					IIntuition->GetAttr(SCROLLER_Top, (Object *)GAD(OBJ_SCROLLER), &iValue);
+																					_rcfile.verbosityLevel(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGTOFILE), &iValue);
+																					_rcfile.useWriteLog(iValue);
+																					
+																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_LOGFILENAME_VALUE), &sValue);
+																			        tmp.assign((const char *)sValue);
+																					_rcfile.setDebugLog(tmp);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGPARSER), &iValue);
+																					_rcfile.useParserDump(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGSWF), &iValue);
+																					_rcfile.useActionDump(iValue);
+																					
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGMALFORMEDSWF), &iValue);
+																					_rcfile.showMalformedSWFErrors(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGACTIONSCRIPT), &iValue);
+																					_rcfile.showASCodingErrors(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGLOCALCONNECTION), &iValue);
+																					_rcfile.setLCTrace(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_CONNECTLOCALHOST), &iValue);
+																					_rcfile.useLocalHost(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_CONNECTLOCALDOMAIN), &iValue);
+																					_rcfile.useLocalDomain(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_DISABLESSL), &iValue);
+																					_rcfile.insecureSSL(iValue);
+
+																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_SHAREDOBJDIR_VALUE), &sValue);
+																			        tmp.assign((const char *)sValue);
+																					_rcfile.setSOLSafeDir(tmp);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_DONTWRITESHAREDOBJ), &iValue);
+																					_rcfile.setSOLReadOnly(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_ONLYLOCALSHAREDOBJ), &iValue);
+																					_rcfile.setSOLLocalDomain(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_DISABLELOCALCONNOBJ), &iValue);
+																					_rcfile.setLocalConnection(iValue);
+
+																					IIntuition->GetAttr(INTEGER_Number, (Object *)GAD(OBJ_NETWORKTIMEOUT), &iValue);
+																					_rcfile.setStreamsTimeout(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_USESOUNDHANDLER), &iValue);
+																					_rcfile.useSound(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_SAVEMEDIASTREAMS), &iValue);
+																					_rcfile.saveStreamingMedia(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_SEVEDYNAMICSTREAMS), &iValue);
+																					_rcfile.saveLoadedMedia(iValue);
+
+																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_MEDIASAVEDIR_VALUE), &sValue);
+																			        tmp.assign((const char *)sValue);
+																					_rcfile.setMediaDir(tmp);
+
+																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_PLAYERVERSION_VALUE), &sValue);
+																			        tmp.assign((const char *)sValue);
+																					_rcfile.setFlashVersionString(tmp);
+
+																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_OS_VALUE), &sValue);
+																			        tmp.assign((const char *)sValue);
+																					_rcfile.setFlashSystemOS(tmp);
+
+																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_URLOPENER_VALUE), &sValue);
+																			        tmp.assign((const char *)sValue);
+																					_rcfile.setURLOpenerFormat(tmp);
+
+																					IIntuition->GetAttr(INTEGER_Number, (Object *)GAD(OBJ_SIZEMOVIELIB), &iValue);
+																					_rcfile.setMovieLibraryLimit(iValue);
+
+																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_STARTINPAUSE), &iValue);
+																					_rcfile.startStopped(iValue);
+
+																			    	_rcfile.updateFile();
+																			    	done = TRUE;
+																				break;
+																			}
+																			break;
+																		case WMHI_ICONIFY:
+																			if (RA_Iconify(win)) PrefsWindow = NULL;
+																			break;
+																		case WMHI_UNICONIFY:
+																			PrefsWindow = RA_OpenWindow(win);
+																			break;
+																	}
+																}
+															}
+															IIntuition->DisposeObject(win);
+														}
+														IExec->DeleteMsgPort(AppPort);
+													}
+		                    		            break;
+											}
                     		            break;
                     		            case 2:
     	        	                        switch (ITEMNUM(menucode))
@@ -279,7 +447,7 @@ AOS4Gui::run()
 														nm[13].nm_Flags = MENUTOGGLE|CHECKIT|CHECKED;
 													else
 														nm[13].nm_Flags = MENUTOGGLE|CHECKIT;
-    
+
 													// refresh to clear the remaining red lines...
 													if (!showUpdatedRegions()) refreshView();
 												break;
@@ -352,7 +520,7 @@ AOS4Gui::run()
 						}
 					break;
 					case IDCMP_RAWKEY:
-						if (imsg->IDCMPWindow == _window) 
+						if (imsg->IDCMPWindow == _window)
 						{
 							IExec->ReplyMsg ((struct Message *)imsg);
 							if ( (imsg->Code  & ~IECODE_UP_PREFIX) == RAWKEY_ESC) //ESC
@@ -439,7 +607,7 @@ AOS4Gui::createWindow(const char *title, int width, int height)
 	_window_title = (char*)malloc(strlen(title)+1);
 	memset(_window_title,0x0,strlen(title)+1);
 	strcpy(_window_title,title);
-	
+
 	IIntuition->SetWindowTitles(_window,title,title);
 
     return true;
@@ -510,7 +678,7 @@ AOS4Gui::unsetFullscreen()
     _fullscreen = false;
 }
 
-bool 
+bool
 AOS4Gui::showMouse(bool show)
 {
     bool state = _mouseShown;
@@ -533,7 +701,7 @@ AOS4Gui::showMouse(bool show)
 	}
 
     return state;
-	
+
 }
 
 key::code
@@ -643,7 +811,7 @@ AOS4Gui::PrintMsg( CONST_STRPTR text )
 {
 	Object *reqobj;
 
-	reqobj = IIntuition->NewObject( IRequester->REQUESTER_GetClass(), NULL,
+	reqobj = (Object *)IIntuition->NewObject( IRequester->REQUESTER_GetClass(), NULL,
             REQ_Type,       REQTYPE_INFO,
 			REQ_TitleText,  "Gnash",
             REQ_BodyText,   text,
@@ -678,6 +846,43 @@ AOS4Gui::showAboutDialog(void)
 						"\n\nAmigaOS4 Version by Andrea Palmatè - http://www.amigasoft.net";
 
 	PrintMsg(about);
+}
+
+struct GnashPrefs *
+AOS4Gui::ReadPrefs(void)
+{
+    RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
+	struct GnashPrefs *localprefs;
+
+	localprefs = (struct GnashPrefs *) malloc(sizeof(GnashPrefs));
+	memset(localprefs, 0, sizeof(GnashPrefs));
+
+	localprefs->verbosity 			= _rcfile.verbosityLevel();
+	localprefs->logtofile 			= _rcfile.useWriteLog();
+	strncpy(localprefs->logfilename, 	_rcfile.getDebugLog().c_str(), 			 254);
+	localprefs->logparser 			= _rcfile.useParserDump();
+	localprefs->logswf    			= _rcfile.useActionDump();
+	localprefs->logmalformedswf 	= _rcfile.showMalformedSWFErrors();
+	localprefs->logactionscript		= _rcfile.showASCodingErrors();
+	localprefs->loglocalconn		= _rcfile.getLCTrace();
+	localprefs->connectlocalhost	= _rcfile.useLocalHost();
+	localprefs->connectlocaldomain	= _rcfile.useLocalDomain();
+	localprefs->disablessl			= _rcfile.insecureSSL();
+	strncpy(localprefs->sharedobjdir, 	_rcfile.getSOLSafeDir().c_str(), 		 254);
+	localprefs->dontwriteso			= _rcfile.getSOLReadOnly();
+	localprefs->onlylocalso			= _rcfile.getSOLLocalDomain();
+	localprefs->disablelocal		= _rcfile.getLocalConnection();
+	localprefs->nettimeout			= _rcfile.getStreamsTimeout();
+	localprefs->usesound			= _rcfile.useSound();
+	localprefs->savemedia			= _rcfile.saveStreamingMedia();
+	localprefs->savedynamic			= _rcfile.saveLoadedMedia();
+	strncpy(localprefs->savemediadir, 	_rcfile.getMediaDir().c_str(), 			 254);
+	strncpy(localprefs->playerversion, 	_rcfile.getFlashVersionString().c_str(), 31);
+	strncpy(localprefs->detectedos, 	_rcfile.getFlashSystemOS().c_str(), 	 31);
+	strncpy(localprefs->urlopener, 		_rcfile.getURLOpenerFormat().c_str(),	 254);
+	localprefs->maxsizemovielib		= _rcfile.getMovieLibraryLimit();
+	localprefs->startpaused			= _rcfile.startStopped();
+	return localprefs;
 }
 
 } // namespace gnash

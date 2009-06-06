@@ -22,7 +22,7 @@ if BUILD_AMIGAOS4_GUI
 bin_PROGRAMS += aos4-gnash
 aos4_gnash_CPPFLAGS = -DGUI_AOS4 -DGUI_CONFIG=\"AOS4\" \
 	 $(AM_CPPFLAGS) $(AOS4_CFLAGS) 
-aos4_gnash_SOURCES = $(GUI_SRCS) gui_aos4.cpp aos4.cpp aos4sup.h aos4_glue.h
+aos4_gnash_SOURCES = $(GUI_SRCS) aos4_gnash_prefs.cpp aos4_gnash_prefs.h gui_aos4.cpp aos4.cpp aos4sup.h aos4_glue.h 
 aos4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #aos4_gnash_DEPENDENCIES = .configline
 aos4_gnash_LDADD = \
