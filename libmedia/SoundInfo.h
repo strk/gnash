@@ -53,16 +53,26 @@ public:
 	///
 	/// @param is16bit
 	///     If true, the sound is in 16bit format (samplesize == 2)
-    ///     else it is 8bit (samplesize == 1).
-    ///     Used for streams when decoding adpcm.
+	///     else it is 8bit (samplesize == 1).
+	///     Used for streams when decoding adpcm.
+	///
+	/// @param delaySeek
+	///     Number of samples to seek forward or delay.
+	///     If this value is positive, the player seeks this
+	///     number of samples into the sound block before the
+	///     sound is played.
+	///     If this value is negative the player plays this
+	///     number of silent samples before playing the sound block
 	///
 	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate,
-            boost::uint32_t sampleCount, bool is16bit)
+            boost::uint32_t sampleCount, bool is16bit,
+            boost::int16_t delaySeek=0)
 	    :
         _format(format),
 		_stereo(stereo),
 		_sampleRate(sampleRate),
 		_sampleCount(sampleCount),
+		_delaySeek(delaySeek),
 		_is16bit(is16bit)
 	{
 	}
@@ -91,6 +101,9 @@ public:
 	///
 	unsigned long getSampleCount() const { return _sampleCount; }
 
+	/// Return the number of samples to seek forward or delay.
+	boost::int16_t getDelaySeek() const { return _delaySeek; }
+
 	/// Returns the 16bit status of the sound
 	//
 	/// @return the 16bit status of the sound
@@ -111,6 +124,9 @@ private:
 
 	/// Number of samples
 	boost::uint32_t _sampleCount;
+
+	/// Number of samples to seek forward or delay.
+	boost::int16_t _delaySeek;
 
 	/// Is the audio in 16bit format (samplesize == 2)? else it 
 	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
