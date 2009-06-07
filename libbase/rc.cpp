@@ -512,6 +512,9 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_solreadonly, "SOLReadOnly", variable,
                            value)
             ||
+                 extractSetting(_sollocaldomain, "solLocalDomain", variable,
+                           value)
+            ||
                  extractSetting(_lcdisabled, "LocalConnection", variable,
                            value)
             ||
@@ -689,6 +692,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "delay " << _delay << endl <<
     cmd << "verbosity " << _verbosity << endl <<
     cmd << "solReadOnly " << _solreadonly << endl <<
+	cmd << "solLocalDomain " << _sollocaldomain << endl <<
     cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
     cmd << "LCTrace " << _lctrace << endl <<

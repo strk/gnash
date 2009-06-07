@@ -217,6 +217,13 @@
 	  <entry>The full path to a directory where &app; should store Shared Object files (&quot;flash cookies&quot;) if
 	  they are enabled.</entry>
 	</row>
+
+	<row>
+	  <entry>solLocalDomain</entry>
+	  <entry>on/off</entry>
+	  <entry>If set to <emphasis>on</emphasis>, allow the loading of
+	  Shared Objects only on the localhost.</entry>
+	</row>
 	
 	<row>
 	  <entry>SOLreadonly</entry>
