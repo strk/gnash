@@ -41,5 +41,5 @@ SAMPLER_HEADERS += asobj/flash/sampler/StackFrame_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SAMPLER_SOURCES)
-noinst_HEADERS +=  $(SAMPLER_HEADERS) flash/sampler/samplerclasses.h
+noinst_HEADERS +=  $(SAMPLER_HEADERS) asobj/flash/sampler/samplerclasses.h
 

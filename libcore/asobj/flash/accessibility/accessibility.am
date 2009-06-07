@@ -32,5 +32,5 @@ endif
 
 libgnashasobjs_la_SOURCES += $(ACCESSIBILITY_SOURCES)
 noinst_HEADERS +=  $(ACCESSIBILITY_HEADERS) \
-	flash/accessibility/accessibilityclasses.h
+	asobj/flash/accessibility/accessibilityclasses.h
 

@@ -191,5 +191,5 @@ DISPLAY_HEADERS += asobj/flash/display/Stage_as.h
 
 libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES) $(DISPLAY_SOURCES_AS2)
 noinst_HEADERS +=  $(DISPLAY_HEADERS) $(DISPLAY_HEADERS_AS2) \
-	flash/display/displayclasses.h
+	asobj/flash/display/displayclasses.h
 

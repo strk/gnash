@@ -26,5 +26,5 @@ EXTERNAL_HEADERS += asobj/flash/external/ExternalInterface_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(EXTERNAL_SOURCES)
-noinst_HEADERS +=  $(EXTERNAL_HEADERS) flash/external/externalclasses.h
+noinst_HEADERS +=  $(EXTERNAL_HEADERS) asobj/flash/external/externalclasses.h
 

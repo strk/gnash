@@ -15,6 +15,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
+EXTRA_DIST += aos4_ogl_glue.cpp aos4_ogl_glue.h
+
 #
 # Build the AOS4 gui
 #
@@ -31,12 +33,12 @@ aos4_gnash_LDADD = \
 	$(AM_LDFLAGS) \
 	$(AOS4_LIBS)
 
-if BUILD_OGL_RENDERER
-aos4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-aos4_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
-	$(OPENGL_LIBS)
-aos4_gnash_SOURCES += aos4_ogl_glue.cpp aos4_ogl_glue.h 
-endif
+# if BUILD_OGL_RENDERER
+# aos4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+# aos4_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+# 	$(OPENGL_LIBS)
+# aos4_gnash_SOURCES += aos4_ogl_glue.cpp aos4_ogl_glue.h 
+# endif
 
 if BUILD_AGG_RENDERER
 aos4_gnash_CPPFLAGS += $(AGG_CFLAGS)
@@ -45,10 +47,10 @@ aos4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
 aos4_gnash_SOURCES += aos4_agg_glue.cpp aos4_agg_glue.h 
 endif
 
-if BUILD_CAIRO_RENDERER
-aos4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-aos4_gnash_LDADD += $(top_builddir)/backend/libgnashcairo.la \
-	$(CAIRO_LIBS) 
-aos4_gnash_SOURCES += aos4_cairo_glue.cpp aos4_cairo_glue.h 
-endif
+# if BUILD_CAIRO_RENDERER
+# aos4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+# aos4_gnash_LDADD += $(top_builddir)/backend/libgnashcairo.la \
+# 	$(CAIRO_LIBS) 
+# aos4_gnash_SOURCES += aos4_cairo_glue.cpp aos4_cairo_glue.h 
+# endif
 endif

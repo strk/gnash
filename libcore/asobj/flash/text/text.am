@@ -117,4 +117,4 @@ TEXT_HEADERS += asobj/flash/text/TextSnapshot_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(TEXT_SOURCES) $(TEXT_SOURCES_AS2)
-noinst_HEADERS +=  $(TEXT_HEADERS) $(TEXT_HEADERS_AS2) flash/text/textclasses.h
+noinst_HEADERS +=  $(TEXT_HEADERS) $(TEXT_HEADERS_AS2) asobj/flash/text/textclasses.h

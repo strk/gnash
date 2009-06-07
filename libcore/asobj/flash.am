@@ -26,75 +26,75 @@ BUILT_SOURCES =
 # pkglib_LTLIBRARIES += libgnashasobjs.la 
 
 libgnashasobjs_la_SOURCES = \
-	AsBroadcaster.cpp \
-	Array_as.cpp \
-	Boolean_as.cpp \
-	Camera.cpp \
-	Color_as.cpp \
-	ContextMenu.cpp	\
-	CustomActions.cpp\
-	Date_as.cpp \
-	Error_as.cpp \
-	Global.cpp \
-	int_as.cpp \
-	Key_as.cpp	\
-	LoadVars_as.cpp \
-	LocalConnection_as.cpp\
-	Math_as.cpp \
-	Microphone.cpp	\
-	NetConnection_as.cpp \
-	NetStream_as.cpp \
-	Number_as.cpp \
-	PlayHead.cpp \
-	Selection_as.cpp \
-	SharedObject_as.cpp\
-	Namespace_as.cpp \
-	Sound_as.cpp \
-	Stage_as.cpp \
-	System_as.cpp \
-	TextFormat_as.cpp \
-	TextSnapshot_as.cpp \
-	MovieClipLoader.cpp\
-	String_as.cpp \
-	XML_as.cpp \
-	XMLSocket_as.cpp \
-	LoadableObject.cpp \
-	Object.cpp
+	asobj/AsBroadcaster.cpp \
+	asobj/Array_as.cpp \
+	asobj/Boolean_as.cpp \
+	asobj/Camera.cpp \
+	asobj/Color_as.cpp \
+	asobj/ContextMenu.cpp	\
+	asobj/CustomActions.cpp\
+	asobj/Date_as.cpp \
+	asobj/Error_as.cpp \
+	asobj/Global.cpp \
+	asobj/int_as.cpp \
+	asobj/Key_as.cpp	\
+	asobj/LoadVars_as.cpp \
+	asobj/LocalConnection_as.cpp\
+	asobj/Math_as.cpp \
+	asobj/Microphone.cpp	\
+	asobj/NetConnection_as.cpp \
+	asobj/NetStream_as.cpp \
+	asobj/Number_as.cpp \
+	asobj/PlayHead.cpp \
+	asobj/Selection_as.cpp \
+	asobj/SharedObject_as.cpp\
+	asobj/Namespace_as.cpp \
+	asobj/Sound_as.cpp \
+	asobj/Stage_as.cpp \
+	asobj/System_as.cpp \
+	asobj/TextFormat_as.cpp \
+	asobj/TextSnapshot_as.cpp \
+	asobj/MovieClipLoader.cpp\
+	asobj/String_as.cpp \
+	asobj/XML_as.cpp \
+	asobj/XMLSocket_as.cpp \
+	asobj/LoadableObject.cpp \
+	asobj/Object.cpp
 
 noinst_HEADERS += \
-	AsBroadcaster.h \
-	Boolean_as.h \
-	Camera.h \
-	Color_as.h	\
-	ContextMenu.h \
-	CustomActions.h	\
-	Date_as.h \
-	Error_as.h	\
-	Math_as.h	\
-	Global.h\
-	int_as.h \
-	Key_as.h \
-	LoadVars_as.h \
-	LocalConnection_as.h\
-	Microphone.h \
-	MovieClipLoader.h \
-	NetConnection_as.h	\
-	NetStream_as.h \
-	Number_as.h \
-	PlayHead.h \
-	Selection_as.h \
-	SharedObject_as.h \
-	Sound_as.h \
-	Stage_as.h	\
-	System_as.h \
-	TextFormat_as.h \
-	TextSnapshot_as.h \
-	String_as.h \
-	XML_as.h \
-	XMLSocket_as.h \
-	LoadableObject.h \
-	Namespace_as.h \
-	Object.h
+	asobj/AsBroadcaster.h \
+	asobj/Boolean_as.h \
+	asobj/Camera.h \
+	asobj/Color_as.h	\
+	asobj/ContextMenu.h \
+	asobj/CustomActions.h	\
+	asobj/Date_as.h \
+	asobj/Error_as.h	\
+	asobj/Math_as.h	\
+	asobj/Global.h\
+	asobj/int_as.h \
+	asobj/Key_as.h \
+	asobj/LoadVars_as.h \
+	asobj/LocalConnection_as.h\
+	asobj/Microphone.h \
+	asobj/MovieClipLoader.h \
+	asobj/NetConnection_as.h	\
+	asobj/NetStream_as.h \
+	asobj/Number_as.h \
+	asobj/PlayHead.h \
+	asobj/Selection_as.h \
+	asobj/SharedObject_as.h \
+	asobj/Sound_as.h \
+	asobj/Stage_as.h	\
+	asobj/System_as.h \
+	asobj/TextFormat_as.h \
+	asobj/TextSnapshot_as.h \
+	asobj/String_as.h \
+	asobj/XML_as.h \
+	asobj/XMLSocket_as.h \
+	asobj/LoadableObject.h \
+	asobj/Namespace_as.h \
+	asobj/Object.h
 
 EXTENSIONS_API += \
 	asobj/Array_as.h \
