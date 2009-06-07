@@ -97,15 +97,29 @@ public:
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
     
+    void setDocumentRoot(const std::string &x) { _wwwroot = x; }
+    std::string getDocumentRoot() { return _wwwroot; }
+    
+    void setCgiRoot(const std::string &x) { _cgiroot = x; }
+    std::string getCgiRoot() { return _cgiroot; }
+    
     /// \overload dump(std::ostream& os) const
     void dump(std::ostream& os) const;
     
-  private:
     /// Construct only by getDefaultInstance()
     CRcInitFile();
     /// Never destroy (TODO: add a destroyDefaultInstance)
     ~CRcInitFile();
     
+  private:
+    /// \var _wwwroot
+    ///		The root path for the streaming server to find al files.
+    std::string _wwwroot;
+    
+    /// \var _cgiroot;
+    ///		This specifies the default directory for all cgi (exeutables).
+    std::string _cgiroot;
+
     /// \var _port_offset
     ///		This is an offset applied to all priviledged tcp/ip
     ///		ports. This enables the port number to be shifted into
@@ -140,6 +154,7 @@ public:
     ///		This toggles whether the admin thread is started or
     ///		not, also to reduce complecity when debugging.
     bool _admin;
+
 };
 
 /// \brief Dump to the specified output stream.

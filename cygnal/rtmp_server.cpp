@@ -904,7 +904,7 @@ rtmp_handler(Network::thread_params_t *args)
     string url, filespec;
     url = docroot;
     bool done = false;
-    RTMPMsg *body = 0;
+    boost::shared_ptr<RTMPMsg> body;
     static bool initialize = true;
     static bool echo = false;
     bool sendfile = false;

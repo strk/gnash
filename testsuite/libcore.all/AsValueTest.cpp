@@ -303,7 +303,7 @@ test_obj()
         }
     }
 
-    std::auto_ptr<Element> el1 = as1.to_element();
+    boost::shared_ptr<Element> el1 = as1.to_element();
     boost::shared_ptr<amf::Element> fooel = el1->getProperty(0);
     boost::shared_ptr<amf::Element> barel = el1->getProperty(1);
     if ((el1.get()->getType() == Element::OBJECT_AMF0)

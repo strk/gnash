@@ -28,9 +28,7 @@
 #include <string>
 #include <algorithm> //for std::find
 
-#ifndef NDEBUG
-# include <boost/thread.hpp>
-#endif
+#include <boost/thread.hpp>
 
 #include "dsodefs.h"
 
@@ -227,8 +225,10 @@ public:
 	///
 	void addCollectable(const GcResource* item)
 	{
+	  boost::thread self;
+	  // Don't add an object from a thread
+	  if (self == mainThread) {	  
 #ifndef NDEBUG
-		boost::thread self;
 		assert(self == mainThread);
 		assert(item);
 		assert(! item->isReachable());
@@ -237,6 +237,7 @@ public:
 #endif
 
 		_resList.push_back(item);
+	  }
 #if GNASH_GC_DEBUG > 1
 		log_debug(_("GC %p: collectable %p added, num collectables: %d"), (void*)this, (void*)item, _resList.size());
 #endif
@@ -301,12 +302,10 @@ private:
 
 	static GC* _singleton;
 
-#ifndef NDEBUG
 	/// The thread that initialized the GC is 
 	/// the only one allowed to run the collector
 	/// and to register collectable objects
 	boost::thread mainThread;
-#endif
 
 	/// Number of resources in collectable list at end of last
 	/// collect() call.

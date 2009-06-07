@@ -451,8 +451,6 @@ if {$sid > 0} {
     catch {close -i $sid}
 }
 
-
-
 # testcases is set by the Makefile in the site.exp data file.
 #foreach file $testcases {
 #     expect {

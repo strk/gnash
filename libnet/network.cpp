@@ -139,15 +139,7 @@ Network::createServer(short port)
     struct sockaddr_in sock_in;
     int             on, type;
     int             retries = 0;
-    in_addr_t       nodeaddr;
 
-#if 0
-    if (port < 1024) {
-	log_error(_("Can't connect to privileged port #%d"), port);
-	return -1;
-    }
-#endif
-    
     if (_listenfd >= 2) {
 	log_debug("already connected to port %hd", port);
 	return _listenfd;
@@ -201,6 +193,7 @@ Network::createServer(short port)
 
     retries = 0;
 
+//     in_addr_t       nodeaddr;
 //     nodeaddr = inet_lnaof(*thisaddr);
     while (retries < 5) {
         if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
@@ -355,6 +348,7 @@ Network::newConnection(bool block, int fd)
         if (ret == 0) {
             if (_debug) {
                 log_debug(_("The accept() socket for fd #%d timed out waiting to write"), fd);
+		return 0;
             }
         }
 	
@@ -520,12 +514,9 @@ Network::createClient(const string &hostname, short port)
     char                thishostname[MAXHOSTNAMELEN];
     struct protoent     *proto;
 
-    assert( ! connected() );
-
-    if (port < 1024) {
-        log_error(_("Can't connect to privileged port %hd"), port);
-        _connected = false;
-        return false;
+//    assert( ! connected() );
+    if (connected()) {
+	return true;
     }
 
     _port = port;    
@@ -824,6 +815,8 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
     fd_set              fdset;
     int                 ret = -1;
 
+//     boost::mutex::scoped_lock lock(_net_mutex);
+
     if (_debug) {
 	log_debug (_("Trying to read %d bytes from fd #%d"), nbytes, fd);
     }
@@ -1001,6 +994,8 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
     fd_set              fdset;
     int                 ret = -1;
 
+    boost::mutex::scoped_lock lock(_net_mutex);
+    
     // We need a writable, and not const point for byte arithmetic.
     byte_t *bufptr = const_cast<byte_t *>(buffer);
 

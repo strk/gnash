@@ -60,10 +60,10 @@ class Buffer;
 namespace gnash {
 
 // Define the ports for the RTMP protocols
-const short ADMIN_PORT = 1111;
-const short RTMP_PORT = 1935;
-const short RTMPE_PORT = 1935;
-const short RTMPT_PORT = 80;
+const short ADMIN_PORT  = 1111;
+const short RTMP_PORT   = 1935;
+const short RTMPE_PORT  = 1935;
+const short RTMPT_PORT  = 80;
 const short RTMPTE_PORT = 80;
 const short RTMPTS_PORT = 443;
 
@@ -234,10 +234,20 @@ public:
     int getListenFd() const { return _listenfd; };
     void setListenFd(int x) { _listenfd = x; };
     const std::string& getURL() const { return _url; }
+    void setURL(const std::string& url) { _url = url; }
+
     const std::string& getProtocol() const  { return _protocol; }
+    void setProtocol(const std::string& proto) { _protocol = proto; }
+
     const std::string& getHost() const { return _host; }
+    void setHost(const std::string& host) { _host = host; }
+
     const std::string& getPortStr() const { return _portstr; }
+    void setPortStr(const std::string& port) { _portstr = port; }
+
     const std::string& getPath() const { return _path; }
+    void setPath(const std::string& path) { _path = path; }
+
     void setTimeout(int x) { _timeout = x; }
     int getTimeout() const { return _timeout; }
 
@@ -277,12 +287,14 @@ public:
     bool        _connected;
     bool        _debug;
     int         _timeout;
+    size_t	_bytes_loaded;
     /// \var Handler::_handlers
     ///		Keep a list of all active network connections
     std::map<int, entry_t *> _handlers;
     std::vector<struct pollfd> _pollfds;
     // This is the mutex that controls access to the que.
     boost::mutex	_poll_mutex;
+    boost::mutex	_net_mutex;
 };
 
 } // end of gnash namespace

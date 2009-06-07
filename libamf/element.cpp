@@ -1451,13 +1451,9 @@ Element::setName(boost::uint8_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     if ((size > 0) && (name != 0)) {
-	if (isascii(*name)) {
-	    _name = new char[size+1];
-	    std::copy(name, name+size, _name);
-	    *(_name + size) = 0;
-	} else {
-	    log_error("Got unprintable characters for the element name!");
-	}
+	_name = new char[size+1];
+	std::copy(name, name+size, _name);
+	*(_name + size) = 0;
     }
 }
 

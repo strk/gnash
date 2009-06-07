@@ -136,22 +136,22 @@ main(int argc, char *argv[])
 void
 test_encoding()
 {
-//     00 06 67 65 74 77 61 79                <- getway, message #1
+//  00 06 67 65 74 77 61 79                <- getway, message #1
 //  00 04 2f 32 32 39                      <- /229, operation name
-//  00 00 00 0e				<- byte length of message
-//     0a 00 00 00 01			<- array, 1 item
+//  00 00 00 0e				   <- byte length of message
+//     0a 00 00 00 01			   <- array, 1 item
 //        00 41 70 43 87 20 00 00 00
 //
 //  00 06 67 65 74 77 61 79                <- getway, message #2
 //  00 04 2f 32 33 30                      <- /230, operation name
-//  00 00 00 0e				<- byte length of message
-//     0a 00 00 00 01			<- array, 1 item
+//  00 00 00 0e				   <- byte length of message
+//     0a 00 00 00 01			   <- array, 1 item
 //        00 41 70 43 ba 00 00 00 00
 //
 //  00 06 67 65 74 77 61 79                <- getway, message #3
 //  00 04 2f 32 33 31                      <- /231, operation name
-//  00 00 00 0e				<- byte length of message
-//     0a 00 00 00 01			<- array, 1 item
+//  00 00 00 0e				   <- byte length of message
+//     0a 00 00 00 01			   <- array, 1 item
 //        00 41 70 43 ac e0 00 00 00
     boost::shared_ptr<Buffer> buf1(new Buffer("00 00 00 00 00 03 00 06 67 65 74 77 61 79 00 04 2f 32 32 39 00 00 00 0e 0a 00 00 00 01 00 41 70 43 87 20 00 00 00 00 06 67 65 74 77 61 79 00 04 2f 32 33 30 00 00 00 0e 0a 00 00 00 01 00 41 70 43 ba 00 00 00 00 00 06 67 65 74 77 61 79 00 04 2f 32 33 31 00 00 00 0e 0a 00 00 00 01 00 41 70 43 ac e0 00 00 00"));
     double num = *(reinterpret_cast<double *>(buf1->reference()));

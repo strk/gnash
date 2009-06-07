@@ -108,7 +108,8 @@ public:
         HTTP_PUT,
         HTTP_DELETE,
         HTTP_TRACE,
-        HTTP_CONNECT
+        HTTP_CONNECT,
+	HTTP_RESPONSE		// unique to gnash
     } http_method_e;
     typedef enum {
 	OPEN,
@@ -116,10 +117,11 @@ public:
 	IDLE,
 	CLOSE
     } rtmpt_cmd_e;
-    struct status_codes {
-        const char *code;
-        const char *msg;
-    };
+    // A response from an FTTP request has a code an an error message
+    typedef struct {
+	http_status_e code;
+	std::string   msg;
+    } http_response_t;
     typedef struct {
 	int major;
 	int minor;
@@ -128,26 +130,18 @@ public:
     HTTP(Handler *hand);
     ~HTTP();
 
-    // These are for the protocol itself
-    http_method_e processClientRequest(int fd);
-    bool processGetRequest(int fd);
-    bool processPostRequest(int fd);
-    bool processPutRequest(int fd);
-    bool processDeleteRequest(int fd);
-    bool processConnectRequest(int fd);
-    bool processOptionsRequest(int fd);
-    bool processHeadRequest(int fd);
-    bool processTraceRequest(int fd);
-
     // Check the Header fields to make sure they're valid values.
     bool checkRequestFields(amf::Buffer &buf);
     bool checkEntityFields(amf::Buffer &buf);
     bool checkGeneralFields(amf::Buffer &buf);
 
-    // Parse an Echo Request message coming from the Red5 echo_test.
+//     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
+    // Convert the Content-Length field to a number we can use
+    size_t getContentLength();
+
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
@@ -160,7 +154,10 @@ public:
 
     // Get an array of values for header field 'name'.
     boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
-    
+
+    // Client side parsing of response message codes
+    boost::shared_ptr<http_response_t> parseStatus(const std::string &line);
+
     // Handle the response for the request.
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
     amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
@@ -171,19 +168,6 @@ public:
     // Make copies of ourself
     HTTP &operator = (HTTP &obj);
 
-    // These methods extract data from an RTMPT message. RTMP is an
-    // extension to HTTP that adds commands to manipulate the
-    // connection's persistance.
-    rtmpt_cmd_e extractRTMPT(boost::uint8_t *data);
-    rtmpt_cmd_e extractRTMPT(amf::Buffer &data)
-	{ return extractRTMPT(data.reference()); };
-
-    // Examine the beginning of the data for an HTTP request command
-    // like GET or POST, etc...
-    http_method_e extractCommand(boost::uint8_t *data);
-    http_method_e extractCommand(amf::Buffer &data)
-	{ return extractCommand(data.reference()); };    
-    
     /// @note These methods add data to the fields in the HTTP header.
     /// \brief clear the data in the stored header
     bool clearHeader();
@@ -249,7 +233,7 @@ public:
     // All HTTP messages are terminated with a blank line
     void terminateHeader() { _buffer += "\r\n"; };    
     
-    amf::Buffer &formatErrorResponse(http_status_e err);
+//     amf::Buffer &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
     boost::uint8_t *getHeader() { return _buffer.reference(); };
@@ -271,8 +255,11 @@ public:
     /// @param fd The file descriptor to read from
     ///
     /// @return The number of bytes sent
-    int DSOEXPORT recvMsg(int fd);
+    int recvMsg(int fd);
+    int recvMsg(int fd, size_t size);
 
+    size_t recvChunked(boost::uint8_t *data, size_t size);
+    
     /// \brief Send a message to the other end of the network connection.
     ///
     /// @param data A real pointer to the data.
@@ -283,12 +270,12 @@ public:
     /// @param void Send the contents of the _header and _body.
     ///
     /// @return The number of bytes sent
-    int DSOEXPORT sendMsg();
-    int DSOEXPORT sendMsg(int fd);
-    int DSOEXPORT sendMsg(const boost::uint8_t *data, size_t size);
-    int DSOEXPORT sendMsg(boost::shared_ptr<amf::Buffer> &buf)
+    int sendMsg();
+    int sendMsg(int fd);
+    int sendMsg(const boost::uint8_t *data, size_t size);
+    int sendMsg(boost::shared_ptr<amf::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
-    int DSOEXPORT sendMsg(std::stringstream &sstr)
+    int sendMsg(std::stringstream &sstr)
 	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
     
     // These accessors are used mostly just for debugging.
@@ -304,8 +291,24 @@ public:
     
     void setHandler(Handler *hand) { _handler = hand; };
     void setDocRoot(const std::string &path) { _docroot = path; };
+    std::string &getDocRoot() { return _docroot; };
     
-private:
+    // Pop the first date element off the que
+    boost::shared_ptr<amf::Buffer> DSOEXPORT popChunk() { return _que.pop(); };
+    // Peek at the first date element witjhout removing it from the que
+    boost::shared_ptr<amf::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
+    // Get the number of elements in the que
+    size_t DSOEXPORT sizeChunks() { return _que.size(); };
+
+    boost::shared_ptr<amf::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
+    
+protected:
+    // Examine the beginning of the data for an HTTP request command
+    // like GET or POST, etc...
+    http_method_e extractCommand(boost::uint8_t *data);
+    http_method_e extractCommand(amf::Buffer &data)
+	{ return extractCommand(data.reference()); };    
+
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
     http_method_e	_cmd;
@@ -332,7 +335,7 @@ private:
     std::string		_docroot;
 };  
 
-// This is the thread for all incoming HTTP connections
+// This is the thread for all incoming HTTP connections for the server
 extern "C" {
     bool DSOEXPORT http_handler(Network::thread_params_t *args);
 }

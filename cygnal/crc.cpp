@@ -186,6 +186,16 @@ CRcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
+            if (noCaseCompare(variable, "cgiroot") ) {
+                setCgiRoot(value);
+                continue;
+            }
+
+            if (noCaseCompare(variable, "documentroot") ) {
+                _wwwroot = value;
+                continue;
+            }
+            
             bool test;
             bool threads;
 	    bool netdebug;

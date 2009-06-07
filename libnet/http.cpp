@@ -34,8 +34,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
-#include "GnashSystemIOHeaders.h" // read()
 
+#include "GnashSystemIOHeaders.h" // read()
 #include "http.h"
 #include "amf.h"
 #include "element.h"
@@ -131,6 +131,220 @@ HTTP::operator = (HTTP& /*obj*/)
 //    this = obj;
     // TODO: FIXME !
     return *this; 
+}
+
+
+boost::uint8_t *
+HTTP::processHeaderFields(amf::Buffer &buf)
+{
+  //    GNASH_REPORT_FUNCTION;
+    string head(reinterpret_cast<const char *>(buf.reference()));
+
+    // The end of the header block is always followed by a blank line
+    string::size_type end = head.find("\r\n\r\n", 0);
+//    head.erase(end, buf.size()-end);
+    Tok t(head, Sep("\r\n"));
+    for (Tok::iterator i = t.begin(); i != t.end(); ++i) {
+	string::size_type pos = i->find(":", 0);
+ 	if (pos != string::npos) {
+	    string name = i->substr(0, pos);
+	    string value = i->substr(pos+2, i->size());
+ 	    std::transform(name.begin(), name.end(), name.begin(), 
+ 			   (int(*)(int)) tolower);
+ 	    std::transform(value.begin(), value.end(), value.begin(), 
+ 			   (int(*)(int)) tolower);
+ 	    _fields[name] = value;
+	    if (name == "keep-alive") {
+		_keepalive = true;
+		if ((value != "on") && (value != "off")) {
+		    _max_requests = strtol(value.c_str(), NULL, 0);
+		    log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
+		}
+	    }
+	    if (name == "connection") {
+		if (value.find("keep-alive", 0) != string::npos) {
+		    _keepalive = true;
+		}
+	    }
+	    if (name == "content-length") {
+		_filesize = strtol(value.c_str(), NULL, 0);
+		log_debug("Setting Content Length to %d", _filesize);
+	    }
+	    if (name == "content-type") {
+		// This is the type used by flash when sending a AMF data via POST
+		if (value == "application/x-amf") {
+//		    log_debug("Got AMF data in the POST request!");
+		    _filetype = DiskStream::FILETYPE_AMF;
+		}
+		// This is the type used by wget when sending a file via POST
+		if (value == "application/x-www-form-urlencoded") {
+//		    log_debug("Got file data in the POST request");
+		    _filetype = DiskStream::FILETYPE_ENCODED;
+		}
+		log_debug("Setting Content Type to %d", _filetype);
+	    }
+	    
+//	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
+	} else {
+	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
+	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
+		break;
+#if 1
+	    } else {
+		log_debug("Got a request, parsing \"%s\"", *i);
+		string::size_type start = i->find(" ");
+		string::size_type params = i->find("?");
+		string::size_type pos = i->find("HTTP/");
+		if (pos != string::npos) {
+		    // The version is the last field and is the protocol name
+		    // followed by a slash, and the version number. Note that
+		    // the version is not a double, even though it has a dot
+		    // in it. It's actually two separate integers.
+		    _version.major = i->at(pos+5) - '0';
+		    _version.minor = i->at(pos+7) - '0';
+		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+		    // the filespec in the request is the middle field, deliminated
+		    // by a space on each end.
+		    if (params != string::npos) {
+			_params = i->substr(params+1, end);
+			_filespec = i->substr(start+1, params);
+			log_debug("Parameters for file: \"%s\"", _params);
+		    } else {
+			_filespec = i->substr(start+1, pos-start-2);
+		    }
+		    log_debug("Requesting file: \"%s\"", _filespec);
+
+		    // HTTP 1.1 enables persistant network connections
+		    // by default.
+		    if (_version.minor > 0) {
+			log_debug("Enabling Keep Alive by default for HTTP > 1.0");
+			_keepalive = true;
+		    }
+		}
+	    }
+#endif
+	}
+    }
+    
+    return buf.reference() + end + 4;
+}
+
+// // Parse an Echo Request message coming from the Red5 echo_test. This
+// // method should only be used for testing purposes.
+// vector<boost::shared_ptr<amf::Element > >
+// HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
+// {
+// //    GNASH_REPORT_FUNCTION;
+    
+//     vector<boost::shared_ptr<amf::Element > > headers;
+	
+//     // skip past the header bytes, we don't care about them.
+//     boost::uint8_t *tmpptr = data + 6;
+    
+//     boost::uint16_t length;
+//     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+//     tmpptr += sizeof(boost::uint16_t);
+
+//     // Get the first name, which is a raw string, and not preceded by
+//     // a type byte.
+//     boost::shared_ptr<amf::Element > el1(new amf::Element);
+    
+//     // If the length of the name field is corrupted, then we get out of
+//     // range quick, and corrupt memory. This is a bit of a hack, but
+//     // reduces memory errors caused by some of the corrupted tes cases.
+//     boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
+//     if (endstr != tmpptr+length) {
+// 	log_debug("Caught corrupted string! length was %d, null at %d",
+// 		  length,  endstr-tmpptr);
+// 	length = endstr-tmpptr;
+//     }
+//     el1->setName(tmpptr, length);
+//     tmpptr += length;
+//     headers.push_back(el1);
+    
+//     // Get the second name, which is a raw string, and not preceded by
+//     // a type byte.
+//     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+//     tmpptr += sizeof(boost::uint16_t);
+//     boost::shared_ptr<amf::Element > el2(new amf::Element);
+
+// //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
+// //     el2->setName(name2.c_str(), name2.size());
+//     // If the length of the name field is corrupted, then we get out of
+//     // range quick, and corrupt memory. This is a bit of a hack, but
+//     // reduces memory errors caused by some of the corrupted tes cases.
+//     endstr = std::find(tmpptr, tmpptr+length, '\0');
+//     if (endstr != tmpptr+length) {
+// 	log_debug("Caught corrupted string! length was %d, null at %d",
+// 		  length,  endstr-tmpptr);
+// 	length = endstr-tmpptr;
+//     }
+//     el2->setName(tmpptr, length);
+//     headers.push_back(el2);
+//     tmpptr += length;
+
+//     // Get the last two pieces of data, which are both AMF encoded
+//     // with a type byte.
+//     amf::AMF amf;
+//     boost::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
+//     headers.push_back(el3);
+//     tmpptr += amf.totalsize();
+    
+//     boost::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
+//     headers.push_back(el4);
+
+//      return headers;
+// }
+
+// // format a response to the 'echo' test used for testing Gnash. This
+// // is only used for testing by developers. The format appears to be
+// // two strings, followed by a double, followed by the "onResult".
+// amf::Buffer &
+// HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     boost::shared_ptr<amf::Buffer> data;
+
+//     amf::Element nel;
+//     if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
+// 	nel.makeTypedObject();
+// 	string name = el.getName();
+// 	nel.setName(name);
+// 	if (el.propertySize()) {
+// 	    // FIXME: see about using std::reverse() instead.
+// 	    for (int i=el.propertySize()-1; i>=0; i--) {
+// // 	    for (int i=0 ; i<el.propertySize(); i++) {
+// 		boost::shared_ptr<amf::Element> child = el.getProperty(i);
+// 		nel.addProperty(child);
+// 	    }
+// 	    data = nel.encode();
+// 	} else {
+// 	    data = el.encode();
+// 	}
+//     } else {
+// 	data = el.encode();
+//     }
+
+//     return formatEchoResponse(num, data->reference(), data->allocated());
+// }
+
+#if 0				// FIXME:
+// Client side parsing of response message codes
+boost::shared_ptr<HTTP::http_response_t> 
+HTTP::parseStatus(const std::string &line)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    boost::shared_ptr<http_response_t> status;
+    // The respnse is a number followed by the error message.
+    string::size_type pos = line.find(" ", 0);
+    if (pos != string::npos) {
+	status.reset(new http_response_t);
+	status->code = static_cast<HTTP::http_status_e>(strtol(line.substr(0, pos).c_str(), NULL, 0));
+	status->msg = line.substr(pos+1, line.size());
+    }
+
+    return status;
 }
 
 HTTP::http_method_e
@@ -417,6 +631,21 @@ HTTP::processTraceRequest(int /* fd */)
     log_unimpl("TRACE request");
     return false;
 }
+#endif
+
+// Convert the Content-Length field to a number we can use
+size_t
+HTTP::getContentLength()
+{
+    //    GNASH_REPORT_FUNCTION;
+    std::string length = getField("content-length");
+    if (length.size() > 0) {
+	return static_cast<size_t>(strtol(length.c_str(), NULL, 0));
+    }
+
+    return 0;
+}
+
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
 bool
@@ -499,101 +728,6 @@ HTTP::checkGeneralFields(amf::Buffer & /* buf */)
 	};
 #endif
     return false;
-}
-
-boost::uint8_t *
-HTTP::processHeaderFields(amf::Buffer &buf)
-{
-  //    GNASH_REPORT_FUNCTION;
-    string head(reinterpret_cast<const char *>(buf.reference()));
-
-    // The end of the header block is always followed by a blank line
-    string::size_type end = head.find("\r\n\r\n", 0);
-//    head.erase(end, buf.size()-end);
-    Tok t(head, Sep("\r\n"));
-    for (Tok::iterator i = t.begin(); i != t.end(); ++i) {
-	string::size_type pos = i->find(":", 0);
- 	if (pos != string::npos) {
-	    string name = i->substr(0, pos);
-	    string value = i->substr(pos+2, i->size());
- 	    std::transform(name.begin(), name.end(), name.begin(), 
- 			   (int(*)(int)) tolower);
- 	    std::transform(value.begin(), value.end(), value.begin(), 
- 			   (int(*)(int)) tolower);
- 	    _fields[name] = value;
-	    if (name == "keep-alive") {
-		_keepalive = true;
-		if ((value != "on") && (value != "off")) {
-		    _max_requests = strtol(value.c_str(), NULL, 0);
-		    log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
-		}
-	    }
-	    if (name == "connection") {
-		if (value.find("keep-alive", 0) != string::npos) {
-		    _keepalive = true;
-		}
-	    }
-	    if (name == "content-length") {
-		_filesize = strtol(value.c_str(), NULL, 0);
-		log_debug("Setting Content Length to %d", _filesize);
-	    }
-	    if (name == "content-type") {
-		// This is the type used by flash when sending a AMF data via POST
-		if (value == "application/x-amf") {
-//		    log_debug("Got AMF data in the POST request!");
-		    _filetype = DiskStream::FILETYPE_AMF;
-		}
-		// This is the type used by wget when sending a file via POST
-		if (value == "application/x-www-form-urlencoded") {
-//		    log_debug("Got file data in the POST request");
-		    _filetype = DiskStream::FILETYPE_ENCODED;
-		}
-		log_debug("Setting Content Type to %d", _filetype);
-	    }
-	    
-//	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
-	} else {
-	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
-	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
-		break;
-#if 1
-	    } else {
-		log_debug("Got a request, parsing \"%s\"", *i);
-		string::size_type start = i->find(" ");
-		string::size_type params = i->find("?");
-		string::size_type pos = i->find("HTTP/");
-		if (pos != string::npos) {
-		    // The version is the last field and is the protocol name
-		    // followed by a slash, and the version number. Note that
-		    // the version is not a double, even though it has a dot
-		    // in it. It's actually two separate integers.
-		    _version.major = i->at(pos+5) - '0';
-		    _version.minor = i->at(pos+7) - '0';
-		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
-		    // the filespec in the request is the middle field, deliminated
-		    // by a space on each end.
-		    if (params != string::npos) {
-			_params = i->substr(params+1, end);
-			_filespec = i->substr(start+1, params);
-			log_debug("Parameters for file: \"%s\"", _params);
-		    } else {
-			_filespec = i->substr(start+1, pos-start-2);
-		    }
-		    log_debug("Requesting file: \"%s\"", _filespec);
-
-		    // HTTP 1.1 enables persistant network connections
-		    // by default.
-		    if (_version.minor > 0) {
-			log_debug("Enabling Keep Alive by default for HTTP > 1.0");
-			_keepalive = true;
-		    }
-		}
-	    }
-#endif
-	}
-    }
-    
-    return buf.reference() + end + 4;
 }
 
 boost::shared_ptr<std::vector<std::string> >
@@ -818,43 +952,6 @@ HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
 }
 
 amf::Buffer &
-HTTP::formatErrorResponse(http_status_e code)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    char num[12];
-    // First build the message body, so we know how to set Content-Length
-    _buffer += "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n";
-    _buffer += "<html><head>\r\n";
-    _buffer += "<title>";
-    sprintf(num, "%d", code);
-    _buffer += num;
-    _buffer += " Not Found</title>\r\n";
-    _buffer += "</head><body>\r\n";
-    _buffer += "<h1>Not Found</h1>\r\n";
-    _buffer += "<p>The requested URL ";
-    _buffer += _filespec;
-    _buffer += " was not found on this server.</p>\r\n";
-    _buffer += "<hr>\r\n";
-    _buffer += "<address>Cygnal (GNU/Linux) Server at ";
-    _buffer += getField("host");
-    _buffer += " </address>\r\n";
-    _buffer += "</body></html>\r\n";
-
-    // First build the header
-    formatDate();
-    formatServer();
-    formatContentLength(_filesize);
-    formatConnection("close");
-    formatContentType(_filetype);
-
-    // All HTTP messages are followed by a blank line.
-    terminateHeader();
-
-    return _buffer;
-}
-
-amf::Buffer &
 HTTP::formatDate()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1026,170 +1123,6 @@ HTTP::formatLastModified()
     return formatLastModified(date.str());
 }
 
-amf::Buffer &
-HTTP::formatGetReply(http_status_e code)
-{
-
-//    GNASH_REPORT_FUNCTION;
-    
-    return formatHeader(_filesize, code);
-}
-
-amf::Buffer &
-HTTP::formatGetReply(size_t size, http_status_e code)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    formatHeader(size, code);
-    
-//    int ret = Network::writeNet(_header.str());    
-//    boost::uint8_t *ptr = (boost::uint8_t *)_body.str().c_str();
-//     buf->copy(ptr, _body.str().size());
-//    _handler->dump();
-
-#if 0
-    if (_header.str().size()) {
-        log_debug (_("Sent GET Reply"));
-	return _buffer;
-    } else {
-	clearHeader();
-	log_debug (_("Couldn't send GET Reply, no header data"));
-    }    
-#endif
-    
-    return _buffer;
-}
-
-amf::Buffer &
-HTTP::formatPostReply(rtmpt_cmd_e /* code */)
-{
-    GNASH_REPORT_FUNCTION;
-
-    formatDate();
-    formatServer();
-    formatContentType(DiskStream::FILETYPE_AMF);
-    // All HTTP messages are followed by a blank line.
-    terminateHeader();
-    return _buffer;
-
-#if 0
-    formatHeader(_filesize, code);
-    boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
-    if (_header.str().size()) {
-	buf->resize(_header.str().size());
-	string str = _header.str();
-	buf->copy(str);
-	_handler->pushout(buf);
-	_handler->notifyout();
-        log_debug (_("Sent GET Reply"));
-	return true; // Default to true
-    } else {
-	clearHeader();
-	log_debug (_("Couldn't send POST Reply, no header data"));
-    }
-#endif
-
-    return _buffer;
-}
-
-// Parse an Echo Request message coming from the Red5 echo_test. This
-// method should only be used for testing purposes.
-vector<boost::shared_ptr<amf::Element > >
-HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    vector<boost::shared_ptr<amf::Element > > headers;
-	
-    // skip past the header bytes, we don't care about them.
-    boost::uint8_t *tmpptr = data + 6;
-    
-    boost::uint16_t length;
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
-
-    // Get the first name, which is a raw string, and not preceded by
-    // a type byte.
-    boost::shared_ptr<amf::Element > el1(new amf::Element);
-    
-    // If the length of the name field is corrupted, then we get out of
-    // range quick, and corrupt memory. This is a bit of a hack, but
-    // reduces memory errors caused by some of the corrupted tes cases.
-    boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
-    if (endstr != tmpptr+length) {
-	log_debug("Caught corrupted string! length was %d, null at %d",
-		  length,  endstr-tmpptr);
-	length = endstr-tmpptr;
-    }
-    el1->setName(tmpptr, length);
-    tmpptr += length;
-    headers.push_back(el1);
-    
-    // Get the second name, which is a raw string, and not preceded by
-    // a type byte.
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
-    boost::shared_ptr<amf::Element > el2(new amf::Element);
-
-//     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
-//     el2->setName(name2.c_str(), name2.size());
-    // If the length of the name field is corrupted, then we get out of
-    // range quick, and corrupt memory. This is a bit of a hack, but
-    // reduces memory errors caused by some of the corrupted tes cases.
-    endstr = std::find(tmpptr, tmpptr+length, '\0');
-    if (endstr != tmpptr+length) {
-	log_debug("Caught corrupted string! length was %d, null at %d",
-		  length,  endstr-tmpptr);
-	length = endstr-tmpptr;
-    }
-    el2->setName(tmpptr, length);
-    headers.push_back(el2);
-    tmpptr += length;
-
-    // Get the last two pieces of data, which are both AMF encoded
-    // with a type byte.
-    amf::AMF amf;
-    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
-    headers.push_back(el3);
-    tmpptr += amf.totalsize();
-    
-    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
-    headers.push_back(el4);
-
-     return headers;
-}
-
-// format a response to the 'echo' test used for testing Gnash. This
-// is only used for testing by developers. The format appears to be
-// two strings, followed by a double, followed by the "onResult".
-amf::Buffer &
-HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data;
-
-    amf::Element nel;
-    if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
-	nel.makeTypedObject();
-	string name = el.getName();
-	nel.setName(name);
-	if (el.propertySize()) {
-	    // FIXME: see about using std::reverse() instead.
-	    for (int i=el.propertySize()-1; i>=0; i--) {
-// 	    for (int i=0 ; i<el.propertySize(); i++) {
-		boost::shared_ptr<amf::Element> child = el.getProperty(i);
-		nel.addProperty(child);
-	    }
-	    data = nel.encode();
-	} else {
-	    data = el.encode();
-	}
-    } else {
-	data = el.encode();
-    }
-
-    return formatEchoResponse(num, data->reference(), data->allocated());
-}
 
 amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
@@ -1256,95 +1189,58 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
 }
 
 amf::Buffer &
-HTTP::formatRequest(const string & /* url */, http_method_e /* req */)
+HTTP::formatRequest(const string &url, http_method_e cmd)
 {
 //    GNASH_REPORT_FUNCTION;
-
-#if 0
-    _header.str("");
-
-    _header << req << " " << url << "HTTP/1.1" << "\r\n";
-    _header << "User-Agent: Opera/9.01 (X11; Linux i686; U; en)" << "\r\n";
-    _header << "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1" << "\r\n";
-
-    _header << "Accept-Language: en" << "\r\n";
-    _header << "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1" << "\r\n";
     
-    _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << "\r\n";
-    _header << "Referer: " << url << "\r\n";
+    clearHeader();
 
-    _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
-#endif
-    
+    switch (cmd) {
+    case HTTP::HTTP_GET:
+	_buffer = "GET ";
+	break;
+    case HTTP::HTTP_POST:
+	_buffer = "POST ";
+	break;
+    case HTTP::HTTP_HEAD:
+	_buffer = "HEAD ";
+	break;
+    case HTTP::HTTP_CONNECT:
+	_buffer = "CONNECT ";
+	break;
+    case HTTP::HTTP_TRACE:
+	_buffer = "TRACE ";
+	break;
+    case HTTP::HTTP_OPTIONS:
+	_buffer = "OPTIONS ";
+	break;
+    default:
+	break;
+    }
+    _buffer += url;
+
+    _buffer += " HTTP/1.1";
+//     sprintf(num, "%d.%d", _version.major, _version.minor);
+//     _buffer += num;
+    // end the line
+    _buffer += "\r\n";
+
+    formatHost("localhost");
+    formatAgent("Gnash");
+
+    // Post messages want a bunch more fields than a GET request
+    if (cmd == HTTP::HTTP_POST) {
+	formatContentType(DiskStream::FILETYPE_AMF);
+	formatEncoding("deflate, gzip, x-gzip, identity, *;q=0");
+	formatConnection("Keep-Alive");
+    }
+
+//     // All HTTP messages are followed by a blank line.
+//     terminateHeader();
+
     return _buffer;
 }
 
-/// These methods extract data from an RTMPT message. RTMP is an
-/// extension to HTTP that adds commands to manipulate the
-/// connection's persistance.
-//
-/// The URL to be opened has the following form:
-/// http://server/<comand>/[<client>/]<index>
-/// <command>
-///    denotes the RTMPT request type, "OPEN", "SEND", "IDLE", "CLOSE")
-/// <client>
-///    specifies the id of the client that performs the requests
-///    (only sent for established sessions)
-/// <index>
-///    is a consecutive number that seems to be used to detect missing packages
-HTTP::rtmpt_cmd_e
-HTTP::extractRTMPT(boost::uint8_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-
-    string body = reinterpret_cast<const char *>(data);
-    string tmp, cid, indx;
-    HTTP::rtmpt_cmd_e cmd;
-
-    // force the case to make comparisons easier
-    std::transform(body.begin(), body.end(), body.begin(), 
-               (int(*)(int)) toupper);
-    string::size_type start, end;
-
-    // Extract the command first
-    start = body.find("OPEN", 0);
-    if (start != string::npos) {
-        cmd = HTTP::OPEN;
-    }
-    start = body.find("SEND", 0);
-    if (start != string::npos) {
-        cmd = HTTP::SEND;
-    }
-    start = body.find("IDLE", 0);
-    if (start != string::npos) {
-        cmd = HTTP::IDLE;
-    }
-    start = body.find("CLOSE", 0);
-    if (start != string::npos) {
-        cmd = HTTP::CLOSE;
-    }
-
-    // Extract the optional client id
-    start = body.find("/", start+1);
-    if (start != string::npos) {
-	end = body.find("/", start+1);
-	if (end != string::npos) {
-	    indx = body.substr(end, body.size());
-	    cid = body.substr(start, (end-start));
-	} else {
-	    cid = body.substr(start, body.size());
-	}
-    }
-
-    _index = strtol(indx.c_str(), NULL, 0);
-    _clientid = strtol(cid.c_str(), NULL, 0);
-    end =  body.find("\r\n", start);
-//     if (end != string::npos) {
-//         cmd = HTTP::CLOSE;
-//     }
-
-    return cmd;
-}
 
 HTTP::http_method_e
 HTTP::extractCommand(boost::uint8_t *data)
@@ -1375,6 +1271,8 @@ HTTP::extractCommand(boost::uint8_t *data)
         cmd = HTTP::HTTP_OPTIONS;
     } else if (memcmp(data, "DELETE", 4) == 0) {
         cmd = HTTP::HTTP_DELETE;
+    } else if (memcmp(data, "HTTP", 4) == 0) {
+        cmd = HTTP::HTTP_RESPONSE;
     }
 
     // For valid requests, the second argument, delimited by spaces
@@ -1451,18 +1349,152 @@ HTTP::sendMsg(const boost::uint8_t *data, size_t size)
     return Network::writeNet(data, size);
 }
 
+size_t
+HTTP::recvChunked(boost::uint8_t *data, size_t size)
+{
+//     GNASH_REPORT_FUNCTION;
+    bool done = false;
+    bool chunks = true;
+    size_t total = 0;
+    size_t pktsize = 0;
+    
+    if (size == 0) {
+	return 0;
+    }
+    
+    // A chunked transfer sends a count of bytes in ASCII hex first,
+    // and that line is terminated with the usual \r\n HTTP header field
+    // line number. There is supposed to be a ';' before the \r\n, as this
+    // field can have other attributes, but the OpenStreetMap server doesn't
+    // use the semi-colon, as it's optional, and rarely used anyway.
+    boost::shared_ptr<amf::Buffer> buf;
+    boost::uint8_t *start = std::find(data, data+size, '\r') + 2;
+    if (start != data+size) {
+	// extract the total size of the chunk
+	std::string bytes(data, start-2);
+	size_t sizesize = start-data;
+	total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
+	log_debug("%s: Total size for first chunk is: %d, data size %d (%d)",
+		  __PRETTY_FUNCTION__, total, size, sizesize);
+	buf.reset(new amf::Buffer(total+2));
+	// Add the existing data from the previous packet
+	buf->copy(data+sizesize, size-sizesize);
+    }
+
+    // The size of the packet we need to read has a 2 byte terminator "\r\n",
+    // like any other HTTP header field, so we have to read those bytes too
+    // so we can stay sychronized with the start of each chunk.
+    pktsize = total - buf->allocated() + 2;
+//     log_debug("%s: Total Packet size for first chunk is: %d", __PRETTY_FUNCTION__,
+// 	      pktsize);
+    
+    done = false;
+    size_t ret = 0;
+
+    // Keep reading chunks as long as they arrive
+    while (chunks) {
+	do {
+	    if (!pktsize) {
+		total = 0;
+		// Only read a few bytes, as we have todo a resize, so the less
+		// data to copy the better. We only do this to get the total size
+		// of the chunk, which we need to know when it's done. As we can't
+		// tell we're done processing chunks till one has a length of
+		// "0\r\n", this is important.
+		pktsize = 12;
+		buf.reset(new amf::Buffer(pktsize+2));
+	    }
+	    ret = readNet(buf->reference() + buf->allocated(), pktsize, 60);
+ 	    //buf->dump();
+	    // We got data.
+	    if (ret == 0) {
+		log_debug("no data yet for fd #%d, continuing...", getFileFd());
+		done = true;
+	    }
+	    if (ret) {
+		// manually set the seek pointer in the buffer, as we read
+		// the data into the raw memory allocated to the buffer. We
+		// only want to do this if we got data of course.
+		buf->setSeekPointer(buf->end() + ret);
+		if (!total) {
+		    start = std::find(buf->reference(), buf->reference()+ret, '\r') + 2;
+		    if (start != buf->reference()+ret) {
+			// extract the total size of the chunk
+			std::string bytes(buf->reference(), start-2);
+			total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
+			// The total size of the last chunk is always "0"
+			if (total == 0) {
+			    log_debug("%s: end of chunks!", __PRETTY_FUNCTION__);
+			    pktsize = 0;
+			    done = true;
+			    chunks = false;
+			} else {
+			    pktsize = total+8; // FIXME: why do we need an 8 here ?
+// 			    log_debug("%s: Total size for chunk is: %d (%s), adding %d bytes",
+// 				      __PRETTY_FUNCTION__, total, bytes, (start - buf->reference()));
+			    amf::Buffer tmpbuf(start - buf->reference());
+			    // don't forget the two bytes for the "\r\n"
+			    tmpbuf.copy(buf->reference() + bytes.size() + 2, (start - buf->reference()));
+			    buf->clear(); // FIXME: debug only
+			    buf->resize(total);
+ 			    buf->copy(tmpbuf.reference(), tmpbuf.size());
+			}
+		    }
+		}
+		
+		// If we got less data than specified, we need to keep reading data
+		if (ret < buf->size()) {
+		    pktsize -= ret;
+		    if (pktsize == 0) {
+			done = true;
+		    } else {
+// 			log_debug("Didn't get a full packet, reading more data");
+			continue;
+		    }
+		}
+	    }
+	} while (!done);
+//  	log_debug("%s: finished packet, ret is %d, pktsize is %d\r\n%s", __PRETTY_FUNCTION__, ret, pktsize,
+//  		  hexify(buf->reference(), buf->allocated(), true));
+	if (pktsize == 0) {
+	    // The last two bytes of the chunk are always "\r\n", which we remove so it
+	    // doesn't become part of the binary data being sent in the chunk.
+	    if ((*(buf->end()-2) == '\r') && (*(buf->end()-1) == '\n')) {
+		*(buf->end()-2) = 0; // '\r'
+		*(buf->end()-1) = 0; // '\n'
+		buf->setSeekPointer(buf->end() - 2);
+	    }
+	    _que.push(buf);
+	}
+	done = false;		// reset
+    } // end of while chunks
+    
+    return _que.size();
+}
+
 int
 HTTP::recvMsg(int fd)
 {
+//     GNASH_REPORT_FUNCTION;
+    return recvMsg(fd, 0);
+}
+
+int
+HTTP::recvMsg(int fd, size_t size)
+{
     GNASH_REPORT_FUNCTION;
-    int ret = 0;
+    size_t ret = 0;
+
+    if (size == 0) {
+	size = amf::NETBUFSIZE;
+    }
     
     log_debug("Starting to wait for data in net for fd #%d", fd);
     Network net;
 
     do {
-	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-	int ret = net.readNet(fd, *buf, 5);
+	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(size));
+	ret = net.readNet(fd, *buf, 5);
 //	cerr << __PRETTY_FUNCTION__ << ret << " : " << (char *)buf->reference() << endl;
 
 	// the read timed out as there was no data, but the socket is still open.
@@ -1472,7 +1504,7 @@ HTTP::recvMsg(int fd)
  	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
-	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
+	if ((ret == static_cast<size_t>(string::npos)) || (static_cast<int>(ret) == -1)) {
 	    log_debug("socket for fd #%d was closed...", fd);
 	    return 0;
 	}
@@ -1488,16 +1520,15 @@ HTTP::recvMsg(int fd)
  	    } else {
 		_que.push(buf);
 	    }
-
-        // ret must be more than 0 here
-	    if (static_cast<size_t>(ret) == buf->size()) {
+	    // ret must be more than 0 here
+	    if (ret == buf->size()) {
 		continue;
 	    }
 	} else {
 	    log_debug("no more data for fd #%d, exiting...", fd);
 	    return 0;
 	}
-	if (ret == -1) {
+	if (static_cast<int>(ret) == -1) {
 	  log_debug("Handler done for fd #%d, can't read any data...", fd);
 	  return -1;
 	}
@@ -1508,6 +1539,7 @@ HTTP::recvMsg(int fd)
 
     return ret;
 }
+
 
 void
 HTTP::dump() {
@@ -1529,92 +1561,6 @@ HTTP::dump() {
     log_debug("RTMPT optional client ID is: ", _clientid);
     log_debug (_("==== ==== ===="));
 }
-
-extern "C" {
-bool
-http_handler(Network::thread_params_t *args)
-{
-//    GNASH_REPORT_FUNCTION;
-//    struct thread_params thread_data;
-    string url, filespec, parameters;
-    HTTP *www = new HTTP;
-    bool result = false;
-    
-//    Network *net = reinterpret_cast<Network *>(args->handler);
-    bool done = false;
-//    www.setHandler(net);
-
-    log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
-    
-    string docroot = args->filespec;
-
-    www->setDocRoot(docroot);
-    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
-
-    // Wait for data, and when we get it, process it.
-    do {
-	
-#ifdef USE_STATISTICS
-	struct timespec start;
-	clock_gettime (CLOCK_REALTIME, &start);
-#endif
-
-	// See if we have any messages waiting
-	if (www->recvMsg(args->netfd) == 0) {
-	    done = true;
-	}
-
-	// Process incoming messages
-	if (!www->processClientRequest(args->netfd)) {
-//	    hand->die();	// tell all the threads for this connection to die
-//	    hand->notifyin();
-	    log_debug("Net HTTP done for fd #%d...", args->netfd);
-//	    done = true;
-	}
-//	www.dump();
-	
-#if 0
-	string response = cache.findResponse(filestream->getFilespec());
-	if (response.empty()) {
-	    cerr << "FIXME no cache hit for: " << www.getFilespec() << endl;
-//	    www.clearHeader();
-// 	    amf::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
-// 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
-// 	    cache.addResponse(www.getFilespec(), www.getHeader());
-	} else {
-	    cerr << "FIXME cache hit on: " << www.getFilespec() << endl;
-	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
-	}	
-#endif
-	
-	// Unless the Keep-Alive flag is set, this isn't a persisant network
-	// connection.
-	if (!www->keepAlive()) {
-	    log_debug("Keep-Alive is off", www->keepAlive());
-	    result = false;
-	    done = true;
-	} else {
-	    log_debug("Keep-Alive is on", www->keepAlive());
-	    result = true;
-//	    done = true;
-	}
-#ifdef USE_STATISTICS
-	struct timespec end;
-	clock_gettime (CLOCK_REALTIME, &end);
-	log_debug("Processing time for GET request was %f seconds",
-		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
-#endif
-    } while(done != true);
-    
-//    hand->notify();
-    
-    log_debug("http_handler all done now finally...");
-
-    return result;
-} // end of httphandler
-    
-} // end of extern C
 
 } // end of gnash namespace
 

@@ -143,7 +143,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     tmpptr += sizeof(boost::uint16_t);
     string str1(reinterpret_cast<const char *>(tmpptr), length);
     msg->target = str1;
-    if (static_cast<size_t>(tmpptr - data) > size) {
+    if ((tmpptr - data) > static_cast<int>(size)) {
         boost::format msg("Trying to read past the end of data! Wants %1% bytes, given %2% bytes");
         msg % length % size;
         throw GnashException(msg.str());
@@ -162,7 +162,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     string str2(reinterpret_cast<const char *>(tmpptr), length);
     msg->response = str2;
     tmpptr += length;
-    if (static_cast<size_t>(tmpptr - data) > size) {
+    if ((tmpptr - data) > static_cast<int>(size)) {
         boost::format msg("Trying to read past the end of data! Wants %1% bytes, given %2% bytes");
         msg % length % size;
         throw GnashException(msg.str());
@@ -197,10 +197,12 @@ AMF_msg::parseAMFPacket(amf::Buffer &data)
 boost::shared_ptr<AMF_msg::context_header_t>
 AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 //    _messages.push_back();
     boost::uint8_t *ptr = data + sizeof(AMF_msg::context_header_t);
     boost::shared_ptr<context_header_t> header = AMF_msg::parseContextHeader(data, size);
+
+//     log_debug("%s: %s", __PRETTY_FUNCTION__, hexify(data, size, true));
     
     AMF amf;
     /// Read all the messages from the AMF packet
@@ -230,8 +232,8 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
 }
 
 boost::shared_ptr<amf::Buffer>
-AMF_msg::encodeAMFPacket(const std::string &/* target */,
-                         const std::string &/* response */, size_t /* size */)
+AMF_msg::encodeAMFPacket(const std::string & /* target */,
+                         const std::string & /*response */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
 

@@ -17,6 +17,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <boost/shared_ptr.hpp>
+#include <cmath> // std::fmod
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
+#include <locale>
+#include <sstream>
+#include <iomanip>
+#include <string>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h"
 #include "as_object.h"
@@ -42,29 +52,20 @@
 #include "SimpleBuffer.h"
 #include "StringPredicates.h"
 
-#include <cmath> // std::fmod
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
-#include <locale>
-#include <sstream>
-#include <iomanip>
-#include <string>
-
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
 
 // Define the macro below to make to_primitive verbose
-//#define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
+// #define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
 
 // Define this macro to make soft references activity verbose
-//#define GNASH_DEBUG_SOFT_REFERENCES
+#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macro to make AMF parsing verbose
-//#define GNASH_DEBUG_AMF_DESERIALIZE
+#define GNASH_DEBUG_AMF_DESERIALIZE 1
 
 // Define this macto to make AMF writing verbose
-//#define GNASH_DEBUG_AMF_SERIALIZE
+// #define GNASH_DEBUG_AMF_SERIALIZE 1
 
 namespace gnash {
 
@@ -196,14 +197,22 @@ public:
                 str = val.to_string();
             }
             el.reset(new amf::Element(name, str));
-        }
-
-        else if (val.is_bool()) {
+        } else if (val.is_bool()) {
             bool flag = val.to_bool();
             el.reset(new amf::Element(name, flag));
-        }
-
-        else if (val.is_number()) { 
+        } else if (val.is_object()) {
+//            el.reset(new amf::Element(name, flag));
+        } else if (val.is_null()) {
+	    boost::shared_ptr<amf::Element> tmpel(new amf::Element);
+	    tmpel->setName(name);
+	    tmpel->makeNull();
+            el = tmpel;
+        } else if (val.is_undefined()) {
+	    boost::shared_ptr<amf::Element> tmpel(new amf::Element);
+	    tmpel->setName(name);
+	    tmpel->makeUndefined();
+            el = tmpel;
+        } else if (val.is_number()) { 
             double dub;
             if (val.is_undefined()) {
                 dub = 0.0;
@@ -282,13 +291,16 @@ public:
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
+#if 0
         if ( ! val.writeAMF0(_buf, _offsetTable, _vm, _allowStrict) )
         {
             log_error("Problems serializing an object's member");
             _error=true;
         }
+#else
+    log_error("writeAMF0 disabled for now");
+#endif
     }
-
 private:
 
     bool _allowStrict;
@@ -847,23 +859,29 @@ as_value::to_number() const
     }
 }
 
-std::auto_ptr<amf::Element>
+boost::shared_ptr<amf::Element>
 as_value::to_element() const
 {
     VM& vm = VM::get();
     //int swfVersion = vm.getSWFVersion();
-    std::auto_ptr<amf::Element> el ( new amf::Element );
+    boost::shared_ptr<amf::Element> el ( new amf::Element );
     boost::intrusive_ptr<as_object> ptr = to_object();
 
     switch (m_type) {
+      case UNDEFINED:
+	  el->makeUndefined();
+	  break;
+      case NULLTYPE:
+	  el->makeNull();
+	  break;
+      case BOOLEAN:
+	  el->makeBoolean(getBool());
+	  break;
       case  STRING:
 	  el->makeString(getStr());
 	  break;
       case NUMBER:
 	  el->makeNumber(getNum());
-	  break;
-      case BOOLEAN:
-	  el->makeBoolean(getBool());
 	  break;
       case OBJECT:
       {
@@ -1126,6 +1144,13 @@ void
 as_value::set_null()
 {
 	m_type = NULLTYPE;
+	_value = boost::blank();
+}
+
+void
+as_value::set_unsupported()
+{
+	m_type = UNSUPPORTED;
 	_value = boost::blank();
 }
 
@@ -1837,10 +1862,20 @@ as_value::as_value(const amf::Element& el)
 	:
 	m_type(UNDEFINED)
 {
+//     GNASH_REPORT_FUNCTION;    
+//     el.dump();
+    
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
-    
+
     switch (el.getType()) {
+      case amf::Element::NOTYPE:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type NO TYPE!");
+#endif
+	  break;
+      }
       case amf::Element::NULL_AMF0:
       {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -1894,8 +1929,16 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
             log_debug("as_value(Element&) : AMF type STRING");
 #endif
-            std::string str = el.to_string();
-            set_string(str);
+	    std::string str;
+	    // If there is data, convert it to a string for the as_value
+	    if (el.getDataSize() != 0) {
+		str = el.to_string();
+		// Element's store the property name as the name, not as data.
+	    } else if (el.getNameSize() != 0) {
+		str = el.getName();
+	    }
+	    
+	    set_string(str);
             break;
       }
 
@@ -1905,18 +1948,22 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type OBJECT");
 #endif
-          as_object* obj = new as_object(getObjectInterface());
+	  as_object* obj = new as_object(getObjectInterface());
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
-              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-              if (prop == 0) {
-                  break;
-              } else {
-                  obj->set_member(st.find(prop->getName()), as_value(*prop));
-              }
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      if (prop->getNameSize() == 0) {
+			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		      } else {
+			  obj->set_member(st.find(prop->getName()), as_value(*prop));
+		      }
+		  }
               }
           }
-          set_as_object(obj);
+	  set_as_object(obj);
           break;
       }
 
@@ -1932,12 +1979,12 @@ as_value::as_value(const amf::Element& el)
           Array_as* obj = new Array_as;
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
-              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-              if (prop == 0) {
-                  break;
-              } else {
-                  obj->set_member(st.find(prop->getName()), as_value(*prop));
-              }
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
               }
           }
           set_as_object(obj);
@@ -1959,7 +2006,11 @@ as_value::as_value(const amf::Element& el)
               if (prop == 0) {
                   break;
               } else {
-                  obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  if (prop->getNameSize() == 0) {
+		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
               }
           }
           
@@ -1975,14 +2026,23 @@ as_value::as_value(const amf::Element& el)
 
       case amf::Element::DATE_AMF0:
       {
-        log_unimpl("DATE Element to as_value");
-        //if (swfVersion > 5) m_type = STRING;
-        break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type DATE");
+#endif
+	  double num = el.to_number();
+	  set_double(num);
+	  break;
       }
-
+      //if (swfVersion > 5) m_type = STRING;
+      
       case amf::Element::UNSUPPORTED_AMF0:
-          log_unimpl("Unsupported data type is not supported yet");
-          break;
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
+#endif
+	  set_unsupported();
+	  break;
+      }
       case amf::Element::RECORD_SET_AMF0:
           log_unimpl("Record Set data type is not supported yet");
           break;

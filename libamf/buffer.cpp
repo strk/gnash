@@ -668,6 +668,11 @@ Buffer::resize(size_t size)
 //    GNASH_REPORT_FUNCTION;
     boost::scoped_array<boost::uint8_t> tmp;
 
+    // If there is no size, don't do anything
+    if (size == 0) {
+	return *this;
+    }
+    
     // If we don't have any data yet in this buffer, resizing is cheap, as
     // we don't havce to copy any data.
     if (_seekptr == _data.get()) {
@@ -728,7 +733,7 @@ Buffer::dump(std::ostream& os) const
 {
     os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes: ";
      // Skip in-memory address " at " << (void *)_data.get() << endl;
-    if (_nbytes < 0xffff) {
+    if (_nbytes > 0) {
 	const size_t bytes = _seekptr - _data.get();
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;

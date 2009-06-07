@@ -31,6 +31,7 @@
 #include "buffer.h"
 #include "rtmp_msg.h"
 #include "cque.h"
+#include "dsodefs.h"
 
 namespace gnash
 {
@@ -235,8 +236,8 @@ public:
     int getMysteryWord()        { return _mystery_word; };
 
     // Decode an RTMP message
-    RTMPMsg *decodeMsgBody(boost::uint8_t *data, size_t size);
-    RTMPMsg *decodeMsgBody(amf::Buffer &buf);
+    boost::shared_ptr<RTMPMsg> decodeMsgBody(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<RTMPMsg> decodeMsgBody(amf::Buffer &buf);
     
     virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
     boost::shared_ptr<rtmp_ping_t> decodePing(amf::Buffer &buf);
@@ -279,11 +280,17 @@ public:
     // interval. (128 bytes for video data by default). Each message main
     // contain multiple packets.
     bool sendMsg(amf::Buffer &data);
-    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+    bool sendMsg(int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data);
     bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
+	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data);
+    bool sendMsg(int channel, rtmp_headersize_e head_size,
+		 size_t total_size, content_types_e type,
+		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
+    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+		 size_t total_size, content_types_e type,
 		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
     
 #if 0

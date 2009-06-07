@@ -37,15 +37,12 @@ dnl AC_EXEEXT
 dnl AC_PROG_INSTALL
 dnl AM_COMPILER_LIB
 
+dnl Build the cgibins server if specified.
 AC_DEFUN([CYGNAL_PATHS],
 [
-
-dnl For Asynchronous I/O
-dnl AC_CHECK_HEADERS(aio.h poll.h)
 
 AC_CHECK_HEADERS(poll.h epoll.h)
 
 dnl Look for the various ways of blocking while waiting for I/O
 AC_CHECK_FUNCS(pselect ppoll)
- 
 ])

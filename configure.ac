@@ -461,6 +461,16 @@ AC_ARG_ENABLE(cygnal,
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
 
+dnl Build the cgibins server if specified.
+AC_ARG_ENABLE(cgibins,
+  AC_HELP_STRING([--enable-cgibin], [Enable building of the CGIs for Cygnal]),
+[case "${enableval}" in
+  yes) cgibin=yes ;;
+  no)  cgibin=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-cgibin option]) ;;
+esac],cgibin=yes)
+AM_CONDITIONAL(USE_CGI, test x$cgibin = xyes)
+
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias,
   AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
@@ -1239,7 +1249,6 @@ dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
-AC_PATH_TOOL([NETCAT], [netcat])
 AC_HEADER_DIRENT
 
 dnl -----------------------------------------------------------------
@@ -1670,6 +1679,11 @@ if test x$cross_compiling = xno; then
   AC_SUBST(RED5_HOST)
 fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
+
+AC_PATH_PROG(NETCAT, nc)
+AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
+AC_PATH_PROG(WGET, wget)
+AM_CONDITIONAL(HAS_WGET, [ test x"$WGET" != x ])
 
 dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
@@ -2227,8 +2241,8 @@ AC_SUBST(MEDIA_CONFIG)
 dnl AC_CONFIG_LINKS(doc/C/images)
 dnl AC_CONFIG_LINKS(gnashconfig.h,libltdl/config.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
-AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
-AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
+AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc:testsuite/libbase.all/gnashrc.in)
+AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashrc-local.in)
 
 AC_CONFIG_FILES(gnash.pc:gnash.pc.in)
 
@@ -2250,7 +2264,7 @@ doc/Doxyfile
 pythonmodule/Makefile
 testsuite/Makefile
 testsuite/media/Makefile
-testsuite/libbase/Makefile
+testsuite/libbase.all/Makefile
 testsuite/as3/Makefile
 testsuite/as3/classes.all/Makefile
 testsuite/actionscript.all/Makefile
@@ -2261,6 +2275,7 @@ testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-swfmill.all/Makefile
 testsuite/misc-swfc.all/Makefile
+testsuite/network.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
 testsuite/libamf.all/Makefile
@@ -2283,6 +2298,8 @@ plugin/klash4/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
 cygnal/Makefile
+cygnal/cgi-bin/Makefile
+cygnal/cgi-bin/echo/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
 )
@@ -3246,6 +3263,17 @@ if test x"${build_all_as3}" = x"yes"; then
 else
   echo "        Only building these ActionScript classes into the library:"
   echo "     ${classlist}"
+fi
+
+if test x"$NETCAT" != x; then
+    echo "        You have netcat installed, which is only used for testing"
+else
+    echo "        Install netcat for networking test support"
+fi
+if test x"$WGET" != x; then
+    echo "        You have wget installed, which is only used for testing"
+else
+    echo "        Install wget for networking test support"
 fi
 
 if test x$cross_compiling = xyes; then

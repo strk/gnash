@@ -17,8 +17,14 @@
 
 AUTOMAKE_OPTIONS = 
 
+DIR_MING=
+
 if ENABLE_MING
-DIR_MING = misc-ming.all actionscript.all
+DIR_MING += misc-ming.all actionscript.all
+endif
+
+if HAS_NETCAT
+DIR_MING += network.all
 endif
 
 if ENABLE_MTASC
@@ -49,10 +55,11 @@ DIST_SUBDIRS = \
 	media \
 	as3 \
 	actionscript.all \
-	libbase	\
+	libbase.all	\
 	libamf.all \
 	libnet.all \
 	libcore.all \
+	network.all \
 	samples	\
 	swfdec \
 	misc-ming.all \
@@ -69,7 +76,8 @@ SUBDIRS = \
 	$(DIR_AS3) \
 	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
-	libbase	\
+	libbase.all	\
+	network.all \
 	libamf.all \
 	libcore.all \
 	samples	\

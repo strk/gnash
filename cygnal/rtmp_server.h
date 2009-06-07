@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifndef _RTMP_SERVER_H_
-#define _RTMP_SERVER_H_ 1
+#define _RTMP_SERVER_H_
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
@@ -30,11 +30,12 @@
 #include "buffer.h"
 #include "diskstream.h"
 #include "rtmp_msg.h"
+#include "dsodefs.h"
 
 namespace cygnal
 {
 
-class DSOEXPORT RTMPServer : public gnash::RTMP
+class RTMPServer : public gnash::RTMP
 {
 public:
     RTMPServer();
@@ -85,7 +86,7 @@ public:
 };
 
 // This is the thread for all incoming RTMP connections
-bool rtmp_handler(gnash::Network::thread_params_t *args);
+bool DSOEXPORT rtmp_handler(gnash::Network::thread_params_t *args);
 
 } // end of gnash namespace
 // end of _RTMP_SERVER_H_

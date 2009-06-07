@@ -34,7 +34,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	libcygnal.la \
+	$(top_builddir)/cygnal/libcygnal.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 

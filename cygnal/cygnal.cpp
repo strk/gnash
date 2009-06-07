@@ -53,9 +53,9 @@ extern "C"{
 #include "network.h"
 #include "log.h"
 #include "crc.h"
+#include "proc.h"
 #include "rtmp.h"
-#include "rtmp_server.h"
-#include "http.h"
+#include "buffer.h"
 #include "utility.h"
 #include "limits.h"
 #include "netstats.h"
@@ -68,7 +68,9 @@ extern "C"{
 #include "GnashSleep.h" // for usleep comptibility.
 
 // classes internal to Cygnal
-#include "buffer.h"
+#include "rtmp_server.h"
+#include "http_server.h"
+
 #include "handler.h"
 #include "cache.h"
 #include "gettext.h"
@@ -145,12 +147,17 @@ map<int, Network *> networks;
 
 // end of globals
 
+// The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
-// The rcfile is loaded and parsed here:
+// The user config for Cygnal is loaded and parsed here:
 static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
+// Cache support for responses and files.
 static Cache& cache = Cache::getDefaultInstance();
+
+// The list of active cgis beiung executed.
+static std::map<std::string, Proc> procs; // = proc::getDefaultInstance();
 
 // This mutex is used to signify when all the threads are done.
 static boost::condition	alldone;
@@ -670,25 +677,31 @@ dispatch_handler(Network::thread_params_t *args)
 		    if ((it->revents & POLLRDHUP) || (it->revents & POLLNVAL))  {
 			log_debug("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
 				  it->revents, it->fd);
-			net->erasePollFD(it->fd);
- 			net->closeNet(it->fd);
+ 			if (it->fd > 0) {
+			    net->erasePollFD(it->fd);
+			    net->closeNet(it->fd);
+			}
 //			continue;
 			break;
 		    } else {
 			// We got some data, so process it
 			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
+ 			if (it->fd > 0) {
+			    // Call the protocol handler for this network connection
+			    bool ret = net->getEntry(it->fd)(args);
 			// Call the protocol handler for this network connection
 // 			bool ret = net->getEntry(it->fd)(args);
 			
 //			log_debug("Handler returned %s", (ret) ? "true" : "false");
-			// FIXME: we currently force a 'close connection' at the end
-			// of sending a file, since apache does too. This pretty much
-			// blows persistance,
+			    // FIXME: we currently force a 'close connection' at the end
+			    // of sending a file, since apache does too. This pretty much
+			    // blows persistance,
 //			if (ret) {
 			    networks[args->tid] = 0;
 			    net->closeNet(it->fd);
 			    net->erasePollFD(it->fd);
 //			}
+			}
 		    }
 		}
 	    } catch (std::exception& e) {

@@ -32,7 +32,7 @@
 namespace gnash
 {
 
-class DSOEXPORT RTMPMsg
+class RTMPMsg
 {
 public:
     typedef enum {
@@ -86,8 +86,8 @@ public:
 	NS_DELETE_STREAM
     } rtmp_status_e;
     typedef enum {
-	FROM_SERVER,                      // Flash com server
-	FROM_CLIENT			  // SWF player
+	FROM_CLIENT,			  // SWF player
+	FROM_SERVER                      // Flash com server
     } rtmp_source_e;
     RTMPMsg();
     ~RTMPMsg();
@@ -118,12 +118,12 @@ public:
     ///		search for.
     ///
     /// @return A smart pointer to the Element for this property.
-    boost::shared_ptr<amf::Element> findProperty(const std::string &name);
+    DSOEXPORT boost::shared_ptr<amf::Element> findProperty(const std::string &name);
 
 //    void setHeaderData(RTMP::rtmp_head_t &qhead);
 			
 // Dump internal status to the terminal
-    void dump();
+    DSOEXPORT void dump();
     
   protected:
     rtmp_source_e	  _routing;

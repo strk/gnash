@@ -36,6 +36,7 @@
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "utility.h" // UNUSED
 #include "string_table.h"
@@ -117,6 +118,10 @@ public:
 		/// NULL value
 		NULLTYPE,
 		NULLTYPE_EXCEPT,
+
+		/// NULL value
+		UNSUPPORTED,
+		UNSUPPORTED_EXCEPT,
 
 		/// Boolean value
 		BOOLEAN,
@@ -370,7 +375,7 @@ public:
 	double	to_number() const;
 
 	/// Get an AMF element representation for this value
-	std::auto_ptr<amf::Element> to_element() const;
+        boost::shared_ptr<amf::Element> to_element() const;
 
 	/// Conversion to 32bit integer
 	//
@@ -565,6 +570,9 @@ public:
 	/// Set this value to the NULL value
 	void set_null();
 
+	/// Set this value to the Unsupported value
+	void set_unsupported();
+
 	/// Equality operator, follows strict equality semantic
 	//
 	/// See strictly_equals
@@ -590,11 +598,14 @@ public:
 
 	bool is_bool() const { return (m_type == BOOLEAN); }
 
-	bool is_exception() const
+	bool is_unsupported() const { return (m_type == UNSUPPORTED); }
+
+        bool is_exception() const
 	{ return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
 		|| m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
 		|| m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
-		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
+		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT
+		|| m_type == UNSUPPORTED_EXCEPT);
 	}
 
 	// Flag or unflag an as_value as an exception -- this gets flagged

@@ -17,7 +17,7 @@
 //
 
 #ifndef __CQUE_H__
-#define __CQUE_H__ 1
+#define __CQUE_H__
 
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
@@ -53,7 +53,7 @@ public:
     // Pop the first date element off the que
     boost::shared_ptr<amf::Buffer> DSOEXPORT pop();
     // Peek at the first date element witjhout removing it from the que
-    boost::shared_ptr<amf::Buffer> peek();
+    boost::shared_ptr<amf::Buffer> DSOEXPORT peek();
     // Get the number of elements in the que
     size_t DSOEXPORT size();
     // Wait for a condition variable to trigger
@@ -69,7 +69,8 @@ public:
     void remove(boost::shared_ptr<amf::Buffer> it);
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
-    boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin);
+    boost::shared_ptr<amf::Buffer> DSOEXPORT merge(boost::shared_ptr<amf::Buffer> begin);
+    boost::shared_ptr<amf::Buffer> DSOEXPORT merge();
 
     boost::shared_ptr<amf::Buffer> operator[] (int index) { return _que[index]; };
     

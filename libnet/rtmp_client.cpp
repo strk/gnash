@@ -51,13 +51,16 @@ typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
 namespace gnash
 {
 
+extern const char *ping_str[];
+
 // The rcfile is loaded and parsed here:
 static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
 extern map<int, Handler *> handlers;
 
 RTMPClient::RTMPClient()
-    : _connections(0)
+    : _connected(false),
+      _connections(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -65,6 +68,8 @@ RTMPClient::RTMPClient()
 RTMPClient::~RTMPClient()
 {
 //    GNASH_REPORT_FUNCTION;
+    _connected = false;
+
     _properties.clear();
 //    delete _body;
 }
@@ -116,7 +121,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     swfUrlnode->makeString("swfUrl", swfUrl);
     obj->addProperty(swfUrlnode);
 
-//    filespec = "rtmp://localhost/oflaDemo";
+//    filespec = "rtmp://localhost:5935/oflaDemo";
     ElementSharedPtr tcUrlnode(new amf::Element);
     tcUrlnode->makeString("tcUrl", tcUrl);
     obj->addProperty(tcUrlnode);
@@ -145,10 +150,11 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj->addProperty(pageUrlnode);
 
+#if 0
     ElementSharedPtr objencodingnode(new Element);
     objencodingnode->makeNumber("objectEncoding", 0.0);
     obj->addProperty(objencodingnode);
-    
+#endif
 //    size_t total_size = 227;
 //     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
@@ -163,6 +169,38 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     *buf += numobj;
     *buf += encobj;
 		   
+    return buf;
+}
+
+boost::shared_ptr<amf::Buffer>
+RTMPClient::encodeEchoRequest(const std::string &method, double id, amf::Element &el)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Element> str(new amf::Element);
+    str->makeString(method);
+    boost::shared_ptr<Buffer> strobj = str->encode();
+
+    // Encod ethe stream ID
+    boost::shared_ptr<amf::Element>  num(new amf::Element);
+    num->makeNumber(id);
+    boost::shared_ptr<Buffer> numobj = num->encode();
+
+    // Set the NULL object element that follows the stream ID
+    boost::shared_ptr<amf::Element> null(new amf::Element);
+    null->makeNull();
+    boost::shared_ptr<Buffer> nullobj = null->encode();
+
+    boost::shared_ptr<Buffer> elobj = el.encode();
+
+    size_t totalsize = strobj->size() + numobj->size() + nullobj->size() + elobj->size();
+
+    boost::shared_ptr<Buffer> buf(new Buffer(totalsize));
+    
+    *buf += strobj;
+    *buf += numobj;
+    *buf += nullobj;
+    *buf += elobj;
+
     return buf;
 }
 
@@ -351,55 +389,216 @@ RTMPClient::handShakeRequest()
     }
 }
 
-// The client finished the handshake process by sending the second
+// The client finishes the handshake process by sending the second
 // data block we get from the server as the response
 bool
 RTMPClient::clientFinish()
 {
     GNASH_REPORT_FUNCTION;
+    amf::Buffer data;
+    return clientFinish(data);
+}
 
+bool
+RTMPClient::clientFinish(amf::Buffer &data)
+{
+    GNASH_REPORT_FUNCTION;
+    bool done = false;
     int ret = 0;
-    _handshake->clear();
+    int offset = 0;
+
     
-    gnashSleep(1000000); // FIXME: why do we still need a delay here, when readNet() does a select ?
-    ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-    if (ret == RTMP_HANDSHAKE_SIZE) {
-        log_debug (_("Read first data block in handshake"));
-    } else {
-        log_error (_("Couldn't read first data block in handshake"));
-//        return false;
-    }
-    if (ret > RTMP_HANDSHAKE_SIZE) {
-	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-	if (ret == RTMP_HANDSHAKE_SIZE) {        
-	    log_debug (_("Read second data block in handshake"));
-	} else {
-	    log_error (_("Couldn't read second data block in handshake"));
-//        return false;
+    // The total size of incoming bytes is twice the handshake size, plus the handshake
+    // header byte. Then we append the NetConnection::connect packet as well.
+    size_t maxsize = (RTMP_HANDSHAKE_SIZE*2)+1+data.size();
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(maxsize));
+    do {
+	ret = readNet(buf->reference() + offset, buf->size() - offset);
+	offset += ret;
+	buf->setSeekPointer(buf->reference() + offset);
+	if (offset == (RTMP_HANDSHAKE_SIZE*2)+1) {
+	    done = true;
 	}
-    }
-    ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-    if (ret == RTMP_HANDSHAKE_SIZE) {        
-        log_debug (_("Read second data block in handshake"));
-    } else {
-        log_error (_("Couldn't read second data block in handshake"));
-//        return false;
-    }
-    if (ret > RTMP_HANDSHAKE_SIZE) {
-	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-	if (ret == RTMP_HANDSHAKE_SIZE) {        
-	    log_debug (_("Read second data block in handshake"));
-	} else {
-	    log_error (_("Couldn't read second data block in handshake"));
-//        return false;
+	if (ret < 0) {
+	    log_error (_("Couldn't read data block in handshake!"));
+	    done = true;
 	}
+    } while (!done);    
+    
+    if (buf->allocated() > RTMP_HANDSHAKE_SIZE) {
+	log_debug (_("Read first data block in handshake"));
+    } else {
+	log_error (_("Couldn't read first data block in handshake"));
+    }
+    if (buf->allocated() > RTMP_HANDSHAKE_SIZE*2) {
+	log_debug (_("Read second data block in handshake"));
+    } else {
+	log_error (_("Couldn't read second data block in handshake"));
+	return false;
     }
 
-    ret = writeNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-    if ( ret <= 0 ) return false;
+#if 1
+    if (memcmp(buf->reference() + RTMP_HANDSHAKE_SIZE + 1, _handshake->reference(), RTMP_HANDSHAKE_SIZE) == 0) {
+	log_debug("Handshake matched");
+    } else {
+	log_debug("Handshake didn't match");
+// 	return false;
+    }
+    *buf += data;
+#endif
+    
+    // For some reason, Red5 won't connect unless the connect packet is
+    // part of the final handshake packet. Sending the identical data with
+    // two writeNet()s won't connect. Go figure...
+    _handshake->resize(RTMP_HANDSHAKE_SIZE + data.size());
+    // FIXME: unless the handshake is all zeros, Gnash won't connect to
+    // Red5 for some reason. Cygnal isn't so picky.
+    _handshake->clear();
+    _handshake->setSeekPointer(_handshake->reference() + RTMP_HANDSHAKE_SIZE);
+    // Add the NetConnection::connect() packet
+    _handshake->append(data.reference(), data.allocated());
+    ret = writeNet(_handshake->reference(), _handshake->allocated());
+    if ( ret <= 0 ) {
+	return false;
+    }
+    
+    // Since the handshake completed sucessfully, we're connected.
+    _connected == true;
 
     return true;
 }
+
+// Get and process an RTMP response. After reading all the data, then we have
+// split it up on the chunksize boudaries, and into the respective queues
+// for each channel.
+RTMPClient::msgque_t
+RTMPClient::recvResponse()
+{
+    GNASH_REPORT_FUNCTION;
+
+    RTMPClient::msgque_t msgque;
+    
+    // Read the responses back from the server.  This is usually a series of system
+    // messages on channel 2, and the response message on channel 3 from our request.
+    boost::shared_ptr<amf::Buffer> response = recvMsg();
+    if (!response) {
+	log_error("Got no response from the RTMP server");
+    }
+
+    // when doing remoting calls I don't see this problem with an empty packet from Red5,
+    // but when I do streaming, it's always there, so we need to remove it.
+    boost::uint8_t *pktstart = response->reference();
+    if (*pktstart == 0xff) {
+	log_debug("Got empty packet in buffer.");
+	pktstart++;
+    }
+
+    // The response packet contains multiple messages for multiple channels, so we
+    // we have to split the Buffer into seperate messages on a chunksize boundary.
+    boost::shared_ptr<RTMP::rtmp_head_t> rthead;
+    boost::shared_ptr<RTMP::queues_t> que = split(pktstart, response->allocated()-1);
+
+    // If we got no responses, something obviously went wrong.
+    if (!que->size()) {
+        log_error("No response from INVOKE of NetConnection connect");
+	
+    }
+
+    // There is a queue of queues used to hold all the messages. The first queue
+    // is indexed by the channel number, the second queue is all the messages that
+    // have arrived for that channel.
+    while (que->size()) {	// see if there are any messages at all
+	log_debug("%s: There are %d channel queues in the RTMP input queue, %d messages in front queue",
+		  __PRETTY_FUNCTION__, que->size(), que->front()->size());
+	// Get the CQue for the first channel
+	CQue *channel_q = que->front();
+	que->pop_front();	// remove this Cque from the top level que
+
+	while (channel_q->size()) {
+	    // Get the first message in the channel queue
+	    boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
+  	    ptr->dump();
+	    if (ptr) {		// If there is legit data
+		rthead = decodeHeader(ptr->reference());
+		if (!rthead) {
+		    log_error("Couldn't decode RTMP message header");
+		    continue;
+		}
+		switch (rthead->type) {
+		  case RTMP::NONE:
+		      log_error("RTMP packet can't be of none type!");
+		      break;
+		  case RTMP::CHUNK_SIZE:
+		      log_unimpl("Server message data packet");
+		      break;
+		  case RTMP::UNKNOWN:	
+		      log_unimpl("Unknown data packet");
+		      break;
+		  case RTMP::BYTES_READ:
+		      log_unimpl("Bytes Read data packet");
+		      break;
+		  case RTMP::PING:
+		  {
+		      boost::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
+		      log_debug("Got a Ping type %s", ping_str[ping->type]);
+		      break;
+		  }
+		  case RTMP::SERVER:
+		      log_unimpl("Server message data packet");
+		      break;
+		  case RTMP::CLIENT:
+		      log_unimpl("Client message data packet");
+		      break;
+		  case RTMP::UNKNOWN2:
+		      log_unimpl("Unknown2 data packet");
+		      break;
+		  case RTMP::AUDIO_DATA:
+		  {
+		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      if (msg) {
+			  msgque.push_back(msg);
+		      }
+		      break;
+		  }
+		  case RTMP::VIDEO_DATA:
+		  {
+		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      if (msg) {
+			  msgque.push_back(msg);
+		      }
+		      break;
+		  }
+		  case RTMP::UNKNOWN3:
+		      log_unimpl("Unknown3 data packet message");
+		      break;
+		  case RTMP::NOTIFY:
+		      log_unimpl("Notify data packet message");
+		      break;
+		  case RTMP::SHARED_OBJ:
+		      log_unimpl("Shared Object data packet message");
+		      break;
+		  case RTMP::INVOKE:
+		  {
+		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      if (msg) {
+			  msgque.push_back(msg);
+		      }
+		      break;
+		  }
+		  case RTMP::FLV_DATA:
+		      log_unimpl("Flv data packet message");
+		      break;
+		  default :
+		      log_error("Couldn't decode RTMP message Body");
+		      break;
+		}
+	    }
+	}
+    }
+    
+    return msgque;
+}
+
 
 // bool
 // RTMPClient::packetRequest()

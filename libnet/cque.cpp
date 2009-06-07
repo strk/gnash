@@ -93,7 +93,7 @@ CQue::size()
 bool
 CQue::push(boost::shared_ptr<amf::Buffer> data)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
 #ifdef USE_STATS_QUEUE
@@ -195,8 +195,17 @@ CQue::remove(boost::shared_ptr<amf::Buffer> element)
 // Merge sucessive buffers into one single larger buffer. This is for some
 // protocols, than have very long headers.
 boost::shared_ptr<amf::Buffer> 
+CQue::merge()
+{
+//     GNASH_REPORT_FUNCTION;
+    
+    return merge(_que.front());
+}
+
+boost::shared_ptr<amf::Buffer> 
 CQue::merge(boost::shared_ptr<amf::Buffer> start)
 {
+//     GNASH_REPORT_FUNCTION;
     // Find iterator to first element to merge
     que_t::iterator from = std::find(_que.begin(), _que.end(), start); 
     if (from == _que.end()) {
@@ -211,27 +220,29 @@ CQue::merge(boost::shared_ptr<amf::Buffer> start)
     for (que_t::iterator e=_que.end(); to!=e; ++to) {
         size_t sz = (*to)->size();
         totalsize += sz;
-        if (sz < amf::NETBUFSIZE) break;
+// 	log_debug("%s: Totalsize is %s", __PRETTY_FUNCTION__, totalsize);
+        if (sz < amf::NETBUFSIZE) {
+	    break;
+	}
     }
-    if (to == _que.end()) {
-        // Didn't find an element ending the merge
-        return start;		// FIXME:
-    }
-
+    totalsize += 24;
+//     log_debug("%s: Final Totalsize is %s", __PRETTY_FUNCTION__, totalsize);
+    
     // Merge all elements in a single buffer. We have totalsize now.
     boost::shared_ptr<amf::Buffer> newbuf(new Buffer(totalsize));
-    boost::uint8_t *tmp = newbuf->reference();
-    ++to;
     for (que_t::iterator i=from; i!=to; ++i) {
-        boost::shared_ptr<amf::Buffer> buf = *i;
-        size_t sz = buf->size();
-        std::copy(buf->reference(), buf->reference() + sz, tmp);
+//  	log_debug("%s: copying %d bytes, space left is %d, totalsize is %d", __PRETTY_FUNCTION__,
+//  		  (*i)->allocated(), newbuf->spaceLeft(), totalsize);
+//  	(*i)->dump();
+// 	if (newbuf->spaceLeft() >= (*i)->allocated()) {
+	    *newbuf += *i;
+// 	}
+	
 	//
 	// NOTE: If we're the buffer owners, it is safe to delete
 	//       the buffer now.
 	// delete buf;
 	//
-        tmp += sz;
     }
 
     // Finally erase all merged elements, and replace with the composite one
