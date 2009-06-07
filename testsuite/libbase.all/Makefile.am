@@ -83,6 +83,7 @@ snappingrangetest_SOURCES = snappingrangetest.cpp
 
 string_tableTest_SOURCES = string_tableTest.cpp
 string_tableTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+string_tableTest_LDFLAGS = $(BOOST_LIBS)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
