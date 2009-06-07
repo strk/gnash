@@ -154,12 +154,13 @@ main (int /*argc*/, char** /*argv*/) {
      }
      que.push(merge3);
 
+//     que.dump();
      // A merge gives us one big buffer where there were several buffers
      boost::shared_ptr<amf::Buffer> foo = que.merge(merge1);
      if (foo == 0) {
          runtest.unresolved("CQue::merge()");
      } else {
-         if (foo->size() == (amf::NETBUFSIZE * 2) + 96) {
+         if (foo->size() == (amf::NETBUFSIZE * 2) + 120) {
              runtest.pass("CQue::merge()");
          } else {
              runtest.fail("CQue::merge()");
@@ -168,6 +169,5 @@ main (int /*argc*/, char** /*argv*/) {
 
 //     que.pop();
 
-//     que.dump();
 }
 
