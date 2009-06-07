@@ -499,7 +499,7 @@ test_header()
 //    const char *x1 = "03 00 00 00 00 01 1f 14 00 00 00 00";
     boost::shared_ptr<amf::Buffer> buf1(new Buffer("03 00 00 00 00 01 1f 14 00 00 00 00"));
     boost::shared_ptr<amf::Buffer> head1 = client.encodeHeader(0x3, RTMP::HEADER_12, 287,
-                                        RTMP::INVOKE, RTMPMsg::FROM_SERVER);
+                                        RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
 //     cerr << hexify(buf1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
 //     cerr << hexify(head1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
     
@@ -776,7 +776,7 @@ test_client()
     boost::shared_ptr<amf::Buffer> buf2 = rtmp.encodeConnect("mp3_app/id3test", "http://renaun.com/flex2/posts/MP3Test.swf", "rtmp://renaun.com/mp3_app/id3test", 615, 124, 1, "http://renaun.com/flex2/posts/MP3Test.html");
 //     cerr << hexify(buf1->begin(), buf1->size(), false) << endl;
 //     cerr << hexify(buf2->begin(), buf1->size(), false) << endl;
-    if ((memcmp(buf1->reference(), buf2->reference(), buf1->allocated()) == 0)) {
+    if ((memcmp(buf1->reference(), buf2->reference(), 290) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeConnect()");
     } else {
         runtest.fail("Encoded RTMPClient::encodeConnect()");
