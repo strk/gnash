@@ -95,7 +95,13 @@ SDL_sound_handler::initAudio()
     //512 - not enough for  videostream
     audioSpec.samples = 2048;   
 
+    // NOTE: we open and close the audio card for the sole purpose
+    //       of throwing an exception on error (unavailable audio
+    //       card). Normally we'd want to open the audio card only
+    //       when needed (it has a cost in number of wakeups).
+    //
     openAudio();
+    closeAudio();
 
 }
 
@@ -383,12 +389,15 @@ SDL_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 
     sound_handler::plugInputStream(newStreamer);
 
-    lock.unlock(); // we need to unlock before unpausing (right?)
+    { // TODO: this whole block should only be executed when adding
+      // the first stream. 
 
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
-    log_debug("Unpausing SDL Audio...");
+        log_debug("Unpausing SDL Audio on inpust stream plug...");
 #endif
-    SDL_PauseAudio(0);
+        openAudio(); // lazy sound card initialization
+        SDL_PauseAudio(0); // start polling data from us 
+    }
 }
 
 void
@@ -423,9 +432,11 @@ SDL_sound_handler::pause()
 void
 SDL_sound_handler::unpause() 
 {
-    openAudio();
-
-    if ( hasInputStreams() ) SDL_PauseAudio(0);
+    if ( hasInputStreams() )
+    {
+        openAudio();
+        SDL_PauseAudio(0);
+    }
 
     sound_handler::unpause();
 }
