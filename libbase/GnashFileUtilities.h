@@ -54,10 +54,10 @@ namespace gnash {
         return mkdir(dirname.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
 #elif defined(__amigaos4__)
       // on AmigaOS4 if you try to create a directory that is an assign or a drive
-      // you will receive an EINVAL instead of EEXIST and so will force it
+      // you will receive an EINVAL or an ENOTDIR instead of EEXIST and so will force it
       int ret = 0;
       ret =  mkdir(dirname.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
-      if (errno == EINVAL)
+      if (errno == EINVAL || errno == ENOTDIR)
           errno = EEXIST;
       return ret;
 #else
