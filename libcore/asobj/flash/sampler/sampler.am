@@ -17,27 +17,27 @@
 
 SAMPLERdir = $(includedir)/gnash
 
-SAMPLER_SOURCES = flash/sampler/sampler_pkg.cpp
-SAMPLER_HEADERS = flash/sampler/sampler_pkg.h
+SAMPLER_SOURCES = asobj/flash/sampler/sampler_pkg.cpp
+SAMPLER_HEADERS = asobj/flash/sampler/sampler_pkg.h
 
 if BUILD_DELETEOBJECTSAMPLE_AS3
-SAMPLER_SOURCES += flash/sampler/DeleteObjectSample_as.cpp
-SAMPLER_HEADERS += flash/sampler/DeleteObjectSample_as.h
+SAMPLER_SOURCES += asobj/flash/sampler/DeleteObjectSample_as.cpp
+SAMPLER_HEADERS += asobj/flash/sampler/DeleteObjectSample_as.h
 endif
 
 if BUILD_NEWOBJECTSAMPLE_AS3
-SAMPLER_SOURCES += flash/sampler/NewObjectSample_as.cpp
-SAMPLER_HEADERS += flash/sampler/NewObjectSample_as.h
+SAMPLER_SOURCES += asobj/flash/sampler/NewObjectSample_as.cpp
+SAMPLER_HEADERS += asobj/flash/sampler/NewObjectSample_as.h
 endif
 
 if BUILD_SAMPLE_AS3
-SAMPLER_SOURCES += flash/sampler/Sample_as.cpp
-SAMPLER_HEADERS += flash/sampler/Sample_as.h
+SAMPLER_SOURCES += asobj/flash/sampler/Sample_as.cpp
+SAMPLER_HEADERS += asobj/flash/sampler/Sample_as.h
 endif
 
 if BUILD_STACKFRAME_AS3
-SAMPLER_SOURCES += flash/sampler/StackFrame_as.cpp
-SAMPLER_HEADERS += flash/sampler/StackFrame_as.h
+SAMPLER_SOURCES += asobj/flash/sampler/StackFrame_as.cpp
+SAMPLER_HEADERS += asobj/flash/sampler/StackFrame_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SAMPLER_SOURCES)

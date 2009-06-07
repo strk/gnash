@@ -17,7 +17,7 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = asobj parser vm
+SUBDIRS = parser vm
 
 # noinst_LTLIBRARIES = libserver.la 
 pkglib_LTLIBRARIES = libgnashcore.la
@@ -256,6 +256,12 @@ EXTENSIONS_API = \
 	asNamespace.h \
 	$(NULL)
 
+# These makefile fragments build the ActionScript library for
+# Gnash, and supports both AS2 as well as AS3, so we always
+# want to build.
+include $(srcdir)/asobj/flash.am
+libgnashcore_la_SOURCES += $(libgnashasobjs_la_SOURCES)
+
 if SDKINSTALL
 noinst_HEADERS += $(EXTENSIONS_API)
 else
@@ -267,7 +273,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
 	$(BOOST_LIBS) \
@@ -310,7 +315,7 @@ if HAVE_SPEEX
 endif
 else
   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
-  	$(top_builddir)/libsound/libgnashsound.la
+ 	$(top_builddir)/libsound/libgnashsound.la
 endif
 
 # Rebuild with GCC 4.x Mudflap support

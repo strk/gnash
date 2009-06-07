@@ -17,32 +17,32 @@
 
 GEOMdir = $(includedir)/gnash
 
-GEOM_SOURCES = flash/geom/geom_pkg.cpp
-GEOM_HEADERS = flash/geom/geom_pkg.h
+GEOM_SOURCES = asobj/flash/geom/geom_pkg.cpp
+GEOM_HEADERS = asobj/flash/geom/geom_pkg.h
 
 if BUILD_COLORTRANSFORM_AS3
-GEOM_SOURCES += flash/geom/ColorTransform_as.cpp
-GEOM_HEADERS += flash/geom/ColorTransform_as.h
+GEOM_SOURCES += asobj/flash/geom/ColorTransform_as.cpp
+GEOM_HEADERS += asobj/flash/geom/ColorTransform_as.h
 endif
 
 if BUILD_MATRIX_AS3
-GEOM_SOURCES += flash/geom/Matrix_as.cpp
-GEOM_HEADERS += flash/geom/Matrix_as.h
+GEOM_SOURCES += asobj/flash/geom/Matrix_as.cpp
+GEOM_HEADERS += asobj/flash/geom/Matrix_as.h
 endif
 
 if BUILD_POINT_AS3
-GEOM_SOURCES += flash/geom/Point_as.cpp
-GEOM_HEADERS += flash/geom/Point_as.h
+GEOM_SOURCES += asobj/flash/geom/Point_as.cpp
+GEOM_HEADERS += asobj/flash/geom/Point_as.h
 endif
 
 if BUILD_RECTANGLE_AS3
-GEOM_SOURCES += flash/geom/Rectangle_as.cpp
-GEOM_HEADERS += flash/geom/Rectangle_as.h
+GEOM_SOURCES += asobj/flash/geom/Rectangle_as.cpp
+GEOM_HEADERS += asobj/flash/geom/Rectangle_as.h
 endif
 
 if BUILD_TRANSFORM_AS3
-GEOM_SOURCES += flash/geom/Transform_as.cpp
-GEOM_HEADERS += flash/geom/Transform_as.h
+GEOM_SOURCES += asobj/flash/geom/Transform_as.cpp
+GEOM_HEADERS += asobj/flash/geom/Transform_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(GEOM_SOURCES)

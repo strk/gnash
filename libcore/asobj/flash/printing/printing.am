@@ -17,22 +17,22 @@
 
 PRINTINGdir = $(includedir)/gnash
 
-PRINTING_SOURCES = flash/printing/printing_pkg.cpp
-PRINTING_HEADERS = flash/printing/printing_pkg.h
+PRINTING_SOURCES = asobj/flash/printing/printing_pkg.cpp
+PRINTING_HEADERS = asobj/flash/printing/printing_pkg.h
 
 if BUILD_PRINTJOBOPTIONS_AS3
-PRINTING_SOURCES += flash/printing/PrintJobOptions_as.cpp
-PRINTING_HEADERS += flash/printing/PrintJobOptions_as.h
+PRINTING_SOURCES += asobj/flash/printing/PrintJobOptions_as.cpp
+PRINTING_HEADERS += asobj/flash/printing/PrintJobOptions_as.h
 endif
 
 if BUILD_PRINTJOBORIENTATION_AS3
-PRINTING_SOURCES += flash/printing/PrintJobOrientation_as.cpp
-PRINTING_HEADERS += flash/printing/PrintJobOrientation_as.h
+PRINTING_SOURCES += asobj/flash/printing/PrintJobOrientation_as.cpp
+PRINTING_HEADERS += asobj/flash/printing/PrintJobOrientation_as.h
 endif
 
 if BUILD_PRINTJOB_AS3
-PRINTING_SOURCES += flash/printing/PrintJob_as.cpp
-PRINTING_HEADERS += flash/printing/PrintJob_as.h
+PRINTING_SOURCES += asobj/flash/printing/PrintJob_as.cpp
+PRINTING_HEADERS += asobj/flash/printing/PrintJob_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(PRINTING_SOURCES)

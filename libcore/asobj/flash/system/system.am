@@ -17,53 +17,53 @@
 
 SYSTEMdir = $(includedir)/gnash
 
-SYSTEM_SOURCES = flash/system/system_pkg.cpp
-SYSTEM_HEADERS = flash/system/system_pkg.h
+SYSTEM_SOURCES = asobj/flash/system/system_pkg.cpp
+SYSTEM_HEADERS = asobj/flash/system/system_pkg.h
 
 if BUILD_APPLICATIONDOMAIN_AS3
-SYSTEM_SOURCES += flash/system/ApplicationDomain_as.cpp
-SYSTEM_HEADERS += flash/system/ApplicationDomain_as.h
+SYSTEM_SOURCES += asobj/flash/system/ApplicationDomain_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/ApplicationDomain_as.h
 endif
 
 if BUILD_CAPABILITIES_AS3
-SYSTEM_SOURCES += flash/system/Capabilities_as.cpp
-SYSTEM_HEADERS += flash/system/Capabilities_as.h
+SYSTEM_SOURCES += asobj/flash/system/Capabilities_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/Capabilities_as.h
 endif
 
 if BUILD_IMECONVERSIONMODE_AS3
-SYSTEM_SOURCES += flash/system/IMEConversionMode_as.cpp
-SYSTEM_HEADERS += flash/system/IMEConversionMode_as.h
+SYSTEM_SOURCES += asobj/flash/system/IMEConversionMode_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/IMEConversionMode_as.h
 endif
 
 if BUILD_IME_AS3
-SYSTEM_SOURCES += flash/system/IME_as.cpp
-SYSTEM_HEADERS += flash/system/IME_as.h
+SYSTEM_SOURCES += asobj/flash/system/IME_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/IME_as.h
 endif
 
 if BUILD_LOADERCONTEXT_AS3
-SYSTEM_SOURCES += flash/system/LoaderContext_as.cpp
-SYSTEM_HEADERS += flash/system/LoaderContext_as.h
+SYSTEM_SOURCES += asobj/flash/system/LoaderContext_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/LoaderContext_as.h
 endif
 
 if BUILD_SECURITYDOMAIN_AS3
-SYSTEM_SOURCES += flash/system/SecurityDomain_as.cpp
-SYSTEM_HEADERS += flash/system/SecurityDomain_as.h
+SYSTEM_SOURCES += asobj/flash/system/SecurityDomain_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/SecurityDomain_as.h
 endif
 
 if BUILD_SECURITYPANEL_AS3
-SYSTEM_SOURCES += flash/system/SecurityPanel_as.cpp
-SYSTEM_HEADERS += flash/system/SecurityPanel_as.h
+SYSTEM_SOURCES += asobj/flash/system/SecurityPanel_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/SecurityPanel_as.h
 endif
 
 if BUILD_SECURITY_AS3
-SYSTEM_SOURCES += flash/system/Security_as.cpp
-SYSTEM_HEADERS += flash/system/Security_as.h
+SYSTEM_SOURCES += asobj/flash/system/Security_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/Security_as.h
 endif
 
 # FIXME: already exists
 if BUILD_SYSTEM_AS3
-# SYSTEM_SOURCES += flash/system/System_as.cpp
-SYSTEM_HEADERS += flash/system/System_as.h
+# SYSTEM_SOURCES += asobj/flash/system/System_as.cpp
+SYSTEM_HEADERS += asobj/flash/system/System_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SYSTEM_SOURCES)

@@ -2238,7 +2238,6 @@ libmedia/Makefile
 libsound/Makefile
 libbase/Makefile
 libcore/Makefile
-libcore/asobj/Makefile
 libcore/vm/Makefile
 libcore/parser/Makefile
 libnet/Makefile

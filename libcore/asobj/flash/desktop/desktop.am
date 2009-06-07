@@ -17,22 +17,22 @@
 
 DESKTOPdir = $(includedir)/gnash
 
-DESKTOP_SOURCES = flash/desktop/desktop_pkg.cpp
-DESKTOP_HEADERS = flash/desktop/desktop_pkg.h
+DESKTOP_SOURCES = asobj/flash/desktop/desktop_pkg.cpp
+DESKTOP_HEADERS = asobj/flash/desktop/desktop_pkg.h
 
 if BUILD_CLIPBOARDFORMATS_AS3
-DESKTOP_SOURCES += flash/desktop/ClipboardFormats_as.cpp
-DESKTOP_HEADERS += flash/desktop/ClipboardFormats_as.h
+DESKTOP_SOURCES += asobj/flash/desktop/ClipboardFormats_as.cpp
+DESKTOP_HEADERS += asobj/flash/desktop/ClipboardFormats_as.h
 endif
 
 if BUILD_CLIPBOARDTRANSFERMODE_AS3
-DESKTOP_SOURCES += flash/desktop/ClipboardTransferMode_as.cpp
-DESKTOP_HEADERS += flash/desktop/ClipboardTransferMode_as.h
+DESKTOP_SOURCES += asobj/flash/desktop/ClipboardTransferMode_as.cpp
+DESKTOP_HEADERS += asobj/flash/desktop/ClipboardTransferMode_as.h
 endif
 
 if BUILD_CLIPBOARD_AS3
-DESKTOP_SOURCES += flash/desktop/Clipboard_as.cpp
-DESKTOP_HEADERS += flash/desktop/Clipboard_as.h
+DESKTOP_SOURCES += asobj/flash/desktop/Clipboard_as.cpp
+DESKTOP_HEADERS += asobj/flash/desktop/Clipboard_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(DESKTOP_SOURCES)
