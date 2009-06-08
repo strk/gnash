@@ -57,7 +57,6 @@ libgnashasobjs_la_SOURCES = \
 	Boolean_as.cpp \
 	Camera.cpp \
 	Color_as.cpp \
-	ContextMenu.cpp	\
 	CustomActions.cpp\
 	Date_as.cpp \
 	Error_as.cpp \
@@ -91,7 +90,6 @@ noinst_HEADERS = \
 	Boolean_as.h \
 	Camera.h \
 	Color_as.h	\
-	ContextMenu.h \
 	CustomActions.h	\
 	Date_as.h \
 	Error_as.h	\

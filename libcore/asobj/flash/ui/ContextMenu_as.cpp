@@ -22,11 +22,13 @@
 #endif
 
 #include "ui/ContextMenu_as.h"
+#include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 namespace gnash {
 
@@ -50,6 +52,61 @@ public:
         :
         as_object(getContextMenuInterface())
     {}
+    
+    ContextMenu_as(const as_value& callback)
+		:
+		as_object(getExportedInterface())
+	{
+		setCallback(callback);
+	}
+
+    ContextMenu_as(as_function* callback)
+		:
+		as_object(getExportedInterface())
+	{
+		setCallback(callback);
+	}
+
+	static void registerConstructor(as_object& global);
+
+private:
+
+	/// Get the callback to call when user invokes the context menu.
+	//
+	/// If NULL, no action will be taken on select.
+	///
+	as_function* getCallback() 
+	{
+		as_value tmp;
+		if (get_member(NSV::PROP_ON_SELECT, &tmp))
+			return tmp.to_as_function();
+		else return NULL;
+	}
+
+	/// Set the callback to call when user invokes the context menu.
+	//
+	/// @param callback
+	///	The function to call. If the value is not a function, no
+	///	action will be taken on select.
+	///
+	void setCallback(const as_value& callback)
+	{
+		set_member(NSV::PROP_ON_SELECT, callback);
+	}
+
+	/// Attach the exported interface of this ActionScript class
+	/// to the given object.
+	static void attachExportedInterface(as_object& o);
+
+	/// Get the ContextMenu.prototype ActionScript object
+	static as_object* getExportedInterface();
+
+	static as_value ctor_method(const fn_call& fn);
+
+	static as_value hideBuiltInItems_method(const fn_call& fn);
+
+	static as_value copy_method(const fn_call& fn);
+
 };
 
 // extern (used by Global.cpp)
