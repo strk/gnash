@@ -47,7 +47,7 @@
 #include "NetConnection_as.h"
 #include "NetStream_as.h"
 #include "Selection_as.h"
-#include "SharedObject_as.h"
+#include "flash/net/SharedObject_as.h"
 #include "Sound_as.h"
 #include "Stage_as.h"
 #include "System_as.h"

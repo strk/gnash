@@ -50,7 +50,7 @@
 #include "movie_definition.h"
 #include "NetConnection_as.h"
 #include "NetStream_as.h"
-#include "SharedObject_as.h"
+#include "flash/net/SharedObject_as.h"
 #include "Stage_as.h"
 #include "System_as.h"
 #include "flash/text/TextFormat_as.h"

@@ -184,10 +184,10 @@ DISPLAY_HEADERS += asobj/flash/display/StageScaleMode_as.h
 endif
 
 # FIXME: already exists
-# if BUILD_STAGE_AS3
-# DISPLAY_SOURCES += asobj/flash/display/Stage_as.cpp
+if BUILD_STAGE_AS3
+DISPLAY_SOURCES += asobj/flash/display/Stage_as.cpp
 DISPLAY_HEADERS += asobj/flash/display/Stage_as.h
-# endif
+endif
 
 libgnashasobjs_la_SOURCES += $(DISPLAY_SOURCES) $(DISPLAY_SOURCES_AS2)
 noinst_HEADERS +=  $(DISPLAY_HEADERS) $(DISPLAY_HEADERS_AS2) \
