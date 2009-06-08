@@ -62,7 +62,6 @@ libgnashasobjs_la_SOURCES = \
 	Error_as.cpp \
 	Global.cpp \
 	int_as.cpp \
-	Key_as.cpp	\
 	LoadVars_as.cpp \
 	LocalConnection_as.cpp\
 	Math_as.cpp \
@@ -94,7 +93,6 @@ noinst_HEADERS = \
 	Math_as.h	\
 	Global.h\
 	int_as.h \
-	Key_as.h \
 	LoadVars_as.h \
 	LocalConnection_as.h\
 	Microphone.h \

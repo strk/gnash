@@ -24,14 +24,58 @@
 #include "gnashconfig.h"
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
+#include "as_object.h" // for inheritance
+#include "GnashKey.h" // for key::code
+#include "dsodefs.h"
+#include <bitset>
 
 namespace gnash {
 
 // Forward declarations
-class as_object;
+class event_id;
 
-/// Initialize the global Keyboard class
-void keyboard_class_init(as_object& global);
+class Keyboard_as : public as_object
+{
+protected:
+
+#ifdef GNASH_USE_GC
+    // Mark all key listeners as reachable
+    void markReachableResources() const;
+#endif // def GNASH_USE_GC
+
+public:
+
+    Keyboard_as();	
+	static void init(as_object& global);
+	    // Pass SWF keycode, returns true if currently pressed.
+    bool is_key_down(int keycode);
+
+    // Pass gnash::key::code. Changes m_last_key_event
+    // and adds appropriate SWF keycode to bit array of keys
+    // pressed (_unreleasedKeys)
+    void set_key_down(key::code code);
+
+    // Pass gnash::key::code. Changes m_last_key_event
+    // and removes appropriate SWF keycode from bit array of keys
+    // pressed (_unreleasedKeys)
+    void set_key_up(key::code code);
+    
+    int get_last_key() const;
+
+    /// Responsible for user defined key events handlers only;
+    /// take over both DisplayObjects and non-DisplayObjects object.
+    void notify_listeners(const event_id& key_event_type);
+
+private:
+    /// bit-array for recording the unreleased keys
+    std::bitset<key::KEYCOUNT> _unreleasedKeys;   
+
+    typedef std::list<boost::intrusive_ptr<as_object> > Listeners;
+    Listeners _listeners;
+
+    int _lastKeyEvent;
+};
 
 } // gnash namespace
 

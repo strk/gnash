@@ -33,7 +33,7 @@
 #include "Global.h"
 #include "int_as.h"
 #include "String_as.h"
-#include "Key_as.h"
+#include "flash/ui/Keyboard_as.h"
 #include "LoadVars_as.h"
 #include "LocalConnection_as.h"
 #include "Microphone.h"
@@ -312,7 +312,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
         NS_GLOBAL, 5 },
-	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
         NS_GLOBAL, 5 },
 	{ TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,

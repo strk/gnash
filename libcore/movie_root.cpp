@@ -565,7 +565,7 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-boost::intrusive_ptr<Key_as>
+boost::intrusive_ptr<Keyboard_as>
 movie_root::getKeyObject()
 {
 	// TODO: test what happens with the global "Key" object
@@ -584,7 +584,7 @@ movie_root::getKeyObject()
 		if (global->get_member(NSV::CLASS_KEY, &kval)) {
 
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
-			_keyobject = boost::dynamic_pointer_cast<Key_as>( obj );
+			_keyobject = boost::dynamic_pointer_cast<Keyboard_as>( obj );
 		}
 	}
 
@@ -612,7 +612,7 @@ movie_root::getMouseObject()
 }
 
 
-Key_as*
+Keyboard_as*
 movie_root::notify_global_key(key::code k, bool down)
 {
     // NOTE: we don't check SWF version here
@@ -621,7 +621,7 @@ movie_root::notify_global_key(key::code k, bool down)
     //       which would need to query Key object.
     //       Testcase: http://www.ferryhalim.com/orisinal/g3/00dog.swf 
 
-	boost::intrusive_ptr<Key_as> keyobject = getKeyObject();
+	boost::intrusive_ptr<Keyboard_as> keyobject = getKeyObject();
 	if ( keyobject )
 	{
 		if (down) _keyobject->set_key_down(k);
@@ -642,7 +642,7 @@ movie_root::notify_key_event(key::code k, bool down)
 	//
 	// First of all, notify the _global.Key object about key event
 	//
-	Key_as * global_key = notify_global_key(k, down);
+	Keyboard_as * global_key = notify_global_key(k, down);
 
 	// Notify DisplayObject key listeners for clip key events
 	notify_key_listeners(k, down);

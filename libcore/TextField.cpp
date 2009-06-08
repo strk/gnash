@@ -28,7 +28,7 @@
 #include "movie_definition.h" // to extract version info
 #include "MovieClip.h"
 #include "TextField.h"
-#include "Key_as.h" // for keyboard events
+#include "flash/ui/Keyboard_as.h" // for keyboard events
 #include "movie_root.h"     // for killing focus
 #include "as_environment.h" // for parse_path
 #include "action.h" // for as_standard_member enum

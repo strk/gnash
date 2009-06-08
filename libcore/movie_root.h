@@ -73,7 +73,7 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
 #include "drag_state.h" // for composition
-#include "Key_as.h"
+#include "flash/ui/Keyboard_as.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
@@ -951,7 +951,7 @@ private:
     void executeTimers();
 
     /// Notify the global Key ActionScript object about a key status change
-    Key_as * notify_global_key(key::code k, bool down);
+    Keyboard_as * notify_global_key(key::code k, bool down);
 
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
@@ -1017,7 +1017,7 @@ private:
     /// Characters for listening key events
     KeyListeners m_key_listeners;
 
-    boost::intrusive_ptr<Key_as> _keyobject;
+    boost::intrusive_ptr<Keyboard_as> _keyobject;
 
     boost::intrusive_ptr<as_object> _mouseobject;
 
@@ -1104,7 +1104,7 @@ private:
     //
     /// @@ might be worth making public
     ///
-    boost::intrusive_ptr<Key_as> getKeyObject();
+    boost::intrusive_ptr<Keyboard_as> getKeyObject();
 
     /// Return the global Mouse object 
     //
