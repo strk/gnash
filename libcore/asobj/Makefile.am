@@ -78,8 +78,6 @@ libgnashasobjs_la_SOURCES = \
 	Sound_as.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
-	TextFormat_as.cpp \
-	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
 	XMLSocket_as.cpp \
@@ -112,8 +110,6 @@ noinst_HEADERS = \
 	Sound_as.h \
 	Stage_as.h	\
 	System_as.h \
-	TextFormat_as.h \
-	TextSnapshot_as.h \
 	String_as.h \
 	XMLSocket_as.h \
 	LoadableObject.h \

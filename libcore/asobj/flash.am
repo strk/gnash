@@ -52,7 +52,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Sound_as.cpp \
 	asobj/Stage_as.cpp \
 	asobj/System_as.cpp \
-	asobj/TextFormat_as.cpp \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
 	asobj/XMLSocket_as.cpp \
@@ -85,7 +84,6 @@ noinst_HEADERS += \
 	asobj/Sound_as.h \
 	asobj/Stage_as.h	\
 	asobj/System_as.h \
-	asobj/TextFormat_as.h \
 	asobj/String_as.h \
 	asobj/XMLSocket_as.h \
 	asobj/LoadableObject.h \

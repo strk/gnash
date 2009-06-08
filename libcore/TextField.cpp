@@ -41,7 +41,7 @@
 #include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
-#include "TextFormat_as.h" // for getTextFormat/setTextFormat
+#include "text/TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 #include "Point2d.h"
