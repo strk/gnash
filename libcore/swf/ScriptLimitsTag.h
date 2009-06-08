@@ -22,6 +22,7 @@
 #include "SWFStream.h" // for inlines
 #include "movie_root.h"
 #include "movie_definition.h"
+#include "ControlTag.h"
 
 namespace gnash {
 namespace SWF {
@@ -30,34 +31,48 @@ namespace SWF {
 //
 /// A loaded movie containing a ScriptLimits tag should change the *global*
 /// scriptlimits setting, so this is kept in movie_root rather than the
-/// immutable movie_definition. Whenever this tag is parsed, the value in
-/// movie_root is overridden.
-class ScriptLimitsTag
+/// immutable movie_definition. 
+class ScriptLimitsTag : public ControlTag
 {
 public:
 
-    static void loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
+    virtual ~ScriptLimitsTag() {}
+
+    virtual void execute(MovieClip* m, DisplayList& /*dl*/) const
+    {
+        log_debug("Setting script limits: recursion %s, timeout %s",
+                _recursionLimit, _timeoutLimit);
+        m->getVM().getRoot().setScriptLimits(_recursionLimit, _timeoutLimit);
+    }
+
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& /*r*/)
     {
+        assert(tag = SWF::SCRIPTLIMITS);
+        std::auto_ptr<ScriptLimitsTag> s(new ScriptLimitsTag(in));
+        m.addControlTag(s.release());
+    }
 
-        assert(VM::isInitialized());
+private:
 
-        in.ensureBytes(4); // recursion and timeout.
-
-        // We need to get the root movie or the VM from somewhere
-        // in order to make the VM not a singleton.
-        movie_root& r = VM::get().getRoot();
-
-        const boost::uint16_t recursionLimit = in.read_u16();
-        const boost::uint16_t timeoutLimit = in.read_u16();      
+    ScriptLimitsTag(SWFStream& in)
+        :
+        _recursionLimit(0),
+        _timeoutLimit(0)
+    {
+        in.ensureBytes(4); 
+        _recursionLimit = in.read_u16();
+        _timeoutLimit = in.read_u16();      
 
         IF_VERBOSE_PARSE (
-            log_parse(_("  ScriptLimits tag(%d): recursion: %d, timeout: %d"),
-                    tag, recursionLimit, timeoutLimit);
+            log_parse(_("  ScriptLimits tag: recursion: %d, timeout: %d"),
+                    _recursionLimit, _timeoutLimit);
 	    );
 
-        r.setScriptLimits(recursionLimit, timeoutLimit);
     }
+    
+    boost::uint16_t _recursionLimit;
+    boost::uint16_t _timeoutLimit;
 };
 
 } // namespace gnash::SWF
