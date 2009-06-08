@@ -38,6 +38,8 @@
 // Debug sound decoding
 //#define GNASH_DEBUG_SOUNDS_DECODING
 
+//#define GNASH_DEBUG_SOUNDS_MANAGEMENT
+
 namespace gnash {
 namespace sound {
 
@@ -405,6 +407,77 @@ EmbedSoundInst::eof() const
 EmbedSoundInst::~EmbedSoundInst()
 {
     _soundDef.eraseActiveSound(this);
+}
+
+void
+EmbedSoundInst::appendDecodedData(boost::uint8_t* data, unsigned int size)
+{
+    if ( ! _decodedData.get() )
+    {
+        _decodedData.reset( new SimpleBuffer );
+
+        // Skip samples if requested and we're at the start
+        const media::SoundInfo& sinfo = *(_soundDef.soundinfo);
+        boost::int16_t delaySeek = sinfo.getDelaySeek();
+
+        if ( delaySeek > 0 )
+        {
+            // seek the specified number of samples and throw them away
+
+            // each sample is 2 bytes per channel, and we're stereo
+            unsigned int off = delaySeek*4;
+
+            // delaySeek refers to pre-resampled state so we need to
+            // take that into account.
+            //
+            // NOTE: this was tested with inputs:
+            //     - isStereo?0 is16bit()?1 sampleRate?22050
+            //     - isStereo?1 is16bit()?1 sampleRate?22050
+            //     - isStereo?1 is16bit()?1 sampleRate?44100
+            // TODO: test with other sample sizes !
+            //log_debug("NOTE: isStereo?%d is16bit()?%d sampleRate?%d",
+            //  sinfo.isStereo(), sinfo.is16bit(), sinfo.getSampleRate());
+            //
+            off *= 44100/sinfo.getSampleRate();
+
+
+            if ( off < size )
+            {
+                log_debug("Skipping first %d samples of event sound", off/2);
+                _decodedData->append(data+off, size-off);
+            }
+            else
+            {
+                // TODO: could be there'll be more samples later
+                //       so we need to keep track of how many we decoded
+                //       at this stage
+                log_error("delaySeek (%d) >= initial block samples (%d)",
+                    delaySeek, size/2);
+            }
+        }
+        else if ( delaySeek < 0 )
+        {
+            // insert delaySeek samples of silence here
+
+            // TODO: use a stack-allocated buffer and a loop here
+            unsigned int silenceSize = -delaySeek*2; // we talk 8bit
+            boost::scoped_array<boost::uint8_t> silence (
+                new boost::uint8_t[silenceSize]
+            );
+            _decodedData->append(silence.get(), silenceSize);
+            _decodedData->append(data, size);
+        }
+        else
+        {
+            _decodedData->append(data, size);
+        }
+    }
+    else
+    {
+        _decodedData->append(data, size);
+    }
+
+    delete [] data; // ownership transferred...
 }
 
 } // gnash.sound namespace 

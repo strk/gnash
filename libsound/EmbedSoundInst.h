@@ -143,16 +143,7 @@ private:
     /// @param size
     /// Size of the 'data' buffer.
     ///
-    void appendDecodedData(boost::uint8_t* data, unsigned int size)
-    {
-        if ( ! _decodedData.get() )
-        {
-            _decodedData.reset( new SimpleBuffer );
-        }
-  
-        _decodedData->append(data, size);
-        delete [] data; // ownership transferred...
-    }
+    void appendDecodedData(boost::uint8_t* data, unsigned int size);
   
     /// Set decoded data
     //
