@@ -17,16 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <boost/shared_ptr.hpp>
-#include <cmath> // std::fmod
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
-#include <locale>
-#include <sstream>
-#include <iomanip>
-#include <string>
-
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h"
 #include "as_object.h"
@@ -51,6 +41,16 @@
 #include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
 #include "StringPredicates.h"
+
+#include <boost/shared_ptr.hpp>
+#include <cmath> 
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
+#include <locale>
+#include <sstream>
+#include <iomanip>
+#include <string>
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
@@ -291,15 +291,11 @@ public:
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
-#if 0
         if ( ! val.writeAMF0(_buf, _offsetTable, _vm, _allowStrict) )
         {
             log_error("Problems serializing an object's member");
             _error=true;
         }
-#else
-    log_error("writeAMF0 disabled for now");
-#endif
     }
 private:
 
