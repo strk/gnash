@@ -3,7 +3,7 @@
 #define GNASH_ASOBJ_FLASH_XML_H 1
 #include "sharedlib.h"
 static gnash::SharedLib::initentry *as3xmlclasses[] = {
-	gnash::xmldocument_class_init,
+	gnash::XMLDocument_as::init,
 	gnash::XMLNode_as::init,
 	gnash::xmlnodetype_class_init,
 	0
