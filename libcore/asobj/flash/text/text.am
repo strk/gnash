@@ -96,7 +96,7 @@ endif
 
 # FIXME: already exists
 if BUILD_TEXTFORMAT_AS3
-# TEXT_SOURCES += asobj/flash/text/TextFormat_as.cpp
+TEXT_SOURCES += asobj/flash/text/TextFormat_as.cpp
 TEXT_HEADERS += asobj/flash/text/TextFormat_as.h
 endif
 
