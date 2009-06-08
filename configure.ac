@@ -495,6 +495,31 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
+dnl Enable using OpenSSL with libnet.
+AC_ARG_ENABLE(build_openssl,
+  AC_HELP_STRING([--enable-openssl], [Enable using OpenSSL directly]),
+[case "${enableval}" in
+  yes) build_openssl=yes ;;
+  no)  build_openssl=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
+esac], build_openssl=yes)
+
+with_cert=
+with_pem=
+AM_CONDITIONAL(BUILD_OPENSSL, test x$build_openssl= xyes)
+AC_ARG_WITH(cert,
+  AC_HELP_STRING([--with-cert],
+  [cert file for SSL]),
+  with_cert=${withval})
+AC_ARG_WITH(pem,
+  AC_HELP_STRING([--with-pe,],
+  [pem file for SSL]),
+  with_pem=${withval})
+
+if test x"${build_openssl}" = x"yes"; then
+  GNASH_PKG_FIND(openssl, [openssl/openssl.h], [openssl library], SSL_get_peer_certificate, [1.0])
+fi
+
 dnl The class file is an optional file that if it is specified at configure time
 dnl with --with-classfile=, then only those classes are compiled and built into the
 dnl class library used for Gnash. THis is designed for small systems that execute the
@@ -1199,6 +1224,7 @@ fi
 if test x$ext_mysql = xyes; then
   GNASH_PATH_MYSQL
 fi
+
 
 dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
@@ -2381,6 +2407,22 @@ dnl   echo "        Building extensions enabled (default). Use --disable-extensi
 dnl else
 dnl   echo "        Building Gnash extensions disabled."
 dnl fi
+
+if test x"${build_openssl}" = x"yes"; then
+  echo "        OpenSSL support enabled (default). Use --disable-openssl to disable."
+  if test x"$(cert}" != x; then
+     echo "        Cert is: $(cert}"
+  else
+     echo "        Cert is: default"
+  fi
+  if test x"$(pem}" != x; then
+     echo "        Pem is: $(pem}"
+  else
+     echo "        Pem is: default"
+  fi
+else
+  echo "        OpenSSL support disabled."
+fi
 
 if test x"$cygnal" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
