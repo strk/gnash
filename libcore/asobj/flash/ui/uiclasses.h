@@ -6,7 +6,7 @@ static gnash::SharedLib::initentry *as3uiclasses[] = {
 	gnash::contextmenubuiltinitems_class_init,
 	gnash::contextmenuitem_class_init,
 	gnash::keylocation_class_init,
-	gnash::keyboard_class_init,
+	gnash::Keyboard_as::init,
 	gnash::mouse_class_init,
 	0
 };

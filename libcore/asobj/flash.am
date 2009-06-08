@@ -37,7 +37,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Error_as.cpp \
 	asobj/Global.cpp \
 	asobj/int_as.cpp \
-	asobj/Key_as.cpp	\
 	asobj/LoadVars_as.cpp \
 	asobj/LocalConnection_as.cpp\
 	asobj/Math_as.cpp \
@@ -71,7 +70,6 @@ noinst_HEADERS += \
 	asobj/Math_as.h	\
 	asobj/Global.h\
 	asobj/int_as.h \
-	asobj/Key_as.h \
 	asobj/LoadVars_as.h \
 	asobj/LocalConnection_as.h\
 	asobj/Microphone.h \
@@ -94,7 +92,7 @@ noinst_HEADERS += \
 
 EXTENSIONS_API += \
 	asobj/Array_as.h \
-	asobj/Key_as.h \
+	asobj/flash/ui/Keyboard_as.h \
 	$(NULL)
 
 CLEANFILES = *classes.h

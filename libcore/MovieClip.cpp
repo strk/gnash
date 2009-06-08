@@ -31,7 +31,7 @@
 #include "TextField.h"
 #include "ControlTag.h"
 #include "fn_call.h"
-#include "Key_as.h"
+#include "flash/ui/Keyboard_as.h"
 #include "movie_root.h"
 #include "Movie.h"
 #include "swf_event.h"
