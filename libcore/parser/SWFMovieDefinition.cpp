@@ -340,28 +340,11 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 		);
 	}
 
-	// It seems frame rate is limited to a max 
-	// 84 was found by testing the pp, might be turned into a
-    // compile-time define
-	static const int maxfps = 84;
-	
 	_str->ensureBytes(2 + 2); // frame rate, frame count.
-	m_frame_rate = _str->read_u16();
-	if ( ! m_frame_rate )
-	{
-		log_debug("Frame rate of 0 taken as %d (upper bound)", maxfps);
-		m_frame_rate = maxfps;
-	}
-	else
-	{
-		m_frame_rate /= 256.0f;
-		if ( m_frame_rate > maxfps )
-		{
-			log_debug("Frame rate of %d too high, we'll use %d (upper bound)",
-				m_frame_rate, maxfps);
-			m_frame_rate = maxfps;
-		}
-	}
+	m_frame_rate = _str->read_u16() / 256.0f;
+    if (!m_frame_rate) {
+        m_frame_rate = std::numeric_limits<boost::uint16_t>::max();
+    }
 
 	m_frame_count = _str->read_u16();
 
