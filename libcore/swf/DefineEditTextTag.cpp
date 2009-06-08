@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "DefineEditTextTag.h"
-#include "TextField.h"
+#include "text/TextField_as.h"
 #include "movie_definition.h"
 #include "Font.h"
 #include "SWFStream.h"
@@ -43,7 +43,7 @@ DefineEditTextTag::createDisplayObject(DisplayObject* parent, int id) const
 {
 	// Resolve the font, if possible
 	getFont();
-	TextField* ch = new TextField(parent, *this, id);
+	TextField_as* ch = new TextField_as(parent, *this, id);
 
 	// This gives an "instance name" to the TextField, but
 	// it is not really what we need.
@@ -152,7 +152,7 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 	if (hasLayout)
 	{
 		in.ensureBytes(9); //1 + 2 + 2 + 2 + 2
-		_alignment = static_cast<TextField::TextAlignment>(in.read_u8());
+		_alignment = static_cast<TextField_as::TextAlignment>(in.read_u8());
 		_leftMargin = in.read_u16();
 		_rightMargin = in.read_u16();
 		_indent = in.read_s16();
@@ -191,7 +191,7 @@ DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m)
 	_fontID(-1),
 	_textHeight(1),
 	_maxChars(0),
-	_alignment(TextField::ALIGN_LEFT),
+	_alignment(TextField_as::ALIGN_LEFT),
 	_leftMargin(0),
 	_rightMargin(0),
 	_indent(0),

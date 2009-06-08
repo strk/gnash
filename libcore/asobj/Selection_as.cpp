@@ -29,7 +29,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h"
-#include "TextField.h"
+#include "text/TextField_as.h"
 
 // For getting and setting focus
 #include "VM.h"
@@ -120,7 +120,7 @@ selection_getBeginIndex(const fn_call& fn)
     movie_root& mr = ptr->getVM().getRoot();
     DisplayObject* focus = mr.getFocus().get();
 
-    TextField* tf = dynamic_cast<TextField*>(focus);
+    TextField_as* tf = dynamic_cast<TextField_as*>(focus);
 
     if (!tf) return as_value(-1);
 
@@ -142,7 +142,7 @@ selection_getCaretIndex(const fn_call& fn)
     movie_root& mr = ptr->getVM().getRoot();
     DisplayObject* focus = mr.getFocus().get();
 
-    TextField* tf = dynamic_cast<TextField*>(focus);
+    TextField_as* tf = dynamic_cast<TextField_as*>(focus);
 
     if (!tf) return as_value(-1);
 
@@ -158,7 +158,7 @@ selection_getEndIndex(const fn_call& fn)
     movie_root& mr = ptr->getVM().getRoot();
     DisplayObject* focus = mr.getFocus().get();
 
-    TextField* tf = dynamic_cast<TextField*>(focus);
+    TextField_as* tf = dynamic_cast<TextField_as*>(focus);
 
     if (!tf) return as_value(-1);
 
@@ -257,7 +257,7 @@ selection_setSelection(const fn_call& fn)
     movie_root& mr = ptr->getVM().getRoot();
     DisplayObject* focus = mr.getFocus().get();
 
-    TextField* tf = dynamic_cast<TextField*>(focus);
+    TextField_as* tf = dynamic_cast<TextField_as*>(focus);
 
     if (!tf) return as_value();
 
