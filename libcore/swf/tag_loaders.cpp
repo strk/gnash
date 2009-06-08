@@ -954,34 +954,19 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     unsigned int    sample_count = in.read_u32();
 
+    boost::int16_t delaySeek = 0;
+
     if (format == media::AUDIO_CODEC_MP3) {
         in.ensureBytes(2);
-        boost::int16_t    delay_seek = in.read_s16();    // FIXME - not implemented/used
-        //
-        // The DelaySeek field has the following meaning:
-        // * If this value is positive, the player seeks this number of
-        //   samples into the sound block before the sound is played.
-        //   However, the seek is only performed if the player reached
-        //   the current frame via a GotoFrame action, otherwise no
-        //   seek is performed.
-        //
-        // * If this value is negative the player plays this number of
-        //   silent samples before playing the sound block. The player
-        //   behaves this way, regardless of how the current frame was
-        //   reached.
-        //
-        // quoted from
-        // http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/swf/Sounds.htm
-        //
-        if ( delay_seek ) { LOG_ONCE( log_unimpl("MP3 delay seek") ); }
+        delaySeek = in.read_s16();
     }
 
     IF_VERBOSE_PARSE
     (
         log_parse(_("define sound: ch=%d, format=%s, "
-            "rate=%d, 16=%d, stereo=%d, ct=%d"),
+            "rate=%d, 16=%d, stereo=%d, ct=%d, delay=%d"),
               id, format, sample_rate,
-              int(sample_16bit), int(stereo), sample_count);
+              int(sample_16bit), int(stereo), sample_count, delaySeek);
     );
 
     // If we have a sound_handler, ask it to init this sound.
@@ -1014,7 +999,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         // Store all the data in a SoundInfo object
         std::auto_ptr<media::SoundInfo> sinfo;
         sinfo.reset(new media::SoundInfo(format, stereo, sample_rate,
-                    sample_count, sample_16bit));
+                    sample_count, sample_16bit, delaySeek));
 
         // Stores the sounddata in the soundhandler, and the ID returned
         // can be used to starting, stopping and deleting that sound
@@ -1140,8 +1125,12 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
         try
         {
             in.ensureBytes(2);
-            latency = in.read_s16(); // UNUSED !!
-            LOG_ONCE ( if ( latency ) log_unimpl("MP3 stream latency seek") );
+            latency = in.read_s16(); 
+            if ( latency )
+            {
+                LOG_ONCE ( log_unimpl("MP3 stream latency seek") );
+                // TODO: should we pass as 'delaySeek' to SoundInfo ?
+            }
         }
         catch (ParserException& ex)
         {
