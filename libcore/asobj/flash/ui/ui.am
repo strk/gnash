@@ -32,7 +32,7 @@ endif
 
 # FIXME: already exists
 if BUILD_CONTEXTMENU_AS3
-# UI_SOURCES += asobj/flash/ui/ContextMenu_as.cpp
+UI_SOURCES += asobj/flash/ui/ContextMenu_as.cpp
 UI_HEADERS += asobj/flash/ui/ContextMenu_as.h
 endif
 
