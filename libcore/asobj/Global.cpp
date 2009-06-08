@@ -43,7 +43,7 @@
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
-#include "XML_as.h"
+#include "flash/xml/XMLDocument_as.h"
 #include "XMLSocket_as.h"
 #include "flash/ui/Mouse_as.h"
 #include "MovieClipLoader.h"
@@ -899,7 +899,7 @@ registerNatives(as_object& global)
     // LoadableObject has natives shared between LoadVars and XML, so 
     // should be registered first.
     LoadableObject::registerNative(global);
-    XML_as::registerNative(global);
+    XMLDocument_as::registerNative(global);
     XMLNode_as::registerNative(global);
 
 }

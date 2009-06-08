@@ -82,7 +82,6 @@ libgnashasobjs_la_SOURCES = \
 	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
-	XML_as.cpp \
 	XMLSocket_as.cpp \
 	LoadableObject.cpp \
 	Object.cpp
@@ -116,7 +115,6 @@ noinst_HEADERS = \
 	TextFormat_as.h \
 	TextSnapshot_as.h \
 	String_as.h \
-	XML_as.h \
 	XMLSocket_as.h \
 	LoadableObject.h \
 	Namespace_as.h \

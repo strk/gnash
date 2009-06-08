@@ -798,14 +798,13 @@ myxml.onLoad = function(success)
 
 	if ( ! success )
 	{
-		//note("No success loading gnash.xml");
+		note("No success loading gnash.xml");
 		check_equals(myxml.status, 0);
 		check(! myxml.loaded);
 		return;
 	}
-	//note("gnash.xml successfully loaded");
-	//note("myxml status is "+myxml.status);
-
+	note("gnash.xml successfully loaded");
+	note("myxml status is "+myxml.status);
 	check_equals(myxml.status, 0);
 	check(myxml.loaded);
 

@@ -23,7 +23,7 @@
 
 #include "xml/XMLNode_as.h"
 //FIXME: direct this to the proper flash namespace
-#include "XML_as.h"
+#include "xml/XMLDocument_as.h"
 #include "Array_as.h"
 #include "Object.h"
 #include "VM.h"
@@ -356,7 +356,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 
             for (PropertyList::SortedPropertyList::iterator i = 
                     attrs.begin(), e = attrs.end(); i != e; ++i) { 
-                XML_as::escape(i->second);
+                XMLDocument_as::escape(i->second);
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
             }
         }
@@ -381,7 +381,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 
         // Insert entities.
         std::string escaped(nodeValue);
-        XML_as::escape(escaped);
+        XMLDocument_as::escape(escaped);
         const std::string& val = encode ? 
             global->callMethod(NSV::PROP_ESCAPE, escaped).to_string() :
             escaped;

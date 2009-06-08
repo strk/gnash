@@ -63,7 +63,7 @@
 #include "ClassHierarchy.h"
 #include "builtin_function.h"
 #include "XMLSocket_as.h"
-#include "XML_as.h"
+#include "xml/XMLDocument_as.h"
 #include "xml/XMLNode_as.h"
 #include "asClass.h"
 #include "flash/text/TextFieldAutoSize_as.h"
@@ -304,7 +304,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_NET, 5 },
 	{ Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ XML_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_XML, 5 },
 	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI,
