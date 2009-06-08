@@ -85,7 +85,7 @@ endif
 
 # FIXME: already exists
 if BUILD_TEXTFIELD_AS3
-# TEXT_SOURCES += asobj/flash/text/TextField_as.cpp
+TEXT_SOURCES += asobj/flash/text/TextField_as.cpp
 TEXT_HEADERS += asobj/flash/text/TextField_as.h
 endif
 

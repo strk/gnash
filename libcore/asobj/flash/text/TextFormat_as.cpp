@@ -27,7 +27,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "TextField.h"
+#include "text/TextField_as.h"
 #include "VM.h"
 #include "RGBA.h" // for rgba type
 #include "namedStrings.h"
@@ -41,8 +41,8 @@ namespace {
     void attachTextFormatInterface(as_object& o);
     void attachTextFormatStaticInterface(as_object& o);
     as_object* getTextFormatInterface();
-    const char* getAlignString(TextField::TextAlignment a);
-	TextField::TextAlignment parseAlignString(const std::string& align);
+    const char* getAlignString(TextField_as::TextAlignment a);
+	TextField_as::TextAlignment parseAlignString(const std::string& align);
     
 	as_value textformat_display(const fn_call& fn);
 	as_value textformat_bullet(const fn_call& fn);
@@ -135,7 +135,7 @@ TextFormat_as::TextFormat_as()
 	_bold(false),
 	_italic(false),
 	_bullet(false),
-	_align(TextField::ALIGN_LEFT),
+	_align(TextField_as::ALIGN_LEFT),
 	_blockIndent(-1),
 	_color(),
 	_indent(-1),
@@ -520,31 +520,31 @@ textformat_getTextExtent(const fn_call& /*fn*/)
 	return as_value();
 }
 
-TextField::TextAlignment
+TextField_as::TextAlignment
 parseAlignString(const std::string& align)
 {
 	StringNoCaseEqual cmp;
-	if ( cmp(align, "left") ) return TextField::ALIGN_LEFT;
-    if ( cmp(align, "center") ) return TextField::ALIGN_CENTER;
-	if ( cmp(align, "right") ) return TextField::ALIGN_RIGHT;
-	if ( cmp(align, "justify") ) return TextField::ALIGN_JUSTIFY;
+	if ( cmp(align, "left") ) return TextField_as::ALIGN_LEFT;
+    if ( cmp(align, "center") ) return TextField_as::ALIGN_CENTER;
+	if ( cmp(align, "right") ) return TextField_as::ALIGN_RIGHT;
+	if ( cmp(align, "justify") ) return TextField_as::ALIGN_JUSTIFY;
 	
 	log_debug("Invalid align string %s, taking as left", align);
-	return TextField::ALIGN_LEFT;
+	return TextField_as::ALIGN_LEFT;
 }
 
 const char* 
-getAlignString(TextField::TextAlignment a)
+getAlignString(TextField_as::TextAlignment a)
 {
 	switch (a)
 	{
-		case TextField::ALIGN_LEFT:
+		case TextField_as::ALIGN_LEFT:
 			return "left";
-		case TextField::ALIGN_CENTER:
+		case TextField_as::ALIGN_CENTER:
 			return "center";
-		case TextField::ALIGN_RIGHT:
+		case TextField_as::ALIGN_RIGHT:
 			return "right";
-		case TextField::ALIGN_JUSTIFY:
+		case TextField_as::ALIGN_JUSTIFY:
 			return "justify";
 		default:
 			log_error("Uknown alignment value: %d, take as left", a);

@@ -28,7 +28,7 @@
 #include "as_value.h"
 #include "as_function.h"
 #include "Bitmap.h"
-#include "TextField.h"
+#include "text/TextField_as.h"
 #include "ControlTag.h"
 #include "fn_call.h"
 #include "flash/ui/Keyboard_as.h"
@@ -638,7 +638,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
         for (TextFields::const_iterator i=etc->begin(), e=etc->end();
                 i!=e; ++i)
         {
-            boost::intrusive_ptr<TextField> tf = i->get();
+            boost::intrusive_ptr<TextField_as> tf = i->get();
             if ( tf->getTextDefined() )
             {
                 val->set_string(tf->get_text_value());
@@ -767,7 +767,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
     rect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
 
     // Create an instance
-    boost::intrusive_ptr<DisplayObject> txt_char = new TextField(this, bounds);
+    boost::intrusive_ptr<DisplayObject> txt_char = new TextField_as(this, bounds);
 
     // Give name and mark as dynamic
     txt_char->set_name(name);
@@ -1970,7 +1970,7 @@ MovieClip::cleanup_textfield_variables()
 
 
 void
-MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
+MovieClip::set_textfield_variable(const std::string& name, TextField_as* ch)
 {
     assert(ch);
 

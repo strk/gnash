@@ -26,7 +26,7 @@
 #include "DefinitionTag.h"
 #include "swf.h" // for TagType definition
 #include "RGBA.h"
-#include "TextField.h"
+#include "text/TextField_as.h"
 
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends
  
@@ -135,7 +135,7 @@ public:
     }
 
 	/// Get text alignment
-    TextField::TextAlignment alignment() const {
+    TextField_as::TextAlignment alignment() const {
 		return _alignment;
 	}
 
@@ -277,7 +277,7 @@ private:
 	///
 	unsigned int _maxChars;
 
-    TextField::TextAlignment _alignment;
+    TextField_as::TextAlignment _alignment;
 	
 	/// extra space between box's left border and text (in twips)
 	boost::uint16_t _leftMargin;

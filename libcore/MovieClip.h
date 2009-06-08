@@ -46,7 +46,7 @@ namespace gnash {
     class drag_state;
     class LoadVariablesThread;
     class gradient_record;
-    class TextField;
+    class TextField_as;
     class BitmapData_as;
     class BitmapInfo;
     namespace SWF {
@@ -588,7 +588,7 @@ public:
     /// A TextField variable is a variable that acts
     /// as a setter/getter for a TextField 'text' member.
     ///
-    void set_textfield_variable(const std::string& name, TextField* ch);
+    void set_textfield_variable(const std::string& name, TextField_as* ch);
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
@@ -809,7 +809,7 @@ protected:
 
 private:
 
-    typedef std::vector<boost::intrusive_ptr<TextField> > TextFields;
+    typedef std::vector<boost::intrusive_ptr<TextField_as> > TextFields;
 
     /// A container for textfields, indexed by their variable name
     typedef std::map<std::string, TextFields> TextFieldIndex;
