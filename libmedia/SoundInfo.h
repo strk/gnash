@@ -63,6 +63,10 @@ public:
 	///     sound is played.
 	///     If this value is negative the player plays this
 	///     number of silent samples before playing the sound block
+	///     NOTE that this value refers to input samples, so must
+	///     be multiplied by OUTPUT_SAMPLE_RATE/getSampleRate()
+	///     and by 2 (two channels) to find number of output
+	///     samples to skip or fill.
 	///
 	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate,
             boost::uint32_t sampleCount, bool is16bit,
@@ -101,7 +105,10 @@ public:
 	///
 	unsigned long getSampleCount() const { return _sampleCount; }
 
-	/// Return the number of samples to seek forward or delay.
+	/// Return the number of samples to seek forward or delay
+	// 
+	/// The number is to be considered in pre-resampling units.
+	///
 	boost::int16_t getDelaySeek() const { return _delaySeek; }
 
 	/// Returns the 16bit status of the sound
