@@ -86,6 +86,9 @@ class LocalConnection_as {
 //	DejaGnu.note("ME1 "   + Type.typeof(String));
 //	DejaGnu.note("ME2 "   + Type.typeof(x1.domain));	
 //	if (Type.typeof(x1.domain)== Type.typeof(String));		
+
+	DejaGnu.note("Type of x1.domain "   + Type.typeof(x1.domain));
+
 #if flash9
 	if (Std.is(x1.domain,String) ) {
 	    DejaGnu.pass("LocalConnection.domain property exists");
@@ -115,7 +118,7 @@ class LocalConnection_as {
 	}
 #else
 	DejaGnu.note("Warning! A event handler here: allowDomain"   + Type.typeof(x1.allowDomain)); 
-	if (Type.typeof(x1.allowDomain) == ValueType.TNull) {
+	if (Type.typeof(x1.allowDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowDomain() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::allowDomain() method doesn't exist");
@@ -124,6 +127,9 @@ class LocalConnection_as {
 
 //Si modified May 27
 //This is test 4
+
+	DejaGnu.note("Type of x1.allowInsecureDomain "   + Type.typeof(x1.allowInsecureDomain));
+
 #if flash9
 	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowInsecureDomain() method exists");
@@ -132,7 +138,7 @@ class LocalConnection_as {
 	}
 #else
 	DejaGnu.note("Warning! A event handler here: allosDa "   + Type.typeof(x1.allowInsecureDomain));
-	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TNull) {
+	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowInsecureDomain() method exists");
 	} else {
 	    DejaGnu.fail("LocalConnection::allowInsecureDomain() method doesn't exist");
