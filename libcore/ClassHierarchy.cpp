@@ -58,7 +58,7 @@
 #include "VM.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
-#include "flash/text/TextField_as.h"
+#include "TextField.h"
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "builtin_function.h"
@@ -292,7 +292,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ system_class_init, NSV::CLASS_SYSTEM, 0, NSV::NS_FLASH_SYSTEM, 1 },
 	{ stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1 },
 	{ movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, NSV::NS_FLASH_DISPLAY, 3 },
-	{ TextField_as::init, NSV::CLASS_TEXT_FIELD, 0, NSV::NS_FLASH_TEXT, 3 },
+	{ textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, NSV::NS_FLASH_TEXT, 3 },
 	{ math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4 },
 	{ boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },

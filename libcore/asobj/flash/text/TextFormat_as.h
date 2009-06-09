@@ -23,7 +23,7 @@
 #ifdef HAVE_CONFIG_H
 #include "as_object.h" // for inheritance of TextFormat
 #include "gnashconfig.h"
-#include "text/TextField_as.h" // for TextAlignment enum
+#include "TextField.h" // for TextAlignment enum
 #include "RGBA.h" // for rgba
 #include <boost/cstdint.hpp> // for boost::uint32_t
 #include <string>
@@ -72,7 +72,7 @@ public:
 	bool indentDefined() const { return _flags&DEFindent; }
 
 	/// Return the alignment of the paragraph.
-	TextField_as::TextAlignment align() const { return _align; }
+	TextField::TextAlignment align() const { return _align; }
 	bool alignDefined() const { return _flags&DEFalign; }
 
 	/// Return the name of a font for text as a string.
@@ -122,7 +122,7 @@ public:
 	void indentSet(boost::uint16_t x)      { _indent = x; _flags |= DEFindent; }
 	void fontSet(const std::string& font) { _font=font; _flags |= DEFfont; }
 	
-    void alignSet(TextField_as::TextAlignment x) {
+    void alignSet(TextField::TextAlignment x) {
         _align = x;
         _flags |= DEFalign;
     }
@@ -198,7 +198,7 @@ public:
 	/// paragraph is centered. If "right", the paragraph is
 	/// right-aligned. If "justify", the paragraph is justified.
 	///
-	TextField_as::TextAlignment _align;
+	TextField::TextAlignment _align;
 
 	// 
 	boost::uint16_t _blockIndent;

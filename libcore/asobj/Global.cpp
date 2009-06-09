@@ -61,7 +61,7 @@
 #include "Timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
-#include "flash/text/TextField_as.h"
+#include "TextField.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
