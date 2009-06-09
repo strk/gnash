@@ -52,7 +52,7 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	$(base_RUNNERS)
 
-dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
+dist_noinst_SCRIPTS = gen-test.sh
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
@@ -214,7 +214,6 @@ v8-online-tests:
 	$(MAKE) $(ASTESTS_V8_OUT) alltests-v8.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v8
 	mv $(ASTESTS_V8_OUT) alltests-v8.swf online-tests/v8
-	sh $(srcdir)/gen-index.sh alltests-v8.swf $(ASTESTS_V8_OUT) 
 	mv index.html embed.html online-tests/v8
 
 v7-online-tests: 
@@ -222,7 +221,6 @@ v7-online-tests:
 	$(MAKE) $(ASTESTS_V7_OUT) alltests-v7.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v7
 	mv $(ASTESTS_V7_OUT) alltests-v7.swf online-tests/v7
-	sh $(srcdir)/gen-index.sh alltests-v7.swf $(ASTESTS_V7_OUT) 
 	mv index.html embed.html online-tests/v7
 
 v6-online-tests: 
@@ -230,7 +228,6 @@ v6-online-tests:
 	$(MAKE) $(ASTESTS_V6_OUT) alltests-v6.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v6
 	mv $(ASTESTS_V6_OUT) alltests-v6.swf online-tests/v6
-	sh $(srcdir)/gen-index.sh alltests-v6.swf $(ASTESTS_V6_OUT) 
 	mv index.html embed.html online-tests/v6
 
 v5-online-tests: 
@@ -238,7 +235,6 @@ v5-online-tests:
 	$(MAKE) $(ASTESTS_V5_OUT) alltests-v5.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v5
 	mv $(ASTESTS_V5_OUT) alltests-v5.swf online-tests/v5
-	sh $(srcdir)/gen-index.sh alltests-v5.swf $(ASTESTS_V5_OUT) 
 	mv index.html embed.html online-tests/v5
 
 index.wiki: gen-index-wiki.sh
