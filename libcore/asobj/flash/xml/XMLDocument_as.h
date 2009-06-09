@@ -41,7 +41,10 @@ class fn_call;
 class URL;
 class LoaderThread;
 
-/// XML class and ActionScript object
+/// Implements XML (AS2) and flash.xml.XMLDocument (AS3) class.
+//
+/// This class interface is identical in AS3 and AS2; it is probably 
+/// included in AS3 for backward compatibility.
 class XMLDocument_as : public XMLNode_as, public LoadableObject
 {
 public:
