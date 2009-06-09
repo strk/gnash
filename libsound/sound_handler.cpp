@@ -393,6 +393,10 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
         return;
     }
 
+    if (offSecs)
+    {
+        LOG_ONCE(log_unimpl("Time based sound start offset"));
+    }
 
     // Make a "EmbedSoundInst" for this sound which is later placed
     // on the vector of instances of this sound being played
