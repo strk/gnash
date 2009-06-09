@@ -58,7 +58,7 @@ MEDIA_HEADERS += asobj/flash/media/SoundTransform_as.h
 endif
 
 if BUILD_SOUND_AS3
-# MEDIA_SOURCES += asobj/flash/media/Sound_as.cpp
+MEDIA_SOURCES += asobj/flash/media/Sound_as.cpp
 MEDIA_HEADERS += asobj/flash/media/Sound_as.h
 endif
 

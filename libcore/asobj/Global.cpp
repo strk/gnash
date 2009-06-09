@@ -40,6 +40,7 @@
 #include "flash/ui/Keyboard_as.h"
 #include "Selection_as.h"
 #include "Microphone.h"
+#include "flash/media/Sound_as.h"
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
