@@ -25,6 +25,7 @@
 #endif
 
 
+
 namespace gnash {
 
 // Forward declarations
@@ -32,6 +33,8 @@ class as_object;
 
 /// Initialize the global System class
 void system_class_init(as_object& global);
+
+void registerSystemNative(as_object& global);
 
 } // gnash namespace
 

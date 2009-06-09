@@ -49,7 +49,7 @@ NET_HEADERS += asobj/flash/net/IDynamicPropertyWriter_as.h
 endif
 
 if BUILD_LOCALCONNECTION_AS3
-# NET_SOURCES += asobj/flash/net/LocalConnection_as.cpp
+NET_SOURCES += asobj/flash/net/LocalConnection_as.cpp
 NET_HEADERS += asobj/flash/net/LocalConnection_as.h
 endif
 

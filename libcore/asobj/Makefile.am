@@ -65,7 +65,6 @@ libgnashasobjs_la_SOURCES = \
 	int_as.cpp \
 	Key_as.cpp	\
 	LoadVars_as.cpp \
-	LocalConnection_as.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
 	NetConnection_as.cpp \
@@ -77,7 +76,6 @@ libgnashasobjs_la_SOURCES = \
 	Namespace_as.cpp \
 	Sound_as.cpp \
 	Stage_as.cpp \
-	System_as.cpp \
 	TextFormat_as.cpp \
 	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
@@ -100,7 +98,6 @@ noinst_HEADERS = \
 	int_as.h \
 	Key_as.h \
 	LoadVars_as.h \
-	LocalConnection_as.h\
 	Microphone.h \
 	MovieClipLoader.h \
 	NetConnection_as.h	\
@@ -111,7 +108,6 @@ noinst_HEADERS = \
 	SharedObject_as.h \
 	Sound_as.h \
 	Stage_as.h	\
-	System_as.h \
 	TextFormat_as.h \
 	TextSnapshot_as.h \
 	String_as.h \

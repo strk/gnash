@@ -39,7 +39,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/int_as.cpp \
 	asobj/Key_as.cpp	\
 	asobj/LoadVars_as.cpp \
-	asobj/LocalConnection_as.cpp\
 	asobj/Math_as.cpp \
 	asobj/Microphone.cpp	\
 	asobj/NetConnection_as.cpp \
@@ -51,7 +50,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Namespace_as.cpp \
 	asobj/Sound_as.cpp \
 	asobj/Stage_as.cpp \
-	asobj/System_as.cpp \
 	asobj/TextFormat_as.cpp \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
@@ -73,7 +71,6 @@ noinst_HEADERS += \
 	asobj/int_as.h \
 	asobj/Key_as.h \
 	asobj/LoadVars_as.h \
-	asobj/LocalConnection_as.h\
 	asobj/Microphone.h \
 	asobj/MovieClipLoader.h \
 	asobj/NetConnection_as.h	\
@@ -84,7 +81,6 @@ noinst_HEADERS += \
 	asobj/SharedObject_as.h \
 	asobj/Sound_as.h \
 	asobj/Stage_as.h	\
-	asobj/System_as.h \
 	asobj/TextFormat_as.h \
 	asobj/String_as.h \
 	asobj/XMLSocket_as.h \
