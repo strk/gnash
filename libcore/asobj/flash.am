@@ -31,6 +31,7 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Boolean_as.cpp \
 	asobj/Camera.cpp \
 	asobj/Color_as.cpp \
+	asobj/ContextMenu.cpp	\
 	asobj/CustomActions.cpp\
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
@@ -62,6 +63,7 @@ noinst_HEADERS += \
 	asobj/Boolean_as.h \
 	asobj/Camera.h \
 	asobj/Color_as.h	\
+	asobj/ContextMenu.h \
 	asobj/CustomActions.h	\
 	asobj/Date_as.h \
 	asobj/Error_as.h	\
