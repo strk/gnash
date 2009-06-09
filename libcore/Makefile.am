@@ -70,15 +70,16 @@ libgnashcore_la_SOURCES = \
 	Shape.cpp \
 	MorphShape.cpp \
 	StaticText.cpp \
-    BlurFilter.cpp \
-    GlowFilter.cpp \
-    DropShadowFilter.cpp \
-    ConvolutionFilter.cpp \
-    ColorMatrixFilter.cpp \
-    GradientGlowFilter.cpp \
-    BevelFilter.cpp \
-    GradientBevelFilter.cpp \
-    parser/filter_factory.cpp \
+	TextField.cpp \
+        BlurFilter.cpp \
+        GlowFilter.cpp \
+        DropShadowFilter.cpp \
+        ConvolutionFilter.cpp \
+        ColorMatrixFilter.cpp \
+        GradientGlowFilter.cpp \
+        BevelFilter.cpp \
+        GradientBevelFilter.cpp \
+        parser/filter_factory.cpp \
 	InteractiveObject.cpp \
 	SWFMatrix.cpp \
 	SWFMovie.cpp \
@@ -145,16 +146,17 @@ noinst_HEADERS = \
 	BitmapMovie.h \
 	Button.h \
 	debugger.h \
-    BitmapFilter.h \
-    BlurFilter.h \
-    BevelFilter.h \
-    GradientBevelFilter.h \
-    GlowFilter.h \
-    GradientGlowFilter.h \
-    DropShadowFilter.h \
-    ConvolutionFilter.h \
-    ColorMatrixFilter.h \
-    parser/filter_factory.h \
+	TextField.h \
+        BitmapFilter.h \
+        BlurFilter.h \
+        BevelFilter.h \
+        GradientBevelFilter.h \
+        GlowFilter.h \
+        GradientGlowFilter.h \
+        DropShadowFilter.h \
+        ConvolutionFilter.h \
+        ColorMatrixFilter.h \
+        parser/filter_factory.h \
 	Font.h \
 	fontlib.h \
 	Shape.h \

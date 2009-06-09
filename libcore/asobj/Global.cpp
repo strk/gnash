@@ -31,7 +31,7 @@
 #include "Boolean_as.h"
 #include "Camera.h"
 #include "Color_as.h"
-#include "flash/ui/ContextMenu_as.h"
+#include "ContextMenu.h"
 #include "CustomActions.h"
 #include "Date_as.h" // for registerDateNative
 #include "Error_as.h"
@@ -53,7 +53,7 @@
 #include "SharedObject_as.h"
 #include "Stage_as.h"
 #include "System_as.h"
-#include "flash/text/TextFormat_as.h"
+#include "TextFormat_as.h"
 #include "flash/text/TextSnapshot_as.h"
 #include "Video.h"
 #include "extension.h"
@@ -61,7 +61,7 @@
 #include "Timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
-#include "flash/text/TextField_as.h"
+#include "TextField.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"

@@ -1,6 +1,5 @@
-// TextField_as.h:  ActionScript 3 "TextField" class, for Gnash.
-//
-//   Copyright (C) 2009 Free Software Foundation, Inc.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,29 +16,23 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_TEXTFIELD_H
-#define GNASH_ASOBJ3_TEXTFIELD_H
+#ifndef __GNASH_ASOBJ_CONTEXTMENU_H__
+#define __GNASH_ASOBJ_CONTEXTMENU_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
-// Forward declarations
 class as_object;
 
-/// Initialize the global TextField class
-void textfield_class_init(as_object& global);
+/// Initialize the global ContextMenu class
+void contextmenu_class_init(as_object& global);
 
-} // gnash namespace
+/// Return a ContextMenu instance (in case the core lib needs it)
+//std::auto_ptr<as_object> init_contextmenu_instance();
+  
+} // end of gnash namespace
 
-// GNASH_ASOBJ3_TEXTFIELD_H
+// __GNASH_ASOBJ_CONTEXTMENU_H__
 #endif
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
 
