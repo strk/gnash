@@ -24,19 +24,81 @@
 #include "gnashconfig.h"
 #endif
 
+#include <string>
+#include <map>
+
+// Forward declarations
+namespace gnash {
+    class as_object;
+    class SharedObject_as;
+    class VM;
+}
 
 namespace gnash {
+
+class SharedObjectLibrary
+{
+public:
+
+    typedef std::map<std::string, SharedObject_as*> SoLib;
+
+    SharedObjectLibrary(VM& vm);
+
+    ~SharedObjectLibrary();
+
+    /// Return a local shared object with given name and with given root
+    //
+    /// May return NULL if name is invalid or can't access the given root
+    ///
+    SharedObject_as* getLocal(const std::string& name, const std::string& root);
+
+    void markReachableResources() const;
+
+    // Drop all library items
+    void clear();
+
+private:
+
+    VM& _vm;
+
+    /// Domain component of the VM SWF url
+    std::string _baseDomain;
+
+    /// Path component of the VM SWF url
+    std::string _basePath;
+
+    /// Base SOL dir
+    std::string _solSafeDir; 
+
+    SoLib _soLib;
+};
+
+/// Initialize the global SharedObject class
+void sharedobject_class_init(as_object& global);
+
+void registerSharedObjectNative(as_object& o);
+
+  
+} // end of gnash namespace
+
+#endif
+
+
+/*namespace gnash {
 
 // Forward declarations
 class as_object;
 
 /// Initialize the global SharedObject class
 void sharedobject_class_init(as_object& global);
+void attachSharedObjectInterface(as_object& o);
+void attachSharedObjectStaticInterface(as_object& o);
+
 
 } // gnash namespace
 
 // GNASH_ASOBJ3_SHAREDOBJECT_H
-#endif
+#endif*/
 
 // local Variables:
 // mode: C++

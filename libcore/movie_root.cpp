@@ -27,7 +27,7 @@
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
-#include "Stage_as.h"
+#include "flash/display/Stage_as.h"
 #include "URL.h"
 #include "namedStrings.h"
 #include "GnashException.h"

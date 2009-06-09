@@ -80,7 +80,7 @@ endif
 
 FIXME: already exists
 if BUILD_SHAREDOBJECT_AS3
-# NET_SOURCES += asobj/flash/net/SharedObject_as.cpp
+NET_SOURCES += asobj/flash/net/SharedObject_as.cpp
 NET_HEADERS += asobj/flash/net/SharedObject_as.h
 endif
 

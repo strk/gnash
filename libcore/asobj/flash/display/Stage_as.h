@@ -24,14 +24,54 @@
 #include "gnashconfig.h"
 #endif
 
+// ADDED
+#include "as_object.h" // for inheritance
+#include "movie_root.h" // for access to scaleMode
+
+#include <list>
 
 // Forward declarations
 class as_object;
 
 namespace gnash {
+	
+// ADDED
+/// This is the Stage ActionScript object.
+//
+/// Some Stage methods are implemented in movie_root, because
+/// it provides the interface to the Gui and/or all the values
+/// required are necessarily in movie_root:
+///
+/// - scaleMode
+/// - width
+/// - height
+/// - displayState
+/// - alignMode
+//
+/// Most functions are ASnative, which means they cannot rely on
+/// the existence of a load-on-demand Stage object. Only resize events
+/// appear to need this (not ASnative). The ASnative functions
+/// are available from SWF5
+
+class Stage_as: public as_object
+{
+
+public:
+    
+	Stage_as();
+	
+	/// Notify all listeners about a resize event
+	void notifyResize();
+	
+	void notifyFullScreen(bool fs);
+
+};
 
 /// Initialize the global Stage class
 void stage_class_init(as_object& global);
+
+// ADDED
+void registerStageNative(as_object& o);
 
 } // gnash namespace
 
