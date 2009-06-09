@@ -22,7 +22,7 @@ MEDIA_HEADERS = asobj/flash/media/media_pkg.h
 
 # FIXME: already exists
 if BUILD_CAMERA_AS3
-# MEDIA_SOURCES += asobj/flash/media/Camera_as.cpp
+MEDIA_SOURCES += asobj/flash/media/Camera_as.cpp
 MEDIA_HEADERS += asobj/flash/media/Camera_as.h
 endif
 
@@ -33,7 +33,7 @@ endif
 
 # FIXME: already exists
 if BUILD_MICROPHONE_AS3
-# MEDIA_SOURCES += asobj/flash/media/Microphone_as.cpp
+MEDIA_SOURCES += asobj/flash/media/Microphone_as.cpp
 MEDIA_HEADERS += asobj/flash/media/Microphone_as.h
 endif
 

@@ -29,7 +29,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/AsBroadcaster.cpp \
 	asobj/Array_as.cpp \
 	asobj/Boolean_as.cpp \
-	asobj/Camera.cpp \
 	asobj/Color_as.cpp \
 	asobj/ContextMenu.cpp	\
 	asobj/CustomActions.cpp\
@@ -38,16 +37,13 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Global.cpp \
 	asobj/int_as.cpp \
 	asobj/LoadVars_as.cpp \
-	asobj/LocalConnection_as.cpp\
 	asobj/Math_as.cpp \
-	asobj/Microphone.cpp	\
 	asobj/NetConnection_as.cpp \
 	asobj/NetStream_as.cpp \
 	asobj/Number_as.cpp \
 	asobj/PlayHead.cpp \
 	asobj/Selection_as.cpp \
 	asobj/Namespace_as.cpp \
-	asobj/System_as.cpp \
 	asobj/TextFormat_as.cpp \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
@@ -58,7 +54,6 @@ libgnashasobjs_la_SOURCES = \
 noinst_HEADERS += \
 	asobj/AsBroadcaster.h \
 	asobj/Boolean_as.h \
-	asobj/Camera.h \
 	asobj/Color_as.h	\
 	asobj/ContextMenu.h \
 	asobj/CustomActions.h	\
@@ -68,15 +63,12 @@ noinst_HEADERS += \
 	asobj/Global.h\
 	asobj/int_as.h \
 	asobj/LoadVars_as.h \
-	asobj/LocalConnection_as.h\
-	asobj/Microphone.h \
 	asobj/MovieClipLoader.h \
 	asobj/NetConnection_as.h	\
 	asobj/NetStream_as.h \
 	asobj/Number_as.h \
 	asobj/PlayHead.h \
 	asobj/Selection_as.h \
-	asobj/System_as.h \
 	asobj/TextFormat_as.h \
 	asobj/String_as.h \
 	asobj/XMLSocket_as.h \
