@@ -67,7 +67,7 @@ public:
 
     /// Parse a specified number of bytes from the stream.
     //
-    /// This function will as many complete tags as it can in the specified
+    /// This function will read as many complete tags as are in the specified
     /// number of bytes. Any incomplete tags will be left open and unparsed
     /// until the next call to read().
     //

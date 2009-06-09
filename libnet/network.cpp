@@ -516,7 +516,7 @@ Network::createClient(const string &hostname, short port)
 
 //    assert( ! connected() );
     if (connected()) {
-	return true;
+        return true;
     }
 
     _port = port;    
@@ -532,6 +532,7 @@ Network::createClient(const string &hostname, short port)
             return false;
         }
     }
+
     const struct hostent *hent = ::gethostbyname(hostname.c_str());
     if (hent > 0) {
         ::memcpy(&sock_in.sin_addr, hent->h_addr, hent->h_length);
@@ -548,12 +549,11 @@ Network::createClient(const string &hostname, short port)
     proto = ::getprotobyname("TCP");
 
     _sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
-    if (_sockfd < 0)
-        {
-            log_error(_("unable to create socket: %s"), strerror(errno));
-            _sockfd = -1;
-            return false;
-        }
+    if (_sockfd < 0) {
+        log_error(_("unable to create socket: %s"), strerror(errno));
+        _sockfd = -1;
+        return false;
+    }
 
     retries = 2;
     while (retries-- > 0) {
@@ -570,37 +570,39 @@ Network::createClient(const string &hostname, short port)
         ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
 
         // If interupted by a system call, try again
-        if (ret == -1 && errno == EINTR)
-            {
-                log_debug(_("The connect() socket for fd %d was interupted by a system call"),
-                        _sockfd);
-                continue;
-            }
+        if (ret == -1 && errno == EINTR) {
+            log_debug(_("The connect() socket for fd %d was interrupted "
+                        "by a system call"), _sockfd);
+            continue;
+        }
 
-        if (ret == -1)
-            {
-                log_debug(_("The connect() socket for fd %d never was available for writing"),
-                        _sockfd);
+        if (ret == -1) {
+            log_debug(_("The connect() socket for fd %d never was "
+                        "available for writing"), _sockfd);
 #ifdef HAVE_WINSOCK_H
-                ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+            ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
 #else
-                ::shutdown(_sockfd, SHUT_RDWR);
+            ::shutdown(_sockfd, SHUT_RDWR);
 #endif
-                _sockfd = -1;
-                return false;
-            }
+            _sockfd = -1;
+            return false;
+        }
+
         if (ret == 0) {
-            log_error(_("The connect() socket for fd %d timed out waiting to write"),
-                      _sockfd);
+            log_error(_("The connect() socket for fd %d timed out waiting "
+                        "to write"), _sockfd);
             continue;
         }
 
         if (ret > 0) {
-            ret = ::connect(_sockfd, reinterpret_cast<struct sockaddr *>(&sock_in), sizeof(sock_in));
+            ret = ::connect(_sockfd, 
+                    reinterpret_cast<struct sockaddr *>(&sock_in),
+                    sizeof(sock_in));
+
             if (ret == 0) {
-		char *ascip = ::inet_ntoa(sock_in.sin_addr);
-// 		char ascip[INET_ADDRSTRLEN];
-// 		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
+                char *ascip = ::inet_ntoa(sock_in.sin_addr);
+        // 		char ascip[INET_ADDRSTRLEN];
+        // 		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
                 log_debug(_("\tport %d at IP %s for fd %d"), port,
                         ascip, _sockfd);
                 _connected = true;
@@ -608,8 +610,8 @@ Network::createClient(const string &hostname, short port)
                 return true;
             }
             if (ret == -1) {
-                log_error(_("The connect() socket for fd %d never was available for writing"),
-                        _sockfd);
+                log_error(_("The connect() socket for fd %d never was "
+                            "available for writing"), _sockfd);
                 _sockfd = -1;
                 assert(!_connected);
                 return false;
