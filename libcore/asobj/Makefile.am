@@ -74,7 +74,6 @@ libgnashasobjs_la_SOURCES = \
 	Selection_as.cpp \
 	SharedObject_as.cpp\
 	Namespace_as.cpp \
-	Sound_as.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
 	TextFormat_as.cpp \
@@ -107,7 +106,6 @@ noinst_HEADERS = \
 	PlayHead.h \
 	Selection_as.h \
 	SharedObject_as.h \
-	Sound_as.h \
 	Stage_as.h	\
 	System_as.h \
 	TextFormat_as.h \

@@ -48,7 +48,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Selection_as.cpp \
 	asobj/SharedObject_as.cpp\
 	asobj/Namespace_as.cpp \
-	asobj/Sound_as.cpp \
 	asobj/Stage_as.cpp \
 	asobj/System_as.cpp \
 	asobj/TextFormat_as.cpp \
@@ -80,7 +79,6 @@ noinst_HEADERS += \
 	asobj/PlayHead.h \
 	asobj/Selection_as.h \
 	asobj/SharedObject_as.h \
-	asobj/Sound_as.h \
 	asobj/Stage_as.h	\
 	asobj/System_as.h \
 	asobj/TextFormat_as.h \
