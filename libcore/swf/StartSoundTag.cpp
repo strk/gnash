@@ -92,10 +92,9 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
             const sound::SoundEnvelopes* env = 
                 _soundInfo.envelopes.empty() ? 0 : &_soundInfo.envelopes;
 
-            handler->playSound(m_handler_id,
+            handler->startSound(m_handler_id,
                     _soundInfo.loopCount,
                     0, // secs offset
-                    0, // byte offset
                     env, // envelopes
                     !_soundInfo.noMultiple // allow multiple instances ?
                     );

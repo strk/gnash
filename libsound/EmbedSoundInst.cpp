@@ -51,7 +51,8 @@ EmbedSoundInst::samplesFetched() const
 
 EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
             media::MediaHandler& mediaHandler,
-            unsigned long blockOffset, unsigned int secsOffset,
+            sound_handler::StreamBlockId blockOffset,
+            unsigned int secsOffset,
             const SoundEnvelopes* env,
             unsigned int loopCount)
         :

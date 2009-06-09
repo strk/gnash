@@ -82,6 +82,12 @@ class DSOEXPORT sound_handler
 {
 public:
 
+    /// Identifier of a streaming sound block
+    //
+    /// Use coupled with a soundId for fully qualified identifier
+    ///
+    typedef unsigned long StreamBlockId;
+
 	/// Create a sound buffer slot, for on-demand playback.
 	//
 	/// @param data
@@ -119,14 +125,17 @@ public:
 	/// @param sampleCount
 	/// 	Number of samples in the data
 	///
-	/// @param handleId
-	/// 	The soundhandlers id of the sound we want some info about.
+	/// @param streamId
+	/// 	The soundhandlers id of the sound we want to add data to
 	///
-	/// @return size of the data buffer before the new data is appended, or -1
-	///         on error.
+	/// @return an identifier for the new block for use in playSound
 	///
-	virtual long fill_stream_data(unsigned char* data, unsigned int dataBytes,
-                                  unsigned int sampleCount, int handleId);
+	/// @throw SoundException on error
+	///
+	virtual StreamBlockId addSoundBlock(unsigned char* data,
+	                                   unsigned int dataBytes,
+	                                   unsigned int sampleCount,
+	                                   int streamId);
 
 	/// Returns a pointer to the SoundInfo object for the sound with the given id.
     //
@@ -139,7 +148,7 @@ public:
 	///
 	virtual media::SoundInfo* get_sound_info(int soundHandle);
 
-	/// Schedule playing of a sound buffer slot
+	/// Start playback of an event sound
 	//
 	/// All scheduled sounds will be played on next output flush.
 	///
@@ -150,31 +159,38 @@ public:
 	/// 	loops == 0 means play the sound once (1 means play it twice, etc)
 	///
 	/// @param secsOffset
-	/// 	When starting event sounds there sometimes is a offset to make the sound
-	/// 	start at the exact right moment. Gnash supports this troough 'Sound' AS
-	///     class only, not from the actual control tag (StartSound). Units given in 
-    ///     seconds.
-	///
-	/// @param start
-	/// 	When starting a soundstream from a random frame, this tells where in the
-	/// 	data the decoding should start, in bytes.
-	///     If non-zero, the sound will only start when no other instances of it
-	///     are already playing.
-	///     @todo use unsigned
+	/// 	When starting event sounds there sometimes is a offset to make
+	///		the sound start at the exact right moment. Gnash supports this
+	///		through 'Sound' AS class only, not from the actual control tag
+	///		(StartSound). Units given in seconds.
 	///
 	/// @param env
-	/// 	Some eventsounds have some volume control mechanism called envelopes.
+	/// 	Some eventsounds have some volume control mechanism called
+    ///     envelopes.
 	/// 	They basically tells that from sample X the volume should be Y.
     ///
 	/// @param allowMultiple
 	/// 	If false, the sound will not be scheduled if there's another
     ///     instance of it already playing.
 	///
-	/// TODO: add out_point parameter (when to stop playing the sound)
+	/// TODO: add inPoint and outPoint parameters
+    ///       (pre-resampling samples offset of start and end)
+	///       or take SWF::SoundInfoRecord& directly !
+	void startSound(int id, int loops, int secsOffset,
+	               const SoundEnvelopes* env,
+	               bool allowMultiple);
+
+	/// Start playback of a streaming sound, if not playing already
+	//
 	///
-	virtual void playSound(int id, int loops, int secsOffset,
-					long start, const SoundEnvelopes* env,
-                    bool allowMultiple);
+	/// @param streamId
+	///     Id of the sound buffer slot schedule playback of.
+	///     It is assumed to refer to a straming sound
+	///
+	/// @param blockId
+	/// 	Identifier of the block to start decoding from.
+	///
+	void playStream(int id, StreamBlockId blockId);
 
 	/// Remove all scheduled request for playback of sound buffer slots
 	virtual void	stop_all_sounds();
@@ -468,6 +484,43 @@ private:
 
     /// Unplug any completed input stream
     void unplugCompletedInputStreams();
+
+	/// Schedule playing of a sound buffer slot
+	//
+	/// All scheduled sounds will be played on next output flush.
+	///
+	/// @param id
+	///     Id of the sound buffer slot schedule playback of.
+	///
+	/// @param loops
+	/// 	loops == 0 means play the sound once (1 means play it twice, etc)
+	///
+	/// @param secsOffset
+	/// 	When starting event sounds there sometimes is a offset to make
+	///		the sound start at the exact right moment. Gnash supports this
+	///		through 'Sound' AS class only, not from the actual control tag
+	///		(StartSound). Units given in seconds.
+	///
+	/// @param blockId
+	/// 	When starting a soundstream from a random frame, this tells which
+	///     block to start decoding from.
+	///     If non-zero, the sound will only start when no other instances of it
+	///     are already playing.
+	///
+	/// @param env
+	/// 	Some eventsounds have some volume control mechanism called
+    ///     envelopes.
+	/// 	They basically tells that from sample X the volume should be Y.
+    ///
+	/// @param allowMultiple
+	/// 	If false, the sound will not be scheduled if there's another
+    ///     instance of it already playing.
+	///
+	/// TODO: add out_point parameter (when to stop playing the sound)
+	///
+	void playSound(int id, int loops, int secsOffset,
+	               StreamBlockId blockId, const SoundEnvelopes* env,
+	               bool allowMultiple);
 
 };
 

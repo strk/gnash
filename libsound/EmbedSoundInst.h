@@ -24,6 +24,7 @@
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
 #include "SimpleBuffer.h" // for composition (decoded data)
 #include "EmbedSound.h" // for inlines
+#include "sound_handler.h" // for StreamBlockId typedef
 
 #include <memory>
 #include <cassert>
@@ -63,12 +64,9 @@ public:
     /// @param mh
     ///     The MediaHandler to use for on-demand decoding
     ///
-    /// @param blockOffset
-    ///     Byte offset in the immutable (encoded) data this
-    ///     instance should start decoding.
-    ///     This is currently used for streaming embedded sounds
-    ///     to refer to a specific StreamSoundBlock.
-    ///     @see gnash::swf::StreamSoundBlockTag
+    /// @param blockId
+    ///     Identifier of the encoded block to start decoding from.
+    ///     @see gnash::swf::StreamBlockIdTag
     ///
     /// @param secsOffset
     ///     Offset, in seconds, this instance should start playing
@@ -83,8 +81,8 @@ public:
     ///     @todo document if every loop starts at secsOffset !
     ///
     EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
-            unsigned long blockOffset, unsigned int secsOffset,
-            const SoundEnvelopes* envelopes,
+            sound_handler::StreamBlockId blockId,
+            unsigned int secsOffset, const SoundEnvelopes* envelopes,
             unsigned int loopCount);
 
     // See dox in sound_handler.h (InputStream)

@@ -42,13 +42,7 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 		// This makes it possible to stop only the stream when framejumping.
 		m->setStreamSoundId(m_handler_id);
 
-		handler->playSound(m_handler_id,
-                0, // no looping
-                0, // no seconds offset (MP3 seek samples might use this ?)
-                m_start, // offset to this block of sound
-                0, // no envelopes
-                false // don't allow multiple instances of the same sound
-                );
+		handler->playStream(m_handler_id, _blockId);
 	}
 }
 
@@ -69,11 +63,11 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     // Get the ID of the sound stream currently being loaded
-    int handle_id = m.get_loading_sound_stream_id();
+    int streamId = m.get_loading_sound_stream_id();
 
     // Get the SoundInfo object that contains info about the sound stream.
     // Ownership of the object is in the soundhandler
-    media::SoundInfo* sinfo = handler->get_sound_info(handle_id);
+    media::SoundInfo* sinfo = handler->get_sound_info(streamId);
 
     // If there is no SoundInfo something is wrong...
     if (!sinfo)
@@ -86,7 +80,7 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     media::audioCodecType format = sinfo->getFormat();
-    unsigned int sample_count = sinfo->getSampleCount();
+    unsigned int sampleCount = sinfo->getSampleCount();
 
     // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3)
@@ -122,12 +116,12 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     //
     // ownership of 'data' is transferred here
     //
-    long start = handler->fill_stream_data(data, dataLength, sample_count,
-            handle_id);
+    sound::sound_handler::StreamBlockId blockId =
+        handler->addSoundBlock(data, dataLength, sampleCount, streamId);
 
     // TODO: log_parse ?
 
-    StreamSoundBlockTag* ssst = new StreamSoundBlockTag(handle_id, start);
+    StreamSoundBlockTag* ssst = new StreamSoundBlockTag(streamId, blockId);
     m.addControlTag(ssst); // ownership is transferred to movie_definition
 }
 

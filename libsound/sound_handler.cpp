@@ -38,8 +38,8 @@
 namespace gnash {
 namespace sound {
 
-long
-sound_handler::fill_stream_data(unsigned char* data,
+sound_handler::StreamBlockId
+sound_handler::addSoundBlock(unsigned char* data,
         unsigned int data_bytes, unsigned int /*sample_count*/,
         int handleId)
 {
@@ -334,7 +334,7 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 
 void
 sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
-                            long start_position,
+                            StreamBlockId blockId,
                             const SoundEnvelopes* envelopes,
                             bool allowMultiples)
 {
@@ -344,14 +344,6 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
         log_error("Invalid (%d) sound_handle passed to playSound, "
                   "doing nothing", sound_handle);
         return;
-    }
-
-    // parameter checking
-    if (start_position < 0)
-    {
-        log_error("Negative (%d) start_position passed to playSound, "
-                  "taking as zero ", start_position);
-        start_position=0;
     }
 
     // parameter checking
@@ -409,9 +401,8 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
             // MediaHandler to use for decoding
             *_mediaHandler,
 
-            // Byte offset position to start decoding from
-            // (would be offset to streaming sound block)
-            start_position, // or blockOffset
+            // Sound block identifier
+            blockId, 
 
             // Seconds offset
             // WARNING: this is wrong, offset is passed as seconds !!
@@ -427,6 +418,22 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
     ) );
 
     plugInputStream(sound);
+}
+
+/*public*/
+void
+sound_handler::playStream(int soundId, StreamBlockId blockId)
+{
+    playSound(soundId, 0, 0, blockId, 0, false);
+}
+
+/*public*/
+void
+sound_handler::startSound(int soundId, int loops, int secsOffset,
+	               const SoundEnvelopes* env,
+	               bool allowMultiple)
+{
+    playSound(soundId, loops, secsOffset, 0, env, allowMultiple);
 }
 
 void

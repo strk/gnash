@@ -367,13 +367,12 @@ Sound_as::start(int offset, int loops)
     }
     else
     {
-        _soundHandler->playSound(
+        _soundHandler->startSound(
                     soundId,
                     loops,
                     offset, // in seconds
-                    0, // start position in bytes...
                     0, // envelopes
-                    true // allow multiple instances (TODO: checkme)
+                    true // allow multiple instances (checked)
                     );
     }
 }

@@ -551,10 +551,9 @@ Button::mouseEvent(const event_id& event)
             const sound::SoundEnvelopes* env = 
                 sinfo.envelopes.empty() ? 0 : &sinfo.envelopes;
 
-            s->playSound(bs.sample->m_sound_handler_id,
+            s->startSound(bs.sample->m_sound_handler_id,
                     bs.soundInfo.loopCount,
                     0, // secs offset
-                    0, // byte offset
                     env, // envelopes
                     !sinfo.noMultiple // allow multiple instances ?
                     );
