@@ -53,7 +53,7 @@
 #include "SharedObject_as.h"
 #include "Stage_as.h"
 #include "System_as.h"
-#include "flash/text/TextFormat_as.h"
+#include "TextFormat_as.h"
 #include "flash/text/TextSnapshot_as.h"
 #include "Video.h"
 #include "extension.h"
