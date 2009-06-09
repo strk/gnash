@@ -62,7 +62,7 @@ endif
 
 # FIXME: already exists
 if BUILD_SYSTEM_AS3
-# SYSTEM_SOURCES += asobj/flash/system/System_as.cpp
+SYSTEM_SOURCES += asobj/flash/system/System_as.cpp
 SYSTEM_HEADERS += asobj/flash/system/System_as.h
 endif
 
