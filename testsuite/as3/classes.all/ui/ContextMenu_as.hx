@@ -30,7 +30,6 @@ import flash.ui.ContextMenu;
 #else
 import flash.MovieClip;
 import flash.ContextMenu;
-//import flash.ContextMenuBuiltInItems;
 #end
 import flash.Lib;
 import Type;
@@ -42,6 +41,9 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ContextMenu_as {
     static function main() {
+	#if flash6
+		DejaGnu.note("You cannot rely on availability of ContextMenu class with a SWF < 7");
+	#end
 	
 	#if flash9
         var x1:ContextMenu = new ContextMenu();
@@ -84,6 +86,45 @@ class ContextMenu_as {
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
 	#end
+	
+	#if (flash7 || flash8)
+		var x2:ContextMenu = new ContextMenu();
+		
+        // Make sure we actually get a valid class 
+		if (Std.is(x2, ContextMenu)) {       
+			DejaGnu.pass("ContextMenu class exists");
+		} else {
+			DejaGnu.fail("ContextMenu class doesn't exist");
+		}
+		// test existence of copy function
+		if (Type.typeof(x2.copy)==ValueType.TFunction) {
+			DejaGnu.pass("ContextMenu::copy() method exists");
+		} else {
+			DejaGnu.fail("ContextMenu::copy() method doesn't exist");
+		}
+		//test existence of hideBuiltInItems function
+		if (Type.typeof(x2.hideBuiltInItems)==ValueType.TFunction) {
+			DejaGnu.pass("ContextMenu::hideBuiltInItems() method exists");
+		} else {
+			DejaGnu.fail("ContextMenu::hideBuiltInItems() method doesn't exist");
+		}
+		
+		//check properties
+		if (Type.typeof(x2.builtInItems) == ValueType.TObject) {	
+			DejaGnu.pass("ContextMenu.builtInItems property exists");
+		} else {
+			DejaGnu.xfail("ContextMenu.builtInItems property doesn't exist");
+		}
+		
+		if (Std.is(x2.customItems, Array)) {	
+			DejaGnu.pass("ContextMenu.customItems property exists");
+		} else {
+			DejaGnu.xfail("ContextMenu.customItems property doesn't exist");
+		}
+	#end
+	
+	DejaGnu.done();
+	
     }
 }
 
