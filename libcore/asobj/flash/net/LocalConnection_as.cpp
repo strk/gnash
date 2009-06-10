@@ -1,12 +1,12 @@
-// LocalConnection_as.cpp:  ActionScript "LocalConnection" class, for Gnash.
-//
-//   Copyright (C) 2009 Free Software Foundation, Inc.
-//
+// LocalConnection.cpp:  Connect two SWF movies & send objects, for Gnash.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+// 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,27 +21,21 @@
 #include "gnashconfig.h"
 #endif
 
-#include "net/LocalConnection_as.h"
-#include "log.h"
-#include "fn_call.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-//moved to header file
-//#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
-
-//Si 
-///Added
+#include "GnashSystemIOHeaders.h"
 #include <cerrno>
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 
-//#include "VM.h"
+#include "VM.h"
 #include "movie_root.h"
 #include "URLAccessManager.h"
 #include "URL.h"
+#include "log.h"
+#include "net/LocalConnection_as.h"
 #include "network.h"
+#include "fn_call.h"
 #include "builtin_function.h"
 #include "amf.h"
 #include "lcshm.h"
@@ -51,67 +45,57 @@
 
 using namespace amf;
 
-//Added end
+// http://www.osflash.org/localconnection
+//
+// Listening
+// To create a listening LocalConnection, you just have to set a thread to:
+//
+//    1.register the application as a valid LocalConnection listener,
+//    2.require the mutex to have exclusive access to the shared memory,
+//    3.access the shared memory and check the recipient,
+//    4.if you are the recipient, read the message and mark it read,
+//    5.release the shared memory and the mutex,
+//    6.repeat indefinitely from step 2.
+//
+// Sending
+// To send a message to a LocalConnection apparently works like that:
+//    1. require the mutex to have exclusive access to the shared memory,
+//    2. access the shared memory and check that the listener is connected,
+//    3. if the recipient is registered, write the message,
+//    4. release the shared memory and the mutex.
+//
+// The main thing you have to care about is the timestamp - simply call GetTickCount()
+//  and the message size. If your message is correctly encoded, it should be received
+// by the listening LocalConnection 
+//
+// Some facts:
+//     * The header is 16 bytes,
+//     * The message can be up to 40k,
+//     * The listeners block starts at 40k+16 = 40976 bytes,
+//     * To add a listener, simply append its name in the listeners list (null terminated strings)
+//
+namespace {
+
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();    
+
+} // anonymous namespace
 
 namespace gnash {
 
-// Forward declarations
-
-void attachLocalConnectionInterface(as_object& o);
-//si
-//moved to header file
-//extern as_object* getLocalConnectionInterface();
-
-
-//namespace {
-    as_value localconnection_allowInsecureDomain(const fn_call& fn);
-
-    as_value localconnection_allowDomain(const fn_call& fn);
-
-//Si
-//FIX ME
-//allowDomain has not been defined !!!!!!!!!!!!!!!!!!!!
-	
-    as_value localconnection_close(const fn_call& fn);
+namespace {
     as_value localconnection_connect(const fn_call& fn);
-    as_value localconnection_send(const fn_call& fn);
-    as_value localconnection_asyncError(const fn_call& fn);
-    as_value localconnection_securityError(const fn_call& fn);
-    as_value localconnection_status(const fn_call& fn);
-
-//	Si
-//   moved to header file
-//    as_value localconnection_ctor(const fn_call& fn);
-    
-    void attachLocalConnectionStaticInterface(as_object& o);
-//    as_object* getLocalConnectionInterface();
-
-//Si 
-//Added
-    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance(); 
     as_value localconnection_domain(const fn_call& fn);
 
     bool validFunctionName(const std::string& func);
 
     builtin_function* getLocalConnectionConstructor();
-//Added end
+    as_object* getLocalConnectionInterface();
+}
 
-
-//}
-
-//Si
-//Moved into head file
-//class LocalConnection_as : public as_object
-//{
-//public:
-//    LocalConnection_as()
-//        :
-//        as_object(getLocalConnectionInterface())
-//    {}
-//};
-
-// extern (used by Global.cpp)
-
+// \class LocalConnection_as
+/// \brief Open a connection between two SWF movies so they can send
+/// each other Flash Objects to be executed.
+///
 LocalConnection_as::LocalConnection_as()
     :
     as_object(getLocalConnectionInterface()),
@@ -135,210 +119,35 @@ LocalConnection_as::close()
 #endif
 }
 
-
-void LocalConnection_as::init(as_object& global)
-{
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&localconnection_ctor, getLocalConnectionInterface());
-        attachLocalConnectionStaticInterface(*cl);
-    }
-
-    // Register _global.LocalConnection
-    global.init_member("LocalConnection", cl.get());
-}
-
-
-//namespace {
-
+/// \brief Prepares the LocalConnection object to receive commands from a
+/// LocalConnection.send() command.
+/// 
+/// The name is a symbolic name like "lc_name", that is used by the
+/// send() command to signify which local connection to send the
+/// object to.
 void
-attachLocalConnectionInterface(as_object& o)
+LocalConnection_as::connect(const std::string& name)
 {
-    o.init_member("allowInsecureDomain", new builtin_function(localconnection_allowInsecureDomain));
-    o.init_member("allowDomain", new builtin_function(localconnection_allowDomain));	
-    o.init_member("close", new builtin_function(localconnection_close));
-    o.init_member("connect", new builtin_function(localconnection_connect));
-    o.init_member("send", new builtin_function(localconnection_send));
-    o.init_member("asyncError", new builtin_function(localconnection_asyncError));
-    o.init_member("securityError", new builtin_function(localconnection_securityError));
-    o.init_member("status", new builtin_function(localconnection_status));
-    o.init_member("domain", new builtin_function(localconnection_domain));
-}
 
-void
-attachLocalConnectionStaticInterface(as_object& )
-{
-}
+    assert(!name.empty());
 
-as_object*
-getLocalConnectionInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachLocalConnectionInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-localconnection_allowInsecureDomain(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-
-
-//Si
-//FIX ME!
-//This function has not been completed.
-//The definition here is only used for test!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-as_value
-localconnection_allowDomain(const fn_call& fn)
-{
+    _name = name;
     
-    return as_value();
-}
+    // TODO: does this depend on success?
+    _connected = true;
+    
+    log_debug("trying to open shared memory segment: \"%s\"", _name);
+    
+    if (Shm::attach(_name.c_str(), true) == false) {
+        return;
+    }
 
-
-as_value
-localconnection_close(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-localconnection_connect(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-localconnection_send(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-localconnection_asyncError(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-localconnection_securityError(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-localconnection_status(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-localconnection_ctor(const fn_call&)
-{
-    boost::intrusive_ptr<as_object> obj = new LocalConnection_as;
-
-    return as_value(obj.get()); // will keep alive
-}
-
-//Si
-//Added
-
-
-/// Instantiate a new LocalConnection object within a flash movie
-as_value
-localconnection_new(const fn_call& /* fn */)
-{
-    LocalConnection_as *obj = new LocalConnection_as;
-
-    return as_value(obj);
-}
-
-/// The callback for LocalConnection::domain()
-as_value
-localconnection_domain(const fn_call& fn)
-{
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-
-    return as_value(ptr->domain());
-}
-
-
-builtin_function*
-getLocalConnectionConstructor()
-{
-	// This is going to be the global Number "class"/"function"
-	static builtin_function* cl=NULL;
-
-	if ( cl == NULL )
-	{
-		cl = new builtin_function(&localconnection_new,getLocalConnectionInterface());
-
-        // FIXME: why do we need to register ourself here ?
-		VM::get().addStatic(cl);
-	}
-
-	return cl;
-}
-
-/// These names are invalid as a function name.
-bool
-validFunctionName(const std::string& func)
-{
-
-    if (func.empty()) return false;
-
-    typedef std::vector<std::string> ReservedNames;
-
-    static const ReservedNames reserved = boost::assign::list_of
-        ("send")
-        ("onStatus")
-        ("close")
-        ("connect")
-        ("domain")
-	("allowDomain")
-        ("allowInsecureDomain");
-
-    const ReservedNames::const_iterator it =
-        std::find_if(reserved.begin(), reserved.end(),
-                boost::bind(StringNoCaseEqual(), _1, func));
-        
-    return (it == reserved.end());
+    if (Shm::getAddr() <= 0) {
+        log_error("Failed to open shared memory segment: \"%s\"", _name);
+        return; 
+    }
+    
+    return;
 }
 
 /// \brief Returns a string representing the superdomain of the
@@ -383,6 +192,7 @@ LocalConnection_as::getDomain()
     if (pos == std::string::npos) {
         return domain;
     }
+
     // Return everything after the second-to-last '.'
     // FIXME: this must be wrong, or it would return 'org.uk' for many
     // UK websites, and not even Adobe is that stupid. I think.
@@ -390,12 +200,222 @@ LocalConnection_as::getDomain()
 
 }
 
+void
+LocalConnection_as::init(as_object& glob)
+{
+	builtin_function* ctor=getLocalConnectionConstructor();
 
-//} // anonymous namespace 
-} // gnash namespace
+	int swf6flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::dontDelete | 
+                    as_prop_flags::onlySWF6Up;
 
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
+    glob.init_member(NSV::CLASS_LOCALCONNECTION, ctor, swf6flags);
+}
 
+
+// Anonymous namespace for module-statics
+namespace {
+
+/// Instantiate a new LocalConnection object within a flash movie
+as_value
+localconnection_new(const fn_call& /* fn */)
+{
+    LocalConnection_as *obj = new LocalConnection_as;
+
+    return as_value(obj);
+}
+
+/// The callback for LocalConnection::close()
+as_value
+localconnection_close(const fn_call& fn)
+{
+    
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
+    
+    ptr->close();
+    return as_value();
+}
+
+/// The callback for LocalConnection::connect()
+as_value
+localconnection_connect(const fn_call& fn)
+{
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
+
+    // If already connected, don't try again until close() is called.
+    if (ptr->connected()) return false;
+
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("LocalConnection.connect() expects exactly "
+                    "1 argument"));
+        );
+        return as_value(false);
+    }
+
+    if (!fn.arg(0).is_string()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("LocalConnection.connect(): first argument must "
+                    "be a string"));
+        );
+        return as_value(false);
+    }
+
+    std::string name = fn.arg(0).to_string();
+
+    if (name.empty()) {
+        return as_value(false);
+    }
+
+    ptr->connect(name);
+
+    // We don't care whether connected or not.
+    return as_value(true);
+}
+
+/// The callback for LocalConnection::domain()
+as_value
+localconnection_domain(const fn_call& fn)
+{
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
+
+    return as_value(ptr->domain());
+}
+
+/// LocalConnection.send()
+//
+/// Returns false only if the call was syntactically incorrect.
+as_value
+localconnection_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
+
+    // At least 2 args (connection name, function) required.
+    if (fn.nargs < 2) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("LocalConnection.send(%s): requires at least 2 "
+                    "arguments"), os.str());
+        );
+        return as_value(false);
+    }
+
+    // Both the first two arguments must be a string
+    if (!fn.arg(0).is_string() || !fn.arg(1).is_string()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("LocalConnection.send(%s): requires at least 2 "
+                    "arguments"), os.str());
+        );
+        return as_value(false);
+    }
+
+    const std::string& func = fn.arg(1).to_string();
+
+    if (!validFunctionName(func)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("LocalConnection.send(%s): requires at least 2 "
+                    "arguments"), os.str());
+        );
+        return as_value(false);
+    }
+
+
+    // Now we have a valid call.
+
+    // It is useful to see what's supposed being sent, so we log
+    // this every time until implemented.
+    std::ostringstream os;
+    fn.dump_args(os);
+    log_unimpl(_("LocalConnection.send unimplemented %s"), os.str());
+
+    // We'll return true if the LocalConnection is disabled too, as
+    // the return value doesn't indicate success of the connection.
+    if (rcfile.getLocalConnection() ) {
+        log_security("Attempting to write to disabled LocalConnection!");
+        return as_value(true);
+    }
+
+    return as_value(true);
+}
+
+
+void
+attachLocalConnectionInterface(as_object& o)
+{
+    o.init_member("close", new builtin_function(localconnection_close));
+    o.init_member("connect", new builtin_function(localconnection_connect));
+    o.init_member("domain", new builtin_function(localconnection_domain));
+    o.init_member("send", new builtin_function(localconnection_send));
+}
+
+as_object*
+getLocalConnectionInterface()
+{
+
+    static boost::intrusive_ptr<as_object> o;
+
+    if ( o == NULL )
+    {
+        o = new as_object(getObjectInterface());
+	    VM::get().addStatic(o.get());
+
+        attachLocalConnectionInterface(*o);
+    }
+
+    return o.get();
+}
+
+builtin_function*
+getLocalConnectionConstructor()
+{
+	// This is going to be the global Number "class"/"function"
+	static builtin_function* cl=NULL;
+
+	if ( cl == NULL )
+	{
+		cl = new builtin_function(&localconnection_new,
+                getLocalConnectionInterface());
+
+        // FIXME: why do we need to register ourself here ?
+		VM::get().addStatic(cl);
+	}
+
+	return cl;
+}
+
+/// These names are invalid as a function name.
+bool
+validFunctionName(const std::string& func)
+{
+
+    if (func.empty()) return false;
+
+    typedef std::vector<std::string> ReservedNames;
+
+    static const ReservedNames reserved = boost::assign::list_of
+        ("send")
+        ("onStatus")
+        ("close")
+        ("connect")
+        ("domain")
+        ("allowDomain");
+
+    const ReservedNames::const_iterator it =
+        std::find_if(reserved.begin(), reserved.end(),
+                boost::bind(StringNoCaseEqual(), _1, func));
+        
+    return (it == reserved.end());
+}
+
+} // anonymous namespace
+
+} // end of gnash namespace

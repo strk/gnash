@@ -327,7 +327,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
         NSV::NS_FLASH_NET, 6 },
 	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
     { LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION, NSV::CLASS_OBJECT,
-        NS_GLOBAL, 6 },
+        NSV::NS_FLASH_NET, 6 },
     { customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT,
         NSV::NS_ADOBE_UTILS, 6 },
     { NetConnection_as::init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT,
