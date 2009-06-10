@@ -17,11 +17,7 @@
  */ 
 
 /*
- * Test for sounds being started and stopped
- * 
- * The _root movie has 20 frames. 
- *
- * In uneven frames a sound is started, and in even frames it is stopped.
+ * Test for event sounds, self-contained self-documented
  */
 
 
@@ -194,8 +190,8 @@ runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
     add_actions(mo,
               "note('\nMultiple Sound Test.\n"
               "The notes should start exactly at the beginning of a frame "
-              "(to coincide with the appearance of the description text).\n"
-              "Test should start in two seconds.');");
+              "(to coincide with the appearance of the description text)"
+              "');\n");
 
     /* This is what is supposed to happen in each frame */
     frameDesc[0] = "Two notes (C, E)";
@@ -206,16 +202,15 @@ runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
 
     for (i = 0; i < 4; i++)
     {
-        SWFMovie_nextFrame(mo);
-
-        (*frame)++;
 
         printFrameInfo(mo, i, frameDesc[i]);
 
         SWFMovie_startSound(mo, so);
+
+        SWFMovie_nextFrame(mo); (*frame)++;
     }
 
-    SWFMovie_nextFrame(mo);
+    //SWFMovie_nextFrame(mo);
 
     printFrameInfo(mo, i, frameDesc[i]);
     SWFMovie_stopSound(mo, so);
@@ -234,7 +229,7 @@ runNoMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
               "note('\nNon-multiple Sound Test\n"
               "The notes should start exactly at the beginning "
               "of a frame (to coincide with the appearance of the description "
-              "text). Test should start in two seconds.');");
+              "text)');");
             
 
   /* This is what is supposed to happen in each frame */
@@ -247,20 +242,59 @@ runNoMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
 
     for (i = 0; i < 4; i++)
     {
-        SWFMovie_nextFrame(mo);
-
-        (*frame)++;
 
         printFrameInfo(mo, i, frameDesc[i]);
 
         SWFSoundInstance so_in = SWFMovie_startSound(mo, so);
         SWFSoundInstance_setNoMultiple(so_in);
+
+        SWFMovie_nextFrame(mo); (*frame)++;
     }
 
-    SWFMovie_nextFrame(mo);
+    //SWFMovie_nextFrame(mo);
 
     printFrameInfo(mo, i, frameDesc[i]);
     SWFMovie_stopSound(mo, so);
+
+}
+
+void
+runTrimmedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
+{
+    SWFSoundInstance so_in;
+    int i;
+
+    SWFMovie_nextFrame(mo);
+    add_actions(mo,
+              "note('\nTrimmed Sound Test.\n"
+              "The notes should start exactly at the beginning of a frame "
+              "(to coincide with the appearance of the description text');");
+
+    // outPoint
+    so_in = SWFMovie_startSound(mo, so);
+    SWFSoundInstance_setLoopOutPoint(so_in, 44100*2);
+    printFrameInfo(mo, 0, "Two notes (C, E)");
+    SWFMovie_nextFrame(mo); (*frame)++;
+
+    // inPoint
+    so_in = SWFMovie_startSound(mo, so);
+    SWFSoundInstance_setLoopInPoint(so_in, 44100);
+    printFrameInfo(mo, 1, "Two notes (E, G)");
+    SWFMovie_nextFrame(mo); (*frame)++;
+
+    // inPoint + outPoint + loop
+    so_in = SWFMovie_startSound(mo, so);
+    SWFSoundInstance_setLoopInPoint(so_in, 44100);
+    SWFSoundInstance_setLoopOutPoint(so_in, 44100*2);
+    SWFSoundInstance_setLoopCount(so_in, 2);
+    printFrameInfo(mo, 2, "One note (E)");
+    SWFMovie_nextFrame(mo); (*frame)++;
+
+    printFrameInfo(mo, 3, "One note (E)");
+    SWFMovie_nextFrame(mo); (*frame)++;
+
+    printFrameInfo(mo, 4, "Nothing");
+    SWFMovie_nextFrame(mo); (*frame)++;
 
 }
 
@@ -321,9 +355,11 @@ main(int argc, char** argv)
   runNoMultipleSoundsTest(mo, so, &frame);
 
   pauseForNextTest(mo);
+  runTrimmedSoundsTest(mo, so, &frame);
+
+  pauseForNextTest(mo);
   runAttachedSoundsTest(mo, so, &frame);
 
-  // TODO: test inPoint/outPoint (+ with loop ?)
   // TODO: test start(<sec_offset>) (+ with loop ?)
 
   endOfTests(mo);

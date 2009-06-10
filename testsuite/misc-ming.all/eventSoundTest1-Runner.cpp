@@ -79,18 +79,20 @@ main(int /*argc*/, char** /*argv*/)
 	const int totalFrames = root->get_frame_count();
 
 	// Make sure you adjust this with the test!
-	cerr << "Total frames: " <<  totalFrames;
-	assert (totalFrames == 20);
+	cerr << "Total frames: " <<  totalFrames << endl;
+	assert (totalFrames == 24);
 
 	int numSoundsStarted[] = {
-		0,
-		4,
-		6,
-        12
+		0, 
+		4, // Multiple   (+4 sounds started)
+		6, // NoMultiple (+2 sounds started)
+        9, // Trimmed    (+3 sounds started)
+        15 // Attached   (+6 sounds started)
 	};
 
 	/// Expected success for each test
 	bool testPasses[] = {
+		true,
 		true,
 		true,
 		true,
@@ -107,7 +109,6 @@ main(int /*argc*/, char** /*argv*/)
 			root->delProperty(st.find("testReady"));
 			
 			// When a test is ready, check the result of the previous test.
-			check_equals(tester.soundsStarted(), numSoundsStarted[test]);
 			if (testPasses[test]) {
 				check_equals(tester.soundsStarted(), numSoundsStarted[test]);
 			}
@@ -123,6 +124,13 @@ main(int /*argc*/, char** /*argv*/)
 		tester.advance();
 		frame++;
 	}
+
+    if (testPasses[test]) {
+        check_equals(tester.soundsStarted(), numSoundsStarted[test]);
+    }
+    else {
+        xcheck_equals(tester.soundsStarted(), numSoundsStarted[test]);
+    }
 
     // Consistency checking
     as_value eot;
