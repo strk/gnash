@@ -486,11 +486,11 @@ fi
 
 dnl Install the headers to make Gnash an SDK
 AC_ARG_ENABLE(sdkinstall,
-  AC_HELP_STRING([--enable-sdk-install], [Enable installing the libraries and headers as an SDK]),
+  AC_HELP_STRING([--enable-sdkinstall], [Enable installing the libraries and headers as an SDK]),
 [case "${enableval}" in
   yes) sdkinstall=yes ;;
   no)  sdkinstall=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-i810-lod-bias option]) ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-sdkinstall option]) ;;
 esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
