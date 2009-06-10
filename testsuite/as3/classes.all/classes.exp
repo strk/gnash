@@ -48,7 +48,7 @@ set testcases [glob -nocomplain *.swf]
 # testcases is set by the Makefile in the site.exp data file.
 foreach file $testcases {
 
-    verbose "Running test $gprocessor $file"
+    verbose "Running test $gprocessor -v $file"
 
     # spawn the executable and look for the DejaGnu output messages from the
     # test case.
@@ -57,7 +57,7 @@ foreach file $testcases {
     # -open [open "|cmd" "r"] doesn't work for that
   
     # Ignore SIGHUP or we'd get a lot of them on Debian stable
-    spawn -noecho -ignore SIGHUP $gprocessor ./$file 
+    spawn -noecho -ignore SIGHUP $gprocessor -v ./$file 
 
     expect {
 	-re "^\[^\n]*NOTE:\[^\n]*\n" {
