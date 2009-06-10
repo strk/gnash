@@ -6,7 +6,7 @@ static gnash::SharedLib::initentry *as3netclasses[] = {
     gnash::filefilter_class_init,
     gnash::idynamicpropertyoutput_class_init,
     gnash::idynamicpropertywriter_class_init,
-    gnash::LocalConnection::init,
+    gnash::localconnection_class_init,
     gnash::objectencoding_class_init,
     gnash::responder_class_init,
     gnash::sharedobject_class_init,
