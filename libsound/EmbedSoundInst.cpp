@@ -52,7 +52,8 @@ EmbedSoundInst::samplesFetched() const
 EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
             media::MediaHandler& mediaHandler,
             sound_handler::StreamBlockId blockOffset,
-            unsigned int secsOffset,
+            unsigned int inPoint,
+            unsigned int outPoint,
             const SoundEnvelopes* env,
             unsigned int loopCount)
         :
@@ -60,11 +61,20 @@ EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
         // should store blockOffset somewhere else too, for resetting
         decodingPosition(blockOffset),
 
-        // should change based on offSecs I guess ?
-        playbackPosition(0),
-
         loopCount(loopCount),
-        offSecs(secsOffset),
+
+        // parameter is in stereo samples (44100 per second)
+        // we double to take 2 channels into account
+        // and double again to use bytes
+        _inPoint(inPoint*4),
+
+        // parameter is in stereo samples (44100 per second)
+        // we double to take 2 channels into account
+        // and double again to use bytes
+        _outPoint( outPoint == std::numeric_limits<unsigned int>::max() ?
+                   std::numeric_limits<unsigned long>::max()
+                   : outPoint * 4),
+
         envelopes(env),
         current_env(0),
         _samplesFetched(0),
@@ -73,6 +83,8 @@ EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
         _soundDef(soundData),
         _decodedData(0)
 {
+    playbackPosition = _inPoint; 
+
     createDecoder(mediaHandler);
 }
 
@@ -110,6 +122,15 @@ EmbedSoundInst::getDecodedData(unsigned long int pos)
         return reinterpret_cast<boost::int16_t*>(_decodedData->data()+pos);
     }
     else return 0;
+}
+
+bool
+EmbedSoundInst::reachedCustomEnd() const
+{
+    if ( _outPoint == std::numeric_limits<unsigned long>::max() )
+            return false;
+    if ( playbackPosition >= _outPoint ) return true;
+    return false;
 }
 
 unsigned int 
@@ -161,10 +182,8 @@ EmbedSoundInst::fetchSamples(boost::int16_t* to, unsigned int nSamples)
         // We haven't finished fetching yet, so see if we
         // have more to decode or not
 
-        if ( decodingCompleted() )
+        if ( decodingCompleted() || reachedCustomEnd() )
         {
-            // No more to decode, see if we want to loop...
-
             if ( loopCount )
             {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
@@ -175,14 +194,23 @@ EmbedSoundInst::fetchSamples(boost::int16_t* to, unsigned int nSamples)
                 // position and keep looping
                 --loopCount;
 
-                // @todo playbackPosition is not necessarely 0
-                //       if we were asked to start somewhere after that!!
-                playbackPosition=0;
+                // Start next loop
+                playbackPosition = _inPoint; 
 
                 continue;
             }
 
-            log_debug("Decoding completed and no looping, sound is over");
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+            if ( reachedCustomEnd() )
+            {
+                log_debug("Reached custom end (pos:%d out:%d) and no looping, "
+                          "sound is over", playbackPosition, _outPoint);
+            }
+            else
+            {
+                log_debug("Decoding completed and no looping, sound is over");
+            }
+#endif
             break; // fetched what possible, filled with silence the rest
         }
 
@@ -207,7 +235,7 @@ EmbedSoundInst::decodeNextBlock()
     // Doing so we know what's the sample number
     // of the first sample in the newly decoded block.
     //
-    assert(playbackPosition >= decodedDataSize() );
+    assert( playbackPosition >= decodedDataSize() );
 
     boost::uint32_t inputSize = 0; // or blockSize
     bool parse = true; // need to parse ?
@@ -402,7 +430,7 @@ EmbedSoundInst::eof() const
 {
     // it isn't threaded, but just in case, we call decodingCompleted first
     // and we also check loopCount... (over paranoid?)
-    return ( decodingCompleted() && !loopCount && !decodedSamplesAhead() );
+    return ( ( decodingCompleted() || reachedCustomEnd() ) && !loopCount && !decodedSamplesAhead() );
 }
 
 EmbedSoundInst::~EmbedSoundInst()
@@ -416,67 +444,9 @@ EmbedSoundInst::appendDecodedData(boost::uint8_t* data, unsigned int size)
     if ( ! _decodedData.get() )
     {
         _decodedData.reset( new SimpleBuffer );
-
-        // Skip samples if requested and we're at the start
-        const media::SoundInfo& sinfo = *(_soundDef.soundinfo);
-        boost::int16_t delaySeek = sinfo.getDelaySeek();
-
-        if ( delaySeek > 0 )
-        {
-            // seek the specified number of samples and throw them away
-
-            // each sample is 2 bytes per channel, and we're stereo
-            unsigned int off = delaySeek*4;
-
-            // delaySeek refers to pre-resampled state so we need to
-            // take that into account.
-            //
-            // NOTE: this was tested with inputs:
-            //     - isStereo?0 is16bit()?1 sampleRate?22050
-            //     - isStereo?1 is16bit()?1 sampleRate?22050
-            //     - isStereo?1 is16bit()?1 sampleRate?44100
-            // TODO: test with other sample sizes !
-            //log_debug("NOTE: isStereo?%d is16bit()?%d sampleRate?%d",
-            //  sinfo.isStereo(), sinfo.is16bit(), sinfo.getSampleRate());
-            //
-            off *= 44100/sinfo.getSampleRate();
-
-
-            if ( off < size )
-            {
-                log_debug("Skipping first %d samples of event sound", off/2);
-                _decodedData->append(data+off, size-off);
-            }
-            else
-            {
-                // TODO: could be there'll be more samples later
-                //       so we need to keep track of how many we decoded
-                //       at this stage
-                log_error("delaySeek (%d) >= initial block samples (%d)",
-                    delaySeek, size/2);
-            }
-        }
-        else if ( delaySeek < 0 )
-        {
-            // insert delaySeek samples of silence here
-
-            // TODO: use a stack-allocated buffer and a loop here
-            unsigned int silenceSize = -delaySeek*2; // we talk 8bit
-            boost::scoped_array<boost::uint8_t> silence (
-                new boost::uint8_t[silenceSize]
-            );
-            _decodedData->append(silence.get(), silenceSize);
-            _decodedData->append(data, size);
-        }
-        else
-        {
-            _decodedData->append(data, size);
-        }
     }
-    else
-    {
-        _decodedData->append(data, size);
-    }
+
+    _decodedData->append(data, size);
 
     delete [] data; // ownership transferred...
 }

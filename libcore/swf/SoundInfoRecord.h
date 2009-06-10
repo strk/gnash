@@ -22,6 +22,8 @@
 
 #include "sound_handler.h" // sound::SoundEnvelopes
 
+#include <limits>
+
 namespace gnash {
     class SWFStream;
 }
@@ -38,7 +40,7 @@ struct SoundInfoRecord
         :
         loopCount(0),
         inPoint(0),
-        outPoint(0)
+        outPoint(std::numeric_limits<unsigned int>::max())
     {}
 
     bool noMultiple;
@@ -63,11 +65,19 @@ struct SoundInfoRecord
 	///
 	bool stopPlayback;
 
-	/// In/Out points, currently unsupported
+	/// In point, 44100 for one second
 	//
 	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_soundinfo
-    boost::uint32_t inPoint;
-    boost::uint32_t outPoint;
+    ///
+    unsigned int inPoint;
+
+	/// Out point, 44100 for one second
+	//
+	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_soundinfo
+    ///
+    /// NOTE: std::numeric_limits<unsigned int>::max() means none
+    ///
+    unsigned int outPoint;
 
 	/// Sound effects (envelopes) for this start of the sound
 	//

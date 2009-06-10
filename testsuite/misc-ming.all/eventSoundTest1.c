@@ -323,6 +323,9 @@ main(int argc, char** argv)
   pauseForNextTest(mo);
   runAttachedSoundsTest(mo, so, &frame);
 
+  // TODO: test inPoint/outPoint (+ with loop ?)
+  // TODO: test start(<sec_offset>) (+ with loop ?)
+
   endOfTests(mo);
 
   //Output movie

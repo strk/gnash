@@ -162,10 +162,16 @@ public:
     ///     to refer to a specific StreamSoundBlock.
     ///     @see gnash::swf::StreamSoundBlockTag
     ///
-    /// @param secsOffset
-    ///     Offset, in seconds, this instance should start playing
-    ///     from. @todo take samples (for easier implementation of
-    ///     seekSamples in streaming sound).
+    /// @param inPoint
+    ///     Offset in output samples this instance should start
+    ///     playing from. These are post-resampling samples from
+    ///     the start of the specified blockId.
+    ///     
+    ///
+    /// @param outPoint
+    ///     Offset in output samples this instance should stop
+    ///     playing at. These are post-resampling samples from
+    ///     the start of the specified blockId.
     ///
     /// @param envelopes
     ///     SoundEnvelopes to apply to this sound. May be 0 for none.
@@ -181,7 +187,8 @@ public:
     /// Locks the _soundInstancesMutex when pushing to it
     ///
     std::auto_ptr<EmbedSoundInst> createInstance( media::MediaHandler& mh,
-            unsigned long blockOffset, unsigned int secsOffset,
+            unsigned long blockOffset,
+            unsigned int inPoint, unsigned int outPoint,
             const SoundEnvelopes* envelopes, unsigned int loopCount);
 
     /// Volume for AS-sounds, range: 0-100.

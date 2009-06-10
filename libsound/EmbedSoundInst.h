@@ -66,23 +66,32 @@ public:
     ///
     /// @param blockId
     ///     Identifier of the encoded block to start decoding from.
-    ///     @see gnash::swf::StreamBlockIdTag
+    ///     @see gnash::swf::StreamSoundBlockTag
     ///
-    /// @param secsOffset
-    ///     Offset, in seconds, this instance should start playing
-    ///     from. @todo take samples (for easier implementation of
-    ///     seekSamples in streaming sound).
+    /// @param inPoint
+    ///     Offset in output samples this instance should start
+    ///     playing from. These are post-resampling samples (44100 
+    ///     for one second of samples).
+    ///
+    /// @param outPoint
+    ///     Offset in output samples this instance should stop
+    ///     playing at. These are post-resampling samples (44100 
+    ///     for one second of samples).
+    ///     Use numeric_limits<unsigned int>::max() for never
     ///
     /// @param envelopes
     ///     SoundEnvelopes to apply to this sound. May be 0 for none.
     ///
     /// @param loopCount
     ///     Number of times this instance should loop over the defined sound.
-    ///     @todo document if every loop starts at secsOffset !
+    ///     Note that every loop begins and ends at the range given by
+    ///     inPoint and outPoint.
     ///
     EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
             sound_handler::StreamBlockId blockId,
-            unsigned int secsOffset, const SoundEnvelopes* envelopes,
+            unsigned int inPoint,
+            unsigned int outPoint,
+            const SoundEnvelopes* envelopes,
             unsigned int loopCount);
 
     // See dox in sound_handler.h (InputStream)
@@ -112,11 +121,13 @@ private:
     /// For every loop completed, it is decremented.
     long loopCount;
 
-    /// Offset in seconds to make playback start in-sync
-    //
-    /// only used with mp3 streams.
-    ///
-    unsigned int offSecs;
+    /// Offset in bytes samples from start of the block
+    /// to begin playback from
+    unsigned long _inPoint;
+
+    /// Offset in bytes to end playback at
+    /// Never if numeric_limits<unsigned long>::max()
+    unsigned long _outPoint;
 
     /// Sound envelopes for the current sound, which determine the volume level
     /// from a given position. Only used with event sounds.
@@ -220,12 +231,23 @@ private:
     /// from playback position on
     unsigned int decodedSamplesAhead() const
     {
-        unsigned int bytesAhead = decodedDataSize() - playbackPosition;
+        unsigned int dds = decodedDataSize();
+        if ( dds <= playbackPosition ) return 0; 
+        unsigned int bytesAhead = dds - playbackPosition;
         assert(!(bytesAhead%2));
 
+        if ( _outPoint < std::numeric_limits<unsigned long>::max() )
+        {
+            unsigned int toCustomEnd = _outPoint-playbackPosition;
+            if ( toCustomEnd < bytesAhead ) bytesAhead = toCustomEnd;
+        }
+
         unsigned int samplesAhead = bytesAhead/2;
+
         return samplesAhead;
     }
+
+    bool reachedCustomEnd() const;
 
     /// Return true if there's nothing more to decode
     bool decodingCompleted() const

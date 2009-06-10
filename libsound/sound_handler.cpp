@@ -332,27 +332,49 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 
 }
 
-void
-sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
-                            StreamBlockId blockId,
-                            const SoundEnvelopes* envelopes,
-                            bool allowMultiples)
+/*static private*/
+unsigned int
+sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
+                                      unsigned int swfSamples)
 {
-    // Check if the sound exists
-    if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
-    {
-        log_error("Invalid (%d) sound_handle passed to playSound, "
-                  "doing nothing", sound_handle);
-        return;
-    }
+    // swf samples refers to pre-resampled state so we need to
+    // take that into account.
 
-    // parameter checking
-    if (offSecs < 0)
-    {
-        log_error("Negative (%d) seconds offset passed to playSound, "
-                  "taking as zero ", offSecs);
-        offSecs = 0;
-    }
+
+    static const unsigned int outSampleRate = 44100;
+
+    unsigned int outSamples = swfSamples *
+                                (outSampleRate/sinfo.getSampleRate());
+
+    // NOTE: this was tested with inputs:
+    //     - isStereo?0 is16bit()?1 sampleRate?11025
+    //     - isStereo?0 is16bit()?1 sampleRate?22050
+    //     - isStereo?1 is16bit()?1 sampleRate?22050
+    //     - isStereo?0 is16bit()?1 sampleRate?44100
+    //     - isStereo?1 is16bit()?1 sampleRate?44100
+    //
+    // TODO: test with other sample sizes !
+    //
+#if 1
+    log_debug("NOTE: isStereo?%d is16bit()?%d sampleRate?%d",
+              sinfo.isStereo(), sinfo.is16bit(), sinfo.getSampleRate());
+#endif
+
+
+    return outSamples;
+}
+
+
+
+void
+sound_handler::playSound(int sound_handle, int loopCount,
+                         unsigned int inPoint,
+                         unsigned int outPoint,
+                         StreamBlockId blockId,
+                         const SoundEnvelopes* envelopes,
+                         bool allowMultiples)
+{
+    assert (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size());
 
     EmbedSound& sounddata = *(_sounds[sound_handle]);
 
@@ -385,11 +407,6 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
         return;
     }
 
-    if (offSecs)
-    {
-        LOG_ONCE(log_unimpl("Time based sound start offset"));
-    }
-
     // Make a "EmbedSoundInst" for this sound which is later placed
     // on the vector of instances of this sound being played
     //
@@ -404,10 +421,8 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
             // Sound block identifier
             blockId, 
 
-            // Seconds offset
-            // WARNING: this is wrong, offset is passed as seconds !!
-            // (currently unused anyway)
-            (sounddata.soundinfo->isStereo() ? offSecs : offSecs*2),
+            // Samples range
+            inPoint, outPoint,
 
             // Volume envelopes to use for this instance
             envelopes,
@@ -424,16 +439,74 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
 {
-    playSound(soundId, 0, 0, blockId, 0, false);
+    unsigned int inPoint=0;
+    unsigned int outPoint=std::numeric_limits<unsigned int>::max();
+
+    playSound(soundId, 0, inPoint, outPoint, blockId, 0, false);
 }
 
 /*public*/
 void
-sound_handler::startSound(int soundId, int loops, int secsOffset,
+sound_handler::startSound(int soundId, int loops, 
 	               const SoundEnvelopes* env,
-	               bool allowMultiple)
+	               bool allowMultiple, unsigned int inPoint,
+                   unsigned int outPoint)
 {
-    playSound(soundId, loops, secsOffset, 0, env, allowMultiple);
+    // Check if the sound exists
+    if (soundId < 0 ||
+        static_cast<unsigned int>(soundId) >= _sounds.size())
+    {
+        log_error("Invalid (%d) sound_handle passed to startSound, "
+                  "doing nothing", soundId);
+        return;
+    }
+
+
+    // Handle delaySeek
+
+    EmbedSound& sounddata = *(_sounds[soundId]);
+    const media::SoundInfo& sinfo = *(sounddata.soundinfo);
+
+    int swfDelaySeek = sinfo.getDelaySeek(); 
+    if ( swfDelaySeek )
+    {
+        // NOTE: differences between delaySeek and inPoint:
+        //
+        //      - Sample count semantic:
+        //        inPoint uses output sample rate (44100 for one second)
+        //        while delaySeek uses source sample rate
+        //        (SoundInfo.getSampleRate() for one second)
+        //
+        //      - Loop-back semantic:
+        //        An event sound always loops-back from inPoint with no gaps
+        //        When delaySeek is specified it is still used as a start
+        //        for the initial playback but when it comes to looping back
+        //        it seems to play silence instead of samples for the amount
+        //        skipped:
+        //
+        //               [ delaySeekTime ]
+        //        loop1                  *****************
+        //        loop2  ----------------*****************
+        //        loop3  ----------------*****************
+        //
+        //               [ inPoint ]
+        //        loop1             *****************
+        //        loop2             *****************
+        //        loop3             *****************
+        //
+        LOG_ONCE(log_unimpl("MP3 delaySeek"));
+#if 0
+        unsigned int outDelaySeek = swfToOutSamples(sinfo, swfDelaySeek);
+
+        log_debug("inPoint(%d) + delaySeek(%d -> %d) == %d",
+                  inPoint, swfDelaySeek, outDelaySeek,
+                  inPoint+outDelaySeek);
+
+        inPoint += outDelaySeek;
+#endif
+    }
+
+    playSound(soundId, loops, inPoint, outPoint, 0, env, allowMultiple);
 }
 
 void

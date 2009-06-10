@@ -100,14 +100,17 @@ EmbedSound::eraseActiveSound(Instances::iterator i)
 
 std::auto_ptr<EmbedSoundInst>
 EmbedSound::createInstance(media::MediaHandler& mh,
-            unsigned long blockOffset, unsigned int secsOffset,
+            unsigned long blockOffset,
+            unsigned int inPoint,
+            unsigned int outPoint,
             const SoundEnvelopes* envelopes,
             unsigned int loopCount)
 {
     std::auto_ptr<EmbedSoundInst> ret ( new EmbedSoundInst(
                                 *this,
                                 mh, blockOffset,
-                                secsOffset, envelopes,
+                                inPoint, outPoint,
+                                envelopes,
                                 loopCount) );
 
     boost::mutex::scoped_lock lock(_soundInstancesMutex);

@@ -463,7 +463,7 @@ Sound_as::setVolume(int volume)
 }
 
 void
-Sound_as::start(int offset, int loops)
+Sound_as::start(double secOff, int loops)
 {
     if ( ! _soundHandler )
     {
@@ -479,10 +479,10 @@ Sound_as::start(int offset, int loops)
             return;
         }
 
-        if (offset > 0)
+        if (secOff > 0)
         {
-            _startTime=offset*1000;
-            boost::uint32_t seekms = boost::uint32_t(offset*1000);
+            _startTime = secOff * 1000;
+            boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
             // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
             _mediaParser->seek(seekms); // well, we try...
         }
@@ -511,12 +511,20 @@ Sound_as::start(int offset, int loops)
     }
     else
     {
+        unsigned int inPoint = 0;
+
+        if ( secOff > 0 ) {
+            inPoint = (secOff*44100);
+        }
+
+        log_debug("Sound.start: secOff:%d", secOff);
+
         _soundHandler->startSound(
                     soundId,
                     loops,
-                    offset, // in seconds
                     0, // envelopes
-                    true // allow multiple instances (checked)
+                    true, // allow multiple instances (checked)
+                    inPoint
                     );
     }
 }
@@ -825,10 +833,10 @@ sound_start(const fn_call& fn)
     )
     boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
     int loop = 0;
-    int secondOffset = 0;
+    double secondOffset = 0;
 
     if (fn.nargs > 0) {
-        secondOffset = (int) fn.arg(0).to_number();
+        secondOffset = fn.arg(0).to_number();
 
         if (fn.nargs > 1) {
             loop = (int) fn.arg(1).to_number() - 1;

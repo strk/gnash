@@ -37,6 +37,7 @@
 #include <memory>
 #include <cassert>
 #include <cstring>
+#include <limits>
 #include <set> // for composition
 
 namespace gnash {
@@ -163,11 +164,17 @@ public:
     /// @param loops
     ///     loops == 0 means play the sound once (1 means play it twice, etc)
     ///
-    /// @param secsOffset
-    ///     When starting event sounds there sometimes is a offset to make
-    ///     the sound start at the exact right moment. Gnash supports this
-    ///     through 'Sound' AS class only, not from the actual control tag
-    ///     (StartSound). Units given in seconds.
+    /// @param inPoint
+    ///     Offset in output samples this instance should start
+    ///     playing from. These are post-resampling samples (44100 
+    ///     for one second of samples).
+    ///
+    /// @param outPoint
+    ///     Offset in output samples this instance should stop
+    ///     playing at. These are post-resampling samples (44100 
+    ///     for one second of samples).
+    ///     Use std::numeric_limits<unsigned int>::max() for no limit
+    ///     (default if missing)
     ///
     /// @param env
     ///     Some eventsounds have some volume control mechanism called
@@ -178,12 +185,11 @@ public:
     ///     If false, the sound will not be scheduled if there's another
     ///     instance of it already playing.
     ///
-    /// TODO: add inPoint and outPoint parameters
-    ///       (pre-resampling samples offset of start and end)
-    ///       or take SWF::SoundInfoRecord& directly !
-    void startSound(int id, int loops, int secsOffset,
+    ///
+    void startSound(int id, int loops, 
                    const SoundEnvelopes* env,
-                   bool allowMultiple);
+                   bool allowMultiple, unsigned int inPoint=0,
+                   unsigned int outPoint=std::numeric_limits<unsigned int>::max());
 
     /// Start playback of a streaming sound, if not playing already
     //
@@ -504,11 +510,15 @@ private:
     /// @param loops
     ///     loops == 0 means play the sound once (1 means play it twice, etc)
     ///
-    /// @param secsOffset
-    ///     When starting event sounds there sometimes is a offset to make
-    ///     the sound start at the exact right moment. Gnash supports this
-    ///     through 'Sound' AS class only, not from the actual control tag
-    ///     (StartSound). Units given in seconds.
+    /// @param inPoint
+    ///     Offset in output samples this instance should start
+    ///     playing from. These are post-resampling samples (44100 
+    ///     for one second of samples).
+    ///
+    /// @param outPoint
+    ///     Offset in output samples this instance should stop
+    ///     playing at. These are post-resampling samples (44100 
+    ///     for one second of samples).
     ///
     /// @param blockId
     ///     When starting a soundstream from a random frame, this tells which
@@ -525,11 +535,29 @@ private:
     ///     If false, the sound will not be scheduled if there's another
     ///     instance of it already playing.
     ///
-    /// TODO: add out_point parameter (when to stop playing the sound)
-    ///
-    void playSound(int id, int loops, int secsOffset,
+    void playSound(int id, int loops,
+                   unsigned int inPoint,
+                   unsigned int outPoint,
                    StreamBlockId blockId, const SoundEnvelopes* env,
                    bool allowMultiple);
+
+    /// Convert SWF-specified number of samples to output number of samples
+    //
+    /// SWF-specified number of samples are: delaySeek in DEFINESOUND,
+    /// latency in STREAMSOUNDHEAD and seekSamples in STREAMSOUNDBLOCK.
+    /// These refer to samples at the sampleRate of input.
+    ///
+    /// As gnash will resample the sounds to match expected output
+    /// (44100 Hz, stereo 16bit) this function is handy to convert
+    /// for simpler use later.
+    ///
+    /// It is non-static in the event we'll one day allow different
+    /// sound_handler instances to be configured with different output
+    /// sample rate (would need a lot more changes atm but let's keep
+    /// that in mind).
+    ///
+    unsigned int swfToOutSamples(const media::SoundInfo& sinfo,
+                                          unsigned int swfSamples);
 
 };
 

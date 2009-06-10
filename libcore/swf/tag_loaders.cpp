@@ -1126,11 +1126,6 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
         {
             in.ensureBytes(2);
             latency = in.read_s16(); 
-            if ( latency )
-            {
-                LOG_ONCE ( log_unimpl("MP3 stream latency seek") );
-                // TODO: should we pass as 'delaySeek' to SoundInfo ?
-            }
         }
         catch (ParserException& ex)
         {
@@ -1156,7 +1151,7 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     // Store all the data in a SoundInfo object
     std::auto_ptr<media::SoundInfo> sinfo;
-    sinfo.reset(new media::SoundInfo(format, streamSoundStereo, streamSoundRate, sampleCount, streamSound16bit));
+    sinfo.reset(new media::SoundInfo(format, streamSoundStereo, streamSoundRate, sampleCount, streamSound16bit, latency));
 
     // Stores the sounddata in the soundhandler, and the ID returned
     // can be used to starting, stopping and deleting that sound

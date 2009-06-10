@@ -91,7 +91,7 @@ class CharacterProxy;
     void loadSound(const std::string& file, bool streaming);
     void setPan();
     void setTransform();
-    void start(int offset, int loops);
+    void start(double secsStart, int loops);
     void stop(int si);
     unsigned int getDuration();
     unsigned int getPosition();

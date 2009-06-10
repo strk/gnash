@@ -27,6 +27,8 @@
 #include "SoundInfoRecord.h"
 #include "MovieClip.h"
 
+#include <limits>
+
 namespace gnash {
 namespace SWF {
 
@@ -94,9 +96,10 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 
             handler->startSound(m_handler_id,
                     _soundInfo.loopCount,
-                    0, // secs offset
                     env, // envelopes
-                    !_soundInfo.noMultiple // allow multiple instances ?
+                    !_soundInfo.noMultiple, // allow multiple instances ?
+                    _soundInfo.inPoint,
+                    _soundInfo.outPoint
                     );
         }
     }
