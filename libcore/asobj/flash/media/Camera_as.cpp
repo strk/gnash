@@ -21,182 +21,106 @@
 #include "gnashconfig.h"
 #endif
 
-#include "media/Camera_as.h"
+#include "flash/media/Camera_as.h"
+#include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
-// Forward declarations
-namespace {
-    as_value camera_getCamera(const fn_call& fn);
-    as_value camera_setKeyFrameInterval(const fn_call& fn);
-    as_value camera_setLoopback(const fn_call& fn);
-    as_value camera_setMode(const fn_call& fn);
-    as_value camera_setMotionLevel(const fn_call& fn);
-    as_value camera_setQuality(const fn_call& fn);
-    as_value camera_activity(const fn_call& fn);
-    as_value camera_status(const fn_call& fn);
-    as_value camera_ctor(const fn_call& fn);
-    void attachCameraInterface(as_object& o);
-    void attachCameraStaticInterface(as_object& o);
-    as_object* getCameraInterface();
+as_value camera_get(const fn_call& fn);
+as_value camera_setmode(const fn_call& fn);
+as_value camera_setmotionlevel(const fn_call& fn);
+as_value camera_setquality(const fn_call& fn);
+as_value camera_ctor(const fn_call& fn);
 
+static void
+attachCameraInterface(as_object& o)
+{
+	o.init_member("get", new builtin_function(camera_get));
+	o.init_member("setmode", new builtin_function(camera_setmode));
+	o.init_member("setmotionlevel", new builtin_function(camera_setmotionlevel));
+	o.init_member("setquality", new builtin_function(camera_setquality));
 }
 
-class Camera_as : public as_object
+static as_object*
+getCameraInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object(getObjectInterface());
+		attachCameraInterface(*o);
+	}
+	return o.get();
+}
+
+class camera_as_object: public as_object
 {
 
 public:
 
-    Camera_as()
-        :
-        as_object(getCameraInterface())
-    {}
+	camera_as_object()
+		:
+		as_object(getCameraInterface())
+	{}
+
+	// override from as_object ?
+	//const char* get_text_value() const { return "Camera"; }
+
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
 };
+
+as_value camera_get(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value camera_setmode(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value camera_setmotionlevel(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value camera_setquality(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+
+    return as_value();
+}
+
+as_value
+camera_ctor(const fn_call& /* fn */)
+{
+	boost::intrusive_ptr<as_object> obj = new camera_as_object;
+	
+	return as_value(obj.get()); // will keep alive
+}
 
 // extern (used by Global.cpp)
 void camera_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+	// This is going to be the global Camera "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
 
-    if (!cl) {
-        cl = new builtin_function(&camera_ctor, getCameraInterface());
-        attachCameraStaticInterface(*cl);
-    }
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&camera_ctor, getCameraInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachCameraInterface(*cl);
+		     
+	}
 
-    // Register _global.Camera
-    global.init_member("Camera", cl.get());
-}
-
-namespace {
-
-void
-attachCameraInterface(as_object& o)
-{
-    o.init_member("getCamera", new builtin_function(camera_getCamera));
-    o.init_member("setKeyFrameInterval", new builtin_function(camera_setKeyFrameInterval));
-    o.init_member("setLoopback", new builtin_function(camera_setLoopback));
-    o.init_member("setMode", new builtin_function(camera_setMode));
-    o.init_member("setMotionLevel", new builtin_function(camera_setMotionLevel));
-    o.init_member("setQuality", new builtin_function(camera_setQuality));
-    o.init_member("activity", new builtin_function(camera_activity));
-    o.init_member("status", new builtin_function(camera_status));
-}
-
-void
-attachCameraStaticInterface(as_object& o)
-{
+	// Register _global.Camera
+	global.init_member("Camera", cl.get());
 
 }
 
-as_object*
-getCameraInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachCameraInterface(*o);
-    }
-    return o.get();
-}
 
-as_value
-camera_getCamera(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_setKeyFrameInterval(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_setLoopback(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_setMode(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_setMotionLevel(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_setQuality(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_activity(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_status(const fn_call& fn)
-{
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-camera_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new Camera_as;
-
-    return as_value(obj.get()); // will keep alive
-}
-
-} // anonymous namespace 
-} // gnash namespace
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
+} // end of gnash namespace
 

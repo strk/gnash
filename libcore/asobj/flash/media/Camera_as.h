@@ -17,29 +17,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_CAMERA_H
-#define GNASH_ASOBJ3_CAMERA_H
+#ifndef __GNASH_ASOBJ_CAMERA_H__
+#define __GNASH_ASOBJ_CAMERA_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
-// Forward declarations
 class as_object;
 
 /// Initialize the global Camera class
 void camera_class_init(as_object& global);
 
-} // gnash namespace
+/// Return a Camera instance (in case the core lib needs it)
+//std::auto_ptr<as_object> init_camera_instance();
+  
+} // end of gnash namespace
 
-// GNASH_ASOBJ3_CAMERA_H
+// __GNASH_ASOBJ_CAMERA_H__
 #endif
 
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
 

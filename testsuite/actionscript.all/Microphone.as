@@ -35,7 +35,6 @@ check_equals ( typeof(Microphone.prototype.setRate), 'function' );
 check_equals ( typeof(Microphone.prototype.setSilenceLevel), 'function' );
 check_equals ( typeof(Microphone.prototype.setUseEchoSuppression), 'function' );
 
-
 check(Microphone.prototype.hasOwnProperty("setGain"));
 check(Microphone.prototype.hasOwnProperty("setRate"));
 check(Microphone.prototype.hasOwnProperty("setSilenceLevel"));
