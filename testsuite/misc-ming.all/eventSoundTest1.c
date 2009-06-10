@@ -39,6 +39,7 @@ SWFSound setupSounds(const char* filename);
 void runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame);
 void runNoMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame);
 void pauseForNextTest(SWFMovie mo);
+void endOfTests(SWFMovie mo);
 void printFrameInfo(SWFMovie mo, int i, const char* desc);
 
 void pauseForNextTest(SWFMovie mo)
@@ -50,6 +51,11 @@ void pauseForNextTest(SWFMovie mo)
   add_actions(mo, "note('Click and "
                   "wait for the test.');"
 		  "testReady = true; stop();");
+}
+
+void endOfTests(SWFMovie mo)
+{
+  add_actions(mo, "stop(); _root.endOfTest=1; note('END OF TESTS');");
 }
 
 void setupMovie(SWFMovie mo, const char* srcdir)
@@ -104,16 +110,13 @@ SWFSound setupSounds(const char* filename)
 void
 printFrameInfo(SWFMovie mo, int i, const char* desc)
 {
-    char descBuf[200];
-    char frameBuf[50];
+    char acts[2048];
 
-    sprintf(descBuf, "note('%s');", desc);
-    sprintf(frameBuf, "note('Frame: ' + %d);", i);
+    sprintf(acts, "note('Frame: ' + %d + ' - %s');", i, desc);
 
     /* Display frame number and description
     at the beginning of each frame */
-    add_actions(mo, frameBuf);
-    add_actions(mo, descBuf);
+    add_actions(mo, acts);
 }
 
 void
@@ -124,7 +127,7 @@ runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
 
     SWFMovie_nextFrame(mo);
     add_actions(mo,
-              "note('Attached Embedded Sound Test.\n"
+              "note('\nAttached Embedded Sound Test.\n"
               "The notes should start exactly at the beginning of a frame "
               "(to coincide with the appearance of the description text).\n"
               "Test should start in two seconds.');");
@@ -189,7 +192,7 @@ runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
 
     SWFMovie_nextFrame(mo);
     add_actions(mo,
-              "note('Multiple Sound Test.\n"
+              "note('\nMultiple Sound Test.\n"
               "The notes should start exactly at the beginning of a frame "
               "(to coincide with the appearance of the description text).\n"
               "Test should start in two seconds.');");
@@ -227,7 +230,8 @@ runNoMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
   int i;
 
   SWFMovie_nextFrame(mo);
-  add_actions(mo, "note('Non-multiple Sound Test\n"
+  add_actions(mo,
+              "note('\nNon-multiple Sound Test\n"
               "The notes should start exactly at the beginning "
               "of a frame (to coincide with the appearance of the description "
               "text). Test should start in two seconds.');");
@@ -319,7 +323,8 @@ main(int argc, char** argv)
   pauseForNextTest(mo);
   runAttachedSoundsTest(mo, so, &frame);
 
-  pauseForNextTest(mo);
+  endOfTests(mo);
+
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);

@@ -89,12 +89,12 @@ main(int /*argc*/, char** /*argv*/)
         12
 	};
 
-    /// Expected success for each test
+	/// Expected success for each test
 	bool testPasses[] = {
 		true,
 		true,
 		true,
-        true
+		true
 	};
 
 	// Advance and check...
@@ -107,12 +107,14 @@ main(int /*argc*/, char** /*argv*/)
 			root->delProperty(st.find("testReady"));
 			
 			// When a test is ready, check the result of the previous test.
+			check_equals(tester.soundsStarted(), numSoundsStarted[test]);
 			if (testPasses[test]) {
 				check_equals(tester.soundsStarted(), numSoundsStarted[test]);
 			}
 			else {
 				xcheck_equals(tester.soundsStarted(), numSoundsStarted[test]);
 			}
+
 			check_equals(tester.soundsStopped(), tester.soundsStarted());
 			++test;
 			tester.click();
@@ -121,6 +123,11 @@ main(int /*argc*/, char** /*argv*/)
 		tester.advance();
 		frame++;
 	}
+
+    // Consistency checking
+    as_value eot;
+    bool endOfTestFound = root->get_member(st.find("endoftest"), &eot);
+    check(endOfTestFound);
 
 }
 
