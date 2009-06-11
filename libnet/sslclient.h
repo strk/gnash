@@ -29,10 +29,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/cstdint.hpp>
 #include <sstream>
 
-#ifdef HAVE_OPENSSL
+#ifdef HAVE_OPENSSL_SSL_H
 #include <openssl/ssl.h>
+#include <openssl/err.h>
 #endif
 
 #include "cque.h"
@@ -42,11 +44,9 @@
 namespace gnash
 {
 
-#define CA_LIST "root.pem"
-#define HOST    "localhost"
-#define RANDOM  "random.pem"
-
-const boost::uint16_t PORT = 4433;
+const char *CA_LIST = "root.pem";
+const char *HOST    = "localhost";
+const char *RANDOM  = "random.pem";
 
 class DSOEXPORT SSLClient : public gnash::Network
 {
@@ -54,14 +54,41 @@ public:
     SSLClient();
     ~SSLClient();
 
-    bool checkCert(SSL *ssl, std::string &hostname);
+    // Read bytes from the already opened SSL connection
+    size_t sslRead(SSL &ssl, amf::Buffer &buf, size_t length);
+
+    // Write bytes to the already opened SSL connection
+    size_t sslWrite(SSL &ssl, amf::Buffer &buf, size_t length);
+
+    // Setup the Context for this connection
+    size_t sslSetupCTX(SSL &ssl);
+
+    // Shutdown the Context for this connection
+    size_t sslShutdown(SSL &ssl);
+
+    // sslConnect() is how the client connects to the server 
+    size_t sslConnect(std::string &hostname);
+
+    // sslAccept() is how the server waits for connections for clients
+    size_t sslAccept(SSL &ssl);
 
     void dump();
+
+ private:
+    // Check a certificate
+    bool checkCert(std::string &hostname);
+
+    boost::scoped_ptr<SSL> _ssl;
+    boost::scoped_ptr<SSL_CTX> _ctx;
+    boost::scoped_ptr<BIO> _bio;
+    boost::scoped_ptr<BIO> _bio_error;
+    std::string _keyfile;
+    bool _need_server_auth;
 };
 
-// This is the thread for all incoming SSL connections for the server
 extern "C" {
-    bool DSOEXPORT ssl_handler(Network::thread_params_t *args);
+    // This is the callback required when setting up the password
+    int password_cb(char *buf, int size, int rwflag, void *userdata);
 }
 
 
