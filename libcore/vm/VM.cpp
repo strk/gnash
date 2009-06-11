@@ -108,6 +108,9 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 
 VM::~VM()
 {
+#ifdef ENABLE_AVM2
+    delete _machine;
+#endif
 }
 
 void

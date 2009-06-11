@@ -2261,7 +2261,6 @@ utilities/Makefile
 doc/Makefile
 doc/C/Makefile
 doc/Doxyfile
-pythonmodule/Makefile
 testsuite/Makefile
 testsuite/media/Makefile
 testsuite/libbase.all/Makefile

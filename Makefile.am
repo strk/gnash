@@ -75,13 +75,9 @@ if BUILD_EXTENSIONS
 SUBDIRS += extensions
 endif
 
-if USE_PYTHON
-SUBDIRS += pythonmodule
-endif
-
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
-DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite pythonmodule
+DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
 
 EXTRA_DIST =  \
 	autogen.sh \

@@ -21,146 +21,109 @@
 #include "gnashconfig.h"
 #endif
 
-#include "media/Microphone_as.h"
+#include "flash/media/Microphone_as.h"
+#include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
-// Forward declarations
-namespace {
-    as_value microphone_setLoopBack(const fn_call& fn);
-    as_value microphone_setSilenceLevel(const fn_call& fn);
-    as_value microphone_setUseEchoSuppression(const fn_call& fn);
-    as_value microphone_activity(const fn_call& fn);
-    as_value microphone_status(const fn_call& fn);
-    as_value microphone_ctor(const fn_call& fn);
-    void attachMicrophoneInterface(as_object& o);
-    void attachMicrophoneStaticInterface(as_object& o);
-    as_object* getMicrophoneInterface();
+as_value microphone_get(const fn_call& fn);
+as_value microphone_setgain(const fn_call& fn);
+as_value microphone_setrate(const fn_call& fn);
+as_value microphone_setsilencelevel(const fn_call& fn);
+as_value microphone_setuseechosuppression(const fn_call& fn);
+as_value microphone_ctor(const fn_call& fn);
 
+static void
+attachMicrophoneInterface(as_object& o)
+{
+	o.init_member("get", new builtin_function(microphone_get));
+	o.init_member("setGain", new builtin_function(microphone_setgain));
+	o.init_member("setRate", new builtin_function(microphone_setrate));
+	o.init_member("setSilenceLevel", new builtin_function(microphone_setsilencelevel));
+	o.init_member("setUseEchoSuppression", new builtin_function(microphone_setuseechosuppression));
 }
 
-class Microphone_as : public as_object
+static as_object*
+getMicrophoneInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object(getObjectInterface());
+		attachMicrophoneInterface(*o);
+	}
+	return o.get();
+}
+
+class microphone_as_object: public as_object
 {
 
 public:
 
-    Microphone_as()
-        :
-        as_object(getMicrophoneInterface())
-    {}
+	microphone_as_object()
+		:
+		as_object(getMicrophoneInterface())
+	{}
+
+	// override from as_object ?
+	//std::string get_text_value() const { return "Microphone"; }
+
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
 };
+
+as_value microphone_get(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value microphone_setgain(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value microphone_setrate(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value microphone_setsilencelevel(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value microphone_setuseechosuppression(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+microphone_ctor(const fn_call& /* fn */)
+{
+	boost::intrusive_ptr<as_object> obj = new microphone_as_object;
+	
+	return as_value(obj.get()); // will keep alive
+}
 
 // extern (used by Global.cpp)
 void microphone_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+	// This is going to be the global Microphone "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
 
-    if (!cl) {
-        cl = new builtin_function(&microphone_ctor, getMicrophoneInterface());
-        attachMicrophoneStaticInterface(*cl);
-    }
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&microphone_ctor, getMicrophoneInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachMicrophoneInterface(*cl);
+	}
 
-    // Register _global.Microphone
-    global.init_member("Microphone", cl.get());
-}
-
-namespace {
-
-void
-attachMicrophoneInterface(as_object& o)
-{
-    o.init_member("setLoopBack", new builtin_function(microphone_setLoopBack));
-    o.init_member("setSilenceLevel", new builtin_function(microphone_setSilenceLevel));
-    o.init_member("setUseEchoSuppression", new builtin_function(microphone_setUseEchoSuppression));
-    o.init_member("activity", new builtin_function(microphone_activity));
-    o.init_member("status", new builtin_function(microphone_status));
-}
-
-void
-attachMicrophoneStaticInterface(as_object& o)
-{
+	// Register _global.Microphone
+	global.init_member("Microphone", cl.get());
 
 }
 
-as_object*
-getMicrophoneInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachMicrophoneInterface(*o);
-    }
-    return o.get();
-}
 
-as_value
-microphone_setLoopBack(const fn_call& fn)
-{
-    boost::intrusive_ptr<Microphone_as> ptr =
-        ensureType<Microphone_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-microphone_setSilenceLevel(const fn_call& fn)
-{
-    boost::intrusive_ptr<Microphone_as> ptr =
-        ensureType<Microphone_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-microphone_setUseEchoSuppression(const fn_call& fn)
-{
-    boost::intrusive_ptr<Microphone_as> ptr =
-        ensureType<Microphone_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-microphone_activity(const fn_call& fn)
-{
-    boost::intrusive_ptr<Microphone_as> ptr =
-        ensureType<Microphone_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-microphone_status(const fn_call& fn)
-{
-    boost::intrusive_ptr<Microphone_as> ptr =
-        ensureType<Microphone_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-microphone_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new Microphone_as;
-
-    return as_value(obj.get()); // will keep alive
-}
-
-} // anonymous namespace 
-} // gnash namespace
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
-
+} // end of gnash namespace

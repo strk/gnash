@@ -279,6 +279,10 @@ runTrimmedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
     // inPoint
     so_in = SWFMovie_startSound(mo, so);
     SWFSoundInstance_setLoopInPoint(so_in, 44100);
+    // We ask not to start this if previous is still going,
+    // so if outPoint didn't work it's easly to detect
+    SWFSoundInstance_setNoMultiple(so_in);
+
     printFrameInfo(mo, 1, "Two notes (E, G)");
     SWFMovie_nextFrame(mo); (*frame)++;
 
