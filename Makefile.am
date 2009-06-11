@@ -351,11 +351,15 @@ endif
 	@echo "	Media handler: $(MEDIA_CONFIG)"
 	@echo "	Renderer engine: $(RENDERER_CONFIG)"
 
+if BUILD_SSL
+	@echo "	SSL_CFLAGS is $(SSL_CFLAGS)"
+	@echo "	SSL_LIBS is $(SSL_LIBS)"
+endif
 if BUILD_GTK_GUI
 if HAVE_XV
 	@echo "	Supported GUI: GTK (+XVideo)"
 else
- 	@echo "	Supported GUI: GTK"
+	@echo "	Supported GUI: GTK"
 endif
 endif
 if BUILD_HILDON_GUI

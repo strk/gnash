@@ -495,6 +495,31 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
+dnl Enable using OpenSSL with libnet.
+AC_ARG_ENABLE(ssl,
+  AC_HELP_STRING([--enable-ssl], [Enable using OpenSSL directly]),
+[case "${enableval}" in
+  yes) build_ssl=yes ;;
+  no)  build_ssl=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
+esac], build_ssl=no)
+
+with_cert=
+with_pem=
+AM_CONDITIONAL(BUILD_SSL, test x"${build_ssl}" = xyes)
+AC_ARG_WITH(cert,
+  AC_HELP_STRING([--with-cert],
+  [cert file for SSL]),
+  with_cert=${withval})
+AC_ARG_WITH(pem,
+  AC_HELP_STRING([--with-pe,],
+  [pem file for SSL]),
+  with_pem=${withval})
+
+if test x"${build_ssl}" = xyes; then
+  GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
+fi
+
 dnl The class file is an optional file that if it is specified at configure time
 dnl with --with-classfile=, then only those classes are compiled and built into the
 dnl class library used for Gnash. THis is designed for small systems that execute the
@@ -1199,6 +1224,7 @@ fi
 if test x$ext_mysql = xyes; then
   GNASH_PATH_MYSQL
 fi
+
 
 dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
@@ -3254,6 +3280,18 @@ if test x"$python" = x"yes"; then
     echo "        PYTHON executable is are: $PYTHON"
   else
     echo "        ERROR: No Python development package is installed, but it's enabled." >&3
+  fi
+fi
+if test x${build_ssl} = xyes; then
+  if test x"${has_ssl}" = xyes; then
+    if test x"${SSL_CFLAGS}" = xyes; then
+      echo "        SSL flags are: default"
+    else
+      echo "        SSL flags are: $SSL_CFLAGS"
+    fi
+    echo "        SSL libs are: $SSL_LIBS"
+  else
+    echo "        ERROR: No SSL development package is installed, but it's enabled." >&3
   fi
 fi
 

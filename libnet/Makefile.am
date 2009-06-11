@@ -28,6 +28,7 @@ AM_LDFLAGS = \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
+	$(SSL_LIBS) \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
@@ -39,6 +40,7 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
+	$(SSL_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
@@ -70,6 +72,11 @@ libgnashnet_la_SOURCES = \
 	statistics.cpp \
 	diskstream.cpp \
 	cache.cpp
+
+if BUILD_SSL
+libgnashnet_la_SOURCES += sslclient.cpp
+noinst_HEADERS += sslclient.h
+endif
 
 if WIN32
   AM_LDFLAGS += -no-undefined

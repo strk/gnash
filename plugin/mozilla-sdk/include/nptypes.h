@@ -42,7 +42,7 @@
   #ifndef __cplusplus
     typedef int bool;
   #endif
-#elif defined(bsdi) || defined(FREEBSD) || defined(OPENBSD)
+#elif defined(bsdi) || defined(FREEBSD) || defined(OPENBSD) || defined(LINUX_HOST)
   /*
    * BSD/OS, FreeBSD, and OpenBSD ship sys/types.h that define int32_t and 
    * u_int32_t.
