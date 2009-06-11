@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.IMEEvent;
 import flash.display.MovieClip;
-#else
-import flash.IMEEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class IMEEvent_as {
     static function main() {
-        var x1:IMEEvent = new IMEEvent();
+        #if !flash9
+			DejaGnu.note("this isnt a valid class in AS2");
+		#end
+		
+		#if flash9
+		var x1:IMEEvent = new IMEEvent("imeevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -51,7 +54,18 @@ class IMEEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
+	    DejaGnu.pass("IMEEvent::clone() method exists");
+	} else {
+	    DejaGnu.fail("IMEEvent::clone() method doesn't exist");
+	}
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
+	    DejaGnu.pass("IMEEvent::toString() method exists");
+	} else {
+	    DejaGnu.fail("IMEEvent::toString() method doesn't exist");
+	}
 
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

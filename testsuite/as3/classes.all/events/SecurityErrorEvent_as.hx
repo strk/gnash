@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.SecurityErrorEvent;
 import flash.display.MovieClip;
-#else
-import flash.SecurityErrorEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class SecurityErrorEvent_as {
     static function main() {
-        var x1:SecurityErrorEvent = new SecurityErrorEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:SecurityErrorEvent = new SecurityErrorEvent("securityevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -51,7 +54,22 @@ class SecurityErrorEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
+	    DejaGnu.pass("SecurityErrorEvent::clone() method exists");
+	} else {
+	    DejaGnu.fail("SecurityErrorEvent::clone() method doesn't exist");
+	}
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
+	    DejaGnu.pass("SecurityErrorEvent::toString() method exists");
+	} else {
+	    DejaGnu.fail("SecurityErrorEvent::toString() method doesn't exist");
+	}
+	if (Std.string(flash.events.SecurityErrorEvent.SECURITY_ERROR) == "securityError") {
+	    DejaGnu.pass("SecurityErrorEvent.SECURITY_ERROR property exists");
+	} else {
+	    DejaGnu.fail("SecurityErrorEvent.SECURITY_ERROR property doesn't exist");
+	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

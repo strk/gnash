@@ -17,159 +17,177 @@
 
 EVENTSdir = $(srcdir)/events
 
-EVENTS_TESTS = 
+EVENTS_TESTS_V9 = 
+EVENTS_TESTS =
 
 if BUILD_ACTIVITYEVENT_AS3
-EVENTS_TESTS += events/ActivityEvent_as3.swf
+EVENTS_TESTS_V9 += events/ActivityEvent_as.swf
 endif
 
 if BUILD_ASYNCERROREVENT_AS3
-EVENTS_TESTS += events/AsyncErrorEvent_as3.swf
+EVENTS_TESTS_V9 += events/AsyncErrorEvent_as.swf
 endif
 
-if BUILD_BROWSERINVOKEEVENT_AS3
-EVENTS_TESTS += events/BrowserInvokeEvent_as3.swf
-endif
+#this is air only
+#if BUILD_BROWSERINVOKEEVENT_AS3
+#EVENTS_TESTS += events/BrowserInvokeEvent_as.swf
+#endif
 
 if BUILD_CONTEXTMENUEVENT_AS3
-EVENTS_TESTS += events/ContextMenuEvent_as3.swf
+EVENTS_TESTS_V9 += events/ContextMenuEvent_as.swf
 endif
 
-if BUILD_DRMAUTHENTICATEEVENT_AS3
-EVENTS_TESTS += events/DRMAuthenticateEvent_as3.swf
-endif
+#this is air only
+#if BUILD_DRMAUTHENTICATEEVENT_AS3
+#EVENTS_TESTS += events/DRMAuthenticateEvent_as.swf
+#endif
 
-if BUILD_DRMERROREVENT_AS3
-EVENTS_TESTS += events/DRMErrorEvent_as3.swf
-endif
+#this is air only
+#if BUILD_DRMERROREVENT_AS3
+#EVENTS_TESTS += events/DRMErrorEvent_as.swf
+#endif
 
-if BUILD_DRMSTATUSEVENT_AS3
-EVENTS_TESTS += events/DRMStatusEvent_as3.swf
-endif
+#this is air only
+#if BUILD_DRMSTATUSEVENT_AS3
+#EVENTS_TESTS += events/DRMStatusEvent_as.swf
+#endif
 
 if BUILD_DATAEVENT_AS3
-EVENTS_TESTS += events/DataEvent_as3.swf
+EVENTS_TESTS_V9 += events/DataEvent_as.swf
 endif
 
 if BUILD_ERROREVENT_AS3
-EVENTS_TESTS += events/ErrorEvent_as3.swf
+EVENTS_TESTS_V9 += events/ErrorEvent_as.swf
 endif
 
 if BUILD_EVENTDISPATCHER_AS3
-EVENTS_TESTS += events/EventDispatcher_as3.swf
+EVENTS_TESTS_V9 += events/EventDispatcher_as.swf
 endif
 
 if BUILD_EVENTPHASE_AS3
-EVENTS_TESTS += events/EventPhase_as3.swf
+EVENTS_TESTS_V9 += events/EventPhase_as.swf
 endif
 
 if BUILD_EVENT_AS3
-EVENTS_TESTS += events/Event_as3.swf
+EVENTS_TESTS_V9 += events/Event_as.swf
 endif
 
-if BUILD_FILELISTEVENT_AS3
-EVENTS_TESTS += events/FileListEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_FILELISTEVENT_AS3
+#EVENTS_TESTS += events/FileListEvent_as.swf
+#endif
 
 if BUILD_FOCUSEVENT_AS3
-EVENTS_TESTS += events/FocusEvent_as3.swf
+EVENTS_TESTS_V9 += events/FocusEvent_as.swf
 endif
 
 if BUILD_FULLSCREENEVENT_AS3
-EVENTS_TESTS += events/FullScreenEvent_as3.swf
+EVENTS_TESTS_V9 += events/FullScreenEvent_as.swf
 endif
 
-if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
-EVENTS_TESTS += events/HTMLUncaughtScriptExceptionEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
+#EVENTS_TESTS += events/HTMLUncaughtScriptExceptionEvent_as.swf
+#endif
 
 if BUILD_HTTPSTATUSEVENT_AS3
-EVENTS_TESTS += events/HTTPStatusEvent_as3.swf
+EVENTS_TESTS_V9 += events/HTTPStatusEvent_as.swf
 endif
 
-if BUILD_IEVENTDISPATCHER_AS3
-EVENTS_TESTS += events/IEventDispatcher_as3.swf
-endif
+#THIS IS AN INTERFACE
+#if BUILD_IEVENTDISPATCHER_AS3
+#EVENTS_TESTS_V9 += events/IEventDispatcher_as.swf
+#endif
 
 if BUILD_IMEEVENT_AS3
-EVENTS_TESTS += events/IMEEvent_as3.swf
+EVENTS_TESTS_V9 += events/IMEEvent_as.swf
 endif
 
 if BUILD_IOERROREVENT_AS3
-EVENTS_TESTS += events/IOErrorEvent_as3.swf
+EVENTS_TESTS += events/IOErrorEvent_as.swf
 endif
 
-if BUILD_INVOKEEVENT_AS3
-EVENTS_TESTS += events/InvokeEvent_as3.swf
-endif
+#not implemented in haxe
+#if BUILD_INVOKEEVENT_AS3
+#EVENTS_TESTS += events/InvokeEvent_as.swf
+#endif
 
 if BUILD_KEYBOARDEVENT_AS3
-EVENTS_TESTS += events/KeyboardEvent_as3.swf
+EVENTS_TESTS_V9 += events/KeyboardEvent_as.swf
 endif
 
 if BUILD_MOUSEEVENT_AS3
-EVENTS_TESTS += events/MouseEvent_as3.swf
+EVENTS_TESTS_V9 += events/MouseEvent_as.swf
 endif
 
-if BUILD_NATIVEDRAGEVENT_AS3
-EVENTS_TESTS += events/NativeDragEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_NATIVEDRAGEVENT_AS3
+#EVENTS_TESTS += events/NativeDragEvent_as.swf
+#endif
 
-if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
-EVENTS_TESTS += events/NativeWindowBoundsEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
+#EVENTS_TESTS += events/NativeWindowBoundsEvent_as.swf
+#endif
 
-if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
-EVENTS_TESTS += events/NativeWindowDisplayStateEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
+#EVENTS_TESTS += events/NativeWindowDisplayStateEvent_as.swf
+#endif
 
 if BUILD_NETSTATUSEVENT_AS3
-EVENTS_TESTS += events/NetStatusEvent_as3.swf
+EVENTS_TESTS_V9 += events/NetStatusEvent_as.swf
 endif
 
-if BUILD_OUTPUTPROGRESSEVENT_AS3
-EVENTS_TESTS += events/OutputProgressEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_OUTPUTPROGRESSEVENT_AS3
+#EVENTS_TESTS += events/OutputProgressEvent_as.swf
+#endif
 
 if BUILD_PROGRESSEVENT_AS3
-EVENTS_TESTS += events/ProgressEvent_as3.swf
+EVENTS_TESTS_V9 += events/ProgressEvent_as.swf
 endif
 
-if BUILD_SQLERROREVENT_AS3
-EVENTS_TESTS += events/SQLErrorEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_SQLERROREVENT_AS3
+#EVENTS_TESTS += events/SQLErrorEvent_as.swf
+#endif
 
-if BUILD_SQLEVENT_AS3
-EVENTS_TESTS += events/SQLEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_SQLEVENT_AS3
+#EVENTS_TESTS += events/SQLEvent_as.swf
+#endif
 
-if BUILD_SQLUPDATEEVENT_AS3
-EVENTS_TESTS += events/SQLUpdateEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_SQLUPDATEEVENT_AS3
+#EVENTS_TESTS += events/SQLUpdateEvent_as.swf
+#endif
 
-if BUILD_SCREENMOUSEEVENT_AS3
-EVENTS_TESTS += events/ScreenMouseEvent_as3.swf
-endif
+#AIR ONLY
+#if BUILD_SCREENMOUSEEVENT_AS3
+#EVENTS_TESTS += events/ScreenMouseEvent_as.swf
+#endif
+
 
 if BUILD_SECURITYERROREVENT_AS3
-EVENTS_TESTS += events/SecurityErrorEvent_as3.swf
+EVENTS_TESTS_V9 += events/SecurityErrorEvent_as.swf
 endif
 
 if BUILD_STATUSEVENT_AS3
-EVENTS_TESTS += events/StatusEvent_as3.swf
+EVENTS_TESTS_V9 += events/StatusEvent_as.swf
 endif
 
 if BUILD_SYNCEVENT_AS3
-EVENTS_TESTS += events/SyncEvent_as3.swf
+EVENTS_TESTS_V9 += events/SyncEvent_as.swf
 endif
 
 if BUILD_TEXTEVENT_AS3
-EVENTS_TESTS += events/TextEvent_as3.swf
+EVENTS_TESTS_V9 += events/TextEvent_as.swf
 endif
 
 if BUILD_TIMEREVENT_AS3
-EVENTS_TESTS += events/TimerEvent_as3.swf
+EVENTS_TESTS_V9 += events/TimerEvent_as.swf
 endif
 
-check_SCRIPTS += $(EVENTS_TESTS)
+check_SCRIPTS += $(EVENTS_TESTS_V9)
 HAXE_FLAGS += -cp $(EVENTSdir)

@@ -17,10 +17,11 @@
 
 FILTERSdir = $(srcdir)/filters
 
-FILTERS_TESTS = 
+FILTERS_TESTS =
+FILTERS_TESTS_V8 =  
 
 if BUILD_BEVELFILTER_AS3
-FILTERS_TESTS += filters/BevelFilter_as3.swf
+FILTERS_TESTS_V8 += filters/BevelFilter_as.swf
 endif
 
 if BUILD_BITMAPFILTERQUALITY_AS3

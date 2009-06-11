@@ -26,9 +26,6 @@
 #if flash9
 import flash.events.TimerEvent;
 import flash.display.MovieClip;
-#else
-import flash.TimerEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TimerEvent_as {
     static function main() {
-        var x1:TimerEvent = new TimerEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:TimerEvent = new TimerEvent("timerevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -51,7 +53,27 @@ class TimerEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+		if (Type.typeof(x1.clone) == ValueType.TFunction) {
+			DejaGnu.pass("TimerEvent::clone() method exists");
+		} else {
+			DejaGnu.fail("TimerEvent::clone() method doesn't exist");
+		}
+		if (Type.typeof(x1.toString) == ValueType.TFunction) {
+			DejaGnu.pass("TimerEvent::toString() method exists");
+		} else {
+			DejaGnu.fail("TimerEvent::toString() method doesn't exist");
+		}
+		if (Std.string(flash.events.TimerEvent.TIMER) == "timer") {
+			DejaGnu.pass("TimerEvent.TIMER property exists");
+		} else {
+			DejaGnu.fail("TimerEvent.TIMER property doesn't exist");
+		}
+		if (Std.string(flash.events.TimerEvent.TIMER_COMPLETE) == "timerComplete") {
+			DejaGnu.pass("TimerEvent.TIMER_COMPLETE property exists");
+		} else {
+			DejaGnu.fail("TimerEvent.TIMER_COMPLETE property doesn't exist");
+		}
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

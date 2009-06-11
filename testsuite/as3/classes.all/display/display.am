@@ -19,42 +19,44 @@ DISPLAYdir = $(srcdir)/display
 
 #AM_CPPFLAGS += 
 
-DISPLAY_TESTS = 
+DISPLAY_TESTS_V9 = 
+DISPLAY_TESTS_V8 = 
+DISPLAY_TESTS_V6 =
 
 # if BUILD_AVM1MOVIE_AS3
-# DISPLAY_TESTS += display/AVM1Movie_as.swf
+# DISPLAY_TESTS_V9 += display/AVM1Movie_as.swf
 # endif
 
 # if BUILD_ACTIONSCRIPTVERSION_AS3
-# DISPLAY_TESTS += display/ActionScriptVersion_as.swf
+# DISPLAY_TESTS_V9 += display/ActionScriptVersion_as.swf
 # endif
 
 # if BUILD_BITMAPDATACHANNEL_AS3
-# DISPLAY_TESTS += display/BitmapDataChannel_as.swf
+# DISPLAY_TESTS_V9 += display/BitmapDataChannel_as.swf
 # endif
 
 if BUILD_BITMAPDATA_AS3
-DISPLAY_TESTS += display/BitmapData_as.swf
+DISPLAY_TESTS_V8 += display/BitmapData_as.swf
 endif
 
 if BUILD_BITMAP_AS3
-DISPLAY_TESTS += display/Bitmap_as.swf
+DISPLAY_TESTS_V9 += display/Bitmap_as.swf
 endif
 
 if BUILD_BLENDMODE_AS3
-DISPLAY_TESTS += display/BlendMode_as.swf
+DISPLAY_TESTS_V9 += display/BlendMode_as.swf
 endif
 
 if BUILD_CAPSSTYLE_AS3
-DISPLAY_TESTS += display/CapsStyle_as.swf
+DISPLAY_TESTS_V9 += display/CapsStyle_as.swf
 endif
 
 if BUILD_DISPLAYOBJECTCONTAINER_AS3
-DISPLAY_TESTS += display/DisplayObjectContainer_as.swf
+DISPLAY_TESTS_V9 += display/DisplayObjectContainer_as.swf
 endif
 
 if BUILD_DISPLAYOBJECT_AS3
-DISPLAY_TESTS += display/DisplayObject_as.swf
+DISPLAY_TESTS_V9 += display/DisplayObject_as.swf
 endif
 
 # this class is AIR only
@@ -63,15 +65,15 @@ endif
 # endif
 
 if BUILD_FRAMELABEL_AS3
-DISPLAY_TESTS += display/FrameLabel_as.swf
+DISPLAY_TESTS_V9 += display/FrameLabel_as.swf
 endif
 
 if BUILD_GRADIENTTYPE_AS3
-DISPLAY_TESTS += display/GradientType_as.swf
+DISPLAY_TESTS_V9 += display/GradientType_as.swf
 endif
 
 if BUILD_GRAPHICS_AS3
-DISPLAY_TESTS += display/Graphics_as.swf
+DISPLAY_TESTS_V9 += display/Graphics_as.swf
 endif
 
 # FIXME: this in an interface, not a class
@@ -80,35 +82,35 @@ endif
 # endif
 
 if BUILD_INTERACTIVEOBJECT_AS3
-DISPLAY_TESTS += display/InteractiveObject_as.swf
+DISPLAY_TESTS_V9 += display/InteractiveObject_as.swf
 endif
 
 if BUILD_INTERPOLATIONMETHOD_AS3
-DISPLAY_TESTS += display/InterpolationMethod_as.swf
+DISPLAY_TESTS_V9 += display/InterpolationMethod_as.swf
 endif
 
 if BUILD_JOINTSTYLE_AS3
-DISPLAY_TESTS += display/JointStyle_as.swf
+DISPLAY_TESTS_V9 += display/JointStyle_as.swf
 endif
 
 if BUILD_LINESCALEMODE_AS3
-DISPLAY_TESTS += display/LineScaleMode_as.swf
+DISPLAY_TESTS_V9 += display/LineScaleMode_as.swf
 endif
 
 if BUILD_LOADERINFO_AS3
-DISPLAY_TESTS += display/LoaderInfo_as.swf
+DISPLAY_TESTS_V9 += display/LoaderInfo_as.swf
 endif
 
 if BUILD_LOADER_AS3
-DISPLAY_TESTS += display/Loader_as.swf
+DISPLAY_TESTS_V9 += display/Loader_as.swf
 endif
 
 if BUILD_MORPHSHAPE_AS3
-DISPLAY_TESTS += display/MorphShape_as.swf
+DISPLAY_TESTS_V9 += display/MorphShape_as.swf
 endif
 
 if BUILD_MOVIECLIP_AS3
-DISPLAY_TESTS += display/MovieClip_as.swf
+DISPLAY_TESTS_V6 += display/MovieClip_as.swf
 endif
 
 # These Native* classes are AIR only
@@ -141,15 +143,15 @@ endif
 # endif
 
 if BUILD_PIXELSNAPPING_AS3
-DISPLAY_TESTS += display/PixelSnapping_as.swf
+DISPLAY_TESTS_V9 += display/PixelSnapping_as.swf
 endif
 
 if BUILD_SWFVERSION_AS3
-DISPLAY_TESTS += display/SWFVersion_as.swf
+DISPLAY_TESTS_V9 += display/SWFVersion_as.swf
 endif
 
 if BUILD_SCENE_AS3
-DISPLAY_TESTS += display/Scene_as.swf
+DISPLAY_TESTS_V9 += display/Scene_as.swf
 endif
 
 # This class is AIR only
@@ -158,40 +160,40 @@ endif
 # endif
 
 if BUILD_SHAPE_AS3
-DISPLAY_TESTS += display/Shape_as.swf
+DISPLAY_TESTS_V9 += display/Shape_as.swf
 endif
 
 if BUILD_SIMPLEBUTTON_AS3
-DISPLAY_TESTS += display/SimpleButton_as.swf
+DISPLAY_TESTS_V9 += display/SimpleButton_as.swf
 endif
 
 if BUILD_SPREADMETHOD_AS3
-DISPLAY_TESTS += display/SpreadMethod_as.swf
+DISPLAY_TESTS_V9 += display/SpreadMethod_as.swf
 endif
 
 if BUILD_SPRITE_AS3
-DISPLAY_TESTS += display/Sprite_as.swf
+DISPLAY_TESTS_V9 += display/Sprite_as.swf
 endif
 
 if BUILD_STAGEALIGN_AS3
-DISPLAY_TESTS += display/StageAlign_as.swf
+DISPLAY_TESTS_V9 += display/StageAlign_as.swf
 endif
 
 if BUILD_STAGEDISPLAYSTATE_AS3
-DISPLAY_TESTS += display/StageDisplayState_as.swf
+DISPLAY_TESTS_V9 += display/StageDisplayState_as.swf
 endif
 
 if BUILD_STAGEQUALITY_AS3
-DISPLAY_TESTS += display/StageQuality_as.swf
+DISPLAY_TESTS_V9 += display/StageQuality_as.swf
 endif
 
 if BUILD_STAGESCALEMODE_AS3
-DISPLAY_TESTS += display/StageScaleMode_as.swf
+DISPLAY_TESTS_V9 += display/StageScaleMode_as.swf
 endif
 
 if BUILD_STAGE_AS3
-DISPLAY_TESTS += display/Stage_as.swf
+DISPLAY_TESTS_V6 += display/Stage_as.swf
 endif
 
-check_SCRIPTS += $(DISPLAY_TESTS)
+check_SCRIPTS += $(DISPLAY_TESTS_V6) $(DISPLAY_TESTS_V8) $(DISPLAY_TESTS_V9)
 HAXE_FLAGS += -cp $(DISPLAYdir)

@@ -17,11 +17,11 @@
 
 EXTERNALdir = $(srcdir)/external
 
-EXTERNAL_TESTS = 
+EXTERNAL_TESTS_V9 = 
 
 if BUILD_EXTERNALINTERFACE_AS3
-EXTERNAL_TESTS += external/ExternalInterface_as.swf
+EXTERNAL_TESTS_V9 += external/ExternalInterface_as.swf
 endif
 
-check_SCRIPTS += $(EXTERNAL_TESTS)
+check_SCRIPTS += $(EXTERNAL_TESTS_V9)
 HAXE_FLAGS += -cp $(EXTERNALdir)

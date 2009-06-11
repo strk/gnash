@@ -26,9 +26,6 @@
 #if flash9
 import flash.events.IEventDispatcher;
 import flash.display.MovieClip;
-#else
-import flash.IEventDispatcher;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,19 +36,21 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class IEventDispatcher_as {
     static function main() {
-        var x1:IEventDispatcher = new IEventDispatcher();
-
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("IEventDispatcher class exists");
-        } else {
-            DejaGnu.fail("IEventDispatcher class doesn't exist");
-        }
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+	if (Type.typeof(flash.events.IEventDispatcher.addEventListener) == ValueType.TFunction) {
+	    DejaGnu.pass("FullScreenEvent::clone() method exists");
+	} else {
+	    DejaGnu.fail("FullScreenEvent::clone() method doesn't exist");
+	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

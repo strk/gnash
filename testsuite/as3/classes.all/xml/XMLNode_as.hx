@@ -28,7 +28,8 @@ import flash.xml.XMLNode;
 import flash.xml.XMLNodeType;
 import flash.display.MovieClip;
 #else
-import flash.XMLNode;
+//this functionality is currently not built into haxe
+//import flash.XMLNode;
 import flash.MovieClip;
 #end
 import flash.Lib;
@@ -41,7 +42,7 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class XMLNode_as {
     static function main() {
-	#if flash
+	#if flash9
         var x1:XMLNode = new XMLNode(XMLNodeType.ELEMENT_NODE, null);	
 	
         // Make sure we actually get a valid class        

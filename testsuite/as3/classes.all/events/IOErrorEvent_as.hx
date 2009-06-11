@@ -26,12 +26,11 @@
 #if flash9
 import flash.events.IOErrorEvent;
 import flash.display.MovieClip;
-#else
-import flash.IOErrorEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
+
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +38,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class IOErrorEvent_as {
     static function main() {
-        var x1:IOErrorEvent = new IOErrorEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:IOErrorEvent = new IOErrorEvent("ioerrorevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -51,7 +55,17 @@ class IOErrorEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
+	    DejaGnu.pass("IOErrorEvent::clone() method exists");
+	} else {
+	    DejaGnu.fail("IOErrorEvent::clone() method doesn't exist");
+	}
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
+	    DejaGnu.pass("IOErrorEvent::toString() method exists");
+	} else {
+	    DejaGnu.fail("IOErrorEvent::toString() method doesn't exist");
+	}
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

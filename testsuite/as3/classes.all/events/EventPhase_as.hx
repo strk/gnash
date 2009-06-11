@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.EventPhase;
 import flash.display.MovieClip;
-#else
-import flash.EventPhase;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,19 +37,30 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class EventPhase_as {
     static function main() {
-        var x1:EventPhase = new EventPhase();
+        #if !flash9
+			DejaGnu.note("this class did not exist in as2");
+		#end
+		
+		#if flash9
+		if (Std.string(flash.events.EventPhase.AT_TARGET) == "2") {
+			DejaGnu.pass("EventPhase::AT_TARGET has correct constant");
+		} else {
+			DejaGnu.fail("EventPhase::AT_TARGET doesn't return the correct constant");
+		}
 
-        // Make sure we actually get a valid class        
-        if (x1 != null) {
-            DejaGnu.pass("EventPhase class exists");
-        } else {
-            DejaGnu.fail("EventPhase class doesn't exist");
-        }
+		if (Std.string(flash.events.EventPhase.BUBBLING_PHASE) == "3") {
+			DejaGnu.pass("EventPhase::BUBBLING_PHASE has correct constant");
+		} else {
+			DejaGnu.fail("EventPhase::BUBBLING_PHASE doesn't return the correct constant");
+		}
+		
+		if (Std.string(flash.events.EventPhase.CAPTURING_PHASE) == "1") {
+			DejaGnu.pass("EventPhase::CAPTURING_PHASE has correct constant");
+		} else {
+			DejaGnu.fail("EventPhase::CAPTURING_PHASE doesn't return the correct constant");
+		}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

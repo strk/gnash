@@ -17,19 +17,22 @@
 
 FILESYSTEMdir = $(srcdir)/filesystem
 
-FILESYSTEM_SOURCES = 
+FILESYSTEM_SOURCES_V9 = 
 
-if BUILD_FILEMODE_AS3
-FILESYSTEM_SOURCES += filesystem/FileMode_as3.cpp
-endif
+#AIR ONLY
+#if BUILD_FILEMODE_AS3
+#FILESYSTEM_SOURCES_V9 += filesystem/FileMode_as.swf
+#endif
 
-if BUILD_FILESTREAM_AS3
-FILESYSTEM_SOURCES += filesystem/FileStream_as3.cpp
-endif
+#AIR ONLY
+#if BUILD_FILESTREAM_AS3
+#FILESYSTEM_SOURCES += filesystem/FileStream_as3.cpp
+#endif
 
-if BUILD_FILE_AS3
-FILESYSTEM_SOURCES += filesystem/File_as3.cpp
-endif
+#AIR ONLY
+#if BUILD_FILE_AS3
+#FILESYSTEM_SOURCES += filesystem/File_as3.cpp
+#endif
 
-check_SCRIPTS += $(FILESYSTEM_TESTS)
+check_SCRIPTS += $(FILESYSTEM_TESTS_V9)
 HAXE_FLAGS += -cp $(FILESYSTEMdir)

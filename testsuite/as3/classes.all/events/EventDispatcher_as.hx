@@ -26,9 +26,6 @@
 #if flash9
 import flash.events.EventDispatcher;
 import flash.display.MovieClip;
-#else
-import flash.EventDispatcher;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class EventDispatcher_as {
     static function main() {
-        var x1:EventDispatcher = new EventDispatcher();
+        #if !flash9
+			DejaGnu.note("this class did not exist in AS2");
+		#end
+		
+		#if flash9
+		var x1:EventDispatcher = new EventDispatcher();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -51,7 +53,32 @@ class EventDispatcher_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+	if (Type.typeof(x1.addEventListener) == ValueType.TFunction) {
+		DejaGnu.pass("EventDispatch::addEventListener method exists");
+	} else {
+		DejaGnu.fail("EventDispatch::addEventListener method doesn't exist");
+	}
+	if (Type.typeof(x1.dispatchEvent) == ValueType.TFunction) {
+		DejaGnu.pass("EventDispatch::dispatchEvent method exists");
+	} else {
+		DejaGnu.fail("EventDispatch::dispatchEvent method doesn't exist");
+	}
+	if (Type.typeof(x1.hasEventListener) == ValueType.TFunction) {
+		DejaGnu.pass("EventDispatch::hasEventListener method exists");
+	} else {
+		DejaGnu.fail("EventDispatch::hasEventListener method doesn't exist");
+	}
+	if (Type.typeof(x1.removeEventListener) == ValueType.TFunction) {
+		DejaGnu.pass("EventDispatch::removeEventListener method exists");
+	} else {
+		DejaGnu.fail("EventDispatch::removeEventListener method doesn't exist");
+	}
+	if (Type.typeof(x1.willTrigger) == ValueType.TFunction) {
+		DejaGnu.pass("EventDispatch::willTrigger method exists");
+	} else {
+		DejaGnu.fail("EventDispatch::willTrigger method doesn't exist");
+	}
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

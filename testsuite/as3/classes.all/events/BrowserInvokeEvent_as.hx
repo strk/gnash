@@ -26,9 +26,6 @@
 #if flash9
 import flash.events.BrowserInvokeEvent;
 import flash.display.MovieClip;
-#else
-import flash.BrowserInvokeEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class BrowserInvokeEvent_as {
     static function main() {
-        var x1:BrowserInvokeEvent = new BrowserInvokeEvent();
+        #if !flash9
+			DejaGnu.note("this class did not exist in AS2");
+		#end
+		
+		#if !flash
+		var x1:BrowserInvokeEvent = new BrowserInvokeEvent();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -274,7 +276,7 @@ class BrowserInvokeEvent_as {
 	} else {
 	    DejaGnu.fail("BrowserInvokeEvent::USER() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

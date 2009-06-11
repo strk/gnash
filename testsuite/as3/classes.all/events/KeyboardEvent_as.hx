@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.KeyboardEvent;
 import flash.display.MovieClip;
-#else
-import flash.KeyboardEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class KeyboardEvent_as {
     static function main() {
-        var x1:KeyboardEvent = new KeyboardEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:KeyboardEvent = new KeyboardEvent("keyboardevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,42 +53,32 @@ class KeyboardEvent_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.altKey == false) {
+	if (Std.is(x1.altKey, Bool)) {
 	    DejaGnu.pass("KeyboardEvent.altKey property exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent.altKey property doesn't exist");
 	}
-	if (x1.charCode == uint) {
+	if (Std.is(x1.charCode, Float)) {
 	    DejaGnu.pass("KeyboardEvent.charCode property exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent.charCode property doesn't exist");
 	}
-	if (x1.commandKey == false) {
-	    DejaGnu.pass("KeyboardEvent.commandKey property exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent.commandKey property doesn't exist");
-	}
-	if (x1.controlKey == false) {
-	    DejaGnu.pass("KeyboardEvent.controlKey property exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent.controlKey property doesn't exist");
-	}
-	if (x1.ctrlKey == false) {
+	if (Std.is(x1.ctrlKey, Bool)) {
 	    DejaGnu.pass("KeyboardEvent.ctrlKey property exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent.ctrlKey property doesn't exist");
 	}
-	if (x1.keyCode == uint) {
+	if (Std.is(x1.keyCode, Float)) {
 	    DejaGnu.pass("KeyboardEvent.keyCode property exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent.keyCode property doesn't exist");
 	}
-	if (x1.keyLocation == uint) {
+	if (Std.is(x1.keyLocation, Float)) {
 	    DejaGnu.pass("KeyboardEvent.keyLocation property exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent.keyLocation property doesn't exist");
 	}
-	if (x1.shiftKey == false) {
+	if (Std.is(x1.shiftKey, Bool)) {
 	    DejaGnu.pass("KeyboardEvent.shiftKey property exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent.shiftKey property doesn't exist");
@@ -94,217 +87,32 @@ class KeyboardEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.KeyboardEvent == false) {
-	    DejaGnu.pass("KeyboardEvent::KeyboardEvent() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::KeyboardEvent() method doesn't exist");
-	}
-	if (x1.clone == Event) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("KeyboardEvent::clone() method exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent::clone() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("KeyboardEvent::toString() method exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent::toString() method doesn't exist");
 	}
-	if (x1.updateAfterEvent == null) {
+	if (Type.typeof(x1.updateAfterEvent) == ValueType.TFunction) {
 	    DejaGnu.pass("KeyboardEvent::updateAfterEvent() method exists");
 	} else {
 	    DejaGnu.fail("KeyboardEvent::updateAfterEvent() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("KeyboardEvent::ACTIVATE() method exists");
+	if (Std.string(flash.events.KeyboardEvent.KEY_DOWN) == "keyDown") {
+	    DejaGnu.pass("KeyboardEvent.KEY_DOWN property exists");
 	} else {
-	    DejaGnu.fail("KeyboardEvent::ACTIVATE() method doesn't exist");
+	    DejaGnu.fail("KeyboardEvent.KEY_DOWN property doesn't exist");
 	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("KeyboardEvent::ADDED() method exists");
+	if (Std.string(flash.events.KeyboardEvent.KEY_UP) == "keyUp") {
+	    DejaGnu.pass("KeyboardEvent.KEY_UP property exists");
 	} else {
-	    DejaGnu.fail("KeyboardEvent::ADDED() method doesn't exist");
+	    DejaGnu.fail("KeyboardEvent.KEY_UP property doesn't exist");
 	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("KeyboardEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::ADDED() method doesn't exist");
-	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("KeyboardEvent::CANCEL() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::CANCEL() method doesn't exist");
-	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("KeyboardEvent::CHANGE() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::CHANGE() method doesn't exist");
-	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("KeyboardEvent::CLOSE() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::CLOSE() method doesn't exist");
-	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("KeyboardEvent::CLOSING() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::CLOSING() method doesn't exist");
-	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("KeyboardEvent::COMPLETE() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::COMPLETE() method doesn't exist");
-	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("KeyboardEvent::CONNECT() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::CONNECT() method doesn't exist");
-	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("KeyboardEvent::DEACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::DEACTIVATE() method doesn't exist");
-	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("KeyboardEvent::DISPLAYING() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::DISPLAYING() method doesn't exist");
-	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("KeyboardEvent::ENTER() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::ENTER() method doesn't exist");
-	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("KeyboardEvent::EXITING() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::EXITING() method doesn't exist");
-	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("KeyboardEvent::FULLSCREEN() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::FULLSCREEN() method doesn't exist");
-	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("KeyboardEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("KeyboardEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("KeyboardEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::HTML() method doesn't exist");
-	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("KeyboardEvent::ID3() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::ID3() method doesn't exist");
-	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("KeyboardEvent::INIT() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::INIT() method doesn't exist");
-	}
-	if (x1.KEY == DOWN) {
-	    DejaGnu.pass("KeyboardEvent::KEY() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::KEY() method doesn't exist");
-	}
-	if (x1.KEY == UP) {
-	    DejaGnu.pass("KeyboardEvent::KEY() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::KEY() method doesn't exist");
-	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("KeyboardEvent::LOCATION() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::LOCATION() method doesn't exist");
-	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("KeyboardEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("KeyboardEvent::NETWORK() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::NETWORK() method doesn't exist");
-	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("KeyboardEvent::OPEN() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::OPEN() method doesn't exist");
-	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("KeyboardEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("KeyboardEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("KeyboardEvent::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("KeyboardEvent::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("KeyboardEvent::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("KeyboardEvent::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("KeyboardEvent::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("KeyboardEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("KeyboardEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("KeyboardEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::TAB() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("KeyboardEvent::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("KeyboardEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("KeyboardEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("KeyboardEvent::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

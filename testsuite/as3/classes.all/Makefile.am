@@ -46,7 +46,7 @@ include $(srcdir)/accessibility/accessibility.am
 
 include $(srcdir)/display/display.am
 include $(srcdir)/errors/errors.am
-# # include $(srcdir)/events/events.am
+include $(srcdir)/events/events.am
 include $(srcdir)/external/external.am
 # # include $(srcdir)/filesystem/filesystem.am
 # # include $(srcdir)/filters/filters.am

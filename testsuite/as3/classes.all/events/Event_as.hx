@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.Event;
 import flash.display.MovieClip;
-#else
-import flash.Event;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Event_as {
     static function main() {
-        var x1:Event = new Event();
+        #if !flash9
+			DejaGnu.note("this class did not exist in as2");
+		#end
+		
+		#if flash9
+		var x1:Event = new Event("event");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,32 +53,32 @@ class Event_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.bubbles == false) {
+	if (Std.is(x1.bubbles, Bool)) {
 	    DejaGnu.pass("Event.bubbles property exists");
 	} else {
 	    DejaGnu.fail("Event.bubbles property doesn't exist");
 	}
-	if (x1.cancelable == false) {
+	if (Std.is(x1.cancelable, Bool)) {
 	    DejaGnu.pass("Event.cancelable property exists");
 	} else {
 	    DejaGnu.fail("Event.cancelable property doesn't exist");
 	}
-	if (x1.currentTarget == Object) {
+	if (Type.typeof(x1.currentTarget) == ValueType.TObject) {
 	    DejaGnu.pass("Event.currentTarget property exists");
 	} else {
-	    DejaGnu.fail("Event.currentTarget property doesn't exist");
+	    DejaGnu.xfail("Event.currentTarget property doesn't exist");
 	}
-	if (x1.eventPhase == uint) {
+	if (Std.is(x1.eventPhase, Float)) {
 	    DejaGnu.pass("Event.eventPhase property exists");
 	} else {
 	    DejaGnu.fail("Event.eventPhase property doesn't exist");
 	}
-	if (x1.target == Object) {
+	if (Type.typeof(x1.target) == ValueType.TObject) {
 	    DejaGnu.pass("Event.target property exists");
 	} else {
-	    DejaGnu.fail("Event.target property doesn't exist");
+	    DejaGnu.xfail("Event.target property doesn't exist");
 	}
-	if (x1.type == null) {
+	if (Std.is(x1.type, String)) {
 	    DejaGnu.pass("Event.type property exists");
 	} else {
 	    DejaGnu.fail("Event.type property doesn't exist");
@@ -84,227 +87,216 @@ class Event_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.Event == false) {
-	    DejaGnu.pass("Event::Event() method exists");
-	} else {
-	    DejaGnu.fail("Event::Event() method doesn't exist");
-	}
-	if (x1.clone == Event) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::clone() method exists");
 	} else {
 	    DejaGnu.fail("Event::clone() method doesn't exist");
 	}
-	if (x1.formatToString == null) {
+	if (Type.typeof(x1.formatToString) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::formatToString() method exists");
 	} else {
 	    DejaGnu.fail("Event::formatToString() method doesn't exist");
 	}
-	if (x1.isDefaultPrevented == false) {
+	if (Type.typeof(x1.isDefaultPrevented) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::isDefaultPrevented() method exists");
 	} else {
 	    DejaGnu.fail("Event::isDefaultPrevented() method doesn't exist");
 	}
-	if (x1.preventDefault == null) {
+	if (Type.typeof(x1.preventDefault) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::preventDefault() method exists");
 	} else {
 	    DejaGnu.fail("Event::preventDefault() method doesn't exist");
 	}
-	if (x1.stopImmediatePropagation == null) {
+	if (Type.typeof(x1.stopImmediatePropagation) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::stopImmediatePropagation() method exists");
 	} else {
 	    DejaGnu.fail("Event::stopImmediatePropagation() method doesn't exist");
 	}
-	if (x1.stopPropagation == null) {
+	if (Type.typeof(x1.stopPropagation) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::stopPropagation() method exists");
 	} else {
 	    DejaGnu.fail("Event::stopPropagation() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("Event::toString() method exists");
 	} else {
 	    DejaGnu.fail("Event::toString() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("Event::ACTIVATE() method exists");
+	
+	//check constants
+	if (Std.string(flash.events.Event.ACTIVATE) == "activate") {
+		DejaGnu.pass("Event::ACTIVATE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::ACTIVATE() method doesn't exist");
+		DejaGnu.fail("Event::ACTIVATE constant returns the wrong string");
 	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("Event::ADDED() method exists");
+	if (Std.string(flash.events.Event.ADDED) == "added") {
+		DejaGnu.pass("Event::ADDED  constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::ADDED() method doesn't exist");
+		DejaGnu.fail("Event::ADDED  constant returns the wrong string");
 	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("Event::ADDED() method exists");
+	if (Std.string(flash.events.Event.ADDED_TO_STAGE) == "addedToStage") {
+		DejaGnu.pass("Event::  constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::ADDED() method doesn't exist");
+		DejaGnu.fail("Event::  constant returns the wrong string");
 	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("Event::CANCEL() method exists");
+	if (Std.string(flash.events.Event.CANCEL) == "cancel") {
+		DejaGnu.pass("Event::CANCEL constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::CANCEL() method doesn't exist");
+		DejaGnu.fail("Event::CANCEL constant returns the wrong string");
 	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("Event::CHANGE() method exists");
+	if (Std.string(flash.events.Event.CHANGE) == "change") {
+		DejaGnu.pass("Event::CHANGE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::CHANGE() method doesn't exist");
+		DejaGnu.fail("Event::CHANGE constant returns the wrong string");
 	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("Event::CLOSE() method exists");
+	if (Std.string(flash.events.Event.CLOSE) == "close") {
+		DejaGnu.pass("Event::  constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::CLOSE() method doesn't exist");
+		DejaGnu.fail("Event::  constant returns the wrong string");
 	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("Event::CLOSING() method exists");
+	if (Std.string(flash.events.Event.CONNECT) == "connect") {
+		DejaGnu.pass("Event::CONNECT constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::CLOSING() method doesn't exist");
+		DejaGnu.fail("Event::CONNECT constant returns the wrong string");
 	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("Event::COMPLETE() method exists");
+	if (Std.string(flash.events.Event.COMPLETE) == "complete") {
+		DejaGnu.pass("Event::COMPLETE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::COMPLETE() method doesn't exist");
+		DejaGnu.fail("Event::COMPLETE constant returns the wrong string");
 	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("Event::CONNECT() method exists");
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.COPY) == "copy") {
+	//	DejaGnu.pass("Event::COPY constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::COPY constant returns the wrong string");
+	//}
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.CUT) == "cut") {
+	//	DejaGnu.pass("Event::CUT constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::CUT constant returns the wrong string");
+	//}
+	if (Std.string(flash.events.Event.DEACTIVATE) == "deactivate") {
+		DejaGnu.pass("Event::DEACTIVATE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::CONNECT() method doesn't exist");
+		DejaGnu.fail("Event::DEACTIVATE constant returns the wrong string");
 	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("Event::DEACTIVATE() method exists");
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.DISPLAYING) == "displaying") {
+	//	DejaGnu.pass("Event::DISPLAYING constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::DISPLAYING constant returns the wrong string");
+	//}
+	//if (Std.string(flash.events.Event.ENTER_FRAME) == "enterFrame") {
+	//	DejaGnu.pass("Event::ENTER_FRAME constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::ENTER_FRAME constant returns the wrong string");
+	//}
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.EXIT_FRAME) == "exitFrame") {
+	//	DejaGnu.pass("Event::EXIT_FRAME constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::EXIT_FRAME constant returns the wrong string");
+	//}
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.FRAME_CONSTRUCTED) == "exitFrame") {
+	//	DejaGnu.pass("Event::EXIT_FRAME constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::EXIT_FRAME constant returns the wrong string");
+	//}
+	if (Std.string(flash.events.Event.FULLSCREEN) == "fullScreen") {
+		DejaGnu.pass("Event::FULLSCREEN constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::DEACTIVATE() method doesn't exist");
+		DejaGnu.fail("Event::FULLSCREEN constant returns the wrong string");
 	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("Event::DISPLAYING() method exists");
+	if (Std.string(flash.events.Event.ID3) == "id3") {
+		DejaGnu.pass("Event::ID3 constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::DISPLAYING() method doesn't exist");
+		DejaGnu.fail("Event::ID3 constant returns the wrong string");
 	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("Event::ENTER() method exists");
+	if (Std.string(flash.events.Event.INIT) == "init") {
+		DejaGnu.pass("Event::INIT constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::ENTER() method doesn't exist");
+		DejaGnu.fail("Event::INIT constant returns the wrong string");
 	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("Event::EXITING() method exists");
+	if (Std.string(flash.events.Event.MOUSE_LEAVE) == "mouseLeave") {
+		DejaGnu.pass("Event::MOUSELEAVE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::EXITING() method doesn't exist");
+		DejaGnu.fail("Event::MOUSELEAVE  constant returns the wrong string");
 	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("Event::FULLSCREEN() method exists");
+	if (Std.string(flash.events.Event.OPEN) == "open") {
+		DejaGnu.pass("Event::OPEN constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::FULLSCREEN() method doesn't exist");
+		DejaGnu.fail("Event::OPEN constant returns the wrong string");
 	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("Event::HTML() method exists");
+	//if (Std.string(flash.events.Event.PASTE) == "paste") {
+	//	DejaGnu.pass("Event::PASTE constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::PASTE constant returns the wrong string");
+	//}
+	if (Std.string(flash.events.Event.REMOVED) == "removed") {
+		DejaGnu.pass("Event::REMOVED constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::HTML() method doesn't exist");
+		DejaGnu.fail("Event::REMOVED constant returns the wrong string");
 	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("Event::HTML() method exists");
+	if (Std.string(flash.events.Event.REMOVED_FROM_STAGE) == "removedFromStage") {
+		DejaGnu.pass("Event::REMOVEDFROMSTAGE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::HTML() method doesn't exist");
+		DejaGnu.fail("Event::REMOVEDFROMSTAGE constant returns the wrong string");
 	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("Event::HTML() method exists");
+	if (Std.string(flash.events.Event.RENDER) == "render") {
+		DejaGnu.pass("Event::RENDER constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::HTML() method doesn't exist");
+		DejaGnu.fail("Event::RENDER constant returns the wrong string");
 	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("Event::ID3() method exists");
+	if (Std.string(flash.events.Event.RESIZE) == "resize") {
+		DejaGnu.pass("Event::RESIZE  constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::ID3() method doesn't exist");
+		DejaGnu.fail("Event::RESIZE  constant returns the wrong string");
 	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("Event::INIT() method exists");
+	if (Std.string(flash.events.Event.SCROLL) == "scroll") {
+		DejaGnu.pass("Event::SCROLL  constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::INIT() method doesn't exist");
+		DejaGnu.fail("Event::SCROLL  constant returns the wrong string");
 	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("Event::LOCATION() method exists");
+	if (Std.string(flash.events.Event.SELECT) == "select") {
+		DejaGnu.pass("Event::SELECT constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::LOCATION() method doesn't exist");
+		DejaGnu.fail("Event::SELECT constant returns the wrong string");
 	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("Event::MOUSE() method exists");
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.SELECT_ALL) == "selectAll") {
+	//	DejaGnu.pass("Event::SELECTALL constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::SELECTALL constant returns the wrong string");
+	//}
+	if (Std.string(flash.events.Event.SOUND_COMPLETE) == "soundComplete") {
+		DejaGnu.pass("Event::SOUNDCOMPLETE  constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::MOUSE() method doesn't exist");
+		DejaGnu.fail("Event::SOUNDCOMPLETE  constant returns the wrong string");
 	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("Event::NETWORK() method exists");
+	if (Std.string(flash.events.Event.TAB_CHILDREN_CHANGE) == "tabChildrenChange") {
+		DejaGnu.pass("Event::TABCHILDRENCHANGE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::NETWORK() method doesn't exist");
+		DejaGnu.fail("Event::TABCHILDRENCHANGE constant returns the wrong string");
 	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("Event::OPEN() method exists");
+	//NOT IN HAXE
+	//if (Std.string(flash.events.Event.TAB_ENBABLED_CHANGE) == "tabEnabledChange") {
+	//	DejaGnu.pass("Event::TABENABLEDCHANGE constant returns the correct string");
+	//} else {
+	//	DejaGnu.fail("Event::TABENABLEDCHANGE constant returns the wrong string");
+	//}
+	if (Std.string(flash.events.Event.TAB_INDEX_CHANGE) == "tabIndexChange") {
+		DejaGnu.pass("Event::TABINDEXCHANGE constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::OPEN() method doesn't exist");
+		DejaGnu.fail("Event::TABINDEXCHANGE constant returns the wrong string");
 	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("Event::REMOVED() method exists");
+	if (Std.string(flash.events.Event.UNLOAD) == "unload") {
+		DejaGnu.pass("Event::UNLOAD constant returns the correct string");
 	} else {
-	    DejaGnu.fail("Event::REMOVED() method doesn't exist");
+		DejaGnu.fail("Event::UNLOAD constant returns the wrong string");
 	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("Event::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("Event::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("Event::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("Event::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("Event::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("Event::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("Event::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("Event::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("Event::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("Event::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("Event::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("Event::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("Event::TAB() method exists");
-	} else {
-	    DejaGnu.fail("Event::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("Event::TAB() method exists");
-	} else {
-	    DejaGnu.fail("Event::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("Event::TAB() method exists");
-	} else {
-	    DejaGnu.fail("Event::TAB() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("Event::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("Event::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("Event::USER() method exists");
-	} else {
-	    DejaGnu.fail("Event::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("Event::USER() method exists");
-	} else {
-	    DejaGnu.fail("Event::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

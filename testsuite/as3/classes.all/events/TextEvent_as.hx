@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.TextEvent;
 import flash.display.MovieClip;
-#else
-import flash.TextEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextEvent_as {
     static function main() {
-        var x1:TextEvent = new TextEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:TextEvent = new TextEvent("textevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,221 +53,32 @@ class TextEvent_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.text == null) {
+	if (Std.is(x1.text, String)) {
 	    DejaGnu.pass("TextEvent.text property exists");
 	} else {
 	    DejaGnu.fail("TextEvent.text property doesn't exist");
 	}
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (x1.TextEvent == null) {
-	    DejaGnu.pass("TextEvent::TextEvent() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::TextEvent() method doesn't exist");
-	}
-	if (x1.clone == Event) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("TextEvent::clone() method exists");
 	} else {
 	    DejaGnu.fail("TextEvent::clone() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("TextEvent::toString() method exists");
 	} else {
 	    DejaGnu.fail("TextEvent::toString() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("TextEvent::ACTIVATE() method exists");
+	if (Std.string(flash.events.TextEvent.LINK) == "link") {
+	    DejaGnu.pass("TextEvent.LINK property exists");
 	} else {
-	    DejaGnu.fail("TextEvent::ACTIVATE() method doesn't exist");
+	    DejaGnu.fail("TextEvent.LINK property doesn't exist");
 	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("TextEvent::ADDED() method exists");
+	if (Std.string(flash.events.TextEvent.TEXT_INPUT) == "textInput") {
+	    DejaGnu.pass("TextEvent.TEXT_INPUT property exists");
 	} else {
-	    DejaGnu.fail("TextEvent::ADDED() method doesn't exist");
+	    DejaGnu.fail("TextEvent.TEXT_INPUT property doesn't exist");
 	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("TextEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::ADDED() method doesn't exist");
-	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("TextEvent::CANCEL() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::CANCEL() method doesn't exist");
-	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("TextEvent::CHANGE() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::CHANGE() method doesn't exist");
-	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("TextEvent::CLOSE() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::CLOSE() method doesn't exist");
-	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("TextEvent::CLOSING() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::CLOSING() method doesn't exist");
-	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("TextEvent::COMPLETE() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::COMPLETE() method doesn't exist");
-	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("TextEvent::CONNECT() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::CONNECT() method doesn't exist");
-	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("TextEvent::DEACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::DEACTIVATE() method doesn't exist");
-	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("TextEvent::DISPLAYING() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::DISPLAYING() method doesn't exist");
-	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("TextEvent::ENTER() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::ENTER() method doesn't exist");
-	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("TextEvent::EXITING() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::EXITING() method doesn't exist");
-	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("TextEvent::FULLSCREEN() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::FULLSCREEN() method doesn't exist");
-	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("TextEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("TextEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("TextEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::HTML() method doesn't exist");
-	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("TextEvent::ID3() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::ID3() method doesn't exist");
-	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("TextEvent::INIT() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::INIT() method doesn't exist");
-	}
-	if (x1.LINK == null) {
-	    DejaGnu.pass("TextEvent::LINK() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::LINK() method doesn't exist");
-	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("TextEvent::LOCATION() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::LOCATION() method doesn't exist");
-	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("TextEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("TextEvent::NETWORK() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::NETWORK() method doesn't exist");
-	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("TextEvent::OPEN() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::OPEN() method doesn't exist");
-	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("TextEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("TextEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("TextEvent::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("TextEvent::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("TextEvent::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("TextEvent::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("TextEvent::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("TextEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("TextEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("TextEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::TAB() method doesn't exist");
-	}
-	if (x1.TEXT == INPUT) {
-	    DejaGnu.pass("TextEvent::TEXT() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::TEXT() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("TextEvent::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("TextEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("TextEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("TextEvent::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

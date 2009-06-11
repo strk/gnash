@@ -19,19 +19,20 @@ ACCESSIBILITYdir = $(srcdir)/accessibility
 
 #AM_CPPFLAGS += -I$(ACCESSIBILITYdir)
 
-ACCESSIBILITY_TESTS = 
+ACCESSIBILITY_TESTS_V6 = 
+ACCESSIBILITY_TESTS_V9 =
 
 # if BUILD_ACCIMPL_AS3
 # ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccImpl_as3.cpp
 # endif
 
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
-ACCESSIBILITY_TESTS += accessibility/AccessibilityProperties_as.swf
+ACCESSIBILITY_TESTS_V9 += accessibility/AccessibilityProperties_as.swf
 endif
 
 if BUILD_ACCESSIBILITY_AS3
-ACCESSIBILITY_TESTS += accessibility/Accessibility_as.swf
+ACCESSIBILITY_TESTS_V6 += accessibility/Accessibility_as.swf
 endif
 
-check_SCRIPTS += $(ACCESSIBILITY_TESTS)
+check_SCRIPTS += $(ACCESSIBILITY_TESTS_V6) $(ACCESSIBILITY_TESTS_V9)
 HAXE_FLAGS += -cp $(ACCESSIBILITYdir)

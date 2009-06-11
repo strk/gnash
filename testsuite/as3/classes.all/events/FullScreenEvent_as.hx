@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.FullScreenEvent;
 import flash.display.MovieClip;
-#else
-import flash.FullScreenEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class FullScreenEvent_as {
     static function main() {
-        var x1:FullScreenEvent = new FullScreenEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:FullScreenEvent = new FullScreenEvent("fullscreenevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,7 +53,7 @@ class FullScreenEvent_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.fullScreen == false) {
+	if (Std.is(x1.fullScreen, Bool)) {
 	    DejaGnu.pass("FullScreenEvent.fullScreen property exists");
 	} else {
 	    DejaGnu.fail("FullScreenEvent.fullScreen property doesn't exist");
@@ -59,212 +62,22 @@ class FullScreenEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.FullScreenEvent == false) {
-	    DejaGnu.pass("FullScreenEvent::FullScreenEvent() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::FullScreenEvent() method doesn't exist");
-	}
-	if (x1.clone == Event) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("FullScreenEvent::clone() method exists");
 	} else {
 	    DejaGnu.fail("FullScreenEvent::clone() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("FullScreenEvent::toString() method exists");
 	} else {
 	    DejaGnu.fail("FullScreenEvent::toString() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("FullScreenEvent::ACTIVATE() method exists");
+	if (Std.string(flash.events.FullScreenEvent.FULL_SCREEN) == "fullScreen") {
+	    DejaGnu.pass("FullScreenEvent.FULL_SCREEN property exists");
 	} else {
-	    DejaGnu.fail("FullScreenEvent::ACTIVATE() method doesn't exist");
+	    DejaGnu.fail("FullScreenEvent.FULL_SCREEN property doesn't exist");
 	}
-	if (x1.ACTIVITY == null) {
-	    DejaGnu.pass("FullScreenEvent::ACTIVITY() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::ACTIVITY() method doesn't exist");
-	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("FullScreenEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::ADDED() method doesn't exist");
-	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("FullScreenEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::ADDED() method doesn't exist");
-	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("FullScreenEvent::CANCEL() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::CANCEL() method doesn't exist");
-	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("FullScreenEvent::CHANGE() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::CHANGE() method doesn't exist");
-	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("FullScreenEvent::CLOSE() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::CLOSE() method doesn't exist");
-	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("FullScreenEvent::CLOSING() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::CLOSING() method doesn't exist");
-	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("FullScreenEvent::COMPLETE() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::COMPLETE() method doesn't exist");
-	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("FullScreenEvent::CONNECT() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::CONNECT() method doesn't exist");
-	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("FullScreenEvent::DEACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::DEACTIVATE() method doesn't exist");
-	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("FullScreenEvent::DISPLAYING() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::DISPLAYING() method doesn't exist");
-	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("FullScreenEvent::ENTER() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::ENTER() method doesn't exist");
-	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("FullScreenEvent::EXITING() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::EXITING() method doesn't exist");
-	}
-	if (x1.FULL == SCREEN) {
-	    DejaGnu.pass("FullScreenEvent::FULL() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::FULL() method doesn't exist");
-	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("FullScreenEvent::FULLSCREEN() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::FULLSCREEN() method doesn't exist");
-	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("FullScreenEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("FullScreenEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("FullScreenEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::HTML() method doesn't exist");
-	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("FullScreenEvent::ID3() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::ID3() method doesn't exist");
-	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("FullScreenEvent::INIT() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::INIT() method doesn't exist");
-	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("FullScreenEvent::LOCATION() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::LOCATION() method doesn't exist");
-	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("FullScreenEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("FullScreenEvent::NETWORK() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::NETWORK() method doesn't exist");
-	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("FullScreenEvent::OPEN() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::OPEN() method doesn't exist");
-	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("FullScreenEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("FullScreenEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("FullScreenEvent::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("FullScreenEvent::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("FullScreenEvent::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("FullScreenEvent::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("FullScreenEvent::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("FullScreenEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("FullScreenEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("FullScreenEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::TAB() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("FullScreenEvent::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("FullScreenEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("FullScreenEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("FullScreenEvent::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

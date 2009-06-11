@@ -40,7 +40,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class BevelFilter_as {
     static function main() {
-        var x1:BevelFilter = new BevelFilter();
+        #if (!flash7 && !flash6)
+		var x1:BevelFilter = new BevelFilter();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -120,7 +121,7 @@ class BevelFilter_as {
 	} else {
 	    DejaGnu.fail("BevelFilter::clone() method doesn't exist");
 	}
-
+		#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

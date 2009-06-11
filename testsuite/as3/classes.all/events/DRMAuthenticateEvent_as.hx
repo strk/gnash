@@ -26,9 +26,6 @@
 #if flash9
 import flash.events.DRMAuthenticateEvent;
 import flash.display.MovieClip;
-#else
-import flash.DRMAuthenticateEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
@@ -39,7 +36,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class DRMAuthenticateEvent_as {
     static function main() {
-        var x1:DRMAuthenticateEvent = new DRMAuthenticateEvent();
+        #if !flash9
+			DejaGnu.note("this class did not exist before AS2");
+		#end
+		
+		#if flash9
+		var x1:DRMAuthenticateEvent = new DRMAuthenticateEvent();
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -84,11 +86,6 @@ class DRMAuthenticateEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.DRMAuthenticateEvent == NetStream) {
-	    DejaGnu.pass("DRMAuthenticateEvent::DRMAuthenticateEvent() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::DRMAuthenticateEvent() method doesn't exist");
-	}
 	if (x1.clone == Event) {
 	    DejaGnu.pass("DRMAuthenticateEvent::clone() method exists");
 	} else {
@@ -99,202 +96,7 @@ class DRMAuthenticateEvent_as {
 	} else {
 	    DejaGnu.fail("DRMAuthenticateEvent::toString() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::ACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::ACTIVATE() method doesn't exist");
-	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::ADDED() method doesn't exist");
-	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("DRMAuthenticateEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::ADDED() method doesn't exist");
-	}
-	if (x1.AUTHENTICATION == TYPE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::AUTHENTICATION() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::AUTHENTICATION() method doesn't exist");
-	}
-	if (x1.AUTHENTICATION == TYPE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::AUTHENTICATION() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::AUTHENTICATION() method doesn't exist");
-	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::CANCEL() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::CANCEL() method doesn't exist");
-	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::CHANGE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::CHANGE() method doesn't exist");
-	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::CLOSE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::CLOSE() method doesn't exist");
-	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::CLOSING() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::CLOSING() method doesn't exist");
-	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::COMPLETE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::COMPLETE() method doesn't exist");
-	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::CONNECT() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::CONNECT() method doesn't exist");
-	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::DEACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::DEACTIVATE() method doesn't exist");
-	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::DISPLAYING() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::DISPLAYING() method doesn't exist");
-	}
-	if (x1.DRM == AUTHENTICATE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::DRM() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::DRM() method doesn't exist");
-	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("DRMAuthenticateEvent::ENTER() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::ENTER() method doesn't exist");
-	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::EXITING() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::EXITING() method doesn't exist");
-	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::FULLSCREEN() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::FULLSCREEN() method doesn't exist");
-	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("DRMAuthenticateEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("DRMAuthenticateEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("DRMAuthenticateEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::HTML() method doesn't exist");
-	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::ID3() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::ID3() method doesn't exist");
-	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::INIT() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::INIT() method doesn't exist");
-	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::LOCATION() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::LOCATION() method doesn't exist");
-	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::NETWORK() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::NETWORK() method doesn't exist");
-	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::OPEN() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::OPEN() method doesn't exist");
-	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("DRMAuthenticateEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("DRMAuthenticateEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("DRMAuthenticateEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("DRMAuthenticateEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::TAB() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("DRMAuthenticateEvent::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("DRMAuthenticateEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("DRMAuthenticateEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("DRMAuthenticateEvent::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

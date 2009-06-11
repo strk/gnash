@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.FocusEvent;
 import flash.display.MovieClip;
-#else
-import flash.FocusEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class FocusEvent_as {
     static function main() {
-        var x1:FocusEvent = new FocusEvent();
+        #if !flash9
+			DejaGnu.note("this is not a valid class in as2");
+		#end
+		
+		#if flash9
+		var x1:FocusEvent = new FocusEvent("focusevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,22 +53,23 @@ class FocusEvent_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.direction == null) {
-	    DejaGnu.pass("FocusEvent.direction property exists");
-	} else {
-	    DejaGnu.fail("FocusEvent.direction property doesn't exist");
-	}
-	if (x1.keyCode == uint) {
+	//not implemented in haxe
+	//if (Std.is(x1.isRelatedObjectInaccessible, Bool)) {
+	//    DejaGnu.pass("FocusEvent.keyCode property exists");
+	//} else {
+	//    DejaGnu.fail("FocusEvent.keyCode property doesn't exist");
+	//}
+	if (Std.is(x1.keyCode, Float)) {
 	    DejaGnu.pass("FocusEvent.keyCode property exists");
 	} else {
 	    DejaGnu.fail("FocusEvent.keyCode property doesn't exist");
 	}
-	if (x1.relatedObject == relatedObject) {
+	if (Std.string(Type.typeof(x1.relatedObject)) == "TNull") {
 	    DejaGnu.pass("FocusEvent.relatedObject property exists");
 	} else {
 	    DejaGnu.fail("FocusEvent.relatedObject property doesn't exist");
 	}
-	if (x1.shiftKey == false) {
+	if (Std.is(x1.shiftKey, Bool)) {
 	    DejaGnu.pass("FocusEvent.shiftKey property exists");
 	} else {
 	    DejaGnu.fail("FocusEvent.shiftKey property doesn't exist");
@@ -74,222 +78,39 @@ class FocusEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.FocusEvent == null) {
-	    DejaGnu.pass("FocusEvent::FocusEvent() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::FocusEvent() method doesn't exist");
-	}
-	if (x1.clone == Event) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("FocusEvent::clone() method exists");
 	} else {
 	    DejaGnu.fail("FocusEvent::clone() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("FocusEvent::toString() method exists");
 	} else {
 	    DejaGnu.fail("FocusEvent::toString() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("FocusEvent::ACTIVATE() method exists");
+	
+//check constants
+	if (Std.string(flash.events.FocusEvent.FOCUS_IN) == "focusIn") {
+	    DejaGnu.pass("FocusEvent.FOCUS_IN property exists");
 	} else {
-	    DejaGnu.fail("FocusEvent::ACTIVATE() method doesn't exist");
+	    DejaGnu.fail("FocusEvent.FOCUS_IN property doesn't exist");
 	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("FocusEvent::ADDED() method exists");
+	if (Std.string(flash.events.FocusEvent.FOCUS_OUT) == "focusOut") {
+	    DejaGnu.pass("FocusEvent.FOCUS_OUT property exists");
 	} else {
-	    DejaGnu.fail("FocusEvent::ADDED() method doesn't exist");
+	    DejaGnu.fail("FocusEvent.FOCUS_OUT property doesn't exist");
 	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("FocusEvent::ADDED() method exists");
+	if (Std.string(flash.events.FocusEvent.KEY_FOCUS_CHANGE) == "keyFocusChange") {
+	    DejaGnu.pass("FocusEvent.KEY_FOCUS_CHANGE property exists");
 	} else {
-	    DejaGnu.fail("FocusEvent::ADDED() method doesn't exist");
+	    DejaGnu.fail("FocusEvent.KEY_FOCUS_CHANGE property doesn't exist");
 	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("FocusEvent::CANCEL() method exists");
+	if (Std.string(flash.events.FocusEvent.MOUSE_FOCUS_CHANGE) == "mouseFocusChange") {
+	    DejaGnu.pass("FocusEvent.FOCUS_IN property exists");
 	} else {
-	    DejaGnu.fail("FocusEvent::CANCEL() method doesn't exist");
+	    DejaGnu.fail("FocusEvent.FOCUS_IN property doesn't exist");
 	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("FocusEvent::CHANGE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::CHANGE() method doesn't exist");
-	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("FocusEvent::CLOSE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::CLOSE() method doesn't exist");
-	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("FocusEvent::CLOSING() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::CLOSING() method doesn't exist");
-	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("FocusEvent::COMPLETE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::COMPLETE() method doesn't exist");
-	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("FocusEvent::CONNECT() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::CONNECT() method doesn't exist");
-	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("FocusEvent::DEACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::DEACTIVATE() method doesn't exist");
-	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("FocusEvent::DISPLAYING() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::DISPLAYING() method doesn't exist");
-	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("FocusEvent::ENTER() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::ENTER() method doesn't exist");
-	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("FocusEvent::EXITING() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::EXITING() method doesn't exist");
-	}
-	if (x1.FOCUS == IN) {
-	    DejaGnu.pass("FocusEvent::FOCUS() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::FOCUS() method doesn't exist");
-	}
-	if (x1.FOCUS == OUT) {
-	    DejaGnu.pass("FocusEvent::FOCUS() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::FOCUS() method doesn't exist");
-	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("FocusEvent::FULLSCREEN() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::FULLSCREEN() method doesn't exist");
-	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("FocusEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("FocusEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("FocusEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::HTML() method doesn't exist");
-	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("FocusEvent::ID3() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::ID3() method doesn't exist");
-	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("FocusEvent::INIT() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::INIT() method doesn't exist");
-	}
-	if (x1.KEY == FOCUS) {
-	    DejaGnu.pass("FocusEvent::KEY() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::KEY() method doesn't exist");
-	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("FocusEvent::LOCATION() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::LOCATION() method doesn't exist");
-	}
-	if (x1.MOUSE == FOCUS) {
-	    DejaGnu.pass("FocusEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("FocusEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("FocusEvent::NETWORK() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::NETWORK() method doesn't exist");
-	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("FocusEvent::OPEN() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::OPEN() method doesn't exist");
-	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("FocusEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("FocusEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("FocusEvent::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("FocusEvent::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("FocusEvent::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("FocusEvent::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("FocusEvent::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("FocusEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("FocusEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("FocusEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::TAB() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("FocusEvent::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("FocusEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("FocusEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("FocusEvent::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

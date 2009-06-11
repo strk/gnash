@@ -26,12 +26,10 @@
 #if flash9
 import flash.events.HTTPStatusEvent;
 import flash.display.MovieClip;
-#else
-import flash.HTTPStatusEvent;
-import flash.MovieClip;
 #end
 import flash.Lib;
 import Type;
+import Std;
 
 // import our testing API
 import DejaGnu;
@@ -39,7 +37,12 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class HTTPStatusEvent_as {
     static function main() {
-        var x1:HTTPStatusEvent = new HTTPStatusEvent();
+        #if !flash9
+			DejaGnu.note("this class didn't exist in as2");
+		#end
+		
+		#if flash9
+		var x1:HTTPStatusEvent = new HTTPStatusEvent("httpstatusevent");
 
         // Make sure we actually get a valid class        
         if (x1 != null) {
@@ -50,17 +53,7 @@ class HTTPStatusEvent_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.responseHeaders == 0) {
-	    DejaGnu.pass("HTTPStatusEvent.responseHeaders property exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent.responseHeaders property doesn't exist");
-	}
-	if (x1.responseURL == null) {
-	    DejaGnu.pass("HTTPStatusEvent.responseURL property exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent.responseURL property doesn't exist");
-	}
-	if (x1.status == 0) {
+	if (Std.is(x1.status, Int)) {
 	    DejaGnu.pass("HTTPStatusEvent.status property exists");
 	} else {
 	    DejaGnu.fail("HTTPStatusEvent.status property doesn't exist");
@@ -69,212 +62,23 @@ class HTTPStatusEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (x1.HTTPStatusEvent == 0) {
-	    DejaGnu.pass("HTTPStatusEvent::HTTPStatusEvent() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::HTTPStatusEvent() method doesn't exist");
-	}
-	if (x1.clone == Event) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("HTTPStatusEvent::clone() method exists");
 	} else {
 	    DejaGnu.fail("HTTPStatusEvent::clone() method doesn't exist");
 	}
-	if (x1.toString == null) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("HTTPStatusEvent::toString() method exists");
 	} else {
 	    DejaGnu.fail("HTTPStatusEvent::toString() method doesn't exist");
 	}
-	if (x1.ACTIVATE == null) {
-	    DejaGnu.pass("HTTPStatusEvent::ACTIVATE() method exists");
+	
+	if (Std.string(flash.events.HTTPStatusEvent.HTTP_STATUS) == "httpStatus") {
+	    DejaGnu.pass("HTTPStatusEvent::HTTPSTATUS constant exists");
 	} else {
-	    DejaGnu.fail("HTTPStatusEvent::ACTIVATE() method doesn't exist");
+	    DejaGnu.fail("HTTPStatusEvent::HTTPSTATUS constant doesn't exist");
 	}
-	if (x1.ADDED == null) {
-	    DejaGnu.pass("HTTPStatusEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::ADDED() method doesn't exist");
-	}
-	if (x1.ADDED == TO) {
-	    DejaGnu.pass("HTTPStatusEvent::ADDED() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::ADDED() method doesn't exist");
-	}
-	if (x1.CANCEL == null) {
-	    DejaGnu.pass("HTTPStatusEvent::CANCEL() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::CANCEL() method doesn't exist");
-	}
-	if (x1.CHANGE == null) {
-	    DejaGnu.pass("HTTPStatusEvent::CHANGE() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::CHANGE() method doesn't exist");
-	}
-	if (x1.CLOSE == null) {
-	    DejaGnu.pass("HTTPStatusEvent::CLOSE() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::CLOSE() method doesn't exist");
-	}
-	if (x1.CLOSING == null) {
-	    DejaGnu.pass("HTTPStatusEvent::CLOSING() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::CLOSING() method doesn't exist");
-	}
-	if (x1.COMPLETE == null) {
-	    DejaGnu.pass("HTTPStatusEvent::COMPLETE() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::COMPLETE() method doesn't exist");
-	}
-	if (x1.CONNECT == null) {
-	    DejaGnu.pass("HTTPStatusEvent::CONNECT() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::CONNECT() method doesn't exist");
-	}
-	if (x1.DEACTIVATE == null) {
-	    DejaGnu.pass("HTTPStatusEvent::DEACTIVATE() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::DEACTIVATE() method doesn't exist");
-	}
-	if (x1.DISPLAYING == null) {
-	    DejaGnu.pass("HTTPStatusEvent::DISPLAYING() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::DISPLAYING() method doesn't exist");
-	}
-	if (x1.ENTER == FRAME) {
-	    DejaGnu.pass("HTTPStatusEvent::ENTER() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::ENTER() method doesn't exist");
-	}
-	if (x1.EXITING == null) {
-	    DejaGnu.pass("HTTPStatusEvent::EXITING() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::EXITING() method doesn't exist");
-	}
-	if (x1.FULLSCREEN == null) {
-	    DejaGnu.pass("HTTPStatusEvent::FULLSCREEN() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::FULLSCREEN() method doesn't exist");
-	}
-	if (x1.HTML == BOUNDS) {
-	    DejaGnu.pass("HTTPStatusEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == DOM) {
-	    DejaGnu.pass("HTTPStatusEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTML == RENDER) {
-	    DejaGnu.pass("HTTPStatusEvent::HTML() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::HTML() method doesn't exist");
-	}
-	if (x1.HTTP == RESPONSE) {
-	    DejaGnu.pass("HTTPStatusEvent::HTTP() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::HTTP() method doesn't exist");
-	}
-	if (x1.HTTP == STATUS) {
-	    DejaGnu.pass("HTTPStatusEvent::HTTP() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::HTTP() method doesn't exist");
-	}
-	if (x1.ID3 == null) {
-	    DejaGnu.pass("HTTPStatusEvent::ID3() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::ID3() method doesn't exist");
-	}
-	if (x1.INIT == null) {
-	    DejaGnu.pass("HTTPStatusEvent::INIT() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::INIT() method doesn't exist");
-	}
-	if (x1.LOCATION == CHANGE) {
-	    DejaGnu.pass("HTTPStatusEvent::LOCATION() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::LOCATION() method doesn't exist");
-	}
-	if (x1.MOUSE == LEAVE) {
-	    DejaGnu.pass("HTTPStatusEvent::MOUSE() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::MOUSE() method doesn't exist");
-	}
-	if (x1.NETWORK == CHANGE) {
-	    DejaGnu.pass("HTTPStatusEvent::NETWORK() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::NETWORK() method doesn't exist");
-	}
-	if (x1.OPEN == null) {
-	    DejaGnu.pass("HTTPStatusEvent::OPEN() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::OPEN() method doesn't exist");
-	}
-	if (x1.REMOVED == null) {
-	    DejaGnu.pass("HTTPStatusEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.REMOVED == FROM) {
-	    DejaGnu.pass("HTTPStatusEvent::REMOVED() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::REMOVED() method doesn't exist");
-	}
-	if (x1.RENDER == null) {
-	    DejaGnu.pass("HTTPStatusEvent::RENDER() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::RENDER() method doesn't exist");
-	}
-	if (x1.RESIZE == null) {
-	    DejaGnu.pass("HTTPStatusEvent::RESIZE() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::RESIZE() method doesn't exist");
-	}
-	if (x1.SCROLL == null) {
-	    DejaGnu.pass("HTTPStatusEvent::SCROLL() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::SCROLL() method doesn't exist");
-	}
-	if (x1.SELECT == null) {
-	    DejaGnu.pass("HTTPStatusEvent::SELECT() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::SELECT() method doesn't exist");
-	}
-	if (x1.SOUND == COMPLETE) {
-	    DejaGnu.pass("HTTPStatusEvent::SOUND() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::SOUND() method doesn't exist");
-	}
-	if (x1.TAB == CHILDREN) {
-	    DejaGnu.pass("HTTPStatusEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == ENABLED) {
-	    DejaGnu.pass("HTTPStatusEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::TAB() method doesn't exist");
-	}
-	if (x1.TAB == INDEX) {
-	    DejaGnu.pass("HTTPStatusEvent::TAB() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::TAB() method doesn't exist");
-	}
-	if (x1.UNLOAD == null) {
-	    DejaGnu.pass("HTTPStatusEvent::UNLOAD() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::UNLOAD() method doesn't exist");
-	}
-	if (x1.USER == IDLE) {
-	    DejaGnu.pass("HTTPStatusEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::USER() method doesn't exist");
-	}
-	if (x1.USER == PRESENT) {
-	    DejaGnu.pass("HTTPStatusEvent::USER() method exists");
-	} else {
-	    DejaGnu.fail("HTTPStatusEvent::USER() method doesn't exist");
-	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

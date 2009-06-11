@@ -34,5 +34,5 @@ if BUILD_XMLNODE_AS3
 XML_TESTS_V6 += xml/XMLNode_as.swf
 endif
 
-check_SCRIPTS += $(XML_TESTS_v8) $(XML_TESTS_v9)
+check_SCRIPTS += $(XML_TESTS_v6) $(XML_TESTS_v9)
 HAXE_FLAGS += -cp $(XMLdir)
