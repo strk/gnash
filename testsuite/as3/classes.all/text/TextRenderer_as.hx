@@ -76,13 +76,13 @@ class TextRenderer_as {
 	if (Type.typeof(TextRenderer.setAdvancedAntiAliasingTable) == ValueType.TFunction) {
 	    DejaGnu.pass("TextRenderer::setAdvancedAntiAliasingTable() method exists");
 	} else {
-	    DejaGnu.fail("TextRenderer::setAdvancedAntiAliasingTable() method doesn't exist");
+	    DejaGnu.xfail("TextRenderer::setAdvancedAntiAliasingTable() method doesn't exist");
 	}
 #else
 	if (Type.typeof(TextRenderer.setAdvancedAntialiasingTable) == ValueType.TFunction) {
 	    DejaGnu.pass("TextRenderer::setAdvancedAntialiasingTable() method exists");
 	} else {
-	    DejaGnu.fail("TextRenderer::setAdvancedAntialiasingTable() method doesn't exist");
+	    DejaGnu.xfail("TextRenderer::setAdvancedAntialiasingTable() method doesn't exist");
 	}
 #end
         // Call this after finishing all tests. It prints out the totals.

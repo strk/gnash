@@ -40,7 +40,7 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ExternalInterface_as {
     static function main() {
-	#if (!flash6 && !flash7)
+	#if (flash8 || flash9)
         // Make sure we actually get a valid class        
         if (flash.external.ExternalInterface != null) {
             DejaGnu.pass("ExternalInterface class exists");
@@ -72,7 +72,7 @@ class ExternalInterface_as {
 	if (Type.typeof(flash.external.ExternalInterface.available) == ValueType.TBool) {
 	    DejaGnu.pass("ExternalInterface.available property exists");
 	} else {
-	    DejaGnu.fail("ExternalInterface.available property doesn't exist");
+	    DejaGnu.xfail("ExternalInterface.available property doesn't exist");
 	}
 
 // Tests to see if all the methods exist. All these do is test for

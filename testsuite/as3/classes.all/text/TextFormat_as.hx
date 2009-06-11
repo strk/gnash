@@ -74,7 +74,7 @@ class TextFormat_as {
 	if (Std.is(x1.bullet, Dynamic)) {
 	    DejaGnu.pass("TextFormat.bullet property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.bullet property doesn't exist");
+	    DejaGnu.xfail("TextFormat.bullet property doesn't exist");
 	}
 	if (Std.is(x1.color, Dynamic)) {
 	    DejaGnu.pass("TextFormat.color property exists");
@@ -152,7 +152,7 @@ class TextFormat_as {
 	if (Std.is(x1.bullet, Bool)) {
 	    DejaGnu.pass("TextFormat.bullet property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.bullet property doesn't exist");
+	    DejaGnu.xfail("TextFormat.bullet property doesn't exist");
 	}
 	if (Std.is(x1.color, Int)) {
 	    DejaGnu.pass("TextFormat.color property exists");
@@ -210,7 +210,7 @@ class TextFormat_as {
 	if (Std.is(x1.display, String)) {
 	    DejaGnu.pass("TextFormat.display property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.display property doesn't exist");
+	    DejaGnu.xfail("TextFormat.display property doesn't exist");
 	}
 #end
 #end
@@ -223,17 +223,17 @@ class TextFormat_as {
 	if (Std.is(x1.tabStops, Array)) {
 	    DejaGnu.pass("TextFormat.tabStops property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.tabStops property doesn't exist");
+	    DejaGnu.xfail("TextFormat.tabStops property doesn't exist");
 	}
 	if (Std.is(x1.target, String)) {
 	    DejaGnu.pass("TextFormat.target property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.target property doesn't exist");
+	    DejaGnu.xfail("TextFormat.target property doesn't exist");
 	}
 	if (Std.is(x1.url, String)) {
 	    DejaGnu.pass("TextFormat.url property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.url property doesn't exist");
+	    DejaGnu.xfail("TextFormat.url property doesn't exist");
 	}
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This

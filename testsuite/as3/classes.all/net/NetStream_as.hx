@@ -95,7 +95,7 @@ class NetStream_as {
 	if (Std.is(x1.liveDelay, Float)) {
 	    DejaGnu.pass("NetStream.liveDelay property exists");
 	} else {
-	    DejaGnu.fail("NetStream.liveDelay property doesn't exist");
+	    DejaGnu.xfail("NetStream.liveDelay property doesn't exist");
 	}
 #if flash9
 	if (Std.is(x1.currentFPS, Float)) {

@@ -56,14 +56,14 @@ class Video_as {
         if (Type.typeof(Video) == TObject && x1!= null) {
             DejaGnu.pass("Video class exists");
         } else {
-            DejaGnu.fail("Video lass doesn't exist");
+            DejaGnu.xfail("Video lass doesn't exist");
         }
 #else	
         // Make sure we actually get a valid class        
         if (Type.typeof(Video) == TObject) {
             DejaGnu.pass("Video class exists");
         } else {
-            DejaGnu.fail("Video lass doesn't exist");
+            DejaGnu.xfail("Video lass doesn't exist");
         }
 #end
 // Tests to see if all the properties exist. All these do is test for

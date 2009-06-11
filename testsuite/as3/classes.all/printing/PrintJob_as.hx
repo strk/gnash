@@ -47,7 +47,7 @@ class PrintJob_as {
         if (x1 != null) {
             DejaGnu.pass("PrintJob class exists");
         } else {
-            DejaGnu.fail("PrintJob class doesn't exist");
+            DejaGnu.xfail("PrintJob class doesn't exist");
         }
 		
 
@@ -57,12 +57,12 @@ class PrintJob_as {
 	if (Type.typeof(x1.addPage) == ValueType.TFunction) {
 	    DejaGnu.pass("PrintJob::addPage() method exists");
 	} else {
-	    DejaGnu.fail("PrintJob::addPage() method doesn't exist");
+	    DejaGnu.xfail("PrintJob::addPage() method doesn't exist");
 	}
 	if (Type.typeof(x1.send) == ValueType.TFunction) {
 	    DejaGnu.pass("PrintJob::send() method exists");
 	} else {
-	    DejaGnu.fail("PrintJob::send() method doesn't exist");
+	    DejaGnu.xfail("PrintJob::send() method doesn't exist");
 	}
 	
  	if (Type.typeof(x1.start) == ValueType.TFunction) {
@@ -70,7 +70,7 @@ class PrintJob_as {
 		//need to run x1.start() to populate the properties
 		x1.start();
  	} else {
- 	    DejaGnu.fail("PrintJob::start() method doesn't exist");	 	
+ 	    DejaGnu.xfail("PrintJob::start() method doesn't exist");	 	
 	}
 
 
@@ -91,35 +91,35 @@ class PrintJob_as {
 	if ( Type.typeof(x1.orientation) == ValueType.TNull) {
 	    DejaGnu.pass("PrintJob.orientation property exists");
 	} else {
-	    DejaGnu.fail("PrintJob.orientation property doesn't exist");
+	    DejaGnu.xfail("PrintJob.orientation property doesn't exist");
 	}
 #else
 	if ( (x1.orientation == "portrait") || x1.orientation == "landscape") {
 	    DejaGnu.pass("PrintJob.orientation property exists");
 	} else {
-	    DejaGnu.fail("PrintJob.orientation property doesn't exist");
+	    DejaGnu.xfail("PrintJob.orientation property doesn't exist");
 	}
 #end
 
 	if (Type.typeof(x1.pageHeight) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.pageHeight property exists");
 	} else {
-	    DejaGnu.fail("PrintJob.pageHeight property doesn't exist");
+	    DejaGnu.xfail("PrintJob.pageHeight property doesn't exist");
 	}
 	if (Type.typeof(x1.pageWidth) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.pageWidth property exists");
 	} else {
-	    DejaGnu.fail("PrintJob.pageWidth property doesn't exist");
+	    DejaGnu.xfail("PrintJob.pageWidth property doesn't exist");
 	}
 	if (Type.typeof(x1.paperHeight) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.paperHeight property exists");
 	} else {
-	    DejaGnu.fail("PrintJob.paperHeight property doesn't exist");
+	    DejaGnu.xfail("PrintJob.paperHeight property doesn't exist");
 	}
 	if (Type.typeof(x1.paperWidth) == ValueType.TInt) {
 	    DejaGnu.pass("PrintJob.paperWidth property exists");
 	} else {
-	    DejaGnu.fail("PrintJob.paperWidth property doesn't exist");
+	    DejaGnu.xfail("PrintJob.paperWidth property doesn't exist");
 	}
 
 
