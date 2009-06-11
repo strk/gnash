@@ -55,7 +55,6 @@ noinst_HEADERS = \
 	rtmp.h \
 	rtmp_msg.h \
 	rtmp_client.h \
-	sslclient.h \
 	statistics.h \
 	diskstream.h \
 	cache.h
@@ -70,10 +69,14 @@ libgnashnet_la_SOURCES = \
 	rtmp.cpp \
 	rtmp_msg.cpp \
 	rtmp_client.cpp \
-	sslclient.cpp \
 	statistics.cpp \
 	diskstream.cpp \
 	cache.cpp
+
+if BUILD_SSL
+libgnashnet_la_SOURCES += sslclient.cpp
+noinst_HEADERS += sslclient.h
+endif
 
 if WIN32
   AM_LDFLAGS += -no-undefined
