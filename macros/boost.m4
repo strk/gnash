@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 dnl Boost modules are:
-dnl date-time, filesystem. graph. iostreams, program options, python,
+dnl date-time, filesystem. graph. iostreams, program options,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
 AC_DEFUN([GNASH_PATH_BOOST],
@@ -37,9 +37,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
   boost_libs="thread date_time"
-  if test x"${has_python}" = xyes; then
-    boost_libs="${boost_libs} python"
-  fi
 
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
