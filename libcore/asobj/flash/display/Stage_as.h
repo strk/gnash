@@ -1,6 +1,5 @@
-// Stage_as.h:  ActionScript 3 "Stage" class, for Gnash.
-//
-//   Copyright (C) 2009 Free Software Foundation, Inc.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,25 +16,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_STAGE_H
-#define GNASH_ASOBJ3_STAGE_H
+#ifndef GNASH_ASOBJ_STAGE_H
+#define GNASH_ASOBJ_STAGE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-// ADDED
 #include "as_object.h" // for inheritance
 #include "movie_root.h" // for access to scaleMode
 
 #include <list>
 
-// Forward declarations
-class as_object;
-
 namespace gnash {
-	
-// ADDED
+
 /// This is the Stage ActionScript object.
 //
 /// Some Stage methods are implemented in movie_root, because
@@ -67,19 +57,13 @@ public:
 
 };
 
-/// Initialize the global Stage class
-void stage_class_init(as_object& global);
-
-// ADDED
+/// Register native functions with the VM.
 void registerStageNative(as_object& o);
 
-} // gnash namespace
+/// Initialize the global Stage class
+void stage_class_init(as_object& global);
+  
+} // end of gnash namespace
 
-// GNASH_ASOBJ3_STAGE_H
 #endif
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
 

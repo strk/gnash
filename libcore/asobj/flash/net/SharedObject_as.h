@@ -1,6 +1,5 @@
-// SharedObject_as.h:  ActionScript 3 "SharedObject" class, for Gnash.
-//
-//   Copyright (C) 2009 Free Software Foundation, Inc.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_SHAREDOBJECT_H
-#define GNASH_ASOBJ3_SHAREDOBJECT_H
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+#ifndef GNASH_ASOBJ_SHAREDOBJECT_H
+#define GNASH_ASOBJ_SHAREDOBJECT_H
 
 #include <string>
 #include <map>
@@ -83,25 +78,7 @@ void registerSharedObjectNative(as_object& o);
 
 #endif
 
-
-/*namespace gnash {
-
-// Forward declarations
-class as_object;
-
-/// Initialize the global SharedObject class
-void sharedobject_class_init(as_object& global);
-void attachSharedObjectInterface(as_object& o);
-void attachSharedObjectStaticInterface(as_object& o);
-
-
-} // gnash namespace
-
-// GNASH_ASOBJ3_SHAREDOBJECT_H
-#endif*/
-
 // local Variables:
 // mode: C++
 // indent-tabs-mode: t
 // End:
-

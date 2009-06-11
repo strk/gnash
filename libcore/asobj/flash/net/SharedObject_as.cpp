@@ -1,6 +1,6 @@
 // SharedObject_as.cpp:  ActionScript "SharedObject" class, for Gnash.
-//
-//   Copyright (C) 2009 Free Software Foundation, Inc.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,17 +18,10 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
-#include "flash/net/SharedObject_as.h"
-#include "log.h"
-#include "fn_call.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
-
-// ADDED
+#include "movie_root.h"
 #include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
@@ -36,8 +29,12 @@
 #include "amf.h"
 #include "element.h"
 #include "sol.h"
-#include "movie_root.h"
+#include "net/SharedObject_as.h"
 #include "as_object.h" // for inheritance
+#include "log.h"
+#include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "Property.h"
@@ -64,41 +61,33 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-	    as_value sharedobject_close(const fn_call& fn);
-	    as_value sharedobject_connect(const fn_call& fn);
-	    as_value sharedobject_flush(const fn_call& fn);
-	    as_value sharedobject_getLocal(const fn_call& fn);
-	    as_value sharedobject_getRemote(const fn_call& fn);
-	    as_value sharedobject_send(const fn_call& fn);
-	    as_value sharedobject_setDirty(const fn_call& fn);
-	    as_value sharedobject_setProperty(const fn_call& fn);
-	    as_value sharedobject_asyncError(const fn_call& fn);
-	    as_value sharedobject_netStatus(const fn_call& fn);
-	    as_value sharedobject_sync(const fn_call& fn);
-	    as_value sharedobject_ctor(const fn_call& fn);
-	    void attachSharedObjectInterface(as_object& o);
-	    void attachSharedObjectStaticInterface(as_object& o);
+
+    as_value sharedobject_connect(const fn_call& fn);
+    as_value sharedobject_send(const fn_call& fn);
+    as_value sharedobject_flush(const fn_call& fn);
+    as_value sharedobject_close(const fn_call& fn);
+    as_value sharedobject_getsize(const fn_call& fn);
+    as_value sharedobject_setFps(const fn_call& fn);
+    as_value sharedobject_clear(const fn_call& fn);
+    as_value sharedobject_deleteAll(const fn_call& fn);
+    as_value sharedobject_getDiskUsage(const fn_call& fn);
+    as_value sharedobject_getRemote(const fn_call& fn);
+    as_value sharedobject_data(const fn_call& fn);
+
+    as_value sharedobject_getLocal(const fn_call& fn);
+    as_value sharedobject_ctor(const fn_call& fn);
+
+    as_object* readSOL(VM& vm, const std::string& filespec);
+
     as_object* getSharedObjectInterface();
-
-	// ADDED
-		as_value sharedobject_getsize(const fn_call& fn);
-	    as_value sharedobject_setFps(const fn_call& fn);
-	    as_value sharedobject_clear(const fn_call& fn);
-	    as_value sharedobject_deleteAll(const fn_call& fn);
-	    as_value sharedobject_getDiskUsage(const fn_call& fn);
-	    as_value sharedobject_data(const fn_call& fn);
-    
-		as_object* readSOL(VM& vm, const std::string& filespec);
-
-	    as_object* getSharedObjectInterface();
-	    void flushSOL(SharedObjectLibrary::SoLib::value_type& sol);
-	    bool validateName(const std::string& solName);
-    
-	
+    void attachSharedObjectStaticInterface(as_object& o);
+    void flushSOL(SharedObjectLibrary::SoLib::value_type& sol);
+    bool validateName(const std::string& solName);
 }
 
-// ADDED
 // Serializer helper
+namespace { 
+
 class PropsSerializer : public AbstractPropertyVisitor
 {
 public:
@@ -228,7 +217,8 @@ private:
     bool _error;
 };
 
-// MODIFIED
+} // anonymous namespace
+
 class SharedObject_as: public as_object 
 {
 public:
@@ -300,9 +290,11 @@ private:
     SOL _sol;
 };
 
+
 SharedObject_as::~SharedObject_as()
 {
 }
+
 
 bool
 SharedObject_as::flush(int space) const
@@ -409,6 +401,7 @@ SharedObject_as::flush(int space) const
     log_security("SharedObject '%s' written to filesystem.", filespec);
     return true;
 }
+
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
@@ -610,54 +603,78 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     return obj;
 }
 
-
-// UNCHANGED
-// extern (used by Global.cpp)
-void 
+void
 sharedobject_class_init(as_object& global)
 {
     static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
+    
+    if (cl == NULL) {
+        cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
         attachSharedObjectStaticInterface(*cl);
     }
-
+    
     // Register _global.SharedObject
-    global.init_member("SharedObject", cl.get());
+    global.init_member("SharedObject", cl.get());    
 }
 
+void
+registerSharedObjectNative(as_object& o)
+{
+    VM& vm = o.getVM();
+
+    // ASnative table registration
+	vm.registerNative(sharedobject_connect, 2106, 0);
+	vm.registerNative(sharedobject_send, 2106, 1);
+	vm.registerNative(sharedobject_flush, 2106, 2);
+	vm.registerNative(sharedobject_close, 2106, 3);
+	vm.registerNative(sharedobject_getsize, 2106, 4);
+	vm.registerNative(sharedobject_setFps, 2106, 5);
+	vm.registerNative(sharedobject_clear, 2106, 6);
+
+    // FIXME: getRemote and getLocal use both these methods,
+    // but aren't identical with either of them.
+    // TODO: The first method looks in a library and returns either a
+    // SharedObject or null. The second takes a new SharedObject as
+    // its first argument and populates its data member (more or less
+    // like readSOL). This is only important for ASNative compatibility.
+	vm.registerNative(sharedobject_getLocal, 2106, 202);
+	vm.registerNative(sharedobject_getRemote, 2106, 203);
+	vm.registerNative(sharedobject_getLocal, 2106, 204);
+	vm.registerNative(sharedobject_getRemote, 2106, 205);
+
+	vm.registerNative(sharedobject_deleteAll, 2106, 206);
+	vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
+}
+
+
+/// SharedObject AS interface
 namespace {
 
 void
 attachSharedObjectInterface(as_object& o)
 {
-	//VM& vm = o.getVM();
 
-	o.init_member("close", new builtin_function(sharedobject_close));
-	o.init_member("connect", new builtin_function(sharedobject_connect));
-	o.init_member("flush", new builtin_function(sharedobject_flush));
-	o.init_member("getLocal", new builtin_function(sharedobject_getLocal));
-	o.init_member("getRemote", new builtin_function(sharedobject_getRemote));
-	o.init_member("send", new builtin_function(sharedobject_send));
-	o.init_member("setDirty", new builtin_function(sharedobject_setDirty));
-	o.init_member("setProperty", new builtin_function(sharedobject_setProperty));
-	o.init_member("asyncError", new builtin_function(sharedobject_asyncError));
-	o.init_member("netStatus", new builtin_function(sharedobject_netStatus));
-	o.init_member("sync", new builtin_function(sharedobject_sync));
-	
-	// ADDED
-	o.init_member("getSize", new builtin_function(sharedobject_getsize));
-    o.init_member("setFps", new builtin_function(sharedobject_setFps));
-    o.init_member("clear", new builtin_function(sharedobject_clear));
+    VM& vm = o.getVM();
+
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::onlySWF6Up;
+
+    o.init_member("connect", vm.getNative(2106, 0), flags);
+    o.init_member("send", vm.getNative(2106, 1), flags);
+    o.init_member("flush", vm.getNative(2106, 2), flags);
+    o.init_member("close", vm.getNative(2106, 3), flags);
+    o.init_member("getSize", vm.getNative(2106, 4), flags);
+    o.init_member("setFps", vm.getNative(2106, 5), flags);
+    o.init_member("clear", vm.getNative(2106, 6), flags);
 
 }
+
 
 void
 attachSharedObjectStaticInterface(as_object& o)
 {
-	// MODIFIED
-  	VM& vm = o.getVM();
+    VM& vm = o.getVM();
 
     const int flags = 0;
 
@@ -672,7 +689,20 @@ attachSharedObjectStaticInterface(as_object& o)
     o.init_member("getDiskUsage",  vm.getNative(2106, 207), hiddenOnly);
 }
 
-// ADDED
+
+as_object*
+getSharedObjectInterface()
+{
+
+    static boost::intrusive_ptr<as_object> o;
+    if ( ! o ) {
+        o = new as_object(getObjectInterface());
+        attachSharedObjectInterface(*o);
+    }
+    return o.get();
+}
+
+
 as_value
 sharedobject_clear(const fn_call& fn)
 {
@@ -685,44 +715,54 @@ sharedobject_clear(const fn_call& fn)
     return as_value();
 }
 
-// UNCHANGED
-as_object*
-getSharedObjectInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSharedObjectInterface(*o);
-    }
-    return o.get();
-}
-
-// UNCHANGED
-as_value
-sharedobject_close(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-// UNCHANGED
 as_value
 sharedobject_connect(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> ptr =
+    boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.connect"));
     return as_value();
 }
 
-// MODIFIED
+as_value
+sharedobject_close(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.close"));
+    return as_value();
+}
+
+as_value
+sharedobject_setFps(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.setFps"));
+    return as_value();
+}
+
+as_value
+sharedobject_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.send"));
+    return as_value();
+}
+
 as_value
 sharedobject_flush(const fn_call& fn)
 {
+    
     GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<SharedObject_as> obj =
@@ -750,10 +790,11 @@ sharedobject_flush(const fn_call& fn)
     return as_value(obj->flush(space));
 }
 
-// MODIFIED
+// Set the file name
 as_value
 sharedobject_getLocal(const fn_call& fn)
 {
+
     VM& vm = fn.env().getVM();
     int swfVersion = vm.getSWFVersion();
 
@@ -788,94 +829,22 @@ sharedobject_getLocal(const fn_call& fn)
     return ret;
 }
 
-// UNCHANGED
+/// Undocumented
 as_value
 sharedobject_getRemote(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> ptr =
+    boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
+
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
     return as_value();
 }
 
-// UNCHANGED
-as_value
-sharedobject_send(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
 
-// UNCHANGED
-as_value
-sharedobject_setDirty(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-// UNCHANGED
-as_value
-sharedobject_setProperty(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-// UNCHANGED
-as_value
-sharedobject_asyncError(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-// UNCHANGED
-as_value
-sharedobject_netStatus(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-// UNCHANGED
-as_value
-sharedobject_sync(const fn_call& fn)
-{
-    boost::intrusive_ptr<SharedObject_as> ptr =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-// UNCHANGED
-as_value
-sharedobject_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new SharedObject_as;
-
-    return as_value(obj.get()); // will keep alive
-}
-
-// ADDED
 /// Undocumented
+//
 /// Takes a URL argument and deletes all SharedObjects under that URL.
 as_value
 sharedobject_deleteAll(const fn_call& fn)
@@ -889,8 +858,8 @@ sharedobject_deleteAll(const fn_call& fn)
     return as_value();
 }
 
-// ADDED
 /// Undocumented
+//
 /// Should be quite obvious what it does.
 as_value
 sharedobject_getDiskUsage(const fn_call& fn)
@@ -904,7 +873,7 @@ sharedobject_getDiskUsage(const fn_call& fn)
     return as_value();
 }
 
-// ADDED
+
 as_value
 sharedobject_data(const fn_call& fn)
 {
@@ -913,7 +882,6 @@ sharedobject_data(const fn_call& fn)
     return as_value(obj->data());
 }
 
-// ADDED
 as_value
 sharedobject_getsize(const fn_call& fn)
 {
@@ -922,19 +890,31 @@ sharedobject_getsize(const fn_call& fn)
     return as_value(obj->size());
 }
 
-// ADDED
 as_value
-sharedobject_setFps(const fn_call& fn)
+sharedobject_ctor(const fn_call& /* fn */)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(obj);
-
-    LOG_ONCE(log_unimpl("SharedObject.setFps"));
-    return as_value();
+    boost::intrusive_ptr<as_object> obj = new SharedObject_as;
+    
+    return as_value(obj.get()); // will keep alive
 }
 
-// ADDED
+/// Return true if the name is a valid SOL name.
+//
+/// The official docs claim that '%' is also an invalid DisplayObject,
+/// but that is incorrect (see actionscript.all/SharedObject.as)
+bool
+validateName(const std::string& solName)
+{
+    // A double forward slash isn't allowed
+    std::string::size_type pos = solName.find("//");
+    if (pos != std::string::npos) return false;
+
+    // These DisplayObjects are also illegal
+    pos = solName.find_first_of(",~;\"'<&>?#:\\ ");
+
+    return (pos == std::string::npos);
+}
+
 as_object*
 readSOL(VM& vm, const std::string& filespec)
 {
@@ -1079,6 +1059,7 @@ readSOL(VM& vm, const std::string& filespec)
             case Element::BOOLEAN_AMF0:
                 ptr->set_member(st.string_table::find(el->getName()),
                                             as_value(el->to_bool()));
+                break;
 
             case Element::STRING_AMF0:
             {
@@ -1116,66 +1097,12 @@ readSOL(VM& vm, const std::string& filespec)
 #endif
 }
 
-// ADDED
+
 void
 flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
     sol.second->flush();
 }
 
-// ADDED
-/// Return true if the name is a valid SOL name.
-/// The official docs claim that '%' is also an invalid DisplayObject,
-/// but that is incorrect (see actionscript.all/SharedObject.as)
-bool
-validateName(const std::string& solName)
-{
-    // A double forward slash isn't allowed
-    std::string::size_type pos = solName.find("//");
-    if (pos != std::string::npos) return false;
-
-    // These DisplayObjects are also illegal
-    pos = solName.find_first_of(",~;\"'<&>?#:\\ ");
-
-    return (pos == std::string::npos);
-}
-
-
-
-} // anonymous namespace 
-
-void
-registerSharedObjectNative(as_object& o)
-{
-    VM& vm = o.getVM();
-
-    // ASnative table registration
-	vm.registerNative(sharedobject_connect, 2106, 0);
-	vm.registerNative(sharedobject_send, 2106, 1);
-	vm.registerNative(sharedobject_flush, 2106, 2);
-	vm.registerNative(sharedobject_close, 2106, 3);
-	vm.registerNative(sharedobject_getsize, 2106, 4);
-	vm.registerNative(sharedobject_setFps, 2106, 5);
-	vm.registerNative(sharedobject_clear, 2106, 6);
-
-    // FIXME: getRemote and getLocal use both these methods,
-    // but aren't identical with either of them.
-    // TODO: The first method looks in a library and returns either a
-    // SharedObject or null. The second takes a new SharedObject as
-    // its first argument and populates its data member (more or less
-    // like readSOL). This is only important for ASNative compatibility.
-	vm.registerNative(sharedobject_getLocal, 2106, 202);
-	vm.registerNative(sharedobject_getRemote, 2106, 203);
-	vm.registerNative(sharedobject_getLocal, 2106, 204);
-	vm.registerNative(sharedobject_getRemote, 2106, 205);
-
-	vm.registerNative(sharedobject_deleteAll, 2106, 206);
-	vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
-}
-} // gnash namespace
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
-
+} // anonymous namespace
+} // end of gnash namespace
