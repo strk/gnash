@@ -126,7 +126,7 @@ endif
 
 # FIXME: already exists
 if BUILD_XMLSOCKET_AS3
-# NET_SOURCES += asobj/flash/net/XMLSocket_as.cpp
+NET_SOURCES += asobj/flash/net/XMLSocket_as.cpp
 NET_HEADERS += asobj/flash/net/XMLSocket_as.h
 endif
 

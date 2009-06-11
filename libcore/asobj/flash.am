@@ -47,7 +47,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
 	asobj/Stage_as.cpp \
-	asobj/XMLSocket_as.cpp \
 	asobj/LoadableObject.cpp \
 	asobj/Object.cpp
 
@@ -71,7 +70,6 @@ noinst_HEADERS += \
 	asobj/Stage_as.h \
 	asobj/TextFormat_as.h \
 	asobj/String_as.h \
-	asobj/XMLSocket_as.h \
 	asobj/LoadableObject.h \
 	asobj/Namespace_as.h \
 	asobj/Object.h
