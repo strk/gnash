@@ -28,6 +28,7 @@ AM_LDFLAGS = \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
+	$(SSL_LIBS) \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
@@ -39,6 +40,7 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
+	$(SSL_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
