@@ -31,7 +31,7 @@
 #include "Boolean_as.h"
 #include "flash/media/Camera_as.h"
 #include "Color_as.h"
-#include "ContextMenu.h"
+#include "flash/ui/ContextMenu_as.h"
 #include "CustomActions.h"
 #include "Date_as.h" // for registerDateNative
 #include "Error_as.h"

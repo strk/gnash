@@ -29,7 +29,7 @@ UI_TESTS_V9 =
 # endif
 
 # if BUILD_CONTEXTMENU_AS3
-# UI_TESTS_V8 += ui/ContextMenu_as.swf
+UI_TESTS_V8 += ui/ContextMenu_as.swf
 # endif
 
 if BUILD_KEYLOCATION_AS3
