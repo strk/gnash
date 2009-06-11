@@ -496,17 +496,17 @@ esac], sdkinstall=no)
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 dnl Enable using OpenSSL with libnet.
-AC_ARG_ENABLE(build_openssl,
-  AC_HELP_STRING([--enable-openssl], [Enable using OpenSSL directly]),
+AC_ARG_ENABLE(ssl,
+  AC_HELP_STRING([--enable-ssl], [Enable using OpenSSL directly]),
 [case "${enableval}" in
-  yes) build_openssl=yes ;;
-  no)  build_openssl=no ;;
+  yes) build_ssl=yes ;;
+  no)  build_ssl=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
-esac], build_openssl=yes)
+esac], build_ssl=no)
 
 with_cert=
 with_pem=
-AM_CONDITIONAL(BUILD_OPENSSL, test x$build_openssl= xyes)
+AM_CONDITIONAL(BUILD_SSL, test x"${build_ssl}" = xyes)
 AC_ARG_WITH(cert,
   AC_HELP_STRING([--with-cert],
   [cert file for SSL]),
@@ -516,8 +516,8 @@ AC_ARG_WITH(pem,
   [pem file for SSL]),
   with_pem=${withval})
 
-if test x"${build_openssl}" = x"yes"; then
-  GNASH_PKG_FIND(openssl, [openssl/openssl.h], [openssl library], SSL_get_peer_certificate, [1.0])
+if test x"${build_ssl}" = xyes; then
+  GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
 fi
 
 dnl The class file is an optional file that if it is specified at configure time
@@ -2408,22 +2408,6 @@ dnl else
 dnl   echo "        Building Gnash extensions disabled."
 dnl fi
 
-if test x"${build_openssl}" = x"yes"; then
-  echo "        OpenSSL support enabled (default). Use --disable-openssl to disable."
-  if test x"$(cert}" != x; then
-     echo "        Cert is: $(cert}"
-  else
-     echo "        Cert is: default"
-  fi
-  if test x"$(pem}" != x; then
-     echo "        Pem is: $(pem}"
-  else
-     echo "        Pem is: default"
-  fi
-else
-  echo "        OpenSSL support disabled."
-fi
-
 if test x"$cygnal" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
 else
@@ -3297,6 +3281,18 @@ if test x"$python" = x"yes"; then
     echo "        PYTHON executable is are: $PYTHON"
   else
     echo "        ERROR: No Python development package is installed, but it's enabled." >&3
+  fi
+fi
+if test x${build_ssl} = xyes; then
+  if test x"${has_ssl}" = xyes; then
+    if test x"${SSL_CFLAGS}" = xyes; then
+      echo "        SSL flags are: default"
+    else
+      echo "        SSL flags are: $SSL_CFLAGS"
+    fi
+    echo "        SSL libs are: $SSL_LIBS"
+  else
+    echo "        ERROR: No SSL development package is installed, but it's enabled." >&3
   fi
 fi
 
