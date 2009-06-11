@@ -61,21 +61,21 @@ class ActivityEvent_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (ValueType.typeof(x1.clone) == ValueType.TFunction) {
+	if (Type.typeof(x1.clone) == ValueType.TFunction) {
 	    DejaGnu.pass("ActivityEvent::clone() method exists");
 	} else {
 	    DejaGnu.fail("ActivityEvent::clone() method doesn't exist");
 	}
-	if (ValueType.typeof(x1.toString) == ValueType.TFunction) {
+	if (Type.typeof(x1.toString) == ValueType.TFunction) {
 	    DejaGnu.pass("ActivityEvent::toString() method exists");
 	} else {
 	    DejaGnu.fail("ActivityEvent::toString() method doesn't exist");
 	}
-	if (Std.string(x1.ACTIVITY) == "activity") {
-	    DejaGnu.pass("ActivityEvent::ACTIVITY() method exists");
-	} else {
-	    DejaGnu.fail("ActivityEvent::ACTIVITY() method doesn't exist");
-	}
+//	if (Std.string(x1.ACTIVITY) == "activity") {
+//	    DejaGnu.pass("ActivityEvent::ACTIVITY() method exists");
+//	} else {
+//	    DejaGnu.fail("ActivityEvent::ACTIVITY() method doesn't exist");
+//	}
 	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
