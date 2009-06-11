@@ -45,7 +45,7 @@
 #include "Object.h"
 #include "Math_as.h"
 #include "flash/xml/XMLDocument_as.h"
-#include "XMLSocket_as.h"
+#include "flash/net/XMLSocket_as.h"
 #include "flash/ui/Mouse_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
