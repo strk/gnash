@@ -216,7 +216,7 @@ class Stage_as {
 	if (Std.is(Stage.showMenu, Bool)) {
 	    DejaGnu.pass("Stage::showMenu property exists");
 	} else {
-	    DejaGnu.fail("Stage::showMenu property doesn't exist");
+	    DejaGnu.xfail("Stage::showMenu property doesn't exist");
 	}
 #if flash8
 	if (Std.is(Stage.displayState, String)) {

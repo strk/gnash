@@ -40,7 +40,7 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ExternalInterface_as {
     static function main() {
-	
+	#if (!flash6 && !flash7)
         // Make sure we actually get a valid class        
         if (flash.external.ExternalInterface != null) {
             DejaGnu.pass("ExternalInterface class exists");
@@ -90,7 +90,7 @@ class ExternalInterface_as {
 	} else {
 	    DejaGnu.fail("ExternalInterface::call() method doesn't exist");
 	}
-
+	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

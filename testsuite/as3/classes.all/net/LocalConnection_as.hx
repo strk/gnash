@@ -114,14 +114,14 @@ class LocalConnection_as {
 	if (Type.typeof(x1.allowDomain) == ValueType.TFunction ) {
 	    DejaGnu.pass("LocalConnection::allowDomain() method exists");
 	} else {
-	    DejaGnu.fail("LocalConnection::allowDomain() method doesn't exist");
+	    DejaGnu.xfail("LocalConnection::allowDomain() method doesn't exist");
 	}
 #else
 	DejaGnu.note("Warning! A event handler here: allowDomain"   + Type.typeof(x1.allowDomain)); 
 	if (Type.typeof(x1.allowDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowDomain() method exists");
 	} else {
-	    DejaGnu.fail("LocalConnection::allowDomain() method doesn't exist");
+	    DejaGnu.xfail("LocalConnection::allowDomain() method doesn't exist");
 	}
 #end
 
@@ -134,14 +134,14 @@ class LocalConnection_as {
 	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowInsecureDomain() method exists");
 	} else {
-	    DejaGnu.fail("LocalConnection::allowInsecureDomain() method doesn't exist");
+	    DejaGnu.xfail("LocalConnection::allowInsecureDomain() method doesn't exist");
 	}
 #else
 	DejaGnu.note("Warning! A event handler here: allosDa "   + Type.typeof(x1.allowInsecureDomain));
 	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowInsecureDomain() method exists");
 	} else {
-	    DejaGnu.fail("LocalConnection::allowInsecureDomain() method doesn't exist");
+	    DejaGnu.xfail("LocalConnection::allowInsecureDomain() method doesn't exist");
 	}
 #end
 

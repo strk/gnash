@@ -52,7 +52,7 @@ class FileReferenceList_as {
         if (x1 != null) {
             DejaGnu.pass("FileReferenceList class exists");
         } else {
-            DejaGnu.fail("FileReferenceList class doesn't exist");
+            DejaGnu.xfail("FileReferenceList class doesn't exist");
         }
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
@@ -74,7 +74,7 @@ class FileReferenceList_as {
  	if (Type.typeof(x1.browse) == ValueType.TFunction) {
  	    DejaGnu.pass("FileReferenceList::browse() method exists");
  	} else {
- 	    DejaGnu.fail("FileReferenceList::browse() method doesn't exist");
+ 	    DejaGnu.xfail("FileReferenceList::browse() method doesn't exist");
  	}
 	#end
 	#if flash8
@@ -83,22 +83,22 @@ class FileReferenceList_as {
 	if (Std.is(x2.fileList, Array)){
 		DejaGnu.pass("Filelist property exists");
 	} else {
-		DejaGnu.fail("Filelist doesn't properly exist");
+		DejaGnu.xfail("Filelist doesn't properly exist");
 	}
 	if (Type.typeof(x2.addListener) == ValueType.TFunction){
 		DejaGnu.pass("addListener method exists");
 	} else {
-		DejaGnu.fail("addListener method doesn't exist");
+		DejaGnu.xfail("addListener method doesn't exist");
 	}
 	if (Type.typeof(x2.browse) == ValueType.TFunction) {
 		DejaGnu.pass("browse method exists");
 	} else {
-		DejaGnu.fail("browse method doesn't exist");
+		DejaGnu.xfail("browse method doesn't exist");
 	}
 	if (Type.typeof(x2.removeListener) == ValueType.TFunction){
 		DejaGnu.pass("removeListener method exists");
 	} else {
-		DejaGnu.fail("removeListener method doesn't exist");
+		DejaGnu.xfail("removeListener method doesn't exist");
 	}
 	#end
         // Call this after finishing all tests. It prints out the totals.

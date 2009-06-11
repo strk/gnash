@@ -79,13 +79,13 @@ class Transform_as {
  	if (Std.is(x1.concatenatedColorTransform, ColorTransform)) {
  	    DejaGnu.pass("Transform.concatenatedColorTransform property exists");
  	} else {
- 	    DejaGnu.fail("Transform.concatenatedColorTransform property doesn't exist");
+ 	    DejaGnu.xfail("Transform.concatenatedColorTransform property doesn't exist");
  	}
 //FIXME: This property is unimplemented for flash8
  	if (Std.is(x1.concatenatedMatrix, Matrix)) {
  	    DejaGnu.pass("Transform.concatenatedMatrix property exists");
  	} else {
- 	    DejaGnu.fail("Transform.concatenatedMatrix property doesn't exist");
+ 	    DejaGnu.xfail("Transform.concatenatedMatrix property doesn't exist");
  	}
 #if flash10
 //	if (Std.is(x1.matrix3D, Matrix3D)) {
@@ -113,7 +113,7 @@ class Transform_as {
  	if (Std.is(x1.pixelBounds, Rectangle)) {
  	    DejaGnu.pass("Transform.pixelBounds property exists");
  	} else {
- 	    DejaGnu.fail("Transform.pixelBounds property doesn't exist");
+ 	    DejaGnu.xfail("Transform.pixelBounds property doesn't exist");
  	}
  	DejaGnu.note("pixelBounds... is "+Type.typeof(x1.pixelBounds));
 #if flash9
