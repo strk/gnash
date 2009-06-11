@@ -256,6 +256,8 @@ MovieTester::advanceClock(unsigned long ms)
                 ms%10);
         }
 
+        // We double because sound_handler interface takes
+        // "mono" samples... (eh.. would be wise to change)
         unsigned int toFetch = nSamples*2;
 
         log_debug("advanceClock(%d) needs to fetch %d samples", ms, toFetch);
