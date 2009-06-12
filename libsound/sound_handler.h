@@ -396,6 +396,14 @@ public:
     ///
     /// @param nSamples
     ///     The amount of samples to fetch.
+    ///     NOTE: this number currently refers to "mono" samples
+    ///     due to some bad design decision. It is so expected
+    ///     that the user fetches 44100 * 2 samples which has to
+    ///     be interpreted as series of left,right channel couples.
+    ///     TODO: use actual number of samples so that it's expected
+    ///           to fetch 44100 per second and let expose a function
+    ///           to give interpretation of what comes back (how many
+    ///           bytes per channel, which format).
     ///
     virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
