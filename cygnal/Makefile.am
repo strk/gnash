@@ -29,10 +29,12 @@ CGI_DIR = cgi-bin
 endif
 
 SUBDIRS = \
-	$(TEST_DIR)
+	$(TEST_DIR) \
+	$(CGI_BIN)
 
-# we don't want these anymore
-DIST_SUBDIRS  = testsuite
+# these need to be included in a distribution, even if not part
+# of the top level configure options.
+DIST_SUBDIRS  = testsuite cgi-bin
 
 AM_CPPFLAGS = # -Wall
 
