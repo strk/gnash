@@ -495,31 +495,6 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
-dnl Enable using OpenSSL with libnet.
-AC_ARG_ENABLE(ssl,
-  AC_HELP_STRING([--enable-ssl], [Enable using OpenSSL directly]),
-[case "${enableval}" in
-  yes) build_ssl=yes ;;
-  no)  build_ssl=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
-esac], build_ssl=no)
-
-with_cert=
-with_pem=
-AM_CONDITIONAL(BUILD_SSL, test x"${build_ssl}" = xyes)
-AC_ARG_WITH(cert,
-  AC_HELP_STRING([--with-cert],
-  [cert file for SSL]),
-  with_cert=${withval})
-AC_ARG_WITH(pem,
-  AC_HELP_STRING([--with-pe,],
-  [pem file for SSL]),
-  with_pem=${withval})
-
-if test x"${build_ssl}" = xyes; then
-  GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
-fi
-
 dnl The class file is an optional file that if it is specified at configure time
 dnl with --with-classfile=, then only those classes are compiled and built into the
 dnl class library used for Gnash. THis is designed for small systems that execute the
@@ -1214,6 +1189,12 @@ dnl !!
 dnl !!  Any call to GNASH_PATH_XXX must be be given *after* this snippet.
 dnl !!  This is to ensure that PKG_CONFIG, cross_compiling and incllist are
 dnl !!  properly set at the time of call.
+dnl !!
+dnl !!  Also GNASH_PKG_FIND has to be called later. Not sure
+dnl !!  why but calling before breaks detection of CPP (see
+dnl !!  gnash-dev mailing archives for June 12 2009
+dnl !!  http://lists.gnu.org/archive/html/gnash-dev/2009-06/index.html
+dnl !! 
 dnl !! 
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -1223,6 +1204,35 @@ fi
 
 if test x$ext_mysql = xyes; then
   GNASH_PATH_MYSQL
+fi
+
+dnl --------------------------------------------------------
+dnl  Select SSL support
+dnl --------------------------------------------------------
+
+dnl Enable using OpenSSL with libnet.
+AC_ARG_ENABLE(ssl,
+  AC_HELP_STRING([--enable-ssl], [Enable using OpenSSL directly]),
+[case "${enableval}" in
+  yes) build_ssl=yes ;;
+  no)  build_ssl=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
+esac], build_ssl=no)
+
+with_cert=
+with_pem=
+AM_CONDITIONAL(BUILD_SSL, test x"${build_ssl}" = xyes)
+AC_ARG_WITH(cert,
+  AC_HELP_STRING([--with-cert],
+  [cert file for SSL]),
+  with_cert=${withval})
+AC_ARG_WITH(pem,
+  AC_HELP_STRING([--with-pe],
+  [pem file for SSL]),
+  with_pem=${withval})
+
+if test x"${build_ssl}" = xyes; then
+  GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
 fi
 
 
