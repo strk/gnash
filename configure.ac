@@ -1150,41 +1150,6 @@ fi
 
 AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
 
-dnl Check for PKG_CONFIG before any GNASH_PATH call
-PKG_PROG_PKG_CONFIG
-
-dnl Look for python, which is optional. If enabled, a python loadable
-dnl module of Gnash is created.
-GNASH_PATH_PYTHON
-AM_CONDITIONAL([USE_PYTHON], test x"$python" = xyes)
-AM_CONDITIONAL([HAS_PYTHON], test x"$has_python" = xyes)
-
-AC_PATH_PROG(PERL, perl)
-AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
-
-AC_PATH_PROG(CSOUND, csound)
-AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
-
-dnl Look for scratchbox
-sbox=no
-if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
-  sbox=yes
-fi
-if test x"${build_alp}" = xyes; then
-  GNASH_PATH_ALP
-  if test x"${have_alp}" = x"yes"; then
-    AC_DEFINE([HAVE_ALP], 1, [Access Linux Platform framework])
-  fi
-  dnl @@ It makes NO sense to set cross_compiling here,
-  dnl @@ *after* it is used in conditionals above
-  dnl @@ (AM_CONDITIONAL and directories search)
-  dnl cross_compiling=yes
-dnl  build_gtk=yes
-  build_kde3=no
-  build_ogl=no
-  build_agg=yes
-fi
-
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 dnl !! 
 dnl !! IMPORTANT NOTICE 
@@ -1200,6 +1165,22 @@ dnl !!  http://lists.gnu.org/archive/html/gnash-dev/2009-06/index.html
 dnl !! 
 dnl !! 
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+dnl Check for PKG_CONFIG before any GNASH_PATH call
+PKG_PROG_PKG_CONFIG
+
+
+dnl Look for python, which is optional. If enabled, a python loadable
+dnl module of Gnash is created.
+GNASH_PATH_PYTHON
+AM_CONDITIONAL([USE_PYTHON], test x"$python" = xyes)
+AM_CONDITIONAL([HAS_PYTHON], test x"$has_python" = xyes)
+
+AC_PATH_PROG(PERL, perl)
+AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
+
+AC_PATH_PROG(CSOUND, csound)
+AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
 
 if test x$ext_dbus = xyes; then
   GNASH_PATH_DBUS
@@ -1243,6 +1224,28 @@ dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
 dnl   disable build of the GUIS for which deps are NOT met
 dnl ------------------------------------------------------------
+
+dnl Look for scratchbox (used in GNASH_PATH_ALP)
+dnl FIXME: move it in macros/alp.m4 or at least after
+dnl        the build_alp conditional ?
+sbox=no
+if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
+  sbox=yes
+fi
+if test x"${build_alp}" = xyes; then
+  GNASH_PATH_ALP
+  if test x"${have_alp}" = x"yes"; then
+    AC_DEFINE([HAVE_ALP], 1, [Access Linux Platform framework])
+  fi
+  dnl @@ It makes NO sense to set cross_compiling here,
+  dnl @@ *after* it is used in conditionals above
+  dnl @@ (AM_CONDITIONAL and directories search)
+  dnl cross_compiling=yes
+dnl  build_gtk=yes
+  build_kde3=no
+  build_ogl=no
+  build_agg=yes
+fi
 
 if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    GNASH_PATH_GTK2
