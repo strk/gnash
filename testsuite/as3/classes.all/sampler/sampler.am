@@ -17,23 +17,23 @@
 
 SAMPLERdir = $(srcdir)/sampler
 
-SAMPLER_TESTS = 
+SAMPLER_TESTS_V9 = 
 
 if BUILD_DELETEOBJECTSAMPLE_AS3
-SAMPLER_TESTS += sampler/DeleteObjectSample_as.swf
+SAMPLER_TESTS_V9 += sampler/DeleteObjectSample_as.swf
 endif
 
 if BUILD_NEWOBJECTSAMPLE_AS3
-SAMPLER_TESTS += sampler/NewObjectSample_as.swf
+SAMPLER_TESTS_V9 += sampler/NewObjectSample_as.swf
 endif
 
 if BUILD_SAMPLE_AS3
-SAMPLER_TESTS += sampler/Sample_as.swf
+SAMPLER_TESTS_V9 += sampler/Sample_as.swf
 endif
 
 if BUILD_STACKFRAME_AS3
-SAMPLER_TESTS += sampler/StackFrame_as.swf
+SAMPLER_TESTS_V9 += sampler/StackFrame_as.swf
 endif
 
-check_SCRIPTS += $(SAMPLER_TESTS)
+check_SCRIPTS += $(SAMPLER_TESTS_V9)
 HAXE_FLAGS += -cp $(SAMPLERdir)

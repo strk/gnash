@@ -17,19 +17,20 @@
 
 PRINTINGdir = $(srcdir)/printing
 
-PRINTING_TESTS = 
+PRINTING_TESTS_V9 = 
+PRINTING_TESTS_V7 =
 
 if BUILD_PRINTJOBOPTIONS_AS3
-PRINTING_TESTS += printing/PrintJobOptions_as.swf
+PRINTING_TESTS_V9 += printing/PrintJobOptions_as.swf
 endif
 
 if BUILD_PRINTJOBORIENTATION_AS3
-PRINTING_TESTS += printing/PrintJobOrientation_as.swf
+PRINTING_TESTS_V9 += printing/PrintJobOrientation_as.swf
 endif
 
 if BUILD_PRINTJOB_AS3
-PRINTING_TESTS += printing/PrintJob_as.swf
+PRINTING_TESTS_V7 += printing/PrintJob_as.swf
 endif
 
-check_SCRIPTS += $(PRINTING_TESTS)
+check_SCRIPTS += $(PRINTING_TESTS_V7) $(PRINTING_TESTS_V9)
 HAXE_FLAGS += -cp $(PRINTINGdir)
