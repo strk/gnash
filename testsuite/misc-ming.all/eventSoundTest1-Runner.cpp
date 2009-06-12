@@ -80,14 +80,14 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Make sure you adjust this with the test!
 	cerr << "Total frames: " <<  totalFrames << endl;
-	assert (totalFrames == 24);
+	assert (totalFrames == 23);
 
 	int numSoundsStarted[] = {
 		0, 
 		4, // Multiple   (+4 sounds started)
 		6, // NoMultiple (+2 sounds started)
         9, // Trimmed    (+3 sounds started)
-        15 // Attached   (+6 sounds started)
+        14 // Attached   (+5 sounds started)
 	};
 
 	/// Expected success for each test

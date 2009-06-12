@@ -34,6 +34,8 @@ void setupMovie(SWFMovie mo, const char* srcdir);
 SWFSound setupSounds(const char* filename);
 void runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame);
 void runNoMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame);
+void runTrimmedSoundsTest(SWFMovie mo, SWFSound so, int* frame);
+void runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame);
 void pauseForNextTest(SWFMovie mo);
 void endOfTests(SWFMovie mo);
 void printFrameInfo(SWFMovie mo, int i, const char* desc);
@@ -153,7 +155,9 @@ runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
     /// make sure the correct object is notified.
     add_actions(mo, "s2.start(); delete s2;");
 
-    for (i = 0; i < 4; i++)
+    printFrameInfo(mo, 0, frameDesc[0]);
+
+    for (i = 1; i < 4; i++)
     {
         SWFMovie_nextFrame(mo);
         
@@ -163,11 +167,11 @@ runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
         add_actions(mo, "s.start();");
     }
 
-    add_actions(mo, "xcheck_equals(cs, 2);");
+    add_actions(mo, "xcheck_equals(cs, 1);");
 
     SWFMovie_nextFrame(mo);
     
-    add_actions(mo, "xcheck_equals(cs, 3);");
+    add_actions(mo, "xcheck_equals(cs, 2);");
     
     // Check that Sound.onSoundComplete isn't executed if the Sound is
     // deleted. This only passes currently because onSoundComplete is never
@@ -262,7 +266,6 @@ void
 runTrimmedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
 {
     SWFSoundInstance so_in;
-    int i;
 
     SWFMovie_nextFrame(mo);
     add_actions(mo,
