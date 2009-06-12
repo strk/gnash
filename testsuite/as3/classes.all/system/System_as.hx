@@ -521,7 +521,7 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	    DejaGnu.fail("System.capabilities.useCodepage is not a bool");
 	}
 
-#if (flash6 || flash7 ||flsah8 || flash9)
+#if (flash6 || flash7 ||flash8 || flash9)
 	if (untyped System.Product.prototype.hasOwnProperty("launch") ){
 		 DejaGnu.fail("System.Product.ptototype 'launch' should not exist, but it exists"); 
 	} else {

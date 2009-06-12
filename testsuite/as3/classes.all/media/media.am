@@ -19,44 +19,45 @@ MEDIAdir = $(srcdir)/media
 
 #AM_CPPFLAGS += -I$(MEDIAdir)
 
-MEDIA_TESTS = 
+MEDIA_TESTS_V9 = 
+MEDIA_TESTS_V6 = 
 
 if BUILD_CAMERA_AS3
-MEDIA_TESTS += media/Camera_as.swf
+MEDIA_TESTS_V6 += media/Camera_as.swf
 endif
 
 if BUILD_ID3INFO_AS3
-MEDIA_TESTS += media/ID3Info_as.swf
+MEDIA_TESTS_V9 += media/ID3Info_as.swf
 endif
 
 if BUILD_MICROPHONE_AS3
-MEDIA_TESTS += media/Microphone_as.swf
+MEDIA_TESTS_V6 += media/Microphone_as.swf
 endif
 
 if BUILD_SOUNDCHANNEL_AS3
-MEDIA_TESTS += media/SoundChannel_as.swf
+MEDIA_TESTS_V9 += media/SoundChannel_as.swf
 endif
 
 if BUILD_SOUNDLOADERCONTEXT_AS3
-MEDIA_TESTS += media/SoundLoaderContext_as.swf
+MEDIA_TESTS_V9 += media/SoundLoaderContext_as.swf
 endif
 
 if BUILD_SOUNDMIXER_AS3
-MEDIA_TESTS += media/SoundMixer_as.swf
+MEDIA_TESTS_V9 += media/SoundMixer_as.swf
 endif
 
 if BUILD_SOUNDTRANSFORM_AS3
-MEDIA_TESTS += media/SoundTransform_as.swf
+MEDIA_TESTS_V9 += media/SoundTransform_as.swf
 endif
 
 if BUILD_SOUND_AS3
-MEDIA_TESTS += media/Sound_as.swf
+MEDIA_TESTS_V6 += media/Sound_as.swf
 endif
 
 if BUILD_VIDEO_AS3
-MEDIA_TESTS += media/Video_as.swf
+MEDIA_TESTS_V6 += media/Video_as.swf
 endif
 
-check_SCRIPTS += $(MEDIA_TESTS)
+check_SCRIPTS += $(MEDIA_TESTS_V6) $(MEDIA_TESTS_V9)
 HAXE_FLAGS += -cp $(MEDIAdir)
 
