@@ -228,7 +228,6 @@ scrollkeeper-update -q || :
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
 %{_bindir}/dumpshm
-%{_bindir}/cygnal
 %{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so
 %{_prefix}/share/gnash/GnashG.png
@@ -256,6 +255,7 @@ scrollkeeper-update -q || :
 %files cygnal
 %defattr(-,root,root,-)
 %{_bindir}/cygnal
+%{_libdir}/libcygnal.*
 
 %files devel
 %{_prefix}/include/gnash/*.h
