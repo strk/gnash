@@ -24,7 +24,8 @@ DIR_MING += misc-ming.all actionscript.all
 endif
 
 if HAS_NETCAT
-DIR_MING += network.all
+# don't build the network tests yet till they're fully implemented
+DIR_MING += # network.all
 endif
 
 if ENABLE_MTASC
@@ -89,7 +90,7 @@ SUBDIRS = \
 	movies.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp
+EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp network.all
 
 
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
