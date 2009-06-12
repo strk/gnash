@@ -87,6 +87,13 @@ main(int argc, char** argv)
 
   it = SWFMovie_add(mo, mc);
   SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);
 
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
