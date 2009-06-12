@@ -1175,7 +1175,10 @@ if test x"${build_alp}" = xyes; then
   if test x"${have_alp}" = x"yes"; then
     AC_DEFINE([HAVE_ALP], 1, [Access Linux Platform framework])
   fi
-  cross_compiling=yes
+  dnl @@ It makes NO sense to set cross_compiling here,
+  dnl @@ *after* it is used in conditionals above
+  dnl @@ (AM_CONDITIONAL and directories search)
+  dnl cross_compiling=yes
 dnl  build_gtk=yes
   build_kde3=no
   build_ogl=no
