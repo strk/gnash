@@ -324,7 +324,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
     { microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_MEDIA, 6 },
     { sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_NET, 6 },
+        NSV::NS_FLASH_NET, 5 },
     { loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
     { LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_NET, 6 },
