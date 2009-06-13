@@ -74,7 +74,7 @@ test_perms:
 	    echo "Or configure with --with-kde-prefix= set to a writable directory"; \
 	    exit 1; \
           fi; \
-	  if test -d $(DESTDIR)$(kde_servicesdir); then \
+	  if test -d $(DESTDIR)$(kde_servicesdir) -a -d $(DESTDIR)$(kde_appsdatadir); then \
 	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
 	    echo "You probably need to be root"; \
 	    echo "Or configure with --with-kde-prefix= set to a writable directory"; \
