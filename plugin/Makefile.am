@@ -143,7 +143,7 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 
 if !WIN32
 if NPAPI
-install-plugin: $(plugin_LTLIBRARIES) $(PKGLIB)
+install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
 	@if test -d .libs; then \
@@ -152,11 +152,11 @@ install-plugin: $(plugin_LTLIBRARIES) $(PKGLIB)
 	  cp -f libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
 else # NPAPI
-install-plugin:
+install-plugin install-plugins:
 	: # do nothing
 endif
 else
-install-plugin: 
+install-plugin install-plugins: 
 	: # do nothing
 endif # WIN32
 
@@ -171,7 +171,7 @@ endif # WIN32
 install-pkglib:
 	$(MAKE) -C xpcom install-pkglib
 
-uninstall-plugin: 
+uninstall-plugin uninstall-plugins: 
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
 
 .PHONY : install-plugins install-plugin test_perms
