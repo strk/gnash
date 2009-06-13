@@ -33,19 +33,30 @@
 #include <cstdlib>
 
 #if defined(WIN32) || defined(_WIN32)
-#define LIBLTDL_DLL_IMPORT 1
+# define LIBLTDL_DLL_IMPORT 1
 #endif
-#include <ltdl.h>
 #ifdef HAVE_DLFCN_H
-	#include <dlfcn.h>
+# include <dlfcn.h>
 #endif
 #ifdef HAVE_LIBGEN_H
-	#include <libgen.h>
+# include <libgen.h>
 #endif
+
+#include "ltdl.h"
 #include <boost/thread/mutex.hpp>
 
+#if defined(WIN32) || defined(_WIN32)
+int        lt_dlsetsearchpath   (const char *search_path);
+int        lt_dlinit           (void);
+void *     lt_dlsym            (lt_dlhandle handle, const char *name);
+const char *lt_dlerror         (void);
+int        lt_dlclose          (lt_dlhandle handle);
+int        lt_dlmakeresident   (lt_dlhandle handle);
+lt_dlhandle lt_dlopenext       (const char *filename);
+#endif
+
 #if defined(_WIN32) || defined(WIN32)
-#	define PLUGINSDIR "./"
+# define PLUGINSDIR "./"
 #endif
 
 

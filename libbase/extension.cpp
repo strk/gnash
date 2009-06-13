@@ -36,15 +36,25 @@
 #if defined(WIN32) || defined(_WIN32)
 #define LIBLTDL_DLL_IMPORT 1
 #endif
-#include <ltdl.h>
 #include <cstring>
 #include <iostream>
 #include <sys/types.h>
 
 #include "log.h"
+#include "ltdl.h"
 #include "sharedlib.h"
 #include "extension.h"
 #include "as_object.h"
+
+#if defined(WIN32) || defined(_WIN32)
+int        lt_dlsetsearchpath   (const char *search_path);
+int        lt_dlinit           (void);
+void *     lt_dlsym            (lt_dlhandle handle, const char *name);
+const char *lt_dlerror         (void);
+int        lt_dlclose          (lt_dlhandle handle);
+int        lt_dlmakeresident   (lt_dlhandle handle);
+lt_dlhandle lt_dlopenext       (const char *filename);
+#endif
 
 #if HAVE_DIRENT_H || WIN32==1    // win32 hack
 # include <dirent.h>
