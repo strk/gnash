@@ -144,19 +144,19 @@ include $(srcdir)/packaging/xpi.am
 CLEANFILES += bzrversion.h
 BUILT_SOURCES = bzrversion.h
 bzrversion.h: Makefile.in
-	@status=`cd $(srcdir) && bzr version-info --custom --template={revno}`; \
-	if test $${status} -gt 0; then \
+	@status=`which bzr 2>&1 | grep -c " no bz"`; \
+	if test x"$${status}" = x"0"; then \
 	   echo "Generating bzrversion.h"; \
 	   $(RM) -f bzrversion.h; \
-	   (cd $(srcdir) && bzr version-info --custom --template='static const char *BRANCH_REVNO  = "{revno}";\nstatic const char *BRANCH_NICK = "{branch_nick}";\n') > bzrversion.h; \
+	   revno=`(cd $(srcdir) && bzr revno)`; \
+	   nick=`basename $(top_srcdir)`; \
 	else \
-	  if test -e bzrversion.h; then \
-	    echo "Using existing bzrversion.h"; \
-	else \
-	    echo "Generating bzrversion.h"; \
-	    echo -e 'static const char *BRANCH_REVNO  = '\"${NOW}\"';\nstatic const char *BRANCH_NICK = "none";\n' > bzrversion.h; \
-	  fi; \
-	fi
+	   revno="${NOW}"; \
+	   nick="none"; \
+	fi; \
+	echo "Generating bzrversion.h"; \
+	echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > bzrversion.h; \
+	echo "static const char *BRANCH_NICK = \"$${nick}\";" >> bzrversion.h;
 
 BRANCH_REVNO  = `grep "REVNO" bzrversion.h | cut -d '"' -f 2`
 BRANCH_NICK   = `grep "NICK" bzrversion.h | cut -d '"' -f 2`
