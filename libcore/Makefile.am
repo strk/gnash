@@ -315,7 +315,7 @@ if HAVE_SPEEX
 endif
 else
   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
- 	$(top_builddir)/libsound/libgnashsound.la
+	$(top_builddir)/libsound/libgnashsound.la
 endif
 
 # Rebuild with GCC 4.x Mudflap support

@@ -35,14 +35,14 @@ GNASH_LIBS = \
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
+	$(LIBINTL) \
 	$(LIBADD_DL) \
-	$(LIBLTDL) \
 	$(MYSQL_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIBINTL) \
+	$(LIBLTDL) \
 	$(NULL)
 
 localedir = $(datadir)/locale
@@ -87,17 +87,18 @@ bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
 
 gprocessor_SOURCES = processor.cpp
 # export our symbols so they can be used by Gnash plugins
-gprocessor_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
-gprocessor_LDADD = $(GNASH_LIBS) 
+gprocessor_LDFLAGS = -export-dynamic
+gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+gprocessor_DEPENDENCIES = $(LTDLDEPS)
 
 dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS)
+dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS)
+soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 flvdumper_SOURCES = flvdumper.cpp
-flvdumper_LDADD = $(GNASH_LIBS)
+flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

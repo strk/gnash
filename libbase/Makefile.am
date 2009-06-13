@@ -77,10 +77,10 @@ libgnashbase_la_LIBADD = \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
 	$(LIBINTL) \
-	$(LIBLTDL) \
-	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(LIBLTDL) \
+	$(LIBADD_DL) \
 	$(NULL)
 
 if WIN32
@@ -198,7 +198,8 @@ instdir = $(includedir)/gnash
 inst_HEADERS = $(EXTENSIONS_API)
 endif
 
-libgnashbase_la_LDFLAGS = -release $(VERSION)
+libgnashbase_la_LDFLAGS = -release $(VERSION) $(LIBLTDL)
+libgnashbase_la_DEPENDENCIES = $(LIBLTDL)
 
 if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined

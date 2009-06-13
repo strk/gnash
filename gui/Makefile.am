@@ -108,8 +108,8 @@ GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 # Only build loadable modules unless statically linking
@@ -120,7 +120,11 @@ GNASH_LIBS = \
 #      LIB_FLAGS = -release $(VERSION)
 # endif # ENABLE_SHARED
 # else # make shared libraries suitable for linking.
-      LIB_FLAGS = -release $(VERSION)
+LIB_FLAGS = -release $(VERSION)
+if WIN32
+LIB_FLAGS += --enable-auto-import
+endif
+
 # endif # DYNAMIC_GUI
 
 # AQUA Toolkit
