@@ -165,7 +165,6 @@ class AsBroadcaster_as {
 	DejaGnu.note("Note 4: " + Type.typeof(untyped myObj.addListener));
 	DejaGnu.note("Note 5: " + Type.typeof(untyped myObj.removeLitener));
 	
-
 /*
 // not sure if this can be tested because AsBroadcaster does not exist in haxe
 // There is no way to access the constructor
