@@ -78,7 +78,7 @@ noinst_HEADERS = \
 	crc.h
 
 bin_PROGRAMS = cygnal
-lib_LTLIBRARIES = libcygnal.la
+noinst_LTLIBRARIES = libcygnal.la
 
 cygnal_SOURCES = cygnal.cpp
 cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
