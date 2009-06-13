@@ -75,6 +75,14 @@ Cygnal is a streaming media server that's Flash aware.
 Summary:   Gnash header files
 Group:     Applications/Multimedia
 
+%package widget
+Summary:   Gnash widgets for Gtk and Python
+Group:     Applications/Multimedia
+
+%description widget
+The Gnash widgets can be used to embed Gnash into any Gtk or Python-Gtk
+application.
+
 %description devel
 Gnash header files can be used to write external Gnash extensions.
 
@@ -171,6 +179,11 @@ make $(MAKEFLAGS) dumpconfig all
 	--disable-dependency-tracking \
 	--disable-rpath \
 	--enable-cygnal \
+	--enable-ssl \
+	--enable-avm2 \
+	--enable-python \
+	--enable-jemalloc \
+	--enable-sdkinstall \
 	--disable-testsuite \
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
@@ -189,7 +202,7 @@ strip gui/.libs/*-gnash
 strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
 make $(MAKEFLAGS) install DESTDIR=$RPM_BUILD_ROOT
-make $(MAKEFLAGS) install-plugin DESTDIR=$RPM_BUILD_ROOT
+make $(MAKEFLAGS) install-plugins DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
 
@@ -255,13 +268,19 @@ scrollkeeper-update -q || :
 %files cygnal
 %defattr(-,root,root,-)
 %{_bindir}/cygnal
-%{_libdir}/libcygnal.*
 
 %files devel
 %{_prefix}/include/gnash/*.h
 %{_prefix}/lib/pkgconfig/gnash.pc
 
+%files widget
+%{_prefix}/include/gnash/*.h
+%{_prefix}/lib/python*/site-packages/gtk-2.0/gnash.*
+
 %changelog
+* Sat Jun 13 2009 Rob Savoye <rob@welcomehome.org> - trunk
+- Add support for packaging the gtk & python widget
+
 * Sat Feb 13 2009 Rob Savoye <rob@welcomehome.org> - trunk
 - Split off klash into it's own spec file.
 
