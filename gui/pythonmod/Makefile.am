@@ -20,6 +20,7 @@ pkgpyexecdir = $(pyexecdir)/gtk-2.0
 
 GNASH_INCLUDES = \
 	-I$(top_srcdir)/gui \
+	-I$(top_srcdir)/gui/pythonmod \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/backend	\
 	-I$(top_srcdir)/libcore	\
@@ -54,6 +55,9 @@ gnash_la_LIBADD = \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS) \
 	$(DEPS_LIBS)
+
+instdir = $(includedir)/gnash
+inst_HEADERS = gnash-view.h
 
 if BUILD_OGL_RENDERER
 RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_gtkglext.cpp
