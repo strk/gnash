@@ -2899,6 +2899,9 @@ void
 Machine::pushCall(as_function *func, as_object *pthis, as_value& return_slot,
 	unsigned char stack_in, short stack_out)
 {
+
+    log_abc("Pushing function call for function %s", func);
+
 	if (1 || func->isBuiltin())
 	{
 		immediateFunction(func, pthis, return_slot, stack_in, stack_out);
