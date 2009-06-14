@@ -142,7 +142,6 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Use \"make install-plugin\" to install the Firefox plugin to $(DESTDIR)$(plugindir)."
 
 if !WIN32
-if NPAPI
 install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
@@ -151,14 +150,16 @@ install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
 	else \
 	  cp -f libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
-else # NPAPI
-install-plugin install-plugins:
-	: # do nothing
+if KPARTS4
+	$(MAKE) -C klash4 install-plugins
+endif
+if KPARTS3
+	$(MAKE) -C klash install-plugins
 endif
 else
 install-plugin install-plugins: 
 	: # do nothing
-endif # WIN32
+endif	# end of if not windoze
 
 # install-plugins: install-plugin $(PKGLIB)
 # 	$(MAKE) -C klash install-plugins
