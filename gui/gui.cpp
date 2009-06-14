@@ -66,6 +66,12 @@
 //
 //#define DEBUG_MOUSE_COORDINATES 1
 
+// Define the following macro if you want to skip rendering
+// when late on FPS time.
+// This is an experimental feature, so it's off by default
+//#define SKIP_RENDERING_IF_LATE 1
+
+
 
 namespace gnash {
 

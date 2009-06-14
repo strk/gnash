@@ -41,12 +41,6 @@
 // gnashconfig.h
 //#define GNASH_FPS_DEBUG
 
-// Define the following macro if you want to skip rendering
-// when late on FPS time.
-// This is an experimental feature, so it's off by default
-//#define SKIP_RENDERING_IF_LATE
-
-
 /// Define this to disable region updates debugging altogether. If undefined,
 /// debugging will be a runtime option. The flag and flag-setting functions
 /// will not be disabled (too ugly).
