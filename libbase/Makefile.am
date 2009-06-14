@@ -198,7 +198,7 @@ instdir = $(includedir)/gnash
 inst_HEADERS = $(EXTENSIONS_API)
 endif
 
-libgnashbase_la_LDFLAGS = -release $(VERSION) $(LIBLTDL)
+libgnashbase_la_LDFLAGS = -release $(VERSION) 
 libgnashbase_la_DEPENDENCIES = $(LIBLTDL)
 
 if WIN32
