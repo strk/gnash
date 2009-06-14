@@ -1429,7 +1429,9 @@ Machine::execute()
                     as_function *func = super->get_constructor();
                     if (!func) {
                         log_abc("CONSTRUCTSUPER: %s has no constructor");
+                        return;
                     }
+
                     // 'obj' is the 'this' for the call, we ignore the
                     // return, there are argc arguments, and we drop all
                     // of the arguments plus 'obj' from the stack.
@@ -2849,22 +2851,21 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-Machine::immediateFunction(const as_function * /*to_call*/,
-        as_object* /*pThis*/, as_value& /*storage*/,
-        unsigned char /*stack_in*/, short /*stack_out*/)
+Machine::immediateFunction(const as_function* func,
+        as_object* thisptr, as_value& storage,
+        unsigned char stack_in, short stack_out)
 {
-	// TODO: Set up the fn, or remove the need.
+    assert(func);
 
-#if 0
-	fn_call fn(NULL, NULL, 0, 0);
+	// TODO: Set up the fn to use the stack
+	fn_call fn(thisptr, as_environment(_vm));
 	mStack.drop(stack_in - stack_out);
 	saveState();
-	mThis = pThis;
+	mThis = thisptr;
 	mStack.grow(stack_in - stack_out);
 	mStack.setDownstop(stack_in);
-	storage = const_cast<as_function*>(to_call)->call(fn);
+	storage = const_cast<as_function*>(func)->call(fn);
 	restoreState();
-#endif
 }
 
 void
