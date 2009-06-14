@@ -58,9 +58,15 @@ endif
 		--prefix=/usr \
 		--mandir=/usr/share/man \
 		--infodir=/usr/share/info \
-		--disable-testsuite \
+		--disable-dependency-tracking \
 		--disable-rpath \
 		--enable-cygnal \
+		--enable-ssl \
+		--enable-avm2 \
+		--enable-python \
+		--enable-jemalloc \
+		--enable-sdkinstall \
+		--disable-testsuite \
 		--enable-media=ffmpeg \
 		--enable-gui=gtk,kde4 \
 		--enable-renderer=agg \

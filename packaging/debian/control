@@ -139,3 +139,18 @@ Description: free SWF movie player - Plugin for Konqueror
  This package includes the plugin for Konqueror.
  .
  Homepage: http://www.gnu.org/software/gnash/
+
+Package: gtk-plugin-gnash
+Section: libs
+Architecture: any
+Depends: gnash (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
+Xb-Npp-MimeType: application/x-shockwave-flash
+Xb-Npp-Name: Gnash SWF Player
+Description: free SWF movie player - Plugin for Gtk and PyGtk donated by 
+ Sugar Labs.
+ .
+ This package includes the plugin for Gtk and PyGtk..
+ .
+ Homepage: http://www.gnu.org/software/gnash/
+
