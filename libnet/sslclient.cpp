@@ -26,10 +26,12 @@
 #include <boost/shared_array.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/array.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <cstring>
 #include <sstream>
@@ -51,11 +53,7 @@
 
 #ifdef HAVE_OPENSSL_SSL_H
 #include <openssl/ssl.h>
-#endif
-
-// Not POSIX, so best not rely on it if possible.
-#ifndef PATH_MAX
-# define PATH_MAX 1024
+#include <openssl/err.h>
 #endif
 
 #if defined(_WIN32) || defined(WIN32)
@@ -75,42 +73,98 @@ static boost::mutex stl_mutex;
 // This is static in this file, instead of being a private variable in
 // the SSLCLient class, is so it's accessible from the C function callback,
 // which can't access the private data of the class.
-static std::string password;
+// static SSLClient::passwd_t password(SSL_PASSWD_SIZE);
+static SSLClient::passwd_t password;
 
 namespace gnash
 {
 
 SSLClient::SSLClient()
-    : _need_server_auth(true)
+    : _hostname("localhost"),
+      _calist(CA_LIST),
+      _keyfile(KEYFILE),
+      _rootpath(ROOTPATH),
+      _need_server_auth(true)
 {
     GNASH_REPORT_FUNCTION;
+
+    setPort(SSL_PORT);
 }
 
 SSLClient::~SSLClient()
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 }
 
 // Read bytes from the already opened SSL connection
 size_t
-SSLClient::sslRead(SSL &ssl, amf::Buffer &buf, size_t length)
+SSLClient::sslRead(amf::Buffer &buf)
+{
+//     GNASH_REPORT_FUNCTION;
+
+    return sslRead(buf.reference(), buf.allocated());
+}
+
+size_t
+SSLClient::sslRead(boost::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
+    
+//    return SSL_Read(_ssl.get(), buf, size);
 }
 
 // Write bytes to the already opened SSL connection
 size_t
-SSLClient::sslWrite(SSL &ssl, amf::Buffer &buf, size_t length)
+SSLClient::sslWrite(amf::Buffer &buf)
+{
+//     GNASH_REPORT_FUNCTION;
+
+    return sslWrite(buf.reference(), buf.allocated());
+}
+
+size_t
+SSLClient::sslWrite(boost::uint8_t *buf, size_t length)
 {
     GNASH_REPORT_FUNCTION;
+
+    size_t ret = SSL_write(_ssl.get(), buf, length);
+
+    return ret;
 }
 
 // Setup the Context for this connection
-size_t
-SSLClient::sslSetupCTX(SSL &ssl)
+bool
+SSLClient::sslSetupCTX()
+{
+    return sslSetupCTX(_keyfile, _calist);
+}
+
+bool
+SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 {
     GNASH_REPORT_FUNCTION;
     SSL_METHOD *meth;
+    int ret;
+    string keyfile;
+    string cafile;
+
+    if (keyspec.find('/', 0) != string::npos) {
+	keyfile = keyspec;
+    } else {
+	keyfile = _rootpath;
+	keyfile += "/";
+	keyfile += keyspec;
+    }
+    
+    
+    if (caspec.find('/', 0) != string::npos) {
+	cafile = caspec;
+    } else {
+	cafile = _rootpath;
+	cafile += "/";
+	cafile += caspec;
+    }
+    
     SSL_library_init();
     SSL_load_error_strings();
     
@@ -119,78 +173,104 @@ SSLClient::sslSetupCTX(SSL &ssl)
     }
 
     // create the context
-    meth=SSLv23_method();
+    meth = SSLv23_method();
     _ctx.reset(SSL_CTX_new(meth));
-
     
     // Load our keys and certificates
-    if(!(SSL_CTX_use_certificate_chain_file(_ctx.get(), _keyfile.c_str()))) {
-	log_error("Can't read certificate file %s!", _keyfile);
+    if ((ret = SSL_CTX_use_certificate_chain_file(_ctx.get(), keyfile.c_str())) != 1) {
+	log_error("Can't read certificate file \"%s\"!", keyfile);
+	return false;
+    } else {
+	log_error("Read certificate file \"%s\".", keyfile);
     }
 
+    // Set the passwor dcallback
     SSL_CTX_set_default_passwd_cb(_ctx.get(), password_cb);
-    if(!(SSL_CTX_use_PrivateKey_file(_ctx.get(), _keyfile.c_str(),
-				     SSL_FILETYPE_PEM))) {
-	log_error("Can't read key file %s!", _keyfile);
+
+    // Add the first private key in the keyfile to the context.
+    ERR_clear_error();
+    if((ret = SSL_CTX_use_PrivateKey_file(_ctx.get(), keyfile.c_str(),
+					  SSL_FILETYPE_PEM)) != 1) {
+	log_error("Can't read key file \"%s\"!", keyfile);
+ 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+//	return false;
+    } else {
+	log_error("Read key file \"%s\".", keyfile);
     }
 
     // Load the CAs we trust
-    if(!(SSL_CTX_load_verify_locations(_ctx.get(), CA_LIST, 0))) {
-	log_error("Can't read CA list!");
+    ERR_clear_error();
+    if (!(SSL_CTX_load_verify_locations(_ctx.get(), cafile.c_str(), 0))) {
+	log_error("Can't read CA list from \"%s\"!", cafile);
+ 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	return false;
+    } else {
+	log_error("Read CA list from \"%s\"!", cafile);
     }
     
 #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
     SSL_CTX_set_verify_depth(_ctx.get() ,1);
 #endif
 
+    return true;
 }
 
 // Shutdown the Context for this connection
-size_t
-SSLClient::sslShutdown(SSL &ssl)
+bool
+SSLClient::sslShutdown()
 {
     GNASH_REPORT_FUNCTION;
 
     SSL_CTX_free(_ctx.get());
 
-    closeNet();
+    return closeNet();
 }
 
 // sslConnect() is how the client connects to the server 
-size_t
+bool
+SSLClient::sslConnect()
+{
+    return sslConnect(_hostname);
+}
+
+bool
 SSLClient::sslConnect(std::string &hostname)
 {
     GNASH_REPORT_FUNCTION;
 
     if (!_ctx) {
-	sslSetupCTX(*_ssl);
+	if (!sslSetupCTX()) {
+	    return false;
+	}
     }
 
     _ssl.reset(SSL_new(_ctx.get()));
 
-    if (createClient(hostname, SSL_PORT) == false) {
-        log_error("Can't connect to RTMP server %s", hostname);
-        return(-1);
+    if (createClient(hostname, getPort()) == false) {
+        log_error("Can't connect to SSL server %s", hostname);
+        return false;
     }
 
     _bio.reset(BIO_new_socket(getFileFd(), BIO_NOCLOSE));
     if (SSL_connect(_ssl.get()) <= 0) {
         log_error("Can't connect to SSL server %s", hostname);
-        return(-1);
+        return false;
     }
 
     if (_need_server_auth) {
 	checkCert(hostname);
     }
 
-    return 0;
+    return true;
 }
 
 // sslAccept() is how the server waits for connections for clients
 size_t
-SSLClient::sslAccept(SSL &ssl)
+SSLClient::sslAccept()
 {
     GNASH_REPORT_FUNCTION;
+
+    return 0;
 }
 
 bool
@@ -234,22 +314,36 @@ SSLClient::dump() {
     log_debug (_("==== The SSL header breaks down as follows: ===="));
 }
 
+// void
+// SSLClient::setPassword(boost::array<boost::uint8_t> pw) {
+//     password = pw;
+// }
+
+SSLClient::passwd_t &
+SSLClient::getPassword() {
+    return password;
+}    
+
 extern "C" {
+
 // This is the callback required when setting up the password. 
 int
-password_cb(char *buf, int size, int rwflag,
-		       void *userdata)
+password_cb(char *buf, int size, int rwflag, void *userdata)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+    log_debug("Callback executed to set the SSL password, size", size);
     
-    if(size < password.size()) {
+    if(size < static_cast<int>(password.size())) {
 	log_error("The buffer for the password needs to be %d bytes larger",
 		  password.size() - size);
 	return(0);
     }
 
-    std::copy(password.c_str(), password.c_str(), buf);
-    return(password.size());
+    // copy the password, we'll need it later
+    std::copy(buf, buf + size, password.data());    
+    
+    return(size);
+    
 }
 } // end of extern C
 
