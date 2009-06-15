@@ -38,6 +38,8 @@
 #include <locale>
 #endif
 
+#include "swf/TagLoadersTable.h"
+#include "swf/DefaultTagLoaders.h"
 #include "gettext.h"
 #include "ClockTime.h"
 #include "gnash.h"
@@ -372,6 +374,9 @@ main(int argc, char *argv[])
     boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
     std::vector<movie_data>	data;
+        
+    boost::shared_ptr<const SWF::TagLoadersTable> loaders(
+           new SWF::TagLoadersTable(SWF::defaultTagLoaders()));
 
     // Play through all the movies.
     for (std::vector<std::string>::const_iterator i = infiles.begin(), 
@@ -381,6 +386,7 @@ main(int argc, char *argv[])
         RunInfo runInfo(*i);
         runInfo.setSoundHandler(soundHandler);
         runInfo.setStreamProvider(sp);
+        runInfo.setTagLoaders(loaders);
 
 	    boost::intrusive_ptr<gnash::movie_definition> m =
             play_movie(*i, runInfo);

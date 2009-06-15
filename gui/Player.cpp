@@ -36,6 +36,8 @@
 #include "Player.h"
 #include "StreamProvider.h"
 
+#include "swf/TagLoadersTable.h"
+#include "swf/DefaultTagLoaders.h"
 #include "NamingPolicy.h"
 #include "StringPredicates.h"
 #include "URL.h"
@@ -376,6 +378,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     /// The RunInfo should be populated before parsing.
     _runInfo.reset(new RunInfo(baseURL.str()));
     _runInfo->setSoundHandler(_soundHandler);
+
+    boost::shared_ptr<const SWF::TagLoadersTable> loaders(
+            new SWF::TagLoadersTable(SWF::defaultTagLoaders()));
+    _runInfo->setTagLoaders(loaders);
 
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
     boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));

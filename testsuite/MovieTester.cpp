@@ -35,6 +35,8 @@
 #include "render_handler.h"
 #include "ManualClock.h" // for use by advance
 #include "StreamProvider.h" // for passing to RunInfo
+#include "swf/TagLoadersTable.h"
+#include "swf/DefaultTagLoaders.h"
 #ifdef RENDERER_CAIRO
 # include "render_handler_cairo.h"
 #endif
@@ -57,6 +59,7 @@
 #include <memory> // for auto_ptr
 #include <cmath> // for ceil and (possibly) exp2
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
 
@@ -86,6 +89,11 @@ MovieTester::MovieTester(const std::string& url)
 
     _runInfo.reset(new RunInfo(url));
     _runInfo->setSoundHandler(_sound_handler);
+    
+    boost::shared_ptr<const SWF::TagLoadersTable> loaders(
+           new SWF::TagLoadersTable(SWF::defaultTagLoaders()));
+
+    _runInfo->setTagLoaders(loaders);
 
     _runInfo->setStreamProvider(boost::shared_ptr<StreamProvider>(
                 new StreamProvider));
