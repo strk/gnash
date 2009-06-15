@@ -58,6 +58,7 @@ static string infile;
 
 static void test_client();
 static SSLClient client;
+static Network net;
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -102,9 +103,9 @@ main(int argc, char *argv[])
                             client.getHostname());
                   break;
               case 'o':
-                  client.setPort(parser.argument<short>(i));
+                  net.setPort(parser.argument<short>(i));
                   log_debug(_("Port for SSL connections is: %hd"),
-                            client.getPort());
+                            net.getPort());
                   break; 
               case 'c':
                   client.setCert(parser.argument(i));
@@ -137,7 +138,7 @@ main(int argc, char *argv[])
                             client.getPassword());
                   break;
               case 'n':
-                  client.toggleDebug(true);
+                  net.toggleDebug(true);
                   break;
               case 0:
                   infile = parser.argument(i);
@@ -159,8 +160,13 @@ static void test_client()
 {
     size_t ret;
     bool giveup = false;    
-    
-    if (client.sslConnect()) {
+
+    // Make a tcp/ip connect to the server
+    if (net.createClient(client.getHostname(), SSL_PORT) == false) {
+	log_error("Can't connect to server %s", client.getHostname());
+    }
+
+    if (client.sslConnect(net.getFileFd())) {
         runtest.pass("Connected to SSL server");
     } else {
         runtest.fail("Couldn't connect to SSL server");
@@ -195,13 +201,16 @@ static void test_client()
         runtest.unresolved("Couldn't write to SSL connection");
     } else {
         amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
+	request.dump();
+
         if ((ret = client.sslWrite(request)) == request.allocated()) {
             runtest.pass("Wrote bytes to SSL connection");
         } else {
             runtest.fail("Couldn't write to SSL connection.");
         }
     }
-    
+
+#if 0    
     if (giveup) {
         runtest.unresolved("Couldn't read bytes from SSL connection");
     } else {
@@ -212,7 +221,8 @@ static void test_client()
             runtest.fail("Couldn't read bytes to SSL connection.");
         }
     }
-    
+#endif
+
     if (giveup) {
         runtest.unresolved("Couldn't shutdown SSL connection");
     } else {
@@ -229,10 +239,10 @@ static void
 usage (void)
 {
     cerr << "This program tests SSL support in the libnet library." << endl;
-    cerr << "Usage: test_ssl [hv]" << endl;
+    cerr << "Usage: test_ssl [hvsocpkwar]" << endl;
     cerr << "-h\tHelp" << endl;
     cerr << "-v\tVerbose" << endl;
-    cerr << "-n\tname of host" << endl;
+    cerr << "-s\thostname" << endl;
     cerr << "-o\tPort" << endl;
     cerr << "-c\tCert File" << endl;
     cerr << "-p\tPem file" << endl;
