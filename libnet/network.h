@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 # include <sys/types.h>
 # include <netinet/in.h>
@@ -43,13 +42,17 @@
 # include <io.h>
 #endif
 
-#include "dsodefs.h" //For DSOEXPORT.
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/mutex.hpp>
 #include <vector>
 #include <cassert>
 #include <string>
 #include <map>
+
+#include "dsodefs.h" //For DSOEXPORT.
+#include "sslclient.h"
 
 namespace amf {
 class Buffer;
@@ -58,6 +61,8 @@ class Buffer;
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
+
+class SSLClient;
 
 // Define the ports for the RTMP protocols
 const short ADMIN_PORT  = 1111;
@@ -296,6 +301,8 @@ public:
     // This is the mutex that controls access to the que.
     boost::mutex	_poll_mutex;
     boost::mutex	_net_mutex;
+    boost::scoped_ptr<SSLClient> _ssl;
+//     boost::scoped_ptr<gnash::Encrypt> _encrypt;
 };
 
 } // end of gnash namespace
