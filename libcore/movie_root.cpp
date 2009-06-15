@@ -425,7 +425,7 @@ bool
 movie_root::loadLevel(unsigned int num, const URL& url)
 {
 	boost::intrusive_ptr<movie_definition> md (
-            MovieFactory::createMovie(url, _runInfo));
+            MovieFactory::makeMovie(url, _runInfo));
 	if (!md)
 	{
 		log_error(_("can't create movie_definition for %s"), url.str());

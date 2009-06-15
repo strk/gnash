@@ -99,7 +99,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 
 movie_definition*
-MovieFactory::createMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunInfo& runInfo, bool startLoaderThread)
 {
   assert(in.get());
@@ -169,7 +169,7 @@ createNonLibraryMovie(const URL& url, const RunInfo& runInfo,
   }
 
   std::string movie_url = reset_url ? reset_url : url.str();
-  movie_definition* ret = MovieFactory::createMovie(in, movie_url, runInfo,
+  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runInfo,
           startLoaderThread);
 
   return ret;
@@ -334,7 +334,7 @@ static void clear_library()
 // return a pointer to it.
 //
 movie_definition*
-MovieFactory::createMovie(const URL& url, const RunInfo& runInfo,
+MovieFactory::makeMovie(const URL& url, const RunInfo& runInfo,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {

@@ -858,7 +858,7 @@ void import_loader(SWFStream& in, TagType tag, movie_definition& m,
     boost::intrusive_ptr<movie_definition> source_movie;
 
     try {
-        source_movie = MovieFactory::createMovie(abs_url, r);
+        source_movie = MovieFactory::makeMovie(abs_url, r);
     }
     catch (gnash::GnashException& e) {
         log_error(_("Exception: %s"), e.what());

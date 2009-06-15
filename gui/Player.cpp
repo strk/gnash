@@ -263,7 +263,7 @@ Player::load_movie()
         {
             std::auto_ptr<IOChannel> in (
                     noseek_fd_adapter::make_stream(fileno(stdin)));
-            md = MovieFactory::createMovie(in, _url, *_runInfo, false);
+            md = MovieFactory::makeMovie(in, _url, *_runInfo, false);
         }
         else
         {
@@ -283,7 +283,7 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = MovieFactory::createMovie(url, *_runInfo, _url.c_str(),
+            md = MovieFactory::makeMovie(url, *_runInfo, _url.c_str(),
                     false);
         }
     } catch (const GnashException& er) {

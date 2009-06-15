@@ -2281,7 +2281,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         const movie_root& mr = _vm.getRoot();
 
         boost::intrusive_ptr<movie_definition> md(
-            MovieFactory::createMovie(url, mr.runInfo(), NULL, true, postdata));
+            MovieFactory::makeMovie(url, mr.runInfo(), NULL, true, postdata));
 
         if (!md)
         {

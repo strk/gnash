@@ -37,11 +37,11 @@ class MovieFactory
 {
 public:
     
-    static DSOEXPORT movie_definition* createMovie(const URL& url,
+    static DSOEXPORT movie_definition* makeMovie(const URL& url,
         const RunInfo& runInfo, const char* real_url = NULL,
         bool startLoaderThread = true, const std::string* postdata = NULL);
     
-    static DSOEXPORT movie_definition* createMovie(std::auto_ptr<IOChannel> in,
+    static DSOEXPORT movie_definition* makeMovie(std::auto_ptr<IOChannel> in,
             const std::string& url, const RunInfo& runInfo,
             bool startLoaderThread);
 };

@@ -103,7 +103,7 @@ MovieTester::MovieTester(const std::string& url)
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = MovieFactory::createMovie(in, url, *_runInfo, false);
+		_movie_def = MovieFactory::makeMovie(in, url, *_runInfo, false);
 	}
 	else
 	{
@@ -123,7 +123,7 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = MovieFactory::createMovie(urlObj, *_runInfo,
+		_movie_def = MovieFactory::makeMovie(urlObj, *_runInfo,
                 NULL, false);
 	}
 
