@@ -45,6 +45,9 @@ package hello {
         public function Hello() {
 
             check_equals(S, "[class S]");
+            check_equals(S.constructor, "[class Class]");
+            check_equals(S.__constructor__, undefined);
+            
             check_equals(S.s, null);
             check_equals(typeof(S.s), "object");
 
@@ -54,10 +57,17 @@ package hello {
             check_equals(Base, "[class Base]");
             check_equals(Derived, "[class Derived]");
 
+            check_equals(Derived.constructor, "[class Class]");
+            check_equals(Base.constructor, "[class Class]");
+            check_equals(Derived.__constructor__, undefined);
+            check_equals(Base.__constructor__, undefined);
+
             var b1 : Base = new Base();
             check(b1 instanceof Base);
             check(!(b1 instanceof Derived));
             check_equals(S.s, "Hello Base ");
+            
+            check_equals(b1.constructor, "[class Base]");
             
             S.s = "";
             var b2 : Base = new Derived();
