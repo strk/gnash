@@ -167,6 +167,7 @@ noinst_HEADERS = \
 	SWFMovie.h \
 	render.h \
 	SWFStream.h \
+	MovieLibrary.h \
 	swf/tag_loaders.h \
 	swf/DefaultTagLoaders.h \
 	swf/VideoFrameTag.h \

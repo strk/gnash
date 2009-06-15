@@ -36,6 +36,7 @@
 #include "StreamProvider.h"
 #include "MovieClip.h"
 #include "VM.h"
+#include "MovieLibrary.h"
 
 #ifdef GNASH_USE_GC
 #include "GC.h"
@@ -317,119 +318,6 @@ void  clear()
     // after it's been de-referenced (fixes bug #21310)
     set_render_handler(NULL);
 }
-
-//
-// library stuff, for sharing resources among different movies.
-//
-
-
-/// Library of SWF movies indexed by URL strings
-//
-/// Elements are actually SWFMovieDefinition, the ones
-/// associated with URLS. Dunno why, but we were using
-/// movie_definition here before so this didn't change
-/// when the new class was introduced.
-///
-class MovieLibrary
-{
-public:
-
-    struct LibraryItem {
-        boost::intrusive_ptr<movie_definition> def;
-        unsigned hitCount;
-    };
-
-    typedef std::map<std::string, LibraryItem> LibraryContainer;
-
-    MovieLibrary() : 
-        _limit(8) 
-    {
-        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-	    setLimit(rcfile.getMovieLibraryLimit());
-    }
-  
-    /// Sets the maximum number of items to hold in the library. When adding new
-    /// items, the one with the least hit count is being removed in that case.
-    /// Zero is a valid limit (disables library). 
-    void setLimit(unsigned limit)
-    {
-        _limit = limit;  
-        limitSize(_limit);  
-    }
-
-    bool get(const std::string& key, boost::intrusive_ptr<movie_definition>* ret)
-    {
-        LibraryContainer::iterator it = _map.find(key);
-        if ( it != _map.end() )
-        {
-            *ret = it->second.def;
-            it->second.hitCount++;
-      
-            return true;
-        }
-        return false;
-    }
-
-#ifdef GNASH_USE_GC
-    /// Mark all library elements as reachable (for GC)
-    void markReachableResources() const
-    {
-        for (LibraryContainer::const_iterator i=_map.begin(), e=_map.end();
-                i!=e; ++i)
-        {
-            i->second.def->setReachable();
-        }
-    }
-#endif
-
-    void add(const std::string& key, movie_definition* mov)
-    {
-
-        if (_limit)
-        {
-            limitSize(_limit-1);
-        }
-        else return;  // zero limit, library is a no-op
-
-        LibraryItem temp;
-
-        temp.def = mov;
-        temp.hitCount=0;
-
-        _map[key] = temp;
-    }
-  
-
-    void clear() { _map.clear(); }
-  
-private:
-
-    static bool findWorstHitCount(const MovieLibrary::LibraryContainer::value_type& a,
-                                const MovieLibrary::LibraryContainer::value_type& b)
-    {
-        return (a.second.hitCount < b.second.hitCount);
-    }
-
-    LibraryContainer _map;
-    unsigned _limit;
-
-    void limitSize(unsigned max) 
-    {
-
-        if (max < 1) 
-        {
-            clear();
-            return;
-        }
-
-        while (_map.size() > max) 
-        {
-            _map.erase(std::min_element(_map.begin(), _map.end(), &findWorstHitCount));
-        }
-    
-    }
-  
-};
 
 static MovieLibrary s_movie_library;
 
