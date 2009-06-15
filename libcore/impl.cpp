@@ -30,43 +30,12 @@
 #include "GnashImage.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
-#include "SWF.h"
-#include "swf/TagLoadersTable.h"
+#include "BitmapMovieDefinition.h"
 #include "RunInfo.h"
 #include "URL.h"
 #include "StreamProvider.h"
 #include "MovieClip.h"
 #include "VM.h"
-
-#include "swf/tag_loaders.h" 
-#include "ScriptLimitsTag.h"
-#include "BitmapMovieDefinition.h"
-#include "DefineFontAlignZonesTag.h"
-#include "DefineShapeTag.h"
-#include "DefineButtonCxformTag.h"
-#include "CSMTextSettingsTag.h"
-#include "DefineFontTag.h"
-#include "DefineButtonTag.h"
-#include "DefineTextTag.h"
-#include "PlaceObject2Tag.h"
-#include "RemoveObjectTag.h"
-#include "DoActionTag.h"
-#include "DoInitActionTag.h"
-#include "DefineEditTextTag.h"
-#include "SetBackgroundColorTag.h"
-#include "StartSoundTag.h"
-#include "StreamSoundBlockTag.h"
-#include "DefineButtonSoundTag.h"
-#include "DefineMorphShapeTag.h"
-#include "DefineVideoStreamTag.h"
-#include "DefineFontNameTag.h"
-#include "VideoFrameTag.h"
-#ifdef ENABLE_AVM2
-# include "SymbolClassTag.h"
-# include "DoABCTag.h"
-# include "DefineSceneAndFrameLabelDataTag.h"
-#endif
-
 
 #ifdef GNASH_USE_GC
 #include "GC.h"
@@ -76,7 +45,6 @@
 #include <map>
 #include <memory> // for auto_ptr
 #include <algorithm>
-#include <boost/assign.hpp>
 
 namespace gnash
 {
@@ -90,186 +58,6 @@ namespace {
 }
 
 static void clear_library();
-
-// Associate the specified tag type with the given tag loader
-// function.
-void
-register_tag_loader(const std::pair<SWF::TagType, SWF::TagLoadersTable::loader_function>& p)
-{
-  using SWF::TagLoadersTable;
-
-  TagLoadersTable& table = TagLoadersTable::getInstance();
-
-  bool loader_registered = table.register_loader(p.first, p.second);
-  assert(loader_registered);
-}
-
-static void ensure_loaders_registered()
-{
-    using namespace SWF::tag_loaders;
-    using namespace SWF;
-
-    static bool s_registered = false;
-
-    if (s_registered) return;
-
-    // Register the standard loaders.
-    s_registered = true;
-
-
-    static const
-        std::map<SWF::TagType, SWF::TagLoadersTable::loader_function> tags =
-        boost::assign::map_list_of
-
-    (SWF::END, end_loader)
-
-    (SWF::DEFINESHAPE, DefineShapeTag::loader)
-    (SWF::FREECHARACTER, fixme_loader) // 03
-    (SWF::PLACEOBJECT, PlaceObject2Tag::loader)
-    (SWF::REMOVEOBJECT, RemoveObjectTag::loader) // 05
-    (SWF::DEFINEBITS, define_bits_jpeg_loader)
-    (SWF::DEFINEBUTTON, DefineButtonTag::loader)
-    (SWF::JPEGTABLES, jpeg_tables_loader)
-    (SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader)
-    (SWF::DEFINEFONT, DefineFontTag::loader)
-    (SWF::DEFINETEXT, DefineTextTag::loader)
-    (SWF::DOACTION,  DoActionTag::loader)
-    (SWF::DEFINEFONTINFO, DefineFontInfoTag::loader)
-    // 62
-    (SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader)
-    (SWF::DEFINESOUND, define_sound_loader)
-    (SWF::STARTSOUND, StartSoundTag::loader)
-    // 89
-    (SWF::STARTSOUND2, StartSound2Tag::loader)
-
-    (SWF::STOPSOUND, fixme_loader) // 16 
-
-    // 17
-    (SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader)
-    // 18
-    (SWF::SOUNDSTREAMHEAD, sound_stream_head_loader)
-    // 19
-    (SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader)
-    (SWF::DEFINELOSSLESS, define_bits_lossless_2_loader)
-    (SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader)
-    (SWF::DEFINESHAPE2,  DefineShapeTag::loader)
-    (SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader) // 23
-    // "protect" tag; we're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    (SWF::PROTECT, null_loader)
-    (SWF::PATHSAREPOSTSCRIPT, fixme_loader) // 25
-    (SWF::PLACEOBJECT2,  PlaceObject2Tag::loader)
-    // 27 - _UNKNOWN_ unimplemented
-    (SWF::REMOVEOBJECT2, RemoveObjectTag::loader) // 28
-    (SWF::SYNCFRAME, fixme_loader) // 29
-    // 30 - _UNKNOWN_ unimplemented
-    (SWF::FREEALL, fixme_loader) // 31
-    (SWF::DEFINESHAPE3,  DefineShapeTag::loader)
-    (SWF::DEFINETEXT2, DefineText2Tag::loader)
-    // 37
-    (SWF::DEFINEBUTTON2, DefineButton2Tag::loader)
-    (SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader)
-    (SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader)
-    (SWF::DEFINEEDITTEXT, DefineEditTextTag::loader)
-    (SWF::DEFINEVIDEO, fixme_loader) // 38
-    (SWF::DEFINESPRITE,  sprite_loader)
-    (SWF::NAMECHARACTER, fixme_loader) // 40
-    (SWF::SERIALNUMBER,  serialnumber_loader) // 41
-    (SWF::DEFINETEXTFORMAT, fixme_loader) // 42
-    (SWF::FRAMELABEL,  frame_label_loader) // 43
-
-    // TODO: Implement, but fixme_loader breaks tests.
-    (SWF::DEFINEBEHAVIOR, fixme_loader) // 44
-
-    (SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader) // 45
-    // 46
-    (SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader)
-    (SWF::FRAMETAG,  fixme_loader) // 47
-    // 48
-    (SWF::DEFINEFONT2, DefineFontTag::loader)
-    (SWF::GENCOMMAND,  fixme_loader) // 49
-    (SWF::DEFINECOMMANDOBJ, fixme_loader) // 50
-    (SWF::CHARACTERSET,  fixme_loader) // 51
-    (SWF::FONTREF, fixme_loader) // 52
-
-    // TODO: Implement, but fixme_loader breaks tests.
-    (SWF::DEFINEFUNCTION, fixme_loader) // 53 
-    (SWF::PLACEFUNCTION, fixme_loader) // 54 
-    (SWF::GENTAGOBJECT, fixme_loader) // 55 
-
-    (SWF::EXPORTASSETS, export_loader) // 56
-    (SWF::IMPORTASSETS, import_loader) // 57
-
-    //  We're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    (SWF::ENABLEDEBUGGER, null_loader)    // 58
-
-    // 59
-    (SWF::INITACTION, DoInitActionTag::loader) 
-    // 60
-    (SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader)
-    // 61
-    (SWF::VIDEOFRAME, VideoFrameTag::loader)
-
-    // 62, DEFINEFONTINFO2 is done above.
-    // We're not an authoring tool.
-    (SWF::DEBUGID, null_loader) // 63
-
-    //  We're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    (SWF::ENABLEDEBUGGER2, null_loader)    // 64
-    (SWF::SCRIPTLIMITS, ScriptLimitsTag::loader) //65
-
-    // TODO: Fix this, but probably not critical.
-    (SWF::SETTABINDEX, fixme_loader) //66 
-
-    // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
-    // Tamarin. Figure out which one is correct (possibly both are).
-    // 67
-    (SWF::DEFINESHAPE4_, DefineShapeTag::loader)
-    // 68
-    (SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader)
-    // 69
-    (SWF::FILEATTRIBUTES, file_attributes_loader)
-    // 70
-    (SWF::PLACEOBJECT3, PlaceObject2Tag::loader)
-    // 71
-    (SWF::IMPORTASSETS2, import_loader)
-    // 73
-    (SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader)
-    // 74
-    (SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader)
-    // 75
-    (SWF::DEFINEFONT3, DefineFontTag::loader)
-    // 77
-    (SWF::METADATA, metadata_loader)
-    // 78
-    (SWF::DEFINESCALINGGRID, fixme_loader)
-    // 83
-    (SWF::DEFINESHAPE4, DefineShapeTag::loader)
-    // 84
-    (SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader)
-    // 88
-    (SWF::DEFINEFONTNAME, DefineFontNameTag::loader)
-    // 777
-    (SWF::REFLEX, reflex_loader)
-    
-    // The following tags are AVM2 only.
-
-#ifdef ENABLE_AVM2
-    // 72 -- AS3 codeblock.
-    (SWF::DOABC, DoABCTag::loader) 
-    // 76
-    (SWF::SYMBOLCLASS, SymbolClassTag::loader)
-    // 82
-    (SWF::DOABCDEFINE, DoABCTag::loader)
-    // 86
-    (SWF::DEFINESCENEANDFRAMELABELDATA,
-            DefineSceneAndFrameLabelDataTag::loader);
-#endif
-
-    std::for_each(tags.begin(), tags.end(), boost::bind(register_tag_loader, _1));
-}
 
 // Create a movie_definition from an image format stream
 // NOTE: this method assumes this *is* the format described in the
@@ -314,8 +102,6 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunInfo& runInfo, bool startLoaderThread)
 {
   assert(in.get());
-
-  ensure_loaders_registered();
 
   // see if it's a jpeg or an swf
   FileType type = getFileType(*in);

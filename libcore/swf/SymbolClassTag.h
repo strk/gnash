@@ -25,6 +25,7 @@
 #include "SWFStream.h" // for inlines
 #include "Machine.h"
 #include "VM.h"
+#include "sprite_definition.h"
 
 // Forward declarations
 namespace gnash {

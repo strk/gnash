@@ -48,44 +48,40 @@ public:
 	/// 't' is the tag type
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
-	typedef void (*loader_function)(SWFStream& input, TagType type,
+	typedef void (*TagLoader)(SWFStream& input, TagType type,
             movie_definition& m, const RunInfo& r);
 
-	/// \brief
-	/// Get a pointer to the loader_function for the
-	/// specified SWF::TagType.
+    typedef std::map<SWF::TagType, TagLoader> Loaders;
+
+    /// Construct an empty TagLoadersTable
+	TagLoadersTable() {}
+
+    /// Construct a TagLoadersTable by copying another table
+    TagLoadersTable(const Loaders& loaders)
+        :
+        _loaders(loaders)
+    {}
+	
+    ~TagLoadersTable() {}
+
+	/// Get the TagLoader for a specified TagType.
 	//
 	/// @return false if no loader is associated with the tag.
 	///
-	bool get(TagType t, loader_function* lf) const;
+	bool get(TagType t, TagLoader& lf) const;
 
-	/// \brief
 	/// Register a loader for the specified SWF::TagType.
 	//
+    /// This is part of an API for allowing external applications
+    /// to register custom tags, and is not used by Gnash itself.
 	/// @return false if a loader is already registered
 	///               for the given tag
 	///
-	bool register_loader(TagType t, loader_function lf);
-
-	/// \brief
-	/// Return a reference to the singleton instance
-	/// of this class.
-	static TagLoadersTable& getInstance();
+	bool registerLoader(TagType t, TagLoader lf);
 
 private:
 
-	/// The container being used for the table
-	typedef std::map<SWF::TagType, loader_function> container;
-
-	container _tag_loaders;
-
-	/// Use getInstance()
-	TagLoadersTable()
-		:
-		_tag_loaders()
-	{}
-
-	~TagLoadersTable() {}
+	Loaders _loaders;
 
 };
 

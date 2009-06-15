@@ -15,39 +15,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef GNASH_SWF_DEFAULTLOADERS_H
+#define GNASH_SWF_DEFAULTLOADERS_H
+
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include "swf/TagLoadersTable.h"
 #include "SWF.h"
-
-#include <map>
-#include <cassert>
+#include "TagLoadersTable.h"
 
 namespace gnash {
 namespace SWF {
 
-bool
-TagLoadersTable::get(SWF::TagType t, TagLoader& lf) const
-{
-	Loaders::const_iterator it = _loaders.find(t);
-
-	// no loader found for the specified tag
-	if (it == _loaders.end()) return false;
-
-	// copy TagLoader to the given pointer
-	lf = it->second;
-	return true;
-}
-
-bool
-TagLoadersTable::registerLoader(SWF::TagType t, TagLoader lf)
-{
-	assert(lf);
-    return _loaders.insert(std::make_pair(t, lf)).second;
-}
+const std::map<TagType, TagLoadersTable::TagLoader> defaultTagLoaders();
 
 } // namespace gnash::SWF
 } // namespace gnash
 
+#endif 

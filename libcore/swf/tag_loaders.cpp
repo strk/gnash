@@ -64,7 +64,6 @@
 namespace gnash {
 
 namespace SWF {
-namespace tag_loaders {
 
 
 /// Anonymous namespace
@@ -1316,7 +1315,6 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
 }
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 
 // Local Variables:

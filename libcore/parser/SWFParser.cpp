@@ -85,14 +85,14 @@ SWFParser::read(std::streamsize bytes)
                 return false;
             }
 
-            SWF::TagLoadersTable::loader_function lf = 0;
+            SWF::TagLoadersTable::TagLoader lf = 0;
 
             if (_tag == SWF::SHOWFRAME) {
                 // show frame tag -- advance to the next frame.
                 IF_VERBOSE_PARSE(log_parse("SHOWFRAME tag"));
                 _md->incrementLoadedFrames();
             }
-            else if (tagLoaders.get(_tag, &lf)) {
+            else if (tagLoaders.get(_tag, lf)) {
                 // call the tag loader.  The tag loader should add
                 // DisplayObjects or tags to the movie data structure.
                 lf(_stream, _tag, *_md, _runInfo);

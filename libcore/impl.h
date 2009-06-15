@@ -36,7 +36,7 @@ namespace gnash {
 
 /// Register a tag loader for the given tag
 void register_tag_loader(SWF::TagType t,
-        SWF::TagLoadersTable::loader_function lf);
+        SWF::TagLoadersTable::TagLoader lf);
 	
 }	// end namespace gnash
 
