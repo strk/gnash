@@ -44,6 +44,9 @@ package hello {
 
         public function Hello() {
 
+            check_equals(this, "[object Hello]");
+            check_equals(this.constructor, "[class Hello]");
+
             check_equals(S, "[class S]");
             check_equals(S.constructor, "[class Class]");
             check_equals(S.__constructor__, undefined);
