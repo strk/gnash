@@ -19,11 +19,6 @@
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
 
-#include "dsodefs.h"
-
-#include "smart_ptr.h"
-#include "TagLoadersTable.h"
-
 namespace gnash {
 
 }	// end namespace gnash
