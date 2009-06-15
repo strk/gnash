@@ -1176,7 +1176,8 @@ Machine::execute()
                 ///  argN ... arg1 -- the arg_count arguments to pass
                 ///  function -- constructor for the object to be constructed
                 /// Stack Out:
-                ///  value -- obj after it has been constructed as obj(arg1, ..., argN)
+                ///  value -- obj after it has been constructed as
+                ///  obj(arg1, ..., argN)
                 case SWF::ABC_ACTION_CONSTRUCT:
                 {
                     boost::uint32_t argc = mStream->read_V32();
@@ -1185,6 +1186,7 @@ Machine::execute()
                     pushCall(f, NULL, mStack.top(argc), argc, 0);
                     break;
                 }
+
                 /// 0x43 ABC_ACTION_CALLMETHOD
                 /// Stream: V32 'method_id + 1' | V32 'arg_count'
                 /// Stack In:
@@ -1419,17 +1421,21 @@ Machine::execute()
                     
                     as_object* obj = mStack.top(argc).to_object().get();
                     as_object* super = obj ? obj->get_super() : 0;
-                    log_abc("CONSTRUCTSUPER: object is: %s, args: %s",
-                            mStack.top(argc), argc);
+                    log_abc("CONSTRUCTSUPER: object %s, super %s, args %s",
+                            mStack.top(argc), super, argc);
 
                     if (!super) {
                         log_error("ABC_ACTION_CONSTRUCTSUPER: No super found");
                         throw ASException();
                     }
+
                     as_function *func = super->get_constructor();
                     if (!func) {
-                        log_abc("CONSTRUCTSUPER: %s has no constructor");
+                        log_abc("CONSTRUCTSUPER: %s has no constructor",
+                                super);
+                        return;
                     }
+
                     // 'obj' is the 'this' for the call, we ignore the
                     // return, there are argc arguments, and we drop all
                     // of the arguments plus 'obj' from the stack.
@@ -2849,22 +2855,27 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-Machine::immediateFunction(const as_function * /*to_call*/,
-        as_object* /*pThis*/, as_value& /*storage*/,
-        unsigned char /*stack_in*/, short /*stack_out*/)
+Machine::immediateFunction(const as_function* func, as_object* thisptr,
+        as_value& storage, unsigned char stack_in, short stack_out)
 {
-	// TODO: Set up the fn, or remove the need.
+    assert(func);
 
-#if 0
-	fn_call fn(NULL, NULL, 0, 0);
+	// TODO: Set up the fn to use the stack
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    size_t st = 0;
+    while (st < stack_in) {
+        args->push_back(mStack.top(st));
+        ++st;
+    }
+
+	fn_call fn(thisptr, as_environment(_vm), args);
 	mStack.drop(stack_in - stack_out);
 	saveState();
-	mThis = pThis;
+	mThis = thisptr;
 	mStack.grow(stack_in - stack_out);
 	mStack.setDownstop(stack_in);
-	storage = const_cast<as_function*>(to_call)->call(fn);
+	storage = const_cast<as_function*>(func)->call(fn);
 	restoreState();
-#endif
 }
 
 void
@@ -2898,6 +2909,9 @@ void
 Machine::pushCall(as_function *func, as_object *pthis, as_value& return_slot,
 	unsigned char stack_in, short stack_out)
 {
+
+    log_abc("Pushing function call for function %s", func);
+
 	if (1 || func->isBuiltin())
 	{
 		immediateFunction(func, pthis, return_slot, stack_in, stack_out);
@@ -3023,7 +3037,7 @@ Machine::executeCodeblock(CodeStream* stream)
 }
 
 void
-Machine::instantiateClass(std::string className, as_object* global)
+Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
 
     log_debug("instantiateClass: class name %s", className);
@@ -3042,7 +3056,11 @@ Machine::instantiateClass(std::string className, as_object* global)
 	mCurrentFunction = ctor->getPrototype();
 	mStack.clear();
 	mScopeStack.clear();
-	mRegisters[0] = as_value(global);
+
+    // The value at mRegisters[0] is generally pushed to the stack for
+    // CONSTRUCTSUPER, which apparently expects the object whose super
+    // is to be constructed. Setting it to global as before seems to be wrong.
+	mRegisters[0] = cl->getPrototype();
 	executeCodeblock(ctor->getBody());
 
     log_debug("Finished instantiating class %s", className);
