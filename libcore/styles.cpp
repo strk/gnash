@@ -7,7 +7,6 @@
 
 
 #include "styles.h"
-#include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "SWFStream.h"

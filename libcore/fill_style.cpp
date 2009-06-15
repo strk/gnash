@@ -21,7 +21,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fill_style.h"
-#include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "SWFStream.h"

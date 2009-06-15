@@ -9,7 +9,6 @@
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
 
-#include "impl.h"
 #include "RGBA.h"
 #include "SWF.h"
 

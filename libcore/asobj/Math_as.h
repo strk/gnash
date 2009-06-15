@@ -19,7 +19,6 @@
 #ifndef GNASH_ASOBJ_MATH_H
 #define GNASH_ASOBJ_MATH_H
 
-#include "impl.h"
 #include "as_object.h"
 
 namespace gnash {
