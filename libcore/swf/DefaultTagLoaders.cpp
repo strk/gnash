@@ -52,12 +52,30 @@
 #endif
 
 #include <boost/assign.hpp>
+#include <boost/bind.hpp>
 
 namespace gnash {
 namespace SWF {
 
-const std::map<TagType, TagLoadersTable::TagLoader>
-defaultTagLoaders()
+namespace {
+    class AddLoader
+    {
+    public:
+        AddLoader(TagLoadersTable& table)
+            :
+            _table(table)
+        {}
+        void operator()(const TagLoadersTable::Loaders::value_type& p)
+        {
+            _table.registerLoader(p.first, p.second);
+        }
+    private:
+        TagLoadersTable& _table;
+    };
+}
+
+void
+addDefaultLoaders(TagLoadersTable& table)
 {
 
     const std::map<TagType, TagLoadersTable::TagLoader> tags =
@@ -208,7 +226,7 @@ defaultTagLoaders()
             DefineSceneAndFrameLabelDataTag::loader);
 #endif
 
-    return tags;
+    std::for_each(tags.begin(), tags.end(), AddLoader(table));
 
 }
 

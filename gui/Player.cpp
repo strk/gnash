@@ -379,8 +379,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _runInfo.reset(new RunInfo(baseURL.str()));
     _runInfo->setSoundHandler(_soundHandler);
 
-    boost::shared_ptr<const SWF::TagLoadersTable> loaders(
-            new SWF::TagLoadersTable(SWF::defaultTagLoaders()));
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
     _runInfo->setTagLoaders(loaders);
 
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));

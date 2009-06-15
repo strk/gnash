@@ -375,8 +375,9 @@ main(int argc, char *argv[])
 
     std::vector<movie_data>	data;
         
-    boost::shared_ptr<const SWF::TagLoadersTable> loaders(
-           new SWF::TagLoadersTable(SWF::defaultTagLoaders()));
+
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
 
     // Play through all the movies.
     for (std::vector<std::string>::const_iterator i = infiles.begin(), 

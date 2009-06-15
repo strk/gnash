@@ -28,7 +28,8 @@
 namespace gnash {
 namespace SWF {
 
-const std::map<TagType, TagLoadersTable::TagLoader> defaultTagLoaders();
+/// Add the default parsing functions for SWF files to a TagLoadersTable.
+void addDefaultLoaders(TagLoadersTable& table);
 
 } // namespace gnash::SWF
 } // namespace gnash

@@ -90,8 +90,8 @@ MovieTester::MovieTester(const std::string& url)
     _runInfo.reset(new RunInfo(url));
     _runInfo->setSoundHandler(_sound_handler);
     
-    boost::shared_ptr<const SWF::TagLoadersTable> loaders(
-           new SWF::TagLoadersTable(SWF::defaultTagLoaders()));
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
 
     _runInfo->setTagLoaders(loaders);
 
