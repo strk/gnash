@@ -26,7 +26,7 @@
 #include "Movie.h"
 #include "movie_root.h"
 #include "MovieClip.h"
-#include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
+#include "MovieFactory.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "NullSoundHandler.h"
 #include "RGBA.h" // for rgba class (pixel checking)
@@ -35,6 +35,8 @@
 #include "render_handler.h"
 #include "ManualClock.h" // for use by advance
 #include "StreamProvider.h" // for passing to RunInfo
+#include "swf/TagLoadersTable.h"
+#include "swf/DefaultTagLoaders.h"
 #ifdef RENDERER_CAIRO
 # include "render_handler_cairo.h"
 #endif
@@ -57,6 +59,7 @@
 #include <memory> // for auto_ptr
 #include <cmath> // for ceil and (possibly) exp2
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
 
@@ -86,6 +89,11 @@ MovieTester::MovieTester(const std::string& url)
 
     _runInfo.reset(new RunInfo(url));
     _runInfo->setSoundHandler(_sound_handler);
+    
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
+
+    _runInfo->setTagLoaders(loaders);
 
     _runInfo->setStreamProvider(boost::shared_ptr<StreamProvider>(
                 new StreamProvider));
@@ -95,7 +103,7 @@ MovieTester::MovieTester(const std::string& url)
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = gnash::create_movie(in, url, *_runInfo, false);
+		_movie_def = MovieFactory::makeMovie(in, url, *_runInfo, false);
 	}
 	else
 	{
@@ -115,7 +123,7 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = gnash::create_library_movie(urlObj, *_runInfo,
+		_movie_def = MovieFactory::makeMovie(urlObj, *_runInfo,
                 NULL, false);
 	}
 

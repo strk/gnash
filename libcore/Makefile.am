@@ -87,8 +87,9 @@ libgnashcore_la_SOURCES = \
 	namedStrings.cpp \
 	rect.cpp \
 	MovieClip.cpp \
-	swf/swf.cpp \
+	swf/SWF.cpp \
 	swf/TagLoadersTable.cpp	\
+	swf/DefaultTagLoaders.cpp \
 	swf/DefineVideoStreamTag.cpp \
 	swf/DefineTextTag.cpp \
 	swf/DefineButtonSoundTag.cpp \
@@ -166,7 +167,9 @@ noinst_HEADERS = \
 	SWFMovie.h \
 	render.h \
 	SWFStream.h \
+	MovieLibrary.h \
 	swf/tag_loaders.h \
+	swf/DefaultTagLoaders.h \
 	swf/VideoFrameTag.h \
 	swf/DefineVideoStreamTag.h \
 	swf/DefineFontAlignZonesTag.h \
@@ -243,8 +246,8 @@ EXTENSIONS_API = \
 	swf/DefinitionTag.h \
 	swf/ShapeRecord.h \
 	swf/TagLoadersTable.h \
-	swf/swf.h \
-	impl.h \
+	swf/SWF.h \
+	MovieFactory.h \
 	fill_style.h \
 	styles.h \
 	ExportableResource.h \

@@ -19,7 +19,7 @@
 #define GNASH_SWF_TEXTRECORD_H
 
 #include "RGBA.h"
-#include "swf.h"
+#include "SWF.h"
 #include <vector>
 
 namespace gnash {

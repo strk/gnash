@@ -38,18 +38,18 @@
 #include "swf_function.h"
 #include "as_function.h"
 #include "SWFMovieDefinition.h"
-#include "swf.h"
+#include "SWF.h"
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "GnashException.h"
 #include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
 #include "SoundInfo.h"
-#include "gnash.h" 
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
 #include "ExportableResource.h"
+#include "MovieFactory.h"
 #include "render.h"
 
 #ifdef HAVE_ZLIB_H
@@ -64,7 +64,6 @@
 namespace gnash {
 
 namespace SWF {
-namespace tag_loaders {
 
 
 /// Anonymous namespace
@@ -859,7 +858,7 @@ void import_loader(SWFStream& in, TagType tag, movie_definition& m,
     boost::intrusive_ptr<movie_definition> source_movie;
 
     try {
-        source_movie = create_library_movie(abs_url, r);
+        source_movie = MovieFactory::makeMovie(abs_url, r);
     }
     catch (gnash::GnashException& e) {
         log_error(_("Exception: %s"), e.what());
@@ -1316,7 +1315,6 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
 }
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 
 // Local Variables:

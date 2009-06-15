@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_DEFINEBUTTONCXFORMTAG_H
 #define GNASH_SWF_DEFINEBUTTONCXFORMTAG_H
 
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 
 namespace gnash {
     class SWFStream;

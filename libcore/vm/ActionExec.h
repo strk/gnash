@@ -21,7 +21,7 @@
 #include "with_stack_entry.h"
 #include "as_environment.h" // for ScopeStack
 #include "smart_ptr.h"
-#include "swf.h"
+#include "SWF.h"
 #include "action_buffer.h"
 
 #include <vector>

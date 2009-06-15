@@ -24,7 +24,7 @@
 #endif
 
 #include "DisplayListTag.h" // for inheritance
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
 #include "DisplayObject.h" // BlendMode enum

@@ -52,8 +52,7 @@ public:
     ///                 construction.
     RunInfo(const std::string& baseURL)
         :
-        _baseURL(baseURL),
-        _tagLoaders(SWF::TagLoadersTable::getInstance())
+        _baseURL(baseURL)
     {
     }
 
@@ -100,8 +99,20 @@ public:
         return _soundHandler.get();
     }
 
+    /// Set the loader functions for SWF parsing.
+    //
+    /// This must be present before parsing.
+    /// It is a pointer to const so that the same table can be shared between
+    /// simultaneous runs if desired.
+    void setTagLoaders(boost::shared_ptr<const SWF::TagLoadersTable> loaders)
+    {
+        _tagLoaders = loaders;
+    }
+
+    /// Get the loader function table for parsing a SWF.
     const SWF::TagLoadersTable& tagLoaders() const {
-        return _tagLoaders;
+        assert(_tagLoaders.get());
+        return *_tagLoaders;
     }
 
 private:
@@ -112,7 +123,7 @@ private:
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
 
-    const SWF::TagLoadersTable& _tagLoaders;
+    boost::shared_ptr<const SWF::TagLoadersTable> _tagLoaders;
 
 };
 

@@ -26,7 +26,7 @@
 
 #include "DefinitionTag.h"
 #include "movie_definition.h"
-#include "swf.h"
+#include "SWF.h"
 #include "rect.h" // for composition
 #include "ControlTag.h"
 #include "VideoDecoder.h"

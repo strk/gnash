@@ -21,52 +21,22 @@
 # include "gnashconfig.h"
 #endif
 
+#include "MovieFactory.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
 #include "utility.h"
-#include "impl.h"
 #include "fontlib.h"
 #include "log.h"
 #include "GnashImage.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
-#include "swf.h"
-#include "swf/TagLoadersTable.h"
+#include "BitmapMovieDefinition.h"
 #include "RunInfo.h"
 #include "URL.h"
 #include "StreamProvider.h"
 #include "MovieClip.h"
 #include "VM.h"
-
-#include "swf/tag_loaders.h" 
-#include "ScriptLimitsTag.h"
-#include "BitmapMovieDefinition.h"
-#include "DefineFontAlignZonesTag.h"
-#include "DefineShapeTag.h"
-#include "DefineButtonCxformTag.h"
-#include "CSMTextSettingsTag.h"
-#include "DefineFontTag.h"
-#include "DefineButtonTag.h"
-#include "DefineTextTag.h"
-#include "PlaceObject2Tag.h"
-#include "RemoveObjectTag.h"
-#include "DoActionTag.h"
-#include "DoInitActionTag.h"
-#include "DefineEditTextTag.h"
-#include "SetBackgroundColorTag.h"
-#include "StartSoundTag.h"
-#include "StreamSoundBlockTag.h"
-#include "DefineButtonSoundTag.h"
-#include "DefineMorphShapeTag.h"
-#include "DefineVideoStreamTag.h"
-#include "DefineFontNameTag.h"
-#include "VideoFrameTag.h"
-#ifdef ENABLE_AVM2
-# include "SymbolClassTag.h"
-# include "DoABCTag.h"
-# include "DefineSceneAndFrameLabelDataTag.h"
-#endif
-
+#include "MovieLibrary.h"
 
 #ifdef GNASH_USE_GC
 #include "GC.h"
@@ -76,7 +46,6 @@
 #include <map>
 #include <memory> // for auto_ptr
 #include <algorithm>
-
 
 namespace gnash
 {
@@ -90,181 +59,6 @@ namespace {
 }
 
 static void clear_library();
-
-// Associate the specified tag type with the given tag loader
-// function.
-void
-register_tag_loader(SWF::TagType t, SWF::TagLoadersTable::loader_function lf)
-{
-  using SWF::TagLoadersTable;
-
-  TagLoadersTable& table = TagLoadersTable::getInstance();
-
-  bool loader_registered = table.register_loader(t, lf);
-  assert(loader_registered);
-}
-
-static void ensure_loaders_registered()
-{
-    using namespace SWF::tag_loaders;
-    using namespace SWF;
-
-    static bool s_registered = false;
-
-    if (s_registered) return;
-
-    // Register the standard loaders.
-    s_registered = true;
-
-    // End tag doesn't really need to exist.
-    // TODO: use null_loader here ?
-    register_tag_loader(SWF::END, end_loader);
-
-    register_tag_loader(SWF::DEFINESHAPE, DefineShapeTag::loader);
-    register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
-    register_tag_loader(SWF::PLACEOBJECT, PlaceObject2Tag::loader);
-    register_tag_loader(SWF::REMOVEOBJECT, RemoveObjectTag::loader); // 05
-    register_tag_loader(SWF::DEFINEBITS, define_bits_jpeg_loader);
-    register_tag_loader(SWF::DEFINEBUTTON, DefineButtonTag::loader);
-    register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
-    register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
-    register_tag_loader(SWF::DEFINEFONT, DefineFontTag::loader);
-    register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
-    register_tag_loader(SWF::DOACTION,  DoActionTag::loader);
-    register_tag_loader(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader);
-    // 62
-    register_tag_loader(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader);
-    register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
-    register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
-    // 89
-    register_tag_loader(SWF::STARTSOUND2, StartSound2Tag::loader);
-
-    register_tag_loader(SWF::STOPSOUND, fixme_loader); // 16 
-
-    // 17
-    register_tag_loader(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader);
-    // 18
-    register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader);
-    // 19
-    register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader);
-    register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
-    register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
-    register_tag_loader(SWF::DEFINESHAPE2,  DefineShapeTag::loader);
-    register_tag_loader(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader); // 23
-    // "protect" tag; we're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    register_tag_loader(SWF::PROTECT, null_loader);
-    register_tag_loader(SWF::PATHSAREPOSTSCRIPT, fixme_loader); // 25
-    register_tag_loader(SWF::PLACEOBJECT2,  PlaceObject2Tag::loader);
-    // 27 - _UNKNOWN_ unimplemented
-    register_tag_loader(SWF::REMOVEOBJECT2, RemoveObjectTag::loader); // 28
-    register_tag_loader(SWF::SYNCFRAME, fixme_loader); // 29
-    // 30 - _UNKNOWN_ unimplemented
-    register_tag_loader(SWF::FREEALL, fixme_loader); // 31
-    register_tag_loader(SWF::DEFINESHAPE3,  DefineShapeTag::loader);
-    register_tag_loader(SWF::DEFINETEXT2, DefineText2Tag::loader);
-    // 37
-    register_tag_loader(SWF::DEFINEBUTTON2, DefineButton2Tag::loader);
-    register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
-    register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
-    register_tag_loader(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader);
-    register_tag_loader(SWF::DEFINEVIDEO, fixme_loader); // 38
-    register_tag_loader(SWF::DEFINESPRITE,  sprite_loader);
-    register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40
-    register_tag_loader(SWF::SERIALNUMBER,  serialnumber_loader); // 41
-    register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
-    register_tag_loader(SWF::FRAMELABEL,  frame_label_loader); // 43
-
-    // TODO: Implement, but fixme_loader breaks tests.
-    register_tag_loader(SWF::DEFINEBEHAVIOR, fixme_loader); // 44
-
-    register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
-    // 46
-    register_tag_loader(SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader);
-    register_tag_loader(SWF::FRAMETAG,  fixme_loader); // 47
-    // 48
-    register_tag_loader(SWF::DEFINEFONT2, DefineFontTag::loader);
-    register_tag_loader(SWF::GENCOMMAND,  fixme_loader); // 49
-    register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
-    register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
-    register_tag_loader(SWF::FONTREF, fixme_loader); // 52
-
-    // TODO: Implement, but fixme_loader breaks tests.
-    register_tag_loader(SWF::DEFINEFUNCTION, fixme_loader); // 53 
-    register_tag_loader(SWF::PLACEFUNCTION, fixme_loader); // 54 
-    register_tag_loader(SWF::GENTAGOBJECT, fixme_loader); // 55 
-
-    register_tag_loader(SWF::EXPORTASSETS, export_loader); // 56
-    register_tag_loader(SWF::IMPORTASSETS, import_loader); // 57
-
-    //  We're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    register_tag_loader(SWF::ENABLEDEBUGGER, null_loader);    // 58
-
-    // 59
-    register_tag_loader(SWF::INITACTION, DoInitActionTag::loader); 
-    // 60
-    register_tag_loader(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader);
-    // 61
-    register_tag_loader(SWF::VIDEOFRAME, VideoFrameTag::loader);
-
-    // 62, DEFINEFONTINFO2 is done above.
-    // We're not an authoring tool.
-    register_tag_loader(SWF::DEBUGID, null_loader); // 63
-
-    //  We're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    register_tag_loader(SWF::ENABLEDEBUGGER2, null_loader);    // 64
-    register_tag_loader(SWF::SCRIPTLIMITS, ScriptLimitsTag::loader); //65
-
-    // TODO: Fix this, but probably not critical.
-    register_tag_loader(SWF::SETTABINDEX, fixme_loader); //66 
-
-    // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
-    // Tamarin. Figure out which one is correct (possibly both are).
-    // 67
-    register_tag_loader(SWF::DEFINESHAPE4_, DefineShapeTag::loader);
-    // 68
-    register_tag_loader(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader);
-    // 69
-    register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader);
-    // 70
-    register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader);
-    // 71
-    register_tag_loader(SWF::IMPORTASSETS2, import_loader);
-    // 73
-    register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader);
-    // 74
-    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader);
-    // 75
-    register_tag_loader(SWF::DEFINEFONT3, DefineFontTag::loader);
-    // 77
-    register_tag_loader(SWF::METADATA, metadata_loader);
-    // 78
-    register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader);
-    // 83
-    register_tag_loader(SWF::DEFINESHAPE4, DefineShapeTag::loader);
-    // 84
-    register_tag_loader(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader);
-    // 88
-    register_tag_loader(SWF::DEFINEFONTNAME, DefineFontNameTag::loader);
-    // 777
-    register_tag_loader(SWF::REFLEX, reflex_loader);
-    
-    // The following tags are AVM2 only.
-
-#ifdef ENABLE_AVM2
-    // 72 -- AS3 codeblock.
-    register_tag_loader(SWF::DOABC, DoABCTag::loader); 
-    // 76
-    register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader);
-    // 82
-    register_tag_loader(SWF::DOABCDEFINE, DoABCTag::loader);
-    // 86
-    register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,
-            DefineSceneAndFrameLabelDataTag::loader);
-#endif
-}
 
 // Create a movie_definition from an image format stream
 // NOTE: this method assumes this *is* the format described in the
@@ -305,12 +99,10 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 
 movie_definition*
-create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
+MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunInfo& runInfo, bool startLoaderThread)
 {
   assert(in.get());
-
-  ensure_loaders_registered();
 
   // see if it's a jpeg or an swf
   FileType type = getFileType(*in);
@@ -348,8 +140,9 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
 }
 
 movie_definition*
-create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
-        bool startLoaderThread, const std::string* postdata)
+createNonLibraryMovie(const URL& url, const RunInfo& runInfo,
+        const char* reset_url, bool startLoaderThread,
+        const std::string* postdata)
 {
 
   std::auto_ptr<IOChannel> in;
@@ -376,7 +169,7 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
   }
 
   std::string movie_url = reset_url ? reset_url : url.str();
-  movie_definition* ret = create_movie(in, movie_url, runInfo,
+  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runInfo,
           startLoaderThread);
 
   return ret;
@@ -527,119 +320,6 @@ void  clear()
     set_render_handler(NULL);
 }
 
-//
-// library stuff, for sharing resources among different movies.
-//
-
-
-/// Library of SWF movies indexed by URL strings
-//
-/// Elements are actually SWFMovieDefinition, the ones
-/// associated with URLS. Dunno why, but we were using
-/// movie_definition here before so this didn't change
-/// when the new class was introduced.
-///
-class MovieLibrary
-{
-public:
-
-    struct LibraryItem {
-        boost::intrusive_ptr<movie_definition> def;
-        unsigned hitCount;
-    };
-
-    typedef std::map<std::string, LibraryItem> LibraryContainer;
-
-    MovieLibrary() : 
-        _limit(8) 
-    {
-        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-	    setLimit(rcfile.getMovieLibraryLimit());
-    }
-  
-    /// Sets the maximum number of items to hold in the library. When adding new
-    /// items, the one with the least hit count is being removed in that case.
-    /// Zero is a valid limit (disables library). 
-    void setLimit(unsigned limit)
-    {
-        _limit = limit;  
-        limitSize(_limit);  
-    }
-
-    bool get(const std::string& key, boost::intrusive_ptr<movie_definition>* ret)
-    {
-        LibraryContainer::iterator it = _map.find(key);
-        if ( it != _map.end() )
-        {
-            *ret = it->second.def;
-            it->second.hitCount++;
-      
-            return true;
-        }
-        return false;
-    }
-
-#ifdef GNASH_USE_GC
-    /// Mark all library elements as reachable (for GC)
-    void markReachableResources() const
-    {
-        for (LibraryContainer::const_iterator i=_map.begin(), e=_map.end();
-                i!=e; ++i)
-        {
-            i->second.def->setReachable();
-        }
-    }
-#endif
-
-    void add(const std::string& key, movie_definition* mov)
-    {
-
-        if (_limit)
-        {
-            limitSize(_limit-1);
-        }
-        else return;  // zero limit, library is a no-op
-
-        LibraryItem temp;
-
-        temp.def = mov;
-        temp.hitCount=0;
-
-        _map[key] = temp;
-    }
-  
-
-    void clear() { _map.clear(); }
-  
-private:
-
-    static bool findWorstHitCount(const MovieLibrary::LibraryContainer::value_type& a,
-                                const MovieLibrary::LibraryContainer::value_type& b)
-    {
-        return (a.second.hitCount < b.second.hitCount);
-    }
-
-    LibraryContainer _map;
-    unsigned _limit;
-
-    void limitSize(unsigned max) 
-    {
-
-        if (max < 1) 
-        {
-            clear();
-            return;
-        }
-
-        while (_map.size() > max) 
-        {
-            _map.erase(std::min_element(_map.begin(), _map.end(), &findWorstHitCount));
-        }
-    
-    }
-  
-};
-
 static MovieLibrary s_movie_library;
 
 static void clear_library()
@@ -653,7 +333,8 @@ static void clear_library()
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
 //
-movie_definition* create_library_movie(const URL& url, const RunInfo& runInfo,
+movie_definition*
+MovieFactory::makeMovie(const URL& url, const RunInfo& runInfo,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {
@@ -674,9 +355,9 @@ movie_definition* create_library_movie(const URL& url, const RunInfo& runInfo,
 
     // Try to open a file under the filename, but DO NOT start
     // the loader thread now to avoid IMPORT tag loaders from 
-    // calling create_library_movie() again and NOT finding
+    // calling createMovie() again and NOT finding
     // the just-created movie.
-    movie_definition* mov = create_movie(url, runInfo, real_url, false,
+    movie_definition* mov = createNonLibraryMovie(url, runInfo, real_url, false,
             postdata);
 
     if (!mov)

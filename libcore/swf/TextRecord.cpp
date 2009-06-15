@@ -21,7 +21,7 @@
 #include "cxform.h"
 #include "movie_definition.h"
 #include "DisplayObject.h"
-#include "swf.h"
+#include "SWF.h"
 #include "log.h"
 #include "render.h"
 #include "fill_style.h"

@@ -21,12 +21,11 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fill_style.h"
-#include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "swf.h"
+#include "SWF.h"
 #include "GnashException.h"
 #include "GnashNumeric.h"
 #include <cmath> // sqrt, floor

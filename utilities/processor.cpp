@@ -38,6 +38,9 @@
 #include <locale>
 #endif
 
+#include "MovieFactory.h"
+#include "swf/TagLoadersTable.h"
+#include "swf/DefaultTagLoaders.h"
 #include "gettext.h"
 #include "ClockTime.h"
 #include "gnash.h"
@@ -372,6 +375,10 @@ main(int argc, char *argv[])
     boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
     std::vector<movie_data>	data;
+        
+
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
 
     // Play through all the movies.
     for (std::vector<std::string>::const_iterator i = infiles.begin(), 
@@ -381,6 +388,7 @@ main(int argc, char *argv[])
         RunInfo runInfo(*i);
         runInfo.setSoundHandler(soundHandler);
         runInfo.setStreamProvider(sp);
+        runInfo.setTagLoaders(loaders);
 
 	    boost::intrusive_ptr<gnash::movie_definition> m =
             play_movie(*i, runInfo);
@@ -424,7 +432,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
       {
          std::auto_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
-         md = gnash::create_movie(in, filename, runInfo, false);
+         md = MovieFactory::makeMovie(in, filename, runInfo, false);
       }
       else
       {
@@ -441,7 +449,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
              log_debug(_("%s appended to local sandboxes"), path.c_str());
 #endif
          }
-         md = gnash::create_library_movie(url, runInfo, NULL, false);
+         md = MovieFactory::makeMovie(url, runInfo, NULL, false);
       }
     }
     catch (GnashException& ge)

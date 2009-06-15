@@ -16,10 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GMATH_H__
-#define __GMATH_H__
+#ifndef GNASH_ASOBJ_MATH_H
+#define GNASH_ASOBJ_MATH_H
 
-#include "impl.h"
 #include "as_object.h"
 
 namespace gnash {

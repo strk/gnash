@@ -25,7 +25,7 @@
 #endif
 
 #include "DefinitionTag.h"
-#include "swf.h"
+#include "SWF.h"
 #include "rect.h" // for composition
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
 

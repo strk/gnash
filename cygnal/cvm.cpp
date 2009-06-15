@@ -55,6 +55,7 @@
 #include "smart_ptr.h"
 #include "IOChannel.h" // for proper dtor call
 #include "GnashSleep.h" // for usleep comptibility.
+#include "MovieFactory.h" 
 
 extern "C"{
 #ifdef HAVE_GETOPT_H
@@ -406,7 +407,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
       {
          std::auto_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
-         md = gnash::create_movie(in, filename, runInfo, false);
+         md = gnash::MovieFactory::makeMovie(in, filename, runInfo, false);
       }
       else
       {
@@ -423,7 +424,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
              log_debug(_("%s appended to local sandboxes"), path.c_str());
 #endif
          }
-         md = gnash::create_library_movie(url, runInfo, NULL, false);
+         md = gnash::MovieFactory::makeMovie(url, runInfo, NULL, false);
       }
     }
     catch (GnashException& ge)

@@ -19,12 +19,13 @@
 #define GNASH_SWF_SYMBOLCLASSTAG_H
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+#include "SWF.h" // for tag_type definition
 #include "action_buffer.h" // for composition
 #include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
 #include "Machine.h"
 #include "VM.h"
+#include "sprite_definition.h"
 
 // Forward declarations
 namespace gnash {

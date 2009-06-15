@@ -23,7 +23,7 @@
 #endif
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "sound_handler.h" // for StreamBlockId identifier
 
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends

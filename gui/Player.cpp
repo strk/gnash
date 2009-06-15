@@ -28,7 +28,7 @@
 #include "gui.h"
 #include "NullGui.h"
 
-#include "gnash.h" // still needed ?
+#include "MovieFactory.h"
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
 #include "MovieClip.h" // for setting FlashVars
@@ -36,6 +36,8 @@
 #include "Player.h"
 #include "StreamProvider.h"
 
+#include "swf/TagLoadersTable.h"
+#include "swf/DefaultTagLoaders.h"
 #include "NamingPolicy.h"
 #include "StringPredicates.h"
 #include "URL.h"
@@ -261,7 +263,7 @@ Player::load_movie()
         {
             std::auto_ptr<IOChannel> in (
                     noseek_fd_adapter::make_stream(fileno(stdin)));
-            md = gnash::create_movie(in, _url, *_runInfo, false);
+            md = MovieFactory::makeMovie(in, _url, *_runInfo, false);
         }
         else
         {
@@ -272,7 +274,7 @@ Player::load_movie()
                 // We'll need to allow load of the file, no matter virtual url
                 // specified...
                 // This is kind of hackish, cleaner would be adding an argument
-                // to create_library_movie to skip the security checking phase.
+                // to createMovie to skip the security checking phase.
                 // NOTE that if we fail to allow this load, the konqueror plugin
                 // would not be able to load anything
                 //
@@ -281,7 +283,7 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = gnash::create_library_movie(url, *_runInfo, _url.c_str(),
+            md = MovieFactory::makeMovie(url, *_runInfo, _url.c_str(),
                     false);
         }
     } catch (const GnashException& er) {
@@ -376,6 +378,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     /// The RunInfo should be populated before parsing.
     _runInfo.reset(new RunInfo(baseURL.str()));
     _runInfo->setSoundHandler(_soundHandler);
+
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
+    _runInfo->setTagLoaders(loaders);
 
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
     boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));

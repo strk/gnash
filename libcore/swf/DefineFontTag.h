@@ -30,7 +30,7 @@
 #define GNASH_SWF_DEFINEFONTTAG_H
 
 #include "smart_ptr.h" // GC
-#include "swf.h"
+#include "SWF.h"
 #include "Font.h"
 #include <vector>
 

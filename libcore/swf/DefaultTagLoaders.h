@@ -15,36 +15,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef GNASH_SWF_DEFAULTLOADERS_H
+#define GNASH_SWF_DEFAULTLOADERS_H
 
-#ifndef GNASH_IMPL_H
-#define GNASH_IMPL_H
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
-#include "dsodefs.h"
-
-#include "smart_ptr.h"
+#include "SWF.h"
 #include "TagLoadersTable.h"
 
 namespace gnash {
+namespace SWF {
 
-//
-// Loader callbacks.
-//
-	
-// Register a loader function for a certain tag type.  Most
-// standard tags are handled within gnash.  Host apps might want
-// to call this in order to handle special tag types.
+/// Add the default parsing functions for SWF files to a TagLoadersTable.
+void addDefaultLoaders(TagLoadersTable& table);
 
-/// Register a tag loader for the given tag
-void register_tag_loader(SWF::TagType t,
-        SWF::TagLoadersTable::loader_function lf);
-	
-}	// end namespace gnash
+} // namespace gnash::SWF
+} // namespace gnash
 
-
-#endif // GNASH_IMPL_H
-
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
+#endif 

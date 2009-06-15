@@ -18,11 +18,12 @@
 #ifndef GNASH_SWF_SCRIPTLIMITSTAG_H
 #define GNASH_SWF_SCRIPTLIMITSTAG_H
 
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "SWFStream.h" // for inlines
 #include "movie_root.h"
 #include "movie_definition.h"
 #include "ControlTag.h"
+#include "VM.h"
 
 namespace gnash {
 namespace SWF {

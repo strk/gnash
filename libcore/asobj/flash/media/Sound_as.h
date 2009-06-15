@@ -25,7 +25,6 @@
 #endif
 
 #include "smart_ptr.h" //GNASH_USE_GC
-#include "impl.h"
 #include "as_object.h"
 
 #include <boost/scoped_ptr.hpp>

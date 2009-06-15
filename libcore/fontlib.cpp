@@ -10,7 +10,6 @@
 #endif
 
 #include "Font.h"
-#include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "DefineShapeTag.h"

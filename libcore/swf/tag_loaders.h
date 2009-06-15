@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
 
-#include "swf.h" 
+#include "SWF.h" 
 #include "SWFStream.h"
 
 #include <cassert>
@@ -32,9 +32,6 @@ namespace gnash {
 
 namespace gnash {
 namespace SWF {
-
-/// Tag loader functions.
-namespace tag_loaders {
 
 /// Silently ignore the contents of this tag.
 void null_loader(SWFStream&, TagType, movie_definition&, const RunInfo&);
@@ -137,7 +134,6 @@ serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
         const RunInfo& /*r*/);
 
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
 

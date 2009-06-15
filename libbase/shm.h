@@ -24,7 +24,6 @@
 
 #include <string>
 
-//#include "impl.h"
 #include "as_object.h" // for inheritance
 
 #include <sys/types.h>

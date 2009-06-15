@@ -19,7 +19,7 @@
 #ifndef GNASH_STREAM_H
 #define GNASH_STREAM_H
 
-#include "swf.h"
+#include "SWF.h"
 #include "dsodefs.h" // still neded ?
 #include "GnashException.h"
 

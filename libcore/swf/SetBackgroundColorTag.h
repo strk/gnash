@@ -23,7 +23,7 @@
 #endif
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "MovieClip.h" // for inlines (execute)
 #include "movie_definition.h" // for inlines (loader)
 #include "log.h" // for log_parse

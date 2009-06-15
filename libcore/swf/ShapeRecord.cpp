@@ -16,7 +16,7 @@
 
 
 #include "ShapeRecord.h"
-#include "swf.h"
+#include "SWF.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "Geometry.h"

@@ -25,13 +25,12 @@
 
 #include "DefineShapeTag.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "Shape.h"
 #include "SWFStream.h"
 #include "MovieClip.h"
-#include "swf.h"
+#include "SWF.h"
 
 #include <algorithm>
 

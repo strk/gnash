@@ -455,7 +455,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     }
 
     // Load the actual movie.
-    view->movie_definition.reset(gnash::create_library_movie(url,
+    view->movie_definition.reset(gnash::createMovie(url,
             *view->run_info, url.str().c_str(), false));
 
     g_return_if_fail(view->movie_definition.get() != NULL);

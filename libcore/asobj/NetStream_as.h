@@ -28,7 +28,6 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "impl.h"
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
 #include "NetConnection_as.h"

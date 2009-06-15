@@ -24,7 +24,7 @@
 
 #include "rect.h"
 #include "DefinitionTag.h"
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "RGBA.h"
 #include "TextField.h"
 

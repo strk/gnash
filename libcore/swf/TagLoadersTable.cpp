@@ -20,7 +20,7 @@
 #endif
 
 #include "swf/TagLoadersTable.h"
-#include "swf.h"
+#include "SWF.h"
 
 #include <map>
 #include <cassert>
@@ -29,30 +29,23 @@ namespace gnash {
 namespace SWF {
 
 bool
-TagLoadersTable::get(SWF::TagType t, loader_function* lf) const
+TagLoadersTable::get(SWF::TagType t, TagLoader& lf) const
 {
-	container::const_iterator it = _tag_loaders.find(t);
+	Loaders::const_iterator it = _loaders.find(t);
 
 	// no loader found for the specified tag
-	if (it == _tag_loaders.end()) return false;
+	if (it == _loaders.end()) return false;
 
-	// copy loader_function to the given pointer
-	*lf = it->second;
+	// copy TagLoader to the given pointer
+	lf = it->second;
 	return true;
 }
 
 bool
-TagLoadersTable::register_loader(SWF::TagType t, loader_function lf)
+TagLoadersTable::registerLoader(SWF::TagType t, TagLoader lf)
 {
 	assert(lf);
-    return _tag_loaders.insert(std::make_pair(t, lf)).second;
-}
-
-TagLoadersTable&
-TagLoadersTable::getInstance()
-{
-	static TagLoadersTable inst;
-	return inst;
+    return _loaders.insert(std::make_pair(t, lf)).second;
 }
 
 } // namespace gnash::SWF
