@@ -1176,7 +1176,8 @@ Machine::execute()
                 ///  argN ... arg1 -- the arg_count arguments to pass
                 ///  function -- constructor for the object to be constructed
                 /// Stack Out:
-                ///  value -- obj after it has been constructed as obj(arg1, ..., argN)
+                ///  value -- obj after it has been constructed as
+                ///  obj(arg1, ..., argN)
                 case SWF::ABC_ACTION_CONSTRUCT:
                 {
                     boost::uint32_t argc = mStream->read_V32();
@@ -1185,6 +1186,7 @@ Machine::execute()
                     pushCall(f, NULL, mStack.top(argc), argc, 0);
                     break;
                 }
+
                 /// 0x43 ABC_ACTION_CALLMETHOD
                 /// Stream: V32 'method_id + 1' | V32 'arg_count'
                 /// Stack In:
@@ -1428,7 +1430,8 @@ Machine::execute()
                     }
                     as_function *func = super->get_constructor();
                     if (!func) {
-                        log_abc("CONSTRUCTSUPER: %s has no constructor");
+                        log_abc("CONSTRUCTSUPER: %s has no constructor",
+                                super);
                         return;
                     }
 
