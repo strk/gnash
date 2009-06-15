@@ -98,38 +98,47 @@ SSLClient::~SSLClient()
 }
 
 // Read bytes from the already opened SSL connection
-size_t
+int
 SSLClient::sslRead(amf::Buffer &buf)
 {
-//     GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     return sslRead(buf.reference(), buf.allocated());
 }
 
-size_t
+int
 SSLClient::sslRead(boost::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
-//     return SSL_Read(_ssl.get(), buf, size);
+    ERR_clear_error();
+    int ret = SSL_read(_ssl.get(), buf, size);
+    if (ret < 0) {
+	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+    }
+    
+    return ret;
 }
 
 // Write bytes to the already opened SSL connection
-size_t
+int
 SSLClient::sslWrite(amf::Buffer &buf)
 {
-//     GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     return sslWrite(buf.reference(), buf.allocated());
 }
 
-size_t
+int
 SSLClient::sslWrite(boost::uint8_t *buf, size_t length)
 {
     GNASH_REPORT_FUNCTION;
-
-    size_t ret = SSL_write(_ssl.get(), buf, length);
-
+    
+    ERR_clear_error();
+    int ret = SSL_write(_ssl.get(), buf, length);
+    if (ret < 0) {
+	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+    }
     return ret;
 }
 
@@ -181,7 +190,7 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 	log_error("Can't read certificate file \"%s\"!", keyfile);
 	return false;
     } else {
-	log_error("Read certificate file \"%s\".", keyfile);
+	log_debug("Read certificate file \"%s\".", keyfile);
     }
 
     // Set the passwor dcallback
@@ -237,6 +246,7 @@ bool
 SSLClient::sslConnect(std::string &hostname)
 {
     GNASH_REPORT_FUNCTION;
+    int ret;
 
     if (!_ctx) {
 	if (!sslSetupCTX()) {
@@ -255,18 +265,23 @@ SSLClient::sslConnect(std::string &hostname)
     // Handshake the server
     ERR_clear_error();
     _bio.reset(BIO_new_socket(getFileFd(), BIO_NOCLOSE));
-    if (SSL_connect(_ssl.get()) < 0) {
+    SSL_set_bio(_ssl.get(), _bio.get(), _bio.get());
+
+    if ((ret = SSL_connect(_ssl.get())) < 0) {
         log_error("Can't connect to SSL server %s", hostname);
  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
         return false;
     } else {
-        log_error("Connected to SSL server %s", hostname);
+        log_debug("Connected to SSL server %s", hostname);
     }
 
+    ERR_clear_error();
+#if 0
     if (_need_server_auth) {
  	checkCert(hostname);
     }
-
+#endif
+    
     return true;
 }
 
@@ -298,10 +313,8 @@ SSLClient::checkCert(std::string &hostname)
     X509 *peer;
     char peer_CN[256];
     
-    ERR_clear_error();
     if (SSL_get_verify_result(_ssl.get()) != X509_V_OK) {
 	log_error("Certificate doesn't verify");
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
 	return false;
     } else {
 	log_debug("Certificate verified.");
@@ -312,11 +325,8 @@ SSLClient::checkCert(std::string &hostname)
     // we set the verify depth in the ctx
 
     // Check the common name
-    ERR_clear_error();
-    peer = SSL_get_peer_certificate(_ssl.get());
-    if (peer == 0) {
-	log_debug("Couldn't get peer certificate!");
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+    if ((peer = SSL_get_peer_certificate(_ssl.get())) == 0) {
+	log_debug("Couldn't get Peer certificate!");
 	return false;
     } else {
 	log_debug("Got Peer certificate.");

@@ -59,14 +59,14 @@ public:
     ~SSLClient();
 
     // Read bytes from the already opened SSL connection
-    size_t sslRead(amf::Buffer &buf);
-    size_t sslRead(boost::uint8_t *buf, size_t length);
-    size_t sslRead(std::string &buf);
+    int sslRead(amf::Buffer &buf);
+    int sslRead(boost::uint8_t *buf, size_t length);
+    int sslRead(std::string &buf);
 
     // Write bytes to the already opened SSL connection
-    size_t sslWrite(amf::Buffer &buf);
-    size_t sslWrite(boost::uint8_t *buf, size_t length);
-    size_t sslWrite(std::string &buf);
+    int sslWrite(amf::Buffer &buf);
+    int sslWrite(boost::uint8_t *buf, size_t length);
+    int sslWrite(std::string &buf);
 
     // Setup the Context for this connection
     bool sslSetupCTX();
