@@ -35,6 +35,7 @@
 
 #include "as_object.h"
 #include "dejagnu.h"
+#include "http.h"
 #include "log.h"
 #include "openssl/ssl.h"
 #include "sslclient.h"
@@ -187,18 +188,30 @@ static void test_client()
             runtest.fail("Cert didn't match host for SSL connection");
         }
     }
-    
+
+    HTTP http;
+
     if (giveup) {
         runtest.unresolved("Couldn't write to SSL connection");
     } else {
-        amf::Buffer buf("Hello World");
-        if ((ret = client.sslWrite(buf)) == buf.allocated()) {
+        amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
+        if ((ret = client.sslWrite(request)) == request.allocated()) {
             runtest.pass("Wrote bytes to SSL connection");
         } else {
-            runtest.fail("Couldn't write to SSL connection");
+            runtest.fail("Couldn't write to SSL connection.");
         }
     }
     
+    if (giveup) {
+        runtest.unresolved("Couldn't read bytes from SSL connection");
+    } else {
+        amf::Buffer buf;
+        if ((ret = client.sslRead(buf)) > 0) {
+            runtest.pass("Read bytes from SSL connection");
+        } else {
+            runtest.fail("Couldn't read bytes to SSL connection.");
+        }
+    }
     
     if (giveup) {
         runtest.unresolved("Couldn't shutdown SSL connection");
