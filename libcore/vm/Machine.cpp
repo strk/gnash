@@ -1421,13 +1421,14 @@ Machine::execute()
                     
                     as_object* obj = mStack.top(argc).to_object().get();
                     as_object* super = obj ? obj->get_super() : 0;
-                    log_abc("CONSTRUCTSUPER: object is: %s, args: %s",
-                            mStack.top(argc), argc);
+                    log_abc("CONSTRUCTSUPER: object %s, super %s, args %s",
+                            mStack.top(argc), super, argc);
 
                     if (!super) {
                         log_error("ABC_ACTION_CONSTRUCTSUPER: No super found");
                         throw ASException();
                     }
+
                     as_function *func = super->get_constructor();
                     if (!func) {
                         log_abc("CONSTRUCTSUPER: %s has no constructor",
