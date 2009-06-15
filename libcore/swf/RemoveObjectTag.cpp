@@ -20,7 +20,7 @@
 
 #include "RemoveObjectTag.h"
 #include "MovieClip.h"
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "log.h"
 #include "SWFStream.h"
 

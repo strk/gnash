@@ -24,7 +24,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
-#include "swf.h"
+#include "SWF.h"
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"

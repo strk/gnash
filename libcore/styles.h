@@ -11,7 +11,7 @@
 
 #include "impl.h"
 #include "RGBA.h"
-#include "swf.h"
+#include "SWF.h"
 
 namespace gnash {
 

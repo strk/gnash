@@ -29,7 +29,7 @@
 #include "filter_factory.h" // for Filters (composition of button_record)
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 #include "DefineButtonSoundTag.h"
-#include "swf.h"
+#include "SWF.h"
 #include "Button.h"
 
 #include <boost/scoped_ptr.hpp>

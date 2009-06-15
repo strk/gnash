@@ -24,7 +24,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMatrix.h"
 #include "BitmapInfo.h"
-#include "swf.h"
+#include "SWF.h"
 #include "RGBA.h" // for rgba type
 
 #include <vector> // for composition

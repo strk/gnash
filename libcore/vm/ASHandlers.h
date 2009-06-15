@@ -21,7 +21,7 @@
 #include <map>
 #include <vector>
 #include "action.h" // we should get rid of this probably
-#include "swf.h"
+#include "SWF.h"
 
 
 // Forward declarations

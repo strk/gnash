@@ -22,7 +22,7 @@
 #ifndef GNASH_SWFPARSER_H
 #define GNASH_SWFPARSER_H
 
-#include "swf.h"
+#include "SWF.h"
 #include "TagLoadersTable.h"
 
 namespace gnash {

@@ -31,7 +31,7 @@
 #include "log.h"
 #include "as_value.h"
 #include "as_environment.h"
-#include "swf.h"
+#include "SWF.h"
 #include "ASHandlers.h"
 #include "movie_root.h"
 

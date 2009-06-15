@@ -21,7 +21,7 @@
 #include "DefinitionTag.h" // for inheritance
 #include "styles.h" 
 #include "rect.h" // for composition
-#include "swf.h"
+#include "SWF.h"
 #include "movie_definition.h"
 #include "SWFMatrix.h"
 #include "TextRecord.h"

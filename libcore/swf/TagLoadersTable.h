@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "swf.h"
+#include "SWF.h"
 
 #include <map>
 #include <boost/noncopyable.hpp>
@@ -48,8 +48,8 @@ public:
 	/// 't' is the tag type
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
-	typedef void (*loader_function)(
-        SWFStream& input, TagType type, movie_definition& m, const RunInfo& r);
+	typedef void (*loader_function)(SWFStream& input, TagType type,
+            movie_definition& m, const RunInfo& r);
 
 	/// \brief
 	/// Get a pointer to the loader_function for the

@@ -8,7 +8,7 @@
 #ifndef GNASH_TYPES_H
 #define GNASH_TYPES_H
 
-#include "swf.h"
+#include "SWF.h"
 
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t 

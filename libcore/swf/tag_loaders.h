@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
 
-#include "swf.h" 
+#include "SWF.h" 
 #include "SWFStream.h"
 
 #include <cassert>

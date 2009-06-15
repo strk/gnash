@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "IOChannel.h"
-#include "swf.h"
+#include "SWF.h"
 #include "Property.h"
 #include "action_buffer.h"
 

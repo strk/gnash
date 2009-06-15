@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "SWFStream.h" // for inlines
 #include "movie_definition.h"
 #include "DefineButtonTag.h"

@@ -24,7 +24,7 @@
 #include "SafeStack.h"
 #include "as_value.h"
 #include "asClass.h"
-#include "swf.h"
+#include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
 

@@ -11,7 +11,7 @@
 
 #include "DefinitionTag.h" // for inheritance of DefineShapeTag
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "swf.h"
+#include "SWF.h"
 #include "ShapeRecord.h"
 
 namespace gnash {

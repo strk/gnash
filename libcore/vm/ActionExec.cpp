@@ -30,7 +30,7 @@
 #include "GnashException.h"
 #include "DisplayObject.h"
 #include "movie_root.h"
-#include "swf.h"
+#include "SWF.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
 #include "debugger.h"

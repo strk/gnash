@@ -20,7 +20,7 @@
 #endif
 
 #include "swf/TagLoadersTable.h"
-#include "swf.h"
+#include "SWF.h"
 
 #include <map>
 #include <cassert>

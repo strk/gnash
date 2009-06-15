@@ -38,7 +38,7 @@
 #include "swf_function.h"
 #include "as_function.h"
 #include "SWFMovieDefinition.h"
-#include "swf.h"
+#include "SWF.h"
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "GnashException.h"

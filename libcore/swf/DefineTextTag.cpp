@@ -10,7 +10,7 @@
 #include "DefineTextTag.h"
 #include "SWFStream.h"
 #include "log.h"
-#include "swf.h"
+#include "SWF.h"
 #include "TextRecord.h"
 #include "Font.h"
 #include "StaticText.h"

@@ -22,7 +22,7 @@
 #include "as_object.h"
 #include "log.h"
 #include "as_function.h"
-#include "swf.h"
+#include "SWF.h"
 #include "GnashException.h"
 #include "as_environment.h"
 #include "fn_call.h"

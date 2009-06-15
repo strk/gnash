@@ -31,7 +31,7 @@
 #include "Shape.h"
 #include "SWFStream.h"
 #include "MovieClip.h"
-#include "swf.h"
+#include "SWF.h"
 
 #include <algorithm>
 

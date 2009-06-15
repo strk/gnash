@@ -19,7 +19,7 @@
 #define GNASH_SWF_DOINITACTIONTAG_H
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for TagType definition
+#include "SWF.h" // for TagType definition
 #include "action_buffer.h" // for composition
 #include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines

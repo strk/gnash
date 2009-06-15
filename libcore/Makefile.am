@@ -87,7 +87,7 @@ libgnashcore_la_SOURCES = \
 	namedStrings.cpp \
 	rect.cpp \
 	MovieClip.cpp \
-	swf/swf.cpp \
+	swf/SWF.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/DefineVideoStreamTag.cpp \
 	swf/DefineTextTag.cpp \
@@ -243,7 +243,7 @@ EXTENSIONS_API = \
 	swf/DefinitionTag.h \
 	swf/ShapeRecord.h \
 	swf/TagLoadersTable.h \
-	swf/swf.h \
+	swf/SWF.h \
 	impl.h \
 	fill_style.h \
 	styles.h \

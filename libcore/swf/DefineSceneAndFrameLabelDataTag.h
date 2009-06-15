@@ -19,7 +19,7 @@
 #define GNASH_SWF_SCENEANDLABELTAG_H
 
 #include "ControlTag.h"
-#include "swf.h" 
+#include "SWF.h" 
 #include "MovieClip.h" 
 #include "SWFStream.h"
 #include "VM.h"

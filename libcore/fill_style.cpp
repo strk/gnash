@@ -26,7 +26,7 @@
 #include "render.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "swf.h"
+#include "SWF.h"
 #include "GnashException.h"
 #include "GnashNumeric.h"
 #include <cmath> // sqrt, floor

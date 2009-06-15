@@ -21,7 +21,7 @@
 #include "SWFStream.h"
 #include "Font.h"
 #include "RunInfo.h"
-#include "swf.h"
+#include "SWF.h"
 #include "movie_definition.h"
 #include "ShapeRecord.h"
 

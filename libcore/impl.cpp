@@ -30,7 +30,7 @@
 #include "GnashImage.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
-#include "swf.h"
+#include "SWF.h"
 #include "swf/TagLoadersTable.h"
 #include "RunInfo.h"
 #include "URL.h"
@@ -76,7 +76,7 @@
 #include <map>
 #include <memory> // for auto_ptr
 #include <algorithm>
-
+#include <boost/assign.hpp>
 
 namespace gnash
 {
@@ -94,13 +94,13 @@ static void clear_library();
 // Associate the specified tag type with the given tag loader
 // function.
 void
-register_tag_loader(SWF::TagType t, SWF::TagLoadersTable::loader_function lf)
+register_tag_loader(const std::pair<SWF::TagType, SWF::TagLoadersTable::loader_function>& p)
 {
   using SWF::TagLoadersTable;
 
   TagLoadersTable& table = TagLoadersTable::getInstance();
 
-  bool loader_registered = table.register_loader(t, lf);
+  bool loader_registered = table.register_loader(p.first, p.second);
   assert(loader_registered);
 }
 
@@ -116,154 +116,159 @@ static void ensure_loaders_registered()
     // Register the standard loaders.
     s_registered = true;
 
-    // End tag doesn't really need to exist.
-    // TODO: use null_loader here ?
-    register_tag_loader(SWF::END, end_loader);
 
-    register_tag_loader(SWF::DEFINESHAPE, DefineShapeTag::loader);
-    register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
-    register_tag_loader(SWF::PLACEOBJECT, PlaceObject2Tag::loader);
-    register_tag_loader(SWF::REMOVEOBJECT, RemoveObjectTag::loader); // 05
-    register_tag_loader(SWF::DEFINEBITS, define_bits_jpeg_loader);
-    register_tag_loader(SWF::DEFINEBUTTON, DefineButtonTag::loader);
-    register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
-    register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
-    register_tag_loader(SWF::DEFINEFONT, DefineFontTag::loader);
-    register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
-    register_tag_loader(SWF::DOACTION,  DoActionTag::loader);
-    register_tag_loader(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader);
+    static const
+        std::map<SWF::TagType, SWF::TagLoadersTable::loader_function> tags =
+        boost::assign::map_list_of
+
+    (SWF::END, end_loader)
+
+    (SWF::DEFINESHAPE, DefineShapeTag::loader)
+    (SWF::FREECHARACTER, fixme_loader) // 03
+    (SWF::PLACEOBJECT, PlaceObject2Tag::loader)
+    (SWF::REMOVEOBJECT, RemoveObjectTag::loader) // 05
+    (SWF::DEFINEBITS, define_bits_jpeg_loader)
+    (SWF::DEFINEBUTTON, DefineButtonTag::loader)
+    (SWF::JPEGTABLES, jpeg_tables_loader)
+    (SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader)
+    (SWF::DEFINEFONT, DefineFontTag::loader)
+    (SWF::DEFINETEXT, DefineTextTag::loader)
+    (SWF::DOACTION,  DoActionTag::loader)
+    (SWF::DEFINEFONTINFO, DefineFontInfoTag::loader)
     // 62
-    register_tag_loader(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader);
-    register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
-    register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
+    (SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader)
+    (SWF::DEFINESOUND, define_sound_loader)
+    (SWF::STARTSOUND, StartSoundTag::loader)
     // 89
-    register_tag_loader(SWF::STARTSOUND2, StartSound2Tag::loader);
+    (SWF::STARTSOUND2, StartSound2Tag::loader)
 
-    register_tag_loader(SWF::STOPSOUND, fixme_loader); // 16 
+    (SWF::STOPSOUND, fixme_loader) // 16 
 
     // 17
-    register_tag_loader(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader);
+    (SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader)
     // 18
-    register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader);
+    (SWF::SOUNDSTREAMHEAD, sound_stream_head_loader)
     // 19
-    register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader);
-    register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
-    register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
-    register_tag_loader(SWF::DEFINESHAPE2,  DefineShapeTag::loader);
-    register_tag_loader(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader); // 23
+    (SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader)
+    (SWF::DEFINELOSSLESS, define_bits_lossless_2_loader)
+    (SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader)
+    (SWF::DEFINESHAPE2,  DefineShapeTag::loader)
+    (SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader) // 23
     // "protect" tag; we're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
-    register_tag_loader(SWF::PROTECT, null_loader);
-    register_tag_loader(SWF::PATHSAREPOSTSCRIPT, fixme_loader); // 25
-    register_tag_loader(SWF::PLACEOBJECT2,  PlaceObject2Tag::loader);
+    (SWF::PROTECT, null_loader)
+    (SWF::PATHSAREPOSTSCRIPT, fixme_loader) // 25
+    (SWF::PLACEOBJECT2,  PlaceObject2Tag::loader)
     // 27 - _UNKNOWN_ unimplemented
-    register_tag_loader(SWF::REMOVEOBJECT2, RemoveObjectTag::loader); // 28
-    register_tag_loader(SWF::SYNCFRAME, fixme_loader); // 29
+    (SWF::REMOVEOBJECT2, RemoveObjectTag::loader) // 28
+    (SWF::SYNCFRAME, fixme_loader) // 29
     // 30 - _UNKNOWN_ unimplemented
-    register_tag_loader(SWF::FREEALL, fixme_loader); // 31
-    register_tag_loader(SWF::DEFINESHAPE3,  DefineShapeTag::loader);
-    register_tag_loader(SWF::DEFINETEXT2, DefineText2Tag::loader);
+    (SWF::FREEALL, fixme_loader) // 31
+    (SWF::DEFINESHAPE3,  DefineShapeTag::loader)
+    (SWF::DEFINETEXT2, DefineText2Tag::loader)
     // 37
-    register_tag_loader(SWF::DEFINEBUTTON2, DefineButton2Tag::loader);
-    register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
-    register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
-    register_tag_loader(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader);
-    register_tag_loader(SWF::DEFINEVIDEO, fixme_loader); // 38
-    register_tag_loader(SWF::DEFINESPRITE,  sprite_loader);
-    register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40
-    register_tag_loader(SWF::SERIALNUMBER,  serialnumber_loader); // 41
-    register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
-    register_tag_loader(SWF::FRAMELABEL,  frame_label_loader); // 43
+    (SWF::DEFINEBUTTON2, DefineButton2Tag::loader)
+    (SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader)
+    (SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader)
+    (SWF::DEFINEEDITTEXT, DefineEditTextTag::loader)
+    (SWF::DEFINEVIDEO, fixme_loader) // 38
+    (SWF::DEFINESPRITE,  sprite_loader)
+    (SWF::NAMECHARACTER, fixme_loader) // 40
+    (SWF::SERIALNUMBER,  serialnumber_loader) // 41
+    (SWF::DEFINETEXTFORMAT, fixme_loader) // 42
+    (SWF::FRAMELABEL,  frame_label_loader) // 43
 
     // TODO: Implement, but fixme_loader breaks tests.
-    register_tag_loader(SWF::DEFINEBEHAVIOR, fixme_loader); // 44
+    (SWF::DEFINEBEHAVIOR, fixme_loader) // 44
 
-    register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
+    (SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader) // 45
     // 46
-    register_tag_loader(SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader);
-    register_tag_loader(SWF::FRAMETAG,  fixme_loader); // 47
+    (SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader)
+    (SWF::FRAMETAG,  fixme_loader) // 47
     // 48
-    register_tag_loader(SWF::DEFINEFONT2, DefineFontTag::loader);
-    register_tag_loader(SWF::GENCOMMAND,  fixme_loader); // 49
-    register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
-    register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
-    register_tag_loader(SWF::FONTREF, fixme_loader); // 52
+    (SWF::DEFINEFONT2, DefineFontTag::loader)
+    (SWF::GENCOMMAND,  fixme_loader) // 49
+    (SWF::DEFINECOMMANDOBJ, fixme_loader) // 50
+    (SWF::CHARACTERSET,  fixme_loader) // 51
+    (SWF::FONTREF, fixme_loader) // 52
 
     // TODO: Implement, but fixme_loader breaks tests.
-    register_tag_loader(SWF::DEFINEFUNCTION, fixme_loader); // 53 
-    register_tag_loader(SWF::PLACEFUNCTION, fixme_loader); // 54 
-    register_tag_loader(SWF::GENTAGOBJECT, fixme_loader); // 55 
+    (SWF::DEFINEFUNCTION, fixme_loader) // 53 
+    (SWF::PLACEFUNCTION, fixme_loader) // 54 
+    (SWF::GENTAGOBJECT, fixme_loader) // 55 
 
-    register_tag_loader(SWF::EXPORTASSETS, export_loader); // 56
-    register_tag_loader(SWF::IMPORTASSETS, import_loader); // 57
+    (SWF::EXPORTASSETS, export_loader) // 56
+    (SWF::IMPORTASSETS, import_loader) // 57
 
     //  We're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
-    register_tag_loader(SWF::ENABLEDEBUGGER, null_loader);    // 58
+    (SWF::ENABLEDEBUGGER, null_loader)    // 58
 
     // 59
-    register_tag_loader(SWF::INITACTION, DoInitActionTag::loader); 
+    (SWF::INITACTION, DoInitActionTag::loader) 
     // 60
-    register_tag_loader(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader);
+    (SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader)
     // 61
-    register_tag_loader(SWF::VIDEOFRAME, VideoFrameTag::loader);
+    (SWF::VIDEOFRAME, VideoFrameTag::loader)
 
     // 62, DEFINEFONTINFO2 is done above.
     // We're not an authoring tool.
-    register_tag_loader(SWF::DEBUGID, null_loader); // 63
+    (SWF::DEBUGID, null_loader) // 63
 
     //  We're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
-    register_tag_loader(SWF::ENABLEDEBUGGER2, null_loader);    // 64
-    register_tag_loader(SWF::SCRIPTLIMITS, ScriptLimitsTag::loader); //65
+    (SWF::ENABLEDEBUGGER2, null_loader)    // 64
+    (SWF::SCRIPTLIMITS, ScriptLimitsTag::loader) //65
 
     // TODO: Fix this, but probably not critical.
-    register_tag_loader(SWF::SETTABINDEX, fixme_loader); //66 
+    (SWF::SETTABINDEX, fixme_loader) //66 
 
     // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
     // Tamarin. Figure out which one is correct (possibly both are).
     // 67
-    register_tag_loader(SWF::DEFINESHAPE4_, DefineShapeTag::loader);
+    (SWF::DEFINESHAPE4_, DefineShapeTag::loader)
     // 68
-    register_tag_loader(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader);
+    (SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader)
     // 69
-    register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader);
+    (SWF::FILEATTRIBUTES, file_attributes_loader)
     // 70
-    register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader);
+    (SWF::PLACEOBJECT3, PlaceObject2Tag::loader)
     // 71
-    register_tag_loader(SWF::IMPORTASSETS2, import_loader);
+    (SWF::IMPORTASSETS2, import_loader)
     // 73
-    register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader);
+    (SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader)
     // 74
-    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader);
+    (SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader)
     // 75
-    register_tag_loader(SWF::DEFINEFONT3, DefineFontTag::loader);
+    (SWF::DEFINEFONT3, DefineFontTag::loader)
     // 77
-    register_tag_loader(SWF::METADATA, metadata_loader);
+    (SWF::METADATA, metadata_loader)
     // 78
-    register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader);
+    (SWF::DEFINESCALINGGRID, fixme_loader)
     // 83
-    register_tag_loader(SWF::DEFINESHAPE4, DefineShapeTag::loader);
+    (SWF::DEFINESHAPE4, DefineShapeTag::loader)
     // 84
-    register_tag_loader(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader);
+    (SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader)
     // 88
-    register_tag_loader(SWF::DEFINEFONTNAME, DefineFontNameTag::loader);
+    (SWF::DEFINEFONTNAME, DefineFontNameTag::loader)
     // 777
-    register_tag_loader(SWF::REFLEX, reflex_loader);
+    (SWF::REFLEX, reflex_loader)
     
     // The following tags are AVM2 only.
 
 #ifdef ENABLE_AVM2
     // 72 -- AS3 codeblock.
-    register_tag_loader(SWF::DOABC, DoABCTag::loader); 
+    (SWF::DOABC, DoABCTag::loader) 
     // 76
-    register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader);
+    (SWF::SYMBOLCLASS, SymbolClassTag::loader)
     // 82
-    register_tag_loader(SWF::DOABCDEFINE, DoABCTag::loader);
+    (SWF::DOABCDEFINE, DoABCTag::loader)
     // 86
-    register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,
+    (SWF::DEFINESCENEANDFRAMELABELDATA,
             DefineSceneAndFrameLabelDataTag::loader);
 #endif
+
+    std::for_each(tags.begin(), tags.end(), boost::bind(register_tag_loader, _1));
 }
 
 // Create a movie_definition from an image format stream

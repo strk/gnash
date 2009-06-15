@@ -25,7 +25,7 @@
 #include "DisplayObject.h"
 #include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"
-#include "swf.h"
+#include "SWF.h"
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "action_buffer.h"
