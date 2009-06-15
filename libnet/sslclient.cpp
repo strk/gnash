@@ -74,7 +74,7 @@ static boost::mutex stl_mutex;
 // the SSLCLient class, is so it's accessible from the C function callback,
 // which can't access the private data of the class.
 // static SSLClient::passwd_t password(SSL_PASSWD_SIZE);
-static SSLClient::passwd_t password;
+static string password;
 
 namespace gnash
 {
@@ -89,6 +89,7 @@ SSLClient::SSLClient()
     GNASH_REPORT_FUNCTION;
 
     setPort(SSL_PORT);
+    setPassword("password");
 }
 
 SSLClient::~SSLClient()
@@ -110,7 +111,7 @@ SSLClient::sslRead(boost::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
-//    return SSL_Read(_ssl.get(), buf, size);
+//     return SSL_Read(_ssl.get(), buf, size);
 }
 
 // Write bytes to the already opened SSL connection
@@ -164,14 +165,13 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 	cafile += "/";
 	cafile += caspec;
     }
-    
+
+    // Initialize SSL library
     SSL_library_init();
+
+    // Load the error strings so the SSL_error_*() functions work
     SSL_load_error_strings();
     
-    if (!_bio_error) {
-	_bio_error.reset(BIO_new_fp(stderr, BIO_NOCLOSE));
-    }
-
     // create the context
     meth = SSLv23_method();
     _ctx.reset(SSL_CTX_new(meth));
@@ -193,7 +193,7 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 					  SSL_FILETYPE_PEM)) != 1) {
 	log_error("Can't read key file \"%s\"!", keyfile);
  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-//	return false;
+	return false;
     } else {
 	log_error("Read key file \"%s\".", keyfile);
     }
@@ -205,7 +205,7 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
 	return false;
     } else {
-	log_error("Read CA list from \"%s\"!", cafile);
+	log_debug("Read CA list from \"%s\"", cafile);
     }
     
 #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
@@ -246,19 +246,25 @@ SSLClient::sslConnect(std::string &hostname)
 
     _ssl.reset(SSL_new(_ctx.get()));
 
+    // Make a tcp/ip coinnect to the server
     if (createClient(hostname, getPort()) == false) {
-        log_error("Can't connect to SSL server %s", hostname);
+        log_error("Can't connect to server %s", hostname);
         return false;
     }
 
+    // Handshake the server
+    ERR_clear_error();
     _bio.reset(BIO_new_socket(getFileFd(), BIO_NOCLOSE));
-    if (SSL_connect(_ssl.get()) <= 0) {
+    if (SSL_connect(_ssl.get()) < 0) {
         log_error("Can't connect to SSL server %s", hostname);
+ 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
         return false;
+    } else {
+        log_error("Connected to SSL server %s", hostname);
     }
 
     if (_need_server_auth) {
-	checkCert(hostname);
+ 	checkCert(hostname);
     }
 
     return true;
@@ -274,19 +280,31 @@ SSLClient::sslAccept()
 }
 
 bool
+SSLClient::checkCert()
+{
+    GNASH_REPORT_FUNCTION;
+    return checkCert(_hostname);
+}
+
+bool
 SSLClient::checkCert(std::string &hostname)
 {
     GNASH_REPORT_FUNCTION;
 
-    if (!_ssl) {
+    if (!_ssl || (hostname.empty())) {
 	return false;
     }
 
     X509 *peer;
     char peer_CN[256];
     
-    if (SSL_get_verify_result(_ssl.get()) !=X509_V_OK) {
+    ERR_clear_error();
+    if (SSL_get_verify_result(_ssl.get()) != X509_V_OK) {
 	log_error("Certificate doesn't verify");
+ 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	return false;
+    } else {
+	log_debug("Certificate verified.");
     }
 
     // Check the cert chain. The chain length
@@ -294,7 +312,17 @@ SSLClient::checkCert(std::string &hostname)
     // we set the verify depth in the ctx
 
     // Check the common name
+    ERR_clear_error();
     peer = SSL_get_peer_certificate(_ssl.get());
+    if (peer == 0) {
+	log_debug("Couldn't get peer certificate!");
+ 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	return false;
+    } else {
+	log_debug("Got Peer certificate.");
+    }
+    
+    ERR_clear_error();
     X509_NAME_get_text_by_NID (X509_get_subject_name(peer),
 			       NID_commonName, peer_CN, 256);
 
@@ -314,12 +342,14 @@ SSLClient::dump() {
     log_debug (_("==== The SSL header breaks down as follows: ===="));
 }
 
-// void
-// SSLClient::setPassword(boost::array<boost::uint8_t> pw) {
-//     password = pw;
-// }
+// The password is a global variable so it can be set from a C function
+// callback.
+void
+SSLClient::setPassword(std::string pw) {
+    password = pw;
+}
 
-SSLClient::passwd_t &
+std::string &
 SSLClient::getPassword() {
     return password;
 }    
@@ -328,21 +358,23 @@ extern "C" {
 
 // This is the callback required when setting up the password. 
 int
-password_cb(char *buf, int size, int rwflag, void *userdata)
+password_cb(char *buf, int size, int rwflag, void * /* userdata */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug("Callback executed to set the SSL password, size", size);
+    log_debug("Callback executed to set the SSL password, size is: %d",
+	      password.size());
     
-    if(size < static_cast<int>(password.size())) {
+    if(size <= static_cast<int>(password.size()+1)) {
 	log_error("The buffer for the password needs to be %d bytes larger",
 		  password.size() - size);
 	return(0);
     }
 
     // copy the password, we'll need it later
-    std::copy(buf, buf + size, password.data());    
+//     std::copy(buf, buf + size, password.data());
+    std::copy(password.begin(), password.end(), buf);
     
-    return(size);
+    return(password.size());
     
 }
 } // end of extern C

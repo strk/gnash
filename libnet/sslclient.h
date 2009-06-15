@@ -58,19 +58,15 @@ public:
     SSLClient();
     ~SSLClient();
 
-    typedef boost::array<boost::uint8_t, SSL_PASSWD_SIZE> passwd_t;
-//     typedef std::vector<boost::uint8_t> passwd_t;
-//    typedef std::string passwd_t;
-    
     // Read bytes from the already opened SSL connection
     size_t sslRead(amf::Buffer &buf);
     size_t sslRead(boost::uint8_t *buf, size_t length);
-    size_t sslRead(passwd_t &buf);
+    size_t sslRead(std::string &buf);
 
     // Write bytes to the already opened SSL connection
     size_t sslWrite(amf::Buffer &buf);
     size_t sslWrite(boost::uint8_t *buf, size_t length);
-    size_t sslWrite(passwd_t &buf);
+    size_t sslWrite(std::string &buf);
 
     // Setup the Context for this connection
     bool sslSetupCTX();
@@ -92,8 +88,8 @@ public:
     void setCAlist(std::string filespec) { _calist = filespec; };
     std::string &getCAlist() { return _calist; };
     
-//     void setPassword(boost::array<boost::uint8_t> pw);
-    passwd_t &getPassword();
+    void setPassword(std::string pw);
+    std::string &getPassword();
     
     void setCert(std::string filespec) { _cert = filespec; };
     std::string &getCert() { return _cert; };
@@ -110,21 +106,21 @@ public:
     void setServerAuth(bool flag) { _need_server_auth = flag; };
     bool getServerAuth() { return _need_server_auth; };
     
-    void dump();
-
- private:
     // Check a certificate
+    bool checkCert();
     bool checkCert(std::string &hostname);
 
+    void dump();
+ private:
     boost::scoped_ptr<SSL> _ssl;
     boost::scoped_ptr<SSL_CTX> _ctx;
     boost::scoped_ptr<BIO> _bio;
     boost::scoped_ptr<BIO> _bio_error;
+    std::string		_hostname;
+    std::string		_calist;
     std::string		_keyfile;
     std::string		_cert;
     std::string		_pem;
-    std::string		_hostname;
-    std::string		_calist;
     std::string		_rootpath;
     bool		_need_server_auth;
 };
