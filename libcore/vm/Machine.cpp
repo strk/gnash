@@ -2851,14 +2851,20 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-Machine::immediateFunction(const as_function* func,
-        as_object* thisptr, as_value& storage,
-        unsigned char stack_in, short stack_out)
+Machine::immediateFunction(const as_function* func, as_object* thisptr,
+        as_value& storage, unsigned char stack_in, short stack_out)
 {
     assert(func);
 
 	// TODO: Set up the fn to use the stack
-	fn_call fn(thisptr, as_environment(_vm));
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    size_t st = 0;
+    while (st < stack_in) {
+        args->push_back(mStack.top(st));
+        ++st;
+    }
+
+	fn_call fn(thisptr, as_environment(_vm), args);
 	mStack.drop(stack_in - stack_out);
 	saveState();
 	mThis = thisptr;
