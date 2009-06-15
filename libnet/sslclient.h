@@ -45,14 +45,14 @@
 namespace gnash
 {
 
-const char *ROOTPATH = "/etc/pki/tls";
-const char *HOST    = "localhost";
-const char *CA_LIST = "root.pem";
-const char *RANDOM  = "random.pem";
-const char *KEYFILE  = "client.pem";
-const size_t SSL_PASSWD_SIZE = 1024;
+extern const char *ROOTPATH;
+extern const char *HOST;
+extern const char *CA_LIST;
+extern const char *RANDOM;
+extern const char *KEYFILE;
+extern const size_t SSL_PASSWD_SIZE;
 
-class DSOEXPORT SSLClient : public gnash::Network
+class DSOEXPORT SSLClient
 {
 public:
     SSLClient();
@@ -76,8 +76,8 @@ public:
     bool sslShutdown();
 
     // sslConnect() is how the client connects to the server 
-    bool sslConnect();
-    bool sslConnect(std::string &hostname);
+    bool sslConnect(int fd);
+    bool sslConnect(int fd, std::string &hostname);
 
     // sslAccept() is how the server waits for connections for clients
     size_t sslAccept();

@@ -79,6 +79,13 @@ static string password;
 namespace gnash
 {
 
+const char *ROOTPATH = "/etc/pki/tls";
+const char *HOST    = "localhost";
+const char *CA_LIST = "root.pem";
+const char *RANDOM  = "random.pem";
+const char *KEYFILE  = "client.pem";
+const size_t SSL_PASSWD_SIZE = 1024;
+
 SSLClient::SSLClient()
     : _hostname("localhost"),
       _calist(CA_LIST),
@@ -88,7 +95,7 @@ SSLClient::SSLClient()
 {
     GNASH_REPORT_FUNCTION;
 
-    setPort(SSL_PORT);
+//     setPort(SSL_PORT);
     setPassword("password");
 }
 
@@ -232,18 +239,19 @@ SSLClient::sslShutdown()
 
     SSL_CTX_free(_ctx.get());
 
-    return closeNet();
+//     return closeNet();
+    return true;
 }
 
 // sslConnect() is how the client connects to the server 
 bool
-SSLClient::sslConnect()
+SSLClient::sslConnect(int fd)
 {
-    return sslConnect(_hostname);
+    return sslConnect(fd, _hostname);
 }
 
 bool
-SSLClient::sslConnect(std::string &hostname)
+SSLClient::sslConnect(int fd, std::string &hostname)
 {
     GNASH_REPORT_FUNCTION;
     int ret;
@@ -256,15 +264,15 @@ SSLClient::sslConnect(std::string &hostname)
 
     _ssl.reset(SSL_new(_ctx.get()));
 
-    // Make a tcp/ip coinnect to the server
-    if (createClient(hostname, getPort()) == false) {
-        log_error("Can't connect to server %s", hostname);
-        return false;
-    }
+//     // Make a tcp/ip connect to the server
+//     if (createClient(hostname, getPort()) == false) {
+//         log_error("Can't connect to server %s", hostname);
+//         return false;
+//     }
 
     // Handshake the server
     ERR_clear_error();
-    _bio.reset(BIO_new_socket(getFileFd(), BIO_NOCLOSE));
+    _bio.reset(BIO_new_socket(fd, BIO_NOCLOSE));
     SSL_set_bio(_ssl.get(), _bio.get(), _bio.get());
 
     if ((ret = SSL_connect(_ssl.get())) < 0) {
