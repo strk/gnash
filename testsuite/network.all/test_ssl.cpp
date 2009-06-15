@@ -43,7 +43,7 @@
 #include "element.h"
 #include "sol.h"
 #include "arg_parser.h"
-#include "gmemory.h"
+#include "sslclient.h"
 
 using namespace amf;
 using namespace gnash;
@@ -51,24 +51,12 @@ using namespace std;
 
 static void usage (void);
 
-// Enable the display of memory allocation and timing data
-static bool memdebug = false;
-
-// We use the Memory profiling class to check the malloc buffers
-// in the kernel to make sure the allocations and frees happen
-// the way we expect them too. There is no real other way to tell.
-#if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-Memory *mem = 0;
-#endif
-
 static TestState runtest;
 
-static int port = 0;
-static string hostname = "localhost";
-static string cert;
-static string pem;
+static string infile;
 
 static void test_client();
+static SSLClient client;
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -79,10 +67,14 @@ main(int argc, char *argv[])
         {
             { 'h', "help",          Arg_parser::no  },
             { 'v', "verbose",       Arg_parser::no  },
-            { 'n', "name",          Arg_parser::yes  },
-            { 'o', "port",          Arg_parser::yes  },
-            { 'c', "cert",          Arg_parser::yes  },
-            { 'p', "pem",           Arg_parser::yes  },
+            { 'n', "name",          Arg_parser::yes },
+            { 'o', "port",          Arg_parser::yes },
+            { 'c', "cert",          Arg_parser::yes },
+            { 'p', "pem",           Arg_parser::yes },
+            { 'k', "leyfile",       Arg_parser::yes },
+            { 'w', "password",      Arg_parser::yes },
+            { 'a', "calist",        Arg_parser::yes },
+            { 'r', "rootpath",      Arg_parser::yes },
         };
     
     Arg_parser parser(argc, argv, opts);
@@ -103,24 +95,46 @@ main(int argc, char *argv[])
                     log_debug(_("Verbose output turned on"));
                     break;
               case 'n':
-                  hostname = parser.argument(i);
-                  log_debug(_("Hostname for SSL connection is: %s"), hostname);
+                  client.setHostname(parser.argument(i));
+                  log_debug(_("Hostname for SSL connection is: %s"),
+                            client.getHostname());
                   break;
               case 'o':
-                  port = parser.argument<int>(i);
-                  log_debug(_("Port for SSL connections is: %hd"), port);
+                  client.setPort(parser.argument<short>(i));
+                  log_debug(_("Port for SSL connections is: %hd"),
+                            client.getPort());
                   break; 
               case 'c':
-                  cert = parser.argument(i);
-                  log_debug(_("Cert file for SSL connection is: %s"), cert);
+                  client.setCert(parser.argument(i));
+                  log_debug(_("Cert file for SSL connection is: %s"),
+                            client.getCert());
                   break;
               case 'p':
-                  pem = parser.argument(i);
-                  log_debug(_("Pem file for SSL connection is: %s"), pem);
+                  client.setPem(parser.argument(i));
+                  log_debug(_("Pem file for SSL connection is: %s"),
+                            client.getPem());
+                  break;
+              case 'k':
+                  client.setKeyfile(parser.argument(i));
+                  log_debug(_("Keyfile file for SSL connection is: %s"),
+                            client.getKeyfile());
+                  break;
+              case 'a':
+                  client.setCAlist(parser.argument(i));
+                  log_debug(_("CA List file for SSL connection is: %s"),
+                            client.getCAlist());
+                  break;
+              case 'r':
+                  client.setRootPath(parser.argument(i));
+                  log_debug(_("Root path for SSL pem files is: %s"),
+                            client.getRootPath());
+                  break;
+              case 0:
+                  infile = parser.argument(i);
+                  log_debug(_("Input file for testing the SSL connection is: %s"), infile);
                   break;
             }
         }
-        
         
         catch (Arg_parser::ArgParserException &e) {
             cerr << _("Error parsing command line options: ") << e.what() << endl;
@@ -133,7 +147,51 @@ main(int argc, char *argv[])
 
 static void test_client()
 {
+    size_t ret;
+    bool giveup = false;
+    
+    if (client.sslConnect()) {
+        runtest.pass("Connected to SSL server");
+    } else {
+        runtest.fail("Couldn't connect to SSL server");
+        giveup = true;
+    }
 
+    // I haven't seen a password with the first character set to
+    // zero ever. so we assume it got set correctly by the callback.
+    if (client.getPassword()[0] != 0) {
+        runtest.pass("Password was set for SSL connection");
+    } else {
+        if (giveup) {
+            runtest.unresolved("Password wasn't set for SSL connection");
+        } else {
+            runtest.fail("Password wasn't set for SSL connection");
+        }
+    }
+
+    
+    if (giveup) {
+        runtest.unresolved("Couldn't write to SSL connection");
+    } else {
+        amf::Buffer buf("Hello World");
+        if ((ret = client.sslWrite(buf)) == buf.allocated()) {
+            runtest.pass("Wrote bytes to SSL connection");
+        } else {
+            runtest.fail("Couldn't write to SSL connection");
+        }
+    }
+    
+    
+    if (giveup) {
+        runtest.unresolved("Couldn't shutdown SSL connection");
+    } else {
+        if (client.sslShutdown()) {
+            runtest.pass("Shutdown SSL connection");
+        } else {
+            runtest.fail("Couldn't shutdown SSL connection");
+        }
+    }
+    
 }
 
 static void
@@ -147,6 +205,10 @@ usage (void)
     cerr << "-o\tPort" << endl;
     cerr << "-c\tCert File" << endl;
     cerr << "-p\tPem file" << endl;
+    cerr << "-k\tKeyfile file" << endl;
+    cerr << "-w\tPassword" << endl;
+    cerr << "-a\tCA List" << endl;
+    cerr << "-r\tRoot path" << endl;
     exit (-1);
 }
 
@@ -161,23 +223,3 @@ main(int /*argc*/, char /* *argv[]*/)
 }
 
 #endif
-
-    
-// T 193.2.4.161:1935 -> 192.168.1.103:34693 [AP]
-//   03 00 00 00 00 00 9e 14    00 00 00 00 02 00 06 5f    ..............._
-//   65 72 72 6f 72 00 3f f0    00 00 00 00 00 00 05 03    error.?.........
-//   00 05 6c 65 76 65 6c 02    00 05 65 72 72 6f 72 00    ..level...error.
-//   04 63 6f 64 65 02 00 1e    4e 65 74 43 6f 6e 6e 65    .code...NetConne
-//   63 74 69 6f 6e 2e 43 6f    6e 6e 65 63 74 2e 52 65    ction.Connect.Re
-//   6a 65 63 74 65 64 00 0b    64 65 73 63 72 69 70 74    jected..descript
-//   69 6f 6e 02 00 41 5b 20    53 65 72 76 65 72 2e 52    ion..A[ Server.R
-//   65 6a 65 63 74 20 5d 20    3a 20 56 69 72 74 75 61    eject ] : Virtua
-//   6c 20 68 6f 73 74 20 5f    64 65 66 61 c3 75 6c 74    l host _defa.ult
-//   56 48 6f 73 74 5f 20 69    73 20 6e 6f 74 20 61 76    VHost_ is not av
-//   61 69 6c 61 62 6c 65 2e    00 00 09                   ailable....     
-// #
-
-// T 193.2.4.161:1935 -> 192.168.1.103:34693 [AP]
-//   03 00 00 00 00 00 12 14    00 00 00 00 02 00 05 63    ...............c
-//   6c 6f 73 65 00 00 00 00    00 00 00 00 00 05          lose..........  
-// #
