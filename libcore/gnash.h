@@ -25,7 +25,6 @@
 
 #include "dsodefs.h"
 
-#include <memory> // for auto_ptr
 #include <string>
 
 namespace gnash {
@@ -73,10 +72,9 @@ DSOEXPORT void set_render_handler(render_handler* s);
 // version of the library, depending on platform etc.
 DSOEXPORT render_handler*   create_render_handler_ogl(bool init = true);
 
-
 /// Initialize gnash core library
 //
-DSOEXPORT void  gnashInit();
+DSOEXPORT void gnashInit();
 
 /// Maximum release of resources. 
 //
