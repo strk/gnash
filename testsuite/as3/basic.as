@@ -21,13 +21,11 @@ package hello {
 
     import flash.display.MovieClip;
 
-
     public class Hello extends MovieClip {
 
         DEJAGNU_OBJ;
 
         public function Hello() {
-            INIT_DEJAGNU;    
 
             var i = 1;
             i++;

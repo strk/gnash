@@ -28,6 +28,7 @@ SANE_AS3TESTS = \
 
 BOGUS_AS3TESTS = \
 	basic.as \
+	class.as \
 	$(NULL)
 
 AS3TESTS=$(SANE_AS3TESTS) $(BOGUS_AS3TESTS)

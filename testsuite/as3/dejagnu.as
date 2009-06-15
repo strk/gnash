@@ -23,52 +23,45 @@ package dejagnu {
 
     public class Dejagnu extends Sprite {
 
-        private var passed;
-        private var failed;
-        private var xpassed;
-        private var xfailed;
-        private var untest;
-        private var unresolve;
-        private var tf:TextField;
+        private static var passed = 0;
+        private static var failed = 0;
+        private static var xpassed = 0;
+        private static var xfailed = 0;
+        private static var untest = 0;
+        private static var unresolve = 0;
+        private static var tf:TextField = new TextField();
         
-        public function Dejagnu(o) {
-            passed = 0;
-            failed = 0;
-            xpassed = 0;
-            xfailed = 0;
-            untest = 0;
-            unresolve = 0;
-            tf = new TextField();
+        public static function Dejagnu(o) {
             tf.autoSize = TextFieldAutoSize.LEFT;
             addChild(tf);
             o.addChild(this);
         } 
        
-        public function fail (why) {
+        public static function fail (why) {
             failed++;
             var msg = 'FAILED: '+why;
             xtrace(msg);
         }
         
-        public function xfail(why) {
+        public static function xfail(why) {
             xfailed++;
             var msg = 'XFAILED: '+why;
             xtrace(msg);
         }
 
-        public function pass(why) {
+        public static function pass(why) {
             passed++;
             var msg = 'PASSED: '+why;
             trace (msg);
         }
 
-        public function xpass(why) {
+        public static function xpass(why) {
             xpassed++;
             var msg = 'XPASSED: '+why;
             trace (msg);
         }
 
-        public function totals(exp, msg) {
+        public static function totals(exp, msg) {
             var obt = testcount();
             if ( exp != undefined && obt != exp ) {
                 fail('Test run '+obt+' (expected '+exp+') ['+msg+']');
@@ -77,7 +70,7 @@ package dejagnu {
             }
         }
     
-        public function xtotals(exp, msg) {
+        public static function xtotals(exp, msg) {
             var obt = testcount();
             if ( exp != undefined && obt != exp ) {
                 xfail('Test run '+obt+' (expected '+exp+') ['+msg+']');
@@ -86,7 +79,7 @@ package dejagnu {
             }
         }
     
-        public function check_equals(obt, exp, msg, expression) {
+        public static function check_equals(obt, exp, msg, expression) {
             if (msg == null) msg = "";
             if (obt == exp) { 
                 pass(expression + ' == ' + exp + ' ' + msg);
@@ -97,7 +90,7 @@ package dejagnu {
             }
         }
     
-        public function xcheck_equals(obt, exp, msg, expression) {
+        public static function xcheck_equals(obt, exp, msg, expression) {
             if (msg == null) msg = "";
             if (obt == exp) { 
                 xpass(expression + ' == ' + exp + ' ' + msg);
@@ -108,7 +101,7 @@ package dejagnu {
             }
         }
     
-        public function check(a, msg) {
+        public static function check(a, msg) {
             if (a) {
                 pass(msg != undefined ? msg : a);
             }
@@ -117,7 +110,7 @@ package dejagnu {
             }
         }
     
-        public function xcheck(a, msg) {
+        public static function xcheck(a, msg) {
             if (a) { 
                 xpass(msg != undefined ? msg : a);
             }
@@ -126,31 +119,31 @@ package dejagnu {
             }
         }
     
-        public function note(msg) {
+        public static function note(msg) {
             xtrace(msg);
         }
     
-        public function untested(msg) {
+        public static function untested(msg) {
             trace("UNTESTED: "+msg);
         }
     
-        public function unresolved(msg) {
+        public static function unresolved(msg) {
             trace("UNRESOLVED: "+msg);
         }
     
         /// Private functions.
 
-        private function xtrace(msg) {
-            tf.text += msg + "\n";
+        private static function xtrace(msg) {
+            //tf.text += msg + "\n";
             trace(msg);
         }
 
-        private function done() {
+        private static function done() {
             printtotals();
             trace("__END_OF_TEST__");
         }
         
-        private function testcount() {
+        private static function testcount() {
             var c = 0;
             if ( passed ) c += passed;
             if ( failed ) c += failed;
@@ -159,7 +152,7 @@ package dejagnu {
             return c;
         }
     
-        private function printtotals() {
+        private static function printtotals() {
             xtrace('#passed: '+ passed);
             xtrace('#failed: '+ failed);
             if ( xpassed ) {
