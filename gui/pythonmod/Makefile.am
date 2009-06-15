@@ -65,6 +65,10 @@ INCLUDES += $(GLEXT_CFLAGS)
 endif
 if BUILD_AGG_RENDERER
 RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_agg.cpp
+if HAVE_XV
+RENDERER_GLUE += $(top_srcdir)/gui/gtk_glue_agg_xv.cpp
+gnash_la_LIBADD += $(X11_LIBS)
+endif               # HAVE_XV
 endif
 if BUILD_CAIRO_RENDERER
 RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_cairo.cpp
