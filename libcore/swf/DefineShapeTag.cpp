@@ -25,7 +25,6 @@
 
 #include "DefineShapeTag.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "Shape.h"
