@@ -21,10 +21,10 @@
 # include "gnashconfig.h"
 #endif
 
+#include "MovieFactory.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
 #include "utility.h"
-#include "impl.h"
 #include "fontlib.h"
 #include "log.h"
 #include "GnashImage.h"
@@ -99,7 +99,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 
 movie_definition*
-create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
+MovieFactory::createMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunInfo& runInfo, bool startLoaderThread)
 {
   assert(in.get());
@@ -140,8 +140,9 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
 }
 
 movie_definition*
-create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
-        bool startLoaderThread, const std::string* postdata)
+createNonLibraryMovie(const URL& url, const RunInfo& runInfo,
+        const char* reset_url, bool startLoaderThread,
+        const std::string* postdata)
 {
 
   std::auto_ptr<IOChannel> in;
@@ -168,7 +169,7 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
   }
 
   std::string movie_url = reset_url ? reset_url : url.str();
-  movie_definition* ret = create_movie(in, movie_url, runInfo,
+  movie_definition* ret = MovieFactory::createMovie(in, movie_url, runInfo,
           startLoaderThread);
 
   return ret;
@@ -332,7 +333,8 @@ static void clear_library()
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
 //
-movie_definition* create_library_movie(const URL& url, const RunInfo& runInfo,
+movie_definition*
+MovieFactory::createMovie(const URL& url, const RunInfo& runInfo,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {
@@ -353,9 +355,9 @@ movie_definition* create_library_movie(const URL& url, const RunInfo& runInfo,
 
     // Try to open a file under the filename, but DO NOT start
     // the loader thread now to avoid IMPORT tag loaders from 
-    // calling create_library_movie() again and NOT finding
+    // calling createMovie() again and NOT finding
     // the just-created movie.
-    movie_definition* mov = create_movie(url, runInfo, real_url, false,
+    movie_definition* mov = createNonLibraryMovie(url, runInfo, real_url, false,
             postdata);
 
     if (!mov)

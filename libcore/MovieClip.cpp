@@ -21,6 +21,7 @@
 #include "gnashconfig.h" // USE_SWFTREE 
 #endif
 
+#include "MovieFactory.h"
 #include "log.h" 
 #include "action.h" // for call_method_parsed (call_method_args)
 #include "MovieClip.h"
@@ -2280,7 +2281,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         const movie_root& mr = _vm.getRoot();
 
         boost::intrusive_ptr<movie_definition> md(
-                create_library_movie(url, mr.runInfo(), NULL, true, postdata));
+            MovieFactory::createMovie(url, mr.runInfo(), NULL, true, postdata));
 
         if (!md)
         {

@@ -34,7 +34,7 @@
 #include "sound_handler.h"
 #include "Timers.h"
 #include "GnashKey.h"
-#include "gnash.h"
+#include "MovieFactory.h"
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
 
@@ -425,7 +425,7 @@ bool
 movie_root::loadLevel(unsigned int num, const URL& url)
 {
 	boost::intrusive_ptr<movie_definition> md (
-            create_library_movie(url, _runInfo));
+            MovieFactory::createMovie(url, _runInfo));
 	if (!md)
 	{
 		log_error(_("can't create movie_definition for %s"), url.str());

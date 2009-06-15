@@ -406,7 +406,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
       {
          std::auto_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
-         md = gnash::create_movie(in, filename, runInfo, false);
+         md = gnash::createMovie(in, filename, runInfo, false);
       }
       else
       {
@@ -423,7 +423,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
              log_debug(_("%s appended to local sandboxes"), path.c_str());
 #endif
          }
-         md = gnash::create_library_movie(url, runInfo, NULL, false);
+         md = gnash::createMovie(url, runInfo, NULL, false);
       }
     }
     catch (GnashException& ge)

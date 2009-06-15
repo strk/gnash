@@ -26,7 +26,7 @@
 #include "Movie.h"
 #include "movie_root.h"
 #include "MovieClip.h"
-#include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
+#include "MovieFactory.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "NullSoundHandler.h"
 #include "RGBA.h" // for rgba class (pixel checking)
@@ -103,7 +103,7 @@ MovieTester::MovieTester(const std::string& url)
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = gnash::create_movie(in, url, *_runInfo, false);
+		_movie_def = MovieFactory::createMovie(in, url, *_runInfo, false);
 	}
 	else
 	{
@@ -123,7 +123,7 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = gnash::create_library_movie(urlObj, *_runInfo,
+		_movie_def = MovieFactory::createMovie(urlObj, *_runInfo,
                 NULL, false);
 	}
 

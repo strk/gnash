@@ -45,11 +45,11 @@
 #include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
 #include "SoundInfo.h"
-#include "gnash.h" 
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
 #include "ExportableResource.h"
+#include "MovieFactory.h"
 #include "render.h"
 
 #ifdef HAVE_ZLIB_H
@@ -858,7 +858,7 @@ void import_loader(SWFStream& in, TagType tag, movie_definition& m,
     boost::intrusive_ptr<movie_definition> source_movie;
 
     try {
-        source_movie = create_library_movie(abs_url, r);
+        source_movie = MovieFactory::createMovie(abs_url, r);
     }
     catch (gnash::GnashException& e) {
         log_error(_("Exception: %s"), e.what());

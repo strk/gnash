@@ -433,7 +433,7 @@ nsPluginInstance::threadMain(void)
 
     gnash::movie_definition* md = NULL;
     try {
-        md = gnash::create_library_movie(url, _url.c_str(), false);
+        md = gnash::createMovie(url, _url.c_str(), false);
     } catch (const gnash::GnashException& err) {
         md = NULL;
     }

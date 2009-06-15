@@ -16,12 +16,37 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_IMPL_H
-#define GNASH_IMPL_H
+#ifndef GNASH_MOVIE_FACTORY_H
+#define GNASH_MOVIE_FACTORY_H
+
+#include "dsodefs.h"
+
+#include <string>
+#include <memory>
+
+namespace gnash {
+    class IOChannel;
+    class RunInfo;
+    class movie_definition;
+    class URL;
+}
 
 namespace gnash {
 
-}	// end namespace gnash
+class MovieFactory
+{
+public:
+    
+    static DSOEXPORT movie_definition* createMovie(const URL& url,
+        const RunInfo& runInfo, const char* real_url = NULL,
+        bool startLoaderThread = true, const std::string* postdata = NULL);
+    
+    static DSOEXPORT movie_definition* createMovie(std::auto_ptr<IOChannel> in,
+            const std::string& url, const RunInfo& runInfo,
+            bool startLoaderThread);
+};
+
+} // namespace gnash
 
 
 #endif // GNASH_IMPL_H

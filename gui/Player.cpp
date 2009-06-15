@@ -28,7 +28,7 @@
 #include "gui.h"
 #include "NullGui.h"
 
-#include "gnash.h" // still needed ?
+#include "MovieFactory.h"
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
 #include "MovieClip.h" // for setting FlashVars
@@ -263,7 +263,7 @@ Player::load_movie()
         {
             std::auto_ptr<IOChannel> in (
                     noseek_fd_adapter::make_stream(fileno(stdin)));
-            md = gnash::create_movie(in, _url, *_runInfo, false);
+            md = MovieFactory::createMovie(in, _url, *_runInfo, false);
         }
         else
         {
@@ -274,7 +274,7 @@ Player::load_movie()
                 // We'll need to allow load of the file, no matter virtual url
                 // specified...
                 // This is kind of hackish, cleaner would be adding an argument
-                // to create_library_movie to skip the security checking phase.
+                // to createMovie to skip the security checking phase.
                 // NOTE that if we fail to allow this load, the konqueror plugin
                 // would not be able to load anything
                 //
@@ -283,7 +283,7 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = gnash::create_library_movie(url, *_runInfo, _url.c_str(),
+            md = MovieFactory::createMovie(url, *_runInfo, _url.c_str(),
                     false);
         }
     } catch (const GnashException& er) {

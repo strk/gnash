@@ -247,7 +247,7 @@ EXTENSIONS_API = \
 	swf/ShapeRecord.h \
 	swf/TagLoadersTable.h \
 	swf/SWF.h \
-	impl.h \
+	MovieFactory.h \
 	fill_style.h \
 	styles.h \
 	ExportableResource.h \
