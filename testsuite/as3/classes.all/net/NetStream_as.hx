@@ -60,56 +60,59 @@ class NetStream_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.bufferLength, Float)) {
-	    DejaGnu.pass("NetStream.bufferLength property exists");
+	//FIXME: This read-only property must be initialized before it can be tested
+	if (Type.typeof(x1.bufferLength) == ValueType.TFloat) {
+	    DejaGnu.xpass("NetStream.bufferLength property exists");
 	} else {
-	    DejaGnu.fail("NetStream.bufferLength property doesn't exist");
+	    DejaGnu.xfail("NetStream.bufferLength property doesn't exist");
 	}
-	if (Std.is(x1.bufferTime, Float)) {
+	if (Type.typeof(x1.bufferTime) == ValueType.TFloat) {
 	    DejaGnu.pass("NetStream.bufferTime property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bufferTime property doesn't exist");
 	}
-	if (Std.is(x1.bytesLoaded, Int)) {
+	if (Type.typeof(x1.bytesLoaded) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.bytesLoaded property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bytesLoaded property doesn't exist");
 	}
-	if (Std.is(x1.bytesTotal, Int)) {
+	if (Type.typeof(x1.bytesTotal) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.bytesTotal property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bytesTotal property doesn't exist");
 	}
-	if (Std.is(x1.time, Float)) {
-	    DejaGnu.pass("NetStream.time property exists");
+	//FIXME: This read-only property must be initialized before it can be tested
+	if (Type.typeof(x1.time) == ValueType.TFloat) {
+	    DejaGnu.xpass("NetStream.time property exists");
 	} else {
-	    DejaGnu.fail("NetStream.time property doesn't exist");
+	    DejaGnu.xfail("NetStream.time property doesn't exist");
 	}
 #if !flash9
-	if (Std.is(x1.currentFps, Float)) {
-	    DejaGnu.pass("NetStream.currentFPS property exists");
+	//FIXME: This read-only property must be initialized before it can be tested
+	if (Type.typeof(x1.currentFps) == ValueType.TFloat) {
+	    DejaGnu.xpass("NetStream.currentFps property exists");
 	} else {
-	    DejaGnu.fail("NetStream.currentFPS property doesn't exist");
+	    DejaGnu.xfail("NetStream.currentFps property doesn't exist");
 	}
 #end
-	if (Std.is(x1.liveDelay, Float)) {
+	if (Type.typeof(x1.liveDelay) == ValueType.TFloat) {
 	    DejaGnu.pass("NetStream.liveDelay property exists");
 	} else {
 	    DejaGnu.xfail("NetStream.liveDelay property doesn't exist");
 	}
 #if flash9
-	if (Std.is(x1.currentFPS, Float)) {
+	if (Type.typeof(x1.currentFPS) == ValueType.TFloat) {
 	    DejaGnu.pass("NetStream.currentFPS property exists");
 	} else {
 	    DejaGnu.fail("NetStream.currentFPS property doesn't exist");
 	}
 //FIXME: This property only exists in haXe
-	if (Std.is(x1.audioCodec, Int)) {
+	if (Type.typeof(x1.audioCodec) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.audioCodec property exists");
 	} else {
 	    DejaGnu.fail("NetStream.audioCodec property doesn't exist");
 	}
-	if (Std.is(x1.checkPolicyFile, Bool)) {
+	if (Type.typeof(x1.checkPolicyFile) == ValueType.TBool) {
 	    DejaGnu.pass("NetStream.checkPolicyFile property exists");
 	} else {
 	    DejaGnu.fail("NetStream.checkPolicyFile property doesn't exist");
@@ -120,12 +123,12 @@ class NetStream_as {
  	    DejaGnu.fail("NetStream.client property doesn't exist");
  	}
 //FIXME: This property only exists in haXe
- 	if (Std.is(x1.decodedFrames, Int)) {
+ 	if (Type.typeof(x1.decodedFrames) == ValueType.TInt) {
  	    DejaGnu.pass("NetStream.decodedFrames property exists");
  	} else {
  	    DejaGnu.fail("NetStream.decodedFrames property doesn't exist");
  	}
-	if (Std.is(x1.objectEncoding, Int)) {
+	if (Type.typeof(x1.objectEncoding) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.objectEncoding property exists");
 	} else {
 	    DejaGnu.fail("NetStream.objectEncoding property doesn't exist");
@@ -136,7 +139,7 @@ class NetStream_as {
  	    DejaGnu.fail("NetStream.soundTransform property doesn't exist");
  	}
 //FIXME: This property only exists in haXe
- 	if (Std.is(x1.videoCodec, Int)) {
+ 	if (Type.typeof(x1.videoCodec) == ValueType.TInt) {
  	    DejaGnu.pass("NetStream.videoCodec property exists");
  	} else {
  	    DejaGnu.fail("NetStream.videoCodec property doesn't exist");

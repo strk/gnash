@@ -67,17 +67,17 @@ class SharedObject_as {
 // 	} else {
 // 	    DejaGnu.fail("SharedObject.fps property doesn't exist");
 // 	}
-	if (Std.is(x1.objectEncoding, Int)) {
+	if (Type.typeof(x1.objectEncoding) == ValueType.TInt) {
 	    DejaGnu.pass("SharedObject.objectEncoding property exists");
 	} else {
 	    DejaGnu.fail("SharedObject.objectEncoding property doesn't exist");
 	}
-	if (Std.is(x1.size, Int)) {
+	if (Type.typeof(x1.size) == ValueType.TInt) {
 	    DejaGnu.pass("SharedObject.size property exists");
 	} else {
 	    DejaGnu.fail("SharedObject.size property doesn't exist");
 	}
-	if (Std.is(SharedObject.defaultObjectEncoding, Int)) {
+	if (Type.typeof(SharedObject.defaultObjectEncoding) == ValueType.TInt) {
 	    DejaGnu.pass("SharedObject.defaultObjectEncoding property exists");
 	} else {
 	    DejaGnu.fail("SharedObject.defaultObjectEncoding property doesn't exist");

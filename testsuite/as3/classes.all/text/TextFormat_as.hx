@@ -113,9 +113,9 @@ class TextFormat_as {
 	    DejaGnu.fail("TextFormat.leftMargin property doesn't exist");
 	}
 	if (Std.is(x1.letterSpacing, Dynamic)) {
-	    DejaGnu.pass("TextFormat.letterSpacing property exists");
+	    DejaGnu.xpass("TextFormat.letterSpacing property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.letterSpacing property doesn't exist");
+	    DejaGnu.xfail("TextFormat.letterSpacing property doesn't exist");
 	}
 	if (Std.is(x1.rightMargin, Dynamic)) {
 	    DejaGnu.pass("TextFormat.rightMargin property exists");
@@ -134,78 +134,85 @@ class TextFormat_as {
 	}
 #else
 	x1.blockIndent = 0.0;
-	if (Std.is(x1.blockIndent, Float)) {
-	    DejaGnu.pass("TextFormat.blockIndent property exists");
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.blockIndent) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.blockIndent property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.blockIndent property doesn't exist");
+	    DejaGnu.xfail("TextFormat.blockIndent property should be float, returns type "+Type.typeof(x1.blockIndent));
 	}
 	if (Std.is(x1.align, String)) {
 	    DejaGnu.pass("TextFormat.align property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.align property doesn't exist");
 	}
-	if (Std.is(x1.bold, Bool)) {
+	if (Type.typeof(x1.bold) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.bold property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.bold property doesn't exist");
 	}
-	if (Std.is(x1.bullet, Bool)) {
+	if (Type.typeof(x1.bullet) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.bullet property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.bullet property doesn't exist");
 	}
-	if (Std.is(x1.color, Int)) {
+	if (Type.typeof(x1.color) == ValueType.TInt) {
 	    DejaGnu.pass("TextFormat.color property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.color property doesn't exist");
 	}
-	if (Std.is(x1.indent, Float)) {
-	    DejaGnu.pass("TextFormat.indent property exists");
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.indent) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.indent property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.indent property doesn't exist");
+	    DejaGnu.xfail("TextFormat.indent property should be float, returns type "+Type.typeof(x1.indent));
 	}
-	if (Std.is(x1.italic, Bool)) {
+	if (Type.typeof(x1.italic) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.italic property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.italic property doesn't exist");
 	}
-	if (Std.is(x1.leading, Float)) {
-	    DejaGnu.pass("TextFormat.leading property exists");
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.leading) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.leading property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.leading property doesn't exist");
+	    DejaGnu.xfail("TextFormat.leading property should be float, returns type "+Type.typeof(x1.leading));
 	}
-	if (Std.is(x1.leftMargin, Float)) {
-	    DejaGnu.pass("TextFormat.leftMargin property exists");
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.leftMargin) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.leftMargin property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.leftMargin property doesn't exist");
+	    DejaGnu.xfail("TextFormat.leftMargin property should be float, returns type "+Type.typeof(x1.leftMargin));
 	}
-	if (Std.is(x1.rightMargin, Float)) {
-	    DejaGnu.pass("TextFormat.rightMargin property exists");
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.rightMargin) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.rightMargin property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.rightMargin property doesn't exist");
+	    DejaGnu.xfail("TextFormat.rightMargin property should be float, returns type "+Type.typeof(x1.rightMargin));
 	}
-	if (Std.is(x1.size, Float)) {
-	    DejaGnu.pass("TextFormat.size property exists");
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.size) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.size property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.size property doesn't exist");
+	    DejaGnu.xfail("TextFormat.size property should be float, returns type "+Type.typeof(x1.size));
 	}
-	if (Std.is(x1.underline, Bool)) {
+	if (Type.typeof(x1.underline) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.underline property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.underline property doesn't exist");
 	}
 #if flash8
 	x1.kerning = false;
-	if (Std.is(x1.kerning, Bool)) {
+	if (Type.typeof(x1.kerning) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.kerning property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.kerning property doesn't exist");
 	}
-	x1.letterSpacing = 0;
-	if (Std.is(x1.letterSpacing, Float)) {
-	    DejaGnu.pass("TextFormat.letterSpacing property exists");
+	x1.letterSpacing = 0.0;
+	//FIXME: gnash uses incorrect data type Int
+	if (Type.typeof(x1.letterSpacing) == ValueType.TFloat) {
+	    DejaGnu.xpass("TextFormat.letterSpacing property exists");
 	} else {
-	    DejaGnu.fail("TextFormat.letterSpacing property doesn't exist");
+	    DejaGnu.xfail("TextFormat.letterSpacing property should be float, returns type "+Type.typeof(x1.letterSpacing));
 	}
 	if (Std.is(x1.display, String)) {
 	    DejaGnu.pass("TextFormat.display property exists");

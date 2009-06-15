@@ -51,32 +51,32 @@ class TextLineMetrics_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.ascent, Float)) {
+	if (Type.typeof(x1.ascent) == ValueType.TFloat) {
 	    DejaGnu.pass("TextLineMetrics.ascent property exists");
 	} else {
 	    DejaGnu.fail("TextLineMetrics.ascent property doesn't exist");
 	}
-	if (Std.is(x1.descent, Float)) {
+	if (Type.typeof(x1.descent) == ValueType.TFloat) {
 	    DejaGnu.pass("TextLineMetrics.descent property exists");
 	} else {
 	    DejaGnu.fail("TextLineMetrics.descent property doesn't exist");
 	}
-	if (Std.is(x1.height, Float)) {
+	if (Type.typeof(x1.height) == ValueType.TFloat) {
 	    DejaGnu.pass("TextLineMetrics.height property exists");
 	} else {
 	    DejaGnu.fail("TextLineMetrics.height property doesn't exist");
 	}
-	if (Std.is(x1.leading, Float)) {
+	if (Type.typeof(x1.leading) == ValueType.TFloat) {
 	    DejaGnu.pass("TextLineMetrics.leading property exists");
 	} else {
 	    DejaGnu.fail("TextLineMetrics.leading property doesn't exist");
 	}
-	if (Std.is(x1.width, Float)) {
+	if (Type.typeof(x1.width) == ValueType.TFloat) {
 	    DejaGnu.pass("TextLineMetrics.width property exists");
 	} else {
 	    DejaGnu.fail("TextLineMetrics.width property doesn't exist");
 	}
-	if (Std.is(x1.x, Float)) {
+	if (Type.typeof(x1.x) == ValueType.TFloat) {
 	    DejaGnu.pass("TextLineMetrics.x property exists");
 	} else {
 	    DejaGnu.fail("TextLineMetrics.x property doesn't exist");

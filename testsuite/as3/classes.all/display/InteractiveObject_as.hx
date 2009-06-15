@@ -66,7 +66,7 @@ class InteractiveObject_as {
  	} else {
  	    DejaGnu.fail("InteractiveObject::contextMenu property doesn't exist");
  	}
-	if (Std.is(x1.doubleClickEnabled, Bool)) {
+	if (Type.typeof(x1.doubleClickEnabled) == ValueType.TBool) {
 	    DejaGnu.pass("InteractiveObject::doubleClickEnabled property exists");
 	} else {
 	    DejaGnu.fail("InteractiveObject::doubleClickEnabled property doesn't exist");
@@ -76,17 +76,17 @@ class InteractiveObject_as {
  	} else {
  	    DejaGnu.fail("InteractiveObject::focusRect property doesn't exist");
  	}
-	if (Std.is(x1.mouseEnabled, Bool)) {
+	if (Type.typeof(x1.mouseEnabled) == ValueType.TBool) {
 	    DejaGnu.pass("InteractiveObject::mouseEnabled property exists");
 	} else {
 	    DejaGnu.fail("InteractiveObject::mouseEnabled property doesn't exist");
 	}
-	if (Std.is(x1.tabEnabled, Bool)) {
+	if (Type.typeof(x1.tabEnabled) == ValueType.TBool) {
 	    DejaGnu.pass("InteractiveObject::tabEnabled property exists");
 	} else {
 	    DejaGnu.fail("InteractiveObject::tabEnabled property doesn't exist");
 	}
-	if (Std.is(x1.tabIndex, Int)) {
+	if (Type.typeof(x1.tabIndex) == ValueType.TInt) {
 	    DejaGnu.pass("InteractiveObject::tabIndex property exists");
 	} else {
 	    DejaGnu.fail("InteractiveObject::tabIndex property doesn't exist");

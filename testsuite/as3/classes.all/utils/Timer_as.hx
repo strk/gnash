@@ -49,22 +49,22 @@ class Timer_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.currentCount, Int)) {
+	if (Type.typeof(x1.currentCount) == ValueType.TInt) {
 	    DejaGnu.pass("Timer.currentCount property exists");
 	} else {
 	    DejaGnu.fail("Timer.currentCount property doesn't exist");
 	}
-	if (Std.is(x1.delay, Int)) {
+	if (Type.typeof(x1.delay) == ValueType.TInt) {
 	    DejaGnu.pass("Timer.delay property exists");
 	} else {
 	    DejaGnu.fail("Timer.delay property doesn't exist");
 	}
-	if (Std.is(x1.repeatCount, Int)) {
+	if (Type.typeof(x1.repeatCount) == ValueType.TInt) {
 	    DejaGnu.pass("Timer.repeatCount property exists");
 	} else {
 	    DejaGnu.fail("Timer.repeatCount property doesn't exist");
 	}
-	if (Std.is(x1.running, Bool)) {
+	if (Type.typeof(x1.running) == ValueType.TBool) {
 	    DejaGnu.pass("Timer.running property exists");
 	} else {
 	    DejaGnu.fail("Timer.running property doesn't exist");

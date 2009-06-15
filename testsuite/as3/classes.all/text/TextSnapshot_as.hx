@@ -61,7 +61,7 @@ class TextSnapshot_as {
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
 #if flash9
-	if (Std.is(x1.charCount, Int)) {
+	if (Type.typeof(x1.charCount) == ValueType.TInt) {
 	    DejaGnu.pass("TextSnapshot.charCount property exists");
 	} else {
 	    DejaGnu.fail("TextSnapshot.charCount property doesn't exist");

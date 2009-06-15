@@ -54,7 +54,7 @@ class Sprite_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.buttonMode, Bool)) {
+	if (Type.typeof(x1.buttonMode) == ValueType.TBool) {
 	    DejaGnu.pass("Sprite::buttonMode property exists");
 	} else {
 	    DejaGnu.fail("Sprite::buttonMode property doesn't exist");
@@ -83,7 +83,7 @@ class Sprite_as {
  	} else {
  	    DejaGnu.fail("Sprite::soundTransform property doesn't exist");
  	}
-	if (Std.is(x1.useHandCursor, Bool)) {
+	if (Type.typeof(x1.useHandCursor) == ValueType.TBool) {
 	    DejaGnu.pass("Sprite::useHandCursor property exists");
 	} else {
 	    DejaGnu.fail("Sprite::useHandCursor property doesn't exist");

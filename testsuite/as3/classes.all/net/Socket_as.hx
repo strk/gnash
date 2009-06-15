@@ -56,7 +56,7 @@ class Socket_as {
 //	} else {
 //	    DejaGnu.fail("Socket.bytesAvailable property doesn't exist");
 //	}
-	if (Std.is(x1.connected, Bool)) {
+	if (Type.typeof(x1.connected) == ValueType.TBool) {
 	    DejaGnu.pass("Socket.connected property exists");
 	} else {
 	    DejaGnu.fail("Socket.connected property doesn't exist");
@@ -66,7 +66,7 @@ class Socket_as {
 	} else {
 	    DejaGnu.fail("Socket.endian property doesn't exist");
 	}
-	if (Std.is(x1.objectEncoding, Int)) {
+	if (Type.typeof(x1.objectEncoding) == ValueType.TInt) {
 	    DejaGnu.pass("Socket.objectEncoding property exists");
 	} else {
 	    DejaGnu.fail("Socket.objectEncoding property doesn't exist");
