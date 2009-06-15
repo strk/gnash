@@ -132,6 +132,8 @@ movieclip_class_init(as_object& where)
             where.getVM().addStatic(cl.get());
         }
         
+        log_debug("AVM2 MovieClip, ctor %s", cl.get());
+
         where.init_member("MovieClip", cl.get());
         return;
     }
@@ -2631,13 +2633,13 @@ movieclip_transform(const fn_call& fn)
 as_value
 movieclip_as3_ctor(const fn_call& fn)
 {
-
     assert(isAS3(fn));
 
-    boost::intrusive_ptr<as_object> clip = 
-        new as_object(getMovieClipAS3Interface());
+    GNASH_REPORT_FUNCTION;
 
-    return as_value(clip.get());
+    boost::intrusive_ptr<MovieClip> mc = new MovieClip(0, 0, 0, -1);
+
+    return as_value(mc.get());
 }
 
 
