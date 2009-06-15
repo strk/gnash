@@ -60,10 +60,11 @@ class NetStream_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+	//FIXME: This read-only property must be initialized before it can be tested
 	if (Type.typeof(x1.bufferLength) == ValueType.TFloat) {
-	    DejaGnu.pass("NetStream.bufferLength property exists");
+	    DejaGnu.xpass("NetStream.bufferLength property exists");
 	} else {
-	    DejaGnu.fail("NetStream.bufferLength property doesn't exist");
+	    DejaGnu.xfail("NetStream.bufferLength property doesn't exist");
 	}
 	if (Type.typeof(x1.bufferTime) == ValueType.TFloat) {
 	    DejaGnu.pass("NetStream.bufferTime property exists");
@@ -80,16 +81,18 @@ class NetStream_as {
 	} else {
 	    DejaGnu.fail("NetStream.bytesTotal property doesn't exist");
 	}
+	//FIXME: This read-only property must be initialized before it can be tested
 	if (Type.typeof(x1.time) == ValueType.TFloat) {
-	    DejaGnu.pass("NetStream.time property exists");
+	    DejaGnu.xpass("NetStream.time property exists");
 	} else {
-	    DejaGnu.fail("NetStream.time property doesn't exist");
+	    DejaGnu.xfail("NetStream.time property doesn't exist");
 	}
 #if !flash9
+	//FIXME: This read-only property must be initialized before it can be tested
 	if (Type.typeof(x1.currentFps) == ValueType.TFloat) {
-	    DejaGnu.pass("NetStream.currentFps property exists");
+	    DejaGnu.xpass("NetStream.currentFps property exists");
 	} else {
-	    DejaGnu.fail("NetStream.currentFps property doesn't exist");
+	    DejaGnu.xfail("NetStream.currentFps property doesn't exist");
 	}
 #end
 	if (Type.typeof(x1.liveDelay) == ValueType.TFloat) {

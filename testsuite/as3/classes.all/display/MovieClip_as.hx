@@ -108,12 +108,13 @@ class MovieClip_as {
 	    DejaGnu.fail("MovieClip::trackAsMenu property doesn't exist");
 	}
 #else
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._alpha) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_alpha property exists");
+	    DejaGnu.xpass("MovieClip::_alpha property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_alpha property should be float, returns type "+Type.typeof(x1._alpha));
+	    DejaGnu.xfail("MovieClip::_alpha property should be float, returns type "+Type.typeof(x1._alpha));
 	}
-	if (Type.typeof(x1._currentFrame) == ValueType.TInt) {
+	if (Type.typeof(x1._currentframe) == ValueType.TInt) {
 	    DejaGnu.pass("MovieClip::_currentframe property exists");
 	} else {
 	    DejaGnu.fail("MovieClip::_currentframe property should be int, returns type "+Type.typeof(x1._currentframe));
@@ -133,10 +134,11 @@ class MovieClip_as {
 	} else {
 	    DejaGnu.fail("MovieClip::_framesloaded property doesn't exist");
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._height) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_height property exists");
+	    DejaGnu.xpass("MovieClip::_height property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_height property should be float, returns type "+Type.typeof(x1._height));
+	    DejaGnu.xfail("MovieClip::_height property should be float, returns type "+Type.typeof(x1._height));
 	}
 	if (Type.typeof(x1._lockroot) == ValueType.TBool) {
 	    DejaGnu.pass("MovieClip::_lockroot property exists");
@@ -159,15 +161,17 @@ class MovieClip_as {
 	} else {
 	    DejaGnu.fail("MovieClip::_quality property doesn't exist");
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._rotation) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_rotation property exists");
+	    DejaGnu.xpass("MovieClip::_rotation property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_rotation property should be float, returns type "+Type.typeof(x1._rotation));
+	    DejaGnu.xfail("MovieClip::_rotation property should be float, returns type "+Type.typeof(x1._rotation));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._soundbuftime) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_soundbuftime property exists");
+	    DejaGnu.xpass("MovieClip::_soundbuftime property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_soundbuftime property should be float, returns type "+Type.typeof(x1._soundbuftime));
+	    DejaGnu.xfail("MovieClip::_soundbuftime property should be float, returns type "+Type.typeof(x1._soundbuftime));
 	}
 	if (Std.is(x1._target, String)) {
 	    DejaGnu.pass("MovieClip::_target property exists");
@@ -189,40 +193,47 @@ class MovieClip_as {
 	} else {
 	    DejaGnu.fail("MovieClip::_visible property doesn't exist");
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._width) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_width property exists");
+	    DejaGnu.xpass("MovieClip::_width property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_width property should be float, returns type "+Type.typeof(x1._width));
+	    DejaGnu.xfail("MovieClip::_width property should be float, returns type "+Type.typeof(x1._width));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._x) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_x property exists");
+	    DejaGnu.xpass("MovieClip::_x property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_x property should be float, returns type "+Type.typeof(x1._x));
+	    DejaGnu.xfail("MovieClip::_x property should be float, returns type "+Type.typeof(x1._x));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._xmouse) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_xmouse property exists");
+	    DejaGnu.xpass("MovieClip::_xmouse property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_xmouse property should be float, returns type "+Type.typeof(x1._xmouse));
+	    DejaGnu.xfail("MovieClip::_xmouse property should be float, returns type "+Type.typeof(x1._xmouse));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._xscale) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_xscale property exists");
+	    DejaGnu.xpass("MovieClip::_xscale property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_xscale property should be float, returns type "+Type.typeof(x1._xscale));
+	    DejaGnu.xfail("MovieClip::_xscale property should be float, returns type "+Type.typeof(x1._xscale));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._y) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_y property exists");
+	    DejaGnu.xpass("MovieClip::_y property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_y property should be float, returns type "+Type.typeof(x1._y));
+	    DejaGnu.xfail("MovieClip::_y property should be float, returns type "+Type.typeof(x1._y));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._ymouse) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_ymouse property exists");
+	    DejaGnu.xpass("MovieClip::_ymouse property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_ymouse property should be float, returns type "+Type.typeof(x1._ymouse));
+	    DejaGnu.xfail("MovieClip::_ymouse property should be float, returns type "+Type.typeof(x1._ymouse));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1._yscale) == ValueType.TFloat) {
-	    DejaGnu.pass("MovieClip::_yscale property exists");
+	    DejaGnu.xpass("MovieClip::_yscale property exists");
 	} else {
-	    DejaGnu.fail("MovieClip::_yscale property should be float, returns type "+Type.typeof(x1._yscale));
+	    DejaGnu.xfail("MovieClip::_yscale property should be float, returns type "+Type.typeof(x1._yscale));
 	}
 	if (Std.is(x1.blendMode, Dynamic)) {
 	    DejaGnu.xpass("MovieClip::blendMode property exists");

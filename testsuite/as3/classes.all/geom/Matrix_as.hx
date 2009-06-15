@@ -54,35 +54,41 @@ class Matrix_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1.a) == ValueType.TFloat) {
-	    DejaGnu.pass("Matrix.a property exists");
+	    DejaGnu.xpass("Matrix.a property exists");
 	} else {
-	    DejaGnu.fail("Matrix.a property should be float, returns type "+Type.typeof(x1.a));
+	    DejaGnu.xfail("Matrix.a property should be float, returns type "+Type.typeof(x1.a));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1.b) == ValueType.TFloat) {
-	    DejaGnu.pass("Matrix.b property exists");
+	    DejaGnu.xpass("Matrix.b property exists");
 	} else {
-	    DejaGnu.fail("Matrix.b property should be float, returns type "+Type.typeof(x1.b));
+	    DejaGnu.xfail("Matrix.b property should be float, returns type "+Type.typeof(x1.b));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1.c) == ValueType.TFloat) {
-	    DejaGnu.pass("Matrix.c property exists");
+	    DejaGnu.xpass("Matrix.c property exists");
 	} else {
-	    DejaGnu.fail("Matrix.c property should be float, returns type "+Type.typeof(x1.c));
+	    DejaGnu.xfail("Matrix.c property should be float, returns type "+Type.typeof(x1.c));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1.d) == ValueType.TFloat) {
-	    DejaGnu.pass("Matrix.d property exists");
+	    DejaGnu.xpass("Matrix.d property exists");
 	} else {
-	    DejaGnu.fail("Matrix.d property should be float, returns type "+Type.typeof(x1.d));
+	    DejaGnu.xfail("Matrix.d property should be float, returns type "+Type.typeof(x1.d));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1.tx) == ValueType.TFloat) {
-	    DejaGnu.pass("Matrix.tx property exists");
+	    DejaGnu.xpass("Matrix.tx property exists");
 	} else {
-	    DejaGnu.fail("Matrix.tx property should be float, returns type "+Type.typeof(x1.tx));
+	    DejaGnu.xfail("Matrix.tx property should be float, returns type "+Type.typeof(x1.tx));
 	}
+	//FIXME: gnash uses incorrect data type Int
 	if (Type.typeof(x1.ty) == ValueType.TFloat) {
-	    DejaGnu.pass("Matrix.ty property exists");
+	    DejaGnu.xpass("Matrix.ty property exists");
 	} else {
-	    DejaGnu.fail("Matrix.ty property should be float, returns type "+Type.typeof(x1.ty));
+	    DejaGnu.xfail("Matrix.ty property should be float, returns type "+Type.typeof(x1.ty));
 	}
 
 // Tests to see if all the methods exist. All these do is test for

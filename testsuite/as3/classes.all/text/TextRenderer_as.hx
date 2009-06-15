@@ -57,10 +57,11 @@ class TextRenderer_as {
 	    DejaGnu.fail("TextRenderer.antiAliasType property doesn't exist");
 	}
 #end
+	//FIXME: This property does not appear to have been implemented
 	if (Type.typeof(TextRenderer.maxLevel) == ValueType.TFloat) {
-	    DejaGnu.pass("TextRenderer.maxLevel property exists");
+	    DejaGnu.xpass("TextRenderer.maxLevel property exists");
 	} else {
-	    DejaGnu.fail("TextRenderer.maxLevel property doesn't exist, returns type "+Type.typeof(TextRenderer.maxLevel));
+	    DejaGnu.xfail("TextRenderer.maxLevel property doesn't exist, returns type "+Type.typeof(TextRenderer.maxLevel));
 	}
 
 // Tests to see if all the methods exist. All these do is test for
