@@ -62,10 +62,10 @@ class Microphone_as {
 	} else {
 	    DejaGnu.xfail("Microphone.names property doesn't exist");
 	}
-	if (Std.is(x1.activityLevel, Int)) {
+	if (Type.typeof(x1.activityLevel) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone.activityLevel property exists");
 	} else {
-	    DejaGnu.fail("Microphone.activityLevel property doesn't exist");
+	    DejaGnu.xfail("Microphone.activityLevel property doesn't exist");
 	}
 	
 	
@@ -89,15 +89,15 @@ class Microphone_as {
 	//}
 	
 	
-	if (Std.is(x1.gain, Int)) {
+	if (Type.typeof(x1.gain) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::gain property exists");
 	} else {
-	    DejaGnu.fail("Microphone::gain property doesn't exist");
+	    DejaGnu.xfail("Microphone::gain property doesn't exist");
 	}
-	if (Std.is(x1.index, Int)) {
+	if (Type.typeof(x1.index) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::index property exists");
 	} else {
-	    DejaGnu.fail("Microphone::index property doesn't exist");
+	    DejaGnu.xfail("Microphone::index property doesn't exist");
 	}
 	if (Std.is(x1.muted, Bool)) {
 	    DejaGnu.pass("Microphone::muted property exists");
@@ -110,32 +110,32 @@ class Microphone_as {
 	} else {
 	    DejaGnu.xfail("Microphone::name property doesn't exist");
 	}
-	if (Std.is(x1.rate, Int)) {
+	if (Type.typeof(x1.rate) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::rate property exists");
 	} else {
-	    DejaGnu.fail("Microphone::rate property doesn't exist");
+	    DejaGnu.xfail("Microphone::rate property doesn't exist");
 	}
-	if (Std.is(x1.silenceLevel, Int)) {
+	if (Type.typeof(x1.silenceLevel) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::silenceLevel property exists");
 	} else {
-	    DejaGnu.fail("Microphone::silenceLevel property doesn't exist");
+	    DejaGnu.xfail("Microphone::silenceLevel property doesn't exist");
 	}
 #if flash9
 	if (Std.is(x1.soundTransform, SoundTransform)) {
 	    DejaGnu.pass("Microphone::soundTransform property exists");
 	} else {
-	    DejaGnu.fail("Microphone::soundTransform property doesn't exist");
+	    DejaGnu.xfail("Microphone::soundTransform property doesn't exist");
 	}
-	if (Std.is(x1.silenceTimeout, Int)) {
+	if (Type.typeof(x1.silenceTimeout) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::silenceTimeout property exists");
 	} else {
-	    DejaGnu.fail("Microphone::silenceTimeout property doesn't exist");
+	    DejaGnu.xfail("Microphone::silenceTimeout property doesn't exist");
 	}
 #else
-	if (Std.is(x1.silenceTimeOut, Int)) {
+	if (Type.typeof(x1.silenceTimeOut) == ValueType.TInt) {
 	    DejaGnu.pass("Microphone::silenceTimeOut property exists");
 	} else {
-	    DejaGnu.fail("Microphone::silenceTimeOut property doesn't exist");
+	    DejaGnu.xfail("Microphone::silenceTimeOut property doesn't exist");
 	}
 #end
 	if (Std.is(x1.useEchoSuppression, Bool)) {
