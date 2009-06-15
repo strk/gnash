@@ -3037,7 +3037,7 @@ Machine::executeCodeblock(CodeStream* stream)
 }
 
 void
-Machine::instantiateClass(std::string className, as_object* global)
+Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
 
     log_debug("instantiateClass: class name %s", className);
