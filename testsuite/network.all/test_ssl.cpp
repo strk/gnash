@@ -67,7 +67,7 @@ main(int argc, char *argv[])
         {
             { 'h', "help",          Arg_parser::no  },
             { 'v', "verbose",       Arg_parser::no  },
-            { 'n', "name",          Arg_parser::yes },
+            { 's', "hostname",      Arg_parser::yes },
             { 'o', "port",          Arg_parser::yes },
             { 'c', "cert",          Arg_parser::yes },
             { 'p', "pem",           Arg_parser::yes },
@@ -75,6 +75,7 @@ main(int argc, char *argv[])
             { 'w', "password",      Arg_parser::yes },
             { 'a', "calist",        Arg_parser::yes },
             { 'r', "rootpath",      Arg_parser::yes },
+            { 'n', "netdebug",      Arg_parser::no },
         };
     
     Arg_parser parser(argc, argv, opts);
@@ -94,7 +95,7 @@ main(int argc, char *argv[])
                     dbglogfile.setVerbosity();
                     log_debug(_("Verbose output turned on"));
                     break;
-              case 'n':
+              case 's':
                   client.setHostname(parser.argument(i));
                   log_debug(_("Hostname for SSL connection is: %s"),
                             client.getHostname());
@@ -129,6 +130,14 @@ main(int argc, char *argv[])
                   log_debug(_("Root path for SSL pem files is: %s"),
                             client.getRootPath());
                   break;
+              case 'w':
+                  client.setPassword(parser.argument(i));
+                  log_debug(_("Password for SSL pem files is: %s"),
+                            client.getPassword());
+                  break;
+              case 'n':
+                  client.toggleDebug(true);
+                  break;
               case 0:
                   infile = parser.argument(i);
                   log_debug(_("Input file for testing the SSL connection is: %s"), infile);
@@ -148,7 +157,7 @@ main(int argc, char *argv[])
 static void test_client()
 {
     size_t ret;
-    bool giveup = false;
+    bool giveup = false;    
     
     if (client.sslConnect()) {
         runtest.pass("Connected to SSL server");
@@ -169,6 +178,15 @@ static void test_client()
         }
     }
 
+    if (giveup) {
+        runtest.unresolved("Cert didn't match hostfor SSL connection");
+    } else {
+        if (client.checkCert()) {
+            runtest.pass("Cert matched host for SSL connection");
+        } else {
+            runtest.fail("Cert didn't match host for SSL connection");
+        }
+    }
     
     if (giveup) {
         runtest.unresolved("Couldn't write to SSL connection");
