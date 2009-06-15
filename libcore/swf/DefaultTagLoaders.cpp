@@ -223,8 +223,9 @@ addDefaultLoaders(TagLoadersTable& table)
     (SWF::DOABCDEFINE, DoABCTag::loader)
     // 86
     (SWF::DEFINESCENEANDFRAMELABELDATA,
-            DefineSceneAndFrameLabelDataTag::loader);
+            DefineSceneAndFrameLabelDataTag::loader)
 #endif
+    ;
 
     std::for_each(tags.begin(), tags.end(), AddLoader(table));
 
