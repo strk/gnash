@@ -44,6 +44,10 @@ package hello {
 
         public function Hello() {
 
+            check_equals(this, "[object Hello]");
+            check_equals(this.constructor, "[class Hello]");
+            check_equals(this.constructor.constructor, "[class Class]");
+
             check_equals(S, "[class S]");
             check_equals(S.constructor, "[class Class]");
             check_equals(S.__constructor__, undefined);
@@ -81,7 +85,7 @@ package hello {
             check(d1 instanceof Derived);
             check_equals(S.s, "Base Derived ");
 
-            totals(15);
+            totals(25);
 
             done();
         }
