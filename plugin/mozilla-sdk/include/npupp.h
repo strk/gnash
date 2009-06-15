@@ -31,6 +31,7 @@
 #include "npapi.h"
 #endif
 
+#include <sys/types.h>
 #include "npruntime.h"
 
 #include "jri.h"

@@ -30,6 +30,7 @@
 
 #include "npapi.h"
 #include "npupp.h"
+#include <sys/types.h>
 
 /**************************************************/
 /*                                                */
