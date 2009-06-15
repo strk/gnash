@@ -3055,7 +3055,11 @@ Machine::instantiateClass(std::string className, as_object* global)
 	mCurrentFunction = ctor->getPrototype();
 	mStack.clear();
 	mScopeStack.clear();
-	mRegisters[0] = as_value(global);
+
+    // The value at mRegisters[0] is generally pushed to the stack for
+    // CONSTRUCTSUPER, which apparently expects the object whose super
+    // is to be constructed. Setting it to global as before seems to be wrong.
+	mRegisters[0] = cl->getPrototype();
 	executeCodeblock(ctor->getBody());
 
     log_debug("Finished instantiating class %s", className);
