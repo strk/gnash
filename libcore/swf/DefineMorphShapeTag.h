@@ -31,6 +31,7 @@
 namespace gnash {
     class movie_definition;
     class SWFStream;
+	class RunInfo;
     class MorphShape;
 }
 

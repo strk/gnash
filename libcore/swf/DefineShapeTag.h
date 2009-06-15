@@ -19,6 +19,7 @@ namespace gnash {
 	class cxform;
     class Shape;
 	class SWFMatrix;
+	class RunInfo;
 }
 
 namespace gnash {
