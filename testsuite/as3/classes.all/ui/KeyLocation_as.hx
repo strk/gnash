@@ -42,7 +42,7 @@ class KeyLocation_as {
 // Tests to see if all the constants exist.
 //	if (KeyLocation.STANDARD != null) {
 //        DejaGnu.pass("KeyLocation.STANDARD constant exists");
-        if (Std.is(KeyLocation.STANDARD, Int)) {
+        if (Type.typeof(KeyLocation.STANDARD) == ValueType.TInt) {
         	DejaGnu.pass("KeyLocation.STANDARD is an int");
         	if (Std.string(KeyLocation.STANDARD) == "0") {
         		DejaGnu.pass("KeyLocation.STANDARD is the correct int (0)");
@@ -59,7 +59,7 @@ class KeyLocation_as {
     
 //	if (KeyLocation.LEFT != null) {
 //        DejaGnu.pass("KeyLocation.LEFT constant exists");
-        if (Std.is(KeyLocation.LEFT, Int)) {
+        if (Type.typeof(KeyLocation.LEFT) == ValueType.TInt) {
         	DejaGnu.pass("KeyLocation.LEFT is an int");
         	if (Std.string(KeyLocation.LEFT) == "1") {
         		DejaGnu.pass("KeyLocation.LEFT is the correct int (1)");
@@ -75,7 +75,7 @@ class KeyLocation_as {
     
 //	if (KeyLocation.RIGHT != null) {
 //        DejaGnu.pass("KeyLocation.RIGHT constant exists");
-        if (Std.is(KeyLocation.RIGHT, Int)) {
+        if (Type.typeof(KeyLocation.RIGHT) == ValueType.TInt) {
         	DejaGnu.pass("KeyLocation.RIGHT is an int");
         	if (Std.string(KeyLocation.RIGHT) == "2") {
         		DejaGnu.pass("KeyLocation.RIGHT is the correct int (2)");
@@ -91,7 +91,7 @@ class KeyLocation_as {
 
 //	if (KeyLocation.NUM_PAD != null) {
 //        DejaGnu.pass("KeyLocation.NUM_PAD constant exists");
-        if (Std.is(KeyLocation.NUM_PAD, Int)) {
+        if (Type.typeof(KeyLocation.NUM_PAD) == ValueType.TInt) {
         	DejaGnu.pass("KeyLocation.NUM_PAD is an int");
         	if (Std.string(KeyLocation.NUM_PAD) == "3") {
         		DejaGnu.pass("KeyLocation.NUM_PAD is the correct int (3)");

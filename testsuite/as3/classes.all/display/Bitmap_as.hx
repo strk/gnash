@@ -66,7 +66,7 @@ class Bitmap_as {
 	} else {
 	    DejaGnu.fail("Bitmap::pixelSnapping property doesn't exist");
 	}
-	if (Std.is(x1.smoothing, Bool)) {
+	if (Type.typeof(x1.smoothing) == ValueType.TBool) {
 	    DejaGnu.pass("Bitmap::smoothing property exists");
 	} else {
 	    DejaGnu.fail("Bitmap::smoothing property doesn't exist");

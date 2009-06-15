@@ -56,17 +56,17 @@ class Point_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.length, Int)) {
+	if (Type.typeof(x1.length) == ValueType.TInt) {
 	    DejaGnu.pass("Point.length property exists");
 	} else {
 	    DejaGnu.fail("Point.length property doesn't exist");
 	}
-	if (Std.is(x1.x, Int)) {
+	if (Type.typeof(x1.x) == ValueType.TInt) {
 	    DejaGnu.pass("Point.x property exists");
 	} else {
 	    DejaGnu.fail("Point.x property doesn't exist");
 	}
-	if (Std.is(x1.y, Int)) {
+	if (Type.typeof(x1.y) == ValueType.TInt) {
 	    DejaGnu.pass("Point.y property exists");
 	} else {
 	    DejaGnu.fail("Point.y property doesn't exist");

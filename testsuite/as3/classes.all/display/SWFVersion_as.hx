@@ -39,7 +39,7 @@ class SWFVersion_as {
 #if flash9
         // Make sure we actually get a valid class        	
 
-		if (Std.is(SWFVersion.FLASH1, Int)) {
+		if (Type.typeof(SWFVersion.FLASH1) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH1 is an int");
         	if (Std.string(SWFVersion.FLASH1) == "1") {
         		DejaGnu.pass("SWFVersion.FLASH1 is the correct int (1)");
@@ -49,7 +49,7 @@ class SWFVersion_as {
 		} else {
        		DejaGnu.fail("SWFVersion.FLASH1 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH1));
 		}
-		if (Std.is(SWFVersion.FLASH2, Int)) {
+		if (Type.typeof(SWFVersion.FLASH2) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH2 is an int");
         	if (Std.string(SWFVersion.FLASH2) == "2") {
         		DejaGnu.pass("SWFVersion.FLASH2 is the correct int (2)");
@@ -59,7 +59,7 @@ class SWFVersion_as {
 		} else {
        		DejaGnu.fail("SWFVersion.FLASH2 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH2));
 		}
-		if (Std.is(SWFVersion.FLASH3, Int)) {
+		if (Type.typeof(SWFVersion.FLASH3) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH3 is an int");
         	if (Std.string(SWFVersion.FLASH3) == "3") {
         		DejaGnu.pass("SWFVersion.FLASH3 is the correct int (3)");
@@ -69,7 +69,7 @@ class SWFVersion_as {
 		} else {
        		DejaGnu.fail("SWFVersion.FLASH3 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH3));
 		}
-		if (Std.is(SWFVersion.FLASH4, Int)) {
+		if (Type.typeof(SWFVersion.FLASH4) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH4 is an int");
         	if (Std.string(SWFVersion.FLASH4) == "4") {
         		DejaGnu.pass("SWFVersion.FLASH4 is the correct int (4)");
@@ -79,7 +79,7 @@ class SWFVersion_as {
 		} else {
        		DejaGnu.fail("SWFVersion.FLASH4 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH4));
 		}
-		if (Std.is(SWFVersion.FLASH5, Int)) {
+		if (Type.typeof(SWFVersion.FLASH5) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH5 is an int");
         	if (Std.string(SWFVersion.FLASH5) == "5") {
         		DejaGnu.pass("SWFVersion.FLASH5 is the correct int (5)");
@@ -90,7 +90,7 @@ class SWFVersion_as {
        		DejaGnu.fail("SWFVersion.FLASH5 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH5));
 		}
 		
-		if (Std.is(SWFVersion.FLASH6, Int)) {
+		if (Type.typeof(SWFVersion.FLASH6) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH6 is an int");
         	if (Std.string(SWFVersion.FLASH6) == "6") {
         		DejaGnu.pass("SWFVersion.FLASH6 is the correct int (6)");
@@ -101,7 +101,7 @@ class SWFVersion_as {
        		DejaGnu.fail("SWFVersion.FLASH6 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH6));
 		}
 		
-		if (Std.is(SWFVersion.FLASH7, Int)) {
+		if (Type.typeof(SWFVersion.FLASH7) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH7 is an int");
         	if (Std.string(SWFVersion.FLASH7) == "7") {
         		DejaGnu.pass("SWFVersion.FLASH7 is the correct int (7)");
@@ -112,7 +112,7 @@ class SWFVersion_as {
        		DejaGnu.fail("SWFVersion.FLASH7 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH7));
 		}
 		
-		if (Std.is(SWFVersion.FLASH8, Int)) {
+		if (Type.typeof(SWFVersion.FLASH8) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH8 is an int");
         	if (Std.string(SWFVersion.FLASH8) == "8") {
         		DejaGnu.pass("SWFVersion.FLASH8 is the correct int (8)");
@@ -123,7 +123,7 @@ class SWFVersion_as {
        		DejaGnu.fail("SWFVersion.FLASH8 is not an int. Instead, it is a "+Type.typeof(SWFVersion.FLASH8));
 		}
 		
-		if (Std.is(SWFVersion.FLASH9, Int)) {
+		if (Type.typeof(SWFVersion.FLASH9) == ValueType.TInt) {
         	DejaGnu.pass("SWFVersion.FLASH9 is an int");
         	if (Std.string(SWFVersion.FLASH9) == "9") {
         		DejaGnu.pass("SWFVersion.FLASH9 is the correct int (9)");

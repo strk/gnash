@@ -51,17 +51,17 @@ class DisplayObjectContainer_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.mouseChildren, Bool)) {
+	if (Type.typeof(x1.mouseChildren) == ValueType.TBool) {
 	    DejaGnu.pass("DisplayObjectContainer::mouseChildren property exists");
 	} else {
 	    DejaGnu.fail("DisplayObjectContainer::mouseChildren property doesn't exist");
 	}
-	if (Std.is(x1.numChildren, Int)) {
+	if (Type.typeof(x1.numChildren) == ValueType.TInt) {
 	    DejaGnu.pass("DisplayObjectContainer::numChildren property exists");
 	} else {
 	    DejaGnu.fail("DisplayObjectContainer::numChildren property doesn't exist");
 	}
-	if (Std.is(x1.tabChildren, Bool)) {
+	if (Type.typeof(x1.tabChildren) == ValueType.TBool) {
 	    DejaGnu.pass("DisplayObjectContainer::tabChildren property exists");
 	} else {
 	    DejaGnu.fail("DisplayObjectContainer::tabChildren property doesn't exist");

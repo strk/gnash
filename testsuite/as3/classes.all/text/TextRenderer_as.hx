@@ -56,18 +56,12 @@ class TextRenderer_as {
 	} else {
 	    DejaGnu.fail("TextRenderer.antiAliasType property doesn't exist");
 	}
-	if (Std.is(TextRenderer.maxLevel, Float)) {
-	    DejaGnu.pass("TextRenderer.maxLevel property exists");
-	} else {
-	    DejaGnu.fail("TextRenderer.maxLevel property doesn't exist");
-	}
-#else
-	if (Std.is(TextRenderer.maxLevel, Int)) {
-	    DejaGnu.pass("TextRenderer.maxLevel property exists");
-	} else {
-	    DejaGnu.fail("TextRenderer.maxLevel property doesn't exist");
-	}
 #end
+	if (Type.typeof(TextRenderer.maxLevel) == ValueType.TFloat) {
+	    DejaGnu.pass("TextRenderer.maxLevel property exists");
+	} else {
+	    DejaGnu.fail("TextRenderer.maxLevel property doesn't exist, returns type "+Type.typeof(TextRenderer.maxLevel));
+	}
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This

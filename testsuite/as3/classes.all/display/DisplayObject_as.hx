@@ -71,7 +71,7 @@ class DisplayObject_as {
  	} else {
  	    DejaGnu.fail("DisplayObject::accessibilityProperties property doesn't exist");
  	}
-	if (Std.is(x1.alpha, Float)) {
+	if (Type.typeof(x1.alpha) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::alpha property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::alpha property doesn't exist");
@@ -81,7 +81,7 @@ class DisplayObject_as {
 	} else {
 	    DejaGnu.fail("DisplayObject::blendMode property doesn't exist");
 	}
-	if (Std.is(x1.cacheAsBitmap, Bool)) {
+	if (Type.typeof(x1.cacheAsBitmap) == ValueType.TBool) {
 	    DejaGnu.pass("DisplayObject::cacheAsBitmap property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::cacheAsBitmap property doesn't exist");
@@ -91,7 +91,7 @@ class DisplayObject_as {
  	} else {
  	    DejaGnu.fail("DisplayObject::filters property doesn't exist");
  	}
-	if (Std.is(x1.height, Float)) {
+	if (Type.typeof(x1.height) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::height property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::height property doesn't exist");
@@ -112,12 +112,12 @@ class DisplayObject_as {
 // 	} else {
 // 	    DejaGnu.fail("DisplayObject::loaderInfo property doesn't exist");
 // 	}
-	if (Std.is(x1.mouseX, Float)) {
+	if (Type.typeof(x1.mouseX) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::mouseX property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::mouseX property doesn't exist");
 	}
-	if (Std.is(x1.mouseY, Float)) {
+	if (Type.typeof(x1.mouseY) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::mouseY property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::mouseY property doesn't exist");
@@ -153,7 +153,7 @@ class DisplayObject_as {
  	    DejaGnu.fail("DisplayObject::root property doesn't exist");
  	}
  	DejaGnu.note("Type of l1.root is "+Type.typeof(l1.root));
-	if (Std.is(x1.rotation, Float)) {
+	if (Type.typeof(x1.rotation) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::rotation property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::rotation property doesn't exist");
@@ -166,12 +166,12 @@ class DisplayObject_as {
  	} else {
  	    DejaGnu.fail("DisplayObject::scale9Grid property doesn't exist");
  	}
-	if (Std.is(x1.scaleX, Float)) {
+	if (Type.typeof(x1.scaleX) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::scaleX property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::scaleX property doesn't exist");
 	}
-	if (Std.is(x1.scaleY, Float)) {
+	if (Type.typeof(x1.scaleY) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::scaleY property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::scaleY property doesn't exist");
@@ -188,22 +188,22 @@ class DisplayObject_as {
   	} else {
  	    DejaGnu.fail("DisplayObject::transform property doesn't exist");
  	}
-	if (Std.is(x1.visible, Bool)) {
+	if (Type.typeof(x1.visible) == ValueType.TBool) {
 	    DejaGnu.pass("DisplayObject::visible property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::visible property doesn't exist");
 	}
-	if (Std.is(x1.width, Float)) {
+	if (Type.typeof(x1.width) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::width property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::width property doesn't exist");
 	}
-	if (Std.is(x1.x, Float)) {
+	if (Type.typeof(x1.x) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::x property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::x property doesn't exist");
 	}
-	if (Std.is(x1.y, Float)) {
+	if (Type.typeof(x1.y) == ValueType.TFloat) {
 	    DejaGnu.pass("DisplayObject::y property exists");
 	} else {
 	    DejaGnu.fail("DisplayObject::y property doesn't exist");

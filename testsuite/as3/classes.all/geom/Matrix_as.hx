@@ -54,35 +54,35 @@ class Matrix_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.a, Float)) {
+	if (Type.typeof(x1.a) == ValueType.TFloat) {
 	    DejaGnu.pass("Matrix.a property exists");
 	} else {
-	    DejaGnu.fail("Matrix.a property doesn't exist");
+	    DejaGnu.fail("Matrix.a property should be float, returns type "+Type.typeof(x1.a));
 	}
-	if (Std.is(x1.b, Float)) {
+	if (Type.typeof(x1.b) == ValueType.TFloat) {
 	    DejaGnu.pass("Matrix.b property exists");
 	} else {
-	    DejaGnu.fail("Matrix.b property doesn't exist");
+	    DejaGnu.fail("Matrix.b property should be float, returns type "+Type.typeof(x1.b));
 	}
-	if (Std.is(x1.c, Float)) {
+	if (Type.typeof(x1.c) == ValueType.TFloat) {
 	    DejaGnu.pass("Matrix.c property exists");
 	} else {
-	    DejaGnu.fail("Matrix.c property doesn't exist");
+	    DejaGnu.fail("Matrix.c property should be float, returns type "+Type.typeof(x1.c));
 	}
-	if (Std.is(x1.d, Float)) {
+	if (Type.typeof(x1.d) == ValueType.TFloat) {
 	    DejaGnu.pass("Matrix.d property exists");
 	} else {
-	    DejaGnu.fail("Matrix.d property doesn't exist");
+	    DejaGnu.fail("Matrix.d property should be float, returns type "+Type.typeof(x1.d));
 	}
-	if (Std.is(x1.tx, Float)) {
+	if (Type.typeof(x1.tx) == ValueType.TFloat) {
 	    DejaGnu.pass("Matrix.tx property exists");
 	} else {
-	    DejaGnu.fail("Matrix.tx property doesn't exist");
+	    DejaGnu.fail("Matrix.tx property should be float, returns type "+Type.typeof(x1.tx));
 	}
-	if (Std.is(x1.ty, Float)) {
+	if (Type.typeof(x1.ty) == ValueType.TFloat) {
 	    DejaGnu.pass("Matrix.ty property exists");
 	} else {
-	    DejaGnu.fail("Matrix.ty property doesn't exist");
+	    DejaGnu.fail("Matrix.ty property should be float, returns type "+Type.typeof(x1.ty));
 	}
 
 // Tests to see if all the methods exist. All these do is test for

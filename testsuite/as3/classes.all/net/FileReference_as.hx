@@ -71,7 +71,7 @@ class FileReference_as {
 	} else {
 	    DejaGnu.xfail("FileReference.name property doesn't exist");
 	}
-	if (Std.is(x1.size, Float)) {
+	if (Type.typeof(x1.size) == ValueType.TFloat) {
 	    DejaGnu.pass("FileReference.size property exists");
 	} else {
 	    DejaGnu.xfail("FileReference.size property doesn't exist");
