@@ -85,7 +85,7 @@ package hello {
             check(d1 instanceof Derived);
             check_equals(S.s, "Base Derived ");
 
-            totals(15);
+            totals(25);
 
             done();
         }
