@@ -22,7 +22,6 @@
 #include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
-#include "impl.h"
 #include "as_function.h" // for inheritance
 #include "as_object.h" // for composition (vector element)
 #include "VM.h" //fow SWF version
