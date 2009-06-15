@@ -365,7 +365,7 @@ XMLSocket_as::checkForIncomingData()
    
     if (msgs.empty()) return;
     
-    log_debug(_("Got %d messages: "), msgs.size());
+    //log_debug(_("Got %d messages: "), msgs.size());
 
 #ifdef GNASH_XMLSOCKET_DEBUG
     for (size_t i = 0, e = msgs.size(); i != e; ++i) {

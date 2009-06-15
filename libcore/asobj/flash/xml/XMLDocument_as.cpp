@@ -535,7 +535,8 @@ XMLDocument_as::parseCData(XMLNode_as* node, const std::string& xml,
 void
 XMLDocument_as::parseXML(const std::string& xml)
 {
-    GNASH_REPORT_FUNCTION; 
+    //GNASH_REPORT_FUNCTION; 
+
     if (xml.empty())
     {
         log_error(_("XML data is empty"));
