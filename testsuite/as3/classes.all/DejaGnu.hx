@@ -141,7 +141,7 @@ class DejaGnu {
 //#end
     }
 
-    static function untested(msg) {
+    static public function untested(msg) {
 //#if flash9
         flash.Lib.trace("UNTESTED: "+msg);
 //#else	
@@ -149,7 +149,7 @@ class DejaGnu {
 //#end
     }
 
-    static function unresolved(msg) {
+    static public function unresolved(msg) {
 //#if flash9
         flash.Lib.trace("UNRESOLVED: "+msg);
 //#else	

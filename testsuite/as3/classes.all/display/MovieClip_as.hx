@@ -236,7 +236,7 @@ class MovieClip_as {
 	    DejaGnu.xfail("MovieClip::_yscale property should be float, returns type "+Type.typeof(x1._yscale));
 	}
 	if (Std.is(x1.blendMode, Dynamic)) {
-	    DejaGnu.xpass("MovieClip::blendMode property exists");
+		DejaGnu.unresolved("This property has not been implemented");
 	} else {
 	    DejaGnu.xfail("MovieClip::blendMode property should be object, returns type "+Type.typeof(x1.blendMode));
 	}
@@ -284,7 +284,7 @@ class MovieClip_as {
 //	}
 #end
 	if (Std.is(x1.scrollRect, Dynamic)) {
-	    DejaGnu.xpass("MovieClip::scrollRect property exists");
+	    DejaGnu.unresolved("This property has not been implemented");
 	} else {
 	    DejaGnu.xfail("MovieClip::scrollRect property doesn't exist");
 	}

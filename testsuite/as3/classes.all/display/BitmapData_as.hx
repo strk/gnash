@@ -23,10 +23,12 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+
 #if flash9
 import flash.utils.ByteArray;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
+import flash.display.Bitmap;
 #end
 #if flash8
 import flash.MovieClip;
@@ -46,188 +48,157 @@ import DejaGnu;
 class BitmapData_as {
     static function main() {
 #if !(flash6 || flash7)
-		//check_equals(typeof(Bitmap), 'function');
 		if(Type.typeof(untyped BitmapData) == ValueType.TFunction) {
 			DejaGnu.pass("BitmapData is a function");
 		} else {
 			DejaGnu.fail("BitmapData is not a function");
 		}
-		//check_equals(typeof(BitmapData.prototype), 'object');
 		if(Type.typeof(untyped BitmapData.prototype) == ValueType.TObject) {
 			DejaGnu.pass("BitmapData prototype is an object");
 		} else {
 			DejaGnu.fail("BitmapData prototype is not an object");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('applyFilter'));
 		if(untyped BitmapData.prototype.hasOwnProperty('applyFilter')) {
 			DejaGnu.pass("BitmapData prototype has 'applyFilter' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'applyFilter' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('clone'));
 		if(untyped BitmapData.prototype.hasOwnProperty('clone')) {
 			DejaGnu.pass("BitmapData prototype has 'clone' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'clone' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('colorTransform'));
 		if(untyped BitmapData.prototype.hasOwnProperty('colorTransform')) {
 			DejaGnu.pass("BitmapData prototype has 'colorTransform' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'colorTransform' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('copyChannel'));
 		if(untyped BitmapData.prototype.hasOwnProperty('copyChannel')) {
 			DejaGnu.pass("BitmapData prototype has 'copyChannel' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'copyChannel' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('copyPixels'));
 		if(untyped BitmapData.prototype.hasOwnProperty('copyPixels')) {
 			DejaGnu.pass("BitmapData prototype has 'copyPixels' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'copyPixels' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('dispose'));
 		if(untyped BitmapData.prototype.hasOwnProperty('dispose')) {
 			DejaGnu.pass("BitmapData prototype has 'dispose' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'dispose' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('draw'));
 		if(untyped BitmapData.prototype.hasOwnProperty('draw')) {
 			DejaGnu.pass("BitmapData prototype has 'draw' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'draw' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('fillRect'));
 		if(untyped BitmapData.prototype.hasOwnProperty('fillRect')) {
 			DejaGnu.pass("BitmapData prototype has 'fillRect' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'fillRect' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('floodFill'));
 		if(untyped BitmapData.prototype.hasOwnProperty('floodFill')) {
 			DejaGnu.pass("BitmapData prototype has 'floodFill' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'floodFill' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('generateFilterRect'));
 		if(untyped BitmapData.prototype.hasOwnProperty('generateFilterRect')) {
 			DejaGnu.pass("BitmapData prototype has 'generateFilterRect' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'generateFilterRect' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('getColorBoundsRect'));
 		if(untyped BitmapData.prototype.hasOwnProperty('getColorBoundsRect')) {
 			DejaGnu.pass("BitmapData prototype has 'getColorBoundsRect' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'getColorBoundsRect' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('getPixel'));
 		if(untyped BitmapData.prototype.hasOwnProperty('getPixel')) {
 			DejaGnu.pass("BitmapData prototype has 'getPixel' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'getPixel' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('getPixel32'));
 		if(untyped BitmapData.prototype.hasOwnProperty('getPixel32')) {
 			DejaGnu.pass("BitmapData prototype has 'getPixel32' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'getPixel32' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('hitTest'));
 		if(untyped BitmapData.prototype.hasOwnProperty('hitTest')) {
 			DejaGnu.pass("BitmapData prototype has 'hitTest' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'hitTest' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('merge'));
 		if(untyped BitmapData.prototype.hasOwnProperty('merge')) {
 			DejaGnu.pass("BitmapData prototype has 'merge' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'merge' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('noise'));
 		if(untyped BitmapData.prototype.hasOwnProperty('noise')) {
 			DejaGnu.pass("BitmapData prototype has 'noise' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'noise' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('paletteMap'));
 		if(untyped BitmapData.prototype.hasOwnProperty('paletteMap')) {
 			DejaGnu.pass("BitmapData prototype has 'paletteMap' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'paletteMap' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('perlinNoise'));
 		if(untyped BitmapData.prototype.hasOwnProperty('perlinNoise')) {
 			DejaGnu.pass("BitmapData prototype has 'perlinNoise' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'perlinNoise' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('pixelDissolve'));
 		if(untyped BitmapData.prototype.hasOwnProperty('pixelDissolve')) {
 			DejaGnu.pass("BitmapData prototype has 'pixelDissolve' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'pixelDissolve' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('scroll'));
 		if(untyped BitmapData.prototype.hasOwnProperty('scroll')) {
 			DejaGnu.pass("BitmapData prototype has 'scroll' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'scroll' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('setPixel'));
 		if(untyped BitmapData.prototype.hasOwnProperty('setPixel')) {
 			DejaGnu.pass("BitmapData prototype has 'setPixel' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'setPixel' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('setPixel32'));
 		if(untyped BitmapData.prototype.hasOwnProperty('setPixel32')) {
 			DejaGnu.pass("BitmapData prototype has 'setPixel32' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'setPixel32' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty('threshold'));
 		if(untyped BitmapData.prototype.hasOwnProperty('threshold')) {
 			DejaGnu.pass("BitmapData prototype has 'threshold' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'threshold' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty("height"));
 		if(untyped BitmapData.prototype.hasOwnProperty("height")) {
 			DejaGnu.pass("BitmapData prototype has 'height' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'height' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty("width"));
 		if(untyped BitmapData.prototype.hasOwnProperty("width")) {
 			DejaGnu.pass("BitmapData prototype has 'width' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'width' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty("rectangle"));
 		if(untyped BitmapData.prototype.hasOwnProperty("rectangle")) {
 			DejaGnu.pass("BitmapData prototype has 'rectangle' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'rectangle' property");
 		}
-		//check(BitmapData.prototype.hasOwnProperty("transparent"));
 		if(untyped BitmapData.prototype.hasOwnProperty("transparent")) {
 			DejaGnu.pass("BitmapData prototype has 'transparent' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype does not have 'transparent' property");
 		}
 
-		//check(!BitmapData.prototype.hasOwnProperty('loadBitmap'));
 		if(!(untyped BitmapData.prototype.hasOwnProperty('loadBitmap'))) {
 			DejaGnu.pass("BitmapData prototype does not have 'loadBitmap' property");
 		} else {
 			DejaGnu.fail("BitmapData prototype has 'loadBitmap' property");
 		}
-		//check(BitmapData.hasOwnProperty('loadBitmap'));
 		if(untyped BitmapData.hasOwnProperty("loadBitmap")) {
 			DejaGnu.pass("BitmapData has 'loadBitmap' property");
 		} else {
@@ -238,7 +209,112 @@ class BitmapData_as {
 		// Test constructor
 		//-------------------------------------------------------------
 
-        var x1:BitmapData = new BitmapData(20, 30, false, 0xeeddee);
+		var x1:BitmapData = Reflect.callMethod(BitmapData, Reflect.field(BitmapData, 'new'), []);
+		if(Type.typeof(x1) == ValueType.TNull) {
+			DejaGnu.pass("Type of x1 is undefined");
+		} else {
+			DejaGnu.fail("Type of x1 should be undefined, is "+Type.typeof(x1));
+		}
+		
+		x1 = Reflect.callMethod(BitmapData, Reflect.field(BitmapData, 'new'), [10, 10]);
+		if(Type.typeof(x1) == ValueType.TObject) {
+			DejaGnu.pass("x1 is an object");
+		} else {
+			DejaGnu.fail("x1 should be an object, is "+Type.typeof(x1));
+		}
+		if(Std.is(x1, BitmapData)) {
+			DejaGnu.pass("x1 is a BitmapData");
+		} else {
+			DejaGnu.fail("x1 should be a BitmapData, is "+Type.getClassName(Type.getClass(x1)));
+		}
+		if(!untyped x1.hasOwnProperty("height")) {
+			DejaGnu.pass("x1 does not have property 'height'");
+		} else {
+			DejaGnu.fail("x1 has property 'height'");
+		}
+		if(!untyped x1.hasOwnProperty("width")) {
+			DejaGnu.pass("x1 does not have property 'width'");
+		} else {
+			DejaGnu.fail("x1 has property 'width'");
+		}
+		if(!untyped x1.hasOwnProperty("rectangle")) {
+			DejaGnu.pass("x1 does not have property 'rectangle'");
+		} else {
+			DejaGnu.fail("x1 has property 'rectangle'");
+		}
+		if(!untyped x1.hasOwnProperty("transparent")) {
+			DejaGnu.pass("x1 does not have property 'transparent'");
+		} else {
+			DejaGnu.fail("x1 has property 'transparent'");
+		}
+		if(x1.height == 10) {
+			DejaGnu.pass("x1.height == 10");
+		} else {
+			DejaGnu.fail("x1.height != 10");
+		}
+		if(x1.width == 10) {
+			DejaGnu.pass("x1.width == 10");
+		} else {
+			DejaGnu.fail("x1.width != 10");
+		}
+		if(x1.transparent) {
+			DejaGnu.pass("x1.transparent is true");
+		} else {
+			DejaGnu.fail("x1.transparent is false");
+		}
+#if flash9
+		if(x1.rect.toString() == "(x=0, y=0, w=10, h=10)") {
+			DejaGnu.pass("x1.rectangle is correct rectangle (x=0, y=0, w=10, h=10)");
+		} else {
+			DejaGnu.fail("x1.rectangle should be (x=0, y=0, w=10, h=10), is "+x1.rect.toString());
+		}
+		if(Std.is(x1.rect, Rectangle)) {
+			DejaGnu.pass("x1.rectangle is a Rectangle");
+		} else {
+			DejaGnu.fail("x1.rectangle is not a Rectangle, it is a "+Type.typeof(x1.rect));
+		}
+#else
+		if(x1.rectangle.toString() == "(x=0, y=0, w=10, h=10)") {
+			DejaGnu.pass("x1.rectangle is correct rectangle (x=0, y=0, w=10, h=10)");
+		} else {
+			DejaGnu.fail("x1.rectangle should be (x=0, y=0, w=10, h=10), is "+x1.rectangle.toString());
+		}
+		if(Std.is(x1.rectangle, Rectangle)) {
+			DejaGnu.pass("x1.rectangle is a Rectangle");
+		} else {
+			DejaGnu.fail("x1.rectangle is not a Rectangle, it is a "+Type.typeof(x1.rectangle));
+		}
+#end
+		if(x1.getPixel(1,1) == 16777215) {
+			DejaGnu.pass("x1.getPixel(1,1) returns correct number (16777215)");
+		} else {
+			DejaGnu.fail("x1.getPixel(1,1) should return 16777215, returns "+x1.getPixel(1,1));
+		}
+		if(x1.getPixel(9,9) == 16777215) {
+			DejaGnu.pass("x1.getPixel(9,9) returns correct number (16777215)");
+		} else {
+			DejaGnu.fail("x1.getPixel(9,9) should return 16777215, returns "+x1.getPixel(9,9));
+		}
+		if(x1.getPixel32(1,1) == -1) {
+			DejaGnu.pass("x1.getPixel32(1,1) returns correct number (-1)");
+		} else {
+			DejaGnu.fail("x1.getPixel32(1,1) should return -1, returns "+x1.getPixel32(1,1));
+		}
+
+		x1 = Reflect.callMethod(BitmapData, Reflect.field(BitmapData, 'new'), [10, 10, true]);
+		if(x1.getPixel32(1,1) == -1) {
+			DejaGnu.pass("x1.getPixel32(1,1) returns correct number (-1)");
+		} else {
+			DejaGnu.fail("x1.getPixel32(1,1) should return -1, returns "+x1.getPixel32(1,1));
+		}
+		x1 = Reflect.callMethod(BitmapData, Reflect.field(BitmapData, 'new'), [10, 10, false]);
+		if(x1.getPixel32(1,1) == -1) {
+			DejaGnu.pass("x1.getPixel32(1,1) returns correct number (-1)");
+		} else {
+			DejaGnu.fail("x1.getPixel32(1,1) should return -1, returns "+x1.getPixel32(1,1));
+		}
+		
+        x1 = new BitmapData(20, 30, false, 0xeeddee);
         
         // check(x1 instanceof Bitmap);      
         if (Std.is(x1,BitmapData)) {
@@ -246,10 +322,6 @@ class BitmapData_as {
         } else {
             DejaGnu.fail("BitmapData lass doesn't exist");
         }
-        
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
 
 		//check_equals(x1.height, 10);
 		if (Type.typeof(x1.height) == ValueType.TInt) {
@@ -311,10 +383,6 @@ class BitmapData_as {
 		}
 #end
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
 		//check_equals(bmp.getPixel(1, 1), 0xeeddee);
 		if (Type.typeof(x1.getPixel) == ValueType.TFunction) {
 			DejaGnu.pass("BitmapData::getPixel() method exists");
@@ -358,7 +426,7 @@ class BitmapData_as {
 		//check_equals(bmp.getPixel32(1, 1), -1122834);
 		if (Type.typeof(x1.getPixel32) == ValueType.TFunction) {
 			DejaGnu.pass("BitmapData::getPixel32() method exists");
-			if (Type.typeof(x1.getPixel32(1,1)) == ValueType.TInt) {
+			if (Type.typeof(x1.getPixel32(1,1)) == ValueType.TFloat) {
 				DejaGnu.pass("BitmapData::getPixel32() method returns correct type (number)");
 #if flash9
 #else

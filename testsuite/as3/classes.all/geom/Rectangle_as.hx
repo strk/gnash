@@ -23,6 +23,11 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+// This test is valid for Flash 8 and lower. Failures will occur if run in
+//  the Adobe player, due to lack of implementation in Gnash, as well as
+//  possible unexpected behavior in haXe. This will be re-evaluated when
+//  visiting Rectangle for AS3 support.
+
 #if flash9
 import flash.display.MovieClip;
 #end
