@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	remoting.as \
+	red5test.as \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -184,7 +185,6 @@ check_PROGRAMS = \
 	new_child_in_unload_test \
 	instanceNameTest \
 	BitmapDataTest \
-	BitmapSmoothingTest \
 	$(NULL)
 
 if MING_VERSION_0_4_3
@@ -314,6 +314,9 @@ endif
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 check_SCRIPTS += remotingTestRunner
+endif
+if ENABLE_RED5_TESTING
+check_SCRIPTS += red5testRunner
 endif
 endif
 
@@ -1500,22 +1503,6 @@ EmbeddedSoundTest_Runner_DEPENDENCIES = \
 	EmbeddedSoundTest.swf	\
 	$(NULL)
 
-BitmapSmoothingTest_SOURCES = \
-	BitmapSmoothingTest.c \
-	$(NULL)
-
-BitmapSmoothingTest_CFLAGS = \
-	-DMEDIADIR='"$(abs_mediadir)"' \
-	$(NULL)
-
-BitmapSmoothingTest_LDADD = libgnashmingutils.la
-
-BitmapSmoothingTest-v7.swf: BitmapSmoothingTest
-	./BitmapSmoothingTest 7
-
-BitmapSmoothingTest-v8.swf: BitmapSmoothingTest
-	./BitmapSmoothingTest 8
-
 registerClassTest_SOURCES =	\
 	registerClassTest.c	\
 	$(NULL)
@@ -1762,6 +1749,13 @@ remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/che
 
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
+	chmod 755 $@
+
+red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+red5testRunner: $(srcdir)/../generic-testrunner.sh red5test.swf
+	sh $< $(top_builddir) red5test.swf > $@
 	chmod 755 $@
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
@@ -2027,6 +2021,9 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 TEST_CASES += remotingTestRunner
 endif
+if ENABLE_RED5_TESTING
+TEST_CASES += red5testRunner
+endif
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS
@@ -2068,4 +2065,3 @@ site-update: site.exp
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
-
