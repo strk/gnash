@@ -36,6 +36,8 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 
+#include <boost/lexical_cast.hpp>
+
 namespace gnash {
 
 // Forward declarations
