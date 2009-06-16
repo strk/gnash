@@ -28,6 +28,7 @@
 #include "smart_ptr.h"
 #include "VirtualClock.h"
 #include "SystemClock.h"
+#include "gnash.h" // for Quality
 
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
@@ -321,6 +322,12 @@ public:
     /// set state to play(). This does not change pause
     /// state.
     void restart();
+
+    /// Set rendering quality, if not locked by RC file..
+    void setQuality(Quality q);
+
+    /// Get current rendering quality
+    Quality getQuality() const;
 
     /// Toggle sound state between muted and unmuted. If
     /// there is no active sound handler this does nothing.

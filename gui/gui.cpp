@@ -1248,5 +1248,27 @@ Gui::yesno(const std::string& question)
     return true;
 }
 
+void
+Gui::setQuality(Quality q)
+{
+	if ( ! _stage )
+	{
+		log_error("Gui::setQuality called before a movie_root was available");
+		return;
+	}
+    _stage->setQuality(q);
+}
+
+Quality
+Gui::getQuality() const
+{
+	if ( ! _stage )
+	{
+		log_error("Gui::getQuality called before a movie_root was available");
+		return QUALITY_HIGH; // just a guess..
+	}
+    return _stage->getQuality();
+}
+
 // end of namespace
 }

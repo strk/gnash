@@ -117,6 +117,7 @@ public:
     void createFileMenu(GtkWidget *obj);
     void createEditMenu(GtkWidget *obj);
     void createViewMenu(GtkWidget *obj);
+    void createQualityMenu(GtkWidget *obj);
     void createHelpMenu(GtkWidget *obj);
     void createControlMenu(GtkWidget *obj);
     

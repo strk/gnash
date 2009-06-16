@@ -31,6 +31,7 @@
 #include "render_handler.h"
 #include "VM.h"
 #include "lirc.h"
+#include "gnash.h" // Quality
 
 #include <iostream>
 #ifdef HAVE_X11
@@ -87,6 +88,10 @@ namespace {
     void menuMovieInfo(GtkMenuItem *menuitem, gpointer instance);
     void menuRefreshView(GtkMenuItem *menuitem, gpointer instance);
     void menuShowUpdatedRegions(GtkMenuItem *menuitem, gpointer instance); 
+    void menuQualityLow(GtkMenuItem *menuitem, gpointer instance); 
+    void menuQualityMedium(GtkMenuItem *menuitem, gpointer instance); 
+    void menuQualityHigh(GtkMenuItem *menuitem, gpointer instance); 
+    void menuQualityBest(GtkMenuItem *menuitem, gpointer instance); 
 
     // Event handlers
     gboolean realizeEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
@@ -1974,6 +1979,51 @@ GtkGui::createViewMenu(GtkWidget *obj)
                      G_CALLBACK(menuShowUpdatedRegions), this);
 #endif
 
+    createQualityMenu(menu);
+
+}
+
+// Create a Quality menu that can be used from the View menu
+void
+GtkGui::createQualityMenu(GtkWidget *obj)
+{
+    GNASH_REPORT_FUNCTION;
+
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Quality"));
+    gtk_widget_show (menuitem);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+
+    Quality curQuality = getQuality();
+
+    // TODO: use to also show current quality state
+
+    // Low
+    GtkWidget* item = gtk_menu_item_new_with_label(_("Low"));
+    gtk_menu_append(menu, item);
+    gtk_widget_show(item);
+    g_signal_connect(item, "activate", G_CALLBACK(menuQualityLow), this);
+
+    // Medium
+    item = gtk_menu_item_new_with_label(_("Medium"));
+    gtk_menu_append(menu, item);
+    gtk_widget_show(item);
+    g_signal_connect(item, "activate", G_CALLBACK(menuQualityMedium), this);
+
+    // High
+    item = gtk_menu_item_new_with_label(_("High"));
+    gtk_menu_append(menu, item);
+    gtk_widget_show(item);
+    g_signal_connect(item, "activate", G_CALLBACK(menuQualityHigh), this);
+
+    // Best
+    item = gtk_menu_item_new_with_label(_("Best"));
+    gtk_menu_append(menu, item);
+    gtk_widget_show(item);
+    g_signal_connect(item, "activate", G_CALLBACK(menuQualityBest), this);
+
 }
 
 // Create a Control menu that can be used from the menu bar or the popup.
@@ -2546,6 +2596,38 @@ menuShowUpdatedRegions(GtkMenuItem* /*menuitem*/, gpointer data)
     
     // refresh to clear the remaining red lines...
     if (!gui->showUpdatedRegions()) gui->refreshView();
+}
+
+/// \brief Set quality to LOW level
+void
+menuQualityLow(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+    gui->setQuality(QUALITY_LOW);
+}
+
+/// \brief Set quality to MEDIUM level
+void
+menuQualityMedium(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+    gui->setQuality(QUALITY_MEDIUM);
+}
+
+/// \brief Set quality to HIGH level
+void
+menuQualityHigh(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+    gui->setQuality(QUALITY_HIGH);
+}
+
+/// \brief Set quality to BEST level
+void
+menuQualityBest(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+    gui->setQuality(QUALITY_BEST);
 }
 
 } // anonymous namespace
