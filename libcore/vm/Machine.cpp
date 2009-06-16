@@ -1599,7 +1599,7 @@ Machine::execute()
                     boost::uint32_t cid = mStream->read_V32();
                     asClass *c = pool_class(cid, mPoolObject);
                     log_abc("Creating new class id=%u name=%s", c->getName(),
-                            mPoolObject->stringPoolAt(c->getName()));
+                            pool_string(c->getName(), mPoolObject));
                     
                     as_object* base_class = pop_stack().to_object().get();
                     as_object* new_class = c->getPrototype();
@@ -1629,6 +1629,9 @@ Machine::execute()
                             NSV::PROP_uuCONSTRUCTORuu, 0);
                     as_value value = call_method(property, env, new_class,
                             get_args(0));
+
+                    log_abc("NEWCLASS(%s) finished. Return: %s", value,
+                            pool_string(c->getName(), mPoolObject));
 
                     break;
                 }
