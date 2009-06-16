@@ -26,7 +26,6 @@
 // There are several event handlers there, we will fix them later.
 
 
-
 #if flash9
 import flash.net.LocalConnection;
 import flash.display.MovieClip;
@@ -37,6 +36,7 @@ import flash.MovieClip;
 
 import flash.Lib;
 import Type;
+import Reflect;
 import Std;
 
 // import our testing API
@@ -87,19 +87,19 @@ class LocalConnection_as {
 //	DejaGnu.note("ME2 "   + Type.typeof(x1.domain));	
 //	if (Type.typeof(x1.domain)== Type.typeof(String));		
 
-	DejaGnu.note("Type of x1.domain "   + Type.typeof(x1.domain));
+//	DejaGnu.note("Type of x1.domain "  + Type.typeof(x1.domain));
 
 #if flash9
 	if (Std.is(x1.domain,String) ) {
-	    DejaGnu.pass("LocalConnection.domain property exists");
+	    DejaGnu.pass("LocalConnection.domain(String) property exists");
 	} else {
-	    DejaGnu.fail("LocalConnection.domain property doesn't exist");
+	    DejaGnu.fail("LocalConnection.domain(String) property doesn't exist");
 	}
 #else
         if (Type.typeof(x1.domain) == TFunction  ){
-	    DejaGnu.pass("LocalConnection.domain property exists");
+	    DejaGnu.pass("LocalConnection.domain(Function) property exists");
 	} else {
-	    DejaGnu.fail("LocalConnection.domain property doesn't exist");
+	    DejaGnu.fail("LocalConnection.domain(Function) property doesn't exist");
 	}
 #end
 
@@ -117,7 +117,7 @@ class LocalConnection_as {
 	    DejaGnu.xfail("LocalConnection::allowDomain() method doesn't exist");
 	}
 #else
-	DejaGnu.note("Warning! A event handler here: allowDomain"   + Type.typeof(x1.allowDomain)); 
+//	DejaGnu.note("Warning! A event handler here: allowDomain"   + Type.typeof(x1.allowDomain)); 
 	if (Type.typeof(x1.allowDomain) == ValueType.TFunction) {
 	    DejaGnu.pass("LocalConnection::allowDomain() method exists");
 	} else {
@@ -128,7 +128,7 @@ class LocalConnection_as {
 //Si modified May 27
 //This is test 4
 
-	DejaGnu.note("Type of x1.allowInsecureDomain "   + Type.typeof(x1.allowInsecureDomain));
+//	DejaGnu.note("Type of x1.allowInsecureDomain "   + Type.typeof(x1.allowInsecureDomain));
 
 #if flash9
 	if (Type.typeof(x1.allowInsecureDomain) == ValueType.TFunction) {
@@ -193,13 +193,414 @@ class LocalConnection_as {
 	}
 #end
 
-        // Call this after finishing all tests. It prints out the totals.
-        DejaGnu.done();
+
+// Si:
+// Add the following Ming test ");cases
+// June 11, 2009
+
+DejaGnu.note("\n\n The following tests come from the Ming test. \n Some of the tests may be  duplicated ! \n" );
+
+//check_equals(LocalConnection.prototype.__proto__, Object.prototype);
+
+#if ( flash6 || flash7 || flash8)
+	if ( Reflect.isObject(untyped LocalConnection.__proto__)) {
+		DejaGnu.pass("LocalConnection.prototype.__proto__ field exists");
+	} else {
+		DejaGnu.fail("LocalConnection.prototype.__proto__ field does not exist");
+	}
+#end
+
+//Si
+//Not sure what happens here.
+/*
+#if ( flash6 || flash7 || flash8)
+	if ( untyped LocalConnection.__proto__ == untyped Object.prototype) {
+		DejaGnu.pass(" LocalConnection.prototype.__proto__ references Object.prototype");
+	} else {
+		DejaGnu.fail(" LocalConnection.prototype.__proto__ does not reference Object.prototype");
+	}
+#end
+*/
+
+#if ( flash6 || flash7 || flash8)
+if (untyped LocalConnection.prototype.hasOwnProperty("send")){
+	DejaGnu.pass("LocalConnection.prototype. 'send' property exists");
+	} else {
+		DejaGnu.fail("LocalConnection.prototype. 'send' property does not exist");
+	}
+if (untyped LocalConnection.prototype.hasOwnProperty("connect")) {
+	DejaGnu.pass("LocalConnection.prototype. 'connect' property exists");
+	} else {
+		DejaGnu.fail("LocalConnection.prototype. 'connect' property does not exist");
+	}
+if (untyped LocalConnection.prototype.hasOwnProperty("close")) {
+	DejaGnu.pass("LocalConnection.prototype. 'close' property exists");
+	} else {
+		DejaGnu.fail("LocalConnection.prototype. 'close'  property does not exist");
+	}
+if (untyped LocalConnection.prototype.hasOwnProperty("domain")) {
+	DejaGnu.pass("LocalConnection.prototype. 'domain' property exists");
+	} else {
+		DejaGnu.fail("LocalConnection.prototype. 'domain'  property does not exist");
+	}
+#end
+
+if  (untyped LocalConnection.prototype.hasOwnProperty("allowDomain")){
+		DejaGnu.pass("LocalConnection.prototype. 'allowdomain' property exists");
+	} else {
+		DejaGnu.xfail("LocalConnection.prototype. 'allowdomain' should be a event handler/function");
+	}
+if (untyped LocalConnection.prototype.hasOwnProperty("onStatus")){
+	DejaGnu.pass("LocalConnection.prototype. 'onStatus' property exists");
+	} else {
+		DejaGnu.xfail("LocalConnection.prototype. 'onStatus' should be a event handler/function");
+	}
+     
+//check_equals (domain, "localhost");
+#if ( flash6 || flash7 || flash8)
+if (x1.domain() == "localhost"){
+	DejaGnu.pass("x1.domain is 'localhost' ");
+	} else {
+	    DejaGnu.fail("x1.domain is not 'localhost' ");
+	}
+#end
+#if flash9
+if (x1.domain == "localhost"){
+	DejaGnu.pass("x1.domain is 'localhost' ");
+	} else {
+	    DejaGnu.fail("x1.domain is not 'localhost' ");
+	}
+#end
+
+#if ( flash6 || flash7 || flash8 )
+// test the LocalConnection::domain method
+if (Type.typeof(untyped x1.domain)== TFunction){
+	DejaGnu.pass("System.security 'domain' is a function");
+	} else {
+	    DejaGnu.fail("System.security 'domain' is not a function");
+	}
+#end
+// test the LocalConnection::close method
+if (Type.typeof(untyped x1.close) == TFunction) {
+	DejaGnu.pass("System.security 'close' is a function");
+	} else {
+	    DejaGnu.fail("System.security 'close' is not a function");
+	}
+// test the LocalConnection::connect method
+if (Type.typeof(untyped x1.connect)== TFunction){
+	DejaGnu.pass("System.security 'connect' is a function");
+	} else {
+	    DejaGnu.fail("System.security 'connect' is not a function");
+	}
+// test the LocalConnection::send method
+if (Type.typeof(untyped x1.send)== TFunction) {
+	DejaGnu.pass("System.security 'send' is a function");
+	} else {
+	    DejaGnu.fail("System.security 'send' is not a function");
+	}
+
+//Si
+//Build another LocalConnection Object x2 besides x1
+	var x2:LocalConnection = new LocalConnection();
+if (x1!=x2){
+	DejaGnu.pass("We build two different objects: x1 != x2");
+	} else {
+	    DejaGnu.fail("We build two different objects. But x1 equas to x2 now!");
+	}
+#if ( flash6 || flash7 || flash8 )
+	var my_domain:String=x1.domain();
+	if (x1!=x2){
+	DejaGnu.pass("my_domain equals to 'localhost'. ");
+	} else {
+	    DejaGnu.fail("my_domain does not equals to 'localhost'.");
+	}
+
+#end
+#if ( flash9 )
+	var my_domain:String=x1.domain;
+	if (x1!=x2){
+	DejaGnu.pass("my_domain equals to 'localhost'. ");
+	} else {
+	    DejaGnu.fail("my_domain does not equals to 'localhost'.");
+	}
+
+#end
+
+	var statuses:Array<Int> = new Array();
+
+#if ( flash6 || flash7 || flash8 )
+	x1.onStatus = function(obj) {
+	    statuses.push(obj.code);
+};
+
+	var ret:Bool = x1.connect("");
+	
+	if (ret==false){
+	DejaGnu.pass("x1.connect is false for empty");
+	} else {
+	    DejaGnu.fail("x1.connect should be false");
+	}
+	if (statuses.length==0){
+	DejaGnu.pass("statuses.length is zero");
+	} else {
+	    DejaGnu.fail("statuses.length is not zero");
+	}
+#end
+#if flash9
+	//EVENT HANDLER
+#end
+
+#if ( flash6 || flash7 || flash8 )
+	x1.onStatus = function(obj) {
+	    statuses.push(obj.code);
+};
+
+	var ret:Bool = x1.connect("string");
+	
+	if (ret==true){
+	DejaGnu.pass("x1.connect('string') is true");
+	} else {
+	    DejaGnu.fail("x1.connect('string') should be true");
+	}
+	if (statuses.length==0){
+	DejaGnu.pass("statuses.length is zero");
+	} else {
+	    DejaGnu.fail("statuses.length is not zero");
+	}
+
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[]);
+	if (ret==false){
+		DejaGnu.pass("x1.connect() should be false.");
+	} else {
+	    DejaGnu.fail("x1.connect(0 should be false!");
+	}
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[3]);
+	if (ret==false){
+		DejaGnu.pass("x1.connect(3) should be false.");
+	} else {
+	    DejaGnu.fail("x1.connect(3) should be false!");
+	}
+//Si
+//The following undefined one can not be implemented!!!
+//	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[undefined]);
+//	if (ret==false){
+//	DejaGnu.pass("x1.connect should be false.");
+//	} else {
+//	    DejaGnu.fail("x1.connect should be false!");
+//	}
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[""]);
+	if (ret==false){
+		DejaGnu.pass("x1.connect('') should be false.");
+	} else {
+	    DejaGnu.fail("x1.connect('') shoulad be false!");
+	}
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),["String",7]);
+	if (ret==false){
+		DejaGnu.pass("x1.connect('String',7) should be false.");
+	} else {
+	    DejaGnu.fail("x1.connect('String',7) shoulad be false!");
+	}
+	
+	x1.close();
+#end
+
+#if ( flash6 || flash7 || flash8 )
+	var result:Bool = x1.connect("lc_test");
+	if (x1.domain()== "localhost"){
+		DejaGnu.pass("x1.connect('lc_test'); x1.domain equals to 'localhost'");
+	} else {
+	    DejaGnu.fail("x1.connect('lc_test'); x1.domain() does not equals to 'localhost'");
+	}
+//Si
+// Old NOTE: This test will fail if a shared memory segment of the same
+// name exists. So the first time it'll pass, then it'll fail.
+//The old notes could be wrong.
+
+
+	if (result == true){
+		DejaGnu.pass("x1.connect('lc_test'); result is true for the first time");
+	} else {
+	    DejaGnu.xfail("x1.connect('lc_test'); result could be wrong after the first time'");
+	}
+
+// Checks only for syntactical correctness, not success
+	result=x2.send("string","string","string","string");
+	if (result == true){
+		DejaGnu.pass("x2.send('String','String','String','String'); result is true for x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('String','String','String','String'); results is true for x2.send");
+	}
+
+	result=x2.send("lc_test", "testfunc", "val");
+	if (result == true){
+		DejaGnu.pass("x2.send('lc_test','testfunc','val'); result is true for x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','testfunc','val'); results is true for x2.send");
+	}
+
+	result = x2.send("lc_test", "send");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test','send'); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','send'); results should be false for this x2.send");
+	}
+
+	result = x2.send("lc_test", "Send");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test','Send'); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','Send'); results should be false for this x2.send");
+	}
+	
+	result = x2.send("lc_test", "DOMAIn");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test',''DOMAIn); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','DOMAIn'); results should be false for this x2.send");
+	}
+
+	result = x2.send("lc_test", "close");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test','close'); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','close'); results should be false for this x2.send");
+	}
+
+	result = x2.send("lc_test", "conNeCt");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test','conNeCt'); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','conNeCt'); results should be false for this x2.send");
+	}
+
+	result = x2.send("lc_test", "onStatus");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test','onStatus'); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','onStatus'); results should be false for this x2.send");
+	}
+
+	result = x2.send("lc_test", "ALLOWDOMAIN");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test','ALLOWDOMAIN');result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','ALLOWDOMAIN');results should be false for this x2.send");
+	}
+
+	result = x2.send("lc_test", "");
+	if (result == false){
+		DejaGnu.pass("x2.send('lc_test',''); result is false for this x2.send");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test',''); results should be false for this x2.send");
+	}
+
+
+	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),[]);
+	if (ret==false){
+		DejaGnu.pass("x2.send() should be false.");
+	} else {
+	    DejaGnu.fail("x2.send() shoulad be false!");
+	}
+	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),[3]);
+	if (ret==false){
+		DejaGnu.pass("x2.send(3) should be false.");
+	} else {
+	    DejaGnu.fail("x2.send(3) shoulad be false!");
+	}
+	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),["lc_test", 1]);
+	if (ret==false){
+		DejaGnu.pass("x2.send('lc_test',1) should be false.");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test',1) shoulad be false!");
+	}
+//Si
+//The following undefined tests can not be implemented!
+//	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),["lc_test", funcname]);
+//	if (ret==false){
+//		DejaGnu.pass("x2.send should be false.");
+//	} else {
+//	    DejaGnu.fail("x2.send shoulad be false!");
+//	}
+
+	// But anything else is fine.
+	result = x2.send("lc_test", "8");
+	if (result == true){
+		DejaGnu.pass("x2.send('lc_test', '8'); result is true");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','8'); results should be true");
+	}
+
+	result = x2.send("lc_test", "ß");
+	if (result == true){
+		DejaGnu.pass("x2.send('lc_test','ß'); result is true");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test','ß'); results should be true");
+	}
+
+	result = x2.send("lc_test", "&");
+	if (result == true){
+		DejaGnu.pass("result is true");
+	} else {
+	    DejaGnu.fail("result should be true");
+	}
+
+	result = x2.send("lc_test", ".");
+	if (result == true){
+		DejaGnu.pass("x2.send('lc_test', '.'); result is true");
+	} else {
+	    DejaGnu.fail(" x2.send('lc_test', '.'); results should be true");
+	}
+
+	result = x2.send("lc_test", "g.");
+	if (result == true){
+		DejaGnu.pass(" x2.send(lc_test','g.'); result is true");
+	} else {
+	    DejaGnu.fail(" x2.send('lc_test', 'g.'); fresults should be true");
+	}
+
+	result = x2.send("lc_test", "getSeconds");
+	if (result == true){
+		DejaGnu.pass(" x2.send('lc_test','getSeconds');result is true");
+	} else {
+	    DejaGnu.fail(" x2.send('lc_test','getSeconds');results should be true");
+	}
+
+	var funcname:String = "onFullScreen";
+	result = x2.send("lc_test", funcname);
+	if (result == true){
+		DejaGnu.pass("x2.send('lc_test',funcname); result is true");
+	} else {
+	    DejaGnu.fail("x2.send('lc_test',funcname); results should be true");
+	}
+	x2.close();
+
+#end
+       DejaGnu.done();
+// Call this after finishing all tests. It prints out the totals.
+
+
+
+// Si
+// The following ming tests have not been implemented for some reasons.
+/*
+
+ret = rec.connect(undefined);
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+// Checks only for syntactical correctness, not success
+
+// undefined
+result = snd.send("lc_test", funcname);
+check_equals (result, false);
+
+*/
+
+
     }
 }
 
 // local Variables:
 // mode: C++
 // indent-tabs-mode: t
-// End:
-
+// End
