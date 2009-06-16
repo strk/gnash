@@ -1303,11 +1303,12 @@ Machine::execute()
                 ///  [ns [n]] -- Namespace stuff
                 ///  obj -- The object whose property is to be accessed.
                 /// Stack Out:
-                ///  value -- the value from obj::(resolve)'name_offset'(arg1, ..., argN)
+                ///  value -- the value from obj::(resolve)'name_offset'
+                ///      (arg1, ..., argN)
                 ///  (unless ABC_ACTION_CALL_PROPVOID, then: . )
                 /// NB: Calls getter/setter if they exist.
-                /// If the opcode is ABC_ACTION_CALLPROPLEX, obj is not altered by
-                /// getter/setters
+                /// If the opcode is ABC_ACTION_CALLPROPLEX, obj is
+                /// not altered by getter/setters
                 case SWF::ABC_ACTION_CALLPROPERTY:
                 case SWF::ABC_ACTION_CALLPROPLEX:
                 case SWF::ABC_ACTION_CALLPROPVOID:
