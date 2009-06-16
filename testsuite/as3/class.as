@@ -45,8 +45,12 @@ package hello {
         public function Hello() {
 
             xcheck_equals(this, "[object Hello]");
+            check_equals(typeof(this), "object");
+            xcheck(this instanceof MovieClip);
+
             xcheck_equals(this.constructor, "[class Hello]");
             xcheck_equals(this.constructor.constructor, "[class Class]");
+            xcheck_equals(this.parent, "[object Stage]");
 
             xcheck_equals(S, "[class S]");
             xcheck_equals(S.constructor, "[class Class]");
@@ -61,7 +65,9 @@ package hello {
             trace(Base);
 
             xcheck_equals(Base, "[class Base]");
+            xcheck_equals(Base.prototype, "[object Object]");
             xcheck_equals(Derived, "[class Derived]");
+            xcheck_equals(Base.prototype, "[object Object]");
 
             xcheck_equals(Derived.constructor, "[class Class]");
             xcheck_equals(Base.constructor, "[class Class]");
@@ -87,7 +93,7 @@ package hello {
             xcheck(d1 instanceof Derived);
             xcheck_equals(S.s, "Base Derived ");
 
-            totals(25);
+            totals(30);
 
             done();
         }
