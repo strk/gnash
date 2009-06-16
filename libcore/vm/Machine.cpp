@@ -3048,6 +3048,7 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
     // is to be constructed. Setting it to global as before seems to be wrong.
 	mRegisters[0] = cl->getPrototype();
 	executeCodeblock(ctor->getBody());
+    log_debug("Finished instantiating class %s", className);
 }
 
 Machine::Machine(VM& vm)
