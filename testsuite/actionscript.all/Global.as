@@ -171,8 +171,15 @@ check_equals (escape('abcdefghijklmnopqrstuvwxyz'), 'abcdefghijklmnopqrstuvwxyz'
 check_equals(typeof(setInterval), 'function');
 check_equals(typeof(clearInterval), 'function');
 
+ret = clearInterval(); // gnash used to crash on this...
+check_equals(typeof(ret), 'undefined');
+
 check_equals(typeof(setTimeout), 'function');
 check_equals(typeof(clearTimeout), 'function');
+
+ret = clearTimeout(); 
+check_equals(typeof(ret), 'undefined');
+
 
 
 //------------------------------------------------------------
@@ -465,15 +472,15 @@ check_equals (int("0x-7.8 "), 0);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(153); // SWF5
+	check_totals(155); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(187); // SWF6
+	check_totals(189); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(169); // SWF7
+	check_totals(171); // SWF7
 #  else
-	check_totals(156); // SWF8+
+	check_totals(158); // SWF8+
 #  endif
 # endif
 #endif
