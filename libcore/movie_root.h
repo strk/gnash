@@ -1042,11 +1042,6 @@ private:
     /// interface to the Movie class definition
     Levels _movies;
 
-    typedef std::map<int, DisplayObject*> Childs;
-
-    /// The stage childs
-    Childs _childs;
-
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial
     /// stage size
