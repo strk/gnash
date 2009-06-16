@@ -321,7 +321,6 @@ double SWFStream::read_d64()
  
     return d;
 
-#endif
 }
 
 boost::uint8_t    SWFStream::read_u8()
