@@ -484,7 +484,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 		if ((i > 255 && swfVersion == 5) || i > 257)
 			throw ActionLimitException("Lookup depth exceeded.");
 
-		Property* prop = obj->_members.getProperty(key);
+		Property* prop = obj->_members.getProperty(key, nsname);
 		if (prop && prop->visible(swfVersion) )
 		{
 			if (owner != NULL)
