@@ -1094,7 +1094,7 @@ Machine::execute()
                     const boost::int32_t oindex = mStream->read_V32();
                     const boost::int32_t iindex = mStream->read_V32();
 
-                    as_value& objv = getRegister(oindex);
+                    const as_value& objv = getRegister(oindex);
                     const as_value& indexv = getRegister(iindex);
                     
                     log_abc("HASNEXT2: Object is %s, index is %d",

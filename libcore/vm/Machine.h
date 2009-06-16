@@ -282,7 +282,7 @@ private:
 
 	void clearRegisters(boost::uint32_t maxRegsiters);
 
-	as_value getRegister(int index){
+	const as_value& getRegister(int index){
 		log_abc("Getting value at a register %d ", index);
 		return _registers[index];
 	}
