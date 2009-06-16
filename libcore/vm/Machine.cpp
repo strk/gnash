@@ -339,8 +339,11 @@ Machine::execute()
                     mStack.drop(completeName(a));
                     // Get the target object.
                     ENSURE_OBJECT(mStack.top(0));
+                    
+                    // Use get_super?
                     as_object *super = mStack.top(0).to_object()->
                         get_prototype().get();
+                    
                     // If we don't have a super, throw.
                     if (!super) throw ASReferenceError();
                     Property *b = super->findProperty(a.getABCName(), 
@@ -368,6 +371,8 @@ Machine::execute()
                     mStack.drop(completeName(a));
 
                     ENSURE_OBJECT(mStack.top(0));
+                    
+                    // Use get_super?
                     as_object* super = mStack.pop().to_object()->
                         get_prototype().get();
                     if (!super) throw ASReferenceError();
@@ -1235,7 +1240,11 @@ Machine::execute()
                     int dropsize = completeName(a);
                     ENSURE_OBJECT(mStack.top(argc + dropsize));
                     mStack.drop(dropsize);
-                    as_object* super = mStack.top(argc).to_object()->get_super();
+
+                    // Why get_super() here and get_prototype everywhere else?
+                    as_object* super =
+                        mStack.top(argc).to_object()->get_super();
+
                     if (!super) throw ASReferenceError();
                     
                     Property* b = super->findProperty(a.getABCName(),
@@ -1397,7 +1406,10 @@ Machine::execute()
                     get_args(argc);
                     
                     as_object* obj = mStack.top(argc).to_object().get();
-                    as_object* super = obj ? obj->get_super() : 0;
+
+                    // Using get_super() here fails; is it broken, or is
+                    // prototype what we want?
+                    as_object* super = obj ? obj->get_prototype().get() : 0;
                     log_abc("CONSTRUCTSUPER: object %s, super %s, args %s",
                             mStack.top(argc), super, argc);
 
@@ -1406,11 +1418,11 @@ Machine::execute()
                         throw ASException();
                     }
 
-                    as_function *func = super->get_constructor();
+                    as_function *func = super->to_function();
                     if (!func) {
                         log_abc("CONSTRUCTSUPER: %s has no constructor",
                                 super);
-                        return;
+                        break;
                     }
 
                     // 'obj' is the 'this' for the call, we ignore the
@@ -1540,14 +1552,17 @@ Machine::execute()
                     push_stack(as_value(mCurrentFunction));
                     break;
                 }
-            /// 0x58 ABC_ACTION_NEWCLASS
-            /// Stream: V32 'class_id'
-            /// Stack In:
-            ///  obj -- An object to be turned into a class. Its super is constructed.
-            /// Stack Out:
-            ///  class -- The newly made class, made from obj and the information at
-            ///   cinits_pool[class_id]
-            /// NB: This depends on scope and scope base (to determine lifetime(?))
+
+                /// 0x58 ABC_ACTION_NEWCLASS
+                /// Stream: V32 'class_id'
+                /// Stack In:
+                ///  obj -- An object to be turned into a class. Its super
+                ///     is constructed.
+                /// Stack Out:
+                ///  class -- The newly made class, made from obj and the
+                ///     information at cinits_pool[class_id]
+                /// NB: This depends on scope and scope base (to determine
+                ///     lifetime(?))
                 case SWF::ABC_ACTION_NEWCLASS:
                 {
                     boost::uint32_t cid = mStream->read_V32();
@@ -1804,8 +1819,8 @@ Machine::execute()
                     as_object* object = object_val.to_object().get();
                     
                     if (!object) {
-                        log_debug(_("ABC_ACTION_GETPROPERTY: expecting "
-                                    "object on stack, got %s."), object_val);
+                        log_abc(_("GETPROPERTY: expecting object on "
+                                    "stack, got %s."), object_val);
                         push_stack(as_value());
                         break;
                     }
@@ -1899,6 +1914,11 @@ Machine::execute()
                     as_value val;
                     boost::uint32_t sindex = mStream->read_V32();
                     as_object* object = pop_stack().to_object().get();
+                    if (!object) {
+                        log_abc("GETSLOT: Did not find expected object on "
+                                "stack");
+                        break;
+                    } 
 
                     object->get_member_slot(sindex + 1, &val);
 
@@ -2539,9 +2559,10 @@ Machine::execute()
                     if (!valueObject || !typeObject) {
                         // TODO: what here!?
                         // This should eventually be a malformed SWF error.
-                        log_error("ACTION_ISTYPELATE: require two objects on stack, got "
-                               "obj: %s, type: %s.", value, type);
-                        return;
+                        log_error("ACTION_ISTYPELATE: require two objects "
+                                "on stack, got obj: %s, type: %s.",
+                                value, type);
+                        break;
                     }
                     const bool truth = valueObject->instanceOf(typeObject);
                     push_stack(truth);
@@ -3087,7 +3108,7 @@ Machine::find_prop_strict(asName multiname) {
 	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
 	std::string ns = mPoolObject->stringPoolAt(
             multiname.getNamespace()->getAbcURI());
-	std::string path = ns.size() == 0 ? name : ns + "." + name;
+	std::string path = ns.empty() ? name : ns + "." + name;
 
     std::auto_ptr<as_environment::ScopeStack> envStack ( getScopeStack() );
 	val = env.get_variable(path, *envStack, &target);
