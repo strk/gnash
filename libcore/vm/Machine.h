@@ -273,32 +273,33 @@ private:
 	void clearRegisters(boost::uint32_t maxRegsiters);
 
 	as_value get_register(int index){
-		log_abc("Getting value at a register %d ",index);
+		log_abc("Getting value at a register %d ", index);
 		return mRegisters[index];
 	}
 
 	void push_stack(as_value object){
-		log_abc("Pushing value %s onto stack.",object.toDebugString());
+		log_abc("Pushing value %s onto stack.", object);
 		mStack.push(object);
 	}
 
 	as_value pop_stack(){
 		as_value value = mStack.pop();
-		log_abc("Popping value %s off the stack.",value.toDebugString());
+		log_abc("Popping value %s off the stack.", value);
 		return value;
 	}
 
 	void push_scope_stack(as_value object){
 		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
 		assert(scopeObj.get());
-		log_abc("Pushing value %s onto scope stack.",object.toDebugString());
+		log_abc("Pushing value %s onto scope stack.", object);
 		mScopeStack.push(scopeObj);
 		print_scope_stack();
 	}
 
 	boost::intrusive_ptr<as_object> pop_scope_stack() {
-		log_abc("Popping value off the scope stack.  There will be "
-                "%u items left.",mScopeStack.size()-1);
+		log_abc("Popping value %s off the scope stack.  There will be "
+                "%u items left.", as_value(mScopeStack.top(0)),
+                mScopeStack.size()-1);
 		return mScopeStack.pop();
 	}
 
