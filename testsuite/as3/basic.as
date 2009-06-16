@@ -38,10 +38,10 @@ package hello {
             check_equals(i, 12);
         
             i /= 8;
-            check_equals(i, 1.5);
+            xcheck_equals(i, 1.5);
 
             i -= 14;
-            check_equals(i, -12.5);
+            xcheck_equals(i, -12.5);
 
             totals(5);
 

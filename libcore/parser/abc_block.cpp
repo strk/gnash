@@ -323,7 +323,7 @@ abc_block::prepare(Machine* mach)
     // If the following is enabled, it reserves slots for all namespaces
     // in the global object. This means that ABC_ACTION_SETSLOT does not
     // fail as often, but doesn't really seem quite correct.
-#if 0
+#if 1
     as_object* global = mach->global();
     for (std::vector<asNamespace*>::iterator i = _namespacePool.begin(), 
             e = _namespacePool.end(); i != e; ++i) {
