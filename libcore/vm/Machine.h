@@ -212,6 +212,10 @@ public:
 
 	Machine(VM& vm);
 
+    as_object* global() {
+        return _vm.getGlobal();
+    }
+
 private:
 	/// The state of the machine.
 	class State
