@@ -444,7 +444,7 @@ class Array_as {
 	// Array functionality testing
 	//===============================================================
 	
-	DejaGnu.note("***  Begin testing Array functionality ***");
+	DejaGnu.note("***  Begin testing Array functionality  ***");
 	#if !flash9
 	//  Testing ASnative function pointers
 	//  ASnative does not exist in flash 9 or later
@@ -467,27 +467,12 @@ class Array_as {
 		DejaGnu.fail("a.pop array method not initialized properly");
 	}
 	#end
-	
-	//used later
-	var neg = untyped __new__( "Object" );
-	neg.valueOf = function () { return -1; };
-	var zero = untyped __new__( "Object" );
-	zero.valueOf = function () { return 0; };
-	var pos = untyped __new__( "Object" );
-	pos.valueOf = function () { return 1; };
-	var two = untyped __new__( "Object" );
-	two.valueOf = function () { return 2; };
-	var numeric = untyped __new__( "Object" );
-	numeric.valueOf = function () { return untyped Array.NUMERIC; };
-	var numericRev = untyped __new__( "Object" );
-	numericRev.valueOf = function () { return (untyped Array.NUMERIC |
-	                                           untyped Array.DESCENDING); };
 
 	
 	var a;
 	var popped;
 	a = [551, "asdf", 12];
-	DejaGnu.note("a size field = " + Reflect.field(a, "size"));
+	// DejaGnu.note("a size field = " + Reflect.field(a, "size"));
 	if (Reflect.field(a, "size") == null) {
 		DejaGnu.pass("a has no 'size' property which is correct");
 	} else {
@@ -555,8 +540,8 @@ class Array_as {
 		DejaGnu.fail("tmp Array not properly initialized");
 	}
 	
-    #if flash6
-	DejaGnu.note("tmp.toString() = " + tmp.toString());
+    #if (flash6 || flash9)
+	//DejaGnu.note("tmp.toString() = " + tmp.toString());
 	if ( tmp.toString() == ",") {
 		DejaGnu.pass("tmp Array elements correctly initialized");
 	} else {
@@ -595,7 +580,7 @@ class Array_as {
 	} else {
 		DejaGnu.fail("a.pop did no return the correct value");
 	}
-	DejaGnu.note("a[2] = " + a[2]);
+	// DejaGnu.note("a[2] = " + a[2]);
 	if (a[2] == null) {
 		DejaGnu.pass("a.pop properly removes last element");
 	} else {
@@ -729,87 +714,65 @@ class Array_as {
 	}
 	
 
-	// FIXME: The following sorting tests are heavily hacked. They work, sort of
-	//        but there may be better ways of doing this. The problem mainly 
-	//        stems from the way haxe overrides the Array class to use their own
-	//        definitions. We may need to fix haXe itself
-	
-	// These are the tests we are trying to duplicate here
-	//// Check sort functions
-	//a.sort();
-	//check_equals ( a.toString(), "200,551,7,8,9" );
-
-	//a.push(200,7,200,7,200,8,8,551,7,7);
-	//a.sort( Array.NUMERIC );
-	//check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+	// NOTE: The Reflect.callMethod() function ended up being very important
+	//       here. haXe will not let us call sort() with no arguments.
+	//       The only test I haven't been able to figure out is the
+	//       following one. 
 	
 	//a.sort( Array.UNIQUESORT | Array.DESCENDING | Array.NUMERIC);
 	//check_equals (a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 	
-	//// Test multi-parameter constructor, and keep testing sort cases
-	//var trysortarray = new Array("But", "alphabet", "Different", "capitalization");
-	//trysortarray.sort( Array.CASEINSENSITIVE );
-	//check_equals ( trysortarray.toString() , "alphabet,But,capitalization,Different");
-	//trysortarray.sort();
-	//check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
-	
 	// Testing sort functions
 	DejaGnu.note("*** Testing sort functions");
-	var hack = 0;
-	//this is a hack to get around the haxe compiler's way of dealing with array
-	a.sort( untyped hack );
+	// a.sort();
+	Reflect.callMethod( a, Reflect.field(a, "sort"), []);
 	if (a.toString() == "200,551,7,8,9") {
 		DejaGnu.pass("a.sort() method correctly sorted a");
 	} else {
 		DejaGnu.fail("a.sort() method did not correctly sort a");
 	}
 	
-	a.sort(untyped Array.NUMERIC);
-	DejaGnu.note("a = " + a.toString());
-	var num:Int = 16;
-	
-	//a.push(200,7,200,7,200,8,8,551,7,7);
-	a.push(200); a.push(7); a.push(200); a.push(7); a.push(200);
-	a.push(8); a.push(8); a.push(551); a.push(7); a.push(7);
+	// a.push(200,7,200,7,200,8,8,551,7,7);
+	Reflect.callMethod(a, Reflect.field(a, "push"), [200,7,200,7,200,8,8,551,7,7]);
 
-	//untyped a.sort(untyped Array.NUMERIC);
-	untyped a.sort(untyped num);
-	DejaGnu.note("a = " + a.toString());
-	//check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+	//a.sort(Array.NUMERIC);
+	Reflect.callMethod( a, Reflect.field(a, "sort"), [untyped Array.NUMERIC]);
+	
+	// check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 	if (a.toString() == "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551") {
 		DejaGnu.pass("a.sort(NUMERIC) correctly sorts the array");
 	} else {
 		DejaGnu.fail("a.sort(NUMERIC) does not correctly sort the array");
 	}
 	
-	// not sure what to do here so making this xfail
-	a.sort( untyped Array.UNIQUESORT | untyped Array.DESCENDING |
-	        untyped Array.NUMERIC );
-	DejaGnu.note("a = " + a.toString());
+	//FIXED
+	Reflect.callMethod( a, Reflect.field(a, "sort"), [untyped Array.UNIQUESORT  |
+	                    untyped Array.DESCENDING | untyped Array.NUMERIC]);
+	// check_equals (a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" )
 	if (a.toString() == "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551") {
 		DejaGnu.pass("a.sort() with | operator correctly sorts the array");
 	} else {
-		DejaGnu.xfail("a.sort() with | operator does not correctly sort the array");
+		DejaGnu.fail("a.sort() with | operator does not correctly sort the array");
 	}
 	
 	// Test multi-parameter constructor, and keep testing sort cases
 	var trysortarray = untyped __new__(Array, "But", "alphabet", "Different",
 	                                   "capitalization");
-	//trysortarray.sort( untyped Array.CASEINSENSITIVE );
-	var cse = 1;
-	trysortarray.sort( untyped cse );
+	// trysortarray.sort( Array.CASEINSENSITIVE );
+	Reflect.callMethod( trysortarray, Reflect.field(trysortarray, "sort"),
+	                   [untyped Array.CASEINSENSITIVE]);
 	if (trysortarray.toString() == "alphabet,But,capitalization,Different") {
 		DejaGnu.pass("sort(CASEINSENSITIVE) correctly sorts the array");
 	} else {
 		DejaGnu.fail("sort(CASEINSENSITIVE) does not correctly sort the array");
 	}
-	trysortarray.sort( untyped hack );
+	// trysortarray.sort();
+	Reflect.callMethod( trysortarray, Reflect.field(trysortarray, "sort"), []);
 	if (trysortarray.toString() == "But,Different,alphabet,capitalization") {
 		DejaGnu.pass("sort() correctly sorts string array");
 	} else {
 		DejaGnu.fail("sort() does not correctly sort string array");
 	}
-	//end of hacked sorting tests
 	
 	
 	// testing array with unassigned indexes
@@ -852,8 +815,8 @@ class Array_as {
 	} else {
 		DejaGnu.fail("extra gaparray property '1' not found");
 	}
-	// hacked sorting again
-	gaparray.sort(untyped hack);
+	// gaparray.sort();
+	Reflect.callMethod( gaparray, Reflect.field(gaparray, "sort"), []);
 	if (gaparray.length == 17) {
 		DejaGnu.pass("After sort gaparry retains correct length");
 	} else {
@@ -887,7 +850,6 @@ class Array_as {
 	}
 	#end
 	
-	DejaGnu.note("gaparray[2] = " + gaparray[2]);
 	if (gaparray[2] == null) {
 		DejaGnu.pass("empty gaparray index 2 still empty");
 	} else {
@@ -1018,7 +980,8 @@ class Array_as {
 		//DejaGnu.note("tmp2 = " + tmp2.toString());
 	}
 	//DejaGnu.note("tmp2 = " + tmp2.toString());
-	tmp2.sort(untyped hack);
+	// tmp2.sort();
+	Reflect.callMethod( tmp2, Reflect.field(tmp2, "sort"), []);
 	#if flash6
 	// 4, 15 and 16
 	if (tmp2.length == 3) {
@@ -1049,7 +1012,7 @@ class Array_as {
 	} else {
 		DejaGnu.xfail("tmp2 does not have length 5");
 	}
-	DejaGnu.note("***These next two cases pass in min which seems very bogus");
+	DejaGnu.note("***These next two cases pass in ming which seems very bogus");
 	if (tmp2[0] == '0') {
 		DejaGnu.xpass("tmp2[0] now contains '0'");
 	} else {
@@ -1103,8 +1066,8 @@ tmp.sort();
 	// Test sorting using a custom comparison function
 	//-----------------------------------------------------
 
-	var testCmpCalls=0;
-	var testCmpThis="not set";
+	var testCmpCalls = 0;
+	var testCmpThis = "not set";
 	var testCmp = function (x,y) {
 		// Gnash fails here by *requiring* a not-null 'this_ptr' in fn_call
 		// NOTE: we can't rely on the number of calls to this function,
@@ -1128,7 +1091,8 @@ tmp.sort();
 	} else {
 		DejaGnu.fail("trysortarray was not correctly sorted with custom function");
 	}
-	if (Type.typeof(testCmpThis) == null) {
+	//DejaGnu.note("testCmpThis = " + Type.typeof(testCmpThis));
+	if (Type.typeof( testCmpThis ) == null) {
 		DejaGnu.xpass("testCmpThis == null");
 	} else {
 		DejaGnu.xfail("testCmpThis != null");
@@ -1141,44 +1105,52 @@ tmp.sort();
 		DejaGnu.xfail("testCmpCalls != 7");
 	}
 	
+	//DejaGnu.note("array = " + trysortarray.toString());
 	var testCmpBogus1 = function (x,y) {return -1;}
 	trysortarray.sort( testCmpBogus1 );
+	//DejaGnu.note("array = " + trysortarray.toString());
+	// this sort fails in gflashplayer. does as3 iterate or sort differently?
 	if (trysortarray.toString() == "But,alphabet,Different,capitalization") {
-		DejaGnu.pass("custom comparison function returned correct array");
+		DejaGnu.pass("custom sort returned correct array");
 	} else {
-		DejaGnu.fail("custom comparison function did not return correct array");
+		DejaGnu.fail("custom sort did not return correct array");
 	}
 	
 	var testCmpBogus2 = function (x,y) {return 1;}
 	trysortarray.sort( testCmpBogus2 );
 	if (trysortarray.toString() == "alphabet,Different,capitalization,But") {
-		DejaGnu.xpass("custom comparison function returned correct array");
+		DejaGnu.xpass("custom sort returned correct array");
 	} else {
-		DejaGnu.xfail("custom comparison function did not return correct array");
+		DejaGnu.xfail("custom sort did not return correct array");
 	}
 	
 	var testCmpBogus3 = function (x,y) {return 0;}
 	trysortarray.sort( testCmpBogus3 );
 	if (trysortarray.toString() == "alphabet,Different,capitalization,But") {
-		DejaGnu.xpass("custom comparison function returned correct array");
+		DejaGnu.xpass("custom sort returned correct array");
 	} else {
-		DejaGnu.xfail("custom comparison function did not return correct array");
+		DejaGnu.xfail("custom sort did not return correct array");
 	}
 	
+	#if !flash9
 	var testCmpBogus4 = function (x,y) {return untyped tmp2++%2;}
 	trysortarray.sort( testCmpBogus4 );
 	if (trysortarray.toString() == "alphabet,Different,capitalization,But") {
-		DejaGnu.xpass("custom comparison function returned correct array");
+		DejaGnu.xpass("custom sort returned correct array");
 	} else {
-		DejaGnu.xfail("custom comparison function did not return correct array");
+		DejaGnu.xfail("custom sort did not return correct array");
 	}
+	#else
+	// The testCmpBogus4 function can not be used in as3 because null may not
+	// be used as an int
+	#end
 	
 	var testCmpBogus5 = function (x,y) { trysortarray.pop(); return -1;}
 	trysortarray.sort( testCmpBogus5 );
 	if (trysortarray.length == 0) {
-		DejaGnu.xpass("custom function sort returned length 0 array");
+		DejaGnu.xpass("custom sort returned length 0 array");
 	} else {
-		DejaGnu.xfail("custom function sort did not return length 0 array");
+		DejaGnu.xfail("custom sort did not return length 0 array");
 	}
 	
 	// what is this testing?
@@ -1196,14 +1168,14 @@ tmp.sort();
 	}
 	trysortarray2.sort( testCmpBogus6 );
 	if (trysortarray2.length == 4) {
-		DejaGnu.pass("after custom sort, array still has correct length");
+		DejaGnu.pass("array still has correct length");
 	} else {
-		DejaGnu.fail("after custom sort, array does not have correct length");
+		DejaGnu.fail("array does not have correct length");
 	}
 	if (trysortarray2.toString() == "2,3,4,1") {
-		DejaGnu.xpass("custom function sort returned '2,3,4,1'");
+		DejaGnu.xpass("custom sort returned '2,3,4,1'");
 	} else {
-		DejaGnu.xfail("custom function sort did not return '2,3,4,1'");
+		DejaGnu.xfail("custom sort did not return '2,3,4,1'");
 	}
 	
 	
@@ -1300,11 +1272,14 @@ tmp.sort();
 	}
 	#end
 	#if flash9
-	if (c[untyped 'int'(-2147483649)] == null) {
-		DejaGnu.pass("c[int(-2147483649)] == 'undefined'");
-	} else {
-		DejaGnu.fail("c[int(-2147483649)] != 'undefined'");
-	}
+	// FIXME: gflashplayer crashes on this test. Not sure what this is testing.
+	//        is this supposed to be a type cast?
+	// check_equals (c[int(-2147483649)], undefined); 
+	//if (c[untyped 'int'(-2147483649)] == null) {
+		//DejaGnu.pass("c[int(-2147483649)] == 'undefined'");
+	//} else {
+		//DejaGnu.fail("c[int(-2147483649)] != 'undefined'");
+	//}
 	#end
 	
 	c[untyped 2147483649] = "too high";
@@ -1333,6 +1308,8 @@ tmp.sort();
 	} else {
 		DejaGnu.xfail("c[3] is not 'undefined'");
 	}
+	// unexpected behavior here in gflashplayer. Is this sequence of testing
+	// legitimate
 	if (c.length == untyped -2147483646) {
 		DejaGnu.xpass("c.length == -2147483646");
 	} else {
@@ -1340,8 +1317,10 @@ tmp.sort();
 	}
 	
 	
-	//More checking of crazy stuff
+	// More checking of crazy stuff
 	// do iterators work differently in ming/haxe/actionscript?
+	// iterator doesn't do the same thing in haxe. Changing this to xfail until
+	// a solution is found.
 	var str:String = new String("");
 	for (i in c) {
 		str += i + ": " + untyped c[i] + "; ";
@@ -1419,6 +1398,10 @@ tmp.sort();
 	} else {
 		DejaGnu.xfail("c.length != 2147483647");
 	}
+	
+	// NOTE: These are the tests we were trying to duplicate in the tests above.
+	//       I don't know if these are legitimate things to try to test in haxe.
+	//       It's not clear whether the problem is with haxe or gnash. 
 //c = ["zero", "one", "two", "three"];
 //check_equals(typeof(c), "object");
 
@@ -1563,10 +1546,8 @@ tmp.sort();
 	}
 	Reflect.callMethod(b, Reflect.field(b,"unshift"), [8,2]);
 	Reflect.callMethod(b, Reflect.field(b,"push"), [4,3]);
-	DejaGnu.note("b = " + b.toString());
 	b.pop();
 	b.shift();
-	DejaGnu.note("b = " + b.toString());
 	//check_equals ( b.toString() , "2,4" );
 	if (b.toString() == "2,4") {
 		DejaGnu.pass("b.toString == '2,4' after several operations");
@@ -1651,7 +1632,8 @@ tmp.sort();
 	//------------------------------------------------------
 	// Test Array.reverse
 	//------------------------------------------------------
-
+	DejaGnu.note("*** Testing Array.reverse");
+	
 	// check reverse for empty case
 	b.reverse();
 	//check_equals ( b.toString() , "" );
@@ -1664,14 +1646,21 @@ tmp.sort();
 	// check reverse for sparse array
 	var sparse = new Array();
 	sparse[5] = 5;
-	//FIXME: this iterator does not work the same way in haxe
-	//       changing following test to xfail
-	var count=0; for (i in sparse) count++;
+	//count=0; for (var i in sparse) count++;
+	//FIXED: needed to use a while loop instead of for...in loop
+	var count=0;
+	var i:Int = 0;
+	while (i < sparse.length) {
+		if( untyped sparse.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
 	//check_equals(count, 1); // a single element exists
 	if (count == 1) {
-		DejaGnu.xpass("Sparse array contains 1 element");
+		DejaGnu.pass("Sparse array contains 1 element");
 	} else {
-		DejaGnu.xfail("Sparse array contains more or less than 1 element");
+		DejaGnu.fail("Sparse array contains more or less than 1 element");
 	}
 	//check(!sparse.hasOwnProperty(0));
 	if ( !(untyped sparse.hasOwnProperty(0))) {
@@ -1685,7 +1674,9 @@ tmp.sort();
 	} else {
 		DejaGnu.fail("5th element of sparse array has not been initialized");
 	}
-	#if flash6
+	#if (flash6 || flash9)
+	// flash9 seems to output sparse arrays in this way also
+	// flash10 too?
 	//check_equals(sparse.toString(), ",,,,,5");
 	if (sparse.toString() == ",,,,,5") {
 		DejaGnu.pass("sparse array contains correct values");
@@ -1701,7 +1692,16 @@ tmp.sort();
 	 } 
 	#end
 	sparse.reverse();
-	count=0; for (i in sparse) count++;
+	//count=0; for (i in sparse) count++;
+	//loop needs to be done in this way
+	count=0;
+	i = 0;
+	while (i < sparse.length) {
+		if( untyped sparse.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
 	//check_equals(count, 6); // no more holes
 	if (count == 6) {
 		DejaGnu.pass("After reverse sparse array contains 6 elements");
@@ -1720,7 +1720,7 @@ tmp.sort();
 	} else {
 		DejaGnu.fail("After reverse sparse[5] does not contain a value");
 	}
-	#if flash6
+	#if (flash6 || flash9)
 	//check_equals(sparse.toString(), "5,,,,,");
 	if (sparse.toString() == "5,,,,,") {
 		DejaGnu.pass("sparse array contains correct values");
@@ -1746,7 +1746,7 @@ tmp.sort();
 	j[1] = 1;
 	j[3] = 3;
 	var s = j.join("^");
-	#if flash6
+	#if (flash6 || flash9)
 	//~ check_equals(s, "^1^^3");
 	if (s == "^1^^3") {
 		DejaGnu.pass("array.join works correctly on sparse array");
@@ -1903,10 +1903,10 @@ tmp.sort();
 	// using objects that implement valueOf as index positions
 	// FIXME: Currently returns an empty array. Is this a haxe problem or not?
 	//        setting to xfail in the mean time. Not sure haxe knows how to deal
-	//        with valueOf. Changing to xfail in the mean time
+	//        with valueOf.
 	//portion = concatted.slice(zero, two);
 	portion = Reflect.callMethod(concatted, Reflect.field(concatted, "slice"),
-	                             [zero, two]);
+	                             ['zero', 'two']);
 	//check_equals ( portion.toString(), "0,1");
 	DejaGnu.note("portion = " + portion.toString());
 	if (portion.toString() == "0,1") {
@@ -1914,188 +1914,1189 @@ tmp.sort();
 	} else {
 		DejaGnu.xfail("invalid call to slice does not return correct array");
 	}
+	
+	//------------------------------------------------------
+	// Test Array.concat 
+	//------------------------------------------------------
+	DejaGnu.note("*** Testing Array.concat");
+
+	var sparse1 = new Array();
+	sparse1[3] = 'a3';
+
+	var sparse2 = new Array();
+	sparse2[2] = 'b2';
+
+	//csp = sparse1.concat(sparse2);
+	var csp = sparse1.concat(sparse2);
+
+	//count=0; for (var i in sparse1) count++;
+	count=0;
+	i = 0;
+	while (i < sparse1.length) {
+		if( untyped sparse1.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 1);
+	if (count == 1) {
+		DejaGnu.pass("sparse1 contains only 1 element");
+	} else {
+		DejaGnu.fail("sparse1 contains more or less than 1 element");
+	}
+	
+	
+	//count=0; for (var i in sparse2) count++;
+	count=0;
+	i = 0;
+	while (i < sparse2.length) {
+		if( untyped sparse2.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 1);
+	if (count == 1) {
+		DejaGnu.pass("sparse2 contains only 1 element");
+	} else {
+		DejaGnu.fail("sparse2 contains more or less than 1 element");
+	}
+
+	//count=0; for (var i in csp) count++;
+	count = 0;
+	i = 0;
+	while (i < csp.length) {
+		if( untyped csp.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	
+	//check_equals(count, 7); // concat filled any holes
+	if (count == 7) {
+		DejaGnu.pass("concat filled holes in csp");
+	} else {
+		DejaGnu.fail("concat did not fill holes in csp");
+	}
+
+	csp = sparse1.concat(untyped 'onemore');
+	//count=0; for (var i in csp) count++;
+	count = 0;
+	i = 0;
+	while (i < csp.length) {
+		if( untyped csp.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 5); // concat filled any holes
+	if (count == 5) {
+		DejaGnu.pass("concat filled holes in sparse1");
+	} else {
+		DejaGnu.fail("concat did not fill holes in sparse1");
+	}
+	
+	
+	//-------------------------------
+	// Test Array.splice
+	//-------------------------------
+	DejaGnu.note("***  Begin testing Array.splice");
+
+	var ary = [0,1,2,3,4,5];
+	//check_equals ( ary.toString(), "0,1,2,3,4,5" );
+	if (ary.toString() == "0,1,2,3,4,5") {
+		DejaGnu.pass("ary constructed properly: sanity checked");
+	} else {
+		DejaGnu.fail("ary not constructed proplerly");
+	}
+
+	// No args is invalid
+	//spliced = ary.splice();
+	var spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), []);
+	//check_equals ( ary.toString(), "0,1,2,3,4,5" );
+	if (ary.toString() == "0,1,2,3,4,5") {
+		DejaGnu.pass("splice() with no args returns same array");
+	} else {
+		DejaGnu.fail("splice() with no args does not return same array");
+	}
+	//check_equals ( typeof(spliced), "undefined" );
+	if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+		DejaGnu.pass("splice() returns undefined");
+	} else {
+		DejaGnu.fail("splice() does not return undefined");
+	}
+
+	// Zero and positive offset starts from the end (-1 is last)
+	spliced = ary.splice(0, 1);
+	//check_equals ( ary.toString(), "1,2,3,4,5" );
+	if (ary.toString() == "1,2,3,4,5") {
+		DejaGnu.pass("ary[0] element removed");
+	} else {
+		DejaGnu.fail("ary[0] element was not remeoved");
+	}
+	//check_equals ( spliced.toString(), "0" );
+	if (spliced.toString() == "0") {
+		DejaGnu.pass("'0' element moved into spliced");
+	} else {
+		DejaGnu.fail("'0' element was not moved into spliced");
+	}
+	spliced = ary.splice(1, 1);
+	//check_equals ( ary.toString(), "1,3,4,5" );
+	if (ary.toString() == "1,3,4,5") {
+		DejaGnu.pass("ary[1] element removed");
+	} else {
+		DejaGnu.fail("ary[1] element was not removed");
+	}
+	//check_equals ( spliced.toString(), "2" );
+	if (spliced.toString() == "2") {
+		DejaGnu.pass("'2' element moved into spliced");
+	} else {
+		DejaGnu.fail("'2' element was not moved into spliced");
+	}
+
+	//// Negative offset starts from the end (-1 is last)
+	spliced = ary.splice(-1, 1);
+	//check_equals ( ary.toString(), "1,3,4" );
+	if (ary.toString() == "1,3,4") {
+		DejaGnu.pass("ary[3] element removed from end");
+	} else {
+		DejaGnu.fail("ary[3] element not removed from end");
+	}
+	//check_equals ( spliced.toString(), "5" );
+	if (spliced.toString() == "5") {
+		DejaGnu.pass("'5' element moved into spliced");
+	} else {
+		DejaGnu.fail("'5' element was not moved into spliced");
+	}
+	spliced = ary.splice(-2, 1);
+	//check_equals ( ary.toString(), "1,4" );
+	if (ary.toString() == "1,4") {
+		DejaGnu.pass("ary[1] removed with negative argument");
+	} else {
+		DejaGnu.fail("ary[1] was not removed with negative argument");
+	}
+	//check_equals ( spliced.toString(), "3" );
+	if (spliced.toString() == "3") {
+		DejaGnu.pass("'3' correctly moved into spliced");
+	} else {
+		DejaGnu.fail("'3' was not correctly moved into spliced");
+	}
+
+	// Out-of bound zero or positive offset are taken as one-past the end
+	spliced = ary.splice(2, 1);
+	//check_equals ( ary.toString(), "1,4" );
+	if (ary.toString() == "1,4") {
+		DejaGnu.pass("out of bounds index did not change ary");
+	} else {
+		DejaGnu.fail("out of bounds index changed ary");
+	}
+	//check_equals ( spliced.toString(), "" );
+	if (spliced.toString() == "") {
+		DejaGnu.pass("out of bounds index produced empty array");
+	} else {
+		DejaGnu.fail("out of bounds index did not produce empty array");
+	}
+	spliced = ary.splice(2, 10);
+	//check_equals ( ary.toString(), "1,4" );
+	if (ary.toString() == "1,4") {
+		DejaGnu.pass("out of bounds index did not change ary");
+	} else {
+		DejaGnu.fail("out of bounds index changed ary");
+	}
+	//check_equals ( spliced.toString(), "" );
+	if (spliced.toString() == "") {
+		DejaGnu.pass("out of bounds index produced empty array");
+	} else {
+		DejaGnu.fail("out of bounds index did not produce empty array");
+	}
+
+	// Out-of bound negative offset are taken as zero
+	spliced = ary.splice(-20, 1);
+	//check_equals ( ary.toString(), "4" );
+	if (ary.toString() == "4") {
+		DejaGnu.pass("out of bounds negative index taken as 0");
+	} else {
+		DejaGnu.fail("out of bounds negative index not taken as 0");
+	}
+	//check_equals ( spliced.toString(), "1" );
+	if (spliced.toString() == "1") {
+		DejaGnu.pass("out of bounds negative index removed correct element");
+	} else {
+		DejaGnu.fail("out of bounds negative index did not remove correct element");
+	}
+
+	// rebuild the array
+	ary = [0,1,2,3,4,5,6,7,8];
+
+	// Zero length doesn't change anything, and return an empty array
+	spliced = ary.splice(2, 0);
+	//check_equals ( ary.toString(), "0,1,2,3,4,5,6,7,8" );
+	if (ary.toString() == "0,1,2,3,4,5,6,7,8") {
+		DejaGnu.pass("0 length arg did not change ary");
+	} else {
+		DejaGnu.fail("0 length arg changed ary");
+	}
+	//check_equals ( spliced.toString(), "" );
+	if (spliced.toString() == "") {
+		DejaGnu.pass("0 length arg returned empty array");
+	} else {
+		DejaGnu.fail("0 length arg did not return empty array");
+	}
+
+	// Out of bound positive length consumes up to the end
+	spliced = ary.splice(2, 100);
+	//check_equals ( ary.toString(), "0,1" );
+	if (ary.toString() == "0,1") {
+		DejaGnu.pass("too long positive length removed to end of ary");
+	} else {
+		DejaGnu.fail("too long positive length did not remove to end");
+	}
+	//check_equals ( spliced.toString(), "2,3,4,5,6,7,8" );
+	if (spliced.toString() == "2,3,4,5,6,7,8") {
+		DejaGnu.pass("splice contains ary from [2] to the end");
+	} else {
+		DejaGnu.fail("splice does not contain ary from [2] to the end");
+	}
+	ary=spliced; // reset array
+	spliced = ary.splice(-2, 100);
+	//check_equals ( ary.toString(), "2,3,4,5,6" );
+	if (ary.toString() == "2,3,4,5,6") {
+		DejaGnu.pass("neg index large length removes end of ary");
+	} else {
+		DejaGnu.fail("neg index large length does not remove end of ary");
+	}
+	//check_equals ( spliced.toString(), "7,8" );
+	if (spliced.toString() == "7,8") {
+		DejaGnu.pass("spliced now contains end of ary");
+	} else {
+		DejaGnu.fail("spliced does not contain correct end of ary");
+	}
+
+	// Negative length are invalid
+	spliced = ary.splice(0, -1);
+	//check_equals ( typeof(spliced), 'undefined' );
+	if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+		DejaGnu.pass("splice(0,-1) returns undefined");
+	} else {
+		DejaGnu.fail("splice(0,-1) does not return undefined");
+	}
+	//check_equals ( ary.toString(), "2,3,4,5,6" );
+	if (ary.toString() == "2,3,4,5,6") {
+		DejaGnu.pass("negative length did not change ary");
+	} else {
+		DejaGnu.fail("negative length changed ary");
+	}
+	spliced = ary.splice(3, -1);
+	//check_equals ( typeof(spliced), 'undefined' );
+	if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+		DejaGnu.pass("splice(-3,-1,) returns undefined");
+	} else {
+		DejaGnu.fail("splice(-3,-1,) does not return undefined");
+	}
+	//check_equals ( ary.toString(), "2,3,4,5,6" );
+	if (ary.toString() == "2,3,4,5,6") {
+		DejaGnu.pass("negative length did not change ary");
+	} else {
+		DejaGnu.fail("negative length changed ary");
+	}
+	spliced = ary.splice(-1, -1);
+	//check_equals ( typeof(spliced), 'undefined' );
+	if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+		DejaGnu.pass("splice(-1,-1) returns undefined");
+	} else {
+		DejaGnu.fail("splice(-1,-1) does not return undefined");
+	}
+	//check_equals ( ary.toString(), "2,3,4,5,6" );
+	if (ary.toString() == "2,3,4,5,6") {
+		DejaGnu.pass("negative length did not change ary");
+	} else {
+		DejaGnu.fail("negative length changed ary");
+	}
+	//spliced = ary.splice(-1, -1, "a", "b", "c");
+	spliced == Reflect.callMethod( ary, Reflect.field(ary, "splice"),
+	                              [-1,-1,"a","b","c"]);
+	//check_equals ( typeof(spliced), 'undefined' );
+	if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+		DejaGnu.pass("splice(-1,-1,'a','b','c') returns undefined");
+	} else {
+		DejaGnu.fail("splice(-1,-1,'a','b','c') does not return undefined");
+	}
+	//check_equals ( ary.toString(), "2,3,4,5,6" );
+	if (ary.toString() == "2,3,4,5,6") {
+		DejaGnu.pass("negative length did not change ary");
+	} else {
+		DejaGnu.fail("negative length changed ary");
+	}
+	// NOTE: resetting ary because flash 9 makes changes here which invalidate 
+	//       further tests.
+	ary = new Array();
+	ary = [2,3,4,5,6];
+
+	// Provide substitutions now
+	//spliced = ary.splice(1, 1, "a", "b", "c");
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"),
+	                              [1,1,"a","b","c"]);
+	//check_equals ( ary.toString(), "2,a,b,c,4,5,6" );
+	if (ary.toString() == "2,a,b,c,4,5,6") {
+		DejaGnu.pass("splice with subst. changed ary correctly");
+	} else {
+		DejaGnu.fail("splice with subst. did not change ary correctly");
+	}
+	//check_equals ( spliced.toString(), '3' );
+	if (spliced.toString() == "3") {
+		DejaGnu.pass("splice with subst. removed correct element");
+	} else {
+		DejaGnu.fail("splice with subst. did not remove correct element");
+	}
+	//spliced = ary.splice(-4, 2, 8);
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [-4,2,8]);
+	//check_equals ( ary.toString(), "2,a,b,8,5,6" );
+	if (ary.toString() == "2,a,b,8,5,6") {
+		DejaGnu.pass("splice with subst. changed ary correctly");
+	} else {
+		DejaGnu.fail("splice with subst. did not change ary correctly");
+	}
+	//check_equals ( spliced.toString(), 'c,4' );
+	if ( spliced.toString() == "c,4" ) {
+		DejaGnu.pass("splice with subst. removed correct elements");
+	} else {
+		DejaGnu.fail("splice with subst. removed correct elements");
+	}
+
+	// Insert w/out deleting anything
+	//spliced = ary.splice(3, 0, 10, 11, 12);
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), 
+	                             [3, 0, 10, 11, 12]);
+	//check_equals ( ary.toString(), "2,a,b,10,11,12,8,5,6" );
+	if (ary.toString() == "2,a,b,10,11,12,8,5,6") {
+		DejaGnu.pass("splice correctly inserted elements into ary");
+	} else {
+		DejaGnu.fail("splice did not correctly insert elements into ary");
+	}
+	//check_equals ( spliced.toString(), '' );
+	if (spliced.toString() == "") {
+		DejaGnu.pass("splice did not remove any elements");
+	} else {
+		DejaGnu.fail("splice removed elements when it shouldn't");
+	}
+
+	// Use arrays as replacement
+	//spliced = ary.splice(0, 7, [1,2], [3,4]);
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"),
+	                             [0, 7, [1,2], [3,4]]);
+	//check_equals ( ary.toString(), "1,2,3,4,5,6" );
+	if (ary.toString() == "1,2,3,4,5,6") {
+		DejaGnu.pass("array arguments passed as subst. correctly");
+	} else {
+		DejaGnu.fail("array arguments not passed correctly");
+	}
+	//check_equals ( ary.length, 4 ); // don't be fooled by toString output !
+	if (ary.length == 4) {
+		DejaGnu.pass("ary.length == 4 because of internal arrays");
+	} else {
+		DejaGnu.fail("ary.length != 4");
+	}
+	//check_equals ( spliced.toString(), '2,a,b,10,11,12,8' );
+	if (spliced.toString() == "2,a,b,10,11,12,8") {
+		DejaGnu.pass("splice removed correct elements from ary");
+	} else {
+		DejaGnu.fail("splice did not remove correct elements from ary");
+	}
+
+	// Ensure the simplest usage cases are correct!
+	//spliced = ary.splice(1);
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [1]);
+	//check_equals ( spliced.toString(), "3,4,5,6");
+	if (spliced.toString() == "3,4,5,6") {
+		DejaGnu.pass("splice(1) returns correct array");
+	} else {
+		DejaGnu.fail("splice(1) does not return correct array");
+	}
+	//spliced = ary.splice(0);
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [0]);
+	//check_equals ( spliced.toString(), "1,2");
+	if (spliced.toString() == "1,2") {
+		DejaGnu.pass("splice(0) returns correct array");
+	} else {
+		DejaGnu.fail("splice(0) does not return correct arry");
+	}
+
+	// Splice a sparse array
+	ary = new Array(); ary[2] = 2; ary[7] = 7;
+
+	//check_equals(ary.length, 8);
+	if (ary.length == 8) {
+		DejaGnu.pass("sparse array has correct length");
+	} else {
+		DejaGnu.fail("sparse array does not have correct length");
+	}
+	//count=0; for (var i in ary) count++;
+	count = 0;
+	i = 0;
+	while (i < ary.length) {
+		if( untyped ary.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 2);
+	if (count == 2) {
+		DejaGnu.pass("sparse array has only 2 elements");
+	} else {
+		DejaGnu.fail("sparse array has more or less than 2 elements");
+	}
+
+	spliced = ary.splice(3, 0); // no op ?
+	//check_equals(ary.length, 8); // no change in length
+	if (ary.length == 8) {
+		DejaGnu.pass("splice(3,0) does not change length of sparse array");
+	} else {
+		DejaGnu.fail("splice(3,0) changed length of sparse array");
+	}
+	//count=0; for (var i in ary) count++;
+	count = 0;
+	i = 0;
+	while (i < ary.length) {
+		if( untyped ary.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 8); // but fills the gaps !
+	//NOTE: is this correct behavior?
+	if (count == 8) {
+		DejaGnu.pass("splice fills holes in sparse array");
+	} else {
+		DejaGnu.fail("splice does not fill holes in sparse array");
+	}
+
+	ary = new Array(); ary[2] = 2; ary[7] = 7;
+	//spliced = ary.splice(3, 0, 3); // add 3 at index 3
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [3,0,3]);
+	//check_equals(ary.length, 9);
+	if (ary.length == 9) {
+		DejaGnu.pass("splice inserted element into sparse array");
+	} else {
+		DejaGnu.fail("splice did not insert element into sparse array");
+	}
+	//count=0; for (var i in ary) count++;
+	count = 0;
+	i = 0;
+	while (i < ary.length) {
+		if( untyped ary.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 9); // fills the gaps !
+	//correct or not?
+	if (count == 9) {
+		DejaGnu.pass("splice fills holes in sparse array");
+	} else {
+		DejaGnu.fail("splice does not fill holes in sparse array");
+	}
+	//check_equals(ary[3], 3);
+	if (ary[3] == 3) {
+		DejaGnu.pass("ary[3] == 3");
+	} else {
+		DejaGnu.fail("ary[3] != 3");
+	}
+	//check_equals(ary[2], 2);
+	if (ary[3] == 3) {
+		DejaGnu.pass("ary[3] == 3");
+	} else {
+		DejaGnu.fail("ary[3] != 3");
+	}
+
+	ary = new Array(); ary[2] = 2; ary[7] = 7;
+	//spliced = ary.splice(3, 1, 3); // replace index 3 (an hole) with a 3 value
+	spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [3,1,3]);
+	//count=0; for (var i in ary) count++;
+	count = 0;
+	i = 0;
+	while (i < ary.length) {
+		if( untyped ary.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 8); // fills the gaps
+	if (count == 8) {
+		DejaGnu.pass("empty ary indexes have been filled");
+	} else {
+		DejaGnu.fail("empty ary indexes have not been filled");
+	}
+	//count=0; for (var i in spliced) count++;
+	count = 0;
+	i = 0;
+	while (i < spliced.length) {
+		if( untyped spliced.hasOwnProperty(i) ) {
+			count++;
+		}
+		i++;
+	}
+	//check_equals(count, 1); // the returned array contains an actual value, not an hole
+	if (count == 1) {
+		DejaGnu.pass("splice on empty index returned a value");
+	} else {
+		DejaGnu.fail("splice on empty index did not return a value");
+	}
+	
+	
+	//-------------------------------
+	// Test single parameter constructor, and implicitly expanding array
+	//-------------------------------
+	DejaGnu.note("*** Begin testing single parameter constructor");
+
+	//var c = new Array(10);
+	var c = untyped __new__(Array, 10);
+	//check_equals(c.constructor, Array);
+	if (untyped c.constructor == Array) {
+		DejaGnu.pass("array c has an Array constructor property");
+	} else {
+		DejaGnu.fail("array c does not have a constructor property");
+	}
+	//check (a instanceOf Array);
+	// I'm pretty sure this is supposed to be check (c instanceOf Array)
+	if (Type.getClassName(Type.getClass(c)) == "Array") {
+		DejaGnu.pass("c is an Array");
+	} else {
+		DejaGnu.fail("c is not an Array");
+	}
+	//check_equals ( typeof(c), "object" );
+	if (Std.string(untyped __typeof__(c)) == "object") {
+		DejaGnu.pass("c is an object");
+	} else {
+		DejaGnu.fail("c is not an object");
+	}
+	//check_equals ( c.length, 10 );
+	if (c.length == 10) {
+		DejaGnu.pass("c.length == 10");
+	} else {
+		DejaGnu.fail("c.length != 10");
+	}
+	//check_equals ( c[5] , undefined );
+	if (untyped c[5] == null) {
+		DejaGnu.pass("c[5] is currently 'undefined'");
+	} else {
+		DejaGnu.fail("c[5] is not 'undefined'");
+	}
+	untyped c[1000] = 283;
+	//check_equals ( c[1000] , 283 );
+	if (untyped c[1000] == 283) {
+		DejaGnu.pass("c[1000] correctly assigned 283");
+	} else {
+		DejaGnu.fail("c[1000] not correctly assigned 283");
+	}
+	//check_equals ( c[1001] , undefined );
+	if (untyped c[1001] == null) {
+		DejaGnu.pass("c[1001] == 'undefined' one beyond array end");
+	} else {
+		DejaGnu.fail("c[1001] != 'undefined' one beyond array end");
+	}
+	//check_equals ( c[999] , undefined );
+	if (untyped c[999] == null) {
+		DejaGnu.pass("c[999] == 'undefined' still");
+	} else {
+		DejaGnu.fail("c[999] != 'undefined'");
+	}
+	//check_equals ( c.length, 1001 );
+	if (c.length == 1001) {
+		DejaGnu.pass("length of c correctly extended to 1001");
+	} else {
+		DejaGnu.fail("length of c not correctly extended");
+	}
+
+	// Test that the 'length' property is overridable
+	untyped c[8] = 'eight';
+	untyped c[0] = 'zero';
+	//check_equals(c[8], 'eight');
+	if (untyped c[8] == "eight") {
+		DejaGnu.pass("c[8] == 'eight'");
+	} else {
+		DejaGnu.fail("c[8] != 'eight'");
+	}
+	//c.length = 2;
+	Reflect.setField(c, "length", 2);
+	//check_equals(c.length, 2);
+	if (c.length == 2) {
+		DejaGnu.pass("length of c reset to 2");
+	} else {
+		DejaGnu.fail("length of c not reset to 2");
+	}
+	//check_equals(c[8], undefined);
+	if (untyped c[8] == null) {
+		DejaGnu.pass("c[8] changed to 'undefined'");
+	} else {
+		DejaGnu.fail("c[8] not correctly changed to 'undefined'");
+	}
+	//check_equals(c[0], 'zero');
+	if (untyped c[0] == "zero") {
+		DejaGnu.pass("c[0] == 'zero' still");
+	} else {
+		DejaGnu.fail("c[0] != 'zero' anymore");
+	}
+	
+	// Probable flash9 bug in gflashplayer here or Haxe bug, not sure which
+	//c.length = -1;
+	Reflect.setField(c, "length", -1);
+	// it seems Gnash needs to store the 'length' property as a normal property
+	//xcheck_equals(c.length, -1);
+	if (c.length == -1) {
+		DejaGnu.xpass("c.length now == -1");
+	} else {
+		DejaGnu.xfail("c.length != -1");
+	}
+	//check_equals(c[0], undefined);
+	if (untyped c[0] == null) {
+		DejaGnu.pass("c[0] == 'undefined'");
+	} else {
+		DejaGnu.fail("c[0] != 'undefined'");
+	}
+	
+	
+	//-------------------------------
+	// Test deleting an array element
+	//-------------------------------
+
+	//var c = new Array(10,20,30);
+	//var c = untyped __new__(Array, 10, 20, 30);
+	var c = [10,20,30];
+	//check_equals ( c.length, 3 );
+	if (c.length == 3) {
+		DejaGnu.pass("c constructed with correct length");
+	} else {
+		DejaGnu.fail("c not constructed with correct length");
+	}
+	//check_equals(c[0], 10);
+	if (untyped c[0] == 10) {
+		DejaGnu.pass("c[0] == 10");
+	} else {
+		DejaGnu.fail("c[0] != 10");
+	}
+	//check_equals(c[1], 20);
+	if (untyped c[1] == 20) {
+		DejaGnu.pass("c[1] == 20");
+	} else {
+		DejaGnu.fail("c[1] != 20");
+	}
+	//check_equals(c[2], 30);
+	if (untyped c[2] == 30) {
+		DejaGnu.pass("c[2] == 30");
+	} else {
+		DejaGnu.fail("c[2] != 30");
+	}
+	
+	//check(c.hasOwnProperty('0'));
+	if (untyped c.hasOwnProperty('0')) {
+		DejaGnu.pass("c has property '0'");
+	} else {
+		DejaGnu.fail("c does not have property '0'");
+	}
+	//check(c.hasOwnProperty('1'));
+	if (untyped c.hasOwnProperty('1')) {
+		DejaGnu.pass("c has property '1'");
+	} else {
+		DejaGnu.fail("c does not have property '1'");
+	}
+	//check(c.hasOwnProperty('2'));
+	if (untyped c.hasOwnProperty('2')) {
+		DejaGnu.pass("c has property '2'");
+	} else {
+		DejaGnu.fail("c does not have property '2'");
+	}
+	
+	// NOTE: the following tests do not seem to have an equivalent haxe test.
+	//       Is the delete keyword specific to ming?
+	//check(delete c[1]);
+	//check_equals ( c.length, 3 );
+	//check_equals(c[0], 10);
+	//check_equals(typeof(c[1]), 'undefined');
+	//check_equals(c[2], 30);
+	//#if OUTPUT_VERSION > 5
+	//check(c.hasOwnProperty('0'));
+	//check(!c.hasOwnProperty('1'));
+	//check(c.hasOwnProperty('2'));
+	//#endif
+
+	//c[10] = 'ten';
+	//check_equals(c.length, 11);
+	//ASSetPropFlags(c, "2", 7, 0); // protect from deletion
+	//xcheck( ! delete c[2] ); // gnash doesn't store prop flags here..
+	//xcheck_equals(c[2], 30); // so won't respect delete-protection
+	//c.length = 2;
+	//xcheck_equals(c[2], 30); // was protected !
+	//check_equals(typeof(c[10]), 'undefined'); // was not protected..
+	//c.length = 11;
+	//check_equals(typeof(c[10]), 'undefined'); // and won't come back
+
+	
+	//-------------------------------
+	// Test sort
+	//-------------------------------
+	DejaGnu.note("Begin Array sort testing");
+	
+	//NOTE: Gnash seems to allow these types of objects to be used as comparison
+	//      functions. However, gflashplayer, flash9 do not allow this. I will
+	//      write some equivalent functions so that these test can be run in 
+	//      flash9.
+	//used later
+	//neg = new Object();
+	//neg.valueOf = function () { return -1; };
+	var neg = { valueOf : function() {return -1;} };
+	var fneg = function(x,y) {return -1;};
+	//zero = new Object();
+	//zero.valueOf = function () { return 0; };
+	var zero = { valueOf : function() {return 0;} };
+	var fzero = function(x,y) {return 0;};
+	//pos = new Object();
+	//pos.valueOf = function () { return 1; };
+	var pos = { valueOf : function() {return 1;} };
+	var fpos = function(x,y) {return 1;};
+	//two = new Object();
+	//two.valueOf = function () { return 2; };
+	var two = { valueOf : function() {return 2;} };
+	var ftwo = function(x,y) {return 2;};
+	//numeric = new Object();
+	//numeric.valueOf = function () { return Array.NUMERIC; };
+	var numeric = { valueOf : function() {return untyped Array.NUMERIC;} };
+	var fnumeric = function(x,y) {return untyped Array.NUMERIC;};
+	//numericRev = new Object();
+	//numericRev.valueOf = function () { return (Array.NUMERIC | Array.DESCENDING); };
+	var numericRev = { valueOf : function() {return (untyped Array.NUMERIC |
+	                  untyped Array.DESCENDING);} };
+	var fnumericRev = function(x,y) {return (untyped Array.NUMERIC |
+	                                 untyped Array.DESCENDING);};
+
+	
+	var cmp_fn = function(x,y) {
+		if (x.length < y.length) { return -1; }
+		if (x.length > y.length) { return 1; }
+		return 0;
+	};
+
+	var cmp_fn_obj =  function(x,y) {
+		if (x.length < y.length) { return neg; }
+		if (x.length > y.length) { return pos; }
+		return zero;
+	};
+
+	var tolen = function(x) {
+		var i = 0;
+		var str = "[";
+		while( i < x.length ) {
+			str += untyped x[i].length;
+			if ( i != x.length - 1) str += ", ";
+			i++;
+		}
+		str += "]";
+		return str;
+	};
+
+	//id = new Object();
+	//id.toString = function () { return "Name"; };
+	var id = { toString : function() {return "Name";} };
+	//yr = new Object();
+	//yr.toString = function () { return "Year"; };
+	var yr = { toString : function() {return "Year";} };
+
+	var a = ["ed", "emacs", "", "vi", "nano", "Jedit"];
+	var b = [8, 1, -2, 5, -7, -9, 3, 0];
+	var c = [7.2, 2.0, -0.5, 3/0, 0.0, 8.35, 0.001, -3.7];
+	var d = [];
+	var e = ["singleton"];
+	var f = [id, yr, id];
+
+	//trace(" -- Basic Sort Tests -- ");
+	DejaGnu.note("** Basic sort tests");
+	
+	
+	//a.sort();
+	Reflect.callMethod( a, Reflect.field(a, "sort"), []);
+	//check_equals( a.toString(), ",Jedit,ed,emacs,nano,vi" );
+	if (a.toString() == ",Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("a.sort() correctly sorts a");
+	} else {
+		DejaGnu.fail("a.sorty() does not correctly sort a");
+	}
+	//NOTE: flash9/gflashplayer does not allow NUMERIC sorting of strings
+	#if !flash9
+	//r = a.sort( Array.NUMERIC );
+	var r = Reflect.callMethod( a, Reflect.field(a, "sort"),
+	                           [untyped Array.NUMERIC]);
+	//check_equals( r.toString(), ",Jedit,ed,emacs,nano,vi" );
+	if (r.toString() == ",Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("Numeric sort on a returns correct array");
+	} else {
+		DejaGnu.fail("Numeric sort on a does not return correct array");
+	}
+	//check_equals( a.toString(), ",Jedit,ed,emacs,nano,vi" );
+	if (a.toString() == ",Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("Numeric sort on a correctly sorts a");
+	} else {
+		DejaGnu.fail("Numeric sort on a does not correctly sort a");
+	}
+	//a.sort( Array.NUMERIC | Array.CASEINSENSITIVE );
+	Reflect.callMethod( a, Reflect.field(a, "sort"), [untyped Array.NUMERIC |
+	                   untyped Array.CASEINSENSITIVE]);
+	//check_equals( a.toString(), ",ed,emacs,Jedit,nano,vi" );
+	if (a.toString() == ",ed,emacs,Jedit,nano,vi") {
+		DejaGnu.pass("Numeric | Caseinsensitive sort on a works correclty");
+	} else {
+		DejaGnu.fail("Numeric | Caseinsensitive sort on a does not work");
+	}
+	#end
+	//a.sort( Array.CASEINSENSITIVE );
+	Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                   [untyped Array.CASEINSENSITIVE]);
+	//check_equals( a.toString(), ",ed,emacs,Jedit,nano,vi" );
+	if (a.toString() == ",ed,emacs,Jedit,nano,vi") {
+		DejaGnu.pass("Caseinsensitive sort on a works correctly");
+	} else {
+		DejaGnu.fail("Caseinsensitive sort on a does not work");
+	}
+	//a.sort( Array.UNIQUESORT );
+	Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                   [untyped Array.UNIQUESORT]);
+	//check_equals( a.toString(), ",Jedit,ed,emacs,nano,vi" );
+	if (a.toString() == ",Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("Uniquesort sort on a works correctly");
+	} else {
+		DejaGnu.fail("Uniquesort sort on a does not work");
+	}
+	//r = a.sort( Array.DESCENDING );
+	var r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.DESCENDING]);
+	//check_equals( r.toString(), "vi,nano,emacs,ed,Jedit," );
+	if (r.toString() == "vi,nano,emacs,ed,Jedit,") {
+		DejaGnu.pass("Descending sort on a returns correct array");
+	} else {
+		DejaGnu.fail("Descending sort on a does not return correct array");
+	}
+	//check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+	if (a.toString() == "vi,nano,emacs,ed,Jedit,") {
+		DejaGnu.pass("Descending sort on a works correctly");
+	} else {
+		DejaGnu.fail("Descending sort on a does not work");
+	}
+
+	//r = b.sort();
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), []);
+	//check_equals( r.toString(), "-2,-7,-9,0,1,3,5,8" );
+	if (r.toString() == "-2,-7,-9,0,1,3,5,8") {
+		DejaGnu.pass("b.sort() returns correct array");
+	} else {
+		DejaGnu.fail("b.sort() does not return correct array");
+	}
+	//check_equals( b.toString(), "-2,-7,-9,0,1,3,5,8" );
+	if (b.toString() == "-2,-7,-9,0,1,3,5,8") {
+		DejaGnu.pass("b.sort() correctly sorted b");
+	} else {
+		DejaGnu.fail("b.sort() did not correctly sort b");
+	}
+	//b.sort( Array.NUMERIC );
+	Reflect.callMethod( b, Reflect.field(b, "sort"), [untyped Array.NUMERIC]);
+	//check_equals( b.toString(), "-9,-7,-2,0,1,3,5,8" );
+	if (b.toString() == "-9,-7,-2,0,1,3,5,8") {
+		DejaGnu.pass("NUMERIC sort on b correctly sorted b");
+	} else {
+		DejaGnu.fail("NUMERIC sort on b did not work");
+	}
+	//b.sort( Array.UNIQUESORT );
+	Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                   [untyped Array.UNIQUESORT]);
+	//check_equals( b.toString(), "-2,-7,-9,0,1,3,5,8" );
+	if (b.toString() == "-2,-7,-9,0,1,3,5,8") {
+		DejaGnu.pass("UNIQUESORT on b correctly sorted b");
+	} else {
+		DejaGnu.fail("UNIQUESORT on b did not work");
+	}
+	//b.sort( Array.DESCENDING );
+	Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                   [untyped Array.DESCENDING]);
+	//check_equals( b.toString(), "8,5,3,1,0,-9,-7,-2" );
+	if (b.toString() == "8,5,3,1,0,-9,-7,-2") {
+		DejaGnu.pass("DESCENDING sort on b correctly sorted b");
+	} else {
+		DejaGnu.fail("DESCENDING sort on b did not work");
+	}
+	//r = b.sort( Array.DESCENDING | Array.NUMERIC );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.DESCENDING | untyped Array.NUMERIC]);
+	//check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
+	if (r.toString() == "8,5,3,1,0,-2,-7,-9") {
+		DejaGnu.pass("DESCENDING | NUMERIC sort on b returned correct array");
+	} else {
+		DejaGnu.fail("DESCENDING | NUMERIC sort on b did not return correctly");
+	}
+	//check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
+	if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
+		DejaGnu.pass("DESCENDING | NUMERIC sort correctly sorted b");
+	} else {
+		DejaGnu.fail("DESCENDING | NUMERIC sort on b did not work");
+	}
+	
+	//NOTE: These may not be doing anything in Gnash. It could be that these
+	//      test cases were written so that they pass and not written for
+	//      correctness. It seems that the intention here is to pass a custom
+	//      sort function to array, but what's being passed are objects with
+	//      function properties.
+	
+	//r = b.sort( zero );
+	#if !flash9
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), [zero]);
+	#else
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), [fzero]);
+	#end
+	//check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
+	if (r.toString() == "8,5,3,1,0,-2,-7,-9") {
+		DejaGnu.pass("custom sort 'zero' returns correct array");
+	} else {
+		DejaGnu.fail("custom sort 'zero' does not return correctly");
+	}
+	//check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
+	if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
+		DejaGnu.pass("custom sort 'zero' sorted b correctly");
+	} else {
+		DejaGnu.fail("custom sort 'zero' did not sort b correctly");
+	}
+	//b.sort( numeric );
+	#if !flash9
+	Reflect.callMethod( b, Reflect.field(b, "sort"), [numeric]);
+	#else
+	Reflect.callMethod( b, Reflect.field(b, "sort"), [fnumeric]);
+	#end
+	//check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
+	if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
+		DejaGnu.pass("custom sort 'numeric' sorted b correctly");
+	} else {
+		DejaGnu.fail("custom sort 'numeric' did not sort b correctly");
+	}
+	//b.sort( numericRev );
+	#if !flash9
+	Reflect.callMethod( b, Reflect.field(b, "sort"), [numericRev]);
+	#else
+	Reflect.callMethod( b, Reflect.field(b, "sort"), [fnumericRev]);
+	#end
+	//check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
+	if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
+		DejaGnu.pass("custom sort 'numericRev' sorted b correctly");
+	} else {
+		DejaGnu.fail("custom sort 'numericRev' did not sort b correctly");
+	}
+	
+
+	//r = c.sort();
+	//check_equals( r.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	//c.sort( Array.CASEINSENSITIVE );
+	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	//c.sort( Array.NUMERIC );
+	//check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity" );
+	//r = c.sort( Array.UNIQUESORT );
+	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	//r = c.sort( Array.DESCENDING | Array.NUMERIC );
+	//check_equals( c.toString(), "Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+
+	//r = d.sort();
+	//check_equals( r.toString(), "" );
+	//check_equals( d.toString(), "" );
+	//d.sort( Array.UNIQUESORT );
+	//check_equals( d.toString(), "" );
+	//d.sort( Array.DESCENDING | Array.NUMERIC );
+	//check_equals( d.toString(), "" );
+
+	//r = e.sort();
+	//check_equals( r.toString(), "singleton" );
+	//check_equals( e.toString(), "singleton" );
+	//e.sort( Array.UNIQUESORT );
+	//check_equals( e.toString(), "singleton" );
+	//e.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
+	//check_equals( e.toString(), "singleton" );
+
+	//r = f.sort();
+	//check_equals( r.toString(), "Name,Name,Year" );
+	//check_equals( f.toString(), "Name,Name,Year" );
+	//r = f.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//f.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
+	//check_equals( f.toString(), "Year,Name,Name" );
+
+	////trace(" -- Return Indexed Array Tests -- ");
+
+	//r = a.sort( Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "5,4,3,2,1,0" );
+	//check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+	//r = a.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "0,1,4,2,3,5" );
+	//check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+	//r = b.sort( Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "5,6,7,4,3,2,1,0" );
+	//r = b.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+	//check_equals( r.toString(), "7,6,5,4,3,2,1,0" );
+	//r = b.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "0,1,2,3,4,7,6,5" );
+	//r = c.sort( Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "6,7,5,4,3,2,1,0" );
+	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+	//check_equals( r.toString(), "7,6,5,4,3,2,1,0" );
+	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "0,1,2,3,4,5,7,6" );
+	//r = d.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	//check_equals( r.toString(), "" );
+	//check_equals( d.toString(), "" );
+	//r = d.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "" );
+	//check_equals( d.toString(), "" );
+	//r = e.sort( Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+	//check_equals( e.toString(), "singleton" );
+	//r = e.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	//check_equals( r.toString(), "0" );
+
+	////trace(" -- Custom AS function tests -- ");
+	//r = a.sort( cmp_fn, Array.UNIQUESORT );
+	//check_equals( r.toString(), ",vi,ed,nano,emacs,Jedit" );
+	//check_equals( a.toString(), ",vi,ed,nano,emacs,Jedit" );
+	//r = a.sort( something_undefined );
+	//check_equals(typeof(r), 'undefined');
+	//r = a.sort( cmp_fn, Array.DESCENDING );
+	//check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
+	//check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
+	//a.sort( cmp_fn, Array.CASEINSENSITIVE | Array.NUMERIC );
+	//check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+	//r = a.sort( cmp_fn, Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0,1,2,3,4,5" );
+	//r = a.sort( cmp_fn, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	//check_equals( r.toString(), "5,4,3,2,1,0" );
+	//r = d.sort( cmp_fn );
+	//check_equals( r.toString(), "" );
+	//check_equals( d.toString(), "" );
+	//r = d.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "" );
+	//check_equals( d.toString(), "" );
+	//r = e.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "singleton" );
+	//check_equals( e.toString(), "singleton" );
+
+	////trace(" -- Custom AS function tests using an AS comparator that returns objects -- ");
+	//r = a.sort( cmp_fn_obj, Array.DESCENDING );
+	//check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
+	//check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
+	//a.sort( cmp_fn_obj, Array.CASEINSENSITIVE | Array.NUMERIC );
+	//check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+	//r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0,1,2,3,4,5" );
+	//r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	//check_equals( r.toString(), "5,4,3,2,1,0" );
+	//e.sort( cmp_fn_obj, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	//check_equals( e.toString(), "singleton" );
+
+	//a.push("ED");
+	//b.push(3.0);
+	//c.push(9/0);
+
+	////trace(" -- UNIQUESORT tests -- ");
+
+	//r = a.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	//check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	//r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "0" );
+	//check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	//r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.DESCENDING );
+	//check_equals( r.toString(), "0" );
+	//check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	//r = a.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0,1,2,3,4,5,6" );
+	//r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+
+	//r = b.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9,3" );
+	//r = b.sort( Array.UNIQUESORT | Array.NUMERIC );
+	//check_equals( r.toString(), "0" );
+	//r = b.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING );
+	//check_equals( r.toString(), "0" );
+	//r = b.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+	//r = b.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+
+	//r = c.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//check_equals( c.toString(), "Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7,Infinity" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+	//r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	//check_equals( tolen(r), "[0, 2, 2, 2, 4, 5, 5]" );
+	//check_equals( tolen(a), "[0, 2, 2, 2, 4, 5, 5]" );
+	//r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0,1,2,3,4,5,6" ); 
+	//r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	//check_equals( r.toString(), "6,5,4,3,2,1,0" );
+
+	////trace(" -- Array with null value  -- ");
+	//c.push(null);
+
+	//r = c.sort();
+	//check_equals( r.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity,Infinity,null" ); 
+	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity,Infinity,null" );
+	//c.sort( Array.NUMERIC );
+	//check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity,Infinity,null" );
+	//c.sort( Array.DESCENDING | Array.NUMERIC );
+	//check_equals( c.toString(), "null,Infinity,Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+	//check_equals( r.toString(), "9,8,7,6,5,4,3,1,2,0" );
+	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	//check_equals( r.toString(), "0,1,2,3,4,5,6,7,9,8" );
+	//r = c.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+	//check_equals( r.toString(), "0" );
+
+	////trace(" -- Array with 2 null values  -- ");
+	//c = [7.2, 2.0, null, -0.5, 3/0, 0.0, null, 8.35, 0.001, -3.7];
+	//c.sort( Array.NUMERIC );
+	//check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity,null,null" );
+	//c.sort( Array.DESCENDING | Array.NUMERIC );
+	//check_equals( c.toString(), "null,null,Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+	//check_equals( r.toString(), "9,8,7,6,5,4,3,2,0,1" );
+	//check_equals( c.toString(), "null,null,Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+	//r = c.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+	//check_equals( r.toString(), "0" );
+
+	////trace(" -- Array with 2 undefined values  -- ");
+	//c = [7.2, 2.0, undefined, -0.5, 3/0, 0.0, undefined, 8.35, 0.001, -3.7];
+	//r = c.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+	//check_equals( r.toString(), "0" );
+
+	////trace(" -- Array with 2 NaN values  -- ");
+	//c = [7.2, 2.0, NaN, -0.5, 3/0, 0.0, NaN, 8.35, 0.001, -3.7];
+	//r = c.sort( Array.UNIQUESORT );
+	//check_equals( r.toString(), "0" );
+	//r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+	//check_equals( r.toString(), "0" );
 
 
 //Note: All these (to end of file) will need to be migrated to Haxe
 /*
-
-//------------------------------------------------------
-// Test Array.concat 
-//------------------------------------------------------
-
-sparse1 = new Array();
-sparse1[3] = 'a3';
-
-sparse2 = new Array();
-sparse2[2] = 'b2';
-
-csp = sparse1.concat(sparse2);
-
-count=0; for (var i in sparse1) count++;
-check_equals(count, 1);
-
-count=0; for (var i in sparse2) count++;
-check_equals(count, 1);
-
-count=0; for (var i in csp) count++;
-check_equals(count, 7); // concat filled any holes
-
-csp = sparse1.concat('onemore');
-count=0; for (var i in csp) count++;
-check_equals(count, 5); // concat filled any holes
-
-//-------------------------------
-// Test Array.splice
-//-------------------------------
-
-ary = [0,1,2,3,4,5];
-check_equals ( ary.toString(), "0,1,2,3,4,5" );
-
-// No args is invalid
-spliced = ary.splice();
-check_equals ( ary.toString(), "0,1,2,3,4,5" );
-check_equals ( typeof(spliced), "undefined" );
-
-// Zero and positive offset starts from the end (-1 is last)
-spliced = ary.splice(0, 1);
-check_equals ( ary.toString(), "1,2,3,4,5" );
-check_equals ( spliced.toString(), "0" );
-spliced = ary.splice(1, 1);
-check_equals ( ary.toString(), "1,3,4,5" );
-check_equals ( spliced.toString(), "2" );
-
-// Negative offset starts from the end (-1 is last)
-spliced = ary.splice(-1, 1);
-check_equals ( ary.toString(), "1,3,4" );
-check_equals ( spliced.toString(), "5" );
-spliced = ary.splice(-2, 1);
-check_equals ( ary.toString(), "1,4" );
-check_equals ( spliced.toString(), "3" );
-
-// Out-of bound zero or positive offset are taken as one-past the end
-spliced = ary.splice(2, 1);
-check_equals ( ary.toString(), "1,4" );
-check_equals ( spliced.toString(), "" );
-spliced = ary.splice(2, 10);
-check_equals ( ary.toString(), "1,4" );
-check_equals ( spliced.toString(), "" );
-
-// Out-of bound negative offset are taken as zero
-spliced = ary.splice(-20, 1);
-check_equals ( ary.toString(), "4" );
-check_equals ( spliced.toString(), "1" );
-
-// rebuild the array
-ary = [0,1,2,3,4,5,6,7,8];
-
-// Zero length doesn't change anything, and return an empty array
-spliced = ary.splice(2, 0);
-check_equals ( ary.toString(), "0,1,2,3,4,5,6,7,8" );
-check_equals ( spliced.toString(), "" );
-
-// Out of bound positive length consumes up to the end
-spliced = ary.splice(2, 100);
-check_equals ( ary.toString(), "0,1" );
-check_equals ( spliced.toString(), "2,3,4,5,6,7,8" );
-ary=spliced; // reset array
-spliced = ary.splice(-2, 100);
-check_equals ( ary.toString(), "2,3,4,5,6" );
-check_equals ( spliced.toString(), "7,8" );
-
-// Negative length are invalid
-spliced = ary.splice(0, -1);
-check_equals ( typeof(spliced), 'undefined' );
-check_equals ( ary.toString(), "2,3,4,5,6" );
-spliced = ary.splice(3, -1);
-check_equals ( typeof(spliced), 'undefined' );
-check_equals ( ary.toString(), "2,3,4,5,6" );
-spliced = ary.splice(-1, -1);
-check_equals ( typeof(spliced), 'undefined' );
-check_equals ( ary.toString(), "2,3,4,5,6" );
-spliced = ary.splice(-1, -1, "a", "b", "c");
-check_equals ( typeof(spliced), 'undefined' );
-check_equals ( ary.toString(), "2,3,4,5,6" );
-
-// Provide substitutions now
-spliced = ary.splice(1, 1, "a", "b", "c");
-check_equals ( ary.toString(), "2,a,b,c,4,5,6" );
-check_equals ( spliced.toString(), '3' );
-spliced = ary.splice(-4, 2, 8);
-check_equals ( ary.toString(), "2,a,b,8,5,6" );
-check_equals ( spliced.toString(), 'c,4' );
-
-// Insert w/out deleting anything
-spliced = ary.splice(3, 0, 10, 11, 12);
-check_equals ( ary.toString(), "2,a,b,10,11,12,8,5,6" );
-check_equals ( spliced.toString(), '' );
-
-// Use arrays as replacement
-spliced = ary.splice(0, 7, [1,2], [3,4]);
-check_equals ( ary.toString(), "1,2,3,4,5,6" );
-check_equals ( ary.length, 4 ); // don't be fooled by toString output !
-check_equals ( spliced.toString(), '2,a,b,10,11,12,8' );
-
-// Ensure the simplest usage cases are correct!
-spliced = ary.splice(1);
-check_equals ( spliced.toString(), "3,4,5,6");
-spliced = ary.splice(0);
-check_equals ( spliced.toString(), "1,2");
-
-// Splice a sparse array
-ary = new Array(); ary[2] = 2; ary[7] = 7;
-
-check_equals(ary.length, 8);
-count=0; for (var i in ary) count++;
-check_equals(count, 2);
-
-spliced = ary.splice(3, 0); // no op ?
-check_equals(ary.length, 8); // no change in length
-count=0; for (var i in ary) count++;
-check_equals(count, 8); // but fills the gaps !
-
-ary = new Array(); ary[2] = 2; ary[7] = 7;
-spliced = ary.splice(3, 0, 3); // add 3 at index 3
-check_equals(ary.length, 9); 
-count=0; for (var i in ary) count++;
-check_equals(count, 9); // fills the gaps !
-check_equals(ary[3], 3);
-check_equals(ary[2], 2);
-
-ary = new Array(); ary[2] = 2; ary[7] = 7;
-spliced = ary.splice(3, 1, 3); // replace index 3 (an hole) with a 3 value
-count=0; for (var i in ary) count++;
-check_equals(count, 8); // fills the gaps 
-count=0; for (var i in spliced) count++;
-check_equals(count, 1); // the returned array contains an actual value, not an hole
-
-//-------------------------------
-// Test single parameter constructor, and implicitly expanding array
-//-------------------------------
-
-var c = new Array(10);
-check_equals(c.constructor, Array);
-check (a instanceOf Array);
-check_equals ( typeof(c), "object" );
-check_equals ( c.length, 10 );
-check_equals ( c[5] , undefined );
-c[1000] = 283;
-check_equals ( c[1000] , 283 );
-check_equals ( c[1001] , undefined );
-check_equals ( c[999] , undefined );
-check_equals ( c.length, 1001 );
-
-// Test that the 'length' property is overridable
-c[8] = 'eight';
-c[0] = 'zero';
-check_equals(c[8], 'eight');
-c.length = 2;
-check_equals(c.length, 2);
-check_equals(c[8], undefined);
-check_equals(c[0], 'zero');
-c.length = -1;
-// it seems Gnash needs to store the 'length' property as a normal property
-xcheck_equals(c.length, -1);
-check_equals(c[0], undefined);
 
 //-------------------------------
 // Test deleting an array element
