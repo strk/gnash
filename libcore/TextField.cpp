@@ -2700,8 +2700,7 @@ textfield_ctor(const fn_call& fn)
 
     as_object* obj = 0;
 
-    if ( vm.getSWFVersion() < 9 )
-    {
+    if (!isAS3(fn)) {
         // We should attach more properties to the prototype on first
         // instantiation.
         // TODO: this also attaches properties to the SWF5 prototype but makes
@@ -2710,8 +2709,7 @@ textfield_ctor(const fn_call& fn)
 
         obj = new as_object(proto);
     }
-    else
-    {
+    else {
         rect nullRect;
         obj = new TextField(0, nullRect);
     }

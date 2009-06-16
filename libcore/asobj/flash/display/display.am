@@ -123,10 +123,10 @@ DISPLAY_SOURCES += asobj/flash/display/MorphShape_as.cpp
 DISPLAY_HEADERS += asobj/flash/display/MorphShape_as.h
 endif
 
-# FIXME: already exists
-# DISPLAY_SOURCES += asobj/flash/display/MovieClip_as.cpp
+if BUILD_MOVIECLIP_AS3
+DISPLAY_SOURCES += asobj/flash/display/MovieClip_as.cpp
 DISPLAY_HEADERS += asobj/flash/display/MovieClip_as.h
-# endif
+endif
 
 if BUILD_PIXELSNAPPING_AS3
 DISPLAY_SOURCES += asobj/flash/display/PixelSnapping_as.cpp
