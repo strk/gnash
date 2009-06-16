@@ -1630,7 +1630,7 @@ Machine::execute()
                     as_value value = call_method(property, env, new_class,
                             get_args(0));
 
-                    log_abc("NEWCLASS(%s) finished. Return: %s", value,
+                    log_abc("NEWCLASS(%2%) finished. Return: %1%", value,
                             pool_string(c->getName(), mPoolObject));
 
                     break;
