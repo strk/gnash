@@ -1680,6 +1680,10 @@ Machine::execute()
                 case SWF::ABC_ACTION_FINDPROPERTY:
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    if (a.isRuntime()) {
+                        mStack.drop(completeName(a));
+                    }
+
                     as_value ret = find_prop_strict(a);
 
 
