@@ -54,12 +54,12 @@ NET_HEADERS += asobj/flash/net/LocalConnection_as.h
 endif
 
 if BUILD_NETCONNECTION_AS3
-# NET_SOURCES += asobj/flash/net/NetConnection_as.cpp
+NET_SOURCES += asobj/flash/net/NetConnection_as.cpp
 NET_HEADERS += asobj/flash/net/NetConnection_as.h
 endif
 
 if BUILD_NETSTREAM_AS3
-# NET_SOURCES += asobj/flash/net/NetStream_as.cpp
+NET_SOURCES += asobj/flash/net/NetStream_as.cpp
 NET_HEADERS += asobj/flash/net/NetStream_as.h
 endif
 
