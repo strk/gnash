@@ -1981,6 +1981,8 @@ Machine::execute()
                     boost::uint32_t sindex = mStream->read_V32();
                     as_value value = pop_stack();
                     as_value object = pop_stack();
+                    log_abc("SETSLOT object: %s, value: %s, index: %s",
+                            object, value, sindex);
 
                     as_object* obj = object.to_object().get();
                     if ( ! obj )
@@ -1992,9 +1994,9 @@ Machine::execute()
                         break;
                     }
 
-                    // We use sindex + 1, because currently as_object sets a property
-                    // at a slot index 1 higher than the index the abc_block thinks the
-                    // property is at.
+                    // We use sindex + 1, because currently as_object sets
+                    // a property at a slot index 1 higher than the
+                    // index the abc_block thinks the property is at.
                     if ( ! obj->set_member_slot(sindex+1, value) )
                     {
                         log_abc("Failed to set property at "
@@ -3094,7 +3096,9 @@ as_value
 Machine::find_prop_strict(asName multiname)
 {
 	
-    log_abc("Looking for property %s", mST.value(multiname.getGlobalName()));
+    log_abc("Looking for property %2% in namespace %1%",
+            mST.value(multiname.getNamespace()->getURI()),
+            mST.value(multiname.getGlobalName()));
 
 	as_value val;
 	mScopeStack.push(mGlobalObject);
