@@ -71,7 +71,7 @@
 #include <string>
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 
 namespace gnash {
