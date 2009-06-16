@@ -28,6 +28,7 @@
 #include "namedStrings.h"
 #include "CodeStream.h"
 #include "action_buffer.h"
+#include "Machine.h"
 
 namespace gnash {
 
@@ -319,6 +320,17 @@ abc_block::prepare(Machine* mach)
     std::for_each(_traits.begin(), _traits.end(),
             boost::bind(&Trait::finalize, _1, this));
 
+    // If the following is enabled, it reserves slots for all namespaces
+    // in the global object. This means that ABC_ACTION_SETSLOT does not
+    // fail as often, but doesn't really seem quite correct.
+#if 1
+    as_object* global = mach->global();
+    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin(), 
+            e = _namespacePool.end(); i != e; ++i) {
+        assert(global);
+        global->reserveSlot((*i)->getURI(), 0, i - _namespacePool.begin());
+    }
+#endif
     _traits.clear();
 
 }

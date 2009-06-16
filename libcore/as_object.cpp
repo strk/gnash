@@ -484,11 +484,10 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 		if ((i > 255 && swfVersion == 5) || i > 257)
 			throw ActionLimitException("Lookup depth exceeded.");
 
-		Property* prop = obj->_members.getProperty(key);
+		Property* prop = obj->_members.getProperty(key, nsname);
 		if (prop && prop->visible(swfVersion) )
 		{
-			if (owner != NULL)
-				*owner = obj.get();
+			if (owner) *owner = obj.get();
 			return prop;
 		}
 		else
@@ -553,7 +552,7 @@ void
 as_object::reserveSlot(string_table::key name, string_table::key nsId,
 	unsigned short slotId)
 {
-	_members.reserveSlot(name, nsId, slotId);
+	_members.reserveSlot(slotId, name, nsId);
 }
 
 bool

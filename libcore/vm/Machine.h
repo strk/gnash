@@ -212,6 +212,16 @@ public:
 
 	Machine(VM& vm);
 
+    /// Return the Global object.
+    //
+    /// TODO: is this really necessary? Which object should we
+    /// return anyway, i.e. why not mGlobalObject? (that is null
+    /// at inopportune moments right now, which is why VM::getGlobal()
+    /// is returned.
+    as_object* global() {
+        return _vm.getGlobal();
+    }
+
 private:
 	/// The state of the machine.
 	class State
@@ -227,7 +237,7 @@ private:
 		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
 		as_object *mThis;
-		std::vector<as_value> mRegisters;
+		std::vector<as_value> _registers;
 		abc_function* mFunction;
 	void to_debug_string(){
 		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
@@ -272,33 +282,43 @@ private:
 
 	void clearRegisters(boost::uint32_t maxRegsiters);
 
-	as_value get_register(int index){
-		log_abc("Getting value at a register %d ",index);
-		return mRegisters[index];
+	const as_value& getRegister(int index){
+		log_abc("Getting value at a register %d ", index);
+		return _registers[index];
 	}
 
+    void setRegister(size_t index, const as_value& val) {
+        log_abc("Putting %s in register %s", val, index);
+        if (_registers.size() <= index) {
+            log_abc("Register doesn't exist! Adding new registers!");
+            _registers.resize(index + 1);
+        }
+        _registers[index] = val;
+    }
+
 	void push_stack(as_value object){
-		log_abc("Pushing value %s onto stack.",object.toDebugString());
+		log_abc("Pushing value %s onto stack.", object);
 		mStack.push(object);
 	}
 
 	as_value pop_stack(){
 		as_value value = mStack.pop();
-		log_abc("Popping value %s off the stack.",value.toDebugString());
+		log_abc("Popping value %s off the stack.", value);
 		return value;
 	}
 
 	void push_scope_stack(as_value object){
 		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
 		assert(scopeObj.get());
-		log_abc("Pushing value %s onto scope stack.",object.toDebugString());
+		log_abc("Pushing value %s onto scope stack.", object);
 		mScopeStack.push(scopeObj);
 		print_scope_stack();
 	}
 
 	boost::intrusive_ptr<as_object> pop_scope_stack() {
-		log_abc("Popping value off the scope stack.  There will be "
-                "%u items left.",mScopeStack.size()-1);
+		log_abc("Popping value %s off the scope stack.  There will be "
+                "%u items left.", as_value(mScopeStack.top(0)),
+                mScopeStack.size()-1);
 		return mScopeStack.pop();
 	}
 
@@ -311,7 +331,7 @@ private:
 
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
-	std::vector<as_value> mRegisters;
+	std::vector<as_value> _registers;
 	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
 	CodeStream *mStream;
 

@@ -44,46 +44,48 @@ package hello {
 
         public function Hello() {
 
-            check_equals(this, "[object Hello]");
-            check_equals(this.constructor, "[class Hello]");
-            check_equals(this.constructor.constructor, "[class Class]");
+            xcheck_equals(this, "[object Hello]");
+            xcheck_equals(this.constructor, "[class Hello]");
+            xcheck_equals(this.constructor.constructor, "[class Class]");
 
-            check_equals(S, "[class S]");
-            check_equals(S.constructor, "[class Class]");
-            check_equals(S.__constructor__, undefined);
+            xcheck_equals(S, "[class S]");
+            xcheck_equals(S.constructor, "[class Class]");
+            xcheck_equals(S.__constructor__, undefined);
             
             check_equals(S.s, null);
-            check_equals(typeof(S.s), "object");
+            xcheck_equals(typeof(S.s), "object");
 
             S.s = "Hello ";
             check_equals(S.s, "Hello ");
 
-            check_equals(Base, "[class Base]");
-            check_equals(Derived, "[class Derived]");
+            trace(Base);
 
-            check_equals(Derived.constructor, "[class Class]");
-            check_equals(Base.constructor, "[class Class]");
-            check_equals(Derived.__constructor__, undefined);
-            check_equals(Base.__constructor__, undefined);
+            xcheck_equals(Base, "[class Base]");
+            xcheck_equals(Derived, "[class Derived]");
+
+            xcheck_equals(Derived.constructor, "[class Class]");
+            xcheck_equals(Base.constructor, "[class Class]");
+            xcheck_equals(Derived.__constructor__, undefined);
+            xcheck_equals(Base.__constructor__, undefined);
 
             var b1 : Base = new Base();
-            check(b1 instanceof Base);
+            xcheck(b1 instanceof Base);
             check(!(b1 instanceof Derived));
             check_equals(S.s, "Hello Base ");
             
-            check_equals(b1.constructor, "[class Base]");
+            xcheck_equals(b1.constructor, "[class Base]");
             
             S.s = "";
             var b2 : Base = new Derived();
-            check(b2 instanceof Base);
-            check(b2 instanceof Derived);
-            check_equals(S.s, "Base Derived ");
+            xcheck(b2 instanceof Base);
+            xcheck(b2 instanceof Derived);
+            xcheck_equals(S.s, "Base Derived ");
 
             S.s = "";
             var d1 : Derived = new Derived();
-            check(d1 instanceof Base);
-            check(d1 instanceof Derived);
-            check_equals(S.s, "Base Derived ");
+            xcheck(d1 instanceof Base);
+            xcheck(d1 instanceof Derived);
+            xcheck_equals(S.s, "Base Derived ");
 
             totals(25);
 
