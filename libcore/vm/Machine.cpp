@@ -2853,8 +2853,8 @@ Machine::completeName(asName& name, int offset)
 		as_value obj = mStack.top(offset);
 		if (obj.is_object() && obj.to_object()->isQName()) {
 			name.fill(obj.to_object().get());
+            ++size;
         }
-		++size;
 
 		if (name.isRtns())
 			++size; // Ignore the Namespace.
