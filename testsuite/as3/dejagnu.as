@@ -19,9 +19,8 @@
 package dejagnu {
 
     import flash.text.*;
-    import flash.display.Sprite;
 
-    public class Dejagnu extends Sprite {
+    public class Dejagnu {
 
         private static var passed = 0;
         private static var failed = 0;

@@ -47,6 +47,7 @@
 #include "flash/xml/XMLDocument_as.h"
 #include "flash/net/XMLSocket_as.h"
 #include "flash/ui/Mouse_as.h"
+#include "flash/display/MovieClip_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
@@ -70,7 +71,6 @@
 #include "flash_pkg.h"
 
 #include "fn_call.h"
-#include "MovieClip.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>
@@ -111,8 +111,6 @@ namespace {
     as_value global_clearTimeout(const fn_call& fn);
     as_value global_clearInterval(const fn_call& fn);
     as_value global_setInterval(const fn_call& fn);
-    as_value global_addChild(const fn_call& fn);
-    as_value global_addChildAt(const fn_call& fn);
     
     void registerNatives(as_object& global);
 }
@@ -170,8 +168,6 @@ Global::Global(VM& vm, ClassHierarchy *ch)
         default:
             // Version 10 or above reported
         case 9:
-            init_member("addChild", new builtin_function(global_addChild));
-            init_member("addChildAt", new builtin_function(global_addChildAt));
         case 8:
 
         case 7:
@@ -595,114 +591,6 @@ global_updateAfterEvent(const fn_call& /*fn*/)
     return as_value();
 }
 
-as_value
-global_addChild(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-
-    as_value ret;
-
-    if ( ! fn.nargs )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("_global.addChild(): %s", _("missing arguments"));
-        );
-        return ret;
-    }
-
-    if ( fn.nargs > 1 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("_global.addChild(%s): %s", ss.str(), _("ignoring args after the first"));
-        );
-    }
-
-    as_object* objArg = fn.arg(0).to_object().get();
-    if ( ! objArg )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("_global.addChild(%s): first arg doesn't cast to an object", ss.str());
-        );
-        return ret;
-    }
-
-    DisplayObject* ch = objArg->toDisplayObject();
-    if ( ! ch )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("_global.addChild(%s): first arg doesn't cast to a "
-            "DisplayObject", ss.str());
-        );
-        return ret;
-    }
-
-    VM& vm = ptr->getVM();
-    movie_root& stage = vm.getRoot();
-
-    stage.addChild(ch);
-
-    return as_value(ch);
-}
-
-as_value
-global_addChildAt(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-
-    as_value ret;
-
-    if ( fn.nargs < 2 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("_global.addChildAt(): %s", _("missing arguments"));
-        );
-        return ret;
-    }
-
-    if ( fn.nargs > 2 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("_global.addChildAt(%s): %s", ss.str(), _("ignoring args after the second"));
-        );
-    }
-
-    as_object* objArg = fn.arg(0).to_object().get();
-    if ( ! objArg )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("_global.addChildAt(%s): first arg doesn't cast to an object", ss.str());
-        );
-        return ret;
-    }
-
-    DisplayObject* ch = objArg->toDisplayObject();
-    if ( ! ch )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("_global.addChildAt(%s): first arg doesn't cast to a "
-            "DisplayObject", ss.str());
-        );
-        return ret;
-    }
-
-    int depth = fn.arg(1).to_number();
-
-    VM& vm = ptr->getVM();
-    movie_root& stage = vm.getRoot();
-
-    std::stringstream ss; fn.dump_args(ss);
-    log_debug("TESTING: _global.addChildAt(%s)", ss.str());
-    
-    stage.addChildAt(ch, depth);
-
-    return as_value(ch);
-}
 
 as_value
 global_setInterval(const fn_call& fn)
@@ -885,6 +773,7 @@ registerNatives(as_object& global)
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
 
+    registerMovieClipNative(global);
     registerSelectionNative(global);
     registerColorNative(global);
     registerMathNative(global);

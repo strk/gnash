@@ -1297,8 +1297,8 @@ DisplayObject::getTarget() const
 				// must be an as-referenceable
 				// DisplayObject created using 'new'
 				// like, new MovieClip, new Video, new TextField...
-				log_debug("DisplayObject %p (%s) doesn't have a parent and "
-                        "is not a Movie", ch, typeName(*ch));
+				//log_debug("DisplayObject %p (%s) doesn't have a parent and "
+                //        "is not a Movie", ch, typeName(*ch));
 				ss << "<no parent, depth" << ch->get_depth() << ">";
 				path.push_back(ss.str());
 			}

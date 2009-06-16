@@ -352,6 +352,13 @@ private:
 
 };
 
+/// Return true if the VM is executing AS3 (ABC bytecode).
+inline bool
+isAS3(VM& vm)
+{
+    return vm.getAVMVersion() == VM::AVM2;
+}
+
 } // namespace gnash
 
 #endif // GNASH_VM_H

@@ -33,6 +33,9 @@ namespace gnash {
 /// Initialize the global DisplayObjectContainer class
 void displayobjectcontainer_class_init(as_object& global);
 
+/// Get an as_object with the DisplayObjectContainer interface.
+as_object* getDisplayObjectContainerInterface();
+
 } // gnash namespace
 
 // GNASH_ASOBJ3_DISPLAYOBJECTCONTAINER_H

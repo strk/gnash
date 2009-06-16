@@ -269,30 +269,6 @@ private:
 
 }
 
-Machine::Machine(VM& vm)
-        :
-        mStack(),
-        mRegisters(),
-        mScopeStack(),
-        mStream(0),
-        mST(vm.getStringTable()),
-        mDefaultXMLNamespace(0),
-        mCurrentScope(0),
-        mGlobalScope(0),
-        mDefaultThis(0),
-        mThis(0),
-        mGlobalObject(0),
-        mGlobalReturn(),
-        mIgnoreReturn(),
-        mIsAS3(false),
-        mExitWithReturn(false),
-        mPoolObject(0),
-        mCurrentFunction(0),
-        _vm(vm),
-        mCH(_vm.getClassHierarchy())
-{
-}
-
 void
 Machine::execute()
 {
@@ -363,8 +339,11 @@ Machine::execute()
                     mStack.drop(completeName(a));
                     // Get the target object.
                     ENSURE_OBJECT(mStack.top(0));
+                    
+                    // Use get_super?
                     as_object *super = mStack.top(0).to_object()->
                         get_prototype().get();
+                    
                     // If we don't have a super, throw.
                     if (!super) throw ASReferenceError();
                     Property *b = super->findProperty(a.getABCName(), 
@@ -392,6 +371,8 @@ Machine::execute()
                     mStack.drop(completeName(a));
 
                     ENSURE_OBJECT(mStack.top(0));
+                    
+                    // Use get_super?
                     as_object* super = mStack.pop().to_object()->
                         get_prototype().get();
                     if (!super) throw ASReferenceError();
@@ -1259,7 +1240,11 @@ Machine::execute()
                     int dropsize = completeName(a);
                     ENSURE_OBJECT(mStack.top(argc + dropsize));
                     mStack.drop(dropsize);
-                    as_object* super = mStack.top(argc).to_object()->get_super();
+
+                    // Why get_super() here and get_prototype everywhere else?
+                    as_object* super =
+                        mStack.top(argc).to_object()->get_super();
+
                     if (!super) throw ASReferenceError();
                     
                     Property* b = super->findProperty(a.getABCName(),
@@ -1301,10 +1286,11 @@ Machine::execute()
                     as_value result;
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     boost::uint32_t argc = mStream->read_V32();
-                    std::auto_ptr<std::vector<as_value> > args = get_args(argc);
- 
+                    std::auto_ptr< std::vector<as_value> > args = get_args(argc);
+                    //TODO: If multiname is runtime also pop namespace and/or name values.
+                    
                     if (a.isRuntime()) {
-                        mStack.drop(completeName(a));
+                        log_unimpl("ABC_ACTION_CALL* with runtime multiname");
                     }
 
                     as_value object_val = pop_stack();
@@ -1312,31 +1298,31 @@ Machine::execute()
                     as_object *object = object_val.to_object().get();
                     if (!object) {
                         IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't call a method of a value that "
-                                "doesn't cast to an object (%s)."),
+                        log_aserror(_("Can't call a method of a value that doesn't "
+                                "cast to an object (%s)."),
                             object_val);
                         )
                     }
                     else {
 
-                        as_value property = object->getMember(
-                                a.getGlobalName(), 0);
+                        as_value property = object->getMember(a.getGlobalName(), 0);
                     
                         if (!property.is_undefined() && !property.is_null()) {
                             log_abc("Calling method %s on object %s",
-                                    property, object_val);
+                                    property.toDebugString(),object_val.toDebugString());
                             as_environment env = as_environment(_vm);
                             result = call_method(property,env,object,args);
 
                         }
                         else {
                             IF_VERBOSE_ASCODING_ERRORS(
-                            log_aserror(_("Property '%s' of object '%s' is "
-                                    "'%s', cannot call as method"),
+                            log_aserror(_("Property '%s' of object '%s' is '%s', "
+                                    "cannot call as method"),
                                     mPoolObject->stringPoolAt(a.getABCName()),
                                     object_val, property);
                             )
                         }
+
                     }
                     
                     if (opcode == SWF::ABC_ACTION_CALLPROPERTY) {
@@ -1420,7 +1406,10 @@ Machine::execute()
                     get_args(argc);
                     
                     as_object* obj = mStack.top(argc).to_object().get();
-                    as_object* super = obj ? obj->get_super() : 0;
+
+                    // Using get_super() here fails; is it broken, or is
+                    // prototype what we want?
+                    as_object* super = obj ? obj->get_prototype().get() : 0;
                     log_abc("CONSTRUCTSUPER: object %s, super %s, args %s",
                             mStack.top(argc), super, argc);
 
@@ -1429,11 +1418,11 @@ Machine::execute()
                         throw ASException();
                     }
 
-                    as_function *func = super->get_constructor();
+                    as_function *func = super->to_function();
                     if (!func) {
                         log_abc("CONSTRUCTSUPER: %s has no constructor",
                                 super);
-                        return;
+                        break;
                     }
 
                     // 'obj' is the 'this' for the call, we ignore the
@@ -1563,14 +1552,15 @@ Machine::execute()
                     push_stack(as_value(mCurrentFunction));
                     break;
                 }
+
                 /// 0x58 ABC_ACTION_NEWCLASS
                 /// Stream: V32 'class_id'
                 /// Stack In:
                 ///  obj -- An object to be turned into a class. Its super
                 ///     is constructed.
                 /// Stack Out:
-                ///  class -- The newly made class, made from obj and the "
-                ///     "information at cinits_pool[class_id]
+                ///  class -- The newly made class, made from obj and the
+                ///     information at cinits_pool[class_id]
                 /// NB: This depends on scope and scope base (to determine
                 ///     lifetime(?))
                 case SWF::ABC_ACTION_NEWCLASS:
@@ -1595,19 +1585,14 @@ Machine::execute()
                     new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,
                             as_value(static_constructor), 0);
                     
-                    as_function* constructor =
-                        c->getConstructor()->getPrototype();
-                    new_class->init_member(NSV::PROP_CONSTRUCTOR,
-                            constructor, 0);
-                    push_stack(new_class);
+                    as_function* constructor = c->getConstructor()->getPrototype();
+                    new_class->init_member(NSV::PROP_CONSTRUCTOR, as_value(constructor), 0);
+                    push_stack(as_value(new_class));
 
-                    // Call the class's static constructor (which may be 
-                    // undefined).
+                    // Call the class's static constructor (which may be undefined).
                     as_environment env = as_environment(_vm);
-                    as_value property = new_class->getMember(
-                            NSV::PROP_uuCONSTRUCTORuu, 0);
-                    as_value value = call_method(property, env, new_class,
-                            get_args(0));
+                    as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu, 0);
+                    as_value value = call_method(property, env, new_class, get_args(0));
 
                     break;
                 }
@@ -1700,8 +1685,6 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                 
-                    // This pushes a value onto the stack, but it seems
-                    // we don't need it.
                     as_value val = find_prop_strict(a);
 
                     log_abc("GETLEX: found value %s", val);
@@ -1834,13 +1817,10 @@ Machine::execute()
 
                     as_value object_val = pop_stack();
                     as_object* object = object_val.to_object().get();
-                   
-                    log_abc(_("ABC_ACTION_GETPROPERTY: Looking for property "
-                            "%s of object %s"), mST.value(name), object_val);
-
+                    
                     if (!object) {
-                        log_abc(_("ABC_ACTION_GETPROPERTY: expecting "
-                                    "object on stack, got %s."), object_val);
+                        log_abc(_("GETPROPERTY: expecting object on "
+                                    "stack, got %s."), object_val);
                         push_stack(as_value());
                         break;
                     }
@@ -1934,6 +1914,11 @@ Machine::execute()
                     as_value val;
                     boost::uint32_t sindex = mStream->read_V32();
                     as_object* object = pop_stack().to_object().get();
+                    if (!object) {
+                        log_abc("GETSLOT: Did not find expected object on "
+                                "stack");
+                        break;
+                    } 
 
                     object->get_member_slot(sindex + 1, &val);
 
@@ -2574,9 +2559,10 @@ Machine::execute()
                     if (!valueObject || !typeObject) {
                         // TODO: what here!?
                         // This should eventually be a malformed SWF error.
-                        log_error("ACTION_ISTYPELATE: require two objects on stack, got "
-                               "obj: %s, type: %s.", value, type);
-                        return;
+                        log_error("ACTION_ISTYPELATE: require two objects "
+                                "on stack, got obj: %s, type: %s.",
+                                value, type);
+                        break;
                     }
                     const bool truth = valueObject->instanceOf(typeObject);
                     push_stack(truth);
@@ -3062,16 +3048,41 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
     // is to be constructed. Setting it to global as before seems to be wrong.
 	mRegisters[0] = cl->getPrototype();
 	executeCodeblock(ctor->getBody());
-
     log_debug("Finished instantiating class %s", className);
 }
 
-as_value
-Machine::find_prop_strict(asName multiname)
+Machine::Machine(VM& vm)
+        :
+        mStack(),
+        mRegisters(),
+        mScopeStack(),
+        mStream(0),
+        mST(vm.getStringTable()),
+        mDefaultXMLNamespace(0),
+        mCurrentScope(0),
+        mGlobalScope(0),
+        mDefaultThis(0),
+        mThis(0),
+        mGlobalObject(0),
+        mGlobalReturn(),
+        mIgnoreReturn(),
+        mIsAS3(false),
+        mExitWithReturn(false),
+        mPoolObject(0),
+        mCurrentFunction(0),
+        _vm(vm),
+        mCH(_vm.getClassHierarchy())
 {
-    
-    log_abc("Looking for property %s", mST.value(multiname.getGlobalName()));
+	//Local registers should be initialized at the beginning of each function call, but
+	//we don't currently parse the number of local registers for each function.
+//	mRegisters.resize(16);
+//	mST = new string_table();
+//	mST = ST;
+}
 
+as_value
+Machine::find_prop_strict(asName multiname) {
+	
 	as_value val;
 	mScopeStack.push(mGlobalObject);
 	for (size_t i = 0; i < mScopeStack.size(); ++i)
@@ -3091,17 +3102,16 @@ Machine::find_prop_strict(asName multiname)
 		}
 	}
 
-	as_object* target = 0;
+	log_abc("Cannot find property in scope stack.  Trying again using "
+            "as_environment.");
+	as_object *target = NULL;
 	as_environment env = as_environment(_vm);
 	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
 	std::string ns = mPoolObject->stringPoolAt(
             multiname.getNamespace()->getAbcURI());
 	std::string path = ns.empty() ? name : ns + "." + name;
-	
-    log_abc("Failed to find property in scope stack. Looking for %s in "
-            "as_environment", path);
 
-    std::auto_ptr<as_environment::ScopeStack> envStack (getScopeStack());
+    std::auto_ptr<as_environment::ScopeStack> envStack ( getScopeStack() );
 	val = env.get_variable(path, *envStack, &target);
 
 	push_stack(target);	
