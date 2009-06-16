@@ -552,7 +552,7 @@ void
 as_object::reserveSlot(string_table::key name, string_table::key nsId,
 	unsigned short slotId)
 {
-	_members.reserveSlot(name, nsId, slotId);
+	_members.reserveSlot(slotId, name, nsId);
 }
 
 bool
