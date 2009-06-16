@@ -487,8 +487,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 		Property* prop = obj->_members.getProperty(key, nsname);
 		if (prop && prop->visible(swfVersion) )
 		{
-			if (owner != NULL)
-				*owner = obj.get();
+			if (owner) *owner = obj.get();
 			return prop;
 		}
 		else
