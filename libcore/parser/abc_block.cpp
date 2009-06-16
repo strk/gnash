@@ -81,30 +81,22 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_GETTER:
 	{
-		log_abc("Finalize getter not implemented.");
-		break;
 		pClass->addGetter(_name, _namespace, _method, do_static);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		log_abc("Finalize setter not implemented.");
-		break;
 		pClass->addSetter(_name, _namespace, _method, do_static);
 		break;
 	}
 	case KIND_CLASS:
 	{
-		log_abc("Finalize class not implemented.");
-		break;
 		pClass->addMemberClass(_name, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex], do_static);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		log_abc("Finalize function not implemented.");
-		break;
 		pClass->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
 		break;
 	}
@@ -377,10 +369,9 @@ abc_block::setMultinameNames(asName *n, string_table::key ABCName)
 void
 abc_block::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
 {
-	
 	ns->setAbcURI(ABCName);
 	std::string name = _stringPool[ABCName];
-	string_table::key global_key = _stringTable->find(name, false);
+	string_table::key global_key = _stringTable->find(name);
 	ns->setURI(global_key);
 	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
