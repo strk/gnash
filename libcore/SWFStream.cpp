@@ -27,6 +27,7 @@
 
 #include <cstring>
 #include <climits>
+#include <boost/static_assert.hpp>
 
 //#define USE_TU_FILE_BYTESWAPPING 1
 
@@ -305,32 +306,21 @@ float    SWFStream::read_long_float()
 // Read a 64-bit double value
 double SWFStream::read_d64()
 {
-#ifdef USE_TU_FILE_BYTESWAPPING 
-    align();
-    return m_input->read_le_double64();
-#else
-    using boost::uint32_t;
 
+    // TODO: This is very dodgy and doesn't account for endianness!
     const unsigned short dataLength = 8;
-    unsigned char buf[dataLength];
-    
+    double d;
+
+    BOOST_STATIC_ASSERT(sizeof(double) == dataLength);
+
     // Should align:
-    if (read(reinterpret_cast<char*>(buf), dataLength) < dataLength)
+    if (read(reinterpret_cast<char*>(&d), dataLength) < dataLength)
     {
         throw ParserException(_("Unexpected end of stream while reading"));
     }
-    
-    boost::uint64_t low = buf[0];
-    low |= buf[1] << 8;
-    low |= buf[2] << 16;
-    low |= buf[3] << 24;
+ 
+    return d;
 
-    boost::uint64_t hi = buf[4];
-    hi |= buf[5] << 8;
-    hi |= buf[6] << 16;
-    hi |= buf[7] << 24;
-
-    return static_cast<long double> ( low | (hi<<32) );
 #endif
 }
 
