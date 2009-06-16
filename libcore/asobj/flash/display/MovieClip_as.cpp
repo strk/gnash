@@ -2635,11 +2635,9 @@ movieclip_as3_ctor(const fn_call& fn)
 {
     assert(isAS3(fn));
 
-    GNASH_REPORT_FUNCTION;
+    log_unimpl("AVM2 MovieClip ctor");
 
-    boost::intrusive_ptr<MovieClip> mc = new MovieClip(0, 0, 0, -1);
-
-    return as_value(mc.get());
+    return as_value();
 }
 
 
