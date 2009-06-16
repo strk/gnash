@@ -740,7 +740,12 @@ global_setTimeout(const fn_call& fn)
 as_value
 global_clearInterval(const fn_call& fn)
 {
-	//log_debug("%s: nargs = %d", __FUNCTION__, fn.nargs);
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("clearInterval requires one argument, got none");
+        );
+        return as_value();
+    }
 
 	int id = int(fn.arg(0).to_number());
 
