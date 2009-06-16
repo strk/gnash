@@ -212,6 +212,12 @@ public:
 
 	Machine(VM& vm);
 
+    /// Return the Global object.
+    //
+    /// TODO: is this really necessary? Which object should we
+    /// return anyway, i.e. why not mGlobalObject? (that is null
+    /// at inopportune moments right now, which is why VM::getGlobal()
+    /// is returned.
     as_object* global() {
         return _vm.getGlobal();
     }
