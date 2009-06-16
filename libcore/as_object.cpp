@@ -86,7 +86,7 @@ public:
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0)
 	{
-		log_debug("as_super::get_member %s called - _proto is %p", getVM().getStringTable().value(name), _proto);
+		//log_debug("as_super::get_member %s called - _proto is %p", getVM().getStringTable().value(name), _proto);
 		if ( _proto ) return _proto->get_member(name, val, nsname);
 		log_debug("Super has no associated prototype");
 		return false;
