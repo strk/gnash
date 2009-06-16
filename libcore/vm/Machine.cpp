@@ -272,7 +272,7 @@ private:
 Machine::Machine(VM& vm)
         :
         mStack(),
-        mRegisters(),
+        _registers(),
         mScopeStack(),
         mStream(0),
         mST(vm.getStringTable()),
@@ -294,7 +294,7 @@ Machine::Machine(VM& vm)
 	// Local registers should be initialized at the beginning of each
     // function call, but we don't currently parse the number of local
     // registers for each function.
-    //	mRegisters.resize(16);
+    //	_registers.resize(16);
 }
 
 
@@ -449,7 +449,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_KILL:
                 {
                     boost::uint32_t regNum = mStream->read_V32();
-                    mRegisters[regNum].set_undefined();
+                    setRegister(regNum, as_value());
                     break;
                 }
 
@@ -1094,8 +1094,8 @@ Machine::execute()
                     const boost::int32_t oindex = mStream->read_V32();
                     const boost::int32_t iindex = mStream->read_V32();
 
-                    as_value& objv = mRegisters[oindex];
-                    const as_value& indexv = mRegisters[iindex];
+                    as_value& objv = getRegister(oindex);
+                    const as_value& indexv = getRegister(iindex);
                     
                     log_abc("HASNEXT2: Object is %s, index is %d",
                             objv, indexv);
@@ -1118,14 +1118,20 @@ Machine::execute()
 
                     if (next) {
                         push_stack(true);
-                        if (owner) mRegisters[oindex] = owner;
-                        else mRegisters[oindex].set_null();
-                        mRegisters[iindex] = next;
+                        if (owner) setRegister(oindex, owner);
+                        else {
+                            as_value null;
+                            null.set_null();
+                            setRegister(oindex, null);
+                        }
+                        setRegister(iindex, next);
                     }
                     else {
                         push_stack(false);
-                        mRegisters[oindex].set_null();
-                        mRegisters[iindex] = 0.0;
+                        as_value null;
+                        null.set_null();
+                        setRegister(oindex, null);
+                        setRegisters(iindex, 0.0);
                     }
                     break;
                 }
@@ -1791,7 +1797,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_GETLOCAL:
                 {
                     boost::uint32_t index = mStream->read_V32();
-                    push_stack(get_register(index));
+                    push_stack(getRegister(index));
                     break;
                 }
 
@@ -1806,7 +1812,7 @@ Machine::execute()
                 {
                     boost::uint32_t index = mStream->read_V32();
                     log_abc("Register index: %u",index);
-                    mRegisters[index] = pop_stack();
+                    setRegister(index, pop_stack());
                     break;
                 }
 
@@ -2281,32 +2287,35 @@ Machine::execute()
                     push_stack(as_value(val.to_number() + 1));
                     break;
                 }
-            /// 0x92 ABC_ACTION_INCLOCAL
-            /// Stream: V32 'frame_addr'
-            /// Frame: Load i from frame_addr and increment it.
+
+                /// 0x92 ABC_ACTION_INCLOCAL
+                /// Stream: V32 'frame_addr'
+                /// Frame: Load i from frame_addr and increment it.
                 case SWF::ABC_ACTION_INCLOCAL:
                 {
                     boost::uint32_t foff = mStream->read_V32();
-                    mRegisters[foff] = mRegisters[foff].to_number() + 1;
+                    setRegister(foff, getRegister(foff).to_number() + 1);
                     break;
                 }
-            /// 0x93 ABC_ACTION_DECREMENT
-            /// Stack In:
-            ///  num -- A number, integer or double
-            /// Stack Out:
-            ///  num - 1
+
+                /// 0x93 ABC_ACTION_DECREMENT
+                /// Stack In:
+                ///  num -- A number, integer or double
+                /// Stack Out:
+                ///  num - 1
                 case SWF::ABC_ACTION_DECREMENT:
                 {
                     mStack.top(0) = mStack.top(0).to_number() - 1;
                     break;
                 }
-            /// 0x94 ABC_ACTION_DECLOCAL
-            /// Stream: V32 'frame_addr'
-            /// Frame: Load i from frame_addr and decrement it.
+
+                /// 0x94 ABC_ACTION_DECLOCAL
+                /// Stream: V32 'frame_addr'
+                /// Frame: Load i from frame_addr and decrement it.
                 case SWF::ABC_ACTION_DECLOCAL:
                 {
-                    boost::uint32_t foff = mStream->read_V32();
-                    mRegisters[foff] = mRegisters[foff].to_number() - 1;
+                    const boost::uint32_t foff = mStream->read_V32();
+                    setRegister(foff, getRegister(foff).to_number() - 1);
                     break;
                 }
 
@@ -2651,23 +2660,28 @@ Machine::execute()
                 }
 
                 /// 0xC2 ABC_ACTION_INCLOCAL_I
-                /// See: 0x92 (ABC_ACTION_INCLOCAL), but forces types to int, not double
+                /// See: 0x92 (ABC_ACTION_INCLOCAL), but forces types to int
+                /// not double
                 case SWF::ABC_ACTION_INCLOCAL_I:
                 {
-                    boost::uint32_t foff = mStream->read_V32();
-                    mRegisters[foff] = mRegisters[foff].to_int() + 1;
+                    const boost::uint32_t foff = mStream->read_V32();
+                    setRegister(foff,  getRegisters(foff).to_int() + 1);
                     break;
                 }
-            /// 0xC3 ABC_ACTION_DECLOCAL_I
-            /// See: 0x94 (ABC_ACTION_DECLOCAL), but forces types to int, not double
+
+                /// 0xC3 ABC_ACTION_DECLOCAL_I
+                /// See: 0x94 (ABC_ACTION_DECLOCAL), but forces types to int,
+                /// not double
                 case SWF::ABC_ACTION_DECLOCAL_I:
                 {
-                    boost::uint32_t foff = mStream->read_V32();
-                    mRegisters[foff] = mRegisters[foff].to_int() - 1;
+                    const boost::uint32_t foff = mStream->read_V32();
+                    setRegisters(foff, getRegisters(foff).to_int() - 1);
                     break;
                 }
-            /// 0xC4 ABC_ACTION_NEGATE_I
-            /// See: 0x90 (ABC_ACTION_NEGATE), but forces type to int, not double
+
+                /// 0xC4 ABC_ACTION_NEGATE_I
+                /// See: 0x90 (ABC_ACTION_NEGATE), but forces type to int,
+                /// not double
                 case SWF::ABC_ACTION_NEGATE_I:
                 {
                     mStack.top(0) = - mStack.top(0).to_int();
@@ -2678,7 +2692,8 @@ Machine::execute()
                 /// See: 0xA0 (ABC_ACTION_ADD), but forces type to int
                 case SWF::ABC_ACTION_ADD_I:
                 {
-                    mStack.top(1) = mStack.top(1).to_int() + mStack.top(0).to_int();
+                    mStack.top(1) = mStack.top(1).to_int() +
+                        mStack.top(0).to_int();
                     mStack.drop(1);
                     break;
                 }
@@ -2687,25 +2702,28 @@ Machine::execute()
                 /// See: 0xA1 (ABC_ACTION_SUBTRACT), but forces type to int
                 case SWF::ABC_ACTION_SUBTRACT_I:
                 {
-                    mStack.top(1) = mStack.top(1).to_int() - mStack.top(0).to_int();
+                    mStack.top(1) = mStack.top(1).to_int() -
+                        mStack.top(0).to_int();
                     mStack.drop(1);
                     break;
                 }
-            /// 0xC7 ABC_ACTION_MULTIPLY_I
-            /// See: 0xA2 (ABC_ACTION_MULTIPLY), but forces type to int
+
+                /// 0xC7 ABC_ACTION_MULTIPLY_I
+                /// See: 0xA2 (ABC_ACTION_MULTIPLY), but forces type to int
                 case SWF::ABC_ACTION_MULTIPLY_I:
                 {
                     mStack.top(1) = mStack.top(0).to_int() * mStack.top(1).to_int();
                     mStack.drop(1);
                     break;
                 }
-            /// 0xD0 ABC_ACTION_GETLOCAL0
-            /// 0xD1 ABC_ACTION_GETLOCAL1
-            /// 0xD2 ABC_ACTION_GETLOCAL2
-            /// 0xD3 ABC_ACTION_GETLOCAL3
-            /// Frame: Load frame[#] as val
-            /// Stack Out:
-            ///  val
+
+                /// 0xD0 ABC_ACTION_GETLOCAL0
+                /// 0xD1 ABC_ACTION_GETLOCAL1
+                /// 0xD2 ABC_ACTION_GETLOCAL2
+                /// 0xD3 ABC_ACTION_GETLOCAL3
+                /// Frame: Load frame[#] as val
+                /// Stack Out:
+                ///  val
                 case SWF::ABC_ACTION_GETLOCAL0:
                 case SWF::ABC_ACTION_GETLOCAL1:
                 case SWF::ABC_ACTION_GETLOCAL2:
@@ -2716,8 +2734,8 @@ Machine::execute()
             //		mStack.grow(1);
             //		mStack.push() instead?
 
-                    push_stack(get_register(opcode- SWF::ABC_ACTION_GETLOCAL0));
-            //		mStack.top(0) = mRegisters.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
+                    push_stack(getRegister(opcode- SWF::ABC_ACTION_GETLOCAL0));
+            //		mStack.top(0) = _registers.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
                     break;
                 }
             /// 0xD4 ABC_ACTION_SETLOCAL0
@@ -2734,7 +2752,8 @@ Machine::execute()
                 case SWF::ABC_ACTION_SETLOCAL2:
                 case SWF::ABC_ACTION_SETLOCAL3:
                 {
-                    mRegisters[opcode - SWF::ABC_ACTION_SETLOCAL0] = pop_stack();
+                    setRegisters(opcode - SWF::ABC_ACTION_SETLOCAL0,
+                            pop_stack());
                     break;
                 }
 
@@ -2979,7 +2998,7 @@ Machine::restoreState()
 //	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
-	mRegisters = s.mRegisters;
+	_registers = s._registers;
 	mCurrentFunction = s.mFunction;
 //	mExitWithReturn = s.mReturn;
 //	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
@@ -3004,7 +3023,7 @@ Machine::saveState()
 //	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
 	s.to_debug_string();
-	s.mRegisters = mRegisters;
+	s._registers = _registers;
 	s.mFunction = mCurrentFunction;
 //	s.mReturn = mExitWithReturn;
 //	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
@@ -3025,7 +3044,7 @@ Machine::initMachine(abc_block* pool_block, as_object* global)
 	log_debug("Loding code stream.");
 	mStream = constructor->getBody();
 	mCurrentFunction = constructor->getPrototype();
-	mRegisters[0] = as_value(global);
+	setRegister(0, global);
 	mGlobalObject = global;
 }
 
@@ -3043,9 +3062,9 @@ Machine::executeFunction(asMethod* function, const fn_call& fn)
 	CodeStream *stream = function->getBody();
 	load_function(stream, function->getMaxRegisters());
 	mExitWithReturn = true;
-	mRegisters[0] = as_value(fn.this_ptr);
+	setRegister(0, fn.this_ptr);
 	for (unsigned int i=0;i<fn.nargs;i++) {
-		mRegisters[i+1] = fn.arg(i);
+		setRegister(i + 1, fn.arg(i));
 	}
 	//TODO:  There is probably a better way to do this.
     //
@@ -3091,10 +3110,10 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 	mStack.clear();
 	mScopeStack.clear();
 
-    // The value at mRegisters[0] is generally pushed to the stack for
+    // The value at _registers[0] is generally pushed to the stack for
     // CONSTRUCTSUPER, which apparently expects the object whose super
     // is to be constructed. Setting it to global as before seems to be wrong.
-	mRegisters[0] = cl->getPrototype();
+	setRegister(0, cl->getPrototype());
 	executeCodeblock(ctor->getBody());
     log_debug("Finished instantiating class %s", className);
 }
@@ -3241,8 +3260,8 @@ Machine::getScopeStack()
 void
 Machine::clearRegisters(boost::uint32_t maxRegisters)
 {
-	mRegisters.clear();
-	mRegisters.resize(maxRegisters);
+	_registers.clear();
+	_registers.resize(maxRegisters);
 }
 
 

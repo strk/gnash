@@ -237,7 +237,7 @@ private:
 		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
 		as_object *mThis;
-		std::vector<as_value> mRegisters;
+		std::vector<as_value> _registers;
 		abc_function* mFunction;
 	void to_debug_string(){
 		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
@@ -282,10 +282,19 @@ private:
 
 	void clearRegisters(boost::uint32_t maxRegsiters);
 
-	as_value get_register(int index){
+	as_value getRegister(int index){
 		log_abc("Getting value at a register %d ", index);
-		return mRegisters[index];
+		return _registers[index];
 	}
+
+    void setRegister(size_t index, const as_value& val) {
+        log_abc("Putting %s in register %s", val, index);
+        if (_registers.size() <= index) {
+            log_abc("Register doesn't exist! Adding new registers!");
+            _registers.resize(index + 1);
+        }
+        _registers[index] = val;
+    }
 
 	void push_stack(as_value object){
 		log_abc("Pushing value %s onto stack.", object);
@@ -322,7 +331,7 @@ private:
 
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
-	std::vector<as_value> mRegisters;
+	std::vector<as_value> _registers;
 	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
 	CodeStream *mStream;
 
