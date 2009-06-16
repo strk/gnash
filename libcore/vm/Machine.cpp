@@ -1131,7 +1131,7 @@ Machine::execute()
                         as_value null;
                         null.set_null();
                         setRegister(oindex, null);
-                        setRegisters(iindex, 0.0);
+                        setRegister(iindex, 0.0);
                     }
                     break;
                 }
@@ -2665,7 +2665,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_INCLOCAL_I:
                 {
                     const boost::uint32_t foff = mStream->read_V32();
-                    setRegister(foff,  getRegisters(foff).to_int() + 1);
+                    setRegister(foff,  getRegister(foff).to_int() + 1);
                     break;
                 }
 
@@ -2675,7 +2675,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_DECLOCAL_I:
                 {
                     const boost::uint32_t foff = mStream->read_V32();
-                    setRegisters(foff, getRegisters(foff).to_int() - 1);
+                    setRegister(foff, getRegister(foff).to_int() - 1);
                     break;
                 }
 
@@ -2752,7 +2752,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_SETLOCAL2:
                 case SWF::ABC_ACTION_SETLOCAL3:
                 {
-                    setRegisters(opcode - SWF::ABC_ACTION_SETLOCAL0,
+                    setRegister(opcode - SWF::ABC_ACTION_SETLOCAL0,
                             pop_stack());
                     break;
                 }
