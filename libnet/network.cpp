@@ -899,7 +899,11 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
             return 0;
         }
 
-        ret = read(fd, buffer, nbytes);
+	if (_ssl) {
+	    ret = _ssl->sslRead(buffer, nbytes);
+	} else {
+	    ret = read(fd, buffer, nbytes);
+	}
 	// If we read zero bytes, the network may be closed, as we returned from the select()
         if (ret == -1) {
             log_error (_("The socket for fd #%d was never available for reading data"), fd);
@@ -1057,7 +1061,11 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 	    return 0;
         }
 
-        ret = write(fd, bufptr, nbytes);
+	if (_ssl) {
+	    ret = _ssl->sslWrite(buffer, nbytes);
+	} else {
+	    ret = write(fd, bufptr, nbytes);
+	}
 
         if (ret == 0) {
             log_error (_("Wrote zero out of %d bytes to fd #%d: %s"), 
@@ -1415,7 +1423,7 @@ Network::initSSL(std::string &hostname)
 {
     GNASH_REPORT_FUNCTION;
     string nothing;
-    initSSL(hostname, password);
+    initSSL(hostname, nothing);
 }
 
 bool
