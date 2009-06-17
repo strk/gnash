@@ -50,9 +50,9 @@ main(int argc, char** argv)
   SWFDisplayItem item;
   SWFAction a;
   SWFAction b;
-  char buffer_a[1024];  //exact array size needed = 674 bits
-  char buffer_b[1024];	//exact array size needed = 589 bits
-  char buffer_c[2048];  //exact array size needed = 1043 bits
+  char buffer_a[1024];
+  char buffer_b[1024];
+  char buffer_c[1024];
 
   // This is different from the real video width to make sure that
   // Video.width returns the actual width (128).

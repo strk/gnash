@@ -37,6 +37,8 @@ libgnashasobjs_la_SOURCES = \
 	asobj/int_as.cpp \
 	asobj/LoadVars_as.cpp \
 	asobj/Math_as.cpp \
+	asobj/NetConnection_as.cpp \
+	asobj/NetStream_as.cpp \
 	asobj/Number_as.cpp \
 	asobj/PlayHead.cpp \
 	asobj/Selection_as.cpp \
@@ -59,6 +61,8 @@ noinst_HEADERS += \
 	asobj/int_as.h \
 	asobj/LoadVars_as.h \
 	asobj/MovieClipLoader.h \
+	asobj/NetConnection_as.h	\
+	asobj/NetStream_as.h \
 	asobj/Number_as.h \
 	asobj/PlayHead.h \
 	asobj/Selection_as.h \

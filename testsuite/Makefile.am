@@ -60,7 +60,6 @@ DIST_SUBDIRS = \
 	libamf.all \
 	libnet.all \
 	libcore.all \
-	network.all \
 	samples	\
 	swfdec \
 	misc-ming.all \
@@ -78,6 +77,7 @@ SUBDIRS = \
 	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
 	libbase.all	\
+	network.all \
 	libamf.all \
 	libcore.all \
 	samples	\
