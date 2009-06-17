@@ -78,7 +78,6 @@ SUBDIRS = \
 	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
 	libbase.all	\
-	network.all \
 	libamf.all \
 	libcore.all \
 	samples	\
