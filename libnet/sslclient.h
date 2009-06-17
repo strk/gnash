@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ public:
 
     // Write bytes to the already opened SSL connection
     int sslWrite(amf::Buffer &buf);
-    int sslWrite(boost::uint8_t *buf, size_t length);
+    int sslWrite(const boost::uint8_t *buf, size_t length);
     int sslWrite(std::string &buf);
 
     // Setup the Context for this connection
