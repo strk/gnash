@@ -1198,6 +1198,10 @@ Machine::execute()
                 {
                     boost::uint32_t argc = mStream->read_V32();
                     as_function *f = mStack.top(argc).to_as_function();
+                    if (!f) {
+                        log_abc("CONSTRUCT: No function on stack!");
+                        break;
+                    }
                     Property b(0, 0, f, NULL);
                     pushCall(f, NULL, mStack.top(argc), argc, 0);
                     break;
