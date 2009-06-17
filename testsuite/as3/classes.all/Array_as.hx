@@ -2634,7 +2634,7 @@ tmp.sort();
 	//-------------------------------
 	// Test sort
 	//-------------------------------
-	DejaGnu.note("Begin Array sort testing");
+	DejaGnu.note("*** Begin Array sort testing");
 	
 	//NOTE: Gnash seems to allow these types of objects to be used as comparison
 	//      functions. However, gflashplayer, flash9 do not allow this. I will
@@ -2692,6 +2692,19 @@ tmp.sort();
 		str += "]";
 		return str;
 	};
+	
+	//function tolen(x)
+	//{
+		//var i;
+		//str = "[";
+		//for (i = 0; i < x.length; i++) 
+		//{
+			//str += String(x[i].length);
+			//if (i != x.length - 1) str += ", ";
+		//}
+		//str += "]";
+		//return str;
+	//}
 
 	//id = new Object();
 	//id.toString = function () { return "Name"; };
@@ -2841,11 +2854,16 @@ tmp.sort();
 	//      correctness. It seems that the intention here is to pass a custom
 	//      sort function to array, but what's being passed are objects with
 	//      function properties.
+	//      It also could be that these tests are just checking to make sure an 
+	//      object cannot be accidentally interpreted as a function.
 	
 	//r = b.sort( zero );
 	#if !flash9
 	r = Reflect.callMethod( b, Reflect.field(b, "sort"), [zero]);
 	#else
+	// gflashplyaer crashes if the arguement to sort is an object and not a 
+	// function. These tests may need to be changed once gnash is capable of
+	// running flash9
 	r = Reflect.callMethod( b, Reflect.field(b, "sort"), [fzero]);
 	#end
 	//check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
@@ -2885,144 +2903,644 @@ tmp.sort();
 		DejaGnu.fail("custom sort 'numericRev' did not sort b correctly");
 	}
 	
+	// resetting order of b so that it is in the expected order for the
+	// RETURNINDEXEDARRAY tests. Might be able to remove this once gnash can run
+	// the as3 tests
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.DESCENDING | untyped Array.NUMERIC]);
+	
 
 	//r = c.sort();
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), []);
 	//check_equals( r.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	if (r.toString() == "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity") {
+		DejaGnu.pass("sort() on c returns correct array");
+	} else {
+		DejaGnu.fail("sort() on c does not return correct array");
+	}
 	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	if (c.toString() == "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity") {
+		DejaGnu.pass("sort() on c correctly sorted c");
+	} else {
+		DejaGnu.fail("sort() on c did not correctly sort c");
+	}
 	//c.sort( Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.CASEINSENSITIVE]);
 	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	if (c.toString() == "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity") {
+		DejaGnu.pass("sort(CASEINSENSITIVE) on c correctly sorted c");
+	} else {
+		DejaGnu.fail("sort(CASEINSENSITIVE) on c did not correctly sort c");
+	}
 	//c.sort( Array.NUMERIC );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.NUMERIC]);
 	//check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity" );
+	if (c.toString() == "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity") {
+		DejaGnu.pass("sort(NUMERIC) on c correctly sorted c");
+	} else {
+		DejaGnu.fail("sort(NUMERIC) on c did not correctly sort c");
+	}
 	//r = c.sort( Array.UNIQUESORT );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.UNIQUESORT]);
 	//check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+	if (c.toString() == "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity") {
+		DejaGnu.pass("sort(UNIQUESORT) on c correctly sorted c");
+	} else {
+		DejaGnu.fail("sort(UNIQUESORT) on c did not correctly sort c");
+	}
 	//r = c.sort( Array.DESCENDING | Array.NUMERIC );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.DESCENDING | untyped Array.NUMERIC]);
 	//check_equals( c.toString(), "Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+	if (c.toString() == "Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7") {
+		DejaGnu.pass("sort(DESCENDING | NUMERIC) on c works");
+	} else {
+		DejaGnu.fail("sort(DESCENDING | NUMERIC) on c does not work");
+	}
 
 	//r = d.sort();
+	r = Reflect.callMethod( d, Reflect.field(d, "sort"), []);
 	//check_equals( r.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("sort() on empty d returns empty array");
+	} else {
+		DejaGnu.fail("sort() on empty d does not return empty array");
+	}
 	//check_equals( d.toString(), "" );
+	if (d.toString() == "") {
+		DejaGnu.pass("sort() on d leaves d empty");
+	} else {
+		DejaGnu.fail("sort() on d does not leave d empty");
+	}
 	//d.sort( Array.UNIQUESORT );
+	Reflect.callMethod( d, Reflect.field(d, "sort"), 
+	                   [untyped Array.UNIQUESORT]);
 	//check_equals( d.toString(), "" );
+	if (d.toString() == "") {
+		DejaGnu.pass("sort(UNIQUESORT) on d leaves d empty");
+	} else {
+		DejaGnu.fail("sort(UNIQUESORT) on d does not leave d empty");
+	}
 	//d.sort( Array.DESCENDING | Array.NUMERIC );
+	Reflect.callMethod( d, Reflect.field(d, "sort"), 
+	                   [untyped Array.DESCENDING | untyped Array.NUMERIC]);
 	//check_equals( d.toString(), "" );
+	if (d.toString() == "") {
+		DejaGnu.pass("sort(DESCENDING | NUMERIC) on d leaves d empty");
+	} else {
+		DejaGnu.fail("sort(DESCENDING | NUMERIC) on d does not leave d empty");
+	}
 
 	//r = e.sort();
+	r = Reflect.callMethod( e, Reflect.field(e, "sort"), []);
 	//check_equals( r.toString(), "singleton" );
+	if (r.toString() == "singleton") {
+		DejaGnu.pass("sort() on e array returns correctly");
+	} else {
+		DejaGnu.fail("sort() on e array does not return correctly");
+	}
 	//check_equals( e.toString(), "singleton" );
+	if (e.toString() == "singleton") {
+		DejaGnu.pass("sort() on e array correctly sorts e");
+	} else {
+		DejaGnu.fail("sort() on e array does not correctly sort e");
+	}
 	//e.sort( Array.UNIQUESORT );
+	Reflect.callMethod( e, Reflect.field(e, "sort"), 
+	                   [untyped Array.UNIQUESORT]);
 	//check_equals( e.toString(), "singleton" );
+	if (e.toString() == "singleton") {
+		DejaGnu.pass("sort(UNIQUESORT) on e array correctly sorts e");
+	} else {
+		DejaGnu.fail("sort(UNIQUESORT) on e array does not correctly sort e");
+	}
 	//e.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
+	Reflect.callMethod( e, Reflect.field(e, "sort"),[untyped Array.DESCENDING |
+	                   untyped Array.CASEINSENSITIVE]);
 	//check_equals( e.toString(), "singleton" );
+	if (e.toString() == "singleton") {
+		DejaGnu.pass("sort(DESCENDING | CASEINSENSITIVE) on e array correctly sorts e");
+	} else {
+		DejaGnu.fail("sort(DESCENDING | CASEINSENSITIVE) on e array does not correctly sort e");
+	}
 
 	//r = f.sort();
+	r = Reflect.callMethod( f, Reflect.field(f, "sort"), []);
 	//check_equals( r.toString(), "Name,Name,Year" );
+	if (r.toString() == "Name,Name,Year") {
+		DejaGnu.pass("sort() on f array returns correctly");
+	} else {
+		DejaGnu.fail("sort() on f array does not return correctly");
+	}
 	//check_equals( f.toString(), "Name,Name,Year" );
+	if (f.toString() == "Name,Name,Year") {
+		DejaGnu.pass("sort() on f array sorts f correctly");
+	} else {
+		DejaGnu.fail("sort() on f array did not sort f correctly");
+	}
 	//r = f.sort( Array.UNIQUESORT );
+	r = Reflect.callMethod( f, Reflect.field(f, "sort"), 
+	                       [untyped Array.UNIQUESORT]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("sort(UNIQUESORT) on f returns correctly");
+	} else {
+		DejaGnu.fail("sort(UNIQUESORT) on f does not return correctly");
+	}
 	//f.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
+	Reflect.callMethod( f, Reflect.field(f, "sort"), [untyped Array.DESCENDING |
+	                   untyped Array.CASEINSENSITIVE]);
 	//check_equals( f.toString(), "Year,Name,Name" );
+	if (f.toString() == "Year,Name,Name") {
+		DejaGnu.pass("sort(DESCENDING | CASEINSENSITIVE) on f correctly sorts f");
+	} else {
+		DejaGnu.fail("sort(DESCENDING | CASEINSENSITIVE) on f does not correctly sort f");
+	}
 
 	////trace(" -- Return Indexed Array Tests -- ");
+	DejaGnu.note("** Testing RETURNINDEXEDARRAY sorts");
+
 
 	//r = a.sort( Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "5,4,3,2,1,0" );
+	if (r.toString() == "5,4,3,2,1,0") {
+		DejaGnu.pass("RIA sort on a returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on a does not return correct indexes");
+	}
 	//check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+	if (a.toString() == "vi,nano,emacs,ed,Jedit,") {
+		DejaGnu.pass("RIA sort on  a does not change a");
+	} else {
+		DejaGnu.fail("RIA sort on a changed a");
+	}
 	//r = a.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY |
+						    untyped Array.DESCENDING |
+							untyped Array.CASEINSENSITIVE]);
 	//check_equals( r.toString(), "0,1,4,2,3,5" );
+	if (r.toString() == "0,1,4,2,3,5") {
+		DejaGnu.pass("RIA sort on a returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA on a does not return correct indexes");
+	}
 	//check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+	if (a.toString() == "vi,nano,emacs,ed,Jedit,") {
+		DejaGnu.pass("RIA sort on  a does not change a");
+	} else {
+		DejaGnu.fail("RIA on a changed a");
+	}
 	//r = b.sort( Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "5,6,7,4,3,2,1,0" );
+	if (r.toString() == "5,6,7,4,3,2,1,0") {
+		DejaGnu.pass("RIA sort on b returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on b does not return correct indexes");
+	}
 	//r = b.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY | 
+						    untyped Array.NUMERIC]);
 	//check_equals( r.toString(), "7,6,5,4,3,2,1,0" );
+	if (r.toString() == "7,6,5,4,3,2,1,0") {
+		DejaGnu.pass("RIA sort on b returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on b does not return correct indexes");
+	}
 	//r = b.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY | 
+						    untyped Array.DESCENDING |
+							untyped Array.CASEINSENSITIVE]);
 	//check_equals( r.toString(), "0,1,2,3,4,7,6,5" );
+	if (r.toString() == "0,1,2,3,4,7,6,5") {
+		DejaGnu.pass("RIA sort on b returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on b does not return correct indexes");
+	}
 	//r = c.sort( Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "6,7,5,4,3,2,1,0" );
+	if (r.toString() == "6,7,5,4,3,2,1,0") {
+		DejaGnu.pass("RIA sort on c returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on c does not return correct indexes");
+	}
 	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY |
+						    untyped Array.NUMERIC]);
 	//check_equals( r.toString(), "7,6,5,4,3,2,1,0" );
+	if (r.toString() == "7,6,5,4,3,2,1,0") {
+		DejaGnu.pass("RIA sort on c returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on c does not return correct indexes");
+	}
 	//r = c.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( c, Reflect.field(c, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY |
+						    untyped Array.DESCENDING |
+							untyped Array.CASEINSENSITIVE]);
 	//check_equals( r.toString(), "0,1,2,3,4,5,7,6" );
+	if (r.toString() == "0,1,2,3,4,5,7,6") {
+		DejaGnu.pass("RIA sort on c returns correct indexes");
+	} else {
+		DejaGnu.fail("RIA sort on c does not return correct indexes");
+	}
 	//r = d.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	r = Reflect.callMethod( d, Reflect.field(d, "sort"), 
+	                       [untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("RIA sort on d returns empty");
+	} else {
+		DejaGnu.fail("RIA sort on d does not return empty");
+	}
 	//check_equals( d.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("RIA sort on d leaves d empty");
+	} else {
+		DejaGnu.fail("RIA sort on d does not leave d empty");
+	}
 	//r = d.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( d, Reflect.field(d, "sort"), 
+	                       [untyped Array.NUMERIC |
+						    untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("RIA sort on d returns empty");
+	} else {
+		DejaGnu.fail("RIA sort on d does not return empty");
+	}
 	//check_equals( d.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("RIA sort on d leaves d empty");
+	} else {
+		DejaGnu.fail("RIA sort on d does not leave d empty");
+	}
 	//r = e.sort( Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( e, Reflect.field(e, "sort"), 
+	                       [untyped Array.CASEINSENSITIVE |
+						    untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("RIA sort on e returns single index");
+	} else {
+		DejaGnu.fail("RIA sort on e does not return single index");
+	}
 	//check_equals( e.toString(), "singleton" );
+	if (e.toString() == "singleton") {
+		DejaGnu.pass("RIA sort on e did not change e");
+	} else {
+		DejaGnu.fail("RIA sort on e changed e");
+	}
+	#if !flash9
+	// flash9/gflashplayer can't do NUMERIC sorts on strings
 	//r = e.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	r = Reflect.callMethod( e, Reflect.field(e, "sort"), 
+	                       [untyped Array.NUMERIC |
+						    untyped Array.RETURNINDEXEDARRAY |
+							untyped Array.DESCENDING]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("RIA sort on e returns single index");
+	} else {
+		DejaGnu.fail("RIA sort on e does not return single index");
+	}
+	#end
 
-	////trace(" -- Custom AS function tests -- ");
+	//trace(" -- Custom AS function tests -- ");
+	DejaGnu.note("** Custom AS functon sort tests");
+	
 	//r = a.sort( cmp_fn, Array.UNIQUESORT );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn, untyped Array.UNIQUESORT | 0]);
 	//check_equals( r.toString(), ",vi,ed,nano,emacs,Jedit" );
+	if (r.toString() == ",vi,ed,nano,emacs,Jedit") {
+		DejaGnu.pass("cmp_fn sort returned correct array");
+	} else {
+		DejaGnu.fail("cmp_fn sort did not return correct array");
+	}
 	//check_equals( a.toString(), ",vi,ed,nano,emacs,Jedit" );
+	if (a.toString() == ",vi,ed,nano,emacs,Jedit") {
+		DejaGnu.pass("cmp_fn sort correctly sorted a");
+	} else {
+		DejaGnu.fail("cmp_fn sort did not correctly sort a");
+	}
+	#if !flash9
+	// flash9/gflashplayer crashes on this
 	//r = a.sort( something_undefined );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped something_undefined]);
 	//check_equals(typeof(r), 'undefined');
+	if (Std.string(untyped __typeof__(r)) == "undefined") {
+		DejaGnu.pass("undefined sort returns 'undefined' array");
+	} else {
+		DejaGnu.fail("undefined sort does not return 'undefined' array");
+	}
+	#end
 	//r = a.sort( cmp_fn, Array.DESCENDING );
+	// The following is not working for some reason. Probable compiler bug
+	// DejaGnu.note("DESCENDING = " + Std.string(untyped Array.DESCENDING));
+	//r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       //[cmp_fn, untyped Array.DESCENDING]);
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn, untyped Array.DESCENDING | 0]);
 	//check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
+	if (tolen(r) == "[5, 5, 4, 2, 2, 0]") {
+		DejaGnu.pass("cmp_fn and DESCENDING sort returned correctly");
+	} else {
+		DejaGnu.fail("cmp_fn and DESCENDING sort did not return correctly");
+	}
 	//check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
+	if (tolen(a) == "[5, 5, 4, 2, 2, 0]") {
+		DejaGnu.pass("cmp_fn and DESCENDING sorted correctly");
+	} else {
+		DejaGnu.fail("cmp_fn and DESCENDING did not sort correctly");
+	}
 	//a.sort( cmp_fn, Array.CASEINSENSITIVE | Array.NUMERIC );
+	Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn, untyped Array.CASEINSENSITIVE |
+						    untyped Array.NUMERIC]);
 	//check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+	if (tolen(a) == "[0, 2, 2, 4, 5, 5]") {
+		DejaGnu.pass("cmp_fn, CSE, NUM sorted correctly");
+	} else {
+		DejaGnu.fail("cmp_fn, CSE, NUM did not sort correctly");
+	}
 	//r = a.sort( cmp_fn, Array.RETURNINDEXEDARRAY );
+	//r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       //[cmp_fn, untyped Array.RETURNINDEXEDARRAY]);
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn, untyped Array.RETURNINDEXEDARRAY | 0]);
+
 	//check_equals( r.toString(), "0,1,2,3,4,5" );
+	if (r.toString() == "0,1,2,3,4,5") {
+		DejaGnu.pass("cmp_fn, RIA returns correct indexes");
+	} else {
+		DejaGnu.fail("cmp_fn, RIA does not return correct indexes");
+	}
+
 	//r = a.sort( cmp_fn, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn, untyped Array.RETURNINDEXEDARRAY |
+						    untyped Array.DESCENDING]);
+
 	//check_equals( r.toString(), "5,4,3,2,1,0" );
+	if (r.toString() == "5,4,3,2,1,0") {
+		DejaGnu.pass("cmp_fn, RIA, DESCENDING returns correct indexes");
+	} else {
+		DejaGnu.fail("cmp_fn, RIA, DESCENDING not returning crrect indexes");
+	}
 	//r = d.sort( cmp_fn );
+	r = Reflect.callMethod( d, Reflect.field(d, "sort"), 
+	                       [cmp_fn]);
 	//check_equals( r.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("cmp_fn on empty array returns nothing");
+	} else {
+		DejaGnu.fail("cmp_fn on empty array does not return nothing");
+	}
 	//check_equals( d.toString(), "" );
+	if (d.toString() == "") {
+		DejaGnu.pass("cmp_fn on empty array did not alter array");
+	} else {
+		DejaGnu.fail("cmp_fn on empty array aleterd the array");
+	}
 	//r = d.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( d, Reflect.field(d, "sort"), 
+	                       [cmp_fn, untyped Array.UNIQUESORT |
+						    untyped Array.CASEINSENSITIVE]);
 	//check_equals( r.toString(), "" );
+	if (r.toString() == "") {
+		DejaGnu.pass("cmp_fn, + ARGS on d returns empty array");
+	} else {
+		DejaGnu.fail("cmp_fn, + ARGS on d did not return empty array");
+	}
 	//check_equals( d.toString(), "" );
+	if (d.toString() == "") {
+		DejaGnu.pass("cmp_fn, + ARGS on d did not alter d");
+	} else {
+		DejaGnu.fail("cmp_fn, + ARGS on d altered d");
+	}
 	//r = e.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( e, Reflect.field(e, "sort"), 
+	                       [cmp_fn, untyped Array.UNIQUESORT |
+						    untyped Array.CASEINSENSITIVE]);
 	//check_equals( r.toString(), "singleton" );
+	if (r.toString() == "singleton") {
+		DejaGnu.pass("cmp_fn, + ARGS on e returns correct array");
+	} else {
+		DejaGnu.fail("cmp_fn, + ARGS on e did not return correct array");
+	}
 	//check_equals( e.toString(), "singleton" );
+	if (e.toString() == "singleton") {
+		DejaGnu.pass("cmp_fn, + ARGS on e correctly sorted e");
+	} else {
+		DejaGnu.fail("cmp_fn, + ARGS on e did not correctly sort e");
+	}
 
-	////trace(" -- Custom AS function tests using an AS comparator that returns objects -- ");
+	//trace(" -- Custom AS function tests using an AS comparator that returns objects -- ");
 	//r = a.sort( cmp_fn_obj, Array.DESCENDING );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn_obj, untyped Array.DESCENDING | 0]);
 	//check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
+	if (tolen(r) == "[5, 5, 4, 2, 2, 0]") {
+		DejaGnu.pass("cmp_fn_obj, DES sort returned correct array");
+	} else {
+		DejaGnu.fail("cmp_fn_obj, DES sort did not return correct array");
+	}
 	//check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
+	if (tolen(a) == "[5, 5, 4, 2, 2, 0]") {
+		DejaGnu.pass("cmp_fn_obj, DES on a sorted a correctly");
+	} else {
+		DejaGnu.fail("cmp_fn_obj, DES on a did not sort a correctly");
+	}
 	//a.sort( cmp_fn_obj, Array.CASEINSENSITIVE | Array.NUMERIC );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn_obj, untyped Array.CASEINSENSITIVE |
+						    Array.NUMERIC]);
 	//check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+	if (tolen(a) == "[0, 2, 2, 4, 5, 5]") {
+		DejaGnu.pass("cmp_fn_obj, CAS, NUM, on a sorted a correctly");
+	} else {
+		DejaGnu.fail("cmp_fn_obj, CAS, NUM, on a did not sort a correctly");
+	}
 	//r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn_obj, untyped Array.RETURNINDEXEDARRAY | 0]);
 	//check_equals( r.toString(), "0,1,2,3,4,5" );
+	if (r.toString() == "0,1,2,3,4,5") {
+		DejaGnu.pass("cmp_fn_obj, RIA on a returns correct indexes");
+	} else {
+		DejaGnu.fail("cmp_fn_obj, RIA on a does not return correct indexes");
+	}
 	//r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [cmp_fn_obj, untyped Array.RETURNINDEXEDARRAY |
+						    Array.DESCENDING]);
 	//check_equals( r.toString(), "5,4,3,2,1,0" );
+	if (r.toString() == "5,4,3,2,1,0") {
+		DejaGnu.pass("cmp_fn_obj, RIA, DES on a returns correct indexes");
+	} else {
+		DejaGnu.fail("cmp_fn_obj, RIA, DES on a does not return correct indexes");
+	}
 	//e.sort( cmp_fn_obj, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( e, Reflect.field(e, "sort"), 
+	                       [cmp_fn_obj, untyped Array.UNIQUESORT |
+						    Array.CASEINSENSITIVE]);
 	//check_equals( e.toString(), "singleton" );
+	if (e.toString() == "singleton") {
+		DejaGnu.pass("cmp_fn_obj, UNI, CAS on e leaves single element");
+	} else {
+		DejaGnu.fail("cmp_fn_obj, UNI, CAS on e does not leave single element");
+	}
 
-	//a.push("ED");
-	//b.push(3.0);
-	//c.push(9/0);
+	a.push("ED");
+	b.push(untyped 3.0);
+	c.push(9/0);
 
-	////trace(" -- UNIQUESORT tests -- ");
+	//trace(" -- UNIQUESORT tests -- ");
+	DejaGnu.note("** Testing UNIQUESORT option");
 
 	//r = a.sort( Array.UNIQUESORT );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.UNIQUESORT]);
 	//check_equals( r.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	if (r.toString() == ",ED,Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("UNIQ sort on a returned correct array");
+	} else {
+		DejaGnu.fail("UNIQ sort on a did not return correct array");
+	}
 	//check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	if (a.toString() == ",ED,Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("UNIQ sort on a correclty sorted a");
+	} else {
+		DejaGnu.fail("UNIQ sort on a did not correctly sort a");
+	}
 	//r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.UNIQUESORT | 
+						    untyped Array.CASEINSENSITIVE]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI, CAS sort on a correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI, CAS sort on a did not return correctly");
+	}
 	//check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	if (a.toString() == ",ED,Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("UNI, CAS sort on a correctly sorted a");
+	} else {
+		DejaGnu.fail("UNI, CAS sort on a did not correctly sort a");
+	}
 	//r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.DESCENDING );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.UNIQUESORT | 
+						    untyped Array.CASEINSENSITIVE |
+							untyped Array.DESCENDING]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI|CAS|DES sort on a correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI|CAS|DES sort on a did not return correctly");
+	}
 	//check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+	if (a.toString() == ",ED,Jedit,ed,emacs,nano,vi") {
+		DejaGnu.pass("UNI|CAS|DES sort on a correctly sorted a");
+	} else {
+		DejaGnu.fail("UNI|CAS|DES sort on a did not correctly sort a");
+	}
 	//r = a.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.UNIQUESORT | 
+						    untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "0,1,2,3,4,5,6" );
+	if (r.toString() == "0,1,2,3,4,5,6") {
+		DejaGnu.pass("UNI|RIA sort on a returned correct indexes");
+	} else {
+		DejaGnu.fail("UNI|RIA sort on a did not correctly return");
+	}
 	//r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( a, Reflect.field(a, "sort"), 
+	                       [untyped Array.UNIQUESORT |
+						    untyped Array.CASEINSENSITIVE |
+							untyped Array.DESCENDING | 
+						    untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI|CAS|DES|RIA sort on a correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI|CAS|DES|RIA sort on a did not correctly return");
+	}
 
 	//r = b.sort( Array.UNIQUESORT );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.UNIQUESORT]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI sort on b correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI sort on b did not return correctly");
+	}
 	//check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9,3" );
+	if (b.toString() == "8,5,3,1,0,-2,-7,-9,3") {
+		DejaGnu.pass("UNI sort on b sorted b correctly");
+	} else {
+		DejaGnu.fail("UNI sort on b did not sort b correctly");
+	}
 	//r = b.sort( Array.UNIQUESORT | Array.NUMERIC );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.UNIQUESORT |
+						    untyped Array.NUMERIC]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI|NUM sort on b correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI|NUM sort on b did not correctly return 0");
+	}
 	//r = b.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.UNIQUESORT |
+						    untyped Array.NUMERIC |
+							untyped Array.DESCENDING]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI|NUM|DES sort on b correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI|NUM|DES sort on b did no return correctly");
+	}
 	//r = b.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.UNIQUESORT |
+						    untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI|RIA sort on b correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI|RIA sort on b did not correctly return 0");
+	}
 	//r = b.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+	r = Reflect.callMethod( b, Reflect.field(b, "sort"), 
+	                       [untyped Array.UNIQUESORT |
+						    untyped Array.NUMERIC |
+							untyped Array.DESCENDING |
+							untyped Array.RETURNINDEXEDARRAY]);
 	//check_equals( r.toString(), "0" );
+	if (r.toString() == "0") {
+		DejaGnu.pass("UNI|NUM|DES|RIA sort on b correctly returned 0");
+	} else {
+		DejaGnu.fail("UNI|NUM|DES|RIA sort on did not return correctly");
+	}
 
 	//r = c.sort( Array.UNIQUESORT );
 	//check_equals( r.toString(), "0" );
