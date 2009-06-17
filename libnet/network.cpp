@@ -1410,6 +1410,90 @@ Network::toggleDebug(bool val)
     // toggleDebug(true);
 }
 
+bool
+Network::initSSL(std::string &hostname)
+{
+    GNASH_REPORT_FUNCTION;
+    string nothing;
+    initSSL(hostname, password);
+}
+
+bool
+Network::initSSL(std::string &hostname, std::string &password)
+{
+    GNASH_REPORT_FUNCTION;
+    string nothing;
+
+    initSSL(hostname, password, nothing, nothing, nothing, true);
+}
+
+bool
+Network::initSSL(std::string &hostname, std::string &password, bool auth)
+{
+    GNASH_REPORT_FUNCTION;
+
+    string nothing;
+    initSSL(hostname, password, nothing, nothing, nothing, auth);
+}
+
+bool
+Network::initSSL(std::string &hostname, std::string &passwd, 
+		 std::string &keyfile, std::string &calist,
+		 std::string &rootpath, bool auth)
+{
+    GNASH_REPORT_FUNCTION;
+
+    // FIXME: make sure we have a connection
+
+    if (_sockfd == 0) {
+	if ((_sockfd = createClient(hostname, SSL_PORT) == false)) {
+	    log_error("Can't connect to server %s", hostname);
+	    return false;
+	}
+    }
+
+    if (!_ssl) {
+	_ssl.reset(new SSLClient);
+    }
+
+    if (!hostname.empty()) {
+	_ssl->setHostname(hostname);
+    } else {
+	log_debug("Using default hostname: \"%s\"", _host);
+    }
+    if (!keyfile.empty()) {
+	_ssl->setKeyfile(keyfile);
+    } else {
+	log_debug("Using default keyfile: \"%s\"", _ssl->getKeyfile());
+    }
+    if (!calist.empty()) {
+	_ssl->setCAlist(calist);
+    } else {
+	log_debug("Using default CA List: \"%s\"", _ssl->getCAlist());
+    }
+
+    if (!passwd.empty()) {
+	_ssl->setPassword(passwd);
+    } else {
+	log_debug("Using default Password: \"%s\"", _ssl->getPassword());
+    }
+    if (!rootpath.empty()) {
+	_ssl->setRootPath(rootpath);
+    } else {
+	log_debug("Using default Root Path to PEM files: \"%s\"",
+		  _ssl->getRootPath());
+    }
+
+    if (_ssl->sslConnect(_sockfd)) {
+        log_debug("Connected to SSL server");
+    } else {
+        log_error("Couldn't connect to SSL server");
+	return false;
+    }
+
+    // If we got this far, everthing worked
+    return true;
+}
 
 // Trap Control-C so we can cleanly exit
 static void

@@ -279,7 +279,14 @@ public:
     entry_t *getEntry(int fd);
     
 //    void executePollFD(int index) { _handler[index](); ];
-    
+
+    bool initSSL(std::string &hostname);
+    bool initSSL(std::string &hostname, std::string &password);
+    bool initSSL(std::string &hostname, std::string &password, bool auth);
+    bool initSSL(std::string &hostname, std::string &password, 
+		 std::string &keyfile, std::string &calist,
+		 std::string &rootpath, bool auth);
+
  protected:
     in_addr_t   _ipaddr;
     int         _sockfd;	// the file descriptor used for reading and writing

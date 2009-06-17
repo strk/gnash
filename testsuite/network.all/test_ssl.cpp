@@ -189,9 +189,9 @@ static void test_client()
         runtest.unresolved("Cert didn't match hostfor SSL connection");
     } else {
         if (client.checkCert()) {
-            runtest.pass("Cert matched host for SSL connection");
+            runtest.xpass("Cert matched host for SSL connection");
         } else {
-            runtest.fail("Cert didn't match host for SSL connection");
+            runtest.xfail("Cert didn't match host for SSL connection");
         }
     }
 
@@ -201,7 +201,6 @@ static void test_client()
         runtest.unresolved("Couldn't write to SSL connection");
     } else {
         amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
-	request.dump();
 
         if ((ret = client.sslWrite(request)) == request.allocated()) {
             runtest.pass("Wrote bytes to SSL connection");
@@ -210,7 +209,8 @@ static void test_client()
         }
     }
 
-#if 0    
+#if 0
+    // This blocks forever unless data is received.
     if (giveup) {
         runtest.unresolved("Couldn't read bytes from SSL connection");
     } else {
