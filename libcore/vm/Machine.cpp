@@ -54,8 +54,14 @@ public:
 	{}
 };
 
-// Functions for getting pool constants.
-static inline const std::string&
+/// Functions for getting pool constants.
+//
+/// TODO: it's quite possible for a malformed SWF to ask for out-of-bounds
+/// pool access, although at the moment it's mainly Gnash bugs causing this.
+/// Throwing an exception is good here, but it's not clear which one.
+namespace {
+
+inline const std::string&
 pool_string(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
@@ -67,7 +73,7 @@ pool_string(boost::uint32_t index, abc_block *pool)
     }
 }
 
-static inline int
+inline int
 pool_int(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
@@ -79,7 +85,7 @@ pool_int(boost::uint32_t index, abc_block *pool)
     }
 }
 
-static inline unsigned int
+inline unsigned int
 pool_uint(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
@@ -91,7 +97,7 @@ pool_uint(boost::uint32_t index, abc_block *pool)
     }
 }
 
-static inline double
+inline double
 pool_double(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
@@ -103,7 +109,7 @@ pool_double(boost::uint32_t index, abc_block *pool)
     }
 }
 
-static inline asNamespace*
+inline asNamespace*
 pool_namespace(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
@@ -116,7 +122,7 @@ pool_namespace(boost::uint32_t index, abc_block *pool)
 
 }
 
-static inline asMethod*
+inline asMethod*
 pool_method(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
@@ -128,7 +134,7 @@ pool_method(boost::uint32_t index, abc_block* pool)
     }
 }
 
-static inline asClass*
+inline asClass*
 pool_class(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
@@ -141,7 +147,7 @@ pool_class(boost::uint32_t index, abc_block* pool)
 }
 
 // Don't make this a reference or you'll taint the pool.
-static inline asName
+inline asName
 pool_name(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
@@ -153,6 +159,8 @@ pool_name(boost::uint32_t index, abc_block* pool)
         throw ASException();
     }
 }
+
+} // anonymous namespace
 
 /// ENSURE_NUMBER makes sure that the given argument is a number,
 /// calling the valueOf method if necessary -- it's a macro so that
