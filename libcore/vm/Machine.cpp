@@ -59,50 +59,85 @@ static inline const std::string&
 pool_string(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->stringPoolAt(index);
+    try {
+        return pool->stringPoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 static inline int
 pool_int(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->integerPoolAt(index);
+    try {
+        return pool->integerPoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 static inline unsigned int
 pool_uint(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->uIntegerPoolAt(index);
+    try {
+        return pool->uIntegerPoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 static inline double
 pool_double(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	log_abc("Getting double from pool at index %u",index);
-	return pool->doublePoolAt(index);
+    try {
+        return pool->doublePoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 static inline asNamespace*
 pool_namespace(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->namespacePoolAt(index);
+    try {
+        return pool->namespacePoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
+
 }
 
 static inline asMethod*
 pool_method(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
-	return pool->methodPoolAt(index);
+    try {
+        return pool->methodPoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 static inline asClass*
 pool_class(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
-	return pool->classPoolAt(index);
+    try {
+        return pool->classPoolAt(index);
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 // Don't make this a reference or you'll taint the pool.
@@ -110,15 +145,13 @@ static inline asName
 pool_name(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
-	asName multiname = pool->multinamePoolAt(index);
-#if 0
-    log_abc("Searching multiname pool for property id=%u abc name=%u "
-            "global name = %u abc string=%s flags=0x%X name_space=%u",
-            index, multiname.getABCName(), multiname.getGlobalName(),
-            pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,
-            multiname.getNamespace()->getURI());
-#endif
-	return multiname;
+	try {
+        asName multiname = pool->multinamePoolAt(index);
+        return multiname;
+    }
+    catch (std::range_error& e) {
+        throw ASException();
+    }
 }
 
 /// ENSURE_NUMBER makes sure that the given argument is a number,
@@ -3152,9 +3185,9 @@ Machine::find_prop_strict(asName multiname)
 
 	as_object *target = 0;
 	as_environment env = as_environment(_vm);
-	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
-	std::string ns = mPoolObject->stringPoolAt(
-            multiname.getNamespace()->getAbcURI());
+	std::string name = pool_string(multiname.getABCName(), mPoolObject);
+	std::string ns = pool_string(multiname.getNamespace()->getAbcURI(),
+            mPoolObject);
 	std::string path = ns.empty() ? name : ns + "." + name;
 
     log_abc("Failed to find property in scope stack. Looking for %s in "
@@ -3179,9 +3212,9 @@ Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
         asName multiname)
 {
 
-	std::string ns = 
-        mPoolObject->stringPoolAt(multiname.getNamespace()->getAbcURI());
-	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
+	std::string ns = pool_string(multiname.getNamespace()->getAbcURI(),
+            mPoolObject);
+	std::string name = pool_string(multiname.getABCName(), mPoolObject);
 	return get_property_value(obj, name, ns);
 }
 

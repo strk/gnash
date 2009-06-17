@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 #include <boost/scoped_array.hpp>
+#include <stdexcept>
 
 namespace gnash {
 	class SWFStream; // for read signature
@@ -120,7 +121,18 @@ public:
 
 } // namespace abc
 
-			
+namespace {
+
+template<typename T>
+inline void checkBounds(size_t i, const T& container)
+{
+    if (i >= container.size()) {
+        throw std::range_error("Attempt to access pool out of range");
+    }
+}
+
+}
+
 class abc_block
 {
 public:
@@ -151,42 +163,42 @@ public:
     }
 
     boost::uint32_t uIntegerPoolAt(size_t i) const {
-        assert(i < _uIntegerPool.size());
+        checkBounds(i, _uIntegerPool);
         return _uIntegerPool[i];
     }
 
     const std::string& stringPoolAt(size_t i) const {
-        assert(i < _stringPool.size());
+        checkBounds(i, _stringPool);
         return _stringPool[i];
     }
 
     boost::int32_t integerPoolAt(size_t i) const {
-        assert(i < _integerPool.size());
+        checkBounds(i, _integerPool);
         return _integerPool[i];
     }
 
     double doublePoolAt(size_t i) const {
-        assert(i < _doublePool.size());
+        checkBounds(i, _doublePool);
         return _doublePool[i];
     }
 
     asMethod* methodPoolAt(size_t i) const {
-        assert(i < _methods.size());
+        checkBounds(i, _methods);
         return _methods[i];
     }
 
     asName multinamePoolAt(size_t i) const {
-        assert(i < _multinamePool.size());
+        checkBounds(i, _multinamePool);
         return _multinamePool[i];
     }
 
     asClass* classPoolAt(size_t i) const {
-        assert(i < _classes.size());
+        checkBounds(i, _classes);
         return _classes[i];
     }
 
     asNamespace* namespacePoolAt(size_t i) const {
-        assert(i < _namespacePool.size());
+        checkBounds(i, _namespacePool);
         return _namespacePool[i];
     }
 
