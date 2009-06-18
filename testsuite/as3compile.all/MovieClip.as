@@ -41,6 +41,9 @@ package hello {
             check(!MovieClip.prototype.hasOwnProperty("play"));
             check(!MovieClip.prototype.hasOwnProperty("stop"));
             check(!MovieClip.prototype.hasOwnProperty("addFrameScript"));
+            check(!MovieClip.prototype.hasOwnProperty("framesLoaded"));
+            check(!MovieClip.prototype.hasOwnProperty("totalFrames"));
+            check(!MovieClip.prototype.hasOwnProperty("currentFrame"));
             
             var m = new MovieClip();
             check_equals(m.constructor, "[class MovieClip]");
@@ -54,6 +57,9 @@ package hello {
             check(m.hasOwnProperty("play"));
             check(m.hasOwnProperty("stop"));
             check(m.hasOwnProperty("addFrameScript"));
+            check(m.hasOwnProperty("framesLoaded"));
+            check(m.hasOwnProperty("totalFrames"));
+            check(m.hasOwnProperty("currentFrame"));
 
             // Sprite properties
             check(m.hasOwnProperty("graphics"));
@@ -80,9 +86,6 @@ package hello {
             check(m.hasOwnProperty("filters"));
             check(m.hasOwnProperty("cacheAsBitmap"));
             check(m.hasOwnProperty("getRect"));
-            check(m.hasOwnProperty("framesLoaded"));
-            check(m.hasOwnProperty("totalFrames"));
-            check(m.hasOwnProperty("currentFrame"));
 
             // AS2-only properties
             check(!m.hasOwnProperty("loadVariables"));
@@ -122,8 +125,8 @@ package hello {
             check(!m.hasOwnProperty("attachVideo"));
             check(!m.hasOwnProperty("attachAudio"));
 
-            // Check type of properties. Inherited properties should be
-            // dealt with elsewhere.
+            // Check type of MovieClip properties. Inherited properties should
+	    // be dealt with elsewhere.
             check_equals(typeof(m.nextFrame), "function");
             check_equals(typeof(m.prevFrame), "function");
             check_equals(typeof(m.gotoAndStop), "function");
@@ -132,6 +135,9 @@ package hello {
             check_equals(typeof(m.play), "function");
             check_equals(typeof(m.stop), "function");
             check_equals(typeof(m.addFrameScript), "function");
+            check_equals(typeof(m.framesLoaded), "number");
+            check_equals(typeof(m.totalFrames), "number");
+            check_equals(typeof(m.currentFrame), "number");
 
             done();
         }
