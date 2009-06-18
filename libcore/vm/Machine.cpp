@@ -1328,6 +1328,9 @@ Machine::execute()
                     if (a.isRuntime()) {
                         mStack.drop(completeName(a));
                     }
+                    
+                    log_abc("CALL_PROP*: calling property %s of object %s",
+                            mST.value(a.getGlobalName()), mStack.top(0));
 
                     as_value object_val = pop_stack();
 
@@ -1483,9 +1486,16 @@ Machine::execute()
                 {
                     as_environment env = as_environment(_vm);
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    
                     boost::uint32_t argc = mStream->read_V32();
-                    std::auto_ptr< std::vector<as_value> > args = get_args(argc);
+                    std::auto_ptr<std::vector<as_value> > args = get_args(argc);
+                    
+                    log_abc("CONSTRUCT_PROP: will try to construct property "
+                            "%s on object %s", mST.value(a.getGlobalName()),
+                            mStack.top(0));
+
                     as_object* object = pop_stack().to_object().get();
+
                     if (!object) {
                         //TODO: Should this result in an exeception or an 
                         // actionscript error?
@@ -1494,9 +1504,10 @@ Machine::execute()
                         push_stack(as_value());
                         break;
                     }
-                    //std::string& classname = mPoolObject->mStringPool[a.getABCName()];
                     
-                    as_value constructor_val = object->getMember(a.getGlobalName());
+                    as_value constructor_val =
+                        object->getMember(a.getGlobalName());
+
                     boost::intrusive_ptr<as_function> constructor =
                         constructor_val.to_as_function();
                     
@@ -1505,21 +1516,26 @@ Machine::execute()
                             constructor->constructInstance(env, args);
                         push_stack(as_value(newobj));
                     }
-                    // TODO: This else clause is needed to construct classes that
-                    // aren't builtin into gnash. I don't think this is correct,
-                    // and I think the problem might be how AVM2 adds
+                    // TODO: This else clause is needed to construct classes
+                    // that aren't builtin into gnash. I don't think this is
+                    // correct, and I think the problem might be how AVM2 adds
                     // new objects to the Global object.
                     else {
-                        log_abc("Object %s is not a constructor", 
-                                constructor_val.toDebugString());
-                        if (constructor_val.is_null() || constructor_val.is_undefined()) {
-                            log_abc("Constructor is undefined, will not construct "
-                                    "property.");
+                        log_abc("The property we found (%s) is not a "
+                                "constructor", constructor_val);
+
+                        if (constructor_val.is_null() ||
+                                constructor_val.is_undefined()) {
+
+                            log_abc("Constructor is undefined, will not "
+                                    "construct property.");
                             push_stack(as_value());
                         }
                         else {
-                            as_value val = constructor_val.to_object().get()->getMember(
+                            as_value val =
+                                constructor_val.to_object().get()->getMember(
                                     NSV::PROP_CONSTRUCTOR, 0);
+
                             as_value result = call_method(val, env,
                                     constructor_val.to_object().get(),args);
                             push_stack(result);
@@ -2178,7 +2194,6 @@ Machine::execute()
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
 
                     as_value value = mStack.top(0);
-                    LOG_ONCE(log_unimpl("ABC_ACTION_COERCE"));
                     log_abc("COERCE: object for conversion is %s, "
                             "desired type %s", value,
                             mST.value(a.getGlobalName()));
