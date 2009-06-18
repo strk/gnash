@@ -2306,14 +2306,14 @@ doc/Doxyfile
 testsuite/Makefile
 testsuite/media/Makefile
 testsuite/libbase.all/Makefile
-testsuite/as3/Makefile
-testsuite/as3/classes.all/Makefile
+testsuite/as3compile.all/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
+testsuite/misc-haxe.all/classes.all/Makefile
 testsuite/misc-swfmill.all/Makefile
 testsuite/misc-swfc.all/Makefile
 testsuite/network.all/Makefile

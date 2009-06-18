@@ -49,12 +49,12 @@ DIR_SWFDEC_TESTSUITE = swfdec
 endif
 
 if ENABLE_AS3COMPILE
-DIR_AS3 = as3
+DIR_AS3 = as3compile.all
 endif
 
 DIST_SUBDIRS = \
 	media \
-	as3 \
+	as3compile.all \
 	actionscript.all \
 	libbase.all	\
 	libamf.all \
