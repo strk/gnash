@@ -24,6 +24,7 @@ SANE_AS3TESTS = \
 	class.as \
 	lookup.as \
 	function.as \
+	MovieClip.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
