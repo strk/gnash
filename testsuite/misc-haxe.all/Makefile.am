@@ -18,6 +18,8 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+SUBDIRS = classes.all
+
 # These will get executed and parsed for test output
 SANE_ASTESTS = \
 	$(NULL)
