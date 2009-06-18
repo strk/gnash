@@ -1536,9 +1536,8 @@ Machine::execute()
                                 constructor_val.to_object().get()->getMember(
                                     NSV::PROP_CONSTRUCTOR, 0);
 
-                            as_value result = call_method(val, env,
-                                    constructor_val.to_object().get(),args);
-                            push_stack(result);
+                            call_method(val, env,
+                                    constructor_val.to_object().get(), args);
                         }
                     }
                     
