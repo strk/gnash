@@ -28,15 +28,15 @@ package hello {
 
         public function Main() {
 
-            check_equals(Sprite.prototype, "[object Object]");
-            check_equals(Sprite.constructor, "[class Class]");
+            xcheck_equals(Sprite.prototype, "[object Object]");
+            xcheck_equals(Sprite.constructor, "[class Class]");
             
             // The prototype seems really to be just an object. Just
             // test the Sprite properties until there's a reason
             // to check others.
             
             var m = new Sprite();
-            check_equals(m.constructor, "[class Sprite]");
+            xcheck_equals(m.constructor, "[class Sprite]");
             
             // MovieClip properties
             check(!m.hasOwnProperty("nextFrame"));
@@ -52,41 +52,42 @@ package hello {
             check(!m.hasOwnProperty("currentFrame"));
 
             // Sprite properties
-            check(m.hasOwnProperty("graphics"));
-            check(m.hasOwnProperty("buttonMode"));
-            check(m.hasOwnProperty("dropTarget"));
-            check(m.hasOwnProperty("soundTransform"));
-            check(m.hasOwnProperty("useHandCursor"));
-            check(m.hasOwnProperty("stopDrag"));
-            check(m.hasOwnProperty("startDrag"));
+            xcheck(m.hasOwnProperty("graphics"));
+            xcheck(m.hasOwnProperty("buttonMode"));
+            xcheck(m.hasOwnProperty("dropTarget"));
+            xcheck(m.hasOwnProperty("soundTransform"));
+            xcheck(m.hasOwnProperty("useHandCursor"));
+            xcheck(m.hasOwnProperty("stopDrag"));
+            xcheck(m.hasOwnProperty("startDrag"));
 
             // DisplayObjectContainer properties
-            check(m.hasOwnProperty("addChild"));
-            check(m.hasOwnProperty("removeChild"));
+            xcheck(m.hasOwnProperty("addChild"));
+            xcheck(m.hasOwnProperty("removeChild"));
             
             // DisplayObject properties (?)
-            check(m.hasOwnProperty("transform"));
-            check(m.hasOwnProperty("scale9Grid"));
-            check(m.hasOwnProperty("localToGlobal"));
-            check(m.hasOwnProperty("globalToLocal"));
-            check(m.hasOwnProperty("getBounds"));
-            check(m.hasOwnProperty("scrollRect"));
-            check(m.hasOwnProperty("tabIndex"));
-            check(m.hasOwnProperty("opaqueBackground"));
-            check(m.hasOwnProperty("filters"));
-            check(m.hasOwnProperty("cacheAsBitmap"));
-            check(m.hasOwnProperty("getRect"));
+            xcheck(m.hasOwnProperty("transform"));
+            xcheck(m.hasOwnProperty("scale9Grid"));
+            xcheck(m.hasOwnProperty("localToGlobal"));
+            xcheck(m.hasOwnProperty("globalToLocal"));
+            xcheck(m.hasOwnProperty("getBounds"));
+            xcheck(m.hasOwnProperty("scrollRect"));
+            xcheck(m.hasOwnProperty("tabIndex"));
+            xcheck(m.hasOwnProperty("opaqueBackground"));
+            xcheck(m.hasOwnProperty("filters"));
+            xcheck(m.hasOwnProperty("cacheAsBitmap"));
+            xcheck(m.hasOwnProperty("getRect"));
 
             // Check type of Sprite properties. Inherited properties should be
             // dealt with elsewhere.
-            check_equals(typeof(m.graphics), "object");
-            check_equals(typeof(m.buttonMode), "boolean");
-            check_equals(typeof(m.dropTarget), "object");
-            check_equals(typeof(m.soundTransform), "object");
-            check_equals(typeof(m.useHandCursor), "boolean");
-            check_equals(typeof(m.stopDrag), "function");
-            check_equals(typeof(m.startDrag), "function");
+            xcheck_equals(typeof(m.graphics), "object");
+            xcheck_equals(typeof(m.buttonMode), "boolean");
+            xcheck_equals(typeof(m.dropTarget), "object");
+            xcheck_equals(typeof(m.soundTransform), "object");
+            xcheck_equals(typeof(m.useHandCursor), "boolean");
+            xcheck_equals(typeof(m.stopDrag), "function");
+            xcheck_equals(typeof(m.startDrag), "function");
 
+            totals(41);
             done();
         }
     }
