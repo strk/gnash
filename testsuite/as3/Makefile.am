@@ -26,6 +26,7 @@ endif
 SANE_AS3TESTS = \
 	basic.as \
 	class.as \
+	lookup.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
