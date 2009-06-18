@@ -84,7 +84,7 @@ package hello {
             xcheck_equals(typeof(m.dropTarget), "object");
             xcheck_equals(typeof(m.soundTransform), "object");
             xcheck_equals(typeof(m.useHandCursor), "boolean");
-            xcheck_equals(typeof(m.stopDrag), "function");
+            check_equals(typeof(m.stopDrag), "function");
             xcheck_equals(typeof(m.startDrag), "function");
 
             totals(41);
