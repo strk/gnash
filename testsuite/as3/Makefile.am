@@ -27,6 +27,7 @@ SANE_AS3TESTS = \
 	basic.as \
 	class.as \
 	lookup.as \
+	function.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
