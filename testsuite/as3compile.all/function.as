@@ -26,6 +26,9 @@ package p1 {
         public function e(a1) { return a1; }
         public function f(a1, a2) { return a1 + a2; }
         public function g() {}
+        public function h() { return c(); }
+        public function i() { return h(); }
+        public function j() { return bb(); }
 
         public static function aa() { return "string"; }
         public static function bb() { return 10; }
@@ -53,9 +56,9 @@ public class Main extends MovieClip {
         
         check_equals(A.aa(), "string");
         check_equals(typeof(A.aa()), "string");
-        check_equals(A.bb(), "10");
+        check_equals(A.bb(), 10);
         check_equals(typeof(A.bb()), "number");
-        check_equals(A.cc(), "2.45");
+        check_equals(A.cc(), 2.45);
         check_equals(typeof(A.cc()), "number");
         xcheck_equals(A.dd(), "[object Object]");
         check_equals(typeof(A.dd()), "object");
@@ -72,9 +75,9 @@ public class Main extends MovieClip {
         var a = new A();
         check_equals(a.a(), "string");
         check_equals(typeof(a.a()), "string");
-        check_equals(a.b(), "9");
+        check_equals(a.b(), 9);
         check_equals(typeof(a.b()), "number");
-        check_equals(a.c(), "5.65");
+        check_equals(a.c(), 5.65);
         check_equals(typeof(a.c()), "number");
         xcheck_equals(a.d(), "[object Object]");
         check_equals(typeof(a.d()), "object");
@@ -86,6 +89,12 @@ public class Main extends MovieClip {
         check_equals(typeof(a.f(45, 6)), typeof(51));
         check_equals(a.g(), undefined);
         check_equals(typeof(a.g()), "undefined");
+
+        check_equals(a.h(), a.c());
+        check_equals(a.i(), a.h());
+        check_equals(a.i(), 5.65);
+        check_equals(a.j(), A.bb());
+        check_equals(a.j(), 10);
         done();
     }
 }
