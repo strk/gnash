@@ -95,6 +95,10 @@ public class Main extends MovieClip {
         check_equals(a.i(), 5.65);
         check_equals(a.j(), A.bb());
         check_equals(a.j(), 10);
+        
+        check_equals(a.f(a.h(), a.i()), 11.30);
+
+        totals(40);
         done();
     }
 }
