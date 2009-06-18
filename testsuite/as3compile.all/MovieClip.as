@@ -27,8 +27,8 @@ package hello {
 
         public function Main() {
 
-            check_equals(MovieClip.prototype, "[object Object]");
-            check_equals(MovieClip.constructor, "[class Class]");
+            xcheck_equals(MovieClip.prototype, "[object Object]");
+            xcheck_equals(MovieClip.constructor, "[class Class]");
             
             // The prototype seems really to be just an object. Just
             // test the MovieClip properties until there's a reason
@@ -46,46 +46,46 @@ package hello {
             check(!MovieClip.prototype.hasOwnProperty("currentFrame"));
             
             var m = new MovieClip();
-            check_equals(m.constructor, "[class MovieClip]");
+            xcheck_equals(m.constructor, "[class MovieClip]");
             
             // MovieClip properties
-            check(m.hasOwnProperty("nextFrame"));
-            check(m.hasOwnProperty("prevFrame"));
-            check(m.hasOwnProperty("gotoAndStop"));
-            check(m.hasOwnProperty("nextScene"));
-            check(m.hasOwnProperty("prevScene"));
-            check(m.hasOwnProperty("play"));
-            check(m.hasOwnProperty("stop"));
-            check(m.hasOwnProperty("addFrameScript"));
-            check(m.hasOwnProperty("framesLoaded"));
-            check(m.hasOwnProperty("totalFrames"));
-            check(m.hasOwnProperty("currentFrame"));
+            xcheck(m.hasOwnProperty("nextFrame"));
+            xcheck(m.hasOwnProperty("prevFrame"));
+            xcheck(m.hasOwnProperty("gotoAndStop"));
+            xcheck(m.hasOwnProperty("nextScene"));
+            xcheck(m.hasOwnProperty("prevScene"));
+            xcheck(m.hasOwnProperty("play"));
+            xcheck(m.hasOwnProperty("stop"));
+            xcheck(m.hasOwnProperty("addFrameScript"));
+            xcheck(m.hasOwnProperty("framesLoaded"));
+            xcheck(m.hasOwnProperty("totalFrames"));
+            xcheck(m.hasOwnProperty("currentFrame"));
 
             // Sprite properties
-            check(m.hasOwnProperty("graphics"));
-            check(m.hasOwnProperty("buttonMode"));
-            check(m.hasOwnProperty("dropTarget"));
-            check(m.hasOwnProperty("soundTransform"));
-            check(m.hasOwnProperty("useHandCursor"));
-            check(m.hasOwnProperty("stopDrag"));
-            check(m.hasOwnProperty("startDrag"));
+            xcheck(m.hasOwnProperty("graphics"));
+            xcheck(m.hasOwnProperty("buttonMode"));
+            xcheck(m.hasOwnProperty("dropTarget"));
+            xcheck(m.hasOwnProperty("soundTransform"));
+            xcheck(m.hasOwnProperty("useHandCursor"));
+            xcheck(m.hasOwnProperty("stopDrag"));
+            xcheck(m.hasOwnProperty("startDrag"));
 
             // DisplayObjectContainer properties
-            check(m.hasOwnProperty("addChild"));
-            check(m.hasOwnProperty("removeChild"));
+            xcheck(m.hasOwnProperty("addChild"));
+            xcheck(m.hasOwnProperty("removeChild"));
             
             // DisplayObject properties (?)
-            check(m.hasOwnProperty("transform"));
-            check(m.hasOwnProperty("scale9Grid"));
-            check(m.hasOwnProperty("localToGlobal"));
-            check(m.hasOwnProperty("globalToLocal"));
-            check(m.hasOwnProperty("getBounds"));
-            check(m.hasOwnProperty("scrollRect"));
-            check(m.hasOwnProperty("tabIndex"));
-            check(m.hasOwnProperty("opaqueBackground"));
-            check(m.hasOwnProperty("filters"));
-            check(m.hasOwnProperty("cacheAsBitmap"));
-            check(m.hasOwnProperty("getRect"));
+            xcheck(m.hasOwnProperty("transform"));
+            xcheck(m.hasOwnProperty("scale9Grid"));
+            xcheck(m.hasOwnProperty("localToGlobal"));
+            xcheck(m.hasOwnProperty("globalToLocal"));
+            xcheck(m.hasOwnProperty("getBounds"));
+            xcheck(m.hasOwnProperty("scrollRect"));
+            xcheck(m.hasOwnProperty("tabIndex"));
+            xcheck(m.hasOwnProperty("opaqueBackground"));
+            xcheck(m.hasOwnProperty("filters"));
+            xcheck(m.hasOwnProperty("cacheAsBitmap"));
+            xcheck(m.hasOwnProperty("getRect"));
 
             // AS2-only properties
             check(!m.hasOwnProperty("loadVariables"));
@@ -127,17 +127,19 @@ package hello {
 
             // Check type of MovieClip properties. Inherited properties should
 	    // be dealt with elsewhere.
-            check_equals(typeof(m.nextFrame), "function");
-            check_equals(typeof(m.prevFrame), "function");
-            check_equals(typeof(m.gotoAndStop), "function");
-            check_equals(typeof(m.nextScene), "function");
-            check_equals(typeof(m.prevScene), "function");
-            check_equals(typeof(m.play), "function");
-            check_equals(typeof(m.stop), "function");
-            check_equals(typeof(m.addFrameScript), "function");
-            check_equals(typeof(m.framesLoaded), "number");
-            check_equals(typeof(m.totalFrames), "number");
-            check_equals(typeof(m.currentFrame), "number");
+            xcheck_equals(typeof(m.nextFrame), "function");
+            xcheck_equals(typeof(m.prevFrame), "function");
+            xcheck_equals(typeof(m.gotoAndStop), "function");
+            xcheck_equals(typeof(m.nextScene), "function");
+            xcheck_equals(typeof(m.prevScene), "function");
+            xcheck_equals(typeof(m.play), "function");
+            xcheck_equals(typeof(m.stop), "function");
+            xcheck_equals(typeof(m.addFrameScript), "function");
+            xcheck_equals(typeof(m.framesLoaded), "number");
+            xcheck_equals(typeof(m.totalFrames), "number");
+            xcheck_equals(typeof(m.currentFrame), "number");
+
+            totals(92);
 
             done();
         }
