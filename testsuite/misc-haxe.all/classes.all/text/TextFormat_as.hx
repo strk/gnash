@@ -61,21 +61,25 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.fail("TextFormat.blockIndent property doesn't exist");
 	}
+
 	if (Std.is(x1.align, String)) {
 	    DejaGnu.pass("TextFormat.align property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.align property doesn't exist");
 	}
+
 	if (Std.is(x1.bold, Dynamic)) {
 	    DejaGnu.pass("TextFormat.bold property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.bold property doesn't exist");
 	}
+
 	if (Std.is(x1.bullet, Dynamic)) {
 	    DejaGnu.pass("TextFormat.bullet property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.bullet property doesn't exist");
 	}
+
 	if (Std.is(x1.color, Dynamic)) {
 	    DejaGnu.pass("TextFormat.color property exists");
 	} else {
@@ -92,41 +96,49 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.fail("TextFormat.indent property doesn't exist");
 	}
+
 	if (Std.is(x1.italic, Dynamic)) {
 	    DejaGnu.pass("TextFormat.italic property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.italic property doesn't exist");
 	}
+
 	if (Std.is(x1.kerning, Dynamic)) {
 	    DejaGnu.pass("TextFormat.kerning property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.kerning property doesn't exist");
 	}
+
 	if (Std.is(x1.leading, Dynamic)) {
 	    DejaGnu.pass("TextFormat.leading property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.leading property doesn't exist");
 	}
+
 	if (Std.is(x1.leftMargin, Dynamic)) {
 	    DejaGnu.pass("TextFormat.leftMargin property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.leftMargin property doesn't exist");
 	}
+
 	if (Std.is(x1.letterSpacing, Dynamic)) {
-	    DejaGnu.xpass("TextFormat.letterSpacing property exists");
+	    DejaGnu.pass("TextFormat.letterSpacing property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.letterSpacing property doesn't exist");
+	    DejaGnu.fail("TextFormat.letterSpacing property doesn't exist");
 	}
+
 	if (Std.is(x1.rightMargin, Dynamic)) {
 	    DejaGnu.pass("TextFormat.rightMargin property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.rightMargin property doesn't exist");
 	}
+
 	if (Std.is(x1.size, Dynamic)) {
 	    DejaGnu.pass("TextFormat.size property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.size property doesn't exist");
 	}
+
 	if (Std.is(x1.underline, Dynamic)) {
 	    DejaGnu.pass("TextFormat.underline property exists");
 	} else {
@@ -134,67 +146,97 @@ class TextFormat_as {
 	}
 #else
 	x1.blockIndent = 0.0;
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.blockIndent) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.blockIndent property exists");
+
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+/*	DejaGnu.note("Test 1 "+untyped __typeof__(x1.blockIndent) );
+	DejaGnu.note("Test 2 "+untyped Type.typeof(x1.blockIndent) );
+	DejaGnu.note("Test 3 "+untyped __typeof__(TextFormat.blockIndent) );
+	DejaGnu.note("Test 4 "+untyped Type.typeof(TextFormat.blockIndent) );	
+*/
+//	if (Type.typeof(x1.blockIndent) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.blockIndent) )== 'number'){
+	    DejaGnu.pass("TextFormat.blockIndent property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.blockIndent property should be float, returns type "+Type.typeof(x1.blockIndent));
+	    DejaGnu.fail("TextFormat.blockIndent property should be float, returns type "+Type.typeof(x1.blockIndent));
 	}
+
 	if (Std.is(x1.align, String)) {
 	    DejaGnu.pass("TextFormat.align property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.align property doesn't exist");
 	}
+
 	if (Type.typeof(x1.bold) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.bold property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.bold property doesn't exist");
 	}
+
 	if (Type.typeof(x1.bullet) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.bullet property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.bullet property doesn't exist");
 	}
+
 	if (Type.typeof(x1.color) == ValueType.TInt) {
 	    DejaGnu.pass("TextFormat.color property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.color property doesn't exist");
 	}
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.indent) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.indent property exists");
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+//	if (Type.typeof(x1.indent) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.indent  ) )== 'number'){
+	    DejaGnu.pass("TextFormat.indent property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.indent property should be float, returns type "+Type.typeof(x1.indent));
+	    DejaGnu.fail("TextFormat.indent property should be float, returns type "+Type.typeof(x1.indent));
 	}
+
 	if (Type.typeof(x1.italic) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.italic property exists");
 	} else {
 	    DejaGnu.fail("TextFormat.italic property doesn't exist");
 	}
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.leading) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.leading property exists");
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+//	if (Type.typeof(x1.leading) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.leading  ) )== 'number'){
+	    DejaGnu.pass("TextFormat.leading property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.leading property should be float, returns type "+Type.typeof(x1.leading));
+	    DejaGnu.fail("TextFormat.leading property should be float, returns type "+Type.typeof(x1.leading));
 	}
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.leftMargin) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.leftMargin property exists");
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+//	if (Type.typeof(x1.leftMargin) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.leftMargin  ) )== 'number'){
+	    DejaGnu.pass("TextFormat.leftMargin property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.leftMargin property should be float, returns type "+Type.typeof(x1.leftMargin));
+	    DejaGnu.fail("TextFormat.leftMargin property should be float, returns type "+Type.typeof(x1.leftMargin));
 	}
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.rightMargin) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.rightMargin property exists");
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+//	if (Type.typeof(x1.rightMargin) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.rightMargin  ) )== 'number'){	
+	    DejaGnu.pass("TextFormat.rightMargin property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.rightMargin property should be float, returns type "+Type.typeof(x1.rightMargin));
+	    DejaGnu.fail("TextFormat.rightMargin property should be float, returns type "+Type.typeof(x1.rightMargin));
 	}
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.size) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.size property exists");
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+//	if (Type.typeof(x1.size) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.size  ) )== 'number'){
+	    DejaGnu.pass("TextFormat.size property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.size property should be float, returns type "+Type.typeof(x1.size));
+	    DejaGnu.fail("TextFormat.size property should be float, returns type "+Type.typeof(x1.size));
 	}
+
 	if (Type.typeof(x1.underline) == ValueType.TBool) {
 	    DejaGnu.pass("TextFormat.underline property exists");
 	} else {
@@ -208,12 +250,16 @@ class TextFormat_as {
 	    DejaGnu.fail("TextFormat.kerning property doesn't exist");
 	}
 	x1.letterSpacing = 0.0;
-	//FIXME: gnash uses incorrect data type Int
-	if (Type.typeof(x1.letterSpacing) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextFormat.letterSpacing property exists");
+	//FIX ME: gnash uses incorrect data type Int
+	//FIXED 
+	// SI
+//	if (Type.typeof(x1.letterSpacing) == ValueType.TFloat) {
+	if (Std.string(untyped __typeof__(x1.letterSpacing  ) )== 'number'){
+		    DejaGnu.pass("TextFormat.letterSpacing property exists");
 	} else {
-	    DejaGnu.xfail("TextFormat.letterSpacing property should be float, returns type "+Type.typeof(x1.letterSpacing));
+	    DejaGnu.fail("TextFormat.letterSpacing property should be float, returns type "+Type.typeof(x1.letterSpacing));
 	}
+
 	if (Std.is(x1.display, String)) {
 	    DejaGnu.pass("TextFormat.display property exists");
 	} else {
@@ -226,17 +272,20 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.fail("TextFormat.font property doesn't exist");
 	}
+
 	x1.tabStops = [0,1,2,3];
 	if (Std.is(x1.tabStops, Array)) {
 	    DejaGnu.pass("TextFormat.tabStops property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.tabStops property doesn't exist");
 	}
+
 	if (Std.is(x1.target, String)) {
 	    DejaGnu.pass("TextFormat.target property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.target property doesn't exist");
 	}
+
 	if (Std.is(x1.url, String)) {
 	    DejaGnu.pass("TextFormat.url property exists");
 	} else {
@@ -253,6 +302,480 @@ class TextFormat_as {
 	}
 #end
         // Call this after finishing all tests. It prints out the totals.
+
+//Si
+//The followings are ming tests:
+
+//      Not implemeted in the haXe here.
+//      Object.prototype.hasOwnProperty = ASnative(101, 5);
+//	DejaGnu.note("type of TextFormat" + untyped __typeof__(TextFormat));
+//	DejaGnu.note("type of TextFormat.phototype" + untyped __typeof__(TextFormat.prototype));
+
+#if flash9
+	if (Std.string(untyped __typeof__(TextFormat) )== 'object'){
+		DejaGnu.pass("The type of TextFormat is 'object' in flash 9");
+	} else {
+	    DejaGnu.fail("The type of TextFormat is not 'object' in flash 9");
+	}
+#else
+	if (Std.string(untyped __typeof__(TextFormat) )== 'function'){
+		DejaGnu.pass("The type of TextFormat is 'fucntion'");
+	} else {
+	    DejaGnu.fail("The type of TextFormat is not 'fucntion'");
+	}
+#end
+
+	if (Std.string(untyped __typeof__(TextFormat.prototype))== 'object'){
+		DejaGnu.pass("The type of TextFormat.prototype is 'object'");
+	} else {
+	    DejaGnu.fail("The type of TextFormat.prototype is not 'object'");
+	}
+	
+//Si
+//build an instance
+
+	var tfObj:TextFormat = new TextFormat();
+
+//	DejaGnu.note("type of TextFormat" + Type.typeof(tfObj));
+	if (Std.string(untyped __typeof__(tfObj))== 'object'){
+		DejaGnu.pass("The type of tfObj is 'object'");
+	} else {
+	    DejaGnu.fail("The type of tfObj is not 'object'");
+	}
+
+#if flash9
+	if (Std.is(tfObj, TextFormat) ){
+		DejaGnu.pass("'tfObj' is an instance of TextFormat");
+	} else {
+	    DejaGnu.fail("'tfObj' is not an instance of TextFormat");
+	}	
+#else
+
+//Si
+//Check "is" a instance
+//	DejaGnu.note(""+untyped __instanceof__(tfObj, TextFormat));
+	if (untyped __instanceof__(tfObj,TextFormat) ){
+		DejaGnu.pass("'tfObj' is an instance of TextFormat");
+	} else {
+	    DejaGnu.fail("'tfObj' is not an instance of TextFormat");
+	}	
+#end
+
+#if (flash6 || flash7 || flash8)
+
+	if (untyped TextFormat.prototype.hasOwnProperty("display")) {
+		DejaGnu.pass("TextFormat.prototype.'display' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'display' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("bullet")) {
+		DejaGnu.pass("TextFormat.prototype.'bullet' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'bullet' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("tabStops")) {
+	DejaGnu.pass("TextFormat.prototype.'tabStops' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'tabStops' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("blockIndent")) {
+		DejaGnu.pass("TextFormat.prototype.'blockIndent' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'blockIndent' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("leading")) {
+	DejaGnu.pass("TextFormat.prototype.'leading' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'leading' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("indent")) {
+		DejaGnu.pass("TextFormat.prototype.'indent' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'indent' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("rightMargin")) {
+		DejaGnu.pass("TextFormat.prototype.'rightMargin' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'rightMargin' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("leftMargin")) {
+		DejaGnu.pass("TextFormat.prototype.'leftMargin' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'leftMargin' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("align")) {
+		DejaGnu.pass("TextFormat.prototype.'align' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'align' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("underline")) {
+		DejaGnu.pass("TextFormat.prototype.'underline' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'underline' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("italic")) {
+		DejaGnu.pass("TextFormat.prototype.'italic' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'italic' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("bold")) {
+		DejaGnu.pass("TextFormat.prototype.'bold' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'bold' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("target")) {
+		DejaGnu.pass("TextFormat.prototype.'target' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'target' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("url")) {
+		DejaGnu.pass("TextFormat.prototype.'url' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'url' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("color")) {
+		DejaGnu.pass("TextFormat.prototype.'color' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'color' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("size")) {
+		DejaGnu.pass("TextFormat.prototype.'size' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'size' property does not exist");
+	}
+
+	if (untyped TextFormat.prototype.hasOwnProperty("font")) {
+		DejaGnu.pass("TextFormat.prototype.'font' property exists");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'font' property does not exist");
+	}
+
+	if (untyped !TextFormat.prototype.hasOwnProperty("getTextExtent")) {
+		DejaGnu.pass("TextFormat.prototype.'getTextExtent' property does not exist");
+	} else {
+		DejaGnu.fail("TextFormat.prototype.'getTextExtent' property exists! WRONG!");
+	}
+
+	if (untyped tfObj.hasOwnProperty("getTextExtent")) {
+		DejaGnu.pass("tfObj.'getTextExtent' property exists");
+	} else {
+		DejaGnu.fail("tfObj.'getTextExtent' property does not exist");
+	}
+#else
+#end
+
+//More checks.
+// When you construct a TextFormat w/out args all members
+// are of the 'null' type. In general, uninitialized members
+// are all of the 'null' type.
+
+#if flash9
+#else
+	if (Std.string(untyped __typeof__(tfObj.display)) == 'string') {
+		DejaGnu.xpass("Good, tfObj.display is a  'null'.");
+	} else {
+	    DejaGnu.xfail("Wrong, tfObj.display is not 'null'.");
+	}
+
+//Si
+//FIXME
+//tfObj.display() ?????????
+//What is the value????????????
+	
+/*
+	if (Std.string((tfObj.leftMargin)) == 'null') {
+		DejaGnu.xpass("Good, tfObj.leftMargin is a  'null'.");
+	} else {
+	    DejaGnu.xfail("Wrong, tfObj.leftMargin is not 'null'.");
+	}
+*/
+	if (Std.string(untyped __typeof__(tfObj.bullet)) == 'null') {
+		DejaGnu.pass("Good, tfObj.bullet is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.bullet is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.tabStops)) == 'null') {
+		DejaGnu.xpass("Good, tfObj.tabStops is a  'null'.");
+	} else {
+	    DejaGnu.xfail("Wrong, tfObj.tabStops is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.blockIndent)) == 'null') {
+		DejaGnu.pass("Good, tfObj.blockIndent is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.blockIndent is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.leading)) == 'null') {
+		DejaGnu.pass("Good, tfObj.leading is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.leading is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.indent)) == 'null') {
+		DejaGnu.pass("Good, tfObj.indent is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.indent is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.rightMargin)) == 'null') {
+		DejaGnu.pass("Good, tfObj.rightMargin is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.rightMargin is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.leftMargin)) == 'null') {
+		DejaGnu.pass("Good, tfObj.leftMargin is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.leftMargin is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.align)) == 'null') {
+		DejaGnu.pass("Good, tfObj.align is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.align is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.underline)) == 'null') {
+		DejaGnu.pass("Good, tfObj.underline is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.underline is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.italic)) == 'null') {
+		DejaGnu.pass("Good, tfObj.italic is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.italic is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.bold)) == 'null') {
+		DejaGnu.pass("Good, tfObj.bold is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.bold is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.target)) == 'null') {
+		DejaGnu.pass("Good, tfObj.target is a  'null'.");
+	} else {
+	    DejaGnu.xfail("Wrong, tfObj.target is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.url)) == 'null') {
+		DejaGnu.xpass("Good, tfObj.url is a  'null'.");
+	} else {
+	    DejaGnu.xfail("Wrong, tfObj.url is not 'null'.");
+	}
+
+ 	if (Std.string(untyped __typeof__(tfObj.color)) == 'null') {
+		DejaGnu.pass("Good, tfObj.color is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.color is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.size)) == 'null') {
+		DejaGnu.pass("Good, tfObj.size is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.size is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.font)) == 'null') {
+		DejaGnu.pass("Good, tfObj.font is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.font is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.getTextExtent))== 'function'){
+		DejaGnu.pass("The type of tfObj.getTextExtent is 'function'");
+	} else {
+	    DejaGnu.fail("The type of tfObj.getTextExtent is not 'functino'");
+	} 
+#end
+
+#if flash9
+	var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4);
+#else
+	var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","cEnter",untyped "23",untyped "32", 12, 4);
+//      This is the right way.
+//	var tfObj:TextFormat = untyped __new__(TextFormat, ["fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4]);
+//	There must be a problme here.
+//	var tfObj:TextFormat = 	Reflect.callMethod(TextFormat, Reflect.field(TextFormat,"new"), ["fname", 2, 30, true, false, true,"http","tgt","cEnter",23,32, 12,4]);
+#end
+/*
+	DejaGnu.note("type of TextFormat" + untyped __typeof__(tfObj.display)+tfobj.display);
+	if (Std.string(untyped __typeof__(tfObj.display))== 'string'){
+		DejaGnu.pass("The type of tfObj.display is 'string'");
+	} else {
+	    DejaGnu.fail("The type of tfObj.display is not 'string'");
+	}
+	if (tfObj.display == "block") {
+		DejaGnu.pass("The type of tfObj.display is 'string'");
+	} else {
+	    DejaGnu.fail("The type of tfObj.display is not 'string'");
+	}
+*/
+
+	if (tfObj.leading == 4) {
+		DejaGnu.pass("Good, tfObj.leading equals to 4.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.leading does not equal to 4.");
+	}
+
+	if (tfObj.indent == 12) {
+		DejaGnu.pass("Good, tfObj.indent equals to 12.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.indent does not equal to 12.");
+	}
+
+	if (tfObj.rightMargin == 32) {
+		DejaGnu.pass("Good, tfObj.rightMargin equals to 32.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.rightMargin does not equal to 32.");
+	}
+
+	if (tfObj.leftMargin == 23) {
+		DejaGnu.pass("Good, tfObj.leftMargin equals to 23.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.leftMargin does not equal to 23.");
+	}
+
+	if (tfObj.font == "fname") {
+		DejaGnu.pass("Good, tfObj.font equals to 'fname'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.font does not equal to 'fname'.");
+	}	
+
+	if (tfObj.underline == true) {
+		DejaGnu.pass("Good, tfObj.underline equals to true.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.underline does not equal to true.");
+	}	
+
+	if (tfObj.italic == false) {
+		DejaGnu.pass("Good, tfObj.italic equals to false.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.italic does not equal to false.");
+	}
+
+	if (tfObj.bold == true) {
+		DejaGnu.pass("Good, tfObj.bold equals to true.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.bold does not equal to true.");
+	}	
+
+	if (tfObj.color == 30) {
+		DejaGnu.pass("Good, tfObj.color equals to 30.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.color does not equal to 30.");
+	}
+
+	if (tfObj.size == 2) {
+		DejaGnu.pass("Good, tfObj.size equals to 2.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.size does not equal to 2.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.rightMargin) )== 'number'){
+		DejaGnu.pass("Good, tfObj.rightMargin is a  'number'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.rightMargin is not a 'number'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.leftMargin) )== 'number'){
+		DejaGnu.pass("Good, tfObj.leftMargin is a  'number'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.leftMargin is not a 'number'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.italic) )== 'boolean'){
+		DejaGnu.pass("Good, tfObj.leftMargin is a  'boolean'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.leftMargin is not a 'boolean'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.italic))== 'boolean') {
+		DejaGnu.pass("Good, tfObj.italic is a  'boolean'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.italic is not 'boolean'.");
+	}	
+
+#if (flash6 || flash7 || flash8)
+	if (tfObj.align == "center") {
+		DejaGnu.pass("Good, tfObj.align equals to 'center'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.align does not equal to 'center'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.string)) == 'undefined') {
+		DejaGnu.pass("Good, tfObj.display is 'undefined'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.display is not 'undefined'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.tabStops)) == 'undefined') {
+		DejaGnu.pass("Good, tfObj.tabStops is 'undefined'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.tabStops is not 'undefined'.");
+	}
+
+	if (tfObj.target != "tgt") {
+		DejaGnu.pass("Good, tfObj.target does not equal to 'tgt'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.target equals to 'tgt'.");
+	}
+
+	if (tfObj.url != "http") {
+		DejaGnu.pass("Good, tfObj.url does not equal to 'http'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.url equals to 'http'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.bullet)) == 'null') {
+		DejaGnu.pass("Good, tfObj.bullet is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.bullet is not 'null'.");
+	}
+
+	if (Std.string(untyped __typeof__(tfObj.blockIndent)) == 'null') {
+		DejaGnu.pass("Good, tfObj.blockIndent is a  'null'.");
+	} else {
+	    DejaGnu.fail("Wrong, tfObj.blockIndent is not 'null'.");
+	}
+//	DejaGnu.note("1"+untyped __typeof__(tfObj.display));
+//	DejaGnu.note("2"+ tfObj.display);
+
+#else
+#end
+//	DejaGnu.note("3"+untyped __typeof__(tfObj.tapStops));
+	
+//The following tests has not been implemented!
+
+/*
+xcheck_equals(typeof(tfObj.display), 'string');
+xcheck_equals(tfObj.display, 'block');
+
+xcheck_equals(typeof(tfObj.tabStops), 'null');
+
+check_equals(typeof(tfObj.rightMargin), 'number'); // even if we passed a string to it
+check_equals(typeof(tfObj.leftMargin), 'number'); // even if we passed a string to it
+
+*/
+
         DejaGnu.done();
     }
 }

@@ -55,7 +55,7 @@ class System_as {
 // 	} else {
 // 	    DejaGnu.fail("System.ime property doesn't exist");
 // 	}
-
+/*
 #if flash9
 	DejaGnu.note("Warning! Type of exit "   + Type.typeof(System.exit));
         DejaGnu.note("Warning! Type of gc "   + Type.typeof(System.gc) );
@@ -63,7 +63,7 @@ class System_as {
 	DejaGnu.note("Warning! Type of resume" + Type.typeof(System.resume) );
 	DejaGnu.note("Warning! type of setClipboard "   + Type.typeof(System.setClipboard));
 #end
-
+*/
 //Test System.totalMemory
 #if flash9
 	if (Type.typeof(System.totalMemory) == ValueType.TInt) {
@@ -98,11 +98,15 @@ class System_as {
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation
 
-
 // Si: I am not sure if these four functions are well defined!!!!!!
 // They are claimed. 
 // They may never be implemented!
+
+//Si
+//These functions have not been implemented yet!
+
 #if flash9
+	DejaGnu.note("Warning! exit(), gc(), pause(), and resume() have not been implemented yet!");
 	if (System.exit == null) {
 	    DejaGnu.pass("System::exit() method exists");
 	} else {
@@ -149,20 +153,31 @@ class System_as {
 	} else {
 	    DejaGnu.fail("System::onStatus() method doesn't exist");
 	}
+	if (Std.is(System.onStatus, Dynamic)) {
+	    DejaGnu.pass("System::onStatus() method exists (Dynamic)");
+	} else {
+	    DejaGnu.fail("System::onStatus() method doesn't exist (Danamic)");
+	}
 #end
 
 // Si:
-// Add the following Ming test ");cases
+// Add the following Ming test 
 // June 9 and 10, 2009
 
-DejaGnu.note("\n\n The following tests come from the Ming test. \n Some of the tests may be  duplicated ! \n" );
+DejaGnu.note("\n The following tests come from the Ming test. \n Some of the tests may be  duplicated !\n" );
 
+#if flash9
+//Si
+//The following capabilities.hasOwnProperty tests are not implemented in flash 9!
+// capabilities is now derived from object directly.
+	DejaGnu.note("Warning! Capabilities is now derived from object directly!");
+#else
 if (untyped System.capabilities.hasOwnProperty("version")){
 	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
 	} else {
 		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
 	}
-if (untyped System.capabilities.hasOwnProperty("os")){
+	if (untyped System.capabilities.hasOwnProperty("os")){
 	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
 	} else {
 		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
@@ -292,51 +307,64 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 		DejaGnu.fail("System 'exactSettings' property does not exist");
 	}	
-
-        // Call this after finishing all tests. It prints out the totals.
-
-
-//Si
-//Check te versions more carefully!
+#end
+       
+//Si	//Check te versions more carefully!
 
 #if flash6
 	//Do Nothing!
 #else
 //	DejaGnu.note("__proto__: " + Type.typeof(untyped System.__proto__));
+#if flash9
+#else
 	if ( Reflect.isObject(untyped System.__proto__)) {
 		DejaGnu.pass("System.prototype.__proto__ field exists");
 	} else {
 		DejaGnu.fail("System.prototype.__proto__ field does not exist");
 	}
-
-
-#if flash9
-#else
 	if ( untyped System.__proto__ == untyped Object.prototype) {
 		DejaGnu.pass("System.prototype.__proto__ references Object.prototype");
 	} else {
 		DejaGnu.fail("System.prototype.__proto__ does not reference Object.prototype");
 	}
 #end
-
 #end
 
 //	Si
 //	System does not have a constructor
 // 	I can not build a object to check other things!
 
+#if flash9
+//Si
+//security, as well as capabilities, is now derived from object directly!
+//These tests should be done in the security and capabilities class
+#else
 	if (Type.typeof(untyped System.security.allowDomain) == TFunction) {
 	    DejaGnu.pass("System.security 'allowDomain()' method exists");
 	} else {
 	    DejaGnu.fail("System.security 'allowDomain()' method doesn't exist");
 	}
-
 	if (Type.typeof(untyped System.security.loadPolicyFile) == TFunction) {
 	    DejaGnu.pass("System.security 'loadPolicyFile()' method exists");
 	} else {
 	    DejaGnu.fail("System.security 'loadPolicyFile()' method doesn't exist");
 	}
-#if !flash6
+	if (Type.typeof(untyped System.showSettings) == TFunction) {
+	    DejaGnu.pass("System.'showSettings()' method exists");
+	} else {
+	    DejaGnu.fail("System.'showSettings()' method doesn't exist");
+	}
+#end
+	if (Type.typeof(untyped System.setClipboard) == TFunction) {
+	    DejaGnu.pass("System.'setClipboard()' method exists");
+	} else {
+	    DejaGnu.fail("System.'setClipboard()' method doesn't exist");
+	}
+
+#if flash6
+#else 
+#if flash9
+#else
 	if ( Type.typeof(untyped System.security.allowInsecureDomain) == TFunction ){
 	    DejaGnu.pass("System.security 'allowInsecureDomain()' method exists");
 	} else {
@@ -348,10 +376,14 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 	    DejaGnu.fail("System capabilities doesn't exist");
 	}
+#end
 #end	
 
 //	DejaGnu.note("system.capabilities type: " + Type.typeof(untyped System.capabilities.version));
-        if (Std.is(untyped System.capabilities.version, String)){
+
+#if flash9
+#else    
+    if (Std.is(untyped System.capabilities.version, String)){
 	    DejaGnu.pass("System.capabilities.version is a string ");
 	} else {
 	    DejaGnu.fail("System.capabilities.version is not a string");
@@ -376,7 +408,6 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 	    DejaGnu.fail("System.capabilities.serverString is not a string");
 	}
-
 	if (Std.is(untyped System.capabilities.screenColor, String)){
 	   DejaGnu.pass("System.capabilities.screenColor is a string ");
 	} else {
@@ -388,13 +419,11 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 	    DejaGnu.fail("System.capabilities.pixelAspectRatio is not a string");
 	}
-
 	if (Std.is(untyped System.capabilities.language, String)){
 	   DejaGnu.pass("System.capabilities.language is a string ");
 	} else {
 	    DejaGnu.fail("System.capabilities.language is not a string");
 	}
-		
 	if (Std.is(untyped System.capabilities.screenResolutionX,Float)){
 	   DejaGnu.pass("System.capabilities.screenResolutionX is a number");
 	} else {
@@ -497,7 +526,9 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 	    DejaGnu.fail("System.capabilities.hasIME is not a bool");
 	}
+#end
 
+/*
 #if flash9
 	if (Std.is(untyped System.capabilities.hasTLS,Bool) ){
 	 DejaGnu.pass("System.capabilities.hasTLS is a bool");
@@ -505,23 +536,30 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	    DejaGnu.fail("System.capabilities.hasTLS is not a bool");
 	}
 #end
-
+*/
 	// System.exactSettings
-#if (flash6 || flash7 ||flsah8 || flash9)
+#if (flash6 || flash7 ||flsah8 )
 	if (Std.is(untyped System.exactSettings, Bool) ){
-	 DejaGnu.pass("System.capabilities.exactSettings is a bool");
+	 DejaGnu.pass("System.exactSettings is a bool");
 	} else {
-	    DejaGnu.fail("System.capabilities.exactSetting is not a bool");
+	    DejaGnu.fail("System.exactSetting is not a bool");
+	}
+	if (Std.is(untyped System.useCodepage, Bool) ){
+	 DejaGnu.pass("System.useCodepage is a bool");
+	} else {
+	    DejaGnu.fail("System.useCodepage is not a bool");
 	}
 #end
 
-	if (Std.is(untyped System.useCodepage, Bool) ){
-	 DejaGnu.pass("System.capabilities.useCodepage is a bool");
+#if flash9
+	if (Std.is(untyped System.useCodePage, Bool) ){
+		 DejaGnu.pass("System.useCodePage is a bool");
 	} else {
-	    DejaGnu.fail("System.capabilities.useCodepage is not a bool");
+	    DejaGnu.fail("System.useCodePage is not a bool");
 	}
+#end
 
-#if (flash6 || flash7 ||flash8 || flash9)
+#if (flash6 || flash7 ||flash8 )
 	if (untyped System.Product.prototype.hasOwnProperty("launch") ){
 		 DejaGnu.fail("System.Product.ptototype 'launch' should not exist, but it exists"); 
 	} else {
@@ -532,7 +570,6 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 	    DejaGnu.pass("System.Product.hasOwnProperty 'download' should not exist");
 	}
-
 #end
 
 #if flash9
@@ -549,12 +586,11 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	System.useCodePage = false;
 	if ( System.useCodePage == false)
 	{
-	 DejaGnu.pass("System.useCodePage is flase");
+	 DejaGnu.pass("System.useCodePage is false");
 	} else {
 	    DejaGnu.fail("System.useCodePage is true");
 	}
 #else
-
 	System.exactSettings = true;
 	if ( System.exactSettings == true)
 	{
@@ -565,11 +601,10 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	System.exactSettings = false;
 	if ( System.exactSettings == false)
 	{
-	 DejaGnu.pass("System.exactSetting is flase");
+	 DejaGnu.pass("System.exactSetting is false");
 	} else {
 	    DejaGnu.xfail("System.exactSetting is true");
 	}
-	
 	System.useCodepage = true;
 	if ( System.useCodepage == true)
 	{
@@ -577,15 +612,13 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	} else {
 	    DejaGnu.xfail("System.useCodepage is false");
 	}
-
 	System.useCodepage = false;
 	if ( System.useCodepage == false)
 	{
-	 DejaGnu.pass("System.useCodepage is flase");
+	 DejaGnu.pass("System.useCodepage is false");
 	} else {
 	    DejaGnu.fail("System.useCodepage is true");
-	}
-	
+	}	
 #end
 
 //Si
@@ -599,6 +632,7 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 //xcheck_equals(typeof(p.launch), 'function');
 	
 //Si
+//FIXME:
 //The following things have not been checked!
 
 //	check_equals(System.capabilities.version, $version);
@@ -607,10 +641,8 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 //	check_equals(this.$version, System.capabilities.version);
 //	xcheck_equals(typeof(System.Product), 'function');
 
-	
 	DejaGnu.done();
-
-
+	// Call this after finishing all tests. It prints out the totals.
     }
 }
 
