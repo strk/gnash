@@ -71,7 +71,6 @@ namespace {
     as_value movieclip_beginGradientFill(const fn_call& fn);
     as_value movieclip_stopDrag(const fn_call& fn);
     as_value movieclip_startDrag(const fn_call& fn);
-    as_value movieclip_removeMovieClip(const fn_call& fn);
     as_value movieclip_gotoAndStop(const fn_call& fn);
     as_value movieclip_duplicateMovieClip(const fn_call& fn);
     as_value movieclip_gotoAndPlay(const fn_call& fn);
@@ -116,6 +115,7 @@ namespace {
     as_value movieclip_as3_ctor(const fn_call& fn);
     as_value movieclip_nextScene(const fn_call& fn);
     as_value movieclip_prevScene(const fn_call& fn);
+    as_value movieclip_addFrameScript(const fn_call& fn);
 
 }
 
@@ -2653,6 +2653,17 @@ attachMovieClipAS3Interface(as_object& o)
     o.init_member("prevFrame", new builtin_function(movieclip_prevFrame));
     o.init_member("prevScene", new builtin_function(movieclip_prevScene));
     o.init_member("stop", new builtin_function(movieclip_stop));
+    o.init_member("addFrameScript", new builtin_function(
+                movieclip_addFrameScript));
+}
+
+as_value
+movieclip_addFrameScript(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl (__FUNCTION__);
+    return as_value();
 }
 
 as_value
