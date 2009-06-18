@@ -1411,12 +1411,10 @@ Machine::execute()
                     mStream->seekTo(0);
                     if (!mStateStack.size()) return;
                     
+                    mGlobalReturn = as_value();
                     restoreState();
+                    
                     if (mExitWithReturn) return;
-                    // Slot the return.
-                    //*mGlobalReturn = as_value();
-                    // And restore the previous state.
-                    //restoreState();
                     break;
                 
                 /// 0x48 ABC_ACTION_RETURNVALUE
