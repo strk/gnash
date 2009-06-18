@@ -56,6 +56,13 @@ package hello {
             check(m.hasOwnProperty("stop"));
             check(m.hasOwnProperty("addFrameScript"));
 
+            // Sprite properties
+            check(m.hasOwnProperty("graphics"));
+            check(m.hasOwnProperty("buttonMode"));
+            check(m.hasOwnProperty("dropTarget"));
+            check(m.hasOwnProperty("soundTransform"));
+            check(m.hasOwnProperty("useHandCursor"));
+
             // DisplayObjectContainer properties
             check(m.hasOwnProperty("addChild"));
             check(m.hasOwnProperty("removeChild"));
@@ -74,7 +81,6 @@ package hello {
             check(m.hasOwnProperty("filters"));
             check(m.hasOwnProperty("cacheAsBitmap"));
             check(m.hasOwnProperty("getRect"));
-            check(m.hasOwnProperty("dropTarget"));
             check(m.hasOwnProperty("framesLoaded"));
             check(m.hasOwnProperty("totalFrames"));
             check(m.hasOwnProperty("currentFrame"));
@@ -119,7 +125,6 @@ package hello {
 
             // Check type of properties. Inherited properties should be
             // dealt with elsewhere.
-            check_equals(typeof(m.graphics), "object");
             check_equals(typeof(m.nextFrame), "function");
             check_equals(typeof(m.prevFrame), "function");
             check_equals(typeof(m.gotoAndStop), "function");
