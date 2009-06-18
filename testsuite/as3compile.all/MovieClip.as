@@ -46,7 +46,6 @@ package hello {
             check_equals(m.constructor, "[class MovieClip]");
             
             // MovieClip properties
-            check(m.hasOwnProperty("graphics"));
             check(m.hasOwnProperty("nextFrame"));
             check(m.hasOwnProperty("prevFrame"));
             check(m.hasOwnProperty("gotoAndStop"));
@@ -62,6 +61,8 @@ package hello {
             check(m.hasOwnProperty("dropTarget"));
             check(m.hasOwnProperty("soundTransform"));
             check(m.hasOwnProperty("useHandCursor"));
+            check(m.hasOwnProperty("stopDrag"));
+            check(m.hasOwnProperty("startDrag"));
 
             // DisplayObjectContainer properties
             check(m.hasOwnProperty("addChild"));
@@ -70,8 +71,6 @@ package hello {
             // DisplayObject properties (?)
             check(m.hasOwnProperty("transform"));
             check(m.hasOwnProperty("scale9Grid"));
-            check(m.hasOwnProperty("stopDrag"));
-            check(m.hasOwnProperty("startDrag"));
             check(m.hasOwnProperty("localToGlobal"));
             check(m.hasOwnProperty("globalToLocal"));
             check(m.hasOwnProperty("getBounds"));
