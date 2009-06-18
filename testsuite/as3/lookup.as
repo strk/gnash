@@ -45,7 +45,7 @@ public class Main extends MovieClip {
         check_equals(typeof(a.id()), "string");
 
         // Check non-static function lookup
-        check_equals(a.id(), "p1.A");
+        xcheck_equals(a.id(), "p1.A");
         
         // Check static function lookup.
         check_equals(B.id(), "p1.B");

@@ -48,7 +48,7 @@ public class Main extends MovieClip {
 
     public function Main() {
 
-        check_equals(A.aa, "function Function() {}");
+        xcheck_equals(A.aa, "function Function() {}");
         check_equals(typeof(A.aa), "function");
         
         check_equals(A.aa(), "string");
@@ -57,7 +57,7 @@ public class Main extends MovieClip {
         check_equals(typeof(A.bb()), "number");
         check_equals(A.cc(), "2.45");
         check_equals(typeof(A.cc()), "number");
-        check_equals(A.dd(), "[object Object]");
+        xcheck_equals(A.dd(), "[object Object]");
         check_equals(typeof(A.dd()), "object");
         check_equals(A.ee("f"), "f");
         check_equals(typeof(A.ee("f")), typeof("f"));
@@ -76,7 +76,7 @@ public class Main extends MovieClip {
         check_equals(typeof(a.b()), "number");
         check_equals(a.c(), "5.65");
         check_equals(typeof(a.c()), "number");
-        check_equals(a.d(), "[object Object]");
+        xcheck_equals(a.d(), "[object Object]");
         check_equals(typeof(a.d()), "object");
         check_equals(a.e("f"), "f");
         check_equals(typeof(a.e("f")), typeof("f"));
