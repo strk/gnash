@@ -3053,7 +3053,6 @@ Machine::restoreState()
 	State &s = mStateStack.top(0);
 	s.to_debug_string();
 //	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
-//	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
 	_registers = s._registers;
@@ -3063,7 +3062,6 @@ Machine::restoreState()
 //	mCurrentScope = s.mCurrentScope;
 //	mGlobalReturn = s.mGlobalReturn;
 //	mThis = s.mThis;
-//	mStateStack.drop(1);
 	mStateStack.pop();
 }
 
@@ -3077,8 +3075,6 @@ Machine::saveState()
 	s.mStackTotalSize = mStack.totalSize();
 	s.mScopeStackDepth = mScopeStack.getDownstop();
 	s.mScopeTotalSize = mScopeStack.totalSize();
-//	s.mScopeStackDepth = mScopeStack.getDownstop();
-//	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
 	s.to_debug_string();
 	s._registers = _registers;
