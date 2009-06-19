@@ -391,14 +391,20 @@ if (x1!=x2){
 	    DejaGnu.fail("statuses.length is not zero");
 	}
 //Si
-//The following undefined one can not be implemented!!!
+//'undefined' is replaced by 'null' !!!
 //haxe can not recognize 'undefined'.
-//	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[undefined]);
-//	if (ret==false){
-//	DejaGnu.pass("x1.connect should be false.");
-//	} else {
-//	    DejaGnu.fail("x1.connect should be false!");
-//	}
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[null]);
+	if (ret==false){
+	DejaGnu.pass("x1.connect(null) should be false.");
+	} else {
+	    DejaGnu.fail("x1.connect(null) should be false!");
+	}
+	if (statuses.length==0){
+		DejaGnu.pass("statuses.length is zero");
+	} else {
+	    DejaGnu.fail("statuses.length is not zero");
+	}
+
 	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),[""]);
 	if (ret==false){
 		DejaGnu.pass("x1.connect('') should be false.");
@@ -543,13 +549,13 @@ if (x1!=x2){
 	    DejaGnu.fail("x2.send('lc_test',1) shoulad be false!");
 	}
 //Si
-//The following undefined tests can not be implemented!
-//	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),["lc_test", funcname]);
-//	if (ret==false){
-//		DejaGnu.pass("x2.send should be false.");
-//	} else {
-//	    DejaGnu.fail("x2.send shoulad be false!");
-//	}
+//built a static function, named funcname
+	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),["lc_test", funcname]);
+	if (ret==false){
+		DejaGnu.pass("x2.send should be false.");
+	} else {
+	    DejaGnu.fail("x2.send shoulad be false!");
+	}
 
 	// But anything else is fine.
 	result = x2.send("lc_test", "8");
@@ -602,6 +608,9 @@ if (x1!=x2){
 	x2.close();
 
 #end
+
+
+
        DejaGnu.done();
 // Call this after finishing all tests. It prints out the totals.
 
@@ -609,14 +618,7 @@ if (x1!=x2){
 
 // Si
 // The following ming tests have not been implemented for some reasons.
-/*
-
-ret = rec.connect(undefined);
-check_equals(ret, false);
-check_equals(statuses.length, 0);
-
-// Checks only for syntactical correctness, not success
-
+/*
 // undefined
 result = snd.send("lc_test", funcname);
 check_equals (result, false);
@@ -625,6 +627,8 @@ check_equals (result, false);
 
 
     }
+
+    static function funcname () {}
 }
 
 // local Variables:

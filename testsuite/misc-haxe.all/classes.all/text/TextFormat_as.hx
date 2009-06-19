@@ -261,7 +261,7 @@ class TextFormat_as {
 	}
 
 	if (Std.is(x1.display, String)) {
-	    DejaGnu.pass("TextFormat.display property exists");
+	    DejaGnu.xpass("TextFormat.display property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.display property doesn't exist");
 	}
@@ -307,7 +307,10 @@ class TextFormat_as {
 //The followings are ming tests:
 
 //      Not implemeted in the haXe here.
-//      Object.prototype.hasOwnProperty = ASnative(101, 5);
+#if flash9
+#else
+        untyped Object.prototype.hasOwnProperty = ASnative(101, 5);
+#end
 //	DejaGnu.note("type of TextFormat" + untyped __typeof__(TextFormat));
 //	DejaGnu.note("type of TextFormat.phototype" + untyped __typeof__(TextFormat.prototype));
 
@@ -491,19 +494,14 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.xfail("Wrong, tfObj.display is not 'null'.");
 	}
+//	DejaGnu.note("tfObj.display:"+Std.string(untyped tfObj.display ));
 
-//Si
-//FIXME
-//tfObj.display() ?????????
-//What is the value????????????
-	
-/*
-	if (Std.string((tfObj.leftMargin)) == 'null') {
-		DejaGnu.xpass("Good, tfObj.leftMargin is a  'null'.");
+	if (Std.string(untyped tfObj.display) == 'block') {
+		DejaGnu.xpass("Wrong, tfObj.display equlas to block.");
 	} else {
-	    DejaGnu.xfail("Wrong, tfObj.leftMargin is not 'null'.");
+	    DejaGnu.xfail("tfObj.display does not equal to 'block'.");
 	}
-*/
+
 	if (Std.string(untyped __typeof__(tfObj.bullet)) == 'null') {
 		DejaGnu.pass("Good, tfObj.bullet is a  'null'.");
 	} else {
@@ -611,24 +609,30 @@ class TextFormat_as {
 	var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4);
 #else
 	var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","cEnter",untyped "23",untyped "32", 12, 4);
+
 //      This is the right way.
 //	var tfObj:TextFormat = untyped __new__(TextFormat, ["fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4]);
 //	There must be a problme here.
 //	var tfObj:TextFormat = 	Reflect.callMethod(TextFormat, Reflect.field(TextFormat,"new"), ["fname", 2, 30, true, false, true,"http","tgt","cEnter",23,32, 12,4]);
 #end
-/*
-	DejaGnu.note("type of TextFormat" + untyped __typeof__(tfObj.display)+tfobj.display);
-	if (Std.string(untyped __typeof__(tfObj.display))== 'string'){
-		DejaGnu.pass("The type of tfObj.display is 'string'");
+
+	if (Std.string(untyped __typeof__(tfObj.display)) == 'string') {
+		DejaGnu.xpass("Good, tfObj.display is a  'null'.");
 	} else {
-	    DejaGnu.fail("The type of tfObj.display is not 'string'");
+	    DejaGnu.xfail("Wrong, tfObj.display is not 'null'.");
 	}
-	if (tfObj.display == "block") {
-		DejaGnu.pass("The type of tfObj.display is 'string'");
+//	DejaGnu.note("tfObj.display:"+Std.string(untyped tfObj.display ));
+	if (Std.string(untyped tfObj.display) == 'block') {
+		DejaGnu.xpass("Wrong, tfObj.display equlas to block.");
 	} else {
-	    DejaGnu.fail("The type of tfObj.display is not 'string'");
+	    DejaGnu.xfail("tfObj.display does not equal to 'block'.");
 	}
-*/
+	
+	if (Std.string(untyped __typeof__(tfObj.tabStops)) == 'null') {
+		DejaGnu.xpass("Good, tfObj.tabStops is a  'null'.");
+	} else {
+	    DejaGnu.xfail("Wrong, tfObj.tabStops is not 'null'.");
+	}
 
 	if (tfObj.leading == 4) {
 		DejaGnu.pass("Good, tfObj.leading equals to 4.");
@@ -733,16 +737,16 @@ class TextFormat_as {
 	    DejaGnu.fail("Wrong, tfObj.tabStops is not 'undefined'.");
 	}
 
-	if (tfObj.target != "tgt") {
-		DejaGnu.pass("Good, tfObj.target does not equal to 'tgt'.");
+	if (tfObj.target == "tgt") {
+		DejaGnu.xpass("Wrong, tfObj.target equals to 'tgt'.");
 	} else {
-	    DejaGnu.fail("Wrong, tfObj.target equals to 'tgt'.");
+	    DejaGnu.xfail("Good, tfObj.target does not equal to 'tgt'.");
 	}
 
-	if (tfObj.url != "http") {
-		DejaGnu.pass("Good, tfObj.url does not equal to 'http'.");
+	if (tfObj.url == "http") {
+		DejaGnu.xpass("Wrong, tfObj.url equals to 'http'.");
 	} else {
-	    DejaGnu.fail("Wrong, tfObj.url equals to 'http'.");
+	    DejaGnu.xfail("Good, tfObj.url does not equal to 'http'.");
 	}
 
 	if (Std.string(untyped __typeof__(tfObj.bullet)) == 'null') {
@@ -761,19 +765,12 @@ class TextFormat_as {
 
 #else
 #end
-//	DejaGnu.note("3"+untyped __typeof__(tfObj.tapStops));
+//	DejaGnu.note("3"+untyped __typeof__(tfObj.tabStops));
 	
 //The following tests has not been implemented!
 
 /*
-xcheck_equals(typeof(tfObj.display), 'string');
-xcheck_equals(tfObj.display, 'block');
-
-xcheck_equals(typeof(tfObj.tabStops), 'null');
-
-check_equals(typeof(tfObj.rightMargin), 'number'); // even if we passed a string to it
-check_equals(typeof(tfObj.leftMargin), 'number'); // even if we passed a string to it
-
+none
 */
 
         DejaGnu.done();

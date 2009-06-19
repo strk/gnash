@@ -142,7 +142,6 @@ class System_as {
 	} else {
 	    DejaGnu.fail("System::showSettings() method doesn't exist");
 	}
-
 //Si:
 //onStatus is a dynamic function only used in the old version!
 //The return type is TNULL 
@@ -308,9 +307,20 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 		DejaGnu.fail("System 'exactSettings' property does not exist");
 	}	
 #end
-       
-//Si	//Check te versions more carefully!
 
+#if flash9
+#else
+var systemObj = untyped __new__(System);
+//DejaGnu.note("type of systemObj: " +Std.string(untyped __typeof__(systemObj)) );
+
+if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
+	DejaGnu.pass("Type of systemObj is undefined");
+} else {
+	DejaGnu.fail("Type of systemObj is not undefined");
+}
+#end
+
+//Si	//Check te versions more carefully!
 #if flash6
 	//Do Nothing!
 #else
@@ -561,14 +571,15 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 
 #if (flash6 || flash7 ||flash8 )
 	if (untyped System.Product.prototype.hasOwnProperty("launch") ){
-		 DejaGnu.fail("System.Product.ptototype 'launch' should not exist, but it exists"); 
+		DejaGnu.xpass("System.Product.ptototype 'launch' should not exist, but it exists");   
 	} else {
-		DejaGnu.pass("System.Product.ptototype 'launch' should not exist");   
+		DejaGnu.xfail("System.Product.ptototype 'launch' should not exist."); 
+		
 	}
 	if (untyped System.Product.prototype.hasOwnProperty("download") ){
-    	    DejaGnu.fail("System.Product.hasOwnProperty 'download' should not exist, but it exists");
+    	    DejaGnu.xpass("System.Product.hasOwnProperty 'download' should not exist, but it exists");
 	} else {
-	    DejaGnu.pass("System.Product.hasOwnProperty 'download' should not exist");
+	    DejaGnu.xfail("System.Product.hasOwnProperty 'download' should not exist");
 	}
 #end
 
@@ -601,16 +612,16 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	System.exactSettings = false;
 	if ( System.exactSettings == false)
 	{
-	 DejaGnu.pass("System.exactSetting is false");
+	 DejaGnu.xpass("System.exactSetting is false");
 	} else {
-	    DejaGnu.xfail("System.exactSetting is true");
+	    DejaGnu.xfail("System.exactSetting is set to be false, but is true");
 	}
 	System.useCodepage = true;
 	if ( System.useCodepage == true)
 	{
-	 DejaGnu.pass("System.useCodepage is true");
+	 DejaGnu.xpass("System.useCodepage is true");
 	} else {
-	    DejaGnu.xfail("System.useCodepage is false");
+	    DejaGnu.xfail("System.useCodepage is set to be true, but is false");
 	}
 	System.useCodepage = false;
 	if ( System.useCodepage == false)
@@ -621,26 +632,95 @@ if (untyped System.hasOwnProperty("exactSettings") ){
 	}	
 #end
 
+#if flash9
+#else
+if (Std.string(untyped __typeof__(System.showSettings)) == 'function') {
+	DejaGnu.pass("Type of System.showSetting is a 'function'.");
+} else {
+	DejaGnu.fail("Type of System.showSetting is not a 'function'.");
+}
+#end
+if (Std.string(untyped __typeof__(System.Product)) == 'function') {
+	DejaGnu.xpass("Type of System.Product is a 'function'.");
+} else {
+	DejaGnu.xfail("Type of System.Product is not a 'function'.");
+}
+
 //Si
-//FIXME:
+//FIX ME:
 //The following test in Ming has not been implemented yet.
+
+//Si
+//Fixed the these 'p = new System.Product("whatisthis")' tests.
+
 //p = new System.Product("whatisthis");
 //xcheck_equals(typeof(p), 'object');
 // Tries to do something with 'whatisthis'
 //xcheck_equals(typeof(p.download), 'function');
 // Tries to exec whatisthis from a particular location?
 //xcheck_equals(typeof(p.launch), 'function');
-	
+//	xcheck_equals(typeof(System.Product), 'function');
+
+#if (flash6 || flash7 || flash8)
+var p = untyped System.Product("whatisthis");
+
+//DejaGnu.note("type of p: " +Std.string(untyped __typeof__(p)) );
+//DejaGnu.note("type of p.download:" + Std.string(untyped __typeof__(p.download))  );
+//DejaGnu.note("type of p.launch:" + Std.string(untyped __typeof__(p.launch))  );
+
+if (Std.string(untyped __typeof__(p)) == 'object') {
+	DejaGnu.xpass("Type of p is 'object'");
+} else {
+	DejaGnu.xfail("Type of p should be 'object', is "+untyped __typeof__(p));
+}
+if (Std.string(untyped __typeof__(p.download)) == 'function') {
+	DejaGnu.xpass("Type of p.download is 'function'.");
+} else {
+	DejaGnu.xfail("Type of p.donwload should be 'functoin', is "+untyped __typeof__(p.download));
+}
+if (Std.string(untyped __typeof__(p.launch)) == 'function') {
+	DejaGnu.xpass("Type of p.launch is 'function'.");
+} else {
+	DejaGnu.xfail("Type of p.launch should be 'function', is "+untyped __typeof__(p));
+}
+#else
+#end
+
 //Si
 //FIXME:
-//The following things have not been checked!
+//The following things have not been checked, since the capabilities class has been moved out.
+// If you want, you can probably make a comparision of the string 
+
+/*
+#if (flash6 || flash7 || flash9)
+
+//      check_equals(typeof($version), 'string');
+//if(Std.string(untyped __typeof__($version)) == 'string'){
+//	DejaGnu.xpass("Type of '$version' is 'string'");
+//} else {
+//	DejaGnu.xfail("Type of '$version' is 'string'");
+//}
 
 //	check_equals(System.capabilities.version, $version);
+//if(Std.string(untyped (System.capabilities.version)) == '$version'){
+//	DejaGnu.xpass("Type of 'System.capabilities.version' is '$version'");
+//} else {
+//	DejaGnu.xfail("Type of 'System.capabilities.version' is '$version'");
+//}
+
 //	check_equals(typeof(_global.$version), 'undefined');
 //	check_equals(typeof(this.$version), 'string');
 //	check_equals(this.$version, System.capabilities.version);
-//	xcheck_equals(typeof(System.Product), 'function');
 
+//DejaGnu.note("type of version: " +Std.string(untyped __typeof__($version)) );
+//DejaGnu.note("System.capabilities.version " +Std.string(untyped System.capabilities.version) );
+//DejaGnu.note("type of _global.$version: " +Std.string(untyped __typeof__(_global.$version)) ;
+//DejaGnu.note("type of this.$version: " +Std.string(untyped __typeof__(this.$version)) ;
+#else
+	//Do nothing in flash9
+#end
+
+*/
 	DejaGnu.done();
 	// Call this after finishing all tests. It prints out the totals.
     }

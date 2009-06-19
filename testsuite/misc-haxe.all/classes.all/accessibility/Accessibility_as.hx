@@ -118,6 +118,16 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
 //      Accessibility has no constructor 
 //	var accObj:Accessibility = new Accessibility();
 
+#if flash9
+#else
+	var accobj = untyped __new__(Accessibility);
+	if (Std.string(untyped __typeof__(accobj)) == 'undefined') {
+		DejaGnu.pass("Type of accobj is undefined");
+} else {
+	DejaGnu.fail("Type of accObj is not undefined");
+}
+#end
+
 //Check the prototype.
 #if flash9
 	//Do Nothing!
