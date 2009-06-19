@@ -26,7 +26,7 @@
 
 namespace gnash {
 
-class StackException {/**/};
+class StackException {};
 
 /// A stack in which all references given remain valid while the stack lives.
 ///
@@ -48,24 +48,27 @@ public:
     // May be useful for callers to know.
     typedef typename StackType::size_type StackSize;
 
-	/// From the top of the stack, get the i'th value down. 0 is the topmost
-	/// value.
+	/// From the top of the stack, get the i'th value down.
+    //
+    /// 0 is the topmost value.
 	const T& top(StackSize i) const
 	{
 
 		if (i >= size()) throw StackException();
-		const StackSize offset = mEnd - i;
-		return mData[offset >> mChunkShift][offset & mChunkMod];
+		const StackSize offset = _end - i;
+		return _data[offset >> _chunkShift][offset & _chunkMod];
 	}
 
-	/// From the top of the stack, get the i'th value down. 0 is the topmost
-	/// value.
+	/// From the top of the stack, get the i'th value down. 
+    //
+    /// This is a non-const version of top().
+    /// 0 is the topmost value value.
 	T& top(StackSize i)
 	{
 
 		if (i >= size()) throw StackException();
-		const StackSize offset = mEnd - i;
-		return mData[offset >> mChunkShift][offset & mChunkMod];
+		const StackSize offset = _end - i;
+		return _data[offset >> _chunkShift][offset & _chunkMod];
 	}
 
 	/// From the bottom of the stack, get the i'th value up. 0 is the
@@ -74,16 +77,16 @@ public:
 	{
 		if (i >= size()) throw StackException();
 
-		StackSize offset = mDownstop + i + 2;
-		return mData[offset >> mChunkShift][offset & mChunkMod];
+		StackSize offset = _downstop + i + 2;
+		return _data[offset >> _chunkShift][offset & _chunkMod];
 	}
 
 	const T& value(StackSize i) const
 	{
 		if (i >= size()) throw StackException();
 
-		StackSize offset = mDownstop + i + 2;
-		return mData[offset >> mChunkShift][offset & mChunkMod];
+		StackSize offset = _downstop + i + 2;
+		return _data[offset >> _chunkShift][offset & _chunkMod];
 	}
 
 	/// Assign a value to given index counting from bottom.
@@ -91,8 +94,8 @@ public:
 	{ 
 		if (i >= size()) throw StackException();
 
-		StackSize offset = mDownstop + i + 2;
-		mData[offset >> mChunkShift][offset & mChunkMod] = val;
+		StackSize offset = _downstop + i + 2;
+		_data[offset >> _chunkShift][offset & _chunkMod] = val;
 	}
 
 	/// Shrink the stack by i entries. Does not invalidate any entries
@@ -101,14 +104,14 @@ public:
 	void drop(StackSize i)
     {
         if (i > size()) throw StackException();
-        mEnd -= i;
+        _end -= i;
     }
 
 	/// Drop all stack elements reguardless of the "downstop"
 	void clear()
 	{
-        mDownstop = 0;
-        mEnd = 1;
+        _downstop = 0;
+        _end = 1;
     }
 
 	/// Put a new value onto the top of the stack.  The value will be
@@ -131,25 +134,25 @@ public:
 	/// when you need more than that.
 	void grow(StackSize i)
 	{
-		StackSize available = (1 << mChunkShift) * mData.size() - mEnd + 1;
+		StackSize available = (1 << _chunkShift) * _data.size() - _end + 1;
 		StackSize n = size()+i;
 		while (available < n)
 		{
-            //log_debug("Increasing size of the real stack: %d.",mData.size());
-			mData.push_back(new T[1 << mChunkShift]);
-			available += 1 << mChunkShift;
+            //log_debug("Increasing size of the real stack: %d.",_data.size());
+			_data.push_back(new T[1 << _chunkShift]);
+			available += 1 << _chunkShift;
 		}
-		mEnd += i;
+		_end += i;
 	}
 
 	/// Gives the size of the stack which is currently accessible.
 	StackSize getDownstop() const 
 	{
-        return mDownstop;
+        return _downstop;
     }
 
 	/// Alias for getDownstop()
-	StackSize size() const { return mEnd - mDownstop - 1; }
+	StackSize size() const { return _end - _downstop - 1; }
 
 	/// Is the stack empty to us? (Check totalSize() != for actually empty)
 	bool empty() const { return size() == 0; }
@@ -159,8 +162,8 @@ public:
 	/// calling. Returns the old downstop for restoring it using setDownstop.
 	StackSize fixDownstop() 
 	{
-        StackSize ret = mDownstop;
-        mDownstop = mEnd - 1;
+        StackSize ret = _downstop;
+        _downstop = _end - 1;
         return ret;
     }
 
@@ -168,8 +171,8 @@ public:
 	/// totalSize()
 	void setDownstop(StackSize i)
 	{
-        if (i > mEnd) throw StackException();
-        mDownstop = i;
+        if (i > _end) throw StackException();
+        _downstop = i;
     }
 
 	/// The total size of the stack. This is not what can be read. That
@@ -178,33 +181,33 @@ public:
 	/// This function is probably not what you need for anything except for
 	/// setting downstops that weren't returned by either fixDownstop() or
 	/// getDownstop()
-	StackSize totalSize() const { return mEnd - 1; }
+	StackSize totalSize() const { return _end - 1; }
 
 	/// Set the total size and local size of the stack, for restoring a
 	/// stack through unknown changes.
 	void setAllSizes(StackSize total, StackSize downstop)
 	{
-        mEnd = total + 1;
-        mDownstop = downstop;
+        _end = total + 1;
+        _downstop = downstop;
     }
 
 	/// Default constructor.
-	SafeStack() : mData(), mDownstop(0), mEnd(1) {}
+	SafeStack() : _data(), _downstop(0), _end(1) {}
 
 	/// Delete the allocated data. 
 	~SafeStack()
 	{
-		for (StackSize i = 0; i < mData.size(); ++i) delete [] mData[i];
+		for (StackSize i = 0; i < _data.size(); ++i) delete [] _data[i];
 	}
 
 private:
-	StackType mData;
-	StackSize mDownstop;
-	StackSize mEnd;
+	StackType _data;
+	StackSize _downstop;
+	StackSize _end;
 
-	// If mChunkMod is not a power of 2 less 1, it will not work properly.
-	static const StackSize mChunkShift = 6;
-	static const StackSize mChunkMod = (1 << mChunkShift) - 1;
+	// If _chunkMod is not a power of 2 less 1, it will not work properly.
+	static const StackSize _chunkShift = 6;
+	static const StackSize _chunkMod = (1 << _chunkShift) - 1;
 };
 
 } // namespace gnash
