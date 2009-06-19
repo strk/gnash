@@ -50,11 +50,21 @@ public:
 
 	/// From the top of the stack, get the i'th value down. 0 is the topmost
 	/// value.
+	const T& top(StackSize i) const
+	{
+
+		if (i >= size()) throw StackException();
+		const StackSize offset = mEnd - i;
+		return mData[offset >> mChunkShift][offset & mChunkMod];
+	}
+
+	/// From the top of the stack, get the i'th value down. 0 is the topmost
+	/// value.
 	T& top(StackSize i)
 	{
 
 		if (i >= size()) throw StackException();
-		StackSize offset = mEnd - i;
+		const StackSize offset = mEnd - i;
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
