@@ -25,7 +25,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "sound_handler_sdl.h"
+#include "sound_handler_ahi.h"
 #include "SoundInfo.h"
 #include "EmbedSound.h"
 #include "AuxStream.h" // for use..

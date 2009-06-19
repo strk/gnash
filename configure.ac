@@ -642,6 +642,25 @@ dnl         ;;
 	add_renderer=agg
 )
 
+add_sound=
+build_sound_sdl=no
+build_sound_ahi=no
+AC_ARG_ENABLE(sound,
+  AC_HELP_STRING([--enable-sound=[[sdl|ahi]]], [Use the specified sound handler (default=sdl)]),
+     [case "${enableval}" in
+      sdl|SDL|Sdl)
+        build_sound_sdl=yes
+        add_sound="sdl"
+        ;;
+      ahi|AHI|Ahi)
+        build_sound_ahi=yes
+        add_sound="ahi"
+        ;;
+     esac],
+  build_sound_sdl=yes
+  add_sound=sdl
+)
+
 if test x$build_ogl = xyes; then
   if test x$build_fb = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
@@ -1750,7 +1769,7 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xgst; then
+if test x$build_sdl = xyes -o x$build_sound_sdl = xyes; then
   GNASH_PATH_SDL
 fi
 
@@ -1993,15 +2012,19 @@ fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
-AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg -o x"$media_handler" = xgst)
+AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
+AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 
-case "${media_handler}" in
-  ffmpeg|gst) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
-  *)
-esac
+if test x$build_sound_sdl = xyes; then
+  AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling])
+fi
+
+if test x$build_sound_ahi = xyes; then
+  AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
+fi
 
 case "${media_handler}" in
   ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
@@ -2463,7 +2486,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-echo "        Using SDL for sound handling"
+echo "        Using ${add_sound} for sound handling"
 echo "        Using $with_shm mode for shared memory"
 echo ""
 echo "Configured paths for ${build} are:"
@@ -2883,8 +2906,7 @@ fi
 # See whether SDL is required
 need_sdl=false
 test x$build_sdl = xyes			&& need_sdl=true
-test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
-test x"$media_handler" = x"gst"		&& need_sdl=true
+test x$build_sound_sdl = xyes	&& need_sdl=true
 
 if $need_sdl; then
   if test x"$SDL_LIBS" != x; then

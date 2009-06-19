@@ -571,12 +571,19 @@ private:
 
 // TODO: move to appropriate specific sound handlers
 
+#ifdef SOUND_SDL
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_sdl();
 
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_sdl(const std::string& wave_file);
-    
+#elif defined(SOUND_AHI)
+/// @throw a SoundException if fails to initialize audio card.
+DSOEXPORT sound_handler* create_sound_handler_aos4();
+
+/// @throw a SoundException if fails to initialize audio card.
+DSOEXPORT sound_handler* create_sound_handler_aos4(const std::string& wave_file);
+#endif
 
 } // gnash.sound namespace 
 } // namespace gnash

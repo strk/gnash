@@ -59,7 +59,10 @@ if USE_SOUND_SDL
  libgnashsound_la_SOURCES += sdl/sound_handler_sdl.cpp 
  noinst_HEADERS += sdl/sound_handler_sdl.h
 endif
-
+if USE_SOUND_AHI
+ libgnashsound_la_SOURCES += aos4/sound_handler_ahi.cpp 
+ noinst_HEADERS += aos4/sound_handler_ahi.h
+endif
 
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 
