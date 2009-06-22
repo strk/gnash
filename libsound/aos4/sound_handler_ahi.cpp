@@ -251,16 +251,15 @@ AOS4_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
     return sound_handler::create_sound(data, sinfo);
 }
 
-// This gets called when an SWF embedded sound stream gets more data
-long
-AOS4_sound_handler::fill_stream_data(unsigned char* data,
+sound_handler::StreamBlockId
+AOS4_sound_handler::addSoundBlock(unsigned char* data,
         unsigned int dataBytes, unsigned int nSamples,
-        int handleId)
+        int streamId)
 {
-    boost::mutex::scoped_lock lock(_mutex);
-    return sound_handler::fill_stream_data(data, dataBytes, nSamples, handleId);
-}
 
+    boost::mutex::scoped_lock lock(_mutex);
+    return sound_handler::addSoundBlock(data, dataBytes, nSamples, streamId);
+}
 
 void
 AOS4_sound_handler::stop_sound(int soundHandle)

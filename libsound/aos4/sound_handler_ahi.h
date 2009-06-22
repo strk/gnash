@@ -117,9 +117,12 @@ public:
     // See dox in sound_handler.h
     virtual int create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> sinfo);
 
-    // see dox in sound_handler.h
-    virtual long    fill_stream_data(unsigned char* data, unsigned int data_bytes,
-                     unsigned int sample_count, int handle_id);
+    // See dox in sound_handler.h
+    // overridden to serialize access to the data buffer slot
+    virtual StreamBlockId addSoundBlock(unsigned char* data,
+                                       unsigned int data_bytes,
+                                       unsigned int sample_count,
+                                       int streamId);
 
     // See dox in sound_handler.h
     virtual void    stop_sound(int sound_handle);

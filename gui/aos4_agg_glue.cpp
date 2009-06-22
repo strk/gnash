@@ -182,6 +182,7 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
     int depth_bytes = _bpp / 8;  // TODO: <Udo> is this correct? Gives 1 for 15 bit modes!
 	struct Screen *_menu_screen; /* Screen pointer for the menu definition */
     APTR vi;
+	uint32_t left = 0, top = 0;
 	
     assert(_bpp % 8 == 0);
 
@@ -192,6 +193,9 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 	{
 	    if ( ( _menu_screen = IIntuition->LockPubScreen ( "Workbench") ) )
 	    {
+		    left=(_menu_screen->Width-_width)/2;
+		    top=(_menu_screen->Height-_height)/2;
+
         	vi = IGadTools->GetVisualInfoA(_menu_screen,NULL);
 	        if (vi)
 			{
@@ -214,6 +218,8 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 
 		_window = IIntuition->OpenWindowTags (NULL,
 			WA_Activate, 		TRUE,
+           	WA_Left,            left,
+           	WA_Top,             top,
 			WA_InnerWidth,  	width,
 			WA_InnerHeight,		height,
 			WA_SmartRefresh, 	TRUE,

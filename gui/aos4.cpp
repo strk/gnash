@@ -42,7 +42,7 @@
 
 // Use 4MB of stack.. just to be safe
 __attribute__ ((used)) static const char *stackcookie = "$STACK: 4000000";
-__attribute__ ((used)) static const char *version     = "$VER: Gnash 0.8.5 for AmigaOS4 (" __DATE__ ")";
+__attribute__ ((used)) static const char *version     = "$VER: Gnash " VERSION " for AmigaOS4 (" __DATE__ ")";
 
 extern struct NewMenu nm[];
 extern Object *win;
@@ -51,7 +51,7 @@ extern Object *Objects[OBJ_NUM];
 
 #define GAD(x) (struct Gadget *)Objects[x]
 
-#define RESET_TIME 20 * 1000 //25fps
+#define RESET_TIME 40 * 1000 //25fps
 
 using namespace std;
 
@@ -201,12 +201,7 @@ AOS4Gui::run()
 			Gui::advance_movie(this);
 			TimerReset(RESET_TIME); 			// 20fps
 	    }
-	    else if (sigGot & SIGBREAKF_CTRL_C)
-	    {
-    	    return true;
-		}
-		else
-		if (sigGot)
+		else if (sigGot)
   		{
 			while ( (imsg = (struct IntuiMessage *)IExec->GetMsg(_window->UserPort) ) )
 			{
@@ -488,7 +483,8 @@ AOS4Gui::run()
     	                }
                     break;
 					case IDCMP_CLOSEWINDOW:
-						if (imsg->IDCMPWindow == _window) IExec->ReplyMsg ((struct Message *)imsg);
+						if (imsg->IDCMPWindow == _window) 
+							IExec->ReplyMsg ((struct Message *)imsg);
         	    	    return true;
 					break;
 					case IDCMP_MOUSEMOVE:
@@ -525,13 +521,25 @@ AOS4Gui::run()
 							IExec->ReplyMsg ((struct Message *)imsg);
 							if ( (imsg->Code  & ~IECODE_UP_PREFIX) == RAWKEY_ESC) //ESC
     	    		    	    return true;
-							code = os4_to_gnash_key(imsg);
-					    	mod  = os4_to_gnash_modifier(imsg->Qualifier);
-						   	key_event(code, mod, true);
+							
+							if (!(imsg->Code & IECODE_UP_PREFIX))
+							{
+								code = os4_to_gnash_key(imsg);
+						    	mod  = os4_to_gnash_modifier(imsg->Qualifier);
+							   	key_event(code, mod, true);
+							}
+							else
+							{
+								imsg->Code &= ~IECODE_UP_PREFIX;
+								code = os4_to_gnash_key(imsg);
+						    	mod  = os4_to_gnash_modifier(imsg->Qualifier);
+							   	key_event(code, mod, false);
+							}								
 						}
 	    			break;
 					case IDCMP_SIZEVERIFY:
-						if (imsg->IDCMPWindow == _window) IExec->ReplyMsg ((struct Message *)imsg);
+						if (imsg->IDCMPWindow == _window) 
+							IExec->ReplyMsg ((struct Message *)imsg);
 						IGraphics->WaitBlit();
 					break;
 					case IDCMP_NEWSIZE:
@@ -550,6 +558,10 @@ AOS4Gui::run()
 					break;
 				}
 			}
+		}
+	    else if (sigGot & SIGBREAKF_CTRL_C)
+	    {
+    	    return true;
 		}
 	}
 
@@ -744,8 +756,15 @@ AOS4Gui::os4_to_gnash_key(struct IntuiMessage *imsg)
 		case RAWKEY_F10: 		c = gnash::key::F10; 		break;
 		case RAWKEY_F11: 		c = gnash::key::F11; 		break;
 		case RAWKEY_F12: 		c = gnash::key::F12; 		break;
-
-   		default: 				c = gnash::key::INVALID; 	break;
+		case RAWKEY_SPACE:		c = gnash::key::SPACE;		break;
+		case RAWKEY_TAB:		c = gnash::key::TAB;		break;
+		case RAWKEY_BACKSPACE:	c = gnash::key::BACKSPACE;	break;
+		case RAWKEY_ENTER:
+		case RAWKEY_RETURN:		c = gnash::key::ENTER;		break;
+		
+   		default: 				
+   			c = gnash::key::INVALID; 	
+   		break;
 	}
 
 	if (c == gnash::key::INVALID)
@@ -757,6 +776,7 @@ AOS4Gui::os4_to_gnash_key(struct IntuiMessage *imsg)
 		ie.ie_Qualifier    = imsg->Qualifier;
 		/* recover dead key codes & qualifiers */
 		ie.ie_EventAddress=(APTR *) *((ULONG *)imsg->IAddress);
+
 		actual = IKeymap->MapRawKey(&ie, (STRPTR)code, 10, NULL);
 		if (actual == 1)
 		{
