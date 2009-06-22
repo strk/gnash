@@ -79,6 +79,7 @@ class Dejagnu {
         if ( failed > 0 ) c += failed;
         if ( xpassed > 0 ) c += xpassed;
         if ( xfailed > 0 ) c += xfailed;
+        if ( unresolve > 0 ) c += unresolve;
         return c;
     }
 
@@ -90,6 +91,9 @@ class Dejagnu {
         }
         if ( xfailed > 0 ) {
             xtrace('#expected failures: '+ xfailed);
+        }
+        if ( unresolve > 0) {
+            xtrace('#tests unresolved'+ unresolve);
         }
 		xtrace('#total tests run: '+ testcount());
     }
@@ -175,6 +179,7 @@ class Dejagnu {
     }
 
     static function unresolved(msg) {
+        unresolve++;
         flash.Lib.trace("UNRESOLVED: "+msg);
     }
 
