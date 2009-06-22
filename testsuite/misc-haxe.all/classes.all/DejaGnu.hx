@@ -95,6 +95,7 @@ class DejaGnu {
         if ( failed > 0 ) c += failed;
         if ( xpassed > 0 ) c += xpassed;
         if ( xfailed > 0 ) c += xfailed;
+        if ( unresolve > 0 ) c += unresolve;
         return c;
     }
 
@@ -106,6 +107,9 @@ class DejaGnu {
         }
         if ( xfailed > 0 ) {
             xtrace('#expected failures: '+ xfailed);
+        }
+        if ( unresolve > 0 ) {
+            xtrace('#tests unresolved: '+ unresolve);
         }
 		xtrace('#total tests run: '+ testcount());
     }
@@ -151,6 +155,7 @@ class DejaGnu {
 
     static public function unresolved(msg) {
 //#if flash9
+        unresolve++;
         flash.Lib.trace("UNRESOLVED: "+msg);
 //#else	
 //		untyped flash.Boot.__trace("UNRESOLVED: "+msg,position);
