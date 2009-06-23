@@ -3162,6 +3162,12 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 	
     asMethod* ctor = cl->getConstructor();
 
+    if (!ctor) {
+        log_error("Class found has no constructor, can't instantiate "
+                "class");
+        return;
+    }
+
 	clearRegisters(ctor->getMaxRegisters());
 	mCurrentFunction = ctor->getPrototype();
 	mStack.clear();
