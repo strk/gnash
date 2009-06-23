@@ -59,6 +59,15 @@ public:
             const RunInfo& /*r*/)
 	{
 		assert(tag == SYMBOLCLASS); 
+        
+        if (!m.isAS3()) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror("SWF contains SymbolClass tag, but is not an "
+                    "AS3 SWF!");
+            );
+            throw ParserException("SymbolClass tag found in non-AS3 SWF!");
+        }
+
 
 		in.ensureBytes(2);
 		boost::uint16_t num_symbols = in.read_u16();
@@ -68,7 +77,7 @@ public:
 			boost::uint16_t id = in.read_u16();
 			std::string name;
 			in.read_string(name);
-			log_parse("Symbol %u name=%s tag=%u", i, name, id);
+			log_parse("Symbol %u name %s, character %u", i, name, id);
             
             SymbolClassTag* st = new SymbolClassTag(name);
 			
