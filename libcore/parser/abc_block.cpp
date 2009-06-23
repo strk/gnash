@@ -911,10 +911,6 @@ abc_block::read_instances()
 		pClass = locateClass(_multinamePool[index]);
 		if (!pClass)
 		{
-            log_abc("Adding class %s to namespace %s", 
-                    _stringTable->value(_multinamePool[index].getGlobalName()),
-                    _stringPool[_multinamePool[index].getNamespace()->
-                        getAbcURI()]);
 			pClass = mCH->newClass();
 			if (!_multinamePool[index].getNamespace()->addClass(
 				_multinamePool[index].getABCName(), pClass))
@@ -946,10 +942,6 @@ abc_block::read_instances()
 				pSuper = mCH->newClass();
 				pSuper->setName(_multinamePool[super_index].getABCName());
 				mCH->getGlobalNs()->addClass(_multinamePool[super_index].getABCName(), pSuper);
-            log_abc("Adding class %s to namespace %s", 
-                    _stringTable->value(_multinamePool[index].getGlobalName()),
-                    _stringPool[_multinamePool[index].getNamespace()->
-                        getAbcURI()]);
 				// return false;
 			}
 
