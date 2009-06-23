@@ -23,6 +23,7 @@
 #include "asClass.h"
 #include "CodeStream.h"
 #include "abc_function.h"
+#include "VM.h"
 
 namespace gnash {
 
@@ -100,5 +101,89 @@ asMethod::addValue(string_table::key name, asNamespace *ns,
 	}
 	return true;
 }
+
+bool
+asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
+{
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+
+	Property *getset = _prototype->getOwnProperty(name, nsname);
+
+	if (getset)
+		getset->setGetter(method->getPrototype());
+	else
+	{
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		_prototype->init_property(name, *method->getPrototype(), 
+			*method->getPrototype(), flags, nsname);
+	}
+	return true;
+}
+
+bool
+asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
+{
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+
+	Property *getset = _prototype->getOwnProperty(name, nsname);
+
+	if (getset)
+		getset->setSetter(method->getPrototype());
+	else
+	{
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		_prototype->init_property(name, *method->getPrototype(), 
+			*method->getPrototype(), flags, nsname);
+	}
+	return true;
+}
+
+bool
+asMethod::addMemberClass(string_table::key name, asNamespace *ns,
+	boost::uint32_t slotId, asClass *type)
+{
+	return addSlot(name, ns, slotId, type);
+}
+
+bool
+asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
+	asClass */*type*/)
+{
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+	int flags = as_prop_flags::dontDelete;
+
+	_prototype->init_member(name, as_value(), flags, nsname, slotId);
+	return true;
+}
+
+bool
+asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
+	boost::uint32_t slotId, asMethod *method)
+{
+	asClass a;
+	a.setName(NSV::CLASS_FUNCTION);
+	as_value b(method->getPrototype());
+	return addValue(name, ns, slotId, &a, b, false);
+}
+
+void
+asMethod::initPrototype(Machine* machine)
+{
+	_prototype = new abc_function(this,machine);
+}
+
+bool
+asMethod::addMethod(string_table::key /*name*/, asNamespace* /*ns*/, asMethod*
+        /*method*/)
+{
+//	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+//	as_value val(method->getPrototype());
+// 	as value val = new as_value(abc_function(asMethod->getBody,_prototype->getVM().getMachine()));
+// 	_prototype->init_member(name, val, as_prop_flags::readOnly |
+// 		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
+// 	return true;
+return false;
+}
+
 
 } // namespace gnash
