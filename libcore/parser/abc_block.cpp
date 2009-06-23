@@ -1146,35 +1146,41 @@ abc_block::read_method_bodies()
 	{
 		boost::uint32_t offset = mS->read_V32();
 		log_abc("Method body %u method offset=%u", i, offset);
-		if (offset >= _methods.size())
-		{
+
+		if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bounds for method body."));
 			return false;
 		}
-		if (_methods[offset]->getBody())
-		{
+
+        asMethod& method = *_methods[offset];
+
+		if (method.getBody()) {
 			log_error(_("ABC: Only one body per method."));
 			return false;
 		}
-		//TODO: Read values.
 
 		// Maximum stack size.
-		mS->skip_V32();
-		// Maximum register size.
-		_methods[offset]->setMaxRegisters(mS->read_V32());
-		// Scope depth.
-		mS->skip_V32();
-		// Max scope depth.
-		mS->skip_V32();
-		// Code length
+        method.setMaxStack(mS->read_V32());
+		
+        // Maximum register size.
+		method.setMaxRegisters(mS->read_V32());
+		
+        // Scope depth.
+		method.setScopeDepth(mS->read_V32());
+		
+        // Max scope depth.
+		method.setMaxScope(mS->read_V32());
+		
+        // Code length
 		boost::uint32_t clength = mS->read_V32();
-		_methods[offset]->setBodyLength(clength);
+		method.setBodyLength(clength);
+
 		// The code.
 		//TODO: Clean this up.
 		std::string body;
 		mS->read_string_with_length(clength, body);
 
-		_methods[offset]->setBody(new CodeStream(body));
+		method.setBody(new CodeStream(body));
 		
 		boost::uint32_t ecount = mS->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
@@ -1190,13 +1196,11 @@ abc_block::read_method_bodies()
 
 			// What types should be caught.
 			boost::uint32_t catch_type = mS->read_V32();
-			if (catch_type >= _multinamePool.size())
-			{
+			if (catch_type >= _multinamePool.size()) {
 				log_error(_("ABC: Out of bound type for exception."));
 //				return false;
 			}
-			if (!catch_type)
-			{
+			if (!catch_type) {
 				pExcept->catchAny();
 			}
 			else
@@ -1205,13 +1209,14 @@ abc_block::read_method_bodies()
 				if (!pType)
 				{
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 
-						_stringTable->value(_multinamePool[catch_type].getABCName()));
-					// return false;
+						_stringTable->value(
+                            _multinamePool[catch_type].getABCName()));
+
+                    // return false;
 					// Fake it, for now:
 					pExcept->catchAny();
 				}
-				else
-				{
+				else {
 					pExcept->setCatchType(pType);
 				}
 			}
