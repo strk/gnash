@@ -3106,15 +3106,15 @@ Machine::initMachine(abc_block* pool_block, as_object* global)
 //TODO: There is probably a better way to do this, once we understand what the VM is supposed
 //todo, this should be fixed.
 as_value
-Machine::executeFunction(asMethod* function, const fn_call& fn)
+Machine::executeFunction(asMethod* method, const fn_call& fn)
 {
 	
     //TODO: Figure out a good way to use the State object to handle
     //returning values.
-	mCurrentFunction = function->getPrototype();
+	mCurrentFunction = method->getPrototype();
 	bool prev_ext = mExitWithReturn;
-	CodeStream *stream = function->getBody();
-	load_function(stream, function->getMaxRegisters());
+	CodeStream *stream = method->getBody();
+	load_function(stream, method->getMaxRegisters());
 	mExitWithReturn = true;
 	setRegister(0, fn.this_ptr);
 	for (unsigned int i=0;i<fn.nargs;i++) {
