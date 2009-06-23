@@ -3095,7 +3095,7 @@ Machine::initMachine(abc_block* pool_block, as_object* global)
 	log_debug("Getting constructor.");
 	asMethod* constructor = start_script->getConstructor();
 	clearRegisters(constructor->getMaxRegisters());
-	log_debug("Loding code stream.");
+	log_debug("Loading code stream.");
 	mStream = constructor->getBody();
 	mCurrentFunction = constructor->getPrototype();
 	setRegister(0, global);
