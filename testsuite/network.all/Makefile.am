@@ -42,6 +42,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/parser  \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/asobj \
+	-I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/testsuite \
 	-I$(top_srcdir)/testsuite/misc-ming.all \
 	$(MING_CFLAGS) \
@@ -50,15 +52,19 @@ AM_CPPFLAGS = \
 	-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
 	$(NULL)
 
-AM_LDFLAGS = \
-	$(MING_LIBS) \
+AM_LDFLAGS = 
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la \
 	$(OPENGL_LIBS) \
-	$(GIF_LIBS) \
+	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS)
 	$(NULL)
 
 check_PROGRAMS = \
 	Dejagnu \
 	Dejagnu.swf \
+	test_ssl \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -103,6 +109,14 @@ Dejagnu_LDADD = libgnashmingutils.la
 
 Dejagnu.swf: Dejagnu
 	./Dejagnu $(top_srcdir)/testsuite/media
+
+test_ssl_SOURCES = test_ssl.cpp
+test_ssl_LDADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la
+
+test_ssl_DEPENDENCIES = site-update
 
 clean-local: 
 	-rm *.swf media *.pp *unner

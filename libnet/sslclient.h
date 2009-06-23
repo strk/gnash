@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #endif
 
 #include <string>
+#include <boost/array.hpp>
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -44,46 +45,84 @@
 namespace gnash
 {
 
-const char *CA_LIST = "root.pem";
-const char *HOST    = "localhost";
-const char *RANDOM  = "random.pem";
+extern const char *ROOTPATH;
+extern const char *HOST;
+extern const char *CA_LIST;
+extern const char *RANDOM;
+extern const char *KEYFILE;
+extern const size_t SSL_PASSWD_SIZE;
 
-class DSOEXPORT SSLClient : public gnash::Network
+class DSOEXPORT SSLClient
 {
 public:
     SSLClient();
     ~SSLClient();
 
     // Read bytes from the already opened SSL connection
-    size_t sslRead(SSL &ssl, amf::Buffer &buf, size_t length);
+    int sslRead(amf::Buffer &buf);
+    int sslRead(boost::uint8_t *buf, size_t length);
+    int sslRead(std::string &buf);
 
     // Write bytes to the already opened SSL connection
-    size_t sslWrite(SSL &ssl, amf::Buffer &buf, size_t length);
+    int sslWrite(amf::Buffer &buf);
+    int sslWrite(const boost::uint8_t *buf, size_t length);
+    int sslWrite(std::string &buf);
 
     // Setup the Context for this connection
-    size_t sslSetupCTX(SSL &ssl);
-
+    bool sslSetupCTX();
+    bool sslSetupCTX(std::string &keyfile, std::string &cafile);
+    
     // Shutdown the Context for this connection
-    size_t sslShutdown(SSL &ssl);
+    bool sslShutdown();
 
     // sslConnect() is how the client connects to the server 
-    size_t sslConnect(std::string &hostname);
+    bool sslConnect(int fd);
+    bool sslConnect(int fd, std::string &hostname);
 
     // sslAccept() is how the server waits for connections for clients
-    size_t sslAccept(SSL &ssl);
+    size_t sslAccept();
 
-    void dump();
-
- private:
+    void setKeyfile(std::string filespec) { _keyfile = filespec; };
+    std::string &getKeyfile() { return _keyfile; };
+    
+    void setCAlist(std::string filespec) { _calist = filespec; };
+    std::string &getCAlist() { return _calist; };
+    
+    void setPassword(std::string pw);
+    std::string &getPassword();
+    
+    void setCert(std::string filespec) { _cert = filespec; };
+    std::string &getCert() { return _cert; };
+    
+    void setRootPath(std::string filespec) { _rootpath = filespec; };
+    std::string &getRootPath() { return _rootpath; };
+    
+    void setPem(std::string filespec) { _pem = filespec; };
+    std::string &getPem() { return _pem; };
+    
+    void setHostname(std::string name) { _hostname = name; };
+    std::string &getHostname() { return _hostname; };
+    
+    void setServerAuth(bool flag) { _need_server_auth = flag; };
+    bool getServerAuth() { return _need_server_auth; };
+    
     // Check a certificate
+    bool checkCert();
     bool checkCert(std::string &hostname);
 
+    void dump();
+ private:
     boost::scoped_ptr<SSL> _ssl;
     boost::scoped_ptr<SSL_CTX> _ctx;
     boost::scoped_ptr<BIO> _bio;
     boost::scoped_ptr<BIO> _bio_error;
-    std::string _keyfile;
-    bool _need_server_auth;
+    std::string		_hostname;
+    std::string		_calist;
+    std::string		_keyfile;
+    std::string		_cert;
+    std::string		_pem;
+    std::string		_rootpath;
+    bool		_need_server_auth;
 };
 
 extern "C" {
