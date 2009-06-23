@@ -436,7 +436,7 @@ bool
 abc_block::read_version()
 {
 	// Minor version, major version.
-	mVersion = (mS->read_u16()) | (mS->read_u16() << 16);
+	mVersion = (_stream->read_u16()) | (_stream->read_u16() << 16);
 	log_debug(_("Abc Version: %d.%d"), (mVersion & 0xFFFF0000) >> 16, 
 		(mVersion & 0x0000FFFF));
 	return true;
@@ -447,13 +447,13 @@ bool
 abc_block::read_integer_constants()
 {
 	// count overestimates by 1.
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	_integerPool.resize(count);
 	if (count)
 		_integerPool[0] = 0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		_integerPool[i] = static_cast<boost::int32_t> (mS->read_V32());
+		_integerPool[i] = static_cast<boost::int32_t> (_stream->read_V32());
 	}
 	return true;
 }
@@ -463,13 +463,13 @@ bool
 abc_block::read_unsigned_integer_constants()
 {
 	// count overestimates by 1.
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	_uIntegerPool.resize(count);
 	if (count)
 		_uIntegerPool[0] = 0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		_uIntegerPool[i] = mS->read_V32();
+		_uIntegerPool[i] = _stream->read_V32();
 	}
 	return true;
 }
@@ -478,13 +478,13 @@ abc_block::read_unsigned_integer_constants()
 bool
 abc_block::read_double_constants()
 {
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	_doublePool.resize(count);
 	if (count)
 		_doublePool[0] = 0.0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		_doublePool[i] = mS->read_d64();
+		_doublePool[i] = _stream->read_d64();
 		log_abc("Double %u=%lf", i, _doublePool[i]);
 	}
 	return true;
@@ -495,7 +495,7 @@ bool
 abc_block::read_string_constants()
 {
 	log_abc("Begin reading string constants.");
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u string constants.", count);
 	_stringPool.resize(count);
 	_stringPoolTableIDs.resize(count);
@@ -506,8 +506,8 @@ abc_block::read_string_constants()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		boost::uint32_t length = mS->read_V32();
-		mS->read_string_with_length(length, _stringPool[i]);
+		boost::uint32_t length = _stream->read_V32();
+		_stream->read_string_with_length(length, _stringPool[i]);
 		log_abc("Adding string constant to string pool: index=%u %s", i, _stringPool[i]);
 		_stringPoolTableIDs[i] = 0;
 	}
@@ -521,7 +521,7 @@ bool
 abc_block::read_namespaces()
 {	
 	log_abc("Begin reading namespaces.");
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u namespaces.", count);
 	_namespacePool.resize(count);
 	if (count)
@@ -530,8 +530,8 @@ abc_block::read_namespaces()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		boost::uint8_t kind = mS->read_u8();
-		boost::uint32_t nameIndex = mS->read_V32();
+		boost::uint8_t kind = _stream->read_u8();
+		boost::uint32_t nameIndex = _stream->read_V32();
 		log_abc("Namespace %u kind=0x%X index=%u name=%s", i, kind | 0x0, nameIndex, _stringPool[nameIndex]);
 
 		if (nameIndex >= _stringPool.size())
@@ -565,7 +565,7 @@ abc_block::read_namespaces()
 bool
 abc_block::read_namespace_sets()
 {
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	_namespaceSetPool.resize(count);
 	if (count)
 	{
@@ -573,11 +573,11 @@ abc_block::read_namespace_sets()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		boost::uint32_t icount = mS->read_V32();
+		boost::uint32_t icount = _stream->read_V32();
 		_namespaceSetPool[i].resize(icount);
 		for (unsigned int j = 0; j < icount; ++j)
 		{
-			boost::uint32_t selection = mS->read_V32();
+			boost::uint32_t selection = _stream->read_V32();
 			if (!selection || selection >= _namespacePool.size())
 			{
 				log_error(_("ABC: Out of bounds namespace for namespace set."));
@@ -593,7 +593,7 @@ abc_block::read_namespace_sets()
 bool
 abc_block::read_multinames()
 {
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u multinames.", count);
 	_multinamePool.resize(count);
 	if (count)
@@ -604,7 +604,7 @@ abc_block::read_multinames()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-        asName::Kind kind = static_cast<asName::Kind>(mS->read_u8());
+        asName::Kind kind = static_cast<asName::Kind>(_stream->read_u8());
 		boost::uint32_t ns = 0;
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
@@ -616,9 +616,9 @@ abc_block::read_multinames()
 		{
             case asName::KIND_Qname:
             case asName::KIND_QnameA:
-                ns = mS->read_V32();
+                ns = _stream->read_V32();
                 check_multiname_namespace(ns);
-                name = mS->read_V32();
+                name = _stream->read_V32();
                 check_multiname_name(name);
                 log_abc("\tnamespace_index=%u name_index=%u name=%s",
                         ns, name, _stringPool[name]);
@@ -626,7 +626,7 @@ abc_block::read_multinames()
             
             case asName::KIND_RTQname:
             case asName::KIND_RTQnameA:
-                name = mS->read_V32();
+                name = _stream->read_V32();
                 check_multiname_name(name);
                 break;
             
@@ -636,15 +636,15 @@ abc_block::read_multinames()
             
             case asName::KIND_Multiname:
             case asName::KIND_MultinameA:
-                name = mS->read_V32();
+                name = _stream->read_V32();
                 check_multiname_name(name);
-                nsset = mS->read_V32();
+                nsset = _stream->read_V32();
                 check_multiname_namespaceset(nsset);
                 break;
             
             case asName::KIND_MultinameL:
             case asName::KIND_MultinameLA:
-                nsset = mS->read_V32();
+                nsset = _stream->read_V32();
                 check_multiname_namespaceset(nsset);
                 break;
             
@@ -759,7 +759,7 @@ abc_block::read_method_infos()
 {
 	log_abc("Begin read_method_infos.");
 
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
     log_abc("Method count: %u", count);
 
 	_methods.resize(count);
@@ -769,8 +769,8 @@ abc_block::read_method_infos()
 		asMethod *pMethod = mCH->newMethod();
 		pMethod->setMethodID(i);
 		_methods[i] = pMethod;
-		boost::uint32_t param_count = mS->read_V32();
-		boost::uint32_t return_type = mS->read_V32();
+		boost::uint32_t param_count = _stream->read_V32();
+		boost::uint32_t return_type = _stream->read_V32();
 
 		log_abc("  Param count: %u return type(index): %s(%u)", param_count, 
                 _stringPool[_multinamePool[return_type].getABCName()],
@@ -797,7 +797,7 @@ abc_block::read_method_infos()
 		{
 			log_abc("  Reading parameter %u", j);
 			// The parameter type.
-			boost::uint32_t ptype = mS->read_V32();
+			boost::uint32_t ptype = _stream->read_V32();
 			log_abc("   Parameter type(index): %s(%u)", 
                     _stringPool[_multinamePool[ptype].getABCName()], ptype);
 
@@ -819,10 +819,10 @@ abc_block::read_method_infos()
 		}
 //		log_abc("End loop j.");
 		// A skippable name index.
-//		mS->skip_V32();
-		boost::uint32_t method_name = mS->read_V32();
+//		_stream->skip_V32();
+		boost::uint32_t method_name = _stream->read_V32();
 		log_abc(  "Method name=%s %d", _stringPool[method_name], method_name);
-		boost::uint8_t flags = mS->read_u8();
+		boost::uint8_t flags = _stream->read_u8();
 		log_abc("  Flags: %X", flags | 0x0);
 //		log_abc("Check if flags and optional args.");
 		// If there are default parameters, read them now.
@@ -831,14 +831,14 @@ abc_block::read_method_infos()
 		if (flags & METHOD_OPTIONAL_ARGS)
 		{
 //			log_abc("We have flags and optional args.");
-			boost::uint32_t ocount = mS->read_V32();
+			boost::uint32_t ocount = _stream->read_V32();
 			log_abc("  Optional args: %u", ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
 			for (unsigned int j = 0; j < ocount; ++j)
 			{
 				log_abc("  Reading optional arg: %u", j);
-				boost::uint32_t index = mS->read_V32();
-				boost::uint8_t kindof = mS->read_u8();
+				boost::uint32_t index = _stream->read_V32();
+				boost::uint8_t kindof = _stream->read_u8();
 				log_abc("   Index: %u Kindof: %u", index, kindof);
 				as_value v;
 				if (!pool_value(index, kindof, v))
@@ -853,7 +853,7 @@ abc_block::read_method_infos()
 		{
 			for (unsigned int j = 0; j < param_count; ++j)
 			{
-				mS->skip_V32();
+				_stream->skip_V32();
 			}
 		}
 	} // End of method loop.
@@ -864,16 +864,16 @@ abc_block::read_method_infos()
 bool
 abc_block::skip_metadata()
 {
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		mS->skip_V32(); // A name index.
-		boost::uint32_t icount = mS->read_V32();
+		_stream->skip_V32(); // A name index.
+		boost::uint32_t icount = _stream->read_V32();
 		for (unsigned int j = 0; j < icount; ++j)
 		{
 			// key/values may not be stored together, but this still works.
-			mS->skip_V32();
-			mS->skip_V32();
+			_stream->skip_V32();
+			_stream->skip_V32();
 		}
 	}
 	return true;
@@ -883,14 +883,14 @@ abc_block::skip_metadata()
 bool
 abc_block::read_instances()
 {
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asClass *pClass;
 		//Read multiname index.
-		boost::uint32_t index = mS->read_V32();
+		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
 		if (index >= _multinamePool.size())
 		{
@@ -921,7 +921,7 @@ abc_block::read_instances()
 		}
 		pClass->setDeclared();
 		_classes[i] = pClass;
-		boost::uint32_t super_index = mS->read_V32();;
+		boost::uint32_t super_index = _stream->read_V32();;
 		if (super_index && super_index >= _multinamePool.size())
 		{
 			log_error(_("ABC: Out of bounds super type."));
@@ -966,7 +966,7 @@ abc_block::read_instances()
 			pSuper->setInherited();
 		}
 
-		boost::uint8_t flags = mS->read_u8();
+		boost::uint8_t flags = _stream->read_u8();
 		log_abc("Instance %u multiname index=%u name=%s super index=%u flags=%X", i, index, _stringPool[_multinamePool[index].getABCName()], super_index, flags | 0x0);
 
 		if (flags & INSTANCE_SEALED)
@@ -980,7 +980,7 @@ abc_block::read_instances()
 
 		if (flags & INSTANCE_PROTECTED_NS) // Protected Namespace
 		{
-			boost::uint32_t ns_index = mS->read_V32();
+			boost::uint32_t ns_index = _stream->read_V32();
 			if (ns_index >= _namespacePool.size())
 			{
 				log_error(_("ABC: Out of bounds namespace for protected."));
@@ -994,11 +994,11 @@ abc_block::read_instances()
 
 		// This is the list of interfaces which the instances has agreed to
 		// implement. They must be interfaces, and they must exist.
-		boost::uint32_t intcount = mS->read_V32();
+		boost::uint32_t intcount = _stream->read_V32();
 		log_abc("This instance has %u interfaces.", intcount);
 		for (unsigned int j = 0; j < intcount; ++j)
 		{
-			boost::uint32_t i_index = mS->read_V32();
+			boost::uint32_t i_index = _stream->read_V32();
 			log_abc("Interface %u has multiname index=%u", i, i_index);
 			// 0 is allowed as an interface, typically for the last one.
 			if (i_index >= _multinamePool.size())
@@ -1018,7 +1018,7 @@ abc_block::read_instances()
 		// The next thing should be the constructor.
 		// TODO: What does this mean exactly? How does it differ from the one in
 		// the class info block?
-		boost::uint32_t offset = mS->read_V32();
+		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Moffset: %u", offset);
 		if (offset >= _methods.size())
 		{
@@ -1034,13 +1034,13 @@ abc_block::read_instances()
 //		_methods[offset]->setOwner(pClass);
 
 		// Next come the 'traits' of the instance. (The members.)
-		boost::uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("Trait count: %u", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			Trait &aTrait = newTrait();
 			aTrait.set_target(pClass, false);
-			if (!aTrait.read(mS, this))
+			if (!aTrait.read(_stream, this))
 				return false;
 		}
 	} // End of instances loop.
@@ -1058,7 +1058,7 @@ abc_block::read_classes()
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asClass *pClass = _classes[i];
-		boost::uint32_t offset = mS->read_V32();
+		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Class %u static constructor index=%u", i, offset);
 		if (offset >= _methods.size())
 		{
@@ -1073,13 +1073,13 @@ abc_block::read_classes()
 		initialized.  The parser seems to work ok without this call.*/
 //		_methods[offset]->setOwner(pClass);
 		
-		boost::uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("This class has %u traits.", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			Trait &aTrait = newTrait();
 			aTrait.set_target(pClass, true);
-			if (!(aTrait.read(mS, this)))
+			if (!(aTrait.read(_stream, this)))
 				return false;
 		}
 	} // end of classes loop
@@ -1092,7 +1092,7 @@ bool
 abc_block::read_scripts()
 {
 	log_abc("Begin reading scripts.");
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u scripts.", count);
 	_scripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
@@ -1100,7 +1100,7 @@ abc_block::read_scripts()
 		asClass *pScript = mCH->newClass();
 		_scripts[i] = pScript;
 
-		boost::uint32_t offset = mS->read_V32();
+		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Reading script %u initializer method index=%u", i, offset);
 		if (offset >= _methods.size())
 		{
@@ -1117,13 +1117,13 @@ abc_block::read_scripts()
 		pScript->setConstructor(_methods[offset]);
 		pScript->setSuper(mTheObject);
 
-		boost::uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = _stream->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			
 			Trait &aTrait = newTrait();
 			aTrait.set_target(pScript, false);
-			if (!(aTrait.read(mS, this))) {
+			if (!(aTrait.read(_stream, this))) {
 				return false;
             }
 			log_abc("Trait: %u name: %s(%u) kind: %u value: %s ", j, 
@@ -1140,11 +1140,11 @@ abc_block::read_scripts()
 bool
 abc_block::read_method_bodies()
 {
-	boost::uint32_t count = mS->read_V32();
+	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u method bodies.", count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		boost::uint32_t offset = mS->read_V32();
+		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Method body %u method offset=%u", i, offset);
 
 		if (offset >= _methods.size()) {
@@ -1160,42 +1160,42 @@ abc_block::read_method_bodies()
 		}
 
 		// Maximum stack size.
-        method.setMaxStack(mS->read_V32());
+        method.setMaxStack(_stream->read_V32());
 		
         // Maximum register size.
-		method.setMaxRegisters(mS->read_V32());
+		method.setMaxRegisters(_stream->read_V32());
 		
         // Scope depth.
-		method.setScopeDepth(mS->read_V32());
+		method.setScopeDepth(_stream->read_V32());
 		
         // Max scope depth.
-		method.setMaxScope(mS->read_V32());
+		method.setMaxScope(_stream->read_V32());
 		
         // Code length
-		boost::uint32_t clength = mS->read_V32();
+		boost::uint32_t clength = _stream->read_V32();
 		method.setBodyLength(clength);
 
 		// The code.
 		//TODO: Clean this up.
 		std::string body;
-		mS->read_string_with_length(clength, body);
+		_stream->read_string_with_length(clength, body);
 
 		method.setBody(new CodeStream(body));
 		
-		boost::uint32_t ecount = mS->read_V32();
+		boost::uint32_t ecount = _stream->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
 		{
 			asException *pExcept = mCH->newException();
 
 			// Where the try block begins and ends.
-			pExcept->setStart(mS->read_V32());
-			pExcept->setEnd(mS->read_V32());
+			pExcept->setStart(_stream->read_V32());
+			pExcept->setEnd(_stream->read_V32());
 
 			// Where to go when the exception is activated.
-			pExcept->setCatch(mS->read_V32());
+			pExcept->setCatch(_stream->read_V32());
 
 			// What types should be caught.
-			boost::uint32_t catch_type = mS->read_V32();
+			boost::uint32_t catch_type = _stream->read_V32();
 			if (catch_type >= _multinamePool.size()) {
 				log_error(_("ABC: Out of bound type for exception."));
 //				return false;
@@ -1225,7 +1225,7 @@ abc_block::read_method_bodies()
 			// In version 46.15, no names.
 			if (mVersion != ((46 << 16) | 15))
 			{
-				boost::uint32_t cvn = mS->read_V32();
+				boost::uint32_t cvn = _stream->read_V32();
 				if (cvn >= _multinamePool.size())
 				{
 					log_error(_("ABC: Out of bound name for caught exception."));
@@ -1236,12 +1236,12 @@ abc_block::read_method_bodies()
 			}
 		} // end of exceptions
 
-		boost::uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = _stream->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			Trait &aTrait = newTrait();
 			aTrait.set_target(_methods[offset]);
-			if (!aTrait.read(mS, this)) {
+			if (!aTrait.read(_stream, this)) {
                 // TODO: 'method body activation traits'
 				return false;
             }
@@ -1258,7 +1258,7 @@ bool
 abc_block::read(SWFStream& in)
 {
     // This isn't very nice:
-	mS = &in;
+	_stream = &in;
 
 	if (!read_version()) return false;
 	if (!read_integer_constants()) return false;
