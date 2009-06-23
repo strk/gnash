@@ -67,9 +67,8 @@ public:
             );
             throw ParserException("SymbolClass tag found in non-AS3 SWF!");
         }
-
-
-		in.ensureBytes(2);
+		
+        in.ensureBytes(2);
 		boost::uint16_t num_symbols = in.read_u16();
 		log_debug("There are %u symbols.", num_symbols);
 		for (unsigned int i = 0; i < num_symbols; ++i) {
@@ -85,7 +84,12 @@ public:
             else {
                 sprite_definition* s =
                     dynamic_cast<sprite_definition*>(m.getDefinitionTag(id));
+                
+                // TODO: it seems that the pp will add the control tag to
+                // the main timeline also if the id is not 0 but the
+                // sprite_definition does not exist.
                 if (s) s->addControlTag(st);
+
             }
 		}
 	}
