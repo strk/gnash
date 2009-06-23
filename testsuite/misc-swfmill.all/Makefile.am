@@ -22,8 +22,7 @@ abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-swfmill.all; pwd)
 
 ## Self-contained XML tests
-SC_XMLTESTS =			\
-	mixed-bytecode-as3.xml	\
+SC_AS2_XMLTESTS =			\
 	mixed-bytecode-as2.xml	\
 	hello.xml		\
 	jump_after_end.xml	\
@@ -36,7 +35,11 @@ SC_XMLTESTS =			\
 	Try-without-jump.xml \
 	$(NULL)
 
-EXTRA_DIST = $(SC_XMLTESTS) 
+SC_AS3_XMLTEXTS = \
+	mixed-bytecode-as2.xml	\
+	$(NULL)
+
+EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS)  
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -51,13 +54,16 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/testsuite \
 	$(NULL)
 
-SC_XMLTESTS_OUT = $(SC_XMLTESTS:.xml=.swf)
+SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
+
+if ENABLE_AVM2
+SC_XMLTESTS_OUT += $(SC_AS3_XMLTESTS:.xml=.swf)
+endif
 
 # Dependencies for all self-contained SWF tests
 $(SC_XMLTESTS_OUT) : 
 
 check_SCRIPTS = \
-	mixed-bytecode-as3-runner	\
 	mixed-bytecode-as2-runner	\
 	jump_after_end-runner	\
 	jump_to_prev_block-runner	\
@@ -67,6 +73,12 @@ check_SCRIPTS = \
 	registers-runner \
 	Try-without-jump-runner \
 	$(NULL)
+
+if ENABLE_AVM2
+check_SCRIPTS += \
+	mixed-bytecode-as3-runner	\
+	$(NULL)
+endif
 
 check_PROGRAMS = \
 	backgroundTestRunner
