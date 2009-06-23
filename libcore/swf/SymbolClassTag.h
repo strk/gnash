@@ -41,10 +41,10 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
+	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
-		VM& vm = VM::get();
-		Machine *mach = vm.getMachine();
+		VM& vm = m->getVM();
+		Machine* mach = vm.getMachine();
 		log_debug("SymbolClassTag: Creating class %s.", _rootClass);
 		mach->instantiateClass(_rootClass, vm.getGlobal());
 	}
@@ -88,6 +88,15 @@ public:
                 // TODO: it seems that the pp will add the control tag to
                 // the main timeline also if the id is not 0 but the
                 // sprite_definition does not exist.
+                //
+                // Manual tests show that:
+                // 1. Only the first SymbolClass tag is executed for the
+                //    root Sprite. TODO: check also for other Sprites. This
+                //    applies to multiple symbols in the same tag or to
+                //    subsequent SymbolClass tags.
+                // 2. If the id is not a definition, the tag is added to
+                //    the root Sprite (main timeline). TODO: check what
+                //    happens if the sprite is defined later.
                 if (s) s->addControlTag(st);
 
             }
