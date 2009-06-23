@@ -124,7 +124,7 @@ backgroundTestRunner_DEPENDENCIES = \
 	$(NULL)
 
 .xml.swf: 
-	$(SWFMILL) -v simple $(@:%.swf=$(srcdir)/%.xml) $@
+	$(SWFMILL) -v xml2swf $(@:%.swf=$(srcdir)/%.xml) $@
 
 clean-local: 
 	rm -f $(check_SCRIPTS) $(SC_XMLTESTS_OUT) \
