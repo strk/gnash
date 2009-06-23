@@ -911,6 +911,10 @@ abc_block::read_instances()
 		pClass = locateClass(_multinamePool[index]);
 		if (!pClass)
 		{
+            log_abc("Adding class %s to namespace %s", 
+                    _stringTable->value(_multinamePool[index].getGlobalName()),
+                    _stringPool[_multinamePool[index].getNamespace()->
+                        getAbcURI()]);
 			pClass = mCH->newClass();
 			if (!_multinamePool[index].getNamespace()->addClass(
 				_multinamePool[index].getABCName(), pClass))
@@ -942,6 +946,10 @@ abc_block::read_instances()
 				pSuper = mCH->newClass();
 				pSuper->setName(_multinamePool[super_index].getABCName());
 				mCH->getGlobalNs()->addClass(_multinamePool[super_index].getABCName(), pSuper);
+            log_abc("Adding class %s to namespace %s", 
+                    _stringTable->value(_multinamePool[index].getGlobalName()),
+                    _stringPool[_multinamePool[index].getNamespace()->
+                        getAbcURI()]);
 				// return false;
 			}
 
@@ -1316,34 +1324,33 @@ abc_block::locateClass(const std::string& className)
 
     const std::string::size_type pos = className.rfind(".");
     
-    if (pos == std::string::npos) {
-        for (std::vector<asClass*>::iterator i = _classes.begin();
-                i != _classes.end(); ++i) {
-            if (_stringPool[(*i)->getName()] == className) {
-                return *i;
+    asName a;
+
+    if (pos != std::string::npos) {
+        const std::string& nsstr = className.substr(0, pos);
+        const std::string& clstr = className.substr(pos + 1);
+        std::vector<std::string>::iterator it = 
+            std::find(_stringPool.begin(), _stringPool.end(), clstr);
+
+        if (it == _stringPool.end()) return 0;
+        for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
+                i != _namespacePool.end(); ++i) {
+            log_abc("Looking in ns: %s", _stringPool[(*i)->getAbcURI()]);
+            if (_stringPool[(*i)->getAbcURI()] == nsstr) {
+                a.setNamespace(*i);
+                break;
             }
-        }	
-        return 0;
+        }
+        a.setABCName(it - _stringPool.begin());
+    }
+    else {
+        std::vector<std::string>::iterator it = 
+            std::find(_stringPool.begin(), _stringPool.end(), className);
+        if (it == _stringPool.end()) return 0;
+        a.setABCName(it - _stringPool.begin());
     }
     
-    const std::string& nsstr = className.substr(0, pos);
-    const std::string& clstr = className.substr(pos + 1);
-    
-    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
-            i != _namespacePool.end(); ++i) {
-        if (_stringPool[(*i)->getAbcURI()] == nsstr) {
-
-            for (std::vector<asClass*>::iterator j = _classes.begin();
-                    j != _classes.end(); ++j) {
-                if (_stringPool[(*j)->getName()] == clstr) {
-                    return (*i)->getClass((*j)->getName());
-                }
-            }	
-        return 0;
-        
-        }
-    }	
-	return 0;
+    return locateClass(a);
 
 }
 
