@@ -41,10 +41,10 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
+	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
-		VM& vm = VM::get();
-		Machine *mach = vm.getMachine();
+		VM& vm = m->getVM();
+		Machine* mach = vm.getMachine();
 		log_debug("SymbolClassTag: Creating class %s.", _rootClass);
 		mach->instantiateClass(_rootClass, vm.getGlobal());
 	}
@@ -59,8 +59,16 @@ public:
             const RunInfo& /*r*/)
 	{
 		assert(tag == SYMBOLCLASS); 
-
-		in.ensureBytes(2);
+        
+        if (!m.isAS3()) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror("SWF contains SymbolClass tag, but is not an "
+                    "AS3 SWF!");
+            );
+            throw ParserException("SymbolClass tag found in non-AS3 SWF!");
+        }
+		
+        in.ensureBytes(2);
 		boost::uint16_t num_symbols = in.read_u16();
 		log_debug("There are %u symbols.", num_symbols);
 		for (unsigned int i = 0; i < num_symbols; ++i) {
@@ -68,7 +76,7 @@ public:
 			boost::uint16_t id = in.read_u16();
 			std::string name;
 			in.read_string(name);
-			log_parse("Symbol %u name=%s tag=%u", i, name, id);
+			log_parse("Symbol %u name %s, character %u", i, name, id);
             
             SymbolClassTag* st = new SymbolClassTag(name);
 			
@@ -76,7 +84,21 @@ public:
             else {
                 sprite_definition* s =
                     dynamic_cast<sprite_definition*>(m.getDefinitionTag(id));
+                
+                // TODO: it seems that the pp will add the control tag to
+                // the main timeline also if the id is not 0 but the
+                // sprite_definition does not exist.
+                //
+                // Manual tests show that:
+                // 1. Only the first SymbolClass tag is executed for the
+                //    root Sprite. TODO: check also for other Sprites. This
+                //    applies to multiple symbols in the same tag or to
+                //    subsequent SymbolClass tags.
+                // 2. If the id is not a definition, the tag is added to
+                //    the root Sprite (main timeline). TODO: check what
+                //    happens if the sprite is defined later.
                 if (s) s->addControlTag(st);
+
             }
 		}
 	}
