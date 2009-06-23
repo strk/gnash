@@ -73,6 +73,30 @@ public:
 
 	void setBodyLength(boost::uint32_t length){ _bodyLength = length;}
 
+    void setMaxStack(boost::uint32_t max) {
+        _maxStack = max;
+    }
+ 
+    boost::uint32_t maxStack() const {
+        return _maxStack;
+    }
+
+    void setMaxScope(boost::uint32_t max) {
+        _maxScope = max;
+    }
+ 
+    boost::uint32_t maxScope() const {
+        return _maxScope;
+    }
+    
+    void setScopeDepth(boost::uint32_t depth) {
+        _scopeDepth = depth;
+    }
+ 
+    boost::uint32_t scopeDepth() const {
+        return _scopeDepth;
+    }
+
 	abc_function* getPrototype() { return _prototype; }
 
 	asBinding* getBinding(string_table::key name);
@@ -80,7 +104,10 @@ public:
 	bool isNative() { return _isNative; }
 	bool hasBody() const { return _body != NULL; }
 
-	as_object* construct(as_object* /*base_scope*/) { /* TODO */ return NULL; }
+	as_object* construct(as_object* /*base_scope*/) {
+        // TODO:
+        return NULL;
+    }
 
 	bool hasActivation();
 
@@ -240,6 +267,10 @@ private:
 	unsigned char _flags;
 	CodeStream* _body;
 	boost::uint32_t _maxRegisters;
+
+    boost::uint32_t _scopeDepth;
+    boost::uint32_t _maxScope;
+    boost::uint32_t _maxStack;
 
 };
 

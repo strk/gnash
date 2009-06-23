@@ -274,7 +274,7 @@ private:
 	std::vector<abc::Trait*> _traits;
 
 	string_table* _stringTable;
-	SWFStream* mS; // Not stored beyond one read.
+	SWFStream* _stream; // Not stored beyond one read.
 
 	asClass *mTheObject;
 	ClassHierarchy *mCH;

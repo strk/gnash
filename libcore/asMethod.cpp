@@ -37,7 +37,10 @@ asMethod::asMethod()
     _implementation(0),
     _flags(0),
     _body(0),
-    _maxRegisters(0)
+    _maxRegisters(0),
+    _scopeDepth(0),
+    _maxScope(0),
+    _maxStack(0)
 {
 }
 
