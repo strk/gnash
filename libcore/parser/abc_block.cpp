@@ -768,12 +768,14 @@ abc_block::read_method_infos()
 		log_abc(" Reading method %u", i);
 		asMethod *pMethod = mCH->newMethod();
 		pMethod->setMethodID(i);
-//		log_abc("Min arg count: %d max: %d", pMethod->minArgumentCount(), pMethod->maxArgumentCount());
 		_methods[i] = pMethod;
 		boost::uint32_t param_count = mS->read_V32();
 		boost::uint32_t return_type = mS->read_V32();
 
-		log_abc("  Param count: %u return type(index): %s(%u)", param_count, _stringPool[_multinamePool[return_type].getABCName()], return_type);
+		log_abc("  Param count: %u return type(index): %s(%u)", param_count, 
+                _stringPool[_multinamePool[return_type].getABCName()],
+                return_type);
+
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
 
@@ -796,7 +798,9 @@ abc_block::read_method_infos()
 			log_abc("  Reading parameter %u", j);
 			// The parameter type.
 			boost::uint32_t ptype = mS->read_V32();
-			log_abc("   Parameter type(index): %s(%u)", _stringPool[_multinamePool[ptype].getABCName()], ptype);
+			log_abc("   Parameter type(index): %s(%u)", 
+                    _stringPool[_multinamePool[ptype].getABCName()], ptype);
+
 			if (ptype >= _multinamePool.size())
 			{
 				log_error(_("ABC: Out of bounds parameter type in method."));
