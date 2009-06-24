@@ -562,7 +562,6 @@ as_object::get_member_slot(int order, as_value* val){
 	if (prop) {
 		return get_member(prop->getName(), val, prop->getNamespace());
 	}
-    
     return false;
 }
 
