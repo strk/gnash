@@ -572,10 +572,10 @@ bool
 as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
 	const Property* prop = _members.getPropertyByOrder(order);
-	if(prop){
+	if (prop) {
 		return set_member(prop->getName(), val, prop->getNamespace(), ifFound);
 	}
-	else{
+	else {
 		return false;
 	}
 }
