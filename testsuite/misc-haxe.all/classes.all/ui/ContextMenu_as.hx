@@ -23,9 +23,14 @@
 // This test case must be processed by CPP before compiling to include the
 //  DejaGnu.hx header file for the testing framework support.
 
+#if flash10
+import flash.ui.ContextMenuClipboardItems;
+import flash.net.URLRequest;
+#end
 #if flash9
 import flash.display.MovieClip;
 import flash.ui.ContextMenuBuiltInItems;
+import flash.ui.ContextMenuClipboardItems;
 import flash.ui.ContextMenu;
 #else
 import flash.MovieClip;
@@ -40,86 +45,217 @@ import DejaGnu;
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class ContextMenu_as {
+	
+	// Tests for undefined and number (last two tests)
+	#if (flash8 || flash7)
+	static var undef = untyped __global__["undefined"];
+	static var num = untyped __global__["number"];
+	#end
+	
     static function main() {
 	#if flash6
 		DejaGnu.note("You cannot rely on availability of ContextMenu class with a SWF < 7");
 	#end
 	
+	#if flash10
+		var x1:ContextMenu = new ContextMenu();
+		
+		if (Std.is(x1.clipboardItems, ContextMenuClipboardItems)) {
+			DejaGnu.pass("ContextMenu::clipboardItems property exists");
+		} else {
+			DejaGnu.fail("ContextMenu::clipboardItems property doesn't exist");
+		}
+		if (Type.typeof(x1.clipboardMenu)==ValueType.TBool) {
+			DejaGnu.pass("ContextMenu::clipboardMenu property exists");
+		} else {
+			DejaGnu.fail("ContextMenu::clipboardMenu property doesn't exist");
+		}
+		if (Std.is(x1.link, URLRequest)) {
+			DejaGnu.pass("ContextMenu::link property exists");
+		} else {
+			DejaGnu.fail("ContextMenu::link property doesn't exist");
+		}
+	#end
+		
 	#if flash9
         var x1:ContextMenu = new ContextMenu();
 
         // Make sure we actually get a valid class 
-	if (Std.is(x1, ContextMenu)) {       
-            DejaGnu.pass("ContextMenu class exists");
-        } else {
-            DejaGnu.fail("ContextMenu class doesn't exist");
-        }
+		if (Std.is(x1, ContextMenu)) {       
+				DejaGnu.pass("ContextMenu class exists");
+			} else {
+				DejaGnu.fail("ContextMenu class doesn't exist");
+			}
 
-	// Tests to see if all the properties exist. All these do is test for
-	// existance of a property, and don't test the functionality at all. This
-	// is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.builtInItems, ContextMenuBuiltInItems)) {	
-	    DejaGnu.pass("ContextMenu.builtInItems property exists");
-	} else {
-	    DejaGnu.fail("ContextMenu.builtInItems property doesn't exist");
-	}
-	if (Std.is(x1.customItems, Array)) {
-	    DejaGnu.pass("ContextMenu.customItems property exists");
-	} else {
-	    DejaGnu.fail("ContextMenu.customItems property doesn't exist");
-	}
-
-	// Tests to see if all the methods exist. All these do is test for
-	// existance of a method, and don't test the functionality at all. This
-	// is primarily useful only to test completeness of the API implementation.
-	if (Type.typeof(x1.clone)==ValueType.TFunction) {
- 	    DejaGnu.pass("ContextMenu::clone() method exists");
-	} else {
-	    DejaGnu.fail("ContextMenu::clone() method doesn't exist");
-	}
-	if (Type.typeof(x1.hideBuiltInItems)==ValueType.TFunction) {
-	    DejaGnu.pass("ContextMenu::hideBuiltInItems() method exists");
-	} else {
-	    DejaGnu.fail("ContextMenu::hideBuiltInItems() method doesn't exist");
-	}
-
-        // Call this after finishing all tests. It prints out the totals.
-        DejaGnu.done();
-	#end
-	
-	#if (flash7 || flash8)
-		var x2:ContextMenu = new ContextMenu();
-		
-        // Make sure we actually get a valid class 
-		if (Std.is(x2, ContextMenu)) {       
-			DejaGnu.pass("ContextMenu class exists");
+		// Tests to see if all the properties exist. All these do is test for
+		// existance of a property, and don't test the functionality at all. This
+		// is primarily useful only to test completeness of the API implementation.
+		if (Std.is(x1.builtInItems, ContextMenuBuiltInItems)) {	
+			DejaGnu.pass("ContextMenu.builtInItems property exists");
 		} else {
-			DejaGnu.fail("ContextMenu class doesn't exist");
+			DejaGnu.fail("ContextMenu.builtInItems property doesn't exist");
 		}
-		// test existence of copy function
-		if (Type.typeof(x2.copy)==ValueType.TFunction) {
-			DejaGnu.pass("ContextMenu::copy() method exists");
+		if (Std.is(x1.customItems, Array)) {
+			DejaGnu.pass("ContextMenu.customItems property exists");
 		} else {
-			DejaGnu.fail("ContextMenu::copy() method doesn't exist");
+			DejaGnu.fail("ContextMenu.customItems property doesn't exist");
 		}
-		//test existence of hideBuiltInItems function
-		if (Type.typeof(x2.hideBuiltInItems)==ValueType.TFunction) {
+
+		// Tests to see if all the methods exist. All these do is test for
+		// existance of a method, and don't test the functionality at all. This
+		// is primarily useful only to test completeness of the API implementation.
+		if (Type.typeof(x1.clone)==ValueType.TFunction) {
+			DejaGnu.pass("ContextMenu::clone() method exists");
+		} else {
+			DejaGnu.fail("ContextMenu::clone() method doesn't exist");
+		}
+		if (Type.typeof(x1.hideBuiltInItems)==ValueType.TFunction) {
 			DejaGnu.pass("ContextMenu::hideBuiltInItems() method exists");
 		} else {
 			DejaGnu.fail("ContextMenu::hideBuiltInItems() method doesn't exist");
 		}
-		
-		//check properties
-		if (Type.typeof(x2.builtInItems) == ValueType.TObject) {	
-			DejaGnu.pass("ContextMenu.builtInItems property exists");
+
+			// Call this after finishing all tests. It prints out the totals.
+			DejaGnu.done();
+	#end
+	
+	#if (flash7 || flash8)
+	
+		if (Type.typeof(ContextMenu)==ValueType.TFunction) {
+			DejaGnu.pass("typeof(ContextMenu)=='function'");
 		} else {
-			DejaGnu.xfail("ContextMenu.builtInItems property doesn't exist");
+			DejaGnu.fail("typeof(ContextMenu)!='function'");
 		}
 		
-		if (Std.is(x2.customItems, Array)) {	
-			DejaGnu.pass("ContextMenu.customItems property exists");
+		var contextMenuObj = new ContextMenu();
+		
+		// Tests ContextMenu constructor
+		if (Type.typeof(contextMenuObj)==ValueType.TObject) {
+			DejaGnu.pass("typeof(contextMenuObj)=='object'");
 		} else {
-			DejaGnu.xfail("ContextMenu.customItems property doesn't exist");
+			DejaGnu.fail("typeof(contextMenuObj)!='object'");
+		}
+		
+		// Tests ContextMenu::copy method
+		if (Type.typeof(contextMenuObj.copy)==ValueType.TFunction) {
+			DejaGnu.pass("typeof(contextMenuObj.copy)=='function'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj.copy)!='function'");
+		}
+		
+		// Tests ContextMenu::hideBuiltInItems method
+		if (Type.typeof(contextMenuObj.hideBuiltInItems)==ValueType.TFunction) {
+			DejaGnu.pass("typeof(contextMenuObj.hideBuiltInItems)=='function'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj.hideBuiltInItems)!='function'");
+		}
+		
+		// Tests existence of ContextMenu::builtInItems object
+		if (Type.typeof(contextMenuObj.builtInItems)==ValueType.TObject) {
+			DejaGnu.pass("typeof(contextMenuObj.builtInItems)=='object'");
+		} else {
+			DejaGnu.xfail("typeof(contextMenuObj.builtInItems)!='object'");
+		} 
+		if (! untyped __instanceof__(contextMenuObj.builtInItems, Array)) {
+			DejaGnu.pass("!contextMenuObj.builtInItems instanceOf Array");
+		} else {
+			DejaGnu.fail("contextMenuObj.builtInItems instanceOf Array");
+		}
+		if (Type.typeof(contextMenuObj.builtInItems.length)==ValueType.TNull) {
+			DejaGnu.pass("typeof(contextMenuObj.builtInItems.length)=='undefined'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj.builtInItems.length)!='undefined'");
+		}
+		
+		// Tests existence of ContextMenu::customItems object
+		if (Type.typeof(contextMenuObj.customItems)==ValueType.TObject) {
+			DejaGnu.pass("typeof(contextMenuObj.customItems)=='object'");
+		} else {
+			DejaGnu.xfail("typeof(contextMenuObj.customItems)!='object'");
+		} 
+		if (! untyped __instanceof__(contextMenuObj.customItems, Array)) {
+			DejaGnu.pass("!contextMenuObj.customItems instanceOf Array");
+		} else {
+			DejaGnu.fail("contextMenuObj.customItems instanceOf Array");
+		}
+		if (Type.typeof(contextMenuObj.customItems.length)==ValueType.TInt) {
+			DejaGnu.pass("typeof(contextMenuObj.customItems.length)=='number'");
+		} else {
+			DejaGnu.xfail("typeof(contextMenuObj.customItems.length)!='number'");
+		}
+		
+		// Tests existence of ContextMenu::onSelect object
+		if (Type.typeof(contextMenuObj.onSelect)==ValueType.TNull) {
+			DejaGnu.pass("typeof(contextMenuObj.onSelect)=='undefined'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj.onSelect)!='undefined'");
+		}
+		
+		// Tests onSelect (only for Flash 7 and 8)
+		var callback1 : Dynamic = {};
+		
+		callback1 = function() {};
+		
+		var contextMenuObj2 = new ContextMenu(callback1);
+		
+		if (Type.typeof(contextMenuObj2.onSelect)==ValueType.TFunction) {
+			DejaGnu.pass("typeof(contextMenuObj2.onSelect)=='function'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj2.onSelect)!='function'");
+		}
+		
+		// UNRESOLVED
+		// Cannot figure out how to set a class method to a callback
+		// function
+		if (Std.is(contextMenuObj2.onSelect, callback1)) {
+			DejaGnu.pass("contextMenuObj2.onSelect==callback1");
+		} else {
+			DejaGnu.unresolved("contextMenuObj2.onSelect!=callback1");
+		}
+		
+		var callback2 : Dynamic = {};
+		
+		callback2 = function() {};
+		
+		Reflect.setField(contextMenuObj2, "onSelect", callback2);
+		
+		if (Type.typeof(contextMenuObj2.onSelect)==ValueType.TFunction) {
+			DejaGnu.pass("typeof(contextMenuObj2.onSelect)=='function'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj2.onSelect)!='function'");
+		}
+		
+		// UNRESOLVED
+		// Cannot figure out how to set a class method to a callback
+		// function
+		if (Reflect.compareMethods(contextMenuObj2.onSelect, callback2)) {
+			DejaGnu.pass("contextMenuObj2.onSelect==callback2");
+		} else {
+			DejaGnu.unresolved("contextMenuObj2.onSelect!=callback2");
+		}
+		
+		Reflect.setField(contextMenuObj2, "onSelect", null);
+		
+		if (Type.typeof(contextMenuObj2.onSelect)==ValueType.TNull) {
+			DejaGnu.pass("typeof(contextMenuObj2.onSelect)=='null'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj2.onSelect)!='null'");
+		}
+		
+		Reflect.setField(contextMenuObj2, "onSelect", undef);
+		
+		if (untyped contextMenuObj2.onSelect==undef) {
+			DejaGnu.pass("contextMenuObj2.onSelect=='undefined'");
+		} else {
+			DejaGnu.fail("contextMenuObj2.onSelect!='undefined'");
+		}
+				
+		Reflect.setField(contextMenuObj2, "onSelect", num);
+
+		if (untyped contextMenuObj2.onSelect==num) {
+			DejaGnu.pass("typeof(contextMenuObj2)=='number'");
+		} else {
+			DejaGnu.fail("typeof(contextMenuObj2)!='number'");
 		}
 	#end
 	
@@ -132,4 +268,3 @@ class ContextMenu_as {
 // mode: C++
 // indent-tabs-mode: t
 // End:
-
