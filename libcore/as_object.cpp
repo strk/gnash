@@ -559,12 +559,11 @@ bool
 as_object::get_member_slot(int order, as_value* val){
 	
 	const Property* prop = _members.getPropertyByOrder(order);
-	if(prop){
+	if (prop) {
 		return get_member(prop->getName(), val, prop->getNamespace());
 	}
-	else{
-		return false;
-	}
+    
+    return false;
 }
 
 
@@ -575,9 +574,7 @@ as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 	if (prop) {
 		return set_member(prop->getName(), val, prop->getNamespace(), ifFound);
 	}
-	else {
-		return false;
-	}
+    return false;
 }
 
 // Handles read_only and static properties properly.
