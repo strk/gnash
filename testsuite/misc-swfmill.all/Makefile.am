@@ -36,7 +36,7 @@ SC_AS2_XMLTESTS =			\
 	$(NULL)
 
 SC_AS3_XMLTEXTS = \
-	mixed-bytecode-as2.xml	\
+	mixed-bytecode-as3.xml	\
 	$(NULL)
 
 EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS)  

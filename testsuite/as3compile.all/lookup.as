@@ -18,14 +18,14 @@
 #include "check.as"
 
 package p1 {
-    class A { public function id() { return "p1.A"; } }
-    class B { public static function id() { return "p1.B"; } }
+    public class A { public function id() { return "p1.A"; } }
+    public class B { public static function id() { return "p1.B"; } }
 }
 
 package p2 {
-    class A { public function id() { return "p2.A"; } }
-    class B { public static function id() { return "p2.B"; } }
-    class C {}
+    public class A { public function id() { return "p2.A"; } }
+    public class B { public static function id() { return "p2.B"; } }
+    public class C {}
 }
 
 import flash.display.MovieClip;
