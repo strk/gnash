@@ -39,7 +39,17 @@ SC_AS3_XMLTEXTS = \
 	mixed-bytecode-as3.xml	\
 	$(NULL)
 
-EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS)  
+# XML tests that rely on comparing trace output.
+TRACE_AS_TESTS = \
+	scope1.xml \
+	$(NULL)
+
+TRACE_AS3_TRACES = \
+	scope1.trace \
+	$(NULL)
+
+EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS) $(TRACE_AS_TESTS) \
+			 $(TRACE_AS3_TRACES)
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -58,6 +68,7 @@ SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
 
 if ENABLE_AVM2
 SC_XMLTESTS_OUT += $(SC_AS3_XMLTESTS:.xml=.swf)
+SC_XMLTESTS_OUT += $(TRACE_AS3_TESTS:.xml=.swf)
 endif
 
 # Dependencies for all self-contained SWF tests
