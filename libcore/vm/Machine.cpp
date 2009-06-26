@@ -1375,11 +1375,9 @@ Machine::execute()
 
                     as_object *object = object_val.to_object().get();
                     if (!object) {
-                        IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't call a method of a value "
+                        log_abc(_("CALLPROP: Can't call a method of a value "
                                 "that doesn't cast to an object (%s)."),
                                 object_val);
-                        )
                     }
                     else {
 
@@ -1394,12 +1392,10 @@ Machine::execute()
 
                         }
                         else {
-                            IF_VERBOSE_ASCODING_ERRORS(
-                            log_aserror(_("Property '%s' of object '%s' "
+                            log_abc(_("CALLPROP: Property '%s' of object '%s' "
                                     "is '%s', cannot call as method"),
                                     mPoolObject->stringPoolAt(a.getABCName()),
                                     object_val, property);
-                            )
                         }
 
                     }
@@ -1575,6 +1571,9 @@ Machine::execute()
 
                             call_method(val, env,
                                     constructor_val.to_object().get(), args);
+
+                            // Push the constructed property?
+                            push_stack(constructor_val);
                         }
                     }
                     
@@ -2969,6 +2968,8 @@ void
 Machine::immediateFunction(const as_function* func, as_object* thisptr,
         as_value& storage, unsigned char stack_in, short stack_out)
 {
+
+    GNASH_REPORT_FUNCTION;
     assert(func);
 
 	// TODO: Set up the fn to use the stack
@@ -2980,11 +2981,11 @@ Machine::immediateFunction(const as_function* func, as_object* thisptr,
     }
 
 	fn_call fn(thisptr, as_environment(_vm), args);
-	mStack.drop(stack_in - stack_out);
+    mStack.drop(stack_in - stack_out);
 	saveState();
+    mStack.grow(stack_in - stack_out);
+    mStack.setDownstop(stack_in);
 	mThis = thisptr;
-	mStack.grow(stack_in - stack_out);
-	mStack.setDownstop(stack_in);
 	storage = const_cast<as_function*>(func)->call(fn);
 	restoreState();
 }
@@ -3115,13 +3116,14 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
 	bool prev_ext = mExitWithReturn;
 	CodeStream *stream = method->getBody();
     
+    // Protect the current stack from alteration
+    // TODO: use saveState only, but not before checking other effects.
     size_t stackdepth = mStack.fixDownstop();
+    size_t stacksize = mStack.totalSize();
     size_t scopedepth = mScopeStack.fixDownstop();
+    size_t scopesize = mScopeStack.totalSize();
 	
     saveState();
-	//TODO: Maybe this call should be part of saveState(), it
-    //returns the old downstop.
-	mScopeStack.fixDownstop();
 	mStream = stream;
 	clearRegisters(method->getMaxRegisters());
 	
@@ -3136,10 +3138,14 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
 	
     execute();
 	mExitWithReturn = prev_ext;
-	stream->seekTo(0);
+	
+    // Not sure exactly if this is necessary, but it certainly must be
+    // called on stream and not mStream, which may have changed during
+    // execution (restoreState on return).
+    stream->seekTo(0);
     
-    mStack.setDownstop(stackdepth);
-    mScopeStack.setDownstop(scopedepth);
+    mStack.setAllSizes(stacksize, stackdepth);
+    mScopeStack.setAllSizes(scopesize, scopedepth);
 
 	return mGlobalReturn;
 }
@@ -3179,7 +3185,9 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
     // Protect the current stack from alteration
     // TODO: use saveState
     size_t stackdepth = mStack.fixDownstop();
+    size_t stacksize = mStack.totalSize();
     size_t scopedepth = mScopeStack.fixDownstop();
+    size_t scopesize = mScopeStack.totalSize();
 
     // The value at _registers[0] is generally pushed to the stack for
     // CONSTRUCTSUPER, which apparently expects the object whose super
@@ -3188,8 +3196,8 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 	executeCodeblock(ctor->getBody());
     log_debug("Finished instantiating class %s", className);
 
-    mStack.setDownstop(stackdepth);
-    mScopeStack.setDownstop(scopedepth);
+    mStack.setAllSizes(stacksize, stackdepth);
+    mScopeStack.setAllSizes(scopesize, scopedepth);
 
 }
 
@@ -3284,9 +3292,9 @@ Machine::print_stack()
 
 	std::stringstream ss;
 	ss << "Stack: ";
-	for (unsigned int i = 0; i < mStack.size(); ++i) {
+	for (unsigned int i = 0; i < mStack.totalSize(); ++i) {
 		if (i!=0) ss << " | ";
-		ss << mStack.value(i).toDebugString();
+		ss << mStack.at(i);
 	}
 	log_abc("%s", ss.str());
 }
