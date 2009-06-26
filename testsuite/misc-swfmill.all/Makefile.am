@@ -50,8 +50,12 @@ TRACE_AS3_TRACES = \
 	scope2.trace \
 	$(NULL)
 
-EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS) $(TRACE_AS_TESTS) \
-			 $(TRACE_AS3_TRACES)
+EXTRA_DIST = $(SC_AS2_XMLTESTS) \
+	     $(SC_AS3_XMLTESTS) \
+	     $(TRACE_AS_TESTS) \
+	     $(TRACE_AS3_TRACES) \
+	     gen-swfmill-trace-runner \
+	     $(NULL)
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -90,11 +94,17 @@ check_SCRIPTS = \
 if ENABLE_AVM2
 check_SCRIPTS += \
 	mixed-bytecode-as3-runner	\
+	trace-test-runner	\
 	$(NULL)
 endif
 
 check_PROGRAMS = \
-	backgroundTestRunner
+	backgroundTestRunner \
+	$(NULL)
+
+trace-test-runner: $(TRACE_AS3_TESTS)
+	sh gen-swfmill-trace-runner $(srcdir) $(builddir) > $@
+	chmod 755 $@
 
 mixed-bytecode-as3-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as3.swf Makefile
 	sh $< -r 50 -c "AS3" $(top_builddir) mixed-bytecode-as3.swf > $@
