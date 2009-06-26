@@ -1459,6 +1459,8 @@ Machine::execute()
                 ///  .
                 /// Do: Return value up the callstack.
                 case SWF::ABC_ACTION_RETURNVALUE:
+                    mStream->seekTo(0);
+                    
                     // Slot the return.
                     mGlobalReturn = pop_stack();
                     // And restore the previous state.
@@ -3139,11 +3141,6 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
     execute();
 	mExitWithReturn = prev_ext;
 	
-    // Not sure exactly if this is necessary, but it certainly must be
-    // called on stream and not mStream, which may have changed during
-    // execution (restoreState on return).
-    stream->seekTo(0);
-    
     mStack.setAllSizes(stacksize, stackdepth);
     mScopeStack.setAllSizes(scopesize, scopedepth);
 
