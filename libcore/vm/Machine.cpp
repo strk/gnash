@@ -2917,6 +2917,11 @@ UNUSED(newvalue);
 int
 Machine::completeName(asName& name, int offset)
 {
+    
+    // TODO: implement this properly.
+    // Should this really be called when there's nothing on the stack?
+    if (mStack.empty()) return 0;
+
 	int size = 0;
 
 	if (name.isRuntime())
@@ -2927,8 +2932,9 @@ Machine::completeName(asName& name, int offset)
             ++size;
         }
 
-		if (name.isRtns())
+		if (name.isRtns()) {
 			++size; // Ignore the Namespace.
+        }
 	}
 	else if (name.isRtns())
 	{
@@ -3108,7 +3114,17 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
 	mCurrentFunction = method->getPrototype();
 	bool prev_ext = mExitWithReturn;
 	CodeStream *stream = method->getBody();
-	load_function(stream, method->getMaxRegisters());
+    
+    size_t stackdepth = mStack.fixDownstop();
+    size_t scopedepth = mScopeStack.fixDownstop();
+	
+    saveState();
+	//TODO: Maybe this call should be part of saveState(), it
+    //returns the old downstop.
+	mScopeStack.fixDownstop();
+	mStream = stream;
+	clearRegisters(method->getMaxRegisters());
+	
     log_abc("Executing function: max registers %s, scope depth %s, "
             "max scope %s, max stack: %s", method->getMaxRegisters(),
             method->scopeDepth(), method->maxScope(), method->maxStack());
@@ -3121,6 +3137,9 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
     execute();
 	mExitWithReturn = prev_ext;
 	stream->seekTo(0);
+    
+    mStack.setDownstop(stackdepth);
+    mScopeStack.setDownstop(scopedepth);
 
 	return mGlobalReturn;
 }
@@ -3297,17 +3316,6 @@ Machine::get_args(unsigned int argc)
 		args->at(i-1) = pop_stack();
 	}
 	return args;
-}
-
-void
-Machine::load_function(CodeStream* stream, boost::uint32_t maxRegisters)
-{
-	saveState();
-	//TODO: Maybe this call should be part of saveState(), it
-    //returns the old downstop.
-	mScopeStack.fixDownstop();
-	mStream = stream;
-	clearRegisters(maxRegisters);
 }
 
 as_environment::ScopeStack*
