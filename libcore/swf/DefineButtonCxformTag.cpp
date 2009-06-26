@@ -37,7 +37,7 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     const boost::uint16_t buttonID = in.read_u16();
 
     IF_VERBOSE_PARSE (
-        log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
+        log_parse("DefineButtonCxformTag: ButtonId=%d", buttonID);
     );
     
     DefinitionTag* chdef = m.getDefinitionTag(buttonID);
