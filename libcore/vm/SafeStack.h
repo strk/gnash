@@ -70,6 +70,30 @@ public:
 		const StackSize offset = _end - i;
 		return _data[offset >> _chunkShift][offset & _chunkMod];
 	}
+    
+    /// From the top of the stack, get the i'th value down. 
+    //
+    /// 0 is the topmost value value.
+	const T& at(StackSize i) const
+	{
+
+		if (i >= totalSize()) throw StackException();
+		const StackSize offset = _end - i;
+		return _data[offset >> _chunkShift][offset & _chunkMod];
+	}
+
+	
+    /// From the top of the stack, get the i'th value down. 
+    //
+    /// This is a non-const version of at().
+    /// 0 is the topmost value value.
+	T& at(StackSize i)
+	{
+
+		if (i >= totalSize()) throw StackException();
+		const StackSize offset = _end - i;
+		return _data[offset >> _chunkShift][offset & _chunkMod];
+	}
 
 	/// From the bottom of the stack, get the i'th value up. 0 is the
 	/// bottommost value.
@@ -175,12 +199,10 @@ public:
         _downstop = i;
     }
 
-	/// The total size of the stack. This is not what can be read. That
-	/// value is given by size()
-	///
-	/// This function is probably not what you need for anything except for
-	/// setting downstops that weren't returned by either fixDownstop() or
-	/// getDownstop()
+    /// Return the complete stack size, including non-accessible elements
+    //
+    /// This is required because AVM2 scope stacks are usable even when they
+    /// appear inaccessible
 	StackSize totalSize() const { return _end - 1; }
 
 	/// Set the total size and local size of the stack, for restoring a
