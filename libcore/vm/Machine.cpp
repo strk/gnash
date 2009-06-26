@@ -1189,13 +1189,7 @@ Machine::execute()
                     log_abc("Creating new abc_function: method index=%u",method_index);
                     asMethod *m = pool_method(method_index, mPoolObject);
                     abc_function* new_function = m->getPrototype();
-                    // TODO: SafeStack contains all the scope objects
-                    // in for all functions in the call stack.
-                    // We should only copy the relevent scope objects
-                    // to the function's scope stacks.
-                    // Note: this doesn't copy any values, but rather assigns a pointer
-                    // value.
-                    new_function->setScopeStack(getScopeStack());
+                    
                     push_stack(as_value(new_function));
                     break;
                 }
@@ -3123,16 +3117,8 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
 	for (unsigned int i=0;i<fn.nargs;i++) {
 		setRegister(i + 1, fn.arg(i));
 	}
-	//TODO:  There is probably a better way to do this.
-    //
-    const as_environment::ScopeStack* const ss = mCurrentFunction->scopeStack();
-
-	if (ss) {
-		for (unsigned int i=0; i < ss->size(); ++i) {
-			push_scope_stack(as_value(ss->at(i)));
-		}
-	}
-	execute();
+	
+    execute();
 	mExitWithReturn = prev_ext;
 	stream->seekTo(0);
 
@@ -3170,8 +3156,11 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 
 	clearRegisters(ctor->getMaxRegisters());
 	mCurrentFunction = ctor->getPrototype();
-	mStack.clear();
-	mScopeStack.clear();
+
+    // Protect the current stack from alteration
+    // TODO: use saveState
+    size_t stackdepth = mStack.fixDownstop();
+    size_t scopedepth = mScopeStack.fixDownstop();
 
     // The value at _registers[0] is generally pushed to the stack for
     // CONSTRUCTSUPER, which apparently expects the object whose super
@@ -3179,6 +3168,10 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 	setRegister(0, cl->getPrototype());
 	executeCodeblock(ctor->getBody());
     log_debug("Finished instantiating class %s", className);
+
+    mStack.setDownstop(stackdepth);
+    mScopeStack.setDownstop(scopedepth);
+
 }
 
 as_value
@@ -3192,10 +3185,14 @@ Machine::find_prop_strict(asName multiname)
     // We should not push anything onto the scope stack here; whatever is
     // needed should already be pushed. The pp will not call FINDPROP*
     // when the scope stack is empty.
+    //
+    // However, the complete scope stack, including elements that are
+    // 'invisible' to this scope, is available
 	as_value val;
-	for (size_t i = 0; i < mScopeStack.size(); ++i)
+    print_scope_stack();
+	for (size_t i = 0; i < mScopeStack.totalSize(); ++i)
     {
-		as_object* scope_object = mScopeStack.top(i).get();
+		as_object* scope_object = mScopeStack.at(i).get();
 		if (!scope_object) {
 			log_abc("Scope object is NULL.");
 			continue;
@@ -3204,7 +3201,7 @@ Machine::find_prop_strict(asName multiname)
                 multiname.getNamespace()->getURI());
 
 		if (!val.is_undefined()) {
-			push_stack(mScopeStack.top(i));
+			push_stack(mScopeStack.at(i));
 			return val;
 		}
 	}
@@ -3281,8 +3278,11 @@ Machine::print_scope_stack()
 
 	std::stringstream ss;
 	ss << "ScopeStack: ";
-	for (unsigned int i=0;i<mScopeStack.size();++i) {
-		ss << as_value(mScopeStack.top(i).get()).toDebugString();
+
+    size_t totalSize = mScopeStack.totalSize();
+
+    for (unsigned int i = 0; i < totalSize; ++i) {
+		ss << as_value(mScopeStack.at(i).get()).toDebugString();
 	}
 	log_abc("%s", ss.str());
 }	
