@@ -42,10 +42,12 @@ SC_AS3_XMLTEXTS = \
 # XML tests that rely on comparing trace output.
 TRACE_AS_TESTS = \
 	scope1.xml \
+	scope2.xml \
 	$(NULL)
 
 TRACE_AS3_TRACES = \
 	scope1.trace \
+	scope2.trace \
 	$(NULL)
 
 EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS) $(TRACE_AS_TESTS) \
