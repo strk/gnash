@@ -332,8 +332,18 @@ private:
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
 	std::vector<as_value> _registers;
+
+    /// The scope stack is used to look for objects as properties
+    //
+    /// This stack is not cleared before a function call, class instantiation
+    /// etc, but anything on the stack cannot be altered by the function call.
+    /// On return from the function, the stack should be the same as it was
+    /// before.
+    /// Most importantly, the complete stack is used for lookups, including
+    /// the section that is not changeable.
 	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
-	CodeStream *mStream;
+
+    CodeStream *mStream;
 
 	string_table& mST;
 

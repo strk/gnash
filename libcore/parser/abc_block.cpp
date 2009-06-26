@@ -325,9 +325,9 @@ abc_block::prepare(Machine* mach)
     // fail as often, but doesn't really seem quite correct.
 #if 1
     as_object* global = mach->global();
+        assert(global);
     for (std::vector<asNamespace*>::iterator i = _namespacePool.begin(), 
             e = _namespacePool.end(); i != e; ++i) {
-        assert(global);
         global->reserveSlot((*i)->getURI(), 0, i - _namespacePool.begin());
     }
 #endif
@@ -548,14 +548,10 @@ abc_block::read_namespaces()
 		else
 		{
 			asNamespace *n = mCH->findNamespace(nameIndex);
-			if (n == NULL)
-				n = mCH->addNamespace(nameIndex);
+			if (!n) n = mCH->addNamespace(nameIndex);
 			_namespacePool[i] = n;
 		}
-		if (kind == PROTECTED_NS)
-		{
-			_namespacePool[i]->setProtected();
-		}
+		if (kind == PROTECTED_NS) _namespacePool[i]->setProtected();
 		setNamespaceURI(_namespacePool[i], nameIndex);
 	}
 	return true;

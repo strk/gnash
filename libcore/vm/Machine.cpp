@@ -1189,13 +1189,7 @@ Machine::execute()
                     log_abc("Creating new abc_function: method index=%u",method_index);
                     asMethod *m = pool_method(method_index, mPoolObject);
                     abc_function* new_function = m->getPrototype();
-                    // TODO: SafeStack contains all the scope objects
-                    // in for all functions in the call stack.
-                    // We should only copy the relevent scope objects
-                    // to the function's scope stacks.
-                    // Note: this doesn't copy any values, but rather assigns a pointer
-                    // value.
-                    new_function->setScopeStack(getScopeStack());
+                    
                     push_stack(as_value(new_function));
                     break;
                 }
@@ -1381,11 +1375,9 @@ Machine::execute()
 
                     as_object *object = object_val.to_object().get();
                     if (!object) {
-                        IF_VERBOSE_ASCODING_ERRORS(
-                        log_aserror(_("Can't call a method of a value "
+                        log_abc(_("CALLPROP: Can't call a method of a value "
                                 "that doesn't cast to an object (%s)."),
                                 object_val);
-                        )
                     }
                     else {
 
@@ -1400,12 +1392,10 @@ Machine::execute()
 
                         }
                         else {
-                            IF_VERBOSE_ASCODING_ERRORS(
-                            log_aserror(_("Property '%s' of object '%s' "
+                            log_abc(_("CALLPROP: Property '%s' of object '%s' "
                                     "is '%s', cannot call as method"),
                                     mPoolObject->stringPoolAt(a.getABCName()),
                                     object_val, property);
-                            )
                         }
 
                     }
@@ -1469,6 +1459,8 @@ Machine::execute()
                 ///  .
                 /// Do: Return value up the callstack.
                 case SWF::ABC_ACTION_RETURNVALUE:
+                    mStream->seekTo(0);
+                    
                     // Slot the return.
                     mGlobalReturn = pop_stack();
                     // And restore the previous state.
@@ -1581,6 +1573,9 @@ Machine::execute()
 
                             call_method(val, env,
                                     constructor_val.to_object().get(), args);
+
+                            // Push the constructed property?
+                            push_stack(constructor_val);
                         }
                     }
                     
@@ -2923,6 +2918,11 @@ UNUSED(newvalue);
 int
 Machine::completeName(asName& name, int offset)
 {
+    
+    // TODO: implement this properly.
+    // Should this really be called when there's nothing on the stack?
+    if (mStack.empty()) return 0;
+
 	int size = 0;
 
 	if (name.isRuntime())
@@ -2933,8 +2933,9 @@ Machine::completeName(asName& name, int offset)
             ++size;
         }
 
-		if (name.isRtns())
+		if (name.isRtns()) {
 			++size; // Ignore the Namespace.
+        }
 	}
 	else if (name.isRtns())
 	{
@@ -2969,6 +2970,8 @@ void
 Machine::immediateFunction(const as_function* func, as_object* thisptr,
         as_value& storage, unsigned char stack_in, short stack_out)
 {
+
+    GNASH_REPORT_FUNCTION;
     assert(func);
 
 	// TODO: Set up the fn to use the stack
@@ -2980,11 +2983,11 @@ Machine::immediateFunction(const as_function* func, as_object* thisptr,
     }
 
 	fn_call fn(thisptr, as_environment(_vm), args);
-	mStack.drop(stack_in - stack_out);
+    mStack.drop(stack_in - stack_out);
 	saveState();
+    mStack.grow(stack_in - stack_out);
+    mStack.setDownstop(stack_in);
 	mThis = thisptr;
-	mStack.grow(stack_in - stack_out);
-	mStack.setDownstop(stack_in);
 	storage = const_cast<as_function*>(func)->call(fn);
 	restoreState();
 }
@@ -3114,7 +3117,18 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
 	mCurrentFunction = method->getPrototype();
 	bool prev_ext = mExitWithReturn;
 	CodeStream *stream = method->getBody();
-	load_function(stream, method->getMaxRegisters());
+    
+    // Protect the current stack from alteration
+    // TODO: use saveState only, but not before checking other effects.
+    size_t stackdepth = mStack.fixDownstop();
+    size_t stacksize = mStack.totalSize();
+    size_t scopedepth = mScopeStack.fixDownstop();
+    size_t scopesize = mScopeStack.totalSize();
+	
+    saveState();
+	mStream = stream;
+	clearRegisters(method->getMaxRegisters());
+	
     log_abc("Executing function: max registers %s, scope depth %s, "
             "max scope %s, max stack: %s", method->getMaxRegisters(),
             method->scopeDepth(), method->maxScope(), method->maxStack());
@@ -3123,18 +3137,12 @@ Machine::executeFunction(asMethod* method, const fn_call& fn)
 	for (unsigned int i=0;i<fn.nargs;i++) {
 		setRegister(i + 1, fn.arg(i));
 	}
-	//TODO:  There is probably a better way to do this.
-    //
-    const as_environment::ScopeStack* const ss = mCurrentFunction->scopeStack();
-
-	if (ss) {
-		for (unsigned int i=0; i < ss->size(); ++i) {
-			push_scope_stack(as_value(ss->at(i)));
-		}
-	}
-	execute();
+	
+    execute();
 	mExitWithReturn = prev_ext;
-	stream->seekTo(0);
+	
+    mStack.setAllSizes(stacksize, stackdepth);
+    mScopeStack.setAllSizes(scopesize, scopedepth);
 
 	return mGlobalReturn;
 }
@@ -3170,8 +3178,13 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 
 	clearRegisters(ctor->getMaxRegisters());
 	mCurrentFunction = ctor->getPrototype();
-	mStack.clear();
-	mScopeStack.clear();
+
+    // Protect the current stack from alteration
+    // TODO: use saveState
+    size_t stackdepth = mStack.fixDownstop();
+    size_t stacksize = mStack.totalSize();
+    size_t scopedepth = mScopeStack.fixDownstop();
+    size_t scopesize = mScopeStack.totalSize();
 
     // The value at _registers[0] is generally pushed to the stack for
     // CONSTRUCTSUPER, which apparently expects the object whose super
@@ -3179,6 +3192,10 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 	setRegister(0, cl->getPrototype());
 	executeCodeblock(ctor->getBody());
     log_debug("Finished instantiating class %s", className);
+
+    mStack.setAllSizes(stacksize, stackdepth);
+    mScopeStack.setAllSizes(scopesize, scopedepth);
+
 }
 
 as_value
@@ -3189,11 +3206,17 @@ Machine::find_prop_strict(asName multiname)
             mST.value(multiname.getNamespace()->getURI()),
             mST.value(multiname.getGlobalName()));
 
+    // We should not push anything onto the scope stack here; whatever is
+    // needed should already be pushed. The pp will not call FINDPROP*
+    // when the scope stack is empty.
+    //
+    // However, the complete scope stack, including elements that are
+    // 'invisible' to this scope, is available
 	as_value val;
-	mScopeStack.push(mGlobalObject);
-	for (size_t i = 0; i < mScopeStack.size(); ++i)
+    print_scope_stack();
+	for (size_t i = 0; i < mScopeStack.totalSize(); ++i)
     {
-		as_object* scope_object = mScopeStack.top(i).get();
+		as_object* scope_object = mScopeStack.at(i).get();
 		if (!scope_object) {
 			log_abc("Scope object is NULL.");
 			continue;
@@ -3202,8 +3225,7 @@ Machine::find_prop_strict(asName multiname)
                 multiname.getNamespace()->getURI());
 
 		if (!val.is_undefined()) {
-			push_stack(mScopeStack.top(i));
-			mScopeStack.pop();
+			push_stack(mScopeStack.at(i));
 			return val;
 		}
 	}
@@ -3222,7 +3244,6 @@ Machine::find_prop_strict(asName multiname)
 	val = env.get_variable(path, *envStack, &target);
 
 	push_stack(target);	
-	mScopeStack.pop();
 	return val;
 }
 
@@ -3268,9 +3289,9 @@ Machine::print_stack()
 
 	std::stringstream ss;
 	ss << "Stack: ";
-	for (unsigned int i = 0; i < mStack.size(); ++i) {
+	for (unsigned int i = 0; i < mStack.totalSize(); ++i) {
 		if (i!=0) ss << " | ";
-		ss << mStack.value(i).toDebugString();
+		ss << mStack.at(i);
 	}
 	log_abc("%s", ss.str());
 }
@@ -3281,8 +3302,11 @@ Machine::print_scope_stack()
 
 	std::stringstream ss;
 	ss << "ScopeStack: ";
-	for (unsigned int i=0;i<mScopeStack.size();++i) {
-		ss << as_value(mScopeStack.top(i).get()).toDebugString();
+
+    size_t totalSize = mScopeStack.totalSize();
+
+    for (unsigned int i = 0; i < totalSize; ++i) {
+		ss << as_value(mScopeStack.at(i).get()).toDebugString();
 	}
 	log_abc("%s", ss.str());
 }	
@@ -3297,17 +3321,6 @@ Machine::get_args(unsigned int argc)
 		args->at(i-1) = pop_stack();
 	}
 	return args;
-}
-
-void
-Machine::load_function(CodeStream* stream, boost::uint32_t maxRegisters)
-{
-	saveState();
-	//TODO: Maybe this call should be part of saveState(), it
-    //returns the old downstop.
-	mScopeStack.fixDownstop();
-	mStream = stream;
-	clearRegisters(maxRegisters);
 }
 
 as_environment::ScopeStack*

@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <swf version="9" compressed="1">
+<!-- This is a simpler version of scope1.xml. It only traces simple stack
+values, because tracing things from the scope stack means getting object
+and class names right. That's the reason why scope1.swf fails, so this serves
+as a regression test for stack values only. -->
   <Header framerate="25" frames="1">
     <size>
       <Rectangle left="0" right="8000" top="0" bottom="6000"/>
@@ -140,39 +144,6 @@
 		  <OpPushByte value="9"/>
 		  <OpPushByte value="9"/>
 		  
-		  <!-- Push junk to the scope stack (first A.A, then
-		  4 Sprite classes) -->
-                  <OpGetLocal0/>
-		  <OpPushScope/>
-		  <OpGetGlobalScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-
-		  <!-- Check that the junk is there -->
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="0"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="1"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="2"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="3"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="4"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  <!-- scopeIndex 5 causes a VerifyError (out of bounds),
-		  so the scope stack from before the call is not available. -->
-
 		  <OpReturnVoid/>
                 </code>
                 <exceptions/>
@@ -183,18 +154,6 @@
                   <OpGetLocal0/>
                   <OpConstructSuper argc="0"/>
 		  
-		  <!-- Push stuff to the scope stack (A.A then three 
-		  EventDispatcher classes) -->
-                  <OpGetLocal0/>
-		  <OpPushScope/>
-		  <OpGetGlobalScope/>
-		  <OpGetLex name="5"/>
-		  <OpPushScope/>
-		  <OpGetLex name="5"/>
-		  <OpPushScope/>
-		  <OpGetLex name="5"/>
-		  <OpPushScope/>
-
 		  <!-- Push 3 values, 3 trace function lookups to the stack -->
 		  <OpFindPropStrict name="10"/>
 		  <OpPushByte value="1"/>	
@@ -207,9 +166,9 @@
 		  <OpCallPropVoid name="10" argc="1"/>
 		  
 		  <!-- This is the call to f() -->
-		  <!-- f() pushes things to the stack and scope stack, 
-		  and leaves them there. They should not be available after
-		  the function call has finished, but what was on the stacks
+		  <!-- f() pushes things to the stack and leaves them there.
+		  They should not be available after
+		  the function call has finished, but what was on the stack
 		  before the call should still be there. -->
                   <OpGetLocal0/>
 		  <OpCallPropVoid name="3" argc="0"/>
@@ -218,23 +177,6 @@
                   <OpCallPropVoid name="10" argc="1"/>
                   <OpCallPropVoid name="10" argc="1"/>
 
-		  <!-- Now trace what's on the scope stack -->
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="0"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="1"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="2"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="3"/>
-                  <OpCallPropVoid name="10" argc="1"/>
-		  
 		  <OpReturnVoid/>
                 </code>
                 <exceptions/>

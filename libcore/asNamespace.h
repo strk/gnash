@@ -43,7 +43,8 @@ public:
         mClasses(),
 		mRecursePrevent(false),
         _private(false),
-        _protected(false)
+        _protected(false),
+        _package(false)
 	{}
 
     void markReachableResources() const { /* TODO */ }
@@ -100,6 +101,10 @@ public:
 	void unsetProtected() { _protected = false; }
 	bool isProtected() { return _protected; }
 	
+    void setPackage() { _package = true; }
+	void unsetPackage() { _package = false; }
+	bool isPackage() { return _package; }
+	
 private:
 
 	asNamespace* _parent;
@@ -114,6 +119,7 @@ private:
 
 	bool _private;
 	bool _protected;
+	bool _package;
 
 	asClass* getClassInternal(string_table::key name) const
 	{

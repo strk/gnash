@@ -35,21 +35,27 @@ SC_AS2_XMLTESTS =			\
 	Try-without-jump.xml \
 	$(NULL)
 
-SC_AS3_XMLTEXTS = \
+SC_AS3_XMLTESTS = \
 	mixed-bytecode-as3.xml	\
 	$(NULL)
 
 # XML tests that rely on comparing trace output.
-TRACE_AS_TESTS = \
+TRACE_AS3_TESTS = \
 	scope1.xml \
+	scope2.xml \
 	$(NULL)
 
 TRACE_AS3_TRACES = \
 	scope1.trace \
+	scope2.trace \
 	$(NULL)
 
-EXTRA_DIST = $(SC_AS2_XMLTESTS) $(SC_AS3_XMLTESTS) $(TRACE_AS_TESTS) \
-			 $(TRACE_AS3_TRACES)
+EXTRA_DIST = $(SC_AS2_XMLTESTS) \
+	     $(SC_AS3_XMLTESTS) \
+	     $(TRACE_AS3_TESTS) \
+	     $(TRACE_AS3_TRACES) \
+	     gen-swfmill-trace-runner.sh \
+	     $(NULL)
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -65,10 +71,11 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
+TRACE_XMLTESTS_OUT = 
 
 if ENABLE_AVM2
 SC_XMLTESTS_OUT += $(SC_AS3_XMLTESTS:.xml=.swf)
-SC_XMLTESTS_OUT += $(TRACE_AS3_TESTS:.xml=.swf)
+TRACE_XMLTESTS_OUT += $(TRACE_AS3_TESTS:.xml=.swf)
 endif
 
 # Dependencies for all self-contained SWF tests
@@ -88,11 +95,17 @@ check_SCRIPTS = \
 if ENABLE_AVM2
 check_SCRIPTS += \
 	mixed-bytecode-as3-runner	\
+	trace-test-runner	\
 	$(NULL)
 endif
 
 check_PROGRAMS = \
-	backgroundTestRunner
+	backgroundTestRunner \
+	$(NULL)
+
+trace-test-runner: $(srcdir)/gen-swfmill-trace-runner.sh $(TRACE_AS3_TESTS) $(TRACE_XMLTESTS_OUT)
+	sh $< $(srcdir) $(builddir) > $@
+	chmod 755 $@
 
 mixed-bytecode-as3-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as3.swf Makefile
 	sh $< -r 50 -c "AS3" $(top_builddir) mixed-bytecode-as3.swf > $@
@@ -150,8 +163,8 @@ backgroundTestRunner_DEPENDENCIES = \
 	$(SWFMILL) -v xml2swf $(@:%.swf=$(srcdir)/%.xml) $@
 
 clean-local: 
-	rm -f $(check_SCRIPTS) $(SC_XMLTESTS_OUT) \
-		*.log *.trace-gnash \
+	rm -f $(check_SCRIPTS) $(SC_XMLTESTS_OUT) $(TRACE_XMLTESTS_OUT) \
+		*.log *.trace-gnash *.out \
 		site.bak site.exp site.exp.bak testrun.sum \
 		gnash.sum 
 

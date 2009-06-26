@@ -236,6 +236,8 @@ private:
 	enum Constants
 	{
 		PRIVATE_NS = 0x05,
+		PACKAGE_NS = 0x16,
+		PACKAGE_INTERNAL_NS = 0x17,
 		PROTECTED_NS = 0x18,
 		METHOD_ARGS = 0x01,
 		METHOD_ACTIVATION = 0x02,
