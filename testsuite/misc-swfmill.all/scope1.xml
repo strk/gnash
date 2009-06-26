@@ -126,19 +126,7 @@
               <MethodBody methodInfo="1" maxStack="8" maxRegs="1" scopeDepth="5" maxScope="14" exceptionCount="0">
 	        <code>
 
-		  <!-- This seems accepted by the player, but has no effect -->
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-		  <OpPopStack/>
-
-		  <!-- OpPopScope, on the other hand, causes a scope stack
+		  <!-- OpPop and OpPopScope cause a scope stack
 		  underflow error, so we don't do it. -->
 
                   <OpFindPropStrict name="10"/>
