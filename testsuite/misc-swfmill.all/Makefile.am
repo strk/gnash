@@ -54,7 +54,7 @@ EXTRA_DIST = $(SC_AS2_XMLTESTS) \
 	     $(SC_AS3_XMLTESTS) \
 	     $(TRACE_AS_TESTS) \
 	     $(TRACE_AS3_TRACES) \
-	     gen-swfmill-trace-runner \
+	     gen-swfmill-trace-runner.sh \
 	     $(NULL)
 
 AM_CPPFLAGS = \
@@ -102,8 +102,8 @@ check_PROGRAMS = \
 	backgroundTestRunner \
 	$(NULL)
 
-trace-test-runner: $(TRACE_AS3_TESTS)
-	sh gen-swfmill-trace-runner $(srcdir) $(builddir) > $@
+trace-test-runner: $(srcdir)/gen-swfmill-trace-runner.sh $(TRACE_AS3_TESTS)
+	sh $< $(srcdir) $(builddir) > $@
 	chmod 755 $@
 
 mixed-bytecode-as3-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as3.swf Makefile
