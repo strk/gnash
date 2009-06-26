@@ -3189,8 +3189,10 @@ Machine::find_prop_strict(asName multiname)
             mST.value(multiname.getNamespace()->getURI()),
             mST.value(multiname.getGlobalName()));
 
+    // We should not push anything onto the scope stack here; whatever is
+    // needed should already be pushed. The pp will not call FINDPROP*
+    // when the scope stack is empty.
 	as_value val;
-	mScopeStack.push(mGlobalObject);
 	for (size_t i = 0; i < mScopeStack.size(); ++i)
     {
 		as_object* scope_object = mScopeStack.top(i).get();
@@ -3203,7 +3205,6 @@ Machine::find_prop_strict(asName multiname)
 
 		if (!val.is_undefined()) {
 			push_stack(mScopeStack.top(i));
-			mScopeStack.pop();
 			return val;
 		}
 	}
@@ -3222,7 +3223,6 @@ Machine::find_prop_strict(asName multiname)
 	val = env.get_variable(path, *envStack, &target);
 
 	push_stack(target);	
-	mScopeStack.pop();
 	return val;
 }
 
