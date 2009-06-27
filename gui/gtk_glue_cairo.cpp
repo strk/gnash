@@ -119,7 +119,7 @@ cairoFormatFromVisual(const GdkVisual* visual, cairo_format_t* format /*out*/)
     case 24:
       *format = CAIRO_FORMAT_RGB24;
       break;
-    case 36:
+    case 32:
       *format = CAIRO_FORMAT_ARGB32;
       break;
     default:
