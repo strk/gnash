@@ -39,6 +39,8 @@
 
 #include <getopt.h>
 
+#include "GnashSleep.h" // for gnashSleep
+
 
 // Use 4MB of stack.. just to be safe
 __attribute__ ((used)) static const char *stackcookie = "$STACK: 4000000";
@@ -60,7 +62,7 @@ namespace boost
 {
 	void throw_exception(std::exception const &e)
 	{
-		gnash::log_error (_("Exception: %s"), e.what() );
+		gnash::log_error (_("Exception: %s on file %s line %d"), e.what(), __FILE__, __LINE__ );
 		//std::abort();
 	}
 }
@@ -189,12 +191,12 @@ AOS4Gui::run()
 		if (sigGot & _timerSig)
     	{
 	        // Wait until real time catches up with movie time.
+			IExec->GetMsg(_port);
 
 			int delay = movie_time - OS4_GetTicks();
 			if (delay > 0)
 			{
-				printf("delay:%d\n",delay);
-				usleep(delay);
+				gnashSleep(delay);
 			}
 
 			movie_time += _interval;        // Time next frame should be displayed
@@ -602,11 +604,10 @@ AOS4Gui::init(int argc, char **argv[])
 bool
 AOS4Gui::createWindow(const char *title, int width, int height)
 {
-    GNASH_REPORT_FUNCTION;
     _width = width;
     _height = height;
 
-    //_glue.saveOrigiginalDimension(width,height);
+    _glue.saveOrigiginalDimension(width,height);
 	_orig_width  = width;
 	_orig_height = height;
 
@@ -640,8 +641,6 @@ AOS4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 void
 AOS4Gui::renderBuffer()
 {
-    //GNASH_REPORT_FUNCTION;
-
     _glue.render();
 }
 
@@ -654,14 +653,12 @@ AOS4Gui::setInterval(unsigned int interval)
 bool
 AOS4Gui::createMenu()
 {
-    GNASH_REPORT_FUNCTION;
-    return false;
+    return true;
 }
 
 bool
 AOS4Gui::setupEvents()
 {
-    GNASH_REPORT_FUNCTION;
     return false;
 }
 

@@ -33,6 +33,7 @@
 
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
+#include "GnashSleep.h" // for gnashSleep
 
 //#include <cmath>
 #include <vector>
@@ -134,8 +135,11 @@ AOS4_sound_handler::~AOS4_sound_handler()
     boost::mutex::scoped_lock lock(_mutex);
 
 	// on class destruction we must kill the Audio thread
+	_closing = true;
+	_paused = true;
+	IDOS->Delay(80);
 	IExec->Signal((struct Task*)AudioPump,SIGBREAKF_CTRL_C);
-
+	
     lock.unlock();
 
     // we already locked, so we call
@@ -192,46 +196,6 @@ AOS4_sound_handler::openAudio()
 void
 AOS4_sound_handler::closeAudio()
 {
-	if (_closing == false)
-	{
-		_closing = true;
-		log_debug(_("AOS4: Cleaning Audio Stuff.."));
-
-		if (AHIios[0])
-		{
-			if (!IExec->CheckIO((struct IORequest *) AHIios[0]))
-			{
-				IExec->AbortIO((struct IORequest *) AHIios[0]);
-				IExec->WaitIO((struct IORequest *) AHIios[0]);
-			}
-		}
-
-		if(AHIios[1])
-		{ // Only if the second request was started
-			if (!IExec->CheckIO((struct IORequest *) AHIios[1]))
-			{
-	    		IExec->AbortIO((struct IORequest *) AHIios[1]);
-	    		IExec->WaitIO((struct IORequest *) AHIios[1]);
-			}
-		}
-
-
-		if(!AHIDevice)
-			if (AHIio) 	IExec->CloseDevice((struct IORequest *)AHIio);
-
-		if (AHIio) 		IExec->FreeSysObject(ASOT_IOREQUEST,(struct IORequest *)AHIio); AHIio = 0;
-  		if (AHIiocopy) 	IExec->FreeMem(AHIiocopy,sizeof(struct AHIRequest)); AHIiocopy = 0;
-
-	  	if (AHImp)		IExec->FreeSysObject(ASOT_PORT, AHImp); AHImp = 0;
-
-		if (IAHI) 		IExec->DropInterface((struct Interface*) IAHI); IAHI = 0;
-
-		if (PlayBuffer[0]) IExec->FreeMem(PlayBuffer[0],BUFSIZE); PlayBuffer[0] = 0;
-		if (PlayBuffer[1]) IExec->FreeMem(PlayBuffer[1],BUFSIZE); PlayBuffer[1] = 0;
-
-		log_debug(_("AOS4: Exit Audio Thread.."));
-	}
-
     _audioOpened = false;
 }
 
@@ -374,11 +338,19 @@ AOS4_sound_handler::write_wave_header(std::ofstream& outfile)
 void
 AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
-	if (_closing == false)
+	if (!_closing)
 	{
 	    boost::mutex::scoped_lock lock(_mutex);
-    	sound_handler::fetchSamples(to, nSamples);
-
+    	if (!_closing) 
+    	{
+	    	if (to)
+	    		sound_handler::fetchSamples(to, nSamples);
+	    	else
+	    		return;
+    	}
+		
+		if (!_closing) return;
+		
 	    // TODO: move this to base class !
     	if (file_stream)
 	    {
@@ -407,7 +379,7 @@ void
 AOS4_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
 {
     unsigned int nBytes = nSamples*2;
-	if (_closing == false)
+	if (!_closing)
 	{
 		memcpy(BufferPointer, inSamples, nBytes);
 		BufferPointer += nBytes;
@@ -594,6 +566,7 @@ AOS4_sound_handler::audioTask()
 	unsigned int nSamples = (441*clockAdvance) / 10;
 	unsigned int toFetch = nSamples*2;
 	boost::int16_t samples[AHI_BUF_SIZE];
+    struct Process *_audioTask = ( struct Process *)IExec->FindTask(0);
 
 	_closing = false;
 
@@ -679,29 +652,69 @@ AOS4_sound_handler::audioTask()
 
 		uint32 sigGot = IExec->Wait(sigMask);
 
-	    if (sigGot & SIGBREAKF_CTRL_C)
-	    {
-			log_debug(_("AOS4: Closing Audio Thread.."));
-			break;
-		}
 		if (sigGot & _timerSig)
     	{
+			IExec->GetMsg(_port);
 			if (_paused == false)
 			{
-				while (toFetch)
+				while (toFetch && !_closing)
 				{
 					unsigned int n = std::min(toFetch, AHI_BUF_SIZE);
-					fetchSamples((boost::int16_t*)&samples, n);
+					if (!_closing) fetchSamples((boost::int16_t*)&samples, n);
 					toFetch -= n;
 				}
 				toFetch = nSamples*2;
 			}
-			TimerReset(RESET_TIME);
+			if (!_closing) TimerReset(RESET_TIME);
 	    }
+	    if (sigGot & SIGBREAKF_CTRL_C)
+	    {
+			_closing = true;
+			log_debug(_("AOS4: Closing Audio Thread.."));
+			break;
+		}
 	}
+
+	log_debug(_("AOS4: Cleaning Audio Stuff.."));
+
+	if (AHIios[0])
+	{
+		if (!IExec->CheckIO((struct IORequest *) AHIios[0]))
+		{
+			IExec->AbortIO((struct IORequest *) AHIios[0]);
+			IExec->WaitIO((struct IORequest *) AHIios[0]);
+		}
+	}
+
+	if(AHIios[1])
+	{ // Only if the second request was started
+		if (!IExec->CheckIO((struct IORequest *) AHIios[1]))
+		{
+    		IExec->AbortIO((struct IORequest *) AHIios[1]);
+    		IExec->WaitIO((struct IORequest *) AHIios[1]);
+		}
+	}
+
+
+	if(!AHIDevice)
+		if (AHIio) 	IExec->CloseDevice((struct IORequest *)AHIio);
+
+	if (AHIio) 		IExec->FreeSysObject(ASOT_IOREQUEST,(struct IORequest *)AHIio); AHIio = 0;
+	if (AHIiocopy) 	IExec->FreeMem(AHIiocopy,sizeof(struct AHIRequest)); AHIiocopy = 0;
+
+  	if (AHImp)		IExec->FreeSysObject(ASOT_PORT, AHImp); AHImp = 0;
+
+	if (IAHI) 		IExec->DropInterface((struct Interface*) IAHI); IAHI = 0;
+
+	if (PlayBuffer[0]) IExec->FreeMem(PlayBuffer[0],BUFSIZE); PlayBuffer[0] = 0;
+	if (PlayBuffer[1]) IExec->FreeMem(PlayBuffer[1],BUFSIZE); PlayBuffer[1] = 0;
+
+	log_debug(_("AOS4: Exit Audio Thread.."));
+
 	log_debug(_("AOS4: audioTask:Close timer.."));
 	TimerExit();
-	return(0);
+	IDOS->SetIoErr((int32)_audioTask->pr_ProcessID); 
+    return(RETURN_OK);
 }
 
 } // gnash.sound namespace

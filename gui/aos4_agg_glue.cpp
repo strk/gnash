@@ -26,7 +26,7 @@
 #include <cerrno>
 #include <ostream>
 
-/* END OF MENU DEFINITION */
+/* START OF MENU DEFINITION */
 struct NewMenu nm[] =
 {
 	/* Type, Label, CommKey, Flags, MutualExclude, UserData */
@@ -70,12 +70,10 @@ _screen(NULL),
 _agg_renderer(NULL),
 _fullscreen(FALSE)
 {
-//    GNASH_REPORT_FUNCTION;
 }
 
 AOS4AggGlue::~AOS4AggGlue()
 {
-//    GNASH_REPORT_FUNCTION;
     delete [] _offscreenbuf;
 	if (_window) 
 	{
@@ -89,8 +87,6 @@ AOS4AggGlue::~AOS4AggGlue()
 bool
 AOS4AggGlue::init(int /*argc*/, char*** /*argv*/)
 {
-//    GNASH_REPORT_FUNCTION;
-
     return true;
 }
 
@@ -98,8 +94,6 @@ AOS4AggGlue::init(int /*argc*/, char*** /*argv*/)
 render_handler*
 AOS4AggGlue::createRenderHandler(int bpp)
 {
-//    GNASH_REPORT_FUNCTION;
-
     _bpp = bpp;
 
     switch (_bpp) {
@@ -173,7 +167,10 @@ AOS4AggGlue::unsetFullscreen()
 	
     _fullscreen = false;
 
-    resize(_orig_width, _orig_height);
+	_width  = _orig_width;
+	_height = _orig_height;
+
+    resize(_width, _height);
 }
 
 bool
@@ -225,8 +222,6 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 			WA_SmartRefresh, 	TRUE,
 			WA_RMBTrap, 		FALSE,
 			WA_ReportMouse, 	TRUE,
-			WA_MaxWidth,		~0,
-			WA_MaxHeight,		~0,
 			WA_IDCMP, 			IDCMP_MOUSEBUTTONS|
 								IDCMP_RAWKEY|
 								IDCMP_MOUSEMOVE|
@@ -279,7 +274,12 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 	ri.RGBFormat 	= _ftype;
 
 	if (_window)
-		IP96->p96WritePixelArray(&ri,0,0,_window->RPort,_window->BorderLeft,_window->BorderTop,_width,_height);
+	{
+		if (!_fullscreen)
+			IP96->p96WritePixelArray(&ri,0,0,_window->RPort,_window->BorderLeft,_window->BorderTop,_width,_height);
+		else
+			IP96->p96WritePixelArray(&ri,0,0,_window->RPort,0,0,_width,_height);
+	}
 
     _validbounds.setTo(0, 0, width, height);
 
@@ -333,17 +333,27 @@ AOS4AggGlue::render()
 void
 AOS4AggGlue::render(int minx, int miny, int maxx, int maxy)
 {
+	if (!_window) return;
+	
 	// Update only the invalidated rectangle
 	struct RenderInfo ri;
 	ri.Memory 		= _offscreenbuf;
 	ri.BytesPerRow = _stride;
 	ri.RGBFormat 	= _ftype;
 
-	IP96->p96WritePixelArray(&ri,minx , miny, _window->RPort, 
-							minx+_window->BorderLeft,
-							miny+_window->BorderTop,
-							maxx - minx ,
-							maxy - miny);
+	if (!_fullscreen)
+		IP96->p96WritePixelArray(&ri,minx , miny, _window->RPort, 
+								minx+_window->BorderLeft,
+								miny+_window->BorderTop,
+								maxx - minx ,
+								maxy - miny);
+	else
+		IP96->p96WritePixelArray(&ri,minx , miny, _window->RPort, 
+								minx,
+								miny,
+								maxx - minx ,
+								maxy - miny);
+	
 
 /*
 	IGraphics->BltBitMapTags(
@@ -363,7 +373,6 @@ AOS4AggGlue::render(int minx, int miny, int maxx, int maxy)
 void
 AOS4AggGlue::resize(int width, int height)
 {
-    GNASH_REPORT_FUNCTION;
     if (!_offscreenbuf) {
       // If initialisation has not taken place yet, we don't want to touch this.
       return;
