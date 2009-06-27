@@ -125,7 +125,8 @@ AOS4_sound_handler::AOS4_sound_handler()
     _audioOpened(false),
 	_closing(false),
 	_paused(true),
-	_started(false)
+	_started(false),
+	_fetching(false)
 {
     initAudio();
 }
@@ -137,9 +138,20 @@ AOS4_sound_handler::~AOS4_sound_handler()
 	// on class destruction we must kill the Audio thread
 	_closing = true;
 	_paused = true;
-	IDOS->Delay(80);
+	IDOS->Delay(30);
 	IExec->Signal((struct Task*)AudioPump,SIGBREAKF_CTRL_C);
+
+	IExec->WaitPort(_DMreplyport);
+	IExec->GetMsg(_DMreplyport);
+
+	if (_dmsg)			IExec->FreeSysObject(ASOT_MESSAGE, _dmsg); _dmsg = 0;
+	if (_DMreplyport) 	IExec->FreeSysObject(ASOT_PORT, _DMreplyport); _DMreplyport = 0;
 	
+	while (_fetching)
+	{
+		gnashSleep(100);
+	}
+
     lock.unlock();
 
     // we already locked, so we call
@@ -165,7 +177,22 @@ AOS4_sound_handler::openAudio()
     if ( _audioOpened ) return; // nothing to do
 
 	log_debug(_("AOS4: Spawn Audio Process.."));
-
+	
+	_DMreplyport = (struct MsgPort*) IExec->AllocSysObjectTags(ASOT_PORT, TAG_DONE);
+	_dmsg 		 = (struct DeathMessage*) IExec->AllocSysObjectTags(ASOT_MESSAGE,
+																	ASOMSG_Size, sizeof(struct DeathMessage),
+																	ASOMSG_ReplyPort, _DMreplyport,
+																	TAG_DONE);
+	
+	if (!_dmsg || !_DMreplyport)
+	{
+		_audioOpened = false;
+		log_error(_("Unable to create Death Message for child!!"));
+		throw SoundException("Unable to create Death Message for child!!");
+	}
+	_dmsg->dm_Msg.mn_ReplyPort = _DMreplyport;
+	_dmsg->dm_Msg.mn_Length    = (uint16)sizeof(*_dmsg);
+	
 	AudioPump = (struct Process *) IDOS->CreateNewProcTags (
 		   							NP_Entry, 		(ULONG) audioTaskWrapper,
 						   			NP_Name,	   	PLAYERTASK_NAME,
@@ -176,6 +203,7 @@ AOS4_sound_handler::openAudio()
 									NP_StackSize,   262144,
 									NP_Child,		TRUE,
 									NP_Priority,	PLAYERTASK_PRIORITY,
+									NP_NotifyOnDeathMessage, _dmsg,
 		   							NP_EntryData, 	this,
 						  			TAG_DONE);
 
@@ -343,10 +371,10 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 	    boost::mutex::scoped_lock lock(_mutex);
     	if (!_closing) 
     	{
+	    	_fetching = true;
 	    	if (to)
 	    		sound_handler::fetchSamples(to, nSamples);
-	    	else
-	    		return;
+    		_fetching = false;
     	}
 		
 		if (!_closing) return;

@@ -86,7 +86,11 @@ private:
 	bool _closing;
 	bool _paused;
 	bool _started;
+	bool _fetching;
 
+	struct DeathMessage *_dmsg; 	// the child Death Message
+	struct MsgPort *_DMreplyport;	// and its port
+	
     /// Mutex for making sure threads doesn't mess things up
     boost::mutex _mutex;
 
