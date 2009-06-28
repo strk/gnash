@@ -50,10 +50,7 @@ class Kde4OglGlue : public Kde4Glue
   private:
     int _width;
     int _height;
-    boost::scoped_array<unsigned char> _offscreenbuf;
     render_handler* _renderer; // We don't own this pointer.
-    std::auto_ptr<QImage> _image;
-    std::auto_ptr<QPainter> _painter;
 };
 
 

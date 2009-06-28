@@ -22,7 +22,6 @@
 
 #include "Kde4GlueOgl.h"
 #include "render_handler.h"
-#include "render_handler_agg.h"
 #include <QRect>
 #include <QGLWidget>
 
