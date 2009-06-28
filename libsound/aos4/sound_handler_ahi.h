@@ -84,9 +84,6 @@ private:
 
     bool _audioOpened;
 	bool _closing;
-	bool _paused;
-	bool _started;
-	bool _fetching;
 
 	struct DeathMessage *_dmsg; 	// the child Death Message
 	struct MsgPort *_DMreplyport;	// and its port
@@ -182,8 +179,10 @@ public:
     // See dox in sound_handler.h
     void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
-	int  audioTask();
+	int audioTask();
 };
+
+
 
 } // gnash.sound namespace
 } // namespace gnash

@@ -38,6 +38,7 @@
 #include "aos4_gnash_prefs.h"
 
 #include <getopt.h>
+#include <signal.h>
 
 #include "GnashSleep.h" // for gnashSleep
 
@@ -50,6 +51,7 @@ extern struct NewMenu nm[];
 extern Object *win;
 extern struct MsgPort *AppPort;
 extern Object *Objects[OBJ_NUM];
+extern int audioTaskID;
 
 #define GAD(x) (struct Gadget *)Objects[x]
 
@@ -152,7 +154,15 @@ AOS4Gui::TimerReset(uint32 microDelay)
 	IExec->SendIO((struct IORequest *)_timerio);
 }
 
-
+void
+AOS4Gui::killAudioTask()
+{
+	if (audioTaskID) // This is a Global variable defined in sound_handler_ahi that point to the audioTask
+	{
+		IExec->Signal((struct Task*)audioTaskID,SIGBREAKF_CTRL_C);
+		IDOS->Delay(50); //Wait to be sure that audio task has finished its work..
+	}
+}
 
 bool
 AOS4Gui::run()
@@ -261,6 +271,7 @@ AOS4Gui::run()
 														log_error (_("Cannot open File Requester!\n"));
 												break;
     		                                    case 6:  /* Quit */
+    		                                    	killAudioTask();
         		                                    return true;
             		                            break;
                 	    	                }
@@ -487,6 +498,7 @@ AOS4Gui::run()
 					case IDCMP_CLOSEWINDOW:
 						if (imsg->IDCMPWindow == _window) 
 							IExec->ReplyMsg ((struct Message *)imsg);
+                       	killAudioTask();
         	    	    return true;
 					break;
 					case IDCMP_MOUSEMOVE:
@@ -520,10 +532,6 @@ AOS4Gui::run()
 					case IDCMP_RAWKEY:
 						if (imsg->IDCMPWindow == _window)
 						{
-							IExec->ReplyMsg ((struct Message *)imsg);
-							if ( (imsg->Code  & ~IECODE_UP_PREFIX) == RAWKEY_ESC) //ESC
-    	    		    	    return true;
-							
 							if (!(imsg->Code & IECODE_UP_PREFIX))
 							{
 								code = os4_to_gnash_key(imsg);
@@ -596,6 +604,7 @@ AOS4Gui::init(int argc, char **argv[])
 		log_error (_("error creating RenderHandler!\n"));
     	return false;
 	}
+	signal(SIGINT, SIG_IGN);
 
     return true;
 }

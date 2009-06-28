@@ -107,6 +107,7 @@ private:
 	void TimerExit(void);
 	bool TimerInit(void);
 	void TimerReset(uint32 microDelay);
+	void killAudioTask();
 
    	int	 _orig_width;
     int	 _orig_height;

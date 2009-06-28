@@ -47,10 +47,10 @@
 #include <exec/memory.h>
 
 #define PLAYERTASK_NAME       "Gnash audio task"
-#define PLAYERTASK_PRIORITY   2
-#define RESET_TIME 30 * 1000
+#define PLAYERTASK_PRIORITY   20
+#define RESET_TIME 10 * 1000
 
-#define BUFSIZE  		7056 * 2
+#define BUFSIZE  		7056 * 1
 #define AHI_BUF_SIZE 	7056u
 
 // Define this to get debugging call about pausing/unpausing audio
@@ -58,6 +58,8 @@
 
 // Mixing and decoding debugging
 //#define GNASH_DEBUG_MIXING
+
+int audioTaskID;
 
 static int
 audioTaskWrapper()
@@ -99,9 +101,7 @@ namespace sound {
 AOS4_sound_handler::AOS4_sound_handler(const std::string& wavefile)
     :
     _audioOpened(false),
-	_closing(false),
-	_paused(true),
-	_started(false)
+	_closing(false)
 {
 
     initAudio();
@@ -123,10 +123,7 @@ AOS4_sound_handler::AOS4_sound_handler(const std::string& wavefile)
 AOS4_sound_handler::AOS4_sound_handler()
     :
     _audioOpened(false),
-	_closing(false),
-	_paused(true),
-	_started(false),
-	_fetching(false)
+	_closing(false)
 {
     initAudio();
 }
@@ -137,8 +134,10 @@ AOS4_sound_handler::~AOS4_sound_handler()
 
 	// on class destruction we must kill the Audio thread
 	_closing = true;
-	_paused = true;
-	IDOS->Delay(30);
+	sound_handler::pause();
+
+	log_debug("Killing Audio Task..");
+
 	IExec->Signal((struct Task*)AudioPump,SIGBREAKF_CTRL_C);
 
 	IExec->WaitPort(_DMreplyport);
@@ -146,11 +145,6 @@ AOS4_sound_handler::~AOS4_sound_handler()
 
 	if (_dmsg)			IExec->FreeSysObject(ASOT_MESSAGE, _dmsg); _dmsg = 0;
 	if (_DMreplyport) 	IExec->FreeSysObject(ASOT_PORT, _DMreplyport); _DMreplyport = 0;
-	
-	while (_fetching)
-	{
-		gnashSleep(100);
-	}
 
     lock.unlock();
 
@@ -209,6 +203,9 @@ AOS4_sound_handler::openAudio()
 
 	if (AudioPump)
 	{
+		//Get audio task pointer to kill it from the GUI.. it actually use a global variable.. better than nothing
+		audioTaskID = (int)AudioPump;
+		
 		_audioOpened = true;
 		log_debug(_("AOS4: Audio Process spawned.."));
 	}
@@ -371,13 +368,10 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 	    boost::mutex::scoped_lock lock(_mutex);
     	if (!_closing) 
     	{
-	    	_fetching = true;
-	    	if (to)
 	    		sound_handler::fetchSamples(to, nSamples);
-    		_fetching = false;
     	}
-		
-		if (!_closing) return;
+		else		
+			return;
 		
 	    // TODO: move this to base class !
     	if (file_stream)
@@ -398,7 +392,7 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 #ifdef GNASH_DEBUG_AOS4_AUDIO_PAUSING
     	    log_debug("Pausing AOS4 Audio...");
 #endif
-			_paused = true;
+			sound_handler::pause();
     	}
 	}
 }
@@ -407,6 +401,7 @@ void
 AOS4_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
 {
     unsigned int nBytes = nSamples*2;
+
 	if (!_closing)
 	{
 		memcpy(BufferPointer, inSamples, nBytes);
@@ -470,7 +465,7 @@ AOS4_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 #ifdef GNASH_DEBUG_AOS4_AUDIO_PAUSING
         log_debug("Unpausing AOS4 Audio on inpust stream plug...");
 #endif
-		_paused = false;
+		sound_handler::unpause();
 	}
 }
 
@@ -500,7 +495,7 @@ AOS4_sound_handler::pause()
 {
     //closeAudio();
 	log_debug(_("AOS4: AOS4_sound_handler::pause"));
-	_paused = true;
+	sound_handler::pause();
 	log_debug(_("AOS4: paused"));
 
     sound_handler::pause();
@@ -512,7 +507,7 @@ AOS4_sound_handler::unpause()
     if ( hasInputStreams() )
     {
 		log_debug(_("AOS4: AOS4_sound_handler::unpause"));
-		_paused = false;
+		sound_handler::unpause();
 		log_debug(_("AOS4: unpaused"));
     }
 
@@ -594,7 +589,6 @@ AOS4_sound_handler::audioTask()
 	unsigned int nSamples = (441*clockAdvance) / 10;
 	unsigned int toFetch = nSamples*2;
 	boost::int16_t samples[AHI_BUF_SIZE];
-    struct Process *_audioTask = ( struct Process *)IExec->FindTask(0);
 
 	_closing = false;
 
@@ -680,10 +674,16 @@ AOS4_sound_handler::audioTask()
 
 		uint32 sigGot = IExec->Wait(sigMask);
 
+	    if (sigGot & SIGBREAKF_CTRL_C)
+	    {
+			_closing = true;
+			log_debug(_("AOS4: Closing Audio Thread.."));
+			break;
+		}
 		if (sigGot & _timerSig)
     	{
 			IExec->GetMsg(_port);
-			if (_paused == false)
+			if (!sound_handler::isPaused())
 			{
 				while (toFetch && !_closing)
 				{
@@ -695,12 +695,6 @@ AOS4_sound_handler::audioTask()
 			}
 			if (!_closing) TimerReset(RESET_TIME);
 	    }
-	    if (sigGot & SIGBREAKF_CTRL_C)
-	    {
-			_closing = true;
-			log_debug(_("AOS4: Closing Audio Thread.."));
-			break;
-		}
 	}
 
 	log_debug(_("AOS4: Cleaning Audio Stuff.."));
@@ -741,7 +735,6 @@ AOS4_sound_handler::audioTask()
 
 	log_debug(_("AOS4: audioTask:Close timer.."));
 	TimerExit();
-	IDOS->SetIoErr((int32)_audioTask->pr_ProcessID); 
     return(RETURN_OK);
 }
 
