@@ -48,10 +48,10 @@
 
 #define PLAYERTASK_NAME       "Gnash audio task"
 #define PLAYERTASK_PRIORITY   20
-#define RESET_TIME 10 * 1000
+#define RESET_TIME 30 * 1000
 
-#define BUFSIZE  		7056 * 1
-#define AHI_BUF_SIZE 	7056u
+#define BUFSIZE  		7056 * 4
+#define AHI_BUF_SIZE 	28224u
 
 // Define this to get debugging call about pausing/unpausing audio
 //#define GNASH_DEBUG_AOS4_AUDIO_PAUSING

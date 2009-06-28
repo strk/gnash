@@ -219,6 +219,8 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
            	WA_Top,             top,
 			WA_InnerWidth,  	width,
 			WA_InnerHeight,		height,
+			WA_MaxWidth,		~0,
+			WA_MaxHeight,		~0,
 			WA_SmartRefresh, 	TRUE,
 			WA_RMBTrap, 		FALSE,
 			WA_ReportMouse, 	TRUE,

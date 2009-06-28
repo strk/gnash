@@ -55,7 +55,7 @@ extern int audioTaskID;
 
 #define GAD(x) (struct Gadget *)Objects[x]
 
-#define RESET_TIME 40 * 1000 //25fps
+#define RESET_TIME 30 * 1000 
 
 using namespace std;
 
