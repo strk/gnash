@@ -46,6 +46,14 @@ kde4_gnash_SOURCES += Kde4GlueOgl.cpp Kde4GlueOgl.h \
 	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
 endif                           # BUILD_OGL_RENDERER
 
+if BUILD_CAIRO_RENDERER
+kde4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+kde4_gnash_LDADD += $(top_builddir)/backend/libgnashcairo.la \
+	$(QT4_LIBS) $(CAIRO_LIBS)
+kde4_gnash_SOURCES += Kde4GlueCairo.cpp Kde4GlueCairo.h \
+	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
+endif                           # BUILD_CAIRO_RENDERER
+
 if BUILD_AGG_RENDERER
 kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
