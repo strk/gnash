@@ -34,7 +34,9 @@
 # define BaseWidget QGLWidget
 # define GlueClass Kde4OglGlue
 #elif defined(RENDERER_CAIRO)
-# error "Cairo not supported yet for KDE4!"
+#include "Kde4GlueCairo.h"
+# define BaseWidget QWidget
+# define GlueClass Kde4CairoGlue
 #elif defined(RENDERER_AGG)
 # include "Kde4GlueAgg.h"
 # define BaseWidget QWidget
