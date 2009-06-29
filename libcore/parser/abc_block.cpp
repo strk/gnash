@@ -339,18 +339,17 @@ abc_block::prepare(Machine* mach)
     std::for_each(_classes.begin(), _classes.end(),
             std::mem_fun(&asClass::initPrototype));
 
-    // The first (entry) script has Global as its prototype.
+    // The last (entry) script has Global as its prototype.
     // This can be deduced because the global classes are initialized with a
     // slot on script 0 (entry script). OpNewClass then attempts to set the
     // corresponding slot once the class has been constructed. At this point,
     // global should verifiably be on the stack, so the slots are expected
     // to be set on the global object.
-    if (!_scripts.empty()) {
-        _scripts.front()->setPrototype(mach->global());
-
-        std::for_each(_scripts.begin() + 1, _scripts.end(),
-                std::mem_fun(&asClass::initPrototype));
-    }
+    // It seems likely, though testing it is not straightforward, that all
+    // scripts have Global as a target object (prototype), so for now we
+    // will do that.
+    std::for_each(_scripts.begin(), _scripts.end(),
+            boost::bind(&asClass::setPrototype, _1, mach->global()));
  
     std::for_each(_methods.begin(), _methods.end(),
             boost::bind(&asMethod::initPrototype, _1, mach));
