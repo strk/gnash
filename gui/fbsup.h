@@ -168,8 +168,8 @@ class FBGui : public Gui
   	/// Initializes mouse routines
   	bool init_mouse();
   	
-  	/// Checks for any mouse activity
-  	void check_mouse();
+  	/// Checks for and processes any mouse activity. Returns true on activity.
+  	bool check_mouse();
   	
   	/// Initializes keyboard routines 
   	bool init_keyboard();
@@ -177,8 +177,8 @@ class FBGui : public Gui
   	/// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
     gnash::key::code scancode_to_gnash_key(int code, bool shift);
   	
-  	/// Checks for any keyboard activity
-  	void check_keyboard();
+  	/// Checks for and processes any keyboard activity. Returns true on activity.
+  	bool check_keyboard();
   	
 #ifdef USE_INPUT_EVENTS  	
     /// Applies builtin touchscreen calibration

@@ -374,22 +374,21 @@ bool FBGui::run()
 
   while (!terminate_request) {
   
-    double prevtimer = timer; 
-    
-    while ((timer-prevtimer)*1000 < _interval) {
-    
-      gnashSleep(1); // task switch
-      
-      check_mouse(); // TODO: Exit delay loop on mouse events! 
-      check_keyboard(); // TODO: Exit delay loop on keyboard events!
-            
-      if (!gettimeofday(&tv, NULL))
-        timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
-    }
+    // wait the "heartbeat" inteval
+    gnashSleep(_interval * 1000);    
+    // TODO: Do we need to check the real time slept or is it OK when we woke
+    // up early because of some Linux signal sent to our process (and thus
+    // "advance" faster than the "heartbeat" interval)? - Udo
   
-  // advance movie  
-  Gui::advance_movie(this);
+    // check input devices
+    check_mouse();
+    check_keyboard();
+  
+    // advance movie  
+    Gui::advance_movie(this);
+    
   }
+  
   return true;
 }
 
@@ -842,9 +841,9 @@ bool FBGui::init_mouse()
 #endif
 
 #ifdef USE_MOUSE_PS2    
-void FBGui::check_mouse() 
+bool FBGui::check_mouse() 
 {
-  if (input_fd<0) return;   // no mouse available
+  if (input_fd<0) return false;   // no mouse available
   
   int i;
   int xmove, ymove, btn, btn_changed;
@@ -858,7 +857,7 @@ void FBGui::check_mouse()
     pos = i;
     break;    
   }
-  if (pos<0) return; // no sync or no data
+  if (pos<0) return false; // no sync or no data
   
   if (pos>0) {
     // remove garbage:
@@ -906,6 +905,7 @@ void FBGui::check_mouse()
     memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
     mouse_buf_size -= pos;  
     
+    return true;
   
   }
   
@@ -943,9 +943,11 @@ bool FBGui::init_mouse()
 #endif
 
 #ifdef USE_MOUSE_ETT    
-void FBGui::check_mouse() 
+bool FBGui::check_mouse() 
 {
-  if (input_fd<0) return;   // no mouse available
+  bool activity = false;
+  
+  if (input_fd<0) return false;   // no mouse available
   
   read_mouse_data();
   
@@ -957,7 +959,7 @@ void FBGui::check_mouse()
     pos = i;
     break;    
   }
-  if (pos<0) return; // no sync or no data
+  if (pos<0) return false; // no sync or no data
   
   if (pos>0) {
     //printf("touchscreen: removing %d bytes garbage!\n", pos);  
@@ -996,11 +998,13 @@ void FBGui::check_mouse()
       mouse_x = new_x;
       mouse_y = new_y;
       notify_mouse_moved(mouse_x, mouse_y);
+      activity = true;
     }
     
     if (new_btn != mouse_btn) {
       mouse_btn = new_btn;      
       notify_mouse_clicked(mouse_btn, 1);  // mask=?
+      activity = true;
     }
     
     // remove from buffer
@@ -1008,6 +1012,8 @@ void FBGui::check_mouse()
     memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
     mouse_buf_size -= pos;    
   }
+  
+  return activity;
   
 }
 #endif
@@ -1134,10 +1140,11 @@ void FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy) {
   *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
 }
 
-void FBGui::check_mouse()
+bool FBGui::check_mouse()
 {
-
-  if (input_fd < 0) return;
+  bool activity = false;
+  
+  if (input_fd < 0) return false;
 
   struct input_event ev;  // time,type,code,value
   
@@ -1188,11 +1195,13 @@ void FBGui::check_mouse()
       
         if (move_pending) {
           notify_mouse_moved(notify_x, notify_y);
+          activity = true;
           move_pending = false;
         }
       
         mouse_btn = new_mouse_btn;
         notify_mouse_clicked(mouse_btn, 1);  // mark=??
+        activity = true;
       }
 
       if (coordinatedebug)
@@ -1225,8 +1234,12 @@ void FBGui::check_mouse()
   
   } 
   
-  if (move_pending) 
+  if (move_pending) {
     notify_mouse_moved(notify_x, notify_y);
+    activity = true;
+  }
+  
+  return activity;
  
 } //check_mouse
 #endif
@@ -1380,10 +1393,11 @@ gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
   return gnash::key::INVALID;  
 }
 
-void FBGui::check_keyboard()
+bool FBGui::check_keyboard()
 {
-
-  if (keyb_fd < 0) return;
+  bool activity = false;
+  
+  if (keyb_fd < 0) return false;
 
   struct input_event ev;  // time,type,code,value
 
@@ -1435,14 +1449,18 @@ void FBGui::check_keyboard()
           
           
         // send event
-        if (c != gnash::key::INVALID) 
-            Gui::notify_key_event(c, modifier, ev.value);
+        if (c != gnash::key::INVALID) {
+          Gui::notify_key_event(c, modifier, ev.value);
+          activity=true;
+        }
               
       } //if normal key
 
     } //if EV_KEY      
   
   } //while
+  
+  return activity;
 
 }
 
