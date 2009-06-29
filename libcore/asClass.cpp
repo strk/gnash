@@ -82,17 +82,14 @@ bool
 asClass::addSlot(string_table::key name, asNamespace* ns,
         boost::uint32_t slotId, asClass* /*type*/, bool /*isstatic*/)
 {
-	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
-//	int flags = as_prop_flags::dontDelete;
-//	if (isstatic)
-//		flags |= as_prop_flags::staticProp;
-//	log_debug("Before init_member.");
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
 	//TODO: Set flags.
-	if(slotId == 0){
-		_prototype->init_member(name,as_value(), 0, nsname);
+	if(slotId == 0) {
+		_prototype->init_member(name, as_value(), 0, nsname);
 	}
-	else{
-		_prototype->init_member(name, as_value(), 0, nsname, slotId);
+	else {
+		_prototype->reserveSlot(name, nsname, slotId);
 	}
 	return true;
 }

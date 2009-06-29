@@ -169,7 +169,13 @@ public:
 
 	string_table::key getName() const { return _name; }
 
-	void initPrototype(){ _prototype = new as_object();}
+    void setPrototype(as_object* prototype) {
+        _prototype = prototype;
+    }
+
+	void initPrototype() {
+        _prototype =  new as_object();
+    }
 
 	/// What is the type of our parent class?
 	asClass* getSuper() const { return _super; }
