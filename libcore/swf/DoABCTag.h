@@ -50,10 +50,10 @@ public:
 		Machine *mach = vm.getMachine();
 		as_object* global = vm.getGlobal();
 		
-        mABC->prepare(mach);
+        _abc->prepare(mach);
 
 		log_debug("Begin execute abc_block.");
-		mach->initMachine(mABC, global);
+		mach->initMachine(_abc, global);
 		log_debug("Executing machine...");
 		mach->execute();
 	}
@@ -87,10 +87,15 @@ public:
 			in.read_string(name);
 		}
 
-		abc_block* block = new abc_block();
-		block->read(in);
-        // mABC = block;
-		DoABCTag* ABCtag = new DoABCTag(block);
+        std::auto_ptr<abc_block> block(new abc_block());
+		if (!block->read(in)) {
+            log_error("ABC parsing error while processing DoABCTag. This "
+                    "tag will never be executed");
+            return;
+        }
+
+        // _abc = block;
+		DoABCTag* ABCtag = new DoABCTag(block.release());
 		
 		IF_VERBOSE_PARSE (
             log_parse(_("tag %d: DoABCDefine"), tag);
@@ -102,9 +107,9 @@ public:
 
 private:
 
-	DoABCTag(abc_block *block) : mABC(block) {}
+	DoABCTag(abc_block* block) : _abc(block) {}
 
-	abc_block *mABC;
+	abc_block* _abc;
 	
 };
 

@@ -910,14 +910,12 @@ abc_block::read_instances()
 	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
-	for (unsigned int i = 0; i < count; ++i)
-	{
-		asClass *pClass;
+	for (size_t i = 0; i < count; ++i) {
+		asClass* pClass;
 		//Read multiname index.
 		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
-		if (index >= _multinamePool.size())
-		{
+		if (index >= _multinamePool.size()) {
 			log_error(_("ABC: Out of bounds instance name."));
 			return false;
 		}
@@ -961,11 +959,14 @@ abc_block::read_instances()
 			if (!pSuper)
 			{
 				log_error(_("ABC: Super type not found (%s), faking."), 
-					_stringTable->value(_multinamePool[super_index].getABCName()));
+					_stringTable->value(
+                        _multinamePool[super_index].getABCName()));
+
 				// While testing, we will add a fake type, rather than abort.
 				pSuper = mCH->newClass();
 				pSuper->setName(_multinamePool[super_index].getABCName());
-				mCH->getGlobalNs()->addClass(_multinamePool[super_index].getABCName(), pSuper);
+				mCH->getGlobalNs()->addClass(
+                        _multinamePool[super_index].getABCName(), pSuper);
 				// return false;
 			}
 
@@ -996,26 +997,21 @@ abc_block::read_instances()
                 _stringPool[_multinamePool[index].getABCName()],
                 super_index, flags | 0x0);
 
-		if (flags & INSTANCE_SEALED)
-			pClass->setSealed();
-		if (flags & INSTANCE_FINAL)
-			pClass->setFinal();
-		if (flags & INSTANCE_INTERFACE)
-			pClass->setInterface();
-		if ((flags & 7) == INSTANCE_DYNAMIC)
-			pClass->setDynamic();
+		if (flags & INSTANCE_SEALED) pClass->setSealed();
+		if (flags & INSTANCE_FINAL) pClass->setFinal();
+		if (flags & INSTANCE_INTERFACE) pClass->setInterface();
+		if ((flags & 7) == INSTANCE_DYNAMIC) pClass->setDynamic();
 
-		if (flags & INSTANCE_PROTECTED_NS) // Protected Namespace
-		{
+		if (flags & INSTANCE_PROTECTED_NS) {
 			boost::uint32_t ns_index = _stream->read_V32();
-			if (ns_index >= _namespacePool.size())
-			{
+			if (ns_index >= _namespacePool.size()) {
 				log_error(_("ABC: Out of bounds namespace for protected."));
 				return false;
 			}
 			// Set the protected namespace's parent, if it exists.
 			if (pClass->getSuper()->hasProtectedNs())
-				_namespacePool[ns_index]->setParent(pClass->getSuper()->getProtectedNs());
+				_namespacePool[ns_index]->setParent(
+                        pClass->getSuper()->getProtectedNs());
 			pClass->setProtectedNs(_namespacePool[ns_index]);
 		}
 
@@ -1023,13 +1019,11 @@ abc_block::read_instances()
 		// implement. They must be interfaces, and they must exist.
 		boost::uint32_t intcount = _stream->read_V32();
 		log_abc("This instance has %u interfaces.", intcount);
-		for (unsigned int j = 0; j < intcount; ++j)
-		{
+		for (size_t j = 0; j < intcount; ++j) {
 			boost::uint32_t i_index = _stream->read_V32();
 			log_abc("Interface %u has multiname index=%u", i, i_index);
 			// 0 is allowed as an interface, typically for the last one.
-			if (i_index >= _multinamePool.size())
-			{
+			if (i_index >= _multinamePool.size()) {
 				log_error(_("ABC: Out of bounds name for interface."));
 				return false;
 			}
@@ -1042,13 +1036,13 @@ abc_block::read_instances()
 			}
 			pClass->pushInterface(pInterface);
 		}
+
 		// The next thing should be the constructor.
 		// TODO: What does this mean exactly? How does it differ from the one in
 		// the class info block?
 		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Moffset: %u", offset);
-		if (offset >= _methods.size())
-		{
+		if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bounds method for initializer."));
 			return false;
 		}
@@ -1082,16 +1076,17 @@ abc_block::read_classes()
 	log_abc("Begin reading classes.");
 	boost::uint32_t count = _classes.size();
 	log_abc("There are %u classes.", count);
-	for (unsigned int i = 0; i < count; ++i)
-	{
+	
+    for (size_t i = 0; i < count; ++i) {
 		asClass* pClass = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Class %u(%s) static constructor index=%u", i, pClass, offset);
-		if (offset >= _methods.size())
-		{
+
+        if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bound static constructor for class."));
 			return false;
 		}
+
 		// Don't validate for previous owner.
 		pClass->setStaticConstructor(_methods[offset]);
 
@@ -1102,14 +1097,13 @@ abc_block::read_classes()
 		
 		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("This class has %u traits.", tcount);
-		for (unsigned int j = 0; j < tcount; ++j)
-		{
+		for (size_t j = 0; j < tcount; ++j) {
 			Trait &aTrait = newTrait();
 			aTrait.set_target(pClass, true);
 			if (!(aTrait.read(_stream, this)))
 				return false;
 		}
-	} // end of classes loop
+	} 
 	return true;
 }
 
@@ -1292,30 +1286,41 @@ abc_block::read(SWFStream& in)
 	if (!read_integer_constants()) return false;
 	if (!read_unsigned_integer_constants()) return false;
 	log_abc("Done reading unsigned integer constants.");
-	if (!read_double_constants()) return false;
+	
+    if (!read_double_constants()) return false;
 	log_abc("Done reading double constants.");
-	if (!read_string_constants()) return false;
+	
+    if (!read_string_constants()) return false;
 	log_abc("Done reading string constants.");
-	if (!read_namespaces()) return false;
+	
+    if (!read_namespaces()) return false;
 	log_abc("Done reading namespaces.");
-	if (!read_namespace_sets()) return false;
+	
+    if (!read_namespace_sets()) return false;
 	log_abc("Done reading namespace sets.");
-	if (!read_multinames()) return false;
+	
+    if (!read_multinames()) return false;
 	log_abc("Done reading multinames.");
-	if (!read_method_infos()) return false;
+	
+    if (!read_method_infos()) return false;
 	log_abc("Done reading method infos.");
-	if (!skip_metadata()) return false;
+	
+    if (!skip_metadata()) return false;
 	log_abc("Done reading metadata.");
-	if (!read_instances()) return false;
+	
+    if (!read_instances()) return false;
 	log_abc("Done reading instances.");
-	if (!read_classes()) return false;
+	
+    if (!read_classes()) return false;
 	log_abc("Done reading classes.");
-	if (!read_scripts()) return false;
+	
+    if (!read_scripts()) return false;
 	log_abc("Done reading scripts.");
-	if (!read_method_bodies()) return false;
+	
+    if (!read_method_bodies()) return false;
 	log_abc("Done reading stuff.");
 
-	for(unsigned int i=0;i<_methods.size();i++) {
+	for (size_t i=0; i < _methods.size(); ++i) {
 		log_abc("Method %d body:", i);
 		IF_VERBOSE_PARSE(_methods[i]->print_body());
 	}
