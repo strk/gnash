@@ -187,48 +187,43 @@ public:
 	void setProtected() {
         _flags = (_flags & ~(FLAGS_PUBLIC | FLAGS_PRIVATE)) | FLAGS_PROTECTED; }
 
-	/// \brief
 	/// Is the method public?
 	bool isPublic() const { return _flags & FLAGS_PUBLIC; }
 
-	/// \brief
 	/// Make the method public.
 	void setPublic() {
         _flags = (_flags & ~(FLAGS_PRIVATE | FLAGS_PROTECTED)) | FLAGS_PUBLIC;
     }
 
-	/// \brief
 	/// How many arguments are required? -1 means unknown.
 	int minArgumentCount() const { return _minArguments; }
 
-	/// \brief
 	/// Set the required minimum arguments.
 	void setMinArgumentCount(int i) { _minArguments = i; }
 
-	/// \brief
 	/// How many arguments are allowed? -1 means unknown.
 	int maxArgumentCount() const { return _maxArguments; }
 
 	/// Set the required maximum arguments.
 	void setMaxArgumentCount(int i) { _maxArguments = i; }
 
-	/// \brief
 	/// Push an argument of type t into the method definition
-	void pushArgument(asClass *t) { _arguments.push_back(t); }
+    //
+    /// A value of 0 stands for 'any'.
+	void pushArgument(asClass* t) { _arguments.push_back(t); }
 
-	/// \brief
 	/// Push an optional argument's default value.
 	void pushOptional(const as_value& v) { _optionalArguments.push_back(v); }
 
-	/// \brief
 	/// Are any of the arguments optional?
 	bool optionalArguments() const {
         return minArgumentCount() != maxArgumentCount();
     }
 
-	/// \brief
 	/// Get a reference to a list of argument types.
-	ArgumentList& getArgumentList() { return _arguments; }
+    //
+    /// NB: Some values may be 0, meaning "any".
+	const ArgumentList& getArgumentList() const { return _arguments; }
 
 	/// \brief
 	/// Get an object capable of executing this function.
