@@ -1335,13 +1335,11 @@ gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
     case KEY_KP8    : return gnash::key::KP_8; 
     case KEY_KP9    : return gnash::key::KP_9;
 
-    /*    
-    case KEY_KPMINUS       : return gnash::key::;
-    case KEY_KPPLUS        : return gnash::key::;
-    case KEY_KPDOT         : return gnash::key::;
-    case KEY_KPASTERISK    : return gnash::key::;
-    case KEY_KPENTER       : return gnash::key::;
-    */
+    case KEY_KPMINUS       : return gnash::key::KP_SUBTRACT;
+    case KEY_KPPLUS        : return gnash::key::KP_ADD;
+    case KEY_KPDOT         : return gnash::key::KP_DECIMAL;
+    case KEY_KPASTERISK    : return gnash::key::KP_MULITPLY;  // typo in GnashKey.h
+    case KEY_KPENTER       : return gnash::key::KP_ENTER;
     
     case KEY_ESC           : return gnash::key::ESCAPE;
     case KEY_MINUS         : return gnash::key::MINUS;
@@ -1358,13 +1356,12 @@ gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
     case KEY_LEFTSHIFT     : return gnash::key::SHIFT;
     case KEY_BACKSLASH     : return gnash::key::BACKSLASH;
     case KEY_COMMA         : return gnash::key::COMMA;
-    //case KEY_DOT           : return gnash::key::DOT;
     case KEY_SLASH         : return gnash::key::SLASH;
     case KEY_RIGHTSHIFT    : return gnash::key::SHIFT;
     case KEY_LEFTALT       : return gnash::key::ALT;
     case KEY_SPACE         : return gnash::key::SPACE;
     case KEY_CAPSLOCK      : return gnash::key::CAPSLOCK;
-    //case KEY_NUMLOCK       : return gnash::key::NUMLOCK;
+    case KEY_NUMLOCK       : return gnash::key::NUM_LOCK;
     //case KEY_SCROLLLOCK    : return gnash::key::SCROLLLOCK;
     
     case KEY_UP            : return gnash::key::UP;
