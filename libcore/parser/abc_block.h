@@ -119,6 +119,9 @@ public:
 	}
 };
 
+/// Output stream operator for abc::Trait::Kind
+std::ostream& operator<<(std::ostream& o, const Trait::Kind k);
+
 } // namespace abc
 
 namespace {
@@ -205,35 +208,8 @@ public:
     void prepare(Machine* mach);
 
 private:
-
-    friend class abc::Trait;
-
-	bool read_version();
-	bool read_integer_constants();
-	bool read_unsigned_integer_constants();
-	bool read_double_constants();
-	bool read_string_constants();
-	bool read_namespaces();
-	bool read_namespace_sets();
-	bool read_multinames();
-	bool read_method_infos();
-	bool skip_metadata();
-	bool read_instances();
-	bool read_classes();
-	bool read_scripts();
-	bool read_method_bodies();
-
-	void check_multiname_name(boost::uint32_t name);
-
-	void check_multiname_namespace(boost::uint32_t ns);
-
-	void check_multiname_namespaceset(boost::uint32_t nsset);
-
-	void setMultinameNames(asName *n,string_table::key ABCName);
-
-	void setNamespaceURI(asNamespace *ns,string_table::key ABCName);
-
-	enum Constants
+	
+    enum Constant
 	{
 		PRIVATE_NS = 0x05,
 		PACKAGE_NS = 0x16,
@@ -262,6 +238,33 @@ private:
 		POOL_NULL = 0x0C
 	};
 
+    friend class abc::Trait;
+
+	bool read_version();
+	bool read_integer_constants();
+	bool read_unsigned_integer_constants();
+	bool read_double_constants();
+	bool read_string_constants();
+	bool read_namespaces();
+	bool read_namespace_sets();
+	bool read_multinames();
+	bool read_method_infos();
+	bool skip_metadata();
+	bool read_instances();
+	bool read_classes();
+	bool read_scripts();
+	bool read_method_bodies();
+
+	void check_multiname_name(boost::uint32_t name);
+
+	void check_multiname_namespace(boost::uint32_t ns);
+
+	void check_multiname_namespaceset(boost::uint32_t nsset);
+
+	void setMultinameNames(asName *n,string_table::key ABCName);
+
+	void setNamespaceURI(asNamespace *ns,string_table::key ABCName);
+
 	std::vector<boost::int32_t> _integerPool;
 	std::vector<boost::uint32_t> _uIntegerPool;
 	std::vector<double> _doublePool;
@@ -286,7 +289,9 @@ private:
 
 };
 
+
 } 
+
 
 #endif /* GNASH_ABC_BLOCK_H */
 

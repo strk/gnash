@@ -37,8 +37,8 @@ namespace abc {
 bool
 Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
-	log_abc("In finalize class %s (name: %s), trait kind 0x%X", pClass,
-            pBlock->_stringPool[pClass->getName()], _kind | 0x0);
+	log_abc("Finalize class %s (%s), trait kind: %s", 
+            pBlock->_stringPool[pClass->getName()], pClass, _kind);
 
 	switch (_kind)
 	{
@@ -48,7 +48,7 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		// Validate the type.
 		asClass *pType;
 		if (_typeIndex) {
-			log_abc("Trait type is %s", 
+			log_abc("Trait type: %s", 
                 pBlock->_stringPool[
                     pBlock->_multinamePool[_typeIndex].getABCName()]);
 			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
@@ -210,8 +210,8 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 	boost::uint8_t kind = in->read_u8();
 	_kind = static_cast<Kind>(kind & 0x0F);
 
-	log_abc("Trait name: %s, Trait kind: 0x%X",
-            pBlock->_stringPool[multiname.getABCName()], kind | 0x0);
+	log_abc("Trait name: %s, Trait kind: %s",
+            pBlock->_stringPool[multiname.getABCName()], kind);
 
     switch (_kind)
 	{
@@ -293,6 +293,29 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 		}
 	}
 	return true;
+}
+
+std::ostream&
+operator<<(std::ostream& o, const Trait::Kind k)
+{
+    switch (k) {
+        case abc::Trait::KIND_SLOT:
+            return o << "slot";
+        case abc::Trait::KIND_CONST:
+            return o << "const";
+        case abc::Trait::KIND_METHOD:
+            return o << "method";
+        case abc::Trait::KIND_GETTER:
+            return o << "getter";
+        case abc::Trait::KIND_SETTER:
+            return o << "setter";
+        case abc::Trait::KIND_CLASS:
+            return o << "class";
+        case abc::Trait::KIND_FUNCTION:
+            return o << "function";
+        default:
+            return o << "Unknown kind " << static_cast<int>(k);
+    }
 }
 
 } // abc
@@ -525,7 +548,8 @@ abc_block::read_namespaces()
 	{
 		boost::uint8_t kind = _stream->read_u8();
 		boost::uint32_t nameIndex = _stream->read_V32();
-		log_abc("Namespace %u kind=0x%X index=%u name=%s", i, kind | 0x0, nameIndex, _stringPool[nameIndex]);
+		log_abc("Namespace %u kind %s, index %u, name %s", i, kind, 
+                nameIndex, _stringPool[nameIndex]);
 
 		if (nameIndex >= _stringPool.size())
 		{
@@ -599,7 +623,7 @@ abc_block::read_multinames()
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
 
-		log_abc("Multiname %u has kind=0x%X", i, kind | 0x0);
+		log_abc("Multiname %u has kind %s", i, kind);
 
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
@@ -1120,7 +1144,7 @@ abc_block::read_scripts()
 			if (!(aTrait.read(_stream, this))) {
 				return false;
             }
-			log_abc("Trait: %u name: %s(%u) kind: %u value: %s ", j, 
+			log_abc("Trait: %u name: %s(%u) kind: %s value: %s ", j, 
                     _stringPool[aTrait._name], aTrait._name, aTrait._kind,
                     aTrait._value.to_string());
 
@@ -1239,7 +1263,7 @@ abc_block::read_method_bodies()
                 // TODO: 'method body activation traits'
 				return false;
             }
-			log_abc("Trait: %u name: %s kind: %u value: %s ", j, 
+			log_abc("Trait: %u name: %s kind: %s value: %s ", j, 
                     _stringPool[aTrait._name], aTrait._kind, 
                     aTrait._value.to_string());
 		}
