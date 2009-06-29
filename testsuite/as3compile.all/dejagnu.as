@@ -30,12 +30,6 @@ package dejagnu {
         private static var unresolve = 0;
         private static var tf:TextField = new TextField();
         
-        public static function Dejagnu(o) {
-            tf.autoSize = TextFieldAutoSize.LEFT;
-            addChild(tf);
-            o.addChild(this);
-        } 
-       
         public static function fail (why) {
             failed++;
             var msg = 'FAILED: '+why;
