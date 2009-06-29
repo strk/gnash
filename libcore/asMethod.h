@@ -147,7 +147,8 @@ public:
     /// TODO: This is currently a no-op, so find out what it's for and
     /// implement it.
     /// NB: the return type of a method can be * (any) or void, neither of
-    /// which are asClasses.
+    /// which are asClasses, so this may not be an appropriate way to
+    /// handle return type.
 	void setReturnType(asClass* t);
 
 	asMethod *getSuper();
