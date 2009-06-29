@@ -96,7 +96,7 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		log_abc("Adding class %s, value %s, slot=%u",
                 pBlock->_stringPool[_name], _value, _slotID);
 
-		pClass->addMemberClass(_name, _namespace, _slotID, 
+		pClass->addMemberClass(_globalName, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex], do_static);
 		break;
 	}
@@ -335,11 +335,22 @@ abc_block::abc_block()
 void
 abc_block::prepare(Machine* mach)
 {
+    
     std::for_each(_classes.begin(), _classes.end(),
             std::mem_fun(&asClass::initPrototype));
 
-    std::for_each(_scripts.begin(), _scripts.end(),
-            std::mem_fun(&asClass::initPrototype));
+    // The first (entry) script has Global as its prototype.
+    // This can be deduced because the global classes are initialized with a
+    // slot on script 0 (entry script). OpNewClass then attempts to set the
+    // corresponding slot once the class has been constructed. At this point,
+    // global should verifiably be on the stack, so the slots are expected
+    // to be set on the global object.
+    if (!_scripts.empty()) {
+        _scripts.front()->setPrototype(mach->global());
+
+        std::for_each(_scripts.begin() + 1, _scripts.end(),
+                std::mem_fun(&asClass::initPrototype));
+    }
  
     std::for_each(_methods.begin(), _methods.end(),
             boost::bind(&asMethod::initPrototype, _1, mach));

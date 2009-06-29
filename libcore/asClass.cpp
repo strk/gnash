@@ -82,13 +82,14 @@ bool
 asClass::addSlot(string_table::key name, asNamespace* ns,
         boost::uint32_t slotId, asClass* /*type*/, bool /*isstatic*/)
 {
-	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
 	//TODO: Set flags.
 	if(slotId == 0) {
-		_prototype->init_member(name,as_value(), 0, nsname);
+		_prototype->init_member(name, as_value(), 0, nsname);
 	}
 	else {
-		_prototype->init_member(name, as_value(), 0, nsname, slotId);
+		_prototype->reserveSlot(name, nsname, slotId);
 	}
 	return true;
 }
