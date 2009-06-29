@@ -437,24 +437,8 @@ abc_block::locateClass(asName &m)
 	}
 	// One last chance: Look globally.
 	found = mCH->getGlobalNs()->getClass(m.getABCName());
-	if (found)
-		return found;
+    return found;
 
-	// Fake it here for a while.
-	if (m.getNamespace())
-	{
-		m.getNamespace()->stubPrototype(m.getABCName());
-		found = m.getNamespace()->getClass(m.getABCName());
-		return found;
-	}
-	else
-	{
-		// Fake in global.
-		mCH->getGlobalNs()->stubPrototype(m.getABCName());
-		found = mCH->getGlobalNs()->getClass(m.getABCName());
-		return found;
-	}
-	return NULL;
 }
 
 /// Read the ActionBlock version number.
@@ -796,54 +780,56 @@ abc_block::read_method_infos()
 		boost::uint32_t param_count = _stream->read_V32();
 		boost::uint32_t return_type = _stream->read_V32();
 
-		log_abc("  Param count: %u return type(index): %s(%u)", param_count, 
-                _stringPool[_multinamePool[return_type].getABCName()],
-                return_type);
+        const std::string& rt = return_type ? 
+            _stringPool[_multinamePool[return_type].getABCName()] :
+            "*";
+
+		log_abc("  Param count: %u, return type: %s", param_count, 
+                rt, return_type);
 
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
 
-		if (return_type >= _multinamePool.size())
-		{
+		if (return_type >= _multinamePool.size()) {
 			log_error(_("ABC: Out of bounds return type for method info."));
 			return false;
 		}
-		asClass *rtClass = locateClass(_multinamePool[return_type]);
-		if (!rtClass)
-		{
-			log_error(_("ABC: Unknown return type."));
-			return false;
-		}
 
-		pMethod->setReturnType(rtClass);
+        if (!return_type) {
+            pMethod->setReturnType(0);
+        }
+        else {
+            // TODO: this can be 'void', which clearly isn't a class, so this
+            // seems bogus. As setReturnType is a no-op, we should log it
+            // and ignore it.
+            asClass* rtClass = locateClass(_multinamePool[return_type]);
+            if (!rtClass) {
+                log_abc(_("ABC: Unknown return type."));
+            }
 
-		for (unsigned int j = 0; j < param_count; ++j)
-		{
+            pMethod->setReturnType(rtClass);
+        }
+		for (size_t j = 0; j < param_count; ++j) {
 			log_abc("  Reading parameter %u", j);
 			// The parameter type.
 			boost::uint32_t ptype = _stream->read_V32();
 			log_abc("   Parameter type(index): %s(%u)", 
                     _stringPool[_multinamePool[ptype].getABCName()], ptype);
 
-			if (ptype >= _multinamePool.size())
-			{
+			if (ptype >= _multinamePool.size()) {
 				log_error(_("ABC: Out of bounds parameter type in method."));
 				return false;
 			}
-			asClass *param_type = locateClass(_multinamePool[ptype]);
-//			log_abc("Done creating asClass object.");
-			if (!param_type)
-			{
+			
+            asClass* param_type = locateClass(_multinamePool[ptype]);
+			if (!param_type) {
 				log_error((_("ABC: Unknown parameter type.")));
-				return false;
+                // TODO: what should we do here?
 			}
-//			log_abc("Trying to add argument to method.");
+
 			pMethod->pushArgument(param_type);
-//			log_abc("Done adding argument to method object.");
 		}
-//		log_abc("End loop j.");
-		// A skippable name index.
-//		_stream->skip_V32();
+
 		boost::uint32_t method_name = _stream->read_V32();
 		log_abc(  "Method name=%s %d", _stringPool[method_name], method_name);
 		boost::uint8_t flags = _stream->read_u8();

@@ -143,6 +143,11 @@ public:
 	asClass* getReturnType() const;
 
 	/// Set the return type
+    //
+    /// TODO: This is currently a no-op, so find out what it's for and
+    /// implement it.
+    /// NB: the return type of a method can be * (any) or void, neither of
+    /// which are asClasses.
 	void setReturnType(asClass* t);
 
 	asMethod *getSuper();
