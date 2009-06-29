@@ -23,7 +23,7 @@
 #include "log.h"
 #include "IOChannel.h"
 
-//#ifdef GNASH_ALLOW_VCODEC_ENV 1
+//#define GNASH_ALLOW_VCODEC_ENV 1
 // Set this to enable a special GNASH_DEFAULT_VCODEC environment variable, which
 // is used as a default when the video codec can't be detected. This is a quick
 // hack to make MJPEG HTTP videos work (which can't be detected as their MIME
