@@ -241,8 +241,7 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 
 		boost::uint32_t offset = in->read_V32();
 		log_abc("Method index=%u", offset);
-		if (offset >= pBlock->_methods.size())
-		{
+		if (offset >= pBlock->_methods.size()) {
 			log_error(_("Bad method id in trait."));
 			return false;
 		}
@@ -268,8 +267,7 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 	{
 		_slotID = in->read_V32();
 		boost::uint32_t offset = in->read_V32();
-		if (offset >= pBlock->_methods.size())
-		{
+		if (offset >= pBlock->_methods.size()) {
 			log_error(_("Bad method id in trait."));
 			return false;
 		}
@@ -545,9 +543,8 @@ abc_block::read_namespaces()
 		log_abc("Namespace %u: kind %s, index %u, name %s", i,
                 static_cast<int>(kind), nameIndex, _stringPool[nameIndex]);
 
-		if (nameIndex >= _stringPool.size())
-		{
-			log_error(_("ABC: Out of bounds string given for namespace."));
+		if (nameIndex >= _stringPool.size()) {
+			log_error(_("ABC: Bad string given for namespace."));
 			return false;
 		}
 		
@@ -588,7 +585,7 @@ abc_block::read_namespace_sets()
 			boost::uint32_t selection = _stream->read_V32();
 			if (!selection || selection >= _namespacePool.size())
 			{
-				log_error(_("ABC: Out of bounds namespace for namespace set."));
+				log_error(_("ABC: Bad namespace for namespace set."));
 				return false;
 			}
 			_namespaceSetPool[i][j] = _namespacePool[selection];
@@ -791,7 +788,7 @@ abc_block::read_method_infos()
 		pMethod->setMaxArgumentCount(param_count);
 
 		if (return_type >= _multinamePool.size()) {
-			log_error(_("ABC: Out of bounds return type for method info."));
+			log_error(_("ABC: Bad return type for method info."));
 			return false;
 		}
 
@@ -813,21 +810,33 @@ abc_block::read_method_infos()
 			log_abc("  Reading parameter %u", j);
 			// The parameter type.
 			boost::uint32_t ptype = _stream->read_V32();
-			log_abc("   Parameter type(index): %s(%u)", 
-                    _stringPool[_multinamePool[ptype].getABCName()], ptype);
+            
+            const std::string& pt = return_type ? 
+                _stringPool[_multinamePool[ptype].getABCName()] :
+                "*";
+			
+            log_abc("   Parameter type(index): %s(%u)", pt, ptype);
 
 			if (ptype >= _multinamePool.size()) {
-				log_error(_("ABC: Out of bounds parameter type in method."));
+				log_error(_("ABC: Bad parameter type in method."));
 				return false;
 			}
 			
-            asClass* param_type = locateClass(_multinamePool[ptype]);
-			if (!param_type) {
-				log_error((_("ABC: Unknown parameter type.")));
-                // TODO: what should we do here?
-			}
+            // A value of 0 is legitimate, meaning 'any (*)'. 
+            if (ptype) {
+                asClass* param_type = locateClass(_multinamePool[ptype]);
 
-			pMethod->pushArgument(param_type);
+                if (!param_type) {
+                    log_abc((_("ABC: Unknown parameter type.")));
+                }
+                
+                // This currently also pushes 0, meaning 'any'; perhaps it
+                // should throw a VerifyError if the class is not known.
+                pMethod->pushArgument(param_type);
+            }
+            else {
+                pMethod->pushArgument(0);
+            }
 		}
 
 		boost::uint32_t method_name = _stream->read_V32();
@@ -932,7 +941,7 @@ abc_block::read_instances()
 		boost::uint32_t super_index = _stream->read_V32();;
 		if (super_index && super_index >= _multinamePool.size())
 		{
-			log_error(_("ABC: Out of bounds super type."));
+			log_error(_("ABC: Bad super type."));
 			return false;
 		}
 		if (!super_index)
@@ -991,7 +1000,7 @@ abc_block::read_instances()
 		if (flags & INSTANCE_PROTECTED_NS) {
 			boost::uint32_t ns_index = _stream->read_V32();
 			if (ns_index >= _namespacePool.size()) {
-				log_error(_("ABC: Out of bounds namespace for protected."));
+				log_error(_("ABC: Bad namespace for protected."));
 				return false;
 			}
 			// Set the protected namespace's parent, if it exists.
@@ -1010,7 +1019,7 @@ abc_block::read_instances()
 			log_abc("Interface %u has multiname index=%u", i, i_index);
 			// 0 is allowed as an interface, typically for the last one.
 			if (i_index >= _multinamePool.size()) {
-				log_error(_("ABC: Out of bounds name for interface."));
+				log_error(_("ABC: Bad name for interface."));
 				return false;
 			}
 			asClass *pInterface = locateClass(_multinamePool[i_index]);
