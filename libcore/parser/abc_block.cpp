@@ -211,7 +211,7 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 	_kind = static_cast<Kind>(kind & 0x0F);
 
 	log_abc("Trait name: %s, Trait kind: %s",
-            pBlock->_stringPool[multiname.getABCName()], kind);
+            pBlock->_stringPool[multiname.getABCName()], _kind);
 
     switch (_kind)
 	{
@@ -548,8 +548,8 @@ abc_block::read_namespaces()
 	{
 		boost::uint8_t kind = _stream->read_u8();
 		boost::uint32_t nameIndex = _stream->read_V32();
-		log_abc("Namespace %u kind %s, index %u, name %s", i, kind, 
-                nameIndex, _stringPool[nameIndex]);
+		log_abc("Namespace %u: kind %s, index %u, name %s", i,
+                static_cast<int>(kind), nameIndex, _stringPool[nameIndex]);
 
 		if (nameIndex >= _stringPool.size())
 		{
@@ -623,7 +623,7 @@ abc_block::read_multinames()
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
 
-		log_abc("Multiname %u has kind %s", i, kind);
+		log_abc("Multiname %u has kind %s", i, static_cast<int>(kind));
 
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
