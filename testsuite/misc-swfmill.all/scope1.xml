@@ -114,64 +114,64 @@
                 <traits/>
               </MethodBody>
 
-	      <!-- This is function A.f() -->
-	      <!--
-	      Its purpose is to push things onto the stack and the scope
-	      stack and leave them there to see whether they are still
-	      available after return.
-	      Ideally we would also verify that the stack and the scope stack
-	      from before this function call are not available, but this causes
-	      VerifyErrors that interrupt execution.
-	      -->
+              <!-- This is function A.f() -->
+              <!--
+              Its purpose is to push things onto the stack and the scope
+              stack and leave them there to see whether they are still
+              available after return.
+              Ideally we would also verify that the stack and the scope stack
+              from before this function call are not available, but this causes
+              VerifyErrors that interrupt execution.
+              -->
               <MethodBody methodInfo="1" maxStack="8" maxRegs="1" scopeDepth="5" maxScope="14" exceptionCount="0">
-	        <code>
+                <code>
 
-		  <!-- OpPop and OpPopScope cause a scope stack
-		  underflow error, so we don't do it. -->
+                  <!-- OpPop and OpPopScope cause a scope stack
+                  underflow error, so we don't do it. -->
 
                   <OpFindPropStrict name="10"/>
                   <OpPushString index="1"/>
-		  <OpCallPropVoid name="10" argc="1"/>
+                  <OpCallPropVoid name="10" argc="1"/>
 
-		  <!-- Push junk to the stack -->
-		  <OpPushByte value="9"/>
-		  <OpPushByte value="9"/>
-		  <OpPushByte value="9"/>
-		  <OpPushByte value="9"/>
-		  <OpPushByte value="9"/>
-		  
-		  <!-- Push junk to the scope stack (first A.A, then
-		  4 Sprite classes) -->
+                  <!-- Push junk to the stack -->
+                  <OpPushByte value="9"/>
+                  <OpPushByte value="9"/>
+                  <OpPushByte value="9"/>
+                  <OpPushByte value="9"/>
+                  <OpPushByte value="9"/>
+                  
+                  <!-- Push junk to the scope stack (first A.A, then
+                  4 Sprite classes) -->
                   <OpGetLocal0/>
-		  <OpPushScope/>
-		  <OpGetGlobalScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
-		  <OpGetLex name="9"/>
-		  <OpPushScope/>
+                  <OpPushScope/>
+                  <OpGetGlobalScope/>
+                  <OpGetLex name="9"/>
+                  <OpPushScope/>
+                  <OpGetLex name="9"/>
+                  <OpPushScope/>
+                  <OpGetLex name="9"/>
+                  <OpPushScope/>
+                  <OpGetLex name="9"/>
+                  <OpPushScope/>
 
-		  <!-- Check that the junk is there -->
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="0"/>
+                  <!-- Check that the junk is there -->
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="0"/>
                   <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="1"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="1"/>
                   <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="2"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="2"/>
                   <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="3"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="3"/>
                   <OpCallPropVoid name="10" argc="1"/>
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="4"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="4"/>
                   <OpCallPropVoid name="10" argc="1"/>
-		  <!-- scopeIndex 5 causes a VerifyError (out of bounds),
-		  so the scope stack from before the call is not available. -->
+                  <!-- scopeIndex 5 causes a VerifyError (out of bounds),
+                  so the scope stack from before the call is not available. -->
 
 		  <OpReturnVoid/>
                 </code>
@@ -183,59 +183,59 @@
                   <OpGetLocal0/>
                   <OpConstructSuper argc="0"/>
 		  
-		  <!-- Push stuff to the scope stack (A.A then three 
-		  EventDispatcher classes) -->
+                  <!-- Push stuff to the scope stack (A.A then three 
+                  EventDispatcher classes) -->
                   <OpGetLocal0/>
-		  <OpPushScope/>
-		  <OpGetGlobalScope/>
-		  <OpGetLex name="5"/>
-		  <OpPushScope/>
-		  <OpGetLex name="5"/>
-		  <OpPushScope/>
-		  <OpGetLex name="5"/>
-		  <OpPushScope/>
+                  <OpPushScope/>
+                  <OpGetGlobalScope/>
+                  <OpGetLex name="5"/>
+                  <OpPushScope/>
+                  <OpGetLex name="5"/>
+                  <OpPushScope/>
+                  <OpGetLex name="5"/>
+                  <OpPushScope/>
 
-		  <!-- Push 3 values, 3 trace function lookups to the stack -->
-		  <OpFindPropStrict name="10"/>
-		  <OpPushByte value="1"/>	
-		  <OpFindPropStrict name="10"/>
-		  <OpPushByte value="2"/>	
-		  <OpFindPropStrict name="10"/>
-		  <OpPushByte value="3"/>	
+                  <!-- Push 3 values, 3 trace function lookups to the stack -->
+                  <OpFindPropStrict name="10"/>
+                  <OpPushByte value="1"/>	
+                  <OpFindPropStrict name="10"/>
+                  <OpPushByte value="2"/>	
+                  <OpFindPropStrict name="10"/>
+                  <OpPushByte value="3"/>	
+                  
+                  <!-- This is one call to trace() -->
+                  <OpCallPropVoid name="10" argc="1"/>
 		  
-		  <!-- This is one call to trace() -->
-		  <OpCallPropVoid name="10" argc="1"/>
-		  
-		  <!-- This is the call to f() -->
-		  <!-- f() pushes things to the stack and scope stack, 
-		  and leaves them there. They should not be available after
-		  the function call has finished, but what was on the stacks
-		  before the call should still be there. -->
+                  <!-- This is the call to f() -->
+                  <!-- f() pushes things to the stack and scope stack, 
+                  and leaves them there. They should not be available after
+                  the function call has finished, but what was on the stacks
+                  before the call should still be there. -->
                   <OpGetLocal0/>
-		  <OpCallPropVoid name="3" argc="0"/>
+                  <OpCallPropVoid name="3" argc="0"/>
 		  
-		  <!-- These are the remaining calls to trace() -->
+                  <!-- These are the remaining calls to trace() -->
                   <OpCallPropVoid name="10" argc="1"/>
                   <OpCallPropVoid name="10" argc="1"/>
 
-		  <!-- Now trace what's on the scope stack -->
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="0"/>
+                  <!-- Now trace what's on the scope stack -->
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="0"/>
                   <OpCallPropVoid name="10" argc="1"/>
 		  
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="1"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="1"/>
                   <OpCallPropVoid name="10" argc="1"/>
 		  
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="2"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="2"/>
                   <OpCallPropVoid name="10" argc="1"/>
 		  
-		  <OpFindPropStrict name="10"/>
-		  <OpGetScopeObject scopeIndex="3"/>
+                  <OpFindPropStrict name="10"/>
+                  <OpGetScopeObject scopeIndex="3"/>
                   <OpCallPropVoid name="10" argc="1"/>
 		  
-		  <OpReturnVoid/>
+                  <OpReturnVoid/>
                 </code>
                 <exceptions/>
                 <traits/>
