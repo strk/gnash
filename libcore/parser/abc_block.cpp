@@ -37,8 +37,9 @@ namespace abc {
 bool
 Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
-	log_abc("In finalize class name=%s trait kind=0x%X", 
+	log_abc("In finalize class %s (name: %s), trait kind 0x%X", pClass,
             pBlock->_stringPool[pClass->getName()], _kind | 0x0);
+
 	switch (_kind)
 	{
 	case KIND_SLOT:
@@ -92,6 +93,9 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_CLASS:
 	{
+		log_abc("Adding class %s, value %s, slot=%u",
+                pBlock->_stringPool[_name], _value, _slotID);
+
 		pClass->addMemberClass(_name, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex], do_static);
 		break;
@@ -320,17 +324,6 @@ abc_block::prepare(Machine* mach)
     std::for_each(_traits.begin(), _traits.end(),
             boost::bind(&Trait::finalize, _1, this));
 
-    // If the following is enabled, it reserves slots for all namespaces
-    // in the global object. This means that ABC_ACTION_SETSLOT does not
-    // fail as often, but doesn't really seem quite correct.
-#if 1
-    as_object* global = mach->global();
-        assert(global);
-    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin(), 
-            e = _namespacePool.end(); i != e; ++i) {
-        global->reserveSlot((*i)->getURI(), 0, i - _namespacePool.begin());
-    }
-#endif
     _traits.clear();
 
 }
@@ -552,6 +545,7 @@ abc_block::read_namespaces()
 			_namespacePool[i] = n;
 		}
 		if (kind == PROTECTED_NS) _namespacePool[i]->setProtected();
+		if (kind == PACKAGE_NS) _namespacePool[i]->setPackage();
 		setNamespaceURI(_namespacePool[i], nameIndex);
 	}
 	return true;
@@ -963,7 +957,10 @@ abc_block::read_instances()
 		}
 
 		boost::uint8_t flags = _stream->read_u8();
-		log_abc("Instance %u multiname index=%u name=%s super index=%u flags=%X", i, index, _stringPool[_multinamePool[index].getABCName()], super_index, flags | 0x0);
+		log_abc("Instance %u(%s) multiname index=%u name=%s super index=%u "
+                "flags=%X", i, pClass, index, 
+                _stringPool[_multinamePool[index].getABCName()],
+                super_index, flags | 0x0);
 
 		if (flags & INSTANCE_SEALED)
 			pClass->setSealed();
@@ -1053,9 +1050,9 @@ abc_block::read_classes()
 	log_abc("There are %u classes.", count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		asClass *pClass = _classes[i];
+		asClass* pClass = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
-		log_abc("Class %u static constructor index=%u", i, offset);
+		log_abc("Class %u(%s) static constructor index=%u", i, pClass, offset);
 		if (offset >= _methods.size())
 		{
 			log_error(_("ABC: Out of bound static constructor for class."));
@@ -1093,11 +1090,12 @@ abc_block::read_scripts()
 	_scripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		asClass *pScript = mCH->newClass();
+		asClass* pScript = mCH->newClass();
 		_scripts[i] = pScript;
 
 		boost::uint32_t offset = _stream->read_V32();
-		log_abc("Reading script %u initializer method index=%u", i, offset);
+		log_abc("Reading script %u(%s) initializer method index=%u", i,
+                pScript, offset);
 		if (offset >= _methods.size())
 		{
 			log_error(_("ABC: Out of bounds method for script."));
