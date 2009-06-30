@@ -24,6 +24,7 @@
 // Forward declarations
 namespace gnash {
     class asClass;
+    class ClassHierarchy;
 }
 
 namespace gnash {
@@ -75,7 +76,7 @@ public:
 		return true;
 	}
 
-	void stubPrototype(string_table::key name);
+	void stubPrototype(ClassHierarchy& ch, string_table::key name);
 
 	/// Get the named class. Returns NULL if information is not known
 	/// about the class. (Stubbed classes still return NULL here.)
