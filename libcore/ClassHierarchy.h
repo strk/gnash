@@ -109,6 +109,30 @@ public:
 		/// The version at which this should be visible.
 		int version;
 	};
+	
+    /// \brief
+	/// Construct the declaration object. Later set the global and
+	/// extension objects using setGlobal and setExtension
+	ClassHierarchy(as_object* global, Extension* e)
+        :
+		mGlobal(global),
+        mExtension(e) ,
+		mAnonNamespaces(),
+        mGlobalNamespace(anonNamespace(0)),
+		mClassMemory()
+#ifdef ENABLE_AVM2
+        ,
+        mExceptionMemory(),
+		mMethodMemory(),
+		mBoundValueMemory(),
+        mBoundAccessorMemory()
+#endif
+	{}
+
+	/// \brief
+	/// Delete our private namespaces.
+	~ClassHierarchy();
+
 
     typedef std::vector<NativeClass> NativeClasses;
 
@@ -214,37 +238,8 @@ public:
 
 #endif
 
-	/// Set the extension object, since it wasn't set on construction.
-	void setExtension(Extension *e) { mExtension = e; }
-
-	/// Set the global object, for registrations.
-	void setGlobal(as_object *g) { mGlobal = g; }
-
 	/// Mark objects for garbage collector.
 	void markReachableResources() const;
-
-	/// \brief
-	/// Construct the declaration object. Later set the global and
-	/// extension objects using setGlobal and setExtension
-	ClassHierarchy()
-        :
-		mGlobal(0),
-        mExtension(0) ,
-		mAnonNamespaces(),
-        mGlobalNamespace(anonNamespace(0)),
-		mClassMemory()
-#ifdef ENABLE_AVM2
-        ,
-        mExceptionMemory(),
-		mMethodMemory(),
-		mBoundValueMemory(),
-        mBoundAccessorMemory()
-#endif
-	{}
-
-	/// \brief
-	/// Delete our private namespaces.
-	~ClassHierarchy();
 
 private:
 	as_object* mGlobal;

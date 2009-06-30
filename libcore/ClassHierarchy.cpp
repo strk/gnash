@@ -206,7 +206,7 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 {
     if (!mExtension) return false; 
 
-    mGlobalNamespace->stubPrototype(c.name);
+    mGlobalNamespace->stubPrototype(*this, c.name);
     mGlobalNamespace->getClass(c.name)->setDeclared();
     mGlobalNamespace->getClass(c.name)->setSystem();
 
@@ -227,7 +227,7 @@ ClassHierarchy::declareClass(const NativeClass& c)
 
     if (!nso) nso = addNamespace(c.namespace_name);
 
-    nso->stubPrototype(c.name);
+    nso->stubPrototype(*this, c.name);
     nso->getClass(c.name)->setDeclared();
     nso->getClass(c.name)->setSystem();
 
