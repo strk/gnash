@@ -47,6 +47,7 @@
 #include "flash/net/XMLSocket_as.h"
 #include "flash/ui/Mouse_as.h"
 #include "flash/display/MovieClip_as.h"
+#include "flash/display/Sprite_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
@@ -137,7 +138,7 @@ AVM2Global::AVM2Global(Machine& machine)
     
     init_member("trace", new builtin_function(global_trace));
     init_member("escape", new builtin_function(global_escape));
-    
+   
     object_class_init(*this); 
     string_class_init(*this); 
     array_class_init(*this); 
@@ -371,6 +372,7 @@ avm2Classes()
         (N(stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1))
         (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0,
            NSV::NS_FLASH_DISPLAY, 3))
+        (N(sprite_class_init, NSV::CLASS_SPRITE, 0, NSV::NS_FLASH_DISPLAY, 3))
         (N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, 
            NSV::NS_FLASH_TEXT, 3))
         (N(math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4))
