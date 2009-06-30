@@ -45,43 +45,74 @@
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
-#include "extension.h" // for composition
+#include "extension.h"
+#include "ClassHierarchy.h"
 
 // Forward declarations
 namespace gnash {
 	class Machine;
 	class VM;
 	class fn_call;
-	class ClassHierarchy;
 }
 
 namespace gnash {
 
-
-class AVM1Global: public as_object
+class AVM1Global : public as_object
 {
 public:
 
-	AVM1Global(VM& vm, ClassHierarchy *ch);
+	AVM1Global(VM& vm);
 	~AVM1Global() {}
+
+    const ClassHierarchy& classHierarchy() const {
+        return _classes;
+    }
+    
+    ClassHierarchy& classHierarchy() {
+        return _classes;
+    }
+
+protected:
+    
+    void markReachableResources() const;
 
 private:
 
     void loadExtensions();
 	Extension _et;
 
+    ClassHierarchy _classes;
+
 };
 
-class AVM2Global: public as_object
+class AVM2Global : public as_object
 {
 public:
 
-	AVM2Global(Machine& m, ClassHierarchy *ch);
+	AVM2Global(Machine& m);
 	~AVM2Global() {}
+
+    const ClassHierarchy& classHierarchy() const {
+        return _classes;
+    }
+    
+    ClassHierarchy& classHierarchy() {
+        return _classes;
+    }
+
+protected:
+
+    void markReachableResources() const {
+        _classes.markReachableResources();
+        markAsObjectReachable();
+    }
+
+private:
+
+    ClassHierarchy _classes;
 
 };
 
-
 } // namespace gnash
 
-#endif // ndef GNASH_GLOBAL_H
+#endif 
