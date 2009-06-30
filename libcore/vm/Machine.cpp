@@ -28,6 +28,7 @@
 #include "action.h"
 #include "Object.h"
 #include "VM.h"
+#include "Global.h"
 
 namespace gnash {
 /// The type of exceptions thrown by ActionScript.
@@ -322,15 +323,14 @@ Machine::Machine(VM& vm)
         mGlobalScope(0),
         mDefaultThis(0),
         mThis(0),
-        _global(vm.getGlobal()),
+        _global(new AVM2Global(*this)),
         mGlobalReturn(),
         mIgnoreReturn(),
         mIsAS3(false),
         mExitWithReturn(false),
         mPoolObject(0),
         mCurrentFunction(0),
-        _vm(vm),
-        mCH(_vm.getClassHierarchy())
+        _vm(vm)
 {
 	// Local registers should be initialized at the beginning of each
     // function call, but we don't currently parse the number of local
@@ -462,7 +462,9 @@ Machine::execute()
                 {
                     boost::uint32_t soffset = mStream->read_V32();
                     const std::string& uri = pool_string(soffset, mPoolObject);
-                    mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
+
+                    ClassHierarchy& ch = _global->classHierarchy();
+                    mDefaultXMLNamespace = ch.anonNamespace(mST.find(uri));
                     break;
                 }
 
@@ -477,7 +479,9 @@ Machine::execute()
                 {
                     ENSURE_STRING(mStack.top(0));
                     const std::string& uri = mStack.top(0).to_string();
-                    mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
+                    
+                    ClassHierarchy& ch = _global->classHierarchy();
+                    mDefaultXMLNamespace = ch.anonNamespace(mST.find(uri));
                     mStack.drop(1);
                     break;
                 }
@@ -2958,7 +2962,7 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 	if (!find_for_primitive) return 0;
 
 	if (v.is_number()) {
-		return NULL; // TODO: mCH->getClass(NSV::CLASS_NUMBER);
+		return NULL; // TODO: _classes->getClass(NSV::CLASS_NUMBER);
 	}
 
 	// And so on...
