@@ -126,15 +126,16 @@ class declare_native_function : public as_function
 private:
     ClassHierarchy::NativeClass mDeclaration;
     as_object *mTarget;
-    Extension *mExtension;
 
 public:
     bool isBuiltin() { return true; }
 
     declare_native_function(const ClassHierarchy::NativeClass &c,
-        as_object *g, Extension *e) :
+        as_object *g)
+        :
         as_function(getObjectInterface()),
-        mDeclaration(c), mTarget(g), mExtension(e)
+        mDeclaration(c),
+        mTarget(g)
     {
         // does it make any sense to set a 'constructor' here ??
         //init_member("constructor", this);
@@ -149,7 +150,7 @@ public:
         mDeclaration.initializer(*mTarget);
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
-        if ( mTarget->get_member(mDeclaration.name, &us) )
+        if (mTarget->get_member(mDeclaration.name, &us))
         {
             as_value super;
             if (mDeclaration.super_name)
@@ -181,9 +182,11 @@ public:
                 log_error("Native class %s is not an object after initialization (%s)",
                     st.value(mDeclaration.name), us);
             }
-            if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
+            if (mDeclaration.super_name &&
+                    !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
             {
-                us.to_object()->set_prototype(super.to_as_function()->getPrototype());
+                us.to_object()->set_prototype(
+                        super.to_as_function()->getPrototype());
             }
         }
         else
@@ -232,7 +235,7 @@ ClassHierarchy::declareClass(const NativeClass& c)
     nso->getClass(c.name)->setSystem();
 
     boost::intrusive_ptr<as_function> getter =
-        new declare_native_function(c, mGlobal, mExtension);
+        new declare_native_function(c, mGlobal);
 
     int flags = as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
