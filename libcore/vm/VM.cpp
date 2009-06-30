@@ -67,7 +67,8 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	NSV::loadStrings(_singleton->_stringTable, _singleton->getSWFVersion());
 
 	_singleton->_classHierarchy.reset(new ClassHierarchy);
-	_singleton->setGlobal(new Global(*_singleton, _singleton->_classHierarchy.get()));
+	_singleton->setGlobal(
+            new AVM1Global(*_singleton, _singleton->_classHierarchy.get()));
 
 #ifdef ENABLE_AVM2
 	_singleton->_machine = new Machine(*_singleton);

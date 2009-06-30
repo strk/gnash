@@ -115,7 +115,7 @@ namespace {
     void registerNatives(as_object& global);
 }
 
-Global::Global(VM& vm, ClassHierarchy *ch)
+AVM1Global::AVM1Global(VM& vm, ClassHierarchy *ch)
     :
     as_object()
 {
@@ -215,7 +215,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 // if a plugin defines a class that a movie actually wants to
 // use.
 void
-Global::loadExtensions()
+AVM1Global::loadExtensions()
 {
 
     if ( RcInitFile::getDefaultInstance().enableExtensions() )
