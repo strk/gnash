@@ -159,7 +159,6 @@ AVM2Global::AVM2Global(Machine& machine)
 void 
 AVM1Global::markReachableResources() const
 {
-    GNASH_REPORT_FUNCTION;
     _classes.markReachableResources();
     markAsObjectReachable();
 }
@@ -863,7 +862,6 @@ global_setInterval(const fn_call& fn)
 	return as_value(id);
 }
 
-// TODO: move to Global.cpp
 as_value
 global_setTimeout(const fn_call& fn)
 {
