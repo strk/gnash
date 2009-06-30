@@ -29,6 +29,7 @@
 #include "CodeStream.h"
 #include "action_buffer.h"
 #include "Machine.h"
+#include "Global.h"
 
 namespace gnash {
 
@@ -324,16 +325,18 @@ abc_block::abc_block()
     :
     _stringTable(&VM::get().getStringTable())
 {
-	mCH = VM::get().getClassHierarchy();
+#if 1
+	mCH = &(dynamic_cast<AVM2Global*>(VM::get().getMachine()->global())->classHierarchy());
 	// TODO: Make this the real 'Object' prototype.
-	mCH->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
+	mCH->getGlobalNs()->stubPrototype(*mCH, NSV::CLASS_OBJECT);
 	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
+#endif
 }
 
 void
 abc_block::prepare(Machine* mach)
 {
-    
+
     std::for_each(_classes.begin(), _classes.end(),
             std::mem_fun(&asClass::initPrototype));
 
