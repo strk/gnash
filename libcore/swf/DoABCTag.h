@@ -48,12 +48,11 @@ public:
         
         log_debug("getting machine.");
 		Machine *mach = vm.getMachine();
-		as_object* global = vm.getGlobal();
 		
         _abc->prepare(mach);
 
 		log_debug("Begin execute abc_block.");
-		mach->initMachine(_abc, global);
+		mach->initMachine(_abc);
 		log_debug("Executing machine...");
 		mach->execute();
 	}

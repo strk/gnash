@@ -201,10 +201,11 @@ public:
 		as_value& storage, unsigned char stack_in, short stack_out);
 
 	void immediateProcedure(const as_function *to_call, as_object *pthis,
-		unsigned char stack_in, short stack_out)
-	{ immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out); }
+		unsigned char stack_in, short stack_out) {
+        immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out);
+    }
 
-	void initMachine(abc_block* pool_block,as_object* global);
+	void initMachine(abc_block* pool_block);
 
 	as_value executeFunction(asMethod* function, const fn_call& fn);
 
@@ -212,14 +213,14 @@ public:
 
 	Machine(VM& vm);
 
-    /// Return the Global object.
+    /// Return the Global object for this Machine.
     //
-    /// TODO: is this really necessary? Which object should we
-    /// return anyway, i.e. why not mGlobalObject? (that is null
-    /// at inopportune moments right now, which is why VM::getGlobal()
-    /// is returned.
+    /// This should be different from the AVM1 global object because the VMs
+    /// do not share any ActionScript resources. It should be the same
+    /// for a complete run of the Machine so that modifications carried out
+    /// by scripts are preserved for subsequent scripts.
     as_object* global() {
-        return _vm.getGlobal();
+        return _global;
     }
 
 private:
@@ -353,7 +354,7 @@ private:
 	as_object* mDefaultThis;
 	as_object* mThis;
 
-	as_object* mGlobalObject;
+	as_object* _global;
 
 	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.

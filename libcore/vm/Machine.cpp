@@ -322,7 +322,7 @@ Machine::Machine(VM& vm)
         mGlobalScope(0),
         mDefaultThis(0),
         mThis(0),
-        mGlobalObject(0),
+        _global(vm.getGlobal()),
         mGlobalReturn(),
         mIgnoreReturn(),
         mIsAS3(false),
@@ -3090,7 +3090,7 @@ Machine::saveState()
 }
 
 void
-Machine::initMachine(abc_block* pool_block, as_object* global)
+Machine::initMachine(abc_block* pool_block)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");
@@ -3101,8 +3101,7 @@ Machine::initMachine(abc_block* pool_block, as_object* global)
 	log_debug("Loading code stream.");
 	mStream = constructor->getBody();
 	mCurrentFunction = constructor->getPrototype();
-	setRegister(0, global);
-	mGlobalObject = global;
+	setRegister(0, _global);
 }
 
 //This is called by abc_functions to execute their code stream.
