@@ -35,7 +35,6 @@
 #include "CustomActions.h"
 #include "Date_as.h" // for registerDateNative
 #include "Error_as.h"
-#include "Global.h"
 #include "String_as.h"
 #include "flash/ui/Keyboard_as.h"
 #include "Selection_as.h"
@@ -61,7 +60,7 @@
 #include "extension.h"
 #include "VM.h"
 #include "Timers.h"
-#include "URL.h" // for URL::encode and URL::decode (escape/unescape)
+#include "URL.h" 
 #include "builtin_function.h"
 #include "TextField.h"
 #include "rc.h"
@@ -69,12 +68,21 @@
 #include "namedStrings.h"
 #include "GnashNumeric.h" // for isfinite replacement
 #include "flash_pkg.h"
-
 #include "fn_call.h"
+#include "Button.h"
+#include "flash/accessibility/Accessibility_as.h"
+#include "Global.h"
+#include "int_as.h"
+#include "LoadVars_as.h"
+#include "flash/net/LocalConnection_as.h"
+#include "Namespace_as.h"
+#include "xml/XMLNode_as.h"
+#include "flash/text/TextFieldAutoSize_as.h"
 
-#include <limits> // for numeric_limits<double>::infinity
+#include <limits> 
 #include <sstream>
 #include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
@@ -93,6 +101,10 @@
 namespace gnash {
 
 namespace {
+
+    const ClassHierarchy::NativeClasses& avm1Classes();
+    const ClassHierarchy::NativeClasses& avm2Classes();
+
     as_value global_trace(const fn_call& fn);
     as_value global_isNaN(const fn_call& fn);
     as_value global_isfinite(const fn_call& fn);
@@ -149,7 +161,7 @@ AVM1Global::AVM1Global(VM& vm, ClassHierarchy *ch)
 
     ch->setGlobal(this);
     ch->setExtension(&_et);
-    ch->massDeclare();
+    ch->declareAll(avm1Classes());
 
     object_class_init(*this); 
     string_class_init(*this); 
@@ -230,8 +242,82 @@ AVM1Global::loadExtensions()
 
 }
 
-
 namespace {
+
+const ClassHierarchy::NativeClasses&
+avm1Classes()
+{
+
+    const string_table::key NS_GLOBAL = 0;
+    const string_table::key NS_UNKNOWN = 0;
+
+    typedef ClassHierarchy::NativeClass N;
+
+    static const ClassHierarchy::NativeClasses s = boost::assign::list_of
+
+        (N(system_class_init, NSV::CLASS_SYSTEM, 0, NSV::NS_FLASH_SYSTEM, 1))
+        (N(stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1))
+        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0,
+           NSV::NS_FLASH_DISPLAY, 3))
+        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, 
+           NSV::NS_FLASH_TEXT, 3))
+        (N(math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4))
+        (N(boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, 
+           NS_GLOBAL, 5))
+        (N(Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, 
+           NS_UNKNOWN, 5))
+        (N(Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, 
+           NSV::NS_FLASH_MEDIA, 5))
+        (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_NET, 5))
+        (N(Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT, 
+           NS_GLOBAL, 5))
+        (N(XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_XML, 5))
+        (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_UI, 5))
+        (N(number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
+        (N(TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
+        (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
+        (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_TEXT, 5))
+        (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_MEDIA, 6))
+        (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_MEDIA, 6))
+        (N(microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_MEDIA, 6))
+        (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5))
+        (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 6))
+        (N(LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
+        (N(customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS,
+           NSV::CLASS_OBJECT, NSV::NS_ADOBE_UTILS, 6))
+        (N(NetConnection_as::init, NSV::CLASS_NET_CONNECTION,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
+        (N(NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_NET, 6))
+        (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_UI, 7))
+        (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
+           NSV::CLASS_OBJECT, NS_GLOBAL, 7))
+        (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_ACCESSIBILITY, 5));
+
+        return s;
+
+}
+
 
 as_value
 global_trace(const fn_call& fn)
