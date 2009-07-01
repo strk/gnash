@@ -171,9 +171,9 @@ attachLoadVarsInterface(as_object& o)
 	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", vm.getNative(301, 3));
 	o.init_member("getBytesLoaded", new builtin_function(
-	            loadvars_getBytesLoaded));
+	            LoadableObject::loadableobject_getBytesLoaded));
 	o.init_member("getBytesTotal", new builtin_function(
-                loadvars_getBytesTotal));
+                LoadableObject::loadableobject_getBytesTotal));
 	o.init_member("load", vm.getNative(301, 0));
 	o.init_member("send", vm.getNative(301, 1));
 	o.init_member("sendAndLoad", vm.getNative(301, 2));
@@ -191,25 +191,6 @@ getLoadVarsInterface()
 		attachLoadVarsInterface(*o);
 	}
 	return o.get();
-}
-
-
-as_value
-loadvars_getBytesLoaded(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars_as> ptr = 
-        ensureType<LoadVars_as>(fn.this_ptr);
-    
-	return as_value(ptr->getBytesLoaded());
-}
-
-as_value
-loadvars_getBytesTotal(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars_as> ptr =
-        ensureType<LoadVars_as>(fn.this_ptr);
-
-    return as_value(ptr->getBytesTotal());
 }
 
 as_value
