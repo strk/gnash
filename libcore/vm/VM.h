@@ -50,8 +50,6 @@ namespace gnash {
 
 namespace gnash {
 
-class ClassHierarchy;
-
 /// A GC root used to mark all reachable collectable pointers
 class VmGcRoot : public GcRoot 
 {
@@ -245,9 +243,6 @@ public:
 	/// Get a pointer to this VM's _global Object
 	as_object* getGlobal() const;
 
-	/// Get a pointer to this VM's global ClassHierarchy object.
-	ClassHierarchy* getClassHierarchy() const { return _classHierarchy.get(); }
-	
 	/// Mark all reachable resources (for GC)
 	//
 	/// - root movie / stage (_rootMovie)
@@ -324,9 +319,6 @@ private:
 
 	/// Mutable since it should not affect how the VM runs.
 	mutable string_table _stringTable;
-
-	/// Not mutable since changing this changes behavior of the VM.
-	std::auto_ptr<ClassHierarchy> _classHierarchy;
 
 #ifdef ENABLE_AVM2
 	/// A running execution thread.

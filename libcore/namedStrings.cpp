@@ -210,6 +210,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "flash.system", NSV::NS_FLASH_SYSTEM ),
 	string_table::svt( "flash.utils", NSV::NS_FLASH_UTILS ),
 	string_table::svt( "flash.events", NSV::NS_FLASH_EVENTS ),
+	string_table::svt( "flash.errors", NSV::NS_FLASH_ERRORS ),
 	string_table::svt( "flash.accessibility", NSV::NS_FLASH_ACCESSIBILITY ),
 	string_table::svt( "flash.media", NSV::NS_FLASH_MEDIA ),
 	string_table::svt( "flash.xml", NSV::NS_FLASH_XML ),

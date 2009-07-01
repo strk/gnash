@@ -19,55 +19,13 @@
 #include "as_object.h"
 #include "as_prop_flags.h"
 #include "as_value.h"
-#include "as_function.h" // for function_class_init
-#include "Button.h"
-#include "AsBroadcaster.h"
-#include "flash/accessibility/Accessibility_as.h"
-#include "Boolean_as.h"
-#include "flash/media/Camera_as.h"
-#include "Color_as.h"
-#include "flash/ui/ContextMenu_as.h"
-#include "CustomActions.h"
-#include "Date_as.h"
-#include "Error_as.h"
-#include "Global.h"
-#include "int_as.h"
-#include "String_as.h"
-#include "flash/ui/Keyboard_as.h"
-#include "LoadVars_as.h"
-#include "flash/net/LocalConnection_as.h"
-#include "flash/media/Microphone_as.h"
-#include "Number_as.h"
-#include "Object.h"
-#include "Math_as.h"
-#include "Namespace_as.h"
-#include "flash/ui/Mouse_as.h"
-#include "flash/display/MovieClip_as.h"
-#include "MovieClipLoader.h"
-#include "movie_definition.h"
-#include "NetConnection_as.h"
-#include "NetStream_as.h"
-#include "Selection_as.h"
-#include "flash/net/SharedObject_as.h"
-#include "flash/display/Stage_as.h"
-#include "flash/media/Sound_as.h"
-#include "flash/system/System_as.h"
-#include "flash/text/TextSnapshot_as.h"
-#include "TextFormat_as.h"
-#include "Video.h"
-#include "extension.h"
-#include "VM.h"
-#include "URL.h" // for URL::encode and URL::decode (escape/unescape)
-#include "builtin_function.h"
-#include "TextField.h"
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
+#include "as_function.h"
 #include "builtin_function.h"
-#include "flash/net/XMLSocket_as.h"
-#include "xml/XMLDocument_as.h"
-#include "xml/XMLNode_as.h"
 #include "asClass.h"
-#include "flash/text/TextFieldAutoSize_as.h"
+#include "Object.h"
+#include "extension.h"
 
 namespace gnash {
 
@@ -100,17 +58,19 @@ addVisibilityFlag(int& flags, int version)
 class declare_extension_function : public as_function
 {
 private:
-    ClassHierarchy::extensionClass mDeclaration;
+    ClassHierarchy::ExtensionClass mDeclaration;
     as_object *mTarget;
     Extension *mExtension;
 
 public:
     bool isBuiltin() { return true; }
 
-    declare_extension_function(ClassHierarchy::extensionClass &c,
-        as_object *g, Extension* e) :
-        as_function(getObjectInterface()),
-        mDeclaration(c), mTarget(g), mExtension(e)
+    declare_extension_function(ClassHierarchy::ExtensionClass &c,
+        as_object *g, Extension* e)
+        :
+        mDeclaration(c),
+        mTarget(g),
+        mExtension(e)
     {
         init_member("constructor", as_function::getFunctionConstructor().get());
     }
@@ -166,17 +126,17 @@ public:
 class declare_native_function : public as_function
 {
 private:
-    ClassHierarchy::nativeClass mDeclaration;
+    ClassHierarchy::NativeClass mDeclaration;
     as_object *mTarget;
-    Extension *mExtension;
 
 public:
     bool isBuiltin() { return true; }
 
-    declare_native_function(const ClassHierarchy::nativeClass &c,
-        as_object *g, Extension *e) :
-        as_function(getObjectInterface()),
-        mDeclaration(c), mTarget(g), mExtension(e)
+    declare_native_function(const ClassHierarchy::NativeClass &c,
+        as_object *g)
+        :
+        mDeclaration(c),
+        mTarget(g)
     {
         // does it make any sense to set a 'constructor' here ??
         //init_member("constructor", this);
@@ -191,8 +151,9 @@ public:
         mDeclaration.initializer(*mTarget);
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
-        if ( mTarget->get_member(mDeclaration.name, &us) )
-        {
+        if (mTarget->get_member(mDeclaration.name, &us,
+                    mDeclaration.namespace_name)) {
+
             as_value super;
             if (mDeclaration.super_name)
             {
@@ -218,14 +179,15 @@ public:
                 }
                 assert(super.to_as_function());
             }
-            if ( ! us.to_object() )
-            {
-                log_error("Native class %s is not an object after initialization (%s)",
-                    st.value(mDeclaration.name), us);
+            if (!us.to_object()) {
+                log_error("Native class %s is not an object after "
+                        "initialization (%s)", st.value(mDeclaration.name), us);
             }
-            if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
-            {
-                us.to_object()->set_prototype(super.to_as_function()->getPrototype());
+            if (mDeclaration.super_name &&
+                    !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
+                
+                us.to_object()->set_prototype(
+                        super.to_as_function()->getPrototype());
             }
         }
         else
@@ -244,16 +206,17 @@ ClassHierarchy::~ClassHierarchy()
 }
 
 bool
-ClassHierarchy::declareClass(extensionClass& c)
+ClassHierarchy::declareClass(ExtensionClass& c)
 {
     if (!mExtension) return false; 
 
-    mGlobalNamespace->stubPrototype(c.name);
+    mGlobalNamespace->stubPrototype(*this, c.name);
     mGlobalNamespace->getClass(c.name)->setDeclared();
     mGlobalNamespace->getClass(c.name)->setSystem();
 
     boost::intrusive_ptr<as_function> getter =
         new declare_extension_function(c, mGlobal, mExtension);
+
 
     int flags=as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
@@ -261,123 +224,36 @@ ClassHierarchy::declareClass(extensionClass& c)
 }
 
 bool
-ClassHierarchy::declareClass(const nativeClass& c)
+ClassHierarchy::declareClass(const NativeClass& c)
 {
-    // For AS2 and below, registering with mGlobal _should_ make it equivalent
-    // to being in the global namespace, since everything is global there.
+    // AS2 classes should be registered with namespace 0, so they all
+    // appear in a single global namespace.
     asNamespace *nso = findNamespace(c.namespace_name);
 
     if (!nso) nso = addNamespace(c.namespace_name);
 
-    nso->stubPrototype(c.name);
+    nso->stubPrototype(*this, c.name);
     nso->getClass(c.name)->setDeclared();
     nso->getClass(c.name)->setSystem();
 
     boost::intrusive_ptr<as_function> getter =
-        new declare_native_function(c, mGlobal, mExtension);
-
+        new declare_native_function(c, mGlobal);
+    
     int flags = as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
-    return mGlobal->init_destructive_property(c.name, *getter, flags);
+    return mGlobal->init_destructive_property(c.name, *getter, flags,
+            c.namespace_name);
 }
 
-static const ClassHierarchy::nativeClass knownClasses[] =
-{
-// This makes clear the difference between "We don't know where the
-// class belongs" and "it belongs in the global namespace", even though
-// the result is the same.
-    #define NS_GLOBAL 0
-    #define NS_UNKNOWN 0
-
-//  { function_name, name key, super name key, lowest version },
-    { system_class_init, NSV::CLASS_SYSTEM, 0, NSV::NS_FLASH_SYSTEM, 1 },
-    { stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1 },
-    { movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, NSV::NS_FLASH_DISPLAY, 3 },
-    { textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, NSV::NS_FLASH_TEXT, 3 },
-    { math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4 },
-    { boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT,
-        NS_UNKNOWN, 5 },
-    { Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_MEDIA, 5 },
-    { xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_NET, 5 },
-    { Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_XML, 5 },
-    { mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI,
-        5 },
-    { number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
-        NS_GLOBAL, 5 },
-    { Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
-        NS_GLOBAL, 5 },
-    { TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_TEXT, 5 },
-    { video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_MEDIA, 6 },
-    { camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_MEDIA, 6 },
-    { microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_MEDIA, 6 },
-    { sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_NET, 5 },
-    { loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
-    { LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_NET, 6 },
-    { customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT,
-        NSV::NS_ADOBE_UTILS, 6 },
-    { NetConnection_as::init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_NET, 6 },
-    { NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_NET, 6 },
-    { contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
-        NSV::NS_FLASH_UI, 7 },
-    { moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
-        NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
-    { Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-    { accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT,
-          NSV::NS_FLASH_ACCESSIBILITY, 5 },
-    { int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, NS_GLOBAL, 9 },
-    { namespace_class_init, NSV::CLASS_NAMESPACE, NSV::CLASS_OBJECT,
-        NS_GLOBAL, 9 }
-//  { function_name, name key, super name key, lowest version },
-
-// These classes are all implicitly constructed; that is, it is not necessary for
-// the class name to be used to construct the class, so they must always be available.
-//  { object_class_init, NSV::CLASS_OBJECT, 0, NS_GLOBAL, 5 }
-//  { function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT,
-//  NS_GLOBAL, 6 }
-//  { array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
-//  { string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
-
-};
 
 void
-ClassHierarchy::massDeclare()
+ClassHierarchy::declareAll(const NativeClasses& classes)
 {
-    // Natives get declared first. It doesn't make any sense for a native
-    // to depend on an extension, but it does make sense the other way
-    // around.
-    const size_t size = sizeof (knownClasses) / sizeof (nativeClass);
-    for (size_t i = 0; i < size; ++i)
-    {
-        const nativeClass& c = knownClasses[i];
+    // This is necessary to resolve the overload...
+    bool(ClassHierarchy::*nf)(const NativeClass& f) =
+        &ClassHierarchy::declareClass;
 
-        if ( ! declareClass(c) )
-        {
-            log_error("Could not declare class %s", c);
-        }
-    }
-
-    if (mExtension != NULL)
-    {
-        /* Load extensions here */
-    }
+    std::for_each(classes.begin(), classes.end(), boost::bind(nf, this, _1));
 }
 
 void
@@ -387,7 +263,7 @@ ClassHierarchy::markReachableResources() const
 }
 
 std::ostream&
-operator<<(std::ostream& os, const ClassHierarchy::nativeClass& c)
+operator<<(std::ostream& os, const ClassHierarchy::NativeClass& c)
 {
     string_table& st = VM::get().getStringTable();
 
@@ -402,7 +278,7 @@ operator<<(std::ostream& os, const ClassHierarchy::nativeClass& c)
 }
 
 std::ostream&
-operator<<(std::ostream& os, const ClassHierarchy::extensionClass& c)
+operator<<(std::ostream& os, const ClassHierarchy::ExtensionClass& c)
 {
     string_table& st = VM::get().getStringTable();
 

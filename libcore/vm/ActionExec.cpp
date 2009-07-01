@@ -716,7 +716,7 @@ ActionExec::setVariable(const std::string& name, const as_value& val)
 as_value
 ActionExec::getVariable(const std::string& name)
 {
-    return env.get_variable(PROPNAME(name), getScopeStack());
+    return env.get_variable(name, getScopeStack());
 }
 
 as_value

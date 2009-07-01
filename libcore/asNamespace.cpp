@@ -22,9 +22,9 @@
 namespace gnash {
 
 void
-asNamespace::stubPrototype(string_table::key name)
+asNamespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 {
-	asClass *pClass = VM::get().getClassHierarchy()->newClass();
+	asClass *pClass = ch.newClass();
 	pClass->setName(name);
 	addClass(name, pClass);
 }

@@ -27,15 +27,20 @@
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
+#include "Global.h"
 
 namespace gnash {
+    class DisplayObject;
+    class as_object;
+    class abc_block;
+    class asName;
+    class Property;
+    class CodeStream;
+    class AVM2Global;
+}
 
-class DisplayObject;
-class as_object;
-class abc_block;
-class asName;
-class Property;
-class CodeStream;
+
+namespace gnash {
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
@@ -49,10 +54,12 @@ class CodeStream;
 /// allows both ActionScript code and C++ code to use the exception handling
 /// with a minimum of hassle, and it helps with correctness.
 ///
-/// The intent is that the machine will run both AS2 and AS3 code. Despite the
-/// difference in presentation between the two, they should be compatible (or
-/// able to become so), so that extensions written for AS2 will work in AS3
-/// (and vice versa).
+/// It was intended that this Machine should run both AS2 and AS3 code.
+/// However, as the two codestreams must be strictly separated - different
+/// global objects, no sharing of resources, and no ability to communicate
+/// directly, there is no sense in using a single instance of this machine
+/// for both AS2 and AS3 interpretation. It's questionable whether there is
+/// any advantage in using this Machine for AS2; it is not a near-term goal.
 class Machine
 {
 public:
@@ -201,10 +208,11 @@ public:
 		as_value& storage, unsigned char stack_in, short stack_out);
 
 	void immediateProcedure(const as_function *to_call, as_object *pthis,
-		unsigned char stack_in, short stack_out)
-	{ immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out); }
+		unsigned char stack_in, short stack_out) {
+        immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out);
+    }
 
-	void initMachine(abc_block* pool_block,as_object* global);
+	void initMachine(abc_block* pool_block);
 
 	as_value executeFunction(asMethod* function, const fn_call& fn);
 
@@ -212,14 +220,22 @@ public:
 
 	Machine(VM& vm);
 
-    /// Return the Global object.
+    /// Return the Global object for this Machine.
     //
-    /// TODO: is this really necessary? Which object should we
-    /// return anyway, i.e. why not mGlobalObject? (that is null
-    /// at inopportune moments right now, which is why VM::getGlobal()
-    /// is returned.
+    /// This should be different from the AVM1 global object because the VMs
+    /// do not share any ActionScript resources. It should be the same
+    /// for a complete run of the Machine so that modifications carried out
+    /// by scripts are preserved for subsequent scripts.
     as_object* global() {
-        return _vm.getGlobal();
+        return _global;
+    }
+
+    /// Return the ClassHierarchy used by our global object.
+    //
+    /// This is used in parsing, though maybe would be better accessed
+    /// through the Global object.
+    ClassHierarchy* classHierarchy() {
+        return &_global->classHierarchy();
     }
 
 private:
@@ -353,20 +369,20 @@ private:
 	as_object* mDefaultThis;
 	as_object* mThis;
 
-	as_object* mGlobalObject;
+    /// The global object for this machine.
+    //
+    /// We need to know the type to access the ClassHierarchy.
+	AVM2Global* _global;
 
 	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 
-	bool mIsAS3; // Is the stream an AS3 stream.
 	bool mExitWithReturn;
 	abc_block* mPoolObject; // Where all of the pools are stored.
 
 	abc_function* mCurrentFunction;
 
 	VM& _vm;
-	
-    ClassHierarchy *mCH;
 };
 
 } // namespace gnash

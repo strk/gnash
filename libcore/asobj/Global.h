@@ -16,37 +16,103 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// Implementation of the Global ActionScript Object
-
+/// This file provides implementations of two different ActionScript global
+/// objects: one for AVM1, one for AVM2.
+//
+/// The AVM1 global object has more (known) global functions. All AS2 classes
+/// are initialized as object prototypes and functions attached to the 
+/// global object. From SWF8, the 'flash' package is attached as follows:
+///
+///                             _global
+///                                 |
+///                               flash
+///                                 |
+///            ---------------------------------------------------
+///            |         |          |          |         |       |
+///         display     net     external    filters     geom    text
+///
+/// where each item is an object.
+///
+/// The AVM2 global object has functions such as trace(), escape(),
+/// parseFloat(), parseInt() in common with AVM1. Some classes, such as
+/// Array, Boolean, Date, String, and Object, are also directly attached.
+/// Other classes, however, are different. The flash package in AVM2 is a 
+/// namespace, not an object, and all members of the flash package are
+/// attached with a namespace to the global object. As we do this on
+/// demand, the AVM2 global object is much emptier than the AVM1 equivalent
+/// to start with.
 #ifndef GNASH_GLOBAL_H
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
-#include "extension.h" // for composition
+#include "extension.h"
+#include "ClassHierarchy.h"
 
 // Forward declarations
 namespace gnash {
+	class Machine;
 	class VM;
 	class fn_call;
-	class ClassHierarchy;
 }
 
 namespace gnash {
 
-class Global: public as_object
+class AVM1Global : public as_object
 {
 public:
 
-	Global(VM& vm, ClassHierarchy *ch);
-	~Global() {}
+	AVM1Global(VM& vm);
+	~AVM1Global() {}
+
+    const ClassHierarchy& classHierarchy() const {
+        return _classes;
+    }
+    
+    ClassHierarchy& classHierarchy() {
+        return _classes;
+    }
+
+protected:
+    
+    void markReachableResources() const;
 
 private:
 
     void loadExtensions();
 	Extension _et;
 
+    ClassHierarchy _classes;
+
+};
+
+class AVM2Global : public as_object
+{
+public:
+
+	AVM2Global(Machine& m);
+	~AVM2Global() {}
+
+    const ClassHierarchy& classHierarchy() const {
+        return _classes;
+    }
+    
+    ClassHierarchy& classHierarchy() {
+        return _classes;
+    }
+
+protected:
+
+    void markReachableResources() const {
+        _classes.markReachableResources();
+        markAsObjectReachable();
+    }
+
+private:
+
+    ClassHierarchy _classes;
+
 };
 
 } // namespace gnash
 
-#endif // ndef GNASH_GLOBAL_H
+#endif 
