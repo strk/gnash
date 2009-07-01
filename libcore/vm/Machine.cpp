@@ -3160,7 +3160,10 @@ void
 Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
 
-    assert(mPoolObject);
+    if (!mPoolObject) {
+        log_debug("No ABC block! Can't instantiate class!");
+        return;
+    }
 
     log_debug("instantiateClass: class name %s", className);
 
