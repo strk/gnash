@@ -435,12 +435,20 @@ abc_block::locateClass(asName &m)
 		}
 	}
 
-    asNamespace* ns = mCH->findNamespace(m.getNamespace()->getURI());
-    if (!ns) return 0;
 
-	// One last chance: Look globally.
-	found = ns->getClass(m.getGlobalName());
-    return found;
+    // Look in known built-in classes.
+    asNamespace* nsToFind = m.getNamespace();
+
+    // If there is no namespace specified, look in global only.
+    // TODO: check if this is correct, or if there should always be
+    // a namespace.
+    if (!nsToFind) {
+        return mCH->getGlobalNs()->getClass(m.getGlobalName());
+    }
+
+    // Else look in the specified namespace only.
+    asNamespace* ns = mCH->findNamespace(nsToFind->getURI());
+    return ns ? ns->getClass(m.getGlobalName()) : 0;
 
 }
 
