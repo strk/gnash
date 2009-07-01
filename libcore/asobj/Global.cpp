@@ -51,6 +51,8 @@
 #include "flash/display/DisplayObject_as.h"
 #include "flash/display/MovieClip_as.h"
 #include "flash/display/Sprite_as.h"
+#include "flash/events/Event_as.h"
+#include "flash/events/EventDispatcher_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
@@ -448,7 +450,14 @@ avm2Classes()
         
         // Accessibility classes
         (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_ACCESSIBILITY, 5));
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_ACCESSIBILITY, 5))
+       
+        // Event classes
+        (N(event_class_init, NSV::CLASS_EVENT,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_EVENTS, 5))
+        (N(eventdispatcher_class_init, NSV::CLASS_EVENTDISPATCHER,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_EVENTS, 5));
+        
 
     return s;
 }

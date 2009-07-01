@@ -242,6 +242,10 @@ VM::markReachableResources() const
 
 	_global->setReachable();
 
+#if ENABLE_AVM2
+    _machine->markReachableResources();
+#endif
+
 	/// Mark all static GcResources
 	for (ResVect::const_iterator i=_statics.begin(), e=_statics.end(); i!=e; ++i)
 	{

@@ -3157,8 +3157,19 @@ Machine::executeCodeblock(CodeStream* stream)
 }
 
 void
+Machine::markReachableResources() const
+{
+    _global->setReachable();
+}
+
+void
 Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
+
+    if (!mPoolObject) {
+        log_debug("No ABC block! Can't instantiate class!");
+        return;
+    }
 
     log_debug("instantiateClass: class name %s", className);
 
@@ -3232,20 +3243,7 @@ Machine::find_prop_strict(asName multiname)
 		}
 	}
 
-	as_object *target = 0;
-	as_environment env = as_environment(_vm);
-	std::string name = pool_string(multiname.getABCName(), mPoolObject);
-	std::string ns = pool_string(multiname.getNamespace()->getAbcURI(),
-            mPoolObject);
-	std::string path = ns.empty() ? name : ns + "." + name;
-
-    log_abc("Failed to find property in scope stack. Looking for %s in "
-        "as_environment", path);
-
-    std::auto_ptr<as_environment::ScopeStack> envStack (getScopeStack());
-	val = env.get_variable(path, *envStack, &target);
-
-	push_stack(target);	
+    log_abc("Failed to find property in scope stack.");
 	return val;
 }
 

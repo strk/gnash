@@ -325,12 +325,10 @@ abc_block::abc_block()
     :
     _stringTable(&VM::get().getStringTable())
 {
-#if 1
-	mCH = &(dynamic_cast<AVM2Global*>(VM::get().getMachine()->global())->classHierarchy());
+	mCH = VM::get().getMachine()->classHierarchy();
 	// TODO: Make this the real 'Object' prototype.
 	mCH->getGlobalNs()->stubPrototype(*mCH, NSV::CLASS_OBJECT);
 	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
-#endif
 }
 
 void
@@ -436,9 +434,21 @@ abc_block::locateClass(asName &m)
 				return found;
 		}
 	}
-	// One last chance: Look globally.
-	found = mCH->getGlobalNs()->getClass(m.getABCName());
-    return found;
+
+
+    // Look in known built-in classes.
+    asNamespace* nsToFind = m.getNamespace();
+
+    // If there is no namespace specified, look in global only.
+    // TODO: check if this is correct, or if there should always be
+    // a namespace.
+    if (!nsToFind) {
+        return mCH->getGlobalNs()->getClass(m.getGlobalName());
+    }
+
+    // Else look in the specified namespace only.
+    asNamespace* ns = mCH->findNamespace(nsToFind->getURI());
+    return ns ? ns->getClass(m.getGlobalName()) : 0;
 
 }
 
@@ -958,15 +968,9 @@ abc_block::read_instances()
 			{
 				log_error(_("ABC: Super type not found (%s), faking."), 
 					_stringTable->value(
-                        _multinamePool[super_index].getABCName()));
-
-				// While testing, we will add a fake type, rather than abort.
-				pSuper = mCH->newClass();
-				pSuper->setName(_multinamePool[super_index].getABCName());
-				mCH->getGlobalNs()->addClass(
-                        _multinamePool[super_index].getABCName(), pSuper);
-				// return false;
-			}
+                        _multinamePool[super_index].getGlobalName()));
+			    return false;
+            }
 
 			if (pSuper->isFinal())
 			{

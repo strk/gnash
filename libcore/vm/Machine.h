@@ -238,6 +238,8 @@ public:
         return &_global->classHierarchy();
     }
 
+    void markReachableResources() const;
+
 private:
 	/// The state of the machine.
 	class State
