@@ -151,8 +151,9 @@ public:
         mDeclaration.initializer(*mTarget);
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
-        if (mTarget->get_member(mDeclaration.name, &us))
-        {
+        if (mTarget->get_member(mDeclaration.name, &us,
+                    mDeclaration.namespace_name)) {
+
             as_value super;
             if (mDeclaration.super_name)
             {
@@ -240,7 +241,8 @@ ClassHierarchy::declareClass(const NativeClass& c)
     
     int flags = as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
-    return mGlobal->init_destructive_property(c.name, *getter, flags);
+    return mGlobal->init_destructive_property(c.name, *getter, flags,
+            c.namespace_name);
 }
 
 
