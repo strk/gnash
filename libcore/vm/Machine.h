@@ -230,6 +230,14 @@ public:
         return _global;
     }
 
+    /// Return the ClassHierarchy used by our global object.
+    //
+    /// This is used in parsing, though maybe would be better accessed
+    /// through the Global object.
+    ClassHierarchy* classHierarchy() {
+        return &_global->classHierarchy();
+    }
+
 private:
 	/// The state of the machine.
 	class State
