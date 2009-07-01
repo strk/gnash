@@ -55,8 +55,6 @@ namespace {
     as_value xml_new(const fn_call& fn);
     as_value xml_createElement(const fn_call& fn);
     as_value xml_createTextNode(const fn_call& fn);
-    as_value xml_getBytesLoaded(const fn_call& fn);
-    as_value xml_getBytesTotal(const fn_call& fn);
     as_value xml_parseXML(const fn_call& fn);
     as_value xml_ondata(const fn_call& fn);
     as_value xml_xmlDecl(const fn_call& fn);
@@ -668,10 +666,10 @@ attachXMLInterface(as_object& o)
                 LoadableObject::loadableobject_addRequestHeader), flags);
     o.init_member("createElement", vm.getNative(253, 8), flags);
     o.init_member("createTextNode", vm.getNative(253, 9), flags);
-    o.init_member("getBytesLoaded", 
-            new builtin_function(xml_getBytesLoaded), flags);
-    o.init_member("getBytesTotal", 
-            new builtin_function(xml_getBytesTotal), flags);
+    o.init_member("getBytesLoaded", new builtin_function(
+                LoadableObject::loadableobject_getBytesLoaded), flags);
+    o.init_member("getBytesTotal", new builtin_function(
+                LoadableObject::loadableobject_getBytesTotal), flags);
     o.init_member("load", vm.getNative(301, 0), flags);
     o.init_member("parseXML", vm.getNative(253, 10), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
@@ -798,26 +796,6 @@ xml_createTextNode(const fn_call& fn)
         log_error(_("no text for text node creation"));
     }
     return as_value();
-}
-
-
-as_value
-xml_getBytesLoaded(const fn_call& fn)
-{
-    boost::intrusive_ptr<XMLDocument_as> ptr = ensureType<XMLDocument_as>(fn.this_ptr);
-    long int ret = ptr->getBytesLoaded();
-    if ( ret < 0 ) return as_value();
-    else return as_value(ret);
-}
-
-
-as_value
-xml_getBytesTotal(const fn_call& fn)
-{
-    boost::intrusive_ptr<XMLDocument_as> ptr = ensureType<XMLDocument_as>(fn.this_ptr);
-    long int ret = ptr->getBytesTotal();
-    if ( ret < 0 ) return as_value();
-    else return as_value(ret);
 }
 
 
