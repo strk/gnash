@@ -391,7 +391,7 @@ avm2Classes()
         (N(sprite_class_init, NSV::CLASS_SPRITE, 0, NSV::NS_FLASH_DISPLAY, 3))
         (N(displayobjectcontainer_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER,
            0, NSV::NS_FLASH_DISPLAY, 3))
-        (N(interactiveobject_class_init, NSV::CLASS_INTERACTIVE_OBJECT,
+        (N(interactiveobject_class_init, NSV::CLASS_INTERACTIVEOBJECT,
            0, NSV::NS_FLASH_DISPLAY, 3))
         (N(displayobject_class_init, NSV::CLASS_DISPLAYOBJECT, 0,
            NSV::NS_FLASH_DISPLAY, 3))
