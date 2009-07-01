@@ -360,7 +360,6 @@ bool FBGui::run()
 {
   struct timeval tv;
 
-  double timer = 0.0;
   double start_timer;
   
   if (!gettimeofday(&tv, NULL))
