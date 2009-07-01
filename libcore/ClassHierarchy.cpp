@@ -226,8 +226,8 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 bool
 ClassHierarchy::declareClass(const NativeClass& c)
 {
-    // For AS2 and below, registering with mGlobal _should_ make it equivalent
-    // to being in the global namespace, since everything is global there.
+    // AS2 classes should be registered with namespace 0, so they all
+    // appear in a single global namespace.
     asNamespace *nso = findNamespace(c.namespace_name);
 
     if (!nso) nso = addNamespace(c.namespace_name);
