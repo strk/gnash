@@ -44,6 +44,12 @@ public:
 
     virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
+
+        if (!_abc) {
+            log_debug("Not executing ABC tag because we failed to parse it");
+            return;
+        }
+
 		VM& vm = m->getVM();
         
         log_debug("getting machine.");
