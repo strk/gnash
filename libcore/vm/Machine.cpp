@@ -3157,6 +3157,12 @@ Machine::executeCodeblock(CodeStream* stream)
 }
 
 void
+Machine::markReachableResources() const
+{
+    _global->setReachable();
+}
+
+void
 Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
 
