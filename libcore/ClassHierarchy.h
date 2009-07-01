@@ -118,7 +118,7 @@ public:
 		mGlobal(global),
         mExtension(e) ,
 		mAnonNamespaces(),
-        mGlobalNamespace(anonNamespace(0)),
+        mGlobalNamespace(addNamespace(0)),
 		mClassMemory()
 #ifdef ENABLE_AVM2
         ,
