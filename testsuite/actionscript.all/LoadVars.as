@@ -180,7 +180,7 @@ check_equals(r.loaded, false);
 // For checking that the data were loaded with XML.prototype.load.
 x.onLoad = function(success) {
     check_equals(x['var2'], 'val2');
-    check_totals(140);
+    check_totals(144);
     play();
 };
 
@@ -285,9 +285,9 @@ loadvarsObj.onLoad = function(success) {
 
 	check_equals (loadvarsObj.getBytesTotal(), loadvarsObj.getBytesLoaded());
 	check_equals (loadvarsObj.getBytesLoaded(), 1126);
-	xcheck_equals (loadvarsObj.getBytesTotal(), loadvarsObj._bytesTotal);
+	check_equals (loadvarsObj.getBytesTotal(), loadvarsObj._bytesTotal);
 	check_equals (loadvarsObj._bytesLoaded, loadvarsObj._bytesTotal);
-	xcheck_equals (loadvarsObj._bytesLoaded, 1126);
+	check_equals (loadvarsObj._bytesLoaded, 1126);
 	check_equals (this, loadvarsObj);
 	check_equals(arguments.length, 1);
 	check_equals(typeof(success), 'boolean');
@@ -305,9 +305,9 @@ loadvarsObj.onLoad = function(success) {
 	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
 
     loadvarsObj._bytesTotal = 3;
-	xcheck_equals (loadvarsObj.getBytesTotal(), 3);
+	check_equals (loadvarsObj.getBytesTotal(), 3);
     loadvarsObj._bytesLoaded = 5;
-	xcheck_equals (loadvarsObj.getBytesLoaded(), 5);
+	check_equals (loadvarsObj.getBytesLoaded(), 5);
 
 	if ( varsloaded == 1 )
 	{
@@ -361,8 +361,15 @@ check( loadvarsObj instanceOf LoadVars );
 check(!loadvarsObj.hasOwnProperty('_bytesLoaded'));
 check(!loadvarsObj.hasOwnProperty('_bytesTotal'));
 check( loadvarsObj.load( MEDIA(vars.txt) ) );
-xcheck(loadvarsObj.hasOwnProperty('_bytesLoaded'));
-xcheck(loadvarsObj.hasOwnProperty('_bytesTotal'));
+
+check(loadvarsObj.hasOwnProperty('_bytesLoaded'));
+check(loadvarsObj.hasOwnProperty('_bytesTotal'));
+
+check_equals(loadvarsObj._bytesLoaded, 0);
+check_equals(loadvarsObj._bytesTotal, undefined);
+check_equals(loadvarsObj.getBytesLoaded(), 0);
+check_equals(loadvarsObj.getBytesTotal(), undefined);
+
 check_equals(typeof(this.loaded), 'undefined');
 //loadvarsObj.load( 'vars.cgi' );
 
