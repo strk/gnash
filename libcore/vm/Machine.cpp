@@ -3160,6 +3160,8 @@ void
 Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
 
+    assert(mPoolObject);
+
     log_debug("instantiateClass: class name %s", className);
 
 	asClass* cl = mPoolObject->locateClass(className);
