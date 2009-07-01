@@ -257,13 +257,23 @@ LoadableObject::advanceState()
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
+            string_table& st = _vm.getStringTable();
+            set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            set_member(st.find("_bytesTotal"), _bytesTotal);
+            
             // might push_front on the list..
             callMethod(NSV::PROP_ON_DATA, dataVal);
 
         }
         else
         {
+            _bytesTotal = lt->getBytesTotal();
             _bytesLoaded = lt->getBytesLoaded();
+            
+            string_table& st = _vm.getStringTable();
+            set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            // TODO: should this really be set on each iteration?
+            set_member(st.find("_bytesTotal"), _bytesTotal);
             ++it;
         }
     }
@@ -288,6 +298,27 @@ LoadableObject::registerNative(as_object& o)
     vm.registerNative(loadableobject_decode, 301, 3);
 }
 
+as_value
+LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+    as_value bytesLoaded;
+    string_table& st = fn.getVM().getStringTable();
+    ptr->get_member(st.find("_bytesLoaded"), &bytesLoaded);
+    return bytesLoaded;
+}
+    
+as_value
+LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+    as_value bytesTotal;
+    string_table& st = fn.getVM().getStringTable();
+    ptr->get_member(st.find("_bytesTotal"), &bytesTotal);
+    return bytesTotal;
+}
 
 /// Can take either a two strings as arguments or an array of strings,
 /// alternately header and value.
@@ -512,7 +543,12 @@ loadableobject_load(const fn_call& fn)
 	}
 
 	obj->load(urlstr);
-	return as_value(true);
+    
+    string_table& st = obj->getVM().getStringTable();
+    obj->set_member(st.find("_bytesLoaded"), 0.0);
+    obj->set_member(st.find("_bytesTotal"), as_value());
+
+    return as_value(true);
 
 }
 

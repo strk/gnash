@@ -899,8 +899,8 @@ check(!myxml.hasOwnProperty('_bytesTotal'));
 
 ret = myxml.load( MEDIA(gnash.xml) );
 
-xcheck(myxml.hasOwnProperty('_bytesLoaded'));
-xcheck(myxml.hasOwnProperty('_bytesTotal'));
+check(myxml.hasOwnProperty('_bytesLoaded'));
+check(myxml.hasOwnProperty('_bytesTotal'));
 
 check_equals(typeof(myxml.loaded), 'boolean');
 #if OUTPUT_VERSION < 7

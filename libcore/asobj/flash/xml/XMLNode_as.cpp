@@ -985,12 +985,13 @@ prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
 }
 
 as_value
-xmlnode_ctor(const fn_call& fn)
+xmlnode_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new XMLNode_as;
 
     return as_value(obj.get()); // will keep alive
 }
+
 } // anonymous namespace 
 } // gnash namespace
 // local Variables:

@@ -90,6 +90,10 @@ public:
     /// Shared AS methods for XML and LoadVars, which can be used
     /// interchangeably with each object in ActionScript.
     static as_value loadableobject_addRequestHeader(const fn_call& fn);
+    
+    /// These functions return the value of _bytesTotal and _bytesLoaded
+    static as_value loadableobject_getBytesLoaded(const fn_call& fn);
+    static as_value loadableobject_getBytesTotal(const fn_call& fn);
 
     /// Scan the LoadThread queue (_loadThreads) to see if any of
     /// them completed. If any did, invoke the onData event
