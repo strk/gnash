@@ -325,12 +325,10 @@ abc_block::abc_block()
     :
     _stringTable(&VM::get().getStringTable())
 {
-#if 1
-	mCH = &(dynamic_cast<AVM2Global*>(VM::get().getMachine()->global())->classHierarchy());
+	mCH = VM::get().getMachine()->classHierarchy();
 	// TODO: Make this the real 'Object' prototype.
 	mCH->getGlobalNs()->stubPrototype(*mCH, NSV::CLASS_OBJECT);
 	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
-#endif
 }
 
 void
@@ -436,8 +434,12 @@ abc_block::locateClass(asName &m)
 				return found;
 		}
 	}
+
+    asNamespace* ns = mCH->findNamespace(m.getNamespace()->getURI());
+    if (!ns) return 0;
+
 	// One last chance: Look globally.
-	found = mCH->getGlobalNs()->getClass(m.getABCName());
+	found = ns->getClass(m.getGlobalName());
     return found;
 
 }
