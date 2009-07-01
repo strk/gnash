@@ -235,12 +235,9 @@ ClassHierarchy::declareClass(const NativeClass& c)
     nso->getClass(c.name)->setDeclared();
     nso->getClass(c.name)->setSystem();
 
-    boost::intrusive_ptr<as_function> getter = new declare_native_function(c, mGlobal);
+    boost::intrusive_ptr<as_function> getter =
+        new declare_native_function(c, mGlobal);
     
-    log_debug("Native function %s: getter %s", 
-            VM::get().getStringTable().value(c.name), getter.get());
-
-
     int flags = as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
     return mGlobal->init_destructive_property(c.name, *getter, flags);
