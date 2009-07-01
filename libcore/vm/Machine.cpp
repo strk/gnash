@@ -326,7 +326,6 @@ Machine::Machine(VM& vm)
         _global(new AVM2Global(*this)),
         mGlobalReturn(),
         mIgnoreReturn(),
-        mIsAS3(false),
         mExitWithReturn(false),
         mPoolObject(0),
         mCurrentFunction(0),

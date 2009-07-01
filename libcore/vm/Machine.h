@@ -369,7 +369,6 @@ private:
 	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 
-	bool mIsAS3; // Is the stream an AS3 stream.
 	bool mExitWithReturn;
 	abc_block* mPoolObject; // Where all of the pools are stored.
 
