@@ -105,16 +105,16 @@ as_environment::get_variable(const std::string& varname,
     // TODO: have this checked by parse_path as an optimization 
     if (varname.find('/') != std::string::npos &&
             varname.find(':') == std::string::npos)
-    {
-        // Consider it all a path ...
-            as_object* target = find_object(varname, &scopeStack); 
-        if ( target ) 
         {
-            // ... but only if it resolves to a sprite
-            MovieClip* m = target->to_movie();
-            if ( m ) return as_value(m);
+            // Consider it all a path ...
+                as_object* target = find_object(varname, &scopeStack); 
+            if ( target ) 
+            {
+                // ... but only if it resolves to a sprite
+                MovieClip* m = target->to_movie();
+                if ( m ) return as_value(m);
+            }
         }
-    }
         return get_variable_raw(varname, scopeStack, retTarget);
     }
 }
