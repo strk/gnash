@@ -125,7 +125,7 @@ getSystemCapabilitiesInterface(as_object& o)
 
     // FIXME: these need to be implemented properly 
     // Does the NetStream object natively support SSL?
-	const bool hasTLS = false;
+	const bool hasTLS = true;
 
     // Microphone and camera access disabled
 	const bool avHardwareDisable = false;
