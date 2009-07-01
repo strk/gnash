@@ -145,10 +145,6 @@ loadvars_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&loadvars_ctor, getLoadVarsInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachLoadVarsInterface(*cl);
-		     
 	}
 
 	// Register _global.LoadVars, only visible for SWF6 up
