@@ -968,15 +968,9 @@ abc_block::read_instances()
 			{
 				log_error(_("ABC: Super type not found (%s), faking."), 
 					_stringTable->value(
-                        _multinamePool[super_index].getABCName()));
-
-				// While testing, we will add a fake type, rather than abort.
-				pSuper = mCH->newClass();
-				pSuper->setName(_multinamePool[super_index].getABCName());
-				mCH->getGlobalNs()->addClass(
-                        _multinamePool[super_index].getABCName(), pSuper);
-				// return false;
-			}
+                        _multinamePool[super_index].getGlobalName()));
+			    return false;
+            }
 
 			if (pSuper->isFinal())
 			{
