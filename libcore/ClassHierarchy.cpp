@@ -66,9 +66,11 @@ public:
     bool isBuiltin() { return true; }
 
     declare_extension_function(ClassHierarchy::ExtensionClass &c,
-        as_object *g, Extension* e) :
-        as_function(getObjectInterface()),
-        mDeclaration(c), mTarget(g), mExtension(e)
+        as_object *g, Extension* e)
+        :
+        mDeclaration(c),
+        mTarget(g),
+        mExtension(e)
     {
         init_member("constructor", as_function::getFunctionConstructor().get());
     }
@@ -133,7 +135,6 @@ public:
     declare_native_function(const ClassHierarchy::NativeClass &c,
         as_object *g)
         :
-        as_function(getObjectInterface()),
         mDeclaration(c),
         mTarget(g)
     {
@@ -177,14 +178,13 @@ public:
                 }
                 assert(super.to_as_function());
             }
-            if ( ! us.to_object() )
-            {
-                log_error("Native class %s is not an object after initialization (%s)",
-                    st.value(mDeclaration.name), us);
+            if (!us.to_object()) {
+                log_error("Native class %s is not an object after "
+                        "initialization (%s)", st.value(mDeclaration.name), us);
             }
             if (mDeclaration.super_name &&
-                    !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
-            {
+                    !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
+                
                 us.to_object()->set_prototype(
                         super.to_as_function()->getPrototype());
             }
@@ -216,6 +216,7 @@ ClassHierarchy::declareClass(ExtensionClass& c)
     boost::intrusive_ptr<as_function> getter =
         new declare_extension_function(c, mGlobal, mExtension);
 
+
     int flags=as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
     return mGlobal->init_destructive_property(c.name, *getter, flags);
@@ -234,8 +235,11 @@ ClassHierarchy::declareClass(const NativeClass& c)
     nso->getClass(c.name)->setDeclared();
     nso->getClass(c.name)->setSystem();
 
-    boost::intrusive_ptr<as_function> getter =
-        new declare_native_function(c, mGlobal);
+    boost::intrusive_ptr<as_function> getter = new declare_native_function(c, mGlobal);
+    
+    log_debug("Native function %s: getter %s", 
+            VM::get().getStringTable().value(c.name), getter.get());
+
 
     int flags = as_prop_flags::dontEnum;
     addVisibilityFlag(flags, c.version);
