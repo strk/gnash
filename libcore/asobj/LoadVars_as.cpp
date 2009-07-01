@@ -39,8 +39,19 @@
 
 namespace gnash {
 
-static as_value loadvars_tostring(const fn_call& fn);
-static as_value loadvars_ctor(const fn_call& fn);
+namespace {
+
+    as_value loadvars_tostring(const fn_call& fn);
+    as_value loadvars_ctor(const fn_call& fn);
+	as_value loadvars_onLoad(const fn_call& fn);
+	as_value loadvars_getBytesLoaded(const fn_call& fn);
+	as_value loadvars_getBytesTotal(const fn_call& fn);
+	as_value loadvars_onData(const fn_call& fn);
+	as_value loadvars_onLoad(const fn_call& fn);
+	
+    as_object* getLoadVarsInterface();
+	void attachLoadVarsInterface(as_object& o);
+}
 
 //--------------------------------------------
 
@@ -57,10 +68,6 @@ public:
 	LoadVars_as();
 
 	~LoadVars_as() {};
-
-	static as_object* getLoadVarsInterface();
-
-	static void attachLoadVarsInterface(as_object& o);
 
     /// Convert the LoadVars Object to a string.
     //
@@ -87,16 +94,6 @@ protected:
 #endif // GNASH_USE_GC
 
 private:
-
-	static as_value onLoad_getset(const fn_call& fn);
-
-	static as_value getBytesLoaded_method(const fn_call& fn);
-
-	static as_value getBytesTotal_method(const fn_call& fn);
-
-	static as_value onData_method(const fn_call& fn);
-
-	static as_value onLoad_method(const fn_call& fn);
 
 	boost::intrusive_ptr<as_function> _onLoad;
 
@@ -138,8 +135,35 @@ LoadVars_as::LoadVars_as()
 }
 
 
+// extern (used by Global.cpp)
 void
-LoadVars_as::attachLoadVarsInterface(as_object& o)
+loadvars_class_init(as_object& global)
+{
+	// This is going to be the global LoadVars "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&loadvars_ctor, getLoadVarsInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachLoadVarsInterface(*cl);
+		     
+	}
+
+	// Register _global.LoadVars, only visible for SWF6 up
+	int swf6flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::dontDelete | 
+                    as_prop_flags::onlySWF6Up;
+
+	global.init_member("LoadVars", cl.get(), swf6flags);
+
+}
+
+namespace {
+
+void
+attachLoadVarsInterface(as_object& o)
 {
     VM& vm = o.getVM();
 
@@ -147,23 +171,22 @@ LoadVars_as::attachLoadVarsInterface(as_object& o)
 	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", vm.getNative(301, 3));
 	o.init_member("getBytesLoaded", new builtin_function(
-	            LoadVars_as::getBytesLoaded_method));
+	            loadvars_getBytesLoaded));
 	o.init_member("getBytesTotal", new builtin_function(
-	            LoadVars_as::getBytesTotal_method));
+                loadvars_getBytesTotal));
 	o.init_member("load", vm.getNative(301, 0));
 	o.init_member("send", vm.getNative(301, 1));
 	o.init_member("sendAndLoad", vm.getNative(301, 2));
 	o.init_member("toString", new builtin_function(loadvars_tostring));
-	o.init_member("onData", new builtin_function(LoadVars_as::onData_method));
-	o.init_member("onLoad", new builtin_function(LoadVars_as::onLoad_method));
+	o.init_member("onData", new builtin_function(loadvars_onData));
+	o.init_member("onLoad", new builtin_function(loadvars_onLoad));
 }
 
 as_object*
-LoadVars_as::getLoadVarsInterface()
+getLoadVarsInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
+	if (!o) {
 		o = new as_object(getObjectInterface());
 		attachLoadVarsInterface(*o);
 	}
@@ -172,22 +195,25 @@ LoadVars_as::getLoadVarsInterface()
 
 
 as_value
-LoadVars_as::getBytesLoaded_method(const fn_call& fn)
+loadvars_getBytesLoaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = 
+        ensureType<LoadVars_as>(fn.this_ptr);
+    
 	return as_value(ptr->getBytesLoaded());
 }
 
 as_value
-LoadVars_as::getBytesTotal_method(const fn_call& fn)
+loadvars_getBytesTotal(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars_as> ptr =
         ensureType<LoadVars_as>(fn.this_ptr);
-	return as_value(ptr->getBytesTotal());
+
+    return as_value(ptr->getBytesTotal());
 }
 
 as_value
-LoadVars_as::onData_method(const fn_call& fn)
+loadvars_onData(const fn_call& fn)
 {
 
 	as_object* thisPtr = fn.this_ptr.get();
@@ -216,14 +242,14 @@ LoadVars_as::onData_method(const fn_call& fn)
 }
 
 as_value
-LoadVars_as::onLoad_method(const fn_call& /*fn*/)
+loadvars_onLoad(const fn_call& /*fn*/)
 {
 	//GNASH_REPORT_FUNCTION;
 	return as_value();
 }
 
 
-static as_value
+as_value
 loadvars_tostring(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars_as> ptr =
@@ -255,28 +281,5 @@ loadvars_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void
-loadvars_class_init(as_object& global)
-{
-	// This is going to be the global LoadVars "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&loadvars_ctor,
-                LoadVars_as::getLoadVarsInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		LoadVars_as::attachLoadVarsInterface(*cl);
-		     
-	}
-
-	// Register _global.LoadVars, only visible for SWF6 up
-	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
-	global.init_member("LoadVars", cl.get(), swf6flags);
-
-}
-
-
+} // anonymous namespace
 } // end of gnash namespace
