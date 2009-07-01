@@ -972,7 +972,7 @@ parseNodeWithTerminator(const std::string& xml,
 }
 
 as_value
-xmldocument_ctor(const fn_call& fn)
+xmldocument_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new XMLDocument_as;
 
