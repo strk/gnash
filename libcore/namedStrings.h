@@ -62,6 +62,7 @@ enum NamedStrings {
         CLASS_DISPLAYOBJECT,
         CLASS_DISPLAYOBJECTCONTAINER,
         CLASS_ERROR,
+        CLASS_EVENT,
         CLASS_EVENTDISPATCHER,
         CLASS_FUNCTION,
         CLASS_INT,

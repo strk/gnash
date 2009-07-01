@@ -196,6 +196,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "ContextMenu", NSV::CLASS_CONTEXTMENU ),
 	string_table::svt( "MovieClipLoader", NSV::CLASS_MOVIE_CLIP_LOADER ),
 	string_table::svt( "Error", NSV::CLASS_ERROR ),
+	string_table::svt( "Event", NSV::CLASS_EVENT),
 	string_table::svt( "EventDispatcher", NSV::CLASS_EVENTDISPATCHER),
 	string_table::svt( "DisplayObject", NSV::CLASS_DISPLAYOBJECT),
 	string_table::svt( "InteractiveObject", NSV::CLASS_INTERACTIVEOBJECT ),
