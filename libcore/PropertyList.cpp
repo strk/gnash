@@ -356,7 +356,8 @@ PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to)
 	for (container::const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
 	{
-		to.insert(std::make_pair(st.value(i->mName),
+		to.insert(std::make_pair(
+                    st.value(i->mNamespace) + "::" + st.value(i->mName),
                     i->getValue(this_ptr)));
 	}
 }
