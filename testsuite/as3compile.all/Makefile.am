@@ -26,6 +26,7 @@ SANE_AS3TESTS = \
 	function.as \
 	MovieClip.as \
 	Sprite.as \
+	QName.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
