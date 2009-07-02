@@ -211,15 +211,15 @@ VM::getRoot() const
 	return _rootMovie;
 }
 
-/*public*/
 as_object*
 VM::getGlobal() const
 {
+#if ENABLE_AVM2
     if (getAVMVersion() == VM::AVM2) return _machine->global();
+#endif
 	return _global.get();
 }
 
-/*private*/
 void
 VM::setGlobal(as_object* o)
 {
