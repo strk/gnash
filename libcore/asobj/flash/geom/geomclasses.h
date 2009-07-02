@@ -2,7 +2,7 @@
 #ifndef GNASH_ASOBJ_FLASH_GEOM_H
 #define GNASH_ASOBJ_FLASH_GEOM_H 1
 #include "sharedlib.h"
-static gnash::SharedLib::initentry *as3geomclasses[] = {
+static gnash::SharedLib::initentry *geomclasses[] = {
 	gnash::colortransform_class_init,
 	gnash::matrix_class_init,
 	gnash::point_class_init,
