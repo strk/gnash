@@ -54,25 +54,16 @@ namespace gnash {
 static as_value
 get_flash_net_package(const fn_call& fn)
 {
-    bool as3 = isAS3(fn);
-	log_debug("Loading %s flash.display package", as3 ? "AVM2" : "AVM1");
+	log_debug("Loading flash.net package");
     
     as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 
-    if (as3) {
-        while (as3netclasses[i]) {
-            as3netclasses[i](*pkg);
-            ++i;
-        }
-    }
-    else {
-        while (as2netclasses[i]) {
-            as2netclasses[i](*pkg);
-            ++i;
-        }
+    while (netclasses[i]) {
+        netclasses[i](*pkg);
+        ++i;
     }
 
 	return pkg;
