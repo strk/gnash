@@ -28,6 +28,8 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 
+#include <vector>
+
 ////Si added
 #include <sstream>
 #include "movie_root.h" // interface callback
@@ -38,8 +40,11 @@
 
 namespace gnash {
 
+	const std::vector<std::string> *getAllowDataAccess();
+	void addAllowDataAccess( const std::string& url );
+	
 // Forward declarations
-//namespace {
+namespace {
     as_value system_gc(const fn_call& fn);
     as_value system_pause(const fn_call& fn);
     as_value system_resume(const fn_call& fn);
@@ -66,8 +71,13 @@ template<typename T> inline void convertValue(const std::string& in,T& val);
     as_object* getSystemCapabilitiesInterface(as_object& o);
     void attachSystemInterface(as_object& proto);
 
+
+	// List of domains that can access/modify local data
+	static std::vector<std::string> _allowDataAccess;
+
+
 //extern   void registerSystemNative(as_object& global);
-//}
+}
 /// End of Si added
 
 void
@@ -111,8 +121,26 @@ public:
     {}
 };
 
-//Si
-//This function is not defined!
+
+/// Get the current System.security allowDataAccess list of domains allowed to
+/// access/modify local data
+//
+/// @return a std::vector of strings containing urls that can access local data
+const std::vector<std::string>
+*getAllowDataAccess() {
+	return &_allowDataAccess;
+}
+
+
+/// Adds a url to the allowDataAccess list of domains
+//
+// @param url a std string containing the domain name 
+void 
+addAllowDataAccess(const std::string& url) {
+	_allowDataAccess.push_back( url );
+}
+
+namespace {
 
 void
 attachSystemStaticInterface(as_object& )
@@ -225,7 +253,7 @@ getSystemCapabilitiesInterface(as_object& o)
     // Microphone and camera access disabled
 	const bool avHardwareDisable = false;
 	
-	// Not sure: seems to be whether the movie can 'float' above web pages,
+	// Not sure: s_value()seems to be whether the movie can 'float' above web pages,
 	// and is useful for disabling certain annoying adverts.
 	const bool windowlessDisable = false;
 
@@ -417,12 +445,14 @@ attachSystemInterface(as_object& proto)
 
 
 as_value
-system_security_allowdomain(const fn_call& /*fn*/)
+system_security_allowdomain(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl ("System.security.allowDomain") );
-    return as_value();
+    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else") );
+	for(unsigned int i = 0; i < fn.nargs; ++i) {
+		addAllowDataAccess( fn.arg(i).to_string());
+	}
+    return as_value(); 
 }
-
 
 as_value
 system_security_allowinsecuredomain(const fn_call& /*fn*/)
@@ -548,6 +578,8 @@ systemLanguage(as_object& proto)
 	return lang;
 
 }
+
+} // Anonymous namespace
 
 } // gnash namespace
 
