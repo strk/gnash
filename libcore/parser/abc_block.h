@@ -140,6 +140,50 @@ class abc_block
 {
 public:
     
+    enum NamespaceConstant
+	{
+		PRIVATE_NS = 0x05,
+        CONSTANT_NS = 0x08,
+		PACKAGE_NS = 0x16,
+		PACKAGE_INTERNAL_NS = 0x17,
+		PROTECTED_NS = 0x18,
+		EXPLICIT_NS = 0x19,
+		STATIC_PROTECTED_NS = 0x1A
+    };
+
+    enum MethodConstant
+    {
+        METHOD_ARGS = 0x01,
+		METHOD_ACTIVATION = 0x02,
+		METHOD_MORE = 0x04,
+		METHOD_OPTIONAL_ARGS = 0x08,
+		METHOD_IGNORE = 0x10,
+		METHOD_NATIVE = 0x20,
+		METHOD_DEFAULT_NS = 0x40,
+		METHOD_ARG_NAMES = 0x80
+    };
+
+    enum InstanceConstant
+    {
+		INSTANCE_SEALED = 0x01,
+		INSTANCE_FINAL = 0x02,
+		INSTANCE_INTERFACE = 0x04,
+		INSTANCE_DYNAMIC = 0x00,
+		INSTANCE_PROTECTED_NS = 0x08
+    };
+
+    enum PoolConstant
+    {
+		POOL_STRING = 0x01,
+		POOL_INTEGER = 0x03,
+		POOL_UINTEGER = 0x04,
+		POOL_DOUBLE = 0x06,
+		POOL_NAMESPACE = 0x08,
+		POOL_FALSE = 0x0A,
+		POOL_TRUE = 0x0B,
+		POOL_NULL = 0x0C
+	};
+    
     typedef std::vector<asNamespace*> NamespaceSet;
 
 	abc_block();
@@ -156,8 +200,6 @@ public:
 	}
 	
     bool read(SWFStream& in);
-
-	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 
 	void update_global_name(unsigned int multiname_index);
 
@@ -209,36 +251,9 @@ public:
 
 private:
 	
-    enum Constant
-	{
-		PRIVATE_NS = 0x05,
-		PACKAGE_NS = 0x16,
-		PACKAGE_INTERNAL_NS = 0x17,
-		PROTECTED_NS = 0x18,
-		METHOD_ARGS = 0x01,
-		METHOD_ACTIVATION = 0x02,
-		METHOD_MORE = 0x04,
-		METHOD_OPTIONAL_ARGS = 0x08,
-		METHOD_IGNORE = 0x10,
-		METHOD_NATIVE = 0x20,
-		METHOD_DEFAULT_NS = 0x40,
-		METHOD_ARG_NAMES = 0x80,
-		INSTANCE_SEALED = 0x01,
-		INSTANCE_FINAL = 0x02,
-		INSTANCE_INTERFACE = 0x04,
-		INSTANCE_DYNAMIC = 0x00,
-		INSTANCE_PROTECTED_NS = 0x08,
-		POOL_STRING = 0x01,
-		POOL_INTEGER = 0x03,
-		POOL_UINTEGER = 0x04,
-		POOL_DOUBLE = 0x06,
-		POOL_NAMESPACE = 0x08,
-		POOL_FALSE = 0x0A,
-		POOL_TRUE = 0x0B,
-		POOL_NULL = 0x0C
-	};
-
     friend class abc::Trait;
+
+	bool pool_value(boost::uint32_t index, PoolConstant type, as_value &v);
 
 	bool read_version();
 	bool read_integer_constants();
@@ -289,6 +304,10 @@ private:
 
 };
 
+std::ostream& operator<<(std::ostream& o, abc_block::NamespaceConstant c);
+std::ostream& operator<<(std::ostream& o, abc_block::MethodConstant c);
+std::ostream& operator<<(std::ostream& o, abc_block::InstanceConstant c);
+std::ostream& operator<<(std::ostream& o, abc_block::PoolConstant c);
 
 } 
 
