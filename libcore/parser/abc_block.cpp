@@ -931,24 +931,31 @@ abc_block::read_instances()
 			log_error(_("ABC: Out of bounds instance name."));
 			return false;
 		}
-		// This must be a QName.
-		if (!_multinamePool[index].isQName())
-		{
+        
+        asName& multiname = _multinamePool[index];
+		
+        // This must be a QName.
+		if (!multiname.isQName()) {
 			log_error(_("ABC: QName required for instance."));
 			return false;
 		}
-		if (_multinamePool[index].getNamespace() == NULL)
-		{
+		
+        if (!multiname.getNamespace()) {
 			log_error(_("ABC: No namespace to use for storing class."));
 			return false;
 		}
-		pClass = locateClass(_multinamePool[index]);
-		if (!pClass)
-		{
+
+		pClass = locateClass(multiname);
+		
+        if (!pClass) {
+
+            // Shouldn't this be the global name?
+            const string_table::key className = multiname.getABCName();
+
 			pClass = mCH->newClass();
-			if (!_multinamePool[index].getNamespace()->addClass(
-				_multinamePool[index].getABCName(), pClass))
-			{
+
+			if (!multiname.getNamespace()->addClass(className, pClass)) {
+
 				log_error(_("Duplicate class registration."));
 				return false;
 			}
@@ -956,17 +963,16 @@ abc_block::read_instances()
 		pClass->setDeclared();
 		_classes[i] = pClass;
 		boost::uint32_t super_index = _stream->read_V32();;
-		if (super_index && super_index >= _multinamePool.size())
-		{
+
+		if (super_index && super_index >= _multinamePool.size()) {
 			log_error(_("ABC: Bad super type."));
 			return false;
 		}
-		if (!super_index)
-		{
+
+		if (!super_index) {
 			pClass->setSuper(mTheObject);
 		}
-		else
-		{
+		else {
 			asClass *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
@@ -1376,9 +1382,17 @@ abc_block::locateClass(const std::string& className)
     else {
         std::vector<std::string>::iterator it = 
             std::find(_stringPool.begin(), _stringPool.end(), className);
-        
+ 
+#if 1      
         if (it == _stringPool.end()) return 0;
         a.setABCName(it - _stringPool.begin());
+#else
+
+        if (it != _stringPool.end()) {
+            a.setABCName(it - _stringPool.begin());
+        }
+        a.setGlobalName(VM::get().getStringTable().find(className));
+#endif
     }
     
     return locateClass(a);
