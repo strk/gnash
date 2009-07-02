@@ -89,7 +89,7 @@ void
 attachQNameInterface(as_object& o)
 {
     // TODO: prop flags
-    o.init_property("prefix", qname_prefix, qname_prefix);
+    o.init_property("prefix", qname_localName, qname_localName);
     o.init_property("uri", qname_uri, qname_uri);
 }
 
