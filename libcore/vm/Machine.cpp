@@ -3227,6 +3227,9 @@ Machine::find_prop_strict(asName multiname)
     // 'invisible' to this scope, is available
 	as_value val;
     print_scope_stack();
+    const string_table::key var = multiname.getGlobalName();
+    const string_table::key ns = multiname.getNamespace()->getURI();
+
 	for (size_t i = 0; i < mScopeStack.totalSize(); ++i)
     {
 		as_object* scope_object = mScopeStack.at(i).get();
@@ -3234,17 +3237,18 @@ Machine::find_prop_strict(asName multiname)
 			log_abc("Scope object is NULL.");
 			continue;
 		}
-		val = scope_object->getMember(multiname.getGlobalName(),
-                multiname.getNamespace()->getURI());
-
-		if (!val.is_undefined()) {
-			push_stack(mScopeStack.at(i));
+        
+        if (scope_object->get_member(var, &val, ns)) {
+            push_stack(mScopeStack.at(i));
 			return val;
 		}
 	}
 
+    // TODO: find out what to do here.
     log_abc("Failed to find property in scope stack.");
-	return val;
+	as_object* null = 0;
+    push_stack(null);
+    return val;
 }
 
 as_value
