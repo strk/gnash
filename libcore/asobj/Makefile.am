@@ -64,6 +64,7 @@ libgnashasobjs_la_SOURCES = \
 	int_as.cpp \
 	LoadVars_as.cpp \
 	Math_as.cpp \
+	QName_as.cpp \
 	Microphone.cpp	\
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
@@ -71,7 +72,6 @@ libgnashasobjs_la_SOURCES = \
 	PlayHead.cpp \
 	Selection_as.cpp \
 	Namespace_as.cpp \
-	QName_as.cpp \
 	TextFormat_as.cpp \
 	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
