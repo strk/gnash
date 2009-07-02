@@ -17,8 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <sstream>
-
 #include "movie_root.h" // interface callback
 #include "log.h"
 #include "System_as.h"
@@ -26,6 +24,8 @@
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
+
+#include <sstream>
 
 namespace gnash {
 
@@ -42,13 +42,18 @@ namespace {
     as_value system_security_allowdomain(const fn_call& fn);
     as_value system_security_allowinsecuredomain(const fn_call& fn);
     as_value system_security_loadpolicyfile(const fn_call& fn);
-    as_value system_setclipboard(const fn_call& fn);
+    as_value system_setClipboard(const fn_call& fn);
     as_value system_showsettings(const fn_call& fn);
     as_value system_exactsettings(const fn_call& fn);
     as_value system_usecodepage(const fn_call& fn);
     as_object* getSystemSecurityInterface(as_object& o);
     as_object* getSystemCapabilitiesInterface(as_object& o);
     void attachSystemInterface(as_object& proto);
+    
+    // AS3 functions.
+    as_value system_gc(const fn_call& fn);
+    as_value system_pause(const fn_call& fn);
+    as_value system_resume(const fn_call& fn);
 }
 
 
@@ -304,7 +309,7 @@ attachSystemInterface(as_object& proto)
 	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
 	proto.init_member("setClipboard", 
-            new builtin_function(system_setclipboard));
+            new builtin_function(system_setClipboard));
 	proto.init_member("showSettings", vm.getNative(2107, 0));
 
 	proto.init_property("useCodepage", &system_usecodepage,
@@ -344,19 +349,47 @@ system_security_loadpolicyfile(const fn_call& /*fn*/)
     return as_value();
 }
 
-
 as_value
-system_setclipboard(const fn_call& /*fn*/)
+system_setClipboard(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl ("System.setClipboard") );
     return as_value();
 }
 
-
 as_value
 system_showsettings(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl ("System.showSettings") );
+    return as_value();
+}
+
+as_value
+system_gc(const fn_call& fn)
+{
+    boost::intrusive_ptr<System_as> ptr =
+        ensureType<System_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+system_pause(const fn_call& fn)
+{
+    boost::intrusive_ptr<System_as> ptr =
+        ensureType<System_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+system_resume(const fn_call& fn)
+{
+    boost::intrusive_ptr<System_as> ptr =
+        ensureType<System_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
