@@ -31,8 +31,8 @@ package hello {
             check(!QName.prototype.hasOwnProperty("localName"));    
 
             var q = new QName();
-            xcheck(q.hasOwnProperty("uri"));
-            xcheck(q.hasOwnProperty("localName"));
+            check(q.hasOwnProperty("uri"));
+            check(q.hasOwnProperty("localName"));
             xcheck_equals(typeof(q.localName), "string");
             xcheck_equals(typeof(q.uri), "string");
             xcheck_equals(q.localName, "");

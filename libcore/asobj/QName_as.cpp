@@ -78,7 +78,6 @@ getQNameInterface()
     if (!o) {
         o = new as_object(getObjectInterface());
         VM::get().addStatic(o.get());
-        attachQNameInterface(*o);
     }
 
     return o.get();
@@ -88,8 +87,7 @@ getQNameInterface()
 void
 attachQNameInterface(as_object& o)
 {
-    // TODO: prop flags
-    o.init_property("prefix", qname_localName, qname_localName);
+    o.init_property("localName", qname_localName, qname_localName);
     o.init_property("uri", qname_uri, qname_uri);
 }
 
@@ -111,6 +109,7 @@ as_value
 qname_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> ns = new QName_as;
+    attachQNameInterface(*ns);
     return as_value(ns.get()); 
 }
 
