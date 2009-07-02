@@ -860,31 +860,34 @@ abc_block::read_method_infos()
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
 		// be assigned to the corresponding parameters.
-		if (flags & METHOD_OPTIONAL_ARGS)
-		{
-//			log_abc("We have flags and optional args.");
-			boost::uint32_t ocount = _stream->read_V32();
+		if (flags & METHOD_OPTIONAL_ARGS) {
+			
+            boost::uint32_t ocount = _stream->read_V32();
 			log_abc("  Optional args: %u", ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
-			for (unsigned int j = 0; j < ocount; ++j)
-			{
+			
+            for (unsigned int j = 0; j < ocount; ++j) {
 				log_abc("  Reading optional arg: %u", j);
 				boost::uint32_t index = _stream->read_V32();
 				boost::uint8_t kindof = _stream->read_u8();
 				log_abc("   Index: %u Kindof: %u", index, kindof);
 				as_value v;
-				if (!pool_value(index, kindof, v))
-					return false; // message done by pool_value
+				if (!pool_value(index, kindof, v)) {
+					return false; 
+                }
 				pMethod->pushOptional(v);
 			}
 			log_abc("Done handling optional args.");
 		}
 
+        if (flags & METHOD_ACTIVATION) {
+            log_abc("Method needs activation");
+            pMethod->setNeedsActivation();
+        }
+
 		// If there are names present for the parameters, skip them.
-		if (flags & METHOD_ARG_NAMES)
-		{
-			for (unsigned int j = 0; j < param_count; ++j)
-			{
+		if (flags & METHOD_ARG_NAMES) {
+			for (size_t j = 0; j < param_count; ++j) {
 				_stream->skip_V32();
 			}
 		}
