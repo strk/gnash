@@ -17,8 +17,8 @@
 
 PRINTINGdir = $(includedir)/gnash
 
-PRINTING_SOURCES = asobj/flash/printing/printing_pkg.cpp
-PRINTING_HEADERS = asobj/flash/printing/printing_pkg.h
+PRINTING_SOURCES = 
+PRINTING_HEADERS = 
 
 if BUILD_PRINTJOBOPTIONS_AS3
 PRINTING_SOURCES += asobj/flash/printing/PrintJobOptions_as.cpp
