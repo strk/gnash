@@ -66,13 +66,15 @@ namespace gnash {
 static as_value
 get_flash_display_package(const fn_call& fn)
 {
+	log_debug("Loading flash.display package");
+
     as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 
-    while (as2displayclasses[i]) {
-        as2displayclasses[i](*pkg);
+    while (displayclasses[i]) {
+        displayclasses[i](*pkg);
         ++i;
     }
 

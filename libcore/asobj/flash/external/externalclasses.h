@@ -2,7 +2,7 @@
 #ifndef GNASH_ASOBJ_FLASH_EXTERNAL_H
 #define GNASH_ASOBJ_FLASH_EXTERNAL_H 1
 #include "sharedlib.h"
-static gnash::SharedLib::initentry *as3externalclasses[] = {
+static gnash::SharedLib::initentry *externalclasses[] = {
 	gnash::externalinterface_class_init,
 	0
 };
