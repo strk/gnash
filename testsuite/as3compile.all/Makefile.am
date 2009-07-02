@@ -27,6 +27,7 @@ SANE_AS3TESTS = \
 	MovieClip.as \
 	Sprite.as \
 	QName.as \
+	System.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
