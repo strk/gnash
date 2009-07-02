@@ -31,98 +31,98 @@ package hello {
             check(!QName.prototype.hasOwnProperty("localName"));    
 
             var q = new QName();
-            check(q.hasOwnProperty("uri"));
-            check(q.hasOwnProperty("localName"));
-            check_equals(typeof(q.localName), "string");
-            check_equals(typeof(q.uri), "string");
-            check_equals(q.localName, "");
-            check_equals(q.uri, "");
-            check_equals(q.toString(), "");
+            xcheck(q.hasOwnProperty("uri"));
+            xcheck(q.hasOwnProperty("localName"));
+            xcheck_equals(typeof(q.localName), "string");
+            xcheck_equals(typeof(q.uri), "string");
+            xcheck_equals(q.localName, "");
+            xcheck_equals(q.uri, "");
+            xcheck_equals(q.toString(), "");
 
             // One argument: first arg is localName
             q = new QName("a");
-            check_equals(typeof(q.localName), "string");
-            check_equals(typeof(q.uri), "string");
-            check_equals(q.localName, "a");
-            check_equals(q.uri, "");
-            check_equals(q.toString(), "a");
+            xcheck_equals(typeof(q.localName), "string");
+            xcheck_equals(typeof(q.uri), "string");
+            xcheck_equals(q.localName, "a");
+            xcheck_equals(q.uri, "");
+            xcheck_equals(q.toString(), "a");
             
             // Two arguments: first arg is uri, second is localName
             q = new QName("a", "b");
-            check_equals(typeof(q.localName), "string");
-            check_equals(typeof(q.uri), "string");
-            check_equals(q.localName, "b");
-            check_equals(q.uri, "a");
-            check_equals(q.toString(), "a::b");
+            xcheck_equals(typeof(q.localName), "string");
+            xcheck_equals(typeof(q.uri), "string");
+            xcheck_equals(q.localName, "b");
+            xcheck_equals(q.uri, "a");
+            xcheck_equals(q.toString(), "a::b");
             
             q = new QName("d", "e", "f");
-            check_equals(typeof(q.localName), "string");
-            check_equals(typeof(q.uri), "string");
-            check_equals(q.localName, "e");
-            check_equals(q.uri, "d");
-            check_equals(q.toString(), "d::e");
+            xcheck_equals(typeof(q.localName), "string");
+            xcheck_equals(typeof(q.uri), "string");
+            xcheck_equals(q.localName, "e");
+            xcheck_equals(q.uri, "d");
+            xcheck_equals(q.toString(), "d::e");
 
             // Copy constructor (not sure what bytecode is produced).
             var q2 = new QName(q);
-            check_equals(typeof(q2.localName), "string");
-            check_equals(typeof(q2.uri), "string");
-            check_equals(q2.localName, "e");
-            check_equals(q2.uri, "d");
-            check_equals(q.toString(), "d::e");
+            xcheck_equals(typeof(q2.localName), "string");
+            xcheck_equals(typeof(q2.uri), "string");
+            xcheck_equals(q2.localName, "e");
+            xcheck_equals(q2.uri, "d");
+            xcheck_equals(q.toString(), "d::e");
 
             q2 = new QName("g", q);
-            check_equals(q2.localName, "e");
-            check_equals(q2.uri, "g");
-            check_equals(q2.toString(), "g::e");
+            xcheck_equals(q2.localName, "e");
+            xcheck_equals(q2.uri, "g");
+            xcheck_equals(q2.toString(), "g::e");
 
             // A constructor QName(Namespace, string) is documented, but this
             // seems like a bit of a fraud as the Namespace is simply
             // converted to a string so can be used as either argument.
             var ns = new Namespace("nsA");
             q2 = new QName(ns);
-            check_equals(q2.localName, "nsA");
-            check_equals(q2.uri, "");
-            check_equals(q2.toString(), "nsA");
+            xcheck_equals(q2.localName, "nsA");
+            xcheck_equals(q2.uri, "");
+            xcheck_equals(q2.toString(), "nsA");
 
             q2 = new QName(ns, "h");
-            check_equals(q2.localName, "h");
-            check_equals(q2.uri, "nsA");
-            check_equals(q2.toString(), "nsA::h");
+            xcheck_equals(q2.localName, "h");
+            xcheck_equals(q2.uri, "nsA");
+            xcheck_equals(q2.toString(), "nsA::h");
             
             q2 = new QName(ns, ns);
-            check_equals(q2.localName, "nsA");
-            check_equals(q2.uri, "nsA");
-            check_equals(q2.toString(), "nsA::nsA");
+            xcheck_equals(q2.localName, "nsA");
+            xcheck_equals(q2.uri, "nsA");
+            xcheck_equals(q2.toString(), "nsA::nsA");
 
             ns = new Namespace("prefix", "uri");
             q2 = new QName(ns, ns);
-            check_equals(q2.localName, "uri");
-            check_equals(q2.uri, "uri");
-            check_equals(q2.toString(), "uri::uri");
+            xcheck_equals(q2.localName, "uri");
+            xcheck_equals(q2.uri, "uri");
+            xcheck_equals(q2.toString(), "uri::uri");
 
             // null can be passed as a uri, meaning 'all namespaces'; if it's
             // passed as a localName, it's converted to a string.
             var q3 = new QName(null, null);            
-            check_equals(q3.localName, "null");
+            xcheck_equals(q3.localName, "null");
             check_equals(q3.uri, null);
-            check_equals(q3.toString(), "*::null");
+            xcheck_equals(q3.toString(), "*::null");
 
             q3 = new QName(null);            
-            check_equals(q3.localName, "null");
-            check_equals(q3.uri, "");
-            check_equals(q3.toString(), "null");
+            xcheck_equals(q3.localName, "null");
+            xcheck_equals(q3.uri, "");
+            xcheck_equals(q3.toString(), "null");
 
             // Numbers can be used in either position; they are converted to
             // a string.
             q3 = new QName(null, 20);
-            check_equals(q3.localName, "20");
+            xcheck_equals(q3.localName, "20");
             check_equals(q3.uri, null);
-            check_equals(q3.toString(), "*::20");
+            xcheck_equals(q3.toString(), "*::20");
 
             q3 = new QName(400, 20);
-            check_equals(q3.localName, "20");
-            check_equals(q3.uri, "400");
-            check_equals(q3.toString(), "400::20");
+            xcheck_equals(q3.localName, "20");
+            xcheck_equals(q3.uri, "400");
+            xcheck_equals(q3.toString(), "400::20");
             totals(56);
 
             done();
