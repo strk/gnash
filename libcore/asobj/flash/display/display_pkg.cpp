@@ -66,25 +66,14 @@ namespace gnash {
 static as_value
 get_flash_display_package(const fn_call& fn)
 {
-    bool as3 = isAS3(fn);
-	log_debug("Loading %s flash.display package", as3 ? "AVM2" : "AVM1");
-    
     as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 
-    if (as3) {
-        while (as3displayclasses[i]) {
-            as3displayclasses[i](*pkg);
-            ++i;
-        }
-    }
-    else {
-        while (as2displayclasses[i]) {
-            as2displayclasses[i](*pkg);
-            ++i;
-        }
+    while (as2displayclasses[i]) {
+        as2displayclasses[i](*pkg);
+        ++i;
     }
 
 	return pkg;
