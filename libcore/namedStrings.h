@@ -80,6 +80,7 @@ enum NamedStrings {
         CLASS_NET_STREAM,
         CLASS_NUMBER,
         CLASS_OBJECT,
+        CLASS_QNAME,
         CLASS_SELECTION,
         CLASS_SHARED_OBJECT,
         CLASS_SOUND,

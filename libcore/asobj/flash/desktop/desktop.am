@@ -17,8 +17,8 @@
 
 DESKTOPdir = $(includedir)/gnash
 
-DESKTOP_SOURCES = asobj/flash/desktop/desktop_pkg.cpp
-DESKTOP_HEADERS = asobj/flash/desktop/desktop_pkg.h
+DESKTOP_SOURCES = 
+DESKTOP_HEADERS =
 
 if BUILD_CLIPBOARDFORMATS_AS3
 DESKTOP_SOURCES += asobj/flash/desktop/ClipboardFormats_as.cpp

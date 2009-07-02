@@ -29,39 +29,43 @@
 #include "Array_as.h"
 #include "AsBroadcaster.h"
 #include "Boolean_as.h"
-#include "flash/media/Camera_as.h"
 #include "Color_as.h"
-#include "flash/ui/ContextMenu_as.h"
 #include "CustomActions.h"
 #include "Date_as.h" 
 #include "Error_as.h"
 #include "String_as.h"
-#include "flash/ui/Keyboard_as.h"
 #include "Selection_as.h"
-#include "flash/media/Microphone_as.h"
-#include "flash/media/Sound_as.h"
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
-#include "flash/xml/XMLDocument_as.h"
-#include "flash/net/XMLSocket_as.h"
+#include "flash/accessibility/Accessibility_as.h"
+#include "flash/ui/ContextMenu_as.h"
+#include "flash/ui/Keyboard_as.h"
 #include "flash/ui/Mouse_as.h"
+#include "flash/media/Microphone_as.h"
+#include "flash/media/Sound_as.h"
+#include "flash/media/Camera_as.h"
 #include "flash/display/InteractiveObject_as.h"
 #include "flash/display/DisplayObjectContainer_as.h"
 #include "flash/display/DisplayObject_as.h"
+#include "flash/display/Stage_as.h"
 #include "flash/display/MovieClip_as.h"
 #include "flash/display/Sprite_as.h"
 #include "flash/events/Event_as.h"
 #include "flash/events/EventDispatcher_as.h"
+#include "flash/net/LocalConnection_as.h"
+#include "flash/net/XMLSocket_as.h"
+#include "flash/net/SharedObject_as.h"
+#include "flash/system/System_as.h"
+#include "flash/text/TextSnapshot_as.h"
+#include "flash/text/TextFieldAutoSize_as.h"
+#include "flash/xml/XMLDocument_as.h"
+#include "flash/xml/XMLNode_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
 #include "NetStream_as.h"
-#include "flash/net/SharedObject_as.h"
-#include "flash/display/Stage_as.h"
-#include "flash/system/System_as.h"
 #include "TextFormat_as.h"
-#include "flash/text/TextSnapshot_as.h"
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
@@ -76,14 +80,11 @@
 #include "flash_pkg.h"
 #include "fn_call.h"
 #include "Button.h"
-#include "flash/accessibility/Accessibility_as.h"
 #include "Global.h"
 #include "int_as.h"
 #include "LoadVars_as.h"
-#include "flash/net/LocalConnection_as.h"
 #include "Namespace_as.h"
-#include "xml/XMLNode_as.h"
-#include "flash/text/TextFieldAutoSize_as.h"
+#include "QName_as.h"
 
 #include <limits> 
 #include <sstream>
@@ -381,28 +382,35 @@ avm2Classes()
            NS_GLOBAL, 5))
         (N(namespace_class_init, NSV::CLASS_NAMESPACE, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
+        (N(qname_class_init, NSV::CLASS_QNAME, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
         (N(Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
 
         // System classes
-        (N(system_class_init, NSV::CLASS_SYSTEM, 0, NSV::NS_FLASH_SYSTEM, 1))
+        (N(system_class_init, NSV::CLASS_SYSTEM, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_SYSTEM, 1))
 
         // Display classes
-        (N(stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1))
-        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0,
-           NSV::NS_FLASH_DISPLAY, 3))
-        (N(sprite_class_init, NSV::CLASS_SPRITE, 0, NSV::NS_FLASH_DISPLAY, 3))
-        (N(displayobjectcontainer_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER,
-           0, NSV::NS_FLASH_DISPLAY, 3))
+        (N(displayobject_class_init, NSV::CLASS_DISPLAYOBJECT,
+           NSV::CLASS_EVENTDISPATCHER, NSV::NS_FLASH_DISPLAY, 3))
         (N(interactiveobject_class_init, NSV::CLASS_INTERACTIVEOBJECT,
-           0, NSV::NS_FLASH_DISPLAY, 3))
-        (N(displayobject_class_init, NSV::CLASS_DISPLAYOBJECT, 0,
+           NSV::CLASS_DISPLAYOBJECT, NSV::NS_FLASH_DISPLAY, 3))
+        (N(displayobjectcontainer_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER,
+           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY, 3))
+        (N(sprite_class_init, NSV::CLASS_SPRITE,
+           NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::NS_FLASH_DISPLAY, 3))
+        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, NSV::CLASS_SPRITE,
            NSV::NS_FLASH_DISPLAY, 3))
-        (N(Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT,
+        (N(stage_class_init, NSV::CLASS_STAGE, NSV::CLASS_MOVIE_CLIP,
+           NSV::NS_FLASH_DISPLAY, 1))
+
+        // TODO: should be SimpleButton
+        (N(Button::init, NSV::CLASS_BUTTON, NSV::CLASS_INTERACTIVEOBJECT,
            NSV::NS_FLASH_DISPLAY, 5))
 
         // Text classes
-        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 0,
-           NSV::NS_FLASH_TEXT, 3))
+        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD,
+           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_TEXT, 3))
         (N(TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
         (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
@@ -411,7 +419,7 @@ avm2Classes()
         // Media classes
         (N(Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_MEDIA, 5))
-        (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT,
+        (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_DISPLAYOBJECT,
            NSV::NS_FLASH_MEDIA, 6))
         (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_MEDIA, 6))

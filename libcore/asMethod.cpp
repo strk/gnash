@@ -41,7 +41,8 @@ asMethod::asMethod()
     _maxRegisters(0),
     _scopeDepth(0),
     _maxScope(0),
-    _maxStack(0)
+    _maxStack(0),
+    _needsActivation(false)
 {
 }
 

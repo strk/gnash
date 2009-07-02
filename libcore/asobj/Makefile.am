@@ -64,6 +64,7 @@ libgnashasobjs_la_SOURCES = \
 	int_as.cpp \
 	LoadVars_as.cpp \
 	Math_as.cpp \
+	QName_as.cpp \
 	Microphone.cpp	\
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
@@ -102,6 +103,7 @@ noinst_HEADERS = \
 	String_as.h \
 	LoadableObject.h \
 	Namespace_as.h \
+	QName_as.h \
 	Object.h
 
 EXTENSIONS_API = \

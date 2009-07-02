@@ -17,8 +17,8 @@
 
 UIdir = $(includedir)/gnash
 
-UI_SOURCES = asobj/flash/ui/ui_pkg.cpp
-UI_HEADERS = asobj/flash/ui/ui_pkg.h
+UI_SOURCES = 
+UI_HEADERS = 
 
 if BUILD_CONTEXTMENUBUILTINITEMS_AS3
 UI_SOURCES += asobj/flash/ui/ContextMenuBuiltInItems_as.cpp

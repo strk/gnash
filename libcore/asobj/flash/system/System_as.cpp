@@ -1,12 +1,12 @@
-// System_as.cpp:  ActionScript "System" class, for Gnash.
-//
-//   Copyright (C) 2009 Free Software Foundation, Inc.
-//
+// System.cpp:  ActionScript "System" class, for Gnash.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+// 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -17,58 +17,45 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "System_as.h"
-#include "log.h"
-#include "fn_call.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
-
-////Si added
-#include <sstream>
 #include "movie_root.h" // interface callback
+#include "log.h"
+#include "System_as.h"
+#include "fn_call.h"
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
-///end of Si added
+
+#include <sstream>
 
 namespace gnash {
 
-// Forward declarations
-//namespace {
-    as_value system_gc(const fn_call& fn);
-    as_value system_pause(const fn_call& fn);
-    as_value system_resume(const fn_call& fn);
-    as_value system_setClipboard(const fn_call& fn);
-    as_value system_ctor(const fn_call& fn);
-    void attachSystemInterface(as_object& o);
-    void attachSystemStaticInterface(as_object& o);
-    as_object* getSystemInterface();
+// Forward declarations.
+namespace {
 
-/// Si added
+    inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
 
-inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
-
-template<typename T> inline void convertValue(const std::string& in,T& val);
+    template<typename T> inline void convertValue(const std::string& in,
+            T& val);
 
     const std::string& systemLanguage(as_object& proto);
+
     as_value system_security_allowdomain(const fn_call& fn);
     as_value system_security_allowinsecuredomain(const fn_call& fn);
     as_value system_security_loadpolicyfile(const fn_call& fn);
+    as_value system_setClipboard(const fn_call& fn);
     as_value system_showsettings(const fn_call& fn);
     as_value system_exactsettings(const fn_call& fn);
     as_value system_usecodepage(const fn_call& fn);
     as_object* getSystemSecurityInterface(as_object& o);
     as_object* getSystemCapabilitiesInterface(as_object& o);
     void attachSystemInterface(as_object& proto);
+    
+    // AS3 functions.
+    as_value system_gc(const fn_call& fn);
+    as_value system_pause(const fn_call& fn);
+    as_value system_resume(const fn_call& fn);
+}
 
-//extern   void registerSystemNative(as_object& global);
-//}
-/// End of Si added
 
 void
 system_class_init(as_object& global)
@@ -79,6 +66,7 @@ system_class_init(as_object& global)
 	attachSystemInterface(*obj);
 	global.init_member("System", obj.get());
 }
+
 
 void
 registerSystemNative(as_object& global)
@@ -99,85 +87,7 @@ registerSystemNative(as_object& global)
     // System.Product.download 2201, 3    
 }
 
-
-class System_as : public as_object
-{
-
-public:
-
-    System_as()
-        :
-        as_object(getSystemInterface())
-    {}
-};
-
-//Si
-//This function is not defined!
-
-void
-attachSystemStaticInterface(as_object& )
-{
-
-}
-
-as_object*
-getSystemInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSystemInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-system_gc(const fn_call& fn)
-{
-    boost::intrusive_ptr<System_as> ptr =
-        ensureType<System_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-system_pause(const fn_call& fn)
-{
-    boost::intrusive_ptr<System_as> ptr =
-        ensureType<System_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-system_resume(const fn_call& fn)
-{
-    boost::intrusive_ptr<System_as> ptr =
-        ensureType<System_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-system_setClipboard(const fn_call& fn)
-{
-    boost::intrusive_ptr<System_as> ptr =
-        ensureType<System_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-system_ctor(const fn_call& )
-{
-    boost::intrusive_ptr<as_object> obj = new System_as;
-
-    return as_value(obj.get()); // will keep alive
-}
+namespace {
 
 as_object*
 getSystemSecurityInterface(as_object& o)
@@ -220,7 +130,7 @@ getSystemCapabilitiesInterface(as_object& o)
 
     // FIXME: these need to be implemented properly 
     // Does the NetStream object natively support SSL?
-	const bool hasTLS = false;
+	const bool hasTLS = true;
 
     // Microphone and camera access disabled
 	const bool avHardwareDisable = false;
@@ -440,9 +350,37 @@ system_security_loadpolicyfile(const fn_call& /*fn*/)
 }
 
 as_value
+system_setClipboard(const fn_call& /*fn*/)
+{
+    LOG_ONCE(log_unimpl ("System.setClipboard") );
+    return as_value();
+}
+
+as_value
 system_showsettings(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl ("System.showSettings") );
+    return as_value();
+}
+
+as_value
+system_gc(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+system_pause(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+system_resume(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
@@ -549,10 +487,5 @@ systemLanguage(as_object& proto)
 
 }
 
+} // anonymous namespace
 } // gnash namespace
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
-

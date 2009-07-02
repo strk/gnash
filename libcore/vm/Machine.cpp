@@ -1634,14 +1634,23 @@ Machine::execute()
                     push_stack(as_value(arr));
                     break;
                 }
-            /// 0x57 ABC_ACTION_NEWACTIVATION
-            /// Stack Out:
-            ///  vtable -- A new virtual table, which has the previous one as a parent.
+
+                /// 0x57 ABC_ACTION_NEWACTIVATION
+                /// Stack Out:
+                ///  vtable -- A new virtual table, which has the
+                ///  previous one as a parent.
                 case SWF::ABC_ACTION_NEWACTIVATION:
                 {
-                    // TODO:  The function contains traits that need to be included in the activation object.
-                    //For now we are using the function object as the activation object.  There is probably
-                    //a better way.
+                    // TODO:  The function contains traits that need to be
+                    // included in the activation object.
+                    // For now we are using the function object as the
+                    // activation object.  There is probably
+                    // a better way.
+                    //
+                    if (!mCurrentFunction->needsActivation()) {
+                        log_abc("NEWACTIVATION: called for a function without"
+                                "the NEED_ACTIVATION flag");
+                    }
                     push_stack(as_value(mCurrentFunction));
                     break;
                 }
@@ -3201,7 +3210,9 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 
     // The value at _registers[0] is generally pushed to the stack for
     // CONSTRUCTSUPER, which apparently expects the object whose super
-    // is to be constructed. Setting it to global as before seems to be wrong.
+    // is to be constructed. The pp's stack names the class for instantiation
+    // at register 0 when the constructor body is executed, which must
+    // correspond to the class prototype.
 	setRegister(0, cl->getPrototype());
 	executeCodeblock(ctor->getBody());
     log_debug("Finished instantiating class %s", className);
@@ -3227,6 +3238,9 @@ Machine::find_prop_strict(asName multiname)
     // 'invisible' to this scope, is available
 	as_value val;
     print_scope_stack();
+    const string_table::key var = multiname.getGlobalName();
+    const string_table::key ns = multiname.getNamespace()->getURI();
+
 	for (size_t i = 0; i < mScopeStack.totalSize(); ++i)
     {
 		as_object* scope_object = mScopeStack.at(i).get();
@@ -3234,17 +3248,18 @@ Machine::find_prop_strict(asName multiname)
 			log_abc("Scope object is NULL.");
 			continue;
 		}
-		val = scope_object->getMember(multiname.getGlobalName(),
-                multiname.getNamespace()->getURI());
-
-		if (!val.is_undefined()) {
-			push_stack(mScopeStack.at(i));
+        
+        if (scope_object->get_member(var, &val, ns)) {
+            push_stack(mScopeStack.at(i));
 			return val;
 		}
 	}
 
+    // TODO: find out what to do here.
     log_abc("Failed to find property in scope stack.");
-	return val;
+	as_object* null = 0;
+    push_stack(null);
+    return val;
 }
 
 as_value

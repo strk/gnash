@@ -17,8 +17,8 @@
 
 ACCESSIBILITYdir = $(includedir)/gnash
 
-ACCESSIBILITY_SOURCES = asobj/flash/accessibility/accessibility_pkg.cpp
-ACCESSIBILITY_HEADERS = asobj/flash/accessibility/accessibility_pkg.h
+ACCESSIBILITY_SOURCES = 
+ACCESSIBILITY_HEADERS =
 
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
 ACCESSIBILITY_SOURCES += asobj/flash/accessibility/AccessibilityProperties_as.cpp

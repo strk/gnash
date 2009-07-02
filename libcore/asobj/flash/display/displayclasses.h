@@ -2,40 +2,7 @@
 #ifndef GNASH_ASOBJ_FLASH_DISPLAY_H
 #define GNASH_ASOBJ_FLASH_DISPLAY_H 1
 #include "sharedlib.h"
-static gnash::SharedLib::initentry *as3displayclasses[] = {
-	gnash::avm1movie_class_init,
-	gnash::actionscriptversion_class_init,
-	gnash::bitmapdatachannel_class_init,
-	gnash::blendmode_class_init,
-	gnash::capsstyle_class_init,
-	gnash::displayobjectcontainer_class_init,
-	gnash::displayobject_class_init,
-	gnash::framelabel_class_init,
-	gnash::gradienttype_class_init,
-	gnash::graphics_class_init,
-	gnash::ibitmapdrawable_class_init,
-	gnash::interactiveobject_class_init,
-	gnash::interpolationmethod_class_init,
-	gnash::jointstyle_class_init,
-	gnash::linescalemode_class_init,
-	gnash::loaderinfo_class_init,
-	gnash::loader_class_init,
-	gnash::morphshape_class_init,
-	gnash::pixelsnapping_class_init,
-	gnash::swfversion_class_init,
-	gnash::scene_class_init,
-	gnash::shape_class_init,
-	gnash::simplebutton_class_init,
-	gnash::spreadmethod_class_init,
-	gnash::sprite_class_init,
-	gnash::stagealign_class_init,
-	gnash::stagedisplaystate_class_init,
-	gnash::stagequality_class_init,
-	gnash::stagescalemode_class_init,
-	gnash::bitmapdata_class_init,
-	0
-};
-static gnash::SharedLib::initentry *as2displayclasses[] = {
+static gnash::SharedLib::initentry *displayclasses[] = {
 	gnash::bitmapdata_class_init,
 	0
 };

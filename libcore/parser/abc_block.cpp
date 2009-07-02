@@ -117,7 +117,7 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 bool
 Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 {
-	log_abc("Finalizing method");
+	log_abc("Finalizing method trait: kind %s", _kind);
 	switch (_kind)
 	{
 	case KIND_SLOT:
@@ -125,66 +125,59 @@ Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 	{
 		// Validate the type.
 		asClass *pType;
-		if (_typeIndex)
+		if (_typeIndex) {
 			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
-		else
+        }
+		else {
 			pType = pBlock->mTheObject;
-		if (!pType)
-		{
+        }
+
+		if (!pType) {
 			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
 			return false;
 		}
+
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
 		if (!_hasValue) {
 			_value = as_value((as_object*)0); // NULL value, right ?
 		}
-		log_abc("Adding property=%s with value=%s slot=%u", pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
+		log_abc("Adding property=%s with value=%s slot=%u",
+                pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
 		pMethod->addValue(_globalName, _namespace, _slotID, pType, 
 			_value, _kind == KIND_CONST);
 		break;
 	}
 	case KIND_METHOD:
 	{
-		log_abc("Finalize method trait not implemented.  Returning");
-		break;
 		pMethod->addMethod(_name, _namespace, _method);
 		break;
 	}
 	case KIND_GETTER:
 	{
-		log_abc("Finalize getter trait not implemented.  Returning");
-		break;
 		pMethod->addGetter(_name, _namespace, _method);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		log_abc("Finalize setter trait not implemented.  Returning");
-		break;
 		pMethod->addSetter(_name, _namespace, _method);
 		break;
 	}
 	case KIND_CLASS:
 	{
-		log_abc("Finalize class trait not implemented.  Returning");
-		break;
 		pMethod->addMemberClass(_name, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex]);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		log_abc("Finalize function trait not implemented.  Returning");
-		break;
 		pMethod->addSlotFunction(_name, _namespace, _slotID, _method);
 		break;
 	}
 	default:
 		// Not here -- validated already in read.
 		return false;
-		break;
-	} // end of switch
+	} 
 	return true;
 }
 
@@ -860,31 +853,34 @@ abc_block::read_method_infos()
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
 		// be assigned to the corresponding parameters.
-		if (flags & METHOD_OPTIONAL_ARGS)
-		{
-//			log_abc("We have flags and optional args.");
-			boost::uint32_t ocount = _stream->read_V32();
+		if (flags & METHOD_OPTIONAL_ARGS) {
+			
+            boost::uint32_t ocount = _stream->read_V32();
 			log_abc("  Optional args: %u", ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
-			for (unsigned int j = 0; j < ocount; ++j)
-			{
+			
+            for (unsigned int j = 0; j < ocount; ++j) {
 				log_abc("  Reading optional arg: %u", j);
 				boost::uint32_t index = _stream->read_V32();
 				boost::uint8_t kindof = _stream->read_u8();
 				log_abc("   Index: %u Kindof: %u", index, kindof);
 				as_value v;
-				if (!pool_value(index, kindof, v))
-					return false; // message done by pool_value
+				if (!pool_value(index, kindof, v)) {
+					return false; 
+                }
 				pMethod->pushOptional(v);
 			}
 			log_abc("Done handling optional args.");
 		}
 
+        if (flags & METHOD_ACTIVATION) {
+            log_abc("Method needs activation");
+            pMethod->setNeedsActivation();
+        }
+
 		// If there are names present for the parameters, skip them.
-		if (flags & METHOD_ARG_NAMES)
-		{
-			for (unsigned int j = 0; j < param_count; ++j)
-			{
+		if (flags & METHOD_ARG_NAMES) {
+			for (size_t j = 0; j < param_count; ++j) {
 				_stream->skip_V32();
 			}
 		}
@@ -1206,9 +1202,9 @@ abc_block::read_method_bodies()
 
 		method.setBody(new CodeStream(body));
 		
-		boost::uint32_t ecount = _stream->read_V32();
-		for (unsigned int j = 0; j < ecount; ++j)
-		{
+        // Exception count and exceptions
+		const boost::uint32_t ecount = _stream->read_V32();
+		for (unsigned int j = 0; j < ecount; ++j) {
 			asException *pExcept = mCH->newException();
 
 			// Where the try block begins and ends.
@@ -1222,16 +1218,15 @@ abc_block::read_method_bodies()
 			boost::uint32_t catch_type = _stream->read_V32();
 			if (catch_type >= _multinamePool.size()) {
 				log_error(_("ABC: Out of bound type for exception."));
-//				return false;
+				return false;
 			}
 			if (!catch_type) {
 				pExcept->catchAny();
 			}
-			else
-			{
+			else {
 				asClass *pType = locateClass(_multinamePool[catch_type]);
-				if (!pType)
-				{
+				if (!pType) {
+
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 
 						_stringTable->value(
                             _multinamePool[catch_type].getABCName()));
@@ -1247,33 +1242,34 @@ abc_block::read_method_bodies()
 
 			// A variable name for the catch type.
 			// In version 46.15, no names.
-			if (mVersion != ((46 << 16) | 15))
-			{
+			if (mVersion != ((46 << 16) | 15)) {
 				boost::uint32_t cvn = _stream->read_V32();
-				if (cvn >= _multinamePool.size())
-				{
-					log_error(_("ABC: Out of bound name for caught exception."));
-//					return false;
+				if (cvn >= _multinamePool.size()) {
+					log_error(_("ABC: Out of bound name for caught "
+                                "exception."));
+					return false;
 				}
 				pExcept->setName(_multinamePool[cvn].getABCName());
 				pExcept->setNamespace(_multinamePool[cvn].getNamespace());
 			}
-		} // end of exceptions
+		} 
 
+        // Traits
 		boost::uint32_t tcount = _stream->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			Trait &aTrait = newTrait();
+			Trait& aTrait = newTrait();
 			aTrait.set_target(_methods[offset]);
-			if (!aTrait.read(_stream, this)) {
-                // TODO: 'method body activation traits'
+			
+            if (!aTrait.read(_stream, this)) {
 				return false;
             }
-			log_abc("Trait: %u name: %s kind: %s value: %s ", j, 
+
+			log_abc("Activation trait: %u name: %s, kind: %s, value: %s ", j, 
                     _stringPool[aTrait._name], aTrait._kind, 
                     aTrait._value.to_string());
 		}
-	} // end of bodies loop
+	} 
 	return true;
 }
 
@@ -1362,7 +1358,6 @@ abc_block::locateClass(const std::string& className)
         if (it == _stringPool.end()) return 0;
         for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
                 i != _namespacePool.end(); ++i) {
-            log_abc("Looking in ns: %s", _stringPool[(*i)->getAbcURI()]);
             if (_stringPool[(*i)->getAbcURI()] == nsstr) {
                 a.setNamespace(*i);
                 break;

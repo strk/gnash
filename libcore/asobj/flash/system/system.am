@@ -17,8 +17,8 @@
 
 SYSTEMdir = $(includedir)/gnash
 
-SYSTEM_SOURCES = asobj/flash/system/system_pkg.cpp
-SYSTEM_HEADERS = asobj/flash/system/system_pkg.h
+SYSTEM_SOURCES = 
+SYSTEM_HEADERS = 
 
 if BUILD_APPLICATIONDOMAIN_AS3
 SYSTEM_SOURCES += asobj/flash/system/ApplicationDomain_as.cpp
