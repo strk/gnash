@@ -45,7 +45,7 @@ asNamespace::dump(string_table& st)
         s << st.value(t) << "(" << t << "), ";
     }
 
-    log_debug("Classes in namespace %s: %s", st.value(_uri), s.str());
+    log_debug("Classes in namespace %s(%s): %s", st.value(_uri), _uri, s.str());
 
 }
 
