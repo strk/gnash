@@ -17,8 +17,8 @@
 
 ERRORSdir = $(includedir)/gnash
 
-ERRORS_SOURCES = asobj/flash/errors/errors_pkg.cpp
-ERRORS_HEADERS = asobj/flash/errors/errors_pkg.h
+ERRORS_SOURCES = 
+ERRORS_HEADERS = 
 
 if BUILD_EOFERROR_AS3
 ERRORS_SOURCES += asobj/flash/errors/EOFError_as.cpp
