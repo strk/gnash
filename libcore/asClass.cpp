@@ -85,7 +85,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns,
 	string_table::key nsname = ns ? ns->getURI() : 0;
 
 	//TODO: Set flags.
-	if(slotId == 0) {
+	if (slotId == 0) {
 		_prototype->init_member(name, as_value(), 0, nsname);
 	}
 	else {
