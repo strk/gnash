@@ -28,6 +28,7 @@
 #include "action.h"
 #include "Object.h"
 #include "VM.h"
+#include "Global.h"
 
 namespace gnash {
 /// The type of exceptions thrown by ActionScript.
@@ -322,15 +323,13 @@ Machine::Machine(VM& vm)
         mGlobalScope(0),
         mDefaultThis(0),
         mThis(0),
-        mGlobalObject(0),
+        _global(new AVM2Global(*this)),
         mGlobalReturn(),
         mIgnoreReturn(),
-        mIsAS3(false),
         mExitWithReturn(false),
         mPoolObject(0),
         mCurrentFunction(0),
-        _vm(vm),
-        mCH(_vm.getClassHierarchy())
+        _vm(vm)
 {
 	// Local registers should be initialized at the beginning of each
     // function call, but we don't currently parse the number of local
@@ -462,7 +461,9 @@ Machine::execute()
                 {
                     boost::uint32_t soffset = mStream->read_V32();
                     const std::string& uri = pool_string(soffset, mPoolObject);
-                    mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
+
+                    ClassHierarchy& ch = _global->classHierarchy();
+                    mDefaultXMLNamespace = ch.anonNamespace(mST.find(uri));
                     break;
                 }
 
@@ -477,7 +478,9 @@ Machine::execute()
                 {
                     ENSURE_STRING(mStack.top(0));
                     const std::string& uri = mStack.top(0).to_string();
-                    mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
+                    
+                    ClassHierarchy& ch = _global->classHierarchy();
+                    mDefaultXMLNamespace = ch.anonNamespace(mST.find(uri));
                     mStack.drop(1);
                     break;
                 }
@@ -1631,14 +1634,23 @@ Machine::execute()
                     push_stack(as_value(arr));
                     break;
                 }
-            /// 0x57 ABC_ACTION_NEWACTIVATION
-            /// Stack Out:
-            ///  vtable -- A new virtual table, which has the previous one as a parent.
+
+                /// 0x57 ABC_ACTION_NEWACTIVATION
+                /// Stack Out:
+                ///  vtable -- A new virtual table, which has the
+                ///  previous one as a parent.
                 case SWF::ABC_ACTION_NEWACTIVATION:
                 {
-                    // TODO:  The function contains traits that need to be included in the activation object.
-                    //For now we are using the function object as the activation object.  There is probably
-                    //a better way.
+                    // TODO:  The function contains traits that need to be
+                    // included in the activation object.
+                    // For now we are using the function object as the
+                    // activation object.  There is probably
+                    // a better way.
+                    //
+                    if (!mCurrentFunction->needsActivation()) {
+                        log_abc("NEWACTIVATION: called for a function without"
+                                "the NEED_ACTIVATION flag");
+                    }
                     push_stack(as_value(mCurrentFunction));
                     break;
                 }
@@ -2958,7 +2970,7 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 	if (!find_for_primitive) return 0;
 
 	if (v.is_number()) {
-		return NULL; // TODO: mCH->getClass(NSV::CLASS_NUMBER);
+		return NULL; // TODO: _classes->getClass(NSV::CLASS_NUMBER);
 	}
 
 	// And so on...
@@ -3090,7 +3102,7 @@ Machine::saveState()
 }
 
 void
-Machine::initMachine(abc_block* pool_block, as_object* global)
+Machine::initMachine(abc_block* pool_block)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");
@@ -3101,8 +3113,7 @@ Machine::initMachine(abc_block* pool_block, as_object* global)
 	log_debug("Loading code stream.");
 	mStream = constructor->getBody();
 	mCurrentFunction = constructor->getPrototype();
-	setRegister(0, global);
-	mGlobalObject = global;
+	setRegister(0, _global);
 }
 
 //This is called by abc_functions to execute their code stream.
@@ -3155,8 +3166,19 @@ Machine::executeCodeblock(CodeStream* stream)
 }
 
 void
+Machine::markReachableResources() const
+{
+    _global->setReachable();
+}
+
+void
 Machine::instantiateClass(std::string className, as_object* /*global*/)
 {
+
+    if (!mPoolObject) {
+        log_debug("No ABC block! Can't instantiate class!");
+        return;
+    }
 
     log_debug("instantiateClass: class name %s", className);
 
@@ -3188,7 +3210,9 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 
     // The value at _registers[0] is generally pushed to the stack for
     // CONSTRUCTSUPER, which apparently expects the object whose super
-    // is to be constructed. Setting it to global as before seems to be wrong.
+    // is to be constructed. The pp's stack names the class for instantiation
+    // at register 0 when the constructor body is executed, which must
+    // correspond to the class prototype.
 	setRegister(0, cl->getPrototype());
 	executeCodeblock(ctor->getBody());
     log_debug("Finished instantiating class %s", className);
@@ -3214,6 +3238,9 @@ Machine::find_prop_strict(asName multiname)
     // 'invisible' to this scope, is available
 	as_value val;
     print_scope_stack();
+    const string_table::key var = multiname.getGlobalName();
+    const string_table::key ns = multiname.getNamespace()->getURI();
+
 	for (size_t i = 0; i < mScopeStack.totalSize(); ++i)
     {
 		as_object* scope_object = mScopeStack.at(i).get();
@@ -3221,30 +3248,18 @@ Machine::find_prop_strict(asName multiname)
 			log_abc("Scope object is NULL.");
 			continue;
 		}
-		val = scope_object->getMember(multiname.getGlobalName(),
-                multiname.getNamespace()->getURI());
-
-		if (!val.is_undefined()) {
-			push_stack(mScopeStack.at(i));
+        
+        if (scope_object->get_member(var, &val, ns)) {
+            push_stack(mScopeStack.at(i));
 			return val;
 		}
 	}
 
-	as_object *target = 0;
-	as_environment env = as_environment(_vm);
-	std::string name = pool_string(multiname.getABCName(), mPoolObject);
-	std::string ns = pool_string(multiname.getNamespace()->getAbcURI(),
-            mPoolObject);
-	std::string path = ns.empty() ? name : ns + "." + name;
-
-    log_abc("Failed to find property in scope stack. Looking for %s in "
-        "as_environment", path);
-
-    std::auto_ptr<as_environment::ScopeStack> envStack (getScopeStack());
-	val = env.get_variable(path, *envStack, &target);
-
-	push_stack(target);	
-	return val;
+    // TODO: find out what to do here.
+    log_abc("Failed to find property in scope stack.");
+	as_object* null = 0;
+    push_stack(null);
+    return val;
 }
 
 as_value

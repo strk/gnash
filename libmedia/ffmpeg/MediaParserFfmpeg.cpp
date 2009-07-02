@@ -21,7 +21,14 @@
 #include "MediaParserFfmpeg.h"
 #include "GnashException.h"
 #include "log.h"
-#include "IOChannel.h" 
+#include "IOChannel.h"
+
+//#define GNASH_ALLOW_VCODEC_ENV 1
+// Set this to enable a special GNASH_DEFAULT_VCODEC environment variable, which
+// is used as a default when the video codec can't be detected. This is a quick
+// hack to make MJPEG HTTP videos work (which can't be detected as their MIME
+// type is just "mixed/multipart"). Perhaps the codec will be configurable via
+// ActionScript sometime. - Udo 
 
 namespace gnash {
 namespace media {
@@ -328,6 +335,15 @@ MediaParserFfmpeg::initializeParser()
 	_byteIOCxt.buffer = NULL;
 
 	_inputFmt = probeStream();
+#ifdef GNASH_ALLOW_VCODEC_ENV	
+	if ( ! _inputFmt )
+	{
+	  char* defcodec = getenv("GNASH_DEFAULT_VCODEC");
+	  if (defcodec && strlen(defcodec))
+      _inputFmt = av_find_input_format(defcodec);	
+
+  }
+#endif	
 	if ( ! _inputFmt )
 	{
 		throw MediaException("MediaParserFfmpeg couldn't figure out input "

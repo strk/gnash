@@ -18,15 +18,35 @@
 #include "asNamespace.h"
 #include "VM.h"
 #include "ClassHierarchy.h"
+#include "string_table.h"
+#include "log.h"
+
+#include <sstream>
 
 namespace gnash {
 
 void
-asNamespace::stubPrototype(string_table::key name)
+asNamespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 {
-	asClass *pClass = VM::get().getClassHierarchy()->newClass();
+	asClass *pClass = ch.newClass();
 	pClass->setName(name);
 	addClass(name, pClass);
+}
+
+void
+asNamespace::dump(string_table& st)
+{
+    std::ostringstream s;
+
+    for (container::const_iterator i = _classes.begin(), e = _classes.end();
+            i != e; ++i)
+    {
+        const string_table::key t = i->second->getName();
+        s << st.value(t) << "(" << t << "), ";
+    }
+
+    log_debug("Classes in namespace %s(%s): %s", st.value(_uri), _uri, s.str());
+
 }
 
 }

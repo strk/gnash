@@ -17,8 +17,8 @@
 
 UTILSdir = $(includedir)/gnash
 
-UTILS_SOURCES = asobj/flash/utils/utils_pkg.cpp
-UTILS_HEADERS = asobj/flash/utils/utils_pkg.h
+UTILS_SOURCES = 
+UTILS_HEADERS = 
 
 if BUILD_BYTEARRAY_AS3
 UTILS_SOURCES += asobj/flash/utils/ByteArray_as.cpp

@@ -199,7 +199,7 @@ inst_HEADERS = $(EXTENSIONS_API)
 endif
 
 libgnashbase_la_LDFLAGS = -release $(VERSION) 
-libgnashbase_la_DEPENDENCIES = $(LIBLTDL)
+libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)
 
 if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined

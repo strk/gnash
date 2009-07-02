@@ -2,25 +2,7 @@
 #ifndef GNASH_ASOBJ_FLASH_TEXT_H
 #define GNASH_ASOBJ_FLASH_TEXT_H 1
 #include "sharedlib.h"
-static gnash::SharedLib::initentry *as3textclasses[] = {
-	gnash::antialiastype_class_init,
-	gnash::csmsettings_class_init,
-	gnash::fontstyle_class_init,
-	gnash::fonttype_class_init,
-	gnash::font_class_init,
-	gnash::gridfittype_class_init,
-	gnash::statictext_class_init,
-	gnash::stylesheet_class_init,
-	gnash::textcolortype_class_init,
-	gnash::textdisplaymode_class_init,
-	gnash::textfieldautosize_class_init,
-	gnash::textfieldtype_class_init,
-	gnash::textformatalign_class_init,
-	gnash::textlinemetrics_class_init,
-	gnash::textrenderer_class_init,
-	0
-};
-static gnash::SharedLib::initentry *as2textclasses[] = {
+static gnash::SharedLib::initentry *textclasses[] = {
 	gnash::textrenderer_class_init,
 	0
 };

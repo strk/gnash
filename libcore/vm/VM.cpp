@@ -31,7 +31,6 @@
 #include "Global.h"
 #include "rc.h" //for overriding default version string with rcfile
 #include "namedStrings.h"
-#include "ClassHierarchy.h"
 #include "VirtualClock.h" // for getTime()
 
 #ifdef ENABLE_AVM2
@@ -66,8 +65,7 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	assert(_singleton.get());
 	NSV::loadStrings(_singleton->_stringTable, _singleton->getSWFVersion());
 
-	_singleton->_classHierarchy.reset(new ClassHierarchy);
-	_singleton->setGlobal(new Global(*_singleton, _singleton->_classHierarchy.get()));
+	_singleton->setGlobal(new AVM1Global(*_singleton));
 
 #ifdef ENABLE_AVM2
 	_singleton->_machine = new Machine(*_singleton);
@@ -213,14 +211,15 @@ VM::getRoot() const
 	return _rootMovie;
 }
 
-/*public*/
 as_object*
 VM::getGlobal() const
 {
+#if ENABLE_AVM2
+    if (getAVMVersion() == VM::AVM2) return _machine->global();
+#endif
 	return _global.get();
 }
 
-/*private*/
 void
 VM::setGlobal(as_object* o)
 {
@@ -243,13 +242,15 @@ VM::markReachableResources() const
 
 	_global->setReachable();
 
+#if ENABLE_AVM2
+    _machine->markReachableResources();
+#endif
+
 	/// Mark all static GcResources
 	for (ResVect::const_iterator i=_statics.begin(), e=_statics.end(); i!=e; ++i)
 	{
 		(*i)->setReachable();
 	}
-
-	_classHierarchy->markReachableResources();
 
     if (_shLib.get()) _shLib->markReachableResources();
 #endif

@@ -47,14 +47,12 @@ class as_object;
 class ClassHierarchy
 {
 public:
-	struct extensionClass
+	struct ExtensionClass
 	{
-		/// \brief
-		/// The file name which contains the library, relative to the 
-		/// plugins directory.
+		/// The filename for the library relative to the plugins directory.
 		std::string file_name;
 
-		/// \brief Initialization function name
+		/// Initialization function name
 		///
 		/// The name of the function which will yield the prototype
 		/// object. It should be a function with signature:
@@ -64,77 +62,98 @@ public:
 		/// mysql_class_init
 		std::string init_name;
 
-		/// \brief The name of the class.
+		/// The name of the class.
 		string_table::key name;
 
-		/// \brief
-		/// The name of the inherited class.
-		/// Ordinarily should be CLASS_OBJECT
+		/// The name of the inherited class. Ordinarily should be CLASS_OBJECT
 		string_table::key super_name;
 
-		/// \brief
 		/// The name of the namespace in which this belongs.
 		string_table::key namespace_name;
 
-		/// \brief
 		/// The version at which this should be added.
 		int version;
 	};
 
-	struct nativeClass
+	struct NativeClass
 	{
-		/// The type of function to use for initing.
-		typedef void (*init_func)(as_object& obj);
+		
+        /// The type of function to use for initialization
+		typedef void (*InitFunc)(as_object& obj);
 
-		/// \brief
+        NativeClass(InitFunc init, string_table::key n,
+                string_table::key sc, string_table::key ns, int ver)
+            :
+            initializer(init),
+            name(n),
+            super_name(sc),
+            namespace_name(ns),
+            version(ver)
+        {}
+
 		/// The initialization function
 		///
-		/// See extensionClass.init_name for the necessary function.
-		init_func initializer;
+		/// See ExtensionClass.init_name for the necessary function.
+		InitFunc initializer;
 
 		/// The name of the class.
 		string_table::key name;
 
-		/// \brief
 		/// The name of the inherited class. Object is assumed if
 		/// none is given. (Unless name is itself Object)
 		string_table::key super_name;
 
-		/// \brief
 		/// The name of the namespace in which this belongs.
 		string_table::key namespace_name;
 
-		/// \brief
-		/// The version at which this should be added.
+		/// The version at which this should be visible.
 		int version;
 	};
+	
+    /// \brief
+	/// Construct the declaration object. Later set the global and
+	/// extension objects using setGlobal and setExtension
+	ClassHierarchy(as_object* global, Extension* e)
+        :
+		mGlobal(global),
+        mExtension(e) ,
+		mAnonNamespaces(),
+        mGlobalNamespace(addNamespace(0)),
+		mClassMemory()
+#ifdef ENABLE_AVM2
+        ,
+        mExceptionMemory(),
+		mMethodMemory(),
+		mBoundValueMemory(),
+        mBoundAccessorMemory()
+#endif
+	{}
 
 	/// \brief
-	/// Declare an ActionScript class, with information on how
-	/// to load it from an extension.
+	/// Delete our private namespaces.
+	~ClassHierarchy();
+
+
+    typedef std::vector<NativeClass> NativeClasses;
+
+	/// Declare an ActionScript class, with information on how to load it.
 	///
 	/// @param c
-	/// The extensionClass structure which defines the class.
+	/// The ExtensionClass structure which defines the class.
 	///
 	/// @return true, unless the class with c.name already existed.
-	bool declareClass(extensionClass& c);
+	bool declareClass(ExtensionClass& c);
 
-	/// \brief
-	/// Declare an ActionScript class, with information on how
-	/// to instantiate it from the core.
+	/// Declare an ActionScript class and how to instantiate it from the core.
 	///
 	/// @param c
-	/// The nativeClass structure which defines the class.
+	/// The NativeClass structure which defines the class.
 	///
 	/// @return true, unless the class with c.name already existed.
-	bool declareClass(const nativeClass& c);
+	bool declareClass(const NativeClass& c);
 
-	/// \brief
-	/// Declare all of the native and extension classes from the
-	/// tables contained in the source file.
-	///
-	void massDeclare();
-
+	/// Declare a list of native classes.
+	void declareAll(const NativeClasses& classes);
 
 	/// The global namespace
 	///
@@ -219,37 +238,8 @@ public:
 
 #endif
 
-	/// Set the extension object, since it wasn't set on construction.
-	void setExtension(Extension *e) { mExtension = e; }
-
-	/// Set the global object, for registrations.
-	void setGlobal(as_object *g) { mGlobal = g; }
-
 	/// Mark objects for garbage collector.
 	void markReachableResources() const;
-
-	/// \brief
-	/// Construct the declaration object. Later set the global and
-	/// extension objects using setGlobal and setExtension
-	ClassHierarchy()
-        :
-		mGlobal(0),
-        mExtension(0) ,
-		mAnonNamespaces(),
-        mGlobalNamespace(anonNamespace(0)),
-		mClassMemory()
-#ifdef ENABLE_AVM2
-        ,
-        mExceptionMemory(),
-		mMethodMemory(),
-		mBoundValueMemory(),
-        mBoundAccessorMemory()
-#endif
-	{}
-
-	/// \brief
-	/// Delete our private namespaces.
-	~ClassHierarchy();
 
 private:
 	as_object* mGlobal;
@@ -270,9 +260,10 @@ private:
 };
 
 std::ostream&
-operator<< (std::ostream& os, const ClassHierarchy::nativeClass& c);
+operator<< (std::ostream& os, const ClassHierarchy::NativeClass& c);
+
 std::ostream&
-operator<< (std::ostream& os, const ClassHierarchy::extensionClass& c);
+operator<< (std::ostream& os, const ClassHierarchy::ExtensionClass& c);
 
 } 
 #endif 

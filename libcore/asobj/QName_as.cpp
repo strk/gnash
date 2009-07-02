@@ -1,4 +1,4 @@
-// Namespace_as.cpp:  ActionScript 3 Namespace class, for Gnash.
+// QName_as.cpp:  ActionScript 3 QName class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -21,13 +21,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Namespace_as.h"
+#include "QName_as.h"
 #include "as_object.h" 
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
-#include "GnashException.h"
 #include "Object.h" 
 #include "VM.h" 
 
@@ -36,23 +35,23 @@
 namespace gnash {
 
 namespace {
-    as_value namespace_ctor(const fn_call& fn);
-    as_value namespace_uri(const fn_call& fn);
-    as_value namespace_prefix(const fn_call& fn);
+    as_value qname_ctor(const fn_call& fn);
+    as_value qname_uri(const fn_call& fn);
+    as_value qname_localName(const fn_call& fn);
     
-    as_object* getNamespaceInterface();
-    void attachNamespaceInterface(as_object& o);
+    as_object* getQNameInterface();
+    void attachQNameInterface(as_object& o);
 }
 
 
-class Namespace_as : public as_object
+class QName_as : public as_object
 {
 
 public:
 
-    Namespace_as()
+    QName_as()
         :
-        as_object(getNamespaceInterface())
+        as_object(getQNameInterface())
     {}
 
 };
@@ -60,26 +59,25 @@ public:
 
 // extern 
 void
-namespace_class_init(as_object& where)
+qname_class_init(as_object& where)
 {
     boost::intrusive_ptr<builtin_function> cl;
-    cl = new builtin_function(&namespace_ctor, getNamespaceInterface());
+    cl = new builtin_function(&qname_ctor, getQNameInterface());
 
-    where.init_member("Namespace", cl.get());
+    where.init_member("QName", cl.get());
 }
 
 
 namespace {
 
 as_object*
-getNamespaceInterface()
+getQNameInterface()
 {
     static boost::intrusive_ptr<as_object> o;
 
     if (!o) {
         o = new as_object(getObjectInterface());
         VM::get().addStatic(o.get());
-        attachNamespaceInterface(*o);
     }
 
     return o.get();
@@ -87,32 +85,31 @@ getNamespaceInterface()
 
 
 void
-attachNamespaceInterface(as_object& o)
+attachQNameInterface(as_object& o)
 {
-    // TODO: prop flags
-    o.init_property("prefix", namespace_prefix, namespace_prefix);
-    o.init_property("uri", namespace_uri, namespace_uri);
+    o.init_property("localName", qname_localName, qname_localName);
+    o.init_property("uri", qname_uri, qname_uri);
 }
 
 as_value
-namespace_prefix(const fn_call& /*fn*/)
+qname_localName(const fn_call& /*fn*/)
 {
-    log_unimpl("Namespace.prefix");
+    log_unimpl("QName.localName");
     return as_value();
 }
 
 as_value
-namespace_uri(const fn_call& /*fn*/)
+qname_uri(const fn_call& /*fn*/)
 {
-    log_unimpl("Namespace.uri");
+    log_unimpl("QName.uri");
     return as_value();
 }
 
 as_value
-namespace_ctor(const fn_call& /*fn*/)
+qname_ctor(const fn_call& /*fn*/)
 {
-    log_unimpl("Namespace");
-    boost::intrusive_ptr<as_object> ns = new Namespace_as;
+    boost::intrusive_ptr<as_object> ns = new QName_as;
+    attachQNameInterface(*ns);
     return as_value(ns.get()); 
 }
 

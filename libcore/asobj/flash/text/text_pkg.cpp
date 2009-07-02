@@ -51,25 +51,16 @@ namespace gnash {
 static as_value
 get_flash_text_package(const fn_call& fn)
 {
-    bool as3 = isAS3(fn);
-	log_debug("Loading %s flash.text package", as3 ? "AVM2" : "AVM1");
+	log_debug("Loading flash.text package");
     
     as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 
-    if (as3) {
-        while (as3textclasses[i]) {
-            as3textclasses[i](*pkg);
-            ++i;
-        }
-    }
-    else {
-        while (as2textclasses[i]) {
-            as2textclasses[i](*pkg);
-            ++i;
-        }
+    while (textclasses[i]) {
+        textclasses[i](*pkg);
+        ++i;
     }
 
 	return pkg;

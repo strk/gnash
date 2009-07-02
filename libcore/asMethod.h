@@ -109,16 +109,22 @@ public:
         return NULL;
     }
 
-	bool hasActivation();
+	bool needsActivation() const {
+        return _needsActivation;
+    }
+
+    void setNeedsActivation() {
+        _needsActivation = true;
+    }
 
 	CodeStream *getBody() { return _body; }
 	void setBody(CodeStream *b) { _body = b; }
 
-	bool addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotID,
-		asClass *type, as_value& val, bool isconst);
+	bool addValue(string_table::key name, asNamespace *ns,
+            boost::uint32_t slotID, asClass *type, as_value& val, bool isconst);
 
-	bool addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotID,
-		asClass *type);
+	bool addSlot(string_table::key name, asNamespace *ns,
+            boost::uint32_t slotID, asClass *type);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method);
 
@@ -272,6 +278,8 @@ private:
     boost::uint32_t _scopeDepth;
     boost::uint32_t _maxScope;
     boost::uint32_t _maxStack;
+
+    bool _needsActivation;
 
 };
 

@@ -40,27 +40,27 @@ class abc_function : public as_function
 {
 
 public:
-	abc_function(asMethod *methodInfo, Machine* mMachine);
+	abc_function(asMethod* methodInfo, Machine* machine);
 
 	as_value operator()(const fn_call& fn);
 
-	CodeStream* getCodeStream(){ return mMethodInfo->getBody();}
+	CodeStream* getCodeStream() const {
+        return _methodInfo->getBody();
+    }
 
-	boost::uint32_t getMaxRegisters(){ return mMethodInfo->getMaxRegisters(); }
+	boost::uint32_t getMaxRegisters() const {
+        return _methodInfo->getMaxRegisters();
+    }
 
-    as_environment::ScopeStack* scopeStack() { return _scopeStack; }
-
-    void setScopeStack(as_environment::ScopeStack* stack) {
-        _scopeStack = stack;
+    bool needsActivation() const {
+        return _methodInfo->needsActivation();
     }
 
 private:
 
-    asMethod *mMethodInfo;
+    asMethod* _methodInfo;
 
-    Machine* mMachine;
-
-	as_environment::ScopeStack* _scopeStack;
+    Machine* _machine;
 
 };
 

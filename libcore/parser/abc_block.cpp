@@ -29,6 +29,7 @@
 #include "CodeStream.h"
 #include "action_buffer.h"
 #include "Machine.h"
+#include "Global.h"
 
 namespace gnash {
 
@@ -116,7 +117,7 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 bool
 Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 {
-	log_abc("Finalizing method");
+	log_abc("Finalizing method trait: kind %s", _kind);
 	switch (_kind)
 	{
 	case KIND_SLOT:
@@ -124,66 +125,59 @@ Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 	{
 		// Validate the type.
 		asClass *pType;
-		if (_typeIndex)
+		if (_typeIndex) {
 			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
-		else
+        }
+		else {
 			pType = pBlock->mTheObject;
-		if (!pType)
-		{
+        }
+
+		if (!pType) {
 			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
 			return false;
 		}
+
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
 		if (!_hasValue) {
 			_value = as_value((as_object*)0); // NULL value, right ?
 		}
-		log_abc("Adding property=%s with value=%s slot=%u", pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
+		log_abc("Adding property=%s with value=%s slot=%u",
+                pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
 		pMethod->addValue(_globalName, _namespace, _slotID, pType, 
 			_value, _kind == KIND_CONST);
 		break;
 	}
 	case KIND_METHOD:
 	{
-		log_abc("Finalize method trait not implemented.  Returning");
-		break;
 		pMethod->addMethod(_name, _namespace, _method);
 		break;
 	}
 	case KIND_GETTER:
 	{
-		log_abc("Finalize getter trait not implemented.  Returning");
-		break;
 		pMethod->addGetter(_name, _namespace, _method);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		log_abc("Finalize setter trait not implemented.  Returning");
-		break;
 		pMethod->addSetter(_name, _namespace, _method);
 		break;
 	}
 	case KIND_CLASS:
 	{
-		log_abc("Finalize class trait not implemented.  Returning");
-		break;
 		pMethod->addMemberClass(_name, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex]);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		log_abc("Finalize function trait not implemented.  Returning");
-		break;
 		pMethod->addSlotFunction(_name, _namespace, _slotID, _method);
 		break;
 	}
 	default:
 		// Not here -- validated already in read.
 		return false;
-		break;
-	} // end of switch
+	} 
 	return true;
 }
 
@@ -215,70 +209,74 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 
     switch (_kind)
 	{
-	case KIND_SLOT:
-	case KIND_CONST:
-	{
-		_slotID = in->read_V32();
-		_typeIndex = in->read_V32();
-		boost::uint32_t vindex = in->read_V32();
-		log_abc("Slot ID=%u Type=%s Pool index=%u", _slotID, pBlock->_stringPool[pBlock->_multinamePool[_typeIndex].getABCName()], vindex);
-		if (vindex)
-		{
-			if (!pBlock->pool_value(vindex, in->read_u8(), _value))
-				return false; // Message done by pool_value
-			_hasValue = true;
-		}
-		else
-			_hasValue = false;
-		break;
-	}
-	case KIND_METHOD:
-	case KIND_GETTER:
-	case KIND_SETTER:
-	{
-		// Ignore the 'disp_id'
-		in->skip_V32();
+        case KIND_SLOT:
+        case KIND_CONST:
+        {
+            _slotID = in->read_V32();
+            _typeIndex = in->read_V32();
+            boost::uint32_t vindex = in->read_V32();
+            log_abc("Slot ID=%u Type=%s Pool index=%u", _slotID,
+                    pBlock->_stringPool[
+                    pBlock->_multinamePool[_typeIndex].getABCName()], vindex);
+            
+            if (vindex) {
+                const abc_block::PoolConstant c =
+                    static_cast<abc_block::PoolConstant>(in->read_u8());
 
-		boost::uint32_t offset = in->read_V32();
-		log_abc("Method index=%u", offset);
-		if (offset >= pBlock->_methods.size()) {
-			log_error(_("Bad method id in trait."));
-			return false;
-		}
-		_method = pBlock->_methods[offset];
-		break;
-	}
-	case KIND_CLASS:
-	{
-		_slotID = in->read_V32();
-		_classInfoIndex = in->read_V32();
-		log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
-                _classInfoIndex, 
-                pBlock->_stringPool[pBlock->
-                        _classes[_classInfoIndex]->getName()]);
+                if (!pBlock->pool_value(vindex, c, _value))
+                    return false; // Message done by pool_value
+                _hasValue = true;
+            }
+            else _hasValue = false;
+            break;
+        }
+        case KIND_METHOD:
+        case KIND_GETTER:
+        case KIND_SETTER:
+        {
+            // Ignore the 'disp_id'
+            in->skip_V32();
 
-        if (_classInfoIndex >= pBlock->_classes.size()) {
-			log_error(_("Bad Class id in trait."));
-			return false;
-		}
-		break;
-	}
-	case KIND_FUNCTION:
-	{
-		_slotID = in->read_V32();
-		boost::uint32_t offset = in->read_V32();
-		if (offset >= pBlock->_methods.size()) {
-			log_error(_("Bad method id in trait."));
-			return false;
-		}
-		_method = pBlock->_methods[offset];
-		break;
-	}
-	default:
-	{
-		log_error(_("ABC: Unknown type of trait."));
-//		return false;
-	}
+            boost::uint32_t offset = in->read_V32();
+            log_abc("Method index=%u", offset);
+            if (offset >= pBlock->_methods.size()) {
+                log_error(_("Bad method id in trait."));
+                return false;
+            }
+            _method = pBlock->_methods[offset];
+            break;
+        }
+        case KIND_CLASS:
+        {
+            _slotID = in->read_V32();
+            _classInfoIndex = in->read_V32();
+            log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
+                    _classInfoIndex, 
+                    pBlock->_stringPool[pBlock->
+                            _classes[_classInfoIndex]->getName()]);
+
+            if (_classInfoIndex >= pBlock->_classes.size()) {
+                log_error(_("Bad Class id in trait."));
+                return false;
+            }
+            break;
+        }
+        case KIND_FUNCTION:
+        {
+            _slotID = in->read_V32();
+            boost::uint32_t offset = in->read_V32();
+            if (offset >= pBlock->_methods.size()) {
+                log_error(_("Bad method id in trait."));
+                return false;
+            }
+            _method = pBlock->_methods[offset];
+            break;
+        }
+        default:
+        {
+            log_error(_("ABC: Unknown type of trait."));
+    //		return false;
+        }
 	} // end of switch statement
 
 	// Ignore the metadata, but it must be read to know how to ignore it.
@@ -324,16 +322,16 @@ abc_block::abc_block()
     :
     _stringTable(&VM::get().getStringTable())
 {
-	mCH = VM::get().getClassHierarchy();
+	mCH = VM::get().getMachine()->classHierarchy();
 	// TODO: Make this the real 'Object' prototype.
-	mCH->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
+	mCH->getGlobalNs()->stubPrototype(*mCH, NSV::CLASS_OBJECT);
 	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
 }
 
 void
 abc_block::prepare(Machine* mach)
 {
-    
+
     std::for_each(_classes.begin(), _classes.end(),
             std::mem_fun(&asClass::initPrototype));
 
@@ -413,29 +411,40 @@ abc_block::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
 }
 
 asClass *
-abc_block::locateClass(asName &m)
+abc_block::locateClass(asName& m)
 {
-	asClass *found = NULL;
+	asClass* found = 0;
 
 	if (m.getNamespace())
 	{
 		found = m.getNamespace()->getClass(m.getABCName());
-		if (found)
-			return found;
+		if (found) return found;
 	}
 	if (m.namespaceSet() && !m.namespaceSet()->empty())
 	{
 		std::vector<asNamespace*>::const_iterator i;
-		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i)
-		{
+		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i) {
+
 			found = (*i)->getClass(m.getABCName());
-			if (found)
-				return found;
+			if (found) return found;
 		}
 	}
-	// One last chance: Look globally.
-	found = mCH->getGlobalNs()->getClass(m.getABCName());
-    return found;
+
+    log_abc("Failed to locate class in ABC block, looking in Global");
+
+    // Look in known built-in classes.
+    asNamespace* nsToFind = m.getNamespace();
+
+    // If there is no namespace specified, look in global only.
+    // TODO: check if this is correct, or if there should always be
+    // a namespace.
+    if (!nsToFind) {
+        return mCH->getGlobalNs()->getClass(m.getGlobalName());
+    }
+
+    // Else look in the specified namespace only.
+    asNamespace* ns = mCH->findNamespace(nsToFind->getURI());
+    return ns ? ns->getClass(m.getGlobalName()) : 0;
 
 }
 
@@ -538,10 +547,12 @@ abc_block::read_namespaces()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		boost::uint8_t kind = _stream->read_u8();
+		NamespaceConstant kind =
+            static_cast<NamespaceConstant>(_stream->read_u8());
+
 		boost::uint32_t nameIndex = _stream->read_V32();
-		log_abc("Namespace %u: kind %s, index %u, name %s", i,
-                static_cast<int>(kind), nameIndex, _stringPool[nameIndex]);
+		log_abc("Namespace %u: %s, index %u, name %s", i, kind,
+                nameIndex, _stringPool[nameIndex]);
 
 		if (nameIndex >= _stringPool.size()) {
 			log_error(_("ABC: Bad string given for namespace."));
@@ -676,7 +687,7 @@ abc_block::read_multinames()
 }
 
 bool
-abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
+abc_block::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 {
 	if (!index)
 		return true;
@@ -847,31 +858,37 @@ abc_block::read_method_infos()
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
 		// be assigned to the corresponding parameters.
-		if (flags & METHOD_OPTIONAL_ARGS)
-		{
-//			log_abc("We have flags and optional args.");
-			boost::uint32_t ocount = _stream->read_V32();
+		if (flags & METHOD_OPTIONAL_ARGS) {
+			
+            boost::uint32_t ocount = _stream->read_V32();
 			log_abc("  Optional args: %u", ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
-			for (unsigned int j = 0; j < ocount; ++j)
-			{
+			
+            for (unsigned int j = 0; j < ocount; ++j) {
 				log_abc("  Reading optional arg: %u", j);
 				boost::uint32_t index = _stream->read_V32();
-				boost::uint8_t kindof = _stream->read_u8();
+				
+                PoolConstant kindof =
+                    static_cast<PoolConstant>(_stream->read_u8());
+
 				log_abc("   Index: %u Kindof: %u", index, kindof);
 				as_value v;
-				if (!pool_value(index, kindof, v))
-					return false; // message done by pool_value
+				if (!pool_value(index, kindof, v)) {
+					return false; 
+                }
 				pMethod->pushOptional(v);
 			}
 			log_abc("Done handling optional args.");
 		}
 
+        if (flags & METHOD_ACTIVATION) {
+            log_abc("Method needs activation");
+            pMethod->setNeedsActivation();
+        }
+
 		// If there are names present for the parameters, skip them.
-		if (flags & METHOD_ARG_NAMES)
-		{
-			for (unsigned int j = 0; j < param_count; ++j)
-			{
+		if (flags & METHOD_ARG_NAMES) {
+			for (size_t j = 0; j < param_count; ++j) {
 				_stream->skip_V32();
 			}
 		}
@@ -914,24 +931,31 @@ abc_block::read_instances()
 			log_error(_("ABC: Out of bounds instance name."));
 			return false;
 		}
-		// This must be a QName.
-		if (!_multinamePool[index].isQName())
-		{
+        
+        asName& multiname = _multinamePool[index];
+		
+        // This must be a QName.
+		if (!multiname.isQName()) {
 			log_error(_("ABC: QName required for instance."));
 			return false;
 		}
-		if (_multinamePool[index].getNamespace() == NULL)
-		{
+		
+        if (!multiname.getNamespace()) {
 			log_error(_("ABC: No namespace to use for storing class."));
 			return false;
 		}
-		pClass = locateClass(_multinamePool[index]);
-		if (!pClass)
-		{
+
+		pClass = locateClass(multiname);
+		
+        if (!pClass) {
+
+            // Shouldn't this be the global name?
+            const string_table::key className = multiname.getABCName();
+
 			pClass = mCH->newClass();
-			if (!_multinamePool[index].getNamespace()->addClass(
-				_multinamePool[index].getABCName(), pClass))
-			{
+
+			if (!multiname.getNamespace()->addClass(className, pClass)) {
+
 				log_error(_("Duplicate class registration."));
 				return false;
 			}
@@ -939,31 +963,24 @@ abc_block::read_instances()
 		pClass->setDeclared();
 		_classes[i] = pClass;
 		boost::uint32_t super_index = _stream->read_V32();;
-		if (super_index && super_index >= _multinamePool.size())
-		{
+
+		if (super_index && super_index >= _multinamePool.size()) {
 			log_error(_("ABC: Bad super type."));
 			return false;
 		}
-		if (!super_index)
-		{
+
+		if (!super_index) {
 			pClass->setSuper(mTheObject);
 		}
-		else
-		{
+		else {
 			asClass *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
 				log_error(_("ABC: Super type not found (%s), faking."), 
 					_stringTable->value(
-                        _multinamePool[super_index].getABCName()));
-
-				// While testing, we will add a fake type, rather than abort.
-				pSuper = mCH->newClass();
-				pSuper->setName(_multinamePool[super_index].getABCName());
-				mCH->getGlobalNs()->addClass(
-                        _multinamePool[super_index].getABCName(), pSuper);
-				// return false;
-			}
+                        _multinamePool[super_index].getGlobalName()));
+			    return false;
+            }
 
 			if (pSuper->isFinal())
 			{
@@ -1199,9 +1216,9 @@ abc_block::read_method_bodies()
 
 		method.setBody(new CodeStream(body));
 		
-		boost::uint32_t ecount = _stream->read_V32();
-		for (unsigned int j = 0; j < ecount; ++j)
-		{
+        // Exception count and exceptions
+		const boost::uint32_t ecount = _stream->read_V32();
+		for (unsigned int j = 0; j < ecount; ++j) {
 			asException *pExcept = mCH->newException();
 
 			// Where the try block begins and ends.
@@ -1215,16 +1232,15 @@ abc_block::read_method_bodies()
 			boost::uint32_t catch_type = _stream->read_V32();
 			if (catch_type >= _multinamePool.size()) {
 				log_error(_("ABC: Out of bound type for exception."));
-//				return false;
+				return false;
 			}
 			if (!catch_type) {
 				pExcept->catchAny();
 			}
-			else
-			{
+			else {
 				asClass *pType = locateClass(_multinamePool[catch_type]);
-				if (!pType)
-				{
+				if (!pType) {
+
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 
 						_stringTable->value(
                             _multinamePool[catch_type].getABCName()));
@@ -1240,33 +1256,34 @@ abc_block::read_method_bodies()
 
 			// A variable name for the catch type.
 			// In version 46.15, no names.
-			if (mVersion != ((46 << 16) | 15))
-			{
+			if (mVersion != ((46 << 16) | 15)) {
 				boost::uint32_t cvn = _stream->read_V32();
-				if (cvn >= _multinamePool.size())
-				{
-					log_error(_("ABC: Out of bound name for caught exception."));
-//					return false;
+				if (cvn >= _multinamePool.size()) {
+					log_error(_("ABC: Out of bound name for caught "
+                                "exception."));
+					return false;
 				}
 				pExcept->setName(_multinamePool[cvn].getABCName());
 				pExcept->setNamespace(_multinamePool[cvn].getNamespace());
 			}
-		} // end of exceptions
+		} 
 
+        // Traits
 		boost::uint32_t tcount = _stream->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			Trait &aTrait = newTrait();
+			Trait& aTrait = newTrait();
 			aTrait.set_target(_methods[offset]);
-			if (!aTrait.read(_stream, this)) {
-                // TODO: 'method body activation traits'
+			
+            if (!aTrait.read(_stream, this)) {
 				return false;
             }
-			log_abc("Trait: %u name: %s kind: %s value: %s ", j, 
+
+			log_abc("Activation trait: %u name: %s, kind: %s, value: %s ", j, 
                     _stringPool[aTrait._name], aTrait._kind, 
                     aTrait._value.to_string());
 		}
-	} // end of bodies loop
+	} 
 	return true;
 }
 
@@ -1355,7 +1372,6 @@ abc_block::locateClass(const std::string& className)
         if (it == _stringPool.end()) return 0;
         for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
                 i != _namespacePool.end(); ++i) {
-            log_abc("Looking in ns: %s", _stringPool[(*i)->getAbcURI()]);
             if (_stringPool[(*i)->getAbcURI()] == nsstr) {
                 a.setNamespace(*i);
                 break;
@@ -1366,8 +1382,17 @@ abc_block::locateClass(const std::string& className)
     else {
         std::vector<std::string>::iterator it = 
             std::find(_stringPool.begin(), _stringPool.end(), className);
+ 
+#if 1      
         if (it == _stringPool.end()) return 0;
         a.setABCName(it - _stringPool.begin());
+#else
+
+        if (it != _stringPool.end()) {
+            a.setABCName(it - _stringPool.begin());
+        }
+        a.setGlobalName(VM::get().getStringTable().find(className));
+#endif
     }
     
     return locateClass(a);
@@ -1382,6 +1407,103 @@ abc_block::update_global_name(unsigned int multiname_index)
 	string_table::key new_key = 
         _stringTable->find(_stringPool[multiname->getABCName()], false);
 	multiname->setGlobalName(new_key);	
+}
+
+std::ostream&
+operator<<(std::ostream& o, abc_block::NamespaceConstant c)
+{
+    switch (c)
+    {
+        case abc_block::PRIVATE_NS:
+            return o << "private namespace";
+        case abc_block::CONSTANT_NS:
+            return o << "constant namespace";
+        case abc_block::PACKAGE_NS:
+            return o << "package namespace";
+        case abc_block::PACKAGE_INTERNAL_NS:
+            return o << "package internal namespace";
+        case abc_block::PROTECTED_NS:
+            return o << "protected namespace";
+        case abc_block::EXPLICIT_NS:
+            return o << "explicit namespace";
+        case abc_block::STATIC_PROTECTED_NS:
+            return o << "static protected namespace";
+        default:
+            return o << "invalid namespace constant";
+    }
+}
+
+std::ostream&
+operator<<(std::ostream& o, abc_block::MethodConstant c)
+{
+    switch (c)
+    {
+        case abc_block::METHOD_ARGS:
+            return o << "method arg";
+        case abc_block::METHOD_ACTIVATION:
+            return o << "method activation";
+        case abc_block::METHOD_MORE:
+            return o << "method more";
+        case abc_block::METHOD_OPTIONAL_ARGS:
+            return o << "method optional args";
+        case abc_block::METHOD_IGNORE:
+            return o << "method ignore";
+        case abc_block::METHOD_NATIVE:
+            return o << "method native";
+        case abc_block::METHOD_DEFAULT_NS:
+            return o << "default namespace";
+        case abc_block::METHOD_ARG_NAMES:
+            return o << "method arg names";
+        default:
+            return o << "invalid method constant";
+    }
+}
+
+std::ostream&
+operator<<(std::ostream& o, abc_block::InstanceConstant c)
+{
+    switch (c)
+    {
+        case abc_block::INSTANCE_SEALED:
+            return o << "instance sealed";
+        case abc_block::INSTANCE_FINAL:
+            return o << "instance final";
+        case abc_block::INSTANCE_INTERFACE:
+            return o << "instance interface";
+        case abc_block::INSTANCE_DYNAMIC:
+            return o << "instance dynamic";
+        case abc_block::INSTANCE_PROTECTED_NS:
+            return o << "instance protected namespace";
+        default:
+            return o << "invalid instance constant";
+    }
+}
+
+std::ostream&
+operator<<(std::ostream& o, abc_block::PoolConstant c)
+{
+    switch (c)
+    {
+        case abc_block::POOL_STRING:
+            return o << "pool string";
+        case abc_block::POOL_INTEGER:
+            return o << "pool integer";
+        case abc_block::POOL_UINTEGER:
+            return o << "pool uinteger";
+        case abc_block::POOL_DOUBLE:
+            return o << "pool double";
+        case abc_block::POOL_NAMESPACE:
+            return o << "pool namespace";
+        case abc_block::POOL_FALSE:
+            return o << "pool false";
+        case abc_block::POOL_TRUE:
+            return o << "pool true";
+        case abc_block::POOL_NULL:
+            return o << "pool null";
+        default:
+            return o << "invalid pool constant";
+
+    }
 }
 
 } /* namespace gnash */

@@ -2,7 +2,7 @@
 #ifndef GNASH_ASOBJ_FLASH_FILTERS_H
 #define GNASH_ASOBJ_FLASH_FILTERS_H 1
 #include "sharedlib.h"
-static gnash::SharedLib::initentry *as3filtersclasses[] = {
+static gnash::SharedLib::initentry *filtersclasses[] = {
 	gnash::bevelfilter_class_init,
 	gnash::bitmapfilterquality_class_init,
 	gnash::bitmapfiltertype_class_init,

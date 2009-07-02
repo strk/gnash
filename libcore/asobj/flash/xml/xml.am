@@ -18,8 +18,8 @@
 XMLdir = $(includedir)/gnash
 
 # This variable contains all classes in AS2 and AS3
-XML_SOURCES = asobj/flash/xml/xml_pkg.cpp
-XML_HEADERS = asobj/flash/xml/xml_pkg.h
+XML_SOURCES =
+XML_HEADERS =
 
 # This variable contains the classes only in AS3
 XML_SOURCES_AS3 = 
