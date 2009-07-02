@@ -1362,7 +1362,6 @@ abc_block::locateClass(const std::string& className)
         if (it == _stringPool.end()) return 0;
         for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
                 i != _namespacePool.end(); ++i) {
-            log_abc("Looking in ns: %s", _stringPool[(*i)->getAbcURI()]);
             if (_stringPool[(*i)->getAbcURI()] == nsstr) {
                 a.setNamespace(*i);
                 break;
