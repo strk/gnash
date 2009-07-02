@@ -29,8 +29,17 @@ package hello {
 
             check(!QName.prototype.hasOwnProperty("uri"));    
             check(!QName.prototype.hasOwnProperty("localName"));    
+            
+            xcheck_equals(QName.prototype, "");    
+            xcheck_equals(QName.constructor, "[class Class]");    
+            xcheck_equals(QName.constructor.prototype, "[object Object]");    
 
             var q = new QName();
+            xcheck_equals(q.constructor, "[class QName]");    
+            xcheck_equals(q.constructor.constructor, "[class Class]");    
+            xcheck_equals(q.constructor.constructor.prototype,
+                                "[object Object]");    
+            
             check(q.hasOwnProperty("uri"));
             check(q.hasOwnProperty("localName"));
             xcheck_equals(typeof(q.localName), "string");
@@ -123,7 +132,26 @@ package hello {
             xcheck_equals(q3.localName, "20");
             xcheck_equals(q3.uri, "400");
             xcheck_equals(q3.toString(), "400::20");
-            totals(56);
+            
+            // Check that QName has Object as its prototype.
+            var b = Object.prototype;
+            b.a = 7;
+            var q4 = new QName();
+            check_equals(q4.a, 7);
+
+            QName.constructor.prototype.a = "stringy";
+            QName.constructor.a = "stringy";
+            check_equals(b.a, 7);
+            q4 = new QName();
+            check_equals(q4.a, 7);    
+            
+            QName.prototype.a = "string";            
+            check_equals(b.a, 7);
+            check_equals(Object.prototype.a, 7);
+            check_equals(q4.a, "string");   
+
+
+            totals(68);
 
             done();
         }
