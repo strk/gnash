@@ -1,4 +1,4 @@
-// Namespace_as.cpp:  ActionScript Namespace class, for Gnash.
+// Namespace_as.cpp:  ActionScript 3 Namespace class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -45,15 +45,15 @@ namespace {
 }
 
 
-class Namespace_as: public as_object
+class Namespace_as : public as_object
 {
 
 public:
 
-	Namespace_as()
-		:
-		as_object(getNamespaceInterface())
-	{}
+    Namespace_as()
+        :
+        as_object(getNamespaceInterface())
+    {}
 
 };
 
@@ -63,9 +63,9 @@ void
 namespace_class_init(as_object& where)
 {
     boost::intrusive_ptr<builtin_function> cl;
-	cl = new builtin_function(&namespace_ctor, getNamespaceInterface());
+    cl = new builtin_function(&namespace_ctor, getNamespaceInterface());
 
-	where.init_member("Namespace", cl.get());
+    where.init_member("Namespace", cl.get());
 }
 
 
@@ -74,15 +74,15 @@ namespace {
 as_object*
 getNamespaceInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
+    static boost::intrusive_ptr<as_object> o;
 
-	if (!o) {
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-		attachNamespaceInterface(*o);
-	}
+    if (!o) {
+        o = new as_object(getObjectInterface());
+        VM::get().addStatic(o.get());
+        attachNamespaceInterface(*o);
+    }
 
-	return o.get();
+    return o.get();
 }
 
 
@@ -112,8 +112,8 @@ as_value
 namespace_ctor(const fn_call& /*fn*/)
 {
     log_unimpl("Namespace");
-	boost::intrusive_ptr<as_object> ns = new Namespace_as;
-	return as_value(ns.get()); 
+    boost::intrusive_ptr<as_object> ns = new Namespace_as;
+    return as_value(ns.get()); 
 }
 
 } // anonymous namespace
