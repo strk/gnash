@@ -308,6 +308,16 @@ public:
         return *_rootMovie;
     }
 
+    /// Creating new MovieClips needs this for now.
+    //
+    /// TODO: create MovieClips without this and drop. It's deliberately
+    /// different from getRootMovie() so it doesn't end up getting used
+    /// in the same way.
+    Movie* topLevelMovie() const
+    {
+        return _rootMovie.get();
+    }
+
     /// Return the current nominal frame rate for the Stage.
     //
     /// This is dependent on the Movie set as root movie.

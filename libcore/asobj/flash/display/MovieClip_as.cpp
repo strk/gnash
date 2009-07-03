@@ -2637,9 +2637,11 @@ movieclip_as3_ctor(const fn_call& fn)
 {
     assert(isAS3(fn));
 
-    log_unimpl("AVM2 MovieClip ctor");
+    // TODO: currently it's necessary to have a top-level movie to initialize
+    // a MovieClip.
+    Movie* m = fn.getVM().getRoot().topLevelMovie();
 
-    return as_value();
+    return new MovieClip(0, m, 0, -1);
 }
 
 
