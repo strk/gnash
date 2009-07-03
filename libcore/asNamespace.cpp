@@ -47,10 +47,11 @@ asNamespace::dump(string_table& st)
             i != e; ++i)
     {
         const string_table::key t = i->second->getName();
-        s << st.value(t) << "(" << t << "), ";
+        s << st.value(t) << "(URI: " << t << "), ";
     }
 
-    log_debug("Classes in namespace %s(%s): %s", st.value(_uri), _uri, s.str());
+    log_debug("Classes in namespace %s (URI: %s, ABC: %s): %s",
+            st.value(_uri), _uri, _abcURI, s.str());
 #endif
 }
 

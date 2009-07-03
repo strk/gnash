@@ -39,7 +39,7 @@ bool
 Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
 	log_abc("Finalize class %s (%s), trait kind: %s", 
-            pBlock->_stringPool[pClass->getName()], pClass, _kind);
+            pBlock->_stringTable->value(pClass->getName()), pClass, _kind);
 
 	switch (_kind)
 	{
@@ -251,9 +251,9 @@ Trait::read(SWFStream* in, abc_block *pBlock)
             _slotID = in->read_V32();
             _classInfoIndex = in->read_V32();
             log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
-                    _classInfoIndex, 
-                    pBlock->_stringPool[pBlock->
-                            _classes[_classInfoIndex]->getName()]);
+                _classInfoIndex, 
+                pBlock->_stringTable->value(
+                    pBlock->_classes[_classInfoIndex]->getName()));
 
             if (_classInfoIndex >= pBlock->_classes.size()) {
                 log_error(_("Bad Class id in trait."));
@@ -414,58 +414,38 @@ asClass*
 abc_block::locateClass(const std::string& className)
 {
 
-    // TODO: this is rubbish and should be done properly. Machine.cpp also
-    // has completeName for runtime names, so should probably use common
-    // code (construction of asName?).
-
     const std::string::size_type pos = className.rfind(".");
     
     asName a;
 
-    if (pos != std::string::npos) {
-        const std::string& nsstr = className.substr(0, pos);
-        const std::string& clstr = className.substr(pos + 1);
-        std::vector<std::string>::iterator it = 
-            std::find(_stringPool.begin(), _stringPool.end(), clstr);
+    const std::string& nsstr = (pos != std::string::npos) ? 
+        className.substr(0, pos) : "";
 
-        if (it == _stringPool.end()) return 0;
-        for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
-                i != _namespacePool.end(); ++i) {
-            if (_stringPool[(*i)->getAbcURI()] == nsstr) {
-                a.setNamespace(*i);
-                break;
-            }
-        }
-        a.setABCName(it - _stringPool.begin());
-    }
-    else {
-        std::vector<std::string>::iterator it = 
-            std::find(_stringPool.begin(), _stringPool.end(), className);
- 
-#if 1      
-        if (it == _stringPool.end()) return 0;
-        a.setABCName(it - _stringPool.begin());
-#else
+    const std::string& clstr = (pos != std::string::npos) ? 
+        className.substr(pos + 1) : className;
+    
+    a.setGlobalName(_stringTable->find(clstr));
 
-        if (it != _stringPool.end()) {
-            a.setABCName(it - _stringPool.begin());
+    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
+            i != _namespacePool.end(); ++i) {
+        if (_stringPool[(*i)->getAbcURI()] == nsstr) {
+            a.setNamespace(*i);
+            break;
         }
-        a.setGlobalName(VM::get().getStringTable().find(className));
-#endif
     }
     
     return locateClass(a);
 
 }
 
-asClass *
+asClass*
 abc_block::locateClass(asName& m)
 {
 	asClass* found = 0;
 
 	if (m.getNamespace())
 	{
-		found = m.getNamespace()->getClass(m.getABCName());
+		found = m.getNamespace()->getClass(m.getGlobalName());
 		if (found) return found;
 	}
 	if (m.namespaceSet() && !m.namespaceSet()->empty())
@@ -473,26 +453,14 @@ abc_block::locateClass(asName& m)
 		std::vector<asNamespace*>::const_iterator i;
 		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i) {
 
-			found = (*i)->getClass(m.getABCName());
+			found = (*i)->getClass(m.getGlobalName());
 			if (found) return found;
 		}
 	}
 
-    log_abc("Failed to locate class in ABC block, looking in Global");
+    log_abc("Could not locate class in ABC block resources!");
 
-    // Look in known built-in classes.
-    asNamespace* nsToFind = m.getNamespace();
-
-    // If there is no namespace specified, look in global only.
-    // TODO: check if this is correct, or if there should always be
-    // a namespace.
-    if (!nsToFind) {
-        return mCH->getGlobalNs()->getClass(m.getGlobalName());
-    }
-
-    // Else look in the specified namespace only.
-    asNamespace* ns = mCH->findNamespace(nsToFind->getURI());
-    return ns ? ns->getClass(m.getGlobalName()) : 0;
+    return 0;
 
 }
 
@@ -614,8 +582,9 @@ abc_block::read_namespaces()
 		}
 		else
 		{
-			asNamespace *n = mCH->findNamespace(nameIndex);
-			if (!n) n = mCH->addNamespace(nameIndex);
+            string_table::key gn = _stringTable->find(_stringPool[nameIndex]);
+			asNamespace *n = mCH->findNamespace(gn);
+			if (!n) n = mCH->addNamespace(gn);
 			_namespacePool[i] = n;
 		}
 		if (kind == PROTECTED_NS) _namespacePool[i]->setProtected();
@@ -997,16 +966,23 @@ abc_block::read_instances()
 		
         if (!pClass) {
 
-            // Shouldn't this be the global name?
-            const string_table::key className = multiname.getABCName();
+            const string_table::key className = multiname.getGlobalName();
 
 			pClass = mCH->newClass();
+            pClass->setName(className);
 
 			if (!multiname.getNamespace()->addClass(className, pClass)) {
 
 				log_error(_("Duplicate class registration."));
 				return false;
 			}
+            log_debug("Adding class %s (%s) to namespace %s",
+                    _stringTable->value(multiname.getGlobalName()),
+                    _stringPool[multiname.getABCName()],
+                    _stringTable->value(multiname.getNamespace()->getURI()));
+            log_debug("Namespace now:");
+            multiname.getNamespace()->dump(*_stringTable);
+
 		}
 		pClass->setDeclared();
 		_classes[i] = pClass;

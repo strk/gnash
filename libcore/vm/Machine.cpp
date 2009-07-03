@@ -1668,9 +1668,10 @@ Machine::execute()
                 case SWF::ABC_ACTION_NEWCLASS:
                 {
                     boost::uint32_t cid = mStream->read_V32();
+                    log_abc("Class index: %s", cid);
                     asClass *c = pool_class(cid, mPoolObject);
                     log_abc("Creating new class id=%u name=%s", c->getName(),
-                            pool_string(c->getName(), mPoolObject));
+                            mST.value(c->getName()));
                     
                     as_object* base_class = pop_stack().to_object().get();
                     as_object* new_class = c->getPrototype();
@@ -1703,7 +1704,7 @@ Machine::execute()
                             get_args(0));
 
                     log_abc("NEWCLASS(%2%) finished. Return: %1%", value,
-                            pool_string(c->getName(), mPoolObject));
+                            mST.value(c->getName()));
 
                     break;
                 }
