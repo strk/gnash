@@ -136,6 +136,46 @@ inline void checkBounds(size_t i, const T& container)
 
 }
 
+/// ABC blocks have their own "names" for all resources. In Gnash, these are
+/// a string table index. They are different from global names. These are used
+/// to locate resources inside the ABC block.
+// 
+/// Namespaces
+//
+/// ABC blocks have a set of "namespace" resources. Some namespaces are
+/// private. We make these into anonymous namespaces.
+// 
+/// We assume all non-private namespaces are public. Some are "package"
+/// namespaces; these seem to coincide with the built-in packages or 0,
+/// the global namespace.
+/// 
+/// We always search for these public namespaces by global URI in our
+/// ClassHierarchy. If we use ABC names, "flash.text" will not find the built-in
+/// flash.text namespace. Using the global name means that we 'import' the
+/// built-in namespace into our own resources.
+//
+/// Instances / Classes 
+//
+/// Likewise, classes are always given a global name, not an ABC name. This is
+/// because they become globally available, including (we assume) to other ABC
+/// blocks, so using an ABC name means they cannot be located externally.
+/// Even if ABC block resources should not be available to other blocks (which
+/// seems unlikely), using an ABC name for classes risks name conflicts with
+/// the built-in classes already in a namespace: ABC names and global names
+/// can have the same index even when the names are different.
+//
+/// Class lookup
+//
+/// This is particularly important for locateClass (called by instantiateClass
+/// from SymbolClass tag execution). The SymbolClass tag identifies a class
+/// using a global name, which may be qualified with a namespace. If it is
+/// not qualified, we look in the global namespace 0.
+// 
+/// When we call locateClass, we use global names, not ABC names, because
+/// classes are identified by global names (see above). However, we
+/// still look only in the ABC block's namespaces. The block's first namespace
+/// is always the global namespace; other package namespaces are imported
+/// according to the block's namespace constants.
 class abc_block
 {
 public:
