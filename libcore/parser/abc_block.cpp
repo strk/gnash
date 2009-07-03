@@ -976,9 +976,8 @@ abc_block::read_instances()
 			asClass *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
-				log_error(_("ABC: Super type not found (%s), faking."), 
-					_stringTable->value(
-                        _multinamePool[super_index].getGlobalName()));
+				log_error(_("ABC: Super type not found (%s)"), 
+					_stringPool[_multinamePool[super_index].getABCName()]);
 			    return false;
             }
 
