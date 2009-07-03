@@ -59,6 +59,19 @@
 #include "flash/system/System_as.h"
 #include "flash/text/TextSnapshot_as.h"
 #include "flash/text/TextFieldAutoSize_as.h"
+#include "flash/text/Font_as.h"
+#include "flash/text/FontStyle_as.h"
+#include "flash/text/AntiAliasType_as.h"
+#include "flash/text/CSMSettings_as.h"
+#include "flash/text/GridFitType_as.h"
+#include "flash/text/StaticText_as.h"
+#include "flash/text/StyleSheet_as.h"
+#include "flash/text/TextColorType_as.h"
+#include "flash/text/TextDisplayMode_as.h"
+#include "flash/text/TextFieldType_as.h"
+#include "flash/text/TextFormatAlign_as.h"
+#include "flash/text/TextLineMetrics_as.h"
+#include "flash/text/TextRenderer_as.h"
 #include "flash/xml/XMLDocument_as.h"
 #include "flash/xml/XMLNode_as.h"
 #include "MovieClipLoader.h"
@@ -415,7 +428,40 @@ avm2Classes()
            NSV::NS_FLASH_TEXT, 5))
         (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
-        
+        (N(textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(font_class_init, NSV::CLASS_FONT, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_TEXT, 5))
+        (N(fontstyle_class_init, NSV::CLASS_FONTSTYLE, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_TEXT, 5))
+        (N(antialiastype_class_init, NSV::CLASS_ANTIALIASTYPE,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(csmsettings_class_init, NSV::CLASS_CSMTEXTSETTINGS,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(gridfittype_class_init, NSV::CLASS_GRIDFITTYPE,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(statictext_class_init, NSV::CLASS_STATICTEXT,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(stylesheet_class_init, NSV::CLASS_STYLESHEET,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+#if 0
+        // This one isn't stubbed for some reason.
+        (N(textcolor_class_init, NSV::CLASS_TEXTCOLOR,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+#endif
+        (N(textcolortype_class_init, NSV::CLASS_TEXTCOLORTYPE,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textdisplaymode_class_init, NSV::CLASS_TEXTDISPLAYMODE,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textfieldtype_class_init, NSV::CLASS_TEXTFIELDTYPE,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textformatalign_class_init, NSV::CLASS_TEXTFORMATALIGN,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textlinemetrics_class_init, NSV::CLASS_TEXTLINEMETRICS,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textrenderer_class_init, NSV::CLASS_TEXTRENDERER,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+
         // Media classes
         (N(Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_MEDIA, 5))
