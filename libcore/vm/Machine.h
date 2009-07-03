@@ -32,7 +32,7 @@
 namespace gnash {
     class DisplayObject;
     class as_object;
-    class abc_block;
+    class AbcBlock;
     class asName;
     class Property;
     class CodeStream;
@@ -212,7 +212,7 @@ public:
         immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out);
     }
 
-	void initMachine(abc_block* pool_block);
+	void initMachine(AbcBlock* pool_block);
 
 	as_value executeFunction(asMethod* function, const fn_call& fn);
 
@@ -380,7 +380,7 @@ private:
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mExitWithReturn;
-	abc_block* mPoolObject; // Where all of the pools are stored.
+	AbcBlock* mPoolObject; // Where all of the pools are stored.
 
 	abc_function* mCurrentFunction;
 

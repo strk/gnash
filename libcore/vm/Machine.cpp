@@ -22,7 +22,7 @@
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
 #include "Array_as.h"
-#include "abc_block.h"
+#include "AbcBlock.h"
 #include "fn_call.h"
 #include "abc_function.h"
 #include "action.h"
@@ -63,7 +63,7 @@ public:
 namespace {
 
 inline const std::string&
-pool_string(boost::uint32_t index, abc_block *pool)
+pool_string(boost::uint32_t index, AbcBlock *pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -75,7 +75,7 @@ pool_string(boost::uint32_t index, abc_block *pool)
 }
 
 inline int
-pool_int(boost::uint32_t index, abc_block *pool)
+pool_int(boost::uint32_t index, AbcBlock *pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -87,7 +87,7 @@ pool_int(boost::uint32_t index, abc_block *pool)
 }
 
 inline unsigned int
-pool_uint(boost::uint32_t index, abc_block *pool)
+pool_uint(boost::uint32_t index, AbcBlock *pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -99,7 +99,7 @@ pool_uint(boost::uint32_t index, abc_block *pool)
 }
 
 inline double
-pool_double(boost::uint32_t index, abc_block *pool)
+pool_double(boost::uint32_t index, AbcBlock *pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -111,7 +111,7 @@ pool_double(boost::uint32_t index, abc_block *pool)
 }
 
 inline asNamespace*
-pool_namespace(boost::uint32_t index, abc_block *pool)
+pool_namespace(boost::uint32_t index, AbcBlock *pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -124,7 +124,7 @@ pool_namespace(boost::uint32_t index, abc_block *pool)
 }
 
 inline asMethod*
-pool_method(boost::uint32_t index, abc_block* pool)
+pool_method(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -136,7 +136,7 @@ pool_method(boost::uint32_t index, abc_block* pool)
 }
 
 inline asClass*
-pool_class(boost::uint32_t index, abc_block* pool)
+pool_class(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -149,7 +149,7 @@ pool_class(boost::uint32_t index, abc_block* pool)
 
 // Don't make this a reference or you'll taint the pool.
 inline asName
-pool_name(boost::uint32_t index, abc_block* pool)
+pool_name(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
 	try {
@@ -2076,7 +2076,7 @@ Machine::execute()
 
                     // We use sindex + 1, because currently as_object sets
                     // a property at a slot index 1 higher than the
-                    // index the abc_block thinks the property is at.
+                    // index the AbcBlock thinks the property is at.
                     if ( ! obj->set_member_slot(sindex+1, value) )
                     {
                         log_abc("Failed to set property at "
@@ -3103,7 +3103,7 @@ Machine::saveState()
 }
 
 void
-Machine::initMachine(abc_block* pool_block)
+Machine::initMachine(AbcBlock* pool_block)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");

@@ -37,7 +37,7 @@ namespace gnash {
 
 namespace gnash {
 
-class abc_block;
+class AbcBlock;
 class ClassHierarchy;
 class asMethod;
 class asClass;
@@ -94,11 +94,11 @@ public:
         _static(false)
 	{}
 
-	bool read(SWFStream* in, abc_block *pBlock);
+	bool read(SWFStream* in, AbcBlock *pBlock);
 
-	bool finalize(abc_block* pBlock, asClass* pClass, bool do_static);
+	bool finalize(AbcBlock* pBlock, asClass* pClass, bool do_static);
 
-	bool finalize_mbody(abc_block* pBlock, asMethod* pMethod);
+	bool finalize_mbody(AbcBlock* pBlock, asMethod* pMethod);
 
 	void set_target(asClass* pClass, bool do_static) {
         _classTarget = pClass;
@@ -110,7 +110,7 @@ public:
         _methodTarget = pMethod;
     }
 
-	bool finalize(abc_block* pBlock)
+	bool finalize(AbcBlock* pBlock)
 	{
 		if (_classTarget) {
 			return finalize(pBlock, _classTarget, _static);
@@ -176,7 +176,7 @@ inline void checkBounds(size_t i, const T& container)
 /// still look only in the ABC block's namespaces. The block's first namespace
 /// is always the global namespace; other package namespaces are imported
 /// according to the block's namespace constants.
-class abc_block
+class AbcBlock
 {
 public:
     
@@ -226,7 +226,7 @@ public:
     
     typedef std::vector<asNamespace*> NamespaceSet;
 
-	abc_block();
+	AbcBlock();
 
     asClass* locateClass(asName &m);
 
@@ -344,10 +344,10 @@ private:
 
 };
 
-std::ostream& operator<<(std::ostream& o, abc_block::NamespaceConstant c);
-std::ostream& operator<<(std::ostream& o, abc_block::MethodConstant c);
-std::ostream& operator<<(std::ostream& o, abc_block::InstanceConstant c);
-std::ostream& operator<<(std::ostream& o, abc_block::PoolConstant c);
+std::ostream& operator<<(std::ostream& o, AbcBlock::NamespaceConstant c);
+std::ostream& operator<<(std::ostream& o, AbcBlock::MethodConstant c);
+std::ostream& operator<<(std::ostream& o, AbcBlock::InstanceConstant c);
+std::ostream& operator<<(std::ostream& o, AbcBlock::PoolConstant c);
 
 } 
 
