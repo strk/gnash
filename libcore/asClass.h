@@ -33,7 +33,7 @@
 
 #ifdef ENABLE_AVM2
 # include "CodeStream.h"
-# include "abc_block.h"
+# include "AbcBlock.h"
 #endif
 
 namespace gnash {

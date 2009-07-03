@@ -19,7 +19,7 @@
 //
 
 #include "gnashconfig.h"
-#include "abc_block.h"
+#include "AbcBlock.h"
 #include "SWFStream.h" // for use
 #include "VM.h"
 #include "log.h"
@@ -36,10 +36,10 @@ namespace gnash {
 namespace abc {
 
 bool
-Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
+Trait::finalize(AbcBlock *pBlock, asClass *pClass, bool do_static)
 {
 	log_abc("Finalize class %s (%s), trait kind: %s", 
-            pBlock->_stringPool[pClass->getName()], pClass, _kind);
+            pBlock->_stringTable->value(pClass->getName()), pClass, _kind);
 
 	switch (_kind)
 	{
@@ -115,7 +115,7 @@ Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 }
 
 bool
-Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
+Trait::finalize_mbody(AbcBlock *pBlock, asMethod *pMethod)
 {
 	log_abc("Finalizing method trait: kind %s", _kind);
 	switch (_kind)
@@ -183,7 +183,7 @@ Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 
 /// Read an AS3 'trait'
 bool
-Trait::read(SWFStream* in, abc_block *pBlock)
+Trait::read(SWFStream* in, AbcBlock *pBlock)
 {
 	boost::uint32_t name = in->read_V32();
 	if (name >= pBlock->_multinamePool.size())
@@ -220,8 +220,8 @@ Trait::read(SWFStream* in, abc_block *pBlock)
                     pBlock->_multinamePool[_typeIndex].getABCName()], vindex);
             
             if (vindex) {
-                const abc_block::PoolConstant c =
-                    static_cast<abc_block::PoolConstant>(in->read_u8());
+                const AbcBlock::PoolConstant c =
+                    static_cast<AbcBlock::PoolConstant>(in->read_u8());
 
                 if (!pBlock->pool_value(vindex, c, _value))
                     return false; // Message done by pool_value
@@ -251,9 +251,9 @@ Trait::read(SWFStream* in, abc_block *pBlock)
             _slotID = in->read_V32();
             _classInfoIndex = in->read_V32();
             log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
-                    _classInfoIndex, 
-                    pBlock->_stringPool[pBlock->
-                            _classes[_classInfoIndex]->getName()]);
+                _classInfoIndex, 
+                pBlock->_stringTable->value(
+                    pBlock->_classes[_classInfoIndex]->getName()));
 
             if (_classInfoIndex >= pBlock->_classes.size()) {
                 log_error(_("Bad Class id in trait."));
@@ -318,7 +318,7 @@ operator<<(std::ostream& o, const Trait::Kind k)
 
 using namespace abc;
 
-abc_block::abc_block()
+AbcBlock::AbcBlock()
     :
     _stringTable(&VM::get().getStringTable())
 {
@@ -329,7 +329,7 @@ abc_block::abc_block()
 }
 
 void
-abc_block::prepare(Machine* mach)
+AbcBlock::prepare(Machine* mach)
 {
 
     std::for_each(_classes.begin(), _classes.end(),
@@ -358,7 +358,7 @@ abc_block::prepare(Machine* mach)
 }
 
 void
-abc_block::check_multiname_name(boost::uint32_t name)
+AbcBlock::check_multiname_name(boost::uint32_t name)
 {
 
 	if (name >= _stringPool.size()) {
@@ -367,7 +367,7 @@ abc_block::check_multiname_name(boost::uint32_t name)
 }
 
 void
-abc_block::check_multiname_namespace(boost::uint32_t ns)
+AbcBlock::check_multiname_namespace(boost::uint32_t ns)
 {
 	if (ns >= _namespacePool.size()) {
 		throw ParserException("ABC: Out of bounds namespace for Multiname.");
@@ -375,7 +375,7 @@ abc_block::check_multiname_namespace(boost::uint32_t ns)
 }
 
 void
-abc_block::check_multiname_namespaceset(boost::uint32_t nsset)
+AbcBlock::check_multiname_namespaceset(boost::uint32_t nsset)
 {
 	if (!nsset)
     {
@@ -388,7 +388,7 @@ abc_block::check_multiname_namespaceset(boost::uint32_t nsset)
 }
 
 void
-abc_block::setMultinameNames(asName *n, string_table::key ABCName)
+AbcBlock::setMultinameNames(asName *n, string_table::key ABCName)
 {
 	
 	n->setABCName(ABCName);
@@ -401,7 +401,7 @@ abc_block::setMultinameNames(asName *n, string_table::key ABCName)
 }
 
 void
-abc_block::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
+AbcBlock::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
 {
 	ns->setAbcURI(ABCName);
 	std::string name = _stringPool[ABCName];
@@ -410,14 +410,42 @@ abc_block::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
 	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
 
-asClass *
-abc_block::locateClass(asName& m)
+asClass*
+AbcBlock::locateClass(const std::string& className)
+{
+
+    const std::string::size_type pos = className.rfind(".");
+    
+    asName a;
+
+    const std::string& nsstr = (pos != std::string::npos) ? 
+        className.substr(0, pos) : "";
+
+    const std::string& clstr = (pos != std::string::npos) ? 
+        className.substr(pos + 1) : className;
+    
+    a.setGlobalName(_stringTable->find(clstr));
+
+    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
+            i != _namespacePool.end(); ++i) {
+        if (_stringPool[(*i)->getAbcURI()] == nsstr) {
+            a.setNamespace(*i);
+            break;
+        }
+    }
+    
+    return locateClass(a);
+
+}
+
+asClass*
+AbcBlock::locateClass(asName& m)
 {
 	asClass* found = 0;
 
 	if (m.getNamespace())
 	{
-		found = m.getNamespace()->getClass(m.getABCName());
+		found = m.getNamespace()->getClass(m.getGlobalName());
 		if (found) return found;
 	}
 	if (m.namespaceSet() && !m.namespaceSet()->empty())
@@ -425,32 +453,20 @@ abc_block::locateClass(asName& m)
 		std::vector<asNamespace*>::const_iterator i;
 		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i) {
 
-			found = (*i)->getClass(m.getABCName());
+			found = (*i)->getClass(m.getGlobalName());
 			if (found) return found;
 		}
 	}
 
-    log_abc("Failed to locate class in ABC block, looking in Global");
+    log_abc("Could not locate class in ABC block resources!");
 
-    // Look in known built-in classes.
-    asNamespace* nsToFind = m.getNamespace();
-
-    // If there is no namespace specified, look in global only.
-    // TODO: check if this is correct, or if there should always be
-    // a namespace.
-    if (!nsToFind) {
-        return mCH->getGlobalNs()->getClass(m.getGlobalName());
-    }
-
-    // Else look in the specified namespace only.
-    asNamespace* ns = mCH->findNamespace(nsToFind->getURI());
-    return ns ? ns->getClass(m.getGlobalName()) : 0;
+    return 0;
 
 }
 
 /// Read the ActionBlock version number.
 bool
-abc_block::read_version()
+AbcBlock::read_version()
 {
 	// Minor version, major version.
 	mVersion = (_stream->read_u16()) | (_stream->read_u16() << 16);
@@ -461,7 +477,7 @@ abc_block::read_version()
 
 /// Read the pool of integer constants.
 bool
-abc_block::read_integer_constants()
+AbcBlock::read_integer_constants()
 {
 	// count overestimates by 1.
 	boost::uint32_t count = _stream->read_V32();
@@ -477,7 +493,7 @@ abc_block::read_integer_constants()
 
 /// Read the pool of unsigned integer constants.
 bool
-abc_block::read_unsigned_integer_constants()
+AbcBlock::read_unsigned_integer_constants()
 {
 	// count overestimates by 1.
 	boost::uint32_t count = _stream->read_V32();
@@ -493,7 +509,7 @@ abc_block::read_unsigned_integer_constants()
 
 /// Read the pool of 64-bit double constants.
 bool
-abc_block::read_double_constants()
+AbcBlock::read_double_constants()
 {
 	boost::uint32_t count = _stream->read_V32();
 	_doublePool.resize(count);
@@ -509,7 +525,7 @@ abc_block::read_double_constants()
 
 /// Read the pool of string constants.
 bool
-abc_block::read_string_constants()
+AbcBlock::read_string_constants()
 {
 	log_abc("Begin reading string constants.");
 	boost::uint32_t count = _stream->read_V32();
@@ -535,7 +551,7 @@ abc_block::read_string_constants()
 /// Any two namespaces with the same uri here are the same namespace, 
 /// excepting private namespaces.
 bool
-abc_block::read_namespaces()
+AbcBlock::read_namespaces()
 {	
 	log_abc("Begin reading namespaces.");
 	boost::uint32_t count = _stream->read_V32();
@@ -566,8 +582,9 @@ abc_block::read_namespaces()
 		}
 		else
 		{
-			asNamespace *n = mCH->findNamespace(nameIndex);
-			if (!n) n = mCH->addNamespace(nameIndex);
+            string_table::key gn = _stringTable->find(_stringPool[nameIndex]);
+			asNamespace *n = mCH->findNamespace(gn);
+			if (!n) n = mCH->addNamespace(gn);
 			_namespacePool[i] = n;
 		}
 		if (kind == PROTECTED_NS) _namespacePool[i]->setProtected();
@@ -579,7 +596,7 @@ abc_block::read_namespaces()
 
 /// Read the set of sets of namespaces.
 bool
-abc_block::read_namespace_sets()
+AbcBlock::read_namespace_sets()
 {
 	boost::uint32_t count = _stream->read_V32();
 	_namespaceSetPool.resize(count);
@@ -607,7 +624,7 @@ abc_block::read_namespace_sets()
 
 /// Read the multinames.
 bool
-abc_block::read_multinames()
+AbcBlock::read_multinames()
 {
 	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u multinames.", count);
@@ -687,7 +704,7 @@ abc_block::read_multinames()
 }
 
 bool
-abc_block::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
+AbcBlock::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 {
 	if (!index)
 		return true;
@@ -771,7 +788,7 @@ abc_block::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 
 /// Read the method infos.
 bool
-abc_block::read_method_infos()
+AbcBlock::read_method_infos()
 {
 	log_abc("Begin read_method_infos.");
 
@@ -898,7 +915,7 @@ abc_block::read_method_infos()
 
 /// Skip the metadata, which is useless to us.
 bool
-abc_block::skip_metadata()
+AbcBlock::skip_metadata()
 {
 	boost::uint32_t count = _stream->read_V32();
 	for (unsigned int i = 0; i < count; ++i)
@@ -917,7 +934,7 @@ abc_block::skip_metadata()
 
 /// Load the instances from the block.
 bool
-abc_block::read_instances()
+AbcBlock::read_instances()
 {
 	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u instances.", count);
@@ -949,16 +966,23 @@ abc_block::read_instances()
 		
         if (!pClass) {
 
-            // Shouldn't this be the global name?
-            const string_table::key className = multiname.getABCName();
+            const string_table::key className = multiname.getGlobalName();
 
 			pClass = mCH->newClass();
+            pClass->setName(className);
 
 			if (!multiname.getNamespace()->addClass(className, pClass)) {
 
 				log_error(_("Duplicate class registration."));
 				return false;
 			}
+            log_debug("Adding class %s (%s) to namespace %s",
+                    _stringTable->value(multiname.getGlobalName()),
+                    _stringPool[multiname.getABCName()],
+                    _stringTable->value(multiname.getNamespace()->getURI()));
+            log_debug("Namespace now:");
+            multiname.getNamespace()->dump(*_stringTable);
+
 		}
 		pClass->setDeclared();
 		_classes[i] = pClass;
@@ -976,9 +1000,8 @@ abc_block::read_instances()
 			asClass *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
-				log_error(_("ABC: Super type not found (%s), faking."), 
-					_stringTable->value(
-                        _multinamePool[super_index].getGlobalName()));
+				log_error(_("ABC: Super type not found (%s)"), 
+					_stringPool[_multinamePool[super_index].getABCName()]);
 			    return false;
             }
 
@@ -1082,7 +1105,7 @@ abc_block::read_instances()
 
 /// Read the class data
 bool
-abc_block::read_classes()
+AbcBlock::read_classes()
 {
 	// Count was found in read_instances().
 	log_abc("Begin reading classes.");
@@ -1122,7 +1145,7 @@ abc_block::read_classes()
 /// Read the scripts (global functions)
 /// The final script is the entry point for the block.
 bool
-abc_block::read_scripts()
+AbcBlock::read_scripts()
 {
 	log_abc("Begin reading scripts.");
 	boost::uint32_t count = _stream->read_V32();
@@ -1172,7 +1195,7 @@ abc_block::read_scripts()
 
 /// Read the method bodies and attach them to the methods.
 bool
-abc_block::read_method_bodies()
+AbcBlock::read_method_bodies()
 {
 	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u method bodies.", count);
@@ -1289,7 +1312,7 @@ abc_block::read_method_bodies()
 
 // Load up all of the data.
 bool
-abc_block::read(SWFStream& in)
+AbcBlock::read(SWFStream& in)
 {
     // This isn't very nice:
 	_stream = &in;
@@ -1351,56 +1374,9 @@ abc_block::read(SWFStream& in)
 	return true;
 }
 
-asClass*
-abc_block::locateClass(const std::string& className)
-{
-
-    // TODO: this is rubbish and should be done properly. Machine.cpp also
-    // has completeName for runtime names, so should probably use common
-    // code (construction of asName?).
-
-    const std::string::size_type pos = className.rfind(".");
-    
-    asName a;
-
-    if (pos != std::string::npos) {
-        const std::string& nsstr = className.substr(0, pos);
-        const std::string& clstr = className.substr(pos + 1);
-        std::vector<std::string>::iterator it = 
-            std::find(_stringPool.begin(), _stringPool.end(), clstr);
-
-        if (it == _stringPool.end()) return 0;
-        for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
-                i != _namespacePool.end(); ++i) {
-            if (_stringPool[(*i)->getAbcURI()] == nsstr) {
-                a.setNamespace(*i);
-                break;
-            }
-        }
-        a.setABCName(it - _stringPool.begin());
-    }
-    else {
-        std::vector<std::string>::iterator it = 
-            std::find(_stringPool.begin(), _stringPool.end(), className);
- 
-#if 1      
-        if (it == _stringPool.end()) return 0;
-        a.setABCName(it - _stringPool.begin());
-#else
-
-        if (it != _stringPool.end()) {
-            a.setABCName(it - _stringPool.begin());
-        }
-        a.setGlobalName(VM::get().getStringTable().find(className));
-#endif
-    }
-    
-    return locateClass(a);
-
-}
 
 void
-abc_block::update_global_name(unsigned int multiname_index)
+AbcBlock::update_global_name(unsigned int multiname_index)
 {
 	
 	asName* multiname = &_multinamePool[multiname_index];
@@ -1410,23 +1386,23 @@ abc_block::update_global_name(unsigned int multiname_index)
 }
 
 std::ostream&
-operator<<(std::ostream& o, abc_block::NamespaceConstant c)
+operator<<(std::ostream& o, AbcBlock::NamespaceConstant c)
 {
     switch (c)
     {
-        case abc_block::PRIVATE_NS:
+        case AbcBlock::PRIVATE_NS:
             return o << "private namespace";
-        case abc_block::CONSTANT_NS:
+        case AbcBlock::CONSTANT_NS:
             return o << "constant namespace";
-        case abc_block::PACKAGE_NS:
+        case AbcBlock::PACKAGE_NS:
             return o << "package namespace";
-        case abc_block::PACKAGE_INTERNAL_NS:
+        case AbcBlock::PACKAGE_INTERNAL_NS:
             return o << "package internal namespace";
-        case abc_block::PROTECTED_NS:
+        case AbcBlock::PROTECTED_NS:
             return o << "protected namespace";
-        case abc_block::EXPLICIT_NS:
+        case AbcBlock::EXPLICIT_NS:
             return o << "explicit namespace";
-        case abc_block::STATIC_PROTECTED_NS:
+        case AbcBlock::STATIC_PROTECTED_NS:
             return o << "static protected namespace";
         default:
             return o << "invalid namespace constant";
@@ -1434,25 +1410,25 @@ operator<<(std::ostream& o, abc_block::NamespaceConstant c)
 }
 
 std::ostream&
-operator<<(std::ostream& o, abc_block::MethodConstant c)
+operator<<(std::ostream& o, AbcBlock::MethodConstant c)
 {
     switch (c)
     {
-        case abc_block::METHOD_ARGS:
+        case AbcBlock::METHOD_ARGS:
             return o << "method arg";
-        case abc_block::METHOD_ACTIVATION:
+        case AbcBlock::METHOD_ACTIVATION:
             return o << "method activation";
-        case abc_block::METHOD_MORE:
+        case AbcBlock::METHOD_MORE:
             return o << "method more";
-        case abc_block::METHOD_OPTIONAL_ARGS:
+        case AbcBlock::METHOD_OPTIONAL_ARGS:
             return o << "method optional args";
-        case abc_block::METHOD_IGNORE:
+        case AbcBlock::METHOD_IGNORE:
             return o << "method ignore";
-        case abc_block::METHOD_NATIVE:
+        case AbcBlock::METHOD_NATIVE:
             return o << "method native";
-        case abc_block::METHOD_DEFAULT_NS:
+        case AbcBlock::METHOD_DEFAULT_NS:
             return o << "default namespace";
-        case abc_block::METHOD_ARG_NAMES:
+        case AbcBlock::METHOD_ARG_NAMES:
             return o << "method arg names";
         default:
             return o << "invalid method constant";
@@ -1460,19 +1436,19 @@ operator<<(std::ostream& o, abc_block::MethodConstant c)
 }
 
 std::ostream&
-operator<<(std::ostream& o, abc_block::InstanceConstant c)
+operator<<(std::ostream& o, AbcBlock::InstanceConstant c)
 {
     switch (c)
     {
-        case abc_block::INSTANCE_SEALED:
+        case AbcBlock::INSTANCE_SEALED:
             return o << "instance sealed";
-        case abc_block::INSTANCE_FINAL:
+        case AbcBlock::INSTANCE_FINAL:
             return o << "instance final";
-        case abc_block::INSTANCE_INTERFACE:
+        case AbcBlock::INSTANCE_INTERFACE:
             return o << "instance interface";
-        case abc_block::INSTANCE_DYNAMIC:
+        case AbcBlock::INSTANCE_DYNAMIC:
             return o << "instance dynamic";
-        case abc_block::INSTANCE_PROTECTED_NS:
+        case AbcBlock::INSTANCE_PROTECTED_NS:
             return o << "instance protected namespace";
         default:
             return o << "invalid instance constant";
@@ -1480,25 +1456,25 @@ operator<<(std::ostream& o, abc_block::InstanceConstant c)
 }
 
 std::ostream&
-operator<<(std::ostream& o, abc_block::PoolConstant c)
+operator<<(std::ostream& o, AbcBlock::PoolConstant c)
 {
     switch (c)
     {
-        case abc_block::POOL_STRING:
+        case AbcBlock::POOL_STRING:
             return o << "pool string";
-        case abc_block::POOL_INTEGER:
+        case AbcBlock::POOL_INTEGER:
             return o << "pool integer";
-        case abc_block::POOL_UINTEGER:
+        case AbcBlock::POOL_UINTEGER:
             return o << "pool uinteger";
-        case abc_block::POOL_DOUBLE:
+        case AbcBlock::POOL_DOUBLE:
             return o << "pool double";
-        case abc_block::POOL_NAMESPACE:
+        case AbcBlock::POOL_NAMESPACE:
             return o << "pool namespace";
-        case abc_block::POOL_FALSE:
+        case AbcBlock::POOL_FALSE:
             return o << "pool false";
-        case abc_block::POOL_TRUE:
+        case AbcBlock::POOL_TRUE:
             return o << "pool true";
-        case abc_block::POOL_NULL:
+        case AbcBlock::POOL_NULL:
             return o << "pool null";
         default:
             return o << "invalid pool constant";
