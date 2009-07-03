@@ -410,6 +410,54 @@ abc_block::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
 	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
 
+asClass*
+abc_block::locateClass(const std::string& className)
+{
+
+    // TODO: this is rubbish and should be done properly. Machine.cpp also
+    // has completeName for runtime names, so should probably use common
+    // code (construction of asName?).
+
+    const std::string::size_type pos = className.rfind(".");
+    
+    asName a;
+
+    if (pos != std::string::npos) {
+        const std::string& nsstr = className.substr(0, pos);
+        const std::string& clstr = className.substr(pos + 1);
+        std::vector<std::string>::iterator it = 
+            std::find(_stringPool.begin(), _stringPool.end(), clstr);
+
+        if (it == _stringPool.end()) return 0;
+        for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
+                i != _namespacePool.end(); ++i) {
+            if (_stringPool[(*i)->getAbcURI()] == nsstr) {
+                a.setNamespace(*i);
+                break;
+            }
+        }
+        a.setABCName(it - _stringPool.begin());
+    }
+    else {
+        std::vector<std::string>::iterator it = 
+            std::find(_stringPool.begin(), _stringPool.end(), className);
+ 
+#if 1      
+        if (it == _stringPool.end()) return 0;
+        a.setABCName(it - _stringPool.begin());
+#else
+
+        if (it != _stringPool.end()) {
+            a.setABCName(it - _stringPool.begin());
+        }
+        a.setGlobalName(VM::get().getStringTable().find(className));
+#endif
+    }
+    
+    return locateClass(a);
+
+}
+
 asClass *
 abc_block::locateClass(asName& m)
 {
@@ -1350,53 +1398,6 @@ abc_block::read(SWFStream& in)
 	return true;
 }
 
-asClass*
-abc_block::locateClass(const std::string& className)
-{
-
-    // TODO: this is rubbish and should be done properly. Machine.cpp also
-    // has completeName for runtime names, so should probably use common
-    // code (construction of asName?).
-
-    const std::string::size_type pos = className.rfind(".");
-    
-    asName a;
-
-    if (pos != std::string::npos) {
-        const std::string& nsstr = className.substr(0, pos);
-        const std::string& clstr = className.substr(pos + 1);
-        std::vector<std::string>::iterator it = 
-            std::find(_stringPool.begin(), _stringPool.end(), clstr);
-
-        if (it == _stringPool.end()) return 0;
-        for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
-                i != _namespacePool.end(); ++i) {
-            if (_stringPool[(*i)->getAbcURI()] == nsstr) {
-                a.setNamespace(*i);
-                break;
-            }
-        }
-        a.setABCName(it - _stringPool.begin());
-    }
-    else {
-        std::vector<std::string>::iterator it = 
-            std::find(_stringPool.begin(), _stringPool.end(), className);
- 
-#if 1      
-        if (it == _stringPool.end()) return 0;
-        a.setABCName(it - _stringPool.begin());
-#else
-
-        if (it != _stringPool.end()) {
-            a.setABCName(it - _stringPool.begin());
-        }
-        a.setGlobalName(VM::get().getStringTable().find(className));
-#endif
-    }
-    
-    return locateClass(a);
-
-}
 
 void
 abc_block::update_global_name(unsigned int multiname_index)
