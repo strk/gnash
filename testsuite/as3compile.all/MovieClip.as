@@ -126,15 +126,15 @@ package hello {
             check(!m.hasOwnProperty("attachAudio"));
 
             // Check type of MovieClip properties. Inherited properties should
-	    // be dealt with elsewhere.
-            xcheck_equals(typeof(m.nextFrame), "function");
-            xcheck_equals(typeof(m.prevFrame), "function");
-            xcheck_equals(typeof(m.gotoAndStop), "function");
-            xcheck_equals(typeof(m.nextScene), "function");
-            xcheck_equals(typeof(m.prevScene), "function");
-            xcheck_equals(typeof(m.play), "function");
-            xcheck_equals(typeof(m.stop), "function");
-            xcheck_equals(typeof(m.addFrameScript), "function");
+            // be dealt with elsewhere.
+            check_equals(typeof(m.nextFrame), "function");
+            check_equals(typeof(m.prevFrame), "function");
+            check_equals(typeof(m.gotoAndStop), "function");
+            check_equals(typeof(m.nextScene), "function");
+            check_equals(typeof(m.prevScene), "function");
+            check_equals(typeof(m.play), "function");
+            check_equals(typeof(m.stop), "function");
+            check_equals(typeof(m.addFrameScript), "function");
             xcheck_equals(typeof(m.framesLoaded), "number");
             xcheck_equals(typeof(m.totalFrames), "number");
             xcheck_equals(typeof(m.currentFrame), "number");
