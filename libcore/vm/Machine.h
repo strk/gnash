@@ -245,9 +245,9 @@ private:
 	class State
 	{
 	public:
-		unsigned int mStackDepth;
-		unsigned int mStackTotalSize;
-		unsigned int mScopeStackDepth;
+		unsigned int _stackDepth;
+		unsigned int _stackTotalSize;
+		unsigned int _scopeStackDepth;
 		unsigned int mScopeTotalSize;
 		bool mReturn;
 		CodeStream *mStream;
@@ -258,7 +258,7 @@ private:
 		std::vector<as_value> _registers;
 		abc_function* mFunction;
 	void to_debug_string(){
-		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
+		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",_stackDepth,_stackTotalSize,_scopeStackDepth,mScopeTotalSize);
 
 	}
 	};
@@ -308,11 +308,11 @@ private:
 
 	void push_stack(as_value object){
 		log_abc("Pushing value %s onto stack.", object);
-		mStack.push(object);
+		_stack.push(object);
 	}
 
 	as_value pop_stack(){
-		as_value value = mStack.pop();
+		as_value value = _stack.pop();
 		log_abc("Popping value %s off the stack.", value);
 		return value;
 	}
@@ -321,25 +321,25 @@ private:
 		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
 		assert(scopeObj.get());
 		log_abc("Pushing value %s onto scope stack.", object);
-		mScopeStack.push(scopeObj);
+		_scopeStack.push(scopeObj);
 		print_scope_stack();
 	}
 
 	boost::intrusive_ptr<as_object> pop_scope_stack() {
 		log_abc("Popping value %s off the scope stack.  There will be "
-                "%u items left.", as_value(mScopeStack.top(0)),
-                mScopeStack.size()-1);
-		return mScopeStack.pop();
+                "%u items left.", as_value(_scopeStack.top(0)),
+                _scopeStack.size()-1);
+		return _scopeStack.pop();
 	}
 
 	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth)
         const {
 		log_abc("Getting value from scope stack %u from the bottom.",
                 depth | 0x0);
-		return mScopeStack.value(depth);
+		return _scopeStack.value(depth);
 	}
 
-	SafeStack<as_value> mStack;
+	SafeStack<as_value> _stack;
 	SafeStack<State> mStateStack;
 	std::vector<as_value> _registers;
 
@@ -351,7 +351,7 @@ private:
     /// before.
     /// Most importantly, the complete stack is used for lookups, including
     /// the section that is not changeable.
-	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
+	SafeStack<boost::intrusive_ptr<as_object> > _scopeStack;
 
     CodeStream *mStream;
 
