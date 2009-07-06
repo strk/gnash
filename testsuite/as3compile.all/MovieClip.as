@@ -27,6 +27,7 @@ package hello {
 
         public function Main() {
 
+            xcheck_equals(MovieClip, "[class MovieClip]");
             xcheck_equals(MovieClip.prototype, "[object Object]");
             xcheck_equals(MovieClip.constructor, "[class Class]");
             check(!MovieClip.hasOwnProperty("constructor"));
@@ -150,7 +151,7 @@ package hello {
             xcheck_equals(typeof(m.totalFrames), "number");
             xcheck_equals(typeof(m.currentFrame), "number");
 
-            totals(98);
+            totals(99);
 
             done();
         }
