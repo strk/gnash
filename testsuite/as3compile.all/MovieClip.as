@@ -29,6 +29,12 @@ package hello {
 
             xcheck_equals(MovieClip.prototype, "[object Object]");
             xcheck_equals(MovieClip.constructor, "[class Class]");
+
+            // Check that this object is a MovieClip and has MovieClip
+            // functions (no need to check them all).
+            xcheck(this instanceof MovieClip);
+            xcheck_equals(typeof(this.nextFrame), "function");
+            xcheck_equals(typeof(this.play), "function");
             
             // The prototype seems really to be just an object. Just
             // test the MovieClip properties until there's a reason
@@ -139,7 +145,7 @@ package hello {
             xcheck_equals(typeof(m.totalFrames), "number");
             xcheck_equals(typeof(m.currentFrame), "number");
 
-            totals(92);
+            totals(95);
 
             done();
         }
