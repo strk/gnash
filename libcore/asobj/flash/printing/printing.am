@@ -36,4 +36,3 @@ PRINTING_HEADERS += asobj/flash/printing/PrintJob_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(PRINTING_SOURCES)
-noinst_HEADERS +=  $(PRINTING_HEADERS) asobj/flash/printing/printingclasses.h

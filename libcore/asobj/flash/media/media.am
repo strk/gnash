@@ -69,4 +69,4 @@ MEDIA_HEADERS += asobj/flash/media/Video_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(MEDIA_SOURCES)
-noinst_HEADERS +=  $(MEDIA_HEADERS) asobj/flash/media/mediaclasses.h
+

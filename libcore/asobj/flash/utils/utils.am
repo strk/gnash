@@ -61,5 +61,4 @@ UTILS_HEADERS += asobj/flash/utils/Timer_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(UTILS_SOURCES)
-noinst_HEADERS += $(UTILS_HEADERS) asobj/flash/utils/utilsclasses.h
 
