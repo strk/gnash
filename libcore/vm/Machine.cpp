@@ -1569,7 +1569,7 @@ Machine::execute()
 
                             call_method(val, env, c.to_object().get(), args);
 
-                            // Push the constructed property?
+                            // Push the constructed property
                             push_stack(c);
                         }
                     }
