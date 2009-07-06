@@ -1496,19 +1496,11 @@ Machine::execute()
                         throw ASException();
                     }
 
-                    as_function *func = super->to_function();
-                    if (!func) {
-                        log_abc("CONSTRUCTSUPER: %s has no constructor",
-                                super);
-                        break;
-                    }
-
-                    // 'obj' is the 'this' for the call, we ignore the
-                    // return, there are argc arguments, and we drop all
-                    // of the arguments plus 'obj' from the stack.
-                    pushCall(func, super, mIgnoreReturn, argc, -1);
-
+                    as_value c = super->getMember(NSV::PROP_CONSTRUCTOR, 0);
+                    pushCall(c.to_as_function(), super, mIgnoreReturn,
+                            argc, -1);
                     break;
+                    
                 }
                 
                 /// 0x4A ABC_ACTION_CONSTRUCTPROP
