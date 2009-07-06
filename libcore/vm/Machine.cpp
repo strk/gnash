@@ -3295,16 +3295,6 @@ Machine::get_args(unsigned int argc)
 	return args;
 }
 
-as_environment::ScopeStack*
-Machine::getScopeStack()
-{
-	as_environment::ScopeStack *stack = new as_environment::ScopeStack();
-	for (size_t i = 0; i < mScopeStack.size(); ++i) {
-		stack->push_back(mScopeStack.top(i));
-	}
-	return stack;
-}
-
 void
 Machine::clearRegisters(boost::uint32_t maxRegisters)
 {

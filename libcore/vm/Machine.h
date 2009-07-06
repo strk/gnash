@@ -288,8 +288,6 @@ private:
 	
 	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
 
-	as_environment::ScopeStack* getScopeStack();
-
 	void executeCodeblock(CodeStream* stream);
 
 	void clearRegisters(boost::uint32_t maxRegsiters);
