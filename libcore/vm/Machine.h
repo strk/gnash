@@ -280,12 +280,6 @@ private:
 
 	as_value find_prop_strict(asName multiname);
 
-	as_value get_property_value(asName multiname);
-
-	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname);
-
-	as_value get_property_value(boost::intrusive_ptr<as_object> obj, std::string name, std::string ns);
-
 	void print_stack();
 
 	void print_scope_stack();

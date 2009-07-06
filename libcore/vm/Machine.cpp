@@ -3255,42 +3255,6 @@ Machine::find_prop_strict(asName multiname)
     return val;
 }
 
-as_value
-Machine::get_property_value(asName multiname)
-{
-	return get_property_value(0, multiname);
-}
-
-as_value
-Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
-        asName multiname)
-{
-
-	std::string ns = pool_string(multiname.getNamespace()->getAbcURI(),
-            mPoolObject);
-	std::string name = pool_string(multiname.getABCName(), mPoolObject);
-	return get_property_value(obj, name, ns);
-}
-
-as_value
-Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
-        std::string name, std::string ns)
-{
-
-    as_environment::ScopeStack stack;
-	as_environment env = as_environment(_vm);
-	
-    if (!obj) stack = *getScopeStack();
-	else stack.push_back(obj);
-
-	std::string path;
-
-	if (ns.empty()) path = name;
-	else path = ns + "." + name;
-
-	return env.get_variable(path, stack, 0);
-}
-
 void
 Machine::print_stack()
 {
