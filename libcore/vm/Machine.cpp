@@ -1514,6 +1514,7 @@ Machine::execute()
                 ///   'name_offset'(arg1, ..., argN)
                 case SWF::ABC_ACTION_CONSTRUCTPROP:
                 {
+                    print_stack();
                     as_environment env = as_environment(_vm);
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     
@@ -1535,42 +1536,41 @@ Machine::execute()
                         break;
                     }
                     
-                    as_value constructor_val =
-                        object->getMember(a.getGlobalName());
+                    string_table::key ns = a.getNamespace() ?
+                        a.getNamespace()->getURI() : 0;
 
-                    boost::intrusive_ptr<as_function> constructor =
-                        constructor_val.to_as_function();
+                    as_value c = object->getMember(a.getGlobalName(), ns);
+
+                    // TODO: don't do this. Classes should not be functions;
+                    // we should always use the constructor member, most
+                    // likely.
+                    boost::intrusive_ptr<as_function> ctor = c.to_as_function();
                     
-                    if (constructor) {
+                    if (ctor) {
                         boost::intrusive_ptr<as_object> newobj =
-                            constructor->constructInstance(env, args);
+                            ctor->constructInstance(env, args);
                         push_stack(as_value(newobj));
                     }
-                    // TODO: This else clause is needed to construct classes
-                    // that aren't builtin into gnash. I don't think this is
-                    // correct, and I think the problem might be how AVM2 adds
-                    // new objects to the Global object.
+
+                    // TODO: This is more or less how everything should be done.
                     else {
                         log_abc("The property we found (%s) is not a "
-                                "constructor", constructor_val);
+                                "constructor", c);
 
-                        if (constructor_val.is_null() ||
-                                constructor_val.is_undefined()) {
+                        if (c.is_null() || c.is_undefined()) {
 
                             log_abc("Constructor is undefined, will not "
                                     "construct property.");
                             push_stack(as_value());
                         }
                         else {
-                            as_value val =
-                                constructor_val.to_object().get()->getMember(
+                            as_value val = c.to_object()->getMember(
                                     NSV::PROP_CONSTRUCTOR, 0);
 
-                            call_method(val, env,
-                                    constructor_val.to_object().get(), args);
+                            call_method(val, env, c.to_object().get(), args);
 
-                            // Push the constructed property?
-                            push_stack(constructor_val);
+                            // Push the constructed property
+                            push_stack(c);
                         }
                     }
                     

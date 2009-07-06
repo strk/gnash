@@ -56,5 +56,4 @@ ERRORS_HEADERS += asobj/flash/errors/StackOverflowError_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(ERRORS_SOURCES)
-noinst_HEADERS +=  $(ERRORS_HEADERS) asobj/flash/errors/errorsclasses.h
 

@@ -67,4 +67,3 @@ SYSTEM_HEADERS += asobj/flash/system/System_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SYSTEM_SOURCES)
-noinst_HEADERS +=  $(SYSTEM_HEADERS) asobj/flash/system/systemclasses.h
