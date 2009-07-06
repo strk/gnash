@@ -29,6 +29,7 @@ package hello {
 
             xcheck_equals(MovieClip.prototype, "[object Object]");
             xcheck_equals(MovieClip.constructor, "[class Class]");
+            check(!MovieClip.hasOwnProperty("constructor"));
 
             // Check that this object is a MovieClip and has MovieClip
             // functions (no need to check them all).
@@ -36,9 +37,12 @@ package hello {
             xcheck_equals(typeof(this.nextFrame), "function");
             xcheck_equals(typeof(this.play), "function");
             
+            xcheck(MovieClip.prototype.hasOwnProperty("constructor"));
+            
             // The prototype seems really to be just an object. Just
             // test the MovieClip properties until there's a reason
             // to check others.
+            
             check(!MovieClip.prototype.hasOwnProperty("nextFrame"));
             check(!MovieClip.prototype.hasOwnProperty("prevFrame"));
             check(!MovieClip.prototype.hasOwnProperty("gotoAndStop"));
@@ -53,6 +57,7 @@ package hello {
             
             var m = new MovieClip();
             xcheck_equals(m.constructor, "[class MovieClip]");
+            xcheck(!m.hasOwnProperty("constructor"));
             
             // MovieClip properties
             xcheck(m.hasOwnProperty("nextFrame"));
@@ -145,7 +150,7 @@ package hello {
             xcheck_equals(typeof(m.totalFrames), "number");
             xcheck_equals(typeof(m.currentFrame), "number");
 
-            totals(95);
+            totals(98);
 
             done();
         }
