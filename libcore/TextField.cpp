@@ -2425,6 +2425,14 @@ textfield_setTextFormat(const fn_call& fn)
     if ( tf->colorDefined() ) text->setTextColor(tf->color());
     if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
 
+    if (isAS3(fn)) {
+        // TODO: current font finding assumes we have a parent, which isn't
+        // necessarily the case in AS3. It seems the AS2 implementation is
+        // wrong anyway.
+        log_unimpl("fonts in AS3 TextField.setTextFormat");
+        return as_value();
+    }
+
     if ( tf->fontDefined() )
     {
         const std::string& fontName = tf->font();
