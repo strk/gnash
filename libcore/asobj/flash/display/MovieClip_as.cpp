@@ -125,18 +125,15 @@ movieclip_class_init(as_object& where)
 {
     if (isAS3(where.getVM())) {
 
-        static boost::intrusive_ptr<builtin_function> cl;
-
-        if (!cl) {
-            cl = new builtin_function(&movieclip_as3_ctor,
-                    getMovieClipAS3Interface());
-
-            where.getVM().addStatic(cl.get());
-        }
+        static boost::intrusive_ptr<as_object> cl =
+            new as_object(getMovieClipAS3Interface());
         
-        log_debug("AVM2 MovieClip, ctor %s", cl.get());
+        cl->init_member(NSV::PROP_CONSTRUCTOR,
+                new builtin_function(movieclip_as3_ctor));
 
-        where.init_member("MovieClip", cl.get());
+        log_debug("AVM2 MovieClip, proto %s", cl);
+
+        where.init_member("MovieClip", cl);
         return;
     }
 
