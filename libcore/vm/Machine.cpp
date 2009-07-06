@@ -1665,6 +1665,7 @@ Machine::execute()
                     log_abc("Creating new class id=%u name=%s", c->getName(),
                             mST.value(c->getName()));
                     
+                    // This may be 0, and that's fine.
                     as_object* base_class = pop_stack().to_object().get();
                     as_object* new_class = c->getPrototype();
                     
@@ -1680,10 +1681,8 @@ Machine::execute()
                     new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,
                             as_value(static_constructor), 0);
                     
-                    as_function* constructor =
-                        c->getConstructor()->getPrototype();
-                    new_class->init_member(NSV::PROP_CONSTRUCTOR, as_value(
-                                constructor), 0);
+                    as_function* ctor = c->getConstructor()->getPrototype();
+                    new_class->init_member(NSV::PROP_CONSTRUCTOR, ctor, 0);
 
                     push_stack(new_class);
 
