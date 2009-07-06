@@ -80,7 +80,7 @@ package hello {
             // Objects are objects in AS3, not functions.
             check_equals(typeof(Base), "object");
             check_equals(typeof(Derived), "object");
-            xcheck_equals(typeof(MovieClip), "object");
+            check_equals(typeof(MovieClip), "object");
 
             var b1 : Base = new Base();
             xcheck(b1 instanceof Base);
