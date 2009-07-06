@@ -2974,8 +2974,6 @@ void
 Machine::immediateFunction(const as_function* func, as_object* thisptr,
         as_value& storage, unsigned char stack_in, short stack_out)
 {
-
-    GNASH_REPORT_FUNCTION;
     assert(func);
 
 	// TODO: Set up the fn to use the stack
