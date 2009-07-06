@@ -398,6 +398,8 @@ avm2Classes()
         (N(qname_class_init, NSV::CLASS_QNAME, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
 
         // System classes
         (N(system_class_init, NSV::CLASS_SYSTEM, NSV::CLASS_OBJECT,
@@ -484,6 +486,8 @@ avm2Classes()
         (N(NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_NET, 6))
         
+        // Error classes
+        
         // XML classes
         (N(XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_XML, 5))
@@ -497,10 +501,6 @@ avm2Classes()
            NSV::NS_FLASH_UI, 5))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 7))
-        
-        // Error classes
-        (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_ERRORS, 5))
         
         // Accessibility classes
         (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,
