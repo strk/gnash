@@ -573,6 +573,73 @@ with(inv)
 	_visible = false;
 }
 
+createEmptyMovieClip("line", 110);
+with(line) {
+
+    col = 0xff0000;
+    colc = 100;
+    x = 20;
+    y = 20;
+    xr = 100;
+    yr = 100;
+    n = 10;
+    alpha = 100;
+    
+    // =======================
+    //   Shape 1
+    // =======================
+
+    beginFill(col,colc);
+    lineStyle(n,1,alpha);
+
+    moveTo(x,y);
+    lineTo(x+xr,y);
+    lineTo((x+xr),(y+yr));
+
+    // In Gnash, next line forces a new path,
+    // and closeup of the former (shouldn't)
+    // 
+    lineStyle(n,100,alpha);
+
+    lineTo(x,(y+yr));
+    lineTo(x,y);
+
+    endFill();
+
+    // =======================
+    //   Shape 2
+    // =======================
+
+    x += 200;
+
+    beginFill(col,colc);
+    lineStyle(n,1,alpha);
+
+    moveTo(x,y);
+    lineTo(x+xr,y);
+
+    lineStyle(n,1,alpha);
+
+    lineTo((x+xr),(y+yr));
+
+    lineStyle(n,1,alpha);
+
+    lineTo(x,(y+yr));
+    lineTo(x,y);
+
+    endFill(); 
+
+    _visible = false;
+}
+line.onRollOver = function() {};
+
+// Check the the top right diagonal half of Shape 2.
+xcheck(line.hitTest(270, 40, true));
+
+// Check the bottom left diagonal half of Shape 2.
+check(line.hitTest(230, 80, true));
+
+
 //---------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------
@@ -700,10 +767,12 @@ onMouseDown = function()
 };
 
 
+
 visibleIndex = 0;
 page = new Array;
 page[0] = a;
 page[1] = inv;
+page[2] = line;
 onKeyDown = function()
 {
 	var ascii = Key.getAscii();
