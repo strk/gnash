@@ -230,8 +230,11 @@ endif
 
 if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 check_PROGRAMS += \
+	ButtonPropertiesTest \
 	ButtonEventsTest \
-	ButtonEventsTest-Runner 
+	ButtonPropertiesTestRunner \
+	ButtonEventsTest-Runner \
+	$(NULL)
 endif
 
 if MING_VERSION_0_4_3
@@ -1682,6 +1685,27 @@ SharedObjectTestRunner: SharedObjectTestRunner.sh Makefile SharedObjectTest.swf
 StageConfigTest.swf: $(srcdir)/StageConfigTest.as 
 	$(MAKESWF) -o $@ -s 512x512 $(srcdir)/StageConfigTest.as
 
+ButtonPropertiesTest_SOURCES = \
+	ButtonPropertiesTest.c \
+	$(NULL)
+ButtonPropertiesTest_LDADD = libgnashmingutils.la
+ButtonPropertiesTest.swf: ButtonPropertiesTest
+	./ButtonPropertiesTest $(top_srcdir)/testsuite/media
+ButtonPropertiesTestRunner_SOURCES = \
+	ButtonPropertiesTestRunner.cpp \
+	$(NULL)
+ButtonPropertiesTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+ButtonPropertiesTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	ButtonPropertiesTest.swf	\
+	$(NULL)
+ButtonPropertiesTestRunner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+
 init_action_test_SOURCES =	\
 	init_action_test.c	\
 	$(NULL)
@@ -2047,6 +2071,7 @@ endif
 
 if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 TEST_CASES += \
+	ButtonPropertiesTestRunner \
 	ButtonEventsTest-Runner \
 	$(NULL)
 endif
