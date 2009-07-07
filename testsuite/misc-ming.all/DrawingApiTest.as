@@ -227,6 +227,8 @@ with (a)
 	check( zshape.hitTest((223+25), (145+20), true) ); // 3
 	check( zshape.hitTest(273, 165, true) ); // 4
 
+	// The ugly orange stroke / light brown fill
+	// expected to auto-close on endFill()
 	createEmptyMovieClip("x", 20);
 	with (x)
 	{
