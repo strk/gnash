@@ -58,7 +58,24 @@ void
 DynamicShape::endFill()
 {
 	// Close the path
-	if ( _currpath ) _currpath->close();
+	if ( _currpath && _currfill )
+	{
+		// TODO: should not just close the last path
+		//       but rather append the point where
+		//       the fill actually begun (could be
+		//       in a previous path).
+		//
+		// NOTE that doing so will require changing 
+		// the hitTest code to do stop considering
+		// each path in isolation when doing PIP testing
+		//
+
+		_currpath->close();
+
+		// reset _x and _y to reflect closing point
+		_x = _currpath->ap.x;
+		_y = _currpath->ap.y;
+	}
 
 	// Remove reference to the "current" path, as
 	// next drawing will happen on a different one
@@ -70,12 +87,13 @@ DynamicShape::endFill()
 void
 DynamicShape::beginFill(const rgba& color)
 {
-	// Add the new fill style and set as current
-	fill_style style; style.setSolid(color);
-
+	// End previous fill
 	endFill();
 
+	// Add the new fill style and set as current
+	fill_style style; style.setSolid(color);
 	_currfill = add_fill_style(style);
+
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
@@ -102,12 +120,14 @@ DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, 
 void
 DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
 {
-	// Add the new fill style and set as current
-	fill_style style; style.setRadialGradient(grad, mat);
 
+	// End previous fill
 	endFill();
 
+	// Add the new fill style and set as current
+	fill_style style; style.setRadialGradient(grad, mat);
 	_currfill = add_fill_style(style);
+
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
@@ -119,10 +139,14 @@ void
 DynamicShape::startNewPath(bool newShape)
 {
 	// Close any pending filled path
-	if ( _currpath && _currfill) _currpath->close();
+	if ( _currpath && _currfill)
+	{
+		// TODO: this is probably bogus
+		_currpath->close();
+	}
 
 	// The DrawingApiTest.swf file shows we should not
-	// end the current fill when starting a new one.
+	// end the current fill when starting a new path.
 
 	// A quick test shows that *left* always work fine !
 	// More than that, using a *right* fill seems to break the tests !
