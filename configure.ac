@@ -1756,8 +1756,12 @@ if test x$cross_compiling = xno; then
   AC_PATH_MTASC
   AC_PATH_HAXE
 fi
-AM_CONDITIONAL(ENABLE_AS3COMPILE, [ test x"$AS3COMPILE" != x ])
+
 AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
+AM_CONDITIONAL(SWFMILL_AS3_SUPPORT,
+        [ test x"$SWFMILL" != x && test $SWFMILL_VERSION -ge 00021206 ])
+
+AM_CONDITIONAL(ENABLE_AS3COMPILE, [ test x"$AS3COMPILE" != x ])
 AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
 AM_CONDITIONAL(ENABLE_SWFC, [ test x"$SWFC" != x ])
@@ -3136,7 +3140,7 @@ if test x"$testsuite" = x"yes"; then
       echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
     else
       echo "        WARNING: You need to have the HAXE compiler package " >&4
-      echo "                 version 2.00 or hither installed" >&4
+      echo "                 version 2.00 or higher installed" >&4
       echo "                 to run some of the tests in Gnash testsuite." >&4
       echo "                 You can install it from http://haxe.org" >&4
       echo "                 or .deb users: apt-get install haxe" >&4
@@ -3144,6 +3148,11 @@ if test x"$testsuite" = x"yes"; then
 
     if test x"$SWFMILL" != x; then
       echo "        SWFMILL is $SWFMILL"
+      if test x"$ENABLE_AVM2" != x -a "$SWFMILL_VERSION" -lt 00021206; then
+        echo "        WARNING: You are building Gnash with AVM2 support but" >&4
+        echo "                 your swfmill version is too old to run AS3" >&4
+        echo "                 tests." >&4
+      fi
     else
       echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
       echo "                 to run some of the tests in Gnash testsuite." >&4

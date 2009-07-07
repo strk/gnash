@@ -307,6 +307,7 @@ if ENABLE_HAXE
 endif
 if ENABLE_SWFMILL
 	@echo "	SWFMILL $(SWFMILL) "
+	@echo "	SWFMILL_VERSION_CODE $(SWFMILL_VERSION) "
 endif
 if ENABLE_SWFC
 	@echo "	SWFC $(SWFC) "
