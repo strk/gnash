@@ -590,7 +590,7 @@ with(line) {
     // =======================
 
     beginFill(col,colc);
-    lineStyle(n,1,alpha);
+    lineStyle(n,0x0000ff,alpha);
 
     moveTo(x,y);
     lineTo(x+xr,y);
@@ -599,7 +599,7 @@ with(line) {
     // In Gnash, next line forces a new path,
     // and closeup of the former (shouldn't)
     // 
-    lineStyle(n,100,alpha);
+    lineStyle(n,0x00ff00,alpha);
 
     lineTo(x,(y+yr));
     lineTo(x,y);
@@ -618,11 +618,11 @@ with(line) {
     moveTo(x,y);
     lineTo(x+xr,y);
 
-    lineStyle(n,1,alpha);
+    lineStyle(n,0x0000ff,alpha);
 
     lineTo((x+xr),(y+yr));
 
-    lineStyle(n,1,alpha);
+    lineStyle(n,0x00ff00,alpha);
 
     lineTo(x,(y+yr));
     lineTo(x,y);

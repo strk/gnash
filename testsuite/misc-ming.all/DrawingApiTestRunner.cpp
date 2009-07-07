@@ -758,6 +758,37 @@ main(int /*argc*/, char** /*argv*/)
 	// Cairo succeeds.
 	check_pixel(xo + (20*scale), yo + (25*scale), 3, white, 2);
 
+    // Test picture 3
+	tester.pressKey(gnash::key::_3); tester.advance();
+
+    // Shape 1
+
+    // Bottom left corner (green line).
+    check_pixel(20, 120, 2, green, 2);
+    // Bottom left fill (red)
+    check_pixel(40, 80, 2, red, 2);
+    // Top right fill (red)
+    check_pixel(100, 40, 2, red, 2);
+    // Dead centre fill (red)
+    xcheck_pixel(70, 70, 2, red, 2);
+    // Top right corner (blue line)
+    check_pixel(120, 20, 2, blue, 2);
+
+    // Shape 2
+    
+    // Bottom left corner (green line).
+    check_pixel(220, 120, 2, green, 2);
+    // Bottom left fill (red)
+    check_pixel(240, 80, 2, red, 2);
+    // Top right fill (red)
+    xcheck_pixel(300, 40, 2, red, 2);
+    // Dead centre fill (red)
+    xcheck_pixel(270, 70, 2, red, 2);
+    // Top right corner (blue line, is correct to be over black line ending)
+    check_pixel(320, 20, 2, blue, 2);
+    // Top centre (black line)
+    check_pixel(270, 20, 2, black, 2);
+
 	//----------------------------------------------------------
 	// TODO: check startDrag/stopDrag on the hit detector
 	// (hit 'd' key to toggle)
