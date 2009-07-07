@@ -21,9 +21,8 @@
 		trace("Sound duration is: ");
 		trace(snd.duration);
 		trace("Correct value should be 13740");
-		// fails due to missing sound handler when using gprocessor
-		// TODO: use gnash or register a sound handler with gprocessor !
-                xcheck_equals(snd.duration, 13740);
+		// fails when no media handler is compiled-in
+		check_equals(snd.duration, 13740);
 	
 		trace("Now I'll get the position before starting it");
 		sndpos=snd.position;
