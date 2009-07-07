@@ -217,6 +217,22 @@ private:
 // Forward declarations
 static as_object* getButtonInterface();
 
+namespace {
+    void addInstanceProperty(Button& b, DisplayObject* d) {
+        if (!d) return;
+        const std::string& name = d->get_name();
+        if (name.empty()) return;
+        b.init_member(name, d, 0);
+    }
+
+    void removeInstanceProperty(Button& b, DisplayObject* d) {
+        if (!d) return;
+        const std::string& name = d->get_name();
+        if (name.empty()) return;
+        b.delProperty(b.getVM().getStringTable().find(name));
+    }
+}
+
 /// Predicates for standard algorithms.
 
 /// Depth comparator for DisplayObjects.
@@ -683,9 +699,10 @@ Button::set_current_state(MouseState new_state)
 
         if ( ! shouldBeThere )
         {
+
             // is there, but is unloaded: destroy, clear slot and go on
-            if ( oldch && oldch->unloaded() )
-            {
+            if ( oldch && oldch->unloaded() ) {
+                removeInstanceProperty(*this, oldch);
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
                 _stateCharacters[i] = NULL;
                 oldch = NULL;
@@ -698,7 +715,8 @@ Button::set_current_state(MouseState new_state)
                 if ( ! oldch->unload() )
                 {
                     // No onUnload handler: destroy and clear slot
-                    if ( ! oldch->isDestroyed() ) oldch->destroy();
+                    removeInstanceProperty(*this, oldch);
+                    if (!oldch->isDestroyed()) oldch->destroy();
                     _stateCharacters[i] = NULL;
                 }
                 else
@@ -718,6 +736,7 @@ Button::set_current_state(MouseState new_state)
             // Is there already, but is unloaded: destroy and consider as gone
             if ( oldch && oldch->unloaded() )
             {
+                removeInstanceProperty(*this, oldch);
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
                 _stateCharacters[i] = NULL;
                 oldch = NULL;
@@ -730,6 +749,7 @@ Button::set_current_state(MouseState new_state)
                 
                 set_invalidated();
                 _stateCharacters[i] = ch;
+                addInstanceProperty(*this, ch);
                 ch->stagePlacementCallback(); 
             }
         }
@@ -885,6 +905,7 @@ Button::stagePlacementCallback(as_object* initObj)
         DisplayObject* ch = rec.instantiate(this);
 
         _stateCharacters[rno] = ch;
+        addInstanceProperty(*this, ch);
         ch->stagePlacementCallback(); // give this DisplayObject a life
     }
 
@@ -1125,7 +1146,12 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     os << actChars.size() << " active DisplayObjects for state " <<
         mouseStateName(_mouseState);
     InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Button state"), os.str()));        
+            StringPair(_("Button state"), os.str()));
+
+    os.str("");
+    os << std::boolalpha << isEnabled();
+    localIter = tr.append_child(selfIt, StringPair(_("Enabled"), os.str()));
+
     std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
 
