@@ -252,7 +252,7 @@ with (a)
 
 	check( x.hitTest(126, 168, true) ); 
 	check( x.hitTest(112, 158, true) ); 
-	check( x.hitTest(122, 157, true) ); 
+	check( x.hitTest(122, 157, true) ); // NOTE: flashplayer 10.0.12.10 for linux fails this, whereas 9.0.115.0 doesn't
 	check( ! x.hitTest(120, 155, true) ); 
 	check( x.hitTest(120, 155, false) ); 
 	check( ! x.hitTest(116, 177, true) ); 
