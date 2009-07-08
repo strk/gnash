@@ -920,6 +920,8 @@ AC_LIB_LTDL
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
+AM_CONDITIONAL(ENABLE_SHARED, [ test x$build_aqua = xno ])
+AM_CONDITIONAL(ENABLE_STATIC, [ test x$build_aqua = xyes ]) dnl the Aqua-binary is always static.
 dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
 AC_PATH_PROG(DEJAGNU, runtest)
