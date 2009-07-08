@@ -67,13 +67,6 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent,
 
   SWFTextField_addString(tf, text);
 
-  /*
-   * Bounds computed by Ming (if we omit the setBounds call)
-   * are 2640, 240. This means that we're shrinking the available
-   * space with this explicit setting. Gnash chokes in this case.
-   *
-   * Ref: https://savannah.gnu.org/bugs/?func=detailitem&item_id=16637.
-   */
   SWFTextField_setBounds(tf, 80, 16);
   
   return SWFMovie_add(mo, (SWFBlock)tf);
@@ -187,25 +180,25 @@ main(int argc, char** argv)
   SWFDisplayItem_scale(it, 8, 1);
   y += inc;
   
-  it = add_text_field(mo, (SWFBlock)bfont, "X scaled by 0.2", 1, 2, 3,
+  it = add_text_field(mo, (SWFBlock)bfont, "X scaled by 0.2", 8, 8, 8,
           SWFTEXTFIELD_ALIGN_LEFT, 10, 0, 0, 0, 255);
   SWFDisplayItem_moveTo(it, 50, y);
   SWFDisplayItem_scale(it, 0.2, 1);
   
   y += inc;
   
-  it = add_text_field(mo, (SWFBlock)bfont, "X scaled by 8", 0, 0, 0,
-          SWFTEXTFIELD_ALIGN_LEFT, 0, 0, 0, 0, 255);
+  it = add_text_field(mo, (SWFBlock)bfont, "Y scaled by 4", 4, 4, 0,
+          SWFTEXTFIELD_ALIGN_LEFT, 10, 0, 0, 0, 255);
   SWFDisplayItem_moveTo(it, 50, y);
-  SWFDisplayItem_scale(it, 8, 1);
-
-  y += inc;
+  SWFDisplayItem_scale(it, 1, 4);
   
-  it = add_text_field(mo, (SWFBlock)bfont, "Y scaled by 8", 1, 2, 3,
+  y += inc * 3;
+  
+  it = add_text_field(mo, (SWFBlock)bfont, "Y scaled by 8", 4, 4, 0,
           SWFTEXTFIELD_ALIGN_LEFT, 10, 0, 0, 0, 255);
   SWFDisplayItem_moveTo(it, 50, y);
   SWFDisplayItem_scale(it, 1, 8);
-  
+
   SWFMovie_nextFrame(mo); 
 
   /*****************************************************
