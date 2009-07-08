@@ -2058,33 +2058,38 @@ movieclip_beginFill(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
 
+    if ( fn.nargs < 1 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("beginFill() with no args is a no-op");
+        );
+        return as_value();
+    }
+
     boost::uint8_t r = 0;
     boost::uint8_t g = 0;
     boost::uint8_t b = 0;
     boost::uint8_t a = 255;
 
-    if ( fn.nargs > 0 )
+
+    // 2^24 is the max here
+    boost::uint32_t rgbval = boost::uint32_t(
+            clamp<float>(fn.arg(0).to_number(), 0, 16777216));
+    r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
+    g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
+    b = boost::uint8_t( (rgbval&0x0000FF) );
+
+    if ( fn.nargs > 1 )
     {
-        // 2^24 is the max here
-        boost::uint32_t rgbval = boost::uint32_t(
-                clamp<float>(fn.arg(0).to_number(), 0, 16777216));
-        r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
-        g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
-        b = boost::uint8_t( (rgbval&0x0000FF) );
-
-        if ( fn.nargs > 1 )
+        a = 255 * clamp<int>(fn.arg(1).to_int(), 0, 100) / 100;
+        IF_VERBOSE_ASCODING_ERRORS(
+        if ( fn.nargs > 2 )
         {
-            a = 255 * clamp<int>(fn.arg(1).to_int(), 0, 100) / 100;
-            IF_VERBOSE_ASCODING_ERRORS(
-            if ( fn.nargs > 2 )
-            {
-                std::stringstream ss; fn.dump_args(ss);
-                log_aserror(_("MovieClip.beginFill(%s): args after the "
-                        "first will be discarded"), ss.str());
-            }
-            );
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("MovieClip.beginFill(%s): args after the "
+                    "first will be discarded"), ss.str());
         }
-
+        );
     }
 
     rgba color(r, g, b, a);
