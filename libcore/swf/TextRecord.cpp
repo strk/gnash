@@ -142,7 +142,21 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 }
 
 
-// Render the given glyph records.
+///Render the given glyph records.
+//
+/// Display of device fonts is complicated in Gnash as we use the same
+/// rendering process as for embedded fonts.
+//
+/// The shape and position of a font relies on the concatenated transformation
+/// of its containing DisplayObject and all parent DisplayObjects.
+//
+/// Device fonts have the peculiarity that the glyphs are always scaled
+/// equally in both dimensions, using the y scale only. However, indentation
+/// and left margin (the starting x position) *are* scaled using the given
+/// x scale. The translation is applied as normal.
+//
+/// The proprietary player does not display rotated or skewed device fonts.
+/// Gnash does.
 void
 TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
         const TextRecords& records, bool embedded)
@@ -177,7 +191,12 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
         log_debug("font for TextRecord == %p" static_cast<void*>(fnt));
 #endif
 
-        if (rec.hasXOffset()) x = rec.xOffset();
+        // If we are displaying a device font, we will not be applying the
+        // matrix's x scale to each glyph. As the indentation and left
+        // margin are affected by the x scale, we must set it manually here.
+        if (rec.hasXOffset()) x =
+            embedded ? rec.xOffset() : rec.xOffset() * mat.get_x_scale();
+
         if (rec.hasYOffset()) y = rec.yOffset();
 
         boost::int16_t startX = x; // for the underline, if any
@@ -192,7 +211,19 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
 
             const int index = ge.index;
                 
-            SWFMatrix m = mat;
+            SWFMatrix m;
+            if (embedded) m = mat;
+            else {
+
+                // Device fonts adopt the concatenated translation.
+                m.tx = mat.tx;
+                m.ty = mat.ty;
+                // Device fonts have each glyph scaled in both dimensions
+                // by the matrix's y scale.
+                const double textScale = mat.get_y_scale();
+                m.concatenate_scale(textScale, textScale);
+            }
+
             m.concatenate_translation(x, y);
             m.concatenate_scale(scale, scale);
 
