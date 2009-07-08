@@ -78,6 +78,7 @@ check_PROGRAMS = \
 	DefineTextTest \
 	DefineTextTest-Runner \
 	TextSnapshotTest \
+	DeviceFontTest \
 	DefineEditTextTest \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
@@ -406,9 +407,13 @@ TextSnapshotTest-Runner: $(srcdir)/../generic-testrunner.sh TextSnapshotTest.swf
 	sh $< $(top_builddir) TextSnapshotTest.swf > $@
 	chmod 755 $@
 
+DeviceFontTest.swf: DeviceFontTest
+	./DeviceFontTest $(top_srcdir)/testsuite/media
+DeviceFontTest_SOURCES =  DeviceFontTest.c
+DeviceFontTest_LDADD = libgnashmingutils.la
+
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
-
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
 DefineEditTextTest_LDADD = libgnashmingutils.la
 
