@@ -166,9 +166,8 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
     double x = 0.0;
     double y = 0.0;
 
-    for (TextRecords::const_iterator i = records.begin(),
-            e = records.end(); i !=e; ++i)
-    {
+    for (TextRecords::const_iterator i = records.begin(), e = records.end();
+            i !=e; ++i) {
 
         // Draw the DisplayObjects within the current record; i.e. consecutive
         // chars that share a particular style.
@@ -202,14 +201,14 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
 
         if (rec.hasYOffset()) y = rec.yOffset();
 
-        boost::int16_t startX = x; // for the underline, if any
+        // Save for the underline, if any
+        const boost::int16_t startX = x; 
 
         const rgba textColor = cx.transform(rec.color());
 
         for (Glyphs::const_iterator j = rec.glyphs().begin(),
-                je = rec.glyphs().end(); j != je; ++j)
-        {
-            // the glyph entry
+                je = rec.glyphs().end(); j != je; ++j) {
+
             const TextRecord::GlyphEntry& ge = *j;
 
             const int index = ge.index;
@@ -217,7 +216,6 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
             SWFMatrix m;
             if (embedded) m = mat;
             else {
-
                 // Device fonts adopt the concatenated translation.
                 m.tx = mat.tx;
                 m.ty = mat.ty;
@@ -261,8 +259,7 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
             x += ge.advance;
         }
 
-        if (rec.underline())
-        {
+        if (rec.underline()) {
             // Underline should end where last displayed glyphs
             // does. 'x' here is where next glyph would be displayed
             // which is normally after some space.
