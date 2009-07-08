@@ -197,12 +197,13 @@ DynamicShape::resetLineStyle()
 void
 DynamicShape::moveTo(boost::int32_t x, boost::int32_t y)
 {
-	if ( x != _x || y != _y )
-	{
-		_x = x;
-		_y = y;
-		startNewPath(false);
-	}
+    // It was manually tested that a moveTo, even
+    // when moving to the same point of current cursor,
+    // will start a new path.
+
+    _x = x;
+    _y = y;
+    startNewPath(false);
 }
 
 void
