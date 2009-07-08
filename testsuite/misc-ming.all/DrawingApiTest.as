@@ -665,7 +665,7 @@ with(line) {
 
     // The shape is not closed to form a triangle,
     // so the only way to hit it is to hit the line.
-    check(!e.hitTest(x + 30, y + 30, true));
+    xcheck(!e.hitTest(x + 30, y + 30, true));
 
     // Top right 'corner'
     check(e.hitTest(x, y, true));
