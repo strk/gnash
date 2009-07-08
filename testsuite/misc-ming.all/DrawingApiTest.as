@@ -721,11 +721,14 @@ with(line) {
 
     // Top right
     // COMPATIBLITY NOTE:
-    // This test fails with 9,0,115,0, even though it is 
-    // clearly within a fill. It's a bug, so we should
-    // probably not worry about behaviour in this case.
-    // It succeeds with 10,0,12,10.
-    check(!g.hitTest(x + 80, y + 20, true));
+    // 9,0,115,0 for linux sometimes finds the point to hit
+    // the shape and sometimes it doesn't.
+    // 10,0,12,10 never succeeds the hit test.
+    //
+    // The point is clearly within a fill so we'll take an hit test
+    // success as expected.
+    //
+    xcheck(g.hitTest(x + 80, y + 20, true));
 
     _visible = false;
 }
