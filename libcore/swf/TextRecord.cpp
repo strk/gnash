@@ -142,19 +142,32 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 }
 
 
-// Render the given glyph records.
+///Render the given glyph records.
+//
+/// Display of device fonts is complicated in Gnash as we use the same
+/// rendering process as for embedded fonts.
+//
+/// The shape and position of a font relies on the concatenated transformation
+/// of its containing DisplayObject and all parent DisplayObjects.
+//
+/// Device fonts have the peculiarity that the glyphs are always scaled
+/// equally in both dimensions, using the y scale only. However, indentation
+/// and left margin (the starting x position) *are* scaled using the given
+/// x scale. The translation is applied as normal.
+//
+/// The proprietary player does not display rotated or skewed device fonts.
+/// Gnash does.
 void
 TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
         const TextRecords& records, bool embedded)
 {
 
     // Starting positions.
-    float x = 0.0f;
-    float y = 0.0f;
+    double x = 0.0;
+    double y = 0.0;
 
-    for (TextRecords::const_iterator i = records.begin(),
-            e = records.end(); i !=e; ++i)
-    {
+    for (TextRecords::const_iterator i = records.begin(), e = records.end();
+            i !=e; ++i) {
 
         // Draw the DisplayObjects within the current record; i.e. consecutive
         // chars that share a particular style.
@@ -177,22 +190,43 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
         log_debug("font for TextRecord == %p" static_cast<void*>(fnt));
 #endif
 
-        if (rec.hasXOffset()) x = rec.xOffset();
+        // If we are displaying a device font, we will not be applying the
+        // matrix's x scale to each glyph. As the indentation and left
+        // margin are affected by the x scale, we must set it manually here.
+        // Worse, as we will be applying the y scale, we cancel that out
+        // in advance.
+        if (rec.hasXOffset()) x =
+            embedded ? rec.xOffset() :
+                rec.xOffset() * mat.get_x_scale() / mat.get_y_scale();
+
         if (rec.hasYOffset()) y = rec.yOffset();
 
-        boost::int16_t startX = x; // for the underline, if any
+        // Save for the underline, if any
+        const boost::int16_t startX = x; 
 
-        const rgba textColor = cx.transform(rec.color());
+        rgba textColor = cx.transform(rec.color());
+
+        // Device fonts have no transparency.
+        if (!embedded) textColor.m_a = 0xff;
 
         for (Glyphs::const_iterator j = rec.glyphs().begin(),
-                je = rec.glyphs().end(); j != je; ++j)
-        {
-            // the glyph entry
+                je = rec.glyphs().end(); j != je; ++j) {
+
             const TextRecord::GlyphEntry& ge = *j;
 
             const int index = ge.index;
                 
-            SWFMatrix m = mat;
+            SWFMatrix m;
+            if (embedded) m = mat;
+            else {
+                // Device fonts adopt the concatenated translation.
+                m.concatenate_translation(mat.tx, mat.ty);
+                // Device fonts have each glyph scaled in both dimensions
+                // by the matrix's y scale.
+                const double textScale = mat.get_y_scale();
+                m.concatenate_scale(textScale, textScale);
+            }
+
             m.concatenate_translation(x, y);
             m.concatenate_scale(scale, scale);
 
@@ -227,8 +261,7 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
             x += ge.advance;
         }
 
-        if (rec.underline())
-        {
+        if (rec.underline()) {
             // Underline should end where last displayed glyphs
             // does. 'x' here is where next glyph would be displayed
             // which is normally after some space.
