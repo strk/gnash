@@ -898,15 +898,22 @@ fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 if test $ltmajor -eq 1; then
-AC_LIBLTDL_CONVENIENCE
-AC_LIBTOOL_DLOPEN
-AC_LIBTOOL_WIN32_DLL
-AC_DISABLE_STATIC
+	AC_LIBLTDL_CONVENIENCE
+	AC_LIBTOOL_DLOPEN
+	AC_LIBTOOL_WIN32_DLL
+	AC_DISABLE_STATIC
 else
-LT_INIT([dlopen win32-dll  disable-static])
-dnl lt_ltdl_dir=libbase/libltdlL
-LTDL_INIT([convenience recursive])
-AC_CONFIG_FILES([libltdl/Makefile])
+if test x$build_aqua = xyes; then
+	dnl the Aqua-binary is always static.
+	AC_ENABLE_STATIC
+	AC_DISABLE_SHARED
+else
+	AC_DISABLE_STATIC
+fi	
+	LT_INIT([dlopen win32-dll])
+	dnl lt_ltdl_dir=libbase/libltdl
+	LTDL_INIT([convenience recursive])
+	AC_CONFIG_FILES([libltdl/Makefile])
 fi
 AC_PROG_LIBTOOL
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
@@ -920,8 +927,6 @@ AC_LIB_LTDL
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
-AM_CONDITIONAL(ENABLE_SHARED, [ test x$build_aqua = xno ])
-AM_CONDITIONAL(ENABLE_STATIC, [ test x$build_aqua = xyes ]) dnl the Aqua-binary is always static.
 dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
 AC_PATH_PROG(DEJAGNU, runtest)
