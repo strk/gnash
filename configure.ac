@@ -1865,6 +1865,7 @@ AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI,       [ test x$build_fb = xyes ])
 AM_CONDITIONAL(BUILD_AQUA_GUI,     [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(ALLSTATIC,          [ test x$build_aqua = xyes ]) dnl the Aqua-binary is always static.
 AM_CONDITIONAL(BUILD_RISCOS_GUI,   [ test x$build_riscos = xyes ])
 AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
 AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
