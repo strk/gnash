@@ -204,7 +204,10 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
         // Save for the underline, if any
         const boost::int16_t startX = x; 
 
-        const rgba textColor = cx.transform(rec.color());
+        rgba textColor = cx.transform(rec.color());
+
+        // Device fonts have no transparency.
+        if (!embedded) textColor.m_a = 0xff;
 
         for (Glyphs::const_iterator j = rec.glyphs().begin(),
                 je = rec.glyphs().end(); j != je; ++j) {
