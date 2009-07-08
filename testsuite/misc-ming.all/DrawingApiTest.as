@@ -252,7 +252,11 @@ with (a)
 
 	check( x.hitTest(126, 168, true) ); 
 	check( x.hitTest(112, 158, true) ); 
-	check( x.hitTest(122, 157, true) ); // NOTE: flashplayer 10.0.12.10 for linux fails this, whereas 9.0.115.0 doesn't
+
+    // COMPATIBLITY NOTE:
+    // flashplayer 10.0.12.10 for linux fails this, whereas 9.0.115.0 doesn't
+	check( x.hitTest(122, 157, true) );
+
 	check( ! x.hitTest(120, 155, true) ); 
 	check( x.hitTest(120, 155, false) ); 
 	check( ! x.hitTest(116, 177, true) ); 
@@ -716,9 +720,11 @@ with(line) {
     check(g.hitTest(x + 20, y + 80, true));
 
     // Top right
-    // This is not a hit with 9,0,115,0, even though it is 
+    // COMPATIBLITY NOTE:
+    // This test fails with 9,0,115,0, even though it is 
     // clearly within a fill. It's a bug, so we should
     // probably not worry about behaviour in this case.
+    // It succeeds with 10,0,12,10.
     check(!g.hitTest(x + 80, y + 20, true));
 
     _visible = false;
