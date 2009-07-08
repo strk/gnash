@@ -194,10 +194,10 @@ class Rectangle_as {
 		//-------------------------------------------------------------
 
 #if flash9
-        var x1:Rectangle = new Rectangle();
+        var x1:Rectangle = untyped __new__(Rectangle);
         DejaGnu.note("var x1:Rectangle = new Rectangle();");
 #else
-		var x1:Rectangle<Int> = new Rectangle();
+		var x1:Rectangle<Int> = untyped __new__(Rectangle);
 		DejaGnu.note("var x1:Rectangle<Int> = new Rectangle();");
 #end
 		if (Type.typeof(x1) == ValueType.TObject) {
@@ -261,7 +261,7 @@ class Rectangle_as {
 		} else {
 			DejaGnu.fail("Rectangle object .height is not a number");
 		}
-		x1 = new Rectangle(1);
+		x1 = untyped __new__(Rectangle, 1);
 		DejaGnu.note("x1 = new Rectangle(1);");
 		if(untyped x1.hasOwnProperty('height')) {
 			DejaGnu.pass("Rectangle object has 'height' property");
@@ -333,7 +333,7 @@ class Rectangle_as {
 		//o1 = {}; o1.toString = function() { return '2'; };
 		var o1 = {};
 		Reflect.setField(o1, 'toString', function() { return '2'; });
-		x1 = new Rectangle(0,0,untyped o1,null);
+		x1 = new Rectangle(0, 0, untyped o1, null);
 		DejaGnu.note("x1 = new Rectangle(0,0,untyped o1,null);");
 		if (x1.toString() == "(x=0, y=0, w=2, h=null)") {
 			DejaGnu.pass("Rectangle object is correct rectangle (x=0, y=0, w=2, h=null)");
