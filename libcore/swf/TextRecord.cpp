@@ -163,8 +163,8 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
 {
 
     // Starting positions.
-    float x = 0.0f;
-    float y = 0.0f;
+    double x = 0.0;
+    double y = 0.0;
 
     for (TextRecords::const_iterator i = records.begin(),
             e = records.end(); i !=e; ++i)
@@ -194,8 +194,11 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
         // If we are displaying a device font, we will not be applying the
         // matrix's x scale to each glyph. As the indentation and left
         // margin are affected by the x scale, we must set it manually here.
+        // Worse, as we will be applying the y scale, we cancel that out
+        // in advance.
         if (rec.hasXOffset()) x =
-            embedded ? rec.xOffset() : rec.xOffset() * mat.get_x_scale();
+            embedded ? rec.xOffset() :
+                rec.xOffset() * mat.get_x_scale() / mat.get_y_scale();
 
         if (rec.hasYOffset()) y = rec.yOffset();
 
