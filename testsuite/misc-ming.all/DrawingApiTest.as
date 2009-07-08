@@ -671,7 +671,7 @@ with(line) {
 
     // The shape is not closed to form a triangle,
     // so the only way to hit it is to hit the line.
-    xcheck(!e.hitTest(x + 30, y + 30, true));
+    check(!e.hitTest(x + 30, y + 30, true));
 
     // Top right 'corner'
     check(e.hitTest(x, y, true));
@@ -728,7 +728,7 @@ with(line) {
     // The point is clearly within a fill so we'll take an hit test
     // success as expected.
     //
-    xcheck(g.hitTest(x + 80, y + 20, true));
+    check(g.hitTest(x + 80, y + 20, true));
 
     _visible = false;
 }

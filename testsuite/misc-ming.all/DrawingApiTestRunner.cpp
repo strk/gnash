@@ -806,7 +806,7 @@ main(int /*argc*/, char** /*argv*/)
     // Top right fill (none)
     check_pixel(x + 80, y + 20, 2, white, 2);
     // Dead centre fill (none)
-    xcheck_pixel(x + w / 2, y + h / 2, 2, white, 2);
+    check_pixel(x + w / 2, y + h / 2, 2, white, 2);
     // Top right corner (nothing)
     check_pixel(x + w, y, 2, white, 2);
 
@@ -820,11 +820,11 @@ main(int /*argc*/, char** /*argv*/)
     // Bottom left corner (black line).
     check_pixel(x, y + h, 2, black, 2);
     // Bottom left fill (none)
-    xcheck_pixel(x + 20, y + 60, 2, white, 2);
+    check_pixel(x + 20, y + 60, 2, white, 2);
     // Top right fill (none)
     check_pixel(x + 80, y + 20, 2, white, 2);
     // Dead centre fill (none)
-    xcheck_pixel(x + w / 2, y + h / 2, 2, white, 2);
+    check_pixel(x + w / 2, y + h / 2, 2, white, 2);
     // Top right corner (nothing)
     check_pixel(x + w, y, 2, white, 2);
 
@@ -860,7 +860,7 @@ main(int /*argc*/, char** /*argv*/)
     // The following tests are possibly meaningless:
     
     // Top right fill (blue)
-    xcheck_pixel(x + 80, y + 20, 2, blue, 2);
+    check_pixel(x + 80, y + 20, 2, blue, 2);
     // Dead centre (yellow line)
     check_pixel(x + w / 2, y + h / 2, 2, yellow, 2);
     // Top right corner (yellow line)
