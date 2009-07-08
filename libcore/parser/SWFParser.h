@@ -43,6 +43,10 @@ namespace gnash {
 /// the number of bytes read. It does not expose the absolute stream position.
 /// This is intended to make internal refactoring simpler. Users must tell
 /// the SWFParser how many bytes it should read from the stream.
+//
+/// The SWFParser will only deal with ParserExceptions in an open tag.
+/// Exceptions thrown when opening and closing tags signal a fatal error,
+/// and will be left to the callers to deal with.
 class SWFParser
 {
 

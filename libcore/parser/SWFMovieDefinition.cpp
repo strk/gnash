@@ -488,23 +488,30 @@ SWFMovieDefinition::read_all_swf()
 
     const size_t chunkSize = 65535;
 
-    while (left) {
+    try {
+        while (left) {
 
-        if (_loadingCanceled) {
-            log_debug("Loading thread cancelation requested, "
-                    "returning from read_all_swf");
-            return;
+            if (_loadingCanceled) {
+                log_debug("Loading thread cancelation requested, "
+                        "returning from read_all_swf");
+                return;
+            }
+            if (!parser.read(std::min<size_t>(left, chunkSize))) break;
+            
+            left -= parser.bytesRead();
+            setBytesLoaded(startPos + parser.bytesRead());
         }
-        if (!parser.read(std::min<size_t>(left, chunkSize))) break;
-        
-        left -= parser.bytesRead();
-        setBytesLoaded(startPos + parser.bytesRead());
+
+        // Make sure we won't leave any pending writers
+        // on any eventual fd-based IOChannel.
+        _str->consumeInput();
+    
+    }
+    catch (const ParserException& e) {
+        // This is a fatal parser error.
+        log_error(_("Error while parsing SWF stream."));
     }
 
-	// Make sure we won't leave any pending writers
-	// on any eventual fd-based IOChannel.
-	_str->consumeInput();
-    
     // Set bytesLoaded to the current stream position unless it's greater
     // than the reported length. TODO: should we be trying to continue
     // parsing after an exception?
