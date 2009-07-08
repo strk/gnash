@@ -629,6 +629,96 @@ with(line) {
 
     endFill(); 
 
+    // =======================
+    //   Shape 3
+    // =======================
+
+    x += 200;
+
+    createEmptyMovieClip("d", 500);
+    with (d)
+    {
+        lineStyle(10, 10, 100);
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        endFill(); // does NOT force closeup
+    }
+
+    // =======================
+    //   Shape 4
+    // =======================
+
+    x = 20;
+    y += 150;
+
+    createEmptyMovieClip("e", 501);
+    with (e)
+    {
+        lineStyle(10, 10, 100);
+        beginFill(); // does NOT start a fill
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        endFill(); // does NOT force closeup
+    }
+
+    // The shape is not closed to form a triangle,
+    // so the only way to hit it is to hit the line.
+    check(!e.hitTest(x + 30, y + 30, true));
+
+    // Top right 'corner'
+    check(e.hitTest(x, y, true));
+
+    // =======================
+    //   Shape 5
+    // =======================
+
+    x += 200;
+
+    createEmptyMovieClip("f", 502);
+    with (f)
+    {
+        lineStyle(10, 10, 100);
+        beginFill(0); // does start a fill
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        endFill(); // DOES force closeup
+    }
+    
+    // Somewhere within the closed triangle.
+    check(f.hitTest(x + 30, y + 30, true));
+
+    // =======================
+    //   Shape 6
+    // =======================
+    
+    x += 200;
+
+    createEmptyMovieClip("g", 503);
+    with (g)
+    {
+        lineStyle(10, 0xFFFF00, 100);
+        beginFill(0x00ff00); // does start a fill
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        beginFill(0x0000ff); // closes previous fill, opens a new one
+        lineTo(x + xr, y);
+        lineTo(x + xr, y + yr);
+        endFill(); // DOES force closeup
+    }
+
+    // Bottom left
+    check(g.hitTest(x + 20, y + 80, true));
+
+    // Top right
+    // This is not a hit with 9,0,115,0, even though it is 
+    // clearly within a fill. It's a bug, so we should
+    // probably not worry about behaviour in this case.
+    check(!g.hitTest(x + 80, y + 20, true));
+
     _visible = false;
 }
 line.onRollOver = function() {};
