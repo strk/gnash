@@ -79,6 +79,8 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 
     SWFParser parser(in, this, runInfo);
 
+    // This can throw a ParserException; we will let the SWFMovieDefintion
+    // catch it, as a failure means the whole stream is invalid.
     parser.read(tag_end - in.tell());
 
     if (m_frame_count > m_loading_frame) {
