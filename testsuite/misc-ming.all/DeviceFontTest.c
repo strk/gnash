@@ -62,8 +62,7 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent,
   SWFTextField_setLineSpacing(tf, lineSpacing);
   SWFTextField_setColor(tf, textR, textG, textB, textA);
 
-  /* setting flags seem unneeded */
-  /*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
+  SWFTextField_setFlags(tf, SWFTEXTFIELD_DRAWBOX);
   SWFTextField_addChars(tf, text);
 
   SWFTextField_addString(tf, text);
@@ -75,23 +74,8 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent,
    *
    * Ref: https://savannah.gnu.org/bugs/?func=detailitem&item_id=16637.
    */
-  SWFTextField_setBounds(tf, 100, 100);
-  //SWFTextField_setBounds(tf, 60000, 338);
-
-  /*
-   * The following settings (found in the reported SWF)
-   * are not needed to exploit the bug.
-   */
- 
-  /*SWFTextField_setHeight(tf, 240);*/
-  /*SWFTextField_setColor(tf, 0x00, 0x00, 0x00, 0xff);*/
-  /*SWFTextField_setAlignment(tf, SWFTEXTFIELD_ALIGN_LEFT);*/
-  /*SWFTextField_setLeftMargin(tf, 0);*/
-  /*SWFTextField_setRightMargin(tf, 0);*/
-  /*SWFTextField_setIndentation(tf, 0);*/
-  /*SWFTextField_setLineSpacing(tf, 40);*/
-  /*SWFTextField_setLineSpacing(tf, 40);*/
-
+  SWFTextField_setBounds(tf, 80, 16);
+  
   return SWFMovie_add(mo, (SWFBlock)tf);
 }
 
