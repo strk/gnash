@@ -761,35 +761,112 @@ main(int /*argc*/, char** /*argv*/)
     // Test picture 3
 	tester.pressKey(gnash::key::_3); tester.advance();
 
+    const int w = 100, h = 100;
+
+    int x = 20, y = 20;
+
     // Shape 1
 
     // Bottom left corner (green line).
-    check_pixel(20, 120, 2, green, 2);
+    check_pixel(x, y + h, 2, green, 2);
     // Bottom left fill (red)
-    check_pixel(40, 80, 2, red, 2);
+    check_pixel(x + 20, y + 60, 2, red, 2);
     // Top right fill (red)
-    check_pixel(100, 40, 2, red, 2);
+    check_pixel(x + 80, y + 20, 2, red, 2);
     // Dead centre fill (red)
-    xcheck_pixel(70, 70, 2, red, 2);
+    xcheck_pixel(x + w / 2, y + h / 2, 2, red, 2);
     // Top right corner (blue line)
-    check_pixel(120, 20, 2, blue, 2);
+    check_pixel(x + w, y, 2, blue, 2);
 
     // Shape 2
     
-    // Bottom left corner (green line).
-    check_pixel(220, 120, 2, green, 2);
-    // Bottom left fill (red)
-    check_pixel(240, 80, 2, red, 2);
-    // Top right fill (red)
-    xcheck_pixel(300, 40, 2, red, 2);
-    // Dead centre fill (red)
-    xcheck_pixel(270, 70, 2, red, 2);
-    // Top right corner (blue line, is correct to be over black line ending)
-    check_pixel(320, 20, 2, blue, 2);
-    // Top centre (black line)
-    check_pixel(270, 20, 2, black, 2);
+    x += 200;
 
-	//----------------------------------------------------------
+    // Bottom left corner (green line).
+    check_pixel(x, y + h, 2, green, 2);
+    // Bottom left fill (red)
+    check_pixel(x + 20, y + 60, 2, red, 2);
+    // Top right fill (red)
+    xcheck_pixel(x + 80, y + 20, 2, red, 2);
+    // Dead centre fill (red)
+    xcheck_pixel(x + w / 2, y + h / 2, 2, red, 2);
+    // Top right corner (blue line, is correct to be over black line ending)
+    check_pixel(x + w, y, 2, blue, 2);
+    // Top centre (black line)
+    check_pixel(x + w / 2, y, 2, black, 2);
+
+    // Shape 3
+    
+    x += 200;
+
+    // Bottom left corner (black line).
+    check_pixel(x, y + h, 2, black, 2);
+    // Bottom left fill (none)
+    check_pixel(x + 20, y + 60, 2, white, 2);
+    // Top right fill (none)
+    check_pixel(x + 80, y + 20, 2, white, 2);
+    // Dead centre fill (none)
+    xcheck_pixel(x + w / 2, y + h / 2, 2, white, 2);
+    // Top right corner (nothing)
+    check_pixel(x + w, y, 2, white, 2);
+
+    // Shape 4
+    
+    x = 20;
+    y += 150;
+
+    // Should look the same as Shape 3
+
+    // Bottom left corner (black line).
+    check_pixel(x, y + h, 2, black, 2);
+    // Bottom left fill (none)
+    xcheck_pixel(x + 20, y + 60, 2, white, 2);
+    // Top right fill (none)
+    check_pixel(x + 80, y + 20, 2, white, 2);
+    // Dead centre fill (none)
+    xcheck_pixel(x + w / 2, y + h / 2, 2, white, 2);
+    // Top right corner (nothing)
+    check_pixel(x + w, y, 2, white, 2);
+
+    // Shape 5
+
+    x += 200;
+
+    // Bottom left corner (black line).
+    check_pixel(x, y + h, 2, black, 2);
+    // Bottom left fill (black)
+    check_pixel(x + 20, y + 60, 2, black, 2);
+    // Top right fill (none)
+    check_pixel(x + 80, y + 20, 2, white, 2);
+    // Dead centre (black line)
+    check_pixel(x + w / 2, y + h / 2, 2, black, 2);
+    // Top right corner (nothing)
+    check_pixel(x + w, y, 2, white, 2);
+    
+    // Shape 6
+
+    x += 200;
+
+    // NB: the rendering of this shape is not consistent
+    // across different versions of the pp. It doesn't seem
+    // like a sane case, so there is probably no need
+    // to worry about compatibility.
+
+    // Bottom left corner (yellow line).
+    check_pixel(x, y + h, 2, yellow, 2);
+    // Bottom left fill (green)
+    check_pixel(x + 20, y + 60, 2, green, 2);
+
+    // The following tests are possibly meaningless:
+    
+    // Top right fill (blue)
+    xcheck_pixel(x + 80, y + 20, 2, blue, 2);
+    // Dead centre (yellow line)
+    check_pixel(x + w / 2, y + h / 2, 2, yellow, 2);
+    // Top right corner (yellow line)
+    check_pixel(x + w, y, 2, yellow, 2);
+
+    //----------------------------------------------------------
 	// TODO: check startDrag/stopDrag on the hit detector
 	// (hit 'd' key to toggle)
 	//----------------------------------------------------------
