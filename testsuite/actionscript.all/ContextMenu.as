@@ -86,7 +86,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // Check that the hideBuiltInItems method isn't fussy.
   e = {};
-  e.builtInItems = new Object();
   e.f = ContextMenu.prototype.hideBuiltInItems;
   e.f();
   s = "";
