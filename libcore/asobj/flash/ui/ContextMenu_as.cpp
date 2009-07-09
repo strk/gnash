@@ -47,21 +47,6 @@ namespace {
 
 }
 
-class ContextMenu_as : public as_object
-{
-
-public:
-
-    ContextMenu_as()
-        :
-        as_object(getContextMenuInterface())
-    {}
-
-private:
-
-};
-
-
 // extern (used by Global.cpp)
 void
 contextmenu_class_init(as_object& global)
@@ -142,7 +127,8 @@ contextmenu_copy(const fn_call& fn)
 as_value
 contextmenu_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new ContextMenu_as;
+    boost::intrusive_ptr<as_object> obj =
+        new as_object(getContextMenuInterface());
 
     // There is always an onSelect member, but it may be undefined.
     const as_value& callback = fn.nargs ? fn.arg(0) : as_value();
