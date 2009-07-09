@@ -117,6 +117,16 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(ee.builtInItems.extraProp, "boo");
   check(ee instanceof ContextMenu);
 
+  // It will copy anything, not just objects
+  f = {};
+  f.builtInItems = 6;
+  f.copy = ContextMenu.prototype.copy;
+  ff = f.copy();
+  check(ff.hasOwnProperty("builtInItems"));
+  check(ff.hasOwnProperty("customItems"));
+  check(ff.hasOwnProperty("onSelect"));
+  check_equals(ff.builtInItems, 6);
+
   // Test ContextMenuItem
   
   xcheck_equals(typeof(ContextMenuItem), "function");
@@ -223,6 +233,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  totals(92);
+  totals(96);
 
 #endif
