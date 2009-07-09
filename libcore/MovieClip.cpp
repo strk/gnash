@@ -2158,6 +2158,7 @@ MovieClip::constructAsScriptObject()
                 if ( swfversion == 6 )
                 {
                     set_member(NSV::PROP_CONSTRUCTOR, ctor);
+                    set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
                 }
 
                 // Provide a 'super' reference..
