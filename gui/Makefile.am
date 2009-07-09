@@ -268,7 +268,7 @@ endif
 
 CLEANFILES = klash3.moc klash4.moc .configline gnash
 
-bundle: Info.plist
+bundle: Info.plist aqua-gnash
 	@echo " Building: $(bundle_name)" 
 	rm -rf $(bundle_name)/Contents
 	mkdir -p $(bundle_name)/Contents/MacOS
