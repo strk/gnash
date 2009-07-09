@@ -2151,10 +2151,14 @@ MovieClip::constructAsScriptObject()
             if ( swfversion > 5 )
             {
 
+                const int flags = as_prop_flags::dontEnum;
+
                 set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
+                set_member_flags(NSV::PROP_uuCONSTRUCTORuu, flags);
                 if ( swfversion == 6 )
                 {
                     set_member(NSV::PROP_CONSTRUCTOR, ctor);
+                    set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
                 }
 
                 // Provide a 'super' reference..
@@ -2477,10 +2481,14 @@ public:
 
     void operator() (DisplayObject* ch)
     {
-        // don't enumerate unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
-
-        _env.push(ch->get_name());
+        // Don't enumerate unloaded DisplayObjects
+        if (ch->unloaded()) return;
+        
+        const std::string& name = ch->get_name();
+        // Don't enumerate unnamed DisplayObjects
+        if (name.empty()) return;
+        
+        _env.push(name);
     }
 };
 
