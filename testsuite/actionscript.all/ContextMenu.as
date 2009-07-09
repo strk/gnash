@@ -56,20 +56,20 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(typeof(cm.copy), "function");
   check_equals(typeof(cm.hideBuiltInItems), "function");
 
-  xcheck(cm.hasOwnProperty("builtInItems"));  
-  xcheck(cm.hasOwnProperty("customItems"));
-  xcheck(cm.hasOwnProperty("onSelect"));  
+  check(cm.hasOwnProperty("builtInItems"));  
+  check(cm.hasOwnProperty("customItems"));
+  check(cm.hasOwnProperty("onSelect"));  
 
-  xcheck_equals(typeof(cm.builtInItems), "object");  
+  check_equals(typeof(cm.builtInItems), "object");  
   check(!cm.builtInItems instanceof Array);
   check_equals(typeof(cm.builtInItems.length), 'undefined');
 
-  xcheck_equals(typeof(cm.customItems), "object");
-  xcheck(cm.customItems instanceof Array);
-  xcheck_equals(typeof(cm.customItems.length), 'number');
+  check_equals(typeof(cm.customItems), "object");
+  check(cm.customItems instanceof Array);
+  check_equals(typeof(cm.customItems.length), 'number');
 
   // There are no custom items by default.
-  xcheck_equals(cm.customItems.length, 0);
+  check_equals(cm.customItems.length, 0);
 
   check_equals(typeof(cm.onSelect), "undefined");
  
@@ -81,7 +81,7 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
      check_equals(typeof(o[i]), "boolean");
      s += i + ",";
   }
-  xcheck_equals(s, "save,zoom,quality,play,loop,rewind,forward_back,print,");
+  check_equals(s, "save,zoom,quality,play,loop,rewind,forward_back,print,");
 
 
   // Test ContextMenuItem
@@ -132,7 +132,7 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // Add a test object to the ContextMenu
   cm.customItems.push(it);
-  xcheck_equals(cm.customItems.length, 1);
+  check_equals(cm.customItems.length, 1);
   _root.menu = cm;
 
   // An object is added to the menu if:
@@ -190,6 +190,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  xtotals(82);
+  totals(82);
 
 #endif
