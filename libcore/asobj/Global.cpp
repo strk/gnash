@@ -364,7 +364,7 @@ avm1Classes()
         (N(NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
            NS_GLOBAL, 6))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 7))
+           NS_GLOBAL, 5))
         (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
            NSV::CLASS_OBJECT, NS_GLOBAL, 7))
         (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
