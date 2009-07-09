@@ -43,7 +43,7 @@ namespace {
     void attachContextMenuInterface(as_object& o);
     void attachContextMenuStaticInterface(as_object& o);
     as_object* getContextMenuInterface();
-    as_object* getBuiltInItemsObject();
+    as_object* setBuiltInItems();
 
 }
 
@@ -79,29 +79,32 @@ contextmenu_class_init(as_object& global)
 
 namespace {
 
-as_object*
-getBuiltInItemsObject()
+void
+setBuiltInItems(as_object& o, bool setting)
 {
-    as_object* o = new as_object();
     const int flags = 0;
-    o->init_member("print", true, flags);
-    o->init_member("forward_back", true, flags);
-    o->init_member("rewind", true, flags);
-    o->init_member("loop", true, flags);
-    o->init_member("play", true, flags);
-    o->init_member("quality", true, flags);
-    o->init_member("zoom", true, flags);
-    o->init_member("save", true, flags);
-    return o;
+    string_table& st = o.getVM().getStringTable();
+    o.set_member(st.find("print"), setting, flags);
+    o.set_member(st.find("forward_back"), setting, flags);
+    o.set_member(st.find("rewind"), setting, flags);
+    o.set_member(st.find("loop"), setting, flags);
+    o.set_member(st.find("play"), setting, flags);
+    o.set_member(st.find("quality"), setting, flags);
+    o.set_member(st.find("zoom"), setting, flags);
+    o.set_member(st.find("save"), setting, flags);
 }
 
 
 void
 attachContextMenuInterface(as_object& o)
 {
+    const int flags = as_prop_flags::dontDelete |
+                      as_prop_flags::dontEnum |
+                      as_prop_flags::onlySWF7Up;
+
     o.init_member("hideBuiltInItems",
-            new builtin_function(contextmenu_hideBuiltInItems));
-    o.init_member("copy", new builtin_function(contextmenu_copy));
+            new builtin_function(contextmenu_hideBuiltInItems), flags);
+    o.init_member("copy", new builtin_function(contextmenu_copy), flags);
 }
 
 as_object*
@@ -119,21 +122,21 @@ getContextMenuInterface()
 as_value
 contextmenu_hideBuiltInItems(const fn_call& fn)
 {
-    boost::intrusive_ptr<ContextMenu_as> ptr =
-        ensureType<ContextMenu_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    string_table& st = fn.getVM().getStringTable();
+    as_object* builtIns = new as_object;
+    setBuiltInItems(*builtIns, false);
+    ptr->set_member(st.find("builtInItems"), builtIns);
     return as_value();
 }
 
 as_value
 contextmenu_copy(const fn_call& fn)
 {
-    boost::intrusive_ptr<ContextMenu_as> ptr =
-        ensureType<ContextMenu_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* o = new as_object;
+    o->copyProperties(*ptr);
+    return as_value(o);
 }
 
 as_value
@@ -146,7 +149,9 @@ contextmenu_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_ON_SELECT, callback);
     
     string_table& st = fn.getVM().getStringTable();
-    obj->set_member(st.find("builtInItems"), getBuiltInItemsObject());
+    as_object* builtInItems = new as_object;
+    setBuiltInItems(*builtInItems, true);
+    obj->set_member(st.find("builtInItems"), builtInItems);
 
     // There is an empty customItems array.
     Array_as* customItems = new Array_as();
