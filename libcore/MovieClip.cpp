@@ -2481,10 +2481,14 @@ public:
 
     void operator() (DisplayObject* ch)
     {
-        // don't enumerate unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
-
-        _env.push(ch->get_name());
+        // Don't enumerate unloaded DisplayObjects
+        if (ch->unloaded()) return;
+        
+        const std::string& name = ch->get_name();
+        // Don't enumerate unnamed DisplayObjects
+        if (name.empty()) return;
+        
+        _env.push(name);
     }
 };
 
