@@ -177,6 +177,11 @@ main(int argc, char** argv)
 	check(mo, "clip1 instanceOf MovieClip");
 	check_equals(mo, "clip1._x", "0");
 	check(mo, "! clip1 instanceOf CustomClass");
+	
+	// Check that non-enumerable properties (unnamed instances,
+	// constructor, __constructor__) are not enumerated.
+	add_actions(mo, "var s = ''; for (i in clip1) { s += i + ','; };");
+	xcheck_equals(mo, "s", "'onRollOver,'");
 
 	check_equals(mo, "typeof(clip2)", "'movieclip'");
 	check(mo, "clip2 instanceOf CustomClass");
@@ -189,6 +194,11 @@ main(int argc, char** argv)
 	check_equals(mo, "clip2._x", "80");
 	check_equals(mo, "typeof(clip2.lineTo)", "'undefined'");
 	check(mo, "! clip2 instanceOf MovieClip");
+	
+	// Check that non-enumerable properties (unnamed instances,
+	// constructor, __constructor__) are not enumerated.
+	add_actions(mo, "var s = ''; for (i in clip2) { s += i + ','; };");
+	xcheck_equals(mo, "s", "'onLoad,onRollOver,'");
 
 	check(mo, "clip3.hasOwnProperty('__constructor__')");
 	check(mo, "clip3.hasOwnProperty('constructor')");
@@ -200,6 +210,11 @@ main(int argc, char** argv)
 	check_equals(mo, "clip3._x", "160");
 	check(mo, "clip3 instanceOf CustomClass2");
 	check(mo, "clip3 instanceOf MovieClip");
+	
+	// Check that non-enumerable properties (unnamed instances,
+	// constructor, __constructor__) are not enumerated.
+	add_actions(mo, "var s = ''; for (i in clip3) { s += i + ','; };");
+	xcheck_equals(mo, "s", "'onRollOver,'");
 
 	check(mo, "clip4.hasOwnProperty('__constructor__')");
 	check(mo, "clip4.hasOwnProperty('constructor')");
@@ -212,7 +227,7 @@ main(int argc, char** argv)
 	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
-		"totals(44);"
+		"totals(47);"
 		"stop();"
 		);
 
