@@ -44,7 +44,7 @@ DISPLAY_HEADERS_AS2 += asobj/flash/display/BitmapData_as.h
 endif
 
 # if BUILD_BITMAP_AS3
-# DISPLAY_SOURCES += asobj/flash/display/Bitmap_as.cpp
+DISPLAY_SOURCES += asobj/flash/display/Bitmap_as.cpp
 DISPLAY_HEADERS += asobj/flash/display/Bitmap_as.h
 # endif
 

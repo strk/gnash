@@ -53,6 +53,7 @@ enum NamedStrings {
         CLASS_ANTIALIASTYPE,
         CLASS_ARRAY,
         CLASS_AS_BROADCASTER,
+        CLASS_BITMAP,
         CLASS_BOOLEAN,
         CLASS_BUTTON,
         CLASS_CAMERA,

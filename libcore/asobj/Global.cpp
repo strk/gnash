@@ -51,6 +51,7 @@
 #include "flash/display/Stage_as.h"
 #include "flash/display/MovieClip_as.h"
 #include "flash/display/Sprite_as.h"
+#include "flash/display/Bitmap_as.h"
 #include "flash/events/Event_as.h"
 #include "flash/events/EventDispatcher_as.h"
 #include "flash/net/LocalConnection_as.h"
@@ -414,6 +415,8 @@ avm2Classes()
            NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY, 3))
         (N(sprite_class_init, NSV::CLASS_SPRITE,
            NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::NS_FLASH_DISPLAY, 3))
+        (N(bitmap_class_init, NSV::CLASS_BITMAP, NSV::CLASS_DISPLAYOBJECT,
+           NSV::NS_FLASH_DISPLAY, 3))
         (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, NSV::CLASS_SPRITE,
            NSV::NS_FLASH_DISPLAY, 3))
         (N(stage_class_init, NSV::CLASS_STAGE, NSV::CLASS_MOVIE_CLIP,

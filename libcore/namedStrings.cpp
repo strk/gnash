@@ -178,6 +178,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "Button", NSV::CLASS_BUTTON ),
 	string_table::svt( "Math", NSV::CLASS_MATH ),
 	string_table::svt( "Boolean", NSV::CLASS_BOOLEAN ),
+	string_table::svt( "Bitmap", NSV::CLASS_BITMAP ),
 	string_table::svt( "Color", NSV::CLASS_COLOR ),
 	string_table::svt( "Selection", NSV::CLASS_SELECTION ),
 	string_table::svt( "Sound", NSV::CLASS_SOUND ),
