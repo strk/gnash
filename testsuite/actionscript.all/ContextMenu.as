@@ -84,6 +84,17 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(s, "save,zoom,quality,play,loop,rewind,forward_back,print,");
 
 
+  // Check that the hideBuiltInItems method isn't fussy.
+  e = {};
+  e.builtInItems = new Object();
+  e.f = ContextMenu.prototype.hideBuiltInItems;
+  e.f();
+  s = "";
+  for (i in e.builtInItems) {
+      s += i + ":" + e.builtInItems[i] + ",";
+  };
+  check_equals(s, "save:false,zoom:false,quality:false,play:false,loop:false,rewind:false,forward_back:false,print:false,");
+
   // Test ContextMenuItem
   
   xcheck_equals(typeof(ContextMenuItem), "function");
