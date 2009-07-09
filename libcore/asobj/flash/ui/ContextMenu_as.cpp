@@ -30,6 +30,7 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "Array_as.h"
 
 namespace gnash {
 
@@ -42,6 +43,7 @@ namespace {
     void attachContextMenuInterface(as_object& o);
     void attachContextMenuStaticInterface(as_object& o);
     as_object* getContextMenuInterface();
+    as_object* getBuiltInItemsObject();
 
 }
 
@@ -76,6 +78,23 @@ contextmenu_class_init(as_object& global)
 
 
 namespace {
+
+as_object*
+getBuiltInItemsObject()
+{
+    as_object* o = new as_object();
+    const int flags = 0;
+    o->init_member("print", true, flags);
+    o->init_member("forward_back", true, flags);
+    o->init_member("rewind", true, flags);
+    o->init_member("loop", true, flags);
+    o->init_member("play", true, flags);
+    o->init_member("quality", true, flags);
+    o->init_member("zoom", true, flags);
+    o->init_member("save", true, flags);
+    return o;
+}
+
 
 void
 attachContextMenuInterface(as_object& o)
@@ -122,9 +141,17 @@ contextmenu_ctor(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = new ContextMenu_as;
 
-    if (fn.nargs) {
-        obj->set_member(NSV::PROP_ON_SELECT, fn.arg(0));
-    }
+    // There is always an onSelect member, but it may be undefined.
+    const as_value& callback = fn.nargs ? fn.arg(0) : as_value();
+    obj->set_member(NSV::PROP_ON_SELECT, callback);
+    
+    string_table& st = fn.getVM().getStringTable();
+    obj->set_member(st.find("builtInItems"), getBuiltInItemsObject());
+
+    // There is an empty customItems array.
+    Array_as* customItems = new Array_as();
+    obj->set_member(st.find("customItems"), customItems);
+
     return as_value(obj.get()); // will keep alive
 }
 
