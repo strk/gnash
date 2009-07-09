@@ -36,8 +36,9 @@ namespace gnash {
 // Forward declarations
 namespace {
     as_value contextmenu_hideBuiltInItems(const fn_call& fn);
-    as_value contextmenu_menuSelect(const fn_call& fn);
+    as_value contextmenu_copy(const fn_call& fn);
     as_value contextmenu_ctor(const fn_call& fn);
+
     void attachContextMenuInterface(as_object& o);
     void attachContextMenuStaticInterface(as_object& o);
     as_object* getContextMenuInterface();
@@ -51,152 +52,26 @@ public:
 
     ContextMenu_as()
         :
-        as_object(getExportedInterface())
+        as_object(getContextMenuInterface())
     {}
 
-    ContextMenu_as(const as_value& callback)
-		:
-		as_object(getExportedInterface())
-	{
-		setCallback(callback);
-	}
-
-    ContextMenu_as(as_function* callback)
-		:
-		as_object(getExportedInterface())
-	{
-		setCallback(callback);
-	}
-
-	static void registerConstructor(as_object& global);
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "ContextMenu"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-
 private:
-
-	/// Get the callback to call when user invokes the context menu.
-	//
-	/// If NULL, no action will be taken on select.
-	///
-	as_function* getCallback() 
-	{
-		as_value tmp;
-		if (get_member(NSV::PROP_ON_SELECT, &tmp))
-			return tmp.to_as_function();
-		else return NULL;
-	}
-
-	/// Set the callback to call when user invokes the context menu.
-	//
-	/// @param callback
-	///	The function to call. If the value is not a function, no
-	///	action will be taken on select.
-	///
-	void setCallback(const as_value& callback)
-	{
-		set_member(NSV::PROP_ON_SELECT, callback);
-	}
-
-	/// Attach the exported interface of this ActionScript class
-	/// to the given object.
-	static void attachExportedInterface(as_object& o);
-
-	/// Get the ContextMenu.prototype ActionScript object
-	static as_object* getExportedInterface();
-
-	static as_value ctor_method(const fn_call& fn);
-
-	static as_value hideBuiltInItems_method(const fn_call& fn);
-
-	static as_value copy_method(const fn_call& fn);
 
 };
 
 
-/* static private */
+// extern (used by Global.cpp)
 void
-ContextMenu_as::attachExportedInterface(as_object& o)
+contextmenu_class_init(as_object& global)
 {
-	o.init_member("copy", new builtin_function(ContextMenu_as::copy_method));
-	o.init_member("hideBuiltInItems", new builtin_function(ContextMenu_as::hideBuiltInItems_method));
-}
-
-/* static private */
-as_object*
-ContextMenu_as::getExportedInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachExportedInterface(*o);
-	}
-	return o.get();
-}
-
-
-/* static private */
-as_value
-ContextMenu_as::copy_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<ContextMenu_as> ptr = ensureType<ContextMenu_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-/* static private */
-as_value
-ContextMenu_as::hideBuiltInItems_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<ContextMenu_as> ptr = ensureType<ContextMenu_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-/* static private */
-as_value
-ContextMenu_as::ctor_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_object> obj;
-	if ( fn.nargs > 0 )
-       		obj = new ContextMenu_as(fn.arg(0));
-	else
-		obj = new ContextMenu_as();
-	
-	return as_value(obj.get()); // will keep alive
-}
-
-/* static public */
-void
-ContextMenu_as::registerConstructor(as_object& global)
-{
-	// This is going to be the global ContextMenu "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(ContextMenu_as::ctor_method, ContextMenu_as::getExportedInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		ContextMenu_as::attachExportedInterface(*cl);
-		     
+	if (cl == NULL) {
+		cl=new builtin_function(contextmenu_ctor, getContextMenuInterface());
 	}
 
 	// Register _global.ContextMenu
 	global.init_member("ContextMenu", cl.get());
-
-}
-
-// extern (used by Global.cpp)
-void contextmenu_class_init(as_object& global)
-{
-	ContextMenu_as::registerConstructor(global);
 }
 
 
@@ -205,14 +80,9 @@ namespace {
 void
 attachContextMenuInterface(as_object& o)
 {
-    o.init_member("hideBuiltInItems", new builtin_function(contextmenu_hideBuiltInItems));
-    o.init_member("menuSelect", new builtin_function(contextmenu_menuSelect));
-}
-
-void
-attachContextMenuStaticInterface(as_object& o)
-{
-
+    o.init_member("hideBuiltInItems",
+            new builtin_function(contextmenu_hideBuiltInItems));
+    o.init_member("copy", new builtin_function(contextmenu_copy));
 }
 
 as_object*
@@ -220,8 +90,9 @@ getContextMenuInterface()
 {
     static boost::intrusive_ptr<as_object> o;
     if ( ! o ) {
-        o = new as_object();
+        o = new as_object(getObjectInterface());
         attachContextMenuInterface(*o);
+        VM::get().addStatic(o.get());
     }
     return o.get();
 }
@@ -237,7 +108,7 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
 }
 
 as_value
-contextmenu_menuSelect(const fn_call& fn)
+contextmenu_copy(const fn_call& fn)
 {
     boost::intrusive_ptr<ContextMenu_as> ptr =
         ensureType<ContextMenu_as>(fn.this_ptr);
@@ -251,6 +122,9 @@ contextmenu_ctor(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = new ContextMenu_as;
 
+    if (fn.nargs) {
+        obj->set_member(NSV::PROP_ON_SELECT, fn.arg(0));
+    }
     return as_value(obj.get()); // will keep alive
 }
 
