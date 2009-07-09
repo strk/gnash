@@ -117,7 +117,9 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(ee.builtInItems.extraProp, "boo");
   check(ee instanceof ContextMenu);
 
-  // It will copy anything, not just objects
+  // It will copy any expected properties, not only if they are objects, and
+  // add those that aren't there. The customItems array is cloned; if the
+  // original customItems member isn't an array, the new array is empty.
   f = {};
   f.builtInItems = 6;
   f.copy = ContextMenu.prototype.copy;
@@ -126,6 +128,70 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check(ff.hasOwnProperty("customItems"));
   check(ff.hasOwnProperty("onSelect"));
   check_equals(ff.builtInItems, 6);
+  check_equals(typeof(ff.customItems), "object");
+  check(ff.customItems instanceof Array);
+
+  f.customItems = 88;
+  ff = f.copy();
+  check_equals(typeof(ff.customItems), "object");
+
+  f.customItems = {};
+  f.customItems.p = "hello";
+  ff = f.copy();
+  check_equals(ff.customItems.length, 0);
+  check_equals(ff.customItems.p, undefined);
+
+  f.customItems = new Array;
+  f.customItems.push("hello");
+  ff = f.copy();
+  check_equals(ff.customItems.length, 1);
+  check_equals(ff.customItems[0], undefined);
+
+  h = function() {};
+
+  cmi = new ContextMenuItem("hi", h);
+  f.customItems.push(cmi);
+  ff = f.copy();
+  check_equals(f.customItems.length, 2);
+  check_equals(f.customItems[1].caption, "hi");
+  check_equals(ff.customItems.length, 2);
+  check_equals(ff.customItems[1].caption, "hi");
+
+  c = {};
+  c.onSelect = h;
+  c.caption = "moo";
+  f.customItems.push(c);
+  check_equals(f.customItems.length, 3);
+  check_equals(f.customItems[2].caption, "moo");
+  ff = f.copy();
+  check_equals(ff.customItems.length, 3);
+  check_equals(ff.customItems[2].caption, undefined);
+
+  // Properties are only copied if instanceOf ContextMenuItem.
+  c.__proto__ = ContextMenuItem.prototype;
+  ff = f.copy();
+  check_equals(ff.customItems.length, 3);
+  check_equals(ff.customItems[2].caption, "moo");
+
+  // If builtInItems is undefined, it is copied as undefined. If it is an
+  // object, the new ContextMenu refers to the *same* object.
+  f.builtInItems = undefined;
+  ff = f.copy();
+  check(ff.hasOwnProperty("builtInItems"));
+  check_equals(typeof(ff.builtInItems), "undefined")
+  
+  delete f.builtInItems;
+  ff = f.copy();
+  check(ff.hasOwnProperty("builtInItems"));
+  check_equals(typeof(ff.builtInItems), "undefined")
+
+  o = {};
+  o.g = 5;
+  f.builtInItems = o;
+  ff = f.copy();
+  check_equals(ff.builtInItems.g, 5);
+  o.g = "string";
+  check_equals(ff.builtInItems.g, "string");
 
   // Test ContextMenuItem
   
