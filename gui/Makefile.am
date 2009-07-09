@@ -275,7 +275,7 @@ bundle: Info.plist aqua-gnash
 	mkdir -p $(bundle_name)/Contents/Resources
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	cp Info.plist $(bundle_name)/Contents/Info.plist
-	mv -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
+	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
 
