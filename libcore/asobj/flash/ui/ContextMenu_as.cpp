@@ -129,9 +129,13 @@ contextmenu_copy(const fn_call& fn)
     ptr->get_member(st.find("builtInItems"), &builtInItems);
     ptr->get_member(st.find("customItems"), &customItems);
 
+    // The onSelect and the builtInItems property are simple copies, which
+    // means the new object has a reference to the same object.
     o->set_member(NSV::PROP_ON_SELECT, onSelect);
     o->set_member(st.find("builtInItems"), builtInItems);
 
+    // The customItems object is a deep copy, but only of elements that are
+    // instances of ContextMenuItem (have its prototype as a __proto__ member).
     as_object* nc = new Array_as;
     as_object* customs;
 
