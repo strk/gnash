@@ -94,6 +94,29 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   };
   check_equals(s, "save:false,zoom:false,quality:false,play:false,loop:false,rewind:false,forward_back:false,print:false,");
 
+  e.a = "string";
+  e.builtInItems.extraProp = "boo";
+
+  // Check the copy method. The original object has the following members:
+  // f : function
+  // builtInItems : object
+  // a : string
+  //
+  // The builtInItems has an extra property.
+
+  e.copy = ContextMenu.prototype.copy;
+  ee = e.copy();
+  check(!ee.hasOwnProperty("a"));
+  check(!ee.hasOwnProperty("f"));
+  check(ee.hasOwnProperty("onSelect"));
+  check(ee.hasOwnProperty("builtInItems"));
+  check(ee.hasOwnProperty("customItems"));
+
+  check_equals(typeof(ee.builtInItems), "object");
+  check_equals(typeof(ee.builtInItems.extraProp), "string");
+  check_equals(ee.builtInItems.extraProp, "boo");
+
+
   // Test ContextMenuItem
   
   xcheck_equals(typeof(ContextMenuItem), "function");
@@ -200,6 +223,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  totals(83);
+  totals(91);
 
 #endif
