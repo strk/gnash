@@ -56,20 +56,20 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(typeof(cm.copy), "function");
   check_equals(typeof(cm.hideBuiltInItems), "function");
 
-  xcheck(cm.hasOwnProperty("builtInItems"));  
-  xcheck(cm.hasOwnProperty("customItems"));
-  xcheck(cm.hasOwnProperty("onSelect"));  
+  check(cm.hasOwnProperty("builtInItems"));  
+  check(cm.hasOwnProperty("customItems"));
+  check(cm.hasOwnProperty("onSelect"));  
 
-  xcheck_equals(typeof(cm.builtInItems), "object");  
+  check_equals(typeof(cm.builtInItems), "object");  
   check(!cm.builtInItems instanceof Array);
   check_equals(typeof(cm.builtInItems.length), 'undefined');
 
-  xcheck_equals(typeof(cm.customItems), "object");
-  xcheck(cm.customItems instanceof Array);
-  xcheck_equals(typeof(cm.customItems.length), 'number');
+  check_equals(typeof(cm.customItems), "object");
+  check(cm.customItems instanceof Array);
+  check_equals(typeof(cm.customItems.length), 'number');
 
   // There are no custom items by default.
-  xcheck_equals(cm.customItems.length, 0);
+  check_equals(cm.customItems.length, 0);
 
   check_equals(typeof(cm.onSelect), "undefined");
  
@@ -81,8 +81,119 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
      check_equals(typeof(o[i]), "boolean");
      s += i + ",";
   }
-  xcheck_equals(s, "save,zoom,quality,play,loop,rewind,forward_back,print,");
+  check_equals(s, "save,zoom,quality,play,loop,rewind,forward_back,print,");
 
+
+  // Check that the hideBuiltInItems method isn't fussy.
+  e = {};
+  e.f = ContextMenu.prototype.hideBuiltInItems;
+  e.f();
+  s = "";
+  for (i in e.builtInItems) {
+      s += i + ":" + e.builtInItems[i] + ",";
+  };
+  check_equals(s, "save:false,zoom:false,quality:false,play:false,loop:false,rewind:false,forward_back:false,print:false,");
+
+  e.a = "string";
+  e.builtInItems.extraProp = "boo";
+
+  // Check the copy method. The original object has the following members:
+  // f : function
+  // builtInItems : object
+  // a : string
+  //
+  // The builtInItems has an extra property.
+
+  e.copy = ContextMenu.prototype.copy;
+  ee = e.copy();
+  check(!ee.hasOwnProperty("a"));
+  check(!ee.hasOwnProperty("f"));
+  check(ee.hasOwnProperty("onSelect"));
+  check(ee.hasOwnProperty("builtInItems"));
+  check(ee.hasOwnProperty("customItems"));
+
+  check_equals(typeof(ee.builtInItems), "object");
+  check_equals(typeof(ee.builtInItems.extraProp), "string");
+  check_equals(ee.builtInItems.extraProp, "boo");
+  check(ee instanceof ContextMenu);
+
+  // It will copy any expected properties, not only if they are objects, and
+  // add those that aren't there. The customItems array is cloned; if the
+  // original customItems member isn't an array, the new array is empty.
+  f = {};
+  f.builtInItems = 6;
+  f.copy = ContextMenu.prototype.copy;
+  ff = f.copy();
+  check(ff.hasOwnProperty("builtInItems"));
+  check(ff.hasOwnProperty("customItems"));
+  check(ff.hasOwnProperty("onSelect"));
+  check_equals(ff.builtInItems, 6);
+  check_equals(typeof(ff.customItems), "object");
+  check(ff.customItems instanceof Array);
+
+  f.customItems = 88;
+  ff = f.copy();
+  xcheck_equals(typeof(ff.customItems), "object");
+
+  f.customItems = {};
+  f.customItems.p = "hello";
+  ff = f.copy();
+  check_equals(ff.customItems.length, 0);
+  xcheck_equals(ff.customItems.p, undefined);
+
+  f.customItems = new Array;
+  f.customItems.push("hello");
+  ff = f.copy();
+  check_equals(ff.customItems.length, 1);
+  xcheck_equals(ff.customItems[0], undefined);
+
+  h = function() {};
+
+  cmi = new ContextMenuItem("hi", h);
+  f.customItems.push(cmi);
+  ff = f.copy();
+  check_equals(f.customItems.length, 2);
+  xcheck_equals(f.customItems[1].caption, "hi");
+  check_equals(ff.customItems.length, 2);
+  xcheck_equals(ff.customItems[1].caption, "hi");
+
+  c = {};
+  c.onSelect = h;
+  c.caption = "moo";
+  f.customItems.push(c);
+  check_equals(f.customItems.length, 3);
+  check_equals(f.customItems[2].caption, "moo");
+  ff = f.copy();
+  check_equals(ff.customItems.length, 3);
+  xcheck_equals(ff.customItems[2].caption, undefined);
+
+  // Properties are only copied properly if instanceOf ContextMenuItem;
+  // otherwise they are undefined.
+  c.__proto__ = ContextMenuItem.prototype;
+  xcheck_equals(ff.customItems[2].caption, undefined);
+  ff = f.copy();
+  check_equals(ff.customItems.length, 3);
+  check_equals(ff.customItems[2].caption, "moo");
+
+  // If builtInItems is undefined, it is copied as undefined. If it is an
+  // object, the new ContextMenu refers to the *same* object.
+  f.builtInItems = undefined;
+  ff = f.copy();
+  check(ff.hasOwnProperty("builtInItems"));
+  check_equals(typeof(ff.builtInItems), "undefined")
+  
+  delete f.builtInItems;
+  ff = f.copy();
+  check(ff.hasOwnProperty("builtInItems"));
+  check_equals(typeof(ff.builtInItems), "undefined")
+
+  o = {};
+  o.g = 5;
+  f.builtInItems = o;
+  ff = f.copy();
+  check_equals(ff.builtInItems.g, 5);
+  o.g = "string";
+  check_equals(ff.builtInItems.g, "string");
 
   // Test ContextMenuItem
   
@@ -132,7 +243,7 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // Add a test object to the ContextMenu
   cm.customItems.push(it);
-  xcheck_equals(cm.customItems.length, 1);
+  check_equals(cm.customItems.length, 1);
   _root.menu = cm;
 
   // An object is added to the menu if:
@@ -190,6 +301,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  xtotals(82);
+  totals(120);
 
 #endif
