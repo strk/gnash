@@ -317,8 +317,8 @@ object_registerClass(const fn_call& fn)
 	// Check that the exported resource is a sprite_definition
 	// (we're looking for a MovieClip symbol)
 
-	boost::intrusive_ptr<sprite_definition> exp_clipdef = 
-		boost::intrusive_ptr<sprite_definition>(dynamic_cast<sprite_definition*>(exp_res.get()));
+	boost::intrusive_ptr<sprite_definition> exp_clipdef(
+            dynamic_cast<sprite_definition*>(exp_res.get()));
 
 
 	if ( ! exp_clipdef )
@@ -327,9 +327,7 @@ object_registerClass(const fn_call& fn)
 		log_aserror(_("Object.registerClass(%s, %s): "
 			"exported symbol is not a MovieClip symbol "
 			"(sprite_definition), but a %s"),
-			symbolid, 
-			typeid(theclass).name(),
-			typeid(*exp_res).name());
+			symbolid, typeName(theclass), typeName(exp_res));
 		);
 		return as_value(false);
 	}
