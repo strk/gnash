@@ -122,33 +122,26 @@ contextmenu_copy(const fn_call& fn)
     as_object* o = new as_object(getContextMenuInterface());
     
     string_table& st = ptr->getVM().getStringTable();
-    as_value onSelect, builtInItems, customItems;
+    as_value onSelect, builtInItems;
+    as_value customItems = new Array_as;;
 
     ptr->get_member(NSV::PROP_ON_SELECT, &onSelect);
     ptr->get_member(st.find("builtInItems"), &builtInItems);
     ptr->get_member(st.find("customItems"), &customItems);
 
     o->set_member(NSV::PROP_ON_SELECT, onSelect);
+    o->set_member(st.find("builtInItems"), builtInItems);
 
-    as_object* builtIns;
+    as_object* nc = new Array_as;
     as_object* customs;
 
-    // If they are objects as they should be, they must be copied.
-    if (builtInItems.is_object() &&
-            (builtIns = builtInItems.to_object().get())) {
-        as_object* nb = new as_object;
-        nb->copyProperties(*builtIns);
-        builtInItems = nb;
-    }
-
     if (customItems.is_object() && (customs = customItems.to_object().get())) {
-        as_object* nc = new as_object;
+        // TODO: only copy properties that are ContextMenuItems.
         nc->copyProperties(*customs);
         customItems = nc;
     }
 
     o->set_member(st.find("customItems"), customItems);
-    o->set_member(st.find("builtInItems"), builtInItems);
 
     return as_value(o);
 }
