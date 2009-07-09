@@ -130,22 +130,24 @@ contextmenu_copy(const fn_call& fn)
 
     o->set_member(NSV::PROP_ON_SELECT, onSelect);
 
-    as_object* builtIns = builtInItems.to_object().get();
-    as_object* customs = customItems.to_object().get();
+    as_object* builtIns;
+    as_object* customs;
 
     // If they are objects as they should be, they must be copied.
-    if (builtIns) {
+    if (builtInItems.is_object() &&
+            (builtIns = builtInItems.to_object().get())) {
         as_object* nb = new as_object;
         nb->copyProperties(*builtIns);
         builtInItems = nb;
     }
-    if (customs) {
+
+    if (customItems.is_object() && (customs = customItems.to_object().get())) {
         as_object* nc = new as_object;
         nc->copyProperties(*customs);
         customItems = nc;
     }
 
-    o->set_member(st.find("customItems"), builtInItems);
+    o->set_member(st.find("customItems"), customItems);
     o->set_member(st.find("builtInItems"), builtInItems);
 
     return as_value(o);
