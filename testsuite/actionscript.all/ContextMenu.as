@@ -200,6 +200,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  totals(82);
+  totals(83);
 
 #endif
