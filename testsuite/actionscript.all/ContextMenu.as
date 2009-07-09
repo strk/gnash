@@ -133,19 +133,19 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   f.customItems = 88;
   ff = f.copy();
-  check_equals(typeof(ff.customItems), "object");
+  xcheck_equals(typeof(ff.customItems), "object");
 
   f.customItems = {};
   f.customItems.p = "hello";
   ff = f.copy();
   check_equals(ff.customItems.length, 0);
-  check_equals(ff.customItems.p, undefined);
+  xcheck_equals(ff.customItems.p, undefined);
 
   f.customItems = new Array;
   f.customItems.push("hello");
   ff = f.copy();
   check_equals(ff.customItems.length, 1);
-  check_equals(ff.customItems[0], undefined);
+  xcheck_equals(ff.customItems[0], undefined);
 
   h = function() {};
 
@@ -153,9 +153,9 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   f.customItems.push(cmi);
   ff = f.copy();
   check_equals(f.customItems.length, 2);
-  check_equals(f.customItems[1].caption, "hi");
+  xcheck_equals(f.customItems[1].caption, "hi");
   check_equals(ff.customItems.length, 2);
-  check_equals(ff.customItems[1].caption, "hi");
+  xcheck_equals(ff.customItems[1].caption, "hi");
 
   c = {};
   c.onSelect = h;
@@ -165,10 +165,12 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(f.customItems[2].caption, "moo");
   ff = f.copy();
   check_equals(ff.customItems.length, 3);
-  check_equals(ff.customItems[2].caption, undefined);
+  xcheck_equals(ff.customItems[2].caption, undefined);
 
-  // Properties are only copied if instanceOf ContextMenuItem.
+  // Properties are only copied properly if instanceOf ContextMenuItem;
+  // otherwise they are undefined.
   c.__proto__ = ContextMenuItem.prototype;
+  xcheck_equals(ff.customItems[2].caption, undefined);
   ff = f.copy();
   check_equals(ff.customItems.length, 3);
   check_equals(ff.customItems[2].caption, "moo");
@@ -299,6 +301,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  totals(96);
+  totals(120);
 
 #endif
