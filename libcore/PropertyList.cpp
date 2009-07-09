@@ -310,17 +310,17 @@ PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
     typedef container::nth_index<1>::type ContainerByOrder;
 
 	for (ContainerByOrder::const_reverse_iterator i=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); i != ie; ++i)
-	{
-		if (i->getFlags().get_dont_enum())
-			continue;
+            ie=_props.get<1>().rend(); i != ie; ++i) {
 
-		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second)
-		{
-			if (i->mNamespace)
-				env.push(as_value(st.value(i->mName) + "." + st.value(i->mNamespace)));
-			else
-				env.push(as_value(st.value(i->mName)));
+		if (i->getFlags().get_dont_enum()) continue;
+
+		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second) {
+
+            const std::string& qname = i->mNamespace ?
+                st.value(i->mName) + "." + st.value(i->mNamespace) :
+                st.value(i->mName);
+
+			env.push(qname);
 		}
 	}
 }
