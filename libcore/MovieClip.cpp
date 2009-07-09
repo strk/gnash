@@ -2151,7 +2151,10 @@ MovieClip::constructAsScriptObject()
             if ( swfversion > 5 )
             {
 
+                const int flags = as_prop_flags::dontEnum;
+
                 set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
+                set_member_flags(NSV::PROP_uuCONSTRUCTORuu, flags);
                 if ( swfversion == 6 )
                 {
                     set_member(NSV::PROP_CONSTRUCTOR, ctor);
