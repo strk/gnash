@@ -145,7 +145,7 @@ ContextMenu_as::copy_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<ContextMenu_as> ptr = ensureType<ContextMenu_as>(fn.this_ptr);
 	UNUSED(ptr);
-	log_unimpl (__FUNCTION__);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
@@ -155,7 +155,7 @@ ContextMenu_as::hideBuiltInItems_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<ContextMenu_as> ptr = ensureType<ContextMenu_as>(fn.this_ptr);
 	UNUSED(ptr);
-	log_unimpl (__FUNCTION__);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
@@ -232,7 +232,7 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
     boost::intrusive_ptr<ContextMenu_as> ptr =
         ensureType<ContextMenu_as>(fn.this_ptr);
     UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
@@ -242,7 +242,7 @@ contextmenu_menuSelect(const fn_call& fn)
     boost::intrusive_ptr<ContextMenu_as> ptr =
         ensureType<ContextMenu_as>(fn.this_ptr);
     UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
