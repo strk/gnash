@@ -26,8 +26,8 @@
 #include "fltk_glue_agg.h"
 #include "gnash.h"
 
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 
 using namespace std;
 
@@ -43,10 +43,10 @@ FltkAggGlue::~FltkAggGlue()
 {
 }
 
-render_handler*
+Renderer*
 FltkAggGlue::createRenderHandler()
 {
-    _renderer = create_render_handler_agg("RGB24");
+    _renderer = create_Renderer_agg("RGB24");
     return _renderer;
 }
 
@@ -71,8 +71,8 @@ FltkAggGlue::initBuffer(int width, int height)
     // Only the AGG renderer has the function init_buffer, which is *not* part of
     // the renderer api. It allows us to change the renderers movie size (and buffer
     // address) during run-time.
-    render_handler_agg_base * renderer =
-      static_cast<render_handler_agg_base *>(_renderer);
+    Renderer_agg_base * renderer =
+      static_cast<Renderer_agg_base *>(_renderer);
     renderer->init_buffer(_offscreenbuf, bufsize, width, height, 
       width*((_bpp+7)/8));
 

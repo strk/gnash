@@ -32,19 +32,19 @@
 #include "RGBA.h" // for rgba class (pixel checking)
 #include "FuzzyPixel.h" // for pixel checking
 #include "render.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "ManualClock.h" // for use by advance
 #include "StreamProvider.h" // for passing to RunInfo
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 #ifdef RENDERER_CAIRO
-# include "render_handler_cairo.h"
+# include "Renderer_cairo.h"
 #endif
 #ifdef RENDERER_OPENGL
-# include "render_handler_ogl.h"
+# include "Renderer_ogl.h"
 #endif
 #ifdef RENDERER_AGG
-# include "render_handler_agg.h"
+# include "Renderer_agg.h"
 #endif
 
 #include "MediaHandler.h"
@@ -164,11 +164,11 @@ MovieTester::MovieTester(const std::string& url)
 }
 
 void
-MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions) 
+MovieTester::render(Renderer& h, InvalidatedRanges& invalidated_regions) 
 {
 	assert(_movie);
 
-	set_render_handler(&h);
+	set_Renderer(&h);
 
 	h.set_invalidated_regions(invalidated_regions);
 
@@ -320,7 +320,7 @@ MovieTester::resizeStage(int x, int y)
 			        it != itE; ++it)
         {
             TestingRenderer& rend = *(*it);
-            render_handler& h = rend.getRenderer();
+            Renderer& h = rend.getRenderer();
             h.set_scale(xscale, yscale);
         }
 	}
@@ -379,7 +379,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 		rgba obt_col;
 
-		render_handler& handler = rend.getRenderer();
+		Renderer& handler = rend.getRenderer();
 
 	        if ( ! handler.getAveragePixel(obt_col, x, y, radius) )
 		{
@@ -503,7 +503,7 @@ MovieTester::soundsStopped()
 void
 MovieTester::initTestingRenderers()
 {
-	std::auto_ptr<render_handler> handler;
+	std::auto_ptr<Renderer> handler;
 
 	// TODO: add support for testing multiple renderers
 	// This is tricky as requires changes in the core lib
@@ -521,7 +521,7 @@ MovieTester::initTestingRenderers()
 		const char* pixelFormat = aggPixelFormats[i];
 		std::string name = "AGG_" + std::string(pixelFormat);
 
-		handler.reset( create_render_handler_agg(pixelFormat) );
+		handler.reset( create_Renderer_agg(pixelFormat) );
 		if ( handler.get() )
 		{
 			//log_debug("Renderer %s initialized", name.c_str());
@@ -544,13 +544,13 @@ MovieTester::initTestingRenderers()
 
 #ifdef RENDERER_OPENGL
 	// Initialize opengl renderer
-	handler.reset(create_render_handler_ogl(false));
+	handler.reset(create_Renderer_ogl(false));
 	addTestingRenderer(handler, "OpenGL");
 #endif
 }
 
 void
-MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name)
+MovieTester::addTestingRenderer(std::auto_ptr<Renderer> h, const std::string& name)
 {
 	if ( ! h->initTestBuffer(_width, _height) )
 	{
@@ -576,7 +576,7 @@ MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::stri
 
 	// this will be needed till we allow run-time swapping of renderers,
 	// see above UNTESTED message...
-	set_render_handler(&(_testingRenderers.back()->getRenderer()));
+	set_Renderer(&(_testingRenderers.back()->getRenderer()));
 }
 
 bool

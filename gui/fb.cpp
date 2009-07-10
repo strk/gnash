@@ -88,8 +88,8 @@
 #include "log.h"
 #include "movie_root.h"
 
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include "GnashSleep.h" // for gnashSleep
 
 #include <linux/input.h>    // for /dev/input/event*
@@ -299,7 +299,7 @@ bool FBGui::initialize_renderer() {
   int _bpp = var_screeninfo.bits_per_pixel;
   int _size = fix_screeninfo.smem_len;   // TODO: should recalculate!  
   unsigned char *_mem;
-  render_handler_agg_base *agg_handler;
+  Renderer_agg_base *agg_handler;
   
   m_stage_width = _width;
   m_stage_height = _height;
@@ -336,7 +336,7 @@ bool FBGui::initialize_renderer() {
   );
 
   if (pixelformat) {    
-    agg_handler = create_render_handler_agg(pixelformat);      
+    agg_handler = create_Renderer_agg(pixelformat);      
   } else {
     fatal_error("The pixel format of your framebuffer could not be detected.");
     return false;
@@ -345,7 +345,7 @@ bool FBGui::initialize_renderer() {
   assert(agg_handler!=NULL);
   _renderer = agg_handler;
 
-  set_render_handler(agg_handler);
+  set_Renderer(agg_handler);
   
   m_rowsize = var_screeninfo.xres_virtual*((_bpp+7)/8);
   

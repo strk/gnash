@@ -21,8 +21,8 @@
 #include "gnash.h"
 #include "log.h"
 #undef ACTION_END
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include <cerrno>
 #include <ostream>
 
@@ -91,24 +91,24 @@ AOS4AggGlue::init(int /*argc*/, char*** /*argv*/)
 }
 
 
-render_handler*
+Renderer*
 AOS4AggGlue::createRenderHandler(int bpp)
 {
     _bpp = bpp;
 
     switch (_bpp) {
       case 32:
-        _agg_renderer = create_render_handler_agg("RGBA32");
+        _agg_renderer = create_Renderer_agg("RGBA32");
         _btype        = BLITT_ARGB32;
         _ftype		  = RGBFB_R8G8B8;
         break;
       case 24:
-        _agg_renderer = create_render_handler_agg("RGB24");
+        _agg_renderer = create_Renderer_agg("RGB24");
         _btype        = BLITT_RGB24;
         _ftype 		  = RGBFB_R8G8B8;
         break;
       case 16:
-        _agg_renderer = create_render_handler_agg("RGBA16");
+        _agg_renderer = create_Renderer_agg("RGBA16");
         _btype        = BLITT_CHUNKY;
         _ftype		  = RGBFB_R5G6B5;
         break;
@@ -119,13 +119,13 @@ AOS4AggGlue::createRenderHandler(int bpp)
     return _agg_renderer;
 }
 
-render_handler*
+Renderer*
 AOS4AggGlue::createRenderHandler()
 {
 //    GNASH_REPORT_FUNCTION;
     _bpp = 24;
 
-    _agg_renderer = create_render_handler_agg("RGB24");
+    _agg_renderer = create_Renderer_agg("RGB24");
     _btype        = BLITT_RGB24;
 
     return _agg_renderer;
@@ -267,7 +267,7 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
     // Only the AGG renderer has the function init_buffer, which is *not* part of
     // the renderer api. It allows us to change the renderers movie size (and buffer
     // address) during run-time.
-    render_handler_agg_base *renderer = static_cast<render_handler_agg_base *>(_agg_renderer);
+    Renderer_agg_base *renderer = static_cast<Renderer_agg_base *>(_agg_renderer);
     renderer->init_buffer(_offscreenbuf, bufsize, width, height, width*((_bpp+7)/8));
 
 	struct RenderInfo ri;

@@ -26,7 +26,7 @@
 #include <cassert>
 
 namespace gnash {
-    class render_handler;
+    class Renderer;
 }
 
 namespace gnash {
@@ -53,7 +53,7 @@ public:
     MorphShape(const SWF::DefineMorphShapeTag* const def, 
             DisplayObject* parent, int id);
 
-	virtual void display(render_handler& renderer);
+	virtual void display(Renderer& renderer);
 
     virtual rect getBounds() const;
     

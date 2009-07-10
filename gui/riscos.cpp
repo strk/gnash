@@ -25,7 +25,7 @@
 #include "gui.h"
 #include "rc.h"
 #include "riscossup.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "log.h"
 
 //#include <iostream>
@@ -107,7 +107,7 @@ RiscosGui::init(int argc, char **argv[])
 #endif
 
     _renderer = glue.createRenderHandler();
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
     // hack?
     _renderer->set_scale(1.0f, 1.0f);
 

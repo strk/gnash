@@ -33,8 +33,8 @@
 #include "Player.h"
 #include "URL.h"
 #include "sound_handler.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include "MovieClip.h"
 #include "movie_definition.h"
 #include "movie_root.h"
@@ -101,7 +101,7 @@ private:
     unsigned char* _memaddr;
 
     std::auto_ptr<gnash::media::sound_handler> _sound_handler;
-    gnash::render_handler* _render_handler;
+    gnash::Renderer* _Renderer;
 
     // Mouse state.
     int mouse_x;

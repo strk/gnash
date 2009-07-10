@@ -28,7 +28,7 @@
 #include "rc.h"
 #include "gtksup.h"
 #include "sound_handler.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "VM.h"
 #include "lirc.h"
 #include "gnash.h" // Quality
@@ -247,7 +247,7 @@ GtkGui::init(int argc, char **argv[])
 #else
     _renderer = _glue->createRenderHandler();
     if ( ! _renderer ) return false;
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
 #endif
 
     // The first time stop() was called, stopHook() might not have had a chance

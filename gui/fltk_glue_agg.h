@@ -28,8 +28,8 @@
 #include "log.h"
 #include "gui.h"
 
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 
 using namespace fltk;
 
@@ -42,7 +42,7 @@ class FltkAggGlue : public fltk::Widget
       ~FltkAggGlue();
      // resize(int width, int height);
       void draw();
-      render_handler* createRenderHandler();
+      Renderer* createRenderHandler();
       void initBuffer(int width, int height);
       void resize(int width, int height);
       void render(geometry::Range2d<int>& bounds);
@@ -53,7 +53,7 @@ class FltkAggGlue : public fltk::Widget
       int _height;
       int _stride;
       unsigned char* _offscreenbuf;
-      render_handler* _renderer;
+      Renderer* _renderer;
       //Rectangle _bounds;
       geometry::Range2d<int> _drawbounds;
       geometry::Range2d<int> _validbounds;

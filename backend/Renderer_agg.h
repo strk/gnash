@@ -24,7 +24,7 @@
 namespace gnash {
 
 // Base class to shield GUIs from AGG's pixelformat classes 
-class render_handler_agg_base : public render_handler
+class Renderer_agg_base : public Renderer
 {
 private:
 
@@ -32,10 +32,10 @@ private:
   
 public:
   
-  render_handler_agg_base() : _testBuffer(0) { }  
+  Renderer_agg_base() : _testBuffer(0) { }  
 
   // virtual classes should have virtual destructors
-  virtual ~render_handler_agg_base() {}
+  virtual ~Renderer_agg_base() {}
   
   // these methods need to be accessed from outside:
   virtual void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)=0;
@@ -63,8 +63,8 @@ public:
 /// If the given pixelformat is unsupported, or any other error
 /// occurs, NULL is returned.
 ///
-DSOEXPORT render_handler_agg_base*
-  create_render_handler_agg(const char *pixelformat);
+DSOEXPORT Renderer_agg_base*
+  create_Renderer_agg(const char *pixelformat);
   
 /// Detect pixel format based on bit mask. If the pixel format is unknown,
 /// NULL is returned. Note that a successfully detected pixel format does

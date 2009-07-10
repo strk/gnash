@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "gtk_glue_cairo.h"
-#include "render_handler_cairo.h"
+#include "Renderer_cairo.h"
 
 #if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION < 8
 # include "gtk_cairo_create.h"
@@ -53,7 +53,7 @@ GtkCairoGlue::prepDrawingArea(GtkWidget *drawing_area)
     gtk_widget_set_double_buffered(_drawing_area, FALSE);
 }
 
-render_handler*
+Renderer*
 GtkCairoGlue::createRenderHandler()
 {
     _renderer = renderer::cairo::create_handler();

@@ -41,7 +41,7 @@ namespace sound {
 /// This must be kept alive for the entire duration of a run (presently
 /// until the last SWFMovieDefinition has been destroyed).
 /// @todo Check the lifetime and update documentation if it changes.
-/// @todo   Add render_handler, MediaHandler.
+/// @todo   Add Renderer, MediaHandler.
 class RunInfo
 {
 public:
@@ -99,8 +99,8 @@ public:
         return _soundHandler.get();
     }
 
-    render_handler* renderer() const {
-        return get_render_handler();
+    Renderer* renderer() const {
+        return get_Renderer();
     }
 
     /// Set the loader functions for SWF parsing.

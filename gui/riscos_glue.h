@@ -28,7 +28,7 @@ class RiscosGlue
     virtual bool init(int argc, char **argv[]) = 0;
 
     virtual void prepFramebuffer(void *framebuffer, int width, int height) = 0;
-    virtual render_handler* createRenderHandler() = 0;
+    virtual Renderer* createRenderHandler() = 0;
     virtual void setRenderHandlerSize(int /*width*/, int /*height*/) { };
     virtual void render(int /* x */, int /* y */) = 0;
     virtual void render(int x, int y, int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)

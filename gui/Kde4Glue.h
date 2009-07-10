@@ -38,7 +38,7 @@ class Kde4Glue
     virtual bool init(int argc, char **argv[]) = 0;
 
     virtual void prepDrawingArea(QWidget *drawing_area) = 0;
-    virtual render_handler* createRenderHandler() = 0;
+    virtual Renderer* createRenderHandler() = 0;
     virtual void render() = 0;
     virtual void render(const QRect& updateRect) = 0;
     virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}

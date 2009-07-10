@@ -19,7 +19,7 @@
 // INDUNET GmbH (www.indunet.it)
 
 
-/// A render_handler that uses the Anti-Grain Geometry Toolkit (antigrain.com)
+/// A Renderer that uses the Anti-Grain Geometry Toolkit (antigrain.com)
 /// and renders directly to a buffer (for example to the framebuffer). This 
 /// backend is *completely* independent of any hardware. It can be used for
 /// rendering to the Linux FrameBuffer device, or be blitted inside a 
@@ -117,8 +117,8 @@ AGG resources
 #include "RGBA.h"
 #include "GnashImage.h"
 #include "log.h"
-#include "render_handler.h"
-#include "render_handler_agg.h" 
+#include "Renderer.h"
+#include "Renderer_agg.h" 
 #include "Range2d.h"
 #include "swf/DefineMorphShapeTag.h" 
 #include "swf/ShapeRecord.h" 
@@ -163,8 +163,8 @@ AGG resources
 #include <agg_gradient_lut.h>
 #include <agg_alpha_mask_u8.h>
 
-#include "render_handler_agg_bitmap.h"
-#include "render_handler_agg_style.h"
+#include "Renderer_agg_bitmap.h"
+#include "Renderer_agg_style.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
@@ -577,7 +577,7 @@ private:
 
 // Real AGG handler
 template <class PixelFormat>
-class render_handler_agg : public render_handler_agg_base
+class Renderer_agg : public Renderer_agg_base
 {
   
 public:
@@ -664,7 +664,7 @@ public:
     } 
 
   // Constructor
-  render_handler_agg(int bits_per_pixel)
+  Renderer_agg(int bits_per_pixel)
       :
       xres(1),
       yres(1),
@@ -971,7 +971,7 @@ public:
 
         cur_bounds.expand_to_transformed_rect(worldMat, shape.getBounds());
                 
-        if (!render_handler::bounds_in_clipping_area(cur_bounds))
+        if (!Renderer::bounds_in_clipping_area(cur_bounds))
         {
             return; // no need to draw
         }        
@@ -2091,7 +2091,7 @@ bool is_little_endian_host() {
 }
 
 
-DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelformat)
+DSOEXPORT Renderer_agg_base*  create_Renderer_agg(const char *pixelformat)
 {
 
   if (!pixelformat) return NULL;
@@ -2103,42 +2103,42 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
   
 #ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))
-    return new render_handler_agg<agg::pixfmt_rgb555_pre> (16); // yep, 16!
+    return new Renderer_agg<agg::pixfmt_rgb555_pre> (16); // yep, 16!
   
   else
 #endif   
 #ifdef PIXELFORMAT_RGB565  
   if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
-    return new render_handler_agg<agg::pixfmt_rgb565_pre> (16); 
+    return new Renderer_agg<agg::pixfmt_rgb565_pre> (16); 
   else 
 #endif   
 #ifdef PIXELFORMAT_RGB24  
   if (!strcmp(pixelformat, "RGB24"))
-    return new render_handler_agg<agg::pixfmt_rgb24_pre> (24);    
+    return new Renderer_agg<agg::pixfmt_rgb24_pre> (24);    
   else 
 #endif   
 #ifdef PIXELFORMAT_BGR24  
   if (!strcmp(pixelformat, "BGR24"))
-    return new render_handler_agg<agg::pixfmt_bgr24_pre> (24);
+    return new Renderer_agg<agg::pixfmt_bgr24_pre> (24);
   else 
 #endif   
 #ifdef PIXELFORMAT_RGBA32 
   if (!strcmp(pixelformat, "RGBA32"))
-    return new render_handler_agg<agg::pixfmt_rgba32_pre> (32);
+    return new Renderer_agg<agg::pixfmt_rgba32_pre> (32);
   else 
 #endif   
 #ifdef PIXELFORMAT_BGRA32  
   if (!strcmp(pixelformat, "BGRA32"))
-    return new render_handler_agg<agg::pixfmt_bgra32_pre> (32);
+    return new Renderer_agg<agg::pixfmt_bgra32_pre> (32);
 #endif   
 #ifdef PIXELFORMAT_RGBA32 
   if (!strcmp(pixelformat, "ARGB32"))
-    return new render_handler_agg<agg::pixfmt_argb32_pre> (32);
+    return new Renderer_agg<agg::pixfmt_argb32_pre> (32);
   else 
 #endif   
 #ifdef PIXELFORMAT_BGRA32  
   if (!strcmp(pixelformat, "ABGR32"))
-    return new render_handler_agg<agg::pixfmt_abgr32_pre> (32);
+    return new Renderer_agg<agg::pixfmt_abgr32_pre> (32);
         
   else 
 #endif

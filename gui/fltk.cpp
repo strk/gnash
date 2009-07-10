@@ -39,7 +39,7 @@
 #include "gui.h"
 #include "VM.h"
 
-#include "render_handler.h"
+#include "Renderer.h"
 
 using namespace std;
 using namespace fltk;
@@ -256,7 +256,7 @@ FltkGui::createWindow(const char* title, int width, int height)
 
     _renderer = _glue->createRenderHandler();
     if ( ! _renderer ) return false;
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
 
     _glue->initBuffer(width, height);
 

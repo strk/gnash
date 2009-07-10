@@ -24,7 +24,7 @@
 
 // Forward declarations.
 namespace gnash {
-    class render_handler;
+    class Renderer;
 }
 
 G_BEGIN_DECLS
@@ -48,7 +48,7 @@ GtkWidget       *gnash_canvas_new                   ();
 
 void             gnash_canvas_setup                 (GnashCanvas *canvas, int argc, char **argv[]);
 void             gnash_canvas_before_rendering      (GnashCanvas *canvas);
-gnash::render_handler  *gnash_canvas_get_renderer   (GnashCanvas *canvas);
+gnash::Renderer  *gnash_canvas_get_renderer   (GnashCanvas *canvas);
 
 G_END_DECLS
 

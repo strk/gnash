@@ -50,7 +50,7 @@ public:
             const RunInfo& r);
 
 	/// Draw the string.
-	void display(render_handler& renderer, const StaticText& inst) const;
+	void display(Renderer& renderer, const StaticText& inst) const;
 	
 	const rect& bounds() const {
         // TODO: There is a _matrix field in the definition(!) that's

@@ -33,7 +33,7 @@ namespace gnash {
     class SWFStream;
 	class RunInfo;
     class MorphShape;
-    class render_handler;
+    class Renderer;
 }
 
 namespace gnash {
@@ -53,7 +53,7 @@ public:
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
         const;
 
-    virtual void display(render_handler& renderer, const MorphShape& inst) const;
+    virtual void display(Renderer& renderer, const MorphShape& inst) const;
 
     const ShapeRecord& shape1() const { 
         return _shape1;

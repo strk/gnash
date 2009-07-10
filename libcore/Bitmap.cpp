@@ -21,7 +21,7 @@
 #include "GnashImage.h"
 #include "DynamicShape.h"
 #include "rect.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "VM.h"
 #include "movie_root.h"
 
@@ -77,7 +77,7 @@ Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 }
 
 void
-Bitmap::display(render_handler& renderer)
+Bitmap::display(Renderer& renderer)
 {
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
@@ -127,7 +127,7 @@ Bitmap::makeBitmap()
         }
     }
 
-    render_handler* renderer = _vm.getRoot().runInfo().renderer();
+    Renderer* renderer = _vm.getRoot().runInfo().renderer();
 
     _bitmapInfo = renderer->createBitmapInfo(im);
 

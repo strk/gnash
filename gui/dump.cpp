@@ -31,7 +31,7 @@
 #include "gui.h"
 #include "rc.h"
 #include "sound_handler.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "VM.h"
 #include "GnashSleep.h"
 
@@ -62,7 +62,7 @@
 #endif
 
 #include "dump.h"
-#include "render_handler_agg.h"
+#include "Renderer_agg.h"
 
 namespace gnash 
 {
@@ -140,8 +140,8 @@ DumpGui::init(int argc, char **argv[])
 #endif
 
     init_dumpfile();
-    _agg_renderer = create_render_handler_agg(_pixelformat.c_str());
-    set_render_handler(_agg_renderer);
+    _agg_renderer = create_Renderer_agg(_pixelformat.c_str());
+    set_Renderer(_agg_renderer);
 
     return true;
 }
@@ -311,7 +311,7 @@ DumpGui::setRenderHandlerSize(int width, int height)
             log_error("Could not allocate %i bytes for offscreen buffer: %s",
                   newBufferSize, e.what());
                   
-              // TODO: what to do here? An assertion in render_handler_agg.cpp
+              // TODO: what to do here? An assertion in Renderer_agg.cpp
               // fails if we just return.
               return;
         }
@@ -320,7 +320,7 @@ DumpGui::setRenderHandlerSize(int width, int height)
 
     }
 
-    static_cast<render_handler_agg_base *> (_agg_renderer)->init_buffer
+    static_cast<Renderer_agg_base *> (_agg_renderer)->init_buffer
         (_offscreenbuf.get(),
          _offscreenbuf_size,
          _width,

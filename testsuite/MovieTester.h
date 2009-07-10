@@ -28,7 +28,7 @@
 #include "Range2d.h"
 #include "GnashKey.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "render_handler.h" // for dtor visibility by auto_ptr
+#include "Renderer.h" // for dtor visibility by auto_ptr
 #include "Movie.h" 
 #include "ManualClock.h" // for composition
 #include "RunInfo.h" // For initialization.
@@ -73,7 +73,7 @@ class TestingRenderer
 
 public:
 
-	TestingRenderer(std::auto_ptr<render_handler> renderer, const std::string& name)
+	TestingRenderer(std::auto_ptr<Renderer> renderer, const std::string& name)
 		:
 		_name(name),
 		_renderer(renderer)
@@ -82,12 +82,12 @@ public:
 	const std::string& getName() const { return _name; }
 
 	/// Return the underlying render handler
-	render_handler& getRenderer() const { return *_renderer; }
+	Renderer& getRenderer() const { return *_renderer; }
 
 private:
 
 	std::string _name;
-	std::auto_ptr<render_handler> _renderer;
+	std::auto_ptr<Renderer> _renderer;
 };
 
 typedef boost::shared_ptr<TestingRenderer> TestingRendererPtr;
@@ -251,7 +251,7 @@ public:
 	//
 	/// Pixel checking will be supported as long as a testing-capable render handler
 	/// was compiled in. Testing-capable means capable of off-screen rendering, which
-	/// is implementing the render_handler::initTestBuffer method.
+	/// is implementing the Renderer::initTestBuffer method.
 	///
 	bool canTestRendering() const { return ! _testingRenderers.empty(); }
 
@@ -308,10 +308,10 @@ private:
 	/// @param invalidated
 	///	The invalidated ranges as computed by the core lib.
 	///
-	void render(render_handler& renderer, InvalidatedRanges& invalidated);
+	void render(Renderer& renderer, InvalidatedRanges& invalidated);
 
 	/// Add a testing renderer to the list, initializing it with current viewport size
-	void addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name);
+	void addTestingRenderer(std::auto_ptr<Renderer> h, const std::string& name);
 
 	gnash::movie_root* _movie_root;
 

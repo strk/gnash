@@ -21,7 +21,7 @@
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
 
-/// \page render_handler_intro Render handler introduction
+/// \page Renderer_intro Render handler introduction
 ///
 /// Information for writing new render handlers.
 ///
@@ -189,22 +189,22 @@ public:
 
 /// Base class for render handlers.
 //
-/// You must define a subclass of render_handler, and pass an
-/// instance to set_render_handler() *before* any SWF parsing begins.
+/// You must define a subclass of Renderer, and pass an
+/// instance to set_Renderer() *before* any SWF parsing begins.
 ///
-/// For more info see page \ref render_handler_intro.
+/// For more info see page \ref Renderer_intro.
 /// 
 ///
-class DSOEXPORT render_handler
+class DSOEXPORT Renderer
 {
 public:
 
-    render_handler()
+    Renderer()
         :
         _quality(QUALITY_HIGH)
     {}
 
-    virtual ~render_handler() {}
+    virtual ~Renderer() {}
 
     /// ==================================================================
     /// Interfaces for adjusting renderer output.
@@ -566,7 +566,7 @@ protected:
     /// Kept in parallel with movie_root's setting.
     Quality _quality;
 
-}; // class render_handler
+}; // class Renderer
 
 
 

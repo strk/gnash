@@ -1423,7 +1423,7 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 
 
 bool 
-DisplayObject::boundsInClippingArea(render_handler& renderer) const 
+DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
   rect mybounds = getBounds();
   getWorldMatrix().transform(mybounds);

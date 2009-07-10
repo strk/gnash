@@ -100,7 +100,7 @@ KdeGui::createWindow(const char* windowtitle, int width, int height)
     
     _width = width;
     _height = height;
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
     
     return true;
 }

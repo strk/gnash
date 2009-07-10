@@ -106,7 +106,7 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 }
 
 void
-DefineTextTag::display(render_handler& renderer, const StaticText& inst) const
+DefineTextTag::display(Renderer& renderer, const StaticText& inst) const
 {
 
     SWFMatrix mat = inst.getWorldMatrix();

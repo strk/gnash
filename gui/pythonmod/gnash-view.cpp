@@ -29,7 +29,7 @@
 #include "VM.h"
 #include "movie_definition.h"
 #include "movie_root.h" // for Abstract callbacks
-#include "render_handler.h"
+#include "Renderer.h"
 #include "sound_handler.h"
 #include "MediaHandler.h"
 #include "RunInfo.h" // for passing handlers and other data to the core.
@@ -269,7 +269,7 @@ gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
     if( view->stage.get() != NULL) {
     	view->stage->set_display_viewport(0, 0, allocation->width, allocation->height);
 
-        gnash::render_handler *renderer = gnash_canvas_get_renderer(view->canvas);
+        gnash::Renderer *renderer = gnash_canvas_get_renderer(view->canvas);
         float xscale = allocation->width / view->movie_definition->get_width_pixels();
         float yscale = allocation->height / view->movie_definition->get_height_pixels();
 		renderer->set_scale(xscale, yscale);
@@ -509,7 +509,7 @@ gnash_view_display(GnashView *view)
     gnash::InvalidatedRanges changed_ranges;
     changed_ranges.setWorld();
 
-    gnash::render_handler *renderer = gnash_canvas_get_renderer(view->canvas);
+    gnash::Renderer *renderer = gnash_canvas_get_renderer(view->canvas);
     renderer->set_invalidated_regions(changed_ranges);
     gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
 

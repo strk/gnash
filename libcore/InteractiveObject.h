@@ -52,7 +52,7 @@ public:
     virtual ~InteractiveObject() {}
 
     /// Render this InteractiveObject
-    virtual void display(render_handler& renderer) = 0;
+    virtual void display(Renderer& renderer) = 0;
 
     /// Whether the DisplayObject can handle a mouse event.
     //

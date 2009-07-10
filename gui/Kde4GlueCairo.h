@@ -46,7 +46,7 @@ class Kde4CairoGlue : public Kde4Glue
     bool init(int argc, char **argv[]);
     void initBuffer(int width, int height);
     void prepDrawingArea(QWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void render();
     void render(const QRect& updateRect);
     void resize(int width, int height);
@@ -55,7 +55,7 @@ class Kde4CairoGlue : public Kde4Glue
     int _width;
     int _height;
     boost::scoped_array<unsigned char> _offscreenbuf;
-    render_handler* _renderer; // We don't own this pointer.
+    Renderer* _renderer; // We don't own this pointer.
     std::auto_ptr<QImage> _image;
     std::auto_ptr<QPainter> _painter;
 

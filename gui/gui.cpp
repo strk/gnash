@@ -24,7 +24,7 @@
 #include "MovieClip.h"
 #include "gui.h"
 #include "render.h"  // debug
-#include "render_handler.h"
+#include "Renderer.h"
 #include "sound_handler.h"
 #include "movie_root.h"
 #include "VM.h"

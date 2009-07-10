@@ -36,7 +36,7 @@
 
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
-#include "render_handler.h"
+#include "Renderer.h"
 #include "GnashImage.h"
 #include <cmath>
 #include "PathParser.h"
@@ -402,13 +402,13 @@ private:
 };
 
 
-class DSOEXPORT render_handler_cairo: public render_handler
+class DSOEXPORT Renderer_cairo: public Renderer
 {
   typedef std::vector<Path> PathVec;
   typedef std::vector<const Path*> PathPtrVec;
 public:
 
-  render_handler_cairo()
+  Renderer_cairo()
     : _video_bufsize(0),
       _drawing_mask(false)
   {    
@@ -416,7 +416,7 @@ public:
     cairo_matrix_init_scale(&_stage_mat, 1/20.0f, 1/20.0f);
   }
   
-  ~render_handler_cairo()
+  ~Renderer_cairo()
   {
   }
 
@@ -1091,7 +1091,7 @@ private:
   InvalidatedRanges _invalidated_ranges;
   cairo_matrix_t _stage_mat;
     
-}; // class render_handler_cairo
+}; // class Renderer_cairo
 
 
 
@@ -1103,17 +1103,17 @@ namespace renderer {
 namespace cairo
 {
 
-DSOEXPORT render_handler*
+DSOEXPORT Renderer*
 create_handler()
 // Factory.
 {
-	return new render_handler_cairo();
+	return new Renderer_cairo();
 }
 
 DSOEXPORT void
-set_context(render_handler* handler, cairo_t* context)
+set_context(Renderer* handler, cairo_t* context)
 {
-  render_handler_cairo* cairo_handler = static_cast<render_handler_cairo*>(handler);
+  Renderer_cairo* cairo_handler = static_cast<Renderer_cairo*>(handler);
   cairo_handler->set_context(context);
 }
 

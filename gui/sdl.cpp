@@ -39,7 +39,7 @@ extern "C"{
 #include "log.h"
 #include "sdlsup.h"
 #include "Range2d.h" // for Intersection of inv bounds
-#include "render_handler.h" // for setInvalidatedRegions
+#include "Renderer.h" // for setInvalidatedRegions
 
 using namespace std;
 
@@ -211,7 +211,7 @@ SDLGui::createWindow(const char *title, int width, int height)
 
     _glue.prepDrawingArea(_width, _height, sdl_flags);
 
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
 
     SDL_WM_SetCaption( title, title);
 

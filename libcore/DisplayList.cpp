@@ -20,7 +20,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayList.h"
 #include "log.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "StringPredicates.h"
 #include "MovieClip.h"
 
@@ -648,7 +648,7 @@ DisplayList::destroy()
 // Display the referenced DisplayObjects. Lower depths
 // are obscured by higher depths.
 void
-DisplayList::display(render_handler& renderer)
+DisplayList::display(Renderer& renderer)
 {
     testInvariant();
 
@@ -666,12 +666,12 @@ DisplayList::display(render_handler& renderer)
         {
             renderer.begin_submit_mask();
             
-            if (mask->boundsInClippingArea()) mask->display(renderer);
+            if (mask->boundsInClippingArea(renderer)) mask->display(renderer);
             else mask->omit_display();
               
             renderer.end_submit_mask();
             
-            if (ch->boundsInClippingArea()) ch->display(renderer);
+            if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
             else ch->omit_display();
               
             renderer.disable_mask();

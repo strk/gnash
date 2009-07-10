@@ -55,7 +55,7 @@ public:
 	    assert(_def);
 	}
 
-	virtual void display(render_handler& renderer);
+	virtual void display(Renderer& renderer);
 
     virtual rect getBounds() const {
         return _def ? _def->bounds() : _shape->getBounds();

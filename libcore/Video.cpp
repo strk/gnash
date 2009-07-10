@@ -134,7 +134,7 @@ Video::clear()
 }
 
 void
-Video::display(render_handler& renderer)
+Video::display(Renderer& renderer)
 {
 	// if m_def is NULL we've been constructed by 'new Video', in this
 	// case I think display() would never be invoked on us...

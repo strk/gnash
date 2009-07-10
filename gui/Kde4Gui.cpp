@@ -62,7 +62,7 @@
 #include "gui.h"
 #include "Kde4Gui.h"
 #include "klash4.moc"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "utility.h" // for pixelsToTwips 
 
 // Macro for using gettext strings where Qt expects QStrings
@@ -162,7 +162,7 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
     _validbounds.setTo(0, 0, _width, _height);
     _glue.initBuffer(_width, _height);
     
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
    
     return true;
 }

@@ -272,7 +272,7 @@ TextField::removeTextField()
 }
 
 void
-TextField::show_cursor(render_handler& renderer, const SWFMatrix& mat)
+TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 {
     boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
     boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
@@ -286,7 +286,7 @@ TextField::show_cursor(render_handler& renderer, const SWFMatrix& mat)
 }
 
 void
-TextField::display(render_handler& renderer)
+TextField::display(Renderer& renderer)
 {
 
     registerTextVariable();

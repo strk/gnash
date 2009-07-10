@@ -1107,7 +1107,8 @@ movie_root::display()
 		return;
 	}
 
-    render_handler* renderer = _runInfo.renderer();
+    Renderer* renderer = _runInfo.renderer();
+    if (!renderer) return;
 
 	renderer->begin_display(
 		m_background_color,
@@ -1138,7 +1139,7 @@ movie_root::display()
 
 	}
 
-	renderer.end_display();
+	renderer->end_display();
 }
 
 
@@ -1406,7 +1407,7 @@ movie_root::setQuality(Quality q)
 
     // We always tell the renderer, because it could
     // be the first time we do
-    render_handler* renderer = get_render_handler();
+    Renderer* renderer = get_Renderer();
     if (renderer) renderer->setQuality(_quality);
 
 }

@@ -62,7 +62,7 @@ public:
 
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-    virtual void display(render_handler& renderer);
+    virtual void display(Renderer& renderer);
 
     virtual rect getBounds() const;
 

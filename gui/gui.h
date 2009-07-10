@@ -61,7 +61,7 @@
 // Forward declarations
 namespace gnash
 {
-    class render_handler;
+    class Renderer;
     class movie_root;
     class movie_definition;
 }
@@ -433,7 +433,7 @@ protected:
     unsigned int    _interval;
 
     /// The handler which is called to update the client area of our window.
-    render_handler* _renderer;
+    Renderer* _renderer;
 
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.

@@ -62,7 +62,7 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-MorphShape::display(render_handler& renderer)
+MorphShape::display(Renderer& renderer)
 {
     morph();
     _def->display(renderer, *this); 

@@ -1173,7 +1173,7 @@ private:
 
     /// The display quality of the entire movie.
     //
-    /// This is here, not just in the render_handler, so that AS compatibility
+    /// This is here, not just in the Renderer, so that AS compatibility
     /// does not rely on the presence of a renderer.
     Quality _quality;
 

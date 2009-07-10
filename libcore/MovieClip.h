@@ -299,7 +299,7 @@ public:
     bool goto_labeled_frame(const std::string& label);
         
     /// Display (render?) this Sprite/MovieClip, unless invisible
-    void display(render_handler& renderer);
+    void display(Renderer& renderer);
     
     void omit_display();
 

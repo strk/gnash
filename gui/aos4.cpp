@@ -622,7 +622,7 @@ AOS4Gui::createWindow(const char *title, int width, int height)
 
     _glue.prepDrawingArea(_width, _height);
 
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
 
 	struct Window *_window = _glue.getWindow();
 

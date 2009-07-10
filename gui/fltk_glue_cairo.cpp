@@ -34,8 +34,8 @@
 #include <fltk/layout.h>
 #include <fltk/Cursor.h>
 
-#include "render_handler.h"
-#include "render_handler_cairo.h"
+#include "Renderer.h"
+#include "Renderer_cairo.h"
 
 #include "fltksup.h"
 #include "fltk_glue_cairo.h"
@@ -43,7 +43,7 @@
 #include "log.h"
 #include "gui.h"
 
-//#include "render_handler.h"
+//#include "Renderer.h"
 
 using namespace std;
 //using namespace fltk;
@@ -62,7 +62,7 @@ FltkCairoGlue::~FltkCairoGlue()
     delete [] _offscreenbuf;
 }
 
-render_handler*
+Renderer*
 FltkCairoGlue::createRenderHandler()
 {
     _renderer = renderer::cairo::create_handler();
@@ -101,7 +101,7 @@ FltkCairoGlue::initBuffer(int width, int height)
     renderer::cairo::set_handle(_cairo_handle);
 
     if (firstTime) {
-      set_render_handler(_renderer);
+      set_Renderer(_renderer);
       firstTime = false;
     }
 

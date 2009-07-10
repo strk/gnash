@@ -83,10 +83,10 @@ AquaOglGlue::init(int, char***)
     return ret; 
 }
 
-render_handler* AquaOglGlue::createRenderHandler()
+Renderer* AquaOglGlue::createRenderHandler()
 {
 //    GNASH_REPORT_FUNCTION;
-    render_handler* renderer = create_render_handler_ogl();
+    Renderer* renderer = create_Renderer_ogl();
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #endif

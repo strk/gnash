@@ -33,7 +33,7 @@ extern "C"{
 #include "log.h"
 #include "movie_root.h"
 
-#include "render_handler.h"
+#include "Renderer.h"
 
 #include <Carbon/Carbon.h>
 
@@ -121,7 +121,7 @@ bool AquaGui::init(int argc, char **argv[]) /* Self-explainatory */
     _renderer = _glue.createRenderHandler();
     if(!_renderer)return false;
 
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
     return true;
 
 }

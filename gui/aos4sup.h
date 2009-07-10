@@ -58,8 +58,8 @@
 #define End TAG_END
 
 #undef ACTION_END
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 
 static struct TimeVal os4timer_starttime;
 

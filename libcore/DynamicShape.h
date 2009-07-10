@@ -26,7 +26,7 @@
 
 namespace gnash {
     class DisplayObject;
-    class render_handler;
+    class Renderer;
 }
 
 namespace gnash {
@@ -84,7 +84,7 @@ public:
     }
 
     /// Display a DynamicShape object.
-    void display(render_handler& renderer, const DisplayObject& inst) const;
+    void display(Renderer& renderer, const DisplayObject& inst) const;
 
 	/// Set current line style and start a new path.
 	//

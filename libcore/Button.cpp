@@ -391,7 +391,7 @@ Button::handleFocus() {
 
 
 void
-Button::display(render_handler& renderer)
+Button::display(Renderer& renderer)
 {
 
     DisplayObjects actChars;

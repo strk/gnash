@@ -33,7 +33,7 @@ class AquaOglGlue : public AquaGlue
     virtual ~AquaOglGlue();
 
     bool init(int argc, char ***argv);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     bool prepDrawingArea(int width, int height, AGLDrawable drawable);
     void setInvalidatedRegions(const InvalidatedRanges& /* ranges */);
     void render();

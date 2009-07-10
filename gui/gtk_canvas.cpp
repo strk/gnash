@@ -46,7 +46,7 @@ struct _GnashCanvas {
 	GtkDrawingArea base_instance;
 
     std::auto_ptr<gnash::GtkGlue> glue;
-    gnash::render_handler *renderer;
+    gnash::Renderer *renderer;
 };
 
 G_DEFINE_TYPE(GnashCanvas, gnash_canvas, GTK_TYPE_DRAWING_AREA)
@@ -188,7 +188,7 @@ gnash_canvas_after_realize(GtkWidget *widget)
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
     canvas->renderer = canvas->glue->createRenderHandler();
-    set_render_handler(canvas->renderer);
+    set_Renderer(canvas->renderer);
 
     canvas->glue->setRenderHandlerSize(widget->allocation.width,
                                         widget->allocation.height);
@@ -239,7 +239,7 @@ gnash_canvas_before_rendering(GnashCanvas *canvas)
     canvas->glue->beforeRendering();
 }
 
-gnash::render_handler *
+gnash::Renderer *
 gnash_canvas_get_renderer(GnashCanvas *canvas)
 {
     return canvas->renderer;

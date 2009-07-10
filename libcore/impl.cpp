@@ -317,7 +317,7 @@ void  clear()
 
     // By setting the render handler to NULL we avoid it being used
     // after it's been de-referenced (fixes bug #21310)
-    set_render_handler(NULL);
+    set_Renderer(NULL);
 }
 
 static MovieLibrary s_movie_library;

@@ -21,8 +21,8 @@
 #include "gnash.h"
 #include "log.h"
 #undef ACTION_END
-#include "render_handler.h"
-#include "render_handler_cairo.h"
+#include "Renderer.h"
+#include "Renderer_cairo.h"
 #include <cerrno>
 #include <ostream>
 
@@ -97,7 +97,7 @@ AOS4CairoGlue::init(int argc, char** argv[])
 }
 
 
-render_handler*
+Renderer*
 AOS4CairoGlue::createRenderHandler(int depth)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -128,7 +128,7 @@ AOS4CairoGlue::createRenderHandler(int depth)
     return _cairo_renderer;
 }
 
-render_handler*
+Renderer*
 AOS4CairoGlue::createRenderHandler()
 {
     _bpp = 24;

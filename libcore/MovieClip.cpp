@@ -1351,7 +1351,7 @@ MovieClip::goto_labeled_frame(const std::string& label)
 }
 
 void
-MovieClip::display(render_handler& renderer)
+MovieClip::display(Renderer& renderer)
 {
 
     // Note: 
