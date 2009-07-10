@@ -26,7 +26,7 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "Object.h" 
 
 namespace gnash {
 
@@ -71,7 +71,7 @@ getContextMenuItemInterface()
 {
     static boost::intrusive_ptr<as_object> o;
     if ( ! o ) {
-        o = new as_object();
+        o = new as_object(getObjectInterface());
         attachContextMenuItemInterface(*o);
         VM::get().addStatic(o.get());
     }
@@ -92,13 +92,12 @@ contextmenuitem_ctor(const fn_call& fn)
 
     string_table& st = fn.getVM().getStringTable();
 
-    const int flags = 0;
-
     obj->set_member(st.find("caption"), fn.nargs ? fn.arg(0) : as_value());
-    obj->set_member(st.find("onSelect"), fn.nargs > 1 ? fn.arg(1) : as_value());
-    obj->set_member(st.find("enabled"), true);
-    obj->set_member(st.find("separatorBefore"), false);
-    obj->set_member(st.find("visible"), true);
+    obj->set_member(NSV::PROP_ON_SELECT, fn.nargs > 1 ? fn.arg(1) : as_value());
+    obj->set_member(st.find("separatorBefore"), fn.nargs > 2 ?
+            fn.arg(2) : false);
+    obj->set_member(NSV::PROP_ENABLED, fn.nargs > 3 ? fn.arg(3) : true);
+    obj->set_member(st.find("visible"), fn.nargs > 4 ? fn.arg(4) : true);
 
     return obj; 
 }

@@ -199,7 +199,7 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   
   check_equals(typeof(ContextMenuItem), "function");
 
-  xcheck(ContextMenuItem.prototype.hasOwnProperty("copy"));
+  check(ContextMenuItem.prototype.hasOwnProperty("copy"));
 
   check(!ContextMenuItem.prototype.hasOwnProperty("caption"));
   check(!ContextMenuItem.prototype.hasOwnProperty("enabled"));
@@ -211,11 +211,11 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check(it instanceof ContextMenuItem);
 
   check(!it.hasOwnProperty("copy"));
-  xcheck(it.hasOwnProperty("caption"));
-  xcheck(it.hasOwnProperty("enabled"));
-  xcheck(it.hasOwnProperty("separatorBefore"));
-  xcheck(it.hasOwnProperty("visible"));
-  xcheck(it.hasOwnProperty("onSelect"));
+  check(it.hasOwnProperty("caption"));
+  check(it.hasOwnProperty("enabled"));
+  check(it.hasOwnProperty("separatorBefore"));
+  check(it.hasOwnProperty("visible"));
+  check(it.hasOwnProperty("onSelect"));
 
   check_equals(typeof(it.caption), "undefined");
   check_equals(it.caption, undefined);
