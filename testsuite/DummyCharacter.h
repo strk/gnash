@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-    virtual void display(render_hander& /*renderer*/) {}
+    virtual void display(Renderer& /*renderer*/) {}
 
     virtual rect getBounds() const { return rect(); }
 
