@@ -1350,7 +1350,8 @@ MovieClip::goto_labeled_frame(const std::string& label)
         return false;
 }
 
-void MovieClip::display()
+void
+MovieClip::display(render_handler& renderer)
 {
 
     // Note: 
@@ -1362,11 +1363,11 @@ void MovieClip::display()
     
     // render drawable (ActionScript generated graphics)
     _drawable.finalize();
-    _drawable.display(*this);
+    _drawable.display(renderer, *this);
     
     
     // descend the display list
-    _displayList.display();
+    _displayList.display(renderer);
      
     clear_invalidated();
 }

@@ -22,9 +22,9 @@
 
 #include "TagLoadersTable.h"
 #include "StreamProvider.h"
+#include "render.h"
 #include <string>
 #include <boost/shared_ptr.hpp>
-
 namespace gnash {
 
 // Forward declarations
@@ -97,6 +97,10 @@ public:
     ///             has yet been set.
     sound::sound_handler* soundHandler() const {
         return _soundHandler.get();
+    }
+
+    render_handler* renderer() const {
+        return get_render_handler();
     }
 
     /// Set the loader functions for SWF parsing.

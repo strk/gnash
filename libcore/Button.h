@@ -91,7 +91,7 @@ public:
 	// called from keypress listener only
 	bool on_event(const event_id& id);
 
-	void display();
+	void display(render_handler& renderer);
 	
 	void set_current_state(MouseState new_state);
 

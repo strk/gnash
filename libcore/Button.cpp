@@ -391,7 +391,7 @@ Button::handleFocus() {
 
 
 void
-Button::display()
+Button::display(render_handler& renderer)
 {
 
     DisplayObjects actChars;
@@ -400,8 +400,10 @@ Button::display()
     // TODO: by keeping chars sorted by depth we'd avoid the sort on display
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    std::for_each(actChars.begin(), actChars.end(),
-            std::mem_fun(&DisplayObject::display)); 
+    for (DisplayObjects::iterator it = actChars.begin(), e = actChars.end();
+            it != e; ++it) {
+        (*it)->display(renderer);
+    }
 
     clear_invalidated();
 }

@@ -67,7 +67,7 @@ public:
 	/// Register this video instance as a live DisplayObject
 	virtual void stagePlacementCallback(as_object* initObj = 0);
 
-	void display();
+	void display(render_handler& renderer);
 
 	// For sure isActionScriptReferenceable...
 	bool wantsInstanceName() const

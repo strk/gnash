@@ -1423,12 +1423,12 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 
 
 bool 
-DisplayObject::boundsInClippingArea() const 
+DisplayObject::boundsInClippingArea(render_handler& renderer) const 
 {
   rect mybounds = getBounds();
   getWorldMatrix().transform(mybounds);
   
-  return gnash::render::bounds_in_clipping_area( mybounds.getRange() );  
+  return renderer.bounds_in_clipping_area(mybounds.getRange());  
 }
 
 #ifdef USE_SWFTREE

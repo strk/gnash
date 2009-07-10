@@ -26,6 +26,10 @@
 #include <cassert>
 
 namespace gnash {
+    class render_handler;
+}
+
+namespace gnash {
 
 /// A DisplayObject that tweens between two shapes.
 //
@@ -49,7 +53,7 @@ public:
     MorphShape(const SWF::DefineMorphShapeTag* const def, 
             DisplayObject* parent, int id);
 
-	virtual void display();
+	virtual void display(render_handler& renderer);
 
     virtual rect getBounds() const;
     

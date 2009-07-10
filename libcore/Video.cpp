@@ -134,7 +134,7 @@ Video::clear()
 }
 
 void
-Video::display()
+Video::display(render_handler& renderer)
 {
 	// if m_def is NULL we've been constructed by 'new Video', in this
 	// case I think display() would never be invoked on us...
@@ -146,7 +146,7 @@ Video::display()
 	GnashImage* img = getVideoFrame();
 	if (img)
 	{
-		gnash::render::drawVideoFrame(img, &m, &bounds, _smoothing);
+		renderer.drawVideoFrame(img, &m, &bounds, _smoothing);
 	}
 
 	clear_invalidated();

@@ -106,13 +106,14 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 }
 
 void
-DefineTextTag::display(const StaticText& inst) const
+DefineTextTag::display(render_handler& renderer, const StaticText& inst) const
 {
 
     SWFMatrix mat = inst.getWorldMatrix();
     mat.concatenate(_matrix);
 
-    TextRecord::displayRecords(mat, inst.get_world_cxform(), _textRecords);
+    TextRecord::displayRecords(renderer, mat, inst.get_world_cxform(),
+            _textRecords);
 }
 
 

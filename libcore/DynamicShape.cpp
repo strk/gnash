@@ -42,9 +42,9 @@ DynamicShape::clear()
 }
 
 void
-DynamicShape::display(const DisplayObject& inst) const
+DynamicShape::display(render_handler& renderer, const DisplayObject& inst) const
 {
-    render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+    renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
 void

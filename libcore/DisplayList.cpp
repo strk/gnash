@@ -20,7 +20,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayList.h"
 #include "log.h"
-#include "render.h"
+#include "render_handler.h"
 #include "StringPredicates.h"
 #include "MovieClip.h"
 
@@ -648,7 +648,7 @@ DisplayList::destroy()
 // Display the referenced DisplayObjects. Lower depths
 // are obscured by higher depths.
 void
-DisplayList::display()
+DisplayList::display(render_handler& renderer)
 {
     testInvariant();
 
@@ -664,17 +664,17 @@ DisplayList::display()
         DisplayObject* mask = ch->getMask();
         if (mask && ch->visible() && ! mask->unloaded())
         {
-            render::begin_submit_mask();
+            renderer.begin_submit_mask();
             
-            if (mask->boundsInClippingArea()) mask->display();
+            if (mask->boundsInClippingArea()) mask->display(renderer);
             else mask->omit_display();
               
-            render::end_submit_mask();
+            renderer.end_submit_mask();
             
-            if (ch->boundsInClippingArea()) ch->display();
+            if (ch->boundsInClippingArea()) ch->display(renderer);
             else ch->omit_display();
               
-            render::disable_mask();
+            renderer.disable_mask();
             
             continue;
         }
@@ -707,27 +707,27 @@ DisplayList::display()
         // Discard useless masks
         while (!clipDepthStack.empty() && (depth > clipDepthStack.top())) {
             clipDepthStack.pop();
-            render::disable_mask();
+            renderer.disable_mask();
         }
 
         // Push a new mask to the masks stack
     	if (ch->isMaskLayer()) {
             int clipDepth = ch->get_clip_depth();
             clipDepthStack.push(clipDepth);
-            render::begin_submit_mask();
+            renderer.begin_submit_mask();
         }
         
-        if (ch->boundsInClippingArea()) ch->display();        
+        if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
         else ch->omit_display();
         
         // Notify the renderer that mask drawing has finished.
-        if (ch->isMaskLayer()) render::end_submit_mask();
+        if (ch->isMaskLayer()) renderer.end_submit_mask();
     } 
 
     // Discard any remaining masks
     while (!clipDepthStack.empty()) {
         clipDepthStack.pop();
-        render::disable_mask();
+        renderer.disable_mask();
     }
     
     

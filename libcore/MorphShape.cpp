@@ -62,10 +62,10 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-MorphShape::display()
+MorphShape::display(render_handler& renderer)
 {
     morph();
-    _def->display(*this); 
+    _def->display(renderer, *this); 
     clear_invalidated();
 }
 

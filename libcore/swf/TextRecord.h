@@ -28,6 +28,7 @@ namespace gnash {
     class SWFMatrix;
     class cxform;
     class Font;
+    class render_handler;
 }
 
 namespace gnash {
@@ -88,8 +89,8 @@ public:
     bool read(SWFStream& in, movie_definition& m, int glyphBits,
             int advanceBits, TagType tag);
 
-    static void displayRecords(const SWFMatrix& mat, const cxform& cx,
-            const TextRecords& records, bool embedded = true);
+    static void displayRecords(render_handler& renderer, const SWFMatrix& mat,
+            const cxform& cx, const TextRecords& records, bool embedded = true);
 
     const Glyphs& glyphs() const {
         return _glyphs;

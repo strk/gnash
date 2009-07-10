@@ -272,7 +272,7 @@ TextField::removeTextField()
 }
 
 void
-TextField::show_cursor(const SWFMatrix& mat)
+TextField::show_cursor(render_handler& renderer, const SWFMatrix& mat)
 {
     boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
     boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
@@ -282,11 +282,11 @@ TextField::show_cursor(const SWFMatrix& mat)
         (point(x, y))
         (point(x, y + h));
     
-    render::drawLine(box, rgba(0,0,0,255), mat);
+    renderer.drawLine(box, rgba(0,0,0,255), mat);
 }
 
 void
-TextField::display()
+TextField::display(render_handler& renderer)
 {
 
     registerTextVariable();
@@ -325,7 +325,7 @@ TextField::display()
     log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
-        render::draw_poly(&coords.front(), 4, backgroundColor, 
+        renderer.draw_poly(&coords.front(), 4, backgroundColor, 
                 borderColor, wmat, true);
         
     }
@@ -341,10 +341,10 @@ TextField::display()
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    SWF::TextRecord::displayRecords(m, get_world_cxform(), _textRecords,
-            _embedFonts);
+    SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
+            _textRecords, _embedFonts);
 
-    if (m_has_focus) show_cursor(wmat);
+    if (m_has_focus) show_cursor(renderer, wmat);
     
     clear_invalidated();
 }

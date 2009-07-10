@@ -20,6 +20,7 @@ namespace gnash {
     class Shape;
 	class SWFMatrix;
 	class RunInfo;
+	class render_handler;
 }
 
 namespace gnash {
@@ -38,7 +39,7 @@ public:
     virtual ~DefineShapeTag() {};
 
     // Display a Shape character.
-    virtual void display(const DisplayObject& inst) const;
+    virtual void display(render_handler& renderer, const DisplayObject& inst) const;
 
     // Create a Shape DisplayObject.
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)

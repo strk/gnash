@@ -85,9 +85,9 @@ DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
 }
 
 void
-DefineShapeTag::display(const DisplayObject& inst) const
+DefineShapeTag::display(render_handler& renderer, const DisplayObject& inst) const
 {
-    render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+    renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
 void

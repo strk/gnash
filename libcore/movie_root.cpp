@@ -1107,7 +1107,9 @@ movie_root::display()
 		return;
 	}
 
-	render::begin_display(
+    render_handler* renderer = _runInfo.renderer();
+
+	renderer->begin_display(
 		m_background_color,
 		m_viewport_x0, m_viewport_y0,
 		m_viewport_width, m_viewport_height,
@@ -1132,11 +1134,11 @@ movie_root::display()
 			continue;
 		}
 
-		movie->display();
+		movie->display(*renderer);
 
 	}
 
-	render::end_display();
+	renderer.end_display();
 }
 
 

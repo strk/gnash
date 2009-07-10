@@ -161,7 +161,7 @@ public:
 		string_table::key nsname = 0);
 
 	/// Draw the dynamic string.
-	void	display();
+	void display(render_handler& renderer);
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
@@ -601,7 +601,7 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
-	void show_cursor(const SWFMatrix& mat);
+	void show_cursor(render_handler& renderer, const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
 

@@ -21,6 +21,9 @@
 #include "GnashImage.h"
 #include "DynamicShape.h"
 #include "rect.h"
+#include "render_handler.h"
+#include "VM.h"
+#include "movie_root.h"
 
 namespace gnash {
 
@@ -74,12 +77,12 @@ Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 }
 
 void
-Bitmap::display()
+Bitmap::display(render_handler& renderer)
 {
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
 
-    _shape.display(*this);
+    _shape.display(renderer, *this);
     clear_invalidated();
 }
 
@@ -124,7 +127,9 @@ Bitmap::makeBitmap()
         }
     }
 
-    _bitmapInfo = render::createBitmapInfo(im);
+    render_handler* renderer = _vm.getRoot().runInfo().renderer();
+
+    _bitmapInfo = renderer->createBitmapInfo(im);
 
 }
 
