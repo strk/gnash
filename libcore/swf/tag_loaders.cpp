@@ -349,13 +349,30 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    // Read the image data.else
+    char buf[3];
+    if (in.read(buf, 3) < 3) {
+        log_swferror(_("DEFINEBITS data too short to read type header"));
+        return;
+    }
+    in.seek(in.tell() - 3);
 
-    boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in,
+    FileType ft = GNASH_FILETYPE_JPEG;  
+
+    // Check the data type. The pp version 9,0,115,0 supports PNG and GIF
+    // in DefineBits tags, though it is not documented. The version makes
+    // no difference.
+    if (std::equal(buf, buf + 3, "\x89PN")) {
+        ft = GNASH_FILETYPE_PNG;
+    }
+    else if (std::equal(buf, buf + 3, "GIF")) {
+        ft = GNASH_FILETYPE_GIF;
+    }
+
+    // Read the image data.
+    boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 in.get_tag_end_position()).release() );
 
-    std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad,
-                GNASH_FILETYPE_JPEG));
+    std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad, ft));
 
     boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
 
