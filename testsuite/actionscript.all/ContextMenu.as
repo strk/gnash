@@ -268,8 +268,8 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // This isn't added because onSelect isn't a function.
   o2 = it.copy();
-  xcheck_equals(o2.caption, "name1");
-  xcheck_equals(o2.onSelect(), "f");
+  check_equals(o2.caption, "name1");
+  check_equals(o2.onSelect(), "f");
   o2.onSelect = 6;
   o2.caption = "name2";
   cm.customItems.push(o2);
@@ -281,7 +281,7 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // If two objects have the same caption, only the first is added to the menu.
   o4 = it.copy();
-  xcheck_equals(o4.caption, "name1");
+  check_equals(o4.caption, "name1");
   o4.onSelect = g;
   cm.customItems.push(o4);
 
