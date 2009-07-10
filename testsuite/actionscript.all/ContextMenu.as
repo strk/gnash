@@ -215,9 +215,12 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   xcheck(it.hasOwnProperty("enabled"));
   xcheck(it.hasOwnProperty("separatorBefore"));
   xcheck(it.hasOwnProperty("visible"));
+  xcheck(it.hasOwnProperty("onSelect"));
 
   check_equals(typeof(it.caption), "undefined");
   check_equals(it.caption, undefined);
+  check_equals(typeof(it.onSelect), "undefined");
+  check_equals(it.onSelect, undefined);
   xcheck_equals(typeof(it.enabled), "boolean");
   xcheck_equals(it.enabled, true);
   xcheck_equals(typeof(it.separatorBefore), "boolean");
@@ -301,6 +304,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  totals(120);
+  totals(123);
 
 #endif
