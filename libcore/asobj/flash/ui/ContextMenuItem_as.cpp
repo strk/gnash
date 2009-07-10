@@ -81,7 +81,25 @@ getContextMenuItemInterface()
 as_value
 contextmenuitem_copy(const fn_call& fn)
 {
-    return as_value();
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+    as_value caption, separatorBefore, visible, enabled, onSelect;
+    string_table& st = fn.getVM().getStringTable();
+
+    ptr->get_member(st.find("caption"), &caption);
+    ptr->get_member(st.find("separatorBefore"), &separatorBefore);
+    ptr->get_member(st.find("visible"), &visible);
+    ptr->get_member(NSV::PROP_ON_SELECT, &onSelect);
+    ptr->get_member(NSV::PROP_ENABLED, &enabled);
+
+    as_object* c = new as_object(getContextMenuItemInterface());
+    c->set_member(st.find("caption"), caption);
+    c->set_member(st.find("separatorBefore"), separatorBefore);
+    c->set_member(st.find("visible"), visible);
+    c->set_member(NSV::PROP_ON_SELECT, onSelect);
+    c->set_member(NSV::PROP_ENABLED, enabled);
+    
+    return as_value(c);
 }
 
 
