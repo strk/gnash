@@ -1,4 +1,4 @@
-// ContextMenuItem_as.cpp:  ActionScript "ContextMenuItem" class, for Gnash.
+// as_object.cpp:  ActionScript "ContextMenuItem" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -33,31 +33,21 @@ namespace gnash {
 // Forward declarations
 namespace {
     as_value contextmenuitem_ctor(const fn_call& fn);
+    as_value contextmenuitem_copy(const fn_call& fn);
     void attachContextMenuItemInterface(as_object& o);
-    void attachContextMenuItemStaticInterface(as_object& o);
     as_object* getContextMenuItemInterface();
 
 }
 
-class ContextMenuItem_as : public as_object
-{
-
-public:
-
-    ContextMenuItem_as()
-        :
-        as_object(getContextMenuItemInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void contextmenuitem_class_init(as_object& global)
+void
+contextmenuitem_class_init(as_object& global)
 {
     static boost::intrusive_ptr<builtin_function> cl;
 
     if (!cl) {
-        cl = new builtin_function(&contextmenuitem_ctor, getContextMenuItemInterface());
-        attachContextMenuItemStaticInterface(*cl);
+        cl = new builtin_function(&contextmenuitem_ctor,
+                getContextMenuItemInterface());
     }
 
     // Register _global.ContextMenuItem
@@ -69,12 +59,11 @@ namespace {
 void
 attachContextMenuItemInterface(as_object& o)
 {
-}
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::onlySWF7Up;
 
-void
-attachContextMenuItemStaticInterface(as_object& o)
-{
-
+    o.init_member("copy", new builtin_function(contextmenuitem_copy), flags);
 }
 
 as_object*
@@ -84,16 +73,34 @@ getContextMenuItemInterface()
     if ( ! o ) {
         o = new as_object();
         attachContextMenuItemInterface(*o);
+        VM::get().addStatic(o.get());
     }
     return o.get();
 }
 
 as_value
+contextmenuitem_copy(const fn_call& fn)
+{
+    return as_value();
+}
+
+
+as_value
 contextmenuitem_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new ContextMenuItem_as;
+    as_object* obj = new as_object(getContextMenuItemInterface());
 
-    return as_value(obj.get()); // will keep alive
+    string_table& st = fn.getVM().getStringTable();
+
+    const int flags = 0;
+
+    obj->set_member(st.find("caption"), fn.nargs ? fn.arg(0) : as_value());
+    obj->set_member(st.find("onSelect"), fn.nargs > 1 ? fn.arg(1) : as_value());
+    obj->set_member(st.find("enabled"), true);
+    obj->set_member(st.find("separatorBefore"), false);
+    obj->set_member(st.find("visible"), true);
+
+    return obj; 
 }
 
 } // anonymous namespace 
