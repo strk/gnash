@@ -40,6 +40,7 @@
 #include "Math_as.h"
 #include "flash/accessibility/Accessibility_as.h"
 #include "flash/ui/ContextMenu_as.h"
+#include "flash/ui/ContextMenuItem_as.h"
 #include "flash/ui/Keyboard_as.h"
 #include "flash/ui/Mouse_as.h"
 #include "flash/media/Microphone_as.h"
@@ -366,6 +367,8 @@ avm1Classes()
            NS_GLOBAL, 6))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
+        (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM,
+           NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
            NSV::CLASS_OBJECT, NS_GLOBAL, 7))
         (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
@@ -504,6 +507,8 @@ avm2Classes()
            NSV::NS_FLASH_UI, 5))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 7))
+        (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM,
+           NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5))
         
         // Accessibility classes
         (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,

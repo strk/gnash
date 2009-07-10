@@ -59,6 +59,7 @@ enum NamedStrings {
         CLASS_CAMERA,
         CLASS_COLOR,
         CLASS_CONTEXTMENU,
+        CLASS_CONTEXTMENUITEM,
         CLASS_CUSTOM_ACTIONS,
         CLASS_CSMTEXTSETTINGS,
         CLASS_DATE,
