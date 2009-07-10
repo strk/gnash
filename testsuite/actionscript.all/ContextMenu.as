@@ -153,9 +153,9 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   f.customItems.push(cmi);
   ff = f.copy();
   check_equals(f.customItems.length, 2);
-  xcheck_equals(f.customItems[1].caption, "hi");
+  check_equals(f.customItems[1].caption, "hi");
   check_equals(ff.customItems.length, 2);
-  xcheck_equals(ff.customItems[1].caption, "hi");
+  check_equals(ff.customItems[1].caption, "hi");
 
   c = {};
   c.onSelect = h;
@@ -197,9 +197,9 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // Test ContextMenuItem
   
-  xcheck_equals(typeof(ContextMenuItem), "function");
+  check_equals(typeof(ContextMenuItem), "function");
 
-  xcheck(ContextMenuItem.prototype.hasOwnProperty("copy"));
+  check(ContextMenuItem.prototype.hasOwnProperty("copy"));
 
   check(!ContextMenuItem.prototype.hasOwnProperty("caption"));
   check(!ContextMenuItem.prototype.hasOwnProperty("enabled"));
@@ -207,39 +207,42 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check(!ContextMenuItem.prototype.hasOwnProperty("visible"));
 
   it = new ContextMenuItem();
-  xcheck_equals(typeof(it), "object");
-  xcheck(it instanceof ContextMenuItem);
+  check_equals(typeof(it), "object");
+  check(it instanceof ContextMenuItem);
 
   check(!it.hasOwnProperty("copy"));
-  xcheck(it.hasOwnProperty("caption"));
-  xcheck(it.hasOwnProperty("enabled"));
-  xcheck(it.hasOwnProperty("separatorBefore"));
-  xcheck(it.hasOwnProperty("visible"));
+  check(it.hasOwnProperty("caption"));
+  check(it.hasOwnProperty("enabled"));
+  check(it.hasOwnProperty("separatorBefore"));
+  check(it.hasOwnProperty("visible"));
+  check(it.hasOwnProperty("onSelect"));
 
   check_equals(typeof(it.caption), "undefined");
   check_equals(it.caption, undefined);
-  xcheck_equals(typeof(it.enabled), "boolean");
-  xcheck_equals(it.enabled, true);
-  xcheck_equals(typeof(it.separatorBefore), "boolean");
-  xcheck_equals(it.separatorBefore, false);
-  xcheck_equals(typeof(it.visible), "boolean");
-  xcheck_equals(it.visible, true);
+  check_equals(typeof(it.onSelect), "undefined");
+  check_equals(it.onSelect, undefined);
+  check_equals(typeof(it.enabled), "boolean");
+  check_equals(it.enabled, true);
+  check_equals(typeof(it.separatorBefore), "boolean");
+  check_equals(it.separatorBefore, false);
+  check_equals(typeof(it.visible), "boolean");
+  check_equals(it.visible, true);
 
   f = function () { trace("f"); return "f"; };
   g = function () { trace("g"); return "g"; };
   
 
   it = new ContextMenuItem("name1", f);
-  xcheck_equals(typeof(it.caption), "string");
-  xcheck_equals(it.caption, "name1");
-  xcheck_equals(typeof(it.onSelect), "function");
-  xcheck_equals(it.onSelect(), "f");
-  xcheck_equals(typeof(it.enabled), "boolean");
-  xcheck_equals(it.enabled, true);
-  xcheck_equals(typeof(it.separatorBefore), "boolean");
-  xcheck_equals(it.separatorBefore, false);
-  xcheck_equals(typeof(it.visible), "boolean");
-  xcheck_equals(it.visible, true);
+  check_equals(typeof(it.caption), "string");
+  check_equals(it.caption, "name1");
+  check_equals(typeof(it.onSelect), "function");
+  check_equals(it.onSelect(), "f");
+  check_equals(typeof(it.enabled), "boolean");
+  check_equals(it.enabled, true);
+  check_equals(typeof(it.separatorBefore), "boolean");
+  check_equals(it.separatorBefore, false);
+  check_equals(typeof(it.visible), "boolean");
+  check_equals(it.visible, true);
 
   // Add a test object to the ContextMenu
   cm.customItems.push(it);
@@ -265,8 +268,8 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // This isn't added because onSelect isn't a function.
   o2 = it.copy();
-  xcheck_equals(o2.caption, "name1");
-  xcheck_equals(o2.onSelect(), "f");
+  check_equals(o2.caption, "name1");
+  check_equals(o2.onSelect(), "f");
   o2.onSelect = 6;
   o2.caption = "name2";
   cm.customItems.push(o2);
@@ -278,7 +281,7 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   // If two objects have the same caption, only the first is added to the menu.
   o4 = it.copy();
-  xcheck_equals(o4.caption, "name1");
+  check_equals(o4.caption, "name1");
   o4.onSelect = g;
   cm.customItems.push(o4);
 
@@ -301,6 +304,6 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   contextMenuObj2.onSelect = 4;
   check_equals(typeof(contextMenuObj2.onSelect), 'number');
   
-  totals(120);
+  totals(123);
 
 #endif

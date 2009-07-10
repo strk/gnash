@@ -209,6 +209,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "NetConnection", NSV::CLASS_NET_CONNECTION ),
 	string_table::svt( "NetStream", NSV::CLASS_NET_STREAM ),
 	string_table::svt( "ContextMenu", NSV::CLASS_CONTEXTMENU ),
+	string_table::svt( "ContextMenuItem", NSV::CLASS_CONTEXTMENUITEM ),
 	string_table::svt( "MovieClipLoader", NSV::CLASS_MOVIE_CLIP_LOADER ),
 	string_table::svt( "Error", NSV::CLASS_ERROR ),
 	string_table::svt( "Event", NSV::CLASS_EVENT),
