@@ -17,6 +17,7 @@
 
 #include "DynamicShape.h"
 #include "render.h"
+#include "fill_style.h"
 
 #include <vector>
 

@@ -20,13 +20,13 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-#include "fill_style.h"
 #include "styles.h" 
 #include "ShapeRecord.h"
 
 namespace gnash {
     class DisplayObject;
     class Renderer;
+    class fill_style;
 }
 
 namespace gnash {

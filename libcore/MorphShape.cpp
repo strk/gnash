@@ -19,7 +19,6 @@
 
 #include "MorphShape.h"
 #include "VM.h"
-#include "fill_style.h"
 #include "swf/ShapeRecord.h"
 #include "Geometry.h"
 #include "SWFMatrix.h"

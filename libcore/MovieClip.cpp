@@ -53,7 +53,6 @@
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
-#include "fill_style.h" // for beginGradientFill
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 #include "NetStream_as.h"

@@ -20,7 +20,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
-#include "fill_style.h"
 #include "Geometry.h" // for class path and class edge
 #include "render.h" // for ::display
 #include "GnashImage.h"
