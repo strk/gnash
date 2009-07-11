@@ -274,7 +274,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 // existing JpegImageInput object stored in the movie.
 void
 define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunInfo& r)
 {
     assert(tag == SWF::DEFINEBITS); // 6
 
@@ -317,7 +317,12 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
     
-    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
+    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(im);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -326,7 +331,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunInfo& r)
 {
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
 
@@ -374,7 +379,12 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad, ft));
 
-    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
+    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(im);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -474,7 +484,7 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
 // channel using zlib compression.
 void
 define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunInfo& r)
 {
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
@@ -523,8 +533,14 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
     im->mergeAlpha(buffer.get(), bufferLength);
 
+
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
     boost::intrusive_ptr<BitmapInfo> bi =
-        render::createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
+        renderer->createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -534,7 +550,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunInfo& r)
 {
     // tags 20 || 36
     assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
@@ -711,7 +727,12 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     }
 
-    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(image);
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
+    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(image);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
