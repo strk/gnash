@@ -32,14 +32,14 @@ namespace SWF {
 
 void
 DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunInfo& r)
 {
     assert(tag == DEFINEFONT || tag == DEFINEFONT2 || tag == DEFINEFONT3);
 
     in.ensureBytes(2);
     boost::uint16_t fontID = in.read_u16();
 
-    std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag));
+    std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag, r));
 
     Font* f = new Font(ft);
 
@@ -94,7 +94,8 @@ DefineFontTag::markReachableResources() const
 #endif
 
 
-DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag)
+DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
+        const RunInfo& r)
     :
     _subpixelFont(tag == DEFINEFONT3 ? true : false),
     _unicodeChars(false),
@@ -113,17 +114,18 @@ DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag)
             std::abort();
             break;
         case DEFINEFONT:
-            readDefineFont(in, m);
+            readDefineFont(in, m, r);
             break;
         case DEFINEFONT2:
         case DEFINEFONT3:
-            readDefineFont2Or3(in, m);
+            readDefineFont2Or3(in, m, r);
             break;
     }
 }
 
 void
-DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m)
+DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m,
+        const RunInfo& r)
 {
     IF_VERBOSE_PARSE(
         log_parse(_("reading DefineFont"));
@@ -175,13 +177,14 @@ DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m)
         }
 
         // Create & read the shape.
-        _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT, m)); 
+        _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT, m, r)); 
     }
 }
 
 // Read a DefineFont2 or DefineFont3 tag
 void
-DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
+DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
+        const RunInfo& r)
 {
     IF_VERBOSE_PARSE (
     log_parse(_("reading DefineFont2 or DefineFont3"));
@@ -282,7 +285,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         }
 
         // Create & read the shape.
-        _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT2, m));
+        _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT2, m, r));
     }
 
     unsigned long current_position = in.tell();

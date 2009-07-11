@@ -22,6 +22,7 @@
 #include "fill_style.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"
+#include "RunInfo.h"
 
 #include <vector>
 
@@ -31,9 +32,9 @@ namespace SWF {
 // Forward declarations
 namespace {
     void readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md);
+        SWF::TagType tag, movie_definition& md, const RunInfo& r);
     void readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md);
+        SWF::TagType tag, movie_definition& md, const RunInfo& r);
     void computeBounds(rect& bounds, const ShapeRecord::Paths& paths,
         const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
@@ -135,9 +136,10 @@ private:
 } // anonymous namespace
 
 
-ShapeRecord::ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m)
+ShapeRecord::ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
+        const RunInfo& r)
 {
-    read(in, tag, m);
+    read(in, tag, m, r);
 }
 
 void
@@ -210,7 +212,8 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
 }
 
 void
-ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
+ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
+        const RunInfo& r)
 {
 
     /// TODO: is this correct?
@@ -239,8 +242,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
             LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));
         }
     
-        readFillStyles(_fillStyles, in, tag, m);
-        readLineStyles(_lineStyles, in, tag, m);
+        readFillStyles(_fillStyles, in, tag, m, r);
+        readLineStyles(_lineStyles, in, tag, m, r);
     }
 
     if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 )
@@ -522,8 +525,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
     
                 fill_base = _fillStyles.size();
                 line_base = _lineStyles.size();
-                readFillStyles(_fillStyles, in, tag, m);
-                readLineStyles(_lineStyles, in, tag, m);
+                readFillStyles(_fillStyles, in, tag, m, r);
+                readLineStyles(_lineStyles, in, tag, m, r);
     
                 in.ensureBits(8);
                 num_fill_bits = in.read_uint(4);
@@ -628,7 +631,7 @@ namespace {
 // Read fill styles, and push them onto the given style array.
 void
 readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-                 SWF::TagType tag, movie_definition& m)
+                 SWF::TagType tag, movie_definition& m, const RunInfo& r)
 {
     in.ensureBytes(1);
     boost::uint16_t fill_style_count = in.read_u8();
@@ -647,11 +650,10 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
 
     // Read the styles.
     styles.reserve(styles.size()+fill_style_count);
-    for (boost::uint16_t i = 0; i < fill_style_count; ++i)
-    {
+    for (boost::uint16_t i = 0; i < fill_style_count; ++i) {
         // TODO: add a fill_style constructor directly reading from stream
         fill_style fs;
-        fs.read(in, tag, m);
+        fs.read(in, tag, m, r);
         styles.push_back(fs);
     }
 }
@@ -659,7 +661,7 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
 // Read line styles and push them onto the back of the given array.
 void
 readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md)
+        SWF::TagType tag, movie_definition& md, const RunInfo& r)
 {
     in.ensureBytes(1);
     int line_style_count = in.read_u8();
@@ -681,7 +683,7 @@ readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
     for (int i = 0; i < line_style_count; i++)
     {
         styles.resize(styles.size() + 1);
-        styles.back().read(in, tag, md);
+        styles.back().read(in, tag, md, r);
     }
 }
 

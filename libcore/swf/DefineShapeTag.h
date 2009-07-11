@@ -65,7 +65,8 @@ protected:
 
 private:
 
-    DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m);
+    DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m,
+            const RunInfo& r);
 
     /// The actual shape data is stored in this record.
     const ShapeRecord _shape;

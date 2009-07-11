@@ -103,13 +103,15 @@ public:
 
 private:
 
-    DefineFontTag(SWFStream& in, movie_definition& m, TagType tag);
+    DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
+            const RunInfo& r);
 
     /// Read a DefineFont tag.
-    void readDefineFont(SWFStream& in, movie_definition & m);
+    void readDefineFont(SWFStream& in, movie_definition& m, const RunInfo& r);
 
     /// Read a DefineFont2 or DefineFont3 tag.
-    void readDefineFont2Or3(SWFStream& in, movie_definition& m);
+    void readDefineFont2Or3(SWFStream& in, movie_definition& m,
+            const RunInfo& r);
 
     /// The GlyphInfo records contained in the tag.
     Font::GlyphInfoRecords _glyphTable;

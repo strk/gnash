@@ -65,7 +65,8 @@ public:
 
 private:
 
-    DefineMorphShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& md);
+    DefineMorphShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& md,
+            const RunInfo& r);
     
     /// Read a DefineMorphShape tag from stream
     //
@@ -84,7 +85,8 @@ private:
     ///	Movie definition. Used to resolv DisplayObject ids for fill styles.
     ///	Must be not-null or would segfault. 
     ///
-    void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
+    void read(SWFStream& in, SWF::TagType tag, movie_definition& m,
+            const RunInfo& r);
 
     ShapeRecord _shape1;
     ShapeRecord _shape2;
