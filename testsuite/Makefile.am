@@ -62,6 +62,7 @@ DIST_SUBDIRS = \
 	libamf.all \
 	libnet.all \
 	libcore.all \
+	network.all \
 	samples	\
 	swfdec \
 	misc-ming.all \
@@ -90,8 +91,7 @@ SUBDIRS = \
 	movies.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp network.all
-
+EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp
 
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
 
