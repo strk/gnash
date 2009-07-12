@@ -28,7 +28,6 @@ AM_LDFLAGS = \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
-	$(SSL_LIBS) \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
@@ -40,7 +39,6 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
-	$(SSL_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
@@ -74,8 +72,17 @@ libgnashnet_la_SOURCES = \
 	cache.cpp
 
 if BUILD_SSL
+AM_LDFLAGS += $(SSL_LIBS)
+INCLUDES += $(SSL_CFLAGS)
 libgnashnet_la_SOURCES += sslclient.cpp
 noinst_HEADERS += sslclient.h
+endif
+
+if BUILD_SSH
+AM_LDFLAGS += $(SSH_LIBS)
+INCLUDES += $(SSH_CFLAGS)
+libgnashnet_la_SOURCES += sshclient.cpp # sshserver.cpp
+noinst_HEADERS += sshclient.h # sshserver.h
 endif
 
 if WIN32
