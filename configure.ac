@@ -1220,13 +1220,32 @@ dnl --------------------------------------------------------
 dnl  Select SSL support
 dnl --------------------------------------------------------
 
+dnl Enable using libssh with libnet
+AC_ARG_ENABLE(ssh,
+  AC_HELP_STRING([--enable-ssh], [Enable using SSH for network authentication]),
+[case "${enableval}" in
+  yes) build_ssh=yes ;;
+  no)  build_ssh=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssh option]) ;;
+esac], build_ssh=no)
+
+AM_CONDITIONAL(BUILD_SSH, test x"${build_ssh}" = xyes)
+if test x"${build_ssh}" = xyes; then
+  GNASH_PKG_FIND(ssh, [libssh/libssh.h], [libssh library], ssh_socket_init)
+dnl  GNASH_PKG_FIND(poppler, [popt.h], [Poppler library], poppler_init)
+fi
+
+dnl --------------------------------------------------------
+dnl  Select SSL support
+dnl --------------------------------------------------------
+
 dnl Enable using OpenSSL with libnet.
 AC_ARG_ENABLE(ssl,
   AC_HELP_STRING([--enable-ssl], [Enable using OpenSSL directly]),
 [case "${enableval}" in
   yes) build_ssl=yes ;;
   no)  build_ssl=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssl option]) ;;
 esac], build_ssl=no)
 
 with_cert=
@@ -1244,7 +1263,6 @@ AC_ARG_WITH(pem,
 if test x"${build_ssl}" = xyes; then
   GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
 fi
-
 
 dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
@@ -3347,6 +3365,19 @@ if test x${build_ssl} = xyes; then
     echo "        SSL libs are: $SSL_LIBS"
   else
     echo "        ERROR: No SSL development package is installed, but it's enabled." >&3
+  fi
+fi
+
+if test x${build_ssh} = xyes; then
+  if test x"${has_ssh}" = xyes; then
+    if test x"${SSH_CFLAGS}" = xyes; then
+      echo "        SSH flags are: default"
+    else
+      echo "        SSH flags are: $SSH_CFLAGS"
+    fi
+    echo "        SSH libs are: $SSH_LIBS"
+  else
+    echo "        ERROR: No SSH development package is installed, but it's enabled." >&3
   fi
 fi
 
