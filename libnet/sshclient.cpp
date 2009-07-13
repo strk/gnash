@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
+#include <cstdlib> // getenv
 
 #include "GnashSystemIOHeaders.h" // read()
 #include "sshclient.h"
@@ -82,11 +83,25 @@ SSHClient::SSHClient()
 {
     GNASH_REPORT_FUNCTION;
 
+    // Set the default user name
+    setUser();
 }
 
 SSHClient::~SSHClient()
 {
     GNASH_REPORT_FUNCTION;
+    
+    sshShutdown();
+}
+
+void
+SSHClient::setUser()
+{
+    GNASH_REPORT_FUNCTION;
+    string user = std::getenv("USER");
+    if (!user.empty()) {
+	_user = user;
+    }    
 }
 
 // Read bytes from the already opened SSH connection
@@ -140,8 +155,12 @@ SSHClient::sshShutdown()
 {
     GNASH_REPORT_FUNCTION;
 
-//     SSH_CTX_free(_ctx.get());
+    if (_session) {
+	ssh_disconnect(_session);
+	ssh_finalize();
+    }
 
+    _session = 0;
 //     return closeNet();
     return true;
 }
@@ -150,7 +169,7 @@ SSHClient::sshShutdown()
 bool
 SSHClient::sshConnect(int fd)
 {
-//     return sshConnect(fd, _hostname);
+    return sshConnect(fd, _hostname);
 }
 
 bool
@@ -163,80 +182,88 @@ SSHClient::sshConnect(int fd, std::string &hostname)
     char buf[10];
 
 //    _options.reset(ssh_options_new());
+    // Setup the options to for this SSH session
     _options = ssh_options_new();
-    if (!_user.empty()) {
+
+    // We always need a hostname to connect to
+    if (ssh_options_set_host(_options, hostname.c_str()) < 0) {
+	log_error("Couldn't set hostname option");
+	ssh_options_free(_options);
+	return false;
+    }
+
+    // We always need a user name for the connection
+    if (_user.empty()) {
 	if (ssh_options_set_username(_options, _user.c_str()) < 0) {
+	    log_error("Couldn't set user name option");
 	    ssh_options_free(_options);
 	    return false;
 	}
     }
     
-    if (ssh_options_set_host(_options, hostname.c_str()) < 0) {
-	ssh_options_free(_options);
-	return false;
-    }
-
+    // Start a new session
     _session = ssh_new();
+    ssh_set_options(_session, _options);
     if(ssh_connect(_session)){
-        log_debug("Connection failed : %s\n", ssh_get_error(_session));
-        ssh_disconnect(_session);
-	ssh_finalize();
+        log_error("Connection failed : %s\n", ssh_get_error(_session));
+	sshShutdown();
         return false;
     }
 
     _state = ssh_is_server_known(_session);
-    log_debug("SSH Server is known: %d", _state);
 
     unsigned char *hash = 0;
     int hlen = ssh_get_pubkey_hash(_session, &hash);
     if (hlen < 0) {
-	ssh_disconnect(_session);
-	ssh_finalize();
+	sshShutdown();
 	return false;
     }
     switch(_state){
       case SSH_SERVER_KNOWN_OK:	// ok
+	  log_debug("SSH Server is cyrrently known: %d", _state);
 	  break; 
       case SSH_SERVER_KNOWN_CHANGED:
-	  log_error("Host key for server changed : server's one is now :\n");
-	  ssh_print_hexa("Public key hash",hash, hlen);
+	  log_error("Host key for server changed : server's one is now: ");
+	  ssh_print_hexa("Public key hash", hash, hlen);
 	  free(hash);
-	  log_error("For security reason, connection will be stopped\n");
-	  ssh_disconnect(_session);
-	  ssh_finalize();
+	  log_error("For security reason, connection will be stopped");
+	  sshShutdown();
 	  return false;;
       case SSH_SERVER_FOUND_OTHER:
-	  log_error("The host key for this server was not found but an other type of key exists.\n");
+	  log_error("The host key for this server was not found but an other type of key exists.");
 	  log_error("An attacker might change the default server key to confuse your client"
 		    "into thinking the key does not exist\n"
-		    "We advise you to rerun the client with -d or -r for more safety.\n");
-	  ssh_disconnect(_session);
-	  ssh_finalize();
+		    "We advise you to rerun the client with -d or -r for more safety.");
+	  sshShutdown();
 	  return false;;
       case SSH_SERVER_NOT_KNOWN:
 	  hexa = ssh_get_hexa(hash, hlen);
 	  free(hash);
-	  log_error("The server is unknown. Do you trust the host key ?\n");
-	  log_error("Public key hash: %s\n", hexa);
+#if 0
+	  log_error("The server is unknown. Do you trust the host key ? (yes,no)");
+	  log_error("Public key hash: %s", hexa);
 	  free(hexa);
 	  fgets(buf, sizeof(buf), stdin);
-	  if(strncasecmp(buf, "yes", 3)!=0){
-	      ssh_disconnect(_session);
+	  if(strncasecmp(buf, "yes", 3) != 0){
+	      sshShutdown();
 	      return false;
 	  }
-	  log_error("This new key will be written on disk for further usage. do you agree ?\n");
+	  log_error("This new key will be written on disk for further usage. do you agree? (yes,no) ");
 	  fgets(buf, sizeof(buf), stdin);
 	  if(strncasecmp(buf, "yes", 3)==0){
 	      if(ssh_write_knownhost(_session))
-		  log_error("%s\n",ssh_get_error(_session));
+		  log_error("%s", ssh_get_error(_session));
 	  }
-	  
+#else
+	  if(ssh_write_knownhost(_session)) {
+	      log_error("%s", ssh_get_error(_session));
+	  }
+#endif  
 	  break;
       case SSH_SERVER_ERROR:
 	  free(hash);
-	  log_error("%s",ssh_get_error(_session));
-	  ssh_disconnect(_session);
-	  ssh_finalize();
+	  log_error("%s", ssh_get_error(_session));
+	  sshShutdown();
 	  return false;
     }
     
@@ -246,32 +273,31 @@ SSHClient::sshConnect(int fd, std::string &hostname)
     
     int auth = ssh_auth_list(_session);
 
-    log_debug("auth: 0x%04x\n", auth);
+//    log_debug("auth: 0x%04x", auth);
     log_debug("supported auth methods: ");
     if (auth & SSH_AUTH_METHOD_PUBLICKEY) {
-      log_debug("publickey");
+      log_debug("\tpublickey");
     }
     if (auth & SSH_AUTH_METHOD_INTERACTIVE) {
-      log_debug(", keyboard-interactive");
+      log_debug("\tkeyboard-interactive");
     }
-    log_debug("\n");
 
     /* no ? you should :) */
     auth=ssh_userauth_autopubkey(_session, NULL);
     if(auth == SSH_AUTH_ERROR){
-        log_debug("Authenticating with pubkey: %s\n",ssh_get_error(_session));
+        log_debug("Authenticating with pubkey: %s",ssh_get_error(_session));
 	ssh_finalize();
         return false;
     }
     banner = ssh_get_issue_banner(_session);
     if(banner){
-        log_debug("%s\n", banner);
+        log_debug("%s", banner);
         free(banner);
     }
     if(auth != SSH_AUTH_SUCCESS){
 //        auth = auth_kbdint(_session);
         if(auth == SSH_AUTH_ERROR){
-            log_error("authenticating with keyb-interactive: %s\n",
+            log_error("authenticating with keyb-interactive: %s",
 		      ssh_get_error(_session));
 	    ssh_finalize();
             return false;
@@ -280,7 +306,7 @@ SSHClient::sshConnect(int fd, std::string &hostname)
     if(auth != SSH_AUTH_SUCCESS){
         password = getpass("Password: ");
         if(ssh_userauth_password(_session, NULL, password) != SSH_AUTH_SUCCESS){
-            log_error("Authentication failed: %s\n",ssh_get_error(_session));
+            log_error("Authentication failed: %s",ssh_get_error(_session));
             ssh_disconnect(_session);
                 ssh_finalize();
             return false;
@@ -288,6 +314,7 @@ SSHClient::sshConnect(int fd, std::string &hostname)
         memset(password, 0, strlen(password));
     }
     ssh_log(_session, SSH_LOG_FUNCTIONS, "Authentication success");
+
 #if 0
     if(strstr(argv[0],"sftp")){
         sftp = 1;
@@ -305,9 +332,6 @@ SSHClient::sshConnect(int fd, std::string &hostname)
         do_cleanup(0);
 #endif
     
-    ssh_disconnect(_session);
-    ssh_finalize();
-
     return true;
 }
 
