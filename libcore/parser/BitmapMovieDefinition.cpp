@@ -51,7 +51,6 @@ DisplayObject*
 BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id) const
 {
     /// What should we do if construction of the bitmap fails?
-    if (!_bitmap.get()) return 0;
     return new Bitmap(this, parent, id);
 }
 
