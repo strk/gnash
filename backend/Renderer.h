@@ -457,7 +457,7 @@ public:
     /// the nearest pixel is returned.
     /// The function returns false when the coordinates are outside the 
     /// main frame buffer.
-    virtual bool getPixel(rgba& /*color_return*/, int /*x*/, int /*y*/)
+    virtual bool getPixel(rgba& /*color_return*/, int /*x*/, int /*y*/) const
     {
 
         log_debug("getPixel() not implemented for this renderer");
@@ -477,7 +477,7 @@ public:
     /// This implementation is provided for simplicity. Renderers should
     /// implement a specialized version for better performance.
     virtual bool getAveragePixel(rgba& color_return, int x, int y, 
-        unsigned int radius)
+        unsigned int radius) const
     {
     
         assert(radius>0); 

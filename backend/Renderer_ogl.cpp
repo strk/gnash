@@ -1701,7 +1701,7 @@ public:
   }
 
 #ifdef OSMESA_TESTING
-  bool getPixel(rgba& color_out, int x, int y)
+  bool getPixel(rgba& color_out, int x, int y) const
   {  
     return _offscreen->getPixel(color_out, x, y);
   }

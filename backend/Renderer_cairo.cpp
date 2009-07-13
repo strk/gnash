@@ -1051,7 +1051,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     }   
   }
   
-  bool getPixel(rgba& color_return, int x, int y)
+  bool getPixel(rgba& color_return, int x, int y) const
   {
     if (x < 0 || y < 0) {
       return false;

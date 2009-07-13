@@ -1988,7 +1988,7 @@ public:
     return false;
   }
 
-  bool getPixel(rgba& color_return, int x, int y) {
+  bool getPixel(rgba& color_return, int x, int y) const {
   
     if ((x<0) || (y<0) || (x>=xres) || (y>=yres))
       return false;
