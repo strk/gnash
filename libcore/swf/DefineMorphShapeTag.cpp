@@ -28,14 +28,14 @@
 #include "movie_definition.h"
 #include "MovieClip.h"
 #include "GnashNumeric.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 
 namespace gnash {
 namespace SWF {
 
 void
 DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
-        const RunInfo& r)
+        const RunResources& r)
 {
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();
@@ -49,7 +49,7 @@ DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
 }
 
 DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
-        movie_definition& md, const RunInfo& r)
+        movie_definition& md, const RunResources& r)
 {
     read(in, tag, md, r);
 }
@@ -70,7 +70,7 @@ DefineMorphShapeTag::display(Renderer& renderer, const MorphShape& inst) const
 
 void
 DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
-        const RunInfo& r)
+        const RunResources& r)
 {
     assert(tag == DEFINEMORPHSHAPE
         || tag == DEFINEMORPHSHAPE2

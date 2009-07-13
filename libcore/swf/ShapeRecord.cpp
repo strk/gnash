@@ -22,7 +22,7 @@
 #include "fill_style.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 
 #include <vector>
 
@@ -32,9 +32,9 @@ namespace SWF {
 // Forward declarations
 namespace {
     void readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunInfo& r);
+        SWF::TagType tag, movie_definition& md, const RunResources& r);
     void readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunInfo& r);
+        SWF::TagType tag, movie_definition& md, const RunResources& r);
     void computeBounds(rect& bounds, const ShapeRecord::Paths& paths,
         const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
@@ -137,7 +137,7 @@ private:
 
 
 ShapeRecord::ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     read(in, tag, m, r);
 }
@@ -213,7 +213,7 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
 
 void
 ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
 
     /// TODO: is this correct?
@@ -631,7 +631,7 @@ namespace {
 // Read fill styles, and push them onto the given style array.
 void
 readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-                 SWF::TagType tag, movie_definition& m, const RunInfo& r)
+                 SWF::TagType tag, movie_definition& m, const RunResources& r)
 {
     in.ensureBytes(1);
     boost::uint16_t fill_style_count = in.read_u8();
@@ -661,7 +661,7 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
 // Read line styles and push them onto the back of the given array.
 void
 readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunInfo& r)
+        SWF::TagType tag, movie_definition& md, const RunResources& r)
 {
     in.ensureBytes(1);
     int line_style_count = in.read_u8();

@@ -43,7 +43,7 @@ namespace SWF {
 
 void
 DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     assert(tag == DEFINESHAPE ||
            tag == DEFINESHAPE2 ||
@@ -77,7 +77,7 @@ DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y,
 
 
 DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
-        movie_definition& m, const RunInfo& r)
+        movie_definition& m, const RunResources& r)
     :
     DefinitionTag(),
     _shape(in, tag, m, r)

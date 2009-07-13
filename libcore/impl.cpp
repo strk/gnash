@@ -31,7 +31,7 @@
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
 #include "BitmapMovieDefinition.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "URL.h"
 #include "StreamProvider.h"
 #include "MovieClip.h"
@@ -54,7 +54,7 @@ namespace gnash
 namespace {
     FileType getFileType(IOChannel& in);
     SWFMovieDefinition* createSWFMovie(std::auto_ptr<IOChannel> in,
-            const std::string& url, const RunInfo& runInfo,
+            const std::string& url, const RunResources& runInfo,
             bool startLoaderThread);
 }
 
@@ -66,7 +66,7 @@ static void clear_library();
 // TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
 createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunInfo& r, FileType type)
+        const RunResources& r, FileType type)
 {
     assert (in.get());
 
@@ -103,7 +103,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 movie_definition*
 MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunInfo& runInfo, bool startLoaderThread)
+        const RunResources& runInfo, bool startLoaderThread)
 {
   assert(in.get());
 
@@ -143,7 +143,7 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 }
 
 movie_definition*
-createNonLibraryMovie(const URL& url, const RunInfo& runInfo,
+createNonLibraryMovie(const URL& url, const RunResources& runInfo,
         const char* reset_url, bool startLoaderThread,
         const std::string* postdata)
 {
@@ -267,7 +267,7 @@ getFileType(IOChannel& in)
 //
 SWFMovieDefinition*
 createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunInfo& runInfo, bool startLoaderThread)
+        const RunResources& runInfo, bool startLoaderThread)
 {
 
     std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
@@ -334,7 +334,7 @@ static void clear_library()
 // return a pointer to it.
 //
 movie_definition*
-MovieFactory::makeMovie(const URL& url, const RunInfo& runInfo,
+MovieFactory::makeMovie(const URL& url, const RunResources& runInfo,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {

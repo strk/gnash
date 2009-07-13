@@ -37,7 +37,7 @@ DefineButtonSoundTag::DefineButtonSoundTag(SWFStream& in, movie_definition& m)
 
 void
 DefineButtonSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == SWF::DEFINEBUTTONSOUND);
 

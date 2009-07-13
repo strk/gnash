@@ -24,7 +24,7 @@
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
 #include "log.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "VM.h" // For getting movie_root. TODO: drop
 
 namespace gnash {
@@ -49,7 +49,7 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 /* public static */
 void
 StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 

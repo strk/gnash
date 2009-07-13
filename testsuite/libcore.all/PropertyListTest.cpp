@@ -29,7 +29,7 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h"
 #include "ManualClock.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 
 #include <iostream>
 #include <sstream>
@@ -55,7 +55,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnashInit();
 
     // We don't care about the base URL.
-    RunInfo runInfo("");
+    RunResources runInfo("");
 	
     boost::intrusive_ptr<movie_definition> md5(
             new DummyMovieDefinition(runInfo, 5));

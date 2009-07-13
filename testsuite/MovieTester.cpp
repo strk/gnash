@@ -33,7 +33,7 @@
 #include "FuzzyPixel.h" // for pixel checking
 #include "Renderer.h"
 #include "ManualClock.h" // for use by advance
-#include "StreamProvider.h" // for passing to RunInfo
+#include "StreamProvider.h" // for passing to RunResources
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 #ifdef RENDERER_CAIRO
@@ -86,7 +86,7 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-    _runInfo.reset(new RunInfo(url));
+    _runInfo.reset(new RunResources(url));
     _runInfo->setSoundHandler(_sound_handler);
     
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());

@@ -30,7 +30,7 @@
 #include "movie_definition.h" // for visibility of movie_definition destructor
 #include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
 #include "movie_root.h" // for Abstract callbacks
-#include "RunInfo.h" // for passing handlers and other data to the core.
+#include "RunResources.h" // for passing handlers and other data to the core.
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -250,7 +250,7 @@ private:
     /// Initialization / destruction order is important here.
     //
     /// some sound_samples are destroyed in the dtor of SWFMovieDefinition,
-    /// which is called by the Gui's dtor. This means that the RunInfo
+    /// which is called by the Gui's dtor. This means that the RunResources
     /// and sound::sound_handler must still be alive. Initializing them
     /// later ensures that this is the case. It is still a good idea to
     /// initialize _gui after _runInfo.
@@ -261,7 +261,7 @@ private:
     //
     /// @todo   This is hairy, and the core should be sorted out so that
     ///         sound_sample knows about its sound::sound_handler without
-    ///         needing a RunInfo.
+    ///         needing a RunResources.
     boost::shared_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
@@ -270,7 +270,7 @@ private:
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
-    std::auto_ptr<RunInfo> _runInfo;
+    std::auto_ptr<RunResources> _runInfo;
 
     /// This must be initialized after _runInfo
 	std::auto_ptr<Gui> _gui;

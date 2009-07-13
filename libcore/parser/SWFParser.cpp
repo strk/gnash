@@ -21,7 +21,7 @@
 
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "SWFParser.h"
 #include "TagLoadersTable.h"
 

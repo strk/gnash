@@ -253,7 +253,7 @@ Player::init_gui()
 boost::intrusive_ptr<movie_definition>
 Player::load_movie()
 {
-    /// The RunInfo must be initialized by this point to provide resources
+    /// The RunResources must be initialized by this point to provide resources
     /// for parsing.
     assert(_runInfo.get());
 
@@ -388,8 +388,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
                                        : URL(_baseurl);
 
-    /// The RunInfo should be populated before parsing.
-    _runInfo.reset(new RunInfo(baseURL.str()));
+    /// The RunResources should be populated before parsing.
+    _runInfo.reset(new RunResources(baseURL.str()));
     _runInfo->setSoundHandler(_soundHandler);
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());

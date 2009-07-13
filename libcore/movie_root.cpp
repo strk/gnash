@@ -92,7 +92,7 @@ movie_root::testInvariant() const
 
 
 movie_root::movie_root(const movie_definition& def,
-        VirtualClock& clock, const RunInfo& runInfo)
+        VirtualClock& clock, const RunResources& runInfo)
 	:
     _runInfo(runInfo),
     _originalURL(def.get_url()),

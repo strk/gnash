@@ -108,7 +108,7 @@ struct movie_data
 };
 
 static boost::intrusive_ptr<gnash::movie_definition> play_movie(
-        const std::string& filename, const RunInfo& runInfo);
+        const std::string& filename, const RunResources& runInfo);
 
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
@@ -362,7 +362,7 @@ vm_main(int argc, char *argv[])
             e = infiles.end(); i != e; ++i)
     {
 
-        RunInfo runInfo(*i);
+        RunResources runInfo(*i);
         runInfo.setSoundHandler(soundHandler);
 
 	    boost::intrusive_ptr<gnash::movie_definition> m =
@@ -395,7 +395,7 @@ vm_main(int argc, char *argv[])
 //
 // Return the movie definition.
 boost::intrusive_ptr<gnash::movie_definition>
-play_movie(const std::string& filename, const RunInfo& runInfo)
+play_movie(const std::string& filename, const RunResources& runInfo)
 {
     boost::intrusive_ptr<gnash::movie_definition> md;
 

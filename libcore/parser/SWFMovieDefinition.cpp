@@ -29,7 +29,7 @@
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
 #include "GnashImageJpeg.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "Font.h"
 #include "VM.h"
 #include "log.h"
@@ -145,7 +145,7 @@ MovieLoader::start()
 // SWFMovieDefinition
 //
 
-SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
+SWFMovieDefinition::SWFMovieDefinition(const RunResources& runInfo)
 	:
 	m_frame_rate(30.0f),
 	m_frame_count(0u),

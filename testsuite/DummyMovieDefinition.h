@@ -64,7 +64,7 @@ public:
 	///  - 0 bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - empty url
 	///
-	DummyMovieDefinition(const RunInfo& ri)
+	DummyMovieDefinition(const RunResources& ri)
 		:
         SWFMovieDefinition(ri),
 		_version(6),
@@ -82,7 +82,7 @@ public:
 	/// All but the target version will be initialized
 	/// exactly as with the default constructor.
 	///
-	DummyMovieDefinition(const RunInfo& ri, int version)
+	DummyMovieDefinition(const RunResources& ri, int version)
 		:
         SWFMovieDefinition(ri),
 		_version(version),

@@ -63,7 +63,7 @@ public:
 	///	to be already positioned right before the frame count
 	///
 	sprite_definition(movie_definition& m, SWFStream& in,
-            const RunInfo& runInfo);
+            const RunResources& runInfo);
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
@@ -246,7 +246,7 @@ public:
 
 private:
 
-	void read(SWFStream& in, const RunInfo& runInfo);
+	void read(SWFStream& in, const RunResources& runInfo);
 
 	/// Top-level movie definition
 	/// (the definition read from SWF stream)

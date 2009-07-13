@@ -74,7 +74,7 @@ public:
     }
 	
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const gnash::RunInfo&)
+            const gnash::RunResources&)
 	{
 
         if (!m.isAS3()) {

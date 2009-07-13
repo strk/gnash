@@ -29,7 +29,7 @@
 namespace gnash {
     class movie_definition;
     class SWFStream;
-    class RunInfo;
+    class RunResources;
     class StaticText;
 }
 
@@ -47,7 +47,7 @@ class DefineTextTag : public DefinitionTag
 public:
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m, 
-            const RunInfo& r);
+            const RunResources& r);
 
 	/// Draw the string.
 	void display(Renderer& renderer, const StaticText& inst) const;
@@ -99,7 +99,7 @@ class DefineText2Tag
 {
 public:
     static void loader(SWFStream& in, TagType tag, movie_definition& m, 
-            const RunInfo& r);
+            const RunResources& r);
 };
 
 } // namespace SWF

@@ -20,7 +20,7 @@
 #include "SWF.h"
 #include "SWFStream.h"
 #include "Font.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "movie_definition.h"
 
 #ifndef GNASH_SWF_DEFINEFONTNAMETAG_H
@@ -39,7 +39,7 @@ public:
 
     // Set font name for a font.
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
     {
         assert(tag == SWF::DEFINEFONTNAME);
 

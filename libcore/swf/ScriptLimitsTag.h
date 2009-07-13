@@ -47,7 +47,7 @@ public:
     }
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
     {
         assert(tag = SWF::SCRIPTLIMITS);
         std::auto_ptr<ScriptLimitsTag> s(new ScriptLimitsTag(in));

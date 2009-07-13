@@ -943,7 +943,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
-    const RunInfo& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = _vm.getRoot().runInfo();
 
     const StreamProvider& streamProvider = ri.streamProvider();
 

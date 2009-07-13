@@ -1,4 +1,4 @@
-// RunInfo.h    Hold external and per-run resources for Gnash core.
+// RunResources.h    Hold external and per-run resources for Gnash core.
 // 
 //   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -40,15 +40,15 @@ namespace gnash {
 /// until the last SWFMovieDefinition has been destroyed).
 /// @todo Check the lifetime and update documentation if it changes.
 /// @todo   Add MediaHandler.
-class RunInfo
+class RunResources
 {
 public:
 
-    /// Constructs a RunInfo instance with an immutable base URL.
+    /// Constructs a RunResources instance with an immutable base URL.
     //
     /// @param baseURL  The base URL for the run. This cannot be changed after
     ///                 construction.
-    RunInfo(const std::string& baseURL)
+    RunResources(const std::string& baseURL)
         :
         _baseURL(baseURL)
     {

@@ -31,7 +31,7 @@
 #include "Renderer.h" // for dtor visibility by auto_ptr
 #include "Movie.h" 
 #include "ManualClock.h" // for composition
-#include "RunInfo.h" // For initialization.
+#include "RunResources.h" // For initialization.
 
 #include <memory> // for auto_ptr
 #include <string> 
@@ -323,7 +323,7 @@ private:
 
     boost::shared_ptr<sound::sound_handler> _sound_handler;
 
-    std::auto_ptr<RunInfo> _runInfo;
+    std::auto_ptr<RunResources> _runInfo;
 	/// Current pointer position - X ordinate
 	int _x;
 

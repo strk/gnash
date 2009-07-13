@@ -35,7 +35,7 @@
 namespace gnash {
 	class SWFStream;
 	class movie_definition;
-	class RunInfo;
+	class RunResources;
     class Font;
 }
 
@@ -63,7 +63,7 @@ public:
 
 	/// Load an SWF::DEFINEEDITTEXT (37) tag.
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     const rect& bounds() const { return _rect; }
 

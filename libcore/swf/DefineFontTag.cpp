@@ -20,7 +20,7 @@
 #include "DefineFontTag.h"
 #include "SWFStream.h"
 #include "Font.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "SWF.h"
 #include "movie_definition.h"
 #include "ShapeRecord.h"
@@ -32,7 +32,7 @@ namespace SWF {
 
 void
 DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r)
+            const RunResources& r)
 {
     assert(tag == DEFINEFONT || tag == DEFINEFONT2 || tag == DEFINEFONT3);
 
@@ -95,7 +95,7 @@ DefineFontTag::markReachableResources() const
 
 
 DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
-        const RunInfo& r)
+        const RunResources& r)
     :
     _subpixelFont(tag == DEFINEFONT3 ? true : false),
     _unicodeChars(false),
@@ -125,7 +125,7 @@ DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
 
 void
 DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     IF_VERBOSE_PARSE(
         log_parse(_("reading DefineFont"));
@@ -184,7 +184,7 @@ DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m,
 // Read a DefineFont2 or DefineFont3 tag
 void
 DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     IF_VERBOSE_PARSE (
     log_parse(_("reading DefineFont2 or DefineFont3"));
@@ -372,7 +372,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
 void
 DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
 {
     assert(tag == DEFINEFONTINFO || tag == DEFINEFONTINFO2); 
 

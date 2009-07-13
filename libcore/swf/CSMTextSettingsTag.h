@@ -28,7 +28,7 @@
 namespace gnash {
 	class movie_definition;
 	class SWFStream;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -39,7 +39,7 @@ public:
 
 	CSMTextSettingsTag(movie_definition& m, SWFStream& in);
 
-	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunInfo& r);
+	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunResources& r);
 
 private:
 

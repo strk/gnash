@@ -32,7 +32,7 @@
 #include "Renderer.h"
 #include "sound_handler.h"
 #include "MediaHandler.h"
-#include "RunInfo.h" // for passing handlers and other data to the core.
+#include "RunResources.h" // for passing handlers and other data to the core.
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "smart_ptr.h"
@@ -64,7 +64,7 @@ struct _GnashView {
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
-    std::auto_ptr<gnash::RunInfo> run_info;
+    std::auto_ptr<gnash::RunResources> run_info;
 
     std::auto_ptr<gnash::movie_definition> movie_definition;
     boost::intrusive_ptr<gnash::Movie> movie;
@@ -432,8 +432,8 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
 
     gnash::URL url(uri);
 
-    // The RunInfo should be populated before parsing.
-    view->run_info.reset(new gnash::RunInfo(url.str()));
+    // The RunResources should be populated before parsing.
+    view->run_info.reset(new gnash::RunResources(url.str()));
     view->run_info->setSoundHandler(view->sound_handler);
 
     std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));

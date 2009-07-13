@@ -229,7 +229,7 @@ EXTENSIONS_API = \
 	rect.h \
 	GnashKey.h \
 	Movie.h \
-	RunInfo.h \
+	RunResources.h \
 	gnash.h	\
 	DisplayObjectContainer.h \
 	DisplayObject.h \

@@ -40,7 +40,7 @@ line_style::line_style()
 
 void
 line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-    const RunInfo& r, line_style *pOther)
+    const RunResources& r, line_style *pOther)
 {
     if (t == SWF::DEFINEMORPHSHAPE)
     {
@@ -92,7 +92,7 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 
 void
 line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
-        const RunInfo& r)
+        const RunResources& r)
 {
     if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
     {

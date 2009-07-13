@@ -28,7 +28,7 @@
 #include "GnashException.h"
 #include "GnashNumeric.h"
 #include "Renderer.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 
 #include <cmath> // sqrt, floor
 #include <iostream> // for output operator
@@ -64,7 +64,7 @@ fill_style::fill_style()
 
 void
 fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
-        const RunInfo& r, fill_style *pOther)
+        const RunResources& r, fill_style *pOther)
 {
     const bool is_morph = (pOther != NULL);
 

@@ -65,7 +65,7 @@ public:
     }
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
     {
         if (m.isAS3()) {
             IF_VERBOSE_MALFORMED_SWF(

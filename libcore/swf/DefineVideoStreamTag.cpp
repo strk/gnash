@@ -71,7 +71,7 @@ DefineVideoStreamTag::~DefineVideoStreamTag()
 
 void
 DefineVideoStreamTag::loader(SWFStream& in, SWF::TagType tag,
-        movie_definition& m, const RunInfo& /*r*/)
+        movie_definition& m, const RunResources& /*r*/)
 {
     assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
     

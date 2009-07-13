@@ -35,7 +35,7 @@ namespace gnash {
 class SWFStream;
 class movie_definition;
 class Renderer;
-class RunInfo;
+class RunResources;
 
 class gradient_record
 {
@@ -169,7 +169,7 @@ public:
 	/// currently opened tag for reading. See stream::ensureBytes()
 	///
 	void read(SWFStream& in, SWF::TagType t, movie_definition& m,
-            const RunInfo& r, fill_style *pOther = 0);
+            const RunResources& r, fill_style *pOther = 0);
 
 	/// \brief
 	/// Make a BitmapInfo* corresponding to our gradient.

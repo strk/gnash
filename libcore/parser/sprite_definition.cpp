@@ -64,7 +64,7 @@ sprite_definition::~sprite_definition()
 /*private*/
 // only called from constructors
 void
-sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
+sprite_definition::read(SWFStream& in, const RunResources& runInfo)
 {
     const size_t tag_end = in.get_tag_end_position();
 
@@ -119,7 +119,7 @@ sprite_definition::get_labeled_frame(const std::string& label,
 }
 
 sprite_definition::sprite_definition(movie_definition& m, SWFStream& in, 
-        const RunInfo& runInfo)
+        const RunResources& runInfo)
 	:
 	m_movie_def(m),
 	m_frame_count(0),

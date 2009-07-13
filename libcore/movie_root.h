@@ -78,7 +78,7 @@
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "Movie.h"
-#include "RunInfo.h" // for initialization
+#include "RunResources.h" // for initialization
 #include "gnash.h" // Quality
 
 #ifdef USE_SWFTREE
@@ -150,7 +150,7 @@ public:
     /// before using any of this class methods !
     ///
     movie_root(const movie_definition& def, VirtualClock& clock,
-            const RunInfo& runInfo);
+            const RunResources& runInfo);
 
     ~movie_root();
 
@@ -847,7 +847,7 @@ public:
 	///
 	const std::string& getOriginalURL() const { return _originalURL; }
 
-    const RunInfo& runInfo() const { return _runInfo; }
+    const RunResources& runInfo() const { return _runInfo; }
 
     /// Add a DisplayObject child on top depth
     //
@@ -867,7 +867,7 @@ public:
 
 private:
 
-    const RunInfo& _runInfo; 
+    const RunResources& _runInfo; 
 
     /// The URL of the original root movie.
     //

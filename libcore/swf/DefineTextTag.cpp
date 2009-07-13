@@ -24,7 +24,7 @@ namespace SWF {
 
 void
 DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == DEFINETEXT);
 
@@ -64,7 +64,7 @@ DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
 
 void
 DefineText2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == DEFINETEXT2);
 

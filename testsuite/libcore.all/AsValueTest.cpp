@@ -107,7 +107,7 @@ main(int argc, char *argv[])
     // Initialize gnash lib
     gnashInit();
     
-    RunInfo runInfo("");
+    RunResources runInfo("");
 
     // Create a bogus movie with swf version 7 support
     boost::intrusive_ptr<movie_definition> md(

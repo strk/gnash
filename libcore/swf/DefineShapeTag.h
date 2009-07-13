@@ -19,7 +19,7 @@ namespace gnash {
 	class cxform;
     class Shape;
 	class SWFMatrix;
-	class RunInfo;
+	class RunResources;
 	class Renderer;
 }
 
@@ -34,7 +34,7 @@ class DefineShapeTag : public DefinitionTag
 public:
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     virtual ~DefineShapeTag() {};
 
@@ -66,7 +66,7 @@ protected:
 private:
 
     DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     /// The actual shape data is stored in this record.
     const ShapeRecord _shape;

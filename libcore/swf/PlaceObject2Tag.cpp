@@ -486,7 +486,7 @@ PlaceObject2Tag::~PlaceObject2Tag()
 /* public static */
 void
 PlaceObject2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
 
