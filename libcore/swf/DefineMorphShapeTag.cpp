@@ -25,7 +25,6 @@
 #include "DefineMorphShapeTag.h"
 #include "MorphShape.h"
 #include "SWFStream.h"
-#include "render.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
 #include "GnashNumeric.h"

@@ -30,7 +30,6 @@
 namespace gnash {
 	class IOChannel;
 	class movie_definition; // for create_movie
-	class Renderer; // for set_Renderer 
 	class URL; // for set_base_url
     class RunInfo;
 }
@@ -60,17 +59,6 @@ enum Quality
     QUALITY_HIGH,
     QUALITY_BEST
 };
-
-// Sound callbacks stuff
-
-/// Set the render handler.  This is one of the first
-/// things you should do to initialise the player (assuming you
-/// want to display anything).
-DSOEXPORT void set_Renderer(Renderer* s);
-
-// Some helpers that may or may not be compiled into your
-// version of the library, depending on platform etc.
-DSOEXPORT Renderer*   create_Renderer_ogl(bool init = true);
 
 /// Initialize gnash core library
 //

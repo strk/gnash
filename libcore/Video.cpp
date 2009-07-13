@@ -24,7 +24,6 @@
 #include "fn_call.h"
 #include "as_value.h"
 #include "NetStream_as.h"
-#include "render.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "movie_root.h"

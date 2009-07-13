@@ -22,15 +22,13 @@
 
 #include "TagLoadersTable.h"
 #include "StreamProvider.h"
-#include "render.h"
+#include "Renderer.h"
+#include "sound_handler.h"
+
 #include <string>
 #include <boost/shared_ptr.hpp>
-namespace gnash {
 
-// Forward declarations
-namespace sound {
-    class sound_handler;
-}
+namespace gnash {
 
 /// Class to group together per-run and external resources for Gnash
 //
@@ -41,7 +39,7 @@ namespace sound {
 /// This must be kept alive for the entire duration of a run (presently
 /// until the last SWFMovieDefinition has been destroyed).
 /// @todo Check the lifetime and update documentation if it changes.
-/// @todo   Add Renderer, MediaHandler.
+/// @todo   Add MediaHandler.
 class RunInfo
 {
 public:
@@ -99,8 +97,12 @@ public:
         return _soundHandler.get();
     }
 
+    void setRenderer(boost::shared_ptr<Renderer> r) {
+        _renderer = r;
+    }
+
     Renderer* renderer() const {
-        return get_Renderer();
+        return _renderer.get();
     }
 
     /// Set the loader functions for SWF parsing.
@@ -108,8 +110,7 @@ public:
     /// This must be present before parsing.
     /// It is a pointer to const so that the same table can be shared between
     /// simultaneous runs if desired.
-    void setTagLoaders(boost::shared_ptr<const SWF::TagLoadersTable> loaders)
-    {
+    void setTagLoaders(boost::shared_ptr<const SWF::TagLoadersTable> loaders) {
         _tagLoaders = loaders;
     }
 
@@ -126,6 +127,8 @@ private:
     boost::shared_ptr<StreamProvider> _streamProvider;
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
+
+    boost::shared_ptr<Renderer> _renderer;
 
     boost::shared_ptr<const SWF::TagLoadersTable> _tagLoaders;
 

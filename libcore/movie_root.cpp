@@ -24,7 +24,6 @@
 #include "log.h"
 #include "MovieClip.h"
 #include "Movie.h" // for implicit upcast to MovieClip
-#include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
 #include "flash/display/Stage_as.h"
@@ -1404,10 +1403,9 @@ movie_root::setQuality(Quality q)
         _quality = q;
     }
 
-
     // We always tell the renderer, because it could
     // be the first time we do
-    Renderer* renderer = get_Renderer();
+    Renderer* renderer = _runInfo.renderer();
     if (renderer) renderer->setQuality(_quality);
 
 }

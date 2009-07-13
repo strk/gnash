@@ -23,8 +23,8 @@
 #include "DisplayObject.h"
 #include "SWF.h"
 #include "log.h"
-#include "render.h"
 #include "Font.h"
+#include "Renderer.h"
 
 #include <boost/assign/list_of.hpp>
 #include <vector>

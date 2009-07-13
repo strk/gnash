@@ -50,7 +50,6 @@
 #include "sound_handler.h"
 #include "ExportableResource.h"
 #include "MovieFactory.h"
-#include "render.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>

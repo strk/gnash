@@ -22,7 +22,6 @@
 #include "DisplayObject.h" 
 #include "BitmapInfo.h"
 #include "flash/display/BitmapData_as.h"
-#include "render.h"
 #include "BitmapMovieDefinition.h"
 #include "DynamicShape.h"
 

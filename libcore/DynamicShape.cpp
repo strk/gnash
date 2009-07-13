@@ -16,8 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "DynamicShape.h"
-#include "render.h"
 #include "fill_style.h"
+#include "Renderer.h"
+#include "DisplayObject.h"
 
 #include <vector>
 

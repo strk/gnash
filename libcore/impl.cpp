@@ -66,7 +66,7 @@ static void clear_library();
 // TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
 createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        FileType type)
+        const RunInfo& r, FileType type)
 {
     assert (in.get());
 
@@ -79,13 +79,16 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         std::auto_ptr<GnashImage> im(
                 ImageInput::readImageData(imageData, type));
 
-        if (!im.get())
-        {
+        if (!im.get()) {
             log_error(_("Can't read image file from %s"), url);
             return NULL;
-        } 
+        }
 
-        BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
+        Renderer* renderer = r.renderer();
+
+        BitmapMovieDefinition* mdef =
+            new BitmapMovieDefinition(im, renderer, url);
+
         return mdef;
 
     }
@@ -120,7 +123,7 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
             }
-            return createBitmapMovie(in, url, type);
+            return createBitmapMovie(in, url, runInfo, type);
         }
 
 
@@ -315,9 +318,6 @@ void  clear()
     GC::cleanup();
 #endif
 
-    // By setting the render handler to NULL we avoid it being used
-    // after it's been de-referenced (fixes bug #21310)
-    set_Renderer(NULL);
 }
 
 static MovieLibrary s_movie_library;

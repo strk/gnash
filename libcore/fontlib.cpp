@@ -11,7 +11,6 @@
 
 #include "Font.h"
 #include "log.h"
-#include "render.h"
 #include "DefineShapeTag.h"
 #include "styles.h"
 #include "movie_definition.h"

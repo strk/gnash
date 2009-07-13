@@ -8,7 +8,6 @@
 
 #include "styles.h"
 #include "log.h"
-#include "render.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "SWF.h"

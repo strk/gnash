@@ -18,7 +18,6 @@
 
 // Based on original by Willem Kokke <willem@mindparity.com> 2003
 
-#include "render.h"
 #include "GnashImage.h"
 #include "BitmapInfo.h"
 

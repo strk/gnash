@@ -24,7 +24,6 @@
 #include "utf8.h"
 #include "log.h"
 #include "swf/DefineEditTextTag.h"
-#include "render.h"
 #include "movie_definition.h" // to extract version info
 #include "MovieClip.h"
 #include "TextField.h"
