@@ -325,7 +325,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     init_logfile();
     init_media();
     init_sound();
-    init_gui();
    
     // gnash.cpp should check that a filename is supplied.
     assert (!infile.empty());
@@ -347,6 +346,29 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _url = infile;
     }
 
+    // These flags are here so we can construct
+    // the correct URL for base url later.
+    // If the URL class was not immutable we could do something smarter...
+    bool hasOverriddenBaseUrl=false;
+    std::string overriddenBaseUrl;
+
+    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
+                                       : URL(_baseurl);
+
+    /// The RunResources should be populated before parsing.
+    _runResources.reset(new RunResources(baseURL.str()));
+    _runResources->setSoundHandler(_soundHandler);
+
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
+    _runResources->setTagLoaders(loaders);
+
+    std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
+
+    _runResources->setStreamProvider(sp);
+    
+    init_gui();
 
     // Initialize gui (we need argc/argv for this)
     // note that this will also initialize the renderer
@@ -357,15 +379,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
         return EXIT_FAILURE;
     }
 
-    // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
+    // Parse querystring (before FlashVars, see
+    // testsuite/misc-ming.all/FlashVarsTest*)
     setFlashVars(URL(_url).querystring());
-
-    // These flags are here so we can construct
-    // the correct URL for base url later.
-    // If the URL class was not immutable we could do something smarter...
-    bool hasOverriddenBaseUrl=false;
-    std::string overriddenBaseUrl;
-
+    
     // Parse parameters
     StringNoCaseEqual noCaseCompare;
     for ( std::map<std::string,std::string>::const_iterator it=params.begin(),
@@ -385,21 +402,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
         }
     }
 
-    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
-                                       : URL(_baseurl);
-
-    /// The RunResources should be populated before parsing.
-    _runResources.reset(new RunResources(baseURL.str()));
-    _runResources->setSoundHandler(_soundHandler);
-
-    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
-    addDefaultLoaders(*loaders);
-    _runResources->setTagLoaders(loaders);
-
-    std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
-
-    _runResources->setStreamProvider(sp);
 
     // Load the actual movie.
     _movieDef = load_movie();
