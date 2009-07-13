@@ -73,15 +73,6 @@ public:
         return _def;
     }
 	
-    /// Render this MovieClip to a GnashImage using the passed transform
-    //
-    /// @return     The GnashImage with the MovieClip drawn onto it.
-    virtual std::auto_ptr<GnashImage> drawToBitmap(
-            const SWFMatrix& mat = SWFMatrix(), 
-            const cxform& cx = cxform(),
-            DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
-            const rect& clipRect = rect(),
-            bool smooth = false);
 private:
 	
     const BitmapMovieDefinition* const _def;

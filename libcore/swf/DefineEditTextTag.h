@@ -144,6 +144,10 @@ public:
 		return _border;
 	}
 
+    bool autoSize() const {
+        return _autoSize;
+    }
+
 	/// Word wrap requested ?
 	bool wordWrap() const {
 		return _wordWrap;
