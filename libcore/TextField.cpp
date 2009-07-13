@@ -142,7 +142,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _wordWrap(def.wordWrap()),
     _html(def.html()),
     _selectable(!def.noSelect()),
-    _autoSize(autoSizeNone),
+    _autoSize(def.autoSize() ? autoSizeLeft : autoSizeNone),
     _type(def.readOnly() ? typeDynamic : typeInput),
     _bounds(def.bounds()),
     _selection(0, 0)
