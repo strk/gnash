@@ -82,6 +82,8 @@ noinst_HEADERS = \
 	AudioDecoderSimple.h \
 	SoundInfo.h \
 	AudioResampler.h \
+	AudioInput.h \
+	VideoInput.h \
 	$(NULL)
 
 
@@ -94,6 +96,8 @@ if USE_GST_ENGINE
 		gst/VideoConverterGst.cpp \
 		gst/GstUtil.cpp \
 		gst/swfdec_codec_gst.c \
+		gst/VideoInputGst.cpp \
+		gst/AudioInputGst.cpp \
 		$(NULL)
 
    noinst_HEADERS += \
@@ -105,6 +109,8 @@ if USE_GST_ENGINE
 		gst/GstUtil.h \
 		gst/swfdec_codec_gst.h \
 		gst/gnash_gst_version.h \
+		gst/VideoInputGst.h \
+		gst/AudioInputGst.h \
 		$(NULL)
 
    libgnashmedia_la_CPPFLAGS += \
