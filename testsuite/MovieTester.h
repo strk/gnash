@@ -73,7 +73,8 @@ class TestingRenderer
 
 public:
 
-	TestingRenderer(std::auto_ptr<Renderer> renderer, const std::string& name)
+	TestingRenderer(boost::shared_ptr<Renderer> renderer,
+            const std::string& name)
 		:
 		_name(name),
 		_renderer(renderer)
@@ -82,15 +83,13 @@ public:
 	const std::string& getName() const { return _name; }
 
 	/// Return the underlying render handler
-	Renderer& getRenderer() const { return *_renderer; }
+    boost::shared_ptr<Renderer> getRenderer() const { return _renderer; }
 
 private:
 
 	std::string _name;
-	std::auto_ptr<Renderer> _renderer;
+    boost::shared_ptr<Renderer> _renderer;
 };
-
-typedef boost::shared_ptr<TestingRenderer> TestingRendererPtr;
 
 /// An utility class for testing movie playback
 //
@@ -308,10 +307,13 @@ private:
 	/// @param invalidated
 	///	The invalidated ranges as computed by the core lib.
 	///
-	void render(Renderer& renderer, InvalidatedRanges& invalidated);
+	void render(boost::shared_ptr<Renderer> renderer,
+            InvalidatedRanges& invalidated);
 
-	/// Add a testing renderer to the list, initializing it with current viewport size
-	void addTestingRenderer(std::auto_ptr<Renderer> h, const std::string& name);
+	/// Add a testing renderer to the list, initializing it with current
+    //viewport size
+	void addTestingRenderer(boost::shared_ptr<Renderer> h,
+            const std::string& name);
 
 	gnash::movie_root* _movie_root;
 
@@ -340,13 +342,9 @@ private:
 	/// information out.
 	InvalidatedRanges _invalidatedBounds;
 
-	/// I'd use ptr_list here, but trying not to spread
-	/// boost 1.33 requirement for the moment.
-	/// Still, I'd like to simplify things...
-	/// is shared_ptr fine ?
-	typedef std::vector< TestingRendererPtr > TRenderers;
+    typedef std::vector<TestingRenderer> TestingRenderers;
 
-	std::vector< TestingRendererPtr > _testingRenderers;
+	TestingRenderers _testingRenderers;
 
 	// When true, pass world invalidated ranges
 	// to the renderer(s) at ::render time.

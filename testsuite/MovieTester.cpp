@@ -31,7 +31,6 @@
 #include "NullSoundHandler.h"
 #include "RGBA.h" // for rgba class (pixel checking)
 #include "FuzzyPixel.h" // for pixel checking
-#include "render.h"
 #include "Renderer.h"
 #include "ManualClock.h" // for use by advance
 #include "StreamProvider.h" // for passing to RunInfo
@@ -164,13 +163,17 @@ MovieTester::MovieTester(const std::string& url)
 }
 
 void
-MovieTester::render(Renderer& h, InvalidatedRanges& invalidated_regions) 
+MovieTester::render(boost::shared_ptr<Renderer> h,
+        InvalidatedRanges& invalidated_regions) 
 {
 	assert(_movie);
 
-	set_Renderer(&h);
+    // This is a bit dangerous, as there isn't really support for swapping
+    // renderers during runtime; though the only problem is likely to be
+    // that BitmapInfos are missing.
+	_runInfo->setRenderer(h);
 
-	h.set_invalidated_regions(invalidated_regions);
+	h->set_invalidated_regions(invalidated_regions);
 
 	// We call display here to simulate effect of a real run.
 	//
@@ -217,10 +220,10 @@ MovieTester::render()
 		_forceRedraw = false; // reset to no forced redraw
 	}
 
-	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
-				it != itE; ++it)
+	for (TestingRenderers::const_iterator it=_testingRenderers.begin(),
+            itE=_testingRenderers.end(); it != itE; ++it)
 	{
-		TestingRenderer& rend = *(*it);
+		const TestingRenderer& rend = *it;
 		render(rend.getRenderer(), ranges);
 	}
 	
@@ -316,12 +319,12 @@ MovieTester::resizeStage(int x, int y)
 		if (yscale < xscale) xscale = yscale;
 
         // Scale for all renderers.
-        for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
-			        it != itE; ++it)
+        for (TestingRenderers::iterator it=_testingRenderers.begin(),
+                itE=_testingRenderers.end(); it != itE; ++it)
         {
-            TestingRenderer& rend = *(*it);
-            Renderer& h = rend.getRenderer();
-            h.set_scale(xscale, yscale);
+            TestingRenderer& rend = *it;
+            Renderer* h = rend.getRenderer().get();
+            h->set_scale(xscale, yscale);
         }
 	}
 
@@ -368,10 +371,10 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 	//std::cout <<"chekPixel(" << color << ") called" << std::endl;
 
-	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
-				it != itE; ++it)
+	for (TestingRenderers::const_iterator it=_testingRenderers.begin(),
+            itE=_testingRenderers.end(); it != itE; ++it)
 	{
-		const TestingRenderer& rend = *(*it);
+		const TestingRenderer& rend = *it;
 
 		std::stringstream ss;
 		ss << rend.getName() <<" ";
@@ -379,7 +382,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 		rgba obt_col;
 
-		Renderer& handler = rend.getRenderer();
+		const Renderer& handler = *rend.getRenderer();
 
 	        if ( ! handler.getAveragePixel(obt_col, x, y, radius) )
 		{
@@ -503,7 +506,7 @@ MovieTester::soundsStopped()
 void
 MovieTester::initTestingRenderers()
 {
-	std::auto_ptr<Renderer> handler;
+    boost::shared_ptr<Renderer> handler;
 
 	// TODO: add support for testing multiple renderers
 	// This is tricky as requires changes in the core lib
@@ -550,7 +553,8 @@ MovieTester::initTestingRenderers()
 }
 
 void
-MovieTester::addTestingRenderer(std::auto_ptr<Renderer> h, const std::string& name)
+MovieTester::addTestingRenderer(boost::shared_ptr<Renderer> h,
+        const std::string& name)
 {
 	if ( ! h->initTestBuffer(_width, _height) )
 	{
@@ -567,16 +571,16 @@ MovieTester::addTestingRenderer(std::auto_ptr<Renderer> h, const std::string& na
 			<< " because gnash core lib is unable to support testing of "
 			<< "multiple renderers from a single process "
 			<< "and we're already testing render handler "
-			<< _testingRenderers.front()->getName()
+			<< _testingRenderers.front().getName()
 			<< std::endl;
 		return;
 	}
 
-	_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
+	_testingRenderers.push_back(TestingRenderer(h, name));
 
 	// this will be needed till we allow run-time swapping of renderers,
 	// see above UNTESTED message...
-	set_Renderer(&(_testingRenderers.back()->getRenderer()));
+	_runInfo->setRenderer(_testingRenderers.back().getRenderer());
 }
 
 bool
