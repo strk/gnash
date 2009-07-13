@@ -154,7 +154,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
     
     movie_root& mr = _vm.getRoot();
 
-	URL url(url_str, mr.runInfo().baseURL());
+	URL url(url_str, mr.runResources().baseURL());
 	
 #if GNASH_DEBUG
 	log_debug(_(" resolved url: %s"), url.str());

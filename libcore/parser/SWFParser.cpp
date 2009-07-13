@@ -57,7 +57,7 @@ SWFParser::read(std::streamsize bytes)
     // we may read more than the size passed.
     _endRead += bytes;
 
-    const SWF::TagLoadersTable& tagLoaders = _runInfo.tagLoaders();
+    const SWF::TagLoadersTable& tagLoaders = _runResources.tagLoaders();
 
     while (_bytesRead < _endRead) {
         
@@ -95,7 +95,7 @@ SWFParser::read(std::streamsize bytes)
             else if (tagLoaders.get(_tag, lf)) {
                 // call the tag loader.  The tag loader should add
                 // DisplayObjects or tags to the movie data structure.
-                lf(_stream, _tag, *_md, _runInfo);
+                lf(_stream, _tag, *_md, _runResources);
             }
             else {
                 // no tag loader for this tag type.

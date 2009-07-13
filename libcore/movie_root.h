@@ -150,7 +150,7 @@ public:
     /// before using any of this class methods !
     ///
     movie_root(const movie_definition& def, VirtualClock& clock,
-            const RunResources& runInfo);
+            const RunResources& runResources);
 
     ~movie_root();
 
@@ -847,7 +847,7 @@ public:
 	///
 	const std::string& getOriginalURL() const { return _originalURL; }
 
-    const RunResources& runInfo() const { return _runInfo; }
+    const RunResources& runResources() const { return _runResources; }
 
     /// Add a DisplayObject child on top depth
     //
@@ -867,7 +867,7 @@ public:
 
 private:
 
-    const RunResources& _runInfo; 
+    const RunResources& _runResources; 
 
     /// The URL of the original root movie.
     //

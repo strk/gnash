@@ -55,18 +55,18 @@ main(int /*argc*/, char** /*argv*/)
 	gnashInit();
 
     // We don't care about the base URL.
-    RunResources runInfo("");
+    RunResources runResources("");
 	
     boost::intrusive_ptr<movie_definition> md5(
-            new DummyMovieDefinition(runInfo, 5));
+            new DummyMovieDefinition(runResources, 5));
 	boost::intrusive_ptr<movie_definition> md7(
-            new DummyMovieDefinition(runInfo, 7));
+            new DummyMovieDefinition(runResources, 7));
 
 	// TODO: test both SWF5 and SWF7 as they are different !!
 
 	ManualClock clock;
 
-    movie_root root(*md5, clock, runInfo);
+    movie_root root(*md5, clock, runResources);
 
     root.setRootMovie( md5->createMovie() );
 

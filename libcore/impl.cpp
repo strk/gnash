@@ -54,7 +54,7 @@ namespace gnash
 namespace {
     FileType getFileType(IOChannel& in);
     SWFMovieDefinition* createSWFMovie(std::auto_ptr<IOChannel> in,
-            const std::string& url, const RunResources& runInfo,
+            const std::string& url, const RunResources& runResources,
             bool startLoaderThread);
 }
 
@@ -103,7 +103,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 movie_definition*
 MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunResources& runInfo, bool startLoaderThread)
+        const RunResources& runResources, bool startLoaderThread)
 {
   assert(in.get());
 
@@ -123,12 +123,12 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
             }
-            return createBitmapMovie(in, url, runInfo, type);
+            return createBitmapMovie(in, url, runResources, type);
         }
 
 
         case GNASH_FILETYPE_SWF:
-            return createSWFMovie(in, url, runInfo, startLoaderThread);
+            return createSWFMovie(in, url, runResources, startLoaderThread);
 
         case GNASH_FILETYPE_FLV:
             log_unimpl(_("FLV can't be loaded directly as a movie"));
@@ -143,14 +143,14 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 }
 
 movie_definition*
-createNonLibraryMovie(const URL& url, const RunResources& runInfo,
+createNonLibraryMovie(const URL& url, const RunResources& runResources,
         const char* reset_url, bool startLoaderThread,
         const std::string* postdata)
 {
 
   std::auto_ptr<IOChannel> in;
 
-  const StreamProvider& streamProvider = runInfo.streamProvider();
+  const StreamProvider& streamProvider = runResources.streamProvider();
 
   const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -172,7 +172,7 @@ createNonLibraryMovie(const URL& url, const RunResources& runInfo,
   }
 
   std::string movie_url = reset_url ? reset_url : url.str();
-  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runInfo,
+  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runResources,
           startLoaderThread);
 
   return ret;
@@ -267,10 +267,10 @@ getFileType(IOChannel& in)
 //
 SWFMovieDefinition*
 createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunResources& runInfo, bool startLoaderThread)
+        const RunResources& runResources, bool startLoaderThread)
 {
 
-    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
+    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runResources));
 
     const std::string& absURL = URL(url).str();
 
@@ -334,7 +334,7 @@ static void clear_library()
 // return a pointer to it.
 //
 movie_definition*
-MovieFactory::makeMovie(const URL& url, const RunResources& runInfo,
+MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {
@@ -357,7 +357,7 @@ MovieFactory::makeMovie(const URL& url, const RunResources& runInfo,
     // the loader thread now to avoid IMPORT tag loaders from 
     // calling createMovie() again and NOT finding
     // the just-created movie.
-    movie_definition* mov = createNonLibraryMovie(url, runInfo, real_url, false,
+    movie_definition* mov = createNonLibraryMovie(url, runResources, real_url, false,
             postdata);
 
     if (!mov)

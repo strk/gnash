@@ -88,7 +88,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = _vm.getRoot().runResources();
 	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
@@ -176,7 +176,7 @@ LoadableObject::load(const std::string& urlstr)
     // when loading is complete.
 	set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = _vm.getRoot().runResources();
 	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.

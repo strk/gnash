@@ -2225,7 +2225,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         const movie_root& mr = _vm.getRoot();
 
         boost::intrusive_ptr<movie_definition> md(
-            MovieFactory::makeMovie(url, mr.runInfo(), NULL, true, postdata));
+            MovieFactory::makeMovie(url, mr.runResources(), NULL, true, postdata));
 
         if (!md)
         {
@@ -2299,7 +2299,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     // (down by getStream, that is)
     
     const movie_root& mr = _vm.getRoot();
-    URL url(urlstr, mr.runInfo().baseURL());
+    URL url(urlstr, mr.runResources().baseURL());
 
     std::string postdata;
     
@@ -2308,7 +2308,7 @@ MovieClip::loadVariables(const std::string& urlstr,
 
     try 
     {
-        const StreamProvider& sp = _vm.getRoot().runInfo().streamProvider();
+        const StreamProvider& sp = _vm.getRoot().runResources().streamProvider();
         
         if (sendVarsMethod == METHOD_POST)
         {
@@ -2634,7 +2634,7 @@ MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-    sound::sound_handler* handler = _vm.getRoot().runInfo().soundHandler();
+    sound::sound_handler* handler = _vm.getRoot().runResources().soundHandler();
     if (handler)
     {
         handler->stop_sound(m_sound_stream_id);

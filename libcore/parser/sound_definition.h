@@ -61,7 +61,7 @@ public:
 	sound_sample(int id, const RunResources& r)
 		:
 		m_sound_handler_id(id),
-        _runInfo(r)
+        _runResources(r)
 	{
 	}
 
@@ -73,7 +73,7 @@ public:
     /// destroyed after the movie_root has been destroyed, so that
     /// access through the VM (which assumes movie_root exists) causes
     /// a segfault.
-    const RunResources& _runInfo;
+    const RunResources& _runResources;
 
 };
 

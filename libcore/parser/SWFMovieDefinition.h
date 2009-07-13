@@ -179,9 +179,9 @@ public:
 
     /// Construct a SWF movie.
     //
-    /// @param runInfo      A RunResources containing information used for
+    /// @param runResources      A RunResources containing information used for
     ///                     parsing.
-	SWFMovieDefinition(const RunResources& runInfo);
+	SWFMovieDefinition(const RunResources& runResources);
 
 	~SWFMovieDefinition();
 
@@ -568,7 +568,7 @@ private:
     /// @todo   Add to base class? This would make it available for other
     ///         kinds of movies (e.g. FLV) and make it easier to initialize
     ///         movie_root with the same RunResources as its first definition.
-    const RunResources& _runInfo;
+    const RunResources& _runResources;
 
     bool _as3;
 

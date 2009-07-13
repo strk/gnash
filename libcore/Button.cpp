@@ -522,7 +522,7 @@ Button::mouseEvent(const event_id& event)
         if (!_def->hasSound()) break;
 
         // Check if there is a sound handler
-        sound::sound_handler* s = _vm.getRoot().runInfo().soundHandler();
+        sound::sound_handler* s = _vm.getRoot().runResources().soundHandler();
         if (!s) break;
 
         int bi; // button sound array index [0..3]

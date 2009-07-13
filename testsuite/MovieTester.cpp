@@ -86,15 +86,15 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-    _runInfo.reset(new RunResources(url));
-    _runInfo->setSoundHandler(_sound_handler);
+    _runResources.reset(new RunResources(url));
+    _runResources->setSoundHandler(_sound_handler);
     
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
 
-    _runInfo->setTagLoaders(loaders);
+    _runResources->setTagLoaders(loaders);
 
-    _runInfo->setStreamProvider(boost::shared_ptr<StreamProvider>(
+    _runResources->setStreamProvider(boost::shared_ptr<StreamProvider>(
                 new StreamProvider));
 
 	if ( url == "-" )
@@ -102,7 +102,7 @@ MovieTester::MovieTester(const std::string& url)
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = MovieFactory::makeMovie(in, url, *_runInfo, false);
+		_movie_def = MovieFactory::makeMovie(in, url, *_runResources, false);
 	}
 	else
 	{
@@ -122,7 +122,7 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = MovieFactory::makeMovie(urlObj, *_runInfo,
+		_movie_def = MovieFactory::makeMovie(urlObj, *_runResources,
                 NULL, false);
 	}
 
@@ -131,7 +131,7 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	_movie_root = new movie_root(*_movie_def, _clock, *_runInfo);
+	_movie_root = new movie_root(*_movie_def, _clock, *_runResources);
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());
@@ -171,7 +171,7 @@ MovieTester::render(boost::shared_ptr<Renderer> h,
     // This is a bit dangerous, as there isn't really support for swapping
     // renderers during runtime; though the only problem is likely to be
     // that BitmapInfos are missing.
-	_runInfo->setRenderer(h);
+	_runResources->setRenderer(h);
 
 	h->set_invalidated_regions(invalidated_regions);
 
@@ -580,7 +580,7 @@ MovieTester::addTestingRenderer(boost::shared_ptr<Renderer> h,
 
 	// this will be needed till we allow run-time swapping of renderers,
 	// see above UNTESTED message...
-	_runInfo->setRenderer(_testingRenderers.back().getRenderer());
+	_runResources->setRenderer(_testingRenderers.back().getRenderer());
 }
 
 bool

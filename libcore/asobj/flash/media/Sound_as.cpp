@@ -87,7 +87,7 @@ Sound_as::Sound_as()
     soundId(-1),
     externalSound(false),
     isStreaming(false),
-    _soundHandler(_vm.getRoot().runInfo().soundHandler()),
+    _soundHandler(_vm.getRoot().runResources().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _startTime(0),
     _leftOverData(),
@@ -353,11 +353,11 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     _startTime=0;
 
     const movie_root& mr = _vm.getRoot();
-    URL url(file, mr.runInfo().baseURL());
+    URL url(file, mr.runResources().baseURL());
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-    const StreamProvider& streamProvider = mr.runInfo().streamProvider();
+    const StreamProvider& streamProvider = mr.runResources().streamProvider();
     std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url,
                 rcfile.saveStreamingMedia()));
     if ( ! inputStream.get() )

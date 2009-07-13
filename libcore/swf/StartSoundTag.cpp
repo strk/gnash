@@ -77,7 +77,7 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 {
 
     sound::sound_handler* handler = 
-        m->getVM().getRoot().runInfo().soundHandler();
+        m->getVM().getRoot().runResources().soundHandler();
 
     if (handler)
     {

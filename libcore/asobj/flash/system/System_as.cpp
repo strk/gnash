@@ -175,7 +175,7 @@ getSystemCapabilitiesInterface(as_object& o)
     //
         
     // Is audio available?
-    const bool hasAudio = (vm.getRoot().runInfo().soundHandler());
+    const bool hasAudio = (vm.getRoot().runResources().soundHandler());
 
     // FIXME: these need to be implemented properly. They are mostly
     // self-explanatory.

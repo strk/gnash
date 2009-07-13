@@ -323,7 +323,7 @@ private:
 
     boost::shared_ptr<sound::sound_handler> _sound_handler;
 
-    std::auto_ptr<RunResources> _runInfo;
+    std::auto_ptr<RunResources> _runResources;
 	/// Current pointer position - X ordinate
 	int _x;
 

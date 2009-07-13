@@ -123,7 +123,7 @@ struct movie_data
 };
 
 static boost::intrusive_ptr<gnash::movie_definition> play_movie(
-        const std::string& filename, const RunResources& runInfo);
+        const std::string& filename, const RunResources& runResources);
 
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
@@ -385,13 +385,13 @@ main(int argc, char *argv[])
             e = infiles.end(); i != e; ++i)
     {
 
-        RunResources runInfo(*i);
-        runInfo.setSoundHandler(soundHandler);
-        runInfo.setStreamProvider(sp);
-        runInfo.setTagLoaders(loaders);
+        RunResources runResources(*i);
+        runResources.setSoundHandler(soundHandler);
+        runResources.setStreamProvider(sp);
+        runResources.setTagLoaders(loaders);
 
 	    boost::intrusive_ptr<gnash::movie_definition> m =
-            play_movie(*i, runInfo);
+            play_movie(*i, runResources);
 	    if (!m) {
 	        if (s_stop_on_errors) {
 		    // Fail.
@@ -420,7 +420,7 @@ main(int argc, char *argv[])
 //
 // Return the movie definition.
 boost::intrusive_ptr<gnash::movie_definition>
-play_movie(const std::string& filename, const RunResources& runInfo)
+play_movie(const std::string& filename, const RunResources& runResources)
 {
     boost::intrusive_ptr<gnash::movie_definition> md;
 
@@ -432,7 +432,7 @@ play_movie(const std::string& filename, const RunResources& runInfo)
       {
          std::auto_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
-         md = MovieFactory::makeMovie(in, filename, runInfo, false);
+         md = MovieFactory::makeMovie(in, filename, runResources, false);
       }
       else
       {
@@ -449,7 +449,7 @@ play_movie(const std::string& filename, const RunResources& runInfo)
              log_debug(_("%s appended to local sandboxes"), path.c_str());
 #endif
          }
-         md = MovieFactory::makeMovie(url, runInfo, NULL, false);
+         md = MovieFactory::makeMovie(url, runResources, NULL, false);
       }
     }
     catch (GnashException& ge)
@@ -473,7 +473,7 @@ play_movie(const std::string& filename, const RunResources& runInfo)
 
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
-    gnash::movie_root m(*md, cl, runInfo);
+    gnash::movie_root m(*md, cl, runResources);
     
     // Register processor to receive ActionScript events (Mouse, Stage
     // System etc).

@@ -583,7 +583,7 @@ HTTPRemotingHandler::advance()
         // TODO: it might be useful for a Remoting Handler to have a 
         // StreamProvider member
         const StreamProvider& sp =
-            _nc.getVM().getRoot().runInfo().streamProvider();
+            _nc.getVM().getRoot().runResources().streamProvider();
 
         _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
 
@@ -735,7 +735,7 @@ NetConnection_as::validateURL() const
 {
 
     const movie_root& mr = _vm.getRoot();
-    URL uri(_uri, mr.runInfo().baseURL());
+    URL uri(_uri, mr.runResources().baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -841,7 +841,7 @@ NetConnection_as::connect(const std::string& uri)
     }
 
     const movie_root& mr = _vm.getRoot();
-    URL url(uri, mr.runInfo().baseURL());
+    URL url(uri, mr.runResources().baseURL());
 
     if ( url.protocol() == "rtmp" )
     {
@@ -943,7 +943,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
-    const RunResources& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = _vm.getRoot().runResources();
 
     const StreamProvider& streamProvider = ri.streamProvider();
 
