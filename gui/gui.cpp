@@ -23,7 +23,6 @@
 
 #include "MovieClip.h"
 #include "gui.h"
-#include "render.h"  // debug
 #include "Renderer.h"
 #include "sound_handler.h"
 #include "movie_root.h"
@@ -785,7 +784,7 @@ Gui::display(movie_root* m)
 		// show invalidated region using a red rectangle
 		// (Flash debug style)
 		IF_DEBUG_REGION_UPDATES (
-		if ( ! changed_ranges.isWorld() )
+		if (_renderer && !changed_ranges.isWorld())
 		{
 		
 			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
@@ -807,7 +806,7 @@ Gui::display(movie_root* m)
 				corners[3].x = xmin;
 				corners[3].y = ymax;
 				SWFMatrix no_transform;
-				gnash::render::draw_poly(corners, 4,
+				_renderer->draw_poly(corners, 4,
 					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
 					
 			}
