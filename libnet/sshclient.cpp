@@ -51,10 +51,10 @@
 #include "diskstream.h"
 #include "cache.h"
 
-#ifdef HAVE_OPENSSH_SSH_H
-#include <openssh/ssh.h>
-#include <openssh/err.h>
-#endif
+extern "C" {
+# include <libssh/libssh.h>
+# include <libssh/sftp.h>
+}
 
 #if defined(_WIN32) || defined(WIN32)
 # define __PRETTY_FUNCTION__ __FUNCDNAME__
@@ -70,38 +70,23 @@ using namespace std;
 
 static boost::mutex stl_mutex;
 
-// This is static in this file, instead of being a private variable in
-// the SSHCLient class, is so it's accessible from the C function callback,
-// which can't access the private data of the class.
-// static SSHClient::passwd_t password(SSH_PASSWD_SIZE);
-static string password;
-
 namespace gnash
 {
 
-const char *ROOTPATH = "/etc/pki/tls";
-const char *HOST    = "localhost";
-const char *CA_LIST = "root.pem";
-const char *RANDOM  = "random.pem";
-const char *KEYFILE  = "client.pem";
-const size_t SSH_PASSWD_SIZE = 1024;
-
 SSHClient::SSHClient()
     : _hostname("localhost"),
-      _calist(CA_LIST),
-      _keyfile(KEYFILE),
-      _rootpath(ROOTPATH),
-      _need_server_auth(true)
+      _need_server_auth(true),
+      _state(0),
+      _session(0),
+      _options(0)
 {
     GNASH_REPORT_FUNCTION;
 
-//     setPort(SSH_PORT);
-    setPassword("password");
 }
 
 SSHClient::~SSHClient()
 {
-//     GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 }
 
 // Read bytes from the already opened SSH connection
@@ -114,7 +99,7 @@ SSHClient::sshRead(amf::Buffer &buf)
 }
 
 int
-SSHClient::sshRead(boost::uint8_t *buf, size_t size)
+SSHClient::sshRead(boost::uint8_t */* buf */, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -137,7 +122,7 @@ SSHClient::sshWrite(amf::Buffer &buf)
 }
 
 int
-SSHClient::sshWrite(const boost::uint8_t *buf, size_t length)
+SSHClient::sshWrite(const boost::uint8_t */* buf */, size_t /* length */)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -147,88 +132,6 @@ SSHClient::sshWrite(const boost::uint8_t *buf, size_t length)
 // 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
 //     }
 //    return ret;
-}
-
-// Setup the Context for this connection
-bool
-SSHClient::sshSetupCTX()
-{
-//     return sshSetupCTX(_keyfile, _calist);
-}
-
-bool
-SSHClient::sshSetupCTX(std::string &keyspec, std::string &caspec)
-{
-    GNASH_REPORT_FUNCTION;
-//     SSH_METHOD *meth;
-//     int ret;
-//     string keyfile;
-//     string cafile;
-
-//     if (keyspec.find('/', 0) != string::npos) {
-// 	keyfile = keyspec;
-//     } else {
-// 	keyfile = _rootpath;
-// 	keyfile += "/";
-// 	keyfile += keyspec;
-//     }
-    
-    
-//     if (caspec.find('/', 0) != string::npos) {
-// 	cafile = caspec;
-//     } else {
-// 	cafile = _rootpath;
-// 	cafile += "/";
-// 	cafile += caspec;
-//     }
-
-//     // Initialize SSH library
-//     SSH_library_init();
-
-//     // Load the error strings so the SSH_error_*() functions work
-//     SSH_load_error_strings();
-    
-//     // create the context
-//     meth = SSHv23_method();
-//     _ctx.reset(SSH_CTX_new(meth));
-    
-//     // Load our keys and certificates
-//     if ((ret = SSH_CTX_use_certificate_chain_file(_ctx.get(), keyfile.c_str())) != 1) {
-// 	log_error("Can't read certificate file \"%s\"!", keyfile);
-// 	return false;
-//     } else {
-// 	log_debug("Read certificate file \"%s\".", keyfile);
-//     }
-
-//     // Set the passwor dcallback
-//     SSH_CTX_set_default_passwd_cb(_ctx.get(), password_cb);
-
-//     // Add the first private key in the keyfile to the context.
-//     ERR_clear_error();
-//     if((ret = SSH_CTX_use_PrivateKey_file(_ctx.get(), keyfile.c_str(),
-// 					  SSH_FILETYPE_PEM)) != 1) {
-// 	log_error("Can't read key file \"%s\"!", keyfile);
-//  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-// 	return false;
-//     } else {
-// 	log_error("Read key file \"%s\".", keyfile);
-//     }
-
-//     // Load the CAs we trust
-//     ERR_clear_error();
-//     if (!(SSH_CTX_load_verify_locations(_ctx.get(), cafile.c_str(), 0))) {
-// 	log_error("Can't read CA list from \"%s\"!", cafile);
-//  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-// 	return false;
-//     } else {
-// 	log_debug("Read CA list from \"%s\"", cafile);
-//     }
-    
-// #if (OPENSSH_VERSION_NUMBER < 0x00905100L)
-//     SSH_CTX_set_verify_depth(_ctx.get() ,1);
-// #endif
-
-    return true;
 }
 
 // Shutdown the Context for this connection
@@ -254,99 +157,156 @@ bool
 SSHClient::sshConnect(int fd, std::string &hostname)
 {
     GNASH_REPORT_FUNCTION;
-    int ret;
+    char *password;
+    char *banner;
+    char *hexa;
+    char buf[10];
 
-//     if (!_ctx) {
-// 	if (!sshSetupCTX()) {
-// 	    return false;
-// 	}
-//     }
-
-//     _ssh.reset(SSH_new(_ctx.get()));
-
-// //     // Make a tcp/ip connect to the server
-// //     if (createClient(hostname, getPort()) == false) {
-// //         log_error("Can't connect to server %s", hostname);
-// //         return false;
-// //     }
-
-//     // Handshake the server
-//     ERR_clear_error();
-//     _bio.reset(BIO_new_socket(fd, BIO_NOCLOSE));
-//     SSH_set_bio(_ssh.get(), _bio.get(), _bio.get());
-
-//     if ((ret = SSH_connect(_ssh.get())) < 0) {
-//         log_error("Can't connect to SSH server %s", hostname);
-//  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-//         return false;
-//     } else {
-//         log_debug("Connected to SSH server %s", hostname);
-//     }
-
-//     ERR_clear_error();
-// #if 0
-//     if (_need_server_auth) {
-//  	checkCert(hostname);
-//     }
-// #endif
+//    _options.reset(ssh_options_new());
+    _options = ssh_options_new();
+    if (!_user.empty()) {
+	if (ssh_options_set_username(_options, _user.c_str()) < 0) {
+	    ssh_options_free(_options);
+	    return false;
+	}
+    }
     
-    return true;
-}
+    if (ssh_options_set_host(_options, hostname.c_str()) < 0) {
+	ssh_options_free(_options);
+	return false;
+    }
 
-// sshAccept() is how the server waits for connections for clients
-size_t
-SSHClient::sshAccept()
-{
-    GNASH_REPORT_FUNCTION;
+    _session = ssh_new();
+    if(ssh_connect(_session)){
+        log_debug("Connection failed : %s\n", ssh_get_error(_session));
+        ssh_disconnect(_session);
+	ssh_finalize();
+        return false;
+    }
 
-    return 0;
-}
+    _state = ssh_is_server_known(_session);
+    log_debug("SSH Server is known: %d", _state);
 
-bool
-SSHClient::checkCert()
-{
-    GNASH_REPORT_FUNCTION;
-    return checkCert(_hostname);
-}
-
-bool
-SSHClient::checkCert(std::string &hostname)
-{
-    GNASH_REPORT_FUNCTION;
-
-//     if (!_ssh || (hostname.empty())) {
-// 	return false;
-//     }
-
-//     X509 *peer;
-//     char peer_CN[256];
+    unsigned char *hash = 0;
+    int hlen = ssh_get_pubkey_hash(_session, &hash);
+    if (hlen < 0) {
+	ssh_disconnect(_session);
+	ssh_finalize();
+	return false;
+    }
+    switch(_state){
+      case SSH_SERVER_KNOWN_OK:	// ok
+	  break; 
+      case SSH_SERVER_KNOWN_CHANGED:
+	  log_error("Host key for server changed : server's one is now :\n");
+	  ssh_print_hexa("Public key hash",hash, hlen);
+	  free(hash);
+	  log_error("For security reason, connection will be stopped\n");
+	  ssh_disconnect(_session);
+	  ssh_finalize();
+	  return false;;
+      case SSH_SERVER_FOUND_OTHER:
+	  log_error("The host key for this server was not found but an other type of key exists.\n");
+	  log_error("An attacker might change the default server key to confuse your client"
+		    "into thinking the key does not exist\n"
+		    "We advise you to rerun the client with -d or -r for more safety.\n");
+	  ssh_disconnect(_session);
+	  ssh_finalize();
+	  return false;;
+      case SSH_SERVER_NOT_KNOWN:
+	  hexa = ssh_get_hexa(hash, hlen);
+	  free(hash);
+	  log_error("The server is unknown. Do you trust the host key ?\n");
+	  log_error("Public key hash: %s\n", hexa);
+	  free(hexa);
+	  fgets(buf, sizeof(buf), stdin);
+	  if(strncasecmp(buf, "yes", 3)!=0){
+	      ssh_disconnect(_session);
+	      return false;
+	  }
+	  log_error("This new key will be written on disk for further usage. do you agree ?\n");
+	  fgets(buf, sizeof(buf), stdin);
+	  if(strncasecmp(buf, "yes", 3)==0){
+	      if(ssh_write_knownhost(_session))
+		  log_error("%s\n",ssh_get_error(_session));
+	  }
+	  
+	  break;
+      case SSH_SERVER_ERROR:
+	  free(hash);
+	  log_error("%s",ssh_get_error(_session));
+	  ssh_disconnect(_session);
+	  ssh_finalize();
+	  return false;
+    }
     
-//     if (SSH_get_verify_result(_ssh.get()) != X509_V_OK) {
-// 	log_error("Certificate doesn't verify");
-// 	return false;
-//     } else {
-// 	log_debug("Certificate verified.");
-//     }
-
-//     // Check the cert chain. The chain length
-//     // is automatically checked by OpenSSH when
-//     // we set the verify depth in the ctx
-
-//     // Check the common name
-//     if ((peer = SSH_get_peer_certificate(_ssh.get())) == 0) {
-// 	log_debug("Couldn't get Peer certificate!");
-// 	return false;
-//     } else {
-// 	log_debug("Got Peer certificate.");
-//     }
+    free(hash);
     
-//     ERR_clear_error();
-//     X509_NAME_get_text_by_NID (X509_get_subject_name(peer),
-// 			       NID_commonName, peer_CN, 256);
+    ssh_userauth_none(_session, NULL);
+    
+    int auth = ssh_auth_list(_session);
 
-//     if (strcasecmp(peer_CN, hostname.c_str())) {
-// 	log_error("Common name doesn't match host name");
-//     }
+    log_debug("auth: 0x%04x\n", auth);
+    log_debug("supported auth methods: ");
+    if (auth & SSH_AUTH_METHOD_PUBLICKEY) {
+      log_debug("publickey");
+    }
+    if (auth & SSH_AUTH_METHOD_INTERACTIVE) {
+      log_debug(", keyboard-interactive");
+    }
+    log_debug("\n");
+
+    /* no ? you should :) */
+    auth=ssh_userauth_autopubkey(_session, NULL);
+    if(auth == SSH_AUTH_ERROR){
+        log_debug("Authenticating with pubkey: %s\n",ssh_get_error(_session));
+	ssh_finalize();
+        return false;
+    }
+    banner = ssh_get_issue_banner(_session);
+    if(banner){
+        log_debug("%s\n", banner);
+        free(banner);
+    }
+    if(auth != SSH_AUTH_SUCCESS){
+//        auth = auth_kbdint(_session);
+        if(auth == SSH_AUTH_ERROR){
+            log_error("authenticating with keyb-interactive: %s\n",
+		      ssh_get_error(_session));
+	    ssh_finalize();
+            return false;
+        }
+    }
+    if(auth != SSH_AUTH_SUCCESS){
+        password = getpass("Password: ");
+        if(ssh_userauth_password(_session, NULL, password) != SSH_AUTH_SUCCESS){
+            log_error("Authentication failed: %s\n",ssh_get_error(_session));
+            ssh_disconnect(_session);
+                ssh_finalize();
+            return false;
+        }
+        memset(password, 0, strlen(password));
+    }
+    ssh_log(_session, SSH_LOG_FUNCTIONS, "Authentication success");
+#if 0
+    if(strstr(argv[0],"sftp")){
+        sftp = 1;
+        ssh_log(_session, SSH_LOG_FUNCTIONS, "Doing sftp instead");
+    }
+    if(!sftp){
+        if(!cmds[0])
+            shell(_session);
+        else
+            batch_shell(_session);
+    }
+    else
+        do_sftp(_session);
+    if(!sftp && !cmds[0])
+        do_cleanup(0);
+#endif
+    
+    ssh_disconnect(_session);
+    ssh_finalize();
 
     return true;
 }
@@ -356,20 +316,10 @@ SSHClient::dump() {
 //    GNASH_REPORT_FUNCTION;
     
     boost::mutex::scoped_lock lock(stl_mutex);
-        
+  
     log_debug (_("==== The SSH header breaks down as follows: ===="));
-}
 
-// The password is a global variable so it can be set from a C function
-// callback.
-void
-SSHClient::setPassword(std::string pw) {
-    password = pw;
-}
-
-std::string &
-SSHClient::getPassword() {
-    return password;
+    ssh_version(0);
 }
 
 } // end of gnash namespace
