@@ -1234,6 +1234,9 @@ if test x"${build_ssh}" = xyes; then
   GNASH_PKG_FIND(ssh, [libssh/libssh.h], [libssh library], ssh_socket_init)
 dnl  GNASH_PKG_FIND(poppler, [popt.h], [Poppler library], poppler_init)
 fi
+if test x"${has_ssh}" = x"yes"; then
+  AC_DEFINE([USE_SSH], [1], [Use SSH for authentication])
+fi
 
 dnl --------------------------------------------------------
 dnl  Select SSL support
@@ -1262,6 +1265,9 @@ AC_ARG_WITH(pem,
 
 if test x"${build_ssl}" = xyes; then
   GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
+fi
+if test x"${has_ssl}" = x"yes"; then
+  AC_DEFINE([USE_SSL], [1], [Use SSL for authentication])
 fi
 
 dnl -----------------------------------------------------------
