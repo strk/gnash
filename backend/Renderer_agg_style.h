@@ -18,7 +18,7 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_STYLE_H
 #define BACKEND_RENDER_HANDLER_AGG_STYLE_H
 
-// This include file used only to make render_handler_agg more readable.
+// This include file used only to make Renderer_agg more readable.
 
 
 // TODO: Instead of re-creating AGG fill styles again and again, they should

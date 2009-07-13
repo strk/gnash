@@ -1,4 +1,4 @@
-// RunInfo.h    Hold external and per-run resources for Gnash core.
+// RunResources.h    Hold external and per-run resources for Gnash core.
 // 
 //   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -22,15 +22,13 @@
 
 #include "TagLoadersTable.h"
 #include "StreamProvider.h"
+#include "Renderer.h"
+#include "sound_handler.h"
+
 #include <string>
 #include <boost/shared_ptr.hpp>
 
 namespace gnash {
-
-// Forward declarations
-namespace sound {
-    class sound_handler;
-}
 
 /// Class to group together per-run and external resources for Gnash
 //
@@ -41,16 +39,16 @@ namespace sound {
 /// This must be kept alive for the entire duration of a run (presently
 /// until the last SWFMovieDefinition has been destroyed).
 /// @todo Check the lifetime and update documentation if it changes.
-/// @todo   Add render_handler, MediaHandler.
-class RunInfo
+/// @todo   Add MediaHandler.
+class RunResources
 {
 public:
 
-    /// Constructs a RunInfo instance with an immutable base URL.
+    /// Constructs a RunResources instance with an immutable base URL.
     //
     /// @param baseURL  The base URL for the run. This cannot be changed after
     ///                 construction.
-    RunInfo(const std::string& baseURL)
+    RunResources(const std::string& baseURL)
         :
         _baseURL(baseURL)
     {
@@ -99,13 +97,20 @@ public:
         return _soundHandler.get();
     }
 
+    void setRenderer(boost::shared_ptr<Renderer> r) {
+        _renderer = r;
+    }
+
+    Renderer* renderer() const {
+        return _renderer.get();
+    }
+
     /// Set the loader functions for SWF parsing.
     //
     /// This must be present before parsing.
     /// It is a pointer to const so that the same table can be shared between
     /// simultaneous runs if desired.
-    void setTagLoaders(boost::shared_ptr<const SWF::TagLoadersTable> loaders)
-    {
+    void setTagLoaders(boost::shared_ptr<const SWF::TagLoadersTable> loaders) {
         _tagLoaders = loaders;
     }
 
@@ -122,6 +127,8 @@ private:
     boost::shared_ptr<StreamProvider> _streamProvider;
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
+
+    boost::shared_ptr<Renderer> _renderer;
 
     boost::shared_ptr<const SWF::TagLoadersTable> _tagLoaders;
 

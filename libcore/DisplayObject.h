@@ -53,6 +53,7 @@ namespace gnash {
     class movie_definition;
     class StaticText;
     class InteractiveObject;
+    class Renderer;
     namespace SWF {
         class TextRecord;
     }
@@ -417,7 +418,7 @@ public:
     /// Render the DisplayObject.
     //
     /// All DisplayObjects must have a display() function.
-	virtual void display() = 0;
+	virtual void display(Renderer& renderer) = 0;
 
     /// Search for StaticText objects
     //
@@ -828,7 +829,7 @@ public:
     /// There is no need to do any rendering for this DisplayObject when this 
     /// function returns false because the renderer will not change any pixels
     /// in the area where this DisplayObject is placed.    
-    bool boundsInClippingArea() const; 
+    bool boundsInClippingArea(Renderer& renderer) const; 
 
     /// Return full path to this object, in slash notation
     //

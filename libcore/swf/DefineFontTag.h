@@ -38,7 +38,7 @@
 namespace gnash {
     class SWFStream;
     class movie_definition;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -53,7 +53,7 @@ public:
     //
     /// A corresponding Font is created and added to the movie_definition.
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     /// Return the glyphs read from the DefineFont tag.
     const Font::GlyphInfoRecords& glyphTable() const {
@@ -103,13 +103,15 @@ public:
 
 private:
 
-    DefineFontTag(SWFStream& in, movie_definition& m, TagType tag);
+    DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
+            const RunResources& r);
 
     /// Read a DefineFont tag.
-    void readDefineFont(SWFStream& in, movie_definition & m);
+    void readDefineFont(SWFStream& in, movie_definition& m, const RunResources& r);
 
     /// Read a DefineFont2 or DefineFont3 tag.
-    void readDefineFont2Or3(SWFStream& in, movie_definition& m);
+    void readDefineFont2Or3(SWFStream& in, movie_definition& m,
+            const RunResources& r);
 
     /// The GlyphInfo records contained in the tag.
     Font::GlyphInfoRecords _glyphTable;
@@ -143,7 +145,7 @@ public:
     /// DefineFont tag. The information is already contained in a 
     /// DefineFont2 or DefineFont3 tag.
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 };
 
 }

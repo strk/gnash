@@ -21,7 +21,7 @@
 
 #include "ExportableResource.h"
 #include "ControlTag.h" // for sound tags inheritance
-#include "RunInfo.h" // TODO: drop.
+#include "RunResources.h" // TODO: drop.
 
 // Forward declarations
 namespace gnash {
@@ -58,10 +58,10 @@ class sound_sample: public ExportableResource
 public:
 	int	m_sound_handler_id;
 
-	sound_sample(int id, const RunInfo& r)
+	sound_sample(int id, const RunResources& r)
 		:
 		m_sound_handler_id(id),
-        _runInfo(r)
+        _runResources(r)
 	{
 	}
 
@@ -73,7 +73,7 @@ public:
     /// destroyed after the movie_root has been destroyed, so that
     /// access through the VM (which assumes movie_root exists) causes
     /// a segfault.
-    const RunInfo& _runInfo;
+    const RunResources& _runResources;
 
 };
 

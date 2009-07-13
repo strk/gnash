@@ -50,7 +50,6 @@
 #include "sound_handler.h"
 #include "ExportableResource.h"
 #include "MovieFactory.h"
-#include "render.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -165,14 +164,14 @@ public:
 
 // Silently ignore the contents of this tag.
 void null_loader(SWFStream& /*in*/, TagType /*tag*/, movie_definition& /*m*/,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
 }
 
 // Label the current frame of m with the name from the SWFStream.
 void
 frame_label_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& /*r*/)
 {
     assert(tag == SWF::FRAMELABEL); // 43
 
@@ -216,7 +215,7 @@ frame_label_loader(SWFStream& in, TagType tag, movie_definition& m,
 // images further along in the SWFStream.
 void
 jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& /*r*/)
 {
     //GNASH_REPORT_FUNCTION;
     assert(tag == SWF::JPEGTABLES);
@@ -274,7 +273,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 // existing JpegImageInput object stored in the movie.
 void
 define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& r)
 {
     assert(tag == SWF::DEFINEBITS); // 6
 
@@ -317,7 +316,12 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
     
-    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
+    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(im);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -326,7 +330,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& r)
 {
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
 
@@ -374,7 +378,12 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad, ft));
 
-    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
+    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(im);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -474,7 +483,7 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
 // channel using zlib compression.
 void
 define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& r)
 {
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
@@ -523,8 +532,14 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
     im->mergeAlpha(buffer.get(), bufferLength);
 
+
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
     boost::intrusive_ptr<BitmapInfo> bi =
-        render::createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
+        renderer->createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -534,7 +549,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& r)
 {
     // tags 20 || 36
     assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
@@ -711,7 +726,12 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     }
 
-    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(image);
+    Renderer* renderer = r.renderer();
+    if (!renderer) {
+        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        return;
+    }    
+    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(image);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -722,7 +742,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 // This is like null_loader except it prints a message to nag us to fix it.
 void
 fixme_loader(SWFStream& /*in*/, TagType tag, movie_definition& /*m*/,
-		const RunInfo& /*r*/)
+		const RunResources& /*r*/)
 {
     static std::set<TagType> warned;
     if (warned.insert(tag).second) {
@@ -733,7 +753,7 @@ fixme_loader(SWFStream& /*in*/, TagType tag, movie_definition& /*m*/,
 // Create and initialize a sprite, and add it to the movie.
 void
 sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& r)
+		const RunResources& r)
 {
     assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
 
@@ -778,7 +798,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 
 void export_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& /*r*/)
     // Load an export tag (for exposing internal resources of m)
 {
     assert(tag == SWF::EXPORTASSETS); // 56
@@ -841,7 +861,7 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 
 void import_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& r)
+		const RunResources& r)
 {
     assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
 
@@ -940,7 +960,7 @@ static unsigned int s_sample_rate_table_len = 4;
 // Load a DefineSound tag.
 void
 define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& r)
+		const RunResources& r)
 {
     assert(tag == SWF::DEFINESOUND); // 14
 
@@ -1041,7 +1061,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 // Load a SoundStreamHead(2) tag.
 void
 sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& r)
+		const RunResources& r)
 {
 
     // 18 || 45
@@ -1179,7 +1199,7 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == SWF::FILEATTRIBUTES); // 69
 
@@ -1238,7 +1258,7 @@ file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 metadata_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
+		const RunResources& /*r*/)
 {
     assert(tag == SWF::METADATA); 
 
@@ -1280,7 +1300,7 @@ metadata_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/, 
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == SWF::SERIALNUMBER); // 41
 
@@ -1314,7 +1334,7 @@ serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
 void
 reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == SWF::REFLEX); // 777
 

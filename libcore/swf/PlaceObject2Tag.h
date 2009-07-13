@@ -37,7 +37,7 @@ namespace gnash {
     class action_buffer;
     class movie_definition;
 	class DisplayList;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -115,7 +115,7 @@ public:
     void execute(MovieClip* m, DisplayList& dlist) const;
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     int getPlaceType() const { 
         return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);

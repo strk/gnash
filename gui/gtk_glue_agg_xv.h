@@ -45,7 +45,7 @@ class GtkAggXvGlue : public GtkGlue
 
     bool init(int argc, char **argv[]);
     void prepDrawingArea(GtkWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void beforeRendering();
     void render();
     void render(int minx, int miny, int maxx, int maxy);
@@ -66,7 +66,7 @@ class GtkAggXvGlue : public GtkGlue
 
     /// This will be used in case of RGB->YUV conversion.
     boost::scoped_array<boost::uint8_t> _offscreenbuf;
-    render_handler *_agg_renderer;
+    Renderer *_agg_renderer;
     size_t _stride;
 
     /// If the hardware accepts RGB, then Agg will render directly into this.

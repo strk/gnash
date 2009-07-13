@@ -543,7 +543,7 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
 #endif
 
     VM& vm = thread.env.getVM();
-    sound::sound_handler* s = vm.getRoot().runInfo().soundHandler();
+    sound::sound_handler* s = vm.getRoot().runResources().soundHandler();
     if (s)
     {
         s->stop_all_sounds();

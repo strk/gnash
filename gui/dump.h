@@ -35,7 +35,7 @@ typedef bool (*callback_t)(void*, int, void *data);
 class DSOEXPORT DumpGui : public Gui
 {
  public:
-    DumpGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    DumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
     ~DumpGui();
     void beforeRendering();
     bool createMenu() { return true; }
@@ -64,7 +64,7 @@ class DSOEXPORT DumpGui : public Gui
     void writeFrame();
 
 private:
-    render_handler *_agg_renderer;      /* pointer to AGG renderer */
+    Renderer *_agg_renderer;      /* pointer to AGG renderer */
 
     // A buffer to hold the actual image data. A boost::scoped_array
     // is destroyed on reset and when it goes out of scope (including on

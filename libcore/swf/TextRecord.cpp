@@ -23,9 +23,8 @@
 #include "DisplayObject.h"
 #include "SWF.h"
 #include "log.h"
-#include "render.h"
-#include "fill_style.h"
 #include "Font.h"
+#include "Renderer.h"
 
 #include <boost/assign/list_of.hpp>
 #include <vector>
@@ -158,8 +157,8 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 /// The proprietary player does not display rotated or skewed device fonts.
 /// Gnash does.
 void
-TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
-        const TextRecords& records, bool embedded)
+TextRecord::displayRecords(Renderer& renderer, const SWFMatrix& mat,
+        const cxform& cx, const TextRecords& records, bool embedded)
 {
 
     // Starting positions.
@@ -248,7 +247,7 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
                                            (point(480, -656))
                                            (point(32, -656))
                                            (point(32,32));
-                render::drawLine(emptyCharBox, textColor, m);
+                renderer.drawLine(emptyCharBox, textColor, m);
 #endif
 
             }
@@ -256,7 +255,7 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
                 ShapeRecord* glyph = fnt->get_glyph(index, embedded);
 
                 // Draw the DisplayObject using the filled outline.
-                if (glyph) render::drawGlyph(*glyph, textColor, m);
+                if (glyph) renderer.drawGlyph(*glyph, textColor, m);
             }
             x += ge.advance;
         }
@@ -282,7 +281,7 @@ TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
                 (point(startX, posY))
                 (point(endX, posY));
 
-            render::drawLine(underline, textColor, mat);
+            renderer.drawLine(underline, textColor, mat);
         }
     }
 }

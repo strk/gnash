@@ -26,11 +26,11 @@
 #include "DefineShapeTag.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
-#include "render.h"
 #include "Shape.h"
 #include "SWFStream.h"
 #include "MovieClip.h"
 #include "SWF.h"
+#include "Renderer.h"
 
 #include <algorithm>
 
@@ -43,7 +43,7 @@ namespace SWF {
 
 void
 DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& r)
 {
     assert(tag == DEFINESHAPE ||
            tag == DEFINESHAPE2 ||
@@ -57,7 +57,7 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("DefineShapeTag(%s): id = %d"), tag, id);
     );
 
-    DefineShapeTag* ch = new DefineShapeTag(in, tag, m);
+    DefineShapeTag* ch = new DefineShapeTag(in, tag, m, r);
     m.addDisplayObject(id, ch);
 
 }
@@ -77,17 +77,17 @@ DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y,
 
 
 DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
-        movie_definition& m)
+        movie_definition& m, const RunResources& r)
     :
     DefinitionTag(),
-    _shape(in, tag, m)
+    _shape(in, tag, m, r)
 {
 }
 
 void
-DefineShapeTag::display(const DisplayObject& inst) const
+DefineShapeTag::display(Renderer& renderer, const DisplayObject& inst) const
 {
-    render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+    renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
 void

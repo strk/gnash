@@ -70,7 +70,7 @@ DefineButtonTag::~DefineButtonTag()
 
 void
 DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m, 
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
 {
     assert(tag == DEFINEBUTTON);
     in.ensureBytes(2);
@@ -87,7 +87,7 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
 void
 DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m, 
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
 {
     assert(tag == DEFINEBUTTON2);
     in.ensureBytes(2);

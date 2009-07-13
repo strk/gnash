@@ -39,7 +39,7 @@ class DefineButtonCxformTag
 public:
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/);
+            const RunResources& /*r*/);
 
 };
 

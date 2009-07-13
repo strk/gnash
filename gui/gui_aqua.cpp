@@ -31,12 +31,12 @@
 namespace gnash {
 
 #ifdef GUI_AQUA
-std::auto_ptr<Gui> createAQUAGui(unsigned long windowid, float scale, bool do_loop, unsigned int bit_depth)
+std::auto_ptr<Gui> createAQUAGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new AquaGui(windowid, scale, do_loop, bit_depth));
+	return std::auto_ptr<Gui>(new AquaGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_AQUA
-std::auto_ptr<Gui> createAQUAGui(unsigned long , float , bool , unsigned int )
+std::auto_ptr<Gui> createAQUAGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
 	throw GnashException("Support for AQUA gui was not compiled in");
 }

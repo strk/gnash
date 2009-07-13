@@ -28,7 +28,7 @@
 namespace gnash {
     class SWFStream;
     class movie_definition;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -51,11 +51,11 @@ class SWFParser
 {
 
 public:
-    SWFParser(SWFStream& in, movie_definition* md, const RunInfo& runInfo)
+    SWFParser(SWFStream& in, movie_definition* md, const RunResources& runResources)
         :
         _stream(in),
         _md(md),
-        _runInfo(runInfo),
+        _runResources(runResources),
         _bytesRead(0),
         _tagOpen(false),
         _endRead(0),
@@ -94,7 +94,7 @@ private:
     
     movie_definition* _md;
     
-    const RunInfo& _runInfo;
+    const RunResources& _runResources;
     
     size_t _bytesRead;
     

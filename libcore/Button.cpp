@@ -391,7 +391,7 @@ Button::handleFocus() {
 
 
 void
-Button::display()
+Button::display(Renderer& renderer)
 {
 
     DisplayObjects actChars;
@@ -400,8 +400,10 @@ Button::display()
     // TODO: by keeping chars sorted by depth we'd avoid the sort on display
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    std::for_each(actChars.begin(), actChars.end(),
-            std::mem_fun(&DisplayObject::display)); 
+    for (DisplayObjects::iterator it = actChars.begin(), e = actChars.end();
+            it != e; ++it) {
+        (*it)->display(renderer);
+    }
 
     clear_invalidated();
 }
@@ -520,7 +522,7 @@ Button::mouseEvent(const event_id& event)
         if (!_def->hasSound()) break;
 
         // Check if there is a sound handler
-        sound::sound_handler* s = _vm.getRoot().runInfo().soundHandler();
+        sound::sound_handler* s = _vm.getRoot().runResources().soundHandler();
         if (!s) break;
 
         int bi; // button sound array index [0..3]

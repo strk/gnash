@@ -23,7 +23,7 @@
 #include <cstring>
 #include <cmath>
 
-#include "render_handler.h"
+#include "Renderer.h"
 #include "swf/ShapeRecord.h"
 #include "gnash.h"
 #include "RGBA.h"
@@ -38,12 +38,12 @@
 #  include <Windows.h>
 #endif
 
-#include "render_handler_ogl.h"
+#include "Renderer_ogl.h"
 
 #include <boost/utility.hpp>
 #include <boost/bind.hpp>
 
-/// \file render_handler_ogl.cpp
+/// \file Renderer_ogl.cpp
 /// \brief The OpenGL renderer and related code.
 ///
 /// So how does this thing work?
@@ -584,10 +584,10 @@ for_each(C& container, R (T::*pmf)(const A&),const A& arg)
 
 
 
-class DSOEXPORT render_handler_ogl : public render_handler, boost::noncopyable
+class DSOEXPORT Renderer_ogl : public Renderer, boost::noncopyable
 {
 public: 
-  render_handler_ogl()
+  Renderer_ogl()
     : _xscale(1.0),
       _yscale(1.0),
       _drawing_mask(false)
@@ -639,7 +639,7 @@ public:
   
   }
   
-  ~render_handler_ogl()
+  ~Renderer_ogl()
   {
   }
   
@@ -998,7 +998,7 @@ public:
 
     // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
-      boost::bind(&render_handler_ogl::add_paths, this, _1));    
+      boost::bind(&Renderer_ogl::add_paths, this, _1));    
           
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilFunc(GL_EQUAL, _masks.size(), _masks.size());
@@ -1229,8 +1229,9 @@ public:
         case SWF::FILL_FOCAL_GRADIENT:
         {
                     
-          const bitmap_info_ogl* binfo =
-              static_cast<const bitmap_info_ogl*>(style.need_gradient_bitmap());       
+          const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+                      style.need_gradient_bitmap(*this));       
+
           SWFMatrix m = style.getGradientMatrix();
           
           binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
@@ -1240,8 +1241,8 @@ public:
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_TILED_BITMAP:
         {
-            const bitmap_info_ogl* binfo =
-                static_cast<const bitmap_info_ogl*>(style.get_bitmap_info());
+            const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+                    style.get_bitmap_info(*this));
 
           binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
           break;
@@ -1251,8 +1252,8 @@ public:
         // smooth=true;
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {     
-          const bitmap_info_ogl* binfo =
-              dynamic_cast<const bitmap_info_ogl*>(style.get_bitmap_info());
+          const bitmap_info_ogl* binfo = dynamic_cast<const bitmap_info_ogl*>(
+                  style.get_bitmap_info(*this));
           
           assert(binfo);
 
@@ -1700,7 +1701,7 @@ public:
   }
 
 #ifdef OSMESA_TESTING
-  bool getPixel(rgba& color_out, int x, int y)
+  bool getPixel(rgba& color_out, int x, int y) const
   {  
     return _offscreen->getPixel(color_out, x, y);
   }
@@ -1740,12 +1741,12 @@ private:
 #ifdef OSMESA_TESTING
   std::auto_ptr<OSRenderMesa> _offscreen;
 #endif
-}; // class render_handler_ogl
+}; // class Renderer_ogl
   
-render_handler* create_render_handler_ogl(bool init)
+Renderer* create_Renderer_ogl(bool init)
 // Factory.
 {
-  render_handler_ogl* renderer = new render_handler_ogl;
+  Renderer_ogl* renderer = new Renderer_ogl;
   if (init) {
     renderer->init();
   }

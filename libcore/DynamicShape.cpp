@@ -16,7 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "DynamicShape.h"
-#include "render.h"
+#include "fill_style.h"
+#include "Renderer.h"
+#include "DisplayObject.h"
 
 #include <vector>
 
@@ -42,9 +44,9 @@ DynamicShape::clear()
 }
 
 void
-DynamicShape::display(const DisplayObject& inst) const
+DynamicShape::display(Renderer& renderer, const DisplayObject& inst) const
 {
-    render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+    renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
 void

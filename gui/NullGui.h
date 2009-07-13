@@ -33,9 +33,9 @@ class NullGui : public Gui {
 
 public: 
 
-	NullGui(bool do_loop)
+	NullGui(bool do_loop, RunResources& r)
 		:
-		Gui(0,0,do_loop,0),
+		Gui(0,0,do_loop, r),
 		_timeout(0),
 		_quit(false)
 	{}

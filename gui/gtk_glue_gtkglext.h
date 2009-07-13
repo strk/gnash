@@ -40,7 +40,7 @@ class GtkGlExtGlue : public GtkGlue
 
     bool init(int argc, char **argv[]);
     void prepDrawingArea(GtkWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void render();
     void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/) { render(); };
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);

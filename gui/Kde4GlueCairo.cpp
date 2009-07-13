@@ -21,8 +21,8 @@
 #endif
 
 #include "Kde4GlueCairo.h"
-#include "render_handler.h"
-#include "render_handler_cairo.h"
+#include "Renderer.h"
+#include "Renderer_cairo.h"
 #include <QRect>
 
 namespace gnash
@@ -136,7 +136,7 @@ Kde4CairoGlue::resize(int width, int height)
 
 
 
-render_handler*
+Renderer*
 Kde4CairoGlue::createRenderHandler()
 {
     _renderer = renderer::cairo::create_handler();

@@ -23,7 +23,7 @@
 #include "movie_definition.h"
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "SoundInfoRecord.h"
 #include "MovieClip.h"
 
@@ -35,7 +35,7 @@ namespace SWF {
 
 void
 StartSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     assert(tag == STARTSOUND); 
 
@@ -77,7 +77,7 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 {
 
     sound::sound_handler* handler = 
-        m->getVM().getRoot().runInfo().soundHandler();
+        m->getVM().getRoot().runResources().soundHandler();
 
     if (handler)
     {
@@ -107,7 +107,7 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 
 void
 StartSound2Tag::loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == STARTSOUND2);
 

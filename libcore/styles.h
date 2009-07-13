@@ -16,6 +16,7 @@ namespace gnash {
 
 class SWFStream;
 class movie_definition;
+class RunResources;
 
   typedef enum { CAP_ROUND=0, CAP_NONE=1, CAP_SQUARE=2 } cap_style_e;
   typedef enum { JOIN_ROUND=0, JOIN_BEVEL=1, JOIN_MITER=2 } join_style_e;
@@ -82,12 +83,13 @@ public:
 	/// Throw a ParserException if there's no enough bytes in the
 	/// currently opened tag for reading. See stream::ensureBytes()
 	///
-	void	read(SWFStream& in, SWF::TagType t, movie_definition& md);
+	void read(SWFStream& in, SWF::TagType t, movie_definition& md,
+            const RunResources& r);
 	
 	/// Read two lines styles from the SWF stream
 	/// at the same time -- this is used in morphing.
 	void read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-		line_style *pOther);
+            const RunResources& r, line_style *pOther);
 
 	/// Return thickness of the line, in TWIPS
 	boost::uint16_t	getThickness() const

@@ -20,7 +20,7 @@
 #define BACKEND_RENDER_HANDLER_CAIRO_H
 
 #include <cairo/cairo.h>
-#include "render_handler.h"
+#include "Renderer.h"
 
 namespace gnash {
 namespace renderer {
@@ -29,10 +29,10 @@ namespace renderer {
 namespace cairo {
 
 /// Create a render handler
-gnash::render_handler* create_handler();
+gnash::Renderer* create_handler();
 
 /// Make sure to call this before starting display
-void set_context(render_handler* handler, cairo_t* context);
+void set_context(Renderer* handler, cairo_t* context);
 
 } // namespace gnash::renderer::cairo
 } // namespace gnash::renderer

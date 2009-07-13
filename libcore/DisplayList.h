@@ -40,6 +40,7 @@
 
 namespace gnash {
 	class cxform;
+	class Renderer;
 }
 
 namespace gnash {
@@ -243,7 +244,7 @@ public:
 	/// \brief
 	/// Display the referenced DisplayObjects.
 	/// Lower depths are obscured by higher depths.
-	void display();
+	void display(Renderer& renderer);
 	
 	void omit_display();
 

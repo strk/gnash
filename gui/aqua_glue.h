@@ -32,7 +32,7 @@ class AquaGlue
     virtual ~AquaGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
     virtual bool prepDrawingArea(int width, int height, AGLDrawable drawable) = 0;
-    virtual render_handler* createRenderHandler() = 0;
+    virtual Renderer* createRenderHandler() = 0;
     virtual void render() = 0;
   protected:
     int _bpp;

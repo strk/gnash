@@ -18,7 +18,7 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 #define BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 
-// This include file used only to make render_handler_agg more readable.
+// This include file used only to make Renderer_agg more readable.
 
 namespace gnash {
 

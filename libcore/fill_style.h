@@ -34,6 +34,8 @@ namespace gnash {
 
 class SWFStream;
 class movie_definition;
+class Renderer;
+class RunResources;
 
 class gradient_record
 {
@@ -167,21 +169,17 @@ public:
 	/// currently opened tag for reading. See stream::ensureBytes()
 	///
 	void read(SWFStream& in, SWF::TagType t, movie_definition& m,
-		fill_style *pOther = NULL);
-
-	/// Read the fill style from a stream, morph version.
-	void read_morph(SWFStream& in, SWF::TagType t, movie_definition& m,
-		fill_style *pOther);
+            const RunResources& r, fill_style *pOther = 0);
 
 	/// \brief
 	/// Make a BitmapInfo* corresponding to our gradient.
 	/// We can use this to set the gradient fill style.
-	const BitmapInfo* create_gradient_bitmap() const;
+	const BitmapInfo* create_gradient_bitmap(Renderer& renderer) const;
 	
 	/// \brief
 	/// Makes sure that _gradientBitmapInfo is not NULL. Calls 
 	/// create_gradient_bitmap() if necessary and returns _gradientBitmapInfo.
-	const BitmapInfo* need_gradient_bitmap() const; 
+	const BitmapInfo* need_gradient_bitmap(Renderer& renderer) const; 
 	
 	rgba	get_color() const { return m_color; }
 
@@ -209,7 +207,7 @@ public:
 	///        to a DisplayObject defined in the DisplayObjects dictionary.
 	///        (it happens..)
 	///
-	const BitmapInfo* get_bitmap_info() const;
+	const BitmapInfo* get_bitmap_info(Renderer& renderer) const;
 
     BitmapSmoothingPolicy getBitmapSmoothingPolicy() const {
         return _bitmapSmoothingPolicy;

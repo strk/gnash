@@ -125,7 +125,7 @@ public:
     //
     /// NOTE: this clock should drive all internal operations
     /// but maybe accessing it trough VM isn't the best idea.
-    /// TODO: consider making this accessible trough RunInfo
+    /// TODO: consider making this accessible trough RunResources
     /// instead.
     ///
     VirtualClock& getClock() {

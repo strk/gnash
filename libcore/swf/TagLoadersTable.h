@@ -31,7 +31,7 @@
 namespace gnash {
 	class SWFStream;
 	class movie_definition;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -49,7 +49,7 @@ public:
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
 	typedef void (*TagLoader)(SWFStream& input, TagType type,
-            movie_definition& m, const RunInfo& r);
+            movie_definition& m, const RunResources& r);
 
     typedef std::map<SWF::TagType, TagLoader> Loaders;
 

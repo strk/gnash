@@ -434,7 +434,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // loaded SWF, so that in the A loads B scenario above the
     // domain would be the one of A, not B.
     //
-    // NOTE: using the base url RunInfo::baseURL() would mean
+    // NOTE: using the base url RunResources::baseURL() would mean
     // blindly trusting the SWF publisher as base url is changed
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx

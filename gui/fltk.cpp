@@ -38,8 +38,9 @@
 #include "gnash.h"
 #include "gui.h"
 #include "VM.h"
+#include "RunResources.h"
 
-#include "render_handler.h"
+#include "Renderer.h"
 
 using namespace std;
 using namespace fltk;
@@ -50,9 +51,9 @@ namespace gnash
 {
 
 
-FltkGui::FltkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
+FltkGui::FltkGui(unsigned long xid, float scale, bool loop, RunResources& r)
   : Window(0, 0),
-    Gui(xid, scale, loop, depth),
+    Gui(xid, scale, loop, r),
     _menu_height(_xid ? 0 : 20)
 {
 }
@@ -254,9 +255,9 @@ FltkGui::createWindow(const char* title, int width, int height)
     createMenu();
     end();
 
-    _renderer = _glue->createRenderHandler();
-    if ( ! _renderer ) return false;
-    set_render_handler(_renderer);
+    _renderer.reset(_glue->createRenderHandler());
+    if (!_renderer.get()) return false;
+    _runResources.setRenderer(_renderer);
 
     _glue->initBuffer(width, height);
 

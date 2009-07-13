@@ -200,7 +200,7 @@ public:
 
     /// Load a DefineButtonTag.
     static void loader(SWFStream& in, TagType tag, movie_definition& m, 
-            const RunInfo& r);
+            const RunResources& r);
 
     typedef std::vector<ButtonRecord> ButtonRecords; 
     typedef std::vector<ButtonAction*> ButtonActions;
@@ -321,7 +321,7 @@ class DefineButton2Tag
 public:
     /// Load a DefineButton2 tag.
     static void loader(SWFStream& in, TagType tag, movie_definition& m, 
-            const RunInfo& r);
+            const RunResources& r);
 };
 
 }

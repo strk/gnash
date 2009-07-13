@@ -30,7 +30,6 @@
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" 
-#include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "gnash.h" // Quality
@@ -1423,12 +1422,12 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 
 
 bool 
-DisplayObject::boundsInClippingArea() const 
+DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
   rect mybounds = getBounds();
   getWorldMatrix().transform(mybounds);
   
-  return gnash::render::bounds_in_clipping_area( mybounds.getRange() );  
+  return renderer.bounds_in_clipping_area(mybounds.getRange());  
 }
 
 #ifdef USE_SWFTREE

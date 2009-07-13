@@ -24,7 +24,6 @@
 #include "fn_call.h"
 #include "as_value.h"
 #include "NetStream_as.h"
-#include "render.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "movie_root.h"
@@ -134,7 +133,7 @@ Video::clear()
 }
 
 void
-Video::display()
+Video::display(Renderer& renderer)
 {
 	// if m_def is NULL we've been constructed by 'new Video', in this
 	// case I think display() would never be invoked on us...
@@ -146,7 +145,7 @@ Video::display()
 	GnashImage* img = getVideoFrame();
 	if (img)
 	{
-		gnash::render::drawVideoFrame(img, &m, &bounds, _smoothing);
+		renderer.drawVideoFrame(img, &m, &bounds, _smoothing);
 	}
 
 	clear_invalidated();

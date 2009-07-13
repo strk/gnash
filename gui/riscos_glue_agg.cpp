@@ -22,8 +22,8 @@
 
 #include "gnash.h"
 #include "log.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include "riscos_glue_agg.h"
 
 namespace gnash
@@ -61,10 +61,10 @@ RiscosAggGlue::prepFramebuffer(void *framebuffer, int width, int height)
     _fbheight = height;
 }
 
-render_handler*
+Renderer*
 RiscosAggGlue::createRenderHandler()
 {
-  _agg_renderer = create_render_handler_agg("RGB24");
+  _agg_renderer = create_Renderer_agg("RGB24");
   return _agg_renderer;
 }
 
@@ -107,7 +107,7 @@ RiscosAggGlue::setRenderHandlerSize(int width, int height)
   // Only the AGG renderer has the function init_buffer, which is *not* part
   // of the renderer api. It allows us to change the renderers movie size
   // (and buffer address) during run-time.
-  static_cast<render_handler_agg_base *>(_agg_renderer)->init_buffer(
+  static_cast<Renderer_agg_base *>(_agg_renderer)->init_buffer(
          _offscreenbuf,
          _offscreenbuf_size,
          _width,

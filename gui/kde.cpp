@@ -56,8 +56,8 @@ KdeGui::~KdeGui()
 }
 
 
-KdeGui::KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth)
+KdeGui::KdeGui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r)
 {
 }
 
@@ -100,7 +100,7 @@ KdeGui::createWindow(const char* windowtitle, int width, int height)
     
     _width = width;
     _height = height;
-    set_render_handler(_renderer);
+    _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
     
     return true;
 }

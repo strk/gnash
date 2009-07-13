@@ -33,7 +33,7 @@ extern "C"{
 #include "log.h"
 #include "movie_root.h"
 
-#include "render_handler.h"
+#include "Renderer.h"
 
 #include <Carbon/Carbon.h>
 
@@ -57,8 +57,8 @@ void DoAdvanceMovie ( EventLoopTimerRef inTimer, void* data)
 }
   
 	
-AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
-	: Gui(xid, scale, loop, depth),
+AquaGui::AquaGui(unsigned long xid, float scale, bool loop, RunResources& r)
+	: Gui(xid, scale, loop, r),
           _advance_timer(NULL)
 {
 }
@@ -121,7 +121,7 @@ bool AquaGui::init(int argc, char **argv[]) /* Self-explainatory */
     _renderer = _glue.createRenderHandler();
     if(!_renderer)return false;
 
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
     return true;
 
 }

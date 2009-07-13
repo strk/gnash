@@ -18,7 +18,6 @@
 
 // Based on original by Willem Kokke <willem@mindparity.com> 2003
 
-#include "render.h"
 #include "GnashImage.h"
 #include "BitmapInfo.h"
 
@@ -33,16 +32,16 @@
 #include <memory>
 
 namespace gnash {
-static render_handler* s_render_handler = NULL;
+static Renderer* s_Renderer = NULL;
 
-void set_render_handler(render_handler* r)
+void set_Renderer(Renderer* r)
 {
-	s_render_handler = r;
+	s_Renderer = r;
 }
 
-render_handler* get_render_handler()
+Renderer* get_Renderer()
 {
-	return s_render_handler;
+	return s_Renderer;
 }
 
 
@@ -66,7 +65,7 @@ namespace render
 	BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
 	{
 	
-        if (!s_render_handler)
+        if (!s_Renderer)
         {
             return new bogus_bi;
         }
@@ -81,7 +80,7 @@ namespace render
             case GNASH_IMAGE_RGB:
             case GNASH_IMAGE_RGBA:
             {
-                return s_render_handler->createBitmapInfo(im);
+                return s_Renderer->createBitmapInfo(im);
             }
         }
 
@@ -91,8 +90,8 @@ namespace render
 	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
             const rect* bounds, bool smooth)
     {
-		if (s_render_handler) {
-            return s_render_handler->drawVideoFrame(frame, mat, bounds, smooth);
+		if (s_Renderer) {
+            return s_Renderer->drawVideoFrame(frame, mat, bounds, smooth);
         }
 	}
 
@@ -109,16 +108,16 @@ namespace render
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler)
+		if (s_Renderer)
 		{
-			s_render_handler->begin_display(
+			s_Renderer->begin_display(
 				background_color, viewport_x0, viewport_y0,
 				viewport_width, viewport_height,
 				x0, x1, y0, y1);
 		}
 // 			else
 // 			{
-// 				log_error("begin_display called, but no render_handler was registered by the app!\n");
+// 				log_error("begin_display called, but no Renderer was registered by the app!\n");
 // 			}
 	}
 
@@ -128,7 +127,7 @@ namespace render
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->end_display();
+		if (s_Renderer) s_Renderer->end_display();
 	}
 
 
@@ -137,7 +136,7 @@ namespace render
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->drawLine(coords, color, mat);
+		if (s_Renderer) s_Renderer->drawLine(coords, color, mat);
 }
 
 
@@ -147,7 +146,7 @@ void  draw_poly(const point* corners, int corner_count, const rgba& fill,
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->draw_poly(corners, corner_count,
+		if (s_Renderer) s_Renderer->draw_poly(corners, corner_count,
     fill, outline, mat, masked);
 }
 
@@ -159,7 +158,7 @@ drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->drawShape(shape, cx, worldMat);
+		if (s_Renderer) s_Renderer->drawShape(shape, cx, worldMat);
 }
 
 void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color, 
@@ -168,27 +167,27 @@ void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->drawGlyph(rec, color, mat);
+		if (s_Renderer) s_Renderer->drawGlyph(rec, color, mat);
 }
 
 bool bounds_in_clipping_area(const rect& bounds) {
 	return bounds_in_clipping_area(bounds.getRange());
-  if (s_render_handler) 
-    return s_render_handler->bounds_in_clipping_area(bounds);
+  if (s_Renderer) 
+    return s_Renderer->bounds_in_clipping_area(bounds);
   else
     return true;
 }
 
 bool bounds_in_clipping_area(const InvalidatedRanges& ranges) {
-  if (s_render_handler) 
-    return s_render_handler->bounds_in_clipping_area(ranges);
+  if (s_Renderer) 
+    return s_Renderer->bounds_in_clipping_area(ranges);
   else
     return true;
 	}
 
 bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {
-  if (s_render_handler) 
-    return s_render_handler->bounds_in_clipping_area(bounds);
+  if (s_Renderer) 
+    return s_Renderer->bounds_in_clipping_area(bounds);
   else
     return true;
 	}
@@ -201,7 +200,7 @@ bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->begin_submit_mask();
+		if (s_Renderer) s_Renderer->begin_submit_mask();
 	}
 
 	void	end_submit_mask()
@@ -209,7 +208,7 @@ bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->end_submit_mask();
+		if (s_Renderer) s_Renderer->end_submit_mask();
 	}
 
 	void	disable_mask()
@@ -217,7 +216,7 @@ bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->disable_mask();
+		if (s_Renderer) s_Renderer->disable_mask();
 	}
 }
 

@@ -53,7 +53,6 @@
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
-#include "fill_style.h" // for beginGradientFill
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 #include "NetStream_as.h"
@@ -1350,7 +1349,8 @@ MovieClip::goto_labeled_frame(const std::string& label)
         return false;
 }
 
-void MovieClip::display()
+void
+MovieClip::display(Renderer& renderer)
 {
 
     // Note: 
@@ -1362,11 +1362,11 @@ void MovieClip::display()
     
     // render drawable (ActionScript generated graphics)
     _drawable.finalize();
-    _drawable.display(*this);
+    _drawable.display(renderer, *this);
     
     
     // descend the display list
-    _displayList.display();
+    _displayList.display(renderer);
      
     clear_invalidated();
 }
@@ -2225,7 +2225,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         const movie_root& mr = _vm.getRoot();
 
         boost::intrusive_ptr<movie_definition> md(
-            MovieFactory::makeMovie(url, mr.runInfo(), NULL, true, postdata));
+            MovieFactory::makeMovie(url, mr.runResources(), NULL, true, postdata));
 
         if (!md)
         {
@@ -2299,7 +2299,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     // (down by getStream, that is)
     
     const movie_root& mr = _vm.getRoot();
-    URL url(urlstr, mr.runInfo().baseURL());
+    URL url(urlstr, mr.runResources().baseURL());
 
     std::string postdata;
     
@@ -2308,7 +2308,7 @@ MovieClip::loadVariables(const std::string& urlstr,
 
     try 
     {
-        const StreamProvider& sp = _vm.getRoot().runInfo().streamProvider();
+        const StreamProvider& sp = _vm.getRoot().runResources().streamProvider();
         
         if (sendVarsMethod == METHOD_POST)
         {
@@ -2634,7 +2634,7 @@ MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-    sound::sound_handler* handler = _vm.getRoot().runInfo().soundHandler();
+    sound::sound_handler* handler = _vm.getRoot().runResources().soundHandler();
     if (handler)
     {
         handler->stop_sound(m_sound_stream_id);

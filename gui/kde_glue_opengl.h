@@ -31,7 +31,7 @@ class KdeOpenGLGlue : public KdeGlue
     
     bool init(int argc, char **argv[]);
     void prepDrawingArea(QWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void render();
   private:
 #ifdef FIX_I810_LOD_BIAS
