@@ -1229,8 +1229,9 @@ public:
         case SWF::FILL_FOCAL_GRADIENT:
         {
                     
-          const bitmap_info_ogl* binfo =
-              static_cast<const bitmap_info_ogl*>(style.need_gradient_bitmap());       
+          const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+                      style.need_gradient_bitmap(*this));       
+
           SWFMatrix m = style.getGradientMatrix();
           
           binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
@@ -1240,8 +1241,8 @@ public:
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_TILED_BITMAP:
         {
-            const bitmap_info_ogl* binfo =
-                static_cast<const bitmap_info_ogl*>(style.get_bitmap_info());
+            const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+                    style.get_bitmap_info(*this));
 
           binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
           break;
@@ -1251,8 +1252,8 @@ public:
         // smooth=true;
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {     
-          const bitmap_info_ogl* binfo =
-              dynamic_cast<const bitmap_info_ogl*>(style.get_bitmap_info());
+          const bitmap_info_ogl* binfo = dynamic_cast<const bitmap_info_ogl*>(
+                  style.get_bitmap_info(*this));
           
           assert(binfo);
 
