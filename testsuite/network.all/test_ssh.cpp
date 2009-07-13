@@ -71,12 +71,12 @@ main(int argc, char *argv[])
             { 'v', "verbose",       Arg_parser::no  },
             { 's', "hostname",      Arg_parser::yes },
             { 'o', "port",          Arg_parser::yes },
-            { 'c', "cert",          Arg_parser::yes },
-            { 'p', "pem",           Arg_parser::yes },
-            { 'k', "leyfile",       Arg_parser::yes },
-            { 'w', "password",      Arg_parser::yes },
-            { 'a', "calist",        Arg_parser::yes },
-            { 'r', "rootpath",      Arg_parser::yes },
+            { 'p', "password",      Arg_parser::yes },
+            { 'u', "user",          Arg_parser::yes },
+            { 'd', "dss",           Arg_parser::no },
+            { 'r', "rsa",           Arg_parser::no },
+            { 'f', "sftp",          Arg_parser::no },
+            { 'a', "raw",           Arg_parser::no },
             { 'n', "netdebug",      Arg_parser::no },
         };
     
@@ -107,35 +107,35 @@ main(int argc, char *argv[])
                   log_debug(_("Port for SSH connections is: %hd"),
                             net.getPort());
                   break; 
-              case 'c':
-                  client.setCert(parser.argument(i));
-                  log_debug(_("Cert file for SSH connection is: %s"),
-                            client.getCert());
-                  break;
               case 'p':
-                  client.setPem(parser.argument(i));
-                  log_debug(_("Pem file for SSH connection is: %s"),
-                            client.getPem());
+                  client.setPassword(parser.argument(i));
+                  log_debug(_("SSH password is: %s"),
+                            client.getPassword());
                   break;
-              case 'k':
-                  client.setKeyfile(parser.argument(i));
-                  log_debug(_("Keyfile file for SSH connection is: %s"),
-                            client.getKeyfile());
+              case 'u':
+                  client.setUser(parser.argument(i));
+                  log_debug(_("SSH user is: %s"),
+                            client.getUser());
                   break;
-              case 'a':
-                  client.setCAlist(parser.argument(i));
-                  log_debug(_("CA List file for SSH connection is: %s"),
-                            client.getCAlist());
+              case 'd':
+                  client.setAuthType(SSHClient::DSS);
+                  log_debug(_("SSH Authentication type is: %d"),
+                            client.getAuthType());
                   break;
               case 'r':
-                  client.setRootPath(parser.argument(i));
-                  log_debug(_("Root path for SSH pem files is: %s"),
-                            client.getRootPath());
+                  client.setAuthType(SSHClient::RSA);
+                  log_debug(_("SSH Authentication type is: %d"),
+                            client.getAuthType());
                   break;
-              case 'w':
-                  client.setPassword(parser.argument(i));
-                  log_debug(_("Password for SSH pem files is: %s"),
-                            client.getPassword());
+              case 'a':
+                  client.setTransportType(SSHClient::RAW);
+                  log_debug(_("SSH Transport type is: %d"),
+                            client.getTransportType());
+                  break;
+              case 'f':
+                  client.setTransportType(SSHClient::SFTP);
+                  log_debug(_("SSH Transport type is: %d"),
+                            client.getTransportType());
                   break;
               case 'n':
                   net.toggleDebug(true);
@@ -166,7 +166,6 @@ static void test_client()
 	log_error("Can't connect to server %s", client.getHostname());
     }
 
-#if 0
     if (client.sshConnect(net.getFileFd())) {
         runtest.pass("Connected to SSH server");
     } else {
@@ -186,6 +185,7 @@ static void test_client()
         }
     }
 
+#if 0
     if (giveup) {
         runtest.unresolved("Cert didn't match hostfor SSH connection");
     } else {
@@ -246,12 +246,15 @@ usage (void)
     cerr << "-v\tVerbose" << endl;
     cerr << "-s\thostname" << endl;
     cerr << "-o\tPort" << endl;
-    cerr << "-c\tCert File" << endl;
-    cerr << "-p\tPem file" << endl;
-    cerr << "-k\tKeyfile file" << endl;
-    cerr << "-w\tPassword" << endl;
-    cerr << "-a\tCA List" << endl;
-    cerr << "-r\tRoot path" << endl;
+    cerr << "-p\tPassword" << endl;
+    cerr << "-u\tUser" << endl;
+    cerr << "-r\tUse RSA" << endl;
+    cerr << "-d\tUse DSS" << endl;
+    cerr << "-f\tUse SFTP for transport" << endl;
+    cerr << "-a\tUse RAW for transport" << endl;
+    cerr << "-n\tEnable network debug" << endl << endl;
+    
+    cerr << "Libssh version is: " << ssh_version(0) << endl;
     exit (-1);
 }
 
