@@ -53,7 +53,7 @@ namespace {
     as_value textsnapshot_getCount(const fn_call& fn);
     as_value textsnapshot_getSelected(const fn_call& fn);
     as_value textsnapshot_getSelectedText(const fn_call& fn);
-    as_value textsnapshot_getTextRunResources(const fn_call& fn);
+    as_value textsnapshot_getTextRunInfo(const fn_call& fn);
     as_value textsnapshot_getText(const fn_call& fn);
     as_value textsnapshot_hitTestTextNearPos(const fn_call& fn);
     as_value textsnapshot_setSelectColor(const fn_call& fn);
@@ -167,7 +167,7 @@ TextSnapshot_as::markReachableResources() const
 }
 
 void
-TextSnapshot_as::getTextRunResources(size_t start, size_t end, Array_as& ri) const
+TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 {
     std::string::size_type pos = 0;
 
@@ -399,8 +399,8 @@ attachTextSnapshotInterface(as_object& o)
             flags);
 	o.init_member("getCount", new builtin_function(textsnapshot_getCount),
             flags);
-	o.init_member("getTextRunResources",
-            new builtin_function(textsnapshot_getTextRunResources), flags);
+	o.init_member("getTextRunInfo",
+            new builtin_function(textsnapshot_getTextRunInfo), flags);
 	o.init_member("getSelected",
             new builtin_function(textsnapshot_getSelected), flags);
 	o.init_member("getSelectedText",
@@ -428,7 +428,7 @@ getTextSnapshotInterface()
 }
 
 as_value
-textsnapshot_getTextRunResources(const fn_call& fn)
+textsnapshot_getTextRunInfo(const fn_call& fn)
 {
     boost::intrusive_ptr<TextSnapshot_as> ts =
         ensureType<TextSnapshot_as>(fn.this_ptr);
@@ -444,7 +444,7 @@ textsnapshot_getTextRunResources(const fn_call& fn)
 
     Array_as* ri = new Array_as;
 
-    ts->getTextRunResources(start, end, *ri);
+    ts->getTextRunInfo(start, end, *ri);
     
     return as_value(ri);
 }

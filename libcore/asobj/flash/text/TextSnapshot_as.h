@@ -73,7 +73,7 @@ public:
 
     std::string getSelectedText(bool newlines) const;
 
-    void getTextRunResources(size_t start, size_t end, Array_as& ri) const;
+    void getTextRunInfo(size_t start, size_t end, Array_as& ri) const;
 
 protected:
 
