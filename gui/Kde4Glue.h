@@ -26,6 +26,9 @@
 #include <QWidget>
 #include "snappingrange.h"
 
+namespace gnash {
+    class Renderer;
+}
 
 namespace gnash
 {
