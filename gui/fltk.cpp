@@ -50,9 +50,9 @@ namespace gnash
 {
 
 
-FltkGui::FltkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
+FltkGui::FltkGui(unsigned long xid, float scale, bool loop, RunResources& r)
   : Window(0, 0),
-    Gui(xid, scale, loop, depth),
+    Gui(xid, scale, loop, r),
     _menu_height(_xid ? 0 : 20)
 {
 }

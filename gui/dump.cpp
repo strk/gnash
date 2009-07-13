@@ -80,8 +80,8 @@ void terminate_signal(int /*signo*/) {
 
 // TODO:  Let user decide bits-per-pixel
 // TODO:  let user decide colorspace (see also _bpp above!)
-DumpGui::DumpGui(unsigned long xid, float scale, bool loop, unsigned int depth) :
-    Gui(xid, scale, loop, depth),
+DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
+    Gui(xid, scale, loop, r),
     _agg_renderer(NULL),
     _offscreenbuf(NULL),
     _offscreenbuf_size(-1),

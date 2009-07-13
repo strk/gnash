@@ -21,6 +21,7 @@
 #define GNASH_GTK_CANVAS_H
 
 #include <gtk/gtkdrawingarea.h>
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations.
 namespace gnash {
@@ -48,7 +49,7 @@ GtkWidget       *gnash_canvas_new                   ();
 
 void             gnash_canvas_setup                 (GnashCanvas *canvas, int argc, char **argv[]);
 void             gnash_canvas_before_rendering      (GnashCanvas *canvas);
-gnash::Renderer  *gnash_canvas_get_renderer   (GnashCanvas *canvas);
+boost::shared_ptr<gnash::Renderer>  gnash_canvas_get_renderer   (GnashCanvas *canvas);
 
 G_END_DECLS
 

@@ -56,8 +56,8 @@ KdeGui::~KdeGui()
 }
 
 
-KdeGui::KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth)
+KdeGui::KdeGui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r)
 {
 }
 

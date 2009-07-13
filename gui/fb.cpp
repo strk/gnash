@@ -168,8 +168,8 @@ FBGui::FBGui() : Gui()
 {
 }
 
-FBGui::FBGui(unsigned long xid, float scale, bool loop, unsigned int depth)
-  : Gui(xid, scale, loop, depth)
+FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
+  : Gui(xid, scale, loop, r)
 {
   fd      = -1;
   fbmem   = NULL;

@@ -40,7 +40,7 @@ namespace gnash
 class RiscosGui : public Gui
 {
  public:
-    RiscosGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    RiscosGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~RiscosGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);

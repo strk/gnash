@@ -190,7 +190,7 @@ class FBGui : public Gui
   	  	
 	public:
 		FBGui();
-		FBGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+		FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~FBGui();
     virtual bool init(int argc, char ***argv);
     virtual bool createWindow(const char* title, int width, int height);

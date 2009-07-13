@@ -46,8 +46,8 @@ using namespace std;
 namespace gnash 
 {
 
-SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth),
+SDLGui::SDLGui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r),
    _timeout(0),
    _core_trap(true)
 {

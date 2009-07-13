@@ -74,14 +74,13 @@
 
 namespace gnash {
 
-Gui::Gui() :
+Gui::Gui(RunResources& r) :
     _loop(true),
     _xid(0),
     _width(1),
     _height(1),
-    _depth(16),
+    _runResources(r),
     _interval(0),
-    _renderer(NULL),
     _redraw_flag(true),
     _fullscreen(false),
     _mouseShown(true),
@@ -119,15 +118,14 @@ Gui::Gui() :
 
 }
 
-Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
+Gui::Gui(unsigned long xid, float scale, bool loop, RunResources& r)
 	:
     _loop(loop),
     _xid(xid),
     _width(1),
     _height(1),
-    _depth(depth),
+    _runResources(r),
     _interval(0),
-    _renderer(NULL),
     _redraw_flag(true),
     _fullscreen(false),
     _mouseShown(true),
@@ -168,7 +166,6 @@ Gui::~Gui()
 {
     if ( _movieDef.get() ) log_debug("~Gui - _movieDef refcount: %d", _movieDef->get_ref_count());
 
-    delete _renderer;
 #ifdef GNASH_FPS_DEBUG
     if ( fps_timer_interval ) {
         std::cerr << "Total frame advances/drops: "
@@ -389,7 +386,7 @@ Gui::updateStageMatrix()
 	//scaleMode, valign, halign);
 
 	// TODO: have a generic set_matrix ?
-	if ( _renderer ) {
+	if (_renderer.get()) {
 		_renderer->set_scale(_xscale, _yscale);
 		_renderer->set_translation(_xoffset, _yoffset);
 	}
@@ -438,7 +435,7 @@ Gui::toggleSound()
     assert (_stage);
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
-    sound::sound_handler* s = _stage->runInfo().soundHandler();
+    sound::sound_handler* s = _stage->runResources().soundHandler();
 
     if (!s) return;
 
@@ -784,7 +781,7 @@ Gui::display(movie_root* m)
 		// show invalidated region using a red rectangle
 		// (Flash debug style)
 		IF_DEBUG_REGION_UPDATES (
-		if (_renderer && !changed_ranges.isWorld())
+		if (_renderer.get() && !changed_ranges.isWorld())
 		{
 		
 			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
@@ -833,7 +830,7 @@ Gui::play()
         assert (_stage);
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
-        sound::sound_handler* s = _stage->runInfo().soundHandler();
+        sound::sound_handler* s = _stage->runResources().soundHandler();
         if ( s ) s->unpause();
 
         log_debug("Starting virtual clock");
@@ -856,7 +853,7 @@ Gui::stop()
 
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
-    sound::sound_handler* s = _stage->runInfo().soundHandler();
+    sound::sound_handler* s = _stage->runResources().soundHandler();
     if ( s ) s->pause();
 
     log_debug("Pausing virtual clock");
@@ -880,7 +877,7 @@ Gui::pause()
 
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
-    	sound::sound_handler* s = _stage->runInfo().soundHandler();
+    	sound::sound_handler* s = _stage->runResources().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
 
@@ -911,7 +908,7 @@ Gui::start()
 
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
-    sound::sound_handler* s = _stage->runInfo().soundHandler();
+    sound::sound_handler* s = _stage->runResources().soundHandler();
     if ( s ) s->unpause();
     _started = true;
     

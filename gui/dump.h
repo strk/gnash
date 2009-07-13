@@ -35,7 +35,7 @@ typedef bool (*callback_t)(void*, int, void *data);
 class DSOEXPORT DumpGui : public Gui
 {
  public:
-    DumpGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    DumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
     ~DumpGui();
     void beforeRendering();
     bool createMenu() { return true; }

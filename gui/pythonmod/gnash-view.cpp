@@ -484,7 +484,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
 
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
-    gnash::sound::sound_handler* s = view->stage->runInfo().soundHandler();
+    gnash::sound::sound_handler* s = view->stage->runResources().soundHandler();
     if ( s ) s->unpause();
     
     gnash::log_debug("Starting virtual clock");

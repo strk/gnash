@@ -69,7 +69,7 @@ namespace gnash
 class AOS4Gui : public Gui
 {
 public:
-    AOS4Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    AOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~AOS4Gui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(const char *title, int width, int height);

@@ -57,8 +57,8 @@ void DoAdvanceMovie ( EventLoopTimerRef inTimer, void* data)
 }
   
 	
-AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
-	: Gui(xid, scale, loop, depth),
+AquaGui::AquaGui(unsigned long xid, float scale, bool loop, RunResources& r)
+	: Gui(xid, scale, loop, r),
           _advance_timer(NULL)
 {
 }

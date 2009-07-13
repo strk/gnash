@@ -253,7 +253,7 @@ private:
     /// which is called by the Gui's dtor. This means that the RunResources
     /// and sound::sound_handler must still be alive. Initializing them
     /// later ensures that this is the case. It is still a good idea to
-    /// initialize _gui after _runInfo.
+    /// initialize _gui after _runResources.
     //
     /// Moreover, _movieDef (the SWFMovieDefinition) would also prevent
     /// destruction of a SWFMovieDefinition if it is not initialized after
@@ -270,9 +270,9 @@ private:
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
-    std::auto_ptr<RunResources> _runInfo;
+    std::auto_ptr<RunResources> _runResources;
 
-    /// This must be initialized after _runInfo
+    /// This must be initialized after _runResources
 	std::auto_ptr<Gui> _gui;
 
     std::string _url;

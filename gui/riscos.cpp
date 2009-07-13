@@ -39,8 +39,8 @@ RiscosGui::~RiscosGui()
       wimp_close_down(_task);
 }
 
-RiscosGui::RiscosGui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth), _task((wimp_t)0), _window((wimp_w)0),
+RiscosGui::RiscosGui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r), _task((wimp_t)0), _window((wimp_w)0),
    _quit(false), _timeout(0), m_draw_minx(0), m_draw_miny(0),
    m_draw_maxx(0), m_draw_maxy(0), _screen_height(480), _screen_width(640)
 {
