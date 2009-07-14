@@ -1540,7 +1540,7 @@ void
 registerArrayNative(as_object& global)
 {
     VM& vm = getVM(global);
-    vm.registerNative(array_new, 252, 0);.
+    vm.registerNative(array_new, 252, 0);
 }
 
 // this registers the "Array" member on a "Global"
@@ -1557,7 +1557,7 @@ array_class_init(as_object& glob)
     if ( ar == NULL )
     {
         Global_as* gl = getGlobal(glob);
-        ar = glob->createClass(&array_new, getArrayInterface());
+        ar = gl->createClass(&array_new, getArrayInterface());
 
         // Attach static members
         attachArrayStatics(*ar);

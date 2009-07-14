@@ -86,10 +86,10 @@ namespace gnash {
 namespace {
     as_value localconnection_connect(const fn_call& fn);
     as_value localconnection_domain(const fn_call& fn);
+    as_value localconnection_new(const fn_call& fn);
 
     bool validFunctionName(const std::string& func);
 
-    builtin_function* getLocalConnectionConstructor();
     as_object* getLocalConnectionInterface();
 }
 
@@ -204,13 +204,25 @@ LocalConnection_as::getDomain()
 void
 LocalConnection_as::init(as_object& glob)
 {
-	builtin_function* ctor=getLocalConnectionConstructor();
+	// This is going to be the global Number "class"/"function"
+	static as_object* cl = NULL;
+
+	if ( cl == NULL )
+	{
+        Global_as* gl = getGlobal(glob);
+		cl = gl->createClass(&localconnection_new,
+                getLocalConnectionInterface());
+
+        // FIXME: why do we need to register ourself here ?
+		VM::get().addStatic(cl);
+	}
+
 
 	int swf6flags = as_prop_flags::dontEnum | 
                     as_prop_flags::dontDelete | 
                     as_prop_flags::onlySWF6Up;
 
-    glob.init_member(NSV::CLASS_LOCALCONNECTION, ctor, swf6flags);
+    glob.init_member(NSV::CLASS_LOCALCONNECTION, cl, swf6flags);
 }
 
 
@@ -374,24 +386,6 @@ getLocalConnectionInterface()
     }
 
     return o.get();
-}
-
-builtin_function*
-getLocalConnectionConstructor()
-{
-	// This is going to be the global Number "class"/"function"
-	static builtin_function* cl=NULL;
-
-	if ( cl == NULL )
-	{
-		cl = new builtin_function(&localconnection_new,
-                getLocalConnectionInterface());
-
-        // FIXME: why do we need to register ourself here ?
-		VM::get().addStatic(cl);
-	}
-
-	return cl;
 }
 
 /// These names are invalid as a function name.

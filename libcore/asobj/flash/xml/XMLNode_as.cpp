@@ -478,9 +478,9 @@ attachXMLNodeInterface(as_object& o)
     o.init_member("appendChild", vm.getNative(253, 4), noFlags);
     o.init_member("hasChildNodes", vm.getNative(253, 5), noFlags);
     o.init_member("toString", vm.getNative(253, 6), noFlags);
-    o.init_member("getPrefixForNamespace", new builtin_function(
+    o.init_member("getPrefixForNamespace", gl->createFunction(
                 xmlnode_getPrefixForNamespace), noFlags);
-    o.init_member("getNamespaceForPrefix", new builtin_function(
+    o.init_member("getNamespaceForPrefix", gl->createFunction(
                 xmlnode_getNamespaceForPrefix), noFlags);
 
 
