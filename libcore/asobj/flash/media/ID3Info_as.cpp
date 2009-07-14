@@ -57,7 +57,8 @@ void id3info_class_init(as_object& global)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&id3info_ctor, getID3InfoInterface());
+	Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&id3info_ctor, getID3InfoInterface());
         attachID3InfoStaticInterface(*cl);
     }
 

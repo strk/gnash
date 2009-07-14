@@ -123,7 +123,7 @@ attachEventInterface(as_object& o)
     o.init_member("DISPLAYING", gl->createFunction(event_DISPLAYING));
     o.init_member("ENTER_FRAME", gl->createFunction(event_ENTER_FRAME));
     o.init_member("FULLSCREEN", gl->createFunction(event_FULLSCREEN));
-    o.init_member("ID3", new builtin_function(event_ID3));
+    o.init_member("ID3", gl->createFunction(event_ID3));
     o.init_member("INIT", gl->createFunction(event_INIT));
     o.init_member("MOUSE_LEAVE", gl->createFunction(event_MOUSE_LEAVE));
     o.init_member("OPEN", gl->createFunction(event_OPEN));

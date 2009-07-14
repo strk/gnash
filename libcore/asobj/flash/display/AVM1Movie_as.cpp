@@ -57,7 +57,8 @@ void avm1movie_class_init(as_object& global)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&avm1movie_ctor, getAVM1MovieInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&avm1movie_ctor, getAVM1MovieInterface());
         attachAVM1MovieStaticInterface(*cl);
     }
 

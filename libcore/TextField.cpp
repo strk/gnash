@@ -2733,7 +2733,6 @@ void
 attachTextFieldInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> getset;
 
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
@@ -2744,16 +2743,16 @@ attachTextFieldInterface(as_object& o)
         |as_prop_flags::isProtected;
 
     // Parent seems to not be a normal property
-    getset = new builtin_function(&DisplayObject::parent_getset, NULL);
-    o.init_property(NSV::PROP_uPARENT, *getset, *getset);
+    o.init_property(NSV::PROP_uPARENT, &DisplayObject::parent_getset,
+            &DisplayObject::parent_getset);
 
     // Target seems to not be a normal property
-    getset = new builtin_function(&DisplayObject::target_getset, NULL);
-    o.init_property(NSV::PROP_uTARGET, *getset, *getset);
+    o.init_property(NSV::PROP_uTARGET, &DisplayObject::target_getset,
+            &DisplayObject::target_getset);
 
     // _name should be a property of the instance, not the prototype
-    getset = new builtin_function(&DisplayObject::name_getset, NULL);
-    o.init_property(NSV::PROP_uNAME, *getset, *getset);
+    o.init_property(NSV::PROP_uNAME, &DisplayObject::name_getset,
+            &DisplayObject::name_getset);
 
     o.init_property(NSV::PROP_uXMOUSE,
             DisplayObject::xmouse_get, DisplayObject::xmouse_get, propFlags);
