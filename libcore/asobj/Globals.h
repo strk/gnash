@@ -75,6 +75,16 @@ public:
     VM& getVM() const {
         return _vm;
     }
+    
+    /// Create an ActionScript function
+    virtual as_object* createFunction(Global_as::ASFunction function);
+
+    /// Create an ActionScript class
+    //
+    /// An AS2 class is generally a function (the constructor) with a
+    /// prototype.
+    virtual as_object* createClass(Global_as::ASFunction ctor,
+            as_object* prototype);
 
 protected:
     
@@ -100,6 +110,15 @@ public:
     /// resources is still through the VM.
 	AVM2Global(Machine& m, VM& vm);
 	~AVM2Global() {}
+    
+    /// Create an ActionScript function
+    virtual as_object* createFunction(Global_as::ASFunction function);
+
+    /// Create an ActionScript class
+    //
+    /// An AS3 class is generally an object (the prototype) with a constructor.
+    virtual as_object* createClass(Global_as::ASFunction ctor,
+            as_object* prototype);
 
     const ClassHierarchy& classHierarchy() const {
         return _classes;

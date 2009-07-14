@@ -51,6 +51,7 @@
 // Forward declarations
 namespace gnash {
 	class Machine;
+	class as_value;
 	class VM;
 	class fn_call;
 	class ClassHierarchy;
@@ -69,8 +70,21 @@ namespace gnash {
 class Global_as : public as_object
 {
 public:
+
+    typedef as_value(*ASFunction)(const fn_call& fn);
+
     virtual const ClassHierarchy& classHierarchy() const = 0;
     virtual ClassHierarchy& classHierarchy() = 0;
+
+    /// Create an ActionScript function
+    virtual as_object* createFunction(ASFunction function) = 0;
+
+    /// Create an ActionScript class
+    //
+    /// The type of a class is different in AS2 and AS3. In AS2 it is generally
+    /// a function (the constructor) with a prototype. In AS3 it is generally
+    /// an object (the prototype) with a constructor.
+    virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
 
     virtual Global_as& global() {
         return *this;

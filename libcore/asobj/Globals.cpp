@@ -177,6 +177,33 @@ AVM2Global::AVM2Global(Machine& machine, VM& vm)
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_STRING);
     _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
 }
+    
+as_object*
+AVM1Global::createFunction(Global_as::ASFunction function)
+{
+    return new builtin_function(function);
+}
+
+as_object*
+AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
+{
+    return new builtin_function(ctor, prototype);
+
+}
+
+as_object*
+AVM2Global::createFunction(Global_as::ASFunction function)
+{
+    return new builtin_function(function);
+}
+
+as_object*
+AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
+{
+    // TODO: this should attach the function to the prototype as its
+    // constructor member.
+    return new builtin_function(ctor, prototype);
+}
 
 void 
 AVM1Global::markReachableResources() const
