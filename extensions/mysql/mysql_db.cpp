@@ -326,7 +326,7 @@ mysql_qetData(const fn_call& fn)
 
     if (fn.nargs > 0) {
 	string sql = fn.arg(0).to_string();
-	Array_as *arr = (Array_as *)fn.arg(1).to_object().get();
+	Array_as *arr = (Array_as *)fn.arg(1).to_object(*getGlobal(fn)).get();
 //	std::vector< std::vector<const char *> >
 	MySQL::query_t qresult;
 #if 0
