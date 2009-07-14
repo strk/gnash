@@ -636,7 +636,7 @@ XMLDocument_as::init(as_object& global)
 void
 XMLDocument_as::registerNative(as_object& global)
 {
-    VM& vm = gnash::getVM(global);
+    VM& vm = getVM(global);
     vm.registerNative(xml_escape, 100, 5);
     vm.registerNative(xml_createElement, 253, 8);
     vm.registerNative(xml_createTextNode, 253, 9);

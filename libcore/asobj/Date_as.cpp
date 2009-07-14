@@ -227,7 +227,7 @@ Date_as::init(as_object& global)
 void
 Date_as::registerNative(as_object& global)
 {
-    VM& vm = gnash::getVM(global);
+    VM& vm = getVM(global);
 
     vm.registerNative(date_getFullYear, 103, 0); 
     vm.registerNative(date_getYear, 103, 1);

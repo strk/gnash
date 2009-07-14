@@ -95,7 +95,7 @@ NetStream_as::NetStream_as()
 
     // TODO: figure out if we should take another path to get to the clock
     _playbackClock(
-            new InterruptableVirtualClock(gnash::getVM(*this).getClock())),
+            new InterruptableVirtualClock(getVM(*this).getClock())),
     _playHead(_playbackClock.get()), 
     _soundHandler(getRunResources(*this).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),

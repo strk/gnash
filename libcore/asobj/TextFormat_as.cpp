@@ -72,7 +72,7 @@ TextFormat_as::alignSet(const std::string& align)
 void
 TextFormat_as::registerNative(as_object& o)
 {
-    VM& vm = gnash::getVM(o);
+    VM& vm = getVM(o);
     
     //vm.registerNative(110, 0) // [_global] TextFormat
     vm.registerNative(textformat_font, 110, 1);

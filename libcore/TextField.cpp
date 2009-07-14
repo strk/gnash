@@ -215,7 +215,7 @@ void
 TextField::init()
 {
 
-    as_object* proto = getTextFieldInterface(gnash::getVM(*this));
+    as_object* proto = getTextFieldInterface(getVM(*this));
  
     // This is an instantiation, so attach properties to the
     // prototype.

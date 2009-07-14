@@ -288,7 +288,7 @@ LoadableObject::advanceState()
 void
 LoadableObject::registerNative(as_object& o)
 {
-    VM& vm = gnash::getVM(o);
+    VM& vm = getVM(o);
 
     vm.registerNative(loadableobject_load, 301, 0);
     vm.registerNative(loadableobject_send, 301, 1);

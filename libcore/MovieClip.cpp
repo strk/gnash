@@ -425,7 +425,7 @@ MovieClip::MovieClip(const movie_definition* const def, Movie* r,
     _currentFrame(0),
     _hasLooped(false),
     _callingFrameActions(false),
-    _environment(gnash::getVM(*this)),
+    _environment(getVM(*this)),
     m_sound_stream_id(-1),
     _droptarget(),
     _lockroot(false)

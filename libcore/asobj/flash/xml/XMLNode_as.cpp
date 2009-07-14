@@ -376,7 +376,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     // Node as_value first, then children
     if (type == Text)
     {
-        as_object* global = gnash::getVM(xml).getGlobal();
+        as_object* global = getVM(xml).getGlobal();
         assert(global);
 
         // Insert entities.
@@ -422,7 +422,7 @@ XMLNode_as::markReachableResources() const
 void
 XMLNode_as::registerNative(as_object& global)
 {
-    VM& vm = gnash::getVM(global);
+    VM& vm = getVM(global);
     vm.registerNative(xmlnode_cloneNode, 253, 1);
     vm.registerNative(xmlnode_removeNode, 253, 2);
     vm.registerNative(xmlnode_insertBefore, 253, 3);
