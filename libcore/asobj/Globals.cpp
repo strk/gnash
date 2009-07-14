@@ -1099,6 +1099,7 @@ registerNatives(as_object& global)
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
 
+    registerArrayNative(global);
     registerMovieClipNative(global);
     registerSelectionNative(global);
     registerColorNative(global);

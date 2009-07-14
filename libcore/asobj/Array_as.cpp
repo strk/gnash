@@ -1536,23 +1536,11 @@ getArrayInterface()
     return proto.get();
 }
 
-static as_function*
-getArrayConstructor(VM& vm)
+void
+registerArrayNative(as_object& global)
 {
-    // This is going to be the global Array "class"/"function"
-    static as_function* ar=0;
-
-    if ( ar == NULL )
-    {
-        vm.registerNative(array_new, 252, 0);
-        ar = new builtin_function(&array_new, getArrayInterface());
-        vm.addStatic(ar);
-
-        // Attach static members
-        attachArrayStatics(*ar);
-    }
-
-    return ar;
+    VM& vm = getVM(global);
+    vm.registerNative(array_new, 252, 0);.
 }
 
 // this registers the "Array" member on a "Global"
@@ -1563,9 +1551,20 @@ getArrayConstructor(VM& vm)
 void
 array_class_init(as_object& glob)
 {
-    // Register _global.Array
+    // This is going to be the global Array "class"/"function"
+    static as_object* ar = 0;
+
+    if ( ar == NULL )
+    {
+        Global_as* gl = getGlobal(glob);
+        ar = glob->createClass(&array_new, getArrayInterface());
+
+        // Attach static members
+        attachArrayStatics(*ar);
+    }
+
     int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
-    glob.init_member("Array", getArrayConstructor(getVM(glob)), flags);
+    glob.init_member("Array", ar, flags);
 }
 
 void
