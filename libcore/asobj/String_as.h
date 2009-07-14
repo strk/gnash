@@ -37,7 +37,9 @@ void string_class_init(as_object& global);
 /// In the second case, not finding a proper constructor might result in
 /// returning the NULL object.
 ///
-as_object* init_string_instance(const Global_as& g, const std::string& val);
+as_object* init_string_instance(Global_as& g, const std::string& val);
+
+void registerStringNative(as_object& global);
 
 }
 

@@ -33,7 +33,7 @@ class Global_as;
 void number_class_init(as_object& global);
 
 /// Return a Number instance
-as_object* init_number_instance(const Global_as& g, double val);
+as_object* init_number_instance(Global_as& g, double val);
 
 }
 

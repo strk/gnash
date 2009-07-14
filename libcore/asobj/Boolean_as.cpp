@@ -79,7 +79,7 @@ void boolean_class_init(as_object& global)
 }
 
 as_object*
-init_boolean_instance(const Global_as& g, bool val)
+init_boolean_instance(Global_as& g, bool val)
 {
 	boost::intrusive_ptr<builtin_function> cl = getBooleanConstructor();
 	as_environment env(getVM(g));

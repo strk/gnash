@@ -207,7 +207,7 @@ void number_class_init(as_object& global)
 }
 
 as_object*
-init_number_instance(const Global_as& g, double val)
+init_number_instance(Global_as& g, double val)
 {
 	boost::intrusive_ptr<builtin_function> cl = getNumberConstructor();
 

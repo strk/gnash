@@ -45,8 +45,6 @@
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
-#include "extension.h"
-#include "ClassHierarchy.h"
 
 // Forward declarations
 namespace gnash {
