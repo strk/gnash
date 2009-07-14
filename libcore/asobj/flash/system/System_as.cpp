@@ -101,6 +101,7 @@ getSystemSecurityInterface(as_object& o)
 		proto = new as_object(getObjectInterface());
 		proto->init_member("allowDomain", vm.getNative(12, 0));
 
+        Global_as* gl = getGlobal(o);
 		// TODO: only available when SWF >= 7 
 		proto->init_member("allowInsecureDomain",
                 gl->createFunction(system_security_allowinsecuredomain));

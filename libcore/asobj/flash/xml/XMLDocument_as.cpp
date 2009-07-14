@@ -659,6 +659,7 @@ attachXMLInterface(as_object& o)
 {
 
     VM& vm = getVM(o);
+    Global_as* gl = getGlobal(o);
 
     const int flags = 0;
 

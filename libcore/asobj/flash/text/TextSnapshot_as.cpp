@@ -396,6 +396,7 @@ attachTextSnapshotInterface(as_object& o)
 
     const int flags = as_prop_flags::onlySWF6Up;
 
+    Global_as* gl = getGlobal(o);
 	o.init_member("findText", gl->createFunction(textsnapshot_findText),
             flags);
 	o.init_member("getCount", gl->createFunction(textsnapshot_getCount),

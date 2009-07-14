@@ -81,6 +81,7 @@ namespace {
 void
 attachIDataOutputInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("writeByte", gl->createFunction(idataoutput_writeByte));
     o.init_member("writeBytes", gl->createFunction(idataoutput_writeBytes));
     o.init_member("writeDouble", gl->createFunction(idataoutput_writeDouble));
@@ -95,10 +96,8 @@ attachIDataOutputInterface(as_object& o)
 }
 
 void
-attachIDataOutputStaticInterface(as_object& o)
+attachIDataOutputStaticInterface(as_object& /*o*/)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

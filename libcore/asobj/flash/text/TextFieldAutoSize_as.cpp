@@ -50,7 +50,6 @@ namespace {
 void
 attachTextFieldAutoSizeInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
 	o.init_member("CENTER", as_value("center"));
 	o.init_member("LEFT", as_value("left"));
 	o.init_member("RIGHT", as_value("right"));

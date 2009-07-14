@@ -88,6 +88,7 @@ attachContextMenuInterface(as_object& o)
                       as_prop_flags::dontEnum |
                       as_prop_flags::onlySWF7Up;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("hideBuiltInItems",
             gl->createFunction(contextmenu_hideBuiltInItems), flags);
     o.init_member("copy", gl->createFunction(contextmenu_copy), flags);

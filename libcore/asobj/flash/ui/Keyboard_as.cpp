@@ -259,6 +259,7 @@ void Keyboard_as::init(as_object& global)
     // methods
 
     VM& vm = getVM(global);
+    Global_as* gl = getGlobal(global);
 
     vm.registerNative(key_get_ascii, 800, 0);
     key_obj->init_member("getAscii", vm.getNative(800, 0), flags);
