@@ -31,8 +31,6 @@
 
 namespace gnash {
 
-	// List of domains that can access/modify local data
-	std::vector<std::string> _allowDataAccess;
 
 // Forward declarations.
 namespace {
@@ -60,6 +58,8 @@ namespace {
     as_value system_pause(const fn_call& fn);
     as_value system_resume(const fn_call& fn);
 
+	// List of domains that can access/modify local data
+	std::vector<std::string> _allowDataAccess;
 }
 
 
