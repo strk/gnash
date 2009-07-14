@@ -91,7 +91,7 @@ void event_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&event_ctor, getEventInterface());;
+        cl = gl->createClass(&event_ctor, getEventInterface());
         attachEventStaticInterface(*cl);
     }
 

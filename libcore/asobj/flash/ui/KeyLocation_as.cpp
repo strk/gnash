@@ -58,7 +58,7 @@ void keylocation_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&keylocation_ctor, getKeyLocationInterface());;
+        cl = gl->createClass(&keylocation_ctor, getKeyLocationInterface());
         attachKeyLocationStaticInterface(*cl);
     }
 

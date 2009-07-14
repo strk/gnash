@@ -427,7 +427,7 @@ xmlsocket_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&xmlsocket_new, getXMLSocketInterface());;
+        cl = gl->createClass(&xmlsocket_new, getXMLSocketInterface());
     }
     
     // Register _global.XMLSocket

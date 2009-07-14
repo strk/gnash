@@ -58,7 +58,7 @@ void textformat_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&textformat_ctor, getTextFormatInterface());;
+        cl = gl->createClass(&textformat_ctor, getTextFormatInterface());
         attachTextFormatStaticInterface(*cl);
     }
 

@@ -58,7 +58,7 @@ void urlrequestheader_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&urlrequestheader_ctor, getURLRequestHeaderInterface());;
+        cl = gl->createClass(&urlrequestheader_ctor, getURLRequestHeaderInterface());
         attachURLRequestHeaderStaticInterface(*cl);
     }
 

@@ -70,7 +70,7 @@ void mouseevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&mouseevent_ctor, getMouseEventInterface());;
+        cl = gl->createClass(&mouseevent_ctor, getMouseEventInterface());
         attachMouseEventStaticInterface(*cl);
     }
 

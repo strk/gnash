@@ -59,7 +59,7 @@ void applicationdomain_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&applicationdomain_ctor, getApplicationDomainInterface());;
+        cl = gl->createClass(&applicationdomain_ctor, getApplicationDomainInterface());
         attachApplicationDomainStaticInterface(*cl);
     }
 

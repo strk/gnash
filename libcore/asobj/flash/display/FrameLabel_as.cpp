@@ -58,7 +58,7 @@ void framelabel_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&framelabel_ctor, getFrameLabelInterface());;
+        cl = gl->createClass(&framelabel_ctor, getFrameLabelInterface());
         attachFrameLabelStaticInterface(*cl);
     }
 

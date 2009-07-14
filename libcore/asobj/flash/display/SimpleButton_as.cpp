@@ -58,7 +58,7 @@ void simplebutton_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&simplebutton_ctor, getSimpleButtonInterface());;
+        cl = gl->createClass(&simplebutton_ctor, getSimpleButtonInterface());
         attachSimpleButtonStaticInterface(*cl);
     }
 

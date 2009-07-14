@@ -58,7 +58,7 @@ void dictionary_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&dictionary_ctor, getDictionaryInterface());;
+        cl = gl->createClass(&dictionary_ctor, getDictionaryInterface());
         attachDictionaryStaticInterface(*cl);
     }
 

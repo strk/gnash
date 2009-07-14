@@ -215,7 +215,7 @@ Date_as::init(as_object& global)
 
     if ( cl == NULL ) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&date_new, getDateInterface());;
+        cl = gl->createClass(&date_new, getDateInterface());
         
         // replicate static interface to class (Date.UTC)
         attachDateStaticInterface(*cl);

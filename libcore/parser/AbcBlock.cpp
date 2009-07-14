@@ -986,7 +986,7 @@ AbcBlock::read_instances()
 		}
 		pClass->setDeclared();
 		_classes[i] = pClass;
-		boost::uint32_t super_index = _stream->read_V32();;
+		boost::uint32_t super_index = _stream->read_V32();
 
 		if (super_index && super_index >= _multinamePool.size()) {
 			log_error(_("ABC: Bad super type."));

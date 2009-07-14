@@ -59,7 +59,7 @@ void urlvariables_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&urlvariables_ctor, getURLVariablesInterface());;
+        cl = gl->createClass(&urlvariables_ctor, getURLVariablesInterface());
         attachURLVariablesStaticInterface(*cl);
     }
 

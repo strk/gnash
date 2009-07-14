@@ -60,7 +60,7 @@ void video_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&video_ctor, getVideoInterface());;
+        cl = gl->createClass(&video_ctor, getVideoInterface());
         attachVideoStaticInterface(*cl);
     }
 

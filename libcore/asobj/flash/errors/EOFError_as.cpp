@@ -58,7 +58,7 @@ void eoferror_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&eoferror_ctor, getEOFErrorInterface());;
+        cl = gl->createClass(&eoferror_ctor, getEOFErrorInterface());
         attachEOFErrorStaticInterface(*cl);
     }
 

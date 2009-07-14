@@ -58,7 +58,7 @@ void media_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&media_ctor, getmediaInterface());;
+        cl = gl->createClass(&media_ctor, getmediaInterface());
         attachmediaStaticInterface(*cl);
     }
 

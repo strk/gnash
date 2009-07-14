@@ -115,7 +115,7 @@ NetStream_as::init(as_object& global)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&netstream_new, getNetStreamInterface());;
+        cl = gl->createClass(&netstream_new, getNetStreamInterface());
         // replicate all interface to class, to be able to access
         // all methods as static functions
         attachNetStreamInterface(*cl);
@@ -1717,7 +1717,7 @@ netstream_attachAudio(const fn_call& fn)
         ensureType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
-    LOG_ONCE(log_unimpl("NetStream.attachAudio"));;
+    LOG_ONCE(log_unimpl("NetStream.attachAudio"));
 
     return as_value();
 }

@@ -76,7 +76,7 @@ void
 BevelFilter_as::registerCtor(as_object& global) {
     if (BevelFilter_as::s_ctor != NULL) return;
     Global_as* gl = getGlobal(global);
-    BevelFilter_as::s_ctor = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());;
+    BevelFilter_as::s_ctor = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());
     VM::get().addStatic(BevelFilter_as::s_ctor.get());
     BevelFilter_as::attachInterface(*BevelFilter_as::s_ctor);
     global.init_member("BevelFilter" , BevelFilter_as::s_ctor.get());

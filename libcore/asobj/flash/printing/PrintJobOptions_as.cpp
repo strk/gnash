@@ -58,7 +58,7 @@ void printjoboptions_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&printjoboptions_ctor, getPrintJobOptionsInterface());;
+        cl = gl->createClass(&printjoboptions_ctor, getPrintJobOptionsInterface());
         attachPrintJobOptionsStaticInterface(*cl);
     }
 

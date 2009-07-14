@@ -60,7 +60,7 @@ void ime_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&ime_ctor, getIMEInterface());;
+        cl = gl->createClass(&ime_ctor, getIMEInterface());
         attachIMEStaticInterface(*cl);
     }
 

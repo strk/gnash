@@ -90,7 +90,7 @@ void socket_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&socket_ctor, getSocketInterface());;
+        cl = gl->createClass(&socket_ctor, getSocketInterface());
         attachSocketStaticInterface(*cl);
     }
 

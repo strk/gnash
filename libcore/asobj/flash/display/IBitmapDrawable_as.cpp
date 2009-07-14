@@ -58,7 +58,7 @@ void ibitmapdrawable_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&ibitmapdrawable_ctor, getIBitmapDrawableInterface());;
+        cl = gl->createClass(&ibitmapdrawable_ctor, getIBitmapDrawableInterface());
         attachIBitmapDrawableStaticInterface(*cl);
     }
 

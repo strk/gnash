@@ -58,7 +58,7 @@ void shape_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&shape_ctor, getShapeInterface());;
+        cl = gl->createClass(&shape_ctor, getShapeInterface());
         attachShapeStaticInterface(*cl);
     }
 

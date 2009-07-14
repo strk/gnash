@@ -81,7 +81,7 @@ void
 GlowFilter_as::registerCtor(as_object& global) {
     if (GlowFilter_as::s_ctor != NULL) return;
     Global_as* gl = getGlobal(global);
-    GlowFilter_as::s_ctor = gl->createClass(&GlowFilter_as::ctor, GlowFilter_as::Interface());;
+    GlowFilter_as::s_ctor = gl->createClass(&GlowFilter_as::ctor, GlowFilter_as::Interface());
     VM::get().addStatic(GlowFilter_as::s_ctor.get());
     GlowFilter_as::attachInterface(*GlowFilter_as::s_ctor);
     global.init_member("GlowFilter" , GlowFilter_as::s_ctor.get());

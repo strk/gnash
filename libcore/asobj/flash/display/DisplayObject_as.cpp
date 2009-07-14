@@ -69,7 +69,7 @@ void displayobject_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&displayobject_ctor, getDisplayObjectInterface());;
+        cl = gl->createClass(&displayobject_ctor, getDisplayObjectInterface());
         attachDisplayObjectStaticInterface(*cl);
     }
 

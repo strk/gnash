@@ -69,7 +69,7 @@ void idataoutput_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&idataoutput_ctor, getIDataOutputInterface());;
+        cl = gl->createClass(&idataoutput_ctor, getIDataOutputInterface());
         attachIDataOutputStaticInterface(*cl);
     }
 

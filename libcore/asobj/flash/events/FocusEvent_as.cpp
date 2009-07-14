@@ -63,7 +63,7 @@ void focusevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&focusevent_ctor, getFocusEventInterface());;
+        cl = gl->createClass(&focusevent_ctor, getFocusEventInterface());
         attachFocusEventStaticInterface(*cl);
     }
 

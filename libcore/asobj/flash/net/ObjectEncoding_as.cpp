@@ -58,7 +58,7 @@ void objectencoding_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&objectencoding_ctor, getObjectEncodingInterface());;
+        cl = gl->createClass(&objectencoding_ctor, getObjectEncodingInterface());
         attachObjectEncodingStaticInterface(*cl);
     }
 

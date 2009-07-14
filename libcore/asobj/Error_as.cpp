@@ -65,7 +65,7 @@ void Error_class_init(as_object& where)
     Global_as* gl = getGlobal(where);
 
     boost::intrusive_ptr<as_object> cl =
-        gl->createClass(&error_ctor, getErrorInterface());;
+        gl->createClass(&error_ctor, getErrorInterface());
 
 	// Register _global.Error
 	where.init_member("Error", cl.get());

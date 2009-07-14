@@ -58,7 +58,7 @@ void securitydomain_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&securitydomain_ctor, getSecurityDomainInterface());;
+        cl = gl->createClass(&securitydomain_ctor, getSecurityDomainInterface());
         attachSecurityDomainStaticInterface(*cl);
     }
 

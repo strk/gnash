@@ -78,7 +78,7 @@ void textfield_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&textfield_ctor, getTextFieldInterface());;
+        cl = gl->createClass(&textfield_ctor, getTextFieldInterface());
         attachTextFieldStaticInterface(*cl);
     }
 

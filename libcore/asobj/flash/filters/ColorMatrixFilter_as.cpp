@@ -64,7 +64,7 @@ ColorMatrixFilter_as::registerCtor(as_object& global)
     if (!cl) return;
 
     Global_as* gl = getGlobal(global);
-    cl = gl->createClass(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());;
+    cl = gl->createClass(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());
     ColorMatrixFilter_as::attachInterface(*cl);
 
     global.init_member("ColorMatrixFilter" , cl.get());

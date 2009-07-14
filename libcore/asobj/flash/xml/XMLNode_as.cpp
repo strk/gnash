@@ -452,7 +452,7 @@ XMLNode_as::init(as_object& global)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());;
+        cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());
     }
 
     global.init_member("XMLNode", cl.get());

@@ -60,7 +60,7 @@ void ioerrorevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&ioerrorevent_ctor, getIOErrorEventInterface());;
+        cl = gl->createClass(&ioerrorevent_ctor, getIOErrorEventInterface());
         attachIOErrorEventStaticInterface(*cl);
     }
 

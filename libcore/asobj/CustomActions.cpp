@@ -111,7 +111,7 @@ void customactions_class_init(as_object& global)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&customactions_ctor, getCustomActionsInterface());;
+        cl = gl->createClass(&customactions_ctor, getCustomActionsInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCustomActionsInterface(*cl);

@@ -611,7 +611,7 @@ sharedobject_class_init(as_object& global)
     
     if (cl == NULL) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&sharedobject_ctor, getSharedObjectInterface());;
+        cl = gl->createClass(&sharedobject_ctor, getSharedObjectInterface());
         attachSharedObjectStaticInterface(*cl);
     }
     

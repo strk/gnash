@@ -60,7 +60,7 @@ void activityevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&activityevent_ctor, getActivityEventInterface());;
+        cl = gl->createClass(&activityevent_ctor, getActivityEventInterface());
         attachActivityEventStaticInterface(*cl);
     }
 

@@ -70,7 +70,7 @@ BlurFilter_as::registerCtor(as_object& global)
     if (!cl) return;
 
     Global_as* gl = getGlobal(global);
-    cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());;
+    cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());
     BlurFilter_as::attachInterface(*cl);
 
     global.init_member("BlurFilter" , cl.get());
