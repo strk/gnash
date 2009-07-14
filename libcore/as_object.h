@@ -1037,10 +1037,6 @@ public:
 
     static as_value valueof_method(const fn_call& fn);
 
-    virtual Global_as* global() const {
-        return _global;
-    }
-
 protected:
 
     /// Enumerate any non-proper properties
@@ -1109,8 +1105,6 @@ protected:
 
 private:
     
-    Global_as* _global;
-
     /// The Virtual Machine used to create this object
     VM& _vm;
 

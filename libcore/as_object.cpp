@@ -1471,7 +1471,6 @@ getSWFVersion(const as_object& o)
 
 Global_as* getGlobal(const as_object& o)
 {
-    // TODO: should be as_object's _global member!
     return o.vm().getGlobal();
 }
 
