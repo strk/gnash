@@ -66,7 +66,10 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	assert(_singleton.get());
 	NSV::loadStrings(_singleton->_stringTable, _singleton->getSWFVersion());
 
-	_singleton->setGlobal(new AVM1Global(*_singleton));
+    AVM1Global* gl(new AVM1Global(*_singleton));
+
+	_singleton->setGlobal(gl);
+    gl->registerClasses();
 
 #ifdef ENABLE_AVM2
 	_singleton->_machine = new Machine(*_singleton);
@@ -278,8 +281,8 @@ builtin_function*
 VM::getNative(unsigned int x, unsigned int y)
 {
 	as_c_function_ptr fun = _asNativeTable[x][y];
-	if ( fun ) return _global->createFunction(fun);
-	else return 0;
+	if (fun) return _global->createFunction(fun);
+	return 0;
 }
 
 } // end of namespace gnash

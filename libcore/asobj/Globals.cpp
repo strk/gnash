@@ -217,7 +217,11 @@ AVM1Global::AVM1Global(VM& vm)
     _classes(this, &_et),
     _vm(vm)
 {
+}
 
+void
+AVM1Global::registerClasses()
+{
     registerNatives(*this);
 
     // No idea why, but it seems there's a NULL _global.o 
@@ -234,14 +238,14 @@ AVM1Global::AVM1Global(VM& vm)
     // reference at all.
     init_member("ASnative", createFunction(global_asnative));
     init_member("ASconstructor", createFunction(global_asconstructor));
-    init_member("ASSetPropFlags", vm.getNative(1, 0));
-    init_member("ASSetNative", vm.getNative(4, 0));
-    init_member("ASSetNativeAccessor", vm.getNative(4, 1));
-    init_member("updateAfterEvent", vm.getNative(9, 0));
-    init_member("trace", vm.getNative(100, 4));
+    init_member("ASSetPropFlags", _vm.getNative(1, 0));
+    init_member("ASSetNative", _vm.getNative(4, 0));
+    init_member("ASSetNativeAccessor", _vm.getNative(4, 1));
+    init_member("updateAfterEvent", _vm.getNative(9, 0));
+    init_member("trace", _vm.getNative(100, 4));
 
-    init_member("setInterval", vm.getNative(250, 0));
-    init_member("clearInterval", vm.getNative(250, 1));
+    init_member("setInterval", _vm.getNative(250, 0));
+    init_member("clearInterval", _vm.getNative(250, 1));
     init_member("setTimeout", createFunction(global_setTimeout));
     init_member("clearTimeout", createFunction(global_clearInterval));
 
@@ -257,7 +261,7 @@ AVM1Global::AVM1Global(VM& vm)
     // SWF8 visibility:
     flash_package_init(*this); 
 
-    const int version = vm.getSWFVersion();
+    const int version = _vm.getSWFVersion();
 
     switch (version)
     {
@@ -285,12 +289,12 @@ AVM1Global::AVM1Global(VM& vm)
             _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
             // This is surely not correct, but they are not available
             // in SWF4
-            init_member("escape", vm.getNative(100, 0));
-            init_member("unescape", vm.getNative(100, 1));
-            init_member("parseInt", vm.getNative(100, 2));
-            init_member("parseFloat", vm.getNative(100, 3));
-            init_member("isNaN", vm.getNative(200, 18));
-            init_member("isFinite", vm.getNative(200, 19));
+            init_member("escape", _vm.getNative(100, 0));
+            init_member("unescape", _vm.getNative(100, 1));
+            init_member("parseInt", _vm.getNative(100, 2));
+            init_member("parseFloat", _vm.getNative(100, 3));
+            init_member("isNaN", _vm.getNative(200, 18));
+            init_member("isFinite", _vm.getNative(200, 19));
 
             init_member("NaN", as_value(NaN));
             init_member("Infinity", as_value(

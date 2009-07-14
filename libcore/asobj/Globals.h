@@ -64,6 +64,8 @@ public:
 	AVM1Global(VM& vm);
 	~AVM1Global() {}
 
+    void registerClasses();
+
     const ClassHierarchy& classHierarchy() const {
         return _classes;
     }
