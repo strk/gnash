@@ -93,6 +93,7 @@ VM::isInitialized()
 VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
 	_rootMovie(root),
+	_global(0),
 	_swfversion(version),
 #ifdef ENABLE_AVM2
     _machine(0),
