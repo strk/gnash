@@ -127,6 +127,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
+	_top_visible_line(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(def.multiline()),
@@ -184,6 +185,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
+	_top_visible_line(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(false),
@@ -429,6 +431,13 @@ TextField::on_event(const event_id& ev)
 
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());
+			
+			int cur_cursor = m_cursor;
+			int previouslinesize = 0;
+			int nextlinesize = 0;
+			int manylines = _line_starts.size();
+			std::vector<int>::iterator vit = _line_starts.begin();
+			const std::vector<int>::const_iterator ve = _line_starts.end();
 
             switch (c)
             {
@@ -453,18 +462,99 @@ TextField::on_event(const event_id& ev)
                     break;
 
                 case key::HOME:
+					while ( vit < ve && *vit <= m_cursor ) {
+						cur_cursor = *vit;
+						vit++;
+					}
+					m_cursor = cur_cursor;
+					format_text();
+					break;
+					
                 case key::PGUP:
+					// if going a page up is too far...
+					if(_top_visible_line - _linesindisplay < 0) {
+						_top_visible_line = 0;
+						if(_linesindisplay <= manylines && m_cursor > _line_starts[_linesindisplay-1]) {
+							m_cursor = _line_starts[_linesindisplay - 1];
+						}
+						m_cursor = 0;
+					} else { // go a page up
+						_top_visible_line -= _linesindisplay;
+						m_cursor = _line_starts[_top_visible_line];
+					}
+					format_text();
+					break;
+					
                 case key::UP:
-                    m_cursor = 0;
+					while ( vit < ve && *vit <= m_cursor ) {
+						cur_cursor = *vit;
+						vit++;
+					}
+					//if there is no previous line
+					if ( vit-_line_starts.begin() - 2 < 0 ) {
+						m_cursor = 0;
+						format_text();
+						break;
+					}
+					previouslinesize = _textRecords[vit-_line_starts.begin() - 2].glyphs().size();
+					//if the previous line is smaller
+					if (m_cursor - cur_cursor > previouslinesize)
+						m_cursor = *(--(--vit)) + previouslinesize;
+					else
+						m_cursor = *(--(--vit)) + (m_cursor - cur_cursor);
+					if (m_cursor < _line_starts[_top_visible_line] && _line_starts[_top_visible_line] != 0)
+						--_top_visible_line;
                     format_text();
                     break;
 
                 case key::END:
+					while ( vit < ve && *vit <= m_cursor ) {
+						vit++;
+					}
+					m_cursor = vit != ve ? *vit - 1 : _text.size();
+					format_text();
+					break;
+					
                 case key::PGDN:
+					//if going another page down is too far...
+					if(_top_visible_line + _linesindisplay >= manylines) {
+						if(manylines - _linesindisplay <= 0) {
+							_top_visible_line = 0;
+						} else {
+							_top_visible_line = manylines - _linesindisplay;
+						}
+						if(m_cursor < _line_starts[_top_visible_line-1]) {
+							m_cursor = _line_starts[_top_visible_line-1];
+						} else {
+							m_cursor = _text.size();
+						}
+					} else { //go a page down
+						_top_visible_line += _linesindisplay;
+						m_cursor = _line_starts[_top_visible_line];
+					}
+					format_text();
+					break;
+					
                 case key::DOWN:
-                    m_cursor = _text.size();
+                    while ( vit < ve && *vit <= m_cursor ) {
+						cur_cursor = *vit;
+						vit++;
+					}
+					//if there is no next line
+					if ( vit-_line_starts.begin() >= manylines ) {
+						m_cursor = _text.size();
+						format_text();
+						break;
+					}
+					nextlinesize = _textRecords[vit-_line_starts.begin()].glyphs().size();
+					//if the next line is smaller
+					if (m_cursor - cur_cursor > nextlinesize)
+						m_cursor = *vit + nextlinesize;
+					else //put the cursor at the same character distance
+						m_cursor = *(vit) + (m_cursor - cur_cursor);
                     format_text();
                     break;
+
 
                 case key::LEFT:
                     m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
@@ -911,15 +1001,7 @@ void
 TextField::format_text()
 {
     _textRecords.clear();
-
-    // nothing more to do if text is empty
-    if ( _text.empty() )
-    {
-        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
-        //       not sure we should...
-        reset_bounding_box(0, 0);
-        return;
-    }
+	_line_starts.clear();
 
     // See bug #24266
     const rect& defBounds = _bounds;
@@ -981,16 +1063,29 @@ TextField::format_text()
 
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
+	
+	y -= _top_visible_line*(fontHeight + leading); //to display the correct section
 
     int    last_code = -1; // only used if _embedFonts
     int    last_space_glyph = -1;
     int    last_line_start_record = 0;
+	_line_starts.push_back(0);
+	_linesindisplay = (defBounds.height() / (fontHeight + leading));
 
     unsigned int idx = 0;
     m_xcursor = x;
     m_ycursor = y;
 
-    assert(! _text.empty() );
+    // nothing more to do if text is empty
+    if ( _text.empty() )
+    {
+        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
+        //       not sure we should...
+        //reset_bounding_box(0, 0);
+		m_ycursor -= fontHeight + (fontLeading - fontDescent);
+		set_invalidated();
+        return;
+    }
     
     boost::uint32_t code = 0;
     
@@ -1001,6 +1096,9 @@ TextField::format_text()
     // Especially not c_str() or data().
     std::wstring::const_iterator it = _text.begin();
     const std::wstring::const_iterator e = _text.end();
+	
+	std::vector<int>::iterator linestartit = _line_starts.begin();
+	std::vector<int>::const_iterator linestartsend = _line_starts.end();
 
     while (it != e)
     {
@@ -1059,7 +1157,15 @@ TextField::format_text()
                 last_space_glyph = -1;
                 last_line_start_record = _textRecords.size();
 
-                continue;
+                linestartit = _line_starts.begin();
+				linestartsend = _line_starts.end();
+				//Fit a line_start in the correct place
+				while ( linestartit < linestartsend && *linestartit < it-_text.begin())
+				{
+					linestartit++;
+				}
+				_line_starts.insert(linestartit, it-_text.begin());
+				break;
             }
             case 8:
                 // Backspace 
@@ -1227,6 +1333,8 @@ TextField::format_text()
                 // Is it possible ?
                 assert(!_textRecords.empty());
                 SWF::TextRecord& last_line = _textRecords.back();
+				linestartit = _line_starts.begin();
+				linestartsend = _line_starts.end();
                 if (last_space_glyph == -1)
                 {
                     // Pull the previous glyph down onto the
@@ -1237,6 +1345,13 @@ TextField::format_text()
                         x += last_line.glyphs().back().advance;
                         previous_x -= last_line.glyphs().back().advance;
                         last_line.clearGlyphs(1);
+						
+						//record the new line start
+						while ( linestartit < linestartsend && *linestartit < (it-_text.begin())-1)
+						{
+							linestartit++;
+						}
+						_line_starts.insert(linestartit, (it-_text.begin()));
                     }
                 }
                 else
@@ -1255,6 +1370,14 @@ TextField::format_text()
                         previous_x -= last_line.glyphs()[i].advance;
                     }
                     last_line.clearGlyphs(lineSize - last_space_glyph);
+					
+					//record the new line start
+					int linestartpos = (it-_text.begin())-rec.glyphs().size();
+					while ( linestartit < linestartsend && *linestartit < linestartpos)
+					{
+						linestartit++;
+					}
+					_line_starts.insert(linestartit, linestartpos);
                 }
 
                 align_line(textAlignment, last_line_start_record, previous_x);
@@ -1284,12 +1407,15 @@ TextField::format_text()
             break;
         }
 
-        if (m_cursor > idx)
-        {
-            m_xcursor = x;
-            m_ycursor = y;
-        }
-        idx++;
+        ///This won't work for positioning the cursor properly with wordWrap
+		///the cursor is positioned before the word is wrapped
+        //if (m_cursor > idx)
+        //{
+            //m_xcursor = x;
+            //m_ycursor = y;
+        //}
+		//idx++;
+		///We will use m_cursor to position the cursor instead
 
         // TODO: HTML markup
     }
@@ -1301,12 +1427,62 @@ TextField::format_text()
     }
 
     // Add this line to our output.
-    if (!rec.glyphs().empty()) _textRecords.push_back(rec);
+    //if (!rec.glyphs().empty()) _textRecords.push_back(rec);
+	_textRecords.push_back(rec); //just add an empty line anyway
+	
+	linestartit = _line_starts.begin();
+	linestartsend = _line_starts.end();
+	int current_line;
+	int last_visible_line = _top_visible_line + _linesindisplay;
+	int linestart = 0;
+	SWF::TextRecord cursorposition_line;
+	while(linestartit != linestartsend && *linestartit <= m_cursor) {
+		linestart = *linestartit++;
+	}
+	//the line that m_cursor is on
+	current_line = linestartit - _line_starts.begin();
+	
+	///compute the lines to display
+	///this whole section could probably use some optimization!!!
+	if ( autoSize == autoSizeNone ) {
+		int manylines = _line_starts.size();
+		if (manylines - _top_visible_line <= _linesindisplay) {
+			if(manylines - _linesindisplay <= 0)
+				_top_visible_line = 0;
+			else
+				_top_visible_line = manylines - _linesindisplay;
+		///if we are at a higher position, scoot the lines down
+		} else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
+			_top_visible_line -= _top_visible_line-(current_line);
+		///if we are at a lower position, scoot the lines up
+		} else if (manylines > _top_visible_line+_linesindisplay) {
+			if ( m_cursor >= (_line_starts[last_visible_line])) {
+				_top_visible_line += (current_line) - (last_visible_line);
+			}
+		}
+    }
+	for(unsigned int i = 0; i < _line_starts.size(); ++i) {
+		_textRecords[i].setYOffset((i-_top_visible_line)*(fontHeight + leading) + (PADDING_TWIPS + fontHeight + (fontLeading - fontDescent)));
+	}
 
     float extra_space = align_line(textAlignment, last_line_start_record, x);
 
+	///Here we use m_cursor to position the cursor once
+	if ( --current_line < _textRecords.size() ) {
+		cursorposition_line = _textRecords[current_line];
+		for ( unsigned int i = linestart; i < m_cursor; ++i ) {
+			m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
+		}
+	}
+	m_ycursor = PADDING_TWIPS;
+	for(unsigned int i = _top_visible_line; i < current_line; ++i) {
+		m_ycursor += (fontHeight+leading);
+	}
+	
     m_xcursor += static_cast<int>(extra_space);
-    m_ycursor -= fontHeight + (fontLeading - fontDescent);
+    //m_ycursor -= fontHeight + (fontLeading - fontDescent);
+	
+	set_invalidated(); //redraw
 }
 
 TextField::VariableRef
