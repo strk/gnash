@@ -24,6 +24,7 @@
 #include "events/EventDispatcher_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -59,10 +60,11 @@ public:
 // extern (used by Global.cpp)
 void eventdispatcher_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&eventdispatcher_ctor, getEventDispatcherInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&eventdispatcher_ctor, getEventDispatcherInterface());;
         attachEventDispatcherStaticInterface(*cl);
     }
 
@@ -75,12 +77,13 @@ namespace {
 void
 attachEventDispatcherInterface(as_object& o)
 {
-    o.init_member("dispatchEvent", new builtin_function(eventdispatcher_dispatchEvent));
-    o.init_member("hasEventListener", new builtin_function(eventdispatcher_hasEventListener));
-    o.init_member("removeEventListener", new builtin_function(eventdispatcher_removeEventListener));
-    o.init_member("willTrigger", new builtin_function(eventdispatcher_willTrigger));
-    o.init_member("activate", new builtin_function(eventdispatcher_activate));
-    o.init_member("deactivate", new builtin_function(eventdispatcher_deactivate));
+    Global_as* gl = getGlobal(o);
+    o.init_member("dispatchEvent", gl->createFunction(eventdispatcher_dispatchEvent));
+    o.init_member("hasEventListener", gl->createFunction(eventdispatcher_hasEventListener));
+    o.init_member("removeEventListener", gl->createFunction(eventdispatcher_removeEventListener));
+    o.init_member("willTrigger", gl->createFunction(eventdispatcher_willTrigger));
+    o.init_member("activate", gl->createFunction(eventdispatcher_activate));
+    o.init_member("deactivate", gl->createFunction(eventdispatcher_deactivate));
 }
 
 void

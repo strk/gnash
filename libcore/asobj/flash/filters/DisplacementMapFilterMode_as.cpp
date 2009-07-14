@@ -24,6 +24,8 @@
 #include "filters/DisplacementMapFilterMode_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
+#include "Object.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -32,33 +34,15 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value displacementmapfiltermode_ctor(const fn_call& fn);
-    void attachDisplacementMapFilterModeInterface(as_object& o);
     void attachDisplacementMapFilterModeStaticInterface(as_object& o);
-    as_object* getDisplacementMapFilterModeInterface();
 
 }
-
-class DisplacementMapFilterMode_as : public as_object
-{
-public:
-
-    DisplacementMapFilterMode_as()
-        :
-        as_object(getDisplacementMapFilterModeInterface())
-    {}
-
-};
 
 // extern (used by Global.cpp)
 void displacementmapfiltermode_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&displacementmapfiltermode_ctor, getDisplacementMapFilterModeInterface());
-        attachDisplacementMapFilterModeStaticInterface(*cl);
-    }
+    boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
+    attachDisplacementMapFilterModeStaticInterface(*cl);
 
     // Register _global.DisplacementMapFilterMode
     global.init_member("DisplacementMapFilterMode", cl.get());
@@ -67,33 +51,9 @@ void displacementmapfiltermode_class_init(as_object& global)
 namespace {
 
 void
-attachDisplacementMapFilterModeInterface(as_object& o)
-{
-}
-
-void
 attachDisplacementMapFilterModeStaticInterface(as_object& o)
 {
 
-}
-
-as_object*
-getDisplacementMapFilterModeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachDisplacementMapFilterModeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-displacementmapfiltermode_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new DisplacementMapFilterMode_as;
-
-    return as_value(obj.get()); // will keep alive
 }
 
 } // anonymous namespace 

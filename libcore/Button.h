@@ -215,7 +215,7 @@ private:
 	/// \brief
 	/// Return version of the SWF containing
 	/// the button definition this is an instance of.
-    int getSWFVersion() const;
+    int getMovieVersion() const;
 
 };
 

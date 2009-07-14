@@ -24,6 +24,7 @@
 #include "events/StatusEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -55,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void statusevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&statusevent_ctor, getStatusEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&statusevent_ctor, getStatusEventInterface());;
         attachStatusEventStaticInterface(*cl);
     }
 
@@ -71,14 +73,14 @@ namespace {
 void
 attachStatusEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(statusevent_toString));
-    o.init_member("STATUS", new builtin_function(statusevent_STATUS));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(statusevent_toString));
+    o.init_member("STATUS", gl->createFunction(statusevent_STATUS));
 }
 
 void
 attachStatusEventStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

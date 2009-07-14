@@ -24,6 +24,7 @@
 #include "display/Graphics_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -66,10 +67,11 @@ public:
 // extern (used by Global.cpp)
 void graphics_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&graphics_ctor, getGraphicsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&graphics_ctor, getGraphicsInterface());;
         attachGraphicsStaticInterface(*cl);
     }
 
@@ -82,25 +84,25 @@ namespace {
 void
 attachGraphicsInterface(as_object& o)
 {
-    o.init_member("beginFill", new builtin_function(graphics_beginFill));
-    o.init_member("beginGradientFill", new builtin_function(graphics_beginGradientFill));
-    o.init_member("clear", new builtin_function(graphics_clear));
-    o.init_member("curveTo", new builtin_function(graphics_curveTo));
-    o.init_member("drawCircle", new builtin_function(graphics_drawCircle));
-    o.init_member("drawEllipse", new builtin_function(graphics_drawEllipse));
-    o.init_member("drawRect", new builtin_function(graphics_drawRect));
-    o.init_member("drawRoundRect", new builtin_function(graphics_drawRoundRect));
-    o.init_member("endFill", new builtin_function(graphics_endFill));
-    o.init_member("lineGradientStyle", new builtin_function(graphics_lineGradientStyle));
-    o.init_member("lineStyle", new builtin_function(graphics_lineStyle));
-    o.init_member("lineTo", new builtin_function(graphics_lineTo));
-    o.init_member("moveTo", new builtin_function(graphics_moveTo));
+    Global_as* gl = getGlobal(o);
+    o.init_member("beginFill", gl->createFunction(graphics_beginFill));
+    o.init_member("beginGradientFill", gl->createFunction(graphics_beginGradientFill));
+    o.init_member("clear", gl->createFunction(graphics_clear));
+    o.init_member("curveTo", gl->createFunction(graphics_curveTo));
+    o.init_member("drawCircle", gl->createFunction(graphics_drawCircle));
+    o.init_member("drawEllipse", gl->createFunction(graphics_drawEllipse));
+    o.init_member("drawRect", gl->createFunction(graphics_drawRect));
+    o.init_member("drawRoundRect", gl->createFunction(graphics_drawRoundRect));
+    o.init_member("endFill", gl->createFunction(graphics_endFill));
+    o.init_member("lineGradientStyle", gl->createFunction(graphics_lineGradientStyle));
+    o.init_member("lineStyle", gl->createFunction(graphics_lineStyle));
+    o.init_member("lineTo", gl->createFunction(graphics_lineTo));
+    o.init_member("moveTo", gl->createFunction(graphics_moveTo));
 }
 
 void
 attachGraphicsStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

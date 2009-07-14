@@ -24,6 +24,7 @@
 #include "events/FocusEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -58,10 +59,11 @@ public:
 // extern (used by Global.cpp)
 void focusevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&focusevent_ctor, getFocusEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&focusevent_ctor, getFocusEventInterface());;
         attachFocusEventStaticInterface(*cl);
     }
 
@@ -74,17 +76,17 @@ namespace {
 void
 attachFocusEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(focusevent_toString));
-    o.init_member("FOCUS_IN", new builtin_function(focusevent_FOCUS_IN));
-    o.init_member("FOCUS_OUT", new builtin_function(focusevent_FOCUS_OUT));
-    o.init_member("KEY_FOCUS_CHANGE", new builtin_function(focusevent_KEY_FOCUS_CHANGE));
-    o.init_member("MOUSE_FOCUS_CHANGE", new builtin_function(focusevent_MOUSE_FOCUS_CHANGE));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(focusevent_toString));
+    o.init_member("FOCUS_IN", gl->createFunction(focusevent_FOCUS_IN));
+    o.init_member("FOCUS_OUT", gl->createFunction(focusevent_FOCUS_OUT));
+    o.init_member("KEY_FOCUS_CHANGE", gl->createFunction(focusevent_KEY_FOCUS_CHANGE));
+    o.init_member("MOUSE_FOCUS_CHANGE", gl->createFunction(focusevent_MOUSE_FOCUS_CHANGE));
 }
 
 void
-attachFocusEventStaticInterface(as_object& o)
+attachFocusEventStaticInterface(as_object& /*o*/)
 {
-
 }
 
 as_object*

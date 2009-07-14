@@ -50,67 +50,48 @@
 
 // Forward declarations
 namespace gnash {
+	class builtin_function;
 	class Machine;
+	class as_value;
 	class VM;
 	class fn_call;
+	class ClassHierarchy;
 }
 
 namespace gnash {
 
-class AVM1Global : public as_object
+/// The Global object ultimately contains all objects in an ActionScript run
+//
+/// An ActionScript run is a single version (AS1/2 or AS3) and includes all
+/// resources parsed from the SWF, created dynamically, loaded, or imported
+/// that are available to ActionScript code.
+//
+/// Each VM (VM for AS1/2, Machine for AS3) has different resources in its
+/// Global object. The two objects should be entirely separate.
+class Global_as : public as_object
 {
 public:
 
-	AVM1Global(VM& vm);
-	~AVM1Global() {}
+    typedef as_value(*ASFunction)(const fn_call& fn);
 
-    const ClassHierarchy& classHierarchy() const {
-        return _classes;
-    }
-    
-    ClassHierarchy& classHierarchy() {
-        return _classes;
-    }
+    virtual const ClassHierarchy& classHierarchy() const = 0;
+    virtual ClassHierarchy& classHierarchy() = 0;
 
-protected:
-    
-    void markReachableResources() const;
+    /// Create an ActionScript function
+    virtual builtin_function* createFunction(ASFunction function) = 0;
 
-private:
+    /// Create an ActionScript class
+    //
+    /// The type of a class is different in AS2 and AS3. In AS2 it is generally
+    /// a function (the constructor) with a prototype. In AS3 it is generally
+    /// an object (the prototype) with a constructor.
+    virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
 
-    void loadExtensions();
-	Extension _et;
-
-    ClassHierarchy _classes;
-
-};
-
-class AVM2Global : public as_object
-{
-public:
-
-	AVM2Global(Machine& m);
-	~AVM2Global() {}
-
-    const ClassHierarchy& classHierarchy() const {
-        return _classes;
-    }
-    
-    ClassHierarchy& classHierarchy() {
-        return _classes;
+    virtual Global_as& global() {
+        return *this;
     }
 
-protected:
-
-    void markReachableResources() const {
-        _classes.markReachableResources();
-        markAsObjectReachable();
-    }
-
-private:
-
-    ClassHierarchy _classes;
-
+    virtual VM& getVM() const = 0;
 };
 
 } // namespace gnash

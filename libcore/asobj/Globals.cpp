@@ -95,7 +95,7 @@
 #include "flash_pkg.h"
 #include "fn_call.h"
 #include "Button.h"
-#include "Global.h"
+#include "Globals.h"
 #include "int_as.h"
 #include "LoadVars_as.h"
 #include "Namespace_as.h"
@@ -149,16 +149,16 @@ namespace {
     void registerNatives(as_object& global);
 }
 
-AVM2Global::AVM2Global(Machine& machine)
+AVM2Global::AVM2Global(Machine& machine, VM& vm)
     :
-    as_object(),
-    _classes(this, 0)
+    _classes(this, 0),
+    _vm(vm)
 {
     
     _classes.declareAll(avm2Classes());
     
-    init_member("trace", new builtin_function(global_trace));
-    init_member("escape", new builtin_function(global_escape));
+    init_member("trace", createFunction(global_trace));
+    init_member("escape", createFunction(global_escape));
    
     object_class_init(*this); 
     string_class_init(*this); 
@@ -177,6 +177,33 @@ AVM2Global::AVM2Global(Machine& machine)
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_STRING);
     _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
 }
+    
+builtin_function*
+AVM1Global::createFunction(Global_as::ASFunction function)
+{
+    return new builtin_function(function);
+}
+
+as_object*
+AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
+{
+    return new builtin_function(ctor, prototype);
+
+}
+
+builtin_function*
+AVM2Global::createFunction(Global_as::ASFunction function)
+{
+    return new builtin_function(function);
+}
+
+as_object*
+AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
+{
+    // TODO: this should attach the function to the prototype as its
+    // constructor member.
+    return new builtin_function(ctor, prototype);
+}
 
 void 
 AVM1Global::markReachableResources() const
@@ -187,10 +214,14 @@ AVM1Global::markReachableResources() const
 
 AVM1Global::AVM1Global(VM& vm)
     :
-    as_object(),
-    _classes(this, &_et)
+    _classes(this, &_et),
+    _vm(vm)
 {
+}
 
+void
+AVM1Global::registerClasses()
+{
     registerNatives(*this);
 
     // No idea why, but it seems there's a NULL _global.o 
@@ -205,18 +236,18 @@ AVM1Global::AVM1Global(VM& vm)
     // These functions are only available in SWF6+, but this is just
     // because SWF5 or lower did not have a "_global"
     // reference at all.
-    init_member("ASnative", new builtin_function(global_asnative));
-    init_member("ASconstructor", new builtin_function(global_asconstructor));
-    init_member("ASSetPropFlags", vm.getNative(1, 0));
-    init_member("ASSetNative", vm.getNative(4, 0));
-    init_member("ASSetNativeAccessor", vm.getNative(4, 1));
-    init_member("updateAfterEvent", vm.getNative(9, 0));
-    init_member("trace", vm.getNative(100, 4));
+    init_member("ASnative", createFunction(global_asnative));
+    init_member("ASconstructor", createFunction(global_asconstructor));
+    init_member("ASSetPropFlags", _vm.getNative(1, 0));
+    init_member("ASSetNative", _vm.getNative(4, 0));
+    init_member("ASSetNativeAccessor", _vm.getNative(4, 1));
+    init_member("updateAfterEvent", _vm.getNative(9, 0));
+    init_member("trace", _vm.getNative(100, 4));
 
-    init_member("setInterval", vm.getNative(250, 0));
-    init_member("clearInterval", vm.getNative(250, 1));
-    init_member("setTimeout", new builtin_function(global_setTimeout));
-    init_member("clearTimeout", new builtin_function(global_clearInterval));
+    init_member("setInterval", _vm.getNative(250, 0));
+    init_member("clearInterval", _vm.getNative(250, 1));
+    init_member("setTimeout", createFunction(global_setTimeout));
+    init_member("clearTimeout", createFunction(global_clearInterval));
 
     _classes.declareAll(avm1Classes());
 
@@ -230,7 +261,7 @@ AVM1Global::AVM1Global(VM& vm)
     // SWF8 visibility:
     flash_package_init(*this); 
 
-    const int version = vm.getSWFVersion();
+    const int version = _vm.getSWFVersion();
 
     switch (version)
     {
@@ -258,12 +289,12 @@ AVM1Global::AVM1Global(VM& vm)
             _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
             // This is surely not correct, but they are not available
             // in SWF4
-            init_member("escape", vm.getNative(100, 0));
-            init_member("unescape", vm.getNative(100, 1));
-            init_member("parseInt", vm.getNative(100, 2));
-            init_member("parseFloat", vm.getNative(100, 3));
-            init_member("isNaN", vm.getNative(200, 18));
-            init_member("isFinite", vm.getNative(200, 19));
+            init_member("escape", _vm.getNative(100, 0));
+            init_member("unescape", _vm.getNative(100, 1));
+            init_member("parseInt", _vm.getNative(100, 2));
+            init_member("parseFloat", _vm.getNative(100, 3));
+            init_member("isNaN", _vm.getNative(200, 18));
+            init_member("isFinite", _vm.getNative(200, 19));
 
             init_member("NaN", as_value(NaN));
             init_member("Infinity", as_value(
@@ -827,7 +858,7 @@ global_asnative(const fn_call& fn)
     const unsigned int x = static_cast<unsigned int>(sx);
     const unsigned int y = static_cast<unsigned int>(sy);
 
-    VM& vm = fn.getVM();
+    VM& vm = getVM(fn);
     as_function* fun = vm.getNative(x, y);
     if ( ! fun ) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
@@ -951,7 +982,7 @@ global_setInterval(const fn_call& fn)
 	}
     
     
-	movie_root& root = fn.env().getVM().getRoot();
+	movie_root& root = getRoot(fn);
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
 }
@@ -1021,7 +1052,7 @@ global_setTimeout(const fn_call& fn)
 	}
     
     
-	movie_root& root = fn.env().getVM().getRoot();
+	movie_root& root = getRoot(fn);
 
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
@@ -1039,7 +1070,7 @@ global_clearInterval(const fn_call& fn)
 
 	int id = int(fn.arg(0).to_number());
 
-	movie_root& root = fn.env().getVM().getRoot();
+	movie_root& root = getRoot(fn);
 	bool ret = root.clear_interval_timer(id);
 	return as_value(ret);
 }
@@ -1049,7 +1080,7 @@ void
 registerNatives(as_object& global)
 {
     
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
     // ASNew was dropped as a builtin function but exists
     // as ASnative.
@@ -1068,6 +1099,7 @@ registerNatives(as_object& global)
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
 
+    registerArrayNative(global);
     registerMovieClipNative(global);
     registerSelectionNative(global);
     registerColorNative(global);

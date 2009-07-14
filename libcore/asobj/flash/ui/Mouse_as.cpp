@@ -21,6 +21,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "VM.h" // for registerNative
@@ -44,7 +45,7 @@ namespace {
 void
 Mouse_as::registerNative(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     vm.registerNative(mouse_show, 5, 0);
     vm.registerNative(mouse_hide, 5, 1);
@@ -70,7 +71,8 @@ namespace {
 void
 attachMouseInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    Global_as* gl = getGlobal(o);
+    VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
@@ -92,7 +94,7 @@ mouse_hide(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
 
     const int success = (m.callInterface("Mouse.hide") == "true") ? 1 : 0;
 
@@ -108,7 +110,7 @@ mouse_show(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
 
     const int success = (m.callInterface("Mouse.show") == "true") ? 1 : 0;
 

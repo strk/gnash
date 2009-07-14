@@ -24,6 +24,7 @@
 #include "utils/IDataInput_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -66,10 +67,11 @@ public:
 // extern (used by Global.cpp)
 void idatainput_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&idatainput_ctor, getIDataInputInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&idatainput_ctor, getIDataInputInterface());;
         attachIDataInputStaticInterface(*cl);
     }
 
@@ -82,25 +84,25 @@ namespace {
 void
 attachIDataInputInterface(as_object& o)
 {
-    o.init_member("readByte", new builtin_function(idatainput_readByte));
-    o.init_member("readBytes", new builtin_function(idatainput_readBytes));
-    o.init_member("readDouble", new builtin_function(idatainput_readDouble));
-    o.init_member("readFloat", new builtin_function(idatainput_readFloat));
-    o.init_member("readInt", new builtin_function(idatainput_readInt));
-    o.init_member("readMultiByte", new builtin_function(idatainput_readMultiByte));
-    o.init_member("readObject", new builtin_function(idatainput_readObject));
-    o.init_member("readShort", new builtin_function(idatainput_readShort));
-    o.init_member("readUnsignedByte", new builtin_function(idatainput_readUnsignedByte));
-    o.init_member("readUnsignedInt", new builtin_function(idatainput_readUnsignedInt));
-    o.init_member("readUnsignedShort", new builtin_function(idatainput_readUnsignedShort));
-    o.init_member("readUTF", new builtin_function(idatainput_readUTF));
-    o.init_member("readUTFBytes", new builtin_function(idatainput_readUTFBytes));
+    Global_as* gl = getGlobal(o);
+    o.init_member("readByte", gl->createFunction(idatainput_readByte));
+    o.init_member("readBytes", gl->createFunction(idatainput_readBytes));
+    o.init_member("readDouble", gl->createFunction(idatainput_readDouble));
+    o.init_member("readFloat", gl->createFunction(idatainput_readFloat));
+    o.init_member("readInt", gl->createFunction(idatainput_readInt));
+    o.init_member("readMultiByte", gl->createFunction(idatainput_readMultiByte));
+    o.init_member("readObject", gl->createFunction(idatainput_readObject));
+    o.init_member("readShort", gl->createFunction(idatainput_readShort));
+    o.init_member("readUnsignedByte", gl->createFunction(idatainput_readUnsignedByte));
+    o.init_member("readUnsignedInt", gl->createFunction(idatainput_readUnsignedInt));
+    o.init_member("readUnsignedShort", gl->createFunction(idatainput_readUnsignedShort));
+    o.init_member("readUTF", gl->createFunction(idatainput_readUTF));
+    o.init_member("readUTFBytes", gl->createFunction(idatainput_readUTFBytes));
 }
 
 void
 attachIDataInputStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

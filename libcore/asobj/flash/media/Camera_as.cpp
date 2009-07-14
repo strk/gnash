@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
@@ -40,10 +41,11 @@ as_value camera_ctor(const fn_call& fn);
 static void
 attachCameraInterface(as_object& o)
 {
-	o.init_member("get", new builtin_function(camera_get));
-	o.init_member("setmode", new builtin_function(camera_setmode));
-	o.init_member("setmotionlevel", new builtin_function(camera_setmotionlevel));
-	o.init_member("setquality", new builtin_function(camera_setquality));
+    Global_as* gl = getGlobal(o);
+	o.init_member("get", gl->createFunction(camera_get));
+	o.init_member("setmode", gl->createFunction(camera_setmode));
+	o.init_member("setmotionlevel", gl->createFunction(camera_setmotionlevel));
+	o.init_member("setquality", gl->createFunction(camera_setquality));
 }
 
 static as_object*
@@ -105,11 +107,12 @@ camera_ctor(const fn_call& /* fn */)
 void camera_class_init(as_object& global)
 {
 	// This is going to be the global Camera "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&camera_ctor, getCameraInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&camera_ctor, getCameraInterface());;
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCameraInterface(*cl);

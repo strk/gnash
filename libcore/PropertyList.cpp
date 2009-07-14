@@ -304,7 +304,7 @@ PropertyList::setFlagsAll(const PropertyList& props,
 void
 PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 {
-	string_table& st = env.getVM().getStringTable();
+	string_table& st = getStringTable(env);
 
     // We should enumerate in order of creation, not lexicographically.
     typedef container::nth_index<1>::type ContainerByOrder;
@@ -329,7 +329,7 @@ void
 PropertyList::enumerateKeyValue(const as_object& this_ptr,
         SortedPropertyList& to) const
 {
-    VM& vm = this_ptr.getVM();
+    VM& vm = getVM(this_ptr);
 	string_table& st = vm.getStringTable();
     typedef container::nth_index<1>::type ContainerByOrder;
 

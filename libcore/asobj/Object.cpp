@@ -28,6 +28,7 @@
 #include "sprite_definition.h" // for get_movie_definition()
 #include "VM.h" // for SWF version (attachObjectInterface)
 #include "namedStrings.h" // for NSV::PROP_TO_STRING
+#include "Global_as.h"
 
 #include "log.h"
 
@@ -65,13 +66,14 @@ init_object_instance()
 void object_class_init(as_object& global)
 {
 	// This is going to be the global Object "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl=NULL;
+	static boost::intrusive_ptr<as_object> cl=NULL;
 
-	VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&object_ctor, getObjectInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&object_ctor, getObjectInterface());;
 
 		// Object.registerClass() --
         // TODO: should this only be in SWF6 or higher ?
@@ -107,7 +109,7 @@ namespace {
 void
 attachObjectInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
 	// We register natives despite swf version,
 
@@ -120,10 +122,12 @@ attachObjectInterface(as_object& o)
 	vm.registerNative(object_isPrototypeOf, 101, 6); 
 	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
 
+    Global_as* gl = getGlobal(o);
+
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));
 	o.init_member("toLocaleString", 
-            new builtin_function(object_toLocaleString));
+            gl->createFunction(object_toLocaleString));
 
 	int swf6flags = as_prop_flags::dontEnum | 
         as_prop_flags::dontDelete | 
@@ -360,7 +364,9 @@ object_hasOwnProperty(const fn_call& fn)
 		return as_value(false);
 	}
 	//log_debug("%p.hasOwnProperty", fn.this_ptr);
-	return as_value(fn.this_ptr->hasOwnProperty(obj->getVM().getStringTable().find(propname)));
+    const bool found =
+        fn.this_ptr->hasOwnProperty(getStringTable(fn).find(propname));
+    return as_value(found);
 }
 
 as_value
@@ -386,7 +392,8 @@ object_isPropertyEnumerable(const fn_call& fn)
 		return as_value();
 	}
 
-	Property* prop = fn.this_ptr->getOwnProperty(obj->getVM().getStringTable().find(propname));
+	Property* prop =
+        fn.this_ptr->getOwnProperty(getStringTable(fn).find(propname));
 	if ( ! prop )
 	{
 		return as_value(false);
@@ -448,8 +455,7 @@ object_watch(const fn_call& fn)
 		return as_value(false);
 	}
 
-	VM& vm = obj->getVM();
-	string_table& st = vm.getStringTable();
+	string_table& st = getStringTable(fn);
 
 	std::string propname = propval.to_string();
 	string_table::key propkey = st.find(propname);
@@ -476,8 +482,7 @@ object_unwatch(const fn_call& fn)
 
 	const as_value& propval = fn.arg(0);
 
-	VM& vm = obj->getVM();
-	string_table& st = vm.getStringTable();
+	string_table& st = getStringTable(fn);
 
 	std::string propname = propval.to_string();
 	string_table::key propkey = st.find(propname);

@@ -43,6 +43,7 @@
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
+#include "Global_as.h"
 #include "Point2d.h"
 #include "GnashNumeric.h"
 
@@ -153,7 +154,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = parent->getVM().getSWFVersion();
+    int version = getSWFVersion(*parent);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -215,7 +216,7 @@ void
 TextField::init()
 {
 
-    as_object* proto = getTextFieldInterface(_vm);
+    as_object* proto = getTextFieldInterface(getVM(*this));
  
     // This is an instantiation, so attach properties to the
     // prototype.
@@ -369,7 +370,7 @@ void
 TextField::replaceSelection(const std::string& replace)
 {
 
-    const int version = _vm.getSWFVersion();
+    const int version = getSWFVersion(*this);
     const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
     
     const size_t start = _selection.first;
@@ -520,7 +521,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -551,7 +552,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = _vm.getSWFVersion();
+            int version = getSWFVersion(*this);
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -578,7 +579,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -1363,7 +1364,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     }
 
     ret.first = target;
-    ret.second = _vm.getStringTable().find(parsedName);
+    ret.second = getStringTable(*this).find(parsedName);
 
     return ret;
 }
@@ -1412,13 +1413,13 @@ TextField::registerTextVariable()
     // in that case update text value
     as_value val;
     
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
     
     if (target->get_member(key, &val) )
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target object (%s @ %p) does have a member named %s"),
-            typeName(*target), (void*)target, _vm.getStringTable().value(key));
+            typeName(*target), (void*)target, getStringTable(*this).value(key));
 #endif
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
@@ -1431,7 +1432,7 @@ TextField::registerTextVariable()
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s (no problem, we'll add it with value %s)"),
                     typeName(*target), (void*)target,
-                    _vm.getStringTable().value(key), newVal);
+                    getStringTable(*this).value(key), newVal);
 #endif
         target->set_member(key, newVal);
     }
@@ -1441,7 +1442,7 @@ TextField::registerTextVariable()
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s, and we don't have text defined"),
                     typeName(*target), (void*)target,
-                    _vm.getStringTable().value(key));
+                    getStringTable(*this).value(key));
 #endif
     }
 
@@ -1453,9 +1454,9 @@ TextField::registerTextVariable()
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
-                _vm.getStringTable().value(key), sprite->getTarget());
+                getStringTable(*this).value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
+        sprite->set_textfield_variable(getStringTable(*this).value(key), this);
 
     }
     _text_variable_registered=true;
@@ -1531,20 +1532,21 @@ TextField::set_variable_name(const std::string& newname)
 void
 textfield_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl = NULL;
+    static boost::intrusive_ptr<as_object> cl = NULL;
 
     if (!cl)
     {
-        VM& vm = global.getVM();
+        VM& vm = getVM(global);
+        Global_as* gl = getGlobal(global);
 
         if (vm.getSWFVersion() < 6) {
             /// Version 5 or less: no initial prototype
-            cl = new builtin_function(&textfield_ctor, 0);
+            cl = gl->createClass(&textfield_ctor, 0);
         }
         else {
             /// Version 6 upward: limited initial prototype
             as_object* iface = getTextFieldInterface(vm);
-            cl = new builtin_function(&textfield_ctor, iface);
+            cl = gl->createClass(&textfield_ctor, iface);;
         }
 
         vm.addStatic(cl.get());
@@ -1884,7 +1886,7 @@ TextField::handleFocus()
 
     // why should we add to the key listener list every time
     // we call setFocus()???
-    _vm.getRoot().add_key_listener(this);
+    getRoot(*this).add_key_listener(this);
 
     m_cursor = _text.size();
     format_text();
@@ -1901,7 +1903,7 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    movie_root& root = _vm.getRoot();
+    movie_root& root = getRoot(*this);
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
@@ -1942,53 +1944,55 @@ attachPrototypeProperties(as_object& o)
     o.init_property(NSV::PROP_TEXT_HEIGHT,
             textfield_textHeight, textfield_textHeight);
 
-    getset = new builtin_function(textfield_variable);
+    Global_as* gl = getGlobal(o);
+
+    getset = gl->createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_background);
+    getset = gl->createFunction(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_text);
+    getset = gl->createFunction(textfield_text);
     o.init_property("text", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_backgroundColor);
+    getset = gl->createFunction(textfield_backgroundColor);
     o.init_property("backgroundColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_border);
+    getset = gl->createFunction(textfield_border);
     o.init_property("border", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_borderColor);
+    getset = gl->createFunction(textfield_borderColor);
     o.init_property("borderColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_textColor);
+    getset = gl->createFunction(textfield_textColor);
     o.init_property("textColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_embedFonts);
+    getset = gl->createFunction(textfield_embedFonts);
     o.init_property("embedFonts", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_autoSize);
+    getset = gl->createFunction(textfield_autoSize);
     o.init_property("autoSize", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_type);
+    getset = gl->createFunction(textfield_type);
     o.init_property("type", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_wordWrap);
+    getset = gl->createFunction(textfield_wordWrap);
     o.init_property("wordWrap", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_html);
+    getset = gl->createFunction(textfield_html);
     o.init_property("html", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_selectable);
+    getset = gl->createFunction(textfield_selectable);
     o.init_property("selectable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_length);
+    getset = gl->createFunction(textfield_length);
     o.init_property("length", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxscroll);
+    getset = gl->createFunction(textfield_maxscroll);
     o.init_property("maxscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxhscroll);
+    getset = gl->createFunction(textfield_maxhscroll);
     o.init_property("maxhscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxChars);
+    getset = gl->createFunction(textfield_maxChars);
     o.init_property("maxChars", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_bottomScroll);
+    getset = gl->createFunction(textfield_bottomScroll);
     o.init_property("bottomScroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_scroll);
+    getset = gl->createFunction(textfield_scroll);
     o.init_property("scroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_hscroll);
+    getset = gl->createFunction(textfield_hscroll);
     o.init_property("hscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_restrict);
+    getset = gl->createFunction(textfield_restrict);
     o.init_property("restrict", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_multiline);
+    getset = gl->createFunction(textfield_multiline);
     o.init_property("multiline", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_password);
+    getset = gl->createFunction(textfield_password);
     o.init_property("password", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_htmlText);
+    getset = gl->createFunction(textfield_htmlText);
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
@@ -2581,7 +2585,7 @@ textfield_text(const fn_call& fn)
     }
 
     // Setter
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(*ptr);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -2599,7 +2603,7 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(*ptr);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -2631,7 +2635,7 @@ textfield_replaceSel(const fn_call& fn)
     const std::string& replace = fn.arg(0).to_string();
 
     /// Do nothing if text is empty and version less than 8.
-    const int version = text->getVM().getSWFVersion();
+    const int version = getSWFVersion(*text);
     if (version < 8 && replace.empty()) return as_value();
 
     text->replaceSelection(replace);
@@ -2701,7 +2705,7 @@ as_value
 textfield_ctor(const fn_call& fn)
 {
 
-    VM& vm = fn.getVM();
+    VM& vm = getVM(fn);
 
     as_object* proto = getTextFieldInterface(vm);
 
@@ -2728,7 +2732,7 @@ textfield_ctor(const fn_call& fn)
 void
 attachTextFieldInterface(as_object& o)
 {
-    boost::intrusive_ptr<builtin_function> getset;
+    Global_as* gl = getGlobal(o);
 
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
@@ -2739,16 +2743,16 @@ attachTextFieldInterface(as_object& o)
         |as_prop_flags::isProtected;
 
     // Parent seems to not be a normal property
-    getset = new builtin_function(&DisplayObject::parent_getset, NULL);
-    o.init_property(NSV::PROP_uPARENT, *getset, *getset);
+    o.init_property(NSV::PROP_uPARENT, &DisplayObject::parent_getset,
+            &DisplayObject::parent_getset);
 
     // Target seems to not be a normal property
-    getset = new builtin_function(&DisplayObject::target_getset, NULL);
-    o.init_property(NSV::PROP_uTARGET, *getset, *getset);
+    o.init_property(NSV::PROP_uTARGET, &DisplayObject::target_getset,
+            &DisplayObject::target_getset);
 
     // _name should be a property of the instance, not the prototype
-    getset = new builtin_function(&DisplayObject::name_getset, NULL);
-    o.init_property(NSV::PROP_uNAME, *getset, *getset);
+    o.init_property(NSV::PROP_uNAME, &DisplayObject::name_getset,
+            &DisplayObject::name_getset);
 
     o.init_property(NSV::PROP_uXMOUSE,
             DisplayObject::xmouse_get, DisplayObject::xmouse_get, propFlags);
@@ -2771,27 +2775,27 @@ attachTextFieldInterface(as_object& o)
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
     o.init_member("setTextFormat", 
-            new builtin_function(textfield_setTextFormat), swf6Flags);
+            gl->createFunction(textfield_setTextFormat), swf6Flags);
     o.init_member("getTextFormat", 
-            new builtin_function(textfield_getTextFormat), swf6Flags);
+            gl->createFunction(textfield_getTextFormat), swf6Flags);
     o.init_member("setNewTextFormat",
-            new builtin_function(textfield_setNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_setNewTextFormat), swf6Flags);
     o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
     o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
     o.init_member("getDepth",
-            new builtin_function(textfield_getDepth), swf6Flags);
+            gl->createFunction(textfield_getDepth), swf6Flags);
     o.init_member("removeTextField",
-            new builtin_function(textfield_removeTextField), swf6Flags);
+            gl->createFunction(textfield_removeTextField), swf6Flags);
     o.init_member("replaceSel",
-            new builtin_function(textfield_replaceSel), swf6Flags);
+            gl->createFunction(textfield_replaceSel), swf6Flags);
 
     // SWF7 or higher
     const int swf7Flags = flags | as_prop_flags::onlySWF7Up;
 
     o.init_member("replaceText",
-            new builtin_function(textfield_replaceText), swf7Flags);
+            gl->createFunction(textfield_replaceText), swf7Flags);
 
 }
 
@@ -2805,8 +2809,9 @@ attachTextFieldStaticMembers(as_object& o)
     // SWF6 or higher
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("getFontList",
-            new builtin_function(textfield_getFontList), swf6Flags);
+            gl->createFunction(textfield_getFontList), swf6Flags);
 
 }
 

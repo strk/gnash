@@ -28,7 +28,8 @@
 #include "action.h"
 #include "Object.h"
 #include "VM.h"
-#include "Global.h"
+#include "Globals.h"
+#include "Global_as.h"
 
 namespace gnash {
 /// The type of exceptions thrown by ActionScript.
@@ -323,7 +324,7 @@ Machine::Machine(VM& vm)
         mGlobalScope(0),
         mDefaultThis(0),
         mThis(0),
-        _global(new AVM2Global(*this)),
+        _global(new AVM2Global(*this, _vm)),
         mGlobalReturn(),
         mIgnoreReturn(),
         mExitWithReturn(false),
@@ -337,6 +338,11 @@ Machine::Machine(VM& vm)
     //	_registers.resize(16);
 }
 
+Global_as*
+Machine::global()
+{
+    return _global;
+}
 
 void
 Machine::execute()
@@ -1330,7 +1336,7 @@ Machine::execute()
                     if (!b) throw ASReferenceError();
                     
                     as_function *f = // b->isGetterSetter() ? b->getGetter() :
-                        b->getValue(super).to_as_function();
+                        b->getValue(*super).to_as_function();
 
                     if (opcode == SWF::ABC_ACTION_CALLSUPER) {
                         pushCall(f, super, _stack.top(argc), argc, 0);

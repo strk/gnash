@@ -22,18 +22,19 @@
 #endif
 
 #include "xml/XMLNode_as.h"
-//FIXME: direct this to the proper flash namespace
 #include "xml/XMLDocument_as.h"
 #include "Array_as.h"
 #include "Object.h"
 #include "VM.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "string_table.h"
 #include "PropertyList.h"
+#include "Global_as.h"
 
 #include <boost/bind.hpp>
 #include <string>
@@ -245,7 +246,7 @@ void
 XMLNode_as::setAttribute(const std::string& name, const std::string& value)
 {
     if (_attributes) {
-        string_table& st = _vm.getStringTable();
+        string_table& st = getStringTable(*this);
         _attributes->set_member(st.find(name), value);
     }
 }
@@ -376,7 +377,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     // Node as_value first, then children
     if (type == Text)
     {
-        as_object* global = xml.getVM().getGlobal();
+        as_object* global = getVM(xml).getGlobal();
         assert(global);
 
         // Insert entities.
@@ -422,7 +423,7 @@ XMLNode_as::markReachableResources() const
 void
 XMLNode_as::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
     vm.registerNative(xmlnode_cloneNode, 253, 1);
     vm.registerNative(xmlnode_removeNode, 253, 2);
     vm.registerNative(xmlnode_insertBefore, 253, 3);
@@ -446,11 +447,12 @@ void
 XMLNode_as::init(as_object& global)
 {
     // This is the global XMLNode_as "class"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());;
     }
 
     global.init_member("XMLNode", cl.get());
@@ -462,9 +464,10 @@ namespace {
 void
 attachXMLNodeInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     // These need to be full-featured AS functions (builtin_function)
     
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int noFlags = 0;
     
@@ -475,9 +478,9 @@ attachXMLNodeInterface(as_object& o)
     o.init_member("appendChild", vm.getNative(253, 4), noFlags);
     o.init_member("hasChildNodes", vm.getNative(253, 5), noFlags);
     o.init_member("toString", vm.getNative(253, 6), noFlags);
-    o.init_member("getPrefixForNamespace", new builtin_function(
+    o.init_member("getPrefixForNamespace", gl->createFunction(
                 xmlnode_getPrefixForNamespace), noFlags);
-    o.init_member("getNamespaceForPrefix", new builtin_function(
+    o.init_member("getNamespaceForPrefix", gl->createFunction(
                 xmlnode_getNamespaceForPrefix), noFlags);
 
 

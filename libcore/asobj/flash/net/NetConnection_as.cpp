@@ -24,6 +24,7 @@
 #include "net/NetConnection_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -60,10 +61,11 @@ public:
 // extern (used by Global.cpp)
 void netconnection_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&netconnection_ctor, getNetConnectionInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netconnection_ctor, getNetConnectionInterface());;
         attachNetConnectionStaticInterface(*cl);
     }
 
@@ -76,19 +78,19 @@ namespace {
 void
 attachNetConnectionInterface(as_object& o)
 {
-    o.init_member("call", new builtin_function(netconnection_call));
-    o.init_member("close", new builtin_function(netconnection_close));
-    o.init_member("connect", new builtin_function(netconnection_connect));
-    o.init_member("asyncError", new builtin_function(netconnection_asyncError));
-    o.init_member("ioError", new builtin_function(netconnection_ioError));
-    o.init_member("netStatus", new builtin_function(netconnection_netStatus));
-    o.init_member("securityError", new builtin_function(netconnection_securityError));
+    Global_as* gl = getGlobal(o);
+    o.init_member("call", gl->createFunction(netconnection_call));
+    o.init_member("close", gl->createFunction(netconnection_close));
+    o.init_member("connect", gl->createFunction(netconnection_connect));
+    o.init_member("asyncError", gl->createFunction(netconnection_asyncError));
+    o.init_member("ioError", gl->createFunction(netconnection_ioError));
+    o.init_member("netStatus", gl->createFunction(netconnection_netStatus));
+    o.init_member("securityError", gl->createFunction(netconnection_securityError));
 }
 
 void
 attachNetConnectionStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

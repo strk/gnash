@@ -579,7 +579,7 @@ as_value::to_primitive(AsType hint) const
 
 	assert(obj);
 
-	as_environment env(obj->getVM());
+	as_environment env(getVM(*obj));
 	as_value ret = call_method0(method, env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
@@ -684,7 +684,7 @@ as_value::convert_to_primitive(AsType hint)
 
 	assert(obj);
 
-	as_environment env(obj->getVM());
+	as_environment env(getVM(*obj));
 	as_value ret = call_method0(method, env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);

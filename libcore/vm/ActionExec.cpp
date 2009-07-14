@@ -150,7 +150,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
 void
 ActionExec::operator() ()
 {
-    VM& vm = env.getVM();
+    VM& vm = getVM(env);
 
     // Do not execute if scripts are disabled
     if ( vm.getRoot().scriptsDisabled() ) return;
@@ -598,7 +598,7 @@ ActionExec::processExceptions(TryBlock& t)
 void
 ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argument...
 {
-    VM& vm = env.getVM();
+    VM& vm = getVM(env);
 
     //assert(_originalTarget); // this execution context might have been started while target had a null target
     env.set_target(_originalTarget);
@@ -622,7 +622,7 @@ ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argume
     );
 
     // Have movie_root flush any newly pushed actions in higher priority queues
-    env.getVM().getRoot().flushHigherPriorityActionQueues();
+    getRoot(env).flushHigherPriorityActionQueues();
 
 //    log_debug("After cleanup of ActionExec %p, env %p has "
 //        "stack size of %d and callStackDepth of %d",
@@ -702,7 +702,7 @@ ActionExec::delVariable(const std::string& name)
 bool
 ActionExec::delObjectMember(as_object& obj, const std::string& name)
 {
-    string_table& st = env.getVM().getStringTable();
+    string_table& st = getStringTable(env);
     std::pair<bool,bool> ret = obj.delProperty(st.find(PROPNAME(name)));
     return ret.second;
 }
@@ -742,7 +742,7 @@ void
 ActionExec::setObjectMember(as_object& obj, const std::string& var,
         const as_value& val)
 {
-    string_table& st = env.getVM().getStringTable();
+    string_table& st = getStringTable(env);
     obj.set_member(st.find(var), val);
 }
 
@@ -750,7 +750,7 @@ bool
 ActionExec::getObjectMember(as_object& obj, const std::string& var,
         as_value& val)
 {
-    string_table& st = env.getVM().getStringTable();
+    string_table& st = getStringTable(env);
     return obj.get_member(st.find(var), &val);
 }
 

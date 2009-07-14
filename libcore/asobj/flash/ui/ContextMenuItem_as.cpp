@@ -24,6 +24,7 @@
 #include "ui/ContextMenuItem_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" 
@@ -43,10 +44,11 @@ namespace {
 void
 contextmenuitem_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&contextmenuitem_ctor,
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&contextmenuitem_ctor,
                 getContextMenuItemInterface());
     }
 
@@ -63,7 +65,8 @@ attachContextMenuItemInterface(as_object& o)
                       as_prop_flags::dontDelete |
                       as_prop_flags::onlySWF7Up;
 
-    o.init_member("copy", new builtin_function(contextmenuitem_copy), flags);
+    Global_as* gl = getGlobal(o);
+    o.init_member("copy", gl->createFunction(contextmenuitem_copy), flags);
 }
 
 as_object*
@@ -84,7 +87,7 @@ contextmenuitem_copy(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value caption, separatorBefore, visible, enabled, onSelect;
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
 
     ptr->get_member(st.find("caption"), &caption);
     ptr->get_member(st.find("separatorBefore"), &separatorBefore);
@@ -108,7 +111,7 @@ contextmenuitem_ctor(const fn_call& fn)
 {
     as_object* obj = new as_object(getContextMenuItemInterface());
 
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
 
     obj->set_member(st.find("caption"), fn.nargs ? fn.arg(0) : as_value());
     obj->set_member(NSV::PROP_ON_SELECT, fn.nargs > 1 ? fn.arg(1) : as_value());

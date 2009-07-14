@@ -24,6 +24,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h"
@@ -113,8 +114,10 @@ getBooleanConstructor()
 void
 attachBooleanInterface(as_object& o)
 {
-	o.init_member("toString", new builtin_function(boolean_tostring));
-	o.init_member("valueOf", new builtin_function(boolean_valueof));
+    Global_as* gl = getGlobal(o);
+
+	o.init_member("toString", gl->createFunction(boolean_tostring));
+	o.init_member("valueOf", gl->createFunction(boolean_valueof));
 }
 
 as_object*

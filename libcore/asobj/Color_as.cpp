@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
@@ -126,7 +127,7 @@ private:
 
 void registerColorNative(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
 	vm.registerNative(color_setrgb, 700, 0);
 	vm.registerNative(color_settransform, 700, 1);
@@ -138,11 +139,12 @@ void registerColorNative(as_object& o)
 void color_class_init(as_object& global)
 {
 	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&color_ctor, getColorInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&color_ctor, getColorInterface());;
 	}
 
 	// Register _global.Color
@@ -156,7 +158,7 @@ namespace {
 void
 attachColorInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
@@ -322,7 +324,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	string_table& st = obj->getVM().getStringTable();
+	string_table& st = getStringTable(*obj);
 
 	cxform newTrans = obj->getTransform();
 

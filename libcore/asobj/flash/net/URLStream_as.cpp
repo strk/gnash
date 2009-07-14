@@ -24,6 +24,7 @@
 #include "net/URLStream_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -74,10 +75,11 @@ public:
 // extern (used by Global.cpp)
 void urlstream_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&urlstream_ctor, getURLStreamInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&urlstream_ctor, getURLStreamInterface());;
         attachURLStreamStaticInterface(*cl);
     }
 
@@ -90,27 +92,28 @@ namespace {
 void
 attachURLStreamInterface(as_object& o)
 {
-    o.init_member("load", new builtin_function(urlstream_load));
-    o.init_member("readBoolean", new builtin_function(urlstream_readBoolean));
-    o.init_member("readByte", new builtin_function(urlstream_readByte));
-    o.init_member("readBytes", new builtin_function(urlstream_readBytes));
-    o.init_member("readDouble", new builtin_function(urlstream_readDouble));
-    o.init_member("readFloat", new builtin_function(urlstream_readFloat));
-    o.init_member("readInt", new builtin_function(urlstream_readInt));
-    o.init_member("readMultiByte", new builtin_function(urlstream_readMultiByte));
-    o.init_member("readObject", new builtin_function(urlstream_readObject));
-    o.init_member("readShort", new builtin_function(urlstream_readShort));
-    o.init_member("readUnsignedByte", new builtin_function(urlstream_readUnsignedByte));
-    o.init_member("readUnsignedInt", new builtin_function(urlstream_readUnsignedInt));
-    o.init_member("readUnsignedShort", new builtin_function(urlstream_readUnsignedShort));
-    o.init_member("readUTF", new builtin_function(urlstream_readUTF));
-    o.init_member("readUTFBytes", new builtin_function(urlstream_readUTFBytes));
-    o.init_member("complete", new builtin_function(urlstream_complete));
-    o.init_member("httpStatus", new builtin_function(urlstream_httpStatus));
-    o.init_member("ioError", new builtin_function(urlstream_ioError));
-    o.init_member("open", new builtin_function(urlstream_open));
-    o.init_member("progress", new builtin_function(urlstream_progress));
-    o.init_member("securityError", new builtin_function(urlstream_securityError));
+    Global_as* gl = getGlobal(o);
+    o.init_member("load", gl->createFunction(urlstream_load));
+    o.init_member("readBoolean", gl->createFunction(urlstream_readBoolean));
+    o.init_member("readByte", gl->createFunction(urlstream_readByte));
+    o.init_member("readBytes", gl->createFunction(urlstream_readBytes));
+    o.init_member("readDouble", gl->createFunction(urlstream_readDouble));
+    o.init_member("readFloat", gl->createFunction(urlstream_readFloat));
+    o.init_member("readInt", gl->createFunction(urlstream_readInt));
+    o.init_member("readMultiByte", gl->createFunction(urlstream_readMultiByte));
+    o.init_member("readObject", gl->createFunction(urlstream_readObject));
+    o.init_member("readShort", gl->createFunction(urlstream_readShort));
+    o.init_member("readUnsignedByte", gl->createFunction(urlstream_readUnsignedByte));
+    o.init_member("readUnsignedInt", gl->createFunction(urlstream_readUnsignedInt));
+    o.init_member("readUnsignedShort", gl->createFunction(urlstream_readUnsignedShort));
+    o.init_member("readUTF", gl->createFunction(urlstream_readUTF));
+    o.init_member("readUTFBytes", gl->createFunction(urlstream_readUTFBytes));
+    o.init_member("complete", gl->createFunction(urlstream_complete));
+    o.init_member("httpStatus", gl->createFunction(urlstream_httpStatus));
+    o.init_member("ioError", gl->createFunction(urlstream_ioError));
+    o.init_member("open", gl->createFunction(urlstream_open));
+    o.init_member("progress", gl->createFunction(urlstream_progress));
+    o.init_member("securityError", gl->createFunction(urlstream_securityError));
 }
 
 void

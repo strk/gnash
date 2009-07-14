@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -51,10 +52,11 @@ namespace {
 void
 contextmenu_class_init(as_object& global)
 {
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if (cl == NULL) {
-		cl=new builtin_function(contextmenu_ctor, getContextMenuInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(contextmenu_ctor, getContextMenuInterface());;
 	}
 
 	// Register _global.ContextMenu
@@ -68,7 +70,7 @@ void
 setBuiltInItems(as_object& o, bool setting)
 {
     const int flags = 0;
-    string_table& st = o.getVM().getStringTable();
+    string_table& st = getStringTable(o);
     o.set_member(st.find("print"), setting, flags);
     o.set_member(st.find("forward_back"), setting, flags);
     o.set_member(st.find("rewind"), setting, flags);
@@ -87,9 +89,10 @@ attachContextMenuInterface(as_object& o)
                       as_prop_flags::dontEnum |
                       as_prop_flags::onlySWF7Up;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("hideBuiltInItems",
-            new builtin_function(contextmenu_hideBuiltInItems), flags);
-    o.init_member("copy", new builtin_function(contextmenu_copy), flags);
+            gl->createFunction(contextmenu_hideBuiltInItems), flags);
+    o.init_member("copy", gl->createFunction(contextmenu_copy), flags);
 }
 
 as_object*
@@ -108,7 +111,7 @@ as_value
 contextmenu_hideBuiltInItems(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     as_object* builtIns = new as_object;
     setBuiltInItems(*builtIns, false);
     ptr->set_member(st.find("builtInItems"), builtIns);
@@ -121,7 +124,7 @@ contextmenu_copy(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     as_object* o = new as_object(getContextMenuInterface());
     
-    string_table& st = ptr->getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     as_value onSelect, builtInItems;
     as_value customItems = new Array_as;;
 
@@ -160,7 +163,7 @@ contextmenu_ctor(const fn_call& fn)
     const as_value& callback = fn.nargs ? fn.arg(0) : as_value();
     obj->set_member(NSV::PROP_ON_SELECT, callback);
     
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     as_object* builtInItems = new as_object;
     setBuiltInItems(*builtInItems, true);
     obj->set_member(st.find("builtInItems"), builtInItems);

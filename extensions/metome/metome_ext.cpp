@@ -69,7 +69,7 @@ static void
 attachInterface(as_object *obj)
 {
     GNASH_REPORT_FUNCTION;
-    obj->init_member("connect", new builtin_function(metome_ext_connect));
+    obj->init_member("connect", gl->createFunction(metome_ext_connect));
 }
 
 static as_object*
@@ -123,7 +123,8 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&metome_ctor, getInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&metome_ctor, getInterface());;
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    attachInterface(cl.get());

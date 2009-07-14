@@ -29,7 +29,7 @@
 #include "CodeStream.h"
 #include "action_buffer.h"
 #include "Machine.h"
-#include "Global.h"
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -322,7 +322,7 @@ AbcBlock::AbcBlock()
     :
     _stringTable(&VM::get().getStringTable())
 {
-	mCH = VM::get().getMachine()->classHierarchy();
+	mCH = &VM::get().getMachine()->global()->classHierarchy();
 	// TODO: Make this the real 'Object' prototype.
 	mCH->getGlobalNs()->stubPrototype(*mCH, NSV::CLASS_OBJECT);
 	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);

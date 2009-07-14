@@ -36,6 +36,7 @@
 #include "MovieFactory.h"
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
+#include "Global_as.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>

@@ -24,6 +24,7 @@
 #include "net/URLVariables_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -54,10 +55,11 @@ public:
 // extern (used by Global.cpp)
 void urlvariables_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&urlvariables_ctor, getURLVariablesInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&urlvariables_ctor, getURLVariablesInterface());;
         attachURLVariablesStaticInterface(*cl);
     }
 
@@ -70,13 +72,13 @@ namespace {
 void
 attachURLVariablesInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(urlvariables_toString));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(urlvariables_toString));
 }
 
 void
 attachURLVariablesStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

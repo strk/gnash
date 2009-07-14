@@ -27,16 +27,15 @@
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
-#include "Global.h"
 
 namespace gnash {
+    class Global_as;
     class DisplayObject;
     class as_object;
     class AbcBlock;
     class asName;
     class Property;
     class CodeStream;
-    class AVM2Global;
 }
 
 
@@ -226,17 +225,7 @@ public:
     /// do not share any ActionScript resources. It should be the same
     /// for a complete run of the Machine so that modifications carried out
     /// by scripts are preserved for subsequent scripts.
-    as_object* global() {
-        return _global;
-    }
-
-    /// Return the ClassHierarchy used by our global object.
-    //
-    /// This is used in parsing, though maybe would be better accessed
-    /// through the Global object.
-    ClassHierarchy* classHierarchy() {
-        return &_global->classHierarchy();
-    }
+    Global_as* global();
 
     void markReachableResources() const;
 
@@ -364,9 +353,7 @@ private:
 	as_object* mThis;
 
     /// The global object for this machine.
-    //
-    /// We need to know the type to access the ClassHierarchy.
-	AVM2Global* _global;
+	Global_as* _global;
 
 	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.

@@ -25,17 +25,18 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h"
 #include "as_function.h"
-#include "as_environment.h" // for enumerateProperties
-#include "movie_root.h" // for enumerateProperties
-#include "event_id.h" // for enumerateProperties
-#include "Property.h" // for findGetterSetter
+#include "as_environment.h" 
+#include "movie_root.h" 
+#include "event_id.h" 
+#include "Property.h"
 #include "VM.h"
 #include "GnashException.h"
-#include "fn_call.h" // for generic methods
-#include "Object.h" // for getObjectInterface
-#include "action.h" // for call_method
-#include "Array_as.h" // for setPropFlags
-#include "as_function.h" // for inheritance of as_super
+#include "fn_call.h" 
+#include "Object.h" 
+#include "action.h" 
+#include "Array_as.h"
+#include "as_function.h"
+#include "Global_as.h" 
 
 #include <set>
 #include <string>
@@ -86,7 +87,6 @@ public:
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0)
 	{
-		//log_debug("as_super::get_member %s called - _proto is %p", getVM().getStringTable().value(name), _proto);
 		if ( _proto ) return _proto->get_member(name, val, nsname);
 		log_debug("Super has no associated prototype");
 		return false;
@@ -151,11 +151,10 @@ as_super::get_super(const char* fname)
 
 	//log_debug("super %p proto is %p, its prototype %p", this, proto, proto->get_prototype());
 
-	VM& vm = getVM();
-	if ( fname && vm.getSWFVersion() > 6)
+	if ( fname && getSWFVersion(*this) > 6)
 	{
 		as_object* owner = 0;
-		string_table& st = vm.getStringTable();
+		string_table& st = getStringTable(*this);
 		string_table::key k = st.find(fname);
 
 		proto->findProperty(k, 0, &owner);
@@ -374,11 +373,10 @@ as_object::get_super(const char* fname)
 	// Our class prototype is __proto__.
 	as_object* proto = get_prototype().get();
 
-	VM& vm = getVM();
-	if ( fname && vm.getSWFVersion() > 6)
+	if ( fname && getSWFVersion(*this) > 6)
 	{
 		as_object* owner = 0;
-		string_table& st = vm.getStringTable();
+		string_table& st = getStringTable(*this);
 		string_table::key k = st.find(fname);
 		findProperty(k, 0, &owner);
         // should be 0 if findProperty returned 0
@@ -1018,7 +1016,8 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 
 	// The passed argument has to be considered an array
 	//std::pair<size_t, size_t> result = 
-	FlagsSetterVisitor visitor(getVM().getStringTable(), _members, set_true, set_false);
+	FlagsSetterVisitor visitor(getStringTable(*this), _members, set_true,
+            set_false);
 	ary->visitAll(visitor);
 	//_members.setFlagsAll(props->_members, set_true, set_false);
 }
@@ -1073,13 +1072,6 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 		obj = obj->get_prototype();
 	}
 
-}
-
-as_object::as_object(movie_root& mr)
-	:
-	_vm(mr.getVM()),
-	_members(_vm)
-{
 }
 
 
@@ -1365,14 +1357,14 @@ as_object::unwatch(string_table::key key, string_table::key ns)
 	if ( trigIter == _trigs.end() )
 	{
 		log_debug("No watch for property %s",
-                getVM().getStringTable().value(key));
+                getStringTable(*this).value(key));
 		return false;
 	}
 	Property* prop = _members.getProperty(key, ns);
 	if ( prop && prop->isGetterSetter() )
 	{
 		log_debug("Watch on %s not removed (is a getter-setter)",
-                getVM().getStringTable().value(key));
+                getStringTable(*this).value(key));
 		return false;
 	}
 	_trigs.erase(trigIter);
@@ -1444,6 +1436,43 @@ as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
     _members.visitNonHiddenValues(visitor, *this);
 }
 
+/// Get the VM from an as_object
+VM&
+getVM(const as_object& o)
+{
+    return o.vm();
+}
+
+/// Get the movie_root from an as_object
+movie_root&
+getRoot(const as_object& o)
+{
+    return o.vm().getRoot();
+}
+
+/// Get the string_table from an as_object
+string_table&
+getStringTable(const as_object& o)
+{
+    return o.vm().getStringTable();
+}
+
+const RunResources&
+getRunResources(const as_object& o)
+{
+    return o.vm().getRoot().runResources();
+}
+
+int
+getSWFVersion(const as_object& o)
+{
+    return o.vm().getSWFVersion();
+}
+
+Global_as* getGlobal(const as_object& o)
+{
+    return o.vm().getGlobal();
+}
 
 
 } // end of gnash namespace

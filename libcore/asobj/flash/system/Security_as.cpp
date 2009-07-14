@@ -24,6 +24,7 @@
 #include "system/Security_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -60,10 +61,11 @@ public:
 // extern (used by Global.cpp)
 void security_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&security_ctor, getSecurityInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&security_ctor, getSecurityInterface());;
         attachSecurityStaticInterface(*cl);
     }
 
@@ -76,19 +78,19 @@ namespace {
 void
 attachSecurityInterface(as_object& o)
 {
-    o.init_member("allowInsecureDomain", new builtin_function(security_allowInsecureDomain));
-    o.init_member("loadPolicyFile", new builtin_function(security_loadPolicyFile));
-    o.init_member("showSettings", new builtin_function(security_showSettings));
-    o.init_member("LOCAL_TRUSTED", new builtin_function(security_LOCAL_TRUSTED));
-    o.init_member("LOCAL_WITH_FILE", new builtin_function(security_LOCAL_WITH_FILE));
-    o.init_member("LOCAL_WITH_NETWORK", new builtin_function(security_LOCAL_WITH_NETWORK));
-    o.init_member("REMOTE", new builtin_function(security_REMOTE));
+    Global_as* gl = getGlobal(o);
+    o.init_member("allowInsecureDomain", gl->createFunction(security_allowInsecureDomain));
+    o.init_member("loadPolicyFile", gl->createFunction(security_loadPolicyFile));
+    o.init_member("showSettings", gl->createFunction(security_showSettings));
+    o.init_member("LOCAL_TRUSTED", gl->createFunction(security_LOCAL_TRUSTED));
+    o.init_member("LOCAL_WITH_FILE", gl->createFunction(security_LOCAL_WITH_FILE));
+    o.init_member("LOCAL_WITH_NETWORK", gl->createFunction(security_LOCAL_WITH_NETWORK));
+    o.init_member("REMOTE", gl->createFunction(security_REMOTE));
 }
 
 void
 attachSecurityStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

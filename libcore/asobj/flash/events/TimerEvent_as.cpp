@@ -24,6 +24,7 @@
 #include "events/TimerEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -57,10 +58,11 @@ public:
 // extern (used by Global.cpp)
 void timerevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&timerevent_ctor, getTimerEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&timerevent_ctor, getTimerEventInterface());;
         attachTimerEventStaticInterface(*cl);
     }
 
@@ -73,16 +75,16 @@ namespace {
 void
 attachTimerEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(timerevent_toString));
-    o.init_member("updateAfterEvent", new builtin_function(timerevent_updateAfterEvent));
-    o.init_member("TIMER", new builtin_function(timerevent_TIMER));
-    o.init_member("TIMER_COMPLETE", new builtin_function(timerevent_TIMER_COMPLETE));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(timerevent_toString));
+    o.init_member("updateAfterEvent", gl->createFunction(timerevent_updateAfterEvent));
+    o.init_member("TIMER", gl->createFunction(timerevent_TIMER));
+    o.init_member("TIMER_COMPLETE", gl->createFunction(timerevent_TIMER_COMPLETE));
 }
 
 void
 attachTimerEventStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

@@ -25,6 +25,7 @@
 #include "as_object.h" 
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
 #include "Object.h" 
@@ -61,8 +62,10 @@ public:
 void
 qname_class_init(as_object& where)
 {
-    boost::intrusive_ptr<builtin_function> cl;
-    cl = new builtin_function(&qname_ctor, getQNameInterface());
+    boost::intrusive_ptr<as_object> cl;
+
+    Global_as* gl = getGlobal(where);
+    cl = gl->createClass(&qname_ctor, getQNameInterface());;
 
     where.init_member("QName", cl.get());
 }

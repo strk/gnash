@@ -53,9 +53,9 @@ static void
 attachInterface(as_object *obj)
 {
     GNASH_REPORT_FUNCTION;
-    obj->init_member("lirc_init", new builtin_function(lirc_ext_init));
-    obj->init_member("lirc_getKey", new builtin_function(lirc_ext_getkey));
-    obj->init_member("lirc_getButton", new builtin_function(lirc_ext_getbutton));
+    obj->init_member("lirc_init", gl->createFunction(lirc_ext_init));
+    obj->init_member("lirc_getKey", gl->createFunction(lirc_ext_getkey));
+    obj->init_member("lirc_getButton", gl->createFunction(lirc_ext_getbutton));
 }
 
 static as_object*
@@ -145,7 +145,8 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&lirc_ctor, getInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&lirc_ctor, getInterface());;
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    attachInterface(cl.get());

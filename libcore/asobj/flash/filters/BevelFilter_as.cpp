@@ -21,7 +21,7 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "flash/filters/BitmapFilter_as.h"
-
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -54,13 +54,13 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
+    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> BevelFilter_as::s_interface;
-boost:: intrusive_ptr<builtin_function> BevelFilter_as::s_ctor;
+boost::intrusive_ptr<as_object> BevelFilter_as::s_ctor;
 
 as_object*
 BevelFilter_as::Interface() {
@@ -75,7 +75,8 @@ BevelFilter_as::Interface() {
 void
 BevelFilter_as::registerCtor(as_object& global) {
     if (BevelFilter_as::s_ctor != NULL) return;
-    BevelFilter_as::s_ctor = new builtin_function(&BevelFilter_as::ctor, BevelFilter_as::Interface());
+    Global_as* gl = getGlobal(global);
+    BevelFilter_as::s_ctor = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());;
     VM::get().addStatic(BevelFilter_as::s_ctor.get());
     BevelFilter_as::attachInterface(*BevelFilter_as::s_ctor);
     global.init_member("BevelFilter" , BevelFilter_as::s_ctor.get());
@@ -91,9 +92,10 @@ bevelfilter_class_init(as_object& global)
 void
 BevelFilter_as::attachInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     boost::intrusive_ptr<builtin_function> gs;
 
-    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
+    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
 
 }
 
@@ -101,42 +103,30 @@ BevelFilter_as::attachInterface(as_object& o)
 void
 BevelFilter_as::attachProperties(as_object& o) {
     boost::intrusive_ptr<builtin_function> gs;
-
-    gs = new builtin_function(BevelFilter_as::distance_gs, NULL);
-    o.init_property("distance" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::angle_gs, NULL);
-    o.init_property("angle" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::highlightColor_gs, NULL);
-    o.init_property("highlightColor" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::highlightAlpha_gs, NULL);
-    o.init_property("highlightAlpha" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::shadowColor_gs, NULL);
-    o.init_property("shadowColor" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::shadowAlpha_gs, NULL);
-    o.init_property("shadowAlpha" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::strength_gs, NULL);
-    o.init_property("strength" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::type_gs, NULL);
-    o.init_property("type" , *gs, *gs);
-
-    gs = new builtin_function(BevelFilter_as::knockout_gs, NULL);
-    o.init_property("knockout" , *gs, *gs);
+    o.init_property("distance" , BevelFilter_as::distance_gs, 
+        BevelFilter_as::distance_gs);
+    o.init_property("angle" , BevelFilter_as::angle_gs, 
+        BevelFilter_as::angle_gs);
+    o.init_property("highlightColor" , BevelFilter_as::highlightColor_gs, 
+        BevelFilter_as::highlightColor_gs);
+    o.init_property("highlightAlpha" , BevelFilter_as::highlightAlpha_gs, 
+        BevelFilter_as::highlightAlpha_gs);
+    o.init_property("shadowColor" , BevelFilter_as::shadowColor_gs, 
+        BevelFilter_as::shadowColor_gs);
+    o.init_property("shadowAlpha" , BevelFilter_as::shadowAlpha_gs, 
+        BevelFilter_as::shadowAlpha_gs);
+    o.init_property("blurX" , BevelFilter_as::blurX_gs, 
+        BevelFilter_as::blurX_gs);
+    o.init_property("blurY" , BevelFilter_as::blurY_gs, 
+        BevelFilter_as::blurY_gs);
+    o.init_property("strength" , BevelFilter_as::strength_gs, 
+        BevelFilter_as::strength_gs);
+    o.init_property("quality" , BevelFilter_as::quality_gs, 
+        BevelFilter_as::quality_gs);
+    o.init_property("type" , BevelFilter_as::type_gs, 
+        BevelFilter_as::type_gs);
+    o.init_property("knockout" , BevelFilter_as::knockout_gs, 
+        BevelFilter_as::knockout_gs);
 
 }
 

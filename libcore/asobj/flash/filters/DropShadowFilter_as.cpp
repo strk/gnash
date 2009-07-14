@@ -19,6 +19,7 @@
 #include "as_object.h"
 #include "DropShadowFilter.h"
 #include "VM.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "BitmapFilter_as.h"
 
@@ -54,14 +55,14 @@ public:
     
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
+    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> DropShadowFilter_as::s_interface;
 
-boost:: intrusive_ptr<builtin_function> DropShadowFilter_as::s_ctor;
+boost:: intrusive_ptr<as_object> DropShadowFilter_as::s_ctor;
 
 as_object*
 DropShadowFilter_as::Interface() {
@@ -76,7 +77,8 @@ DropShadowFilter_as::Interface() {
 void
 DropShadowFilter_as::registerCtor(as_object& global) {
     if (DropShadowFilter_as::s_ctor != NULL) return;
-    DropShadowFilter_as::s_ctor = new builtin_function(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());
+    Global_as* gl = getGlobal(global);
+    DropShadowFilter_as::s_ctor = gl->createClass(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());;
     VM::get().addStatic(DropShadowFilter_as::s_ctor.get());
     DropShadowFilter_as::attachInterface(*DropShadowFilter_as::s_ctor);
     global.init_member("DropShadowFilter" , DropShadowFilter_as::s_ctor.get());
@@ -90,9 +92,10 @@ dropshadowfilter_class_init(as_object& global)
 
 
 void DropShadowFilter_as::attachInterface(as_object& o) {
+    Global_as* gl = getGlobal(o);
     boost::intrusive_ptr<builtin_function> gs;
 
-    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
+    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
 
 }
 
@@ -100,39 +103,28 @@ void
 DropShadowFilter_as::attachProperties(as_object& o)
 {
     boost::intrusive_ptr<builtin_function> gs;
-
-    gs = new builtin_function(DropShadowFilter_as::distance_gs, NULL);
-    o.init_property("distance" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::angle_gs, NULL);
-    o.init_property("angle" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::color_gs, NULL);
-    o.init_property("color" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::alpha_gs, NULL);
-    o.init_property("alpha" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::strength_gs, NULL);
-    o.init_property("strength" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::inner_gs, NULL);
-    o.init_property("inner" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::knockout_gs, NULL);
-    o.init_property("knockout" , *gs, *gs);
-
-    gs = new builtin_function(DropShadowFilter_as::hideObject_gs, NULL);
-    o.init_property("hideObject" , *gs, *gs);
+    o.init_property("distance" , DropShadowFilter_as::distance_gs, 
+        DropShadowFilter_as::distance_gs);
+    o.init_property("angle" , DropShadowFilter_as::angle_gs, 
+        DropShadowFilter_as::angle_gs);
+    o.init_property("color" , DropShadowFilter_as::color_gs, 
+        DropShadowFilter_as::color_gs);
+    o.init_property("alpha" , DropShadowFilter_as::alpha_gs, 
+        DropShadowFilter_as::alpha_gs);
+    o.init_property("blurX" , DropShadowFilter_as::blurX_gs, 
+        DropShadowFilter_as::blurX_gs);
+    o.init_property("blurY" , DropShadowFilter_as::blurY_gs, 
+        DropShadowFilter_as::blurY_gs);
+    o.init_property("strength" , DropShadowFilter_as::strength_gs, 
+        DropShadowFilter_as::strength_gs);
+    o.init_property("quality" , DropShadowFilter_as::quality_gs, 
+        DropShadowFilter_as::quality_gs);
+    o.init_property("inner" , DropShadowFilter_as::inner_gs, 
+        DropShadowFilter_as::inner_gs);
+    o.init_property("knockout" , DropShadowFilter_as::knockout_gs, 
+        DropShadowFilter_as::knockout_gs);
+    o.init_property("hideObject" , DropShadowFilter_as::hideObject_gs, 
+        DropShadowFilter_as::hideObject_gs);
 
 }
 

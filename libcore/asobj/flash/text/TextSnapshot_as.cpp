@@ -27,6 +27,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
@@ -73,10 +74,11 @@ namespace {
 // extern (used by Global.cpp)
 void TextSnapshot_as::init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&textsnapshot_ctor, getTextSnapshotInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textsnapshot_ctor, getTextSnapshotInterface());;
         attachTextSnapshotStaticInterface(*cl);
     }
 
@@ -395,24 +397,25 @@ attachTextSnapshotInterface(as_object& o)
 
     const int flags = as_prop_flags::onlySWF6Up;
 
-	o.init_member("findText", new builtin_function(textsnapshot_findText),
+    Global_as* gl = getGlobal(o);
+	o.init_member("findText", gl->createFunction(textsnapshot_findText),
             flags);
-	o.init_member("getCount", new builtin_function(textsnapshot_getCount),
+	o.init_member("getCount", gl->createFunction(textsnapshot_getCount),
             flags);
 	o.init_member("getTextRunInfo",
-            new builtin_function(textsnapshot_getTextRunInfo), flags);
+            gl->createFunction(textsnapshot_getTextRunInfo), flags);
 	o.init_member("getSelected",
-            new builtin_function(textsnapshot_getSelected), flags);
+            gl->createFunction(textsnapshot_getSelected), flags);
 	o.init_member("getSelectedText",
-            new builtin_function(textsnapshot_getSelectedText), flags);
+            gl->createFunction(textsnapshot_getSelectedText), flags);
 	o.init_member("getText",
-            new builtin_function(textsnapshot_getText), flags);
+            gl->createFunction(textsnapshot_getText), flags);
 	o.init_member("hitTestTextNearPos",
-            new builtin_function(textsnapshot_hitTestTextNearPos), flags);
+            gl->createFunction(textsnapshot_hitTestTextNearPos), flags);
 	o.init_member("setSelectColor",
-            new builtin_function(textsnapshot_setSelectColor), flags);
+            gl->createFunction(textsnapshot_setSelectColor), flags);
 	o.init_member("setSelected",
-            new builtin_function(textsnapshot_setSelected), flags);
+            gl->createFunction(textsnapshot_setSelected), flags);
 }
 
 as_object*

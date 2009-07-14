@@ -30,6 +30,7 @@
 #include "movie_root.h"
 #include "movie_definition.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "GnashException.h" // for ActionException
 #include "builtin_function.h" // need builtin_function
 #include "smart_ptr.h" // for boost intrusive_ptr
@@ -87,7 +88,7 @@ Sound_as::Sound_as()
     soundId(-1),
     externalSound(false),
     isStreaming(false),
-    _soundHandler(_vm.getRoot().runResources().soundHandler()),
+    _soundHandler(getRunResources(*this).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _startTime(0),
     _leftOverData(),
@@ -118,12 +119,13 @@ Sound_as::init(as_object& global)
 {
 
     // This is going to be the global Sound "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
         as_object* iface = getSoundInterface();
-        cl=new builtin_function(&sound_new, iface);
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&sound_new, iface);;
         iface->set_member_flags(NSV::PROP_CONSTRUCTOR, as_prop_flags::readOnly);
     }
 
@@ -137,7 +139,7 @@ void
 Sound_as::startProbeTimer()
 {
     _probeTimer = 1;
-    getVM().getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
 }
 
 /*private*/
@@ -150,8 +152,7 @@ Sound_as::stopProbeTimer()
 
     if ( _probeTimer )
     {
-        VM& vm = getVM();
-        vm.getRoot().removeAdvanceCallback(this);
+        getRoot(*this).removeAdvanceCallback(this);
         log_debug(" sound callback removed");
         _probeTimer = 0;
     }
@@ -352,12 +353,12 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     /// changed that.
     _startTime=0;
 
-    const movie_root& mr = _vm.getRoot();
-    URL url(file, mr.runResources().baseURL());
+    const RunResources& rr = getRunResources(*this);
+    URL url(file, rr.baseURL());
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-    const StreamProvider& streamProvider = mr.runResources().streamProvider();
+    const StreamProvider& streamProvider = rr.streamProvider();
     std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url,
                 rcfile.saveStreamingMedia()));
     if ( ! inputStream.get() )
@@ -718,39 +719,40 @@ namespace {
 void
 attachSoundInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
     int flags = as_prop_flags::dontEnum | 
                 as_prop_flags::dontDelete | 
                 as_prop_flags::readOnly;
 
-    o.init_member("attachSound", new builtin_function(sound_attachsound),
+    o.init_member("attachSound", gl->createFunction(sound_attachsound),
             flags);
-    o.init_member("getPan", new builtin_function(sound_getpan), flags);
-    o.init_member("setPan", new builtin_function(sound_setpan), flags);
-    o.init_member("start", new builtin_function(sound_start), flags);
-    o.init_member("stop", new builtin_function(sound_stop), flags);
-    o.init_member("getTransform", new builtin_function(sound_gettransform),
+    o.init_member("getPan", gl->createFunction(sound_getpan), flags);
+    o.init_member("setPan", gl->createFunction(sound_setpan), flags);
+    o.init_member("start", gl->createFunction(sound_start), flags);
+    o.init_member("stop", gl->createFunction(sound_stop), flags);
+    o.init_member("getTransform", gl->createFunction(sound_gettransform),
             flags);
-    o.init_member("setTransform", new builtin_function(sound_settransform),
+    o.init_member("setTransform", gl->createFunction(sound_settransform),
             flags);
-    o.init_member("getVolume", new builtin_function(sound_getvolume), flags);
-    o.init_member("setVolume", new builtin_function(sound_setvolume), flags);
+    o.init_member("getVolume", gl->createFunction(sound_getvolume), flags);
+    o.init_member("setVolume", gl->createFunction(sound_setvolume), flags);
 
     int flagsn6 = flags | as_prop_flags::onlySWF6Up;
 
     o.init_member("getDuration", 
-            new builtin_function(sound_getDuration), flagsn6);
+            gl->createFunction(sound_getDuration), flagsn6);
     o.init_member("setDuration", 
-            new builtin_function(sound_setDuration), flagsn6);
-    o.init_member("loadSound", new builtin_function(sound_loadsound), flagsn6);
+            gl->createFunction(sound_setDuration), flagsn6);
+    o.init_member("loadSound", gl->createFunction(sound_loadsound), flagsn6);
     o.init_member("getPosition", 
-            new builtin_function(sound_getPosition), flagsn6);
+            gl->createFunction(sound_getPosition), flagsn6);
     o.init_member("setPosition", 
-            new builtin_function(sound_setPosition), flagsn6);
+            gl->createFunction(sound_setPosition), flagsn6);
     o.init_member("getBytesLoaded", 
-            new builtin_function(sound_getbytesloaded), flagsn6);
+            gl->createFunction(sound_getbytesloaded), flagsn6);
     o.init_member("getBytesTotal", 
-            new builtin_function(sound_getbytestotal), flagsn6);
+            gl->createFunction(sound_getbytestotal), flagsn6);
 
     int flagsn9 = as_prop_flags::dontEnum | 
                   as_prop_flags::dontDelete | 
@@ -758,7 +760,7 @@ attachSoundInterface(as_object& o)
                   as_prop_flags::onlySWF9Up;
 
     o.init_member("areSoundsInaccessible", 
-            new builtin_function(sound_areSoundsInaccessible), flagsn9);
+            gl->createFunction(sound_areSoundsInaccessible), flagsn9);
 
     // Properties
     //there's no such thing as an ID3 member (swfdec shows)

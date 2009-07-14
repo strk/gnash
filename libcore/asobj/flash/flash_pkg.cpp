@@ -47,7 +47,7 @@ get_flash_package(const fn_call& fn)
 void
 flash_package_init(as_object& where)
 {
-	string_table& st = where.getVM().getStringTable();
+	string_table& st = getStringTable(where);
 	where.init_destructive_property(st.find("flash"), get_flash_package,
 		as_prop_flags::dontEnum | as_prop_flags::onlySWF8Up);
 }

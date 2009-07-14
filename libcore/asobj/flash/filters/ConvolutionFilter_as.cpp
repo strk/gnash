@@ -58,7 +58,7 @@ public:
 void
 convolutionfilter_class_init(as_object& global)
 {
-    string_table& st = global.getVM().getStringTable();
+    string_table& st = getStringTable(global);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
@@ -111,7 +111,7 @@ getConvolutionFilterConstructor(const fn_call& fn)
     if (!cl) {
         cl = new builtin_function(&convolutionfilter_ctor,
                 getConvolutionFilterInterface());
-        fn.getVM().addStatic(cl);
+        getVM(fn).addStatic(cl);
     }
     return cl;
 }

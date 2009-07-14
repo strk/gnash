@@ -22,6 +22,7 @@
 #include "Number_as.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "as_value.h" // for doubleToString
 #include "builtin_function.h" // need builtin_function
@@ -132,10 +133,11 @@ number_ctor(const fn_call& fn)
 void
 attachNumberInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
-	o.init_member("toString", new builtin_function(number_toString));
+	o.init_member("toString", gl->createFunction(number_toString));
 
-	o.init_member("valueOf", new builtin_function(number_valueOf));
+	o.init_member("valueOf", gl->createFunction(number_valueOf));
 }
 
 void

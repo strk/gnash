@@ -713,14 +713,14 @@ public:
     void lineTo(boost::int32_t x, boost::int32_t y)
     {
         set_invalidated();
-        _drawable.lineTo(x, y, getSWFVersion());
+        _drawable.lineTo(x, y, getMovieVersion());
     }
 
     void curveTo(boost::int32_t cx, boost::int32_t cy, 
                  boost::int32_t ax, boost::int32_t ay)
     {
         set_invalidated();
-        _drawable.curveTo(cx, cy, ax, ay, getSWFVersion());
+        _drawable.curveTo(cx, cy, ax, ay, getMovieVersion());
     }
 
     void clear()
@@ -783,7 +783,7 @@ public:
     /// Return version of the SWF definition of this instance
     /// as been parsed from.
     //
-    int getSWFVersion() const;
+    int getMovieVersion() const;
 
 protected:
 

@@ -19,6 +19,7 @@
 #include "as_object.h"
 #include "GlowFilter.h"
 #include "VM.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "BitmapFilter_as.h"
 
@@ -58,13 +59,13 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
+    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> GlowFilter_as::s_interface;
-boost:: intrusive_ptr<builtin_function> GlowFilter_as::s_ctor;
+boost::intrusive_ptr<as_object> GlowFilter_as::s_ctor;
 
 as_object*
 GlowFilter_as::Interface() {
@@ -79,7 +80,8 @@ GlowFilter_as::Interface() {
 void
 GlowFilter_as::registerCtor(as_object& global) {
     if (GlowFilter_as::s_ctor != NULL) return;
-    GlowFilter_as::s_ctor = new builtin_function(&GlowFilter_as::ctor, GlowFilter_as::Interface());
+    Global_as* gl = getGlobal(global);
+    GlowFilter_as::s_ctor = gl->createClass(&GlowFilter_as::ctor, GlowFilter_as::Interface());;
     VM::get().addStatic(GlowFilter_as::s_ctor.get());
     GlowFilter_as::attachInterface(*GlowFilter_as::s_ctor);
     global.init_member("GlowFilter" , GlowFilter_as::s_ctor.get());
@@ -94,8 +96,9 @@ glowfilter_class_init(as_object& global)
 
 void
 GlowFilter_as::attachInterface(as_object& o) {
+    Global_as* gl = getGlobal(o);
     boost::intrusive_ptr<builtin_function> gs;
-    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
+    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
 
 }
 
@@ -103,29 +106,29 @@ void
 GlowFilter_as::attachProperties(as_object& o) {
     boost::intrusive_ptr<builtin_function> gs;
 
-    gs = new builtin_function(GlowFilter_as::color_gs, NULL);
-    o.init_property("color" , *gs, *gs);
+    o.init_property("color" , GlowFilter_as::color_gs, 
+        GlowFilter_as::color_gs);
 
-    gs = new builtin_function(GlowFilter_as::alpha_gs, NULL);
-    o.init_property("alpha" , *gs, *gs);
+    o.init_property("alpha" , GlowFilter_as::alpha_gs, 
+        GlowFilter_as::alpha_gs);
 
-    gs = new builtin_function(GlowFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
+    o.init_property("blurX" , GlowFilter_as::blurX_gs, 
+        GlowFilter_as::blurX_gs);
 
-    gs = new builtin_function(GlowFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
+    o.init_property("blurY" , GlowFilter_as::blurY_gs, 
+        GlowFilter_as::blurY_gs);
 
-    gs = new builtin_function(GlowFilter_as::strength_gs, NULL);
-    o.init_property("strength" , *gs, *gs);
+    o.init_property("strength" , GlowFilter_as::strength_gs, 
+        GlowFilter_as::strength_gs);
 
-    gs = new builtin_function(GlowFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
+    o.init_property("quality" , GlowFilter_as::quality_gs, 
+        GlowFilter_as::quality_gs);
 
-    gs = new builtin_function(GlowFilter_as::inner_gs, NULL);
-    o.init_property("inner" , *gs, *gs);
+    o.init_property("inner" , GlowFilter_as::inner_gs, 
+        GlowFilter_as::inner_gs);
 
-    gs = new builtin_function(GlowFilter_as::knockout_gs, NULL);
-    o.init_property("knockout" , *gs, *gs);
+    o.init_property("knockout" , GlowFilter_as::knockout_gs, 
+        GlowFilter_as::knockout_gs);
 
 }
 

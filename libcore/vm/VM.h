@@ -37,6 +37,7 @@
 
 // Forward declarations
 namespace gnash {
+	class Global_as;
 	class VM;
 	class fn_call;
 	class movie_root;
@@ -241,7 +242,7 @@ public:
     }
 
 	/// Get a pointer to this VM's _global Object
-	as_object* getGlobal() const;
+	Global_as* getGlobal() const;
 
 	/// Mark all reachable resources (for GC)
 	//
@@ -291,8 +292,8 @@ private:
 	/// Stage associated with this VM
 	movie_root& _rootMovie;
 
-	/// The _global ActionScript object
-	boost::intrusive_ptr<as_object> _global;
+	/// The _global ActionScript object for AVM1
+	Global_as* _global;
 
 	/// Target SWF version
 	int _swfversion;
@@ -301,7 +302,7 @@ private:
 	//
 	/// Will be called by the init() function
 	/// 
-	void setGlobal(as_object*);
+	void setGlobal(Global_as*);
 
 #ifdef GNASH_USE_GC
 	/// A vector of static GcResources (typically used for built-in

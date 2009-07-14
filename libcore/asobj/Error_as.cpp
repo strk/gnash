@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -60,10 +61,11 @@ public:
 // extern 
 void Error_class_init(as_object& where)
 {
-	// This is going to be the Error "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl = new builtin_function(&error_ctor, getErrorInterface());
+    
+    Global_as* gl = getGlobal(where);
+
+    boost::intrusive_ptr<as_object> cl =
+        gl->createClass(&error_ctor, getErrorInterface());;
 
 	// Register _global.Error
 	where.init_member("Error", cl.get());
@@ -93,8 +95,9 @@ getErrorInterface()
 void
 attachErrorInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     int flags = 0;
-    o.init_member("toString", new builtin_function(error_toString), flags);
+    o.init_member("toString", gl->createFunction(error_toString), flags);
     o.init_member("message", "Error", flags);
     o.init_member("name", "Error", flags);
 }
@@ -105,7 +108,7 @@ error_toString(const fn_call& fn)
 {
  	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
 
-    string_table& st = ptr->getVM().getStringTable();
+    string_table& st = getStringTable(*ptr);
     as_value message;
     ptr->get_member(st.find("message"), &message);
 
@@ -121,7 +124,7 @@ error_ctor(const fn_call& fn)
 
 	boost::intrusive_ptr<Error_as> err = new Error_as;
 	
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     if (fn.nargs > 0)
 	{
 		err->set_member(st.find("message"), fn.arg(0));
