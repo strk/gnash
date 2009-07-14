@@ -70,7 +70,7 @@ namespace {
 void
 attachURLVariablesInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(urlvariables_toString));
+    o.init_member("toString", gl->createFunction(urlvariables_toString));
 }
 
 void

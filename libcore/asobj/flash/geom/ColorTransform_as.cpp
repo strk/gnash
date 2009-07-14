@@ -55,12 +55,12 @@ attachColorTransformInterface(as_object& o)
 {
     int flags = 0;
     /// This has no flags:
-    o.init_member("concat", new builtin_function(ColorTransform_concat), flags);
+    o.init_member("concat", gl->createFunction(ColorTransform_concat), flags);
 
     flags = as_prop_flags::isProtected;
 
     /// These are all protected:
-    o.init_member("toString", new builtin_function(ColorTransform_toString),
+    o.init_member("toString", gl->createFunction(ColorTransform_toString),
             flags);
 
     o.init_property("alphaMultiplier", ColorTransform_alphaMultiplier_getset,

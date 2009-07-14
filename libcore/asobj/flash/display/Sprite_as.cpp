@@ -70,7 +70,7 @@ namespace {
 void
 attachSpriteInterface(as_object& o)
 {
-    o.init_member("stopDrag", new builtin_function(sprite_stopDrag));
+    o.init_member("stopDrag", gl->createFunction(sprite_stopDrag));
 }
 
 void

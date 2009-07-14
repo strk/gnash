@@ -73,10 +73,10 @@ namespace {
 void
 attachTimerEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(timerevent_toString));
-    o.init_member("updateAfterEvent", new builtin_function(timerevent_updateAfterEvent));
-    o.init_member("TIMER", new builtin_function(timerevent_TIMER));
-    o.init_member("TIMER_COMPLETE", new builtin_function(timerevent_TIMER_COMPLETE));
+    o.init_member("toString", gl->createFunction(timerevent_toString));
+    o.init_member("updateAfterEvent", gl->createFunction(timerevent_updateAfterEvent));
+    o.init_member("TIMER", gl->createFunction(timerevent_TIMER));
+    o.init_member("TIMER_COMPLETE", gl->createFunction(timerevent_TIMER_COMPLETE));
 }
 
 void

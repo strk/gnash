@@ -72,9 +72,9 @@ namespace {
 void
 attachTextEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(textevent_toString));
-    o.init_member("LINK", new builtin_function(textevent_LINK));
-    o.init_member("TEXT_INPUT", new builtin_function(textevent_TEXT_INPUT));
+    o.init_member("toString", gl->createFunction(textevent_toString));
+    o.init_member("LINK", gl->createFunction(textevent_LINK));
+    o.init_member("TEXT_INPUT", gl->createFunction(textevent_TEXT_INPUT));
 }
 
 void

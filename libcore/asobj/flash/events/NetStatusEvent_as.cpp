@@ -71,8 +71,8 @@ namespace {
 void
 attachNetStatusEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(netstatusevent_toString));
-    o.init_member("NET_STATUS", new builtin_function(netstatusevent_NET_STATUS));
+    o.init_member("toString", gl->createFunction(netstatusevent_toString));
+    o.init_member("NET_STATUS", gl->createFunction(netstatusevent_NET_STATUS));
 }
 
 void

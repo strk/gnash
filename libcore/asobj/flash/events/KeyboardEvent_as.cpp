@@ -73,10 +73,10 @@ namespace {
 void
 attachKeyboardEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(keyboardevent_toString));
-    o.init_member("updateAfterEvent", new builtin_function(keyboardevent_updateAfterEvent));
-    o.init_member("KEY_DOWN", new builtin_function(keyboardevent_KEY_DOWN));
-    o.init_member("KEY_UP", new builtin_function(keyboardevent_KEY_UP));
+    o.init_member("toString", gl->createFunction(keyboardevent_toString));
+    o.init_member("updateAfterEvent", gl->createFunction(keyboardevent_updateAfterEvent));
+    o.init_member("KEY_DOWN", gl->createFunction(keyboardevent_KEY_DOWN));
+    o.init_member("KEY_UP", gl->createFunction(keyboardevent_KEY_UP));
 }
 
 void

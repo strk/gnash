@@ -48,9 +48,9 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("pass", new builtin_function(dejagnu_pass));
-    obj->init_member("fail", new builtin_function(dejagnu_fail));
-    obj->init_member("totals", new builtin_function(dejagnu_totals));
+    obj->init_member("pass", gl->createFunction(dejagnu_pass));
+    obj->init_member("fail", gl->createFunction(dejagnu_fail));
+    obj->init_member("totals", gl->createFunction(dejagnu_totals));
 }
 
 static as_object*

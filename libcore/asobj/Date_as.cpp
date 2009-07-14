@@ -375,7 +375,7 @@ attachDateInterface(as_object& o)
     o.init_member("setUTCMinutes", vm.getNative(103, 141));
     o.init_member("setUTCSeconds", vm.getNative(103, 142));
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
-    o.init_member("valueOf", new builtin_function(date_valueof));
+    o.init_member("valueOf", gl->createFunction(date_valueof));
 
 }   
 

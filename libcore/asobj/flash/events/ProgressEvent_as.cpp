@@ -72,9 +72,9 @@ namespace {
 void
 attachProgressEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(progressevent_toString));
-    o.init_member("PROGRESS", new builtin_function(progressevent_PROGRESS));
-    o.init_member("SOCKET_DATA", new builtin_function(progressevent_SOCKET_DATA));
+    o.init_member("toString", gl->createFunction(progressevent_toString));
+    o.init_member("PROGRESS", gl->createFunction(progressevent_PROGRESS));
+    o.init_member("SOCKET_DATA", gl->createFunction(progressevent_SOCKET_DATA));
 }
 
 void

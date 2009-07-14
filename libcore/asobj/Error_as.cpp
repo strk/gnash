@@ -94,7 +94,7 @@ void
 attachErrorInterface(as_object& o)
 {
     int flags = 0;
-    o.init_member("toString", new builtin_function(error_toString), flags);
+    o.init_member("toString", gl->createFunction(error_toString), flags);
     o.init_member("message", "Error", flags);
     o.init_member("name", "Error", flags);
 }

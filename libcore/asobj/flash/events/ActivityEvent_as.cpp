@@ -71,8 +71,8 @@ namespace {
 void
 attachActivityEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(activityevent_toString));
-    o.init_member("ACTIVITY", new builtin_function(activityevent_ACTIVITY));
+    o.init_member("toString", gl->createFunction(activityevent_toString));
+    o.init_member("ACTIVITY", gl->createFunction(activityevent_ACTIVITY));
 }
 
 void

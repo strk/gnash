@@ -679,9 +679,9 @@ attachSharedObjectStaticInterface(as_object& o)
     const int flags = 0;
 
     o.init_member("getLocal", 
-            new builtin_function(sharedobject_getLocal), flags);
+            gl->createFunction(sharedobject_getLocal), flags);
     o.init_member("getRemote",
-            new builtin_function(sharedobject_getRemote), flags);
+            gl->createFunction(sharedobject_getRemote), flags);
 
     const int hiddenOnly = as_prop_flags::dontEnum;
 

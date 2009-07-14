@@ -95,7 +95,7 @@ glowfilter_class_init(as_object& global)
 void
 GlowFilter_as::attachInterface(as_object& o) {
     boost::intrusive_ptr<builtin_function> gs;
-    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
+    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
 
 }
 

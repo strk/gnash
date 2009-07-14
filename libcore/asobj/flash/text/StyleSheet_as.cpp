@@ -73,10 +73,10 @@ namespace {
 void
 attachStyleSheetInterface(as_object& o)
 {
-    o.init_member("getStyle", new builtin_function(stylesheet_getStyle));
-    o.init_member("parseCSS", new builtin_function(stylesheet_parseCSS));
-    o.init_member("setStyle", new builtin_function(stylesheet_setStyle));
-    o.init_member("transform", new builtin_function(stylesheet_transform));
+    o.init_member("getStyle", gl->createFunction(stylesheet_getStyle));
+    o.init_member("parseCSS", gl->createFunction(stylesheet_parseCSS));
+    o.init_member("setStyle", gl->createFunction(stylesheet_setStyle));
+    o.init_member("transform", gl->createFunction(stylesheet_transform));
 }
 
 void

@@ -722,34 +722,34 @@ attachSoundInterface(as_object& o)
                 as_prop_flags::dontDelete | 
                 as_prop_flags::readOnly;
 
-    o.init_member("attachSound", new builtin_function(sound_attachsound),
+    o.init_member("attachSound", gl->createFunction(sound_attachsound),
             flags);
-    o.init_member("getPan", new builtin_function(sound_getpan), flags);
-    o.init_member("setPan", new builtin_function(sound_setpan), flags);
-    o.init_member("start", new builtin_function(sound_start), flags);
-    o.init_member("stop", new builtin_function(sound_stop), flags);
-    o.init_member("getTransform", new builtin_function(sound_gettransform),
+    o.init_member("getPan", gl->createFunction(sound_getpan), flags);
+    o.init_member("setPan", gl->createFunction(sound_setpan), flags);
+    o.init_member("start", gl->createFunction(sound_start), flags);
+    o.init_member("stop", gl->createFunction(sound_stop), flags);
+    o.init_member("getTransform", gl->createFunction(sound_gettransform),
             flags);
-    o.init_member("setTransform", new builtin_function(sound_settransform),
+    o.init_member("setTransform", gl->createFunction(sound_settransform),
             flags);
-    o.init_member("getVolume", new builtin_function(sound_getvolume), flags);
-    o.init_member("setVolume", new builtin_function(sound_setvolume), flags);
+    o.init_member("getVolume", gl->createFunction(sound_getvolume), flags);
+    o.init_member("setVolume", gl->createFunction(sound_setvolume), flags);
 
     int flagsn6 = flags | as_prop_flags::onlySWF6Up;
 
     o.init_member("getDuration", 
-            new builtin_function(sound_getDuration), flagsn6);
+            gl->createFunction(sound_getDuration), flagsn6);
     o.init_member("setDuration", 
-            new builtin_function(sound_setDuration), flagsn6);
-    o.init_member("loadSound", new builtin_function(sound_loadsound), flagsn6);
+            gl->createFunction(sound_setDuration), flagsn6);
+    o.init_member("loadSound", gl->createFunction(sound_loadsound), flagsn6);
     o.init_member("getPosition", 
-            new builtin_function(sound_getPosition), flagsn6);
+            gl->createFunction(sound_getPosition), flagsn6);
     o.init_member("setPosition", 
-            new builtin_function(sound_setPosition), flagsn6);
+            gl->createFunction(sound_setPosition), flagsn6);
     o.init_member("getBytesLoaded", 
-            new builtin_function(sound_getbytesloaded), flagsn6);
+            gl->createFunction(sound_getbytesloaded), flagsn6);
     o.init_member("getBytesTotal", 
-            new builtin_function(sound_getbytestotal), flagsn6);
+            gl->createFunction(sound_getbytestotal), flagsn6);
 
     int flagsn9 = as_prop_flags::dontEnum | 
                   as_prop_flags::dontDelete | 
@@ -757,7 +757,7 @@ attachSoundInterface(as_object& o)
                   as_prop_flags::onlySWF9Up;
 
     o.init_member("areSoundsInaccessible", 
-            new builtin_function(sound_areSoundsInaccessible), flagsn9);
+            gl->createFunction(sound_areSoundsInaccessible), flagsn9);
 
     // Properties
     //there's no such thing as an ID3 member (swfdec shows)

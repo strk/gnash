@@ -72,9 +72,9 @@ namespace {
 void
 attachStackFrameInterface(as_object& o)
 {
-    o.init_member("file", new builtin_function(stackframe_file));
-    o.init_member("line", new builtin_function(stackframe_line));
-    o.init_member("name", new builtin_function(stackframe_name));
+    o.init_member("file", gl->createFunction(stackframe_file));
+    o.init_member("line", gl->createFunction(stackframe_line));
+    o.init_member("name", gl->createFunction(stackframe_name));
 }
 
 void

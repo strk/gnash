@@ -78,29 +78,29 @@ attachInterface(as_object& obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj.init_member("fopen", new builtin_function(fileio_fopen));
-    obj.init_member("fread", new builtin_function(fileio_fread));
-    obj.init_member("fgetc", new builtin_function(fileio_fgetc));
-    obj.init_member("fgets", new builtin_function(fileio_fgets));
-    obj.init_member("gets", new builtin_function(fileio_fgets));
-    obj.init_member("getchar", new builtin_function(fileio_getchar));
+    obj.init_member("fopen", gl->createFunction(fileio_fopen));
+    obj.init_member("fread", gl->createFunction(fileio_fread));
+    obj.init_member("fgetc", gl->createFunction(fileio_fgetc));
+    obj.init_member("fgets", gl->createFunction(fileio_fgets));
+    obj.init_member("gets", gl->createFunction(fileio_fgets));
+    obj.init_member("getchar", gl->createFunction(fileio_getchar));
 
-    obj.init_member("fwrite", new builtin_function(fileio_fwrite));
-    obj.init_member("fputc", new builtin_function(fileio_fputc));
-    obj.init_member("fputs", new builtin_function(fileio_fputs));
-    obj.init_member("puts", new builtin_function(fileio_puts));
-    obj.init_member("putchar", new builtin_function(fileio_putchar));
+    obj.init_member("fwrite", gl->createFunction(fileio_fwrite));
+    obj.init_member("fputc", gl->createFunction(fileio_fputc));
+    obj.init_member("fputs", gl->createFunction(fileio_fputs));
+    obj.init_member("puts", gl->createFunction(fileio_puts));
+    obj.init_member("putchar", gl->createFunction(fileio_putchar));
     
-    obj.init_member("fflush", new builtin_function(fileio_fflush));
-    obj.init_member("fseek", new builtin_function(fileio_fseek));
-    obj.init_member("ftell", new builtin_function(fileio_ftell));
-    obj.init_member("asyncmode", new builtin_function(fileio_asyncmode));
-    obj.init_member("feof", new builtin_function(fileio_feof));
-    obj.init_member("fclose", new builtin_function(fileio_fclose));
+    obj.init_member("fflush", gl->createFunction(fileio_fflush));
+    obj.init_member("fseek", gl->createFunction(fileio_fseek));
+    obj.init_member("ftell", gl->createFunction(fileio_ftell));
+    obj.init_member("asyncmode", gl->createFunction(fileio_asyncmode));
+    obj.init_member("feof", gl->createFunction(fileio_feof));
+    obj.init_member("fclose", gl->createFunction(fileio_fclose));
     
-    obj.init_member("unlink", new builtin_function(fileio_unlink));
+    obj.init_member("unlink", gl->createFunction(fileio_unlink));
     
-    obj.init_member("scandir", new builtin_function(fileio_scandir));
+    obj.init_member("scandir", gl->createFunction(fileio_scandir));
 }
 
 static as_object*

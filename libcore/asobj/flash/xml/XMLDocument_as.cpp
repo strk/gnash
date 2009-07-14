@@ -674,7 +674,7 @@ attachXMLInterface(as_object& o)
     o.init_member("parseXML", vm.getNative(253, 10), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
-    o.init_member("onData", new builtin_function(xml_ondata), flags);
+    o.init_member("onData", gl->createFunction(xml_ondata), flags);
 
     o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
     o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);

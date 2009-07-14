@@ -71,8 +71,8 @@ namespace {
 void
 attachHTTPStatusEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(httpstatusevent_toString));
-    o.init_member("HTTP_STATUS", new builtin_function(httpstatusevent_HTTP_STATUS));
+    o.init_member("toString", gl->createFunction(httpstatusevent_toString));
+    o.init_member("HTTP_STATUS", gl->createFunction(httpstatusevent_HTTP_STATUS));
 }
 
 void

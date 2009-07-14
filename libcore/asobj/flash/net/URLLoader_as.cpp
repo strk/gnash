@@ -77,14 +77,14 @@ namespace {
 void
 attachURLLoaderInterface(as_object& o)
 {
-    o.init_member("close", new builtin_function(urlloader_close));
-    o.init_member("load", new builtin_function(urlloader_load));
-    o.init_member("complete", new builtin_function(urlloader_complete));
-    o.init_member("httpStatus", new builtin_function(urlloader_httpStatus));
-    o.init_member("ioError", new builtin_function(urlloader_ioError));
-    o.init_member("open", new builtin_function(urlloader_open));
-    o.init_member("progress", new builtin_function(urlloader_progress));
-    o.init_member("securityError", new builtin_function(urlloader_securityError));
+    o.init_member("close", gl->createFunction(urlloader_close));
+    o.init_member("load", gl->createFunction(urlloader_load));
+    o.init_member("complete", gl->createFunction(urlloader_complete));
+    o.init_member("httpStatus", gl->createFunction(urlloader_httpStatus));
+    o.init_member("ioError", gl->createFunction(urlloader_ioError));
+    o.init_member("open", gl->createFunction(urlloader_open));
+    o.init_member("progress", gl->createFunction(urlloader_progress));
+    o.init_member("securityError", gl->createFunction(urlloader_securityError));
 }
 
 void

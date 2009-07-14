@@ -129,7 +129,7 @@ AsBroadcaster::initialize(as_object& o)
 	}
 	
     o.set_member(NSV::PROP_BROADCAST_MESSAGE,
-            new builtin_function(asbroadcaster_broadcastMessage));
+            gl->createFunction(asbroadcaster_broadcastMessage));
 
     o.set_member(NSV::PROP_uLISTENERS, new Array_as());
 
@@ -166,11 +166,11 @@ AsBroadcaster::getAsBroadcaster()
         // well save the string_table size in case we'll not load
         // the class.
         obj->init_member("initialize",
-                new builtin_function(asbroadcaster_initialize), flags);
+                gl->createFunction(asbroadcaster_initialize), flags);
         obj->init_member(NSV::PROP_ADD_LISTENER,
-                new builtin_function(asbroadcaster_addListener), flags);
+                gl->createFunction(asbroadcaster_addListener), flags);
         obj->init_member(NSV::PROP_REMOVE_LISTENER,
-                new builtin_function(asbroadcaster_removeListener), flags);
+                gl->createFunction(asbroadcaster_removeListener), flags);
         obj->init_member(NSV::PROP_BROADCAST_MESSAGE, vm.getNative(101, 12),
                 flags);
 	}

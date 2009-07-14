@@ -72,9 +72,9 @@ namespace {
 void
 attachLoaderInterface(as_object& o)
 {
-    o.init_member("load", new builtin_function(loader_load));
-    o.init_member("loadBytes", new builtin_function(loader_loadBytes));
-    o.init_member("unload", new builtin_function(loader_unload));
+    o.init_member("load", gl->createFunction(loader_load));
+    o.init_member("loadBytes", gl->createFunction(loader_loadBytes));
+    o.init_member("unload", gl->createFunction(loader_unload));
 }
 
 void

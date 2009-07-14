@@ -63,7 +63,7 @@ attachContextMenuItemInterface(as_object& o)
                       as_prop_flags::dontDelete |
                       as_prop_flags::onlySWF7Up;
 
-    o.init_member("copy", new builtin_function(contextmenuitem_copy), flags);
+    o.init_member("copy", gl->createFunction(contextmenuitem_copy), flags);
 }
 
 as_object*

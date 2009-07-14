@@ -72,7 +72,7 @@ void
 attachBitmapFilterInterface(as_object& o)
 {
     const int flags = 0;
-    o.init_member("clone", new builtin_function(bitmapfilter_clone), flags);
+    o.init_member("clone", gl->createFunction(bitmapfilter_clone), flags);
 }
 
 as_value

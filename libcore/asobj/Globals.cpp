@@ -157,8 +157,8 @@ AVM2Global::AVM2Global(Machine& machine, VM& vm)
     
     _classes.declareAll(avm2Classes());
     
-    init_member("trace", new builtin_function(global_trace));
-    init_member("escape", new builtin_function(global_escape));
+    init_member("trace", gl->createFunction(global_trace));
+    init_member("escape", gl->createFunction(global_escape));
    
     object_class_init(*this); 
     string_class_init(*this); 
@@ -181,7 +181,7 @@ AVM2Global::AVM2Global(Machine& machine, VM& vm)
 as_object*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(function);
+    return gl->createFunction(function);
 }
 
 as_object*
@@ -194,7 +194,7 @@ AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 as_object*
 AVM2Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(function);
+    return gl->createFunction(function);
 }
 
 as_object*
@@ -232,8 +232,8 @@ AVM1Global::AVM1Global(VM& vm)
     // These functions are only available in SWF6+, but this is just
     // because SWF5 or lower did not have a "_global"
     // reference at all.
-    init_member("ASnative", new builtin_function(global_asnative));
-    init_member("ASconstructor", new builtin_function(global_asconstructor));
+    init_member("ASnative", gl->createFunction(global_asnative));
+    init_member("ASconstructor", gl->createFunction(global_asconstructor));
     init_member("ASSetPropFlags", vm.getNative(1, 0));
     init_member("ASSetNative", vm.getNative(4, 0));
     init_member("ASSetNativeAccessor", vm.getNative(4, 1));
@@ -242,8 +242,8 @@ AVM1Global::AVM1Global(VM& vm)
 
     init_member("setInterval", vm.getNative(250, 0));
     init_member("clearInterval", vm.getNative(250, 1));
-    init_member("setTimeout", new builtin_function(global_setTimeout));
-    init_member("clearTimeout", new builtin_function(global_clearInterval));
+    init_member("setTimeout", gl->createFunction(global_setTimeout));
+    init_member("clearTimeout", gl->createFunction(global_clearInterval));
 
     _classes.declareAll(avm1Classes());
 

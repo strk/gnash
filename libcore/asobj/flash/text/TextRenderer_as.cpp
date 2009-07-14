@@ -50,7 +50,7 @@ static void
 attachTextRendererStaticProperties(as_object& o)
 {
    
-    o.init_member("setAdvancedAntialiasingTable", new builtin_function(TextRenderer_setAdvancedAntialiasingTable));
+    o.init_member("setAdvancedAntialiasingTable", gl->createFunction(TextRenderer_setAdvancedAntialiasingTable));
     o.init_property("maxLevel", TextRenderer_maxLevel_getset, TextRenderer_maxLevel_getset);
 }
 

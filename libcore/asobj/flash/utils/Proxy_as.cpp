@@ -78,15 +78,15 @@ namespace {
 void
 attachProxyInterface(as_object& o)
 {
-    o.init_member("deleteProperty", new builtin_function(proxy_deleteProperty));
-    o.init_member("getDescendants", new builtin_function(proxy_getDescendants));
-    o.init_member("getProperty", new builtin_function(proxy_getProperty));
-    o.init_member("hasProperty", new builtin_function(proxy_hasProperty));
-    o.init_member("isAttribute", new builtin_function(proxy_isAttribute));
-    o.init_member("nextName", new builtin_function(proxy_nextName));
-    o.init_member("nextNameIndex", new builtin_function(proxy_nextNameIndex));
-    o.init_member("nextValue", new builtin_function(proxy_nextValue));
-    o.init_member("setProperty", new builtin_function(proxy_setProperty));
+    o.init_member("deleteProperty", gl->createFunction(proxy_deleteProperty));
+    o.init_member("getDescendants", gl->createFunction(proxy_getDescendants));
+    o.init_member("getProperty", gl->createFunction(proxy_getProperty));
+    o.init_member("hasProperty", gl->createFunction(proxy_hasProperty));
+    o.init_member("isAttribute", gl->createFunction(proxy_isAttribute));
+    o.init_member("nextName", gl->createFunction(proxy_nextName));
+    o.init_member("nextNameIndex", gl->createFunction(proxy_nextNameIndex));
+    o.init_member("nextValue", gl->createFunction(proxy_nextValue));
+    o.init_member("setProperty", gl->createFunction(proxy_setProperty));
 }
 
 void

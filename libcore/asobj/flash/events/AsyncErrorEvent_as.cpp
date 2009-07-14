@@ -71,8 +71,8 @@ namespace {
 void
 attachAsyncErrorEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(asyncerrorevent_toString));
-    o.init_member("ASYNC_ERROR", new builtin_function(asyncerrorevent_ASYNC_ERROR));
+    o.init_member("toString", gl->createFunction(asyncerrorevent_toString));
+    o.init_member("ASYNC_ERROR", gl->createFunction(asyncerrorevent_ASYNC_ERROR));
 }
 
 void

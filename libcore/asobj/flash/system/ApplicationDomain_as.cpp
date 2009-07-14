@@ -70,7 +70,7 @@ namespace {
 void
 attachApplicationDomainInterface(as_object& o)
 {
-    o.init_member("hasDefinition", new builtin_function(applicationdomain_hasDefinition));
+    o.init_member("hasDefinition", gl->createFunction(applicationdomain_hasDefinition));
 }
 
 void

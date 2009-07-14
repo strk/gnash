@@ -133,9 +133,9 @@ void
 attachNumberInterface(as_object& o)
 {
 
-	o.init_member("toString", new builtin_function(number_toString));
+	o.init_member("toString", gl->createFunction(number_toString));
 
-	o.init_member("valueOf", new builtin_function(number_valueOf));
+	o.init_member("valueOf", gl->createFunction(number_valueOf));
 }
 
 void

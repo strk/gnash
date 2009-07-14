@@ -52,22 +52,22 @@ attachPointInterface(as_object& o)
 {
     int fl=0; // flags...
 
-    o.init_member("add", new builtin_function(Point_add), fl);
-    o.init_member("clone", new builtin_function(Point_clone), fl);
-    o.init_member("equals", new builtin_function(Point_equals), fl);
-    o.init_member("normalize", new builtin_function(Point_normalize), fl);
-    o.init_member("offset", new builtin_function(Point_offset), fl);
-    o.init_member("subtract", new builtin_function(Point_subtract), fl);
-    o.init_member("toString", new builtin_function(Point_toString), fl);
+    o.init_member("add", gl->createFunction(Point_add), fl);
+    o.init_member("clone", gl->createFunction(Point_clone), fl);
+    o.init_member("equals", gl->createFunction(Point_equals), fl);
+    o.init_member("normalize", gl->createFunction(Point_normalize), fl);
+    o.init_member("offset", gl->createFunction(Point_offset), fl);
+    o.init_member("subtract", gl->createFunction(Point_subtract), fl);
+    o.init_member("toString", gl->createFunction(Point_toString), fl);
     o.init_property("length", Point_length_getset, Point_length_getset, fl);
 }
 
 static void
 attachPointStaticProperties(as_object& o)
 {
-    o.init_member("distance", new builtin_function(Point_distance), 0);
-    o.init_member("interpolate", new builtin_function(Point_interpolate), 0);
-    o.init_member("polar", new builtin_function(Point_polar), 0);
+    o.init_member("distance", gl->createFunction(Point_distance), 0);
+    o.init_member("interpolate", gl->createFunction(Point_interpolate), 0);
+    o.init_member("polar", gl->createFunction(Point_polar), 0);
 }
 
 static as_object*

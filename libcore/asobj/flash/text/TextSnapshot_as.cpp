@@ -395,24 +395,24 @@ attachTextSnapshotInterface(as_object& o)
 
     const int flags = as_prop_flags::onlySWF6Up;
 
-	o.init_member("findText", new builtin_function(textsnapshot_findText),
+	o.init_member("findText", gl->createFunction(textsnapshot_findText),
             flags);
-	o.init_member("getCount", new builtin_function(textsnapshot_getCount),
+	o.init_member("getCount", gl->createFunction(textsnapshot_getCount),
             flags);
 	o.init_member("getTextRunInfo",
-            new builtin_function(textsnapshot_getTextRunInfo), flags);
+            gl->createFunction(textsnapshot_getTextRunInfo), flags);
 	o.init_member("getSelected",
-            new builtin_function(textsnapshot_getSelected), flags);
+            gl->createFunction(textsnapshot_getSelected), flags);
 	o.init_member("getSelectedText",
-            new builtin_function(textsnapshot_getSelectedText), flags);
+            gl->createFunction(textsnapshot_getSelectedText), flags);
 	o.init_member("getText",
-            new builtin_function(textsnapshot_getText), flags);
+            gl->createFunction(textsnapshot_getText), flags);
 	o.init_member("hitTestTextNearPos",
-            new builtin_function(textsnapshot_hitTestTextNearPos), flags);
+            gl->createFunction(textsnapshot_hitTestTextNearPos), flags);
 	o.init_member("setSelectColor",
-            new builtin_function(textsnapshot_setSelectColor), flags);
+            gl->createFunction(textsnapshot_setSelectColor), flags);
 	o.init_member("setSelected",
-            new builtin_function(textsnapshot_setSelected), flags);
+            gl->createFunction(textsnapshot_setSelected), flags);
 }
 
 as_object*

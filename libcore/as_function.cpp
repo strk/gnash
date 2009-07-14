@@ -283,9 +283,9 @@ getFunctionPrototype()
                           as_prop_flags::dontEnum | 
                           as_prop_flags::onlySWF6Up; 
 
-		proto->init_member("apply", new builtin_function(function_apply),
+		proto->init_member("apply", gl->createFunction(function_apply),
                 flags);
-		proto->init_member("call", new builtin_function(function_call), flags);
+		proto->init_member("call", gl->createFunction(function_call), flags);
 	}
 
 	return proto.get();

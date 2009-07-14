@@ -174,9 +174,9 @@ attachLoadVarsInterface(as_object& o)
 	o.init_member("load", vm.getNative(301, 0));
 	o.init_member("send", vm.getNative(301, 1));
 	o.init_member("sendAndLoad", vm.getNative(301, 2));
-	o.init_member("toString", new builtin_function(loadvars_tostring));
-	o.init_member("onData", new builtin_function(loadvars_onData));
-	o.init_member("onLoad", new builtin_function(loadvars_onLoad));
+	o.init_member("toString", gl->createFunction(loadvars_tostring));
+	o.init_member("onData", gl->createFunction(loadvars_onData));
+	o.init_member("onLoad", gl->createFunction(loadvars_onLoad));
 }
 
 as_object*

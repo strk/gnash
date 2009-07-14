@@ -72,9 +72,9 @@ namespace {
 void
 attachContextMenuEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(contextmenuevent_toString));
-    o.init_member("MENU_ITEM_SELECT", new builtin_function(contextmenuevent_MENU_ITEM_SELECT));
-    o.init_member("MENU_SELECT", new builtin_function(contextmenuevent_MENU_SELECT));
+    o.init_member("toString", gl->createFunction(contextmenuevent_toString));
+    o.init_member("MENU_ITEM_SELECT", gl->createFunction(contextmenuevent_MENU_ITEM_SELECT));
+    o.init_member("MENU_SELECT", gl->createFunction(contextmenuevent_MENU_SELECT));
 }
 
 void

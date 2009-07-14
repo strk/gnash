@@ -71,8 +71,8 @@ namespace {
 void
 attachFullScreenEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(fullscreenevent_toString));
-    o.init_member("FULL_SCREEN", new builtin_function(fullscreenevent_FULL_SCREEN));
+    o.init_member("toString", gl->createFunction(fullscreenevent_toString));
+    o.init_member("FULL_SCREEN", gl->createFunction(fullscreenevent_FULL_SCREEN));
 }
 
 void

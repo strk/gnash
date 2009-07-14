@@ -570,9 +570,9 @@ getXMLSocketInterface()
 void
 attachXMLSocketInterface(as_object& o)
 {
-    o.init_member("connect", new builtin_function(xmlsocket_connect));
-    o.init_member("send", new builtin_function(xmlsocket_send));
-    o.init_member("close", new builtin_function(xmlsocket_close));
+    o.init_member("connect", gl->createFunction(xmlsocket_connect));
+    o.init_member("send", gl->createFunction(xmlsocket_send));
+    o.init_member("close", gl->createFunction(xmlsocket_close));
 
 
     // all this crap to satisfy swfdec testsuite... (xml-socket-properties*)

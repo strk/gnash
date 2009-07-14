@@ -76,13 +76,13 @@ namespace {
 void
 attachNetConnectionInterface(as_object& o)
 {
-    o.init_member("call", new builtin_function(netconnection_call));
-    o.init_member("close", new builtin_function(netconnection_close));
-    o.init_member("connect", new builtin_function(netconnection_connect));
-    o.init_member("asyncError", new builtin_function(netconnection_asyncError));
-    o.init_member("ioError", new builtin_function(netconnection_ioError));
-    o.init_member("netStatus", new builtin_function(netconnection_netStatus));
-    o.init_member("securityError", new builtin_function(netconnection_securityError));
+    o.init_member("call", gl->createFunction(netconnection_call));
+    o.init_member("close", gl->createFunction(netconnection_close));
+    o.init_member("connect", gl->createFunction(netconnection_connect));
+    o.init_member("asyncError", gl->createFunction(netconnection_asyncError));
+    o.init_member("ioError", gl->createFunction(netconnection_ioError));
+    o.init_member("netStatus", gl->createFunction(netconnection_netStatus));
+    o.init_member("securityError", gl->createFunction(netconnection_securityError));
 }
 
 void

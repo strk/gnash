@@ -81,18 +81,18 @@ namespace {
 void
 attachMouseEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(mouseevent_toString));
-    o.init_member("updateAfterEvent", new builtin_function(mouseevent_updateAfterEvent));
-    o.init_member("CLICK", new builtin_function(mouseevent_CLICK));
-    o.init_member("DOUBLE_CLICK", new builtin_function(mouseevent_DOUBLE_CLICK));
-    o.init_member("MOUSE_DOWN", new builtin_function(mouseevent_MOUSE_DOWN));
-    o.init_member("MOUSE_MOVE", new builtin_function(mouseevent_MOUSE_MOVE));
-    o.init_member("MOUSE_OUT", new builtin_function(mouseevent_MOUSE_OUT));
-    o.init_member("MOUSE_OVER", new builtin_function(mouseevent_MOUSE_OVER));
-    o.init_member("MOUSE_UP", new builtin_function(mouseevent_MOUSE_UP));
-    o.init_member("MOUSE_WHEEL", new builtin_function(mouseevent_MOUSE_WHEEL));
-    o.init_member("ROLL_OUT", new builtin_function(mouseevent_ROLL_OUT));
-    o.init_member("ROLL_OVER", new builtin_function(mouseevent_ROLL_OVER));
+    o.init_member("toString", gl->createFunction(mouseevent_toString));
+    o.init_member("updateAfterEvent", gl->createFunction(mouseevent_updateAfterEvent));
+    o.init_member("CLICK", gl->createFunction(mouseevent_CLICK));
+    o.init_member("DOUBLE_CLICK", gl->createFunction(mouseevent_DOUBLE_CLICK));
+    o.init_member("MOUSE_DOWN", gl->createFunction(mouseevent_MOUSE_DOWN));
+    o.init_member("MOUSE_MOVE", gl->createFunction(mouseevent_MOUSE_MOVE));
+    o.init_member("MOUSE_OUT", gl->createFunction(mouseevent_MOUSE_OUT));
+    o.init_member("MOUSE_OVER", gl->createFunction(mouseevent_MOUSE_OVER));
+    o.init_member("MOUSE_UP", gl->createFunction(mouseevent_MOUSE_UP));
+    o.init_member("MOUSE_WHEEL", gl->createFunction(mouseevent_MOUSE_WHEEL));
+    o.init_member("ROLL_OUT", gl->createFunction(mouseevent_ROLL_OUT));
+    o.init_member("ROLL_OVER", gl->createFunction(mouseevent_ROLL_OVER));
 }
 
 void

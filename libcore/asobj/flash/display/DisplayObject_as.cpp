@@ -80,17 +80,17 @@ namespace {
 void
 attachDisplayObjectInterface(as_object& o)
 {
-    o.init_member("getRect", new builtin_function(displayobject_getRect));
-    o.init_member("globalToLocal", new builtin_function(displayobject_globalToLocal));
-    o.init_member("hitTestObject", new builtin_function(displayobject_hitTestObject));
-    o.init_member("hitTestPoint", new builtin_function(displayobject_hitTestPoint));
-    o.init_member("localToGlobal", new builtin_function(displayobject_localToGlobal));
-    o.init_member("added", new builtin_function(displayobject_added));
-    o.init_member("addedToStage", new builtin_function(displayobject_addedToStage));
-    o.init_member("enterFrame", new builtin_function(displayobject_enterFrame));
-    o.init_member("removed", new builtin_function(displayobject_removed));
-    o.init_member("removedFromStage", new builtin_function(displayobject_removedFromStage));
-    o.init_member("render", new builtin_function(displayobject_render));
+    o.init_member("getRect", gl->createFunction(displayobject_getRect));
+    o.init_member("globalToLocal", gl->createFunction(displayobject_globalToLocal));
+    o.init_member("hitTestObject", gl->createFunction(displayobject_hitTestObject));
+    o.init_member("hitTestPoint", gl->createFunction(displayobject_hitTestPoint));
+    o.init_member("localToGlobal", gl->createFunction(displayobject_localToGlobal));
+    o.init_member("added", gl->createFunction(displayobject_added));
+    o.init_member("addedToStage", gl->createFunction(displayobject_addedToStage));
+    o.init_member("enterFrame", gl->createFunction(displayobject_enterFrame));
+    o.init_member("removed", gl->createFunction(displayobject_removed));
+    o.init_member("removedFromStage", gl->createFunction(displayobject_removedFromStage));
+    o.init_member("render", gl->createFunction(displayobject_render));
 }
 
 void

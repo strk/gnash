@@ -71,8 +71,8 @@ namespace {
 void
 attachVideoInterface(as_object& o)
 {
-    o.init_member("attachNetStream", new builtin_function(video_attachNetStream));
-    o.init_member("clear", new builtin_function(video_clear));
+    o.init_member("attachNetStream", gl->createFunction(video_attachNetStream));
+    o.init_member("clear", gl->createFunction(video_clear));
 }
 
 void

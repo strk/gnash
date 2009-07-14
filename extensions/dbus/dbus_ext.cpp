@@ -69,7 +69,7 @@ static void
 attachInterface(as_object *obj)
 {
     GNASH_REPORT_FUNCTION;
-    obj->init_member("setSocketName", new builtin_function(dbus_ext_setsockname));
+    obj->init_member("setSocketName", gl->createFunction(dbus_ext_setsockname));
 }
 
 static as_object*

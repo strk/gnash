@@ -70,7 +70,7 @@ namespace {
 void
 attachIExternalizableInterface(as_object& o)
 {
-    o.init_member("writeExternal", new builtin_function(iexternalizable_writeExternal));
+    o.init_member("writeExternal", gl->createFunction(iexternalizable_writeExternal));
 }
 
 void

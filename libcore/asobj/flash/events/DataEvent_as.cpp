@@ -72,9 +72,9 @@ namespace {
 void
 attachDataEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(dataevent_toString));
-    o.init_member("DATA", new builtin_function(dataevent_DATA));
-    o.init_member("UPLOAD_COMPLETE_DATA", new builtin_function(dataevent_UPLOAD_COMPLETE_DATA));
+    o.init_member("toString", gl->createFunction(dataevent_toString));
+    o.init_member("DATA", gl->createFunction(dataevent_DATA));
+    o.init_member("UPLOAD_COMPLETE_DATA", gl->createFunction(dataevent_UPLOAD_COMPLETE_DATA));
 }
 
 void

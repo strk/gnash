@@ -123,7 +123,7 @@ attachObjectInterface(as_object& o)
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));
 	o.init_member("toLocaleString", 
-            new builtin_function(object_toLocaleString));
+            gl->createFunction(object_toLocaleString));
 
 	int swf6flags = as_prop_flags::dontEnum | 
         as_prop_flags::dontDelete | 

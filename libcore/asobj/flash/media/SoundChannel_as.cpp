@@ -70,7 +70,7 @@ namespace {
 void
 attachSoundChannelInterface(as_object& o)
 {
-    o.init_member("soundComplete", new builtin_function(soundchannel_soundComplete));
+    o.init_member("soundComplete", gl->createFunction(soundchannel_soundComplete));
 }
 
 void

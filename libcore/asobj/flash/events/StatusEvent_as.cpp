@@ -71,8 +71,8 @@ namespace {
 void
 attachStatusEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(statusevent_toString));
-    o.init_member("STATUS", new builtin_function(statusevent_STATUS));
+    o.init_member("toString", gl->createFunction(statusevent_toString));
+    o.init_member("STATUS", gl->createFunction(statusevent_STATUS));
 }
 
 void

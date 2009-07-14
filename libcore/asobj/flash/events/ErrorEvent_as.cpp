@@ -71,8 +71,8 @@ namespace {
 void
 attachErrorEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(errorevent_toString));
-    o.init_member("ERROR", new builtin_function(errorevent_ERROR));
+    o.init_member("toString", gl->createFunction(errorevent_toString));
+    o.init_member("ERROR", gl->createFunction(errorevent_ERROR));
 }
 
 void

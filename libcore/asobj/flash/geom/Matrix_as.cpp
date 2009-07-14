@@ -91,21 +91,21 @@ attachMatrixInterface(as_object& o)
 {
     int fl = 0;
 
-    o.init_member("clone", new builtin_function(Matrix_clone), fl);
-    o.init_member("concat", new builtin_function(Matrix_concat), fl);
-    o.init_member("createBox", new builtin_function(Matrix_createBox), fl);
+    o.init_member("clone", gl->createFunction(Matrix_clone), fl);
+    o.init_member("concat", gl->createFunction(Matrix_concat), fl);
+    o.init_member("createBox", gl->createFunction(Matrix_createBox), fl);
     o.init_member("createGradientBox",
-            new builtin_function(Matrix_createGradientBox), fl);
+            gl->createFunction(Matrix_createGradientBox), fl);
     o.init_member("deltaTransformPoint",
-            new builtin_function(Matrix_deltaTransformPoint), fl);
-    o.init_member("identity", new builtin_function(Matrix_identity), fl);
-    o.init_member("invert", new builtin_function(Matrix_invert), fl);
-    o.init_member("rotate", new builtin_function(Matrix_rotate), fl);
-    o.init_member("scale", new builtin_function(Matrix_scale), fl);
-    o.init_member("toString", new builtin_function(Matrix_toString), fl);
+            gl->createFunction(Matrix_deltaTransformPoint), fl);
+    o.init_member("identity", gl->createFunction(Matrix_identity), fl);
+    o.init_member("invert", gl->createFunction(Matrix_invert), fl);
+    o.init_member("rotate", gl->createFunction(Matrix_rotate), fl);
+    o.init_member("scale", gl->createFunction(Matrix_scale), fl);
+    o.init_member("toString", gl->createFunction(Matrix_toString), fl);
     o.init_member("transformPoint",
-            new builtin_function(Matrix_transformPoint), fl);
-    o.init_member("translate", new builtin_function(Matrix_translate), fl);
+            gl->createFunction(Matrix_transformPoint), fl);
+    o.init_member("translate", gl->createFunction(Matrix_translate), fl);
 }
 
 

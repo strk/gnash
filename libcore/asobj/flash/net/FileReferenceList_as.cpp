@@ -46,9 +46,9 @@ as_value FileReferenceList_ctor(const fn_call& fn);
 static void
 attachFileReferenceListInterface(as_object& o)
 {
-    o.init_member("addListener", new builtin_function(FileReferenceList_addListener));
-    o.init_member("browse", new builtin_function(FileReferenceList_browse));
-    o.init_member("removeListener", new builtin_function(FileReferenceList_removeListener));
+    o.init_member("addListener", gl->createFunction(FileReferenceList_addListener));
+    o.init_member("browse", gl->createFunction(FileReferenceList_browse));
+    o.init_member("removeListener", gl->createFunction(FileReferenceList_removeListener));
     o.init_property("fileList", FileReferenceList_fileList_getset, FileReferenceList_fileList_getset);
 }
 

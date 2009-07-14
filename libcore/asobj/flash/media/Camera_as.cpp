@@ -40,10 +40,10 @@ as_value camera_ctor(const fn_call& fn);
 static void
 attachCameraInterface(as_object& o)
 {
-	o.init_member("get", new builtin_function(camera_get));
-	o.init_member("setmode", new builtin_function(camera_setmode));
-	o.init_member("setmotionlevel", new builtin_function(camera_setmotionlevel));
-	o.init_member("setquality", new builtin_function(camera_setquality));
+	o.init_member("get", gl->createFunction(camera_get));
+	o.init_member("setmode", gl->createFunction(camera_setmode));
+	o.init_member("setmotionlevel", gl->createFunction(camera_setmotionlevel));
+	o.init_member("setquality", gl->createFunction(camera_setquality));
 }
 
 static as_object*

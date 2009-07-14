@@ -54,12 +54,12 @@ as_value FileReference_ctor(const fn_call& fn);
 static void
 attachFileReferenceInterface(as_object& o)
 {
-    o.init_member("addListener", new builtin_function(FileReference_addListener));
-    o.init_member("browse", new builtin_function(FileReference_browse));
-    o.init_member("cancel", new builtin_function(FileReference_cancel));
-    o.init_member("download", new builtin_function(FileReference_download));
-    o.init_member("removeListener", new builtin_function(FileReference_removeListener));
-    o.init_member("upload", new builtin_function(FileReference_upload));
+    o.init_member("addListener", gl->createFunction(FileReference_addListener));
+    o.init_member("browse", gl->createFunction(FileReference_browse));
+    o.init_member("cancel", gl->createFunction(FileReference_cancel));
+    o.init_member("download", gl->createFunction(FileReference_download));
+    o.init_member("removeListener", gl->createFunction(FileReference_removeListener));
+    o.init_member("upload", gl->createFunction(FileReference_upload));
     o.init_property("creationDate", FileReference_creationDate_getset, FileReference_creationDate_getset);
     o.init_property("creator", FileReference_creator_getset, FileReference_creator_getset);
     o.init_property("modificationDate", FileReference_modificationDate_getset, FileReference_modificationDate_getset);

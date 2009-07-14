@@ -278,7 +278,7 @@ builtin_function*
 VM::getNative(unsigned int x, unsigned int y)
 {
 	as_c_function_ptr fun = _asNativeTable[x][y];
-	if ( fun ) return new builtin_function(fun);
+	if ( fun ) return _global->createFunction(fun);
 	else return 0;
 }
 

@@ -102,10 +102,10 @@ getSystemSecurityInterface(as_object& o)
 
 		// TODO: only available when SWF >= 7 
 		proto->init_member("allowInsecureDomain",
-                new builtin_function(system_security_allowinsecuredomain));
+                gl->createFunction(system_security_allowinsecuredomain));
 
 		proto->init_member("loadPolicyFile",
-                new builtin_function(system_security_loadpolicyfile));
+                gl->createFunction(system_security_loadpolicyfile));
 	}
 	return proto.get();
 }
@@ -309,7 +309,7 @@ attachSystemInterface(as_object& proto)
 	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
 	proto.init_member("setClipboard", 
-            new builtin_function(system_setClipboard));
+            gl->createFunction(system_setClipboard));
 	proto.init_member("showSettings", vm.getNative(2107, 0));
 
 	proto.init_property("useCodepage", &system_usecodepage,

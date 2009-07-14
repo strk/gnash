@@ -245,11 +245,11 @@ namespace {
 void
 attachMovieClipLoaderInterface(as_object& o)
 {
-  	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
+  	o.init_member("loadClip", gl->createFunction(moviecliploader_loadclip));
 	o.init_member("unloadClip",
-            new builtin_function(moviecliploader_unloadclip));
+            gl->createFunction(moviecliploader_unloadclip));
 	o.init_member("getProgress",
-            new builtin_function(moviecliploader_getprogress));
+            gl->createFunction(moviecliploader_getprogress));
 
 	// NOTE: we want addListener/removeListener/broadcastMessage
 	//       but don't what the _listeners property here...

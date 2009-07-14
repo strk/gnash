@@ -71,8 +71,8 @@ namespace {
 void
 attachIMEInterface(as_object& o)
 {
-    o.init_member("setCompositionString", new builtin_function(ime_setCompositionString));
-    o.init_member("imeComposition", new builtin_function(ime_imeComposition));
+    o.init_member("setCompositionString", gl->createFunction(ime_setCompositionString));
+    o.init_member("imeComposition", gl->createFunction(ime_imeComposition));
 }
 
 void

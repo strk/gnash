@@ -1888,19 +1888,19 @@ void
 attachNetStreamInterface(as_object& o)
 {
 
-    o.init_member("close", new builtin_function(netstream_close));
-    o.init_member("pause", new builtin_function(netstream_pause));
-    o.init_member("play", new builtin_function(netstream_play));
-    o.init_member("seek", new builtin_function(netstream_seek));
+    o.init_member("close", gl->createFunction(netstream_close));
+    o.init_member("pause", gl->createFunction(netstream_pause));
+    o.init_member("play", gl->createFunction(netstream_play));
+    o.init_member("seek", gl->createFunction(netstream_seek));
     o.init_member("setBufferTime",
-            new builtin_function(netstream_setbuffertime));
+            gl->createFunction(netstream_setbuffertime));
 
-    o.init_member("attachAudio", new builtin_function(netstream_attachAudio));
-    o.init_member("attachVideo", new builtin_function(netstream_attachVideo));
-    o.init_member("publish", new builtin_function(netstream_publish));
-    o.init_member("receiveAudio", new builtin_function(netstream_receiveAudio));
-    o.init_member("receiveVideo", new builtin_function(netstream_receiveVideo));
-    o.init_member("send", new builtin_function(netstream_send));
+    o.init_member("attachAudio", gl->createFunction(netstream_attachAudio));
+    o.init_member("attachVideo", gl->createFunction(netstream_attachVideo));
+    o.init_member("publish", gl->createFunction(netstream_publish));
+    o.init_member("receiveAudio", gl->createFunction(netstream_receiveAudio));
+    o.init_member("receiveVideo", gl->createFunction(netstream_receiveVideo));
+    o.init_member("send", gl->createFunction(netstream_send));
 
     // Properties
     // TODO: attach to each instance rather then to the class ? check it ..

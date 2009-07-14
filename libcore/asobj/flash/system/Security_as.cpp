@@ -76,13 +76,13 @@ namespace {
 void
 attachSecurityInterface(as_object& o)
 {
-    o.init_member("allowInsecureDomain", new builtin_function(security_allowInsecureDomain));
-    o.init_member("loadPolicyFile", new builtin_function(security_loadPolicyFile));
-    o.init_member("showSettings", new builtin_function(security_showSettings));
-    o.init_member("LOCAL_TRUSTED", new builtin_function(security_LOCAL_TRUSTED));
-    o.init_member("LOCAL_WITH_FILE", new builtin_function(security_LOCAL_WITH_FILE));
-    o.init_member("LOCAL_WITH_NETWORK", new builtin_function(security_LOCAL_WITH_NETWORK));
-    o.init_member("REMOTE", new builtin_function(security_REMOTE));
+    o.init_member("allowInsecureDomain", gl->createFunction(security_allowInsecureDomain));
+    o.init_member("loadPolicyFile", gl->createFunction(security_loadPolicyFile));
+    o.init_member("showSettings", gl->createFunction(security_showSettings));
+    o.init_member("LOCAL_TRUSTED", gl->createFunction(security_LOCAL_TRUSTED));
+    o.init_member("LOCAL_WITH_FILE", gl->createFunction(security_LOCAL_WITH_FILE));
+    o.init_member("LOCAL_WITH_NETWORK", gl->createFunction(security_LOCAL_WITH_NETWORK));
+    o.init_member("REMOTE", gl->createFunction(security_REMOTE));
 }
 
 void

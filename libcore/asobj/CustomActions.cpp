@@ -40,10 +40,10 @@ as_value customactions_ctor(const fn_call& fn);
 static void
 attachCustomActionsInterface(as_object& o)
 {
-	o.init_member("get", new builtin_function(customactions_get));
-	o.init_member("install", new builtin_function(customactions_install));
-	o.init_member("list", new builtin_function(customactions_list));
-	o.init_member("uninstall", new builtin_function(customactions_uninstall));
+	o.init_member("get", gl->createFunction(customactions_get));
+	o.init_member("install", gl->createFunction(customactions_install));
+	o.init_member("list", gl->createFunction(customactions_list));
+	o.init_member("uninstall", gl->createFunction(customactions_uninstall));
 }
 
 static as_object*

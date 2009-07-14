@@ -41,11 +41,11 @@ as_value microphone_ctor(const fn_call& fn);
 static void
 attachMicrophoneInterface(as_object& o)
 {
-	o.init_member("get", new builtin_function(microphone_get));
-	o.init_member("setGain", new builtin_function(microphone_setgain));
-	o.init_member("setRate", new builtin_function(microphone_setrate));
-	o.init_member("setSilenceLevel", new builtin_function(microphone_setsilencelevel));
-	o.init_member("setUseEchoSuppression", new builtin_function(microphone_setuseechosuppression));
+	o.init_member("get", gl->createFunction(microphone_get));
+	o.init_member("setGain", gl->createFunction(microphone_setgain));
+	o.init_member("setRate", gl->createFunction(microphone_setrate));
+	o.init_member("setSilenceLevel", gl->createFunction(microphone_setsilencelevel));
+	o.init_member("setUseEchoSuppression", gl->createFunction(microphone_setuseechosuppression));
 }
 
 static as_object*

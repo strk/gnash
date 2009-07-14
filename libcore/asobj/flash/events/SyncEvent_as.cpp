@@ -71,8 +71,8 @@ namespace {
 void
 attachSyncEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(syncevent_toString));
-    o.init_member("SYNC", new builtin_function(syncevent_SYNC));
+    o.init_member("toString", gl->createFunction(syncevent_toString));
+    o.init_member("SYNC", gl->createFunction(syncevent_SYNC));
 }
 
 void

@@ -113,8 +113,8 @@ getBooleanConstructor()
 void
 attachBooleanInterface(as_object& o)
 {
-	o.init_member("toString", new builtin_function(boolean_tostring));
-	o.init_member("valueOf", new builtin_function(boolean_valueof));
+	o.init_member("toString", gl->createFunction(boolean_tostring));
+	o.init_member("valueOf", gl->createFunction(boolean_valueof));
 }
 
 as_object*

@@ -75,12 +75,12 @@ namespace {
 void
 attachEventDispatcherInterface(as_object& o)
 {
-    o.init_member("dispatchEvent", new builtin_function(eventdispatcher_dispatchEvent));
-    o.init_member("hasEventListener", new builtin_function(eventdispatcher_hasEventListener));
-    o.init_member("removeEventListener", new builtin_function(eventdispatcher_removeEventListener));
-    o.init_member("willTrigger", new builtin_function(eventdispatcher_willTrigger));
-    o.init_member("activate", new builtin_function(eventdispatcher_activate));
-    o.init_member("deactivate", new builtin_function(eventdispatcher_deactivate));
+    o.init_member("dispatchEvent", gl->createFunction(eventdispatcher_dispatchEvent));
+    o.init_member("hasEventListener", gl->createFunction(eventdispatcher_hasEventListener));
+    o.init_member("removeEventListener", gl->createFunction(eventdispatcher_removeEventListener));
+    o.init_member("willTrigger", gl->createFunction(eventdispatcher_willTrigger));
+    o.init_member("activate", gl->createFunction(eventdispatcher_activate));
+    o.init_member("deactivate", gl->createFunction(eventdispatcher_deactivate));
 }
 
 void

@@ -69,7 +69,7 @@ static void
 attachInterface(as_object *obj)
 {
     GNASH_REPORT_FUNCTION;
-    obj->init_member("connect", new builtin_function(metome_ext_connect));
+    obj->init_member("connect", gl->createFunction(metome_ext_connect));
 }
 
 static as_object*

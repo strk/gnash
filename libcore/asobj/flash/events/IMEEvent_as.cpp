@@ -71,8 +71,8 @@ namespace {
 void
 attachIMEEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(imeevent_toString));
-    o.init_member("IME_COMPOSITION", new builtin_function(imeevent_IME_COMPOSITION));
+    o.init_member("toString", gl->createFunction(imeevent_toString));
+    o.init_member("IME_COMPOSITION", gl->createFunction(imeevent_IME_COMPOSITION));
 }
 
 void

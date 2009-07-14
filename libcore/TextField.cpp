@@ -1942,53 +1942,53 @@ attachPrototypeProperties(as_object& o)
     o.init_property(NSV::PROP_TEXT_HEIGHT,
             textfield_textHeight, textfield_textHeight);
 
-    getset = new builtin_function(textfield_variable);
+    getset = gl->createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_background);
+    getset = gl->createFunction(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_text);
+    getset = gl->createFunction(textfield_text);
     o.init_property("text", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_backgroundColor);
+    getset = gl->createFunction(textfield_backgroundColor);
     o.init_property("backgroundColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_border);
+    getset = gl->createFunction(textfield_border);
     o.init_property("border", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_borderColor);
+    getset = gl->createFunction(textfield_borderColor);
     o.init_property("borderColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_textColor);
+    getset = gl->createFunction(textfield_textColor);
     o.init_property("textColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_embedFonts);
+    getset = gl->createFunction(textfield_embedFonts);
     o.init_property("embedFonts", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_autoSize);
+    getset = gl->createFunction(textfield_autoSize);
     o.init_property("autoSize", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_type);
+    getset = gl->createFunction(textfield_type);
     o.init_property("type", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_wordWrap);
+    getset = gl->createFunction(textfield_wordWrap);
     o.init_property("wordWrap", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_html);
+    getset = gl->createFunction(textfield_html);
     o.init_property("html", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_selectable);
+    getset = gl->createFunction(textfield_selectable);
     o.init_property("selectable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_length);
+    getset = gl->createFunction(textfield_length);
     o.init_property("length", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxscroll);
+    getset = gl->createFunction(textfield_maxscroll);
     o.init_property("maxscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxhscroll);
+    getset = gl->createFunction(textfield_maxhscroll);
     o.init_property("maxhscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxChars);
+    getset = gl->createFunction(textfield_maxChars);
     o.init_property("maxChars", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_bottomScroll);
+    getset = gl->createFunction(textfield_bottomScroll);
     o.init_property("bottomScroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_scroll);
+    getset = gl->createFunction(textfield_scroll);
     o.init_property("scroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_hscroll);
+    getset = gl->createFunction(textfield_hscroll);
     o.init_property("hscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_restrict);
+    getset = gl->createFunction(textfield_restrict);
     o.init_property("restrict", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_multiline);
+    getset = gl->createFunction(textfield_multiline);
     o.init_property("multiline", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_password);
+    getset = gl->createFunction(textfield_password);
     o.init_property("password", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_htmlText);
+    getset = gl->createFunction(textfield_htmlText);
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
@@ -2771,27 +2771,27 @@ attachTextFieldInterface(as_object& o)
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
     o.init_member("setTextFormat", 
-            new builtin_function(textfield_setTextFormat), swf6Flags);
+            gl->createFunction(textfield_setTextFormat), swf6Flags);
     o.init_member("getTextFormat", 
-            new builtin_function(textfield_getTextFormat), swf6Flags);
+            gl->createFunction(textfield_getTextFormat), swf6Flags);
     o.init_member("setNewTextFormat",
-            new builtin_function(textfield_setNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_setNewTextFormat), swf6Flags);
     o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
     o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
     o.init_member("getDepth",
-            new builtin_function(textfield_getDepth), swf6Flags);
+            gl->createFunction(textfield_getDepth), swf6Flags);
     o.init_member("removeTextField",
-            new builtin_function(textfield_removeTextField), swf6Flags);
+            gl->createFunction(textfield_removeTextField), swf6Flags);
     o.init_member("replaceSel",
-            new builtin_function(textfield_replaceSel), swf6Flags);
+            gl->createFunction(textfield_replaceSel), swf6Flags);
 
     // SWF7 or higher
     const int swf7Flags = flags | as_prop_flags::onlySWF7Up;
 
     o.init_member("replaceText",
-            new builtin_function(textfield_replaceText), swf7Flags);
+            gl->createFunction(textfield_replaceText), swf7Flags);
 
 }
 
@@ -2806,7 +2806,7 @@ attachTextFieldStaticMembers(as_object& o)
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
     o.init_member("getFontList",
-            new builtin_function(textfield_getFontList), swf6Flags);
+            gl->createFunction(textfield_getFontList), swf6Flags);
 
 }
 

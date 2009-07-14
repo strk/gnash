@@ -1121,10 +1121,10 @@ netconnection_uri(const fn_call& fn)
 void
 attachNetConnectionInterface(as_object& o)
 {
-    o.init_member("connect", new builtin_function(netconnection_connect));
-    o.init_member("addHeader", new builtin_function(netconnection_addHeader));
-    o.init_member("call", new builtin_function(netconnection_call));
-    o.init_member("close", new builtin_function(netconnection_close));
+    o.init_member("connect", gl->createFunction(netconnection_connect));
+    o.init_member("addHeader", gl->createFunction(netconnection_addHeader));
+    o.init_member("call", gl->createFunction(netconnection_call));
+    o.init_member("close", gl->createFunction(netconnection_close));
 }
 
 void

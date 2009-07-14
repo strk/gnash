@@ -76,13 +76,13 @@ namespace {
 void
 attachLoaderInfoInterface(as_object& o)
 {
-    o.init_member("complete", new builtin_function(loaderinfo_complete));
-    o.init_member("httpStatus", new builtin_function(loaderinfo_httpStatus));
-    o.init_member("init", new builtin_function(loaderinfo_init));
-    o.init_member("ioError", new builtin_function(loaderinfo_ioError));
-    o.init_member("open", new builtin_function(loaderinfo_open));
-    o.init_member("progress", new builtin_function(loaderinfo_progress));
-    o.init_member("unload", new builtin_function(loaderinfo_unload));
+    o.init_member("complete", gl->createFunction(loaderinfo_complete));
+    o.init_member("httpStatus", gl->createFunction(loaderinfo_httpStatus));
+    o.init_member("init", gl->createFunction(loaderinfo_init));
+    o.init_member("ioError", gl->createFunction(loaderinfo_ioError));
+    o.init_member("open", gl->createFunction(loaderinfo_open));
+    o.init_member("progress", gl->createFunction(loaderinfo_progress));
+    o.init_member("unload", gl->createFunction(loaderinfo_unload));
 }
 
 void

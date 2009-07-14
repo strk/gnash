@@ -75,54 +75,54 @@ attachExternalInterfaceStaticProperties(as_object& o)
 
     o.init_member("addCallback", new builtin_function(
                 ExternalInterface_addCallback), flags);
-    o.init_member("call", new builtin_function(ExternalInterface_call), flags);
+    o.init_member("call", gl->createFunction(ExternalInterface_call), flags);
     o.init_member("_argumentsToXML",
-            new builtin_function(ExternalInterface_uArgumentsToXML), flags);
+            gl->createFunction(ExternalInterface_uArgumentsToXML), flags);
     o.init_member("_argumentsToAS",
-            new builtin_function(ExternalInterface_uArgumentsToAS), flags);
+            gl->createFunction(ExternalInterface_uArgumentsToAS), flags);
     o.init_member("_addCallback",
-            new builtin_function(ExternalInterface_uAddCallback), flags);
+            gl->createFunction(ExternalInterface_uAddCallback), flags);
     o.init_member("_arrayToAS",
-            new builtin_function(ExternalInterface_uArrayToAS), flags);
+            gl->createFunction(ExternalInterface_uArrayToAS), flags);
     o.init_member("_arrayToJS",
-            new builtin_function(ExternalInterface_uArrayToJS), flags);
+            gl->createFunction(ExternalInterface_uArrayToJS), flags);
     o.init_member("_arrayToXML",
-            new builtin_function(ExternalInterface_uArrayToXML), flags);
+            gl->createFunction(ExternalInterface_uArrayToXML), flags);
     o.init_member("_callIn",
-            new builtin_function(ExternalInterface_uCallIn), flags);
+            gl->createFunction(ExternalInterface_uCallIn), flags);
     o.init_member("_callOut",
-            new builtin_function(ExternalInterface_uCallOut), flags);
+            gl->createFunction(ExternalInterface_uCallOut), flags);
     o.init_member("_escapeXML",
-            new builtin_function(ExternalInterface_uEscapeXML), flags);
+            gl->createFunction(ExternalInterface_uEscapeXML), flags);
     o.init_member("_evalJS",
-            new builtin_function(ExternalInterface_uEvalJS), flags);
+            gl->createFunction(ExternalInterface_uEvalJS), flags);
     o.init_member("_initJS",
-            new builtin_function(ExternalInterface_uInitJS), flags);
+            gl->createFunction(ExternalInterface_uInitJS), flags);
     o.init_member("_jsQuoteString",
-            new builtin_function(ExternalInterface_uJsQuoteString), flags);
+            gl->createFunction(ExternalInterface_uJsQuoteString), flags);
     o.init_member("_objectID",
-            new builtin_function(ExternalInterface_uObjectID), flags);
+            gl->createFunction(ExternalInterface_uObjectID), flags);
     o.init_member("_objectToAS",
-            new builtin_function(ExternalInterface_uObjectToAS), flags);
+            gl->createFunction(ExternalInterface_uObjectToAS), flags);
     o.init_member("_objectToJS",
-            new builtin_function(ExternalInterface_uObjectToJS), flags);
+            gl->createFunction(ExternalInterface_uObjectToJS), flags);
     o.init_member("_objectToXML",
-            new builtin_function(ExternalInterface_uObjectToXML), flags);
+            gl->createFunction(ExternalInterface_uObjectToXML), flags);
     o.init_member("_toAS",
-            new builtin_function(ExternalInterface_uToAS), flags);
+            gl->createFunction(ExternalInterface_uToAS), flags);
     o.init_member("_toJS",
-            new builtin_function(ExternalInterface_uToJS), flags);
+            gl->createFunction(ExternalInterface_uToJS), flags);
     o.init_member("_toXML",
-            new builtin_function(ExternalInterface_uToXML), flags);
+            gl->createFunction(ExternalInterface_uToXML), flags);
     o.init_member("_unescapeXML",
-            new builtin_function(ExternalInterface_uUnescapeXML), flags);
+            gl->createFunction(ExternalInterface_uUnescapeXML), flags);
 
     int protectedFlags = as_prop_flags::dontEnum |
                          as_prop_flags::dontDelete |
                          as_prop_flags::isProtected;
 
     o.init_member("available",
-            new builtin_function(ExternalInterface_available), protectedFlags);
+            gl->createFunction(ExternalInterface_available), protectedFlags);
 }
 
 static as_object*

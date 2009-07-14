@@ -73,10 +73,10 @@ namespace {
 void
 attachTimerInterface(as_object& o)
 {
-    o.init_member("start", new builtin_function(timer_start));
-    o.init_member("stop", new builtin_function(timer_stop));
-    o.init_member("timer", new builtin_function(timer_timer));
-    o.init_member("timerComplete", new builtin_function(timer_timerComplete));
+    o.init_member("start", gl->createFunction(timer_start));
+    o.init_member("stop", gl->createFunction(timer_stop));
+    o.init_member("timer", gl->createFunction(timer_timer));
+    o.init_member("timerComplete", gl->createFunction(timer_timerComplete));
 }
 
 void

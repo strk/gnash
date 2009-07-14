@@ -71,8 +71,8 @@ namespace {
 void
 attachFontInterface(as_object& o)
 {
-    o.init_member("hasGlyphs", new builtin_function(font_hasGlyphs));
-    o.init_member("registerFont", new builtin_function(font_registerFont));
+    o.init_member("hasGlyphs", gl->createFunction(font_hasGlyphs));
+    o.init_member("registerFont", gl->createFunction(font_registerFont));
 }
 
 void

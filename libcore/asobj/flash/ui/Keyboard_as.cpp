@@ -272,7 +272,7 @@ void Keyboard_as::init(as_object& global)
     key_obj->init_member("isToggled", vm.getNative(800, 3), flags);
 
     key_obj->init_member("isAccessible", 
-            new builtin_function(key_is_accessible), flags);
+            gl->createFunction(key_is_accessible), flags);
 
     global.init_member("Key", key_obj);
 }

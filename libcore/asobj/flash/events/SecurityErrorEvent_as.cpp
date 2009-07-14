@@ -71,8 +71,8 @@ namespace {
 void
 attachSecurityErrorEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(securityerrorevent_toString));
-    o.init_member("SECURITY_ERROR", new builtin_function(securityerrorevent_SECURITY_ERROR));
+    o.init_member("toString", gl->createFunction(securityerrorevent_toString));
+    o.init_member("SECURITY_ERROR", gl->createFunction(securityerrorevent_SECURITY_ERROR));
 }
 
 void

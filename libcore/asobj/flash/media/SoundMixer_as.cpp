@@ -71,8 +71,8 @@ namespace {
 void
 attachSoundMixerInterface(as_object& o)
 {
-    o.init_member("computeSpectrum", new builtin_function(soundmixer_computeSpectrum));
-    o.init_member("stopAll", new builtin_function(soundmixer_stopAll));
+    o.init_member("computeSpectrum", gl->createFunction(soundmixer_computeSpectrum));
+    o.init_member("stopAll", gl->createFunction(soundmixer_stopAll));
 }
 
 void

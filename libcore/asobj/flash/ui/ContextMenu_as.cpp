@@ -88,8 +88,8 @@ attachContextMenuInterface(as_object& o)
                       as_prop_flags::onlySWF7Up;
 
     o.init_member("hideBuiltInItems",
-            new builtin_function(contextmenu_hideBuiltInItems), flags);
-    o.init_member("copy", new builtin_function(contextmenu_copy), flags);
+            gl->createFunction(contextmenu_hideBuiltInItems), flags);
+    o.init_member("copy", gl->createFunction(contextmenu_copy), flags);
 }
 
 as_object*

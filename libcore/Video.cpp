@@ -344,7 +344,7 @@ getVideoInterface(as_object& where)
 		getVM(where).addStatic(proto.get());
 
 		attachVideoInterface(*proto);
-		//proto->init_member("constructor", new builtin_function(video_ctor));
+		//proto->init_member("constructor", gl->createFunction(video_ctor));
 	}
 	return proto.get();
 }
@@ -352,8 +352,8 @@ getVideoInterface(as_object& where)
 void
 attachVideoInterface(as_object& o)
 {
-	o.init_member("attachVideo", new builtin_function(video_attach));
-	o.init_member("clear", new builtin_function(video_clear));
+	o.init_member("attachVideo", gl->createFunction(video_attach));
+	o.init_member("clear", gl->createFunction(video_clear));
 }
 
 void

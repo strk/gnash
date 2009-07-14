@@ -71,8 +71,8 @@ namespace {
 void
 attachPrintJobInterface(as_object& o)
 {
-    o.init_member("send", new builtin_function(printjob_send));
-    o.init_member("start", new builtin_function(printjob_start));
+    o.init_member("send", gl->createFunction(printjob_send));
+    o.init_member("start", gl->createFunction(printjob_start));
 }
 
 void

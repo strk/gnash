@@ -89,26 +89,26 @@ namespace {
 void
 attachTextFieldInterface(as_object& o)
 {
-    o.init_member("getCharBoundaries", new builtin_function(textfield_getCharBoundaries));
-    o.init_member("getCharIndexAtPoint", new builtin_function(textfield_getCharIndexAtPoint));
-    o.init_member("getFirstCharInParagraph", new builtin_function(textfield_getFirstCharInParagraph));
-    o.init_member("getImageReference", new builtin_function(textfield_getImageReference));
-    o.init_member("getLineIndexAtPoint", new builtin_function(textfield_getLineIndexAtPoint));
-    o.init_member("getLineIndexOfChar", new builtin_function(textfield_getLineIndexOfChar));
-    o.init_member("getLineLength", new builtin_function(textfield_getLineLength));
-    o.init_member("getLineMetrics", new builtin_function(textfield_getLineMetrics));
-    o.init_member("getLineOffset", new builtin_function(textfield_getLineOffset));
-    o.init_member("getLineText", new builtin_function(textfield_getLineText));
-    o.init_member("getParagraphLength", new builtin_function(textfield_getParagraphLength));
-    o.init_member("getTextFormat", new builtin_function(textfield_getTextFormat));
-    o.init_member("replaceSelectedText", new builtin_function(textfield_replaceSelectedText));
-    o.init_member("replaceText", new builtin_function(textfield_replaceText));
-    o.init_member("setSelection", new builtin_function(textfield_setSelection));
-    o.init_member("setTextFormat", new builtin_function(textfield_setTextFormat));
-    o.init_member("change", new builtin_function(textfield_change));
-    o.init_member("link", new builtin_function(textfield_link));
-    o.init_member("scroll", new builtin_function(textfield_scroll));
-    o.init_member("textInput", new builtin_function(textfield_textInput));
+    o.init_member("getCharBoundaries", gl->createFunction(textfield_getCharBoundaries));
+    o.init_member("getCharIndexAtPoint", gl->createFunction(textfield_getCharIndexAtPoint));
+    o.init_member("getFirstCharInParagraph", gl->createFunction(textfield_getFirstCharInParagraph));
+    o.init_member("getImageReference", gl->createFunction(textfield_getImageReference));
+    o.init_member("getLineIndexAtPoint", gl->createFunction(textfield_getLineIndexAtPoint));
+    o.init_member("getLineIndexOfChar", gl->createFunction(textfield_getLineIndexOfChar));
+    o.init_member("getLineLength", gl->createFunction(textfield_getLineLength));
+    o.init_member("getLineMetrics", gl->createFunction(textfield_getLineMetrics));
+    o.init_member("getLineOffset", gl->createFunction(textfield_getLineOffset));
+    o.init_member("getLineText", gl->createFunction(textfield_getLineText));
+    o.init_member("getParagraphLength", gl->createFunction(textfield_getParagraphLength));
+    o.init_member("getTextFormat", gl->createFunction(textfield_getTextFormat));
+    o.init_member("replaceSelectedText", gl->createFunction(textfield_replaceSelectedText));
+    o.init_member("replaceText", gl->createFunction(textfield_replaceText));
+    o.init_member("setSelection", gl->createFunction(textfield_setSelection));
+    o.init_member("setTextFormat", gl->createFunction(textfield_setTextFormat));
+    o.init_member("change", gl->createFunction(textfield_change));
+    o.init_member("link", gl->createFunction(textfield_link));
+    o.init_member("scroll", gl->createFunction(textfield_scroll));
+    o.init_member("textInput", gl->createFunction(textfield_textInput));
 }
 
 void

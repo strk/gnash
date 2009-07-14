@@ -77,13 +77,13 @@ attachAccessibilityInterface(as_object& o)
     // For swf v9 or greater, the isActive() method has been changed to a
     // the property "active".
     if ( vm.getSWFVersion() >= 9 ) {
-	o.init_member("active", new builtin_function(Accessibility_active), flags);
+	o.init_member("active", gl->createFunction(Accessibility_active), flags);
     } else {
-	o.init_member("isActive", new builtin_function(Accessibility_isActive), flags);
-	o.init_member("sendEvent", new builtin_function(Accessibility_sendEvent), flags);
+	o.init_member("isActive", gl->createFunction(Accessibility_isActive), flags);
+	o.init_member("sendEvent", gl->createFunction(Accessibility_sendEvent), flags);
     }
     
-    o.init_member("updateProperties", new builtin_function(Accessibility_updateProperties), flags);
+    o.init_member("updateProperties", gl->createFunction(Accessibility_updateProperties), flags);
 
 }
 

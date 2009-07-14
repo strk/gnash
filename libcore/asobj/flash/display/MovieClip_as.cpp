@@ -332,15 +332,15 @@ attachMovieClipAS2Interface(as_object& o)
         o.init_member("removeMovieClip", vm.getNative(900, 19));
         o.init_member("startDrag", vm.getNative(900, 20));
         o.init_member("stopDrag", vm.getNative(900, 21));
-        o.init_member("loadMovie", new builtin_function(movieclip_loadMovie));
+        o.init_member("loadMovie", gl->createFunction(movieclip_loadMovie));
         o.init_member("loadVariables", new builtin_function(
                     movieclip_loadVariables));
         o.init_member("unloadMovie", new builtin_function(
                     movieclip_unloadMovie));
-        o.init_member("getURL", new builtin_function(movieclip_getURL));
+        o.init_member("getURL", gl->createFunction(movieclip_getURL));
         o.init_member("getSWFVersion", new builtin_function(
                     movieclip_getSWFVersion));
-        o.init_member("meth", new builtin_function(movieclip_meth));
+        o.init_member("meth", gl->createFunction(movieclip_meth));
         o.init_member("enabled", true);
         o.init_member("useHandCursor", true);
         o.init_property("_lockroot", &MovieClip::lockroot_getset,
@@ -389,7 +389,7 @@ attachMovieClipAS2Interface(as_object& o)
         o.init_member("clear", vm.getNative(901, 8), swf6Flags);
         o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
         o.init_member("getTextSnapshot", 
-                new builtin_function(movieclip_getTextSnapshot), swf6Flags);
+                gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
         const int swf7Flags = as_prop_flags::dontDelete |
                     as_prop_flags::dontEnum |
@@ -2648,13 +2648,13 @@ movieclip_as3_ctor(const fn_call& fn)
 void
 attachMovieClipAS3Interface(as_object& o)
 {
-    o.init_member("gotoAndStop", new builtin_function(movieclip_gotoAndStop));
-    o.init_member("nextFrame", new builtin_function(movieclip_nextFrame));
-    o.init_member("nextScene", new builtin_function(movieclip_nextScene));
-    o.init_member("play", new builtin_function(movieclip_play));
-    o.init_member("prevFrame", new builtin_function(movieclip_prevFrame));
-    o.init_member("prevScene", new builtin_function(movieclip_prevScene));
-    o.init_member("stop", new builtin_function(movieclip_stop));
+    o.init_member("gotoAndStop", gl->createFunction(movieclip_gotoAndStop));
+    o.init_member("nextFrame", gl->createFunction(movieclip_nextFrame));
+    o.init_member("nextScene", gl->createFunction(movieclip_nextScene));
+    o.init_member("play", gl->createFunction(movieclip_play));
+    o.init_member("prevFrame", gl->createFunction(movieclip_prevFrame));
+    o.init_member("prevScene", gl->createFunction(movieclip_prevScene));
+    o.init_member("stop", gl->createFunction(movieclip_stop));
     o.init_member("addFrameScript", new builtin_function(
                 movieclip_addFrameScript));
 }
