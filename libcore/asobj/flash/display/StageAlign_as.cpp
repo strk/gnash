@@ -56,7 +56,6 @@ namespace {
 void
 attachStageAlignStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     // TODO: flags
     o.init_member("BOTTOM", "B");
     o.init_member("BOTTOM_LEFT", "BL");

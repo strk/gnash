@@ -53,7 +53,6 @@ namespace {
 void
 attachGradientTypeStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     // TODO: add constants here.
 }
 
