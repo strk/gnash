@@ -30,6 +30,7 @@
 #include "movie_root.h"
 #include "movie_definition.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "GnashException.h" // for ActionException
 #include "builtin_function.h" // need builtin_function
 #include "smart_ptr.h" // for boost intrusive_ptr

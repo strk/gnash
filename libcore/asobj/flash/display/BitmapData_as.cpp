@@ -29,6 +29,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -759,7 +760,7 @@ attachBitmapDataInterface(as_object& o)
 void
 attachBitmapDataStaticProperties(as_object& o)
 {
-   
+    Global_as* gl = getGlobal(o);
     o.init_member("loadBitmap", gl->createFunction(BitmapData_loadBitmap));
 }
 

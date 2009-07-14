@@ -30,6 +30,7 @@
 
 #include "VM.h" // get random generator
 #include "fn_call.h"
+#include "Global_as.h"
 #include "Math_as.h"
 #include "log.h"
 #include "builtin_function.h" 
@@ -234,8 +235,6 @@ round(double d)
 void
 attachMathInterface(as_object& proto)
 {
-    Global_as* gl = getGlobal(proto);
-
 	// TODO: rely on inheritance, use init_property ?
 	// All Math members are constant and non-enumerable.
 

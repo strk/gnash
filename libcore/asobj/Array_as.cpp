@@ -28,6 +28,7 @@
 #include "builtin_function.h" // for Array class
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
+#include "Global_as.h"
 #include "GnashException.h"
 #include "action.h" // for call_method
 #include "VM.h" // for PROPNAME, registerNative

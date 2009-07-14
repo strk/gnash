@@ -27,6 +27,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "GnashException.h"
 #include "NetConnection_as.h"

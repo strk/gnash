@@ -19,6 +19,7 @@
 
 #include "smart_ptr.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
 #include "Object.h"

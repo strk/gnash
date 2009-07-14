@@ -37,6 +37,8 @@
 #include "SimpleBuffer.h"
 #include "namedStrings.h"
 #include "GnashAlgorithm.h"
+#include "fn_call.h"
+#include "Global_as.h"
 
 #include <iostream>
 #include <string>
@@ -1121,6 +1123,8 @@ netconnection_uri(const fn_call& fn)
 void
 attachNetConnectionInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
+
     o.init_member("connect", gl->createFunction(netconnection_connect));
     o.init_member("addHeader", gl->createFunction(netconnection_addHeader));
     o.init_member("call", gl->createFunction(netconnection_call));

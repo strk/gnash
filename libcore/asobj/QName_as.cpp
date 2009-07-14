@@ -25,6 +25,7 @@
 #include "as_object.h" 
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
 #include "Object.h" 
@@ -87,7 +88,6 @@ getQNameInterface()
 void
 attachQNameInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     o.init_property("localName", qname_localName, qname_localName);
     o.init_property("uri", qname_uri, qname_uri);
 }

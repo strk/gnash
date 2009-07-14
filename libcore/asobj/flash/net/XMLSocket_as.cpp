@@ -29,6 +29,7 @@
 #include "as_function.h"
 #include "movie_root.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "VM.h"
 #include "builtin_function.h" 
 #include "URLAccessManager.h"

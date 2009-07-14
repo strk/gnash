@@ -24,6 +24,7 @@
 #include "display/DisplayObject_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -80,6 +81,8 @@ namespace {
 void
 attachDisplayObjectInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
+
     o.init_member("getRect", gl->createFunction(displayobject_getRect));
     o.init_member("globalToLocal", gl->createFunction(displayobject_globalToLocal));
     o.init_member("hitTestObject", gl->createFunction(displayobject_hitTestObject));

@@ -22,6 +22,7 @@
 #include "Number_as.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "as_value.h" // for doubleToString
 #include "builtin_function.h" // need builtin_function
@@ -142,7 +143,6 @@ attachNumberInterface(as_object& o)
 void
 attachNumberStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     // constant flags
     const int cflags = as_prop_flags::dontEnum | 
         as_prop_flags::dontDelete | 

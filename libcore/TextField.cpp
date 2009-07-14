@@ -43,6 +43,7 @@
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
+#include "Global_as.h"
 #include "Point2d.h"
 #include "GnashNumeric.h"
 
@@ -1942,6 +1943,8 @@ attachPrototypeProperties(as_object& o)
     o.init_property(NSV::PROP_TEXT_HEIGHT,
             textfield_textHeight, textfield_textHeight);
 
+    Global_as* gl = getGlobal(o);
+
     getset = gl->createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
     getset = gl->createFunction(textfield_background);
@@ -2806,6 +2809,7 @@ attachTextFieldStaticMembers(as_object& o)
     // SWF6 or higher
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("getFontList",
             gl->createFunction(textfield_getFontList), swf6Flags);
 

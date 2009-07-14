@@ -32,6 +32,7 @@
 #include "MediaHandler.h" // for setting up embedded video decoder 
 #include "VideoDecoder.h" // for setting up embedded video decoder
 #include "namedStrings.h"
+#include "Global_as.h"
 
 // Define this to get debug logging during embedded video decoding
 //#define DEBUG_EMBEDDED_VIDEO_DECODING

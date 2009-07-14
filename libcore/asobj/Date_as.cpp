@@ -71,6 +71,7 @@
 #include "GnashNumeric.h"
 #include "Date_as.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
@@ -383,7 +384,6 @@ attachDateInterface(as_object& o)
 void
 attachDateStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
     o.init_member("UTC", vm.getNative(103, 257));
 }

@@ -36,6 +36,7 @@
 #include "net/LocalConnection_as.h"
 #include "network.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "amf.h"
 #include "lcshm.h"

@@ -28,6 +28,7 @@
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
+#include "Global_as.h"
 #include "namedStrings.h"
 
 namespace gnash {
@@ -128,6 +129,7 @@ AsBroadcaster::initialize(as_object& o)
         o.set_member(NSV::PROP_REMOVE_LISTENER, tmp);
 	}
 	
+    Global_as* gl = getGlobal(o);
     o.set_member(NSV::PROP_BROADCAST_MESSAGE,
             gl->createFunction(asbroadcaster_broadcastMessage));
 
@@ -165,6 +167,7 @@ AsBroadcaster::getAsBroadcaster()
         // class we know using an 'initialize' method we might as
         // well save the string_table size in case we'll not load
         // the class.
+        Global_as* gl = getGlobal(*obj);
         obj->init_member("initialize",
                 gl->createFunction(asbroadcaster_initialize), flags);
         obj->init_member(NSV::PROP_ADD_LISTENER,

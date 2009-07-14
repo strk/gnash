@@ -24,6 +24,7 @@
 #include "log.h"
 #include "as_function.h" //for as_function
 #include "fn_call.h"
+#include "Global_as.h"
 
 #include "LoadableObject.h"
 #include "xml/XMLNode_as.h"

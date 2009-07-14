@@ -28,6 +28,7 @@
 #include "sprite_definition.h" // for get_movie_definition()
 #include "VM.h" // for SWF version (attachObjectInterface)
 #include "namedStrings.h" // for NSV::PROP_TO_STRING
+#include "Global_as.h"
 
 #include "log.h"
 
@@ -119,6 +120,8 @@ attachObjectInterface(as_object& o)
 	vm.registerNative(object_hasOwnProperty, 101, 5); 
 	vm.registerNative(object_isPrototypeOf, 101, 6); 
 	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
+
+    Global_as* gl = getGlobal(o);
 
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));

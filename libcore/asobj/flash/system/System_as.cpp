@@ -21,6 +21,7 @@
 #include "log.h"
 #include "System_as.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface

@@ -27,6 +27,7 @@
 #include "as_object.h" // for inheritance
 #include "movie_root.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "as_function.h"
 #include "MovieClip.h"
 #include "DisplayObject.h" // for loadClip (get_parent)
@@ -245,6 +246,7 @@ namespace {
 void
 attachMovieClipLoaderInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
   	o.init_member("loadClip", gl->createFunction(moviecliploader_loadclip));
 	o.init_member("unloadClip",
             gl->createFunction(moviecliploader_unloadclip));
