@@ -33,6 +33,7 @@
 #include "buffer.h"
 #include "network.h"
 #include "amf.h"
+#include "Global_as.h"
 #include "element.h"
 #include "GnashNumeric.h"
 #include "movie_root.h"
