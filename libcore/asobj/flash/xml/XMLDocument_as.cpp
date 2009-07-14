@@ -705,7 +705,7 @@ xml_new(const fn_call& fn)
     {
         if ( fn.arg(0).is_object() )
         {
-            boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+            boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
             xml_obj = dynamic_cast<XMLDocument_as*>(obj.get());
             if ( xml_obj )
             {

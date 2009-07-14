@@ -214,7 +214,7 @@ Matrix_concat(const fn_call& fn)
     }
 
     // The object to concatenate doesn't have to be a matrix.    
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
 
     MatrixType concatMatrix;
@@ -416,7 +416,7 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 
     // It doesn't have to be a point. If it has x and y
     // properties, they will be used.    
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
 
     const PointType& point = transformPoint(obj, ptr.get());
@@ -706,7 +706,7 @@ Matrix_transformPoint(const fn_call& fn)
         return as_value();
     }
     
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
     if ( ! obj->instanceOf(getFlashGeomPointConstructor()) )
     {

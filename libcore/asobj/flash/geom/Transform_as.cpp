@@ -195,7 +195,7 @@ Transform_colorTransform_getset(const fn_call& fn)
         );
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -312,7 +312,7 @@ Transform_matrix_getset(const fn_call& fn)
     }
 
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -384,7 +384,7 @@ Transform_ctor(const fn_call& fn)
 	}
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
-    boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.arg(0).to_object());
+    boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.arg(0).to_object(*getGlobal(fn)));
 
 	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);
 
