@@ -57,7 +57,7 @@ static void usage (void);
 
 // Prototypes for test cases
 static void test_el();
-static void test_obj();
+static void test_obj(as_object* o);
 static void test_isnan();
 static void test_conversion();
 
@@ -123,7 +123,7 @@ main(int argc, char *argv[])
     // run the tests
     test_isnan();
     test_el();
-    test_obj();
+    test_obj(root);
     test_conversion();
    
 }
@@ -244,7 +244,7 @@ test_el()
 }
 
 void
-test_obj()
+test_obj(as_object* o)
 {
     // Create an object element with some properties
     bool notest = false;
@@ -276,7 +276,7 @@ test_obj()
     }
 
     as_value fooas, baras;
-    boost::intrusive_ptr<as_object> ao1 = as1.to_object();
+    boost::intrusive_ptr<as_object> ao1 = as1.to_object(*getGlobal(*o));
 
     if (ao1 == 0) {
         notest= true;
