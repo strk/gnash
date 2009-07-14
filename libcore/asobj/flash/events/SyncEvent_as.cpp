@@ -56,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void syncevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&syncevent_ctor, getSyncEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&syncevent_ctor, getSyncEventInterface());;
         attachSyncEventStaticInterface(*cl);
     }
 

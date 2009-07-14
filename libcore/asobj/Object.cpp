@@ -66,13 +66,14 @@ init_object_instance()
 void object_class_init(as_object& global)
 {
 	// This is going to be the global Object "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl=NULL;
+	static boost::intrusive_ptr<as_object> cl=NULL;
 
     VM& vm = getVM(global);
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&object_ctor, getObjectInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&object_ctor, getObjectInterface());;
 
 		// Object.registerClass() --
         // TODO: should this only be in SWF6 or higher ?

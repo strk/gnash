@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void morphshape_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&morphshape_ctor, getMorphShapeInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&morphshape_ctor, getMorphShapeInterface());;
         attachMorphShapeStaticInterface(*cl);
     }
 

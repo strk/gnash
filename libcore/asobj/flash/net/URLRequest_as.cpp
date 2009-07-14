@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void urlrequest_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&urlrequest_ctor, getURLRequestInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&urlrequest_ctor, getURLRequestInterface());;
         attachURLRequestStaticInterface(*cl);
     }
 

@@ -138,11 +138,11 @@ movieclip_class_init(as_object& where)
         return;
     }
 
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&movieclip_as2_ctor,
-                getMovieClipAS2Interface());
+        Global_as* gl = getGlobal(where);
+        cl = gl->createClass(&movieclip_as2_ctor, getMovieClipAS2Interface());
         getVM(where).addStatic(cl.get());
     }
 
@@ -335,25 +335,25 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("startDrag", vm.getNative(900, 20));
     o.init_member("stopDrag", vm.getNative(900, 21));
     o.init_member("loadMovie", gl->createFunction(movieclip_loadMovie));
-    o.init_member("loadVariables", new builtin_function(
+    o.init_member("loadVariables", gl->createFunction(
                 movieclip_loadVariables));
-    o.init_member("unloadMovie", new builtin_function(
+    o.init_member("unloadMovie", gl->createFunction(
                 movieclip_unloadMovie));
     o.init_member("getURL", gl->createFunction(movieclip_getURL));
-    o.init_member("getSWFVersion", new builtin_function(
+    o.init_member("getSWFVersion", gl->createFunction(
                 movieclip_getSWFVersion));
     o.init_member("meth", gl->createFunction(movieclip_meth));
     o.init_member("enabled", true);
     o.init_member("useHandCursor", true);
     o.init_property("_lockroot", &MovieClip::lockroot_getset,
           &MovieClip::lockroot_getset);
-    o.init_member("beginBitmapFill", new builtin_function(
+    o.init_member("beginBitmapFill", gl->createFunction(
                 movieclip_beginBitmapFill));
-    o.init_member("getRect", new builtin_function(
+    o.init_member("getRect", gl->createFunction(
                 movieclip_getRect));
-    o.init_member("lineGradientStyle", new builtin_function(
+    o.init_member("lineGradientStyle", gl->createFunction(
                 movieclip_lineGradientStyle));
-    o.init_member("attachBitmap", new builtin_function(
+    o.init_member("attachBitmap", gl->createFunction(
                 movieclip_attachBitmap));
     o.init_property("blendMode", &DisplayObject::blendMode,
             &DisplayObject::blendMode);
@@ -397,9 +397,9 @@ attachMovieClipAS2Interface(as_object& o)
                 as_prop_flags::dontEnum |
                 as_prop_flags::onlySWF7Up;
 
-    o.init_member("getNextHighestDepth", new builtin_function(
+    o.init_member("getNextHighestDepth", gl->createFunction(
                 movieclip_getNextHighestDepth), swf7Flags);
-    o.init_member("getInstanceAtDepth", new builtin_function(
+    o.init_member("getInstanceAtDepth", gl->createFunction(
                 movieclip_getInstanceAtDepth), swf7Flags);
 
 }
@@ -2658,7 +2658,7 @@ attachMovieClipAS3Interface(as_object& o)
     o.init_member("prevFrame", gl->createFunction(movieclip_prevFrame));
     o.init_member("prevScene", gl->createFunction(movieclip_prevScene));
     o.init_member("stop", gl->createFunction(movieclip_stop));
-    o.init_member("addFrameScript", new builtin_function(
+    o.init_member("addFrameScript", gl->createFunction(
                 movieclip_addFrameScript));
 }
 

@@ -61,10 +61,11 @@ public:
 // extern (used by Global.cpp)
 void netconnection_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&netconnection_ctor, getNetConnectionInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netconnection_ctor, getNetConnectionInterface());;
         attachNetConnectionStaticInterface(*cl);
     }
 

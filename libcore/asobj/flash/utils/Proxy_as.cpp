@@ -63,10 +63,11 @@ public:
 // extern (used by Global.cpp)
 void proxy_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&proxy_ctor, getProxyInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&proxy_ctor, getProxyInterface());;
         attachProxyStaticInterface(*cl);
     }
 

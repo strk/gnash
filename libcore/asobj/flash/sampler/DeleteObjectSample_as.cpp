@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void deleteobjectsample_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&deleteobjectsample_ctor, getDeleteObjectSampleInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&deleteobjectsample_ctor, getDeleteObjectSampleInterface());;
         attachDeleteObjectSampleStaticInterface(*cl);
     }
 

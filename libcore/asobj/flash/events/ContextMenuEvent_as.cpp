@@ -57,10 +57,11 @@ public:
 // extern (used by Global.cpp)
 void contextmenuevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&contextmenuevent_ctor, getContextMenuEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&contextmenuevent_ctor, getContextMenuEventInterface());;
         attachContextMenuEventStaticInterface(*cl);
     }
 

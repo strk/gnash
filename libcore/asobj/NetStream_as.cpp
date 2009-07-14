@@ -110,11 +110,12 @@ NetStream_as::init(as_object& global)
 {
 
     // This is going to be the global NetStream "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&netstream_new, getNetStreamInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netstream_new, getNetStreamInterface());;
         // replicate all interface to class, to be able to access
         // all methods as static functions
         attachNetStreamInterface(*cl);

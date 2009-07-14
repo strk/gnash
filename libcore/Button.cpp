@@ -1122,11 +1122,12 @@ void
 Button::init(as_object& global)
 {
   // This is going to be the global Button "class"/"function"
-  static boost::intrusive_ptr<builtin_function> cl=NULL;
+  static boost::intrusive_ptr<as_object> cl=NULL;
 
   if ( cl == NULL )
   {
-    cl=new builtin_function(&button_ctor, getButtonInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&button_ctor, getButtonInterface());;
     VM::get().addStatic(cl.get());
   }
 

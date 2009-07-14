@@ -52,10 +52,11 @@ namespace {
 void
 contextmenu_class_init(as_object& global)
 {
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if (cl == NULL) {
-		cl=new builtin_function(contextmenu_ctor, getContextMenuInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(contextmenu_ctor, getContextMenuInterface());;
 	}
 
 	// Register _global.ContextMenu

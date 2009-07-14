@@ -106,11 +106,12 @@ customactions_ctor(const fn_call& /* fn */)
 void customactions_class_init(as_object& global)
 {
 	// This is going to be the global CustomActions "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&customactions_ctor, getCustomActionsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&customactions_ctor, getCustomActionsInterface());;
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCustomActionsInterface(*cl);

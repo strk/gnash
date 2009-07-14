@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void capabilities_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&capabilities_ctor, getCapabilitiesInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&capabilities_ctor, getCapabilitiesInterface());;
         attachCapabilitiesStaticInterface(*cl);
     }
 

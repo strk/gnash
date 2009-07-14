@@ -63,20 +63,20 @@ attachFileReferenceListStaticProperties(as_object& /*o*/)
 static as_object*
 getFileReferenceListInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
+    static boost::intrusive_ptr<as_object> o;
 
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
+    if ( ! o )
+    {
+        // TODO: check if this class should inherit from Object
+        //       or from a different class
+        o = new as_object(getObjectInterface());
+        VM::get().addStatic(o.get());
 
-		attachFileReferenceListInterface(*o);
+        attachFileReferenceListInterface(*o);
 
-	}
+    }
 
-	return o.get();
+    return o.get();
 }
 
 class FileReferenceList_as: public as_object
@@ -84,53 +84,53 @@ class FileReferenceList_as: public as_object
 
 public:
 
-	FileReferenceList_as()
-		:
-		as_object(getFileReferenceListInterface())
-	{}
+    FileReferenceList_as()
+        :
+        as_object(getFileReferenceListInterface())
+    {}
 
-	// override from as_object ?
-	//std::string get_text_value() const { return "FileReferenceList"; }
+    // override from as_object ?
+    //std::string get_text_value() const { return "FileReferenceList"; }
 
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
+    // override from as_object ?
+    //double get_numeric_value() const { return 0; }
 };
 
 
 static as_value
 FileReferenceList_addListener(const fn_call& fn)
 {
-	boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 static as_value
 FileReferenceList_browse(const fn_call& fn)
 {
-	boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 static as_value
 FileReferenceList_removeListener(const fn_call& fn)
 {
-	boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 static as_value
 FileReferenceList_fileList_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 
@@ -138,29 +138,30 @@ FileReferenceList_fileList_getset(const fn_call& fn)
 as_value
 FileReferenceList_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new FileReferenceList_as;
+    boost::intrusive_ptr<as_object> obj = new FileReferenceList_as;
 
-	if ( fn.nargs )
-	{
-		std::stringstream ss;
-		fn.dump_args(ss);
-		LOG_ONCE( log_unimpl("FileReferenceList(%s): %s", ss.str(), _("arguments discarded")) );
-	}
+    if ( fn.nargs )
+    {
+        std::stringstream ss;
+        fn.dump_args(ss);
+        LOG_ONCE( log_unimpl("FileReferenceList(%s): %s", ss.str(), _("arguments discarded")) );
+    }
 
-	return as_value(obj.get()); // will keep alive
+    return as_value(obj.get()); // will keep alive
 }
 
 // extern 
 void filereferencelist_class_init(as_object& where)
 {
-	// This is going to be the FileReferenceList "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl=new builtin_function(&FileReferenceList_ctor, getFileReferenceListInterface());
-	attachFileReferenceListStaticProperties(*cl);
+    // This is going to be the FileReferenceList "class"/"function"
+    // in the 'where' package
+    boost::intrusive_ptr<as_object> cl;
+    Global_as* gl = getGlobal(where);
+    cl = gl->createClass(&FileReferenceList_ctor, getFileReferenceListInterface());
+    attachFileReferenceListStaticProperties(*cl);
 
-	// Register _global.FileReferenceList
-	where.init_member("FileReferenceList", cl.get());
+    // Register _global.FileReferenceList
+    where.init_member("FileReferenceList", cl.get());
 }
 
 } // end of gnash namespace

@@ -107,11 +107,12 @@ camera_ctor(const fn_call& /* fn */)
 void camera_class_init(as_object& global)
 {
 	// This is going to be the global Camera "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&camera_ctor, getCameraInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&camera_ctor, getCameraInterface());;
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCameraInterface(*cl);

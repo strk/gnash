@@ -230,7 +230,7 @@ void
 moviecliploader_class_init(as_object& global)
 {
 	// This is going to be the global Number "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl = NULL;
+	static boost::intrusive_ptr<as_object> cl = NULL;
 
 	if (cl == NULL)
 	{

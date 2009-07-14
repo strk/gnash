@@ -74,10 +74,11 @@ namespace {
 // extern (used by Global.cpp)
 void TextSnapshot_as::init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&textsnapshot_ctor, getTextSnapshotInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textsnapshot_ctor, getTextSnapshotInterface());;
         attachTextSnapshotStaticInterface(*cl);
     }
 

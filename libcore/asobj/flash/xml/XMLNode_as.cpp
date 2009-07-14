@@ -447,11 +447,12 @@ void
 XMLNode_as::init(as_object& global)
 {
     // This is the global XMLNode_as "class"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());;
     }
 
     global.init_member("XMLNode", cl.get());

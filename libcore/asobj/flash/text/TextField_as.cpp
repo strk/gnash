@@ -74,10 +74,11 @@ public:
 // extern (used by Global.cpp)
 void textfield_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&textfield_ctor, getTextFieldInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textfield_ctor, getTextFieldInterface());;
         attachTextFieldStaticInterface(*cl);
     }
 

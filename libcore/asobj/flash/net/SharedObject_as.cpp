@@ -607,10 +607,11 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 void
 sharedobject_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
     
     if (cl == NULL) {
-        cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&sharedobject_ctor, getSharedObjectInterface());;
         attachSharedObjectStaticInterface(*cl);
     }
     

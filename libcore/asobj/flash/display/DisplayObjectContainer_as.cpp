@@ -60,7 +60,7 @@ displayobjectcontainer_class_init(as_object& where)
     // This should never be called during AVM1 execution!
     assert(isAS3(getVM(where)));
 
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
         cl = new builtin_function(&displayobjectcontainer_ctor,

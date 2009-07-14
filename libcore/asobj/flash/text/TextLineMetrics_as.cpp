@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void textlinemetrics_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&textlinemetrics_ctor, getTextLineMetricsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textlinemetrics_ctor, getTextLineMetricsInterface());;
         attachTextLineMetricsStaticInterface(*cl);
     }
 

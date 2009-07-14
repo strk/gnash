@@ -423,10 +423,11 @@ void
 xmlsocket_class_init(as_object& global)
 {
     // This is the global XMLSocket class
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&xmlsocket_new, getXMLSocketInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&xmlsocket_new, getXMLSocketInterface());;
     }
     
     // Register _global.XMLSocket

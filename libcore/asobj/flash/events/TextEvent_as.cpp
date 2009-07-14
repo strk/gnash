@@ -57,10 +57,11 @@ public:
 // extern (used by Global.cpp)
 void textevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&textevent_ctor, getTextEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textevent_ctor, getTextEventInterface());;
         attachTextEventStaticInterface(*cl);
     }
 

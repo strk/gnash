@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void dictionary_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&dictionary_ctor, getDictionaryInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&dictionary_ctor, getDictionaryInterface());;
         attachDictionaryStaticInterface(*cl);
     }
 

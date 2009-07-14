@@ -56,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void statusevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&statusevent_ctor, getStatusEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&statusevent_ctor, getStatusEventInterface());;
         attachStatusEventStaticInterface(*cl);
     }
 

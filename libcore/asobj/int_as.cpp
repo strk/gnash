@@ -70,9 +70,10 @@ getintInterface()
 // extern (used by Global.cpp)
 void int_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
-	cl=new builtin_function(&int_ctor, getintInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&int_ctor, getintInterface());;
 
 	// Register _global.DisplayObject
 	global.init_member("int", cl.get());

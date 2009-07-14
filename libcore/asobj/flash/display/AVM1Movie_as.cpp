@@ -54,7 +54,7 @@ public:
 // extern (used by Global.cpp)
 void avm1movie_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
         cl = new builtin_function(&avm1movie_ctor, getAVM1MovieInterface());

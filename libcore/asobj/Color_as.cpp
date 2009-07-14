@@ -139,11 +139,12 @@ void registerColorNative(as_object& o)
 void color_class_init(as_object& global)
 {
 	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&color_ctor, getColorInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&color_ctor, getColorInterface());;
 	}
 
 	// Register _global.Color

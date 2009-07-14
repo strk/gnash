@@ -300,11 +300,12 @@ void
 video_class_init(as_object& global)
 {
 	// This is going to be the global Video "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&video_ctor, getVideoInterface(global));
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&video_ctor, getVideoInterface(global));;
 		getVM(global).addStatic(cl.get());
 	}
 

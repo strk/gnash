@@ -119,12 +119,13 @@ Sound_as::init(as_object& global)
 {
 
     // This is going to be the global Sound "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
         as_object* iface = getSoundInterface();
-        cl=new builtin_function(&sound_new, iface);
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&sound_new, iface);;
         iface->set_member_flags(NSV::PROP_CONSTRUCTOR, as_prop_flags::readOnly);
     }
 

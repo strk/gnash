@@ -211,10 +211,11 @@ void
 Date_as::init(as_object& global)
 {
     // This is going to be the global Date "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL ) {
-        cl = new builtin_function(&date_new, getDateInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&date_new, getDateInterface());;
         
         // replicate static interface to class (Date.UTC)
         attachDateStaticInterface(*cl);

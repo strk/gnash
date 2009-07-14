@@ -56,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void ime_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&ime_ctor, getIMEInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&ime_ctor, getIMEInterface());;
         attachIMEStaticInterface(*cl);
     }
 

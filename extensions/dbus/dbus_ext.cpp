@@ -123,7 +123,8 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&dbus_ctor, getInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&dbus_ctor, getInterface());;
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    attachInterface(cl.get());

@@ -142,11 +142,12 @@ void
 loadvars_class_init(as_object& global)
 {
 	// This is going to be the global LoadVars "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&loadvars_ctor, getLoadVarsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&loadvars_ctor, getLoadVarsInterface());;
 	}
 
 	// Register _global.LoadVars, only visible for SWF6 up

@@ -66,10 +66,11 @@ public:
 // extern (used by Global.cpp)
 void mouseevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&mouseevent_ctor, getMouseEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&mouseevent_ctor, getMouseEventInterface());;
         attachMouseEventStaticInterface(*cl);
     }
 

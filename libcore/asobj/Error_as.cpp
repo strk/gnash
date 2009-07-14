@@ -61,10 +61,11 @@ public:
 // extern 
 void Error_class_init(as_object& where)
 {
-	// This is going to be the Error "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl = new builtin_function(&error_ctor, getErrorInterface());
+    
+    Global_as* gl = getGlobal(where);
+
+    boost::intrusive_ptr<as_object> cl =
+        gl->createClass(&error_ctor, getErrorInterface());;
 
 	// Register _global.Error
 	where.init_member("Error", cl.get());

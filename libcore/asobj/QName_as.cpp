@@ -62,8 +62,10 @@ public:
 void
 qname_class_init(as_object& where)
 {
-    boost::intrusive_ptr<builtin_function> cl;
-    cl = new builtin_function(&qname_ctor, getQNameInterface());
+    boost::intrusive_ptr<as_object> cl;
+
+    Global_as* gl = getGlobal(where);
+    cl = gl->createClass(&qname_ctor, getQNameInterface());;
 
     where.init_member("QName", cl.get());
 }

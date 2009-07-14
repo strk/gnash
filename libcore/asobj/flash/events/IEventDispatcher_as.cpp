@@ -58,10 +58,11 @@ public:
 // extern (used by Global.cpp)
 void ieventdispatcher_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&ieventdispatcher_ctor, getIEventDispatcherInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&ieventdispatcher_ctor, getIEventDispatcherInterface());;
         attachIEventDispatcherStaticInterface(*cl);
     }
 

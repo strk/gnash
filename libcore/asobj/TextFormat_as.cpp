@@ -141,11 +141,12 @@ void
 TextFormat_as::init(as_object& global)
 {
 	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&textformat_new, getTextFormatInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textformat_new, getTextFormatInterface());;
 	}
 
 	// Register _global.Color

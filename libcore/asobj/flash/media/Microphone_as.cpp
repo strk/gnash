@@ -112,11 +112,12 @@ microphone_ctor(const fn_call& /* fn */)
 void microphone_class_init(as_object& global)
 {
 	// This is going to be the global Microphone "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&microphone_ctor, getMicrophoneInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&microphone_ctor, getMicrophoneInterface());;
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachMicrophoneInterface(*cl);

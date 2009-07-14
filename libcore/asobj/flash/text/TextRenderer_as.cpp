@@ -59,20 +59,20 @@ attachTextRendererStaticProperties(as_object& o)
 static as_object*
 getTextRendererInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
+    static boost::intrusive_ptr<as_object> o;
 
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
+    if ( ! o )
+    {
+        // TODO: check if this class should inherit from Object
+        //       or from a different class
+        o = new as_object(getObjectInterface());
+        VM::get().addStatic(o.get());
 
-		attachTextRendererInterface(*o);
+        attachTextRendererInterface(*o);
 
-	}
+    }
 
-	return o.get();
+    return o.get();
 }
 
 class TextRenderer_as: public as_object
@@ -80,16 +80,16 @@ class TextRenderer_as: public as_object
 
 public:
 
-	TextRenderer_as()
-		:
-		as_object(getTextRendererInterface())
-	{}
+    TextRenderer_as()
+        :
+        as_object(getTextRendererInterface())
+    {}
 
-	// override from as_object ?
-	//std::string get_text_value() const { return "TextRenderer"; }
+    // override from as_object ?
+    //std::string get_text_value() const { return "TextRenderer"; }
 
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
+    // override from as_object ?
+    //double get_numeric_value() const { return 0; }
 };
 
 
@@ -97,48 +97,49 @@ public:
 static as_value
 TextRenderer_setAdvancedAntialiasingTable(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextRenderer_as> ptr = ensureType<TextRenderer_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    boost::intrusive_ptr<TextRenderer_as> ptr = ensureType<TextRenderer_as>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 static as_value
 TextRenderer_maxLevel_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextRenderer_as> ptr = ensureType<TextRenderer_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    boost::intrusive_ptr<TextRenderer_as> ptr = ensureType<TextRenderer_as>(fn.this_ptr);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 
 as_value
 TextRenderer_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new TextRenderer_as;
+    boost::intrusive_ptr<as_object> obj = new TextRenderer_as;
 
-	if ( fn.nargs )
-	{
-		std::stringstream ss;
-		fn.dump_args(ss);
-		LOG_ONCE( log_unimpl("TextRenderer(%s): %s", ss.str(), _("arguments discarded")) );
-	}
+    if ( fn.nargs )
+    {
+        std::stringstream ss;
+        fn.dump_args(ss);
+        LOG_ONCE( log_unimpl("TextRenderer(%s): %s", ss.str(), _("arguments discarded")) );
+    }
 
-	return as_value(obj.get()); // will keep alive
+    return as_value(obj.get()); // will keep alive
 }
 
 // extern 
 void textrenderer_class_init(as_object& where)
 {
-	// This is going to be the TextRenderer "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl=new builtin_function(&TextRenderer_ctor, getTextRendererInterface());
-	attachTextRendererStaticProperties(*cl);
+    // This is going to be the TextRenderer "class"/"function"
+    // in the 'where' package
+    boost::intrusive_ptr<as_object> cl;
+    Global_as* gl = getGlobal(where);
+    cl = gl->createClass(&TextRenderer_ctor, getTextRendererInterface());;
+    attachTextRendererStaticProperties(*cl);
 
-	// Register _global.TextRenderer
-	where.init_member("TextRenderer", cl.get());
+    // Register _global.TextRenderer
+    where.init_member("TextRenderer", cl.get());
 }
 
 } // end of gnash namespace

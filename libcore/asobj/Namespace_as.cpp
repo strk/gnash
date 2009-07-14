@@ -63,8 +63,10 @@ public:
 void
 namespace_class_init(as_object& where)
 {
-    boost::intrusive_ptr<builtin_function> cl;
-    cl = new builtin_function(&namespace_ctor, getNamespaceInterface());
+    boost::intrusive_ptr<as_object> cl;
+    
+    Global_as* gl = getGlobal(where);
+    cl = gl->createClass(&namespace_ctor, getNamespaceInterface());;
 
     where.init_member("Namespace", cl.get());
 }

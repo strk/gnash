@@ -56,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void printjob_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&printjob_ctor, getPrintJobInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&printjob_ctor, getPrintJobInterface());;
         attachPrintJobStaticInterface(*cl);
     }
 

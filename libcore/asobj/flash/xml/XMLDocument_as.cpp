@@ -623,11 +623,12 @@ void
 XMLDocument_as::init(as_object& global)
 {
 
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&xml_new, getXMLInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&xml_new, getXMLInterface());;
     }
     
     global.init_member("XML", cl.get());

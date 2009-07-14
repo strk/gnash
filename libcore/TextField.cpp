@@ -1532,20 +1532,21 @@ TextField::set_variable_name(const std::string& newname)
 void
 textfield_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl = NULL;
+    static boost::intrusive_ptr<as_object> cl = NULL;
 
     if (!cl)
     {
         VM& vm = getVM(global);
+        Global_as* gl = getGlobal(global);
 
         if (vm.getSWFVersion() < 6) {
             /// Version 5 or less: no initial prototype
-            cl = new builtin_function(&textfield_ctor, 0);
+            cl = gl->createClass(&textfield_ctor, 0);
         }
         else {
             /// Version 6 upward: limited initial prototype
             as_object* iface = getTextFieldInterface(vm);
-            cl = new builtin_function(&textfield_ctor, iface);
+            cl = gl->createClass(&textfield_ctor, iface);;
         }
 
         vm.addStatic(cl.get());

@@ -54,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void soundtransform_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&soundtransform_ctor, getSoundTransformInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&soundtransform_ctor, getSoundTransformInterface());;
         attachSoundTransformStaticInterface(*cl);
     }
 

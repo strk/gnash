@@ -55,10 +55,11 @@ public:
 // extern (used by Global.cpp)
 void applicationdomain_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&applicationdomain_ctor, getApplicationDomainInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&applicationdomain_ctor, getApplicationDomainInterface());;
         attachApplicationDomainStaticInterface(*cl);
     }
 

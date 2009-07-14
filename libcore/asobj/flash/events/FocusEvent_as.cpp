@@ -59,10 +59,11 @@ public:
 // extern (used by Global.cpp)
 void focusevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&focusevent_ctor, getFocusEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&focusevent_ctor, getFocusEventInterface());;
         attachFocusEventStaticInterface(*cl);
     }
 
