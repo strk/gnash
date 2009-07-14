@@ -106,7 +106,7 @@ gnash_view_new (void)
 const gchar *
 gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_data)
 {
-    gnash::VM& vm = getVM(*view->stage);
+    gnash::VM& vm = view->stage->getVM();
     gnash::string_table& st = vm.getStringTable();
 	gnash::as_value obj;
 
