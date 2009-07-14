@@ -91,7 +91,7 @@ SUBDIRS = \
 	movies.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp
+EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp 
 
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
 

@@ -1,5 +1,5 @@
 // System.cpp:  ActionScript "System" class, for Gnash.
-// 
+//
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #include "log.h"
 #include "System_as.h"
 #include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
 #include "Global_as.h"
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
@@ -29,6 +30,9 @@
 #include <sstream>
 
 namespace gnash {
+
+	// List of domains that can access/modify local data
+	std::vector<std::string> _allowDataAccess;
 
 // Forward declarations.
 namespace {
@@ -55,6 +59,7 @@ namespace {
     as_value system_gc(const fn_call& fn);
     as_value system_pause(const fn_call& fn);
     as_value system_resume(const fn_call& fn);
+
 }
 
 
@@ -87,6 +92,29 @@ registerSystemNative(as_object& global)
     // System.Product.launch 2201, 2
     // System.Product.download 2201, 3    
 }
+
+
+/// Get the current System.security allowDataAccess list of domains allowed to
+/// access/modify local data
+//
+/// @return a std::vector of strings containing urls that can access local data
+const std::vector<std::string>&
+getAllowDataAccess()
+{
+	return _allowDataAccess;
+}
+
+
+/// Adds a string containing url or ip info to the allowDataAccess list of
+/// domains that can access/modify local data
+//
+/// @param url a std::string containing the domain name
+void
+addAllowDataAccess( const std::string& url )
+{
+	_allowDataAccess.push_back( url );	
+}
+
 
 namespace {
 
@@ -330,10 +358,13 @@ attachSystemInterface(as_object& proto)
 
 
 as_value
-system_security_allowdomain(const fn_call& /*fn*/)
+system_security_allowdomain(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl ("System.security.allowDomain") );
-    return as_value();
+    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else") );
+	for(unsigned int i = 0; i < fn.nargs; ++i) {
+		addAllowDataAccess( fn.arg(i).to_string());
+	}
+    return as_value(); 
 }
 
 
