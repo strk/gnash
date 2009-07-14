@@ -78,6 +78,7 @@ attachPrintJobInterface(as_object& o)
 void
 attachPrintJobStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

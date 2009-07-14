@@ -132,6 +132,7 @@ number_ctor(const fn_call& fn)
 void
 attachNumberInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 	o.init_member("toString", gl->createFunction(number_toString));
 
@@ -141,6 +142,7 @@ attachNumberInterface(as_object& o)
 void
 attachNumberStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     // constant flags
     const int cflags = as_prop_flags::dontEnum | 
         as_prop_flags::dontDelete | 

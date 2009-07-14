@@ -87,6 +87,7 @@ getQNameInterface()
 void
 attachQNameInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_property("localName", qname_localName, qname_localName);
     o.init_property("uri", qname_uri, qname_uri);
 }

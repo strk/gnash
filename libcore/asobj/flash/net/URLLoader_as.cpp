@@ -90,6 +90,7 @@ attachURLLoaderInterface(as_object& o)
 void
 attachURLLoaderStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

@@ -82,6 +82,7 @@ namespace {
 void
 attachGraphicsInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("beginFill", gl->createFunction(graphics_beginFill));
     o.init_member("beginGradientFill", gl->createFunction(graphics_beginGradientFill));
     o.init_member("clear", gl->createFunction(graphics_clear));
@@ -100,6 +101,7 @@ attachGraphicsInterface(as_object& o)
 void
 attachGraphicsStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

@@ -717,6 +717,7 @@ namespace {
 void
 attachSoundInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
     int flags = as_prop_flags::dontEnum | 
                 as_prop_flags::dontDelete | 

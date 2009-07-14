@@ -2728,6 +2728,7 @@ textfield_ctor(const fn_call& fn)
 void
 attachTextFieldInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     boost::intrusive_ptr<builtin_function> getset;
 
     // TextField is an AsBroadcaster

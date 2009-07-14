@@ -75,6 +75,7 @@ namespace {
 void
 attachEventDispatcherInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("dispatchEvent", gl->createFunction(eventdispatcher_dispatchEvent));
     o.init_member("hasEventListener", gl->createFunction(eventdispatcher_hasEventListener));
     o.init_member("removeEventListener", gl->createFunction(eventdispatcher_removeEventListener));

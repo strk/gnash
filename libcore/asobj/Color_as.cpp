@@ -156,6 +156,7 @@ namespace {
 void
 attachColorInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |

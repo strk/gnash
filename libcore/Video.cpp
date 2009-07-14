@@ -352,6 +352,7 @@ getVideoInterface(as_object& where)
 void
 attachVideoInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	o.init_member("attachVideo", gl->createFunction(video_attach));
 	o.init_member("clear", gl->createFunction(video_clear));
 }

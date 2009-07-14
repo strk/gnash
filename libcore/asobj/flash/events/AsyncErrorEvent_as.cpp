@@ -78,6 +78,7 @@ attachAsyncErrorEventInterface(as_object& o)
 void
 attachAsyncErrorEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

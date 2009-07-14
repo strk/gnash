@@ -78,6 +78,7 @@ attachFullScreenEventInterface(as_object& o)
 void
 attachFullScreenEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

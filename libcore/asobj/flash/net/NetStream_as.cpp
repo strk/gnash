@@ -114,6 +114,7 @@ attachNetStreamInterface(as_object& o)
 void
 attachNetStreamStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

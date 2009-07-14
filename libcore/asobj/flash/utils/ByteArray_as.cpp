@@ -97,6 +97,7 @@ namespace {
 void
 attachByteArrayInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("readBoolean", gl->createFunction(bytearray_readBoolean));
     o.init_member("readByte", gl->createFunction(bytearray_readByte));
     o.init_member("readBytes", gl->createFunction(bytearray_readBytes));
@@ -130,6 +131,7 @@ attachByteArrayInterface(as_object& o)
 void
 attachByteArrayStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

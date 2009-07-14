@@ -40,6 +40,7 @@ as_value camera_ctor(const fn_call& fn);
 static void
 attachCameraInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	o.init_member("get", gl->createFunction(camera_get));
 	o.init_member("setmode", gl->createFunction(camera_setmode));
 	o.init_member("setmotionlevel", gl->createFunction(camera_setmotionlevel));

@@ -234,6 +234,7 @@ round(double d)
 void
 attachMathInterface(as_object& proto)
 {
+    Global_as* gl = getGlobal(proto);
 
 	// TODO: rely on inheritance, use init_property ?
 	// All Math members are constant and non-enumerable.

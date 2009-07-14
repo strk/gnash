@@ -336,6 +336,7 @@ void truncateDouble(T& target, double value)
 void
 attachDateInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
 
     o.init_member("getFullYear", vm.getNative(103, 0));
@@ -382,6 +383,7 @@ attachDateInterface(as_object& o)
 void
 attachDateStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
     o.init_member("UTC", vm.getNative(103, 257));
 }

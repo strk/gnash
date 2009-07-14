@@ -78,6 +78,7 @@ attachSyncEventInterface(as_object& o)
 void
 attachSyncEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

@@ -76,6 +76,7 @@ namespace {
 void
 attachLoaderInfoInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("complete", gl->createFunction(loaderinfo_complete));
     o.init_member("httpStatus", gl->createFunction(loaderinfo_httpStatus));
     o.init_member("init", gl->createFunction(loaderinfo_init));
@@ -88,6 +89,7 @@ attachLoaderInfoInterface(as_object& o)
 void
 attachLoaderInfoStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

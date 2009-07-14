@@ -78,6 +78,7 @@ attachNetStatusEventInterface(as_object& o)
 void
 attachNetStatusEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

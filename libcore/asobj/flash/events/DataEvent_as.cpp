@@ -72,6 +72,7 @@ namespace {
 void
 attachDataEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(dataevent_toString));
     o.init_member("DATA", gl->createFunction(dataevent_DATA));
     o.init_member("UPLOAD_COMPLETE_DATA", gl->createFunction(dataevent_UPLOAD_COMPLETE_DATA));

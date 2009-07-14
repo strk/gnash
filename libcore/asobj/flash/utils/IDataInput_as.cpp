@@ -82,6 +82,7 @@ namespace {
 void
 attachIDataInputInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("readByte", gl->createFunction(idatainput_readByte));
     o.init_member("readBytes", gl->createFunction(idatainput_readBytes));
     o.init_member("readDouble", gl->createFunction(idatainput_readDouble));
@@ -100,6 +101,7 @@ attachIDataInputInterface(as_object& o)
 void
 attachIDataInputStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

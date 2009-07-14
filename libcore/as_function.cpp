@@ -23,6 +23,7 @@
 #include "builtin_function.h" // for _global.Function
 #include "as_value.h"
 #include "Array_as.h"
+#include "Global_as.h"
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"
@@ -264,12 +265,16 @@ namespace {
 as_object*
 getFunctionPrototype()
 {
+
 	static boost::intrusive_ptr<as_object> proto;
 
 	if (proto.get() == NULL) {
 
 		// Initialize Function prototype
 		proto = new as_object();
+        
+        // TODO: get a Global_as passed in.
+        Global_as* gl = getGlobal(*proto);
 
 		// We initialize the __proto__ member separately, as getObjectInterface
 		// will end up calling getFunctionPrototype again and we want that

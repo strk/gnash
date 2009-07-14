@@ -72,6 +72,7 @@ namespace {
 void
 attachContextMenuEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(contextmenuevent_toString));
     o.init_member("MENU_ITEM_SELECT", gl->createFunction(contextmenuevent_MENU_ITEM_SELECT));
     o.init_member("MENU_SELECT", gl->createFunction(contextmenuevent_MENU_SELECT));

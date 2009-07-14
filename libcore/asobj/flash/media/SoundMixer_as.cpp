@@ -78,6 +78,7 @@ attachSoundMixerInterface(as_object& o)
 void
 attachSoundMixerStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

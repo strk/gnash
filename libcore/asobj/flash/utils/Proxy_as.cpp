@@ -78,6 +78,7 @@ namespace {
 void
 attachProxyInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("deleteProperty", gl->createFunction(proxy_deleteProperty));
     o.init_member("getDescendants", gl->createFunction(proxy_getDescendants));
     o.init_member("getProperty", gl->createFunction(proxy_getProperty));

@@ -81,6 +81,7 @@ namespace {
 void
 attachMouseEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(mouseevent_toString));
     o.init_member("updateAfterEvent", gl->createFunction(mouseevent_updateAfterEvent));
     o.init_member("CLICK", gl->createFunction(mouseevent_CLICK));

@@ -162,6 +162,7 @@ namespace {
 void
 attachLoadVarsInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
 
 	o.init_member("addRequestHeader", new builtin_function(

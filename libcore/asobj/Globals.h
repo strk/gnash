@@ -77,7 +77,7 @@ public:
     }
     
     /// Create an ActionScript function
-    virtual as_object* createFunction(Global_as::ASFunction function);
+    virtual builtin_function* createFunction(Global_as::ASFunction function);
 
     /// Create an ActionScript class
     //
@@ -112,7 +112,7 @@ public:
 	~AVM2Global() {}
     
     /// Create an ActionScript function
-    virtual as_object* createFunction(Global_as::ASFunction function);
+    virtual builtin_function* createFunction(Global_as::ASFunction function);
 
     /// Create an ActionScript class
     //

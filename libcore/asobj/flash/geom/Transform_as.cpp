@@ -51,6 +51,7 @@ as_value Transform_ctor(const fn_call& fn);
 static void
 attachTransformInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     const int protectedFlags = as_prop_flags::isProtected;
 
     o.init_property("matrix",

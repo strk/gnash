@@ -64,6 +64,7 @@ as_value ExternalInterface_uctor(const fn_call& fn);
 static void
 attachExternalInterfaceInterface(as_object& /*o*/)
 {
+    Global_as* gl = getGlobal(/*o*/);
 }
 
 static void

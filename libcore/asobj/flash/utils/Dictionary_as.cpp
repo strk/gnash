@@ -69,6 +69,7 @@ namespace {
 void
 attachDictionaryInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 }
 
 void

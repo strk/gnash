@@ -720,6 +720,7 @@ BitmapData_ctor(const fn_call& fn)
 void
 attachBitmapDataInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("applyFilter", gl->createFunction(BitmapData_applyFilter));
     o.init_member("clone", gl->createFunction(BitmapData_clone));
     o.init_member("colorTransform", new builtin_function(

@@ -1887,6 +1887,7 @@ netstream_liveDelay(const fn_call& fn)
 void
 attachNetStreamInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
     o.init_member("close", gl->createFunction(netstream_close));
     o.init_member("pause", gl->createFunction(netstream_pause));

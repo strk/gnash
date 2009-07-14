@@ -76,6 +76,7 @@ namespace {
 void
 attachNetConnectionInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("call", gl->createFunction(netconnection_call));
     o.init_member("close", gl->createFunction(netconnection_close));
     o.init_member("connect", gl->createFunction(netconnection_connect));
@@ -88,6 +89,7 @@ attachNetConnectionInterface(as_object& o)
 void
 attachNetConnectionStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

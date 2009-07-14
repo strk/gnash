@@ -525,6 +525,7 @@ textformat_getTextExtent(const fn_call& /*fn*/)
 void
 attachTextFormatInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	int flags = 0; // for sure we want to enum, dunno about deleting yet
 
 	o.init_property("display", textformat_display, textformat_display, flags);

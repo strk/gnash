@@ -54,6 +54,7 @@ as_value FileReference_ctor(const fn_call& fn);
 static void
 attachFileReferenceInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("addListener", gl->createFunction(FileReference_addListener));
     o.init_member("browse", gl->createFunction(FileReference_browse));
     o.init_member("cancel", gl->createFunction(FileReference_cancel));

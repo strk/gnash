@@ -78,6 +78,7 @@ attachIMEEventInterface(as_object& o)
 void
 attachIMEEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

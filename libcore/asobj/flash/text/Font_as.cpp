@@ -78,6 +78,7 @@ attachFontInterface(as_object& o)
 void
 attachFontStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

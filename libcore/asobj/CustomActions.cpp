@@ -40,6 +40,7 @@ as_value customactions_ctor(const fn_call& fn);
 static void
 attachCustomActionsInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	o.init_member("get", gl->createFunction(customactions_get));
 	o.init_member("install", gl->createFunction(customactions_install));
 	o.init_member("list", gl->createFunction(customactions_list));

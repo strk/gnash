@@ -78,6 +78,7 @@ attachVideoInterface(as_object& o)
 void
 attachVideoStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

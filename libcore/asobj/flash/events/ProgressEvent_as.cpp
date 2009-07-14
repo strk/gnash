@@ -72,6 +72,7 @@ namespace {
 void
 attachProgressEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(progressevent_toString));
     o.init_member("PROGRESS", gl->createFunction(progressevent_PROGRESS));
     o.init_member("SOCKET_DATA", gl->createFunction(progressevent_SOCKET_DATA));

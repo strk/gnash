@@ -351,6 +351,7 @@ localconnection_send(const fn_call& fn)
 void
 attachLocalConnectionInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("close", gl->createFunction(localconnection_close));
     o.init_member("connect", gl->createFunction(localconnection_connect));
     o.init_member("domain", gl->createFunction(localconnection_domain));

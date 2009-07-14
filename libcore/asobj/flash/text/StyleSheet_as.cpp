@@ -73,6 +73,7 @@ namespace {
 void
 attachStyleSheetInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("getStyle", gl->createFunction(stylesheet_getStyle));
     o.init_member("parseCSS", gl->createFunction(stylesheet_parseCSS));
     o.init_member("setStyle", gl->createFunction(stylesheet_setStyle));
@@ -82,6 +83,7 @@ attachStyleSheetInterface(as_object& o)
 void
 attachStyleSheetStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

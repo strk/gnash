@@ -52,6 +52,7 @@ as_value DisplacementMapFilter_ctor(const fn_call& fn);
 static void
 attachDisplacementMapFilterInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("clone", gl->createFunction(DisplacementMapFilter_clone));
     o.init_property("alpha", DisplacementMapFilter_alpha_getset, DisplacementMapFilter_alpha_getset);
     o.init_property("color", DisplacementMapFilter_color_getset, DisplacementMapFilter_color_getset);

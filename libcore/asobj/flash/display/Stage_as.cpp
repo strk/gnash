@@ -66,6 +66,7 @@ void registerStageNative(as_object& o)
 static void
 attachStageInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     const int version = getSWFVersion(o);
 
     if ( version < 5 ) return;

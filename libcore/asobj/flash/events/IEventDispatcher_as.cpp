@@ -73,6 +73,7 @@ namespace {
 void
 attachIEventDispatcherInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("dispatchEvent", gl->createFunction(ieventdispatcher_dispatchEvent));
     o.init_member("hasEventListener", gl->createFunction(ieventdispatcher_hasEventListener));
     o.init_member("removeEventListener", gl->createFunction(ieventdispatcher_removeEventListener));
@@ -82,6 +83,7 @@ attachIEventDispatcherInterface(as_object& o)
 void
 attachIEventDispatcherStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

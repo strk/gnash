@@ -78,6 +78,7 @@ attachStatusEventInterface(as_object& o)
 void
 attachStatusEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

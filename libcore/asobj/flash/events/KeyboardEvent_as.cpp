@@ -73,6 +73,7 @@ namespace {
 void
 attachKeyboardEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(keyboardevent_toString));
     o.init_member("updateAfterEvent", gl->createFunction(keyboardevent_updateAfterEvent));
     o.init_member("KEY_DOWN", gl->createFunction(keyboardevent_KEY_DOWN));
@@ -82,6 +83,7 @@ attachKeyboardEventInterface(as_object& o)
 void
 attachKeyboardEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

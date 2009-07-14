@@ -90,6 +90,7 @@ namespace {
 void
 attachURLStreamInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("load", gl->createFunction(urlstream_load));
     o.init_member("readBoolean", gl->createFunction(urlstream_readBoolean));
     o.init_member("readByte", gl->createFunction(urlstream_readByte));

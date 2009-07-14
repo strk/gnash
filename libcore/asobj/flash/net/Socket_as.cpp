@@ -139,6 +139,7 @@ attachSocketInterface(as_object& o)
 void
 attachSocketStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

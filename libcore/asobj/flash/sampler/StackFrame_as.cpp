@@ -72,6 +72,7 @@ namespace {
 void
 attachStackFrameInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("file", gl->createFunction(stackframe_file));
     o.init_member("line", gl->createFunction(stackframe_line));
     o.init_member("name", gl->createFunction(stackframe_name));

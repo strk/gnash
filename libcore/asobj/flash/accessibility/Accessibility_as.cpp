@@ -70,6 +70,7 @@ namespace {
 void
 attachAccessibilityInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     const int flags = as_prop_flags::dontDelete
                 | as_prop_flags::readOnly;
 
@@ -90,6 +91,7 @@ attachAccessibilityInterface(as_object& o)
 void
 attachAccessibilityStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

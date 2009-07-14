@@ -70,12 +70,14 @@ namespace {
 void
 attachSoundChannelInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("soundComplete", gl->createFunction(soundchannel_soundComplete));
 }
 
 void
 attachSoundChannelStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

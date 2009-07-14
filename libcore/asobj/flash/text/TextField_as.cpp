@@ -114,6 +114,7 @@ attachTextFieldInterface(as_object& o)
 void
 attachTextFieldStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

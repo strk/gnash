@@ -73,6 +73,7 @@ namespace {
 void
 attachTimerEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(timerevent_toString));
     o.init_member("updateAfterEvent", gl->createFunction(timerevent_updateAfterEvent));
     o.init_member("TIMER", gl->createFunction(timerevent_TIMER));
@@ -82,6 +83,7 @@ attachTimerEventInterface(as_object& o)
 void
 attachTimerEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

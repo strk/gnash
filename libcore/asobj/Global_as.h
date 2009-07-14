@@ -50,6 +50,7 @@
 
 // Forward declarations
 namespace gnash {
+	class builtin_function;
 	class Machine;
 	class as_value;
 	class VM;
@@ -77,7 +78,7 @@ public:
     virtual ClassHierarchy& classHierarchy() = 0;
 
     /// Create an ActionScript function
-    virtual as_object* createFunction(ASFunction function) = 0;
+    virtual builtin_function* createFunction(ASFunction function) = 0;
 
     /// Create an ActionScript class
     //

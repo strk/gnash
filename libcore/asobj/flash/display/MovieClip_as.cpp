@@ -312,6 +312,7 @@ namespace {
 void
 attachMovieClipAS2Interface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
         VM& vm = getVM(o);
 
         o.init_member("attachMovie", vm.getNative(900, 0)); 

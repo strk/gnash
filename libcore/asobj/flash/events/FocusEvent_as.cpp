@@ -84,6 +84,7 @@ attachFocusEventInterface(as_object& o)
 void
 attachFocusEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

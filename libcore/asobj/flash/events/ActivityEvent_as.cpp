@@ -78,6 +78,7 @@ attachActivityEventInterface(as_object& o)
 void
 attachActivityEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

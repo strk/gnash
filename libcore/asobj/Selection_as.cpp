@@ -81,6 +81,7 @@ namespace {
 void
 attachSelectionInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
     VM& vm = getVM(o);
 

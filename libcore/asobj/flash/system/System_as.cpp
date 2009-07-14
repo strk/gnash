@@ -304,6 +304,7 @@ convertValue(const std::string& in, T& val)
 void
 attachSystemInterface(as_object& proto)
 {
+    Global_as* gl = getGlobal(proto);
 	VM& vm = getVM(proto);
 
 	proto.init_member("security", getSystemSecurityInterface(proto));

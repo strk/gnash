@@ -76,6 +76,7 @@ namespace {
 void
 attachSecurityInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("allowInsecureDomain", gl->createFunction(security_allowInsecureDomain));
     o.init_member("loadPolicyFile", gl->createFunction(security_loadPolicyFile));
     o.init_member("showSettings", gl->createFunction(security_showSettings));
@@ -88,6 +89,7 @@ attachSecurityInterface(as_object& o)
 void
 attachSecurityStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

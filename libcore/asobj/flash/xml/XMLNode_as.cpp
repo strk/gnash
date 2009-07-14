@@ -462,6 +462,7 @@ namespace {
 void
 attachXMLNodeInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     // These need to be full-featured AS functions (builtin_function)
     
     VM& vm = getVM(o);

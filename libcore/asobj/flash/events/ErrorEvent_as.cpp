@@ -78,6 +78,7 @@ attachErrorEventInterface(as_object& o)
 void
 attachErrorEventStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

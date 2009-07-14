@@ -102,6 +102,7 @@ namespace {
 void
 attachEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("formatToString", gl->createFunction(event_formatToString));
     o.init_member("isDefaultPrevented", gl->createFunction(event_isDefaultPrevented));
     o.init_member("preventDefault", gl->createFunction(event_preventDefault));

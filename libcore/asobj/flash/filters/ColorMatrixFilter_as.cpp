@@ -78,6 +78,7 @@ colormatrixfilter_class_init(as_object& global)
 void
 ColorMatrixFilter_as::attachInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	boost::intrusive_ptr<builtin_function> gs;
 
     o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));

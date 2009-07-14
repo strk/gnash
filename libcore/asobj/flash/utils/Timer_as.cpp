@@ -73,6 +73,7 @@ namespace {
 void
 attachTimerInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("start", gl->createFunction(timer_start));
     o.init_member("stop", gl->createFunction(timer_stop));
     o.init_member("timer", gl->createFunction(timer_timer));
@@ -82,6 +83,7 @@ attachTimerInterface(as_object& o)
 void
 attachTimerStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

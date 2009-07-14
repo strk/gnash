@@ -70,11 +70,13 @@ namespace {
 void
 attachBitmapFilterTypeInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 }
 
 void
 attachBitmapFilterTypeStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

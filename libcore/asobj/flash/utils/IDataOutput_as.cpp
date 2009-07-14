@@ -96,6 +96,7 @@ attachIDataOutputInterface(as_object& o)
 void
 attachIDataOutputStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 
