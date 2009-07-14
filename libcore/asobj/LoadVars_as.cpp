@@ -167,12 +167,12 @@ attachLoadVarsInterface(as_object& o)
     Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
 
-	o.init_member("addRequestHeader", new builtin_function(
+	o.init_member("addRequestHeader", gl->createFunction(
 	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", vm.getNative(301, 3));
-	o.init_member("getBytesLoaded", new builtin_function(
+	o.init_member("getBytesLoaded", gl->createFunction(
 	            LoadableObject::loadableobject_getBytesLoaded));
-	o.init_member("getBytesTotal", new builtin_function(
+	o.init_member("getBytesTotal", gl->createFunction(
                 LoadableObject::loadableobject_getBytesTotal));
 	o.init_member("load", vm.getNative(301, 0));
 	o.init_member("send", vm.getNative(301, 1));

@@ -131,8 +131,8 @@ TextFormat_as::TextFormat_as()
 	_tabStops(-1),
 	_target()
 {
-	init_member("getTextExtent", new builtin_function(
-                textformat_getTextExtent));
+    Global_as* gl = getGlobal(*this);
+	init_member("getTextExtent", gl->createFunction(textformat_getTextExtent));
 }
 
 

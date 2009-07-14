@@ -695,8 +695,9 @@ NetConnection_as::init(as_object& global)
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&netconnection_new,
-                getNetConnectionInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netconnection_new, getNetConnectionInterface());
+
         // replicate all interface to class, to be able to access
         // all methods as static functions
         attachNetConnectionInterface(*cl);
