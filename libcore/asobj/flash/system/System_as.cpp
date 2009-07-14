@@ -27,13 +27,12 @@
 #include "Object.h" // for getObjectInterface
 
 #include <sstream>
-#include <vector>
 
 namespace gnash {
 
-	const std::vector<std::string> *getAllowDataAccess();
-	void addAllowDataAccess( const std::string& url );
-	
+	// List of domains that can access/modify local data
+	std::vector<std::string> _allowDataAccess;
+
 // Forward declarations.
 namespace {
 
@@ -60,8 +59,6 @@ namespace {
     as_value system_pause(const fn_call& fn);
     as_value system_resume(const fn_call& fn);
 
-	// List of domains that can access/modify local data
-	static std::vector<std::string> _allowDataAccess;
 }
 
 
@@ -94,6 +91,29 @@ registerSystemNative(as_object& global)
     // System.Product.launch 2201, 2
     // System.Product.download 2201, 3    
 }
+
+
+/// Get the current System.security allowDataAccess list of domains allowed to
+/// access/modify local data
+//
+/// @return a std::vector of strings containing urls that can access local data
+const std::vector<std::string>&
+getAllowDataAccess()
+{
+	return _allowDataAccess;
+}
+
+
+/// Adds a string containing url or ip info to the allowDataAccess list of
+/// domains that can access/modify local data
+//
+/// @param url a std::string containing the domain name
+void
+addAllowDataAccess( const std::string& url )
+{
+	_allowDataAccess.push_back( url );	
+}
+
 
 namespace {
 

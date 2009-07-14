@@ -46,6 +46,7 @@ static void usage (void);
 
 static TestState runtest;
 
+static void test_client();
 static string url;
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -61,7 +62,7 @@ main(int argc, char *argv[])
     
     Arg_parser parser(argc, argv, opts);
     if( ! parser.error().empty() ) {
-        cout << parser.error() << endl;
+		cout << parser.error() << endl;
         exit(EXIT_FAILURE);
     }
     
@@ -73,12 +74,12 @@ main(int argc, char *argv[])
                   usage ();
                   exit(EXIT_SUCCESS);
               case 'v':
-                    dbglogfile.setVerbosity();
-                    log_debug(_("Verbose output turned on"));
-                    break;
+				  dbglogfile.setVerbosity();
+				  log_debug(_("Verbose output turned on"));
+                  break;
               case 0:
                   url = parser.argument(i);
-                  log_debug(_("Input file for testing the SSL connection is: %s"), infile);
+				  log_debug(_("URL for testing the allowDomain function is: %s"), url);
                   break;
             }
         }
@@ -94,17 +95,67 @@ main(int argc, char *argv[])
 
 static void test_client()
 {
-	string domain1 = "www.google.com";
-	string domain2 = "www.youtube.com";
-	string domain3 = "cnn.com";
-	string domain4 = "92.123.68.89";
+	string domain1("www.google.com");
+	string domain2("www.youtube.com");
+	string domain3("cnn.com");
+	string domain4("92.123.68.89");
 
 	addAllowDataAccess( domain1 );
 
-	if( getAllowDataAccess()[1] == domain1 ) {
-		runtest.pass("addAllowDataAccess correctly added domain1");
+	vector<string> vec = getAllowDataAccess();
+
+	string added = vec[0];
+	if( added == domain1 ) {
+		runtest.pass("addAllowDataAccess correctly added 'www.google.com'");
 	} else {
-		runtest.fail("addAllowDataAccess did not correctly add domain1");
+		runtest.fail("addAllowDataAccess did not correctly add 'www.google.com'");
+	}
+	if( (int) vec.size() == 1 ) {
+		runtest.pass("_allowDataAccess vector contains 1 item");
+	} else {
+		runtest.fail("_allowDataAccess vector does not contain 1 item");
+	}
+
+	addAllowDataAccess( domain2 );
+	vec = getAllowDataAccess();
+	added = vec[1];
+	if( added == domain2 ) {
+		runtest.pass("addAllowDataAccess correctly added 'www.youtube.com'");
+	} else {
+		runtest.fail("addAllowDataAccess did not correctly add 'www.youtube.com'");
+	}
+	if( (int) vec.size()  == 2 ) {
+		runtest.pass("_allowDataAccess vector contains 2 items");
+	} else {
+		runtest.fail("_allowDataAccess vector does not contain 2 items");
+	}
+
+	addAllowDataAccess( domain3 );
+	vec = getAllowDataAccess();
+	added = vec[2];
+	if( added == domain3 ) {
+		runtest.pass("'cnn.com' was correctly added to the vector");
+	} else {
+		runtest.fail("'cnn.com' was not correctly added to the vector");
+	}
+	if( (int)vec.size() == 3 ) {
+		runtest.pass("_allowDataAccess vector contains 3 items");
+	} else {
+		runtest.fail("_allowDataAccess vector does not contain 3 items");
+	}
+
+	addAllowDataAccess( domain4 );
+	vec = getAllowDataAccess();
+	added = vec[3];
+	if( added == domain4 ) {
+		runtest.pass("'92.123.68.89' was correctly added to the vector");
+	} else {
+		runtest.fail("'92.123.68.89' was not correctly added to the vector");
+	}
+	if( (int)vec.size() == 4 ) {
+		runtest.pass("_allowDataAccess vector now contains 4 items");
+	} else {
+		runtest.fail("_allowDataAccess vector does not contain 4 items");
 	}
 
 }

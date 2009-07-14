@@ -123,8 +123,7 @@ test_ssl_DEPENDENCIES = site-update
 test_allowDomain_SOURCES = test_allowDomain.cpp
 test_allowDomain_LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la
+	$(top_builddir)/libcore/libgnashcore.la
 
 test_allowDomain_DEPENDENCIES = site-update
 
