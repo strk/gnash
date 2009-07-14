@@ -38,6 +38,20 @@ AC_DEFUN([AC_PATH_SWFMILL], [
     AC_PATH_PROG(SWFMILL, swfmill, ,[${pathlist}])
   fi
 
+  if test x"$SWFMILL" != "x"; then
+    sm=`$SWFMILL -h 2>&1 | head -n 4`
+    version=`echo $sm | grep 'swfmill [[0-9]]\{1,2\}\(\.[[0-9]]\{1,2\}\)\{2,3\}' | cut -d' ' -f2`
+    major=`echo $version | cut -d'.' -f1`
+    minor=`echo $version | cut -d'.' -f2`
+    micro=`echo $version | cut -d'.' -f3`
+    beta=`echo $version | cut -d'.' -f4`
+    if test -z $beta; then
+      beta=0
+    fi
+    SWFMILL_VERSION=`printf %2.2d%2.2d%2.2d%2.2d $major $minor $micro $beta`
+  fi
+
+  AC_SUBST(SWFMILL_VERSION)
   AC_SUBST(SWFMILL)
 ])
 

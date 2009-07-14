@@ -22,6 +22,7 @@
 #include "System_as.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
@@ -76,7 +77,7 @@ system_class_init(as_object& global)
 void
 registerSystemNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
     
     vm.registerNative(system_security_allowdomain, 12, 0);
     vm.registerNative(system_showsettings, 2107, 0);
@@ -120,7 +121,7 @@ namespace {
 as_object*
 getSystemSecurityInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
@@ -128,12 +129,13 @@ getSystemSecurityInterface(as_object& o)
 		proto = new as_object(getObjectInterface());
 		proto->init_member("allowDomain", vm.getNative(12, 0));
 
+        Global_as* gl = getGlobal(o);
 		// TODO: only available when SWF >= 7 
 		proto->init_member("allowInsecureDomain",
-                new builtin_function(system_security_allowinsecuredomain));
+                gl->createFunction(system_security_allowinsecuredomain));
 
 		proto->init_member("loadPolicyFile",
-                new builtin_function(system_security_loadpolicyfile));
+                gl->createFunction(system_security_loadpolicyfile));
 	}
 	return proto.get();
 }
@@ -150,7 +152,7 @@ getSystemCapabilitiesInterface(as_object& o)
     // "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME",
     // "Windows 95", "Windows CE", "Linux", "MacOS"
     // Override in gnashrc
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
     
     const std::string os = vm.getOSName();
 
@@ -203,7 +205,7 @@ getSystemCapabilitiesInterface(as_object& o)
     //
         
     // Is audio available?
-    const bool hasAudio = (vm.getRoot().runInfo().soundHandler());
+    const bool hasAudio = (vm.getRoot().runResources().soundHandler());
 
     // FIXME: these need to be implemented properly. They are mostly
     // self-explanatory.
@@ -332,12 +334,13 @@ convertValue(const std::string& in, T& val)
 void
 attachSystemInterface(as_object& proto)
 {
-	VM& vm = proto.getVM();
+    Global_as* gl = getGlobal(proto);
+	VM& vm = getVM(proto);
 
 	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
 	proto.init_member("setClipboard", 
-            new builtin_function(system_setClipboard));
+            gl->createFunction(system_setClipboard));
 	proto.init_member("showSettings", vm.getNative(2107, 0));
 
 	proto.init_property("useCodepage", &system_usecodepage,
@@ -481,7 +484,7 @@ systemLanguage(as_object& proto)
 	// some scripts rely on there being only 20 possible languages. It could
 	// be a run time option if it's important enough to care.
 
-	static std::string lang = proto.getVM().getSystemLanguage();
+	static std::string lang = getVM(proto).getSystemLanguage();
 	
 	const char* languages[] = {"en", "fr", "ko", "ja", "sv",
 				"de", "es", "it", "zh", "pt",

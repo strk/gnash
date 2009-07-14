@@ -27,12 +27,35 @@ package hello {
 
         public function Main() {
 
+            xcheck_equals(MovieClip, "[class MovieClip]");
             xcheck_equals(MovieClip.prototype, "[object Object]");
             xcheck_equals(MovieClip.constructor, "[class Class]");
+            check(!MovieClip.hasOwnProperty("constructor"));
+
+            // Check that this object is a MovieClip and has MovieClip
+            // functions (no need to check them all).
+            xcheck(this instanceof MovieClip);
+            check_equals(typeof(this.nextFrame), "function");
+            check_equals(typeof(this.play), "function");
             
+            xcheck(MovieClip.prototype.hasOwnProperty("constructor"));
+            
+            check(!MovieClip.hasOwnProperty("nextFrame"));
+            check(!MovieClip.hasOwnProperty("prevFrame"));
+            check(!MovieClip.hasOwnProperty("gotoAndStop"));
+            check(!MovieClip.hasOwnProperty("nextScene"));
+            check(!MovieClip.hasOwnProperty("prevScene"));
+            check(!MovieClip.hasOwnProperty("play"));
+            check(!MovieClip.hasOwnProperty("stop"));
+            check(!MovieClip.hasOwnProperty("addFrameScript"));
+            check(!MovieClip.hasOwnProperty("framesLoaded"));
+            check(!MovieClip.hasOwnProperty("totalFrames"));
+            check(!MovieClip.hasOwnProperty("currentFrame"));
+
             // The prototype seems really to be just an object. Just
             // test the MovieClip properties until there's a reason
             // to check others.
+            
             check(!MovieClip.prototype.hasOwnProperty("nextFrame"));
             check(!MovieClip.prototype.hasOwnProperty("prevFrame"));
             check(!MovieClip.prototype.hasOwnProperty("gotoAndStop"));
@@ -47,6 +70,7 @@ package hello {
             
             var m = new MovieClip();
             xcheck_equals(m.constructor, "[class MovieClip]");
+            check(!m.hasOwnProperty("constructor"));
             
             // MovieClip properties
             xcheck(m.hasOwnProperty("nextFrame"));
@@ -126,20 +150,20 @@ package hello {
             check(!m.hasOwnProperty("attachAudio"));
 
             // Check type of MovieClip properties. Inherited properties should
-	    // be dealt with elsewhere.
-            xcheck_equals(typeof(m.nextFrame), "function");
-            xcheck_equals(typeof(m.prevFrame), "function");
-            xcheck_equals(typeof(m.gotoAndStop), "function");
-            xcheck_equals(typeof(m.nextScene), "function");
-            xcheck_equals(typeof(m.prevScene), "function");
-            xcheck_equals(typeof(m.play), "function");
-            xcheck_equals(typeof(m.stop), "function");
-            xcheck_equals(typeof(m.addFrameScript), "function");
+            // be dealt with elsewhere.
+            check_equals(typeof(m.nextFrame), "function");
+            check_equals(typeof(m.prevFrame), "function");
+            check_equals(typeof(m.gotoAndStop), "function");
+            check_equals(typeof(m.nextScene), "function");
+            check_equals(typeof(m.prevScene), "function");
+            check_equals(typeof(m.play), "function");
+            check_equals(typeof(m.stop), "function");
+            check_equals(typeof(m.addFrameScript), "function");
             xcheck_equals(typeof(m.framesLoaded), "number");
             xcheck_equals(typeof(m.totalFrames), "number");
             xcheck_equals(typeof(m.currentFrame), "number");
 
-            totals(92);
+            totals(110);
 
             done();
         }

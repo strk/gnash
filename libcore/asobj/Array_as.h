@@ -430,9 +430,11 @@ private:
 // needed by SWFHandlers::ActionInitArray
 void array_class_init(as_object& global);
 
+void registerArrayNative(as_object& global);
+
 /// Constructor for ActionScript class Array.
 // needed by SWFHandlers::ActionInitArray
-as_value	array_new(const fn_call& fn);
+as_value array_new(const fn_call& fn);
 
 }
 

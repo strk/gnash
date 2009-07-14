@@ -33,6 +33,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
@@ -350,7 +351,7 @@ SharedObject_as::flush(int space) const
     buf.append("\x00\x00\x00\x00", 4);
 
     // append properties of object
-    VM& vm = getVM();
+    VM& vm = getVM(*this);
 
     std::map<as_object*, size_t> offsetTable;
     SOLPropsBufSerializer props(buf, vm, offsetTable);
@@ -384,7 +385,7 @@ SharedObject_as::flush(int space) const
 #else // amf::SOL-based serialization
 
     // append properties of object
-    VM& vm = getVM();
+    VM& vm = getVM(*this)
 
     SOL sol;
     PropsSerializer props(sol, vm);
@@ -434,7 +435,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // loaded SWF, so that in the A loads B scenario above the
     // domain would be the one of A, not B.
     //
-    // NOTE: using the base url RunInfo::baseURL() would mean
+    // NOTE: using the base url RunResources::baseURL() would mean
     // blindly trusting the SWF publisher as base url is changed
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
@@ -606,10 +607,11 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 void
 sharedobject_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
     
     if (cl == NULL) {
-        cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&sharedobject_ctor, getSharedObjectInterface());
         attachSharedObjectStaticInterface(*cl);
     }
     
@@ -620,7 +622,7 @@ sharedobject_class_init(as_object& global)
 void
 registerSharedObjectNative(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     // ASnative table registration
 	vm.registerNative(sharedobject_connect, 2106, 0);
@@ -654,7 +656,7 @@ void
 attachSharedObjectInterface(as_object& o)
 {
 
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
@@ -674,14 +676,15 @@ attachSharedObjectInterface(as_object& o)
 void
 attachSharedObjectStaticInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int flags = 0;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("getLocal", 
-            new builtin_function(sharedobject_getLocal), flags);
+            gl->createFunction(sharedobject_getLocal), flags);
     o.init_member("getRemote",
-            new builtin_function(sharedobject_getRemote), flags);
+            gl->createFunction(sharedobject_getRemote), flags);
 
     const int hiddenOnly = as_prop_flags::dontEnum;
 
@@ -795,8 +798,7 @@ as_value
 sharedobject_getLocal(const fn_call& fn)
 {
 
-    VM& vm = fn.env().getVM();
-    int swfVersion = vm.getSWFVersion();
+    int swfVersion = getSWFVersion(fn);
 
     as_value objNameVal;
     if (fn.nargs > 0) objNameVal = fn.arg(0);
@@ -821,6 +823,8 @@ sharedobject_getLocal(const fn_call& fn)
     }
 
     log_debug("SO name:%s, root:%s", objName, root);
+
+    VM& vm = getVM(fn);
 
     SharedObject_as* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
 

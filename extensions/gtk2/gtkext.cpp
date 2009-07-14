@@ -123,14 +123,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("window_new", new builtin_function(gtkext_window_new));
-    obj->init_member("signal_connect", new builtin_function(gtkext_signal_connect));
-    obj->init_member("container_set_border_width", new builtin_function(gtkext_container_set_border_width));
-    obj->init_member("button_new_with_label", new builtin_function(gtkext_button_new_with_label));
-    obj->init_member("signal_connect_swapped", new builtin_function(gtkext_signal_connect_swapped));
-    obj->init_member("container_add", new builtin_function(gtkext_container_add));
-    obj->init_member("widget_show", new builtin_function(gtkext_widget_show));
-    obj->init_member("main", new builtin_function(gtkext_main));
+    obj->init_member("window_new", gl->createFunction(gtkext_window_new));
+    obj->init_member("signal_connect", gl->createFunction(gtkext_signal_connect));
+    obj->init_member("container_set_border_width", gl->createFunction(gtkext_container_set_border_width));
+    obj->init_member("button_new_with_label", gl->createFunction(gtkext_button_new_with_label));
+    obj->init_member("signal_connect_swapped", gl->createFunction(gtkext_signal_connect_swapped));
+    obj->init_member("container_add", gl->createFunction(gtkext_container_add));
+    obj->init_member("widget_show", gl->createFunction(gtkext_widget_show));
+    obj->init_member("main", gl->createFunction(gtkext_main));
 }
 
 static as_object*
@@ -356,7 +356,8 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&gtkext_ctor, getInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&gtkext_ctor, getInterface());
  	    // replicate all interface to class, to be able to access
  	    // all methods as static functions
  	    attachInterface(cl.get());

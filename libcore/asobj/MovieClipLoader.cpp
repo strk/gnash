@@ -27,6 +27,7 @@
 #include "as_object.h" // for inheritance
 #include "movie_root.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "as_function.h"
 #include "MovieClip.h"
 #include "DisplayObject.h" // for loadClip (get_parent)
@@ -152,9 +153,9 @@ bool
 MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
 {
     
-    movie_root& mr = _vm.getRoot();
+    movie_root& mr = getRoot(*this);
 
-	URL url(url_str, mr.runInfo().baseURL());
+	URL url(url_str, mr.runResources().baseURL());
 	
 #if GNASH_DEBUG
 	log_debug(_(" resolved url: %s"), url.str());
@@ -213,7 +214,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
             new DelayedFunctionCall(this, NSV::PROP_BROADCAST_MESSAGE, 
                 "onLoadInit", targetVal));
 
-	_vm.getRoot().pushAction(code, movie_root::apDOACTION);
+	getRoot(*this).pushAction(code, movie_root::apDOACTION);
 
 	return true;
 }
@@ -229,11 +230,12 @@ void
 moviecliploader_class_init(as_object& global)
 {
 	// This is going to be the global Number "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl = NULL;
+	static boost::intrusive_ptr<as_object> cl = NULL;
 
 	if (cl == NULL)
 	{
-		cl=new builtin_function(&moviecliploader_new,
+        Global_as* gl = getGlobal(global);
+		cl = gl->createClass(&moviecliploader_new,
                 getMovieClipLoaderInterface());
 	}
 	global.init_member("MovieClipLoader", cl.get()); 
@@ -245,11 +247,12 @@ namespace {
 void
 attachMovieClipLoaderInterface(as_object& o)
 {
-  	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
+    Global_as* gl = getGlobal(o);
+  	o.init_member("loadClip", gl->createFunction(moviecliploader_loadclip));
 	o.init_member("unloadClip",
-            new builtin_function(moviecliploader_unloadclip));
+            gl->createFunction(moviecliploader_unloadclip));
 	o.init_member("getProgress",
-            new builtin_function(moviecliploader_getprogress));
+            gl->createFunction(moviecliploader_getprogress));
 
 	// NOTE: we want addListener/removeListener/broadcastMessage
 	//       but don't what the _listeners property here...
@@ -386,7 +389,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();
 
-	string_table& st = ptr->getVM().getStringTable();
+	string_table& st = getStringTable(fn);
 
 	// We want these to be enumerable
 	mcl_obj->set_member(st.find("bytesLoaded"), bytesLoaded);

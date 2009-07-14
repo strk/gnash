@@ -23,6 +23,7 @@
 
 #include "smart_ptr.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
 #include "log.h"
@@ -36,6 +37,7 @@
 #include "utf8.h"
 #include "String_as.h"
 #include "GnashNumeric.h"
+#include "Global_as.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
@@ -84,7 +86,7 @@ public:
             _string(s)
     {
         std::wstring wstr = utf8::decodeCanonicalString(
-                _string, _vm.getSWFVersion());
+                _string, getSWFVersion(*this));
         init_member(NSV::PROP_LENGTH, wstr.size(), 
                 as_prop_flags::dontDelete | as_prop_flags::dontEnum); 
     }
@@ -172,7 +174,7 @@ namespace {
 void
 attachStringInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
 	// ASnative(251, 1) - [String.prototype] valueOf
 	vm.registerNative(as_object::tostring_method, 251, 1);
@@ -288,7 +290,7 @@ string_slice(const fn_call& fn)
         log_error("No fn_call::callerDef in string_slice call");
     }
     const int version = fn.callerDef ? fn.callerDef->get_version() :
-        obj->getVM().getSWFVersion();
+        getSWFVersion(fn);
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -357,7 +359,7 @@ string_split(const fn_call& fn)
     }
 
     const int version = fn.callerDef ? fn.callerDef->get_version() :
-        obj->getVM().getSWFVersion();
+        getSWFVersion(fn);
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -507,7 +509,7 @@ string_substr(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    int version = obj->getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -547,7 +549,7 @@ string_substring(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    int version = obj->getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
@@ -603,7 +605,7 @@ string_indexOf(const fn_call& fn)
 
     if (!checkArgs(fn, 1, 2, "String.indexOf")) return as_value(-1);
 
-    int version = obj->getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
@@ -646,7 +648,7 @@ string_fromCharCode(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-    const int version = obj->getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     if (version == 5)
     {
@@ -691,7 +693,7 @@ string_charCodeAt(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    int version = obj->getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
@@ -729,7 +731,7 @@ string_charAt(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    const int version = obj->getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     if (!checkArgs(fn, 1, 1, "String.charAt()")) return as_value("");
 
@@ -763,8 +765,7 @@ string_toUpperCase(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
 
-    VM& vm = obj->getVM();
-    const int version = vm.getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
 
@@ -801,8 +802,7 @@ string_toLowerCase(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    VM& vm = obj->getVM();
-    const int version = vm.getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
 

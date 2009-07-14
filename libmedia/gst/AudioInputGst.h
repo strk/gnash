@@ -1,5 +1,6 @@
+// AudioInput.h: Audio input processing using Gstreamer.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,32 +11,34 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef GNASH_AUDIOINPUTGST_H
+#define GNASH_AUDIOINPUTGST_H
 
-#ifndef BACKEND_RENDER_HANDLER_CAIRO_H
-#define BACKEND_RENDER_HANDLER_CAIRO_H
-
-#include <cairo/cairo.h>
-#include "render_handler.h"
+#include <boost/cstdint.hpp> // for C99 int types
+#include "AudioInput.h"
 
 namespace gnash {
-namespace renderer {
+namespace media {
+namespace gst {
 
-/// Cairo renderer namespace
-namespace cairo {
 
-/// Create a render handler
-gnash::render_handler* create_handler();
+class AudioInputGst : public AudioInput {
+	
+public:
 
-/// Make sure to call this before starting display
-void set_context(render_handler* handler, cairo_t* context);
+	AudioInputGst();
 
-} // namespace gnash::renderer::cairo
-} // namespace gnash::renderer
-} // namespace gnash
+	~AudioInputGst();
 
-#endif // BACKEND_RENDER_HANDLER_CAIRO_H
+};
+
+} // gst namespace
+} // gnash.media namespace 
+} // gnash namespace
+
+#endif // __AUDIOINPUT_H__

@@ -268,14 +268,14 @@ endif
 
 CLEANFILES = klash3.moc klash4.moc .configline gnash
 
-bundle: Info.plist
+bundle: Info.plist aqua-gnash
 	@echo " Building: $(bundle_name)" 
 	rm -rf $(bundle_name)/Contents
 	mkdir -p $(bundle_name)/Contents/MacOS
 	mkdir -p $(bundle_name)/Contents/Resources
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	cp Info.plist $(bundle_name)/Contents/Info.plist
-	cp -f .libs/aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
+	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
 

@@ -28,7 +28,8 @@
 #include "rc.h"
 #include "gtksup.h"
 #include "sound_handler.h"
-#include "render_handler.h"
+#include "Renderer.h"
+#include "RunResources.h"
 #include "VM.h"
 #include "lirc.h"
 #include "gnash.h" // Quality
@@ -135,9 +136,9 @@ GtkGui::~GtkGui()
 {
 }
 
-GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
+GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
 	:
-	Gui(xid, scale, loop, depth)
+	Gui(xid, scale, loop, r)
 #ifdef GUI_HILDON
 	,_hildon_program(0)
 #endif
@@ -245,10 +246,10 @@ GtkGui::init(int argc, char **argv[])
 #ifdef BUILD_CANVAS
     _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
 #else
-    _renderer = _glue->createRenderHandler();
-    if ( ! _renderer ) return false;
-    set_render_handler(_renderer);
+    _renderer.reset(_glue->createRenderHandler());
+    if (!_renderer.get()) return false;
 #endif
+    _runResources.setRenderer(_renderer);
 
     // The first time stop() was called, stopHook() might not have had a chance
     // to do anything, because GTK+ wasn't garanteed to be initialised.

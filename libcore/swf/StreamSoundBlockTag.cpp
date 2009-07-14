@@ -24,7 +24,7 @@
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
 #include "log.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "VM.h" // For getting movie_root. TODO: drop
 
 namespace gnash {
@@ -34,9 +34,7 @@ void
 StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
 
-    const movie_root& mr = m->getVM().getRoot();
-
-	sound::sound_handler* handler = mr.runInfo().soundHandler(); 
+	sound::sound_handler* handler = getRunResources(*m).soundHandler(); 
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.
@@ -49,7 +47,7 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 /* public static */
 void
 StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& r)
+        const RunResources& r)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 

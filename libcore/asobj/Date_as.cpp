@@ -71,6 +71,7 @@
 #include "GnashNumeric.h"
 #include "Date_as.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
@@ -210,10 +211,11 @@ void
 Date_as::init(as_object& global)
 {
     // This is going to be the global Date "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL ) {
-        cl = new builtin_function(&date_new, getDateInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&date_new, getDateInterface());
         
         // replicate static interface to class (Date.UTC)
         attachDateStaticInterface(*cl);
@@ -227,7 +229,7 @@ Date_as::init(as_object& global)
 void
 Date_as::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
     vm.registerNative(date_getFullYear, 103, 0); 
     vm.registerNative(date_getYear, 103, 1);
@@ -336,7 +338,8 @@ void truncateDouble(T& target, double value)
 void
 attachDateInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    Global_as* gl = getGlobal(o);
+    VM& vm = getVM(o);
 
     o.init_member("getFullYear", vm.getNative(103, 0));
     o.init_member("getYear", vm.getNative(103, 1));
@@ -375,14 +378,14 @@ attachDateInterface(as_object& o)
     o.init_member("setUTCMinutes", vm.getNative(103, 141));
     o.init_member("setUTCSeconds", vm.getNative(103, 142));
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
-    o.init_member("valueOf", new builtin_function(date_valueof));
+    o.init_member("valueOf", gl->createFunction(date_valueof));
 
 }   
 
 void
 attachDateStaticInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
     o.init_member("UTC", vm.getNative(103, 257));
 }
 

@@ -31,7 +31,7 @@
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
 #include "BitmapMovieDefinition.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "URL.h"
 #include "StreamProvider.h"
 #include "MovieClip.h"
@@ -54,7 +54,7 @@ namespace gnash
 namespace {
     FileType getFileType(IOChannel& in);
     SWFMovieDefinition* createSWFMovie(std::auto_ptr<IOChannel> in,
-            const std::string& url, const RunInfo& runInfo,
+            const std::string& url, const RunResources& runResources,
             bool startLoaderThread);
 }
 
@@ -66,7 +66,7 @@ static void clear_library();
 // TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
 createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        FileType type)
+        const RunResources& r, FileType type)
 {
     assert (in.get());
 
@@ -79,13 +79,16 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         std::auto_ptr<GnashImage> im(
                 ImageInput::readImageData(imageData, type));
 
-        if (!im.get())
-        {
+        if (!im.get()) {
             log_error(_("Can't read image file from %s"), url);
             return NULL;
-        } 
+        }
 
-        BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
+        Renderer* renderer = r.renderer();
+
+        BitmapMovieDefinition* mdef =
+            new BitmapMovieDefinition(im, renderer, url);
+
         return mdef;
 
     }
@@ -100,7 +103,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 movie_definition*
 MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunInfo& runInfo, bool startLoaderThread)
+        const RunResources& runResources, bool startLoaderThread)
 {
   assert(in.get());
 
@@ -120,12 +123,12 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
             }
-            return createBitmapMovie(in, url, type);
+            return createBitmapMovie(in, url, runResources, type);
         }
 
 
         case GNASH_FILETYPE_SWF:
-            return createSWFMovie(in, url, runInfo, startLoaderThread);
+            return createSWFMovie(in, url, runResources, startLoaderThread);
 
         case GNASH_FILETYPE_FLV:
             log_unimpl(_("FLV can't be loaded directly as a movie"));
@@ -140,14 +143,14 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 }
 
 movie_definition*
-createNonLibraryMovie(const URL& url, const RunInfo& runInfo,
+createNonLibraryMovie(const URL& url, const RunResources& runResources,
         const char* reset_url, bool startLoaderThread,
         const std::string* postdata)
 {
 
   std::auto_ptr<IOChannel> in;
 
-  const StreamProvider& streamProvider = runInfo.streamProvider();
+  const StreamProvider& streamProvider = runResources.streamProvider();
 
   const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -169,7 +172,7 @@ createNonLibraryMovie(const URL& url, const RunInfo& runInfo,
   }
 
   std::string movie_url = reset_url ? reset_url : url.str();
-  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runInfo,
+  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runResources,
           startLoaderThread);
 
   return ret;
@@ -264,10 +267,10 @@ getFileType(IOChannel& in)
 //
 SWFMovieDefinition*
 createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunInfo& runInfo, bool startLoaderThread)
+        const RunResources& runResources, bool startLoaderThread)
 {
 
-    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
+    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runResources));
 
     const std::string& absURL = URL(url).str();
 
@@ -315,9 +318,6 @@ void  clear()
     GC::cleanup();
 #endif
 
-    // By setting the render handler to NULL we avoid it being used
-    // after it's been de-referenced (fixes bug #21310)
-    set_render_handler(NULL);
 }
 
 static MovieLibrary s_movie_library;
@@ -334,7 +334,7 @@ static void clear_library()
 // return a pointer to it.
 //
 movie_definition*
-MovieFactory::makeMovie(const URL& url, const RunInfo& runInfo,
+MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {
@@ -357,7 +357,7 @@ MovieFactory::makeMovie(const URL& url, const RunInfo& runInfo,
     // the loader thread now to avoid IMPORT tag loaders from 
     // calling createMovie() again and NOT finding
     // the just-created movie.
-    movie_definition* mov = createNonLibraryMovie(url, runInfo, real_url, false,
+    movie_definition* mov = createNonLibraryMovie(url, runResources, real_url, false,
             postdata);
 
     if (!mov)

@@ -227,6 +227,8 @@ with (a)
 	check( zshape.hitTest((223+25), (145+20), true) ); // 3
 	check( zshape.hitTest(273, 165, true) ); // 4
 
+	// The ugly orange stroke / light brown fill
+	// expected to auto-close on endFill()
 	createEmptyMovieClip("x", 20);
 	with (x)
 	{
@@ -250,7 +252,11 @@ with (a)
 
 	check( x.hitTest(126, 168, true) ); 
 	check( x.hitTest(112, 158, true) ); 
-	check( x.hitTest(122, 157, true) ); 
+
+    // COMPATIBLITY NOTE:
+    // flashplayer 10.0.12.10 for linux fails this, whereas 9.0.115.0 doesn't
+	check( x.hitTest(122, 157, true) );
+
 	check( ! x.hitTest(120, 155, true) ); 
 	check( x.hitTest(120, 155, false) ); 
 	check( ! x.hitTest(116, 177, true) ); 
@@ -573,6 +579,168 @@ with(inv)
 	_visible = false;
 }
 
+createEmptyMovieClip("line", 110);
+with(line) {
+
+    col = 0xff0000;
+    colc = 100;
+    x = 20;
+    y = 20;
+    xr = 100;
+    yr = 100;
+    n = 10;
+    alpha = 100;
+    
+    // =======================
+    //   Shape 1
+    // =======================
+
+    beginFill(col,colc);
+    lineStyle(n,0x0000ff,alpha);
+
+    moveTo(x,y);
+    lineTo(x+xr,y);
+    lineTo((x+xr),(y+yr));
+
+    // In Gnash, next line forces a new path,
+    // and closeup of the former (shouldn't)
+    // 
+    lineStyle(n,0x00ff00,alpha);
+
+    lineTo(x,(y+yr));
+    lineTo(x,y);
+
+    endFill();
+
+    // =======================
+    //   Shape 2
+    // =======================
+
+    x += 200;
+
+    beginFill(col,colc);
+    lineStyle(n,1,alpha);
+
+    moveTo(x,y);
+    lineTo(x+xr,y);
+
+    lineStyle(n,0x0000ff,alpha);
+
+    lineTo((x+xr),(y+yr));
+
+    lineStyle(n,0x00ff00,alpha);
+
+    lineTo(x,(y+yr));
+    lineTo(x,y);
+
+    endFill(); 
+
+    // =======================
+    //   Shape 3
+    // =======================
+
+    x += 200;
+
+    createEmptyMovieClip("d", 500);
+    with (d)
+    {
+        lineStyle(10, 10, 100);
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        endFill(); // does NOT force closeup
+    }
+
+    // =======================
+    //   Shape 4
+    // =======================
+
+    x = 20;
+    y += 150;
+
+    createEmptyMovieClip("e", 501);
+    with (e)
+    {
+        lineStyle(10, 10, 100);
+        beginFill(); // does NOT start a fill
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        endFill(); // does NOT force closeup
+    }
+
+    // The shape is not closed to form a triangle,
+    // so the only way to hit it is to hit the line.
+    check(!e.hitTest(x + 30, y + 30, true));
+
+    // Top right 'corner'
+    check(e.hitTest(x, y, true));
+
+    // =======================
+    //   Shape 5
+    // =======================
+
+    x += 200;
+
+    createEmptyMovieClip("f", 502);
+    with (f)
+    {
+        lineStyle(10, 10, 100);
+        beginFill(0); // does start a fill
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        endFill(); // DOES force closeup
+    }
+    
+    // Somewhere within the closed triangle.
+    check(f.hitTest(x + 30, y + 30, true));
+
+    // =======================
+    //   Shape 6
+    // =======================
+    
+    x += 200;
+
+    createEmptyMovieClip("g", 503);
+    with (g)
+    {
+        lineStyle(10, 0xFFFF00, 100);
+        beginFill(0x00ff00); // does start a fill
+        moveTo(x, y);
+        lineTo(x, y + yr);
+        lineTo(x + xr, y + yr);
+        beginFill(0x0000ff); // closes previous fill, opens a new one
+        lineTo(x + xr, y);
+        lineTo(x + xr, y + yr);
+        endFill(); // DOES force closeup
+    }
+
+    // Bottom left
+    check(g.hitTest(x + 20, y + 80, true));
+
+    // Top right
+    // COMPATIBLITY NOTE:
+    // 9,0,115,0 for linux sometimes finds the point to hit
+    // the shape and sometimes it doesn't.
+    // 10,0,12,10 never succeeds the hit test.
+    //
+    // The point is clearly within a fill so we'll take an hit test
+    // success as expected.
+    //
+    check(g.hitTest(x + 80, y + 20, true));
+
+    _visible = false;
+}
+line.onRollOver = function() {};
+
+// Check the the top right diagonal half of Shape 2.
+xcheck(line.hitTest(270, 40, true));
+
+// Check the bottom left diagonal half of Shape 2.
+check(line.hitTest(230, 80, true));
+
+
 //---------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------
@@ -700,10 +868,12 @@ onMouseDown = function()
 };
 
 
+
 visibleIndex = 0;
 page = new Array;
 page[0] = a;
 page[1] = inv;
+page[2] = line;
 onKeyDown = function()
 {
 	var ascii = Key.getAscii();

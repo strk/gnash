@@ -18,8 +18,8 @@
 #include "aos4_glue.h"
 #include "gnash.h"
 #undef ACTION_END
-#include "render_handler.h"
-#include "render_handler_cairo.h"
+#include "Renderer.h"
+#include "Renderer_cairo.h"
 
 #include <proto/intuition.h>
 #include <proto/graphics.h>
@@ -43,8 +43,8 @@ namespace gnash
 	    virtual ~AOS4CairoGlue();
 
     	bool 			 	 init(int argc, char **argv[]);
-	    render_handler		*createRenderHandler(int depth);
-    	render_handler		*createRenderHandler();
+	    Renderer		*createRenderHandler(int depth);
+    	Renderer		*createRenderHandler();
 	    bool 			 	 prepDrawingArea(int width, int height);
 	    void 			 	 render();
     	void 			 	 render(int minx, int miny, int maxx, int maxy);
@@ -61,7 +61,7 @@ namespace gnash
 		cairo_surface_t 	*_cairo_surface;
 		cairo_t         	*_cairo_handle;
     	unsigned char   	*_offscreenbuf;
-	    render_handler  	*_cairo_renderer;
+	    Renderer  	*_cairo_renderer;
     	struct Window   	*_window;
     	struct Screen		*_screen;
 		bool 				 _fullscreen;

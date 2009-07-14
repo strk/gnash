@@ -27,15 +27,18 @@ package hello {
 
     public class Base {
         public function Base() {
-            trace("Base ctor");
             S.s += "Base ";
+            a = 7;
         }
+        var a : int;
     }
 
     public class Derived extends Base {
         public function Derived() {
             S.s += "Derived ";
+            b = "string";
         }
+        var b : String;
     }
 
     public class Hello extends MovieClip {
@@ -74,10 +77,16 @@ package hello {
             xcheck_equals(Derived.__constructor__, undefined);
             xcheck_equals(Base.__constructor__, undefined);
 
+            // Objects are objects in AS3, not functions.
+            check_equals(typeof(Base), "object");
+            check_equals(typeof(Derived), "object");
+            check_equals(typeof(MovieClip), "object");
+
             var b1 : Base = new Base();
             xcheck(b1 instanceof Base);
             check(!(b1 instanceof Derived));
             check_equals(S.s, "Hello Base ");
+            check_equals(b1.a, 7);
             
             xcheck_equals(b1.constructor, "[class Base]");
             
@@ -85,15 +94,19 @@ package hello {
             var b2 : Base = new Derived();
             xcheck(b2 instanceof Base);
             xcheck(b2 instanceof Derived);
-            xcheck_equals(S.s, "Base Derived ");
+            check_equals(S.s, "Base Derived ");
+            check_equals(b2.a, 7);
+            check_equals(b2.b, "string");
 
             S.s = "";
             var d1 : Derived = new Derived();
             xcheck(d1 instanceof Base);
             xcheck(d1 instanceof Derived);
-            xcheck_equals(S.s, "Base Derived ");
+            check_equals(S.s, "Base Derived ");
+            check_equals(d1.a, 7);
+            check_equals(d1.b, "string");
 
-            totals(30);
+            totals(38);
 
             done();
         }

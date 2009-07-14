@@ -41,7 +41,7 @@ namespace gnash
 class FltkGui : public fltk::Window, public Gui
 {
 public:
-    FltkGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    FltkGui(unsigned long xid, float scale, bool loop, RunResources& r);
 
     virtual ~FltkGui();
     virtual bool init(int argc, char **argv[]);

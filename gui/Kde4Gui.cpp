@@ -62,8 +62,8 @@
 #include "gui.h"
 #include "Kde4Gui.h"
 #include "klash4.moc"
-#include "render_handler.h"
-#include "utility.h" // for pixelsToTwips 
+#include "Renderer.h"
+#include "RunResources.h" 
 
 // Macro for using gettext strings where Qt expects QStrings
 #define _q(Str) QString::fromUtf8(_(Str))
@@ -75,8 +75,8 @@ extern "C" {
 namespace gnash 
 {
 
-Kde4Gui::Kde4Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth)
+Kde4Gui::Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r)
 {
 }
 
@@ -153,16 +153,20 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
 
     _glue.prepDrawingArea(_drawingWidget);
 
-    _renderer = _glue.createRenderHandler();
+    _renderer.reset(_glue.createRenderHandler());
 
-    if ( ! _renderer ) {
+    if (!_renderer.get()) {
         return false;
     }
 
     _validbounds.setTo(0, 0, _width, _height);
     _glue.initBuffer(_width, _height);
     
-    set_render_handler(_renderer);
+    log_debug("Setting renderer");
+
+    _runResources.setRenderer(_renderer);
+    
+    log_debug("Set renderer");
    
     return true;
 }

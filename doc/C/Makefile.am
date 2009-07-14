@@ -82,7 +82,7 @@ EXTRA_DIST = \
 # docbook-utils transform the name at different steps in the process.
 # This is an easy way to handle it either way, since we only need it as
 # dependency anyway.
-dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 flvdumper.1 cygnal.1
+dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 flvdumper.1 cygnal.1 rtmpget.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)

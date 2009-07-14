@@ -27,16 +27,15 @@
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
-#include "Global.h"
 
 namespace gnash {
+    class Global_as;
     class DisplayObject;
     class as_object;
-    class abc_block;
+    class AbcBlock;
     class asName;
     class Property;
     class CodeStream;
-    class AVM2Global;
 }
 
 
@@ -212,7 +211,7 @@ public:
         immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out);
     }
 
-	void initMachine(abc_block* pool_block);
+	void initMachine(AbcBlock* pool_block);
 
 	as_value executeFunction(asMethod* function, const fn_call& fn);
 
@@ -226,17 +225,7 @@ public:
     /// do not share any ActionScript resources. It should be the same
     /// for a complete run of the Machine so that modifications carried out
     /// by scripts are preserved for subsequent scripts.
-    as_object* global() {
-        return _global;
-    }
-
-    /// Return the ClassHierarchy used by our global object.
-    //
-    /// This is used in parsing, though maybe would be better accessed
-    /// through the Global object.
-    ClassHierarchy* classHierarchy() {
-        return &_global->classHierarchy();
-    }
+    Global_as* global();
 
     void markReachableResources() const;
 
@@ -245,9 +234,9 @@ private:
 	class State
 	{
 	public:
-		unsigned int mStackDepth;
-		unsigned int mStackTotalSize;
-		unsigned int mScopeStackDepth;
+		unsigned int _stackDepth;
+		unsigned int _stackTotalSize;
+		unsigned int _scopeStackDepth;
 		unsigned int mScopeTotalSize;
 		bool mReturn;
 		CodeStream *mStream;
@@ -258,7 +247,7 @@ private:
 		std::vector<as_value> _registers;
 		abc_function* mFunction;
 	void to_debug_string(){
-		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
+		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",_stackDepth,_stackTotalSize,_scopeStackDepth,mScopeTotalSize);
 
 	}
 	};
@@ -280,12 +269,6 @@ private:
 
 	as_value find_prop_strict(asName multiname);
 
-	as_value get_property_value(asName multiname);
-
-	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname);
-
-	as_value get_property_value(boost::intrusive_ptr<as_object> obj, std::string name, std::string ns);
-
 	void print_stack();
 
 	void print_scope_stack();
@@ -293,8 +276,6 @@ private:
 	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc);
 	
 	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
-
-	as_environment::ScopeStack* getScopeStack();
 
 	void executeCodeblock(CodeStream* stream);
 
@@ -316,11 +297,11 @@ private:
 
 	void push_stack(as_value object){
 		log_abc("Pushing value %s onto stack.", object);
-		mStack.push(object);
+		_stack.push(object);
 	}
 
 	as_value pop_stack(){
-		as_value value = mStack.pop();
+		as_value value = _stack.pop();
 		log_abc("Popping value %s off the stack.", value);
 		return value;
 	}
@@ -329,25 +310,25 @@ private:
 		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
 		assert(scopeObj.get());
 		log_abc("Pushing value %s onto scope stack.", object);
-		mScopeStack.push(scopeObj);
+		_scopeStack.push(scopeObj);
 		print_scope_stack();
 	}
 
 	boost::intrusive_ptr<as_object> pop_scope_stack() {
 		log_abc("Popping value %s off the scope stack.  There will be "
-                "%u items left.", as_value(mScopeStack.top(0)),
-                mScopeStack.size()-1);
-		return mScopeStack.pop();
+                "%u items left.", as_value(_scopeStack.top(0)),
+                _scopeStack.size()-1);
+		return _scopeStack.pop();
 	}
 
 	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth)
         const {
 		log_abc("Getting value from scope stack %u from the bottom.",
                 depth | 0x0);
-		return mScopeStack.value(depth);
+		return _scopeStack.value(depth);
 	}
 
-	SafeStack<as_value> mStack;
+	SafeStack<as_value> _stack;
 	SafeStack<State> mStateStack;
 	std::vector<as_value> _registers;
 
@@ -359,7 +340,7 @@ private:
     /// before.
     /// Most importantly, the complete stack is used for lookups, including
     /// the section that is not changeable.
-	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
+	SafeStack<boost::intrusive_ptr<as_object> > _scopeStack;
 
     CodeStream *mStream;
 
@@ -372,15 +353,13 @@ private:
 	as_object* mThis;
 
     /// The global object for this machine.
-    //
-    /// We need to know the type to access the ClassHierarchy.
-	AVM2Global* _global;
+	Global_as* _global;
 
 	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mExitWithReturn;
-	abc_block* mPoolObject; // Where all of the pools are stored.
+	AbcBlock* mPoolObject; // Where all of the pools are stored.
 
 	abc_function* mCurrentFunction;
 

@@ -91,7 +91,7 @@ Timer::clearInterval()
 void
 Timer::start()
 {
-    _start = _object->getVM().getTime();
+    _start = getVM(*_object).getTime();
 }
     
 
@@ -121,7 +121,7 @@ Timer::execute()
     as_value timer_method;
 
     as_object* super = _object->get_super(_function ? 0 : _methodName.c_str());
-    VM& vm = _object->getVM();
+    VM& vm = getVM(*_object);
 
     if (_function.get() ) {
         timer_method.set_as_function(_function.get());

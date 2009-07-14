@@ -24,6 +24,7 @@
 #include "events/DataEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -56,10 +57,11 @@ public:
 // extern (used by Global.cpp)
 void dataevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&dataevent_ctor, getDataEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&dataevent_ctor, getDataEventInterface());
         attachDataEventStaticInterface(*cl);
     }
 
@@ -72,9 +74,10 @@ namespace {
 void
 attachDataEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(dataevent_toString));
-    o.init_member("DATA", new builtin_function(dataevent_DATA));
-    o.init_member("UPLOAD_COMPLETE_DATA", new builtin_function(dataevent_UPLOAD_COMPLETE_DATA));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(dataevent_toString));
+    o.init_member("DATA", gl->createFunction(dataevent_DATA));
+    o.init_member("UPLOAD_COMPLETE_DATA", gl->createFunction(dataevent_UPLOAD_COMPLETE_DATA));
 }
 
 void

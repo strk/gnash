@@ -898,15 +898,22 @@ fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 if test $ltmajor -eq 1; then
-AC_LIBLTDL_CONVENIENCE
-AC_LIBTOOL_DLOPEN
-AC_LIBTOOL_WIN32_DLL
-AC_DISABLE_STATIC
+	AC_LIBLTDL_CONVENIENCE
+	AC_LIBTOOL_DLOPEN
+	AC_LIBTOOL_WIN32_DLL
+	AC_DISABLE_STATIC
 else
-LT_INIT([dlopen win32-dll  disable-static])
-dnl lt_ltdl_dir=libbase/libltdlL
-LTDL_INIT([convenience recursive])
-AC_CONFIG_FILES([libltdl/Makefile])
+dnl if test x$build_aqua = xyes; then
+	dnl the Aqua-binary is always static.
+dnl	AC_ENABLE_STATIC
+dnl	AC_DISABLE_SHARED
+dnl else
+dnl	AC_DISABLE_STATIC
+dnl fi	
+	LT_INIT([dlopen win32-dll disable-static])
+	dnl lt_ltdl_dir=libbase/libltdl
+	LTDL_INIT([convenience recursive])
+	AC_CONFIG_FILES([libltdl/Makefile])
 fi
 AC_PROG_LIBTOOL
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
@@ -1213,13 +1220,35 @@ dnl --------------------------------------------------------
 dnl  Select SSL support
 dnl --------------------------------------------------------
 
+dnl Enable using libssh with libnet
+AC_ARG_ENABLE(ssh,
+  AC_HELP_STRING([--enable-ssh], [Enable using SSH for network authentication]),
+[case "${enableval}" in
+  yes) build_ssh=yes ;;
+  no)  build_ssh=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssh option]) ;;
+esac], build_ssh=no)
+
+AM_CONDITIONAL(BUILD_SSH, test x"${build_ssh}" = xyes)
+if test x"${build_ssh}" = xyes; then
+  GNASH_PKG_FIND(ssh, [libssh/libssh.h], [libssh library], ssh_socket_init)
+dnl  GNASH_PKG_FIND(poppler, [popt.h], [Poppler library], poppler_init)
+fi
+if test x"${has_ssh}" = x"yes"; then
+  AC_DEFINE([USE_SSH], [1], [Use SSH for authentication])
+fi
+
+dnl --------------------------------------------------------
+dnl  Select SSL support
+dnl --------------------------------------------------------
+
 dnl Enable using OpenSSL with libnet.
 AC_ARG_ENABLE(ssl,
   AC_HELP_STRING([--enable-ssl], [Enable using OpenSSL directly]),
 [case "${enableval}" in
   yes) build_ssl=yes ;;
   no)  build_ssl=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-openssl option]) ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssl option]) ;;
 esac], build_ssl=no)
 
 with_cert=
@@ -1237,7 +1266,9 @@ AC_ARG_WITH(pem,
 if test x"${build_ssl}" = xyes; then
   GNASH_PKG_FIND(ssl, [openssl/ssl.h], [OpenSSL library], SSL_library_init)
 fi
-
+if test x"${has_ssl}" = x"yes"; then
+  AC_DEFINE([USE_SSL], [1], [Use SSL for authentication])
+fi
 
 dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
@@ -1756,8 +1787,12 @@ if test x$cross_compiling = xno; then
   AC_PATH_MTASC
   AC_PATH_HAXE
 fi
-AM_CONDITIONAL(ENABLE_AS3COMPILE, [ test x"$AS3COMPILE" != x ])
+
 AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
+AM_CONDITIONAL(SWFMILL_AS3_SUPPORT,
+        [ test x"$SWFMILL" != x && test $SWFMILL_VERSION -ge 00021206 ])
+
+AM_CONDITIONAL(ENABLE_AS3COMPILE, [ test x"$AS3COMPILE" != x ])
 AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
 AM_CONDITIONAL(ENABLE_SWFC, [ test x"$SWFC" != x ])
@@ -1861,6 +1896,7 @@ AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI,       [ test x$build_fb = xyes ])
 AM_CONDITIONAL(BUILD_AQUA_GUI,     [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(ALLSTATIC,          [ test x$build_aqua = xyes ]) dnl the Aqua-binary is always static.
 AM_CONDITIONAL(BUILD_RISCOS_GUI,   [ test x$build_riscos = xyes ])
 AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
 AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
@@ -3136,7 +3172,7 @@ if test x"$testsuite" = x"yes"; then
       echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
     else
       echo "        WARNING: You need to have the HAXE compiler package " >&4
-      echo "                 version 2.00 or hither installed" >&4
+      echo "                 version 2.00 or higher installed" >&4
       echo "                 to run some of the tests in Gnash testsuite." >&4
       echo "                 You can install it from http://haxe.org" >&4
       echo "                 or .deb users: apt-get install haxe" >&4
@@ -3144,6 +3180,11 @@ if test x"$testsuite" = x"yes"; then
 
     if test x"$SWFMILL" != x; then
       echo "        SWFMILL is $SWFMILL"
+      if test x"$ENABLE_AVM2" != x -a "$SWFMILL_VERSION" -lt 00021206; then
+        echo "        WARNING: You are building Gnash with AVM2 support but" >&4
+        echo "                 your swfmill version is too old to run AS3" >&4
+        echo "                 tests." >&4
+      fi
     else
       echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
       echo "                 to run some of the tests in Gnash testsuite." >&4
@@ -3330,6 +3371,19 @@ if test x${build_ssl} = xyes; then
     echo "        SSL libs are: $SSL_LIBS"
   else
     echo "        ERROR: No SSL development package is installed, but it's enabled." >&3
+  fi
+fi
+
+if test x${build_ssh} = xyes; then
+  if test x"${has_ssh}" = xyes; then
+    if test x"${SSH_CFLAGS}" = xyes; then
+      echo "        SSH flags are: default"
+    else
+      echo "        SSH flags are: $SSH_CFLAGS"
+    fi
+    echo "        SSH libs are: $SSH_LIBS"
+  else
+    echo "        ERROR: No SSH development package is installed, but it's enabled." >&3
   fi
 fi
 

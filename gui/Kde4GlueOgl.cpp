@@ -21,7 +21,7 @@
 #endif
 
 #include "Kde4GlueOgl.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include <QRect>
 #include <QGLWidget>
 
@@ -71,10 +71,10 @@ Kde4OglGlue::render(const QRect& /*updateRect*/)
 }
 
 
-render_handler*
+Renderer*
 Kde4OglGlue::createRenderHandler()
 {
-    _renderer = create_render_handler_ogl();
+    _renderer = create_Renderer_ogl();
 
     if ( ! _renderer )
     {

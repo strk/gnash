@@ -17,7 +17,7 @@
 
 #include "sdl_cairo_glue.h"
 #include "log.h"
-#include "render_handler_cairo.h"
+#include "Renderer_cairo.h"
 
 using namespace std;
 
@@ -48,7 +48,7 @@ SdlCairoGlue::init(int argc, char** argv[])
 }
 
 
-render_handler*
+Renderer*
 SdlCairoGlue::createRenderHandler(int depth)
 {
 //    GNASH_REPORT_FUNCTION;

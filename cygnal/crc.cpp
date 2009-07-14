@@ -222,7 +222,7 @@ CRcInitFile::parseFile(const std::string& filespec)
 	    else if (extractNumber(num, "fdThread", variable, value) )
 		setFDThread(num);
             else if (extractNumber(num, "portOffset", variable, value) )
-		setPortOffset(num);;
+		setPortOffset(num);
 
         } while (!in.eof());
 

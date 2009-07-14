@@ -24,6 +24,7 @@
 #include "net/NetStream_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -73,10 +74,11 @@ public:
 // extern (used by Global.cpp)
 void netstream_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&netstream_ctor, getNetStreamInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netstream_ctor, getNetStreamInterface());
         attachNetStreamStaticInterface(*cl);
     }
 
@@ -89,31 +91,32 @@ namespace {
 void
 attachNetStreamInterface(as_object& o)
 {
-    o.init_member("attachCamera", new builtin_function(netstream_attachCamera));
-    o.init_member("close", new builtin_function(netstream_close));
-    o.init_member("pause", new builtin_function(netstream_pause));
-    o.init_member("play", new builtin_function(netstream_play));
-    o.init_member("publish", new builtin_function(netstream_publish));
-    o.init_member("receiveAudio", new builtin_function(netstream_receiveAudio));
-    o.init_member("receiveVideo", new builtin_function(netstream_receiveVideo));
-    o.init_member("receiveVideoFPS", new builtin_function(netstream_receiveVideoFPS));
-    o.init_member("resume", new builtin_function(netstream_resume));
-    o.init_member("seek", new builtin_function(netstream_seek));
-    o.init_member("send", new builtin_function(netstream_send));
-    o.init_member("togglePause", new builtin_function(netstream_togglePause));
-    o.init_member("asyncError", new builtin_function(netstream_asyncError));
-    o.init_member("ioError", new builtin_function(netstream_ioError));
-    o.init_member("netStatus", new builtin_function(netstream_netStatus));
-    o.init_member("onCuePoint", new builtin_function(netstream_onCuePoint));
-    o.init_member("onImageData", new builtin_function(netstream_onImageData));
-    o.init_member("onMetaData", new builtin_function(netstream_onMetaData));
-    o.init_member("onPlayStatus", new builtin_function(netstream_onPlayStatus));
-    o.init_member("onTextData", new builtin_function(netstream_onTextData));
+    o.init_member("attachCamera", gl->createFunction(netstream_attachCamera));
+    o.init_member("close", gl->createFunction(netstream_close));
+    o.init_member("pause", gl->createFunction(netstream_pause));
+    o.init_member("play", gl->createFunction(netstream_play));
+    o.init_member("publish", gl->createFunction(netstream_publish));
+    o.init_member("receiveAudio", gl->createFunction(netstream_receiveAudio));
+    o.init_member("receiveVideo", gl->createFunction(netstream_receiveVideo));
+    o.init_member("receiveVideoFPS", gl->createFunction(netstream_receiveVideoFPS));
+    o.init_member("resume", gl->createFunction(netstream_resume));
+    o.init_member("seek", gl->createFunction(netstream_seek));
+    o.init_member("send", gl->createFunction(netstream_send));
+    o.init_member("togglePause", gl->createFunction(netstream_togglePause));
+    o.init_member("asyncError", gl->createFunction(netstream_asyncError));
+    o.init_member("ioError", gl->createFunction(netstream_ioError));
+    o.init_member("netStatus", gl->createFunction(netstream_netStatus));
+    o.init_member("onCuePoint", gl->createFunction(netstream_onCuePoint));
+    o.init_member("onImageData", gl->createFunction(netstream_onImageData));
+    o.init_member("onMetaData", gl->createFunction(netstream_onMetaData));
+    o.init_member("onPlayStatus", gl->createFunction(netstream_onPlayStatus));
+    o.init_member("onTextData", gl->createFunction(netstream_onTextData));
 }
 
 void
 attachNetStreamStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 

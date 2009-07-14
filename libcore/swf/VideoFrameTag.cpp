@@ -31,7 +31,7 @@ namespace SWF {
 
 void
 VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == SWF::VIDEOFRAME);
 

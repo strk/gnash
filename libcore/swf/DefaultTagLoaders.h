@@ -22,6 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "dsodefs.h" //DSOEXPORT
 #include "SWF.h"
 #include "TagLoadersTable.h"
 
@@ -29,7 +30,7 @@ namespace gnash {
 namespace SWF {
 
 /// Add the default parsing functions for SWF files to a TagLoadersTable.
-void addDefaultLoaders(TagLoadersTable& table);
+DSOEXPORT void addDefaultLoaders(TagLoadersTable& table);
 
 } // namespace gnash::SWF
 } // namespace gnash

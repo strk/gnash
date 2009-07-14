@@ -24,6 +24,7 @@
 #include "sampler/StackFrame_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -56,10 +57,11 @@ public:
 // extern (used by Global.cpp)
 void stackframe_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&stackframe_ctor, getStackFrameInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&stackframe_ctor, getStackFrameInterface());
         attachStackFrameStaticInterface(*cl);
     }
 
@@ -72,9 +74,10 @@ namespace {
 void
 attachStackFrameInterface(as_object& o)
 {
-    o.init_member("file", new builtin_function(stackframe_file));
-    o.init_member("line", new builtin_function(stackframe_line));
-    o.init_member("name", new builtin_function(stackframe_name));
+    Global_as* gl = getGlobal(o);
+    o.init_member("file", gl->createFunction(stackframe_file));
+    o.init_member("line", gl->createFunction(stackframe_line));
+    o.init_member("name", gl->createFunction(stackframe_name));
 }
 
 void

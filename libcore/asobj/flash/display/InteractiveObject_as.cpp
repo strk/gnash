@@ -24,6 +24,7 @@
 #include "display/InteractiveObject_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void interactiveobject_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&interactiveobject_ctor, getInteractiveObjectInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&interactiveobject_ctor, getInteractiveObjectInterface());
         attachInteractiveObjectStaticInterface(*cl);
     }
 

@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
@@ -41,11 +42,12 @@ as_value microphone_ctor(const fn_call& fn);
 static void
 attachMicrophoneInterface(as_object& o)
 {
-	o.init_member("get", new builtin_function(microphone_get));
-	o.init_member("setGain", new builtin_function(microphone_setgain));
-	o.init_member("setRate", new builtin_function(microphone_setrate));
-	o.init_member("setSilenceLevel", new builtin_function(microphone_setsilencelevel));
-	o.init_member("setUseEchoSuppression", new builtin_function(microphone_setuseechosuppression));
+    Global_as* gl = getGlobal(o);
+	o.init_member("get", gl->createFunction(microphone_get));
+	o.init_member("setGain", gl->createFunction(microphone_setgain));
+	o.init_member("setRate", gl->createFunction(microphone_setrate));
+	o.init_member("setSilenceLevel", gl->createFunction(microphone_setsilencelevel));
+	o.init_member("setUseEchoSuppression", gl->createFunction(microphone_setuseechosuppression));
 }
 
 static as_object*
@@ -110,11 +112,12 @@ microphone_ctor(const fn_call& /* fn */)
 void microphone_class_init(as_object& global)
 {
 	// This is going to be the global Microphone "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&microphone_ctor, getMicrophoneInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&microphone_ctor, getMicrophoneInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachMicrophoneInterface(*cl);

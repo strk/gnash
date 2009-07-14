@@ -24,6 +24,7 @@
 #include "utils/IExternalizable_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -54,10 +55,11 @@ public:
 // extern (used by Global.cpp)
 void iexternalizable_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&iexternalizable_ctor, getIExternalizableInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&iexternalizable_ctor, getIExternalizableInterface());
         attachIExternalizableStaticInterface(*cl);
     }
 
@@ -70,13 +72,13 @@ namespace {
 void
 attachIExternalizableInterface(as_object& o)
 {
-    o.init_member("writeExternal", new builtin_function(iexternalizable_writeExternal));
+    Global_as* gl = getGlobal(o);
+    o.init_member("writeExternal", gl->createFunction(iexternalizable_writeExternal));
 }
 
 void
 attachIExternalizableStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

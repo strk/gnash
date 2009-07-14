@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -51,6 +52,7 @@ as_value Transform_ctor(const fn_call& fn);
 static void
 attachTransformInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     const int protectedFlags = as_prop_flags::isProtected;
 
     o.init_property("matrix",
@@ -421,7 +423,7 @@ void transform_class_init(as_object& where)
 	attachTransformStaticProperties(*cl);
 
 	// Register _global.Transform
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

@@ -236,7 +236,7 @@ public:
 
     virtual void execute()
     {
-        as_environment env(func->getVM()); env.set_target(target.get());
+        as_environment env(getVM(*func)); env.set_target(target.get());
         func->call(fn_call(target.get(), env));
     }
 

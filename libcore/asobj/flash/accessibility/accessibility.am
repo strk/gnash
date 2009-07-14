@@ -31,6 +31,4 @@ ACCESSIBILITY_HEADERS += asobj/flash/accessibility/Accessibility_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(ACCESSIBILITY_SOURCES)
-noinst_HEADERS +=  $(ACCESSIBILITY_HEADERS) \
-	asobj/flash/accessibility/accessibilityclasses.h
 

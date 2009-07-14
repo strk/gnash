@@ -40,7 +40,7 @@ class KdeAggGlue : public KdeGlue
     
     bool init(int argc, char **argv[]);
     void prepDrawingArea(QWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void initBuffer(int width, int height);
     void resize(int width, int height);
     void render();
@@ -50,7 +50,7 @@ class KdeAggGlue : public KdeGlue
     int _width;
     int _height;
     boost::scoped_array<unsigned char> _offscreenbuf;
-    render_handler* _renderer; // We don't own this pointer.
+    Renderer* _renderer; // We don't own this pointer.
     geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
     std::auto_ptr<QImage> _qimage;

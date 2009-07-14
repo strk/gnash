@@ -24,6 +24,8 @@
 #include "filters/BitmapFilterType_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
+#include "Object.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -32,69 +34,24 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value bitmapfiltertype_ctor(const fn_call& fn);
-    void attachBitmapFilterTypeInterface(as_object& o);
     void attachBitmapFilterTypeStaticInterface(as_object& o);
-    as_object* getBitmapFilterTypeInterface();
-
 }
 
-class BitmapFilterType_as : public as_object
-{
-
-public:
-
-    BitmapFilterType_as()
-        :
-        as_object(getBitmapFilterTypeInterface())
-    {}
-
-};
-
 // extern (used by Global.cpp)
-void bitmapfiltertype_class_init(as_object& global)
+void
+bitmapfiltertype_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&bitmapfiltertype_ctor, getBitmapFilterTypeInterface());
-        attachBitmapFilterTypeStaticInterface(*cl);
-    }
-
-    // Register _global.BitmapFilterType
+    boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
+    attachBitmapFilterTypeStaticInterface(*cl);
     global.init_member("BitmapFilterType", cl.get());
 }
 
 namespace {
 
 void
-attachBitmapFilterTypeInterface(as_object& o)
-{
-}
-
-void
 attachBitmapFilterTypeStaticInterface(as_object& o)
 {
-
-}
-
-as_object*
-getBitmapFilterTypeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachBitmapFilterTypeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-bitmapfiltertype_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new BitmapFilterType_as;
-
-    return as_value(obj.get()); // will keep alive
+    // TODO: attach constants.
 }
 
 } // anonymous namespace 

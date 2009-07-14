@@ -54,7 +54,7 @@ class FltkCairoGlue
       ~FltkCairoGlue();
      // resize(int width, int height);
       void draw();
-      render_handler* createRenderHandler();
+      Renderer* createRenderHandler();
       void initBuffer(int width, int height);
       void resize(int width, int height);
       void invalidateRegion(const rect& bounds);
@@ -63,7 +63,7 @@ class FltkCairoGlue
       int _height;
       int _stride;
       unsigned char* _offscreenbuf;
-      render_handler* _renderer;
+      Renderer* _renderer;
       cairo_surface_t *_cairo_surface;
       cairo_t         *_cairo_handle;
 };

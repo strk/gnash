@@ -29,7 +29,7 @@
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
 #include "GnashImageJpeg.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "Font.h"
 #include "VM.h"
 #include "log.h"
@@ -145,7 +145,7 @@ MovieLoader::start()
 // SWFMovieDefinition
 //
 
-SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
+SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
 	:
 	m_frame_rate(30.0f),
 	m_frame_count(0u),
@@ -157,7 +157,7 @@ SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
 	m_jpeg_in(0),
 	_loader(*this),
 	_loadingCanceled(false),
-    _runInfo(runInfo),
+    _runResources(runResources),
     _as3(false)
 {
 }
@@ -479,7 +479,7 @@ SWFMovieDefinition::read_all_swf()
 	assert( ! _loader.isSelfThread() );
 #endif
 
-    SWFParser parser(*_str, this, _runInfo);
+    SWFParser parser(*_str, this, _runResources);
 
     const size_t startPos = _str->tell();
     assert (startPos <= _swf_end_pos);
@@ -488,23 +488,30 @@ SWFMovieDefinition::read_all_swf()
 
     const size_t chunkSize = 65535;
 
-    while (left) {
+    try {
+        while (left) {
 
-        if (_loadingCanceled) {
-            log_debug("Loading thread cancelation requested, "
-                    "returning from read_all_swf");
-            return;
+            if (_loadingCanceled) {
+                log_debug("Loading thread cancelation requested, "
+                        "returning from read_all_swf");
+                return;
+            }
+            if (!parser.read(std::min<size_t>(left, chunkSize))) break;
+            
+            left -= parser.bytesRead();
+            setBytesLoaded(startPos + parser.bytesRead());
         }
-        if (!parser.read(std::min<size_t>(left, chunkSize))) break;
-        
-        left -= parser.bytesRead();
-        setBytesLoaded(startPos + parser.bytesRead());
+
+        // Make sure we won't leave any pending writers
+        // on any eventual fd-based IOChannel.
+        _str->consumeInput();
+    
+    }
+    catch (const ParserException& e) {
+        // This is a fatal parser error.
+        log_error(_("Error while parsing SWF stream."));
     }
 
-	// Make sure we won't leave any pending writers
-	// on any eventual fd-based IOChannel.
-	_str->consumeInput();
-    
     // Set bytesLoaded to the current stream position unless it's greater
     // than the reported length. TODO: should we be trying to continue
     // parsing after an exception?

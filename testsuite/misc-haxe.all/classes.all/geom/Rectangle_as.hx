@@ -333,7 +333,7 @@ class Rectangle_as {
 		//o1 = {}; o1.toString = function() { return '2'; };
 		var o1 = {};
 		Reflect.setField(o1, 'toString', function() { return '2'; });
-		x1 = new Rectangle(0,0,untyped o1,null);
+		x1 = new Rectangle(0, 0, untyped o1, null);
 		DejaGnu.note("x1 = new Rectangle(0,0,untyped o1,null);");
 		if (x1.toString() == "(x=0, y=0, w=2, h=null)") {
 			DejaGnu.pass("Rectangle object is correct rectangle (x=0, y=0, w=2, h=null)");

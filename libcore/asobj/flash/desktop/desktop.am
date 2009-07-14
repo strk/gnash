@@ -36,5 +36,4 @@ DESKTOP_HEADERS += asobj/flash/desktop/Clipboard_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(DESKTOP_SOURCES)
-noinst_HEADERS +=  $(DESKTOP_HEADERS) asobj/flash/desktop/desktopclasses.h
 

@@ -28,6 +28,7 @@
 #include "builtin_function.h" // for Array class
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
+#include "Global_as.h"
 #include "GnashException.h"
 #include "action.h" // for call_method
 #include "VM.h" // for PROPNAME, registerNative
@@ -577,7 +578,7 @@ Array_as::end()
 int
 Array_as::index_requested(string_table::key name)
 {
-    const std::string& nameString = _vm.getStringTable().value(name);
+    const std::string& nameString = getStringTable(*this).value(name);
 
     // Anything not in [0-9] makes this an invalid index
     if ( nameString.find_first_not_of("0123456789") != std::string::npos )
@@ -687,7 +688,7 @@ Array_as::join(const std::string& separator) const
 
     if ( s ) 
     {
-        int swfversion = _vm.getSWFVersion();
+        int swfversion = getSWFVersion(*this);
 
         for (size_t i = 0; i < s; ++i)
         {
@@ -960,7 +961,7 @@ array_sort(const fn_call& fn)
     boost::intrusive_ptr<Array_as> array = 
         ensureType<Array_as>(fn.this_ptr);
     
-    const int version = array->getVM().getSWFVersion();
+    const int version = getSWFVersion(*array);
     
     if (!fn.nargs)
     {
@@ -1040,14 +1041,13 @@ array_sortOn(const fn_call& fn)
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
 
-    VM& vm = array->getVM();
-    int version = vm.getSWFVersion();
-    string_table& st = vm.getStringTable();
+    int version = getSWFVersion(fn);
+    string_table& st = getStringTable(fn);
 
     // cases: sortOn("prop) and sortOn("prop", Array.FLAG)
     if ( fn.nargs > 0 && fn.arg(0).is_string() )
     {
-        string_table::key propField = st.find(PROPNAME(fn.arg(0).to_string_versioned(version)));
+        string_table::key propField = st.find(fn.arg(0).to_string_versioned(version));
 
         if ( fn.nargs > 1 && fn.arg(1).is_number() )
         {
@@ -1259,7 +1259,7 @@ array_join(const fn_call& fn)
     boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     std::string separator = ",";
-    int version = fn.getVM().getSWFVersion();
+    int version = getSWFVersion(fn);
 
     if (fn.nargs > 0)
     {
@@ -1470,7 +1470,7 @@ attachArrayStatics(as_object& proto)
 static void
 attachArrayInterface(as_object& proto)
 {
-    VM& vm = proto.getVM();
+    VM& vm = getVM(proto);
 
     // Array.push
     vm.registerNative(array_push, 252, 1);
@@ -1529,30 +1529,18 @@ getArrayInterface()
     if ( proto == NULL )
     {
         proto = new as_object(getObjectInterface());
-        proto->getVM().addStatic(proto.get());
+        getVM(*proto).addStatic(proto.get());
 
         attachArrayInterface(*proto);
     }
     return proto.get();
 }
 
-static as_function*
-getArrayConstructor(VM& vm)
+void
+registerArrayNative(as_object& global)
 {
-    // This is going to be the global Array "class"/"function"
-    static as_function* ar=0;
-
-    if ( ar == NULL )
-    {
-        vm.registerNative(array_new, 252, 0);
-        ar = new builtin_function(&array_new, getArrayInterface());
-        vm.addStatic(ar);
-
-        // Attach static members
-        attachArrayStatics(*ar);
-    }
-
-    return ar;
+    VM& vm = getVM(global);
+    vm.registerNative(array_new, 252, 0);
 }
 
 // this registers the "Array" member on a "Global"
@@ -1563,9 +1551,20 @@ getArrayConstructor(VM& vm)
 void
 array_class_init(as_object& glob)
 {
-    // Register _global.Array
+    // This is going to be the global Array "class"/"function"
+    static as_object* ar = 0;
+
+    if ( ar == NULL )
+    {
+        Global_as* gl = getGlobal(glob);
+        ar = gl->createClass(&array_new, getArrayInterface());
+
+        // Attach static members
+        attachArrayStatics(*ar);
+    }
+
     int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
-    glob.init_member("Array", getArrayConstructor(glob.getVM()), flags);
+    glob.init_member("Array", ar, flags);
 }
 
 void
@@ -1677,7 +1676,7 @@ void
 Array_as::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
     std::stringstream ss; 
-    string_table& st = getVM().getStringTable();
+    string_table& st = getStringTable(*this);
     for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
     {
         int idx = i.index();
@@ -1694,7 +1693,7 @@ void
 Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 {
     std::stringstream ss; 
-    string_table& st = getVM().getStringTable();
+    string_table& st = getStringTable(*this);
     for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
     {
         // TODO: skip hidden ones

@@ -30,8 +30,8 @@
 
 #include "gnash.h"
 #include "log.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include "Movie.h"
 #include "movie_root.h"
 #include "gtk_glue_agg_xv.h"
@@ -102,10 +102,10 @@ GtkAggXvGlue::prepDrawingArea(GtkWidget *drawing_area)
     gtk_widget_set_double_buffered(_drawing_area, FALSE);
 }
 
-render_handler*
+Renderer*
 GtkAggXvGlue::createRenderHandler()
 {
-    _agg_renderer = create_render_handler_agg(findPixelFormat(_xv_format).c_str());
+    _agg_renderer = create_Renderer_agg(findPixelFormat(_xv_format).c_str());
     return _agg_renderer;
 }
 
@@ -131,7 +131,7 @@ GtkAggXvGlue::setupRendering()
         
         if (_xv_format.type == XvRGB) {
             // init renderer to write directly to xv_image
-            static_cast<render_handler_agg_base *>(_agg_renderer)->init_buffer
+            static_cast<Renderer_agg_base *>(_agg_renderer)->init_buffer
                   ((unsigned char*) _xv_image->data, _xv_image->data_size,
                   _movie_width, _movie_height, _xv_image->pitches[0]);
     
@@ -147,8 +147,8 @@ GtkAggXvGlue::setupRendering()
 
     	    _offscreenbuf.reset(new unsigned char[bufsize]);
     	    
-    	    render_handler_agg_base * renderer =
-    	      static_cast<render_handler_agg_base *>(_agg_renderer);
+    	    Renderer_agg_base * renderer =
+    	      static_cast<Renderer_agg_base *>(_agg_renderer);
     	    renderer->init_buffer(_offscreenbuf.get(), bufsize, _movie_width,
     	                          _movie_height, _stride);
 

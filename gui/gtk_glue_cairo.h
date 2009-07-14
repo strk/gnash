@@ -33,7 +33,7 @@ class GtkCairoGlue : public GtkGlue
 
     bool init(int argc, char ***argv);
     void prepDrawingArea(GtkWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void beforeRendering();
     void render();
     void render(int minx, int miny, int maxx, int maxy);
@@ -45,7 +45,7 @@ class GtkCairoGlue : public GtkGlue
 
     cairo_t     *_cairo_handle;
     cairo_t     *_cairo_offscreen;
-    render_handler* _renderer;
+    Renderer* _renderer;
     GdkImage*       _image;
 };
 

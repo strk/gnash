@@ -24,6 +24,7 @@
 #include "display/StageScaleMode_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -52,6 +53,7 @@ namespace {
 void
 attachStageScaleModeStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("EXACT_FIT", "exactFit");
     o.init_member("NO_BORDER", "noBorder");
     o.init_member("NO_SCALE", "noScale");

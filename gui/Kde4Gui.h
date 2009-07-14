@@ -122,7 +122,7 @@ class DSOEXPORT Kde4Gui :  public Gui
 {
 
 public:
-    Kde4Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~Kde4Gui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(const char* windowtitle, int width, int height);

@@ -47,7 +47,7 @@ namespace gnash
 class SDLGui : public Gui
 {
 public:
-    SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    SDLGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~SDLGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(const char *title, int width, int height);

@@ -31,8 +31,8 @@ class AOS4Glue
     virtual bool init(int argc, char **argv[]) = 0;
 
     virtual bool prepDrawingArea(int width, int height) = 0;
-    virtual render_handler* createRenderHandler(int depth) = 0;
-    virtual render_handler* createRenderHandler() = 0;
+    virtual Renderer* createRenderHandler(int depth) = 0;
+    virtual Renderer* createRenderHandler() = 0;
     virtual void render() = 0;
   protected:
     int _bpp;

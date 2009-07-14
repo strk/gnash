@@ -20,12 +20,11 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
-#include "fill_style.h"
 #include "Geometry.h" // for class path and class edge
-#include "render.h" // for ::display
 #include "GnashImage.h"
 #include "log.h"
 #include "Bitmap.h"
+#include "Renderer.h"
 
 namespace gnash {
 
@@ -36,7 +35,7 @@ BitmapMovieDefinition::createMovie(DisplayObject* parent)
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
-		const std::string& url)
+		Renderer* renderer, const std::string& url)
 	:
 	_version(6),
 	_framesize(0, 0, image->width()*20, image->height()*20),
@@ -44,7 +43,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 	_framerate(12),
 	_url(url),
 	_bytesTotal(image->size()),
-	_bitmap(render::createBitmapInfo(image))
+	_bitmap(renderer ? renderer->createBitmapInfo(image) : 0)
 {
 }
 
@@ -52,7 +51,6 @@ DisplayObject*
 BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id) const
 {
     /// What should we do if construction of the bitmap fails?
-    if (!_bitmap.get()) return 0;
     return new Bitmap(this, parent, id);
 }
 

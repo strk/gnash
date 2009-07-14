@@ -22,7 +22,7 @@
 
 // Forward declarations
 namespace gnash {
-    class render_handler;
+    class Renderer;
 }
 
 namespace gnash
@@ -35,7 +35,7 @@ class SdlCairoGlue : public SdlGlue
     virtual ~SdlCairoGlue();
 
     bool init(int argc, char **argv[]);
-    render_handler* createRenderHandler( int depth);
+    Renderer* createRenderHandler( int depth);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
     boost::uint32_t maskFlags(boost::uint32_t sdl_flags);
@@ -46,7 +46,7 @@ class SdlCairoGlue : public SdlGlue
     SDL_Surface     *_sdl_surface;
     unsigned char   *_render_image;
     SDL_Surface     *_screen;
-    render_handler  *_renderer;
+    Renderer  *_renderer;
 };
 
 }

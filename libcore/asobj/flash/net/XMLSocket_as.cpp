@@ -29,10 +29,12 @@
 #include "as_function.h"
 #include "movie_root.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "VM.h"
-#include "builtin_function.h" // for setting timer, should likely avoid that..
+#include "builtin_function.h" 
 #include "URLAccessManager.h"
 #include "Object.h" // for getObjectInterface
+#include "Global_as.h" 
 #include "log.h"
 
 #include <boost/thread.hpp>
@@ -304,7 +306,7 @@ XMLSocket_as::advanceState()
             // This means advanceState() will not be called again until
             // XMLSocket.connect() is invoked.
             callMethod(NSV::PROP_ON_CONNECT, false);
-            _vm.getRoot().removeAdvanceCallback(this);
+            getRoot(*this).removeAdvanceCallback(this);
             return;    
         }
 
@@ -329,7 +331,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
     _connection.connect(host, port);
     
     // Start callbacks on advance.
-    _vm.getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
     
     return true;
 }
@@ -337,7 +339,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 void
 XMLSocket_as::close()
 {
-    _vm.getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
     _connection.close();
     _ready = false;
 }
@@ -349,7 +351,7 @@ XMLSocket_as::getEventHandler(const std::string& name)
 	boost::intrusive_ptr<as_function> ret;
 
 	as_value tmp;
-	string_table& st = getVM().getStringTable();
+	string_table& st = getStringTable(*this);
 	if (!get_member(st.find(name), &tmp) ) return ret;
 	ret = tmp.to_as_function();
 	return ret;
@@ -373,7 +375,7 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    as_environment env(_vm); 
+    as_environment env(getVM(*this)); 
 
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {
@@ -421,10 +423,11 @@ void
 xmlsocket_class_init(as_object& global)
 {
     // This is the global XMLSocket class
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&xmlsocket_new, getXMLSocketInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&xmlsocket_new, getXMLSocketInterface());
     }
     
     // Register _global.XMLSocket
@@ -569,9 +572,10 @@ getXMLSocketInterface()
 void
 attachXMLSocketInterface(as_object& o)
 {
-    o.init_member("connect", new builtin_function(xmlsocket_connect));
-    o.init_member("send", new builtin_function(xmlsocket_send));
-    o.init_member("close", new builtin_function(xmlsocket_close));
+    Global_as* gl = getGlobal(o);
+    o.init_member("connect", gl->createFunction(xmlsocket_connect));
+    o.init_member("send", gl->createFunction(xmlsocket_send));
+    o.init_member("close", gl->createFunction(xmlsocket_close));
 
 
     // all this crap to satisfy swfdec testsuite... (xml-socket-properties*)

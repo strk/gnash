@@ -23,7 +23,7 @@
 #include "action_buffer.h" // for composition
 #include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
-#include "abc_block.h"
+#include "AbcBlock.h"
 #include "Machine.h"
 #include "VM.h"
 
@@ -50,14 +50,14 @@ public:
             return;
         }
 
-		VM& vm = m->getVM();
+		VM& vm = getVM(*m);
         
         log_debug("getting machine.");
 		Machine *mach = vm.getMachine();
 		
         _abc->prepare(mach);
 
-		log_debug("Begin execute abc_block.");
+		log_debug("Begin execute AbcBlock.");
 		mach->initMachine(_abc);
 		log_debug("Executing machine...");
 		mach->execute();
@@ -74,7 +74,7 @@ public:
     }
 	
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const gnash::RunInfo&)
+            const gnash::RunResources&)
 	{
 
         if (!m.isAS3()) {
@@ -92,7 +92,7 @@ public:
 			in.read_string(name);
 		}
 
-        std::auto_ptr<abc_block> block(new abc_block());
+        std::auto_ptr<AbcBlock> block(new AbcBlock());
 		if (!block->read(in)) {
             log_error("ABC parsing error while processing DoABCTag. This "
                     "tag will never be executed");
@@ -112,9 +112,9 @@ public:
 
 private:
 
-	DoABCTag(abc_block* block) : _abc(block) {}
+	DoABCTag(AbcBlock* block) : _abc(block) {}
 
-	abc_block* _abc;
+	AbcBlock* _abc;
 	
 };
 

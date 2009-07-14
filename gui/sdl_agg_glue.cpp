@@ -19,8 +19,8 @@
 
 #include "sdl_agg_glue.h"
 #include "log.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include <cerrno>
 #include <ostream>
 
@@ -56,7 +56,7 @@ SdlAggGlue::init(int /*argc*/, char*** /*argv*/)
 }
 
 
-render_handler*
+Renderer*
 SdlAggGlue::createRenderHandler(int bpp)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -65,13 +65,13 @@ SdlAggGlue::createRenderHandler(int bpp)
 
     switch (_bpp) {
       case 32:
-        _agg_renderer = create_render_handler_agg("RGBA32");
+        _agg_renderer = create_Renderer_agg("RGBA32");
         break;
       case 24:
-        _agg_renderer = create_render_handler_agg("RGB24");
+        _agg_renderer = create_Renderer_agg("RGB24");
         break;
       case 16:
-        _agg_renderer = create_render_handler_agg("RGBA16");
+        _agg_renderer = create_Renderer_agg("RGBA16");
         break;
       default:
         log_error (_("AGG's bit depth must be 16, 24 or 32 bits, not %d."), _bpp);
@@ -134,8 +134,8 @@ SdlAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
     // Only the AGG renderer has the function init_buffer, which is *not* part of
     // the renderer api. It allows us to change the renderers movie size (and buffer
     // address) during run-time.
-    render_handler_agg_base * renderer =
-      static_cast<render_handler_agg_base *>(_agg_renderer);
+    Renderer_agg_base * renderer =
+      static_cast<Renderer_agg_base *>(_agg_renderer);
     renderer->init_buffer(_offscreenbuf, bufsize, width, height,
       width*((_bpp+7)/8));
 

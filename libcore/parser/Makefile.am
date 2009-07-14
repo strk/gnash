@@ -55,7 +55,7 @@ libgnashparser_la_SOURCES = \
 
 if ENABLE_AVM2
 libgnashparser_la_SOURCES += \
-	abc_block.cpp
+	AbcBlock.cpp
 endif
 
 noinst_HEADERS = \
@@ -69,7 +69,7 @@ noinst_HEADERS = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
-	abc_block.h
+	AbcBlock.h
 endif
 
 EXTENSIONS_API = \

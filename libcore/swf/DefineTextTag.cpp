@@ -24,7 +24,7 @@ namespace SWF {
 
 void
 DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == DEFINETEXT);
 
@@ -64,7 +64,7 @@ DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
 
 void
 DefineText2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
     assert(tag == DEFINETEXT2);
 
@@ -106,13 +106,14 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 }
 
 void
-DefineTextTag::display(const StaticText& inst) const
+DefineTextTag::display(Renderer& renderer, const StaticText& inst) const
 {
 
     SWFMatrix mat = inst.getWorldMatrix();
     mat.concatenate(_matrix);
 
-    TextRecord::displayRecords(mat, inst.get_world_cxform(), _textRecords);
+    TextRecord::displayRecords(renderer, mat, inst.get_world_cxform(),
+            _textRecords);
 }
 
 

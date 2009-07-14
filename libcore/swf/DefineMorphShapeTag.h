@@ -31,8 +31,9 @@
 namespace gnash {
     class movie_definition;
     class SWFStream;
-	class RunInfo;
+	class RunResources;
     class MorphShape;
+    class Renderer;
 }
 
 namespace gnash {
@@ -45,14 +46,14 @@ class DefineMorphShapeTag : public DefinitionTag
 public:
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     virtual ~DefineMorphShapeTag() {}
 
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
         const;
 
-    virtual void display(const MorphShape& inst) const;
+    virtual void display(Renderer& renderer, const MorphShape& inst) const;
 
     const ShapeRecord& shape1() const { 
         return _shape1;
@@ -64,7 +65,8 @@ public:
 
 private:
 
-    DefineMorphShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& md);
+    DefineMorphShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& md,
+            const RunResources& r);
     
     /// Read a DefineMorphShape tag from stream
     //
@@ -83,7 +85,8 @@ private:
     ///	Movie definition. Used to resolv DisplayObject ids for fill styles.
     ///	Must be not-null or would segfault. 
     ///
-    void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
+    void read(SWFStream& in, SWF::TagType tag, movie_definition& m,
+            const RunResources& r);
 
     ShapeRecord _shape1;
     ShapeRecord _shape2;

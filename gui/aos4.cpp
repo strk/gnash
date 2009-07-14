@@ -73,8 +73,8 @@ namespace boost
 namespace gnash
 {
 
-AOS4Gui::AOS4Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth),
+AOS4Gui::AOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r),
    _timeout(0),
    _core_trap(true)
 {
@@ -622,7 +622,7 @@ AOS4Gui::createWindow(const char *title, int width, int height)
 
     _glue.prepDrawingArea(_width, _height);
 
-    set_render_handler(_renderer);
+    set_Renderer(_renderer);
 
 	struct Window *_window = _glue.getWindow();
 

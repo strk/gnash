@@ -22,12 +22,14 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fill_style.h"
 #include "log.h"
-#include "render.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "SWF.h"
 #include "GnashException.h"
 #include "GnashNumeric.h"
+#include "Renderer.h"
+#include "RunResources.h"
+
 #include <cmath> // sqrt, floor
 #include <iostream> // for output operator
 
@@ -62,7 +64,7 @@ fill_style::fill_style()
 
 void
 fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
-    fill_style *pOther)
+        const RunResources& r, fill_style *pOther)
 {
     const bool is_morph = (pOther != NULL);
 
@@ -236,10 +238,13 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                pOther->m_color = pOther->m_gradients[0].m_color;
         }
     
-        _bitmapInfo = create_gradient_bitmap();
-        if (is_morph)
-        {
-            pOther->_bitmapInfo = pOther->need_gradient_bitmap();
+        Renderer* renderer = r.renderer();
+        if (renderer) {
+
+            _bitmapInfo = create_gradient_bitmap(*renderer);
+            if (is_morph) {
+                pOther->_bitmapInfo = pOther->need_gradient_bitmap(*renderer);
+            }
         }
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
@@ -320,7 +325,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
 
 const BitmapInfo* 
-fill_style::get_bitmap_info() const 
+fill_style::get_bitmap_info(Renderer& renderer) const 
 {    
     assert(m_type != SWF::FILL_SOLID);
 
@@ -338,7 +343,7 @@ fill_style::get_bitmap_info() const
    
         case SWF::FILL_LINEAR_GRADIENT:
         case SWF::FILL_RADIAL_GRADIENT:
-            return need_gradient_bitmap();
+            return need_gradient_bitmap(renderer);
         default:
             log_error(_("Unknown fill style %d"), m_type);
             // Seems a bit drastic...
@@ -432,7 +437,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
 }
 
 const BitmapInfo*
-fill_style::create_gradient_bitmap() const
+fill_style::create_gradient_bitmap(Renderer& renderer) const
 {
     assert(m_type == SWF::FILL_LINEAR_GRADIENT
         || m_type == SWF::FILL_RADIAL_GRADIENT
@@ -498,7 +503,7 @@ fill_style::create_gradient_bitmap() const
             break;
     }
 
-    const BitmapInfo* bi = render::createBitmapInfo(
+    const BitmapInfo* bi = renderer.createBitmapInfo(
                     static_cast<std::auto_ptr<GnashImage> >(im));
 
     return bi;
@@ -506,12 +511,12 @@ fill_style::create_gradient_bitmap() const
 
 
 const BitmapInfo*
-fill_style::need_gradient_bitmap() const 
+fill_style::need_gradient_bitmap(Renderer& renderer) const 
 {
 
   if (!_bitmapInfo) {
     fill_style* this_non_const = const_cast<fill_style*>(this);
-    this_non_const->_bitmapInfo = create_gradient_bitmap();
+    this_non_const->_bitmapInfo = create_gradient_bitmap(renderer);
   }
   
   return _bitmapInfo.get();

@@ -23,6 +23,7 @@
 #include "builtin_function.h" // for _global.Function
 #include "as_value.h"
 #include "Array_as.h"
+#include "Global_as.h"
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"
@@ -98,7 +99,7 @@ as_function::extends(as_function& superclass)
 	as_object* newproto = new as_object(superclass.getPrototype().get());
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
-    if (_vm.getSWFVersion() > 5) {
+    if (getSWFVersion(superclass) > 5) {
         const int flags = as_prop_flags::dontEnum;
         newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
     }
@@ -140,7 +141,7 @@ as_function::constructInstance(const as_environment& env,
 	assert(get_ref_count() > 0);
 #endif // GNASH_USE_GC
 
-	int swfversion = env.getVM().getSWFVersion();
+	int swfversion = getSWFVersion(env);
 
 	boost::intrusive_ptr<as_object> newobj;
 
@@ -264,12 +265,16 @@ namespace {
 as_object*
 getFunctionPrototype()
 {
+
 	static boost::intrusive_ptr<as_object> proto;
 
 	if (proto.get() == NULL) {
 
 		// Initialize Function prototype
 		proto = new as_object();
+        
+        // TODO: get a Global_as passed in.
+        Global_as* gl = getGlobal(*proto);
 
 		// We initialize the __proto__ member separately, as getObjectInterface
 		// will end up calling getFunctionPrototype again and we want that
@@ -283,9 +288,9 @@ getFunctionPrototype()
                           as_prop_flags::dontEnum | 
                           as_prop_flags::onlySWF6Up; 
 
-		proto->init_member("apply", new builtin_function(function_apply),
+		proto->init_member("apply", gl->createFunction(function_apply),
                 flags);
-		proto->init_member("call", new builtin_function(function_call), flags);
+		proto->init_member("call", gl->createFunction(function_call), flags);
 	}
 
 	return proto.get();

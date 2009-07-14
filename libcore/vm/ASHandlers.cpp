@@ -542,8 +542,8 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STOPSOUNDS));
 #endif
 
-    VM& vm = thread.env.getVM();
-    sound::sound_handler* s = vm.getRoot().runInfo().soundHandler();
+    VM& vm = getVM(thread.env);
+    sound::sound_handler* s = vm.getRoot().runResources().soundHandler();
     if (s)
     {
         s->stop_all_sounds();
@@ -1363,7 +1363,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
     if (tgt)
     {
-        VM& vm = env.getVM();
+        VM& vm = getVM(env);
         vm.getRoot().set_drag_state(st);
     }
 
@@ -1591,7 +1591,7 @@ SWFHandlers::ActionRandom(ActionExec& thread)
     if (max < 1) max = 1;
 
     // Get pointer to static random generator in VM
-    VM::RNG& rnd = env.getVM().randomNumberGenerator();
+    VM::RNG& rnd = getVM(env).randomNumberGenerator();
 
     // Produces int (0 <= n <= max - 1)
     boost::uniform_int<> uni_dist(0, max - 1);
@@ -1792,7 +1792,7 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    const VM& vm = env.getVM();
+    const VM& vm = getVM(env);
     env.push(vm.getTime());
 }
 
@@ -2237,7 +2237,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         target_string = target.to_string();
     }
 
-    VM& vm = env.getVM();
+    VM& vm = getVM(env);
     movie_root& m = vm.getRoot();
  
     // If the url starts with "FSCommand:", then this is
@@ -2610,7 +2610,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     // 'a.b.c'  | string        nothing
 
     const size_t stackSize = env.stack_size();
-    const int version = env.getVM().getSWFVersion();
+    const int version = getSWFVersion(env);
 
     std::string propertyname = env.top(0).to_string();
 
@@ -3159,7 +3159,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEWEQUALS));
 #endif
 
-    const VM& vm = env.getVM();
+    const VM& vm = getVM(env);
 
     int swfVersion = vm.getSWFVersion();
     if ( swfVersion <= 5 )

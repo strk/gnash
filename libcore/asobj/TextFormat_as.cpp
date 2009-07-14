@@ -21,6 +21,7 @@
 #include "Object.h" // for getObjectInterface
 #include "TextFormat_as.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "namedStrings.h"
 #include "VM.h"
@@ -72,7 +73,7 @@ TextFormat_as::alignSet(const std::string& align)
 void
 TextFormat_as::registerNative(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
     
     //vm.registerNative(110, 0) // [_global] TextFormat
     vm.registerNative(textformat_font, 110, 1);
@@ -130,8 +131,8 @@ TextFormat_as::TextFormat_as()
 	_tabStops(-1),
 	_target()
 {
-	init_member("getTextExtent", new builtin_function(
-                textformat_getTextExtent));
+    Global_as* gl = getGlobal(*this);
+	init_member("getTextExtent", gl->createFunction(textformat_getTextExtent));
 }
 
 
@@ -140,11 +141,12 @@ void
 TextFormat_as::init(as_object& global)
 {
 	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&textformat_new, getTextFormatInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textformat_new, getTextFormatInterface());
 	}
 
 	// Register _global.Color

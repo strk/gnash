@@ -39,11 +39,15 @@
 namespace gnash
 {
 
+namespace {
+    void processAlpha(boost::uint8_t* imageData, size_t pixels);
+}
+
 //
 // GnashImage
 //
 
-/// Create an image taking ownership of the given buffer, supposedly of height*pitch bytes
+/// Create an image taking ownership of the given buffer height*pitch bytes
 GnashImage::GnashImage(boost::uint8_t* data, int width,
         int height, int pitch, ImageType type)
     :
@@ -292,9 +296,16 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
         return im;
     }
     
-    for (size_t i = 0; i < height; ++i)
-    {
+    for (size_t i = 0; i < height; ++i) {
         inChannel->readScanline(im->scanline(i));
+    }
+
+    // The renderers expect RGBA data to be preprocessed. JPEG images are
+    // never transparent, but the addition of alpha data stored elsewhere
+    // in the SWF is possible; in that case, the processing happens during
+    // mergeAlpha().
+    if (im->type() == GNASH_IMAGE_RGBA) {
+        processAlpha(im->data(), width * height);
     }
     return im;
 }
@@ -339,6 +350,26 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 
     return im;
 }
+
+namespace {
+
+void
+processAlpha(boost::uint8_t* imageData, size_t pixels)
+{
+
+    boost::uint8_t* p = imageData;
+    for (size_t i = 0; i < pixels; ++i) {
+        boost::uint8_t alpha = *(p + 3);
+        *p = std::min(*p, alpha);
+        ++p;
+        *p = std::min(*p, alpha);
+        ++p;
+        *p = std::min(*p, alpha);
+        p += 2;
+    }
+}
+
+} // anonymous namespace
 
 } // namespace gnash
 

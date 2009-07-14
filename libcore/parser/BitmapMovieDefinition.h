@@ -30,6 +30,9 @@
 #include <memory> // for auto_ptr
 
 // Forward declarations
+namespace gnash {
+    class Renderer;
+}
 
 namespace gnash
 {
@@ -54,7 +57,7 @@ public:
 	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
-	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
+	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, Renderer* renderer,
             const std::string& url);
 
     virtual DisplayObject* createDisplayObject(DisplayObject*, int) const;

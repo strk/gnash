@@ -77,7 +77,7 @@ public:
 
     virtual as_value operator()(const fn_call& fn)
     {
-        string_table& st = fn.getVM().getStringTable();
+        string_table& st = getStringTable(fn);
         log_debug("Loading extension class %s", st.value(mDeclaration.name));
 
         as_value super;
@@ -143,9 +143,9 @@ public:
         //init_member("constructor", as_function::getFunctionConstructor().get());
     }
 
-    virtual as_value operator()(const fn_call& /*fn*/)
+    virtual as_value operator()(const fn_call& fn)
     {
-        string_table& st = VM::get().getStringTable();
+        string_table& st = getStringTable(fn);
         log_debug("Loading native class %s", st.value(mDeclaration.name));
 
         mDeclaration.initializer(*mTarget);

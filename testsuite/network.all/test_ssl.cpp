@@ -73,7 +73,7 @@ main(int argc, char *argv[])
             { 'o', "port",          Arg_parser::yes },
             { 'c', "cert",          Arg_parser::yes },
             { 'p', "pem",           Arg_parser::yes },
-            { 'k', "leyfile",       Arg_parser::yes },
+            { 'k', "keyfile",       Arg_parser::yes },
             { 'w', "password",      Arg_parser::yes },
             { 'a', "calist",        Arg_parser::yes },
             { 'r', "rootpath",      Arg_parser::yes },

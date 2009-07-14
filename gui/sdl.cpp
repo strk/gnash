@@ -39,15 +39,16 @@ extern "C"{
 #include "log.h"
 #include "sdlsup.h"
 #include "Range2d.h" // for Intersection of inv bounds
-#include "render_handler.h" // for setInvalidatedRegions
+#include "Renderer.h" // for setInvalidatedRegions
+#include "RunResources.h"
 
 using namespace std;
 
 namespace gnash 
 {
 
-SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth),
+SDLGui::SDLGui(unsigned long xid, float scale, bool loop, RunResources& r)
+ : Gui(xid, scale, loop, r),
    _timeout(0),
    _core_trap(true)
 {
@@ -185,7 +186,7 @@ SDLGui::init(int argc, char **argv[])
 
     _glue.init(argc, argv);
 
-    _renderer = _glue.createRenderHandler(_depth);
+    _renderer.reset(_glue.createRenderHandler(32));
     if ( ! _renderer ) return false;
 
     return true;
@@ -211,7 +212,7 @@ SDLGui::createWindow(const char *title, int width, int height)
 
     _glue.prepDrawingArea(_width, _height, sdl_flags);
 
-    set_render_handler(_renderer);
+    _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
 
     SDL_WM_SetCaption( title, title);
 

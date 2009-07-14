@@ -26,6 +26,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "VM.h"
@@ -49,7 +50,7 @@ static const char* getDisplayStateString(movie_root::DisplayState ds);
 
 void registerStageNative(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 	
 	vm.registerNative(stage_scalemode_getset, 666, 1);
     vm.registerNative(stage_scalemode_getset, 666, 2);
@@ -66,7 +67,8 @@ void registerStageNative(as_object& o)
 static void
 attachStageInterface(as_object& o)
 {
-    const int version = o.getVM().getSWFVersion();
+    Global_as* gl = getGlobal(o);
+    const int version = getSWFVersion(o);
 
     if ( version < 5 ) return;
 
@@ -86,7 +88,7 @@ Stage_as::Stage_as()
 {
 	attachStageInterface(*this);
 
-	const int swfversion = _vm.getSWFVersion();
+	const int swfversion = getSWFVersion(*this);
 	if ( swfversion > 5 )
 	{
 		AsBroadcaster::initialize(*this);
@@ -142,7 +144,7 @@ stage_scalemode_getset(const fn_call& fn)
 
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -182,7 +184,7 @@ stage_width_getset(const fn_call& fn)
 	}
 
     // getter
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
     return as_value(m.getStageWidth());
 }
 
@@ -200,7 +202,7 @@ stage_height_getset(const fn_call& fn)
 	}
 
     // getter
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
     return as_value(m.getStageHeight());
 }
 
@@ -210,7 +212,7 @@ stage_align_getset(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr); 
  
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
     
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -271,7 +273,7 @@ stage_displaystate_getset(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
-    movie_root& m = obj->getVM().getRoot();
+    movie_root& m = getRoot(fn);
 
 	if (!fn.nargs) {
 		return getDisplayStateString(m.getStageDisplayState());

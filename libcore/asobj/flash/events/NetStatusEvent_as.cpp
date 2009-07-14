@@ -24,6 +24,7 @@
 #include "events/NetStatusEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -55,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void netstatusevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&netstatusevent_ctor, getNetStatusEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netstatusevent_ctor, getNetStatusEventInterface());
         attachNetStatusEventStaticInterface(*cl);
     }
 
@@ -71,14 +73,14 @@ namespace {
 void
 attachNetStatusEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(netstatusevent_toString));
-    o.init_member("NET_STATUS", new builtin_function(netstatusevent_NET_STATUS));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(netstatusevent_toString));
+    o.init_member("NET_STATUS", gl->createFunction(netstatusevent_NET_STATUS));
 }
 
 void
 attachNetStatusEventStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

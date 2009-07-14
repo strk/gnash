@@ -27,6 +27,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "GnashException.h"
 #include "NetConnection_as.h"
@@ -94,9 +95,10 @@ NetStream_as::NetStream_as()
     _audioInfoKnown(false),
 
     // TODO: figure out if we should take another path to get to the clock
-    _playbackClock(new InterruptableVirtualClock(getVM().getClock())),
+    _playbackClock(
+            new InterruptableVirtualClock(getVM(*this).getClock())),
     _playHead(_playbackClock.get()), 
-    _soundHandler(_vm.getRoot().runInfo().soundHandler()),
+    _soundHandler(getRunResources(*this).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _audioStreamer(_soundHandler),
     _statusCode(invalidStatus)
@@ -108,11 +110,12 @@ NetStream_as::init(as_object& global)
 {
 
     // This is going to be the global NetStream "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&netstream_new, getNetStreamInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&netstream_new, getNetStreamInterface());
         // replicate all interface to class, to be able to access
         // all methods as static functions
         attachNetStreamInterface(*cl);
@@ -135,7 +138,7 @@ NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
   log_debug(" Invoking onMetaData");
 #endif
 
-    string_table::key func = getVM().getStringTable().find(funcname);
+    string_table::key func = getStringTable(*this).find(funcname);
 
     callMethod(func, as_value(info_obj));
 }
@@ -300,13 +303,13 @@ NetStream_as::markReachableResources() const
 void
 NetStream_as::stopAdvanceTimer()
 {
-    getVM().getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
 }
 
 void
 NetStream_as::startAdvanceTimer()
 {
-    getVM().getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
 }
 
 
@@ -444,7 +447,7 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
         log_error("NetStream: Could not create Video decoder: %s", e.what());
 
         // This is important enough to let the user know.
-        movie_root& m = _vm.getRoot();
+        movie_root& m = getRoot(*this);
         m.errorInterface(e.what());
     }
 
@@ -472,7 +475,7 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
         log_error("Could not create Audio decoder: %s", e.what());
 
         // This is important enough to let the user know.
-        movie_root& m = _vm.getRoot();
+        movie_root& m = getRoot(*this);
         m.errorInterface(e.what());
     }
 
@@ -1367,7 +1370,7 @@ NetStream_as::advanceState()
 
     for (media::MediaParser::OrderedMetaTags::iterator i = tags.begin(),
             e = tags.end(); i != e; ++i) {
-        executeTag(**i, this, getVM());
+        executeTag(**i, this, getVM(*this));
     }
 }
 
@@ -1714,7 +1717,7 @@ netstream_attachAudio(const fn_call& fn)
         ensureType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
-    LOG_ONCE(log_unimpl("NetStream.attachAudio"));;
+    LOG_ONCE(log_unimpl("NetStream.attachAudio"));
 
     return as_value();
 }
@@ -1886,20 +1889,21 @@ netstream_liveDelay(const fn_call& fn)
 void
 attachNetStreamInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
-    o.init_member("close", new builtin_function(netstream_close));
-    o.init_member("pause", new builtin_function(netstream_pause));
-    o.init_member("play", new builtin_function(netstream_play));
-    o.init_member("seek", new builtin_function(netstream_seek));
+    o.init_member("close", gl->createFunction(netstream_close));
+    o.init_member("pause", gl->createFunction(netstream_pause));
+    o.init_member("play", gl->createFunction(netstream_play));
+    o.init_member("seek", gl->createFunction(netstream_seek));
     o.init_member("setBufferTime",
-            new builtin_function(netstream_setbuffertime));
+            gl->createFunction(netstream_setbuffertime));
 
-    o.init_member("attachAudio", new builtin_function(netstream_attachAudio));
-    o.init_member("attachVideo", new builtin_function(netstream_attachVideo));
-    o.init_member("publish", new builtin_function(netstream_publish));
-    o.init_member("receiveAudio", new builtin_function(netstream_receiveAudio));
-    o.init_member("receiveVideo", new builtin_function(netstream_receiveVideo));
-    o.init_member("send", new builtin_function(netstream_send));
+    o.init_member("attachAudio", gl->createFunction(netstream_attachAudio));
+    o.init_member("attachVideo", gl->createFunction(netstream_attachVideo));
+    o.init_member("publish", gl->createFunction(netstream_publish));
+    o.init_member("receiveAudio", gl->createFunction(netstream_receiveAudio));
+    o.init_member("receiveVideo", gl->createFunction(netstream_receiveVideo));
+    o.init_member("send", gl->createFunction(netstream_send));
 
     // Properties
     // TODO: attach to each instance rather then to the class ? check it ..

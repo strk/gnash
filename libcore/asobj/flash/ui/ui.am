@@ -52,5 +52,4 @@ UI_HEADERS += asobj/flash/ui/Mouse_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(UI_SOURCES)
-noinst_HEADERS +=  $(UI_HEADERS) asobj/flash/ui/uiclasses.h
 

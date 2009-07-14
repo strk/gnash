@@ -140,6 +140,7 @@ add_button(SWFMovie mo)
 			//"	_root.note(''+this+' at depth '+myDepth+' unloaded.');"
 			"	_root.buttonChild[myDepth]['uld']++;"
 			"};"
+            "for (i in _level0.square1.button) { trace (i); };"
 			//"_root.note('buttonChilds:'+dumpObj(_root.buttonChild));"
 		));
 		SWFMovieClip_nextFrame(ermc);

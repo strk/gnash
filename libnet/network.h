@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 # include <sys/types.h>
 # include <netinet/in.h>
@@ -43,13 +42,24 @@
 # include <io.h>
 #endif
 
-#include "dsodefs.h" //For DSOEXPORT.
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/mutex.hpp>
 #include <vector>
 #include <cassert>
 #include <string>
 #include <map>
+
+#ifdef USE_SSH
+# include "sshclient.h"
+#endif
+
+#ifdef USE_SSL
+# include "sslclient.h"
+#endif
+
+#include "dsodefs.h" //For DSOEXPORT.
 
 namespace amf {
 class Buffer;
@@ -59,14 +69,26 @@ class Buffer;
 ///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
 
+// forward declare the encryption protocols
+class SSLClient;
+class SSHClient;
+
+// Define the default ports
+const short SSL_PORT    = 443;
+const short SSH_PORT    = 22;
+const short HTTP_PORT   = 80;
+
+// Delay Tolerant Networking Research Group, http://www.dtnrg.org
+const short DTN1_PORT   = 2445;
+const short DTN2_PORT   = 4556;
+
 // Define the ports for the RTMP protocols
 const short ADMIN_PORT  = 1111;
 const short RTMP_PORT   = 1935;
 const short RTMPE_PORT  = 1935;
-const short RTMPT_PORT  = 80;
-const short RTMPTE_PORT = 80;
-const short RTMPTS_PORT = 443;
-const short SSL_PORT    = 4433;
+const short RTMPT_PORT  = HTTP_PORT;
+const short RTMPTE_PORT = HTTP_PORT;
+const short RTMPTS_PORT = SSL_PORT;
 
 #ifdef __OS2__
  typedef int    socklen_t;
@@ -274,6 +296,15 @@ public:
     entry_t *getEntry(int fd);
     
 //    void executePollFD(int index) { _handler[index](); ];
+
+#ifdef USE_SSL
+    bool initSSL(std::string &hostname);
+    bool initSSL(std::string &hostname, std::string &password);
+    bool initSSL(std::string &hostname, std::string &password, bool auth);
+    bool initSSL(std::string &hostname, std::string &password, 
+		 std::string &keyfile, std::string &calist,
+		 std::string &rootpath, bool auth);
+#endif
     
  protected:
     in_addr_t   _ipaddr;
@@ -296,6 +327,12 @@ public:
     // This is the mutex that controls access to the que.
     boost::mutex	_poll_mutex;
     boost::mutex	_net_mutex;
+#ifdef USE_SSL
+    boost::scoped_ptr<SSLClient> _ssl;
+#endif
+#ifdef USE_SSH
+    boost::scoped_ptr<SSHClient> _ssh;
+#endif
 };
 
 } // end of gnash namespace

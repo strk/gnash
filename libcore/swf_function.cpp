@@ -25,6 +25,7 @@
 #include "VM.h" // for storing _global in a local register
 #include "builtin_function.h" // for Function constructor
 #include "Object.h" // for getObjectInterface
+#include "Global_as.h" // for getObjectInterface
 #include "namedStrings.h"
 
 #include <typeinfo>
@@ -125,7 +126,7 @@ swf_function::operator()(const fn_call& fn)
 {
     // Extract caller before pushing ourself on the call stack
     as_object* caller = 0;
-    VM& vm = getVM(); 
+    VM& vm = getVM(fn); 
     CallStack& cs = vm.getCallStack();
     if ( ! cs.empty() ) caller = cs.back().func;
 

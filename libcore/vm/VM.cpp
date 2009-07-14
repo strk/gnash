@@ -28,7 +28,8 @@
 #include "movie_definition.h"
 #include "Movie.h"
 #include "movie_root.h"
-#include "Global.h"
+#include "Globals.h"
+#include "Global_as.h"
 #include "rc.h" //for overriding default version string with rcfile
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
@@ -65,7 +66,10 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	assert(_singleton.get());
 	NSV::loadStrings(_singleton->_stringTable, _singleton->getSWFVersion());
 
-	_singleton->setGlobal(new AVM1Global(*_singleton));
+    AVM1Global* gl(new AVM1Global(*_singleton));
+
+	_singleton->setGlobal(gl);
+    gl->registerClasses();
 
 #ifdef ENABLE_AVM2
 	_singleton->_machine = new Machine(*_singleton);
@@ -92,6 +96,7 @@ VM::isInitialized()
 VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
 	_rootMovie(root),
+	_global(0),
 	_swfversion(version),
 #ifdef ENABLE_AVM2
     _machine(0),
@@ -211,17 +216,17 @@ VM::getRoot() const
 	return _rootMovie;
 }
 
-as_object*
+Global_as*
 VM::getGlobal() const
 {
 #if ENABLE_AVM2
     if (getAVMVersion() == VM::AVM2) return _machine->global();
 #endif
-	return _global.get();
+	return _global;
 }
 
 void
-VM::setGlobal(as_object* o)
+VM::setGlobal(Global_as* o)
 {
 	assert(!_global);
 	_global = o;
@@ -276,8 +281,8 @@ builtin_function*
 VM::getNative(unsigned int x, unsigned int y)
 {
 	as_c_function_ptr fun = _asNativeTable[x][y];
-	if ( fun ) return new builtin_function(fun);
-	else return 0;
+	if (fun) return _global->createFunction(fun);
+	return 0;
 }
 
 } // end of namespace gnash

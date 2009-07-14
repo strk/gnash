@@ -29,10 +29,10 @@
 #include "VM.h"
 #include "movie_definition.h"
 #include "movie_root.h" // for Abstract callbacks
-#include "render_handler.h"
+#include "Renderer.h"
 #include "sound_handler.h"
 #include "MediaHandler.h"
-#include "RunInfo.h" // for passing handlers and other data to the core.
+#include "RunResources.h" // for passing handlers and other data to the core.
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "smart_ptr.h"
@@ -64,7 +64,7 @@ struct _GnashView {
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
-    std::auto_ptr<gnash::RunInfo> run_info;
+    std::auto_ptr<gnash::RunResources> run_info;
 
     std::auto_ptr<gnash::movie_definition> movie_definition;
     boost::intrusive_ptr<gnash::Movie> movie;
@@ -269,7 +269,7 @@ gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
     if( view->stage.get() != NULL) {
     	view->stage->set_display_viewport(0, 0, allocation->width, allocation->height);
 
-        gnash::render_handler *renderer = gnash_canvas_get_renderer(view->canvas);
+        gnash::Renderer *renderer = gnash_canvas_get_renderer(view->canvas);
         float xscale = allocation->width / view->movie_definition->get_width_pixels();
         float yscale = allocation->height / view->movie_definition->get_height_pixels();
 		renderer->set_scale(xscale, yscale);
@@ -432,8 +432,8 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
 
     gnash::URL url(uri);
 
-    // The RunInfo should be populated before parsing.
-    view->run_info.reset(new gnash::RunInfo(url.str()));
+    // The RunResources should be populated before parsing.
+    view->run_info.reset(new gnash::RunResources(url.str()));
     view->run_info->setSoundHandler(view->sound_handler);
 
     std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
@@ -484,7 +484,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
 
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
-    gnash::sound::sound_handler* s = view->stage->runInfo().soundHandler();
+    gnash::sound::sound_handler* s = view->stage->runResources().soundHandler();
     if ( s ) s->unpause();
     
     gnash::log_debug("Starting virtual clock");
@@ -509,7 +509,7 @@ gnash_view_display(GnashView *view)
     gnash::InvalidatedRanges changed_ranges;
     changed_ranges.setWorld();
 
-    gnash::render_handler *renderer = gnash_canvas_get_renderer(view->canvas);
+    gnash::Renderer *renderer = gnash_canvas_get_renderer(view->canvas);
     renderer->set_invalidated_regions(changed_ranges);
     gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
 

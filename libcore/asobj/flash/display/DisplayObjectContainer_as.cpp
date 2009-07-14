@@ -25,6 +25,7 @@
 #include "display/DisplayObjectContainer_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" 
 #include "builtin_function.h" 
 
@@ -57,12 +58,13 @@ displayobjectcontainer_class_init(as_object& where)
 {
     
     // This should never be called during AVM1 execution!
-    assert(isAS3(where.getVM()));
+    assert(isAS3(getVM(where)));
 
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&displayobjectcontainer_ctor,
+        Global_as* gl = getGlobal(where);
+        cl = gl->createClass(&displayobjectcontainer_ctor,
                 getDisplayObjectContainerInterface());
     }
 
@@ -86,31 +88,33 @@ namespace {
 void
 attachDisplayObjectContainerInterface(as_object& o)
 {
-    o.init_member("addChildAt", new builtin_function(
+    Global_as* gl = getGlobal(o);
+
+    o.init_member("addChildAt", gl->createFunction(
                 displayobjectcontainer_addChildAt));
-    o.init_member("addChild", new builtin_function(
+    o.init_member("addChild", gl->createFunction(
                 displayobjectcontainer_addChild));
-    o.init_member("areInaccessibleObjectsUnderPoint", new builtin_function(
+    o.init_member("areInaccessibleObjectsUnderPoint", gl->createFunction(
                 displayobjectcontainer_areInaccessibleObjectsUnderPoint));
-    o.init_member("contains", new builtin_function(
+    o.init_member("contains", gl->createFunction(
                 displayobjectcontainer_contains));
-    o.init_member("getChildAt", new builtin_function(
+    o.init_member("getChildAt", gl->createFunction(
                 displayobjectcontainer_getChildAt));
-    o.init_member("getChildByName", new builtin_function(
+    o.init_member("getChildByName", gl->createFunction(
                 displayobjectcontainer_getChildByName));
-    o.init_member("getChildIndex", new builtin_function(
+    o.init_member("getChildIndex", gl->createFunction(
                 displayobjectcontainer_getChildIndex));
-    o.init_member("getObjectsUnderPoint", new builtin_function(
+    o.init_member("getObjectsUnderPoint", gl->createFunction(
                 displayobjectcontainer_getObjectsUnderPoint));
-    o.init_member("removeChild", new builtin_function(
+    o.init_member("removeChild", gl->createFunction(
                 displayobjectcontainer_removeChild));
-    o.init_member("removeChildAt", new builtin_function(
+    o.init_member("removeChildAt", gl->createFunction(
                 displayobjectcontainer_removeChildAt));
-    o.init_member("setChildIndex", new builtin_function(
+    o.init_member("setChildIndex", gl->createFunction(
                 displayobjectcontainer_setChildIndex));
-    o.init_member("swapChildren", new builtin_function(
+    o.init_member("swapChildren", gl->createFunction(
                 displayobjectcontainer_swapChildren));
-    o.init_member("swapChildrenAt", new builtin_function(
+    o.init_member("swapChildrenAt", gl->createFunction(
                 displayobjectcontainer_swapChildrenAt));
     o.init_readonly_property("numChildren",
             displayobjectcontainer_numChildren);

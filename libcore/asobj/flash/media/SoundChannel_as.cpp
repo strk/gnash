@@ -24,6 +24,7 @@
 #include "media/SoundChannel_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -54,10 +55,11 @@ public:
 // extern (used by Global.cpp)
 void soundchannel_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&soundchannel_ctor, getSoundChannelInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&soundchannel_ctor, getSoundChannelInterface());
         attachSoundChannelStaticInterface(*cl);
     }
 
@@ -70,13 +72,13 @@ namespace {
 void
 attachSoundChannelInterface(as_object& o)
 {
-    o.init_member("soundComplete", new builtin_function(soundchannel_soundComplete));
+    Global_as* gl = getGlobal(o);
+    o.init_member("soundComplete", gl->createFunction(soundchannel_soundComplete));
 }
 
 void
 attachSoundChannelStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

@@ -24,6 +24,7 @@
 #include "net/Socket_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -85,10 +86,11 @@ public:
 // extern (used by Global.cpp)
 void socket_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&socket_ctor, getSocketInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&socket_ctor, getSocketInterface());
         attachSocketStaticInterface(*cl);
     }
 
@@ -101,45 +103,45 @@ namespace {
 void
 attachSocketInterface(as_object& o)
 {
-    o.init_member("connect", new builtin_function(socket_connect));
-    o.init_member("flush", new builtin_function(socket_flush));
-    o.init_member("readBoolean", new builtin_function(socket_readBoolean));
-    o.init_member("readByte", new builtin_function(socket_readByte));
-    o.init_member("readBytes", new builtin_function(socket_readBytes));
-    o.init_member("readDouble", new builtin_function(socket_readDouble));
-    o.init_member("readFloat", new builtin_function(socket_readFloat));
-    o.init_member("readInt", new builtin_function(socket_readInt));
-    o.init_member("readMultiByte", new builtin_function(socket_readMultiByte));
-    o.init_member("readObject", new builtin_function(socket_readObject));
-    o.init_member("readShort", new builtin_function(socket_readShort));
-    o.init_member("readUnsignedByte", new builtin_function(socket_readUnsignedByte));
-    o.init_member("readUnsignedInt", new builtin_function(socket_readUnsignedInt));
-    o.init_member("readUnsignedShort", new builtin_function(socket_readUnsignedShort));
-    o.init_member("readUTF", new builtin_function(socket_readUTF));
-    o.init_member("readUTFBytes", new builtin_function(socket_readUTFBytes));
-    o.init_member("writeBoolean", new builtin_function(socket_writeBoolean));
-    o.init_member("writeByte", new builtin_function(socket_writeByte));
-    o.init_member("writeBytes", new builtin_function(socket_writeBytes));
-    o.init_member("writeDouble", new builtin_function(socket_writeDouble));
-    o.init_member("writeFloat", new builtin_function(socket_writeFloat));
-    o.init_member("writeInt", new builtin_function(socket_writeInt));
-    o.init_member("writeMultiByte", new builtin_function(socket_writeMultiByte));
-    o.init_member("writeObject", new builtin_function(socket_writeObject));
-    o.init_member("writeShort", new builtin_function(socket_writeShort));
-    o.init_member("writeUnsignedInt", new builtin_function(socket_writeUnsignedInt));
-    o.init_member("writeUTF", new builtin_function(socket_writeUTF));
-    o.init_member("writeUTFBytes", new builtin_function(socket_writeUTFBytes));
-    o.init_member("close", new builtin_function(socket_close));
-    o.init_member("connect", new builtin_function(socket_connect));
-    o.init_member("ioError", new builtin_function(socket_ioError));
-    o.init_member("securityError", new builtin_function(socket_securityError));
-    o.init_member("socketData", new builtin_function(socket_socketData));
+    Global_as* gl = getGlobal(o);
+    o.init_member("connect", gl->createFunction(socket_connect));
+    o.init_member("flush", gl->createFunction(socket_flush));
+    o.init_member("readBoolean", gl->createFunction(socket_readBoolean));
+    o.init_member("readByte", gl->createFunction(socket_readByte));
+    o.init_member("readBytes", gl->createFunction(socket_readBytes));
+    o.init_member("readDouble", gl->createFunction(socket_readDouble));
+    o.init_member("readFloat", gl->createFunction(socket_readFloat));
+    o.init_member("readInt", gl->createFunction(socket_readInt));
+    o.init_member("readMultiByte", gl->createFunction(socket_readMultiByte));
+    o.init_member("readObject", gl->createFunction(socket_readObject));
+    o.init_member("readShort", gl->createFunction(socket_readShort));
+    o.init_member("readUnsignedByte", gl->createFunction(socket_readUnsignedByte));
+    o.init_member("readUnsignedInt", gl->createFunction(socket_readUnsignedInt));
+    o.init_member("readUnsignedShort", gl->createFunction(socket_readUnsignedShort));
+    o.init_member("readUTF", gl->createFunction(socket_readUTF));
+    o.init_member("readUTFBytes", gl->createFunction(socket_readUTFBytes));
+    o.init_member("writeBoolean", gl->createFunction(socket_writeBoolean));
+    o.init_member("writeByte", gl->createFunction(socket_writeByte));
+    o.init_member("writeBytes", gl->createFunction(socket_writeBytes));
+    o.init_member("writeDouble", gl->createFunction(socket_writeDouble));
+    o.init_member("writeFloat", gl->createFunction(socket_writeFloat));
+    o.init_member("writeInt", gl->createFunction(socket_writeInt));
+    o.init_member("writeMultiByte", gl->createFunction(socket_writeMultiByte));
+    o.init_member("writeObject", gl->createFunction(socket_writeObject));
+    o.init_member("writeShort", gl->createFunction(socket_writeShort));
+    o.init_member("writeUnsignedInt", gl->createFunction(socket_writeUnsignedInt));
+    o.init_member("writeUTF", gl->createFunction(socket_writeUTF));
+    o.init_member("writeUTFBytes", gl->createFunction(socket_writeUTFBytes));
+    o.init_member("close", gl->createFunction(socket_close));
+    o.init_member("connect", gl->createFunction(socket_connect));
+    o.init_member("ioError", gl->createFunction(socket_ioError));
+    o.init_member("securityError", gl->createFunction(socket_securityError));
+    o.init_member("socketData", gl->createFunction(socket_socketData));
 }
 
 void
 attachSocketStaticInterface(as_object& o)
 {
-
 }
 
 as_object*

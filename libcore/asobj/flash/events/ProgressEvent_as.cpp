@@ -24,6 +24,7 @@
 #include "events/ProgressEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -56,10 +57,11 @@ public:
 // extern (used by Global.cpp)
 void progressevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&progressevent_ctor, getProgressEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&progressevent_ctor, getProgressEventInterface());
         attachProgressEventStaticInterface(*cl);
     }
 
@@ -72,9 +74,10 @@ namespace {
 void
 attachProgressEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(progressevent_toString));
-    o.init_member("PROGRESS", new builtin_function(progressevent_PROGRESS));
-    o.init_member("SOCKET_DATA", new builtin_function(progressevent_SOCKET_DATA));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(progressevent_toString));
+    o.init_member("PROGRESS", gl->createFunction(progressevent_PROGRESS));
+    o.init_member("SOCKET_DATA", gl->createFunction(progressevent_SOCKET_DATA));
 }
 
 void
