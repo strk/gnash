@@ -72,15 +72,14 @@ namespace {
 void
 attachErrorEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(errorevent_toString));
     o.init_member("ERROR", gl->createFunction(errorevent_ERROR));
 }
 
 void
-attachErrorEventStaticInterface(as_object& o)
+attachErrorEventStaticInterface(as_object& /*o*/)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

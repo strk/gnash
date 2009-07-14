@@ -69,6 +69,7 @@ as_value Rectangle_ctor(const fn_call& fn);
 static void
 attachRectangleInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("clone", gl->createFunction(Rectangle_clone), 0);
     o.init_member("contains", gl->createFunction(Rectangle_contains), 0);
     o.init_member("containsPoint", gl->createFunction(Rectangle_containsPoint), 0);

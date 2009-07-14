@@ -92,6 +92,7 @@ attachMatrixInterface(as_object& o)
 {
     int fl = 0;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("clone", gl->createFunction(Matrix_clone), fl);
     o.init_member("concat", gl->createFunction(Matrix_concat), fl);
     o.init_member("createBox", gl->createFunction(Matrix_createBox), fl);

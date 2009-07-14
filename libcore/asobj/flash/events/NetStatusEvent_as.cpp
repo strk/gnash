@@ -72,6 +72,7 @@ namespace {
 void
 attachNetStatusEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(netstatusevent_toString));
     o.init_member("NET_STATUS", gl->createFunction(netstatusevent_NET_STATUS));
 }
@@ -79,8 +80,6 @@ attachNetStatusEventInterface(as_object& o)
 void
 attachNetStatusEventStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

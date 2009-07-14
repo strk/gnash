@@ -53,6 +53,7 @@ attachPointInterface(as_object& o)
 {
     int fl=0; // flags...
 
+    Global_as* gl = getGlobal(o);
     o.init_member("add", gl->createFunction(Point_add), fl);
     o.init_member("clone", gl->createFunction(Point_clone), fl);
     o.init_member("equals", gl->createFunction(Point_equals), fl);
@@ -66,6 +67,7 @@ attachPointInterface(as_object& o)
 static void
 attachPointStaticProperties(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("distance", gl->createFunction(Point_distance), 0);
     o.init_member("interpolate", gl->createFunction(Point_interpolate), 0);
     o.init_member("polar", gl->createFunction(Point_polar), 0);

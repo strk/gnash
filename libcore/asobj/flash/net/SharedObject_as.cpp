@@ -679,6 +679,7 @@ attachSharedObjectStaticInterface(as_object& o)
 
     const int flags = 0;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("getLocal", 
             gl->createFunction(sharedobject_getLocal), flags);
     o.init_member("getRemote",

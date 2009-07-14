@@ -42,6 +42,7 @@ as_value microphone_ctor(const fn_call& fn);
 static void
 attachMicrophoneInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 	o.init_member("get", gl->createFunction(microphone_get));
 	o.init_member("setGain", gl->createFunction(microphone_setgain));
 	o.init_member("setRate", gl->createFunction(microphone_setrate));

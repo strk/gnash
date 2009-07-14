@@ -75,6 +75,7 @@ namespace {
 void
 attachFocusEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(focusevent_toString));
     o.init_member("FOCUS_IN", gl->createFunction(focusevent_FOCUS_IN));
     o.init_member("FOCUS_OUT", gl->createFunction(focusevent_FOCUS_OUT));
@@ -83,10 +84,8 @@ attachFocusEventInterface(as_object& o)
 }
 
 void
-attachFocusEventStaticInterface(as_object& o)
+attachFocusEventStaticInterface(as_object& /*o*/)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

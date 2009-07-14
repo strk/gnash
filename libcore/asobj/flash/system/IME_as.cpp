@@ -72,6 +72,7 @@ namespace {
 void
 attachIMEInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("setCompositionString", gl->createFunction(ime_setCompositionString));
     o.init_member("imeComposition", gl->createFunction(ime_imeComposition));
 }
@@ -79,8 +80,6 @@ attachIMEInterface(as_object& o)
 void
 attachIMEStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

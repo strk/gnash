@@ -72,6 +72,7 @@ namespace {
 void
 attachPrintJobInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("send", gl->createFunction(printjob_send));
     o.init_member("start", gl->createFunction(printjob_start));
 }
@@ -79,8 +80,6 @@ attachPrintJobInterface(as_object& o)
 void
 attachPrintJobStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

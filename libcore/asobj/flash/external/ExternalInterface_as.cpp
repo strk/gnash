@@ -65,7 +65,6 @@ as_value ExternalInterface_uctor(const fn_call& fn);
 static void
 attachExternalInterfaceInterface(as_object& /*o*/)
 {
-    Global_as* gl = getGlobal(/*o*/);
 }
 
 static void
@@ -75,7 +74,8 @@ attachExternalInterfaceStaticProperties(as_object& o)
                       as_prop_flags::dontDelete |
                       as_prop_flags::readOnly;
 
-    o.init_member("addCallback", new builtin_function(
+    Global_as* gl = getGlobal(o);
+    o.init_member("addCallback", gl->createFunction(
                 ExternalInterface_addCallback), flags);
     o.init_member("call", gl->createFunction(ExternalInterface_call), flags);
     o.init_member("_argumentsToXML",

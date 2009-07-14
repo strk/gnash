@@ -20,6 +20,7 @@
 #include "ColorMatrixFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
+#include "Global_as.h"
 #include "BitmapFilter_as.h"
 
 namespace gnash {

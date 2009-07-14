@@ -78,6 +78,7 @@ namespace {
 void
 attachURLLoaderInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("close", gl->createFunction(urlloader_close));
     o.init_member("load", gl->createFunction(urlloader_load));
     o.init_member("complete", gl->createFunction(urlloader_complete));

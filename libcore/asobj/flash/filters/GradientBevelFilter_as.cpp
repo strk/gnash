@@ -21,6 +21,7 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "BitmapFilter_as.h"
+#include "Global_as.h"
 
 namespace gnash {
 

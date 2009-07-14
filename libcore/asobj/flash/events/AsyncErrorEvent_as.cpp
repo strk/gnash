@@ -72,6 +72,7 @@ namespace {
 void
 attachAsyncErrorEventInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(asyncerrorevent_toString));
     o.init_member("ASYNC_ERROR", gl->createFunction(asyncerrorevent_ASYNC_ERROR));
 }
@@ -79,8 +80,6 @@ attachAsyncErrorEventInterface(as_object& o)
 void
 attachAsyncErrorEventStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*
@@ -115,7 +114,7 @@ asyncerrorevent_ASYNC_ERROR(const fn_call& fn)
 }
 
 as_value
-asyncerrorevent_ctor(const fn_call& fn)
+asyncerrorevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new AsyncErrorEvent_as;
 

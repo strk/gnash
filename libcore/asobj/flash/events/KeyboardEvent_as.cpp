@@ -84,8 +84,6 @@ attachKeyboardEventInterface(as_object& o)
 void
 attachKeyboardEventStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

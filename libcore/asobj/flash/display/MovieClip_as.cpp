@@ -314,93 +314,93 @@ void
 attachMovieClipAS2Interface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-        VM& vm = getVM(o);
+    VM& vm = getVM(o);
 
-        o.init_member("attachMovie", vm.getNative(900, 0)); 
-        o.init_member("swapDepths", vm.getNative(900, 1));
-        o.init_member("localToGlobal", vm.getNative(900, 2));
-        o.init_member("globalToLocal", vm.getNative(900, 3));
-        o.init_member("hitTest", vm.getNative(900, 4));
-        o.init_member("getBounds", vm.getNative(900, 5));
-        o.init_member("getBytesTotal", vm.getNative(900, 6));
-        o.init_member("getBytesLoaded", vm.getNative(900, 7));
-        o.init_member("play", vm.getNative(900, 12));
-        o.init_member("stop", vm.getNative(900, 13));
-        o.init_member("nextFrame", vm.getNative(900, 14));
-        o.init_member("prevFrame", vm.getNative(900, 15));
-        o.init_member("gotoAndPlay", vm.getNative(900, 16));
-        o.init_member("gotoAndStop", vm.getNative(900, 17));
-        o.init_member("duplicateMovieClip", vm.getNative(900, 18));
-        o.init_member("removeMovieClip", vm.getNative(900, 19));
-        o.init_member("startDrag", vm.getNative(900, 20));
-        o.init_member("stopDrag", vm.getNative(900, 21));
-        o.init_member("loadMovie", gl->createFunction(movieclip_loadMovie));
-        o.init_member("loadVariables", new builtin_function(
-                    movieclip_loadVariables));
-        o.init_member("unloadMovie", new builtin_function(
-                    movieclip_unloadMovie));
-        o.init_member("getURL", gl->createFunction(movieclip_getURL));
-        o.init_member("getSWFVersion", new builtin_function(
-                    movieclip_getSWFVersion));
-        o.init_member("meth", gl->createFunction(movieclip_meth));
-        o.init_member("enabled", true);
-        o.init_member("useHandCursor", true);
-        o.init_property("_lockroot", &MovieClip::lockroot_getset,
-              &MovieClip::lockroot_getset);
-        o.init_member("beginBitmapFill", new builtin_function(
-                    movieclip_beginBitmapFill));
-        o.init_member("getRect", new builtin_function(
-                    movieclip_getRect));
-        o.init_member("lineGradientStyle", new builtin_function(
-                    movieclip_lineGradientStyle));
-        o.init_member("attachBitmap", new builtin_function(
-                    movieclip_attachBitmap));
-        o.init_property("blendMode", &DisplayObject::blendMode,
-                &DisplayObject::blendMode);
-        o.init_property("cacheAsBitmap", &movieclip_cacheAsBitmap, 
-                &movieclip_cacheAsBitmap);
-        o.init_property("filters", &movieclip_filters, &movieclip_filters);
-        o.init_property("forceSmoothing", &movieclip_forceSmoothing,
-                &movieclip_forceSmoothing);
-        o.init_property("opaqueBackground", &movieclip_opaqueBackground,
-                &movieclip_opaqueBackground);
-        o.init_property("scale9Grid", &movieclip_scale9Grid,
-                movieclip_scale9Grid);
-        o.init_property("scrollRect", &movieclip_scrollRect,
-			&movieclip_scrollRect);
-        o.init_property("tabIndex", &movieclip_tabIndex, &movieclip_tabIndex);
-        o.init_property("transform", &movieclip_transform, 
-                &movieclip_transform);
+    o.init_member("attachMovie", vm.getNative(900, 0)); 
+    o.init_member("swapDepths", vm.getNative(900, 1));
+    o.init_member("localToGlobal", vm.getNative(900, 2));
+    o.init_member("globalToLocal", vm.getNative(900, 3));
+    o.init_member("hitTest", vm.getNative(900, 4));
+    o.init_member("getBounds", vm.getNative(900, 5));
+    o.init_member("getBytesTotal", vm.getNative(900, 6));
+    o.init_member("getBytesLoaded", vm.getNative(900, 7));
+    o.init_member("play", vm.getNative(900, 12));
+    o.init_member("stop", vm.getNative(900, 13));
+    o.init_member("nextFrame", vm.getNative(900, 14));
+    o.init_member("prevFrame", vm.getNative(900, 15));
+    o.init_member("gotoAndPlay", vm.getNative(900, 16));
+    o.init_member("gotoAndStop", vm.getNative(900, 17));
+    o.init_member("duplicateMovieClip", vm.getNative(900, 18));
+    o.init_member("removeMovieClip", vm.getNative(900, 19));
+    o.init_member("startDrag", vm.getNative(900, 20));
+    o.init_member("stopDrag", vm.getNative(900, 21));
+    o.init_member("loadMovie", gl->createFunction(movieclip_loadMovie));
+    o.init_member("loadVariables", new builtin_function(
+                movieclip_loadVariables));
+    o.init_member("unloadMovie", new builtin_function(
+                movieclip_unloadMovie));
+    o.init_member("getURL", gl->createFunction(movieclip_getURL));
+    o.init_member("getSWFVersion", new builtin_function(
+                movieclip_getSWFVersion));
+    o.init_member("meth", gl->createFunction(movieclip_meth));
+    o.init_member("enabled", true);
+    o.init_member("useHandCursor", true);
+    o.init_property("_lockroot", &MovieClip::lockroot_getset,
+          &MovieClip::lockroot_getset);
+    o.init_member("beginBitmapFill", new builtin_function(
+                movieclip_beginBitmapFill));
+    o.init_member("getRect", new builtin_function(
+                movieclip_getRect));
+    o.init_member("lineGradientStyle", new builtin_function(
+                movieclip_lineGradientStyle));
+    o.init_member("attachBitmap", new builtin_function(
+                movieclip_attachBitmap));
+    o.init_property("blendMode", &DisplayObject::blendMode,
+            &DisplayObject::blendMode);
+    o.init_property("cacheAsBitmap", &movieclip_cacheAsBitmap, 
+            &movieclip_cacheAsBitmap);
+    o.init_property("filters", &movieclip_filters, &movieclip_filters);
+    o.init_property("forceSmoothing", &movieclip_forceSmoothing,
+            &movieclip_forceSmoothing);
+    o.init_property("opaqueBackground", &movieclip_opaqueBackground,
+            &movieclip_opaqueBackground);
+    o.init_property("scale9Grid", &movieclip_scale9Grid,
+            movieclip_scale9Grid);
+    o.init_property("scrollRect", &movieclip_scrollRect,
+        &movieclip_scrollRect);
+    o.init_property("tabIndex", &movieclip_tabIndex, &movieclip_tabIndex);
+    o.init_property("transform", &movieclip_transform, 
+            &movieclip_transform);
 
-        const int swf6Flags = as_prop_flags::dontDelete |
-                    as_prop_flags::dontEnum |
-                    as_prop_flags::onlySWF6Up;
+    const int swf6Flags = as_prop_flags::dontDelete |
+                as_prop_flags::dontEnum |
+                as_prop_flags::onlySWF6Up;
 
-        o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
-        o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
-        o.init_member("getDepth", vm.getNative(900, 10), swf6Flags);
-        o.init_member("setMask", vm.getNative(900, 11), swf6Flags);
-        o.init_member("createEmptyMovieClip", vm.getNative(901, 0), swf6Flags);
-        o.init_member("beginFill", vm.getNative(901, 1), swf6Flags);
-        o.init_member("beginGradientFill", vm.getNative(901, 2), swf6Flags);
-        o.init_member("moveTo", vm.getNative(901, 3), swf6Flags);
-        o.init_member("lineTo", vm.getNative(901, 4), swf6Flags);
-        o.init_member("curveTo", vm.getNative(901, 5), swf6Flags);
-        o.init_member("lineStyle", vm.getNative(901, 6), swf6Flags);
-        o.init_member("endFill", vm.getNative(901, 7), swf6Flags);
-        o.init_member("clear", vm.getNative(901, 8), swf6Flags);
-        o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
-        o.init_member("getTextSnapshot", 
-                gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
+    o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
+    o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
+    o.init_member("getDepth", vm.getNative(900, 10), swf6Flags);
+    o.init_member("setMask", vm.getNative(900, 11), swf6Flags);
+    o.init_member("createEmptyMovieClip", vm.getNative(901, 0), swf6Flags);
+    o.init_member("beginFill", vm.getNative(901, 1), swf6Flags);
+    o.init_member("beginGradientFill", vm.getNative(901, 2), swf6Flags);
+    o.init_member("moveTo", vm.getNative(901, 3), swf6Flags);
+    o.init_member("lineTo", vm.getNative(901, 4), swf6Flags);
+    o.init_member("curveTo", vm.getNative(901, 5), swf6Flags);
+    o.init_member("lineStyle", vm.getNative(901, 6), swf6Flags);
+    o.init_member("endFill", vm.getNative(901, 7), swf6Flags);
+    o.init_member("clear", vm.getNative(901, 8), swf6Flags);
+    o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
+    o.init_member("getTextSnapshot", 
+            gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
-        const int swf7Flags = as_prop_flags::dontDelete |
-                    as_prop_flags::dontEnum |
-                    as_prop_flags::onlySWF7Up;
+    const int swf7Flags = as_prop_flags::dontDelete |
+                as_prop_flags::dontEnum |
+                as_prop_flags::onlySWF7Up;
 
-        o.init_member("getNextHighestDepth", new builtin_function(
-                    movieclip_getNextHighestDepth), swf7Flags);
-        o.init_member("getInstanceAtDepth", new builtin_function(
-                    movieclip_getInstanceAtDepth), swf7Flags);
+    o.init_member("getNextHighestDepth", new builtin_function(
+                movieclip_getNextHighestDepth), swf7Flags);
+    o.init_member("getInstanceAtDepth", new builtin_function(
+                movieclip_getInstanceAtDepth), swf7Flags);
 
 }
 
@@ -2650,6 +2650,7 @@ movieclip_as3_ctor(const fn_call& fn)
 void
 attachMovieClipAS3Interface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("gotoAndStop", gl->createFunction(movieclip_gotoAndStop));
     o.init_member("nextFrame", gl->createFunction(movieclip_nextFrame));
     o.init_member("nextScene", gl->createFunction(movieclip_nextScene));

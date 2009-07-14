@@ -21,6 +21,7 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "Object.h"
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -72,6 +73,7 @@ void
 attachBitmapFilterInterface(as_object& o)
 {
     const int flags = 0;
+    Global_as* gl = getGlobal(o);
     o.init_member("clone", gl->createFunction(bitmapfilter_clone), flags);
 }
 

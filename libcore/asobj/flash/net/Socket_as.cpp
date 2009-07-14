@@ -102,6 +102,7 @@ namespace {
 void
 attachSocketInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
     o.init_member("connect", gl->createFunction(socket_connect));
     o.init_member("flush", gl->createFunction(socket_flush));
     o.init_member("readBoolean", gl->createFunction(socket_readBoolean));

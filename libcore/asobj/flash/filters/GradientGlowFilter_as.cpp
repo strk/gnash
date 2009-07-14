@@ -19,6 +19,7 @@
 #include "as_object.h"
 #include "GradientGlowFilter.h"
 #include "VM.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "BitmapFilter_as.h"
 

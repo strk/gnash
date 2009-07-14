@@ -56,6 +56,8 @@ attachColorTransformInterface(as_object& o)
 {
     int flags = 0;
     /// This has no flags:
+    Global_as* gl = getGlobal(o);
+
     o.init_member("concat", gl->createFunction(ColorTransform_concat), flags);
 
     flags = as_prop_flags::isProtected;
