@@ -25,6 +25,7 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
+#include "Object.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -40,7 +41,7 @@ namespace {
 // extern (used by Global.cpp)
 void bitmapfilterquality_class_init(as_object& global)
 {
-    boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface);
+    boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
     attachBitmapFilterQualityStaticInterface(*cl);
 
     // Register _global.BitmapFilterQuality

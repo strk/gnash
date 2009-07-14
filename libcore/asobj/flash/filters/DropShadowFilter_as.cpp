@@ -55,14 +55,14 @@ public:
     
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
+    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> DropShadowFilter_as::s_interface;
 
-boost:: intrusive_ptr<builtin_function> DropShadowFilter_as::s_ctor;
+boost:: intrusive_ptr<as_object> DropShadowFilter_as::s_ctor;
 
 as_object*
 DropShadowFilter_as::Interface() {
@@ -77,7 +77,8 @@ DropShadowFilter_as::Interface() {
 void
 DropShadowFilter_as::registerCtor(as_object& global) {
     if (DropShadowFilter_as::s_ctor != NULL) return;
-    DropShadowFilter_as::s_ctor = new builtin_function(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());
+    Global_as* gl = getGlobal(global);
+    DropShadowFilter_as::s_ctor = gl->createClass(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());;
     VM::get().addStatic(DropShadowFilter_as::s_ctor.get());
     DropShadowFilter_as::attachInterface(*DropShadowFilter_as::s_ctor);
     global.init_member("DropShadowFilter" , DropShadowFilter_as::s_ctor.get());

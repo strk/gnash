@@ -42,13 +42,11 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> ColorMatrixFilter_as::s_interface;
-boost:: intrusive_ptr<builtin_function> ColorMatrixFilter_as::s_ctor;
 
 as_object* ColorMatrixFilter_as::Interface() {
     if (ColorMatrixFilter_as::s_interface == NULL) {
@@ -62,11 +60,15 @@ as_object* ColorMatrixFilter_as::Interface() {
 void
 ColorMatrixFilter_as::registerCtor(as_object& global)
 {
-    if (ColorMatrixFilter_as::s_ctor != NULL) return;
-    ColorMatrixFilter_as::s_ctor = new builtin_function(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());
-    VM::get().addStatic(ColorMatrixFilter_as::s_ctor.get());
-    ColorMatrixFilter_as::attachInterface(*ColorMatrixFilter_as::s_ctor);
-    global.init_member("ColorMatrixFilter" , ColorMatrixFilter_as::s_ctor.get());
+    static boost::intrusive_ptr<as_object> cl;
+    if (!cl) return;
+
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());;
+    ColorMatrixFilter_as::attachInterface(*cl);
+
+    global.init_member("ColorMatrixFilter" , cl.get());
+
 }
 
 void

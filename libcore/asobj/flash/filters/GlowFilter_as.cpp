@@ -59,13 +59,13 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
+    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> GlowFilter_as::s_interface;
-boost:: intrusive_ptr<builtin_function> GlowFilter_as::s_ctor;
+boost::intrusive_ptr<as_object> GlowFilter_as::s_ctor;
 
 as_object*
 GlowFilter_as::Interface() {
@@ -80,7 +80,8 @@ GlowFilter_as::Interface() {
 void
 GlowFilter_as::registerCtor(as_object& global) {
     if (GlowFilter_as::s_ctor != NULL) return;
-    GlowFilter_as::s_ctor = new builtin_function(&GlowFilter_as::ctor, GlowFilter_as::Interface());
+    Global_as* gl = getGlobal(global);
+    GlowFilter_as::s_ctor = gl->createClass(&GlowFilter_as::ctor, GlowFilter_as::Interface());;
     VM::get().addStatic(GlowFilter_as::s_ctor.get());
     GlowFilter_as::attachInterface(*GlowFilter_as::s_ctor);
     global.init_member("GlowFilter" , GlowFilter_as::s_ctor.get());

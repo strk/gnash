@@ -47,13 +47,11 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> BlurFilter_as::s_interface;
-boost:: intrusive_ptr<builtin_function> BlurFilter_as::s_ctor;
 
 as_object*
 BlurFilter_as::Interface() {
@@ -68,11 +66,15 @@ BlurFilter_as::Interface() {
 void
 BlurFilter_as::registerCtor(as_object& global)
 {
-    if (BlurFilter_as::s_ctor != NULL) return;
-    BlurFilter_as::s_ctor = new builtin_function(&BlurFilter_as::ctor, BlurFilter_as::Interface());
-    VM::get().addStatic(BlurFilter_as::s_ctor.get());
-    BlurFilter_as::attachInterface(*BlurFilter_as::s_ctor);
-    global.init_member("BlurFilter" , BlurFilter_as::s_ctor.get());
+    static boost::intrusive_ptr<as_object> cl;
+    if (!cl) return;
+
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());;
+    BlurFilter_as::attachInterface(*cl);
+
+    global.init_member("BlurFilter" , cl.get());
+
 }
 
 void
