@@ -33,34 +33,15 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value bitmapfilterquality_ctor(const fn_call& fn);
-    void attachBitmapFilterQualityInterface(as_object& o);
     void attachBitmapFilterQualityStaticInterface(as_object& o);
-    as_object* getBitmapFilterQualityInterface();
 
 }
-
-class BitmapFilterQuality_as : public as_object
-{
-
-public:
-
-    BitmapFilterQuality_as()
-        :
-        as_object(getBitmapFilterQualityInterface())
-    {}
-
-};
 
 // extern (used by Global.cpp)
 void bitmapfilterquality_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if (!cl) {
-        cl = new builtin_function(&bitmapfilterquality_ctor, getBitmapFilterQualityInterface());
-        attachBitmapFilterQualityStaticInterface(*cl);
-    }
+    boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface);
+    attachBitmapFilterQualityStaticInterface(*cl);
 
     // Register _global.BitmapFilterQuality
     global.init_member("BitmapFilterQuality", cl.get());
@@ -69,34 +50,8 @@ void bitmapfilterquality_class_init(as_object& global)
 namespace {
 
 void
-attachBitmapFilterQualityInterface(as_object& o)
+attachBitmapFilterQualityStaticInterface(as_object& /*o*/)
 {
-}
-
-void
-attachBitmapFilterQualityStaticInterface(as_object& o)
-{
-    Global_as* gl = getGlobal(o);
-
-}
-
-as_object*
-getBitmapFilterQualityInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachBitmapFilterQualityInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-bitmapfilterquality_ctor(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> obj = new BitmapFilterQuality_as;
-
-    return as_value(obj.get()); // will keep alive
 }
 
 } // anonymous namespace 
