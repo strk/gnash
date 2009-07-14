@@ -270,7 +270,7 @@ ActionExec::operator() ()
                       stop_pc);
                     );
                     
-                    //throw ActionException(ss.str());;
+                    //throw ActionException(ss.str());
                     // no way to recover from this actually...
                     // Give this action handler a chance anyway.
                     // Maybe it will be able to do something about

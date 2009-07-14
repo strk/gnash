@@ -58,7 +58,7 @@ void textlinemetrics_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&textlinemetrics_ctor, getTextLineMetricsInterface());;
+        cl = gl->createClass(&textlinemetrics_ctor, getTextLineMetricsInterface());
         attachTextLineMetricsStaticInterface(*cl);
     }
 

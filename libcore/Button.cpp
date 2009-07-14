@@ -1127,7 +1127,7 @@ Button::init(as_object& global)
   if ( cl == NULL )
   {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&button_ctor, getButtonInterface());;
+        cl = gl->createClass(&button_ctor, getButtonInterface());
     VM::get().addStatic(cl.get());
   }
 

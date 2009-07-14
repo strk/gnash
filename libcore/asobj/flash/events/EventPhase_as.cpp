@@ -58,7 +58,7 @@ void eventphase_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&eventphase_ctor, getEventPhaseInterface());;
+        cl = gl->createClass(&eventphase_ctor, getEventPhaseInterface());
         attachEventPhaseStaticInterface(*cl);
     }
 

@@ -58,7 +58,7 @@ void filefilter_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&filefilter_ctor, getFileFilterInterface());;
+        cl = gl->createClass(&filefilter_ctor, getFileFilterInterface());
         attachFileFilterStaticInterface(*cl);
     }
 

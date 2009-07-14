@@ -60,7 +60,7 @@ void securityerrorevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&securityerrorevent_ctor, getSecurityErrorEventInterface());;
+        cl = gl->createClass(&securityerrorevent_ctor, getSecurityErrorEventInterface());
         attachSecurityErrorEventStaticInterface(*cl);
     }
 

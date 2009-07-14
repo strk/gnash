@@ -146,7 +146,7 @@ TextFormat_as::init(as_object& global)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&textformat_new, getTextFormatInterface());;
+        cl = gl->createClass(&textformat_new, getTextFormatInterface());
 	}
 
 	// Register _global.Color

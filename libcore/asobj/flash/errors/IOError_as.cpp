@@ -58,7 +58,7 @@ void ioerror_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&ioerror_ctor, getIOErrorInterface());;
+        cl = gl->createClass(&ioerror_ctor, getIOErrorInterface());
         attachIOErrorStaticInterface(*cl);
     }
 

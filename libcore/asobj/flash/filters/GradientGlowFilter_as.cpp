@@ -79,7 +79,7 @@ GradientGlowFilter_as::registerCtor(as_object& global)
 {
     if (GradientGlowFilter_as::s_ctor != NULL) return;
     Global_as* gl = getGlobal(global);
-    GradientGlowFilter_as::s_ctor = gl->createClass(&GradientGlowFilter_as::ctor, GradientGlowFilter_as::Interface());;
+    GradientGlowFilter_as::s_ctor = gl->createClass(&GradientGlowFilter_as::ctor, GradientGlowFilter_as::Interface());
     VM::get().addStatic(GradientGlowFilter_as::s_ctor.get());
     GradientGlowFilter_as::attachInterface(*GradientGlowFilter_as::s_ctor);
     global.init_member("GradientGlowFilter" , GradientGlowFilter_as::s_ctor.get());

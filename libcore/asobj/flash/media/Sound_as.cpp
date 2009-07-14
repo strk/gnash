@@ -125,7 +125,7 @@ Sound_as::init(as_object& global)
     {
         as_object* iface = getSoundInterface();
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&sound_new, iface);;
+        cl = gl->createClass(&sound_new, iface);
         iface->set_member_flags(NSV::PROP_CONSTRUCTOR, as_prop_flags::readOnly);
     }
 

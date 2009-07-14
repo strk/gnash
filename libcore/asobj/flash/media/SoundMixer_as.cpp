@@ -60,7 +60,7 @@ void soundmixer_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&soundmixer_ctor, getSoundMixerInterface());;
+        cl = gl->createClass(&soundmixer_ctor, getSoundMixerInterface());
         attachSoundMixerStaticInterface(*cl);
     }
 

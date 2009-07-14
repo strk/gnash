@@ -422,7 +422,7 @@ extern "C" {
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&mysql_ctor, getInterface());;
+        cl = gl->createClass(&mysql_ctor, getInterface());
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    attachInterface(cl.get());

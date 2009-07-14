@@ -628,7 +628,7 @@ XMLDocument_as::init(as_object& global)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&xml_new, getXMLInterface());;
+        cl = gl->createClass(&xml_new, getXMLInterface());
     }
     
     global.init_member("XML", cl.get());

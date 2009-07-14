@@ -58,7 +58,7 @@ void idynamicpropertyoutput_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&idynamicpropertyoutput_ctor, getIDynamicPropertyOutputInterface());;
+        cl = gl->createClass(&idynamicpropertyoutput_ctor, getIDynamicPropertyOutputInterface());
         attachIDynamicPropertyOutputStaticInterface(*cl);
     }
 

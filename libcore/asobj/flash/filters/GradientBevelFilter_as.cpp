@@ -77,7 +77,7 @@ void
 GradientBevelFilter_as::registerCtor(as_object& global) {
     if (GradientBevelFilter_as::s_ctor != NULL) return;
         Global_as* gl = getGlobal(global);
-	GradientBevelFilter_as::s_ctor = gl->createClass(&GradientBevelFilter_as::ctor, GradientBevelFilter_as::Interface());;
+	GradientBevelFilter_as::s_ctor = gl->createClass(&GradientBevelFilter_as::ctor, GradientBevelFilter_as::Interface());
     VM::get().addStatic(GradientBevelFilter_as::s_ctor.get());
     GradientBevelFilter_as::attachInterface(*GradientBevelFilter_as::s_ctor);
     global.init_member("GradientBevelFilter" , GradientBevelFilter_as::s_ctor.get());

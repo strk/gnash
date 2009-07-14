@@ -78,7 +78,7 @@ void
 DropShadowFilter_as::registerCtor(as_object& global) {
     if (DropShadowFilter_as::s_ctor != NULL) return;
     Global_as* gl = getGlobal(global);
-    DropShadowFilter_as::s_ctor = gl->createClass(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());;
+    DropShadowFilter_as::s_ctor = gl->createClass(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());
     VM::get().addStatic(DropShadowFilter_as::s_ctor.get());
     DropShadowFilter_as::attachInterface(*DropShadowFilter_as::s_ctor);
     global.init_member("DropShadowFilter" , DropShadowFilter_as::s_ctor.get());

@@ -112,7 +112,7 @@ void camera_class_init(as_object& global)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&camera_ctor, getCameraInterface());;
+        cl = gl->createClass(&camera_ctor, getCameraInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCameraInterface(*cl);

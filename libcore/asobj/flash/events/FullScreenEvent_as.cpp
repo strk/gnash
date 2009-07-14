@@ -60,7 +60,7 @@ void fullscreenevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&fullscreenevent_ctor, getFullScreenEventInterface());;
+        cl = gl->createClass(&fullscreenevent_ctor, getFullScreenEventInterface());
         attachFullScreenEventStaticInterface(*cl);
     }
 

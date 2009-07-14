@@ -1546,7 +1546,7 @@ textfield_class_init(as_object& global)
         else {
             /// Version 6 upward: limited initial prototype
             as_object* iface = getTextFieldInterface(vm);
-            cl = gl->createClass(&textfield_ctor, iface);;
+            cl = gl->createClass(&textfield_ctor, iface);
         }
 
         vm.addStatic(cl.get());

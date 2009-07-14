@@ -58,7 +58,7 @@ void accessibilityproperties_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&accessibilityproperties_ctor, getAccessibilityPropertiesInterface());;
+        cl = gl->createClass(&accessibilityproperties_ctor, getAccessibilityPropertiesInterface());
         attachAccessibilityPropertiesStaticInterface(*cl);
     }
 

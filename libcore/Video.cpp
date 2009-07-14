@@ -305,7 +305,7 @@ video_class_init(as_object& global)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&video_ctor, getVideoInterface(global));;
+        cl = gl->createClass(&video_ctor, getVideoInterface(global));
 		getVM(global).addStatic(cl.get());
 	}
 

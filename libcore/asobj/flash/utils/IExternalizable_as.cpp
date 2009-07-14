@@ -59,7 +59,7 @@ void iexternalizable_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&iexternalizable_ctor, getIExternalizableInterface());;
+        cl = gl->createClass(&iexternalizable_ctor, getIExternalizableInterface());
         attachIExternalizableStaticInterface(*cl);
     }
 

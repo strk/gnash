@@ -58,7 +58,7 @@ void loadercontext_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&loadercontext_ctor, getLoaderContextInterface());;
+        cl = gl->createClass(&loadercontext_ctor, getLoaderContextInterface());
         attachLoaderContextStaticInterface(*cl);
     }
 

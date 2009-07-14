@@ -61,7 +61,7 @@ void loader_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&loader_ctor, getLoaderInterface());;
+        cl = gl->createClass(&loader_ctor, getLoaderInterface());
         attachLoaderStaticInterface(*cl);
     }
 

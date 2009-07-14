@@ -60,7 +60,7 @@ void httpstatusevent_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&httpstatusevent_ctor, getHTTPStatusEventInterface());;
+        cl = gl->createClass(&httpstatusevent_ctor, getHTTPStatusEventInterface());
         attachHTTPStatusEventStaticInterface(*cl);
     }
 

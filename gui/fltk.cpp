@@ -117,7 +117,7 @@ FltkGui::handle(int event)
           return Window::handle(event);
         }
         notify_mouse_moved(event_x(), event_y()-_menu_height);
-        return Window::handle(event);;
+        return Window::handle(event);
       }
       case SHORTCUT:
       case KEY:

@@ -67,7 +67,7 @@ void proxy_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&proxy_ctor, getProxyInterface());;
+        cl = gl->createClass(&proxy_ctor, getProxyInterface());
         attachProxyStaticInterface(*cl);
     }
 

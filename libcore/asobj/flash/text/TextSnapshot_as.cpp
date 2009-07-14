@@ -78,7 +78,7 @@ void TextSnapshot_as::init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&textsnapshot_ctor, getTextSnapshotInterface());;
+        cl = gl->createClass(&textsnapshot_ctor, getTextSnapshotInterface());
         attachTextSnapshotStaticInterface(*cl);
     }
 

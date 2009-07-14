@@ -58,7 +58,7 @@ void stackoverflowerror_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&stackoverflowerror_ctor, getStackOverflowErrorInterface());;
+        cl = gl->createClass(&stackoverflowerror_ctor, getStackOverflowErrorInterface());
         attachStackOverflowErrorStaticInterface(*cl);
     }
 

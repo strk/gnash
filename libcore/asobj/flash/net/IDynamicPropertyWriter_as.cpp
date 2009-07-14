@@ -58,7 +58,7 @@ void idynamicpropertywriter_class_init(as_object& global)
 
     if (!cl) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&idynamicpropertywriter_ctor, getIDynamicPropertyWriterInterface());;
+        cl = gl->createClass(&idynamicpropertywriter_ctor, getIDynamicPropertyWriterInterface());
         attachIDynamicPropertyWriterStaticInterface(*cl);
     }
 
