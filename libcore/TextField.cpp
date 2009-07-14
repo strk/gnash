@@ -1442,6 +1442,8 @@ TextField::format_text()
 	int current_line;
 	int last_visible_line = _top_visible_line + _linesindisplay;
 	int linestart = 0;
+	size_t manylines = _line_starts.size();
+	size_t manyrecords = _textRecords.size();
 	SWF::TextRecord cursorposition_line;
 	while(linestartit != linestartsend && *linestartit <= m_cursor) {
 		linestart = *linestartit++;
@@ -1451,13 +1453,13 @@ TextField::format_text()
 	///compute the lines to display
 	///this whole section could probably use some optimization!!!
 	//if ( autoSize == autoSizeNone ) {
-		int manylines = _line_starts.size();
 		if (manylines - _top_visible_line <= _linesindisplay) {
 			if(manylines - _linesindisplay <= 0)
 				_top_visible_line = 0;
 			else
 				_top_visible_line = manylines - _linesindisplay;
 		///if we are at a higher position, scoot the lines down
+		//INVALID READ - Conditional jump or move depends on uninitialised value(s)
 		} else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
 			_top_visible_line -= _top_visible_line-(current_line);
 		///if we are at a lower position, scoot the lines up
@@ -1467,8 +1469,8 @@ TextField::format_text()
 			}
 		}
     //}
-	for(unsigned int i = 0; i < _line_starts.size(); ++i) {
-		_textRecords[i].setYOffset((i-_top_visible_line)*(fontHeight + leading) + (PADDING_TWIPS + fontHeight + (fontLeading - fontDescent)));
+	for(unsigned int i = 0; i < manyrecords; ++i) {
+		_textRecords[i].setYOffset(static_cast<float>((i-_top_visible_line)*(fontHeight + leading) + (PADDING_TWIPS + fontHeight + (fontLeading - fontDescent))));
 	}
 
     float extra_space = align_line(textAlignment, last_line_start_record, x);
@@ -1476,6 +1478,7 @@ TextField::format_text()
 	if ( --current_line < _textRecords.size() ) {
 		cursorposition_line = _textRecords[current_line];
 		for ( unsigned int i = linestart; i < m_cursor; ++i ) {
+			//INVALID READ
 			m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
 		}
 	}
