@@ -97,15 +97,12 @@ void
 BlurFilter_as::attachProperties(as_object& o)
 {
     boost::intrusive_ptr<builtin_function> gs;
-
-    gs = new builtin_function(BlurFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
-
-    gs = new builtin_function(BlurFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
-
-    gs = new builtin_function(BlurFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
+    o.init_property("blurX" , BlurFilter_as::blurX_gs, 
+        BlurFilter_as::blurX_gs);
+    o.init_property("blurY" , BlurFilter_as::blurY_gs, 
+        BlurFilter_as::blurY_gs);
+    o.init_property("quality" , BlurFilter_as::quality_gs, 
+        BlurFilter_as::quality_gs);
 
 }
 

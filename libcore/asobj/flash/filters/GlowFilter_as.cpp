@@ -106,29 +106,29 @@ void
 GlowFilter_as::attachProperties(as_object& o) {
     boost::intrusive_ptr<builtin_function> gs;
 
-    gs = new builtin_function(GlowFilter_as::color_gs, NULL);
-    o.init_property("color" , *gs, *gs);
+    o.init_property("color" , GlowFilter_as::color_gs, 
+        GlowFilter_as::color_gs);
 
-    gs = new builtin_function(GlowFilter_as::alpha_gs, NULL);
-    o.init_property("alpha" , *gs, *gs);
+    o.init_property("alpha" , GlowFilter_as::alpha_gs, 
+        GlowFilter_as::alpha_gs);
 
-    gs = new builtin_function(GlowFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
+    o.init_property("blurX" , GlowFilter_as::blurX_gs, 
+        GlowFilter_as::blurX_gs);
 
-    gs = new builtin_function(GlowFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
+    o.init_property("blurY" , GlowFilter_as::blurY_gs, 
+        GlowFilter_as::blurY_gs);
 
-    gs = new builtin_function(GlowFilter_as::strength_gs, NULL);
-    o.init_property("strength" , *gs, *gs);
+    o.init_property("strength" , GlowFilter_as::strength_gs, 
+        GlowFilter_as::strength_gs);
 
-    gs = new builtin_function(GlowFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
+    o.init_property("quality" , GlowFilter_as::quality_gs, 
+        GlowFilter_as::quality_gs);
 
-    gs = new builtin_function(GlowFilter_as::inner_gs, NULL);
-    o.init_property("inner" , *gs, *gs);
+    o.init_property("inner" , GlowFilter_as::inner_gs, 
+        GlowFilter_as::inner_gs);
 
-    gs = new builtin_function(GlowFilter_as::knockout_gs, NULL);
-    o.init_property("knockout" , *gs, *gs);
+    o.init_property("knockout" , GlowFilter_as::knockout_gs, 
+        GlowFilter_as::knockout_gs);
 
 }
 
