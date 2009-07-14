@@ -108,38 +108,32 @@ GradientGlowFilter_as::attachProperties(as_object& o)
 {
 	boost::intrusive_ptr<builtin_function> gs;
 
-    gs = new builtin_function(GradientGlowFilter_as::distance_gs, NULL);
-    o.init_property("distance" , *gs, *gs);
+    o.init_property("distance" , GradientGlowFilter_as::distance_gs, 
+        GradientGlowFilter_as::distance_gs);
+    o.init_property("angle" , GradientGlowFilter_as::angle_gs, 
+        GradientGlowFilter_as::angle_gs);
 
-    gs = new builtin_function(GradientGlowFilter_as::angle_gs, NULL);
-    o.init_property("angle" , *gs, *gs);
+    o.init_property("alphas" , GradientGlowFilter_as::alphas_gs, 
+        GradientGlowFilter_as::alphas_gs);
 
-    gs = new builtin_function(GradientGlowFilter_as::colors_gs, NULL);
-    o.init_property("colors" , *gs, *gs);
+    o.init_property("ratios" , GradientGlowFilter_as::ratios_gs, 
+        GradientGlowFilter_as::ratios_gs);
+    o.init_property("blurX" , GradientGlowFilter_as::blurX_gs, 
+        GradientGlowFilter_as::blurX_gs);
 
-    gs = new builtin_function(GradientGlowFilter_as::alphas_gs, NULL);
-    o.init_property("alphas" , *gs, *gs);
+    o.init_property("blurY" , GradientGlowFilter_as::blurY_gs, 
+        GradientGlowFilter_as::blurY_gs);
 
-    gs = new builtin_function(GradientGlowFilter_as::ratios_gs, NULL);
-    o.init_property("ratios" , *gs, *gs);
+    o.init_property("strength" , GradientGlowFilter_as::strength_gs, 
+        GradientGlowFilter_as::strength_gs);
 
-    gs = new builtin_function(GradientGlowFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
+    o.init_property("quality" , GradientGlowFilter_as::quality_gs, 
+        GradientGlowFilter_as::quality_gs);
+    o.init_property("type" , GradientGlowFilter_as::type_gs, 
+        GradientGlowFilter_as::type_gs);
 
-    gs = new builtin_function(GradientGlowFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
-
-    gs = new builtin_function(GradientGlowFilter_as::strength_gs, NULL);
-    o.init_property("strength" , *gs, *gs);
-
-    gs = new builtin_function(GradientGlowFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
-
-    gs = new builtin_function(GradientGlowFilter_as::type_gs, NULL);
-    o.init_property("type" , *gs, *gs);
-
-    gs = new builtin_function(GradientGlowFilter_as::knockout_gs, NULL);
-    o.init_property("knockout" , *gs, *gs);
+    o.init_property("knockout" , GradientGlowFilter_as::knockout_gs, 
+        GradientGlowFilter_as::knockout_gs);
 
 }
 

@@ -93,8 +93,8 @@ ColorMatrixFilter_as::attachProperties(as_object& o)
 {
 	boost::intrusive_ptr<builtin_function> gs;
 
-    gs = new builtin_function(ColorMatrixFilter_as::matrix_gs, NULL);
-    o.init_property("matrix" , *gs, *gs);
+    o.init_property("matrix" , ColorMatrixFilter_as::matrix_gs, 
+        ColorMatrixFilter_as::matrix_gs);
 }
 
 as_value

@@ -103,40 +103,32 @@ GradientBevelFilter_as::attachInterface(as_object& o)
 
 void
 GradientBevelFilter_as::attachProperties(as_object& o) {
-	boost::intrusive_ptr<builtin_function> gs;
+    o.init_property("distance" , GradientBevelFilter_as::distance_gs, 
+        GradientBevelFilter_as::distance_gs);
 
-    gs = new builtin_function(GradientBevelFilter_as::distance_gs, NULL);
-    o.init_property("distance" , *gs, *gs);
+    o.init_property("angle" , GradientBevelFilter_as::angle_gs, 
+        GradientBevelFilter_as::angle_gs);
+    o.init_property("colors" , GradientBevelFilter_as::colors_gs, 
+        GradientBevelFilter_as::colors_gs);
 
-    gs = new builtin_function(GradientBevelFilter_as::angle_gs, NULL);
-    o.init_property("angle" , *gs, *gs);
+    o.init_property("ratios" , GradientBevelFilter_as::ratios_gs, 
+        GradientBevelFilter_as::ratios_gs);
 
-    gs = new builtin_function(GradientBevelFilter_as::colors_gs, NULL);
-    o.init_property("colors" , *gs, *gs);
+    o.init_property("blurX" , GradientBevelFilter_as::blurX_gs, 
+        GradientBevelFilter_as::blurX_gs);
+    o.init_property("blurY" , GradientBevelFilter_as::blurY_gs, 
+        GradientBevelFilter_as::blurY_gs);
 
-    gs = new builtin_function(GradientBevelFilter_as::alphas_gs, NULL);
-    o.init_property("alphas" , *gs, *gs);
+    o.init_property("strength" , GradientBevelFilter_as::strength_gs, 
+        GradientBevelFilter_as::strength_gs);
 
-    gs = new builtin_function(GradientBevelFilter_as::ratios_gs, NULL);
-    o.init_property("ratios" , *gs, *gs);
+    o.init_property("quality" , GradientBevelFilter_as::quality_gs, 
+        GradientBevelFilter_as::quality_gs);
 
-    gs = new builtin_function(GradientBevelFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
-
-    gs = new builtin_function(GradientBevelFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
-
-    gs = new builtin_function(GradientBevelFilter_as::strength_gs, NULL);
-    o.init_property("strength" , *gs, *gs);
-
-    gs = new builtin_function(GradientBevelFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
-
-    gs = new builtin_function(GradientBevelFilter_as::type_gs, NULL);
-    o.init_property("type" , *gs, *gs);
-
-    gs = new builtin_function(GradientBevelFilter_as::knockout_gs, NULL);
-    o.init_property("knockout" , *gs, *gs);
+    o.init_property("type" , GradientBevelFilter_as::type_gs, 
+        GradientBevelFilter_as::type_gs);
+    o.init_property("knockout" , GradientBevelFilter_as::knockout_gs, 
+        GradientBevelFilter_as::knockout_gs);
 
 }
 
