@@ -517,7 +517,7 @@ movie_root::getSelectionObject() const
     as_value s;
     if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object().get();
+    as_object* sel = s.to_object(*global).get();
    
     return sel;
 }
@@ -530,7 +530,7 @@ movie_root::getStageObject()
 	as_object* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
-	return boost::dynamic_pointer_cast<Stage_as>(v.to_object());
+	return boost::dynamic_pointer_cast<Stage_as>(v.to_object(*global));
 }
 		
 void
@@ -583,7 +583,7 @@ movie_root::getKeyObject()
 
 		if (global->get_member(NSV::CLASS_KEY, &kval)) {
 
-			boost::intrusive_ptr<as_object> obj = kval.to_object();
+			boost::intrusive_ptr<as_object> obj = kval.to_object(*global);
 			_keyobject = boost::dynamic_pointer_cast<Keyboard_as>( obj );
 		}
 	}
@@ -604,7 +604,7 @@ movie_root::getMouseObject()
 		if (global->get_member(NSV::CLASS_MOUSE, &val) )
 		{
 			//log_debug("Found member 'Mouse' in _global: %s", val);
-			_mouseobject = val.to_object();
+			_mouseobject = val.to_object(*global);
 		}
 	}
 

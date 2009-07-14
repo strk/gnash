@@ -87,6 +87,12 @@ public:
     /// an object (the prototype) with a constructor.
     virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
 
+    virtual as_object* createString(const std::string& s) = 0;
+
+    virtual as_object* createNumber(double d) = 0;
+
+    virtual as_object* createBoolean(bool b) = 0;
+
     virtual Global_as& global() {
         return *this;
     }

@@ -1073,7 +1073,7 @@ netconnection_call(const fn_call& fn)
     if (fn.nargs > 1) {
 
         if (fn.arg(1).is_object()) {
-            asCallback = (fn.arg(1).to_object());
+            asCallback = (fn.arg(1).to_object(*getGlobal(fn)));
         }
         else {
             IF_VERBOSE_ASCODING_ERRORS(

@@ -24,6 +24,7 @@
 #include "as_function.h"
 #include "builtin_function.h"
 #include "asClass.h"
+#include "Global_as.h"
 #include "Object.h"
 #include "extension.h"
 
@@ -107,12 +108,15 @@ public:
         if (mExtension->initModuleWithFunc(mDeclaration.file_name,
             mDeclaration.init_name, *mTarget))
         {
+            const Global_as& gl = *getGlobal(fn);
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
             mTarget->get_member(mDeclaration.name, &us);
-            if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
+            if (mDeclaration.super_name && 
+                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu))
             {
-                us.to_object()->set_prototype(super.to_as_function()->getPrototype());
+                us.to_object(gl)->set_prototype(
+                        super.to_as_function()->getPrototype());
             }
             return us;
         }
@@ -179,14 +183,17 @@ public:
                 }
                 assert(super.to_as_function());
             }
-            if (!us.to_object()) {
+
+            const Global_as& gl = *getGlobal(fn);
+
+            if (!us.to_object(gl)) {
                 log_error("Native class %s is not an object after "
                         "initialization (%s)", st.value(mDeclaration.name), us);
             }
             if (mDeclaration.super_name &&
-                    !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
+                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
                 
-                us.to_object()->set_prototype(
+                us.to_object(gl)->set_prototype(
                         super.to_as_function()->getPrototype());
             }
         }

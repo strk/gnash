@@ -380,15 +380,13 @@ public:
 class as_value_prop
 {
 public:
-    as_cmp_fn _comp;
-    string_table::key _prop;
     
     // Note: cmpfn must implement a strict weak ordering
-    as_value_prop(string_table::key name, 
-        as_cmp_fn cmpfn)
+    as_value_prop(string_table::key name, as_cmp_fn cmpfn, const as_object& o)
         :
         _comp(cmpfn),
-        _prop(name)
+        _prop(name),
+        _obj(o)
     {
     }
 
@@ -397,13 +395,17 @@ public:
         as_value av, bv;
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object();
-        boost::intrusive_ptr<as_object> bo = b.to_object();
+        boost::intrusive_ptr<as_object> ao = a.to_object(_obj);
+        boost::intrusive_ptr<as_object> bo = b.to_object(_obj);
         
         ao->get_member(_prop, &av);
         bo->get_member(_prop, &bv);
         return _comp(av, bv);
     }
+private:
+    as_cmp_fn _comp;
+    string_table::key _prop;
+    const as_object& _obj;
 };
 
 // Comparator for sorting on multiple array properties
@@ -415,13 +417,16 @@ public:
 
     typedef std::deque<string_table::key> Props;
     Props& _prps;
+    
+    const as_object& _obj;
 
     // Note: all as_cmp_fns in *cmps must implement strict weak ordering
     as_value_multiprop(std::deque<string_table::key>& prps, 
-        std::deque<as_cmp_fn>& cmps)
+        std::deque<as_cmp_fn>& cmps, const as_object& o)
         :
         _cmps(cmps),
-        _prps(prps)
+        _prps(prps),
+        _obj(o)
     {
     }
 
@@ -432,8 +437,8 @@ public:
         std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object();
-        boost::intrusive_ptr<as_object> bo = b.to_object();
+        boost::intrusive_ptr<as_object> ao = a.to_object(_obj);
+        boost::intrusive_ptr<as_object> bo = b.to_object(_obj);
         
         for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
         {
@@ -457,8 +462,10 @@ class as_value_multiprop_eq : public as_value_multiprop
 {
 public:
     as_value_multiprop_eq(std::deque<string_table::key>& prps, 
-        std::deque<as_cmp_fn>& cmps)
-        : as_value_multiprop(prps, cmps)
+        std::deque<as_cmp_fn>& cmps, const as_object& o)
+        :
+        as_value_multiprop(prps, cmps, o),
+        _obj(o)
     {
     }
 
@@ -469,8 +476,8 @@ public:
         Comps::const_iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object();
-        boost::intrusive_ptr<as_object> bo = b.to_object();
+        boost::intrusive_ptr<as_object> ao = a.to_object(_obj);
+        boost::intrusive_ptr<as_object> bo = b.to_object(_obj);
 
         for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
         {
@@ -483,6 +490,8 @@ public:
         
         return true;
     }
+private:
+    const as_object& _obj;
 };
 
 // Convenience function to strip fUniqueSort and fReturnIndexedArray from sort
@@ -1054,12 +1063,12 @@ array_sortOn(const fn_call& fn)
             flags = static_cast<boost::uint8_t>(fn.arg(1).to_number());
             flags = flag_preprocess(flags, &do_unique, &do_index);
         }
-        as_value_prop avc = as_value_prop(propField, 
-                    get_basic_cmp(flags, version));
+        as_value_prop avc(propField, get_basic_cmp(flags, version),
+                *getGlobal(fn));
         if (do_unique)
         {
-            as_value_prop ave = as_value_prop(propField, 
-                get_basic_eq(flags, version));
+            as_value_prop ave(propField, get_basic_eq(flags, version), 
+                    *getGlobal(fn));
             if (do_index)
                 return array->sort_indexed(avc, ave);
             return array->sort(avc, ave);
@@ -1074,7 +1083,7 @@ array_sortOn(const fn_call& fn)
     if (fn.nargs > 0 && fn.arg(0).is_object() ) 
     {
         boost::intrusive_ptr<Array_as> props = 
-            ensureType<Array_as>(fn.arg(0).to_object());
+            ensureType<Array_as>(fn.arg(0).to_object(*getGlobal(fn)));
         std::deque<string_table::key> prp;
         unsigned int optnum = props->size();
         std::deque<as_cmp_fn> cmp;
@@ -1098,7 +1107,7 @@ array_sortOn(const fn_call& fn)
         else if ( fn.arg(1).is_object() )
         {
             boost::intrusive_ptr<Array_as> farray = 
-                ensureType<Array_as>(fn.arg(1).to_object());
+                ensureType<Array_as>(fn.arg(1).to_object(*getGlobal(fn)));
             if (farray->size() == optnum)
             {
                 Array_as::const_iterator 
@@ -1145,19 +1154,15 @@ array_sortOn(const fn_call& fn)
             }
         }
 
-        as_value_multiprop avc = 
-            as_value_multiprop(prp, cmp);
+        as_value_multiprop avc(prp, cmp, *getGlobal(fn));
 
         if (do_unique)
         {
-            as_value_multiprop_eq ave = 
-                as_value_multiprop_eq(prp, eq);
-            if (do_index)
-                return array->sort_indexed(avc, ave);
+            as_value_multiprop_eq ave(prp, eq, *getGlobal(fn));
+            if (do_index) return array->sort_indexed(avc, ave);
             return array->sort(avc, ave);
         }
-        if (do_index)
-            return as_value(array->sort_indexed(avc));
+        if (do_index) return as_value(array->sort_indexed(avc));
         array->sort(avc);
         return as_value(array.get());
 
@@ -1310,7 +1315,9 @@ array_concat(const fn_call& fn)
     for (unsigned int i=0; i<fn.nargs; i++)
     {
         // Array args get concatenated by elements
-        boost::intrusive_ptr<Array_as> other = boost::dynamic_pointer_cast<Array_as>(fn.arg(i).to_object());
+        boost::intrusive_ptr<Array_as> other =
+            boost::dynamic_pointer_cast<Array_as>(
+                    fn.arg(i).to_object(*getGlobal(fn)));
         if ( other )
         {
             newarray->concat(*other);

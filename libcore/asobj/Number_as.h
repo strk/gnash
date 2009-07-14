@@ -27,12 +27,13 @@
 namespace gnash {
 
 class as_object;
+class Global_as;
 
 /// Initialize the global Number class
 void number_class_init(as_object& global);
 
 /// Return a Number instance
-boost::intrusive_ptr<as_object> init_number_instance(double val);
+as_object* init_number_instance(const Global_as& g, double val);
 
 }
 

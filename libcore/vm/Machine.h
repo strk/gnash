@@ -306,13 +306,7 @@ private:
 		return value;
 	}
 
-	void push_scope_stack(as_value object){
-		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
-		assert(scopeObj.get());
-		log_abc("Pushing value %s onto scope stack.", object);
-		_scopeStack.push(scopeObj);
-		print_scope_stack();
-	}
+	void push_scope_stack(as_value object);
 
 	boost::intrusive_ptr<as_object> pop_scope_stack() {
 		log_abc("Popping value %s off the scope stack.  There will be "

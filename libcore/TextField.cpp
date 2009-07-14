@@ -2396,7 +2396,7 @@ textfield_setTextFormat(const fn_call& fn)
                 "unhandled by Gnash", ss.str());
     }
 
-    as_object* obj = fn.arg(0).to_object().get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(

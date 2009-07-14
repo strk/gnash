@@ -24,12 +24,13 @@
 namespace gnash {
 
 class as_object;
+class Global_as;
 
 /// Initialize the global Boolean class
 void boolean_class_init(as_object& global);
 
 /// Return a Boolean instance (in case the core lib needs it)
-boost::intrusive_ptr<as_object> init_boolean_instance(bool val);
+as_object* init_boolean_instance(const Global_as& g, bool val);
   
 } // end of gnash namespace
 

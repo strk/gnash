@@ -87,7 +87,7 @@ public:
     /// Call a method on the given value
     void visit(as_value& v)
     {
-        boost::intrusive_ptr<as_object> o = v.to_object();
+        boost::intrusive_ptr<as_object> o = v.to_object(*getGlobal(_fn));
         if ( ! o ) return;
 
         as_value method;
@@ -222,7 +222,7 @@ asbroadcaster_initialize(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> tgt = tgtval.to_object();
+    boost::intrusive_ptr<as_object> tgt = tgtval.to_object(*getGlobal(fn));
     if ( ! tgt )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -274,7 +274,8 @@ asbroadcaster_addListener(const fn_call& fn)
         return as_value(false); // TODO: check this
     }
 
-    boost::intrusive_ptr<as_object> listenersObj = listenersValue.to_object();
+    boost::intrusive_ptr<as_object> listenersObj =
+        listenersValue.to_object(*getGlobal(fn));
     assert(listenersObj);
 
     boost::intrusive_ptr<Array_as> listeners = boost::dynamic_pointer_cast<Array_as>(listenersObj);
@@ -330,7 +331,8 @@ asbroadcaster_removeListener(const fn_call& fn)
         return as_value(false); // TODO: check this
     }
 
-    boost::intrusive_ptr<as_object> listenersObj = listenersValue.to_object();
+    boost::intrusive_ptr<as_object> listenersObj =
+        listenersValue.to_object(*getGlobal(fn));
     assert(listenersObj);
 
     as_value listenerToRemove; assert(listenerToRemove.is_undefined());
@@ -413,7 +415,8 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     }
 
     boost::intrusive_ptr<Array_as> listeners =
-        boost::dynamic_pointer_cast<Array_as>(listenersValue.to_object());
+        boost::dynamic_pointer_cast<Array_as>(
+                listenersValue.to_object(*getGlobal(fn)));
 
     if ( ! listeners )
     {

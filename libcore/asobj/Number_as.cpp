@@ -206,17 +206,17 @@ void number_class_init(as_object& global)
 
 }
 
-boost::intrusive_ptr<as_object>
-init_number_instance(double val)
+as_object*
+init_number_instance(const Global_as& g, double val)
 {
-	boost::intrusive_ptr<builtin_function> cl=getNumberConstructor();
+	boost::intrusive_ptr<builtin_function> cl = getNumberConstructor();
 
-	as_environment env(VM::get());
+	as_environment env(getVM(g));
 
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);
 
-	return cl->constructInstance(env, args);
+	return cl->constructInstance(env, args).get();
 }
 
   

@@ -438,8 +438,12 @@ public:
 	///
 	/// If you want to avoid the conversion, check with is_object() before
 	/// calling this function.
-	///
-	boost::intrusive_ptr<as_object> to_object() const;
+    //
+    /// @param ref      The reference object for the conversion. This is
+    ///                 used to find the global object, which contains the
+    ///                 prototypes or constructors necessary for conversion.
+    ///                 It does not have to be the global object.
+	boost::intrusive_ptr<as_object> to_object(const as_object& ref) const;
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//

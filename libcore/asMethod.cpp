@@ -23,6 +23,7 @@
 #include "asClass.h"
 #include "CodeStream.h"
 #include "abc_function.h"
+#include "Global_as.h"
 #include "VM.h"
 
 namespace gnash {
@@ -83,8 +84,9 @@ bool
 asMethod::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst)
 {
+    const as_object& g = *VM::get().getGlobal();
 	if (val.is_object()) {
-		val.to_object()->set_member(NSV::INTERNAL_TYPE,
+		val.to_object(g)->set_member(NSV::INTERNAL_TYPE,
                 size_t(type->getName()));
     }
 

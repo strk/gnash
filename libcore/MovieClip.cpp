@@ -953,7 +953,7 @@ MovieClip::get_path_element(string_table::key key)
         return tmp.to_sprite(true);
     }
 
-    return tmp.to_object().get();
+    return tmp.to_object(*this).get();
 }
 
 bool

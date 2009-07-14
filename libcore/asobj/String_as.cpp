@@ -110,16 +110,15 @@ private:
     std::string _string;
 };
 
-boost::intrusive_ptr<as_object>
-init_string_instance(const std::string& val)
+as_object*
+init_string_instance(const Global_as& g, const std::string& val)
 {
 	// TODO: get VM from the environment ?
-	VM& vm = VM::get();
 
 	// TODO: get the environment passed in !!
-	as_environment env(vm);
+	as_environment env(getVM(g));
 
-	int swfVersion = vm.getSWFVersion();
+	int swfVersion = getSWFVersion(g);
 
 	boost::intrusive_ptr<as_function> cl;
 
@@ -127,19 +126,21 @@ init_string_instance(const std::string& val)
 		cl = getStringConstructor();
 	}
 	else {
-		as_object* global = vm.getGlobal();
 		as_value clval;
-		if ( ! global->get_member(NSV::CLASS_STRING, &clval) ) {
+
+        // It's a bit silly doing this as we have the global object passed,
+        // but this is a non-const function...
+		if (!getGlobal(env)->get_member(NSV::CLASS_STRING, &clval) ) {
 			log_debug("UNTESTED: String instantiation requested but "
                     "_global doesn't contain a 'String' symbol. Returning "
                     "the NULL object.");
-			return cl;
+			return cl.get();
 		}
 		else if ( ! clval.is_function() ) {
 			log_debug("UNTESTED: String instantiation requested but "
                     "_global.String is not a function (%s). Returning "
                     "the NULL object.", clval);
-			return cl;
+			return cl.get();
 		}
 		else {
 			cl = clval.to_as_function();
@@ -151,7 +152,7 @@ init_string_instance(const std::string& val)
 	args->push_back(val);
 	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
 
-	return ret;
+	return ret.get();
 }
 
 // extern (used by Global.cpp)
