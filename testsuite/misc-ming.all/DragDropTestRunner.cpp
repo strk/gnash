@@ -53,7 +53,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	// for variables lookup (consistency checking)
-	string_table& st = getStringTable(root);
+	string_table& st = getStringTable(*root);
 
 	rgba white(255, 255, 255, 255); // background color
 	rgba blue(0, 0, 255, 255);      // blue circles fill color

@@ -65,7 +65,7 @@ main(int /*argc*/, char** /*argv*/)
 	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-	VM& vm = getVM(root);
+	VM& vm = getVM(*root);
 	string_table& st = vm.getStringTable();
 
 	//check_equals(root->get_frame_count(), 20);

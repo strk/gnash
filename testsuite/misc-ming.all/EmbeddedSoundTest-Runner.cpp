@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
 	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-    VM& vm = getVM(root);
+    VM& vm = getVM(*root);
     string_table& st = vm.getStringTable();
 
     const size_t framecount = root->get_frame_count();
