@@ -65,6 +65,7 @@ check_PROGRAMS = \
 	Dejagnu \
 	Dejagnu.swf \
 	test_ssl \
+	test_ssh \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -112,6 +113,12 @@ Dejagnu.swf: Dejagnu
 
 test_ssl_SOURCES = test_ssl.cpp
 test_ssl_LDADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la
+
+test_ssh_SOURCES = test_ssh.cpp
+test_ssh_LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la

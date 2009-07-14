@@ -32,18 +32,18 @@
 #include <fcntl.h>
 #include <iostream>
 #include <string>
+#include <cstdio>
 
 #include "as_object.h"
 #include "dejagnu.h"
 #include "http.h"
 #include "log.h"
-#include "openssl/ssl.h"
-#include "sslclient.h"
 #include "buffer.h"
 #include "network.h"
 #include "element.h"
 #include "sol.h"
 #include "arg_parser.h"
+#include "sshclient.h"
 #include "sslclient.h"
 
 using namespace amf;
@@ -57,7 +57,7 @@ static TestState runtest;
 static string infile;
 
 static void test_client();
-static SSLClient client;
+static SSHClient client;
 static Network net;
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -71,12 +71,12 @@ main(int argc, char *argv[])
             { 'v', "verbose",       Arg_parser::no  },
             { 's', "hostname",      Arg_parser::yes },
             { 'o', "port",          Arg_parser::yes },
-            { 'c', "cert",          Arg_parser::yes },
-            { 'p', "pem",           Arg_parser::yes },
-            { 'k', "keyfile",       Arg_parser::yes },
-            { 'w', "password",      Arg_parser::yes },
-            { 'a', "calist",        Arg_parser::yes },
-            { 'r', "rootpath",      Arg_parser::yes },
+            { 'p', "password",      Arg_parser::yes },
+            { 'u', "user",          Arg_parser::yes },
+            { 'd', "dss",           Arg_parser::no },
+            { 'r', "rsa",           Arg_parser::no },
+            { 'f', "sftp",          Arg_parser::no },
+            { 'a', "raw",           Arg_parser::no },
             { 'n', "netdebug",      Arg_parser::no },
         };
     
@@ -99,50 +99,50 @@ main(int argc, char *argv[])
                     break;
               case 's':
                   client.setHostname(parser.argument(i));
-                  log_debug(_("Hostname for SSL connection is: %s"),
+                  log_debug(_("Hostname for SSH connection is: %s"),
                             client.getHostname());
                   break;
               case 'o':
                   net.setPort(parser.argument<short>(i));
-                  log_debug(_("Port for SSL connections is: %hd"),
+                  log_debug(_("Port for SSH connections is: %hd"),
                             net.getPort());
                   break; 
-              case 'c':
-                  client.setCert(parser.argument(i));
-                  log_debug(_("Cert file for SSL connection is: %s"),
-                            client.getCert());
-                  break;
               case 'p':
-                  client.setPem(parser.argument(i));
-                  log_debug(_("Pem file for SSL connection is: %s"),
-                            client.getPem());
+                  client.setPassword(parser.argument(i));
+                  log_debug(_("SSH password is: %s"),
+                            client.getPassword());
                   break;
-              case 'k':
-                  client.setKeyfile(parser.argument(i));
-                  log_debug(_("Keyfile file for SSL connection is: %s"),
-                            client.getKeyfile());
+              case 'u':
+                  client.setUser(parser.argument(i));
+                  log_debug(_("SSH user is: %s"),
+                            client.getUser());
                   break;
-              case 'a':
-                  client.setCAlist(parser.argument(i));
-                  log_debug(_("CA List file for SSL connection is: %s"),
-                            client.getCAlist());
+              case 'd':
+                  client.setAuthType(SSHClient::DSS);
+                  log_debug(_("SSH Authentication type is: %d"),
+                            client.getAuthType());
                   break;
               case 'r':
-                  client.setRootPath(parser.argument(i));
-                  log_debug(_("Root path for SSL pem files is: %s"),
-                            client.getRootPath());
+                  client.setAuthType(SSHClient::RSA);
+                  log_debug(_("SSH Authentication type is: %d"),
+                            client.getAuthType());
                   break;
-              case 'w':
-                  client.setPassword(parser.argument(i));
-                  log_debug(_("Password for SSL pem files is: %s"),
-                            client.getPassword());
+              case 'a':
+                  client.setTransportType(SSHClient::RAW);
+                  log_debug(_("SSH Transport type is: %d"),
+                            client.getTransportType());
+                  break;
+              case 'f':
+                  client.setTransportType(SSHClient::SFTP);
+                  log_debug(_("SSH Transport type is: %d"),
+                            client.getTransportType());
                   break;
               case 'n':
                   net.toggleDebug(true);
                   break;
               case 0:
                   infile = parser.argument(i);
-                  log_debug(_("Input file for testing the SSL connection is: %s"), infile);
+                  log_debug(_("Input file for testing the SSH connection is: %s"), infile);
                   break;
             }
         }
@@ -162,74 +162,76 @@ static void test_client()
     bool giveup = false;    
 
     // Make a tcp/ip connect to the server
-    if (net.createClient(client.getHostname(), SSL_PORT) == false) {
+    if (net.createClient(client.getHostname(), SSH_PORT) == false) {
 	log_error("Can't connect to server %s", client.getHostname());
     }
 
-    if (client.sslConnect(net.getFileFd())) {
-        runtest.pass("Connected to SSL server");
+    if (client.sshConnect(net.getFileFd())) {
+        runtest.pass("Connected to SSH server");
     } else {
-        runtest.fail("Couldn't connect to SSL server");
+        runtest.fail("Couldn't connect to SSH server");
         giveup = true;
     }
 
     // I haven't seen a password with the first character set to
     // zero ever. so we assume it got set correctly by the callback.
     if (client.getPassword()[0] != 0) {
-        runtest.pass("Password was set for SSL connection");
+        runtest.pass("Password was set for SSH connection");
     } else {
         if (giveup) {
-            runtest.unresolved("Password wasn't set for SSL connection");
+            runtest.unresolved("Password wasn't set for SSH connection");
         } else {
-            runtest.fail("Password wasn't set for SSL connection");
+            runtest.fail("Password wasn't set for SSH connection");
         }
     }
 
+#if 0
     if (giveup) {
-        runtest.unresolved("Cert didn't match hostfor SSL connection");
+        runtest.unresolved("Cert didn't match hostfor SSH connection");
     } else {
         if (client.checkCert()) {
-            runtest.xpass("Cert matched host for SSL connection");
+            runtest.xpass("Cert matched host for SSH connection");
         } else {
-            runtest.xfail("Cert didn't match host for SSL connection");
+            runtest.xfail("Cert didn't match host for SSH connection");
         }
     }
 
     HTTP http;
 
     if (giveup) {
-        runtest.unresolved("Couldn't write to SSL connection");
+        runtest.unresolved("Couldn't write to SSH connection");
     } else {
         amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
 
-        if ((ret = client.sslWrite(request)) == request.allocated()) {
-            runtest.pass("Wrote bytes to SSL connection");
+        if ((ret = client.sshWrite(request)) == request.allocated()) {
+            runtest.pass("Wrote bytes to SSH connection");
         } else {
-            runtest.fail("Couldn't write to SSL connection.");
+            runtest.fail("Couldn't write to SSH connection.");
         }
     }
-
+#endif
+    
 #if 0
     // This blocks forever unless data is received.
     if (giveup) {
-        runtest.unresolved("Couldn't read bytes from SSL connection");
+        runtest.unresolved("Couldn't read bytes from SSH connection");
     } else {
         amf::Buffer buf;
-        if ((ret = client.sslRead(buf)) > 0) {
-            runtest.pass("Read bytes from SSL connection");
+        if ((ret = client.sshRead(buf)) > 0) {
+            runtest.pass("Read bytes from SSH connection");
         } else {
-            runtest.fail("Couldn't read bytes to SSL connection.");
+            runtest.fail("Couldn't read bytes to SSH connection.");
         }
     }
 #endif
 
     if (giveup) {
-        runtest.unresolved("Couldn't shutdown SSL connection");
+        runtest.unresolved("Couldn't shutdown SSH connection");
     } else {
-        if (client.sslShutdown()) {
-            runtest.pass("Shutdown SSL connection");
+        if (client.sshShutdown()) {
+            runtest.pass("Shutdown SSH connection");
         } else {
-            runtest.fail("Couldn't shutdown SSL connection");
+            runtest.fail("Couldn't shutdown SSH connection");
         }
     }
     
@@ -238,18 +240,21 @@ static void test_client()
 static void
 usage (void)
 {
-    cerr << "This program tests SSL support in the libnet library." << endl;
-    cerr << "Usage: test_ssl [hvsocpkwar]" << endl;
+    cerr << "This program tests SSH support in the libnet library." << endl;
+    cerr << "Usage: test_ssh [hvsocpkwar]" << endl;
     cerr << "-h\tHelp" << endl;
     cerr << "-v\tVerbose" << endl;
     cerr << "-s\thostname" << endl;
     cerr << "-o\tPort" << endl;
-    cerr << "-c\tCert File" << endl;
-    cerr << "-p\tPem file" << endl;
-    cerr << "-k\tKeyfile file" << endl;
-    cerr << "-w\tPassword" << endl;
-    cerr << "-a\tCA List" << endl;
-    cerr << "-r\tRoot path" << endl;
+    cerr << "-p\tPassword" << endl;
+    cerr << "-u\tUser" << endl;
+    cerr << "-r\tUse RSA" << endl;
+    cerr << "-d\tUse DSS" << endl;
+    cerr << "-f\tUse SFTP for transport" << endl;
+    cerr << "-a\tUse RAW for transport" << endl;
+    cerr << "-n\tEnable network debug" << endl << endl;
+    
+    cerr << "Libssh version is: " << ssh_version(0) << endl;
     exit (-1);
 }
 

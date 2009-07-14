@@ -356,6 +356,10 @@ if BUILD_SSL
 	@echo "	SSL_CFLAGS is $(SSL_CFLAGS)"
 	@echo "	SSL_LIBS is $(SSL_LIBS)"
 endif
+if BUILD_SSH
+	@echo "	SSH_CFLAGS is $(SSH_CFLAGS)"
+	@echo "	SSH_LIBS is $(SSH_LIBS)"
+endif
 if BUILD_GTK_GUI
 if HAVE_XV
 	@echo "	Supported GUI: GTK (+XVideo)"
