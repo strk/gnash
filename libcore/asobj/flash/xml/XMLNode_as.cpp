@@ -22,7 +22,6 @@
 #endif
 
 #include "xml/XMLNode_as.h"
-//FIXME: direct this to the proper flash namespace
 #include "xml/XMLDocument_as.h"
 #include "Array_as.h"
 #include "Object.h"
@@ -34,6 +33,7 @@
 #include "GnashException.h" // for ActionException
 #include "string_table.h"
 #include "PropertyList.h"
+#include "Global_as.h"
 
 #include <boost/bind.hpp>
 #include <string>

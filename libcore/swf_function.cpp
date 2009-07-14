@@ -25,6 +25,7 @@
 #include "VM.h" // for storing _global in a local register
 #include "builtin_function.h" // for Function constructor
 #include "Object.h" // for getObjectInterface
+#include "Global_as.h" // for getObjectInterface
 #include "namedStrings.h"
 
 #include <typeinfo>

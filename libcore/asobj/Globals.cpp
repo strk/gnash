@@ -95,7 +95,7 @@
 #include "flash_pkg.h"
 #include "fn_call.h"
 #include "Button.h"
-#include "Global.h"
+#include "Globals.h"
 #include "int_as.h"
 #include "LoadVars_as.h"
 #include "Namespace_as.h"

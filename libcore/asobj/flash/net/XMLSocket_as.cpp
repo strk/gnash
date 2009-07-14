@@ -30,9 +30,10 @@
 #include "movie_root.h"
 #include "fn_call.h"
 #include "VM.h"
-#include "builtin_function.h" // for setting timer, should likely avoid that..
+#include "builtin_function.h" 
 #include "URLAccessManager.h"
 #include "Object.h" // for getObjectInterface
+#include "Global_as.h" 
 #include "log.h"
 
 #include <boost/thread.hpp>

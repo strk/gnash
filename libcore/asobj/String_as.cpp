@@ -36,6 +36,7 @@
 #include "utf8.h"
 #include "String_as.h"
 #include "GnashNumeric.h"
+#include "Global_as.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
