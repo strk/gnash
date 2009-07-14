@@ -173,10 +173,9 @@ public:
     /// \brief
     /// Return a reference to the Virtual Machine that created
     /// this object. 
-    VM& getVM() const {
+    VM& vm() const {
         return _vm;
     }
-
 
     /// Dump all properties using log_debug
     //

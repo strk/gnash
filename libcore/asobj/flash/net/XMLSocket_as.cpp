@@ -349,7 +349,7 @@ XMLSocket_as::getEventHandler(const std::string& name)
 	boost::intrusive_ptr<as_function> ret;
 
 	as_value tmp;
-	string_table& st = getVM().getStringTable();
+	string_table& st = getStringTable(*this);
 	if (!get_member(st.find(name), &tmp) ) return ret;
 	ret = tmp.to_as_function();
 	return ret;
@@ -373,7 +373,7 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    as_environment env(gnash::getVM(*this)); 
+    as_environment env(getVM(*this)); 
 
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {

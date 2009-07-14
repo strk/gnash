@@ -350,7 +350,7 @@ SharedObject_as::flush(int space) const
     buf.append("\x00\x00\x00\x00", 4);
 
     // append properties of object
-    VM& vm = getVM();
+    VM& vm = getVM(*this);
 
     std::map<as_object*, size_t> offsetTable;
     SOLPropsBufSerializer props(buf, vm, offsetTable);
@@ -384,7 +384,7 @@ SharedObject_as::flush(int space) const
 #else // amf::SOL-based serialization
 
     // append properties of object
-    VM& vm = getVM();
+    VM& vm = getVM(*this)
 
     SOL sol;
     PropsSerializer props(sol, vm);

@@ -136,7 +136,7 @@ NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
   log_debug(" Invoking onMetaData");
 #endif
 
-    string_table::key func = getVM().getStringTable().find(funcname);
+    string_table::key func = getStringTable(*this).find(funcname);
 
     callMethod(func, as_value(info_obj));
 }
@@ -301,13 +301,13 @@ NetStream_as::markReachableResources() const
 void
 NetStream_as::stopAdvanceTimer()
 {
-    getVM().getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
 }
 
 void
 NetStream_as::startAdvanceTimer()
 {
-    getVM().getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
 }
 
 
@@ -1368,7 +1368,7 @@ NetStream_as::advanceState()
 
     for (media::MediaParser::OrderedMetaTags::iterator i = tags.begin(),
             e = tags.end(); i != e; ++i) {
-        executeTag(**i, this, getVM());
+        executeTag(**i, this, getVM(*this));
     }
 }
 

@@ -137,7 +137,7 @@ void
 Sound_as::startProbeTimer()
 {
     _probeTimer = 1;
-    getVM().getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
 }
 
 /*private*/
@@ -150,8 +150,7 @@ Sound_as::stopProbeTimer()
 
     if ( _probeTimer )
     {
-        VM& vm = getVM();
-        vm.getRoot().removeAdvanceCallback(this);
+        getRoot(*this).removeAdvanceCallback(this);
         log_debug(" sound callback removed");
         _probeTimer = 0;
     }

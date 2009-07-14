@@ -43,7 +43,7 @@ public:
     {
         log_debug("Setting script limits: recursion %s, timeout %s",
                 _recursionLimit, _timeoutLimit);
-        m->getVM().getRoot().setScriptLimits(_recursionLimit, _timeoutLimit);
+        getRoot(*m).setScriptLimits(_recursionLimit, _timeoutLimit);
     }
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,

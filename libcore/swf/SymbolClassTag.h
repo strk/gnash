@@ -43,7 +43,7 @@ public:
 
 	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
-		VM& vm = m->getVM();
+		VM& vm = getVM(*m);
 		Machine* mach = vm.getMachine();
 		log_debug("SymbolClassTag: Creating class %s.", _rootClass);
 		mach->instantiateClass(_rootClass, vm.getGlobal());

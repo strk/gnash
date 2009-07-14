@@ -304,7 +304,7 @@ video_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&video_ctor, getVideoInterface(global));
-		global.getVM().addStatic(cl.get());
+		getVM(global).addStatic(cl.get());
 	}
 
 	// Register _global.Video

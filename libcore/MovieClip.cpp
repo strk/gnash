@@ -432,7 +432,7 @@ MovieClip::MovieClip(const movie_definition* const def, Movie* r,
 {
     assert(_swf);
 
-    if (!isAS3(getVM())) {
+    if (!isAS3(getVM(*this))) {
         set_prototype(getMovieClipAS2Interface());
         attachMovieClipAS2Properties(*this);
     }
@@ -2591,7 +2591,7 @@ MovieClip::getAsRoot()
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    int topSWFVersion = getVM().getRoot().getRootMovie().version();
+    int topSWFVersion = getRoot(*this).getRootMovie().version();
 
     if (getMovieVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;

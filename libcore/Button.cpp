@@ -378,7 +378,7 @@ Button::on_event(const event_id& id)
     // We only respond to valid key code (should we assert here?)
     if ( id.keyCode() == key::INVALID ) return false;
 
-    ButtonActionPusher xec(getVM().getRoot(), this); 
+    ButtonActionPusher xec(getRoot(*this), this); 
     _def->forEachTrigger(id, xec);
 
     return xec.called;
@@ -591,7 +591,7 @@ Button::mouseEvent(const event_id& event)
     // the action queue on mouse event.
     //
 
-    movie_root& mr = getVM().getRoot();
+    movie_root& mr = getRoot(*this);
 
     ButtonActionPusher xec(mr, this); 
     _def->forEachTrigger(event, xec);
