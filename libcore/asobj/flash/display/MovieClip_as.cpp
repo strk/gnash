@@ -123,7 +123,7 @@ namespace {
 void
 movieclip_class_init(as_object& where)
 {
-    if (isAS3(where.getVM())) {
+    if (isAS3(getVM(where))) {
 
         static boost::intrusive_ptr<as_object> cl =
             new as_object(getMovieClipAS3Interface());
@@ -142,8 +142,7 @@ movieclip_class_init(as_object& where)
     if (!cl) {
         cl = new builtin_function(&movieclip_as2_ctor,
                 getMovieClipAS2Interface());
-
-        where.getVM().addStatic(cl.get());
+        getVM(where).addStatic(cl.get());
     }
 
     where.init_member("MovieClip", cl.get());
@@ -163,7 +162,7 @@ getMovieClipAS3Interface()
 void
 registerMovieClipNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
     // Natives are always here    (at least in swf5 I guess)
     vm.registerNative(movieclip_attachMovie, 900, 0); 
@@ -213,7 +212,7 @@ attachMovieClipAS2Properties(DisplayObject& o)
     // See swfdec/test/trace/movieclip-version-#.swf for why we only
     // initialize this if we don't have a parent
     if (!o.get_parent()) o.init_member("$version",
-            o.getVM().getPlayerVersion(), 0); 
+            getVM(o).getPlayerVersion(), 0); 
 
     as_c_function_ptr gettersetter;
 
@@ -313,7 +312,7 @@ namespace {
 void
 attachMovieClipAS2Interface(as_object& o)
 {
-        VM& vm = o.getVM();
+        VM& vm = getVM(o);
 
         o.init_member("attachMovie", vm.getNative(900, 0)); 
         o.init_member("swapDepths", vm.getNative(900, 1));
@@ -855,7 +854,7 @@ movieclip_swapDepths(const fn_call& fn)
     }
     else
     {
-        movie_root& root = movieclip->getVM().getRoot();
+        movie_root& root = getRoot(fn);
         root.swapLevels(movieclip, target_depth);
         return as_value();
     }
@@ -1067,7 +1066,7 @@ movieclip_loadMovie(const fn_call& fn)
         return as_value();
     }
 
-    movie_root& mr = movieclip->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
     std::string target = movieclip->getTarget();
 
     // TODO: if GET/POST should send variables of *this* movie,
@@ -1262,7 +1261,7 @@ movieclip_createTextField(const fn_call& fn)
             txt_depth, txt_x, txt_y, txt_width, txt_height);
 
     // createTextField returns void, it seems
-    if ( movieclip->getVM().getSWFVersion() > 7 ) return as_value(txt.get());
+    if (getSWFVersion(fn) > 7) return as_value(txt.get());
     else return as_value(); 
 }
 
@@ -1359,7 +1358,7 @@ movieclip_getURL(const fn_call& fn)
         movieclip->getURLEncodedVars(vars);
     }
 
-    movie_root& m = movieclip->getVM().getRoot();
+    movie_root& m = getRoot(fn);
     
     m.getURL(urlstr, target, vars, method);
 
@@ -1373,7 +1372,7 @@ movieclip_getSWFVersion(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(movieclip->getSWFVersion());
+    return as_value(getSWFVersion(*movieclip));
 }
 
 // MovieClip.meth(<string>) : Number
@@ -1823,7 +1822,7 @@ movieclip_lineStyle(const fn_call& fn)
 
     int arguments = fn.nargs;
 
-    const int swfVersion = movieclip->getVM().getSWFVersion();
+    const int swfVersion = getSWFVersion(fn);
     if (swfVersion < 8 && fn.nargs > 3)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2314,8 +2313,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         ngradients = 8;
     }
 
-    VM& vm = movieclip->getVM();
-    string_table& st = vm.getStringTable();
+    string_table& st = getStringTable(fn);
 
     std::vector<gradient_record> gradients;
     gradients.reserve(ngradients);
@@ -2423,7 +2421,7 @@ movieclip_startDrag(const fn_call& fn)
         }
     }
 
-    movieclip->getVM().getRoot().set_drag_state(st);
+    getRoot(fn).set_drag_state(st);
 
     return as_value();
 }
@@ -2435,7 +2433,7 @@ movieclip_stopDrag(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
 
-    movieclip->getVM().getRoot().stop_drag();
+    getRoot(fn).stop_drag();
 
     return as_value();
 }
@@ -2641,7 +2639,7 @@ movieclip_as3_ctor(const fn_call& fn)
 
     // TODO: currently it's necessary to have a top-level movie to initialize
     // a MovieClip.
-    Movie* m = fn.getVM().getRoot().topLevelMovie();
+    Movie* m = getRoot(fn).topLevelMovie();
 
     return new MovieClip(0, m, 0, -1);
 }

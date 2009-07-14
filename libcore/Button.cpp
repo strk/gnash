@@ -25,7 +25,7 @@
 #include "Button.h"
 #include "DefineButtonTag.h"
 #include "as_value.h"
-
+#include "Button.h"
 #include "ActionExec.h"
 #include "MovieClip.h"
 #include "movie_root.h"
@@ -39,6 +39,7 @@
 #include "StringPredicates.h"
 #include "GnashKey.h" // key::code
 #include "SoundInfoRecord.h" // for use
+#include "Global.h" // for use
 
 #include <boost/bind.hpp>
 
@@ -229,7 +230,7 @@ namespace {
         if (!d) return;
         const std::string& name = d->get_name();
         if (name.empty()) return;
-        b.delProperty(b.getVM().getStringTable().find(name));
+        b.delProperty(getStringTable(b).find(name));
     }
 }
 
@@ -324,14 +325,14 @@ Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {
-        _vm.getRoot().add_key_listener(this);
+        getRoot(*this).add_key_listener(this);
     }
 
 }
 
 Button::~Button()
 {
-    _vm.getRoot().remove_key_listener(this);
+    getRoot(*this).remove_key_listener(this);
 }
 
 bool
@@ -339,7 +340,7 @@ Button::trackAsMenu()
 {
     // TODO: check whether the AS or the tag value takes precedence.
     as_value track;
-    string_table& st = _vm.getStringTable();
+    string_table& st = getStringTable(*this);
     if (get_member(st.find("trackAsMenu"), &track)) {
         return track.to_bool();
     }
@@ -522,7 +523,7 @@ Button::mouseEvent(const event_id& event)
         if (!_def->hasSound()) break;
 
         // Check if there is a sound handler
-        sound::sound_handler* s = _vm.getRoot().runResources().soundHandler();
+        sound::sound_handler* s = getRunResources(*this).soundHandler();
         if (!s) break;
 
         int bi; // button sound array index [0..3]
@@ -826,7 +827,7 @@ Button::get_path_element(string_table::key key)
     as_object* ch = getPathElementSeparator(key);
     if ( ch ) return ch;
 
-    const std::string& name = _vm.getStringTable().value(key);
+    const std::string& name = getStringTable(*this).value(key);
     return getChildByName(name); // possibly NULL
 }
 
@@ -846,7 +847,7 @@ Button::getChildByName(const std::string& name)
         DisplayObject* const child = *i;
         const std::string& childname = child->get_name();
  
-        if ( _vm.getSWFVersion() >= 7 )
+        if (getSWFVersion(*this) >= 7 )
         {
             if ( childname == name ) return child;
         }
@@ -1021,15 +1022,15 @@ Button::get_member(string_table::key name_key, as_value* val,
     //             to the SWF4 code but available to the SWF6 one.
     //
     // see MovieClip.as
-    if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
+    if (getMovieVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
         // The "_global" ref was added in SWF6
-        val->set_as_object( _vm.getGlobal() );
+        val->set_as_object(getGlobal(*this));
         return true;
     }
 
-    const std::string& name = _vm.getStringTable().value(name_key);
+    const std::string& name = getStringTable(*this).value(name_key);
 
-    movie_root& mr = _vm.getRoot();
+    movie_root& mr = getRoot(*this);
     unsigned int levelno;
     if ( mr.isLevelTarget(name, levelno) ) {
         Movie* mo = mr.getLevel(levelno).get();
@@ -1092,7 +1093,7 @@ Button::get_member(string_table::key name_key, as_value* val,
 }
 
 int
-Button::getSWFVersion() const
+Button::getMovieVersion() const
 {
     return _def->getSWFVersion();
 }

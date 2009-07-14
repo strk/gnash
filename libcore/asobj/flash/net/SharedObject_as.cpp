@@ -620,7 +620,7 @@ sharedobject_class_init(as_object& global)
 void
 registerSharedObjectNative(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     // ASnative table registration
 	vm.registerNative(sharedobject_connect, 2106, 0);
@@ -654,7 +654,7 @@ void
 attachSharedObjectInterface(as_object& o)
 {
 
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
@@ -674,7 +674,7 @@ attachSharedObjectInterface(as_object& o)
 void
 attachSharedObjectStaticInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int flags = 0;
 
@@ -795,8 +795,7 @@ as_value
 sharedobject_getLocal(const fn_call& fn)
 {
 
-    VM& vm = fn.env().getVM();
-    int swfVersion = vm.getSWFVersion();
+    int swfVersion = getSWFVersion(fn);
 
     as_value objNameVal;
     if (fn.nargs > 0) objNameVal = fn.arg(0);
@@ -821,6 +820,8 @@ sharedobject_getLocal(const fn_call& fn)
     }
 
     log_debug("SO name:%s, root:%s", objName, root);
+
+    VM& vm = getVM(fn);
 
     SharedObject_as* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
 

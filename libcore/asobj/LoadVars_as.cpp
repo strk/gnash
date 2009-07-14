@@ -30,6 +30,7 @@
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "PropertyList.h"
+#include "Global.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -109,7 +110,7 @@ LoadVars_as::toString(std::ostream& o, bool /*post*/) const
 
 	enumerateProperties(vars);
 
-    as_object* global = _vm.getGlobal();
+    as_object* global = getGlobal(*this);
     assert(global);
 
     // LoadVars.toString() calls _global.escape().
@@ -161,7 +162,7 @@ namespace {
 void
 attachLoadVarsInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
 	o.init_member("addRequestHeader", new builtin_function(
 	            LoadableObject::loadableobject_addRequestHeader));
@@ -206,7 +207,7 @@ loadvars_onData(const fn_call& fn)
 		thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
     }
     else {
-		VM& vm = fn.getVM();
+		VM& vm = getVM(fn);
 		string_table& st = vm.getStringTable();
 		string_table::key decodeKey = st.find("decode"); 
 

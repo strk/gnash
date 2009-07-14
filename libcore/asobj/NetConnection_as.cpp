@@ -300,7 +300,7 @@ HTTPRemotingHandler::advance()
     if(_connection)
     {
 
-        VM& vm = _nc.getVM();
+        VM& vm = getVM(_nc);
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("have connection");
@@ -433,7 +433,7 @@ HTTPRemotingHandler::advance()
 
                         { // method call for each header
                           // FIXME: it seems to me that the call should happen
-                            VM& vm = _nc.getVM();
+                            VM& vm = getVM(_nc);
                             string_table& st = vm.getStringTable();
                             string_table::key key = st.find(headerName);
 #ifdef GNASH_DEBUG_REMOTING
@@ -533,7 +533,7 @@ HTTPRemotingHandler::advance()
                                 } else {
                                     // NOTE: the pp is known to actually invoke the custom
                                     //       method, but with 7 undefined arguments (?)
-                                    //methodKey = _nc.getVM().getStringTable().find(methodName);
+                                    //methodKey = getStringTable(_nc).find(methodName);
                                     log_error("Unsupported HTTP Remoting response callback: '%s' (size %d)", methodName, methodName.size());
                                     continue;
                                 }
@@ -583,7 +583,7 @@ HTTPRemotingHandler::advance()
         // TODO: it might be useful for a Remoting Handler to have a 
         // StreamProvider member
         const StreamProvider& sp =
-            _nc.getVM().getRoot().runResources().streamProvider();
+            getRunResources(_nc).streamProvider();
 
         _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
 
@@ -634,7 +634,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
     buf->appendNetworkLong(args.size()-firstArg);
 
-    VM& vm = _nc.getVM();
+    VM& vm = getVM(_nc);
 
     for (unsigned int i = firstArg; i < args.size(); ++i)
     {
@@ -734,8 +734,7 @@ std::string
 NetConnection_as::validateURL() const
 {
 
-    const movie_root& mr = _vm.getRoot();
-    URL uri(_uri, mr.runResources().baseURL());
+    URL uri(_uri, getRunResources(*this).baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -840,8 +839,7 @@ NetConnection_as::connect(const std::string& uri)
         return;
     }
 
-    const movie_root& mr = _vm.getRoot();
-    URL url(uri, mr.runResources().baseURL());
+    URL url(uri, getRunResources(*this).baseURL());
 
     if ( url.protocol() == "rtmp" )
     {
@@ -943,7 +941,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
-    const RunResources& ri = _vm.getRoot().runResources();
+    const RunResources& ri = getRunResources(*this);
 
     const StreamProvider& streamProvider = ri.streamProvider();
 
@@ -963,14 +961,14 @@ NetConnection_as::getStream(const std::string& name)
 void
 NetConnection_as::startAdvanceTimer() 
 {
-    getVM().getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
     log_debug("startAdvanceTimer: registered NetConnection timer");
 }
 
 void
 NetConnection_as::stopAdvanceTimer() 
 {
-    getVM().getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
     log_debug("stopAdvanceTimer: deregistered NetConnection timer");
 }
 
@@ -1194,14 +1192,14 @@ netconnection_connect(const fn_call& fn)
 
     const as_value& uri = fn.arg(0);
 
-    const VM& vm = ptr->getVM();
+    const VM& vm = getVM(fn);
     const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
     
     // This is always set without validification.
     ptr->setURI(uriStr);
 
     // Check first arg for validity 
-    if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined())) {
+    if (uri.is_null() || (getSWFVersion(fn) > 6 && uri.is_undefined())) {
         ptr->connect();
     }
     else {

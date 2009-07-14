@@ -46,7 +46,7 @@ public:
 void
 bitmapfilter_class_init(as_object& global)
 {
-    string_table& st = global.getVM().getStringTable();
+    string_table& st = getStringTable(global);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
@@ -82,7 +82,7 @@ getBitmapFilterConstructor(const fn_call& fn)
     if (!cl) {
         cl = new builtin_function(&bitmapfilter_ctor,
                 getBitmapFilterInterface());
-        fn.getVM().addStatic(cl);
+        getVM(fn).addStatic(cl);
     }
     return cl;
 }

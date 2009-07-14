@@ -66,7 +66,7 @@ selection_class_init(as_object& global)
 void
 registerSelectionNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
     vm.registerNative(selection_getBeginIndex, 600, 0);
     vm.registerNative(selection_getEndIndex, 600, 1);
@@ -82,7 +82,7 @@ void
 attachSelectionInterface(as_object& o)
 {
 
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
@@ -117,7 +117,7 @@ selection_getBeginIndex(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
@@ -139,7 +139,7 @@ selection_getCaretIndex(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
@@ -155,7 +155,7 @@ selection_getEndIndex(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
@@ -172,7 +172,7 @@ selection_getFocus(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
 
     boost::intrusive_ptr<DisplayObject> ch = mr.getFocus();
     if (!ch.get()) {
@@ -218,7 +218,7 @@ selection_setFocus(const fn_call& fn)
         return as_value(false);
     }
 
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
 
     const as_value& focus = fn.arg(0);
 
@@ -254,7 +254,7 @@ selection_setSelection(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);

@@ -54,7 +54,7 @@ LoadableObject::LoadableObject()
 LoadableObject::~LoadableObject()
 {
     deleteAllChecked(_loadThreads);
-    _vm.getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
 }
 
 
@@ -62,7 +62,7 @@ void
 LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
-    movie_root& m = _vm.getRoot();
+    movie_root& m = getRoot(*this);
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
@@ -88,7 +88,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = _vm.getRoot().runResources();
+    const RunResources& ri = getRunResources(*this);
 	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
@@ -176,7 +176,7 @@ LoadableObject::load(const std::string& urlstr)
     // when loading is complete.
 	set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = _vm.getRoot().runResources();
+    const RunResources& ri = getRunResources(*this);
 	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
@@ -257,7 +257,7 @@ LoadableObject::advanceState()
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
-            string_table& st = _vm.getStringTable();
+            string_table& st = getStringTable(*this);
             set_member(st.find("_bytesLoaded"), _bytesLoaded);
             set_member(st.find("_bytesTotal"), _bytesTotal);
             
@@ -270,7 +270,7 @@ LoadableObject::advanceState()
             _bytesTotal = lt->getBytesTotal();
             _bytesLoaded = lt->getBytesLoaded();
             
-            string_table& st = _vm.getStringTable();
+            string_table& st = getStringTable(*this);
             set_member(st.find("_bytesLoaded"), _bytesLoaded);
             // TODO: should this really be set on each iteration?
             set_member(st.find("_bytesTotal"), _bytesTotal);
@@ -280,7 +280,7 @@ LoadableObject::advanceState()
 
     if (_loadThreads.empty()) 
     {
-        _vm.getRoot().removeAdvanceCallback(this);
+        getRoot(*this).removeAdvanceCallback(this);
     }
 
 }
@@ -288,7 +288,7 @@ LoadableObject::advanceState()
 void
 LoadableObject::registerNative(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = gnash::getVM(o);
 
     vm.registerNative(loadableobject_load, 301, 0);
     vm.registerNative(loadableobject_send, 301, 1);
@@ -304,7 +304,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesLoaded;
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     ptr->get_member(st.find("_bytesLoaded"), &bytesLoaded);
     return bytesLoaded;
 }
@@ -315,7 +315,7 @@ LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesTotal;
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     ptr->get_member(st.find("_bytesTotal"), &bytesTotal);
     return bytesTotal;
 }
@@ -449,11 +449,11 @@ loadableobject_decode(const fn_call& fn)
 
 	ValuesMap vals;
 
-    const int version = fn.getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
 	URL::parse_querystring(fn.arg(0).to_string_versioned(version), vals);
 
-	string_table& st = ptr->getVM().getStringTable();
+	string_table& st = getStringTable(fn);
 	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
 			it != itEnd; ++it)
 	{
@@ -544,7 +544,7 @@ loadableobject_load(const fn_call& fn)
 
 	obj->load(urlstr);
     
-    string_table& st = obj->getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     obj->set_member(st.find("_bytesLoaded"), 0.0);
     obj->set_member(st.find("_bytesTotal"), as_value());
 

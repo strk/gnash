@@ -71,7 +71,7 @@ system_class_init(as_object& global)
 void
 registerSystemNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
     
     vm.registerNative(system_security_allowdomain, 12, 0);
     vm.registerNative(system_showsettings, 2107, 0);
@@ -92,7 +92,7 @@ namespace {
 as_object*
 getSystemSecurityInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
@@ -122,7 +122,7 @@ getSystemCapabilitiesInterface(as_object& o)
     // "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME",
     // "Windows 95", "Windows CE", "Linux", "MacOS"
     // Override in gnashrc
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
     
     const std::string os = vm.getOSName();
 
@@ -304,7 +304,7 @@ convertValue(const std::string& in, T& val)
 void
 attachSystemInterface(as_object& proto)
 {
-	VM& vm = proto.getVM();
+	VM& vm = getVM(proto);
 
 	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
@@ -450,7 +450,7 @@ systemLanguage(as_object& proto)
 	// some scripts rely on there being only 20 possible languages. It could
 	// be a run time option if it's important enough to care.
 
-	static std::string lang = proto.getVM().getSystemLanguage();
+	static std::string lang = getVM(proto).getSystemLanguage();
 	
 	const char* languages[] = {"en", "fr", "ko", "ja", "sv",
 				"de", "es", "it", "zh", "pt",

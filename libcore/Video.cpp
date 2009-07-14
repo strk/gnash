@@ -255,7 +255,7 @@ Video::stagePlacementCallback(as_object* initObj)
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live DisplayObject
-    _vm.getRoot().addLiveChar(this);
+    getRoot(*this).addLiveChar(this);
 }
 
 
@@ -341,7 +341,7 @@ getVideoInterface(as_object& where)
 	if ( proto == NULL )
 	{
 		proto = new as_object(getObjectInterface());
-		where.getVM().addStatic(proto.get());
+		getVM(where).addStatic(proto.get());
 
 		attachVideoInterface(*proto);
 		//proto->init_member("constructor", new builtin_function(video_ctor));

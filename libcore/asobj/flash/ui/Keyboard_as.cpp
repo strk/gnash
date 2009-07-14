@@ -44,7 +44,7 @@ Keyboard_as::Keyboard_as()
     _lastKeyEvent(0)
 {
     // Key is a broadcaster only in SWF6 and up (correct?)
-    int swfversion = _vm.getSWFVersion();
+    int swfversion = getSWFVersion(*this);
     if ( swfversion > 5 )
     {
         AsBroadcaster::initialize(*this);
@@ -257,7 +257,7 @@ void Keyboard_as::init(as_object& global)
 
     // methods
 
-    VM& vm = global.getVM();
+    VM& vm = gnash::getVM(global);
 
     vm.registerNative(key_get_ascii, 800, 0);
     key_obj->init_member("getAscii", vm.getNative(800, 0), flags);

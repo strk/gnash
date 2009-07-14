@@ -1330,7 +1330,7 @@ Machine::execute()
                     if (!b) throw ASReferenceError();
                     
                     as_function *f = // b->isGetterSetter() ? b->getGetter() :
-                        b->getValue(super).to_as_function();
+                        b->getValue(*super).to_as_function();
 
                     if (opcode == SWF::ABC_ACTION_CALLSUPER) {
                         pushCall(f, super, _stack.top(argc), argc, 0);

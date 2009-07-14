@@ -227,7 +227,7 @@ Date_as::init(as_object& global)
 void
 Date_as::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = gnash::getVM(global);
 
     vm.registerNative(date_getFullYear, 103, 0); 
     vm.registerNative(date_getYear, 103, 1);
@@ -336,7 +336,7 @@ void truncateDouble(T& target, double value)
 void
 attachDateInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     o.init_member("getFullYear", vm.getNative(103, 0));
     o.init_member("getYear", vm.getNative(103, 1));
@@ -382,7 +382,7 @@ attachDateInterface(as_object& o)
 void
 attachDateStaticInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
     o.init_member("UTC", vm.getNative(103, 257));
 }
 

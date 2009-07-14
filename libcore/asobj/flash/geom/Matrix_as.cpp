@@ -663,7 +663,7 @@ Matrix_toString(const fn_call& fn)
     
     std::ostringstream ss;
     
-    const int version = fn.getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     ss << "(a=" << a.to_string_versioned(version) << ", "
           "b="<< b.to_string_versioned(version) << ", "
@@ -915,7 +915,7 @@ void matrix_class_init(as_object& where)
 {
     // This is going to be the Matrix "class"/"function"
     // in the 'where' package
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

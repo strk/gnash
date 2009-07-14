@@ -70,7 +70,7 @@ main(int /*argc*/, char** /*argv*/)
 
     root.setRootMovie( md5->createMovie() );
 
-    VM& vm = root.getVM();
+    VM& vm = getVM(root);
 
 	log_debug("VM version %d", vm.getSWFVersion());
 

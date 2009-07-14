@@ -84,7 +84,7 @@ contextmenuitem_copy(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value caption, separatorBefore, visible, enabled, onSelect;
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
 
     ptr->get_member(st.find("caption"), &caption);
     ptr->get_member(st.find("separatorBefore"), &separatorBefore);
@@ -108,7 +108,7 @@ contextmenuitem_ctor(const fn_call& fn)
 {
     as_object* obj = new as_object(getContextMenuItemInterface());
 
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
 
     obj->set_member(st.find("caption"), fn.nargs ? fn.arg(0) : as_value());
     obj->set_member(NSV::PROP_ON_SELECT, fn.nargs > 1 ? fn.arg(1) : as_value());

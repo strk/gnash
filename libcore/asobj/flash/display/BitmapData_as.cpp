@@ -241,7 +241,7 @@ getFlashDisplayBitmapDataConstructor()
 void bitmapdata_class_init(as_object& where)
 {
 
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

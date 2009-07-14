@@ -105,7 +105,7 @@ error_toString(const fn_call& fn)
 {
  	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
 
-    string_table& st = ptr->getVM().getStringTable();
+    string_table& st = getStringTable(*ptr);
     as_value message;
     ptr->get_member(st.find("message"), &message);
 
@@ -121,7 +121,7 @@ error_ctor(const fn_call& fn)
 
 	boost::intrusive_ptr<Error_as> err = new Error_as;
 	
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     if (fn.nargs > 0)
 	{
 		err->set_member(st.find("message"), fn.arg(0));

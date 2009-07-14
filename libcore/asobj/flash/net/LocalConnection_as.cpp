@@ -163,7 +163,7 @@ std::string
 LocalConnection_as::getDomain()
 {
     
-    URL url(_vm.getRoot().getOriginalURL());
+    URL url(getRoot(*this).getOriginalURL());
 
     if (url.hostname().empty()) {
         return "localhost";
@@ -172,7 +172,7 @@ LocalConnection_as::getDomain()
     // Adjust the name based on the swf version. Prior to v7, the nodename part
     // was removed. For v7 or later. the full hostname is returned. The
     // localhost is always just the localhost.
-    if (_vm.getSWFVersion() > 6) {
+    if (getSWFVersion(*this) > 6) {
         return url.hostname();
     }
 

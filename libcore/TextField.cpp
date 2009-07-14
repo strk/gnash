@@ -153,7 +153,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = parent->getVM().getSWFVersion();
+    int version = getSWFVersion(*parent);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -215,7 +215,7 @@ void
 TextField::init()
 {
 
-    as_object* proto = getTextFieldInterface(_vm);
+    as_object* proto = getTextFieldInterface(gnash::getVM(*this));
  
     // This is an instantiation, so attach properties to the
     // prototype.
@@ -369,7 +369,7 @@ void
 TextField::replaceSelection(const std::string& replace)
 {
 
-    const int version = _vm.getSWFVersion();
+    const int version = getSWFVersion(*this);
     const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
     
     const size_t start = _selection.first;
@@ -520,7 +520,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -551,7 +551,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = _vm.getSWFVersion();
+            int version = getSWFVersion(*this);
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -578,7 +578,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -1363,7 +1363,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     }
 
     ret.first = target;
-    ret.second = _vm.getStringTable().find(parsedName);
+    ret.second = getStringTable(*this).find(parsedName);
 
     return ret;
 }
@@ -1412,13 +1412,13 @@ TextField::registerTextVariable()
     // in that case update text value
     as_value val;
     
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
     
     if (target->get_member(key, &val) )
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target object (%s @ %p) does have a member named %s"),
-            typeName(*target), (void*)target, _vm.getStringTable().value(key));
+            typeName(*target), (void*)target, getStringTable(*this).value(key));
 #endif
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
@@ -1431,7 +1431,7 @@ TextField::registerTextVariable()
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s (no problem, we'll add it with value %s)"),
                     typeName(*target), (void*)target,
-                    _vm.getStringTable().value(key), newVal);
+                    getStringTable(*this).value(key), newVal);
 #endif
         target->set_member(key, newVal);
     }
@@ -1441,7 +1441,7 @@ TextField::registerTextVariable()
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s, and we don't have text defined"),
                     typeName(*target), (void*)target,
-                    _vm.getStringTable().value(key));
+                    getStringTable(*this).value(key));
 #endif
     }
 
@@ -1453,9 +1453,9 @@ TextField::registerTextVariable()
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
-                _vm.getStringTable().value(key), sprite->getTarget());
+                getStringTable(*this).value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
+        sprite->set_textfield_variable(getStringTable(*this).value(key), this);
 
     }
     _text_variable_registered=true;
@@ -1535,7 +1535,7 @@ textfield_class_init(as_object& global)
 
     if (!cl)
     {
-        VM& vm = global.getVM();
+        VM& vm = getVM(global);
 
         if (vm.getSWFVersion() < 6) {
             /// Version 5 or less: no initial prototype
@@ -1884,7 +1884,7 @@ TextField::handleFocus()
 
     // why should we add to the key listener list every time
     // we call setFocus()???
-    _vm.getRoot().add_key_listener(this);
+    getRoot(*this).add_key_listener(this);
 
     m_cursor = _text.size();
     format_text();
@@ -1901,7 +1901,7 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    movie_root& root = _vm.getRoot();
+    movie_root& root = getRoot(*this);
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
@@ -2581,7 +2581,7 @@ textfield_text(const fn_call& fn)
     }
 
     // Setter
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(*ptr);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -2599,7 +2599,7 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(*ptr);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -2631,7 +2631,7 @@ textfield_replaceSel(const fn_call& fn)
     const std::string& replace = fn.arg(0).to_string();
 
     /// Do nothing if text is empty and version less than 8.
-    const int version = text->getVM().getSWFVersion();
+    const int version = getSWFVersion(*text);
     if (version < 8 && replace.empty()) return as_value();
 
     text->replaceSelection(replace);
@@ -2701,7 +2701,7 @@ as_value
 textfield_ctor(const fn_call& fn)
 {
 
-    VM& vm = fn.getVM();
+    VM& vm = getVM(fn);
 
     as_object* proto = getTextFieldInterface(vm);
 

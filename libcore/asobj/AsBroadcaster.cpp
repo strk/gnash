@@ -79,7 +79,7 @@ public:
 		_fn(fn)
 	{
 		_eventName = fn.arg(0).to_string();
-		_eventKey = fn.getVM().getStringTable().find(_eventName);
+		_eventKey = getStringTable(fn).find(_eventName);
 		_fn.drop_bottom();
 	}
 
@@ -182,7 +182,7 @@ AsBroadcaster::getAsBroadcaster()
 void
 AsBroadcaster::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
     vm.registerNative(asbroadcaster_broadcastMessage, 101, 12);
 }
 
@@ -348,7 +348,7 @@ asbroadcaster_removeListener(const fn_call& fn)
 		unsigned int length = 
             listenersObj->getMember(NSV::PROP_LENGTH).to_int();
 
-        string_table& st = obj->getVM().getStringTable();
+        string_table& st = getStringTable(fn);
 
 		for (unsigned int i=0; i<length; ++i)
 		{

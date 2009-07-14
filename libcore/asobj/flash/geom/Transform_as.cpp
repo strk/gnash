@@ -421,7 +421,7 @@ void transform_class_init(as_object& where)
 	attachTransformStaticProperties(*cl);
 
 	// Register _global.Transform
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

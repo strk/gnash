@@ -67,7 +67,7 @@ void object_class_init(as_object& global)
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl=NULL;
 
-	VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
 	if ( cl == NULL )
 	{
@@ -107,7 +107,7 @@ namespace {
 void
 attachObjectInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
 	// We register natives despite swf version,
 
@@ -360,7 +360,9 @@ object_hasOwnProperty(const fn_call& fn)
 		return as_value(false);
 	}
 	//log_debug("%p.hasOwnProperty", fn.this_ptr);
-	return as_value(fn.this_ptr->hasOwnProperty(obj->getVM().getStringTable().find(propname)));
+    const bool found =
+        fn.this_ptr->hasOwnProperty(getStringTable(fn).find(propname));
+    return as_value(found);
 }
 
 as_value
@@ -386,7 +388,8 @@ object_isPropertyEnumerable(const fn_call& fn)
 		return as_value();
 	}
 
-	Property* prop = fn.this_ptr->getOwnProperty(obj->getVM().getStringTable().find(propname));
+	Property* prop =
+        fn.this_ptr->getOwnProperty(getStringTable(fn).find(propname));
 	if ( ! prop )
 	{
 		return as_value(false);
@@ -448,8 +451,7 @@ object_watch(const fn_call& fn)
 		return as_value(false);
 	}
 
-	VM& vm = obj->getVM();
-	string_table& st = vm.getStringTable();
+	string_table& st = getStringTable(fn);
 
 	std::string propname = propval.to_string();
 	string_table::key propkey = st.find(propname);
@@ -476,8 +478,7 @@ object_unwatch(const fn_call& fn)
 
 	const as_value& propval = fn.arg(0);
 
-	VM& vm = obj->getVM();
-	string_table& st = vm.getStringTable();
+	string_table& st = getStringTable(fn);
 
 	std::string propname = propval.to_string();
 	string_table::key propkey = st.find(propname);

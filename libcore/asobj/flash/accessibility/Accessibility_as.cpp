@@ -73,7 +73,7 @@ attachAccessibilityInterface(as_object& o)
     const int flags = as_prop_flags::dontDelete
                 | as_prop_flags::readOnly;
 
-    const VM& vm = o.getVM();
+    const VM& vm = getVM(o);
     // For swf v9 or greater, the isActive() method has been changed to a
     // the property "active".
     if ( vm.getSWFVersion() >= 9 ) {

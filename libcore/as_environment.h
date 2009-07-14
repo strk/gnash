@@ -670,6 +670,15 @@ private:
         
 };
 
+inline VM&
+getVM(const as_environment& env)
+{
+    return env.getVM();
+}
+
+movie_root& getRoot(const as_environment& env);
+string_table& getStringTable(const as_environment& env);
+int getSWFVersion(const as_environment& env);
 
 } // end namespace gnash
 

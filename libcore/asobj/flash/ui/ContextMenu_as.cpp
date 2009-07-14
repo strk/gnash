@@ -68,7 +68,7 @@ void
 setBuiltInItems(as_object& o, bool setting)
 {
     const int flags = 0;
-    string_table& st = o.getVM().getStringTable();
+    string_table& st = getStringTable(o);
     o.set_member(st.find("print"), setting, flags);
     o.set_member(st.find("forward_back"), setting, flags);
     o.set_member(st.find("rewind"), setting, flags);
@@ -108,7 +108,7 @@ as_value
 contextmenu_hideBuiltInItems(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     as_object* builtIns = new as_object;
     setBuiltInItems(*builtIns, false);
     ptr->set_member(st.find("builtInItems"), builtIns);
@@ -121,7 +121,7 @@ contextmenu_copy(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     as_object* o = new as_object(getContextMenuInterface());
     
-    string_table& st = ptr->getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     as_value onSelect, builtInItems;
     as_value customItems = new Array_as;;
 
@@ -160,7 +160,7 @@ contextmenu_ctor(const fn_call& fn)
     const as_value& callback = fn.nargs ? fn.arg(0) : as_value();
     obj->set_member(NSV::PROP_ON_SELECT, callback);
     
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     as_object* builtInItems = new as_object;
     setBuiltInItems(*builtInItems, true);
     obj->set_member(st.find("builtInItems"), builtInItems);

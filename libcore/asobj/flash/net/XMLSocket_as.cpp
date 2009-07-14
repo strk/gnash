@@ -304,7 +304,7 @@ XMLSocket_as::advanceState()
             // This means advanceState() will not be called again until
             // XMLSocket.connect() is invoked.
             callMethod(NSV::PROP_ON_CONNECT, false);
-            _vm.getRoot().removeAdvanceCallback(this);
+            getRoot(*this).removeAdvanceCallback(this);
             return;    
         }
 
@@ -329,7 +329,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
     _connection.connect(host, port);
     
     // Start callbacks on advance.
-    _vm.getRoot().addAdvanceCallback(this);
+    getRoot(*this).addAdvanceCallback(this);
     
     return true;
 }
@@ -337,7 +337,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 void
 XMLSocket_as::close()
 {
-    _vm.getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
     _connection.close();
     _ready = false;
 }
@@ -373,7 +373,7 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    as_environment env(_vm); 
+    as_environment env(gnash::getVM(*this)); 
 
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {

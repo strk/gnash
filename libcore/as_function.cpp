@@ -98,7 +98,7 @@ as_function::extends(as_function& superclass)
 	as_object* newproto = new as_object(superclass.getPrototype().get());
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
-    if (_vm.getSWFVersion() > 5) {
+    if (getSWFVersion(superclass) > 5) {
         const int flags = as_prop_flags::dontEnum;
         newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
     }
@@ -140,7 +140,7 @@ as_function::constructInstance(const as_environment& env,
 	assert(get_ref_count() > 0);
 #endif // GNASH_USE_GC
 
-	int swfversion = env.getVM().getSWFVersion();
+	int swfversion = getSWFVersion(env);
 
 	boost::intrusive_ptr<as_object> newobj;
 

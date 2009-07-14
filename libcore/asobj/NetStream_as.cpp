@@ -94,9 +94,10 @@ NetStream_as::NetStream_as()
     _audioInfoKnown(false),
 
     // TODO: figure out if we should take another path to get to the clock
-    _playbackClock(new InterruptableVirtualClock(getVM().getClock())),
+    _playbackClock(
+            new InterruptableVirtualClock(gnash::getVM(*this).getClock())),
     _playHead(_playbackClock.get()), 
-    _soundHandler(_vm.getRoot().runResources().soundHandler()),
+    _soundHandler(getRunResources(*this).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _audioStreamer(_soundHandler),
     _statusCode(invalidStatus)
@@ -444,7 +445,7 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
         log_error("NetStream: Could not create Video decoder: %s", e.what());
 
         // This is important enough to let the user know.
-        movie_root& m = _vm.getRoot();
+        movie_root& m = getRoot(*this);
         m.errorInterface(e.what());
     }
 
@@ -472,7 +473,7 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
         log_error("Could not create Audio decoder: %s", e.what());
 
         // This is important enough to let the user know.
-        movie_root& m = _vm.getRoot();
+        movie_root& m = getRoot(*this);
         m.errorInterface(e.what());
     }
 

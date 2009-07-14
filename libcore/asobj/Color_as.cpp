@@ -126,7 +126,7 @@ private:
 
 void registerColorNative(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
 	vm.registerNative(color_setrgb, 700, 0);
 	vm.registerNative(color_settransform, 700, 1);
@@ -156,7 +156,7 @@ namespace {
 void
 attachColorInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+	VM& vm = getVM(o);
 
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
@@ -322,7 +322,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	string_table& st = obj->getVM().getStringTable();
+	string_table& st = getStringTable(*obj);
 
 	cxform newTrans = obj->getTransform();
 

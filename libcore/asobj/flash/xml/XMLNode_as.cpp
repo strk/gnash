@@ -245,7 +245,7 @@ void
 XMLNode_as::setAttribute(const std::string& name, const std::string& value)
 {
     if (_attributes) {
-        string_table& st = _vm.getStringTable();
+        string_table& st = getStringTable(*this);
         _attributes->set_member(st.find(name), value);
     }
 }
@@ -376,7 +376,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     // Node as_value first, then children
     if (type == Text)
     {
-        as_object* global = xml.getVM().getGlobal();
+        as_object* global = gnash::getVM(xml).getGlobal();
         assert(global);
 
         // Insert entities.
@@ -422,7 +422,7 @@ XMLNode_as::markReachableResources() const
 void
 XMLNode_as::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = gnash::getVM(global);
     vm.registerNative(xmlnode_cloneNode, 253, 1);
     vm.registerNative(xmlnode_removeNode, 253, 2);
     vm.registerNative(xmlnode_insertBefore, 253, 3);
@@ -464,7 +464,7 @@ attachXMLNodeInterface(as_object& o)
 {
     // These need to be full-featured AS functions (builtin_function)
     
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int noFlags = 0;
     

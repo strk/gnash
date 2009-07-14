@@ -381,7 +381,7 @@ Point_toString(const fn_call& fn)
 	ptr->get_member(NSV::PROP_X, &x);
 	ptr->get_member(NSV::PROP_Y, &y);
 
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(fn);
 
 	std::stringstream ss;
 	ss << "(x=" << x.to_string_versioned(version)
@@ -682,7 +682,7 @@ boost::intrusive_ptr<as_object> init_Point_instance()
 void point_class_init(as_object& where)
 {
 	// Register _global.Point
-	string_table& st = where.getVM().getStringTable();
+	string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

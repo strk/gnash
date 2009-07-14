@@ -1075,13 +1075,6 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 }
 
-as_object::as_object(movie_root& mr)
-	:
-	_vm(mr.getVM()),
-	_members(_vm)
-{
-}
-
 
 as_object::as_object()
 	:
@@ -1444,6 +1437,44 @@ as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
     _members.visitNonHiddenValues(visitor, *this);
 }
 
+/// Get the VM from an as_object
+VM&
+getVM(const as_object& o)
+{
+    return o.getVM();
+}
+
+/// Get the movie_root from an as_object
+movie_root&
+getRoot(const as_object& o)
+{
+    return o.getVM().getRoot();
+}
+
+/// Get the string_table from an as_object
+string_table&
+getStringTable(const as_object& o)
+{
+    return o.getVM().getStringTable();
+}
+
+const RunResources&
+getRunResources(const as_object& o)
+{
+    return o.getVM().getRoot().runResources();
+}
+
+int
+getSWFVersion(const as_object& o)
+{
+    return o.getVM().getSWFVersion();
+}
+
+as_object* getGlobal(const as_object& o)
+{
+    // TODO: should be as_object's _global member!
+    return o.getVM().getGlobal();
+}
 
 
 } // end of gnash namespace

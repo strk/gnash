@@ -608,7 +608,7 @@ bool
 XMLDocument_as::ignoreWhite() const
 {
 
-    string_table::key propnamekey = _vm.getStringTable().find("ignoreWhite");
+    string_table::key propnamekey = getStringTable(*this).find("ignoreWhite");
     as_value val;
     if (!const_cast<XMLDocument_as*>(this)->get_member(propnamekey, &val)) {
         return false;
@@ -636,7 +636,7 @@ XMLDocument_as::init(as_object& global)
 void
 XMLDocument_as::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = gnash::getVM(global);
     vm.registerNative(xml_escape, 100, 5);
     vm.registerNative(xml_createElement, 253, 8);
     vm.registerNative(xml_createTextNode, 253, 9);
@@ -657,7 +657,7 @@ void
 attachXMLInterface(as_object& o)
 {
 
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     const int flags = 0;
 

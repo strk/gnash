@@ -218,6 +218,30 @@ isAS3(const fn_call& fn)
     return fn.getVM().getAVMVersion() == VM::AVM2;
 }
 
+inline string_table&
+getStringTable(const fn_call& fn)
+{
+    return fn.getVM().getStringTable();
+}
+
+inline movie_root&
+getRoot(const fn_call& fn)
+{
+    return fn.getVM().getRoot();
+}
+
+inline int
+getSWFVersion(const fn_call& fn)
+{
+    return fn.getVM().getSWFVersion();
+}
+
+inline VM&
+getVM(const fn_call& fn)
+{
+    return fn.getVM();
+}
+
 } // namespace gnash
 
 

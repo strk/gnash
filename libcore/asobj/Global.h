@@ -57,7 +57,14 @@ namespace gnash {
 
 namespace gnash {
 
-class AVM1Global : public as_object
+class Global : public as_object
+{
+    virtual Global* global() {
+        return this;
+    }
+};
+
+class AVM1Global : public Global
 {
 public:
 
@@ -85,7 +92,7 @@ private:
 
 };
 
-class AVM2Global : public as_object
+class AVM2Global : public Global
 {
 public:
 

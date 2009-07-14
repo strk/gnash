@@ -151,7 +151,7 @@ namespace {
 
 AVM2Global::AVM2Global(Machine& machine)
     :
-    as_object(),
+    Global(),
     _classes(this, 0)
 {
     
@@ -187,7 +187,7 @@ AVM1Global::markReachableResources() const
 
 AVM1Global::AVM1Global(VM& vm)
     :
-    as_object(),
+    Global(),
     _classes(this, &_et)
 {
 
@@ -827,7 +827,7 @@ global_asnative(const fn_call& fn)
     const unsigned int x = static_cast<unsigned int>(sx);
     const unsigned int y = static_cast<unsigned int>(sy);
 
-    VM& vm = fn.getVM();
+    VM& vm = getVM(fn);
     as_function* fun = vm.getNative(x, y);
     if ( ! fun ) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
@@ -951,7 +951,7 @@ global_setInterval(const fn_call& fn)
 	}
     
     
-	movie_root& root = fn.env().getVM().getRoot();
+	movie_root& root = getRoot(fn);
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
 }
@@ -1021,7 +1021,7 @@ global_setTimeout(const fn_call& fn)
 	}
     
     
-	movie_root& root = fn.env().getVM().getRoot();
+	movie_root& root = getRoot(fn);
 
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
@@ -1039,7 +1039,7 @@ global_clearInterval(const fn_call& fn)
 
 	int id = int(fn.arg(0).to_number());
 
-	movie_root& root = fn.env().getVM().getRoot();
+	movie_root& root = getRoot(fn);
 	bool ret = root.clear_interval_timer(id);
 	return as_value(ret);
 }
@@ -1049,7 +1049,7 @@ void
 registerNatives(as_object& global)
 {
     
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
 
     // ASNew was dropped as a builtin function but exists
     // as ASnative.

@@ -50,7 +50,7 @@ xmlnodetype_class_init(as_object& global)
 namespace {
 
 void
-attachXMLNodeTypeStaticInterface(as_object& o)
+attachXMLNodeTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

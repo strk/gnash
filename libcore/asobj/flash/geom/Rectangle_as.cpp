@@ -662,7 +662,7 @@ boost::intrusive_ptr<as_object> init_Rectangle_instance()
 void rectangle_class_init(as_object& where)
 {
 	// Register _global.Rectangle
-	string_table& st = where.getVM().getStringTable();
+	string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

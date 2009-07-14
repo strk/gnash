@@ -173,7 +173,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester->releaseKey(key::SHIFT);
 
 	// Consistency checking
-	string_table& st = root->getVM().getStringTable();
+	string_table& st = getStringTable(root);
 	as_value eot;
 	// It's an swf6, so lowercase 'END_OF_TEST'
 	bool endOfTestFound = root->get_member(st.find("end_of_test"), &eot);

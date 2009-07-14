@@ -152,7 +152,7 @@ bool
 MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
 {
     
-    movie_root& mr = _vm.getRoot();
+    movie_root& mr = getRoot(*this);
 
 	URL url(url_str, mr.runResources().baseURL());
 	
@@ -213,7 +213,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
             new DelayedFunctionCall(this, NSV::PROP_BROADCAST_MESSAGE, 
                 "onLoadInit", targetVal));
 
-	_vm.getRoot().pushAction(code, movie_root::apDOACTION);
+	getRoot(*this).pushAction(code, movie_root::apDOACTION);
 
 	return true;
 }
@@ -386,7 +386,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();
 
-	string_table& st = ptr->getVM().getStringTable();
+	string_table& st = getStringTable(fn);
 
 	// We want these to be enumerable
 	mcl_obj->set_member(st.find("bytesLoaded"), bytesLoaded);

@@ -98,7 +98,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns,
 asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
         asMethod* method, bool /*isstatic*/)
 {
-	as_value val = as_value(new abc_function(method,_prototype->getVM().getMachine()));
+	as_value val = new abc_function(method, getVM(*_prototype).getMachine());
 	_prototype->init_member(name, val);
 //	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
 //		| as_prop_flags::dontEnum;

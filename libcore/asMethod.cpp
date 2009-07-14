@@ -179,7 +179,7 @@ asMethod::addMethod(string_table::key /*name*/, asNamespace* /*ns*/, asMethod*
 {
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	as_value val(method->getPrototype());
-// 	as value val = new as_value(abc_function(asMethod->getBody,_prototype->getVM().getMachine()));
+// 	as value val = new as_value(abc_function(asMethod->getBody,getVM(_prototype).getMachine()));
 // 	_prototype->init_member(name, val, as_prop_flags::readOnly |
 // 		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
 // 	return true;
