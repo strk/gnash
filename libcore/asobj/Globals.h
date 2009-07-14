@@ -41,10 +41,10 @@
 /// attached with a namespace to the global object. As we do this on
 /// demand, the AVM2 global object is much emptier than the AVM1 equivalent
 /// to start with.
-#ifndef GNASH_GLOBAL_H
-#define GNASH_GLOBAL_H
+#ifndef GNASH_GLOBALS_H
+#define GNASH_GLOBALS_H
 
-#include "as_object.h" // for inheritance
+#include "Global_as.h" 
 #include "extension.h"
 #include "ClassHierarchy.h"
 
@@ -57,14 +57,7 @@ namespace gnash {
 
 namespace gnash {
 
-class Global : public as_object
-{
-    virtual Global* global() {
-        return this;
-    }
-};
-
-class AVM1Global : public Global
+class AVM1Global : public Global_as
 {
 public:
 
@@ -79,6 +72,10 @@ public:
         return _classes;
     }
 
+    VM& getVM() const {
+        return _vm;
+    }
+
 protected:
     
     void markReachableResources() const;
@@ -89,14 +86,19 @@ private:
 	Extension _et;
 
     ClassHierarchy _classes;
+    VM& _vm;
 
 };
 
-class AVM2Global : public Global
+class AVM2Global : public Global_as
 {
 public:
 
-	AVM2Global(Machine& m);
+    /// Construct the AVM2 global object.
+    //
+    /// This takes a VM argument because most access to necessary
+    /// resources is still through the VM.
+	AVM2Global(Machine& m, VM& vm);
 	~AVM2Global() {}
 
     const ClassHierarchy& classHierarchy() const {
@@ -105,6 +107,10 @@ public:
     
     ClassHierarchy& classHierarchy() {
         return _classes;
+    }
+    
+    VM& getVM() const {
+        return _vm;
     }
 
 protected:
@@ -117,6 +123,7 @@ protected:
 private:
 
     ClassHierarchy _classes;
+    VM& _vm;
 
 };
 

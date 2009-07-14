@@ -31,15 +31,14 @@
 #include "movie_root.h"
 #include "VM.h"
 #include "builtin_function.h"
-#include "fn_call.h" // for shared ActionScript getter-setters
-#include "GnashException.h" // for shared ActionScript getter-setters
+#include "fn_call.h" 
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "Object.h" // for getObjectInterface
 #include "StringPredicates.h"
-#include "GnashKey.h" // key::code
-#include "SoundInfoRecord.h" // for use
-#include "Global.h" // for use
+#include "GnashKey.h" 
+#include "SoundInfoRecord.h" 
+#include "Global_as.h" 
 
 #include <boost/bind.hpp>
 

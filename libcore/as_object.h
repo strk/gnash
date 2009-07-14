@@ -51,7 +51,7 @@ namespace gnash {
     class asClass;
     class asName;
     class RunResources;
-    class Global;
+    class Global_as;
 }
 
 namespace gnash {
@@ -1037,7 +1037,7 @@ public:
 
     static as_value valueof_method(const fn_call& fn);
 
-    virtual Global* global() const {
+    virtual Global_as* global() const {
         return _global;
     }
 
@@ -1109,7 +1109,7 @@ protected:
 
 private:
     
-    Global* _global;
+    Global_as* _global;
 
     /// The Virtual Machine used to create this object
     VM& _vm;
@@ -1183,7 +1183,7 @@ const RunResources& getRunResources(const as_object& o);
 
 int getSWFVersion(const as_object& o);
 
-as_object* getGlobal(const as_object& o);
+Global_as* getGlobal(const as_object& o);
 
 } // namespace gnash
 

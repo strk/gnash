@@ -62,7 +62,7 @@
 #include "GnashNumeric.h"
 #include "InteractiveObject.h"
 #include "DisplayObjectContainer.h"
-#include "Global.h"
+#include "Global_as.h"
 
 // TODO: get rid of this include.
 #include "flash/display/MovieClip_as.h"

@@ -29,6 +29,7 @@
 #include "namedStrings.h"
 #include "as_function.h" 
 #include "CallStack.h"
+#include "Global_as.h"
 
 #include <string>
 #include <utility> // for std::pair

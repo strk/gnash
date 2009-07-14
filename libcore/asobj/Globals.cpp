@@ -149,10 +149,10 @@ namespace {
     void registerNatives(as_object& global);
 }
 
-AVM2Global::AVM2Global(Machine& machine)
+AVM2Global::AVM2Global(Machine& machine, VM& vm)
     :
-    Global(),
-    _classes(this, 0)
+    _classes(this, 0),
+    _vm(vm)
 {
     
     _classes.declareAll(avm2Classes());
@@ -187,8 +187,8 @@ AVM1Global::markReachableResources() const
 
 AVM1Global::AVM1Global(VM& vm)
     :
-    Global(),
-    _classes(this, &_et)
+    _classes(this, &_et),
+    _vm(vm)
 {
 
     registerNatives(*this);

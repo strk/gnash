@@ -30,7 +30,7 @@
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "PropertyList.h"
-#include "Global.h"
+#include "Global_as.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>

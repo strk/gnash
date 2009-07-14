@@ -28,7 +28,8 @@
 #include "movie_definition.h"
 #include "Movie.h"
 #include "movie_root.h"
-#include "Global.h"
+#include "Globals.h"
+#include "Global_as.h"
 #include "rc.h" //for overriding default version string with rcfile
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
@@ -211,17 +212,17 @@ VM::getRoot() const
 	return _rootMovie;
 }
 
-as_object*
+Global_as*
 VM::getGlobal() const
 {
 #if ENABLE_AVM2
     if (getAVMVersion() == VM::AVM2) return _machine->global();
 #endif
-	return _global.get();
+	return _global;
 }
 
 void
-VM::setGlobal(as_object* o)
+VM::setGlobal(Global_as* o)
 {
 	assert(!_global);
 	_global = o;

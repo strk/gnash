@@ -26,6 +26,7 @@
 #include "Machine.h"
 #include "VM.h"
 #include "sprite_definition.h"
+#include "Global_as.h"
 
 // Forward declarations
 namespace gnash {

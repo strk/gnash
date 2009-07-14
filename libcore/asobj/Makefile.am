@@ -60,7 +60,7 @@ libgnashasobjs_la_SOURCES = \
 	CustomActions.cpp\
 	Date_as.cpp \
 	Error_as.cpp \
-	Global.cpp \
+	Globals.cpp \
 	int_as.cpp \
 	LoadVars_as.cpp \
 	Math_as.cpp \
@@ -88,7 +88,8 @@ noinst_HEADERS = \
 	Date_as.h \
 	Error_as.h	\
 	Math_as.h	\
-	Global.h\
+	Globals.h\
+	Global_as.h\
 	int_as.h \
 	LoadVars_as.h \
 	Microphone.h \

@@ -25,17 +25,18 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h"
 #include "as_function.h"
-#include "as_environment.h" // for enumerateProperties
-#include "movie_root.h" // for enumerateProperties
-#include "event_id.h" // for enumerateProperties
-#include "Property.h" // for findGetterSetter
+#include "as_environment.h" 
+#include "movie_root.h" 
+#include "event_id.h" 
+#include "Property.h"
 #include "VM.h"
 #include "GnashException.h"
-#include "fn_call.h" // for generic methods
-#include "Object.h" // for getObjectInterface
-#include "action.h" // for call_method
-#include "Array_as.h" // for setPropFlags
-#include "as_function.h" // for inheritance of as_super
+#include "fn_call.h" 
+#include "Object.h" 
+#include "action.h" 
+#include "Array_as.h"
+#include "as_function.h"
+#include "Global_as.h" 
 
 #include <set>
 #include <string>
@@ -1468,7 +1469,7 @@ getSWFVersion(const as_object& o)
     return o.vm().getSWFVersion();
 }
 
-as_object* getGlobal(const as_object& o)
+Global_as* getGlobal(const as_object& o)
 {
     // TODO: should be as_object's _global member!
     return o.vm().getGlobal();
