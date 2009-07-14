@@ -1002,6 +1002,15 @@ TextField::format_text()
 {
     _textRecords.clear();
 	_line_starts.clear();
+	
+	// nothing more to do if text is empty
+    if ( _text.empty() )
+    {
+        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
+        //       not sure we should...
+        //reset_bounding_box(0, 0);
+        return;
+    }
 
     // See bug #24266
     const rect& defBounds = _bounds;
@@ -1404,7 +1413,6 @@ TextField::format_text()
             // TODO: should still compute m_text_bounds !
             LOG_ONCE(log_unimpl("Computing text bounds of a TextField "
                         "containing text that doesn't fit the box vertically"));
-            break;
         }
 
         ///This won't work for positioning the cursor properly with wordWrap
@@ -1418,8 +1426,8 @@ TextField::format_text()
 		///We will use m_cursor to position the cursor instead
 
         // TODO: HTML markup
+		
     }
-
     // Expand bounding box to include the whole text (if autoSize)
     if ( _autoSize != autoSizeNone )
     {
@@ -1427,8 +1435,7 @@ TextField::format_text()
     }
 
     // Add this line to our output.
-    //if (!rec.glyphs().empty()) _textRecords.push_back(rec);
-	_textRecords.push_back(rec); //just add an empty line anyway
+    if (!rec.glyphs().empty()) _textRecords.push_back(rec);
 	
 	linestartit = _line_starts.begin();
 	linestartsend = _line_starts.end();
@@ -1441,10 +1448,9 @@ TextField::format_text()
 	}
 	//the line that m_cursor is on
 	current_line = linestartit - _line_starts.begin();
-	
 	///compute the lines to display
 	///this whole section could probably use some optimization!!!
-	if ( autoSize == autoSizeNone ) {
+	//if ( autoSize == autoSizeNone ) {
 		int manylines = _line_starts.size();
 		if (manylines - _top_visible_line <= _linesindisplay) {
 			if(manylines - _linesindisplay <= 0)
@@ -1460,13 +1466,12 @@ TextField::format_text()
 				_top_visible_line += (current_line) - (last_visible_line);
 			}
 		}
-    }
+    //}
 	for(unsigned int i = 0; i < _line_starts.size(); ++i) {
 		_textRecords[i].setYOffset((i-_top_visible_line)*(fontHeight + leading) + (PADDING_TWIPS + fontHeight + (fontLeading - fontDescent)));
 	}
 
     float extra_space = align_line(textAlignment, last_line_start_record, x);
-
 	///Here we use m_cursor to position the cursor once
 	if ( --current_line < _textRecords.size() ) {
 		cursorposition_line = _textRecords[current_line];
@@ -1475,10 +1480,11 @@ TextField::format_text()
 		}
 	}
 	m_ycursor = PADDING_TWIPS;
-	for(unsigned int i = _top_visible_line; i < current_line; ++i) {
-		m_ycursor += (fontHeight+leading);
+	if(current_line >= 0) {
+		for(unsigned int i = _top_visible_line; i < current_line; ++i) {
+			m_ycursor += (fontHeight+leading);
+		}
 	}
-	
     m_xcursor += static_cast<int>(extra_space);
     //m_ycursor -= fontHeight + (fontLeading - fontDescent);
 	
