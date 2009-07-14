@@ -47,7 +47,8 @@ contextmenuitem_class_init(as_object& global)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&contextmenuitem_ctor,
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&contextmenuitem_ctor,
                 getContextMenuItemInterface());
     }
 

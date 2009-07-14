@@ -234,7 +234,8 @@ moviecliploader_class_init(as_object& global)
 
 	if (cl == NULL)
 	{
-		cl=new builtin_function(&moviecliploader_new,
+        Global_as* gl = getGlobal(global);
+		cl = gl->createClass(&moviecliploader_new,
                 getMovieClipLoaderInterface());
 	}
 	global.init_member("MovieClipLoader", cl.get()); 

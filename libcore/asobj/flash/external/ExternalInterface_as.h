@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_EXTERNALINTERFACE_H__
-#define __GNASH_ASOBJ_EXTERNALINTERFACE_H__
+#ifndef GNASH_ASOBJ_EXTERNALINTERFACE_H
+#define GNASH_ASOBJ_EXTERNALINTERFACE_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -33,8 +33,6 @@ class as_object;
 /// Initialize the global ExternalInterface class
 void externalinterface_class_init(as_object& global);
 
-/// Return a ExternalInterface instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_ExternalInterface_instance();
 
 } // end of gnash namespace
 

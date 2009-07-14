@@ -342,13 +342,13 @@ ExternalInterface_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-as_function*
-getFlashExternalExternalInterfaceConstructor()
+as_object*
+getFlashExternalExternalInterfaceConstructor(Global_as& global)
 {
-    static builtin_function* cl=NULL;
+    static as_object* cl=NULL;
     if ( ! cl )
     {
-        cl=new builtin_function(&ExternalInterface_ctor,
+        cl = global.createClass(&ExternalInterface_ctor,
                 getExternalInterfaceInterface());
         VM::get().addStatic(cl);
 	    attachExternalInterfaceStaticProperties(*cl);
@@ -358,10 +358,10 @@ getFlashExternalExternalInterfaceConstructor()
 
 
 static as_value
-get_flash_external_external_interface_constructor(const fn_call& /*fn*/)
+get_flash_external_external_interface_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.external.ExternalInterface class");
-    return getFlashExternalExternalInterfaceConstructor();
+    return getFlashExternalExternalInterfaceConstructor(*getVM(fn).getGlobal());
 }
 
 
