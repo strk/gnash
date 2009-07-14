@@ -91,8 +91,6 @@ attachNetConnectionInterface(as_object& o)
 void
 attachNetConnectionStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

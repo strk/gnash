@@ -85,8 +85,6 @@ attachStyleSheetInterface(as_object& o)
 void
 attachStyleSheetStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

@@ -91,8 +91,6 @@ attachSecurityInterface(as_object& o)
 void
 attachSecurityStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

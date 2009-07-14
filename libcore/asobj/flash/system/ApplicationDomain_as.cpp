@@ -79,8 +79,6 @@ attachApplicationDomainInterface(as_object& o)
 void
 attachApplicationDomainStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

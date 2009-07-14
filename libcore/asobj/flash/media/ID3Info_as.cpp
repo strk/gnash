@@ -70,7 +70,6 @@ namespace {
 void
 attachID3InfoInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
 }
 
 void

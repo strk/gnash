@@ -73,8 +73,6 @@ void
 attachBitmapFilterInterface(as_object& o)
 {
     const int flags = 0;
-    Global_as* gl = getGlobal(o);
-    o.init_member("clone", gl->createFunction(bitmapfilter_clone), flags);
 }
 
 as_value

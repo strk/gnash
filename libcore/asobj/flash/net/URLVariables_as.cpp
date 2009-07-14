@@ -79,8 +79,6 @@ attachURLVariablesInterface(as_object& o)
 void
 attachURLVariablesStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

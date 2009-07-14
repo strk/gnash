@@ -91,8 +91,6 @@ attachLoaderInfoInterface(as_object& o)
 void
 attachLoaderInfoStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

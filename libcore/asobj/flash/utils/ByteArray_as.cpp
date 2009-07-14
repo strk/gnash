@@ -133,8 +133,6 @@ attachByteArrayInterface(as_object& o)
 void
 attachByteArrayStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*

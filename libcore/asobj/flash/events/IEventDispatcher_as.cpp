@@ -85,8 +85,6 @@ attachIEventDispatcherInterface(as_object& o)
 void
 attachIEventDispatcherStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*
