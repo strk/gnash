@@ -91,7 +91,7 @@ getPrintJobOptionsInterface()
 }
 
 as_value
-printjoboptions_ctor(const fn_call& fn)
+printjoboptions_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new PrintJobOptions_as;
 

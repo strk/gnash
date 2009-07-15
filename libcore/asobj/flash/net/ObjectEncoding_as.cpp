@@ -91,7 +91,7 @@ getObjectEncodingInterface()
 }
 
 as_value
-objectencoding_ctor(const fn_call& fn)
+objectencoding_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ObjectEncoding_as;
 

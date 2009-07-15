@@ -91,7 +91,7 @@ getCSMSettingsInterface()
 }
 
 as_value
-csmsettings_ctor(const fn_call& fn)
+csmsettings_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new CSMSettings_as;
 

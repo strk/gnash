@@ -91,7 +91,7 @@ getSceneInterface()
 }
 
 as_value
-scene_ctor(const fn_call& fn)
+scene_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Scene_as;
 

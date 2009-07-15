@@ -115,7 +115,7 @@ activityevent_ACTIVITY(const fn_call& fn)
 }
 
 as_value
-activityevent_ctor(const fn_call& fn)
+activityevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ActivityEvent_as;
 

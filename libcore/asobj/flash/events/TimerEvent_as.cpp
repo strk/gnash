@@ -139,7 +139,7 @@ timerevent_TIMER_COMPLETE(const fn_call& fn)
 }
 
 as_value
-timerevent_ctor(const fn_call& fn)
+timerevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TimerEvent_as;
 

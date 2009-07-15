@@ -91,7 +91,7 @@ getIDynamicPropertyWriterInterface()
 }
 
 as_value
-idynamicpropertywriter_ctor(const fn_call& fn)
+idynamicpropertywriter_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IDynamicPropertyWriter_as;
 

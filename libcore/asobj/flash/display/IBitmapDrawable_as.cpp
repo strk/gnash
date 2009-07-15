@@ -91,7 +91,7 @@ getIBitmapDrawableInterface()
 }
 
 as_value
-ibitmapdrawable_ctor(const fn_call& fn)
+ibitmapdrawable_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IBitmapDrawable_as;
 

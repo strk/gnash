@@ -91,7 +91,7 @@ getInvalidSWFErrorInterface()
 }
 
 as_value
-invalidswferror_ctor(const fn_call& fn)
+invalidswferror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new InvalidSWFError_as;
 

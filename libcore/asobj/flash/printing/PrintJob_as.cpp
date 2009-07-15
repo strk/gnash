@@ -115,7 +115,7 @@ printjob_start(const fn_call& fn)
 }
 
 as_value
-printjob_ctor(const fn_call& fn)
+printjob_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new PrintJob_as;
 

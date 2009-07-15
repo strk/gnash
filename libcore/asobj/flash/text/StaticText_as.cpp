@@ -91,7 +91,7 @@ getStaticTextInterface()
 }
 
 as_value
-statictext_ctor(const fn_call& fn)
+statictext_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StaticText_as;
 

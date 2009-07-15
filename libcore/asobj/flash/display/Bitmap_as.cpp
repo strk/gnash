@@ -91,7 +91,7 @@ getBitmapInterface()
 }
 
 as_value
-bitmap_ctor(const fn_call& fn)
+bitmap_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Bitmap_as;
 

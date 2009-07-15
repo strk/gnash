@@ -103,7 +103,7 @@ iexternalizable_writeExternal(const fn_call& fn)
 }
 
 as_value
-iexternalizable_ctor(const fn_call& fn)
+iexternalizable_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IExternalizable_as;
 

@@ -91,7 +91,7 @@ getKeyLocationInterface()
 }
 
 as_value
-keylocation_ctor(const fn_call& fn)
+keylocation_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new KeyLocation_as;
 

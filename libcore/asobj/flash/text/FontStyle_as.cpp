@@ -91,7 +91,7 @@ getFontStyleInterface()
 }
 
 as_value
-fontstyle_ctor(const fn_call& fn)
+fontstyle_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FontStyle_as;
 

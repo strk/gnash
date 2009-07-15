@@ -51,7 +51,7 @@ void displacementmapfiltermode_class_init(as_object& global)
 namespace {
 
 void
-attachDisplacementMapFilterModeStaticInterface(as_object& o)
+attachDisplacementMapFilterModeStaticInterface(as_object& /*o*/)
 {
 
 }

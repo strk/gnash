@@ -91,7 +91,7 @@ getIllegalOperationErrorInterface()
 }
 
 as_value
-illegaloperationerror_ctor(const fn_call& fn)
+illegaloperationerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IllegalOperationError_as;
 

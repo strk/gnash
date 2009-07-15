@@ -91,7 +91,7 @@ getSoundTransformInterface()
 }
 
 as_value
-soundtransform_ctor(const fn_call& fn)
+soundtransform_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundTransform_as;
 

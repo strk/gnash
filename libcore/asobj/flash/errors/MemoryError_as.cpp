@@ -91,7 +91,7 @@ getMemoryErrorInterface()
 }
 
 as_value
-memoryerror_ctor(const fn_call& fn)
+memoryerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MemoryError_as;
 

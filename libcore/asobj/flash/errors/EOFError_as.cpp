@@ -91,7 +91,7 @@ getEOFErrorInterface()
 }
 
 as_value
-eoferror_ctor(const fn_call& fn)
+eoferror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new EOFError_as;
 

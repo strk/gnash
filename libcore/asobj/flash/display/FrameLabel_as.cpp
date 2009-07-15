@@ -91,7 +91,7 @@ getFrameLabelInterface()
 }
 
 as_value
-framelabel_ctor(const fn_call& fn)
+framelabel_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FrameLabel_as;
 

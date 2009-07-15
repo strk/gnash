@@ -91,7 +91,7 @@ getFileFilterInterface()
 }
 
 as_value
-filefilter_ctor(const fn_call& fn)
+filefilter_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FileFilter_as;
 

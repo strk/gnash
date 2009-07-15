@@ -139,7 +139,7 @@ keyboardevent_KEY_UP(const fn_call& fn)
 }
 
 as_value
-keyboardevent_ctor(const fn_call& fn)
+keyboardevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new KeyboardEvent_as;
 

@@ -236,7 +236,7 @@ mouseevent_ROLL_OVER(const fn_call& fn)
 }
 
 as_value
-mouseevent_ctor(const fn_call& fn)
+mouseevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MouseEvent_as;
 

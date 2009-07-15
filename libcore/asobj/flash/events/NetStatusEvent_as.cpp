@@ -115,7 +115,7 @@ netstatusevent_NET_STATUS(const fn_call& fn)
 }
 
 as_value
-netstatusevent_ctor(const fn_call& fn)
+netstatusevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new NetStatusEvent_as;
 

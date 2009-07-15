@@ -332,7 +332,7 @@ netstream_onTextData(const fn_call& fn)
 }
 
 as_value
-netstream_ctor(const fn_call& fn)
+netstream_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new NetStream_as;
 

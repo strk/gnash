@@ -175,7 +175,7 @@ netconnection_securityError(const fn_call& fn)
 }
 
 as_value
-netconnection_ctor(const fn_call& fn)
+netconnection_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new NetConnection_as;
 

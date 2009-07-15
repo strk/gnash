@@ -91,7 +91,7 @@ getTextFormatInterface()
 }
 
 as_value
-textformat_ctor(const fn_call& fn)
+textformat_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextFormat_as;
 

@@ -91,7 +91,7 @@ getID3InfoInterface()
 }
 
 as_value
-id3info_ctor(const fn_call& fn)
+id3info_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ID3Info_as;
 

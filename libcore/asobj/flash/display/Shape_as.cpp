@@ -91,7 +91,7 @@ getShapeInterface()
 }
 
 as_value
-shape_ctor(const fn_call& fn)
+shape_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Shape_as;
 

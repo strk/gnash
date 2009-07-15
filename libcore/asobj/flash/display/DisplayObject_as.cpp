@@ -224,7 +224,7 @@ displayobject_render(const fn_call& fn)
 }
 
 as_value
-displayobject_ctor(const fn_call& fn)
+displayobject_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new DisplayObject_as;
 

@@ -91,7 +91,7 @@ getURLRequestInterface()
 }
 
 as_value
-urlrequest_ctor(const fn_call& fn)
+urlrequest_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLRequest_as;
 

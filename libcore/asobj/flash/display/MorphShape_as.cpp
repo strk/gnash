@@ -91,7 +91,7 @@ getMorphShapeInterface()
 }
 
 as_value
-morphshape_ctor(const fn_call& fn)
+morphshape_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MorphShape_as;
 

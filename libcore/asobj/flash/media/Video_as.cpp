@@ -116,7 +116,7 @@ video_clear(const fn_call& fn)
 }
 
 as_value
-video_ctor(const fn_call& fn)
+video_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Video_as;
 

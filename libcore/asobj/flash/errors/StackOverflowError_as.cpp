@@ -91,7 +91,7 @@ getStackOverflowErrorInterface()
 }
 
 as_value
-stackoverflowerror_ctor(const fn_call& fn)
+stackoverflowerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StackOverflowError_as;
 

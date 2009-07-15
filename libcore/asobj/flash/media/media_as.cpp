@@ -91,7 +91,7 @@ getmediaInterface()
 }
 
 as_value
-media_ctor(const fn_call& fn)
+media_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new media_as;
 

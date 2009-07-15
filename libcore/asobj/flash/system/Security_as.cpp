@@ -175,7 +175,7 @@ security_REMOTE(const fn_call& fn)
 }
 
 as_value
-security_ctor(const fn_call& fn)
+security_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Security_as;
 

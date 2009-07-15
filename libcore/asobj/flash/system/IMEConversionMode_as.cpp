@@ -51,7 +51,7 @@ imeconversionmode_class_init(as_object& global)
 namespace {
 
 void
-attachIMEConversionModeStaticInterface(as_object& o)
+attachIMEConversionModeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

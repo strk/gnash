@@ -91,7 +91,7 @@ getSampleInterface()
 }
 
 as_value
-sample_ctor(const fn_call& fn)
+sample_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Sample_as;
 

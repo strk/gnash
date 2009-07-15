@@ -91,7 +91,7 @@ getCapabilitiesInterface()
 }
 
 as_value
-capabilities_ctor(const fn_call& fn)
+capabilities_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Capabilities_as;
 

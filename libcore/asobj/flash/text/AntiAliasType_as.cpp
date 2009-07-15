@@ -51,7 +51,7 @@ antialiastype_class_init(as_object& global)
 namespace {
 
 void
-attachAntiAliasTypeStaticInterface(as_object& o)
+attachAntiAliasTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }
