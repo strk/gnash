@@ -843,7 +843,7 @@ as_object::instanceOf(as_object* ctor)
 #endif
 		return false;
 	}
-	as_object* ctorProto = protoVal.to_object(*this).get();
+	as_object* ctorProto = protoVal.to_object(*getGlobal(*this)).get();
 	if ( ! ctorProto )
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
@@ -1003,7 +1003,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	boost::intrusive_ptr<as_object> props = props_val.to_object(*this);
+	boost::intrusive_ptr<as_object> props = props_val.to_object(*getGlobal(*this));
 	Array_as* ary = dynamic_cast<Array_as*>(props.get());
 	if ( ! ary )
 	{
@@ -1158,7 +1158,7 @@ as_object::get_prototype()
 
 	as_value tmp = prop->getValue(*this);
 
-	return tmp.to_object(*this);
+	return tmp.to_object(*getGlobal(*this));
 }
 
 bool
@@ -1306,7 +1306,7 @@ as_object::get_path_element(string_table::key key)
 		return NULL;
 	}
 
-	return tmp.to_object(*this).get();
+	return tmp.to_object(*getGlobal(*this)).get();
 }
 
 void

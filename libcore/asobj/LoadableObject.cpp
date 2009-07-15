@@ -105,7 +105,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
             /// Read in our custom headers if they exist and are an
             /// array.
             Array_as* array = dynamic_cast<Array_as*>(
-                            customHeaders.to_object(target).get());
+                            customHeaders.to_object(*getGlobal(target)).get());
                             
             if (array)
             {

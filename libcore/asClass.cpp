@@ -41,10 +41,10 @@ asClass::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst,
         bool isstatic)
 {
-    const as_object& g = *VM::get().getGlobal();
+    Global_as* g = VM::get().getGlobal();
 
     if (val.is_object()) {
-		val.to_object(g)->set_member(NSV::INTERNAL_TYPE, 
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, 
 			std::size_t(type->getName()));
     }
 

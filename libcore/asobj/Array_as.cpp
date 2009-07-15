@@ -395,8 +395,8 @@ public:
         as_value av, bv;
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(_obj);
-        boost::intrusive_ptr<as_object> bo = b.to_object(_obj);
+        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
+        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
         
         ao->get_member(_prop, &av);
         bo->get_member(_prop, &bv);
@@ -437,8 +437,8 @@ public:
         std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(_obj);
-        boost::intrusive_ptr<as_object> bo = b.to_object(_obj);
+        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
+        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
         
         for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
         {
@@ -476,8 +476,8 @@ public:
         Comps::const_iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(_obj);
-        boost::intrusive_ptr<as_object> bo = b.to_object(_obj);
+        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
+        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
 
         for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
         {

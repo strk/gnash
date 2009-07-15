@@ -107,7 +107,7 @@ public:
         if (mExtension->initModuleWithFunc(mDeclaration.file_name,
             mDeclaration.init_name, *mTarget))
         {
-            const Global_as& gl = *getGlobal(fn);
+            Global_as& gl = *getGlobal(fn);
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
             mTarget->get_member(mDeclaration.name, &us);
@@ -180,7 +180,7 @@ public:
                 assert(super.to_as_function());
             }
 
-            const Global_as& gl = *getGlobal(fn);
+            Global_as& gl = *getGlobal(fn);
 
             if (!us.to_object(gl)) {
                 log_error("Native class %s is not an object after "

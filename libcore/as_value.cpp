@@ -1017,7 +1017,7 @@ as_value::to_bool() const
 	
 // Return value as an object.
 boost::intrusive_ptr<as_object>
-as_value::to_object(const as_object& ref) const
+as_value::to_object(Global_as& global) const
 {
 	typedef boost::intrusive_ptr<as_object> ptr;
 
@@ -1033,13 +1033,13 @@ as_value::to_object(const as_object& ref) const
 			return ptr(toDisplayObject());
 
 		case STRING:
-			return getGlobal(ref)->createString(getStr());
+			return global.createString(getStr());
 
 		case NUMBER:
-			return getGlobal(ref)->createNumber(getNum());
+			return global.createNumber(getNum());
 
 		case BOOLEAN:
-			return getGlobal(ref)->createBoolean(getBool());
+			return global.createBoolean(getBool());
 
 		default:
 			// Invalid to convert exceptions.

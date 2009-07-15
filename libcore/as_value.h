@@ -45,6 +45,7 @@
 namespace gnash {
     class VM;
 	class as_object;
+	class Global_as;
 	class fn_call;
 	class as_function;
 	class MovieClip;
@@ -432,18 +433,17 @@ public:
 	/// as the returned object might be a newly allocated one in case
 	/// of a conversion from a primitive string, number or boolean value.
 	///
-	/// string values will be converted to String objects,
-	/// numeric values will be converted to Number objects,
-	/// boolean values are currently NOT converted, but should (FIXME!)
+	/// string values are converted to String objects
+	/// numeric values are converted to Number objects
+	/// boolean values are converted to Boolean objects
 	///
 	/// If you want to avoid the conversion, check with is_object() before
 	/// calling this function.
     //
-    /// @param ref      The reference object for the conversion. This is
-    ///                 used to find the global object, which contains the
-    ///                 prototypes or constructors necessary for conversion.
-    ///                 It does not have to be the global object.
-	boost::intrusive_ptr<as_object> to_object(const as_object& ref) const;
+    /// @param global   The global object object for the conversion. This
+    ///                 contains the prototypes or constructors necessary for
+    ///                 conversion.
+	boost::intrusive_ptr<as_object> to_object(Global_as& global) const;
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
