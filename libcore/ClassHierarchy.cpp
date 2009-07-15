@@ -73,7 +73,6 @@ public:
         mTarget(g),
         mExtension(e)
     {
-        init_member("constructor", as_function::getFunctionConstructor().get());
     }
 
     virtual as_value operator()(const fn_call& fn)
@@ -142,9 +141,6 @@ public:
         mDeclaration(c),
         mTarget(g)
     {
-        // does it make any sense to set a 'constructor' here ??
-        //init_member("constructor", this);
-        //init_member("constructor", as_function::getFunctionConstructor().get());
     }
 
     virtual as_value operator()(const fn_call& fn)
