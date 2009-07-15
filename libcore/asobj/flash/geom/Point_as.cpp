@@ -204,7 +204,8 @@ Point_equals(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Point.equals(%s): %s", ss.str(), _("First arg must be an object"));
+		log_aserror("Point.equals(%s): %s", ss.str(),
+            _("First arg must be an object"));
 		);
 		return as_value(false);
 	}
@@ -214,7 +215,8 @@ Point_equals(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Point.equals(%s): %s %s", ss.str(), _("First arg must be an instance of"), "flash.geom.Point");
+		log_aserror("Point.equals(%s): %s %s", ss.str(),
+            _("First arg must be an instance of"), "flash.geom.Point");
 		);
 		return as_value(false);
 	}

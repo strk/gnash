@@ -371,24 +371,12 @@ Transform_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-as_object*
-getFlashGeomTransformConstructor(Global_as& gl)
-{
-    static as_object* cl = NULL;
-    if ( ! cl )
-    {
-        cl = gl.createClass(&Transform_ctor, getTransformInterface());
-        VM::get().addStatic(cl);
-    }
-    return cl;
-}
-
 as_value
 get_flash_geom_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Transform class");
-
-    return getFlashGeomTransformConstructor(*getGlobal(fn));
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Transform_ctor, getTransformInterface());
 }
 
 as_object*

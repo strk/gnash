@@ -663,18 +663,13 @@ Rectangle_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
+static as_value
+get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Rectangle class");
 
-	builtin_function* cl =
-	        new builtin_function(&Rectangle_ctor, getRectangleInterface());
-	return cl;
-}
-
-boost::intrusive_ptr<as_object> init_Rectangle_instance()
-{
-    return boost::intrusive_ptr<as_object>(new Rectangle_as);
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Rectangle_ctor, getRectangleInterface());
 }
 
 // extern 
