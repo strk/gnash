@@ -37,38 +37,39 @@ namespace gnash {
 
 namespace {
     as_object* getNumberInterface();
+    as_object* getNumberClass();
 }
 
 class Number_as : public as_object
 {
-	// the number value
-	double _val;
+    // the number value
+    double _val;
 
 public:
 
-	Number_as(double val=0.0)
-		:
-		as_object(getNumberInterface()),
-		_val(val)
-	{
-	}
+    Number_as(double val = 0.0)
+        :
+        as_object(getNumberInterface()),
+        _val(val)
+    {
+    }
 
-	// override from as_object
-	std::string get_text_value() const
-	{
-		return as_value::doubleToString(_val);
-	}
+    // override from as_object
+    std::string get_text_value() const
+    {
+        return as_value::doubleToString(_val);
+    }
 
-	// override from as_object
-	double get_numeric_value() const
-	{
-		return _val;
-	}
+    // override from as_object
+    double get_numeric_value() const
+    {
+        return _val;
+    }
 
-	as_value get_primitive_value() const 
-	{
-		return _val;
-	}
+    as_value get_primitive_value() const 
+    {
+        return _val;
+    }
 
 };
 
@@ -77,57 +78,57 @@ namespace {
 as_value
 number_toString(const fn_call& fn)
 {
-	// Number.toString must only work for number object, not generic ones.
-	// This is so trace(Number.prototype) doesn't return 0 ...
-	boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
+    // Number.toString must only work for number object, not generic ones.
+    // This is so trace(Number.prototype) doesn't return 0 ...
+    boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
 
-	double val = obj->get_numeric_value();
-	unsigned radix = 10;
+    double val = obj->get_numeric_value();
+    unsigned radix = 10;
 
-	if ( fn.nargs ) 
-	{
-		int userRadix = fn.arg(0).to_int();
-		if ( userRadix >= 2 && userRadix <= 36 ) radix=userRadix;
-		else
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Number.toString(%s): "
-				"radix must be in the 2..36 range (%d is invalid)"),
-				fn.arg(0), userRadix)
-			)
-		}
+    if ( fn.nargs ) 
+    {
+        int userRadix = fn.arg(0).to_int();
+        if ( userRadix >= 2 && userRadix <= 36 ) radix=userRadix;
+        else
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Number.toString(%s): "
+                "radix must be in the 2..36 range (%d is invalid)"),
+                fn.arg(0), userRadix)
+            )
+        }
 
-	}
-	return as_value::doubleToString(val, radix); 
+    }
+    return as_value::doubleToString(val, radix); 
 }
 
 as_value
 number_valueOf(const fn_call& fn)
 {
-	// Number.valueOf must only work for number object, not generic ones.
-	// This is so trace(Number.prototype == Object) return true in swf5 ?
-	boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
+    // Number.valueOf must only work for number object, not generic ones.
+    // This is so trace(Number.prototype == Object) return true in swf5 ?
+    boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
 
-	return obj->get_primitive_value();
+    return obj->get_primitive_value();
 }
 
 as_value
 number_ctor(const fn_call& fn)
 {
-	double val = 0;
-	if (fn.nargs > 0)
-	{
-		val = fn.arg(0).to_number();
-	}
+    double val = 0;
+    if (fn.nargs > 0)
+    {
+        val = fn.arg(0).to_number();
+    }
 
-	if ( ! fn.isInstantiation() )
-	{
-		return as_value(val);
-	}
+    if ( ! fn.isInstantiation() )
+    {
+        return as_value(val);
+    }
 
-	Number_as* obj = new Number_as(val);
-	
-	return as_value(obj); // will keep alive
+    Number_as* obj = new Number_as(val);
+    
+    return as_value(obj); // will keep alive
 }
 
 void
@@ -135,9 +136,9 @@ attachNumberInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
 
-	o.init_member("toString", gl->createFunction(number_toString));
+    o.init_member("toString", gl->createFunction(number_toString));
 
-	o.init_member("valueOf", gl->createFunction(number_valueOf));
+    o.init_member("valueOf", gl->createFunction(number_valueOf));
 }
 
 void
@@ -163,33 +164,32 @@ attachNumberStaticInterface(as_object& o)
             as_value(-std::numeric_limits<double>::infinity()), cflags);
 }
 
-boost::intrusive_ptr<builtin_function> 
-getNumberConstructor()
+as_object*
+getNumberClass(Global_as& g)
 {
-	// This is going to be the global Number "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl=NULL;
+    // This is going to be the global Number "class"/"function"
+    static as_object* cl = 0;
 
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&number_ctor, getNumberInterface());
+    if (!cl) {
+        cl = g.createClass(&number_ctor, getNumberInterface());
         attachNumberStaticInterface(*cl);
-		VM::get().addStatic(cl.get());
-	}
+        VM::get().addStatic(cl);
+    }
 
-	return cl;
+    return cl;
 }
 
 as_object*
 getNumberInterface()
 {
-	static boost::intrusive_ptr<as_object> o=NULL;
-	if ( o == NULL )
-	{
-		o = new as_object(getObjectInterface());
+    static boost::intrusive_ptr<as_object> o=NULL;
+    if ( o == NULL )
+    {
+        o = new as_object(getObjectInterface());
         attachNumberInterface(*o);
-	}
+    }
 
-	return o.get();
+    return o.get();
 }
 
 
@@ -199,24 +199,26 @@ getNumberInterface()
 // extern (used by Global.cpp)
 void number_class_init(as_object& global)
 {
-	boost::intrusive_ptr<builtin_function> cl=getNumberConstructor();
+    boost::intrusive_ptr<as_object> cl = getNumberClass(*getGlobal(global));
 
-	// Register _global.Number
-	global.init_member("Number", cl.get());
+    // Register _global.Number
+    global.init_member("Number", cl.get());
 
 }
 
 as_object*
 init_number_instance(Global_as& g, double val)
 {
-	boost::intrusive_ptr<builtin_function> cl = getNumberConstructor();
+    boost::intrusive_ptr<as_object> cl = getNumberClass(g);
+    as_function* ctor = cl->to_function();
+    if (!ctor) return 0;
 
-	as_environment env(getVM(g));
+    as_environment env(getVM(g));
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(val);
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    args->push_back(val);
 
-	return cl->constructInstance(env, args).get();
+    return ctor->constructInstance(env, args).get();
 }
 
   
