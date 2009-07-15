@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_LIBNET_SSH_H
-#define GNASH_LIBNET_SSH_H
+#ifndef GNASH_SSH_CLIENT_H
+#define GNASH_SSH_CLIENT_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -96,9 +96,12 @@ public:
     
     void setTransportType(transport_type_t type) { _transporttype = type; };
     transport_type_t getTransportType() { return _transporttype; };
-    
+
+    int authKbdint();
+    int authKbdint(SSH_SESSION *);
+
     void dump();
- private:
+ protected:
     std::string		_hostname;
     std::string		_user;
     std::string		_password;
@@ -117,7 +120,7 @@ public:
     
 } // end of gnash namespace
 
-// end of GNASH_LIBNET_SSH_H
+// end of GNASH_SSH_CLIENT_H
 #endif 
 
 // local Variables:
