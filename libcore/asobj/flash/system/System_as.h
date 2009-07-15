@@ -42,7 +42,7 @@ void registerSystemNative(as_object& global);
 const std::vector<std::string>& getAllowDataAccess();
 
 /// add a url string to the vector of allowed domains
-void addAllowDataAccess( const std::string& url );
+bool addAllowDataAccess( const std::string& url );
 
 } // gnash namespace
 

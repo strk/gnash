@@ -40,12 +40,14 @@ import DejaGnu;
 
 // Class must be named with the _as3 suffix, as that's the same name as the file.
 class System_as {
+
     static function main() {
 	if (Type.typeof(System) == ValueType.TObject) {
 	    DejaGnu.pass("System class exists");
 	} else {
 	    DejaGnu.fail("System class doesn't exist");
 	}
+	
 
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
@@ -72,6 +74,7 @@ class System_as {
 	    DejaGnu.fail("System.totalMemory property doesn't exist");
 	}
 #end	
+
 
 // Test of useCodePage or useCodepage
 #if flash9
@@ -127,6 +130,7 @@ class System_as {
 	} else {
 	    DejaGnu.fail("System::resume() method doesn't exist");
 	}
+
 #end
 
 #if flash9
@@ -354,6 +358,7 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 	} else {
 	    DejaGnu.fail("System.security 'allowDomain()' method doesn't exist");
 	}
+
 	if (Type.typeof(untyped System.security.loadPolicyFile) == TFunction) {
 	    DejaGnu.pass("System.security 'loadPolicyFile()' method exists");
 	} else {
@@ -365,6 +370,7 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 	    DejaGnu.fail("System.'showSettings()' method doesn't exist");
 	}
 #end
+
 	if (Type.typeof(untyped System.setClipboard) == TFunction) {
 	    DejaGnu.pass("System.'setClipboard()' method exists");
 	} else {
@@ -685,6 +691,8 @@ if (Std.string(untyped __typeof__(p.launch)) == 'function') {
 }
 #else
 #end
+
+flash.Lib.trace(untyped System.security.allowDomain("um"));
 
 //Si
 //FIXME:

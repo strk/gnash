@@ -109,10 +109,15 @@ getAllowDataAccess()
 /// domains that can access/modify local data
 //
 /// @param url a std::string containing the domain name
-void
+bool
 addAllowDataAccess( const std::string& url )
 {
+	size_t s = _allowDataAccess.size();
 	_allowDataAccess.push_back( url );	
+
+	if( s+1 == _allowDataAccess.size()) return true;
+
+	return false;
 }
 
 
@@ -360,11 +365,18 @@ attachSystemInterface(as_object& proto)
 as_value
 system_security_allowdomain(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else") );
+	// NOTE: This is the AS2 version of allowDomain, the AS3 version is located
+	// in Security_as.cpp
+	bool result;
+
+	// NOTE: Once the security portion (in the VM?) of this is implemented,
+	// this should probably return true only if access to the added domain was
+	// successfully granted
+    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else. It returns true if the string was successfuly added.") );
 	for(unsigned int i = 0; i < fn.nargs; ++i) {
-		addAllowDataAccess( fn.arg(i).to_string());
+		result = addAllowDataAccess( fn.arg(i).to_string());
 	}
-    return as_value(); 
+    return as_value(result); 
 }
 
 
