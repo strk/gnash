@@ -79,6 +79,7 @@ check_PROGRAMS = \
 	DefineTextTest-Runner \
 	TextSnapshotTest \
 	DeviceFontTest \
+	EmbeddedFontTest \
 	DefineEditTextTest \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
@@ -243,6 +244,8 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	DeviceFontTestRunner \
+	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
@@ -407,10 +410,21 @@ TextSnapshotTest-Runner: $(srcdir)/../generic-testrunner.sh TextSnapshotTest.swf
 	sh $< $(top_builddir) TextSnapshotTest.swf > $@
 	chmod 755 $@
 
+DeviceFontTestRunner: $(srcdir)/../generic-testrunner.sh DeviceFontTest.swf
+	sh $< $(top_builddir) DeviceFontTest.swf > $@
+	chmod 755 $@
 DeviceFontTest.swf: DeviceFontTest
 	./DeviceFontTest $(top_srcdir)/testsuite/media
 DeviceFontTest_SOURCES =  DeviceFontTest.c
 DeviceFontTest_LDADD = libgnashmingutils.la
+
+EmbeddedFontTestRunner: $(srcdir)/../generic-testrunner.sh EmbeddedFontTest.swf
+	sh $< $(top_builddir) EmbeddedFontTest.swf > $@
+	chmod 755 $@
+EmbeddedFontTest.swf: EmbeddedFontTest
+	./EmbeddedFontTest $(top_srcdir)/testsuite/media
+EmbeddedFontTest_SOURCES =  EmbeddedFontTest.c
+EmbeddedFontTest_LDADD = libgnashmingutils.la
 
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
@@ -1950,6 +1964,8 @@ clean-local:
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	LoadVarsTestRunner \
+	DeviceFontTestRunner \
+	EmbeddedFontTestRunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	DefineTextTest-Runner \
