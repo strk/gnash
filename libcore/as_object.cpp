@@ -1075,6 +1075,12 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 }
 
+as_object::as_object(Global_as& gl)
+	:
+	_vm(getVM(gl)),
+	_members(_vm)
+{
+}
 
 as_object::as_object()
 	:

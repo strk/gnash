@@ -60,9 +60,9 @@ namespace {
 // the Function class itself, which would be a member
 // of the _global object for each movie instance.
 
-as_function::as_function(Global_as& /*gl*/, as_object* iface)
+as_function::as_function(Global_as& gl, as_object* iface)
 	:
-	as_object()
+	as_object(gl)
 {
 	int flags = as_prop_flags::dontDelete |
 	            as_prop_flags::dontEnum |
@@ -76,9 +76,9 @@ as_function::as_function(Global_as& /*gl*/, as_object* iface)
 	}
 }
 
-as_function::as_function(Global_as& /*gl*/)
+as_function::as_function(Global_as& gl)
 	:
-	as_object()
+	as_object(gl)
 {
 	int flags = as_prop_flags::dontDelete |
 	            as_prop_flags::dontEnum | 
