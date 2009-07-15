@@ -3771,8 +3771,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
-    swf_function* func = new swf_function(
-        &code, &env, thread.getNextPC(), thread.getScopeStack());
+    swf_function* func = new swf_function(code, env, thread.getNextPC(),
+            thread.getScopeStack());
 
     func->set_is_function2();
 
@@ -4012,8 +4012,8 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
-    swf_function* func = new swf_function(
-        &code, &env, thread.getNextPC(), thread.getScopeStack());
+    swf_function* func = new swf_function(code, env, thread.getNextPC(),
+            thread.getScopeStack());
 
     size_t i = thread.getCurrentPC() + 3;
 
