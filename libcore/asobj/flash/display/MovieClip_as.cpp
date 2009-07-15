@@ -129,8 +129,10 @@ movieclip_class_init(as_object& where)
         static boost::intrusive_ptr<as_object> cl =
             new as_object(getMovieClipAS3Interface());
         
+        // TODO: fix AVM2Global::createClass to work for AVM2.
+        Global_as* gl = getGlobal(where);
         cl->init_member(NSV::PROP_CONSTRUCTOR,
-                new builtin_function(movieclip_as3_ctor));
+                gl->createFunction(movieclip_as3_ctor));
 
         log_debug("AVM2 MovieClip, proto %s", cl);
 

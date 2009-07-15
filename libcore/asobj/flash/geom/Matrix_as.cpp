@@ -696,13 +696,13 @@ Matrix_transformPoint(const fn_call& fn)
     
     as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
-    if ( ! obj->instanceOf(getFlashGeomPointConstructor()) )
-    {
+    if (!obj->instanceOf(getFlashGeomPointConstructor(fn))) {
         /// Isn't a point.
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.transformPoint(%s): object must be a Point", ss.str());
+            log_aserror("Matrix.transformPoint(%s): object must be a Point",
+                ss.str());
         );
         return as_value();
     }
