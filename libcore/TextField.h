@@ -509,6 +509,9 @@ private:
 	/// text_glyph_records to be rendered.
 	void format_text();
 	
+	/// Move viewable lines based on m_cursor
+	void changeTopVisibleLine(int current_line);
+	
 	/// Extracts an HTML tag.
 	///
 	/// @param tag  This string is filled with the extracted HTML tag.
@@ -578,6 +581,7 @@ private:
 
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
+	TextRecords _displayRecords;
 	bool _underlined;
 
 	boost::uint16_t _leading;
