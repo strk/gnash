@@ -131,7 +131,7 @@ attachByteArrayInterface(as_object& o)
 }
 
 void
-attachByteArrayStaticInterface(as_object& o)
+attachByteArrayStaticInterface(as_object& /*o*/)
 {
 }
 

@@ -51,7 +51,7 @@ textcolortype_class_init(as_object& global)
 namespace {
 
 void
-attachTextColorTypeStaticInterface(as_object& o)
+attachTextColorTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

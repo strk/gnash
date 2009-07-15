@@ -51,7 +51,7 @@ jointstyle_class_init(as_object& global)
 namespace {
 
 void
-attachJointStyleStaticInterface(as_object& o)
+attachJointStyleStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

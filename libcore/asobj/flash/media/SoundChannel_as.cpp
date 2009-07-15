@@ -77,7 +77,7 @@ attachSoundChannelInterface(as_object& o)
 }
 
 void
-attachSoundChannelStaticInterface(as_object& o)
+attachSoundChannelStaticInterface(as_object& /*o*/)
 {
 }
 

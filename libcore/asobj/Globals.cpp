@@ -149,7 +149,7 @@ namespace {
     void registerNatives(as_object& global);
 }
 
-AVM2Global::AVM2Global(Machine& machine, VM& vm)
+AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     :
     _classes(this, 0),
     _vm(vm)

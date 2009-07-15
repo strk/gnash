@@ -77,7 +77,7 @@ attachApplicationDomainInterface(as_object& o)
 }
 
 void
-attachApplicationDomainStaticInterface(as_object& o)
+attachApplicationDomainStaticInterface(as_object& /*o*/)
 {
 }
 

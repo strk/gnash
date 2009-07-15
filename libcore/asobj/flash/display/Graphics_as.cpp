@@ -101,7 +101,7 @@ attachGraphicsInterface(as_object& o)
 }
 
 void
-attachGraphicsStaticInterface(as_object& o)
+attachGraphicsStaticInterface(as_object& /*o*/)
 {
 }
 

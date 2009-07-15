@@ -81,7 +81,7 @@ attachProgressEventInterface(as_object& o)
 }
 
 void
-attachProgressEventStaticInterface(as_object& o)
+attachProgressEventStaticInterface(as_object& /*o*/)
 {
 
 }

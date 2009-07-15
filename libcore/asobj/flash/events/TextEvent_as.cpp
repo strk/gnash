@@ -81,7 +81,7 @@ attachTextEventInterface(as_object& o)
 }
 
 void
-attachTextEventStaticInterface(as_object& o)
+attachTextEventStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -51,7 +51,7 @@ swfversion_class_init(as_object& global)
 namespace {
 
 void
-attachSWFVersionStaticInterface(as_object& o)
+attachSWFVersionStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

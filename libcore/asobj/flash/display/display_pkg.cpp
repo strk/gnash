@@ -64,7 +64,7 @@
 namespace gnash {
 
 static as_value
-get_flash_display_package(const fn_call& fn)
+get_flash_display_package(const fn_call& /*fn*/)
 {
 	log_debug("Loading flash.display package");
 

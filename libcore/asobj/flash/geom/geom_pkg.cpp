@@ -37,30 +37,30 @@
 namespace gnash {
 
 static as_value
-get_flash_geom_package(const fn_call& fn)
+get_flash_geom_package(const fn_call& /*fn*/)
 {
-	log_debug("Loading flash.geom package");
-	as_object *pkg = new as_object(getObjectInterface());
+    log_debug("Loading flash.geom package");
+    as_object *pkg = new as_object(getObjectInterface());
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-	while (geomclasses[i]) {
-	    geomclasses[i](*pkg);
+    // Call the [objectname]_init() function for each class.
+    int i = 0;
+    while (geomclasses[i]) {
+        geomclasses[i](*pkg);
         ++i;
     }
 
-	return pkg;
+    return pkg;
 }
 
 void
 flash_geom_package_init(as_object& where)
 {
-	string_table& st = getStringTable(where);
+    string_table& st = getStringTable(where);
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("geom"),
-			get_flash_geom_package, flags);
+    where.init_destructive_property(st.find("geom"),
+            get_flash_geom_package, flags);
 }
 
 
