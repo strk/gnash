@@ -46,7 +46,7 @@ public:
 	///
 	builtin_function(Global_as& gl, ASFunction func)
 		:
-		as_function(),
+		as_function(gl),
 		_func(func)
 	{
 		init_member(NSV::PROP_CONSTRUCTOR,
@@ -70,7 +70,7 @@ public:
 	builtin_function(Global_as& gl, ASFunction func, as_object* iface,
             bool useThisAsCtor = false)
 		:
-		as_function(iface),
+		as_function(gl, iface),
 		_func(func)
 	{
 		if (useThisAsCtor) init_member(NSV::PROP_CONSTRUCTOR, this);

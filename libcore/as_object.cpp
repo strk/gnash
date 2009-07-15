@@ -65,13 +65,13 @@ class as_super : public as_function
 {
 public:
 
-	as_super(as_function* ctor, as_object* proto)
+	as_super(Global_as& gl, as_function* ctor, as_object* proto)
 		:
+        as_function(gl),
 		_ctor(ctor),
 		_proto(proto)
 	{
 		set_prototype(proto);
-		//log_debug("as_super %p constructed with ctor %p and proto %p", this, ctor, proto);
 	}
 
 	virtual bool isSuper() const { return true; }
@@ -138,8 +138,7 @@ as_super::get_super(const char* fname)
 	as_object* proto = get_prototype().get(); 
 	if ( ! proto )
 	{
-		//log_debug("We (a super) have no associated prototype, returning a null-referencing as_super from get_super()");
-		return new as_super(0, 0);
+		return new as_super(*getGlobal(*this), 0, 0);
 	}
 
 	// proto's __proto__ is superProto 
@@ -211,7 +210,7 @@ as_super::get_super(const char* fname)
 		}
 	}
 
-	as_object* super = new as_super(superCtor, superProto);
+	as_object* super = new as_super(*getGlobal(*this), superCtor, superProto);
 
 	return super;
 }
@@ -389,7 +388,7 @@ as_object::get_super(const char* fname)
 	// proto's __constructor__ is superCtor
 	as_function* superCtor = proto ? proto->get_constructor() : 0;
 
-	as_object* super = new as_super(superCtor, superProto);
+	as_object* super = new as_super(*getGlobal(*this), superCtor, superProto);
 
 	return super;
 }
