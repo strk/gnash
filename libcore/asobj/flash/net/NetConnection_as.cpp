@@ -89,7 +89,7 @@ attachNetConnectionInterface(as_object& o)
 }
 
 void
-attachNetConnectionStaticInterface(as_object& o)
+attachNetConnectionStaticInterface(as_object& /*o*/)
 {
 }
 

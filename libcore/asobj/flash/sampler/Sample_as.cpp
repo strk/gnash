@@ -69,12 +69,12 @@ void sample_class_init(as_object& global)
 namespace {
 
 void
-attachSampleInterface(as_object& o)
+attachSampleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSampleStaticInterface(as_object& o)
+attachSampleStaticInterface(as_object& /*o*/)
 {
 
 }

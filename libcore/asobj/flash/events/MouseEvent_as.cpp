@@ -99,7 +99,7 @@ attachMouseEventInterface(as_object& o)
 }
 
 void
-attachMouseEventStaticInterface(as_object& o)
+attachMouseEventStaticInterface(as_object& /*o*/)
 {
 
 }

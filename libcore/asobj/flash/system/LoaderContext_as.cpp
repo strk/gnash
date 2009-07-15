@@ -69,12 +69,12 @@ void loadercontext_class_init(as_object& global)
 namespace {
 
 void
-attachLoaderContextInterface(as_object& o)
+attachLoaderContextInterface(as_object& /*o*/)
 {
 }
 
 void
-attachLoaderContextStaticInterface(as_object& o)
+attachLoaderContextStaticInterface(as_object& /*o*/)
 {
 
 }

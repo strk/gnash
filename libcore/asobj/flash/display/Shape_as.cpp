@@ -69,12 +69,12 @@ void shape_class_init(as_object& global)
 namespace {
 
 void
-attachShapeInterface(as_object& o)
+attachShapeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachShapeStaticInterface(as_object& o)
+attachShapeStaticInterface(as_object& /*o*/)
 {
 
 }

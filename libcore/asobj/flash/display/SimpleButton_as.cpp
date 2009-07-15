@@ -69,12 +69,12 @@ void simplebutton_class_init(as_object& global)
 namespace {
 
 void
-attachSimpleButtonInterface(as_object& o)
+attachSimpleButtonInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSimpleButtonStaticInterface(as_object& o)
+attachSimpleButtonStaticInterface(as_object& /*o*/)
 {
 
 }

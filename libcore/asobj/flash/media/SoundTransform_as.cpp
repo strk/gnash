@@ -69,12 +69,12 @@ void soundtransform_class_init(as_object& global)
 namespace {
 
 void
-attachSoundTransformInterface(as_object& o)
+attachSoundTransformInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSoundTransformStaticInterface(as_object& o)
+attachSoundTransformStaticInterface(as_object& /*o*/)
 {
 
 }

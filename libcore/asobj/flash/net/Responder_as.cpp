@@ -69,12 +69,12 @@ void responder_class_init(as_object& global)
 namespace {
 
 void
-attachResponderInterface(as_object& o)
+attachResponderInterface(as_object& /*o*/)
 {
 }
 
 void
-attachResponderStaticInterface(as_object& o)
+attachResponderStaticInterface(as_object& /*o*/)
 {
 
 }

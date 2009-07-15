@@ -69,12 +69,12 @@ void fontstyle_class_init(as_object& global)
 namespace {
 
 void
-attachFontStyleInterface(as_object& o)
+attachFontStyleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachFontStyleStaticInterface(as_object& o)
+attachFontStyleStaticInterface(as_object& /*o*/)
 {
 
 }

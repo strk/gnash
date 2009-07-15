@@ -69,12 +69,12 @@ void idynamicpropertyoutput_class_init(as_object& global)
 namespace {
 
 void
-attachIDynamicPropertyOutputInterface(as_object& o)
+attachIDynamicPropertyOutputInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIDynamicPropertyOutputStaticInterface(as_object& o)
+attachIDynamicPropertyOutputStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -69,12 +69,12 @@ void urlrequestheader_class_init(as_object& global)
 namespace {
 
 void
-attachURLRequestHeaderInterface(as_object& o)
+attachURLRequestHeaderInterface(as_object& /*o*/)
 {
 }
 
 void
-attachURLRequestHeaderStaticInterface(as_object& o)
+attachURLRequestHeaderStaticInterface(as_object& /*o*/)
 {
 
 }

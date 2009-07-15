@@ -69,12 +69,12 @@ void scene_class_init(as_object& global)
 namespace {
 
 void
-attachSceneInterface(as_object& o)
+attachSceneInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSceneStaticInterface(as_object& o)
+attachSceneStaticInterface(as_object& /*o*/)
 {
 
 }

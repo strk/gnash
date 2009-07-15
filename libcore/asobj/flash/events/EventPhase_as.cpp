@@ -69,12 +69,12 @@ void eventphase_class_init(as_object& global)
 namespace {
 
 void
-attachEventPhaseInterface(as_object& o)
+attachEventPhaseInterface(as_object& /*o*/)
 {
 }
 
 void
-attachEventPhaseStaticInterface(as_object& o)
+attachEventPhaseStaticInterface(as_object& /*o*/)
 {
 
 }

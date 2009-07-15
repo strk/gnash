@@ -69,12 +69,12 @@ void csmsettings_class_init(as_object& global)
 namespace {
 
 void
-attachCSMSettingsInterface(as_object& o)
+attachCSMSettingsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachCSMSettingsStaticInterface(as_object& o)
+attachCSMSettingsStaticInterface(as_object& /*o*/)
 {
 
 }

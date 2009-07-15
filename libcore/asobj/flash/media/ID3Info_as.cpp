@@ -69,12 +69,12 @@ void id3info_class_init(as_object& global)
 namespace {
 
 void
-attachID3InfoInterface(as_object& o)
+attachID3InfoInterface(as_object& /*o*/)
 {
 }
 
 void
-attachID3InfoStaticInterface(as_object& o)
+attachID3InfoStaticInterface(as_object& /*o*/)
 {
 
 }

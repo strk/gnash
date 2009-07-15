@@ -69,12 +69,12 @@ void urlrequest_class_init(as_object& global)
 namespace {
 
 void
-attachURLRequestInterface(as_object& o)
+attachURLRequestInterface(as_object& /*o*/)
 {
 }
 
 void
-attachURLRequestStaticInterface(as_object& o)
+attachURLRequestStaticInterface(as_object& /*o*/)
 {
 
 }

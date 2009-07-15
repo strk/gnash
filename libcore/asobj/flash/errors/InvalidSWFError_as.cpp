@@ -69,12 +69,12 @@ void invalidswferror_class_init(as_object& global)
 namespace {
 
 void
-attachInvalidSWFErrorInterface(as_object& o)
+attachInvalidSWFErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachInvalidSWFErrorStaticInterface(as_object& o)
+attachInvalidSWFErrorStaticInterface(as_object& /*o*/)
 {
 
 }

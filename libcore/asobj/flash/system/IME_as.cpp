@@ -79,7 +79,7 @@ attachIMEInterface(as_object& o)
 }
 
 void
-attachIMEStaticInterface(as_object& o)
+attachIMEStaticInterface(as_object& /*o*/)
 {
 }
 

@@ -83,7 +83,7 @@ attachKeyboardEventInterface(as_object& o)
 }
 
 void
-attachKeyboardEventStaticInterface(as_object& o)
+attachKeyboardEventStaticInterface(as_object& /*o*/)
 {
 }
 

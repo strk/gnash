@@ -140,7 +140,7 @@ attachSocketInterface(as_object& o)
 }
 
 void
-attachSocketStaticInterface(as_object& o)
+attachSocketStaticInterface(as_object& /*o*/)
 {
 }
 

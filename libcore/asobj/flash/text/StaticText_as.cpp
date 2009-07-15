@@ -69,12 +69,12 @@ void statictext_class_init(as_object& global)
 namespace {
 
 void
-attachStaticTextInterface(as_object& o)
+attachStaticTextInterface(as_object& /*o*/)
 {
 }
 
 void
-attachStaticTextStaticInterface(as_object& o)
+attachStaticTextStaticInterface(as_object& /*o*/)
 {
 
 }

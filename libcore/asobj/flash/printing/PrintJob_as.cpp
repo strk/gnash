@@ -79,7 +79,7 @@ attachPrintJobInterface(as_object& o)
 }
 
 void
-attachPrintJobStaticInterface(as_object& o)
+attachPrintJobStaticInterface(as_object& /*o*/)
 {
 }
 

@@ -69,12 +69,12 @@ void avm1movie_class_init(as_object& global)
 namespace {
 
 void
-attachAVM1MovieInterface(as_object& o)
+attachAVM1MovieInterface(as_object& /*o*/)
 {
 }
 
 void
-attachAVM1MovieStaticInterface(as_object& o)
+attachAVM1MovieStaticInterface(as_object& /*o*/)
 {
 
 }

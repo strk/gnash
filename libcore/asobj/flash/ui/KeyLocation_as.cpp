@@ -69,12 +69,12 @@ void keylocation_class_init(as_object& global)
 namespace {
 
 void
-attachKeyLocationInterface(as_object& o)
+attachKeyLocationInterface(as_object& /*o*/)
 {
 }
 
 void
-attachKeyLocationStaticInterface(as_object& o)
+attachKeyLocationStaticInterface(as_object& /*o*/)
 {
 
 }

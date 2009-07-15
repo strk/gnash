@@ -69,12 +69,12 @@ void objectencoding_class_init(as_object& global)
 namespace {
 
 void
-attachObjectEncodingInterface(as_object& o)
+attachObjectEncodingInterface(as_object& /*o*/)
 {
 }
 
 void
-attachObjectEncodingStaticInterface(as_object& o)
+attachObjectEncodingStaticInterface(as_object& /*o*/)
 {
 
 }

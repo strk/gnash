@@ -89,7 +89,7 @@ attachLoaderInfoInterface(as_object& o)
 }
 
 void
-attachLoaderInfoStaticInterface(as_object& o)
+attachLoaderInfoStaticInterface(as_object& /*o*/)
 {
 }
 

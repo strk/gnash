@@ -69,12 +69,12 @@ void accessibilityproperties_class_init(as_object& global)
 namespace {
 
 void
-attachAccessibilityPropertiesInterface(as_object& o)
+attachAccessibilityPropertiesInterface(as_object& /*o*/)
 {
 }
 
 void
-attachAccessibilityPropertiesStaticInterface(as_object& o)
+attachAccessibilityPropertiesStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -93,7 +93,7 @@ attachProxyInterface(as_object& o)
 }
 
 void
-attachProxyStaticInterface(as_object& o)
+attachProxyStaticInterface(as_object& /*o*/)
 {
 
 }

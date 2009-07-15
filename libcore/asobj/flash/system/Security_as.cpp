@@ -89,7 +89,7 @@ attachSecurityInterface(as_object& o)
 }
 
 void
-attachSecurityStaticInterface(as_object& o)
+attachSecurityStaticInterface(as_object& /*o*/)
 {
 }
 

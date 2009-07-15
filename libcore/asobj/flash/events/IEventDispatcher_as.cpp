@@ -83,7 +83,7 @@ attachIEventDispatcherInterface(as_object& o)
 }
 
 void
-attachIEventDispatcherStaticInterface(as_object& o)
+attachIEventDispatcherStaticInterface(as_object& /*o*/)
 {
 }
 

@@ -69,12 +69,12 @@ void contextmenubuiltinitems_class_init(as_object& global)
 namespace {
 
 void
-attachContextMenuBuiltInItemsInterface(as_object& o)
+attachContextMenuBuiltInItemsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachContextMenuBuiltInItemsStaticInterface(as_object& o)
+attachContextMenuBuiltInItemsStaticInterface(as_object& /*o*/)
 {
 
 }

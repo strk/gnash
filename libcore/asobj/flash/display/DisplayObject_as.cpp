@@ -98,7 +98,7 @@ attachDisplayObjectInterface(as_object& o)
 }
 
 void
-attachDisplayObjectStaticInterface(as_object& o)
+attachDisplayObjectStaticInterface(as_object& /*o*/)
 {
 }
 

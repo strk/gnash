@@ -79,7 +79,7 @@ attachSoundMixerInterface(as_object& o)
 }
 
 void
-attachSoundMixerStaticInterface(as_object& o)
+attachSoundMixerStaticInterface(as_object& /*o*/)
 {
 }
 

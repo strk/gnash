@@ -69,12 +69,12 @@ void dictionary_class_init(as_object& global)
 namespace {
 
 void
-attachDictionaryInterface(as_object& o)
+attachDictionaryInterface(as_object& /*o*/)
 {
 }
 
 void
-attachDictionaryStaticInterface(as_object& o)
+attachDictionaryStaticInterface(as_object& /*o*/)
 {
 
 }

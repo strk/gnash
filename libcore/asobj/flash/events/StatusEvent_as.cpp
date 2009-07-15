@@ -79,7 +79,7 @@ attachStatusEventInterface(as_object& o)
 }
 
 void
-attachStatusEventStaticInterface(as_object& o)
+attachStatusEventStaticInterface(as_object& /*o*/)
 {
 }
 

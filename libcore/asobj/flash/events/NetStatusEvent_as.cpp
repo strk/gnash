@@ -79,7 +79,7 @@ attachNetStatusEventInterface(as_object& o)
 }
 
 void
-attachNetStatusEventStaticInterface(as_object& o)
+attachNetStatusEventStaticInterface(as_object& /*o*/)
 {
 }
 

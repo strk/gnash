@@ -69,12 +69,12 @@ void endian_class_init(as_object& global)
 namespace {
 
 void
-attachEndianInterface(as_object& o)
+attachEndianInterface(as_object& /*o*/)
 {
 }
 
 void
-attachEndianStaticInterface(as_object& o)
+attachEndianStaticInterface(as_object& /*o*/)
 {
 
 }

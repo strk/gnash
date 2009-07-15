@@ -69,12 +69,12 @@ void soundloadercontext_class_init(as_object& global)
 namespace {
 
 void
-attachSoundLoaderContextInterface(as_object& o)
+attachSoundLoaderContextInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSoundLoaderContextStaticInterface(as_object& o)
+attachSoundLoaderContextStaticInterface(as_object& /*o*/)
 {
 
 }

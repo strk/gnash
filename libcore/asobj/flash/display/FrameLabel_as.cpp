@@ -69,12 +69,12 @@ void framelabel_class_init(as_object& global)
 namespace {
 
 void
-attachFrameLabelInterface(as_object& o)
+attachFrameLabelInterface(as_object& /*o*/)
 {
 }
 
 void
-attachFrameLabelStaticInterface(as_object& o)
+attachFrameLabelStaticInterface(as_object& /*o*/)
 {
 
 }

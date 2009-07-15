@@ -69,12 +69,12 @@ void morphshape_class_init(as_object& global)
 namespace {
 
 void
-attachMorphShapeInterface(as_object& o)
+attachMorphShapeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachMorphShapeStaticInterface(as_object& o)
+attachMorphShapeStaticInterface(as_object& /*o*/)
 {
 
 }

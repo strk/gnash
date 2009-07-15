@@ -69,12 +69,12 @@ void bitmap_class_init(as_object& global)
 namespace {
 
 void
-attachBitmapInterface(as_object& o)
+attachBitmapInterface(as_object& /*o*/)
 {
 }
 
 void
-attachBitmapStaticInterface(as_object& o)
+attachBitmapStaticInterface(as_object& /*o*/)
 {
 
 }

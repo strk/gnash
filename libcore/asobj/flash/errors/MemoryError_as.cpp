@@ -69,12 +69,12 @@ void memoryerror_class_init(as_object& global)
 namespace {
 
 void
-attachMemoryErrorInterface(as_object& o)
+attachMemoryErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachMemoryErrorStaticInterface(as_object& o)
+attachMemoryErrorStaticInterface(as_object& /*o*/)
 {
 
 }

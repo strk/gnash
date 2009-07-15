@@ -79,7 +79,7 @@ attachSyncEventInterface(as_object& o)
 }
 
 void
-attachSyncEventStaticInterface(as_object& o)
+attachSyncEventStaticInterface(as_object& /*o*/)
 {
 }
 

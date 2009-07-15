@@ -69,12 +69,12 @@ void filefilter_class_init(as_object& global)
 namespace {
 
 void
-attachFileFilterInterface(as_object& o)
+attachFileFilterInterface(as_object& /*o*/)
 {
 }
 
 void
-attachFileFilterStaticInterface(as_object& o)
+attachFileFilterStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -69,12 +69,12 @@ void capabilities_class_init(as_object& global)
 namespace {
 
 void
-attachCapabilitiesInterface(as_object& o)
+attachCapabilitiesInterface(as_object& /*o*/)
 {
 }
 
 void
-attachCapabilitiesStaticInterface(as_object& o)
+attachCapabilitiesStaticInterface(as_object& /*o*/)
 {
 
 }

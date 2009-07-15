@@ -79,7 +79,7 @@ attachSecurityErrorEventInterface(as_object& o)
 }
 
 void
-attachSecurityErrorEventStaticInterface(as_object& o)
+attachSecurityErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 

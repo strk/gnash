@@ -69,12 +69,12 @@ void blendmode_class_init(as_object& global)
 namespace {
 
 void
-attachBlendModeInterface(as_object& o)
+attachBlendModeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachBlendModeStaticInterface(as_object& o)
+attachBlendModeStaticInterface(as_object& /*o*/)
 {
 
 }

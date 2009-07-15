@@ -69,12 +69,12 @@ void illegaloperationerror_class_init(as_object& global)
 namespace {
 
 void
-attachIllegalOperationErrorInterface(as_object& o)
+attachIllegalOperationErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIllegalOperationErrorStaticInterface(as_object& o)
+attachIllegalOperationErrorStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -69,12 +69,12 @@ void printjoboptions_class_init(as_object& global)
 namespace {
 
 void
-attachPrintJobOptionsInterface(as_object& o)
+attachPrintJobOptionsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachPrintJobOptionsStaticInterface(as_object& o)
+attachPrintJobOptionsStaticInterface(as_object& /*o*/)
 {
 
 }

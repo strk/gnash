@@ -69,12 +69,12 @@ void stackoverflowerror_class_init(as_object& global)
 namespace {
 
 void
-attachStackOverflowErrorInterface(as_object& o)
+attachStackOverflowErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachStackOverflowErrorStaticInterface(as_object& o)
+attachStackOverflowErrorStaticInterface(as_object& /*o*/)
 {
 
 }

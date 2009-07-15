@@ -69,12 +69,12 @@ void interactiveobject_class_init(as_object& global)
 namespace {
 
 void
-attachInteractiveObjectInterface(as_object& o)
+attachInteractiveObjectInterface(as_object& /*o*/)
 {
 }
 
 void
-attachInteractiveObjectStaticInterface(as_object& o)
+attachInteractiveObjectStaticInterface(as_object& /*o*/)
 {
 
 }

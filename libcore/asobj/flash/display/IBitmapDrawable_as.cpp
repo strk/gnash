@@ -69,12 +69,12 @@ void ibitmapdrawable_class_init(as_object& global)
 namespace {
 
 void
-attachIBitmapDrawableInterface(as_object& o)
+attachIBitmapDrawableInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIBitmapDrawableStaticInterface(as_object& o)
+attachIBitmapDrawableStaticInterface(as_object& /*o*/)
 {
 
 }

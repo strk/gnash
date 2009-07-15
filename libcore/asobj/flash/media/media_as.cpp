@@ -69,12 +69,12 @@ void media_class_init(as_object& global)
 namespace {
 
 void
-attachmediaInterface(as_object& o)
+attachmediaInterface(as_object& /*o*/)
 {
 }
 
 void
-attachmediaStaticInterface(as_object& o)
+attachmediaStaticInterface(as_object& /*o*/)
 {
 
 }

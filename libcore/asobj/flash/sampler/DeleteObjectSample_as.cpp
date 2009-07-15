@@ -69,12 +69,12 @@ void deleteobjectsample_class_init(as_object& global)
 namespace {
 
 void
-attachDeleteObjectSampleInterface(as_object& o)
+attachDeleteObjectSampleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachDeleteObjectSampleStaticInterface(as_object& o)
+attachDeleteObjectSampleStaticInterface(as_object& /*o*/)
 {
 
 }

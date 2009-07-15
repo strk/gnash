@@ -69,12 +69,12 @@ void clipboard_class_init(as_object& global)
 namespace {
 
 void
-attachClipboardInterface(as_object& o)
+attachClipboardInterface(as_object& /*o*/)
 {
 }
 
 void
-attachClipboardStaticInterface(as_object& o)
+attachClipboardStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -83,7 +83,7 @@ attachStyleSheetInterface(as_object& o)
 }
 
 void
-attachStyleSheetStaticInterface(as_object& o)
+attachStyleSheetStaticInterface(as_object& /*o*/)
 {
 }
 

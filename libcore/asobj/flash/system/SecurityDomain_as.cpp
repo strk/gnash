@@ -69,12 +69,12 @@ void securitydomain_class_init(as_object& global)
 namespace {
 
 void
-attachSecurityDomainInterface(as_object& o)
+attachSecurityDomainInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSecurityDomainStaticInterface(as_object& o)
+attachSecurityDomainStaticInterface(as_object& /*o*/)
 {
 
 }

@@ -69,12 +69,12 @@ void textlinemetrics_class_init(as_object& global)
 namespace {
 
 void
-attachTextLineMetricsInterface(as_object& o)
+attachTextLineMetricsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachTextLineMetricsStaticInterface(as_object& o)
+attachTextLineMetricsStaticInterface(as_object& /*o*/)
 {
 
 }

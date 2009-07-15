@@ -83,7 +83,7 @@ attachTimerEventInterface(as_object& o)
 }
 
 void
-attachTimerEventStaticInterface(as_object& o)
+attachTimerEventStaticInterface(as_object& /*o*/)
 {
 }
 

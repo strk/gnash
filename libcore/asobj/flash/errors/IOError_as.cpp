@@ -69,12 +69,12 @@ void ioerror_class_init(as_object& global)
 namespace {
 
 void
-attachIOErrorInterface(as_object& o)
+attachIOErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIOErrorStaticInterface(as_object& o)
+attachIOErrorStaticInterface(as_object& /*o*/)
 {
 
 }

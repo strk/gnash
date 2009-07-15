@@ -69,12 +69,12 @@ void securitypanel_class_init(as_object& global)
 namespace {
 
 void
-attachSecurityPanelInterface(as_object& o)
+attachSecurityPanelInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSecurityPanelStaticInterface(as_object& o)
+attachSecurityPanelStaticInterface(as_object& /*o*/)
 {
 
 }
