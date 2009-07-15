@@ -511,7 +511,7 @@ movie_root::clear()
 as_object*
 movie_root::getSelectionObject() const
 {
-    as_object* global = _vm.getGlobal();
+    Global_as* global = _vm.getGlobal();
     if (!global) return 0;
 
     as_value s;
@@ -527,7 +527,7 @@ movie_root::getStageObject()
 {
 	as_value v;
 	assert ( VM::isInitialized() ); // return NULL;
-	as_object* global = _vm.getGlobal();
+	Global_as* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
 	return boost::dynamic_pointer_cast<Stage_as>(v.to_object(*global));
@@ -579,7 +579,7 @@ movie_root::getKeyObject()
 		// TODO: use a named string...
 
 		as_value kval;
-		as_object* global = _vm.getGlobal();
+		Global_as* global = _vm.getGlobal();
 
 		if (global->get_member(NSV::CLASS_KEY, &kval)) {
 
@@ -599,7 +599,7 @@ movie_root::getMouseObject()
 	if ( ! _mouseobject )
 	{
 		as_value val;
-		as_object* global = _vm.getGlobal();
+		Global_as* global = _vm.getGlobal();
 
 		if (global->get_member(NSV::CLASS_MOUSE, &val) )
 		{
@@ -1013,7 +1013,8 @@ movie_root::advance()
 
     try {
 
-        int elapsed = now - _lastMovieAdvancement;
+        assert(now >= _lastMovieAdvancement);
+        size_t elapsed = now - _lastMovieAdvancement;
 	    if (elapsed >= _movieAdvancementDelay)
 	    {
             advanced = true;
