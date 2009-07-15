@@ -76,13 +76,13 @@ libgnashnet_la_SOURCES = \
 	cache.cpp
 
 if BUILD_SSL
-libgnashnet_la_SOURCES += sslclient.cpp
-noinst_HEADERS += sslclient.h
+libgnashnet_la_SOURCES += sslclient.cpp sslserver.cpp
+noinst_HEADERS += sslclient.h sslserver.h
 endif
 
 if BUILD_SSH
-libgnashnet_la_SOURCES += sshclient.cpp # sshserver.cpp
-noinst_HEADERS += sshclient.h # sshserver.h
+libgnashnet_la_SOURCES += sshclient.cpp sshserver.cpp
+noinst_HEADERS += sshclient.h sshserver.h
 endif
 
 if WIN32
