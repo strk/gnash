@@ -69,12 +69,12 @@ void accessibilityproperties_class_init(as_object& global)
 namespace {
 
 void
-attachAccessibilityPropertiesInterface(as_object& o)
+attachAccessibilityPropertiesInterface(as_object& /*o*/)
 {
 }
 
 void
-attachAccessibilityPropertiesStaticInterface(as_object& o)
+attachAccessibilityPropertiesStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getAccessibilityPropertiesInterface()
 }
 
 as_value
-accessibilityproperties_ctor(const fn_call& fn)
+accessibilityproperties_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new AccessibilityProperties_as;
 

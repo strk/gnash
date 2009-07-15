@@ -69,12 +69,12 @@ void memoryerror_class_init(as_object& global)
 namespace {
 
 void
-attachMemoryErrorInterface(as_object& o)
+attachMemoryErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachMemoryErrorStaticInterface(as_object& o)
+attachMemoryErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getMemoryErrorInterface()
 }
 
 as_value
-memoryerror_ctor(const fn_call& fn)
+memoryerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MemoryError_as;
 

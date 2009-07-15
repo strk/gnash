@@ -144,7 +144,7 @@ displayobjectcontainer_addChild(const fn_call& fn)
         );
     }
 
-    as_object* objArg = fn.arg(0).to_object().get();
+    as_object* objArg = fn.arg(0).to_object(*getGlobal(fn)).get();
     if (!objArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -190,7 +190,7 @@ displayobjectcontainer_addChildAt(const fn_call& fn)
         );
     }
 
-    as_object* objArg = fn.arg(0).to_object().get();
+    as_object* objArg = fn.arg(0).to_object(*getGlobal(fn)).get();
     if (!objArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);

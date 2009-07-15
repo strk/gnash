@@ -69,12 +69,12 @@ void newobjectsample_class_init(as_object& global)
 namespace {
 
 void
-attachNewObjectSampleInterface(as_object& o)
+attachNewObjectSampleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachNewObjectSampleStaticInterface(as_object& o)
+attachNewObjectSampleStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getNewObjectSampleInterface()
 }
 
 as_value
-newobjectsample_ctor(const fn_call& fn)
+newobjectsample_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new NewObjectSample_as;
 

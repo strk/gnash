@@ -302,7 +302,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object(*getGlobal(fn));
 	if ( ! trans )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

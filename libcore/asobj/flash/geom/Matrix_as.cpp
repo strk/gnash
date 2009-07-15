@@ -143,18 +143,6 @@ public:
 };
 
 
-as_function* getFlashGeomMatrixConstructor()
-{
-    static builtin_function* cl = NULL;
-    if ( ! cl )
-    {
-        cl=new builtin_function(&Matrix_ctor, getMatrixInterface());
-        VM::get().addStatic(cl);
-    }
-    return cl;
-}
-
-
 /// Return an exact copy of the matrix.
 static as_value
 Matrix_clone(const fn_call& fn)
@@ -214,7 +202,7 @@ Matrix_concat(const fn_call& fn)
     }
 
     // The object to concatenate doesn't have to be a matrix.    
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
 
     MatrixType concatMatrix;
@@ -416,7 +404,7 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 
     // It doesn't have to be a point. If it has x and y
     // properties, they will be used.    
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
 
     const PointType& point = transformPoint(obj, ptr.get());
@@ -706,15 +694,15 @@ Matrix_transformPoint(const fn_call& fn)
         return as_value();
     }
     
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
-    if ( ! obj->instanceOf(getFlashGeomPointConstructor()) )
-    {
+    if (!obj->instanceOf(getFlashGeomPointConstructor(fn))) {
         /// Isn't a point.
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.transformPoint(%s): object must be a Point", ss.str());
+            log_aserror("Matrix.transformPoint(%s): object must be a Point",
+                ss.str());
         );
         return as_value();
     }
@@ -905,11 +893,11 @@ Matrix_ctor(const fn_call& fn)
 
 
 static as_value
-get_flash_geom_matrix_constructor(const fn_call& /*fn*/)
+get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
-
-    return getFlashGeomMatrixConstructor();
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Matrix_ctor, getMatrixInterface());
 }
 
 // extern 

@@ -99,7 +99,7 @@ attachMouseEventInterface(as_object& o)
 }
 
 void
-attachMouseEventStaticInterface(as_object& o)
+attachMouseEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -236,7 +236,7 @@ mouseevent_ROLL_OVER(const fn_call& fn)
 }
 
 as_value
-mouseevent_ctor(const fn_call& fn)
+mouseevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MouseEvent_as;
 

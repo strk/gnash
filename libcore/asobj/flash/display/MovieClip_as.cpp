@@ -129,8 +129,10 @@ movieclip_class_init(as_object& where)
         static boost::intrusive_ptr<as_object> cl =
             new as_object(getMovieClipAS3Interface());
         
+        // TODO: fix AVM2Global::createClass to work for AVM2.
+        Global_as* gl = getGlobal(where);
         cl->init_member(NSV::PROP_CONSTRUCTOR,
-                new builtin_function(movieclip_as3_ctor));
+                gl->createFunction(movieclip_as3_ctor));
 
         log_debug("AVM2 MovieClip, proto %s", cl);
 
@@ -596,7 +598,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::intrusive_ptr<as_object> initObj;
 
     if (fn.nargs > 3 ) {
-        initObj = fn.arg(3).to_object();
+        initObj = fn.arg(3).to_object(*getGlobal(fn));
         if (!initObj) {
             // This is actually a valid thing to do,
             // the documented behaviour is to just NOT
@@ -636,7 +638,7 @@ movieclip_attachAudio(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object().get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
     if ( ! obj )
     { 
         std::stringstream ss; fn.dump_args(ss);
@@ -907,7 +909,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     // Copy members from initObject
     if (fn.nargs == 3)
     {
-        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
+        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object(*getGlobal(fn));
         ch = movieclip->duplicateMovieClip(newname, depthValue,
                 initObject.get());
     }
@@ -1388,7 +1390,7 @@ movieclip_meth(const fn_call& fn)
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
-    boost::intrusive_ptr<as_object> o = v.to_object();
+    boost::intrusive_ptr<as_object> o = v.to_object(*getGlobal(fn));
     if ( ! o )
     {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
@@ -1504,7 +1506,7 @@ movieclip_globalToLocal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1567,7 +1569,7 @@ movieclip_localToGlobal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1640,7 +1642,7 @@ movieclip_setMask(const fn_call& fn)
     else
     {
 
-        boost::intrusive_ptr<as_object> obj ( arg.to_object() );
+        boost::intrusive_ptr<as_object> obj ( arg.to_object(*getGlobal(fn)) );
         DisplayObject* mask = dynamic_cast<DisplayObject*>(obj.get());
         if ( ! mask )
         {
@@ -2147,10 +2149,10 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     typedef boost::intrusive_ptr<as_object> ObjPtr;
 
-    ObjPtr colors = fn.arg(1).to_object();
-    ObjPtr alphas = fn.arg(2).to_object();
-    ObjPtr ratios = fn.arg(3).to_object();
-    ObjPtr matrixArg = fn.arg(4).to_object();
+    ObjPtr colors = fn.arg(1).to_object(*getGlobal(fn));
+    ObjPtr alphas = fn.arg(2).to_object(*getGlobal(fn));
+    ObjPtr ratios = fn.arg(3).to_object(*getGlobal(fn));
+    ObjPtr matrixArg = fn.arg(4).to_object(*getGlobal(fn));
 
     if ( ! colors || ! alphas || ! ratios || ! matrixArg )
     {
@@ -2490,7 +2492,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object().get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
     boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
 
     if (!bd) {

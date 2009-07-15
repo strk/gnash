@@ -69,12 +69,12 @@ void capabilities_class_init(as_object& global)
 namespace {
 
 void
-attachCapabilitiesInterface(as_object& o)
+attachCapabilitiesInterface(as_object& /*o*/)
 {
 }
 
 void
-attachCapabilitiesStaticInterface(as_object& o)
+attachCapabilitiesStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getCapabilitiesInterface()
 }
 
 as_value
-capabilities_ctor(const fn_call& fn)
+capabilities_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Capabilities_as;
 

@@ -377,7 +377,7 @@ BitmapData_fillRect(const fn_call& fn)
     }
 
     // This can be any object with the right properties.   
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
     
     as_value x, y, w, h;

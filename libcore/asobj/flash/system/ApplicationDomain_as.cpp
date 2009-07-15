@@ -103,7 +103,7 @@ applicationdomain_hasDefinition(const fn_call& fn)
 }
 
 as_value
-applicationdomain_ctor(const fn_call& fn)
+applicationdomain_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ApplicationDomain_as;
 

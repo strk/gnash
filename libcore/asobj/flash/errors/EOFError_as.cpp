@@ -69,12 +69,12 @@ void eoferror_class_init(as_object& global)
 namespace {
 
 void
-attachEOFErrorInterface(as_object& o)
+attachEOFErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachEOFErrorStaticInterface(as_object& o)
+attachEOFErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getEOFErrorInterface()
 }
 
 as_value
-eoferror_ctor(const fn_call& fn)
+eoferror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new EOFError_as;
 

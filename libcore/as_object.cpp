@@ -830,7 +830,9 @@ as_object::add_interface(as_object* obj)
 bool
 as_object::instanceOf(as_object* ctor)
 {
-//#define GNASH_DEBUG_INSTANCE_OF 1
+
+    /// An object is never an instance of a null prototype.
+    if (!ctor) return false;
 
 	as_value protoVal;
 	if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal) )
@@ -841,7 +843,7 @@ as_object::instanceOf(as_object* ctor)
 #endif
 		return false;
 	}
-	as_object* ctorProto = protoVal.to_object().get();
+	as_object* ctorProto = protoVal.to_object(*getGlobal(*this)).get();
 	if ( ! ctorProto )
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
@@ -1001,7 +1003,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	boost::intrusive_ptr<as_object> props = props_val.to_object();
+	boost::intrusive_ptr<as_object> props = props_val.to_object(*getGlobal(*this));
 	Array_as* ary = dynamic_cast<Array_as*>(props.get());
 	if ( ! ary )
 	{
@@ -1148,7 +1150,7 @@ as_object::valueof_method(const fn_call& fn)
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
-	int swfVersion = _vm.getSWFVersion();
+	int swfVersion = getSWFVersion(*this);
 
 	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
 	if ( ! prop ) return 0;
@@ -1156,7 +1158,7 @@ as_object::get_prototype()
 
 	as_value tmp = prop->getValue(*this);
 
-	return tmp.to_object();
+	return tmp.to_object(*getGlobal(*this));
 }
 
 bool
@@ -1304,7 +1306,7 @@ as_object::get_path_element(string_table::key key)
 		return NULL;
 	}
 
-	return tmp.to_object().get();
+	return tmp.to_object(*getGlobal(*this)).get();
 }
 
 void

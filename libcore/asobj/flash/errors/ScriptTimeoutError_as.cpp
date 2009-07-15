@@ -69,12 +69,12 @@ void scripttimeouterror_class_init(as_object& global)
 namespace {
 
 void
-attachScriptTimeoutErrorInterface(as_object& o)
+attachScriptTimeoutErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachScriptTimeoutErrorStaticInterface(as_object& o)
+attachScriptTimeoutErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getScriptTimeoutErrorInterface()
 }
 
 as_value
-scripttimeouterror_ctor(const fn_call& fn)
+scripttimeouterror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ScriptTimeoutError_as;
 

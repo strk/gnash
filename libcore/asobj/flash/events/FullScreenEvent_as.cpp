@@ -115,7 +115,7 @@ fullscreenevent_FULL_SCREEN(const fn_call& fn)
 }
 
 as_value
-fullscreenevent_ctor(const fn_call& fn)
+fullscreenevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FullScreenEvent_as;
 

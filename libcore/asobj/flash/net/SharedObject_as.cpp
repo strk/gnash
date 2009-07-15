@@ -1037,7 +1037,7 @@ readSOL(VM& vm, const std::string& filespec)
     log_debug("Read %d AMF objects from %s", els.size(), filespec);
 
     as_value as = getMember(NSV::PROP_DATA);
-    boost::intrusive_ptr<as_object> ptr = as.to_object();
+    boost::intrusive_ptr<as_object> ptr = as.to_object(*getGlobal(fn));
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
         boost::shared_ptr<amf::Element> el = *it;
@@ -1081,7 +1081,7 @@ readSOL(VM& vm, const std::string& filespec)
             case Element::OBJECT_AMF0:
                 // TODO: implement!
                 log_unimpl("Reading OBJECT type from SharedObject");
-                //data.convert_to_object();
+                //data.convert_to_object(*getGlobal(fn));
                 //ptr->set_member(st.string_table::find(el->name), data);
                 return false;
                 break;

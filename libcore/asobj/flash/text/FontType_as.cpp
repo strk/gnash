@@ -69,12 +69,12 @@ void fonttype_class_init(as_object& global)
 namespace {
 
 void
-attachFontTypeInterface(as_object& o)
+attachFontTypeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachFontTypeStaticInterface(as_object& o)
+attachFontTypeStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getFontTypeInterface()
 }
 
 as_value
-fonttype_ctor(const fn_call& fn)
+fonttype_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FontType_as;
 

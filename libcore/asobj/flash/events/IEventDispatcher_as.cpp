@@ -83,7 +83,7 @@ attachIEventDispatcherInterface(as_object& o)
 }
 
 void
-attachIEventDispatcherStaticInterface(as_object& o)
+attachIEventDispatcherStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -139,7 +139,7 @@ ieventdispatcher_willTrigger(const fn_call& fn)
 }
 
 as_value
-ieventdispatcher_ctor(const fn_call& fn)
+ieventdispatcher_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IEventDispatcher_as;
 

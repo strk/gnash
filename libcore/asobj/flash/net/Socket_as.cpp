@@ -140,7 +140,7 @@ attachSocketInterface(as_object& o)
 }
 
 void
-attachSocketStaticInterface(as_object& o)
+attachSocketStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -476,7 +476,7 @@ socket_socketData(const fn_call& fn)
 }
 
 as_value
-socket_ctor(const fn_call& fn)
+socket_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Socket_as;
 

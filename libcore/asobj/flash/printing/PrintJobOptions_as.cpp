@@ -69,12 +69,12 @@ void printjoboptions_class_init(as_object& global)
 namespace {
 
 void
-attachPrintJobOptionsInterface(as_object& o)
+attachPrintJobOptionsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachPrintJobOptionsStaticInterface(as_object& o)
+attachPrintJobOptionsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getPrintJobOptionsInterface()
 }
 
 as_value
-printjoboptions_ctor(const fn_call& fn)
+printjoboptions_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new PrintJobOptions_as;
 

@@ -148,7 +148,7 @@ object_ctor(const fn_call& fn)
 	if ( fn.nargs == 1 ) // copy constructor
 	{
 
-        as_object* obj = fn.arg(0).to_object().get();
+        as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
 
         /// If it's not an object, return an undefined object, not null.
         if (!obj) return as_value(new as_object);
@@ -415,7 +415,7 @@ object_isPrototypeOf(const fn_call& fn)
 		return as_value(false); 
 	}
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

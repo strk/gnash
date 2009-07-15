@@ -69,12 +69,12 @@ void avm1movie_class_init(as_object& global)
 namespace {
 
 void
-attachAVM1MovieInterface(as_object& o)
+attachAVM1MovieInterface(as_object& /*o*/)
 {
 }
 
 void
-attachAVM1MovieStaticInterface(as_object& o)
+attachAVM1MovieStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getAVM1MovieInterface()
 }
 
 as_value
-avm1movie_ctor(const fn_call& fn)
+avm1movie_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new AVM1Movie_as;
 

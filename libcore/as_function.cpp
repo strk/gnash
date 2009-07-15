@@ -116,7 +116,7 @@ as_function::getPrototype()
 	//               prototype, not the old !!
 	as_value proto;
 	get_member(NSV::PROP_PROTOTYPE, &proto);
-	return proto.to_object();
+	return proto.to_object(*VM::get().getGlobal());
 }
 
 boost::intrusive_ptr<builtin_function>
@@ -175,7 +175,7 @@ as_function::constructInstance(const as_environment& env,
                     "%s", ex.what());
 		}
 
-		if (ret.is_object()) newobj = ret.to_object();
+		if (ret.is_object()) newobj = ret.to_object(*getGlobal(env));
 		else {
 			log_debug("Native function called as constructor returned %s", ret);
 			newobj = new as_object();
@@ -215,7 +215,7 @@ as_function::constructInstance(const as_environment& env,
 		);
 
 		// Create an empty object, with a ref to the constructor's prototype.
-		newobj = new as_object(proto.to_object());
+		newobj = new as_object(proto.to_object(*getGlobal(env)));
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked)
@@ -329,7 +329,7 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object* obj = fn.arg(0).to_object().get();
+		as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
 
         if (!obj) obj = new as_object; 
 
@@ -349,7 +349,9 @@ function_apply(const fn_call& fn)
 				}
 			);
 
-			boost::intrusive_ptr<as_object> arg1 = fn.arg(1).to_object();
+			boost::intrusive_ptr<as_object> arg1 = 
+                fn.arg(1).to_object(*getGlobal(fn));
+
 			if (!arg1) {
 				IF_VERBOSE_ASCODING_ERRORS(
 					log_aserror(_("Second arg of Function.apply"
@@ -410,7 +412,8 @@ function_call(const fn_call& fn)
 	else {
 		// Get the object to use as 'this' reference
 		as_value this_val = fn.arg(0);
-		boost::intrusive_ptr<as_object> this_ptr = this_val.to_object();
+		boost::intrusive_ptr<as_object> this_ptr =
+            this_val.to_object(*getGlobal(fn));
 
 		if (!this_ptr) {
 			// If the first argument is not an object, we should

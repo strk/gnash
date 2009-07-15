@@ -69,12 +69,12 @@ void eventphase_class_init(as_object& global)
 namespace {
 
 void
-attachEventPhaseInterface(as_object& o)
+attachEventPhaseInterface(as_object& /*o*/)
 {
 }
 
 void
-attachEventPhaseStaticInterface(as_object& o)
+attachEventPhaseStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getEventPhaseInterface()
 }
 
 as_value
-eventphase_ctor(const fn_call& fn)
+eventphase_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new EventPhase_as;
 

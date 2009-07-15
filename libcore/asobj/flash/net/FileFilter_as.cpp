@@ -69,12 +69,12 @@ void filefilter_class_init(as_object& global)
 namespace {
 
 void
-attachFileFilterInterface(as_object& o)
+attachFileFilterInterface(as_object& /*o*/)
 {
 }
 
 void
-attachFileFilterStaticInterface(as_object& o)
+attachFileFilterStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getFileFilterInterface()
 }
 
 as_value
-filefilter_ctor(const fn_call& fn)
+filefilter_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FileFilter_as;
 

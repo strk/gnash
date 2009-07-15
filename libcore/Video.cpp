@@ -436,7 +436,8 @@ video_attach(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<NetStream_as> ns = 
-        boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
+        boost::dynamic_pointer_cast<NetStream_as>(
+                fn.arg(0).to_object(*getGlobal(fn)));
 	if (ns)
 	{
 		video->setStream(ns);

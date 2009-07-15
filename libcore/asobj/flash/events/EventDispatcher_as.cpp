@@ -164,7 +164,7 @@ eventdispatcher_deactivate(const fn_call& fn)
 }
 
 as_value
-eventdispatcher_ctor(const fn_call& fn)
+eventdispatcher_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new EventDispatcher_as;
 

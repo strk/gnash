@@ -52,7 +52,6 @@ namespace {
 void
 attachClipboardTransferModeStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     o.init_member("CLONE_ONLY", "cloneOnly");
     o.init_member("CLONE_PREFERRED", "clonePreferred");
     o.init_member("ORIGINAL_ONLY", "originalOnly");

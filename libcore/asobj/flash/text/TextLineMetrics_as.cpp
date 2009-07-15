@@ -69,12 +69,12 @@ void textlinemetrics_class_init(as_object& global)
 namespace {
 
 void
-attachTextLineMetricsInterface(as_object& o)
+attachTextLineMetricsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachTextLineMetricsStaticInterface(as_object& o)
+attachTextLineMetricsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getTextLineMetricsInterface()
 }
 
 as_value
-textlinemetrics_ctor(const fn_call& fn)
+textlinemetrics_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextLineMetrics_as;
 

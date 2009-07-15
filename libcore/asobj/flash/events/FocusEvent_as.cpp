@@ -151,7 +151,7 @@ focusevent_MOUSE_FOCUS_CHANGE(const fn_call& fn)
 }
 
 as_value
-focusevent_ctor(const fn_call& fn)
+focusevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FocusEvent_as;
 

@@ -103,7 +103,7 @@ urlvariables_toString(const fn_call& fn)
 }
 
 as_value
-urlvariables_ctor(const fn_call& fn)
+urlvariables_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLVariables_as;
 

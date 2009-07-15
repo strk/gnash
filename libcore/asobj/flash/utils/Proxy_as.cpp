@@ -93,7 +93,7 @@ attachProxyInterface(as_object& o)
 }
 
 void
-attachProxyStaticInterface(as_object& o)
+attachProxyStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -200,7 +200,7 @@ proxy_setProperty(const fn_call& fn)
 }
 
 as_value
-proxy_ctor(const fn_call& fn)
+proxy_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Proxy_as;
 

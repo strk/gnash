@@ -69,12 +69,12 @@ void deleteobjectsample_class_init(as_object& global)
 namespace {
 
 void
-attachDeleteObjectSampleInterface(as_object& o)
+attachDeleteObjectSampleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachDeleteObjectSampleStaticInterface(as_object& o)
+attachDeleteObjectSampleStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getDeleteObjectSampleInterface()
 }
 
 as_value
-deleteobjectsample_ctor(const fn_call& fn)
+deleteobjectsample_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new DeleteObjectSample_as;
 

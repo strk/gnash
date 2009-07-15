@@ -69,12 +69,12 @@ void keylocation_class_init(as_object& global)
 namespace {
 
 void
-attachKeyLocationInterface(as_object& o)
+attachKeyLocationInterface(as_object& /*o*/)
 {
 }
 
 void
-attachKeyLocationStaticInterface(as_object& o)
+attachKeyLocationStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getKeyLocationInterface()
 }
 
 as_value
-keylocation_ctor(const fn_call& fn)
+keylocation_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new KeyLocation_as;
 

@@ -31,25 +31,25 @@ class as_value;
 class as_object;
 
 static as_value
-get_flash_package(const fn_call& fn)
+get_flash_package(const fn_call& /*fn*/)
 {
     as_object *pkg = new as_object(getObjectInterface());
 
-	int i = 0;
+    int i = 0;
     while (as2classes[i]) {
         as2classes[i](*pkg);
         ++i;
     }
 
-	return pkg;
+    return pkg;
 }
 
 void
 flash_package_init(as_object& where)
 {
-	string_table& st = getStringTable(where);
-	where.init_destructive_property(st.find("flash"), get_flash_package,
-		as_prop_flags::dontEnum | as_prop_flags::onlySWF8Up);
+    string_table& st = getStringTable(where);
+    where.init_destructive_property(st.find("flash"), get_flash_package,
+        as_prop_flags::dontEnum | as_prop_flags::onlySWF8Up);
 }
 
 }

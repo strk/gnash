@@ -131,7 +131,7 @@ Point_add(const fn_call& fn)
 		}
 		);
 		const as_value& arg1 = fn.arg(0);
-		as_object* o = arg1.to_object().get();
+		as_object* o = arg1.to_object(*getGlobal(fn)).get();
 		if ( ! o )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -204,17 +204,19 @@ Point_equals(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Point.equals(%s): %s", ss.str(), _("First arg must be an object"));
+		log_aserror("Point.equals(%s): %s", ss.str(),
+            _("First arg must be an object"));
 		);
 		return as_value(false);
 	}
-	as_object* o = arg1.to_object().get();
+	as_object* o = arg1.to_object(*getGlobal(fn)).get();
 	assert(o);
-	if ( ! o->instanceOf(getFlashGeomPointConstructor()) )
+	if ( ! o->instanceOf(getFlashGeomPointConstructor(fn)) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Point.equals(%s): %s %s", ss.str(), _("First arg must be an instance of"), "flash.geom.Point");
+		log_aserror("Point.equals(%s): %s %s", ss.str(),
+            _("First arg must be an instance of"), "flash.geom.Point");
 		);
 		return as_value(false);
 	}
@@ -336,7 +338,7 @@ Point_subtract(const fn_call& fn)
 		}
 		);
 		const as_value& arg1 = fn.arg(0);
-		as_object* o = arg1.to_object().get();
+		as_object* o = arg1.to_object(*getGlobal(fn)).get();
 		if ( ! o )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -448,9 +450,9 @@ Point_distance(const fn_call& fn)
 		);
 		return as_value();
 	}
-	as_object* o1 = arg1.to_object().get();
+	as_object* o1 = arg1.to_object(*getGlobal(fn)).get();
 	assert(o1);
-	if ( ! o1->instanceOf(getFlashGeomPointConstructor()) )
+	if ( ! o1->instanceOf(getFlashGeomPointConstructor(fn)) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
@@ -460,7 +462,7 @@ Point_distance(const fn_call& fn)
 	}
 
 	const as_value& arg2 = fn.arg(1);
-	as_object* o2 = arg2.to_object().get();
+	as_object* o2 = arg2.to_object(*getGlobal(fn)).get();
 	assert(o2);
 	// it seems there's no need to check arg2 (see actionscript.all/Point.as)
 
@@ -520,7 +522,7 @@ Point_interpolate(const fn_call& fn)
 		);
 
 		const as_value& p0val = fn.arg(0);
-		as_object* p0 = p0val.to_object().get();
+		as_object* p0 = p0val.to_object(*getGlobal(fn)).get();
 		if ( ! p0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -535,7 +537,7 @@ Point_interpolate(const fn_call& fn)
 		}
 
 		const as_value& p1val = fn.arg(1);
-		as_object* p1 = p1val.to_object().get();
+		as_object* p1 = p1val.to_object(*getGlobal(fn)).get();
 		if ( ! p1 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -657,23 +659,21 @@ Point_ctor(const fn_call& fn)
 }
 
 // extern 
-as_function* getFlashGeomPointConstructor()
+as_function*
+getFlashGeomPointConstructor(const fn_call& fn)
 {
-	static builtin_function* cl=NULL;
-	if ( ! cl )
-	{
-		cl=new builtin_function(&Point_ctor, getPointInterface());
-		VM::get().addStatic(cl);
-		attachPointStaticProperties(*cl);
-	}
-	return cl;
+    as_value point(fn.env().find_object("flash.geom.Point"));
+    return point.to_as_function();
 }
 
-static as_value get_flash_geom_point_constructor(const fn_call& /*fn*/)
+static
+as_value get_flash_geom_point_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Point class");
-
-	return getFlashGeomPointConstructor();
+    Global_as* gl = getGlobal(fn);
+    as_object* cl = gl->createClass(&Point_ctor, getPointInterface());
+    attachPointStaticProperties(*cl);
+    return cl;
 }
 
 boost::intrusive_ptr<as_object> init_Point_instance()

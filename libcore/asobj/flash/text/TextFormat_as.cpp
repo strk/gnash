@@ -69,12 +69,12 @@ void textformat_class_init(as_object& global)
 namespace {
 
 void
-attachTextFormatInterface(as_object& o)
+attachTextFormatInterface(as_object& /*o*/)
 {
 }
 
 void
-attachTextFormatStaticInterface(as_object& o)
+attachTextFormatStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getTextFormatInterface()
 }
 
 as_value
-textformat_ctor(const fn_call& fn)
+textformat_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextFormat_as;
 

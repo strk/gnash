@@ -69,12 +69,12 @@ void loadercontext_class_init(as_object& global)
 namespace {
 
 void
-attachLoaderContextInterface(as_object& o)
+attachLoaderContextInterface(as_object& /*o*/)
 {
 }
 
 void
-attachLoaderContextStaticInterface(as_object& o)
+attachLoaderContextStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getLoaderContextInterface()
 }
 
 as_value
-loadercontext_ctor(const fn_call& fn)
+loadercontext_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new LoaderContext_as;
 

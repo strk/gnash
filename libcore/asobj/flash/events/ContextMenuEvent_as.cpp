@@ -128,7 +128,7 @@ contextmenuevent_MENU_SELECT(const fn_call& fn)
 }
 
 as_value
-contextmenuevent_ctor(const fn_call& fn)
+contextmenuevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ContextMenuEvent_as;
 

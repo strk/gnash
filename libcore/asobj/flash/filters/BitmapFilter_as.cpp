@@ -80,13 +80,8 @@ attachBitmapFilterInterface(as_object& o)
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
-    static builtin_function* cl;
-    if (!cl) {
-        cl = new builtin_function(&bitmapfilter_ctor,
-                getBitmapFilterInterface());
-        getVM(fn).addStatic(cl);
-    }
-    return cl;
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&bitmapfilter_ctor, getBitmapFilterInterface());
 }
 
 as_value

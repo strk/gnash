@@ -115,7 +115,7 @@ font_registerFont(const fn_call& fn)
 }
 
 as_value
-font_ctor(const fn_call& fn)
+font_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Font_as;
 

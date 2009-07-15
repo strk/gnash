@@ -69,12 +69,12 @@ void soundtransform_class_init(as_object& global)
 namespace {
 
 void
-attachSoundTransformInterface(as_object& o)
+attachSoundTransformInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSoundTransformStaticInterface(as_object& o)
+attachSoundTransformStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getSoundTransformInterface()
 }
 
 as_value
-soundtransform_ctor(const fn_call& fn)
+soundtransform_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundTransform_as;
 

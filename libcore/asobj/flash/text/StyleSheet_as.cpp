@@ -83,7 +83,7 @@ attachStyleSheetInterface(as_object& o)
 }
 
 void
-attachStyleSheetStaticInterface(as_object& o)
+attachStyleSheetStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -139,7 +139,7 @@ stylesheet_transform(const fn_call& fn)
 }
 
 as_value
-stylesheet_ctor(const fn_call& fn)
+stylesheet_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StyleSheet_as;
 

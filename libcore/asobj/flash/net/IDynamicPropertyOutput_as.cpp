@@ -69,12 +69,12 @@ void idynamicpropertyoutput_class_init(as_object& global)
 namespace {
 
 void
-attachIDynamicPropertyOutputInterface(as_object& o)
+attachIDynamicPropertyOutputInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIDynamicPropertyOutputStaticInterface(as_object& o)
+attachIDynamicPropertyOutputStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getIDynamicPropertyOutputInterface()
 }
 
 as_value
-idynamicpropertyoutput_ctor(const fn_call& fn)
+idynamicpropertyoutput_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IDynamicPropertyOutput_as;
 

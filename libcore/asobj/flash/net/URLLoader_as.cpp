@@ -91,10 +91,8 @@ attachURLLoaderInterface(as_object& o)
 }
 
 void
-attachURLLoaderStaticInterface(as_object& o)
+attachURLLoaderStaticInterface(as_object& /*o*/)
 {
-    Global_as* gl = getGlobal(o);
-
 }
 
 as_object*
@@ -189,7 +187,7 @@ urlloader_securityError(const fn_call& fn)
 }
 
 as_value
-urlloader_ctor(const fn_call& fn)
+urlloader_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLLoader_as;
 

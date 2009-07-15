@@ -142,7 +142,7 @@ contextmenu_copy(const fn_call& fn)
     as_object* nc = new Array_as;
     as_object* customs;
 
-    if (customItems.is_object() && (customs = customItems.to_object().get())) {
+    if (customItems.is_object() && (customs = customItems.to_object(*getGlobal(fn)).get())) {
         // TODO: only copy properties that are ContextMenuItems.
         nc->copyProperties(*customs);
         customItems = nc;
