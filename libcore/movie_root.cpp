@@ -122,6 +122,7 @@ movie_root::movie_root(const movie_definition& def,
 	_hostfd(-1),
     _quality(QUALITY_HIGH),
 	_alignMode(0),
+	_showMenu(true),
 	_scaleMode(showAll),
 	_displayState(DISPLAYSTATE_NORMAL),
 	_recursionLimit(256),
@@ -1464,6 +1465,30 @@ movie_root::getStageAlignment() const
 
     return std::make_pair(ha, va);
 }
+
+/// Returns a string that represents the boolean state of the _showMenu
+/// variable
+bool
+movie_root::getShowMenuState() const
+{
+	return _showMenu;
+}
+
+/// Sets the value of _showMenu and calls the gui handler to process the 
+/// fscommand to change the display of the context menu
+void
+movie_root::setShowMenuState( bool state )
+{
+	_showMenu = state;
+	std::string arg = "" + _showMenu;
+	//FIXME: The fscommand for show menu is semantically different than what
+	//   ActionScript expects it to be. In gtk.cpp the showMenu function hides
+	//   or shows the menubar. Flash expects this option to disable some 
+	//   context menu items.
+	//handleFsCommand( "showMenu", arg );  //use this?
+	//this.callInterface("Stage.showMenu", arg);  //or this?
+}
+
 
 /// Returns the string representation of the current align mode,
 /// which must always be in the order: LTRB

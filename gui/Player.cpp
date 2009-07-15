@@ -539,7 +539,14 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         _gui.updateStageMatrix();
         return "";
     }
-    
+
+    if (event == "Stage.showMenu")
+    {
+        if (noCaseCompare(arg, "true")) _gui.showMenu(true);
+        else if (noCaseCompare(arg, "false")) _gui.showMenu(false);
+        return;
+    }
+
     if (event == "System.capabilities.screenResolutionX")
     {
         std::ostringstream ss;

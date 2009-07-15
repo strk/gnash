@@ -41,6 +41,7 @@ import flash.MovieClip;
 import flash.Lib;
 import Type;
 import Std;
+import Reflect;
 
 // import our testing API
 import DejaGnu;
@@ -229,11 +230,10 @@ class Stage_as {
 	} else {
 	    DejaGnu.fail("Stage::align property doesn't exist");
 	}
-//FIXME: This property has not been implemented yet
 	if (Std.is(Stage.showMenu, Bool)) {
 	    DejaGnu.pass("Stage::showMenu property exists");
 	} else {
-	    DejaGnu.xfail("Stage::showMenu property doesn't exist");
+	    DejaGnu.fail("Stage::showMenu property doesn't exist");
 	}
 #if flash8
 	if (Std.is(Stage.displayState, String)) {
@@ -712,7 +712,36 @@ class Stage_as {
 		DejaGnu.fail("Stage.removeListener is defined");
 	}
 #end
-				
+	
+	//-------------------------------------------------
+	//  Testing Stage.showMenu property
+	//-------------------------------------------------
+	DejaGnu.note("*** Begin testing Stage.showMenu property");
+	
+	DejaGnu.note("showMenu init: " + untyped Stage.showMenu);
+	if (untyped Stage.showMenu == true ) {
+		DejaGnu.pass("Stage.showMenu correctly initialized to 'true'");
+	} else {
+		DejaGnu.fail("Stage.showMenu is not initialized to 'true'");
+	}
+	
+	untyped Stage.showMenu = false;
+	//Reflect.setField( Stage, "showMenu", false );
+	if (untyped Stage.showMenu == false) {
+		DejaGnu.pass("Stage.showMenu changed to false");
+	} else {
+		DejaGnu.fail("Stage.showMenu was not correctly changed to false");
+	}
+	
+	untyped Stage.showMenu = true;
+	//Reflect.setField( Stage, "showMenu", true );
+	if (untyped Stage.showMenu == true) {
+		DejaGnu.pass("Stage.showMenu reset to true");
+	} else {
+		DejaGnu.fail("Stage.showMenu not correctly reset to true");
+	}
+	
+	
     // Call this after finishing all tests. It prints out the totals.
     DejaGnu.done();
     }
