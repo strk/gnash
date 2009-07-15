@@ -24,6 +24,7 @@
 #include "display/Shape_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void shape_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&shape_ctor, getShapeInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&shape_ctor, getShapeInterface());
         attachShapeStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void shape_class_init(as_object& global)
 namespace {
 
 void
-attachShapeInterface(as_object& o)
+attachShapeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachShapeStaticInterface(as_object& o)
+attachShapeStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getShapeInterface()
 }
 
 as_value
-shape_ctor(const fn_call& fn)
+shape_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Shape_as;
 

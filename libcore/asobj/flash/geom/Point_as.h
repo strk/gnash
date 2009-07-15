@@ -30,6 +30,7 @@ namespace gnash {
 
 class as_function;
 class as_object;
+class fn_call;
 
 /// Initialize the global Point class
 void point_class_init(as_object& global);
@@ -38,7 +39,7 @@ void point_class_init(as_object& global);
 boost::intrusive_ptr<as_object> init_Point_instance();
 
 /// Return the Point constructor, for use by Rectangle 
-as_function* getFlashGeomPointConstructor();
+as_function* getFlashGeomPointConstructor(const fn_call& fn);
 
 } // end of gnash namespace
 

@@ -21,8 +21,8 @@
 #endif
 
 #include "Kde4GlueAgg.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 #include <QImage>
 #include <QRect>
 
@@ -74,8 +74,8 @@ Kde4AggGlue::initBuffer(int width, int height)
 
     _offscreenbuf.reset(new unsigned char[bufsize]);
 
-    render_handler_agg_base * renderer =
-      static_cast<render_handler_agg_base *>(_renderer);
+    Renderer_agg_base * renderer =
+      static_cast<Renderer_agg_base *>(_renderer);
 
     renderer->init_buffer(_offscreenbuf.get(), bufsize, _width, _height,
       width*((_bpp+7)/8));
@@ -108,10 +108,10 @@ Kde4AggGlue::render(const QRect& updateRect)
 }
 
 
-render_handler*
+Renderer*
 Kde4AggGlue::createRenderHandler()
 {
-    _renderer = create_render_handler_agg("BGRA32");
+    _renderer = create_Renderer_agg("BGRA32");
 
     if ( ! _renderer )
     {

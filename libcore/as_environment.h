@@ -35,6 +35,8 @@ namespace gnash {
 // Forward declarations
 class DisplayObject;
 class VM;
+class Global_as;
+class movie_root;
 
 /// ActionScript execution environment.
 class as_environment
@@ -670,6 +672,16 @@ private:
         
 };
 
+inline VM&
+getVM(const as_environment& env)
+{
+    return env.getVM();
+}
+
+movie_root& getRoot(const as_environment& env);
+string_table& getStringTable(const as_environment& env);
+int getSWFVersion(const as_environment& env);
+Global_as* getGlobal(const as_environment &env);
 
 } // end namespace gnash
 

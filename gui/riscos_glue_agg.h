@@ -29,7 +29,7 @@ class RiscosAggGlue : public RiscosGlue
 
     bool init(int argc, char **argv[]);
     void prepFramebuffer(void *framebuffer, int width, int height);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void setRenderHandlerSize(int width, int height);
     void render(int x, int y);
     void render(int x, int y, int minx, int miny, int maxx, int maxy);
@@ -38,7 +38,7 @@ class RiscosAggGlue : public RiscosGlue
   private:
     unsigned char *_offscreenbuf;
     int _offscreenbuf_size;
-    render_handler *_agg_renderer;
+    Renderer *_agg_renderer;
     int _width, _height, _bpp;
 };
 

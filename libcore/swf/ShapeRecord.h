@@ -28,6 +28,7 @@
 
 namespace gnash {
     class movie_definition;
+    class RunResources;
 }
 
 namespace gnash {
@@ -63,7 +64,8 @@ public:
     /// Construct a ShapeRecord from a SWFStream.
     //
     /// This is useful for constructing immutable tags.
-    ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m);
+    ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
+            const RunResources& r);
 
     ShapeRecord(const ShapeRecord& other)
         :
@@ -77,7 +79,8 @@ public:
     //
     /// This is used by DefineMorphShapeTag as part of parsing its
     /// more complex ShapeRecords.
-    void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
+    void read(SWFStream& in, SWF::TagType tag, movie_definition& m,
+            const RunResources& r);
 
     const FillStyles& fillStyles() const {
         return _fillStyles;

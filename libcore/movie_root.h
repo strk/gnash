@@ -78,7 +78,7 @@
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "Movie.h"
-#include "RunInfo.h" // for initialization
+#include "RunResources.h" // for initialization
 #include "gnash.h" // Quality
 
 #ifdef USE_SWFTREE
@@ -150,7 +150,7 @@ public:
     /// before using any of this class methods !
     ///
     movie_root(const movie_definition& def, VirtualClock& clock,
-            const RunInfo& runInfo);
+            const RunResources& runResources);
 
     ~movie_root();
 
@@ -306,6 +306,16 @@ public:
     const Movie& getRootMovie() const
     {
         return *_rootMovie;
+    }
+
+    /// Creating new MovieClips needs this for now.
+    //
+    /// TODO: create MovieClips without this and drop. It's deliberately
+    /// different from getRootMovie() so it doesn't end up getting used
+    /// in the same way.
+    Movie* topLevelMovie() const
+    {
+        return _rootMovie.get();
     }
 
     /// Return the current nominal frame rate for the Stage.
@@ -845,7 +855,7 @@ public:
 	///
 	const std::string& getOriginalURL() const { return _originalURL; }
 
-    const RunInfo& runInfo() const { return _runInfo; }
+    const RunResources& runResources() const { return _runResources; }
 
     /// Add a DisplayObject child on top depth
     //
@@ -865,7 +875,7 @@ public:
 
 private:
 
-    const RunInfo& _runInfo; 
+    const RunResources& _runResources; 
 
     /// The URL of the original root movie.
     //
@@ -1171,7 +1181,7 @@ private:
 
     /// The display quality of the entire movie.
     //
-    /// This is here, not just in the render_handler, so that AS compatibility
+    /// This is here, not just in the Renderer, so that AS compatibility
     /// does not rely on the presence of a renderer.
     Quality _quality;
 

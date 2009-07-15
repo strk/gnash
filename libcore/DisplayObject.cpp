@@ -30,7 +30,6 @@
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" 
-#include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "gnash.h" // Quality
@@ -147,13 +146,13 @@ DisplayObject::get_world_cxform() const
 as_object*
 DisplayObject::getPathElementSeparator(string_table::key key)
 {
-	if (_vm.getSWFVersion() > 4 && key == NSV::PROP_uROOT)
+	if (getSWFVersion(*this) > 4 && key == NSV::PROP_uROOT)
 	{
 		// getAsRoot() will handle _lockroot 
 		return getAsRoot();
 	}
 
-	const std::string& name = _vm.getStringTable().value(key);
+	const std::string& name = getStringTable(*this).value(key);
 
 	if (name == ".." || key == NSV::PROP_uPARENT )
 	{
@@ -178,14 +177,15 @@ DisplayObject::getPathElementSeparator(string_table::key key)
 	//       would it be valid at all if not the very first element
 	//       in a path ?
 	unsigned int levelno;
-	if ( _vm.getRoot().isLevelTarget(name, levelno) )
-	{
-		return _vm.getRoot().getLevel(levelno).get();
+
+    movie_root& mr = getRoot(*this);
+	if (mr.isLevelTarget(name, levelno) ) {
+		return mr.getLevel(levelno).get();
 	}
 
 
 	std::string namei = name;
-	if ( _vm.getSWFVersion() < 7 ) boost::to_lower(namei);
+	if (getSWFVersion(*this) < 7) boost::to_lower(namei);
 
 	if (name == "." || namei == "this") 
 	{
@@ -277,9 +277,10 @@ DisplayObject::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 as_value
 DisplayObject::quality(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+    boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(*ptr);
 
     if (!fn.nargs)
     {
@@ -321,9 +322,10 @@ DisplayObject::quality(const fn_call& fn)
 as_value
 DisplayObject::highquality(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+    boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
-    movie_root& mr = ptr->getVM().getRoot();
+    movie_root& mr = getRoot(*ptr);
     
     if (!fn.nargs)
     {
@@ -563,11 +565,12 @@ DisplayObject::yscale_getset(const fn_call& fn)
 as_value
 DisplayObject::xmouse_get(const fn_call& fn)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+	boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y, buttons;
-	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
+	getRoot(*ptr).get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
     point a(pixelsToTwips(x), pixelsToTwips(y));
@@ -579,11 +582,12 @@ DisplayObject::xmouse_get(const fn_call& fn)
 as_value
 DisplayObject::ymouse_get(const fn_call& fn)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+	boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y, buttons;
-	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
+	getRoot(*ptr).get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
     point a(pixelsToTwips(x), pixelsToTwips(y));
@@ -819,7 +823,7 @@ DisplayObject::set_visible(bool visible)
     // Remove focus from this DisplayObject if it changes from visible to
     // invisible (see Selection.as).
     if (_visible && !visible) {
-        movie_root& mr = _vm.getRoot();
+        movie_root& mr = getRoot(*this);
         if (mr.getFocus().get() == this) {
             mr.setFocus(0);
         }
@@ -973,13 +977,13 @@ DisplayObject::target_getset(const fn_call& fn)
 as_value
 DisplayObject::name_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+	boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		const VM& vm = ptr->getVM(); 
 		const std::string& name = ptr->get_name();
-		if ( vm.getSWFVersion() < 6 && name.empty() )
+		if ( getSWFVersion(*ptr) < 6 && name.empty() )
 		{
 			return as_value();
 		} 
@@ -1092,7 +1096,7 @@ void
 DisplayObject::queueEvent(const event_id& id, int lvl)
 {
 
-	movie_root& root = _vm.getRoot();
+	movie_root& root = getRoot(*this);
 	std::auto_ptr<ExecutableCode> event(
             new QueuedEvent(boost::intrusive_ptr<DisplayObject>(this), id));
 	root.pushAction(event, lvl);
@@ -1114,7 +1118,7 @@ DisplayObject::hasEventHandler(const event_id& id) const
 boost::intrusive_ptr<as_function>
 DisplayObject::getUserDefinedEventHandler(const std::string& name) const
 {
-	string_table::key key = _vm.getStringTable().find(PROPNAME(name));
+	string_table::key key = getStringTable(*this).find(name);
 	return getUserDefinedEventHandler(key);
 }
 
@@ -1242,7 +1246,7 @@ DisplayObject::computeTargetPath() const
 	assert(topLevel);
 
 	if (path.empty()) {
-		if (&_vm.getRoot().getRootMovie() == this) return "/";
+		if (&getRoot(*this).getRootMovie() == this) return "/";
 		std::stringstream ss;
 		ss << "_level" << m_depth-DisplayObject::staticDepthOffset;
 		return ss.str();
@@ -1250,7 +1254,7 @@ DisplayObject::computeTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	if (topLevel != &_vm.getRoot().getRootMovie()) {
+	if (topLevel != &getRoot(*this).getRootMovie()) {
 		std::stringstream ss;
 		ss << "_level" << 
             topLevel->get_depth() - DisplayObject::staticDepthOffset;
@@ -1423,12 +1427,12 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 
 
 bool 
-DisplayObject::boundsInClippingArea() const 
+DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
   rect mybounds = getBounds();
   getWorldMatrix().transform(mybounds);
   
-  return gnash::render::bounds_in_clipping_area( mybounds.getRange() );  
+  return renderer.bounds_in_clipping_area(mybounds.getRange());  
 }
 
 #ifdef USE_SWFTREE

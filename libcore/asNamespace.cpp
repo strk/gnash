@@ -15,9 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
+
 #include "asNamespace.h"
 #include "VM.h"
 #include "ClassHierarchy.h"
+#include "string_table.h"
+#include "log.h"
+
+#include <sstream>
 
 namespace gnash {
 
@@ -27,6 +35,24 @@ asNamespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 	asClass *pClass = ch.newClass();
 	pClass->setName(name);
 	addClass(name, pClass);
+}
+
+void
+asNamespace::dump(string_table& st)
+{
+#if ENABLE_AVM2
+    std::ostringstream s;
+
+    for (container::const_iterator i = _classes.begin(), e = _classes.end();
+            i != e; ++i)
+    {
+        const string_table::key t = i->second->getName();
+        s << st.value(t) << "(URI: " << t << "), ";
+    }
+
+    log_debug("Classes in namespace %s (URI: %s, ABC: %s): %s",
+            st.value(_uri), _uri, _abcURI, s.str());
+#endif
 }
 
 }

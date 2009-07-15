@@ -37,7 +37,7 @@ namespace gnash {
 	class SWFStream;
 	class movie_definition;
 	class sound_sample;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -83,7 +83,7 @@ public:
 
 	/// Load a SWF::STARTSOUND tag.
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
 };
 
@@ -97,7 +97,7 @@ public:
 
 	/// Load a SWF::STARTSOUND2 tag.
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 };
 
 } // namespace gnash::SWF

@@ -24,6 +24,7 @@
 #include "errors/StackOverflowError_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void stackoverflowerror_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&stackoverflowerror_ctor, getStackOverflowErrorInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&stackoverflowerror_ctor, getStackOverflowErrorInterface());
         attachStackOverflowErrorStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void stackoverflowerror_class_init(as_object& global)
 namespace {
 
 void
-attachStackOverflowErrorInterface(as_object& o)
+attachStackOverflowErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachStackOverflowErrorStaticInterface(as_object& o)
+attachStackOverflowErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getStackOverflowErrorInterface()
 }
 
 as_value
-stackoverflowerror_ctor(const fn_call& fn)
+stackoverflowerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StackOverflowError_as;
 

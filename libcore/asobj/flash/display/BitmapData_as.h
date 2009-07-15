@@ -119,8 +119,6 @@ private:
 /// Initialize the global BitmapData class
 void bitmapdata_class_init(as_object& global);
 
-as_function* getFlashDisplayBitmapDataConstructor();
-
 } // end of gnash namespace
 
 #endif

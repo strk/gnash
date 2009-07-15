@@ -19,7 +19,6 @@
 
 #include "MorphShape.h"
 #include "VM.h"
-#include "fill_style.h"
 #include "swf/ShapeRecord.h"
 #include "Geometry.h"
 #include "SWFMatrix.h"
@@ -62,10 +61,10 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-MorphShape::display()
+MorphShape::display(Renderer& renderer)
 {
     morph();
-    _def->display(*this); 
+    _def->display(renderer, *this); 
     clear_invalidated();
 }
 

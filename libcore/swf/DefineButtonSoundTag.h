@@ -29,7 +29,7 @@
 
 namespace gnash {
     class SWFStream;
-    class RunInfo;
+    class RunResources;
     class movie_definition;
 }
 
@@ -69,7 +69,7 @@ public:
     typedef std::vector<ButtonSound> Sounds;
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-		    const RunInfo& r);
+		    const RunResources& r);
 
     const ButtonSound& getSound(Sounds::size_type index) const
     {

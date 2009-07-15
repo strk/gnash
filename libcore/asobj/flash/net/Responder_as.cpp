@@ -24,6 +24,7 @@
 #include "net/Responder_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void responder_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&responder_ctor, getResponderInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&responder_ctor, getResponderInterface());
         attachResponderStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void responder_class_init(as_object& global)
 namespace {
 
 void
-attachResponderInterface(as_object& o)
+attachResponderInterface(as_object& /*o*/)
 {
 }
 
 void
-attachResponderStaticInterface(as_object& o)
+attachResponderStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getResponderInterface()
 }
 
 as_value
-responder_ctor(const fn_call& fn)
+responder_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Responder_as;
 

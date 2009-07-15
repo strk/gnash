@@ -28,7 +28,7 @@
 namespace gnash {
     class SWFStream;
     class movie_definition;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -43,15 +43,19 @@ namespace gnash {
 /// the number of bytes read. It does not expose the absolute stream position.
 /// This is intended to make internal refactoring simpler. Users must tell
 /// the SWFParser how many bytes it should read from the stream.
+//
+/// The SWFParser will only deal with ParserExceptions in an open tag.
+/// Exceptions thrown when opening and closing tags signal a fatal error,
+/// and will be left to the callers to deal with.
 class SWFParser
 {
 
 public:
-    SWFParser(SWFStream& in, movie_definition* md, const RunInfo& runInfo)
+    SWFParser(SWFStream& in, movie_definition* md, const RunResources& runResources)
         :
         _stream(in),
         _md(md),
-        _runInfo(runInfo),
+        _runResources(runResources),
         _bytesRead(0),
         _tagOpen(false),
         _endRead(0),
@@ -90,7 +94,7 @@ private:
     
     movie_definition* _md;
     
-    const RunInfo& _runInfo;
+    const RunResources& _runResources;
     
     size_t _bytesRead;
     

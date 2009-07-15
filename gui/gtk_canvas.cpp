@@ -22,6 +22,7 @@
 #endif
 
 #include "gtk_canvas.h"
+#include "Renderer.h"
 
 #include "rc.h"
 #include "log.h"
@@ -46,7 +47,7 @@ struct _GnashCanvas {
 	GtkDrawingArea base_instance;
 
     std::auto_ptr<gnash::GtkGlue> glue;
-    gnash::render_handler *renderer;
+    boost::shared_ptr<gnash::Renderer> renderer;
 };
 
 G_DEFINE_TYPE(GnashCanvas, gnash_canvas, GTK_TYPE_DRAWING_AREA)
@@ -87,7 +88,7 @@ gnash_canvas_init(GnashCanvas *canvas)
 {
     GNASH_REPORT_FUNCTION;
 
-    canvas->renderer = NULL;
+    canvas->renderer.reset();
 
     gtk_widget_set_double_buffered(GTK_WIDGET(canvas), FALSE);
 
@@ -107,7 +108,7 @@ gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 
     gnash::log_debug("gnash_canvas_size_allocate %d %d", allocation->width, allocation->height);
 
-    if (canvas->renderer != NULL)
+    if (canvas->renderer.get())
         canvas->glue->setRenderHandlerSize(allocation->width, allocation->height);
     
     GTK_WIDGET_CLASS (parent_class)->size_allocate (widget, allocation);
@@ -187,8 +188,7 @@ gnash_canvas_after_realize(GtkWidget *widget)
     GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
-    canvas->renderer = canvas->glue->createRenderHandler();
-    set_render_handler(canvas->renderer);
+    canvas->renderer.reset(canvas->glue->createRenderHandler());
 
     canvas->glue->setRenderHandlerSize(widget->allocation.width,
                                         widget->allocation.height);
@@ -239,7 +239,7 @@ gnash_canvas_before_rendering(GnashCanvas *canvas)
     canvas->glue->beforeRendering();
 }
 
-gnash::render_handler *
+boost::shared_ptr<gnash::Renderer>
 gnash_canvas_get_renderer(GnashCanvas *canvas)
 {
     return canvas->renderer;

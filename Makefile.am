@@ -307,6 +307,7 @@ if ENABLE_HAXE
 endif
 if ENABLE_SWFMILL
 	@echo "	SWFMILL $(SWFMILL) "
+	@echo "	SWFMILL_VERSION_CODE $(SWFMILL_VERSION) "
 endif
 if ENABLE_SWFC
 	@echo "	SWFC $(SWFC) "
@@ -354,6 +355,10 @@ endif
 if BUILD_SSL
 	@echo "	SSL_CFLAGS is $(SSL_CFLAGS)"
 	@echo "	SSL_LIBS is $(SSL_LIBS)"
+endif
+if BUILD_SSH
+	@echo "	SSH_CFLAGS is $(SSH_CFLAGS)"
+	@echo "	SSH_LIBS is $(SSH_LIBS)"
 endif
 if BUILD_GTK_GUI
 if HAVE_XV

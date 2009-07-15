@@ -18,8 +18,8 @@
 XMLdir = $(includedir)/gnash
 
 # This variable contains all classes in AS2 and AS3
-XML_SOURCES = asobj/flash/xml/xml_pkg.cpp
-XML_HEADERS = asobj/flash/xml/xml_pkg.h
+XML_SOURCES =
+XML_HEADERS =
 
 # This variable contains the classes only in AS3
 XML_SOURCES_AS3 = 
@@ -43,5 +43,4 @@ XML_HEADERS += asobj/flash/xml/XMLNode_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(XML_SOURCES) $(XML_SOURCES_AS3)
-noinst_HEADERS += $(XML_HEADERS) $(XML_HEADERS_AS3) asobj/flash/xml/xmlclasses.h
-
+noinst_HEADERS +=  $(XML_HEADERS) $(XML_HEADERS_AS3)

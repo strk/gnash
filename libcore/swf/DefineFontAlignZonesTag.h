@@ -58,6 +58,10 @@ private:
 
 };
 
+
+
+
+
 } // namespace gnash::SWF
 } // namespace gnash
 

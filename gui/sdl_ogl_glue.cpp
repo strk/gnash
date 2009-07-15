@@ -62,14 +62,14 @@ SdlOglGlue::init(int, char***)
 }
 
 
-render_handler*
+Renderer*
 SdlOglGlue::createRenderHandler(int depth)
 {
 //    GNASH_REPORT_FUNCTION;
 
     _bpp = depth;
 
-    render_handler* renderer = create_render_handler_ogl();
+    Renderer* renderer = create_Renderer_ogl();
 
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
@@ -100,7 +100,7 @@ SdlOglGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
       // 32-bit color etc, for getting dest alpha,
       // for MULTIPASS_ANTIALIASING (see
-      // render_handler_ogl.cpp).
+      // Renderer_ogl.cpp).
       SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
       SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
       SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);

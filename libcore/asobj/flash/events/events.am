@@ -17,8 +17,8 @@
 
 EVENTSdir = $(includedir)/gnash
 
-EVENTS_SOURCES = asobj/flash/events/events_pkg.cpp
-EVENTS_HEADERS = asobj/flash/events/events_pkg.h
+EVENTS_SOURCES = 
+EVENTS_HEADERS =
 
 if BUILD_ACTIVITYEVENT_AS3
 EVENTS_SOURCES += asobj/flash/events/ActivityEvent_as.cpp
@@ -136,4 +136,3 @@ EVENTS_HEADERS += asobj/flash/events/TimerEvent_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(EVENTS_SOURCES)
-noinst_HEADERS +=  $(EVENTS_HEADERS) asobj/flash/events/eventsclasses.h

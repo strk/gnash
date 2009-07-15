@@ -53,7 +53,7 @@ public:
 	/// This function is allowed to be called zero or more times, as long
 	/// as a DefineVideoStreamTag was read before.
 	static void loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
 };
 

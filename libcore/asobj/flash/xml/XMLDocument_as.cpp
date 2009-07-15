@@ -24,6 +24,7 @@
 #include "log.h"
 #include "as_function.h" //for as_function
 #include "fn_call.h"
+#include "Global_as.h"
 
 #include "LoadableObject.h"
 #include "xml/XMLNode_as.h"
@@ -608,7 +609,7 @@ bool
 XMLDocument_as::ignoreWhite() const
 {
 
-    string_table::key propnamekey = _vm.getStringTable().find("ignoreWhite");
+    string_table::key propnamekey = getStringTable(*this).find("ignoreWhite");
     as_value val;
     if (!const_cast<XMLDocument_as*>(this)->get_member(propnamekey, &val)) {
         return false;
@@ -622,11 +623,12 @@ void
 XMLDocument_as::init(as_object& global)
 {
 
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&xml_new, getXMLInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&xml_new, getXMLInterface());
     }
     
     global.init_member("XML", cl.get());
@@ -636,7 +638,7 @@ XMLDocument_as::init(as_object& global)
 void
 XMLDocument_as::registerNative(as_object& global)
 {
-    VM& vm = global.getVM();
+    VM& vm = getVM(global);
     vm.registerNative(xml_escape, 100, 5);
     vm.registerNative(xml_createElement, 253, 8);
     vm.registerNative(xml_createTextNode, 253, 9);
@@ -657,24 +659,25 @@ void
 attachXMLInterface(as_object& o)
 {
 
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
+    Global_as* gl = getGlobal(o);
 
     const int flags = 0;
 
     // No flags:
-    o.init_member("addRequestHeader", new builtin_function(
+    o.init_member("addRequestHeader", gl->createFunction(
                 LoadableObject::loadableobject_addRequestHeader), flags);
     o.init_member("createElement", vm.getNative(253, 8), flags);
     o.init_member("createTextNode", vm.getNative(253, 9), flags);
-    o.init_member("getBytesLoaded", new builtin_function(
+    o.init_member("getBytesLoaded", gl->createFunction(
                 LoadableObject::loadableobject_getBytesLoaded), flags);
-    o.init_member("getBytesTotal", new builtin_function(
+    o.init_member("getBytesTotal", gl->createFunction(
                 LoadableObject::loadableobject_getBytesTotal), flags);
     o.init_member("load", vm.getNative(301, 0), flags);
     o.init_member("parseXML", vm.getNative(253, 10), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
-    o.init_member("onData", new builtin_function(xml_ondata), flags);
+    o.init_member("onData", gl->createFunction(xml_ondata), flags);
 
     o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
     o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
@@ -702,7 +705,7 @@ xml_new(const fn_call& fn)
     {
         if ( fn.arg(0).is_object() )
         {
-            boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+            boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
             xml_obj = dynamic_cast<XMLDocument_as*>(obj.get());
             if ( xml_obj )
             {

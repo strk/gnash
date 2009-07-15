@@ -26,6 +26,7 @@
 #include "Machine.h"
 #include "VM.h"
 #include "sprite_definition.h"
+#include "Global_as.h"
 
 // Forward declarations
 namespace gnash {
@@ -43,7 +44,7 @@ public:
 
 	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
-		VM& vm = m->getVM();
+		VM& vm = getVM(*m);
 		Machine* mach = vm.getMachine();
 		log_debug("SymbolClassTag: Creating class %s.", _rootClass);
 		mach->instantiateClass(_rootClass, vm.getGlobal());
@@ -56,7 +57,7 @@ public:
 	}
 
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
 	{
 		assert(tag == SYMBOLCLASS); 
         

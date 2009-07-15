@@ -49,7 +49,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Initialize gnash lib
 	gnashInit();
     
-    RunInfo ri("");
+    RunResources ri("");
 
 	// Initialize a VM
 	boost::intrusive_ptr<movie_definition> md5(new DummyMovieDefinition(ri, 5));

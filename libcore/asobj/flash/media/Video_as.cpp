@@ -24,6 +24,7 @@
 #include "media/Video_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -55,10 +56,11 @@ public:
 // extern (used by Global.cpp)
 void video_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&video_ctor, getVideoInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&video_ctor, getVideoInterface());
         attachVideoStaticInterface(*cl);
     }
 
@@ -71,13 +73,14 @@ namespace {
 void
 attachVideoInterface(as_object& o)
 {
-    o.init_member("attachNetStream", new builtin_function(video_attachNetStream));
-    o.init_member("clear", new builtin_function(video_clear));
+    o.init_member("attachNetStream", gl->createFunction(video_attachNetStream));
+    o.init_member("clear", gl->createFunction(video_clear));
 }
 
 void
 attachVideoStaticInterface(as_object& o)
 {
+    Global_as* gl = getGlobal(o);
 
 }
 
@@ -113,7 +116,7 @@ video_clear(const fn_call& fn)
 }
 
 as_value
-video_ctor(const fn_call& fn)
+video_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Video_as;
 

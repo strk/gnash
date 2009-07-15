@@ -26,6 +26,7 @@
 #include "namedStrings.h"
 #include "as_value.h"
 #include "asNamespace.h"
+#include "Global_as.h"
 
 #ifdef ENABLE_AVM2
 #include "asMethod.h"
@@ -40,8 +41,10 @@ asClass::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst,
         bool isstatic)
 {
-	if (val.is_object()) {
-		val.to_object()->set_member(NSV::INTERNAL_TYPE, 
+    Global_as* g = VM::get().getGlobal();
+
+    if (val.is_object()) {
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, 
 			std::size_t(type->getName()));
     }
 
@@ -85,7 +88,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns,
 	string_table::key nsname = ns ? ns->getURI() : 0;
 
 	//TODO: Set flags.
-	if(slotId == 0) {
+	if (slotId == 0) {
 		_prototype->init_member(name, as_value(), 0, nsname);
 	}
 	else {
@@ -98,7 +101,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns,
 asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
         asMethod* method, bool /*isstatic*/)
 {
-	as_value val = as_value(new abc_function(method,_prototype->getVM().getMachine()));
+	as_value val = new abc_function(method, getVM(*_prototype).getMachine());
 	_prototype->init_member(name, val);
 //	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
 //		| as_prop_flags::dontEnum;

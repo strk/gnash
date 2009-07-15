@@ -23,12 +23,11 @@
 
 namespace gnash{
 
-abc_function::abc_function(asMethod *methodInfo, Machine* machine)
+abc_function::abc_function(asMethod* methodInfo, Machine* machine)
     :
-    as_function(),
-    mMethodInfo(methodInfo),
-    mMachine(machine),
-    _scopeStack(0)
+    as_function(*machine->global()),
+    _methodInfo(methodInfo),
+    _machine(machine)
 {
 }
 
@@ -38,10 +37,10 @@ abc_function::operator()(const fn_call& fn)
 {
 
 
-	log_abc("Calling an abc_function id=%u.", mMethodInfo->methodID());
-	as_value val = mMachine->executeFunction(mMethodInfo,fn);
+	log_abc("Calling an abc_function id=%u.", _methodInfo->methodID());
+	as_value val = _machine->executeFunction(_methodInfo,fn);
 	log_abc("Done calling abc_function id=%u value=%s",
-            mMethodInfo->methodID(), val);
+            _methodInfo->methodID(), val);
 	return val;
 
 }

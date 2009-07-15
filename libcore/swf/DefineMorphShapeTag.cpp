@@ -25,17 +25,17 @@
 #include "DefineMorphShapeTag.h"
 #include "MorphShape.h"
 #include "SWFStream.h"
-#include "render.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
 #include "GnashNumeric.h"
+#include "RunResources.h"
 
 namespace gnash {
 namespace SWF {
 
 void
 DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
-        const RunInfo& /*r*/)
+        const RunResources& r)
 {
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();
@@ -44,14 +44,14 @@ DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
             log_parse("DefineMorphShapeTag: id = %d", id);
     );
 
-    DefineMorphShapeTag* morph = new DefineMorphShapeTag(in, tag, md);
+    DefineMorphShapeTag* morph = new DefineMorphShapeTag(in, tag, md, r);
     md.addDisplayObject(id, morph);
 }
 
 DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
-        movie_definition& md)
+        movie_definition& md, const RunResources& r)
 {
-    read(in, tag, md);
+    read(in, tag, md, r);
 }
 
 DisplayObject*
@@ -61,16 +61,16 @@ DefineMorphShapeTag::createDisplayObject(DisplayObject* parent, int id) const
 }
 
 void
-DefineMorphShapeTag::display(const MorphShape& inst) const
+DefineMorphShapeTag::display(Renderer& renderer, const MorphShape& inst) const
 {
-    render::drawShape(inst.shape(), inst.get_world_cxform(),
+    renderer.drawShape(inst.shape(), inst.get_world_cxform(),
             inst.getWorldMatrix());
 }
 
 
 void
-DefineMorphShapeTag::read(SWFStream& in, TagType tag,
-        movie_definition& md)
+DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
+        const RunResources& r)
 {
     assert(tag == DEFINEMORPHSHAPE
         || tag == DEFINEMORPHSHAPE2
@@ -102,7 +102,7 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag,
     
     fill_style fs1, fs2;
     for (size_t i = 0; i < fillCount; ++i) {
-        fs1.read(in, tag, md, &fs2);
+        fs1.read(in, tag, md, r, &fs2);
         _shape1.addFillStyle(fs1);
         _shape2.addFillStyle(fs2);
     }
@@ -110,14 +110,14 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag,
     const boost::uint16_t lineCount = in.read_variable_count();
     line_style ls1, ls2;
     for (size_t i = 0; i < lineCount; ++i) {
-        ls1.read_morph(in, tag, md, &ls2);
+        ls1.read_morph(in, tag, md, r, &ls2);
         _shape1.addLineStyle(ls1);
         _shape2.addLineStyle(ls2);
     }
 
-    _shape1.read(in, tag, md);
+    _shape1.read(in, tag, md, r);
     in.align();
-    _shape2.read(in, tag, md);
+    _shape2.read(in, tag, md, r);
 
     // Set bounds as read in *this* tags rather then
     // the one computed from ShapeRecord parser

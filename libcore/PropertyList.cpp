@@ -304,23 +304,23 @@ PropertyList::setFlagsAll(const PropertyList& props,
 void
 PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 {
-	string_table& st = env.getVM().getStringTable();
+	string_table& st = getStringTable(env);
 
     // We should enumerate in order of creation, not lexicographically.
     typedef container::nth_index<1>::type ContainerByOrder;
 
 	for (ContainerByOrder::const_reverse_iterator i=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); i != ie; ++i)
-	{
-		if (i->getFlags().get_dont_enum())
-			continue;
+            ie=_props.get<1>().rend(); i != ie; ++i) {
 
-		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second)
-		{
-			if (i->mNamespace)
-				env.push(as_value(st.value(i->mName) + "." + st.value(i->mNamespace)));
-			else
-				env.push(as_value(st.value(i->mName)));
+		if (i->getFlags().get_dont_enum()) continue;
+
+		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second) {
+
+            const std::string& qname = i->mNamespace ?
+                st.value(i->mName) + "." + st.value(i->mNamespace) :
+                st.value(i->mName);
+
+			env.push(qname);
 		}
 	}
 }
@@ -329,7 +329,7 @@ void
 PropertyList::enumerateKeyValue(const as_object& this_ptr,
         SortedPropertyList& to) const
 {
-    VM& vm = this_ptr.getVM();
+    VM& vm = getVM(this_ptr);
 	string_table& st = vm.getStringTable();
     typedef container::nth_index<1>::type ContainerByOrder;
 
@@ -356,7 +356,8 @@ PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to)
 	for (container::const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
 	{
-		to.insert(std::make_pair(st.value(i->mName),
+		to.insert(std::make_pair(
+                    st.value(i->mNamespace) + "::" + st.value(i->mName),
                     i->getValue(this_ptr)));
 	}
 }
@@ -367,8 +368,8 @@ PropertyList::dump(as_object& this_ptr)
 	string_table& st = _vm.getStringTable();
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
-		log_debug("  %s: %s", st.value(it->mName),
-			it->getValue(this_ptr).to_string());
+		log_debug("  %s::%s: %s", st.value(it->mNamespace), st.value(it->mName),
+			it->getValue(this_ptr));
 	}
 }
 

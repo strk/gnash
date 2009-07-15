@@ -48,23 +48,19 @@ class DejaGnu {
     static function init() {
         //if(dejagnu_module_initialized == 1) return;
         
-        // create a textfield to output to
+     // create a textfield to output to
 #if flash9
  	tf = new TextField();
-	//tf.autoSize = flash.text.TextFieldAutoSize.LEFT;
-	//tf.multiline = true;
 	tf.wordWrap = true;
 	tf.width = 390;
 	tf.height = 300;
-	//tf.border = true;
-    //flash.Lib.current.createTextField("textout", 99, 10, 10, 500, 500);
 	flash.Lib.current.addChild(tf);
 #else
-	flash.Lib.current.createTextField("tf", 10,0,0,390,390);
-	tf.multiline = true;
-	tf.wordWrap = true;
-	tf.autoSize = "left";
-	tf.border = true;
+	flash.Lib.current.createTextField("tfsoft", 100,0,0,390,290);
+	untyped tfsoft.multiline = true;
+	untyped tfsoft.wordWrap = true;
+	untyped tfsoft.border = true;
+	untyped tfsoft.type = "input";
 #end
         //dejagnu_module_initialized = 1;
 
@@ -193,44 +189,40 @@ class DejaGnu {
     }
     
     static function xtrace(msg) {
+#if flash9
         tf.text += msg+"\n";
-		//trace(msg);
-		//tf.text = "<head>\n<style type=\"text/css\">\n</style>\n</head>\n<body>\n<textarea cols=\"30\" rows=\"4\">\nHere's enough text to make this textarea grow scrollbars....\nHTML scrollbars, scrollbar color, change browser scrollbars,\ncss scrollbar, change color of the scrollbar...\n</textarea>\n</body>";
-		//tf.htmlText = "<head>\n<style type=\"text/css\">\n</style>\n</head>\n<body>\n<textarea cols=\"30\" rows=\"4\">\nHere's enough text to make this textarea grow scrollbars....\nHTML scrollbars, scrollbar color, change browser scrollbars,\ncss scrollbar, change color of the scrollbar...\n</textarea>\n</body>";
-//#if flash9
-        flash.Lib.trace(msg);
-//#else	
-//		untyped flash.Boot.__trace(msg,position);
-//#end
+#else
+		untyped tfsoft.text += msg+"\n";
+#end
+		flash.Lib.trace(msg);
     }
 
     static public function untested(msg) {
-//#if flash9
-        flash.Lib.trace("UNTESTED: "+msg);
-//#else	
-//		untyped flash.Boot.__trace("UNTESTED: "+msg,position);
-//#end
+#if flash9
+        tf.text += "UNTESTED: "+msg+"\n";
+#else
+		untyped tfsoft.text += "UNTESTED: "+msg+"\n";
+#end
+		flash.Lib.trace("UNTESTED: "+msg);
     }
 
     static public function unresolved(msg) {
-//#if flash9
-        unresolve++;
-        flash.Lib.trace("UNRESOLVED: "+msg);
-//#else	
-//		untyped flash.Boot.__trace("UNRESOLVED: "+msg,position);
-//#end
+		unresolve++;
+#if flash9
+        tf.text += "UNRESOLVED: "+msg+"\n";
+#else
+		untyped tfsoft.text += "UNRESOLVED: "+msg+"\n";
+#end
+		flash.Lib.trace("UNRESOLVED: "+msg);
     }
     
     static public function done() {
         printtotals();
-//#if flash9
-        flash.Lib.trace("__END_OF_TEST__");
-//#else	
-//		untyped flash.Boot.__trace("__END_OF_TEST__",position);
-		//untyped flash.Boot.__trace(""+flash.Lib._root._width,position);
-		//flash.Lib.current._width = 800;
-//#end
-	
-	//loadMovie('fscommand:quit', _root);
+#if flash9
+        tf.text += "__END_OF_TEST__";
+#else	
+		untyped tfsoft.text += "__END_OF_TEST__";
+#end
+		flash.Lib.trace("__END_OF_TEST__");
     }
 }

@@ -24,6 +24,7 @@
 #include "text/StyleSheet_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -57,10 +58,11 @@ public:
 // extern (used by Global.cpp)
 void stylesheet_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&stylesheet_ctor, getStyleSheetInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&stylesheet_ctor, getStyleSheetInterface());
         attachStyleSheetStaticInterface(*cl);
     }
 
@@ -73,16 +75,16 @@ namespace {
 void
 attachStyleSheetInterface(as_object& o)
 {
-    o.init_member("getStyle", new builtin_function(stylesheet_getStyle));
-    o.init_member("parseCSS", new builtin_function(stylesheet_parseCSS));
-    o.init_member("setStyle", new builtin_function(stylesheet_setStyle));
-    o.init_member("transform", new builtin_function(stylesheet_transform));
+    Global_as* gl = getGlobal(o);
+    o.init_member("getStyle", gl->createFunction(stylesheet_getStyle));
+    o.init_member("parseCSS", gl->createFunction(stylesheet_parseCSS));
+    o.init_member("setStyle", gl->createFunction(stylesheet_setStyle));
+    o.init_member("transform", gl->createFunction(stylesheet_transform));
 }
 
 void
-attachStyleSheetStaticInterface(as_object& o)
+attachStyleSheetStaticInterface(as_object& /*o*/)
 {
-
 }
 
 as_object*
@@ -137,7 +139,7 @@ stylesheet_transform(const fn_call& fn)
 }
 
 as_value
-stylesheet_ctor(const fn_call& fn)
+stylesheet_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StyleSheet_as;
 

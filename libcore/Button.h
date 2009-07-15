@@ -91,7 +91,7 @@ public:
 	// called from keypress listener only
 	bool on_event(const event_id& id);
 
-	void display();
+	void display(Renderer& renderer);
 	
 	void set_current_state(MouseState new_state);
 
@@ -215,7 +215,7 @@ private:
 	/// \brief
 	/// Return version of the SWF containing
 	/// the button definition this is an instance of.
-    int getSWFVersion() const;
+    int getMovieVersion() const;
 
 };
 

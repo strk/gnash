@@ -20,7 +20,6 @@
 
 #include "InteractiveObject.h" // for inheritance
 #include "styles.h" // for line_style
-#include "fill_style.h"
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
@@ -161,7 +160,7 @@ public:
 		string_table::key nsname = 0);
 
 	/// Draw the dynamic string.
-	void	display();
+	void display(Renderer& renderer);
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
@@ -601,9 +600,12 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
-	void show_cursor(const SWFMatrix& mat);
+	int _top_visible_line;
+	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
+	std::vector<int> _line_starts;
+	int _linesindisplay;
 
     /// Corresponds to the multiline property.
     bool _multiline;

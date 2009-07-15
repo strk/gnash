@@ -24,6 +24,7 @@
 #include "display/Bitmap_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void bitmap_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&bitmap_ctor, getBitmapInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&bitmap_ctor, getBitmapInterface());
         attachBitmapStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void bitmap_class_init(as_object& global)
 namespace {
 
 void
-attachBitmapInterface(as_object& o)
+attachBitmapInterface(as_object& /*o*/)
 {
 }
 
 void
-attachBitmapStaticInterface(as_object& o)
+attachBitmapStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getBitmapInterface()
 }
 
 as_value
-bitmap_ctor(const fn_call& fn)
+bitmap_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Bitmap_as;
 

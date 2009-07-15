@@ -74,8 +74,10 @@ SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
 TRACE_XMLTESTS_OUT = 
 
 if ENABLE_AVM2
+if SWFMILL_AS3_SUPPORT
 SC_XMLTESTS_OUT += $(SC_AS3_XMLTESTS:.xml=.swf)
 TRACE_XMLTESTS_OUT += $(TRACE_AS3_TESTS:.xml=.swf)
+endif
 endif
 
 # Dependencies for all self-contained SWF tests
@@ -93,10 +95,12 @@ check_SCRIPTS = \
 	$(NULL)
 
 if ENABLE_AVM2
+if SWFMILL_AS3_SUPPORT
 check_SCRIPTS += \
 	mixed-bytecode-as3-runner	\
 	trace-test-runner	\
 	$(NULL)
+endif
 endif
 
 check_PROGRAMS = \

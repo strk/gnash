@@ -24,6 +24,7 @@
 #include "display/StageDisplayState_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -50,7 +51,7 @@ stagedisplaystate_class_init(as_object& where)
 namespace {
 
 void
-attachStageDisplayStateStaticInterface(as_object& o)
+attachStageDisplayStateStaticInterface(as_object& /*o*/)
 {
     // TODO: attach constants.
 }

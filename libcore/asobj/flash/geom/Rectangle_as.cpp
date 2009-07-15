@@ -22,10 +22,10 @@
 #endif
 
 #include "Rectangle_as.h"
-#include "Point_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -68,21 +68,22 @@ as_value Rectangle_ctor(const fn_call& fn);
 static void
 attachRectangleInterface(as_object& o)
 {
-    o.init_member("clone", new builtin_function(Rectangle_clone), 0);
-    o.init_member("contains", new builtin_function(Rectangle_contains), 0);
-    o.init_member("containsPoint", new builtin_function(Rectangle_containsPoint), 0);
-    o.init_member("containsRectangle", new builtin_function(Rectangle_containsRectangle), 0);
-    o.init_member("equals", new builtin_function(Rectangle_equals), 0);
-    o.init_member("inflate", new builtin_function(Rectangle_inflate), 0);
-    o.init_member("inflatePoint", new builtin_function(Rectangle_inflatePoint), 0);
-    o.init_member("intersection", new builtin_function(Rectangle_intersection), 0);
-    o.init_member("intersects", new builtin_function(Rectangle_intersects), 0);
-    o.init_member("isEmpty", new builtin_function(Rectangle_isEmpty), 0);
-    o.init_member("offset", new builtin_function(Rectangle_offset), 0);
-    o.init_member("offsetPoint", new builtin_function(Rectangle_offsetPoint), 0);
-    o.init_member("setEmpty", new builtin_function(Rectangle_setEmpty), 0);
-    o.init_member("toString", new builtin_function(Rectangle_toString), 0);
-    o.init_member("union", new builtin_function(Rectangle_union), 0);
+    Global_as* gl = getGlobal(o);
+    o.init_member("clone", gl->createFunction(Rectangle_clone), 0);
+    o.init_member("contains", gl->createFunction(Rectangle_contains), 0);
+    o.init_member("containsPoint", gl->createFunction(Rectangle_containsPoint), 0);
+    o.init_member("containsRectangle", gl->createFunction(Rectangle_containsRectangle), 0);
+    o.init_member("equals", gl->createFunction(Rectangle_equals), 0);
+    o.init_member("inflate", gl->createFunction(Rectangle_inflate), 0);
+    o.init_member("inflatePoint", gl->createFunction(Rectangle_inflatePoint), 0);
+    o.init_member("intersection", gl->createFunction(Rectangle_intersection), 0);
+    o.init_member("intersects", gl->createFunction(Rectangle_intersects), 0);
+    o.init_member("isEmpty", gl->createFunction(Rectangle_isEmpty), 0);
+    o.init_member("offset", gl->createFunction(Rectangle_offset), 0);
+    o.init_member("offsetPoint", gl->createFunction(Rectangle_offsetPoint), 0);
+    o.init_member("setEmpty", gl->createFunction(Rectangle_setEmpty), 0);
+    o.init_member("toString", gl->createFunction(Rectangle_toString), 0);
+    o.init_member("union", gl->createFunction(Rectangle_union), 0);
     o.init_property("bottom", Rectangle_bottom_getset, Rectangle_bottom_getset, 0);
     o.init_property("bottomRight", Rectangle_bottomRight_getset,
             Rectangle_bottomRight_getset, 0);
@@ -419,10 +420,8 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 	boost::intrusive_ptr<Rectangle_as> ptr = 
         ensureType<Rectangle_as>(fn.this_ptr);
 
-	as_value ret;
+	if (!fn.nargs) {
 
-	if ( ! fn.nargs ) // getter
-	{
 		as_value x,y,w,h;
 		ptr->get_member(NSV::PROP_X, &x);
 		ptr->get_member(NSV::PROP_Y, &y);
@@ -432,23 +431,29 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 		as_value right = x.newAdd(w);
 		as_value bottom = y.newAdd(h);
 
-		as_function* pointCtor = getFlashGeomPointConstructor();
+        as_value point(fn.env().find_object("flash.geom.Point"));
+
+        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
+
+        if (!pointCtor) {
+            log_error("Failed to construct flash.geom.Point!");
+            return as_value();
+        }
 
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(right);
 		args->push_back(bottom);
 
-		ret = pointCtor->constructInstance(fn.env(), args);
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Attempt to set read-only property %s"),
-            "Rectangle.bottomRight");
-		);
+		as_value ret = pointCtor->constructInstance(fn.env(), args);
+        return ret;
 	}
 
-	return ret;
+    IF_VERBOSE_ASCODING_ERRORS(
+    log_aserror(_("Attempt to set read-only property %s"),
+        "Rectangle.bottomRight");
+    );
+    return as_value();
+
 }
 
 static as_value
@@ -520,7 +525,14 @@ Rectangle_size_getset(const fn_call& fn)
 		ptr->get_member(NSV::PROP_WIDTH, &w);
 		ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-		as_function* pointCtor = getFlashGeomPointConstructor();
+        as_value point(fn.env().find_object("flash.geom.Point"));
+
+        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
+
+        if (!pointCtor) {
+            log_error("Failed to construct flash.geom.Point!");
+            return as_value();
+        }
 
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(w);
@@ -580,7 +592,14 @@ Rectangle_topLeft_getset(const fn_call& fn)
 		ptr->get_member(NSV::PROP_X, &x);
 		ptr->get_member(NSV::PROP_Y, &y);
 
-		as_function* pointCtor = getFlashGeomPointConstructor();
+        as_value point(fn.env().find_object("flash.geom.Point"));
+
+        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
+
+        if (!pointCtor) {
+            log_error("Failed to construct flash.geom.Point!");
+            return as_value();
+        }
 
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(x);
@@ -644,25 +663,21 @@ Rectangle_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
+static as_value
+get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Rectangle class");
 
-	builtin_function* cl =
-	        new builtin_function(&Rectangle_ctor, getRectangleInterface());
-	return cl;
-}
-
-boost::intrusive_ptr<as_object> init_Rectangle_instance()
-{
-    return boost::intrusive_ptr<as_object>(new Rectangle_as);
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Rectangle_ctor, getRectangleInterface());
 }
 
 // extern 
-void rectangle_class_init(as_object& where)
+void
+rectangle_class_init(as_object& where)
 {
 	// Register _global.Rectangle
-	string_table& st = where.getVM().getStringTable();
+	string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

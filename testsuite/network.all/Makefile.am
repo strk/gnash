@@ -65,6 +65,8 @@ check_PROGRAMS = \
 	Dejagnu \
 	Dejagnu.swf \
 	test_ssl \
+	test_allowDomain \
+	test_ssh \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -116,7 +118,21 @@ test_ssl_LDADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la
 
+test_ssh_SOURCES = test_ssh.cpp
+test_ssh_LDADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la
+
 test_ssl_DEPENDENCIES = site-update
+
+
+test_allowDomain_SOURCES = test_allowDomain.cpp
+test_allowDomain_LDADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la
+
+test_allowDomain_DEPENDENCIES = site-update
 
 clean-local: 
 	-rm *.swf media *.pp *unner

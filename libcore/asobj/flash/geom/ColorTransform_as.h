@@ -81,10 +81,6 @@ private:
 /// Initialize the global ColorTransform class
 void colortransform_class_init(as_object& global);
 
-/// Return a ColorTransform instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_ColorTransform_instance();
-
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_COLORTRANSFORM_H__
 #endif

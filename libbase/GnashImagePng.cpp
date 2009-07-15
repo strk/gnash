@@ -115,8 +115,9 @@ PngImageInput::readScanline(unsigned char* imageData)
     assert (_rowPtrs);
 
     // Data packed as RGB / RGBA
-    std::memcpy(imageData, _rowPtrs[_currentRow],
-                getWidth() * getComponents());
+    const size_t size = getWidth() * getComponents();
+
+    std::copy(_rowPtrs[_currentRow], _rowPtrs[_currentRow] + size, imageData);
     
     ++_currentRow;
 }

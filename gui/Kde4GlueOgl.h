@@ -43,14 +43,14 @@ class Kde4OglGlue : public Kde4Glue
     
     bool init(int argc, char **argv[]);
     void prepDrawingArea(QWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void render();
     void render(const QRect& updateRect);
 
   private:
     int _width;
     int _height;
-    render_handler* _renderer; // We don't own this pointer.
+    Renderer* _renderer; // We don't own this pointer.
 };
 
 

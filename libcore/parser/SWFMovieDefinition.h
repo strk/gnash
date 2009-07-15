@@ -52,7 +52,7 @@ namespace gnash {
     class movie_root;
 	class MovieClip;
 	class SWFMovie;
-    class RunInfo;
+    class RunResources;
     class Font;
 }
 
@@ -179,9 +179,9 @@ public:
 
     /// Construct a SWF movie.
     //
-    /// @param runInfo      A RunInfo containing information used for
+    /// @param runResources      A RunResources containing information used for
     ///                     parsing.
-	SWFMovieDefinition(const RunInfo& runInfo);
+	SWFMovieDefinition(const RunResources& runResources);
 
 	~SWFMovieDefinition();
 
@@ -567,8 +567,8 @@ private:
     //
     /// @todo   Add to base class? This would make it available for other
     ///         kinds of movies (e.g. FLV) and make it easier to initialize
-    ///         movie_root with the same RunInfo as its first definition.
-    const RunInfo& _runInfo;
+    ///         movie_root with the same RunResources as its first definition.
+    const RunResources& _runResources;
 
     bool _as3;
 

@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -52,7 +53,8 @@ as_value DisplacementMapFilter_ctor(const fn_call& fn);
 static void
 attachDisplacementMapFilterInterface(as_object& o)
 {
-    o.init_member("clone", new builtin_function(DisplacementMapFilter_clone));
+    Global_as* gl = getGlobal(o);
+    o.init_member("clone", gl->createFunction(DisplacementMapFilter_clone));
     o.init_property("alpha", DisplacementMapFilter_alpha_getset, DisplacementMapFilter_alpha_getset);
     o.init_property("color", DisplacementMapFilter_color_getset, DisplacementMapFilter_color_getset);
     o.init_property("componentX", DisplacementMapFilter_componentX_getset, DisplacementMapFilter_componentX_getset);
@@ -218,8 +220,9 @@ void displacementmapfilter_class_init(as_object& where)
 {
 	// This is going to be the DisplacementMapFilter "class"/"function"
 	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl=new builtin_function(&DisplacementMapFilter_ctor, getDisplacementMapFilterInterface());
+	boost::intrusive_ptr<as_object> cl;
+        Global_as* gl = getGlobal(where);
+        cl = gl->createClass(&DisplacementMapFilter_ctor, getDisplacementMapFilterInterface());
 	attachDisplacementMapFilterStaticProperties(*cl);
 
 	// Register _global.DisplacementMapFilter

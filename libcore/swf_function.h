@@ -46,10 +46,10 @@ class swf_function : public as_function
 private:
 
 	/// Action buffer containing the function definition
-	const action_buffer* m_action_buffer;
+	const action_buffer& m_action_buffer;
 
 	/// @@ might need some kind of ref count here, but beware cycles
-	as_environment*	m_env;
+	as_environment& m_env;
 
 	typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
@@ -92,7 +92,8 @@ private:
 	///	  a reference on it!
 	///	  
 	///
-	static Array_as* getArguments(swf_function& callee, const fn_call& fn, as_object* caller);
+	static Array_as* getArguments(swf_function& callee, const fn_call& fn,
+            as_object* caller);
 
 public:
 
@@ -133,41 +134,11 @@ public:
 
 	~swf_function();
 
-	/// Default constructor
-	//
-	/// Creates a Function object inheriting
-	/// the Function interface (apply,call)
-	///
-	//swf_function();
-
-	/// Construct a Built-in ActionScript class 
-	//
-	/// The provided export_iface as_object is what will end
-	/// up being the class's 'prototype' member, caller must
-	/// make sure to provide it with a 'constructor' member
-	/// pointing to the function that creates an instance of
-	/// that class.
-	/// All built-in classes derive from the Function
-	/// built-in class, whose exported interface will be 
-	/// accessible trought their __proto__ member.
-	///
-	/// @param export_iface the exported interface
-	///
-	//swf_function(as_object* export_iface);
-	// USE THE builtin_function instead!
-
 	/// \brief
 	/// Create an ActionScript function as defined in an
 	/// action_buffer starting at offset 'start'
 	//
-	/// NULL environment is allowed -- if so, then
-	/// functions will be executed in the caller's
-	/// environment, rather than the environment where they
-	/// were defined.
-	///
-	swf_function(const action_buffer* ab,
-		as_environment* env,
-		size_t start,
+	swf_function(const action_buffer& ab, as_environment& env, size_t start,
 		const ScopeStack& with_stack);
 
 	const ScopeStack& getScopeStack() const
@@ -177,8 +148,7 @@ public:
 
 	const action_buffer& getActionBuffer() const
 	{
-		assert(m_action_buffer);
-		return *m_action_buffer;
+		return m_action_buffer;
 	}
 
 	size_t getStartPC() const

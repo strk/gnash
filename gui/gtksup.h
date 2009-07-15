@@ -53,7 +53,7 @@ public:
     /// For the Gtk GUI FD listener, whatever that might be for.
     typedef bool (*callback_t)(void*, int, void *data);
 
-    GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    GtkGui(unsigned long xid, float scale, bool loop, RunResources& r);
     
     virtual ~GtkGui();
     

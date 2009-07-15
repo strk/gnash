@@ -22,6 +22,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "builtin_function.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
@@ -30,6 +31,7 @@
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "PropertyList.h"
+#include "Global_as.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -109,7 +111,7 @@ LoadVars_as::toString(std::ostream& o, bool /*post*/) const
 
 	enumerateProperties(vars);
 
-    as_object* global = _vm.getGlobal();
+    as_object* global = getGlobal(*this);
     assert(global);
 
     // LoadVars.toString() calls _global.escape().
@@ -140,11 +142,12 @@ void
 loadvars_class_init(as_object& global)
 {
 	// This is going to be the global LoadVars "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&loadvars_ctor, getLoadVarsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&loadvars_ctor, getLoadVarsInterface());
 	}
 
 	// Register _global.LoadVars, only visible for SWF6 up
@@ -161,21 +164,22 @@ namespace {
 void
 attachLoadVarsInterface(as_object& o)
 {
-    VM& vm = o.getVM();
+    Global_as* gl = getGlobal(o);
+    VM& vm = getVM(o);
 
-	o.init_member("addRequestHeader", new builtin_function(
+	o.init_member("addRequestHeader", gl->createFunction(
 	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", vm.getNative(301, 3));
-	o.init_member("getBytesLoaded", new builtin_function(
+	o.init_member("getBytesLoaded", gl->createFunction(
 	            LoadableObject::loadableobject_getBytesLoaded));
-	o.init_member("getBytesTotal", new builtin_function(
+	o.init_member("getBytesTotal", gl->createFunction(
                 LoadableObject::loadableobject_getBytesTotal));
 	o.init_member("load", vm.getNative(301, 0));
 	o.init_member("send", vm.getNative(301, 1));
 	o.init_member("sendAndLoad", vm.getNative(301, 2));
-	o.init_member("toString", new builtin_function(loadvars_tostring));
-	o.init_member("onData", new builtin_function(loadvars_onData));
-	o.init_member("onLoad", new builtin_function(loadvars_onLoad));
+	o.init_member("toString", gl->createFunction(loadvars_tostring));
+	o.init_member("onData", gl->createFunction(loadvars_onData));
+	o.init_member("onLoad", gl->createFunction(loadvars_onLoad));
 }
 
 as_object*
@@ -206,7 +210,7 @@ loadvars_onData(const fn_call& fn)
 		thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
     }
     else {
-		VM& vm = fn.getVM();
+		VM& vm = getVM(fn);
 		string_table& st = vm.getStringTable();
 		string_table::key decodeKey = st.find("decode"); 
 

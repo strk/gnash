@@ -20,12 +20,13 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-#include "fill_style.h"
 #include "styles.h" 
 #include "ShapeRecord.h"
 
 namespace gnash {
     class DisplayObject;
+    class Renderer;
+    class fill_style;
 }
 
 namespace gnash {
@@ -83,7 +84,7 @@ public:
     }
 
     /// Display a DynamicShape object.
-    void display(const DisplayObject& inst) const;
+    void display(Renderer& renderer, const DisplayObject& inst) const;
 
 	/// Set current line style and start a new path.
 	//

@@ -47,16 +47,14 @@ static as_value
 get_flash_filters_package(const fn_call& /*fn*/)
 {
 
-    // TODO: there are differences between AS2 and AS3 here.
-
 	log_debug("Loading flash.filters package");
 	as_object *pkg = new as_object(getObjectInterface());
 
 	// Call the [objectname]_init() function for each class.
 	int i = 0;
 	do {
-	    as3filtersclasses[i](*pkg);
-	} while (as3filtersclasses[++i] != 0);
+	    filtersclasses[i](*pkg);
+	} while (filtersclasses[++i] != 0);
 
 	return pkg;
 }
@@ -64,7 +62,7 @@ get_flash_filters_package(const fn_call& /*fn*/)
 void
 flash_filters_package_init(as_object& where)
 {
-	string_table& st = where.getVM().getStringTable();
+	string_table& st = getStringTable(where);
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

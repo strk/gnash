@@ -1,4 +1,4 @@
-// Error_as.h:  ActionScript "Error" class, for Gnash.
+// Namespace_as.h:  ActionScript "Namespace" class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -28,7 +28,7 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global Error class
+/// Initialize the global Namespace class
 void namespace_class_init(as_object& global);
 
 } // gnash namespace

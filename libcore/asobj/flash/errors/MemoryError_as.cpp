@@ -24,6 +24,7 @@
 #include "errors/MemoryError_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void memoryerror_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&memoryerror_ctor, getMemoryErrorInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&memoryerror_ctor, getMemoryErrorInterface());
         attachMemoryErrorStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void memoryerror_class_init(as_object& global)
 namespace {
 
 void
-attachMemoryErrorInterface(as_object& o)
+attachMemoryErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachMemoryErrorStaticInterface(as_object& o)
+attachMemoryErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getMemoryErrorInterface()
 }
 
 as_value
-memoryerror_ctor(const fn_call& fn)
+memoryerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MemoryError_as;
 

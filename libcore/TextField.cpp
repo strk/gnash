@@ -24,7 +24,6 @@
 #include "utf8.h"
 #include "log.h"
 #include "swf/DefineEditTextTag.h"
-#include "render.h"
 #include "movie_definition.h" // to extract version info
 #include "MovieClip.h"
 #include "TextField.h"
@@ -44,6 +43,7 @@
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
+#include "Global_as.h"
 #include "Point2d.h"
 #include "GnashNumeric.h"
 
@@ -127,6 +127,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
+	_top_visible_line(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(def.multiline()),
@@ -143,7 +144,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _wordWrap(def.wordWrap()),
     _html(def.html()),
     _selectable(!def.noSelect()),
-    _autoSize(autoSizeNone),
+    _autoSize(def.autoSize() ? autoSizeLeft : autoSizeNone),
     _type(def.readOnly() ? typeDynamic : typeInput),
     _bounds(def.bounds()),
     _selection(0, 0)
@@ -154,7 +155,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = parent->getVM().getSWFVersion();
+    int version = getSWFVersion(*parent);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -184,6 +185,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
+	_top_visible_line(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(false),
@@ -216,7 +218,7 @@ void
 TextField::init()
 {
 
-    as_object* proto = getTextFieldInterface(_vm);
+    as_object* proto = getTextFieldInterface(getVM(*this));
  
     // This is an instantiation, so attach properties to the
     // prototype.
@@ -272,7 +274,7 @@ TextField::removeTextField()
 }
 
 void
-TextField::show_cursor(const SWFMatrix& mat)
+TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 {
     boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
     boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
@@ -282,11 +284,11 @@ TextField::show_cursor(const SWFMatrix& mat)
         (point(x, y))
         (point(x, y + h));
     
-    render::drawLine(box, rgba(0,0,0,255), mat);
+    renderer.drawLine(box, rgba(0,0,0,255), mat);
 }
 
 void
-TextField::display()
+TextField::display(Renderer& renderer)
 {
 
     registerTextVariable();
@@ -325,7 +327,7 @@ TextField::display()
     log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
-        render::draw_poly(&coords.front(), 4, backgroundColor, 
+        renderer.draw_poly(&coords.front(), 4, backgroundColor, 
                 borderColor, wmat, true);
         
     }
@@ -341,10 +343,10 @@ TextField::display()
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    SWF::TextRecord::displayRecords(m, get_world_cxform(), _textRecords,
-            _embedFonts);
+    SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
+            _textRecords, _embedFonts);
 
-    if (m_has_focus) show_cursor(wmat);
+    if (m_has_focus) show_cursor(renderer, wmat);
     
     clear_invalidated();
 }
@@ -370,7 +372,7 @@ void
 TextField::replaceSelection(const std::string& replace)
 {
 
-    const int version = _vm.getSWFVersion();
+    const int version = getSWFVersion(*this);
     const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
     
     const size_t start = _selection.first;
@@ -429,6 +431,13 @@ TextField::on_event(const event_id& ev)
 
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());
+			
+			int cur_cursor = m_cursor;
+			int previouslinesize = 0;
+			int nextlinesize = 0;
+			int manylines = _line_starts.size();
+			std::vector<int>::iterator linestartit = _line_starts.begin();
+			std::vector<int>::const_iterator linestartend = _line_starts.end();
 
             switch (c)
             {
@@ -453,18 +462,96 @@ TextField::on_event(const event_id& ev)
                     break;
 
                 case key::HOME:
+					while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+						cur_cursor = *linestartit;
+						linestartit++;
+					}
+					m_cursor = cur_cursor;
+					format_text();
+					break;
+					
                 case key::PGUP:
+					// if going a page up is too far...
+					if(_top_visible_line - _linesindisplay < 0) {
+						_top_visible_line = 0;
+						m_cursor = 0;
+					} else { // go a page up
+						_top_visible_line -= _linesindisplay;
+						m_cursor = _line_starts[_top_visible_line];
+					}
+					format_text();
+					break;
+					
                 case key::UP:
-                    m_cursor = 0;
+					while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+						cur_cursor = *linestartit;
+						linestartit++;
+					}
+					//if there is no previous line
+					if ( linestartit-_line_starts.begin() - 2 < 0 ) {
+						m_cursor = 0;
+						format_text();
+						break;
+					}
+					previouslinesize = _textRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
+					//if the previous line is smaller
+					if (m_cursor - cur_cursor > previouslinesize)
+						m_cursor = *(--(--linestartit)) + previouslinesize;
+					else
+						m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
+					if (m_cursor < _line_starts[_top_visible_line] && _line_starts[_top_visible_line] != 0)
+						--_top_visible_line;
                     format_text();
                     break;
 
                 case key::END:
+					while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+						linestartit++;
+					}
+					m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
+					format_text();
+					break;
+					
                 case key::PGDN:
+					//if going another page down is too far...
+					if(_top_visible_line + _linesindisplay >= manylines) {
+						if(manylines - _linesindisplay <= 0) {
+							_top_visible_line = 0;
+						} else {
+							_top_visible_line = manylines - _linesindisplay;
+						}
+						if(m_cursor < _line_starts[_top_visible_line-1]) {
+							m_cursor = _line_starts[_top_visible_line-1];
+						} else {
+							m_cursor = _text.size();
+						}
+					} else { //go a page down
+						_top_visible_line += _linesindisplay;
+						m_cursor = _line_starts[_top_visible_line];
+					}
+					format_text();
+					break;
+					
                 case key::DOWN:
-                    m_cursor = _text.size();
+                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+						cur_cursor = *linestartit;
+						linestartit++;
+					}
+					//if there is no next line
+					if ( linestartit-_line_starts.begin() >= manylines ) {
+						m_cursor = _text.size();
+						format_text();
+						break;
+					}
+					nextlinesize = _textRecords[linestartit-_line_starts.begin()].glyphs().size();
+					//if the next line is smaller
+					if (m_cursor - cur_cursor > nextlinesize)
+						m_cursor = *linestartit + nextlinesize;
+					else //put the cursor at the same character distance
+						m_cursor = *(linestartit) + (m_cursor - cur_cursor);
                     format_text();
                     break;
+
 
                 case key::LEFT:
                     m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
@@ -521,7 +608,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -552,7 +639,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = _vm.getSWFVersion();
+            int version = getSWFVersion(*this);
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -579,7 +666,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -911,15 +998,21 @@ void
 TextField::format_text()
 {
     _textRecords.clear();
-
-    // nothing more to do if text is empty
+	_line_starts.clear();
+	TextRecords temporary;
+			
+	// nothing more to do if text is empty
     if ( _text.empty() )
     {
         // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
         //       not sure we should...
-        reset_bounding_box(0, 0);
+        //reset_bounding_box(0, 0);
+		m_xcursor = PADDING_TWIPS + std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
         return;
     }
+	
+	std::vector<int>::iterator linestartit = _line_starts.begin();
+	std::vector<int>::const_iterator linestartend = _line_starts.end();
 
     // See bug #24266
     const rect& defBounds = _bounds;
@@ -981,16 +1074,15 @@ TextField::format_text()
 
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
-
+	
     int    last_code = -1; // only used if _embedFonts
     int    last_space_glyph = -1;
     int    last_line_start_record = 0;
+	_line_starts.push_back(0);
+	_linesindisplay = (defBounds.height() / (fontHeight + leading));
 
-    unsigned int idx = 0;
     m_xcursor = x;
     m_ycursor = y;
-
-    assert(! _text.empty() );
     
     boost::uint32_t code = 0;
     
@@ -1037,7 +1129,7 @@ TextField::format_text()
                 // need to detect \r\n and treat it as one newline.
 
                 // Close out this stretch of glyphs.
-                _textRecords.push_back(rec);
+				_textRecords.push_back(rec);
                 align_line(textAlignment, last_line_start_record, x);
 
                 // Expand bounding box to include last column of text ...
@@ -1057,9 +1149,17 @@ TextField::format_text()
                 rec.setYOffset(y);
 
                 last_space_glyph = -1;
-                last_line_start_record = _textRecords.size();
-
-                continue;
+				last_line_start_record = _textRecords.size();
+				 
+                linestartit = _line_starts.begin();
+				linestartend = _line_starts.end();
+				//Fit a line_start in the correct place
+				while ( linestartit < linestartend && *linestartit < it-_text.begin())
+				{
+					linestartit++;
+				}
+				_line_starts.insert(linestartit, it-_text.begin());
+				break;
             }
             case 8:
                 // Backspace 
@@ -1212,7 +1312,7 @@ TextField::format_text()
                 // Insert newline if there's space or autosize != none
 
                 // Close out this stretch of glyphs.
-                _textRecords.push_back(rec);
+				_textRecords.push_back(rec);
 
                 float previous_x = x;
                 x = leftMargin + blockIndent + PADDING_TWIPS;
@@ -1225,8 +1325,11 @@ TextField::format_text()
 
                 // TODO : what if m_text_glyph_records is empty ?
                 // Is it possible ?
-                assert(!_textRecords.empty());
+				assert(!_textRecords.empty());
                 SWF::TextRecord& last_line = _textRecords.back();
+				
+				linestartit = _line_starts.begin();
+				linestartend = _line_starts.end();
                 if (last_space_glyph == -1)
                 {
                     // Pull the previous glyph down onto the
@@ -1237,10 +1340,15 @@ TextField::format_text()
                         x += last_line.glyphs().back().advance;
                         previous_x -= last_line.glyphs().back().advance;
                         last_line.clearGlyphs(1);
+						
+						//record the new line start
+						while ( linestartit < linestartend && *linestartit < (it-_text.begin())-1)
+						{
+							linestartit++;
+						}
+						_line_starts.insert(linestartit, (it-_text.begin()));
                     }
-                }
-                else
-                {
+                } else {
                     // Move the previous word down onto the next line.
 
                     previous_x -= last_line.glyphs()[last_space_glyph].advance;
@@ -1255,12 +1363,20 @@ TextField::format_text()
                         previous_x -= last_line.glyphs()[i].advance;
                     }
                     last_line.clearGlyphs(lineSize - last_space_glyph);
+					
+					//record the position at the start of this line as a line_start
+					int linestartpos = (it-_text.begin())-rec.glyphs().size();
+					while ( linestartit < linestartend && *linestartit < linestartpos)
+					{
+						linestartit++;
+					}
+					_line_starts.insert(linestartit, linestartpos);
                 }
 
                 align_line(textAlignment, last_line_start_record, previous_x);
 
                 last_space_glyph = -1;
-                last_line_start_record = _textRecords.size();
+				last_line_start_record = _textRecords.size();
                 
             }
             else
@@ -1271,42 +1387,77 @@ TextField::format_text()
             }
         }
 
-        if (y > (defBounds.height() - PADDING_TWIPS) && 
-                autoSize == autoSizeNone )
-        {
-#ifdef GNASH_DEBUG_TEXT_FORMATTING
-            log_debug("Text with wordWrap exceeds height of box");
-#endif
-            rec.clearGlyphs();
-            // TODO: should still compute m_text_bounds !
-            LOG_ONCE(log_unimpl("Computing text bounds of a TextField "
-                        "containing text that doesn't fit the box vertically"));
-            break;
-        }
-
-        if (m_cursor > idx)
-        {
-            m_xcursor = x;
-            m_ycursor = y;
-        }
-        idx++;
-
         // TODO: HTML markup
+		
     }
-
     // Expand bounding box to include the whole text (if autoSize)
     if ( _autoSize != autoSizeNone )
     {
         _bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
     }
 
-    // Add this line to our output.
-    if (!rec.glyphs().empty()) _textRecords.push_back(rec);
+    // Add the last line to our output.
+	if (!rec.glyphs().empty()) _textRecords.push_back(rec);
+	
+	linestartit = _line_starts.begin();
+	linestartend = _line_starts.end();
+	int current_line;
+	int last_visible_line = _top_visible_line + _linesindisplay;
+	int linestart = 0;
+	int manylines = _line_starts.size();
+	int manyrecords = _textRecords.size();
+	int yoffset = _top_visible_line*(fontHeight + leading);
+	
+	SWF::TextRecord cursorposition_line;
+	while(linestartit != linestartend && *linestartit <= m_cursor) {
+		linestart = *linestartit++;
+	}
+	current_line = linestartit - _line_starts.begin();
 
-    float extra_space = align_line(textAlignment, last_line_start_record, x);
-
+	///COMPUTE THE LINES TO DISPLAY
+	if (manylines - _top_visible_line <= _linesindisplay) {
+		if(manylines - _linesindisplay <= 0)
+			_top_visible_line = 0;
+		else {
+			_top_visible_line = manylines - _linesindisplay;
+		}
+	//if we are at a higher position, scoot the lines down
+	//INVALID READ - Conditional jump or move depends on uninitialised value(s)
+	} else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
+		_top_visible_line -= _top_visible_line-current_line;
+	//if we are at a lower position, scoot the lines up
+	} else if (manylines > _top_visible_line+_linesindisplay) {
+		if ( m_cursor >= (_line_starts[last_visible_line])) {
+			_top_visible_line += current_line - (last_visible_line);
+		}
+	}
+	///MOVE THE LINES TO SHOW CORRECT SECTION OF TEXT
+	for(unsigned int i = 0; i < manyrecords; ++i) {
+		//if(_textRecords[i].yOffset() - yoffset < defBounds.height()) {
+		//} else if (_textRecords
+		_textRecords[i].setYOffset(_textRecords[i].yOffset() - (_top_visible_line*(fontHeight + leading)));
+	}
+	
+	///POSITION THE CURSOR IN X-DIRECTION
+	if ( current_line <= manyrecords ) {
+		cursorposition_line = _textRecords[current_line-1];
+		for ( unsigned int i = linestart; i < m_cursor; ++i ) {
+			//INVALID READ
+			m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
+		}
+	}
+	///POSITION THE CURSOR IN Y-DIRECTION
+	m_ycursor = PADDING_TWIPS - _top_visible_line*(fontHeight + leading);
+	if(current_line >= 0) {
+		for(unsigned int i = 0; i < current_line-1; ++i) {
+			m_ycursor += (fontHeight+leading);
+		}
+	}
+	
+	float extra_space = align_line(textAlignment, last_line_start_record, x);
     m_xcursor += static_cast<int>(extra_space);
-    m_ycursor -= fontHeight + (fontLeading - fontDescent);
+	
+	set_invalidated(); //redraw
 }
 
 TextField::VariableRef
@@ -1364,7 +1515,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     }
 
     ret.first = target;
-    ret.second = _vm.getStringTable().find(parsedName);
+    ret.second = getStringTable(*this).find(parsedName);
 
     return ret;
 }
@@ -1413,13 +1564,13 @@ TextField::registerTextVariable()
     // in that case update text value
     as_value val;
     
-    int version = _vm.getSWFVersion();
+    int version = getSWFVersion(*this);
     
     if (target->get_member(key, &val) )
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target object (%s @ %p) does have a member named %s"),
-            typeName(*target), (void*)target, _vm.getStringTable().value(key));
+            typeName(*target), (void*)target, getStringTable(*this).value(key));
 #endif
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
@@ -1432,7 +1583,7 @@ TextField::registerTextVariable()
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s (no problem, we'll add it with value %s)"),
                     typeName(*target), (void*)target,
-                    _vm.getStringTable().value(key), newVal);
+                    getStringTable(*this).value(key), newVal);
 #endif
         target->set_member(key, newVal);
     }
@@ -1442,7 +1593,7 @@ TextField::registerTextVariable()
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s, and we don't have text defined"),
                     typeName(*target), (void*)target,
-                    _vm.getStringTable().value(key));
+                    getStringTable(*this).value(key));
 #endif
     }
 
@@ -1454,9 +1605,9 @@ TextField::registerTextVariable()
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
-                _vm.getStringTable().value(key), sprite->getTarget());
+                getStringTable(*this).value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
+        sprite->set_textfield_variable(getStringTable(*this).value(key), this);
 
     }
     _text_variable_registered=true;
@@ -1532,20 +1683,21 @@ TextField::set_variable_name(const std::string& newname)
 void
 textfield_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl = NULL;
+    static boost::intrusive_ptr<as_object> cl = NULL;
 
     if (!cl)
     {
-        VM& vm = global.getVM();
+        VM& vm = getVM(global);
+        Global_as* gl = getGlobal(global);
 
         if (vm.getSWFVersion() < 6) {
             /// Version 5 or less: no initial prototype
-            cl = new builtin_function(&textfield_ctor, 0);
+            cl = gl->createClass(&textfield_ctor, 0);
         }
         else {
             /// Version 6 upward: limited initial prototype
             as_object* iface = getTextFieldInterface(vm);
-            cl = new builtin_function(&textfield_ctor, iface);
+            cl = gl->createClass(&textfield_ctor, iface);
         }
 
         vm.addStatic(cl.get());
@@ -1885,7 +2037,7 @@ TextField::handleFocus()
 
     // why should we add to the key listener list every time
     // we call setFocus()???
-    _vm.getRoot().add_key_listener(this);
+    getRoot(*this).add_key_listener(this);
 
     m_cursor = _text.size();
     format_text();
@@ -1902,7 +2054,7 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    movie_root& root = _vm.getRoot();
+    movie_root& root = getRoot(*this);
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
@@ -1943,53 +2095,55 @@ attachPrototypeProperties(as_object& o)
     o.init_property(NSV::PROP_TEXT_HEIGHT,
             textfield_textHeight, textfield_textHeight);
 
-    getset = new builtin_function(textfield_variable);
+    Global_as* gl = getGlobal(o);
+
+    getset = gl->createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_background);
+    getset = gl->createFunction(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_text);
+    getset = gl->createFunction(textfield_text);
     o.init_property("text", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_backgroundColor);
+    getset = gl->createFunction(textfield_backgroundColor);
     o.init_property("backgroundColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_border);
+    getset = gl->createFunction(textfield_border);
     o.init_property("border", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_borderColor);
+    getset = gl->createFunction(textfield_borderColor);
     o.init_property("borderColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_textColor);
+    getset = gl->createFunction(textfield_textColor);
     o.init_property("textColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_embedFonts);
+    getset = gl->createFunction(textfield_embedFonts);
     o.init_property("embedFonts", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_autoSize);
+    getset = gl->createFunction(textfield_autoSize);
     o.init_property("autoSize", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_type);
+    getset = gl->createFunction(textfield_type);
     o.init_property("type", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_wordWrap);
+    getset = gl->createFunction(textfield_wordWrap);
     o.init_property("wordWrap", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_html);
+    getset = gl->createFunction(textfield_html);
     o.init_property("html", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_selectable);
+    getset = gl->createFunction(textfield_selectable);
     o.init_property("selectable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_length);
+    getset = gl->createFunction(textfield_length);
     o.init_property("length", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxscroll);
+    getset = gl->createFunction(textfield_maxscroll);
     o.init_property("maxscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxhscroll);
+    getset = gl->createFunction(textfield_maxhscroll);
     o.init_property("maxhscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxChars);
+    getset = gl->createFunction(textfield_maxChars);
     o.init_property("maxChars", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_bottomScroll);
+    getset = gl->createFunction(textfield_bottomScroll);
     o.init_property("bottomScroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_scroll);
+    getset = gl->createFunction(textfield_scroll);
     o.init_property("scroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_hscroll);
+    getset = gl->createFunction(textfield_hscroll);
     o.init_property("hscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_restrict);
+    getset = gl->createFunction(textfield_restrict);
     o.init_property("restrict", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_multiline);
+    getset = gl->createFunction(textfield_multiline);
     o.init_property("multiline", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_password);
+    getset = gl->createFunction(textfield_password);
     o.init_property("password", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_htmlText);
+    getset = gl->createFunction(textfield_htmlText);
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
@@ -2393,7 +2547,7 @@ textfield_setTextFormat(const fn_call& fn)
                 "unhandled by Gnash", ss.str());
     }
 
-    as_object* obj = fn.arg(0).to_object().get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2424,6 +2578,14 @@ textfield_setTextFormat(const fn_call& fn)
     if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
     if ( tf->colorDefined() ) text->setTextColor(tf->color());
     if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
+
+    if (isAS3(fn)) {
+        // TODO: current font finding assumes we have a parent, which isn't
+        // necessarily the case in AS3. It seems the AS2 implementation is
+        // wrong anyway.
+        log_unimpl("fonts in AS3 TextField.setTextFormat");
+        return as_value();
+    }
 
     if ( tf->fontDefined() )
     {
@@ -2574,7 +2736,7 @@ textfield_text(const fn_call& fn)
     }
 
     // Setter
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(*ptr);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -2592,7 +2754,7 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(*ptr);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -2624,7 +2786,7 @@ textfield_replaceSel(const fn_call& fn)
     const std::string& replace = fn.arg(0).to_string();
 
     /// Do nothing if text is empty and version less than 8.
-    const int version = text->getVM().getSWFVersion();
+    const int version = getSWFVersion(*text);
     if (version < 8 && replace.empty()) return as_value();
 
     text->replaceSelection(replace);
@@ -2694,7 +2856,7 @@ as_value
 textfield_ctor(const fn_call& fn)
 {
 
-    VM& vm = fn.getVM();
+    VM& vm = getVM(fn);
 
     as_object* proto = getTextFieldInterface(vm);
 
@@ -2721,7 +2883,7 @@ textfield_ctor(const fn_call& fn)
 void
 attachTextFieldInterface(as_object& o)
 {
-    boost::intrusive_ptr<builtin_function> getset;
+    Global_as* gl = getGlobal(o);
 
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
@@ -2732,16 +2894,16 @@ attachTextFieldInterface(as_object& o)
         |as_prop_flags::isProtected;
 
     // Parent seems to not be a normal property
-    getset = new builtin_function(&DisplayObject::parent_getset, NULL);
-    o.init_property(NSV::PROP_uPARENT, *getset, *getset);
+    o.init_property(NSV::PROP_uPARENT, &DisplayObject::parent_getset,
+            &DisplayObject::parent_getset);
 
     // Target seems to not be a normal property
-    getset = new builtin_function(&DisplayObject::target_getset, NULL);
-    o.init_property(NSV::PROP_uTARGET, *getset, *getset);
+    o.init_property(NSV::PROP_uTARGET, &DisplayObject::target_getset,
+            &DisplayObject::target_getset);
 
     // _name should be a property of the instance, not the prototype
-    getset = new builtin_function(&DisplayObject::name_getset, NULL);
-    o.init_property(NSV::PROP_uNAME, *getset, *getset);
+    o.init_property(NSV::PROP_uNAME, &DisplayObject::name_getset,
+            &DisplayObject::name_getset);
 
     o.init_property(NSV::PROP_uXMOUSE,
             DisplayObject::xmouse_get, DisplayObject::xmouse_get, propFlags);
@@ -2764,27 +2926,27 @@ attachTextFieldInterface(as_object& o)
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
     o.init_member("setTextFormat", 
-            new builtin_function(textfield_setTextFormat), swf6Flags);
+            gl->createFunction(textfield_setTextFormat), swf6Flags);
     o.init_member("getTextFormat", 
-            new builtin_function(textfield_getTextFormat), swf6Flags);
+            gl->createFunction(textfield_getTextFormat), swf6Flags);
     o.init_member("setNewTextFormat",
-            new builtin_function(textfield_setNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_setNewTextFormat), swf6Flags);
     o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
     o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
     o.init_member("getDepth",
-            new builtin_function(textfield_getDepth), swf6Flags);
+            gl->createFunction(textfield_getDepth), swf6Flags);
     o.init_member("removeTextField",
-            new builtin_function(textfield_removeTextField), swf6Flags);
+            gl->createFunction(textfield_removeTextField), swf6Flags);
     o.init_member("replaceSel",
-            new builtin_function(textfield_replaceSel), swf6Flags);
+            gl->createFunction(textfield_replaceSel), swf6Flags);
 
     // SWF7 or higher
     const int swf7Flags = flags | as_prop_flags::onlySWF7Up;
 
     o.init_member("replaceText",
-            new builtin_function(textfield_replaceText), swf7Flags);
+            gl->createFunction(textfield_replaceText), swf7Flags);
 
 }
 
@@ -2798,8 +2960,9 @@ attachTextFieldStaticMembers(as_object& o)
     // SWF6 or higher
     const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
 
+    Global_as* gl = getGlobal(o);
     o.init_member("getFontList",
-            new builtin_function(textfield_getFontList), swf6Flags);
+            gl->createFunction(textfield_getFontList), swf6Flags);
 
 }
 

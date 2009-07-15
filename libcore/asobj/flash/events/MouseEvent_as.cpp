@@ -24,6 +24,7 @@
 #include "events/MouseEvent_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -65,10 +66,11 @@ public:
 // extern (used by Global.cpp)
 void mouseevent_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&mouseevent_ctor, getMouseEventInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&mouseevent_ctor, getMouseEventInterface());
         attachMouseEventStaticInterface(*cl);
     }
 
@@ -81,22 +83,23 @@ namespace {
 void
 attachMouseEventInterface(as_object& o)
 {
-    o.init_member("toString", new builtin_function(mouseevent_toString));
-    o.init_member("updateAfterEvent", new builtin_function(mouseevent_updateAfterEvent));
-    o.init_member("CLICK", new builtin_function(mouseevent_CLICK));
-    o.init_member("DOUBLE_CLICK", new builtin_function(mouseevent_DOUBLE_CLICK));
-    o.init_member("MOUSE_DOWN", new builtin_function(mouseevent_MOUSE_DOWN));
-    o.init_member("MOUSE_MOVE", new builtin_function(mouseevent_MOUSE_MOVE));
-    o.init_member("MOUSE_OUT", new builtin_function(mouseevent_MOUSE_OUT));
-    o.init_member("MOUSE_OVER", new builtin_function(mouseevent_MOUSE_OVER));
-    o.init_member("MOUSE_UP", new builtin_function(mouseevent_MOUSE_UP));
-    o.init_member("MOUSE_WHEEL", new builtin_function(mouseevent_MOUSE_WHEEL));
-    o.init_member("ROLL_OUT", new builtin_function(mouseevent_ROLL_OUT));
-    o.init_member("ROLL_OVER", new builtin_function(mouseevent_ROLL_OVER));
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(mouseevent_toString));
+    o.init_member("updateAfterEvent", gl->createFunction(mouseevent_updateAfterEvent));
+    o.init_member("CLICK", gl->createFunction(mouseevent_CLICK));
+    o.init_member("DOUBLE_CLICK", gl->createFunction(mouseevent_DOUBLE_CLICK));
+    o.init_member("MOUSE_DOWN", gl->createFunction(mouseevent_MOUSE_DOWN));
+    o.init_member("MOUSE_MOVE", gl->createFunction(mouseevent_MOUSE_MOVE));
+    o.init_member("MOUSE_OUT", gl->createFunction(mouseevent_MOUSE_OUT));
+    o.init_member("MOUSE_OVER", gl->createFunction(mouseevent_MOUSE_OVER));
+    o.init_member("MOUSE_UP", gl->createFunction(mouseevent_MOUSE_UP));
+    o.init_member("MOUSE_WHEEL", gl->createFunction(mouseevent_MOUSE_WHEEL));
+    o.init_member("ROLL_OUT", gl->createFunction(mouseevent_ROLL_OUT));
+    o.init_member("ROLL_OVER", gl->createFunction(mouseevent_ROLL_OVER));
 }
 
 void
-attachMouseEventStaticInterface(as_object& o)
+attachMouseEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -233,7 +236,7 @@ mouseevent_ROLL_OVER(const fn_call& fn)
 }
 
 as_value
-mouseevent_ctor(const fn_call& fn)
+mouseevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MouseEvent_as;
 

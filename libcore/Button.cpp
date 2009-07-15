@@ -25,20 +25,20 @@
 #include "Button.h"
 #include "DefineButtonTag.h"
 #include "as_value.h"
-
+#include "Button.h"
 #include "ActionExec.h"
 #include "MovieClip.h"
 #include "movie_root.h"
 #include "VM.h"
 #include "builtin_function.h"
-#include "fn_call.h" // for shared ActionScript getter-setters
-#include "GnashException.h" // for shared ActionScript getter-setters
+#include "fn_call.h" 
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "Object.h" // for getObjectInterface
 #include "StringPredicates.h"
-#include "GnashKey.h" // key::code
-#include "SoundInfoRecord.h" // for use
+#include "GnashKey.h" 
+#include "SoundInfoRecord.h" 
+#include "Global_as.h" 
 
 #include <boost/bind.hpp>
 
@@ -217,6 +217,22 @@ private:
 // Forward declarations
 static as_object* getButtonInterface();
 
+namespace {
+    void addInstanceProperty(Button& b, DisplayObject* d) {
+        if (!d) return;
+        const std::string& name = d->get_name();
+        if (name.empty()) return;
+        b.init_member(name, d, 0);
+    }
+
+    void removeInstanceProperty(Button& b, DisplayObject* d) {
+        if (!d) return;
+        const std::string& name = d->get_name();
+        if (name.empty()) return;
+        b.delProperty(getStringTable(b).find(name));
+    }
+}
+
 /// Predicates for standard algorithms.
 
 /// Depth comparator for DisplayObjects.
@@ -308,14 +324,14 @@ Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {
-        _vm.getRoot().add_key_listener(this);
+        getRoot(*this).add_key_listener(this);
     }
 
 }
 
 Button::~Button()
 {
-    _vm.getRoot().remove_key_listener(this);
+    getRoot(*this).remove_key_listener(this);
 }
 
 bool
@@ -323,7 +339,7 @@ Button::trackAsMenu()
 {
     // TODO: check whether the AS or the tag value takes precedence.
     as_value track;
-    string_table& st = _vm.getStringTable();
+    string_table& st = getStringTable(*this);
     if (get_member(st.find("trackAsMenu"), &track)) {
         return track.to_bool();
     }
@@ -361,7 +377,7 @@ Button::on_event(const event_id& id)
     // We only respond to valid key code (should we assert here?)
     if ( id.keyCode() == key::INVALID ) return false;
 
-    ButtonActionPusher xec(getVM().getRoot(), this); 
+    ButtonActionPusher xec(getRoot(*this), this); 
     _def->forEachTrigger(id, xec);
 
     return xec.called;
@@ -375,7 +391,7 @@ Button::handleFocus() {
 
 
 void
-Button::display()
+Button::display(Renderer& renderer)
 {
 
     DisplayObjects actChars;
@@ -384,8 +400,10 @@ Button::display()
     // TODO: by keeping chars sorted by depth we'd avoid the sort on display
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    std::for_each(actChars.begin(), actChars.end(),
-            std::mem_fun(&DisplayObject::display)); 
+    for (DisplayObjects::iterator it = actChars.begin(), e = actChars.end();
+            it != e; ++it) {
+        (*it)->display(renderer);
+    }
 
     clear_invalidated();
 }
@@ -504,7 +522,7 @@ Button::mouseEvent(const event_id& event)
         if (!_def->hasSound()) break;
 
         // Check if there is a sound handler
-        sound::sound_handler* s = _vm.getRoot().runInfo().soundHandler();
+        sound::sound_handler* s = getRunResources(*this).soundHandler();
         if (!s) break;
 
         int bi; // button sound array index [0..3]
@@ -572,7 +590,7 @@ Button::mouseEvent(const event_id& event)
     // the action queue on mouse event.
     //
 
-    movie_root& mr = getVM().getRoot();
+    movie_root& mr = getRoot(*this);
 
     ButtonActionPusher xec(mr, this); 
     _def->forEachTrigger(event, xec);
@@ -683,9 +701,10 @@ Button::set_current_state(MouseState new_state)
 
         if ( ! shouldBeThere )
         {
+
             // is there, but is unloaded: destroy, clear slot and go on
-            if ( oldch && oldch->unloaded() )
-            {
+            if ( oldch && oldch->unloaded() ) {
+                removeInstanceProperty(*this, oldch);
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
                 _stateCharacters[i] = NULL;
                 oldch = NULL;
@@ -698,7 +717,8 @@ Button::set_current_state(MouseState new_state)
                 if ( ! oldch->unload() )
                 {
                     // No onUnload handler: destroy and clear slot
-                    if ( ! oldch->isDestroyed() ) oldch->destroy();
+                    removeInstanceProperty(*this, oldch);
+                    if (!oldch->isDestroyed()) oldch->destroy();
                     _stateCharacters[i] = NULL;
                 }
                 else
@@ -718,6 +738,7 @@ Button::set_current_state(MouseState new_state)
             // Is there already, but is unloaded: destroy and consider as gone
             if ( oldch && oldch->unloaded() )
             {
+                removeInstanceProperty(*this, oldch);
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
                 _stateCharacters[i] = NULL;
                 oldch = NULL;
@@ -730,6 +751,7 @@ Button::set_current_state(MouseState new_state)
                 
                 set_invalidated();
                 _stateCharacters[i] = ch;
+                addInstanceProperty(*this, ch);
                 ch->stagePlacementCallback(); 
             }
         }
@@ -804,7 +826,7 @@ Button::get_path_element(string_table::key key)
     as_object* ch = getPathElementSeparator(key);
     if ( ch ) return ch;
 
-    const std::string& name = _vm.getStringTable().value(key);
+    const std::string& name = getStringTable(*this).value(key);
     return getChildByName(name); // possibly NULL
 }
 
@@ -824,7 +846,7 @@ Button::getChildByName(const std::string& name)
         DisplayObject* const child = *i;
         const std::string& childname = child->get_name();
  
-        if ( _vm.getSWFVersion() >= 7 )
+        if (getSWFVersion(*this) >= 7 )
         {
             if ( childname == name ) return child;
         }
@@ -885,6 +907,7 @@ Button::stagePlacementCallback(as_object* initObj)
         DisplayObject* ch = rec.instantiate(this);
 
         _stateCharacters[rno] = ch;
+        addInstanceProperty(*this, ch);
         ch->stagePlacementCallback(); // give this DisplayObject a life
     }
 
@@ -998,15 +1021,15 @@ Button::get_member(string_table::key name_key, as_value* val,
     //             to the SWF4 code but available to the SWF6 one.
     //
     // see MovieClip.as
-    if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
+    if (getMovieVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
         // The "_global" ref was added in SWF6
-        val->set_as_object( _vm.getGlobal() );
+        val->set_as_object(getGlobal(*this));
         return true;
     }
 
-    const std::string& name = _vm.getStringTable().value(name_key);
+    const std::string& name = getStringTable(*this).value(name_key);
 
-    movie_root& mr = _vm.getRoot();
+    movie_root& mr = getRoot(*this);
     unsigned int levelno;
     if ( mr.isLevelTarget(name, levelno) ) {
         Movie* mo = mr.getLevel(levelno).get();
@@ -1069,7 +1092,7 @@ Button::get_member(string_table::key name_key, as_value* val,
 }
 
 int
-Button::getSWFVersion() const
+Button::getMovieVersion() const
 {
     return _def->getSWFVersion();
 }
@@ -1099,11 +1122,12 @@ void
 Button::init(as_object& global)
 {
   // This is going to be the global Button "class"/"function"
-  static boost::intrusive_ptr<builtin_function> cl=NULL;
+  static boost::intrusive_ptr<as_object> cl=NULL;
 
   if ( cl == NULL )
   {
-    cl=new builtin_function(&button_ctor, getButtonInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&button_ctor, getButtonInterface());
     VM::get().addStatic(cl.get());
   }
 
@@ -1125,7 +1149,12 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     os << actChars.size() << " active DisplayObjects for state " <<
         mouseStateName(_mouseState);
     InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Button state"), os.str()));        
+            StringPair(_("Button state"), os.str()));
+
+    os.str("");
+    os << std::boolalpha << isEnabled();
+    localIter = tr.append_child(selfIt, StringPair(_("Enabled"), os.str()));
+
     std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
 

@@ -24,6 +24,7 @@
 #include "display/SpreadMethod_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
 #include "Object.h" 
@@ -50,7 +51,7 @@ spreadmethod_class_init(as_object& global)
 namespace {
 
 void
-attachSpreadMethodStaticInterface(as_object& o)
+attachSpreadMethodStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

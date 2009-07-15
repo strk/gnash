@@ -24,6 +24,7 @@
 #include "printing/PrintJobOptions_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void printjoboptions_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&printjoboptions_ctor, getPrintJobOptionsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&printjoboptions_ctor, getPrintJobOptionsInterface());
         attachPrintJobOptionsStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void printjoboptions_class_init(as_object& global)
 namespace {
 
 void
-attachPrintJobOptionsInterface(as_object& o)
+attachPrintJobOptionsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachPrintJobOptionsStaticInterface(as_object& o)
+attachPrintJobOptionsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getPrintJobOptionsInterface()
 }
 
 as_value
-printjoboptions_ctor(const fn_call& fn)
+printjoboptions_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new PrintJobOptions_as;
 

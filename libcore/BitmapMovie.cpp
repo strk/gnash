@@ -33,13 +33,5 @@ BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
     placeDisplayObject(ch.get(), depth);
 }
 
-std::auto_ptr<GnashImage>
-BitmapMovie::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-             DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
-             bool /* smooth */)
-{
-    return std::auto_ptr<GnashImage>();
-}
-
 } // namespace gnash
 

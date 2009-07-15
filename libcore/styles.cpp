@@ -8,7 +8,6 @@
 
 #include "styles.h"
 #include "log.h"
-#include "render.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "SWF.h"
@@ -41,7 +40,7 @@ line_style::line_style()
 
 void
 line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-    line_style *pOther)
+    const RunResources& r, line_style *pOther)
 {
     if (t == SWF::DEFINEMORPHSHAPE)
     {
@@ -80,7 +79,7 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         // read fill styles for strokes.
         // TODO: don't throw away this information, should be passed to renderer.
         fill_style f, g;
-        f.read(in, t, md, &g);
+        f.read(in, t, md, r, &g);
         m_color = f.get_color();
         pOther->m_color = g.get_color();
     }
@@ -92,7 +91,8 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 }
 
 void
-line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md)
+line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
+        const RunResources& r)
 {
     if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
     {
@@ -128,7 +128,7 @@ line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md)
         // read fill styles for strokes.
         // TODO: don't throw away this information, should be passed to renderer.
         fill_style f;
-        f.read(in, t, md);
+        f.read(in, t, md, r);
         m_color = f.get_color();
     }
     else

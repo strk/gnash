@@ -37,7 +37,7 @@ class GtkAggGlue : public GtkGlue
 
     bool init(int argc, char **argv[]);
     void prepDrawingArea(GtkWidget *drawing_area);
-    render_handler* createRenderHandler();
+    Renderer* createRenderHandler();
     void setRenderHandlerSize(int width, int height);
     void beforeRendering();
     void render();
@@ -46,7 +46,7 @@ class GtkAggGlue : public GtkGlue
 
   private:
     GdkImage* _offscreenbuf;
-    render_handler *_agg_renderer;
+    Renderer *_agg_renderer;
 };
 
 } // namespace gnash

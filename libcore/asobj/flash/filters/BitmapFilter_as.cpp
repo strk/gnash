@@ -21,6 +21,7 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "Object.h"
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -46,7 +47,7 @@ public:
 void
 bitmapfilter_class_init(as_object& global)
 {
-    string_table& st = global.getVM().getStringTable();
+    string_table& st = getStringTable(global);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
@@ -72,19 +73,15 @@ void
 attachBitmapFilterInterface(as_object& o)
 {
     const int flags = 0;
-    o.init_member("clone", new builtin_function(bitmapfilter_clone), flags);
+    Global_as* gl = getGlobal(o);
+    o.init_member("clone", gl->createFunction(bitmapfilter_clone), flags);
 }
 
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
-    static builtin_function* cl;
-    if (!cl) {
-        cl = new builtin_function(&bitmapfilter_ctor,
-                getBitmapFilterInterface());
-        fn.getVM().addStatic(cl);
-    }
-    return cl;
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&bitmapfilter_ctor, getBitmapFilterInterface());
 }
 
 as_value

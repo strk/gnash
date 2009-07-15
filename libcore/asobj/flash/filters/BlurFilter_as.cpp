@@ -20,6 +20,7 @@
 #include "BlurFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
+#include "Global_as.h"
 
 #include "BitmapFilter_as.h"
 
@@ -46,13 +47,11 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<builtin_function> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> BlurFilter_as::s_interface;
-boost:: intrusive_ptr<builtin_function> BlurFilter_as::s_ctor;
 
 as_object*
 BlurFilter_as::Interface() {
@@ -67,11 +66,15 @@ BlurFilter_as::Interface() {
 void
 BlurFilter_as::registerCtor(as_object& global)
 {
-    if (BlurFilter_as::s_ctor != NULL) return;
-    BlurFilter_as::s_ctor = new builtin_function(&BlurFilter_as::ctor, BlurFilter_as::Interface());
-    VM::get().addStatic(BlurFilter_as::s_ctor.get());
-    BlurFilter_as::attachInterface(*BlurFilter_as::s_ctor);
-    global.init_member("BlurFilter" , BlurFilter_as::s_ctor.get());
+    static boost::intrusive_ptr<as_object> cl;
+    if (!cl) return;
+
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());
+    BlurFilter_as::attachInterface(*cl);
+
+    global.init_member("BlurFilter" , cl.get());
+
 }
 
 void
@@ -83,9 +86,10 @@ blurfilter_class_init(as_object& global)
 
 void
 BlurFilter_as::attachInterface(as_object& o) {
+    Global_as* gl = getGlobal(o);
     boost::intrusive_ptr<builtin_function> gs;
 
-    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
+    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
 
 }
 
@@ -93,15 +97,12 @@ void
 BlurFilter_as::attachProperties(as_object& o)
 {
     boost::intrusive_ptr<builtin_function> gs;
-
-    gs = new builtin_function(BlurFilter_as::blurX_gs, NULL);
-    o.init_property("blurX" , *gs, *gs);
-
-    gs = new builtin_function(BlurFilter_as::blurY_gs, NULL);
-    o.init_property("blurY" , *gs, *gs);
-
-    gs = new builtin_function(BlurFilter_as::quality_gs, NULL);
-    o.init_property("quality" , *gs, *gs);
+    o.init_property("blurX" , BlurFilter_as::blurX_gs, 
+        BlurFilter_as::blurX_gs);
+    o.init_property("blurY" , BlurFilter_as::blurY_gs, 
+        BlurFilter_as::blurY_gs);
+    o.init_property("quality" , BlurFilter_as::quality_gs, 
+        BlurFilter_as::quality_gs);
 
 }
 

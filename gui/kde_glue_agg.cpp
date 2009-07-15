@@ -31,8 +31,8 @@
 #include <qcolor.h>
 #endif
 #include "kde_glue_agg.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
+#include "Renderer.h"
+#include "Renderer_agg.h"
 
 namespace gnash
 {
@@ -85,8 +85,8 @@ KdeAggGlue::initBuffer(int width, int height)
     // Only the AGG renderer has the function init_buffer, which is *not* part of
     // the renderer api. It allows us to change the renderers movie size (and buffer
     // address) during run-time.
-    render_handler_agg_base * renderer =
-      static_cast<render_handler_agg_base *>(_renderer);
+    Renderer_agg_base * renderer =
+      static_cast<Renderer_agg_base *>(_renderer);
     renderer->init_buffer(_offscreenbuf.get(), bufsize, width, height,
       width*((_bpp+7)/8));
 
@@ -146,11 +146,11 @@ KdeAggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
 }
 
 
-render_handler*
+Renderer*
 KdeAggGlue::createRenderHandler()
 {
     // QT requires the use of this pixel format...
-    _renderer = create_render_handler_agg("BGRA32");
+    _renderer = create_Renderer_agg("BGRA32");
     if ( ! _renderer )
     {
         throw GnashException("Could not create AGG renderer with pixelformat BGRA32");

@@ -127,7 +127,7 @@ ASTESTS =			\
 	rtmp.as 		\
 	XMLNode.as		\
 	LocalConnection.as	\
-	enumerate.as		\
+	enumerate.as	\
 	case.as			\
 	ops.as			\
 	toString_valueOf.as	\

@@ -24,6 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <vector>
 
 
 namespace gnash {
@@ -35,6 +36,13 @@ class as_object;
 void system_class_init(as_object& global);
 
 void registerSystemNative(as_object& global);
+
+
+/// Get the vector aof allowed domains to access
+const std::vector<std::string>& getAllowDataAccess();
+
+/// add a url string to the vector of allowed domains
+bool addAllowDataAccess( const std::string& url );
 
 } // gnash namespace
 

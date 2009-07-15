@@ -78,6 +78,8 @@ check_PROGRAMS = \
 	DefineTextTest \
 	DefineTextTest-Runner \
 	TextSnapshotTest \
+	DeviceFontTest \
+	EmbeddedFontTest \
 	DefineEditTextTest \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
@@ -230,8 +232,11 @@ endif
 
 if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 check_PROGRAMS += \
+	ButtonPropertiesTest \
 	ButtonEventsTest \
-	ButtonEventsTest-Runner 
+	ButtonPropertiesTestRunner \
+	ButtonEventsTest-Runner \
+	$(NULL)
 endif
 
 if MING_VERSION_0_4_3
@@ -239,6 +244,8 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	DeviceFontTestRunner \
+	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
@@ -403,9 +410,24 @@ TextSnapshotTest-Runner: $(srcdir)/../generic-testrunner.sh TextSnapshotTest.swf
 	sh $< $(top_builddir) TextSnapshotTest.swf > $@
 	chmod 755 $@
 
+DeviceFontTestRunner: $(srcdir)/../generic-testrunner.sh DeviceFontTest.swf
+	sh $< $(top_builddir) DeviceFontTest.swf > $@
+	chmod 755 $@
+DeviceFontTest.swf: DeviceFontTest
+	./DeviceFontTest $(top_srcdir)/testsuite/media
+DeviceFontTest_SOURCES =  DeviceFontTest.c
+DeviceFontTest_LDADD = libgnashmingutils.la
+
+EmbeddedFontTestRunner: $(srcdir)/../generic-testrunner.sh EmbeddedFontTest.swf
+	sh $< $(top_builddir) EmbeddedFontTest.swf > $@
+	chmod 755 $@
+EmbeddedFontTest.swf: EmbeddedFontTest
+	./EmbeddedFontTest $(top_srcdir)/testsuite/media
+EmbeddedFontTest_SOURCES =  EmbeddedFontTest.c
+EmbeddedFontTest_LDADD = libgnashmingutils.la
+
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
-
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
 DefineEditTextTest_LDADD = libgnashmingutils.la
 
@@ -1682,6 +1704,27 @@ SharedObjectTestRunner: SharedObjectTestRunner.sh Makefile SharedObjectTest.swf
 StageConfigTest.swf: $(srcdir)/StageConfigTest.as 
 	$(MAKESWF) -o $@ -s 512x512 $(srcdir)/StageConfigTest.as
 
+ButtonPropertiesTest_SOURCES = \
+	ButtonPropertiesTest.c \
+	$(NULL)
+ButtonPropertiesTest_LDADD = libgnashmingutils.la
+ButtonPropertiesTest.swf: ButtonPropertiesTest
+	./ButtonPropertiesTest $(top_srcdir)/testsuite/media
+ButtonPropertiesTestRunner_SOURCES = \
+	ButtonPropertiesTestRunner.cpp \
+	$(NULL)
+ButtonPropertiesTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+ButtonPropertiesTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	ButtonPropertiesTest.swf	\
+	$(NULL)
+ButtonPropertiesTestRunner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+
 init_action_test_SOURCES =	\
 	init_action_test.c	\
 	$(NULL)
@@ -1921,6 +1964,8 @@ clean-local:
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	LoadVarsTestRunner \
+	DeviceFontTestRunner \
+	EmbeddedFontTestRunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	DefineTextTest-Runner \
@@ -2047,6 +2092,7 @@ endif
 
 if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 TEST_CASES += \
+	ButtonPropertiesTestRunner \
 	ButtonEventsTest-Runner \
 	$(NULL)
 endif

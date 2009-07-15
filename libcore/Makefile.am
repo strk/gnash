@@ -120,7 +120,6 @@ libgnashcore_la_SOURCES = \
 	fontlib.cpp \
 	impl.cpp \
 	LoadVariablesThread.cpp \
-	render.cpp \
 	SWFStream.cpp \
 	styles.cpp \
 	Timers.cpp \
@@ -165,7 +164,6 @@ noinst_HEADERS = \
 	StaticText.h \
 	LoadVariablesThread.h \
 	SWFMovie.h \
-	render.h \
 	SWFStream.h \
 	MovieLibrary.h \
 	swf/tag_loaders.h \
@@ -231,7 +229,7 @@ EXTENSIONS_API = \
 	rect.h \
 	GnashKey.h \
 	Movie.h \
-	RunInfo.h \
+	RunResources.h \
 	gnash.h	\
 	DisplayObjectContainer.h \
 	DisplayObject.h \

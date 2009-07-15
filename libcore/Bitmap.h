@@ -22,7 +22,6 @@
 #include "DisplayObject.h" 
 #include "BitmapInfo.h"
 #include "flash/display/BitmapData_as.h"
-#include "render.h"
 #include "BitmapMovieDefinition.h"
 #include "DynamicShape.h"
 
@@ -62,7 +61,7 @@ public:
 
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-    virtual void display();
+    virtual void display(Renderer& renderer);
 
     virtual rect getBounds() const;
 

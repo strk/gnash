@@ -17,8 +17,8 @@
 
 MEDIAdir = $(includedir)/gnash
 
-MEDIA_SOURCES = asobj/flash/media/media_pkg.cpp
-MEDIA_HEADERS = asobj/flash/media/media_pkg.h
+MEDIA_SOURCES = 
+MEDIA_HEADERS = 
 
 # FIXME: already exists
 if BUILD_CAMERA_AS3
@@ -69,4 +69,4 @@ MEDIA_HEADERS += asobj/flash/media/Video_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(MEDIA_SOURCES)
-noinst_HEADERS +=  $(MEDIA_HEADERS) asobj/flash/media/mediaclasses.h
+

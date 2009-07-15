@@ -236,7 +236,7 @@ Player::init_gui()
     }
     else
     {
-        _gui.reset(new NullGui(_doLoop));
+        _gui.reset(new NullGui(_doLoop, *_runResources));
     }
 
     _gui->setMaxAdvances(_maxAdvances);
@@ -253,9 +253,9 @@ Player::init_gui()
 boost::intrusive_ptr<movie_definition>
 Player::load_movie()
 {
-    /// The RunInfo must be initialized by this point to provide resources
+    /// The RunResources must be initialized by this point to provide resources
     /// for parsing.
-    assert(_runInfo.get());
+    assert(_runResources.get());
 
     boost::intrusive_ptr<gnash::movie_definition> md;
 
@@ -276,7 +276,7 @@ Player::load_movie()
         {
             std::auto_ptr<IOChannel> in (
                     noseek_fd_adapter::make_stream(fileno(stdin)));
-            md = MovieFactory::makeMovie(in, _url, *_runInfo, false);
+            md = MovieFactory::makeMovie(in, _url, *_runResources, false);
         }
         else
         {
@@ -296,7 +296,7 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = MovieFactory::makeMovie(url, *_runInfo, _url.c_str(),
+            md = MovieFactory::makeMovie(url, *_runResources, _url.c_str(),
                     false);
         }
     } catch (const GnashException& er) {
@@ -325,7 +325,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     init_logfile();
     init_media();
     init_sound();
-    init_gui();
    
     // gnash.cpp should check that a filename is supplied.
     assert (!infile.empty());
@@ -347,6 +346,29 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _url = infile;
     }
 
+    // These flags are here so we can construct
+    // the correct URL for base url later.
+    // If the URL class was not immutable we could do something smarter...
+    bool hasOverriddenBaseUrl=false;
+    std::string overriddenBaseUrl;
+
+    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
+                                       : URL(_baseurl);
+
+    /// The RunResources should be populated before parsing.
+    _runResources.reset(new RunResources(baseURL.str()));
+    _runResources->setSoundHandler(_soundHandler);
+
+    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    addDefaultLoaders(*loaders);
+    _runResources->setTagLoaders(loaders);
+
+    std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
+
+    _runResources->setStreamProvider(sp);
+    
+    init_gui();
 
     // Initialize gui (we need argc/argv for this)
     // note that this will also initialize the renderer
@@ -357,15 +379,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
         return EXIT_FAILURE;
     }
 
-    // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
+    // Parse querystring (before FlashVars, see
+    // testsuite/misc-ming.all/FlashVarsTest*)
     setFlashVars(URL(_url).querystring());
-
-    // These flags are here so we can construct
-    // the correct URL for base url later.
-    // If the URL class was not immutable we could do something smarter...
-    bool hasOverriddenBaseUrl=false;
-    std::string overriddenBaseUrl;
-
+    
     // Parse parameters
     StringNoCaseEqual noCaseCompare;
     for ( std::map<std::string,std::string>::const_iterator it=params.begin(),
@@ -385,21 +402,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
         }
     }
 
-    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
-                                       : URL(_baseurl);
-
-    /// The RunInfo should be populated before parsing.
-    _runInfo.reset(new RunInfo(baseURL.str()));
-    _runInfo->setSoundHandler(_soundHandler);
-
-    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
-    addDefaultLoaders(*loaders);
-    _runInfo->setTagLoaders(loaders);
-
-    std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
-
-    _runInfo->setStreamProvider(sp);
 
     // Load the actual movie.
     _movieDef = load_movie();
@@ -435,7 +437,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
 
-    movie_root root(*_movieDef, _gui->getClock(), *_runInfo);
+    movie_root root(*_movieDef, _gui->getClock(), *_runResources);
 
     _callbacksHandler.reset(new CallbacksHandler(*_gui, *this)); 
     
@@ -719,46 +721,46 @@ std::auto_ptr<Gui>
 Player::getGui()
 {
 #ifdef GUI_GTK
-    return createGTKGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createGTKGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_KDE3
-    return createKDEGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createKDEGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_KDE4
-    return createKDE4Gui(_windowID, _scale, _doLoop, _bitDepth);
+    return createKDE4Gui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_SDL
-    return createSDLGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createSDLGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_AQUA
-    return createAQUAGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createAQUAGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_RISCOS
-    return createRISCOSGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createRISCOSGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_FLTK
-    return createFLTKGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createFLTKGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_FB
-    return createFBGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createFBGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_AOS4
-    return createAOS4Gui(_windowID, _scale, _doLoop, _bitDepth);
+    return createAOS4Gui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_DUMP
-    return createDumpGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createDumpGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
-    return std::auto_ptr<Gui>(new NullGui(_doLoop));
+    return std::auto_ptr<Gui>(new NullGui(_doLoop, *_runResources));
 }
 
 Player::~Player()

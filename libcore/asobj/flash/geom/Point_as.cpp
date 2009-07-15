@@ -21,6 +21,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -52,22 +53,24 @@ attachPointInterface(as_object& o)
 {
     int fl=0; // flags...
 
-    o.init_member("add", new builtin_function(Point_add), fl);
-    o.init_member("clone", new builtin_function(Point_clone), fl);
-    o.init_member("equals", new builtin_function(Point_equals), fl);
-    o.init_member("normalize", new builtin_function(Point_normalize), fl);
-    o.init_member("offset", new builtin_function(Point_offset), fl);
-    o.init_member("subtract", new builtin_function(Point_subtract), fl);
-    o.init_member("toString", new builtin_function(Point_toString), fl);
+    Global_as* gl = getGlobal(o);
+    o.init_member("add", gl->createFunction(Point_add), fl);
+    o.init_member("clone", gl->createFunction(Point_clone), fl);
+    o.init_member("equals", gl->createFunction(Point_equals), fl);
+    o.init_member("normalize", gl->createFunction(Point_normalize), fl);
+    o.init_member("offset", gl->createFunction(Point_offset), fl);
+    o.init_member("subtract", gl->createFunction(Point_subtract), fl);
+    o.init_member("toString", gl->createFunction(Point_toString), fl);
     o.init_property("length", Point_length_getset, Point_length_getset, fl);
 }
 
 static void
 attachPointStaticProperties(as_object& o)
 {
-    o.init_member("distance", new builtin_function(Point_distance), 0);
-    o.init_member("interpolate", new builtin_function(Point_interpolate), 0);
-    o.init_member("polar", new builtin_function(Point_polar), 0);
+    Global_as* gl = getGlobal(o);
+    o.init_member("distance", gl->createFunction(Point_distance), 0);
+    o.init_member("interpolate", gl->createFunction(Point_interpolate), 0);
+    o.init_member("polar", gl->createFunction(Point_polar), 0);
 }
 
 static as_object*
@@ -128,7 +131,7 @@ Point_add(const fn_call& fn)
 		}
 		);
 		const as_value& arg1 = fn.arg(0);
-		as_object* o = arg1.to_object().get();
+		as_object* o = arg1.to_object(*getGlobal(fn)).get();
 		if ( ! o )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -201,17 +204,19 @@ Point_equals(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Point.equals(%s): %s", ss.str(), _("First arg must be an object"));
+		log_aserror("Point.equals(%s): %s", ss.str(),
+            _("First arg must be an object"));
 		);
 		return as_value(false);
 	}
-	as_object* o = arg1.to_object().get();
+	as_object* o = arg1.to_object(*getGlobal(fn)).get();
 	assert(o);
-	if ( ! o->instanceOf(getFlashGeomPointConstructor()) )
+	if ( ! o->instanceOf(getFlashGeomPointConstructor(fn)) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Point.equals(%s): %s %s", ss.str(), _("First arg must be an instance of"), "flash.geom.Point");
+		log_aserror("Point.equals(%s): %s %s", ss.str(),
+            _("First arg must be an instance of"), "flash.geom.Point");
 		);
 		return as_value(false);
 	}
@@ -333,7 +338,7 @@ Point_subtract(const fn_call& fn)
 		}
 		);
 		const as_value& arg1 = fn.arg(0);
-		as_object* o = arg1.to_object().get();
+		as_object* o = arg1.to_object(*getGlobal(fn)).get();
 		if ( ! o )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -381,7 +386,7 @@ Point_toString(const fn_call& fn)
 	ptr->get_member(NSV::PROP_X, &x);
 	ptr->get_member(NSV::PROP_Y, &y);
 
-    int version = ptr->getVM().getSWFVersion();
+    int version = getSWFVersion(fn);
 
 	std::stringstream ss;
 	ss << "(x=" << x.to_string_versioned(version)
@@ -445,9 +450,9 @@ Point_distance(const fn_call& fn)
 		);
 		return as_value();
 	}
-	as_object* o1 = arg1.to_object().get();
+	as_object* o1 = arg1.to_object(*getGlobal(fn)).get();
 	assert(o1);
-	if ( ! o1->instanceOf(getFlashGeomPointConstructor()) )
+	if ( ! o1->instanceOf(getFlashGeomPointConstructor(fn)) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
@@ -457,7 +462,7 @@ Point_distance(const fn_call& fn)
 	}
 
 	const as_value& arg2 = fn.arg(1);
-	as_object* o2 = arg2.to_object().get();
+	as_object* o2 = arg2.to_object(*getGlobal(fn)).get();
 	assert(o2);
 	// it seems there's no need to check arg2 (see actionscript.all/Point.as)
 
@@ -517,7 +522,7 @@ Point_interpolate(const fn_call& fn)
 		);
 
 		const as_value& p0val = fn.arg(0);
-		as_object* p0 = p0val.to_object().get();
+		as_object* p0 = p0val.to_object(*getGlobal(fn)).get();
 		if ( ! p0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -532,7 +537,7 @@ Point_interpolate(const fn_call& fn)
 		}
 
 		const as_value& p1val = fn.arg(1);
-		as_object* p1 = p1val.to_object().get();
+		as_object* p1 = p1val.to_object(*getGlobal(fn)).get();
 		if ( ! p1 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -654,23 +659,21 @@ Point_ctor(const fn_call& fn)
 }
 
 // extern 
-as_function* getFlashGeomPointConstructor()
+as_function*
+getFlashGeomPointConstructor(const fn_call& fn)
 {
-	static builtin_function* cl=NULL;
-	if ( ! cl )
-	{
-		cl=new builtin_function(&Point_ctor, getPointInterface());
-		VM::get().addStatic(cl);
-		attachPointStaticProperties(*cl);
-	}
-	return cl;
+    as_value point(fn.env().find_object("flash.geom.Point"));
+    return point.to_as_function();
 }
 
-static as_value get_flash_geom_point_constructor(const fn_call& /*fn*/)
+static
+as_value get_flash_geom_point_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Point class");
-
-	return getFlashGeomPointConstructor();
+    Global_as* gl = getGlobal(fn);
+    as_object* cl = gl->createClass(&Point_ctor, getPointInterface());
+    attachPointStaticProperties(*cl);
+    return cl;
 }
 
 boost::intrusive_ptr<as_object> init_Point_instance()
@@ -682,7 +685,7 @@ boost::intrusive_ptr<as_object> init_Point_instance()
 void point_class_init(as_object& where)
 {
 	// Register _global.Point
-	string_table& st = where.getVM().getStringTable();
+	string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

@@ -60,10 +60,11 @@ libgnashasobjs_la_SOURCES = \
 	CustomActions.cpp\
 	Date_as.cpp \
 	Error_as.cpp \
-	Global.cpp \
+	Globals.cpp \
 	int_as.cpp \
 	LoadVars_as.cpp \
 	Math_as.cpp \
+	QName_as.cpp \
 	Microphone.cpp	\
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
@@ -87,7 +88,8 @@ noinst_HEADERS = \
 	Date_as.h \
 	Error_as.h	\
 	Math_as.h	\
-	Global.h\
+	Globals.h\
+	Global_as.h\
 	int_as.h \
 	LoadVars_as.h \
 	Microphone.h \
@@ -102,6 +104,7 @@ noinst_HEADERS = \
 	String_as.h \
 	LoadableObject.h \
 	Namespace_as.h \
+	QName_as.h \
 	Object.h
 
 EXTENSIONS_API = \

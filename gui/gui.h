@@ -25,6 +25,7 @@
 #include "rect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h" // for gnash::key::code type
+#include "Renderer.h" // for gnash::key::code type
 #include "smart_ptr.h"
 #include "VirtualClock.h"
 #include "SystemClock.h"
@@ -61,7 +62,7 @@
 // Forward declarations
 namespace gnash
 {
-    class render_handler;
+    class RunResources;
     class movie_root;
     class movie_definition;
 }
@@ -390,7 +391,7 @@ public:
 protected:
 
     /// Default constructor. Initialises members to safe defaults.
-    Gui();
+    Gui(RunResources& r);
 
     /** \brief
      * Expanded constructor for more control over member values.
@@ -406,7 +407,7 @@ protected:
      *
      * @param depth Colour depth to be used in the client area of our window.
      */
-    Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    Gui(unsigned long xid, float scale, bool loop, RunResources& r);
 
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
@@ -427,13 +428,13 @@ protected:
     int             _height;
 
     /// Desired colour depth in bits.
-    int             _depth;
+    RunResources& _runResources;
 
     /// Main loop interval: the time between successive advance_movie calls.
     unsigned int    _interval;
 
     /// The handler which is called to update the client area of our window.
-    render_handler* _renderer;
+    boost::shared_ptr<Renderer> _renderer;
 
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
@@ -533,16 +534,16 @@ private:
 };
 
 /// Named constructors
-std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createKDE4Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
-std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createKDE4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
 
  
 } // end of gnash namespace

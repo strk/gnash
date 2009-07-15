@@ -24,6 +24,7 @@
 #include "events/EventPhase_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void eventphase_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&eventphase_ctor, getEventPhaseInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&eventphase_ctor, getEventPhaseInterface());
         attachEventPhaseStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void eventphase_class_init(as_object& global)
 namespace {
 
 void
-attachEventPhaseInterface(as_object& o)
+attachEventPhaseInterface(as_object& /*o*/)
 {
 }
 
 void
-attachEventPhaseStaticInterface(as_object& o)
+attachEventPhaseStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getEventPhaseInterface()
 }
 
 as_value
-eventphase_ctor(const fn_call& fn)
+eventphase_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new EventPhase_as;
 

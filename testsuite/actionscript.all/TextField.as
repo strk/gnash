@@ -408,6 +408,8 @@ check(!tf.hasOwnProperty('multiline'));
 check_equals(tf.multiline, false);
 tf.multiline = true;
 check_equals(tf.multiline, true);
+tf.multiline = 54;
+check_equals(typeof(tf.multiline), 'boolean'); // always converted
 tf.multiline = false;
 
 //-------------------------------------------------------------------------
@@ -1070,11 +1072,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(464);
+ check_totals(465);
 #elif OUTPUT_VERSION == 7
- check_totals(467);
-#elif OUTPUT_VERSION == 8
  check_totals(468);
+#elif OUTPUT_VERSION == 8
+ check_totals(469);
 #endif
 
 #endif

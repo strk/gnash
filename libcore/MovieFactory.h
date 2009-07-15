@@ -26,7 +26,7 @@
 
 namespace gnash {
     class IOChannel;
-    class RunInfo;
+    class RunResources;
     class movie_definition;
     class URL;
 }
@@ -62,8 +62,8 @@ public:
     /// @param url
     /// The URL to load the movie from.
     ///
-    /// @param runInfo
-    /// A RunInfo containing resources needed for parsing, such as the
+    /// @param runResources
+    /// A RunResources containing resources needed for parsing, such as the
     /// base URL for the run, the sound::sound_handler, and a StreamProvider.
     ///
     /// @param real_url
@@ -83,7 +83,7 @@ public:
     /// If not NULL, use POST method (only valid for HTTP).
     /// NOTE: when POSTing, the movies library won't be used.
     static DSOEXPORT movie_definition* makeMovie(const URL& url,
-        const RunInfo& runInfo, const char* real_url = NULL,
+        const RunResources& runResources, const char* real_url = NULL,
         bool startLoaderThread = true, const std::string* postdata = NULL);
     
     /// Load a movie from an already opened stream.
@@ -100,8 +100,8 @@ public:
     /// movie definition. This is required as it can not be
     /// derived from the IOChannel.
     ///
-    /// @param runInfo
-    /// A RunInfo containing resources needed for parsing, such as the
+    /// @param runResources
+    /// A RunResources containing resources needed for parsing, such as the
     /// base URL for the run, the sound::sound_handler, and a StreamProvider.
     ///
     /// @param startLoaderThread
@@ -111,7 +111,7 @@ public:
     /// is initialized. Initializing the VirtualMachine requires a target
     /// SWF version, which can be found in the SWF header.
     static DSOEXPORT movie_definition* makeMovie(std::auto_ptr<IOChannel> in,
-            const std::string& url, const RunInfo& runInfo,
+            const std::string& url, const RunResources& runResources,
             bool startLoaderThread);
 };
 

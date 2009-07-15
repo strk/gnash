@@ -31,20 +31,19 @@
 #include "NullSoundHandler.h"
 #include "RGBA.h" // for rgba class (pixel checking)
 #include "FuzzyPixel.h" // for pixel checking
-#include "render.h"
-#include "render_handler.h"
+#include "Renderer.h"
 #include "ManualClock.h" // for use by advance
-#include "StreamProvider.h" // for passing to RunInfo
+#include "StreamProvider.h" // for passing to RunResources
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 #ifdef RENDERER_CAIRO
-# include "render_handler_cairo.h"
+# include "Renderer_cairo.h"
 #endif
 #ifdef RENDERER_OPENGL
-# include "render_handler_ogl.h"
+# include "Renderer_ogl.h"
 #endif
 #ifdef RENDERER_AGG
-# include "render_handler_agg.h"
+# include "Renderer_agg.h"
 #endif
 
 #include "MediaHandler.h"
@@ -87,15 +86,15 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-    _runInfo.reset(new RunInfo(url));
-    _runInfo->setSoundHandler(_sound_handler);
+    _runResources.reset(new RunResources(url));
+    _runResources->setSoundHandler(_sound_handler);
     
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
 
-    _runInfo->setTagLoaders(loaders);
+    _runResources->setTagLoaders(loaders);
 
-    _runInfo->setStreamProvider(boost::shared_ptr<StreamProvider>(
+    _runResources->setStreamProvider(boost::shared_ptr<StreamProvider>(
                 new StreamProvider));
 
 	if ( url == "-" )
@@ -103,7 +102,7 @@ MovieTester::MovieTester(const std::string& url)
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = MovieFactory::makeMovie(in, url, *_runInfo, false);
+		_movie_def = MovieFactory::makeMovie(in, url, *_runResources, false);
 	}
 	else
 	{
@@ -123,7 +122,7 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = MovieFactory::makeMovie(urlObj, *_runInfo,
+		_movie_def = MovieFactory::makeMovie(urlObj, *_runResources,
                 NULL, false);
 	}
 
@@ -132,7 +131,7 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	_movie_root = new movie_root(*_movie_def, _clock, *_runInfo);
+	_movie_root = new movie_root(*_movie_def, _clock, *_runResources);
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());
@@ -164,13 +163,17 @@ MovieTester::MovieTester(const std::string& url)
 }
 
 void
-MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions) 
+MovieTester::render(boost::shared_ptr<Renderer> h,
+        InvalidatedRanges& invalidated_regions) 
 {
 	assert(_movie);
 
-	set_render_handler(&h);
+    // This is a bit dangerous, as there isn't really support for swapping
+    // renderers during runtime; though the only problem is likely to be
+    // that BitmapInfos are missing.
+	_runResources->setRenderer(h);
 
-	h.set_invalidated_regions(invalidated_regions);
+	h->set_invalidated_regions(invalidated_regions);
 
 	// We call display here to simulate effect of a real run.
 	//
@@ -217,10 +220,10 @@ MovieTester::render()
 		_forceRedraw = false; // reset to no forced redraw
 	}
 
-	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
-				it != itE; ++it)
+	for (TestingRenderers::const_iterator it=_testingRenderers.begin(),
+            itE=_testingRenderers.end(); it != itE; ++it)
 	{
-		TestingRenderer& rend = *(*it);
+		const TestingRenderer& rend = *it;
 		render(rend.getRenderer(), ranges);
 	}
 	
@@ -316,12 +319,12 @@ MovieTester::resizeStage(int x, int y)
 		if (yscale < xscale) xscale = yscale;
 
         // Scale for all renderers.
-        for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
-			        it != itE; ++it)
+        for (TestingRenderers::iterator it=_testingRenderers.begin(),
+                itE=_testingRenderers.end(); it != itE; ++it)
         {
-            TestingRenderer& rend = *(*it);
-            render_handler& h = rend.getRenderer();
-            h.set_scale(xscale, yscale);
+            TestingRenderer& rend = *it;
+            Renderer* h = rend.getRenderer().get();
+            h->set_scale(xscale, yscale);
         }
 	}
 
@@ -368,10 +371,10 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 	//std::cout <<"chekPixel(" << color << ") called" << std::endl;
 
-	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
-				it != itE; ++it)
+	for (TestingRenderers::const_iterator it=_testingRenderers.begin(),
+            itE=_testingRenderers.end(); it != itE; ++it)
 	{
-		const TestingRenderer& rend = *(*it);
+		const TestingRenderer& rend = *it;
 
 		std::stringstream ss;
 		ss << rend.getName() <<" ";
@@ -379,7 +382,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 		rgba obt_col;
 
-		render_handler& handler = rend.getRenderer();
+		const Renderer& handler = *rend.getRenderer();
 
 	        if ( ! handler.getAveragePixel(obt_col, x, y, radius) )
 		{
@@ -503,7 +506,7 @@ MovieTester::soundsStopped()
 void
 MovieTester::initTestingRenderers()
 {
-	std::auto_ptr<render_handler> handler;
+    boost::shared_ptr<Renderer> handler;
 
 	// TODO: add support for testing multiple renderers
 	// This is tricky as requires changes in the core lib
@@ -521,7 +524,7 @@ MovieTester::initTestingRenderers()
 		const char* pixelFormat = aggPixelFormats[i];
 		std::string name = "AGG_" + std::string(pixelFormat);
 
-		handler.reset( create_render_handler_agg(pixelFormat) );
+		handler.reset( create_Renderer_agg(pixelFormat) );
 		if ( handler.get() )
 		{
 			//log_debug("Renderer %s initialized", name.c_str());
@@ -544,13 +547,14 @@ MovieTester::initTestingRenderers()
 
 #ifdef RENDERER_OPENGL
 	// Initialize opengl renderer
-	handler.reset(create_render_handler_ogl(false));
+	handler.reset(create_Renderer_ogl(false));
 	addTestingRenderer(handler, "OpenGL");
 #endif
 }
 
 void
-MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name)
+MovieTester::addTestingRenderer(boost::shared_ptr<Renderer> h,
+        const std::string& name)
 {
 	if ( ! h->initTestBuffer(_width, _height) )
 	{
@@ -567,16 +571,16 @@ MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::stri
 			<< " because gnash core lib is unable to support testing of "
 			<< "multiple renderers from a single process "
 			<< "and we're already testing render handler "
-			<< _testingRenderers.front()->getName()
+			<< _testingRenderers.front().getName()
 			<< std::endl;
 		return;
 	}
 
-	_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
+	_testingRenderers.push_back(TestingRenderer(h, name));
 
 	// this will be needed till we allow run-time swapping of renderers,
 	// see above UNTESTED message...
-	set_render_handler(&(_testingRenderers.back()->getRenderer()));
+	_runResources->setRenderer(_testingRenderers.back().getRenderer());
 }
 
 bool

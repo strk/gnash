@@ -39,7 +39,7 @@
 namespace gnash {
     class movie_definition;
     class SWFStream;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -93,7 +93,7 @@ public:
 	/// instance of this class.
 	///
 	static void loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
 
 	/// Read tag SWF::VIDEOFRAME

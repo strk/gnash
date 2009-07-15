@@ -24,7 +24,6 @@
 #include "fn_call.h"
 #include "as_value.h"
 #include "NetStream_as.h"
-#include "render.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "movie_root.h"
@@ -33,6 +32,7 @@
 #include "MediaHandler.h" // for setting up embedded video decoder 
 #include "VideoDecoder.h" // for setting up embedded video decoder
 #include "namedStrings.h"
+#include "Global_as.h"
 
 // Define this to get debug logging during embedded video decoding
 //#define DEBUG_EMBEDDED_VIDEO_DECODING
@@ -134,7 +134,7 @@ Video::clear()
 }
 
 void
-Video::display()
+Video::display(Renderer& renderer)
 {
 	// if m_def is NULL we've been constructed by 'new Video', in this
 	// case I think display() would never be invoked on us...
@@ -146,7 +146,7 @@ Video::display()
 	GnashImage* img = getVideoFrame();
 	if (img)
 	{
-		gnash::render::drawVideoFrame(img, &m, &bounds, _smoothing);
+		renderer.drawVideoFrame(img, &m, &bounds, _smoothing);
 	}
 
 	clear_invalidated();
@@ -256,7 +256,7 @@ Video::stagePlacementCallback(as_object* initObj)
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live DisplayObject
-    _vm.getRoot().addLiveChar(this);
+    getRoot(*this).addLiveChar(this);
 }
 
 
@@ -300,12 +300,13 @@ void
 video_class_init(as_object& global)
 {
 	// This is going to be the global Video "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&video_ctor, getVideoInterface(global));
-		global.getVM().addStatic(cl.get());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&video_ctor, getVideoInterface(global));
+		getVM(global).addStatic(cl.get());
 	}
 
 	// Register _global.Video
@@ -342,10 +343,10 @@ getVideoInterface(as_object& where)
 	if ( proto == NULL )
 	{
 		proto = new as_object(getObjectInterface());
-		where.getVM().addStatic(proto.get());
+		getVM(where).addStatic(proto.get());
 
 		attachVideoInterface(*proto);
-		//proto->init_member("constructor", new builtin_function(video_ctor));
+		//proto->init_member("constructor", gl->createFunction(video_ctor));
 	}
 	return proto.get();
 }
@@ -353,8 +354,9 @@ getVideoInterface(as_object& where)
 void
 attachVideoInterface(as_object& o)
 {
-	o.init_member("attachVideo", new builtin_function(video_attach));
-	o.init_member("clear", new builtin_function(video_clear));
+    Global_as* gl = getGlobal(o);
+	o.init_member("attachVideo", gl->createFunction(video_attach));
+	o.init_member("clear", gl->createFunction(video_clear));
 }
 
 void
@@ -434,7 +436,8 @@ video_attach(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<NetStream_as> ns = 
-        boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
+        boost::dynamic_pointer_cast<NetStream_as>(
+                fn.arg(0).to_object(*getGlobal(fn)));
 	if (ns)
 	{
 		video->setStream(ns);

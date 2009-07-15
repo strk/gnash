@@ -21,6 +21,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -91,21 +92,22 @@ attachMatrixInterface(as_object& o)
 {
     int fl = 0;
 
-    o.init_member("clone", new builtin_function(Matrix_clone), fl);
-    o.init_member("concat", new builtin_function(Matrix_concat), fl);
-    o.init_member("createBox", new builtin_function(Matrix_createBox), fl);
+    Global_as* gl = getGlobal(o);
+    o.init_member("clone", gl->createFunction(Matrix_clone), fl);
+    o.init_member("concat", gl->createFunction(Matrix_concat), fl);
+    o.init_member("createBox", gl->createFunction(Matrix_createBox), fl);
     o.init_member("createGradientBox",
-            new builtin_function(Matrix_createGradientBox), fl);
+            gl->createFunction(Matrix_createGradientBox), fl);
     o.init_member("deltaTransformPoint",
-            new builtin_function(Matrix_deltaTransformPoint), fl);
-    o.init_member("identity", new builtin_function(Matrix_identity), fl);
-    o.init_member("invert", new builtin_function(Matrix_invert), fl);
-    o.init_member("rotate", new builtin_function(Matrix_rotate), fl);
-    o.init_member("scale", new builtin_function(Matrix_scale), fl);
-    o.init_member("toString", new builtin_function(Matrix_toString), fl);
+            gl->createFunction(Matrix_deltaTransformPoint), fl);
+    o.init_member("identity", gl->createFunction(Matrix_identity), fl);
+    o.init_member("invert", gl->createFunction(Matrix_invert), fl);
+    o.init_member("rotate", gl->createFunction(Matrix_rotate), fl);
+    o.init_member("scale", gl->createFunction(Matrix_scale), fl);
+    o.init_member("toString", gl->createFunction(Matrix_toString), fl);
     o.init_member("transformPoint",
-            new builtin_function(Matrix_transformPoint), fl);
-    o.init_member("translate", new builtin_function(Matrix_translate), fl);
+            gl->createFunction(Matrix_transformPoint), fl);
+    o.init_member("translate", gl->createFunction(Matrix_translate), fl);
 }
 
 
@@ -139,18 +141,6 @@ public:
     }
 
 };
-
-
-as_function* getFlashGeomMatrixConstructor()
-{
-    static builtin_function* cl = NULL;
-    if ( ! cl )
-    {
-        cl=new builtin_function(&Matrix_ctor, getMatrixInterface());
-        VM::get().addStatic(cl);
-    }
-    return cl;
-}
 
 
 /// Return an exact copy of the matrix.
@@ -212,7 +202,7 @@ Matrix_concat(const fn_call& fn)
     }
 
     // The object to concatenate doesn't have to be a matrix.    
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
 
     MatrixType concatMatrix;
@@ -414,7 +404,7 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 
     // It doesn't have to be a point. If it has x and y
     // properties, they will be used.    
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
 
     const PointType& point = transformPoint(obj, ptr.get());
@@ -663,7 +653,7 @@ Matrix_toString(const fn_call& fn)
     
     std::ostringstream ss;
     
-    const int version = fn.getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
     ss << "(a=" << a.to_string_versioned(version) << ", "
           "b="<< b.to_string_versioned(version) << ", "
@@ -704,15 +694,15 @@ Matrix_transformPoint(const fn_call& fn)
         return as_value();
     }
     
-    as_object* obj = arg.to_object().get();
+    as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
-    if ( ! obj->instanceOf(getFlashGeomPointConstructor()) )
-    {
+    if (!obj->instanceOf(getFlashGeomPointConstructor(fn))) {
         /// Isn't a point.
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.transformPoint(%s): object must be a Point", ss.str());
+            log_aserror("Matrix.transformPoint(%s): object must be a Point",
+                ss.str());
         );
         return as_value();
     }
@@ -903,11 +893,11 @@ Matrix_ctor(const fn_call& fn)
 
 
 static as_value
-get_flash_geom_matrix_constructor(const fn_call& /*fn*/)
+get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
-
-    return getFlashGeomMatrixConstructor();
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Matrix_ctor, getMatrixInterface());
 }
 
 // extern 
@@ -915,7 +905,7 @@ void matrix_class_init(as_object& where)
 {
     // This is going to be the Matrix "class"/"function"
     // in the 'where' package
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
     
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

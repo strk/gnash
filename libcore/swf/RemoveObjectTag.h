@@ -34,7 +34,7 @@ namespace gnash {
 	class swf_event;
 	class movie_definition;
 	class DisplayList;
-    class RunInfo;
+    class RunResources;
 }
 
 namespace gnash {
@@ -63,7 +63,7 @@ public:
 	void execute(MovieClip* m, DisplayList& dlist) const;
 
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
 private:
 

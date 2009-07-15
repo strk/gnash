@@ -19,7 +19,8 @@ namespace gnash {
 	class cxform;
     class Shape;
 	class SWFMatrix;
-	class RunInfo;
+	class RunResources;
+	class Renderer;
 }
 
 namespace gnash {
@@ -33,12 +34,12 @@ class DefineShapeTag : public DefinitionTag
 public:
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& r);
+            const RunResources& r);
 
     virtual ~DefineShapeTag() {};
 
     // Display a Shape character.
-    virtual void display(const DisplayObject& inst) const;
+    virtual void display(Renderer& renderer, const DisplayObject& inst) const;
 
     // Create a Shape DisplayObject.
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
@@ -64,7 +65,8 @@ protected:
 
 private:
 
-    DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m);
+    DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m,
+            const RunResources& r);
 
     /// The actual shape data is stored in this record.
     const ShapeRecord _shape;

@@ -29,6 +29,7 @@
 #include "namedStrings.h"
 #include "as_function.h" 
 #include "CallStack.h"
+#include "Global_as.h"
 
 #include <string>
 #include <utility> // for std::pair
@@ -941,17 +942,13 @@ as_environment::pushCallFrame(as_function* func)
     // TODO: override from gnashrc.
     
     // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t maxstacksize = 
-        func->getVM().getRoot().getRecursionLimit();
+    const boost::uint16_t recursionLimit = getRoot(*func).getRecursionLimit();
 
-    // Doesn't proceed if the stack size would reach the limit; should
-    // this check be done somewhere after adding to the stack? Would
-    // it make any difference?
-    if ( _localFrames.size() + 1 >= maxstacksize )
-    {
+    // Don't proceed if local call frames would reach the recursion limit.
+    if (_localFrames.size() + 1 >= recursionLimit) {
+
         std::ostringstream ss;
-        ss << boost::format(_("Max stack count reached (%u)")) % 
-            _localFrames.size();
+        ss << boost::format(_("Recursion limit reached (%u)")) % recursionLimit;
 
         // throw something
         throw ActionLimitException(ss.str()); 
@@ -1079,6 +1076,30 @@ as_environment::markReachableResources() const
     assert ( _stack.empty() );
 }
 #endif // GNASH_USE_GC
+
+string_table&
+getStringTable(const as_environment& env)
+{
+    return env.getVM().getStringTable();
+}
+
+movie_root&
+getRoot(const as_environment& env)
+{
+    return env.getVM().getRoot();
+}
+
+Global_as*
+getGlobal(const as_environment& env)
+{
+    return env.getVM().getGlobal();
+}
+
+int
+getSWFVersion(const as_environment& env)
+{
+    return env.getVM().getSWFVersion();
+}
 
 } // end of gnash namespace
 

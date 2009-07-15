@@ -25,6 +25,7 @@
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -55,12 +56,14 @@ attachColorTransformInterface(as_object& o)
 {
     int flags = 0;
     /// This has no flags:
-    o.init_member("concat", new builtin_function(ColorTransform_concat), flags);
+    Global_as* gl = getGlobal(o);
+
+    o.init_member("concat", gl->createFunction(ColorTransform_concat), flags);
 
     flags = as_prop_flags::isProtected;
 
     /// These are all protected:
-    o.init_member("toString", new builtin_function(ColorTransform_toString),
+    o.init_member("toString", gl->createFunction(ColorTransform_toString),
             flags);
 
     o.init_property("alphaMultiplier", ColorTransform_alphaMultiplier_getset,
@@ -351,24 +354,12 @@ ColorTransform_ctor(const fn_call& fn)
 }
 
 
-as_function* getFlashGeomColorTransformConstructor()
-{
-    static builtin_function* cl = NULL;
-    if ( ! cl )
-    {
-        cl=new builtin_function(&ColorTransform_ctor, getColorTransformInterface());
-        VM::get().addStatic(cl);
-    }
-    return cl;
-}
-
-
 static as_value
-get_flash_geom_color_transform_constructor(const fn_call& /*fn*/)
+get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
-
-    return getFlashGeomColorTransformConstructor();
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&ColorTransform_ctor, getColorTransformInterface());
 }
 
 
@@ -394,7 +385,7 @@ void colortransform_class_init(as_object& where)
 {
     // This is the ColorTransform "class"/"function"
     // in the 'where' package
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

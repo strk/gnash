@@ -24,6 +24,7 @@
 #include "utils/Proxy_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -62,10 +63,11 @@ public:
 // extern (used by Global.cpp)
 void proxy_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&proxy_ctor, getProxyInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&proxy_ctor, getProxyInterface());
         attachProxyStaticInterface(*cl);
     }
 
@@ -78,19 +80,20 @@ namespace {
 void
 attachProxyInterface(as_object& o)
 {
-    o.init_member("deleteProperty", new builtin_function(proxy_deleteProperty));
-    o.init_member("getDescendants", new builtin_function(proxy_getDescendants));
-    o.init_member("getProperty", new builtin_function(proxy_getProperty));
-    o.init_member("hasProperty", new builtin_function(proxy_hasProperty));
-    o.init_member("isAttribute", new builtin_function(proxy_isAttribute));
-    o.init_member("nextName", new builtin_function(proxy_nextName));
-    o.init_member("nextNameIndex", new builtin_function(proxy_nextNameIndex));
-    o.init_member("nextValue", new builtin_function(proxy_nextValue));
-    o.init_member("setProperty", new builtin_function(proxy_setProperty));
+    Global_as* gl = getGlobal(o);
+    o.init_member("deleteProperty", gl->createFunction(proxy_deleteProperty));
+    o.init_member("getDescendants", gl->createFunction(proxy_getDescendants));
+    o.init_member("getProperty", gl->createFunction(proxy_getProperty));
+    o.init_member("hasProperty", gl->createFunction(proxy_hasProperty));
+    o.init_member("isAttribute", gl->createFunction(proxy_isAttribute));
+    o.init_member("nextName", gl->createFunction(proxy_nextName));
+    o.init_member("nextNameIndex", gl->createFunction(proxy_nextNameIndex));
+    o.init_member("nextValue", gl->createFunction(proxy_nextValue));
+    o.init_member("setProperty", gl->createFunction(proxy_setProperty));
 }
 
 void
-attachProxyStaticInterface(as_object& o)
+attachProxyStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -197,7 +200,7 @@ proxy_setProperty(const fn_call& fn)
 }
 
 as_value
-proxy_ctor(const fn_call& fn)
+proxy_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Proxy_as;
 

@@ -39,6 +39,8 @@ public class Main extends MovieClip {
     import p1.*;
     import p2.*;
 
+    // This is not that hard at all, as the compiler should generate
+    // the code specifying which namespace to look in.
     public function Main() {
 
         var a = new A();
@@ -47,7 +49,7 @@ public class Main extends MovieClip {
         check_equals(typeof(a.id()), "string");
 
         // Check non-static function lookup
-        xcheck_equals(a.id(), "p1.A");
+        check_equals(a.id(), "p1.A");
         
         // Check static function lookup.
         check_equals(B.id(), "p1.B");

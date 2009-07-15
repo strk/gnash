@@ -21,7 +21,7 @@
 
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "RunInfo.h"
+#include "RunResources.h"
 #include "SWFParser.h"
 #include "TagLoadersTable.h"
 
@@ -57,21 +57,21 @@ SWFParser::read(std::streamsize bytes)
     // we may read more than the size passed.
     _endRead += bytes;
 
-    const SWF::TagLoadersTable& tagLoaders = _runInfo.tagLoaders();
+    const SWF::TagLoadersTable& tagLoaders = _runResources.tagLoaders();
 
     while (_bytesRead < _endRead) {
         
         const size_t startPos = _stream.tell();
+        
+        // If a tag hasn't been opened, open one and check
+        // how many bytes are needed. The size reported by the
+        // tag seems to be the value used, even when it's wrong.
+        if (!_tagOpen) {
+            _nextTagEnd = openTag() - startPos;
+        }
 
         try {
 
-            // If a tag hasn't been opened, open one and check
-            // how many bytes are needed. The size reported by the
-            // tag seems to be the value used, even when it's wrong.
-            if (!_tagOpen) {
-                _nextTagEnd = openTag() - startPos;
-            }
-         
             // Check if we are now supposed to read enough bytes to get to the
             // end of the tag.   
             if (_nextTagEnd > _endRead) {
@@ -95,7 +95,7 @@ SWFParser::read(std::streamsize bytes)
             else if (tagLoaders.get(_tag, lf)) {
                 // call the tag loader.  The tag loader should add
                 // DisplayObjects or tags to the movie data structure.
-                lf(_stream, _tag, *_md, _runInfo);
+                lf(_stream, _tag, *_md, _runResources);
             }
             else {
                 // no tag loader for this tag type.
@@ -109,8 +109,8 @@ SWFParser::read(std::streamsize bytes)
 
         }
         catch (const ParserException& e) {
-            // We continue parsing so that single malformed tags don't
-            // prevent reading subsequent tags.
+            // If the error occurred in a tag, we continue parsing so that
+            // single malformed tags don't prevent reading subsequent tags.
             log_error(_("Parsing exception: %s"), e.what());
         }
 

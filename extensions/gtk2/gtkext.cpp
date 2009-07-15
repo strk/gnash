@@ -112,7 +112,7 @@ generic_callback(GtkWidget * /*widget*/, gpointer data)
     args->push_back(event);
     args->push_back(handler);
 
-    as_object obj = val.to_object();
+    as_object obj = val.to_object(*getGlobal(fn));
 
     // Call the AS function defined in the source file using this extension
     (*as_func)(fn_call(&obj, &env, args));
@@ -123,14 +123,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("window_new", new builtin_function(gtkext_window_new));
-    obj->init_member("signal_connect", new builtin_function(gtkext_signal_connect));
-    obj->init_member("container_set_border_width", new builtin_function(gtkext_container_set_border_width));
-    obj->init_member("button_new_with_label", new builtin_function(gtkext_button_new_with_label));
-    obj->init_member("signal_connect_swapped", new builtin_function(gtkext_signal_connect_swapped));
-    obj->init_member("container_add", new builtin_function(gtkext_container_add));
-    obj->init_member("widget_show", new builtin_function(gtkext_widget_show));
-    obj->init_member("main", new builtin_function(gtkext_main));
+    obj->init_member("window_new", gl->createFunction(gtkext_window_new));
+    obj->init_member("signal_connect", gl->createFunction(gtkext_signal_connect));
+    obj->init_member("container_set_border_width", gl->createFunction(gtkext_container_set_border_width));
+    obj->init_member("button_new_with_label", gl->createFunction(gtkext_button_new_with_label));
+    obj->init_member("signal_connect_swapped", gl->createFunction(gtkext_signal_connect_swapped));
+    obj->init_member("container_add", gl->createFunction(gtkext_container_add));
+    obj->init_member("widget_show", gl->createFunction(gtkext_widget_show));
+    obj->init_member("main", gl->createFunction(gtkext_main));
 }
 
 static as_object*
@@ -228,7 +228,7 @@ as_value gtkext_signal_connect(const fn_call& fn)
     boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
 
     if (fn.nargs > 0) {
-	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
+	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object(*getGlobal(fn)).get());
 	string name = fn.arg(1).to_string();
 	as_value func = fn.arg(2).to_as_function();
 	//int data = fn.arg(3).to_int();
@@ -251,7 +251,7 @@ as_value gtkext_container_set_border_width(const fn_call& fn)
     boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
+	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object(*getGlobal(fn)).get());
 	int width = fn.arg(1).to_int();
 	window->container_set_border_width(width);
 	dbglogfile << "set container border width to " << width << " !" << endl;
@@ -291,11 +291,11 @@ as_value gtkext_signal_connect_swapped(const fn_call& fn)
     boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
 
     if (fn.nargs > 0) {
-	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
+	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object(*getGlobal(fn)).get());
 	string name = (fn.arg(1).to_string());
-	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(3).to_object().get());
+	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(3).to_object(*getGlobal(fn)).get());
 // currently unused
-//	as_value *callback = dynamic_cast<as_value *>(fn.arg(2).to_object());
+//	as_value *callback = dynamic_cast<as_value *>(fn.arg(2).to_object(*getGlobal(fn)));
 
 	// FIXME: This seems to cause an Gobject warning
 	g_signal_connect_swapped (G_OBJECT (child->getWindow()), name.c_str(),
@@ -312,8 +312,8 @@ as_value gtkext_container_add(const fn_call& fn)
     boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
-	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(1).to_object().get());
+	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object(*getGlobal(fn)).get());
+	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(1).to_object(*getGlobal(fn)).get());
 	gtk_container_add (GTK_CONTAINER (parent->getWindow()), child->getWindow());
 	return as_value(true);
     }
@@ -326,7 +326,7 @@ as_value gtkext_widget_show(const fn_call& fn)
     boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
      
     if (fn.nargs > 0) {
-	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
+	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object(*getGlobal(fn)).get());
 	gtk_widget_show(window->getWindow());
     }
     return as_value();
@@ -356,7 +356,8 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&gtkext_ctor, getInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&gtkext_ctor, getInterface());
  	    // replicate all interface to class, to be able to access
  	    // all methods as static functions
  	    attachInterface(cl.get());

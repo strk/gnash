@@ -21,6 +21,8 @@ AUTOMAKE_OPTIONS = dejagnu
 AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/backend  \
+        -I$(top_srcdir)/libsound  \
+        -I$(top_srcdir)/libmedia  \
         -I$(top_srcdir)/libamf  \
         -I$(top_srcdir)/libnet  \
         -I$(top_srcdir)/libbase  \

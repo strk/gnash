@@ -30,6 +30,7 @@
 #include "utf8.h"
 #include "fn_call.h"
 #include "GnashAlgorithm.h"
+#include "Global_as.h"
 
 #include <sstream>
 #include <map>
@@ -54,7 +55,7 @@ LoadableObject::LoadableObject()
 LoadableObject::~LoadableObject()
 {
     deleteAllChecked(_loadThreads);
-    _vm.getRoot().removeAdvanceCallback(this);
+    getRoot(*this).removeAdvanceCallback(this);
 }
 
 
@@ -62,7 +63,7 @@ void
 LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
-    movie_root& m = _vm.getRoot();
+    movie_root& m = getRoot(*this);
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
@@ -88,7 +89,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const RunInfo& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = getRunResources(*this);
 	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
@@ -104,7 +105,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
             /// Read in our custom headers if they exist and are an
             /// array.
             Array_as* array = dynamic_cast<Array_as*>(
-                            customHeaders.to_object().get());
+                            customHeaders.to_object(*getGlobal(target)).get());
                             
             if (array)
             {
@@ -176,7 +177,7 @@ LoadableObject::load(const std::string& urlstr)
     // when loading is complete.
 	set_member(NSV::PROP_LOADED, false);
 
-    const RunInfo& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = getRunResources(*this);
 	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
@@ -194,7 +195,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
     // We don't need to check before adding a timer, but
     // this may optimize slightly (it was already in the code).
     if (_loadThreads.empty()) {
-        getVM().getRoot().addAdvanceCallback(this);
+        getRoot(*this).addAdvanceCallback(this);
     }
 
     std::auto_ptr<LoadThread> lt (new LoadThread(str));
@@ -257,7 +258,7 @@ LoadableObject::advanceState()
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
-            string_table& st = _vm.getStringTable();
+            string_table& st = getStringTable(*this);
             set_member(st.find("_bytesLoaded"), _bytesLoaded);
             set_member(st.find("_bytesTotal"), _bytesTotal);
             
@@ -270,7 +271,7 @@ LoadableObject::advanceState()
             _bytesTotal = lt->getBytesTotal();
             _bytesLoaded = lt->getBytesLoaded();
             
-            string_table& st = _vm.getStringTable();
+            string_table& st = getStringTable(*this);
             set_member(st.find("_bytesLoaded"), _bytesLoaded);
             // TODO: should this really be set on each iteration?
             set_member(st.find("_bytesTotal"), _bytesTotal);
@@ -280,7 +281,7 @@ LoadableObject::advanceState()
 
     if (_loadThreads.empty()) 
     {
-        _vm.getRoot().removeAdvanceCallback(this);
+        getRoot(*this).removeAdvanceCallback(this);
     }
 
 }
@@ -288,7 +289,7 @@ LoadableObject::advanceState()
 void
 LoadableObject::registerNative(as_object& o)
 {
-    VM& vm = o.getVM();
+    VM& vm = getVM(o);
 
     vm.registerNative(loadableobject_load, 301, 0);
     vm.registerNative(loadableobject_send, 301, 1);
@@ -304,7 +305,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesLoaded;
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     ptr->get_member(st.find("_bytesLoaded"), &bytesLoaded);
     return bytesLoaded;
 }
@@ -315,7 +316,7 @@ LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesTotal;
-    string_table& st = fn.getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     ptr->get_member(st.find("_bytesTotal"), &bytesTotal);
     return bytesTotal;
 }
@@ -334,7 +335,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 
     if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object().get();
+        array = customHeaders.to_object(*getGlobal(fn)).get();
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -369,7 +370,8 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     {
         // This must be an array. Keys / values are pushed in valid
         // pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+        boost::intrusive_ptr<as_object> obj =
+            fn.arg(0).to_object(*getGlobal(fn));
         Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
 
         if (!headerArray)
@@ -449,11 +451,11 @@ loadableobject_decode(const fn_call& fn)
 
 	ValuesMap vals;
 
-    const int version = fn.getVM().getSWFVersion();
+    const int version = getSWFVersion(fn);
 
 	URL::parse_querystring(fn.arg(0).to_string_versioned(version), vals);
 
-	string_table& st = ptr->getVM().getStringTable();
+	string_table& st = getStringTable(fn);
 	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
 			it != itEnd; ++it)
 	{
@@ -501,7 +503,8 @@ loadableobject_sendAndLoad(const fn_call& fn)
 	}
 
 
-	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
+	boost::intrusive_ptr<as_object> target =
+        fn.arg(1).to_object(*getGlobal(fn));
 
     // According to the Flash 8 Cookbook (Joey Lott, Jeffrey Bardzell), p 427,
     // this method sends by GET unless overridden, and always by GET in the
@@ -544,7 +547,7 @@ loadableobject_load(const fn_call& fn)
 
 	obj->load(urlstr);
     
-    string_table& st = obj->getVM().getStringTable();
+    string_table& st = getStringTable(fn);
     obj->set_member(st.find("_bytesLoaded"), 0.0);
     obj->set_member(st.find("_bytesTotal"), as_value());
 

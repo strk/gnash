@@ -24,6 +24,7 @@
 #include "text/TextLineMetrics_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void textlinemetrics_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&textlinemetrics_ctor, getTextLineMetricsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&textlinemetrics_ctor, getTextLineMetricsInterface());
         attachTextLineMetricsStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void textlinemetrics_class_init(as_object& global)
 namespace {
 
 void
-attachTextLineMetricsInterface(as_object& o)
+attachTextLineMetricsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachTextLineMetricsStaticInterface(as_object& o)
+attachTextLineMetricsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getTextLineMetricsInterface()
 }
 
 as_value
-textlinemetrics_ctor(const fn_call& fn)
+textlinemetrics_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextLineMetrics_as;
 

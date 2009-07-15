@@ -24,6 +24,7 @@
 #include "net/URLRequest_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -53,10 +54,11 @@ public:
 // extern (used by Global.cpp)
 void urlrequest_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&urlrequest_ctor, getURLRequestInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&urlrequest_ctor, getURLRequestInterface());
         attachURLRequestStaticInterface(*cl);
     }
 
@@ -67,12 +69,12 @@ void urlrequest_class_init(as_object& global)
 namespace {
 
 void
-attachURLRequestInterface(as_object& o)
+attachURLRequestInterface(as_object& /*o*/)
 {
 }
 
 void
-attachURLRequestStaticInterface(as_object& o)
+attachURLRequestStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -89,7 +91,7 @@ getURLRequestInterface()
 }
 
 as_value
-urlrequest_ctor(const fn_call& fn)
+urlrequest_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLRequest_as;
 

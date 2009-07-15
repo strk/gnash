@@ -40,12 +40,14 @@ import DejaGnu;
 
 // Class must be named with the _as3 suffix, as that's the same name as the file.
 class System_as {
+
     static function main() {
 	if (Type.typeof(System) == ValueType.TObject) {
 	    DejaGnu.pass("System class exists");
 	} else {
 	    DejaGnu.fail("System class doesn't exist");
 	}
+	
 
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
@@ -72,6 +74,7 @@ class System_as {
 	    DejaGnu.fail("System.totalMemory property doesn't exist");
 	}
 #end	
+
 
 // Test of useCodePage or useCodepage
 #if flash9
@@ -127,6 +130,7 @@ class System_as {
 	} else {
 	    DejaGnu.fail("System::resume() method doesn't exist");
 	}
+
 #end
 
 #if flash9
@@ -172,89 +176,89 @@ DejaGnu.note("\n The following tests come from the Ming test. \n Some of the tes
 	DejaGnu.note("Warning! Capabilities is now derived from object directly!");
 #else
 if (untyped System.capabilities.hasOwnProperty("version")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'version' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'version' property does not exist");
 	}
 	if (untyped System.capabilities.hasOwnProperty("os")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'os' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'os' property does not exist");
 	}	
 if (untyped System.capabilities.hasOwnProperty("manufacturer")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'manufacturer' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'manufacturer' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("playerType")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'playerType' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'playerType' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("serverString")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'serverString' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'serverString' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("screenResolutionX")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'screenResolutionX' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'screenResolutionX' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("screenResolutionY")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'screenResolutionY' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'screenResolutionY' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("screenDPI")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'screenDPI' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'screenDPI' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("screenColor")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'screenColor' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'screenColor' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("pixelAspectRatio")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'pixelAspectRatio' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'pixelAspectRatio' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("localFileReadDisable")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'localFileReadDisable' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'localFileReadDisable' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("language")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'language' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'language' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("isDebugger")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'isDebugger' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'isDebugger' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("hasVideoEncoder")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'hasVideoEncoder' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'hasVideoEncoder' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("hasStreamingVideo")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'hasStreamingVideo' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'hasStreamingVideo' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("hasStreamingAudio")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'hasStreamingAudio' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'hasStreamingAudio' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("hasScreenPlayback")){
-	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
+	DejaGnu.pass("System.capabilities 'hasScreenPlayback' property exists");
 	} else {
-		DejaGnu.fail("System.capabilities 'hasScreenBroadcast' property does not exist");
+		DejaGnu.fail("System.capabilities 'hasScreenPlayback' property does not exist");
 	}
 if (untyped System.capabilities.hasOwnProperty("hasScreenBroadcast") ){
 	DejaGnu.pass("System.capabilities 'hasScreenBroadcast' property exists");
@@ -354,6 +358,19 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 	} else {
 	    DejaGnu.fail("System.security 'allowDomain()' method doesn't exist");
 	}
+	var result = untyped System.security.allowDomain("www.cnn.com");
+	if (untyped __typeof__(result) == 'boolean') {
+		DejaGnu.pass("allowDomain correctly returns a boolean");
+	} else {
+		DejaGnu.fail("allowDomain did not return a boolean");
+	}
+	if (untyped System.security.allowDomain("google.com")) {
+		DejaGnu.pass("google.com successfully added to allowed domains");
+	} else {
+		DejaGnu.fail("google.com not successfully added to allowed domains");
+	}
+	
+
 	if (Type.typeof(untyped System.security.loadPolicyFile) == TFunction) {
 	    DejaGnu.pass("System.security 'loadPolicyFile()' method exists");
 	} else {
@@ -365,6 +382,7 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 	    DejaGnu.fail("System.'showSettings()' method doesn't exist");
 	}
 #end
+
 	if (Type.typeof(untyped System.setClipboard) == TFunction) {
 	    DejaGnu.pass("System.'setClipboard()' method exists");
 	} else {
@@ -530,11 +548,11 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 	} else {
 	    DejaGnu.fail("System.capabilities.windowlessDisable is not a bool");
 	}
-	DejaGnu.note("    System.capabilities.hasIME certainly fails on the pp on\n some platforms. There's no verification that it exists at all so far.");
-	 if (Std.is(untyped System.capabilities.hasIME, Bool) ){
-	  DejaGnu.pass("System.capabilities.hasIME is a bool");
+	DejaGnu.note("System.capabilities.hasIME certainly fails on the pp on\n some platforms. There's no verification that it exists at all so far.");
+	 if (untyped __typeof__(System.capabilities.hasIME) == 'boolean' ){
+	  DejaGnu.pass("System.capabilities.hasIME is a boolean");
 	} else {
-	    DejaGnu.fail("System.capabilities.hasIME is not a bool");
+	    DejaGnu.fail("System.capabilities.hasIME is not a boolean");
 	}
 #end
 
@@ -548,7 +566,7 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 #end
 */
 	// System.exactSettings
-#if (flash6 || flash7 ||flsah8 )
+#if (flash6 || flash7 ||flash8 )
 	if (Std.is(untyped System.exactSettings, Bool) ){
 	 DejaGnu.pass("System.exactSettings is a bool");
 	} else {
@@ -589,17 +607,17 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 	System.useCodePage = true;
 	if ( System.useCodePage == true)
 	{
-	 DejaGnu.pass("System.useCodePage is true");
+	 DejaGnu.pass("System.useCodePage set to true");
 	} else {
-	    DejaGnu.fail("System.useCodePage is false");
+	    DejaGnu.fail("System.useCodePage was not set to true");
 	}
 
 	System.useCodePage = false;
 	if ( System.useCodePage == false)
 	{
-	 DejaGnu.pass("System.useCodePage is false");
+	 DejaGnu.pass("System.useCodePage set to false");
 	} else {
-	    DejaGnu.fail("System.useCodePage is true");
+	    DejaGnu.fail("System.useCodePage was not set to false");
 	}
 #else
 	System.exactSettings = true;
@@ -634,13 +652,13 @@ if (Std.string(untyped __typeof__(systemObj)) == 'undefined') {
 
 #if flash9
 #else
-if (Std.string(untyped __typeof__(System.showSettings)) == 'function') {
+if (untyped __typeof__(System.showSettings) == 'function') {
 	DejaGnu.pass("Type of System.showSetting is a 'function'.");
 } else {
 	DejaGnu.fail("Type of System.showSetting is not a 'function'.");
 }
 #end
-if (Std.string(untyped __typeof__(System.Product)) == 'function') {
+if (untyped __typeof__(System.Product) == 'function') {
 	DejaGnu.xpass("Type of System.Product is a 'function'.");
 } else {
 	DejaGnu.xfail("Type of System.Product is not a 'function'.");
@@ -685,6 +703,7 @@ if (Std.string(untyped __typeof__(p.launch)) == 'function') {
 }
 #else
 #end
+
 
 //Si
 //FIXME:

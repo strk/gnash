@@ -102,7 +102,7 @@ GtkGlExtGlue::prepDrawingArea(GtkWidget *drawing_area)
                                  NULL, TRUE, GDK_GL_RGBA_TYPE);
 }
 
-render_handler*
+Renderer*
 GtkGlExtGlue::createRenderHandler()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -112,7 +112,7 @@ GtkGlExtGlue::createRenderHandler()
     // Attach our OpenGL context to the drawing_area.
     gdk_gl_drawable_make_current(gldrawable, glcontext);
 
-    render_handler* renderer = create_render_handler_ogl();
+    Renderer* renderer = create_Renderer_ogl();
 
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);

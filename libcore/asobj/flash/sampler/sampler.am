@@ -17,8 +17,8 @@
 
 SAMPLERdir = $(includedir)/gnash
 
-SAMPLER_SOURCES = asobj/flash/sampler/sampler_pkg.cpp
-SAMPLER_HEADERS = asobj/flash/sampler/sampler_pkg.h
+SAMPLER_SOURCES = 
+SAMPLER_HEADERS = 
 
 if BUILD_DELETEOBJECTSAMPLE_AS3
 SAMPLER_SOURCES += asobj/flash/sampler/DeleteObjectSample_as.cpp
@@ -41,5 +41,4 @@ SAMPLER_HEADERS += asobj/flash/sampler/StackFrame_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SAMPLER_SOURCES)
-noinst_HEADERS +=  $(SAMPLER_HEADERS) asobj/flash/sampler/samplerclasses.h
 

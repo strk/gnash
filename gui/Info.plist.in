@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Gnash</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Copyright (C) 2005-2007 Free Software Foundation, Inc.</string>
+	<string>Copyright (C) 2007-2009 Free Software Foundation, Inc.</string>
 	<key>CFBundleIconFile</key>
 	<string>GnashG</string>
 	<key>CFBundleIdentifier</key>

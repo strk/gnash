@@ -24,6 +24,7 @@
 #include "net/URLLoader_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -61,10 +62,11 @@ public:
 // extern (used by Global.cpp)
 void urlloader_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&urlloader_ctor, getURLLoaderInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&urlloader_ctor, getURLLoaderInterface());
         attachURLLoaderStaticInterface(*cl);
     }
 
@@ -77,20 +79,20 @@ namespace {
 void
 attachURLLoaderInterface(as_object& o)
 {
-    o.init_member("close", new builtin_function(urlloader_close));
-    o.init_member("load", new builtin_function(urlloader_load));
-    o.init_member("complete", new builtin_function(urlloader_complete));
-    o.init_member("httpStatus", new builtin_function(urlloader_httpStatus));
-    o.init_member("ioError", new builtin_function(urlloader_ioError));
-    o.init_member("open", new builtin_function(urlloader_open));
-    o.init_member("progress", new builtin_function(urlloader_progress));
-    o.init_member("securityError", new builtin_function(urlloader_securityError));
+    Global_as* gl = getGlobal(o);
+    o.init_member("close", gl->createFunction(urlloader_close));
+    o.init_member("load", gl->createFunction(urlloader_load));
+    o.init_member("complete", gl->createFunction(urlloader_complete));
+    o.init_member("httpStatus", gl->createFunction(urlloader_httpStatus));
+    o.init_member("ioError", gl->createFunction(urlloader_ioError));
+    o.init_member("open", gl->createFunction(urlloader_open));
+    o.init_member("progress", gl->createFunction(urlloader_progress));
+    o.init_member("securityError", gl->createFunction(urlloader_securityError));
 }
 
 void
-attachURLLoaderStaticInterface(as_object& o)
+attachURLLoaderStaticInterface(as_object& /*o*/)
 {
-
 }
 
 as_object*
@@ -185,7 +187,7 @@ urlloader_securityError(const fn_call& fn)
 }
 
 as_value
-urlloader_ctor(const fn_call& fn)
+urlloader_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLLoader_as;
 

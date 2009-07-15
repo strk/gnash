@@ -28,6 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -40,10 +41,11 @@ as_value customactions_ctor(const fn_call& fn);
 static void
 attachCustomActionsInterface(as_object& o)
 {
-	o.init_member("get", new builtin_function(customactions_get));
-	o.init_member("install", new builtin_function(customactions_install));
-	o.init_member("list", new builtin_function(customactions_list));
-	o.init_member("uninstall", new builtin_function(customactions_uninstall));
+    Global_as* gl = getGlobal(o);
+	o.init_member("get", gl->createFunction(customactions_get));
+	o.init_member("install", gl->createFunction(customactions_install));
+	o.init_member("list", gl->createFunction(customactions_list));
+	o.init_member("uninstall", gl->createFunction(customactions_uninstall));
 }
 
 static as_object*
@@ -104,11 +106,12 @@ customactions_ctor(const fn_call& /* fn */)
 void customactions_class_init(as_object& global)
 {
 	// This is going to be the global CustomActions "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&customactions_ctor, getCustomActionsInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&customactions_ctor, getCustomActionsInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCustomActionsInterface(*cl);

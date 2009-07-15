@@ -51,7 +51,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	// for variables lookup (consistency checking)
-	string_table& st = root->getVM().getStringTable();
+	string_table& st = getStringTable(*root);
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);

@@ -24,7 +24,7 @@
 
 namespace gnash {
 
-/// Your render_handler creates BitmapInfos for gnash.  You
+/// Your Renderer creates BitmapInfos for gnash.  You
 /// need to subclass BitmapInfo in order to add the
 /// information and functionality your app needs to render
 /// using textures.

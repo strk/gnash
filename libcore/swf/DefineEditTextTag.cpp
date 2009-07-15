@@ -26,7 +26,7 @@ namespace SWF {
 
 void
 DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
-        const RunInfo& /*r*/)
+        const RunResources& /*r*/)
 {
 	assert(tag == SWF::DEFINEEDITTEXT); // 37
 
@@ -189,7 +189,7 @@ DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m)
 	_html(false),
 	_useOutlines(false),
 	_fontID(-1),
-	_textHeight(1),
+	_textHeight(240),
 	_maxChars(0),
 	_alignment(TextField::ALIGN_LEFT),
 	_leftMargin(0),

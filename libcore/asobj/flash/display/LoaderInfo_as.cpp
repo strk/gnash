@@ -24,6 +24,7 @@
 #include "display/LoaderInfo_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -60,10 +61,11 @@ public:
 // extern (used by Global.cpp)
 void loaderinfo_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&loaderinfo_ctor, getLoaderInfoInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&loaderinfo_ctor, getLoaderInfoInterface());
         attachLoaderInfoStaticInterface(*cl);
     }
 
@@ -76,19 +78,19 @@ namespace {
 void
 attachLoaderInfoInterface(as_object& o)
 {
-    o.init_member("complete", new builtin_function(loaderinfo_complete));
-    o.init_member("httpStatus", new builtin_function(loaderinfo_httpStatus));
-    o.init_member("init", new builtin_function(loaderinfo_init));
-    o.init_member("ioError", new builtin_function(loaderinfo_ioError));
-    o.init_member("open", new builtin_function(loaderinfo_open));
-    o.init_member("progress", new builtin_function(loaderinfo_progress));
-    o.init_member("unload", new builtin_function(loaderinfo_unload));
+    Global_as* gl = getGlobal(o);
+    o.init_member("complete", gl->createFunction(loaderinfo_complete));
+    o.init_member("httpStatus", gl->createFunction(loaderinfo_httpStatus));
+    o.init_member("init", gl->createFunction(loaderinfo_init));
+    o.init_member("ioError", gl->createFunction(loaderinfo_ioError));
+    o.init_member("open", gl->createFunction(loaderinfo_open));
+    o.init_member("progress", gl->createFunction(loaderinfo_progress));
+    o.init_member("unload", gl->createFunction(loaderinfo_unload));
 }
 
 void
-attachLoaderInfoStaticInterface(as_object& o)
+attachLoaderInfoStaticInterface(as_object& /*o*/)
 {
-
 }
 
 as_object*
@@ -173,7 +175,7 @@ loaderinfo_unload(const fn_call& fn)
 }
 
 as_value
-loaderinfo_ctor(const fn_call& fn)
+loaderinfo_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new LoaderInfo_as;
 

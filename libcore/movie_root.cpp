@@ -24,7 +24,6 @@
 #include "log.h"
 #include "MovieClip.h"
 #include "Movie.h" // for implicit upcast to MovieClip
-#include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
 #include "flash/display/Stage_as.h"
@@ -37,6 +36,7 @@
 #include "MovieFactory.h"
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
+#include "Global_as.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -93,9 +93,9 @@ movie_root::testInvariant() const
 
 
 movie_root::movie_root(const movie_definition& def,
-        VirtualClock& clock, const RunInfo& runInfo)
+        VirtualClock& clock, const RunResources& runResources)
 	:
-    _runInfo(runInfo),
+    _runResources(runResources),
     _originalURL(def.get_url()),
     _vm(VM::init(def.get_version(), *this, clock)),
 	_interfaceHandler(0),
@@ -426,7 +426,7 @@ bool
 movie_root::loadLevel(unsigned int num, const URL& url)
 {
 	boost::intrusive_ptr<movie_definition> md (
-            MovieFactory::makeMovie(url, _runInfo));
+            MovieFactory::makeMovie(url, _runResources));
 	if (!md)
 	{
 		log_error(_("can't create movie_definition for %s"), url.str());
@@ -468,7 +468,7 @@ movie_root::getLevel(unsigned int num) const
 void
 movie_root::reset()
 {
-	sound::sound_handler* sh = _runInfo.soundHandler();
+	sound::sound_handler* sh = _runResources.soundHandler();
 	if ( sh ) sh->reset();
 	clear();
 	_disableScripts = false;
@@ -512,13 +512,13 @@ movie_root::clear()
 as_object*
 movie_root::getSelectionObject() const
 {
-    as_object* global = _vm.getGlobal();
+    Global_as* global = _vm.getGlobal();
     if (!global) return 0;
 
     as_value s;
     if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object().get();
+    as_object* sel = s.to_object(*global).get();
    
     return sel;
 }
@@ -528,10 +528,10 @@ movie_root::getStageObject()
 {
 	as_value v;
 	assert ( VM::isInitialized() ); // return NULL;
-	as_object* global = _vm.getGlobal();
+	Global_as* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
-	return boost::dynamic_pointer_cast<Stage_as>(v.to_object());
+	return boost::dynamic_pointer_cast<Stage_as>(v.to_object(*global));
 }
 		
 void
@@ -580,11 +580,11 @@ movie_root::getKeyObject()
 		// TODO: use a named string...
 
 		as_value kval;
-		as_object* global = _vm.getGlobal();
+		Global_as* global = _vm.getGlobal();
 
 		if (global->get_member(NSV::CLASS_KEY, &kval)) {
 
-			boost::intrusive_ptr<as_object> obj = kval.to_object();
+			boost::intrusive_ptr<as_object> obj = kval.to_object(*global);
 			_keyobject = boost::dynamic_pointer_cast<Keyboard_as>( obj );
 		}
 	}
@@ -600,12 +600,12 @@ movie_root::getMouseObject()
 	if ( ! _mouseobject )
 	{
 		as_value val;
-		as_object* global = _vm.getGlobal();
+		Global_as* global = _vm.getGlobal();
 
 		if (global->get_member(NSV::CLASS_MOUSE, &val) )
 		{
 			//log_debug("Found member 'Mouse' in _global: %s", val);
-			_mouseobject = val.to_object();
+			_mouseobject = val.to_object(*global);
 		}
 	}
 
@@ -1014,7 +1014,8 @@ movie_root::advance()
 
     try {
 
-        int elapsed = now - _lastMovieAdvancement;
+        assert(now >= _lastMovieAdvancement);
+        size_t elapsed = now - _lastMovieAdvancement;
 	    if (elapsed >= _movieAdvancementDelay)
 	    {
             advanced = true;
@@ -1108,7 +1109,10 @@ movie_root::display()
 		return;
 	}
 
-	render::begin_display(
+    Renderer* renderer = _runResources.renderer();
+    if (!renderer) return;
+
+	renderer->begin_display(
 		m_background_color,
 		m_viewport_x0, m_viewport_y0,
 		m_viewport_width, m_viewport_height,
@@ -1133,11 +1137,11 @@ movie_root::display()
 			continue;
 		}
 
-		movie->display();
+		movie->display(*renderer);
 
 	}
 
-	render::end_display();
+	renderer->end_display();
 }
 
 
@@ -1402,10 +1406,9 @@ movie_root::setQuality(Quality q)
         _quality = q;
     }
 
-
     // We always tell the renderer, because it could
     // be the first time we do
-    render_handler* renderer = get_render_handler();
+    Renderer* renderer = _runResources.renderer();
     if (renderer) renderer->setQuality(_quality);
 
 }
@@ -2123,7 +2126,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, _runInfo.baseURL());
+        URL url(urlstr, _runResources.baseURL());
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();
@@ -2230,7 +2233,7 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 
     /// URL security is checked in StreamProvider::getStream() down the
     /// chain.
-    URL url(urlstr, _runInfo.baseURL());
+    URL url(urlstr, _runResources.baseURL());
 
     /// If the method is MovieClip::METHOD_NONE, we send no data.
     if (method == MovieClip::METHOD_GET)

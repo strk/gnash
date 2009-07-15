@@ -23,6 +23,7 @@
 #include "asClass.h"
 #include "CodeStream.h"
 #include "abc_function.h"
+#include "Global_as.h"
 #include "VM.h"
 
 namespace gnash {
@@ -41,7 +42,8 @@ asMethod::asMethod()
     _maxRegisters(0),
     _scopeDepth(0),
     _maxScope(0),
-    _maxStack(0)
+    _maxStack(0),
+    _needsActivation(false)
 {
 }
 
@@ -82,8 +84,9 @@ bool
 asMethod::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst)
 {
+    Global_as* g = VM::get().getGlobal();
 	if (val.is_object()) {
-		val.to_object()->set_member(NSV::INTERNAL_TYPE,
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE,
                 size_t(type->getName()));
     }
 
@@ -178,7 +181,7 @@ asMethod::addMethod(string_table::key /*name*/, asNamespace* /*ns*/, asMethod*
 {
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	as_value val(method->getPrototype());
-// 	as value val = new as_value(abc_function(asMethod->getBody,_prototype->getVM().getMachine()));
+// 	as value val = new as_value(abc_function(asMethod->getBody,getVM(_prototype).getMachine()));
 // 	_prototype->init_member(name, val, as_prop_flags::readOnly |
 // 		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
 // 	return true;

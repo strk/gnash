@@ -43,11 +43,11 @@ public:
     {
         log_debug("Setting script limits: recursion %s, timeout %s",
                 _recursionLimit, _timeoutLimit);
-        m->getVM().getRoot().setScriptLimits(_recursionLimit, _timeoutLimit);
+        getRoot(*m).setScriptLimits(_recursionLimit, _timeoutLimit);
     }
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunInfo& /*r*/)
+            const RunResources& /*r*/)
     {
         assert(tag = SWF::SCRIPTLIMITS);
         std::auto_ptr<ScriptLimitsTag> s(new ScriptLimitsTag(in));

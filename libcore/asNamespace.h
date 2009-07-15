@@ -25,6 +25,7 @@
 namespace gnash {
     class asClass;
     class ClassHierarchy;
+    class string_table;
 }
 
 namespace gnash {
@@ -38,10 +39,10 @@ public:
 	asNamespace()
         :
         _parent(0),
-        mUri(0),
+        _uri(0),
         _prefix(0),
         _abcURI(0),
-        mClasses(),
+        _classes(),
 		mRecursePrevent(false),
         _private(false),
         _protected(false),
@@ -56,10 +57,10 @@ public:
 	asNamespace* getParent() { return _parent; }
 
 	/// Set the uri
-	void setURI(string_table::key name) { mUri = name; }
+	void setURI(string_table::key name) { _uri = name; }
 
 	/// What is the Uri of the namespace?
-	string_table::key getURI() const { return mUri; }
+	string_table::key getURI() const { return _uri; }
 
 	string_table::key getAbcURI() const {return _abcURI;}
 	void setAbcURI(string_table::key n){ _abcURI = n; }
@@ -72,7 +73,7 @@ public:
 	bool addClass(string_table::key name, asClass *a)
 	{
 		if (getClassInternal(name)) return false;
-		mClasses[static_cast<std::size_t>(name)] = a;
+		_classes[static_cast<std::size_t>(name)] = a;
 		return true;
 	}
 
@@ -94,6 +95,8 @@ public:
 		return found;
 	}
 
+    void dump(string_table& st);
+
 	void setPrivate() { _private = true; }
 	void unsetPrivate() { _private = false; }
 	bool isPrivate() { return _private; }
@@ -109,13 +112,13 @@ public:
 private:
 
 	asNamespace* _parent;
-	string_table::key mUri;
+	string_table::key _uri;
 	string_table::key _prefix;
 
 	string_table::key _abcURI;
 
 	typedef std::map<string_table::key, asClass*> container;
-	container mClasses;
+	container _classes;
 	mutable bool mRecursePrevent;
 
 	bool _private;
@@ -126,11 +129,11 @@ private:
 	{
 		container::const_iterator i;
 		
-        if (mClasses.empty()) return NULL;
+        if (_classes.empty()) return NULL;
 
-		i = mClasses.find(name);
+		i = _classes.find(name);
 
-		if (i == mClasses.end()) return NULL;
+		if (i == _classes.end()) return NULL;
 		return i->second;
 	}
 };

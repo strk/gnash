@@ -1,0 +1,51 @@
+.\"     Title: rtmpget
+.\"    Author: 
+.\" Generator: DocBook XSL Stylesheets v1.73.2 <http://docbook.sf.net/>
+.\"      Date: 07/07/2009
+.\"    Manual: 
+.\"    Source: 
+.\"
+.TH "RTMPGET" "1" "07/07/2009" "" ""
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.SH "NAME"
+rtmpget - Gnash Utility For Fetching RTMP-data
+.SH "SYNOPSIS"
+.sp
+.RS 4
+.nf
+rtmpget [options\.\.\.] [url\.\.\.]
+.fi
+.RE
+.SH "DESCRIPTION"
+.PP
+RTMP is a protocol for streaming/communicating SWF\-data over networks\. RTMPGet is a proof of concept utility for fetching a RTMP\-stream\.
+.PP
+RTMPGet fetch an url containing RTMP\-data for saving it to disk\.
+.PP
+\-h
+.RS 4
+Print usage info\.
+.RE
+.PP
+\-V
+.RS 4
+Print version information\.
+.RE
+.PP
+\-d
+.RS 4
+Display init file to the terminal\.
+.RE
+.PP
+\-n
+.RS 4
+Verbose networking debug info\.
+.RE
+.PP
+\-v
+.RS 4
+Verbose output\.
+.RE

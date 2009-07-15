@@ -64,7 +64,7 @@ sprite_definition::~sprite_definition()
 /*private*/
 // only called from constructors
 void
-sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
+sprite_definition::read(SWFStream& in, const RunResources& runResources)
 {
     const size_t tag_end = in.get_tag_end_position();
 
@@ -77,8 +77,10 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 
 	m_loading_frame = 0;
 
-    SWFParser parser(in, this, runInfo);
+    SWFParser parser(in, this, runResources);
 
+    // This can throw a ParserException; we will let the SWFMovieDefintion
+    // catch it, as a failure means the whole stream is invalid.
     parser.read(tag_end - in.tell());
 
     if (m_frame_count > m_loading_frame) {
@@ -117,7 +119,7 @@ sprite_definition::get_labeled_frame(const std::string& label,
 }
 
 sprite_definition::sprite_definition(movie_definition& m, SWFStream& in, 
-        const RunInfo& runInfo)
+        const RunResources& runResources)
 	:
 	m_movie_def(m),
 	m_frame_count(0),
@@ -125,7 +127,7 @@ sprite_definition::sprite_definition(movie_definition& m, SWFStream& in,
 	registeredClass(0),
 	_loadingSoundStream(-1)
 {
-	read(in, runInfo);
+	read(in, runResources);
 }
 
 /*

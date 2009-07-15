@@ -33,18 +33,17 @@
 namespace gnash {
 
 static as_value
-get_flash_external_package(const fn_call& fn)
+get_flash_external_package(const fn_call& /*fn*/)
 {
-    const bool as3 = isAS3(fn);
-    // This package is identical for AS2 and AS3 (as far as we know)
-    log_debug("Loading %s flash.external package", as3 ? "AVM2" : "AVM1");
-    
+
+    log_debug("Loading flash.external package");
+
     as_object *pkg = new as_object(getObjectInterface());
 
     // Call the [objectname]_init() function for each class.
     int i = 0;
-    while (as3externalclasses[i]) {
-        as3externalclasses[i](*pkg);
+    while (externalclasses[i]) {
+        externalclasses[i](*pkg);
         ++i;
     } 
 
@@ -54,7 +53,7 @@ get_flash_external_package(const fn_call& fn)
 void
 flash_external_package_init(as_object& where)
 {
-    string_table& st = where.getVM().getStringTable();
+    string_table& st = getStringTable(where);
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;

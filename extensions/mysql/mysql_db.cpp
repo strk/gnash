@@ -63,14 +63,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("connect", new builtin_function(mysql_connect));
-    obj->init_member("qetData", new builtin_function(mysql_qetData));
-    obj->init_member("disconnect", new builtin_function(mysql_disconnect));
-    obj->init_member("query", new builtin_function(mysql_query));
-    obj->init_member("fetch_row", new builtin_function(mysql_fetch));
-    obj->init_member("num_fields", new builtin_function(mysql_fields));
-    obj->init_member("free_result", new builtin_function(mysql_free));
-    obj->init_member("store_results", new builtin_function(mysql_store));
+    obj->init_member("connect", gl->createFunction(mysql_connect));
+    obj->init_member("qetData", gl->createFunction(mysql_qetData));
+    obj->init_member("disconnect", gl->createFunction(mysql_disconnect));
+    obj->init_member("query", gl->createFunction(mysql_query));
+    obj->init_member("fetch_row", gl->createFunction(mysql_fetch));
+    obj->init_member("num_fields", gl->createFunction(mysql_fields));
+    obj->init_member("free_result", gl->createFunction(mysql_free));
+    obj->init_member("store_results", gl->createFunction(mysql_store));
 }
 
 static as_object*
@@ -326,7 +326,7 @@ mysql_qetData(const fn_call& fn)
 
     if (fn.nargs > 0) {
 	string sql = fn.arg(0).to_string();
-	Array_as *arr = (Array_as *)fn.arg(1).to_object().get();
+	Array_as *arr = (Array_as *)fn.arg(1).to_object(*getGlobal(fn)).get();
 //	std::vector< std::vector<const char *> >
 	MySQL::query_t qresult;
 #if 0
@@ -421,7 +421,8 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&mysql_ctor, getInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&mysql_ctor, getInterface());
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    attachInterface(cl.get());

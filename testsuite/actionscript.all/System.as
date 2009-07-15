@@ -179,6 +179,8 @@ xcheck_equals(typeof(p.download), 'function');
 // Tries to exec whatisthis from a particular location?
 xcheck_equals(typeof(p.launch), 'function');
 
+trace(System.security.allowDomain("um"));
+
 #if OUTPUT_VERSION > 6
  check_totals(85);
 #else

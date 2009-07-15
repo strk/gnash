@@ -30,6 +30,7 @@
 
 #include "VM.h" // get random generator
 #include "fn_call.h"
+#include "Global_as.h"
 #include "Math_as.h"
 #include "log.h"
 #include "builtin_function.h" 
@@ -66,7 +67,7 @@ namespace {
 void
 registerMathNative(as_object& proto)
 {
-    VM& vm = proto.getVM();
+    VM& vm = getVM(proto);
     
     vm.registerNative(unaryFunction<std::abs>, 200, 0);
     vm.registerNative(math_min, 200, 1);
@@ -214,7 +215,7 @@ math_random(const fn_call& fn)
     if (fn.nargs) fn.arg(0).to_number();
     if (fn.nargs > 1) fn.arg(1).to_number();
 
-	VM::RNG& rnd = fn.getVM().randomNumberGenerator();
+	VM::RNG& rnd = getVM(fn).randomNumberGenerator();
 
 	// Produces double ( 0 <= n < 1)
 	boost::uniform_real<> uni_dist(0, 1);
@@ -234,7 +235,6 @@ round(double d)
 void
 attachMathInterface(as_object& proto)
 {
-
 	// TODO: rely on inheritance, use init_property ?
 	// All Math members are constant and non-enumerable.
 
@@ -252,7 +252,7 @@ attachMathInterface(as_object& proto)
 	proto.init_member("SQRT1_2", 0.7071067811865475244, flags);
 	proto.init_member("SQRT2", 1.4142135623730950488, flags);
 
-    VM& vm = proto.getVM();
+    VM& vm = getVM(proto);
     
     proto.init_member("abs", vm.getNative(200, 0), flags);
     proto.init_member("min", vm.getNative(200, 1), flags);

@@ -24,6 +24,7 @@
 #include "display/DisplayObject_as.h"
 #include "log.h"
 #include "fn_call.h"
+#include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
@@ -64,10 +65,11 @@ public:
 // extern (used by Global.cpp)
 void displayobject_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        cl = new builtin_function(&displayobject_ctor, getDisplayObjectInterface());
+        Global_as* gl = getGlobal(global);
+        cl = gl->createClass(&displayobject_ctor, getDisplayObjectInterface());
         attachDisplayObjectStaticInterface(*cl);
     }
 
@@ -80,23 +82,24 @@ namespace {
 void
 attachDisplayObjectInterface(as_object& o)
 {
-    o.init_member("getRect", new builtin_function(displayobject_getRect));
-    o.init_member("globalToLocal", new builtin_function(displayobject_globalToLocal));
-    o.init_member("hitTestObject", new builtin_function(displayobject_hitTestObject));
-    o.init_member("hitTestPoint", new builtin_function(displayobject_hitTestPoint));
-    o.init_member("localToGlobal", new builtin_function(displayobject_localToGlobal));
-    o.init_member("added", new builtin_function(displayobject_added));
-    o.init_member("addedToStage", new builtin_function(displayobject_addedToStage));
-    o.init_member("enterFrame", new builtin_function(displayobject_enterFrame));
-    o.init_member("removed", new builtin_function(displayobject_removed));
-    o.init_member("removedFromStage", new builtin_function(displayobject_removedFromStage));
-    o.init_member("render", new builtin_function(displayobject_render));
+    Global_as* gl = getGlobal(o);
+
+    o.init_member("getRect", gl->createFunction(displayobject_getRect));
+    o.init_member("globalToLocal", gl->createFunction(displayobject_globalToLocal));
+    o.init_member("hitTestObject", gl->createFunction(displayobject_hitTestObject));
+    o.init_member("hitTestPoint", gl->createFunction(displayobject_hitTestPoint));
+    o.init_member("localToGlobal", gl->createFunction(displayobject_localToGlobal));
+    o.init_member("added", gl->createFunction(displayobject_added));
+    o.init_member("addedToStage", gl->createFunction(displayobject_addedToStage));
+    o.init_member("enterFrame", gl->createFunction(displayobject_enterFrame));
+    o.init_member("removed", gl->createFunction(displayobject_removed));
+    o.init_member("removedFromStage", gl->createFunction(displayobject_removedFromStage));
+    o.init_member("render", gl->createFunction(displayobject_render));
 }
 
 void
-attachDisplayObjectStaticInterface(as_object& o)
+attachDisplayObjectStaticInterface(as_object& /*o*/)
 {
-
 }
 
 as_object*
@@ -221,7 +224,7 @@ displayobject_render(const fn_call& fn)
 }
 
 as_value
-displayobject_ctor(const fn_call& fn)
+displayobject_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new DisplayObject_as;
 
