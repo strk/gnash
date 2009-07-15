@@ -27,12 +27,12 @@
 
 namespace gnash {
 
-typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
 
 /// Any built-in function/class should be of this type
 class builtin_function : public as_function
 {
+    typedef as_value (*ASFunction)(const fn_call& fn);
 
 public:
 
@@ -44,15 +44,16 @@ public:
 	///	The C function to call when this as_function is invoked.
 	/// 	For classes, the function pointer is the constructor.
 	///
-	builtin_function(as_c_function_ptr func)
+	builtin_function(Global_as& gl, ASFunction func)
 		:
 		as_function(),
 		_func(func)
 	{
-		init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor().get());
+		init_member(NSV::PROP_CONSTRUCTOR,
+                as_function::getFunctionConstructor().get());
 	}
 
-	/// Construct a builtin function/class with the given interface (possibly none)
+	/// Construct a builtin function with the given interface (possibly none)
 	//
 	/// @param func
 	///	The C function to call when this as_function is invoked.
@@ -63,20 +64,19 @@ public:
 	///	instances of this class)
 	/// 	If the given interface is NULL no interface will be
 	/// 	provided. Use the constructor taking a single argument
-	///	to get a default interface instead.
-	///
-	builtin_function(as_c_function_ptr func, as_object* iface, bool useThisAsCtor=false)
+	///	    to get a default interface instead.
+    /// @param useThisAsCtor
+    ///     Used only by getFunctionConstructor().
+	builtin_function(Global_as& gl, ASFunction func, as_object* iface,
+            bool useThisAsCtor = false)
 		:
 		as_function(iface),
 		_func(func)
 	{
-		if ( useThisAsCtor )
-		{
-			init_member(NSV::PROP_CONSTRUCTOR, this);
-		}
-		else
-		{
-			init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor().get());
+		if (useThisAsCtor) init_member(NSV::PROP_CONSTRUCTOR, this);
+		else {
+			init_member(NSV::PROP_CONSTRUCTOR,
+                    as_function::getFunctionConstructor().get());
 		}
 	}
 
@@ -106,11 +106,10 @@ public:
 
 private:
 
-	as_c_function_ptr _func;
+	ASFunction _func;
 };
 
 } // end of gnash namespace
 
-// __GNASH_BUILTIN_FUNCTION_H__
 #endif
 

@@ -181,13 +181,13 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(function);
+    return new builtin_function(*this, function);
 }
 
 as_object*
 AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
-    return new builtin_function(ctor, prototype);
+    return new builtin_function(*this, ctor, prototype);
 
 }
 
@@ -212,7 +212,7 @@ AVM1Global::createBoolean(bool b)
 builtin_function*
 AVM2Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(function);
+    return new builtin_function(*this, function);
 }
 
 as_object*
@@ -220,7 +220,7 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
     // TODO: this should attach the function to the prototype as its
     // constructor member.
-    return new builtin_function(ctor, prototype);
+    return new builtin_function(*this, ctor, prototype);
 }
 
 as_object*

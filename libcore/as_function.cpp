@@ -125,7 +125,8 @@ as_function::getFunctionConstructor()
 	static boost::intrusive_ptr<builtin_function> func = NULL;
 	if ( ! func )
 	{
-		func = new builtin_function(function_ctor, getFunctionPrototype(),
+        Global_as* gl = VM::get().getGlobal();
+		func = new builtin_function(*gl, function_ctor, getFunctionPrototype(),
                 true);
 		VM::get().addStatic(func.get());
 	}
