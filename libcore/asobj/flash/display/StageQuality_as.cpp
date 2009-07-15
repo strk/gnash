@@ -50,7 +50,7 @@ stagequality_class_init(as_object& where)
 namespace {
 
 void
-attachStageQualityStaticInterface(as_object& o)
+attachStageQualityStaticInterface(as_object& /*o*/)
 {
     // TODO: attach constants.
 }

@@ -79,7 +79,7 @@ attachAsyncErrorEventInterface(as_object& o)
 }
 
 void
-attachAsyncErrorEventStaticInterface(as_object& o)
+attachAsyncErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 

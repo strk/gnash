@@ -131,7 +131,7 @@ attachByteArrayInterface(as_object& o)
 }
 
 void
-attachByteArrayStaticInterface(as_object& o)
+attachByteArrayStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -427,7 +427,7 @@ bytearray_writeUTFBytes(const fn_call& fn)
 }
 
 as_value
-bytearray_ctor(const fn_call& fn)
+bytearray_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ByteArray_as;
 

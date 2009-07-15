@@ -69,12 +69,12 @@ void stackoverflowerror_class_init(as_object& global)
 namespace {
 
 void
-attachStackOverflowErrorInterface(as_object& o)
+attachStackOverflowErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachStackOverflowErrorStaticInterface(as_object& o)
+attachStackOverflowErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getStackOverflowErrorInterface()
 }
 
 as_value
-stackoverflowerror_ctor(const fn_call& fn)
+stackoverflowerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StackOverflowError_as;
 

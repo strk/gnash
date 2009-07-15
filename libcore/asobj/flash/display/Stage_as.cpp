@@ -39,12 +39,12 @@
 
 namespace gnash {
 
-static as_value stage_scalemode_getset(const fn_call& fn);
-static as_value stage_align_getset(const fn_call& fn);
-static as_value stage_showMenu_getset(const fn_call& fn);
-static as_value stage_width_getset(const fn_call& fn);
-static as_value stage_height_getset(const fn_call& fn);
-static as_value stage_displaystate_getset(const fn_call& fn);
+static as_value stage_scalemode(const fn_call& fn);
+static as_value stage_align(const fn_call& fn);
+static as_value stage_showMenu(const fn_call& fn);
+static as_value stage_width(const fn_call& fn);
+static as_value stage_height(const fn_call& fn);
+static as_value stage_displaystate(const fn_call& fn);
 static const char* getScaleModeString(movie_root::ScaleMode sm);
 static const char* getDisplayStateString(movie_root::DisplayState ds);
 
@@ -52,32 +52,31 @@ void registerStageNative(as_object& o)
 {
 	VM& vm = getVM(o);
 	
-	vm.registerNative(stage_scalemode_getset, 666, 1);
-    vm.registerNative(stage_scalemode_getset, 666, 2);
-    vm.registerNative(stage_align_getset, 666, 3);
-	vm.registerNative(stage_align_getset, 666, 4);
-	vm.registerNative(stage_width_getset, 666, 5);
-    vm.registerNative(stage_width_getset, 666, 6);
-	vm.registerNative(stage_height_getset, 666, 7);
-    vm.registerNative(stage_height_getset, 666, 8);
-	vm.registerNative(stage_showMenu_getset, 666, 9);
-    vm.registerNative(stage_showMenu_getset, 666, 10);
+	vm.registerNative(stage_scalemode, 666, 1);
+    vm.registerNative(stage_scalemode, 666, 2);
+    vm.registerNative(stage_align, 666, 3);
+	vm.registerNative(stage_align, 666, 4);
+	vm.registerNative(stage_width, 666, 5);
+    vm.registerNative(stage_width, 666, 6);
+	vm.registerNative(stage_height, 666, 7);
+    vm.registerNative(stage_height, 666, 8);
+	vm.registerNative(stage_showMenu, 666, 9);
+    vm.registerNative(stage_showMenu, 666, 10);
 }
 
 static void
 attachStageInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     const int version = getSWFVersion(o);
 
     if ( version < 5 ) return;
 
-    o.init_property("scaleMode", &stage_scalemode_getset, &stage_scalemode_getset);
-    o.init_property("align", &stage_align_getset, &stage_align_getset);
-    o.init_property("width", &stage_width_getset, &stage_width_getset);
-    o.init_property("height", &stage_height_getset, &stage_height_getset);
-    o.init_property("showMenu", &stage_showMenu_getset, &stage_showMenu_getset);
-    o.init_property("displayState", &stage_displaystate_getset, &stage_displaystate_getset);
+    o.init_property("scaleMode", &stage_scalemode, &stage_scalemode);
+    o.init_property("align", &stage_align, &stage_align);
+    o.init_property("width", &stage_width, &stage_width);
+    o.init_property("height", &stage_height, &stage_height);
+    o.init_property("showMenu", &stage_showMenu, &stage_showMenu);
+    o.init_property("displayState", &stage_displaystate, &stage_displaystate);
 
 }
 
@@ -139,7 +138,7 @@ getScaleModeString(movie_root::ScaleMode sm)
 
 
 as_value
-stage_scalemode_getset(const fn_call& fn)
+stage_scalemode(const fn_call& fn)
 {
 
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
@@ -171,7 +170,7 @@ stage_scalemode_getset(const fn_call& fn)
 }
 
 as_value
-stage_width_getset(const fn_call& fn)
+stage_width(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
@@ -189,7 +188,7 @@ stage_width_getset(const fn_call& fn)
 }
 
 as_value
-stage_height_getset(const fn_call& fn)
+stage_height(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
@@ -208,7 +207,7 @@ stage_height_getset(const fn_call& fn)
 
 
 as_value
-stage_align_getset(const fn_call& fn)
+stage_align(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr); 
  
@@ -252,7 +251,7 @@ stage_align_getset(const fn_call& fn)
 }
 
 as_value
-stage_showMenu_getset(const fn_call& fn)
+stage_showMenu(const fn_call& fn)
 {
 	boost::intrusive_ptr<Stage_as> stage = ensureType<Stage_as>(fn.this_ptr);
 
@@ -269,7 +268,7 @@ stage_showMenu_getset(const fn_call& fn)
 }
 
 as_value
-stage_displaystate_getset(const fn_call& fn)
+stage_displaystate(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 

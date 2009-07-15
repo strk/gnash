@@ -69,12 +69,12 @@ void bitmap_class_init(as_object& global)
 namespace {
 
 void
-attachBitmapInterface(as_object& o)
+attachBitmapInterface(as_object& /*o*/)
 {
 }
 
 void
-attachBitmapStaticInterface(as_object& o)
+attachBitmapStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getBitmapInterface()
 }
 
 as_value
-bitmap_ctor(const fn_call& fn)
+bitmap_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Bitmap_as;
 

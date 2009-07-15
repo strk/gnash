@@ -51,7 +51,7 @@ sharedobjectflushstatus_class_init(as_object& global)
 namespace {
 
 void
-attachSharedObjectFlushStatusStaticInterface(as_object& o)
+attachSharedObjectFlushStatusStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

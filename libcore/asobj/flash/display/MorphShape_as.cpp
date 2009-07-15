@@ -69,12 +69,12 @@ void morphshape_class_init(as_object& global)
 namespace {
 
 void
-attachMorphShapeInterface(as_object& o)
+attachMorphShapeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachMorphShapeStaticInterface(as_object& o)
+attachMorphShapeStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getMorphShapeInterface()
 }
 
 as_value
-morphshape_ctor(const fn_call& fn)
+morphshape_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MorphShape_as;
 

@@ -38,7 +38,7 @@ namespace {
     as_value boolean_valueof(const fn_call& fn);
     as_value boolean_ctor(const fn_call& fn);
     void attachBooleanInterface(as_object& o);
-    boost::intrusive_ptr<builtin_function> getBooleanConstructor();
+    as_object* getBooleanClass(Global_as& g);
     as_object* getBooleanInterface();
 }
 
@@ -47,68 +47,64 @@ class Boolean_as: public as_object
 
 public:
 
-	Boolean_as()
-		:
-		as_object(getBooleanInterface())
-	{}
+    Boolean_as()
+        :
+        as_object(getBooleanInterface())
+    {}
 
-	Boolean_as(bool val)
-		:
-		as_object(getBooleanInterface())
-	{
-		_val = val;
-	}
-	
+    Boolean_as(bool val)
+        :
+        as_object(getBooleanInterface())
+    {
+        _val = val;
+    }
+    
     bool value() const { return _val; }
 
 private:
 
-	bool _val;
-	
+    bool _val;
+    
 };
 
 // extern (used by Global.cpp)
 void boolean_class_init(as_object& global)
 {
-	// This is going to be the global Boolean "class"/"function"
-	boost::intrusive_ptr<builtin_function> cl=getBooleanConstructor();
+    // This is going to be the global Boolean "class"/"function"
+    boost::intrusive_ptr<as_object> cl = getBooleanClass(*getGlobal(global));
 
-	// Register _global.Boolean
-	global.init_member("Boolean", cl.get());
+    // Register _global.Boolean
+    global.init_member("Boolean", cl.get());
 
 }
 
-boost::intrusive_ptr<as_object>
-init_boolean_instance(bool val)
+as_object*
+init_boolean_instance(Global_as& g, bool val)
 {
-	boost::intrusive_ptr<builtin_function> cl = getBooleanConstructor();
-	as_environment env(VM::get());
+    boost::intrusive_ptr<as_object> cl = getBooleanClass(g);
+    as_function* ctor = cl->to_function();
+    if (!ctor) return 0;
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(val);
-	return cl->constructInstance(env, args);
+    as_environment env(getVM(g));
+
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    args->push_back(val);
+    return ctor->constructInstance(env, args).get();
 }
 
 
 namespace {
 
-boost::intrusive_ptr<builtin_function>
-getBooleanConstructor()
+as_object*
+getBooleanClass(Global_as& g)
 {
-	// This is going to be the global Boolean "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+    static as_object* cl = 0;
 
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&boolean_ctor, getBooleanInterface());
-		VM::get().addStatic(cl.get());
-
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		//attachBooleanInterface(*cl);
-	}
-
-	return cl;
+    if (!cl) {
+        cl = g.createClass(&boolean_ctor, getBooleanInterface());
+        VM::get().addStatic(cl);
+    }
+    return cl;
 }
 
 void
@@ -116,31 +112,31 @@ attachBooleanInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
 
-	o.init_member("toString", gl->createFunction(boolean_tostring));
-	o.init_member("valueOf", gl->createFunction(boolean_valueof));
+    o.init_member("toString", gl->createFunction(boolean_tostring));
+    o.init_member("valueOf", gl->createFunction(boolean_valueof));
 }
 
 as_object*
 getBooleanInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
+    static boost::intrusive_ptr<as_object> o;
+    if ( ! o )
+    {
+        o = new as_object(getObjectInterface());
+        VM::get().addStatic(o.get());
 
-		attachBooleanInterface(*o);
-	}
-	return o.get();
+        attachBooleanInterface(*o);
+    }
+    return o.get();
 }
 
 
 as_value
 boolean_tostring(const fn_call& fn)
 {
-	boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
-	
-	if (obj->value()) return as_value("true");
+    boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
+    
+    if (obj->value()) return as_value("true");
 
     return as_value("false");
 }
@@ -149,24 +145,24 @@ boolean_tostring(const fn_call& fn)
 as_value
 boolean_valueof(const fn_call& fn) 
 {
-	boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
+    boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
 
-	return as_value(obj->value());
+    return as_value(obj->value());
 }
 
 as_value
 boolean_ctor(const fn_call& fn)
 {
-	if (fn.nargs > 0)
-	{
-		bool val = fn.arg(0).to_bool();
-		if ( ! fn.isInstantiation() ) return as_value(val);
+    if (fn.nargs > 0)
+    {
+        bool val = fn.arg(0).to_bool();
+        if ( ! fn.isInstantiation() ) return as_value(val);
         
         return as_value(new Boolean_as(val));
-	}
+    }
 
-	if (!fn.isInstantiation()) return as_value();
-		
+    if (!fn.isInstantiation()) return as_value();
+        
     return as_value(new Boolean_as(false));
 
 }

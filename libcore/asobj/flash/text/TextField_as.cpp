@@ -332,7 +332,7 @@ textfield_textInput(const fn_call& fn)
 }
 
 as_value
-textfield_ctor(const fn_call& fn)
+textfield_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextField_as;
 

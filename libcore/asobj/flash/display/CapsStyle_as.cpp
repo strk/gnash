@@ -51,7 +51,7 @@ capsstyle_class_init(as_object& global)
 namespace {
 
 void
-attachCapsStyleStaticInterface(as_object& o)
+attachCapsStyleStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

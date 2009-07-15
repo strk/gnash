@@ -81,7 +81,7 @@ attachStackFrameInterface(as_object& o)
 }
 
 void
-attachStackFrameStaticInterface(as_object& o)
+attachStackFrameStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +128,7 @@ stackframe_name(const fn_call& fn)
 }
 
 as_value
-stackframe_ctor(const fn_call& fn)
+stackframe_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StackFrame_as;
 

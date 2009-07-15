@@ -101,7 +101,7 @@ attachGraphicsInterface(as_object& o)
 }
 
 void
-attachGraphicsStaticInterface(as_object& o)
+attachGraphicsStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -247,7 +247,7 @@ graphics_moveTo(const fn_call& fn)
 }
 
 as_value
-graphics_ctor(const fn_call& fn)
+graphics_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Graphics_as;
 

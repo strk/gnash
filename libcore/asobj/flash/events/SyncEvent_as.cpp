@@ -79,7 +79,7 @@ attachSyncEventInterface(as_object& o)
 }
 
 void
-attachSyncEventStaticInterface(as_object& o)
+attachSyncEventStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +115,7 @@ syncevent_SYNC(const fn_call& fn)
 }
 
 as_value
-syncevent_ctor(const fn_call& fn)
+syncevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SyncEvent_as;
 

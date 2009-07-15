@@ -808,7 +808,7 @@ sound_new(const fn_call& fn)
         const as_value& arg0 = fn.arg(0);
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
-            as_object* obj = arg0.to_object().get();
+            as_object* obj = arg0.to_object(*getGlobal(fn)).get();
             DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
             IF_VERBOSE_ASCODING_ERRORS(
             if ( ! ch )
@@ -1209,7 +1209,7 @@ sound_progress(const fn_call& fn)
 }
 
 as_value
-sound_ctor(const fn_call& fn)
+sound_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Sound_as;
 

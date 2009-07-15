@@ -116,7 +116,7 @@ imeevent_IME_COMPOSITION(const fn_call& fn)
 }
 
 as_value
-imeevent_ctor(const fn_call& fn)
+imeevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IMEEvent_as;
 

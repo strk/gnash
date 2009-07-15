@@ -571,7 +571,7 @@ Debugger::dumpStackFrame(as_environment &env)
 // FIXME: we want to print the name of the function
 //  	    if (val.is_as_function()) {
 // //		cerr << val.get_symbol_handle() << endl;
-// 		string name = this->lookupSymbol(val.to_object());
+// 		string name = this->lookupSymbol(val.to_object(*getGlobal(fn)));
 // 		if (name.size()) {
 // 		    cerr << name << " ";
 // 		}
@@ -579,7 +579,7 @@ Debugger::dumpStackFrame(as_environment &env)
         cerr << env.bottom(i);
 
 	    if (val.is_object()) {
-		boost::intrusive_ptr<as_object> o = val.to_object();
+		boost::intrusive_ptr<as_object> o = val.to_object(*getGlobal(fn));
 		string name = lookupSymbol(o.get());
 		if (name.size()) {
 		    cerr << " \"" << name << "\"";

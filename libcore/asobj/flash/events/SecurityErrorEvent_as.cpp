@@ -79,7 +79,7 @@ attachSecurityErrorEventInterface(as_object& o)
 }
 
 void
-attachSecurityErrorEventStaticInterface(as_object& o)
+attachSecurityErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +115,7 @@ securityerrorevent_SECURITY_ERROR(const fn_call& fn)
 }
 
 as_value
-securityerrorevent_ctor(const fn_call& fn)
+securityerrorevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SecurityErrorEvent_as;
 

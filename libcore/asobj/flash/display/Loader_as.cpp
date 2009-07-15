@@ -81,7 +81,7 @@ attachLoaderInterface(as_object& o)
 }
 
 void
-attachLoaderStaticInterface(as_object& o)
+attachLoaderStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +128,7 @@ loader_unload(const fn_call& fn)
 }
 
 as_value
-loader_ctor(const fn_call& fn)
+loader_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Loader_as;
 

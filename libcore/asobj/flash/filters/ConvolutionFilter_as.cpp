@@ -19,6 +19,7 @@
 #include "as_object.h"
 #include "ConvolutionFilter.h"
 #include "VM.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "Object.h"
 #include "BitmapFilter_as.h"
@@ -107,13 +108,9 @@ attachConvolutionFilterInterface(as_object& o)
 as_value
 getConvolutionFilterConstructor(const fn_call& fn)
 {
-    static builtin_function* cl;
-    if (!cl) {
-        cl = new builtin_function(&convolutionfilter_ctor,
-                getConvolutionFilterInterface());
-        getVM(fn).addStatic(cl);
-    }
-    return cl;
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&convolutionfilter_ctor,
+            getConvolutionFilterInterface());
 }
 
 as_value

@@ -81,7 +81,7 @@ attachProgressEventInterface(as_object& o)
 }
 
 void
-attachProgressEventStaticInterface(as_object& o)
+attachProgressEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +128,7 @@ progressevent_SOCKET_DATA(const fn_call& fn)
 }
 
 as_value
-progressevent_ctor(const fn_call& fn)
+progressevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ProgressEvent_as;
 

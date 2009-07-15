@@ -51,7 +51,7 @@ gridfittype_class_init(as_object& global)
 namespace {
 
 void
-attachGridFitTypeStaticInterface(as_object& o)
+attachGridFitTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

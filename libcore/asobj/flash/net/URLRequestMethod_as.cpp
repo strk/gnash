@@ -51,7 +51,7 @@ urlrequestmethod_class_init(as_object& global)
 namespace {
 
 void
-attachURLRequestMethodStaticInterface(as_object& o)
+attachURLRequestMethodStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

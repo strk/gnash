@@ -69,12 +69,12 @@ void illegaloperationerror_class_init(as_object& global)
 namespace {
 
 void
-attachIllegalOperationErrorInterface(as_object& o)
+attachIllegalOperationErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIllegalOperationErrorStaticInterface(as_object& o)
+attachIllegalOperationErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getIllegalOperationErrorInterface()
 }
 
 as_value
-illegaloperationerror_ctor(const fn_call& fn)
+illegaloperationerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IllegalOperationError_as;
 

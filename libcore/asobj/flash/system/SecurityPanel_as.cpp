@@ -69,12 +69,12 @@ void securitypanel_class_init(as_object& global)
 namespace {
 
 void
-attachSecurityPanelInterface(as_object& o)
+attachSecurityPanelInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSecurityPanelStaticInterface(as_object& o)
+attachSecurityPanelStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getSecurityPanelInterface()
 }
 
 as_value
-securitypanel_ctor(const fn_call& fn)
+securitypanel_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SecurityPanel_as;
 

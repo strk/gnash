@@ -69,12 +69,12 @@ void csmsettings_class_init(as_object& global)
 namespace {
 
 void
-attachCSMSettingsInterface(as_object& o)
+attachCSMSettingsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachCSMSettingsStaticInterface(as_object& o)
+attachCSMSettingsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getCSMSettingsInterface()
 }
 
 as_value
-csmsettings_ctor(const fn_call& fn)
+csmsettings_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new CSMSettings_as;
 

@@ -69,12 +69,12 @@ void scene_class_init(as_object& global)
 namespace {
 
 void
-attachSceneInterface(as_object& o)
+attachSceneInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSceneStaticInterface(as_object& o)
+attachSceneStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getSceneInterface()
 }
 
 as_value
-scene_ctor(const fn_call& fn)
+scene_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Scene_as;
 

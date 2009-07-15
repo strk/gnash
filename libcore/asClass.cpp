@@ -26,6 +26,7 @@
 #include "namedStrings.h"
 #include "as_value.h"
 #include "asNamespace.h"
+#include "Global_as.h"
 
 #ifdef ENABLE_AVM2
 #include "asMethod.h"
@@ -40,8 +41,10 @@ asClass::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst,
         bool isstatic)
 {
-	if (val.is_object()) {
-		val.to_object()->set_member(NSV::INTERNAL_TYPE, 
+    Global_as* g = VM::get().getGlobal();
+
+    if (val.is_object()) {
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, 
 			std::size_t(type->getName()));
     }
 

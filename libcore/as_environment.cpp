@@ -1089,6 +1089,12 @@ getRoot(const as_environment& env)
     return env.getVM().getRoot();
 }
 
+Global_as*
+getGlobal(const as_environment& env)
+{
+    return env.getVM().getGlobal();
+}
+
 int
 getSWFVersion(const as_environment& env)
 {

@@ -69,12 +69,12 @@ void urlrequestheader_class_init(as_object& global)
 namespace {
 
 void
-attachURLRequestHeaderInterface(as_object& o)
+attachURLRequestHeaderInterface(as_object& /*o*/)
 {
 }
 
 void
-attachURLRequestHeaderStaticInterface(as_object& o)
+attachURLRequestHeaderStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getURLRequestHeaderInterface()
 }
 
 as_value
-urlrequestheader_ctor(const fn_call& fn)
+urlrequestheader_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLRequestHeader_as;
 

@@ -122,8 +122,7 @@ public:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object
-    :
+class as_object :
 #ifdef GNASH_USE_GC
     public GcResource
 #else
@@ -139,6 +138,32 @@ class as_object
     typedef PropertyList::SortedPropertyList SortedPropertyList;
 
 public:
+    
+    /// Construct an ActionScript object with no prototype associated.
+    //
+    /// @param  global  A reference to the Global object. The created object
+    ///                 will hold a reference to this object, using it to
+    ///                 access other AS resources where necessary. The new
+    ///                 object belongs in the scope of the passed Global
+    ///                 object.
+    explicit as_object(Global_as& global);
+
+    /// Construct an ActionScript object with no prototype associated.
+    as_object();
+
+    /// \brief
+    /// Construct an ActionScript object based on the given prototype.
+    /// Adds a reference to the prototype, if any.
+    explicit as_object(as_object* proto);
+
+    /// Construct an ActionScript object based on the given prototype.
+    explicit as_object(boost::intrusive_ptr<as_object> proto);
+    
+    /// Copy an as_object.
+    //
+    /// This is used by Array_as, but almost certainly shouldn't be. Please
+    /// don't use this function.
+    explicit as_object(const as_object& other);
 
     /// A function to be called on movie_root::advance()
     //
@@ -168,11 +193,7 @@ public:
     Property* findProperty(string_table::key name, string_table::key nsname,
         as_object **owner = NULL);
 
-//    Property* findProperty(
-
-    /// \brief
-    /// Return a reference to the Virtual Machine that created
-    /// this object. 
+    /// Return a reference to this as_object's global object.
     VM& vm() const {
         return _vm;
     }
@@ -195,23 +216,6 @@ public:
     ///
     void dump_members(std::map<std::string, as_value>& to);
 
-    /// Construct an ActionScript object with no prototype associated.
-    as_object();
-
-    /// \brief
-    /// Construct an ActionScript object based on the given prototype.
-    /// Adds a reference to the prototype, if any.
-    explicit as_object(as_object* proto);
-
-    /// Construct an ActionScript object based on the given prototype.
-    explicit as_object(boost::intrusive_ptr<as_object> proto);
-
-    /// Copy an as_object
-    //
-    /// TODO: write more about this, is it allowed ? is it safe ?
-    ///
-    as_object(const as_object& other);
-    
     /// Return a text representation for this object
     virtual std::string get_text_value() const { return "[object Object]"; }
 
@@ -1104,9 +1108,9 @@ protected:
 #endif // GNASH_USE_GC
 
 private:
-    
-    /// The Virtual Machine used to create this object
-    VM& _vm;
+ 
+    /// The global object whose scope contains this object.
+    VM& _vm;   
 
     /// Properties of this objects 
     PropertyList _members;

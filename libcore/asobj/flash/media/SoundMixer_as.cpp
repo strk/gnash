@@ -79,7 +79,7 @@ attachSoundMixerInterface(as_object& o)
 }
 
 void
-attachSoundMixerStaticInterface(as_object& o)
+attachSoundMixerStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +115,7 @@ soundmixer_stopAll(const fn_call& fn)
 }
 
 as_value
-soundmixer_ctor(const fn_call& fn)
+soundmixer_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundMixer_as;
 

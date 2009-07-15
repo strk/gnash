@@ -81,7 +81,7 @@ attachTextEventInterface(as_object& o)
 }
 
 void
-attachTextEventStaticInterface(as_object& o)
+attachTextEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +128,7 @@ textevent_TEXT_INPUT(const fn_call& fn)
 }
 
 as_value
-textevent_ctor(const fn_call& fn)
+textevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextEvent_as;
 

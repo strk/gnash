@@ -69,12 +69,12 @@ void statictext_class_init(as_object& global)
 namespace {
 
 void
-attachStaticTextInterface(as_object& o)
+attachStaticTextInterface(as_object& /*o*/)
 {
 }
 
 void
-attachStaticTextStaticInterface(as_object& o)
+attachStaticTextStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getStaticTextInterface()
 }
 
 as_value
-statictext_ctor(const fn_call& fn)
+statictext_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StaticText_as;
 

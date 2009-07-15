@@ -115,7 +115,7 @@ httpstatusevent_HTTP_STATUS(const fn_call& fn)
 }
 
 as_value
-httpstatusevent_ctor(const fn_call& fn)
+httpstatusevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new HTTPStatusEvent_as;
 

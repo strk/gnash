@@ -65,13 +65,13 @@ class as_super : public as_function
 {
 public:
 
-	as_super(as_function* ctor, as_object* proto)
+	as_super(Global_as& gl, as_function* ctor, as_object* proto)
 		:
+        as_function(gl),
 		_ctor(ctor),
 		_proto(proto)
 	{
 		set_prototype(proto);
-		//log_debug("as_super %p constructed with ctor %p and proto %p", this, ctor, proto);
 	}
 
 	virtual bool isSuper() const { return true; }
@@ -138,8 +138,7 @@ as_super::get_super(const char* fname)
 	as_object* proto = get_prototype().get(); 
 	if ( ! proto )
 	{
-		//log_debug("We (a super) have no associated prototype, returning a null-referencing as_super from get_super()");
-		return new as_super(0, 0);
+		return new as_super(*getGlobal(*this), 0, 0);
 	}
 
 	// proto's __proto__ is superProto 
@@ -211,7 +210,7 @@ as_super::get_super(const char* fname)
 		}
 	}
 
-	as_object* super = new as_super(superCtor, superProto);
+	as_object* super = new as_super(*getGlobal(*this), superCtor, superProto);
 
 	return super;
 }
@@ -389,7 +388,7 @@ as_object::get_super(const char* fname)
 	// proto's __constructor__ is superCtor
 	as_function* superCtor = proto ? proto->get_constructor() : 0;
 
-	as_object* super = new as_super(superCtor, superProto);
+	as_object* super = new as_super(*getGlobal(*this), superCtor, superProto);
 
 	return super;
 }
@@ -830,7 +829,9 @@ as_object::add_interface(as_object* obj)
 bool
 as_object::instanceOf(as_object* ctor)
 {
-//#define GNASH_DEBUG_INSTANCE_OF 1
+
+    /// An object is never an instance of a null prototype.
+    if (!ctor) return false;
 
 	as_value protoVal;
 	if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal) )
@@ -841,7 +842,7 @@ as_object::instanceOf(as_object* ctor)
 #endif
 		return false;
 	}
-	as_object* ctorProto = protoVal.to_object().get();
+	as_object* ctorProto = protoVal.to_object(*getGlobal(*this)).get();
 	if ( ! ctorProto )
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
@@ -1001,7 +1002,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	boost::intrusive_ptr<as_object> props = props_val.to_object();
+	boost::intrusive_ptr<as_object> props = props_val.to_object(*getGlobal(*this));
 	Array_as* ary = dynamic_cast<Array_as*>(props.get());
 	if ( ! ary )
 	{
@@ -1074,6 +1075,12 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 }
 
+as_object::as_object(Global_as& gl)
+	:
+	_vm(getVM(gl)),
+	_members(_vm)
+{
+}
 
 as_object::as_object()
 	:
@@ -1148,7 +1155,7 @@ as_object::valueof_method(const fn_call& fn)
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
-	int swfVersion = _vm.getSWFVersion();
+	int swfVersion = getSWFVersion(*this);
 
 	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
 	if ( ! prop ) return 0;
@@ -1156,7 +1163,7 @@ as_object::get_prototype()
 
 	as_value tmp = prop->getValue(*this);
 
-	return tmp.to_object();
+	return tmp.to_object(*getGlobal(*this));
 }
 
 bool
@@ -1304,7 +1311,7 @@ as_object::get_path_element(string_table::key key)
 		return NULL;
 	}
 
-	return tmp.to_object().get();
+	return tmp.to_object(*getGlobal(*this)).get();
 }
 
 void

@@ -141,7 +141,7 @@ attachEventInterface(as_object& o)
 }
 
 void
-attachEventStaticInterface(as_object& o)
+attachEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -488,7 +488,7 @@ event_UNLOAD(const fn_call& fn)
 }
 
 as_value
-event_ctor(const fn_call& fn)
+event_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Event_as;
 

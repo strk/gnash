@@ -69,12 +69,12 @@ void dictionary_class_init(as_object& global)
 namespace {
 
 void
-attachDictionaryInterface(as_object& o)
+attachDictionaryInterface(as_object& /*o*/)
 {
 }
 
 void
-attachDictionaryStaticInterface(as_object& o)
+attachDictionaryStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getDictionaryInterface()
 }
 
 as_value
-dictionary_ctor(const fn_call& fn)
+dictionary_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Dictionary_as;
 

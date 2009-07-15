@@ -149,7 +149,7 @@ namespace {
     void registerNatives(as_object& global);
 }
 
-AVM2Global::AVM2Global(Machine& machine, VM& vm)
+AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     :
     _classes(this, 0),
     _vm(vm)
@@ -181,20 +181,38 @@ AVM2Global::AVM2Global(Machine& machine, VM& vm)
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(function);
+    return new builtin_function(*this, function);
 }
 
 as_object*
 AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
-    return new builtin_function(ctor, prototype);
+    return new builtin_function(*this, ctor, prototype);
 
+}
+
+as_object*
+AVM1Global::createString(const std::string& s)
+{
+    return init_string_instance(*this, s);
+}
+
+as_object*
+AVM1Global::createNumber(double d)
+{
+    return init_number_instance(*this, d);
+}
+
+as_object*
+AVM1Global::createBoolean(bool b)
+{
+    return init_boolean_instance(*this, b);
 }
 
 builtin_function*
 AVM2Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(function);
+    return new builtin_function(*this, function);
 }
 
 as_object*
@@ -202,7 +220,25 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
     // TODO: this should attach the function to the prototype as its
     // constructor member.
-    return new builtin_function(ctor, prototype);
+    return new builtin_function(*this, ctor, prototype);
+}
+
+as_object*
+AVM2Global::createString(const std::string& s)
+{
+    return init_string_instance(*this, s);
+}
+
+as_object*
+AVM2Global::createNumber(double d)
+{
+    return init_number_instance(*this, d);
+}
+
+as_object*
+AVM2Global::createBoolean(bool b)
+{
+    return init_boolean_instance(*this, b);
 }
 
 void 
@@ -777,7 +813,7 @@ global_assetpropflags(const fn_call& fn)
     );
     
     // object
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if ( ! obj ) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "
@@ -930,7 +966,7 @@ global_setInterval(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -1003,7 +1039,7 @@ global_setTimeout(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
 	if (!obj) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
@@ -1099,6 +1135,7 @@ registerNatives(as_object& global)
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
 
+    registerStringNative(global);
     registerArrayNative(global);
     registerMovieClipNative(global);
     registerSelectionNative(global);

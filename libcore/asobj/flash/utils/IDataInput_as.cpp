@@ -101,7 +101,7 @@ attachIDataInputInterface(as_object& o)
 }
 
 void
-attachIDataInputStaticInterface(as_object& o)
+attachIDataInputStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -247,7 +247,7 @@ idatainput_readUTFBytes(const fn_call& fn)
 }
 
 as_value
-idatainput_ctor(const fn_call& fn)
+idatainput_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IDataInput_as;
 

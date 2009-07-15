@@ -51,7 +51,7 @@ printjoborientation_class_init(as_object& global)
 namespace {
 
 void
-attachPrintJobOrientationStaticInterface(as_object& o)
+attachPrintJobOrientationStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

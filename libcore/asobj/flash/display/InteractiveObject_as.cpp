@@ -69,12 +69,12 @@ void interactiveobject_class_init(as_object& global)
 namespace {
 
 void
-attachInteractiveObjectInterface(as_object& o)
+attachInteractiveObjectInterface(as_object& /*o*/)
 {
 }
 
 void
-attachInteractiveObjectStaticInterface(as_object& o)
+attachInteractiveObjectStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getInteractiveObjectInterface()
 }
 
 as_value
-interactiveobject_ctor(const fn_call& fn)
+interactiveobject_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new InteractiveObject_as;
 

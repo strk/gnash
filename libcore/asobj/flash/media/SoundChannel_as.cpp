@@ -77,7 +77,7 @@ attachSoundChannelInterface(as_object& o)
 }
 
 void
-attachSoundChannelStaticInterface(as_object& o)
+attachSoundChannelStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -103,7 +103,7 @@ soundchannel_soundComplete(const fn_call& fn)
 }
 
 as_value
-soundchannel_ctor(const fn_call& fn)
+soundchannel_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundChannel_as;
 

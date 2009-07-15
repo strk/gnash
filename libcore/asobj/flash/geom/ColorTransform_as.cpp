@@ -354,24 +354,12 @@ ColorTransform_ctor(const fn_call& fn)
 }
 
 
-as_function* getFlashGeomColorTransformConstructor()
-{
-    static builtin_function* cl = NULL;
-    if ( ! cl )
-    {
-        cl=new builtin_function(&ColorTransform_ctor, getColorTransformInterface());
-        VM::get().addStatic(cl);
-    }
-    return cl;
-}
-
-
 static as_value
-get_flash_geom_color_transform_constructor(const fn_call& /*fn*/)
+get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
-
-    return getFlashGeomColorTransformConstructor();
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&ColorTransform_ctor, getColorTransformInterface());
 }
 
 

@@ -33,10 +33,10 @@
 namespace gnash {
 
 static as_value
-get_flash_external_package(const fn_call& fn)
+get_flash_external_package(const fn_call& /*fn*/)
 {
 
-	log_debug("Loading flash.external package");
+    log_debug("Loading flash.external package");
 
     as_object *pkg = new as_object(getObjectInterface());
 

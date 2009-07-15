@@ -1595,7 +1595,7 @@ netstream_new(const fn_call& fn)
     {
         boost::intrusive_ptr<NetConnection_as> ns =
             boost::dynamic_pointer_cast<NetConnection_as>(
-                    fn.arg(0).to_object());
+                    fn.arg(0).to_object(*getGlobal(fn)));
         if ( ns )
         {
             netstream_obj->setNetCon(ns);

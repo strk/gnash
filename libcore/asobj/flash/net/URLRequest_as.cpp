@@ -69,12 +69,12 @@ void urlrequest_class_init(as_object& global)
 namespace {
 
 void
-attachURLRequestInterface(as_object& o)
+attachURLRequestInterface(as_object& /*o*/)
 {
 }
 
 void
-attachURLRequestStaticInterface(as_object& o)
+attachURLRequestStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getURLRequestInterface()
 }
 
 as_value
-urlrequest_ctor(const fn_call& fn)
+urlrequest_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLRequest_as;
 

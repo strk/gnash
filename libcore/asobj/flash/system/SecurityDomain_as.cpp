@@ -69,12 +69,12 @@ void securitydomain_class_init(as_object& global)
 namespace {
 
 void
-attachSecurityDomainInterface(as_object& o)
+attachSecurityDomainInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSecurityDomainStaticInterface(as_object& o)
+attachSecurityDomainStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getSecurityDomainInterface()
 }
 
 as_value
-securitydomain_ctor(const fn_call& fn)
+securitydomain_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SecurityDomain_as;
 

@@ -69,12 +69,12 @@ void idynamicpropertywriter_class_init(as_object& global)
 namespace {
 
 void
-attachIDynamicPropertyWriterInterface(as_object& o)
+attachIDynamicPropertyWriterInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIDynamicPropertyWriterStaticInterface(as_object& o)
+attachIDynamicPropertyWriterStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +91,7 @@ getIDynamicPropertyWriterInterface()
 }
 
 as_value
-idynamicpropertywriter_ctor(const fn_call& fn)
+idynamicpropertywriter_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IDynamicPropertyWriter_as;
 

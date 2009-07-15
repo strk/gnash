@@ -600,9 +600,12 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
+	int _top_visible_line;
 	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
+	std::vector<int> _line_starts;
+	int _linesindisplay;
 
     /// Corresponds to the multiline property.
     bool _multiline;

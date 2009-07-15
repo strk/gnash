@@ -362,7 +362,7 @@ moviecliploader_getprogress(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(*getGlobal(fn));
   
 	if ( ! target.get() )
 	{
