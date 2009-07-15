@@ -372,7 +372,7 @@ system_security_allowdomain(const fn_call& fn)
 	// NOTE: Once the security portion (in the VM?) of this is implemented,
 	// this should probably return true only if access to the added domain was
 	// successfully granted
-    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else. It returns true if the string was successfuly added.") );
+    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else. It returns true if the string was successfuly stored.") );
 	for(unsigned int i = 0; i < fn.nargs; ++i) {
 		result = addAllowDataAccess( fn.arg(i).to_string());
 	}
