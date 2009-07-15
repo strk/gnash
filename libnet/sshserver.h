@@ -36,6 +36,7 @@
 extern "C" {
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
+#include <libssh/server.h>
 }
 
 #include "sshclient.h"
@@ -61,14 +62,29 @@ class DSOEXPORT SSHServer : public SSHClient {
     SSHServer();
     ~SSHServer();
     
+    // Authenticate the password from the user
     bool authPassword(std::string &user, std::string &passwd);
+    bool authPassword(SSH_SESSION *session, std::string &user, std::string &passwd);
+
+    // Wait for an incoming network connection
+    bool acceptConnections();
+    bool acceptConnections(short port);
+    bool acceptConnections(SSH_SESSION *session);
+    bool acceptConnections(SSH_SESSION *session, short port);
+
+    bool processSSHMessage(SSH_MESSAGE *message);
 
     bool commandLoop();
 
     void dump();
  protected:
-    SSH_SESSION *_session;
-    SSH_OPTIONS *_options;
+    // Get the SSH command message
+    SSH_MESSAGE *getSSHMessage();
+    SSH_MESSAGE *getSSHMessage(SSH_SESSION *session);
+
+    SSH_SESSION *_session;	// the current session
+    SSH_OPTIONS *_options;	// the current list of options
+    SSH_MESSAGE *_message;	// the current SSH command message
 };
     
 } // end of gnash namespace

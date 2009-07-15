@@ -100,8 +100,24 @@ public:
     int authKbdint();
     int authKbdint(SSH_SESSION *);
 
+    // Channel operations
+    CHANNEL *openChannel();
+    CHANNEL *openChannel(SSH_SESSION *session);
+
+    void closeChannel();
+    void closeChannel(CHANNEL *channel);
+
+    // Accessors
+    CHANNEL *getChannel()     { return _channel; };
+    SSH_SESSION *getSession() { return _session; };
+    boost::shared_ptr<amf::Buffer> &getBuffer()  { return _buffer; };
+
+    // Dump internal data to the screen for debugging
     void dump();
  protected:
+    int readChannel(CHANNEL *channel, amf::Buffer &buf);
+    int writeChannel(CHANNEL *channel, amf::Buffer &buf);
+
     std::string		_hostname;
     std::string		_user;
     std::string		_password;
@@ -115,7 +131,9 @@ public:
 #else
     SSH_SESSION *_session;
     SSH_OPTIONS *_options;
+    CHANNEL	*_channel;
 #endif
+    boost::shared_ptr<amf::Buffer> _buffer;
 };
     
 } // end of gnash namespace
