@@ -44,7 +44,7 @@ swf_function::~swf_function()
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	as_function(new as_object(getObjectInterface())),
+	as_function(*getGlobal(env), new as_object(getObjectInterface())),
 	m_action_buffer(ab),
 	m_env(env),
 	_scopeStack(scopeStack),

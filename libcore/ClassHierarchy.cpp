@@ -66,9 +66,10 @@ private:
 public:
     bool isBuiltin() { return true; }
 
-    declare_extension_function(ClassHierarchy::ExtensionClass &c,
-        as_object *g, Extension* e)
+    declare_extension_function(ClassHierarchy::ExtensionClass &c, as_object *g,
+            Extension* e)
         :
+        as_function(*getGlobal(*g)),
         mDeclaration(c),
         mTarget(g),
         mExtension(e)
@@ -128,9 +129,6 @@ public:
 
 class declare_native_function : public as_function
 {
-private:
-    ClassHierarchy::NativeClass mDeclaration;
-    as_object *mTarget;
 
 public:
     bool isBuiltin() { return true; }
@@ -138,6 +136,7 @@ public:
     declare_native_function(const ClassHierarchy::NativeClass &c,
         as_object *g)
         :
+        as_function(*getGlobal(*g)),
         mDeclaration(c),
         mTarget(g)
     {
@@ -200,6 +199,11 @@ public:
         }
         return us;
     }
+
+private:
+    ClassHierarchy::NativeClass mDeclaration;
+    as_object *mTarget;
+
 };
 
 } // end anonymous namespace

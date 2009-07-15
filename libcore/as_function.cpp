@@ -60,9 +60,9 @@ namespace {
 // the Function class itself, which would be a member
 // of the _global object for each movie instance.
 
-as_function::as_function(as_object* iface)
+as_function::as_function(Global_as& gl, as_object* iface)
 	:
-	as_object()
+	as_object(gl)
 {
 	int flags = as_prop_flags::dontDelete |
 	            as_prop_flags::dontEnum |
@@ -76,9 +76,9 @@ as_function::as_function(as_object* iface)
 	}
 }
 
-as_function::as_function()
+as_function::as_function(Global_as& gl)
 	:
-	as_object()
+	as_object(gl)
 {
 	int flags = as_prop_flags::dontDelete |
 	            as_prop_flags::dontEnum | 
@@ -125,7 +125,8 @@ as_function::getFunctionConstructor()
 	static boost::intrusive_ptr<builtin_function> func = NULL;
 	if ( ! func )
 	{
-		func = new builtin_function(function_ctor, getFunctionPrototype(),
+        Global_as* gl = VM::get().getGlobal();
+		func = new builtin_function(*gl, function_ctor, getFunctionPrototype(),
                 true);
 		VM::get().addStatic(func.get());
 	}

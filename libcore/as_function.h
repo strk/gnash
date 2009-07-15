@@ -25,6 +25,7 @@
 namespace gnash {
 	class fn_call;
 	class builtin_function;
+	class Global_as;
 }
 
 namespace gnash {
@@ -125,6 +126,23 @@ public:
 #endif // GNASH_USE_GC
 
 protected:
+	
+    /// Construct a function with no interface
+	//
+	/// For SWF>5 the function object will have derive from Function.
+	///
+	as_function(Global_as& gl);
+
+	/// Construct a function with given interface (possibly none)
+	//
+	/// @param iface
+	///	The interface exported by this class (its 'prototype' member).
+	///	If NULL, no prototype will be set (this is used for some
+	///	corner cases like TextField in SWF5 or below).
+	///	If not NULL, a 'constructor' member will be added to the
+	///	prototype, pointing to 'this'.
+	///
+	as_function(Global_as& gl, as_object* iface);
 
 #ifdef GNASH_USE_GC
 	/// Mark prototype (properties) as being reachable and invoke
@@ -141,30 +159,6 @@ protected:
 	}
 #endif // GNASH_USE_GC
 
-	/// Construct a function with no interface
-	//
-	/// For SWF>5 the function object will have derive from Function.
-	///
-	as_function();
-
-	/// Construct a function with given interface (possibly none)
-	//
-	/// @param iface
-	///	The interface exported by this class (its 'prototype' member).
-	///	If NULL, no prototype will be set (this is used for some
-	///	corner cases like TextField in SWF5 or below).
-	///	If not NULL, a 'constructor' member will be added to the
-	///	prototype, pointing to 'this'.
-	///
-	as_function(as_object* iface);
-
-	/// The "prototype" member.
-	//
-	/// Used for class constructor and members
-	/// to be inherited by instances of this
-	/// "Function" (class)
-	///
-	//boost::intrusive_ptr<as_object>	_properties;
 
 private:
 
