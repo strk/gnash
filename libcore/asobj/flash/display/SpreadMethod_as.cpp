@@ -51,7 +51,7 @@ spreadmethod_class_init(as_object& global)
 namespace {
 
 void
-attachSpreadMethodStaticInterface(as_object& o)
+attachSpreadMethodStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

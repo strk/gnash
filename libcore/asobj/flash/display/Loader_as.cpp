@@ -81,7 +81,7 @@ attachLoaderInterface(as_object& o)
 }
 
 void
-attachLoaderStaticInterface(as_object& o)
+attachLoaderStaticInterface(as_object& /*o*/)
 {
 
 }

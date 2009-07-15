@@ -81,7 +81,7 @@ attachDataEventInterface(as_object& o)
 }
 
 void
-attachDataEventStaticInterface(as_object& o)
+attachDataEventStaticInterface(as_object& /*o*/)
 {
 
 }

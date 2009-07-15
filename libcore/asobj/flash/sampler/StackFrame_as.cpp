@@ -81,7 +81,7 @@ attachStackFrameInterface(as_object& o)
 }
 
 void
-attachStackFrameStaticInterface(as_object& o)
+attachStackFrameStaticInterface(as_object& /*o*/)
 {
 
 }

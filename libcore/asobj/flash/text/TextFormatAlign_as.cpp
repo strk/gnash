@@ -55,7 +55,6 @@ namespace {
 void
 attachTextFormatAlignStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     o.init_member("CENTER", "center");
     o.init_member("JUSTIFY", "justify");
     o.init_member("LEFT", "left");

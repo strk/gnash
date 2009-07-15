@@ -51,7 +51,7 @@ actionscriptversion_class_init(as_object& global)
 namespace {
 
 void
-attachActionScriptVersionStaticInterface(as_object& o)
+attachActionScriptVersionStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

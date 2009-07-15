@@ -51,7 +51,7 @@ pixelsnapping_class_init(as_object& global)
 namespace {
 
 void
-attachPixelSnappingStaticInterface(as_object& o)
+attachPixelSnappingStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

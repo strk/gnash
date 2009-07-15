@@ -49,7 +49,7 @@ bitmapfiltertype_class_init(as_object& global)
 namespace {
 
 void
-attachBitmapFilterTypeStaticInterface(as_object& o)
+attachBitmapFilterTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: attach constants.
 }

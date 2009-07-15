@@ -141,7 +141,7 @@ attachEventInterface(as_object& o)
 }
 
 void
-attachEventStaticInterface(as_object& o)
+attachEventStaticInterface(as_object& /*o*/)
 {
 
 }

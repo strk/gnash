@@ -77,7 +77,7 @@ attachIExternalizableInterface(as_object& o)
 }
 
 void
-attachIExternalizableStaticInterface(as_object& o)
+attachIExternalizableStaticInterface(as_object& /*o*/)
 {
 }
 

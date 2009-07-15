@@ -386,7 +386,7 @@ private:
 };
 
 void
-attachTextSnapshotStaticInterface(as_object& o)
+attachTextSnapshotStaticInterface(as_object& /*o*/)
 {
 
 }

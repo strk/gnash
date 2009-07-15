@@ -51,7 +51,7 @@ gradienttype_class_init(as_object& global)
 namespace {
 
 void
-attachGradientTypeStaticInterface(as_object& o)
+attachGradientTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

@@ -51,7 +51,7 @@ linescalemode_class_init(as_object& global)
 namespace {
 
 void
-attachLineScaleModeStaticInterface(as_object& o)
+attachLineScaleModeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

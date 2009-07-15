@@ -51,7 +51,7 @@ stagedisplaystate_class_init(as_object& where)
 namespace {
 
 void
-attachStageDisplayStateStaticInterface(as_object& o)
+attachStageDisplayStateStaticInterface(as_object& /*o*/)
 {
     // TODO: attach constants.
 }

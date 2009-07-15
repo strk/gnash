@@ -117,7 +117,7 @@ attachURLStreamInterface(as_object& o)
 }
 
 void
-attachURLStreamStaticInterface(as_object& o)
+attachURLStreamStaticInterface(as_object& /*o*/)
 {
 
 }

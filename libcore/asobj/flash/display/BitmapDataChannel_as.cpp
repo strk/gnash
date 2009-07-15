@@ -51,7 +51,7 @@ bitmapdatachannel_class_init(as_object& global)
 namespace {
 
 void
-attachBitmapDataChannelStaticInterface(as_object& o)
+attachBitmapDataChannelStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

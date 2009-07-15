@@ -51,7 +51,7 @@ textdisplaymode_class_init(as_object& global)
 namespace {
 
 void
-attachTextDisplayModeStaticInterface(as_object& o)
+attachTextDisplayModeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

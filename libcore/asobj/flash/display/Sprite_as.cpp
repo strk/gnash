@@ -77,7 +77,7 @@ attachSpriteInterface(as_object& o)
 }
 
 void
-attachSpriteStaticInterface(as_object& o)
+attachSpriteStaticInterface(as_object& /*o*/)
 {
 }
 

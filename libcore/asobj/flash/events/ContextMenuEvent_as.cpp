@@ -81,7 +81,7 @@ attachContextMenuEventInterface(as_object& o)
 }
 
 void
-attachContextMenuEventStaticInterface(as_object& o)
+attachContextMenuEventStaticInterface(as_object& /*o*/)
 {
 
 }

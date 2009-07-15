@@ -101,7 +101,7 @@ attachIDataInputInterface(as_object& o)
 }
 
 void
-attachIDataInputStaticInterface(as_object& o)
+attachIDataInputStaticInterface(as_object& /*o*/)
 {
 }
 

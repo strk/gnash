@@ -53,7 +53,6 @@ namespace {
 void
 attachStageScaleModeStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     o.init_member("EXACT_FIT", "exactFit");
     o.init_member("NO_BORDER", "noBorder");
     o.init_member("NO_SCALE", "noScale");
