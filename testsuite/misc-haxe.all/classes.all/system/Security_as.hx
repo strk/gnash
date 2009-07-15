@@ -41,6 +41,9 @@ import DejaGnu;
 
 // Class must be named with the _as3 suffix, as that's the same name as the file.
 class Security_as {
+
+	static var undef = untyped __global__["undefined"];
+
     static function main() {
 
         // Make sure we actually get a valid class        
@@ -96,6 +99,9 @@ class Security_as {
 	} else {
 	    DejaGnu.fail("Security::allowDomain() method doesn't exist");
 	}
+    var ret = Security.allowDomain("cnn.com");
+    DejaGnu.note("ret = " + ret);
+
 	if (Type.typeof(Security.allowInsecureDomain) == TFunction) {
 	    DejaGnu.pass("Security::allowInsecureDomain() method exists");
 	} else {
