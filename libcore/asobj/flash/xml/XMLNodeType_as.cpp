@@ -45,7 +45,8 @@ xmlnodetype_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachXMLNodeTypeStaticInterface(*o);
-    global.init_member("XMLNodeType", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

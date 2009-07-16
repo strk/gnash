@@ -45,7 +45,8 @@ swfversion_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachSWFVersionStaticInterface(*o);
-    global.init_member("SWFVersion", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -73,7 +73,8 @@ BlurFilter_as::registerCtor(as_object& global)
     cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());
     BlurFilter_as::attachInterface(*cl);
 
-    global.init_member("BlurFilter" , cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

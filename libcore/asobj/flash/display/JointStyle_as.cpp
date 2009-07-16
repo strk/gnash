@@ -45,7 +45,8 @@ jointstyle_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachJointStyleStaticInterface(*o);
-    global.init_member("JointStyle", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
