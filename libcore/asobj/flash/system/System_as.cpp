@@ -70,7 +70,8 @@ system_class_init(as_object& global, const ObjectURI& uri)
 
 	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachSystemInterface(*obj);
-	global.init_member("System", obj.get());
+	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

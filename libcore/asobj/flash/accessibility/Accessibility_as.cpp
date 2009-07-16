@@ -63,7 +63,8 @@ void accessibility_class_init(as_object& global, const ObjectURI& uri)
     boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
     attachAccessibilityInterface(*obj);
     // Register _global.Accessibility
-    global.init_member("Accessibility", obj.get());
+    global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

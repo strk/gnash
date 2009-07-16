@@ -61,7 +61,8 @@ mouse_class_init(as_object& global, const ObjectURI& uri)
     attachMouseInterface(*obj);
 
     // Register _global.Mouse
-    global.init_member("Mouse", obj.get());
+    global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
