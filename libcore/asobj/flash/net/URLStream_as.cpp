@@ -84,7 +84,8 @@ void urlstream_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.URLStream
-    global.init_member("URLStream", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -65,7 +65,8 @@ void printjob_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.PrintJob
-    global.init_member("PrintJob", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

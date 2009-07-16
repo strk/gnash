@@ -83,7 +83,8 @@ void TextSnapshot_as::init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.TextSnapshot
-    global.init_member("TextSnapshot", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 /// The member _textFields is initialized here unnecessarily to show

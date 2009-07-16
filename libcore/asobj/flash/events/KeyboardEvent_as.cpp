@@ -67,7 +67,8 @@ void keyboardevent_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.KeyboardEvent
-    global.init_member("KeyboardEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -72,7 +72,8 @@ void proxy_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.Proxy
-    global.init_member("Proxy", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

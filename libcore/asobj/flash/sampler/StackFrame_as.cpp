@@ -66,7 +66,8 @@ void stackframe_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.StackFrame
-    global.init_member("StackFrame", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

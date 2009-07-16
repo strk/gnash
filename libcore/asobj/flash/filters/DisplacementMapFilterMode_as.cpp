@@ -45,7 +45,8 @@ void displacementmapfiltermode_class_init(as_object& global, const ObjectURI& ur
     attachDisplacementMapFilterModeStaticInterface(*cl);
 
     // Register _global.DisplacementMapFilterMode
-    global.init_member("DisplacementMapFilterMode", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

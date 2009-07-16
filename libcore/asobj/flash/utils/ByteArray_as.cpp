@@ -91,7 +91,8 @@ void bytearray_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.ByteArray
-    global.init_member("ByteArray", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

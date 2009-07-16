@@ -67,7 +67,8 @@ qname_class_init(as_object& where, const ObjectURI& uri)
     Global_as* gl = getGlobal(where);
     cl = gl->createClass(&qname_ctor, getQNameInterface());
 
-    where.init_member("QName", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

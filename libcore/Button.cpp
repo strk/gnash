@@ -1132,7 +1132,8 @@ Button::init(as_object& global, const ObjectURI& uri)
   }
 
   // Register _global.MovieClip
-  global.init_member("Button", cl.get());
+  global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 #ifdef USE_SWFTREE

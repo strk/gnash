@@ -150,7 +150,8 @@ TextFormat_as::init(as_object& global, const ObjectURI& uri)
 	}
 
 	// Register _global.Color
-	global.init_member("TextFormat", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

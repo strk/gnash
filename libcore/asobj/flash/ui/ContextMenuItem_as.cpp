@@ -53,7 +53,8 @@ contextmenuitem_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.ContextMenuItem
-    global.init_member("ContextMenuItem", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

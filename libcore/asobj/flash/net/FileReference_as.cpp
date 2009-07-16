@@ -249,7 +249,8 @@ void filereference_class_init(as_object& where, const ObjectURI& uri)
     attachFileReferenceStaticProperties(*cl);
 
     // Register _global.FileReference
-    where.init_member("FileReference", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

@@ -63,7 +63,8 @@ void stackoverflowerror_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.StackOverflowError
-    global.init_member("StackOverflowError", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

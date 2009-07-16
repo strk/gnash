@@ -66,7 +66,8 @@ void progressevent_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.ProgressEvent
-    global.init_member("ProgressEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

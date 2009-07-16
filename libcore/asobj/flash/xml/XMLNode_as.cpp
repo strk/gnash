@@ -455,7 +455,8 @@ XMLNode_as::init(as_object& global, const ObjectURI& uri)
         cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());
     }
 
-    global.init_member("XMLNode", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

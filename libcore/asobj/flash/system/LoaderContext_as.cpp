@@ -63,7 +63,8 @@ void loadercontext_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.LoaderContext
-    global.init_member("LoaderContext", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

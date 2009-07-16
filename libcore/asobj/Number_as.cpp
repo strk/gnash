@@ -202,7 +202,8 @@ void number_class_init(as_object& global, const ObjectURI& uri)
     boost::intrusive_ptr<as_object> cl = getNumberClass(*getGlobal(global));
 
     // Register _global.Number
-    global.init_member("Number", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

@@ -226,7 +226,8 @@ void displacementmapfilter_class_init(as_object& where, const ObjectURI& uri)
 	attachDisplacementMapFilterStaticProperties(*cl);
 
 	// Register _global.DisplacementMapFilter
-	where.init_member("DisplacementMapFilter", cl.get());
+	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

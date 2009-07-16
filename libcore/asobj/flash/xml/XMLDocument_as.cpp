@@ -631,7 +631,8 @@ XMLDocument_as::init(as_object& global, const ObjectURI& uri)
         cl = gl->createClass(&xml_new, getXMLInterface());
     }
     
-    global.init_member("XML", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

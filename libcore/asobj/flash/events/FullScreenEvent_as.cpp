@@ -65,7 +65,8 @@ void fullscreenevent_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.FullScreenEvent
-    global.init_member("FullScreenEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

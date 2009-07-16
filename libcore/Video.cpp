@@ -310,7 +310,8 @@ video_class_init(as_object& global, const ObjectURI& uri)
 	}
 
 	// Register _global.Video
-	global.init_member("Video", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 rect

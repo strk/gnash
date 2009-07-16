@@ -76,7 +76,8 @@ void int_class_init(as_object& global, const ObjectURI& uri)
         cl = gl->createClass(&int_ctor, getintInterface());
 
 	// Register _global.DisplayObject
-	global.init_member("int", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 std::auto_ptr<as_object>

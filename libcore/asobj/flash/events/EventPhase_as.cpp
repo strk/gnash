@@ -63,7 +63,8 @@ void eventphase_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.EventPhase
-    global.init_member("EventPhase", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

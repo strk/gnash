@@ -63,7 +63,8 @@ void urlrequestheader_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.URLRequestHeader
-    global.init_member("URLRequestHeader", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

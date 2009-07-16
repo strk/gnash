@@ -83,7 +83,8 @@ void textfield_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.TextField
-    global.init_member("TextField", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

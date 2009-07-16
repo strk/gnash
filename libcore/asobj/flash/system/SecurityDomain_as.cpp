@@ -63,7 +63,8 @@ void securitydomain_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.SecurityDomain
-    global.init_member("SecurityDomain", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

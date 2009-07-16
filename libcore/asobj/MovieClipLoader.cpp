@@ -238,7 +238,8 @@ moviecliploader_class_init(as_object& global, const ObjectURI& uri)
 		cl = gl->createClass(&moviecliploader_new,
                 getMovieClipLoaderInterface());
 	}
-	global.init_member("MovieClipLoader", cl.get()); 
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri)); 
 }
 
 

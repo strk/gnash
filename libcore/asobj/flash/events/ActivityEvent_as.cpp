@@ -65,7 +65,8 @@ void activityevent_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.ActivityEvent
-    global.init_member("ActivityEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

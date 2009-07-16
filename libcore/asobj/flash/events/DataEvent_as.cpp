@@ -66,7 +66,8 @@ void dataevent_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.DataEvent
-    global.init_member("DataEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

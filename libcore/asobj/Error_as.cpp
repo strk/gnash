@@ -68,7 +68,8 @@ void Error_class_init(as_object& where, const ObjectURI& uri)
         gl->createClass(&error_ctor, getErrorInterface());
 
 	// Register _global.Error
-	where.init_member("Error", cl.get());
+	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

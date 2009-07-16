@@ -63,7 +63,8 @@ void scripttimeouterror_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.ScriptTimeoutError
-    global.init_member("ScriptTimeoutError", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

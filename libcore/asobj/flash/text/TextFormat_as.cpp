@@ -63,7 +63,8 @@ void textformat_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.TextFormat
-    global.init_member("TextFormat", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

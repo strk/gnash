@@ -139,7 +139,8 @@ void textrenderer_class_init(as_object& where, const ObjectURI& uri)
     attachTextRendererStaticProperties(*cl);
 
     // Register _global.TextRenderer
-    where.init_member("TextRenderer", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

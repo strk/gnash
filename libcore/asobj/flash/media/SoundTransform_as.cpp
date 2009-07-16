@@ -63,7 +63,8 @@ void soundtransform_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.SoundTransform
-    global.init_member("SoundTransform", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

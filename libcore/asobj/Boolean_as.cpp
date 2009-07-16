@@ -74,7 +74,8 @@ void boolean_class_init(as_object& global, const ObjectURI& uri)
     boost::intrusive_ptr<as_object> cl = getBooleanClass(*getGlobal(global));
 
     // Register _global.Boolean
-    global.init_member("Boolean", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

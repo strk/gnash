@@ -67,7 +67,8 @@ void timerevent_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.TimerEvent
-    global.init_member("TimerEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

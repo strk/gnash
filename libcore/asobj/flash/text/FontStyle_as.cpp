@@ -63,7 +63,8 @@ void fontstyle_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.FontStyle
-    global.init_member("FontStyle", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -148,7 +148,8 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
         getVM(where).addStatic(cl.get());
     }
 
-    where.init_member("MovieClip", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 as_object*

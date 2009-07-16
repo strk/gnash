@@ -45,7 +45,8 @@ void bitmapfilterquality_class_init(as_object& global, const ObjectURI& uri)
     attachBitmapFilterQualityStaticInterface(*cl);
 
     // Register _global.BitmapFilterQuality
-    global.init_member("BitmapFilterQuality", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

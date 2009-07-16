@@ -63,7 +63,8 @@ void objectencoding_class_init(as_object& global, const ObjectURI& uri)
     }
 
     // Register _global.ObjectEncoding
-    global.init_member("ObjectEncoding", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
