@@ -40,11 +40,12 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-clipboardtransfermode_class_init(as_object& where)
+clipboardtransfermode_class_init(as_object& where, const ObjectURI& uri)
 {
     static as_object* obj = new as_object(getObjectInterface());
     attachClipboardTransferModeStaticInterface(*obj);
-    where.init_member("ClipboardTransferMode", obj);
+    where.init_member(getName(uri), obj, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

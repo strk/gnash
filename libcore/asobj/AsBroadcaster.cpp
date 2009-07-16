@@ -158,9 +158,9 @@ AsBroadcaster::getAsBroadcaster()
         obj = gl->createClass(asbroadcaster_ctor, getAsBroadcasterInterface()); 
         vm.addStatic(obj.get()); // correct ?
 
-        const int flags = as_prop_flags::dontEnum |
-                          as_prop_flags::dontDelete |
-                          as_prop_flags::onlySWF6Up;
+        const int flags = PropFlags::dontEnum |
+                          PropFlags::dontDelete |
+                          PropFlags::onlySWF6Up;
 
         // NOTE: we may add NSV::PROP_INITIALIZE, unavailable at
         // time of writing. Anyway, since AsBroadcaster is the only
@@ -190,10 +190,11 @@ AsBroadcaster::registerNative(as_object& global)
 
 
 void
-AsBroadcaster::init(as_object& global)
+AsBroadcaster::init(as_object& global, const ObjectURI& uri)
 {
     // _global.AsBroadcaster is NOT a class, but a simple object
-    global.init_member("AsBroadcaster", AsBroadcaster::getAsBroadcaster());
+    global.init_member(getName(uri), AsBroadcaster::getAsBroadcaster(),
+            as_object::DefaultFlags, getNamespace(uri));
 }
 
 

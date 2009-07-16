@@ -151,7 +151,7 @@ FileReferenceList_ctor(const fn_call& fn)
 }
 
 // extern 
-void filereferencelist_class_init(as_object& where)
+void filereferencelist_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the FileReferenceList "class"/"function"
     // in the 'where' package
@@ -161,7 +161,8 @@ void filereferencelist_class_init(as_object& where)
     attachFileReferenceListStaticProperties(*cl);
 
     // Register _global.FileReferenceList
-    where.init_member("FileReferenceList", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

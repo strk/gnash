@@ -28,9 +28,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global TextFieldType class
-void textfieldtype_class_init(as_object& global);
+void textfieldtype_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

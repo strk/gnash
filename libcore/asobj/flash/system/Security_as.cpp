@@ -59,7 +59,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void security_class_init(as_object& global)
+void security_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -70,7 +70,8 @@ void security_class_init(as_object& global)
     }
 
     // Register _global.Security
-    global.init_member("Security", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

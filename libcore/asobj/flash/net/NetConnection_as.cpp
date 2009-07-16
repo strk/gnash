@@ -59,7 +59,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void netconnection_class_init(as_object& global)
+void netconnection_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -70,7 +70,8 @@ void netconnection_class_init(as_object& global)
     }
 
     // Register _global.NetConnection
-    global.init_member("NetConnection", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

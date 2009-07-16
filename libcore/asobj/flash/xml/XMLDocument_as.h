@@ -68,7 +68,7 @@ public:
 
     ~XMLDocument_as() {};
     
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
     static void registerNative(as_object& global);
 
     /// Convert the XML object to a string

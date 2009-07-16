@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void sample_class_init(as_object& global)
+void sample_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,7 +63,8 @@ void sample_class_init(as_object& global)
     }
 
     // Register _global.Sample
-    global.init_member("Sample", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -56,7 +56,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void timer_class_init(as_object& global)
+void timer_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -67,7 +67,8 @@ void timer_class_init(as_object& global)
     }
 
     // Register _global.Timer
-    global.init_member("Timer", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

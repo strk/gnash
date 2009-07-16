@@ -55,7 +55,7 @@ public:
 	NetConnection_as();
 	~NetConnection_as();
 
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
 
     /// Process connection stuff
     virtual void advanceState();
@@ -130,7 +130,7 @@ private:
     void stopAdvanceTimer();
 };
 
-void netconnection_class_init(as_object& global);
+void netconnection_class_init(as_object& global, const ObjectURI& uri);
 
 } // end of gnash namespace
 

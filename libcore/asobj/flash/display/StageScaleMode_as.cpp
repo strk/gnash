@@ -39,12 +39,13 @@ namespace {
 }
 
 void
-stagescalemode_class_init(as_object& where)
+stagescalemode_class_init(as_object& where, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
     attachStageScaleModeStaticInterface(*obj);
 
-    where.init_member("StageScaleMode", obj.get());
+    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

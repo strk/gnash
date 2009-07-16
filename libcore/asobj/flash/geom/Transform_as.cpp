@@ -102,16 +102,12 @@ truncateDouble(double d)
 
 // extern 
 void
-transform_class_init(as_object& where)
+transform_class_init(as_object& where, const ObjectURI& uri)
 {
-
-	// Register _global.Transform
-    string_table& st = getStringTable(where);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    where.init_destructive_property(st.find("Transform"), 
-		    get_flash_geom_transform_constructor, flags);
+    where.init_destructive_property(getName(uri), 
+		    get_flash_geom_transform_constructor, flags, getNamespace(uri));
 
 }
 
@@ -401,7 +397,7 @@ getTransformInterface()
 void
 attachTransformInterface(as_object& o)
 {
-    const int protectedFlags = as_prop_flags::isProtected;
+    const int protectedFlags = PropFlags::isProtected;
 
     o.init_property("matrix", Transform_matrix, Transform_matrix,
             protectedFlags);

@@ -16,23 +16,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_CUSTOMACTIONS_H__
-#define __GNASH_ASOBJ_CUSTOMACTIONS_H__
-
-#include <memory> // for auto_ptr
+#ifndef GNASH_ASOBJ_CUSTOMACTIONS_H
+#define GNASH_ASOBJ_CUSTOMACTIONS_H
 
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global CustomActions class
-void customactions_class_init(as_object& global);
+void customactions_class_init(as_object& global, const ObjectURI& uri);
 
-/// Return a CustomActions instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_customactions_instance();
   
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_CUSTOMACTIONS_H__
 #endif
 

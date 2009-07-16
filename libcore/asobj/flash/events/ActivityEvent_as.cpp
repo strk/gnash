@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void activityevent_class_init(as_object& global)
+void activityevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void activityevent_class_init(as_object& global)
     }
 
     // Register _global.ActivityEvent
-    global.init_member("ActivityEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -350,8 +350,8 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         array = new Array_as;
         // This property is always initialized on the first call to
         // addRequestHeaders.
-        const int flags = as_prop_flags::dontEnum |
-                          as_prop_flags::dontDelete;
+        const int flags = PropFlags::dontEnum |
+                          PropFlags::dontDelete;
 
         ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
     }

@@ -27,9 +27,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global QName class
-void qname_class_init(as_object& global);
+void qname_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

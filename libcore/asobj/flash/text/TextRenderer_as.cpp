@@ -129,7 +129,7 @@ TextRenderer_ctor(const fn_call& fn)
 }
 
 // extern 
-void textrenderer_class_init(as_object& where)
+void textrenderer_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the TextRenderer "class"/"function"
     // in the 'where' package
@@ -139,7 +139,8 @@ void textrenderer_class_init(as_object& where)
     attachTextRendererStaticProperties(*cl);
 
     // Register _global.TextRenderer
-    where.init_member("TextRenderer", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

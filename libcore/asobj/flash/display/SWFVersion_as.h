@@ -27,11 +27,12 @@
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 namespace gnash {
 
 /// Initialize the global SWFVersion class
-void swfversion_class_init(as_object& global);
+void swfversion_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

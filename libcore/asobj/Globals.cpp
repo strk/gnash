@@ -23,7 +23,7 @@
 #endif
 
 #include "as_object.h"
-#include "as_prop_flags.h"
+#include "PropFlags.h"
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "Array_as.h"
@@ -160,11 +160,12 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     init_member("trace", createFunction(global_trace));
     init_member("escape", createFunction(global_escape));
    
-    object_class_init(*this); 
-    string_class_init(*this); 
-    array_class_init(*this); 
+    const string_table::key NS_GLOBAL(0);
 
-    function_class_init(*this);
+    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
 
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
     
@@ -266,7 +267,7 @@ AVM1Global::registerClasses()
     // Not enumerable but overridable and deletable.
     //
     as_value nullVal; nullVal.set_null();
-    init_member("o", nullVal, as_prop_flags::dontEnum);
+    init_member("o", nullVal, PropFlags::dontEnum);
 
     // _global functions.            
     // These functions are only available in SWF6+, but this is just
@@ -287,15 +288,16 @@ AVM1Global::registerClasses()
 
     _classes.declareAll(avm1Classes());
 
-    object_class_init(*this); 
-    string_class_init(*this); 
-    array_class_init(*this); 
+    const string_table::key NS_GLOBAL(0);
 
-    /// SWF6 visibility:
-    function_class_init(*this);
+    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
 
     // SWF8 visibility:
-    flash_package_init(*this); 
+    const string_table::key NS_FLASH = getStringTable(*this).find("flash");
+    flash_package_init(*this, ObjectURI(NS_FLASH, NS_GLOBAL)); 
 
     const int version = _vm.getSWFVersion();
 
@@ -827,14 +829,14 @@ global_assetpropflags(const fn_call& fn)
 
     const as_value& props = fn.arg(1);
 
-    const int flagsMask = as_prop_flags::dontEnum |
-                          as_prop_flags::dontDelete |
-                          as_prop_flags::readOnly |
-                          as_prop_flags::onlySWF6Up |
-                          as_prop_flags::ignoreSWF6 |
-                          as_prop_flags::onlySWF7Up |
-                          as_prop_flags::onlySWF8Up |
-                          as_prop_flags::onlySWF9Up;
+    const int flagsMask = PropFlags::dontEnum |
+                          PropFlags::dontDelete |
+                          PropFlags::readOnly |
+                          PropFlags::onlySWF6Up |
+                          PropFlags::ignoreSWF6 |
+                          PropFlags::onlySWF7Up |
+                          PropFlags::onlySWF8Up |
+                          PropFlags::onlySWF9Up;
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,

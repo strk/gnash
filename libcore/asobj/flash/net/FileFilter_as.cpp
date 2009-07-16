@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void filefilter_class_init(as_object& global)
+void filefilter_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,7 +63,8 @@ void filefilter_class_init(as_object& global)
     }
 
     // Register _global.FileFilter
-    global.init_member("FileFilter", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -54,7 +54,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-displayobjectcontainer_class_init(as_object& where)
+displayobjectcontainer_class_init(as_object& where, const ObjectURI& uri)
 {
     
     // This should never be called during AVM1 execution!
@@ -69,7 +69,8 @@ displayobjectcontainer_class_init(as_object& where)
     }
 
     // Register _global.DisplayObjectContainer
-    where.init_member("DisplayObjectContainer", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 as_object*

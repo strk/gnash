@@ -72,7 +72,7 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void TextSnapshot_as::init(as_object& global)
+void TextSnapshot_as::init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -83,7 +83,8 @@ void TextSnapshot_as::init(as_object& global)
     }
 
     // Register _global.TextSnapshot
-    global.init_member("TextSnapshot", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 /// The member _textFields is initialized here unnecessarily to show
@@ -395,7 +396,7 @@ void
 attachTextSnapshotInterface(as_object& o)
 {
 
-    const int flags = as_prop_flags::onlySWF6Up;
+    const int flags = PropFlags::onlySWF6Up;
 
     Global_as* gl = getGlobal(o);
 	o.init_member("findText", gl->createFunction(textsnapshot_findText),

@@ -42,7 +42,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-contextmenuitem_class_init(as_object& global)
+contextmenuitem_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -53,7 +53,8 @@ contextmenuitem_class_init(as_object& global)
     }
 
     // Register _global.ContextMenuItem
-    global.init_member("ContextMenuItem", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -61,9 +62,9 @@ namespace {
 void
 attachContextMenuItemInterface(as_object& o)
 {
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::onlySWF7Up;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::onlySWF7Up;
 
     Global_as* gl = getGlobal(o);
     o.init_member("copy", gl->createFunction(contextmenuitem_copy), flags);

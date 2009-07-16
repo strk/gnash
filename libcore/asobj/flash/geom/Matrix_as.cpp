@@ -901,16 +901,12 @@ get_flash_geom_matrix_constructor(const fn_call& fn)
 }
 
 // extern 
-void matrix_class_init(as_object& where)
+void matrix_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the Matrix "class"/"function"
-    // in the 'where' package
-    string_table& st = getStringTable(where);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    where.init_destructive_property(st.find("Matrix"),
-            get_flash_geom_matrix_constructor, flags);
+    where.init_destructive_property(getName(uri),
+            get_flash_geom_matrix_constructor, flags, getNamespace(uri));
 }
 
 } // end of gnash namespace

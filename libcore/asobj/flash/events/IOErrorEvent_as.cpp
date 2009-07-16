@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void ioerrorevent_class_init(as_object& global)
+void ioerrorevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void ioerrorevent_class_init(as_object& global)
     }
 
     // Register _global.IOErrorEvent
-    global.init_member("IOErrorEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

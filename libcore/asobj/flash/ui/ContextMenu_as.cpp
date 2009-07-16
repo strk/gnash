@@ -50,7 +50,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-contextmenu_class_init(as_object& global)
+contextmenu_class_init(as_object& global, const ObjectURI& uri)
 {
 	static boost::intrusive_ptr<as_object> cl;
 
@@ -60,7 +60,8 @@ contextmenu_class_init(as_object& global)
 	}
 
 	// Register _global.ContextMenu
-	global.init_member("ContextMenu", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 
@@ -85,9 +86,9 @@ setBuiltInItems(as_object& o, bool setting)
 void
 attachContextMenuInterface(as_object& o)
 {
-    const int flags = as_prop_flags::dontDelete |
-                      as_prop_flags::dontEnum |
-                      as_prop_flags::onlySWF7Up;
+    const int flags = PropFlags::dontDelete |
+                      PropFlags::dontEnum |
+                      PropFlags::onlySWF7Up;
 
     Global_as* gl = getGlobal(o);
     o.init_member("hideBuiltInItems",

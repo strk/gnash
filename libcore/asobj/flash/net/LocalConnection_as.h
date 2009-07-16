@@ -46,11 +46,11 @@ public:
 
     void send();
 
-    std::string &getName() { return _name; };
+    const std::string& name() { return _name; };
 
     bool connected() { return _connected; };
     
-    static void init(as_object& glob);
+    static void init(as_object& glob, const ObjectURI& uri);
 
 private:
     

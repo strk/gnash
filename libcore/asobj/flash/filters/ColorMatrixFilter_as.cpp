@@ -38,7 +38,6 @@ public:
     static as_object* Interface();
     static void attachInterface(as_object& o);
     static void attachProperties(as_object& o);
-    static void registerCtor(as_object& global);
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
@@ -58,7 +57,7 @@ as_object* ColorMatrixFilter_as::Interface() {
 }
 
 void
-ColorMatrixFilter_as::registerCtor(as_object& global)
+colormatrixfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
     if (!cl) return;
@@ -67,14 +66,9 @@ ColorMatrixFilter_as::registerCtor(as_object& global)
     cl = gl->createClass(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());
     ColorMatrixFilter_as::attachInterface(*cl);
 
-    global.init_member("ColorMatrixFilter" , cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
-}
-
-void
-colormatrixfilter_class_init(as_object& global)
-{
-    ColorMatrixFilter_as::registerCtor(global);
 }
 
 

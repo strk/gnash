@@ -29,9 +29,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global int class
-void int_class_init(as_object& global);
+void int_class_init(as_object& global, const ObjectURI& uri);
 
 /// Return an int instance
 std::auto_ptr<as_object> init_int_instance();

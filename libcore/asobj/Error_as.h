@@ -27,9 +27,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global Error class
-void Error_class_init(as_object& global);
+void Error_class_init(as_object& global, const ObjectURI& uri);
 
 } // end of gnash namespace
 

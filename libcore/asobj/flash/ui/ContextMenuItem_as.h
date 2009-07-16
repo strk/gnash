@@ -29,9 +29,10 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 /// Initialize the global ContextMenuItem class
-void contextmenuitem_class_init(as_object& global);
+void contextmenuitem_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

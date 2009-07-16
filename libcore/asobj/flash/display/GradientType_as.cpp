@@ -41,11 +41,12 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-gradienttype_class_init(as_object& global)
+gradienttype_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachGradientTypeStaticInterface(*o);
-    global.init_member("GradientType", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

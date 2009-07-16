@@ -72,7 +72,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void netstream_class_init(as_object& global)
+void netstream_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -83,7 +83,8 @@ void netstream_class_init(as_object& global)
     }
 
     // Register _global.NetStream
-    global.init_member("NetStream", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
