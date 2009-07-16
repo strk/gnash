@@ -1773,7 +1773,7 @@ movie_root::executeTimers()
 		}
 		else
 		{
-			size_t elapsed;
+			unsigned long elapsed;
 			if (timer->expired(now, elapsed))
 			{
 				expiredTimers.insert( std::make_pair(elapsed, timer) );
