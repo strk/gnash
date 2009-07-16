@@ -179,6 +179,18 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
 }
     
+as_object*
+AVM1Global::createObject()
+{
+    return new as_object;
+}
+
+as_object*
+AVM1Global::createObject(as_object* prototype)
+{
+    return new as_object(prototype);
+}
+    
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
@@ -208,6 +220,18 @@ as_object*
 AVM1Global::createBoolean(bool b)
 {
     return init_boolean_instance(*this, b);
+}
+    
+as_object*
+AVM2Global::createObject()
+{
+    return new as_object;
+}
+
+as_object*
+AVM2Global::createObject(as_object* prototype)
+{
+    return new as_object(prototype);
 }
 
 builtin_function*

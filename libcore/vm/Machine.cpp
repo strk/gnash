@@ -863,7 +863,7 @@ Machine::execute()
                         log_aserror(_("Can't push a null value onto the "
                                 "scope stack (%s)."), scope_value);
                         );
-                        scope_value = as_value(new as_object());
+                        scope_value = as_value(_global->createObject());
                     }	
                     push_scope_stack(scope_value);
                     break;
@@ -1607,7 +1607,7 @@ Machine::execute()
             /// NB: This builds an object from its properties, it's not a constructor.
                 case SWF::ABC_ACTION_NEWOBJECT:
                 {
-                    as_object *obj = new as_object(getObjectInterface());
+                    as_object *obj = _global->createObject(getObjectInterface());
                     boost::uint32_t argc = mStream->read_V32();
                     int i = argc;
                     while (i--)
