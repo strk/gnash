@@ -47,28 +47,28 @@ get_flash_filters_package(const fn_call& fn)
 	as_object *pkg = new as_object(getObjectInterface());
 
     string_table& st = getStringTable(fn);
-    const string_table::key where = st.find("filters");
+    const string_table::key global = 0;
 
 	bevelfilter_class_init(*pkg,
-            ObjectURI(st.find("BevelFilter"), where));
+            ObjectURI(st.find("BevelFilter"), global));
 	bitmapfilter_class_init(*pkg,
-            ObjectURI(st.find("BitmapFilter"), where));
+            ObjectURI(st.find("BitmapFilter"), global));
 	blurfilter_class_init(*pkg,
-            ObjectURI(st.find("BlurFilter"), where));
+            ObjectURI(st.find("BlurFilter"), global));
 	colormatrixfilter_class_init(*pkg,
-            ObjectURI(st.find("ColorMatrixFilter"), where));
+            ObjectURI(st.find("ColorMatrixFilter"), global));
 	convolutionfilter_class_init(*pkg,
-            ObjectURI(st.find("ConvolutionFilter"), where));
+            ObjectURI(st.find("ConvolutionFilter"), global));
 	displacementmapfilter_class_init(*pkg,
-            ObjectURI(st.find("DisplacementMapFilter"), where));
+            ObjectURI(st.find("DisplacementMapFilter"), global));
 	dropshadowfilter_class_init(*pkg,
-            ObjectURI(st.find("DropShadowFilter"), where));
+            ObjectURI(st.find("DropShadowFilter"), global));
 	glowfilter_class_init(*pkg,
-            ObjectURI(st.find("GlowFilter"), where));
+            ObjectURI(st.find("GlowFilter"), global));
 	gradientbevelfilter_class_init(*pkg,
-            ObjectURI(st.find("GradientBevelFilter"), where));
+            ObjectURI(st.find("GradientBevelFilter"), global));
 	gradientglowfilter_class_init(*pkg,
-            ObjectURI(st.find("GradientGlowFilter"), where));
+            ObjectURI(st.find("GradientGlowFilter"), global));
 	
     return pkg;
 }

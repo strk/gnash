@@ -39,14 +39,14 @@ get_flash_geom_package(const fn_call& fn)
     as_object *pkg = new as_object(getObjectInterface());
 	
     string_table& st = getStringTable(fn);
-    const string_table::key where = st.find("geom");
+    const string_table::key global = 0;
 
     colortransform_class_init(*pkg,
-            ObjectURI(st.find("ColorTransform"), where));
-	matrix_class_init(*pkg, ObjectURI(st.find("Matrix"), where));
-	point_class_init(*pkg, ObjectURI(st.find("Point"), where));
-	rectangle_class_init(*pkg, ObjectURI(st.find("Rectangle"), where));
-	transform_class_init(*pkg, ObjectURI(st.find("Transform"), where));
+            ObjectURI(st.find("ColorTransform"), global));
+	matrix_class_init(*pkg, ObjectURI(st.find("Matrix"), global));
+	point_class_init(*pkg, ObjectURI(st.find("Point"), global));
+	rectangle_class_init(*pkg, ObjectURI(st.find("Rectangle"), global));
+	transform_class_init(*pkg, ObjectURI(st.find("Transform"), global));
 
     return pkg;
 }

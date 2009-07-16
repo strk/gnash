@@ -35,9 +35,9 @@ get_flash_text_package(const fn_call& fn)
     as_object *pkg = new as_object(getObjectInterface());
     
     string_table& st = getStringTable(fn);
-    const string_table::key where = st.find("text");
+    const string_table::key global = 0;
 
-    textrenderer_class_init(*pkg, ObjectURI(st.find("TextRenderer"), where));
+    textrenderer_class_init(*pkg, ObjectURI(st.find("TextRenderer"), global));
 
     return pkg;
 }

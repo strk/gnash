@@ -37,10 +37,10 @@ get_flash_external_package(const fn_call& fn)
     as_object *pkg = new as_object(getObjectInterface());
     
     string_table& st = getStringTable(fn);
-    const string_table::key where = st.find("externals");
+    const string_table::key global = 0;
 
 	externalinterface_class_init(*pkg,
-            ObjectURI(st.find("ExternalInterface"), where));
+            ObjectURI(st.find("ExternalInterface"), global));
 
     return pkg;
 }

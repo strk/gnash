@@ -37,9 +37,9 @@ get_flash_net_package(const fn_call& fn)
     as_object *pkg = new as_object(getObjectInterface());
     
     string_table& st = getStringTable(fn);
-    const string_table::key where = st.find("net");
+    const string_table::key global = 0;
 
-    filereference_class_init(*pkg, ObjectURI(st.find("FileReference"), where));
+    filereference_class_init(*pkg, ObjectURI(st.find("FileReference"), global));
 
     return pkg;
 }

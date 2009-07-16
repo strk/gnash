@@ -38,9 +38,9 @@ get_flash_display_package(const fn_call& fn)
     as_object *pkg = new as_object(getObjectInterface());
     
     string_table& st = getStringTable(fn);
-    const string_table::key where = st.find("display");
+    const string_table::key global = 0;
 
-    bitmapdata_class_init(*pkg, ObjectURI(st.find("BitmapData"), where));
+    bitmapdata_class_init(*pkg, ObjectURI(st.find("BitmapData"), global));
 
 	return pkg;
 }
@@ -48,8 +48,6 @@ get_flash_display_package(const fn_call& fn)
 void
 flash_display_package_init(as_object& where, const ObjectURI& uri)
 {
-	string_table& st = getStringTable(where);
-
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
 	where.init_destructive_property(getName(uri),

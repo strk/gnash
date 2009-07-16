@@ -42,18 +42,14 @@ get_flash_package(const fn_call& fn)
     
     string_table& st = getStringTable(fn);
 
-    flash_text_package_init(*pkg,
-            ObjectURI(st.find("text"), NSV::NS_FLASH));
-    flash_display_package_init(*pkg,
-            ObjectURI(st.find("display"), NSV::NS_FLASH));
-    flash_filters_package_init(*pkg,
-            ObjectURI(st.find("filters"), NSV::NS_FLASH));
-    flash_geom_package_init(*pkg,
-            ObjectURI(st.find("geom"), NSV::NS_FLASH));
-    flash_net_package_init(*pkg,
-            ObjectURI(st.find("net"), NSV::NS_FLASH));
-    flash_external_package_init(*pkg,
-            ObjectURI(st.find("external"), NSV::NS_FLASH));
+    const string_table::key global = 0;
+
+    flash_text_package_init(*pkg, ObjectURI(st.find("text"), global));
+    flash_display_package_init(*pkg, ObjectURI(st.find("display"), global));
+    flash_filters_package_init(*pkg, ObjectURI(st.find("filters"), global));
+    flash_geom_package_init(*pkg, ObjectURI(st.find("geom"), global));
+    flash_net_package_init(*pkg, ObjectURI(st.find("net"), global));
+    flash_external_package_init(*pkg, ObjectURI(st.find("external"), global));
 
     return pkg;
 }

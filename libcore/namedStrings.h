@@ -113,7 +113,6 @@ enum NamedStrings {
         CLASS_XMLNODE,
         CLASS_XMLSOCKET,
         NS_ADOBE_UTILS,
-        NS_FLASH,
         NS_FLASH_ACCESSIBILITY,
         NS_FLASH_DISPLAY,
         NS_FLASH_EVENTS,
