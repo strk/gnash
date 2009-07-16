@@ -46,5 +46,5 @@ GEOM_HEADERS += asobj/flash/geom/Transform_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(GEOM_SOURCES)
-noinst_HEADERS +=  $(GEOM_HEADERS) asobj/flash/geom/geomclasses.h
+noinst_HEADERS +=  $(GEOM_HEADERS)
 

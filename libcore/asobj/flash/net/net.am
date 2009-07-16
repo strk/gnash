@@ -131,5 +131,5 @@ NET_HEADERS += asobj/flash/net/XMLSocket_as.h
 endif
 
 libgnashasobjs_la_SOURCES  += $(NET_SOURCES) $(NET_SOURCES_AS2)
-noinst_HEADERS +=  $(NET_HEADERS) $(NET_HEADERS_AS2) asobj/flash/net/netclasses.h
+noinst_HEADERS +=  $(NET_HEADERS) $(NET_HEADERS_AS2)
 
