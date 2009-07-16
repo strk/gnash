@@ -57,9 +57,9 @@ get_flash_package(const fn_call& fn)
 void
 flash_package_init(as_object& where, const ObjectURI& uri)
 {
-    string_table& st = getStringTable(where);
-    where.init_destructive_property(st.find("flash"), get_flash_package,
-        PropFlags::dontEnum | PropFlags::onlySWF8Up);
+    const int flags = PropFlags::dontEnum | PropFlags::onlySWF8Up;
+    where.init_destructive_property(getName(uri), get_flash_package, flags,
+        getNamespace(uri));
 }
 
 }

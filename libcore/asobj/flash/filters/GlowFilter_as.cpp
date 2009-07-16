@@ -59,13 +59,11 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> GlowFilter_as::s_interface;
-boost::intrusive_ptr<as_object> GlowFilter_as::s_ctor;
 
 as_object*
 GlowFilter_as::Interface() {
@@ -78,19 +76,16 @@ GlowFilter_as::Interface() {
 }
 
 void
-GlowFilter_as::registerCtor(as_object& global) {
-    if (GlowFilter_as::s_ctor != NULL) return;
-    Global_as* gl = getGlobal(global);
-    GlowFilter_as::s_ctor = gl->createClass(&GlowFilter_as::ctor, GlowFilter_as::Interface());
-    VM::get().addStatic(GlowFilter_as::s_ctor.get());
-    GlowFilter_as::attachInterface(*GlowFilter_as::s_ctor);
-    global.init_member("GlowFilter" , GlowFilter_as::s_ctor.get());
-}
-
-void
 glowfilter_class_init(as_object& global, const ObjectURI& uri)
 {
-    GlowFilter_as::registerCtor(global);
+    boost::intrusive_ptr<as_object> cl;
+    if (cl != NULL) return;
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&GlowFilter_as::ctor, GlowFilter_as::Interface());
+    VM::get().addStatic(cl.get());
+    GlowFilter_as::attachInterface(*cl);
+    global.init_member(getName(uri), cl.get(),
+		    as_object::DefaultFlags, getNamespace(uri));
 }
 
 
@@ -147,7 +142,7 @@ GlowFilter_as::alpha_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_alpha );
+        return as_value(ptr->m_alpha );
     }
     boost::uint8_t sp_alpha = fn.arg(0).to_number<boost::uint8_t> ();
     ptr->m_alpha = sp_alpha;
@@ -158,7 +153,7 @@ GlowFilter_as::blurX_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_blurX );
+        return as_value(ptr->m_blurX );
     }
     float sp_blurX = fn.arg(0).to_number<float> ();
     ptr->m_blurX = sp_blurX;
@@ -169,7 +164,7 @@ GlowFilter_as::blurY_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_blurY );
+        return as_value(ptr->m_blurY );
     }
     float sp_blurY = fn.arg(0).to_number<float> ();
     ptr->m_blurY = sp_blurY;
@@ -180,7 +175,7 @@ GlowFilter_as::strength_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_strength );
+        return as_value(ptr->m_strength );
     }
     float sp_strength = fn.arg(0).to_number<float> ();
     ptr->m_strength = sp_strength;
@@ -191,7 +186,7 @@ GlowFilter_as::quality_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_quality );
+        return as_value(ptr->m_quality );
     }
     boost::uint8_t sp_quality = fn.arg(0).to_number<boost::uint8_t> ();
     ptr->m_quality = sp_quality;
@@ -202,7 +197,7 @@ GlowFilter_as::inner_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_inner );
+        return as_value(ptr->m_inner );
     }
     bool sp_inner = fn.arg(0).to_bool ();
     ptr->m_inner = sp_inner;
@@ -213,7 +208,7 @@ GlowFilter_as::knockout_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<GlowFilter_as> ptr = ensureType<GlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_knockout );
+        return as_value(ptr->m_knockout );
     }
     bool sp_knockout = fn.arg(0).to_bool ();
     ptr->m_knockout = sp_knockout;

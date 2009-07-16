@@ -60,7 +60,8 @@ selection_class_init(as_object& global, const ObjectURI& uri)
 	static boost::intrusive_ptr<as_object> obj = 
         new as_object(getObjectInterface());
 	attachSelectionInterface(*obj);
-	global.init_member("Selection", obj.get());
+	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

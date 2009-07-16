@@ -46,7 +46,7 @@ public:
 
     void send();
 
-    std::string &getName() { return _name; };
+    const std::string& name() { return _name; };
 
     bool connected() { return _connected; };
     

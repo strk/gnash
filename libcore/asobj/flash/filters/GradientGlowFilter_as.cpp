@@ -49,19 +49,16 @@ public:
     static as_object* Interface();
     static void attachInterface(as_object& o);
     static void attachProperties(as_object& o);
-    static void registerCtor(as_object& global);
     static as_value ctor(const fn_call& fn);
  
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> GradientGlowFilter_as::s_interface;
 
-boost::intrusive_ptr<as_object> GradientGlowFilter_as::s_ctor;
 
 as_object*
 GradientGlowFilter_as::Interface()
@@ -75,20 +72,16 @@ GradientGlowFilter_as::Interface()
 }
 
 void
-GradientGlowFilter_as::registerCtor(as_object& global)
-{
-    if (GradientGlowFilter_as::s_ctor != NULL) return;
-    Global_as* gl = getGlobal(global);
-    GradientGlowFilter_as::s_ctor = gl->createClass(&GradientGlowFilter_as::ctor, GradientGlowFilter_as::Interface());
-    VM::get().addStatic(GradientGlowFilter_as::s_ctor.get());
-    GradientGlowFilter_as::attachInterface(*GradientGlowFilter_as::s_ctor);
-    global.init_member("GradientGlowFilter" , GradientGlowFilter_as::s_ctor.get());
-}
-
-void
 gradientglowfilter_class_init(as_object& global, const ObjectURI& uri)
 {
-    GradientGlowFilter_as::registerCtor(global);
+    boost::intrusive_ptr<as_object> cl;
+    if (cl != NULL) return;
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&GradientGlowFilter_as::ctor, GradientGlowFilter_as::Interface());
+    VM::get().addStatic(cl.get());
+    GradientGlowFilter_as::attachInterface(*cl);
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

@@ -43,45 +43,43 @@ static as_value
 get_flash_filters_package(const fn_call& fn)
 {
 
-	log_debug("Loading flash.filters package");
-	as_object *pkg = new as_object(getObjectInterface());
+    log_debug("Loading flash.filters package");
+    as_object *pkg = new as_object(getObjectInterface());
 
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;
 
-	bevelfilter_class_init(*pkg,
+    bevelfilter_class_init(*pkg,
             ObjectURI(st.find("BevelFilter"), global));
-	bitmapfilter_class_init(*pkg,
+    bitmapfilter_class_init(*pkg,
             ObjectURI(st.find("BitmapFilter"), global));
-	blurfilter_class_init(*pkg,
+    blurfilter_class_init(*pkg,
             ObjectURI(st.find("BlurFilter"), global));
-	colormatrixfilter_class_init(*pkg,
+    colormatrixfilter_class_init(*pkg,
             ObjectURI(st.find("ColorMatrixFilter"), global));
-	convolutionfilter_class_init(*pkg,
+    convolutionfilter_class_init(*pkg,
             ObjectURI(st.find("ConvolutionFilter"), global));
-	displacementmapfilter_class_init(*pkg,
+    displacementmapfilter_class_init(*pkg,
             ObjectURI(st.find("DisplacementMapFilter"), global));
-	dropshadowfilter_class_init(*pkg,
+    dropshadowfilter_class_init(*pkg,
             ObjectURI(st.find("DropShadowFilter"), global));
-	glowfilter_class_init(*pkg,
+    glowfilter_class_init(*pkg,
             ObjectURI(st.find("GlowFilter"), global));
-	gradientbevelfilter_class_init(*pkg,
+    gradientbevelfilter_class_init(*pkg,
             ObjectURI(st.find("GradientBevelFilter"), global));
-	gradientglowfilter_class_init(*pkg,
+    gradientglowfilter_class_init(*pkg,
             ObjectURI(st.find("GradientGlowFilter"), global));
-	
+    
     return pkg;
 }
 
 void
 flash_filters_package_init(as_object& where, const ObjectURI& uri)
 {
-	string_table& st = getStringTable(where);
-
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("filters"),
-			get_flash_filters_package, flags);
+    where.init_destructive_property(getName(uri), get_flash_filters_package,
+                   flags, getNamespace(uri));
 }
 
 
