@@ -48,7 +48,8 @@ stagealign_class_init(as_object& where, const ObjectURI& uri)
 
     attachStageAlignStaticInterface(*obj);
 
-    where.init_member("StageAlign", obj.get());
+    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

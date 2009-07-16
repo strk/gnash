@@ -682,15 +682,13 @@ boost::intrusive_ptr<as_object> init_Point_instance()
 }
 
 // extern 
-void point_class_init(as_object& where, const ObjectURI& uri)
+void
+point_class_init(as_object& where, const ObjectURI& uri)
 {
-	// Register _global.Point
-	string_table& st = getStringTable(where);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("Point"),
-            get_flash_geom_point_constructor, flags);
+	where.init_destructive_property(getName(uri),
+            get_flash_geom_point_constructor, flags, getNamespace(uri));
 }
 
 } // end of gnash namespace

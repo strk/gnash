@@ -155,7 +155,8 @@ loadvars_class_init(as_object& global, const ObjectURI& uri)
                     PropFlags::dontDelete | 
                     PropFlags::onlySWF6Up;
 
-	global.init_member("LoadVars", cl.get(), swf6flags);
+	global.init_member(getName(uri), cl.get(), swf6flags,
+			getNamespace(uri));
 
 }
 

@@ -44,7 +44,8 @@ stagequality_class_init(as_object& where, const ObjectURI& uri)
         new as_object(getObjectInterface());
 
     attachStageQualityStaticInterface(*obj);
-    where.init_member("StageQuality", obj.get());
+    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

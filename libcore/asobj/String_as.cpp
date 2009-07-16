@@ -185,7 +185,7 @@ string_class_init(as_object& global, const ObjectURI& uri)
     // TODO: register as ASnative(251, 0)
     // TODO: register as ASnative(3, 0) for SWF5 ?
     int flags = PropFlags::dontEnum; 
-    global.init_member("String", cl.get(), flags);
+    global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
 }
 
 

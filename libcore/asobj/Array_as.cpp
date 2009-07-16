@@ -1571,7 +1571,7 @@ array_class_init(as_object& glob, const ObjectURI& uri)
     }
 
     int flags = PropFlags::dontEnum; // |PropFlags::onlySWF5Up; 
-    glob.init_member("Array", ar, flags);
+    glob.init_member(getName(uri), ar, flags, getNamespace(uri));
 }
 
 void

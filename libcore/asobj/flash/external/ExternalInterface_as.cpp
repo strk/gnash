@@ -368,13 +368,11 @@ get_flash_external_external_interface_constructor(const fn_call& fn)
 // extern 
 void externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
-    // Register _global.Point
-    string_table& st = getStringTable(where);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    where.init_destructive_property(st.find("ExternalInterface"),
-            get_flash_external_external_interface_constructor, flags);
+    where.init_destructive_property(getName(uri),
+            get_flash_external_external_interface_constructor, flags,
+            getNamespace(uri));
 }
 
 

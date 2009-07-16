@@ -193,7 +193,8 @@ void
 AsBroadcaster::init(as_object& global, const ObjectURI& uri)
 {
     // _global.AsBroadcaster is NOT a class, but a simple object
-    global.init_member("AsBroadcaster", AsBroadcaster::getAsBroadcaster());
+    global.init_member(getName(uri), AsBroadcaster::getAsBroadcaster(),
+            as_object::DefaultFlags, getNamespace(uri));
 }
 
 

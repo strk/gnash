@@ -84,7 +84,7 @@ void object_class_init(as_object& global, const ObjectURI& uri)
 
 	// Register _global.Object (should only be visible in SWF5 up)
 	int flags = PropFlags::dontEnum; 
-	global.init_member("Object", cl.get(), flags);
+	global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
 
 }
 

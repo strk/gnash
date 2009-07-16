@@ -52,8 +52,8 @@ flash_display_package_init(as_object& where, const ObjectURI& uri)
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("display"),
-			get_flash_display_package, flags);
+	where.init_destructive_property(getName(uri),
+			get_flash_display_package, flags, getNamespace(uri));
 }
 
 
