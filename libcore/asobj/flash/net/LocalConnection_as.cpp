@@ -218,9 +218,9 @@ LocalConnection_as::init(as_object& glob, const ObjectURI& uri)
 	}
 
 
-	int swf6flags = as_prop_flags::dontEnum | 
-                    as_prop_flags::dontDelete | 
-                    as_prop_flags::onlySWF6Up;
+	int swf6flags = PropFlags::dontEnum | 
+                    PropFlags::dontDelete | 
+                    PropFlags::onlySWF6Up;
 
     glob.init_member(NSV::CLASS_LOCALCONNECTION, cl, swf6flags);
 }

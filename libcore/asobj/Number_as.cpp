@@ -145,9 +145,9 @@ void
 attachNumberStaticInterface(as_object& o)
 {
     // constant flags
-    const int cflags = as_prop_flags::dontEnum | 
-        as_prop_flags::dontDelete | 
-        as_prop_flags::readOnly;
+    const int cflags = PropFlags::dontEnum | 
+        PropFlags::dontDelete | 
+        PropFlags::readOnly;
 
     // Set __proto__ and constructor to constant.
     as_value null; null.set_null();

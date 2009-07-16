@@ -72,8 +72,8 @@ void
 attachAccessibilityInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    const int flags = as_prop_flags::dontDelete
-                | as_prop_flags::readOnly;
+    const int flags = PropFlags::dontDelete
+                | PropFlags::readOnly;
 
     const VM& vm = getVM(o);
     // For swf v9 or greater, the isActive() method has been changed to a

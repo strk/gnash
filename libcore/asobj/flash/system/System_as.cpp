@@ -287,9 +287,9 @@ getSystemCapabilitiesInterface(as_object& o)
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		const int flags = as_prop_flags::dontDelete
-		                | as_prop_flags::dontEnum
-		                | as_prop_flags::readOnly;
+		const int flags = PropFlags::dontDelete
+		                | PropFlags::dontEnum
+		                | PropFlags::readOnly;
 
 		proto = new as_object(getObjectInterface());
 
@@ -351,10 +351,10 @@ attachSystemInterface(as_object& proto)
 	proto.init_property("useCodepage", &system_usecodepage,
             &system_usecodepage);
 
-    const int flags = as_prop_flags::dontDelete
-                    | as_prop_flags::dontEnum
-                    | as_prop_flags::readOnly
-                    | as_prop_flags::onlySWF6Up;
+    const int flags = PropFlags::dontDelete
+                    | PropFlags::dontEnum
+                    | PropFlags::readOnly
+                    | PropFlags::onlySWF6Up;
 
     proto.init_property("exactSettings", &system_exactsettings,
             &system_exactsettings, flags);

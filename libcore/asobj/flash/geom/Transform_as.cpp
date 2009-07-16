@@ -401,7 +401,7 @@ getTransformInterface()
 void
 attachTransformInterface(as_object& o)
 {
-    const int protectedFlags = as_prop_flags::isProtected;
+    const int protectedFlags = PropFlags::isProtected;
 
     o.init_property("matrix", Transform_matrix, Transform_matrix,
             protectedFlags);

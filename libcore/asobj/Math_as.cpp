@@ -238,9 +238,9 @@ attachMathInterface(as_object& proto)
 	// TODO: rely on inheritance, use init_property ?
 	// All Math members are constant and non-enumerable.
 
-    const int flags = as_prop_flags::dontDelete
-                | as_prop_flags::dontEnum
-                | as_prop_flags::readOnly;
+    const int flags = PropFlags::dontDelete
+                | PropFlags::dontEnum
+                | PropFlags::readOnly;
 
 	// constant
 	proto.init_member("E", 2.7182818284590452354, flags);

@@ -84,9 +84,9 @@ attachSelectionInterface(as_object& o)
 {
     VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
 	o.init_member("getBeginIndex", vm.getNative(600, 0), flags);
 	o.init_member("getEndIndex", vm.getNative(600, 1), flags);

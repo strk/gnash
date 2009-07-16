@@ -484,7 +484,7 @@ attachXMLNodeInterface(as_object& o)
                 xmlnode_getNamespaceForPrefix), noFlags);
 
 
-    const int protectedFlags = as_prop_flags::isProtected;
+    const int protectedFlags = PropFlags::isProtected;
 
     // Just the protected flag:
     o.init_property("nodeValue", &xmlnode_nodeValue, 

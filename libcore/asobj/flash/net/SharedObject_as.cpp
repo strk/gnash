@@ -262,8 +262,8 @@ public:
         assert(data);
         _data = data;
 
-        const int flags = as_prop_flags::dontDelete |
-                          as_prop_flags::readOnly;
+        const int flags = PropFlags::dontDelete |
+                          PropFlags::readOnly;
 
         init_property(NSV::PROP_DATA, &sharedobject_data, &sharedobject_data,
                 flags);
@@ -658,9 +658,9 @@ attachSharedObjectInterface(as_object& o)
 
     VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::onlySWF6Up;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::onlySWF6Up;
 
     o.init_member("connect", vm.getNative(2106, 0), flags);
     o.init_member("send", vm.getNative(2106, 1), flags);
@@ -686,7 +686,7 @@ attachSharedObjectStaticInterface(as_object& o)
     o.init_member("getRemote",
             gl->createFunction(sharedobject_getRemote), flags);
 
-    const int hiddenOnly = as_prop_flags::dontEnum;
+    const int hiddenOnly = PropFlags::dontEnum;
 
     o.init_member("deleteAll",  vm.getNative(2106, 206), hiddenOnly);
     o.init_member("getDiskUsage",  vm.getNative(2106, 207), hiddenOnly);

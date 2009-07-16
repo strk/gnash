@@ -19,7 +19,7 @@
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
 
-#include "as_prop_flags.h"
+#include "PropFlags.h"
 #include "as_value.h"
 #include "string_table.h"
 #include "log.h"
@@ -252,7 +252,7 @@ private:
 	friend class PropertyList; // For index access
 
 	/// Properties flags
-	as_prop_flags _flags;
+	PropFlags _flags;
 
 	// Store the various types of things that can be held.
 	typedef boost::variant<boost::blank, as_value, GetterSetter> boundType;
@@ -302,7 +302,7 @@ public:
 
 	/// Constructor taking initial flags
 	Property(string_table::key name, string_table::key nsId,
-		const as_prop_flags& flags)
+		const PropFlags& flags)
         :
         _flags(flags),
 		mBound(as_value()),
@@ -323,7 +323,7 @@ public:
 	{}
 
 	Property(string_table::key name, string_table::key nsId,
-		const as_value& value, const as_prop_flags& flags)
+		const as_value& value, const PropFlags& flags)
         :
 		_flags(flags),
         mBound(value),
@@ -335,7 +335,7 @@ public:
 
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, 
-		const as_prop_flags& flags, bool destroy = false)
+		const PropFlags& flags, bool destroy = false)
         :
 		_flags(flags), 
         mBound(GetterSetter(getter, setter)),
@@ -358,7 +358,7 @@ public:
 
 	Property(string_table::key name, string_table::key nsId,
 		as_c_function_ptr getter, as_c_function_ptr setter,
-		const as_prop_flags& flags, bool destroy = false)
+		const PropFlags& flags, bool destroy = false)
 		:
 		_flags(flags),
         mBound(GetterSetter(getter, setter)),
@@ -375,8 +375,8 @@ public:
 	void setGetter(as_function* fun);
 
 	/// accessor to the properties flags
-	const as_prop_flags& getFlags() const { return _flags; }
-	as_prop_flags& getFlags() { return _flags; }
+	const PropFlags& getFlags() const { return _flags; }
+	PropFlags& getFlags() { return _flags; }
 
 	/// Get value of this property
 	//

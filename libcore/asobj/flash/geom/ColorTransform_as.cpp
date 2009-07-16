@@ -60,7 +60,7 @@ attachColorTransformInterface(as_object& o)
 
     o.init_member("concat", gl->createFunction(ColorTransform_concat), flags);
 
-    flags = as_prop_flags::isProtected;
+    flags = PropFlags::isProtected;
 
     /// These are all protected:
     o.init_member("toString", gl->createFunction(ColorTransform_toString),

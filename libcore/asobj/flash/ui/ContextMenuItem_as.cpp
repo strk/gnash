@@ -61,9 +61,9 @@ namespace {
 void
 attachContextMenuItemInterface(as_object& o)
 {
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::onlySWF7Up;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::onlySWF7Up;
 
     Global_as* gl = getGlobal(o);
     o.init_member("copy", gl->createFunction(contextmenuitem_copy), flags);

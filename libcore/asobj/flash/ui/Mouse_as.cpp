@@ -73,9 +73,9 @@ attachMouseInterface(as_object& o)
 {
     VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
     o.init_member("show", vm.getNative(5, 0), flags);
     o.init_member("hide", vm.getNative(5, 1), flags);

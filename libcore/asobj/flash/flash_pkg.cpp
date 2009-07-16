@@ -63,7 +63,7 @@ flash_package_init(as_object& where, const ObjectURI& uri)
 {
     string_table& st = getStringTable(where);
     where.init_destructive_property(st.find("flash"), get_flash_package,
-        as_prop_flags::dontEnum | as_prop_flags::onlySWF8Up);
+        PropFlags::dontEnum | PropFlags::onlySWF8Up);
 }
 
 }

@@ -160,9 +160,9 @@ attachColorInterface(as_object& o)
 {
 	VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
 	o.init_member("setRGB", vm.getNative(700, 0), flags);
 	o.init_member("setTransform", vm.getNative(700, 1), flags);

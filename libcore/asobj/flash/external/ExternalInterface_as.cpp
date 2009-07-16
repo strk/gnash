@@ -70,9 +70,9 @@ attachExternalInterfaceInterface(as_object& /*o*/)
 static void
 attachExternalInterfaceStaticProperties(as_object& o)
 {
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
     Global_as* gl = getGlobal(o);
     o.init_member("addCallback", gl->createFunction(
@@ -119,9 +119,9 @@ attachExternalInterfaceStaticProperties(as_object& o)
     o.init_member("_unescapeXML",
             gl->createFunction(ExternalInterface_uUnescapeXML), flags);
 
-    int protectedFlags = as_prop_flags::dontEnum |
-                         as_prop_flags::dontDelete |
-                         as_prop_flags::isProtected;
+    int protectedFlags = PropFlags::dontEnum |
+                         PropFlags::dontDelete |
+                         PropFlags::isProtected;
 
     o.init_member("available",
             gl->createFunction(ExternalInterface_available), protectedFlags);

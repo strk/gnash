@@ -85,9 +85,9 @@ setBuiltInItems(as_object& o, bool setting)
 void
 attachContextMenuInterface(as_object& o)
 {
-    const int flags = as_prop_flags::dontDelete |
-                      as_prop_flags::dontEnum |
-                      as_prop_flags::onlySWF7Up;
+    const int flags = PropFlags::dontDelete |
+                      PropFlags::dontEnum |
+                      PropFlags::onlySWF7Up;
 
     Global_as* gl = getGlobal(o);
     o.init_member("hideBuiltInItems",

@@ -374,9 +374,9 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_property("transform", &movieclip_transform, 
             &movieclip_transform);
 
-    const int swf6Flags = as_prop_flags::dontDelete |
-                as_prop_flags::dontEnum |
-                as_prop_flags::onlySWF6Up;
+    const int swf6Flags = PropFlags::dontDelete |
+                PropFlags::dontEnum |
+                PropFlags::onlySWF6Up;
 
     o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
     o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
@@ -395,9 +395,9 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
-    const int swf7Flags = as_prop_flags::dontDelete |
-                as_prop_flags::dontEnum |
-                as_prop_flags::onlySWF7Up;
+    const int swf7Flags = PropFlags::dontDelete |
+                PropFlags::dontEnum |
+                PropFlags::onlySWF7Up;
 
     o.init_member("getNextHighestDepth", gl->createFunction(
                 movieclip_getNextHighestDepth), swf7Flags);

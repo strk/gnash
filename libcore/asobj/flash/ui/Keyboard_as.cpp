@@ -230,9 +230,9 @@ void Keyboard_as::init(as_object& global, const ObjectURI& uri)
     // NOTE: _global.Key *is* an object, not a constructor
     as_object*  key_obj = new Keyboard_as;
 
-    const int flags = as_prop_flags::readOnly |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::dontEnum;
+    const int flags = PropFlags::readOnly |
+                      PropFlags::dontDelete |
+                      PropFlags::dontEnum;
 
     // constants
 #define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][key::KEY], flags)

@@ -1570,7 +1570,7 @@ array_class_init(as_object& glob, const ObjectURI& uri)
         attachArrayStatics(*ar);
     }
 
-    int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
+    int flags = PropFlags::dontEnum; // |PropFlags::onlySWF5Up; 
     glob.init_member("Array", ar, flags);
 }
 

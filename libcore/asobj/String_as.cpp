@@ -88,7 +88,7 @@ public:
         std::wstring wstr = utf8::decodeCanonicalString(
                 _string, getSWFVersion(*this));
         init_member(NSV::PROP_LENGTH, wstr.size(), 
-                as_prop_flags::dontDelete | as_prop_flags::dontEnum); 
+                PropFlags::dontDelete | PropFlags::dontEnum); 
     }
 
 
@@ -184,7 +184,7 @@ string_class_init(as_object& global, const ObjectURI& uri)
     // Register _global.String (should be only visible from SWF5 up)
     // TODO: register as ASnative(251, 0)
     // TODO: register as ASnative(3, 0) for SWF5 ?
-    int flags = as_prop_flags::dontEnum; 
+    int flags = PropFlags::dontEnum; 
     global.init_member("String", cl.get(), flags);
 }
 

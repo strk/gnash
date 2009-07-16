@@ -2088,11 +2088,11 @@ void
 attachPrototypeProperties(as_object& o)
 {
     // Standard flags.
-    const int flags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum;
+    const int flags = PropFlags::dontDelete
+        |PropFlags::dontEnum;
 
     // SWF6 or higher
-    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
+    const int swf6Flags = flags | PropFlags::onlySWF6Up;
 
     boost::intrusive_ptr<builtin_function> getset;
 
@@ -2896,10 +2896,10 @@ attachTextFieldInterface(as_object& o)
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
 
-    int propFlags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum
-        |as_prop_flags::readOnly
-        |as_prop_flags::isProtected;
+    int propFlags = PropFlags::dontDelete
+        |PropFlags::dontEnum
+        |PropFlags::readOnly
+        |PropFlags::isProtected;
 
     // Parent seems to not be a normal property
     o.init_property(NSV::PROP_uPARENT, &DisplayObject::parent_getset,
@@ -2927,11 +2927,11 @@ attachTextFieldInterface(as_object& o)
             DisplayObject::yscale_getset, DisplayObject::yscale_getset);
  
     // Standard flags.
-    const int flags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum;
+    const int flags = PropFlags::dontDelete
+        |PropFlags::dontEnum;
 
     // SWF6 or higher
-    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
+    const int swf6Flags = flags | PropFlags::onlySWF6Up;
 
     o.init_member("setTextFormat", 
             gl->createFunction(textfield_setTextFormat), swf6Flags);
@@ -2951,7 +2951,7 @@ attachTextFieldInterface(as_object& o)
             gl->createFunction(textfield_replaceSel), swf6Flags);
 
     // SWF7 or higher
-    const int swf7Flags = flags | as_prop_flags::onlySWF7Up;
+    const int swf7Flags = flags | PropFlags::onlySWF7Up;
 
     o.init_member("replaceText",
             gl->createFunction(textfield_replaceText), swf7Flags);
@@ -2962,11 +2962,11 @@ void
 attachTextFieldStaticMembers(as_object& o)
 {
     // Standard flags.
-    const int flags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum;
+    const int flags = PropFlags::dontDelete
+        |PropFlags::dontEnum;
 
     // SWF6 or higher
-    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
+    const int swf6Flags = flags | PropFlags::onlySWF6Up;
 
     Global_as* gl = getGlobal(o);
     o.init_member("getFontList",

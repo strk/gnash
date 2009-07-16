@@ -17,7 +17,7 @@
 //
 
 #include "as_object.h"
-#include "as_prop_flags.h"
+#include "PropFlags.h"
 #include "as_value.h"
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
@@ -42,16 +42,16 @@ addVisibilityFlag(int& flags, int version)
         default:
             return;
         case 9:
-            flags |= as_prop_flags::onlySWF9Up;
+            flags |= PropFlags::onlySWF9Up;
             break;
         case 8:
-            flags |= as_prop_flags::onlySWF8Up;
+            flags |= PropFlags::onlySWF8Up;
             break;
         case 7:
-            flags |= as_prop_flags::onlySWF7Up;
+            flags |= PropFlags::onlySWF7Up;
             break;
         case 6:
-            flags |= as_prop_flags::onlySWF6Up;
+            flags |= PropFlags::onlySWF6Up;
             break;
     }
 }
@@ -226,7 +226,7 @@ ClassHierarchy::declareClass(ExtensionClass& c)
         new declare_extension_function(c, mGlobal, mExtension);
 
 
-    int flags=as_prop_flags::dontEnum;
+    int flags=PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
     return mGlobal->init_destructive_property(c.name, *getter, flags);
 }
@@ -247,7 +247,7 @@ ClassHierarchy::declareClass(const NativeClass& c)
     boost::intrusive_ptr<as_function> getter =
         new declare_native_function(c, mGlobal);
     
-    int flags = as_prop_flags::dontEnum;
+    int flags = PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
     return mGlobal->init_destructive_property(c.name, *getter, flags,
             c.namespace_name);

@@ -83,7 +83,7 @@ void object_class_init(as_object& global, const ObjectURI& uri)
 	}
 
 	// Register _global.Object (should only be visible in SWF5 up)
-	int flags = as_prop_flags::dontEnum; 
+	int flags = PropFlags::dontEnum; 
 	global.init_member("Object", cl.get(), flags);
 
 }
@@ -129,9 +129,9 @@ attachObjectInterface(as_object& o)
 	o.init_member("toLocaleString", 
             gl->createFunction(object_toLocaleString));
 
-	int swf6flags = as_prop_flags::dontEnum | 
-        as_prop_flags::dontDelete | 
-        as_prop_flags::onlySWF6Up;
+	int swf6flags = PropFlags::dontEnum | 
+        PropFlags::dontDelete | 
+        PropFlags::onlySWF6Up;
 
 	o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
 	o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
