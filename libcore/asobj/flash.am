@@ -80,8 +80,6 @@ EXTENSIONS_API += \
 	asobj/flash/ui/Keyboard_as.h \
 	$(NULL)
 
-CLEANFILES = *classes.h
-
 # libgnashasobjs_la_LIBADD = \
 # 	$(top_builddir)/libamf/libgnashamf.la \
 # 	$(top_builddir)/libnet/libgnashnet.la \
@@ -129,7 +127,6 @@ libgnashasobjs_la_SOURCES += \
 
 noinst_HEADERS += \
 	asobj/flash/flash_pkg.h \
-	asobj/flash/flashclasses.h \
 	$(NULL)
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
