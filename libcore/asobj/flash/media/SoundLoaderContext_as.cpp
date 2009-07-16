@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void soundloadercontext_class_init(as_object& global)
+void soundloadercontext_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

@@ -202,7 +202,7 @@ LocalConnection_as::getDomain()
 }
 
 void
-LocalConnection_as::init(as_object& glob)
+LocalConnection_as::init(as_object& glob, const ObjectURI& uri)
 {
 	// This is going to be the global Number "class"/"function"
 	static as_object* cl = NULL;

@@ -22,9 +22,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global GlowFilter class
-void glowfilter_class_init(as_object& global);
+void glowfilter_class_init(as_object& global, const ObjectURI& uri);
 
 } // end of gnash namespace
 

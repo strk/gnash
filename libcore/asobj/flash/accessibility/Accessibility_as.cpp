@@ -57,7 +57,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void accessibility_class_init(as_object& global)
+void accessibility_class_init(as_object& global, const ObjectURI& uri)
 {
 
     boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());

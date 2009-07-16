@@ -61,7 +61,7 @@ public:
 
 // extern 
 void
-namespace_class_init(as_object& where)
+namespace_class_init(as_object& where, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl;
     

@@ -36,7 +36,7 @@ namespace {
 
 // extern
 void
-textfieldautosize_class_init(as_object& where)
+textfieldautosize_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> obj =
         new as_object(getObjectInterface());

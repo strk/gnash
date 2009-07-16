@@ -138,7 +138,7 @@ TextFormat_as::TextFormat_as()
 
 // extern (used by Global.cpp)
 void
-TextFormat_as::init(as_object& global)
+TextFormat_as::init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Color "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;

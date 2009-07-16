@@ -41,7 +41,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-textdisplaymode_class_init(as_object& global)
+textdisplaymode_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachTextDisplayModeStaticInterface(*o);

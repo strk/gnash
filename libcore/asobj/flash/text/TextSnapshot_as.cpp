@@ -72,7 +72,7 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void TextSnapshot_as::init(as_object& global)
+void TextSnapshot_as::init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

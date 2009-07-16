@@ -136,7 +136,7 @@ void registerColorNative(as_object& o)
 }
 
 // extern (used by Global.cpp)
-void color_class_init(as_object& global)
+void color_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Color "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;

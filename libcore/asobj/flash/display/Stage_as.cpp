@@ -293,7 +293,7 @@ stage_displaystate(const fn_call& fn)
 }
 
 // extern (used by Global.cpp)
-void stage_class_init(as_object& global)
+void stage_class_init(as_object& global, const ObjectURI& uri)
 {
 	static boost::intrusive_ptr<as_object> obj = new Stage_as();
 	global.init_member("Stage", obj.get());

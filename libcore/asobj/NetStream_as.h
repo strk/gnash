@@ -183,7 +183,7 @@ public:
 
     ~NetStream_as();
 
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
 
     PlayHead::PlaybackStatus playbackState() const {
         return _playHead.getState();

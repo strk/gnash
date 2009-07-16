@@ -249,7 +249,7 @@ as_function::constructInstance(const as_environment& env,
 
 
 void
-function_class_init(as_object& global)
+function_class_init(as_object& global, const ObjectURI& uri)
 {
 	boost::intrusive_ptr<builtin_function> func = 
         as_function::getFunctionConstructor();

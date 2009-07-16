@@ -47,6 +47,7 @@ class CharacterProxy;
 	
 	class fn_call;
 	class as_object;
+class ObjectURI;
 	class Sound_as : public as_object
 	{
 
@@ -55,7 +56,7 @@ class CharacterProxy;
 		
 		~Sound_as();
 		
-		static void init(as_object& global);
+		static void init(as_object& global, const ObjectURI& uri);
 		
 	/// Make this sound control the given DisplayObject
     //

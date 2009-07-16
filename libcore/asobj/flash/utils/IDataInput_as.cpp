@@ -65,7 +65,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void idatainput_class_init(as_object& global)
+void idatainput_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

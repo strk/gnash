@@ -84,7 +84,7 @@ GradientBevelFilter_as::registerCtor(as_object& global) {
 }
 
 void
-gradientbevelfilter_class_init(as_object& global)
+gradientbevelfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     GradientBevelFilter_as::registerCtor(global);
 }

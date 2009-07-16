@@ -139,7 +139,7 @@ LoadVars_as::LoadVars_as()
 
 // extern (used by Global.cpp)
 void
-loadvars_class_init(as_object& global)
+loadvars_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global LoadVars "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;

@@ -151,7 +151,7 @@ FileReferenceList_ctor(const fn_call& fn)
 }
 
 // extern 
-void filereferencelist_class_init(as_object& where)
+void filereferencelist_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the FileReferenceList "class"/"function"
     // in the 'where' package

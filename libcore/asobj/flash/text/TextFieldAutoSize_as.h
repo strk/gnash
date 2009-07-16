@@ -27,9 +27,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the TextFieldAutoSize Class
-void textfieldautosize_class_init(as_object& where);
+void textfieldautosize_class_init(as_object& where, const ObjectURI& uri);
 
 }
 

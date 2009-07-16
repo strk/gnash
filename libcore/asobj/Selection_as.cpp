@@ -53,7 +53,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-selection_class_init(as_object& global)
+selection_class_init(as_object& global, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
 

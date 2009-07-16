@@ -688,7 +688,7 @@ NetConnection_as::NetConnection_as()
 
 // extern (used by Global.cpp)
 void
-NetConnection_as::init(as_object& global)
+NetConnection_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global NetConnection "class"/"function"
     static boost::intrusive_ptr<as_object> cl;

@@ -227,7 +227,7 @@ MovieClipLoader::unloadClip()
 
 /// Extern.
 void
-moviecliploader_class_init(as_object& global)
+moviecliploader_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Number "class"/"function"
 	static boost::intrusive_ptr<as_object> cl = NULL;

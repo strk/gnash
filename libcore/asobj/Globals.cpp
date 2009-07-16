@@ -160,11 +160,12 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     init_member("trace", createFunction(global_trace));
     init_member("escape", createFunction(global_escape));
    
-    object_class_init(*this); 
-    string_class_init(*this); 
-    array_class_init(*this); 
+    const string_table::key NS_GLOBAL(0);
 
-    function_class_init(*this);
+    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
 
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
     
@@ -287,15 +288,16 @@ AVM1Global::registerClasses()
 
     _classes.declareAll(avm1Classes());
 
-    object_class_init(*this); 
-    string_class_init(*this); 
-    array_class_init(*this); 
+    const string_table::key NS_GLOBAL(0);
 
-    /// SWF6 visibility:
-    function_class_init(*this);
+    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
 
     // SWF8 visibility:
-    flash_package_init(*this); 
+    const string_table::key NS_FLASH = getStringTable(*this).find("flash");
+    flash_package_init(*this, ObjectURI(NS_FLASH, NS_GLOBAL)); 
 
     const int version = _vm.getSWFVersion();
 

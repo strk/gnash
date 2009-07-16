@@ -64,7 +64,7 @@ namespace {
 
 
 void
-system_class_init(as_object& global)
+system_class_init(as_object& global, const ObjectURI& uri)
 {
 	// _global.System is NOT a class, but a simple object, see System.as
 

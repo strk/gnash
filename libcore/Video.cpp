@@ -297,7 +297,7 @@ Video::setStream(boost::intrusive_ptr<NetStream_as> ns)
 
 // extern (used by Global.cpp)
 void
-video_class_init(as_object& global)
+video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;

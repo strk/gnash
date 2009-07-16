@@ -239,7 +239,7 @@ FileReference_ctor(const fn_call& fn)
 }
 
 // extern 
-void filereference_class_init(as_object& where)
+void filereference_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the FileReference "class"/"function"
     // in the 'where' package

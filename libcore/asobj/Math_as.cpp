@@ -91,7 +91,7 @@ registerMathNative(as_object& proto)
 
 
 void
-math_class_init(as_object& global)
+math_class_init(as_object& global, const ObjectURI& uri)
 {
     // Create built-in math object. It is not a class.
 	static boost::intrusive_ptr<as_object> obj =

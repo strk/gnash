@@ -25,42 +25,56 @@
 #include "MovieClip.h"
 
 #include "BevelFilter_as.h"
-#include "BitmapFilterQuality_as.h"
-#include "BitmapFilterType_as.h"
 #include "BitmapFilter_as.h"
 #include "BlurFilter_as.h"
 #include "ColorMatrixFilter_as.h"
 #include "ConvolutionFilter_as.h"
-#include "DisplacementMapFilterMode_as.h"
 #include "DisplacementMapFilter_as.h"
 #include "DropShadowFilter_as.h"
 #include "GlowFilter_as.h"
 #include "GradientBevelFilter_as.h"
 #include "GradientGlowFilter_as.h"
-
+#include "namedStrings.h"
 #include "filters_pkg.h"
-#include "filtersclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_filters_package(const fn_call& /*fn*/)
+get_flash_filters_package(const fn_call& fn)
 {
 
 	log_debug("Loading flash.filters package");
 	as_object *pkg = new as_object(getObjectInterface());
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-	do {
-	    filtersclasses[i](*pkg);
-	} while (filtersclasses[++i] != 0);
+    string_table& st = getStringTable(fn);
+    const string_table::key where = st.find("filters");
 
-	return pkg;
+	bevelfilter_class_init(*pkg,
+            ObjectURI(st.find("BevelFilter"), where));
+	bitmapfilter_class_init(*pkg,
+            ObjectURI(st.find("BitmapFilter"), where));
+	blurfilter_class_init(*pkg,
+            ObjectURI(st.find("BlurFilter"), where));
+	colormatrixfilter_class_init(*pkg,
+            ObjectURI(st.find("ColorMatrixFilter"), where));
+	convolutionfilter_class_init(*pkg,
+            ObjectURI(st.find("ConvolutionFilter"), where));
+	displacementmapfilter_class_init(*pkg,
+            ObjectURI(st.find("DisplacementMapFilter"), where));
+	dropshadowfilter_class_init(*pkg,
+            ObjectURI(st.find("DropShadowFilter"), where));
+	glowfilter_class_init(*pkg,
+            ObjectURI(st.find("GlowFilter"), where));
+	gradientbevelfilter_class_init(*pkg,
+            ObjectURI(st.find("GradientBevelFilter"), where));
+	gradientglowfilter_class_init(*pkg,
+            ObjectURI(st.find("GradientGlowFilter"), where));
+	
+    return pkg;
 }
 
 void
-flash_filters_package_init(as_object& where)
+flash_filters_package_init(as_object& where, const ObjectURI& uri)
 {
 	string_table& st = getStringTable(where);
 

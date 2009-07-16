@@ -23,9 +23,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global Object class
-void object_class_init(as_object& global);
+void object_class_init(as_object& global, const ObjectURI& uri);
 
 /// Return an Object instance
 as_object* init_object_instance();

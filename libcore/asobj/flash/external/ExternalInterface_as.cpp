@@ -366,7 +366,7 @@ get_flash_external_external_interface_constructor(const fn_call& fn)
 
 
 // extern 
-void externalinterface_class_init(as_object& where)
+void externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
     // Register _global.Point
     string_table& st = getStringTable(where);

@@ -208,7 +208,7 @@ Date_as::toString() const
 }
 
 void
-Date_as::init(as_object& global)
+Date_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Date "class"/"function"
     static boost::intrusive_ptr<as_object> cl;

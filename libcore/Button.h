@@ -78,7 +78,7 @@ public:
     static const char* mouseStateName(MouseState s);
 
     /// Initialize the global Button class
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
 
 	// See dox in as_object.h
 	bool get_member(string_table::key name, as_value* val, 

@@ -41,7 +41,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-spreadmethod_class_init(as_object& global)
+spreadmethod_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachSpreadMethodStaticInterface(*o);

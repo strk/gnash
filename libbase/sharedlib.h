@@ -41,7 +41,7 @@
 
 namespace gnash 
 {
-  
+
 
 /// TODO: document this class
 class SharedLib
@@ -51,7 +51,7 @@ class SharedLib
 public:
     // Typedefs for function pointers to keep the code readable
     typedef bool entrypoint (void *obj);
-    typedef void initentry (as_object &obj);
+    typedef void initentry(as_object &obj);
     
     SharedLib();
     SharedLib(const std::string& filespec);

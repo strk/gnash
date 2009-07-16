@@ -19,39 +19,34 @@
 
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
-
 #include "string_table.h"
 #include "VM.h"
 #include "fn_call.h"
-#include "MovieClip.h"
-
 #include "ExternalInterface_as.h"
-
+#include "namedStrings.h"
 #include "external_pkg.h"
-#include "externalclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_external_package(const fn_call& /*fn*/)
+get_flash_external_package(const fn_call& fn)
 {
 
     log_debug("Loading flash.external package");
 
     as_object *pkg = new as_object(getObjectInterface());
+    
+    string_table& st = getStringTable(fn);
+    const string_table::key where = st.find("externals");
 
-    // Call the [objectname]_init() function for each class.
-    int i = 0;
-    while (externalclasses[i]) {
-        externalclasses[i](*pkg);
-        ++i;
-    } 
+	externalinterface_class_init(*pkg,
+            ObjectURI(st.find("ExternalInterface"), where));
 
     return pkg;
 }
 
 void
-flash_external_package_init(as_object& where)
+flash_external_package_init(as_object& where, const ObjectURI& uri)
 {
     string_table& st = getStringTable(where);
 

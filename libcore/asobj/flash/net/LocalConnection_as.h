@@ -50,7 +50,7 @@ public:
 
     bool connected() { return _connected; };
     
-    static void init(as_object& glob);
+    static void init(as_object& glob, const ObjectURI& uri);
 
 private:
     

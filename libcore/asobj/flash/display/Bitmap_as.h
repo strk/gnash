@@ -27,11 +27,12 @@
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 namespace gnash {
 
 /// Initialize the global Bitmap class
-void bitmap_class_init(as_object& global);
+void bitmap_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

@@ -420,7 +420,7 @@ XMLSocket_as::send(std::string str)
 
 // extern (used by Global.cpp)
 void
-xmlsocket_class_init(as_object& global)
+xmlsocket_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is the global XMLSocket class
     static boost::intrusive_ptr<as_object> cl;

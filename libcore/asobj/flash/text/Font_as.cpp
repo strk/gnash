@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void font_class_init(as_object& global)
+void font_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

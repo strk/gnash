@@ -240,7 +240,7 @@ getFlashDisplayBitmapDataConstructor(as_object& global)
 
 
 // extern 
-void bitmapdata_class_init(as_object& where)
+void bitmapdata_class_init(as_object& where, const ObjectURI& uri)
 {
 
     string_table& st = getStringTable(where);

@@ -129,7 +129,7 @@ TextRenderer_ctor(const fn_call& fn)
 }
 
 // extern 
-void textrenderer_class_init(as_object& where)
+void textrenderer_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the TextRenderer "class"/"function"
     // in the 'where' package

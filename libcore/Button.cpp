@@ -1119,7 +1119,7 @@ button_ctor(const fn_call& /* fn */)
 }
 
 void
-Button::init(as_object& global)
+Button::init(as_object& global, const ObjectURI& uri)
 {
   // This is going to be the global Button "class"/"function"
   static boost::intrusive_ptr<as_object> cl=NULL;

@@ -28,9 +28,10 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 /// Initialize the global ClipboardFormats class
-void clipboardformats_class_init(as_object& global);
+void clipboardformats_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

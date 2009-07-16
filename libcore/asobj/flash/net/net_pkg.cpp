@@ -22,55 +22,30 @@
 #include "string_table.h"
 #include "VM.h"
 #include "fn_call.h"
-#include "MovieClip.h"
-
-#include "FileFilter_as.h"
+#include "namedStrings.h"
 #include "FileReferenceList_as.h"
 #include "FileReference_as.h"
-#include "IDynamicPropertyOutput_as.h"
-#include "IDynamicPropertyWriter_as.h"
-#include "LocalConnection_as.h"
-#include "NetConnection_as.h"
-#include "NetStream_as.h"
-#include "ObjectEncoding_as.h"
-#include "Responder_as.h"
-#include "SharedObjectFlushStatus_as.h"
-#include "SharedObject_as.h"
-#include "Socket_as.h"
-#include "URLLoaderDataFormat_as.h"
-#include "URLLoader_as.h"
-#include "URLRequestHeader_as.h"
-#include "URLRequestMethod_as.h"
-#include "URLRequest_as.h"
-#include "URLStream_as.h"
-#include "URLVariables_as.h"
-#include "XMLSocket_as.h"
-
 #include "net_pkg.h"
-#include "netclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_net_package(const fn_call& /*fn*/)
+get_flash_net_package(const fn_call& fn)
 {
     log_debug("Loading flash.net package");
     
     as_object *pkg = new as_object(getObjectInterface());
+    
+    string_table& st = getStringTable(fn);
+    const string_table::key where = st.find("net");
 
-    // Call the [objectname]_init() function for each class.
-    int i = 0;
-
-    while (netclasses[i]) {
-        netclasses[i](*pkg);
-        ++i;
-    }
+    filereference_class_init(*pkg, ObjectURI(st.find("FileReference"), where));
 
     return pkg;
 }
 
 void
-flash_net_package_init(as_object& where)
+flash_net_package_init(as_object& where, const ObjectURI& uri)
 {
     string_table& st = getStringTable(where);
 

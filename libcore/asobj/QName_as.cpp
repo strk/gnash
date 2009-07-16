@@ -60,7 +60,7 @@ public:
 
 // extern 
 void
-qname_class_init(as_object& where)
+qname_class_init(as_object& where, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl;
 

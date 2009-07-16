@@ -24,9 +24,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global Microphone class
-void microphone_class_init(as_object& global);
+void microphone_class_init(as_object& global, const ObjectURI& uri);
 
 /// Return a Microphone instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_microphone_instance();

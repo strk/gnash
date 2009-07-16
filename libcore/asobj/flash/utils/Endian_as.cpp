@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void endian_class_init(as_object& global)
+void endian_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

@@ -1556,7 +1556,7 @@ registerArrayNative(as_object& global)
 // 'constructor'
 //
 void
-array_class_init(as_object& glob)
+array_class_init(as_object& glob, const ObjectURI& uri)
 {
     // This is going to be the global Array "class"/"function"
     static as_object* ar = 0;

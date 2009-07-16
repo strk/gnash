@@ -190,7 +190,7 @@ AsBroadcaster::registerNative(as_object& global)
 
 
 void
-AsBroadcaster::init(as_object& global)
+AsBroadcaster::init(as_object& global, const ObjectURI& uri)
 {
     // _global.AsBroadcaster is NOT a class, but a simple object
     global.init_member("AsBroadcaster", AsBroadcaster::getAsBroadcaster());

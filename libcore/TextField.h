@@ -669,7 +669,7 @@ private:
 };
 
 /// Initialize the global TextField class
-void textfield_class_init(as_object& global);
+void textfield_class_init(as_object& global, const ObjectURI& uri);
 
 } // namespace gnash
 

@@ -115,7 +115,7 @@ Sound_as::~Sound_as()
 
 // extern (used by Global.cpp)
 void
-Sound_as::init(as_object& global)
+Sound_as::init(as_object& global, const ObjectURI& uri)
 {
 
     // This is going to be the global Sound "class"/"function"

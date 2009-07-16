@@ -102,7 +102,7 @@ truncateDouble(double d)
 
 // extern 
 void
-transform_class_init(as_object& where)
+transform_class_init(as_object& where, const ObjectURI& uri)
 {
 
 	// Register _global.Transform

@@ -104,7 +104,7 @@ camera_ctor(const fn_call& /* fn */)
 }
 
 // extern (used by Global.cpp)
-void camera_class_init(as_object& global)
+void camera_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Camera "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;

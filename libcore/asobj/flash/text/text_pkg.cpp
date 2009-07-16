@@ -20,54 +20,30 @@
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
 #include "string_table.h"
-#include "VM.h"
 #include "fn_call.h"
-#include "MovieClip.h"
-
-#include "AntiAliasType_as.h"
-#include "CSMSettings_as.h"
-#include "FontStyle_as.h"
-#include "FontType_as.h"
-#include "Font_as.h"
-#include "GridFitType_as.h"
-#include "StaticText_as.h"
-#include "StyleSheet_as.h"
-#include "TextColorType_as.h"
-#include "TextDisplayMode_as.h"
-#include "TextFieldAutoSize_as.h"
-#include "TextFieldType_as.h"
-#include "TextField_as.h"
-#include "TextFormatAlign_as.h"
-#include "TextFormat_as.h"
-#include "TextLineMetrics_as.h"
 #include "TextRenderer_as.h"
-#include "TextSnapshot_as.h"
-
+#include "namedStrings.h"
 #include "text_pkg.h"
-#include "textclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_text_package(const fn_call& /*fn*/)
+get_flash_text_package(const fn_call& fn)
 {
     log_debug("Loading flash.text package");
     
     as_object *pkg = new as_object(getObjectInterface());
+    
+    string_table& st = getStringTable(fn);
+    const string_table::key where = st.find("text");
 
-    // Call the [objectname]_init() function for each class.
-    int i = 0;
-
-    while (textclasses[i]) {
-        textclasses[i](*pkg);
-        ++i;
-    }
+    textrenderer_class_init(*pkg, ObjectURI(st.find("TextRenderer"), where));
 
     return pkg;
 }
 
 void
-flash_text_package_init(as_object& where)
+flash_text_package_init(as_object& where, const ObjectURI& uri)
 {
     string_table& st = getStringTable(where);
 

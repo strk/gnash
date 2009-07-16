@@ -45,7 +45,7 @@ public:
 
 
 void
-bitmapfilter_class_init(as_object& global)
+bitmapfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     string_table& st = getStringTable(global);
     

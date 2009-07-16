@@ -50,7 +50,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-contextmenu_class_init(as_object& global)
+contextmenu_class_init(as_object& global, const ObjectURI& uri)
 {
 	static boost::intrusive_ptr<as_object> cl;
 

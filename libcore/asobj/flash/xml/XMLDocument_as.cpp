@@ -620,7 +620,7 @@ XMLDocument_as::ignoreWhite() const
 
 // extern (used by Global.cpp)
 void
-XMLDocument_as::init(as_object& global)
+XMLDocument_as::init(as_object& global, const ObjectURI& uri)
 {
 
     static boost::intrusive_ptr<as_object> cl;

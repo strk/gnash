@@ -147,7 +147,8 @@ public:
         string_table& st = getStringTable(fn);
         log_debug("Loading native class %s", st.value(mDeclaration.name));
 
-        mDeclaration.initializer(*mTarget);
+        mDeclaration.initializer(*mTarget,
+                ObjectURI(mDeclaration.name, mDeclaration.namespace_name));
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
         if (mTarget->get_member(mDeclaration.name, &us,

@@ -122,7 +122,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-movieclip_class_init(as_object& where)
+movieclip_class_init(as_object& where, const ObjectURI& uri)
 {
     if (isAS3(getVM(where))) {
 

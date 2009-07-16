@@ -72,7 +72,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textfield_class_init(as_object& global)
+void textfield_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

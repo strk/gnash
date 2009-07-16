@@ -220,7 +220,7 @@ Keyboard_as::markReachableResources() const
 #endif // def GNASH_USE_GC
 
 // extern (used by Global.cpp)
-void Keyboard_as::init(as_object& global)
+void Keyboard_as::init(as_object& global, const ObjectURI& uri)
 {
 
     //  GNASH_REPORT_FUNCTION;

@@ -63,7 +63,7 @@ init_object_instance()
 
 
 // extern (used by Global.cpp)
-void object_class_init(as_object& global)
+void object_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<as_object> cl=NULL;

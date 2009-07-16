@@ -106,7 +106,7 @@ NetStream_as::NetStream_as()
 }
 
 void
-NetStream_as::init(as_object& global)
+NetStream_as::init(as_object& global, const ObjectURI& uri)
 {
 
     // This is going to be the global NetStream "class"/"function"

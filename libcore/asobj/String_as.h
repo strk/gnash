@@ -25,10 +25,11 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 class Global_as;
 
 // Initialize the global String class
-void string_class_init(as_object& global);
+void string_class_init(as_object& global, const ObjectURI& uri);
 
 /// Return a String instance (possibibly NULL!)
 //

@@ -674,7 +674,7 @@ get_flash_geom_rectangle_constructor(const fn_call& fn)
 
 // extern 
 void
-rectangle_class_init(as_object& where)
+rectangle_class_init(as_object& where, const ObjectURI& uri)
 {
 	// Register _global.Rectangle
 	string_table& st = getStringTable(where);

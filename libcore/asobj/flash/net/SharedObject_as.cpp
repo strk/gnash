@@ -605,7 +605,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 }
 
 void
-sharedobject_class_init(as_object& global)
+sharedobject_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
     

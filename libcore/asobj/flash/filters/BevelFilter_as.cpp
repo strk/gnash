@@ -83,7 +83,7 @@ BevelFilter_as::registerCtor(as_object& global) {
 }
 
 void
-bevelfilter_class_init(as_object& global)
+bevelfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     BevelFilter_as::registerCtor(global);
 }

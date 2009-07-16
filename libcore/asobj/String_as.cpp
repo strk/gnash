@@ -175,7 +175,7 @@ void registerStringNative(as_object& global)
 
 // extern (used by Global.cpp)
 void
-string_class_init(as_object& global)
+string_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global String "class"/"function"
     boost::intrusive_ptr<as_object> cl =

@@ -216,7 +216,7 @@ DisplacementMapFilter_ctor(const fn_call& fn)
 }
 
 // extern 
-void displacementmapfilter_class_init(as_object& where)
+void displacementmapfilter_class_init(as_object& where, const ObjectURI& uri)
 {
 	// This is going to be the DisplacementMapFilter "class"/"function"
 	// in the 'where' package

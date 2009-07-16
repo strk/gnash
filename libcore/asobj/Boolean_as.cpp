@@ -68,7 +68,7 @@ private:
 };
 
 // extern (used by Global.cpp)
-void boolean_class_init(as_object& global)
+void boolean_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Boolean "class"/"function"
     boost::intrusive_ptr<as_object> cl = getBooleanClass(*getGlobal(global));

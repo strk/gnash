@@ -85,7 +85,7 @@ DropShadowFilter_as::registerCtor(as_object& global) {
 }
 
 void
-dropshadowfilter_class_init(as_object& global)
+dropshadowfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     DropShadowFilter_as::registerCtor(global);
 }

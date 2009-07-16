@@ -103,7 +103,7 @@ customactions_ctor(const fn_call& /* fn */)
 }
 
 // extern (used by Global.cpp)
-void customactions_class_init(as_object& global)
+void customactions_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global CustomActions "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;

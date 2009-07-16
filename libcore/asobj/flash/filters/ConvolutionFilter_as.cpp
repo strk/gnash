@@ -57,7 +57,7 @@ public:
 
 
 void
-convolutionfilter_class_init(as_object& global)
+convolutionfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     string_table& st = getStringTable(global);
     

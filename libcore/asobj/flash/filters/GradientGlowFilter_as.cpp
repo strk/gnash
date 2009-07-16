@@ -86,7 +86,7 @@ GradientGlowFilter_as::registerCtor(as_object& global)
 }
 
 void
-gradientglowfilter_class_init(as_object& global)
+gradientglowfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     GradientGlowFilter_as::registerCtor(global);
 }

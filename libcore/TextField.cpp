@@ -1689,7 +1689,7 @@ TextField::set_variable_name(const std::string& newname)
 /// limited prototype. This is changed later on instantiation of a
 /// TextField.
 void
-textfield_class_init(as_object& global)
+textfield_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl = NULL;
 

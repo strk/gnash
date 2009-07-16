@@ -444,7 +444,7 @@ XMLNode_as::getXMLNodeInterface()
 }
 
 void
-XMLNode_as::init(as_object& global)
+XMLNode_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is the global XMLNode_as "class"
     static boost::intrusive_ptr<as_object> cl;

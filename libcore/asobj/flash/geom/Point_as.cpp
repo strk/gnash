@@ -682,7 +682,7 @@ boost::intrusive_ptr<as_object> init_Point_instance()
 }
 
 // extern 
-void point_class_init(as_object& where)
+void point_class_init(as_object& where, const ObjectURI& uri)
 {
 	// Register _global.Point
 	string_table& st = getStringTable(where);

@@ -220,6 +220,10 @@ static string_table::svt preload_names[] =
 	string_table::svt( "Sprite", NSV::CLASS_SPRITE ),
 	string_table::svt( "int", NSV::CLASS_INT ),
 	string_table::svt( "TextFieldAutoSize", NSV::CLASS_TEXTFIELDAUTOSIZE),
+    // This isn't technically a namespace, as it doesn't really exist in
+    // AS3 and there are no namespaces in AS2, but it is needed to initialize
+    // the SWF8 flash object.
+	string_table::svt( "flash", NSV::NS_FLASH ),
 	string_table::svt( "flash.display", NSV::NS_FLASH_DISPLAY ),
 	string_table::svt( "flash.text", NSV::NS_FLASH_TEXT ),
 	string_table::svt( "flash.geom", NSV::NS_FLASH_GEOM ),

@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void securitydomain_class_init(as_object& global)
+void securitydomain_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 

@@ -61,7 +61,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void proxy_class_init(as_object& global)
+void proxy_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
