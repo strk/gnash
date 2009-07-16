@@ -222,7 +222,7 @@ LocalConnection_as::init(as_object& glob, const ObjectURI& uri)
                     PropFlags::dontDelete | 
                     PropFlags::onlySWF6Up;
 
-    glob.init_member(NSV::CLASS_LOCALCONNECTION, cl, swf6flags);
+    glob.init_member(getName(uri), cl, swf6flags, getNamespace(uri));
 }
 
 
