@@ -141,11 +141,9 @@ public:
     
     /// Construct an ActionScript object with no prototype associated.
     //
-    /// @param  global  A reference to the Global object. The created object
-    ///                 will hold a reference to this object, using it to
-    ///                 access other AS resources where necessary. The new
-    ///                 object belongs in the scope of the passed Global
-    ///                 object.
+    /// @param  global  A reference to the Global object the new
+    ///                 object ultimately belongs to. The created object
+    ///                 uses the resources of the Global object.
     explicit as_object(Global_as& global);
 
     /// Construct an ActionScript object with no prototype associated.
@@ -1140,6 +1138,38 @@ private:
     typedef std::map< FQkey, Trigger > TriggerContainer;
     TriggerContainer _trigs;
 };
+
+/// A URI for describing built-in as_objects.
+//
+/// This is used as a unique identifier for prototypes, class, constructors
+/// etc.
+struct ObjectURI
+{
+    /// Construct an ObjectURI from name and namespace.
+    ObjectURI(string_table::key name, string_table::key ns)
+        :
+        name(name),
+        ns(ns)
+    {}
+
+    string_table::key name;
+    string_table::key ns;
+};
+
+/// Get the name element of an ObjectURI
+inline string_table::key
+getName(const ObjectURI& o)
+{
+    return o.name;
+}
+
+/// Get the namespace element of an ObjectURI
+inline string_table::key
+getNamespace(const ObjectURI& o)
+{
+    return o.ns;
+}
+
 
 /// Template which does a dynamic cast for as_object pointers.
 //
