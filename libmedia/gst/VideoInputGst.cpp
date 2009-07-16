@@ -275,6 +275,7 @@ namespace gst {
 		if (dev_select == -1) {
 			log_error("%s: No webcam selected in rc file, setting to videotestsource", __FUNCTION__);
 			rcfile.setWebcamDevice(0);
+			dev_select = rcfile.getWebcamDevice();
 		} else {
 			log_trace("Camera %d specified in gnashrc file, using that one.\n", dev_select);
 		}
