@@ -51,13 +51,18 @@ INCLUDES = \
 	$(GSTAPP_CFLAGS) \
 	$(GSTINTERFACES_CFLAGS) 
 
-check_PROGRAMS = \
+check_PROGRAMS = 
+
+if USE_GST_ENGINE
+
+ check_PROGRAMS += \
 	test_videoinput
 
+ test_videoinput_SOURCES = test_videoinput.cpp
+ test_videoinput_LDADD = $(AM_LDFLAGS) 
+ test_videoinput_DEPENDENCIES = site-update
 
-test_videoinput_SOURCES = test_videoinput.cpp
-test_videoinput_LDADD = $(AM_LDFLAGS) 
-test_videoinput_DEPENDENCIES = site-update
+endif
 
 TEST_DRIVERS = ../simple.exp
 
