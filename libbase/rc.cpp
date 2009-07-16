@@ -106,7 +106,8 @@ RcInitFile::RcInitFile()
     _saveStreamingMedia(false),
     _saveLoadedMedia(false),
     _popups(true),
-    _useXv(false)
+    _useXv(false),
+	_webcamDevice(-1)
 {
     expandPath(_solsandbox);
     loadFiles();
@@ -544,6 +545,9 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable,
                          value)
             ||
+				 extractNumber(_webcamDevice, "webcamDevice", variable, 
+						 value)
+			||
                  cerr << boost::format(_("Warning: unrecognized directive "
                              "\"%s\" in rcfile %s line %d")) 
                              % variable % filespec % lineno << endl;

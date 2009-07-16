@@ -62,6 +62,7 @@ DIST_SUBDIRS = \
 	libamf.all \
 	libnet.all \
 	libcore.all \
+	libmedia.all \
 	network.all \
 	samples	\
 	swfdec \
@@ -81,6 +82,7 @@ SUBDIRS = \
 	libnet.all \
 	libbase.all	\
 	libamf.all \
+	libmedia.all \
 	libcore.all \
 	samples	\
 	$(DIR_MING) \

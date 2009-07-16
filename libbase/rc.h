@@ -286,6 +286,10 @@ public:
     void setMediaDir(const std::string& value) { _mediaCacheDir = value; }
 
     const std::string& getMediaDir() const { return _mediaCacheDir; }
+	
+	void setWebcamDevice(int value) {_webcamDevice = value;}
+	
+	int getWebcamDevice() const {return _webcamDevice;}
 
     void dump();    
 
@@ -510,6 +514,10 @@ protected:
     bool _popups;
 
     bool _useXv;
+	
+	///FIXME: this should probably eventually be changed to a more readable
+	///config option instead of an integer
+	int _webcamDevice;
 
 };
 
