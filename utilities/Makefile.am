@@ -63,7 +63,7 @@ AM_CPPFLAGS = \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
-        $(MYSQL_CFLAGS) \
+    $(MYSQL_CFLAGS) \
 	$(NULL)
 
 if WIN32
@@ -82,7 +82,7 @@ if USE_GST_ENGINE
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper 
+bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper findwebcams
 #check_PROGRAMS = gdebug.swf
 
 gprocessor_SOURCES = processor.cpp
@@ -99,6 +99,9 @@ soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 flvdumper_SOURCES = flvdumper.cpp
 flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+findwebcams_SOURCES = findwebcams.cpp
+findwebcams_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
