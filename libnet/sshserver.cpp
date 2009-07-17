@@ -91,6 +91,100 @@ SSHServer::~SSHServer()
     sshShutdown();
 }
 
+// Authenticate the password from the user
+bool
+SSHServer::authPassword(string &user, string &passwd)
+{
+}
+
+bool
+SSHServer::authPassword(SSH_SESSION *session, string &user, string &passwd)
+{
+}
+
+// Wait for an incoming network connection
+bool
+SSHServer::acceptConnections()
+{
+}
+
+bool
+SSHServer::acceptConnections(short port)
+{
+}
+
+bool
+SSHServer::acceptConnections(SSH_SESSION *session)
+{
+}
+
+bool
+SSHServer::acceptConnections(SSH_SESSION *session, short port)
+{
+}
+
+// Parse an SSH command message and do something
+bool
+SSHServer::processSSHMessage(SSH_MESSAGE *message)
+{
+    if (!message) {
+	return false;
+    }
+    switch(ssh_message_type(message)){
+    case SSH_AUTH_REQUEST:
+	switch(ssh_message_subtype(message)) {
+	    // not authenticated, send default message
+ 	case SSH_AUTH_NONE:
+ 	    break;
+	case SSH_AUTH_PASSWORD:
+	    {
+		log_debug("User %s wants to auth with pass %s\n",
+			  ssh_message_auth_user(message),
+			  ssh_message_auth_password(message));
+		string user = ssh_message_auth_user(message);
+		string passwd = ssh_message_auth_password(message);
+		if (authPassword(user, passwd)){
+		    // 		auth=1;
+		    ssh_message_auth_reply_success(message,0);
+		    break;
+		}
+		break;
+	    }
+	case SSH_AUTH_HOSTBASED:
+	    break;
+	case SSH_AUTH_PUBLICKEY:
+	    break;
+	case SSH_AUTH_KEYBINT:
+	    break;
+	case SSH_AUTH_UNKNOWN:
+	    break;
+	default:
+	    ssh_message_auth_set_methods(message,SSH_AUTH_PASSWORD);
+	    ssh_message_reply_default(message);
+	    break;
+	}
+    case SSH_CHANNEL_REQUEST_OPEN:
+	if(ssh_message_subtype(message)==SSH_CHANNEL_SESSION){
+	    _channel = ssh_message_channel_request_open_reply_accept(message);
+	    break;
+	}
+	break;
+//     case SSH_CHANNEL_REQUEST_EXEC:
+// 	break;
+    case SSH_CHANNEL_REQUEST_ENV:
+	break;
+    case SSH_CHANNEL_REQUEST_SUBSYSTEM:
+	break;
+    case SSH_CHANNEL_REQUEST_WINDOW_CHANGE:
+	break;
+    case SSH_CHANNEL_REQUEST_UNKNOWN:
+	break;
+    default:
+	ssh_message_reply_default(message);
+    }
+    ssh_message_free(message);
+}
+
 void
 SSHServer::dump() {
 //    GNASH_REPORT_FUNCTION;

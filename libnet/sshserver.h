@@ -72,9 +72,8 @@ class DSOEXPORT SSHServer : public SSHClient {
     bool acceptConnections(SSH_SESSION *session);
     bool acceptConnections(SSH_SESSION *session, short port);
 
+    // Parse an SSH command message and do something
     bool processSSHMessage(SSH_MESSAGE *message);
-
-    bool commandLoop();
 
     void dump();
  protected:

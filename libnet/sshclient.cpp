@@ -159,9 +159,9 @@ SSHClient::sshShutdown()
 	ssh_disconnect(_session);
 	ssh_finalize();
     }
-
+    free(_session);
     _session = 0;
-//     return closeNet();
+
     return true;
 }
 
