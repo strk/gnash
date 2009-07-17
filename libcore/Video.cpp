@@ -297,7 +297,7 @@ Video::setStream(boost::intrusive_ptr<NetStream_as> ns)
 
 // extern (used by Global.cpp)
 void
-video_class_init(as_object& global)
+video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;
@@ -310,7 +310,8 @@ video_class_init(as_object& global)
 	}
 
 	// Register _global.Video
-	global.init_member("Video", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 rect
@@ -362,15 +363,15 @@ attachVideoInterface(as_object& o)
 void
 attachPrototypeProperties(as_object& proto)
 {
-    const int protect = as_prop_flags::dontDelete;
+    const int protect = PropFlags::dontDelete;
     
     proto.init_property("deblocking", &video_deblocking, &video_deblocking,
             protect);
     proto.init_property("smoothing", &video_smoothing, &video_smoothing,
             protect);
     
-    const int flags = as_prop_flags::dontDelete |
-        as_prop_flags::readOnly;
+    const int flags = PropFlags::dontDelete |
+        PropFlags::readOnly;
 
     proto.init_property("height", &video_height, &video_height, flags);
     proto.init_property("width", &video_width, &video_width, flags);
@@ -436,7 +437,8 @@ video_attach(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<NetStream_as> ns = 
-        boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
+        boost::dynamic_pointer_cast<NetStream_as>(
+                fn.arg(0).to_object(*getGlobal(fn)));
 	if (ns)
 	{
 		video->setStream(ns);

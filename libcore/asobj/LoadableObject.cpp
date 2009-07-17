@@ -30,6 +30,7 @@
 #include "utf8.h"
 #include "fn_call.h"
 #include "GnashAlgorithm.h"
+#include "Global_as.h"
 
 #include <sstream>
 #include <map>
@@ -104,7 +105,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
             /// Read in our custom headers if they exist and are an
             /// array.
             Array_as* array = dynamic_cast<Array_as*>(
-                            customHeaders.to_object().get());
+                            customHeaders.to_object(*getGlobal(target)).get());
                             
             if (array)
             {
@@ -334,7 +335,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 
     if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object().get();
+        array = customHeaders.to_object(*getGlobal(fn)).get();
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -349,8 +350,8 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         array = new Array_as;
         // This property is always initialized on the first call to
         // addRequestHeaders.
-        const int flags = as_prop_flags::dontEnum |
-                          as_prop_flags::dontDelete;
+        const int flags = PropFlags::dontEnum |
+                          PropFlags::dontDelete;
 
         ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
     }
@@ -369,7 +370,8 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     {
         // This must be an array. Keys / values are pushed in valid
         // pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+        boost::intrusive_ptr<as_object> obj =
+            fn.arg(0).to_object(*getGlobal(fn));
         Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
 
         if (!headerArray)
@@ -501,7 +503,8 @@ loadableobject_sendAndLoad(const fn_call& fn)
 	}
 
 
-	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
+	boost::intrusive_ptr<as_object> target =
+        fn.arg(1).to_object(*getGlobal(fn));
 
     // According to the Flash 8 Cookbook (Joey Lott, Jeffrey Bardzell), p 427,
     // this method sends by GET unless overridden, and always by GET in the

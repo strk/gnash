@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void sample_class_init(as_object& global)
+void sample_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void sample_class_init(as_object& global)
     }
 
     // Register _global.Sample
-    global.init_member("Sample", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachSampleInterface(as_object& o)
+attachSampleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSampleStaticInterface(as_object& o)
+attachSampleStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getSampleInterface()
 }
 
 as_value
-sample_ctor(const fn_call& fn)
+sample_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Sample_as;
 

@@ -72,7 +72,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textfield_class_init(as_object& global)
+void textfield_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -83,7 +83,8 @@ void textfield_class_init(as_object& global)
     }
 
     // Register _global.TextField
-    global.init_member("TextField", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -332,7 +333,7 @@ textfield_textInput(const fn_call& fn)
 }
 
 as_value
-textfield_ctor(const fn_call& fn)
+textfield_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextField_as;
 

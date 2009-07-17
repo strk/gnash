@@ -39,19 +39,20 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-stagedisplaystate_class_init(as_object& where)
+stagedisplaystate_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> obj =
         new as_object(getObjectInterface());
 
     attachStageDisplayStateStaticInterface(*obj);
-    where.init_member("StageDisplayState", obj.get());
+    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachStageDisplayStateStaticInterface(as_object& o)
+attachStageDisplayStateStaticInterface(as_object& /*o*/)
 {
     // TODO: attach constants.
 }

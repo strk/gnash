@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-capsstyle_class_init(as_object& global)
+capsstyle_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachCapsStyleStaticInterface(*o);
-    global.init_member("CapsStyle", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachCapsStyleStaticInterface(as_object& o)
+attachCapsStyleStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

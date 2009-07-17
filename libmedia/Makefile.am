@@ -69,6 +69,7 @@ libgnashmedia_la_SOURCES = \
 	MediaParser.cpp \
 	FLVParser.cpp \
 	AudioResampler.cpp \
+	VideoInput.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -116,10 +117,13 @@ if USE_GST_ENGINE
    libgnashmedia_la_CPPFLAGS += \
 		-I$(top_srcdir)/libmedia/gst \
 		$(GSTREAMER_CFLAGS) \
+		$(GSTAPP_CFLAGS) \
+		$(GSTINTERFACES_CFLAGS) \
 		$(NULL)
 
    libgnashmedia_la_LIBADD += \
 		$(GSTREAMER_LIBS) -lgstbase-0.10 \
+		$(GSTAPP_LIBS) $(GSTINTERFACES_LIBS) \
 		$(NULL)
 
 endif

@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void scripttimeouterror_class_init(as_object& global)
+void scripttimeouterror_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void scripttimeouterror_class_init(as_object& global)
     }
 
     // Register _global.ScriptTimeoutError
-    global.init_member("ScriptTimeoutError", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachScriptTimeoutErrorInterface(as_object& o)
+attachScriptTimeoutErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachScriptTimeoutErrorStaticInterface(as_object& o)
+attachScriptTimeoutErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getScriptTimeoutErrorInterface()
 }
 
 as_value
-scripttimeouterror_ctor(const fn_call& fn)
+scripttimeouterror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ScriptTimeoutError_as;
 

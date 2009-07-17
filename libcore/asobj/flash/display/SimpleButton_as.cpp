@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void simplebutton_class_init(as_object& global)
+void simplebutton_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void simplebutton_class_init(as_object& global)
     }
 
     // Register _global.SimpleButton
-    global.init_member("SimpleButton", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachSimpleButtonInterface(as_object& o)
+attachSimpleButtonInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSimpleButtonStaticInterface(as_object& o)
+attachSimpleButtonStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getSimpleButtonInterface()
 }
 
 as_value
-simplebutton_ctor(const fn_call& fn)
+simplebutton_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SimpleButton_as;
 

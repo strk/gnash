@@ -42,7 +42,7 @@ check_PROGRAMS = \
 	PointTest \
 	EdgeTest \
 	PropertyListTest \
-	as_prop_flagsTest \
+	PropFlagsTest \
 	DisplayListTest \
 	AsValueTest \
 	ClassSizes \
@@ -102,8 +102,8 @@ PropertyListTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 
-as_prop_flagsTest_SOURCES = as_prop_flagsTest.cpp
-as_prop_flagsTest_LDADD = \
+PropFlagsTest_SOURCES = PropFlagsTest.cpp
+PropFlagsTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 

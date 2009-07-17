@@ -1119,7 +1119,7 @@ button_ctor(const fn_call& /* fn */)
 }
 
 void
-Button::init(as_object& global)
+Button::init(as_object& global, const ObjectURI& uri)
 {
   // This is going to be the global Button "class"/"function"
   static boost::intrusive_ptr<as_object> cl=NULL;
@@ -1132,7 +1132,8 @@ Button::init(as_object& global)
   }
 
   // Register _global.MovieClip
-  global.init_member("Button", cl.get());
+  global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 #ifdef USE_SWFTREE

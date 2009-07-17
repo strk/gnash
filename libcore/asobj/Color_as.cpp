@@ -136,7 +136,7 @@ void registerColorNative(as_object& o)
 }
 
 // extern (used by Global.cpp)
-void color_class_init(as_object& global)
+void color_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Color "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;
@@ -148,7 +148,8 @@ void color_class_init(as_object& global)
 	}
 
 	// Register _global.Color
-	global.init_member("Color", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -160,9 +161,9 @@ attachColorInterface(as_object& o)
 {
 	VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
 	o.init_member("setRGB", vm.getNative(700, 0), flags);
 	o.init_member("setTransform", vm.getNative(700, 1), flags);
@@ -302,7 +303,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object(*getGlobal(fn));
 	if ( ! trans )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

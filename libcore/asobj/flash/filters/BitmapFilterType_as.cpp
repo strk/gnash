@@ -39,17 +39,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-bitmapfiltertype_class_init(as_object& global)
+bitmapfiltertype_class_init(as_object& global, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
     attachBitmapFilterTypeStaticInterface(*cl);
-    global.init_member("BitmapFilterType", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachBitmapFilterTypeStaticInterface(as_object& o)
+attachBitmapFilterTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: attach constants.
 }

@@ -17,13 +17,14 @@
 //
 #include "CallStack.h"
 #include "as_object.h"
-#include "as_function.h" // for as_environment::CallFrame::markReachableResources
+#include "as_function.h" 
+#include "Global_as.h" 
 
 namespace gnash {
 
 CallFrame::CallFrame(as_function* funcPtr)
 	:
-	locals(new as_object()),
+	locals(getGlobal(*funcPtr)->createObject()),
 	func(funcPtr)
 {
 }

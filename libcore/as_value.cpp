@@ -26,9 +26,6 @@
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
-#include "String_as.h" // for automatic as_value::STRING => String
-#include "Number_as.h" // for automatic as_value::NUMBER => Number
-#include "Boolean_as.h" // for automatic as_value::BOOLEAN => Boolean
 #include "action.h" // for call_method0
 #include "utility.h" // for typeName() 
 #include "GnashNumeric.h"
@@ -41,6 +38,7 @@
 #include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
 #include "StringPredicates.h"
+#include "Global_as.h"
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 
@@ -861,7 +859,7 @@ as_value::to_element() const
     VM& vm = VM::get();
     //int swfVersion = vm.getSWFVersion();
     boost::shared_ptr<amf::Element> el ( new amf::Element );
-    boost::intrusive_ptr<as_object> ptr = to_object();
+    boost::intrusive_ptr<as_object> ptr = to_object(*vm.getGlobal());
 
     switch (m_type) {
       case UNDEFINED:
@@ -1019,7 +1017,7 @@ as_value::to_bool() const
 	
 // Return value as an object.
 boost::intrusive_ptr<as_object>
-as_value::to_object() const
+as_value::to_object(Global_as& global) const
 {
 	typedef boost::intrusive_ptr<as_object> ptr;
 
@@ -1032,18 +1030,16 @@ as_value::to_object() const
 			return getFun().get();
 
 		case MOVIECLIP:
-			// FIXME: update when to_sprite will return
-			//        an intrusive_ptr directly
 			return ptr(toDisplayObject());
 
 		case STRING:
-			return init_string_instance(getStr());
+			return global.createString(getStr());
 
 		case NUMBER:
-			return init_number_instance(getNum());
+			return global.createNumber(getNum());
 
 		case BOOLEAN:
-			return init_boolean_instance(getBool());
+			return global.createBoolean(getBool());
 
 		default:
 			// Invalid to convert exceptions.
@@ -2527,7 +2523,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
         case OBJECT:
         {
-            as_object* obj = to_object().get();
+            as_object* obj = to_object(*vm.getGlobal()).get();
             assert(obj);
             OffsetTable::iterator it = offsetTable.find(obj);
             if ( it == offsetTable.end() )

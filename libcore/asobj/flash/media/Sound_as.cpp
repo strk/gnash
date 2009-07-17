@@ -115,7 +115,7 @@ Sound_as::~Sound_as()
 
 // extern (used by Global.cpp)
 void
-Sound_as::init(as_object& global)
+Sound_as::init(as_object& global, const ObjectURI& uri)
 {
 
     // This is going to be the global Sound "class"/"function"
@@ -126,11 +126,12 @@ Sound_as::init(as_object& global)
         as_object* iface = getSoundInterface();
         Global_as* gl = getGlobal(global);
         cl = gl->createClass(&sound_new, iface);
-        iface->set_member_flags(NSV::PROP_CONSTRUCTOR, as_prop_flags::readOnly);
+        iface->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
     }
 
     // Register _global.String
-    global.init_member("Sound", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -721,9 +722,9 @@ attachSoundInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
 
-    int flags = as_prop_flags::dontEnum | 
-                as_prop_flags::dontDelete | 
-                as_prop_flags::readOnly;
+    int flags = PropFlags::dontEnum | 
+                PropFlags::dontDelete | 
+                PropFlags::readOnly;
 
     o.init_member("attachSound", gl->createFunction(sound_attachsound),
             flags);
@@ -738,7 +739,7 @@ attachSoundInterface(as_object& o)
     o.init_member("getVolume", gl->createFunction(sound_getvolume), flags);
     o.init_member("setVolume", gl->createFunction(sound_setvolume), flags);
 
-    int flagsn6 = flags | as_prop_flags::onlySWF6Up;
+    int flagsn6 = flags | PropFlags::onlySWF6Up;
 
     o.init_member("getDuration", 
             gl->createFunction(sound_getDuration), flagsn6);
@@ -754,10 +755,10 @@ attachSoundInterface(as_object& o)
     o.init_member("getBytesTotal", 
             gl->createFunction(sound_getbytestotal), flagsn6);
 
-    int flagsn9 = as_prop_flags::dontEnum | 
-                  as_prop_flags::dontDelete | 
-                  as_prop_flags::readOnly | 
-                  as_prop_flags::onlySWF9Up;
+    int flagsn9 = PropFlags::dontEnum | 
+                  PropFlags::dontDelete | 
+                  PropFlags::readOnly | 
+                  PropFlags::onlySWF9Up;
 
     o.init_member("areSoundsInaccessible", 
             gl->createFunction(sound_areSoundsInaccessible), flagsn9);
@@ -767,7 +768,7 @@ attachSoundInterface(as_object& o)
     o.init_readonly_property("duration", &sound_duration);
     o.init_readonly_property("position", &sound_position);
 
-    int fl_hp = as_prop_flags::dontEnum | as_prop_flags::dontDelete;
+    int fl_hp = PropFlags::dontEnum | PropFlags::dontDelete;
 
     o.init_property("checkPolicyFile", &checkPolicyFile_getset, 
             &checkPolicyFile_getset, fl_hp);
@@ -784,7 +785,7 @@ getSoundInterface()
         attachSoundInterface(*o);
 
         // TODO: make this an additional second arg to as_object(__proto__) ctor !
-        o->set_member_flags(NSV::PROP_uuPROTOuu, as_prop_flags::readOnly, 0);
+        o->set_member_flags(NSV::PROP_uuPROTOuu, PropFlags::readOnly, 0);
     }
 
     return o.get();
@@ -808,7 +809,7 @@ sound_new(const fn_call& fn)
         const as_value& arg0 = fn.arg(0);
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
-            as_object* obj = arg0.to_object().get();
+            as_object* obj = arg0.to_object(*getGlobal(fn)).get();
             DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
             IF_VERBOSE_ASCODING_ERRORS(
             if ( ! ch )
@@ -1209,7 +1210,7 @@ sound_progress(const fn_call& fn)
 }
 
 as_value
-sound_ctor(const fn_call& fn)
+sound_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Sound_as;
 

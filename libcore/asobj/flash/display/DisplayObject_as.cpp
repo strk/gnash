@@ -63,7 +63,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void displayobject_class_init(as_object& global)
+void displayobject_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -74,7 +74,8 @@ void displayobject_class_init(as_object& global)
     }
 
     // Register _global.DisplayObject
-    global.init_member("DisplayObject", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -98,7 +99,7 @@ attachDisplayObjectInterface(as_object& o)
 }
 
 void
-attachDisplayObjectStaticInterface(as_object& o)
+attachDisplayObjectStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -224,7 +225,7 @@ displayobject_render(const fn_call& fn)
 }
 
 as_value
-displayobject_ctor(const fn_call& fn)
+displayobject_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new DisplayObject_as;
 

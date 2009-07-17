@@ -19,6 +19,7 @@
 #include "as_object.h"
 #include "ConvolutionFilter.h"
 #include "VM.h"
+#include "Global_as.h"
 #include "builtin_function.h"
 #include "Object.h"
 #include "BitmapFilter_as.h"
@@ -48,7 +49,7 @@ class ConvolutionFilter_as : public as_object, public ConvolutionFilter
 {
 public:
     ConvolutionFilter_as(as_object *obj)
-	    :
+        :
         as_object(obj)
     {}
 
@@ -56,14 +57,12 @@ public:
 
 
 void
-convolutionfilter_class_init(as_object& global)
+convolutionfilter_class_init(as_object& global, const ObjectURI& uri)
 {
-    string_table& st = getStringTable(global);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    global.init_destructive_property(st.find("ConvolutionFilter"),
-            getConvolutionFilterConstructor, flags);
+    global.init_destructive_property(getName(uri),
+            getConvolutionFilterConstructor, flags, getNamespace(uri));
 }
 
 as_object*
@@ -107,13 +106,9 @@ attachConvolutionFilterInterface(as_object& o)
 as_value
 getConvolutionFilterConstructor(const fn_call& fn)
 {
-    static builtin_function* cl;
-    if (!cl) {
-        cl = new builtin_function(&convolutionfilter_ctor,
-                getConvolutionFilterInterface());
-        getVM(fn).addStatic(cl);
-    }
-    return cl;
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&convolutionfilter_ctor,
+            getConvolutionFilterInterface());
 }
 
 as_value
@@ -128,7 +123,7 @@ as_value
 convolutionfilter_matrixX(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -138,7 +133,7 @@ convolutionfilter_matrixX(const fn_call& fn)
 as_value
 convolutionfilter_matrixY(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -149,7 +144,7 @@ as_value
 convolutionfilter_divisor(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -160,7 +155,7 @@ as_value
 convolutionfilter_bias(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -171,7 +166,7 @@ as_value
 convolutionfilter_preserveAlpha(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -182,7 +177,7 @@ as_value
 convolutionfilter_clamp(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -193,7 +188,7 @@ as_value
 convolutionfilter_color(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -204,7 +199,7 @@ as_value
 convolutionfilter_alpha(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
@@ -215,7 +210,7 @@ as_value
 convolutionfilter_matrix(const fn_call& fn)
 {
     // TODO: check whether this is necessary (probably is).
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+    boost::intrusive_ptr<ConvolutionFilter_as> ptr =
         ensureType<ConvolutionFilter_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);

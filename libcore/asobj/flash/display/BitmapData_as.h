@@ -31,6 +31,7 @@ namespace gnash {
 
 class as_function;
 class as_object;
+class ObjectURI;
 class Bitmap;
 
 
@@ -117,7 +118,7 @@ private:
 
 
 /// Initialize the global BitmapData class
-void bitmapdata_class_init(as_object& global);
+void bitmapdata_class_init(as_object& global, const ObjectURI& uri);
 
 } // end of gnash namespace
 

@@ -420,7 +420,7 @@ XMLSocket_as::send(std::string str)
 
 // extern (used by Global.cpp)
 void
-xmlsocket_class_init(as_object& global)
+xmlsocket_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is the global XMLSocket class
     static boost::intrusive_ptr<as_object> cl;
@@ -431,7 +431,8 @@ xmlsocket_class_init(as_object& global)
     }
     
     // Register _global.XMLSocket
-    global.init_member("XMLSocket", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -580,8 +581,10 @@ attachXMLSocketInterface(as_object& o)
 
     // all this crap to satisfy swfdec testsuite... (xml-socket-properties*)
     as_object* onDataIface = new as_object(getObjectInterface());
-    as_function* onDataFun = new builtin_function(xmlsocket_onData,
-            onDataIface);
+
+    // It's not really a class, but a constructor function with an object
+    // prototype, so looks in every way like an AS2 class.
+    as_object* onDataFun = gl->createClass(xmlsocket_onData, onDataIface);
     o.init_member("onData", onDataFun);
     onDataIface->init_member(NSV::PROP_CONSTRUCTOR, onDataFun);
 }

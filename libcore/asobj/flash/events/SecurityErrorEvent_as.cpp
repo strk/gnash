@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void securityerrorevent_class_init(as_object& global)
+void securityerrorevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void securityerrorevent_class_init(as_object& global)
     }
 
     // Register _global.SecurityErrorEvent
-    global.init_member("SecurityErrorEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -79,7 +80,7 @@ attachSecurityErrorEventInterface(as_object& o)
 }
 
 void
-attachSecurityErrorEventStaticInterface(as_object& o)
+attachSecurityErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +116,7 @@ securityerrorevent_SECURITY_ERROR(const fn_call& fn)
 }
 
 as_value
-securityerrorevent_ctor(const fn_call& fn)
+securityerrorevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SecurityErrorEvent_as;
 

@@ -106,7 +106,7 @@ NetStream_as::NetStream_as()
 }
 
 void
-NetStream_as::init(as_object& global)
+NetStream_as::init(as_object& global, const ObjectURI& uri)
 {
 
     // This is going to be the global NetStream "class"/"function"
@@ -123,7 +123,8 @@ NetStream_as::init(as_object& global)
     }
 
     // Register _global.String
-    global.init_member("NetStream", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -1595,7 +1596,7 @@ netstream_new(const fn_call& fn)
     {
         boost::intrusive_ptr<NetConnection_as> ns =
             boost::dynamic_pointer_cast<NetConnection_as>(
-                    fn.arg(0).to_object());
+                    fn.arg(0).to_object(*getGlobal(fn)));
         if ( ns )
         {
             netstream_obj->setNetCon(ns);

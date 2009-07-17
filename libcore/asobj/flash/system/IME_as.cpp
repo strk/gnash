@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void ime_class_init(as_object& global)
+void ime_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void ime_class_init(as_object& global)
     }
 
     // Register _global.IME
-    global.init_member("IME", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -79,7 +80,7 @@ attachIMEInterface(as_object& o)
 }
 
 void
-attachIMEStaticInterface(as_object& o)
+attachIMEStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +116,7 @@ ime_imeComposition(const fn_call& fn)
 }
 
 as_value
-ime_ctor(const fn_call& fn)
+ime_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IME_as;
 

@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-bitmapdatachannel_class_init(as_object& global)
+bitmapdatachannel_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachBitmapDataChannelStaticInterface(*o);
-    global.init_member("BitmapDataChannel", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachBitmapDataChannelStaticInterface(as_object& o)
+attachBitmapDataChannelStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

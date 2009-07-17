@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-sharedobjectflushstatus_class_init(as_object& global)
+sharedobjectflushstatus_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachSharedObjectFlushStatusStaticInterface(*o);
-    global.init_member("SharedObjectFlushStatus", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachSharedObjectFlushStatusStaticInterface(as_object& o)
+attachSharedObjectFlushStatusStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

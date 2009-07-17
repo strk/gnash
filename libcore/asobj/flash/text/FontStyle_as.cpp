@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void fontstyle_class_init(as_object& global)
+void fontstyle_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void fontstyle_class_init(as_object& global)
     }
 
     // Register _global.FontStyle
-    global.init_member("FontStyle", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachFontStyleInterface(as_object& o)
+attachFontStyleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachFontStyleStaticInterface(as_object& o)
+attachFontStyleStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getFontStyleInterface()
 }
 
 as_value
-fontstyle_ctor(const fn_call& fn)
+fontstyle_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FontStyle_as;
 

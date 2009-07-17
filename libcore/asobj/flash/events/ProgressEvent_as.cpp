@@ -55,7 +55,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void progressevent_class_init(as_object& global)
+void progressevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -66,7 +66,8 @@ void progressevent_class_init(as_object& global)
     }
 
     // Register _global.ProgressEvent
-    global.init_member("ProgressEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -81,7 +82,7 @@ attachProgressEventInterface(as_object& o)
 }
 
 void
-attachProgressEventStaticInterface(as_object& o)
+attachProgressEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +129,7 @@ progressevent_SOCKET_DATA(const fn_call& fn)
 }
 
 as_value
-progressevent_ctor(const fn_call& fn)
+progressevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ProgressEvent_as;
 

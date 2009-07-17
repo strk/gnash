@@ -45,8 +45,6 @@
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
-#include "extension.h"
-#include "ClassHierarchy.h"
 
 // Forward declarations
 namespace gnash {
@@ -86,6 +84,16 @@ public:
     /// a function (the constructor) with a prototype. In AS3 it is generally
     /// an object (the prototype) with a constructor.
     virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
+
+    virtual as_object* createString(const std::string& s) = 0;
+
+    virtual as_object* createNumber(double d) = 0;
+
+    virtual as_object* createBoolean(bool b) = 0;
+
+    virtual as_object* createObject() = 0;
+    
+    virtual as_object* createObject(as_object* prototype) = 0;
 
     virtual Global_as& global() {
         return *this;

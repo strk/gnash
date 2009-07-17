@@ -220,19 +220,16 @@ Keyboard_as::markReachableResources() const
 #endif // def GNASH_USE_GC
 
 // extern (used by Global.cpp)
-void Keyboard_as::init(as_object& global)
+void Keyboard_as::init(as_object& global, const ObjectURI& uri)
 {
-
-    //  GNASH_REPORT_FUNCTION;
-    //
 
     // Create built-in key object.
     // NOTE: _global.Key *is* an object, not a constructor
     as_object*  key_obj = new Keyboard_as;
 
-    const int flags = as_prop_flags::readOnly |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::dontEnum;
+    const int flags = PropFlags::readOnly |
+                      PropFlags::dontDelete |
+                      PropFlags::dontEnum;
 
     // constants
 #define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][key::KEY], flags)
@@ -276,7 +273,8 @@ void Keyboard_as::init(as_object& global)
     key_obj->init_member("isAccessible", 
             gl->createFunction(key_is_accessible), flags);
 
-    global.init_member("Key", key_obj);
+    global.init_member(getName(uri), key_obj, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // gnash namespace

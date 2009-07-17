@@ -42,8 +42,7 @@ public:
 	};
 
 
-	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunResources& r);
+	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunResources & r);
 
 private:
 
@@ -57,6 +56,10 @@ private:
 	unsigned _csm_table_int;
 
 };
+
+
+
+
 
 } // namespace gnash::SWF
 } // namespace gnash

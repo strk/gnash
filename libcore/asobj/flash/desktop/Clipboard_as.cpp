@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void clipboard_class_init(as_object& global)
+void clipboard_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void clipboard_class_init(as_object& global)
     }
 
     // Register _global.Clipboard
-    global.init_member("Clipboard", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachClipboardInterface(as_object& o)
+attachClipboardInterface(as_object& /*o*/)
 {
 }
 
 void
-attachClipboardStaticInterface(as_object& o)
+attachClipboardStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getClipboardInterface()
 }
 
 as_value
-clipboard_ctor(const fn_call& fn)
+clipboard_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Clipboard_as;
 

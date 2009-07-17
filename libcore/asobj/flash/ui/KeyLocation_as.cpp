@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void keylocation_class_init(as_object& global)
+void keylocation_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void keylocation_class_init(as_object& global)
     }
 
     // Register _global.KeyLocation
-    global.init_member("KeyLocation", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachKeyLocationInterface(as_object& o)
+attachKeyLocationInterface(as_object& /*o*/)
 {
 }
 
 void
-attachKeyLocationStaticInterface(as_object& o)
+attachKeyLocationStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getKeyLocationInterface()
 }
 
 as_value
-keylocation_ctor(const fn_call& fn)
+keylocation_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new KeyLocation_as;
 

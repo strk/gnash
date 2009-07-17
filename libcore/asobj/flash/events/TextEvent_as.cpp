@@ -55,7 +55,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textevent_class_init(as_object& global)
+void textevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -66,7 +66,8 @@ void textevent_class_init(as_object& global)
     }
 
     // Register _global.TextEvent
-    global.init_member("TextEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -81,7 +82,7 @@ attachTextEventInterface(as_object& o)
 }
 
 void
-attachTextEventStaticInterface(as_object& o)
+attachTextEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +129,7 @@ textevent_TEXT_INPUT(const fn_call& fn)
 }
 
 as_value
-textevent_ctor(const fn_call& fn)
+textevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextEvent_as;
 

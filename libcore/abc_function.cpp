@@ -25,6 +25,7 @@ namespace gnash{
 
 abc_function::abc_function(asMethod* methodInfo, Machine* machine)
     :
+    as_function(*machine->global()),
     _methodInfo(methodInfo),
     _machine(machine)
 {

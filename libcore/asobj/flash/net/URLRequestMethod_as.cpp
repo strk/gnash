@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-urlrequestmethod_class_init(as_object& global)
+urlrequestmethod_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachURLRequestMethodStaticInterface(*o);
-    global.init_member("URLRequestMethod", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachURLRequestMethodStaticInterface(as_object& o)
+attachURLRequestMethodStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

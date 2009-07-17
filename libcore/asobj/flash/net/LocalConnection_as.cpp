@@ -202,7 +202,7 @@ LocalConnection_as::getDomain()
 }
 
 void
-LocalConnection_as::init(as_object& glob)
+LocalConnection_as::init(as_object& glob, const ObjectURI& uri)
 {
 	// This is going to be the global Number "class"/"function"
 	static as_object* cl = NULL;
@@ -218,11 +218,11 @@ LocalConnection_as::init(as_object& glob)
 	}
 
 
-	int swf6flags = as_prop_flags::dontEnum | 
-                    as_prop_flags::dontDelete | 
-                    as_prop_flags::onlySWF6Up;
+	int swf6flags = PropFlags::dontEnum | 
+                    PropFlags::dontDelete | 
+                    PropFlags::onlySWF6Up;
 
-    glob.init_member(NSV::CLASS_LOCALCONNECTION, cl, swf6flags);
+    glob.init_member(gnash::getName(uri), cl, swf6flags, getNamespace(uri));
 }
 
 

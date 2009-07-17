@@ -65,7 +65,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void graphics_class_init(as_object& global)
+void graphics_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -76,7 +76,8 @@ void graphics_class_init(as_object& global)
     }
 
     // Register _global.Graphics
-    global.init_member("Graphics", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -101,7 +102,7 @@ attachGraphicsInterface(as_object& o)
 }
 
 void
-attachGraphicsStaticInterface(as_object& o)
+attachGraphicsStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -247,7 +248,7 @@ graphics_moveTo(const fn_call& fn)
 }
 
 as_value
-graphics_ctor(const fn_call& fn)
+graphics_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Graphics_as;
 

@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void soundmixer_class_init(as_object& global)
+void soundmixer_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void soundmixer_class_init(as_object& global)
     }
 
     // Register _global.SoundMixer
-    global.init_member("SoundMixer", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -79,7 +80,7 @@ attachSoundMixerInterface(as_object& o)
 }
 
 void
-attachSoundMixerStaticInterface(as_object& o)
+attachSoundMixerStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +116,7 @@ soundmixer_stopAll(const fn_call& fn)
 }
 
 as_value
-soundmixer_ctor(const fn_call& fn)
+soundmixer_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundMixer_as;
 

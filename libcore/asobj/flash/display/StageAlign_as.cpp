@@ -41,14 +41,15 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-stagealign_class_init(as_object& where)
+stagealign_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> obj =
         new as_object(getObjectInterface());
 
     attachStageAlignStaticInterface(*obj);
 
-    where.init_member("StageAlign", obj.get());
+    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

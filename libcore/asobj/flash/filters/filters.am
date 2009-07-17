@@ -86,4 +86,4 @@ FILTERS_HEADERS += asobj/flash/filters/GradientGlowFilter_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(FILTERS_SOURCES)
-noinst_HEADERS +=  $(FILTERS_HEADERS) asobj/flash/filters/filtersclasses.h
+noinst_HEADERS +=  $(FILTERS_HEADERS)

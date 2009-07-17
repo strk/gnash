@@ -31,8 +31,6 @@
 
 namespace gnash {
 
-	// List of domains that can access/modify local data
-	std::vector<std::string> _allowDataAccess;
 
 // Forward declarations.
 namespace {
@@ -60,17 +58,20 @@ namespace {
     as_value system_pause(const fn_call& fn);
     as_value system_resume(const fn_call& fn);
 
+	// List of domains that can access/modify local data
+	std::vector<std::string> _allowDataAccess;
 }
 
 
 void
-system_class_init(as_object& global)
+system_class_init(as_object& global, const ObjectURI& uri)
 {
 	// _global.System is NOT a class, but a simple object, see System.as
 
 	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachSystemInterface(*obj);
-	global.init_member("System", obj.get());
+	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 
@@ -109,10 +110,15 @@ getAllowDataAccess()
 /// domains that can access/modify local data
 //
 /// @param url a std::string containing the domain name
-void
+bool
 addAllowDataAccess( const std::string& url )
 {
+	size_t s = _allowDataAccess.size();
 	_allowDataAccess.push_back( url );	
+
+	if( s+1 == _allowDataAccess.size()) return true;
+
+	return false;
 }
 
 
@@ -282,9 +288,9 @@ getSystemCapabilitiesInterface(as_object& o)
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		const int flags = as_prop_flags::dontDelete
-		                | as_prop_flags::dontEnum
-		                | as_prop_flags::readOnly;
+		const int flags = PropFlags::dontDelete
+		                | PropFlags::dontEnum
+		                | PropFlags::readOnly;
 
 		proto = new as_object(getObjectInterface());
 
@@ -346,10 +352,10 @@ attachSystemInterface(as_object& proto)
 	proto.init_property("useCodepage", &system_usecodepage,
             &system_usecodepage);
 
-    const int flags = as_prop_flags::dontDelete
-                    | as_prop_flags::dontEnum
-                    | as_prop_flags::readOnly
-                    | as_prop_flags::onlySWF6Up;
+    const int flags = PropFlags::dontDelete
+                    | PropFlags::dontEnum
+                    | PropFlags::readOnly
+                    | PropFlags::onlySWF6Up;
 
     proto.init_property("exactSettings", &system_exactsettings,
             &system_exactsettings, flags);
@@ -360,11 +366,18 @@ attachSystemInterface(as_object& proto)
 as_value
 system_security_allowdomain(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else") );
+	// NOTE: This is the AS2 version of allowDomain, the AS3 version is located
+	// in Security_as.cpp
+	bool result;
+
+	// NOTE: Once the security portion (in the VM?) of this is implemented,
+	// this should probably return true only if access to the added domain was
+	// successfully granted
+    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else. It returns true if the string was successfuly stored.") );
 	for(unsigned int i = 0; i < fn.nargs; ++i) {
-		addAllowDataAccess( fn.arg(i).to_string());
+		result = addAllowDataAccess( fn.arg(i).to_string());
 	}
-    return as_value(); 
+    return as_value(result); 
 }
 
 

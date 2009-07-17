@@ -93,6 +93,7 @@ public:
 	int get_width() {return _width;};
 
 private:
+	//specified in AS livedocs
 	double _activityLevel;
 	int _bandwidth;
 	double _currentFPS;
@@ -108,6 +109,9 @@ private:
 	std::vector<std::string> _names;
 	int _quality;
 	int _width;
+	
+	//gnash specific
+	//std::vector<gst::GnashWebcam*> vid_vect;
 
 };
 

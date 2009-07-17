@@ -29,9 +29,10 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 /// Initialize the global URLRequestMethod class
-void urlrequestmethod_class_init(as_object& global);
+void urlrequestmethod_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

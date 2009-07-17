@@ -31,9 +31,13 @@
 #include <fcntl.h>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "flash/system/System_as.h"
 #include "as_object.h"
+#include "fn_call.h"
+#include "as_environment.h"
+#include "smart_ptr.h"
 #include "dejagnu.h"
 #include "log.h"
 #include "element.h"
@@ -157,6 +161,16 @@ static void test_client()
 	} else {
 		runtest.fail("_allowDataAccess vector does not contain 4 items");
 	}
+	
+	// TODO: Is there a way to call system_security_allowdomain() from here?
+	//boost::intrusive_ptr<as_object> obj = new as_object();
+	//boost::intrusive_ptr<as_environment> env = new as_environment(obj->getVM());
+	//auto_ptr< vector <as_value> > args;
+	//args->push_back( as_value("msn.com"));
+	//fn_call fn(obj, env, args);
+	//system_security_allowdomain(fn);
+
+
 
 }
 

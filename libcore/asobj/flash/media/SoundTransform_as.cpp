@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void soundtransform_class_init(as_object& global)
+void soundtransform_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void soundtransform_class_init(as_object& global)
     }
 
     // Register _global.SoundTransform
-    global.init_member("SoundTransform", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachSoundTransformInterface(as_object& o)
+attachSoundTransformInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSoundTransformStaticInterface(as_object& o)
+attachSoundTransformStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getSoundTransformInterface()
 }
 
 as_value
-soundtransform_ctor(const fn_call& fn)
+soundtransform_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundTransform_as;
 

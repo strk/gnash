@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void deleteobjectsample_class_init(as_object& global)
+void deleteobjectsample_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void deleteobjectsample_class_init(as_object& global)
     }
 
     // Register _global.DeleteObjectSample
-    global.init_member("DeleteObjectSample", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachDeleteObjectSampleInterface(as_object& o)
+attachDeleteObjectSampleInterface(as_object& /*o*/)
 {
 }
 
 void
-attachDeleteObjectSampleStaticInterface(as_object& o)
+attachDeleteObjectSampleStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getDeleteObjectSampleInterface()
 }
 
 as_value
-deleteobjectsample_ctor(const fn_call& fn)
+deleteobjectsample_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new DeleteObjectSample_as;
 

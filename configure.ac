@@ -1980,6 +1980,8 @@ if test "$media_handler" = "gst"; then
        fi
     done
   fi
+  GNASH_PKG_FIND(gstinterfaces, [gst/gstinterface.h], [gstreamer interfaces library], gst_mixer_type_get_type, [0.10])
+  GNASH_PKG_FIND(gstapp, [gst/app/gstappsink.h], [gstreamer app library], call_gmon_start, [0.10])
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
   if test x"${media_handler_specified}" = xfalse; then
     if test x"$GSTREAMER_LIBS" = x; then
@@ -2380,6 +2382,7 @@ testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
 testsuite/libamf.all/Makefile
 testsuite/libnet.all/Makefile
+testsuite/libmedia.all/Makefile
 gui/Makefile
 gui/Info.plist
 gui/pythonmod/Makefile

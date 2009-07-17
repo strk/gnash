@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void morphshape_class_init(as_object& global)
+void morphshape_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void morphshape_class_init(as_object& global)
     }
 
     // Register _global.MorphShape
-    global.init_member("MorphShape", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachMorphShapeInterface(as_object& o)
+attachMorphShapeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachMorphShapeStaticInterface(as_object& o)
+attachMorphShapeStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getMorphShapeInterface()
 }
 
 as_value
-morphshape_ctor(const fn_call& fn)
+morphshape_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new MorphShape_as;
 

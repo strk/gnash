@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void shape_class_init(as_object& global)
+void shape_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void shape_class_init(as_object& global)
     }
 
     // Register _global.Shape
-    global.init_member("Shape", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachShapeInterface(as_object& o)
+attachShapeInterface(as_object& /*o*/)
 {
 }
 
 void
-attachShapeStaticInterface(as_object& o)
+attachShapeStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getShapeInterface()
 }
 
 as_value
-shape_ctor(const fn_call& fn)
+shape_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Shape_as;
 

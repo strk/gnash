@@ -66,15 +66,25 @@ public:
 
     void registerClasses();
 
-    const ClassHierarchy& classHierarchy() const {
+    virtual as_object* createString(const std::string& s);
+
+    virtual as_object* createNumber(double d);
+
+    virtual as_object* createBoolean(bool b);
+    
+    virtual as_object* createObject();
+    
+    virtual as_object* createObject(as_object* prototype);
+    
+    virtual const ClassHierarchy& classHierarchy() const {
         return _classes;
     }
     
-    ClassHierarchy& classHierarchy() {
+    virtual ClassHierarchy& classHierarchy() {
         return _classes;
     }
 
-    VM& getVM() const {
+    virtual VM& getVM() const {
         return _vm;
     }
     
@@ -90,7 +100,7 @@ public:
 
 protected:
     
-    void markReachableResources() const;
+    virtual void markReachableResources() const;
 
 private:
 
@@ -122,21 +132,31 @@ public:
     virtual as_object* createClass(Global_as::ASFunction ctor,
             as_object* prototype);
 
-    const ClassHierarchy& classHierarchy() const {
+    virtual as_object* createString(const std::string& s);
+
+    virtual as_object* createNumber(double d);
+
+    virtual as_object* createBoolean(bool b);
+
+    virtual as_object* createObject();
+    
+    virtual as_object* createObject(as_object* prototype);
+
+    virtual const ClassHierarchy& classHierarchy() const {
         return _classes;
     }
     
-    ClassHierarchy& classHierarchy() {
+    virtual ClassHierarchy& classHierarchy() {
         return _classes;
     }
     
-    VM& getVM() const {
+    virtual VM& getVM() const {
         return _vm;
     }
 
 protected:
 
-    void markReachableResources() const {
+    virtual void markReachableResources() const {
         _classes.markReachableResources();
         markAsObjectReachable();
     }

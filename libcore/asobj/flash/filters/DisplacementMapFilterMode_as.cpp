@@ -39,19 +39,20 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void displacementmapfiltermode_class_init(as_object& global)
+void displacementmapfiltermode_class_init(as_object& global, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
     attachDisplacementMapFilterModeStaticInterface(*cl);
 
     // Register _global.DisplacementMapFilterMode
-    global.init_member("DisplacementMapFilterMode", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachDisplacementMapFilterModeStaticInterface(as_object& o)
+attachDisplacementMapFilterModeStaticInterface(as_object& /*o*/)
 {
 
 }

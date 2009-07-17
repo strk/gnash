@@ -173,11 +173,11 @@ pool_name(boost::uint32_t index, AbcBlock* pool)
 	as_value *e = &vte;														\
 	if (e->is_object())														\
 	{																		\
-		Property *b = e->to_object()->findProperty(NSV::PROP_VALUE_OF, 0);	\
+		Property *b = e->to_object(*_global)->findProperty(NSV::PROP_VALUE_OF, 0);	\
 		if (b)																\
 		{																	\
 			mStream->seekTo(opStart);										\
-			pushGet(e->to_object().get(), *e, b);							\
+			pushGet(e->to_object(*_global).get(), *e, b);							\
 			break;															\
 		}																	\
 	}																		\
@@ -204,11 +204,11 @@ pool_name(boost::uint32_t index, AbcBlock* pool)
 	as_value *c = &vte; /* Don't call vte multiple times */					\
 	if (c->is_object())														\
 	{																		\
-		Property *d = c->to_object()->findProperty(NSV::PROP_TO_STRING, 0);	\
+		Property *d = c->to_object(*_global)->findProperty(NSV::PROP_TO_STRING, 0);	\
 		if (d)																\
 		{																	\
 			mStream->seekTo(opStart);										\
-			pushGet(c->to_object().get(), *c, d);							\
+			pushGet(c->to_object(*_global).get(), *c, d);							\
 			break;															\
 		}																	\
 	}																		\
@@ -264,7 +264,7 @@ inline bool abstractEquality(const as_value& a, const as_value& b,
 	if (b.is_object())														\
 	{																		\
 		as_value v;															\
-		b.to_object()->get_member(NSV::INTERNAL_TYPE, &v);					\
+		b.to_object(*_global)->get_member(NSV::INTERNAL_TYPE, &v);					\
 		if (!a.conforms_to(mST.find(v.to_string())))						\
 			*store = false;													\
 	}																		\
@@ -345,6 +345,16 @@ Machine::global()
 }
 
 void
+Machine::push_scope_stack(as_value object)
+{
+    boost::intrusive_ptr<as_object> scopeObj = object.to_object(*_global);
+    assert(scopeObj.get());
+    log_abc("Pushing value %s onto scope stack.", object);
+    _scopeStack.push(scopeObj);
+    print_scope_stack();
+}
+
+void
 Machine::execute()
 {
 
@@ -416,7 +426,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(0));
                     
                     // Use get_super?
-                    as_object *super = _stack.top(0).to_object()->
+                    as_object *super = _stack.top(0).to_object(*_global)->
                         get_prototype().get();
                     
                     // If we don't have a super, throw.
@@ -448,7 +458,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(0));
                     
                     // Use get_super?
-                    as_object* super = _stack.pop().to_object()->
+                    as_object* super = _stack.pop().to_object(*_global)->
                         get_prototype().get();
                     if (!super) throw ASReferenceError();
                     Property* b = super->findProperty(a.getABCName(), 
@@ -848,12 +858,12 @@ Machine::execute()
                 case SWF::ABC_ACTION_PUSHSCOPE:
                 {
                     as_value scope_value = pop_stack();
-                    if (!scope_value.to_object().get()) {
+                    if (!scope_value.to_object(*_global).get()) {
                         IF_VERBOSE_ASCODING_ERRORS(
                         log_aserror(_("Can't push a null value onto the "
                                 "scope stack (%s)."), scope_value);
                         );
-                        scope_value = as_value(new as_object());
+                        scope_value = as_value(_global->createObject());
                     }	
                     push_scope_stack(scope_value);
                     break;
@@ -871,7 +881,7 @@ Machine::execute()
                     log_unimpl("ABC_ACTION_PUSHWITH");
                     // A scope object is just a regular object.
             // 		ENSURE_OBJECT(_stack.top(0));
-            // 		as_object *a = _stack.top(0).to_object().get();
+            // 		as_object *a = _stack.top(0).to_object(*_global).get();
             // 
             // 		if (!_scopeStack.empty())
             // 			a->set_prototype(_scopeStack.top(0).mScope);
@@ -911,7 +921,7 @@ Machine::execute()
                 {
                     ENSURE_NUMBER(_stack.top(0));
                     ENSURE_OBJECT(_stack.top(1));
-                    as_object *obj = _stack.top(1).to_object().get();
+                    as_object *obj = _stack.top(1).to_object(*_global).get();
                     const boost::uint32_t index =
                         _stack.top(0).to_number<boost::uint32_t>();
                     
@@ -943,7 +953,7 @@ Machine::execute()
                 {
                     ENSURE_NUMBER(_stack.top(0));
                     ENSURE_OBJECT(_stack.top(1));
-                    as_object *obj = _stack.top(1).to_object().get();
+                    as_object *obj = _stack.top(1).to_object(*_global).get();
                     boost::uint32_t index =
                         _stack.top(0).to_number<boost::uint32_t>();
                     _stack.drop(1);
@@ -983,7 +993,7 @@ Machine::execute()
                 {
                     ENSURE_NUMBER(_stack.top(0));
                     ENSURE_OBJECT(_stack.top(1));
-                    as_object *obj = _stack.top(1).to_object().get();
+                    as_object *obj = _stack.top(1).to_object(*_global).get();
                     const boost::uint32_t index =
                         _stack.top(0).to_number<boost::uint32_t>();
                     const Property *b = obj->getByIndex(index);
@@ -1150,7 +1160,7 @@ Machine::execute()
                     log_abc("HASNEXT2: Object is %s, index is %d",
                             objv, indexv);
 
-                    as_object *obj = objv.to_object().get();
+                    as_object *obj = objv.to_object(*_global).get();
                     if (!obj) {
                         // TODO: Check what to do here.
                         log_error("ABC_ACTION_HASNEXT2: expecting object in "
@@ -1217,7 +1227,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(argc + 1)); // The func
                     ENSURE_OBJECT(_stack.top(argc)); // The 'this'
                     as_function *f = _stack.top(argc + 1).to_as_function();
-                    as_object *obj = _stack.top(argc).to_object().get();
+                    as_object *obj = _stack.top(argc).to_object(*_global).get();
                     // We start with argc + 2 values related to this call
                     // on the stack. We want to end with 1 value. We pass
                     // argc values (the parameters), so we need to drop
@@ -1264,7 +1274,7 @@ Machine::execute()
                     boost::uint32_t dispatch_id = mStream->read_V32() - 1;
                     boost::uint32_t argc = mStream->read_V32();
                     ENSURE_OBJECT(_stack.top(argc));
-                    as_object *obj = _stack.top(argc).to_object().get();
+                    as_object *obj = _stack.top(argc).to_object(*_global).get();
                     const Property *f = obj->getByIndex(dispatch_id);
                     as_function* func;
 #if 0
@@ -1300,7 +1310,7 @@ Machine::execute()
                     boost::uint32_t argc = mStream->read_V32();
                     as_function *func = m->getPrototype();
                     ENSURE_OBJECT(_stack.top(argc));
-                    as_object *obj = _stack.top(argc).to_object().get();
+                    as_object *obj = _stack.top(argc).to_object(*_global).get();
                     pushCall(func, obj, _stack.top(argc), argc, 0);
                     break;
                 }
@@ -1326,7 +1336,7 @@ Machine::execute()
 
                     // Why get_super() here and get_prototype everywhere else?
                     as_object* super =
-                        _stack.top(argc).to_object()->get_super();
+                        _stack.top(argc).to_object(*_global)->get_super();
 
                     if (!super) throw ASReferenceError();
                     
@@ -1382,7 +1392,7 @@ Machine::execute()
 
                     as_value object_val = pop_stack();
 
-                    as_object *object = object_val.to_object().get();
+                    as_object *object = object_val.to_object(*_global).get();
                     if (!object) {
                         log_abc(_("CALLPROP: Can't call a method of a value "
                                 "that doesn't cast to an object (%s)."),
@@ -1415,7 +1425,7 @@ Machine::execute()
 
             /*		int shift = completeName(a, argc);
                     ENSURE_OBJECT(_stack.top(shift + argc));
-                    as_object *obj = _stack.top(argc + shift).to_object().get();
+                    as_object *obj = _stack.top(argc + shift).to_object(*_global).get();
                     Property *b = obj->findProperty(a.getABCName(), 
                         a.getNamespace()->getURI());
                     if (!b)
@@ -1489,7 +1499,7 @@ Machine::execute()
                     boost::uint32_t argc = mStream->read_V32();
                     get_args(argc);
                     
-                    as_object* obj = _stack.top(argc).to_object().get();
+                    as_object* obj = _stack.top(argc).to_object(*_global).get();
 
                     // Using get_super() here fails; is it broken, or is
                     // prototype what we want?
@@ -1531,7 +1541,7 @@ Machine::execute()
                             "%s on object %s", mST.value(a.getGlobalName()),
                             _stack.top(0));
 
-                    as_object* object = pop_stack().to_object().get();
+                    as_object* object = pop_stack().to_object(*_global).get();
 
                     if (!object) {
                         //TODO: Should this result in an exeception or an 
@@ -1570,10 +1580,10 @@ Machine::execute()
                             push_stack(as_value());
                         }
                         else {
-                            as_value val = c.to_object()->getMember(
+                            as_value val = c.to_object(*_global)->getMember(
                                     NSV::PROP_CONSTRUCTOR, 0);
 
-                            call_method(val, env, c.to_object().get(), args);
+                            call_method(val, env, c.to_object(*_global).get(), args);
 
                             // Push the constructed property
                             push_stack(c);
@@ -1597,7 +1607,7 @@ Machine::execute()
             /// NB: This builds an object from its properties, it's not a constructor.
                 case SWF::ABC_ACTION_NEWOBJECT:
                 {
-                    as_object *obj = new as_object(getObjectInterface());
+                    as_object *obj = _global->createObject(getObjectInterface());
                     boost::uint32_t argc = mStream->read_V32();
                     int i = argc;
                     while (i--)
@@ -1672,7 +1682,7 @@ Machine::execute()
                             mST.value(c->getName()));
                     
                     // This may be 0, and that's fine.
-                    as_object* base_class = pop_stack().to_object().get();
+                    as_object* base_class = pop_stack().to_object(*_global).get();
                     as_object* new_class = c->getPrototype();
                     
                     new_class->set_prototype(base_class);
@@ -1841,7 +1851,7 @@ Machine::execute()
                     else name = a.getGlobalName();
 
                     as_value val = pop_stack();
-                    as_object *object = val.to_object().get();
+                    as_object *object = val.to_object(*_global).get();
 
                     if (!object) {
                         log_error("ABC_ACTION_SETPROPERTY: expecting object "
@@ -1929,7 +1939,7 @@ Machine::execute()
                     else name = a.getGlobalName();
 
                     as_value object_val = pop_stack();
-                    as_object* object = object_val.to_object().get();
+                    as_object* object = object_val.to_object(*_global).get();
                     
                     log_abc(_("GETPROPERTY: Looking for property "
                             "%s of object %s"), mST.value(name), object_val);
@@ -1977,7 +1987,7 @@ Machine::execute()
                     // pop name and namespace values.
                     as_value object_val = pop_stack();
 
-                    as_object* object = object_val.to_object().get();
+                    as_object* object = object_val.to_object(*_global).get();
                     if (!object) {
                         log_abc("INITPROPERTY: expecting object on stack, "
                                 "got %s", object_val);
@@ -2000,7 +2010,7 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     _stack.drop(completeName(a));
-                    as_object* obj = _stack.top(0).to_object().get();
+                    as_object* obj = _stack.top(0).to_object(*_global).get();
 
                     if (!obj) {
                         // TODO: what here?
@@ -2029,7 +2039,7 @@ Machine::execute()
                 {
                     as_value val;
                     boost::uint32_t sindex = mStream->read_V32();
-                    as_object* object = pop_stack().to_object().get();
+                    as_object* object = pop_stack().to_object(*_global).get();
                     if (!object) {
                         log_abc("GETSLOT: Did not find expected object on "
                                 "stack");
@@ -2061,7 +2071,7 @@ Machine::execute()
                     log_abc("SETSLOT object: %s, value: %s, index: %s",
                             object, value, sindex);
 
-                    as_object* obj = object.to_object().get();
+                    as_object* obj = object.to_object(*_global).get();
                     if ( ! obj )
                     {
                         IF_VERBOSE_ASCODING_ERRORS(
@@ -2207,7 +2217,7 @@ Machine::execute()
                 /// Do: If obj is Undefined or Null, throw TypeError
                 case SWF::ABC_ACTION_CONVERT_O:
                 {
-                    _stack.top(0) = _stack.top(0).to_object().get();
+                    _stack.top(0) = _stack.top(0).to_object(*_global).get();
                     if (_stack.top(0).is_undefined() || _stack.top(0).is_null())
                         throw ASTypeError();
                     break;
@@ -2222,7 +2232,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_CHECKFILTER:
                 {
                     if (!_stack.top(0).is_object() ||
-                            !_stack.top(0).to_object()->isXML())
+                            !_stack.top(0).to_object(*_global)->isXML())
                         throw ASTypeError();
                     break;
                 }
@@ -2324,7 +2334,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_COERCE_O:
                 {
                     if (_stack.top(0).is_undefined())
-                        _stack.top(0) = _stack.top(0).to_object().get();
+                        _stack.top(0) = _stack.top(0).to_object(*_global).get();
                     else
                         _stack.top(0).set_undefined();
                     break;
@@ -2673,8 +2683,8 @@ Machine::execute()
                 {
                     as_value type = pop_stack();
                     as_value value = pop_stack();
-                    as_object* const valueObject = value.to_object().get();
-                    as_object* const typeObject = type.to_object().get();
+                    as_object* const valueObject = value.to_object(*_global).get();
+                    as_object* const typeObject = type.to_object(*_global).get();
 
                     if (!valueObject || !typeObject) {
                         // TODO: what here!?
@@ -2701,7 +2711,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_IN:
                 {
                     log_unimpl("ABC_ACTION_IN");
-                    //TODO: _stack.top(1).set_bool(_stack.top(1).to_object().contains(_stack.top(0)));
+                    //TODO: _stack.top(1).set_bool(_stack.top(1).to_object(*_global).contains(_stack.top(0)));
                     _stack.drop(1);
                     break;
                 }
@@ -2938,8 +2948,8 @@ Machine::completeName(asName& name, int offset)
 	if (name.isRuntime())
 	{
 		as_value obj = _stack.top(offset);
-		if (obj.is_object() && obj.to_object()->isQName()) {
-			name.fill(obj.to_object().get());
+		if (obj.is_object() && obj.to_object(*_global)->isQName()) {
+			name.fill(obj.to_object(*_global).get());
             ++size;
         }
 
@@ -2961,7 +2971,7 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 	if (v.is_undefined() || v.is_null()) return NULL;
 
 	if (v.is_object()) {
-		asClass *pProto = NULL; // TODO: v.to_object()->getClass();
+		asClass *pProto = NULL; // TODO: v.to_object(*_global)->getClass();
 		return pProto ? pProto->getSuper() : NULL;
 	}
 

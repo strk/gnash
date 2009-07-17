@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void invalidswferror_class_init(as_object& global)
+void invalidswferror_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void invalidswferror_class_init(as_object& global)
     }
 
     // Register _global.InvalidSWFError
-    global.init_member("InvalidSWFError", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachInvalidSWFErrorInterface(as_object& o)
+attachInvalidSWFErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachInvalidSWFErrorStaticInterface(as_object& o)
+attachInvalidSWFErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getInvalidSWFErrorInterface()
 }
 
 as_value
-invalidswferror_ctor(const fn_call& fn)
+invalidswferror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new InvalidSWFError_as;
 

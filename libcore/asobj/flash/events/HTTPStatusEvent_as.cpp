@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void httpstatusevent_class_init(as_object& global)
+void httpstatusevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void httpstatusevent_class_init(as_object& global)
     }
 
     // Register _global.HTTPStatusEvent
-    global.init_member("HTTPStatusEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -115,7 +116,7 @@ httpstatusevent_HTTP_STATUS(const fn_call& fn)
 }
 
 as_value
-httpstatusevent_ctor(const fn_call& fn)
+httpstatusevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new HTTPStatusEvent_as;
 

@@ -122,15 +122,17 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-movieclip_class_init(as_object& where)
+movieclip_class_init(as_object& where, const ObjectURI& uri)
 {
     if (isAS3(getVM(where))) {
 
         static boost::intrusive_ptr<as_object> cl =
             new as_object(getMovieClipAS3Interface());
         
+        // TODO: fix AVM2Global::createClass to work for AVM2.
+        Global_as* gl = getGlobal(where);
         cl->init_member(NSV::PROP_CONSTRUCTOR,
-                new builtin_function(movieclip_as3_ctor));
+                gl->createFunction(movieclip_as3_ctor));
 
         log_debug("AVM2 MovieClip, proto %s", cl);
 
@@ -146,7 +148,8 @@ movieclip_class_init(as_object& where)
         getVM(where).addStatic(cl.get());
     }
 
-    where.init_member("MovieClip", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 as_object*
@@ -372,9 +375,9 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_property("transform", &movieclip_transform, 
             &movieclip_transform);
 
-    const int swf6Flags = as_prop_flags::dontDelete |
-                as_prop_flags::dontEnum |
-                as_prop_flags::onlySWF6Up;
+    const int swf6Flags = PropFlags::dontDelete |
+                PropFlags::dontEnum |
+                PropFlags::onlySWF6Up;
 
     o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
     o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
@@ -393,9 +396,9 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
-    const int swf7Flags = as_prop_flags::dontDelete |
-                as_prop_flags::dontEnum |
-                as_prop_flags::onlySWF7Up;
+    const int swf7Flags = PropFlags::dontDelete |
+                PropFlags::dontEnum |
+                PropFlags::onlySWF7Up;
 
     o.init_member("getNextHighestDepth", gl->createFunction(
                 movieclip_getNextHighestDepth), swf7Flags);
@@ -596,7 +599,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::intrusive_ptr<as_object> initObj;
 
     if (fn.nargs > 3 ) {
-        initObj = fn.arg(3).to_object();
+        initObj = fn.arg(3).to_object(*getGlobal(fn));
         if (!initObj) {
             // This is actually a valid thing to do,
             // the documented behaviour is to just NOT
@@ -636,7 +639,7 @@ movieclip_attachAudio(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object().get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
     if ( ! obj )
     { 
         std::stringstream ss; fn.dump_args(ss);
@@ -907,7 +910,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     // Copy members from initObject
     if (fn.nargs == 3)
     {
-        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
+        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object(*getGlobal(fn));
         ch = movieclip->duplicateMovieClip(newname, depthValue,
                 initObject.get());
     }
@@ -1388,7 +1391,7 @@ movieclip_meth(const fn_call& fn)
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
-    boost::intrusive_ptr<as_object> o = v.to_object();
+    boost::intrusive_ptr<as_object> o = v.to_object(*getGlobal(fn));
     if ( ! o )
     {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
@@ -1504,7 +1507,7 @@ movieclip_globalToLocal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1567,7 +1570,7 @@ movieclip_localToGlobal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1640,7 +1643,7 @@ movieclip_setMask(const fn_call& fn)
     else
     {
 
-        boost::intrusive_ptr<as_object> obj ( arg.to_object() );
+        boost::intrusive_ptr<as_object> obj ( arg.to_object(*getGlobal(fn)) );
         DisplayObject* mask = dynamic_cast<DisplayObject*>(obj.get());
         if ( ! mask )
         {
@@ -2147,10 +2150,10 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     typedef boost::intrusive_ptr<as_object> ObjPtr;
 
-    ObjPtr colors = fn.arg(1).to_object();
-    ObjPtr alphas = fn.arg(2).to_object();
-    ObjPtr ratios = fn.arg(3).to_object();
-    ObjPtr matrixArg = fn.arg(4).to_object();
+    ObjPtr colors = fn.arg(1).to_object(*getGlobal(fn));
+    ObjPtr alphas = fn.arg(2).to_object(*getGlobal(fn));
+    ObjPtr ratios = fn.arg(3).to_object(*getGlobal(fn));
+    ObjPtr matrixArg = fn.arg(4).to_object(*getGlobal(fn));
 
     if ( ! colors || ! alphas || ! ratios || ! matrixArg )
     {
@@ -2490,7 +2493,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object().get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
     boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
 
     if (!bd) {

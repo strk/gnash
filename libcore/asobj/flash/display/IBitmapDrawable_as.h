@@ -27,11 +27,12 @@
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 namespace gnash {
 
 /// Initialize the global IBitmapDrawable class
-void ibitmapdrawable_class_init(as_object& global);
+void ibitmapdrawable_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

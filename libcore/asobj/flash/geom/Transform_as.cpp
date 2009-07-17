@@ -40,62 +40,20 @@
 
 namespace gnash {
 
-static as_value Transform_colorTransform_getset(const fn_call& fn);
-static as_value Transform_concatenatedColorTransform_getset(const fn_call& fn);
-static as_value Transform_concatenatedMatrix_getset(const fn_call& fn);
-static as_value Transform_matrix_getset(const fn_call& fn);
-static as_value Transform_pixelBounds_getset(const fn_call& fn);
+namespace {
 
-
-as_value Transform_ctor(const fn_call& fn);
-
-static void
-attachTransformInterface(as_object& o)
-{
-    Global_as* gl = getGlobal(o);
-    const int protectedFlags = as_prop_flags::isProtected;
-
-    o.init_property("matrix",
-            Transform_matrix_getset,
-            Transform_matrix_getset, protectedFlags);
-    o.init_property("concatenatedMatrix",
-            Transform_concatenatedMatrix_getset,
-            Transform_concatenatedMatrix_getset, protectedFlags);
-    o.init_property("colorTransform",
-            Transform_colorTransform_getset,
-            Transform_colorTransform_getset, protectedFlags);
-    o.init_property("concatenatedColorTransform",
-            Transform_concatenatedColorTransform_getset,
-            Transform_concatenatedColorTransform_getset, protectedFlags);
-    o.init_property("pixelBounds",
-            Transform_pixelBounds_getset,
-            Transform_pixelBounds_getset, protectedFlags);
+    as_value Transform_colorTransform(const fn_call& fn);
+    as_value Transform_concatenatedColorTransform(const fn_call& fn);
+    as_value Transform_concatenatedMatrix(const fn_call& fn);
+    as_value Transform_matrix(const fn_call& fn);
+    as_value Transform_pixelBounds(const fn_call& fn);
+    as_value Transform_ctor(const fn_call& fn);
+    void attachTransformInterface(as_object& o);
+    as_object* getTransformInterface();
+    as_value get_flash_geom_transform_constructor(const fn_call& fn);
 }
 
-static void
-attachTransformStaticProperties(as_object& /*o*/)
-{
-   
-}
 
-static as_object*
-getTransformInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachTransformInterface(*o);
-
-	}
-
-	return o.get();
-}
 
 class Transform_as: public as_object
 {
@@ -142,8 +100,21 @@ truncateDouble(double d)
     return static_cast<boost::int16_t>(d);
 }
 
-static as_value
-Transform_colorTransform_getset(const fn_call& fn)
+// extern 
+void
+transform_class_init(as_object& where, const ObjectURI& uri)
+{
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(getName(uri), 
+		    get_flash_geom_transform_constructor, flags, getNamespace(uri));
+
+}
+
+namespace {
+
+as_value
+Transform_colorTransform(const fn_call& fn)
 {
 
     const double factor = 256.0;
@@ -195,7 +166,7 @@ Transform_colorTransform_getset(const fn_call& fn)
         );
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -209,7 +180,8 @@ Transform_colorTransform_getset(const fn_call& fn)
     
     // TODO: check whether this is necessary (probable), 
     // or whether it can be any object.
-    boost::intrusive_ptr<ColorTransform_as> transform = dynamic_cast<ColorTransform_as*>(obj.get());
+    boost::intrusive_ptr<ColorTransform_as> transform =
+        dynamic_cast<ColorTransform_as*>(obj.get());
     if (!transform)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -236,8 +208,8 @@ Transform_colorTransform_getset(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-Transform_concatenatedColorTransform_getset(const fn_call& fn)
+as_value
+Transform_concatenatedColorTransform(const fn_call& fn)
 {
 	boost::intrusive_ptr<Transform_as> ptr = 
         ensureType<Transform_as>(fn.this_ptr);
@@ -246,8 +218,8 @@ Transform_concatenatedColorTransform_getset(const fn_call& fn)
 	return as_value();
 }
 
-static as_value
-Transform_concatenatedMatrix_getset(const fn_call& fn)
+as_value
+Transform_concatenatedMatrix(const fn_call& fn)
 {
 	boost::intrusive_ptr<Transform_as> ptr = 
         ensureType<Transform_as>(fn.this_ptr);
@@ -256,8 +228,8 @@ Transform_concatenatedMatrix_getset(const fn_call& fn)
 	return as_value();
 }
 
-static as_value
-Transform_matrix_getset(const fn_call& fn)
+as_value
+Transform_matrix(const fn_call& fn)
 {
 
     const double factor = 65536.0;
@@ -312,7 +284,7 @@ Transform_matrix_getset(const fn_call& fn)
     }
 
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -348,8 +320,8 @@ Transform_matrix_getset(const fn_call& fn)
 
 }
 
-static as_value
-Transform_pixelBounds_getset(const fn_call& fn)
+as_value
+Transform_pixelBounds(const fn_call& fn)
 {
 	boost::intrusive_ptr<Transform_as> ptr = 
         ensureType<Transform_as>(fn.this_ptr);
@@ -365,26 +337,28 @@ as_value
 Transform_ctor(const fn_call& fn)
 {
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
+
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("flash.geom.Transform(%s): needs one argument", ss.str());
+            log_aserror("flash.geom.Transform(%s): needs one argument",
+                ss.str());
         );
         return as_value();
     }
 
     // TODO: what about more than one argument? 
-	if (fn.nargs > 1)
-	{
+	if (fn.nargs > 1) {
 		std::stringstream ss;
 		fn.dump_args(ss);
-		LOG_ONCE( log_unimpl("Transform(%s): %s", ss.str(), _("arguments discarded")) );
+		LOG_ONCE(log_unimpl("Transform(%s): %s", ss.str(),
+                    _("arguments discarded")) );
 	}
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
-    boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.arg(0).to_object());
+    boost::intrusive_ptr<MovieClip> mc =
+        ensureType<MovieClip>(fn.arg(0).to_object(*getGlobal(fn)));
 
 	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);
 
@@ -393,43 +367,51 @@ Transform_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-as_function* getFlashGeomTransformConstructor()
-{
-    static builtin_function* cl = NULL;
-    if ( ! cl )
-    {
-        cl=new builtin_function(&Transform_ctor, getTransformInterface());
-        VM::get().addStatic(cl);
-        attachTransformStaticProperties(*cl);
-    }
-    return cl;
-}
-
-static as_value
-get_flash_geom_transform_constructor(const fn_call& /*fn*/)
+as_value
+get_flash_geom_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Transform class");
-
-    return getFlashGeomTransformConstructor();
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Transform_ctor, getTransformInterface());
 }
 
-// extern 
-void transform_class_init(as_object& where)
+as_object*
+getTransformInterface()
 {
-	// This is going to be the Transform "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl=new builtin_function(&Transform_ctor, getTransformInterface());
-	attachTransformStaticProperties(*cl);
+	static boost::intrusive_ptr<as_object> o;
 
-	// Register _global.Transform
-    string_table& st = getStringTable(where);
-    
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(st.find("Transform"), 
-		    get_flash_geom_transform_constructor, flags);
+	if (!o) {
 
+		// TODO: check if this class should inherit from Object
+		//       or from a different class
+		o = new as_object(getObjectInterface());
+		VM::get().addStatic(o.get());
+
+		attachTransformInterface(*o);
+
+	}
+
+	return o.get();
 }
+
+void
+attachTransformInterface(as_object& o)
+{
+    const int protectedFlags = PropFlags::isProtected;
+
+    o.init_property("matrix", Transform_matrix, Transform_matrix,
+            protectedFlags);
+    o.init_property("concatenatedMatrix", Transform_concatenatedMatrix,
+            Transform_concatenatedMatrix, protectedFlags);
+    o.init_property("colorTransform", Transform_colorTransform,
+            Transform_colorTransform, protectedFlags);
+    o.init_property("concatenatedColorTransform",
+            Transform_concatenatedColorTransform,
+            Transform_concatenatedColorTransform, protectedFlags);
+    o.init_property("pixelBounds", Transform_pixelBounds,
+            Transform_pixelBounds, protectedFlags);
+}
+
+} // anonymous namespace
 
 } // end of gnash namespace

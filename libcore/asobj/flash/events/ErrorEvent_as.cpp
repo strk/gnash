@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void errorevent_class_init(as_object& global)
+void errorevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void errorevent_class_init(as_object& global)
     }
 
     // Register _global.ErrorEvent
-    global.init_member("ErrorEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -115,7 +116,7 @@ errorevent_ERROR(const fn_call& fn)
 }
 
 as_value
-errorevent_ctor(const fn_call& fn)
+errorevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ErrorEvent_as;
 

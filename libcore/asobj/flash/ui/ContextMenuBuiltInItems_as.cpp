@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void contextmenubuiltinitems_class_init(as_object& global)
+void contextmenubuiltinitems_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void contextmenubuiltinitems_class_init(as_object& global)
     }
 
     // Register _global.ContextMenuBuiltInItems
-    global.init_member("ContextMenuBuiltInItems", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachContextMenuBuiltInItemsInterface(as_object& o)
+attachContextMenuBuiltInItemsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachContextMenuBuiltInItemsStaticInterface(as_object& o)
+attachContextMenuBuiltInItemsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getContextMenuBuiltInItemsInterface()
 }
 
 as_value
-contextmenubuiltinitems_ctor(const fn_call& fn)
+contextmenubuiltinitems_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ContextMenuBuiltInItems_as;
 

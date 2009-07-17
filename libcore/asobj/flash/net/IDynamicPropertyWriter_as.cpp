@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void idynamicpropertywriter_class_init(as_object& global)
+void idynamicpropertywriter_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void idynamicpropertywriter_class_init(as_object& global)
     }
 
     // Register _global.IDynamicPropertyWriter
-    global.init_member("IDynamicPropertyWriter", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachIDynamicPropertyWriterInterface(as_object& o)
+attachIDynamicPropertyWriterInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIDynamicPropertyWriterStaticInterface(as_object& o)
+attachIDynamicPropertyWriterStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getIDynamicPropertyWriterInterface()
 }
 
 as_value
-idynamicpropertywriter_ctor(const fn_call& fn)
+idynamicpropertywriter_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IDynamicPropertyWriter_as;
 

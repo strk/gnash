@@ -85,7 +85,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void event_class_init(as_object& global)
+void event_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -96,7 +96,8 @@ void event_class_init(as_object& global)
     }
 
     // Register _global.Event
-    global.init_member("Event", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -141,7 +142,7 @@ attachEventInterface(as_object& o)
 }
 
 void
-attachEventStaticInterface(as_object& o)
+attachEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -488,7 +489,7 @@ event_UNLOAD(const fn_call& fn)
 }
 
 as_value
-event_ctor(const fn_call& fn)
+event_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Event_as;
 

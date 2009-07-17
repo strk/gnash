@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-gridfittype_class_init(as_object& global)
+gridfittype_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachGridFitTypeStaticInterface(*o);
-    global.init_member("GridFitType", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachGridFitTypeStaticInterface(as_object& o)
+attachGridFitTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

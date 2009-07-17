@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void printjob_class_init(as_object& global)
+void printjob_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void printjob_class_init(as_object& global)
     }
 
     // Register _global.PrintJob
-    global.init_member("PrintJob", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -79,7 +80,7 @@ attachPrintJobInterface(as_object& o)
 }
 
 void
-attachPrintJobStaticInterface(as_object& o)
+attachPrintJobStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +116,7 @@ printjob_start(const fn_call& fn)
 }
 
 as_value
-printjob_ctor(const fn_call& fn)
+printjob_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new PrintJob_as;
 

@@ -444,7 +444,7 @@ XMLNode_as::getXMLNodeInterface()
 }
 
 void
-XMLNode_as::init(as_object& global)
+XMLNode_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is the global XMLNode_as "class"
     static boost::intrusive_ptr<as_object> cl;
@@ -455,7 +455,8 @@ XMLNode_as::init(as_object& global)
         cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());
     }
 
-    global.init_member("XMLNode", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -484,7 +485,7 @@ attachXMLNodeInterface(as_object& o)
                 xmlnode_getNamespaceForPrefix), noFlags);
 
 
-    const int protectedFlags = as_prop_flags::isProtected;
+    const int protectedFlags = PropFlags::isProtected;
 
     // Just the protected flag:
     o.init_property("nodeValue", &xmlnode_nodeValue, 
@@ -544,7 +545,7 @@ xmlnode_appendChild(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> xml_obj = 
-        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object());	
+        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object(*getGlobal(fn)));	
 	if ( ! xml_obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -588,7 +589,7 @@ xmlnode_insertBefore(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> newnode = 
-        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object());
+        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object(*getGlobal(fn)));
 
 	if (!newnode) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -600,7 +601,7 @@ xmlnode_insertBefore(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> pos = 
-        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(1).to_object());
+        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(1).to_object(*getGlobal(fn)));
 
 	if (!pos) {
 		IF_VERBOSE_ASCODING_ERRORS(

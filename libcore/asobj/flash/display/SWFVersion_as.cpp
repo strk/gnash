@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-swfversion_class_init(as_object& global)
+swfversion_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachSWFVersionStaticInterface(*o);
-    global.init_member("SWFVersion", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachSWFVersionStaticInterface(as_object& o)
+attachSWFVersionStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

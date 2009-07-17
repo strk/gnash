@@ -211,6 +211,12 @@ main (int /*argc*/, char** /*argv*/) {
     } else {
         runtest.fail ("rc.getWhiteList() doesn't have elements");        
     }
+
+    if (rc.getLCShmKey() == 0xdd3adabd) {
+        runtest.pass ("rc.getLCShmKey() == 0xabcd1234");
+    } else {
+        runtest.fail ("rc.getLCShmKey() != 0xabcd1234");
+    }
         
     std::vector<std::string> blacklist = rc.getBlackList();
     if (blacklist.size()) {

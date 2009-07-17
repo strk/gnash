@@ -55,7 +55,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void loader_class_init(as_object& global)
+void loader_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -66,7 +66,8 @@ void loader_class_init(as_object& global)
     }
 
     // Register _global.Loader
-    global.init_member("Loader", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -81,7 +82,7 @@ attachLoaderInterface(as_object& o)
 }
 
 void
-attachLoaderStaticInterface(as_object& o)
+attachLoaderStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +129,7 @@ loader_unload(const fn_call& fn)
 }
 
 as_value
-loader_ctor(const fn_call& fn)
+loader_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Loader_as;
 

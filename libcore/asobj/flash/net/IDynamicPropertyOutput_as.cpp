@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void idynamicpropertyoutput_class_init(as_object& global)
+void idynamicpropertyoutput_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void idynamicpropertyoutput_class_init(as_object& global)
     }
 
     // Register _global.IDynamicPropertyOutput
-    global.init_member("IDynamicPropertyOutput", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachIDynamicPropertyOutputInterface(as_object& o)
+attachIDynamicPropertyOutputInterface(as_object& /*o*/)
 {
 }
 
 void
-attachIDynamicPropertyOutputStaticInterface(as_object& o)
+attachIDynamicPropertyOutputStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getIDynamicPropertyOutputInterface()
 }
 
 as_value
-idynamicpropertyoutput_ctor(const fn_call& fn)
+idynamicpropertyoutput_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new IDynamicPropertyOutput_as;
 

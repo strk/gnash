@@ -29,10 +29,11 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 class DisplayObject;
 
 /// Initialize the global MovieClip class
-void movieclip_class_init(as_object& global);
+void movieclip_class_init(as_object& global, const ObjectURI& uri);
 
 /// Get an as_object with the AS3 MovieClip interface.
 as_object* getMovieClipAS3Interface();

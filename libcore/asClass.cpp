@@ -26,6 +26,7 @@
 #include "namedStrings.h"
 #include "as_value.h"
 #include "asNamespace.h"
+#include "Global_as.h"
 
 #ifdef ENABLE_AVM2
 #include "asMethod.h"
@@ -40,18 +41,20 @@ asClass::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst,
         bool isstatic)
 {
-	if (val.is_object()) {
-		val.to_object()->set_member(NSV::INTERNAL_TYPE, 
+    Global_as* g = VM::get().getGlobal();
+
+    if (val.is_object()) {
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, 
 			std::size_t(type->getName()));
     }
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	int flags = as_prop_flags::dontDelete;
+	int flags = PropFlags::dontDelete;
 	if (isconst)
-		flags |= as_prop_flags::readOnly;
+		flags |= PropFlags::readOnly;
 	if (isstatic)
-		flags |= as_prop_flags::staticProp;
+		flags |= PropFlags::staticProp;
 
 	if(slotId == 0){
 		_prototype->init_member(name, val, flags, nsname);
@@ -100,10 +103,10 @@ asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
 {
 	as_value val = new abc_function(method, getVM(*_prototype).getMachine());
 	_prototype->init_member(name, val);
-//	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
-//		| as_prop_flags::dontEnum;
+//	int flags = PropFlags::readOnly | PropFlags::dontDelete
+//		| PropFlags::dontEnum;
 //	if (isstatic)
-//		flags |= as_prop_flags::staticProp;
+//		flags |= PropFlags::staticProp;
 
 	return true;
 }
@@ -121,9 +124,9 @@ asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
 		getset->setGetter(method->getPrototype());
 	else
 	{
-		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		if (isstatic)
-			flags |= as_prop_flags::staticProp;
+			flags |= PropFlags::staticProp;
 		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
@@ -142,9 +145,9 @@ asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
 		getset->setSetter(method->getPrototype());
 	else
 	{
-		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		if (isstatic)
-			flags |= as_prop_flags::staticProp;
+			flags |= PropFlags::staticProp;
 		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}

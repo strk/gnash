@@ -54,14 +54,15 @@ Mouse_as::registerNative(as_object& o)
 
 // extern (used by Global.cpp)
 void
-mouse_class_init(as_object& global)
+mouse_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Mouse "class"/"function"
     boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
     attachMouseInterface(*obj);
 
     // Register _global.Mouse
-    global.init_member("Mouse", obj.get());
+    global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -71,12 +72,11 @@ namespace {
 void
 attachMouseInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
     o.init_member("show", vm.getNative(5, 0), flags);
     o.init_member("hide", vm.getNative(5, 1), flags);

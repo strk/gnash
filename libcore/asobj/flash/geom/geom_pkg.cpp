@@ -19,48 +19,46 @@
 
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
-
 #include "string_table.h"
 #include "VM.h"
 #include "fn_call.h"
-#include "MovieClip.h"
-
 #include "ColorTransform_as.h"
 #include "Matrix_as.h"
 #include "Point_as.h"
 #include "Rectangle_as.h"
 #include "Transform_as.h"
-
+#include "namedStrings.h"
 #include "geom_pkg.h"
-#include "geomclasses.h"
 
 namespace gnash {
 
 static as_value
 get_flash_geom_package(const fn_call& fn)
 {
-	log_debug("Loading flash.geom package");
-	as_object *pkg = new as_object(getObjectInterface());
+    log_debug("Loading flash.geom package");
+    as_object *pkg = new as_object(getObjectInterface());
+	
+    string_table& st = getStringTable(fn);
+    const string_table::key global = 0;
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-	while (geomclasses[i]) {
-	    geomclasses[i](*pkg);
-        ++i;
-    }
+    colortransform_class_init(*pkg,
+            ObjectURI(st.find("ColorTransform"), global));
+	matrix_class_init(*pkg, ObjectURI(st.find("Matrix"), global));
+	point_class_init(*pkg, ObjectURI(st.find("Point"), global));
+	rectangle_class_init(*pkg, ObjectURI(st.find("Rectangle"), global));
+	transform_class_init(*pkg, ObjectURI(st.find("Transform"), global));
 
-	return pkg;
+    return pkg;
 }
 
 void
-flash_geom_package_init(as_object& where)
+flash_geom_package_init(as_object& where, const ObjectURI& uri)
 {
-	string_table& st = getStringTable(where);
 
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("geom"),
-			get_flash_geom_package, flags);
+    where.init_destructive_property(getName(uri), get_flash_geom_package,
+            flags, getNamespace(uri));
 }
 
 

@@ -53,7 +53,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void soundchannel_class_init(as_object& global)
+void soundchannel_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -64,7 +64,8 @@ void soundchannel_class_init(as_object& global)
     }
 
     // Register _global.SoundChannel
-    global.init_member("SoundChannel", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -77,7 +78,7 @@ attachSoundChannelInterface(as_object& o)
 }
 
 void
-attachSoundChannelStaticInterface(as_object& o)
+attachSoundChannelStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -103,7 +104,7 @@ soundchannel_soundComplete(const fn_call& fn)
 }
 
 as_value
-soundchannel_ctor(const fn_call& fn)
+soundchannel_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SoundChannel_as;
 

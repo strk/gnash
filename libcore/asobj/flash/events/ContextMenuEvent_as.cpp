@@ -55,7 +55,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void contextmenuevent_class_init(as_object& global)
+void contextmenuevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -66,7 +66,8 @@ void contextmenuevent_class_init(as_object& global)
     }
 
     // Register _global.ContextMenuEvent
-    global.init_member("ContextMenuEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -81,7 +82,7 @@ attachContextMenuEventInterface(as_object& o)
 }
 
 void
-attachContextMenuEventStaticInterface(as_object& o)
+attachContextMenuEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +129,7 @@ contextmenuevent_MENU_SELECT(const fn_call& fn)
 }
 
 as_value
-contextmenuevent_ctor(const fn_call& fn)
+contextmenuevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ContextMenuEvent_as;
 

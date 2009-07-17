@@ -29,7 +29,7 @@
 #include "PropertyList.h"
 #include "as_value.h" // for return of get_primitive_value
 #include "smart_ptr.h"
-#include "as_prop_flags.h" // for enum
+#include "PropFlags.h" // for enum
 #include "GnashException.h"
 
 #include <cmath>
@@ -122,8 +122,7 @@ public:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object
-    :
+class as_object :
 #ifdef GNASH_USE_GC
     public GcResource
 #else
@@ -139,6 +138,36 @@ class as_object
     typedef PropertyList::SortedPropertyList SortedPropertyList;
 
 public:
+    
+    /// Construct an ActionScript object with no prototype associated.
+    //
+    /// @param  global  A reference to the Global object the new
+    ///                 object ultimately belongs to. The created object
+    ///                 uses the resources of the Global object.
+    explicit as_object(Global_as& global);
+
+    /// Construct an ActionScript object with no prototype associated.
+    as_object();
+
+    /// \brief
+    /// Construct an ActionScript object based on the given prototype.
+    /// Adds a reference to the prototype, if any.
+    explicit as_object(as_object* proto);
+
+    /// Construct an ActionScript object based on the given prototype.
+    explicit as_object(boost::intrusive_ptr<as_object> proto);
+    
+    /// Copy an as_object.
+    //
+    /// This is used by Array_as, but almost certainly shouldn't be. Please
+    /// don't use this function.
+    explicit as_object(const as_object& other);
+
+    /// The most common flags for built-in properties.
+    //
+    /// Most API properties, including classes and objects, have these flags.
+    static const int DefaultFlags = PropFlags::dontDelete |
+                                    PropFlags::dontEnum;
 
     /// A function to be called on movie_root::advance()
     //
@@ -168,11 +197,7 @@ public:
     Property* findProperty(string_table::key name, string_table::key nsname,
         as_object **owner = NULL);
 
-//    Property* findProperty(
-
-    /// \brief
-    /// Return a reference to the Virtual Machine that created
-    /// this object. 
+    /// Return a reference to this as_object's global object.
     VM& vm() const {
         return _vm;
     }
@@ -195,23 +220,6 @@ public:
     ///
     void dump_members(std::map<std::string, as_value>& to);
 
-    /// Construct an ActionScript object with no prototype associated.
-    as_object();
-
-    /// \brief
-    /// Construct an ActionScript object based on the given prototype.
-    /// Adds a reference to the prototype, if any.
-    explicit as_object(as_object* proto);
-
-    /// Construct an ActionScript object based on the given prototype.
-    explicit as_object(boost::intrusive_ptr<as_object> proto);
-
-    /// Copy an as_object
-    //
-    /// TODO: write more about this, is it allowed ? is it safe ?
-    ///
-    as_object(const as_object& other);
-    
     /// Return a text representation for this object
     virtual std::string get_text_value() const { return "[object Object]"; }
 
@@ -303,14 +311,13 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     void init_member(const std::string& name, const as_value& val, 
-        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum, 
-        string_table::key nsname = 0);
+        int flags = DefaultFlags, string_table::key nsname = 0);
 
     /// Initialize a member value by key
     //
@@ -330,7 +337,7 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
@@ -342,8 +349,8 @@ public:
     /// get_slot
     ///
     void init_member(string_table::key key, const as_value& val, 
-        int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
-        string_table::key nsname = 0, int slotId = -1);
+        int flags = DefaultFlags, string_table::key nsname = 0,
+        int slotId = -1);
 
     /// \brief
     /// Initialize a getter/setter property by name
@@ -366,14 +373,13 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     void init_property(const std::string& key, as_function& getter,
-        as_function& setter,
-        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+        as_function& setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
 
     /// \brief
@@ -397,14 +403,13 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     void init_property(const std::string& key, as_c_function_ptr getter,
-        as_c_function_ptr setter,
-        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+        as_c_function_ptr setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
 
     /// \brief
@@ -427,14 +432,13 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     void init_property(string_table::key key, as_function& getter,
-        as_function& setter,
-        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+        as_function& setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
 
     /// \brief
@@ -457,14 +461,13 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     void init_property(string_table::key key, as_c_function_ptr getter,
-        as_c_function_ptr setter,
-        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+        as_c_function_ptr setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
 
 
@@ -486,14 +489,14 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     ///
     bool init_destructive_property(string_table::key key, as_function& getter,
-        int flags = as_prop_flags::dontEnum, string_table::key nsname = 0);
+        int flags = PropFlags::dontEnum, string_table::key nsname = 0);
 
     /// \brief
     /// Initialize a destructive getter property
@@ -513,14 +516,14 @@ public:
     ///
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See as_prop_flags::Flags.
+    ///    See PropFlags::Flags.
     ///
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     ///
     bool init_destructive_property(string_table::key key,
-            as_c_function_ptr getter, int flags = as_prop_flags::dontEnum,
+            as_c_function_ptr getter, int flags = PropFlags::dontEnum,
             string_table::key nsname = 0);
 
 
@@ -551,12 +554,10 @@ public:
     ///
     ///
     void init_readonly_property(const std::string& key, as_function& getter,
-            int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
-            string_table::key nsname = 0);
+            int flags = DefaultFlags, string_table::key nsname = 0);
 
     void init_readonly_property(const string_table::key& key,
-            as_function& getter,
-            int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+            as_function& getter, int flags = DefaultFlags,
             string_table::key nsname = 0);
 
     /// Use this method for read-only properties.
@@ -584,13 +585,11 @@ public:
     ///     for a specific namespace.
     ///
     void init_readonly_property(const std::string& key,
-            as_c_function_ptr getter,
-            int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+            as_c_function_ptr getter, int flags = DefaultFlags,
             string_table::key nsname = 0);
 
     void init_readonly_property(const string_table::key& key,
-            as_c_function_ptr getter,
-            int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
+            as_c_function_ptr getter, int flags = DefaultFlags,
             string_table::key nsname = 0);
 
     /// \brief
@@ -1028,7 +1027,7 @@ public:
     /// will do just the same
     ///
     void set_prototype(boost::intrusive_ptr<as_object> proto,
-            int flags=as_prop_flags::dontDelete | as_prop_flags::dontEnum);
+            int flags = DefaultFlags);
 
     /// @{ Common ActionScript methods for DisplayObjects
     /// TODO: make protected
@@ -1104,9 +1103,9 @@ protected:
 #endif // GNASH_USE_GC
 
 private:
-    
-    /// The Virtual Machine used to create this object
-    VM& _vm;
+ 
+    /// The global object whose scope contains this object.
+    VM& _vm;   
 
     /// Properties of this objects 
     PropertyList _members;
@@ -1136,6 +1135,38 @@ private:
     typedef std::map< FQkey, Trigger > TriggerContainer;
     TriggerContainer _trigs;
 };
+
+/// A URI for describing built-in as_objects.
+//
+/// This is used as a unique identifier for prototypes, class, constructors
+/// etc.
+struct ObjectURI
+{
+    /// Construct an ObjectURI from name and namespace.
+    ObjectURI(string_table::key name, string_table::key ns)
+        :
+        name(name),
+        ns(ns)
+    {}
+
+    string_table::key name;
+    string_table::key ns;
+};
+
+/// Get the name element of an ObjectURI
+inline string_table::key
+getName(const ObjectURI& o)
+{
+    return o.name;
+}
+
+/// Get the namespace element of an ObjectURI
+inline string_table::key
+getNamespace(const ObjectURI& o)
+{
+    return o.ns;
+}
+
 
 /// Template which does a dynamic cast for as_object pointers.
 //

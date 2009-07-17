@@ -57,7 +57,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void focusevent_class_init(as_object& global)
+void focusevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -68,7 +68,8 @@ void focusevent_class_init(as_object& global)
     }
 
     // Register _global.FocusEvent
-    global.init_member("FocusEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -151,7 +152,7 @@ focusevent_MOUSE_FOCUS_CHANGE(const fn_call& fn)
 }
 
 as_value
-focusevent_ctor(const fn_call& fn)
+focusevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FocusEvent_as;
 

@@ -53,14 +53,15 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-selection_class_init(as_object& global)
+selection_class_init(as_object& global, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
 
 	static boost::intrusive_ptr<as_object> obj = 
         new as_object(getObjectInterface());
 	attachSelectionInterface(*obj);
-	global.init_member("Selection", obj.get());
+	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -84,9 +85,9 @@ attachSelectionInterface(as_object& o)
 {
     VM& vm = getVM(o);
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::readOnly;
 
 	o.init_member("getBeginIndex", vm.getNative(600, 0), flags);
 	o.init_member("getEndIndex", vm.getNative(600, 1), flags);
@@ -236,7 +237,8 @@ selection_setFocus(const fn_call& fn)
     }
     else {
         /// Try converting directly to DisplayObject.
-        ch = dynamic_cast<DisplayObject*>(focus.to_object().get());
+        ch = dynamic_cast<DisplayObject*>(
+                focus.to_object(*getGlobal(fn)).get());
     }
 
     // If the argument does not resolve to a DisplayObject, do nothing.

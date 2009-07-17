@@ -73,7 +73,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void urlstream_class_init(as_object& global)
+void urlstream_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -84,7 +84,8 @@ void urlstream_class_init(as_object& global)
     }
 
     // Register _global.URLStream
-    global.init_member("URLStream", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -117,7 +118,7 @@ attachURLStreamInterface(as_object& o)
 }
 
 void
-attachURLStreamStaticInterface(as_object& o)
+attachURLStreamStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -344,7 +345,7 @@ urlstream_securityError(const fn_call& fn)
 }
 
 as_value
-urlstream_ctor(const fn_call& fn)
+urlstream_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLStream_as;
 

@@ -19,7 +19,7 @@
 #define GNASH_PROPERTYLIST_H
 
 #include "Property.h" // for templated functions
-#include "as_prop_flags.h" // for templated functions
+#include "PropFlags.h" // for templated functions
 #include "as_value.h" // for templated functions
 #include "string_table.h"
 
@@ -267,7 +267,7 @@ public:
 	///
 	bool setValue(string_table::key key, const as_value& value,
 			as_object& this_ptr, string_table::key namespaceId = 0,
-			const as_prop_flags& flagsIfMissing=0);
+			const PropFlags& flagsIfMissing=0);
 
 	/// Reserves a slot number for a property
 	///
@@ -353,7 +353,7 @@ public:
 	///
 	bool addGetterSetter(string_table::key key, as_function& getter,
 		as_function* setter, const as_value& cacheVal,
-		const as_prop_flags& flagsIfMissing=0, string_table::key ns=0);
+		const PropFlags& flagsIfMissing=0, string_table::key ns=0);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing
@@ -374,7 +374,7 @@ public:
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
-		as_c_function_ptr setter, const as_prop_flags& flagsIfMissing,
+		as_c_function_ptr setter, const PropFlags& flagsIfMissing,
 		string_table::key ns = 0);
 
 	/// \brief
@@ -394,7 +394,7 @@ public:
 	///
 	bool addDestructiveGetter(string_table::key key,
 		as_function& getter, string_table::key ns = 0,
-		const as_prop_flags& flagsIfMissing=0);
+		const PropFlags& flagsIfMissing=0);
 
 	/// \brief
 	/// Add a destructive getter property, if not already existant.
@@ -413,7 +413,7 @@ public:
 	///
 	bool addDestructiveGetter(string_table::key key,
 		as_c_function_ptr getter, string_table::key ns = 0,
-		const as_prop_flags& flagsIfMissing=0);
+		const PropFlags& flagsIfMissing=0);
 
 	/// Set the flags of a property.
 	//

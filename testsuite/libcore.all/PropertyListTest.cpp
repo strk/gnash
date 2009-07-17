@@ -27,7 +27,7 @@
 #include "as_value.h"
 #include "log.h"
 #include "smart_ptr.h"
-#include "as_prop_flags.h"
+#include "PropFlags.h"
 #include "ManualClock.h"
 #include "RunResources.h"
 
@@ -126,7 +126,7 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(props.size(), 4);
 
 		// Set property var2 as protected from deletion!
-		check(props.setFlags(st.find("var2"), as_prop_flags::dontDelete, 0));
+		check(props.setFlags(st.find("var2"), PropFlags::dontDelete, 0));
 		// this fails (protected from deletion)
 		std::pair<bool, bool> delpair = props.delProperty(st.find("var2"));
 		check_equals(delpair.first, true); // property was found
@@ -190,7 +190,7 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(props.size(), 3);
 
 		// Set property var2 as protected from deletion!
-		check(props.setFlags(st.find("var2"), as_prop_flags::dontDelete, 0));
+		check(props.setFlags(st.find("var2"), PropFlags::dontDelete, 0));
 		// this fails (protected from deletion)
 		std::pair<bool, bool> delpair = props.delProperty(st.find("var2"));
 		check_equals(delpair.first, true); // property was found

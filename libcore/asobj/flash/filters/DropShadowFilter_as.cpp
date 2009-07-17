@@ -55,14 +55,12 @@ public:
     
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> DropShadowFilter_as::s_interface;
 
-boost:: intrusive_ptr<as_object> DropShadowFilter_as::s_ctor;
 
 as_object*
 DropShadowFilter_as::Interface() {
@@ -75,19 +73,16 @@ DropShadowFilter_as::Interface() {
 }
 
 void
-DropShadowFilter_as::registerCtor(as_object& global) {
-    if (DropShadowFilter_as::s_ctor != NULL) return;
-    Global_as* gl = getGlobal(global);
-    DropShadowFilter_as::s_ctor = gl->createClass(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());
-    VM::get().addStatic(DropShadowFilter_as::s_ctor.get());
-    DropShadowFilter_as::attachInterface(*DropShadowFilter_as::s_ctor);
-    global.init_member("DropShadowFilter" , DropShadowFilter_as::s_ctor.get());
-}
-
-void
-dropshadowfilter_class_init(as_object& global)
+dropshadowfilter_class_init(as_object& global, const ObjectURI& uri)
 {
-    DropShadowFilter_as::registerCtor(global);
+    boost:: intrusive_ptr<as_object> cl;
+    if (cl != NULL) return;
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&DropShadowFilter_as::ctor, DropShadowFilter_as::Interface());
+    VM::get().addStatic(cl.get());
+    DropShadowFilter_as::attachInterface(*cl);
+    global.init_member(getName(uri), cl.get(),
+            as_object::DefaultFlags, getNamespace(uri));
 }
 
 
@@ -133,7 +128,7 @@ DropShadowFilter_as::distance_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_distance );
+        return as_value(ptr->m_distance );
     }
     float sp_distance = fn.arg(0).to_number<float> ();
     ptr->m_distance = sp_distance;
@@ -146,7 +141,7 @@ DropShadowFilter_as::angle_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_angle );
+        return as_value(ptr->m_angle );
     }
     float sp_angle = fn.arg(0).to_number<float> ();
     ptr->m_angle = sp_angle;
@@ -159,7 +154,7 @@ DropShadowFilter_as::color_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_color );
+        return as_value(ptr->m_color );
     }
     boost::uint32_t sp_color = fn.arg(0).to_number<boost::uint32_t> ();
     ptr->m_color = sp_color;
@@ -172,7 +167,7 @@ DropShadowFilter_as::alpha_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_alpha );
+        return as_value(ptr->m_alpha );
     }
     boost::uint8_t sp_alpha = fn.arg(0).to_number<boost::uint8_t> ();
     ptr->m_alpha = sp_alpha;
@@ -185,7 +180,7 @@ DropShadowFilter_as::blurX_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_blurX );
+        return as_value(ptr->m_blurX );
     }
     float sp_blurX = fn.arg(0).to_number<float> ();
     ptr->m_blurX = sp_blurX;
@@ -198,7 +193,7 @@ DropShadowFilter_as::blurY_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_blurY );
+        return as_value(ptr->m_blurY );
     }
     float sp_blurY = fn.arg(0).to_number<float> ();
     ptr->m_blurY = sp_blurY;
@@ -211,7 +206,7 @@ DropShadowFilter_as::strength_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_strength );
+        return as_value(ptr->m_strength );
     }
     float sp_strength = fn.arg(0).to_number<float> ();
     ptr->m_strength = sp_strength;
@@ -224,7 +219,7 @@ DropShadowFilter_as::quality_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_quality );
+        return as_value(ptr->m_quality );
     }
     boost::uint8_t sp_quality = fn.arg(0).to_number<boost::uint8_t> ();
     ptr->m_quality = sp_quality;
@@ -237,7 +232,7 @@ DropShadowFilter_as::inner_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_inner );
+        return as_value(ptr->m_inner );
     }
     bool sp_inner = fn.arg(0).to_bool ();
     ptr->m_inner = sp_inner;
@@ -250,7 +245,7 @@ DropShadowFilter_as::knockout_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_knockout );
+        return as_value(ptr->m_knockout );
     }
     bool sp_knockout = fn.arg(0).to_bool ();
     ptr->m_knockout = sp_knockout;
@@ -263,7 +258,7 @@ DropShadowFilter_as::hideObject_gs(const fn_call& fn)
 {
     boost::intrusive_ptr<DropShadowFilter_as> ptr = ensureType<DropShadowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_hideObject );
+        return as_value(ptr->m_hideObject );
     }
     bool sp_hideObject = fn.arg(0).to_bool ();
     ptr->m_hideObject = sp_hideObject;

@@ -80,7 +80,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void bytearray_class_init(as_object& global)
+void bytearray_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -91,7 +91,8 @@ void bytearray_class_init(as_object& global)
     }
 
     // Register _global.ByteArray
-    global.init_member("ByteArray", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -131,7 +132,7 @@ attachByteArrayInterface(as_object& o)
 }
 
 void
-attachByteArrayStaticInterface(as_object& o)
+attachByteArrayStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -427,7 +428,7 @@ bytearray_writeUTFBytes(const fn_call& fn)
 }
 
 as_value
-bytearray_ctor(const fn_call& fn)
+bytearray_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ByteArray_as;
 

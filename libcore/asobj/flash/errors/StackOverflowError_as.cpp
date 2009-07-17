@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void stackoverflowerror_class_init(as_object& global)
+void stackoverflowerror_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void stackoverflowerror_class_init(as_object& global)
     }
 
     // Register _global.StackOverflowError
-    global.init_member("StackOverflowError", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachStackOverflowErrorInterface(as_object& o)
+attachStackOverflowErrorInterface(as_object& /*o*/)
 {
 }
 
 void
-attachStackOverflowErrorStaticInterface(as_object& o)
+attachStackOverflowErrorStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getStackOverflowErrorInterface()
 }
 
 as_value
-stackoverflowerror_ctor(const fn_call& fn)
+stackoverflowerror_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StackOverflowError_as;
 

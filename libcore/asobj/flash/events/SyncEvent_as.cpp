@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void syncevent_class_init(as_object& global)
+void syncevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void syncevent_class_init(as_object& global)
     }
 
     // Register _global.SyncEvent
-    global.init_member("SyncEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -79,7 +80,7 @@ attachSyncEventInterface(as_object& o)
 }
 
 void
-attachSyncEventStaticInterface(as_object& o)
+attachSyncEventStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +116,7 @@ syncevent_SYNC(const fn_call& fn)
 }
 
 as_value
-syncevent_ctor(const fn_call& fn)
+syncevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SyncEvent_as;
 

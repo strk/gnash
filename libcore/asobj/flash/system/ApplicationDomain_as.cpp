@@ -53,7 +53,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void applicationdomain_class_init(as_object& global)
+void applicationdomain_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -64,7 +64,8 @@ void applicationdomain_class_init(as_object& global)
     }
 
     // Register _global.ApplicationDomain
-    global.init_member("ApplicationDomain", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -77,7 +78,7 @@ attachApplicationDomainInterface(as_object& o)
 }
 
 void
-attachApplicationDomainStaticInterface(as_object& o)
+attachApplicationDomainStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -103,7 +104,7 @@ applicationdomain_hasDefinition(const fn_call& fn)
 }
 
 as_value
-applicationdomain_ctor(const fn_call& fn)
+applicationdomain_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new ApplicationDomain_as;
 

@@ -78,3 +78,19 @@ set XVideo false
 
 # Lock-set quality to low
 set quality 0
+
+# Set default webcam to the videotestsrc
+set webcamDevice 0
+
+# These settings are for security of Local connections.
+# Disable using LocalConnection
+set LocalConnection on
+
+# Trace all object flowing gthrough LocalConnection
+set LCTrace on
+
+# This is the# shared memory key for your system
+set LCShmKey 3711621821
+
+
+

@@ -63,7 +63,7 @@ init_object_instance()
 
 
 // extern (used by Global.cpp)
-void object_class_init(as_object& global)
+void object_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<as_object> cl=NULL;
@@ -83,8 +83,8 @@ void object_class_init(as_object& global)
 	}
 
 	// Register _global.Object (should only be visible in SWF5 up)
-	int flags = as_prop_flags::dontEnum; 
-	global.init_member("Object", cl.get(), flags);
+	int flags = PropFlags::dontEnum; 
+	global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
 
 }
 
@@ -129,9 +129,9 @@ attachObjectInterface(as_object& o)
 	o.init_member("toLocaleString", 
             gl->createFunction(object_toLocaleString));
 
-	int swf6flags = as_prop_flags::dontEnum | 
-        as_prop_flags::dontDelete | 
-        as_prop_flags::onlySWF6Up;
+	int swf6flags = PropFlags::dontEnum | 
+        PropFlags::dontDelete | 
+        PropFlags::onlySWF6Up;
 
 	o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
 	o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
@@ -148,7 +148,7 @@ object_ctor(const fn_call& fn)
 	if ( fn.nargs == 1 ) // copy constructor
 	{
 
-        as_object* obj = fn.arg(0).to_object().get();
+        as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
 
         /// If it's not an object, return an undefined object, not null.
         if (!obj) return as_value(new as_object);
@@ -415,7 +415,7 @@ object_isPrototypeOf(const fn_call& fn)
 		return as_value(false); 
 	}
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

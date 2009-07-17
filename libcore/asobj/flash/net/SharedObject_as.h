@@ -25,6 +25,7 @@
 // Forward declarations
 namespace gnash {
     class as_object;
+class ObjectURI;
     class SharedObject_as;
     class VM;
 }
@@ -69,7 +70,7 @@ private:
 };
 
 /// Initialize the global SharedObject class
-void sharedobject_class_init(as_object& global);
+void sharedobject_class_init(as_object& global, const ObjectURI& uri);
 
 void registerSharedObjectNative(as_object& o);
 

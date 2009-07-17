@@ -84,7 +84,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void socket_class_init(as_object& global)
+void socket_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -95,7 +95,8 @@ void socket_class_init(as_object& global)
     }
 
     // Register _global.Socket
-    global.init_member("Socket", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -140,7 +141,7 @@ attachSocketInterface(as_object& o)
 }
 
 void
-attachSocketStaticInterface(as_object& o)
+attachSocketStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -476,7 +477,7 @@ socket_socketData(const fn_call& fn)
 }
 
 as_value
-socket_ctor(const fn_call& fn)
+socket_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Socket_as;
 

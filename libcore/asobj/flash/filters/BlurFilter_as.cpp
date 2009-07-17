@@ -64,7 +64,7 @@ BlurFilter_as::Interface() {
 }
 
 void
-BlurFilter_as::registerCtor(as_object& global)
+blurfilter_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
     if (!cl) return;
@@ -73,14 +73,8 @@ BlurFilter_as::registerCtor(as_object& global)
     cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());
     BlurFilter_as::attachInterface(*cl);
 
-    global.init_member("BlurFilter" , cl.get());
-
-}
-
-void
-blurfilter_class_init(as_object& global)
-{
-    BlurFilter_as::registerCtor(global);
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

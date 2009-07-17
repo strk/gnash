@@ -20,10 +20,15 @@
 #include "string_table.h"
 #include "VM.h"
 #include "fn_call.h"
-
+#include "namedStrings.h"
 #include "Object.h" // for getObjectInterface
 #include "flash_pkg.h"
-#include "flashclasses.h"
+#include "display/display_pkg.h"
+#include "external/external_pkg.h"
+#include "filters/filters_pkg.h"
+#include "geom/geom_pkg.h"
+#include "net/net_pkg.h"
+#include "text/text_pkg.h"
 
 namespace gnash {
 
@@ -34,22 +39,27 @@ static as_value
 get_flash_package(const fn_call& fn)
 {
     as_object *pkg = new as_object(getObjectInterface());
+    
+    string_table& st = getStringTable(fn);
 
-	int i = 0;
-    while (as2classes[i]) {
-        as2classes[i](*pkg);
-        ++i;
-    }
+    const string_table::key global = 0;
 
-	return pkg;
+    flash_text_package_init(*pkg, ObjectURI(st.find("text"), global));
+    flash_display_package_init(*pkg, ObjectURI(st.find("display"), global));
+    flash_filters_package_init(*pkg, ObjectURI(st.find("filters"), global));
+    flash_geom_package_init(*pkg, ObjectURI(st.find("geom"), global));
+    flash_net_package_init(*pkg, ObjectURI(st.find("net"), global));
+    flash_external_package_init(*pkg, ObjectURI(st.find("external"), global));
+
+    return pkg;
 }
 
 void
-flash_package_init(as_object& where)
+flash_package_init(as_object& where, const ObjectURI& uri)
 {
-	string_table& st = getStringTable(where);
-	where.init_destructive_property(st.find("flash"), get_flash_package,
-		as_prop_flags::dontEnum | as_prop_flags::onlySWF8Up);
+    const int flags = PropFlags::dontEnum | PropFlags::onlySWF8Up;
+    where.init_destructive_property(getName(uri), get_flash_package, flags,
+        getNamespace(uri));
 }
 
 }

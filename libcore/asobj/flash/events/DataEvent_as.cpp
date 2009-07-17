@@ -55,7 +55,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void dataevent_class_init(as_object& global)
+void dataevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -66,7 +66,8 @@ void dataevent_class_init(as_object& global)
     }
 
     // Register _global.DataEvent
-    global.init_member("DataEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -81,7 +82,7 @@ attachDataEventInterface(as_object& o)
 }
 
 void
-attachDataEventStaticInterface(as_object& o)
+attachDataEventStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -128,7 +129,7 @@ dataevent_UPLOAD_COMPLETE_DATA(const fn_call& fn)
 }
 
 as_value
-dataevent_ctor(const fn_call& fn)
+dataevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new DataEvent_as;
 

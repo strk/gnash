@@ -23,6 +23,7 @@
 #include "asClass.h"
 #include "CodeStream.h"
 #include "abc_function.h"
+#include "Global_as.h"
 #include "VM.h"
 
 namespace gnash {
@@ -83,16 +84,17 @@ bool
 asMethod::addValue(string_table::key name, asNamespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst)
 {
+    Global_as* g = VM::get().getGlobal();
 	if (val.is_object()) {
-		val.to_object()->set_member(NSV::INTERNAL_TYPE,
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE,
                 size_t(type->getName()));
     }
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	int flags = as_prop_flags::dontDelete;
+	int flags = PropFlags::dontDelete;
 
-	if (isconst) flags |= as_prop_flags::readOnly;
+	if (isconst) flags |= PropFlags::readOnly;
 
 	if (slotId == 0) {
 		_prototype->init_member(name, val, flags, nsname);
@@ -114,7 +116,7 @@ asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
 		getset->setGetter(method->getPrototype());
 	else
 	{
-		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
@@ -132,7 +134,7 @@ asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
 		getset->setSetter(method->getPrototype());
 	else
 	{
-		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
@@ -151,7 +153,7 @@ asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotI
 	asClass */*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
-	int flags = as_prop_flags::dontDelete;
+	int flags = PropFlags::dontDelete;
 
 	_prototype->init_member(name, as_value(), flags, nsname, slotId);
 	return true;
@@ -180,8 +182,8 @@ asMethod::addMethod(string_table::key /*name*/, asNamespace* /*ns*/, asMethod*
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	as_value val(method->getPrototype());
 // 	as value val = new as_value(abc_function(asMethod->getBody,getVM(_prototype).getMachine()));
-// 	_prototype->init_member(name, val, as_prop_flags::readOnly |
-// 		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
+// 	_prototype->init_member(name, val, PropFlags::readOnly |
+// 		PropFlags::dontDelete | PropFlags::dontEnum, nsname);
 // 	return true;
 return false;
 }

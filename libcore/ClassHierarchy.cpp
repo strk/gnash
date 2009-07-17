@@ -17,13 +17,14 @@
 //
 
 #include "as_object.h"
-#include "as_prop_flags.h"
+#include "PropFlags.h"
 #include "as_value.h"
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "as_function.h"
 #include "builtin_function.h"
 #include "asClass.h"
+#include "Global_as.h"
 #include "Object.h"
 #include "extension.h"
 
@@ -41,16 +42,16 @@ addVisibilityFlag(int& flags, int version)
         default:
             return;
         case 9:
-            flags |= as_prop_flags::onlySWF9Up;
+            flags |= PropFlags::onlySWF9Up;
             break;
         case 8:
-            flags |= as_prop_flags::onlySWF8Up;
+            flags |= PropFlags::onlySWF8Up;
             break;
         case 7:
-            flags |= as_prop_flags::onlySWF7Up;
+            flags |= PropFlags::onlySWF7Up;
             break;
         case 6:
-            flags |= as_prop_flags::onlySWF6Up;
+            flags |= PropFlags::onlySWF6Up;
             break;
     }
 }
@@ -65,14 +66,14 @@ private:
 public:
     bool isBuiltin() { return true; }
 
-    declare_extension_function(ClassHierarchy::ExtensionClass &c,
-        as_object *g, Extension* e)
+    declare_extension_function(ClassHierarchy::ExtensionClass &c, as_object *g,
+            Extension* e)
         :
+        as_function(*getGlobal(*g)),
         mDeclaration(c),
         mTarget(g),
         mExtension(e)
     {
-        init_member("constructor", as_function::getFunctionConstructor().get());
     }
 
     virtual as_value operator()(const fn_call& fn)
@@ -107,12 +108,15 @@ public:
         if (mExtension->initModuleWithFunc(mDeclaration.file_name,
             mDeclaration.init_name, *mTarget))
         {
+            Global_as& gl = *getGlobal(fn);
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
             mTarget->get_member(mDeclaration.name, &us);
-            if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
+            if (mDeclaration.super_name && 
+                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu))
             {
-                us.to_object()->set_prototype(super.to_as_function()->getPrototype());
+                us.to_object(gl)->set_prototype(
+                        super.to_as_function()->getPrototype());
             }
             return us;
         }
@@ -125,9 +129,6 @@ public:
 
 class declare_native_function : public as_function
 {
-private:
-    ClassHierarchy::NativeClass mDeclaration;
-    as_object *mTarget;
 
 public:
     bool isBuiltin() { return true; }
@@ -135,12 +136,10 @@ public:
     declare_native_function(const ClassHierarchy::NativeClass &c,
         as_object *g)
         :
+        as_function(*getGlobal(*g)),
         mDeclaration(c),
         mTarget(g)
     {
-        // does it make any sense to set a 'constructor' here ??
-        //init_member("constructor", this);
-        //init_member("constructor", as_function::getFunctionConstructor().get());
     }
 
     virtual as_value operator()(const fn_call& fn)
@@ -148,7 +147,8 @@ public:
         string_table& st = getStringTable(fn);
         log_debug("Loading native class %s", st.value(mDeclaration.name));
 
-        mDeclaration.initializer(*mTarget);
+        mDeclaration.initializer(*mTarget,
+                ObjectURI(mDeclaration.name, mDeclaration.namespace_name));
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
         if (mTarget->get_member(mDeclaration.name, &us,
@@ -179,14 +179,17 @@ public:
                 }
                 assert(super.to_as_function());
             }
-            if (!us.to_object()) {
+
+            Global_as& gl = *getGlobal(fn);
+
+            if (!us.to_object(gl)) {
                 log_error("Native class %s is not an object after "
                         "initialization (%s)", st.value(mDeclaration.name), us);
             }
             if (mDeclaration.super_name &&
-                    !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
+                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
                 
-                us.to_object()->set_prototype(
+                us.to_object(gl)->set_prototype(
                         super.to_as_function()->getPrototype());
             }
         }
@@ -197,6 +200,11 @@ public:
         }
         return us;
     }
+
+private:
+    ClassHierarchy::NativeClass mDeclaration;
+    as_object *mTarget;
+
 };
 
 } // end anonymous namespace
@@ -218,7 +226,7 @@ ClassHierarchy::declareClass(ExtensionClass& c)
         new declare_extension_function(c, mGlobal, mExtension);
 
 
-    int flags=as_prop_flags::dontEnum;
+    int flags=PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
     return mGlobal->init_destructive_property(c.name, *getter, flags);
 }
@@ -239,7 +247,7 @@ ClassHierarchy::declareClass(const NativeClass& c)
     boost::intrusive_ptr<as_function> getter =
         new declare_native_function(c, mGlobal);
     
-    int flags = as_prop_flags::dontEnum;
+    int flags = PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
     return mGlobal->init_destructive_property(c.name, *getter, flags,
             c.namespace_name);

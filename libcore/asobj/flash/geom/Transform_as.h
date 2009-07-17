@@ -17,26 +17,21 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_TRANSFORM_H__
-#define __GNASH_ASOBJ_TRANSFORM_H__
+#ifndef GNASH_ASOBJ_TRANSFORM_H
+#define GNASH_ASOBJ_TRANSFORM_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-//#include <memory> // for auto_ptr
-
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global Transform class
-void transform_class_init(as_object& global);
-
-/// Return a Transform instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_Transform_instance();
+void transform_class_init(as_object& global, const ObjectURI& uri);
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_TRANSFORM_H__
 #endif

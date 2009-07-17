@@ -56,7 +56,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void keyboardevent_class_init(as_object& global)
+void keyboardevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -67,7 +67,8 @@ void keyboardevent_class_init(as_object& global)
     }
 
     // Register _global.KeyboardEvent
-    global.init_member("KeyboardEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -83,7 +84,7 @@ attachKeyboardEventInterface(as_object& o)
 }
 
 void
-attachKeyboardEventStaticInterface(as_object& o)
+attachKeyboardEventStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -139,7 +140,7 @@ keyboardevent_KEY_UP(const fn_call& fn)
 }
 
 as_value
-keyboardevent_ctor(const fn_call& fn)
+keyboardevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new KeyboardEvent_as;
 

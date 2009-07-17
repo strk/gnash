@@ -45,14 +45,12 @@ public:
 
 
 void
-bitmapfilter_class_init(as_object& global)
+bitmapfilter_class_init(as_object& global, const ObjectURI& uri)
 {
-    string_table& st = getStringTable(global);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    global.init_destructive_property(st.find("BitmapFilter"),
-            getBitmapFilterConstructor, flags);
+    global.init_destructive_property(getName(uri), getBitmapFilterConstructor,
+		    flags, getNamespace(uri));
 }
 
 as_object*
@@ -80,13 +78,8 @@ attachBitmapFilterInterface(as_object& o)
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
-    static builtin_function* cl;
-    if (!cl) {
-        cl = new builtin_function(&bitmapfilter_ctor,
-                getBitmapFilterInterface());
-        getVM(fn).addStatic(cl);
-    }
-    return cl;
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&bitmapfilter_ctor, getBitmapFilterInterface());
 }
 
 as_value

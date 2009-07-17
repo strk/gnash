@@ -511,13 +511,13 @@ movie_root::clear()
 as_object*
 movie_root::getSelectionObject() const
 {
-    as_object* global = _vm.getGlobal();
+    Global_as* global = _vm.getGlobal();
     if (!global) return 0;
 
     as_value s;
     if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object().get();
+    as_object* sel = s.to_object(*global).get();
    
     return sel;
 }
@@ -527,10 +527,10 @@ movie_root::getStageObject()
 {
 	as_value v;
 	assert ( VM::isInitialized() ); // return NULL;
-	as_object* global = _vm.getGlobal();
+	Global_as* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
-	return boost::dynamic_pointer_cast<Stage_as>(v.to_object());
+	return boost::dynamic_pointer_cast<Stage_as>(v.to_object(*global));
 }
 		
 void
@@ -579,11 +579,11 @@ movie_root::getKeyObject()
 		// TODO: use a named string...
 
 		as_value kval;
-		as_object* global = _vm.getGlobal();
+		Global_as* global = _vm.getGlobal();
 
 		if (global->get_member(NSV::CLASS_KEY, &kval)) {
 
-			boost::intrusive_ptr<as_object> obj = kval.to_object();
+			boost::intrusive_ptr<as_object> obj = kval.to_object(*global);
 			_keyobject = boost::dynamic_pointer_cast<Keyboard_as>( obj );
 		}
 	}
@@ -599,12 +599,12 @@ movie_root::getMouseObject()
 	if ( ! _mouseobject )
 	{
 		as_value val;
-		as_object* global = _vm.getGlobal();
+		Global_as* global = _vm.getGlobal();
 
 		if (global->get_member(NSV::CLASS_MOUSE, &val) )
 		{
 			//log_debug("Found member 'Mouse' in _global: %s", val);
-			_mouseobject = val.to_object();
+			_mouseobject = val.to_object(*global);
 		}
 	}
 
@@ -1007,13 +1007,16 @@ movie_root::clear_interval_timer(unsigned int x)
 bool
 movie_root::advance()
 {
-	unsigned int now = _vm.getTime();
+    // We can't actually rely on now being later than _lastMovieAdvancement,
+    // so we will have to check. Otherwise we risk elapsed being
+    // contructed from a negative value.
+	const size_t now = std::max<size_t>(_vm.getTime(), _lastMovieAdvancement);
 
     bool advanced = false;
 
     try {
 
-        int elapsed = now - _lastMovieAdvancement;
+        const size_t elapsed = now - _lastMovieAdvancement;
 	    if (elapsed >= _movieAdvancementDelay)
 	    {
             advanced = true;
@@ -1084,7 +1087,7 @@ int
 movie_root::timeToNextFrame() const
 {
     unsigned int now = _vm.getTime();
-    int elapsed = now - _lastMovieAdvancement;
+    const int elapsed = now - _lastMovieAdvancement;
     return _movieAdvancementDelay - elapsed;
 }
 
@@ -1771,7 +1774,7 @@ movie_root::executeTimers()
 		else
 		{
 			unsigned long elapsed;
-			if ( timer->expired(now, elapsed) )
+			if (timer->expired(now, elapsed))
 			{
 				expiredTimers.insert( std::make_pair(elapsed, timer) );
 			}

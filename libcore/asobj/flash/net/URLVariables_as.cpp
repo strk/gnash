@@ -53,7 +53,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void urlvariables_class_init(as_object& global)
+void urlvariables_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -64,7 +64,8 @@ void urlvariables_class_init(as_object& global)
     }
 
     // Register _global.URLVariables
-    global.init_member("URLVariables", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -103,7 +104,7 @@ urlvariables_toString(const fn_call& fn)
 }
 
 as_value
-urlvariables_ctor(const fn_call& fn)
+urlvariables_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLVariables_as;
 

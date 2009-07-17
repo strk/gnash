@@ -53,7 +53,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void sprite_class_init(as_object& global)
+void sprite_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -64,7 +64,8 @@ void sprite_class_init(as_object& global)
     }
 
     // Register _global.Sprite
-    global.init_member("Sprite", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -77,7 +78,7 @@ attachSpriteInterface(as_object& o)
 }
 
 void
-attachSpriteStaticInterface(as_object& o)
+attachSpriteStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -103,7 +104,7 @@ sprite_stopDrag(const fn_call& fn)
 }
 
 as_value
-sprite_ctor(const fn_call& fn)
+sprite_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Sprite_as;
 

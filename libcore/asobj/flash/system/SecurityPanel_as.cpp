@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void securitypanel_class_init(as_object& global)
+void securitypanel_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void securitypanel_class_init(as_object& global)
     }
 
     // Register _global.SecurityPanel
-    global.init_member("SecurityPanel", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachSecurityPanelInterface(as_object& o)
+attachSecurityPanelInterface(as_object& /*o*/)
 {
 }
 
 void
-attachSecurityPanelStaticInterface(as_object& o)
+attachSecurityPanelStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getSecurityPanelInterface()
 }
 
 as_value
-securitypanel_ctor(const fn_call& fn)
+securitypanel_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new SecurityPanel_as;
 

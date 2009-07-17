@@ -22,6 +22,7 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 class Mouse_as
 {
@@ -30,7 +31,7 @@ public:
     static void registerNative(as_object& global);
 };
 
-void mouse_class_init(as_object& where);
+void mouse_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

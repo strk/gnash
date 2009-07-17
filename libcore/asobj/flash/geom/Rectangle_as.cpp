@@ -22,7 +22,6 @@
 #endif
 
 #include "Rectangle_as.h"
-#include "Point_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -421,10 +420,8 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 	boost::intrusive_ptr<Rectangle_as> ptr = 
         ensureType<Rectangle_as>(fn.this_ptr);
 
-	as_value ret;
+	if (!fn.nargs) {
 
-	if ( ! fn.nargs ) // getter
-	{
 		as_value x,y,w,h;
 		ptr->get_member(NSV::PROP_X, &x);
 		ptr->get_member(NSV::PROP_Y, &y);
@@ -434,23 +431,29 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 		as_value right = x.newAdd(w);
 		as_value bottom = y.newAdd(h);
 
-		as_function* pointCtor = getFlashGeomPointConstructor();
+        as_value point(fn.env().find_object("flash.geom.Point"));
+
+        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
+
+        if (!pointCtor) {
+            log_error("Failed to construct flash.geom.Point!");
+            return as_value();
+        }
 
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(right);
 		args->push_back(bottom);
 
-		ret = pointCtor->constructInstance(fn.env(), args);
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Attempt to set read-only property %s"),
-            "Rectangle.bottomRight");
-		);
+		as_value ret = pointCtor->constructInstance(fn.env(), args);
+        return ret;
 	}
 
-	return ret;
+    IF_VERBOSE_ASCODING_ERRORS(
+    log_aserror(_("Attempt to set read-only property %s"),
+        "Rectangle.bottomRight");
+    );
+    return as_value();
+
 }
 
 static as_value
@@ -522,7 +525,14 @@ Rectangle_size_getset(const fn_call& fn)
 		ptr->get_member(NSV::PROP_WIDTH, &w);
 		ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-		as_function* pointCtor = getFlashGeomPointConstructor();
+        as_value point(fn.env().find_object("flash.geom.Point"));
+
+        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
+
+        if (!pointCtor) {
+            log_error("Failed to construct flash.geom.Point!");
+            return as_value();
+        }
 
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(w);
@@ -582,7 +592,14 @@ Rectangle_topLeft_getset(const fn_call& fn)
 		ptr->get_member(NSV::PROP_X, &x);
 		ptr->get_member(NSV::PROP_Y, &y);
 
-		as_function* pointCtor = getFlashGeomPointConstructor();
+        as_value point(fn.env().find_object("flash.geom.Point"));
+
+        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
+
+        if (!pointCtor) {
+            log_error("Failed to construct flash.geom.Point!");
+            return as_value();
+        }
 
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(x);
@@ -646,30 +663,23 @@ Rectangle_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
+static as_value
+get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Rectangle class");
 
-	builtin_function* cl =
-	        new builtin_function(&Rectangle_ctor, getRectangleInterface());
-	return cl;
-}
-
-boost::intrusive_ptr<as_object> init_Rectangle_instance()
-{
-    return boost::intrusive_ptr<as_object>(new Rectangle_as);
+    Global_as* gl = getGlobal(fn);
+    return gl->createClass(&Rectangle_ctor, getRectangleInterface());
 }
 
 // extern 
-void rectangle_class_init(as_object& where)
+void
+rectangle_class_init(as_object& where, const ObjectURI& uri)
 {
-	// Register _global.Rectangle
-	string_table& st = getStringTable(where);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("Rectangle"),
-            get_flash_geom_rectangle_constructor, flags);
+	where.init_destructive_property(getName(uri),
+            get_flash_geom_rectangle_constructor, flags, getNamespace(uri));
 }
 
 } // end of gnash namespace

@@ -23,7 +23,7 @@
 namespace gnash {
 
 /// Flags defining the level of protection of a member
-class as_prop_flags
+class PropFlags
 {
 
 	/// Numeric flags
@@ -70,12 +70,12 @@ public:
 	};
 
 	/// Default constructor
-	as_prop_flags() : _flags(0)
+	PropFlags() : _flags(0)
 	{
 	}
 
 	/// Constructor
-	as_prop_flags(const bool read_only, const bool dont_delete,
+	PropFlags(const bool read_only, const bool dont_delete,
             const bool dont_enum)
 		:
 		_flags(((read_only) ? readOnly : 0) |
@@ -85,17 +85,17 @@ public:
 	}
 
 	/// Constructor, from numerical value
-	as_prop_flags(const int flags)
+	PropFlags(const int flags)
 		: _flags(flags)
 	{
 	}
 
-	bool operator== (const as_prop_flags& o) const
+	bool operator== (const PropFlags& o) const
 	{
 		return ( _flags == o._flags );
 	}
 
-	bool operator!= (const as_prop_flags& o) const
+	bool operator!= (const PropFlags& o) const
 	{
 		return ( _flags != o._flags );
 	}
@@ -207,7 +207,7 @@ public:
 };
 
 inline std::ostream&
-operator << (std::ostream& os, const as_prop_flags& fl)
+operator << (std::ostream& os, const PropFlags& fl)
 {
 	os << "(";
 	if ( fl.get_static() ) os << " static";

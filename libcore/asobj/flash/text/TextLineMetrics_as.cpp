@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textlinemetrics_class_init(as_object& global)
+void textlinemetrics_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void textlinemetrics_class_init(as_object& global)
     }
 
     // Register _global.TextLineMetrics
-    global.init_member("TextLineMetrics", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachTextLineMetricsInterface(as_object& o)
+attachTextLineMetricsInterface(as_object& /*o*/)
 {
 }
 
 void
-attachTextLineMetricsStaticInterface(as_object& o)
+attachTextLineMetricsStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getTextLineMetricsInterface()
 }
 
 as_value
-textlinemetrics_ctor(const fn_call& fn)
+textlinemetrics_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new TextLineMetrics_as;
 

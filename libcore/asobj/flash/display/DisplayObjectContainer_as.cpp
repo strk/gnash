@@ -54,7 +54,7 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-displayobjectcontainer_class_init(as_object& where)
+displayobjectcontainer_class_init(as_object& where, const ObjectURI& uri)
 {
     
     // This should never be called during AVM1 execution!
@@ -69,7 +69,8 @@ displayobjectcontainer_class_init(as_object& where)
     }
 
     // Register _global.DisplayObjectContainer
-    where.init_member("DisplayObjectContainer", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 as_object*
@@ -144,7 +145,7 @@ displayobjectcontainer_addChild(const fn_call& fn)
         );
     }
 
-    as_object* objArg = fn.arg(0).to_object().get();
+    as_object* objArg = fn.arg(0).to_object(*getGlobal(fn)).get();
     if (!objArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -190,7 +191,7 @@ displayobjectcontainer_addChildAt(const fn_call& fn)
         );
     }
 
-    as_object* objArg = fn.arg(0).to_object().get();
+    as_object* objArg = fn.arg(0).to_object(*getGlobal(fn)).get();
     if (!objArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);

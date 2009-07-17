@@ -41,17 +41,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-textcolortype_class_init(as_object& global)
+textcolortype_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachTextColorTypeStaticInterface(*o);
-    global.init_member("TextColorType", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachTextColorTypeStaticInterface(as_object& o)
+attachTextColorTypeStaticInterface(as_object& /*o*/)
 {
     // TODO: add constants here.
 }

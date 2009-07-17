@@ -24,23 +24,14 @@
 #include "gnashconfig.h"
 #endif
 
-//#include <memory> // for auto_ptr
-
 namespace gnash {
 
 class as_object;
-class as_function;
+class ObjectURI;
 
 /// Initialize the global Matrix class
-void matrix_class_init(as_object& global);
-
-/// Return a Matrix instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_Matrix_instance();
-
-// This will probably be needed by other geom classes.
-as_function* getFlashGeomMatrixConstructor();
+void matrix_class_init(as_object& global, const ObjectURI& uri);
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_MATRIX_H__
 #endif

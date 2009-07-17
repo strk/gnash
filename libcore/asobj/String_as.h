@@ -25,9 +25,11 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
+class Global_as;
 
 // Initialize the global String class
-void string_class_init(as_object& global);
+void string_class_init(as_object& global, const ObjectURI& uri);
 
 /// Return a String instance (possibibly NULL!)
 //
@@ -36,7 +38,9 @@ void string_class_init(as_object& global);
 /// In the second case, not finding a proper constructor might result in
 /// returning the NULL object.
 ///
-boost::intrusive_ptr<as_object> init_string_instance(const std::string& val);
+as_object* init_string_instance(Global_as& g, const std::string& val);
+
+void registerStringNative(as_object& global);
 
 }
 

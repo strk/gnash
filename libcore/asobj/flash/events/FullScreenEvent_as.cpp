@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void fullscreenevent_class_init(as_object& global)
+void fullscreenevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void fullscreenevent_class_init(as_object& global)
     }
 
     // Register _global.FullScreenEvent
-    global.init_member("FullScreenEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -115,7 +116,7 @@ fullscreenevent_FULL_SCREEN(const fn_call& fn)
 }
 
 as_value
-fullscreenevent_ctor(const fn_call& fn)
+fullscreenevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new FullScreenEvent_as;
 

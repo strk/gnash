@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void urlrequestheader_class_init(as_object& global)
+void urlrequestheader_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void urlrequestheader_class_init(as_object& global)
     }
 
     // Register _global.URLRequestHeader
-    global.init_member("URLRequestHeader", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachURLRequestHeaderInterface(as_object& o)
+attachURLRequestHeaderInterface(as_object& /*o*/)
 {
 }
 
 void
-attachURLRequestHeaderStaticInterface(as_object& o)
+attachURLRequestHeaderStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getURLRequestHeaderInterface()
 }
 
 as_value
-urlrequestheader_ctor(const fn_call& fn)
+urlrequestheader_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new URLRequestHeader_as;
 

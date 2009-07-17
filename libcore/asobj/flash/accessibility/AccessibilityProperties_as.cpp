@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void accessibilityproperties_class_init(as_object& global)
+void accessibilityproperties_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void accessibilityproperties_class_init(as_object& global)
     }
 
     // Register _global.AccessibilityProperties
-    global.init_member("AccessibilityProperties", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachAccessibilityPropertiesInterface(as_object& o)
+attachAccessibilityPropertiesInterface(as_object& /*o*/)
 {
 }
 
 void
-attachAccessibilityPropertiesStaticInterface(as_object& o)
+attachAccessibilityPropertiesStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getAccessibilityPropertiesInterface()
 }
 
 as_value
-accessibilityproperties_ctor(const fn_call& fn)
+accessibilityproperties_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new AccessibilityProperties_as;
 

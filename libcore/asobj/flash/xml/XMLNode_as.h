@@ -58,7 +58,7 @@ public:
     virtual ~XMLNode_as();
 
     // Initialize the global XMLNode class
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
 
     // Used by XML_as
     static as_object* getXMLNodeInterface();

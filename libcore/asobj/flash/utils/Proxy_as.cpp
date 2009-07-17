@@ -61,7 +61,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void proxy_class_init(as_object& global)
+void proxy_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -72,7 +72,8 @@ void proxy_class_init(as_object& global)
     }
 
     // Register _global.Proxy
-    global.init_member("Proxy", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -93,7 +94,7 @@ attachProxyInterface(as_object& o)
 }
 
 void
-attachProxyStaticInterface(as_object& o)
+attachProxyStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -200,7 +201,7 @@ proxy_setProperty(const fn_call& fn)
 }
 
 as_value
-proxy_ctor(const fn_call& fn)
+proxy_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new Proxy_as;
 

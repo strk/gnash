@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void media_class_init(as_object& global)
+void media_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,18 +63,19 @@ void media_class_init(as_object& global)
     }
 
     // Register _global.media
-    global.init_member("media", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
 
 void
-attachmediaInterface(as_object& o)
+attachmediaInterface(as_object& /*o*/)
 {
 }
 
 void
-attachmediaStaticInterface(as_object& o)
+attachmediaStaticInterface(as_object& /*o*/)
 {
 
 }
@@ -91,7 +92,7 @@ getmediaInterface()
 }
 
 as_value
-media_ctor(const fn_call& fn)
+media_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new media_as;
 

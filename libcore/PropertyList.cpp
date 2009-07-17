@@ -163,7 +163,7 @@ PropertyList::getValue(const string_table::key key, as_value& val,
 bool
 PropertyList::setValue(string_table::key key, const as_value& val,
 		as_object& this_ptr, string_table::key nsId,
-		const as_prop_flags& flagsIfMissing)
+		const PropFlags& flagsIfMissing)
 {
 	container::iterator found = iterator_find(_props, key, nsId);
 	
@@ -206,9 +206,9 @@ PropertyList::setFlags(string_table::key key,
 	container::iterator found = iterator_find(_props, key, nsId);
 	if ( found == _props.end() ) return false;
 
-	as_prop_flags oldFlags = found->getFlags();
+	PropFlags oldFlags = found->getFlags();
 
-	as_prop_flags& f = const_cast<as_prop_flags&>(found->getFlags());
+	PropFlags& f = const_cast<PropFlags&>(found->getFlags());
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -232,10 +232,10 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
         for (it=_props.begin(); it != _props.end(); ++it)
 	{
 #ifdef GNASH_DEBUG_PROPERTY
-		as_prop_flags oldFlags = it->getFlags();
+		PropFlags oldFlags = it->getFlags();
 #endif
 
-		as_prop_flags& f = const_cast<as_prop_flags&>(it->getFlags());
+		PropFlags& f = const_cast<PropFlags&>(it->getFlags());
 		if (f.set_flags(setFlags, clearFlags))
 			++success;
 		else
@@ -409,7 +409,7 @@ PropertyList::import(const PropertyList& o)
 bool
 PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	as_function* setter, const as_value& cacheVal,
-	const as_prop_flags& flagsIfMissing, string_table::key nsId)
+	const PropFlags& flagsIfMissing, string_table::key nsId)
 {
 	Property a(key, nsId, &getter, setter, flagsIfMissing);
 	a.setOrder(- ++mDefaultOrder - 1);
@@ -418,7 +418,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
-		as_prop_flags& f = a.getFlags();
+		PropFlags& f = a.getFlags();
 		f = found->getFlags();
 		a.setCache(found->getCache());
 
@@ -446,7 +446,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 
 bool
 PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
-	as_c_function_ptr setter, const as_prop_flags& flagsIfMissing,
+	as_c_function_ptr setter, const PropFlags& flagsIfMissing,
 	string_table::key nsId)
 {
 	Property a(key, nsId, getter, setter, flagsIfMissing);
@@ -456,7 +456,7 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
-		as_prop_flags& f = a.getFlags();
+		PropFlags& f = a.getFlags();
 		f = found->getFlags();
 
 		_props.replace(found, a);
@@ -486,7 +486,7 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 bool
 PropertyList::addDestructiveGetter(string_table::key key,
 	as_function& getter, string_table::key nsId,
-	const as_prop_flags& flagsIfMissing)
+	const PropFlags& flagsIfMissing)
 {
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
@@ -515,7 +515,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 bool
 PropertyList::addDestructiveGetter(string_table::key key,
 	as_c_function_ptr getter, string_table::key nsId,
-	const as_prop_flags& flagsIfMissing)
+	const PropFlags& flagsIfMissing)
 {
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end()) return false; 

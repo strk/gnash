@@ -69,7 +69,7 @@ namespace {
     size_t validIndex(const std::wstring& subject, int index);
     void attachStringInterface(as_object& o);
     as_object* getStringInterface();
-    boost::intrusive_ptr<builtin_function> getStringConstructor();
+    as_object* getStringConstructor(Global_as& gl);
 
     inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
             const std::string& function);
@@ -88,7 +88,7 @@ public:
         std::wstring wstr = utf8::decodeCanonicalString(
                 _string, getSWFVersion(*this));
         init_member(NSV::PROP_LENGTH, wstr.size(), 
-                as_prop_flags::dontDelete | as_prop_flags::dontEnum); 
+                PropFlags::dontDelete | PropFlags::dontEnum); 
     }
 
 
@@ -110,61 +110,82 @@ private:
     std::string _string;
 };
 
-boost::intrusive_ptr<as_object>
-init_string_instance(const std::string& val)
+as_object*
+init_string_instance(Global_as& g, const std::string& val)
 {
-	// TODO: get VM from the environment ?
-	VM& vm = VM::get();
+	as_environment env(getVM(g));
 
-	// TODO: get the environment passed in !!
-	as_environment env(vm);
+	int swfVersion = getSWFVersion(g);
 
-	int swfVersion = vm.getSWFVersion();
-
-	boost::intrusive_ptr<as_function> cl;
+	boost::intrusive_ptr<as_function> ctor;
 
 	if ( swfVersion < 6 ) {
-		cl = getStringConstructor();
+		as_object* sc = getStringConstructor(g);
+        if (sc) ctor = sc->to_function();
 	}
 	else {
-		as_object* global = vm.getGlobal();
 		as_value clval;
-		if ( ! global->get_member(NSV::CLASS_STRING, &clval) ) {
+
+		if (!g.get_member(NSV::CLASS_STRING, &clval) ) {
 			log_debug("UNTESTED: String instantiation requested but "
                     "_global doesn't contain a 'String' symbol. Returning "
                     "the NULL object.");
-			return cl;
+			return ctor.get();
 		}
-		else if ( ! clval.is_function() ) {
+		else if (!clval.is_function()) {
 			log_debug("UNTESTED: String instantiation requested but "
                     "_global.String is not a function (%s). Returning "
                     "the NULL object.", clval);
-			return cl;
+			return ctor.get();
 		}
 		else {
-			cl = clval.to_as_function();
-			assert(cl);
+			ctor = clval.to_as_function();
 		}
 	}
 
+    if (!ctor.get()) return ctor.get();
+
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);
-	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
+	boost::intrusive_ptr<as_object> ret = ctor->constructInstance(env, args);
 
-	return ret;
+	return ret.get();
+}
+
+void registerStringNative(as_object& global)
+{
+    VM& vm = getVM(global);
+	vm.registerNative(as_object::tostring_method, 251, 1);
+	vm.registerNative(string_toString, 251, 2);
+	vm.registerNative(string_oldToUpper, 102, 0);
+	vm.registerNative(string_toUpperCase, 251, 3);
+	vm.registerNative(string_oldToLower, 102, 1);
+	vm.registerNative(string_toLowerCase, 251, 4);
+	vm.registerNative(string_charAt, 251, 5);
+	vm.registerNative(string_charCodeAt, 251, 6);
+	vm.registerNative(string_concat, 251, 7);
+	vm.registerNative(string_indexOf, 251, 8);
+	vm.registerNative(string_lastIndexOf, 251, 9);
+	vm.registerNative(string_slice, 251, 10);
+	vm.registerNative(string_substring, 251, 11);
+	vm.registerNative(string_split, 251, 12);
+	vm.registerNative(string_substr, 251, 13);
+    vm.registerNative(string_fromCharCode, 251, 14);
 }
 
 // extern (used by Global.cpp)
-void string_class_init(as_object& global)
+void
+string_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global String "class"/"function"
-    boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
+    boost::intrusive_ptr<as_object> cl =
+        getStringConstructor(*getGlobal(global));
 
     // Register _global.String (should be only visible from SWF5 up)
     // TODO: register as ASnative(251, 0)
     // TODO: register as ASnative(3, 0) for SWF5 ?
-    int flags = as_prop_flags::dontEnum; 
-    global.init_member("String", cl.get(), flags);
+    int flags = PropFlags::dontEnum; 
+    global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
 }
 
 
@@ -176,60 +197,18 @@ attachStringInterface(as_object& o)
 {
 	VM& vm = getVM(o);
 
-	// ASnative(251, 1) - [String.prototype] valueOf
-	vm.registerNative(as_object::tostring_method, 251, 1);
 	o.init_member("valueOf", vm.getNative(251, 1));
-
-	// ASnative(251, 2) - [String.prototype] toString
-	vm.registerNative(string_toString, 251, 2);
 	o.init_member("toString", vm.getNative(251, 2));
-
-	// ASnative(251, 3) - [String.prototype] toUpperCase
-	// ASnative(102, 0) - SWF5 to upper.
-	vm.registerNative(string_oldToUpper, 102, 0);
-	vm.registerNative(string_toUpperCase, 251, 3);
 	o.init_member("toUpperCase", vm.getNative(251, 3));
-
-	// ASnative(251, 4) - [String.prototype] toLowerCase
-	// ASnative(102, 1) - SWF5 to lower.
-	vm.registerNative(string_oldToLower, 102, 1);
-	vm.registerNative(string_toLowerCase, 251, 4);
 	o.init_member("toLowerCase", vm.getNative(251, 4));
-
-	// ASnative(251, 5) - [String.prototype] charAt
-	vm.registerNative(string_charAt, 251, 5);
 	o.init_member("charAt", vm.getNative(251, 5));
-
-	// ASnative(251, 6) - [String.prototype] charCodeAt
-	vm.registerNative(string_charCodeAt, 251, 6);
 	o.init_member("charCodeAt", vm.getNative(251, 6));
-
-	// ASnative(251, 7) - [String.prototype] concat
-	vm.registerNative(string_concat, 251, 7);
 	o.init_member("concat", vm.getNative(251, 7));
-
-	// ASnative(251, 8) - [String.prototype] indexOf
-	vm.registerNative(string_indexOf, 251, 8);
 	o.init_member("indexOf", vm.getNative(251, 8));
-
-	// ASnative(251, 9) - [String.prototype] lastIndexOf
-	vm.registerNative(string_lastIndexOf, 251, 9);
 	o.init_member("lastIndexOf", vm.getNative(251, 9));
-
-	// ASnative(251, 10) - [String.prototype] slice
-	vm.registerNative(string_slice, 251, 10);
 	o.init_member("slice", vm.getNative(251, 10));
-
-	// ASnative(251, 11) - [String.prototype] substring
-	vm.registerNative(string_substring, 251, 11);
 	o.init_member("substring", vm.getNative(251, 11));
-
-	// ASnative(251, 12) - [String.prototype] split
-	vm.registerNative(string_split, 251, 12);
 	o.init_member("split", vm.getNative(251, 12));
-
-	// ASnative(251, 13) - [String.prototype] substr
-	vm.registerNative(string_substr, 251, 13);
 	o.init_member("substr", vm.getNative(251, 13));
 }
 
@@ -886,24 +865,16 @@ string_ctor(const fn_call& fn)
 	return as_value(obj.get());
 }
 
-boost::intrusive_ptr<builtin_function>
-getStringConstructor()
+as_object*
+getStringConstructor(Global_as& gl)
 {
     // This is going to be the global String "class"/"function"
 
-    static boost::intrusive_ptr<builtin_function> cl;
+    static as_object* cl = 0;
 
-    if ( cl == NULL )
-    {
-	    VM& vm = VM::get();
-
-        cl=new builtin_function(&string_ctor, getStringInterface());
-	    vm.addStatic(cl.get());
-
-	    // ASnative(251, 14) - [String] fromCharCode 
-	    vm.registerNative(string_fromCharCode, 251, 14);
-	    cl->init_member("fromCharCode", vm.getNative(251, 14)); 
-
+    if (!cl) {
+        cl = gl.createClass(&string_ctor, getStringInterface());
+	    cl->init_member("fromCharCode", getVM(gl).getNative(251, 14)); 
     }
 
     return cl;

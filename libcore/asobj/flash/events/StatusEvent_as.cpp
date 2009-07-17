@@ -54,7 +54,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void statusevent_class_init(as_object& global)
+void statusevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -65,7 +65,8 @@ void statusevent_class_init(as_object& global)
     }
 
     // Register _global.StatusEvent
-    global.init_member("StatusEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -79,7 +80,7 @@ attachStatusEventInterface(as_object& o)
 }
 
 void
-attachStatusEventStaticInterface(as_object& o)
+attachStatusEventStaticInterface(as_object& /*o*/)
 {
 }
 
@@ -115,7 +116,7 @@ statusevent_STATUS(const fn_call& fn)
 }
 
 as_value
-statusevent_ctor(const fn_call& fn)
+statusevent_ctor(const fn_call& /*fn*/)
 {
     boost::intrusive_ptr<as_object> obj = new StatusEvent_as;
 
