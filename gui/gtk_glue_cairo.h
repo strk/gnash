@@ -43,10 +43,10 @@ class GtkCairoGlue : public GtkGlue
     cairo_surface_t* createSimilarSurface(const int& width, const int& height);
     cairo_surface_t* createMemorySurface(const int& width, const int& height);
 
-    cairo_t     *_cairo_handle;
-    cairo_t     *_cairo_offscreen;
+    cairo_t* _cairo_handle;
+    cairo_t* _cairo_offscreen;
     Renderer* _renderer;
-    GdkImage*       _image;
+    GdkImage* _image;
 };
 
 } // namespace gnash

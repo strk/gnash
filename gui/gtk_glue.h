@@ -26,6 +26,8 @@
 namespace gnash
 {
 
+class Renderer;
+
 class GtkGlue
 {
   public:
