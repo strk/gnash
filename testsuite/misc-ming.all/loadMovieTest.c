@@ -141,7 +141,7 @@ add_coverart(SWFMovie mo, int x, int y)
 		"  var lastUrlComponent = this._url.substring(this._url.lastIndexOf('/')+1);"
 		//"  _root.note('last component of _url is '+lastUrlComponent);"
 		"  _root.check_equals(lastUrlComponent, _level0.expectLoaded, '%s:%d');"
-		"  _root.check_equals(this.getDepth(), -16377);"
+		"  _root.check_equals(this.getDepth(), -16376);"
 		"  _root.check_equals(this.getBytesLoaded(), this.getBytesTotal());"
 		"  _root.check(this.getBytesLoaded() > 0);" /* assuming something was loaded here */
 		"  _root.note('bytesLoaded: '+this.getBytesLoaded());"
@@ -253,7 +253,7 @@ main(int argc, char** argv)
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(mediadir), 10, 0, 0, 800, 600);
 	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-	SWFDisplayItem_moveTo(it, 0, 250);
+	SWFDisplayItem_moveTo(it, 0, 270);
 	SWFMovie_nextFrame(mo); 
 
 	/*****************************************************
@@ -300,6 +300,10 @@ main(int argc, char** argv)
 				" }"
 				" art.lastdepth=0;"
 				" art.clear(); "
+				));
+
+	add_button(mo, 50, 240, "Unload", newSWFAction(
+				" _root.coverart.unloadMovie();"
 				));
 
 	/*****************************************************
