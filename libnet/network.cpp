@@ -126,7 +126,14 @@ Network::createServer(void)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return createServer(DEFAULTPORT);
+    short port;
+
+    if (_port) {
+	port = _port;
+    } else {
+	port = DEFAULTPORT;
+    }
+    return createServer(port);
 }
 
 // FIXME: Should also support IPv6 (AF_INET6)
@@ -483,7 +490,14 @@ Network::createClient(void)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return createClient("localhost", RTMP_PORT);
+    short port;
+
+    if (_port) {
+	port = _port;
+    } else {
+	port = RTMP_PORT;
+    }
+    return createClient("localhost", port);
 }
 bool
 Network::createClient(short /* port */)
@@ -498,7 +512,14 @@ Network::createClient(const string &hostname)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return createClient(hostname, RTMP_PORT);
+    short port;
+
+    if (_port) {
+	port = _port;
+    } else {
+	port = RTMP_PORT;
+    }
+    return createClient(hostname, port);
 }
 
 bool
