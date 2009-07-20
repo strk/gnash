@@ -355,6 +355,7 @@ public:
 	///	If true HTML tags in the text will be parsed and rendered
 	void setHtml(bool on) {
 		_html = on;
+		format_text();
 	}
 
 	/// Return true if the TextField text is selectable
@@ -512,6 +513,11 @@ private:
 	/// Move viewable lines based on m_cursor
 	void changeTopVisibleLine(int current_line);
 	
+	/// De-reference and do appropriate action for character iterator
+	void handleChar(std::wstring::const_iterator& it, const std::wstring::const_iterator& e,
+		boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
+		int& last_space_glyph, int& last_line_start_record);
+	
 	/// Extracts an HTML tag.
 	///
 	/// @param tag  This string is filled with the extracted HTML tag.
@@ -666,6 +672,7 @@ private:
     /// Represents the selected part of the text. The second element must
     /// never be less than the first.
     std::pair<size_t, size_t> _selection;
+	
 };
 
 /// Initialize the global TextField class
