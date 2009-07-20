@@ -44,7 +44,7 @@
 #include "sol.h"
 #include "arg_parser.h"
 #include "sshclient.h"
-#include "sslclient.h"
+#include "sshserver.h"
 
 using namespace amf;
 using namespace gnash;
@@ -57,6 +57,8 @@ static TestState runtest;
 static string infile;
 
 static void test_client();
+static void test_server();
+static void test_channels();
 static SSHClient client;
 static Network net;
 
@@ -65,6 +67,8 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 int
 main(int argc, char *argv[])
 {
+    bool servermode = false;
+
     const Arg_parser::Option opts[] =
         {
             { 'h', "help",          Arg_parser::no  },
@@ -78,6 +82,7 @@ main(int argc, char *argv[])
             { 'f', "sftp",          Arg_parser::no },
             { 'a', "raw",           Arg_parser::no },
             { 'n', "netdebug",      Arg_parser::no },
+            { 'c', "daemon",        Arg_parser::no },
         };
     
     Arg_parser parser(argc, argv, opts);
@@ -140,6 +145,10 @@ main(int argc, char *argv[])
               case 'n':
                   net.toggleDebug(true);
                   break;
+              case 'c':
+		  servermode = true;
+                  log_debug(_("Enabling SSH server mode"));
+                  break;
               case 0:
                   infile = parser.argument(i);
                   log_debug(_("Input file for testing the SSH connection is: %s"), infile);
@@ -153,7 +162,13 @@ main(int argc, char *argv[])
         }
     }
     
-    test_client();
+    if (servermode) {
+	test_server();
+    } else {
+	test_client();
+    }
+
+    test_channels();
 }
 
 static void test_client()
@@ -173,57 +188,20 @@ static void test_client()
         giveup = true;
     }
 
-    // I haven't seen a password with the first character set to
-    // zero ever. so we assume it got set correctly by the callback.
-    if (client.getPassword()[0] != 0) {
-        runtest.pass("Password was set for SSH connection");
+    if (client.openChannel()) {
+        runtest.pass("Opened a new channel");
     } else {
-        if (giveup) {
-            runtest.unresolved("Password wasn't set for SSH connection");
-        } else {
-            runtest.fail("Password wasn't set for SSH connection");
-        }
+        runtest.fail("Couldn't open a new channel");
+        giveup = true;
     }
 
-#if 0
-    if (giveup) {
-        runtest.unresolved("Cert didn't match hostfor SSH connection");
-    } else {
-        if (client.checkCert()) {
-            runtest.xpass("Cert matched host for SSH connection");
-        } else {
-            runtest.xfail("Cert didn't match host for SSH connection");
-        }
-    }
-
-    HTTP http;
-
-    if (giveup) {
-        runtest.unresolved("Couldn't write to SSH connection");
-    } else {
-        amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
-
-        if ((ret = client.sshWrite(request)) == request.allocated()) {
-            runtest.pass("Wrote bytes to SSH connection");
-        } else {
-            runtest.fail("Couldn't write to SSH connection.");
-        }
-    }
-#endif
-    
-#if 0
-    // This blocks forever unless data is received.
-    if (giveup) {
-        runtest.unresolved("Couldn't read bytes from SSH connection");
-    } else {
-        amf::Buffer buf;
-        if ((ret = client.sshRead(buf)) > 0) {
-            runtest.pass("Read bytes from SSH connection");
-        } else {
-            runtest.fail("Couldn't read bytes to SSH connection.");
-        }
-    }
-#endif
+     client.closeChannel();
+     if (client.getChannel() == 0) {
+         runtest.pass("Closed the current channel");
+     } else {
+         runtest.fail("Couldn't close the current channel");
+         giveup = true;
+     }
 
     if (giveup) {
         runtest.unresolved("Couldn't shutdown SSH connection");
@@ -234,6 +212,19 @@ static void test_client()
             runtest.fail("Couldn't shutdown SSH connection");
         }
     }
+    
+}
+
+static void test_server()
+{
+
+    SSHServer server;
+
+    
+}
+
+static void test_channels()
+{
     
 }
 
@@ -253,6 +244,7 @@ usage (void)
     cerr << "-f\tUse SFTP for transport" << endl;
     cerr << "-a\tUse RAW for transport" << endl;
     cerr << "-n\tEnable network debug" << endl << endl;
+    cerr << "-c\tEnable SSH Server" << endl << endl;
     
     cerr << "Libssh version is: " << ssh_version(0) << endl;
     exit (-1);
