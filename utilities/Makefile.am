@@ -87,6 +87,7 @@ bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
 
 if USE_GST_ENGINE
  bin_PROGRAMS += findwebcams
+ bin_PROGRAMS += findmicrophones
 endif
 
 gprocessor_SOURCES = processor.cpp
@@ -107,6 +108,9 @@ flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 if USE_GST_ENGINE
  findwebcams_SOURCES = findwebcams.cpp
  findwebcams_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+ 
+ findmicrophones_SOURCES = findmicrophones.cpp
+ findmicrophones_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support
