@@ -23,14 +23,12 @@
 #include <cstring>
 #include <cmath>
 
-#include "Renderer.h"
 #include "swf/ShapeRecord.h"
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
 #include "GnashNumeric.h"
 #include "log.h"
-#include "GnashImage.h"
 #include "utility.h"
 #include "Range2d.h"
 

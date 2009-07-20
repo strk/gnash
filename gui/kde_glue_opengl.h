@@ -17,6 +17,7 @@
 
 #include <qapplication.h>
 #include "kde_glue.h"
+#include "Renderer_ogl.h"
 #include <qgl.h>
 
 
