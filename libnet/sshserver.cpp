@@ -76,6 +76,8 @@ static boost::mutex stl_mutex;
 namespace gnash
 {
 
+const char *PASSWORD  = "none";
+
 SSHServer::SSHServer()
 {
 //     GNASH_REPORT_FUNCTION;

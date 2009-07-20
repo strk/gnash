@@ -162,10 +162,10 @@ main(int argc, char *argv[])
         }
     }
     
-    test_client();
-    
     if (servermode) {
 	test_server();
+    } else {
+	test_client();
     }
 
     test_channels();
@@ -219,6 +219,8 @@ static void test_server()
 {
 
     SSHServer server;
+
+    
 }
 
 static void test_channels()

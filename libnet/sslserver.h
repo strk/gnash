@@ -51,14 +51,26 @@ extern const char *HOST;
 extern const char *CA_LIST;
 extern const char *RANDOM;
 extern const char *KEYFILE;
+extern const char *SERVER_KEYFILE;
 extern const size_t SSL_PASSWD_SIZE;
+extern const char *PASSWORD;
+extern const char *DHFILE;
 
 class DSOEXPORT SSLServer : public SSLClient {
  public:
-  SSLServer();
-  ~SSLServer();
+    SSLServer();
+    ~SSLServer();
+    
+    bool loadDhParams(char *file);
+    bool loadDhParams(SSL_CTX *ctx, char *file);
 
-  void dump();
+    void generateEphRSAKey(SSL_CTX *ctx);
+    
+    // sslAccept() is how the server waits for connections for clients
+    size_t sslAccept(int fd);
+    
+    // display internal data to the terminal
+    void dump();
 };
     
 } // end of gnash namespace

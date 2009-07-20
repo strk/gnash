@@ -77,10 +77,7 @@ public:
 
     // sslConnect() is how the client connects to the server 
     bool sslConnect(int fd);
-    bool sslConnect(int fd, std::string &hostname);
-
-    // sslAccept() is how the server waits for connections for clients
-    size_t sslAccept();
+    bool sslConnect(int fd, std::string &hostname, short port);
 
     void setKeyfile(std::string filespec) { _keyfile = filespec; };
     std::string &getKeyfile() { return _keyfile; };
@@ -111,7 +108,7 @@ public:
     bool checkCert(std::string &hostname);
 
     void dump();
- private:
+ protected:
     boost::scoped_ptr<SSL> _ssl;
     boost::scoped_ptr<SSL_CTX> _ctx;
     boost::scoped_ptr<BIO> _bio;
@@ -128,6 +125,7 @@ public:
 extern "C" {
     // This is the callback required when setting up the password
     int password_cb(char *buf, int size, int rwflag, void *userdata);
+    int verify_callback(int ok, X509_STORE_CTX *store);
 }
 
 
