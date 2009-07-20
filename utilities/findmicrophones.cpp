@@ -78,7 +78,7 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (dev_name == "null") {
+        if (dev_name == "null" || (strstr(dev_name, "Monitor") != NULL)) {
             g_print("no pulse audio sources found\n");
         }
         else { 
