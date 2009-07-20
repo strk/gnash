@@ -303,6 +303,9 @@ main(int argc, char** argv)
 				));
 
 	add_button(mo, 50, 240, "Unload", newSWFAction(
+		   		"_root.coverart.onUnload = function() {"
+				"  _root.note(this+'.onUnload called');"
+				"};"	
 				" _root.coverart.unloadMovie();"
 				));
 
