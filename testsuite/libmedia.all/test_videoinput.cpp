@@ -59,15 +59,16 @@ int
 main(int argc, char *argv[])
 {   
     test_client();
+    return 0;
 }
 
 static void test_client()
 {
 	//create a test class, call constructor
 	gst::VideoInputGst vig;
-	vig.find_vid_devs();
+	vig.findVidDevs();
 	
-	std::vector<GnashWebcam*> *vid_vect = vig.get_vid_vect();
+	std::vector<GnashWebcam*> *vid_vect = vig.getVidVect();
 	
 	if (vid_vect->empty() == true) {
 		runtest.fail("the video vector was not created by find_vid_devs");
@@ -81,19 +82,19 @@ static void test_client()
 		runtest.pass("the videotestsrc element was created");
 	}
 	
-	if (vid_vect->at(0)->get_element_ptr() == NULL) {
+	if (vid_vect->at(0)->getElementPtr() == NULL) {
 		runtest.fail("the videotestsrc didn't get assigned an element ptr");
 	} else {
 		runtest.pass("the videotestsrc was assigned an element ptr");
 	}
 	
-	if (g_strcmp0(vid_vect->at(0)->get_gstreamer_src(), "videotestsrc") == 1) {
+	if (g_strcmp0(vid_vect->at(0)->getGstreamerSrc(), "videotestsrc") == 1) {
 		runtest.fail("the zeroth element doesn't contain the right source info");
 	} else {
 		runtest.pass("the zeroth vid_vect element contains the right source info");
 	}
 
-	if (g_strcmp0(vid_vect->at(0)->get_product_name(), "videotest") == 1) {
+	if (g_strcmp0(vid_vect->at(0)->getProductName(), "videotest") == 1) {
 		runtest.fail("the zeroth element doesn't contain the right product name info");
 	} else {
 		runtest.pass("the zeroth vid_vect element contains the right product name info");
@@ -105,17 +106,6 @@ static void test_client()
     
 }
 
-/*
-static void
-usage (void)
-{
-    cerr << "This program tests SSH support in the libnet library." << endl;
-    cerr << "Usage: test_ssh [hvsocpkwar]" << endl;
-    cerr << "-h\tHelp" << endl;
-    cerr << "-v\tVerbose" << endl;
-
-    exit (-1);
-} */
 
 #else
 
