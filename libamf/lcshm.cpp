@@ -556,7 +556,8 @@ LcShm::send(const string&  name , const string&  domainname ,
 
 //     cout<<" The send function is called ! "<<endl;
      log_debug("Base address is: 0x%x, 0x%x",
-               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+               static_cast<void *>(Listener::getBaseAddress()),
+	       reinterpret_cast<void *>(_baseaddr));
 
 //The base address
      boost::uint8_t *baseptr = Listener::getBaseAddress();
