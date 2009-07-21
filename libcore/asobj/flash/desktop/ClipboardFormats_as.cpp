@@ -38,12 +38,13 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-clipboardformats_class_init(as_object& where)
+clipboardformats_class_init(as_object& where, const ObjectURI& uri)
 {
 
     static as_object* obj = new as_object(getObjectInterface());
     attachClipboardFormatsStaticInterface(*obj);
-    where.init_member("ClipboardFormats", obj);
+    where.init_member(getName(uri), obj, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -59,7 +59,7 @@ public:
 
 
 // extern 
-void Error_class_init(as_object& where)
+void Error_class_init(as_object& where, const ObjectURI& uri)
 {
     
     Global_as* gl = getGlobal(where);
@@ -68,7 +68,8 @@ void Error_class_init(as_object& where)
         gl->createClass(&error_ctor, getErrorInterface());
 
 	// Register _global.Error
-	where.init_member("Error", cl.get());
+	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

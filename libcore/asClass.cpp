@@ -50,11 +50,11 @@ asClass::addValue(string_table::key name, asNamespace *ns,
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	int flags = as_prop_flags::dontDelete;
+	int flags = PropFlags::dontDelete;
 	if (isconst)
-		flags |= as_prop_flags::readOnly;
+		flags |= PropFlags::readOnly;
 	if (isstatic)
-		flags |= as_prop_flags::staticProp;
+		flags |= PropFlags::staticProp;
 
 	if(slotId == 0){
 		_prototype->init_member(name, val, flags, nsname);
@@ -103,10 +103,10 @@ asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
 {
 	as_value val = new abc_function(method, getVM(*_prototype).getMachine());
 	_prototype->init_member(name, val);
-//	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
-//		| as_prop_flags::dontEnum;
+//	int flags = PropFlags::readOnly | PropFlags::dontDelete
+//		| PropFlags::dontEnum;
 //	if (isstatic)
-//		flags |= as_prop_flags::staticProp;
+//		flags |= PropFlags::staticProp;
 
 	return true;
 }
@@ -124,9 +124,9 @@ asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
 		getset->setGetter(method->getPrototype());
 	else
 	{
-		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		if (isstatic)
-			flags |= as_prop_flags::staticProp;
+			flags |= PropFlags::staticProp;
 		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
@@ -145,9 +145,9 @@ asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
 		getset->setSetter(method->getPrototype());
 	else
 	{
-		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		if (isstatic)
-			flags |= as_prop_flags::staticProp;
+			flags |= PropFlags::staticProp;
 		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}

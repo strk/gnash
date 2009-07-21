@@ -91,6 +91,10 @@ public:
 
     virtual as_object* createBoolean(bool b) = 0;
 
+    virtual as_object* createObject() = 0;
+    
+    virtual as_object* createObject(as_object* prototype) = 0;
+
     virtual Global_as& global() {
         return *this;
     }

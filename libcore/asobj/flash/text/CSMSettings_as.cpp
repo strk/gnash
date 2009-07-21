@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void csmsettings_class_init(as_object& global)
+void csmsettings_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,7 +63,8 @@ void csmsettings_class_init(as_object& global)
     }
 
     // Register _global.CSMSettings
-    global.init_member("CSMSettings", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -63,7 +63,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void idataoutput_class_init(as_object& global)
+void idataoutput_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -74,7 +74,8 @@ void idataoutput_class_init(as_object& global)
     }
 
     // Register _global.IDataOutput
-    global.init_member("IDataOutput", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

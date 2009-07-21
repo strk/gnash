@@ -42,6 +42,11 @@ namespace cygnal {
 class DSOEXPORT CRcInitFile : public gnash::RcInitFile
 {
 public:
+    /// Construct only by getDefaultInstance()
+    CRcInitFile();
+    /// Never destroy (TODO: add a destroyDefaultInstance)
+    ~CRcInitFile();
+    
     /// \brief Return the default instance of RC file,
     static CRcInitFile& getDefaultInstance();
     
@@ -93,23 +98,45 @@ public:
     /// \brief Set the  flag for whether to enable the administration thread.
     void setAdminFlag(bool x) { _admin = x; }
 
-    /// \brief Dump the internal data of this class in a human readable form.
-    /// @remarks This should only be used for debugging purposes.
-    void dump() const { dump(std::cerr); }
-    
     void setDocumentRoot(const std::string &x) { _wwwroot = x; }
     std::string getDocumentRoot() { return _wwwroot; }
     
     void setCgiRoot(const std::string &x) { _cgiroot = x; }
     std::string getCgiRoot() { return _cgiroot; }
     
+    /// \brief Get the Root SSL certificate
+    const std::string& getRootCert() const {
+        return _rootcert;
+    }
+    /// \brief Set the Root SSL certificate
+    void setRootCert(const std::string& value) {
+        _rootcert = value;
+    }
+
+    /// \brief Get the Client SSL certificate
+    const std::string& getCertFile() const {
+        return _certfile;
+    }
+    /// \brief Set the Client SSL certificate
+    void setCertFile(const std::string& value) {
+        _certfile = value;
+    }
+
+    /// \brief Get the directory for client SSL certificates
+    const std::string& getCertDir() const {
+        return _certdir;
+    }
+    /// \brief Set the directory for client SSL certificates
+    void setCertDir(const std::string& value) {
+        _certdir = value;
+    }
+
+    /// \brief Dump the internal data of this class in a human readable form.
+    /// @remarks This should only be used for debugging purposes.
+    void dump() const { dump(std::cerr); }
+    
     /// \overload dump(std::ostream& os) const
     void dump(std::ostream& os) const;
-    
-    /// Construct only by getDefaultInstance()
-    CRcInitFile();
-    /// Never destroy (TODO: add a destroyDefaultInstance)
-    ~CRcInitFile();
     
   private:
     /// \var _wwwroot
@@ -154,6 +181,14 @@ public:
     ///		This toggles whether the admin thread is started or
     ///		not, also to reduce complecity when debugging.
     bool _admin;
+
+    /// \var _certfile
+    ///		This is the name of the server certificate file
+    std::string _certfile;
+
+    /// \var _certdir
+    ///		This is the path to the directory containing cert files
+    std::string _certdir;
 
 };
 

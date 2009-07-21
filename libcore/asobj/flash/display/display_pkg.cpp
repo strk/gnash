@@ -24,72 +24,34 @@
 #include "VM.h"
 #include "fn_call.h"
 #include "MovieClip.h"
-#include "display/AVM1Movie_as.h"
-#include "display/ActionScriptVersion_as.h"
-#include "display/BitmapDataChannel_as.h"
 #include "display/BitmapData_as.h"
-#include "display/Bitmap_as.h"
-#include "display/BlendMode_as.h"
-#include "display/CapsStyle_as.h"
-#include "display/DisplayObjectContainer_as.h"
-#include "display/DisplayObject_as.h"
-#include "display/FrameLabel_as.h"
-#include "display/GradientType_as.h"
-#include "display/Graphics_as.h"
-#include "display/IBitmapDrawable_as.h"
-#include "display/InteractiveObject_as.h"
-#include "display/InterpolationMethod_as.h"
-#include "display/JointStyle_as.h"
-#include "display/LineScaleMode_as.h"
-#include "display/LoaderInfo_as.h"
-#include "display/Loader_as.h"
-#include "display/MorphShape_as.h"
-#include "display/MovieClip_as.h"
-#include "display/PixelSnapping_as.h"
-#include "display/SWFVersion_as.h"
-#include "display/Scene_as.h"
-#include "display/Shape_as.h"
-#include "display/SimpleButton_as.h"
-#include "display/SpreadMethod_as.h"
-#include "display/Sprite_as.h"
-#include "display/StageAlign_as.h"
-#include "display/StageDisplayState_as.h"
-#include "display/StageQuality_as.h"
-#include "display/StageScaleMode_as.h"
-#include "display/Stage_as.h"
-
+#include "namedStrings.h"
 #include "display_pkg.h"
-#include "displayclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_display_package(const fn_call& /*fn*/)
+get_flash_display_package(const fn_call& fn)
 {
 	log_debug("Loading flash.display package");
 
     as_object *pkg = new as_object(getObjectInterface());
+    
+    string_table& st = getStringTable(fn);
+    const string_table::key global = 0;
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-
-    while (displayclasses[i]) {
-        displayclasses[i](*pkg);
-        ++i;
-    }
+    bitmapdata_class_init(*pkg, ObjectURI(st.find("BitmapData"), global));
 
 	return pkg;
 }
 
 void
-flash_display_package_init(as_object& where)
+flash_display_package_init(as_object& where, const ObjectURI& uri)
 {
-	string_table& st = getStringTable(where);
-
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("display"),
-			get_flash_display_package, flags);
+	where.init_destructive_property(getName(uri),
+			get_flash_display_package, flags, getNamespace(uri));
 }
 
 

@@ -64,9 +64,9 @@ as_function::as_function(Global_as& gl, as_object* iface)
 	:
 	as_object(gl)
 {
-	int flags = as_prop_flags::dontDelete |
-	            as_prop_flags::dontEnum |
-	            as_prop_flags::onlySWF6Up;
+	int flags = PropFlags::dontDelete |
+	            PropFlags::dontEnum |
+	            PropFlags::onlySWF6Up;
 
     init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 
@@ -80,9 +80,9 @@ as_function::as_function(Global_as& gl)
 	:
 	as_object(gl)
 {
-	int flags = as_prop_flags::dontDelete |
-	            as_prop_flags::dontEnum | 
-	            as_prop_flags::onlySWF6Up;
+	int flags = PropFlags::dontDelete |
+	            PropFlags::dontEnum | 
+	            PropFlags::onlySWF6Up;
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
@@ -100,7 +100,7 @@ as_function::extends(as_function& superclass)
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
     if (getSWFVersion(superclass) > 5) {
-        const int flags = as_prop_flags::dontEnum;
+        const int flags = PropFlags::dontEnum;
         newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
     }
 
@@ -187,8 +187,8 @@ as_function::constructInstance(const as_environment& env,
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked). NOTE that we assume the builtin constructors
 		// won't set __constructor__ to some other value...
-		int flags = as_prop_flags::dontEnum | 
-                    as_prop_flags::onlySWF6Up; 
+		int flags = PropFlags::dontEnum | 
+                    PropFlags::onlySWF6Up; 
 
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
@@ -221,8 +221,8 @@ as_function::constructInstance(const as_environment& env,
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked)
         // Can delete, hidden in swf5 
-		int flags = as_prop_flags::dontEnum | 
-                    as_prop_flags::onlySWF6Up; 
+		int flags = PropFlags::dontEnum | 
+                    PropFlags::onlySWF6Up; 
 
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
 
@@ -249,16 +249,16 @@ as_function::constructInstance(const as_environment& env,
 
 
 void
-function_class_init(as_object& global)
+function_class_init(as_object& global, const ObjectURI& uri)
 {
 	boost::intrusive_ptr<builtin_function> func = 
         as_function::getFunctionConstructor();
 
 	// Register _global.Function, only visible for SWF6 up
-	int swf6flags = as_prop_flags::dontEnum | 
-                    as_prop_flags::dontDelete | 
-                    as_prop_flags::onlySWF6Up;
-	global.init_member("Function", func.get(), swf6flags);
+	int swf6flags = PropFlags::dontEnum | 
+                    PropFlags::dontDelete | 
+                    PropFlags::onlySWF6Up;
+	global.init_member(getName(uri), func.get(), swf6flags, getNamespace(uri));
 }
 
 namespace {
@@ -285,9 +285,9 @@ getFunctionPrototype()
 
 		VM::get().addStatic(proto.get());
 
-		const int flags = as_prop_flags::dontDelete | 
-                          as_prop_flags::dontEnum | 
-                          as_prop_flags::onlySWF6Up; 
+		const int flags = PropFlags::dontDelete | 
+                          PropFlags::dontEnum | 
+                          PropFlags::onlySWF6Up; 
 
 		proto->init_member("apply", gl->createFunction(function_apply),
                 flags);

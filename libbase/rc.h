@@ -262,7 +262,7 @@ public:
     
     void setLocalConnection(bool x) { _lcdisabled = x; }
     
-    // Enable tracing all LocalConnection traffic
+    /// \brief Enable tracing all LocalConnection traffic
     bool getLCTrace() const { return _lctrace; }
     
     void setLCTrace(bool x) { _lctrace = x; }
@@ -287,9 +287,40 @@ public:
 
     const std::string& getMediaDir() const { return _mediaCacheDir; }
 	
-	void setWebcamDevice(int value) {_webcamDevice = value;}
-	
-	int getWebcamDevice() const {return _webcamDevice;}
+    void setWebcamDevice(int value) {_webcamDevice = value;}
+    
+    int getWebcamDevice() const {return _webcamDevice;}
+    
+    void setAudioInputDevice(int value) {_microphoneDevice = value;}
+    
+    int getAudioInputDevice() {return _microphoneDevice;}
+
+    /// \brief Get the Root SSL certificate
+    const std::string& getRootCert() const {
+        return _rootcert;
+    }
+    /// \brief Set the Root SSL certificate
+    void setRootCert(const std::string& value) {
+        _rootcert = value;
+    }
+
+    /// \brief Get the Client SSL certificate
+    const std::string& getCertFile() const {
+        return _certfile;
+    }
+    /// \brief Set the Client SSL certificate
+    void setCertFile(const std::string& value) {
+        _certfile = value;
+    }
+
+    /// \brief Get the directory for client SSL certificates
+    const std::string& getCertDir() const {
+        return _certdir;
+    }
+    /// \brief Set the directory for client SSL certificates
+    void setCertDir(const std::string& value) {
+        _certdir = value;
+    }
 
     void ignoreShowMenu(bool value) { _ignoreShowMenu= value; }
 
@@ -519,13 +550,27 @@ protected:
 
     bool _useXv;
 	
-	///FIXME: this should probably eventually be changed to a more readable
-	///config option instead of an integer
-	int _webcamDevice;
+    ///FIXME: this should probably eventually be changed to a more readable
+    ///config option instead of an integer
+    int _webcamDevice;
+    
+    int _microphoneDevice;
 
-	/// Whether the player will recognize changes to Stage.showMenu in AS
-	/// default value is true
-	bool _ignoreShowMenu;
+    /// \var _certfile
+    ///		This is the name of the client certificate file
+    std::string _certfile;
+
+    /// \var _certdir
+    ///		This is the path to the directory containing cert files
+    std::string _certdir;
+
+    /// \var _rootcert
+    ///		This is the name of the root certificate
+    std::string _rootcert;
+
+    /// Whether the player will recognize changes to Stage.showMenu in AS
+    /// default value is true
+    bool _ignoreShowMenu;
 
 };
 

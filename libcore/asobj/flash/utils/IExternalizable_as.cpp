@@ -53,7 +53,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void iexternalizable_class_init(as_object& global)
+void iexternalizable_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -64,7 +64,8 @@ void iexternalizable_class_init(as_object& global)
     }
 
     // Register _global.IExternalizable
-    global.init_member("IExternalizable", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

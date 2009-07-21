@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void framelabel_class_init(as_object& global)
+void framelabel_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,7 +63,8 @@ void framelabel_class_init(as_object& global)
     }
 
     // Register _global.FrameLabel
-    global.init_member("FrameLabel", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

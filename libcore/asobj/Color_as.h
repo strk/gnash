@@ -22,11 +22,12 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 void registerColorNative(as_object& global);
 
 /// Initialize the global Color class
-void color_class_init(as_object& global);
+void color_class_init(as_object& global, const ObjectURI& uri);
   
 } // end of gnash namespace
 

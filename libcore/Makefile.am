@@ -215,7 +215,7 @@ EXTENSIONS_API = \
 	Property.h \
 	PropertyList.h \
 	as_value.h \
-	as_prop_flags.h	\
+	PropFlags.h	\
 	CharacterProxy.h \
 	StringPredicates.h \
 	builtin_function.h \

@@ -41,11 +41,12 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-antialiastype_class_init(as_object& global)
+antialiastype_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachAntiAliasTypeStaticInterface(*o);
-    global.init_member("AntiAliasType", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

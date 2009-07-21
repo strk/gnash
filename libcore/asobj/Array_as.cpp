@@ -1556,7 +1556,7 @@ registerArrayNative(as_object& global)
 // 'constructor'
 //
 void
-array_class_init(as_object& glob)
+array_class_init(as_object& glob, const ObjectURI& uri)
 {
     // This is going to be the global Array "class"/"function"
     static as_object* ar = 0;
@@ -1570,8 +1570,8 @@ array_class_init(as_object& glob)
         attachArrayStatics(*ar);
     }
 
-    int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
-    glob.init_member("Array", ar, flags);
+    int flags = PropFlags::dontEnum; // |PropFlags::onlySWF5Up; 
+    glob.init_member(getName(uri), ar, flags, getNamespace(uri));
 }
 
 void

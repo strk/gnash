@@ -31,9 +31,10 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
+class ObjectURI;
 
 /// Initialize the global System class
-void system_class_init(as_object& global);
+void system_class_init(as_object& global, const ObjectURI& uri);
 
 void registerSystemNative(as_object& global);
 

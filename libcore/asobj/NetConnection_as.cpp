@@ -688,7 +688,7 @@ NetConnection_as::NetConnection_as()
 
 // extern (used by Global.cpp)
 void
-NetConnection_as::init(as_object& global)
+NetConnection_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global NetConnection "class"/"function"
     static boost::intrusive_ptr<as_object> cl;
@@ -705,7 +705,8 @@ NetConnection_as::init(as_object& global)
     }
 
     // Register _global.String
-    global.init_member("NetConnection", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 // here to have HTTPRemotingHandler definition available

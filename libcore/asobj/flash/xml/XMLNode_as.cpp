@@ -444,7 +444,7 @@ XMLNode_as::getXMLNodeInterface()
 }
 
 void
-XMLNode_as::init(as_object& global)
+XMLNode_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is the global XMLNode_as "class"
     static boost::intrusive_ptr<as_object> cl;
@@ -455,7 +455,8 @@ XMLNode_as::init(as_object& global)
         cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());
     }
 
-    global.init_member("XMLNode", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 
@@ -484,7 +485,7 @@ attachXMLNodeInterface(as_object& o)
                 xmlnode_getNamespaceForPrefix), noFlags);
 
 
-    const int protectedFlags = as_prop_flags::isProtected;
+    const int protectedFlags = PropFlags::isProtected;
 
     // Just the protected flag:
     o.init_property("nodeValue", &xmlnode_nodeValue, 

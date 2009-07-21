@@ -79,7 +79,7 @@ public:
 	{
 		
         /// The type of function to use for initialization
-		typedef void (*InitFunc)(as_object& obj);
+		typedef void (*InitFunc)(as_object& obj, const ObjectURI& uri);
 
         NativeClass(InitFunc init, string_table::key n,
                 string_table::key sc, string_table::key ns, int ver)

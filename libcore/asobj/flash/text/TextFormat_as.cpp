@@ -52,7 +52,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textformat_class_init(as_object& global)
+void textformat_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -63,7 +63,8 @@ void textformat_class_init(as_object& global)
     }
 
     // Register _global.TextFormat
-    global.init_member("TextFormat", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

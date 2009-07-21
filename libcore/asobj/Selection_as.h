@@ -22,9 +22,10 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global Selection class
-void selection_class_init(as_object& global);
+void selection_class_init(as_object& global, const ObjectURI& uri);
 
 /// Register native selection methods
 void registerSelectionNative(as_object& global);

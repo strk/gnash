@@ -54,13 +54,11 @@ public:
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
-    static boost::intrusive_ptr<as_object> s_ctor;
 
 };
 
 
 boost::intrusive_ptr<as_object> BevelFilter_as::s_interface;
-boost::intrusive_ptr<as_object> BevelFilter_as::s_ctor;
 
 as_object*
 BevelFilter_as::Interface() {
@@ -72,20 +70,18 @@ BevelFilter_as::Interface() {
     return BevelFilter_as::s_interface.get();
 }
 
-void
-BevelFilter_as::registerCtor(as_object& global) {
-    if (BevelFilter_as::s_ctor != NULL) return;
-    Global_as* gl = getGlobal(global);
-    BevelFilter_as::s_ctor = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());
-    VM::get().addStatic(BevelFilter_as::s_ctor.get());
-    BevelFilter_as::attachInterface(*BevelFilter_as::s_ctor);
-    global.init_member("BevelFilter" , BevelFilter_as::s_ctor.get());
-}
 
 void
-bevelfilter_class_init(as_object& global)
+bevelfilter_class_init(as_object& global, const ObjectURI& uri)
 {
-    BevelFilter_as::registerCtor(global);
+    boost::intrusive_ptr<as_object> cl;
+    if (cl != NULL) return;
+    Global_as* gl = getGlobal(global);
+    cl = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());
+    VM::get().addStatic(cl.get());
+    BevelFilter_as::attachInterface(*cl);
+    global.init_member(getName(uri) , cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 

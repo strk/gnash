@@ -1,0 +1,39 @@
+# The default verbosity level
+#set verbosity 1
+
+# Print debug info about the ActionScript classes as they are processed
+#set actionDump off
+
+# Print debug info about how Gnash is parsing the file
+#set parserDump off
+
+# The full path to the debug log
+#set debuglog /home/rob/cygnal-dbg.log
+
+# The Port offset to use when we're not root
+#set portOffset 4000
+
+# Output special messages to be used then testing Gnash
+#set testing off
+
+# Use threads for I/O. This is primarily a debugging option for
+# performance testing.
+#set threading on
+
+# When running in threaded mode, this is the number of file descritors
+# watched by each thread
+#set fdThread 100
+
+# The default top level path for all files.
+#set documentroot /var/www
+
+#
+# SSL settings. These are the default values currently used.
+#
+
+#
+# Set the default client certificate currently used,
+#set CertFile	client.pem
+
+# Set the default directory used for certificates
+#set CertDir	/etc/pki/tls

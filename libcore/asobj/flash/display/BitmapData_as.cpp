@@ -240,15 +240,13 @@ getFlashDisplayBitmapDataConstructor(as_object& global)
 
 
 // extern 
-void bitmapdata_class_init(as_object& where)
+void bitmapdata_class_init(as_object& where, const ObjectURI& uri)
 {
-
-    string_table& st = getStringTable(where);
-    
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("BitmapData"),
-                get_flash_display_bitmap_data_constructor, flags);
+	where.init_destructive_property(getName(uri),
+                get_flash_display_bitmap_data_constructor, flags,
+                getNamespace(uri));
 }
 
 

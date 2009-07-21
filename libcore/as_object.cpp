@@ -46,10 +46,11 @@
 #include "asName.h"
 #include "asClass.h"
 
+
+namespace gnash {
+
 // Anonymous namespace used for module-static defs
 namespace {
-
-using namespace gnash;
 
 /// 'super' is a special kind of object
 //
@@ -246,8 +247,56 @@ public:
 
 } // end of anonymous namespace
 
+const int as_object::DefaultFlags;
 
-namespace gnash {
+as_object::as_object(Global_as& gl)
+	:
+	_vm(getVM(gl)),
+	_members(_vm)
+{
+}
+
+as_object::as_object()
+	:
+	_vm(VM::get()),
+	_members(_vm)
+{
+}
+
+as_object::as_object(as_object* proto)
+	:
+	_vm(VM::get()),
+	_members(_vm)
+{
+	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
+}
+
+as_object::as_object(boost::intrusive_ptr<as_object> proto)
+	:
+	_vm(VM::get()),
+	_members(_vm)
+{
+	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
+}
+
+as_object::as_object(const as_object& other)
+	:
+#ifndef GNASH_USE_GC
+	ref_counted(),
+#else
+	GcResource(), 
+#endif
+	_vm(VM::get()),
+	_members(other._members)
+{
+}
+
+std::pair<bool,bool>
+as_object::delProperty(string_table::key name, string_table::key nsname)
+{
+	return _members.delProperty(name, nsname);
+}
+
 
 void
 as_object::add_property(const std::string& name, as_function& getter,
@@ -775,8 +824,8 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
 
-	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
-		| as_prop_flags::isProtected, nsname);
+	init_property(k, getter, getter, initflags | PropFlags::readOnly
+		| PropFlags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
 }
 
@@ -784,8 +833,8 @@ void
 as_object::init_readonly_property(const string_table::key& k,
         as_function& getter, int initflags, string_table::key nsname)
 {
-	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
-		| as_prop_flags::isProtected, nsname);
+	init_property(k, getter, getter, initflags | PropFlags::readOnly
+		| PropFlags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
 }
 
@@ -795,8 +844,8 @@ as_object::init_readonly_property(const std::string& key,
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
 
-	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
-		| as_prop_flags::isProtected, nsname);
+	init_property(k, getter, getter, initflags | PropFlags::readOnly
+		| PropFlags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
 }
 
@@ -804,8 +853,8 @@ void
 as_object::init_readonly_property(const string_table::key& k,
         as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
-	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
-		| as_prop_flags::isProtected, nsname);
+	init_property(k, getter, getter, initflags | PropFlags::readOnly
+		| PropFlags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
 }
 
@@ -1075,53 +1124,6 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 }
 
-as_object::as_object(Global_as& gl)
-	:
-	_vm(getVM(gl)),
-	_members(_vm)
-{
-}
-
-as_object::as_object()
-	:
-	_vm(VM::get()),
-	_members(_vm)
-{
-}
-
-as_object::as_object(as_object* proto)
-	:
-	_vm(VM::get()),
-	_members(_vm)
-{
-	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
-as_object::as_object(boost::intrusive_ptr<as_object> proto)
-	:
-	_vm(VM::get()),
-	_members(_vm)
-{
-	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
-as_object::as_object(const as_object& other)
-	:
-#ifndef GNASH_USE_GC
-	ref_counted(),
-#else
-	GcResource(), 
-#endif
-	_vm(VM::get()),
-	_members(other._members)
-{
-}
-
-std::pair<bool,bool>
-as_object::delProperty(string_table::key name, string_table::key nsname)
-{
-	return _members.delProperty(name, nsname);
-}
 
 Property*
 as_object::getOwnProperty(string_table::key key, string_table::key nsname)

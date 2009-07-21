@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_LIBNET_SSH_H
-#define GNASH_LIBNET_SSH_H
+#ifndef GNASH_SSH_CLIENT_H
+#define GNASH_SSH_CLIENT_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -96,9 +96,28 @@ public:
     
     void setTransportType(transport_type_t type) { _transporttype = type; };
     transport_type_t getTransportType() { return _transporttype; };
-    
+
+    int authKbdint();
+    int authKbdint(SSH_SESSION *);
+
+    // Channel operations
+    CHANNEL *openChannel();
+    CHANNEL *openChannel(SSH_SESSION *session);
+
+    void closeChannel();
+    void closeChannel(CHANNEL *channel);
+
+    // Accessors
+    CHANNEL *getChannel()     { return _channel; };
+    SSH_SESSION *getSession() { return _session; };
+    boost::shared_ptr<amf::Buffer> &getBuffer()  { return _buffer; };
+
+    // Dump internal data to the screen for debugging
     void dump();
- private:
+ protected:
+    int readChannel(CHANNEL *channel, amf::Buffer &buf);
+    int writeChannel(CHANNEL *channel, amf::Buffer &buf);
+
     std::string		_hostname;
     std::string		_user;
     std::string		_password;
@@ -112,12 +131,14 @@ public:
 #else
     SSH_SESSION *_session;
     SSH_OPTIONS *_options;
+    CHANNEL	*_channel;
 #endif
+    boost::shared_ptr<amf::Buffer> _buffer;
 };
     
 } // end of gnash namespace
 
-// end of GNASH_LIBNET_SSH_H
+// end of GNASH_SSH_CLIENT_H
 #endif 
 
 // local Variables:

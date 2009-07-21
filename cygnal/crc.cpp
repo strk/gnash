@@ -64,7 +64,9 @@ CRcInitFile::CRcInitFile()
       _threading(false),
       _fdthread(100),
       _netdebug(false),
-      _admin(false)
+      _admin(false),
+      _certfile("server.pem"),
+      _certdir("/etc/pki/tls")
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -196,6 +198,18 @@ CRcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
             
+            if (noCaseCompare(variable, "CertDir") ) {
+                expandPath(value);
+                _certdir = value;
+                continue;
+            }
+            
+            if (noCaseCompare(variable, "CertFile") ) {
+                expandPath(value);
+                _certfile = value;
+                continue;
+            }
+                        
             bool test;
             bool threads;
 	    bool netdebug;

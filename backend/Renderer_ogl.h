@@ -48,7 +48,9 @@
 # endif
 #endif
 
-
+#include "Renderer.h"
+#include "Geometry.h"
+#include "BitmapInfo.h"
 
 
 namespace gnash {
@@ -177,7 +179,7 @@ class bitmap_info_ogl : public BitmapInfo
 };
 
 
-
+DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
 
 
 

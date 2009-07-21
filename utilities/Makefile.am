@@ -63,7 +63,7 @@ AM_CPPFLAGS = \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
-        $(MYSQL_CFLAGS) \
+    $(MYSQL_CFLAGS) \
 	$(NULL)
 
 if WIN32
@@ -82,8 +82,13 @@ if USE_GST_ENGINE
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper 
+bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
 #check_PROGRAMS = gdebug.swf
+
+if USE_GST_ENGINE
+ bin_PROGRAMS += findwebcams
+ bin_PROGRAMS += findmicrophones
+endif
 
 gprocessor_SOURCES = processor.cpp
 # export our symbols so they can be used by Gnash plugins
@@ -99,6 +104,14 @@ soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 flvdumper_SOURCES = flvdumper.cpp
 flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+if USE_GST_ENGINE
+ findwebcams_SOURCES = findwebcams.cpp
+ findwebcams_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+ 
+ findmicrophones_SOURCES = findmicrophones.cpp
+ findmicrophones_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

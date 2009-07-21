@@ -19,6 +19,7 @@
 
 
 #include "gtk_glue_gtkglext.h"
+#include "Renderer_ogl.h"
 #include "log.h"
 
 using namespace std;

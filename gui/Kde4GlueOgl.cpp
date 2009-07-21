@@ -22,6 +22,7 @@
 
 #include "Kde4GlueOgl.h"
 #include "Renderer.h"
+#include "Renderer_ogl.h"
 #include <QRect>
 #include <QGLWidget>
 

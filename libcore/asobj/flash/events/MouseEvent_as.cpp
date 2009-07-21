@@ -64,7 +64,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void mouseevent_class_init(as_object& global)
+void mouseevent_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -75,7 +75,8 @@ void mouseevent_class_init(as_object& global)
     }
 
     // Register _global.MouseEvent
-    global.init_member("MouseEvent", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -41,11 +41,12 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-imeconversionmode_class_init(as_object& global)
+imeconversionmode_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachIMEConversionModeStaticInterface(*o);
-    global.init_member("IMEConversionMode", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

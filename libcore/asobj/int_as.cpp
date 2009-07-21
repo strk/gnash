@@ -68,7 +68,7 @@ getintInterface()
 }
 
 // extern (used by Global.cpp)
-void int_class_init(as_object& global)
+void int_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -76,7 +76,8 @@ void int_class_init(as_object& global)
         cl = gl->createClass(&int_ctor, getintInterface());
 
 	// Register _global.DisplayObject
-	global.init_member("int", cl.get());
+	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 std::auto_ptr<as_object>

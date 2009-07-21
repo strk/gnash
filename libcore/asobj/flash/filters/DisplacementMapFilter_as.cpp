@@ -216,7 +216,7 @@ DisplacementMapFilter_ctor(const fn_call& fn)
 }
 
 // extern 
-void displacementmapfilter_class_init(as_object& where)
+void displacementmapfilter_class_init(as_object& where, const ObjectURI& uri)
 {
 	// This is going to be the DisplacementMapFilter "class"/"function"
 	// in the 'where' package
@@ -226,7 +226,8 @@ void displacementmapfilter_class_init(as_object& where)
 	attachDisplacementMapFilterStaticProperties(*cl);
 
 	// Register _global.DisplacementMapFilter
-	where.init_member("DisplacementMapFilter", cl.get());
+	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

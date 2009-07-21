@@ -25,49 +25,61 @@
 #include "MovieClip.h"
 
 #include "BevelFilter_as.h"
-#include "BitmapFilterQuality_as.h"
-#include "BitmapFilterType_as.h"
 #include "BitmapFilter_as.h"
 #include "BlurFilter_as.h"
 #include "ColorMatrixFilter_as.h"
 #include "ConvolutionFilter_as.h"
-#include "DisplacementMapFilterMode_as.h"
 #include "DisplacementMapFilter_as.h"
 #include "DropShadowFilter_as.h"
 #include "GlowFilter_as.h"
 #include "GradientBevelFilter_as.h"
 #include "GradientGlowFilter_as.h"
-
+#include "namedStrings.h"
 #include "filters_pkg.h"
-#include "filtersclasses.h"
 
 namespace gnash {
 
 static as_value
-get_flash_filters_package(const fn_call& /*fn*/)
+get_flash_filters_package(const fn_call& fn)
 {
 
-	log_debug("Loading flash.filters package");
-	as_object *pkg = new as_object(getObjectInterface());
+    log_debug("Loading flash.filters package");
+    as_object *pkg = new as_object(getObjectInterface());
 
-	// Call the [objectname]_init() function for each class.
-	int i = 0;
-	do {
-	    filtersclasses[i](*pkg);
-	} while (filtersclasses[++i] != 0);
+    string_table& st = getStringTable(fn);
+    const string_table::key global = 0;
 
-	return pkg;
+    bevelfilter_class_init(*pkg,
+            ObjectURI(st.find("BevelFilter"), global));
+    bitmapfilter_class_init(*pkg,
+            ObjectURI(st.find("BitmapFilter"), global));
+    blurfilter_class_init(*pkg,
+            ObjectURI(st.find("BlurFilter"), global));
+    colormatrixfilter_class_init(*pkg,
+            ObjectURI(st.find("ColorMatrixFilter"), global));
+    convolutionfilter_class_init(*pkg,
+            ObjectURI(st.find("ConvolutionFilter"), global));
+    displacementmapfilter_class_init(*pkg,
+            ObjectURI(st.find("DisplacementMapFilter"), global));
+    dropshadowfilter_class_init(*pkg,
+            ObjectURI(st.find("DropShadowFilter"), global));
+    glowfilter_class_init(*pkg,
+            ObjectURI(st.find("GlowFilter"), global));
+    gradientbevelfilter_class_init(*pkg,
+            ObjectURI(st.find("GradientBevelFilter"), global));
+    gradientglowfilter_class_init(*pkg,
+            ObjectURI(st.find("GradientGlowFilter"), global));
+    
+    return pkg;
 }
 
 void
-flash_filters_package_init(as_object& where)
+flash_filters_package_init(as_object& where, const ObjectURI& uri)
 {
-	string_table& st = getStringTable(where);
-
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(st.find("filters"),
-			get_flash_filters_package, flags);
+    where.init_destructive_property(getName(uri), get_flash_filters_package,
+                   flags, getNamespace(uri));
 }
 
 

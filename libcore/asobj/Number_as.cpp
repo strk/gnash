@@ -145,9 +145,9 @@ void
 attachNumberStaticInterface(as_object& o)
 {
     // constant flags
-    const int cflags = as_prop_flags::dontEnum | 
-        as_prop_flags::dontDelete | 
-        as_prop_flags::readOnly;
+    const int cflags = PropFlags::dontEnum | 
+        PropFlags::dontDelete | 
+        PropFlags::readOnly;
 
     // Set __proto__ and constructor to constant.
     as_value null; null.set_null();
@@ -197,12 +197,13 @@ getNumberInterface()
 
 
 // extern (used by Global.cpp)
-void number_class_init(as_object& global)
+void number_class_init(as_object& global, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl = getNumberClass(*getGlobal(global));
 
     // Register _global.Number
-    global.init_member("Number", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 
 }
 

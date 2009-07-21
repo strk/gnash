@@ -39,7 +39,7 @@ public:
     static void registerNative(as_object& global);
 
     /// Initialize the global Color class
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
 
 	/// Return a Boolean value that indicates whether the text is underlined.
 	bool underlined() const { return _underline; }

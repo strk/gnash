@@ -239,7 +239,7 @@ FileReference_ctor(const fn_call& fn)
 }
 
 // extern 
-void filereference_class_init(as_object& where)
+void filereference_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the FileReference "class"/"function"
     // in the 'where' package
@@ -249,7 +249,8 @@ void filereference_class_init(as_object& where)
     attachFileReferenceStaticProperties(*cl);
 
     // Register _global.FileReference
-    where.init_member("FileReference", cl.get());
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

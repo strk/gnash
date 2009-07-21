@@ -64,13 +64,14 @@ namespace {
 
 
 void
-system_class_init(as_object& global)
+system_class_init(as_object& global, const ObjectURI& uri)
 {
 	// _global.System is NOT a class, but a simple object, see System.as
 
 	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachSystemInterface(*obj);
-	global.init_member("System", obj.get());
+	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 
@@ -287,9 +288,9 @@ getSystemCapabilitiesInterface(as_object& o)
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		const int flags = as_prop_flags::dontDelete
-		                | as_prop_flags::dontEnum
-		                | as_prop_flags::readOnly;
+		const int flags = PropFlags::dontDelete
+		                | PropFlags::dontEnum
+		                | PropFlags::readOnly;
 
 		proto = new as_object(getObjectInterface());
 
@@ -351,10 +352,10 @@ attachSystemInterface(as_object& proto)
 	proto.init_property("useCodepage", &system_usecodepage,
             &system_usecodepage);
 
-    const int flags = as_prop_flags::dontDelete
-                    | as_prop_flags::dontEnum
-                    | as_prop_flags::readOnly
-                    | as_prop_flags::onlySWF6Up;
+    const int flags = PropFlags::dontDelete
+                    | PropFlags::dontEnum
+                    | PropFlags::readOnly
+                    | PropFlags::onlySWF6Up;
 
     proto.init_property("exactSettings", &system_exactsettings,
             &system_exactsettings, flags);

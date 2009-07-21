@@ -148,7 +148,7 @@ private:
     bool _smoothing;
 };
 
-void video_class_init(as_object& global);
+void video_class_init(as_object& global, const ObjectURI& uri);
 
 }	// end namespace gnash
 

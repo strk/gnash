@@ -166,7 +166,7 @@ private:
 };
 
 /// Initialize the global Function constructor
-void function_class_init(as_object& global);
+void function_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

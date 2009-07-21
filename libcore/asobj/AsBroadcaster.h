@@ -56,7 +56,7 @@ public:
 
     static void registerNative(as_object &global);
 
-    static void init(as_object& global);
+    static void init(as_object& global, const ObjectURI& uri);
 
 };
 

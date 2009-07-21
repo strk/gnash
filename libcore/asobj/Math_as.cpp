@@ -91,14 +91,15 @@ registerMathNative(as_object& proto)
 
 
 void
-math_class_init(as_object& global)
+math_class_init(as_object& global, const ObjectURI& uri)
 {
     // Create built-in math object. It is not a class.
 	static boost::intrusive_ptr<as_object> obj =
             new as_object(getObjectInterface());
 
 	attachMathInterface(*obj);
-	global.init_member("Math", obj.get());
+	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {
@@ -238,9 +239,9 @@ attachMathInterface(as_object& proto)
 	// TODO: rely on inheritance, use init_property ?
 	// All Math members are constant and non-enumerable.
 
-    const int flags = as_prop_flags::dontDelete
-                | as_prop_flags::dontEnum
-                | as_prop_flags::readOnly;
+    const int flags = PropFlags::dontDelete
+                | PropFlags::dontEnum
+                | PropFlags::readOnly;
 
 	// constant
 	proto.init_member("E", 2.7182818284590452354, flags);

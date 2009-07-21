@@ -60,7 +60,7 @@ attachColorTransformInterface(as_object& o)
 
     o.init_member("concat", gl->createFunction(ColorTransform_concat), flags);
 
-    flags = as_prop_flags::isProtected;
+    flags = PropFlags::isProtected;
 
     /// These are all protected:
     o.init_member("toString", gl->createFunction(ColorTransform_toString),
@@ -381,16 +381,13 @@ ColorTransform_as::ColorTransform_as(double rm, double gm,
 }
 
 // extern 
-void colortransform_class_init(as_object& where)
+void colortransform_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is the ColorTransform "class"/"function"
-    // in the 'where' package
-    string_table& st = getStringTable(where);
-
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    where.init_destructive_property(st.find("ColorTransform"),
-            get_flash_geom_color_transform_constructor, flags);
+    where.init_destructive_property(getName(uri),
+            get_flash_geom_color_transform_constructor, flags,
+            getNamespace(uri));
 }
 
 } // end of gnash namespace

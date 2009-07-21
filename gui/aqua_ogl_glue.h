@@ -20,6 +20,7 @@
 #define AQUA_OGL_GLUE_H
 
 #include "aqua_glue.h"
+#include "Renderer_ogl.h"
 #include <AGL/agl.h>
 
 

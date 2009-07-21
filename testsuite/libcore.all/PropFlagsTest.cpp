@@ -19,7 +19,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "as_prop_flags.h"
+#include "PropFlags.h"
 
 #include <iostream>
 #include <sstream>
@@ -35,7 +35,7 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
 
-	as_prop_flags flags;
+	PropFlags flags;
 
 	// Check initial state
 	check(!flags.get_is_protected());

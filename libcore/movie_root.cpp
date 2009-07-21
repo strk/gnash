@@ -1008,14 +1008,16 @@ movie_root::clear_interval_timer(unsigned int x)
 bool
 movie_root::advance()
 {
-	unsigned int now = _vm.getTime();
+    // We can't actually rely on now being later than _lastMovieAdvancement,
+    // so we will have to check. Otherwise we risk elapsed being
+    // contructed from a negative value.
+	const size_t now = std::max<size_t>(_vm.getTime(), _lastMovieAdvancement);
 
     bool advanced = false;
 
     try {
 
-        assert(now >= _lastMovieAdvancement);
-        size_t elapsed = now - _lastMovieAdvancement;
+        const size_t elapsed = now - _lastMovieAdvancement;
 	    if (elapsed >= _movieAdvancementDelay)
 	    {
             advanced = true;
@@ -1086,7 +1088,7 @@ int
 movie_root::timeToNextFrame() const
 {
     unsigned int now = _vm.getTime();
-    int elapsed = now - _lastMovieAdvancement;
+    const int elapsed = now - _lastMovieAdvancement;
     return _movieAdvancementDelay - elapsed;
 }
 
@@ -1796,7 +1798,7 @@ movie_root::executeTimers()
 		else
 		{
 			unsigned long elapsed;
-			if ( timer->expired(now, elapsed) )
+			if (timer->expired(now, elapsed))
 			{
 				expiredTimers.insert( std::make_pair(elapsed, timer) );
 			}

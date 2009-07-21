@@ -81,3 +81,27 @@ set quality 0
 
 # Set default webcam to the videotestsrc
 set webcamDevice 0
+
+# These settings are for security of Local connections.
+# Disable using LocalConnection
+set LocalConnection on
+
+# Trace all object flowing gthrough LocalConnection
+set LCTrace on
+
+# This is the shared memory key for your system
+set LCShmKey 3711621821
+
+#
+# SSL settings. These are the default values currently used.
+#
+
+# Set the default CA file name
+set RootCert testrootcert.pem
+
+#
+# Set the default client certificate currently used,
+set CertFile testclient.pem
+
+# Set the default directory used for certificates
+set CertDir /test/etc/pki/tls/

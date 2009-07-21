@@ -36,7 +36,7 @@ public:
 
     static void registerNative(as_object& global);
 
-    static void init(as_object& where);
+    static void init(as_object& where, const ObjectURI& uri);
 
     std::string toString() const;
 

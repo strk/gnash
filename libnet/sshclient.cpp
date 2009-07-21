@@ -79,9 +79,10 @@ SSHClient::SSHClient()
       _need_server_auth(true),
       _state(0),
       _session(0),
-      _options(0)
+      _options(0),
+      _channel(0)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     // Set the default user name
     setUser();
@@ -89,7 +90,7 @@ SSHClient::SSHClient()
 
 SSHClient::~SSHClient()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     sshShutdown();
 }
@@ -97,7 +98,8 @@ SSHClient::~SSHClient()
 void
 SSHClient::setUser()
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
+
     string user = std::getenv("USER");
     if (!user.empty()) {
 	_user = user;
@@ -110,21 +112,20 @@ SSHClient::sshRead(amf::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
 
-    return sshRead(buf.reference(), buf.allocated());
+    return sshRead(buf.reference(), buf.size());
 }
 
 int
-SSHClient::sshRead(boost::uint8_t */* buf */, size_t /* size */)
+SSHClient::sshRead(boost::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
-//     ERR_clear_error();
-//     int ret = SSH_read(_ssh.get(), buf, size);
-//     if (ret < 0) {
-// 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-//     }
+    int ret = channel_read(_channel, buf, size, 0);
+    if (ret < 0) {
+ 	log_error("SSH read error was: \"%s\"!", ssh_get_error(_session));
+    }
     
-//    return ret;
+    return ret;
 }
 
 // Write bytes to the already opened SSH connection
@@ -137,31 +138,30 @@ SSHClient::sshWrite(amf::Buffer &buf)
 }
 
 int
-SSHClient::sshWrite(const boost::uint8_t */* buf */, size_t /* length */)
+SSHClient::sshWrite(const boost::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
-//     ERR_clear_error();
-//     int ret = SSH_write(_ssh.get(), buf, length);
-//     if (ret < 0) {
-// 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-//     }
-//    return ret;
+    int ret = channel_write(_channel, buf, size);
+    if (ret < 0) {
+ 	log_error("SSH write error was: \"%s\"!", ssh_get_error(_session));
+    }
+    return ret;
 }
 
 // Shutdown the Context for this connection
 bool
 SSHClient::sshShutdown()
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     if (_session) {
 	ssh_disconnect(_session);
 	ssh_finalize();
     }
-
+    free(_session);
     _session = 0;
-//     return closeNet();
+
     return true;
 }
 
@@ -175,7 +175,7 @@ SSHClient::sshConnect(int fd)
 bool
 SSHClient::sshConnect(int fd, std::string &hostname)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     char *password;
     char *banner;
     char *hexa;
@@ -220,7 +220,7 @@ SSHClient::sshConnect(int fd, std::string &hostname)
     }
     switch(_state){
       case SSH_SERVER_KNOWN_OK:	// ok
-	  log_debug("SSH Server is cyrrently known: %d", _state);
+	  log_debug("SSH Server is currently known: %d", _state);
 	  break; 
       case SSH_SERVER_KNOWN_CHANGED:
 	  log_error("Host key for server changed : server's one is now: ");
@@ -239,6 +239,8 @@ SSHClient::sshConnect(int fd, std::string &hostname)
       case SSH_SERVER_NOT_KNOWN:
 	  hexa = ssh_get_hexa(hash, hlen);
 	  free(hash);
+	  // FIXME: for now, accecpt all new keys, and update the 
+	  // $HOME/.ssh/know_hosts file.
 #if 0
 	  log_error("The server is unknown. Do you trust the host key ? (yes,no)");
 	  log_error("Public key hash: %s", hexa);
@@ -295,7 +297,7 @@ SSHClient::sshConnect(int fd, std::string &hostname)
         free(banner);
     }
     if(auth != SSH_AUTH_SUCCESS){
-//        auth = auth_kbdint(_session);
+        auth = authKbdint(_session);
         if(auth == SSH_AUTH_ERROR){
             log_error("authenticating with keyb-interactive: %s",
 		      ssh_get_error(_session));
@@ -334,6 +336,130 @@ SSHClient::sshConnect(int fd, std::string &hostname)
     
     return true;
 }
+
+int
+SSHClient::authKbdint()
+{
+//    GNASH_REPORT_FUNCTION;
+    return authKbdint(_session);
+}
+
+int
+SSHClient::authKbdint(SSH_SESSION *session)
+{
+//    GNASH_REPORT_FUNCTION;
+    int err = ssh_userauth_kbdint(session, NULL, NULL);
+    char *name,*instruction,*prompt,*ptr;
+    char buffer[128];
+    int i,n;
+    char echo;
+    while (err == SSH_AUTH_INFO){
+        name = ssh_userauth_kbdint_getname(session);
+        instruction = ssh_userauth_kbdint_getinstruction(session);
+        n=ssh_userauth_kbdint_getnprompts(session);
+        if(strlen(name)>0)
+            log_debug("%s", name);
+        if(strlen(instruction)>0)
+            log_debug("%s", instruction);
+        for(i=0; i<n; ++i){
+            prompt = ssh_userauth_kbdint_getprompt(session, i, &echo);
+            if(echo){
+                log_debug("%s", prompt);
+                fgets(buffer,sizeof(buffer),stdin);
+                buffer[sizeof(buffer)-1]=0;
+                if((ptr=strchr(buffer,'\n')))
+                    *ptr=0;
+                if (ssh_userauth_kbdint_setanswer(session, i, buffer) < 0) {
+                  return SSH_AUTH_ERROR;
+                }
+                memset(buffer,0,strlen(buffer));
+            } else {
+                ptr=getpass(prompt);
+                if (ssh_userauth_kbdint_setanswer(session, i, ptr) < 0) {
+                  return SSH_AUTH_ERROR;
+                }
+            }
+        }
+        err=ssh_userauth_kbdint(session, NULL, NULL);
+    }
+
+    return err;
+}
+
+// Channel operations
+CHANNEL *
+SSHClient::openChannel()
+{
+//    GNASH_REPORT_FUNCTION;
+    return openChannel(_session);
+}
+
+
+CHANNEL *
+SSHClient::openChannel(SSH_SESSION *session)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (session) {
+	_channel = channel_new(session);
+	if (_channel) {
+	    if (channel_open_session(_channel) != SSH_OK) {
+		log_error("Can't open the SSH channel!");
+	    }
+	} else {
+	    log_error("Can't allocate memory for new SSH channel!");
+	}
+    }
+
+    return _channel;
+}
+
+int 
+SSHClient::readChannel(CHANNEL *channel, amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    int ret = -1;
+
+    if (channel) {
+	ret = channel_read(channel, buf.reference(), buf.size(), 0);
+    } else {
+	log_error("Can't read from a non-existant channel!");
+    }
+
+    return ret;
+}
+
+int 
+SSHClient::writeChannel(CHANNEL *channel, amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    int ret = -1;
+
+    if (channel) {
+	ret = channel_write(channel, buf.reference(), buf.size());
+    } else {
+	log_error("Can't write to a non-existant channel!");
+    }
+}
+
+void 
+SSHClient::closeChannel()
+{
+//    GNASH_REPORT_FUNCTION;
+    return closeChannel(_channel);
+}
+
+void 
+SSHClient::closeChannel(CHANNEL *channel)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    if (channel) {
+	channel_close(channel);
+//	free(channel);
+	_channel = 0;
+    }
+}
+
 
 void
 SSHClient::dump() {

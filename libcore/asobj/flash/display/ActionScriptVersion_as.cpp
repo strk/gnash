@@ -41,11 +41,12 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-actionscriptversion_class_init(as_object& global)
+actionscriptversion_class_init(as_object& global, const ObjectURI& uri)
 {
     static as_object* o = new as_object(getObjectInterface());
     attachActionScriptVersionStaticInterface(*o);
-    global.init_member("ActionScriptVersion", o);
+    global.init_member(getName(uri), o, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

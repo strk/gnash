@@ -56,7 +56,7 @@ public:
 };
 
 // extern (used by Global.cpp)
-void stylesheet_class_init(as_object& global)
+void stylesheet_class_init(as_object& global, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
@@ -67,7 +67,8 @@ void stylesheet_class_init(as_object& global)
     }
 
     // Register _global.StyleSheet
-    global.init_member("StyleSheet", cl.get());
+    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -45,6 +45,7 @@
 #include "sol.h"
 #include "arg_parser.h"
 #include "sslclient.h"
+#include "sslserver.h"
 
 using namespace amf;
 using namespace gnash;
@@ -57,7 +58,10 @@ static TestState runtest;
 static string infile;
 
 static void test_client();
+static void test_server();
+
 static SSLClient client;
+SSLServer server;
 static Network net;
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -78,6 +82,7 @@ main(int argc, char *argv[])
             { 'a', "calist",        Arg_parser::yes },
             { 'r', "rootpath",      Arg_parser::yes },
             { 'n', "netdebug",      Arg_parser::no },
+            { 'e', "dsemon",        Arg_parser::no },
         };
     
     Arg_parser parser(argc, argv, opts);
@@ -86,6 +91,8 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     
+    bool servermode = false;
+
     for( int i = 0; i < parser.arguments(); ++i ) {
         const int code = parser.code(i);
         try {
@@ -129,6 +136,7 @@ main(int argc, char *argv[])
                   break;
               case 'r':
                   client.setRootPath(parser.argument(i));
+                  server.setRootPath(parser.argument(i));
                   log_debug(_("Root path for SSL pem files is: %s"),
                             client.getRootPath());
                   break;
@@ -139,6 +147,10 @@ main(int argc, char *argv[])
                   break;
               case 'n':
                   net.toggleDebug(true);
+                  break;
+              case 'e':
+		  servermode = true;
+                  log_debug(_("Enabling SSL server mode"));
                   break;
               case 0:
                   infile = parser.argument(i);
@@ -153,7 +165,11 @@ main(int argc, char *argv[])
         }
     }
     
-    test_client();
+    if (servermode) {
+	test_server();
+    } else {
+	test_client();
+    }
 }
 
 static void test_client()
@@ -161,12 +177,14 @@ static void test_client()
     size_t ret;
     bool giveup = false;    
 
+#if 0
     // Make a tcp/ip connect to the server
-    if (net.createClient(client.getHostname(), SSL_PORT) == false) {
+    if (net.createClient(client.getHostname()) == false) {
 	log_error("Can't connect to server %s", client.getHostname());
     }
+#endif
 
-    if (client.sslConnect(net.getFileFd())) {
+    if (client.sslConnect(net.getFileFd(), client.getHostname(), net.getPort())) {
         runtest.pass("Connected to SSL server");
     } else {
         runtest.fail("Couldn't connect to SSL server");
@@ -189,9 +207,9 @@ static void test_client()
         runtest.unresolved("Cert didn't match hostfor SSL connection");
     } else {
         if (client.checkCert()) {
-            runtest.xpass("Cert matched host for SSL connection");
+            runtest.pass("Cert matched host for SSL connection");
         } else {
-            runtest.xfail("Cert didn't match host for SSL connection");
+            runtest.fail("Cert didn't match host for SSL connection");
         }
     }
 
@@ -235,6 +253,19 @@ static void test_client()
     
 }
 
+static void test_server()
+{
+    log_debug("Starting SSL Server");
+
+    // The por is set by the command line arguments
+    net.createServer();
+
+    net.newConnection();
+
+    server.sslAccept(net.getFileFd());
+
+}
+
 static void
 usage (void)
 {
@@ -250,6 +281,7 @@ usage (void)
     cerr << "-w\tPassword" << endl;
     cerr << "-a\tCA List" << endl;
     cerr << "-r\tRoot path" << endl;
+    cerr << "-e\tServer mode" << endl;
     exit (-1);
 }
 

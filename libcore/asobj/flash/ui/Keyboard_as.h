@@ -47,7 +47,7 @@ protected:
 public:
 
     Keyboard_as();	
-	static void init(as_object& global);
+	static void init(as_object& global, const ObjectURI& uri);
 	    // Pass SWF keycode, returns true if currently pressed.
     bool is_key_down(int keycode);
 

@@ -189,8 +189,8 @@ public:
     ///		contaiing the data for this memory segment.
     ///
     /// @return nothing.
-    void send(const std::string &name, const std::string &dataname,
-	      std::vector<boost::shared_ptr<amf::Element> > &data);
+    void send(const std::string& name, const std::string& dataname,
+	      std::vector< amf::Element* >& data);
 
     /// \brief Put data in the memory segment
     ///		This puts data into the memory segment

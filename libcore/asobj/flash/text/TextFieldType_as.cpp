@@ -40,13 +40,14 @@ namespace {
 
 // extern
 void
-textfieldtype_class_init(as_object& where)
+textfieldtype_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> obj =
         new as_object(getObjectInterface());
 
     attachTextFieldTypeStaticInterface(*obj);
-	where.init_member("TextFieldType", obj.get());
+	where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 namespace {

@@ -54,6 +54,7 @@
 #ifdef HAVE_OPENSSL_SSL_H
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <openssl/rand.h>
 #endif
 
 #if defined(_WIN32) || defined(WIN32)
@@ -69,6 +70,9 @@ using namespace gnash;
 using namespace std;
 
 static boost::mutex stl_mutex;
+// The debug log used by all the gnash libraries.
+
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 // This is static in this file, instead of being a private variable in
 // the SSLCLient class, is so it's accessible from the C function callback,
@@ -79,24 +83,32 @@ static string password;
 namespace gnash
 {
 
-const char *ROOTPATH = "/etc/pki/tls";
-const char *HOST    = "localhost";
-const char *CA_LIST = "root.pem";
-const char *RANDOM  = "random.pem";
-const char *KEYFILE  = "client.pem";
 const size_t SSL_PASSWD_SIZE = 1024;
+const char  *SSL_HOST    = "localhost";
+const char  *SSL_CA_LIST = "rootcert.pem";
+const char  *SSL_CLIENT_CERTFILE  = "client.pem";
+const char  *SSL_CLIENT_ROOTPATH = "/etc/pki/tls";
+
+// const char *RANDOM  = "random.pem";
 
 SSLClient::SSLClient()
     : _hostname("localhost"),
-      _calist(CA_LIST),
-      _keyfile(KEYFILE),
-      _rootpath(ROOTPATH),
+      _calist(SSL_CA_LIST),
+      _keyfile(SSL_CLIENT_CERTFILE),
+      _rootpath(SSL_CLIENT_ROOTPATH),
       _need_server_auth(true)
 {
     GNASH_REPORT_FUNCTION;
 
 //     setPort(SSL_PORT);
-    setPassword("password");
+    setPassword("foobar");
+
+    // Initialize SSL library
+    SSL_library_init();
+    RAND_load_file("/dev/urandom", 1024);
+
+    // Load the error strings so the SSL_error_*() functions work
+    SSL_load_error_strings();    
 }
 
 SSLClient::~SSLClient()
@@ -160,11 +172,12 @@ bool
 SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 {
     GNASH_REPORT_FUNCTION;
-    SSL_METHOD *meth;
+//     SSL_METHOD *meth;
     int ret;
     string keyfile;
     string cafile;
 
+#if 1
     if (keyspec.find('/', 0) != string::npos) {
 	keyfile = keyspec;
     } else {
@@ -181,42 +194,17 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 	cafile += "/";
 	cafile += caspec;
     }
+#else
+    keyfile = keyspec;
+    cafile = caspec;
+#endif
 
-    // Initialize SSL library
-    SSL_library_init();
-
-    // Load the error strings so the SSL_error_*() functions work
-    SSL_load_error_strings();
-    
     // create the context
-    meth = SSLv23_method();
-    _ctx.reset(SSL_CTX_new(meth));
+    _ctx.reset(SSL_CTX_new( SSLv23_method()));
     
-    // Load our keys and certificates
-    if ((ret = SSL_CTX_use_certificate_chain_file(_ctx.get(), keyfile.c_str())) != 1) {
-	log_error("Can't read certificate file \"%s\"!", keyfile);
-	return false;
-    } else {
-	log_debug("Read certificate file \"%s\".", keyfile);
-    }
-
-    // Set the passwor dcallback
-    SSL_CTX_set_default_passwd_cb(_ctx.get(), password_cb);
-
-    // Add the first private key in the keyfile to the context.
     ERR_clear_error();
-    if((ret = SSL_CTX_use_PrivateKey_file(_ctx.get(), keyfile.c_str(),
-					  SSL_FILETYPE_PEM)) != 1) {
-	log_error("Can't read key file \"%s\"!", keyfile);
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-	return false;
-    } else {
-	log_error("Read key file \"%s\".", keyfile);
-    }
-
-    // Load the CAs we trust
-    ERR_clear_error();
-    if (!(SSL_CTX_load_verify_locations(_ctx.get(), cafile.c_str(), 0))) {
+    if (!(SSL_CTX_load_verify_locations(_ctx.get(), cafile.c_str(),
+					_rootpath.c_str()))) {
 	log_error("Can't read CA list from \"%s\"!", cafile);
  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
 	return false;
@@ -224,8 +212,33 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 	log_debug("Read CA list from \"%s\"", cafile);
     }
     
+    // Load our keys and certificates
+    ERR_clear_error();
+    if ((ret = SSL_CTX_use_certificate_chain_file(_ctx.get(), keyfile.c_str())) != 1) {
+	log_error("Can't read certificate file \"%s\"!", keyfile);
+	return false;
+    } else {
+	log_debug("Read certificate file \"%s\".", keyfile);
+    }
+
+    // Set the password as a callback, otherwise we get prompted for it
+    SSL_CTX_set_default_passwd_cb(_ctx.get(), password_cb);
+
+    // Add the first private key in the keyfile to the context.
+    ERR_clear_error();
+    if((ret = SSL_CTX_use_PrivateKey_file(_ctx.get(), keyfile.c_str(),
+					  SSL_FILETYPE_PEM)) != 1) {
+	log_error("Can't read CERT file \"%s\"!", keyfile);
+ 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	return false;
+    } else {
+	log_debug("Read key file \"%s\".", keyfile);
+    }
+
+     SSL_CTX_set_verify(_ctx.get(), SSL_VERIFY_PEER, verify_callback);
+
 #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
-    SSL_CTX_set_verify_depth(_ctx.get() ,1);
+    SSL_CTX_set_verify_depth(_ctx.get(), 4);
 #endif
 
     return true;
@@ -235,11 +248,12 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
 bool
 SSLClient::sslShutdown()
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
+//     SSL_clear(_ssl.get());
+    SSL_free(_ssl.get());
     SSL_CTX_free(_ctx.get());
 
-//     return closeNet();
     return true;
 }
 
@@ -247,11 +261,11 @@ SSLClient::sslShutdown()
 bool
 SSLClient::sslConnect(int fd)
 {
-    return sslConnect(fd, _hostname);
+    return sslConnect(fd, _hostname, 0);
 }
 
 bool
-SSLClient::sslConnect(int fd, std::string &hostname)
+SSLClient::sslConnect(int fd, std::string &hostname, short port)
 {
     GNASH_REPORT_FUNCTION;
     int ret;
@@ -263,7 +277,7 @@ SSLClient::sslConnect(int fd, std::string &hostname)
     }
 
     _ssl.reset(SSL_new(_ctx.get()));
-
+	
 //     // Make a tcp/ip connect to the server
 //     if (createClient(hostname, getPort()) == false) {
 //         log_error("Can't connect to server %s", hostname);
@@ -272,7 +286,21 @@ SSLClient::sslConnect(int fd, std::string &hostname)
 
     // Handshake the server
     ERR_clear_error();
+#if 0
     _bio.reset(BIO_new_socket(fd, BIO_NOCLOSE));
+#else
+//     BIO_set_conn_hostname(_bio.get(), _hostname.c_str());
+    _bio.reset(BIO_new_connect(const_cast<char *>(_hostname.c_str())));
+
+    BIO_set_conn_int_port(_bio.get(), &port);
+    log_debug("PORT is: %d", BIO_get_conn_port(_bio.get()));
+
+    if (BIO_do_connect(_bio.get()) <= 0) {
+        log_error("Error connecting to remote machine: %s",
+		  ERR_reason_error_string(ERR_get_error()));
+    }
+#endif
+
     SSL_set_bio(_ssl.get(), _bio.get(), _bio.get());
 
     if ((ret = SSL_connect(_ssl.get())) < 0) {
@@ -290,16 +318,9 @@ SSLClient::sslConnect(int fd, std::string &hostname)
     }
 #endif
     
+    SSL_set_connect_state(_ssl.get());
+    
     return true;
-}
-
-// sslAccept() is how the server waits for connections for clients
-size_t
-SSLClient::sslAccept()
-{
-    GNASH_REPORT_FUNCTION;
-
-    return 0;
 }
 
 bool
@@ -376,9 +397,10 @@ extern "C" {
 
 // This is the callback required when setting up the password. 
 int
-password_cb(char *buf, int size, int rwflag, void * /* userdata */)
+password_cb(char *buf, int size, int /* rwflag */, void * /* userdata */)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+
     log_debug("Callback executed to set the SSL password, size is: %d",
 	      password.size());
     
@@ -392,9 +414,34 @@ password_cb(char *buf, int size, int rwflag, void * /* userdata */)
 //     std::copy(buf, buf + size, password.data());
     std::copy(password.begin(), password.end(), buf);
     
+    
     return(password.size());
     
 }
+
+int
+verify_callback(int ok, X509_STORE_CTX *store)
+{
+    GNASH_REPORT_FUNCTION;
+
+    char data[256];
+ 
+    if (!ok) {
+        X509 *cert = X509_STORE_CTX_get_current_cert(store);
+        int  depth = X509_STORE_CTX_get_error_depth(store);
+        int  err = X509_STORE_CTX_get_error(store);
+	
+        log_error("-Error with certificate at depth: %i\n", depth);
+        X509_NAME_oneline(X509_get_issuer_name(cert), data, 256);
+        log_error("  issuer   = %s\n", data);
+        X509_NAME_oneline(X509_get_subject_name(cert), data, 256);
+        log_error("  subject  = %s\n", data);
+        log_error("err %i:%s\n", err, X509_verify_cert_error_string(err));
+    }
+ 
+    return ok;
+}
+
 } // end of extern C
 
 } // end of gnash namespace
