@@ -28,7 +28,7 @@
 
 namespace gnash {
   
-class LocalConnection_as : public as_object, amf::LcShm
+class LocalConnection_as : public as_object, public amf::LcShm
 {
 
 public:
@@ -38,13 +38,13 @@ public:
 
     void close();
 
-    void connect(const std::string& name);
+//    void connect(const std::string& name);
 
     const std::string& domain() {
         return _domain;
     }
 
-    void send();
+   // send(const string &  name , const string &  domainname ,vector<boost::shared_ptr<amf::Element> >  & data )
 
     const std::string& name() { return _name; };
 

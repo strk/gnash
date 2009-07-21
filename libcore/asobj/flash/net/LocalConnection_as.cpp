@@ -126,7 +126,7 @@ LocalConnection_as::close()
 /// The name is a symbolic name like "lc_name", that is used by the
 /// send() command to signify which local connection to send the
 /// object to.
-void
+/*void
 LocalConnection_as::connect(const std::string& name)
 {
 
@@ -150,6 +150,7 @@ LocalConnection_as::connect(const std::string& name)
     
     return;
 }
+*/
 
 /// \brief Returns a string representing the superdomain of the
 /// location of the current SWF file.
@@ -250,7 +251,7 @@ localconnection_close(const fn_call& fn)
     return as_value();
 }
 
-/// The callback for LocalConnection::connect()
+/// The callback for LocalConnectiono::connect()
 as_value
 localconnection_connect(const fn_call& fn)
 {
@@ -276,13 +277,15 @@ localconnection_connect(const fn_call& fn)
         return as_value(false);
     }
 
-    std::string name = fn.arg(0).to_string();
+    std::string connection_name = ptr->domain();	
+    connection_name +=":";
+    connection_name += fn.arg(0).to_string();
 
-    if (name.empty()) {
+    if (connection_name.empty()) {
         return as_value(false);
     }
 
-    ptr->connect(name);
+    ptr->connect(connection_name);
 
     // We don't care whether connected or not.
     return as_value(true);
@@ -340,6 +343,24 @@ localconnection_send(const fn_call& fn)
         );
         return as_value(false);
     }
+
+//Si added
+    int numarg=fn.nargs;
+    for (int i=0; i!=numarg; i++)
+		log_debug(_(" *** The value of the arg[ %d ] : %s ***"),i,fn.arg(i).to_string() ); 
+	
+	const std::string & connectionName= fn.arg(0).to_string();
+	const std::string & methodName=     fn.arg(1).to_string();
+		
+	std::vector< amf::Element * >  argument_to_send;
+	
+	for (int i=2; i!=numarg; i++){
+		amf::Element* temp_ptr = fn.arg(i).to_element().get();
+		argument_to_send.push_back(temp_ptr);
+	}
+	
+    ptr->amf::LcShm::send(connectionName,methodName,argument_to_send);
+//end of Si added
 
 
     // Now we have a valid call.
