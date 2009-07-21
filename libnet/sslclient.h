@@ -45,11 +45,11 @@
 namespace gnash
 {
 
-extern const char *ROOTPATH;
+// extern const char *ROOTPATH;
 extern const char *HOST;
-extern const char *CA_LIST;
-extern const char *RANDOM;
-extern const char *KEYFILE;
+// extern const char *CA_LIST;
+// extern const char *RANDOM;
+// extern const char *KEYFILE;
 extern const size_t SSL_PASSWD_SIZE;
 
 class DSOEXPORT SSLClient

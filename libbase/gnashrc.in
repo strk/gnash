@@ -221,11 +221,11 @@
 #
 
 # Set the default CA file name
-#set RootCert	rootcert.pem
+#set RootCert rootcert.pem
 
 #
 # Set the default client certificate currently used,
-#set CertFile	client.pem
+#set CertFile client.pem
 
 # Set the default directory used for certificates
-#set CertDir	/etc/pki/tls
+#set CertDir /etc/pki/tls

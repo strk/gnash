@@ -73,6 +73,7 @@ static boost::mutex stl_mutex;
 // The debug log used by all the gnash libraries.
 
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
+RcInitFile& rc = RcInitFile::getDefaultInstance();
 
 // This is static in this file, instead of being a private variable in
 // the SSLCLient class, is so it's accessible from the C function callback,
@@ -84,18 +85,18 @@ namespace gnash
 {
 
 const size_t SSL_PASSWD_SIZE = 1024;
-const char  *SSL_HOST    = "localhost";
-const char  *SSL_CA_LIST = "rootcert.pem";
-const char  *SSL_CLIENT_CERTFILE  = "client.pem";
-const char  *SSL_CLIENT_ROOTPATH = "/etc/pki/tls";
+static const char  *SSL_HOST    = "localhost";
+// static const char  *SSL_CA_LIST = "rootcert.pem";
+// static const char  *SSL_CLIENT_CERTFILE  = "client.pem";
+// static const char  *SSL_CLIENT_ROOTPATH = "/etc/pki/tls";
 
 // const char *RANDOM  = "random.pem";
 
 SSLClient::SSLClient()
     : _hostname("localhost"),
-      _calist(SSL_CA_LIST),
-      _keyfile(SSL_CLIENT_CERTFILE),
-      _rootpath(SSL_CLIENT_ROOTPATH),
+      _calist(rc.getRootCert()),
+      _keyfile(rc.getCertFile()),
+      _rootpath(rc.getCertDir()),
       _need_server_auth(true)
 {
     GNASH_REPORT_FUNCTION;
@@ -108,7 +109,7 @@ SSLClient::SSLClient()
     RAND_load_file("/dev/urandom", 1024);
 
     // Load the error strings so the SSL_error_*() functions work
-    SSL_load_error_strings();    
+    SSL_load_error_strings();
 }
 
 SSLClient::~SSLClient()
@@ -302,7 +303,8 @@ SSLClient::sslConnect(int fd, std::string &hostname, short port)
 #endif
 
     SSL_set_bio(_ssl.get(), _bio.get(), _bio.get());
-
+    SSL_set_connect_state(_ssl.get());
+    
     if ((ret = SSL_connect(_ssl.get())) < 0) {
         log_error("Can't connect to SSL server %s", hostname);
  	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
@@ -317,8 +319,6 @@ SSLClient::sslConnect(int fd, std::string &hostname, short port)
  	checkCert(hostname);
     }
 #endif
-    
-    SSL_set_connect_state(_ssl.get());
     
     return true;
 }
