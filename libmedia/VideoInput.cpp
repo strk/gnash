@@ -18,19 +18,21 @@
 
 #include "VideoInput.h"
 
+//IMPORTANT: This file has not been worked on yet!
+
 namespace gnash {
 namespace media {
-	/*
-	//constructor
-	VideoInput::VideoInput() {
-		//first call the Gst find_vid_devs to get an array of information
-		//about devices attached to the machine
-		std::vector<GnashWebcam*> vid_vect = gst::find_vid_devs();
-		int i;
-		for (i = 0; i != vid_vect.size(); i++) {
-			_names.push_back(vid_vect[i]->get_product_name)
-		}
-	} */
-	
+    /*
+    //constructor
+    VideoInput::VideoInput() {
+        //first call the Gst find_vid_devs to get an array of information
+        //about devices attached to the machine
+        std::vector<GnashWebcam*> vid_vect = gst::find_vid_devs();
+        int i;
+        for (i = 0; i != vid_vect.size(); i++) {
+            _names.push_back(vid_vect[i]->get_product_name)
+        }
+    } */
+    
 } //media namespace
 } //gnash namespace

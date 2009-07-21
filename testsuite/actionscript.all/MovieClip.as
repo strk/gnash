@@ -115,11 +115,11 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(897); // SWF6
+	check_totals(899); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(914); // SWF7
+	check_totals(916); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
@@ -872,8 +872,8 @@ check_equals(sr60.member, "hardref5@60");
 umc = _root.createEmptyMovieClip("umc", getNextHighestDepth());
 check_equals(typeof(umc), 'movieclip');
 
-#if OUTPUT_VERSION >= 8
 check_equals(umc.getBounds().xMax, 6710886.35);
+
 // This shouldn't be seen.
 with (umc) {
     lineStyle(2, 0xff6699);
@@ -885,7 +885,10 @@ with (umc) {
     lineTo(0, 0);
     endFill();
 }
+#if OUTPUT_VERSION >=8
 check_equals(umc.getBounds().xMax, 101);
+#else
+check_equals(umc.getBounds().xMax, 102);
 #endif
 
 umc.onData = function() { };
@@ -897,7 +900,7 @@ umc.unloadMovie();
 #if OUTPUT_VERSION >=8
 check_equals(umc.getBounds().xMax, 101);
 #else
-check_equals(umc.getBounds().xMax, 6710886.35);
+check_equals(umc.getBounds().xMax, 102);
 #endif
 
 check_equals(umc.a, 7);

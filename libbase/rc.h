@@ -290,6 +290,10 @@ public:
 	void setWebcamDevice(int value) {_webcamDevice = value;}
 	
 	int getWebcamDevice() const {return _webcamDevice;}
+    
+    void setAudioInputDevice(int value) {_microphoneDevice = value;}
+    
+    int getAudioInputDevice() {return _microphoneDevice;}
 
     void dump();    
 
@@ -518,6 +522,8 @@ protected:
 	///FIXME: this should probably eventually be changed to a more readable
 	///config option instead of an integer
 	int _webcamDevice;
+    
+    int _microphoneDevice;
 
 };
 
