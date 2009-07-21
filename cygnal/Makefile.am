@@ -36,6 +36,8 @@ SUBDIRS = \
 # of the top level configure options.
 DIST_SUBDIRS  = testsuite cgi-bin
 
+sysconf_DATA = cygnalrc
+
 AM_CPPFLAGS = # -Wall
 
 AM_LDFLAGS = \
@@ -86,6 +88,9 @@ cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp  proc.cpp
 libcygnal_la_LIBADD = 
 
+
+cygnalrc: cygnalrc.in Makefile
+	cat $(srcdir)/$@.in >$@
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
