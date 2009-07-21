@@ -36,6 +36,10 @@
 #include "GnashException.h"
 #include "lcshm.h"
 
+#ifndef VECTOR
+#include <vector>
+#endif
+
 using namespace std;
 using namespace gnash;
 
@@ -67,6 +71,7 @@ const int MAX_LC_HEADER_SIZE = 40960;
 ///     The starting address for the block of Listeners in the memory
 ///     segment.
 const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
+//LC_LISTENERS_START equals to 40976.
 
 /// \def MAXHOSTNAMELEN
 ///     This doesn't exist on all systems, but here's the value used on Unix.
@@ -386,7 +391,7 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
 ///
 /// @param con The name of the connection.
 ///
-/// @param host The bostname of the connection, often "localhost"
+/// @param host The hostname of the connection, often "localhost"
 ///
 /// @param domain The domain the hostname is in.
 ///
@@ -395,31 +400,46 @@ boost::uint8_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
     GNASH_REPORT_FUNCTION;
-//    boost::uint8_t *ptr = data + LC_HEADER_SIZE;
+//  boost::uint8_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
 
 //    Buffer *buf;
     
-    boost::uint8_t *header = new boost::uint8_t[size + 1];
-    boost::uint8_t *ptr = header;
+//    Si: Do not understand why use new here. 
+//    Assign the value of header and ptr directly.
+//    boost::uint8_t *header = new boost::uint8_t[size + 1];
+//    boost::uint8_t *ptr = header;
+
+    boost::uint8_t *header = Listener::getBaseAddress();
+    boost::uint8_t *ptr_FH    = Listener::getBaseAddress();
 
     // This is the initial 16 bytes of the header
-    memset(ptr, 0, size + 1);
-    *ptr = 1;
-    ptr += 3;
-    *ptr = 1;
-    ptr = header + LC_HEADER_SIZE;
+    memset(ptr_FH, 0, 16 + size + 1);
+    *ptr_FH = 1;
+    ptr_FH += 4;  
+    //Si changes this value from 3 to 4.
+    *ptr_FH = 1;
+    ptr_FH = header + LC_HEADER_SIZE;
+
+//  Si has rewritten the following code.
+//  The protocol is set to be localhost now. 
+//  Make sure it is right later.
 
     // Which is then always followed by 3 AMF objects.
     boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(con);
-    memcpy(ptr, buf1->begin(), buf1->size());
-    ptr += buf1->size();
+    memcpy(ptr_FH, buf1->begin(), buf1->size());
+    ptr_FH += buf1->size();
 
-    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(host);
-    memcpy(ptr, buf2->begin(), buf2->size());
-    ptr += buf2->size();
+    const std::string protocol="localhost";
+    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(protocol);
+    memcpy(ptr_FH, buf2->begin(), buf2->size());
+    ptr_FH += buf2->size();
+
+    boost::shared_ptr<amf::Buffer> buf3 = AMF::encodeString(host);
+    memcpy(ptr_FH, buf3->begin(), buf3->size());
+    ptr_FH += buf3->size();
     
-    return ptr;
+    return ptr_FH;
 }
 
 /// \brief Connect to a memory segment.
@@ -500,6 +520,18 @@ LcShm::connect(key_t key)
     return true;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 /// \brief Put data in the memory segment
 ///		This puts data into the memory segment
 ///
@@ -511,25 +543,55 @@ LcShm::connect(key_t key)
 ///		contaiing the data for this memory segment.
 ///
 /// @return nothing.
+
+// Si have rewrittten these!
+
 void
-LcShm::send(const string & /* name */, const string & /* domainname */,
-            vector<boost::shared_ptr<Element> > &/* data */)
+LcShm::send(const string&  name , const string&  domainname ,
+            vector<amf::Element* >& data )
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
-//     log_debug("Base address is: 0x%x, 0x%x",
-//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+     log_debug(_(" ***** The send function is called *****") ); 
 
-//    formatHeader(name, domainname, _object.domain);
+//     cout<<" The send function is called ! "<<endl;
+     log_debug("Base address is: 0x%x, 0x%x",
+               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
-    // Update the connection name
-    boost::uint8_t *ptr = Listener::getBaseAddress();
-    if (ptr == reinterpret_cast<boost::uint8_t *>(0)) {
-        log_error("base address not set!");
-    }
+//The base address
+     boost::uint8_t *baseptr = Listener::getBaseAddress();
+   	   
+     boost::uint8_t *ptr = baseptr;     
 
+// Check if the base address exists
+    if (baseptr == reinterpret_cast<boost::uint8_t *>(0)) {
+        log_error("***** base address not set! *****");
+	}
+
+// This function write the first 16 bytes and the following three messages into the memory.
+// ptr should be moved
+    ptr=formatHeader(name, domainname, _object.domain);
+// The ptr is now pointing to the start of the message
+
+//Put the date into memory when it is not empty
+
+  	log_debug(_(" ***** The size of the data is %s *****"),data.size() ); 
+      if (data.size()==0){	
+    	   std::vector<amf::Element* >::iterator iter;
+	   for(iter = data.begin(); iter != data.end(); iter++)
+		{
+		// temporary buf for element
+		boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);		
+
+		memcpy(ptr, buf->begin(), buf->size() );
+		ptr+= buf->size();		
+		}
+	}	
+	
+// Update the connection name
+	   
 #if 0
-//    boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
+//     boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
 //     memcpy(ptr, tmp, name.size());
 //     ptr +=  name.size() + AMF_HEADER_SIZE;
 //     delete[] tmp;
@@ -564,11 +626,11 @@ LcShm::send(const string & /* name */, const string & /* domainname */,
 
     ptr += domainname.size() + AMF_HEADER_SIZE;
 
-//     // Set the domain flag to whatever it's current value is.
-// //    Element domain(_object.domain);
+// //  Set the domain flag to whatever it's current value is.
+// //  Element domain(_object.domain);
 //     tmp = AMF::encodeBoolean(_object.domain);
 //     memcpy(ptr, tmp, AMF_BOOLEAN_SIZE);
-// //    delete[] tmp;
+// //  delete[] tmp;
     
 //     ptr += AMF_BOOLEAN_SIZE;
     
