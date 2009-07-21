@@ -107,8 +107,11 @@ RcInitFile::RcInitFile()
     _saveLoadedMedia(false),
     _popups(true),
     _useXv(false),
-	_webcamDevice(-1),
-    _microphoneDevice(-1)
+    _webcamDevice(-1),
+    _microphoneDevice(-1),
+    _certfile("client.pem"),
+    _certdir("/etc/pki/tls"),
+    _rootcert("rootcert.pem")
 {
     expandPath(_solsandbox);
     loadFiles();
@@ -468,6 +471,23 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
+            if (noCaseCompare(variable, "CertDir") ) {
+                expandPath(value);
+                _certdir = value;
+                continue;
+            }
+            
+            if (noCaseCompare(variable, "CertFile") ) {
+                expandPath(value);
+                _certfile = value;
+                continue;
+            }
+            
+            if (noCaseCompare(variable, "RootCert") ) {
+                _rootcert = value;
+                continue;
+            }
+            
             if (noCaseCompare(action , "set") ) {
                  extractSetting(_splashScreen, "splashScreen", variable,
                            value)
