@@ -295,6 +295,10 @@ public:
     
     int getAudioInputDevice() {return _microphoneDevice;}
 
+    void ignoreShowMenu(bool value) { _ignoreShowMenu= value; }
+
+    bool ignoreShowMenu() const { return _ignoreShowMenu; }
+
     void dump();    
 
 protected:
@@ -524,6 +528,10 @@ protected:
 	int _webcamDevice;
     
     int _microphoneDevice;
+
+	/// Whether the player will recognize changes to Stage.showMenu in AS
+	/// default value is true
+	bool _ignoreShowMenu;
 
 };
 

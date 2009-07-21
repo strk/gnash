@@ -68,6 +68,8 @@ public:
     virtual void quit();
 
     virtual bool createMenu();
+
+    virtual bool createMenuAlt(); //an alternative popup menu
     
     /// Set up callbacks for key, mouse and other GTK events.
     //
@@ -144,6 +146,11 @@ public:
 
     virtual void error(const std::string& msg);
 
+	/// get the _showMenuState
+	//bool showMenuState() { return _showMenuState; }
+	/// set the _showMenuState
+	//void showMenuState( bool state ) { _showMenuState = state; }
+
 private:
 
 #ifdef GUI_HILDON
@@ -164,6 +171,7 @@ private:
 #endif
 
     GtkMenu* _popup_menu;
+    GtkMenu* _popup_menu_alt;
     GtkWidget* _menubar;
     GtkWidget* _vbox;
 
@@ -187,6 +195,9 @@ private:
     void startAdvanceTimer();
 
     void stopAdvanceTimer();
+
+	/// This value determines whether the _popup_menu should be shown or not
+	//bool _showMenuState;
 };
 
 } // namespace gnash

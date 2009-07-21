@@ -253,16 +253,27 @@ stage_align(const fn_call& fn)
 as_value
 stage_showMenu(const fn_call& fn)
 {
-	boost::intrusive_ptr<Stage_as> stage = ensureType<Stage_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
+    movie_root& m = getRoot(fn);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		LOG_ONCE(log_unimpl("Stage.showMenu getter"));
-		return as_value();
+		return as_value(m.getShowMenuState());
 	}
 	else // setter
 	{
-		LOG_ONCE(log_unimpl("Stage.showMenu setter"));
+		LOG_ONCE(log_unimpl("Stage.showMenu implemented by setting gnashrc option and for gtk only"));
+
+		const std::string& str = fn.arg(0).to_string();
+		StringNoCaseEqual noCaseCompare;
+		bool state = true;
+		// showMenu property is a boolean who's default value is true
+		if ( noCaseCompare(str, "false") ) {
+			state = false;
+		}
+		
+		m.setShowMenuState( state );
 		return as_value();
 	}
 }

@@ -546,6 +546,14 @@ public:
     /// bottom/centre) as a std::pair
     StageAlign getStageAlignment() const;
 
+	/// Returns the current value of _showMenu which instructs the gui about
+	/// how much to display in the context menu
+	bool getShowMenuState() const;
+
+	/// Sets the value of _showMenu and calls the fscommand handler for the
+	/// current gui
+	void setShowMenuState( bool state );
+
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
     
@@ -1178,6 +1186,8 @@ private:
     Quality _quality;
 
     std::bitset<4u> _alignMode;
+
+	bool _showMenu;
     
     ScaleMode _scaleMode;
     

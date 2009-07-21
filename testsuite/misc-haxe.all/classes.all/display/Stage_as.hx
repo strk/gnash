@@ -39,305 +39,417 @@ import flash.Stage;
 import flash.MovieClip;
 #end
 import flash.Lib;
+
+//haxe imports
 import Type;
 import Std;
+import Reflect;
 
 // import our testing API
 import DejaGnu;
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Stage_as {
+	
+	static var desc = untyped __global__["flash.utils.describeType"];
+	static var className = 
+	           untyped __global__["flash.utils.getQualifiedClassName"];
+	
+	
     static function main() {
     	
-#if !(flash8 || flash7 || flash6) // Basically checking #if flash5
-        var x1:Stage = flash.Lib.current.stage;
+	#if flash9
+	//get the stage here
+	//some properties only seems to exist on the actual stage not on the 
+	//stage class in flash 9. This could be a haxe problem?
+	var x1:Stage = flash.Lib.current.stage;
+	#end
+	
+	//DejaGnu.note("Stage in xml format: ");
+	//DejaGnu.note("-> " + desc(Stage));
+	DejaGnu.note("Stage string: " + untyped Stage.toString());
+	
 
-        // Make sure we actually get a valid class        
-        if (Std.is(x1, Stage)) {
-            DejaGnu.pass("Stage class exists");
-        } else {
-            DejaGnu.fail("Stage class doesn't exist");
-        }
-#else
-		if(Type.typeof(Stage) == ValueType.TObject) {
-		    DejaGnu.pass("Stage class exists");
-        } else {
-            DejaGnu.fail("Stage class doesn't exist");
-        }
-#end
+	if(Type.typeof(Stage) == ValueType.TObject) {
+		DejaGnu.pass("Stage class exists");
+	} else {
+		DejaGnu.fail("Stage class doesn't exist");
+	}
 
 
+	//-------------------------------------------------------------------------
+	// Property Existence
 	// Tests to see if all the properties exist. All these do is test for
 	// existance of a property, and don't test the functionality at all. This
 	// is primarily useful only to test completeness of the API implementation.
+	//-------------------------------------------------------------------------
+	DejaGnu.note("***Property Existence Tests ***");
 	
 	#if flash10
 	if (Std.is(x1.enableColorCorrection, Bool)) {
-	    DejaGnu.pass("Stage::enableColorCorrection() method exists");
+		DejaGnu.pass("Stage.enableColorCorrection() method exists");
 	} else {
-	    DejaGnu.fail("Stage::enableColorCorrection() method doesn't exist");
+		DejaGnu.fail("Stage.enableColorCorrection() method doesn't exist");
+	}
+	if (untyped x1.hasOwnProperty('nativeWindow')) {
+		DejaGnu.pass("Stage.nativeWindow property exists");
+	} else {
+		DejaGnu.fail("Stage.nativeWindow property does not exist");
 	}
 	#end
+
+
 	#if flash9
-	if (Std.is(x1.align, String)) {
-	    DejaGnu.pass("Stage::align property exists");
+	if (untyped x1.hasOwnProperty("align")) {
+	    DejaGnu.pass("Stage.align property exists");
 	} else {
-	    DejaGnu.fail("Stage::align property doesn't exist");
+	    DejaGnu.fail("Stage.align property doesn't exist");
 	}
-//FIXME: This property doesn't exist in haXe
-//	if (Type.typeof(x1.cacheAsBitmap)==ValueType.TBool) { 
-//		DejaGnu.pass("Stage::cacheAsBitmap property exists");
-//	} else {
-//		DejaGnu.fail("Stage::cacheAsBitmap property doesn't exist");
-//	}
 	
-// Set displayState first to standard state and then test for existence 
-	untyped Stage.displayState = "normal";
-	if (Std.is(untyped Stage.displayState,  String)) {
-	    DejaGnu.pass("Stage::displayState property exists");
+	if (untyped x1.hasOwnProperty("cacheAsBitmap")) {
+		DejaGnu.pass("cacheAsBitmap exists");
 	} else {
-	    DejaGnu.fail("Stage::displayState property doesn't exist");
+		DejaGnu.fail("cacheAsBitmap does not exist");
 	}
-//Determine if the focus property exists by setting and testing it
-	var t1:TextField = new TextField();
-	x1.focus = t1;
- 	if (Std.is(x1.focus, InteractiveObject)) {
- 	    DejaGnu.pass("Stage::focus property exists");
- 	} else {
- 	    DejaGnu.fail("Stage::focus property doesn't exist");
- 	}
-	if (Std.is(x1.frameRate, Int)) {
-	    DejaGnu.pass("Stage::frameRate property exists");
+	
+	if (untyped x1.hasOwnProperty('displayState')) {
+		DejaGnu.pass("Stage.displayState property exists");
 	} else {
-	    DejaGnu.fail("Stage::frameRate property doesn't exist");
+		DejaGnu.fail("Stage.displayState property does not exist");
 	}
-	var r1:Rectangle = new Rectangle(0,0,10,10);
-	untyped Stage.fullScreenSourceRect = r1;
-	if (Std.is(untyped Stage.fullScreenSourceRect, Rectangle)) {
-	    DejaGnu.pass("Stage::fullScreenSourceRect property exists");
+	
+	if (untyped x1.hasOwnProperty('focus')) {
+		DejaGnu.pass("Stage.focus property exists");
 	} else {
-	    DejaGnu.fail("Stage::fullScreenSourceRect property doesn't exist");
+		DejaGnu.fail("Stage.focus property does not exist");
 	}
-//FIXME: These probably need to be set somehow before testing
-//	DejaGnu.note("x1.fullScreenHeight type is "+Type.typeof(x1.fullScreenHeight));
-//	if (Std.is(x1.fullScreenHeight, Int)) {
-//	    DejaGnu.pass("Stage::fullScreenHeight property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::fullScreenHeight property doesn't exist");
-//	}
-//	if (Std.is(x1.fullScreenWidth, Int)) {
-//	    DejaGnu.pass("Stage::fullScreenWidth property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::fullScreenWidth property doesn't exist");
-//	}
-//FIXME: This property does not exist in haXe
-//	if (Std.is(x1.height, Int)) {
-//	    DejaGnu.pass("Stage::height property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::height property doesn't exist");
-//	}
-//FIXME: This property does not exist in haXe
-//	if (Std.is(x1.mouseChildren, Bool)) {
-//	    DejaGnu.pass("Stage::mouseChildren property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::mouseChildren property doesn't exist");
-//	}
-//FIXME: This property does not exist in haXe
-// 	if (Std.is(x1.nativeWindow, NativeWindow)) {
-// 	    DejaGnu.pass("Stage::nativeWindow property exists");
-// 	} else {
-// 	    DejaGnu.fail("Stage::nativeWindow property doesn't exist");
-// 	}
-//FIXME: This property does not exist in haXe
-//	if (Std.is(x1.numChildren, Int)) {
-//	    DejaGnu.pass("Stage::numChildren property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::numChildren property doesn't exist");
-//	}
-	if (Std.is(x1.quality, String)) {
-	    DejaGnu.pass("Stage::quality property exists");
+
+	if (untyped x1.hasOwnProperty('frameRate')) {
+		DejaGnu.pass("Stage.frameRate property exists");
 	} else {
-	    DejaGnu.fail("Stage::quality property doesn't exist");
+		DejaGnu.fail("Stage.frameRate property does not exist");
 	}
-	if (Std.is(x1.scaleMode, String)) {
-	    DejaGnu.pass("Stage::scaleMode property exists");
+	
+	DejaGnu.note("displayState: " + untyped x1.displayState);
+	//NOTE: I think we should put the following test in a block like this
+	if (x1.displayState == FULL_SCREEN) {
+	//may only exist in full screen mode
+		//~ var r1:Rectangle = new Rectangle(0,0,10,10);
+		//~ untyped Stage.fullScreenSourceRect = r1;
+		//~ if (Std.is(untyped Stage.fullScreenSourceRect, Rectangle)) {
+			//~ DejaGnu.pass("Stage.fullScreenSourceRect property exists");
+		//~ } else {
+			//~ DejaGnu.fail("Stage.fullScreenSourceRect property doesn't exist");
+		//~ }
+		if (untyped x1.hasOwnProperty('fullScreenSourceRect')) {
+			DejaGnu.pass("Stage.fullScreenSourceRect property exists");
+		} else {
+			DejaGnu.fail("Stage.fullScreenSourceRect property does not exist");
+		}
+		//FIXME: These probably need to be set somehow before testing
+		//	DejaGnu.note("x1.fullScreenHeight type is "+Type.typeof(x1.fullScreenHeight));
+			//Probably need to run in full screen mode to test these two
+		//	if (Std.is(x1.fullScreenHeight, Int)) {
+		//	    DejaGnu.pass("Stage.fullScreenHeight property exists");
+		//	} else {
+		//	    DejaGnu.fail("Stage.fullScreenHeight property doesn't exist");
+		//	}
+		//	if (Std.is(x1.fullScreenWidth, Int)) {
+		//	    DejaGnu.pass("Stage.fullScreenWidth property exists");
+		//	} else {
+		//	    DejaGnu.fail("Stage.fullScreenWidth property doesn't exist");
+		//	}
+	}
+	
+	if (untyped x1.hasOwnProperty('height')) {
+		DejaGnu.pass("Stage.height property exists");
 	} else {
-	    DejaGnu.fail("Stage::scaleMode property doesn't exist");
+		DejaGnu.fail("Stage.height property does not exist");
 	}
-	if (Std.is(x1.showDefaultContextMenu, Bool)) {
-	    DejaGnu.pass("Stage::showDefaultContextMenu property exists");
+	
+	if (untyped x1.hasOwnProperty('mouseChildren')) {
+		DejaGnu.pass("Stage.mouseChildren property exists");
 	} else {
-	    DejaGnu.fail("Stage::showDefaultContextMenu property doesn't exist");
+		DejaGnu.fail("Stage.mouseChildren property does not exist");
 	}
-	if (Std.is(x1.stageFocusRect, Bool)) {
-	    DejaGnu.pass("Stage::stageFocusRect property exists");
+	if (untyped x1.hasOwnProperty('numChildren')) {
+		DejaGnu.pass("Stage.numChildren property exists");
 	} else {
-	    DejaGnu.fail("Stage::stageFocusRect property doesn't exist");
+		DejaGnu.fail("Stage.numChildren property does not exist");
 	}
-	if (Std.is(x1.stageHeight, Int)) {
-	    DejaGnu.pass("Stage::stageHeight property exists");
+	if (untyped x1.hasOwnProperty('quality')) {
+	    DejaGnu.pass("Stage.quality property exists");
 	} else {
-	    DejaGnu.fail("Stage::stageHeight property doesn't exist");
+	    DejaGnu.fail("Stage.quality property doesn't exist");
 	}
-	if (Std.is(x1.stageWidth, Int)) {
-	    DejaGnu.pass("Stage::stageWidth property exists");
+	if (untyped x1.hasOwnProperty('scaleMode')) {
+	    DejaGnu.pass("Stage.scaleMode property exists");
 	} else {
-	    DejaGnu.fail("Stage::stageWidth property doesn't exist");
+	    DejaGnu.fail("Stage.scaleMode property doesn't exist");
 	}
-//FIXME: This property does not exist in haXe
-//	if (Std.is(x1.tabChildren, Bool)) {
-//	    DejaGnu.pass("Stage::tabChildren property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::tabChildren property doesn't exist");
-//	}
-//FIXME: This property does not exist in haXe
-//	if (Std.is(x1.tabEnabled, Bool)) {
-//		DejaGnu.pass("Stage::tabEnabled property exists");
-//	} else {
-//		DejaGnu.fail("Stage::tabEnabled property doesn't exist");
-//	}
-//FIXME: This property does not exist in haXe
-// 	if (Std.is(x1.textSnapshot, TextSnapshot)) {
-// 	    DejaGnu.pass("Stage::textSnapshot property exists");
-// 	} else {
-// 	    DejaGnu.fail("Stage::textSnapshot property doesn't exist");
-// 	}
-//FIXME: This property does not exist in haXe
-//	if (Std.is(x1.width, Int)) {
-//	    DejaGnu.pass("Stage::width property exists");
-//	} else {
-//	    DejaGnu.fail("Stage::width property doesn't exist");
-//	}
+	if (untyped x1.hasOwnProperty('showDefaultContextMenu')) {
+	    DejaGnu.pass("Stage.showDefaultContextMenu property exists");
+	} else {
+	    DejaGnu.fail("Stage.showDefaultContextMenu property doesn't exist");
+	}
+	if (untyped x1.hasOwnProperty('stageFocusRect')) {
+	    DejaGnu.pass("Stage.stageFocusRect property exists");
+	} else {
+	    DejaGnu.fail("Stage.stageFocusRect property doesn't exist");
+	}
+	if (untyped x1.hasOwnProperty('stageHeight')) {
+	    DejaGnu.pass("Stage.stageHeight property exists");
+	} else {
+	    DejaGnu.fail("Stage.stageHeight property doesn't exist");
+	}
+	if (untyped x1.hasOwnProperty('stageWidth')) {
+	    DejaGnu.pass("Stage.stageWidth property exists");
+	} else {
+	    DejaGnu.fail("Stage.stageWidth property doesn't exist");
+	}
+	//FIXME: This property does not exist in haXe
+	if (untyped x1.hasOwnProperty('tabChildren')) {
+		DejaGnu.pass("Stage.tabChildren property exists");
+	} else {
+		DejaGnu.fail("Stage.tabChildren property doesn't exist");
+	}
+	//FIXME: This property does not exist in haXe
+	if (untyped x1.hasOwnProperty('tabEnabled')) {
+		DejaGnu.pass("Stage.tabEnabled property exists");
+	} else {
+		DejaGnu.fail("Stage.tabEnabled property doesn't exist");
+	}
+	//FIXME: This property does not exist in haXe
+	if (untyped x1.hasOwnProperty('textSnapshot')) {
+		DejaGnu.pass("Stage.textSnapshot property exists");
+	} else {
+		DejaGnu.fail("Stage.textSnapshot property doesn't exist");
+	}
+	//FIXME: This property does not exist in haXe
+	if (untyped x1.hasOwnProperty('width')) {
+		DejaGnu.pass("Stage.width property exists");
+	} else {
+		DejaGnu.fail("Stage.width property doesn't exist");
+	}
 #else
-	if (Std.is(Stage.width, Float)) {
-	    DejaGnu.pass("Stage::width property exists");
+	if (untyped Stage.hasOwnProperty('align')) {
+	    DejaGnu.pass("Stage.align property exists");
 	} else {
-	    DejaGnu.fail("Stage::width property doesn't exist");
+	    DejaGnu.fail("Stage.align property doesn't exist");
 	}
-	if (Std.is(Stage.height, Float)) {
-	    DejaGnu.pass("Stage::height property exists");
+	if (untyped Stage.hasOwnProperty('width')) {
+	    DejaGnu.pass("Stage.width property exists");
 	} else {
-	    DejaGnu.fail("Stage::height property doesn't exist");
+	    DejaGnu.fail("Stage.width property doesn't exist");
 	}
-	if (Std.is(Stage.scaleMode, String)) {
-	    DejaGnu.pass("Stage::scaleMode property exists");
+	if (untyped Stage.hasOwnProperty('height')) {
+	    DejaGnu.pass("Stage.height property exists");
 	} else {
-	    DejaGnu.fail("Stage::scaleMode property doesn't exist");
+	    DejaGnu.fail("Stage.height property doesn't exist");
 	}
-	if (Std.is(Stage.align, String)) {
-	    DejaGnu.pass("Stage::align property exists");
+	if (untyped Stage.hasOwnProperty('scaleMode')) {
+	    DejaGnu.pass("Stage.scaleMode property exists");
 	} else {
-	    DejaGnu.fail("Stage::align property doesn't exist");
+	    DejaGnu.fail("Stage.scaleMode property doesn't exist");
 	}
-//FIXME: This property has not been implemented yet
-	if (Std.is(Stage.showMenu, Bool)) {
-	    DejaGnu.pass("Stage::showMenu property exists");
+	if (untyped Stage.hasOwnProperty('align')) {
+	    DejaGnu.pass("Stage.align property exists");
 	} else {
-	    DejaGnu.xfail("Stage::showMenu property doesn't exist");
+	    DejaGnu.fail("Stage.align property doesn't exist");
 	}
-#if flash8
-	if (Std.is(Stage.displayState, String)) {
-	    DejaGnu.pass("Stage::displayState property exists");
+	if (untyped Stage.hasOwnProperty('showMenu')) {
+	    DejaGnu.pass("Stage.showMenu property exists");
 	} else {
-	    DejaGnu.fail("Stage::displayState property doesn't exist");
-	}
-//Test to see if the Stage.fullScreenSourceRect property exists by setting and testing it
-	var r1:Rectangle<Int> = new Rectangle(0,0,10,10);
-	Stage.fullScreenSourceRect = r1;
-	if (Std.is(Stage.fullScreenSourceRect, Rectangle)) {
-	    DejaGnu.pass("Stage::fullScreenSourceRect property exists");
-	} else {
-	    DejaGnu.fail("Stage::fullScreenSourceRect property doesn't exist");
+	    DejaGnu.fail("Stage.showMenu property doesn't exist");
 	}
 #end
-#end
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
+
+	//-------------------------------------------------------------------------
+	// Method existence testing
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
+	//-------------------------------------------------------------------------
+	DejaGnu.note("***Method existence testing");
 #if !flash
  	if (Type.typeof(x1.assignFocus) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::assignFocus() method exists");
+ 	    DejaGnu.pass("Stage.assignFocus() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::assignFocus() method doesn't exist");
+ 	    DejaGnu.fail("Stage.assignFocus() method doesn't exist");
  	}
 #end
 
 #if flash9
  	if (Type.typeof(x1.addChild) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::addChild() method exists");
+ 	    DejaGnu.pass("Stage.addChild() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::addChild() method doesn't exist");
+ 	    DejaGnu.fail("Stage.addChild() method doesn't exist");
  	}
  	if (Type.typeof(x1.addChildAt) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::addChildAt() method exists");
+ 	    DejaGnu.pass("Stage.addChildAt() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::addChildAt() method doesn't exist");
+ 	    DejaGnu.fail("Stage.addChildAt() method doesn't exist");
  	}
 	if (Type.typeof(x1.addEventListener) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::addEventListener() method exists");
+	    DejaGnu.pass("Stage.addEventListener() method exists");
 	} else {
-	    DejaGnu.fail("Stage::addEventListener() method doesn't exist");
+	    DejaGnu.fail("Stage.addEventListener() method doesn't exist");
 	}
  	if (Type.typeof(x1.dispatchEvent) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::dispatchEvent() method exists");
+ 	    DejaGnu.pass("Stage.dispatchEvent() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::dispatchEvent() method doesn't exist");
+ 	    DejaGnu.fail("Stage.dispatchEvent() method doesn't exist");
  	}
 	if (Type.typeof(x1.hasEventListener) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::hasEventListener() method exists");
+	    DejaGnu.pass("Stage.hasEventListener() method exists");
 	} else {
-	    DejaGnu.fail("Stage::hasEventListener() method doesn't exist");
+	    DejaGnu.fail("Stage.hasEventListener() method doesn't exist");
 	}
 	if (Type.typeof(x1.invalidate) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::invalidate() method exists");
+	    DejaGnu.pass("Stage.invalidate() method exists");
 	} else {
-	    DejaGnu.fail("Stage::invalidate() method doesn't exist");
+	    DejaGnu.fail("Stage.invalidate() method doesn't exist");
 	}
 	if (Type.typeof(x1.isFocusInaccessible) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::isFocusInaccessible() method exists");
+	    DejaGnu.pass("Stage.isFocusInaccessible() method exists");
 	} else {
-	    DejaGnu.fail("Stage::isFocusInaccessible() method doesn't exist");
+	    DejaGnu.fail("Stage.isFocusInaccessible() method doesn't exist");
 	}
  	if (Type.typeof(x1.removeChild) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::removeChildAt() method exists");
+ 	    DejaGnu.pass("Stage.removeChildAt() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::removeChildAt() method doesn't exist");
+ 	    DejaGnu.fail("Stage.removeChildAt() method doesn't exist");
  	}
 	if (Type.typeof(x1.setChildIndex) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::setChildIndex() method exists");
+	    DejaGnu.pass("Stage.setChildIndex() method exists");
 	} else {
-	    DejaGnu.fail("Stage::setChildIndex() method doesn't exist");
+	    DejaGnu.fail("Stage.setChildIndex() method doesn't exist");
 	}
 	if (Type.typeof(x1.swapChildrenAt) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::swapChildrenAt() method exists");
+	    DejaGnu.pass("Stage.swapChildrenAt() method exists");
 	} else {
-	    DejaGnu.fail("Stage::swapChildrenAt() method doesn't exist");
+	    DejaGnu.fail("Stage.swapChildrenAt() method doesn't exist");
 	}
 	if (Type.typeof(x1.willTrigger) == ValueType.TFunction) {
-	    DejaGnu.pass("Stage::willTrigger() method exists");
+	    DejaGnu.pass("Stage.willTrigger() method exists");
 	} else {
-	    DejaGnu.fail("Stage::willTrigger() method doesn't exist");
+	    DejaGnu.fail("Stage.willTrigger() method doesn't exist");
 	}
+	
+#else
+	if (untyped Stage.hasOwnProperty('addListener')) {
+		DejaGnu.pass("Stage.addListener() method exists");
+	} else {
+		DejaGnu.fail("Stage.addListener() method does not exist");
+	}
+	if (untyped Stage.hasOwnProperty('removeListener')) {
+		DejaGnu.pass("Stage.removeListener() method exists");
+	} else {
+		DejaGnu.fail("Stage.removeListener() method does not exist");
+	}
+	
 #end
 
-// START OF MING TESTS!
+
+	//------------------------------------------------------------------------
+	// Property functionality testing
+	// The following tests are for checking various aspects of the properties,
+	// such as types and initial settings. Much of this type of testing is done
+	// in the reproduced ming tests.
+	//------------------------------------------------------------------------
+	DejaGnu.note("***Property functionality testing");
+
+#if flash9
+
+	//Stage.align
+	if (untyped __typeof__(x1.align) == 'string') {
+		DejaGnu.pass("Stage.align is a String object");
+	} else {
+		DejaGnu.fail("Stage.align is not a String object");
+	}
+	
+	//Stage.cacheAsBitmap
+	if (untyped __typeof__(x1.cacheAsBitmap) == 'boolean') {
+		DejaGnu.pass("cacheAsBitmap is a boolean");
+	} else {
+		DejaGnu.fail("cacheAsBitmap is not a boolean");
+	}
+	
+	//Stage.displayState
+	if (untyped __typeof__(x1.displayState) == 'object') {
+		DejaGnu.pass("displayState is an object");
+	} else {
+		DejaGnu.fail("displayState is not an object");
+	}
+	
+	//Stage.focus
+	if (untyped __typeof__(x1.focus) == 'object') {
+		DejaGnu.pass("Stage.focus is an object");
+	} else {
+		DejaGnu.fail("Stage.focus is not an object");
+	}
+	if ( className(x1.focus) == 'null') {
+		DejaGnu.pass("Stage.focus initially set to null");
+	} else {
+		DejaGnu.fail("Stage.focus initially set to something other than null	");
+	}
+	var t1:TextField = new TextField();
+	x1.focus = t1;
+	DejaGnu.note("Setting focus to a TextField object");
+	if ( (untyped __typeof__(x1.focus) == 'object') &&
+	     (Std.is(x1.focus, InteractiveObject)) ) {
+		DejaGnu.pass("Stage.focus property is an InteractiveObject");
+	} else {
+		DejaGnu.fail("Stage.focus property is not an InteractiveObject");
+	}
+	
+	//Stage.frameRate
+	if (untyped __typeof__(x1.frameRate) == 'number') {
+		DejaGnu.pass("Stage.frameRate is a number");
+	} else {
+		DejaGnu.fail("Stage.frameRate is a number");
+	}
+	
+	//Stage.height
+	if (untyped __typeof__(x1.height) == 'number') {
+		DejaGnu.pass("height property is a number");
+	} else {
+		DejaGnu.fail("height property is not a number");
+	}
+	
+	//Stage.mouseChildren
+	if (untyped __typeof__(x1.mouseChildren) == 'boolean') {
+		DejaGnu.pass("Stage.mouseChildren is a boolean");
+	} else {
+		DejaGnu.fail("Stage.mouseChildren is not a boolean");
+	}
+	
+#else
+#end
+
+	//-------------------------------------------------------------------------
+	// START OF MING TESTS!
+	// The following tests are reproduced from the ming test cases in 
+	// testsuite/actionscript.all
+	//-------------------------------------------------------------------------
+	DejaGnu.note("***Reproduced ming tests ***");
 
 #if !flash9
 
 	if (Type.typeof(untyped Stage.addListener) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::addChild() method exists");
+ 	    DejaGnu.pass("Stage.addChild() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::addChild() method doesn't exist");
+ 	    DejaGnu.fail("Stage.addChild() method doesn't exist");
  	}
  	if (Type.typeof(untyped Stage.removeListener) == ValueType.TFunction) {
- 	    DejaGnu.pass("Stage::addChildAt() method exists");
+ 	    DejaGnu.pass("Stage.addChildAt() method exists");
  	} else {
- 	    DejaGnu.fail("Stage::addChildAt() method doesn't exist");
+ 	    DejaGnu.fail("Stage.addChildAt() method doesn't exist");
  	}
  	if (Type.typeof(untyped Stage.broadcastMessage) == ValueType.TFunction) {
-		DejaGnu.pass("Stage::broadcastMessage method exists");
+		DejaGnu.pass("Stage.broadcastMessage method exists");
 	} else {
-		DejaGnu.fail("Stage::broadcastMessage method doesn't exist");
+		DejaGnu.fail("Stage.broadcastMessage method doesn't exist");
 	}
 	
 
@@ -712,7 +824,38 @@ class Stage_as {
 		DejaGnu.fail("Stage.removeListener is defined");
 	}
 #end
-				
+
+#if !flash9
+	//-------------------------------------------------
+	//  Testing Stage.showMenu property
+	//-------------------------------------------------
+	DejaGnu.note("*** Begin testing Stage.showMenu property");
+	
+	DejaGnu.note("showMenu init: " + untyped Stage.showMenu);
+	if (untyped Stage.showMenu == true ) {
+		DejaGnu.pass("Stage.showMenu correctly initialized to 'true'");
+	} else {
+		DejaGnu.fail("Stage.showMenu is not initialized to 'true'");
+	}
+	
+	untyped Stage.showMenu = false;
+	//Reflect.setField( Stage, "showMenu", false );
+	if (untyped Stage.showMenu == false) {
+		DejaGnu.pass("Stage.showMenu changed to false");
+	} else {
+		DejaGnu.fail("Stage.showMenu was not correctly changed to false");
+	}
+	
+	untyped Stage.showMenu = true;
+	//Reflect.setField( Stage, "showMenu", true );
+	if (untyped Stage.showMenu == true) {
+		DejaGnu.pass("Stage.showMenu reset to true");
+	} else {
+		DejaGnu.fail("Stage.showMenu not correctly reset to true");
+	}
+#end
+	
+	
     // Call this after finishing all tests. It prints out the totals.
     DejaGnu.done();
     }

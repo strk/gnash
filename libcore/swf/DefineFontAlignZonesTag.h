@@ -42,7 +42,8 @@ public:
 	};
 
 
-	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunResources & r);
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
+            const RunResources& r);
 
 private:
 
