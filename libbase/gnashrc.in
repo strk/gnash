@@ -229,3 +229,12 @@
 
 # Set the default directory used for certificates
 #set CertDir	/etc/pki/tls
+
+
+# Stage.showMenu ignore behavior
+# By default gnash ignores changes to Stage.showMenu which limits what appears
+# in the context menu (right click menu). Set to false to allow the swf author
+# to suppress some menu settings
+#
+# Default: true
+#set ignoreShowMenu false

@@ -487,8 +487,6 @@ GtkGui::showMenu(bool show)
 
     // If we allow the swf author to set Stage.showMenu
     if( !rcfile.ignoreShowMenu() ) {
-		//first try: just don't show the _popup_menu
-		//       this will be done in the handler
 		_showMenuState = show;
 	}
 
@@ -2577,8 +2575,6 @@ gint
 popupHandler(GtkWidget *widget, GdkEvent *event)
 {
     GtkMenu *menu = GTK_MENU(widget);
-    
-    log_debug("showMenuState @handler = %s", _showMenuState);
     
     if( _showMenuState ) {
         if (event->type == GDK_BUTTON_PRESS) {

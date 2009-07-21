@@ -146,10 +146,6 @@ public:
 
     virtual void error(const std::string& msg);
 
-	/// get the _showMenuState
-	//bool showMenuState() { return _showMenuState; }
-	/// set the _showMenuState
-	//void showMenuState( bool state ) { _showMenuState = state; }
 
 private:
 
@@ -196,8 +192,6 @@ private:
 
     void stopAdvanceTimer();
 
-	/// This value determines whether the _popup_menu should be shown or not
-	//bool _showMenuState;
 };
 
 } // namespace gnash
