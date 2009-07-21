@@ -105,3 +105,6 @@ set CertFile testclient.pem
 
 # Set the default directory used for certificates
 set CertDir /test/etc/pki/tls/
+
+# Stage.showMenu ignore behavior
+set ignoreShowMenu false

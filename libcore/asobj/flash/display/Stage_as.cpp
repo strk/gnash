@@ -265,13 +265,7 @@ stage_showMenu(const fn_call& fn)
 	{
 		LOG_ONCE(log_unimpl("Stage.showMenu implemented by setting gnashrc option and for gtk only"));
 
-		const std::string& str = fn.arg(0).to_string();
-		StringNoCaseEqual noCaseCompare;
-		bool state = true;
-		// showMenu property is a boolean who's default value is true
-		if ( noCaseCompare(str, "false") ) {
-			state = false;
-		}
+		bool state = fn.arg(0).to_bool();
 		
 		m.setShowMenuState( state );
 		return as_value();

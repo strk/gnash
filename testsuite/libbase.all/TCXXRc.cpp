@@ -333,5 +333,11 @@ main (int /*argc*/, char** /*argv*/) {
     } else {
         runtest.fail ("getSOLReadOnly");
     }
+    
+    if (rc.ignoreShowMenu() == false) {
+        runtest.pass ("ignoreShowMenu");
+    } else {
+        runtest.fail ("ignoreShowMenu");
+    }
 }
 

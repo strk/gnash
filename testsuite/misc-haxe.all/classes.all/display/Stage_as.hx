@@ -853,6 +853,31 @@ class Stage_as {
 	} else {
 		DejaGnu.fail("Stage.showMenu not correctly reset to true");
 	}
+    
+    untyped Stage.showMenu = 0;
+    if (untyped Stage.showMenu == false) {
+        DejaGnu.pass("showMenu set to false with integer 0");
+    } else {
+        DejaGnu.fail("showMenu not correctly set to false with integer");
+    }
+    
+    var f = function() {return true;};
+    untyped Stage.showMenu = f;
+    if (untyped Stage.showMenu == true) {
+        DejaGnu.pass("showMenu set with function that returns true");
+    } else {
+        DejaGnu.fail("showMenu was not correctly set with a function");
+    }
+    
+    var f2 = untyped __new__("Object");
+    untyped f2.valueOf = function() {return false;};
+    untyped Stage.showMenu = f2;
+    if (untyped Stage.showMenu == false ) {
+        DejaGnu.pass("showMenu set with object that implements valueOf");
+    } else {
+        DejaGnu.fail("showMenu not correctly set with object valueOf");
+    }
+    
 #end
 	
 	
