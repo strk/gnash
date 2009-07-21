@@ -520,6 +520,8 @@ Player::CallbacksHandler::yesNo(const std::string& query)
 std::string
 Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
 {
+    StringNoCaseEqual noCaseCompare;
+	
     if (event == "Mouse.hide") {
         return _gui.showMouse(false) ? "true" : "false";
     }
@@ -546,7 +548,7 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
     {
         if (noCaseCompare(arg, "true")) _gui.showMenu(true);
         else if (noCaseCompare(arg, "false")) _gui.showMenu(false);
-        return;
+        return "";
     }
 
     if (event == "System.capabilities.screenResolutionX")

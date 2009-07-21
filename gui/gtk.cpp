@@ -111,6 +111,8 @@ namespace {
                                         gpointer data);
     gint popupHandler(GtkWidget *widget, GdkEvent *event);    
 
+    gint popupHandlerAlt(GtkWidget *widget, GdkEvent *event);    
+
     void openFile(GtkWidget *widget, gpointer data);
 
     void addPixmapDirectory(const gchar *directory);
@@ -124,6 +126,9 @@ namespace {
     key::code gdk_to_gnash_key(guint key);
 
     int gdk_to_gnash_modifier(int key);
+
+	//for use in popupHandler
+	bool _showMenuState;
 
 }
 
@@ -147,6 +152,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
 	,_overlay(0)
 	,_canvas(0)
 	,_popup_menu(0)
+    ,_popup_menu_alt(0)
 	,_menubar(0)
 	,_vbox(0)
 	,_advanceSourceTimer(0)
@@ -205,6 +211,7 @@ GtkGui::init(int argc, char **argv[])
     g_signal_connect(_resumeButton, "clicked", G_CALLBACK(menuPlay), this);
 
     createMenu();
+    createMenuAlt();
 
     // A vertical box is used to allow display of the menu bar and paused widget
     _vbox = gtk_vbox_new(FALSE, 0);
@@ -326,7 +333,7 @@ GtkGui::error(const std::string& msg)
     gtk_label_set_line_wrap(GTK_LABEL(label), true);
     gtk_box_pack_start(GTK_BOX(content), label, false, false, 0);
     gtk_widget_show_all(popup);
-}
+} 
 
 void
 GtkGui::setFullscreen()
@@ -476,11 +483,27 @@ GtkGui::showMouse(bool show)
 void
 GtkGui::showMenu(bool show)
 {
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    // If we allow the swf author to set Stage.showMenu
+    if( !rcfile.ignoreShowMenu() ) {
+		//first try: just don't show the _popup_menu
+		//       this will be done in the handler
+		_showMenuState = show;
+	}
+
 #ifdef USE_MENUS
-    if (!_menubar) return;
-    if (show) gtk_widget_show(_menubar);
-    else gtk_widget_hide(_menubar);
+	if (!_menubar) {
+		return;
+	}
+
+    if (show) {
+		gtk_widget_show(_menubar);
+	} else {
+		gtk_widget_hide(_menubar);
+	}
 #endif
+	
 }
 
 double
@@ -546,9 +569,14 @@ GtkGui::setupEvents()
                         | GDK_KEY_PRESS_MASK        
                         | GDK_POINTER_MOTION_MASK);
   
+	_showMenuState = true; //Default for showMenu
+
     g_signal_connect_swapped(_canvas, "button_press_event",
                             G_CALLBACK(popupHandler), _popup_menu);
   
+    g_signal_connect_swapped(_canvas, "button_press_event",
+                            G_CALLBACK(popupHandlerAlt), _popup_menu_alt);
+
     g_signal_connect(_canvas, "button_press_event",
                    G_CALLBACK(buttonPressEvent), this);
     g_signal_connect(_canvas, "button_release_event",
@@ -685,6 +713,38 @@ GtkGui::createMenu()
      hildon_window_set_menu(HILDON_WINDOW(_window),
                                GTK_MENU(_popup_menu));
      gtk_widget_show_all(GTK_WIDGET(_popup_menu));   
+#endif
+
+    return true;
+}
+
+bool
+GtkGui::createMenuAlt()
+{
+    //An alternative short version of the popup menu
+
+    _popup_menu_alt = GTK_MENU(gtk_menu_new());
+
+#ifdef USE_MENUS
+    // If menus are disabled, these are not added to the popup menu
+    // either.
+    createEditMenu(GTK_WIDGET(_popup_menu_alt));
+#endif
+    createHelpMenu(GTK_WIDGET(_popup_menu_alt));
+
+    GtkWidget *separator1 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator1);
+    gtk_container_add (GTK_CONTAINER(_popup_menu_alt), separator1);
+
+    GtkWidget *quit = gtk_image_menu_item_new_from_stock("gtk-quit", 0);
+    gtk_widget_show(quit);
+    gtk_container_add(GTK_CONTAINER(_popup_menu_alt), quit);
+    g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
+
+#ifdef GUI_HILDON
+     hildon_window_set_menu(HILDON_WINDOW(_window),
+                               GTK_MENU(_popup_menu_alt));
+     gtk_widget_show_all(GTK_WIDGET(_popup_menu_alt));   
 #endif
 
     return true;
@@ -1730,6 +1790,11 @@ GtkGui::showAboutDialog()
 	"Benjamin Wolsey",
 	"Russ Nelson",
 	"Dossy Shiobara",
+	"Jonathan Crider",
+	"Ben Limmer",
+	"Bob Naugle",
+	"Si Liu",
+	"Sharad Desai",
 	NULL
     };
 
@@ -2507,20 +2572,49 @@ menuMovieInfo(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->showPropertiesDialog();
 }
 
-// This pops up the menu when the right mouse button is clicked
+/// \brief This pops up the menu when the right mouse button is clicked
 gint
 popupHandler(GtkWidget *widget, GdkEvent *event)
 {
     GtkMenu *menu = GTK_MENU(widget);
     
-    if (event->type == GDK_BUTTON_PRESS) {
-        GdkEventButton* event_button = reinterpret_cast<GdkEventButton*>(event);
-        if (event_button->button == 3) {
-            gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
-                           event_button->button, event_button->time);
-            return TRUE;
+    log_debug("showMenuState @handler = %s", _showMenuState);
+    
+    if( _showMenuState ) {
+        if (event->type == GDK_BUTTON_PRESS) {
+            GdkEventButton* event_button =
+                            reinterpret_cast<GdkEventButton*>(event);
+            if (event_button->button == 3) {
+                gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
+                               event_button->button, event_button->time);
+                return TRUE;
+            } 
         }
     }
+
+    return FALSE;
+}
+
+/// \brief This handles the alternative popup for showMenu 
+gint
+popupHandlerAlt(GtkWidget *widget, GdkEvent *event)
+{
+    GtkMenu *menu = GTK_MENU(widget);
+    
+    log_debug("showMenuState @altHandler = %s", _showMenuState);
+    
+    if( !_showMenuState ) {
+        if (event->type == GDK_BUTTON_PRESS) {
+            GdkEventButton* event_button =
+                            reinterpret_cast<GdkEventButton*>(event);
+            if (event_button->button == 3) {
+                gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
+                               event_button->button, event_button->time);
+                return TRUE;
+            } 
+        }
+    }
+
     return FALSE;
 }
 

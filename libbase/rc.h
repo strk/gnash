@@ -291,6 +291,10 @@ public:
 	
 	int getWebcamDevice() const {return _webcamDevice;}
 
+    void ignoreShowMenu(bool value) { _ignoreShowMenu= value; }
+
+    bool ignoreShowMenu() const { return _ignoreShowMenu; }
+
     void dump();    
 
 protected:
@@ -518,6 +522,10 @@ protected:
 	///FIXME: this should probably eventually be changed to a more readable
 	///config option instead of an integer
 	int _webcamDevice;
+
+	/// Whether the player will recognize changes to Stage.showMenu in AS
+	/// default value is true
+	bool _ignoreShowMenu;
 
 };
 

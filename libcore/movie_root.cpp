@@ -1483,13 +1483,12 @@ void
 movie_root::setShowMenuState( bool state )
 {
 	_showMenu = state;
-	std::string arg = "" + _showMenu;
-	//FIXME: The fscommand for show menu is semantically different than what
+	//FIXME: The gui code for show menu is semantically different than what
 	//   ActionScript expects it to be. In gtk.cpp the showMenu function hides
 	//   or shows the menubar. Flash expects this option to disable some 
 	//   context menu items.
-	//handleFsCommand( "showMenu", arg );  //use this?
-	//this.callInterface("Stage.showMenu", arg);  //or this?
+	// callInterface is the proper handler for this
+	callInterface("Stage.showMenu", (_showMenu) ? "true" : "false");  //or this?
 }
 
 
