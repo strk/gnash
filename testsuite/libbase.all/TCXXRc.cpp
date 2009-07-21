@@ -218,6 +218,24 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("rc.getLCShmKey() != 0xabcd1234");
     }
         
+    if (rc.getRootCert() == "testrootcert.pem") {
+        runtest.pass ("rc.getRootCert() == testrootcert.pem");
+    } else {
+        runtest.fail ("rc.getRootCert() != testrootcert.pem");
+    }
+        
+    if (rc.getCertFile() == "testclient.pem") {
+        runtest.pass ("rc.getCertFile() == testclient.pem");
+    } else {
+        runtest.fail ("rc.getCertFile() != testclient.pem");
+    }
+        
+    if (rc.getCertDir() == "/test/etc/pki/tls/") {
+        runtest.pass ("rc.getCertDir() == /test/etc/pki/tls/");
+    } else {
+        runtest.fail ("rc.getCertDir() != /test/etc/pki/tls/");
+    }
+        
     std::vector<std::string> blacklist = rc.getBlackList();
     if (blacklist.size()) {
         if ((blacklist[0] == "www.doubleclick.com")
