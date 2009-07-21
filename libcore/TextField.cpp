@@ -493,7 +493,7 @@ TextField::on_event(const event_id& ev)
 						format_text();
 						break;
 					}
-					previouslinesize = _textRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
+					previouslinesize = _displayRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
 					//if the previous line is smaller
 					if (m_cursor - cur_cursor > previouslinesize)
 						m_cursor = *(--(--linestartit)) + previouslinesize;
@@ -543,7 +543,7 @@ TextField::on_event(const event_id& ev)
 						format_text();
 						break;
 					}
-					nextlinesize = _textRecords[linestartit-_line_starts.begin()].glyphs().size();
+					nextlinesize = _displayRecords[linestartit-_line_starts.begin()].glyphs().size();
 					//if the next line is smaller
 					if (m_cursor - cur_cursor > nextlinesize)
 						m_cursor = *linestartit + nextlinesize;
@@ -943,9 +943,9 @@ TextField::align_line(TextAlignment align,
     }
 
     // Shift the beginnings of the records on this line.
-    for (unsigned int i = last_line_start_record; i < _textRecords.size(); ++i)
+    for (unsigned int i = last_line_start_record; i < _displayRecords.size(); ++i)
     {
-        SWF::TextRecord& rec = _textRecords[i];
+        SWF::TextRecord& rec = _displayRecords[i];
 
         //if ( rec.hasXOffset() ) // why?
             rec.setXOffset(rec.xOffset() + shift_right); 
@@ -1000,13 +1000,13 @@ TextField::format_text()
     _textRecords.clear();
 	_displayRecords.clear();
 	_line_starts.clear();
-			
+	
 	// nothing more to do if text is empty
     if ( _text.empty() )
     {
         // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
         //       not sure we should...
-        //reset_bounding_box(0, 0);
+        reset_bounding_box(0, 0);
 		m_xcursor = PADDING_TWIPS + std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
         return;
     }
@@ -1108,7 +1108,6 @@ TextField::format_text()
 	linestartit = _line_starts.begin();
 	linestartend = _line_starts.end();
 	int current_line;
-	int last_visible_line = _top_visible_line + _linesindisplay;
 	int linestart = 0;
 	int manylines = _line_starts.size();
 	int manyrecords = _textRecords.size();
@@ -1117,7 +1116,6 @@ TextField::format_text()
 		linestart = *linestartit++;
 	}
 	current_line = linestartit - _line_starts.begin();
-
 	changeTopVisibleLine(current_line);
 
 	///ASSIGN THE VISIBLE LINES TO _displayRecord
@@ -1126,7 +1124,10 @@ TextField::format_text()
 		//if the record is in the section we want to show
 		if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
 			_textRecords[i].yOffset() - yoffset > 0) {
+			log_debug("adding _textRecord[%d] to visible lines", i);
 			_displayRecords.push_back(_textRecords[i]);
+			log_debug("and setting _displayRecords.back().yOffset to %f", _displayRecords.back().yOffset() - yoffset);
+			log_debug("the xOffset is %f", _displayRecords.back().xOffset());
 			_displayRecords.back().setYOffset(_displayRecords.back().yOffset() - yoffset);
 		}
 	}
@@ -1135,7 +1136,9 @@ TextField::format_text()
 		float lineposition = (current_line * (fontHeight + leading)) + PADDING_TWIPS;
 		for (unsigned int i = current_line - 1; i < manyrecords && _textRecords[i].yOffset() == lineposition; ++i) {
 			cursorposition_line = _textRecords[i];
-			linestart += _textRecords[i].glyphs().size();
+			if (linestart + _textRecords[i].glyphs().size() < m_cursor - _line_starts[current_line-1]) {
+				linestart += _textRecords[i].glyphs().size();
+			}
 		}
 		m_xcursor = cursorposition_line.xOffset();
 		//extra checks keep MemCheck happy!
@@ -1153,28 +1156,34 @@ TextField::format_text()
 	
 	float extra_space = align_line(textAlignment, last_line_start_record, x);
     m_xcursor += static_cast<int>(extra_space);
-	
+
+	///TESTING STUFF
+	//_displayRecords.clear();
+	//_displayRecords = _textRecords;
+	///
 	set_invalidated(); //redraw
 }
 
 void
 TextField::changeTopVisibleLine(int current_line)
 {
-	int manylines = _textRecords.size();
-	int lastvisibleline = _top_visible_line + _linesindisplay;
-	if (manylines - _top_visible_line <= _linesindisplay) {
-		if(manylines - _linesindisplay <= 0)
-			_top_visible_line = 0;
-		else {
-			_top_visible_line = manylines - _linesindisplay;
-		}
-	//if we are at a higher position, scoot the lines down
-	} else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
-		_top_visible_line -= _top_visible_line-current_line;
-	//if we are at a lower position, scoot the lines up
-	} else if (manylines > _top_visible_line+_linesindisplay) {
-		if ( m_cursor >= (_line_starts[lastvisibleline])) {
-			_top_visible_line += current_line - (lastvisibleline);
+	if (_linesindisplay > 0) {
+		int manylines = _line_starts.size();
+		int lastvisibleline = _top_visible_line + _linesindisplay;
+		if (manylines - _top_visible_line <= _linesindisplay) {
+			if(manylines - _linesindisplay <= 0)
+				_top_visible_line = 0;
+			else {
+				_top_visible_line = manylines - _linesindisplay;
+			}
+		//if we are at a higher position, scoot the lines down
+		} else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
+			_top_visible_line -= _top_visible_line-current_line;
+		//if we are at a lower position, scoot the lines up
+		} else if (manylines > _top_visible_line+_linesindisplay) {
+			if ( m_cursor >= (_line_starts[lastvisibleline])) {
+				_top_visible_line += current_line - (lastvisibleline);
+			}
 		}
 	}
 }
@@ -1184,6 +1193,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 	boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code, int& last_space_glyph,
 	int& last_line_start_record)
 {
+	log_debug("entering handleChar");
 	std::vector<int>::iterator linestartit = _line_starts.begin();
 	std::vector<int>::const_iterator linestartend = _line_starts.end();
 	
@@ -1290,7 +1300,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 				{
 					//close out this stretch of glyphs
 					_textRecords.push_back(rec);
-					if (*it == '\\') {
+					if (*it == '/') {
 						while (it != e && *it != '>') {
 							++it;
 						}
@@ -1317,47 +1327,47 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 					else {
 						log_debug("No TextField html tags are currently implemented in Gnash");
 						//Don't think this is the best way to match with tags...
-						if (strcmp(s.c_str(), "u") == 0) {
+						if (s == "u") {
 							//newrec.setUnderline(true); This works
 							log_unimpl("<u> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "a") == 0) {
+						} else if (s == "a") {
 							//anchor
 							log_unimpl("<a> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "b") == 0) {
+						} else if (s == "b") {
 							//bold
 							log_unimpl("<b> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "font") == 0) {
+						} else if (s == "font") {
 							//font
 							log_unimpl("<font> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "img") == 0) {
+						} else if (s == "img") {
 							//image
 							log_unimpl("<img> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "i") == 0) {
+						} else if (s == "i") {
 							//italic
 							log_unimpl("<i> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "li") == 0) {
+						} else if (s == "li") {
 							//list item
 							log_unimpl("<li> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "span") == 0) {
+						} else if (s == "span") {
 							//span
 							log_unimpl("<span> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "textformat") == 0) {
+						} else if (s == "textformat") {
 							//text format
 							log_unimpl("<textformat> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "p") == 0) { 
+						} else if (s == "p") { 
 							//paragraph
 							log_unimpl("<p> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (strcmp(s.c_str(), "br") == 0) {
+						} else if (s == "br") {
 							//line break
 							log_unimpl("<br> html tag in TextField");
 						} else {
@@ -1476,7 +1486,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 			{
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
 				log_debug(" wordWrap=true");
-#endif 
+#endif
 
 				// Insert newline if there's space or autosize != none
 
@@ -1484,7 +1494,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 				_textRecords.push_back(rec);
 
 				float previous_x = x;
-				x = getLeftMargin() + getBlockIndent() + PADDING_TWIPS;
+				x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
 				y += _fontHeight + leading;
 
 				// Start a new record on the next line.
@@ -1894,7 +1904,7 @@ TextField::setTextColor(const rgba& col)
 
         set_invalidated();
         _textColor = col;
-        std::for_each(_textRecords.begin(), _textRecords.end(),
+        std::for_each(_displayRecords.begin(), _displayRecords.end(),
                 boost::bind(&SWF::TextRecord::setColor, _1, _textColor));
     }
 }
