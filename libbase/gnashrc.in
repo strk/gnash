@@ -193,8 +193,11 @@
 #
 #set LocalConnection on
 
+# This is the shared memory key for your system
+#set LCShmKey 3711621821
+
 # Enable support for the X Video extension. Note that this requires a
-# kernel/X11 driver, and compile-time gstreamer or ffmpeg and libXv .
+# kernel/X11 driver, and compile-time gstreamer or ffmpeg and libXv.
 #
 # Default: false
 #
@@ -212,3 +215,17 @@
 # Default: -1 
 #
 #set quality 4
+
+#
+# SSL settings. These are the default values currently used.
+#
+
+# Set the default CA file name
+#set RootCert	rootcert.pem
+
+#
+# Set the default client certificate currently used,
+#set CertFile	client.pem
+
+# Set the default directory used for certificates
+#set CertDir	/etc/pki/tls
