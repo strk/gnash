@@ -290,6 +290,13 @@ private:
     /// \var LcShm::_amfobjs
     ///		A vector of AMF0 Elements in the memopry segment.
     std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
+	
+	//Si added
+	// This is the mutex that controls access to the sharedmemory
+    boost::mutex        _localconnection_mutex;
+
+
+
 };
 
 } // end of gnash namespace

@@ -104,10 +104,12 @@ main(int argc, char *argv[])
 
     // Read a premade .sol file
 //    string filespec = "localhost:test_lc"; 
-    load_data();
-    test_read();
+//    load_data();
+//    test_read();
+   system("ipcs");
     test_data();
-    test_listen();
+   system("ipcs");
+//    test_listen();
     
 //     // Write a .sol file
 //     filespec = "lc_name1";
@@ -201,17 +203,18 @@ test_listen()
 void
 test_data()
 {
-    LcShm lc;
+    LcShm lcs;
+//  LcShm lcs=LcShm();
     char *shmaddr;
 
-    string con1 = "localhost:lc_reply";
-    if (lc.connect(con1)) {
+    const string con1 = "localhost:WeBuildTheseOOOOOOOOOOOOOOOOO";
+    if (lcs.connect(con1)) {
         runtest.pass("LcShm::connect(localhost:lc_reply)");
     } else {
         runtest.fail("LcShm::connect(localhost:lc_reply)");
     }
 
-    shmaddr = lc.getAddr();     // for gdb
+    shmaddr = lcs.getAddr();     // for gdb
 
     Element *el;
     vector<amf::Element *> els;
@@ -245,8 +248,11 @@ test_data()
     els.push_back(el);
 
     // Send the AMF objects
-//    lc.send(con1, "localhost", els);
-
+    const std::string localS="localhost";
+  lcs.send(con1, localS, els);
+//    system("ipcs");
+//    system("dumpshm -i");
+    sleep(3);
     delete el;
 }
 
@@ -569,8 +575,7 @@ usage (void)
 
 #else
 
-int
-main(int /*argc*/, char /* *argv[]*/)
+int main(int /*argc*/, char **/* argv[]*/)
 {
   // nop
   return 0;  
