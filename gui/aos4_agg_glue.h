@@ -41,8 +41,8 @@ namespace gnash
 	    virtual ~AOS4AggGlue();
 
     	bool 			 init(int argc, char **argv[]);
-	    Renderer	*createRenderHandler(int depth);
-    	Renderer	*createRenderHandler();
+	    Renderer		*createRenderHandler(int depth);
+    	Renderer		*createRenderHandler();
 	    bool 			 prepDrawingArea(int width, int height);
 	    void 			 render();
     	void 			 render(int minx, int miny, int maxx, int maxy);
@@ -57,7 +57,7 @@ namespace gnash
     	geometry::Range2d<int> _validbounds;
 	    std::vector< geometry::Range2d<int> > _drawbounds;
     	unsigned char   	*_offscreenbuf;
-	    Renderer  	*_agg_renderer;
+	    Renderer  			*_agg_renderer;
     	struct Window   	*_window;
     	struct Screen		*_screen;
 		bool 				 _fullscreen;

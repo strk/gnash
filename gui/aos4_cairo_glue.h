@@ -43,8 +43,8 @@ namespace gnash
 	    virtual ~AOS4CairoGlue();
 
     	bool 			 	 init(int argc, char **argv[]);
-	    Renderer		*createRenderHandler(int depth);
-    	Renderer		*createRenderHandler();
+	    Renderer			*createRenderHandler(int depth);
+    	Renderer			*createRenderHandler();
 	    bool 			 	 prepDrawingArea(int width, int height);
 	    void 			 	 render();
     	void 			 	 render(int minx, int miny, int maxx, int maxy);
@@ -61,7 +61,7 @@ namespace gnash
 		cairo_surface_t 	*_cairo_surface;
 		cairo_t         	*_cairo_handle;
     	unsigned char   	*_offscreenbuf;
-	    Renderer  	*_cairo_renderer;
+	    Renderer  			*_cairo_renderer;
     	struct Window   	*_window;
     	struct Screen		*_screen;
 		bool 				 _fullscreen;

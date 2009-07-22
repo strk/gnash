@@ -36,6 +36,8 @@
 #include "log.h"
 #include "aos4sup.h"
 #include "aos4_gnash_prefs.h"
+#undef CUSTOM
+#include "RunResources.h"
 
 #include <getopt.h>
 #include <signal.h>
@@ -588,6 +590,7 @@ AOS4Gui::setTimeout(unsigned int timeout)
 bool
 AOS4Gui::init(int argc, char **argv[])
 {
+	int _depth = 24;
 	struct ExecBase *sysbase = (struct ExecBase*) IExec->Data.LibBase;
 
 	struct Library *timer = (struct Library *)IExec->FindName(&sysbase->DeviceList, "timer.device");
@@ -598,7 +601,8 @@ AOS4Gui::init(int argc, char **argv[])
 
     _glue.init(argc, argv);
 
-    _renderer = _glue.createRenderHandler(_depth);
+    _renderer.reset(_glue.createRenderHandler(_depth));
+    //_renderer = _glue.createRenderHandler(_depth);
     if ( ! _renderer )
 	{
 		log_error (_("error creating RenderHandler!\n"));
@@ -622,7 +626,8 @@ AOS4Gui::createWindow(const char *title, int width, int height)
 
     _glue.prepDrawingArea(_width, _height);
 
-    set_Renderer(_renderer);
+    //set_Renderer(_renderer);
+	_runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
 
 	struct Window *_window = _glue.getWindow();
 

@@ -21,6 +21,8 @@
 
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
+#include "Renderer.h"
+
 namespace gnash
 {
 

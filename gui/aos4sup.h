@@ -45,6 +45,7 @@
 #endif
 
 #undef End
+#undef ACTION_END
 #include "gui.h"
 
 #ifdef RENDERER_AGG
@@ -57,7 +58,6 @@
 
 #define End TAG_END
 
-#undef ACTION_END
 #include "Renderer.h"
 #include "Renderer_agg.h"
 
