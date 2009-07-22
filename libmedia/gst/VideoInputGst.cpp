@@ -287,7 +287,7 @@ namespace gst {
     
     //pulls webcam device selection from gnashrc (will eventually tie into
     //gui)
-    void
+    int
     VideoInputGst::makeWebcamDeviceSelection() {
         int dev_select;
         dev_select = rcfile.getWebcamDevice();
@@ -302,55 +302,7 @@ namespace gst {
         }
         //now that a selection has been made, get capabilities of that device
         getSelectedCaps(rcfile.getWebcamDevice());
-        
-        //now transfer gathered information over to the structure that will hold
-        //pipelining information
-        GnashWebcamPrivate *webcam = NULL;
-        webcam = transferToPrivate(dev_select);
-        if (webcam == NULL) {
-            log_error("%s: GnashWebcamPrivate transfer didn't work as intended",
-                __FUNCTION__);
-        }
-        
-        //now create the main bin (also calls webcamCreateSourceBin)
-        gboolean result = false;
-        result = webcamCreateMainBin(webcam);
-        if (result != true) {
-            log_error("%s: webcamCreateMainBin reported an error",
-                __FUNCTION__);
-        } else {
-            result = false;
-        }
-        
-        //now create video display bin
-        result = webcamCreateDisplayBin(webcam);
-        if (result != true) {
-            log_error("%s: webcamCreateDisplayBin reported an error",
-                __FUNCTION__);
-        } else {
-            result = false;
-        }
-        
-        //try to link up the main and display bins
-        result = webcamMakeVideoDisplayLink(webcam);
-        if (result != true) {
-            log_error("%s: webcamMakeVideoDisplayLink reported an error",
-                __FUNCTION__);
-        } else {
-            result = false;
-        }
-        
-        //now create the save bin
-        result = webcamCreateSaveBin(webcam);
-        if (result != true) {
-            log_error("%s: webcamCreateSaveBin reported an error",
-                __FUNCTION__);
-        } else {
-            result = false;
-        }
-        
-        //start up the pipeline
-        webcamPlay(webcam);
+        return rcfile.getWebcamDevice();
     }
 
     //called after a device selection, this starts enumerating the device's
@@ -370,8 +322,13 @@ namespace gst {
         element = data_struct->getElementPtr();
         
         //create tester pipeline to enumerate properties
-        command = g_strdup_printf ("%s name=src device=%s ! fakesink",
-            data_struct->getGstreamerSrc(), data_struct->getDevLocation());
+        if (dev_select == 0) {
+            command = g_strdup_printf ("%s name=src ! fakesink",
+                data_struct->getGstreamerSrc());
+        } else {
+            command = g_strdup_printf ("%s name=src device=%s ! fakesink",
+                data_struct->getGstreamerSrc(), data_struct->getDevLocation());
+        }
         pipeline = gst_parse_launch(command, &error);
         if ((pipeline != NULL) && (error == NULL)) {
             //Wait at most 5 seconds for the pipeline to start playing
@@ -410,8 +367,9 @@ namespace gst {
                     log_error("%s: Template pad isn't an object for some reason",
                         __FUNCTION__);
                 }
-                
-                getSupportedFormats(data_struct, caps);
+                if (dev_select != 0) {
+                    getSupportedFormats(data_struct, caps);
+                }
                 
                 gst_caps_unref (caps);
             }
@@ -806,6 +764,29 @@ namespace gst {
         }
     }
     
+    //make link to saveQueue in main bin
+    gboolean
+    VideoInputGst::webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam) {
+        gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
+        
+        //linking
+        GstPad *video_save_queue_src, *video_save_sink;
+        
+        video_save_queue_src = gst_element_get_pad(webcam->_webcamMainBin, "save_queue_src");
+        video_save_sink = gst_element_get_pad(webcam->_videoSaveBin, "sink");
+        
+        GstPadLinkReturn padreturn;
+        padreturn = gst_pad_link(video_save_queue_src, video_save_sink);
+        
+        if (padreturn == GST_PAD_LINK_OK) {
+            return true;
+        } else {
+            log_error("%s: something went wrong in the make_video_display_link function",
+                __FUNCTION__);
+            return false;
+        }
+    }
+    
     //create a bin to take the video stream and dump it out to
     //an ogg file
     gboolean
@@ -869,27 +850,6 @@ namespace gst {
         if (ok != true) {
             log_error("%s: there was some problem in linking!", __FUNCTION__);
         }
-        
-        //added starting here
-        
-        gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
-        
-        //linking
-        GstPad *video_save_queue_src, *video_save_sink;
-        
-        video_save_queue_src = gst_element_get_pad(webcam->_webcamMainBin, "save_queue_src");
-        video_save_sink = gst_element_get_pad(webcam->_videoSaveBin, "sink");
-        
-        GstPadLinkReturn padreturn;
-        padreturn = gst_pad_link(video_save_queue_src, video_save_sink);
-        
-        if (padreturn == GST_PAD_LINK_OK) {
-            return true;
-        } else {
-            log_error("%s: something went wrong in the make_video_display_link function",
-                __FUNCTION__);
-            return false;
-        }
         return true;
     }
     
@@ -933,30 +893,29 @@ namespace gst {
         GstBus *bus;
         GMainLoop *loop;
         gint ret;
-        
-        //setup bus to watch pipeline for messages
-        bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));
-        ret = gst_bus_add_watch (bus, bus_call, webcam);
-        gst_object_unref (bus);
+            //setup bus to watch pipeline for messages
+            bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));
+            ret = gst_bus_add_watch (bus, bus_call, webcam);
+            gst_object_unref (bus);
 
-        //declare clock variables to record time (mainly useful in debug)
-        GstClockTime tfthen, tfnow;
-        GstClockTimeDiff diff;
-        
-        tfthen = gst_util_get_timestamp ();
-        state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
-        
-        if (state == GST_STATE_CHANGE_SUCCESS) {
-            webcam->_pipelineIsPlaying = true;
-        }
-        
-        loop = webcam->_loop;
-        log_trace("running (ctrl-c in terminal to quit).....\n");
-        g_main_loop_run(loop);
-        log_trace("main loop done...\n");
-        tfnow = gst_util_get_timestamp ();
-        diff = GST_CLOCK_DIFF (tfthen, tfnow);
-        log_trace(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
+            //declare clock variables to record time (mainly useful in debug)
+            GstClockTime tfthen, tfnow;
+            GstClockTimeDiff diff;
+            
+            tfthen = gst_util_get_timestamp ();
+            state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
+            
+            if (state == GST_STATE_CHANGE_SUCCESS) {
+                webcam->_pipelineIsPlaying = true;
+            }
+            
+            loop = webcam->_loop;
+            log_trace("running (ctrl-c in terminal to quit).....\n");
+            g_main_loop_run(loop);
+            log_trace("main loop done...\n");
+            tfnow = gst_util_get_timestamp ();
+            diff = GST_CLOCK_DIFF (tfthen, tfnow);
+            log_trace(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
     }
 } //gst namespace
 } //media namespace

@@ -407,6 +407,8 @@ GnashWebcamPrivate::GnashWebcamPrivate() {
     _videoFileSink = NULL;
     _videoEnc = NULL;
     
+    _deviceName = NULL;
+    
     _loop = g_main_loop_new(NULL, false);
     
     _pipelineIsPlaying = false;
@@ -448,8 +450,9 @@ public:
     ///       will be used for the remainder of the execution of the code.
     ///       Currently this code also calls other functions to make bins and
     ///       pipelines. It might be abstracted into separate functions later.
-    /// @return Nothing.
-    void makeWebcamDeviceSelection();
+    /// @return The integer value respresenting the selected webcam from the
+    ///   gnashrc file.
+    int makeWebcamDeviceSelection();
     
     /// \brief This function makes a temporary pipeline with the selected device
     ///       to determine its capabilities (Gstreamer calls these caps). This
@@ -574,6 +577,15 @@ public:
     /// @return True if the link to the video_display_queue was successful,
     ///        False otherwise.
     gboolean webcamMakeVideoDisplayLink(GnashWebcamPrivate *webcam);
+    
+    /// \brief Function links the videoSaveBin to the videoSaveQueue in the
+    ///   main bin.
+    /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
+    ///              created previously in a call to transferToPrivate()
+    ///
+    /// @return True if the link to the videoSaveQueue was successfully, false
+    ///    otherwise.
+    gboolean webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam);
 
     /// \brief Function creates the save bin. For more information on pipeline
     ///       implementation and this function in general see the definition of
