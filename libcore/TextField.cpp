@@ -1124,10 +1124,7 @@ TextField::format_text()
 		//if the record is in the section we want to show
 		if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
 			_textRecords[i].yOffset() - yoffset > 0) {
-			log_debug("adding _textRecord[%d] to visible lines", i);
 			_displayRecords.push_back(_textRecords[i]);
-			log_debug("and setting _displayRecords.back().yOffset to %f", _displayRecords.back().yOffset() - yoffset);
-			log_debug("the xOffset is %f", _displayRecords.back().xOffset());
 			_displayRecords.back().setYOffset(_displayRecords.back().yOffset() - yoffset);
 		}
 	}
@@ -1157,10 +1154,6 @@ TextField::format_text()
 	float extra_space = align_line(textAlignment, last_line_start_record, x);
     m_xcursor += static_cast<int>(extra_space);
 
-	///TESTING STUFF
-	//_displayRecords.clear();
-	//_displayRecords = _textRecords;
-	///
 	set_invalidated(); //redraw
 }
 
@@ -1193,7 +1186,6 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 	boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code, int& last_space_glyph,
 	int& last_line_start_record)
 {
-	log_debug("entering handleChar");
 	std::vector<int>::iterator linestartit = _line_starts.begin();
 	std::vector<int>::const_iterator linestartend = _line_starts.end();
 	
@@ -1226,7 +1218,6 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 				break;
 			case 9:
 				insertTab(rec, x, scale);
-				///THIS IS WHERE SHARAD'S TABSTOBS WILL GO
 				break;
 			case 8:
 				// Backspace 
@@ -1313,6 +1304,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 										 "print their content")));
 		 
 					std::wstring discard;
+					std::map<std::string, std::string> attributes;
 					SWF::TextRecord newrec;
 					newrec.setFont(rec.getFont());
 					newrec.setUnderline(rec.underline());
@@ -1320,16 +1312,15 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 					newrec.setTextHeight(rec.textHeight());
 					newrec.setXOffset(x);
 					newrec.setYOffset(y);
-					bool complete = parseHTML(discard, it, e);
+					bool complete = parseHTML(discard, attributes, it, e);
 					std::string s(discard.begin(), discard.end());
 					s.assign(discard.begin(), discard.end());
 					if (!complete) continue;
 					else {
-						log_debug("No TextField html tags are currently implemented in Gnash");
 						//Don't think this is the best way to match with tags...
 						if (s == "u") {
-							//newrec.setUnderline(true); This works
-							log_unimpl("<u> html tag in TextField");
+							//underline
+							newrec.setUnderline(true);
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						} else if (s == "a") {
 							//anchor
@@ -1337,7 +1328,8 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						} else if (s == "b") {
 							//bold
-							log_unimpl("<b> html tag in TextField");
+							Font* boldfont = new Font(rec.getFont()->name(), true, rec.getFont()->isItalic());
+							newrec.setFont(boldfont);
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						} else if (s == "font") {
 							//font
@@ -1349,10 +1341,11 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						} else if (s == "i") {
 							//italic
-							log_unimpl("<i> html tag in TextField");
+							Font* italicfont = new Font(rec.getFont()->name(), rec.getFont()->isBold(), true);
+							newrec.setFont(italicfont);
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						} else if (s == "li") {
-							//list item
+							//list item (bullet)
 							log_unimpl("<li> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						} else if (s == "span") {
@@ -1372,6 +1365,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 							log_unimpl("<br> html tag in TextField");
 						} else {
 							log_debug("<%s> tag is unsupported", s);
+							///THIS IS DANGEROUS. IF TAG HAS NO CLOSING TAG, THIS MAY PRODUCE UNDESIRED RESULTS
 							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
 						}
 					}
@@ -1729,21 +1723,35 @@ TextField::registerTextVariable()
 /// tag was incomplete. The iterator is moved to after
 /// the closing tag or the end of the string.
 bool
-TextField::parseHTML(std::wstring& tag, std::wstring::const_iterator& it,
-                               const std::wstring::const_iterator& e) const
+TextField::parseHTML(std::wstring& tag, std::map<std::string, std::string> attributes,
+						std::wstring::const_iterator& it,
+                        const std::wstring::const_iterator& e) const
 {
-
+	std::string attname;
+	std::string attvalue;
     bool complete = false;
 
-    while (it != e)
-    {
-        if (*it == '>')
-        {
+    while (it != e) {
+        //if (*it == ' ') {
+			//++it;
+			//while (it != e && *it != ' ') {
+				//while (it != e && *it != '=') {
+					//if (*it == 0) break;
+					//attname.push_back(*it);
+					//++it;
+				//}
+				//++it
+				//if (*it == 0) break;
+				//attvalue.push_back(*it);
+			//}
+		//}
+
+		if (*it == '>') {
             ++it;
             complete = true;
             break;
         }
-
+		
         // Check for NULL DisplayObject
         if (*it == 0) break;
 
@@ -2867,6 +2875,7 @@ textfield_htmlText(const fn_call& fn)
 
     // Setter
     int version = getSWFVersion(*ptr);
+	
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
