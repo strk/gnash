@@ -399,7 +399,7 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
 boost::uint8_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 //  boost::uint8_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
 
@@ -412,6 +412,8 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
 
     boost::uint8_t *header = Listener::getBaseAddress();
     boost::uint8_t *ptr_FH    = Listener::getBaseAddress();
+	log_debug("Base address in 'formatHeader' is: 0x%x, 0x%x",
+                    (unsigned int) header, (unsigned int) ptr_FH);
 
     // This is the initial 16 bytes of the header
     memset(ptr_FH, 0, 16 + size + 1);
@@ -457,7 +459,7 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
 bool
 LcShm::connect(const string &name)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     
     _name = name;
 
@@ -475,15 +477,20 @@ LcShm::connect(const string &name)
     }
     
 	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(Shm::getAddr());
+	
+	
 	boost::uint8_t* tooFar = baseAddress+Shm::getSize();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
+	log_debug("Base address in 'connect' is: 0x%x, 0x%x",
+                    (unsigned int) Shm::getAddr(), (unsigned int) _baseaddr);
 //    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
     addListener(name);
+	system("ipcs");
 
     return true;
 }
@@ -497,7 +504,8 @@ LcShm::connect(const string &name)
 bool
 LcShm::connect(key_t key)
 {
-    GNASH_REPORT_FUNCTION;
+	boost::mutex::scoped_lock lock(_localconnection_mutex);
+   // GNASH_REPORT_FUNCTION;
     
     if (Shm::attach(key, true) == false) {
         return false;
@@ -551,13 +559,13 @@ LcShm::send(const string&  name , const string&  domainname ,
             vector<amf::Element* >& data )
 {
     //GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_localconnection_mutex);
 
      log_debug(_(" ***** The send function is called *****") ); 
 
 //     cout<<" The send function is called ! "<<endl;
-     log_debug("Base address is: 0x%x, 0x%x",
-               static_cast<void *>(Listener::getBaseAddress()),
-	       reinterpret_cast<void *>(_baseaddr));
+     log_debug("Base address in 'send' is: 0x%x, 0x%x",
+               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
 //The base address
      boost::uint8_t *baseptr = Listener::getBaseAddress();
@@ -566,14 +574,44 @@ LcShm::send(const string&  name , const string&  domainname ,
 
 // Check if the base address exists
     if (baseptr == reinterpret_cast<boost::uint8_t *>(0)) {
-        log_error("***** base address not set! *****");
+        log_error("***** Base address in 'send' is not set! *****");
 	}
 
 // This function write the first 16 bytes and the following three messages into the memory.
 // ptr should be moved
-    ptr=formatHeader(name, domainname, _object.domain);
+// ptr=formatHeader(name, domainname, _object.domain);
 // The ptr is now pointing to the start of the message
 
+
+    
+	
+	int size = name.size() + domainname.size() + 9;
+    // This is the initial 16 bytes of the header
+    memset(ptr, 0, 16 + size + 1);
+    *ptr = 1;
+    ptr += 4;
+    //Si changes this value from 3 to 4.
+    *ptr = 1;
+    ptr = baseptr + LC_HEADER_SIZE;
+
+//  Si has rewritten the following code.
+//  The protocol is set to be localhost now. 
+//  Make sure it is right later.
+
+    // Which is then always followed by 3 AMF objects.
+    boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(name);
+    memcpy(ptr, buf1->begin(), buf1->size());
+    ptr += buf1->size();
+	
+    const std::string protocol="localhost";
+    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(protocol);
+    memcpy(ptr, buf2->begin(), buf2->size());
+    ptr += buf2->size();
+
+    boost::shared_ptr<amf::Buffer> buf3 = AMF::encodeString(domainname);
+    memcpy(ptr, buf3->begin(), buf3->size());
+    ptr += buf3->size();
+	
 //Put the date into memory when it is not empty
 
   	log_debug(_(" ***** The size of the data is %s *****"),data.size() ); 
@@ -653,6 +691,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 //    delete[] tmp;
 #endif
     
+	system("ipcs");
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.
