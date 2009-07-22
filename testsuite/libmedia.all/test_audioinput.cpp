@@ -71,7 +71,7 @@ static void test_client()
 	std::vector<GnashAudio*> *audioVect = aud.getAudioVect();
 	
 	
-	//aud.makeAudioDevSelection();
+	aud.makeAudioDevSelection();
 	
 	cerr << "placeholder" << endl;
     
