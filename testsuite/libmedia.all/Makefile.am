@@ -56,11 +56,16 @@ check_PROGRAMS =
 if USE_GST_ENGINE
 
  check_PROGRAMS += \
-	test_videoinput
+	test_videoinput \
+	test_audioinput
 
  test_videoinput_SOURCES = test_videoinput.cpp
  test_videoinput_LDADD = $(AM_LDFLAGS) 
  test_videoinput_DEPENDENCIES = site-update
+ 
+ test_audioinput_SOURCES = test_audioinput.cpp
+ test_audioinput_LDADD = $(AM_LDFLAGS)
+ test_audioinput_DEPENDENCIES = site-update
 
 endif
 
