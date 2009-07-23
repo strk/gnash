@@ -362,22 +362,28 @@ attachSystemInterface(as_object& proto)
 
 }
 
-
+// This function returns false if no arguments were passed, true if any
+// arguments were passed at all, even if they are not strings. There is
+// currently no known way of accessing the list of allowed domains.
 as_value
 system_security_allowdomain(const fn_call& fn)
 {
 	// NOTE: This is the AS2 version of allowDomain, the AS3 version is located
 	// in Security_as.cpp
-	bool result;
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("System.security.allowDomain requires at least one "
+                "argument.");
+        );
+        return as_value(false);
+    }
 
-	// NOTE: Once the security portion (in the VM?) of this is implemented,
-	// this should probably return true only if access to the added domain was
-	// successfully granted
-    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores domains but does nothing else. It returns true if the string was successfuly stored.") );
-	for(unsigned int i = 0; i < fn.nargs; ++i) {
-		result = addAllowDataAccess( fn.arg(i).to_string());
+    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores "
+                "domains but does nothing else.")); 
+	for (unsigned int i = 0; i < fn.nargs; ++i) {
+		addAllowDataAccess(fn.arg(i).to_string());
 	}
-    return as_value(result); 
+    return as_value(true);
 }
 
 
