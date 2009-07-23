@@ -607,6 +607,8 @@ public:
     ///
     void webcamPlay(GnashWebcamPrivate *webcam);
     
+    void webcamStop(GnashWebcamPrivate *webcam);
+    
     /// \brief Accessor which returns the vid_vect private variable in the
     ///       VideoInputGst class.
     ///

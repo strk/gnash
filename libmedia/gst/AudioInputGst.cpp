@@ -134,6 +134,10 @@ namespace gst {
     
     void
     AudioInputGst::getSelectedCaps(int devselect) {
+        if (devselect > (_audioVect.size() - 1) || devselect < 0) {
+            log_error("%s: passed an invalid devselect argument", __FUNCTION__);
+            exit(EXIT_FAILURE);
+        }
         GstElement *pipeline;
         gchar *command;
         GError *error = NULL;
@@ -513,7 +517,7 @@ namespace gst {
         g_print(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
     }
     
-    void
+    int
     AudioInputGst::makeAudioDevSelection() {
         int devselect = -1;
         devselect = rcfile.getAudioInputDevice();
@@ -528,53 +532,12 @@ namespace gst {
         
         getSelectedCaps(devselect);
         
-        GnashAudioPrivate *audio = NULL;
-        audio = transferToPrivate(devselect);
-        if (audio == NULL) {
-            log_error("%s: Couldn't transferToPrivate structure", __FUNCTION__);
-        }
-        
-        bool ok = false;
-        ok = audioCreateMainBin(audio);
-        if (ok != true) {
-            log_error("%s: Couldn't make the audioMainBin", __FUNCTION__);
-        } else {
-            ok = false;
-        }
-        
-        ok = audioCreatePlaybackBin(audio);
-        if (ok != true) {
-            log_error("%s: Couldn't make the audioPlaybackBin", __FUNCTION__);
-        } else {
-            ok = false;
-        }
-        
-        ok = audioCreateSaveBin(audio);
-        if (ok != true) {
-            log_error("%s: Couldn't make the audioSaveBin", __FUNCTION__);
-        } else {
-            ok = false;
-        }
-        
-        ok = makeAudioSourcePlaybackLink(audio);
-        if (ok != true) {
-            log_error("%s: Couldn't make the Source-Playback link", __FUNCTION__);
-        } else {
-            ok = false;
-        }
-        
-        ok = makeAudioSourceSaveLink(audio);
-        if (ok != true) {
-            log_error("%s: Couldn't make the Source-Save link", __FUNCTION__);
-        } else {
-            ok = false;
-        }
-        
+        return devselect;
+    } /*             
         //debug
         //g_print("starting pipeline....\n");
         audioPlay(audio);
-        
-    }
+    } */
 
 } //gst namespace
 } //media namespace
