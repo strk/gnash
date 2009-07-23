@@ -413,7 +413,7 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     boost::uint8_t *header = Listener::getBaseAddress();
     boost::uint8_t *ptr_FH    = Listener::getBaseAddress();
 	log_debug("Base address in 'formatHeader' is: 0x%x, 0x%x",
-                    (unsigned int) header, (unsigned int) ptr_FH);
+                     header, ptr_FH);
 
     // This is the initial 16 bytes of the header
     memset(ptr_FH, 0, 16 + size + 1);
@@ -484,10 +484,10 @@ LcShm::connect(const string &name)
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
 	log_debug("Base address in 'connect' is: 0x%x, 0x%x",
-                    (unsigned int) Shm::getAddr(), (unsigned int) _baseaddr);
+                    Shm::getAddr(), _baseaddr);
 //    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
-//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+//               Listener::getBaseAddress(), _baseaddr);
 
     addListener(name);
 	system("ipcs");
@@ -523,7 +523,7 @@ LcShm::connect(key_t key)
     parseHeader(baseAddress, tooFar);
 //    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
-//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+//               Listener::getBaseAddress(), _baseaddr);
     
     return true;
 }
@@ -565,7 +565,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 
 //     cout<<" The send function is called ! "<<endl;
      log_debug("Base address in 'send' is: 0x%x, 0x%x",
-               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+               Listener::getBaseAddress(), _baseaddr);
 
 //The base address
      boost::uint8_t *baseptr = Listener::getBaseAddress();
