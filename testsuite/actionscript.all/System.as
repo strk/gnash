@@ -179,14 +179,28 @@ xcheck_equals(typeof(p.download), 'function');
 // Tries to exec whatisthis from a particular location?
 xcheck_equals(typeof(p.launch), 'function');
 
-trace(System.security.allowDomain("um"));
+ret = System.security.allowDomain(1);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+ret = System.security.allowDomain(false);
+check_equals(ret, true);
+ret = System.security.allowDomain("string");
+check_equals(ret, true);
+ret = System.security.allowDomain("http://www.gnashdev.org");
+check_equals(ret, true);
+ret = System.security.allowDomain();
+check_equals(ret, false);
+ret = System.security.allowDomain("string again");
+check_equals(ret, true);
+ret = System.security.allowDomain(undefined);
+check_equals(ret, true);
 
 #if OUTPUT_VERSION > 6
- check_totals(85);
+ check_totals(93);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(84);
+   check_totals(92);
 # else
-   check_totals(51);
+   check_totals(59);
 # endif
 #endif
