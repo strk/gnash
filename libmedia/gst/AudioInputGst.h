@@ -273,7 +273,7 @@ public:
     /// If one is not selected, the audiotestsrc is used by default. This function
     /// also currently calls the functions to make the GstBins, pipelines and
     /// element connections.
-    void makeAudioDevSelection();
+    int makeAudioDevSelection();
     
     /// \brief This function grabs information about the selected audio input
     /// device. It also calls checkSupportedFormats to make sure that Gnash
@@ -378,6 +378,8 @@ public:
     /// \brief Function returns a pointer to the private _audioVect element from
     ///  AudioInputGst class.
     std::vector<GnashAudio*>* getAudioVect() {return &_audioVect;}
+    
+    GnashAudioPrivate* getGlobalAudio() {return _globalAudio;}
     
     
 private:

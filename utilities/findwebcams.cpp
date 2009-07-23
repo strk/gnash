@@ -36,12 +36,18 @@ class data {
         data();
         gchar* deviceName;
         gchar* deviceType;
+        gint deviceNumber;
+        gboolean duplicate;
 };
 
 data::data() {
     deviceName = NULL;
     deviceType = NULL;
+    gint deviceNumber = -1;
+    duplicate = false;
 };
+
+gint numDuplicates = 0;
 
 gint findVidDevs(std::vector<data*>& vidVect) {
     gint numdevs = 0;
@@ -57,6 +63,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         vidVect.push_back(new data);
         vidVect[numdevs]->deviceName = g_strdup_printf("videotestsrc");
         vidVect[numdevs]->deviceType = g_strdup_printf("videotestsrc");
+        vidVect[numdevs]->deviceNumber = 0;
         numdevs += 1;
     }
     
@@ -85,6 +92,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
             vidVect.push_back(new data);
             vidVect[numdevs]->deviceType = g_strdup_printf("v4lsrc");
             vidVect[numdevs]->deviceName = dev_name;
+            vidVect[numdevs]->deviceNumber = numdevs;
             numdevs += 1;
         }
     }
@@ -97,6 +105,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
     probe = NULL;
     element = NULL;
     devarr = NULL;
+    gint g;
     
     element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
     probe = GST_PROPERTY_PROBE (element);
@@ -113,18 +122,26 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         if (dev_name == "null") {
             g_print("no v4l2 video sources found.\n");
         }
-        else { 
+        else {
             vidVect.push_back(new data);
             vidVect[numdevs]->deviceType = g_strdup_printf("v4l2src");
             vidVect[numdevs]->deviceName = dev_name;
-            
+            vidVect[numdevs]->deviceNumber = numdevs;
+            //mark duplicates (we like v4l2 sources more than v4l, so if
+            //they're both detected, mark the v4l source as a duplicate)
+            for (g=1; g < (vidVect.size()-1); g++) {
+                if (g_strcmp0(vidVect[numdevs]->deviceName,
+                        vidVect[g]->deviceName) == 0) {
+                    vidVect[g]->duplicate = true;
+                    numDuplicates += 1;
+                }
+            }
             numdevs += 1;
         }
     }
     if (devarr) {
         g_value_array_free (devarr);
     }
-    
     return numdevs;
 }
 
@@ -138,18 +155,32 @@ int main () {
     int fromrc = rcfile.getWebcamDevice();
     
     if (fromrc == -1) {
-        g_print("Use this utility to set your desired default webcam device.\n");
+        g_print("\nUse this utility to set your desired default webcam device.\n");
         numdevs = findVidDevs(vidVector);
-        g_print("\nFound %d video devices: \n\n", numdevs);
+        g_print("\nINFO: these devices were ignored because they are supported by both");
+        g_print("\nvideo4linux and video4linux2:\n\n");
+        for (i = 0; i < numdevs; ++i) {
+            if (vidVector[i]->duplicate == true) {
+                g_print("    %s (%s)\n", vidVector[i]->deviceName, vidVector[i]->deviceType);
+            }
+        }
+        g_print("\nGnash interacts with v4l2 sources better than v4l sources, thus they");
+        g_print("\nwill not be printed in the list below.\n");
+        g_print("\nFound %d video devices: \n\n", (numdevs - numDuplicates));
+        gint counter = 0;
         for (i = 0; i < numdevs; ++i)
         {
             if (i == 0 && (vidVector[i] != 0)) {
-                g_print("%d. device[%d] = Video Test Source (videotestsrc)\n", i, i);
+                g_print("    %d. Video Test Source (videotestsrc)\n", i, i);
+                counter++;
             } else if (i == 0 && (vidVector[i] == 0)) {
                 g_print("no test video device available");
             } else {
-                g_print("%d. device[%d] = %s (%s)\n", i, i, vidVector[i]->deviceName,
-                        vidVector[i]->deviceType);
+                if (vidVector[i]->duplicate != true) {
+                    g_print("    %d. %s (%s)\n", counter, vidVector[i]->deviceName,
+                            vidVector[i]->deviceType);
+                    counter++;
+                }
             }
         }
         //prompt user for device selection
@@ -158,7 +189,7 @@ int main () {
         do {
             dev_select = -1;
             g_print("\nChoose the device you would like to use (0-%d): ",
-                (numdevs - 1));
+                (numdevs - numDuplicates - 1));
             std::cin >> fromCin;
             if (fromCin.size() != 1) {
                 dev_select = -1;
@@ -167,12 +198,12 @@ int main () {
             } else {
                 dev_select = atoi(fromCin.c_str());
             }
-            if ((dev_select < 0) || (dev_select > (numdevs - 1))) {
+            if ((dev_select < 0) || (dev_select > (numdevs - numDuplicates - 1))) {
                 g_print("You must make a valid device selection\n");
             }
-        } while ((dev_select < 0) || (dev_select > (numdevs - 1)));
+        } while ((dev_select < 0) || (dev_select > (numdevs - numDuplicates - 1)));
         g_print("\nTo select this camera, add this line to your gnashrc file:\n");
-        g_print("set webcamDevice %d\n", dev_select);
+        g_print("set webcamDevice %d\n", vidVector[dev_select + numDuplicates]->deviceNumber);
     } else {
         numdevs = findVidDevs(vidVector);
         g_print("\nThe gnashrc file reports default webcam is set to:\n");

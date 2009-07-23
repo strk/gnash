@@ -23,6 +23,7 @@
 
 #include <string>
 #include <cstdio>
+#include <sys/stat.h>
 
 #include "dejagnu.h"
 #include "log.h"
@@ -174,12 +175,12 @@ static void test_client()
     } else {
         runtest.pass("the _videoSource reference was created");
     }
-    if (webcam->_capsFilter == NULL) {
+    if (webcam->_capsFilter == NULL && (devselect !=0)) {
         runtest.fail("the _capsFilter reference wasn't created");
     } else {
         runtest.pass("the _capsFilter reference was created");
     }
-    if (webcam->_currentFormat == NULL) {
+    if (webcam->_currentFormat == NULL && (devselect != 0)) {
         runtest.fail("no format was set (_currentFormat == NULL!)");
     } else {
         runtest.pass("format is set");
@@ -253,7 +254,29 @@ static void test_client()
         runtest.pass("webcam->_videoFileSink reference is set");
     }
     
-    //end of setup tests
+    //end of setup tests, now startup the webcamPipeline, run for a few seconds
+    //and then make sure there is a file present after running
+    vig.webcamPlay(webcam);
+    if (webcam->_pipelineIsPlaying != true) {
+        runtest.fail("the _pipelineIsPlaying variable isn't being set");
+    } else {
+        runtest.pass("the _pipelineIsPlaying variable is properly set");
+    }
+    sleep(5);
+    vig.webcamStop(webcam);
+
+    struct stat st;
+    std::string file = "./vidoutput.ogg";
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("vidoutput.ogg file is in testsuite/libmedia.all");
+        if (st.st_blocks == 0) {
+            runtest.fail("the output file is there, but there's no information in it!");
+        } else {
+            runtest.pass("the output file has data in it");
+        }
+    } else {
+        runtest.fail("there's no output video file in testsuite/libmedia.all");
+    }
 }
 
 

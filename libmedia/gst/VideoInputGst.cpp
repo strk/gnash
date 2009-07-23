@@ -300,9 +300,15 @@ namespace gst {
             log_trace("Camera %d specified in gnashrc file, using that one.\n",
                 dev_select);
         }
-        //now that a selection has been made, get capabilities of that device
-        getSelectedCaps(rcfile.getWebcamDevice());
-        return rcfile.getWebcamDevice();
+        //make sure that the device selected is actually valid
+        if ((rcfile.getWebcamDevice() > (_vidVect.size() - 1)) || rcfile.getWebcamDevice() < 0) {
+            log_error("You have an invalid camera selected. Please check your gnashrc file");
+            exit(EXIT_FAILURE);
+        } else {
+            //now that a selection has been made, get capabilities of that device
+            getSelectedCaps(rcfile.getWebcamDevice());
+            return rcfile.getWebcamDevice();
+        }
     }
 
     //called after a device selection, this starts enumerating the device's
@@ -325,6 +331,10 @@ namespace gst {
         if (dev_select == 0) {
             command = g_strdup_printf ("%s name=src ! fakesink",
                 data_struct->getGstreamerSrc());
+        } else if ((dev_select > (_vidVect.size() - 1)) || dev_select < 0) {
+            log_error("%s: Passed an invalid argument (not a valid dev_select value)",
+                __FUNCTION__);
+            exit(EXIT_FAILURE);
         } else {
             command = g_strdup_printf ("%s name=src device=%s ! fakesink",
                 data_struct->getGstreamerSrc(), data_struct->getDevLocation());
@@ -473,6 +483,11 @@ namespace gst {
     GnashWebcamPrivate*
     VideoInputGst::transferToPrivate(gint dev_select)
     {
+        if ((dev_select > (_vidVect.size() - 1)) || dev_select < 0) {
+            log_error("%s: Passed an invalid argument (bad dev_select value)",
+                __FUNCTION__);
+                exit(EXIT_FAILURE);
+        }
         GnashWebcamPrivate *webcam = new GnashWebcamPrivate;
         if (webcam != NULL) {
             webcam->setWebcamDevice(_vidVect[dev_select]);
@@ -905,17 +920,23 @@ namespace gst {
             tfthen = gst_util_get_timestamp ();
             state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
             
-            if (state == GST_STATE_CHANGE_SUCCESS) {
+            if (state != GST_STATE_CHANGE_FAILURE) {
                 webcam->_pipelineIsPlaying = true;
             }
             
-            loop = webcam->_loop;
-            log_trace("running (ctrl-c in terminal to quit).....\n");
-            g_main_loop_run(loop);
-            log_trace("main loop done...\n");
-            tfnow = gst_util_get_timestamp ();
-            diff = GST_CLOCK_DIFF (tfthen, tfnow);
-            log_trace(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
+            //loop = webcam->_loop;
+            //log_trace("running (ctrl-c in terminal to quit).....\n");
+            //g_main_loop_run(loop);
+            //log_trace("main loop done...\n");
+            //tfnow = gst_util_get_timestamp ();
+            //diff = GST_CLOCK_DIFF (tfthen, tfnow);
+            //log_trace(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
+    }
+    
+    void
+    VideoInputGst::webcamStop(GnashWebcamPrivate *webcam) {
+        gst_element_set_state (webcam->_pipeline, GST_STATE_NULL); 
+        webcam->_pipelineIsPlaying = FALSE;
     }
 } //gst namespace
 } //media namespace
