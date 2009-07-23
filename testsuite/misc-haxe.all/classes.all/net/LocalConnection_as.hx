@@ -262,7 +262,7 @@ if (untyped LocalConnection.prototype.hasOwnProperty("onStatus")){
 		DejaGnu.xfail("LocalConnection.prototype. 'onStatus' should be a event handler/function");
 	}
      
-//check_equals (domain, "localhost");
+//check_equals (domain, "");
 #if ( flash6 || flash7 || flash8)
 if (x1.domain() == "localhost"){
 	DejaGnu.pass("x1.domain is 'localhost' ");
@@ -345,6 +345,8 @@ if (x1!=x2){
 	    statuses.push(obj.code);
 };
 
+    //DejaGnu.note("The following test fails!!");
+	//var tempstring:String="Hello Si";
 	var ret:Bool = x1.connect("");
 	
 	if (ret==false){
@@ -430,10 +432,10 @@ if (x1!=x2){
 	}
 
 	var ret:Bool = x1.connect("string");	
-	if (ret==false){
-	DejaGnu.pass("x1.connect('string') is false");
+	if (ret==true){
+	DejaGnu.pass("x1.connect('string') is true");
 	} else {
-	    DejaGnu.fail("x1.connect('string') should be flase");
+	    DejaGnu.fail("x1.connect('string') should be true");
 	}
 	if (statuses.length==0){
 		DejaGnu.pass("statuses.length is zero");
@@ -462,6 +464,8 @@ if (x1!=x2){
 	}
 
 // Checks only for syntactical correctness, not success
+// Be more careful for these test cases which touch the shared memory.
+
 	result=x2.send("string","string","string","string");
 	if (result == true){
 		DejaGnu.pass("x2.send('String','String','String','String'); result is true for x2.send");
@@ -531,30 +535,30 @@ if (x1!=x2){
 	} else {
 	    DejaGnu.fail("x2.send('lc_test',''); results should be false for this x2.send");
 	}	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),[]);
-	if (ret==false){
+	if (result == false){
 		DejaGnu.pass("x2.send() should be false.");
 	} else {
-	    DejaGnu.fail("x2.send() shoulad be false!");
+	    DejaGnu.fail("x2.send() should be false!");
 	}
 	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),[3]);
-	if (ret==false){
+	if (result==false){
 		DejaGnu.pass("x2.send(3) should be false.");
 	} else {
-	    DejaGnu.fail("x2.send(3) shoulad be false!");
+	    DejaGnu.fail("x2.send(3) should be false!");
 	}
 	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),["lc_test", 1]);
-	if (ret==false){
+	if (result==false){
 		DejaGnu.pass("x2.send('lc_test',1) should be false.");
 	} else {
-	    DejaGnu.fail("x2.send('lc_test',1) shoulad be false!");
+	    DejaGnu.fail("x2.send('lc_test',1) should be false!");
 	}
 //Si
 //built a static function, named funcname
 	result = Reflect.callMethod(x2,Reflect.field(x2,"send"),["lc_test", funcname]);
-	if (ret==false){
+	if (result==false){
 		DejaGnu.pass("x2.send should be false.");
 	} else {
-	    DejaGnu.fail("x2.send shoulad be false!");
+	    DejaGnu.fail("x2.send should false!");
 	}
 
 	// But anything else is fine.

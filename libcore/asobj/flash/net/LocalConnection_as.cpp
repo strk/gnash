@@ -276,15 +276,18 @@ localconnection_connect(const fn_call& fn)
         );
         return as_value(false);
     }
-
-    std::string connection_name = ptr->domain();	
-    connection_name +=":";
-    connection_name += fn.arg(0).to_string();
-
-    if (connection_name.empty()) {
+    
+	std::string connection_name;
+	//connection_name=fn.arg(0).to_string();
+	//log_debug("The arg(0) is: %s", connection_name);
+	
+    if (fn.arg(0).to_string()=="") {
         return as_value(false);
     }
-
+       	connection_name = ptr->domain();	
+    	connection_name +=":";
+    	connection_name += fn.arg(0).to_string();
+   
     ptr->connect(connection_name);
 
     // We don't care whether connected or not.
@@ -311,6 +314,9 @@ localconnection_send(const fn_call& fn)
         ensureType<LocalConnection_as>(fn.this_ptr);
 
     // At least 2 args (connection name, function) required.
+
+   log_debug(_("The number of args is %d \n"), fn.nargs) ;
+	 
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream os;
@@ -319,6 +325,7 @@ localconnection_send(const fn_call& fn)
                     "arguments"), os.str());
         );
         return as_value(false);
+		
     }
 
     // Both the first two arguments must be a string

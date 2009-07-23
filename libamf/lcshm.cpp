@@ -413,7 +413,7 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     boost::uint8_t *header = Listener::getBaseAddress();
     boost::uint8_t *ptr_FH    = Listener::getBaseAddress();
 	log_debug("Base address in 'formatHeader' is: 0x%x, 0x%x",
-                     header, ptr_FH);
+                    (unsigned int) header, (unsigned int) ptr_FH);
 
     // This is the initial 16 bytes of the header
     memset(ptr_FH, 0, 16 + size + 1);
@@ -457,22 +457,28 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
 ///     by the send() command to signify which local connection to
 ///     send the object to.
 bool
-LcShm::connect(const string &name)
+LcShm::connect(const string& names)
 {
     //GNASH_REPORT_FUNCTION;
+
+    //log_debug(" The connect function is called");	
+	//log_debug(" The size of %s empty string is %d ",names, names.size()); 
+	
+	if (names == "")
+		return false;
     
-    _name = name;
+    _name = names;
 
     // the name here is optional, Gnash will pick a good default.
     // When using sysv shared memory segments in compatibility mode,
     // the name is ignored, and the SHMkey is specified in the user's
     // ~/.gnashrc file.
-    if (Shm::attach(name.c_str(), true) == false) {
+    if (Shm::attach(names.c_str(), true) == false) {
         return false;
     }
 
     if (Shm::getAddr() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", name.c_str());
+        log_error("Failed to open shared memory segment: \"%s\"", names.c_str());
         return false; 
     }
     
@@ -484,13 +490,13 @@ LcShm::connect(const string &name)
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
 	log_debug("Base address in 'connect' is: 0x%x, 0x%x",
-                    Shm::getAddr(), _baseaddr);
+                    (unsigned int) Shm::getAddr(), (unsigned int) _baseaddr);
 //    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
-//               Listener::getBaseAddress(), _baseaddr);
+//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
-    addListener(name);
-	system("ipcs");
+    addListener(names);
+//	system("ipcs");
 
     return true;
 }
@@ -523,7 +529,7 @@ LcShm::connect(key_t key)
     parseHeader(baseAddress, tooFar);
 //    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
-//               Listener::getBaseAddress(), _baseaddr);
+//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
     
     return true;
 }
@@ -552,7 +558,7 @@ LcShm::connect(key_t key)
 ///
 /// @return nothing.
 
-// Si have rewrittten these!
+// Si have rewrittten all of these!
 
 void
 LcShm::send(const string&  name , const string&  domainname ,
@@ -565,7 +571,13 @@ LcShm::send(const string&  name , const string&  domainname ,
 
 //     cout<<" The send function is called ! "<<endl;
      log_debug("Base address in 'send' is: 0x%x, 0x%x",
-               Listener::getBaseAddress(), _baseaddr);
+               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+			   
+	 if ( (unsigned int)Listener::getBaseAddress() == 0x0 )
+	       {
+		   log_debug("STOP! No memory allocated!! ");
+		   return;
+	   }
 
 //The base address
      boost::uint8_t *baseptr = Listener::getBaseAddress();
@@ -581,9 +593,6 @@ LcShm::send(const string&  name , const string&  domainname ,
 // ptr should be moved
 // ptr=formatHeader(name, domainname, _object.domain);
 // The ptr is now pointing to the start of the message
-
-
-    
 	
 	int size = name.size() + domainname.size() + 9;
     // This is the initial 16 bytes of the header
@@ -603,7 +612,7 @@ LcShm::send(const string&  name , const string&  domainname ,
     memcpy(ptr, buf1->begin(), buf1->size());
     ptr += buf1->size();
 	
-    const std::string protocol="localhost";
+    const std::string protocol="localhostf";
     boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(protocol);
     memcpy(ptr, buf2->begin(), buf2->size());
     ptr += buf2->size();
@@ -691,7 +700,8 @@ LcShm::send(const string&  name , const string&  domainname ,
 //    delete[] tmp;
 #endif
     
-	system("ipcs");
+//	system("ipcs");
+       return;
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.
