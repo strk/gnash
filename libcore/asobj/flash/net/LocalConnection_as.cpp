@@ -445,3 +445,5 @@ validFunctionName(const std::string& func)
 } // anonymous namespace
 
 } // end of gnash namespace
+
+//Adding for testing commit
