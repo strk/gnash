@@ -61,9 +61,11 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/libsound \
         -DLOCALEDIR=\"$(localedir)\" \
-	$(PTHREAD_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
+	$(GSTREAMER_PLUGINS_BASE_CFLAGS) \
 	$(BOOST_CFLAGS) \
-    $(MYSQL_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
+	$(MYSQL_CFLAGS) \
 	$(NULL)
 
 if WIN32
@@ -106,11 +108,12 @@ flvdumper_SOURCES = flvdumper.cpp
 flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 if USE_GST_ENGINE
+ GST_STUFF = $(GSTPBUTILS_LIBS) $(GSTREAMER_PLUGINS_BASE_LIBS) $(GSTREAMER_LIBS) 
  findwebcams_SOURCES = findwebcams.cpp
- findwebcams_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
- 
+ findwebcams_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
+
  findmicrophones_SOURCES = findmicrophones.cpp
- findmicrophones_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+ findmicrophones_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support

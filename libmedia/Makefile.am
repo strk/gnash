@@ -118,12 +118,15 @@ if USE_GST_ENGINE
 		-I$(top_srcdir)/libmedia/gst \
 		$(GSTREAMER_CFLAGS) \
 		$(GSTAPP_CFLAGS) \
-		$(GSTINTERFACES_CFLAGS) \
+		$(GSTPBUTILS_CFLAGS) \
 		$(NULL)
 
    libgnashmedia_la_LIBADD += \
-		$(GSTREAMER_LIBS) -lgstbase-0.10 \
-		$(GSTAPP_LIBS) $(GSTINTERFACES_LIBS) \
+		-lgstbase-0.10 \
+                $(GSTREAMER_APP_LIBS) \
+		$(GSTPBUTILS_LIBS) \
+		$(GSTREAMER_PLUGINS_BASE_LIBS) \
+		$(GSTREAMER_LIBS) \
 		$(NULL)
 
 endif

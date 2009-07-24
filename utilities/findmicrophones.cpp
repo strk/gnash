@@ -20,8 +20,13 @@
 #endif
 
 #include "rc.h"
+#ifdef HAVE_GST_GST_H
 #include "gst/gst.h"
+#endif
+
+#ifdef HAVE_GST_INTERFACES_PROBEPROBE_H
 #include <gst/interfaces/propertyprobe.h>
+#endif
 
 #include <vector>
 #include <string>

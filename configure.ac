@@ -1980,9 +1980,13 @@ if test "$media_handler" = "gst"; then
        fi
     done
   fi
-  GNASH_PKG_FIND(gstinterfaces, [gst/gstinterface.h], [gstreamer interfaces library], gst_mixer_type_get_type, [0.10])
-  GNASH_PKG_FIND(gstapp, [gst/app/gstappsink.h], [gstreamer app library], call_gmon_start, [0.10])
+  GNASH_PKG_FIND(gstreamer_plugins_base, [gst/interfaces/probeprobe.h], [gstreamer interfaces library], gst_mixer_type_get_type, [0.10])
+  GNASH_PKG_FIND(gstreamer_app, [gst/app/gstappsink.h], [gstreamer app library], call_gmon_start, [0.10])
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
+  GNASH_PKG_FIND(gstpbutils, [gstreamer-0.10/gst/pbutils/install-plugins.h], [gstreamer PB Utils library], gst_install_plugins_supported, [0.10])
+  if test x"${has_gstreamer_plugins_base}" = xyes; then
+    GSTREAMER_LIBS="-lgstinterfaces-0.10 $(GSTREAMER_LIBS)"
+  fi
   if test x"${media_handler_specified}" = xfalse; then
     if test x"$GSTREAMER_LIBS" = x; then
        AC_MSG_WARN([No appropriate gstreamer library found, will try using ffmpeg.])
@@ -2001,28 +2005,6 @@ if test x"$media_handler" = x"ffmpeg"; then
      fi
   fi
 fi
-
-if test x"$media_handler" = x"gst"; then
-  AC_MSG_CHECKING([for modern pbutils])
-  save_cflags=$CFLAGS
-  CFLAGS=$GSTREAMER_CFLAGS
-  AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
-    GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-    has_gst_install_plugins_async='no')
-  AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
-    AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
-    has_gst_install_plugins_supported='no')
-  CFLAGS=$save_cflags
-  if test x$has_gst_install_plugins_async = xno -o x$has_gst_install_plugins_supported = xno; then
-    has_modern_gstpbutils='no'
-    AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
-  else
-    AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
-    AC_MSG_RESULT([ok])
-  fi
-fi
-
-
 
 if test x$build_cairo = xyes; then
   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
@@ -2841,6 +2823,11 @@ if test "$media_handler" = "gst"; then
       echo "                     Gstreamer can pop up a message prompting them to." >&4
       echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&4
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+    fi
+    if test x"$has_gstreamer_plugins_base" = "xno"; then
+    echo "                        Install it from http://www.gstreamer.net" >&3
+    echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
+      echo "                      or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
     fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3

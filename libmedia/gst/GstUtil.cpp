@@ -29,11 +29,11 @@
 
 #include "swfdec_codec_gst.h"
 
-#ifdef GST_HAS_MODERN_PBUTILS
+#ifdef HAVE_GSTREAMER_0_10_GST_PBUTILS_INSTALL_PLUGINS_H
 #include <gst/pbutils/pbutils.h>
 #include <gst/pbutils/missing-plugins.h>
 #include <gst/pbutils/install-plugins.h>
-#endif // GST_HAS_MODERN_PBUTILS
+#endif // HAVE_GSTREAMER_0_10_GST_PBUTILS_INSTALL_PLUGINS_H
 
 
 namespace gnash {
@@ -107,7 +107,7 @@ GstUtil::check_missing_plugins(GstCaps* caps)
         return true;
     }
 
-#ifdef GST_HAS_MODERN_PBUTILS
+#ifdef HAVE_GSTREAMER_0_10_GST_PBUTILS_INSTALL_PLUGINS_H
     gst_pb_utils_init();
 
 
@@ -140,7 +140,7 @@ GstUtil::check_missing_plugins(GstCaps* caps)
 #else
     log_error(_("Missing plugin, but automatic plugin installation not "
                 "available."));
-#endif
+#endif  // end of HAVE_GSTREAMER_0_10_GST_PBUTILS_INSTALL_PLUGINS_H
 
     return false;
 }
