@@ -2597,7 +2597,6 @@ popupHandlerAlt(GtkWidget *widget, GdkEvent *event)
 {
     GtkMenu *menu = GTK_MENU(widget);
     
-    log_debug("showMenuState @altHandler = %s", _showMenuState);
     
     if( !_showMenuState ) {
         if (event->type == GDK_BUTTON_PRESS) {
