@@ -48,7 +48,8 @@ public:
 
     const std::string& name() { return _name; };
 
-    bool connected() { return _connected; };
+//  Moved to lcshm class
+//  bool connected() { return _connected; };
     
     static void init(as_object& glob, const ObjectURI& uri);
 
@@ -60,7 +61,8 @@ private:
     /// no harm to call it again.
     std::string getDomain();
     
-    bool _connected;
+//  Moved to lcshm class	
+//  bool _connected;
     std::string _name;
 
     // The immutable domain of this LocalConnection_as, based on the 

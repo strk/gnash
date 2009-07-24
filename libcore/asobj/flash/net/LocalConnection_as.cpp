@@ -1,4 +1,5 @@
 // LocalConnection.cpp:  Connect two SWF movies & send objects, for Gnash.
+// LocalConnection.cpp:  Connect two SWF movies & send objects, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -99,11 +100,12 @@ namespace {
 ///
 LocalConnection_as::LocalConnection_as()
     :
-    as_object(getLocalConnectionInterface()),
-    _connected(false),
+    as_object(getLocalConnectionInterface()),    
     _domain(getDomain())
 {
     log_debug("The domain for this host is: %s", _domain);
+	setconnected(false);
+	
 }
 
 LocalConnection_as::~LocalConnection_as()
@@ -114,7 +116,7 @@ LocalConnection_as::~LocalConnection_as()
 void
 LocalConnection_as::close()
 {
-    _connected = false;
+    setconnected(false);
 #ifndef NETWORK_CONN
     closeMem();
 #endif
@@ -259,7 +261,7 @@ localconnection_connect(const fn_call& fn)
         ensureType<LocalConnection_as>(fn.this_ptr);
 
     // If already connected, don't try again until close() is called.
-    if (ptr->connected()) return false;
+    if (ptr->getconnected()) return false;
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(

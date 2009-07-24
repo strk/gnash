@@ -273,6 +273,11 @@ public:
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump();
+	
+	//Si
+	//Moved this from LocalConnection class to here
+	void setconnected(bool trueorfalse) { _connected=trueorfalse; return;  };
+	bool getconnected(){return _connected;};
     
 private:
     /// \var LcShm::_baseaddr.
@@ -295,7 +300,9 @@ private:
 	// This is the mutex that controls access to the sharedmemory
     boost::mutex        _localconnection_mutex;
 
-
+    //Si 
+	//Moved from LocalConnectoin class to here.
+    bool _connected;
 
 };
 

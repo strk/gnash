@@ -419,11 +419,11 @@ if (x1!=x2){
 	    DejaGnu.fail("statuses.length is not zero");
 	}
 
-	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),["String",7]);
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),["string",7]);
 	if (ret==true){
-		DejaGnu.pass("x1.connect('String',7) should be true.");
+		DejaGnu.pass("x1.connect('string',7) should be true.");
 	} else {
-	    DejaGnu.fail("x1.connect('String',7) shoulad be true!");
+	    DejaGnu.fail("x1.connect('string',7) shoulad be true!");
 	}	
 	if (statuses.length==0){
 		DejaGnu.pass("statuses.length is zero");
@@ -431,9 +431,22 @@ if (x1!=x2){
 	    DejaGnu.fail("statuses.length is not zero");
 	}
 
+	ret = Reflect.callMethod(x1,Reflect.field(x1,"connect"),["string"]);
+	if (ret==false){
+	DejaGnu.pass("x1.connect('string') is false since this con");
+	} else {
+	    DejaGnu.fail("x1.connect('string') should fail");
+	}
+	if (statuses.length==0){
+		DejaGnu.pass("statuses.length is zero");
+	} else {
+	    DejaGnu.fail("statuses.length is not zero");
+	}
+	x1.close();
+	
 	var ret:Bool = x1.connect("string");	
 	if (ret==true){
-	DejaGnu.pass("x1.connect('string') is true");
+	DejaGnu.pass("x1.connect('string') is true.");
 	} else {
 	    DejaGnu.fail("x1.connect('string') should be true");
 	}
@@ -442,7 +455,6 @@ if (x1!=x2){
 	} else {
 	    DejaGnu.fail("statuses.length is not zero");
 	}
-	x1.close();
 #end
 
 #if ( flash6 || flash7 || flash8 )

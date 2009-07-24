@@ -248,6 +248,8 @@ Listener::removeListener(const string &name)
                 item += len + strlen(item + len);
             }
             
+            
+            
             memset(item - len, 0, len);
             return true;
         }
@@ -461,7 +463,7 @@ LcShm::connect(const string& names)
     //GNASH_REPORT_FUNCTION;
 
     //log_debug(" The connect function is called");	
-	//log_debug(" The size of %s empty string is %d ",names, names.size()); 
+	log_debug(" The size of %s is %d ",names, names.size()); 
 	
 	if (names == "")
 		return false;
@@ -494,6 +496,9 @@ LcShm::connect(const string& names)
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
     addListener(names);
+	
+//	Make sure this one is already connected
+	setconnected(true);
 //	system("ipcs");
 
     return true;
@@ -532,18 +537,6 @@ LcShm::connect(key_t key)
     return true;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 /// \brief Put data in the memory segment
 ///		This puts data into the memory segment
 ///
@@ -570,7 +563,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 //     cout<<" The send function is called ! "<<endl;
 //     log_debug("Base address in 'send' is: 0x%x, 0x%x",(unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 			   
-	 if ( (unsigned int)Listener::getBaseAddress() == 0x0 )
+	 if ( Listener::getBaseAddress() == 0x0 )
 	       {
 		   log_debug("STOP! No memory allocated!! ");
 		   return;
@@ -732,7 +725,7 @@ LcShm::dump()
     }
 }
 
-} // end of gnash namespace
+} // end of amf namespace
 
 // local Variables:
 // mode: C++
