@@ -294,7 +294,7 @@ HTTPServer::processPostRequest(int fd)
     // NOTE: this is a "special" path we trap until we have real CGI support
     if ((getField("content-type") == "application/x-amf")
 	&& (getField("content-type") == "application/x-amf")) {
-#if 1
+#ifdef USE_CGIBIN
 	if (_filespec == "/echo/gateway") {
 	}
 	
