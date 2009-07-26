@@ -22,6 +22,8 @@ abs_top_builddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/network.all; pwd)
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
+HAXE_FLAGS = -cp $(srcdir) -cp $(top_srcdir)/testsuite/misc-haxe.all/classes.all
+
 CLEANFILES =  \
 	gnash-dbg.log \
 	site.exp.bak \
@@ -71,7 +73,8 @@ check_PROGRAMS = \
 
 check_SCRIPTS = \
 	http.swf \
-	rtmp.swf
+	rtmp.swf \
+	SharedObject_as.swf
 
 # if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 #   check_SCRIPTS += remotingTestRunner
@@ -149,6 +152,18 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 # endif
 # TEST_CASES += red5testRunner
 endif
+
+SUFFIXES = hx swf
+
+# build multiple output formats from the same test case. exit with failure if
+# the test case doesn't compile for v9, it's a test cases bug. Not all classes
+# support all versions, so in those cases justy ignore the errors as it's less
+# messy than testing for each test case to see if it supports that version.
+.hx.swf:
+	-@newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
+	$(HAXE) -swf-version 9 $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
+	-@newname=`echo $(@F) | sed -e 's:_as:_asv8:'`; \
+	$(HAXE) -swf-version 8  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
