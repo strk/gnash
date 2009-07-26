@@ -251,6 +251,7 @@ enum NamedStrings {
         PROP_WIDTH,
         PROP_X,
         PROP_Y,
+        PROP_ON_SYNC,
         INTERNAL_INTERFACES,
         INTERNAL_STACK_PARENT, // Any public property is unsafe
         INTERNAL_TYPE // The type name
