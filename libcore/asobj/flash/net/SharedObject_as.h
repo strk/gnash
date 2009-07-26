@@ -48,6 +48,14 @@ public:
     ///
     SharedObject_as* getLocal(const std::string& name, const std::string& root);
 
+    /// Return a remote shared object with given name
+    ///
+    /// @param persistance false
+    /// May return NULL if name is invalid or can't access the given root
+    ///
+    SharedObject_as* getRemote(const std::string& name, const std::string& uri,
+	const std::string& persistance);
+
     void markReachableResources() const;
 
     // Drop all library items

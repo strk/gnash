@@ -604,6 +604,67 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     return obj;
 }
 
+SharedObject_as*
+SharedObjectLibrary::getRemote(const std::string& objName,
+                               const std::string& uri,
+                               const std::string& persistance)
+{
+    assert (!objName.empty());
+
+    // Check that the name is valid; if not, return null
+    if (!validateName(objName)) return 0;
+
+    // The 'root' argument, otherwise known as localPath, specifies where
+    // in the SWF path the SOL should be stored. It cannot be outside this
+    // path.
+    std::string requestedPath;
+
+    std::ostringstream solPath;
+
+    URL url(uri);
+    
+    const std::string& key = url.path();
+
+    // If the shared object was already opened, use it.
+    SoLib::iterator it = _soLib.find(key);
+    if (it != _soLib.end()) {
+        log_debug("SharedObject %s already known, returning it", key);
+        return it->second;
+    }
+
+    log_debug("SharedObject %s not loaded. Loading it now", key);
+
+    // Otherwise create a new one and register to the lib
+    SharedObject_as* obj = new SharedObject_as;
+    _soLib[key] = obj;
+
+    obj->setObjectName(objName);
+
+    // Not persistance on either the client or the server
+    if (persistance == "false") {
+    }
+    // Persistance only on the server
+    if (persistance == "true") {
+    }
+    
+    boost::intrusive_ptr<as_object> data;
+    if (persistance[0] == '/') {
+        boost::intrusive_ptr<as_object> localdata = getLocal(objName, url.path());
+//         data = readSOL(_vm, url.path());
+
+#if 0
+        boost::intrusive_ptr<as_object> data = getRemote(objName, uri, persistance);
+        
+        /// Don't set to 0, or it will initialize a property.
+#endif
+        if (localdata) {
+            obj->setData(localdata.get());
+        }
+    }
+    
+    return obj;
+}
+
 void
 sharedobject_class_init(as_object& global, const ObjectURI& uri)
 {
@@ -798,7 +859,6 @@ sharedobject_flush(const fn_call& fn)
 as_value
 sharedobject_getLocal(const fn_call& fn)
 {
-
     int swfVersion = getSWFVersion(fn);
 
     as_value objNameVal;
@@ -838,13 +898,43 @@ sharedobject_getLocal(const fn_call& fn)
 as_value
 sharedobject_getRemote(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    int swfVersion = getSWFVersion(fn);
 
-    UNUSED(obj);
+    as_value objNameVal;
+    if (fn.nargs > 0) {
+        objNameVal = fn.arg(0);
+    }
+    
+    std::string objName = objNameVal.to_string_versioned(swfVersion);
+    if (objName.empty()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("SharedObject.getRemote(%s): %s", 
+                _("missing object name"));
+        );
+        as_value ret;
+        ret.set_null();
+        return ret;
+    }
 
-    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
-    return as_value();
+    std::string root;
+    std::string persistance;
+    if (fn.nargs > 1) {
+        root = fn.arg(1).to_string_versioned(swfVersion);
+        persistance = fn.arg(2).to_string_versioned(swfVersion);
+    }
+
+    log_debug("SO name:%s, root:%s, persitance: %s", objName, root, persistance);
+
+    VM& vm = getVM(fn);
+
+    SharedObject_as* obj = vm.getSharedObjectLibrary().getRemote(objName, root, persistance);
+
+    as_value ret(obj);
+    log_debug("SharedObject.getRemote returning %s", ret);
+    
+    return ret;
 }
 
 

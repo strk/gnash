@@ -530,6 +530,8 @@ HTTPRemotingHandler::advance()
                                 string_table::key methodKey;
                                 if ( methodName == "onResult" ) {
                                     methodKey = NSV::PROP_ON_RESULT;
+                                } else if ( methodName == "onSync" ) {
+                                    methodKey = NSV::PROP_ON_SYNC;
                                 } else if ( methodName == "onStatus" ) {
                                     methodKey = NSV::PROP_ON_STATUS;
                                 } else {
