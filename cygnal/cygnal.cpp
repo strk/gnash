@@ -166,6 +166,8 @@ static boost::mutex	alldone_mutex;
 static boost::condition	noclients;
 static boost::mutex	noclients_mutex;
 
+map<std::string, Handler *> handlers;
+
 static void
 usage()
 {

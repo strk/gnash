@@ -40,7 +40,7 @@
 #include "cque.h"
 #include "network.h"
 #include "element.h"
-#include "handler.h"
+// #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
 #include "GnashSleep.h"
@@ -72,7 +72,7 @@ namespace {
 
 CQue incoming;
 
-extern std::map<int, Handler *> handlers;
+// extern std::map<int, Handler *> handlers;
 
 const char *content_str[] = {
     "None",
@@ -200,7 +200,7 @@ RTMP::headerSize(boost::uint8_t header)
 
 RTMP::RTMP() 
     : _handshake(0),
-      _handler(0),
+//       _handler(0),
       _packet_size(0),
       _mystery_word(0),
       _timeout(1)
@@ -226,7 +226,7 @@ RTMP::~RTMP()
 //    GNASH_REPORT_FUNCTION;
     _properties.clear();
     delete _handshake;
-    delete _handler;
+//     delete _handler;
 
 //    delete _body;
 }

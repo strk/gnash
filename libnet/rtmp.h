@@ -26,7 +26,7 @@
 
 #include "amf.h"
 #include "element.h"
-#include "handler.h"
+// #include "handler.h"
 #include "network.h"
 #include "buffer.h"
 #include "rtmp_msg.h"
@@ -224,7 +224,7 @@ public:
     void addProperty(char *name, amf::Element &el);
     void addProperty(std::string &name, amf::Element &el);
     amf::Element &getProperty(const std::string &name);
-    void setHandler(Handler *hand) { _handler = hand; };
+//     void setHandler(Handler *hand) { _handler = hand; };
     int headerSize(boost::uint8_t header);
 
     rtmp_head_t *getHeader()    { return &_header; };
@@ -312,7 +312,7 @@ public:
   protected:
     AMFProperties _properties;
     amf::Buffer	*_handshake;
-    Handler	*_handler;
+//     Handler	*_handler;
     rtmp_head_t	_header;
     int         _packet_size;
     int         _mystery_word;

@@ -42,7 +42,7 @@
 #include "cque.h"
 #include "log.h"
 #include "network.h"
-#include "handler.h"
+// #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
 #include "diskstream.h"
@@ -70,7 +70,7 @@ static boost::mutex stl_mutex;
 namespace gnash
 {
 
-extern map<int, Handler *> handlers;
+// extern map<int, Handler *> handlers;
 
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
@@ -81,7 +81,7 @@ HTTP::HTTP()
     : _filetype(DiskStream::FILETYPE_HTML),
       _filesize(0),
       _keepalive(false),
-      _handler(0),
+//       _handler(0),
       _clientid(0),
       _index(0),
       _max_requests(0)
@@ -94,6 +94,7 @@ HTTP::HTTP()
 //    _status_codes(CONTINUE, status);
 }
 
+#if 0
 HTTP::HTTP(Handler *hand) 
     : _filetype(DiskStream::FILETYPE_HTML),
       _filesize(0),
@@ -103,10 +104,11 @@ HTTP::HTTP(Handler *hand)
       _max_requests(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    _handler = hand;
+//     _handler = hand;
     _version.major = 0;
     _version.minor = 0;
 }
+#endif
 
 HTTP::~HTTP()
 {

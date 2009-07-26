@@ -44,9 +44,10 @@
 #include "cque.h"
 #include "network.h"
 #include "dsodefs.h" //For DSOEXPORT.
+#include "proc.h"
 
 // _definst_ is the default instance name
-namespace gnash
+namespace cygnal
 {
 
 
@@ -138,7 +139,7 @@ public:
 //    size_t readPacket(int fd);
     
     // start the two thread handlers for the queues
-    bool DSOEXPORT start(Network::thread_params_t *args);
+    bool DSOEXPORT start(gnash::Network::thread_params_t *args);
 
 #if 0
     /// \brief Write a Buffer the network connection.
@@ -173,18 +174,19 @@ public:
     bool timetodie() { return _die; };
 
 private:
+    std::map<std::string, Proc *> _cgis;
     bool	_die;
     int		_netfd;
-    CQue	_incoming;
-    std::map<int, CQue>	_outgoing;
+    gnash::CQue	_incoming;
+    std::map<int, gnash::CQue>	_outgoing;
 };
 
 // This is the thread for all incoming network connections, which
 // has to be in C.
 extern "C" {
-    void netin_handler(Network::thread_params_t *args);
-    void netout_handler(Network::thread_params_t *args);
-    void start_handler(Network::thread_params_t *args);
+    void netin_handler(gnash::Network::thread_params_t *args);
+    void netout_handler(gnash::Network::thread_params_t *args);
+    void start_handler(gnash::Network::thread_params_t *args);
 }
 
 } // end of gnash namespace

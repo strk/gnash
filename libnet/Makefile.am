@@ -50,7 +50,6 @@ INCLUDES = \
 noinst_HEADERS = \
 	cque.h \
 	lirc.h \
-	handler.h \
 	http.h \
 	network.h \
 	netstats.h \
@@ -63,7 +62,6 @@ noinst_HEADERS = \
 
 libgnashnet_la_SOURCES = \
 	cque.cpp \
-	handler.cpp \
 	lirc.cpp \
 	http.cpp \
 	network.cpp \

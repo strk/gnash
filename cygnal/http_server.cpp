@@ -46,7 +46,7 @@
 #include "log.h"
 #include "crc.h"
 #include "network.h"
-#include "handler.h"
+//#include "handler.h"
 #include "utility.h"
 #include "buffer.h"
 #include "diskstream.h"
@@ -303,8 +303,8 @@ HTTPServer::processPostRequest(int fd)
 //  	string path = "/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin";
 	path += _filespec;
 	
-  	cgis.startCGI(_filespec, true, 1234);
- 	cgis.createClient("localhost", 1234);
+  	cgis.startCGI(_filespec, true, CGIBIN_PORT);
+ 	cgis.createClient("localhost", CGIBIN_PORT);
 	cgis.writeNet(*content);
 	boost::shared_ptr<amf::Buffer> reply = cgis.readNet();
 	writeNet(fd, *reply);
@@ -493,7 +493,7 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
     return _buffer;
 }
 
-#if 0
+#ifndef USE_CGIBIN
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<boost::shared_ptr<amf::Element > >

@@ -37,7 +37,7 @@
 #include "rtmp_client.h"
 #include "network.h"
 #include "element.h"
-#include "handler.h"
+// #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
 #include "GnashSleep.h"
@@ -56,7 +56,7 @@ extern const char *ping_str[];
 // The rcfile is loaded and parsed here:
 static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-extern map<int, Handler *> handlers;
+// extern map<int, Handler *> handlers;
 
 RTMPClient::RTMPClient()
     : _connected(false),

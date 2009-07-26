@@ -36,6 +36,7 @@
 #include "buffer.h"
 #include "utility.h"
 #include "dsodefs.h" //For DSOEXPORT.
+#include "handler.h"
 
 #include "rtmp.h"
 #include "http.h"
@@ -44,7 +45,7 @@ using namespace gnash;
 using namespace std;
 using namespace boost;
 
-namespace gnash
+namespace cygnal
 {
 
 map<int, Handler *> DSOEXPORT handlers;
