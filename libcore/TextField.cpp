@@ -1124,10 +1124,10 @@ TextField::format_text()
 		//if the record is in the section we want to show
 		if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
 			_textRecords[i].yOffset() - yoffset > 0) {
-			log_debug("adding _textRecord[%d] to visible lines", i);
+			//log_debug("adding _textRecord[%d] to visible lines", i);
 			_displayRecords.push_back(_textRecords[i]);
-			log_debug("and setting _displayRecords.back().yOffset to %f", _displayRecords.back().yOffset() - yoffset);
-			log_debug("the xOffset is %f", _displayRecords.back().xOffset());
+			//log_debug("and setting _displayRecords.back().yOffset to %f", _displayRecords.back().yOffset() - yoffset);
+			//log_debug("the xOffset is %f", _displayRecords.back().xOffset());
 			_displayRecords.back().setYOffset(_displayRecords.back().yOffset() - yoffset);
 		}
 	}
@@ -1193,7 +1193,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 	boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code, int& last_space_glyph,
 	int& last_line_start_record)
 {
-	log_debug("entering handleChar");
+	//log_debug("entering handleChar");
 	std::vector<int>::iterator linestartit = _line_starts.begin();
 	std::vector<int>::const_iterator linestartend = _line_starts.end();
 	
