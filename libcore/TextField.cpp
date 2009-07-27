@@ -1521,6 +1521,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
                     ge.advance = scale * rec.getFont()->get_advance(bullet, 
                         _embedFonts);
                     rec.addGlyph(ge); 
+					break;
 				}
 				// The font table holds up to 65535 glyphs. Casting
 				// from uint32_t would, in the event that the code
@@ -1621,6 +1622,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
 				log_debug(" wordWrap=true");
 #endif
+
 
 				// Insert newline if there's space or autosize != none
 
@@ -2999,7 +3001,7 @@ textfield_password(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    LOG_ONCE(log_unimpl("TextField.password"));
+    //LOG_ONCE(log_unimpl("TextField.password"));
 
     if (!fn.nargs)
     {

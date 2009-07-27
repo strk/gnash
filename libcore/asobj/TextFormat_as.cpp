@@ -294,7 +294,7 @@ textformat_tabStops(const fn_call& fn)
 	//~ int countComma = 0;
 	//~ int countSpace = 0;
 	//~ int countTab = 0;
-	//~ 
+	
 	//~ // Next check is to see whether there is a comma and a space in the 
 	//~ // array
 	//~ for (int i=0; i<strVal.length(); i++)
@@ -354,11 +354,11 @@ textformat_tabStops(const fn_call& fn)
 	//~ {
 		//~ ptr->tabStopsSet(tabStops);
 	//~ }
-	//~ 
-	//~ return ret;
 	
-	//~ LOG_ONCE( log_unimpl("TextFormat.tabStops") );
-	return as_value();
+	return ret;
+	//~ 
+	LOG_ONCE( log_unimpl("TextFormat.tabStops") );
+	//return as_value();
 }
 
 as_value
