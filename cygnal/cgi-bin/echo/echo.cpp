@@ -51,7 +51,7 @@ static bool netdebug = false;
 int
 main(int argc, char *argv[])
 {
-    int port = 1234;
+    int port = CGIBIN_PORT;
     bool done = false;
     
     dbglogfile.setLogFilename("echo-test.log");
@@ -252,5 +252,6 @@ usage (void)
          << _("  -h,  --help          Print this help and exit") << endl
          << _("  -v,  --verbose       Output verbose debug info") << endl
 	 << _("  -n,  --netdebug      Turn on net debugging messages") << endl
+	 << _("  -p,  --netdebug      port for network") << endl
          << endl;
 }
