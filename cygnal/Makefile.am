@@ -76,6 +76,7 @@ noinst_HEADERS = \
 	cygnal.h \
 	rtmp_server.h \
 	http_server.h \
+	handler.h \
 	proc.h \
 	crc.h
 
@@ -85,9 +86,15 @@ noinst_LTLIBRARIES = libcygnal.la
 cygnal_SOURCES = cygnal.cpp
 cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
-libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp  proc.cpp
-libcygnal_la_LIBADD = 
+libcygnal_la_SOURCES = \
+	crc.cpp \
+	cvm.cpp \
+	rtmp_server.cpp \
+	http_server.cpp \
+	proc.cpp \
+	handler.cpp
 
+libcygnal_la_LIBADD = 
 
 cygnalrc: cygnalrc.in Makefile
 	cat $(srcdir)/$@.in >$@
