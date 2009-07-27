@@ -98,11 +98,13 @@ class SharedObject_as {
 		DejaGnu.note("ERROR: " +e.code);
 	    }
 	};
-        x1.onSync = function(e):Void {
+        x1.onSync = function(list):Void {
 	    DejaGnu.note("Got onSync from "+rtmpuri);
+	    DejaGnu.note(list[0].code);
+	};
+
 //  	    DejaGnu.note(e.code);
 //  	    DejaGnu.note(e.description);
-	};
 #end
 	nc.connect(rtmpuri, "test");
 	DejaGnu.note("Connecting to "+rtmpuri);
