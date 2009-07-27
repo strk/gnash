@@ -1001,7 +1001,7 @@ namespace gst {
     VideoInputGst::webcamStop(GnashWebcamPrivate *webcam) {
         GstStateChangeReturn state;
         
-        gst_element_set_state (webcam->_pipeline, GST_STATE_NULL);
+        state = gst_element_set_state (webcam->_pipeline, GST_STATE_NULL);
         if (state != GST_STATE_CHANGE_FAILURE) {
             webcam->_pipelineIsPlaying = FALSE;
             return true;
