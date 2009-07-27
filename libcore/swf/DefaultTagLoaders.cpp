@@ -31,6 +31,7 @@
 #include "CSMTextSettingsTag.h"
 #include "DefineFontTag.h"
 #include "DefineButtonTag.h"
+#include "DefineScalingGridTag.h"
 #include "DefineTextTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
@@ -38,6 +39,7 @@
 #include "DoInitActionTag.h"
 #include "DefineEditTextTag.h"
 #include "SetBackgroundColorTag.h"
+#include "SetTabIndexTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
 #include "DefineButtonSoundTag.h"
@@ -180,7 +182,7 @@ addDefaultLoaders(TagLoadersTable& table)
     (SWF::SCRIPTLIMITS, ScriptLimitsTag::loader) //65
 
     // TODO: Fix this, but probably not critical.
-    (SWF::SETTABINDEX, fixme_loader) //66 
+    (SWF::SETTABINDEX, SetTabIndexTag::loader) //66 
 
     // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
     // Tamarin. Figure out which one is correct (possibly both are).
@@ -203,7 +205,7 @@ addDefaultLoaders(TagLoadersTable& table)
     // 77
     (SWF::METADATA, metadata_loader)
     // 78
-    (SWF::DEFINESCALINGGRID, fixme_loader)
+    (SWF::DEFINESCALINGGRID, DefineScalingGridTag::loader)
     // 83
     (SWF::DEFINESHAPE4, DefineShapeTag::loader)
     // 84
