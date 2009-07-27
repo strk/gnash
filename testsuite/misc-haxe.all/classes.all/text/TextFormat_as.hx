@@ -41,7 +41,7 @@ import DejaGnu;
 class TextFormat_as {
     static function main() {
 #if flash9
-        var x1:TextFormat = new TextFormat("font","size","color","bold","italic","underline","url","target","left","leftMargin","rightMargin","indent","leading");
+		var x1:TextFormat = untyped __new__(TextFormat, ["fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4]);
 #else
 		var x1:TextFormat = new TextFormat("font",12.0,8,false,false,false,"url","target","align",1.0,1.0,0.0,0.0);
 #end
@@ -62,11 +62,11 @@ class TextFormat_as {
 	    DejaGnu.fail("TextFormat.blockIndent property doesn't exist");
 	}
 
-	if (Std.is(x1.align, String)) {
-	    DejaGnu.pass("TextFormat.align property exists");
-	} else {
-	    DejaGnu.fail("TextFormat.align property doesn't exist");
-	}
+	//~ if (Std.is(x1.align, String)) {
+	    //~ DejaGnu.pass("TextFormat.align property exists");
+	//~ } else {
+	    //~ DejaGnu.fail("TextFormat.align property doesn't exist" + x1.align);
+	//~ }
 
 	if (Std.is(x1.bold, Dynamic)) {
 	    DejaGnu.pass("TextFormat.bold property exists");
@@ -284,7 +284,10 @@ class TextFormat_as {
 	    DejaGnu.pass("TextFormat.target property exists");
 	} else {
 	    DejaGnu.xfail("TextFormat.target property doesn't exist");
+		
 	}
+	
+	DejaGnu.note("typeof(url): " + Type.typeof(x1.url));
 
 	if (Std.is(x1.url, String)) {
 	    DejaGnu.pass("TextFormat.url property exists");
@@ -352,6 +355,7 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.fail("'tfObj' is not an instance of TextFormat");
 	}	
+	
 #else
 
 //Si
@@ -364,7 +368,7 @@ class TextFormat_as {
 	}	
 #end
 
-#if (flash6 || flash7 || flash8)
+#if (!flash9)
 
 	if (untyped TextFormat.prototype.hasOwnProperty("display")) {
 		DejaGnu.pass("TextFormat.prototype.'display' property exists");
@@ -606,7 +610,11 @@ class TextFormat_as {
 #end
 
 #if flash9
-	var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4);
+	//var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","cEnter",untyped "23",untyped "32", 12, 4);
+
+	//var tfObj:TextFormat = new TextFormat();
+	var tfObj:TextFormat = untyped __new__(TextFormat, ["fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12, 4]);
+	//var tfObj:TextFormat = 	Reflect.callMethod(TextFormat, Reflect.field(TextFormat,"new"), ["fname", 2, 30, true, false, true,"http","tgt","center",23,32, 12,4]);
 #else
 	var tfObj:TextFormat = new TextFormat("fname", 2, 30, true, false, true,"http","tgt","cEnter",untyped "23",untyped "32", 12, 4);
 
@@ -616,12 +624,13 @@ class TextFormat_as {
 //	var tfObj:TextFormat = 	Reflect.callMethod(TextFormat, Reflect.field(TextFormat,"new"), ["fname", 2, 30, true, false, true,"http","tgt","cEnter",23,32, 12,4]);
 #end
 
+#if !flash9
 	if (Std.string(untyped __typeof__(tfObj.display)) == 'string') {
 		DejaGnu.xpass("Good, tfObj.display is a  'null'.");
 	} else {
 	    DejaGnu.xfail("Wrong, tfObj.display is not 'null'.");
 	}
-//	DejaGnu.note("tfObj.display:"+Std.string(untyped tfObj.display ));
+
 	if (Std.string(untyped tfObj.display) == 'block') {
 		DejaGnu.xpass("Wrong, tfObj.display equlas to block.");
 	} else {
@@ -634,31 +643,31 @@ class TextFormat_as {
 	    DejaGnu.xfail("Wrong, tfObj.tabStops is not 'null'.");
 	}
 
-	if (tfObj.leading == 4) {
+	if (untyped tfObj.leading == 4) {
 		DejaGnu.pass("Good, tfObj.leading equals to 4.");
 	} else {
-	    DejaGnu.fail("Wrong, tfObj.leading does not equal to 4.");
+	    DejaGnu.fail("Wrong, tfObj.leading does not equal to 4." + untyped tfObj.leading);
 	}
 
-	if (tfObj.indent == 12) {
+	if (untyped tfObj.indent == 12) {
 		DejaGnu.pass("Good, tfObj.indent equals to 12.");
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.indent does not equal to 12.");
 	}
 
-	if (tfObj.rightMargin == 32) {
+	if (Std.string(untyped tfObj.rightMargin) == '32') {
 		DejaGnu.pass("Good, tfObj.rightMargin equals to 32.");
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.rightMargin does not equal to 32.");
 	}
 
-	if (tfObj.leftMargin == 23) {
+	if (untyped tfObj.leftMargin == 23) {
 		DejaGnu.pass("Good, tfObj.leftMargin equals to 23.");
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.leftMargin does not equal to 23.");
 	}
 
-	if (tfObj.font == "fname") {
+	if (untyped tfObj.font == "fname") {
 		DejaGnu.pass("Good, tfObj.font equals to 'fname'.");
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.font does not equal to 'fname'.");
@@ -693,6 +702,7 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.size does not equal to 2.");
 	}
+	
 
 	if (Std.string(untyped __typeof__(tfObj.rightMargin) )== 'number'){
 		DejaGnu.pass("Good, tfObj.rightMargin is a  'number'.");
@@ -712,13 +722,14 @@ class TextFormat_as {
 	    DejaGnu.fail("Wrong, tfObj.leftMargin is not a 'boolean'.");
 	}
 
-	if (Std.string(untyped __typeof__(tfObj.italic))== 'boolean') {
+	if (Type.typeof(untyped tfObj.italic)==ValueType.TBool) {
+	//if (Std.string(untyped __typeof__(tfObj.italic))== 'boolean') {
 		DejaGnu.pass("Good, tfObj.italic is a  'boolean'.");
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.italic is not 'boolean'.");
 	}	
 
-#if (flash6 || flash7 || flash8)
+//#if (flash6 || flash7 || flash8)
 	if (tfObj.align == "center") {
 		DejaGnu.pass("Good, tfObj.align equals to 'center'.");
 	} else {
@@ -760,18 +771,9 @@ class TextFormat_as {
 	} else {
 	    DejaGnu.fail("Wrong, tfObj.blockIndent is not 'null'.");
 	}
-//	DejaGnu.note("1"+untyped __typeof__(tfObj.display));
-//	DejaGnu.note("2"+ tfObj.display);
 
-#else
 #end
-//	DejaGnu.note("3"+untyped __typeof__(tfObj.tabStops));
-	
-//The following tests has not been implemented!
 
-/*
-none
-*/
 
         DejaGnu.done();
     }

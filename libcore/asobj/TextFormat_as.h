@@ -60,6 +60,19 @@ public:
 	const rgba& color() const { return _color; }
 	bool colorDefined() const { return _flags&DEFcolor; }
 
+	TextField::TextFormatDisplay display() const {return _display; }
+	bool displayDefined() const { return _flags&DEFdisplay; }
+	
+	std::vector<int> tabStops() const { return _tabStops; }
+	bool tabStopsDefined() const { return _flags&DEFtabStops; }
+	void tabStopsSet(const std::vector<int>& tabStops) { 
+		_tabStops.resize(tabStops.size());
+		for (int i=0;i<tabStops.size();++i)
+		{
+			_tabStops[i] = tabStops[i];
+		}
+		_flags |= DEFtabStops; 
+	}
 	/// \brief
 	/// Return an integer that indicates the indentation from the left
     /// margin to the first DisplayObject in the paragraph
@@ -116,6 +129,12 @@ public:
 	void colorSet(const rgba& x)      { _color = x; _flags |= DEFcolor; }
 	void indentSet(boost::uint16_t x)      { _indent = x; _flags |= DEFindent; }
 	void fontSet(const std::string& font) { _font=font; _flags |= DEFfont; }
+	void displaySet(TextField::TextFormatDisplay x) {
+		_display = x;
+		_flags |= DEFdisplay;
+	}
+	
+	void displaySet(const std::string& display);
 	
     void alignSet(TextField::TextAlignment x) {
         _align = x;
@@ -169,11 +188,13 @@ private:
 		DEFtabStops	=1<<13,
 		DEFtarget	=1<<14,
 		DEFurl		=1<<15,
-		DEFsize		=1<<16
+		DEFsize		=1<<16,
+		DEFdisplay  =1<<17
 	};
 
     // need at least 17 bit here... (1<<16)
-    boost::uint32_t _flags; 
+	boost::uint64_t _flags;
+    //boost::uint32_t _flags; 
 
 	/// A Boolean value that indicates whether the text is underlined.
 	bool _underline;
@@ -186,6 +207,8 @@ private:
 
 	// 
 	bool _bullet;
+	
+	TextField::TextFormatDisplay _display;
   
 	/// The alignment of the paragraph, represented as a string.
 	//
@@ -225,7 +248,7 @@ private:
 	boost::uint16_t	_pointSize;
 
 	///
-	int _tabStops;
+	std::vector<int> _tabStops;
 
 	/// The target window where the hyperlink is displayed. 
         /// If the target window is an empty string, the text is displayed in
@@ -242,3 +265,4 @@ private:
 } // end of gnash namespace
 
 #endif
+
