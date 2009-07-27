@@ -70,12 +70,13 @@ class SharedObject_as {
 	}
 	
 	var nc:NetConnection = new NetConnection();
-	rtmpuri = "http://"+hostname+":"+rtmptport+"/echo/gateway";
+	// The Adobe flash player only supports remoting with RTMP
+	rtmpuri = "rtmp://"+hostname+":"+rtmptport+"/fitcDemo";
 	
 #if flash9
-        var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, false);
+        var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, true);
 #else
-	var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, false);
+	var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, true);
 #end         
         if (Std.is(x1, SharedObject)) {
             DejaGnu.pass("SharedObject class exists");
@@ -84,16 +85,26 @@ class SharedObject_as {
         }
         DejaGnu.note("SharedObject type is "+Type.typeof(x1));
 
-	var ns:NetStream = new NetStream(nc);
+// 	var ns:NetStream = new NetStream(nc);
 #if flash9
 	nc.addEventListener(NetStatusEvent.NET_STATUS, ncOnStatus);
 #else
-        nc.onStatus = function(e):Void {
+	nc.setID = function(id) {
+	    DejaGnu.note("Got a setID() from "+rtmpuri);
+	}
+        x1.onStatus = function(e):Void {
 	    DejaGnu.note("Got onStatus from "+rtmpuri);
- 	    DejaGnu.note(e.info.code);//"NetConnection.Connect.Success" or
+ 	    if (e.level == "error") {
+		DejaGnu.note("ERROR: " +e.code);
+	    }
+	};
+        x1.onSync = function(e):Void {
+	    DejaGnu.note("Got onSync from "+rtmpuri);
+//  	    DejaGnu.note(e.code);
+//  	    DejaGnu.note(e.description);
 	};
 #end
-	nc.connect(rtmpuri);
+	nc.connect(rtmpuri, "test");
 	DejaGnu.note("Connecting to "+rtmpuri);
 
 
@@ -171,7 +182,7 @@ class SharedObject_as {
 #if flash9
     public static function ncOnStatus(evt:NetStatusEvent):Void {
 	DejaGnu.note("Got NC onStatus from "+rtmpuri);
-	DejaGnu.note(evt.info.code);//"NetConnection.Connect.Success" or
+//	DejaGnu.note(evt.info.code);//"NetConnection.Connect.Success" or
 // 	    "NetStream.Publish.Start" etc.
 // 		if( e.info.code == "NetConnection.Connect.Success")
 // 		    {
