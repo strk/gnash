@@ -164,8 +164,8 @@ int main () {
                 g_print("    %s (%s)\n", vidVector[i]->deviceName, vidVector[i]->deviceType);
             }
         }
-        g_print("\nGnash interacts with v4l2 sources better than v4l sources, thus they");
-        g_print("\nwill not be printed in the list below.\n");
+        g_print("\nGnash interacts with v4l2 sources better than v4l sources, thus the");
+        g_print("\nv4l sources will not be printed in the list below.\n");
         g_print("\nFound %d video devices: \n\n", (numdevs - numDuplicates));
         gint counter = 0;
         for (i = 0; i < numdevs; ++i)

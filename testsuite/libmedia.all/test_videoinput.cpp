@@ -256,14 +256,26 @@ static void test_client()
     
     //end of setup tests, now startup the webcamPipeline, run for a few seconds
     //and then make sure there is a file present after running
-    vig.webcamPlay(webcam);
+    result = vig.webcamPlay(webcam);
+    if (result != true) {
+        runtest.fail("webcamPlay() function reported an error");
+    } else {
+        runtest.pass("webcamPlay() function reported no errors");
+    }
+    
+    
     if (webcam->_pipelineIsPlaying != true) {
         runtest.fail("the _pipelineIsPlaying variable isn't being set");
     } else {
         runtest.pass("the _pipelineIsPlaying variable is properly set");
     }
     sleep(5);
-    vig.webcamStop(webcam);
+    result = vig.webcamStop(webcam);
+    if (result != true) {
+        runtest.fail("webcamStop() function reported an error");
+    } else {
+        runtest.pass("webcamStop() function reported no errors");
+    }
 
     struct stat st;
     std::string file = "./vidoutput.ogg";

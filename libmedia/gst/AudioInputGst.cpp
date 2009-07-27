@@ -485,7 +485,7 @@ namespace gst {
         }
     }
     
-    void
+    bool
     AudioInputGst::audioPlay(GnashAudioPrivate *audio) {
         GstStateChangeReturn state;
         GstBus *bus;
@@ -496,25 +496,30 @@ namespace gst {
         bus = gst_pipeline_get_bus (GST_PIPELINE (audio->_pipeline));
         ret = gst_bus_add_watch (bus, audio_bus_call, audio);
         gst_object_unref (bus);
-
-        //declare clock variables to record time (mainly useful in debug)
-        GstClockTime tfthen, tfnow;
-        GstClockTimeDiff diff;
         
-        tfthen = gst_util_get_timestamp ();
+        //tfthen = gst_util_get_timestamp ();
         state = gst_element_set_state (audio->_pipeline, GST_STATE_PLAYING);
         
-        if (state == GST_STATE_CHANGE_SUCCESS) {
+        if (state != GST_STATE_CHANGE_FAILURE) {
             audio->_pipelineIsPlaying = true;
+            return true;
+        } else {
+            return false;
         }
+    }
+    
+    bool
+    AudioInputGst::audioStop(GnashAudioPrivate *audio) {
+        GstStateChangeReturn state;
         
-        loop = audio->_loop;
-        g_print("running (ctrl-c in terminal to quit).....\n");
-        g_main_loop_run(loop);
-        g_print("main loop done...\n");
-        tfnow = gst_util_get_timestamp ();
-        diff = GST_CLOCK_DIFF (tfthen, tfnow);
-        g_print(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
+        state = gst_element_set_state (audio->_pipeline, GST_STATE_NULL);
+        
+        if (state != GST_STATE_CHANGE_FAILURE) {
+            audio->_pipelineIsPlaying = false;
+            return true;
+        } else {
+            return false;
+        }
     }
     
     int
@@ -533,11 +538,7 @@ namespace gst {
         getSelectedCaps(devselect);
         
         return devselect;
-    } /*             
-        //debug
-        //g_print("starting pipeline....\n");
-        audioPlay(audio);
-    } */
+    }
 
 } //gst namespace
 } //media namespace

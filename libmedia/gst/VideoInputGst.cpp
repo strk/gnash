@@ -902,7 +902,7 @@ namespace gst {
     }
     
     //start the pipeline and run the g_main_loop
-    void
+    bool
     VideoInputGst::webcamPlay(GnashWebcamPrivate *webcam) {
         GstStateChangeReturn state;
         GstBus *bus;
@@ -912,31 +912,26 @@ namespace gst {
             bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));
             ret = gst_bus_add_watch (bus, bus_call, webcam);
             gst_object_unref (bus);
-
-            //declare clock variables to record time (mainly useful in debug)
-            GstClockTime tfthen, tfnow;
-            GstClockTimeDiff diff;
             
-            tfthen = gst_util_get_timestamp ();
+            //tfthen = gst_util_get_timestamp ();
             state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
             
             if (state != GST_STATE_CHANGE_FAILURE) {
                 webcam->_pipelineIsPlaying = true;
             }
-            
-            //loop = webcam->_loop;
-            //log_trace("running (ctrl-c in terminal to quit).....\n");
-            //g_main_loop_run(loop);
-            //log_trace("main loop done...\n");
-            //tfnow = gst_util_get_timestamp ();
-            //diff = GST_CLOCK_DIFF (tfthen, tfnow);
-            //log_trace(("Execution ended after %" G_GUINT64_FORMAT " ns.\n"), diff);
     }
     
-    void
+    bool
     VideoInputGst::webcamStop(GnashWebcamPrivate *webcam) {
-        gst_element_set_state (webcam->_pipeline, GST_STATE_NULL); 
-        webcam->_pipelineIsPlaying = FALSE;
+        GstStateChangeReturn state;
+        
+        gst_element_set_state (webcam->_pipeline, GST_STATE_NULL);
+        if (state != GST_STATE_CHANGE_FAILURE) {
+            webcam->_pipelineIsPlaying = FALSE;
+            return true;
+        } else {
+            return false;
+        }
     }
 } //gst namespace
 } //media namespace
