@@ -605,9 +605,15 @@ public:
     /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
     ///             created previously in a call to transferToPrivate()
     ///
-    void webcamPlay(GnashWebcamPrivate *webcam);
+    /// @return True if the pipeline was started correctly, false otherwise.
+    bool webcamPlay(GnashWebcamPrivate *webcam);
     
-    void webcamStop(GnashWebcamPrivate *webcam);
+    /// \brief Function stops the pipeline designed earlier in code execution.
+    ///
+    /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
+    ///   created previously in a call to transferToPrivate()
+    /// @return True if the pipeline was stopped correctly, false otherwise.
+    bool webcamStop(GnashWebcamPrivate *webcam);
     
     /// \brief Accessor which returns the vid_vect private variable in the
     ///       VideoInputGst class.

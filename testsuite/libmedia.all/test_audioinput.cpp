@@ -21,16 +21,8 @@
 
 #ifdef HAVE_DEJAGNU_H
 
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <sys/types.h>
 #include <sys/stat.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <iostream>
-#include <string>
 #include <cstdio>
 
 #include "dejagnu.h"
@@ -44,8 +36,6 @@ using namespace gnash;
 using namespace media;
 using namespace gst;
 using namespace std;
-
-static void usage (void);
 
 static TestState runtest;
 
@@ -177,6 +167,37 @@ static void test_client()
     } else {
         runtest.pass("makeAudioSourceSaveLink() function reported no errors");
     }
+    
+    ok = aud.audioPlay(audio);
+    if (ok != true) {
+        runtest.fail("audioPlay() function reported an error");
+    } else {
+        runtest.pass("audioPlay() function reported no errors");
+    }
+    
+    //sleep to record a few seconds of audio (from mic or test source)
+    sleep(5);
+    
+    ok = aud.audioStop(audio);
+    if (ok != true) {
+        runtest.fail("audioStop() function reported an error");
+    } else {
+        runtest.pass("audioStop() function reported no errors");
+    }
+    
+    struct stat st;
+    std::string file = "./audioOut.ogg";
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("audioOut.ogg file is in testsuite/libmedia.all");
+        if (st.st_blocks == 0) {
+            runtest.fail("the output file is there, but there's no data in it!");
+        } else {
+            runtest.pass("the output file has data in it");
+        }
+    } else {
+        runtest.fail("there's no output video file in testsuite/libmedia.all");
+    }
+    
 }
 
 

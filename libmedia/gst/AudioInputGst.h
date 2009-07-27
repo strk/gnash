@@ -362,7 +362,15 @@ public:
     /// parameter.
     /// @param audio A pointer to the GnashAudioPrivate class structure containing
     ///   the pipeline to start up.
-    void audioPlay(GnashAudioPrivate *audio);
+    /// @return True if the pipeline started to play correctly, false otherwise.
+    bool audioPlay(GnashAudioPrivate *audio);
+    
+    /// This function stops the audio pipeline created earlier in code execution.
+    /// 
+    /// @param audio A pointer tot he GnashAudioPrivate class structure containing
+    ///  the pipeline to start up.
+    /// @return True if the pipeline successfully stopped, false otherwise.
+    bool audioStop(GnashAudioPrivate *audio);
     
     /// \brief Function returns the total number of devices detected (useful in
     ///  iterating through the _audioVect vector.
