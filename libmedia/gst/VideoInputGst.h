@@ -578,6 +578,15 @@ public:
     ///        False otherwise.
     gboolean webcamMakeVideoDisplayLink(GnashWebcamPrivate *webcam);
     
+    /// \brief Function breaks the link between the _videoDisplayBin and the
+    ///    _videoDisplayQueue in the main bin
+    ///
+    /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
+    ///            created previously in a call to transferToPrivate()
+    ///
+    /// @return True if the link was successfully broken, false otherwise
+    gboolean webcamBreakVideoDisplayLink(GnashWebcamPrivate *webcam);
+    
     /// \brief Function links the videoSaveBin to the videoSaveQueue in the
     ///   main bin.
     /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
@@ -586,6 +595,13 @@ public:
     /// @return True if the link to the videoSaveQueue was successfully, false
     ///    otherwise.
     gboolean webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam);
+
+    /// \brief Function breaks link between the videoSaveBin and the videoSaveQueue
+    ///   in the main bin.
+    /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
+    ///             created previously in a call to transferToPrivate()
+    /// @return True if the link was succesfully broken, false otherwise
+    gboolean webcamBreakVideoSaveLink(GnashWebcamPrivate *webcam);
 
     /// \brief Function creates the save bin. For more information on pipeline
     ///       implementation and this function in general see the definition of
@@ -606,14 +622,14 @@ public:
     ///             created previously in a call to transferToPrivate()
     ///
     /// @return True if the pipeline was started correctly, false otherwise.
-    bool webcamPlay(GnashWebcamPrivate *webcam);
+    gboolean webcamPlay(GnashWebcamPrivate *webcam);
     
     /// \brief Function stops the pipeline designed earlier in code execution.
     ///
     /// @param webcam A pointer to the GnashWebcamPrivate webcam structure
     ///   created previously in a call to transferToPrivate()
     /// @return True if the pipeline was stopped correctly, false otherwise.
-    bool webcamStop(GnashWebcamPrivate *webcam);
+    gboolean webcamStop(GnashWebcamPrivate *webcam);
     
     /// \brief Accessor which returns the vid_vect private variable in the
     ///       VideoInputGst class.

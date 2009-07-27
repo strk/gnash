@@ -779,11 +779,44 @@ namespace gst {
         }
     }
     
+    //break the link that displays the webcam video to the screen
+    gboolean
+    VideoInputGst::webcamBreakVideoDisplayLink(GnashWebcamPrivate *webcam) {
+        if (webcam->_pipelineIsPlaying == true) {
+            GstStateChangeReturn state;
+            state = gst_element_set_state(webcam->_pipeline, GST_STATE_NULL);
+            if (state != GST_STATE_CHANGE_FAILURE) {
+                webcam->_pipelineIsPlaying = false;
+            } else {
+                return false;
+            }
+        }
+        
+        gboolean ok;
+        GstPad *videoDisplayQueueSrc, *videoDisplayBinSink;
+        
+        videoDisplayQueueSrc = gst_element_get_pad(webcam->_webcamMainBin,
+            "video_display_queue_src");
+        videoDisplayBinSink = gst_element_get_pad(webcam->_videoDisplayBin,
+            "sink");
+        
+        ok = gst_pad_unlink(videoDisplayQueueSrc, videoDisplayBinSink);
+        
+        if (ok != true) {
+            log_error("%s: the unlinking of the pads failed", __FUNCTION__);
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     //make link to saveQueue in main bin
     gboolean
     VideoInputGst::webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam) {
-        gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
-        
+        if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_save_bin") == NULL) {
+            gst_bin_add(GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
+        }
+
         //linking
         GstPad *video_save_queue_src, *video_save_sink;
         
@@ -799,6 +832,46 @@ namespace gst {
             log_error("%s: something went wrong in the make_video_display_link function",
                 __FUNCTION__);
             return false;
+        }
+    }
+    
+    //break link to saveQueue in main bin
+    gboolean
+    VideoInputGst::webcamBreakVideoSaveLink(GnashWebcamPrivate *webcam) {
+        if (webcam->_pipelineIsPlaying == true) {
+            GstStateChangeReturn state;
+            state = gst_element_set_state(webcam->_pipeline, GST_STATE_NULL);
+            if (state != GST_STATE_CHANGE_FAILURE) {
+                webcam->_pipelineIsPlaying = false;
+            } else {
+                return false;
+            }
+        }
+        gboolean ok;
+        GstPad *videoSaveQueueSrc, *videoSaveSink;
+        GstStateChangeReturn state;
+        videoSaveQueueSrc = gst_element_get_pad(webcam->_webcamMainBin,
+            "save_queue_src");
+        videoSaveSink = gst_element_get_pad(webcam->_videoSaveBin, "sink");
+        
+        ok = gst_pad_unlink(videoSaveQueueSrc, videoSaveSink);
+        if (ok != true) {
+            log_error("%s: unlink failed", __FUNCTION__);
+            return false;
+        } else {
+            state = gst_element_set_state(webcam->_videoSaveBin, GST_STATE_NULL);
+            if (state != GST_STATE_CHANGE_FAILURE) {
+                ok = gst_bin_remove(GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
+                if (ok != true) {
+                    log_error("%s: couldn't remove saveBin from pipeline", __FUNCTION__);
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                log_error("%s: videoSaveBin state change failed", __FUNCTION__);
+                return false;
+            }
         }
     }
     
@@ -853,7 +926,7 @@ namespace gst {
         gst_bin_add_many (GST_BIN (webcam->_videoSaveBin), video_save_csp, 
                 video_save_rate, video_save_scale, video_enc, mux, webcam->_videoFileSink,
                 NULL);
-                      
+
         //add ghostpad
         pad = gst_element_get_pad (video_save_csp, "sink");
         gst_element_add_pad (webcam->_videoSaveBin, gst_ghost_pad_new ("sink", pad));
@@ -902,7 +975,7 @@ namespace gst {
     }
     
     //start the pipeline and run the g_main_loop
-    bool
+    gboolean
     VideoInputGst::webcamPlay(GnashWebcamPrivate *webcam) {
         GstStateChangeReturn state;
         GstBus *bus;
@@ -918,10 +991,13 @@ namespace gst {
             
             if (state != GST_STATE_CHANGE_FAILURE) {
                 webcam->_pipelineIsPlaying = true;
+                return true;
+            } else {
+                return false;
             }
     }
     
-    bool
+    gboolean
     VideoInputGst::webcamStop(GnashWebcamPrivate *webcam) {
         GstStateChangeReturn state;
         
