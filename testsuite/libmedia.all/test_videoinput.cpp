@@ -23,6 +23,7 @@
 
 #include <string>
 #include <cstdio>
+#include <unistd.h>
 #include <sys/stat.h>
 
 #include "dejagnu.h"
@@ -263,6 +264,7 @@ static void test_client()
         runtest.pass("webcamPlay() function reported no errors");
     }
     
+    g_print("        NOTE: the output window will close automatically\n");
     
     if (webcam->_pipelineIsPlaying != true) {
         runtest.fail("the _pipelineIsPlaying variable isn't being set");
@@ -279,6 +281,7 @@ static void test_client()
 
     struct stat st;
     std::string file = "./vidoutput.ogg";
+    
     if (stat(file.c_str(), &st) == 0) {
         runtest.pass("vidoutput.ogg file is in testsuite/libmedia.all");
         if (st.st_blocks == 0) {
@@ -288,6 +291,111 @@ static void test_client()
         }
     } else {
         runtest.fail("there's no output video file in testsuite/libmedia.all");
+    }
+    
+    //delete the old vidoutput.ogg file
+    if (unlink(file.c_str()) == 0) {
+        g_print("        NOTE: deleting output file...\n");
+    }
+    
+    result = vig.webcamBreakVideoDisplayLink(webcam);
+    if (result != true) {
+        runtest.fail("the webcamBreakVideoDisplayLink() function reported an error");
+    } else {
+        runtest.pass("the webcamBreakVideoDisplayLink() function reported no errors");
+    }
+    
+    result = vig.webcamPlay(webcam);
+    if (result != true) {
+        runtest.fail("webcamPlay() reported errors after breaking display link");
+    } else {
+        runtest.pass("webcamPlay() still works after breaking display link");
+    }
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = vig.webcamStop(webcam);
+    if (result != true) {
+        runtest.fail("webcamStop() reported errors after breaking display link");
+    } else {
+        runtest.pass("webcamStop() reported success after breaking display link");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("the a new vidoput.ogg file was created");
+    } else {
+        runtest.fail("there's no new vidoutput.ogg file!");
+    }
+    
+    //delete the old vidoutput.ogg file
+    if (unlink(file.c_str()) == 0) {
+        g_print("        NOTE: deleting output file...\n");
+    }
+    
+    result = vig.webcamBreakVideoSaveLink(webcam);
+    if (result != true) {
+        runtest.fail("breaking the videoSaveLink failed");
+    } else {
+        runtest.pass("breaking the videoSaveLink was successful");
+    }
+    
+    result = vig.webcamMakeVideoDisplayLink(webcam);
+    if (result != true) {
+        runtest.fail("making videosrc -> display link failed");
+    } else {
+        runtest.pass("making videosrc -> display link succeeded");
+    }
+
+    result = vig.webcamPlay(webcam);
+    if (result != true) {
+        runtest.fail("webcamPlay() reported errors after relinking display");
+    } else {
+        runtest.pass("webcamPlay() still works after relinking display");
+    }
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = vig.webcamStop(webcam);
+    if (result != true) {
+        runtest.fail("webcamStop() reported errors after breaking display link");
+    } else {
+        runtest.pass("webcamStop() reported success after breaking display link");
+    }
+
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.fail("a vidoutput.ogg file was created, and it shouldn't be");
+    } else {
+        runtest.pass("no vidoutput.ogg file wasn't created");
+    }
+    
+    result = vig.webcamMakeVideoSaveLink(webcam);
+    if (result != true) {
+        runtest.fail("webcamMakeVideoSaveLink() reported an error");
+    } else {
+        runtest.pass("webcamMakeVideoSaveLink() reported no errors");
+    }
+    
+    result = vig.webcamPlay(webcam);
+    if (result != true) {
+        runtest.fail("webcamPlay() reported errors");
+    } else {
+        runtest.pass("webcamPlay() reported no errors");
+    }
+    
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = vig.webcamStop(webcam);
+    if (result != true) {
+        runtest.fail("webcamStop() reported errors after breaking display link");
+    } else {
+        runtest.pass("webcamStop() reported success after breaking display link");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("the a new vidoput.ogg file was created");
+    } else {
+        runtest.fail("there's no new vidoutput.ogg file!");
     }
 }
 
