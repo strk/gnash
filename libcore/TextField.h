@@ -20,9 +20,12 @@
 
 #include "InteractiveObject.h" // for inheritance
 #include "styles.h" // for line_style
+#include "fill_style.h"
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
+
+#include <vector>
 
 // Forward declarations
 namespace gnash {
@@ -49,6 +52,13 @@ public:
 		ALIGN_JUSTIFY
 	};
 
+	/// Text format display values
+	enum TextFormatDisplay
+	{
+		BLOCK = 0,
+		INLINE = 1
+	};
+	
 	/// Possible autoSize values
 	enum AutoSizeValue {
 
@@ -449,8 +459,28 @@ public:
 	{
 		return _underlined;
 	}
+	
+	TextFormatDisplay getDisplay() const
+	{ 
+		return _display;
+	}
+	
+	bool getBullet() const
+	{
+		return _bullet;
+	}
+	
+	std::vector<int> getTabStops() const
+	{
+		return _tabStops;
+	}
 
 	void setUnderlined(bool v);
+	void setTabStops(std::vector<int> tabStops);
+	void setBullet(bool b);
+	void setURL(std::string url);
+	void setTarget(std::string target);
+	void setDisplay(TextFormatDisplay display);
 
 	const rect& getTextBoundingBox() const
 	{
@@ -513,6 +543,11 @@ private:
 	/// Move viewable lines based on m_cursor
 	void changeTopVisibleLine(int current_line);
 	
+	/// Handles a new line, this will be called several times, so this
+	/// will hopefully make code cleaner
+	void newLine(std::wstring::const_iterator& it, boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec,
+					int& last_space_glyph, int& last_line_start_record, float div);
+					
 	/// De-reference and do appropriate action for character iterator
 	void handleChar(std::wstring::const_iterator& it, const std::wstring::const_iterator& e,
 		boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
@@ -590,6 +625,11 @@ private:
 	TextRecords _textRecords;
 	TextRecords _displayRecords;
 	bool _underlined;
+	bool _bullet;
+	std::string _url;
+	std::string _target;
+	TextFormatDisplay _display;
+	std::vector<int> _tabStops;
 
 	boost::uint16_t _leading;
 

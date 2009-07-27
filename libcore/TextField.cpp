@@ -52,6 +52,8 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
+#include <stdlib.h>
+#include <typeinfo>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
@@ -117,6 +119,11 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _tag(&def),
     _textDefined(def.hasText()),
     _underlined(false),
+	_bullet(false),
+    _url(""),
+    _target(""),
+    _tabStops(),
+	_display(),
     _leading(def.leading()),
     _alignment(def.alignment()),
     _indent(def.indent()), 
@@ -175,6 +182,11 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     InteractiveObject(parent, parent ? 0 : -1),
     _textDefined(false),
     _underlined(false),
+	_bullet(false),
+    _url(""),
+    _target(""),
+    _tabStops(),
+	_display(),
     _leading(0),
     _alignment(ALIGN_LEFT),
     _indent(0), 
@@ -563,6 +575,10 @@ TextField::on_event(const event_id& ev)
                                                         _text.size();
                     format_text();
                     break;
+					
+				case key::ENTER:
+					if ( !multiline() )
+						break;
 
                 default:
                     wchar_t t = static_cast<wchar_t>(
@@ -969,7 +985,7 @@ TextField::setFont(boost::intrusive_ptr<const Font> newfont)
 void
 TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
 {
-    // tab (ASCII HT)
+     // tab (ASCII HT)
     const int space = 32;
     int index = rec.getFont()->get_glyph_index(space, _embedFonts); 
     if ( index == -1 )
@@ -981,17 +997,46 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
                 rec.getFont()->name());
         );
     }
-    else
-    {
-        SWF::TextRecord::GlyphEntry ge;
-        ge.index = index;
-        ge.advance = scale * rec.getFont()->get_advance(index, 
-                _embedFonts);
+    //~ else
+    //~ {
+		//~ std::vector<int> tabStops;
+		//~ tabStops = _tabStops;
+		//~ 
+		//~ std::sort(_tabStops.begin(), _tabStops.end()); 
+//~ 
+		//~ int tab = 0;
+		//~ if ( !_tabStops.empty() )
+		//~ {
+			//~ tab = _tabStops.back();
+			//~ 
+			//~ for (int i = 0; i < tabStops.size(); ++i)
+			//~ {					
+				//~ if (tabStops[i] > x)
+				//~ {
+					//~ if((tabStops[i] - x) < tab) 
+					//~ {
+						//~ tab = tabStops[i] - x;
+					//~ }
+				//~ }
+				//~ SWF::TextRecord::GlyphEntry ge;
+				//~ ge.index = index;
+				//~ ge.advance = scale * tab;
+				//~ rec.addGlyph(ge);
+				//~ x+=ge.advance;
+			//~ }
+		//~ }
+		else
+		{
+			SWF::TextRecord::GlyphEntry ge;
+			ge.index = index;
+			ge.advance = scale * rec.getFont()->get_advance(index, 
+					_embedFonts);
 
-        const int tabstop = 8;
-        rec.addGlyph(ge, tabstop);
-        x += ge.advance * tabstop;
-    }
+			const int tabstop = 8;
+			rec.addGlyph(ge, tabstop);
+			x += ge.advance * tabstop;
+		}
+	//}
 }
 
 void
@@ -1065,6 +1110,40 @@ TextField::format_text()
             std::max(0, leftMargin + indent + blockIndent));
     rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
     rec.setTextHeight(fontHeight);
+	
+	// BULLET CASE:
+                
+    // First, we indent 10 spaces, and then place the bullet
+    // character (in this case, an asterik), then we pad it
+    // again with 10 spaces
+    // Note: this works only for additional lines of a 
+    // bulleted list, so that is why there is a bullet format
+    // in the beginning of format_text()
+    if ( _bullet )
+    {
+        int space = rec.getFont()->get_glyph_index(
+                    32, _embedFonts);
+        SWF::TextRecord::GlyphEntry ge;
+        ge.index = space;
+        ge.advance = scale * rec.getFont()->get_advance(space,
+                    _embedFonts);
+        rec.addGlyph(ge, 10);
+
+        // We use an asterik instead of a bullet
+        int bullet = rec.getFont()->get_glyph_index(
+                     42, _embedFonts);
+        ge.index = bullet;
+        ge.advance = scale * rec.getFont()->get_advance(bullet, 
+                     _embedFonts);
+        rec.addGlyph(ge);
+        
+        space = rec.getFont()->get_glyph_index(
+                    32, _embedFonts);
+        ge.index = space;
+        ge.advance = scale * rec.getFont()->get_advance(space,
+                    _embedFonts);
+		rec.addGlyph(ge, 9);
+	}
 
     boost::int32_t x = static_cast<boost::int32_t>(rec.xOffset());
     boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
@@ -1182,6 +1261,87 @@ TextField::changeTopVisibleLine(int current_line)
 }
 
 void
+TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec,
+					int& last_space_glyph, int& last_line_start_record, float div)
+{
+
+	// newline.
+	std::vector<int>::iterator linestartit = _line_starts.begin();
+	std::vector<int>::const_iterator linestartend = _line_starts.end();
+	
+	float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float fontDescent = _font->descent() * scale; 
+    float fontLeading = _font->leading() * scale;
+	float leading = getLeading();
+    leading += fontLeading * scale; // not sure this is correct...
+	
+	// Close out this stretch of glyphs.
+	_textRecords.push_back(rec);
+	align_line(getTextAlignment(), last_line_start_record, x);
+
+	// Expand bounding box to include last column of text ...
+	if ( _autoSize != autoSizeNone ) 
+	{
+		_bounds.expand_to_point(x + PADDING_TWIPS,
+			y + PADDING_TWIPS);
+	}
+
+	// new paragraphs get the indent.
+	x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
+	y += div * (getFontHeight() + leading); 			
+			
+	// Start a new record on the next line. Other properties of the
+	// TextRecord should be left unchanged.
+	rec.clearGlyphs();
+	rec.setXOffset(x);
+	rec.setYOffset(y);
+
+	last_space_glyph = -1;
+	last_line_start_record = _textRecords.size();
+						 
+	linestartit = _line_starts.begin();
+	linestartend = _line_starts.end();
+	//Fit a line_start in the correct place
+	while ( linestartit < linestartend && *linestartit < it-_text.begin())
+	{
+		linestartit++;
+	}
+	_line_starts.insert(linestartit, it-_text.begin());
+
+	// BULLET CASE:
+                
+    // First, we indent 10 spaces, and then place the bullet
+    // character (in this case, an asterik), then we pad it
+    // again with 10 spaces
+    // Note: this works only for additional lines of a 
+    // bulleted list, so that is why there is a bullet format
+    // in the beginning of format_text()
+	if (_bullet)
+    {
+		int space = rec.getFont()->get_glyph_index(
+					32, _embedFonts);
+		SWF::TextRecord::GlyphEntry ge;
+		ge.index = space;
+		ge.advance = scale * rec.getFont()->get_advance(space,
+					_embedFonts);
+				  
+		rec.addGlyph(ge,10);
+                    
+		int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
+		ge.index = bullet;
+		ge.advance = scale * rec.getFont()->get_advance(bullet, 
+							  _embedFonts);
+		rec.addGlyph(ge);
+
+		ge.index = space;
+		ge.advance = scale * rec.getFont()->get_advance(space,
+					_embedFonts);
+		
+		rec.addGlyph(ge,9);
+	}
+}
+
+void
 TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::const_iterator& e,
 	boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code, int& last_space_glyph,
 	int& last_line_start_record)
@@ -1246,44 +1406,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 			case 13:
 			case 10:
 			{
-				// newline.
-
-				// Frigging Flash seems to use '\r' (13) as its
-				// default newline DisplayObject.  If we get DOS-style \r\n
-				// sequences, it'll show up as double newlines, so maybe we
-				// need to detect \r\n and treat it as one newline.
-
-				// Close out this stretch of glyphs.
-				_textRecords.push_back(rec);
-				align_line(getTextAlignment(), last_line_start_record, x);
-
-				// Expand bounding box to include last column of text ...
-				if ( _autoSize != autoSizeNone ) {
-					_bounds.expand_to_point(x + PADDING_TWIPS,
-							y + PADDING_TWIPS);
-				}
-
-				// new paragraphs get the indent.
-				x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
-				y += getFontHeight() + leading; 
-
-				// Start a new record on the next line. Other properties of the
-				// TextRecord should be left unchanged.
-				rec.clearGlyphs();
-				rec.setXOffset(x);
-				rec.setYOffset(y);
-
-				last_space_glyph = -1;
-				last_line_start_record = _textRecords.size();
-				 
-				linestartit = _line_starts.begin();
-				linestartend = _line_starts.end();
-				//Fit a line_start in the correct place
-				while ( linestartit < linestartend && *linestartit < it-_text.begin())
-				{
-					linestartit++;
-				}
-				_line_starts.insert(linestartit, it-_text.begin());
+				newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
 				break;
 			}
 			case '<':
@@ -1302,7 +1425,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 					LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
 										 "gnash will just ignore the tags and "
 										 "print their content")));
-		 
+			
 					std::wstring discard;
 					std::map<std::string, std::string> attributes;
 					SWF::TextRecord newrec;
@@ -1359,7 +1482,16 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 						} else if (s == "p") { 
 							//paragraph
 							log_unimpl("<p> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							if ( _display == 0)
+							{
+								newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.5);
+								handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+								newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
+							}
+							else
+							{
+								handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							}
 						} else if (s == "br") {
 							//line break
 							log_unimpl("<br> html tag in TextField");
@@ -1381,6 +1513,15 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 			default:
 			{
 
+				if ( password() )
+				{	
+					SWF::TextRecord::GlyphEntry ge;
+					int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
+                    ge.index = bullet;
+                    ge.advance = scale * rec.getFont()->get_advance(bullet, 
+                        _embedFonts);
+                    rec.addGlyph(ge); 
+				}
 				// The font table holds up to 65535 glyphs. Casting
 				// from uint32_t would, in the event that the code
 				// is higher than 65535, result in the wrong DisplayObject
@@ -1476,8 +1617,7 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 				}
 				if (!newlinefound) break;
 			}
-			else if ( doWordWrap() )
-			{
+
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
 				log_debug(" wordWrap=true");
 #endif
@@ -1561,8 +1701,8 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 
 			// TODO: HTML markup
 			
-	}
 }
+
 
 TextField::VariableRef
 TextField::parseTextVariableRef(const std::string& variableName) const
@@ -1974,6 +2114,67 @@ TextField::setUnderlined(bool v)
     }
 }
 
+// ADDED
+void          
+TextField::setBullet(bool b)
+{              
+    if ( _bullet != b )
+    {
+        _bullet = b;
+        format_text();
+    }
+}
+
+// ADDED
+void 
+TextField::setTabStops(std::vector<int> tabStops)
+{
+	_tabStops.resize(tabStops.size());
+	
+	for (int i = 0; i < tabStops.size(); i++)
+	{
+		if ( _tabStops[i] != tabStops[i] )
+		{
+			_tabStops[i]=tabStops[i];      
+		}
+	}
+	format_text();
+	set_invalidated();
+}
+
+// ADDED
+void
+TextField::setURL(std::string url)
+{ 
+    if ( _url != url )
+    {
+        set_invalidated();
+        _url = url;
+    }
+}
+
+// ADDED
+void
+TextField::setTarget(std::string target)
+{
+    if ( _target != target)
+    {
+        set_invalidated();
+        _target = target;
+    }
+}
+
+// ADDED
+void
+TextField::setDisplay(TextFormatDisplay display)
+{
+    if ( _display != display )
+    {
+        set_invalidated();
+        _display = display;
+    }
+}
+
 void
 TextField::setAlignment(TextAlignment h)
 {
@@ -1981,7 +2182,6 @@ TextField::setAlignment(TextAlignment h)
     {
         set_invalidated();
         _alignment = h;
-        format_text();
     }
 }
 
@@ -2699,6 +2899,52 @@ textfield_setTextFormat(const fn_call& fn)
     if ( tf->colorDefined() ) text->setTextColor(tf->color());
     if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
 
+	LOG_ONCE( log_unimpl("tf->target(): %s ", tf->target()) );
+    LOG_ONCE( log_unimpl("tf->display(): %s", tf->display()) );
+	LOG_ONCE( log_unimpl("tf->url(): %s", tf->url()) );
+    
+	// ADDED (completed)
+	if ( tf->bulletDefined() ) text->setBullet(tf->bullet());
+	if ( tf->displayDefined() ) text->setDisplay(tf->display());
+
+    // URL CASE:
+    if ( tf->urlDefined() )
+    {
+        //~ RcInitFile& rc = RcInitFile::getDefaultInstance();
+        //~ rc.setURLOpenerFormat("firefox -remote 'openurl(%u)'");
+        //~ std::string getUrl = rc.getURLOpenerFormat();
+        //~ system("firefox -remote 'openurl(http://www.gnashdev.org)'");
+        //~ LOG_ONCE( log_unimpl("getUrl: %s ", getUrl) );
+        //~ rgba color = rgba(0, 0, 255, 255);
+        //~ text->setTextColor(color);
+        //~ text->setUnderlined(true);  
+
+			// TARGET CASE:
+			// gets correct _target...need to implement
+			if (tf->targetDefined() )
+			{
+            //~ if (tf->target()=="_blank") 
+                //~ system("firefox -remote 'openurl(http://www.blank.org)'");
+            //~ else if (tf->target()=="_self") {
+                //~ system("firefox -remote 'openurl(http://www.msn.com'");
+            //~ }
+            //~ else if (tf->target()=="_parent") {
+                //~ system("firefox -remote 'openurl(http://www.parent.com'");
+            //~ }
+            //~ else if (tf->target()=="_top") {
+                //~ system("firefox -remote 'openurl(http://www.top.com'");
+            //~ }
+			}
+    }
+
+	// TABSTOPS CASE:
+	// gets correct _tabStops...need to implement
+	if ( tf->tabStopsDefined() )
+	{
+		text->setTabStops(tf->tabStops());
+	}
+
+    
     if (isAS3(fn)) {
         // TODO: current font finding assumes we have a parent, which isn't
         // necessarily the case in AS3. It seems the AS2 implementation is
@@ -2728,8 +2974,8 @@ textfield_setTextFormat(const fn_call& fn)
 
     // TODO: add font color and some more
 
-    LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url, target, "
-                "tabStops, bullet and display") );
+    LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url, target and "
+                "tabStops") );
 
     return as_value();
 

@@ -40,7 +40,9 @@ namespace {
     as_object* getTextFormatInterface();
     void attachTextFormatInterface(as_object& o);
     const char* getAlignString(TextField::TextAlignment a);
+	const char* getDisplayString(TextField::TextFormatDisplay a);
 	TextField::TextAlignment parseAlignString(const std::string& align);
+	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
 	as_value textformat_display(const fn_call& fn);
 	as_value textformat_bullet(const fn_call& fn);
@@ -69,6 +71,11 @@ TextFormat_as::alignSet(const std::string& align)
     alignSet(parseAlignString(align));
 }
 
+void
+TextFormat_as::displaySet(const std::string& display)
+{
+	displaySet(parseDisplayString(display));
+}
 
 void
 TextFormat_as::registerNative(as_object& o)
@@ -115,6 +122,24 @@ TextFormat_as::registerNative(as_object& o)
 TextFormat_as::TextFormat_as()
 	:
 	as_object(getTextFormatInterface()),
+	//~ _flags(0),
+	//~ _underline(false),
+	//~ _bold(false),
+	//~ _italic(false),
+	//~ _display(),
+	//~ _bullet(false),
+	//~ _align(TextField::ALIGN_LEFT),
+	//~ _blockIndent(-1),
+	//~ _color(),
+	//~ _indent(-1),
+	//~ _leading(-1),
+	//~ _leftMargin(-1),
+	//~ _rightMargin(-1),
+	//~ _pointSize(-1),
+	//~ _tabStops(),
+	//~ _target(),
+	//~ _url()
+	
 	_flags(0),
 	_underline(false),
 	_bold(false),
@@ -128,12 +153,13 @@ TextFormat_as::TextFormat_as()
 	_leftMargin(-1),
 	_rightMargin(-1),
 	_pointSize(-1),
-	_tabStops(-1),
+	_tabStops(),
 	_target()
 {
     Global_as* gl = getGlobal(*this);
 	init_member("getTextExtent", gl->createFunction(textformat_getTextExtent));
 }
+
 
 
 // extern (used by Global.cpp)
@@ -211,18 +237,33 @@ textformat_new(const fn_call& fn)
 }
 
 as_value
-textformat_display(const fn_call& /*fn*/)
+textformat_display(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl("TextFormat.display") );
-	return as_value();
+	boost::intrusive_ptr<TextFormat_as> ptr =
+    ensureType<TextFormat_as>(fn.this_ptr);
+
+	as_value ret;
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ptr->displayDefined() ) {
+            ret.set_string(getDisplayString(ptr->display()));
+        }
+        else ret.set_null();
+	}
+	else // setter
+	{
+		ptr->displaySet(fn.arg(0).to_string());
+	}
+
+	return ret;
+	//LOG_ONCE( log_unimpl("TextFormat.display") );
+	//return as_value();
 }
 
 as_value
 textformat_bullet(const fn_call& fn)
 {
-    // Has the right return values, but not properly implemented
-	LOG_ONCE( log_unimpl("TextFormat.bullet") );
-
 	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
@@ -242,9 +283,81 @@ textformat_bullet(const fn_call& fn)
 }
 
 as_value
-textformat_tabStops(const fn_call& /*fn*/)
+textformat_tabStops(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl("TextFormat.tabStops") );
+	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+		
+	as_value ret;
+	
+	//~ std::string strVal = fn.arg(0).to_string();
+	//~ std::stringstream ss;
+	//~ int countComma = 0;
+	//~ int countSpace = 0;
+	//~ int countTab = 0;
+	//~ 
+	//~ // Next check is to see whether there is a comma and a space in the 
+	//~ // array
+	//~ for (int i=0; i<strVal.length(); i++)
+	//~ {
+		//~ if (strVal[i]==(char)44)
+		//~ {
+			//~ countComma ++;
+		//~ }
+		//~ 
+		//~ if (strVal[i]==(char)32)
+		//~ {
+			//~ countSpace ++;
+		//~ }
+		//~ 
+		//~ if (strVal[i]==(char)9)
+		//~ { 
+			//~ countTab ++;
+		//~ }
+	//~ }
+	//~ 
+	//~ for (int i=0; i<strVal.length(); i++)
+	//~ {
+		//~ switch(strVal[i])
+		//~ {
+			//~ case (char)44:
+				//~ strVal[i] = (char)44;
+			//~ case (char)9:
+				//~ strVal[i] = (char)32;
+			//~ default:
+				//~ break;
+		//~ }
+	//~ }
+//~ 
+	//~ int numInt = countComma + countSpace + countTab + 1;
+	//~ std::vector<int> tabStops(numInt);
+	//~ 
+	//~ ss << strVal;
+			//~ 
+	//~ int val;
+	//~ 
+	//~ for (int i = 0; i < numInt; ++i)
+	//~ {
+		//~ ss >> val;
+		//~ tabStops[i] = val;
+	//~ }
+	//~ 
+	//~ for (int i = 0; i < numInt; i ++)
+	//~ { 
+		//~ log_unimpl("num: %d", tabStops[i]);
+	//~ }
+//~ 
+	//~ if ( fn.nargs == 0)	// getter
+	//~ {
+		//~ LOG_ONCE( log_unimpl("Getter for textformat_tabStops") );
+	//~ }
+	//~ else 				// setter
+	//~ {
+		//~ ptr->tabStopsSet(tabStops);
+	//~ }
+	//~ 
+	//~ return ret;
+	
+	//~ LOG_ONCE( log_unimpl("TextFormat.tabStops") );
 	return as_value();
 }
 
@@ -438,17 +551,52 @@ textformat_bold(const fn_call& fn)
 }
 
 as_value
-textformat_target(const fn_call& /*fn*/)
+textformat_target(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl("TextFormat.target") );
+	boost::intrusive_ptr<TextFormat_as> ptr =
+        ensureType<TextFormat_as>(fn.this_ptr);
+
+	as_value ret;
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ptr->targetDefined() ) ret.set_string(ptr->target());
+		else ret.set_null();
+	}
+	else // setter
+	{
+		ptr->targetSet(fn.arg(0).to_string());
+	}
+
+	return ret;
+
+	LOG_ONCE( log_debug("target: %s", fn.dump_args()) );
+	//~ LOG_ONCE( log_unimpl("TextFormat.target") );
 	return as_value();
 }
 
 as_value
-textformat_url(const fn_call& /*fn*/)
+textformat_url(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl("TextFormat.url") );
-	return as_value();
+	boost::intrusive_ptr<TextFormat_as> ptr =
+        ensureType<TextFormat_as>(fn.this_ptr);
+
+	as_value ret;
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ptr->urlDefined() ) ret.set_string(ptr->url());
+		else ret.set_null();
+	}
+	else // setter
+	{
+		ptr->urlSet(fn.arg(0).to_string());
+	}
+
+	return ret;
+	LOG_ONCE( log_debug("url: %s", fn.dump_args()) );
+	//LOG_ONCE( log_unimpl("TextFormat.url") );
+	//return as_value();
 }
 
 as_value
@@ -580,6 +728,16 @@ parseAlignString(const std::string& align)
 	return TextField::ALIGN_LEFT;
 }
 
+TextField::TextFormatDisplay
+parseDisplayString(const std::string& display)
+{
+	StringNoCaseEqual cmp;
+	if ( cmp(display, "inline") ) return TextField::INLINE;
+	if ( cmp(display, "block") ) return TextField::BLOCK;
+	
+	log_debug("Invalid display string %s ", display);
+}
+
 const char* 
 getAlignString(TextField::TextAlignment a)
 {
@@ -598,6 +756,21 @@ getAlignString(TextField::TextAlignment a)
 			return "left";
 	}
 }
+
+const char*
+getDisplayString(TextField::TextFormatDisplay a) 
+{
+	switch (a)
+	{
+		case TextField::INLINE:
+			return "inline";
+		case TextField::BLOCK:
+			return "block";
+		default:
+			log_error("Unknown display value: %d ", a);
+	}
+}
+	
 
 } // anonymous namespace
 } // end of gnash namespace
