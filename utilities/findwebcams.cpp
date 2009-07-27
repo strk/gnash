@@ -43,7 +43,7 @@ class data {
 data::data() {
     deviceName = NULL;
     deviceType = NULL;
-    gint deviceNumber = -1;
+    deviceNumber = -1;
     duplicate = false;
 };
 
