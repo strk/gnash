@@ -25,7 +25,9 @@
 // Forward declarations
 namespace gnash {
     class as_object;
-class ObjectURI;
+    class Network;
+    class NetConnection_as;
+    class ObjectURI;
     class SharedObject_as;
     class VM;
 }
@@ -72,9 +74,8 @@ private:
     std::string _basePath;
 
     /// Base SOL dir
-    std::string _solSafeDir; 
-
-    SoLib _soLib;
+    std::string _solSafeDir;
+    SoLib	_soLib;
 };
 
 /// Initialize the global SharedObject class

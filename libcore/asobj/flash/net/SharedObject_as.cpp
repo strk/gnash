@@ -280,6 +280,15 @@ public:
 
     bool getPersistance() { return _persistance; };
     void setPersistance(bool flag) { _persistance = flag; };
+
+    /// Process the close() method.
+    void close();
+
+    /// Process the connect(uri) method.
+    void connect(NetConnection_as *obj, const std::string& uri);
+
+    NetConnection_as *_netconn;
+
 protected:
 
     void markReachableResources() const {
@@ -406,6 +415,18 @@ SharedObject_as::flush(int space) const
     return true;
 }
 
+/// Process the close() method.
+void
+SharedObject_as::close()
+{
+}
+
+/// Process the connect(uri) method.
+void
+SharedObject_as::connect(NetConnection_as *obj, const std::string& uri)
+{
+    
+}
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
@@ -615,15 +636,15 @@ SharedObjectLibrary::getRemote(const std::string& objName,
     assert (!objName.empty());
 
     // Check that the name is valid; if not, return null
-    if (!validateName(objName)) return 0;
+    if (!validateName(objName)) {
+        return 0;
+    }
 
     // The 'root' argument, otherwise known as localPath, specifies where
     // in the SWF path the SOL should be stored. It cannot be outside this
     // path.
     std::string requestedPath;
-
     std::ostringstream solPath;
-
     URL url(uri);
     
     const std::string& key = url.path();
@@ -660,7 +681,7 @@ SharedObjectLibrary::getRemote(const std::string& objName,
             obj->setData(localdata.get());
         }
     }
-    
+
     return obj;
 }
 
@@ -784,10 +805,44 @@ sharedobject_connect(const fn_call& fn)
 {
     boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.connect"));
-    return as_value();
+    if (fn.nargs < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("NetConnection.connect(): needs at least "
+                    "one argument"));
+        );
+        return as_value();
+    }
+
+    as_value hostval = fn.arg(0);
+
+#if 0
+//     boost::intrusive_ptr<NetConnection_as> foo =
+//         ensureType<NetConnection_as>(fn.arg(0));
+//     foo->to_object().
+    NetConnection_as *nc = fn.arg(0).to_object();
+    const as_value& uri = fn.arg(1);
+
+    const VM& vm = getVM(fn);
+    const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+    
+    // This is always set without validification.fooc->setURI(uriStr);
+
+    // Check first arg for validity 
+    if (uri.is_null() || (getSWFVersion(fn) > 6 && uri.is_undefined())) {
+        ptr->connect();
+    } else {
+        if (fn.nargs > 1) {
+            std::stringstream ss; fn.dump_args(ss);
+            log_unimpl("NetConnection.connect(%s): args after the first are "
+                    "not supported", ss.str());
+        }
+        ptr->connect(uriStr);
+    }
+    
+    return as_value(ptr->isConnected());
+    obj->connect(nc, );
+#endif
 }
 
 as_value
@@ -795,9 +850,9 @@ sharedobject_close(const fn_call& fn)
 {
     boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.close"));
+    obj->close();
+
     return as_value();
 }
 
@@ -899,6 +954,9 @@ sharedobject_getRemote(const fn_call& fn)
 {
     int swfVersion = getSWFVersion(fn);
 
+    boost::intrusive_ptr<SharedObject_as> this_ptr =
+        ensureType<SharedObject_as>(fn.this_ptr);
+
     as_value objNameVal;
     if (fn.nargs > 0) {
         objNameVal = fn.arg(0);
@@ -932,6 +990,9 @@ sharedobject_getRemote(const fn_call& fn)
 
     as_value ret(obj);
     log_debug("SharedObject.getRemote returning %s", ret);
+    
+//     string_table::key methodKey = NSV::PROP_ON_STATUS;
+//     callMethod(methodKey, as_value());
     
     return ret;
 }
