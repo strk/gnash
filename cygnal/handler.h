@@ -41,6 +41,7 @@
 #include "log.h"
 #include "network.h"
 #include "buffer.h"
+#include "element.h"
 #include "cque.h"
 #include "network.h"
 #include "dsodefs.h" //For DSOEXPORT.
@@ -174,7 +175,12 @@ public:
     bool timetodie() { return _die; };
 
 private:
+    // This is for the child processes used to process the data
     std::map<std::string, Proc *> _cgis;
+    
+    // Remote Shared Objects. References are an index into this vector.
+    std::vector<amf::Element *> _sharedobjs;
+
     bool	_die;
     int		_netfd;
     gnash::CQue	_incoming;

@@ -630,7 +630,3 @@ usage (const char *name)
 // mode: C++
 // indent-tabs-mode: t
 // End:
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:

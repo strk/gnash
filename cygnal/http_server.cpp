@@ -300,13 +300,12 @@ HTTPServer::processPostRequest(int fd)
 	
 	Proc cgis;
 	string path = _docroot;
-//  	string path = "/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin";
 	path += _filespec;
-	
   	cgis.startCGI(_filespec, true, CGIBIN_PORT);
  	cgis.createClient("localhost", CGIBIN_PORT);
 	cgis.writeNet(*content);
 	boost::shared_ptr<amf::Buffer> reply = cgis.readNet();
+	
 	writeNet(fd, *reply);
 //	cgis.stopCGI(_filespec);
 #else
