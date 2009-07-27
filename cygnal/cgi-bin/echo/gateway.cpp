@@ -50,7 +50,7 @@ static bool netdebug = false;
 int
 main(int argc, char *argv[])
 {
-    int port = 1234;
+    int port = CGIBIN_PORT;
     bool done = false;
     bool gdb = false;
     
