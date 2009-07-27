@@ -106,7 +106,8 @@ class SharedObject_as {
 //  	    DejaGnu.note(e.code);
 //  	    DejaGnu.note(e.description);
 #end
-	nc.connect(rtmpuri, "test");
+//	nc.connect(rtmpuri, "test");
+	x1.connect(nc);
 	DejaGnu.note("Connecting to "+rtmpuri);
 
 
@@ -119,12 +120,6 @@ class SharedObject_as {
  	} else {
  	    DejaGnu.fail("SharedObject.client property doesn't exist");
  	}
-//FIXME:  Field fps cannot be accessed for reading
-// 	if (Type.typeof(x1.fps) == ValueType.TFloat) {
-// 	    DejaGnu.pass("SharedObject.fps property exists");
-// 	} else {
-// 	    DejaGnu.fail("SharedObject.fps property doesn't exist");
-// 	}
 	if (Type.typeof(x1.objectEncoding) == ValueType.TInt) {
 	    DejaGnu.pass("SharedObject.objectEncoding property exists");
 	} else {
