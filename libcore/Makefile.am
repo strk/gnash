@@ -103,12 +103,14 @@ libgnashcore_la_SOURCES = \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/DefineShapeTag.cpp \
+	swf/DefineScalingGridTag.cpp \
 	swf/DefineEditTextTag.cpp \
 	swf/DefineMorphShapeTag.cpp \
 	swf/CSMTextSettingsTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
 	swf/StartSoundTag.cpp \
+	swf/SetTabIndexTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
 	Video.cpp \
@@ -175,6 +177,7 @@ noinst_HEADERS = \
 	swf/DefineSceneAndFrameLabelDataTag.h \
 	swf/CSMTextSettingsTag.h \
 	swf/DefineShapeTag.h \
+	swf/DefineScalingGridTag.h \
 	swf/DefineMorphShapeTag.h \
 	swf/SoundInfoRecord.h \
 	swf/TextRecord.h \
@@ -191,6 +194,7 @@ noinst_HEADERS = \
 	swf/DoActionTag.h \
 	swf/DoInitActionTag.h \
 	swf/SetBackgroundColorTag.h \
+	swf/SetTabIndexTag.h \
 	swf/StartSoundTag.h \
 	swf/StreamSoundBlockTag.h \
 	swf/ScriptLimitsTag.h \
