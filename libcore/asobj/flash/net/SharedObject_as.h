@@ -36,7 +36,7 @@ class SharedObjectLibrary
 {
 public:
 
-    typedef std::map<std::string, SharedObject_as*> SoLib;
+    typedef std::map<std::string, SharedObject_as *> SoLib;
 
     SharedObjectLibrary(VM& vm);
 
