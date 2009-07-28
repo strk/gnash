@@ -21,6 +21,10 @@
 
 #include "check.as"
 
+#if OUTPUT_VERSION == 5
+MovieClip.prototype.hasOwnProperty = ASNative(101, 5);
+#endif
+
 #if OUTPUT_VERSION < 8
 
 check_equals(typeof(flash), 'undefined');
