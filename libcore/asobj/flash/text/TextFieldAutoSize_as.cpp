@@ -39,7 +39,9 @@ void
 textfieldautosize_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> obj =
-        new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getObjectInterface();
+        gl->createObject(proto);
 
     attachTextFieldAutoSizeInterface(*obj);
 	where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,

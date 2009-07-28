@@ -43,7 +43,9 @@ namespace {
 void
 actionscriptversion_class_init(as_object& global, const ObjectURI& uri)
 {
-    static as_object* o = new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getObjectInterface();
+    static as_object* o = gl->createObject(proto);
     attachActionScriptVersionStaticInterface(*o);
     global.init_member(getName(uri), o, as_object::DefaultFlags,
             getNamespace(uri));
