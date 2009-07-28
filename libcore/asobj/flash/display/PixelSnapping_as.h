@@ -32,7 +32,7 @@ class ObjectURI;
 namespace gnash {
 
 /// Initialize the global PixelSnapping class
-void pixelsnapping_class_init(as_object& global, const ObjectURI& uri);
+void pixelsnapping_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

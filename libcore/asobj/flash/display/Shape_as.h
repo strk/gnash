@@ -32,7 +32,7 @@ class ObjectURI;
 namespace gnash {
 
 /// Initialize the global Shape class
-void shape_class_init(as_object& global, const ObjectURI& uri);
+void shape_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

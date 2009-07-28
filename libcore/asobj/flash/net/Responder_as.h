@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global Responder class
-void responder_class_init(as_object& global, const ObjectURI& uri);
+void responder_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

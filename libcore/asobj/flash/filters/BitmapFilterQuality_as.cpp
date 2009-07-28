@@ -39,13 +39,13 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void bitmapfilterquality_class_init(as_object& global, const ObjectURI& uri)
+void bitmapfilterquality_class_init(as_object& where, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
     attachBitmapFilterQualityStaticInterface(*cl);
 
     // Register _global.BitmapFilterQuality
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 

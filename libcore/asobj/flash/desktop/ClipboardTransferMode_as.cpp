@@ -42,7 +42,7 @@ namespace {
 void
 clipboardtransfermode_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(global);
+    Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
     static as_object* obj = gl->createObject(proto);
     attachClipboardTransferModeStaticInterface(*obj);

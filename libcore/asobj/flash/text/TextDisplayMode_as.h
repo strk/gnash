@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global TextDisplayMode class
-void textdisplaymode_class_init(as_object& global, const ObjectURI& uri);
+void textdisplaymode_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

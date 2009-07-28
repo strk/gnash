@@ -61,7 +61,7 @@ public:
 void registerStageNative(as_object& o);
 
 /// Initialize the global Stage class
-void stage_class_init(as_object& global, const ObjectURI& uri);
+void stage_class_init(as_object& where, const ObjectURI& uri);
   
 } // end of gnash namespace
 

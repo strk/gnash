@@ -72,18 +72,18 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textfield_class_init(as_object& global, const ObjectURI& uri)
+void textfield_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&textfield_ctor, getTextFieldInterface());
         attachTextFieldStaticInterface(*cl);
     }
 
     // Register _global.TextField
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 

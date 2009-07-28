@@ -50,7 +50,7 @@ public:
     static as_object* Interface();
     static void attachInterface(as_object& o);
     static void attachProperties(as_object& o);
-    static void registerCtor(as_object& global);
+    static void registerCtor(as_object& where);
     static as_value ctor(const fn_call& fn);
 private:
     static boost::intrusive_ptr<as_object> s_interface;
@@ -72,15 +72,15 @@ BevelFilter_as::Interface() {
 
 
 void
-bevelfilter_class_init(as_object& global, const ObjectURI& uri)
+bevelfilter_class_init(as_object& where, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl;
     if (cl != NULL) return;
-    Global_as* gl = getGlobal(global);
+    Global_as* gl = getGlobal(where);
     cl = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());
     VM::get().addStatic(cl.get());
     BevelFilter_as::attachInterface(*cl);
-    global.init_member(getName(uri) , cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri) , cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 

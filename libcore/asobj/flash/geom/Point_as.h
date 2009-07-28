@@ -34,7 +34,7 @@ class ObjectURI;
 class fn_call;
 
 /// Initialize the global Point class
-void point_class_init(as_object& global, const ObjectURI& uri);
+void point_class_init(as_object& where, const ObjectURI& uri);
 
 /// Return a Point instance (in case the core lib needs it)
 boost::intrusive_ptr<as_object> init_Point_instance();

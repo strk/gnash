@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global NetConnection class
-void netconnection_class_init(as_object& global, const ObjectURI& uri);
+void netconnection_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

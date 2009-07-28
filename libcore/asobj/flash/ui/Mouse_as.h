@@ -28,7 +28,7 @@ class Mouse_as
 {
 public:
     /// Register native functions with the VM
-    static void registerNative(as_object& global);
+    static void registerNative(as_object& where);
 };
 
 void mouse_class_init(as_object& where, const ObjectURI& uri);

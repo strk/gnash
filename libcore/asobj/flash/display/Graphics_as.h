@@ -32,7 +32,7 @@ class ObjectURI;
 namespace gnash {
 
 /// Initialize the global Graphics class
-void graphics_class_init(as_object& global, const ObjectURI& uri);
+void graphics_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

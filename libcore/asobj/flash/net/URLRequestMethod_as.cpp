@@ -41,13 +41,13 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-urlrequestmethod_class_init(as_object& global, const ObjectURI& uri)
+urlrequestmethod_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(global);
+    Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
     static as_object* o = gl->createObject(proto);
     attachURLRequestMethodStaticInterface(*o);
-    global.init_member(getName(uri), o, as_object::DefaultFlags,
+    where.init_member(getName(uri), o, as_object::DefaultFlags,
             getNamespace(uri));
 }
 

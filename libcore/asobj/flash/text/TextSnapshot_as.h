@@ -55,7 +55,7 @@ public:
     ///                 AS return values.
     TextSnapshot_as(const MovieClip* mc);
 
-    static void init(as_object& global, const ObjectURI& uri);
+    static void init(as_object& where, const ObjectURI& uri);
 
     std::string getText(boost::int32_t start, boost::int32_t end,
             bool nl) const;

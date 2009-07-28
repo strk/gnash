@@ -118,7 +118,7 @@ private:
 
 
 /// Initialize the global BitmapData class
-void bitmapdata_class_init(as_object& global, const ObjectURI& uri);
+void bitmapdata_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 

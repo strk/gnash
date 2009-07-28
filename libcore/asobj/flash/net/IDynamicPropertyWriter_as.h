@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global IDynamicPropertyWriter class
-void idynamicpropertywriter_class_init(as_object& global, const ObjectURI& uri);
+void idynamicpropertywriter_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

@@ -420,18 +420,18 @@ XMLSocket_as::send(std::string str)
 
 // extern (used by Global.cpp)
 void
-xmlsocket_class_init(as_object& global, const ObjectURI& uri)
+xmlsocket_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is the global XMLSocket class
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&xmlsocket_new, getXMLSocketInterface());
     }
     
     // Register _global.XMLSocket
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 
 }

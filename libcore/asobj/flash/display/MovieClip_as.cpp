@@ -164,9 +164,9 @@ getMovieClipAS3Interface()
 }
 
 void
-registerMovieClipNative(as_object& global)
+registerMovieClipNative(as_object& where)
 {
-    VM& vm = getVM(global);
+    VM& vm = getVM(where);
 
     // Natives are always here    (at least in swf5 I guess)
     vm.registerNative(movieclip_attachMovie, 900, 0); 

@@ -70,7 +70,7 @@ private:
 };
 
 /// Initialize the global SharedObject class
-void sharedobject_class_init(as_object& global, const ObjectURI& uri);
+void sharedobject_class_init(as_object& where, const ObjectURI& uri);
 
 void registerSharedObjectNative(as_object& o);
 

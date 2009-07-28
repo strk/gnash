@@ -31,7 +31,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global ClipboardTransferMode class
-void clipboardtransfermode_class_init(as_object& global, const ObjectURI& uri);
+void clipboardtransfermode_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

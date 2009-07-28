@@ -43,10 +43,9 @@ namespace {
 void
 stagealign_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> obj =
-    Global_as* gl = getGlobal(global);
+    Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
-        gl->createObject(proto);
+    static boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
 
     attachStageAlignStaticInterface(*obj);
 

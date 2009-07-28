@@ -25,7 +25,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global DropShadowFilter class
-void dropshadowfilter_class_init(as_object& global, const ObjectURI& uri);
+void dropshadowfilter_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 
