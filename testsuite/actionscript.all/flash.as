@@ -33,7 +33,7 @@ check_equals(typeof(flash), 'undefined');
 check_equals(MovieClip.prototype.transform, undefined);
 check(MovieClip.prototype.hasOwnProperty("transform"));
 MovieClip.prototype.transform = 8;
-check_equals(MovieClip.prototype.transform, 8);
+xcheck_equals(MovieClip.prototype.transform, 8);
 
 check_totals(4);
 
