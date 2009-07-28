@@ -1195,7 +1195,6 @@ TextField::format_text()
     
     linestartit = _line_starts.begin();
     linestartend = _line_starts.end();
-    size_t current_line;
     size_t linestart = 0;
     size_t manylines = _line_starts.size();
     size_t manyrecords = _textRecords.size();
@@ -1204,7 +1203,7 @@ TextField::format_text()
     while (linestartit != linestartend && *linestartit <= m_cursor) {
         linestart = *linestartit++;
     }
-    current_line = linestartit - _line_starts.begin();
+    const size_t current_line = linestartit - _line_starts.begin();
     changeTopVisibleLine(current_line);
 
     ///ASSIGN THE VISIBLE LINES TO _displayRecord
@@ -1246,26 +1245,33 @@ TextField::format_text()
 }
 
 void
-TextField::changeTopVisibleLine(int current_line)
+TextField::changeTopVisibleLine(size_t current_line)
 {
     if (_linesindisplay > 0) {
         size_t manylines = _line_starts.size();
         size_t lastvisibleline = _top_visible_line + _linesindisplay;
+        assert (manylines >= _top_visible_line);
         if (manylines - _top_visible_line <= _linesindisplay) {
-            if(manylines - _linesindisplay <= 0)
-                _top_visible_line = 0;
+            if (manylines < _linesindisplay) _top_visible_line = 0;
             else {
                 _top_visible_line = manylines - _linesindisplay;
             }
-        //if we are at a higher position, scoot the lines down
-        } else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
-            _top_visible_line -= _top_visible_line-current_line;
-        //if we are at a lower position, scoot the lines up
-        } else if (manylines > _top_visible_line+_linesindisplay) {
-            if ( m_cursor >= (_line_starts[lastvisibleline])) {
+            return;
+        }
+        
+        if (m_cursor < (_line_starts[_top_visible_line])) {
+            //if we are at a higher position, scoot the lines down
+            _top_visible_line -= _top_visible_line - current_line;
+            return;
+        }
+
+        if (manylines > _top_visible_line + _linesindisplay) {
+            //if we are at a lower position, scoot the lines up
+            if (m_cursor >= (_line_starts[lastvisibleline])) {
                 _top_visible_line += current_line - (lastvisibleline);
             }
         }
+        return;
     }
 }
 

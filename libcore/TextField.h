@@ -543,7 +543,7 @@ private:
 	void format_text();
 	
 	/// Move viewable lines based on m_cursor
-	void changeTopVisibleLine(int current_line);
+	void changeTopVisibleLine(size_t current_line);
 	
 	/// Handles a new line, this will be called several times, so this
 	/// will hopefully make code cleaner
