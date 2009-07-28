@@ -738,7 +738,7 @@ namespace gst {
         
         //drop the display bin into the pipeline
         //gst_bin_add (GST_BIN (webcam->_webcamMainBin), webcam->_videoDisplayBin);
-        gst_bin_add (GST_BIN (webcam->_pipeline), webcam->_videoDisplayBin);
+        //gst_bin_add (GST_BIN (webcam->_pipeline), webcam->_videoDisplayBin);
         
         ok = gst_element_link_many(video_scale, video_sink, NULL);
         if (ok != true) {
@@ -760,6 +760,11 @@ namespace gst {
     //the elements necessary to display video to screen (_videoDisplayBin)
     gboolean
     VideoInputGst::webcamMakeVideoDisplayLink(GnashWebcamPrivate *webcam) {
+        if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_display_bin") == NULL) {
+            gst_object_ref(webcam->_videoDisplayBin);
+            gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoDisplayBin);
+        }
+        
         gboolean ok;
         GstPad *video_display_queue_src, *video_display_bin_sink;
         
@@ -814,6 +819,7 @@ namespace gst {
     gboolean
     VideoInputGst::webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam) {
         if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_save_bin") == NULL) {
+            gst_object_ref(webcam->_videoSaveBin);
             gst_bin_add(GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
         }
 

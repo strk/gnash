@@ -353,8 +353,6 @@ namespace gst {
         
         ok = gst_bin_add(GST_BIN(audio->_audioPlaybackBin), autosink);
         
-        ok &= gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
-        
         //create ghostpad which can be used to connect this bin to the
         //video_display_queue src ghostpad
         pad = gst_element_get_pad (autosink, "sink");
@@ -366,6 +364,11 @@ namespace gst {
     
     gboolean
     AudioInputGst::makeAudioSourcePlaybackLink(GnashAudioPrivate *audio) {
+        if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "playbackBin") == NULL) {
+            gst_object_ref(audio->_audioPlaybackBin);
+            gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
+        }
+        
         gboolean ok;
         GstPad *audioPlaybackQueueSrc, *audioPlaybackBinSink;
         GstPadLinkReturn padreturn;
@@ -382,6 +385,44 @@ namespace gst {
         } else {
             log_error("something went wrong in the makeSourcePlaybackLink function");
             return false;
+        }
+    }
+    
+    gboolean
+    AudioInputGst::breakAudioSourcePlaybackLink(GnashAudioPrivate *audio) {
+        if (audio->_pipelineIsPlaying == true) {
+            audioStop(audio);
+        }
+        
+        gboolean ok;
+        GstPad *audioPlaybackQueueSrc, *audioPlaybackBinSink;
+        GstStateChangeReturn state;
+        
+        audioPlaybackQueueSrc = gst_element_get_pad(audio->_audioMainBin,
+            "audioPlaybackQueueSrc");
+        audioPlaybackBinSink = gst_element_get_pad(audio->_audioPlaybackBin,
+            "sink");
+        
+        ok = gst_pad_unlink(audioPlaybackQueueSrc, audioPlaybackBinSink);
+        if (ok != true) {
+            log_error("%s: unlink failed", __FUNCTION__);
+            return false;
+        } else {
+            state = gst_element_set_state(audio->_audioPlaybackBin, GST_STATE_NULL);
+            if (state != GST_STATE_CHANGE_FAILURE) {
+                //return true;
+                ok = gst_bin_remove(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
+                if (ok != true) {
+                    log_error("%s: couldn't remove audioPlaybackBin from pipeline",
+                        __FUNCTION__);
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                log_error("%s: changing state of audioPlaybackBin failed", __FUNCTION__);
+                return false;
+            }
         }
     }
     
@@ -465,10 +506,13 @@ namespace gst {
     
     gboolean
     AudioInputGst::makeAudioSourceSaveLink (GnashAudioPrivate* audio) {
+        if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "audioSaveBin") == NULL) {
+            gst_object_ref(audio->_audioSaveBin);
+            gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioSaveBin);
+        }
+        
         GstPad *audioSaveQueueSrc, *audioSaveBinSink;
         GstPadLinkReturn padreturn;
-        
-        gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioSaveBin);
         
         audioSaveQueueSrc = gst_element_get_pad(audio->_audioMainBin,
             "saveQueueSrc");
@@ -482,6 +526,41 @@ namespace gst {
         } else {
             log_error("something went wrong in the makeAudioSourceSaveLink function");
             return false;
+        }
+    }
+    
+    gboolean
+    AudioInputGst::breakAudioSourceSaveLink (GnashAudioPrivate *audio) {
+        if (audio->_pipelineIsPlaying == true) {
+            audioStop(audio);
+        }
+        gboolean ok;
+        GstPad *audioSaveQueueSrc, *audioSaveBinSink;
+        GstStateChangeReturn state;
+        
+        audioSaveQueueSrc = gst_element_get_pad(audio->_audioMainBin,
+            "saveQueueSrc");
+        audioSaveBinSink = gst_element_get_pad(audio->_audioSaveBin,
+            "sink");
+        
+        ok = gst_pad_unlink(audioSaveQueueSrc, audioSaveBinSink);
+        if (ok != true) {
+            log_error("%s: unlink failed", __FUNCTION__);
+            return false;
+        } else {
+            state = gst_element_set_state(audio->_audioSaveBin, GST_STATE_NULL);
+            if (state != GST_STATE_CHANGE_FAILURE) {
+                ok = gst_bin_remove(GST_BIN(audio->_pipeline), audio->_audioSaveBin);
+                if (ok != true) {
+                    log_error("%s: couldn't remove saveBin from pipeline", __FUNCTION__);
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                log_error("%s: audioSaveBin state change failed", __FUNCTION__);
+                return false;
+            }
         }
     }
     

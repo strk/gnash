@@ -203,12 +203,6 @@ static void test_client()
         } else {
             runtest.pass("the _videoDisplayBin sink ghostpad was created");
         }
-        if ((gst_bin_get_by_name(GST_BIN(webcam->_pipeline),
-            "video_display_bin")) == NULL) {
-            runtest.fail("videoDisplayBin has an unexpected address");
-        } else {
-            runtest.pass("videoDisplayBin's address is set as expected");
-        }
     }
 
     result = false;

@@ -149,11 +149,17 @@ int main () {
         g_print("set microphoneDevice %d\n", dev_select);
     } else {
         numdevs = findAudioDevs(audioVector);
-        g_print("\nThe gnashrc file reports default microphone is set to:\n");
-        g_print("%s (%s)\n", audioVector[fromrc]->deviceName,
-            audioVector[fromrc]->deviceType);
-        g_print("To change this setting, delete the 'set microphoneDevice' line\n");
-        g_print("from your gnashrc file and re-run this program.\n\n");
+        if (fromrc <= (audioVector.size() - 1)) {
+            g_print("\nThe gnashrc file reports default microphone is set to:\n");
+            g_print("%s (%s)\n", audioVector[fromrc]->deviceName,
+                audioVector[fromrc]->deviceType);
+            g_print("To change this setting, delete the 'set microphoneDevice' line\n");
+            g_print("from your gnashrc file and re-run this program.\n\n");
+        } else {
+            g_print("\nYou have an invalid microphone chosen in your gnashrc file.\n");
+            g_print("Try reattaching the device or deleting the value from gnashrc\n");
+            g_print("and running this program again\n");
+        }
     }
     return 1;
 }

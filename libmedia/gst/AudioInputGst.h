@@ -337,6 +337,13 @@ public:
     /// @return True if the link was made successfully, false otherwise.
     gboolean makeAudioSourcePlaybackLink (GnashAudioPrivate *audio);
     
+    /// This function breaks the link between the audio playback queue and the
+    /// playback element.
+    /// @param audio A pointer to the GnashAudioPrivate class strucutre of the
+    ///   selected audio input device.
+    /// @return True if the link was successfully broken, false otherwise.
+    gboolean breakAudioSourcePlaybackLink (GnashAudioPrivate *audio);
+    
     /// This function makes the link between the audio save queue (which receives
     /// an audio stream from the source device) and the respective save elements.
     /// It's important to note that if you create the save bin you must make sure
@@ -346,6 +353,13 @@ public:
     ///   selected audio input device.
     /// @return True if the link was made successfully, false otherwise.
     gboolean makeAudioSourceSaveLink (GnashAudioPrivate *audio);
+    
+    /// This function breaks the link between the audio save queue and the audio
+    /// stream.
+    /// @param audio A pointer to the GnashAudioPrivate class of the selected
+    ///   audio input device.
+    /// @return True if the link was successfully broken, false otherwise.
+    gboolean breakAudioSourceSaveLink (GnashAudioPrivate *audio);
     
     /// This function creates the audio save bin. A reference to this bin is
     /// stored in a GnashWebcamPrivate class structure under the _audioSaveBin
