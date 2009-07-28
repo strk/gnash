@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global URLLoader class
-void urlloader_class_init(as_object& global, const ObjectURI& uri);
+void urlloader_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

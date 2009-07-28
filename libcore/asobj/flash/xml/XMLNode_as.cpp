@@ -421,9 +421,9 @@ XMLNode_as::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-XMLNode_as::registerNative(as_object& global)
+XMLNode_as::registerNative(as_object& where)
 {
-    VM& vm = getVM(global);
+    VM& vm = getVM(where);
     vm.registerNative(xmlnode_cloneNode, 253, 1);
     vm.registerNative(xmlnode_removeNode, 253, 2);
     vm.registerNative(xmlnode_insertBefore, 253, 3);
@@ -444,18 +444,18 @@ XMLNode_as::getXMLNodeInterface()
 }
 
 void
-XMLNode_as::init(as_object& global, const ObjectURI& uri)
+XMLNode_as::init(as_object& where, const ObjectURI& uri)
 {
     // This is the global XMLNode_as "class"
     static boost::intrusive_ptr<as_object> cl;
 
     if ( cl == NULL )
     {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());
     }
 
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 
 }

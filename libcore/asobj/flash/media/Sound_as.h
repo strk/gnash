@@ -56,7 +56,7 @@ class ObjectURI;
 		
 		~Sound_as();
 		
-		static void init(as_object& global, const ObjectURI& uri);
+		static void init(as_object& where, const ObjectURI& uri);
 		
 	/// Make this sound control the given DisplayObject
     //

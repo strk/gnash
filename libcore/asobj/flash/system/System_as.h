@@ -34,9 +34,9 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global System class
-void system_class_init(as_object& global, const ObjectURI& uri);
+void system_class_init(as_object& where, const ObjectURI& uri);
 
-void registerSystemNative(as_object& global);
+void registerSystemNative(as_object& where);
 
 
 /// Get the vector aof allowed domains to access

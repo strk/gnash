@@ -32,7 +32,7 @@ class ObjectURI;
 namespace gnash {
 
 /// Initialize the global FrameLabel class
-void framelabel_class_init(as_object& global, const ObjectURI& uri);
+void framelabel_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

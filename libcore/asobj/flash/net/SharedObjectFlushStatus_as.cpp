@@ -41,11 +41,13 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-sharedobjectflushstatus_class_init(as_object& global, const ObjectURI& uri)
+sharedobjectflushstatus_class_init(as_object& where, const ObjectURI& uri)
 {
-    static as_object* o = new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getObjectInterface();
+    static as_object* o = gl->createObject(proto);
     attachSharedObjectFlushStatusStaticInterface(*o);
-    global.init_member(getName(uri), o, as_object::DefaultFlags,
+    where.init_member(getName(uri), o, as_object::DefaultFlags,
             getNamespace(uri));
 }
 

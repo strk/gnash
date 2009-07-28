@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global IDataInput class
-void idatainput_class_init(as_object& global, const ObjectURI& uri);
+void idatainput_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

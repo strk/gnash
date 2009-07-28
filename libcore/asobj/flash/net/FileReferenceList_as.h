@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global FileReferenceList class
-void filereferencelist_class_init(as_object& global, const ObjectURI& uri);
+void filereferencelist_class_init(as_object& where, const ObjectURI& uri);
 
 /// Return a FileReferenceList instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_FileReferenceList_instance();

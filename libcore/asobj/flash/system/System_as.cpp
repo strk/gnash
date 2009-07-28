@@ -64,21 +64,23 @@ namespace {
 
 
 void
-system_class_init(as_object& global, const ObjectURI& uri)
+system_class_init(as_object& where, const ObjectURI& uri)
 {
 	// _global.System is NOT a class, but a simple object, see System.as
 
-	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getObjectInterface();
+	boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
 	attachSystemInterface(*obj);
-	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+	where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 
 
 void
-registerSystemNative(as_object& global)
+registerSystemNative(as_object& where)
 {
-    VM& vm = getVM(global);
+    VM& vm = getVM(where);
     
     vm.registerNative(system_security_allowdomain, 12, 0);
     vm.registerNative(system_showsettings, 2107, 0);

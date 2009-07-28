@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global Socket class
-void socket_class_init(as_object& global, const ObjectURI& uri);
+void socket_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

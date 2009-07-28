@@ -57,16 +57,16 @@ as_object* ColorMatrixFilter_as::Interface() {
 }
 
 void
-colormatrixfilter_class_init(as_object& global, const ObjectURI& uri)
+colormatrixfilter_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
     if (!cl) return;
 
-    Global_as* gl = getGlobal(global);
+    Global_as* gl = getGlobal(where);
     cl = gl->createClass(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());
     ColorMatrixFilter_as::attachInterface(*cl);
 
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 
 }

@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global FocusEvent class
-void focusevent_class_init(as_object& global, const ObjectURI& uri);
+void focusevent_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

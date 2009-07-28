@@ -33,13 +33,13 @@ class ObjectURI;
 class DisplayObject;
 
 /// Initialize the global MovieClip class
-void movieclip_class_init(as_object& global, const ObjectURI& uri);
+void movieclip_class_init(as_object& where, const ObjectURI& uri);
 
 /// Get an as_object with the AS3 MovieClip interface.
 as_object* getMovieClipAS3Interface();
 
 /// Register ASNative MovieClip methods (AS2 only).
-void registerMovieClipNative(as_object& global);
+void registerMovieClipNative(as_object& where);
 
 /// Used by MovieClip's ctor to attach properties to MovieClip instances.
 void attachMovieClipAS2Properties(DisplayObject& d);

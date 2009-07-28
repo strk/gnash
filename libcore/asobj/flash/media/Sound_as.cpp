@@ -115,7 +115,7 @@ Sound_as::~Sound_as()
 
 // extern (used by Global.cpp)
 void
-Sound_as::init(as_object& global, const ObjectURI& uri)
+Sound_as::init(as_object& where, const ObjectURI& uri)
 {
 
     // This is going to be the global Sound "class"/"function"
@@ -124,13 +124,13 @@ Sound_as::init(as_object& global, const ObjectURI& uri)
     if ( cl == NULL )
     {
         as_object* iface = getSoundInterface();
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&sound_new, iface);
         iface->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
     }
 
     // Register _global.String
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 
 }

@@ -225,12 +225,12 @@ BitmapData_as::dispose()
 }
 
 as_object*
-getFlashDisplayBitmapDataConstructor(as_object& global)
+getFlashDisplayBitmapDataConstructor(as_object& where)
 {
     static as_object* cl = NULL;
     if ( ! cl )
     {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&BitmapData_ctor, getBitmapDataInterface());
         VM::get().addStatic(cl);
         attachBitmapDataStaticProperties(*cl);

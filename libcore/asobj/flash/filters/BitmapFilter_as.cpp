@@ -45,11 +45,11 @@ public:
 
 
 void
-bitmapfilter_class_init(as_object& global, const ObjectURI& uri)
+bitmapfilter_class_init(as_object& where, const ObjectURI& uri)
 {
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    global.init_destructive_property(getName(uri), getBitmapFilterConstructor,
+    where.init_destructive_property(getName(uri), getBitmapFilterConstructor,
 		    flags, getNamespace(uri));
 }
 

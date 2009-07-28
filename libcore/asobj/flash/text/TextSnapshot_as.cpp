@@ -72,18 +72,18 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void TextSnapshot_as::init(as_object& global, const ObjectURI& uri)
+void TextSnapshot_as::init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&textsnapshot_ctor, getTextSnapshotInterface());
         attachTextSnapshotStaticInterface(*cl);
     }
 
     // Register _global.TextSnapshot
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 

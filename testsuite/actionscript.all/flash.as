@@ -16,14 +16,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+// This is for miscellaneous testing of SWF8 flash package and related
+// functions.
 
 #include "check.as"
+
+#if OUTPUT_VERSION == 5
+MovieClip.prototype.hasOwnProperty = ASNative(101, 5);
+#endif
 
 #if OUTPUT_VERSION < 8
 
 check_equals(typeof(flash), 'undefined');
 
-check_totals(1);
+// The transform property of MovieClip is not visible to SWF6 or SWF7
+check_equals(MovieClip.prototype.transform, undefined);
+check(MovieClip.prototype.hasOwnProperty("transform"));
+MovieClip.prototype.transform = 8;
+xcheck_equals(MovieClip.prototype.transform, 8);
+
+check_totals(4);
 
 #else
 
@@ -74,8 +86,16 @@ check_equals(flash.system.toString(), undefined);
 check_equals(flash.utils.toString(), undefined);
 check_equals(flash.xml.toString(), undefined);
 
+// MovieClip.transform is protected from deletion and change.
+check_equals(MovieClip.prototype.transform, undefined);
+check(MovieClip.prototype.hasOwnProperty("transform"));
+MovieClip.prototype.transform = 8;
+check_equals(MovieClip.prototype.transform, undefined);
+delete MovieClip.prototype.transform;
+check_equals(MovieClip.prototype.transform, undefined);
+check(MovieClip.prototype.hasOwnProperty("transform"));
 
-totals(30);
+totals(35);
 
 #endif
 

@@ -58,13 +58,13 @@ public:
     virtual ~XMLNode_as();
 
     // Initialize the global XMLNode class
-    static void init(as_object& global, const ObjectURI& uri);
+    static void init(as_object& where, const ObjectURI& uri);
 
     // Used by XML_as
     static as_object* getXMLNodeInterface();
 
     /// Register ASnative methods
-    static void registerNative(as_object& global);
+    static void registerNative(as_object& where);
 
     size_t length() const { return _children.size(); }
 

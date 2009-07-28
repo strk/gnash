@@ -25,7 +25,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global GradientGlowFilter class
-void gradientglowfilter_class_init(as_object& global, const ObjectURI& uri);
+void gradientglowfilter_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 

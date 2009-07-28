@@ -30,7 +30,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global Transform class
-void transform_class_init(as_object& global, const ObjectURI& uri);
+void transform_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 

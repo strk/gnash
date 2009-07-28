@@ -79,7 +79,7 @@ private:
 
 
 /// Initialize the global ColorTransform class
-void colortransform_class_init(as_object& global, const ObjectURI& uri);
+void colortransform_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 

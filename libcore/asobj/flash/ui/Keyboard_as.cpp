@@ -220,7 +220,7 @@ Keyboard_as::markReachableResources() const
 #endif // def GNASH_USE_GC
 
 // extern (used by Global.cpp)
-void Keyboard_as::init(as_object& global, const ObjectURI& uri)
+void Keyboard_as::init(as_object& where, const ObjectURI& uri)
 {
 
     // Create built-in key object.
@@ -255,8 +255,8 @@ void Keyboard_as::init(as_object& global, const ObjectURI& uri)
 
     // methods
 
-    VM& vm = getVM(global);
-    Global_as* gl = getGlobal(global);
+    VM& vm = getVM(where);
+    Global_as* gl = getGlobal(where);
 
     vm.registerNative(key_get_ascii, 800, 0);
     key_obj->init_member("getAscii", vm.getNative(800, 0), flags);
@@ -273,7 +273,7 @@ void Keyboard_as::init(as_object& global, const ObjectURI& uri)
     key_obj->init_member("isAccessible", 
             gl->createFunction(key_is_accessible), flags);
 
-    global.init_member(getName(uri), key_obj, as_object::DefaultFlags,
+    where.init_member(getName(uri), key_obj, as_object::DefaultFlags,
             getNamespace(uri));
 }
 

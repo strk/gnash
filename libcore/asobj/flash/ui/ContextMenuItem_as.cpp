@@ -42,18 +42,18 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-contextmenuitem_class_init(as_object& global, const ObjectURI& uri)
+contextmenuitem_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&contextmenuitem_ctor,
                 getContextMenuItemInterface());
     }
 
     // Register _global.ContextMenuItem
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 

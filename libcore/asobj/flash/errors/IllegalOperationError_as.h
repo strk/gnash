@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global IllegalOperationError class
-void illegaloperationerror_class_init(as_object& global, const ObjectURI& uri);
+void illegaloperationerror_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

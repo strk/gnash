@@ -109,14 +109,14 @@ microphone_ctor(const fn_call& /* fn */)
 }
 
 // extern (used by Global.cpp)
-void microphone_class_init(as_object& global, const ObjectURI& uri)
+void microphone_class_init(as_object& where, const ObjectURI& uri)
 {
 	// This is going to be the global Microphone "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&microphone_ctor, getMicrophoneInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
@@ -124,7 +124,7 @@ void microphone_class_init(as_object& global, const ObjectURI& uri)
 	}
 
 	// Register _global.Microphone
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 
 }

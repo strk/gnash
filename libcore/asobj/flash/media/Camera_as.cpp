@@ -104,14 +104,14 @@ camera_ctor(const fn_call& /* fn */)
 }
 
 // extern (used by Global.cpp)
-void camera_class_init(as_object& global, const ObjectURI& uri)
+void camera_class_init(as_object& where, const ObjectURI& uri)
 {
 	// This is going to be the global Camera "class"/"function"
 	static boost::intrusive_ptr<as_object> cl;
 
 	if ( cl == NULL )
 	{
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&camera_ctor, getCameraInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
@@ -120,7 +120,7 @@ void camera_class_init(as_object& global, const ObjectURI& uri)
 	}
 
 	// Register _global.Camera
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 
 }

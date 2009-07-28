@@ -32,7 +32,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global SharedObjectFlushStatus class
-void sharedobjectflushstatus_class_init(as_object& global, const ObjectURI& uri);
+void sharedobjectflushstatus_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

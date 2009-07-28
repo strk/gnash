@@ -28,7 +28,7 @@ class as_object;
 class ObjectURI;
 
 /// Initialize the global Camera class
-void camera_class_init(as_object& global, const ObjectURI& uri);
+void camera_class_init(as_object& where, const ObjectURI& uri);
 
 /// Return a Camera instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_camera_instance();

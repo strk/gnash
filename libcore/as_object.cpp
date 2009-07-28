@@ -302,7 +302,7 @@ void
 as_object::add_property(const std::string& name, as_function& getter,
 		as_function* setter)
 {
-	string_table &st = _vm.getStringTable();
+	string_table &st = getStringTable(*this);
 	string_table::key k = st.find(name);
 
 	as_value cacheVal;
@@ -370,7 +370,7 @@ as_object::get_member(string_table::key name, as_value* val,
 
         /// If __resolve exists, call it with the name of the undefined
         /// property.
-        string_table& st = _vm.getStringTable();
+        string_table& st = getStringTable(*this);
         const std::string& undefinedName = st.value(name);
         log_debug("__resolve exists, calling with '%s'", undefinedName);
 
@@ -498,7 +498,7 @@ Property*
 as_object::findProperty(string_table::key key, string_table::key nsname, 
 	as_object **owner)
 {
-	int swfVersion = _vm.getSWFVersion();
+	int swfVersion = getSWFVersion(*this);
 
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu && !nsname)
@@ -547,7 +547,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 Property*
 as_object::findUpdatableProperty(string_table::key key, string_table::key nsname)
 {
-	int swfVersion = _vm.getSWFVersion();
+	const int swfVersion = getSWFVersion(*this);
 
 	Property* prop = _members.getProperty(key, nsname);
 	// 
@@ -635,7 +635,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 		{
 			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
 				"Attempt to set read-only property '%s'"),
-				_vm.getStringTable().value(key)););
+				getStringTable(*this).value(key)););
 			return true;
 		}
 
@@ -654,7 +654,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 				as_value curVal = prop->getCache(); // getValue(*this); 
 
 				log_debug("Existing property %s is being watched: firing trigger on update (current val:%s, new val:%s)",
-					_vm.getStringTable().value(key), curVal, val);
+					getStringTable(*this).value(key), curVal, val);
 				as_value newVal = trig.call(curVal, val, *this);
 				// The trigger call could have deleted the property,
 				// so we check for its existance again, and do NOT put
@@ -662,7 +662,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 				prop = findUpdatableProperty(key, nsname);
 				if ( ! prop )
 				{
-					log_debug("Property %s deleted by trigger on update", _vm.getStringTable().value(key));
+					log_debug("Property %s deleted by trigger on update", getStringTable(*this).value(key));
 					return true;
 				}
 
@@ -675,12 +675,12 @@ as_object::set_member(string_table::key key, const as_value& val,
 				prop->setValue(*this, val);
 			}
 
-			prop->clearVisible(_vm.getSWFVersion());
+			prop->clearVisible(getSWFVersion(*this));
 		}
 		catch (ActionTypeError& exc)
 		{
 			log_aserror(_("%s: Exception %s. Will create a new member"),
-				_vm.getStringTable().value(key), exc.what());
+				getStringTable(*this).value(key), exc.what());
 		}
 
 		return true;
@@ -694,7 +694,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Unknown failure in setting property '%s' on "
-			"object '%p'"), _vm.getStringTable().value(key), (void*) this);
+			"object '%p'"), getStringTable(*this).value(key), (void*) this);
 	    );
 		return false;
 	}
@@ -708,7 +708,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 	{
 		Trigger& trig = trigIter->second;
 
-		log_debug("Property %s is being watched, calling trigger on create", _vm.getStringTable().value(key));
+		log_debug("Property %s is being watched, calling trigger on create", getStringTable(*this).value(key));
 
 		// NOTE: the trigger call might delete the propery being added
 		//       so we first add the property, then call the trigger
@@ -721,7 +721,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 		if ( ! prop )
 		{
 			log_debug("Property %s deleted by trigger on create", 
-                    _vm.getStringTable().value(key));
+                    getStringTable(*this).value(key));
 		}
 		else
 		{
@@ -737,7 +737,7 @@ void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
 	string_table::key nsname)
 {
-	init_member(_vm.getStringTable().find(PROPNAME(key1)), val, flags, nsname);
+	init_member(getStringTable(*this).find(PROPNAME(key1)), val, flags, nsname);
 }
 
 void
@@ -758,7 +758,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
-			_vm.getStringTable().value(key), (void*)this);
+			getStringTable(*this).value(key), (void*)this);
 		// We shouldn't attempt to initialize a member twice, should we ?
 		abort();
 	}
@@ -768,7 +768,7 @@ void
 as_object::init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
-	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(PROPNAME(key));
 	init_property(k, getter, setter, flags, nsname);
 }
 
@@ -787,7 +787,7 @@ void
 as_object::init_property(const std::string& key, as_c_function_ptr getter,
 		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
-	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(PROPNAME(key));
 	init_property(k, getter, setter, flags, nsname);
 }
 
@@ -822,7 +822,7 @@ void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
 	int initflags, string_table::key nsname)
 {
-	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(PROPNAME(key));
 
 	init_property(k, getter, getter, initflags | PropFlags::readOnly
 		| PropFlags::isProtected, nsname);
@@ -842,7 +842,7 @@ void
 as_object::init_readonly_property(const std::string& key,
         as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
-	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(PROPNAME(key));
 
 	init_property(k, getter, getter, initflags | PropFlags::readOnly
 		| PropFlags::isProtected, nsname);
@@ -1018,7 +1018,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 			}
 
 			// set_member_flags will take care of case conversion
-			if (!set_member_flags(_vm.getStringTable().find(prop), set_true, set_false) )
+			if (!set_member_flags(getStringTable(*this).find(prop), set_true, set_false) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Can't set propflags on object "
@@ -1300,7 +1300,7 @@ as_object::get_path_element(string_table::key key)
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s not found in object %p",
-			_vm.getStringTable().value(key), (void*)this);
+			getStringTable(*this).value(key), (void*)this);
 #endif
 		return NULL;
 	}
@@ -1308,7 +1308,7 @@ as_object::get_path_element(string_table::key key)
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s of object %p is not an object (%s)",
-			_vm.getStringTable().value(key), (void*)this, tmp);
+			getStringTable(*this).value(key), (void*)this, tmp);
 #endif
 		return NULL;
 	}

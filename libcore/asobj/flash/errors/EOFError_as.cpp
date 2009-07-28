@@ -52,18 +52,18 @@ public:
 };
 
 // extern (used by Global.cpp)
-void eoferror_class_init(as_object& global, const ObjectURI& uri)
+void eoferror_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         cl = gl->createClass(&eoferror_ctor, getEOFErrorInterface());
         attachEOFErrorStaticInterface(*cl);
     }
 
     // Register _global.EOFError
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 

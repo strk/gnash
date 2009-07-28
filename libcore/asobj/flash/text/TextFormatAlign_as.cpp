@@ -39,7 +39,7 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void textformatalign_class_init(as_object& global, const ObjectURI& uri)
+void textformatalign_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> obj =
         new as_object(getObjectInterface());
@@ -47,7 +47,7 @@ void textformatalign_class_init(as_object& global, const ObjectURI& uri)
     attachTextFormatAlignStaticInterface(*obj);
 
     // Register _global.TextFormatAlign
-    global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
             getNamespace(uri));
 }
 
