@@ -24,6 +24,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <cstdio>
+#include <unistd.h>
 
 #include "dejagnu.h"
 #include "log.h"
@@ -176,6 +177,7 @@ static void test_client()
     }
     
     //sleep to record a few seconds of audio (from mic or test source)
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
     sleep(5);
     
     ok = aud.audioStop(audio);
@@ -195,9 +197,129 @@ static void test_client()
             runtest.pass("the output file has data in it");
         }
     } else {
-        runtest.fail("there's no output video file in testsuite/libmedia.all");
+        runtest.fail("there's no output audio file in testsuite/libmedia.all");
     }
     
+    //delete the old audioOut.ogg file
+    if (unlink(file.c_str()) == 0) {
+        g_print("        NOTE: deleting output file...\n");
+    }
+    
+    ok = aud.breakAudioSourcePlaybackLink(audio);
+    if (ok != true) {
+        runtest.fail("breakAudioSourcePlaybackLink() reported an error");
+    } else {
+        runtest.pass("breakAudioSourcePlaybackLink() reported no errors");
+    }
+    
+    ok = aud.audioPlay(audio);
+    if (ok != true) {
+        runtest.fail("audioPlay() reported an error");
+    } else {
+        runtest.pass("audioPlay() reported no errors");
+    }
+
+    g_print("        NOTE: sleeping for 10 seconds here....\n");
+    sleep(10);
+    
+    ok = aud.audioStop(audio);
+    if (ok != true) {
+        runtest.fail("audioStop() reported an error");
+    } else {
+        runtest.pass("audioStop() reported no errors");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("audioOut.ogg file is in testsuite/libmedia.all");
+        if (st.st_blocks == 0) {
+            runtest.fail("the output file is there, but there's no data in it!");
+        } else {
+            runtest.pass("the output file has data in it");
+        }
+    } else {
+        runtest.fail("there's no output audio file in testsuite/libmedia.all");
+    }
+    
+    //delete the old audioOut.ogg file
+    if (unlink(file.c_str()) == 0) {
+        g_print("        NOTE: deleting output file...\n");
+    }
+    
+    ok = aud.breakAudioSourceSaveLink(audio);
+    if (ok != true) {
+        runtest.fail("breakAudioSourceSaveLink() reported an error");
+    } else {
+        runtest.pass("breakAudioSourceSaveLink() reported no errors");
+    }
+    
+    ok = aud.audioPlay(audio);
+    if (ok != true) {
+        runtest.fail("audioPlay() reported an error");
+    } else {
+        runtest.pass("audioPlay() reported no errors");
+    }
+
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    ok = aud.audioStop(audio);
+    if (ok != true) {
+        runtest.fail("audioStop() reported an error");
+    } else {
+        runtest.pass("audioStop() reported no errors");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.fail("an output file was created and it shouldn't have");
+        if (unlink(file.c_str()) == 0) {
+            g_print("        NOTE: deleting output file...\n");
+        }
+    } else {
+        runtest.pass("no output file was created");
+    }
+    
+
+    ok = aud.makeAudioSourcePlaybackLink(audio);
+    if (ok != true) {
+        runtest.fail("couldn't remake the link audiosource->playback link");
+    } else {
+        runtest.pass("successfully remade the audiosource->playback link");
+    }
+    
+    ok = aud.makeAudioSourceSaveLink(audio);
+    if (ok != true) {
+        runtest.fail("couldn't remake the audiosource->save link");
+    } else {
+        runtest.pass("successfully remade the audiosource->save link");
+    }
+    
+    ok = aud.audioPlay(audio);
+    if (ok != true) {
+        runtest.fail("audioPlay() reported an error");
+    } else {
+        runtest.pass("audioPlay() reported no errors");
+    }
+
+    g_print("        NOTE: sleeping for 10 seconds here....\n");
+    sleep(10);
+    
+    ok = aud.audioStop(audio);
+    if (ok != true) {
+        runtest.fail("audioStop() reported an error");
+    } else {
+        runtest.pass("audioStop() reported no errors");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("audioOut.ogg file is in testsuite/libmedia.all");
+        if (st.st_blocks == 0) {
+            runtest.xfail("the output file is there, but there's no data in it!");
+        } else {
+            runtest.pass("the output file has data in it");
+        }
+    } else {
+        runtest.fail("there's no output audio file in testsuite/libmedia.all");
+    }
 }
 
 
