@@ -52,7 +52,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
-#include <stdlib.h>
+#include <cstdlib>
 #include <typeinfo>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
@@ -122,8 +122,8 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
 	_bullet(false),
     _url(""),
     _target(""),
-    _tabStops(),
 	_display(),
+    _tabStops(),
     _leading(def.leading()),
     _alignment(def.alignment()),
     _indent(def.indent()), 
@@ -185,8 +185,8 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
 	_bullet(false),
     _url(""),
     _target(""),
-    _tabStops(),
 	_display(),
+    _tabStops(),
     _leading(0),
     _alignment(ALIGN_LEFT),
     _indent(0), 
@@ -444,12 +444,12 @@ TextField::on_event(const event_id& ev)
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());
 			
-			int cur_cursor = m_cursor;
-			int previouslinesize = 0;
-			int nextlinesize = 0;
-			int manylines = _line_starts.size();
-			std::vector<int>::iterator linestartit = _line_starts.begin();
-			std::vector<int>::const_iterator linestartend = _line_starts.end();
+			size_t cur_cursor = m_cursor;
+			size_t previouslinesize = 0;
+			size_t nextlinesize = 0;
+			size_t manylines = _line_starts.size();
+			LineStarts::iterator linestartit = _line_starts.begin();
+			LineStarts::const_iterator linestartend = _line_starts.end();
 
             switch (c)
             {
@@ -484,7 +484,7 @@ TextField::on_event(const event_id& ev)
 					
                 case key::PGUP:
 					// if going a page up is too far...
-					if(_top_visible_line - _linesindisplay < 0) {
+					if(_top_visible_line < _linesindisplay) {
 						_top_visible_line = 0;
 						m_cursor = 0;
 					} else { // go a page up
@@ -545,25 +545,37 @@ TextField::on_event(const event_id& ev)
 					break;
 					
                 case key::DOWN:
-                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+                {
+                    while (linestartit < linestartend &&
+                            *linestartit <= m_cursor ) {
+
 						cur_cursor = *linestartit;
 						linestartit++;
 					}
-					//if there is no next line
-					if ( linestartit-_line_starts.begin() >= manylines ) {
+
+                    // linestartit should never be before _line_starts.begin()
+                    const size_t currentLine = linestartit -
+                        _line_starts.begin();
+					
+                    //if there is no next line
+					if (currentLine >= manylines ) {
 						m_cursor = _text.size();
 						format_text();
 						break;
 					}
-					nextlinesize = _displayRecords[linestartit-_line_starts.begin()].glyphs().size();
-					//if the next line is smaller
-					if (m_cursor - cur_cursor > nextlinesize)
+					nextlinesize = _displayRecords[currentLine].glyphs().size();
+					
+                    //if the next line is smaller
+					if (m_cursor - cur_cursor > nextlinesize) {
 						m_cursor = *linestartit + nextlinesize;
-					else //put the cursor at the same character distance
+                    }
+					else { 
+                        //put the cursor at the same character distance
 						m_cursor = *(linestartit) + (m_cursor - cur_cursor);
+                    }
                     format_text();
                     break;
-
+                }
 
                 case key::LEFT:
                     m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
@@ -1052,12 +1064,13 @@ TextField::format_text()
         // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
         //       not sure we should...
         reset_bounding_box(0, 0);
-		m_xcursor = PADDING_TWIPS + std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
+		m_xcursor = PADDING_TWIPS +
+            std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
         return;
     }
 	
-	std::vector<int>::iterator linestartit = _line_starts.begin();
-	std::vector<int>::const_iterator linestartend = _line_starts.end();
+	LineStarts::iterator linestartit = _line_starts.begin();
+	LineStarts::const_iterator linestartend = _line_starts.end();
 
     // See bug #24266
     const rect& defBounds = _bounds;
@@ -1094,7 +1107,6 @@ TextField::format_text()
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
-    boost::uint16_t rightMargin = getRightMargin();
     boost::uint16_t indent = getIndent();
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
@@ -1114,34 +1126,29 @@ TextField::format_text()
 	// BULLET CASE:
                 
     // First, we indent 10 spaces, and then place the bullet
-    // character (in this case, an asterik), then we pad it
+    // character (in this case, an asterisk), then we pad it
     // again with 10 spaces
     // Note: this works only for additional lines of a 
     // bulleted list, so that is why there is a bullet format
     // in the beginning of format_text()
     if ( _bullet )
     {
-        int space = rec.getFont()->get_glyph_index(
-                    32, _embedFonts);
+        int space = rec.getFont()->get_glyph_index(32, _embedFonts);
+
         SWF::TextRecord::GlyphEntry ge;
         ge.index = space;
-        ge.advance = scale * rec.getFont()->get_advance(space,
-                    _embedFonts);
+        ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
         rec.addGlyph(ge, 10);
 
-        // We use an asterik instead of a bullet
-        int bullet = rec.getFont()->get_glyph_index(
-                     42, _embedFonts);
+        // We use an asterisk instead of a bullet
+        int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
         ge.index = bullet;
-        ge.advance = scale * rec.getFont()->get_advance(bullet, 
-                     _embedFonts);
+        ge.advance = scale * rec.getFont()->get_advance(bullet, _embedFonts);
         rec.addGlyph(ge);
         
-        space = rec.getFont()->get_glyph_index(
-                    32, _embedFonts);
+        space = rec.getFont()->get_glyph_index(32, _embedFonts);
         ge.index = space;
-        ge.advance = scale * rec.getFont()->get_advance(space,
-                    _embedFonts);
+        ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
 		rec.addGlyph(ge, 9);
 	}
 
@@ -1154,10 +1161,11 @@ TextField::format_text()
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
 	
-	int    last_code = -1; // only used if _embedFonts
-    int    last_space_glyph = -1;
-    int    last_line_start_record = 0;
-	_line_starts.push_back(0);
+	int last_code = -1; // only used if _embedFonts
+    int last_space_glyph = -1;
+    size_t last_line_start_record = 0;
+	
+    _line_starts.push_back(0);
 	_linesindisplay = (defBounds.height() / (fontHeight + leading));
 
     m_xcursor = x;
@@ -1172,7 +1180,8 @@ TextField::format_text()
     const std::wstring::const_iterator e = _text.end();
 
     ///handleChar takes care of placing the glyphs
-	handleChar(it, e, x, y, rec, last_code, last_space_glyph, last_line_start_record);
+	handleChar(it, e, x, y, rec, last_code, last_space_glyph,
+            last_line_start_record);
 	
     // Expand bounding box to include the whole text (if autoSize)
     if ( _autoSize != autoSizeNone )
@@ -1186,10 +1195,11 @@ TextField::format_text()
 	
 	linestartit = _line_starts.begin();
 	linestartend = _line_starts.end();
-	int current_line;
-	int linestart = 0;
-	int manylines = _line_starts.size();
-	int manyrecords = _textRecords.size();
+	size_t current_line;
+	size_t linestart = 0;
+	size_t manylines = _line_starts.size();
+	size_t manyrecords = _textRecords.size();
+
 	SWF::TextRecord cursorposition_line;
 	while (linestartit != linestartend && *linestartit <= m_cursor) {
 		linestart = *linestartit++;
@@ -1199,7 +1209,7 @@ TextField::format_text()
 
 	///ASSIGN THE VISIBLE LINES TO _displayRecord
 	int yoffset = _top_visible_line*(fontHeight + leading) + PADDING_TWIPS;
-	for (unsigned int i = 0; i < manyrecords; ++i) {
+	for (size_t i = 0; i < manyrecords; ++i) {
 		//if the record is in the section we want to show
 		if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
 			_textRecords[i].yOffset() - yoffset > 0) {
@@ -1210,7 +1220,7 @@ TextField::format_text()
 	///POSITION THE CURSOR IN X-DIRECTION
 	if ( current_line <= manylines && current_line >= 1) {
 		float lineposition = (current_line * (fontHeight + leading)) + PADDING_TWIPS;
-		for (unsigned int i = current_line - 1; i < manyrecords && _textRecords[i].yOffset() == lineposition; ++i) {
+		for (size_t i = current_line - 1; i < manyrecords && _textRecords[i].yOffset() == lineposition; ++i) {
 			cursorposition_line = _textRecords[i];
 			if (linestart + _textRecords[i].glyphs().size() < m_cursor - _line_starts[current_line-1]) {
 				linestart += _textRecords[i].glyphs().size();
@@ -1218,17 +1228,16 @@ TextField::format_text()
 		}
 		m_xcursor = cursorposition_line.xOffset();
 		//extra checks keep MemCheck happy!
-		for (unsigned int i = linestart; i < m_cursor && i-linestart < cursorposition_line.glyphs().size(); ++i) {
+		for (size_t i = linestart; i < m_cursor && i-linestart < cursorposition_line.glyphs().size(); ++i) {
 			m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
 		}
 	}
 	///POSITION THE CURSOR IN Y-DIRECTION
 	m_ycursor = PADDING_TWIPS - _top_visible_line*(fontHeight + leading);
-	if (current_line >= 0) {
-		for(unsigned int i = 0; i < current_line-1; ++i) {
-			m_ycursor += (fontHeight+leading);
-		}
-	}
+    
+    for (size_t i = 0; (i + 1) < current_line; ++i) {
+        m_ycursor += (fontHeight+leading);
+    }
 	
 	float extra_space = align_line(textAlignment, last_line_start_record, x);
     m_xcursor += static_cast<int>(extra_space);
@@ -1240,8 +1249,8 @@ void
 TextField::changeTopVisibleLine(int current_line)
 {
 	if (_linesindisplay > 0) {
-		int manylines = _line_starts.size();
-		int lastvisibleline = _top_visible_line + _linesindisplay;
+		size_t manylines = _line_starts.size();
+		size_t lastvisibleline = _top_visible_line + _linesindisplay;
 		if (manylines - _top_visible_line <= _linesindisplay) {
 			if(manylines - _linesindisplay <= 0)
 				_top_visible_line = 0;
@@ -1261,16 +1270,16 @@ TextField::changeTopVisibleLine(int current_line)
 }
 
 void
-TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec,
-					int& last_space_glyph, int& last_line_start_record, float div)
+TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
+        boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
+        LineStarts::value_type& last_line_start_record, float div)
 {
 
 	// newline.
-	std::vector<int>::iterator linestartit = _line_starts.begin();
-	std::vector<int>::const_iterator linestartend = _line_starts.end();
+	LineStarts::iterator linestartit = _line_starts.begin();
+	LineStarts::const_iterator linestartend = _line_starts.end();
 	
 	float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
-    float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
 	float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
@@ -1302,52 +1311,51 @@ TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x, boost::i
 	linestartit = _line_starts.begin();
 	linestartend = _line_starts.end();
 	//Fit a line_start in the correct place
-	while ( linestartit < linestartend && *linestartit < it-_text.begin())
+    const size_t currentPos = it - _text.begin();
+
+	while (linestartit < linestartend && *linestartit < currentPos)
 	{
-		linestartit++;
+		++linestartit;
 	}
-	_line_starts.insert(linestartit, it-_text.begin());
+	_line_starts.insert(linestartit, currentPos);
 
 	// BULLET CASE:
                 
     // First, we indent 10 spaces, and then place the bullet
-    // character (in this case, an asterik), then we pad it
+    // character (in this case, an asterisk), then we pad it
     // again with 10 spaces
     // Note: this works only for additional lines of a 
     // bulleted list, so that is why there is a bullet format
     // in the beginning of format_text()
 	if (_bullet)
     {
-		int space = rec.getFont()->get_glyph_index(
-					32, _embedFonts);
+		int space = rec.getFont()->get_glyph_index(32, _embedFonts);
 		SWF::TextRecord::GlyphEntry ge;
 		ge.index = space;
-		ge.advance = scale * rec.getFont()->get_advance(space,
-					_embedFonts);
+		ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
 				  
 		rec.addGlyph(ge,10);
                     
 		int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
 		ge.index = bullet;
-		ge.advance = scale * rec.getFont()->get_advance(bullet, 
-							  _embedFonts);
+		ge.advance = scale * rec.getFont()->get_advance(bullet, _embedFonts);
 		rec.addGlyph(ge);
 
 		ge.index = space;
-		ge.advance = scale * rec.getFont()->get_advance(space,
-					_embedFonts);
+		ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
 		
 		rec.addGlyph(ge,9);
 	}
 }
 
 void
-TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::const_iterator& e,
-	boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code, int& last_space_glyph,
-	int& last_line_start_record)
+TextField::handleChar(std::wstring::const_iterator& it,
+        const std::wstring::const_iterator& e, boost::int32_t& x,
+        boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
+        int& last_space_glyph, LineStarts::value_type& last_line_start_record)
 {
-	std::vector<int>::iterator linestartit = _line_starts.begin();
-	std::vector<int>::const_iterator linestartend = _line_starts.end();
+	LineStarts::iterator linestartit = _line_starts.begin();
+	LineStarts::const_iterator linestartend = _line_starts.end();
 	
 	float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
     float fontDescent = _font->descent() * scale; 
@@ -1656,11 +1664,14 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 						previous_x -= last_line.glyphs().back().advance;
 						last_line.clearGlyphs(1);
 						//record the new line start
-						while ( linestartit != linestartend && *linestartit <= (it-_text.begin())-1)
+                        //
+                        const size_t currentPos = it - _text.begin();
+						while (linestartit != linestartend &&
+                                *linestartit + 1 <= currentPos)
 						{
 							linestartit++;
 						}
-						_line_starts.insert(linestartit, (it-_text.begin()));
+						_line_starts.insert(linestartit, currentPos);
 					}
 				} else {
 					// Move the previous word down onto the next line.
@@ -1678,11 +1689,15 @@ TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::cons
 					}
 					last_line.clearGlyphs(lineSize - last_space_glyph);
 					
-					//record the position at the start of this line as a line_start
-					int linestartpos = (it-_text.begin())-rec.glyphs().size();
-					while ( linestartit < linestartend && *linestartit < linestartpos)
+					// record the position at the start of this line as
+                    // a line_start
+					const size_t linestartpos = (it - _text.begin()) -
+                            rec.glyphs().size();
+
+					while (linestartit < linestartend &&
+                            *linestartit < linestartpos)
 					{
-						linestartit++;
+						++linestartit;
 					}
 					_line_starts.insert(linestartit, linestartpos);
 				}
@@ -1865,9 +1880,10 @@ TextField::registerTextVariable()
 /// tag was incomplete. The iterator is moved to after
 /// the closing tag or the end of the string.
 bool
-TextField::parseHTML(std::wstring& tag, std::map<std::string, std::string> attributes,
-						std::wstring::const_iterator& it,
-                        const std::wstring::const_iterator& e) const
+TextField::parseHTML(std::wstring& tag,
+        std::map<std::string, std::string> /*attributes*/,
+		std::wstring::const_iterator& it,
+        const std::wstring::const_iterator& e) const
 {
 	std::string attname;
 	std::string attvalue;
@@ -2116,40 +2132,27 @@ TextField::setUnderlined(bool v)
     }
 }
 
-// ADDED
 void          
 TextField::setBullet(bool b)
 {              
-    if ( _bullet != b )
-    {
+    if (_bullet != b) {
         _bullet = b;
         format_text();
     }
 }
 
-// ADDED
 void 
-TextField::setTabStops(std::vector<int> tabStops)
+TextField::setTabStops(const std::vector<int>& tabStops)
 {
-	_tabStops.resize(tabStops.size());
-	
-	for (int i = 0; i < tabStops.size(); i++)
-	{
-		if ( _tabStops[i] != tabStops[i] )
-		{
-			_tabStops[i]=tabStops[i];      
-		}
-	}
+    _tabStops = tabStops;
 	format_text();
 	set_invalidated();
 }
 
-// ADDED
 void
 TextField::setURL(std::string url)
 { 
-    if ( _url != url )
-    {
+    if ( _url != url ) {
         set_invalidated();
         _url = url;
     }
