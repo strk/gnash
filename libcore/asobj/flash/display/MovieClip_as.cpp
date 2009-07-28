@@ -372,12 +372,8 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_property("scrollRect", &movieclip_scrollRect,
         &movieclip_scrollRect);
     o.init_property("tabIndex", &movieclip_tabIndex, &movieclip_tabIndex);
-    o.init_property("transform", &movieclip_transform, 
-            &movieclip_transform);
 
-    const int swf6Flags = PropFlags::dontDelete |
-                PropFlags::dontEnum |
-                PropFlags::onlySWF6Up;
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
     o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
     o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
@@ -396,14 +392,17 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
-    const int swf7Flags = PropFlags::dontDelete |
-                PropFlags::dontEnum |
-                PropFlags::onlySWF7Up;
+    const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
 
     o.init_member("getNextHighestDepth", gl->createFunction(
                 movieclip_getNextHighestDepth), swf7Flags);
     o.init_member("getInstanceAtDepth", gl->createFunction(
                 movieclip_getInstanceAtDepth), swf7Flags);
+    
+    const int swf8Flags = as_object::DefaultFlags | PropFlags::onlySWF8Up;
+
+    o.init_property("transform", &movieclip_transform, &movieclip_transform,
+            swf8Flags);
 
 }
 
