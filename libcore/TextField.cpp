@@ -1452,61 +1452,80 @@ TextField::handleChar(std::wstring::const_iterator& it,
 						if (s == "u") {
 							//underline
 							newrec.setUnderline(true);
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "a") {
 							//anchor
 							log_unimpl("<a> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "b") {
 							//bold
-							Font* boldfont = new Font(rec.getFont()->name(), true, rec.getFont()->isItalic());
+							Font* boldfont = new Font(rec.getFont()->name(),
+                                    true, rec.getFont()->isItalic());
 							newrec.setFont(boldfont);
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "font") {
 							//font
 							log_unimpl("<font> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "img") {
 							//image
 							log_unimpl("<img> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "i") {
 							//italic
-							Font* italicfont = new Font(rec.getFont()->name(), rec.getFont()->isBold(), true);
+							Font* italicfont = new Font(rec.getFont()->name(),
+                                    rec.getFont()->isBold(), true);
 							newrec.setFont(italicfont);
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "li") {
 							//list item (bullet)
 							log_unimpl("<li> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "span") {
 							//span
 							log_unimpl("<span> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "textformat") {
 							//text format
 							log_unimpl("<textformat> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						} else if (s == "p") { 
 							//paragraph
 							log_unimpl("<p> html tag in TextField");
-							if ( _display == 0)
+							if (_display == BLOCK)
 							{
-								newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.5);
-								handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-								newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
+								newLine(it, x, y, rec, last_space_glyph,
+                                        last_line_start_record, 1.5);
+								handleChar(it, e, x, y, newrec, last_code,
+                                        last_space_glyph,
+                                        last_line_start_record);
+								newLine(it, x, y, rec, last_space_glyph,
+                                        last_line_start_record, 1.0);
 							}
 							else
 							{
-								handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+								handleChar(it, e, x, y, newrec, last_code,
+                                        last_space_glyph,
+                                        last_line_start_record);
 							}
 						} else if (s == "br") {
 							//line break
 							log_unimpl("<br> html tag in TextField");
 						} else {
 							log_debug("<%s> tag is unsupported", s);
-							///THIS IS DANGEROUS. IF TAG HAS NO CLOSING TAG, THIS MAY PRODUCE UNDESIRED RESULTS
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
+							// THIS IS DANGEROUS. IF TAG HAS NO CLOSING TAG,
+                            // THIS MAY PRODUCE UNDESIRED RESULTS
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
 						}
 					}
 					rec.setXOffset(x);
@@ -1626,11 +1645,11 @@ TextField::handleChar(std::wstring::const_iterator& it,
 				}
 				if (!newlinefound) break;
 			}
+            else if (doWordWrap()) {
 
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
 				log_debug(" wordWrap=true");
 #endif
-
 
 				// Insert newline if there's space or autosize != none
 
@@ -1715,8 +1734,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
 #endif 
 			}
 		}
-
-			// TODO: HTML markup
+    }
 			
 }
 
