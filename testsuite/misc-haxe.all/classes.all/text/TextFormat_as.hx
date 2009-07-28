@@ -579,9 +579,9 @@ class TextFormat_as {
 	}
 
 	if (Std.string(untyped __typeof__(tfObj.url)) == 'null') {
-		DejaGnu.xpass("Good, tfObj.url is a  'null'.");
+		DejaGnu.pass("Good, tfObj.url is a  'null'.");
 	} else {
-	    DejaGnu.xfail("Wrong, tfObj.url is not 'null'.");
+	    DejaGnu.fail("Wrong, tfObj.url is not 'null'.");
 	}
 
  	if (Std.string(untyped __typeof__(tfObj.color)) == 'null') {
@@ -749,15 +749,15 @@ class TextFormat_as {
 	}
 
 	if (tfObj.target == "tgt") {
-		DejaGnu.xpass("Wrong, tfObj.target equals to 'tgt'.");
+		DejaGnu.pass("Wrong, tfObj.target equals to 'tgt'.");
 	} else {
-	    DejaGnu.xfail("Good, tfObj.target does not equal to 'tgt'.");
+	    DejaGnu.fail("Good, tfObj.target does not equal to 'tgt'.");
 	}
 
 	if (tfObj.url == "http") {
-		DejaGnu.xpass("Wrong, tfObj.url equals to 'http'.");
+		DejaGnu.pass("Wrong, tfObj.url equals to 'http'.");
 	} else {
-	    DejaGnu.xfail("Good, tfObj.url does not equal to 'http'.");
+	    DejaGnu.fail("Good, tfObj.url does not equal to 'http'.");
 	}
 
 	if (Std.string(untyped __typeof__(tfObj.bullet)) == 'null') {
