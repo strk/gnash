@@ -65,14 +65,12 @@ public:
 	
 	std::vector<int> tabStops() const { return _tabStops; }
 	bool tabStopsDefined() const { return _flags&DEFtabStops; }
-	void tabStopsSet(const std::vector<int>& tabStops) { 
-		_tabStops.resize(tabStops.size());
-		for (int i=0;i<tabStops.size();++i)
-		{
-			_tabStops[i] = tabStops[i];
-		}
+	
+    void tabStopsSet(const std::vector<int>& tabStops) { 
+        _tabStops = tabStops;
 		_flags |= DEFtabStops; 
 	}
+
 	/// \brief
 	/// Return an integer that indicates the indentation from the left
     /// margin to the first DisplayObject in the paragraph

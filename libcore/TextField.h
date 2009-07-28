@@ -42,6 +42,8 @@ class TextField : public InteractiveObject
 {
 
 public:
+    
+    typedef std::vector<size_t> LineStarts;
 
     /// Text alignment values
 	enum TextAlignment
@@ -470,13 +472,13 @@ public:
 		return _bullet;
 	}
 	
-	std::vector<int> getTabStops() const
+	const std::vector<int>& getTabStops() const
 	{
 		return _tabStops;
 	}
 
 	void setUnderlined(bool v);
-	void setTabStops(std::vector<int> tabStops);
+	void setTabStops(const std::vector<int>& tabStops);
 	void setBullet(bool b);
 	void setURL(std::string url);
 	void setTarget(std::string target);
@@ -541,17 +543,20 @@ private:
 	void format_text();
 	
 	/// Move viewable lines based on m_cursor
-	void changeTopVisibleLine(int current_line);
+	void changeTopVisibleLine(size_t current_line);
 	
 	/// Handles a new line, this will be called several times, so this
 	/// will hopefully make code cleaner
-	void newLine(std::wstring::const_iterator& it, boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec,
-					int& last_space_glyph, int& last_line_start_record, float div);
+	void newLine(std::wstring::const_iterator& it, boost::int32_t& x,
+            boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
+            LineStarts::value_type& last_line_start_record, float div);
 					
 	/// De-reference and do appropriate action for character iterator
-	void handleChar(std::wstring::const_iterator& it, const std::wstring::const_iterator& e,
-		boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
-		int& last_space_glyph, int& last_line_start_record);
+	void handleChar(std::wstring::const_iterator& it,
+            const std::wstring::const_iterator& e, boost::int32_t& x,
+            boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
+		    int& last_space_glyph,
+            LineStarts::value_type& last_line_start_record);
 	
 	/// Extracts an HTML tag.
 	///
@@ -562,9 +567,10 @@ private:
 	/// @param e    An iterator pointing to the end of the string.
 	/// @return     Whether the tag is complete or not (i.e. whether a '>'
 	///             was found).
-	bool parseHTML(std::wstring& tag, std::map<std::string, std::string> attributes,
-						std::wstring::const_iterator& it,
-	                    const std::wstring::const_iterator& e) const;
+	bool parseHTML(std::wstring& tag,
+            std::map<std::string, std::string> attributes,
+            std::wstring::const_iterator& it,
+            const std::wstring::const_iterator& e) const;
 
 	/// Does LEFT/CENTER/RIGHT alignment on the records in
 	/// m_text_glyph_records[], starting with
@@ -651,12 +657,14 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
-	int _top_visible_line;
+	size_t _top_visible_line;
 	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
-	std::vector<int> _line_starts;
-	int _linesindisplay;
+
+	LineStarts _line_starts;
+
+	size_t _linesindisplay;
 
     /// Corresponds to the multiline property.
     bool _multiline;

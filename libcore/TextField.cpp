@@ -52,7 +52,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
-#include <stdlib.h>
+#include <cstdlib>
 #include <typeinfo>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
@@ -119,11 +119,11 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _tag(&def),
     _textDefined(def.hasText()),
     _underlined(false),
-	_bullet(false),
+    _bullet(false),
     _url(""),
     _target(""),
+    _display(),
     _tabStops(),
-	_display(),
     _leading(def.leading()),
     _alignment(def.alignment()),
     _indent(def.indent()), 
@@ -134,7 +134,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
-	_top_visible_line(0u),
+    _top_visible_line(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(def.multiline()),
@@ -182,11 +182,11 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     InteractiveObject(parent, parent ? 0 : -1),
     _textDefined(false),
     _underlined(false),
-	_bullet(false),
+    _bullet(false),
     _url(""),
     _target(""),
+    _display(),
     _tabStops(),
-	_display(),
     _leading(0),
     _alignment(ALIGN_LEFT),
     _indent(0), 
@@ -197,7 +197,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
-	_top_visible_line(0u),
+    _top_visible_line(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(false),
@@ -443,13 +443,13 @@ TextField::on_event(const event_id& ev)
 
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());
-			
-			int cur_cursor = m_cursor;
-			int previouslinesize = 0;
-			int nextlinesize = 0;
-			int manylines = _line_starts.size();
-			std::vector<int>::iterator linestartit = _line_starts.begin();
-			std::vector<int>::const_iterator linestartend = _line_starts.end();
+            
+            size_t cur_cursor = m_cursor;
+            size_t previouslinesize = 0;
+            size_t nextlinesize = 0;
+            size_t manylines = _line_starts.size();
+            LineStarts::iterator linestartit = _line_starts.begin();
+            LineStarts::const_iterator linestartend = _line_starts.end();
 
             switch (c)
             {
@@ -474,96 +474,108 @@ TextField::on_event(const event_id& ev)
                     break;
 
                 case key::HOME:
-					while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-						cur_cursor = *linestartit;
-						linestartit++;
-					}
-					m_cursor = cur_cursor;
-					format_text();
-					break;
-					
+                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+                        cur_cursor = *linestartit;
+                        linestartit++;
+                    }
+                    m_cursor = cur_cursor;
+                    format_text();
+                    break;
+                    
                 case key::PGUP:
-					// if going a page up is too far...
-					if(_top_visible_line - _linesindisplay < 0) {
-						_top_visible_line = 0;
-						m_cursor = 0;
-					} else { // go a page up
-						_top_visible_line -= _linesindisplay;
-						m_cursor = _line_starts[_top_visible_line];
-					}
-					format_text();
-					break;
-					
+                    // if going a page up is too far...
+                    if(_top_visible_line < _linesindisplay) {
+                        _top_visible_line = 0;
+                        m_cursor = 0;
+                    } else { // go a page up
+                        _top_visible_line -= _linesindisplay;
+                        m_cursor = _line_starts[_top_visible_line];
+                    }
+                    format_text();
+                    break;
+                    
                 case key::UP:
-					while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-						cur_cursor = *linestartit;
-						linestartit++;
-					}
-					//if there is no previous line
-					if ( linestartit-_line_starts.begin() - 2 < 0 ) {
-						m_cursor = 0;
-						format_text();
-						break;
-					}
-					previouslinesize = _displayRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
-					//if the previous line is smaller
-					if (m_cursor - cur_cursor > previouslinesize)
-						m_cursor = *(--(--linestartit)) + previouslinesize;
-					else
-						m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
-					if (m_cursor < _line_starts[_top_visible_line] && _line_starts[_top_visible_line] != 0)
-						--_top_visible_line;
+                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+                        cur_cursor = *linestartit;
+                        linestartit++;
+                    }
+                    //if there is no previous line
+                    if ( linestartit-_line_starts.begin() - 2 < 0 ) {
+                        m_cursor = 0;
+                        format_text();
+                        break;
+                    }
+                    previouslinesize = _displayRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
+                    //if the previous line is smaller
+                    if (m_cursor - cur_cursor > previouslinesize)
+                        m_cursor = *(--(--linestartit)) + previouslinesize;
+                    else
+                        m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
+                    if (m_cursor < _line_starts[_top_visible_line] && _line_starts[_top_visible_line] != 0)
+                        --_top_visible_line;
                     format_text();
                     break;
 
                 case key::END:
-					while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-						linestartit++;
-					}
-					m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
-					format_text();
-					break;
-					
-                case key::PGDN:
-					//if going another page down is too far...
-					if(_top_visible_line + _linesindisplay >= manylines) {
-						if(manylines - _linesindisplay <= 0) {
-							_top_visible_line = 0;
-						} else {
-							_top_visible_line = manylines - _linesindisplay;
-						}
-						if(m_cursor < _line_starts[_top_visible_line-1]) {
-							m_cursor = _line_starts[_top_visible_line-1];
-						} else {
-							m_cursor = _text.size();
-						}
-					} else { //go a page down
-						_top_visible_line += _linesindisplay;
-						m_cursor = _line_starts[_top_visible_line];
-					}
-					format_text();
-					break;
-					
-                case key::DOWN:
                     while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-						cur_cursor = *linestartit;
-						linestartit++;
-					}
-					//if there is no next line
-					if ( linestartit-_line_starts.begin() >= manylines ) {
-						m_cursor = _text.size();
-						format_text();
-						break;
-					}
-					nextlinesize = _displayRecords[linestartit-_line_starts.begin()].glyphs().size();
-					//if the next line is smaller
-					if (m_cursor - cur_cursor > nextlinesize)
-						m_cursor = *linestartit + nextlinesize;
-					else //put the cursor at the same character distance
-						m_cursor = *(linestartit) + (m_cursor - cur_cursor);
+                        linestartit++;
+                    }
+                    m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
                     format_text();
                     break;
+                    
+                case key::PGDN:
+                    //if going another page down is too far...
+                    if(_top_visible_line + _linesindisplay >= manylines) {
+                        if(manylines - _linesindisplay <= 0) {
+                            _top_visible_line = 0;
+                        } else {
+                            _top_visible_line = manylines - _linesindisplay;
+                        }
+                        if(m_cursor < _line_starts[_top_visible_line-1]) {
+                            m_cursor = _line_starts[_top_visible_line-1];
+                        } else {
+                            m_cursor = _text.size();
+                        }
+                    } else { //go a page down
+                        _top_visible_line += _linesindisplay;
+                        m_cursor = _line_starts[_top_visible_line];
+                    }
+                    format_text();
+                    break;
+                    
+                case key::DOWN:
+                {
+                    while (linestartit < linestartend &&
+                            *linestartit <= m_cursor ) {
 
+                        cur_cursor = *linestartit;
+                        linestartit++;
+                    }
+
+                    // linestartit should never be before _line_starts.begin()
+                    const size_t currentLine = linestartit -
+                        _line_starts.begin();
+                    
+                    //if there is no next line
+                    if (currentLine >= manylines ) {
+                        m_cursor = _text.size();
+                        format_text();
+                        break;
+                    }
+                    nextlinesize = _displayRecords[currentLine].glyphs().size();
+                    
+                    //if the next line is smaller
+                    if (m_cursor - cur_cursor > nextlinesize) {
+                        m_cursor = *linestartit + nextlinesize;
+                    }
+                    else { 
+                        //put the cursor at the same character distance
+                        m_cursor = *(linestartit) + (m_cursor - cur_cursor);
+                    }
+                    format_text();
+                    break;
+                }
 
                 case key::LEFT:
                     m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
@@ -575,10 +587,10 @@ TextField::on_event(const event_id& ev)
                                                         _text.size();
                     format_text();
                     break;
-					
-				case key::ENTER:
-					if ( !multiline() )
-						break;
+                    
+                case key::ENTER:
+                    if ( !multiline() )
+                        break;
 
                 default:
                     wchar_t t = static_cast<wchar_t>(
@@ -999,65 +1011,66 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
     }
     //~ else
     //~ {
-		//~ std::vector<int> tabStops;
-		//~ tabStops = _tabStops;
-		//~ 
-		//~ std::sort(_tabStops.begin(), _tabStops.end()); 
+        //~ std::vector<int> tabStops;
+        //~ tabStops = _tabStops;
+        //~ 
+        //~ std::sort(_tabStops.begin(), _tabStops.end()); 
 //~ 
-		//~ int tab = 0;
-		//~ if ( !_tabStops.empty() )
-		//~ {
-			//~ tab = _tabStops.back();
-			//~ 
-			//~ for (int i = 0; i < tabStops.size(); ++i)
-			//~ {					
-				//~ if (tabStops[i] > x)
-				//~ {
-					//~ if((tabStops[i] - x) < tab) 
-					//~ {
-						//~ tab = tabStops[i] - x;
-					//~ }
-				//~ }
-				//~ SWF::TextRecord::GlyphEntry ge;
-				//~ ge.index = index;
-				//~ ge.advance = scale * tab;
-				//~ rec.addGlyph(ge);
-				//~ x+=ge.advance;
-			//~ }
-		//~ }
-		else
-		{
-			SWF::TextRecord::GlyphEntry ge;
-			ge.index = index;
-			ge.advance = scale * rec.getFont()->get_advance(index, 
-					_embedFonts);
+        //~ int tab = 0;
+        //~ if ( !_tabStops.empty() )
+        //~ {
+            //~ tab = _tabStops.back();
+            //~ 
+            //~ for (int i = 0; i < tabStops.size(); ++i)
+            //~ {                    
+                //~ if (tabStops[i] > x)
+                //~ {
+                    //~ if((tabStops[i] - x) < tab) 
+                    //~ {
+                        //~ tab = tabStops[i] - x;
+                    //~ }
+                //~ }
+                //~ SWF::TextRecord::GlyphEntry ge;
+                //~ ge.index = index;
+                //~ ge.advance = scale * tab;
+                //~ rec.addGlyph(ge);
+                //~ x+=ge.advance;
+            //~ }
+        //~ }
+        else
+        {
+            SWF::TextRecord::GlyphEntry ge;
+            ge.index = index;
+            ge.advance = scale * rec.getFont()->get_advance(index, 
+                    _embedFonts);
 
-			const int tabstop = 8;
-			rec.addGlyph(ge, tabstop);
-			x += ge.advance * tabstop;
-		}
-	//}
+            const int tabstop = 8;
+            rec.addGlyph(ge, tabstop);
+            x += ge.advance * tabstop;
+        }
+    //}
 }
 
 void
 TextField::format_text()
 {
     _textRecords.clear();
-	_displayRecords.clear();
-	_line_starts.clear();
-	
-	// nothing more to do if text is empty
+    _displayRecords.clear();
+    _line_starts.clear();
+    
+    // nothing more to do if text is empty
     if ( _text.empty() )
     {
         // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
         //       not sure we should...
         reset_bounding_box(0, 0);
-		m_xcursor = PADDING_TWIPS + std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
+        m_xcursor = PADDING_TWIPS +
+            std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
         return;
     }
-	
-	std::vector<int>::iterator linestartit = _line_starts.begin();
-	std::vector<int>::const_iterator linestartend = _line_starts.end();
+    
+    LineStarts::iterator linestartit = _line_starts.begin();
+    LineStarts::const_iterator linestartend = _line_starts.end();
 
     // See bug #24266
     const rect& defBounds = _bounds;
@@ -1094,7 +1107,6 @@ TextField::format_text()
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
-    boost::uint16_t rightMargin = getRightMargin();
     boost::uint16_t indent = getIndent();
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
@@ -1110,40 +1122,35 @@ TextField::format_text()
             std::max(0, leftMargin + indent + blockIndent));
     rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
     rec.setTextHeight(fontHeight);
-	
-	// BULLET CASE:
+    
+    // BULLET CASE:
                 
     // First, we indent 10 spaces, and then place the bullet
-    // character (in this case, an asterik), then we pad it
+    // character (in this case, an asterisk), then we pad it
     // again with 10 spaces
     // Note: this works only for additional lines of a 
     // bulleted list, so that is why there is a bullet format
     // in the beginning of format_text()
     if ( _bullet )
     {
-        int space = rec.getFont()->get_glyph_index(
-                    32, _embedFonts);
+        int space = rec.getFont()->get_glyph_index(32, _embedFonts);
+
         SWF::TextRecord::GlyphEntry ge;
         ge.index = space;
-        ge.advance = scale * rec.getFont()->get_advance(space,
-                    _embedFonts);
+        ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
         rec.addGlyph(ge, 10);
 
-        // We use an asterik instead of a bullet
-        int bullet = rec.getFont()->get_glyph_index(
-                     42, _embedFonts);
+        // We use an asterisk instead of a bullet
+        int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
         ge.index = bullet;
-        ge.advance = scale * rec.getFont()->get_advance(bullet, 
-                     _embedFonts);
+        ge.advance = scale * rec.getFont()->get_advance(bullet, _embedFonts);
         rec.addGlyph(ge);
         
-        space = rec.getFont()->get_glyph_index(
-                    32, _embedFonts);
+        space = rec.getFont()->get_glyph_index(32, _embedFonts);
         ge.index = space;
-        ge.advance = scale * rec.getFont()->get_advance(space,
-                    _embedFonts);
-		rec.addGlyph(ge, 9);
-	}
+        ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
+        rec.addGlyph(ge, 9);
+    }
 
     boost::int32_t x = static_cast<boost::int32_t>(rec.xOffset());
     boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
@@ -1153,12 +1160,13 @@ TextField::format_text()
 
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
-	
-	int    last_code = -1; // only used if _embedFonts
-    int    last_space_glyph = -1;
-    int    last_line_start_record = 0;
-	_line_starts.push_back(0);
-	_linesindisplay = (defBounds.height() / (fontHeight + leading));
+    
+    int last_code = -1; // only used if _embedFonts
+    int last_space_glyph = -1;
+    size_t last_line_start_record = 0;
+    
+    _line_starts.push_back(0);
+    _linesindisplay = (defBounds.height() / (fontHeight + leading));
 
     m_xcursor = x;
     m_ycursor = y;
@@ -1172,8 +1180,9 @@ TextField::format_text()
     const std::wstring::const_iterator e = _text.end();
 
     ///handleChar takes care of placing the glyphs
-	handleChar(it, e, x, y, rec, last_code, last_space_glyph, last_line_start_record);
-	
+    handleChar(it, e, x, y, rec, last_code, last_space_glyph,
+            last_line_start_record);
+    
     // Expand bounding box to include the whole text (if autoSize)
     if ( _autoSize != autoSizeNone )
     {
@@ -1181,528 +1190,558 @@ TextField::format_text()
     }
 
     // Add the last line to our output.
-	//if (!rec.glyphs().empty()) _textRecords.push_back(rec);
-	_textRecords.push_back(rec);
-	
-	linestartit = _line_starts.begin();
-	linestartend = _line_starts.end();
-	int current_line;
-	int linestart = 0;
-	int manylines = _line_starts.size();
-	int manyrecords = _textRecords.size();
-	SWF::TextRecord cursorposition_line;
-	while (linestartit != linestartend && *linestartit <= m_cursor) {
-		linestart = *linestartit++;
-	}
-	current_line = linestartit - _line_starts.begin();
-	changeTopVisibleLine(current_line);
+    //if (!rec.glyphs().empty()) _textRecords.push_back(rec);
+    _textRecords.push_back(rec);
+    
+    linestartit = _line_starts.begin();
+    linestartend = _line_starts.end();
+    size_t linestart = 0;
+    size_t manylines = _line_starts.size();
+    size_t manyrecords = _textRecords.size();
 
-	///ASSIGN THE VISIBLE LINES TO _displayRecord
-	int yoffset = _top_visible_line*(fontHeight + leading) + PADDING_TWIPS;
-	for (unsigned int i = 0; i < manyrecords; ++i) {
-		//if the record is in the section we want to show
-		if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
-			_textRecords[i].yOffset() - yoffset > 0) {
-			_displayRecords.push_back(_textRecords[i]);
-			_displayRecords.back().setYOffset(_displayRecords.back().yOffset() - yoffset);
-		}
-	}
-	///POSITION THE CURSOR IN X-DIRECTION
-	if ( current_line <= manylines && current_line >= 1) {
-		float lineposition = (current_line * (fontHeight + leading)) + PADDING_TWIPS;
-		for (unsigned int i = current_line - 1; i < manyrecords && _textRecords[i].yOffset() == lineposition; ++i) {
-			cursorposition_line = _textRecords[i];
-			if (linestart + _textRecords[i].glyphs().size() < m_cursor - _line_starts[current_line-1]) {
-				linestart += _textRecords[i].glyphs().size();
-			}
-		}
-		m_xcursor = cursorposition_line.xOffset();
-		//extra checks keep MemCheck happy!
-		for (unsigned int i = linestart; i < m_cursor && i-linestart < cursorposition_line.glyphs().size(); ++i) {
-			m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
-		}
-	}
-	///POSITION THE CURSOR IN Y-DIRECTION
-	m_ycursor = PADDING_TWIPS - _top_visible_line*(fontHeight + leading);
-	if (current_line >= 0) {
-		for(unsigned int i = 0; i < current_line-1; ++i) {
-			m_ycursor += (fontHeight+leading);
-		}
-	}
-	
-	float extra_space = align_line(textAlignment, last_line_start_record, x);
+    SWF::TextRecord cursorposition_line;
+    while (linestartit != linestartend && *linestartit <= m_cursor) {
+        linestart = *linestartit++;
+    }
+    const size_t current_line = linestartit - _line_starts.begin();
+    changeTopVisibleLine(current_line);
+
+    ///ASSIGN THE VISIBLE LINES TO _displayRecord
+    int yoffset = _top_visible_line*(fontHeight + leading) + PADDING_TWIPS;
+    for (size_t i = 0; i < manyrecords; ++i) {
+        //if the record is in the section we want to show
+        if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
+            _textRecords[i].yOffset() - yoffset > 0) {
+            _displayRecords.push_back(_textRecords[i]);
+            _displayRecords.back().setYOffset(_displayRecords.back().yOffset() - yoffset);
+        }
+    }
+    ///POSITION THE CURSOR IN X-DIRECTION
+    if ( current_line <= manylines && current_line >= 1) {
+        float lineposition = (current_line * (fontHeight + leading)) + PADDING_TWIPS;
+        for (size_t i = current_line - 1; i < manyrecords && _textRecords[i].yOffset() == lineposition; ++i) {
+            cursorposition_line = _textRecords[i];
+            if (linestart + _textRecords[i].glyphs().size() < m_cursor - _line_starts[current_line-1]) {
+                linestart += _textRecords[i].glyphs().size();
+            }
+        }
+        m_xcursor = cursorposition_line.xOffset();
+        //extra checks keep MemCheck happy!
+        for (size_t i = linestart; i < m_cursor && i-linestart < cursorposition_line.glyphs().size(); ++i) {
+            m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
+        }
+    }
+    ///POSITION THE CURSOR IN Y-DIRECTION
+    m_ycursor = PADDING_TWIPS - _top_visible_line*(fontHeight + leading);
+    
+    for (size_t i = 0; (i + 1) < current_line; ++i) {
+        m_ycursor += (fontHeight+leading);
+    }
+    
+    float extra_space = align_line(textAlignment, last_line_start_record, x);
     m_xcursor += static_cast<int>(extra_space);
 
-	set_invalidated(); //redraw
+    set_invalidated(); //redraw
 }
 
 void
-TextField::changeTopVisibleLine(int current_line)
+TextField::changeTopVisibleLine(size_t current_line)
 {
-	if (_linesindisplay > 0) {
-		int manylines = _line_starts.size();
-		int lastvisibleline = _top_visible_line + _linesindisplay;
-		if (manylines - _top_visible_line <= _linesindisplay) {
-			if(manylines - _linesindisplay <= 0)
-				_top_visible_line = 0;
-			else {
-				_top_visible_line = manylines - _linesindisplay;
-			}
-		//if we are at a higher position, scoot the lines down
-		} else if ( m_cursor < (_line_starts[_top_visible_line]) ) {
-			_top_visible_line -= _top_visible_line-current_line;
-		//if we are at a lower position, scoot the lines up
-		} else if (manylines > _top_visible_line+_linesindisplay) {
-			if ( m_cursor >= (_line_starts[lastvisibleline])) {
-				_top_visible_line += current_line - (lastvisibleline);
-			}
-		}
-	}
+    if (_linesindisplay > 0) {
+        size_t manylines = _line_starts.size();
+        size_t lastvisibleline = _top_visible_line + _linesindisplay;
+        assert (manylines >= _top_visible_line);
+        if (manylines - _top_visible_line <= _linesindisplay) {
+            if (manylines < _linesindisplay) _top_visible_line = 0;
+            else {
+                _top_visible_line = manylines - _linesindisplay;
+            }
+            return;
+        }
+        
+        if (m_cursor < (_line_starts[_top_visible_line])) {
+            //if we are at a higher position, scoot the lines down
+            _top_visible_line -= _top_visible_line - current_line;
+            return;
+        }
+
+        if (manylines > _top_visible_line + _linesindisplay) {
+            //if we are at a lower position, scoot the lines up
+            if (m_cursor >= (_line_starts[lastvisibleline])) {
+                _top_visible_line += current_line - (lastvisibleline);
+            }
+        }
+        return;
+    }
 }
 
 void
-TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec,
-					int& last_space_glyph, int& last_line_start_record, float div)
+TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
+        boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
+        LineStarts::value_type& last_line_start_record, float div)
 {
 
-	// newline.
-	std::vector<int>::iterator linestartit = _line_starts.begin();
-	std::vector<int>::const_iterator linestartend = _line_starts.end();
-	
-	float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
-    float fontDescent = _font->descent() * scale; 
+    // newline.
+    LineStarts::iterator linestartit = _line_starts.begin();
+    LineStarts::const_iterator linestartend = _line_starts.end();
+    
+    float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
     float fontLeading = _font->leading() * scale;
-	float leading = getLeading();
+    float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
-	
-	// Close out this stretch of glyphs.
-	_textRecords.push_back(rec);
-	align_line(getTextAlignment(), last_line_start_record, x);
+    
+    // Close out this stretch of glyphs.
+    _textRecords.push_back(rec);
+    align_line(getTextAlignment(), last_line_start_record, x);
 
-	// Expand bounding box to include last column of text ...
-	if ( _autoSize != autoSizeNone ) 
-	{
-		_bounds.expand_to_point(x + PADDING_TWIPS,
-			y + PADDING_TWIPS);
-	}
+    // Expand bounding box to include last column of text ...
+    if ( _autoSize != autoSizeNone ) 
+    {
+        _bounds.expand_to_point(x + PADDING_TWIPS,
+            y + PADDING_TWIPS);
+    }
 
-	// new paragraphs get the indent.
-	x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
-	y += div * (getFontHeight() + leading); 			
-			
-	// Start a new record on the next line. Other properties of the
-	// TextRecord should be left unchanged.
-	rec.clearGlyphs();
-	rec.setXOffset(x);
-	rec.setYOffset(y);
+    // new paragraphs get the indent.
+    x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
+    y += div * (getFontHeight() + leading);             
+            
+    // Start a new record on the next line. Other properties of the
+    // TextRecord should be left unchanged.
+    rec.clearGlyphs();
+    rec.setXOffset(x);
+    rec.setYOffset(y);
 
-	last_space_glyph = -1;
-	last_line_start_record = _textRecords.size();
-						 
-	linestartit = _line_starts.begin();
-	linestartend = _line_starts.end();
-	//Fit a line_start in the correct place
-	while ( linestartit < linestartend && *linestartit < it-_text.begin())
-	{
-		linestartit++;
-	}
-	_line_starts.insert(linestartit, it-_text.begin());
+    last_space_glyph = -1;
+    last_line_start_record = _textRecords.size();
+                         
+    linestartit = _line_starts.begin();
+    linestartend = _line_starts.end();
+    //Fit a line_start in the correct place
+    const size_t currentPos = it - _text.begin();
 
-	// BULLET CASE:
+    while (linestartit < linestartend && *linestartit < currentPos)
+    {
+        ++linestartit;
+    }
+    _line_starts.insert(linestartit, currentPos);
+
+    // BULLET CASE:
                 
     // First, we indent 10 spaces, and then place the bullet
-    // character (in this case, an asterik), then we pad it
+    // character (in this case, an asterisk), then we pad it
     // again with 10 spaces
     // Note: this works only for additional lines of a 
     // bulleted list, so that is why there is a bullet format
     // in the beginning of format_text()
-	if (_bullet)
+    if (_bullet)
     {
-		int space = rec.getFont()->get_glyph_index(
-					32, _embedFonts);
-		SWF::TextRecord::GlyphEntry ge;
-		ge.index = space;
-		ge.advance = scale * rec.getFont()->get_advance(space,
-					_embedFonts);
-				  
-		rec.addGlyph(ge,10);
+        int space = rec.getFont()->get_glyph_index(32, _embedFonts);
+        SWF::TextRecord::GlyphEntry ge;
+        ge.index = space;
+        ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
+                  
+        rec.addGlyph(ge,10);
                     
-		int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
-		ge.index = bullet;
-		ge.advance = scale * rec.getFont()->get_advance(bullet, 
-							  _embedFonts);
-		rec.addGlyph(ge);
+        int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
+        ge.index = bullet;
+        ge.advance = scale * rec.getFont()->get_advance(bullet, _embedFonts);
+        rec.addGlyph(ge);
 
-		ge.index = space;
-		ge.advance = scale * rec.getFont()->get_advance(space,
-					_embedFonts);
-		
-		rec.addGlyph(ge,9);
-	}
+        ge.index = space;
+        ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
+        
+        rec.addGlyph(ge,9);
+    }
 }
 
 void
-TextField::handleChar(std::wstring::const_iterator& it, const std::wstring::const_iterator& e,
-	boost::int32_t& x, boost::int32_t& y, SWF::TextRecord& rec, int& last_code, int& last_space_glyph,
-	int& last_line_start_record)
+TextField::handleChar(std::wstring::const_iterator& it,
+        const std::wstring::const_iterator& e, boost::int32_t& x,
+        boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
+        int& last_space_glyph, LineStarts::value_type& last_line_start_record)
 {
-	std::vector<int>::iterator linestartit = _line_starts.begin();
-	std::vector<int>::const_iterator linestartend = _line_starts.end();
-	
-	float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    LineStarts::iterator linestartit = _line_starts.begin();
+    LineStarts::const_iterator linestartend = _line_starts.end();
+    
+    float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
-	float leading = getLeading();
+    float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
-	
-	boost::uint32_t code = 0;
-	while (it != e)
-	{
-		code = *it++;
-		if (!code) break;
+    
+    boost::uint32_t code = 0;
+    while (it != e)
+    {
+        code = *it++;
+        if (!code) break;
 
-		if ( _embedFonts )
-		{
-			x += rec.getFont()->get_kerning_adjustment(last_code, 
-					static_cast<int>(code)) * scale;
-			last_code = static_cast<int>(code);
-		}
+        if ( _embedFonts )
+        {
+            x += rec.getFont()->get_kerning_adjustment(last_code, 
+                    static_cast<int>(code)) * scale;
+            last_code = static_cast<int>(code);
+        }
 
-		// Expand the bounding-box to the lower-right corner of each glyph as
-		// we generate it.
-		m_text_bounding_box.expand_to_point(x, y + fontDescent);
-		switch (code)
-		{
-			case 27:
-				// Ignore escape
-				break;
-			case 9:
-				insertTab(rec, x, scale);
-				break;
-			case 8:
-				// Backspace 
+        // Expand the bounding-box to the lower-right corner of each glyph as
+        // we generate it.
+        m_text_bounding_box.expand_to_point(x, y + fontDescent);
+        switch (code)
+        {
+            case 27:
+                // Ignore escape
+                break;
+            case 9:
+                insertTab(rec, x, scale);
+                break;
+            case 8:
+                // Backspace 
 
-				// This is a limited hack to enable overstrike effects.
-				// It backs the cursor up by one DisplayObject and then continues
-				// the layout.  E.g. you can use this to display an underline
-				// cursor inside a simulated text-entry box.
-				//
-				// ActionScript understands the '\b' escape sequence
-				// for inserting a BS DisplayObject.
-				//
-				// ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
-				// OVER NEWLINES, ETC.
+                // This is a limited hack to enable overstrike effects.
+                // It backs the cursor up by one DisplayObject and then continues
+                // the layout.  E.g. you can use this to display an underline
+                // cursor inside a simulated text-entry box.
+                //
+                // ActionScript understands the '\b' escape sequence
+                // for inserting a BS DisplayObject.
+                //
+                // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
+                // OVER NEWLINES, ETC.
 
-				if (!rec.glyphs().empty())
-				{
-					// Peek at the previous glyph, and zero out its advance
-					// value, so the next char overwrites it.
-					float advance = rec.glyphs().back().advance;
-					x -= advance; 
-					// Remove one glyph
-					rec.clearGlyphs(1);
-				}
-				continue;
-			case 13:
-			case 10:
-			{
-				newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
-				break;
-			}
-			case '<':
-				if (doHtml())
-				{
-					//close out this stretch of glyphs
-					_textRecords.push_back(rec);
-					if (*it == '/') {
-						while (it != e && *it != '>') {
-							++it;
-						}
-						++it;
-						return;
-					}
-					rec.clearGlyphs();
-					LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
-										 "gnash will just ignore the tags and "
-										 "print their content")));
-			
-					std::wstring discard;
-					std::map<std::string, std::string> attributes;
-					SWF::TextRecord newrec;
-					newrec.setFont(rec.getFont());
-					newrec.setUnderline(rec.underline());
-					newrec.setColor(rec.color()); 
-					newrec.setTextHeight(rec.textHeight());
-					newrec.setXOffset(x);
-					newrec.setYOffset(y);
-					bool complete = parseHTML(discard, attributes, it, e);
-					std::string s(discard.begin(), discard.end());
-					s.assign(discard.begin(), discard.end());
-					if (!complete) continue;
-					else {
-						//Don't think this is the best way to match with tags...
-						if (s == "u") {
-							//underline
-							newrec.setUnderline(true);
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "a") {
-							//anchor
-							log_unimpl("<a> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "b") {
-							//bold
-							Font* boldfont = new Font(rec.getFont()->name(), true, rec.getFont()->isItalic());
-							newrec.setFont(boldfont);
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "font") {
-							//font
-							log_unimpl("<font> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "img") {
-							//image
-							log_unimpl("<img> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "i") {
-							//italic
-							Font* italicfont = new Font(rec.getFont()->name(), rec.getFont()->isBold(), true);
-							newrec.setFont(italicfont);
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "li") {
-							//list item (bullet)
-							log_unimpl("<li> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "span") {
-							//span
-							log_unimpl("<span> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "textformat") {
-							//text format
-							log_unimpl("<textformat> html tag in TextField");
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						} else if (s == "p") { 
-							//paragraph
-							log_unimpl("<p> html tag in TextField");
-							if ( _display == 0)
-							{
-								newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.5);
-								handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-								newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
-							}
-							else
-							{
-								handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-							}
-						} else if (s == "br") {
-							//line break
-							log_unimpl("<br> html tag in TextField");
-						} else {
-							log_debug("<%s> tag is unsupported", s);
-							///THIS IS DANGEROUS. IF TAG HAS NO CLOSING TAG, THIS MAY PRODUCE UNDESIRED RESULTS
-							handleChar(it, e, x, y, newrec, last_code, last_space_glyph, last_line_start_record);
-						}
-					}
-					rec.setXOffset(x);
-					rec.setYOffset(y);
-					continue;
-				}
-				// If HTML isn't enabled, carry on and insert the glyph.
-			case 32:
-				last_space_glyph = rec.glyphs().size();
-				// Don't break, as we still need to insert the space glyph.
+                if (!rec.glyphs().empty())
+                {
+                    // Peek at the previous glyph, and zero out its advance
+                    // value, so the next char overwrites it.
+                    float advance = rec.glyphs().back().advance;
+                    x -= advance; 
+                    // Remove one glyph
+                    rec.clearGlyphs(1);
+                }
+                continue;
+            case 13:
+            case 10:
+            {
+                newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
+                break;
+            }
+            case '<':
+                if (doHtml())
+                {
+                    //close out this stretch of glyphs
+                    _textRecords.push_back(rec);
+                    if (*it == '/') {
+                        while (it != e && *it != '>') {
+                            ++it;
+                        }
+                        ++it;
+                        return;
+                    }
+                    rec.clearGlyphs();
+                    LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
+                                         "gnash will just ignore the tags and "
+                                         "print their content")));
+            
+                    std::wstring discard;
+                    std::map<std::string, std::string> attributes;
+                    SWF::TextRecord newrec;
+                    newrec.setFont(rec.getFont());
+                    newrec.setUnderline(rec.underline());
+                    newrec.setColor(rec.color()); 
+                    newrec.setTextHeight(rec.textHeight());
+                    newrec.setXOffset(x);
+                    newrec.setYOffset(y);
+                    bool complete = parseHTML(discard, attributes, it, e);
+                    std::string s(discard.begin(), discard.end());
+                    s.assign(discard.begin(), discard.end());
+                    if (!complete) continue;
+                    else {
+                        //Don't think this is the best way to match with tags...
+                        if (s == "u") {
+                            //underline
+                            newrec.setUnderline(true);
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "a") {
+                            //anchor
+                            log_unimpl("<a> html tag in TextField");
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "b") {
+                            //bold
+                            Font* boldfont = new Font(rec.getFont()->name(),
+                                    true, rec.getFont()->isItalic());
+                            newrec.setFont(boldfont);
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "font") {
+                            //font
+                            log_unimpl("<font> html tag in TextField");
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "img") {
+                            //image
+                            log_unimpl("<img> html tag in TextField");
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "i") {
+                            //italic
+                            Font* italicfont = new Font(rec.getFont()->name(),
+                                    rec.getFont()->isBold(), true);
+                            newrec.setFont(italicfont);
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "li") {
+                            //list item (bullet)
+                            log_unimpl("<li> html tag in TextField");
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "span") {
+                            //span
+                            log_unimpl("<span> html tag in TextField");
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "textformat") {
+                            //text format
+                            log_unimpl("<textformat> html tag in TextField");
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        } else if (s == "p") { 
+                            //paragraph
+                            log_unimpl("<p> html tag in TextField");
+                            if (_display == BLOCK)
+                            {
+                                newLine(it, x, y, rec, last_space_glyph,
+                                        last_line_start_record, 1.5);
+                                handleChar(it, e, x, y, newrec, last_code,
+                                        last_space_glyph,
+                                        last_line_start_record);
+                                newLine(it, x, y, rec, last_space_glyph,
+                                        last_line_start_record, 1.0);
+                            }
+                            else
+                            {
+                                handleChar(it, e, x, y, newrec, last_code,
+                                        last_space_glyph,
+                                        last_line_start_record);
+                            }
+                        } else if (s == "br") {
+                            //line break
+                            log_unimpl("<br> html tag in TextField");
+                        } else {
+                            log_debug("<%s> tag is unsupported", s);
+                            // THIS IS DANGEROUS. IF TAG HAS NO CLOSING TAG,
+                            // THIS MAY PRODUCE UNDESIRED RESULTS
+                            handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
+                        }
+                    }
+                    rec.setXOffset(x);
+                    rec.setYOffset(y);
+                    continue;
+                }
+                // If HTML isn't enabled, carry on and insert the glyph.
+            case 32:
+                last_space_glyph = rec.glyphs().size();
+                // Don't break, as we still need to insert the space glyph.
 
-			default:
-			{
+            default:
+            {
 
-				if ( password() )
-				{	
-					SWF::TextRecord::GlyphEntry ge;
-					int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
+                if ( password() )
+                {    
+                    SWF::TextRecord::GlyphEntry ge;
+                    int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
                     ge.index = bullet;
                     ge.advance = scale * rec.getFont()->get_advance(bullet, 
                         _embedFonts);
                     rec.addGlyph(ge); 
-					break;
-				}
-				// The font table holds up to 65535 glyphs. Casting
-				// from uint32_t would, in the event that the code
-				// is higher than 65535, result in the wrong DisplayObject
-				// being chosen. Flash can currently only handle 16-bit
-				// values.
-				int index = rec.getFont()->get_glyph_index(
-						static_cast<boost::uint16_t>(code), _embedFonts);
+                    break;
+                }
+                // The font table holds up to 65535 glyphs. Casting
+                // from uint32_t would, in the event that the code
+                // is higher than 65535, result in the wrong DisplayObject
+                // being chosen. Flash can currently only handle 16-bit
+                // values.
+                int index = rec.getFont()->get_glyph_index(
+                        static_cast<boost::uint16_t>(code), _embedFonts);
 
-				IF_VERBOSE_MALFORMED_SWF (
-					if (index == -1)
-					{
-						// Missing glyph! Log the first few errors.
-						static int s_log_count = 0;
-						if (s_log_count < 10)
-						{
-							s_log_count++;
-							if (_embedFonts)
-							{
-								log_swferror(_("TextField: missing embedded "
-									"glyph for char %d. Make sure DisplayObject "
-									"shapes for font %s are being exported "
-									"into your SWF file"),
-									code, _font->name());
-							}
-							else
-							{
-								log_swferror(_("TextField: missing device "
-									"glyph for char %d. Maybe you don't have "
-									"font '%s' installed in your system."),
-									code, _font->name());
-							}
-						}
+                IF_VERBOSE_MALFORMED_SWF (
+                    if (index == -1)
+                    {
+                        // Missing glyph! Log the first few errors.
+                        static int s_log_count = 0;
+                        if (s_log_count < 10)
+                        {
+                            s_log_count++;
+                            if (_embedFonts)
+                            {
+                                log_swferror(_("TextField: missing embedded "
+                                    "glyph for char %d. Make sure DisplayObject "
+                                    "shapes for font %s are being exported "
+                                    "into your SWF file"),
+                                    code, _font->name());
+                            }
+                            else
+                            {
+                                log_swferror(_("TextField: missing device "
+                                    "glyph for char %d. Maybe you don't have "
+                                    "font '%s' installed in your system."),
+                                    code, _font->name());
+                            }
+                        }
 
-						// Drop through and use index == -1; this will display
-						// using the empty-box glyph
-					}
-				);
+                        // Drop through and use index == -1; this will display
+                        // using the empty-box glyph
+                    }
+                );
 
-				SWF::TextRecord::GlyphEntry ge;
-				ge.index = index;
-				ge.advance = scale * rec.getFont()->get_advance(index, 
-						_embedFonts);
+                SWF::TextRecord::GlyphEntry ge;
+                ge.index = index;
+                ge.advance = scale * rec.getFont()->get_advance(index, 
+                        _embedFonts);
 
-				rec.addGlyph(ge);
+                rec.addGlyph(ge);
 
-				x += ge.advance;
-			}
-		}
+                x += ge.advance;
+            }
+        }
 
-		float width = _bounds.width();
-		if (x >= width - getRightMargin() - PADDING_TWIPS)
-		{
+        float width = _bounds.width();
+        if (x >= width - getRightMargin() - PADDING_TWIPS)
+        {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-			log_debug("Text in TextField %s exceeds width [ _bounds %s ]", 
-					getTarget(), _bounds);
+            log_debug("Text in TextField %s exceeds width [ _bounds %s ]", 
+                    getTarget(), _bounds);
 #endif
 
-			// No wrap and no resize: truncate
-			if (!doWordWrap() && getAutoSize() == autoSizeNone)
-			{
+            // No wrap and no resize: truncate
+            if (!doWordWrap() && getAutoSize() == autoSizeNone)
+            {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-				log_debug(" wordWrap=false, autoSize=none");
+                log_debug(" wordWrap=false, autoSize=none");
 #endif 
-				// Truncate long line, but keep expanding text box
-				bool newlinefound = false;
-				while (it != e)
-				{
-					code = *it++;
-					if (_embedFonts)
-					{
-						x += rec.getFont()->get_kerning_adjustment(last_code,
-								static_cast<int>(code)) * scale;
-						last_code = code;
-					}
-					// Expand the bounding-box to the lower-right corner
-					// of each glyph, even if we don't display it 
-					m_text_bounding_box.expand_to_point(x, y + fontDescent);
+                // Truncate long line, but keep expanding text box
+                bool newlinefound = false;
+                while (it != e)
+                {
+                    code = *it++;
+                    if (_embedFonts)
+                    {
+                        x += rec.getFont()->get_kerning_adjustment(last_code,
+                                static_cast<int>(code)) * scale;
+                        last_code = code;
+                    }
+                    // Expand the bounding-box to the lower-right corner
+                    // of each glyph, even if we don't display it 
+                    m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-					log_debug("Text bbox expanded to %s (width: %f)",
-							m_text_bounding_box, m_text_bounding_box.width());
+                    log_debug("Text bbox expanded to %s (width: %f)",
+                            m_text_bounding_box, m_text_bounding_box.width());
 #endif
 
-					if (code == 13 || code == 10)
-					{
-						newlinefound = true;
-						break;
-					}
+                    if (code == 13 || code == 10)
+                    {
+                        newlinefound = true;
+                        break;
+                    }
 
-					int index = rec.getFont()->get_glyph_index(
-							static_cast<boost::uint16_t>(code), _embedFonts);
-					x += scale * rec.getFont()->get_advance(index, _embedFonts);
+                    int index = rec.getFont()->get_glyph_index(
+                            static_cast<boost::uint16_t>(code), _embedFonts);
+                    x += scale * rec.getFont()->get_advance(index, _embedFonts);
 
-				}
-				if (!newlinefound) break;
-			}
+                }
+                if (!newlinefound) break;
+            }
+            else if (doWordWrap()) {
 
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-				log_debug(" wordWrap=true");
+                log_debug(" wordWrap=true");
 #endif
 
+                // Insert newline if there's space or autosize != none
 
-				// Insert newline if there's space or autosize != none
+                // Close out this stretch of glyphs.
+                _textRecords.push_back(rec);
 
-				// Close out this stretch of glyphs.
-				_textRecords.push_back(rec);
+                float previous_x = x;
+                x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
+                y += _fontHeight + leading;
 
-				float previous_x = x;
-				x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
-				y += _fontHeight + leading;
+                // Start a new record on the next line.
+                rec.clearGlyphs();
+                rec.setXOffset(x);
+                rec.setYOffset(y);
 
-				// Start a new record on the next line.
-				rec.clearGlyphs();
-				rec.setXOffset(x);
-				rec.setYOffset(y);
+                // TODO : what if m_text_glyph_records is empty ?
+                // Is it possible ?
+                assert(!_textRecords.empty());
+                SWF::TextRecord& last_line = _textRecords.back();
+                
+                linestartit = _line_starts.begin();
+                linestartend = _line_starts.end();
+                if (last_space_glyph == -1)
+                {
+                    // Pull the previous glyph down onto the
+                    // new line.
+                    if (!last_line.glyphs().empty())
+                    {
+                        rec.addGlyph(last_line.glyphs().back());
+                        x += last_line.glyphs().back().advance;
+                        previous_x -= last_line.glyphs().back().advance;
+                        last_line.clearGlyphs(1);
+                        //record the new line start
+                        //
+                        const size_t currentPos = it - _text.begin();
+                        while (linestartit != linestartend &&
+                                *linestartit + 1 <= currentPos)
+                        {
+                            linestartit++;
+                        }
+                        _line_starts.insert(linestartit, currentPos);
+                    }
+                } else {
+                    // Move the previous word down onto the next line.
 
-				// TODO : what if m_text_glyph_records is empty ?
-				// Is it possible ?
-				assert(!_textRecords.empty());
-				SWF::TextRecord& last_line = _textRecords.back();
-				
-				linestartit = _line_starts.begin();
-				linestartend = _line_starts.end();
-				if (last_space_glyph == -1)
-				{
-					// Pull the previous glyph down onto the
-					// new line.
-					if (!last_line.glyphs().empty())
-					{
-						rec.addGlyph(last_line.glyphs().back());
-						x += last_line.glyphs().back().advance;
-						previous_x -= last_line.glyphs().back().advance;
-						last_line.clearGlyphs(1);
-						//record the new line start
-						while ( linestartit != linestartend && *linestartit <= (it-_text.begin())-1)
-						{
-							linestartit++;
-						}
-						_line_starts.insert(linestartit, (it-_text.begin()));
-					}
-				} else {
-					// Move the previous word down onto the next line.
+                    previous_x -= last_line.glyphs()[last_space_glyph].advance;
 
-					previous_x -= last_line.glyphs()[last_space_glyph].advance;
+                    const SWF::TextRecord::Glyphs::size_type lineSize =
+                        last_line.glyphs().size();
+                    for (unsigned int i = last_space_glyph + 1; i < lineSize;
+                            ++i)
+                    {
+                        rec.addGlyph(last_line.glyphs()[i]);
+                        x += last_line.glyphs()[i].advance;
+                        previous_x -= last_line.glyphs()[i].advance;
+                    }
+                    last_line.clearGlyphs(lineSize - last_space_glyph);
+                    
+                    // record the position at the start of this line as
+                    // a line_start
+                    const size_t linestartpos = (it - _text.begin()) -
+                            rec.glyphs().size();
 
-					const SWF::TextRecord::Glyphs::size_type lineSize =
-						last_line.glyphs().size();
-					for (unsigned int i = last_space_glyph + 1; i < lineSize;
-							++i)
-					{
-						rec.addGlyph(last_line.glyphs()[i]);
-						x += last_line.glyphs()[i].advance;
-						previous_x -= last_line.glyphs()[i].advance;
-					}
-					last_line.clearGlyphs(lineSize - last_space_glyph);
-					
-					//record the position at the start of this line as a line_start
-					int linestartpos = (it-_text.begin())-rec.glyphs().size();
-					while ( linestartit < linestartend && *linestartit < linestartpos)
-					{
-						linestartit++;
-					}
-					_line_starts.insert(linestartit, linestartpos);
-				}
+                    while (linestartit < linestartend &&
+                            *linestartit < linestartpos)
+                    {
+                        ++linestartit;
+                    }
+                    _line_starts.insert(linestartit, linestartpos);
+                }
 
-				align_line(getTextAlignment(), last_line_start_record, previous_x);
+                align_line(getTextAlignment(), last_line_start_record, previous_x);
 
-				last_space_glyph = -1;
-				last_line_start_record = _textRecords.size();
-				
-			}
-			else
-			{
+                last_space_glyph = -1;
+                last_line_start_record = _textRecords.size();
+                
+            }
+            else
+            {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-				log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
+                log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
 #endif 
-			}
-		}
-
-			// TODO: HTML markup
-			
+            }
+        }
+    }
+            
 }
 
 
@@ -1865,40 +1904,41 @@ TextField::registerTextVariable()
 /// tag was incomplete. The iterator is moved to after
 /// the closing tag or the end of the string.
 bool
-TextField::parseHTML(std::wstring& tag, std::map<std::string, std::string> attributes,
-						std::wstring::const_iterator& it,
-                        const std::wstring::const_iterator& e) const
+TextField::parseHTML(std::wstring& tag,
+        std::map<std::string, std::string> /*attributes*/,
+        std::wstring::const_iterator& it,
+        const std::wstring::const_iterator& e) const
 {
-	std::string attname;
-	std::string attvalue;
+    std::string attname;
+    std::string attvalue;
     bool complete = false;
 
     while (it != e) {
         //if (*it == ' ') {
-			//++it;
-			//while (it != e && *it != ' ') {
-				//while (it != e && *it != '=') {
-					//if (*it == 0) break;
-					//attname.push_back(*it);
-					//++it;
-				//}
-				//++it
-				//if (*it == 0) break;
-				//attvalue.push_back(*it);
-			//}
-		//}
+            //++it;
+            //while (it != e && *it != ' ') {
+                //while (it != e && *it != '=') {
+                    //if (*it == 0) break;
+                    //attname.push_back(*it);
+                    //++it;
+                //}
+                //++it
+                //if (*it == 0) break;
+                //attvalue.push_back(*it);
+            //}
+        //}
 
-		if (*it == '>') {
+        if (*it == '>') {
             ++it;
             complete = true;
             break;
         }
-		
+        
         // Check for NULL DisplayObject
         if (*it == 0) break;
 
         tag.push_back(*it);
-		++it;
+        ++it;
     }
     
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -2116,40 +2156,27 @@ TextField::setUnderlined(bool v)
     }
 }
 
-// ADDED
 void          
 TextField::setBullet(bool b)
 {              
-    if ( _bullet != b )
-    {
+    if (_bullet != b) {
         _bullet = b;
         format_text();
     }
 }
 
-// ADDED
 void 
-TextField::setTabStops(std::vector<int> tabStops)
+TextField::setTabStops(const std::vector<int>& tabStops)
 {
-	_tabStops.resize(tabStops.size());
-	
-	for (int i = 0; i < tabStops.size(); i++)
-	{
-		if ( _tabStops[i] != tabStops[i] )
-		{
-			_tabStops[i]=tabStops[i];      
-		}
-	}
-	format_text();
-	set_invalidated();
+    _tabStops = tabStops;
+    format_text();
+    set_invalidated();
 }
 
-// ADDED
 void
 TextField::setURL(std::string url)
 { 
-    if ( _url != url )
-    {
+    if ( _url != url ) {
         set_invalidated();
         _url = url;
     }
@@ -2901,13 +2928,13 @@ textfield_setTextFormat(const fn_call& fn)
     if ( tf->colorDefined() ) text->setTextColor(tf->color());
     if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
 
-	LOG_ONCE( log_unimpl("tf->target(): %s ", tf->target()) );
+    LOG_ONCE( log_unimpl("tf->target(): %s ", tf->target()) );
     LOG_ONCE( log_unimpl("tf->display(): %s", tf->display()) );
-	LOG_ONCE( log_unimpl("tf->url(): %s", tf->url()) );
+    LOG_ONCE( log_unimpl("tf->url(): %s", tf->url()) );
     
-	// ADDED (completed)
-	if ( tf->bulletDefined() ) text->setBullet(tf->bullet());
-	if ( tf->displayDefined() ) text->setDisplay(tf->display());
+    // ADDED (completed)
+    if ( tf->bulletDefined() ) text->setBullet(tf->bullet());
+    if ( tf->displayDefined() ) text->setDisplay(tf->display());
 
     // URL CASE:
     if ( tf->urlDefined() )
@@ -2921,10 +2948,10 @@ textfield_setTextFormat(const fn_call& fn)
         //~ text->setTextColor(color);
         //~ text->setUnderlined(true);  
 
-			// TARGET CASE:
-			// gets correct _target...need to implement
-			if (tf->targetDefined() )
-			{
+            // TARGET CASE:
+            // gets correct _target...need to implement
+            if (tf->targetDefined() )
+            {
             //~ if (tf->target()=="_blank") 
                 //~ system("firefox -remote 'openurl(http://www.blank.org)'");
             //~ else if (tf->target()=="_self") {
@@ -2936,15 +2963,15 @@ textfield_setTextFormat(const fn_call& fn)
             //~ else if (tf->target()=="_top") {
                 //~ system("firefox -remote 'openurl(http://www.top.com'");
             //~ }
-			}
+            }
     }
 
-	// TABSTOPS CASE:
-	// gets correct _tabStops...need to implement
-	if ( tf->tabStopsDefined() )
-	{
-		text->setTabStops(tf->tabStops());
-	}
+    // TABSTOPS CASE:
+    // gets correct _tabStops...need to implement
+    if ( tf->tabStopsDefined() )
+    {
+        text->setTabStops(tf->tabStops());
+    }
 
     
     if (isAS3(fn)) {
@@ -3122,8 +3149,8 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    int version = getSWFVersion(*ptr);
-	
+    const int version = getSWFVersion(*ptr);
+    
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
