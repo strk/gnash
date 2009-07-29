@@ -78,7 +78,8 @@ void textfield_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&textfield_ctor, getTextFieldInterface());
+        as_object* proto = getTextFieldInterface();
+        cl = gl->createClass(&textfield_ctor, proto);
         attachTextFieldStaticInterface(*cl);
     }
 

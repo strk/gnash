@@ -59,7 +59,8 @@ void soundchannel_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&soundchannel_ctor, getSoundChannelInterface());
+        as_object* proto = getSoundChannelInterface();
+        cl = gl->createClass(&soundchannel_ctor, proto);
         attachSoundChannelStaticInterface(*cl);
     }
 

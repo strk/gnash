@@ -58,7 +58,8 @@ void dictionary_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&dictionary_ctor, getDictionaryInterface());
+        as_object* proto = getDictionaryInterface();
+        cl = gl->createClass(&dictionary_ctor, proto);
         attachDictionaryStaticInterface(*cl);
     }
 

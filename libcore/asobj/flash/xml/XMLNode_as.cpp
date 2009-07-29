@@ -452,7 +452,8 @@ XMLNode_as::init(as_object& where, const ObjectURI& uri)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&xmlnode_new, getXMLNodeInterface());
+        as_object* proto = getXMLNodeInterface();
+        cl = gl->createClass(&xmlnode_new, proto);
     }
 
     where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,

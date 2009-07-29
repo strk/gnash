@@ -73,7 +73,8 @@ void int_class_init(as_object& global, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&int_ctor, getintInterface());
+        as_object* proto = getintInterface();
+        cl = gl->createClass(&int_ctor, proto);
 
 	// Register _global.DisplayObject
 	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,

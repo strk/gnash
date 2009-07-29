@@ -58,7 +58,8 @@ void illegaloperationerror_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&illegaloperationerror_ctor, getIllegalOperationErrorInterface());
+        as_object* proto = getIllegalOperationErrorInterface();
+        cl = gl->createClass(&illegaloperationerror_ctor, proto);
         attachIllegalOperationErrorStaticInterface(*cl);
     }
 

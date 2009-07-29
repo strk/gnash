@@ -147,7 +147,8 @@ loadvars_class_init(as_object& global, const ObjectURI& uri)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&loadvars_ctor, getLoadVarsInterface());
+        as_object* proto = getLoadVarsInterface();
+        cl = gl->createClass(&loadvars_ctor, proto);
 	}
 
 	// Register _global.LoadVars, only visible for SWF6 up

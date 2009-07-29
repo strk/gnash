@@ -58,7 +58,8 @@ void statictext_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&statictext_ctor, getStaticTextInterface());
+        as_object* proto = getStaticTextInterface();
+        cl = gl->createClass(&statictext_ctor, proto);
         attachStaticTextStaticInterface(*cl);
     }
 

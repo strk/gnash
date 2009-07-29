@@ -62,7 +62,8 @@ void ieventdispatcher_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&ieventdispatcher_ctor, getIEventDispatcherInterface());
+        as_object* proto = getIEventDispatcherInterface();
+        cl = gl->createClass(&ieventdispatcher_ctor, proto);
         attachIEventDispatcherStaticInterface(*cl);
     }
 

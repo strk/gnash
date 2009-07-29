@@ -69,7 +69,8 @@ void idataoutput_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&idataoutput_ctor, getIDataOutputInterface());
+        as_object* proto = getIDataOutputInterface();
+        cl = gl->createClass(&idataoutput_ctor, proto);
         attachIDataOutputStaticInterface(*cl);
     }
 

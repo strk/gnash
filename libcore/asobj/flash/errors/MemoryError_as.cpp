@@ -58,7 +58,8 @@ void memoryerror_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&memoryerror_ctor, getMemoryErrorInterface());
+        as_object* proto = getMemoryErrorInterface();
+        cl = gl->createClass(&memoryerror_ctor, proto);
         attachMemoryErrorStaticInterface(*cl);
     }
 

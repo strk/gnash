@@ -58,7 +58,8 @@ void bitmap_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&bitmap_ctor, getBitmapInterface());
+        as_object* proto = getBitmapInterface();
+        cl = gl->createClass(&bitmap_ctor, proto);
         attachBitmapStaticInterface(*cl);
     }
 

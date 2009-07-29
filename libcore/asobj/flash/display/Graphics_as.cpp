@@ -71,7 +71,8 @@ void graphics_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&graphics_ctor, getGraphicsInterface());
+        as_object* proto = getGraphicsInterface();
+        cl = gl->createClass(&graphics_ctor, proto);
         attachGraphicsStaticInterface(*cl);
     }
 

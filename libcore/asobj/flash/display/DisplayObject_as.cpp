@@ -69,7 +69,8 @@ void displayobject_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&displayobject_ctor, getDisplayObjectInterface());
+        as_object* proto = getDisplayObjectInterface();
+        cl = gl->createClass(&displayobject_ctor, proto);
         attachDisplayObjectStaticInterface(*cl);
     }
 

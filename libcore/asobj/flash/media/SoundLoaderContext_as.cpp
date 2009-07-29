@@ -58,7 +58,8 @@ void soundloadercontext_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&soundloadercontext_ctor, getSoundLoaderContextInterface());
+        as_object* proto = getSoundLoaderContextInterface();
+        cl = gl->createClass(&soundloadercontext_ctor, proto);
         attachSoundLoaderContextStaticInterface(*cl);
     }
 

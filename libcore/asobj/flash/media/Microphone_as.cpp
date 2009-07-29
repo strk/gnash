@@ -117,7 +117,8 @@ void microphone_class_init(as_object& where, const ObjectURI& uri)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&microphone_ctor, getMicrophoneInterface());
+        as_object* proto = getMicrophoneInterface();
+        cl = gl->createClass(&microphone_ctor, proto);
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachMicrophoneInterface(*cl);

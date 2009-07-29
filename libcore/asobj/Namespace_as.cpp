@@ -66,7 +66,8 @@ namespace_class_init(as_object& where, const ObjectURI& uri)
     boost::intrusive_ptr<as_object> cl;
     
     Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&namespace_ctor, getNamespaceInterface());
+    as_object* proto = getNamespaceInterface();
+    cl = gl->createClass(&namespace_ctor, proto);
 
     where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));

@@ -60,7 +60,8 @@ void syncevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&syncevent_ctor, getSyncEventInterface());
+        as_object* proto = getSyncEventInterface();
+        cl = gl->createClass(&syncevent_ctor, proto);
         attachSyncEventStaticInterface(*cl);
     }
 

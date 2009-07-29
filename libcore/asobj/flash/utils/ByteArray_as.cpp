@@ -86,7 +86,8 @@ void bytearray_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&bytearray_ctor, getByteArrayInterface());
+        as_object* proto = getByteArrayInterface();
+        cl = gl->createClass(&bytearray_ctor, proto);
         attachByteArrayStaticInterface(*cl);
     }
 

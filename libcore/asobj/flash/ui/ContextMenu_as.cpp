@@ -56,7 +56,8 @@ contextmenu_class_init(as_object& where, const ObjectURI& uri)
 
 	if (cl == NULL) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(contextmenu_ctor, getContextMenuInterface());
+        as_object* proto = getContextMenuInterface();
+        cl = gl->createClass(contextmenu_ctor, proto);
 	}
 
 	// Register _global.ContextMenu

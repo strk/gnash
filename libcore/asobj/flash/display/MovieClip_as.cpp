@@ -144,7 +144,8 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&movieclip_as2_ctor, getMovieClipAS2Interface());
+        as_object* proto = getMovieClipAS2Interface();
+        cl = gl->createClass(&movieclip_as2_ctor, proto);
         getVM(where).addStatic(cl.get());
     }
 

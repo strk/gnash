@@ -58,7 +58,8 @@ void ibitmapdrawable_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&ibitmapdrawable_ctor, getIBitmapDrawableInterface());
+        as_object* proto = getIBitmapDrawableInterface();
+        cl = gl->createClass(&ibitmapdrawable_ctor, proto);
         attachIBitmapDrawableStaticInterface(*cl);
     }
 

@@ -872,8 +872,9 @@ getStringConstructor(Global_as& gl)
 
     static as_object* cl = 0;
 
+    as_object* proto = getStringInterface();
     if (!cl) {
-        cl = gl.createClass(&string_ctor, getStringInterface());
+        cl = gl.createClass(&string_ctor, proto);
 	    cl->init_member("fromCharCode", getVM(gl).getNative(251, 14)); 
     }
 

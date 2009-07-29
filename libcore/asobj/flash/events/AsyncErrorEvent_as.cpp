@@ -60,7 +60,8 @@ void asyncerrorevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&asyncerrorevent_ctor, getAsyncErrorEventInterface());
+        as_object* proto = getAsyncErrorEventInterface();
+        cl = gl->createClass(&asyncerrorevent_ctor, proto);
         attachAsyncErrorEventStaticInterface(*cl);
     }
 

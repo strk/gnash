@@ -60,7 +60,8 @@ void statusevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&statusevent_ctor, getStatusEventInterface());
+        as_object* proto = getStatusEventInterface();
+        cl = gl->createClass(&statusevent_ctor, proto);
         attachStatusEventStaticInterface(*cl);
     }
 

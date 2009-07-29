@@ -71,7 +71,8 @@ void idatainput_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&idatainput_ctor, getIDataInputInterface());
+        as_object* proto = getIDataInputInterface();
+        cl = gl->createClass(&idatainput_ctor, proto);
         attachIDataInputStaticInterface(*cl);
     }
 

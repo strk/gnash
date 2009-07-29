@@ -60,7 +60,8 @@ void printjob_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&printjob_ctor, getPrintJobInterface());
+        as_object* proto = getPrintJobInterface();
+        cl = gl->createClass(&printjob_ctor, proto);
         attachPrintJobStaticInterface(*cl);
     }
 

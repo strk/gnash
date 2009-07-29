@@ -628,7 +628,8 @@ XMLDocument_as::init(as_object& where, const ObjectURI& uri)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&xml_new, getXMLInterface());
+        as_object* proto = getXMLInterface();
+        cl = gl->createClass(&xml_new, proto);
     }
     
     where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,

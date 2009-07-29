@@ -58,7 +58,8 @@ void stackoverflowerror_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&stackoverflowerror_ctor, getStackOverflowErrorInterface());
+        as_object* proto = getStackOverflowErrorInterface();
+        cl = gl->createClass(&stackoverflowerror_ctor, proto);
         attachStackOverflowErrorStaticInterface(*cl);
     }
 

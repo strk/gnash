@@ -78,7 +78,8 @@ void netstream_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&netstream_ctor, getNetStreamInterface());
+        as_object* proto = getNetStreamInterface();
+        cl = gl->createClass(&netstream_ctor, proto);
         attachNetStreamStaticInterface(*cl);
     }
 

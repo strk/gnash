@@ -61,7 +61,8 @@ void textevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&textevent_ctor, getTextEventInterface());
+        as_object* proto = getTextEventInterface();
+        cl = gl->createClass(&textevent_ctor, proto);
         attachTextEventStaticInterface(*cl);
     }
 

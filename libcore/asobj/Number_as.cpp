@@ -165,13 +165,14 @@ attachNumberStaticInterface(as_object& o)
 }
 
 as_object*
-getNumberClass(Global_as& g)
+getNumberClass(Global_as& gl)
 {
     // This is going to be the global Number "class"/"function"
     static as_object* cl = 0;
 
+    as_object* proto = getNumberInterface();
     if (!cl) {
-        cl = g.createClass(&number_ctor, getNumberInterface());
+        cl = gl.createClass(&number_ctor, proto);
         attachNumberStaticInterface(*cl);
         VM::get().addStatic(cl);
     }

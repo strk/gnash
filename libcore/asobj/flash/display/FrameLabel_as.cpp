@@ -58,7 +58,8 @@ void framelabel_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&framelabel_ctor, getFrameLabelInterface());
+        as_object* proto = getFrameLabelInterface();
+        cl = gl->createClass(&framelabel_ctor, proto);
         attachFrameLabelStaticInterface(*cl);
     }
 

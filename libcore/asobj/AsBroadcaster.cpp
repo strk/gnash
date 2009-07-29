@@ -154,8 +154,9 @@ AsBroadcaster::getAsBroadcaster()
     static boost::intrusive_ptr<as_object> obj = NULL;
     if ( ! obj )
     {
+        as_object* proto = getAsBroadcasterInterface();
         Global_as* gl = vm.getGlobal();
-        obj = gl->createClass(asbroadcaster_ctor, getAsBroadcasterInterface()); 
+        obj = gl->createClass(asbroadcaster_ctor, proto); 
         vm.addStatic(obj.get()); // correct ?
 
         const int flags = PropFlags::dontEnum |

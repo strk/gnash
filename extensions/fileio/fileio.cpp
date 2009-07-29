@@ -604,8 +604,9 @@ extern "C" {
 	// This is going to be the global "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
+        as_object* proto = getInterface();
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&fileio_ctor, getInterface());
+        cl = gl->createClass(&fileio_ctor, proto);
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    //attachInterface(*cl);

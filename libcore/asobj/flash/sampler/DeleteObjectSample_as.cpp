@@ -58,7 +58,8 @@ void deleteobjectsample_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&deleteobjectsample_ctor, getDeleteObjectSampleInterface());
+        as_object* proto = getDeleteObjectSampleInterface();
+        cl = gl->createClass(&deleteobjectsample_ctor, proto);
         attachDeleteObjectSampleStaticInterface(*cl);
     }
 

@@ -696,7 +696,8 @@ NetConnection_as::init(as_object& global, const ObjectURI& uri)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&netconnection_new, getNetConnectionInterface());
+        as_object* proto = getNetConnectionInterface();
+        cl = gl->createClass(&netconnection_new, proto);
 
         // replicate all interface to class, to be able to access
         // all methods as static functions

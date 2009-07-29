@@ -91,7 +91,8 @@ void event_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&event_ctor, getEventInterface());
+        as_object* proto = getEventInterface();
+        cl = gl->createClass(&event_ctor, proto);
         attachEventStaticInterface(*cl);
     }
 

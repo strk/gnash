@@ -26,8 +26,8 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
-#include "Point_as.h" // Matrix needs to operate on Points.
+#include "VM.h" 
+#include "Point_as.h"
 
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
@@ -410,11 +410,22 @@ Matrix_deltaTransformPoint(const fn_call& fn)
     const PointType& point = transformPoint(obj, ptr.get());
 
     // Construct a Point and set its properties.
-    boost::intrusive_ptr<as_object> ret = init_Point_instance();
-    ret->set_member(NSV::PROP_X, point(0));
-    ret->set_member(NSV::PROP_Y, point(1));
+    as_value pointClass(fn.env().find_object("flash.geom.Point"));
 
-    return as_value(ret.get());
+    boost::intrusive_ptr<as_function> pointCtor = pointClass.to_as_function();
+
+    if (!pointCtor) {
+        log_error("Failed to construct flash.geom.Point!");
+        return as_value();
+    }
+
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(point(0));
+    args->push_back(point(1));
+
+    as_value ret = pointCtor->constructInstance(fn.env(), args);
+
+    return as_value(ret);
 }
 
 
@@ -713,11 +724,23 @@ Matrix_transformPoint(const fn_call& fn)
     
     const PointType& point = transformPoint(obj, ptr.get());
 
-    boost::intrusive_ptr<as_object> ret = init_Point_instance();
-    ret->set_member(NSV::PROP_X, point(0) + tx.to_number());
-    ret->set_member(NSV::PROP_Y, point(1) + ty.to_number());
+    // Construct a Point and set its properties.
+    as_value pointClass(fn.env().find_object("flash.geom.Point"));
 
-    return as_value(ret.get());
+    boost::intrusive_ptr<as_function> pointCtor = pointClass.to_as_function();
+
+    if (!pointCtor) {
+        log_error("Failed to construct flash.geom.Point!");
+        return as_value();
+    }
+
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(point(0) + tx.to_number());
+    args->push_back(point(1) + ty.to_number());
+
+    as_value ret = pointCtor->constructInstance(fn.env(), args);
+
+    return as_value(ret);
 }
 
 static as_value
@@ -896,8 +919,9 @@ static as_value
 get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
+    as_object* proto = getMatrixInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&Matrix_ctor, getMatrixInterface());
+    return gl->createClass(&Matrix_ctor, proto);
 }
 
 // extern 

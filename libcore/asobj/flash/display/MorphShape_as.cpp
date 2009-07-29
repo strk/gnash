@@ -58,7 +58,8 @@ void morphshape_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&morphshape_ctor, getMorphShapeInterface());
+        as_object* proto = getMorphShapeInterface();
+        cl = gl->createClass(&morphshape_ctor, proto);
         attachMorphShapeStaticInterface(*cl);
     }
 

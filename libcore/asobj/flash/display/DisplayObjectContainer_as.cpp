@@ -64,8 +64,8 @@ displayobjectcontainer_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&displayobjectcontainer_ctor,
-                getDisplayObjectContainerInterface());
+        as_object* proto = getDisplayObjectContainerInterface();
+        cl = gl->createClass(&displayobjectcontainer_ctor, proto);
     }
 
     // Register _global.DisplayObjectContainer

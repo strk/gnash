@@ -66,7 +66,8 @@ void urlloader_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&urlloader_ctor, getURLLoaderInterface());
+        as_object* proto = getURLLoaderInterface();
+        cl = gl->createClass(&urlloader_ctor, proto);
         attachURLLoaderStaticInterface(*cl);
     }
 

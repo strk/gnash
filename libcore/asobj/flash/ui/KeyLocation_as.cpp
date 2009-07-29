@@ -58,7 +58,8 @@ void keylocation_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&keylocation_ctor, getKeyLocationInterface());
+        as_object* proto = getKeyLocationInterface();
+        cl = gl->createClass(&keylocation_ctor, proto);
         attachKeyLocationStaticInterface(*cl);
     }
 

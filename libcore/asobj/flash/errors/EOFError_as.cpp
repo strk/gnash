@@ -58,7 +58,8 @@ void eoferror_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&eoferror_ctor, getEOFErrorInterface());
+        as_object* proto = getEOFErrorInterface();
+        cl = gl->createClass(&eoferror_ctor, proto);
         attachEOFErrorStaticInterface(*cl);
     }
 

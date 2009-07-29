@@ -70,7 +70,8 @@ void mouseevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&mouseevent_ctor, getMouseEventInterface());
+        as_object* proto = getMouseEventInterface();
+        cl = gl->createClass(&mouseevent_ctor, proto);
         attachMouseEventStaticInterface(*cl);
     }
 

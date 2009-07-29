@@ -59,7 +59,8 @@ void sprite_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&sprite_ctor, getSpriteInterface());
+        as_object* proto = getSpriteInterface();
+        cl = gl->createClass(&sprite_ctor, proto);
         attachSpriteStaticInterface(*cl);
     }
 

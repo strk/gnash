@@ -61,7 +61,8 @@ void contextmenuevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&contextmenuevent_ctor, getContextMenuEventInterface());
+        as_object* proto = getContextMenuEventInterface();
+        cl = gl->createClass(&contextmenuevent_ctor, proto);
         attachContextMenuEventStaticInterface(*cl);
     }
 

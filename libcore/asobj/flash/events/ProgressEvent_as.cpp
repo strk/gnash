@@ -61,7 +61,8 @@ void progressevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&progressevent_ctor, getProgressEventInterface());
+        as_object* proto = getProgressEventInterface();
+        cl = gl->createClass(&progressevent_ctor, proto);
         attachProgressEventStaticInterface(*cl);
     }
 

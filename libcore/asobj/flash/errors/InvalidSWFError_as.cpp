@@ -58,7 +58,8 @@ void invalidswferror_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&invalidswferror_ctor, getInvalidSWFErrorInterface());
+        as_object* proto = getInvalidSWFErrorInterface();
+        cl = gl->createClass(&invalidswferror_ctor, proto);
         attachInvalidSWFErrorStaticInterface(*cl);
     }
 

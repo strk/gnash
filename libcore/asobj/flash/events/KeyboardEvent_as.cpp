@@ -62,7 +62,8 @@ void keyboardevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&keyboardevent_ctor, getKeyboardEventInterface());
+        as_object* proto = getKeyboardEventInterface();
+        cl = gl->createClass(&keyboardevent_ctor, proto);
         attachKeyboardEventStaticInterface(*cl);
     }
 
