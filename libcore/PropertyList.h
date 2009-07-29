@@ -26,18 +26,20 @@
 #include <map> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
-#include <cctype> // for toupper
 #include <utility> // for std::pair
-#include <set> // for propNameSet
+#include <set>
+#include <boost/cstdint.hpp> 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
+
 
 // Forward declaration
 namespace gnash {
 	class as_object;
 	class as_environment;
 	class as_function;
+	class ObjectURI;
 }
 
 namespace gnash {
@@ -282,8 +284,7 @@ public:
 	/// The namespace in which the property should be found.
 	///
 	/// @return true if the slot did not previously exist.
-	bool reserveSlot(unsigned short slotId, string_table::key key,
-		string_table::key nsId = 0);
+	bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
 
 	/// Get a property, if existing
 	//

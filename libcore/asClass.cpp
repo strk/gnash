@@ -92,7 +92,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns,
 		_prototype->init_member(name, as_value(), 0, nsname);
 	}
 	else {
-		_prototype->reserveSlot(name, nsname, slotId);
+		_prototype->reserveSlot(ObjectURI(name, nsname), slotId);
 	}
 	return true;
 }

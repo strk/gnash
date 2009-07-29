@@ -597,10 +597,9 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 }
 
 void
-as_object::reserveSlot(string_table::key name, string_table::key nsId,
-	unsigned short slotId)
+as_object::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
-	_members.reserveSlot(slotId, name, nsId);
+	_members.reserveSlot(uri, slotId);
 }
 
 bool
@@ -732,7 +731,8 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 {
 
 	if (order >= 0 && !_members.
-		reserveSlot(static_cast<unsigned short>(order), key, nsname))
+		reserveSlot(ObjectURI(key, nsname),
+            static_cast<boost::uint16_t>(order)))
 	{
 		log_error(_("Attempt to set a slot for either a slot or a property "
 			"which already exists."));

@@ -121,6 +121,7 @@ public:
 /// prototypes, class, constructors.
 struct ObjectURI
 {
+
     /// Construct an ObjectURI from name and namespace.
     ObjectURI(string_table::key name, string_table::key ns)
         :
@@ -130,6 +131,7 @@ struct ObjectURI
 
     string_table::key name;
     string_table::key ns;
+
 };
 
 
@@ -310,8 +312,7 @@ public:
     /// Reserve a slot
     ///
     /// Reserves a slot for a property to follow.
-    void reserveSlot(string_table::key name, string_table::key nsId,
-        unsigned short slotId);
+    void reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
 
     /// Initialize a member value by string
     //
@@ -1214,9 +1215,12 @@ string_table& getStringTable(const as_object& o);
 /// Get the RunResources from an as_object
 const RunResources& getRunResources(const as_object& o);
 
+/// Get the executing VM version from an as_object
 int getSWFVersion(const as_object& o);
 
+/// Get the Global object from an as_object
 Global_as* getGlobal(const as_object& o);
+
 
 } // namespace gnash
 
