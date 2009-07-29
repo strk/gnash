@@ -27,6 +27,7 @@
 #include <gst/interfaces/propertyprobe.h>
 #include <vector>
 #include "rc.h"
+#include "math.h"
 
 
 namespace {
@@ -41,6 +42,14 @@ namespace gst {
     //initializes the Gstreamer interface
     VideoInputGst::VideoInputGst() {
         gst_init(NULL,NULL);
+        int devSelection;
+        findVidDevs();
+        devSelection = makeWebcamDeviceSelection();
+        _devSelection = devSelection;
+        transferToPrivate(devSelection);
+        webcamCreateMainBin(_globalWebcam);
+        webcamCreateDisplayBin(_globalWebcam);
+        webcamCreateSaveBin(_globalWebcam);
     }
     
     VideoInputGst::~VideoInputGst() {
@@ -146,6 +155,7 @@ namespace gst {
         }
     }
     
+    
     //called by addSupportedFormat. finds the highest possible framerate
     //to record at (can be shaped down by a filter for performance)
     void
@@ -170,7 +180,7 @@ namespace gst {
         //set highest found above
         format->highestFramerate.numerator = framerate_numerator;
         format->highestFramerate.denominator = framerate_denominator;
-    }
+    } 
     
     //find the framerates at which the selected format can handle input
     void
@@ -292,7 +302,7 @@ namespace gst {
         int dev_select;
         dev_select = rcfile.getWebcamDevice();
         if (dev_select == -1) {
-            log_error("%s: No webcam selected in rc file, setting to videotestsource",
+            log_trace("%s: No webcam selected in rc file, setting to videotestsource",
                 __FUNCTION__);
             rcfile.setWebcamDevice(0);
             dev_select = rcfile.getWebcamDevice();
@@ -593,7 +603,7 @@ namespace gst {
                   format->highestFramerate.denominator);
                 
                 //debug
-                log_debug ("GstPipeline command is: %s\n", command);
+                g_print ("GstPipeline command is: %s\n", command);
                 
                 webcam->_webcamSourceBin =
                     gst_parse_bin_from_description (command, TRUE, &error);
@@ -613,6 +623,187 @@ namespace gst {
                     gst_bin_get_by_name (GST_BIN (webcam->_webcamSourceBin),
                     "capsfilter");
                 return true;
+            }
+        }
+        return true;
+    }
+    
+    gboolean
+    VideoInputGst::checkForSupportedFramerate (GnashWebcamPrivate *webcam, int fps) {
+        gint fNum, fDenom, i, val;
+        
+        for (i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
+            val = ceil(webcam->_currentFormat->framerates[i].numerator /
+                       webcam->_currentFormat->framerates[i].denominator);
+            if (val == fps) {
+                return true;
+            } else {
+                continue;
+            }
+        }
+        return false;
+    }
+    
+    gboolean
+    VideoInputGst::webcamChangeSourceBin(GnashWebcamPrivate *webcam) {
+        GError *error = NULL;
+        gchar *command = NULL;
+        
+        if(webcam->_pipelineIsPlaying == true) {
+            webcamStop(webcam);
+        }
+
+        //delete the old source bin
+        gst_bin_remove(GST_BIN(webcam->_webcamMainBin), webcam->_webcamSourceBin);
+        webcam->_webcamSourceBin = NULL;
+        
+        if(webcam->_webcamDevice == NULL) {
+            log_trace("%s: You don't have any webcams chosen, using videotestsrc",
+                __FUNCTION__);
+            webcam->_webcamSourceBin = gst_parse_bin_from_description (
+                "videotestsrc name=video_source ! capsfilter name=capsfilter",
+                TRUE, &error);
+            log_debug("Command: videotestsrc name=video_source ! \
+                capsfilter name=capsfilter");
+        }
+        else {
+            WebcamVidFormat *format = NULL;
+            gint i;
+            gchar *resolution;
+            
+            resolution = g_strdup_printf("%ix%i", webcam->_xResolution,
+                                      webcam->_yResolution);
+                                      
+            //use these resolutions determined above if the camera supports it
+            if (webcam->_xResolution != 0 && webcam->_yResolution != 0) {
+                
+                i = GPOINTER_TO_INT(g_hash_table_lookup
+                    (webcam->_webcamDevice->supportedResolutions, resolution));
+                //the selected res is supported if i
+                if (i) {
+                    format = &g_array_index (webcam->_webcamDevice->videoFormats,
+                             WebcamVidFormat, i - 1);
+                }
+            }
+            
+            //if format didn't get set, something went wrong. try picking
+            //the first supported format and a different supported resolution
+            if (!format) {
+                log_error("%s: the resolution you chose isn't supported, picking \
+                    a supported value", __FUNCTION__);
+                format = &g_array_index (webcam->_webcamDevice->videoFormats,
+                     WebcamVidFormat, 0);
+                for (i = 1; i < webcam->_webcamDevice->numVideoFormats; i++) {
+                    if (g_array_index (webcam->_webcamDevice->videoFormats,
+                               WebcamVidFormat, i).width <= format->width){
+                        format = &g_array_index (webcam->_webcamDevice->videoFormats,
+                             WebcamVidFormat, i);
+                    }
+                }
+            }
+            
+            //check here to make sure the fps value is supported (only valid for
+            //non test sources)
+            if (! g_strcmp0(webcam->_webcamDevice->getGstreamerSrc(), "videotestsrc") == 0) {
+                int newFps = webcam->_fps;
+                if (checkForSupportedFramerate(webcam, newFps)) {
+                    g_print("checkforsupportedfr returned true\n");
+                    format->highestFramerate.numerator = newFps;
+                    format->highestFramerate.denominator = 1;
+                } else {
+                    g_print("checkforsupportedfr returned false\n");
+                    
+                    //currently chooses the ActionScript default of 15 fps in case
+                    //you pass in an unsupported framerate value
+                    format->highestFramerate.numerator = 15;
+                    format->highestFramerate.denominator = 1;
+                }
+            }
+            webcam->_currentFormat = format;
+            g_free(resolution);
+            
+            //if format isn't set, something is still going wrong, make generic
+            //components and see if they work!
+            if (format == NULL) {
+                if (error != NULL) {
+                    g_error_free (error);
+                    error = NULL;
+                }
+                webcam->_webcamSourceBin = 
+                    gst_parse_bin_from_description ("videotestsrc name=video_source",
+                    TRUE, &error);
+                webcam->_videoSource = 
+                    gst_bin_get_by_name (GST_BIN (webcam->_webcamSourceBin),
+                    "video_source");
+                
+                //if there are still errors, something's up, return out of function
+                if (error != NULL) {
+                    g_error_free (error);
+                    return false;
+                }
+                webcam->_capsFilter = 
+                    gst_bin_get_by_name (GST_BIN (webcam->_webcamSourceBin),
+                    "capsfilter");
+                return true;
+            }
+            
+            //execution here means we're good to make the pipeline
+            else {
+                //can't reduce this to 80 line limit without causing problems
+                command = g_strdup_printf (
+                  "%s name=video_source device=%s ! capsfilter name=capsfilter caps=video/x-raw-rgb,width=%d,height=%d,framerate=%d/%d;video/x-raw-yuv,width=%d,height=%d,framerate=%d/%d",
+                  webcam->_webcamDevice->getGstreamerSrc(),
+                  webcam->_webcamDevice->getDevLocation(),
+                  format->width,
+                  format->height,
+                  format->highestFramerate.numerator,
+                  format->highestFramerate.denominator,
+                  format->width,
+                  format->height,
+                  format->highestFramerate.numerator,
+                  format->highestFramerate.denominator);
+                
+                //debug
+                g_print ("GstPipeline command is: %s\n", command);
+                
+                webcam->_webcamSourceBin =
+                    gst_parse_bin_from_description (command, TRUE, &error);
+                if (webcam->_webcamSourceBin == NULL) {
+                    log_error ("%s: Creation of the webcam_source_bin failed",
+                        __FUNCTION__);
+                    g_print ("the error was %s\n", error->message);
+                    return false;
+                }
+                
+                g_free(command);
+                
+                webcam->_videoSource = 
+                    gst_bin_get_by_name (GST_BIN (webcam->_webcamSourceBin),
+                    "video_source");
+                webcam->_capsFilter =
+                    gst_bin_get_by_name (GST_BIN (webcam->_webcamSourceBin),
+                    "capsfilter");
+                
+                //drop the new source bin back into the main bin
+                gboolean result;
+                result = gst_bin_add(GST_BIN(webcam->_pipeline),
+                    webcam->_webcamSourceBin);
+                if (result != true) {
+                    log_error("%s: couldn't drop the sourcebin back into the main bin",
+                        __FUNCTION__);
+                    return false;
+                } else {
+                    //get the tee from main bin
+                    GstElement *tee = gst_bin_get_by_name(GST_BIN(webcam->_webcamMainBin),
+                        "tee");
+                    result = gst_element_link(webcam->_webcamSourceBin, tee);
+                    if (result != true) {
+                        log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
             }
         }
         return true;

@@ -266,6 +266,38 @@ class GnashWebcamPrivate
         /// @param n A gchar* describing the name of the hardware device
         ///       (e.g. Built-In Webcam or Microsoft LifeCam VX500).
         void setDeviceName(gchar *n) {_deviceName = n;}
+        
+        /// \brief Accessor to set the private _xResolution variable in the
+        ///       GnashWebcamPrivate class.
+        /// @param r The desired X Resolution value
+        void setXResolution(int r) {_xResolution = r;}
+        
+        /// \brief Accessor to get the private _xResolution variable in the
+        ///       GnashWebcamPrivate class.
+        /// @return The integer value of the _xResolution variable
+        int getXResolution() {return _xResolution;}
+        
+        /// \brief Accessor to set the private _yResolution variable in the
+        ///       GnashWebcamPrivate class.
+        /// @param r The desired Y Resolution value
+        void setYResolution(int r) {_yResolution = r;}
+        
+        /// \brief Accessor to get the private _yResolution variable in the
+        ///       GnashWebcamPrivate class.
+        /// @return The integer value of the _yResolution variable
+        int getYResolution() {return _yResolution;}
+        
+        /// \brief Accessor to set the private _fps variable in the
+        ///       GnashWebcamPrivate class.
+        /// @param f The desired frames per second variable. If the camera
+        ///       doesn't support the framerate, another will be chosen from
+        ///       an array of available framerates
+        void setFps(int f) {_fps = f;}
+        
+        /// \brief Accessor to get the private _fps variable in the
+        ///       GnashWebcamPrivate class.
+        /// @return The integer _fps value stored in the GnashWebcamPrivate class
+        int getFps() {return _fps;}
       
     //FIXME: this should eventually be a private or protected data field  
     //protected:
@@ -376,6 +408,11 @@ class GnashWebcamPrivate
         ///       value when resolution is written as INTxINT)
         gint _yResolution;
         
+        /// \var GnashWebcamPrivate::_fps
+        /// \brief Contains the integer value of the desired frames per second
+        ///     value.
+        gint _fps;
+        
         /// \var GnashWebcamPrivate::_currentFormat
         /// \brief Contains a pointer to the WebcamVidFormat data structure
         ///       selected to be used with this pipeline.
@@ -413,11 +450,11 @@ GnashWebcamPrivate::GnashWebcamPrivate() {
     
     _pipelineIsPlaying = false;
     
-    //FIXME: the resolution here should be able to either
-    //a. be determined by the user (or)
-    //b. be determined by network latency/bandwidth availability
-    _xResolution = 320;
-    _yResolution = 240;
+    //these default values are per the AS livedocs defaults
+    _xResolution = 160; 
+    _yResolution = 120; 
+    _fps = 15;
+    
     _currentFormat = NULL;
     _eosTimeoutId = 0;
 };
@@ -506,6 +543,14 @@ public:
     /// @return Nothing. All pertantent information is stored in a WebcamVidFormat class.
     void getSupportedFramerates(WebcamVidFormat *video_format, GstStructure *structure);
 
+    /// \brief This function checks to see if the current format selected for the
+    ///     webcam supports the framerate passed in as the second argument
+    /// @param webcam A pointer to the selected GnashWebcamPrivate structure to
+    ///     check for the supported framerate value
+    /// @param fps An integer value to check for support
+    /// @return True if the framerate is supported, false otherwise
+    gboolean checkForSupportedFramerate (GnashWebcamPrivate *webcam, int fps);
+
     /// \brief This function runs through the list of framerates determined by
     ///       getSupportedFramerates() and finds the highest supported framerate
     ///       less than 30fps.
@@ -543,6 +588,15 @@ public:
     /// @return True if everything went correctly (making elements, dropping
     ///        into bins and linking elements), false otherwise.
     gboolean webcamCreateSourceBin(GnashWebcamPrivate *webcam);
+    
+    /// \brief Function is called when changes have been made to certain variables
+    ///      that effect the video source's capabilities (specifically resolution
+    ///      and fps values)
+    /// @param webcam A pointer to the GnashWebcamPrivate data structure where
+    ///      changes have been made to resolution or fps variables
+    /// @return True if the changes to the source's capabilities happened succesfully
+    ///      false otherwise.
+    gboolean webcamChangeSourceBin(GnashWebcamPrivate *webcam);
     
     /// \brief Function creates the main bin. For more information on pipeline
     ///       implementation and this function in general see the definition of
@@ -653,10 +707,20 @@ public:
     ///       attached to the machine.
     void incrementNumdevs() {_numdevs += 1;}
     
+    /// \brief Accessor to return a pointer to the global GnashWebcamPrivate
+    ///    variable
+    /// @return A pointer to the global GnashWebcamPrivate pointer
+    GnashWebcamPrivate* getGlobalWebcam() {return _globalWebcam;}
+    
 private:
     /// \var VideoInputGst::_vidVect
     /// \brief A vector containing pointers to GnashWebcam classes.
     std::vector<GnashWebcam*> _vidVect;
+    
+    /// \var VideoInputGst::_devSelection
+    /// \brief An integer value representing the original GnashWebcam data struct
+    ///     _vidVect
+    int _devSelection;
     
     /// \var VideoInputGst::_numdevs
     /// \brief An integer value containing the number of devices attached
