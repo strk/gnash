@@ -170,8 +170,9 @@ getNumberClass(Global_as& g)
     // This is going to be the global Number "class"/"function"
     static as_object* cl = 0;
 
+    as_object* proto = getNumberInterface();
     if (!cl) {
-        cl = g.createClass(&number_ctor, getNumberInterface());
+        cl = g.createClass(&number_ctor, proto);
         attachNumberStaticInterface(*cl);
         VM::get().addStatic(cl);
     }

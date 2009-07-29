@@ -78,8 +78,9 @@ attachBitmapFilterInterface(as_object& o)
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
+    as_object* proto = getBitmapFilterInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&bitmapfilter_ctor, getBitmapFilterInterface());
+    return gl->createClass(&bitmapfilter_ctor, proto);
 }
 
 as_value

@@ -348,8 +348,8 @@ getFlashExternalExternalInterfaceConstructor(Global_as& global)
     static as_object* cl=NULL;
     if ( ! cl )
     {
-        cl = global.createClass(&ExternalInterface_ctor,
-                getExternalInterfaceInterface());
+        as_object* proto = getExternalInterfaceInterface();
+        cl = global.createClass(&ExternalInterface_ctor, proto);
         VM::get().addStatic(cl);
 	    attachExternalInterfaceStaticProperties(*cl);
     }

@@ -668,8 +668,9 @@ get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Rectangle class");
 
+    as_object* proto = getRectangleInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&Rectangle_ctor, getRectangleInterface());
+    return gl->createClass(&Rectangle_ctor, proto);
 }
 
 // extern 

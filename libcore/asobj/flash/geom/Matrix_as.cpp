@@ -896,8 +896,9 @@ static as_value
 get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
+    as_object* proto = getMatrixInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&Matrix_ctor, getMatrixInterface());
+    return gl->createClass(&Matrix_ctor, proto);
 }
 
 // extern 

@@ -358,8 +358,9 @@ static as_value
 get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
+    as_object* proto = getColorTransformInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&ColorTransform_ctor, getColorTransformInterface());
+    return gl->createClass(&ColorTransform_ctor, proto);
 }
 
 

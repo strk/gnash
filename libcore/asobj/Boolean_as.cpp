@@ -102,7 +102,8 @@ getBooleanClass(Global_as& g)
     static as_object* cl = 0;
 
     if (!cl) {
-        cl = g.createClass(&boolean_ctor, getBooleanInterface());
+        as_object* proto = getBooleanInterface();
+        cl = g.createClass(&boolean_ctor, proto);
         VM::get().addStatic(cl);
     }
     return cl;

@@ -1564,7 +1564,8 @@ array_class_init(as_object& glob, const ObjectURI& uri)
     if ( ar == NULL )
     {
         Global_as* gl = getGlobal(glob);
-        ar = gl->createClass(&array_new, getArrayInterface());
+        as_object* proto = getArrayInterface();
+        ar = gl->createClass(&array_new, proto);
 
         // Attach static members
         attachArrayStatics(*ar);
