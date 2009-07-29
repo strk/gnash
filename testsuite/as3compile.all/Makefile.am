@@ -28,6 +28,7 @@ SANE_AS3TESTS = \
 	Sprite.as \
 	QName.as \
 	System.as \
+	Keyboard.as \
 	$(NULL)
 
 BOGUS_AS3TESTS = \
