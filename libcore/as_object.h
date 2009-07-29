@@ -115,6 +115,23 @@ public:
 
 };
 
+/// A URI for describing as_objects.
+//
+/// This is used as a unique identifier for any object member, especially
+/// prototypes, class, constructors.
+struct ObjectURI
+{
+    /// Construct an ObjectURI from name and namespace.
+    ObjectURI(string_table::key name, string_table::key ns)
+        :
+        name(name),
+        ns(ns)
+    {}
+
+    string_table::key name;
+    string_table::key ns;
+};
+
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -1124,34 +1141,25 @@ private:
     /// @returns a property if found, NULL if not found
     ///          or not visible in current VM version
     ///
-    Property* findUpdatableProperty(string_table::key name, 
-        string_table::key nsname = 0);
+    Property* findUpdatableProperty(const ObjectURI& uri);
+
+    void executeTriggers(Property* prop, const ObjectURI& uri,
+            const as_value& val);
 
     /// The constructors of the objects which are the interfaces
     /// implemented by this one.
     std::list<as_object*> mInterfaces;
 
-    typedef std::pair< string_table::key, string_table::key > FQkey;
-    typedef std::map< FQkey, Trigger > TriggerContainer;
+    typedef std::map<ObjectURI, Trigger> TriggerContainer;
     TriggerContainer _trigs;
 };
 
-/// A URI for describing built-in as_objects.
-//
-/// This is used as a unique identifier for prototypes, class, constructors
-/// etc.
-struct ObjectURI
+inline bool
+operator<(const ObjectURI& a, const ObjectURI& b)
 {
-    /// Construct an ObjectURI from name and namespace.
-    ObjectURI(string_table::key name, string_table::key ns)
-        :
-        name(name),
-        ns(ns)
-    {}
-
-    string_table::key name;
-    string_table::key ns;
-};
+    if (a.name < b.name) return true;
+    return a.ns < b.ns;
+}
 
 /// Get the name element of an ObjectURI
 inline string_table::key
