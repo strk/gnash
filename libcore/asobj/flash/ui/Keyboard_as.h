@@ -77,6 +77,8 @@ private:
     int _lastKeyEvent;
 };
 
+void registerKeyboardNative(as_object& global);
+
 } // gnash namespace
 
 // GNASH_ASOBJ3_KEYBOARD_H
