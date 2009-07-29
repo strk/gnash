@@ -219,13 +219,24 @@ Keyboard_as::markReachableResources() const
 }
 #endif // def GNASH_USE_GC
 
+void
+registerKeyboardNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(key_get_ascii, 800, 0);
+    vm.registerNative(key_get_code, 800, 1);
+    vm.registerNative(key_is_down, 800, 2);
+    vm.registerNative(key_is_toggled, 800, 3);
+}
+
 // extern (used by Global.cpp)
-void Keyboard_as::init(as_object& where, const ObjectURI& uri)
+void
+Keyboard_as::init(as_object& where, const ObjectURI& uri)
 {
 
     // Create built-in key object.
     // NOTE: _global.Key *is* an object, not a constructor
-    as_object*  key_obj = new Keyboard_as;
+    as_object* key_obj = new Keyboard_as;
 
     const int flags = PropFlags::readOnly |
                       PropFlags::dontDelete |
@@ -258,18 +269,10 @@ void Keyboard_as::init(as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     Global_as* gl = getGlobal(where);
 
-    vm.registerNative(key_get_ascii, 800, 0);
     key_obj->init_member("getAscii", vm.getNative(800, 0), flags);
-
-    vm.registerNative(key_get_code, 800, 1);
     key_obj->init_member("getCode", vm.getNative(800, 1), flags);
-
-    vm.registerNative(key_is_down, 800, 2);
     key_obj->init_member("isDown", vm.getNative(800, 2), flags);
-
-    vm.registerNative(key_is_toggled, 800, 3);
     key_obj->init_member("isToggled", vm.getNative(800, 3), flags);
-
     key_obj->init_member("isAccessible", 
             gl->createFunction(key_is_accessible), flags);
 

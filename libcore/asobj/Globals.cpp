@@ -1168,6 +1168,7 @@ registerNatives(as_object& global)
     registerSystemNative(global);
     registerStageNative(global);
     registerSharedObjectNative(global);
+    registerKeyboardNative(global);
 
     AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);
