@@ -29,6 +29,7 @@
 #include "StringPredicates.h" // for parseAlignString
 #include "smart_ptr.h" // intrusive_ptr
 #include "GnashNumeric.h"
+#include "Array_as.h"
 
 namespace gnash {
 
@@ -303,7 +304,7 @@ textformat_tabStops(const fn_call& fn)
 	
 	// Next check is to see whether there is a comma and a space in the 
 	// array
-	for (int i=0; i<strVal.length(); i++)
+	for (size_t i=0; i<strVal.length(); i++)
 	{
 		if (strVal[i]==(char)44)
 		{
@@ -321,7 +322,7 @@ textformat_tabStops(const fn_call& fn)
 		}
 	}
 	
-	for (int i=0; i<strVal.length(); i++)
+	for (size_t i=0; i<strVal.length(); i++)
 	{
 		switch(strVal[i])
 		{
@@ -341,7 +342,7 @@ textformat_tabStops(const fn_call& fn)
 			
 	int val;
 	
-	for (int i = 0; i < numInt; ++i)
+	for (size_t i = 0; i < numInt; ++i)
 	{
 		ss >> val;
 		tabStops[i] = val;

@@ -1023,7 +1023,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
         {
             tab = _tabStops.back()+1;
             
-            for (int i = 0; i < tabStops.size(); ++i)
+            for (size_t i = 0; i < tabStops.size(); ++i)
             {        
                 if (tabStops[i] > x)
                 {
@@ -1925,7 +1925,6 @@ TextField::parseHTML(std::wstring& tag,
 {
     std::string attname;
     std::string attvalue;
-    bool complete = false;
     while (it != e && *it != ' ') {
         if (*it == '>') {
             ++it;
@@ -2277,7 +2276,7 @@ void
 TextField::setTabStops(const std::vector<int>& tabStops)
 {
 	_tabStops.resize(tabStops.size());
-	for (int i = 0; i < tabStops.size(); i ++)
+	for (size_t i = 0; i < tabStops.size(); i ++)
 	{
 		_tabStops[i] = PIXEL_RATIO * tabStops[i];
 	}
