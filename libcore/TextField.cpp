@@ -877,7 +877,6 @@ bool
 TextField::get_member(string_table::key name, as_value* val,
     string_table::key nsname)
 {
-    log_debug("TextField.get_member(%s)", name);
 
     // FIXME: Turn all standard members into getter/setter properties
     //        of the TextField class. See attachTextFieldInterface()
@@ -1468,6 +1467,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     if (!complete) continue;
                     else {
                         //Don't think this is the best way to match with tags...
+                        //Also, assumes tags are properly nested. This is acceptable
+                        //assumption
                         if (s == "u") {
                             //underline
                             newrec.setUnderline(true);
@@ -1487,9 +1488,43 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "font") {
                             //font
-                            log_unimpl("<font> html tag in TextField");
+                            boost::uint16_t originalsize = _fontHeight;
+                            if (attributes.find("color") != attributes.end()) {
+                                boost::uint8_t r = std::strtol(
+                                    attributes["color"].substr(1,2).data(), NULL, 16);
+                                boost::uint8_t g = std::strtol(
+                                    attributes["color"].substr(3,2).data(), NULL, 16);
+                                boost::uint8_t b = std::strtol(
+                                    attributes["color"].substr(5,2).data(), NULL, 16);
+                                boost::uint8_t a = 255; //alpha not given in color attribute
+                                rgba color(r,g,b,a);
+                                newrec.setColor(color);
+                            }
+                            if (attributes.find("face") != attributes.end()) {
+                                Font* newfont = new Font(attributes["face"],
+                                    rec.getFont()->isBold(), rec.getFont()->isItalic());
+                                newrec.setFont(newfont);
+                            }
+                            if (attributes.find("size") != attributes.end()) {
+                                std::string firstchar = attributes["size"].substr(0,1);
+                                if (firstchar == "+") {
+                                    newrec.setTextHeight(rec.textHeight() +
+                                        *(attributes["size"].substr(1,attributes["size"].length()-1).data()));
+                                } else if (firstchar == "-") {
+                                    newrec.setTextHeight(rec.textHeight() -
+                                        *(attributes["size"].substr(1,attributes["size"].length()-1).data()));
+                                } else {
+                                    newrec.setTextHeight(20 * std::strtol(
+                                        attributes["size"].data(), NULL, 10));
+                                    newrec.setYOffset(PADDING_TWIPS + newrec.textHeight() + (fontLeading - fontDescent));
+                                    _fontHeight = 20 * std::strtol(
+                                        attributes["size"].data(), NULL, 10);
+                                }
+                            }
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
+                            _fontHeight = originalsize;
+                            
                         } else if (s == "img") {
                             //image
                             log_unimpl("<img> html tag in TextField");
@@ -1550,8 +1585,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     continue;
                 }
                 // If HTML isn't enabled, carry on and insert the glyph.
-		// FIXME: do we also want to be changing last_space_glyph?
-		//        ...because we are...
+                // FIXME: do we also want to be changing last_space_glyph?
+                //        ...because we are...
             case 32:
                 last_space_glyph = rec.glyphs().size();
                 // Don't break, as we still need to insert the space glyph.
@@ -1921,7 +1956,7 @@ TextField::parseHTML(std::wstring& tag,
         std::map<std::string, std::string>& attributes,
         std::wstring::const_iterator& it,
         const std::wstring::const_iterator& e,
-	bool& selfclosing) const
+        bool& selfclosing) const
 {
     std::string attname;
     std::string attvalue;
@@ -1940,25 +1975,25 @@ TextField::parseHTML(std::wstring& tag,
         ++it;
     }
     while (it != e && *it == ' ') {
-	++it; //skip over spaces
+        ++it; //skip over spaces
     }
     if (*it == '>') {
-	++it;
-	return true;
+        ++it;
+        return true;
     }
     if (*it == '/') {
-	++it;
-	if (*it == '>') {
-	    ++it;
-	    selfclosing = true;
-	    return true;
-	} else {
-	    while (it != e) {
-		++it;
-	    }
-	    log_error("invalid html tag");
-	    return false;
-	}
+        ++it;
+        if (*it == '>') {
+            ++it;
+            selfclosing = true;
+            return true;
+        } else {
+            while (it != e) {
+                ++it;
+            }
+            log_error("invalid html tag");
+            return false;
+        }
     }
     //attributes
     while (it != e && *it != '>') {
