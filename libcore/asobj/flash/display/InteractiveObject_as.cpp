@@ -58,7 +58,8 @@ void interactiveobject_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&interactiveobject_ctor, getInteractiveObjectInterface());
+        as_object* proto = getInteractiveObjectInterface();
+        cl = gl->createClass(&interactiveobject_ctor, proto);
         attachInteractiveObjectStaticInterface(*cl);
     }
 

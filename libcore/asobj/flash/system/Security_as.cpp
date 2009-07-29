@@ -65,7 +65,8 @@ void security_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&security_ctor, getSecurityInterface());
+        as_object* proto = getSecurityInterface();
+        cl = gl->createClass(&security_ctor, proto);
         attachSecurityStaticInterface(*cl);
     }
 

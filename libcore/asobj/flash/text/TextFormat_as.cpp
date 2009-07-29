@@ -58,7 +58,8 @@ void textformat_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&textformat_ctor, getTextFormatInterface());
+        as_object* proto = getTextFormatInterface();
+        cl = gl->createClass(&textformat_ctor, proto);
         attachTextFormatStaticInterface(*cl);
     }
 

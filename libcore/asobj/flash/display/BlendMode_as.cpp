@@ -58,7 +58,8 @@ void blendmode_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&blendmode_ctor, getBlendModeInterface());
+        as_object* proto = getBlendModeInterface();
+        cl = gl->createClass(&blendmode_ctor, proto);
         attachBlendModeStaticInterface(*cl);
     }
 

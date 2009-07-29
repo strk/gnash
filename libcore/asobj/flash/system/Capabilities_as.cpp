@@ -58,7 +58,8 @@ void capabilities_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&capabilities_ctor, getCapabilitiesInterface());
+        as_object* proto = getCapabilitiesInterface();
+        cl = gl->createClass(&capabilities_ctor, proto);
         attachCapabilitiesStaticInterface(*cl);
     }
 

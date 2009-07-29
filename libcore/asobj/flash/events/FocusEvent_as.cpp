@@ -63,7 +63,8 @@ void focusevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&focusevent_ctor, getFocusEventInterface());
+        as_object* proto = getFocusEventInterface();
+        cl = gl->createClass(&focusevent_ctor, proto);
         attachFocusEventStaticInterface(*cl);
     }
 

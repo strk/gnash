@@ -135,7 +135,8 @@ void textrenderer_class_init(as_object& where, const ObjectURI& uri)
     // in the 'where' package
     boost::intrusive_ptr<as_object> cl;
     Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&TextRenderer_ctor, getTextRendererInterface());
+    as_object* proto = getTextRendererInterface();
+    cl = gl->createClass(&TextRenderer_ctor, proto);
     attachTextRendererStaticProperties(*cl);
 
     // Register _global.TextRenderer

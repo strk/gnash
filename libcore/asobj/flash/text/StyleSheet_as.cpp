@@ -62,7 +62,8 @@ void stylesheet_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&stylesheet_ctor, getStyleSheetInterface());
+        as_object* proto = getStyleSheetInterface();
+        cl = gl->createClass(&stylesheet_ctor, proto);
         attachStyleSheetStaticInterface(*cl);
     }
 

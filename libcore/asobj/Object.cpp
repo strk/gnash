@@ -73,7 +73,8 @@ void object_class_init(as_object& global, const ObjectURI& uri)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&object_ctor, getObjectInterface());
+        as_object* proto = getObjectInterface();
+        cl = gl->createClass(&object_ctor, proto);
 
 		// Object.registerClass() --
         // TODO: should this only be in SWF6 or higher ?

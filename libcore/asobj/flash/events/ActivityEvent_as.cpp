@@ -60,7 +60,8 @@ void activityevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&activityevent_ctor, getActivityEventInterface());
+        as_object* proto = getActivityEventInterface();
+        cl = gl->createClass(&activityevent_ctor, proto);
         attachActivityEventStaticInterface(*cl);
     }
 

@@ -65,7 +65,8 @@ void netconnection_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&netconnection_ctor, getNetConnectionInterface());
+        as_object* proto = getNetConnectionInterface();
+        cl = gl->createClass(&netconnection_ctor, proto);
         attachNetConnectionStaticInterface(*cl);
     }
 

@@ -60,7 +60,8 @@ void ime_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&ime_ctor, getIMEInterface());
+        as_object* proto = getIMEInterface();
+        cl = gl->createClass(&ime_ctor, proto);
         attachIMEStaticInterface(*cl);
     }
 

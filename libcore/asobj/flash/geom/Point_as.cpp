@@ -671,7 +671,8 @@ as_value get_flash_geom_point_constructor(const fn_call& fn)
 {
 	log_debug("Loading flash.geom.Point class");
     Global_as* gl = getGlobal(fn);
-    as_object* cl = gl->createClass(&Point_ctor, getPointInterface());
+    as_object* as_object* proto = getPointInterface();
+ cl = gl->createClass(&Point_ctor, proto);
     attachPointStaticProperties(*cl);
     return cl;
 }

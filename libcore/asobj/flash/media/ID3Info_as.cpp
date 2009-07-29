@@ -58,7 +58,8 @@ void id3info_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
 	Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&id3info_ctor, getID3InfoInterface());
+        as_object* proto = getID3InfoInterface();
+        cl = gl->createClass(&id3info_ctor, proto);
         attachID3InfoStaticInterface(*cl);
     }
 

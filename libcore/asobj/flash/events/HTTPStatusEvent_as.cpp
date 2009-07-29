@@ -60,7 +60,8 @@ void httpstatusevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&httpstatusevent_ctor, getHTTPStatusEventInterface());
+        as_object* proto = getHTTPStatusEventInterface();
+        cl = gl->createClass(&httpstatusevent_ctor, proto);
         attachHTTPStatusEventStaticInterface(*cl);
     }
 

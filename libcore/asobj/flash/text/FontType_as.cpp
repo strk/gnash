@@ -58,7 +58,8 @@ void fonttype_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&fonttype_ctor, getFontTypeInterface());
+        as_object* proto = getFontTypeInterface();
+        cl = gl->createClass(&fonttype_ctor, proto);
         attachFontTypeStaticInterface(*cl);
     }
 

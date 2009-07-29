@@ -231,7 +231,8 @@ getFlashDisplayBitmapDataConstructor(as_object& where)
     if ( ! cl )
     {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&BitmapData_ctor, getBitmapDataInterface());
+        as_object* proto = getBitmapDataInterface();
+        cl = gl->createClass(&BitmapData_ctor, proto);
         VM::get().addStatic(cl);
         attachBitmapDataStaticProperties(*cl);
     }

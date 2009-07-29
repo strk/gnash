@@ -58,7 +58,8 @@ void objectencoding_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&objectencoding_ctor, getObjectEncodingInterface());
+        as_object* proto = getObjectEncodingInterface();
+        cl = gl->createClass(&objectencoding_ctor, proto);
         attachObjectEncodingStaticInterface(*cl);
     }
 

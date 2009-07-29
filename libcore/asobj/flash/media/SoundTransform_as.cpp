@@ -58,7 +58,8 @@ void soundtransform_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&soundtransform_ctor, getSoundTransformInterface());
+        as_object* proto = getSoundTransformInterface();
+        cl = gl->createClass(&soundtransform_ctor, proto);
         attachSoundTransformStaticInterface(*cl);
     }
 

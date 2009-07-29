@@ -90,7 +90,8 @@ void socket_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&socket_ctor, getSocketInterface());
+        as_object* proto = getSocketInterface();
+        cl = gl->createClass(&socket_ctor, proto);
         attachSocketStaticInterface(*cl);
     }
 

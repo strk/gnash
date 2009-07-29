@@ -58,7 +58,8 @@ void avm1movie_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&avm1movie_ctor, getAVM1MovieInterface());
+        as_object* proto = getAVM1MovieInterface();
+        cl = gl->createClass(&avm1movie_ctor, proto);
         attachAVM1MovieStaticInterface(*cl);
     }
 

@@ -60,7 +60,8 @@ void securityerrorevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&securityerrorevent_ctor, getSecurityErrorEventInterface());
+        as_object* proto = getSecurityErrorEventInterface();
+        cl = gl->createClass(&securityerrorevent_ctor, proto);
         attachSecurityErrorEventStaticInterface(*cl);
     }
 

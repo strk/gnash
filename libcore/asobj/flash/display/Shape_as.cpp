@@ -58,7 +58,8 @@ void shape_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&shape_ctor, getShapeInterface());
+        as_object* proto = getShapeInterface();
+        cl = gl->createClass(&shape_ctor, proto);
         attachShapeStaticInterface(*cl);
     }
 

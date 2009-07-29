@@ -60,7 +60,8 @@ void errorevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&errorevent_ctor, getErrorEventInterface());
+        as_object* proto = getErrorEventInterface();
+        cl = gl->createClass(&errorevent_ctor, proto);
         attachErrorEventStaticInterface(*cl);
     }
 

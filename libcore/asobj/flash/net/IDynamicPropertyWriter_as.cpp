@@ -58,7 +58,8 @@ void idynamicpropertywriter_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&idynamicpropertywriter_ctor, getIDynamicPropertyWriterInterface());
+        as_object* proto = getIDynamicPropertyWriterInterface();
+        cl = gl->createClass(&idynamicpropertywriter_ctor, proto);
         attachIDynamicPropertyWriterStaticInterface(*cl);
     }
 

@@ -58,7 +58,8 @@ void fontstyle_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&fontstyle_ctor, getFontStyleInterface());
+        as_object* proto = getFontStyleInterface();
+        cl = gl->createClass(&fontstyle_ctor, proto);
         attachFontStyleStaticInterface(*cl);
     }
 

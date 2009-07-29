@@ -58,7 +58,8 @@ void responder_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&responder_ctor, getResponderInterface());
+        as_object* proto = getResponderInterface();
+        cl = gl->createClass(&responder_ctor, proto);
         attachResponderStaticInterface(*cl);
     }
 

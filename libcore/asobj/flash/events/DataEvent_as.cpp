@@ -61,7 +61,8 @@ void dataevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&dataevent_ctor, getDataEventInterface());
+        as_object* proto = getDataEventInterface();
+        cl = gl->createClass(&dataevent_ctor, proto);
         attachDataEventStaticInterface(*cl);
     }
 

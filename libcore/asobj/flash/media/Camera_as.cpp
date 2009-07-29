@@ -112,7 +112,8 @@ void camera_class_init(as_object& where, const ObjectURI& uri)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&camera_ctor, getCameraInterface());
+        as_object* proto = getCameraInterface();
+        cl = gl->createClass(&camera_ctor, proto);
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachCameraInterface(*cl);

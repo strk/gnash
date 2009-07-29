@@ -65,7 +65,8 @@ qname_class_init(as_object& where, const ObjectURI& uri)
     boost::intrusive_ptr<as_object> cl;
 
     Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&qname_ctor, getQNameInterface());
+    as_object* proto = getQNameInterface();
+    cl = gl->createClass(&qname_ctor, proto);
 
     where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
             getNamespace(uri));

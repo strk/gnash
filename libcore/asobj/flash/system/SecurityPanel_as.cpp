@@ -58,7 +58,8 @@ void securitypanel_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&securitypanel_ctor, getSecurityPanelInterface());
+        as_object* proto = getSecurityPanelInterface();
+        cl = gl->createClass(&securitypanel_ctor, proto);
         attachSecurityPanelStaticInterface(*cl);
     }
 

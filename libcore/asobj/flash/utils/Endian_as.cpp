@@ -58,7 +58,8 @@ void endian_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&endian_ctor, getEndianInterface());
+        as_object* proto = getEndianInterface();
+        cl = gl->createClass(&endian_ctor, proto);
         attachEndianStaticInterface(*cl);
     }
 

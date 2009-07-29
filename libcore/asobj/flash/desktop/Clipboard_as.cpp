@@ -58,7 +58,8 @@ void clipboard_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&clipboard_ctor, getClipboardInterface());
+        as_object* proto = getClipboardInterface();
+        cl = gl->createClass(&clipboard_ctor, proto);
         attachClipboardStaticInterface(*cl);
     }
 

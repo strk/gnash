@@ -245,7 +245,8 @@ void filereference_class_init(as_object& where, const ObjectURI& uri)
     // in the 'where' package
     boost::intrusive_ptr<as_object> cl;
     Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&FileReference_ctor, getFileReferenceInterface());
+    as_object* proto = getFileReferenceInterface();
+    cl = gl->createClass(&FileReference_ctor, proto);
     attachFileReferenceStaticProperties(*cl);
 
     // Register _global.FileReference

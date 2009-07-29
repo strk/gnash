@@ -58,7 +58,8 @@ void contextmenubuiltinitems_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&contextmenubuiltinitems_ctor, getContextMenuBuiltInItemsInterface());
+        as_object* proto = getContextMenuBuiltInItemsInterface();
+        cl = gl->createClass(&contextmenubuiltinitems_ctor, proto);
         attachContextMenuBuiltInItemsStaticInterface(*cl);
     }
 

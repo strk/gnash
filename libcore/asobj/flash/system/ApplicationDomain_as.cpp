@@ -59,7 +59,8 @@ void applicationdomain_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&applicationdomain_ctor, getApplicationDomainInterface());
+        as_object* proto = getApplicationDomainInterface();
+        cl = gl->createClass(&applicationdomain_ctor, proto);
         attachApplicationDomainStaticInterface(*cl);
     }
 

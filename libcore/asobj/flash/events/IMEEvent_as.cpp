@@ -60,7 +60,8 @@ void imeevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&imeevent_ctor, getIMEEventInterface());
+        as_object* proto = getIMEEventInterface();
+        cl = gl->createClass(&imeevent_ctor, proto);
         attachIMEEventStaticInterface(*cl);
     }
 

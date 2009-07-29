@@ -65,7 +65,8 @@ void loaderinfo_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&loaderinfo_ctor, getLoaderInfoInterface());
+        as_object* proto = getLoaderInfoInterface();
+        cl = gl->createClass(&loaderinfo_ctor, proto);
         attachLoaderInfoStaticInterface(*cl);
     }
 

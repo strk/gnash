@@ -61,7 +61,8 @@ void stackframe_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&stackframe_ctor, getStackFrameInterface());
+        as_object* proto = getStackFrameInterface();
+        cl = gl->createClass(&stackframe_ctor, proto);
         attachStackFrameStaticInterface(*cl);
     }
 

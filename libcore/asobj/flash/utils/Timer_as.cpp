@@ -62,7 +62,8 @@ void timer_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&timer_ctor, getTimerInterface());
+        as_object* proto = getTimerInterface();
+        cl = gl->createClass(&timer_ctor, proto);
         attachTimerStaticInterface(*cl);
     }
 

@@ -58,7 +58,8 @@ void sample_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&sample_ctor, getSampleInterface());
+        as_object* proto = getSampleInterface();
+        cl = gl->createClass(&sample_ctor, proto);
         attachSampleStaticInterface(*cl);
     }
 

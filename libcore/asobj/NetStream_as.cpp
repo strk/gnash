@@ -115,7 +115,8 @@ NetStream_as::init(as_object& global, const ObjectURI& uri)
     if ( cl == NULL )
     {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&netstream_new, getNetStreamInterface());
+        as_object* proto = getNetStreamInterface();
+        cl = gl->createClass(&netstream_new, proto);
         // replicate all interface to class, to be able to access
         // all methods as static functions
         attachNetStreamInterface(*cl);

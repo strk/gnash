@@ -58,7 +58,8 @@ void textlinemetrics_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&textlinemetrics_ctor, getTextLineMetricsInterface());
+        as_object* proto = getTextLineMetricsInterface();
+        cl = gl->createClass(&textlinemetrics_ctor, proto);
         attachTextLineMetricsStaticInterface(*cl);
     }
 

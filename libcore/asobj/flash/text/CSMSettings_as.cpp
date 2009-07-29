@@ -58,7 +58,8 @@ void csmsettings_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&csmsettings_ctor, getCSMSettingsInterface());
+        as_object* proto = getCSMSettingsInterface();
+        cl = gl->createClass(&csmsettings_ctor, proto);
         attachCSMSettingsStaticInterface(*cl);
     }
 

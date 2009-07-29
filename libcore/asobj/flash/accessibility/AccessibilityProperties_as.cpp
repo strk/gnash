@@ -58,7 +58,8 @@ void accessibilityproperties_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&accessibilityproperties_ctor, getAccessibilityPropertiesInterface());
+        as_object* proto = getAccessibilityPropertiesInterface();
+        cl = gl->createClass(&accessibilityproperties_ctor, proto);
         attachAccessibilityPropertiesStaticInterface(*cl);
     }
 

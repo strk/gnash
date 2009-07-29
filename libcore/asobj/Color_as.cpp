@@ -144,7 +144,8 @@ void color_class_init(as_object& global, const ObjectURI& uri)
 	if ( cl == NULL )
 	{
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&color_ctor, getColorInterface());
+        as_object* proto = getColorInterface();
+        cl = gl->createClass(&color_ctor, proto);
 	}
 
 	// Register _global.Color

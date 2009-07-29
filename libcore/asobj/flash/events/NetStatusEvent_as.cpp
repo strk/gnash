@@ -60,7 +60,8 @@ void netstatusevent_class_init(as_object& where, const ObjectURI& uri)
 
     if (!cl) {
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&netstatusevent_ctor, getNetStatusEventInterface());
+        as_object* proto = getNetStatusEventInterface();
+        cl = gl->createClass(&netstatusevent_ctor, proto);
         attachNetStatusEventStaticInterface(*cl);
     }
 

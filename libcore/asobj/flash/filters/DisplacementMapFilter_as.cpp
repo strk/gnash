@@ -222,7 +222,8 @@ void displacementmapfilter_class_init(as_object& where, const ObjectURI& uri)
 	// in the 'where' package
 	boost::intrusive_ptr<as_object> cl;
         Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&DisplacementMapFilter_ctor, getDisplacementMapFilterInterface());
+        as_object* proto = getDisplacementMapFilterInterface();
+        cl = gl->createClass(&DisplacementMapFilter_ctor, proto);
 	attachDisplacementMapFilterStaticProperties(*cl);
 
 	// Register _global.DisplacementMapFilter
