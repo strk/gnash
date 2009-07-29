@@ -549,7 +549,8 @@ private:
 	/// will hopefully make code cleaner
 	void newLine(std::wstring::const_iterator& it, boost::int32_t& x,
             boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
-            LineStarts::value_type& last_line_start_record, float div);
+            LineStarts::value_type& last_line_start_record, float div,
+			bool bullet);
 					
 	/// De-reference and do appropriate action for character iterator
 	void handleChar(std::wstring::const_iterator& it,

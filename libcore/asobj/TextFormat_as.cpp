@@ -290,76 +290,73 @@ textformat_tabStops(const fn_call& fn)
 		
 	as_value ret;
 	
-	//~ std::string strVal = fn.arg(0).to_string();
-	//~ std::stringstream ss;
-	//~ int countComma = 0;
-	//~ int countSpace = 0;
-	//~ int countTab = 0;
+	if (!fn.nargs)
+	{
+		return ret;
+	}
 	
-	//~ // Next check is to see whether there is a comma and a space in the 
-	//~ // array
-	//~ for (int i=0; i<strVal.length(); i++)
-	//~ {
-		//~ if (strVal[i]==(char)44)
-		//~ {
-			//~ countComma ++;
-		//~ }
-		//~ 
-		//~ if (strVal[i]==(char)32)
-		//~ {
-			//~ countSpace ++;
-		//~ }
-		//~ 
-		//~ if (strVal[i]==(char)9)
-		//~ { 
-			//~ countTab ++;
-		//~ }
-	//~ }
-	//~ 
-	//~ for (int i=0; i<strVal.length(); i++)
-	//~ {
-		//~ switch(strVal[i])
-		//~ {
-			//~ case (char)44:
-				//~ strVal[i] = (char)44;
-			//~ case (char)9:
-				//~ strVal[i] = (char)32;
-			//~ default:
-				//~ break;
-		//~ }
-	//~ }
-//~ 
-	//~ int numInt = countComma + countSpace + countTab + 1;
-	//~ std::vector<int> tabStops(numInt);
-	//~ 
-	//~ ss << strVal;
-			//~ 
-	//~ int val;
-	//~ 
-	//~ for (int i = 0; i < numInt; ++i)
-	//~ {
-		//~ ss >> val;
-		//~ tabStops[i] = val;
-	//~ }
-	//~ 
-	//~ for (int i = 0; i < numInt; i ++)
-	//~ { 
-		//~ log_unimpl("num: %d", tabStops[i]);
-	//~ }
-//~ 
-	//~ if ( fn.nargs == 0)	// getter
-	//~ {
-		//~ LOG_ONCE( log_unimpl("Getter for textformat_tabStops") );
-	//~ }
-	//~ else 				// setter
-	//~ {
-		//~ ptr->tabStopsSet(tabStops);
-	//~ }
+	std::string strVal = fn.arg(0).to_string();
+	std::stringstream ss;
+	int countComma = 0;
+	int countSpace = 0;
+	int countTab = 0;
+	
+	// Next check is to see whether there is a comma and a space in the 
+	// array
+	for (int i=0; i<strVal.length(); i++)
+	{
+		if (strVal[i]==(char)44)
+		{
+			countComma ++;
+		}
+		
+		if (strVal[i]==(char)32)
+		{
+			countSpace ++;
+		}
+		
+		if (strVal[i]==(char)9)
+		{ 
+			countTab ++;
+		}
+	}
+	
+	for (int i=0; i<strVal.length(); i++)
+	{
+		switch(strVal[i])
+		{
+			case (char)44:
+				strVal[i] = (char)44;
+			case (char)9:
+				strVal[i] = (char)32;
+			default:
+				break;
+		}
+	}
+
+	int numInt = countComma + countSpace + countTab + 1;
+	std::vector<int> tabStops(numInt);
+	
+	ss << strVal;
+			
+	int val;
+	
+	for (int i = 0; i < numInt; ++i)
+	{
+		ss >> val;
+		tabStops[i] = val;
+	}
+
+	if ( fn.nargs == 0)	// getter
+	{
+		LOG_ONCE( log_unimpl("Getter for textformat_tabStops") );
+	}
+	else 				// setter
+	{
+		ptr->tabStopsSet(tabStops);
+	}
 	
 	return ret;
-	//~ 
-	LOG_ONCE( log_unimpl("TextFormat.tabStops") );
-	//return as_value();
 }
 
 as_value
