@@ -125,7 +125,7 @@ namespace gnash {
 namespace {
 
     const ClassHierarchy::NativeClasses& avm1Classes();
-    const ClassHierarchy::NativeClasses& avm2Classes();
+    const ClassHierarchy::NativeClasses& avm2Classes(string_table& st);
 
     as_value global_trace(const fn_call& fn);
     as_value global_isNaN(const fn_call& fn);
@@ -155,8 +155,6 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     _vm(vm)
 {
     
-    _classes.declareAll(avm2Classes());
-    
     init_member("trace", createFunction(global_trace));
     init_member("escape", createFunction(global_escape));
    
@@ -166,6 +164,8 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
     array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
     function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
+    
+    _classes.declareAll(avm2Classes(vm.getStringTable()));
 
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
     
@@ -473,7 +473,7 @@ avm1Classes()
 }
 
 const ClassHierarchy::NativeClasses&
-avm2Classes()
+avm2Classes(string_table& st)
 {
 
     const string_table::key NS_GLOBAL = 0;
@@ -517,9 +517,7 @@ avm2Classes()
            NSV::NS_FLASH_DISPLAY, 3))
         (N(stage_class_init, NSV::CLASS_STAGE, NSV::CLASS_MOVIE_CLIP,
            NSV::NS_FLASH_DISPLAY, 1))
-
-        // TODO: should be SimpleButton
-        (N(Button::init, NSV::CLASS_BUTTON, NSV::CLASS_INTERACTIVEOBJECT,
+        (N(Button::init, st.find("SimpleButton"), NSV::CLASS_INTERACTIVEOBJECT,
            NSV::NS_FLASH_DISPLAY, 5))
 
         // Text classes
@@ -588,7 +586,7 @@ avm2Classes()
         // Error classes
         
         // XML classes
-        (N(XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT,
+        (N(XMLDocument_as::init, st.find("XMLDocument"), NSV::CLASS_OBJECT,
            NSV::NS_FLASH_XML, 5))
         (N(XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_XML, 5))
@@ -596,7 +594,7 @@ avm2Classes()
         // UI classes
         (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 5))
-        (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT,
+        (N(Keyboard_as::init, st.find("Keyboard"), NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 5))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 7))
