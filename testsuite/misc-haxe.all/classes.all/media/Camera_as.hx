@@ -26,6 +26,7 @@
 #if flash9
 import flash.media.Camera;
 import flash.display.MovieClip;
+import flash.media.Video;
 #else
 import flash.Camera;
 import flash.MovieClip;
@@ -236,6 +237,12 @@ class Camera_as {
 	}
 	//FIXME: we should add tests to check that Events in this class are
 	//being properly handled.
+    
+    var vid:Video = new Video(x1.width, x1.height);
+    vid.x = 10;
+    vid.y = 10;
+    vid.attachCamera(x1); 
+    
 	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
