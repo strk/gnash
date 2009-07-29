@@ -324,7 +324,7 @@ Machine::Machine(VM& vm)
         mGlobalScope(0),
         mDefaultThis(0),
         mThis(0),
-        _global(new AVM2Global(*this, _vm)),
+        _global(0),
         mGlobalReturn(),
         mIgnoreReturn(),
         mExitWithReturn(false),
@@ -332,10 +332,10 @@ Machine::Machine(VM& vm)
         mCurrentFunction(0),
         _vm(vm)
 {
-	// Local registers should be initialized at the beginning of each
-    // function call, but we don't currently parse the number of local
-    // registers for each function.
-    //	_registers.resize(16);
+    // TODO: The Global constructor needs the Machine and VM to be more or less
+    // fully constructed, so we might think how to do this better.
+    _global = new AVM2Global(*this, _vm);
+               
 }
 
 Global_as*
