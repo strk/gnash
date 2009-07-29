@@ -110,7 +110,8 @@ error_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-	boost::intrusive_ptr<as_object> err = new as_object(getErrorInterface());
+    as_object* proto = getErrorInterface();
+	boost::intrusive_ptr<as_object> err = new as_object(proto);
 	
     string_table& st = getStringTable(fn);
     if (fn.nargs > 0)
