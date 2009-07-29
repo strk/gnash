@@ -45,19 +45,6 @@ namespace {
 }
 
 
-class Error_as: public as_object
-{
-
-public:
-
-	Error_as()
-		:
-		as_object(getErrorInterface())
-	{}
-
-};
-
-
 // extern 
 void Error_class_init(as_object& where, const ObjectURI& uri)
 {
@@ -107,7 +94,7 @@ attachErrorInterface(as_object& o)
 as_value
 error_toString(const fn_call& fn)
 {
- 	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
+ 	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     string_table& st = getStringTable(*ptr);
     as_value message;
@@ -123,7 +110,7 @@ error_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-	boost::intrusive_ptr<Error_as> err = new Error_as;
+	boost::intrusive_ptr<as_object> err = new as_object(getErrorInterface());
 	
     string_table& st = getStringTable(fn);
     if (fn.nargs > 0)
