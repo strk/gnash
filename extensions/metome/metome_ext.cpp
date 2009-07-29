@@ -124,7 +124,8 @@ extern "C" {
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
         Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&metome_ctor, getInterface());
+        as_object* proto = getInterface();
+        cl = gl->createClass(&metome_ctor, proto);
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    attachInterface(cl.get());
