@@ -287,8 +287,6 @@ class TextFormat_as {
 		
 	}
 	
-	DejaGnu.note("typeof(url): " + Type.typeof(x1.url));
-
 	if (Std.is(x1.url, String)) {
 	    DejaGnu.pass("TextFormat.url property exists");
 	} else {
