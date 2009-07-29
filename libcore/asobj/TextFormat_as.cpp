@@ -342,7 +342,7 @@ textformat_tabStops(const fn_call& fn)
 			
 	int val;
 	
-	for (size_t i = 0; i < numInt; ++i)
+	for (int i = 0; i < numInt; ++i)
 	{
 		ss >> val;
 		tabStops[i] = val;
