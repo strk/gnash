@@ -54,6 +54,7 @@
 #include <boost/bind.hpp>
 #include <cstdlib>
 #include <typeinfo>
+#include <map>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
@@ -876,7 +877,7 @@ bool
 TextField::get_member(string_table::key name, as_value* val,
     string_table::key nsname)
 {
-    //log_debug("TextField.get_member(%s)", name);
+    log_debug("TextField.get_member(%s)", name);
 
     // FIXME: Turn all standard members into getter/setter properties
     //        of the TextField class. See attachTextFieldInterface()
@@ -1460,7 +1461,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     newrec.setTextHeight(rec.textHeight());
                     newrec.setXOffset(x);
                     newrec.setYOffset(y);
-                    bool complete = parseHTML(discard, attributes, it, e);
+                    bool selfclosing = false;
+                    bool complete = parseHTML(discard, attributes, it, e, selfclosing);
                     std::string s(discard.begin(), discard.end());
                     s.assign(discard.begin(), discard.end());
                     if (!complete) continue;
@@ -1515,7 +1517,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "p") { 
                             //paragraph
-                            log_unimpl("<p> html tag in TextField");
                             if (_display == BLOCK)
                             {
                                 newLine(it, x, y, rec, last_space_glyph,
@@ -1538,10 +1539,10 @@ TextField::handleChar(std::wstring::const_iterator& it,
 										last_line_start_record, 1.0,false);
                         } else {
                             log_debug("<%s> tag is unsupported", s);
-                            // THIS IS DANGEROUS. IF TAG HAS NO CLOSING TAG,
-                            // THIS MAY PRODUCE UNDESIRED RESULTS
+                            if (!selfclosing) { //then recurse, look for closing tag
                             handleChar(it, e, x, y, newrec, last_code,
-                                    last_space_glyph, last_line_start_record);
+                                                last_space_glyph, last_line_start_record);
+                            }
                         }
                     }
                     rec.setXOffset(x);
@@ -1549,6 +1550,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     continue;
                 }
                 // If HTML isn't enabled, carry on and insert the glyph.
+		// FIXME: do we also want to be changing last_space_glyph?
+		//        ...because we are...
             case 32:
                 last_space_glyph = rec.glyphs().size();
                 // Don't break, as we still need to insert the space glyph.
@@ -1915,47 +1918,142 @@ TextField::registerTextVariable()
 /// the closing tag or the end of the string.
 bool
 TextField::parseHTML(std::wstring& tag,
-        std::map<std::string, std::string> /*attributes*/,
+        std::map<std::string, std::string>& attributes,
         std::wstring::const_iterator& it,
-        const std::wstring::const_iterator& e) const
+        const std::wstring::const_iterator& e,
+	bool& selfclosing) const
 {
     std::string attname;
     std::string attvalue;
     bool complete = false;
-
-    while (it != e) {
-        //if (*it == ' ') {
-            //++it;
-            //while (it != e && *it != ' ') {
-                //while (it != e && *it != '=') {
-                    //if (*it == 0) break;
-                    //attname.push_back(*it);
-                    //++it;
-                //}
-                //++it
-                //if (*it == 0) break;
-                //attvalue.push_back(*it);
-            //}
-        //}
-
+    while (it != e && *it != ' ') {
         if (*it == '>') {
             ++it;
-            complete = true;
-            break;
+            return true;
         }
         
         // Check for NULL DisplayObject
-        if (*it == 0) break;
-
+        if (*it == 0) {
+	    log_error("found NULL DisplayObject in htmlText");
+	    return false;
+	}
         tag.push_back(*it);
         ++it;
+    }
+    while (it != e && *it == ' ') {
+	++it; //skip over spaces
+    }
+    if (*it == '>') {
+	++it;
+	return true;
+    }
+    if (*it == '/') {
+	++it;
+	if (*it == '>') {
+	    ++it;
+	    selfclosing = true;
+	    return true;
+	} else {
+	    while (it != e) {
+		++it;
+	    }
+	    log_error("invalid html tag");
+	    return false;
+	}
+    }
+    //attributes
+    while (it != e && *it != '>') {
+        while (it != e && *it != '=' && *it != ' ') {
+            
+            if (*it == 0) {
+            log_error("found NULL DisplayObject in htmlText");
+            return false;
+            }
+            if (*it == '>') {
+            log_error("malformed HTML tag, invalid attribute name");
+            while (it != e) {
+            ++it;
+            }
+            return false;
+            }
+        
+            attname.push_back(*it);
+            ++it;
+        }
+	while (it != e && (*it == ' ' || *it == '=')) {
+	    ++it; //skip over spaces and '='
+	}
+	if (it != e) {
+	    if (*it != '"') { //make sure attribute value is opened with '"'
+            log_error("attribute value must be opened with \'\"\' (did you remember escape char?)");
+            while (it != e) {
+                ++it;
+            }
+            return false;
+	    } else {
+		++it; //skip (")
+	    }
+	}
+	while (it != e && *it != '"') { //get attribute value
+
+	    if (*it == 0) {
+            log_error("found NULL DisplayObject in htmlText");
+            return false;
+	    }
+
+	    attvalue.push_back(*it);
+	    ++it;
+	}
+	if (it != e) {
+	    if (*it != '"') { //make sure attribute value is closed with '"'
+            log_error("attribute value must be closed with \'\"\' (did you remember escape char?)");
+            while (it != e) {
+                ++it;
+            }
+            return false;
+	    } else {
+            ++it; //skip (")
+	    }
+	}
+	attributes.insert( std::pair<std::string,std::string>(attname, attvalue));
+	attname = "";
+	attvalue = "";
+	if ((*it != ' ') && (*it != '/') && (*it != '>')) {
+	    log_error("malformed HTML tag, invalid attribute value");
+	    while (it != e) {
+            ++it;
+	    }
+	    return false;
+	}
+	if (*it == ' ') {
+	    while (it != e && *it == ' ') {
+            ++it; //skip over spaces
+	    }
+	}
+	if (*it == '>') {
+	    ++it;
+	    return true;
+	} else if (*it == '/') {
+	    ++it;
+	    if (*it == '>') {
+            ++it;
+            selfclosing = true;
+            return true;
+	    } else {
+		while (it != e) {
+		    ++it;
+		}
+		log_error("invalid html tag");
+		return false;
+	    }
+	}
     }
     
 #ifdef GNASH_DEBUG_TEXTFIELDS
     log_debug ("HTML tag: %s", utf8::encodeCanonicalString(tag, 7));
 #endif
-    
-    return complete;
+    log_error("I declare this a HTML syntax error");
+    return false; //since we did not return already, must be malformed...?
 }
 
 void

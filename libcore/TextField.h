@@ -549,8 +549,7 @@ private:
 	/// will hopefully make code cleaner
 	void newLine(std::wstring::const_iterator& it, boost::int32_t& x,
             boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
-            LineStarts::value_type& last_line_start_record, float div,
-			bool bullet);
+            LineStarts::value_type& last_line_start_record, float div);
 					
 	/// De-reference and do appropriate action for character iterator
 	void handleChar(std::wstring::const_iterator& it,
@@ -569,9 +568,10 @@ private:
 	/// @return     Whether the tag is complete or not (i.e. whether a '>'
 	///             was found).
 	bool parseHTML(std::wstring& tag,
-            std::map<std::string, std::string> attributes,
+            std::map<std::string, std::string>& attributes,
             std::wstring::const_iterator& it,
-            const std::wstring::const_iterator& e) const;
+            const std::wstring::const_iterator& e,
+			bool& selfclosing) const;
 
 	/// Does LEFT/CENTER/RIGHT alignment on the records in
 	/// m_text_glyph_records[], starting with
