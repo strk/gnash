@@ -130,20 +130,19 @@ PropertyList::getOrderAfter(int order)
 }
 
 bool
-PropertyList::reserveSlot(unsigned short slotId, string_table::key name,
-	string_table::key nsId)
+PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
 	orderIterator found = iterator_find(_props, slotId + 1);
 	if (found != _props.get<1>().end())
 		return false;
 
-	Property a(name, nsId, as_value());
+	Property a(getName(uri), getNamespace(uri), as_value());
 	a.setOrder(slotId + 1);
 	_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
 	string_table& st = _vm.getStringTable();
-	log_debug("Slot for AS property %s in namespace %s inserted with flags %s",
-		st.value(name), st.value(nsId), a.getFlags());
+	log_debug("Slot for AS property %s::%s inserted with flags %s",
+            getNamespace(uri), getName(uri), a.getFlags());
 #endif
 	return true;
 }

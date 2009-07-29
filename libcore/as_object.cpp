@@ -328,7 +328,7 @@ as_object::add_property(const std::string& name, as_function& getter,
 #if 1
 		// check if we have a trigger, if so, invoke it
 		// and set val to its return
-		TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(k, 0));
+		TriggerContainer::iterator trigIter = _trigs.find(ObjectURI(k, 0));
 		if ( trigIter != _trigs.end() )
 		{
 			Trigger& trig = trigIter->second;
@@ -545,8 +545,10 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 }
 
 Property*
-as_object::findUpdatableProperty(string_table::key key, string_table::key nsname)
+as_object::findUpdatableProperty(const ObjectURI& uri)
 {
+    const string_table::key key = getName(uri), nsname = getNamespace(uri);
+
 	const int swfVersion = getSWFVersion(*this);
 
 	Property* prop = _members.getProperty(key, nsname);
@@ -595,10 +597,9 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 }
 
 void
-as_object::reserveSlot(string_table::key name, string_table::key nsId,
-	unsigned short slotId)
+as_object::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
-	_members.reserveSlot(slotId, name, nsId);
+	_members.reserveSlot(uri, slotId);
 }
 
 bool
@@ -622,63 +623,75 @@ as_object::set_member_slot(int order, const as_value& val, bool ifFound)
     return false;
 }
 
+void
+as_object::executeTriggers(Property* prop, const ObjectURI& uri,
+        const as_value& val)
+{
+
+    // check if we have a trigger, if so, invoke it
+    // and set val to it's return
+    TriggerContainer::iterator trigIter = _trigs.find(uri);
+    
+    if (trigIter == _trigs.end()) {
+        if (prop) {
+            prop->setValue(*this, val);
+            prop->clearVisible(getSWFVersion(*this));
+        }
+        return;
+    }
+
+    Trigger& trig = trigIter->second;
+
+    // WARNING: getValue might itself invoke a trigger
+    // (getter-setter)... ouch ?
+    // TODO: in this case, return the underlying value !
+    as_value curVal = prop ? prop->getCache() : as_value(); 
+
+    log_debug("Existing property %s is being watched: "
+            "firing trigger on update (current val:%s, "
+            "new val:%s)",
+            getStringTable(*this).value(getName(uri)), curVal, val);
+
+    as_value newVal = trig.call(curVal, val, *this);
+
+    // The trigger call could have deleted the property,
+    // so we check for its existance again, and do NOT put
+    // it back in if it was deleted
+    prop = findUpdatableProperty(uri);
+    if (!prop) {
+        log_debug("Property %s deleted by trigger on update",
+                getStringTable(*this).value(getName(uri)));
+        // Return true?
+        return;
+    }
+    prop->setValue(*this, newVal); 
+    prop->clearVisible(getSWFVersion(*this));
+
+}
+
 // Handles read_only and static properties properly.
 bool
 as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
-	//log_debug(_("set_member_default(%s)"), key);
-	Property* prop = findUpdatableProperty(key, nsname);
-	if (prop)
-	{
-		if (prop->isReadOnly())
-		{
-			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
-				"Attempt to set read-only property '%s'"),
-				getStringTable(*this).value(key)););
+
+    ObjectURI uri(key, nsname);
+	Property* prop = findUpdatableProperty(uri);
+	
+    if (prop) {
+
+		if (prop->isReadOnly()) {
+			IF_VERBOSE_ASCODING_ERRORS(
+                    log_aserror(_("Attempt to set read-only property '%s'"),
+                    getStringTable(*this).value(key));
+            );
 			return true;
 		}
 
-		try
-		{
-			// check if we have a trigger, if so, invoke it
-			// and set val to it's return
-			TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
-			if ( trigIter != _trigs.end() )
-			{
-				Trigger& trig = trigIter->second;
-
-				// WARNING: getValue might itself invoke a trigger
-				// (getter-setter)... ouch ?
-				// TODO: in this case, return the underlying value !
-				as_value curVal = prop->getCache(); // getValue(*this); 
-
-				log_debug("Existing property %s is being watched: firing trigger on update (current val:%s, new val:%s)",
-					getStringTable(*this).value(key), curVal, val);
-				as_value newVal = trig.call(curVal, val, *this);
-				// The trigger call could have deleted the property,
-				// so we check for its existance again, and do NOT put
-				// it back in if it was deleted
-				prop = findUpdatableProperty(key, nsname);
-				if ( ! prop )
-				{
-					log_debug("Property %s deleted by trigger on update", getStringTable(*this).value(key));
-					return true;
-				}
-
-				//if ( prop->isGetterSetter() ) prop->setCache(newVal); 
-				prop->setValue(*this, newVal); 
-			}
-			else
-			{
-				// log_debug("No trigger for key %d ns %d", key, nsname);
-				prop->setValue(*this, val);
-			}
-
-			prop->clearVisible(getSWFVersion(*this));
+		try {
+            executeTriggers(prop, uri, val);
 		}
-		catch (ActionTypeError& exc)
-		{
+		catch (ActionTypeError& exc) {
 			log_aserror(_("%s: Exception %s. Will create a new member"),
 				getStringTable(*this).value(key), exc.what());
 		}
@@ -687,11 +700,11 @@ as_object::set_member(string_table::key key, const as_value& val,
 	}
 
 	// Else, add new property...
-	if ( ifFound ) return false;
+	if (ifFound) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(key, val, *this, nsname))
-	{
+	if (!_members.setValue(key, val, *this, nsname)) {
+
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Unknown failure in setting property '%s' on "
 			"object '%p'"), getStringTable(*this).value(key), (void*) this);
@@ -699,35 +712,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 		return false;
 	}
 
-	// Now check if we have a trigger, if so, invoke it
-	// and reset val to it's return
-	// NOTE that we do this *after* setting it in first place 
-	// as the trigger seems allowed to delete the property again
-	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
-	if ( trigIter != _trigs.end() )
-	{
-		Trigger& trig = trigIter->second;
-
-		log_debug("Property %s is being watched, calling trigger on create", getStringTable(*this).value(key));
-
-		// NOTE: the trigger call might delete the propery being added
-		//       so we first add the property, then call the trigger
-		//       and finally check if the property still exists (ufff...)
-		//
-
-		as_value curVal; // undefined, didn't exist...
-		as_value newVal = trig.call(curVal, val, *this);
-		Property* prop = _members.getProperty(key);
-		if ( ! prop )
-		{
-			log_debug("Property %s deleted by trigger on create", 
-                    getStringTable(*this).value(key));
-		}
-		else
-		{
-			prop->setValue(*this, newVal);
-		}
-	}
+    executeTriggers(prop, uri, val);
 
 	return false;
 }
@@ -737,7 +722,7 @@ void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
 	string_table::key nsname)
 {
-	init_member(getStringTable(*this).find(PROPNAME(key1)), val, flags, nsname);
+	init_member(getStringTable(*this).find(key1), val, flags, nsname);
 }
 
 void
@@ -746,7 +731,8 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 {
 
 	if (order >= 0 && !_members.
-		reserveSlot(static_cast<unsigned short>(order), key, nsname))
+		reserveSlot(ObjectURI(key, nsname),
+            static_cast<boost::uint16_t>(order)))
 	{
 		log_error(_("Attempt to set a slot for either a slot or a property "
 			"which already exists."));
@@ -1346,11 +1332,11 @@ as_object::watch(string_table::key key, as_function& trig,
 		const as_value& cust, string_table::key ns)
 {
 	
-	FQkey k = std::make_pair(key, ns);
-	std::string propname = VM::get().getStringTable().value(key);
+	ObjectURI k(key, ns);
+	std::string propname = getStringTable(*this).value(key);
 
 	TriggerContainer::iterator it = _trigs.find(k);
-	if ( it == _trigs.end() )
+	if (it == _trigs.end())
 	{
 		return _trigs.insert(
                 std::make_pair(k, Trigger(propname, trig, cust))).second;
@@ -1362,7 +1348,7 @@ as_object::watch(string_table::key key, as_function& trig,
 bool
 as_object::unwatch(string_table::key key, string_table::key ns)
 {
-	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, ns));
+	TriggerContainer::iterator trigIter = _trigs.find(ObjectURI(key, ns));
 	if ( trigIter == _trigs.end() )
 	{
 		log_debug("No watch for property %s",
@@ -1402,7 +1388,8 @@ Trigger::setReachable() const
 }
 
 as_value
-Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_obj)
+Trigger::call(const as_value& oldval, const as_value& newval,
+        as_object& this_obj)
 {
 	if ( _executing ) return newval;
 

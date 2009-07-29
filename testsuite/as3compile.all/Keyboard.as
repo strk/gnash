@@ -33,10 +33,10 @@ package main {
             xcheck_equals(Keyboard.constructor, "[class Class]");
             xcheck(Keyboard.hasOwnProperty("capsLock"));
             xcheck(Keyboard.hasOwnProperty("numLock"));
-            xcheck(Keyboard.hasOwnProperty("isAccessible"));
+            check(Keyboard.hasOwnProperty("isAccessible"));
 
             // TODO: lots more
-            xcheck(Keyboard.hasOwnProperty("BACKSPACE"));
+            check(Keyboard.hasOwnProperty("BACKSPACE"));
             xcheck(Keyboard.hasOwnProperty("CAPS_LOCK"));
 
             // These are in AIR, but not flash.
