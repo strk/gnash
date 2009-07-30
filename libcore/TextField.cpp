@@ -139,7 +139,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
-    _top_visible_line(0u),
+    _scroll(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(def.multiline()),
@@ -203,7 +203,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
-    _top_visible_line(0u),
+    _scroll(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(false),
@@ -410,9 +410,8 @@ TextField::setRestrict(const std::string& restrict)
                 return;
             } else if (*(rit+1) == '-') {
                 if (re - (rit+2) != 0) {
-                    unsigned int p = *rit;
                     unsigned int q = *(rit+2);
-                    for (p; p <= q; ++p){
+                    for (unsigned int p = *rit; p <= q; (++p)){
                         _restrictedchars.insert(char(p));
                     }
                     ++rit;
@@ -441,9 +440,8 @@ TextField::setRestrict(const std::string& restrict)
                 return;
             } else if (*(rit+1) == '-') {
                 if (re - (rit+2) != 0) {
-                    unsigned int p = *rit;
                     unsigned int q = *(rit+2);
-                    for (p; p <= q; ++p){
+                    for (unsigned int p = *rit; p <= q; ++p){
                         locate = _restrictedchars.find(p);
                         if(locate != _restrictedchars.end()) {
                             _restrictedchars.erase(locate);
@@ -582,12 +580,12 @@ TextField::on_event(const event_id& ev)
                     
                 case key::PGUP:
                     // if going a page up is too far...
-                    if(_top_visible_line < _linesindisplay) {
-                        _top_visible_line = 0;
+                    if(_scroll < _linesindisplay) {
+                        _scroll = 0;
                         m_cursor = 0;
                     } else { // go a page up
-                        _top_visible_line -= _linesindisplay;
-                        m_cursor = _line_starts[_top_visible_line];
+                        _scroll -= _linesindisplay;
+                        m_cursor = _line_starts[_scroll];
                     }
                     format_text();
                     break;
@@ -609,8 +607,8 @@ TextField::on_event(const event_id& ev)
                         m_cursor = *(--(--linestartit)) + previouslinesize;
                     else
                         m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
-                    if (m_cursor < _line_starts[_top_visible_line] && _line_starts[_top_visible_line] != 0)
-                        --_top_visible_line;
+                    if (m_cursor < _line_starts[_scroll] && _line_starts[_scroll] != 0)
+                        --_scroll;
                     format_text();
                     break;
 
@@ -624,20 +622,20 @@ TextField::on_event(const event_id& ev)
                     
                 case key::PGDN:
                     //if going another page down is too far...
-                    if(_top_visible_line + _linesindisplay >= manylines) {
+                    if(_scroll + _linesindisplay >= manylines) {
                         if(manylines - _linesindisplay <= 0) {
-                            _top_visible_line = 0;
+                            _scroll = 0;
                         } else {
-                            _top_visible_line = manylines - _linesindisplay;
+                            _scroll = manylines - _linesindisplay;
                         }
-                        if(m_cursor < _line_starts[_top_visible_line-1]) {
-                            m_cursor = _line_starts[_top_visible_line-1];
+                        if(m_cursor < _line_starts[_scroll-1]) {
+                            m_cursor = _line_starts[_scroll-1];
                         } else {
                             m_cursor = _text.size();
                         }
                     } else { //go a page down
-                        _top_visible_line += _linesindisplay;
-                        m_cursor = _line_starts[_top_visible_line];
+                        _scroll += _linesindisplay;
+                        m_cursor = _line_starts[_scroll];
                     }
                     format_text();
                     break;
@@ -1351,7 +1349,7 @@ TextField::format_text()
     changeTopVisibleLine(current_line);
 
     ///ASSIGN THE VISIBLE LINES TO _displayRecord
-    int yoffset = _top_visible_line*(fontHeight + leading) + PADDING_TWIPS;
+    int yoffset = _scroll*(fontHeight + leading) + PADDING_TWIPS;
     for (size_t i = 0; i < manyrecords; ++i) {
         //if the record is in the section we want to show
         if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
@@ -1376,7 +1374,7 @@ TextField::format_text()
         }
     }
     ///POSITION THE CURSOR IN Y-DIRECTION
-    m_ycursor = PADDING_TWIPS - _top_visible_line*(fontHeight + leading);
+    m_ycursor = PADDING_TWIPS - _scroll*(fontHeight + leading);
     
     for (size_t i = 0; (i + 1) < current_line; ++i) {
         m_ycursor += (fontHeight+leading);
@@ -1393,26 +1391,26 @@ TextField::changeTopVisibleLine(size_t current_line)
 {
     if (_linesindisplay > 0) {
         size_t manylines = _line_starts.size();
-        size_t lastvisibleline = _top_visible_line + _linesindisplay;
-        assert (manylines >= _top_visible_line);
-        if (manylines - _top_visible_line <= _linesindisplay) {
-            if (manylines < _linesindisplay) _top_visible_line = 0;
+        size_t lastvisibleline = _scroll + _linesindisplay;
+        assert (manylines >= _scroll);
+        if (manylines - _scroll <= _linesindisplay) {
+            if (manylines < _linesindisplay) _scroll = 0;
             else {
-                _top_visible_line = manylines - _linesindisplay;
+                _scroll = manylines - _linesindisplay;
             }
             return;
         }
         
-        if (m_cursor < (_line_starts[_top_visible_line])) {
+        if (m_cursor < (_line_starts[_scroll])) {
             //if we are at a higher position, scoot the lines down
-            _top_visible_line -= _top_visible_line - current_line;
+            _scroll -= _scroll - current_line;
             return;
         }
 
-        if (manylines > _top_visible_line + _linesindisplay) {
+        if (manylines > _scroll + _linesindisplay) {
             //if we are at a lower position, scoot the lines up
             if (m_cursor >= (_line_starts[lastvisibleline])) {
-                _top_visible_line += current_line - (lastvisibleline);
+                _scroll += current_line - (lastvisibleline);
             }
         }
         return;
@@ -3531,6 +3529,7 @@ textfield_scroll(const fn_call& fn)
     UNUSED(text);
 
     LOG_ONCE (log_unimpl("TextField.scroll()"));
+    
 
     return as_value();
 }
