@@ -24,7 +24,6 @@
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
-//#include "TextFormat_as.h"
 
 #include <vector>
 
@@ -486,11 +485,7 @@ public:
 	void setTarget(std::string target);
 	void setDisplay(TextFormatDisplay display);
 
-	TextFormat_as* getTextFormat() const
-	{
-		return _textFormat;
-	}
-	void setTextFormat(TextFormat_as tf);
+	void setTextFormat(TextFormat_as& tf);
 
 	const rect& getTextBoundingBox() const
 	{
@@ -626,8 +621,6 @@ private:
     /// string are then the same, which makes manipulating the string much
     /// easier.
 	std::wstring _text;
-
-	TextFormat_as* _textFormat;
 
 	/// This flag will be true as soon as the TextField
 	/// is assigned a text value. Only way to be false is

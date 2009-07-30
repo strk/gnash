@@ -704,7 +704,7 @@ TextField::get_text_value() const
 }
 
 void
-TextField::setTextFormat(TextFormat_as tf)
+TextField::setTextFormat(TextFormat_as& tf)
 {
     //TODO: this is lazy. we should set all the TextFormat variables HERE, i think
     //This is just so we can set individual variables without having to call format_text()
