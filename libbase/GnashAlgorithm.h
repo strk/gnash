@@ -72,6 +72,22 @@ struct RemovePointer<boost::shared_ptr<T> >
     typedef typename RemovePointer<T>::value_type value_type;
 };
 
+/// Erase elements from an associative container based on a predicate
+//
+/// This removes elements from a container such as a map if they fulfil a
+/// particular condition. Because keys of associative container are const,
+/// we can't do this using iterators, because we can't write to them.
+template<typename Container, typename Predicate>
+void EraseIf(Container& c, Predicate p)
+{
+    typedef typename Container::iterator iterator;
+
+    for (iterator i = c.begin(), e = c.end(); i != e; ) {
+        iterator stored = i++;
+        if (p(*stored)) c.erase(stored);
+    }
+}
+
 
 
 /// Delete a pointer safely

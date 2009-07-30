@@ -37,6 +37,7 @@
 #include "Array_as.h"
 #include "as_function.h"
 #include "Global_as.h" 
+#include "GnashAlgorithm.h"
 
 #include <set>
 #include <string>
@@ -585,7 +586,6 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 	return NULL;
 }
 
-/*protected*/
 void
 as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 {
@@ -642,6 +642,11 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
 
     Trigger& trig = trigIter->second;
 
+    if (trig.dead()) {
+        _trigs.erase(trigIter);
+        return;
+    }
+
     // WARNING: getValue might itself invoke a trigger
     // (getter-setter)... ouch ?
     // TODO: in this case, return the underlying value !
@@ -653,7 +658,11 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
             getStringTable(*this).value(getName(uri)), curVal, val);
 
     as_value newVal = trig.call(curVal, val, *this);
-
+    
+    // This is a particularly clear and concise way of removing dead triggers.
+    EraseIf(_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
+            boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
+                    
     // The trigger call could have deleted the property,
     // so we check for its existance again, and do NOT put
     // it back in if it was deleted
@@ -666,7 +675,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     }
     prop->setValue(*this, newVal); 
     prop->clearVisible(getSWFVersion(*this));
-
+    
 }
 
 // Handles read_only and static properties properly.
@@ -1362,7 +1371,7 @@ as_object::unwatch(string_table::key key, string_table::key ns)
                 getStringTable(*this).value(key));
 		return false;
 	}
-	_trigs.erase(trigIter);
+	trigIter->second.kill();
 	return true;
 }
 
@@ -1391,6 +1400,8 @@ as_value
 Trigger::call(const as_value& oldval, const as_value& newval,
         as_object& this_obj)
 {
+    assert(!_dead);
+
 	if ( _executing ) return newval;
 
 	_executing = true;

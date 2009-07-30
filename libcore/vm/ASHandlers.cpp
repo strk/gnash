@@ -2943,19 +2943,24 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     const int nmembers = env.pop().to_int();
 
-    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance());
+    // TODO: see if this could call the ASnative function(101, 9).
+    Global_as* gl = getGlobal(env);
+    as_object* proto = getObjectInterface();
+    as_object* obj = gl->createObject(proto);
+
+    obj->init_member(NSV::PROP_CONSTRUCTOR, gl->getMember(NSV::CLASS_OBJECT));
 
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
         as_value member_value = env.top(0);
         std::string member_name = env.top(1).to_string();
 
-        thread.setObjectMember(*new_obj_ptr, member_name, member_value);
+        thread.setObjectMember(*obj, member_name, member_value);
         env.drop(2);
     }
 
     as_value new_obj;
-    new_obj.set_as_object(new_obj_ptr.get());
+    new_obj.set_as_object(obj);
 
     env.push(new_obj);
 

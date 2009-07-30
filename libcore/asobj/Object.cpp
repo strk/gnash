@@ -61,31 +61,51 @@ init_object_instance()
 	return new as_object(getObjectInterface());
 }
 
+void registerObjectNative(as_object& global)
+{
+    VM& vm = getVM(global);
+
+	vm.registerNative(object_watch, 101, 0); 
+	vm.registerNative(object_unwatch, 101, 1); 
+	vm.registerNative(object_addproperty, 101, 2); 
+	vm.registerNative(as_object::valueof_method, 101, 3); 
+	vm.registerNative(as_object::tostring_method, 101, 4); 
+	vm.registerNative(object_hasOwnProperty, 101, 5); 
+	vm.registerNative(object_isPrototypeOf, 101, 6); 
+	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
+	vm.registerNative(object_registerClass, 101, 8);
+	vm.registerNative(object_ctor, 101, 9);
+}
 
 // extern (used by Global.cpp)
-void object_class_init(as_object& global, const ObjectURI& uri)
+void
+object_class_init(as_object& where, const ObjectURI& uri)
 {
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<as_object> cl=NULL;
 
-    VM& vm = getVM(global);
-
 	if ( cl == NULL )
 	{
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         as_object* proto = getObjectInterface();
-        cl = gl->createClass(&object_ctor, proto);
+        cl = gl->createClass(object_ctor, proto);
 
-		// Object.registerClass() --
-        // TODO: should this only be in SWF6 or higher ?
-		vm.registerNative(object_registerClass, 101, 8);
-		cl->init_member("registerClass", vm.getNative(101, 8));
+        // The as_function ctor takes care of initializing these, but they
+        // are different for the Object class.
+        const int readOnly = PropFlags::readOnly;
+        cl->set_member_flags(NSV::PROP_uuPROTOuu, readOnly);
+        cl->set_member_flags(NSV::PROP_CONSTRUCTOR, readOnly);
+        cl->set_member_flags(NSV::PROP_PROTOTYPE, readOnly);
+
+        VM& vm = getVM(where);
+        const int flags = as_object::DefaultFlags | PropFlags::readOnly;
+		cl->init_member("registerClass", vm.getNative(101, 8), flags);
 		     
 	}
 
 	// Register _global.Object (should only be visible in SWF5 up)
 	int flags = PropFlags::dontEnum; 
-	global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
+	where.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
 
 }
 
@@ -113,22 +133,18 @@ attachObjectInterface(as_object& o)
 	VM& vm = getVM(o);
 
 	// We register natives despite swf version,
-
-	vm.registerNative(object_watch, 101, 0); 
-	vm.registerNative(object_unwatch, 101, 1); 
-	vm.registerNative(object_addproperty, 101, 2); 
-	vm.registerNative(as_object::valueof_method, 101, 3); 
-	vm.registerNative(as_object::tostring_method, 101, 4); 
-	vm.registerNative(object_hasOwnProperty, 101, 5); 
-	vm.registerNative(object_isPrototypeOf, 101, 6); 
-	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
-
     Global_as* gl = getGlobal(o);
 
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));
+
+    as_object* lsProto = getObjectInterface();
+
+    // TODO: this is probably an abuse of the 'createClass' function, but it
+    // gets the correct results.
 	o.init_member("toLocaleString", 
-            gl->createFunction(object_toLocaleString));
+            gl->createClass(object_toLocaleString,
+                gl->createObject(lsProto)));
 
 	int swf6flags = PropFlags::dontEnum | 
         PropFlags::dontDelete | 
@@ -146,30 +162,30 @@ attachObjectInterface(as_object& o)
 as_value
 object_ctor(const fn_call& fn)
 {
-	if ( fn.nargs == 1 ) // copy constructor
-	{
+    Global_as* gl = getGlobal(fn);
 
-        as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+	if (fn.nargs == 1) {
 
-        /// If it's not an object, return an undefined object, not null.
-        if (!obj) return as_value(new as_object);
+        as_object* obj = fn.arg(0).to_object(*gl).get();
 
-        // just copy the reference
-		//
-		// WARNING: it is likely that fn.result and fn.arg(0)
-		// are the same location... so we might skip
-		// the set_as_object() call as a whole.
+        /// If it's not an object, return a simple object, not null.
+        if (!obj) return gl->createObject();
+
 		return as_value(obj);
 	}
 
-	if (fn.nargs)
-	{
+	if (fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(_("Too many args to Object constructor"));
 		);
 	}
 
-    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    if (!fn.isInstantiation()) {
+        return gl->createObject();;
+    }
+
+    as_object* proto = getObjectInterface();
+    boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
 
 	return as_value(obj.get()); 
 }

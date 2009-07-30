@@ -33,6 +33,7 @@ as_object* init_object_instance();
 
 as_object* getObjectInterface();
 
+void registerObjectNative(as_object& global);
 
 }
 

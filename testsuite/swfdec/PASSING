@@ -546,6 +546,9 @@ initobject-stack-7.swf:c1b43bb4d77906e12770302c274fae3f
 instance-name-loaded-5.swf:507414bb411ba30305034cf3078e5fa2
 instance-name-loaded-6.swf:d5fbbda201d50d6bf121b7c1a78ad3c8
 instance-name-loaded-7.swf:f4b4cf3a25a0010b7ff13a56a42d1aad
+instance-of-6.swf:23b56f183fbfddfb3eb7ee074f866035
+instance-of-7.swf:72c7b030a462019116bd6551153f5142
+instance-of-8.swf:fc26462c07bac41c57f3ecaabe9f5ffd
 instance-of-propflags-5.swf:1cab145faaa9544b3b1488c09f6639e5
 instance-of-propflags-8.swf:af7c2eee7fa1e572ff330d03d936d959
 instance-of-propflags-9.swf:b125071d54db67ae00035fc87ba37a9b
@@ -721,6 +724,10 @@ object-isprototypeof-propflags-9.swf:03d8c864e892083523ce19f764f21497
 object-math-5.swf:2d509f7b6e94776a2208fcbec80b7a67
 object-math-6.swf:bdf73b4bfb144113a80ff78a282558d7
 object-math-7.swf:15d6cb896cc58fe289ed0e6de39b3347
+object-properties-5.swf:86727344c3b46a88d41163cd01b26337
+object-properties-6.swf:c34734222b0c6eef649ab3b92b1b830f
+object-properties-7.swf:71ebb1f47408d993409748dae8d32d5e
+object-properties-8.swf:992fafbfd6ae4927116892eb205aac0f
 object-resolve-propflags-9.swf:db769008cba912cd906834a4722fdb95
 object-valueof-5.swf:2520f058ac5a1af3db81ba9b3002e6ab
 object-valueof-6.swf:68d80a5ba580357d1dfeb3b515691e7e
