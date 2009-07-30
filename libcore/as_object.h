@@ -67,6 +67,43 @@ public:
 /// A trigger that can be associated with a property name
 class Trigger
 {
+public:
+
+    Trigger(const std::string& propname, as_function& trig,
+            const as_value& customArg)
+        :
+        _propname(propname),
+        _func(&trig),
+        _customArg(customArg),
+        _executing(false),
+        _dead(false)
+    {}
+
+    /// Call the trigger
+    //
+    /// @param oldval
+    ///    Old value being modified
+    ///
+    /// @param newval
+    ///    New value requested
+    /// 
+    /// @param this_obj
+    ///     Object of which the property is being changed
+    ///
+    as_value call(const as_value& oldval, const as_value& newval, 
+            as_object& this_obj);
+
+    /// True if this Trigger has been disposed of.
+    bool dead() const { return _dead; }
+
+    void kill() {
+        _dead = true;
+    }
+
+    void setReachable() const;
+
+private:
+
     /// Name of the property
     //
     /// By storing a string_table::key we'd save CPU cycles
@@ -86,32 +123,12 @@ class Trigger
     /// Flag to protect from infinite loops
     bool _executing;
 
-public:
-
-    Trigger(const std::string& propname, as_function& trig,
-            const as_value& customArg)
-        :
-        _propname(propname),
-        _func(&trig),
-        _customArg(customArg),
-        _executing(false)
-    {}
-
-    /// Call the trigger
+    /// Flag to check whether this trigger has been deleted.
     //
-    /// @param oldval
-    ///    Old value being modified
-    ///
-    /// @param newval
-    ///    New value requested
-    /// 
-    /// @param this_obj
-    ///     Object of which the property is being changed
-    ///
-    as_value call(const as_value& oldval, const as_value& newval, 
-            as_object& this_obj);
-
-    void setReachable() const;
+    /// As a trigger can be removed during execution, it shouldn't be
+    /// erased from the container straight away, so this flag prevents
+    /// any execution.
+    bool _dead;
 
 };
 
