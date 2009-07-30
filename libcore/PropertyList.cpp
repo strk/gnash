@@ -31,6 +31,7 @@
 #include "string_table.h"
 
 #include <utility> // for std::make_pair
+#include <boost/bind.hpp> 
 
 // Define the following to enable printing address of each property added
 //#define DEBUG_PROPERTY_ALLOC
@@ -540,12 +541,9 @@ PropertyList::clear()
 void
 PropertyList::setReachable() const
 {
-	for (container::const_iterator it = _props.begin();
-			it != _props.end(); ++it)
-	{
-		it->setReachable();
-	}
+    std::for_each(_props.begin(), _props.end(),
+            boost::mem_fn(&Property::setReachable));
 }
 
-} // end of gnash namespace
+} // namespace gnash
 
