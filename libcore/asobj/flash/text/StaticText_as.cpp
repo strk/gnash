@@ -52,7 +52,8 @@ public:
 };
 
 // extern (used by Global.cpp)
-void statictext_class_init(as_object& where, const ObjectURI& uri)
+void
+statictext_class_init(as_object& where, const ObjectURI& uri)
 {
     static boost::intrusive_ptr<as_object> cl;
 
