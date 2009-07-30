@@ -61,31 +61,34 @@ init_object_instance()
 	return new as_object(getObjectInterface());
 }
 
+void registerObjectNative(as_object& global)
+{
+    VM& vm = getVM(global);
+	vm.registerNative(object_registerClass, 101, 8);
+}
 
 // extern (used by Global.cpp)
-void object_class_init(as_object& global, const ObjectURI& uri)
+void
+object_class_init(as_object& where, const ObjectURI& uri)
 {
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<as_object> cl=NULL;
 
-    VM& vm = getVM(global);
-
 	if ( cl == NULL )
 	{
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(where);
         as_object* proto = getObjectInterface();
         cl = gl->createClass(&object_ctor, proto);
 
-		// Object.registerClass() --
-        // TODO: should this only be in SWF6 or higher ?
-		vm.registerNative(object_registerClass, 101, 8);
-		cl->init_member("registerClass", vm.getNative(101, 8));
+        VM& vm = getVM(where);
+        const int flags = as_object::DefaultFlags | PropFlags::readOnly;
+		cl->init_member("registerClass", vm.getNative(101, 8), flags);
 		     
 	}
 
 	// Register _global.Object (should only be visible in SWF5 up)
 	int flags = PropFlags::dontEnum; 
-	global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
+	where.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
 
 }
 
