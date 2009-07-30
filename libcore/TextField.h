@@ -24,6 +24,7 @@
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
+#include "Array_as.h"
 
 #include <vector>
 
@@ -552,7 +553,7 @@ private:
 	/// will hopefully make code cleaner
 	void newLine(std::wstring::const_iterator& it, boost::int32_t& x,
             boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
-            LineStarts::value_type& last_line_start_record, float div, bool bullet);
+            LineStarts::value_type& last_line_start_record, float div);
 					
 	/// De-reference and do appropriate action for character iterator
 	void handleChar(std::wstring::const_iterator& it,
