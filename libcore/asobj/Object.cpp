@@ -74,6 +74,7 @@ void registerObjectNative(as_object& global)
 	vm.registerNative(object_isPrototypeOf, 101, 6); 
 	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
 	vm.registerNative(object_registerClass, 101, 8);
+	vm.registerNative(object_ctor, 101, 9);
 }
 
 // extern (used by Global.cpp)
@@ -87,7 +88,14 @@ object_class_init(as_object& where, const ObjectURI& uri)
 	{
         Global_as* gl = getGlobal(where);
         as_object* proto = getObjectInterface();
-        cl = gl->createClass(&object_ctor, proto);
+        cl = gl->createClass(object_ctor, proto);
+
+        // The as_function ctor takes care of initializing these, but they
+        // are different for the Object class.
+        const int readOnly = PropFlags::readOnly;
+        cl->set_member_flags(NSV::PROP_uuPROTOuu, readOnly);
+        cl->set_member_flags(NSV::PROP_CONSTRUCTOR, readOnly);
+        cl->set_member_flags(NSV::PROP_PROTOTYPE, readOnly);
 
         VM& vm = getVM(where);
         const int flags = as_object::DefaultFlags | PropFlags::readOnly;
@@ -129,8 +137,14 @@ attachObjectInterface(as_object& o)
 
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));
+
+    as_object* lsProto = getObjectInterface();
+
+    // TODO: this is probably an abuse of the 'createClass' function, but it
+    // gets the correct results.
 	o.init_member("toLocaleString", 
-            gl->createFunction(object_toLocaleString));
+            gl->createClass(object_toLocaleString,
+                gl->createObject(lsProto)));
 
 	int swf6flags = PropFlags::dontEnum | 
         PropFlags::dontDelete | 
