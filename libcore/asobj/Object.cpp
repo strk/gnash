@@ -64,6 +64,15 @@ init_object_instance()
 void registerObjectNative(as_object& global)
 {
     VM& vm = getVM(global);
+
+	vm.registerNative(object_watch, 101, 0); 
+	vm.registerNative(object_unwatch, 101, 1); 
+	vm.registerNative(object_addproperty, 101, 2); 
+	vm.registerNative(as_object::valueof_method, 101, 3); 
+	vm.registerNative(as_object::tostring_method, 101, 4); 
+	vm.registerNative(object_hasOwnProperty, 101, 5); 
+	vm.registerNative(object_isPrototypeOf, 101, 6); 
+	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
 	vm.registerNative(object_registerClass, 101, 8);
 }
 
@@ -116,16 +125,6 @@ attachObjectInterface(as_object& o)
 	VM& vm = getVM(o);
 
 	// We register natives despite swf version,
-
-	vm.registerNative(object_watch, 101, 0); 
-	vm.registerNative(object_unwatch, 101, 1); 
-	vm.registerNative(object_addproperty, 101, 2); 
-	vm.registerNative(as_object::valueof_method, 101, 3); 
-	vm.registerNative(as_object::tostring_method, 101, 4); 
-	vm.registerNative(object_hasOwnProperty, 101, 5); 
-	vm.registerNative(object_isPrototypeOf, 101, 6); 
-	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
-
     Global_as* gl = getGlobal(o);
 
 	o.init_member("valueOf", vm.getNative(101, 3));
@@ -149,30 +148,30 @@ attachObjectInterface(as_object& o)
 as_value
 object_ctor(const fn_call& fn)
 {
-	if ( fn.nargs == 1 ) // copy constructor
-	{
+    Global_as* gl = getGlobal(fn);
 
-        as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+	if (fn.nargs == 1) {
 
-        /// If it's not an object, return an undefined object, not null.
-        if (!obj) return as_value(new as_object);
+        as_object* obj = fn.arg(0).to_object(*gl).get();
 
-        // just copy the reference
-		//
-		// WARNING: it is likely that fn.result and fn.arg(0)
-		// are the same location... so we might skip
-		// the set_as_object() call as a whole.
+        /// If it's not an object, return a simple object, not null.
+        if (!obj) return gl->createObject();
+
 		return as_value(obj);
 	}
 
-	if (fn.nargs)
-	{
+	if (fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(_("Too many args to Object constructor"));
 		);
 	}
 
-    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    if (!fn.isInstantiation()) {
+        return gl->createObject();;
+    }
+
+    as_object* proto = getObjectInterface();
+    boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
 
 	return as_value(obj.get()); 
 }
