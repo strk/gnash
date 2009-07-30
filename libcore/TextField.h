@@ -24,6 +24,7 @@
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
+//#include "TextFormat_as.h"
 
 #include <vector>
 
@@ -33,6 +34,7 @@ namespace gnash {
         class DefineEditTextTag;
         class TextRecord;
     }
+	class TextFormat_as;
 }
 
 namespace gnash {
@@ -450,12 +452,12 @@ public:
 
 	void setAlignment(TextAlignment h);
 
-	boost::uint16_t getLeading() const
+	boost::int16_t getLeading() const
 	{
 		return _leading;
 	}
 
-	void setLeading(boost::uint16_t h);
+	void setLeading(boost::int16_t h);
 
 	bool getUnderlined() const
 	{
@@ -483,6 +485,12 @@ public:
 	void setURL(std::string url);
 	void setTarget(std::string target);
 	void setDisplay(TextFormatDisplay display);
+
+	TextFormat_as* getTextFormat() const
+	{
+		return _textFormat;
+	}
+	void setTextFormat(TextFormat_as tf);
 
 	const rect& getTextBoundingBox() const
 	{
@@ -619,6 +627,8 @@ private:
     /// easier.
 	std::wstring _text;
 
+	TextFormat_as* _textFormat;
+
 	/// This flag will be true as soon as the TextField
 	/// is assigned a text value. Only way to be false is
 	/// when definition has the hasText flag set to false
@@ -638,7 +648,7 @@ private:
 	TextFormatDisplay _display;
 	std::vector<int> _tabStops;
 
-	boost::uint16_t _leading;
+	boost::int16_t _leading;
 
 	TextAlignment _alignment;
 

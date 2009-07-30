@@ -53,6 +53,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 #include <cstdlib>
+#include <ctype.h>
 #include <typeinfo>
 #include <map>
 
@@ -425,12 +426,13 @@ bool
 TextField::on_event(const event_id& ev)
 {
     if (isReadOnly()) return false;
-
+    
     switch (ev.id())
     {
         case event_id::KEY_PRESS:
         {
             if ( getType() != typeInput ) break; // not an input field
+            setHtml(false); //editable html fields are not yet implemented
             std::wstring s = _text;
 
             // id.keyCode is the unique gnash::key::code for a DisplayObject/key.
@@ -699,6 +701,30 @@ TextField::get_text_value() const
     int version = getSWFVersion(*this);
 
     return utf8::encodeCanonicalString(_text, version);
+}
+
+void
+TextField::setTextFormat(TextFormat_as tf)
+{
+    //TODO: this is lazy. we should set all the TextFormat variables HERE, i think
+    //This is just so we can set individual variables without having to call format_text()
+    //This calls format_text() at the end of setting TextFormat
+    if ( tf.alignDefined() ) setAlignment(tf.align());
+    if ( tf.sizeDefined() ) setFontHeight(tf.size()); // keep twips
+    if ( tf.indentDefined() ) setIndent(tf.indent());
+    if ( tf.blockIndentDefined() ) setBlockIndent(tf.blockIndent());
+    if ( tf.leadingDefined() ) setLeading(tf.leading());
+    if ( tf.leftMarginDefined() ) setLeftMargin(tf.leftMargin());
+    if ( tf.rightMarginDefined() ) setRightMargin(tf.rightMargin());
+    if ( tf.colorDefined() ) setTextColor(tf.color());
+    if ( tf.underlinedDefined() ) setUnderlined(tf.underlined());
+
+    // ADDED (completed)
+    if ( tf.bulletDefined() ) setBullet(tf.bullet());
+    if ( tf.displayDefined() ) setDisplay(tf.display());
+	if ( tf.tabStopsDefined() ) setTabStops(tf.tabStops());
+    
+    format_text();
 }
 
 bool
@@ -1312,7 +1338,7 @@ TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
     }
 
     // new paragraphs get the indent.
-    x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
+    x = std::max(0, getLeftMargin() + getIndent() + getBlockIndent()) + PADDING_TWIPS;
     y += div * (getFontHeight() + leading);             
             
     // Start a new record on the next line. Other properties of the
@@ -1464,93 +1490,182 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     bool complete = parseHTML(discard, attributes, it, e, selfclosing);
                     std::string s(discard.begin(), discard.end());
                     s.assign(discard.begin(), discard.end());
-                    if (!complete) continue;
-                    else {
+                    if (!complete) {
+                        //parsing went wrong
+                        continue;
+                    } else {
                         //Don't think this is the best way to match with tags...
                         //Also, assumes tags are properly nested. This is acceptable
                         //assumption
-                        if (s == "u") {
+                        if (s == "U") {
                             //underline
                             newrec.setUnderline(true);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "a") {
+                        } else if (s == "A") {
                             //anchor
                             log_unimpl("<a> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "b") {
+                        } else if (s == "B") {
                             //bold
                             Font* boldfont = new Font(rec.getFont()->name(),
                                     true, rec.getFont()->isItalic());
                             newrec.setFont(boldfont);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "font") {
+                        } else if (s == "FONT") {
                             //font
                             boost::uint16_t originalsize = _fontHeight;
-                            if (attributes.find("color") != attributes.end()) {
+                            if (attributes.find("COLOR") != attributes.end()) {
+                                //font COLOR attribute
                                 boost::uint8_t r = std::strtol(
-                                    attributes["color"].substr(1,2).data(), NULL, 16);
+                                    attributes["COLOR"].substr(1,2).data(), NULL, 16);
                                 boost::uint8_t g = std::strtol(
-                                    attributes["color"].substr(3,2).data(), NULL, 16);
+                                    attributes["COLOR"].substr(3,2).data(), NULL, 16);
                                 boost::uint8_t b = std::strtol(
-                                    attributes["color"].substr(5,2).data(), NULL, 16);
+                                    attributes["COLOR"].substr(5,2).data(), NULL, 16);
                                 boost::uint8_t a = 255; //alpha not given in color attribute
                                 rgba color(r,g,b,a);
                                 newrec.setColor(color);
                             }
-                            if (attributes.find("face") != attributes.end()) {
-                                Font* newfont = new Font(attributes["face"],
+                            if (attributes.find("FACE") != attributes.end()) {
+                                //font FACE attribute
+                                Font* newfont = new Font(attributes["FACE"],
                                     rec.getFont()->isBold(), rec.getFont()->isItalic());
                                 newrec.setFont(newfont);
                             }
-                            if (attributes.find("size") != attributes.end()) {
-                                std::string firstchar = attributes["size"].substr(0,1);
+                            if (attributes.find("SIZE") != attributes.end()) {
+                                //font SIZE attribute
+                                std::string firstchar = attributes["SIZE"].substr(0,1);
                                 if (firstchar == "+") {
                                     newrec.setTextHeight(rec.textHeight() +
-                                        *(attributes["size"].substr(1,attributes["size"].length()-1).data()));
+                                        (20 * std::strtol(
+                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        NULL,10)));
+                                    newrec.setYOffset(PADDING_TWIPS +
+                                        newrec.textHeight() +
+                                        (fontLeading - fontDescent));
+                                    _fontHeight += 20 * std::strtol(
+                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        NULL,10);
                                 } else if (firstchar == "-") {
                                     newrec.setTextHeight(rec.textHeight() -
-                                        *(attributes["size"].substr(1,attributes["size"].length()-1).data()));
+                                        (20 * std::strtol(
+                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        NULL,10)));
+                                    newrec.setYOffset(PADDING_TWIPS +
+                                        newrec.textHeight() +
+                                        (fontLeading - fontDescent));
+                                    _fontHeight -= 20 * std::strtol(
+                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        NULL,10);
                                 } else {
                                     newrec.setTextHeight(20 * std::strtol(
-                                        attributes["size"].data(), NULL, 10));
-                                    newrec.setYOffset(PADDING_TWIPS + newrec.textHeight() + (fontLeading - fontDescent));
+                                        attributes["SIZE"].data(), NULL, 10));
+                                    newrec.setYOffset(PADDING_TWIPS + newrec.textHeight() +
+                                        (fontLeading - fontDescent));
                                     _fontHeight = 20 * std::strtol(
-                                        attributes["size"].data(), NULL, 10);
+                                        attributes["SIZE"].data(), NULL, 10);
                                 }
                             }
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                             _fontHeight = originalsize;
-                            
-                        } else if (s == "img") {
+                            y = newrec.yOffset();
+                        } else if (s == "IMG") {
                             //image
                             log_unimpl("<img> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "i") {
+                        } else if (s == "I") {
                             //italic
                             Font* italicfont = new Font(rec.getFont()->name(),
                                     rec.getFont()->isBold(), true);
                             newrec.setFont(italicfont);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "li") {
+                        } else if (s == "LI") {
                             //list item (bullet)
                             log_unimpl("<li> html tag in TextField");
-                        } else if (s == "span") {
+                        } else if (s == "SPAN") {
                             //span
                             log_unimpl("<span> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "textformat") {
-                            //text format
+                        } else if (s == "TEXTFORMAT") {
+                            //textformat
                             log_unimpl("<textformat> html tag in TextField");
+                            boost::uint16_t originalblockindent = getBlockIndent();
+                            boost::uint16_t originalindent = getIndent();
+                            boost::uint16_t originalleading = getLeading();
+                            boost::uint16_t originalleftmargin = getLeftMargin();
+                            boost::uint16_t originalrightmargin = getRightMargin();
+                            std::vector<int> originaltabstops = getTabStops();
+                            if (attributes.find("BLOCKINDENT") != attributes.end()) {
+                                //textformat BLOCKINDENT attribute
+                                setBlockIndent(20 * std::strtol(
+                                        attributes["BLOCKINDENT"].data(), NULL, 10));
+                                if (newrec.xOffset() == std::max(0, originalleftmargin +
+                                    originalindent + originalblockindent) + PADDING_TWIPS) {
+                                    //if beginning of line, indent
+                                    x = std::max(0, getLeftMargin() +
+                                        getIndent() + getBlockIndent())
+                                         + PADDING_TWIPS;
+                                    newrec.setXOffset(x);
+                                }
+                            }
+                            if (attributes.find("INDENT") != attributes.end()) {
+                                //textformat INDENT attribute
+                                setIndent(20 * std::strtol(
+                                    attributes["INDENT"].data(), NULL, 10));
+                                if (newrec.xOffset() == std::max(0, originalleftmargin +
+                                    originalindent + getBlockIndent()) + PADDING_TWIPS) {
+                                    //if beginning of line, indent
+                                    x = std::max(0, getLeftMargin() +
+                                        getIndent() + getBlockIndent())
+                                         + PADDING_TWIPS;
+                                    newrec.setXOffset(x);
+                                }
+                            }
+                            if (attributes.find("LEADING") != attributes.end()) {
+                                //textformat LEADING attribute
+                                setLeading(20 * std::strtol(
+                                        attributes["LEADING"].data(), NULL, 10));
+                            }
+                            if (attributes.find("LEFTMARGIN") != attributes.end()) {
+                                //textformat LEFTMARGIN attribute
+                                setLeftMargin(20 * std::strtol(
+                                        attributes["LEFTMARGIN"].data(), NULL, 10));
+                                if (newrec.xOffset() == std::max(0, originalleftmargin +
+                                    getIndent() + getBlockIndent()) + PADDING_TWIPS) {
+                                    //if beginning of line, indent
+                                    x = std::max(0, getLeftMargin() +
+                                        getIndent() + getBlockIndent())
+                                         + PADDING_TWIPS;
+                                    newrec.setXOffset(x);
+                                }
+                            }
+                            if (attributes.find("RIGHTMARGIN") != attributes.end()) {
+                                //textformat RIGHTMARGIN attribute
+                                setRightMargin(20 * std::strtol(
+                                        attributes["RIGHTMARGIN"].data(), NULL, 10));
+                                //FIXME:Should not apply this to this line if we are not at
+                                //beginning of line. Not sure how to do that.
+                            }
+                            if (attributes.find("TABSTOPS") != attributes.end()) {
+                                //textformat TABSTOPS attribute
+                                log_unimpl("html <textformat> tag tabstops attribute");
+                            }
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "p") { 
+                            setBlockIndent(originalblockindent);
+                            setIndent(originalindent);
+                            setLeading(originalleading);
+                            setLeftMargin(originalleftmargin);
+                            setRightMargin(originalrightmargin);
+                            setTabStops(originaltabstops);
+                        } else if (s == "P") { 
                             //paragraph
                             if (_display == BLOCK)
                             {
@@ -1568,7 +1683,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                         last_space_glyph,
                                         last_line_start_record);
                             }
-                        } else if (s == "br") {
+                        } else if (s == "BR") {
                             //line break
 							newLine(it, x, y, rec, last_space_glyph,
 										last_line_start_record, 1.0,false);
@@ -1711,7 +1826,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                 _textRecords.push_back(rec);
 
                 float previous_x = x;
-                x = std::max(0, getLeftMargin() + getIndent()) + PADDING_TWIPS;
+                x = std::max(0, getLeftMargin() + getBlockIndent()) + PADDING_TWIPS;
                 y += _fontHeight + leading;
 
                 // Start a new record on the next line.
@@ -1961,6 +2076,20 @@ TextField::parseHTML(std::wstring& tag,
     std::string attname;
     std::string attvalue;
     while (it != e && *it != ' ') {
+        if (*it == '/') {
+            ++it;
+            if (*it == '>') {
+                ++it;
+                selfclosing = true;
+                return true;
+            } else {
+                while (it != e) {
+                    ++it;
+                }
+                log_error("invalid html tag");
+                return false;
+            }
+        }
         if (*it == '>') {
             ++it;
             return true;
@@ -1968,10 +2097,10 @@ TextField::parseHTML(std::wstring& tag,
         
         // Check for NULL DisplayObject
         if (*it == 0) {
-	    log_error("found NULL DisplayObject in htmlText");
-	    return false;
-	}
-        tag.push_back(*it);
+            log_error("found NULL DisplayObject in htmlText");
+            return false;
+        }
+        tag.push_back(toupper(*it));
         ++it;
     }
     while (it != e && *it == ' ') {
@@ -2000,87 +2129,87 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && *it != '=' && *it != ' ') {
             
             if (*it == 0) {
-            log_error("found NULL DisplayObject in htmlText");
-            return false;
+                log_error("found NULL DisplayObject in htmlText");
+                return false;
             }
             if (*it == '>') {
-            log_error("malformed HTML tag, invalid attribute name");
-            while (it != e) {
-            ++it;
+                log_error("malformed HTML tag, invalid attribute name");
+                while (it != e) {
+                    ++it;
+                }
+                return false;
             }
-            return false;
-            }
-        
-            attname.push_back(*it);
+            
+            attname.push_back(toupper(*it));
             ++it;
         }
-	while (it != e && (*it == ' ' || *it == '=')) {
-	    ++it; //skip over spaces and '='
-	}
-	if (it != e) {
-	    if (*it != '"') { //make sure attribute value is opened with '"'
-            log_error("attribute value must be opened with \'\"\' (did you remember escape char?)");
+        while (it != e && (*it == ' ' || *it == '=')) {
+            ++it; //skip over spaces and '='
+        }
+        if (it != e) {
+            if (*it != '"') { //make sure attribute value is opened with '"'
+                log_error("attribute value must be opened with \'\"\' (did you remember escape char?)");
+                while (it != e) {
+                    ++it;
+                }
+                return false;
+            } else {
+                ++it; //skip (")
+            }
+        }
+        while (it != e && *it != '"') { //get attribute value
+
+            if (*it == 0) {
+                log_error("found NULL DisplayObject in htmlText");
+                return false;
+            }
+
+            attvalue.push_back(toupper(*it));
+            ++it;
+        }
+        if (it != e) {
+            if (*it != '"') { //make sure attribute value is closed with '"'
+                log_error("attribute value must be closed with \'\"\' (did you remember escape char?)");
+                while (it != e) {
+                    ++it;
+                }
+                return false;
+            } else {
+                ++it; //skip (")
+            }
+        }
+        attributes.insert( std::pair<std::string,std::string>(attname, attvalue));
+        attname = "";
+        attvalue = "";
+        if ((*it != ' ') && (*it != '/') && (*it != '>')) {
+            log_error("malformed HTML tag, invalid attribute value");
             while (it != e) {
                 ++it;
             }
             return false;
-	    } else {
-		++it; //skip (")
-	    }
-	}
-	while (it != e && *it != '"') { //get attribute value
-
-	    if (*it == 0) {
-            log_error("found NULL DisplayObject in htmlText");
-            return false;
-	    }
-
-	    attvalue.push_back(*it);
-	    ++it;
-	}
-	if (it != e) {
-	    if (*it != '"') { //make sure attribute value is closed with '"'
-            log_error("attribute value must be closed with \'\"\' (did you remember escape char?)");
-            while (it != e) {
-                ++it;
+        }
+        if (*it == ' ') {
+            while (it != e && *it == ' ') {
+                ++it; //skip over spaces
             }
-            return false;
-	    } else {
-            ++it; //skip (")
-	    }
-	}
-	attributes.insert( std::pair<std::string,std::string>(attname, attvalue));
-	attname = "";
-	attvalue = "";
-	if ((*it != ' ') && (*it != '/') && (*it != '>')) {
-	    log_error("malformed HTML tag, invalid attribute value");
-	    while (it != e) {
+        }
+        if (*it == '>') {
             ++it;
-	    }
-	    return false;
-	}
-	if (*it == ' ') {
-	    while (it != e && *it == ' ') {
-            ++it; //skip over spaces
-	    }
-	}
-	if (*it == '>') {
-	    ++it;
-	    return true;
-	} else if (*it == '/') {
-	    ++it;
-	    if (*it == '>') {
-            ++it;
-            selfclosing = true;
             return true;
-	    } else {
-		while (it != e) {
-		    ++it;
-		}
-		log_error("invalid html tag");
-		return false;
-	    }
-	}
+        } else if (*it == '/') {
+            ++it;
+            if (*it == '>') {
+                ++it;
+                selfclosing = true;
+                return true;
+            } else {
+                while (it != e) {
+                    ++it;
+                }
+                log_error("invalid html tag");
+                return false;
+            }
+        }
     }
     
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -2277,13 +2406,12 @@ TextField::get_world_cxform() const
 }
 
 void
-TextField::setLeading(boost::uint16_t h)
+TextField::setLeading(boost::int16_t h)
 {
     if ( _leading != h )
     {
         set_invalidated();
         _leading = h;
-        format_text();
     }
 }
 
@@ -2294,7 +2422,6 @@ TextField::setUnderlined(bool v)
     {
         set_invalidated();
         _underlined = v;
-        format_text();
     }
 }
 
@@ -2303,7 +2430,6 @@ TextField::setBullet(bool b)
 {              
     if (_bullet != b) {
         _bullet = b;
-        format_text();
     }
 }
 
@@ -2316,7 +2442,6 @@ TextField::setTabStops(const std::vector<int>& tabStops)
 		_tabStops[i] = PIXEL_RATIO * tabStops[i];
 	}
 	
-    format_text();
     set_invalidated();
 }
 
@@ -2368,7 +2493,6 @@ TextField::setIndent(boost::uint16_t h)
     {
         set_invalidated();
         _indent = h;
-        format_text();
     }
 }
 
@@ -2379,7 +2503,6 @@ TextField::setBlockIndent(boost::uint16_t h)
     {
         set_invalidated();
         _blockIndent = h;
-        format_text();
     }
 }
 
@@ -2390,7 +2513,6 @@ TextField::setRightMargin(boost::uint16_t h)
     {
         set_invalidated();
         _rightMargin = h;
-        format_text();
     }
 }
 
@@ -2401,7 +2523,6 @@ TextField::setLeftMargin(boost::uint16_t h)
     {
         set_invalidated();
         _leftMargin = h;
-        format_text();
     }
 }
 
@@ -2412,7 +2533,6 @@ TextField::setFontHeight(boost::uint16_t h)
     {
         set_invalidated();
         _fontHeight = h;
-        format_text();
     }
 }
 
@@ -2508,7 +2628,7 @@ TextField::getTextAlignment()
     else if ( _autoSize == autoSizeRight ) textAlignment = ALIGN_RIGHT;
     return textAlignment;
 }
-
+    
 void
 TextField::onChanged()
 {
@@ -3064,21 +3184,6 @@ textfield_setTextFormat(const fn_call& fn)
         );
         return as_value();
     }
-
-    if ( tf->alignDefined() ) text->setAlignment(tf->align());
-    if ( tf->sizeDefined() ) text->setFontHeight(tf->size()); // keep twips
-    if ( tf->indentDefined() ) text->setIndent(tf->indent());
-    if ( tf->blockIndentDefined() ) text->setBlockIndent(tf->blockIndent());
-    if ( tf->leadingDefined() ) text->setLeading(tf->leading());
-    if ( tf->leftMarginDefined() ) text->setLeftMargin(tf->leftMargin());
-    if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
-    if ( tf->colorDefined() ) text->setTextColor(tf->color());
-    if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
-
-    // ADDED (completed)
-    if ( tf->bulletDefined() ) text->setBullet(tf->bullet());
-    if ( tf->displayDefined() ) text->setDisplay(tf->display());
-	if ( tf->tabStopsDefined() ) text->setTabStops(tf->tabStops());
     
     if (isAS3(fn)) {
         // TODO: current font finding assumes we have a parent, which isn't
@@ -3111,6 +3216,7 @@ textfield_setTextFormat(const fn_call& fn)
 
     LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url and target") );
 
+    text->setTextFormat(*tf);
     return as_value();
 
 }
