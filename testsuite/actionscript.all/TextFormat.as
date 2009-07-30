@@ -102,6 +102,18 @@ check_equals(tfObj.color, 30);
 check_equals(tfObj.size, 2);
 check_equals(tfObj.font, 'fname');
 
+tf = new TextFormat();
+
+o = {};
+//o.valueOf = function() { return 6; };
+o.toString = function() { return "string"; };
+
+a = [ o ];
+
+tf.tabStops = a;
+trace(tf.tabStops);
+
+
 
 
 check_totals(63);

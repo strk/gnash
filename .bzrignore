@@ -336,3 +336,5 @@ testsuite/libamf.all/site.bak
 testsuite/libnet.all/generate_amfbins
 gui/gtk_widget/gnash.c
 py-compile
+testsuite/libmedia.all/test_videoinput.cpp
+testsuite/libmedia.all/test_videoinput.cpp

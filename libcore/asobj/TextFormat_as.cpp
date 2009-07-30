@@ -31,6 +31,7 @@
 #include "GnashNumeric.h"
 #include "Array_as.h"
 
+
 namespace gnash {
 
 // Forward declarations
@@ -288,64 +289,22 @@ as_value
 textformat_tabStops(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
-		
-	as_value ret;
 	
+	as_value ret;
+		
 	if (!fn.nargs)
 	{
 		return ret;
 	}
 	
-	std::string strVal = fn.arg(0).to_string();
-	std::stringstream ss;
-	int countComma = 0;
-	int countSpace = 0;
-	int countTab = 0;
-	
-	// Next check is to see whether there is a comma and a space in the 
-	// array
-	for (size_t i=0; i<strVal.length(); i++)
-	{
-		if (strVal[i]==(char)44)
-		{
-			countComma ++;
-		}
-		
-		if (strVal[i]==(char)32)
-		{
-			countSpace ++;
-		}
-		
-		if (strVal[i]==(char)9)
-		{ 
-			countTab ++;
-		}
-	}
-	
-	for (size_t i=0; i<strVal.length(); i++)
-	{
-		switch(strVal[i])
-		{
-			case (char)44:
-				strVal[i] = (char)44;
-			case (char)9:
-				strVal[i] = (char)32;
-			default:
-				break;
-		}
-	}
-
-	int numInt = countComma + countSpace + countTab + 1;
-	std::vector<int> tabStops(numInt);
-	
-	ss << strVal;
+	boost::intrusive_ptr<Array_as> tStops = 
+            ensureType<Array_as>(fn.arg(0).to_object(*getGlobal(fn)));
 			
-	int val;
-	
-	for (int i = 0; i < numInt; ++i)
+	std::vector<int> tabStops(tStops->size());
+
+	for (size_t i = 0; i !=tStops->size(); ++i)
 	{
-		ss >> val;
-		tabStops[i] = val;
+		tabStops[i]=tStops->at(i).to_number();
 	}
 
 	if ( fn.nargs == 0)	// getter

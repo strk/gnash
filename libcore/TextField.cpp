@@ -1147,7 +1147,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
     }
     else
     {
-        std::vector<int> tabStops;
+		std::vector<int> tabStops;
         tabStops = _tabStops;
         
         std::sort(_tabStops.begin(), _tabStops.end()); 
@@ -1172,14 +1172,14 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
 			// This is necessary in case the number of tabs in the text
 			// are more than the actual number of tabStops inside the 
 			// vector
-			if ( !(tab == _tabStops.back()+1) ) {
+			if ( !(tab == _tabStops.back()+1) ) 
+			{
 				SWF::TextRecord::GlyphEntry ge;
 				ge.index = rec.getFont()->get_glyph_index(32, _embedFonts);
 				ge.advance = tab;
 				rec.addGlyph(ge);
 				x+=ge.advance;
 			}
-
         }
         else
         {
@@ -1422,10 +1422,8 @@ TextField::changeTopVisibleLine(size_t current_line)
 void
 TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
         boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
-        LineStarts::value_type& last_line_start_record, float div,
-		bool bullet)
+        LineStarts::value_type& last_line_start_record, float div)
 {
-	_bullet = bullet;
     // newline.
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
@@ -1565,8 +1563,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             case 13:
             case 10:
             {
-                newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0,
-						false);
+                newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
                 break;
             }
             case '<':
@@ -1697,6 +1694,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         } else if (s == "LI") {
                             //list item (bullet)
                             log_unimpl("<li> html tag in TextField");
+							handleChar(it, e, x, y, newrec, last_code,
+                                    last_space_glyph, last_line_start_record);
                         } else if (s == "SPAN") {
                             //span
                             log_unimpl("<span> html tag in TextField");
@@ -1784,12 +1783,12 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             if (_display == BLOCK)
                             {
                                 newLine(it, x, y, rec, last_space_glyph,
-                                        last_line_start_record, 1.5,false);
+                                        last_line_start_record, 1.5);
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,
                                         last_line_start_record);
                                 newLine(it, x, y, rec, last_space_glyph,
-                                        last_line_start_record, 1.0,false);
+                                        last_line_start_record, 1.0);
                             }
                             else
                             {
@@ -1800,7 +1799,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         } else if (s == "BR") {
                             //line break
 							newLine(it, x, y, rec, last_space_glyph,
-										last_line_start_record, 1.0,false);
+										last_line_start_record, 1.0);
                         } else {
                             log_debug("<%s> tag is unsupported", s);
                             if (!selfclosing) { //then recurse, look for closing tag
@@ -2541,6 +2540,7 @@ TextField::setUnderlined(bool v)
     }
 }
 
+// ADDED
 void          
 TextField::setBullet(bool b)
 {              
@@ -2549,6 +2549,7 @@ TextField::setBullet(bool b)
     }
 }
 
+// ADDED
 void 
 TextField::setTabStops(const std::vector<int>& tabStops)
 {
@@ -2558,10 +2559,12 @@ TextField::setTabStops(const std::vector<int>& tabStops)
 		_tabStops[i] = PIXEL_RATIO * tabStops[i];
 	}
 	
+    format_text();
     set_invalidated();
 }
 
-void
+// ADDED
+void 
 TextField::setURL(std::string url)
 { 
     if ( _url != url ) {
