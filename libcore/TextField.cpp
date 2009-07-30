@@ -122,6 +122,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     InteractiveObject(parent, id),
     _tag(&def),
     _textDefined(def.hasText()),
+    _restrictDefined(false),
     _underlined(false),
     _bullet(false),
     _url(""),
@@ -185,6 +186,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     // the id trick is to fool assertions in DisplayObject ctor
     InteractiveObject(parent, parent ? 0 : -1),
     _textDefined(false),
+    _restrictDefined(false),
     _underlined(false),
     _bullet(false),
     _url(""),
@@ -385,40 +387,91 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 void
-TextField::setRestrict(std::string restrict)
+TextField::setRestrict(const std::string& restrict)
 {
+    _restrictDefined = true;
+    
     std::string::const_iterator rit = restrict.begin();
     std::string::const_iterator re = restrict.end();
-    std::set<char>::const_iterator locate;
+    std::set<wchar_t>::const_iterator locate;
 
-    //TODO: implement ranges, like (A-Z a-z);
+    if (*rit == '^') { //then this is a true RESTRICT pattern, add all chars to _restrictedchars
+        for (unsigned int i = 0; i <= 255; ++i) {
+            _restrictedchars.insert(char(i));
+        }
+    } else { //then this is an ALLOW pattern, _restrictedchars should remain empty
+        _restrictedchars.clear();
+    }
+        
     while (rit != re) {
         while (rit != re && *rit != '^') { //This loop allows chars
-            if (*rit != '\\') {
+            if (*rit == '-') {
+                log_error("invalid restrict string");
+                return;
+            } else if (*(rit+1) == '-') {
+                if (re - (rit+2) != 0) {
+                    unsigned int p = *rit;
+                    unsigned int q = *(rit+2);
+                    for (p; p <= q; ++p){
+                        _restrictedchars.insert(char(p));
+                    }
+                    ++rit;
+                    ++rit;
+                    ++rit;
+                } else {
+                    log_error("invalid restrict string");
+                    return;
+                }
+            } else if (*rit == '\\') {
+                ++rit;
                 _restrictedchars.insert(*rit);
                 ++rit;
             } else {
-                ++rit;
                 _restrictedchars.insert(*rit);
                 ++rit;
             }
         }
+        if (rit != re) {
+            ++rit;
+        }
         while (rit != re && *rit != '^') { //This loop restricts chars
             locate = _restrictedchars.find(*rit);
-            if (*rit != '\\') {
+            if (*rit == '-') {
+                log_error("invalid restrict string");
+                return;
+            } else if (*(rit+1) == '-') {
+                if (re - (rit+2) != 0) {
+                    unsigned int p = *rit;
+                    unsigned int q = *(rit+2);
+                    for (p; p <= q; ++p){
+                        locate = _restrictedchars.find(p);
+                        if(locate != _restrictedchars.end()) {
+                            _restrictedchars.erase(locate);
+                        }
+                    }
+                    ++rit;
+                    ++rit;
+                    ++rit;
+                } else {
+                    log_error("invalid restrict string");
+                    return;
+                }
+            } else if (*rit == '\\') {
+                ++rit;
                 locate = _restrictedchars.find(*rit);
                 if(locate != _restrictedchars.end()) {
                     _restrictedchars.erase(locate);
                 }
                 ++rit;
             } else {
-                ++rit;
-                locate = _restrictedchars.find(*rit);
                 if(locate != _restrictedchars.end()) {
                     _restrictedchars.erase(locate);
                 }
                 ++rit;
             }
+        }
+        if (rit != re) {
+            ++rit;
         }
     }
     _restrict = restrict;
@@ -642,10 +695,25 @@ TextField::on_event(const event_id& ev)
                             gnash::key::codeMap[c][key::ASCII]);
                     if (t != 0)
                     {
-                        // Insert one copy of the DisplayObject
-                        // at the cursor position.
-                          s.insert(m_cursor, 1, t);
-                        m_cursor++;
+                        if (!_restrictDefined) {
+                            // Insert one copy of the DisplayObject
+                            // at the cursor position.
+                              s.insert(m_cursor, 1, t);
+                            m_cursor++;
+                        } else if (_restrictedchars.count(t)) {
+                            // Insert one copy of the DisplayObject
+                            // at the cursor position.
+                              s.insert(m_cursor, 1, t);
+                            m_cursor++;
+                        } else if (_restrictedchars.count(tolower(t))) {
+                            // restrict substitutes the opposite case
+                              s.insert(m_cursor, 1, tolower(t));
+                            m_cursor++;
+                        } else if (_restrictedchars.count(toupper(t))) {
+                            // restrict substitutes the opposite case
+                              s.insert(m_cursor, 1, toupper(t));
+                            m_cursor++;
+                        }
                     }
                     setTextValue(s);
                     break;
@@ -3321,8 +3389,12 @@ textfield_restrict(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.restrict"));
-
+    if (!fn.nargs) {
+        // Getter
+        return as_value(text->getRestrict());
+    }
+    // Setter
+    text->setRestrict(fn.arg(0).to_string());
     return as_value();
 }
 
