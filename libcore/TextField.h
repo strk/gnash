@@ -478,11 +478,17 @@ public:
 		return _tabStops;
 	}
 
+	std::string getRestrict() const
+	{
+		return _restrict;
+	}
+
 	void setUnderlined(bool v);
 	void setTabStops(const std::vector<int>& tabStops);
 	void setBullet(bool b);
 	void setURL(std::string url);
 	void setTarget(std::string target);
+	void setRestrict(std::string restrict);
 	void setDisplay(TextFormatDisplay display);
 
 	void setTextFormat(TextFormat_as& tf);
@@ -638,6 +644,8 @@ private:
 	bool _bullet;
 	std::string _url;
 	std::string _target;
+	std::string _restrict;
+	std::set<char> _restrictedchars;
 	TextFormatDisplay _display;
 	std::vector<int> _tabStops;
 

@@ -385,6 +385,46 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 void
+TextField::setRestrict(std::string restrict)
+{
+    std::string::const_iterator rit = restrict.begin();
+    std::string::const_iterator re = restrict.end();
+    std::set<char>::const_iterator locate;
+
+    //TODO: implement ranges, like (A-Z a-z);
+    while (rit != re) {
+        while (rit != re && *rit != '^') { //This loop allows chars
+            if (*rit != '\\') {
+                _restrictedchars.insert(*rit);
+                ++rit;
+            } else {
+                ++rit;
+                _restrictedchars.insert(*rit);
+                ++rit;
+            }
+        }
+        while (rit != re && *rit != '^') { //This loop restricts chars
+            locate = _restrictedchars.find(*rit);
+            if (*rit != '\\') {
+                locate = _restrictedchars.find(*rit);
+                if(locate != _restrictedchars.end()) {
+                    _restrictedchars.erase(locate);
+                }
+                ++rit;
+            } else {
+                ++rit;
+                locate = _restrictedchars.find(*rit);
+                if(locate != _restrictedchars.end()) {
+                    _restrictedchars.erase(locate);
+                }
+                ++rit;
+            }
+        }
+    }
+    _restrict = restrict;
+}
+
+void
 TextField::replaceSelection(const std::string& replace)
 {
 
@@ -1479,7 +1519,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                          "print their content")));
             
                     std::wstring discard;
-                    std::map<std::string, std::string> attributes;
+                    std::map<std::string,std::string> attributes;
                     SWF::TextRecord newrec;
                     newrec.setFont(rec.getFont());
                     newrec.setUnderline(rec.underline());
@@ -1491,6 +1531,9 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     bool complete = parseHTML(discard, attributes, it, e, selfclosing);
                     std::string s(discard.begin(), discard.end());
                     s.assign(discard.begin(), discard.end());
+
+                    std::map<std::string,std::string>::const_iterator attloc;
+                    
                     if (!complete) {
                         //parsing went wrong
                         continue;
@@ -1518,56 +1561,59 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         } else if (s == "FONT") {
                             //font
                             boost::uint16_t originalsize = _fontHeight;
-                            if (attributes.find("COLOR") != attributes.end()) {
+                            attloc = attributes.find("COLOR");
+                            if (attloc != attributes.end()) {
                                 //font COLOR attribute
                                 boost::uint8_t r = std::strtol(
-                                    attributes["COLOR"].substr(1,2).data(), NULL, 16);
+                                    attloc->second.substr(1,2).data(), NULL, 16);
                                 boost::uint8_t g = std::strtol(
-                                    attributes["COLOR"].substr(3,2).data(), NULL, 16);
+                                    attloc->second.substr(3,2).data(), NULL, 16);
                                 boost::uint8_t b = std::strtol(
-                                    attributes["COLOR"].substr(5,2).data(), NULL, 16);
+                                    attloc->second.substr(5,2).data(), NULL, 16);
                                 boost::uint8_t a = 255; //alpha not given in color attribute
                                 rgba color(r,g,b,a);
                                 newrec.setColor(color);
                             }
-                            if (attributes.find("FACE") != attributes.end()) {
+                            attloc = attributes.find("FACE");
+                            if (attloc != attributes.end()) {
                                 //font FACE attribute
-                                Font* newfont = new Font(attributes["FACE"],
+                                Font* newfont = new Font(attloc->second,
                                     rec.getFont()->isBold(), rec.getFont()->isItalic());
                                 newrec.setFont(newfont);
                             }
-                            if (attributes.find("SIZE") != attributes.end()) {
+                            attloc = attributes.find("SIZE");
+                            if (attloc != attributes.end()) {
                                 //font SIZE attribute
-                                std::string firstchar = attributes["SIZE"].substr(0,1);
+                                std::string firstchar = attloc->second.substr(0,1);
                                 if (firstchar == "+") {
                                     newrec.setTextHeight(rec.textHeight() +
                                         (20 * std::strtol(
-                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        attloc->second.substr(1,attloc->second.length()-1).data(),
                                         NULL,10)));
                                     newrec.setYOffset(PADDING_TWIPS +
                                         newrec.textHeight() +
                                         (fontLeading - fontDescent));
                                     _fontHeight += 20 * std::strtol(
-                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        attloc->second.substr(1,attloc->second.length()-1).data(),
                                         NULL,10);
                                 } else if (firstchar == "-") {
                                     newrec.setTextHeight(rec.textHeight() -
                                         (20 * std::strtol(
-                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        attloc->second.substr(1,attloc->second.length()-1).data(),
                                         NULL,10)));
                                     newrec.setYOffset(PADDING_TWIPS +
                                         newrec.textHeight() +
                                         (fontLeading - fontDescent));
                                     _fontHeight -= 20 * std::strtol(
-                                        attributes["SIZE"].substr(1,attributes["SIZE"].length()-1).data(),
+                                        attloc->second.substr(1,attloc->second.length()-1).data(),
                                         NULL,10);
                                 } else {
                                     newrec.setTextHeight(20 * std::strtol(
-                                        attributes["SIZE"].data(), NULL, 10));
+                                        attloc->second.data(), NULL, 10));
                                     newrec.setYOffset(PADDING_TWIPS + newrec.textHeight() +
                                         (fontLeading - fontDescent));
                                     _fontHeight = 20 * std::strtol(
-                                        attributes["SIZE"].data(), NULL, 10);
+                                        attloc->second.data(), NULL, 10);
                                 }
                             }
                             handleChar(it, e, x, y, newrec, last_code,
@@ -1596,17 +1642,17 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "TEXTFORMAT") {
                             //textformat
-                            log_unimpl("<textformat> html tag in TextField");
                             boost::uint16_t originalblockindent = getBlockIndent();
                             boost::uint16_t originalindent = getIndent();
                             boost::uint16_t originalleading = getLeading();
                             boost::uint16_t originalleftmargin = getLeftMargin();
                             boost::uint16_t originalrightmargin = getRightMargin();
                             std::vector<int> originaltabstops = getTabStops();
-                            if (attributes.find("BLOCKINDENT") != attributes.end()) {
+                            attloc = attributes.find("BLOCKINDENT");
+                            if (attloc != attributes.end()) {
                                 //textformat BLOCKINDENT attribute
                                 setBlockIndent(20 * std::strtol(
-                                        attributes["BLOCKINDENT"].data(), NULL, 10));
+                                        attloc->second.data(), NULL, 10));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     originalindent + originalblockindent) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1616,10 +1662,11 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     newrec.setXOffset(x);
                                 }
                             }
-                            if (attributes.find("INDENT") != attributes.end()) {
+                            attloc = attributes.find("INDENT");
+                            if (attloc != attributes.end()) {
                                 //textformat INDENT attribute
                                 setIndent(20 * std::strtol(
-                                    attributes["INDENT"].data(), NULL, 10));
+                                    attloc->second.data(), NULL, 10));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     originalindent + getBlockIndent()) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1629,15 +1676,17 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     newrec.setXOffset(x);
                                 }
                             }
-                            if (attributes.find("LEADING") != attributes.end()) {
+                            attloc = attributes.find("LEADING");
+                            if (attloc != attributes.end()) {
                                 //textformat LEADING attribute
                                 setLeading(20 * std::strtol(
-                                        attributes["LEADING"].data(), NULL, 10));
+                                        attloc->second.data(), NULL, 10));
                             }
-                            if (attributes.find("LEFTMARGIN") != attributes.end()) {
+                            attloc = attributes.find("LEFTMARGIN");
+                            if (attloc != attributes.end()) {
                                 //textformat LEFTMARGIN attribute
                                 setLeftMargin(20 * std::strtol(
-                                        attributes["LEFTMARGIN"].data(), NULL, 10));
+                                        attloc->second.data(), NULL, 10));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     getIndent() + getBlockIndent()) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1647,14 +1696,16 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     newrec.setXOffset(x);
                                 }
                             }
-                            if (attributes.find("RIGHTMARGIN") != attributes.end()) {
+                            attloc = attributes.find("RIGHTMARGIN");
+                            if (attloc != attributes.end()) {
                                 //textformat RIGHTMARGIN attribute
                                 setRightMargin(20 * std::strtol(
-                                        attributes["RIGHTMARGIN"].data(), NULL, 10));
+                                        attloc->second.data(), NULL, 10));
                                 //FIXME:Should not apply this to this line if we are not at
                                 //beginning of line. Not sure how to do that.
                             }
-                            if (attributes.find("TABSTOPS") != attributes.end()) {
+                            attloc = attributes.find("TABSTOPS");
+                            if (attloc != attributes.end()) {
                                 //textformat TABSTOPS attribute
                                 log_unimpl("html <textformat> tag tabstops attribute");
                             }
