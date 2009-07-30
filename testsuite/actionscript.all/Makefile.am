@@ -113,6 +113,7 @@ ASTESTS =			\
 	String.as		\
 	System.as		\
 	TextField.as		\
+	TextFieldHTML.as		\
 	TextFormat.as		\
 	TextSnapshot.as		\
 	Transform.as		\
