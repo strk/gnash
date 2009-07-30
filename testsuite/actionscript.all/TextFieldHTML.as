@@ -19,6 +19,12 @@
 
 #include "check.as"
 
+#if OUTPUT_VERSION < 6
+
+ totals(0);
+
+#else
+
  _root.createTextField("textfield1", 1, 10, 10, 100, 100);
  tf = _root.textfield1;
 
@@ -80,6 +86,8 @@
  xcheck_equals(format.color, 0x0000ff);
 
 // WARNING!! The disabled code crashes Gnash at the moment.
+// When that's fixed, this code can be reenabled to get the totals() pass,
+// and the failures in this section (only!) can be expected.
 #if 0
 
  // A color string that is this short doesn't change the color.
@@ -125,3 +133,5 @@
  xcheck_equals(format.color, 0x00ff00);
 
  xtotals(30);
+
+#endif
