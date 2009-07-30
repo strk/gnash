@@ -53,7 +53,8 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 #include <cstdlib>
-#include <ctype.h>
+#include <cctype>
+#include <utility>
 #include <typeinfo>
 #include <map>
 
@@ -2095,12 +2096,12 @@ TextField::parseHTML(std::wstring& tag,
             return true;
         }
         
-        // Check for NULL DisplayObject
+        // Check for NULL character
         if (*it == 0) {
-            log_error("found NULL DisplayObject in htmlText");
+            log_error("found NULL character in htmlText");
             return false;
         }
-        tag.push_back(toupper(*it));
+        tag.push_back(std::toupper(*it));
         ++it;
     }
     while (it != e && *it == ' ') {
@@ -2129,7 +2130,7 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && *it != '=' && *it != ' ') {
             
             if (*it == 0) {
-                log_error("found NULL DisplayObject in htmlText");
+                log_error("found NULL character in htmlText");
                 return false;
             }
             if (*it == '>') {
@@ -2140,7 +2141,7 @@ TextField::parseHTML(std::wstring& tag,
                 return false;
             }
             
-            attname.push_back(toupper(*it));
+            attname.push_back(std::toupper(*it));
             ++it;
         }
         while (it != e && (*it == ' ' || *it == '=')) {
@@ -2148,7 +2149,8 @@ TextField::parseHTML(std::wstring& tag,
         }
         if (it != e) {
             if (*it != '"') { //make sure attribute value is opened with '"'
-                log_error("attribute value must be opened with \'\"\' (did you remember escape char?)");
+                log_error("attribute value must be opened with \'\"\' "
+                        "(did you remember escape char?)");
                 while (it != e) {
                     ++it;
                 }
@@ -2160,16 +2162,17 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && *it != '"') { //get attribute value
 
             if (*it == 0) {
-                log_error("found NULL DisplayObject in htmlText");
+                log_error("found NULL character in htmlText");
                 return false;
             }
 
-            attvalue.push_back(toupper(*it));
+            attvalue.push_back(std::toupper(*it));
             ++it;
         }
         if (it != e) {
             if (*it != '"') { //make sure attribute value is closed with '"'
-                log_error("attribute value must be closed with \'\"\' (did you remember escape char?)");
+                log_error("attribute value must be closed with \'\"\' "
+                        "(did you remember escape char?)");
                 while (it != e) {
                     ++it;
                 }
@@ -2178,7 +2181,7 @@ TextField::parseHTML(std::wstring& tag,
                 ++it; //skip (")
             }
         }
-        attributes.insert( std::pair<std::string,std::string>(attname, attvalue));
+        attributes.insert(std::make_pair(attname, attvalue));
         attname = "";
         attvalue = "";
         if ((*it != ' ') && (*it != '/') && (*it != '>')) {
