@@ -1564,14 +1564,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("COLOR");
                             if (attloc != attributes.end()) {
                                 //font COLOR attribute
-                                boost::uint8_t r = std::strtol(
-                                    attloc->second.substr(1,2).data(), NULL, 16);
-                                boost::uint8_t g = std::strtol(
-                                    attloc->second.substr(3,2).data(), NULL, 16);
-                                boost::uint8_t b = std::strtol(
-                                    attloc->second.substr(5,2).data(), NULL, 16);
-                                boost::uint8_t a = 255; //alpha not given in color attribute
-                                rgba color(r,g,b,a);
+                                rgba color;
+                                color.fromShortString(attloc->second);
                                 newrec.setColor(color);
                             }
                             attloc = attributes.find("FACE");

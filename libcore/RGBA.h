@@ -125,6 +125,11 @@ namespace gnash {
 		// neater string output (example: "0,0,0,255")
 		std::string toShortString() const;
 
+		/// Set values from string (eg. #FF0000)
+		//
+		/// @param color Hex String in '#xxxxxx' format
+		void fromShortString(std::string color);
+
 		bool operator== (const rgba& o) const
 		{
 			return m_r == o.m_r && 

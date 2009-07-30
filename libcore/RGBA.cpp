@@ -83,6 +83,16 @@ rgba::toShortString() const
 }
 
 void
+rgba::fromShortString(std::string color)
+{
+    std::stringstream ss(color);
+    int hexnumber;
+    ss.ignore();
+    ss >> std::hex >> hexnumber;
+    parseRGB(hexnumber);
+}
+
+void
 rgba::set_lerp(const rgba& a, const rgba& b, float f)
 {
     m_r = static_cast<boost::uint8_t>(frnd(flerp(a.m_r, b.m_r, f)));
