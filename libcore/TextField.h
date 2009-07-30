@@ -478,7 +478,7 @@ public:
 		return _tabStops;
 	}
 
-	std::string getRestrict() const
+	const std::string& getRestrict() const
 	{
 		return _restrict;
 	}
@@ -488,7 +488,7 @@ public:
 	void setBullet(bool b);
 	void setURL(std::string url);
 	void setTarget(std::string target);
-	void setRestrict(std::string restrict);
+	void setRestrict(const std::string& restrict);
 	void setDisplay(TextFormatDisplay display);
 
 	void setTextFormat(TextFormat_as& tf);
@@ -634,6 +634,8 @@ private:
 	/// and no actionscript added text.
 	bool _textDefined;
 
+	bool _restrictDefined;
+
 	/// bounds of dynamic text, as laid out
 	rect m_text_bounding_box;
 
@@ -645,7 +647,7 @@ private:
 	std::string _url;
 	std::string _target;
 	std::string _restrict;
-	std::set<char> _restrictedchars;
+	std::set<wchar_t> _restrictedchars;
 	TextFormatDisplay _display;
 	std::vector<int> _tabStops;
 
