@@ -54,6 +54,7 @@
 #include <boost/bind.hpp>
 #include <cstdlib>
 #include <typeinfo>
+#include <utility>
 #include <map>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
@@ -1968,7 +1969,7 @@ TextField::parseHTML(std::wstring& tag,
         
         // Check for NULL DisplayObject
         if (*it == 0) {
-	    log_error("found NULL DisplayObject in htmlText");
+	    log_error("found NULL character in htmlText");
 	    return false;
 	}
         tag.push_back(*it);
@@ -2000,7 +2001,7 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && *it != '=' && *it != ' ') {
             
             if (*it == 0) {
-            log_error("found NULL DisplayObject in htmlText");
+            log_error("found NULL character in htmlText");
             return false;
             }
             if (*it == '>') {
@@ -2049,7 +2050,7 @@ TextField::parseHTML(std::wstring& tag,
             ++it; //skip (")
 	    }
 	}
-	attributes.insert( std::pair<std::string,std::string>(attname, attvalue));
+	attributes.insert(std::make_pair(attname, attvalue));
 	attname = "";
 	attvalue = "";
 	if ((*it != ' ') && (*it != '/') && (*it != '>')) {
