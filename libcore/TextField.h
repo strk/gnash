@@ -20,7 +20,6 @@
 
 #include "InteractiveObject.h" // for inheritance
 #include "styles.h" // for line_style
-#include "fill_style.h"
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref

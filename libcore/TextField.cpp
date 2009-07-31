@@ -825,8 +825,6 @@ TextField::setTextFormat(TextFormat_as& tf)
     if ( tf.rightMarginDefined() ) setRightMargin(tf.rightMargin());
     if ( tf.colorDefined() ) setTextColor(tf.color());
     if ( tf.underlinedDefined() ) setUnderlined(tf.underlined());
-
-    // ADDED (completed)
     if ( tf.bulletDefined() ) setBullet(tf.bullet());
     if ( tf.displayDefined() ) setDisplay(tf.display());
 	if ( tf.tabStopsDefined() ) setTabStops(tf.tabStops());
@@ -2538,7 +2536,6 @@ TextField::setUnderlined(bool v)
     }
 }
 
-// ADDED
 void          
 TextField::setBullet(bool b)
 {              
@@ -2547,7 +2544,6 @@ TextField::setBullet(bool b)
     }
 }
 
-// ADDED
 void 
 TextField::setTabStops(const std::vector<int>& tabStops)
 {
@@ -2561,7 +2557,6 @@ TextField::setTabStops(const std::vector<int>& tabStops)
     set_invalidated();
 }
 
-// ADDED
 void 
 TextField::setURL(std::string url)
 { 
@@ -2571,7 +2566,6 @@ TextField::setURL(std::string url)
     }
 }
 
-// ADDED
 void
 TextField::setTarget(std::string target)
 {
@@ -2582,7 +2576,6 @@ TextField::setTarget(std::string target)
     }
 }
 
-// ADDED
 void
 TextField::setDisplay(TextFormatDisplay display)
 {
