@@ -41,7 +41,7 @@ namespace amf {
 class DSOEXPORT Listener {
 public:
     /// \brief Construct a block of Listeners.
-    ///	        This constructs an uninitialized Listener block.
+    ///	This constructs an uninitialized Listener block.
     Listener();
     
     /// \brief Construct a block Listeners at the specified address.
@@ -186,14 +186,13 @@ public:
     /// @param dataname The name of the data to send.
     ///
     /// @param data A vector of smart pointers to the AMF0 Elements
-    ///		contaiing the data for this memory segment.
+    ///		containing the data for this memory segment.
     ///
     /// @return nothing.
     void send(const std::string& name, const std::string& dataname,
 	      std::vector< amf::Element* >& data);
 
-    /// \brief Put data in the memory segment
-    ///		This puts data into the memory segment
+    /// \brief Read the date from the memory
     ///
     /// @param dataname The name of the data to read.
     ///
@@ -201,6 +200,7 @@ public:
     ///		this memory segment.
     ///
     /// @return nothing.
+	/// We may only need a connection name for the receive function.
     void recv(std::string &name, std::string &dataname, boost::shared_ptr<amf::Element> data);
 
     /// \brief Parse the body of a memory segment.
@@ -293,15 +293,16 @@ private:
     lc_object_t _object;
 
     /// \var LcShm::_amfobjs
-    ///		A vector of AMF0 Elements in the memopry segment.
+    ///		A vector of AMF0 Elements in the memory segment.
+	/// Is this necessary if we have put all the things to pass in the memory?
     std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
 	
-	//Si added
-	// This is the mutex that controls access to the sharedmemory
+	///Si added
+	/// This is the mutex that controls access to the sharedmemory
     boost::mutex        _localconnection_mutex;
 
-    //Si 
-	//Moved from LocalConnectoin class to here.
+    ///Si 
+	///Moved from LocalConnectoin class to here.
     bool _connected;
 
 };

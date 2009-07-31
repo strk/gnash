@@ -168,10 +168,13 @@ Listener::findListener(const string &name)
     char *item = reinterpret_cast<char *>(addr);
     // Walk through the list to the end
     while (*item != 0) {
-        if (name == item) {
+        if (name == item) 	{
             return true;
         }
-        item += strlen(item)+1;
+        item += strlen(item)+8+1;
+		
+		//Si has rewritten thise, please test before using.
+		//This version should be right now.
     }
     
     return false;
@@ -189,13 +192,15 @@ Listener::addListener(const string &name)
 
     boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
+
+	 if (findListener(name)) {
+        return true;
+    }
+
     // Walk to the end of the list
     while ((item[0] != 0) && (item[1] != 0)) {
         item += strlen(item)+1;
-    }
-
-    if (findListener(name)) {
-        return true;
+		// This is not the proper way.  But it works now.	
     }
     
     // Add ourselves to the list
@@ -206,7 +211,8 @@ Listener::addListener(const string &name)
     // Add the two mystery two strings or number that follows the name.
     // These vary somewhat, but as test cases produces these values, we'll
     // use them till we're sure what these actually represent.
-    item += name.size() + 1;
+    
+	item += name.size() + 1;
     const char *x1 = "::3";
     if (!memcpy(item, x1, 4)) {
         return false;
@@ -216,6 +222,12 @@ Listener::addListener(const string &name)
     if (!memcpy(item, x2, 4)) {
         return false;
     }
+	// Si: I have tested more swf files from the internet
+	// Not all of them are 3 and 2. 
+	// Could be 3 2, 4 1, 3 1, etc.
+	
+	//Si has rewritten thise, please test before using.
+	//This version should be right now.
     
     return true;
 }
@@ -239,22 +251,40 @@ Listener::removeListener(const string &name)
     boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
     int len = 0;
+	int dest= 0;	
+	int source =0;
     char *item = reinterpret_cast<char *>(addr);
     while (*item != 0) {
-        if (name == item) {
-            while (*item != 0) {
-                len = strlen(item) + 8 + 1;
-                strcpy(item, item + len);
-                item += len + strlen(item + len);
+        if (name == item) {         
+			len =strlen(item) +8+1; //The length of the removed string, including '\n' 				
+			
+			while (*item != 0) {
+                
+				// len = strlen(item) + 8 + 1;
+                // strcpy(item, item + len);
+                // item += len + strlen(item + len);
+				// These old codes are wrong !!!!  
+				// Rewrite them!!!
+				
+				if (source!=0)
+					dest  += strlen(item+source)+8+1;
+									
+				source+= strlen(item+dest)+8+1;
+				strcpy(item+dest,item+source);		
             }
-            
-            
-            
-            memset(item - len, 0, len);
+                                  	        				  
+            memset(item+dest+strlen(item+source)+8+1, 0, len);
             return true;
         }
-        item += strlen(item) + 1;
-    }
+        //item += strlen(item) + 1;
+		//This is not right.
+		
+		item += strlen(item) + 8 + 1;
+		//You will only know weather this funtion is right or not after you really remove some listeneres.
+		//Si has rewritten thise, please test before using.
+		//This version should be right now.
+		
+	}
     
     return false;
 }
@@ -278,6 +308,8 @@ Listener::listListeners()
                 listeners->push_back(item);
             }
             item += strlen(item) + 1;
+			// This is not very effective but looks right.
+			// A better way should be jump to the next listener directly.
         }
     }
 
@@ -306,6 +338,7 @@ LcShm::close()
 ///          least in my tests, has always been "localhost".
 /// Boolean - In all the files I've looked at, this has always been
 ///           TRUE. I assume this is the domain security flag.
+/// Si: This value could be false.
 /// Number - No idea what this number represents.
 /// Number - No idea what this number represents.
 /// NULL terminator
@@ -341,13 +374,12 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
 #endif
     
     memcpy(&_header, ptr, LC_HEADER_SIZE);
-//     memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
+//    memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
 //    log_debug("Timestamp: %d", _header.timestamp);
 //    log_debug("Length: %d", _header.length);
-//     log_debug("Connection: %s", _object.connection_name);
-//     log_debug("name: %s", _object.hostname);
+//    log_debug("Connection: %s", _object.connection_name);
+//    log_debug("name: %s", _object.hostname);
     ptr += LC_HEADER_SIZE;
-
     
     AMF amf;
     boost::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
@@ -355,7 +387,6 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
         log_debug("Didn't extract an element from the byte stream!");
         return 0;
     }
-    
     _object.connection_name = el->to_string();
     
     el = amf.extractAMF(ptr, tooFar);
@@ -401,18 +432,18 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
 boost::uint8_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
-//    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 //  boost::uint8_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
 
 //    Buffer *buf;
     
-//    Si: Do not understand why use new here. 
+//    Si:
 //    Assign the value of header and ptr directly.
 //    boost::uint8_t *header = new boost::uint8_t[size + 1];
 //    boost::uint8_t *ptr = header;
 
-    boost::uint8_t *header = Listener::getBaseAddress();
+    boost::uint8_t *header    = Listener::getBaseAddress();
     boost::uint8_t *ptr_FH    = Listener::getBaseAddress();
 //	log_debug("Base address in 'formatHeader' is: 0x%x, 0x%x",(unsigned int) header, (unsigned int) ptr_FH);
 
@@ -423,10 +454,11 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     //Si changes this value from 3 to 4.
     *ptr_FH = 1;
     ptr_FH = header + LC_HEADER_SIZE;
+    //Do you want to assign the value of timestamp and message size?
 
 //  Si has rewritten the following code.
 //  The protocol is set to be localhost now. 
-//  Make sure it is right later.
+//  Make sure it is always right. Probably wrong.
 
     // Which is then always followed by 3 AMF objects.
     boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(con);
@@ -434,6 +466,7 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     ptr_FH += buf1->size();
 
     const std::string protocol="localhost";
+	// This could equal to the domain name.
     boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(protocol);
     memcpy(ptr_FH, buf2->begin(), buf2->size());
     ptr_FH += buf2->size();
@@ -485,14 +518,13 @@ LcShm::connect(const string& names)
     
 	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(Shm::getAddr());
 	
-	
 	boost::uint8_t* tooFar = baseAddress+Shm::getSize();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
 //	log_debug("Base address in 'connect' is: 0x%x, 0x%x",(unsigned int) Shm::getAddr(), (unsigned int) _baseaddr);
-//    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
-//     log_debug("Base address is: 0x%x, 0x%x",
+//  vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
+//  log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
     addListener(names);
@@ -550,6 +582,8 @@ LcShm::connect(key_t key)
 /// @return nothing.
 
 // Si have rewrittten all of these!
+// We test several test cases, and it looks like the memory can be written in the right way.
+// Please make further check after 'receiving' is completed.
 
 void
 LcShm::send(const string&  name , const string&  domainname ,
@@ -557,27 +591,43 @@ LcShm::send(const string&  name , const string&  domainname ,
 {
     //GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_localconnection_mutex);
-
-     log_debug(_(" ***** The send function is called *****") ); 
-
-//     cout<<" The send function is called ! "<<endl;
+	
+	std::vector<amf::Element* >::iterator iter;
+		   
+    log_debug(_(" ***** The send function is called *****") ); 
 //     log_debug("Base address in 'send' is: 0x%x, 0x%x",(unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 			   
-	 if ( Listener::getBaseAddress() == 0x0 )
+	if ( Listener::getBaseAddress() == 0x0 )
 	       {
 		   log_debug("STOP! No memory allocated!! ");
 		   return;
 	   }
 
 //The base address
-     boost::uint8_t *baseptr = Listener::getBaseAddress();
-   	   
+     boost::uint8_t *baseptr = Listener::getBaseAddress();  	   
      boost::uint8_t *ptr = baseptr;     
 
 // Check if the base address exists
     if (baseptr == reinterpret_cast<boost::uint8_t *>(0)) {
         log_error("***** Base address in 'send' is not set! *****");
 	}
+
+// Compute the time
+// Please check before use.
+// Put this value into the header if necessary.
+//	int timestamp=GetTickCount();
+	
+// Compute the size of the message.
+// Please check before use.
+// Put this value into the header if necessary.
+      int message_size=0;
+      if (data.size()!=0){	
+		   for(iter = data.begin(); iter != data.end(); iter++){
+			    boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);									
+				message_size+=buf->size();
+			}
+	}	
+	 
 
 // This function write the first 16 bytes and the following three messages into the memory.
 // ptr should be moved
@@ -594,6 +644,7 @@ LcShm::send(const string&  name , const string&  domainname ,
     ptr = baseptr + LC_HEADER_SIZE;
 
 //  Si has rewritten the following code.
+//  duplicate as in formatheader
 //  The protocol is set to be localhost now. 
 //  Make sure it is right later.
 
@@ -614,16 +665,13 @@ LcShm::send(const string&  name , const string&  domainname ,
 //Put the date into memory when it is not empty
 
   	log_debug(_(" ***** The size of the data is %s *****"),data.size() ); 
-      if (data.size()==0){	
-    	   std::vector<amf::Element* >::iterator iter;
-	   for(iter = data.begin(); iter != data.end(); iter++)
-		{
-		// temporary buf for element
-		boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);		
-
-		memcpy(ptr, buf->begin(), buf->size() );
-		ptr+= buf->size();		
-		}
+      if (data.size()==0){	    	  
+		   for(iter = data.begin(); iter != data.end(); iter++){
+				// temporary buf for element
+				boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);		
+				memcpy(ptr, buf->begin(), buf->size() );
+				ptr+= buf->size();		
+			}
 	}	
 	
 // Update the connection name
@@ -686,13 +734,52 @@ LcShm::send(const string&  name , const string&  domainname ,
 #endif
         ptr++;
     }
-    
 //    delete[] tmp;
 #endif
     
 //	system("ipcs");
        return;
 }
+
+
+
+
+
+
+/// \brief Read the date from the memory
+///
+/// @param dataname The name of the data to read.
+///
+/// @param data A vector of smart pointers to the AMF0 Elements in
+///		this memory segment.
+///
+/// @return nothing.
+/// We may only need a connection name for the receive function.
+///void recv(std::string &name, std::string &dataname, boost::shared_ptr<amf::Element> data)
+//{
+	 //GNASH_REPORT_FUNCTION;
+
+///	log_debug(_(" ***** The recv function is called *****") );
+
+///  TODO:
+///  This function should at do the following work:
+///  1: Lock the shared memory
+///			boost::mutex::scoped_lock lock(_localconnection_mutex);
+///  2: Check if the current object is the listener
+///         if findListener()
+///         	Make sure the object is the listener for certain connection name
+///  2: Parse the header
+///         boost::uint8_t *parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar);
+///         	This should be easy if parseHeader function has been finished.
+///  3: Parse the body of the shared memory
+/// 	    std::vector<boost::shared_ptr<amf::Element> > parseBody(boost::uint8_t *data);
+///         	This should be easy if parseHeader function has been finished.
+///  4: The listened should implement these commands somehow automatically .
+///         Handler?
+
+///	return;	
+//	}
+
 
 ///  \brief Dump the internal data of this class in a human readable form.
 /// @remarks This should only be used for debugging purposes.
