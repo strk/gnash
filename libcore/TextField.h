@@ -24,7 +24,6 @@
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
-#include "Array_as.h"
 
 #include <vector>
 
@@ -672,7 +671,7 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
-	size_t _top_visible_line;
+	size_t _scroll;
 	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
