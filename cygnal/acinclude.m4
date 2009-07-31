@@ -43,6 +43,35 @@ AC_DEFUN([CYGNAL_PATHS],
 
 AC_CHECK_HEADERS(poll.h epoll.h)
 
+dnl AC_CHECK_HEADERS(sys/sendfile)
+AC_TRY_COMPILE([#include <sys/sendfile.h>], [
+    sendfile(0, 0, 0, 0); ],
+    has_sendfile=yes,
+    has_sendfile=no
+)
+if test x${has_sendfile} = xyes; then
+   AC_DEFINE(HAVE_SENDFILE, [1], [Has the Linux sendfile() system call])
+fi
+
 dnl Look for the various ways of blocking while waiting for I/O
 AC_CHECK_FUNCS(pselect ppoll)
+
+AC_TRY_COMPILE([#include <fcntl.h>], [
+    splice(0, 0, 0, 0); ],
+    has_splice=yes,
+    has_splice=no
+)
+if test x${has_splice} = xyes; then
+   AC_DEFINE(HAVE_FCNTL_SPLICE, [1], [Has the Linux splice() system call])
+fi
+
+AC_TRY_COMPILE([#include <fcntl.h>], [
+    tee(0, 0, 0, 0); ],
+    has_tee=yes,
+    has_tee=no
+)
+if test x${has_tee} = xyes; then
+   AC_DEFINE(HAVE_FCNTL_TEE, [1], [Has the Linux tee() system call])
+fi
+
 ])
