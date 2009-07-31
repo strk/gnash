@@ -694,12 +694,12 @@ TextField::on_event(const event_id& ev)
                     if (t != 0)
                     {
                         if (!_restrictDefined) {
-                            // Insert one copy of the DisplayObject
+                            // Insert one copy of the character
                             // at the cursor position.
                               s.insert(m_cursor, 1, t);
                             m_cursor++;
                         } else if (_restrictedchars.count(t)) {
-                            // Insert one copy of the DisplayObject
+                            // Insert one copy of the character
                             // at the cursor position.
                               s.insert(m_cursor, 1, t);
                             m_cursor++;
@@ -3381,7 +3381,6 @@ as_value
 textfield_restrict(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
 
     if (!fn.nargs) {
         // Getter

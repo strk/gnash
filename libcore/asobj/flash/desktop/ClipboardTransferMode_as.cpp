@@ -44,7 +44,7 @@ clipboardtransfermode_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
-    static as_object* obj = gl->createObject(proto);
+    as_object* obj = gl->createObject(proto);
     attachClipboardTransferModeStaticInterface(*obj);
     where.init_member(getName(uri), obj, as_object::DefaultFlags,
             getNamespace(uri));
