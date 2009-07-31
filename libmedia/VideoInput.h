@@ -34,7 +34,7 @@ class VideoInput {
     
 public:
 
-    VideoInput() {}
+    VideoInput();
 
     // virtual classes need a virtual destructor !
     virtual ~VideoInput() {}
@@ -46,10 +46,7 @@ public:
     void setMode(int width, int height, double fps, bool favorArea);
     
     void setQuality(int bandwidth, int quality);
-    
-    //need to figure out how to properly write this
-    //static Camera* getCamera(std::string name);
-    
+       
     //setters and getters
     void set_activityLevel(double a) {_activityLevel = a;};
     double get_activityLevel () {return _activityLevel;};
@@ -85,16 +82,16 @@ public:
     
     void set_name(std::string name) {_name = name;};
     std::string get_name() {return _name;};
-    
-    //figure out how to implement vector
-    
+
+    std::vector<std::string> get_names() {return _names;};
+
     void set_quality(int q) {_quality = q;};
     int get_quality() {return _quality;};
     
     void set_width(int w) {_width = w;};
     int get_width() {return _width;};
 
-private:
+protected:
     //specified in AS livedocs
     double _activityLevel;
     int _bandwidth;
@@ -111,9 +108,6 @@ private:
     std::vector<std::string> _names;
     int _quality;
     int _width;
-    
-    //gnash specific
-    //std::vector<gst::GnashWebcam*> vid_vect;
 
 };
 

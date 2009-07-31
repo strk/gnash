@@ -266,38 +266,6 @@ class GnashWebcamPrivate
         /// @param n A gchar* describing the name of the hardware device
         ///       (e.g. Built-In Webcam or Microsoft LifeCam VX500).
         void setDeviceName(gchar *n) {_deviceName = n;}
-        
-        /// \brief Accessor to set the private _xResolution variable in the
-        ///       GnashWebcamPrivate class.
-        /// @param r The desired X Resolution value
-        void setXResolution(int r) {_xResolution = r;}
-        
-        /// \brief Accessor to get the private _xResolution variable in the
-        ///       GnashWebcamPrivate class.
-        /// @return The integer value of the _xResolution variable
-        int getXResolution() {return _xResolution;}
-        
-        /// \brief Accessor to set the private _yResolution variable in the
-        ///       GnashWebcamPrivate class.
-        /// @param r The desired Y Resolution value
-        void setYResolution(int r) {_yResolution = r;}
-        
-        /// \brief Accessor to get the private _yResolution variable in the
-        ///       GnashWebcamPrivate class.
-        /// @return The integer value of the _yResolution variable
-        int getYResolution() {return _yResolution;}
-        
-        /// \brief Accessor to set the private _fps variable in the
-        ///       GnashWebcamPrivate class.
-        /// @param f The desired frames per second variable. If the camera
-        ///       doesn't support the framerate, another will be chosen from
-        ///       an array of available framerates
-        void setFps(int f) {_fps = f;}
-        
-        /// \brief Accessor to get the private _fps variable in the
-        ///       GnashWebcamPrivate class.
-        /// @return The integer _fps value stored in the GnashWebcamPrivate class
-        int getFps() {return _fps;}
       
     //FIXME: this should eventually be a private or protected data field  
     //protected:
@@ -398,31 +366,10 @@ class GnashWebcamPrivate
         ///       hardware.
         GnashWebcam *_webcamDevice;
         
-        /// \var GnashWebcamPrivate::_xResolution
-        /// \brief Contains the integer x_resolution variable (the first
-        ///       value when resolution is written as INTxINT)
-        gint _xResolution;
-        
-        /// \var GnashWebcamPrivate::_yResolution
-        /// \brief Contains the integer y_resolution variable (the second
-        ///       value when resolution is written as INTxINT)
-        gint _yResolution;
-        
-        /// \var GnashWebcamPrivate::_fps
-        /// \brief Contains the integer value of the desired frames per second
-        ///     value.
-        gint _fps;
-        
         /// \var GnashWebcamPrivate::_currentFormat
         /// \brief Contains a pointer to the WebcamVidFormat data structure
         ///       selected to be used with this pipeline.
         WebcamVidFormat *_currentFormat;
-      
-        /// \var GnashWebcamPrivate::_loop
-        /// \brief Contains a pointer to a GMainLoop which runs to keep
-        ///       Gstreamer capturing information from the raw data
-        ///       stream coming in from the hardware input device.
-        GMainLoop *_loop;
         
         /// \var GnashWebcamPrivate::_eosTimeoutId
         /// \brief This variable is not currently used, but will eventually
@@ -446,15 +393,8 @@ GnashWebcamPrivate::GnashWebcamPrivate() {
     
     _deviceName = NULL;
     
-    _loop = g_main_loop_new(NULL, false);
-    
     _pipelineIsPlaying = false;
-    
-    //these default values are per the AS livedocs defaults
-    _xResolution = 160; 
-    _yResolution = 120; 
-    _fps = 15;
-    
+       
     _currentFormat = NULL;
     _eosTimeoutId = 0;
 };
