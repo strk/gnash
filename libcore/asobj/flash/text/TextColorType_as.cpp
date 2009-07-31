@@ -45,7 +45,7 @@ textcolortype_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
-    static as_object* o = gl->createObject(proto);
+    as_object* o = gl->createObject(proto);
     attachTextColorTypeStaticInterface(*o);
     where.init_member(getName(uri), o, as_object::DefaultFlags,
             getNamespace(uri));
