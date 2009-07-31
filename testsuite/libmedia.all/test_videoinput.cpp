@@ -57,10 +57,10 @@ static void test_client()
 {
 	//create a test class, call constructor
 	gst::VideoInputGst vig;
-	vig.findVidDevs();
-	
+
+    vig.findVidDevs();
 	std::vector<GnashWebcam*> *vid_vect = vig.getVidVect();
-	
+
 	if (vid_vect->empty() == true) {
 		runtest.fail("the video vector was not created by find_vid_devs");
 	} else {
@@ -466,9 +466,9 @@ static void test_client()
     }
     
     g_print("        NOTE: changing values (display window should be bigger)....\n");
-    global->_fps = 30;
-    global->_xResolution = 800;
-    global->_yResolution = 600;
+    video->set_fps(30);
+    video->set_width(800);
+    video->set_height(600);
     result = video->webcamChangeSourceBin(global);
     if (result != true) {
         runtest.fail("webcamChangeSourceBin reported an error");
@@ -516,6 +516,158 @@ static void test_client()
     } else {
         runtest.pass("webcamStop reported no errors");
     }
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("the a new vidoput.ogg file was created");
+    } else {
+        runtest.fail("there's no new vidoutput.ogg file!");
+    }
+    //delete the old vidoutput.ogg file
+    if (unlink(file.c_str()) == 0) {
+        g_print("        NOTE: deleting output file...\n");
+    }
+    
+    result = video->webcamBreakVideoDisplayLink(global);
+    if (result != true) {
+        runtest.fail("webcamBreakVideoDisplayLink reported errors");
+    } else {
+        runtest.pass("webcamBreakVideoDisplayLink reported no errors");
+    }
+    
+    result = video->webcamPlay(global);
+    if (result != true) {
+        runtest.fail("webcamPlay reported errors");
+    } else {
+        runtest.pass("webcamPlay reported no errors");
+    }
+    
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = video->webcamStop(global);
+    if (result != true) {
+        runtest.fail("webcamStop reported errors");
+    } else {
+        runtest.pass("webcamStop reported no errors");
+    }
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("the a new vidoput.ogg file was created");
+    } else {
+        runtest.fail("there's no new vidoutput.ogg file!");
+    }
+
+    //delete the old vidoutput.ogg file
+    if (unlink(file.c_str()) == 0) {
+        g_print("        NOTE: deleting output file...\n");
+    }
+    
+    result = video->webcamMakeVideoDisplayLink(global);
+    if (result != true) {
+        runtest.fail("webcamMakeVideoDisplayLink failed after breaking the link");
+    } else {
+        runtest.pass("webcamMakeVideoDisplayLink reported no errors");
+    }
+    
+    result = video->webcamBreakVideoSaveLink(global);
+    if (result != true) {
+        runtest.fail("webcamBreakVideoSaveLink function reported errors");
+    } else {
+        runtest.pass("webcamBreakVideoSaveLink function reported no errors");
+    }
+    
+    result = video->webcamPlay(global);
+    if (result != true) {
+        runtest.fail("webcamPlay reported errors");
+    } else {
+        runtest.pass("webcamPlay reported no errors");
+    }
+    
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = video->webcamStop(global);
+    if (result != true) {
+        runtest.fail("webcamStop reported errors");
+    } else {
+        runtest.pass("webcamStop reported no errors");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.fail("a vidoutput.ogg file was created, and it shouldn't be");
+    } else {
+        runtest.pass("no vidoutput.ogg file wasn't created");
+    }
+    
+    //pass bad values
+    g_print("        NOTE: changing values to bad vals....\n");
+    video->set_fps(200);
+    video->set_width(8000);
+    video->set_height(6000);
+    result = video->webcamChangeSourceBin(global);
+    if (result != true) {
+        runtest.fail("webcamChangeSourceBin reported an error");
+    } else {
+        runtest.pass("webcamChangeSourceBin reported no errors");
+    }
+    
+    result = video->webcamPlay(global);
+    if (result != true) {
+        runtest.fail("webcamPlay reported errors");
+    } else {
+        runtest.pass("webcamPlay reported no errors");
+    }
+
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = video->webcamStop(global);
+    if (result != true) {
+        runtest.fail("webcamStop reported errors");
+    } else {
+        runtest.pass("webcamStop reported no errors");
+    }
+
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.fail("a vidoutput.ogg file was created, and it shouldn't be");
+    } else {
+        runtest.pass("no vidoutput.ogg file wasn't created");
+    }
+    
+    //reset to good vals
+    g_print("        NOTE: changing back to legit vals....\n");
+    video->set_fps(30);
+    video->set_width(320);
+    video->set_height(240);
+    
+    result = video->webcamMakeVideoSaveLink(global);
+    if (result != true) {
+        runtest.fail("webcamMakeVideoSaveLink reported an error");
+    } else {
+        runtest.pass("webcamMakeVideoSaveLink reported no errors");
+    }
+    result = video->webcamChangeSourceBin(global);
+    if (result != true) {
+        runtest.fail("webcamChangeSourceBin reported an error");
+    } else {
+        runtest.pass("webcamChangeSourceBin reported no errors");
+    }
+    
+    result = video->webcamPlay(global);
+    if (result != true) {
+        runtest.fail("webcamPlay reported errors");
+    } else {
+        runtest.pass("webcamPlay reported no errors");
+    }
+
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    result = video->webcamStop(global);
+    if (result != true) {
+        runtest.fail("webcamStop reported errors");
+    } else {
+        runtest.pass("webcamStop reported no errors");
+    }
+
     if (stat(file.c_str(), &st) == 0) {
         runtest.pass("the a new vidoput.ogg file was created");
     } else {

@@ -39,6 +39,10 @@ import DejaGnu;
 // Class must be named with the PP prefix, as that's the name the
 // file passed to haxe will have after the preprocessing step
 class Camera_as {
+    static function typeof(thing:Dynamic) {
+        return ("" + untyped __typeof__(thing));
+    }
+    
     static function main() {
         #if flash9
 		var x1:Camera = Camera.getCamera();
@@ -118,7 +122,7 @@ class Camera_as {
 	if (Type.typeof(x1.name) == ValueType.TObject) {
 	    DejaGnu.pass("Camera::name property exists");
 	} else {
-	    DejaGnu.xfail("Camera::name property doesn't exist");
+	    DejaGnu.fail("Camera::name property doesn't exist");
 	}
 	if (Type.typeof(x1.quality) == ValueType.TInt) {
 	    DejaGnu.pass("Camera::quality property exists");
@@ -132,83 +136,68 @@ class Camera_as {
 	}
 	#end
 	#if !flash9
-	if (Type.typeof(x1.activityLevel) == ValueType.TFloat) {
+	if (typeof(x1.activityLevel) == "number") {
 	    DejaGnu.pass("Camera::activityLevel property exists");
 	} else {
-	    DejaGnu.xfail("Camera::activityLevel property doesn't exist");
+	    DejaGnu.fail("Camera::activityLevel property doesn't exist");
 	}
-	if (Type.typeof(x1.bandwidth) == ValueType.TInt) {
+	if (typeof(x1.bandwidth) == "number") {
 	    DejaGnu.pass("Camera::bandwidth property exists");
 	} else {
-	    DejaGnu.xfail("Camera::bandwidth property doesn't exist");
+	    DejaGnu.fail("Camera::bandwidth property doesn't exist");
 	}
-	if (Type.typeof(x1.currentFps) == ValueType.TFloat) {
+	if (typeof(x1.currentFps) == "number") {
 	    DejaGnu.pass("Camera::currentFPS property exists");
 	} else {
-	    DejaGnu.xfail("Camera::currentFPS property doesn't exist");
+	    DejaGnu.fail("Camera::currentFPS property doesn't exist");
 	}
-	if (Type.typeof(x1.fps) == ValueType.TFloat) {
+	if (typeof(x1.fps) == "number") {
 	    DejaGnu.pass("Camera::fps property exists");
 	} else {
-	    DejaGnu.xfail("Camera::fps property doesn't exist");
+	    DejaGnu.fail("Camera::fps property doesn't exist");
 	}
-	if (Type.typeof(x1.height) == ValueType.TFloat) {
+	if (typeof(x1.height) == "number") {
 	    DejaGnu.pass("Camera::height property exists");
 	} else {
-	    DejaGnu.xfail("Camera::height property doesn't exist");
+	    DejaGnu.fail("Camera::height property doesn't exist");
 	}
-	//FIXME: it would be nice to check that this is returning the 
-	//proper string
-	if (Type.typeof(x1.index) == ValueType.TObject) {
+	if (typeof(x1.index) == "number") {
 	    DejaGnu.pass("Camera::index property exists");
 	} else {
-	    DejaGnu.xfail("Camera::index property doesn't exist");
+	    DejaGnu.fail("Camera::index property doesn't exist");
 	}
-	if (Type.typeof(x1.keyFrameInterval) == ValueType.TFloat) {
-	    DejaGnu.pass("Camera::keyFrameInterval property exists");
-	} else {
-	    DejaGnu.xfail("Camera::keyFrameInterval property doesn't exist");
-	}
-	if (x1.loopback == (false||true)) {
-	    DejaGnu.pass("Camera::loopback property exists");
-	} else {
-	    DejaGnu.xfail("Camera::loopback property doesn't exist");
-	}
-	if (Type.typeof(x1.motionLevel) == ValueType.TFloat) {
+	if (typeof(x1.motionLevel) == "number") {
 	    DejaGnu.pass("Camera::motionLevel property exists");
 	} else {
-	    DejaGnu.xfail("Camera::motionLevel property doesn't exist");
+	    DejaGnu.fail("Camera::motionLevel property doesn't exist");
 	}
-	if (x1.muted == (false || true)) {
+	if (typeof(x1.muted) == "boolean") {
 	    DejaGnu.pass("Camera::muted property exists");
 	} else {
-	    DejaGnu.xfail("Camera::muted property doesn't exist");
+	    DejaGnu.fail("Camera::muted property doesn't exist");
 	}
-// FIXME: this returns an array
-// 	if (x1.names == 0) {
-// 	    DejaGnu.pass("Camera::names property exists");
-// 	} else {
-// 	    DejaGnu.fail("Camera::names property doesn't exist");
-// 	}
-	if (Type.typeof(x1.quality) == ValueType.TFloat) {
+    if (typeof(x1.name) == "string") {
+        DejaGnu.pass("Camera::name property exists");
+    } else {
+        DejaGnu.fail("Camera::name property doesn't exist");
+    }
+    
+	if (typeof(x1.quality) == "number") {
 	    DejaGnu.pass("Camera::quality property exists");
 	} else {
-	    DejaGnu.xfail("Camera::quality property doesn't exist");
+	    DejaGnu.fail("Camera::quality property doesn't exist");
 	}
-	if (Type.typeof(x1.width) == ValueType.TFloat) {
+	if (typeof(x1.width) == "number") {
 	    DejaGnu.pass("Camera::width property exists");
 	} else {
-	    DejaGnu.xfail("Camera::width property doesn't exist");
+	    DejaGnu.fail("Camera::width property doesn't exist");
 	}
+    
+    x1.setMode(800, 600, 30);
 	#end
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-// 	if (flash.media.Camera.getCamera() == Camera) {
-// 	    DejaGnu.pass("Camera::getCamera() method exists");
-// 	} else {
-// 	    DejaGnu.fail("Camera::getCamera() method doesn't exist");
-// 	}
 	#if flash9
 	if (Type.typeof(x1.setKeyFrameInterval) == ValueType.TFunction) {
 	    DejaGnu.pass("Camera::setKeyFrameInterval() method exists");
@@ -237,11 +226,6 @@ class Camera_as {
 	}
 	//FIXME: we should add tests to check that Events in this class are
 	//being properly handled.
-    
-    var vid:Video = new Video(x1.width, x1.height);
-    vid.x = 10;
-    vid.y = 10;
-    vid.attachCamera(x1); 
     
 	#end
         // Call this after finishing all tests. It prints out the totals.

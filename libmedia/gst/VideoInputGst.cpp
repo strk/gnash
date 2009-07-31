@@ -27,7 +27,7 @@
 #include <gst/interfaces/propertyprobe.h>
 #include <vector>
 #include "rc.h"
-#include "math.h"
+#include <cmath>
 
 
 namespace {
@@ -42,10 +42,26 @@ namespace gst {
     //initializes the Gstreamer interface
     VideoInputGst::VideoInputGst() {
         gst_init(NULL,NULL);
+        
+        //actionscript default values
+        _width = 160;
+        _height = 120;
+        _fps = 15;
+        
         int devSelection;
         findVidDevs();
+        
+        //enumerate names array for actionscript accessibility
+        int i;
+        for (i=0; i < _vidVect.size(); ++i) {
+            _names.push_back(_vidVect[i]->getProductName());
+        }
+        
         devSelection = makeWebcamDeviceSelection();
         _devSelection = devSelection;
+        //also set _index for actionscript accessibility
+        _index = devSelection;
+        
         transferToPrivate(devSelection);
         webcamCreateMainBin(_globalWebcam);
         webcamCreateDisplayBin(_globalWebcam);
@@ -68,7 +84,7 @@ namespace gst {
         element = gst_element_factory_make ("videotestsrc", "vidtestsrc");
         
         if (element == NULL) {
-            log_error("%s: Could not create video test source.\n", __FUNCTION__);
+            log_error("%s: Could not create video test source.", __FUNCTION__);
             _vidVect.push_back(NULL);
             _numdevs += 1;
         } else {
@@ -98,7 +114,7 @@ namespace gst {
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
             if (dev_name == "null") {
-                log_trace("No v4l video sources. Checking for other vid inputs\n");
+                log_trace("No v4l video sources. Checking for other vid inputs");
             }
             else { 
                 _vidVect.push_back(new GnashWebcam);
@@ -135,7 +151,7 @@ namespace gst {
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
             if (dev_name == "null") {
-                g_print("no v4l2 video sources found.\n");
+                log_trace("no v4l2 video sources found.");
             }
             else { 
                 _vidVect.push_back(new GnashWebcam);
@@ -231,7 +247,7 @@ namespace gst {
                 gst_value_get_fraction_numerator (fraction_range_max);
             denominator_max = 
                 gst_value_get_fraction_denominator (fraction_range_max);
-            g_print ("FractionRange: %d/%d - %d/%d\n",
+            log_trace ("FractionRange: %d/%d - %d/%d",
                 numerator_min, denominator_min, numerator_max, denominator_max);
 
             video_format->numFramerates =
@@ -279,7 +295,7 @@ namespace gst {
             gfloat curr_framerate = (float)(curr_format->highestFramerate.numerator /
                                       curr_format->highestFramerate.denominator);
             if (new_framerate > curr_framerate) {
-                log_debug("higher framerate replacing existing format\n");
+                log_debug("higher framerate replacing existing format");
                 *curr_format = *video_format;
             }
             
@@ -307,7 +323,7 @@ namespace gst {
             rcfile.setWebcamDevice(0);
             dev_select = rcfile.getWebcamDevice();
         } else {
-            log_trace("Camera %d specified in gnashrc file, using that one.\n",
+            log_trace("Camera %d specified in gnashrc file, using that one.",
                 dev_select);
         }
         //make sure that the device selected is actually valid
@@ -315,6 +331,10 @@ namespace gst {
             log_error("You have an invalid camera selected. Please check your gnashrc file");
             exit(EXIT_FAILURE);
         } else {
+            
+            //set _name value for actionscript
+            _name = _vidVect[dev_select]->getProductName();
+            
             //now that a selection has been made, get capabilities of that device
             getSelectedCaps(rcfile.getWebcamDevice());
             return rcfile.getWebcamDevice();
@@ -529,11 +549,10 @@ namespace gst {
             gint i;
             gchar *resolution;
             
-            resolution = g_strdup_printf("%ix%i", webcam->_xResolution,
-                                      webcam->_yResolution);
+            resolution = g_strdup_printf("%ix%i", _width, _height);
                                       
             //use these resolutions determined above if the camera supports it
-            if (webcam->_xResolution != 0 && webcam->_yResolution != 0) {
+            if (_width != 0 && _height != 0) {
                 
                 i = GPOINTER_TO_INT(g_hash_table_lookup
                     (webcam->_webcamDevice->supportedResolutions, resolution));
@@ -603,16 +622,20 @@ namespace gst {
                   format->highestFramerate.denominator);
                 
                 //debug
-                g_print ("GstPipeline command is: %s\n", command);
+                log_debug("GstPipeline command is: %s", command);
                 
                 webcam->_webcamSourceBin =
                     gst_parse_bin_from_description (command, TRUE, &error);
                 if (webcam->_webcamSourceBin == NULL) {
                     log_error ("%s: Creation of the webcam_source_bin failed",
                         __FUNCTION__);
-                    g_print ("the error was %s\n", error->message);
+                    log_error ("the error was %s", error->message);
                     return false;
                 }
+                
+                //set _currentFps value for actionscript
+                _currentFPS = (format->highestFramerate.numerator / 
+                            format->highestFramerate.denominator);
                 
                 g_free(command);
                 
@@ -633,7 +656,7 @@ namespace gst {
         gint fNum, fDenom, i, val;
         
         for (i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
-            val = ceil(webcam->_currentFormat->framerates[i].numerator /
+            val = std::ceil(webcam->_currentFormat->framerates[i].numerator /
                        webcam->_currentFormat->framerates[i].denominator);
             if (val == fps) {
                 return true;
@@ -671,11 +694,10 @@ namespace gst {
             gint i;
             gchar *resolution;
             
-            resolution = g_strdup_printf("%ix%i", webcam->_xResolution,
-                                      webcam->_yResolution);
+            resolution = g_strdup_printf("%ix%i", _width, _height);
                                       
             //use these resolutions determined above if the camera supports it
-            if (webcam->_xResolution != 0 && webcam->_yResolution != 0) {
+            if (_width != 0 && _height != 0) {
                 
                 i = GPOINTER_TO_INT(g_hash_table_lookup
                     (webcam->_webcamDevice->supportedResolutions, resolution));
@@ -705,13 +727,13 @@ namespace gst {
             //check here to make sure the fps value is supported (only valid for
             //non test sources)
             if (! g_strcmp0(webcam->_webcamDevice->getGstreamerSrc(), "videotestsrc") == 0) {
-                int newFps = webcam->_fps;
+                int newFps = _fps;
                 if (checkForSupportedFramerate(webcam, newFps)) {
-                    g_print("checkforsupportedfr returned true\n");
+                    log_debug("checkforsupportedfr returned true");
                     format->highestFramerate.numerator = newFps;
                     format->highestFramerate.denominator = 1;
                 } else {
-                    g_print("checkforsupportedfr returned false\n");
+                    log_debug("checkforsupportedfr returned false");
                     
                     //currently chooses the ActionScript default of 15 fps in case
                     //you pass in an unsupported framerate value
@@ -764,18 +786,22 @@ namespace gst {
                   format->highestFramerate.denominator);
                 
                 //debug
-                g_print ("GstPipeline command is: %s\n", command);
+                log_debug ("GstPipeline command is: %s", command);
                 
                 webcam->_webcamSourceBin =
                     gst_parse_bin_from_description (command, TRUE, &error);
                 if (webcam->_webcamSourceBin == NULL) {
                     log_error ("%s: Creation of the webcam_source_bin failed",
                         __FUNCTION__);
-                    g_print ("the error was %s\n", error->message);
+                    log_error ("the error was %s", error->message);
                     return false;
                 }
                 
                 g_free(command);
+                
+                //set _currentFps for actionscript
+                _currentFPS = (format->highestFramerate.numerator /
+                            format->highestFramerate.denominator);
                 
                 webcam->_videoSource = 
                     gst_bin_get_by_name (GST_BIN (webcam->_webcamSourceBin),
@@ -786,7 +812,7 @@ namespace gst {
                 
                 //drop the new source bin back into the main bin
                 gboolean result;
-                result = gst_bin_add(GST_BIN(webcam->_pipeline),
+                result = gst_bin_add(GST_BIN(webcam->_webcamMainBin),
                     webcam->_webcamSourceBin);
                 if (result != true) {
                     log_error("%s: couldn't drop the sourcebin back into the main bin",
@@ -892,7 +918,6 @@ namespace gst {
             log_error("%s: Unable to create main pipeline", __FUNCTION__);
             return false;
         }
-
         return true;
     }
 
@@ -926,10 +951,6 @@ namespace gst {
         
         //add created elements to a bin
         gst_bin_add_many (GST_BIN (webcam->_videoDisplayBin), video_scale, video_sink, NULL);
-        
-        //drop the display bin into the pipeline
-        //gst_bin_add (GST_BIN (webcam->_webcamMainBin), webcam->_videoDisplayBin);
-        //gst_bin_add (GST_BIN (webcam->_pipeline), webcam->_videoDisplayBin);
         
         ok = gst_element_link_many(video_scale, video_sink, NULL);
         if (ok != true) {
@@ -1147,8 +1168,7 @@ namespace gst {
       switch (GST_MESSAGE_TYPE (msg)) {
 
         case GST_MESSAGE_EOS:
-            log_trace ("End of stream\n");
-            g_main_loop_quit (((class GnashWebcamPrivate *)data)->_loop);
+            log_trace ("End of stream");
             break;
         
         case GST_MESSAGE_ERROR: {
@@ -1158,10 +1178,9 @@ namespace gst {
             gst_message_parse_error (msg, &error, &debug);
             g_free (debug);
 
-            g_printerr ("Error: %s\n", error->message);
+            log_error ("Error: %s", error->message);
             g_error_free (error);
             
-            g_main_loop_quit (((class GnashWebcamPrivate *)data)->_loop);
             break;
         }
         default:
@@ -1183,7 +1202,6 @@ namespace gst {
             ret = gst_bus_add_watch (bus, bus_call, webcam);
             gst_object_unref (bus);
             
-            //tfthen = gst_util_get_timestamp ();
             state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
             
             if (state != GST_STATE_CHANGE_FAILURE) {

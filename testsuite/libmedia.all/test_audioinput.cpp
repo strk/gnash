@@ -320,6 +320,34 @@ static void test_client()
     } else {
         runtest.fail("there's no output audio file in testsuite/libmedia.all");
     }
+    
+    ok = aud.audioPlay(audio);
+    if (ok != true) {
+        runtest.fail("audioPlay() reported an error");
+    } else {
+        runtest.pass("audioPlay() reported no errors");
+    }
+
+    g_print("        NOTE: sleeping for 10 seconds here....\n");
+    sleep(10);
+    
+    ok = aud.audioStop(audio);
+    if (ok != true) {
+        runtest.fail("audioStop() reported an error");
+    } else {
+        runtest.pass("audioStop() reported no errors");
+    }
+    
+    if (stat(file.c_str(), &st) == 0) {
+        runtest.pass("audioOut.ogg file is in testsuite/libmedia.all");
+        if (st.st_blocks == 0) {
+            runtest.xfail("the output file is there, but there's no data in it!");
+        } else {
+            runtest.pass("the output file has data in it");
+        }
+    } else {
+        runtest.fail("there's no output audio file in testsuite/libmedia.all");
+    }
 }
 
 
