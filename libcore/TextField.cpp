@@ -140,6 +140,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     m_has_focus(false),
     m_cursor(0u),
     _scroll(0u),
+    _maxScroll(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(def.multiline()),
@@ -204,6 +205,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     m_has_focus(false),
     m_cursor(0u),
     _scroll(0u),
+    _maxScroll(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
     _multiline(false),
@@ -516,13 +518,12 @@ TextField::setSelection(int start, int end)
 }
 bool
 TextField::on_event(const event_id& ev)
-{
-    if (isReadOnly()) return false;
-    
+{    
     switch (ev.id())
     {
         case event_id::KEY_PRESS:
         {
+            
             if ( getType() != typeInput ) break; // not an input field
             setHtml(false); //editable html fields are not yet implemented
             std::wstring s = _text;
@@ -550,6 +551,7 @@ TextField::on_event(const event_id& ev)
             switch (c)
             {
                 case key::BACKSPACE:
+                    if (isReadOnly()) return false;
                     if (m_cursor > 0)
                     {
                         s.erase(m_cursor - 1, 1);
@@ -559,6 +561,7 @@ TextField::on_event(const event_id& ev)
                     break;
 
                 case key::DELETEKEY:
+                    if (isReadOnly()) return false;
                     if (s.size() > m_cursor)
                     {
                         s.erase(m_cursor, 1);
@@ -567,6 +570,7 @@ TextField::on_event(const event_id& ev)
                     break;
 
                 case key::INSERT:        // TODO
+                    if (isReadOnly()) return false;
                     break;
 
                 case key::HOME:
@@ -644,7 +648,6 @@ TextField::on_event(const event_id& ev)
                 {
                     while (linestartit < linestartend &&
                             *linestartit <= m_cursor ) {
-
                         cur_cursor = *linestartit;
                         linestartit++;
                     }
@@ -685,10 +688,12 @@ TextField::on_event(const event_id& ev)
                     break;
                     
                 case key::ENTER:
+                    if (isReadOnly()) return false;
                     if ( !multiline() )
                         break;
 
                 default:
+                    if (isReadOnly()) return false;
                     wchar_t t = static_cast<wchar_t>(
                             gnash::key::codeMap[c][key::ASCII]);
                     if (t != 0)
@@ -1442,7 +1447,10 @@ TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
 
     // new paragraphs get the indent.
     x = std::max(0, getLeftMargin() + getIndent() + getBlockIndent()) + PADDING_TWIPS;
-    y += div * (getFontHeight() + leading);             
+    y += div * (getFontHeight() + leading);
+    if (y >= _bounds.height()) {
+        ++_maxScroll;
+    }        
             
     // Start a new record on the next line. Other properties of the
     // TextRecord should be left unchanged.
@@ -1689,33 +1697,16 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "LI") {
                             //list item (bullet)
-							int space = newrec.getFont()->get_glyph_index(32, _embedFonts);
-							SWF::TextRecord::GlyphEntry ge;
-							ge.index = space;
-							ge.advance = scale * newrec.getFont()->get_advance(space, _embedFonts);
-									  
-							newrec.addGlyph(ge,5);
-										
-							int bullet = newrec.getFont()->get_glyph_index(42, _embedFonts);
-							ge.index = bullet;
-							ge.advance = scale * newrec.getFont()->get_advance(bullet, _embedFonts);
-							newrec.addGlyph(ge);
-
-							ge.index = space;
-							ge.advance = scale * newrec.getFont()->get_advance(space, _embedFonts);
-							
-							newrec.addGlyph(ge,4);			
-												
+                            log_unimpl("<li> html tag in TextField");
 							handleChar(it, e, x, y, newrec, last_code,
-									last_space_glyph, last_line_start_record);
-							newLine(it, x, y, rec, last_space_glyph,
-									last_line_start_record, 1.0);
+                                    last_space_glyph, last_line_start_record);
                         } else if (s == "SPAN") {
                             //span
                             log_unimpl("<span> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "TEXTFORMAT") {
+                            log_debug("in textformat");
                             //textformat
                             boost::uint16_t originalblockindent = getBlockIndent();
                             boost::uint16_t originalindent = getIndent();
@@ -1792,7 +1783,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             setLeftMargin(originalleftmargin);
                             setRightMargin(originalrightmargin);
                             setTabStops(originaltabstops);
-                        } else if (s == "P") { 
+                        } else if (s == "P") {
+                            log_debug("P");
                             //paragraph
                             if (_display == BLOCK)
                             {
@@ -1810,6 +1802,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                         last_space_glyph,
                                         last_line_start_record);
                             }
+                            log_debug("noP");
                         } else if (s == "BR") {
                             //line break
 							newLine(it, x, y, rec, last_space_glyph,
@@ -1955,6 +1948,9 @@ TextField::handleChar(std::wstring::const_iterator& it,
                 float previous_x = x;
                 x = std::max(0, getLeftMargin() + getBlockIndent()) + PADDING_TWIPS;
                 y += _fontHeight + leading;
+                if (y >= _bounds.height()) {
+                    ++_maxScroll;
+                }
 
                 // Start a new record on the next line.
                 rec.clearGlyphs();
@@ -2555,7 +2551,6 @@ TextField::setTabStops(const std::vector<int>& tabStops)
 		_tabStops[i] = PIXEL_RATIO * tabStops[i];
 	}
 	
-    format_text();
     set_invalidated();
 }
 
@@ -3522,8 +3517,13 @@ textfield_scroll(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.scroll()"));
-    
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(text->getScroll());
+    }
+    // Setter
+    text->setScroll(int(fn.arg(0).to_number()));
 
     return as_value();
 }
@@ -3545,7 +3545,13 @@ textfield_maxscroll(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.maxscroll"));
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(text->getMaxScroll());
+    }
+    // Setter
+    text->setMaxScroll(int(fn.arg(0).to_number()));
 
     return as_value();
 }

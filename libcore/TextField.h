@@ -91,6 +91,22 @@ public:
 		typeInput
 	};
 
+	static void htmlptag() {
+
+	}
+	
+	typedef void dotag ();
+    typedef std::map<std::string,dotag*> HTMLTags;
+	
+	HTMLTags _htmltags;
+
+	void maptags()
+	{
+		_htmltags["P"] = htmlptag;
+		//_htmltags.insert(std::make_pair("P",ptag*()));
+	}
+	
+
     /// Constructs a TextField as specified in a DefineEditText tag.
 	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def, int id);
 
@@ -482,6 +498,16 @@ public:
 		return _restrict;
 	}
 
+	size_t getScroll() const
+	{
+		return _scroll;
+	}
+
+	size_t getMaxScroll() const
+	{
+		return _maxScroll;
+	}
+
 	void setUnderlined(bool v);
 	void setTabStops(const std::vector<int>& tabStops);
 	void setBullet(bool b);
@@ -489,6 +515,14 @@ public:
 	void setTarget(std::string target);
 	void setRestrict(const std::string& restrict);
 	void setDisplay(TextFormatDisplay display);
+	void setScroll(size_t scroll) {
+		_scroll = scroll;
+		format_text();
+	}
+	void setMaxScroll(size_t maxScroll) {
+		_maxScroll = maxScroll;
+		format_text();
+	}
 
 	void setTextFormat(TextFormat_as& tf);
 
@@ -671,6 +705,7 @@ private:
 	bool m_has_focus;
 	size_t m_cursor;
 	size_t _scroll;
+	size_t _maxScroll;
 	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
