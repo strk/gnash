@@ -122,6 +122,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     InteractiveObject(parent, id),
     _tag(&def),
     _textDefined(def.hasText()),
+    _htmlTextDefined(def.hasText()),
     _restrictDefined(false),
     _underlined(false),
     _bullet(false),
@@ -176,6 +177,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     if (_textDefined) 
     {
         setTextValue(utf8::decodeCanonicalString(def.defaultText(), version));
+        setHtmlTextValue(utf8::decodeCanonicalString(def.defaultText(), version));
     }
 
     init();
@@ -187,6 +189,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     // the id trick is to fool assertions in DisplayObject ctor
     InteractiveObject(parent, parent ? 0 : -1),
     _textDefined(false),
+    _htmlTextDefined(false),
     _restrictDefined(false),
     _underlined(false),
     _bullet(false),
@@ -366,7 +369,7 @@ TextField::display(Renderer& renderer)
     SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
             _displayRecords, _embedFonts);
 
-    if (m_has_focus) show_cursor(renderer, wmat);
+    if (m_has_focus && !isReadOnly()) show_cursor(renderer, wmat);
     
     clear_invalidated();
 }
@@ -771,9 +774,69 @@ TextField::updateText(const std::wstring& wstr)
 }
 
 void
+TextField::updateHtmlText(const std::string& str)
+{
+    int version = getSWFVersion(*this);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
+    updateHtmlText(wstr);
+}
+
+void
+TextField::updateHtmlText(const std::wstring& wstr)
+{
+    _htmlTextDefined = true;
+
+    if (_htmlText == wstr) return;
+
+    set_invalidated();
+
+    _htmlText = wstr;
+    format_text();
+}
+
+void
+TextField::setHtmlTextValue(const std::wstring& wstr)
+{
+    if (!doHtml()) {
+        updateText(wstr);
+    } else {
+        //updateText with no HTML tags
+        //for now, it is better to make the display correct
+        updateText(wstr);
+    }
+    updateHtmlText(wstr);
+
+    if ( ! _variable_name.empty() && _text_variable_registered )
+    {
+        // TODO: notify MovieClip if we have a variable name !
+        VariableRef ref = parseTextVariableRef(_variable_name);
+        as_object* tgt = ref.first;
+        if ( tgt )
+        {
+            int version = getSWFVersion(*this);
+            // we shouldn't truncate, right?
+            tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
+                        version)); 
+        }
+        else    
+        {
+            // nothing to do (too early ?)
+            log_debug("setHtmlTextValue: variable name %s points to a non-existent"
+                    " target, I guess we would not be registered if this was "
+                    "true, or the sprite we've registered our variable name "
+                    "has been unloaded", _variable_name);
+        }
+    }
+}
+
+void
 TextField::setTextValue(const std::wstring& wstr)
 {
-
+    if (!doHtml()) {
+        updateHtmlText(wstr);
+    } else {
+        //updateHtmlText and insert necessary html tags
+    }
     updateText(wstr);
 
     if ( ! _variable_name.empty() && _text_variable_registered )
@@ -813,6 +876,14 @@ TextField::get_text_value() const
     int version = getSWFVersion(*this);
 
     return utf8::encodeCanonicalString(_text, version);
+}
+
+std::string
+TextField::get_htmltext_value() const
+{
+    const_cast<TextField*>(this)->registerTextVariable();
+    int version = getSWFVersion(*this);
+    return utf8::encodeCanonicalString(_htmlText, version);
 }
 
 void
@@ -3466,13 +3537,13 @@ textfield_htmlText(const fn_call& fn)
     if (!fn.nargs)
     {
         // Getter
-        return as_value(ptr->get_text_value());
+        return as_value(ptr->get_htmltext_value());
     }
 
     // Setter
     const int version = getSWFVersion(*ptr);
     
-    ptr->setTextValue(
+    ptr->setHtmlTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
     return as_value();

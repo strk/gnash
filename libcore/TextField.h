@@ -154,8 +154,13 @@ public:
     /// updated.
 	void updateText(const std::string& s);
 
+	void updateHtmlText(const std::string& s);
+
  	/// Return value of our text.
 	std::string get_text_value() const;
+
+	/// Return value of our htmlText.
+	std::string get_htmltext_value() const;
 
 	/// Return true if text is defined
 	bool getTextDefined() const { return _textDefined; }
@@ -537,6 +542,10 @@ public:
 	///
 	void setTextValue(const std::wstring& wstr);
 
+	/// Set our htmlText to the given string.
+	//
+	void setHtmlTextValue(const std::wstring& wstr);
+
 protected:
 
 	/// Mark reachable reosurces (for GC)
@@ -559,6 +568,8 @@ private:
     /// by ourselves or by MovieClip when a registered TextVariable is
     /// updated.
 	void updateText(const std::wstring& s);
+
+	void updateHtmlText(const std::wstring& s);
 
     void insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale);
 
@@ -661,11 +672,17 @@ private:
     /// easier.
 	std::wstring _text;
 
+	/// The html representation of our text
+	//
+	std::wstring _htmlText;
+
 	/// This flag will be true as soon as the TextField
 	/// is assigned a text value. Only way to be false is
 	/// when definition has the hasText flag set to false
 	/// and no actionscript added text.
 	bool _textDefined;
+
+	bool _htmlTextDefined;
 
 	bool _restrictDefined;
 
