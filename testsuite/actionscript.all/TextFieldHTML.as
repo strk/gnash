@@ -88,37 +88,34 @@
 // WARNING!! The disabled code crashes Gnash at the moment.
 // When that's fixed, this code can be reenabled to get the totals() pass,
 // and the failures in this section (only!) can be expected.
-#if 0
 
  // A color string that is this short doesn't change the color.
  tf.htmlText = '<font color="#ff">too short</font>';
- check_equals(tf.text, "too short");
+ xcheck_equals(tf.text, "too short");
  format = tf.getTextFormat(1, 4);
- check_equals(format.color, 0x0000ff);
+ xcheck_equals(format.color, 0x0000ff);
 
  // When it's three characters it does change the color.
  tf.htmlText = '<font color="#ff0">a bit short</font>';
- check_equals(tf.text, "a bit short");
+ xcheck_equals(tf.text, "a bit short");
  format = tf.getTextFormat(1, 4);
- check_equals(format.color, 0x000ff0);
+ xcheck_equals(format.color, 0x000ff0);
  
  // Without a hash it sets the color to black.
  tf.htmlText = '<font color="ff00ff">no hash</font>';
- check_equals(tf.text, "no hash");
+ xcheck_equals(tf.text, "no hash");
  format = tf.getTextFormat(1, 4);
  check_equals(format.color, 0);
 
  tf.htmlText = '<font color="hi">no hash 2</font>';
- check_equals(tf.text, "no hash 2");
+ xcheck_equals(tf.text, "no hash 2");
  format = tf.getTextFormat(1, 4);
  check_equals(format.color, 0);
 
  tf.htmlText = '<font color="">empty</font>';
- check_equals(tf.text, "empty");
+ xcheck_equals(tf.text, "empty");
  format = tf.getTextFormat(1, 4);
  check_equals(format.color, 0);
-
-#endif
 
  // Extra long strings are truncated, but the end counts, not the beginning.
  tf.htmlText = '<font color="#ff00ffffee">long</font>';
@@ -132,6 +129,6 @@
  format = tf.getTextFormat(1, 4);
  xcheck_equals(format.color, 0x00ff00);
 
- xtotals(30);
+ totals(30);
 
 #endif

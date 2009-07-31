@@ -504,14 +504,34 @@ tf._quality = "HIGH";
 
 xcheck_equals(typeof(tf.restrict), 'null');
 check(!tf.hasOwnProperty('restrict'));
+xcheck_equals(typeof(tf.restrict), 'null');
 tf.text = "Hello World";
 tf.restrict = "olH";
+check_equals(typeof(tf.restrict), 'string');
 check_equals(tf.text, "Hello World");
 tf.text = "Hello World"; // override
 // doesn't influence explicit setting, only GUI modification
 // of the textfield (TODO: test with a MovieTester)
 check_equals(tf.text, "Hello World");
 
+tf.restrict = "";
+check_equals(tf.restrict, "");
+check_equals(typeof(tf.restrict), 'string');
+tf.restrict = "ä";
+check_equals(tf.restrict, "ä");
+check_equals(typeof(tf.restrict), 'string');
+
+tf.restrict = 9;
+check_equals(tf.restrict, "9");
+check_equals(typeof(tf.restrict), 'string');
+
+o = {};
+o.toString = function() { return "üöä"; };
+o.valueOf = function() { return 8; };
+
+tf.restrict = o;
+check_equals(tf.restrict, "üöä");
+check_equals(typeof(tf.restrict), 'string');
 
 // Check TextField._rotation
 
@@ -1072,11 +1092,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(465);
+ check_totals(475);
 #elif OUTPUT_VERSION == 7
- check_totals(468);
+ check_totals(478);
 #elif OUTPUT_VERSION == 8
- check_totals(469);
+ check_totals(479);
 #endif
 
 #endif

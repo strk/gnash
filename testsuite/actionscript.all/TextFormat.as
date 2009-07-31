@@ -102,18 +102,19 @@ check_equals(tfObj.color, 30);
 check_equals(tfObj.size, 2);
 check_equals(tfObj.font, 'fname');
 
+
+// Check tabStops property.
+// The passed array is processed before assignment, not simply stored.
 tf = new TextFormat();
 
 o = {};
-//o.valueOf = function() { return 6; };
+o.valueOf = function() { return 6; };
 o.toString = function() { return "string"; };
 
 a = [ o ];
 
 tf.tabStops = a;
-trace(tf.tabStops);
+check_equals(a.toString(), "string");
+xcheck_equals(tf.tabStops.toString(), "6");
 
-
-
-
-check_totals(63);
+check_totals(65);
