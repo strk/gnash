@@ -533,6 +533,10 @@ tf.restrict = o;
 check_equals(tf.restrict, "üöä");
 check_equals(typeof(tf.restrict), 'string');
 
+tf.restrict = null;
+xcheck_equals(tf.restrict, null);
+xcheck_equals(typeof(tf.restrict), "null");
+
 // Check TextField._rotation
 
 xcheck_equals(typeof(tf._rotation), 'number');
@@ -1092,11 +1096,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(475);
+ check_totals(477);
 #elif OUTPUT_VERSION == 7
- check_totals(478);
+ check_totals(480);
 #elif OUTPUT_VERSION == 8
- check_totals(479);
+ check_totals(481);
 #endif
 
 #endif
