@@ -25,12 +25,12 @@ AM_CPPFLAGS = # -Wall
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(GSTREAMER_PLUGINS_BASE_LIBS) \
+	$(GSTREAMER_APP_LIBS) \
+	$(GSTREAMER_LIBS) \
 	$(BOOST_LIBS) \
-	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_LIBS) \
-    $(GSTREAMER_LIBS) -lgstbase-0.10 \
-	$(GSTAPP_LIBS) \
-	$(GSTINTERFACES_LIBS) 
+	$(NULL)
 
 localedir = $(datadir)/locale
 
@@ -39,8 +39,8 @@ INCLUDES = \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
-		-I$(top_srcdir)/libmedia \
-		-I$(top_srcdir)/libmedia/gst \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia/gst \
         -I$(top_srcdir)/cygnal \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
@@ -62,7 +62,7 @@ if USE_GST_ENGINE
  test_videoinput_SOURCES = test_videoinput.cpp
  test_videoinput_LDADD = $(AM_LDFLAGS) 
  test_videoinput_DEPENDENCIES = site-update
- 
+
  test_audioinput_SOURCES = test_audioinput.cpp
  test_audioinput_LDADD = $(AM_LDFLAGS)
  test_audioinput_DEPENDENCIES = site-update

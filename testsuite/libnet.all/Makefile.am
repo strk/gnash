@@ -44,16 +44,16 @@ INCLUDES = \
 	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-# this is a utility program used to generate binary AMF files for testing protocols.
-noinst_PROGRAMS = generate_amfbins
-
-check_PROGRAMS = \
+test_progs = \
 	test_cque \
 	test_http \
 	test_diskstream \
 	test_cache \
 	test_rtmp 
 #	test_handler
+
+# this is a utility program used to generate binary AMF files for testing protocols.
+check_PROGRAMS = generate_amfbins $(test_progs)
 
 generate_amfbins_SOURCES = generate_amfbins.cpp
 generate_amfbins_LDADD = $(AM_LDFLAGS) 
@@ -94,6 +94,7 @@ CLEANFILES =  \
 	site.exp.bak \
 	testrun.* \
 	fooBar* \
+	generate_amfbins \
 	*.bin
 
 check-DEJAGNU: site-update
@@ -102,7 +103,7 @@ check-DEJAGNU: site-update
 	  $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
-	  for i in "$(check_PROGRAMS)"; do \
+	  for i in " $(test_progs)"; do \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
