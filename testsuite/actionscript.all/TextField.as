@@ -504,7 +504,7 @@ tf._quality = "HIGH";
 
 xcheck_equals(typeof(tf.restrict), 'null');
 check(!tf.hasOwnProperty('restrict'));
-check_equals(typeof(tf.restrict), 'null');
+xcheck_equals(typeof(tf.restrict), 'null');
 tf.text = "Hello World";
 tf.restrict = "olH";
 check_equals(typeof(tf.restrict), 'string');
