@@ -2364,35 +2364,19 @@ TextField::set_variable_name(const std::string& newname)
 /// limited prototype. This is changed later on instantiation of a
 /// TextField.
 void
-textfield_class_init(as_object& global, const ObjectURI& uri)
+textfield_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl = NULL;
 
-    if (!cl)
-    {
-        VM& vm = getVM(global);
-        Global_as* gl = getGlobal(global);
+    VM& vm = getVM(where);
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getSWFVersion(where) < 6 ? 0 : getTextFieldInterface(vm);
+    as_object* cl = gl->createClass(&textfield_ctor, proto);
 
-        if (vm.getSWFVersion() < 6) {
-            /// Version 5 or less: no initial prototype
-            cl = gl->createClass(&textfield_ctor, 0);
-        }
-        else {
-            /// Version 6 upward: limited initial prototype
-            as_object* iface = getTextFieldInterface(vm);
-            cl = gl->createClass(&textfield_ctor, iface);
-        }
-
-        vm.addStatic(cl.get());
-
-        // replicate static members to class, to be able to access
-        // all methods as static functions
-        attachTextFieldStaticMembers(*cl);
+    // replicate static members to class, to be able to access
+    // all methods as static functions
+    attachTextFieldStaticMembers(*cl);
              
-    }
-
-    // Register _global.TextField
-    global.init_member("TextField", cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
