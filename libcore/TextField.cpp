@@ -1689,9 +1689,27 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "LI") {
                             //list item (bullet)
-                            log_unimpl("<li> html tag in TextField");
+							int space = newrec.getFont()->get_glyph_index(32, _embedFonts);
+							SWF::TextRecord::GlyphEntry ge;
+							ge.index = space;
+							ge.advance = scale * newrec.getFont()->get_advance(space, _embedFonts);
+									  
+							newrec.addGlyph(ge,5);
+										
+							int bullet = newrec.getFont()->get_glyph_index(42, _embedFonts);
+							ge.index = bullet;
+							ge.advance = scale * newrec.getFont()->get_advance(bullet, _embedFonts);
+							newrec.addGlyph(ge);
+
+							ge.index = space;
+							ge.advance = scale * newrec.getFont()->get_advance(space, _embedFonts);
+							
+							newrec.addGlyph(ge,4);			
+												
 							handleChar(it, e, x, y, newrec, last_code,
-                                    last_space_glyph, last_line_start_record);
+									last_space_glyph, last_line_start_record);
+							newLine(it, x, y, rec, last_space_glyph,
+									last_line_start_record, 1.0);
                         } else if (s == "SPAN") {
                             //span
                             log_unimpl("<span> html tag in TextField");
