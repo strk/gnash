@@ -31,6 +31,7 @@
 namespace gnash
 {
 
+class Renderer; 
 class KdeGlue
 {
   public:
