@@ -725,6 +725,15 @@ TextField::on_event(const event_id& ev)
                         break;
 
                 default:
+				
+					if ( maxChars()!=0 )
+					{
+						if ( _maxChars < _glyphcount )
+						{
+							break;
+						}
+					}
+					
                     if (isReadOnly()) return false;
                     wchar_t t = static_cast<wchar_t>(
                             gnash::key::codeMap[c][key::ASCII]);
@@ -1307,7 +1316,7 @@ TextField::format_text()
     _glyphcount = 0;
 
     _recordStarts.push_back(0);
-    
+		
     // nothing more to do if text is empty
     if ( _text.empty() )
     {
@@ -1440,6 +1449,9 @@ TextField::format_text()
     
     scrollLines();
 
+
+	
+	
     set_invalidated(); //redraw
 }
 
@@ -1934,7 +1946,9 @@ TextField::handleChar(std::wstring::const_iterator& it,
 
             default:
             {
+	
 
+				
                 if ( password() )
                 {    
                     SWF::TextRecord::GlyphEntry ge;
@@ -3471,8 +3485,6 @@ textfield_multiline(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    //LOG_ONCE(log_unimpl("TextField.multiline"));
-
     if (!fn.nargs) {
         // Getter
         return as_value(text->multiline());
@@ -3528,8 +3540,6 @@ as_value
 textfield_maxChars(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    LOG_ONCE(log_unimpl("TextField.maxChars"));
 
     if (!fn.nargs)
     {
