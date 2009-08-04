@@ -29,25 +29,68 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
+#include "Array_as.h"
+
+#ifdef USE_GST
+#include "gst/AudioInputGst.h"
+#endif
+
+#ifdef USE_FFMPEG
+#include "AudioInput.h"
+#endif
 
 namespace gnash {
 
 as_value microphone_get(const fn_call& fn);
+as_value microphone_getMicrophone(const fn_call& fn);
 as_value microphone_setgain(const fn_call& fn);
 as_value microphone_setrate(const fn_call& fn);
 as_value microphone_setsilencelevel(const fn_call& fn);
 as_value microphone_setuseechosuppression(const fn_call& fn);
-as_value microphone_ctor(const fn_call& fn);
+as_value microphone_activityLevel(const fn_call& fn);
+as_value microphone_gain(const fn_call& fn);
+as_value microphone_index(const fn_call& fn);
+as_value microphone_muted(const fn_call& fn);
+as_value microphone_name(const fn_call& fn);
+as_value microphone_names(const fn_call& fn);
+as_value microphone_rate(const fn_call& fn);
+as_value microphone_silenceLevel(const fn_call& fn);
+as_value microphone_silenceTimeout(const fn_call& fn);
+as_value microphone_useEchoSuppression(const fn_call& fn);
 
 static void
 attachMicrophoneInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
+    boost::intrusive_ptr<builtin_function> getset;
+
 	o.init_member("get", gl->createFunction(microphone_get));
+    o.init_member("getMicrophone", gl->createFunction(microphone_getMicrophone));
 	o.init_member("setGain", gl->createFunction(microphone_setgain));
 	o.init_member("setRate", gl->createFunction(microphone_setrate));
 	o.init_member("setSilenceLevel", gl->createFunction(microphone_setsilencelevel));
 	o.init_member("setUseEchoSuppression", gl->createFunction(microphone_setuseechosuppression));
+    
+    getset = gl->createFunction(microphone_activityLevel);
+    o.init_property("activityLevel", *getset, *getset);
+    getset = gl->createFunction(microphone_gain);
+    o.init_property("gain", *getset, *getset);
+    getset = gl->createFunction(microphone_index);
+    o.init_property("index", *getset, *getset);
+    getset = gl->createFunction(microphone_muted);
+    o.init_property("muted", *getset, *getset);
+    getset = gl->createFunction(microphone_name);
+    o.init_property("name", *getset, *getset);
+    getset = gl->createFunction(microphone_names);
+    o.init_property("names", *getset, *getset);
+    getset = gl->createFunction(microphone_rate);
+    o.init_property("rate", *getset, *getset);
+    getset = gl->createFunction(microphone_silenceLevel);
+    o.init_property("silenceLevel", *getset, *getset);
+    getset = gl->createFunction(microphone_silenceTimeout);
+    o.init_property("silenceTimeOut", *getset, *getset);
+    getset = gl->createFunction(microphone_useEchoSuppression);
+    o.init_property("useEchoSuppression", *getset, *getset);
 }
 
 static as_object*
@@ -62,7 +105,8 @@ getMicrophoneInterface()
 	return o.get();
 }
 
-class microphone_as_object: public as_object
+#ifdef USE_GST
+class microphone_as_object: public as_object, public media::gst::AudioInputGst
 {
 
 public:
@@ -78,34 +122,343 @@ public:
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }
 };
+#endif
 
-as_value microphone_get(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+#ifdef USE_FFMPEG
+class microphone_as_object: public as_object, public media::AudioInput
+{
+
+public:
+
+	microphone_as_object()
+		:
+		as_object(getMicrophoneInterface())
+	{}
+
+	// override from as_object ?
+	//std::string get_text_value() const { return "Microphone"; }
+
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
+#endif
+
+//as2 ctor
+as_value
+microphone_get(const fn_call& fn) {
+    boost::intrusive_ptr<as_object> obj = new microphone_as_object;
+    
+    int numargs = fn.nargs;
+    if (numargs > 0) {
+        log_debug("%s: the mic is automatically chosen from gnashrc", __FUNCTION__);
+    }
+    return as_value(obj.get()); //will keep alive
+}
+
+//as3 ctor
+as_value
+microphone_getMicrophone(const fn_call& fn) {
+    boost::intrusive_ptr<as_object> obj = new microphone_as_object;
+    
+    int numargs = fn.nargs;
+    if (numargs > 0) {
+        log_debug("%s: the mic is automatically chosen from gnashrc", __FUNCTION__);
+    }
+    return as_value(obj.get()); //will keep alive
+}
+
+
+as_value 
+microphone_setgain(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+    
+    int numargs = fn.nargs;
+    if (numargs != 1) {
+        log_error("%s: wrong number of parameters passed", __FUNCTION__);
+    } else {
+#ifdef USE_GST
+        //gstreamer's gain values can be between -60 and 60, whereas actionscript
+        //uses values between 0 and 100. this conversion is made here and the proper
+        //value is passed to gstreamer. so, plug the argument into this equation
+        //and then send the new value for use with gstreamer
+        const int32_t argument = fn.arg(0).to_int();
+        ptr->set_gain((argument - 50) * 1.2);
+        ptr->audioChangeSourceBin(ptr->getGlobalAudio());
+#endif
+#ifdef USE_FFMPEG
+        //haven't yet implemented FFMPEG support for this, so we might need to do
+        //a conversion similar to the one above for Gstreamer
+        ptr->set_gain(fn.arg(0).to_int());
+#endif
+    }
     return as_value();
 }
-as_value microphone_setgain(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value microphone_setrate(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value microphone_setsilencelevel(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value microphone_setuseechosuppression(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+
+
+as_value
+microphone_setrate(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+    
+    int numargs = fn.nargs;
+    const int32_t argument = fn.arg(0).to_int();
+    
+    if (numargs != 1) {
+        log_error("%s: wrong number of parameters passed", __FUNCTION__);
+    } else if ((argument != 5) || (argument != 8) || (argument != 11) ||
+        (argument != 22) || (argument != 44)) {
+        log_error("%s: invalid rate argument (%d) passed", fn.arg(0).to_int(),
+            __FUNCTION__);
+    } else {
+        int32_t gstarg = argument * 1000;
+        ptr->set_rate(gstarg);
+#ifdef USE_GST
+        ptr->audioChangeSourceBin(ptr->getGlobalAudio());
+#endif
+    }
     return as_value();
 }
 
 as_value
-microphone_ctor(const fn_call& /* fn */)
-{
-	boost::intrusive_ptr<as_object> obj = new microphone_as_object;
-	
-	return as_value(obj.get()); // will keep alive
+microphone_activityLevel(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        log_unimpl("Microphone::activityLevel only has default value (-1)");
+        return as_value(ptr->get_activityLevel());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set activity property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_gain(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->get_gain());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set gain property of Microphone, use setGain()"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_index(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->get_index());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set index property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_muted(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        log_unimpl("Microphone::muted is always false (always allows access)");
+        return as_value(ptr->get_muted());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set muted property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_name(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->get_name());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set name property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+
+as_value
+microphone_names(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+    
+    //transfer from internal vector to AS array
+    std::vector<std::string> vect;
+    vect = ptr->get_names();
+    
+    int size = vect.size();
+    
+    boost::intrusive_ptr<Array_as> data = new Array_as;
+    
+    int i;
+    for (i=0; i < size; ++i) {
+        data->push(vect[i]);
+    }
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(data.get());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set names property of Microphone"));
+        );
+    }
+
+    return as_value();
+} 
+
+
+as_value
+microphone_rate(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->get_rate());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set rate property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_silenceLevel(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        log_unimpl("Microphone::silenceLevel only has default value");
+        return as_value(ptr->get_silenceLevel());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set silenceLevel property of Microphone, use setSilenceLevel"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_silenceTimeout(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        log_unimpl("Microphone::silenceTimeout has only default values");
+        return as_value(ptr->get_silenceTimeout());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set silenceTimeout property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+microphone_useEchoSuppression(const fn_call& fn) {
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    if ( fn.nargs == 0 ) // getter
+    {
+        log_unimpl("Microphone::useEchoSuppression has only default value");
+        return as_value(ptr->get_useEchoSuppression());
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set useEchoSuppression property of Microphone"));
+        );
+    }
+
+    return as_value();
+}
+
+
+as_value
+microphone_setsilencelevel(const fn_call& fn) {
+    log_unimpl ("Microphone::setSilenceLevel can be set, but it's not implemented");
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+    
+    int numargs = fn.nargs;
+    if (numargs > 1) {
+        log_error("%s: Too many arguments", __FUNCTION__);
+    } else {
+        ptr->set_silenceLevel(fn.arg(0).to_number());
+    }
+    return as_value();
+}
+
+as_value 
+microphone_setuseechosuppression(const fn_call& fn) {
+    log_unimpl ("Microphone::setUseEchoSuppression can be set, but it's not implemented");
+    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
+        (fn.this_ptr);
+        
+    int numargs = fn.nargs;
+    if (numargs > 1) {
+        log_error("%s: Too many arguments", __FUNCTION__);
+    } else {
+        ptr->set_useEchoSuppression(fn.arg(0).to_bool());
+    }
+    return as_value();
 }
 
 // extern (used by Global.cpp)
@@ -118,8 +471,14 @@ void microphone_class_init(as_object& where, const ObjectURI& uri)
 	{
         Global_as* gl = getGlobal(where);
         as_object* proto = getMicrophoneInterface();
-        cl = gl->createClass(&microphone_ctor, proto);
-		// replicate all interface to class, to be able to access
+        
+        if (isAS3(getVM(where))) {
+            cl = gl->createClass(&microphone_getMicrophone, proto);
+        } else {
+            cl = gl->createClass(&microphone_get, proto);
+        }
+        
+        // replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachMicrophoneInterface(*cl);
 	}

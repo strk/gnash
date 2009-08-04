@@ -69,6 +69,7 @@ libgnashmedia_la_SOURCES = \
 	MediaParser.cpp \
 	FLVParser.cpp \
 	AudioResampler.cpp \
+	AudioInput.cpp \
 	VideoInput.cpp \
 	$(NULL)
 

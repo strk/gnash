@@ -30,19 +30,10 @@ class AudioInput {
 	
 public:
 
-	AudioInput() {}
+	AudioInput();
 
 	// virtual classes need a virtual destructor !
 	virtual ~AudioInput() {}
-	
-	//need to figure out how to properly write this
-	//static Microphone* getMicrophone(std::string name)
-	
-	void setLoopBack(bool state);
-	
-	void setSilenceLevel(double silenceLevel, int timeout);
-	
-	void setUseEchoSuppression(bool useEchoSuppression);
 	
 	//setters and getters
 	void set_activityLevel(double a) {_activityLevel = a; };
@@ -60,7 +51,7 @@ public:
 	void set_name(std::string name) {_name = name;};
 	std::string get_name() {return _name;};
 	
-	//figure out vector setter and getter
+	std::vector<std::string> get_names() {return _names;}
 	
 	void set_rate(int r) {_rate = r;};
 	int get_rate() {return _rate;};
@@ -74,7 +65,7 @@ public:
 	void set_useEchoSuppression(bool e) {_useEchoSuppression = e;};
 	bool get_useEchoSuppression() {return _useEchoSuppression;};
 	
-private:
+protected:
 	double _activityLevel;
 	double _gain;
 	int _index;
@@ -84,8 +75,6 @@ private:
 	int _rate;
 	double _silenceLevel;
 	int _silenceTimeout;
-	//figure out how to properly do thi
-	//soundTransform _soundtransform;
 	bool _useEchoSuppression;
 };
 

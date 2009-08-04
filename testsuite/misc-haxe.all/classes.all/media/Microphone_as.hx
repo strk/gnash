@@ -41,6 +41,10 @@ import DejaGnu;
 // Class must be named with the PP prefix, as that's the name the
 // file passed to haxe will have after the preprocessing step
 class Microphone_as {
+    static function typeof(thing:Dynamic) {
+        return ("" + untyped __typeof__(thing));
+    }
+    
     static function main() {
 #if flash9
         var x1:Microphone = Microphone.getMicrophone();
@@ -57,15 +61,10 @@ class Microphone_as {
 // Tests to see if all the properties exist. All these do is test for
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-	if (Std.is(Microphone.names, Array)) {
-	    DejaGnu.pass("Microphone.names property exists");
-	} else {
-	    DejaGnu.xfail("Microphone.names property doesn't exist");
-	}
-	if (Type.typeof(x1.activityLevel) == ValueType.TInt) {
+	if (typeof(x1.activityLevel) == "number") {
 	    DejaGnu.pass("Microphone.activityLevel property exists");
 	} else {
-	    DejaGnu.xfail("Microphone.activityLevel property doesn't exist");
+	    DejaGnu.fail("Microphone.activityLevel property doesn't exist");
 	}
 	
 	
@@ -89,36 +88,36 @@ class Microphone_as {
 	//}
 	
 	
-	if (Type.typeof(x1.gain) == ValueType.TInt) {
+	if (typeof(x1.gain) == "number") {
 	    DejaGnu.pass("Microphone::gain property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::gain property doesn't exist");
+	    DejaGnu.fail("Microphone::gain property doesn't exist");
 	}
-	if (Type.typeof(x1.index) == ValueType.TInt) {
+	if (typeof(x1.index) == "number") {
 	    DejaGnu.pass("Microphone::index property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::index property doesn't exist");
+	    DejaGnu.fail("Microphone::index property doesn't exist");
 	}
-	if (Std.is(x1.muted, Bool)) {
+	if (typeof(x1.muted) == "boolean") {
 	    DejaGnu.pass("Microphone::muted property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::muted property doesn't exist");
+	    DejaGnu.fail("Microphone::muted property doesn't exist");
 	}
 	//FIXME: it would be nice if this parsed and checked the name string
-	if (Std.is(x1.name, String)) {
+	if (typeof(x1.name) == "string") {
 	    DejaGnu.pass("Microphone::name property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::name property doesn't exist");
+	    DejaGnu.fail("Microphone::name property doesn't exist");
 	}
-	if (Type.typeof(x1.rate) == ValueType.TInt) {
+	if (typeof(x1.rate) == "number") {
 	    DejaGnu.pass("Microphone::rate property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::rate property doesn't exist");
+	    DejaGnu.fail("Microphone::rate property doesn't exist");
 	}
-	if (Type.typeof(x1.silenceLevel) == ValueType.TInt) {
+	if (typeof(x1.silenceLevel) == "number") {
 	    DejaGnu.pass("Microphone::silenceLevel property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::silenceLevel property doesn't exist");
+	    DejaGnu.fail("Microphone::silenceLevel property doesn't exist");
 	}
 #if flash9
 	if (Std.is(x1.soundTransform, SoundTransform)) {
@@ -132,16 +131,16 @@ class Microphone_as {
 	    DejaGnu.xfail("Microphone::silenceTimeout property doesn't exist");
 	}
 #else
-	if (Type.typeof(x1.silenceTimeOut) == ValueType.TInt) {
+	if (typeof(x1.silenceTimeOut) == "number") {
 	    DejaGnu.pass("Microphone::silenceTimeOut property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::silenceTimeOut property doesn't exist");
+	    DejaGnu.fail("Microphone::silenceTimeOut property doesn't exist");
 	}
 #end
-	if (Std.is(x1.useEchoSuppression, Bool)) {
+	if (typeof(x1.useEchoSuppression) == "boolean") {
 	    DejaGnu.pass("Microphone::useEchoSuppression property exists");
 	} else {
-	    DejaGnu.xfail("Microphone::useEchoSuppression property doesn't exist");
+	    DejaGnu.fail("Microphone::useEchoSuppression property doesn't exist");
 	}
 
 // Tests to see if all the methods exist. All these do is test for
