@@ -229,10 +229,6 @@ class GnashAudioPrivate {
         /// \brief A boolean value which stores whether or not the _pipeline
         /// element is currently in it's 'playing' state or not
         gboolean _pipelineIsPlaying;
-        
-        /// \var _loop
-        /// \brief A GMainLoop to keep recording input from the device.
-        GMainLoop* _loop;
 };
 
 GnashAudioPrivate::GnashAudioPrivate() {
@@ -241,10 +237,11 @@ GnashAudioPrivate::GnashAudioPrivate() {
     _audioDevice = NULL;
     _deviceName = NULL;
     _pipeline = NULL;
+    _audioMainBin = NULL;
+    _audioPlaybackBin = NULL;
     _audioSourceBin = NULL;
     _audioSaveBin = NULL;
     _pipelineIsPlaying = false;
-    _loop = g_main_loop_new(NULL, false);
     _mux = NULL;
 };
 
@@ -386,6 +383,16 @@ public:
     /// @return True if the pipeline successfully stopped, false otherwise.
     bool audioStop(GnashAudioPrivate *audio);
     
+    /// This function applies changes made to one of the following items:
+    ///   Gstreamer source, device location, gain, rate
+    /// When any of these above listed items are changed, you must call
+    /// audioChangeSourceBin to delete the old source bin, recreate and link the
+    /// source bin up with new values.
+    /// @param audio A pointer to the GnashAudioPrivate structure containing
+    ///  the information about the device with the changed values.
+    /// @return True if the new changes were applied succesfully, false otherwise
+    gboolean audioChangeSourceBin (GnashAudioPrivate *audio);
+    
     /// \brief Function returns the total number of devices detected (useful in
     ///  iterating through the _audioVect vector.
     /// @return The _numdevs private variable from the AudioInputGst class.
@@ -401,6 +408,8 @@ public:
     ///  AudioInputGst class.
     std::vector<GnashAudio*>* getAudioVect() {return &_audioVect;}
     
+    /// \brief Accessor to get the reference to the GnashAudioPrivate data
+    ///   structure currently being worked with.
     GnashAudioPrivate* getGlobalAudio() {return _globalAudio;}
     
     

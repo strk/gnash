@@ -47,7 +47,7 @@ static void test_client();
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 int
-main(int argc, char *argv[])
+main()
 {   
     test_client();
     return 0;
@@ -245,6 +245,13 @@ static void test_client()
         g_print("        NOTE: deleting output file...\n");
     }
     
+    ok = aud.makeAudioSourcePlaybackLink(audio);
+    if (ok != true) {
+        runtest.fail("makeAudioSourcePlaybackLink reported an error");
+    } else {
+        runtest.pass("makeAudioSourcePlaybackLink reported no errors");
+    }
+    
     ok = aud.breakAudioSourceSaveLink(audio);
     if (ok != true) {
         runtest.fail("breakAudioSourceSaveLink() reported an error");
@@ -268,7 +275,7 @@ static void test_client()
     } else {
         runtest.pass("audioStop() reported no errors");
     }
-    
+        
     if (stat(file.c_str(), &st) == 0) {
         runtest.fail("an output file was created and it shouldn't have");
         if (unlink(file.c_str()) == 0) {
@@ -276,14 +283,6 @@ static void test_client()
         }
     } else {
         runtest.pass("no output file was created");
-    }
-    
-
-    ok = aud.makeAudioSourcePlaybackLink(audio);
-    if (ok != true) {
-        runtest.fail("couldn't remake the link audiosource->playback link");
-    } else {
-        runtest.pass("successfully remade the audiosource->playback link");
     }
     
     ok = aud.makeAudioSourceSaveLink(audio);
@@ -347,6 +346,108 @@ static void test_client()
         }
     } else {
         runtest.fail("there's no output audio file in testsuite/libmedia.all");
+    } 
+    //end 'building block' tests
+    
+    //tests more similar to execution flow
+    gst::AudioInputGst *audioObj = new AudioInputGst;
+    if (audioObj == NULL) {
+        runtest.fail("couldn't create new AudioInputGst object");
+    } else {
+        runtest.pass("got a reference to a new AudioInputGst object");
+    }
+    
+    //get a reference to the global GnashAudioPrivate structure
+    GnashAudioPrivate *global;
+    global = audioObj->getGlobalAudio();
+    if (global == NULL) {
+        runtest.fail("couldn't get a global GnashAudioPrivate reference");
+    } else {
+        runtest.pass("got a global GnashAudioPrivate reference");
+    }
+    
+    if (global->_pipeline == NULL) {
+        runtest.fail("audioObj->_globalAudio->_pipeline has null reference");
+    } else {
+        runtest.pass("audioObj->_globalAudio->_pipeline is initialized");
+    }
+    
+    if (global->_audioSourceBin == NULL) {
+        runtest.fail("audioObj->_globalAudio->_audioSourceBin has a null reference");
+    } else {
+        runtest.pass("audioObj->_globalAudio->_audioSourceBin was initialized");
+    }
+    
+    if (global->_audioMainBin == NULL) {
+        runtest.fail("audioObj->_globalAudio->_audioMainBin has a null reference");
+    } else {
+        runtest.pass("audioObj->_globalAudio->_audioMainBin was initialized");
+    }
+    
+    if (global->_audioPlaybackBin == NULL) {
+        runtest.fail("audioObj->_globalAudio->_audioPlaybackBin has a null reference");
+    } else {
+        runtest.pass("audioObj->_globalAudio->_audioPlaybackBin was initialized");
+    }
+    
+    if (global->_audioSaveBin == NULL) {
+        runtest.fail("audioObj->_globalAudio->_audioSaveBin has a null reference");
+    } else {
+        runtest.pass("audioObj->_globalAudio->_audioSaveBin was initialized");
+    }
+    
+    //gboolean ok;
+    ok = audioObj->makeAudioSourcePlaybackLink(global);
+    if (ok != true) {
+        runtest.fail("makeAudioSourcePlaybackLink failed");
+    } else {
+        runtest.pass("makeAudioSourcePlaybackLink reported no errors");
+    }
+    
+    ok = audioObj->audioPlay(global);
+    if (ok != true) {
+        runtest.fail("audioPlay reported errors");
+    } else {
+        runtest.pass("audioPlay reported no errors");
+    }
+    
+    //sleep to record a few seconds of audio (from mic or test source)
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    ok = audioObj->audioStop(global);
+    if (ok != true) {
+        runtest.fail("audioStop reported errors");
+    } else {
+        runtest.pass("audioStop reported no errors");
+    }
+
+    //change some vals and test changeSourceBin
+    audioObj->set_rate(44100);
+    audioObj->set_gain(100);
+    ok = audioObj->audioChangeSourceBin(global);
+    if (ok != true) {
+        runtest.fail("audioChangeSourceBin reported errors");
+    } else {
+        runtest.pass("audioChangeSourceBin reported no errors");
+    }
+    
+    ok = audioObj->audioPlay(global);
+    if (ok != true) {
+        runtest.fail("audioPlay reported errors");
+    } else {
+        runtest.pass("audioPlay reported no errors");
+    }
+    
+    //sleep to record a few seconds of audio (from mic or test source)
+    g_print("        NOTE: sleeping for 5 seconds here....\n");
+    sleep(5);
+    
+    ok = audioObj->audioStop(global);
+    if (ok != true) {
+        runtest.fail("audioStop reported errors");
+    } else {
+        runtest.pass("audioStop reported no errors");
     }
 }
 

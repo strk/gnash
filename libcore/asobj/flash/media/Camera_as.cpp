@@ -29,6 +29,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
+#include "Array_as.h"
 
 #ifdef USE_GST
 #include "gst/VideoInputGst.h"
@@ -57,7 +58,7 @@ as_value camera_motionLevel(const fn_call& fn);
 as_value camera_motionTimeout(const fn_call& fn);
 as_value camera_muted(const fn_call& fn);
 as_value camera_name(const fn_call& fn);
-//as_value camera_names(const fn_call& fn);
+as_value camera_names(const fn_call& fn);
 as_value camera_quality(const fn_call& fn);
 as_value camera_width(const fn_call& fn);
 
@@ -69,9 +70,9 @@ attachCameraInterface(as_object& o)
     
     o.init_member("get", gl->createFunction(camera_get));
     o.init_member("getCamera", gl->createFunction(camera_getCamera));
-    o.init_member("setmode", gl->createFunction(camera_setmode));
-    o.init_member("setmotionlevel", gl->createFunction(camera_setmotionlevel));
-    o.init_member("setquality", gl->createFunction(camera_setquality));
+    o.init_member("setMode", gl->createFunction(camera_setmode));
+    o.init_member("setMotionLevel", gl->createFunction(camera_setmotionlevel));
+    o.init_member("setQuality", gl->createFunction(camera_setquality));
 
 
     getset = gl->createFunction(camera_activitylevel);
@@ -96,8 +97,8 @@ attachCameraInterface(as_object& o)
     o.init_property("muted", *getset, *getset);
     getset = gl->createFunction(camera_name);
     o.init_property("name", *getset, *getset);
-    //getset = gl->createFunction(camera_names);  //need to figure out how to
-    //o.init_property("names", *getset, *getset); //implement this
+    getset = gl->createFunction(camera_names);
+    o.init_property("names", *getset, *getset);
     getset = gl->createFunction(camera_quality);
     o.init_property("quality", *getset, *getset);
     getset = gl->createFunction(camera_width);
@@ -180,10 +181,6 @@ camera_getCamera(const fn_call& fn) {
 
 as_value
 camera_setmode(const fn_call& fn) {
-    
-    //this will need to go through the arguments and set the proper values
-    //...which will also mean changing up some things in the VideoInputGst
-    //implementation (e.g. be able to set the fps values, etc.)
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
     
     int numargs = fn.nargs;
@@ -247,14 +244,93 @@ camera_setmode(const fn_call& fn) {
     return as_value();
 }
 as_value
-camera_setmotionlevel(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+camera_setmotionlevel(const fn_call& fn) {
+    log_unimpl ("Camera::motionLevel can be set, but it's not implemented");
+    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
+        (fn.this_ptr);
+    
+    int numargs = fn.nargs;
+    if (numargs > 2) {
+        log_error("%s: Too many arguments", __FUNCTION__);
+    } else {
+        switch (numargs) {
+            case 0:
+                log_debug("%s: no args passed, using defaults", __FUNCTION__);
+                if (ptr->get_motionLevel() != 50) {
+                    ptr->set_motionLevel(50);
+                }
+                if (ptr->get_motionTimeout() != 2000) {
+                    ptr->set_motionTimeout(2000);
+                }
+                break;
+            case 1:
+            {
+                double argument = fn.arg(0).to_number();
+                if ((argument >= 0) && (argument <= 100)) { 
+                    ptr->set_motionLevel(argument);
+                } else {
+                    log_error("%s: bad value passed for first argument", __FUNCTION__);
+                }
+                if (ptr->get_motionTimeout() != 2000) {
+                    ptr->set_motionTimeout(2000);
+                }
+                break;
+            }
+            case 2:
+            {
+                double argument1 = fn.arg(0).to_number();
+                if ((argument1 >= 0) && (argument1 <= 100)) {
+                    ptr->set_motionLevel(argument1);
+                } else {
+                    log_error("%s: bad value passed for first argument", __FUNCTION__);
+                }
+                ptr->set_motionTimeout(fn.arg(1).to_number());
+                break;
+            }
+        }
+    }
     return as_value();
 }
-as_value
-camera_setquality(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
 
+as_value
+camera_setquality(const fn_call& fn) {
+    log_unimpl ("Camera::quality can be set, but it's not implemented");
+    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
+        (fn.this_ptr);
+    
+    int numargs = fn.nargs;
+    if (numargs > 2) {
+        log_error("%s: Too many arguments", __FUNCTION__);
+    } else {
+        switch (numargs) {
+            case 0:
+                log_debug("%s: No arguments passed, using defaults", __FUNCTION__);
+                if (ptr->get_bandwidth() != 16384) {
+                    ptr->set_bandwidth(16384);
+                }
+                if (ptr->get_quality() != 0) {
+                    ptr->set_quality(0);
+                }
+                break;
+            case 1:
+                ptr->set_bandwidth(fn.arg(0).to_number());
+                if (ptr->get_quality() != 0) {
+                    ptr->set_quality(0);
+                }
+                break;
+            case 2:
+            {
+                double argument2 = fn.arg(1).to_number();
+                ptr->set_bandwidth(fn.arg(0).to_number());
+                if ((argument2 <= 0) && (argument2 >= 100)) {
+                    ptr->set_quality(fn.arg(1).to_number());
+                } else {
+                    log_error("%s: Second argument not in range 0-100", __FUNCTION__);
+                }
+                break;
+            }
+        }
+    }
     return as_value();
 }
 as_value
@@ -264,9 +340,7 @@ camera_activitylevel(const fn_call& fn) {
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Camera::activityLevel only has default value");
-#ifdef USE_GST
         return as_value(ptr->get_activityLevel());
-#endif
     }
     else // setter
     {
@@ -284,9 +358,7 @@ camera_bandwidth(const fn_call& fn) {
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Camera::bandwidth only has default value");
-#ifdef USE_GST
         return as_value(ptr->get_bandwidth());
-#endif
     }
     else // setter
     {
@@ -304,9 +376,7 @@ camera_currentFPS(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_currentFPS());
-#endif
     }
     else // setter
     {
@@ -325,9 +395,7 @@ camera_currentFps(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_currentFPS());
-#endif
     }
     else // setter
     {
@@ -345,9 +413,7 @@ camera_fps(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_fps());
-#endif
     }
     else // setter
     {
@@ -365,9 +431,7 @@ camera_height(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_height());
-#endif
     }
     else // setter
     {
@@ -385,9 +449,7 @@ camera_index(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_index());
-#endif
     }
     else // setter
     {
@@ -406,9 +468,7 @@ camera_motionLevel(const fn_call& fn) {
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Camera::motionLevel only has default value");
-#ifdef USE_GST
         return as_value(ptr->get_motionLevel());
-#endif
     }
     else // setter
     {
@@ -427,9 +487,7 @@ camera_motionTimeout(const fn_call& fn) {
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Camera::motionTimeout");
-#ifdef USE_GST
         return as_value(ptr->get_motionTimeout());
-#endif
     }
     else // setter
     {
@@ -448,9 +506,7 @@ camera_muted(const fn_call& fn) {
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Camera::muted");
-#ifdef USE_GST
         return as_value(ptr->get_muted());
-#endif
     }
     else // setter
     {
@@ -468,9 +524,7 @@ camera_name(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_name());
-#endif
     }
     else // setter
     {
@@ -482,8 +536,6 @@ camera_name(const fn_call& fn) {
     return as_value();
 }
 
-//can gnash return a static array as an as_value(array)?
-/*
 as_value
 camera_names(const fn_call& fn) {
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
@@ -493,16 +545,18 @@ camera_names(const fn_call& fn) {
     vect = ptr->get_names();
     
     int size = vect.size();
-    std::string data[size];
+    
+    boost::intrusive_ptr<Array_as> data = new Array_as;
+
+    //std::string data[size];
     int i;
     for (i = 0; i < size; ++i) {
-        data[i] = vect[i];
+        data->push(vect[i]);
     }
     
     if ( fn.nargs == 0 ) // getter
     {
-        log_trace("holld.....");
-        return as_value(data);
+        return as_value(data.get());
     }
     else // setter
     {
@@ -513,7 +567,7 @@ camera_names(const fn_call& fn) {
 
     return as_value();
 } 
-*/
+
 
 as_value
 camera_quality(const fn_call& fn) {
@@ -522,9 +576,7 @@ camera_quality(const fn_call& fn) {
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Camera::quality has only default values");
-#ifdef USE_GST
         return as_value(ptr->get_quality());
-#endif
     }
     else // setter
     {
@@ -542,9 +594,7 @@ camera_width(const fn_call& fn) {
 
     if ( fn.nargs == 0 ) // getter
     {
-#ifdef USE_GST
         return as_value(ptr->get_width());
-#endif
     }
     else // setter
     {
@@ -571,9 +621,9 @@ void camera_class_init(as_object& where, const ObjectURI& uri)
         //for versions lower than 8, the ctor call was get(), for 9 and higher
         //the ctor was getCamera()
         if (isAS3(getVM(where))) {
-            cl = gl->createClass(&camera_get, getCameraInterface());
-        } else {
             cl = gl->createClass(&camera_getCamera, getCameraInterface());
+        } else {
+            cl = gl->createClass(&camera_get, getCameraInterface());
         }
         
         attachCameraInterface(*cl);

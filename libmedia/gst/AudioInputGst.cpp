@@ -37,8 +37,22 @@ namespace media {
 namespace gst {
 	AudioInputGst::AudioInputGst() {
 		gst_init(NULL,NULL);
-        _numdevs = 0;
-        log_unimpl("Audio Input constructor");
+        
+        findAudioDevs();
+        
+        //enumerate names array for actionscript accessibility
+        int i;
+        for (i = 0; i < _audioVect.size(); ++i) {
+            _names.push_back(_audioVect[i]->getProductName());
+        }
+        
+        int devSelection = makeAudioDevSelection();
+        _index = devSelection;
+        
+        transferToPrivate(devSelection);
+        audioCreateMainBin(_globalAudio);
+        audioCreatePlaybackBin(_globalAudio);
+        audioCreateSaveBin(_globalAudio);
 	}
 	
 	AudioInputGst::~AudioInputGst() {
@@ -54,7 +68,7 @@ namespace gst {
         element = gst_element_factory_make ("audiotestsrc", "audtestsrc");
         
         if (element == NULL) {
-            log_error("%s: Could not create audio test source.\n", __FUNCTION__);
+            log_error("%s: Could not create audio test source", __FUNCTION__);
             _audioVect.push_back(NULL);
             _numdevs += 1;
         } else {
@@ -214,6 +228,10 @@ namespace gst {
     
     GnashAudioPrivate*
     AudioInputGst::transferToPrivate(int devselect) {
+        if ((devselect > (_audioVect.size() - 1)) || devselect < 0) {
+            log_error("%s: Passed a bad devselect value", __FUNCTION__);
+            exit (EXIT_FAILURE);
+        }
         GnashAudioPrivate *audio = new GnashAudioPrivate;
         if (audio != NULL) {
             audio->setAudioDevice(_audioVect[devselect]);
@@ -226,11 +244,20 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio) {
+    AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio) {
         GError *error = NULL;
         gchar *command = NULL;
+        
+        if (audio->_pipelineIsPlaying == true) {
+            audioStop(audio);
+        }
+        
+        //delete the old source bin
+        gst_bin_remove(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
+        audio->_audioSourceBin = NULL;
+        
         if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
-            log_trace("%s: You don't have any webcams chosen, using audiotestsrc",
+            log_trace("%s: You don't have any mics chosen, using audiotestsrc",
                 __FUNCTION__);
             audio->_audioSourceBin = gst_parse_bin_from_description (
                 "audiotestsrc name=audioSource",
@@ -240,9 +267,11 @@ namespace gst {
                         "audioSource");
             return true;
         } else {
-        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=44100;audio/x-raw-float,channels=2,rate=44100",
+        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%d",
             audio->_audioDevice->getGstreamerSrc(),
-            audio->_audioDevice->getDevLocation());
+            audio->_audioDevice->getDevLocation(),
+            gnash::media::AudioInput::_rate, gnash::media::AudioInput::_rate,
+            gnash::media::AudioInput::_gain);
         
         log_debug ("GstPipeline command is: %s\n", command);
         
@@ -252,6 +281,61 @@ namespace gst {
             log_error ("%s: Creation of the audioSourceBin failed",
                 __FUNCTION__);
             log_error ("the error was %s\n", error->message);
+            return false;
+        }
+        g_free(command);
+        audio->audioSource = gst_bin_get_by_name (GST_BIN (audio->_audioSourceBin),
+                    "audioSource");
+                    
+        gboolean result;
+        result = gst_bin_add(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
+        if (result != true) {
+            log_error("%s: couldn't drop the sourcebin back into the main bin",
+                __FUNCTION__);
+        } else {
+            GstElement *tee = gst_bin_get_by_name(GST_BIN(audio->_audioMainBin),
+                "tee");
+            result = gst_element_link(audio->_audioSourceBin, tee);
+            if (result != true) {
+                log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
+                return false;
+            } else {
+                _globalAudio = audio;
+                return true;
+            }
+        }
+        }
+    } 
+    
+    gboolean
+    AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio) {
+        GError *error = NULL;
+        gchar *command = NULL;
+        if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
+            log_trace("%s: You don't have any mics chosen, using audiotestsrc",
+                __FUNCTION__);
+            audio->_audioSourceBin = gst_parse_bin_from_description (
+                "audiotestsrc name=audioSource",
+                TRUE, &error);
+            log_debug("Command: audiotestsrc name=audioSource");
+            audio->audioSource = gst_bin_get_by_name (GST_BIN (audio->_audioSourceBin),
+                        "audioSource");
+            return true;
+        } else {
+        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%d",
+            audio->_audioDevice->getGstreamerSrc(),
+            audio->_audioDevice->getDevLocation(),
+            gnash::media::AudioInput::_rate, gnash::media::AudioInput::_rate,
+            gnash::media::AudioInput::_gain);
+        
+        log_debug ("GstPipeline command is: %s", command);
+        
+        audio->_audioSourceBin = gst_parse_bin_from_description(command, TRUE,
+                                    &error);
+        if (audio->_audioSourceBin == NULL) {
+            log_error ("%s: Creation of the audioSourceBin failed",
+                __FUNCTION__);
+            log_error ("the error was %s", error->message);
             return false;
         }
         g_free(command);
@@ -275,8 +359,7 @@ namespace gst {
         ok = audioCreateSourceBin(audio);
         if (ok != true) {
             log_error("%s: audioCreateSourceBin failed!", __FUNCTION__);
-        } else {
-            ok = false;
+            return false;
         }
         if ((tee = gst_element_factory_make ("tee", "tee")) == NULL) {
             log_error("%s: problem creating tee element", __FUNCTION__);
@@ -335,6 +418,8 @@ namespace gst {
         if (!ok) {
             log_error("%s: Unable to create main pipeline", __FUNCTION__);
             return false;
+        } else {
+            return true;
         }
     }
     
@@ -436,7 +521,6 @@ namespace gst {
 
         case GST_MESSAGE_EOS:
             log_trace ("End of stream\n");
-            g_main_loop_quit (((class GnashAudioPrivate *)data)->_loop);
             break;
         
         case GST_MESSAGE_ERROR: {
@@ -448,8 +532,6 @@ namespace gst {
 
             log_error ("Error: %s\n", error->message);
             g_error_free (error);
-            
-            g_main_loop_quit (((class GnashAudioPrivate *)data)->_loop);
             break;
         }
         default:
@@ -606,17 +688,27 @@ namespace gst {
         int devselect = -1;
         devselect = rcfile.getAudioInputDevice();
         if (devselect == -1) {
-            log_trace("No default audio input device specified, setting to testsrc\n");
+            log_trace("No default audio input device specified, setting to testsrc");
             rcfile.setAudioInputDevice(0);
             devselect = rcfile.getAudioInputDevice();
         } else {
-            log_trace("You've specified audio input %d in gnashrc, using that one\n",
+            log_trace("You've specified audio input %d in gnashrc, using that one",
                 devselect);
         }
         
-        getSelectedCaps(devselect);
+        //make sure device selection is a valid input device
+        if ((rcfile.getAudioInputDevice() > (_audioVect.size() -1)) ||
+            rcfile.getAudioInputDevice() < 0) {
+            log_error("You have an invalid microphone selected. Check your gnashrc file");
+            exit(EXIT_FAILURE);
+        } else {
+            //set _name value for actionscript
+            _name = _audioVect[devselect]->getProductName();
+            
+            getSelectedCaps(devselect);
         
-        return devselect;
+            return devselect;
+        }
     }
 
 } //gst namespace

@@ -23,9 +23,6 @@
 #include <string>
 #include <vector>
 
-//IMPORTANT: I have only simply copied over the AS API into this
-//     file. No real implementation has actually happened here yet.
-
 namespace gnash {
 namespace media {
 
@@ -38,14 +35,6 @@ public:
 
     // virtual classes need a virtual destructor !
     virtual ~VideoInput() {}
-    
-    void setKeyFramInterval(int keyFrameInterval);
-    
-    void setLoopback(bool compress);
-    
-    void setMode(int width, int height, double fps, bool favorArea);
-    
-    void setQuality(int bandwidth, int quality);
        
     //setters and getters
     void set_activityLevel(double a) {_activityLevel = a;};

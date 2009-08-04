@@ -1,4 +1,4 @@
-// VideoInput.cpp: Video input base class source file.
+// AudioInput.cpp: Audio input base class source file.
 // 
 //   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -16,27 +16,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "VideoInput.h"
+#include "AudioInput.h"
 
 namespace gnash {
 namespace media {
     
     //constructor
-    VideoInput::VideoInput() {
-        //initialize variables
-        _activityLevel = -1.0;
-        _bandwidth = 16384;
-        _currentFPS = 0;
-        _fps = 15.0;
-        _height = 120;
-        _index = 0;
-        _keyFrameInterval = 15;
-        _loopback = false;
-        _motionLevel = 50;
-        _motionTimeout = 2000;  //millisecs
-        _muted = false;  //security (false = allow, true = decline)
-        _quality = 0;
-        _width = 160;
+    AudioInput::AudioInput() {
+        //actionscript default values
+        _rate = 8000;
+        _activityLevel = -1;
+        _gain = 50;
+        _silenceLevel = 10;
+        _silenceTimeout = 2000; //in milliseconds
+        _useEchoSuppression = false;
     } 
     
 } //media namespace

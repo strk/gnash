@@ -43,11 +43,6 @@ namespace gst {
     VideoInputGst::VideoInputGst() {
         gst_init(NULL,NULL);
         
-        //actionscript default values
-        _width = 160;
-        _height = 120;
-        _fps = 15;
-        
         int devSelection;
         findVidDevs();
         
