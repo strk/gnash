@@ -728,7 +728,7 @@ TextField::on_event(const event_id& ev)
 				
 					if ( maxChars()!=0 )
 					{
-						if ( _maxChars < _glyphcount )
+						if ( _maxChars <= _glyphcount )
 						{
 							break;
 						}
@@ -944,6 +944,10 @@ TextField::setTextFormat(TextFormat_as& tf)
     if ( tf.bulletDefined() ) setBullet(tf.bullet());
     if ( tf.displayDefined() ) setDisplay(tf.display());
 	if ( tf.tabStopsDefined() ) setTabStops(tf.tabStops());
+	
+	// NEED TO IMPLEMENT THESE TWO
+	if ( tf.urlDefined() ) setURL(tf.url());
+	if ( tf.targetDefined() ) setTarget(tf.target());
     
     format_text();
 }
@@ -1331,9 +1335,6 @@ TextField::format_text()
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
 
-    // See bug #24266
-    const rect& defBounds = _bounds;
-
     AutoSizeValue autoSize = getAutoSize();
     if ( autoSize != autoSizeNone )
     {
@@ -1347,9 +1348,6 @@ TextField::format_text()
             _bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
         }
     }
-
-    // Should get info from autoSize too maybe ?
-    TextAlignment textAlignment = getTextAlignment();
 
     // FIXME: I don't think we should query the definition
     // to find the appropriate font to use, as ActionScript
@@ -1464,7 +1462,6 @@ TextField::scrollLines()
     float fontLeading = _font->leading() * scale;
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
     if (_linesindisplay > 0) { //no need to place lines if we can't fit any
-        float fontDescent = _font->descent() * scale; 
         size_t manylines = _line_starts.size();
         size_t lastvisibleline = _scroll + _linesindisplay;
         size_t line = 0;
@@ -1517,9 +1514,9 @@ TextField::scrollLines()
 }
 
 void
-TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
-        boost::int32_t& y, SWF::TextRecord& rec, int& last_space_glyph,
-        LineStarts::value_type& last_line_start_record, float div)
+TextField::newLine(boost::int32_t& x, boost::int32_t& y, 
+				   SWF::TextRecord& rec, int& last_space_glyph,
+				LineStarts::value_type& last_line_start_record, float div)
 {
     // newline.
     LineStarts::iterator linestartit = _line_starts.begin();
@@ -1668,7 +1665,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             case 13:
             case 10:
             {
-                newLine(it,x,y,rec,last_space_glyph,last_line_start_record,1.0);
+                newLine(x,y,rec,last_space_glyph,last_line_start_record,1.0);
                 break;
             }
             case '<':
@@ -1818,7 +1815,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
 
 							handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-							newLine(it, x, y, newrec, last_space_glyph,
+							newLine(x, y, newrec, last_space_glyph,
                                     last_line_start_record, 1.0);
                         } else if (s == "SPAN") {
                             //span
@@ -1907,12 +1904,12 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             //paragraph
                             if (_display == BLOCK)
                             {
-                                newLine(it, x, y, rec, last_space_glyph,
+                                newLine(x, y, rec, last_space_glyph,
                                         last_line_start_record, 1.5);
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,
                                         last_line_start_record);
-                                newLine(it, x, y, rec, last_space_glyph,
+                                newLine(x, y, rec, last_space_glyph,
                                         last_line_start_record, 1.0);
                             }
                             else
@@ -1923,7 +1920,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             }
                         } else if (s == "BR") {
                             //line break
-							newLine(it, x, y, rec, last_space_glyph,
+							newLine(x, y, rec, last_space_glyph,
 										last_line_start_record, 1.0);
                         } else {
                             log_debug("<%s> tag is unsupported", s);
