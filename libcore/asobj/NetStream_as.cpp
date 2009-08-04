@@ -1592,23 +1592,19 @@ netstream_new(const fn_call& fn)
 
     boost::intrusive_ptr<NetStream_as> netstream_obj = new NetStream_as;
 
-    if (fn.nargs > 0)
-    {
+    if (fn.nargs > 0) {
         boost::intrusive_ptr<NetConnection_as> ns =
             boost::dynamic_pointer_cast<NetConnection_as>(
                     fn.arg(0).to_object(*getGlobal(fn)));
-        if ( ns )
-        {
+        if ( ns ) {
             netstream_obj->setNetCon(ns);
-        }
-        else
-        {
+        } else {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("First argument "
-                    "to NetStream constructor "
-                    "doesn't cast to a NetConnection (%s)"),
-                    fn.arg(0));
-            );
+		       log_aserror(_("First argument "
+			     "to NetStream constructor "
+			     "doesn't cast to a NetConnection (%s)"),
+			   fn.arg(0));
+	       );
         }
     }
     return as_value(netstream_obj.get());
