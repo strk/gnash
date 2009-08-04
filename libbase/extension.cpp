@@ -152,8 +152,7 @@ Extension::initModule(const std::string& module, as_object &where)
         sl = new SharedLib(module);
         sl->openLib();
         _plugins[module] = sl;
-    }
-    else {
+    } else {
         sl = _plugins[module];
     }
     
@@ -163,8 +162,7 @@ Extension::initModule(const std::string& module, as_object &where)
 
     if (symptr) {    
         symptr(where);
-    }
-    else {
+    } else {
         log_error(_("Couldn't get class_init symbol"));
     }
     
@@ -183,8 +181,7 @@ Extension::initModuleWithFunc(const std::string& module, const std::string& func
         sl = new SharedLib(module);
         sl->openLib();
         _plugins[module] = sl;
-    }
-    else {
+    } else {
         sl = _plugins[module];
     }
 
@@ -192,8 +189,7 @@ Extension::initModuleWithFunc(const std::string& module, const std::string& func
 
     if (symptr) {
         symptr(obj);
-    }
-    else {
+    } else {
         log_error(_("Couldn't get class_init symbol: \"%s\""), func);
     }
 
