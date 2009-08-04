@@ -394,7 +394,7 @@ xcheck_equals(tf.maxhscroll, 0); // read-only
 
 // Check TextField.maxscroll
 
-xcheck_equals(typeof(tf.maxscroll), 'number');
+check_equals(typeof(tf.maxscroll), 'number');
 check(!tf.hasOwnProperty('maxscroll'));
 xcheck_equals(tf.maxscroll, 1);
 tf.maxscroll = 10;
@@ -550,7 +550,7 @@ tf._rotation = 0;
 // Check TextField.scroll
 
 // TODO: better test for this, might do nothing if there's no scrollin
-xcheck_equals(typeof(tf.scroll), 'number');
+check_equals(typeof(tf.scroll), 'number');
 check( ! tf.hasOwnProperty('scroll') ); 
 xcheck_equals(tf.scroll, 1);
 tf.scroll = 10;

@@ -1464,9 +1464,16 @@ void
 TextField::changeTopVisibleLine(size_t current_line)
 {
     if (_linesindisplay > 0) {
-        size_t manylines = _line_starts.size();
-        size_t lastvisibleline = _scroll + _linesindisplay;
-        assert (manylines >= _scroll);
+        const size_t manylines = _line_starts.size();
+        const size_t lastvisibleline = _scroll + _linesindisplay;
+
+        // If there aren't as many lines as we have scrolled, display the
+        // end of the text.
+        if (manylines < _scroll) {
+            _scroll = manylines - _linesindisplay;
+            return;
+        }
+
         if (manylines - _scroll <= _linesindisplay) {
             if (manylines < _linesindisplay) _scroll = 0;
             else {
