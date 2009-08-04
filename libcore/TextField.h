@@ -529,6 +529,10 @@ public:
 		format_text();
 	}
 
+	/// Returns the number of the record that the cursor is in
+	//
+	size_t cursorRecord();
+
 	void setTextFormat(TextFormat_as& tf);
 
 	const rect& getTextBoundingBox() const
@@ -596,7 +600,7 @@ private:
 	void format_text();
 	
 	/// Move viewable lines based on m_cursor
-	void changeTopVisibleLine(size_t current_line);
+	void scrollLines();
 	
 	/// Handles a new line, this will be called several times, so this
 	/// will hopefully make code cleaner
@@ -691,6 +695,7 @@ private:
 
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
+	std::vector<size_t> _recordStarts;
 	TextRecords _displayRecords;
 	bool _underlined;
 	bool _bullet;
@@ -721,6 +726,7 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
+	size_t _glyphcount;
 	size_t _scroll;
 	size_t _maxScroll;
 	void show_cursor(Renderer& renderer, const SWFMatrix& mat);

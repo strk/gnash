@@ -140,6 +140,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
+    _glyphcount(0u),
     _scroll(0u),
     _maxScroll(0u),
     m_xcursor(0.0f),
@@ -207,6 +208,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
+    _glyphcount(0u),
     _scroll(0u),
     _maxScroll(0u),
     m_xcursor(0.0f),
@@ -299,15 +301,39 @@ TextField::removeTextField()
 void
 TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 {
-    boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
-    boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
-    boost::uint16_t h = getFontHeight();
+    boost::uint16_t x;
+    boost::uint16_t y;
+    boost::uint16_t h;
+    size_t i = cursorRecord();
+    SWF::TextRecord record = _textRecords[i];
+
+    x = record.xOffset();
+    y = record.yOffset() - record.textHeight() + getLeading();
+    h = record.textHeight();
+
+    for (unsigned int p = 0 ; p < (m_cursor - _recordStarts[i]); ++p) {
+        x += record.glyphs()[p].advance;
+    }
 
     const std::vector<point> box = boost::assign::list_of
         (point(x, y))
         (point(x, y + h));
     
     renderer.drawLine(box, rgba(0,0,0,255), mat);
+}
+
+size_t
+TextField::cursorRecord()
+{
+    SWF::TextRecord record;
+    size_t i = 0;
+    if (_textRecords.size() != 0) {
+        while (i < _recordStarts.size() && m_cursor >= _recordStarts[i]) {
+            ++i;
+        }
+        return i-1;
+    }
+    return 0;
 }
 
 void
@@ -550,6 +576,10 @@ TextField::on_event(const event_id& ev)
             size_t manylines = _line_starts.size();
             LineStarts::iterator linestartit = _line_starts.begin();
             LineStarts::const_iterator linestartend = _line_starts.end();
+            size_t cursorrecord = cursorRecord();
+            SWF::TextRecord record = _textRecords[cursorrecord];
+            //std::vector<GlyphEntry>::const_iterator pos_in_record = record.glyphs().begin();
+            //pos_in_record += m_cursor - _recordStarts[cursorRecord];
 
             switch (c)
             {
@@ -565,7 +595,7 @@ TextField::on_event(const event_id& ev)
 
                 case key::DELETEKEY:
                     if (isReadOnly()) return false;
-                    if (s.size() > m_cursor)
+                    if (_glyphcount > m_cursor)
                     {
                         s.erase(m_cursor, 1);
                         setTextValue(s);
@@ -582,7 +612,6 @@ TextField::on_event(const event_id& ev)
                         linestartit++;
                     }
                     m_cursor = cur_cursor;
-                    format_text();
                     break;
                     
                 case key::PGUP:
@@ -594,7 +623,7 @@ TextField::on_event(const event_id& ev)
                         _scroll -= _linesindisplay;
                         m_cursor = _line_starts[_scroll];
                     }
-                    format_text();
+                    scrollLines();
                     break;
                     
                 case key::UP:
@@ -605,26 +634,26 @@ TextField::on_event(const event_id& ev)
                     //if there is no previous line
                     if ( linestartit-_line_starts.begin() - 2 < 0 ) {
                         m_cursor = 0;
-                        format_text();
                         break;
                     }
-                    previouslinesize = _displayRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
+                    previouslinesize = _textRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
                     //if the previous line is smaller
-                    if (m_cursor - cur_cursor > previouslinesize)
+                    if (m_cursor - cur_cursor > previouslinesize) {
                         m_cursor = *(--(--linestartit)) + previouslinesize;
-                    else
+                    } else {
                         m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
-                    if (m_cursor < _line_starts[_scroll] && _line_starts[_scroll] != 0)
+                    }
+                    if (m_cursor < _line_starts[_scroll] && _line_starts[_scroll] != 0) {
                         --_scroll;
-                    format_text();
+                    }
+                    scrollLines();
                     break;
-
+                    
                 case key::END:
                     while ( linestartit < linestartend && *linestartit <= m_cursor ) {
                         linestartit++;
                     }
                     m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
-                    format_text();
                     break;
                     
                 case key::PGDN:
@@ -644,7 +673,7 @@ TextField::on_event(const event_id& ev)
                         _scroll += _linesindisplay;
                         m_cursor = _line_starts[_scroll];
                     }
-                    format_text();
+                    scrollLines();
                     break;
                     
                 case key::DOWN:
@@ -662,32 +691,32 @@ TextField::on_event(const event_id& ev)
                     //if there is no next line
                     if (currentLine >= manylines ) {
                         m_cursor = _text.size();
-                        format_text();
                         break;
                     }
-                    nextlinesize = _displayRecords[currentLine].glyphs().size();
+                    nextlinesize = _textRecords[currentLine].glyphs().size();
                     
                     //if the next line is smaller
                     if (m_cursor - cur_cursor > nextlinesize) {
                         m_cursor = *linestartit + nextlinesize;
-                    }
-                    else { 
+                    } else { 
                         //put the cursor at the same character distance
                         m_cursor = *(linestartit) + (m_cursor - cur_cursor);
                     }
-                    format_text();
+                    if (_line_starts.size() > _linesindisplay &&
+                        m_cursor >= _line_starts[_scroll+_linesindisplay]) {
+                        ++_scroll;
+                    }
+                    scrollLines();
                     break;
                 }
 
                 case key::LEFT:
                     m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
-                    format_text();
                     break;
 
                 case key::RIGHT:
-                    m_cursor = m_cursor < _text.size() ? m_cursor + 1 :
-                                                        _text.size();
-                    format_text();
+                    m_cursor = m_cursor < _glyphcount ? m_cursor + 1 :
+                                                        _glyphcount;
                     break;
                     
                 case key::ENTER:
@@ -701,6 +730,7 @@ TextField::on_event(const event_id& ev)
                             gnash::key::codeMap[c][key::ASCII]);
                     if (t != 0)
                     {
+                        
                         if (!_restrictDefined) {
                             // Insert one copy of the character
                             // at the cursor position.
@@ -724,6 +754,7 @@ TextField::on_event(const event_id& ev)
                     setTextValue(s);
                     break;
             }
+            log_debug("m_cursor is %d", m_cursor);
             onChanged();
         }
 
@@ -1271,8 +1302,11 @@ void
 TextField::format_text()
 {
     _textRecords.clear();
-    _displayRecords.clear();
     _line_starts.clear();
+    _recordStarts.clear();
+    _glyphcount = 0;
+
+    _recordStarts.push_back(0);
     
     // nothing more to do if text is empty
     if ( _text.empty() )
@@ -1373,19 +1407,15 @@ TextField::format_text()
 
     // Start the bbox at the upper-left corner of the first glyph.
     reset_bounding_box(x, y - fontDescent + fontHeight); 
-
-    float leading = getLeading();
-    leading += fontLeading * scale; // not sure this is correct...
     
     int last_code = -1; // only used if _embedFonts
     int last_space_glyph = -1;
     size_t last_line_start_record = 0;
+
+    float leading = getLeading();
+    leading += fontLeading * scale; // not sure this is correct...
     
     _line_starts.push_back(0);
-    _linesindisplay = (defBounds.height() / (fontHeight + leading));
-
-    m_xcursor = x;
-    m_ycursor = y;
     
     // String iterators are very sensitive to 
     // potential changes to the string (to allow for copy-on-write).
@@ -1406,66 +1436,26 @@ TextField::format_text()
     }
 
     // Add the last line to our output.
-    //if (!rec.glyphs().empty()) _textRecords.push_back(rec);
     _textRecords.push_back(rec);
     
-    linestartit = _line_starts.begin();
-    linestartend = _line_starts.end();
-    size_t linestart = 0;
-    size_t manylines = _line_starts.size();
-    size_t manyrecords = _textRecords.size();
-
-    SWF::TextRecord cursorposition_line;
-    while (linestartit != linestartend && *linestartit <= m_cursor) {
-        linestart = *linestartit++;
-    }
-    const size_t current_line = linestartit - _line_starts.begin();
-    changeTopVisibleLine(current_line);
-
-    ///ASSIGN THE VISIBLE LINES TO _displayRecord
-    int yoffset = _scroll*(fontHeight + leading) + PADDING_TWIPS;
-    for (size_t i = 0; i < manyrecords; ++i) {
-        //if the record is in the section we want to show
-        if(_textRecords[i].yOffset() - yoffset < defBounds.height() && 
-            _textRecords[i].yOffset() - yoffset > 0) {
-            _displayRecords.push_back(_textRecords[i]);
-            _displayRecords.back().setYOffset(_displayRecords.back().yOffset() - yoffset);
-        }
-    }
-    ///POSITION THE CURSOR IN X-DIRECTION
-    if ( current_line <= manylines && current_line >= 1) {
-        float lineposition = (current_line * (fontHeight + leading)) + PADDING_TWIPS;
-        for (size_t i = current_line - 1; i < manyrecords && _textRecords[i].yOffset() == lineposition; ++i) {
-            cursorposition_line = _textRecords[i];
-            if (linestart + _textRecords[i].glyphs().size() < m_cursor - _line_starts[current_line-1]) {
-                linestart += _textRecords[i].glyphs().size();
-            }
-        }
-        m_xcursor = cursorposition_line.xOffset();
-        //extra checks keep MemCheck happy!
-        for (size_t i = linestart; i < m_cursor && i-linestart < cursorposition_line.glyphs().size(); ++i) {
-            m_xcursor += cursorposition_line.glyphs()[i-linestart].advance;
-        }
-    }
-    ///POSITION THE CURSOR IN Y-DIRECTION
-    m_ycursor = PADDING_TWIPS - _scroll*(fontHeight + leading);
-    
-    for (size_t i = 0; (i + 1) < current_line; ++i) {
-        m_ycursor += (fontHeight+leading);
-    }
-    
-    float extra_space = align_line(textAlignment, last_line_start_record, x);
-    m_xcursor += static_cast<int>(extra_space);
+    scrollLines();
 
     set_invalidated(); //redraw
 }
 
 void
-TextField::changeTopVisibleLine(size_t current_line)
+TextField::scrollLines()
 {
-    if (_linesindisplay > 0) {
-        const size_t manylines = _line_starts.size();
-        const size_t lastvisibleline = _scroll + _linesindisplay;
+    _displayRecords.clear();
+    boost::uint16_t fontHeight = getFontHeight();
+    float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts);
+    float fontLeading = _font->leading() * scale;
+    _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
+    if (_linesindisplay > 0) { //no need to place lines if we can't fit any
+        float fontDescent = _font->descent() * scale; 
+        size_t manylines = _line_starts.size();
+        size_t lastvisibleline = _scroll + _linesindisplay;
+        size_t line = 0;
 
         // If there aren't as many lines as we have scrolled, display the
         // end of the text.
@@ -1474,27 +1464,43 @@ TextField::changeTopVisibleLine(size_t current_line)
             return;
         }
 
+        // which line is the cursor on?
+        while (line < manylines && _line_starts[line] <= m_cursor) {
+            ++line;
+        }
+
         if (manylines - _scroll <= _linesindisplay) {
+            // This is for if we delete a line
             if (manylines < _linesindisplay) _scroll = 0;
             else {
                 _scroll = manylines - _linesindisplay;
             }
-            return;
-        }
-        
-        if (m_cursor < (_line_starts[_scroll])) {
-            //if we are at a higher position, scoot the lines down
-            _scroll -= _scroll - current_line;
-            return;
-        }
-
-        if (manylines > _scroll + _linesindisplay) {
-            //if we are at a lower position, scoot the lines up
-            if (m_cursor >= (_line_starts[lastvisibleline])) {
-                _scroll += current_line - (lastvisibleline);
+        } else if (line < _scroll) {
+            //if we are at a higher position, scroll the lines down
+            _scroll -= _scroll - line;
+        } else if (manylines > _scroll + _linesindisplay) {
+            //if we are at a lower position, scroll the lines up
+            if (line >= (_scroll+_linesindisplay)) {
+                _scroll += line - (lastvisibleline);
             }
         }
-        return;
+        //offset the lines
+        int yoffset = (fontHeight + fontLeading) + PADDING_TWIPS;
+        size_t recordline;
+        for (size_t i = 0; i < _textRecords.size(); ++i) {
+            recordline = 0;
+            //find the line the record is on
+            while (recordline < manylines && _line_starts[recordline] <= _recordStarts[i]) {
+                ++recordline;
+            }
+            //offset the line
+            _textRecords[i].setYOffset((recordline-_scroll)*yoffset);
+            //add the lines we want to the display record
+            if (_textRecords[i].yOffset() > 0 &&
+                _textRecords[i].yOffset() < _bounds.height()) {
+                _displayRecords.push_back(_textRecords[i]);
+            }
+        }
     }
 }
 
@@ -1513,7 +1519,9 @@ TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
     leading += fontLeading * scale; // not sure this is correct...
     
     // Close out this stretch of glyphs.
+    ++_glyphcount;
     _textRecords.push_back(rec);
+    _recordStarts.push_back(_glyphcount);
     align_line(getTextAlignment(), last_line_start_record, x);
 
     // Expand bounding box to include last column of text ...
@@ -1566,16 +1574,19 @@ TextField::newLine(std::wstring::const_iterator& it, boost::int32_t& x,
         ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
                   
         rec.addGlyph(ge,5);
+        _glyphcount += 5;
                     
         int bullet = rec.getFont()->get_glyph_index(42, _embedFonts);
         ge.index = bullet;
         ge.advance = scale * rec.getFont()->get_advance(bullet, _embedFonts);
         rec.addGlyph(ge);
+        ++_glyphcount;
 
         ge.index = space;
         ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
         
         rec.addGlyph(ge,4);
+        _glyphcount += 4;
     }
 }
 
@@ -1653,6 +1664,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                 {
                     //close out this stretch of glyphs
                     _textRecords.push_back(rec);
+                    rec.clearGlyphs();
+                    _recordStarts.push_back(_glyphcount);
                     if (*it == '/') {
                         while (it != e && *it != '>') {
                             ++it;
@@ -1660,7 +1673,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         ++it;
                         return;
                     }
-                    rec.clearGlyphs();
                     LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
                                          "gnash will just ignore the tags and "
                                          "print their content")));
@@ -1862,7 +1874,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             setRightMargin(originalrightmargin);
                             setTabStops(originaltabstops);
                         } else if (s == "P") {
-                            log_debug("P");
                             //paragraph
                             if (_display == BLOCK)
                             {
@@ -1880,7 +1891,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                         last_space_glyph,
                                         last_line_start_record);
                             }
-                            log_debug("noP");
                         } else if (s == "BR") {
                             //line break
 							newLine(it, x, y, rec, last_space_glyph,
@@ -1914,7 +1924,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     ge.index = bullet;
                     ge.advance = scale * rec.getFont()->get_advance(bullet, 
                         _embedFonts);
-                    rec.addGlyph(ge); 
+                    rec.addGlyph(ge);
+                    ++_glyphcount;
                     break;
                 }
                 // The font table holds up to 65535 glyphs. Casting
@@ -1963,6 +1974,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                 rec.addGlyph(ge);
 
                 x += ge.advance;
+                ++_glyphcount;
             }
         }
 
@@ -2022,6 +2034,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
 
                 // Close out this stretch of glyphs.
                 _textRecords.push_back(rec);
+                ++_glyphcount;
+                _recordStarts.push_back(_glyphcount);
 
                 float previous_x = x;
                 x = std::max(0, getLeftMargin() + getBlockIndent()) + PADDING_TWIPS;
@@ -2105,9 +2119,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             }
         }
     }
-            
 }
-
 
 TextField::VariableRef
 TextField::parseTextVariableRef(const std::string& variableName) const
