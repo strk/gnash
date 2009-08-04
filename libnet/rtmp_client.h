@@ -28,7 +28,7 @@
 #include "rtmp_msg.h"
 #include "amf.h"
 #include "element.h"
-#include "handler.h"
+// #include "handler.h"
 #include "network.h"
 #include "buffer.h"
 #include "dsodefs.h"

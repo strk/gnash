@@ -21,11 +21,13 @@
 #include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
+#include "action.h"
 #include "amf.h"
 #include "element.h"
 #include "sol.h"
@@ -34,7 +36,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
@@ -44,7 +45,7 @@
 #include "URL.h"
 #include "rc.h" // for use of rcfile
 
-#include <boost/tokenizer.hpp>
+#include "NetConnection_as.h"
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -57,6 +58,7 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 using namespace amf;
+using namespace std;
 
 namespace gnash {
 
@@ -74,9 +76,10 @@ namespace {
     as_value sharedobject_getDiskUsage(const fn_call& fn);
     as_value sharedobject_getRemote(const fn_call& fn);
     as_value sharedobject_data(const fn_call& fn);
-
     as_value sharedobject_getLocal(const fn_call& fn);
     as_value sharedobject_ctor(const fn_call& fn);
+    as_value sharedobject_setdirty(const fn_call& fn);
+    as_value sharedobject_setproperty(const fn_call& fn);
 
     as_object* readSOL(VM& vm, const std::string& filespec);
 
@@ -220,16 +223,16 @@ private:
 
 } // anonymous namespace
 
-class SharedObject_as: public as_object 
+class SharedObject_as: public as_object
 {
 public:
 
     ~SharedObject_as();
 
     SharedObject_as()
-        :
-        as_object(getSharedObjectInterface()),
-        _data(0)
+        : as_object(getSharedObjectInterface()),
+          _data(0),
+          _persistance(0)
     { 
     }
 
@@ -278,15 +281,27 @@ public:
         return _data;
     }
 
+    bool getPersistance() { return _persistance; };
+    void setPersistance(bool flag) { _persistance = flag; };
+
+    /// Process the close() method.
+    void close();
+
+    /// Process the connect(uri) method.
+    void connect(NetConnection_as *obj, const std::string& uri);
+
+    NetConnection_as *_netconn;
+
 protected:
 
-    void markReachableResources() const {
-        if (_data) _data->setReachable();
-    }
+#ifdef GNASH_USE_GC
+    void markReachableResources() const;
+#endif
 
 private:
 
-    as_object* _data;
+    as_object   *_data;
+    bool        _persistance;
 
     SOL _sol;
 };
@@ -403,11 +418,26 @@ SharedObject_as::flush(int space) const
     return true;
 }
 
+/// Process the close() method.
+void
+SharedObject_as::close()
+{
+}
+
+/// Process the connect(uri) method.
+void
+SharedObject_as::connect(NetConnection_as */* obj */, const std::string& /* uri */)
+{
+    GNASH_REPORT_FUNCTION;
+   
+}
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
     _vm(vm)
 {
+    GNASH_REPORT_FUNCTION;
+
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
         log_debug("Empty SOLSafeDir directive: we'll use '/tmp'");
@@ -466,6 +496,15 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
 
 }
 
+#ifdef GNASH_USE_GC
+void
+SharedObject_as::markReachableResources() const
+{
+    if (_data) _data->setReachable();
+}
+#endif // GNASH_USE_GC
+
+#ifdef GNASH_USE_GC
 void
 SharedObjectLibrary::markReachableResources() const
 {
@@ -476,6 +515,7 @@ SharedObjectLibrary::markReachableResources() const
         sh->setReachable();
     }
 }
+#endif
 
 /// The SharedObjectLibrary keeps all known SharedObjects alive. They must
 /// be flushed on clear(). This is called at the latest by the dtor, which
@@ -604,6 +644,65 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     return obj;
 }
 
+SharedObject_as*
+SharedObjectLibrary::getRemote(const std::string& objName,
+                               const std::string& uri,
+                               const std::string& persistance)
+{
+    GNASH_REPORT_FUNCTION;
+
+    assert (!objName.empty());
+
+    // Check that the name is valid; if not, return null
+    if (!validateName(objName)) {
+        return 0;
+    }
+
+    // The 'root' argument, otherwise known as localPath, specifies where
+    // in the SWF path the SOL should be stored. It cannot be outside this
+    // path.
+    std::string requestedPath;
+    std::ostringstream solPath;
+    URL url(uri);
+    
+    const std::string& key = url.path();
+
+    // If the shared object was already opened, use it.
+    SoLib::iterator it = _soLib.find(key);
+    if (it != _soLib.end()) {
+        log_debug("SharedObject %s already known, returning it", key);
+        return it->second;
+    } else {
+        log_debug("SharedObject %s not loaded. Loading it now", key);
+    }
+
+    // Otherwise create a new one and register to the lib
+    SharedObject_as* obj = new SharedObject_as;
+    _soLib[key] = obj;
+
+    obj->setObjectName(objName);
+
+    // Not persistance on either the client or the server
+    if (persistance == "false") {
+        obj->setPersistance(false);
+    }
+    // Persistance only on the server
+    if (persistance == "true") {
+        obj->setPersistance(true);
+    }
+    
+    boost::intrusive_ptr<as_object> data;
+    if (persistance[0] == '/') {
+        obj->setPersistance(true);
+        boost::intrusive_ptr<as_object> localdata = getLocal(objName, url.path());
+        if (localdata) {
+            obj->setData(localdata.get());
+        }
+    }
+
+    return obj;
+}
+
 void
 sharedobject_class_init(as_object& where, const ObjectURI& uri)
 {
@@ -627,13 +726,13 @@ registerSharedObjectNative(as_object& o)
     VM& vm = getVM(o);
 
     // ASnative table registration
-	vm.registerNative(sharedobject_connect, 2106, 0);
-	vm.registerNative(sharedobject_send, 2106, 1);
-	vm.registerNative(sharedobject_flush, 2106, 2);
-	vm.registerNative(sharedobject_close, 2106, 3);
-	vm.registerNative(sharedobject_getsize, 2106, 4);
-	vm.registerNative(sharedobject_setFps, 2106, 5);
-	vm.registerNative(sharedobject_clear, 2106, 6);
+    vm.registerNative(sharedobject_connect, 2106, 0);
+    vm.registerNative(sharedobject_send, 2106, 1);
+    vm.registerNative(sharedobject_flush, 2106, 2);
+    vm.registerNative(sharedobject_close, 2106, 3);
+    vm.registerNative(sharedobject_getsize, 2106, 4);
+    vm.registerNative(sharedobject_setFps, 2106, 5);
+    vm.registerNative(sharedobject_clear, 2106, 6);
 
     // FIXME: getRemote and getLocal use both these methods,
     // but aren't identical with either of them.
@@ -641,13 +740,15 @@ registerSharedObjectNative(as_object& o)
     // SharedObject or null. The second takes a new SharedObject as
     // its first argument and populates its data member (more or less
     // like readSOL). This is only important for ASNative compatibility.
-	vm.registerNative(sharedobject_getLocal, 2106, 202);
-	vm.registerNative(sharedobject_getRemote, 2106, 203);
-	vm.registerNative(sharedobject_getLocal, 2106, 204);
-	vm.registerNative(sharedobject_getRemote, 2106, 205);
-
-	vm.registerNative(sharedobject_deleteAll, 2106, 206);
-	vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
+    vm.registerNative(sharedobject_getLocal, 2106, 202);
+    vm.registerNative(sharedobject_getRemote, 2106, 203);
+    vm.registerNative(sharedobject_getLocal, 2106, 204);
+    vm.registerNative(sharedobject_getRemote, 2106, 205);
+    
+    vm.registerNative(sharedobject_deleteAll, 2106, 206);
+    vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
+    vm.registerNative(sharedobject_setdirty, 2106, 208);
+    vm.registerNative(sharedobject_setproperty, 2106, 209);
 }
 
 
@@ -672,6 +773,8 @@ attachSharedObjectInterface(as_object& o)
     o.init_member("setFps", vm.getNative(2106, 5), flags);
     o.init_member("clear", vm.getNative(2106, 6), flags);
 
+    o.init_member("setDirty", vm.getNative(2106, 7), flags);
+    o.init_member("setProperty", vm.getNative(2106, 8), flags);
 }
 
 
@@ -721,13 +824,74 @@ sharedobject_clear(const fn_call& fn)
 }
 
 as_value
-sharedobject_connect(const fn_call& fn)
+sharedobject_setdirty(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
+    boost::intrusive_ptr<SharedObject_as> obj = 
         ensureType<SharedObject_as>(fn.this_ptr);
     UNUSED(obj);
+    
+    LOG_ONCE(log_unimpl (__FUNCTION__));
 
-    LOG_ONCE(log_unimpl("SharedObject.connect"));
+    return as_value();
+}
+
+as_value
+sharedobject_setproperty(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;    
+    boost::intrusive_ptr<SharedObject_as> obj = 
+        ensureType<SharedObject_as>(fn.this_ptr);
+    UNUSED(obj);
+    
+    LOG_ONCE(log_unimpl (__FUNCTION__));
+
+    return as_value();
+}
+
+as_value
+sharedobject_connect(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;    
+
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
+
+    if (fn.nargs < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("SharedObject.connect(): needs at least "
+                    "one argument"));
+        );
+        return as_value();
+    }
+
+    // Although the ActionScript spec says connect() takes two
+    // arguments, the HAXE implementation only supports one.
+    // So we have to make sure the NetCnnection object we get
+    // passed is already had the URI specified to connect to.
+    if (fn.nargs > 1) {
+	const as_value& uri = fn.arg(1);
+	const VM& vm = getVM(fn);
+	const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+    }
+    
+    boost::intrusive_ptr<NetConnection_as> nc =
+	boost::dynamic_pointer_cast<NetConnection_as>(						     fn.arg(0).to_object(*getGlobal(fn)));
+
+    // This is always set without validification.fooc->setURI(uriStr);
+
+    // Check first arg for validity 
+    if (getSWFVersion(fn) > 6) {
+        nc->connect();
+    } else {
+        if (fn.nargs > 0) {
+            std::stringstream ss; fn.dump_args(ss);
+            log_unimpl("SharedObject.connect(%s): args after the first are "
+                    "not supported", ss.str());
+        }
+//         nc->connect(uriStr);
+        nc->connect();
+    }
+    
     return as_value();
 }
 
@@ -736,9 +900,9 @@ sharedobject_close(const fn_call& fn)
 {
     boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.close"));
+    obj->close();
+
     return as_value();
 }
 
@@ -799,7 +963,6 @@ sharedobject_flush(const fn_call& fn)
 as_value
 sharedobject_getLocal(const fn_call& fn)
 {
-
     int swfVersion = getSWFVersion(fn);
 
     as_value objNameVal;
@@ -839,13 +1002,48 @@ sharedobject_getLocal(const fn_call& fn)
 as_value
 sharedobject_getRemote(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    GNASH_REPORT_FUNCTION;
 
-    UNUSED(obj);
+    int swfVersion = getSWFVersion(fn);
+    as_value objNameVal;
 
-    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
-    return as_value();
+    if (fn.nargs > 0) {
+        objNameVal = fn.arg(0);
+    }
+    
+    std::string objName = objNameVal.to_string_versioned(swfVersion);
+    if (objName.empty()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("SharedObject.getRemote(%s): %s", 
+                _("missing object name"));
+        );
+        as_value ret;
+        ret.set_null();
+        return ret;
+    }
+
+    std::string root;
+    std::string persistance;
+    if (fn.nargs > 1) {
+        root = fn.arg(1).to_string_versioned(swfVersion);
+        persistance = fn.arg(2).to_string_versioned(swfVersion);
+    }
+
+    log_debug("SO name:%s, root:%s, persitance: %s", objName, root, persistance);
+
+    VM& vm = getVM(fn);
+
+    SharedObject_as* obj = vm.getSharedObjectLibrary().getRemote(objName, root, persistance);
+
+    as_value ret(obj);
+    log_debug("SharedObject.getRemote returning %s", ret);
+    
+//     string_table::key methodKey = NSV::PROP_ON_STATUS;
+//     callMethod(methodKey, as_value());
+    
+    return ret;
 }
 
 
@@ -870,6 +1068,7 @@ sharedobject_deleteAll(const fn_call& fn)
 as_value
 sharedobject_getDiskUsage(const fn_call& fn)
 {
+ //    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
 
@@ -882,7 +1081,8 @@ sharedobject_getDiskUsage(const fn_call& fn)
 
 as_value
 sharedobject_data(const fn_call& fn)
-{
+{ 
+//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
     return as_value(obj->data());
@@ -934,28 +1134,25 @@ readSOL(VM& vm, const std::string& filespec)
 
     struct stat st;
 
-    if (stat(filespec.c_str(), &st) != 0)
-    {
+    if (stat(filespec.c_str(), &st) != 0) {
         // No existing SOL file. A new one will be created.
         log_debug("No existing SOL %s found. Will create on flush/exit.",
-                filespec);
+		  filespec);
         return data;
     }
 
-    if (st.st_size < 28)
-    {
+    if (st.st_size < 28) {
         // A SOL file exists, but it was invalid. Count it as not existing.
         log_error("SharedObject::readSOL: SOL file %s is too short "
-                "(only %s bytes long) to be valid.", filespec, st.st_size);
+		  "(only %s bytes long) to be valid.", filespec, st.st_size);
         return data;
     }
-
+    
     boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
     const boost::uint8_t *buf = sbuf.get();
     const boost::uint8_t *end = buf + st.st_size;
 
-    try
-    {
+    try {
         std::ifstream ifs(filespec.c_str(), std::ios::binary);
         ifs.read(reinterpret_cast<char*>(sbuf.get()), st.st_size);
 
@@ -969,8 +1166,7 @@ readSOL(VM& vm, const std::string& filespec)
         
         buf += 4; // skip past padding
 
-        if (buf >= end)
-        {
+        if (buf >= end) {
             // In this case there is no data member.
             log_error("SharedObject::readSOL: file ends before data segment");
             return data;
@@ -978,8 +1174,7 @@ readSOL(VM& vm, const std::string& filespec)
 
         std::vector<as_object*> objRefs;
 
-        while (buf < end)
-        {
+        while (buf < end) {
             log_debug("SharedObject::readSOL: reading property name at "
                     "byte %s", buf - sbuf.get());
             // read property name
@@ -987,8 +1182,7 @@ readSOL(VM& vm, const std::string& filespec)
                 ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
             buf += 2;
 
-            if( buf + len >= end )
-            {
+            if( buf + len >= end ) {
                 log_error("SharedObject::readSOL: premature end of input");
                 break;
             }
@@ -1018,10 +1212,10 @@ readSOL(VM& vm, const std::string& filespec)
         }
         return data;
     }
-    catch (std::exception& e)
-    {
+
+    catch (std::exception& e) {
         log_error("SharedObject::readSOL: Reading SharedObject %s: %s", 
-                filespec, e.what());
+		  filespec, e.what());
         return 0;
     }
 
@@ -1107,6 +1301,7 @@ readSOL(VM& vm, const std::string& filespec)
 void
 flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
+//    GNASH_REPORT_FUNCTION;
     sol.second->flush();
 }
 

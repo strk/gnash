@@ -89,6 +89,7 @@ const short RTMPE_PORT  = 1935;
 const short RTMPT_PORT  = HTTP_PORT;
 const short RTMPTE_PORT = HTTP_PORT;
 const short RTMPTS_PORT = SSL_PORT;
+const short CGIBIN_PORT = 1234;
 
 #ifdef __OS2__
  typedef int    socklen_t;

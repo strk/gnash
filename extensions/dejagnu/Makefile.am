@@ -23,12 +23,12 @@ pluginsdir = $(libdir)/gnash/plugins
 plugins_LTLIBRARIES = dejagnu.la
 
 INCLUDES =  \
-            -I$(top_srcdir)/libbase \
-            -I$(top_srcdir)/libcore \
-            -I$(top_srcdir)/libcore/swf \
-            -I$(top_srcdir)/libcore/vm \
-	    -I$(top_srcdir)/libcore/asobj \
-	    $(INCLTDL)
+	-I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/swf \
+        -I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj \
+	$(INCLTDL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \

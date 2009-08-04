@@ -34,7 +34,7 @@
 #include "amf.h"
 #include "cque.h"
 #include "rtmp.h"
-#include "handler.h"
+//#include "handler.h"
 #include "network.h"
 #include "buffer.h"
 #include "diskstream.h"
@@ -127,7 +127,7 @@ public:
 	int minor;
     } http_version_t;
     HTTP();
-    HTTP(Handler *hand);
+//     HTTP(Handler *hand);
     ~HTTP();
 
     // Check the Header fields to make sure they're valid values.
@@ -289,7 +289,7 @@ public:
 	{ return _status_codes; }
     http_version_t *getVersion() { return &_version; }
     
-    void setHandler(Handler *hand) { _handler = hand; };
+//     void setHandler(Handler *hand) { _handler = hand; };
     void setDocRoot(const std::string &path) { _docroot = path; };
     std::string &getDocRoot() { return _docroot; };
     
@@ -327,7 +327,7 @@ protected:
     
     // Connection parameters we care about
     bool		_keepalive;
-    Handler		*_handler;
+//     Handler		*_handler;
     // These two field hold the data from an RTMPT message
     int			_clientid;
     int			_index;

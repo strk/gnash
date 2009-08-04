@@ -461,6 +461,26 @@ SOL::readFile(const std::string &filespec)
     
 }
 
+bool 
+SOL::updateSO(boost::shared_ptr<amf::Element> &newel)
+{
+//    GNASH_REPORT_FUNCTION;
+    vector<boost::shared_ptr<amf::Element> >::iterator ita; 
+    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
+        boost::shared_ptr<amf::Element> oldel = (*(ita));
+	if (oldel == newel) {
+	    oldel = newel;
+	}
+   }
+}
+
+bool
+SOL::updateSO(int index, boost::shared_ptr<amf::Element> &el)
+{
+//    GNASH_REPORT_FUNCTION;
+    _amfobjs[index] = el;    
+}
+
 ///  \brief Dump the internal data of this class in a human readable form.
 ///
 /// @remarks This should only be used for debugging purposes.

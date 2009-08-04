@@ -22,10 +22,14 @@
 #include <string>
 #include <map>
 
+#include "NetConnection_as.h"
+
 // Forward declarations
 namespace gnash {
     class as_object;
-class ObjectURI;
+    class Network;
+//     class NetConnection_as;
+    class ObjectURI;
     class SharedObject_as;
     class VM;
 }
@@ -36,7 +40,7 @@ class SharedObjectLibrary
 {
 public:
 
-    typedef std::map<std::string, SharedObject_as*> SoLib;
+    typedef std::map<std::string, SharedObject_as *> SoLib;
 
     SharedObjectLibrary(VM& vm);
 
@@ -47,6 +51,14 @@ public:
     /// May return NULL if name is invalid or can't access the given root
     ///
     SharedObject_as* getLocal(const std::string& name, const std::string& root);
+
+    /// Return a remote shared object with given name
+    ///
+    /// @param persistance false
+    /// May return NULL if name is invalid or can't access the given root
+    ///
+    SharedObject_as* getRemote(const std::string& name, const std::string& uri,
+	const std::string& persistance);
 
     void markReachableResources() const;
 
@@ -64,9 +76,8 @@ private:
     std::string _basePath;
 
     /// Base SOL dir
-    std::string _solSafeDir; 
-
-    SoLib _soLib;
+    std::string _solSafeDir;
+    SoLib	_soLib;
 };
 
 /// Initialize the global SharedObject class
