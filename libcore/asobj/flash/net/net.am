@@ -55,7 +55,7 @@ endif
 
 if BUILD_NETCONNECTION_AS3
 # NET_SOURCES += asobj/flash/net/NetConnection_as.cpp
-NET_HEADERS += asobj/flash/net/NetConnection_as.h
+#NET_HEADERS += asobj/flash/net/NetConnection_as.h
 endif
 
 if BUILD_NETSTREAM_AS3
@@ -78,7 +78,6 @@ NET_SOURCES += asobj/flash/net/SharedObjectFlushStatus_as.cpp
 NET_HEADERS += asobj/flash/net/SharedObjectFlushStatus_as.h
 endif
 
-FIXME: already exists
 if BUILD_SHAREDOBJECT_AS3
 NET_SOURCES += asobj/flash/net/SharedObject_as.cpp
 NET_HEADERS += asobj/flash/net/SharedObject_as.h
