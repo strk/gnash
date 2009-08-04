@@ -20,37 +20,44 @@ AUTOMAKE_OPTIONS =
 # this is where Gnash plugins get installed
 cgidir = $(libdir)/gnash/cygnal
 
-bin_PROGRAMS = echo gateway
+bin_PROGRAMS = echo # gateway
+
+# this is where Gnash plugins get installed
+pluginsdir = $(libdir)/cygnal/plugins
+
+plugins_LTLIBRARIES = gateway.la
 
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(PTHREAD_LIBS) \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_LIBS) \
 	$(NULL)
 
 INCLUDES = \
-            -I$(top_srcdir)/libbase \
-	    -I$(top_srcdir)/libamf \
-	    -I$(top_srcdir)/libnet \
-	    -I$(top_srcdir)/libcore \
-	    -I$(top_srcdir)/cygnal \
-	    $(BOOST_CFLAGS)
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/cygnal \
+	$(BOOST_CFLAGS)
 
 echo_SOURCES = echo.cpp echo.h
-echo_LDFLAGS = # -module -avoid-version -no-undefined
 echo_LDADD =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
-gateway_SOURCES = gateway.cpp echo.h 
-gateway_LDFLAGS = # -module -avoid-version -no-undefined
-gateway_LDADD = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
+# gateway_SOURCES = gateway.cpp echo.h 
+# gateway_LDADD = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
+gateway_la_SOURCES = gateway.cpp gateway.h 
+gateway_la_CPPFLAGS = -DPLUGIN
+gateway_la_LDFLAGS = -module -avoid-version -no-undefined
+gateway_la_LIBADD = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
 CLEANFILES = \
       gnash-dbg.log
 
-# install-cgiLTLIBRARIES: $(cgi_LTLIBRARIES)
-# 	test -d "$(DESTDIR)$(cgidir)" || $(mkinstalldirs) "$(DESTDIR)$(cgidir)"
-# 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(cgi_LTLIBRARIES) "$(DESTDIR)$(cgidir)/$(cgi_LTLIBRARIES)"
-# 	$(RM) $(DESTDIR)$(cgidir)/*.a 
+install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
+	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugins_LTLIBRARIES) "$(DESTDIR)$(pluginsdir)/$(plugins_LTLIBRARIES)"
+	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
