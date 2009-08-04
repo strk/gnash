@@ -270,7 +270,7 @@ public:
     void multiline(bool b) {
         _multiline = b;
     }
-
+	
     /// Get the current password setting of the TextField
     bool password() const {
         return _password;
@@ -705,7 +705,8 @@ private:
 	std::set<wchar_t> _restrictedchars;
 	TextFormatDisplay _display;
 	std::vector<int> _tabStops;
-
+	
+	boost::int32_t _numChars;
 	boost::int16_t _leading;
 
 	TextAlignment _alignment;

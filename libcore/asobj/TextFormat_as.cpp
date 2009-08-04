@@ -124,27 +124,11 @@ TextFormat_as::registerNative(as_object& o)
 TextFormat_as::TextFormat_as()
 	:
 	as_object(getTextFormatInterface()),
-	//~ _flags(0),
-	//~ _underline(false),
-	//~ _bold(false),
-	//~ _italic(false),
-	//~ _display(),
-	//~ _bullet(false),
-	//~ _align(TextField::ALIGN_LEFT),
-	//~ _blockIndent(-1),
-	//~ _color(),
-	//~ _indent(-1),
-	//~ _leading(-1),
-	//~ _leftMargin(-1),
-	//~ _rightMargin(-1),
-	//~ _pointSize(-1),
-	//~ _tabStops(),
-	//~ _target(),
-	//~ _url()
 	
 	_flags(0),
 	_underline(false),
 	_bold(false),
+	_display(),
 	_italic(false),
 	_bullet(false),
 	_align(TextField::ALIGN_LEFT),
@@ -156,7 +140,8 @@ TextFormat_as::TextFormat_as()
 	_rightMargin(-1),
 	_pointSize(-1),
 	_tabStops(),
-	_target()
+	_target(),
+	_url()
 {
     Global_as* gl = getGlobal(*this);
 	init_member("getTextExtent", gl->createFunction(textformat_getTextExtent));
