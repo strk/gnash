@@ -179,6 +179,9 @@ public:
     ///		in the .sol file.
     const std::string &getObjectName() const { return _objname; };
         
+    bool updateSO(boost::shared_ptr<amf::Element> &el);
+    bool updateSO(int index, boost::shared_ptr<amf::Element> &el);
+    
     ///  \brief Dump the internal data of this class in a human readable form.
     ///
     /// @remarks This should only be used for debugging purposes.
@@ -201,13 +204,15 @@ public:
     ///		The full path and name of the .sol file.
     std::string      _filespec;
 
+    /// \var SOL::_filesize
+    ///		The size of the .sol file.
+    int              _filesize;
+
+ protected:
     /// \var SOL::_amfobjs
     ///		The array of elements in this SharedObject.
     std::vector<boost::shared_ptr<Element> > _amfobjs;
     
-    /// \var SOL::_filesize
-    ///		The size of the .sol file.
-    int              _filesize;
   };
 
  
