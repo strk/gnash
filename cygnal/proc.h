@@ -60,13 +60,13 @@ public:
     // This stop the process
     bool stopCGI (void);
     bool stopCGI (const std::string &filespec);
+
 private:
     std::map<std::string, bool> _output;
     std::map<std::string, int>  _pids;
     std::map<std::string, int>  _cons;
-    std::string                 _docroot;
-    
-    boost::mutex	_mutex;
+    std::string                 _docroot;    
+    boost::mutex		_mutex;
 };
 
 } // end of cygnal namespace
