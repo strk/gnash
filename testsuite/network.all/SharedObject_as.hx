@@ -71,7 +71,7 @@ class SharedObject_as {
 	
 	var nc:NetConnection = new NetConnection();
 	// The Adobe flash player only supports remoting with RTMP
-	rtmpuri = "rtmp://"+hostname+":"+rtmptport+"/fitcDemo";
+	rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/fitcDemo";
 	
 #if flash9
         var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, true);
@@ -87,7 +87,7 @@ class SharedObject_as {
 
 // 	var ns:NetStream = new NetStream(nc);
 #if flash9
-	nc.addEventListener(NetStatusEvent.NET_STATUS, ncOnStatus);
+//	nc.addEventListener(NetStatusEvent.NET_STATUS, ncOnStatus);
 #else
 	nc.setID = function(id) {
 	    DejaGnu.note("Got a setID() from "+rtmpuri);
@@ -102,93 +102,25 @@ class SharedObject_as {
 	    DejaGnu.note("Got onSync from "+rtmpuri);
 	    DejaGnu.note(list[0].code);
 	};
-
 //  	    DejaGnu.note(e.code);
 //  	    DejaGnu.note(e.description);
 #end
-//	nc.connect(rtmpuri, "test");
-	x1.connect(nc);
+  	x1.connect(nc);
+
+// 	Reflect.callMethod(x1, Reflect.field(x1, "connect"), []);
 	DejaGnu.note("Connecting to "+rtmpuri);
 
+	x1.send("sharedobjecttest", "Hello World");
 
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
 #if flash9
- 	if (Std.is(x1.client, Dynamic)) {
- 	    DejaGnu.pass("SharedObject.client property exists");
- 	} else {
- 	    DejaGnu.fail("SharedObject.client property doesn't exist");
- 	}
-	if (Type.typeof(x1.objectEncoding) == ValueType.TInt) {
-	    DejaGnu.pass("SharedObject.objectEncoding property exists");
-	} else {
-	    DejaGnu.fail("SharedObject.objectEncoding property doesn't exist");
-	}
-	if (Type.typeof(x1.size) == ValueType.TInt) {
-	    DejaGnu.pass("SharedObject.size property exists");
-	} else {
-	    DejaGnu.fail("SharedObject.size property doesn't exist");
-	}
-	if (Type.typeof(SharedObject.defaultObjectEncoding) == ValueType.TInt) {
-	    DejaGnu.pass("SharedObject.defaultObjectEncoding property exists");
-	} else {
-	    DejaGnu.fail("SharedObject.defaultObjectEncoding property doesn't exist");
-	}
+	x1.setDirty("data");
+
+	x1.setProperty("data", nc);
 #end
- 	if (Std.is(x1.data, Dynamic)) {
- 	    DejaGnu.pass("SharedObject.data property exists");
- 	} else {
- 	    DejaGnu.fail("SharedObject.data property doesn't exist");
- 	}
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (Type.typeof(x1.close) == ValueType.TFunction) {
-	    DejaGnu.pass("SharedObject::close() method exists");
-	} else {
-	    DejaGnu.fail("SharedObject::close() method doesn't exist");
-	}
-	if (Type.typeof(x1.connect) == ValueType.TFunction) {
-	    DejaGnu.pass("SharedObject::connect() method exists");
-	} else {
-	    DejaGnu.fail("SharedObject::connect() method doesn't exist");
-	}
-#if flash9
-	if (Type.typeof(x1.setDirty) == ValueType.TFunction) {
-	    DejaGnu.pass("SharedObject::setDirty() method exists");
-	} else {
-	    DejaGnu.fail("SharedObject::setDirty() method doesn't exist");
-	}
-	if (Type.typeof(x1.setProperty) == ValueType.TFunction) {
-	    DejaGnu.pass("SharedObject::setProperty() method exists");
-	} else {
-	    DejaGnu.fail("SharedObject::setProperty() method doesn't exist");
-	}
-#end
- 	if (Type.typeof(SharedObject.getRemote) == ValueType.TFunction) {
- 	    DejaGnu.pass("SharedObject::getRemote() method exists");
- 	} else {
- 	    DejaGnu.fail("SharedObject::getRemote() method doesn't exist");
- 	}
 
 // Call this after finishing all tests. It prints out the totals.
     DejaGnu.done();
     }
-
-#if flash9
-    public static function ncOnStatus(evt:NetStatusEvent):Void {
-	DejaGnu.note("Got NC onStatus from "+rtmpuri);
-//	DejaGnu.note(evt.info.code);//"NetConnection.Connect.Success" or
-// 	    "NetStream.Publish.Start" etc.
-// 		if( e.info.code == "NetConnection.Connect.Success")
-// 		    {
-// 			ns = new NetStream(nc);
-// 			ns.client=this;
-//	    ns.addEventListener(NetStatusEvent.NET_STATUS, onStatus);
-// 		    }
-	}
-#end
     
 }
 
