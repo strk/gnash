@@ -78,7 +78,8 @@ noinst_HEADERS = \
 	http_server.h \
 	handler.h \
 	proc.h \
-	crc.h
+	crc.h \
+	serverSO.h
 
 bin_PROGRAMS = cygnal
 noinst_LTLIBRARIES = libcygnal.la
@@ -92,7 +93,8 @@ libcygnal_la_SOURCES = \
 	rtmp_server.cpp \
 	http_server.cpp \
 	proc.cpp \
-	handler.cpp
+	handler.cpp \
+	serverSO.cpp
 
 libcygnal_la_LIBADD = 
 
