@@ -330,7 +330,7 @@ TextField::cursorRecord()
     SWF::TextRecord record;
     size_t i = 0;
     if (_textRecords.size() != 0) {
-        while (i < _recordStarts.size() && m_cursor >= _recordStarts[i]) {
+        while (i < _textRecords.size() && m_cursor >= _recordStarts[i]) {
             ++i;
         }
         return i-1;
@@ -765,7 +765,6 @@ TextField::on_event(const event_id& ev)
                     setTextValue(s);
                     break;
             }
-            log_debug("m_cursor is %d", m_cursor);
             onChanged();
         }
 
@@ -1445,9 +1444,7 @@ TextField::format_text()
     }
 
     // Add the last line to our output.
-    if (!rec.glyphs().empty()) {
         _textRecords.push_back(rec);
-    }
     
     scrollLines();
 
@@ -2067,8 +2064,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
 
                 // Close out this stretch of glyphs.
                 _textRecords.push_back(rec);
-                ++_glyphcount;
-                _recordStarts.push_back(_glyphcount);
 
                 float previous_x = x;
                 x = std::max(0, getLeftMargin() + getBlockIndent()) + PADDING_TWIPS;
@@ -2108,6 +2103,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             linestartit++;
                         }
                         _line_starts.insert(linestartit, currentPos);
+                        _recordStarts.push_back(currentPos);
                     }
                 } else {
                     // Move the previous word down onto the next line.
@@ -2136,6 +2132,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         ++linestartit;
                     }
                     _line_starts.insert(linestartit, linestartpos);
+                    _recordStarts.push_back(linestartpos);
                 }
 
                 align_line(getTextAlignment(), last_line_start_record, previous_x);
