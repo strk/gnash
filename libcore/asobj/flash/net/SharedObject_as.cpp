@@ -289,8 +289,8 @@ public:
     /// Process the connect(uri) method.
     void connect(NetConnection_as *obj, const std::string& uri);
 
-    void setNetConnection(Network *x) { _nc.reset(x); }
-    Network *getNetConnection() { return _nc.get(); }
+    void setURI(const std::string &url) { _uri = url; }
+    std::string &getURI() { return _uri; }
 
     bool isConnected() { return _connected; };
     void isConnected(bool x) { _connected = x; };
@@ -306,8 +306,7 @@ private:
     bool        _persistance;
     SOL		_sol;
     bool	_connected;
-//     boost::intrusive_ptr<NetConnection_as> _nc;
-    boost::scoped_ptr<Network> _nc;
+    std::string	_uri;
 };
 
 
@@ -874,21 +873,21 @@ sharedobject_connect(const fn_call& fn)
     if (fn.nargs > 1) {
 	const as_value& uri = fn.arg(1);
 	const VM& vm = getVM(fn);
-	const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+ 	const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
     }
     
     boost::intrusive_ptr<NetConnection_as> nc =
 	boost::dynamic_pointer_cast<NetConnection_as>(						     fn.arg(0).to_object(*getGlobal(fn)));
 
     // This is always set without validification.fooc->setURI(uriStr);
+    string str = nc->getURI();
+    obj->setPath(str);
     URL uri = nc->getURI();
     Network *net = new Network;
 
     net->setProtocol(uri.protocol());
     net->setHost(uri.hostname());
     net->setPort(strtol(uri.port().c_str(), NULL, 0) & 0xffff);
-
-    obj->setNetConnection(net);
 
     // Check first arg for validity 
     if (getSWFVersion(fn) > 6) {
@@ -936,10 +935,8 @@ sharedobject_send(const fn_call& fn)
         ensureType<SharedObject_as>(fn.this_ptr);
 
     if (obj->isConnected() == false) {
-	obj->createClient();
-	obj->isConnected(true);
+	obj->connectToServer(this->getURI());
     }
-
     
     return as_value();
 }
