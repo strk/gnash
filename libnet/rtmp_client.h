@@ -32,6 +32,7 @@
 #include "network.h"
 #include "buffer.h"
 #include "dsodefs.h"
+#include "URL.h"
 
 namespace gnash
 {
@@ -50,9 +51,13 @@ public:
     
     // These are used for creating the primary objects
     // Create the initial object sent to the server, which is NetConnection::connect()
-    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
-                                   double audioCodecs, double videoCodecs, double videoFunction,
-                                   const char *pageUrl);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeConnect(const char *uri);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeConnect(const char *uri, double audioCodecs, double videoCodecs,
+		   double videoFunction);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeConnect(const char *app,
+		   const char *swfUrl, const char *tcUrl,
+                   double audioCodecs, double videoCodecs, double videoFunction,
+                    const char *pageUrl);
     // Create the second object sent to the server, which is NetStream():;NetStream()
     DSOEXPORT boost::shared_ptr<amf::Buffer> encodeStream(double id);
     boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag);

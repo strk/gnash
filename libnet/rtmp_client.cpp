@@ -41,6 +41,7 @@
 #include "utility.h"
 #include "buffer.h"
 #include "GnashSleep.h"
+#include "URL.h"
 
 using namespace gnash;
 using namespace std;
@@ -80,11 +81,139 @@ RTMPClient::~RTMPClient()
 // Make the NetConnection object that is used to connect to the
 // server.
 boost::shared_ptr<Buffer> 
+RTMPClient::encodeConnect(const char *uri)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    return encodeConnect(uri, RTMPClient::DEFAULT_AUDIO_SET,
+			 RTMPClient::DEFAULT_VIDEO_SET,
+			 RTMPClient::SEEK);
+}
+
+boost::shared_ptr<Buffer> 
+RTMPClient::encodeConnect(const char *uri,
+			  double audioCodecs, double videoCodecs,
+			  double videoFunction)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    URL url(uri);
+    string portstr;
+
+    short port = 0;
+    string protocol;		// the network protocol, rtmp or http
+    string query;		// any queries for the host
+    string app;			// the application name
+    string path;		// the path to the file on the server
+    string tcUrl;		// the tcUrl field
+    string swfUrl;		// the swfUrl field
+    string filename;		// the filename to play
+    string pageUrl;		// the pageUrl field
+    string hostname;		// the hostname of the server
+
+
+    protocol = url.protocol();
+    hostname = url.hostname();
+    log_debug("hostname: %s", hostname);
+    portstr = url.port();
+    query = url.querystring();
+
+    if (portstr.empty()) {
+        if ((protocol == "http") || (protocol == "rtmpt")) {
+            port = RTMPT_PORT;
+        }
+        if (protocol == "rtmp") {
+            port = RTMP_PORT;
+        }
+    } else {
+        port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
+    }
+
+
+    if (path.empty()) {
+        path = url.path();
+    }
+
+    if (filename.empty()) {
+        string::size_type end = path.rfind('/');
+        if (end != string::npos) {
+            filename = path.substr(end + 1);
+        }
+    }
+    
+    
+    if (tcUrl.empty()) {
+        tcUrl = protocol + "://" + hostname;
+        if (!portstr.empty()) {
+            tcUrl += ":" + portstr;
+        }
+        if (!query.empty()) {
+            tcUrl += "/" + query;
+        } else {
+            tcUrl += "/" + path;
+        }
+    }
+    
+    if (app.empty()) {
+	
+        // Get the application name
+        // rtmp://localhost/application/resource
+        //                  ^^^^^^^^^^^ <-- appname is this
+        //
+        app = path;
+	if (! filename.empty()) {
+        	string::size_type end = app.rfind(filename);
+		if (end != string::npos) {
+		    app = app.substr(0, end);
+		}
+	}
+
+	// drop slashes
+        string::size_type end = app.find_first_not_of('/');
+	if (end != string::npos) {
+	    app = app.substr(end);
+	}
+        end = app.find_last_not_of('/');
+	if (end != string::npos) {
+	    app = app.substr(0, end+1);
+	}
+        
+        if (!query.empty()) {
+            app = path;
+            app += "?" + query;
+        }
+    }
+
+    if (swfUrl.empty()) {
+        swfUrl = "mediaplayer.swf";
+    }
+    if (pageUrl.empty()) {
+        pageUrl = "http://gnashdev.org";
+    }
+    
+    log_debug("URL is %s", url);
+    log_debug("Protocol is %s", protocol);
+    log_debug("Host is %s", hostname);
+    log_debug("Port is %s", port);
+    log_debug("Path is %s", path);
+    log_debug("Filename is %s", filename);
+    log_debug("App is %s", app);
+    log_debug("Query is %s", query);
+    log_debug("tcUrl is %s", tcUrl);
+    log_debug("swfUrl is %s", swfUrl);
+    log_debug("pageUrl is %s", pageUrl);
+
+    return encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(),
+			 audioCodecs, videoCodecs, videoFunction,
+			 pageUrl.c_str());
+}
+
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
                           double audioCodecs, double videoCodecs, double videoFunction,
                           const char *pageUrl)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     AMF amf_obj;
 
