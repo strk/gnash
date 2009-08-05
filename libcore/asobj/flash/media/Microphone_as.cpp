@@ -266,9 +266,11 @@ microphone_gain(const fn_call& fn) {
     } else {
         gain = ((ptr->get_gain())*(0.8333333333)) + 50;
         gain = round(gain);
+        return as_value(gain);
     }
 #endif
-        return as_value(gain);
+        log_unimpl("FFMPEG not implemented");
+        return as_value();
     }
     else // setter
     {
