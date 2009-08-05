@@ -81,6 +81,14 @@ RTMPClient::~RTMPClient()
 // Make the NetConnection object that is used to connect to the
 // server.
 boost::shared_ptr<Buffer> 
+RTMPClient::encodeConnect()
+{
+    GNASH_REPORT_FUNCTION;
+    
+    return encodeConnect(_path.c_str());
+}
+
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeConnect(const char *uri)
 {
     GNASH_REPORT_FUNCTION;
@@ -300,7 +308,64 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 		   
     return buf;
 }
+    
+bool
+RTMPClient::connectToServer(const std::string &url)
+{
+    GNASH_REPORT_FUNCTION;
 
+    if (connected() == false) {
+	createClient();
+	if (!handShakeRequest()) {
+	    log_error("RTMP handshake request failed");
+	}
+	
+	if (!clientFinish()) {
+	    log_error("RTMP handshake completion failed");
+	}
+	
+	boost::shared_ptr<amf::Buffer> buf2 = encodeConnect();
+	size_t total_size = buf2->size();    
+	boost::shared_ptr<amf::Buffer> head2 = encodeHeader(0x3,
+			    RTMP::HEADER_12, buf2->allocated(),
+			    RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
+
+	head2->resize(head2->size() + buf2->size() + 1);
+	// FIXME: ugly hack! Should be a single byte header. Do this in Element::encode() instead!
+	head2->append(buf2->reference(), 128);
+	boost::uint8_t c = 0xc3;
+	*head2 += c;
+	head2->append(buf2->reference() + 128, buf2->allocated()-128);
+	// Finish the handshake process, which has to have the NetConnection::connect() as part
+	// of the buffer, or Red5 refuses to answer.
+	setTimeout(20);
+	if (!clientFinish(*head2)) {
+	    log_error("RTMP handshake completion failed!");
+	    exit(-1);
+	}
+	
+	// give the server time to process our NetConnection::connect() request
+	sleep(1);
+	
+	boost::shared_ptr<amf::Buffer> response;
+	boost::shared_ptr<RTMP::rtmp_head_t> rthead;
+	boost::shared_ptr<RTMP::queues_t> que;
+	boost::uint8_t *pktstart = 0;
+	
+	RTMPClient::msgque_t msgque = recvResponse();
+	while (msgque.size()) {
+	    boost::shared_ptr<RTMPMsg> msg = msgque.front();
+	    msgque.pop_front();
+	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+		log_debug("Sent NetConnection Connect message sucessfully");
+	    }		    
+	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
+		log_error("Couldn't send NetConnection Connect message,");
+	    }
+	}
+    }
+}
+    
 boost::shared_ptr<amf::Buffer>
 RTMPClient::encodeEchoRequest(const std::string &method, double id, amf::Element &el)
 {

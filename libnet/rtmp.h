@@ -82,37 +82,37 @@ public:
     typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
     typedef enum {
-	RAW=0x0001,
-	ADPCM=0x0002,
-	MP3=0x0004,
-	INTEL=0x0005,
-	CELT=0x0008,		// unique to Gnash
-	NELLY8=0x0020,
-	NELLY=0x0040,
-	G711A=0x0080,
-	G711U=0x0100,
-	NELLY16=0x0200,
-	AAC=0x0400,
-	SPEEX=0x0800,
-	DEFAULT_AUDIO_SET=0x0267,
-	ALLAUDIO=0x0fff
+	RAW     = 0x0001,
+	ADPCM   = 0x0002,
+	MP3     = 0x0004,
+	INTEL   = 0x0005,
+	CELT    = 0x0008,		// unique to Gnash
+	NELLY8  = 0x0020,
+	NELLY   = 0x0040,
+	G711A   = 0x0080,
+	G711U   = 0x0100,
+	NELLY16 = 0x0200,
+	AAC     = 0x0400,
+	SPEEX   = 0x0800,
+	DEFAULT_AUDIO_SET = 0x0267,
+	ALLAUDIO = 0x0fff
     } audiocodecs_e;
     typedef enum {
-	UNUSED=0x0001,
-	JPEG=0x0002,
-	SORENSON=0x4,
-	ADOBE=0x0008,
-	VP6=0x0010,
-	VP6ALPHA=0x0020,
-	SCREEN2=0x0040,
-	H264=0x0080,
-	DEFAULT_VIDEO_SET=0x007c,
-	ALLVIDEO=0x00ff
+	UNUSED   = 0x0001,
+	JPEG     = 0x0002,
+	SORENSON = 0x4,
+	ADOBE    = 0x0008,
+	VP6      = 0x0010,
+	VP6ALPHA = 0x0020,
+	SCREEN2  = 0x0040,
+	H264     = 0x0080,
+	DEFAULT_VIDEO_SET = 0x007c,
+	ALLVIDEO = 0x00ff
     } videocodecs_e;
     typedef enum {
-	SEEK=0x1,
-	AMF0=0x0,
-	AMF3=0x3
+	SEEK = 0x1,
+	AMF0 = 0x0,
+	AMF3 = 0x3
     } videofunction_e;
     // The second byte of the AMF file/stream is appears to be 0x00 if the
     // client is the Flash Player and 0x01 if the client is the FlashCom
@@ -134,19 +134,19 @@ public:
         INVOKE = 0x14,
 	FLV_DATA = 0x16
     } content_types_e;
-//     typedef enum {
-//         CONNECT = 0x1,
-//         DISCONNECT = 0x2,
-//         SET_ATTRIBUTE = 0x3,
-//         UPDATE_DATA = 0x4,
-//         UPDATE_ATTRIBUTE = 0x5,
-//         SEND_MESSAGE = 0x6,
-//         STATUS = 0x7,
-//         CLEAR_DATA = 0x8,
-//         DELETE_DATA = 0x9,
-//         DELETE_ATTRIBUTE = 0xa,
-//         INITIAL_DATA = 0xb
-//     } sharedobj_types_e;
+     typedef enum {
+         CREATE = 0x1,		// Client sends event
+         DELETE = 0x2,		// Client sends event
+         REQUEST_CHANGE = 0x3,	// Client sends event
+         CHANGE = 0x4,		// Server sends event
+         SUCCESS_CLIENT = 0x5,	// Server sends event
+         SEND_MESSAGE = 0x6,	// Client sends event
+         STATUS = 0x7,		// Server sends evetn
+         CLEAR = 0x8,		// Server sends event
+         DELETE_SLOT = 0x9,	// Server sends event
+         REQUEST_DELETE_SLOT = 0xa,// Client sends event
+         SUCCESS_SERVER = 0xb	// Server sends event
+     } sharedobj_types_e;
     typedef enum {
 	PING_CLEAR  = 0x0,	// clear the stream
 	PING_PLAY   = 0x1,	// clear the playing buffer
