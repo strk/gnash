@@ -28,6 +28,7 @@ abs_mediadir = `cd $(srcdir)/../media; pwd`
 swfdir = `cd $(top_builddir)/testsuite/actionscript.all; pwd`
 DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"'
 
+
 quickcheck_RUNNERS = \
 	alltests-v5-Runner \
 	alltests-v6-Runner \
@@ -81,7 +82,6 @@ ASTESTS =			\
 	setProperty.as 		\
 	targetPath.as		\
 	Boolean.as		\
-	Camera.as		\
 	Color.as		\
 	ColorTransform.as 	\
 	ContextMenu.as		\
@@ -98,7 +98,6 @@ ASTESTS =			\
 	Key.as			\
 	LoadVars.as		\
 	Math.as			\
-	Microphone.as		\
 	Mouse.as		\
 	MovieClip.as		\
 	MovieClipLoader.as	\
@@ -134,6 +133,12 @@ ASTESTS =			\
 	toString_valueOf.as	\
 	Rectangle.as		\
 	$(NULL)
+
+if USE_GST_ENGINE
+ASTESTS += \
+	Camera.as \
+	Microphone.as
+endif
 
 if HAVE_PERL
 if ENABLE_HAXE
