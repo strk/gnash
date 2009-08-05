@@ -46,6 +46,12 @@
 #include "cache.h"
 #include "getclocktime.hpp"
 
+// This is Linux specific, but offers better I/O for sending
+// files out a network connection.
+#ifdef HAVE_SENDFILE
+# include <sys/sendfile.h>
+#endif
+
 #include <boost/thread/mutex.hpp>
 static boost::mutex io_mutex;
 
