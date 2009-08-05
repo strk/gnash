@@ -29,6 +29,7 @@ namespace media {
 #ifdef USE_GST
         _gain = 5000;
 #endif
+        _index = 0;
         _silenceLevel = 10;
         _silenceTimeout = 2000; //in milliseconds
         _useEchoSuppression = false;
