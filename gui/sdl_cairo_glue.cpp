@@ -34,7 +34,6 @@ SdlCairoGlue::~SdlCairoGlue()
 {
 //    GNASH_REPORT_FUNCTION;
     if ( _cairo_surface ) cairo_surface_destroy(_cairo_surface);
-    if ( _cairo_handle ) cairo_destroy (_cairo_handle);
     if ( _sdl_surface ) SDL_FreeSurface(_sdl_surface);
     if ( _screen ) SDL_FreeSurface(_screen);
     delete [] _render_image;

@@ -43,8 +43,6 @@ Kde4CairoGlue::~Kde4CairoGlue()
 {
     if (_cairo_surface)
         cairo_surface_destroy(_cairo_surface);
-    if (_cairo_handle)
-        cairo_destroy(_cairo_handle);
 }
 
 bool

@@ -58,7 +58,6 @@ FltkCairoGlue::FltkCairoGlue()
 FltkCairoGlue::~FltkCairoGlue()
 {
     cairo_surface_destroy(_cairo_surface);
-    cairo_destroy (_cairo_handle);
     delete [] _offscreenbuf;
 }
 
