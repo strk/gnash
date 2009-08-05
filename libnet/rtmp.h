@@ -82,17 +82,38 @@ public:
     typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
     typedef enum {
-	RAW=0x0,
-	ADPCM=0x01,
-	MP3=0x02,
-	NELLYMOSER_8khz=0x05,
-	NEYYNOSER=0x6
+	RAW=0x0001,
+	ADPCM=0x0002,
+	MP3=0x0004,
+	INTEL=0x0005,
+	CELT=0x0008,		// unique to Gnash
+	NELLY8=0x0020,
+	NELLY=0x0040,
+	G711A=0x0080,
+	G711U=0x0100,
+	NELLY16=0x0200,
+	AAC=0x0400,
+	SPEEX=0x0800,
+	DEFAULT_AUDIO_SET=0x0267,
+	ALLAUDIO=0x0fff
     } audiocodecs_e;
     typedef enum {
-	H263=0x2,
-	SCREEN0x3,
-	VP6=0x4
+	UNUSED=0x0001,
+	JPEG=0x0002,
+	SORENSON=0x4,
+	ADOBE=0x0008,
+	VP6=0x0010,
+	VP6ALPHA=0x0020,
+	SCREEN2=0x0040,
+	H264=0x0080,
+	DEFAULT_VIDEO_SET=0x007c,
+	ALLVIDEO=0x00ff
     } videocodecs_e;
+    typedef enum {
+	SEEK=0x1,
+	AMF0=0x0,
+	AMF3=0x3
+    } videofunction_e;
     // The second byte of the AMF file/stream is appears to be 0x00 if the
     // client is the Flash Player and 0x01 if the client is the FlashCom
     // server.
