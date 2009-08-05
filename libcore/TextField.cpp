@@ -311,8 +311,10 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
     y = record.yOffset() - record.textHeight() + getLeading();
     h = record.textHeight();
 
-    for (unsigned int p = 0 ; p < (m_cursor - _recordStarts[i]); ++p) {
-        x += record.glyphs()[p].advance;
+    if (!record.glyphs().empty()) {
+        for (unsigned int p = 0 ; p < (m_cursor - _recordStarts[i]); ++p) {
+            x += record.glyphs()[p].advance;
+        }
     }
 
     const std::vector<point> box = boost::assign::list_of
@@ -1443,7 +1445,9 @@ TextField::format_text()
     }
 
     // Add the last line to our output.
-    _textRecords.push_back(rec);
+    if (!rec.glyphs().empty()) {
+        _textRecords.push_back(rec);
+    }
     
     scrollLines();
 
@@ -2097,7 +2101,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         last_line.clearGlyphs(1);
                         //record the new line start
                         //
-                        const size_t currentPos = it - _text.begin();
+                        const size_t currentPos = _glyphcount;
                         while (linestartit != linestartend &&
                                 *linestartit + 1 <= currentPos)
                         {
@@ -2123,7 +2127,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     
                     // record the position at the start of this line as
                     // a line_start
-                    const size_t linestartpos = (it - _text.begin()) -
+                    const size_t linestartpos = _glyphcount -
                             rec.glyphs().size();
 
                     while (linestartit < linestartend &&
