@@ -41,9 +41,11 @@
 #include "VM.h"
 #include "Property.h"
 #include "string_table.h"
-#include "URLAccessManager.h"
-#include "URL.h"
 #include "rc.h" // for use of rcfile
+#include "URLAccessManager.h"
+#include "network.h"
+#include "rtmp_client.h"
+#include "URL.h"
 
 #include "NetConnection_as.h"
 #include <boost/scoped_array.hpp>
@@ -211,19 +213,15 @@ public:
 private:
 
     SimpleBuffer& _buf;
-
     VM& _vm;
-
     string_table& _st;
-
     PropertiesOffsetTable& _offsetTable;
-
     bool _error;
 };
 
 } // anonymous namespace
 
-class SharedObject_as: public as_object
+class SharedObject_as: public as_object, public RTMPClient
 {
 public:
 
@@ -232,7 +230,8 @@ public:
     SharedObject_as()
         : as_object(getSharedObjectInterface()),
           _data(0),
-          _persistance(0)
+          _persistance(0),
+	  _connected(false)
     { 
     }
 
@@ -290,10 +289,13 @@ public:
     /// Process the connect(uri) method.
     void connect(NetConnection_as *obj, const std::string& uri);
 
-    NetConnection_as *_netconn;
+    void setNetConnection(Network *x) { _nc.reset(x); }
+    Network *getNetConnection() { return _nc.get(); }
+
+    bool isConnected() { return _connected; };
+    void isConnected(bool x) { _connected = x; };
 
 protected:
-
 #ifdef GNASH_USE_GC
     void markReachableResources() const;
 #endif
@@ -302,8 +304,10 @@ private:
 
     as_object   *_data;
     bool        _persistance;
-
-    SOL _sol;
+    SOL		_sol;
+    bool	_connected;
+//     boost::intrusive_ptr<NetConnection_as> _nc;
+    boost::scoped_ptr<Network> _nc;
 };
 
 
@@ -877,6 +881,14 @@ sharedobject_connect(const fn_call& fn)
 	boost::dynamic_pointer_cast<NetConnection_as>(						     fn.arg(0).to_object(*getGlobal(fn)));
 
     // This is always set without validification.fooc->setURI(uriStr);
+    URL uri = nc->getURI();
+    Network *net = new Network;
+
+    net->setProtocol(uri.protocol());
+    net->setHost(uri.hostname());
+    net->setPort(strtol(uri.port().c_str(), NULL, 0) & 0xffff);
+
+    obj->setNetConnection(net);
 
     // Check first arg for validity 
     if (getSWFVersion(fn) > 6) {
@@ -887,7 +899,6 @@ sharedobject_connect(const fn_call& fn)
             log_unimpl("SharedObject.connect(%s): args after the first are "
                     "not supported", ss.str());
         }
-//         nc->connect(uriStr);
         nc->connect();
     }
     
@@ -919,18 +930,23 @@ sharedobject_setFps(const fn_call& fn)
 as_value
 sharedobject_send(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
+
     boost::intrusive_ptr<SharedObject_as> obj =
         ensureType<SharedObject_as>(fn.this_ptr);
-    UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.send"));
+    if (obj->isConnected() == false) {
+	obj->createClient();
+	obj->isConnected(true);
+    }
+
+    
     return as_value();
 }
 
 as_value
 sharedobject_flush(const fn_call& fn)
-{
-    
+{    
     GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<SharedObject_as> obj =
