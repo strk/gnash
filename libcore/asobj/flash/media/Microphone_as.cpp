@@ -30,6 +30,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 #include "Array_as.h"
+#include <cmath>
 
 #ifdef USE_GST
 #include "gst/AudioInputGst.h"
@@ -177,20 +178,30 @@ microphone_setgain(const fn_call& fn) {
     if (numargs != 1) {
         log_error("%s: wrong number of parameters passed", __FUNCTION__);
     } else {
-#ifdef USE_GST
-        //gstreamer's gain values can be between -60 and 60, whereas actionscript
-        //uses values between 0 and 100. this conversion is made here and the proper
-        //value is passed to gstreamer. so, plug the argument into this equation
-        //and then send the new value for use with gstreamer
         const int32_t argument = fn.arg(0).to_int();
-        ptr->set_gain((argument - 50) * 1.2);
-        ptr->audioChangeSourceBin(ptr->getGlobalAudio());
+        if (argument >= 0 && argument <= 100) { 
+#ifdef USE_GST
+            //gstreamer's gain values can be between -60 and 60, whereas actionscript
+            //uses values between 0 and 100. this conversion is made here and the proper
+            //value is passed to gstreamer. so, plug the argument into this equation
+            //and then send the new value for use with gstreamer
+            ptr->set_gain((argument - 50) * 1.2);
+            ptr->audioChangeSourceBin(ptr->getGlobalAudio());
 #endif
 #ifdef USE_FFMPEG
-        //haven't yet implemented FFMPEG support for this, so we might need to do
-        //a conversion similar to the one above for Gstreamer
-        ptr->set_gain(fn.arg(0).to_int());
+            //haven't yet implemented FFMPEG support for this, so we might need to do
+            //a conversion similar to the one above for Gstreamer
+            ptr->set_gain(argument);
 #endif
+        } else {
+            //set to default gain if bad value was passed
+#ifdef USE_GST
+            ptr->set_gain(0);
+#endif
+#ifdef USE_FFMPEG
+            ptr->set_gain(50);
+#endif
+        }
     }
     return as_value();
 }
@@ -206,10 +217,11 @@ microphone_setrate(const fn_call& fn) {
     
     if (numargs != 1) {
         log_error("%s: wrong number of parameters passed", __FUNCTION__);
-    } else if ((argument != 5) || (argument != 8) || (argument != 11) ||
-        (argument != 22) || (argument != 44)) {
-        log_error("%s: invalid rate argument (%d) passed", fn.arg(0).to_int(),
-            __FUNCTION__);
+    } else if ((argument != 5) && (argument != 8) && (argument != 11) &&
+        (argument != 22) && (argument != 44)) {
+        log_error("%s: invalid rate argument (%d) passed", __FUNCTION__,
+            argument);
+        ptr->set_rate(11000);
     } else {
         int32_t gstarg = argument * 1000;
         ptr->set_rate(gstarg);
@@ -247,7 +259,16 @@ microphone_gain(const fn_call& fn) {
         
     if ( fn.nargs == 0 ) // getter
     {
-        return as_value(ptr->get_gain());
+#ifdef USE_GST
+    double gain;
+    if (ptr->get_gain() == 0) {
+        return as_value(50);
+    } else {
+        gain = ((ptr->get_gain())*(0.8333333333)) + 50;
+        gain = round(gain);
+    }
+#endif
+        return as_value(gain);
     }
     else // setter
     {
@@ -298,8 +319,11 @@ microphone_muted(const fn_call& fn) {
     return as_value();
 }
 
+//i don't know why this is throwing errors, i believe my code is correct, but
+//for some reason it can't get the intrusive this_ptr...
 as_value
 microphone_name(const fn_call& fn) {
+    log_unimpl("Microphone::names: There's some problem with this function");
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
         
@@ -358,7 +382,7 @@ microphone_rate(const fn_call& fn) {
         
     if ( fn.nargs == 0 ) // getter
     {
-        return as_value(ptr->get_rate());
+        return as_value(ptr->get_rate()/1000);
     }
     else // setter
     {
@@ -377,7 +401,7 @@ microphone_silenceLevel(const fn_call& fn) {
         
     if ( fn.nargs == 0 ) // getter
     {
-        log_unimpl("Microphone::silenceLevel only has default value");
+        log_unimpl("Microphone::silenceLevel can be set, but is unimplemented");
         return as_value(ptr->get_silenceLevel());
     }
     else // setter
@@ -397,7 +421,7 @@ microphone_silenceTimeout(const fn_call& fn) {
         
     if ( fn.nargs == 0 ) // getter
     {
-        log_unimpl("Microphone::silenceTimeout has only default values");
+        log_unimpl("Microphone::silenceTimeout can be set, but is unimplemented");
         return as_value(ptr->get_silenceTimeout());
     }
     else // setter
@@ -417,7 +441,7 @@ microphone_useEchoSuppression(const fn_call& fn) {
         
     if ( fn.nargs == 0 ) // getter
     {
-        log_unimpl("Microphone::useEchoSuppression has only default value");
+        log_unimpl("Microphone::useEchoSuppression can be set, but is unimplemented");
         return as_value(ptr->get_useEchoSuppression());
     }
     else // setter
@@ -438,10 +462,32 @@ microphone_setsilencelevel(const fn_call& fn) {
         (fn.this_ptr);
     
     int numargs = fn.nargs;
-    if (numargs > 1) {
+    if (numargs > 2) {
         log_error("%s: Too many arguments", __FUNCTION__);
     } else {
-        ptr->set_silenceLevel(fn.arg(0).to_number());
+        if (numargs == 2) {
+            double argument = fn.arg(0).to_number();
+            if ((argument >= 0) && (argument <=100)) {
+                //then the arg is valid
+                ptr->set_silenceLevel(argument);
+            } else {
+                log_error("%s: argument 1 out of acceptable range", __FUNCTION__);
+            }
+            double argument2 = fn.arg(1).to_number();
+            if (argument2 > 0) {
+                ptr->set_silenceTimeout(argument2);
+            } else {
+                log_error("%s: argument 2 out of acceptable range", __FUNCTION__);
+            }
+        } else {
+            double argument = fn.arg(0).to_number();
+            if ((argument >= 0) && (argument <=100)) {
+                //then the arg is valid
+                ptr->set_silenceLevel(argument);
+            } else {
+                log_error("%s: argument 1 out of acceptable range", __FUNCTION__);
+            }
+        }
     }
     return as_value();
 }

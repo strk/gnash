@@ -252,9 +252,11 @@ namespace gst {
             audioStop(audio);
         }
         
-        //delete the old source bin
-        gst_bin_remove(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
-        audio->_audioSourceBin = NULL;
+        //delete the old source bin if necessary
+        if (!GST_ELEMENT_PARENT(audio->_audioSourceBin) == NULL) {
+            gst_bin_remove(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
+            audio->_audioSourceBin = NULL;
+        }
         
         if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
             log_trace("%s: You don't have any mics chosen, using audiotestsrc",
@@ -267,7 +269,7 @@ namespace gst {
                         "audioSource");
             return true;
         } else {
-        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%d",
+        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
             audio->_audioDevice->getGstreamerSrc(),
             audio->_audioDevice->getDevLocation(),
             gnash::media::AudioInput::_rate, gnash::media::AudioInput::_rate,
@@ -322,7 +324,7 @@ namespace gst {
                         "audioSource");
             return true;
         } else {
-        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%d",
+        command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
             audio->_audioDevice->getGstreamerSrc(),
             audio->_audioDevice->getDevLocation(),
             gnash::media::AudioInput::_rate, gnash::media::AudioInput::_rate,

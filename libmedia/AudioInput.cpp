@@ -26,7 +26,9 @@ namespace media {
         //actionscript default values
         _rate = 8000;
         _activityLevel = -1;
-        _gain = 50;
+#ifdef USE_GST
+        _gain = 5000;
+#endif
         _silenceLevel = 10;
         _silenceTimeout = 2000; //in milliseconds
         _useEchoSuppression = false;

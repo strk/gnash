@@ -36,7 +36,7 @@ xcheck_equals(typeof(Camera), 'function');
 check(Camera);
 var cameraObj = new Camera;
 check(cameraObj);
-var cameraObj2 = new Camera();
+var cameraObj2 = new Camera;
 check(cameraObj2);
 
 check(cameraObj != cameraObj2);
@@ -45,24 +45,14 @@ check_equals(typeof(cameraObj), 'object');
 // The .get() method is a class method, not exported
 // to instances.
 check(Camera.get);
-xcheck_equals(cameraObj.get, undefined); 
+check(Camera.prototype.hasOwnProperty("get")); 
 
 trace("Camera.get() returns: "+Camera.get());
 
 // test that the methods do not exist in the class
-xcheck_equals(Camera.setmode, undefined);
-xcheck_equals(Camera.setmotionlevel, undefined);
-xcheck_equals(Camera.setquality, undefined);
-
-#if OUTPUT_VERSION < 7
-check (cameraObj.setmode); 
-check (cameraObj.setmotionlevel);
-check (cameraObj.setquality);
-#else
-xcheck_equals (cameraObj.setmode, undefined); 
-xcheck_equals (cameraObj.setmotionlevel, undefined);
-xcheck_equals (cameraObj.setquality, undefined);
-#endif
+check(Camera.prototype.hasOwnProperty("setMode")); 
+check(Camera.prototype.hasOwnProperty("setMotionLevel"));
+check(Camera.prototype.hasOwnProperty("setQuality"));
 
 #endif // OUTPUT_VERSION >= 6
 totals();
