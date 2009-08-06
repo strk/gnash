@@ -872,6 +872,17 @@ public:
     ///     The depth to add the child to
     ///
     void addChildAt(DisplayObject* ch, int depth);
+	
+	int getXMouseLoc()
+	{
+		return m_mouse_x;
+	}
+	
+	int getYMouseLoc()
+	{
+		return m_mouse_y;
+	}
+	
 
 private:
 

@@ -245,7 +245,6 @@ textformat_display(const fn_call& fn)
 	}
 
 	return ret;
-	//LOG_ONCE( log_unimpl("TextFormat.display") );
 	//return as_value();
 }
 
@@ -512,10 +511,6 @@ textformat_target(const fn_call& fn)
 	}
 
 	return ret;
-
-	LOG_ONCE( log_debug("target: %s", fn.dump_args()) );
-	//~ LOG_ONCE( log_unimpl("TextFormat.target") );
-	return as_value();
 }
 
 as_value
@@ -537,9 +532,6 @@ textformat_url(const fn_call& fn)
 	}
 
 	return ret;
-	LOG_ONCE( log_debug("url: %s", fn.dump_args()) );
-	//LOG_ONCE( log_unimpl("TextFormat.url") );
-	//return as_value();
 }
 
 as_value
