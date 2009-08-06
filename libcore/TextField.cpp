@@ -396,7 +396,28 @@ TextField::display(Renderer& renderer)
     if (!_bounds.is_null()) {
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
-    
+
+    _displayRecords.clear();
+    float scale = getFontHeight() / (float)_font->unitsPerEM(_embedFonts);
+    float fontLeading = _font->leading() * scale;
+    //offset the lines
+    int yoffset = (getFontHeight() + fontLeading) + PADDING_TWIPS;
+    size_t recordline;
+    for (size_t i = 0; i < _textRecords.size(); ++i) {
+        recordline = 0;
+        //find the line the record is on
+        while (recordline < _line_starts.size() && _line_starts[recordline] <= _recordStarts[i]) {
+            ++recordline;
+        }
+        //offset the line
+        _textRecords[i].setYOffset((recordline-_scroll)*yoffset);
+        //add the lines we want to the display record
+        if (_textRecords[i].yOffset() > 0 &&
+            _textRecords[i].yOffset() < _bounds.height()) {
+            _displayRecords.push_back(_textRecords[i]);
+        }
+    }
+        
     SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
             _displayRecords, _embedFonts);
 
@@ -1502,7 +1523,6 @@ TextField::format_text()
 void
 TextField::scrollLines()
 {
-    _displayRecords.clear();
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts);
     float fontLeading = _font->leading() * scale;
@@ -1537,23 +1557,6 @@ TextField::scrollLines()
             //if we are at a lower position, scroll the lines up
             if (line >= (_scroll+_linesindisplay)) {
                 _scroll += line - (lastvisibleline);
-            }
-        }
-        //offset the lines
-        int yoffset = (fontHeight + fontLeading) + PADDING_TWIPS;
-        size_t recordline;
-        for (size_t i = 0; i < _textRecords.size(); ++i) {
-            recordline = 0;
-            //find the line the record is on
-            while (recordline < manylines && _line_starts[recordline] <= _recordStarts[i]) {
-                ++recordline;
-            }
-            //offset the line
-            _textRecords[i].setYOffset((recordline-_scroll)*yoffset);
-            //add the lines we want to the display record
-            if (_textRecords[i].yOffset() > 0 &&
-                _textRecords[i].yOffset() < _bounds.height()) {
-                _displayRecords.push_back(_textRecords[i]);
             }
         }
     }
