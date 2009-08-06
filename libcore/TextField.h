@@ -699,6 +699,7 @@ private:
 	TextRecords _displayRecords;
 	bool _underlined;
 	bool _bullet;
+
 	std::string _url;
 	std::string _target;
 	std::string _restrict;

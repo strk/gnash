@@ -110,6 +110,22 @@ public:
         _font = f;
     }
 
+	void setURL(std::string url) {
+		_htmlURL = url;
+	}
+	
+	std::string getURL() {
+		return _htmlURL;
+	}
+	
+	void setTarget(std::string target) {
+		_htmlTarget = target;
+	}
+	
+	std::string getTarget() {
+		return _htmlTarget;
+	}
+	
     const Font* getFont() const {
         return _font;
     }
@@ -118,6 +134,13 @@ public:
         _textHeight = height;
     }
 
+	float recordWidth() const {
+		float width=0.0;
+		for (size_t i=0; i < glyphs().size(); ++i)
+		{
+			width += glyphs()[i].advance;
+		}
+	}
     boost::uint16_t textHeight() const {
         return _textHeight;
     }
@@ -189,6 +212,8 @@ private:
     /// The font associated with the TextRecord. Can be NULL.
     const Font* _font;
 
+	std::string _htmlURL;
+	std::string _htmlTarget;
     /// Whether the text should be underlined.
     bool _underline;
 };
