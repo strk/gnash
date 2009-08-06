@@ -128,6 +128,10 @@ boolean-properties-8.swf:bcb5f70be1ae877fb31c198925ba1375
 builtin-construction-5.swf:c3bcb8608999fa7a42a04b22e9e4929a
 call-arguments-5.swf:422c391a2abd3e864eb8ed8a1e05ad31
 callfunction-stack.swf:21d0c957f4caf0eb0ccd0dcadaf17500
+camera-properties-5.swf:495e39b641f89aa49a927cf0a8413028
+camera-properties-6.swf:3eb69243268f61cb8e130b661b6eac1a
+camera-properties-7.swf:ec270af18a3930560841e04ae4c8d952
+camera-properties-8.swf:aec47432bc6f450341ee256511379b91
 case1-6.swf:ba805f628a3a2d1bbd292ec1e56d1708
 case1-7.swf:ad4cfa4c3df86421237239167414fb40
 cast-5.swf:9b7fb2315d1ca5dbc7476ce29037bb19
@@ -606,6 +610,10 @@ matrix-construct-5.swf:bfc2176f4495b5f7465afd1a6f489ead
 matrix-properties-5.swf:a80d726dfde5b460add76a7532e7ee01
 matrix-properties-6.swf:a7934cc5476219b199a40c4feb627dfe
 matrix-properties-7.swf:144e6c666febf556bec9864ee234a54a
+microphone-properties-5.swf:26a2019cc8d42c41630cac3eaf435412
+microphone-properties-6.swf:0463204be0bb721bac2e642cc2c0696d
+microphone-properties-7.swf:111e7119fcf0b3e270503e4df247b27f
+microphone-properties-8.swf:44ae9957bde22d3a948d4ee3e83a3b1c
 mouse-addProperty-relevant-5.swf:1bfc494379c8192d0b410ab431efbebd
 mouse-movie-below-movie-5.swf:c7d97de8768c341a64df75dca2686c0b
 mouse-movie-below-nonevent-movie-5.swf:9027280bdb516e12f2e4255776c079a1

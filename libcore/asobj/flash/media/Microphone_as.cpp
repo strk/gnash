@@ -42,6 +42,7 @@
 
 namespace gnash {
 
+as_value microphone_new(const fn_call& fn);
 as_value microphone_get(const fn_call& fn);
 as_value microphone_getMicrophone(const fn_call& fn);
 as_value microphone_setgain(const fn_call& fn);
@@ -59,19 +60,43 @@ as_value microphone_silenceLevel(const fn_call& fn);
 as_value microphone_silenceTimeout(const fn_call& fn);
 as_value microphone_useEchoSuppression(const fn_call& fn);
 
-static void
-attachMicrophoneInterface(as_object& o)
+
+// get() and names are static properties in AS2.
+void
+attachMicrophoneStaticInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> getset;
 
-	o.init_member("get", gl->createFunction(microphone_get));
-    o.init_member("getMicrophone", gl->createFunction(microphone_getMicrophone));
-	o.init_member("setGain", gl->createFunction(microphone_setgain));
-	o.init_member("setRate", gl->createFunction(microphone_setrate));
-	o.init_member("setSilenceLevel", gl->createFunction(microphone_setsilencelevel));
-	o.init_member("setUseEchoSuppression", gl->createFunction(microphone_setuseechosuppression));
-    
+    const int flags = 0;
+
+    // get() is a function with an Object() as prototype.
+    as_object* proto = gl->createObject(getObjectInterface());
+
+    // TODO: avoid the creative abuse of createClass.
+	o.init_member("get", gl->createClass(microphone_get, proto), flags);
+
+    boost::intrusive_ptr<builtin_function> getset =
+        gl->createFunction(microphone_names);
+    o.init_property("names", *getset, *getset);
+}
+
+// getMicrophone is a static property in AS3.
+void
+attachMicrophoneAS3StaticInterface(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+
+    o.init_member("getMicrophone",
+            gl->createFunction(microphone_getMicrophone));
+}
+
+// These are added to the AS2 prototype when get() is called.
+void
+attachMicrophoneProperties(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+
+    boost::intrusive_ptr<builtin_function> getset;
     getset = gl->createFunction(microphone_activityLevel);
     o.init_property("activityLevel", *getset, *getset);
     getset = gl->createFunction(microphone_gain);
@@ -82,16 +107,28 @@ attachMicrophoneInterface(as_object& o)
     o.init_property("muted", *getset, *getset);
     getset = gl->createFunction(microphone_name);
     o.init_property("name", *getset, *getset);
-    getset = gl->createFunction(microphone_names);
-    o.init_property("names", *getset, *getset);
     getset = gl->createFunction(microphone_rate);
     o.init_property("rate", *getset, *getset);
     getset = gl->createFunction(microphone_silenceLevel);
     o.init_property("silenceLevel", *getset, *getset);
     getset = gl->createFunction(microphone_silenceTimeout);
-    o.init_property("silenceTimeOut", *getset, *getset);
+    o.init_property("silenceTimeout", *getset, *getset);
     getset = gl->createFunction(microphone_useEchoSuppression);
     o.init_property("useEchoSuppression", *getset, *getset);
+}
+
+static void
+attachMicrophoneInterface(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+
+	o.init_member("setGain", gl->createFunction(microphone_setgain));
+	o.init_member("setRate", gl->createFunction(microphone_setrate));
+	o.init_member("setSilenceLevel",
+            gl->createFunction(microphone_setsilencelevel));
+	o.init_member("setUseEchoSuppression",
+            gl->createFunction(microphone_setuseechosuppression));
+    
 }
 
 static as_object*
@@ -115,13 +152,10 @@ public:
 	microphone_as_object()
 		:
 		as_object(getMicrophoneInterface())
-	{}
+	{
+        attachMicrophoneProperties(*get_prototype());
+    }
 
-	// override from as_object ?
-	//std::string get_text_value() const { return "Microphone"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
 };
 #endif
 
@@ -134,31 +168,45 @@ public:
 	microphone_as_object()
 		:
 		as_object(getMicrophoneInterface())
-	{}
+	{
+        attachMicrophoneProperties(*get_prototype());
+    }
 
-	// override from as_object ?
-	//std::string get_text_value() const { return "Microphone"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
 };
 #endif
 
-//as2 ctor
+// There is a constructor for Microphone that returns an object with
+// the correct properties, but it is not usable.
 as_value
-microphone_get(const fn_call& fn) {
+microphone_new(const fn_call& fn)
+{
+    Global_as* gl = getGlobal(fn);
+    as_object* proto = getMicrophoneInterface();
+    return gl->createObject(proto);
+}
+
+// AS2 static accessor.
+as_value
+microphone_get(const fn_call& fn)
+{
+
+    // TODO: this should return the *same* object when the same device
+    // is returned, not a new object.
+    // TODO: check what the function returns when there is no microphone.
     boost::intrusive_ptr<as_object> obj = new microphone_as_object;
     
     int numargs = fn.nargs;
     if (numargs > 0) {
-        log_debug("%s: the mic is automatically chosen from gnashrc", __FUNCTION__);
+        log_debug("%s: the mic is automatically chosen from gnashrc",
+                __FUNCTION__);
     }
     return as_value(obj.get()); //will keep alive
 }
 
-//as3 ctor
+// AS3 static accessor.
 as_value
-microphone_getMicrophone(const fn_call& fn) {
+microphone_getMicrophone(const fn_call& fn)
+{
     boost::intrusive_ptr<as_object> obj = new microphone_as_object;
     
     int numargs = fn.nargs;
@@ -170,7 +218,8 @@ microphone_getMicrophone(const fn_call& fn) {
 
 
 as_value 
-microphone_setgain(const fn_call& fn) {
+microphone_setgain(const fn_call& fn)
+{
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
     
@@ -181,16 +230,19 @@ microphone_setgain(const fn_call& fn) {
         const int32_t argument = fn.arg(0).to_int();
         if (argument >= 0 && argument <= 100) { 
 #ifdef USE_GST
-            //gstreamer's gain values can be between -60 and 60, whereas actionscript
-            //uses values between 0 and 100. this conversion is made here and the proper
-            //value is passed to gstreamer. so, plug the argument into this equation
-            //and then send the new value for use with gstreamer
+            // gstreamer's gain values can be between -60 and 60,
+            // whereas actionscript uses values between 0 and 100.
+            // this conversion is made here and the proper
+            // value is passed to gstreamer. so, plug the argument
+            // into this equation
+            // and then send the new value for use with gstreamer
             ptr->set_gain((argument - 50) * 1.2);
             ptr->audioChangeSourceBin(ptr->getGlobalAudio());
 #endif
 #ifdef USE_FFMPEG
-            //haven't yet implemented FFMPEG support for this, so we might need to do
-            //a conversion similar to the one above for Gstreamer
+            // haven't yet implemented FFMPEG support for this, so we
+            // might need to do a conversion similar to the one above
+            // for Gstreamer
             ptr->set_gain(argument);
 #endif
         } else {
@@ -208,7 +260,8 @@ microphone_setgain(const fn_call& fn) {
 
 
 as_value
-microphone_setrate(const fn_call& fn) {
+microphone_setrate(const fn_call& fn)
+{
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
     
@@ -269,8 +322,8 @@ microphone_gain(const fn_call& fn) {
         return as_value(gain);
     }
 #endif
-        log_unimpl("FFMPEG not implemented");
-        return as_value();
+        log_unimpl("FFMPEG not implemented. Returning a number");
+        return as_value(0.0);
     }
     else // setter
     {
@@ -302,9 +355,10 @@ microphone_index(const fn_call& fn) {
 }
 
 as_value
-microphone_muted(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+microphone_muted(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -321,10 +375,9 @@ microphone_muted(const fn_call& fn) {
     return as_value();
 }
 
-//i don't know why this is throwing errors, i believe my code is correct, but
-//for some reason it can't get the intrusive this_ptr...
 as_value
-microphone_name(const fn_call& fn) {
+microphone_name(const fn_call& fn)
+{
     log_unimpl("Microphone::names: There's some problem with this function");
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
@@ -345,20 +398,24 @@ microphone_name(const fn_call& fn) {
 
 
 as_value
-microphone_names(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+microphone_names(const fn_call& fn)
+{
+    // TODO: this is a static function, not a member function. Because there
+    // is no this pointer, it cannot use microphone_as_object to get the
+    // names. It will have to query the MediaHandler directly (much of the
+    // rest of the code should do this too).
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
     
     //transfer from internal vector to AS array
     std::vector<std::string> vect;
     vect = ptr->get_names();
     
-    int size = vect.size();
+    size_t size = vect.size();
     
     boost::intrusive_ptr<Array_as> data = new Array_as;
     
-    int i;
-    for (i=0; i < size; ++i) {
+    for (size_t i=0; i < size; ++i) {
         data->push(vect[i]);
     }
         
@@ -378,7 +435,8 @@ microphone_names(const fn_call& fn) {
 
 
 as_value
-microphone_rate(const fn_call& fn) {
+microphone_rate(const fn_call& fn)
+{
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
         
@@ -417,9 +475,10 @@ microphone_silenceLevel(const fn_call& fn) {
 }
 
 as_value
-microphone_silenceTimeout(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+microphone_silenceTimeout(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -436,15 +495,19 @@ microphone_silenceTimeout(const fn_call& fn) {
     return as_value();
 }
 
+// This is documented to return a Boolean (which would be sensible), but in
+// fact returns a Number.
 as_value
-microphone_useEchoSuppression(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+microphone_useEchoSuppression(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
-        log_unimpl("Microphone::useEchoSuppression can be set, but is unimplemented");
-        return as_value(ptr->get_useEchoSuppression());
+        log_unimpl("Microphone::useEchoSuppression can be set, but is "
+                "unimplemented");
+        return as_value(static_cast<double>(ptr->get_useEchoSuppression()));
     }
     else // setter
     {
@@ -495,7 +558,8 @@ microphone_setsilencelevel(const fn_call& fn) {
 }
 
 as_value 
-microphone_setuseechosuppression(const fn_call& fn) {
+microphone_setuseechosuppression(const fn_call& fn)
+{
     log_unimpl ("Microphone::setUseEchoSuppression can be set, but it's not implemented");
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
@@ -510,29 +574,25 @@ microphone_setuseechosuppression(const fn_call& fn) {
 }
 
 // extern (used by Global.cpp)
-void microphone_class_init(as_object& where, const ObjectURI& uri)
+void
+microphone_class_init(as_object& where, const ObjectURI& uri)
 {
-	// This is going to be the global Microphone "class"/"function"
-	static boost::intrusive_ptr<as_object> cl;
 
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getMicrophoneInterface();
-        
-        if (isAS3(getVM(where))) {
-            cl = gl->createClass(&microphone_getMicrophone, proto);
-        } else {
-            cl = gl->createClass(&microphone_get, proto);
-        }
-        
-        // replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachMicrophoneInterface(*cl);
-	}
+    Global_as* gl = getGlobal(where);
+    
+    as_object* proto = getMicrophoneInterface();
+    as_object* cl;
 
+    if (isAS3(getVM(where))) {
+        cl = gl->createClass(microphone_new, proto);
+        attachMicrophoneAS3StaticInterface(*cl);
+    } else {
+        cl = gl->createClass(microphone_new, proto);
+        attachMicrophoneStaticInterface(*cl);
+    }
+        
 	// Register _global.Microphone
-	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

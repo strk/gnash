@@ -443,9 +443,9 @@ avm1Classes()
            NS_GLOBAL, 5))
         (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NS_GLOBAL, 6))
         (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 6))
+           NS_GLOBAL, 5))
         (N(microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 6))
+           NS_GLOBAL, 5))
         (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT,
            NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT,

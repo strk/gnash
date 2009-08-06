@@ -46,6 +46,9 @@ as_value camera_getCamera(const fn_call& fn);
 as_value camera_setmode(const fn_call& fn);
 as_value camera_setmotionlevel(const fn_call& fn);
 as_value camera_setquality(const fn_call& fn);
+as_value camera_setLoopback(const fn_call& fn);
+as_value camera_setCursor(const fn_call& fn);
+as_value camera_setKeyFrameInterval(const fn_call& fn);
 
 as_value camera_activitylevel(const fn_call& fn);
 as_value camera_bandwidth(const fn_call& fn);
@@ -62,25 +65,59 @@ as_value camera_names(const fn_call& fn);
 as_value camera_quality(const fn_call& fn);
 as_value camera_width(const fn_call& fn);
 
+
+void
+attachCameraStaticInterface(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+    
+    const int flags = 0;
+
+    // get() is a function with an Object() as prototype.
+    as_object* proto = gl->createObject(getObjectInterface());
+
+    // TODO: avoid the creative abuse of createClass.
+	o.init_member("get", gl->createClass(camera_get, proto), flags);
+
+    boost::intrusive_ptr<builtin_function> getset =
+        gl->createFunction(camera_names);
+    o.init_property("names", *getset, *getset);
+
+}
+
+void
+attachCameraAS3StaticInterface(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+    o.init_member("getCamera", gl->createFunction(camera_getCamera));
+}
+
 static void
 attachCameraInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> getset;
     
-    o.init_member("get", gl->createFunction(camera_get));
-    o.init_member("getCamera", gl->createFunction(camera_getCamera));
     o.init_member("setMode", gl->createFunction(camera_setmode));
     o.init_member("setMotionLevel", gl->createFunction(camera_setmotionlevel));
     o.init_member("setQuality", gl->createFunction(camera_setquality));
+    o.init_member("setCursor", gl->createFunction(camera_setCursor));
+    o.init_member("setLoopback", gl->createFunction(camera_setLoopback));
+    o.init_member("setKeyFrameInterval",
+            gl->createFunction(camera_setKeyFrameInterval));
 
+}
+
+// Properties attached to the prototype when Camera.get() is called
+void
+attachCameraProperties(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+    boost::intrusive_ptr<builtin_function> getset;
 
     getset = gl->createFunction(camera_activitylevel);
     o.init_property("activityLevel", *getset, *getset);
     getset = gl->createFunction(camera_bandwidth);
     o.init_property("bandwidth", *getset, *getset);
-    getset = gl->createFunction(camera_currentFPS);
-    o.init_property("currentFPS", *getset, *getset);
     getset = gl->createFunction(camera_currentFps);
     o.init_property("currentFps", *getset, *getset);
     getset = gl->createFunction(camera_fps);
@@ -97,8 +134,6 @@ attachCameraInterface(as_object& o)
     o.init_property("muted", *getset, *getset);
     getset = gl->createFunction(camera_name);
     o.init_property("name", *getset, *getset);
-    getset = gl->createFunction(camera_names);
-    o.init_property("names", *getset, *getset);
     getset = gl->createFunction(camera_quality);
     o.init_property("quality", *getset, *getset);
     getset = gl->createFunction(camera_width);
@@ -128,11 +163,6 @@ public:
         as_object(getCameraInterface())
     {}
 
-    // override from as_object ?
-    //const char* get_text_value() const { return "Camera"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 #endif
 
@@ -147,29 +177,39 @@ public:
         as_object(getCameraInterface())
     {}
 
-    // override from as_object ?
-    //const char* get_text_value() const { return "Camera"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 #endif
 
-// AS2 ctor
+// AS2 static accessor.
 as_value
-camera_get(const fn_call& fn) {
-    boost::intrusive_ptr<as_object> obj = new camera_as_object;  
+camera_get(const fn_call& fn)
+{
+
+    // Properties are attached to the prototype when get() is called.
+    as_object* proto = getCameraInterface();
+
+    // This is an AS2-only function, so don't worry about VM version.
+    attachCameraProperties(*proto);
+
+    // TODO: this should return the same object when the same device is
+    // meant, not a new object each time. It will be necessary to query
+    // the MediaHandler for this, and possibly to store the as_objects
+    // somewhere.
+    boost::intrusive_ptr<as_object> obj = new camera_as_object; 
+     
 
     int numargs = fn.nargs;
     if (numargs > 0) {
-        log_debug("%s: the camera is automatically chosen from gnashrc", __FUNCTION__);
+        log_debug("%s: the camera is automatically chosen from gnashrc",
+                __FUNCTION__);
     }
     return as_value(obj.get()); // will keep alive
 }
 
-// AS3 ctor
+// AS3 static accessor.
 as_value
-camera_getCamera(const fn_call& fn) {
+camera_getCamera(const fn_call& fn)
+{
     boost::intrusive_ptr<as_object> obj = new camera_as_object;
     
     int numargs = fn.nargs;
@@ -180,7 +220,8 @@ camera_getCamera(const fn_call& fn) {
 }
 
 as_value
-camera_setmode(const fn_call& fn) {
+camera_setmode(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
     
     int numargs = fn.nargs;
@@ -243,8 +284,10 @@ camera_setmode(const fn_call& fn) {
     
     return as_value();
 }
+
 as_value
-camera_setmotionlevel(const fn_call& fn) {
+camera_setmotionlevel(const fn_call& fn)
+{
     log_unimpl ("Camera::motionLevel can be set, but it's not implemented");
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
         (fn.this_ptr);
@@ -292,8 +335,10 @@ camera_setmotionlevel(const fn_call& fn) {
     return as_value();
 }
 
+
 as_value
-camera_setquality(const fn_call& fn) {
+camera_setquality(const fn_call& fn)
+{
     log_unimpl ("Camera::quality can be set, but it's not implemented");
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
         (fn.this_ptr);
@@ -333,8 +378,11 @@ camera_setquality(const fn_call& fn) {
     }
     return as_value();
 }
+
+
 as_value
-camera_activitylevel(const fn_call& fn) {
+camera_activitylevel(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -351,8 +399,10 @@ camera_activitylevel(const fn_call& fn) {
 
     return as_value();
 }
+
 as_value
-camera_bandwidth(const fn_call& fn) {
+camera_bandwidth(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -369,9 +419,11 @@ camera_bandwidth(const fn_call& fn) {
 
     return as_value();
 }
+
 //as3 capitalization
 as_value
-camera_currentFPS(const fn_call& fn) {
+camera_currentFPS(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -390,7 +442,8 @@ camera_currentFPS(const fn_call& fn) {
 
 //as3 capitalization
 as_value
-camera_currentFps(const fn_call& fn) {
+camera_currentFps(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -408,7 +461,8 @@ camera_currentFps(const fn_call& fn) {
 }
 
 as_value
-camera_fps(const fn_call& fn) {
+camera_fps(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -426,7 +480,8 @@ camera_fps(const fn_call& fn) {
 }
 
 as_value
-camera_height(const fn_call& fn) {
+camera_height(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -444,7 +499,8 @@ camera_height(const fn_call& fn) {
 }
 
 as_value
-camera_index(const fn_call& fn) {
+camera_index(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -462,7 +518,8 @@ camera_index(const fn_call& fn) {
 }
 
 as_value
-camera_motionLevel(const fn_call& fn) {
+camera_motionLevel(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -481,7 +538,8 @@ camera_motionLevel(const fn_call& fn) {
 }
 
 as_value
-camera_motionTimeout(const fn_call& fn) {
+camera_motionTimeout(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -519,7 +577,8 @@ camera_muted(const fn_call& fn) {
 }
 
 as_value
-camera_name(const fn_call& fn) {
+camera_name(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -537,41 +596,43 @@ camera_name(const fn_call& fn) {
 }
 
 as_value
-camera_names(const fn_call& fn) {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+camera_names(const fn_call& fn)
+{
+    if (fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Attempt to set names property of Camera"));
+        );
+        return as_value();
+    }
+
+    // TODO: this is a static function, not a member function. Because there
+    // is no this pointer, it cannot use camera_as_object to get the
+    // names. It will have to query the MediaHandler directly (much of the
+    // rest of the code should do this too).
+    boost::intrusive_ptr<camera_as_object> ptr =
+        ensureType<camera_as_object>(fn.this_ptr);
     
     //transfer from vector to an array
     std::vector<std::string> vect;
     vect = ptr->get_names();
     
-    int size = vect.size();
+    const size_t size = vect.size();
     
     boost::intrusive_ptr<Array_as> data = new Array_as;
 
-    //std::string data[size];
-    int i;
-    for (i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         data->push(vect[i]);
     }
     
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(data.get());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set names property of Camera"));
-        );
-    }
-
-    return as_value();
+    return as_value(data.get());
 } 
 
 
 as_value
-camera_quality(const fn_call& fn) {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+camera_quality(const fn_call& fn)
+{
+    boost::intrusive_ptr<camera_as_object> ptr =
+        ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -589,8 +650,38 @@ camera_quality(const fn_call& fn) {
 }
 
 as_value
-camera_width(const fn_call& fn) {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+camera_new(const fn_call& fn)
+{
+    as_object* proto = getCameraInterface();
+    Global_as* gl = getGlobal(fn);
+    return gl->createObject(proto);
+}
+
+as_value
+camera_setLoopback(const fn_call&)
+{
+    LOG_ONCE(log_unimpl("Camera.setLoopback"));
+    return as_value();
+}
+
+as_value camera_setCursor(const fn_call&)
+{
+    LOG_ONCE(log_unimpl("Camera.setCursor"));
+    return as_value();
+}
+
+as_value
+camera_setKeyFrameInterval(const fn_call&)
+{
+    LOG_ONCE(log_unimpl("Camera.setKeyFrameInterval"));
+    return as_value();
+}
+
+as_value
+camera_width(const fn_call& fn)
+{
+    boost::intrusive_ptr<camera_as_object> ptr =
+        ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -608,29 +699,29 @@ camera_width(const fn_call& fn) {
 
 
 // extern (used by Global.cpp)
-void camera_class_init(as_object& where, const ObjectURI& uri)
+void
+camera_class_init(as_object& where, const ObjectURI& uri)
 {
+
+    Global_as* gl = getGlobal(where);
+    
+    as_object* proto = getCameraInterface();
+    
     // This is going to be the global Camera "class"/"function"
-    static boost::intrusive_ptr<as_object> cl;
+    as_object* cl;
 
-    if ( cl == NULL )
-    {
-        VM& vm = getVM(where);
-        Global_as* gl = getGlobal(where);
-        
-        //for versions lower than 8, the ctor call was get(), for 9 and higher
-        //the ctor was getCamera()
-        if (isAS3(getVM(where))) {
-            cl = gl->createClass(&camera_getCamera, getCameraInterface());
-        } else {
-            cl = gl->createClass(&camera_get, getCameraInterface());
-        }
-        
-        attachCameraInterface(*cl);
+    //for versions lower than 8, the ctor call was get(), for 9 and higher
+    //the ctor was getCamera()
+    if (isAS3(getVM(where))) {
+        cl = gl->createClass(&camera_new, proto);
+        attachCameraAS3StaticInterface(*cl);
+    } else {
+        cl = gl->createClass(&camera_new, proto);
+        attachCameraStaticInterface(*cl);
     }
-
+    
     // Register _global.Camera
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

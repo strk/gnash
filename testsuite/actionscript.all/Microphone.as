@@ -41,7 +41,7 @@ check(Microphone.prototype.hasOwnProperty("setSilenceLevel"));
 check(Microphone.prototype.hasOwnProperty("setUseEchoSuppression"));
 
 // These aren't present yet.
-xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("get"));
 check(!Microphone.prototype.hasOwnProperty("activityLevel"));
 check(!Microphone.prototype.hasOwnProperty("gain"));
 check(!Microphone.prototype.hasOwnProperty("index"));
@@ -65,7 +65,7 @@ check_equals(typeof(f.gain), 'undefined')
 check_equals(typeof(f.rate), 'undefined')
 
 // Still not present
-xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("get"));
 check(!Microphone.prototype.hasOwnProperty("activityLevel"));
 check(!Microphone.prototype.hasOwnProperty("gain"));
 check(!Microphone.prototype.hasOwnProperty("index"));
@@ -80,72 +80,76 @@ check(!Microphone.prototype.hasOwnProperty("silenceTimeOut"));
 check(!Microphone.prototype.hasOwnProperty("useEchoSuppression"));
 
 // Documented to be an array.
-xcheck ( Microphone.hasOwnProperty("names"));
+check ( Microphone.hasOwnProperty("names"));
 xcheck_equals (typeof (Microphone.names), 'object');
 
 // test the Microphone constuctor
 var microphoneObj = Microphone.get();
-xcheck_equals (typeof(microphoneObj), 'object');
+check_equals (typeof(microphoneObj), 'object');
 
 // Microphone.get() adds these properties.
 // Other properties are probably dependent on whether a microphone
 // is present or not.
-xcheck(!Microphone.prototype.hasOwnProperty("get"));
-xcheck(Microphone.prototype.hasOwnProperty("activityLevel"));
-xcheck(Microphone.prototype.hasOwnProperty("gain"));
-xcheck(Microphone.prototype.hasOwnProperty("index"));
-xcheck(Microphone.prototype.hasOwnProperty("muted"));
-xcheck(Microphone.prototype.hasOwnProperty("name"));
-xcheck(Microphone.prototype.hasOwnProperty("rate"));
-xcheck(Microphone.prototype.hasOwnProperty("silenceLevel"));
-xcheck(Microphone.prototype.hasOwnProperty("useEchoSuppression"));
+check(!Microphone.prototype.hasOwnProperty("get"));
+check(Microphone.prototype.hasOwnProperty("activityLevel"));
+check(Microphone.prototype.hasOwnProperty("gain"));
+check(Microphone.prototype.hasOwnProperty("index"));
+check(Microphone.prototype.hasOwnProperty("muted"));
+check(Microphone.prototype.hasOwnProperty("name"));
+check(Microphone.prototype.hasOwnProperty("rate"));
+check(Microphone.prototype.hasOwnProperty("silenceLevel"));
+check(Microphone.prototype.hasOwnProperty("useEchoSuppression"));
 
-// test that Microphone.get() returns a singleton
-check_equals(microphoneObj, Microphone.get());
+// test that Microphone.get() returns the same object.
+xcheck_equals(microphoneObj, Microphone.get());
 
 // test that get() method is NOT exported to instances
 check_equals (typeof(microphoneObj.get), 'undefined');
 
 // test the Microphone::setGain method
-xcheck_equals ( typeof(microphoneObj.setGain), 'function' );
+check_equals ( typeof(microphoneObj.setGain), 'function' );
 
 // test the Microphone::setRate method
-xcheck_equals ( typeof(microphoneObj.setRate), 'function' );
+check_equals ( typeof(microphoneObj.setRate), 'function' );
 
 // test the Microphone::setSilenceLevel method
-xcheck_equals ( typeof(microphoneObj.setSilenceLevel), 'function' );
+check_equals ( typeof(microphoneObj.setSilenceLevel), 'function' );
 
 // test the Microphone::setUseEchoSuppression method
-xcheck_equals ( typeof(microphoneObj.setUseEchoSuppression), 'function' );
+check_equals ( typeof(microphoneObj.setUseEchoSuppression), 'function' );
 
 /// Microphone properties
 
-xcheck_equals ( typeof(microphoneObj.activityLevel), 'number' );
-xcheck_equals ( typeof(microphoneObj.gain), 'number' );
-xcheck_equals ( typeof(microphoneObj.index), 'number' );
-xcheck_equals ( typeof(microphoneObj.muted), 'boolean' );
-xcheck_equals ( typeof(microphoneObj.name), 'string' );
-xcheck_equals ( typeof(microphoneObj.rate), 'number' );
-xcheck_equals ( typeof(microphoneObj.silenceTimeout), 'number' );
+check_equals ( typeof(microphoneObj.activityLevel), 'number' );
+check_equals ( typeof(microphoneObj.gain), 'number' );
+check_equals ( typeof(microphoneObj.index), 'number' );
+check_equals ( typeof(microphoneObj.muted), 'boolean' );
+check_equals ( typeof(microphoneObj.name), 'string' );
+check_equals ( typeof(microphoneObj.rate), 'number' );
+check_equals ( typeof(microphoneObj.silenceTimeout), 'number' );
 // Documented to be boolean
-xcheck_equals ( typeof(microphoneObj.useEchoSuppression), 'number' );
+check_equals ( typeof(microphoneObj.useEchoSuppression), 'number' );
 
 // Starting values // values before microphone is activated
-xcheck_equals ( microphoneObj.activityLevel, -1 );
+check_equals ( microphoneObj.activityLevel, -1 );
 xcheck_equals ( microphoneObj.gain, 50 );
-xcheck_equals ( microphoneObj.index, 0 );
+check_equals ( microphoneObj.index, 0 );
 xcheck_equals ( microphoneObj.muted, true );
-xcheck_equals ( microphoneObj.rate, 8 );
-xcheck_equals ( microphoneObj.silenceTimeout, 2000 );
+check_equals ( microphoneObj.rate, 8 );
+check_equals ( microphoneObj.silenceTimeout, 2000 );
 
 
 // Setting and getting
 
+// This only currently works with GST. It would be trivial to implement
+// a simple ffmpeg AudioInput class.
+#if USE_GST
 microphoneObj.setGain(5);
-xcheck_equals (microphoneObj.gain, 5);
+check_equals (microphoneObj.gain, 5);
+#endif
 
 microphoneObj.setSilenceLevel(16);
-xcheck_equals (microphoneObj.silenceLevel, 16);
+check_equals (microphoneObj.silenceLevel, 16);
 
 
 // 5, 8, 11, 22, or 44 documented...
@@ -154,7 +158,7 @@ xcheck_equals (microphoneObj.rate, 5);
 microphoneObj.setRate(7);
 xcheck_equals (microphoneObj.rate, 8);
 microphoneObj.setRate(10);
-xcheck_equals (microphoneObj.rate, 11);
+check_equals (microphoneObj.rate, 11);
 microphoneObj.setRate(15);
 xcheck_equals (microphoneObj.rate, 16);
 microphoneObj.setRate(17);
@@ -169,10 +173,10 @@ xcheck_equals (microphoneObj.rate, 44);
 
 /// It's still a number, though.
 microphoneObj.setUseEchoSuppression(false);
-xcheck_equals (microphoneObj.useEchoSuppression, false);
+check_equals (microphoneObj.useEchoSuppression, false);
 
 microphoneObj.setUseEchoSuppression(16);
-xcheck_equals (microphoneObj.useEchoSuppression, true);
+check_equals (microphoneObj.useEchoSuppression, true);
 
 // listen to the microphone.
 _root.attachAudio(microphoneObj);
