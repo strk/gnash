@@ -69,6 +69,9 @@ attachCameraStaticInterface(as_object& o)
     Global_as* gl = getGlobal(o);
     o.init_member("get", gl->createFunction(camera_get));
 
+    boost::intrusive_ptr<builtin_function> getset =
+        gl->createFunction(camera_names);
+    o.init_property("names", *getset, *getset);
 
 }
 
@@ -117,8 +120,6 @@ attachCameraProperties(as_object& o)
     o.init_property("muted", *getset, *getset);
     getset = gl->createFunction(camera_name);
     o.init_property("name", *getset, *getset);
-    getset = gl->createFunction(camera_names);
-    o.init_property("names", *getset, *getset);
     getset = gl->createFunction(camera_quality);
     o.init_property("quality", *getset, *getset);
     getset = gl->createFunction(camera_width);
@@ -162,11 +163,6 @@ public:
         as_object(getCameraInterface())
     {}
 
-    // override from as_object ?
-    //const char* get_text_value() const { return "Camera"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 #endif
 
