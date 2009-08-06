@@ -46,6 +46,9 @@ as_value camera_getCamera(const fn_call& fn);
 as_value camera_setmode(const fn_call& fn);
 as_value camera_setmotionlevel(const fn_call& fn);
 as_value camera_setquality(const fn_call& fn);
+as_value camera_setLoopback(const fn_call& fn);
+as_value camera_setCursor(const fn_call& fn);
+as_value camera_setKeyFrameInterval(const fn_call& fn);
 
 as_value camera_activitylevel(const fn_call& fn);
 as_value camera_bandwidth(const fn_call& fn);
@@ -67,7 +70,14 @@ void
 attachCameraStaticInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    o.init_member("get", gl->createFunction(camera_get));
+    
+    const int flags = 0;
+
+    // get() is a function with an Object() as prototype.
+    as_object* proto = gl->createObject(getObjectInterface());
+
+    // TODO: avoid the creative abuse of createClass.
+	o.init_member("get", gl->createClass(camera_get, proto), flags);
 
     boost::intrusive_ptr<builtin_function> getset =
         gl->createFunction(camera_names);
@@ -90,6 +100,10 @@ attachCameraInterface(as_object& o)
     o.init_member("setMode", gl->createFunction(camera_setmode));
     o.init_member("setMotionLevel", gl->createFunction(camera_setmotionlevel));
     o.init_member("setQuality", gl->createFunction(camera_setquality));
+    o.init_member("setCursor", gl->createFunction(camera_setCursor));
+    o.init_member("setLoopback", gl->createFunction(camera_setLoopback));
+    o.init_member("setKeyFrameInterval",
+            gl->createFunction(camera_setKeyFrameInterval));
 
 }
 
@@ -641,6 +655,26 @@ camera_new(const fn_call& fn)
     as_object* proto = getCameraInterface();
     Global_as* gl = getGlobal(fn);
     return gl->createObject(proto);
+}
+
+as_value
+camera_setLoopback(const fn_call&)
+{
+    LOG_ONCE(log_unimpl("Camera.setLoopback"));
+    return as_value();
+}
+
+as_value camera_setCursor(const fn_call&)
+{
+    LOG_ONCE(log_unimpl("Camera.setCursor"));
+    return as_value();
+}
+
+as_value
+camera_setKeyFrameInterval(const fn_call&)
+{
+    LOG_ONCE(log_unimpl("Camera.setKeyFrameInterval"));
+    return as_value();
 }
 
 as_value
