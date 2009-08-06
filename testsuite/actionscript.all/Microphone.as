@@ -41,7 +41,7 @@ check(Microphone.prototype.hasOwnProperty("setSilenceLevel"));
 check(Microphone.prototype.hasOwnProperty("setUseEchoSuppression"));
 
 // These aren't present yet.
-xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("get"));
 check(!Microphone.prototype.hasOwnProperty("activityLevel"));
 check(!Microphone.prototype.hasOwnProperty("gain"));
 check(!Microphone.prototype.hasOwnProperty("index"));
@@ -65,7 +65,7 @@ check_equals(typeof(f.gain), 'undefined')
 check_equals(typeof(f.rate), 'undefined')
 
 // Still not present
-xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("get"));
 check(!Microphone.prototype.hasOwnProperty("activityLevel"));
 check(!Microphone.prototype.hasOwnProperty("gain"));
 check(!Microphone.prototype.hasOwnProperty("index"));
@@ -90,7 +90,7 @@ check_equals (typeof(microphoneObj), 'object');
 // Microphone.get() adds these properties.
 // Other properties are probably dependent on whether a microphone
 // is present or not.
-xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("get"));
 check(Microphone.prototype.hasOwnProperty("activityLevel"));
 check(Microphone.prototype.hasOwnProperty("gain"));
 check(Microphone.prototype.hasOwnProperty("index"));
@@ -128,7 +128,7 @@ check_equals ( typeof(microphoneObj.name), 'string' );
 check_equals ( typeof(microphoneObj.rate), 'number' );
 check_equals ( typeof(microphoneObj.silenceTimeout), 'number' );
 // Documented to be boolean
-xcheck_equals ( typeof(microphoneObj.useEchoSuppression), 'number' );
+check_equals ( typeof(microphoneObj.useEchoSuppression), 'number' );
 
 // Starting values // values before microphone is activated
 check_equals ( microphoneObj.activityLevel, -1 );
