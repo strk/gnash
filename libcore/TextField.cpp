@@ -149,8 +149,6 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _glyphcount(0u),
     _scroll(0u),
     _maxScroll(0u),
-    m_xcursor(0.0f),
-    m_ycursor(0.0f),
     _multiline(def.multiline()),
     _password(def.password()),
     _maxChars(def.maxChars()),
@@ -217,8 +215,6 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _glyphcount(0u),
     _scroll(0u),
     _maxScroll(0u),
-    m_xcursor(0.0f),
-    m_ycursor(0.0f),
     _multiline(false),
     _password(false),
     _maxChars(0),
@@ -1378,8 +1374,6 @@ TextField::format_text()
         // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
         //       not sure we should...
         reset_bounding_box(0, 0);
-        m_xcursor = PADDING_TWIPS +
-            std::max(0, getLeftMargin() + getIndent() + getBlockIndent());
         return;
     }
     

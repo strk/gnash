@@ -96,6 +96,10 @@ public:
         return _glyphs;
     }
 
+    Glyphs& glyphsnonconst() {
+        return _glyphs;
+    }
+
     void addGlyph(const GlyphEntry& ge, Glyphs::size_type num = 1) {
         _glyphs.insert(_glyphs.end(), num, ge);
     }

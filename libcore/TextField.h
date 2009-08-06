@@ -113,13 +113,20 @@ public:
     /// Constructs a TextField with default values and the specified bounds.
     //
     /// Notably, the default textHeight is 12pt (240 twips).
+	/// @param parent A pointer to the DisplayObject parent of this TextField
+	/// @param bounds A rect specifying the bounds of this TextField
     TextField(DisplayObject* parent, const rect& bounds);
 
 	~TextField();
 
 	// TODO: should this return isSelectable() ?
+	/// Returns true for now, TextField is always "Mouse-Enabled"
 	bool mouseEnabled() const { return true; }
 
+	/// Returns a pointer to the topmost InteractiveObject at (x,y)
+	//
+	/// @param x x-coordinate
+	/// @param y y-coordinate
 	InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 
@@ -130,7 +137,8 @@ public:
 	{
 		return true; // text fields can be referenced 
 	}	
-		
+
+	/// This function is called as a user-input handler
 	bool on_event(const event_id& id);	
 
 	const std::string& getVariableName() const
@@ -169,14 +177,17 @@ public:
         return m_cursor;
     }
 
+	/// /brief get a std::pair of size_t with start/end of selection
     const std::pair<size_t, size_t>& getSelection() const {
         return _selection;
     }
 
-    /// Replace the current selection with the new text.
+    /// /brief Replace the current selection with the new text.
+	//
+	/// @param replace String to replace the current selection
     void replaceSelection(const std::string& replace);
 
-    /// Set the current selection
+    /// /brief Set the current selection
     //
     /// @param start    The index of the beginning of the selection.
     /// @param end      The index of the end of the selection.
@@ -197,6 +208,7 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
+	/// \brief Get bounding rect of this TextField
 	virtual rect getBounds() const
 	{
 		return _bounds;
@@ -208,40 +220,49 @@ public:
 	/// Return true if the 'background' should be drawn
 	bool getDrawBackground() const;
 
-	/// Specify wheter to draw the background
+	/// \brief Specify wheter to draw the background
+	//
+	/// @param draw If true the background of this TextField will be drawn
 	void setDrawBackground(bool draw);
 
-	/// Return color of the background
+	/// \brief Return color of the background
 	rgba getBackgroundColor() const;
 
-	/// Set color of the background
+	/// \brief Set color of the background
 	//
 	/// Use setDrawBackground to actually use this value.
-	///
+	/// @param col RGBA Object with color information. TextField
+	/// 	background will be drawn in this color
 	void setBackgroundColor(const rgba& col);
 
-	/// Return true if this TextField should have it's border visible
+	/// \brief Return true if this TextField should have it's border visible
 	bool getDrawBorder() const;
 
-	/// Specify wheter to draw the border
+	/// \brief Specify whether to draw the border
+	//
+	/// @param draw If true the border of this TextField will be drawn
 	void setDrawBorder(bool draw);
 
-	/// Return color of the border
+	/// \brief Return color of the border
 	rgba getBorderColor() const;
 
-	/// Set color of the border
+	/// \brief Set color of the border
 	//
 	/// Use setDrawBorder to actually use this value.
-	///
+	/// @param col RGBA Object with color information. TextField border
+	/// 	will be drawn in this color.
 	void setBorderColor(const rgba& col);
 
-	/// Return color of the text
+	/// \brief Return color of the text
 	const rgba& getTextColor() const 
 	{
 		return _textColor;
 	}
 
-	/// Set color of the text
+	/// \brief Set color of the text
+	//
+	/// @param col RGBA Object with color information. Text in this TextField
+	/// 	will be displayed in this color.
 	void setTextColor(const rgba& col);
 
 	/// \brief
@@ -251,32 +272,41 @@ public:
 		return _embedFonts;
 	}
 
-    /// Get the current maxChars setting of the TextField
+    /// \brief Get the current maxChars setting of the TextField
     boost::int32_t maxChars() const {
         return _maxChars;
     }
 
-    /// Set the current maxChars setting of the TextField
+    /// \brief Set the current maxChars setting of the TextField
+	//
+	/// @param max The maximum number of characters that can be
+	/// 	input by the user (Does not restrict Scripts)
     void maxChars(boost::int32_t max) {
         _maxChars = max;
     }
 
-    /// Get the current multiline setting of the TextField
+    /// \brief Get the current multiline setting of the TextField
     bool multiline() const {
         return _multiline;
     }
 
-    /// Set the current multiline setting of the TextField
+    /// \brief Set the current multiline setting of the TextField
+	//
+	/// @param b If true "Enter" key will be recognized (Does not
+	/// 	restrict Scripts)
     void multiline(bool b) {
         _multiline = b;
     }
 	
-    /// Get the current password setting of the TextField
+    /// \brief Get the current password setting of the TextField
     bool password() const {
         return _password;
     }
 
-    /// Set the current password setting of the TextField
+    /// \brief Set the current password setting of the TextField
+	//
+	/// @param b If true characters in the TextField will be displayed
+	/// 	as (*)
     void password(bool b) {
         _password = b;
     }
@@ -287,23 +317,23 @@ public:
 	/// @param use
 	void setEmbedFonts(bool use);
 
-	/// Get autoSize value 
+	/// \brief Get autoSize value 
 	AutoSizeValue getAutoSize() const
 	{
 		return _autoSize;
 	}
 
-	/// Return text TextAlignment
+	/// \brief Return text TextAlignment
     TextAlignment getTextAlignment();
 
-	/// Set autoSize value 
+	/// \brief Set autoSize value 
 	//
 	/// @param val
 	/// 	The AutoSizeValue to use
 	///
 	void setAutoSize(AutoSizeValue val);
 
-	/// Parse autoSize string value
+	/// \brief Parse autoSize string value
 	//
 	/// @param val
 	/// 	Auto size value as a string (one of none, left, center, right)
@@ -312,7 +342,7 @@ public:
 	///
 	static AutoSizeValue parseAutoSizeValue(const std::string& val);
 
-	/// Return autoSize value as a string
+	/// \brief Return autoSize value as a string
 	//
 	/// @param val
 	/// 	Auto size value 
@@ -322,20 +352,20 @@ public:
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
 
-	/// Set type (input or dynamic)
+	/// \brief Set type (input or dynamic)
 	//
 	/// @param val
 	/// 	The TypeValue to use, no-op if typeInvalid.
 	///
 	void setType(TypeValue val) { if (val != typeInvalid) _type=val; }
 
-	/// Get type (input, dynamic or invalid)
+	/// \brief Get type (input, dynamic or invalid)
 	TypeValue getType() const
 	{
 		return _type;
 	}
 
-	/// Return true if this TextField is read-only
+	/// \brief Return true if this TextField is read-only
 	bool isReadOnly() const { return _type != typeInput; }
 
 	/// Parse type string value
@@ -365,7 +395,7 @@ public:
 		return _wordWrap;
 	}
 
-	/// Set wordWrap parameter 
+	/// \brief Set wordWrap parameter 
 	//
 	/// @param on
 	///	If true text hitting bounding box limits will continue
@@ -382,28 +412,31 @@ public:
 		return _html;
 	}
 
-	/// Set html parameter
+	/// \brief Set html parameter
 	//
 	/// @param on
 	///	If true HTML tags in the text will be parsed and rendered
 	void setHtml(bool on) {
 		_html = on;
-		format_text();
 	}
 
-	/// Return true if the TextField text is selectable
+	/// \brief Return true if the TextField text is selectable
 	bool isSelectable() const
 	{
 		return _selectable;
 	}
 
 	/// Set 'selectable' parameter
+	//
+	/// @param v
+	///	If true text in this TextField will be selectable
 	void setSelectable(bool v) 
 	{
 		_selectable = v;
 	}
 
 	// See DisplayObject::isActiveTextField
+	/// Return true if the TextField text is selectable
 	virtual bool isSelectableTextField() const
 	{
 		return isSelectable();
@@ -429,6 +462,7 @@ public:
 
 	const Font* getFont() { return _font.get(); }
 
+	
 	boost::uint16_t getFontHeight() const
 	{
 		return _fontHeight;
@@ -618,6 +652,7 @@ private:
 	/// Extracts an HTML tag.
 	///
 	/// @param tag  This string is filled with the extracted HTML tag.
+	/// @param attributes This is a map of attribute names and values
 	/// @param it   An iterator pointing to the first DisplayObject of the
 	///             HTML tag. It is left pointing to the DisplayObject after the
 	///             closing tag or the end of the string.
@@ -731,9 +766,11 @@ private:
 	size_t _glyphcount;
 	size_t _scroll;
 	size_t _maxScroll;
+	/// Called in display(), this sets the cursor using m_cursor and _textRecords
+	//
+	/// @param renderer
+	/// @param mat
 	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
-	float m_xcursor;
-	float m_ycursor;
 
 	LineStarts _line_starts;
 
