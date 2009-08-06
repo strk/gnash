@@ -134,7 +134,7 @@ namespace gst {
         element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-        for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+        for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
             GValue *val;
             gchar *dev_name = NULL;
             

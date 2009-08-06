@@ -96,7 +96,8 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null" || (strstr(dev_name, "Monitor") != NULL)) {
+            if (dev_name == "null" ||
+                    (std::strstr(dev_name, "Monitor") != NULL)) {
                 log_trace("No pulse audio input devices.");
             }
             else { 
@@ -117,7 +118,7 @@ namespace gst {
     }
     
     bool
-    AudioInputGst::checkSupportedFormats(GnashAudio *aud, GstCaps *caps) {
+    AudioInputGst::checkSupportedFormats(GnashAudio* /*aud*/, GstCaps *caps) {
         gint num_structs;
         
         num_structs = gst_caps_get_size (caps);
@@ -143,11 +144,15 @@ namespace gst {
     }
     
     void
-    AudioInputGst::getSelectedCaps(int devselect) {
-        if (devselect > (_audioVect.size() - 1) || devselect < 0) {
+    AudioInputGst::getSelectedCaps(int devselect)
+    {
+
+        if (devselect < 0 ||
+                (static_cast<size_t>(devselect) >= _audioVect.size())) {
             log_error("%s: passed an invalid devselect argument", __FUNCTION__);
             exit(EXIT_FAILURE);
         }
+
         GstElement *pipeline;
         gchar *command;
         GError *error = NULL;
@@ -183,7 +188,6 @@ namespace gst {
             if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == NULL)) {
                 GstElement *src;
                 GstPad *pad;
-                gchar *name;
                 GstCaps *caps;
                 
                 gst_element_set_state(pipeline, GST_STATE_PAUSED);
@@ -199,9 +203,8 @@ namespace gst {
                     log_error("%s: Template pad isn't an object for some reason",
                         __FUNCTION__);
                 }
-                bool ok;
-                ok = checkSupportedFormats(data_struct, caps);
-                if (ok != true) {
+                bool ok = checkSupportedFormats(data_struct, caps);
+                if (ok) {
                     log_error("The input device you selected isn't supported (yet)");
                 } else {
                     gst_caps_unref(caps);
@@ -224,7 +227,10 @@ namespace gst {
     
     GnashAudioPrivate*
     AudioInputGst::transferToPrivate(int devselect) {
-        if ((devselect > (_audioVect.size() - 1)) || devselect < 0) {
+
+        if (devselect < 0 ||
+                (static_cast<size_t>(devselect) >= _audioVect.size())) {
+
             log_error("%s: Passed a bad devselect value", __FUNCTION__);
             exit (EXIT_FAILURE);
         }
@@ -452,7 +458,6 @@ namespace gst {
             gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
         }
         
-        gboolean ok;
         GstPad *audioPlaybackQueueSrc, *audioPlaybackBinSink;
         GstPadLinkReturn padreturn;
         
@@ -511,9 +516,7 @@ namespace gst {
     
     //to handle messages while the main capture loop is running
     gboolean
-    audio_bus_call (GstBus     *bus,
-              GstMessage *msg,
-              gpointer data)
+    audio_bus_call (GstBus* /*bus*/, GstMessage *msg, gpointer /*data*/)
     {
       switch (GST_MESSAGE_TYPE (msg)) {
 
@@ -648,7 +651,6 @@ namespace gst {
     AudioInputGst::audioPlay(GnashAudioPrivate *audio) {
         GstStateChangeReturn state;
         GstBus *bus;
-        GMainLoop *loop;
         gint ret;
         
         //setup bus to watch pipeline for messages
@@ -695,9 +697,12 @@ namespace gst {
         }
         
         //make sure device selection is a valid input device
-        if ((rcfile.getAudioInputDevice() > (_audioVect.size() -1)) ||
-            rcfile.getAudioInputDevice() < 0) {
-            log_error("You have an invalid microphone selected. Check your gnashrc file");
+        const int audioDevice = rcfile.getAudioInputDevice();
+
+        if (audioDevice < 0 ||
+                static_cast<size_t>(audioDevice) >= _audioVect.size()) {
+            log_error("You have an invalid microphone selected. Check "
+                    "your gnashrc file");
             exit(EXIT_FAILURE);
         } else {
             //set _name value for actionscript
