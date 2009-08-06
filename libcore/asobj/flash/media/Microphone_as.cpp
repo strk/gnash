@@ -485,6 +485,8 @@ microphone_silenceTimeout(const fn_call& fn)
     return as_value();
 }
 
+// This is documented to return a Boolean (which would be sensible), but in
+// fact returns a Number.
 as_value
 microphone_useEchoSuppression(const fn_call& fn)
 {
@@ -493,8 +495,9 @@ microphone_useEchoSuppression(const fn_call& fn)
         
     if ( fn.nargs == 0 ) // getter
     {
-        log_unimpl("Microphone::useEchoSuppression can be set, but is unimplemented");
-        return as_value(ptr->get_useEchoSuppression());
+        log_unimpl("Microphone::useEchoSuppression can be set, but is "
+                "unimplemented");
+        return as_value(static_cast<double>(ptr->get_useEchoSuppression()));
     }
     else // setter
     {
