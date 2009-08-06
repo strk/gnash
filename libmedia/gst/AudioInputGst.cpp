@@ -246,7 +246,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio) {
+    AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
+    {
         GError *error = NULL;
         gchar *command = NULL;
         
@@ -256,21 +257,23 @@ namespace gst {
         
         //delete the old source bin if necessary
         if (!GST_ELEMENT_PARENT(audio->_audioSourceBin)) {
-            gst_bin_remove(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
+            gst_bin_remove(GST_BIN(audio->_audioMainBin),
+                    audio->_audioSourceBin);
             audio->_audioSourceBin = NULL;
         }
         
-        if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
+        if (g_strcmp0(audio->_deviceName, "audiotest") == 0) {
             log_trace("%s: You don't have any mics chosen, using audiotestsrc",
                 __FUNCTION__);
             audio->_audioSourceBin = gst_parse_bin_from_description (
                 "audiotestsrc name=audioSource",
                 TRUE, &error);
             log_debug("Command: audiotestsrc name=audioSource");
-            audio->audioSource = gst_bin_get_by_name (GST_BIN (audio->_audioSourceBin),
-                        "audioSource");
+            audio->audioSource = gst_bin_get_by_name (
+                    GST_BIN (audio->_audioSourceBin), "audioSource");
             return true;
-        } else {
+        } 
+
         command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
             audio->_audioDevice->getGstreamerSrc(),
             audio->_audioDevice->getDevLocation(),
@@ -288,27 +291,28 @@ namespace gst {
             return false;
         }
         g_free(command);
-        audio->audioSource = gst_bin_get_by_name (GST_BIN (audio->_audioSourceBin),
-                    "audioSource");
+        audio->audioSource = gst_bin_get_by_name(
+                GST_BIN (audio->_audioSourceBin), "audioSource");
                     
         gboolean result;
-        result = gst_bin_add(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
-        if (result != true) {
+        result = gst_bin_add(GST_BIN(audio->_audioMainBin),
+                audio->_audioSourceBin);
+        if (!result) {
             log_error("%s: couldn't drop the sourcebin back into the main bin",
                 __FUNCTION__);
-        } else {
-            GstElement *tee = gst_bin_get_by_name(GST_BIN(audio->_audioMainBin),
-                "tee");
-            result = gst_element_link(audio->_audioSourceBin, tee);
-            if (result != true) {
-                log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
-                return false;
-            } else {
-                _globalAudio = audio;
-                return true;
-            }
+            return false;
         }
-        }
+
+        GstElement *tee = gst_bin_get_by_name(GST_BIN(audio->_audioMainBin),
+            "tee");
+        result = gst_element_link(audio->_audioSourceBin, tee);
+
+        if (!result) {
+            log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
+            return false;
+        } 
+        _globalAudio = audio;
+        return true;
     } 
     
     gboolean
@@ -546,7 +550,6 @@ namespace gst {
     AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio) {
         GstElement *audioConvert, *audioEnc, *filesink;
         GstPad* pad;
-        gboolean ok;
         
         audio->_audioSaveBin = gst_bin_new ("audioSaveBin");
         
@@ -578,13 +581,15 @@ namespace gst {
         
         //gst_bin_add (GST_BIN(audio->_pipeline), audio->_audioSaveBin);
         
-        ok = gst_element_link_many(audioConvert, audioEnc, audio->_mux,
+        bool ok = gst_element_link_many(audioConvert, audioEnc, audio->_mux,
                 filesink, NULL);
-        if (ok != true) {
+
+        if (!ok) {
             log_error("%s: Something went wrong in linking", __FUNCTION__);
-        } else {
-            return true;
+            return false;
         }
+
+        return true;
     }
     
     gboolean
