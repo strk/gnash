@@ -249,7 +249,7 @@ namespace gst {
         }
         
         //delete the old source bin if necessary
-        if (!GST_ELEMENT_PARENT(audio->_audioSourceBin) == NULL) {
+        if (!GST_ELEMENT_PARENT(audio->_audioSourceBin)) {
             gst_bin_remove(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
             audio->_audioSourceBin = NULL;
         }
