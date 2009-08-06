@@ -83,18 +83,24 @@ static void
 attachCameraInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> getset;
     
     o.init_member("setMode", gl->createFunction(camera_setmode));
     o.init_member("setMotionLevel", gl->createFunction(camera_setmotionlevel));
     o.init_member("setQuality", gl->createFunction(camera_setquality));
 
+}
+
+// Properties attached to the prototype when Camera.get() is called
+void
+attachCameraProperties(as_object& o)
+{
+    Global_as* gl = getGlobal(o);
+    boost::intrusive_ptr<builtin_function> getset;
+
     getset = gl->createFunction(camera_activitylevel);
     o.init_property("activityLevel", *getset, *getset);
     getset = gl->createFunction(camera_bandwidth);
     o.init_property("bandwidth", *getset, *getset);
-    getset = gl->createFunction(camera_currentFPS);
-    o.init_property("currentFPS", *getset, *getset);
     getset = gl->createFunction(camera_currentFps);
     o.init_property("currentFps", *getset, *getset);
     getset = gl->createFunction(camera_fps);
@@ -169,16 +175,23 @@ as_value
 camera_get(const fn_call& fn)
 {
 
+    // Properties are attached to the prototype when get() is called.
+    as_object* proto = getCameraInterface();
+
+    // This is an AS2-only function, so don't worry about VM version.
+    attachCameraProperties(*proto);
+
     // TODO: this should return the same object when the same device is
     // meant, not a new object each time. It will be necessary to query
     // the MediaHandler for this, and possibly to store the as_objects
     // somewhere.
-
-    boost::intrusive_ptr<as_object> obj = new camera_as_object;  
+    boost::intrusive_ptr<as_object> obj = new camera_as_object; 
+     
 
     int numargs = fn.nargs;
     if (numargs > 0) {
-        log_debug("%s: the camera is automatically chosen from gnashrc", __FUNCTION__);
+        log_debug("%s: the camera is automatically chosen from gnashrc",
+                __FUNCTION__);
     }
     return as_value(obj.get()); // will keep alive
 }
