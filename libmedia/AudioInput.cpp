@@ -22,17 +22,17 @@ namespace gnash {
 namespace media {
     
     //constructor
-    AudioInput::AudioInput() {
+    AudioInput::AudioInput()
+        :
         //actionscript default values
-        _rate = 8000;
-        _activityLevel = -1;
-#ifdef USE_GST
-        _gain = 5000;
-#endif
-        _index = 0;
-        _silenceLevel = 10;
-        _silenceTimeout = 2000; //in milliseconds
-        _useEchoSuppression = false;
+        _rate(8000),
+        _activityLevel(-1),
+        _gain(5000),
+        _index(0),
+        _silenceLevel(10),
+        _silenceTimeout(2000), // in milliseconds
+        _useEchoSuppression(false)
+    {
     } 
     
 } //media namespace
