@@ -50,18 +50,18 @@ xcheck_equals(cameraObj.get, undefined);
 trace("Camera.get() returns: "+Camera.get());
 
 // test that the methods do not exist in the class
-check_equals(Camera.setmode, undefined);
-check_equals(Camera.setmotionlevel, undefined);
-check_equals(Camera.setquality, undefined);
+check_equals(Camera.setMode, undefined);
+check_equals(Camera.setMotionLevel, undefined);
+check_equals(Camera.setQuality, undefined);
 
 #if OUTPUT_VERSION < 7
-check (cameraObj.setmode); 
-check (cameraObj.setmotionlevel);
-check (cameraObj.setquality);
+check (cameraObj.setMode); 
+check (cameraObj.setMotionLevel);
+check (cameraObj.setQuality);
 #else
-check_equals (cameraObj.setmode, undefined); 
-check_equals (cameraObj.setmotionlevel, undefined);
-check_equals (cameraObj.setquality, undefined);
+check_equals (cameraObj.setMode, undefined); 
+check_equals (cameraObj.setMotionLevel, undefined);
+check_equals (cameraObj.setQuality, undefined);
 #endif
 
 #endif // OUTPUT_VERSION >= 6
