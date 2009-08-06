@@ -54,15 +54,12 @@ check_equals(Camera.setMode, undefined);
 check_equals(Camera.setMotionLevel, undefined);
 check_equals(Camera.setQuality, undefined);
 
-#if OUTPUT_VERSION < 7
-check (cameraObj.setMode); 
-check (cameraObj.setMotionLevel);
-check (cameraObj.setQuality);
-#else
-check_equals (cameraObj.setMode, undefined); 
-check_equals (cameraObj.setMotionLevel, undefined);
-check_equals (cameraObj.setQuality, undefined);
-#endif
+check(cameraObj.setMode); 
+check(cameraObj.setMotionLevel);
+check(cameraObj.setQuality);
+check_equals(typeof(cameraObj.setMode), "function");
+check_equals(typeof(cameraObj.setMotionLevel), "function");
+check_equals(typeof(cameraObj.setQuality), "function");
 
 #endif // OUTPUT_VERSION >= 6
 totals();
