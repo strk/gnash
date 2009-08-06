@@ -45,7 +45,7 @@ check_equals(typeof(cameraObj), 'object');
 // The .get() method is a class method, not exported
 // to instances.
 check(Camera.get);
-xcheck_equals(cameraObj.get, undefined); 
+check_equals(cameraObj.get, undefined); 
 
 trace("Camera.get() returns: "+Camera.get());
 
