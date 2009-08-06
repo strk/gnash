@@ -96,7 +96,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null" ||
+            if (g_strcmp0(dev_name, "null") ||
                     (std::strstr(dev_name, "Monitor") != NULL)) {
                 log_trace("No pulse audio input devices.");
             }
