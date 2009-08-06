@@ -472,6 +472,7 @@ SOL::updateSO(boost::shared_ptr<amf::Element> &newel)
 	    oldel = newel;
 	}
    }
+   return true;
 }
 
 bool
@@ -479,6 +480,7 @@ SOL::updateSO(int index, boost::shared_ptr<amf::Element> &el)
 {
 //    GNASH_REPORT_FUNCTION;
     _amfobjs[index] = el;    
+    return true;
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.
