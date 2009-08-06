@@ -66,7 +66,14 @@ void
 attachMicrophoneStaticInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-	o.init_member("get", gl->createFunction(microphone_get));
+
+    const int flags = 0;
+
+    // get() is a function with an Object() as prototype.
+    as_object* proto = gl->createObject(getObjectInterface());
+
+    // TODO: avoid the creative abuse of createClass.
+	o.init_member("get", gl->createClass(microphone_get, proto), flags);
 
     boost::intrusive_ptr<builtin_function> getset =
         gl->createFunction(microphone_names);
