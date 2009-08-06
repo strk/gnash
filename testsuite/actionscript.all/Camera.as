@@ -42,12 +42,64 @@ check(cameraObj2);
 check(cameraObj != cameraObj2);
 check_equals(typeof(cameraObj), 'object');
 
+// These properties are never present before Camera.get() is called.
+check(!Camera.prototype.hasOwnProperty("activityLevel"));
+check(!Camera.prototype.hasOwnProperty("bandwidth"));
+check(!Camera.prototype.hasOwnProperty("currentFps"));
+check(!Camera.prototype.hasOwnProperty("fps"));
+check(!Camera.prototype.hasOwnProperty("height"));
+check(!Camera.prototype.hasOwnProperty("index"));
+check(!Camera.prototype.hasOwnProperty("width"));
+check(!Camera.prototype.hasOwnProperty("motionLevel"));
+check(!Camera.prototype.hasOwnProperty("motionTimeout"));
+check(!Camera.prototype.hasOwnProperty("muted"));
+check(!Camera.prototype.hasOwnProperty("name"));
+check(!Camera.prototype.hasOwnProperty("quality"));
+
+
 // The .get() method is a class method, not exported
 // to instances.
 check(Camera.get);
 check_equals(cameraObj.get, undefined); 
 
-trace("Camera.get() returns: "+Camera.get());
+var cam = Camera.get();
+
+trace("Camera.get() returns: " + cam);
+
+// Static properties
+check(!Camera.prototype.hasOwnProperty("names"));
+check(!Camera.prototype.hasOwnProperty("get"));
+
+// These properties are added to the prototype if a camera is present
+// after get is called.
+if (cam) {
+    check(Camera.prototype.hasOwnProperty("activityLevel"));
+    check(Camera.prototype.hasOwnProperty("bandwidth"));
+    check(Camera.prototype.hasOwnProperty("currentFps"));
+    check(Camera.prototype.hasOwnProperty("fps"));
+    check(Camera.prototype.hasOwnProperty("height"));
+    check(Camera.prototype.hasOwnProperty("index"));
+    check(Camera.prototype.hasOwnProperty("width"));
+    check(Camera.prototype.hasOwnProperty("motionLevel"));
+    check(Camera.prototype.hasOwnProperty("motionTimeout"));
+    check(Camera.prototype.hasOwnProperty("muted"));
+    check(Camera.prototype.hasOwnProperty("name"));
+    check(Camera.prototype.hasOwnProperty("quality"));
+}
+else {
+    check(!Camera.prototype.hasOwnProperty("activityLevel"));
+    check(!Camera.prototype.hasOwnProperty("bandwidth"));
+    check(!Camera.prototype.hasOwnProperty("currentFps"));
+    check(!Camera.prototype.hasOwnProperty("fps"));
+    check(!Camera.prototype.hasOwnProperty("height"));
+    check(!Camera.prototype.hasOwnProperty("index"));
+    check(!Camera.prototype.hasOwnProperty("width"));
+    check(!Camera.prototype.hasOwnProperty("motionLevel"));
+    check(!Camera.prototype.hasOwnProperty("motionTimeout"));
+    check(!Camera.prototype.hasOwnProperty("muted"));
+    check(!Camera.prototype.hasOwnProperty("name"));
+    check(!Camera.prototype.hasOwnProperty("quality"));
+}
 
 // test that the methods do not exist in the class
 check_equals(Camera.setMode, undefined);
