@@ -47,8 +47,7 @@ namespace gst {
         findVidDevs();
         
         //enumerate names array for actionscript accessibility
-        int i;
-        for (i=0; i < _vidVect.size(); ++i) {
+        for (size_t i = 0; i < _vidVect.size(); ++i) {
             _names.push_back(_vidVect[i]->getProductName());
         }
         
@@ -94,12 +93,11 @@ namespace gst {
         GstPropertyProbe *probe;
         GValueArray *devarr;
         element = NULL;
-        gint i;
         
         element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-        for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+        for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
             GValue *val;
             gchar *dev_name = NULL;
             
@@ -108,7 +106,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null") {
+            if (!g_strcmp0(dev_name, "null")) {
                 log_trace("No v4l video sources. Checking for other vid inputs");
             }
             else { 
@@ -136,7 +134,7 @@ namespace gst {
         element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-        for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+        for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
             GValue *val;
             gchar *dev_name = NULL;
             
@@ -145,7 +143,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null") {
+            if (g_strcmp0(dev_name, "null")) {
                 log_trace("no v4l2 video sources found.");
             }
             else { 
@@ -322,18 +320,22 @@ namespace gst {
                 dev_select);
         }
         //make sure that the device selected is actually valid
-        if ((rcfile.getWebcamDevice() > (_vidVect.size() - 1)) || rcfile.getWebcamDevice() < 0) {
-            log_error("You have an invalid camera selected. Please check your gnashrc file");
+
+        const int webcamDevice = rcfile.getWebcamDevice();
+        if (webcamDevice < 0 ||
+                static_cast<size_t>(webcamDevice) >= _vidVect.size()) {
+
+            log_error("You have an invalid camera selected. Please "
+                    "check your gnashrc file");
             exit(EXIT_FAILURE);
-        } else {
-            
-            //set _name value for actionscript
-            _name = _vidVect[dev_select]->getProductName();
-            
-            //now that a selection has been made, get capabilities of that device
-            getSelectedCaps(rcfile.getWebcamDevice());
-            return rcfile.getWebcamDevice();
         }
+            
+        //set _name value for actionscript
+        _name = _vidVect[dev_select]->getProductName();
+        
+        //now that a selection has been made, get capabilities of that device
+        getSelectedCaps(rcfile.getWebcamDevice());
+        return rcfile.getWebcamDevice();
     }
 
     //called after a device selection, this starts enumerating the device's
@@ -352,15 +354,19 @@ namespace gst {
         GstElement *element;
         element = data_struct->getElementPtr();
         
+        if (dev_select < 0 ||
+                static_cast<size_t>(dev_select) >= _vidVect.size()) {
+            log_error("%s: Passed an invalid argument (not a valid "
+                "dev_select value)", __FUNCTION__);
+            exit(EXIT_FAILURE);
+        }
+
         //create tester pipeline to enumerate properties
         if (dev_select == 0) {
             command = g_strdup_printf ("%s name=src ! fakesink",
                 data_struct->getGstreamerSrc());
-        } else if ((dev_select > (_vidVect.size() - 1)) || dev_select < 0) {
-            log_error("%s: Passed an invalid argument (not a valid dev_select value)",
-                __FUNCTION__);
-            exit(EXIT_FAILURE);
-        } else {
+        }
+        else {
             command = g_strdup_printf ("%s name=src device=%s ! fakesink",
                 data_struct->getGstreamerSrc(), data_struct->getDevLocation());
         }
@@ -386,7 +392,6 @@ namespace gst {
             if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == NULL)) {
                 GstElement *src;
                 GstPad *pad;
-                gchar *name;
                 GstCaps *caps;
                 
                 gst_element_set_state(pipeline, GST_STATE_PAUSED);
@@ -508,7 +513,9 @@ namespace gst {
     GnashWebcamPrivate*
     VideoInputGst::transferToPrivate(gint dev_select)
     {
-        if ((dev_select > (_vidVect.size() - 1)) || dev_select < 0) {
+        if (dev_select < 0 ||
+                static_cast<size_t>(dev_select) >= _vidVect.size()) {
+
             log_error("%s: Passed an invalid argument (bad dev_select value)",
                 __FUNCTION__);
                 exit(EXIT_FAILURE);
@@ -647,16 +654,15 @@ namespace gst {
     }
     
     gboolean
-    VideoInputGst::checkForSupportedFramerate (GnashWebcamPrivate *webcam, int fps) {
-        gint fNum, fDenom, i, val;
+    VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
+            int fps) {
         
-        for (i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
-            val = std::ceil(webcam->_currentFormat->framerates[i].numerator /
-                       webcam->_currentFormat->framerates[i].denominator);
+        for (int i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
+            int val = std::ceil(
+                    webcam->_currentFormat->framerates[i].numerator /
+                   webcam->_currentFormat->framerates[i].denominator);
             if (val == fps) {
                 return true;
-            } else {
-                continue;
             }
         }
         return false;
@@ -972,7 +978,6 @@ namespace gst {
             gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoDisplayBin);
         }
         
-        gboolean ok;
         GstPad *video_display_queue_src, *video_display_bin_sink;
         
         video_display_queue_src = gst_element_get_pad(webcam->_webcamMainBin,
@@ -1156,9 +1161,7 @@ namespace gst {
     
     //to handle messages while the main capture loop is running
     gboolean
-    bus_call (GstBus     *bus,
-              GstMessage *msg,
-              gpointer data)
+    bus_call (GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
     {
       switch (GST_MESSAGE_TYPE (msg)) {
 
@@ -1190,7 +1193,6 @@ namespace gst {
     VideoInputGst::webcamPlay(GnashWebcamPrivate *webcam) {
         GstStateChangeReturn state;
         GstBus *bus;
-        GMainLoop *loop;
         gint ret;
             //setup bus to watch pipeline for messages
             bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));

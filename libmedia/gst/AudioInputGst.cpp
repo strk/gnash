@@ -41,8 +41,7 @@ namespace gst {
         findAudioDevs();
         
         //enumerate names array for actionscript accessibility
-        int i;
-        for (i = 0; i < _audioVect.size(); ++i) {
+        for (size_t i = 0; i < _audioVect.size(); ++i) {
             _names.push_back(_audioVect[i]->getProductName());
         }
         
@@ -84,12 +83,11 @@ namespace gst {
         GstPropertyProbe *probe;
         GValueArray *devarr;
         element = NULL;
-        gint i;
         
         element = gst_element_factory_make ("pulsesrc", "pulsesrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-        for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+        for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
             GValue *val;
             gchar *dev_name = NULL;
             
@@ -98,7 +96,8 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null" || (strstr(dev_name, "Monitor") != NULL)) {
+            if (g_strcmp0(dev_name, "null") ||
+                    (std::strstr(dev_name, "Monitor") != NULL)) {
                 log_trace("No pulse audio input devices.");
             }
             else { 
@@ -119,16 +118,14 @@ namespace gst {
     }
     
     bool
-    AudioInputGst::checkSupportedFormats(GnashAudio *aud, GstCaps *caps) {
-        gint i;
+    AudioInputGst::checkSupportedFormats(GnashAudio* /*aud*/, GstCaps *caps) {
         gint num_structs;
         
         num_structs = gst_caps_get_size (caps);
         bool ok = false;
         
-        for (i=0; i < num_structs; i++) {
+        for (gint i = 0; i < num_structs; i++) {
             GstStructure *structure;
-            const GValue *width, *height;
             
             //this structure is used to probe the source for information
             structure = gst_caps_get_structure (caps, i);
@@ -147,11 +144,15 @@ namespace gst {
     }
     
     void
-    AudioInputGst::getSelectedCaps(int devselect) {
-        if (devselect > (_audioVect.size() - 1) || devselect < 0) {
+    AudioInputGst::getSelectedCaps(int devselect)
+    {
+
+        if (devselect < 0 ||
+                (static_cast<size_t>(devselect) >= _audioVect.size())) {
             log_error("%s: passed an invalid devselect argument", __FUNCTION__);
             exit(EXIT_FAILURE);
         }
+
         GstElement *pipeline;
         gchar *command;
         GError *error = NULL;
@@ -187,7 +188,6 @@ namespace gst {
             if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == NULL)) {
                 GstElement *src;
                 GstPad *pad;
-                gchar *name;
                 GstCaps *caps;
                 
                 gst_element_set_state(pipeline, GST_STATE_PAUSED);
@@ -203,9 +203,8 @@ namespace gst {
                     log_error("%s: Template pad isn't an object for some reason",
                         __FUNCTION__);
                 }
-                bool ok;
-                ok = checkSupportedFormats(data_struct, caps);
-                if (ok != true) {
+                bool ok = checkSupportedFormats(data_struct, caps);
+                if (ok) {
                     log_error("The input device you selected isn't supported (yet)");
                 } else {
                     gst_caps_unref(caps);
@@ -228,7 +227,10 @@ namespace gst {
     
     GnashAudioPrivate*
     AudioInputGst::transferToPrivate(int devselect) {
-        if ((devselect > (_audioVect.size() - 1)) || devselect < 0) {
+
+        if (devselect < 0 ||
+                (static_cast<size_t>(devselect) >= _audioVect.size())) {
+
             log_error("%s: Passed a bad devselect value", __FUNCTION__);
             exit (EXIT_FAILURE);
         }
@@ -244,7 +246,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio) {
+    AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
+    {
         GError *error = NULL;
         gchar *command = NULL;
         
@@ -253,22 +256,24 @@ namespace gst {
         }
         
         //delete the old source bin if necessary
-        if (!GST_ELEMENT_PARENT(audio->_audioSourceBin) == NULL) {
-            gst_bin_remove(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
+        if (!GST_ELEMENT_PARENT(audio->_audioSourceBin)) {
+            gst_bin_remove(GST_BIN(audio->_audioMainBin),
+                    audio->_audioSourceBin);
             audio->_audioSourceBin = NULL;
         }
         
-        if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
+        if (g_strcmp0(audio->_deviceName, "audiotest") == 0) {
             log_trace("%s: You don't have any mics chosen, using audiotestsrc",
                 __FUNCTION__);
             audio->_audioSourceBin = gst_parse_bin_from_description (
                 "audiotestsrc name=audioSource",
                 TRUE, &error);
             log_debug("Command: audiotestsrc name=audioSource");
-            audio->audioSource = gst_bin_get_by_name (GST_BIN (audio->_audioSourceBin),
-                        "audioSource");
+            audio->audioSource = gst_bin_get_by_name (
+                    GST_BIN (audio->_audioSourceBin), "audioSource");
             return true;
-        } else {
+        } 
+
         command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
             audio->_audioDevice->getGstreamerSrc(),
             audio->_audioDevice->getDevLocation(),
@@ -286,27 +291,28 @@ namespace gst {
             return false;
         }
         g_free(command);
-        audio->audioSource = gst_bin_get_by_name (GST_BIN (audio->_audioSourceBin),
-                    "audioSource");
+        audio->audioSource = gst_bin_get_by_name(
+                GST_BIN (audio->_audioSourceBin), "audioSource");
                     
         gboolean result;
-        result = gst_bin_add(GST_BIN(audio->_audioMainBin), audio->_audioSourceBin);
-        if (result != true) {
+        result = gst_bin_add(GST_BIN(audio->_audioMainBin),
+                audio->_audioSourceBin);
+        if (!result) {
             log_error("%s: couldn't drop the sourcebin back into the main bin",
                 __FUNCTION__);
-        } else {
-            GstElement *tee = gst_bin_get_by_name(GST_BIN(audio->_audioMainBin),
-                "tee");
-            result = gst_element_link(audio->_audioSourceBin, tee);
-            if (result != true) {
-                log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
-                return false;
-            } else {
-                _globalAudio = audio;
-                return true;
-            }
+            return false;
         }
-        }
+
+        GstElement *tee = gst_bin_get_by_name(GST_BIN(audio->_audioMainBin),
+            "tee");
+        result = gst_element_link(audio->_audioSourceBin, tee);
+
+        if (!result) {
+            log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
+            return false;
+        } 
+        _globalAudio = audio;
+        return true;
     } 
     
     gboolean
@@ -456,7 +462,6 @@ namespace gst {
             gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
         }
         
-        gboolean ok;
         GstPad *audioPlaybackQueueSrc, *audioPlaybackBinSink;
         GstPadLinkReturn padreturn;
         
@@ -515,9 +520,7 @@ namespace gst {
     
     //to handle messages while the main capture loop is running
     gboolean
-    audio_bus_call (GstBus     *bus,
-              GstMessage *msg,
-              gpointer data)
+    audio_bus_call (GstBus* /*bus*/, GstMessage *msg, gpointer /*data*/)
     {
       switch (GST_MESSAGE_TYPE (msg)) {
 
@@ -547,7 +550,6 @@ namespace gst {
     AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio) {
         GstElement *audioConvert, *audioEnc, *filesink;
         GstPad* pad;
-        gboolean ok;
         
         audio->_audioSaveBin = gst_bin_new ("audioSaveBin");
         
@@ -579,13 +581,15 @@ namespace gst {
         
         //gst_bin_add (GST_BIN(audio->_pipeline), audio->_audioSaveBin);
         
-        ok = gst_element_link_many(audioConvert, audioEnc, audio->_mux,
+        bool ok = gst_element_link_many(audioConvert, audioEnc, audio->_mux,
                 filesink, NULL);
-        if (ok != true) {
+
+        if (!ok) {
             log_error("%s: Something went wrong in linking", __FUNCTION__);
-        } else {
-            return true;
+            return false;
         }
+
+        return true;
     }
     
     gboolean
@@ -652,7 +656,6 @@ namespace gst {
     AudioInputGst::audioPlay(GnashAudioPrivate *audio) {
         GstStateChangeReturn state;
         GstBus *bus;
-        GMainLoop *loop;
         gint ret;
         
         //setup bus to watch pipeline for messages
@@ -699,9 +702,12 @@ namespace gst {
         }
         
         //make sure device selection is a valid input device
-        if ((rcfile.getAudioInputDevice() > (_audioVect.size() -1)) ||
-            rcfile.getAudioInputDevice() < 0) {
-            log_error("You have an invalid microphone selected. Check your gnashrc file");
+        const int audioDevice = rcfile.getAudioInputDevice();
+
+        if (audioDevice < 0 ||
+                static_cast<size_t>(audioDevice) >= _audioVect.size()) {
+            log_error("You have an invalid microphone selected. Check "
+                    "your gnashrc file");
             exit(EXIT_FAILURE);
         } else {
             //set _name value for actionscript
