@@ -41,8 +41,7 @@ namespace gst {
         findAudioDevs();
         
         //enumerate names array for actionscript accessibility
-        int i;
-        for (i = 0; i < _audioVect.size(); ++i) {
+        for (size_t i = 0; i < _audioVect.size(); ++i) {
             _names.push_back(_audioVect[i]->getProductName());
         }
         
@@ -84,12 +83,11 @@ namespace gst {
         GstPropertyProbe *probe;
         GValueArray *devarr;
         element = NULL;
-        gint i;
         
         element = gst_element_factory_make ("pulsesrc", "pulsesrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-        for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+        for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
             GValue *val;
             gchar *dev_name = NULL;
             
@@ -120,15 +118,13 @@ namespace gst {
     
     bool
     AudioInputGst::checkSupportedFormats(GnashAudio *aud, GstCaps *caps) {
-        gint i;
         gint num_structs;
         
         num_structs = gst_caps_get_size (caps);
         bool ok = false;
         
-        for (i=0; i < num_structs; i++) {
+        for (gint i = 0; i < num_structs; i++) {
             GstStructure *structure;
-            const GValue *width, *height;
             
             //this structure is used to probe the source for information
             structure = gst_caps_get_structure (caps, i);
