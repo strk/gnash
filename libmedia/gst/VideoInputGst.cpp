@@ -106,7 +106,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null") {
+            if (!g_strcmp0(dev_name, "null")) {
                 log_trace("No v4l video sources. Checking for other vid inputs");
             }
             else { 
@@ -143,7 +143,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (dev_name == "null") {
+            if (g_strcmp0(dev_name, "null")) {
                 log_trace("no v4l2 video sources found.");
             }
             else { 
