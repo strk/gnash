@@ -551,35 +551,35 @@ camera_name(const fn_call& fn) {
 }
 
 as_value
-camera_names(const fn_call& fn) {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+camera_names(const fn_call& fn)
+{
+    if (fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Attempt to set names property of Camera"));
+        );
+        return as_value();
+    }
+
+    // TODO: this is a static function, not a member function. Because there
+    // is no this pointer, it cannot use camera_as_object to get the
+    // names. It will have to query the MediaHandler directly (much of the
+    // rest of the code should do this too).
+    boost::intrusive_ptr<camera_as_object> ptr =
+        ensureType<camera_as_object>(fn.this_ptr);
     
     //transfer from vector to an array
     std::vector<std::string> vect;
     vect = ptr->get_names();
     
-    int size = vect.size();
+    const size_t size = vect.size();
     
     boost::intrusive_ptr<Array_as> data = new Array_as;
 
-    //std::string data[size];
-    int i;
-    for (i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         data->push(vect[i]);
     }
     
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(data.get());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set names property of Camera"));
-        );
-    }
-
-    return as_value();
+    return as_value(data.get());
 } 
 
 
