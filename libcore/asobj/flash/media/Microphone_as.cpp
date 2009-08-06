@@ -393,19 +393,22 @@ microphone_name(const fn_call& fn)
 as_value
 microphone_names(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+    // TODO: this is a static function, not a member function. Because there
+    // is no this pointer, it cannot use microphone_as_object to get the
+    // names. It will have to query the MediaHandler directly (much of the
+    // rest of the code should do this too).
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
     
     //transfer from internal vector to AS array
     std::vector<std::string> vect;
     vect = ptr->get_names();
     
-    int size = vect.size();
+    size_t size = vect.size();
     
     boost::intrusive_ptr<Array_as> data = new Array_as;
     
-    int i;
-    for (i=0; i < size; ++i) {
+    for (size_t i=0; i < size; ++i) {
         data->push(vect[i]);
     }
         
