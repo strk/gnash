@@ -47,8 +47,7 @@ namespace gst {
         findVidDevs();
         
         //enumerate names array for actionscript accessibility
-        int i;
-        for (i=0; i < _vidVect.size(); ++i) {
+        for (size_t i = 0; i < _vidVect.size(); ++i) {
             _names.push_back(_vidVect[i]->getProductName());
         }
         
@@ -94,12 +93,11 @@ namespace gst {
         GstPropertyProbe *probe;
         GValueArray *devarr;
         element = NULL;
-        gint i;
         
         element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-        for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+        for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
             GValue *val;
             gchar *dev_name = NULL;
             
