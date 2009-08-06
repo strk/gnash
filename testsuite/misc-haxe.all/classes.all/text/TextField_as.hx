@@ -25,13 +25,17 @@
 
 #if flash9
 import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
 import flash.text.AntiAliasType;
 import flash.display.MovieClip;
 import flash.text.TextFormat;
 import flash.text.StyleSheet;
+import flash.display.Stage;
 #else
 import flash.TextField;
 import flash.MovieClip;
+import flash.Selection;
+import flash.TextFormat;
 #end
 import flash.Lib;
 import Type;
@@ -42,365 +46,5515 @@ import DejaGnu;
 
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextField_as {
+#if !flash9
+		static var _level0 = flash.Lib._root;
+		static var _global = flash.Lib._global;
+		static var duplicateMovieClip = untyped __global__["duplicateMovieClip"];
+		static var eval = untyped __global__["eval"];
+		static var play = untyped __global__["play"];
+		static var stop = untyped __global__["stop"];
+		static var _this = untyped __global__["this"];
+#else
+		static var describeType = untyped __global__["flash.utils.describeType"];
+		static var getQualifiedSuperclassName = untyped __global__["flash.utils.getQualifiedSuperclassName"];
+		static var getQualifiedClassName = untyped __global__["flash.utils.getQualifiedClassName"];
+		static var getDefinitionByName = untyped __global__["flash.utils.getDefinitionByName"];
+#end
+		static var _root = flash.Lib.current;
+		static var undefined = untyped __global__["undefined"];
+		static var isNaN = untyped __global__["isNaN"];
+		static var posinfinity = untyped __global__["Infinity"];
+		
+#if flash9
+		static var OUTPUT_VERSION = 9;
+#end
+#if flash8
+		static var OUTPUT_VERSION = 8;
+#end
+#if flash7
+		static var OUTPUT_VERSION = 7;
+#end
+#if flash6
+		static var OUTPUT_VERSION = 6;
+#end
+
+	static function typeof (thing:Dynamic) {
+		return (""+untyped __typeof__(thing));
+	}
+	
+	static function printBounds (b) {
+		var s = '';
+		s += "xmin:"+b.xMin;
+		s += " ymin:"+b.yMin;
+		s += " xmax:"+b.xMax;
+		s += " ymax:"+b.yMax;
+		return s;
+	}
+	
     static function main() {
 
-#if flash9
-        var x1:TextField = new TextField();
-#else
-	var x1:TextField;
+	untyped TextField.prototype.getBounds = untyped MovieClip.prototype.getBounds;
+	
+	// check that the dejagnu clip is *not* a TextField, which is why the
+	// following prototype properties are not yet initialized.
+	//#if OUTPUT_VERSION > 6
+#if !flash6
+#if !flash9 //flash.display.MovieClip has no field getInstanceAtDepth
+	 //check_equals(_root.getInstanceAtDepth(-16383), _level0.__shared_assets);
+	if(_root.getInstanceAtDepth(-16383) == _level0.__shared_assets) {
+		DejaGnu.pass("[line "+here.lineNumber+"] ");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] ");
+	}
+#end
+	 //xcheck(!_level0.__shared_assets.instance1._xtrace_win instanceof TextField);
+#if !flash9
+	//if(!untyped __instanceof__(_level0.__shared_assets.instance1._xtrace_win, TextField)) {
+		//DejaGnu.xpass("[line "+here.lineNumber+"] THIS IS AN EXPECTED FAILURE!!!");
+	//} else {
+		//DejaGnu.xfail("[line "+here.lineNumber+"] ");
+	//}
+	 //xcheck_equals(typeof(_level0.__shared_assets.instance1._xtrace_win),
+				//"movieclip");
+	if(typeof(untyped _level0.__shared_assets.instance1._xtrace_win) == "movieclip") {
+		DejaGnu.xpass("[line "+here.lineNumber+"] ");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] ");
+	}
+	 //note(_level0.__shared_assets.instance1._xtrace_win.toString());
+	DejaGnu.note(untyped _level0.__shared_assets.instance1._xtrace_win.toString());
+	//#endif
+#end //if !flash9
 #end
 
+	//check_equals(typeof(TextField), 'function');
+	if(typeof(TextField) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField should be function, is "+typeof(TextField));
+	}
+	//check_equals(typeof(TextField.prototype), 'object');
+	if(typeof(untyped TextField.prototype) == 'object') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype is object");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype should be object, is "+typeof(untyped TextField.prototype));
+	}
+	//check_equals(typeof(TextField.prototype.__proto__), 'object');
+	if(typeof(untyped TextField.prototype.__proto__) == 'object') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.__proto__ is object");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.__proto__ should be object, is "+typeof(untyped TextField.prototype.__proto__));
+	}
+	//check_equals(TextField.prototype.__proto__, Object.prototype);
+#if !flash9 //Some things I just can't make happen in flash9...
+	if(untyped TextField.prototype.__proto__ == Object.prototype) {
+		DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype.__proto__ is Object.prototype");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype.__proto__ should be Object.prototype, is "+untyped TextField.prototype.__proto__);
+	}
+#end //if !flash9
+	//check_equals(typeof(TextField.prototype.setTextFormat), 'function');
+	if(typeof(untyped TextField.prototype.setTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.setTextFormat is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.setTextFormat should be function, is "+typeof(untyped TextField.prototype.setTextFormat));
+	}
+	//check_equals(typeof(TextField.prototype.getTextFormat), 'function');
+	if(typeof(untyped TextField.prototype.getTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.getTextFormat is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.getTextFormat should be function, is "+typeof(untyped TextField.prototype.getTextFormat));
+	}
+	//check_equals(typeof(TextField.prototype.setNewTextFormat), 'function');
+	if(typeof(untyped TextField.prototype.setNewTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.setNewTextFormat is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.setNewTextFormat should be function, is "+typeof(untyped TextField.prototype.setNewTextFormat));
+	}
+	//check_equals(typeof(TextField.prototype.getNewTextFormat), 'function');
+	if(typeof(untyped TextField.prototype.getNewTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.getNewTextFormat is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.getNewTextFormat should be function, is "+typeof(untyped TextField.prototype.getNewTextFormat));
+	}
+	//check_equals(typeof(TextField.prototype.getDepth), 'function');
+	if(typeof(untyped TextField.prototype.getDepth) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.getDepth is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.getDepth should be function, is "+typeof(untyped TextField.prototype.getDepth));
+	}
+	//check_equals(typeof(TextField.prototype.removeTextField), 'function');
+	if(typeof(untyped TextField.prototype.removeTextField) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.removeTextField is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.removeTextField should be function, is "+typeof(untyped TextField.prototype));
+	}
+	//check_equals(typeof(TextField.prototype.replaceSel), 'function');
+	if(typeof(untyped TextField.prototype.replaceSel) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.replaceSel is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.replaceSel should be function, is "+typeof(untyped TextField.prototype.replaceSel));
+	}
+
+	 //// TextField.prototype was implicitly initialized by ASBroadcaster.initialize !
+	 //// See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+	 //check_equals(typeof(TextField.prototype.addListener), 'function');
+	if(typeof(untyped TextField.prototype.addListener) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.addListener is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.addListener should be function, is "+typeof(untyped TextField.prototype.addListener));
+	}
+	 //check_equals(typeof(TextField.prototype.removeListener), 'function');
+	if(typeof(untyped TextField.prototype.removeListener) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.removeListener is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.removeListener should be function, is "+typeof(untyped TextField.prototype.removeListener));
+	}
+	 //check_equals(typeof(TextField.prototype.broadcastMessage), 'function');
+	if(typeof(untyped TextField.prototype.broadcastMessage) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype.broadcastMessage is function");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype.broadcastMessage should be function, is "+typeof(untyped TextField.prototype.broadcastMessage));
+	}
+	 //check(TextField.prototype.hasOwnProperty("_listeners"));
+	if(untyped TextField.prototype.hasOwnProperty("_listeners")) {
+		DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property _listeners");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property _listeners");
+	}
+	 //check_equals(typeof(TextField.prototype._listeners), 'object');
+	if(typeof(untyped TextField.prototype._listeners) == 'object') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof TextField.prototype._listeners is object");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof TextField.prototype._listeners should be object, is "+typeof(untyped TextField.prototype._listeners));
+	}
+	 //check(TextField.prototype._listeners instanceof Array);
+#if !flash9
+	if(untyped __instanceof__(TextField.prototype._listeners, Array)) {
+		DejaGnu.pass("[line "+here.lineNumber+"] ");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] ");
+	}
+	 //check_equals(TextField.prototype._listeners.length, 0);
+	if(untyped TextField.prototype._listeners.length == 0) {
+		DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype._listeners.length is 0");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype._listeners.length should be 0, is "+untyped TextField.prototype._listeners.length);
+	}
+#end
+	//// NOTE: the following will be true after a call to createTextField ! Seek forward to see..
+	//xcheck( !TextField.prototype.hasOwnProperty('background'));
+	if(!untyped TextField.prototype.hasOwnProperty('background')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'background'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'background'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('backgroundColor'));
+	if(!untyped TextField.prototype.hasOwnProperty('backgroundColor')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'backgroundColor'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'backgroundColor'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('autoSize') );
+	if(!untyped TextField.prototype.hasOwnProperty('autoSize')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'autoSize'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'autoSize'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('border') );
+	if(!untyped TextField.prototype.hasOwnProperty('border')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'border'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'border'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
+	if(!untyped TextField.prototype.hasOwnProperty('borderColor')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'borderColor'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'borderColor'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
+	if(!untyped TextField.prototype.hasOwnProperty('embedFonts')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'embedFonts'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'embedFonts'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('htmlText') );
+	if(!untyped TextField.prototype.hasOwnProperty('htmlText')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'htmlText'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'htmlText'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('length') );
+	if(!untyped TextField.prototype.hasOwnProperty('length')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'length'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'length'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('maxChars') );
+	if(!untyped TextField.prototype.hasOwnProperty('maxChars')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxChars'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxChars'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('multiline') );
+	if(!untyped TextField.prototype.hasOwnProperty('multiline')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'multiline'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'multiline'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('restrict') );
+	if(!untyped TextField.prototype.hasOwnProperty('restrict')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'restrict'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'restrict'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('selectable') );
+	if(!untyped TextField.prototype.hasOwnProperty('selectable')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'selectable'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'selectable'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('text') );
+	if(!untyped TextField.prototype.hasOwnProperty('text')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'text'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'text'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('textColor') );
+	if(!untyped TextField.prototype.hasOwnProperty('textColor')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'textColor'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textColor'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('textHeight') ); // should be available on first instantiation
+	if(!untyped TextField.prototype.hasOwnProperty('textHeight')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'textHeight'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textHeight'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('textWidth') ); // should be available on first instantiation
+	if(!untyped TextField.prototype.hasOwnProperty('textWidth')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'textWidth'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textWidth'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('type') ); // should be available on first instantiation
+	if(!untyped TextField.prototype.hasOwnProperty('type')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'type'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'type'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('wordWrap') );
+	if(!untyped TextField.prototype.hasOwnProperty('wordWrap')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'wordWrap'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'wordWrap'");
+	}
 #if flash9
-        // Make sure we actually get a valid class        
-        if (Type.typeof(TextField)==TObject && x1 != null) {
-            DejaGnu.pass("TextField class exists");
-        } else {
-            DejaGnu.fail("TextField class doesn't exist");
-        }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-
-	if (Type.typeof(x1.alwaysShowSelection) == TBool) {
-	    DejaGnu.pass("TextField.alwaysShowSelection property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('bottomScrollV') );
+	if(!untyped TextField.prototype.hasOwnProperty('bottomScrollV')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'bottomScrollV'");
 	} else {
-	    DejaGnu.fail("TextField.alwaysShowSelection property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'bottomScrollV'");
 	}
-	if (Std.is(x1.antiAliasType,String) ) {
-	    DejaGnu.pass("TextField.antiAliasType property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('scrollH') );
+	if(!untyped TextField.prototype.hasOwnProperty('scrollH')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollH'");
 	} else {
-	    DejaGnu.fail("TextField.antiAliasType property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollH'");
 	}
-	if (Std.is(x1.antiAliasType,String) ) {
-	    DejaGnu.pass("TextField.antiAliasType property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('maxscrollH') );
+	if(!untyped TextField.prototype.hasOwnProperty('maxscrollH')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscrollH'");
 	} else {
-	    DejaGnu.fail("TextField.antiAliasType property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscrollH'");
 	}
-	if (Std.is(x1.autoSize,String) ) {
-	    DejaGnu.pass("TextField.autoSize property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('maxscrollV') );
+	if(!untyped TextField.prototype.hasOwnProperty('maxscrollV')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscrollV'");
 	} else {
-	    DejaGnu.fail("TextField.autoSize property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscrollV'");
 	}
-	if (Type.typeof(x1.background) == TBool) {
-	    DejaGnu.pass("TextField.background property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('displayAsPassword') );
+	if(!untyped TextField.prototype.hasOwnProperty('displayAsPassword')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'displayAsPassword'");
 	} else {
-	    DejaGnu.fail("TextField.background property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'displayAsPassword'");
 	}
-	if (Std.is(x1.backgroundColor,Float) ) {
-	    DejaGnu.pass("TextField.backgroundColor property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('scrollH') );
+	if(!untyped TextField.prototype.hasOwnProperty('scrollH')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollH'");
 	} else {
-	    DejaGnu.fail("TextField.backgroundColor property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollH'");
 	}
-	if (Type.typeof(x1.border) == TBool) {
-	    DejaGnu.pass("TextField.border property exists");
+	//xcheck( !TextField.prototype.hasOwnProperty('scrollV') );
+	if(!untyped TextField.prototype.hasOwnProperty('scrollV')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollV'");
 	} else {
-	    DejaGnu.fail("TextField.border property doesn't exist");
-	}
-	if (Std.is(x1.borderColor,Float) ) {
-	    DejaGnu.pass("TextField.borderColor property exists");
-	} else {
-	    DejaGnu.fail("TextField.borderColor property doesn't exist");
-	}
-	if (Std.is(x1.bottomScrollV,Float) ) {
-	    DejaGnu.pass("TextField.bottomScrollV property exists");
-	} else {
-	    DejaGnu.fail("TextField.bottomScrollV property doesn't exist");
-	}
-	if (Std.is(x1.caretIndex,Int) ) {
-	    DejaGnu.pass("TextField.caretIndex property exists");
-	} else {
-	    DejaGnu.fail("TextField.caretIndex property doesn't exist");
-	}
-	if (Type.typeof(x1.condenseWhite)== TBool) {
-	    DejaGnu.pass("TextField.condenseWhite property exists");
-	} else {
-	    DejaGnu.fail("TextField.condenseWhite property doesn't exist");
-	}
-	if (Std.is(x1.defaultTextFormat,TextFormat) ) {
-	    DejaGnu.pass("TextField.defaultTextFormat property exists");
-	} else {
-	    DejaGnu.fail("TextField.defaultTextFormat property doesn't exist");
-	}
-	if (Type.typeof(x1.displayAsPassword) == TBool) {
-	    DejaGnu.pass("TextField.displayAsPassword property exists");
-	} else {
-	    DejaGnu.fail("TextField.displayAsPassword property doesn't exist");
-	}
-	if (Type.typeof(x1.embedFonts) == TBool) {
-	    DejaGnu.pass("TextField.embedFonts property exists");
-	} else {
-	    DejaGnu.fail("TextField.embedFonts property doesn't exist");
-	}
-	if (Std.is(x1.gridFitType,String) ) {
-	    DejaGnu.pass("TextField.gridFitType property exists");
-	} else {
-	    DejaGnu.fail("TextField.gridFitType property doesn't exist");
-	}
-	if (Std.is(x1.htmlText,String) ) {
-	    DejaGnu.pass("TextField.htmlText property exists");
-	} else {
-	    DejaGnu.fail("TextField.htmlText property doesn't exist");
-	}
-	if (Std.is(x1.length,Int) ) {
-	    DejaGnu.pass("TextField.length property exists");
-	} else {
-	    DejaGnu.fail("TextField.length property doesn't exist");
-	}
-	if (Std.is(x1.maxChars,Int) ) {
-	    DejaGnu.pass("TextField.maxChars property exists");
-	} else {
-	    DejaGnu.fail("TextField.maxChars property doesn't exist");
-	}
-	if (Std.is(x1.maxScrollH,Int) ) {
-	    DejaGnu.pass("TextField.maxScrollH property exists");
-	} else {
-	    DejaGnu.fail("TextField.maxScrollH property doesn't exist");
-	}
-	if (Std.is(x1.maxScrollV,Int) ) {
-	    DejaGnu.pass("TextField.maxScrollV property exists");
-	} else {
-	    DejaGnu.fail("TextField.maxScrollV property doesn't exist");
-	}
-	if (Type.typeof(x1.mouseWheelEnabled) == TBool) {
-	    DejaGnu.pass("TextField.mouseWheelEnabled property exists");
-	} else {
-	    DejaGnu.fail("TextField.mouseWheelEnabled property doesn't exist");
-	}
-	if (Type.typeof(x1.multiline)==TBool ) {
-	    DejaGnu.pass("TextField.multiline property exists");
-	} else {
-	    DejaGnu.fail("TextField.multiline property doesn't exist");
-	}
-	if (Std.is(x1.numLines,Int) ) {
-	    DejaGnu.pass("TextField.numLines property exists");
-	} else {
-	    DejaGnu.fail("TextField.numLines property doesn't exist");
-	}
-//	if (Std.is(x1.restrict,String) ) {
-//	    DejaGnu.pass("TextField.restrict property exists");
-//	} else {
-//	    DejaGnu.fail("TextField.restrict property doesn't exist");
-//	}
-
-	if (Std.is(x1.scrollH,Int) ) {
-	    DejaGnu.pass("TextField.scrollH property exists");
-	} else {
-	    DejaGnu.fail("TextField.scrollH property doesn't exist");
-	}
-	if (Std.is(x1.scrollV,Int) ) {
-	    DejaGnu.pass("TextField.scrollV property exists");
-	} else {
-	    DejaGnu.fail("TextField.scrollV property doesn't exist");
-	}
-	if (Type.typeof(x1.selectable)==TBool ) {
-	    DejaGnu.pass("TextField.selectable property exists");
-	} else {
-	    DejaGnu.fail("TextField.selectable property doesn't exist");
-	}
-	if (Std.is(x1.selectionBeginIndex,Int) ) {
-	    DejaGnu.pass("TextField.selectionBeginIndex property exists");
-	} else {
-	    DejaGnu.fail("TextField.selectionBeginIndex property doesn't exist");
-	}
-	if (Std.is(x1.selectionEndIndex,Int) ) {
-	    DejaGnu.pass("TextField.selectionEndIndex property exists");
-	} else {
-	    DejaGnu.fail("TextField.selectionEndIndex property doesn't exist");
-	}	
-	if (Std.is(x1.sharpness,Float) ) {
-	    DejaGnu.pass("TextField.sharpness property exists");
-	} else {
-	    DejaGnu.fail("TextField.sharpness property doesn't exist");
-	}
-
-//Si:
-//I initialized the StylsSheet at first
-//Then check the type of it.
-//It works fine now!
-//	DejaGnu.note("TYPE " + Type.typeof(x1.styleSheet));
-	var newStyle:StyleSheet = new StyleSheet();
-	x1.styleSheet=newStyle;
-	if (Std.is(x1.styleSheet,StyleSheet) ) {
-	    DejaGnu.pass("TextField.styleSheet property exists");
-	} else {
-	    DejaGnu.fail("TextField.styleSheet property doesn't exist");
-	}
-	if (Std.is(x1.text,String) ) {
-	    DejaGnu.pass("TextField.text property exists");
-	} else {
-	    DejaGnu.fail("TextField.text property doesn't exist");
-	}
-	if (Std.is(x1.textColor,Int) ) {
-	    DejaGnu.pass("TextField.textColor property exists");
-	} else {
-	    DejaGnu.fail("TextField.textColor property doesn't exist");
-	}
-	if (Std.is(x1.textHeight,Float) ) {
-	    DejaGnu.pass("TextField.textHeight property exists");
-	} else {
-	    DejaGnu.fail("TextField.textHeight property doesn't exist");
-	}
-	if (Std.is(x1.textWidth,Float) ) {
-	    DejaGnu.pass("TextField.textWidth property exists");
-	} else {
-	    DejaGnu.fail("TextField.textWidth property doesn't exist");
-	}
-	if (Std.is(x1.thickness,Float) ){
-	    DejaGnu.pass("TextField.thickness property exists");
-	} else {
-	    DejaGnu.fail("TextField.thickness property doesn't exist");
-	}
-	if (Std.is(x1.type,String) ) {
-	    DejaGnu.pass("TextField.type property exists");
-	} else {
-	    DejaGnu.fail("TextField.type property doesn't exist");
-	}
-	if (Type.typeof(x1.useRichTextClipboard) == TBool) {
-	    DejaGnu.pass("TextField.useRichTextClipboard property exists");
-	} else {
-	    DejaGnu.fail("TextField.useRichTextClipboard property doesn't exist");
-	}
-	if (Type.typeof(x1.wordWrap)== TBool) {
-	    DejaGnu.pass("TextField.wordWrap property exists");
-	} else {
-	    DejaGnu.fail("TextField.wordWrap property doesn't exist");
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollV'");
 	}
 #else
+	//xcheck( !TextField.prototype.hasOwnProperty('bottomScroll') );
+	if(!untyped TextField.prototype.hasOwnProperty('bottomScroll')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'bottomScroll'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'bottomScroll'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('hscroll') );
+	if(!untyped TextField.prototype.hasOwnProperty('hscroll')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'hscroll'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'hscroll'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('html') );
+	if(!untyped TextField.prototype.hasOwnProperty('html')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'html'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'html'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('maxhscroll') );
+	if(!untyped TextField.prototype.hasOwnProperty('maxhscroll')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxhscroll'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxhscroll'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('maxscroll') );
+	if(!untyped TextField.prototype.hasOwnProperty('maxscroll')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscroll'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscroll'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('password') );
+	if(!untyped TextField.prototype.hasOwnProperty('password')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'password'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'password'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('scroll') );
+	if(!untyped TextField.prototype.hasOwnProperty('scroll')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'scroll'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scroll'");
+	}
+	//xcheck( !TextField.prototype.hasOwnProperty('variable') );
+	if(!untyped TextField.prototype.hasOwnProperty('variable')) {
+		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'variable'");
+	} else {
+		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'variable'");
+	}
 #end
 
-
-//Si:
-//This one is not defined in Haxe
-
-//	if (x1.contextMenu == NativeMenu) {
-//	    DejaGnu.pass("TextField.contextMenu property exists");
-//	} else {
-//	    DejaGnu.fail("TextField.contextMenu property doesn't exist");
-//	}
-
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-#if flash9
-//	if (Type.typeof(x1.TextField)==TFunction) {
-//	    DejaGnu.pass("TextField::TextField() method exists");
-//	} else {
-//	    DejaGnu.fail("TextField::TextField() method doesn't exist");
-//	}
-	if (Type.typeof(x1.appendText)==TFunction) {
-	    DejaGnu.pass("TextField::appendText() method exists");
+	//// this is a static method
+#if !flash9 //flash.text.TextField has no field getFontList
+	//check_equals(typeof(TextField.getFontList), 'function');
+	if(typeof(TextField.getFontList) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] type of TextField.getFontList is 'function'");
 	} else {
-	    DejaGnu.fail("TextField::appendText() method doesn't exist");
-	}
-	if (Type.typeof(x1.getCharBoundaries )==TFunction) {
-	    DejaGnu.pass("TextField::getCharBoundaries() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getCharBoundaries() method doesn't exist");
-	}
-	if (Type.typeof(x1.getCharIndexAtPoint)==TFunction) {
-	    DejaGnu.pass("TextField::getCharIndexAtPoint() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getCharIndexAtPoint() method doesn't exist");
-	}
-	if (Type.typeof(x1.getFirstCharInParagraph)==TFunction) {
-	    DejaGnu.pass("TextField::getFirstCharInParagraph() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getFirstCharInParagraph() method doesn't exist");
-	}
-	if (Type.typeof(x1.getImageReference )==TFunction) {
-	    DejaGnu.pass("TextField::getImageReference() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getImageReference() method doesn't exist");
-	}
-	if (Type.typeof(x1.getLineIndexAtPoint )==TFunction) {
-	    DejaGnu.pass("TextField::getLineIndexAtPoint() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getLineIndexAtPoint() method doesn't exist");
-	}
-	if (Type.typeof(x1.getLineIndexOfChar)==TFunction) {
-	    DejaGnu.pass("TextField::getLineIndexOfChar() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getLineIndexOfChar() method doesn't exist");
-	}
-	if (Type.typeof(x1.getLineLength)==TFunction) {
-	    DejaGnu.pass("TextField::getLineLength() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getLineLength() method doesn't exist");
-	}
-	if (Type.typeof(x1.getLineMetrics)==TFunction) {
-	    DejaGnu.pass("TextField::getLineMetrics() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getLineMetrics() method doesn't exist");
-	}
-	if (Type.typeof(x1.getLineOffset)==TFunction) {
-	    DejaGnu.pass("TextField::getLineOffset() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getLineOffset() method doesn't exist");
-	}
-	if (Type.typeof(x1.getLineText)==TFunction) {
-	    DejaGnu.pass("TextField::getLineText() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getLineText() method doesn't exist");
-	}
-	if (Type.typeof(x1.getParagraphLength)==TFunction) {
-	    DejaGnu.pass("TextField::getParagraphLength() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getParagraphLength() method doesn't exist");
-	}
-	if (Type.typeof(x1.getRawText )==TFunction) {
-	    DejaGnu.pass("TextField::getRawText() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getRawText() method doesn't exist");
-	}
-	if (Type.typeof(x1.getTextFormat )==TFunction) {
-	    DejaGnu.pass("TextField::getTextFormat() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getTextFormat() method doesn't exist");
-	}
-	if (Type.typeof(x1.getTextRuns )==TFunction) {
-	    DejaGnu.pass("TextField::getTextRuns() method exists");
-	} else {
-	    DejaGnu.fail("TextField::getTexRuns() method doesn't exist");
+		DejaGnu.fail("[line "+here.lineNumber+"] type of TextField.getFontList shold be 'function', is "+typeof(TextField.getFontList));
 	}
 
-	if (Type.typeof(x1.getXMLText )==TFunction) {
-	    DejaGnu.pass("TextField::getXMLText() method exists");
+	//check_equals(typeof(TextField.prototype.getFontList), 'undefined');
+	if(typeof(untyped TextField.prototype.getFontList) == 'undefined') {
+		DejaGnu.pass("[line "+here.lineNumber+"] type of TextField.prototype.getFontList is 'undefined'");
 	} else {
-	    DejaGnu.fail("TextField::getXMLText() method doesn't exist");
+		DejaGnu.fail("[line "+here.lineNumber+"] type of TextField.prototype.getFontList shold be 'undefined', is "+typeof(untyped TextField.prototype.getFontList));
 	}
-	if (Type.typeof(x1.insertXMLText )==TFunction) {
-	    DejaGnu.pass("TextField::insertXMLText() method exists");
-	} else {
-	    DejaGnu.fail("TextField::insertXMLText() method doesn't exist");
-	}	
+#end //if !flash9
 
+	//#if OUTPUT_VERSION > 6
+#if !flash6
+	//check_equals(typeof(TextField.prototype.replaceText), 'function');
+	if(typeof(untyped TextField.prototype.replaceText) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] type of TextField.prototype.replaceText is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] type of TextField.prototype.replaceText should be 'function', is "+typeof(untyped TextField.prototype.replaceText));
+	}
+	//#else
+#else
+	//check_equals(typeof(TextField.prototype.replaceText), 'undefined');
+	if(typeof(untyped TextField.prototype.replaceText) == 'undefined') {
+		DejaGnu.pass("[line "+here.lineNumber+"] type of TextField.prototype.replaceText is 'undefined'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] type of TextField.prototype.replaceText should be 'undefined', is "+typeof(untyped TextField.prototype.replaceText));
+	}
+	//#endif
+#end
 
-	if (Type.typeof(x1.replaceSelectedText )==TFunction) {
-	    DejaGnu.pass("TextField::replaceSelectedText() method exists");
+	//tfObj = new TextField();
+	var tfObj:TextField = untyped __new__(TextField);
+	//check_equals(typeof(tfObj), 'object');
+	if(typeof(tfObj) == 'object') {
+		DejaGnu.pass("[line "+here.lineNumber+"] type of tfObj is 'object'");
 	} else {
-	    DejaGnu.fail("TextField::replaceSelectedText() method doesn't exist");
+		DejaGnu.fail("[line "+here.lineNumber+"] type of tfObj should be 'object', is "+typeof(tfObj));
 	}
-	if (Type.typeof(x1.replaceText)==TFunction) {
-	    DejaGnu.pass("TextField::replaceText() method exists");
+	//check(tfObj instanceof TextField);
+#if !flash9
+	if(untyped __instanceof__(tfObj, TextField)) {
+		DejaGnu.pass("[line "+here.lineNumber+"] tfObj is instance of TextField");
 	} else {
-	    DejaGnu.fail("TextField::replaceText() method doesn't exist");
-	}
-	if (Type.typeof(x1.setSelection )==TFunction) {
-	    DejaGnu.pass("TextField::setSelection() method exists");
-	} else {
-	    DejaGnu.fail("TextField::setSelection() method doesn't exist");
-	}
-	if (Type.typeof(x1.setTextFormat )==TFunction) {
-	    DejaGnu.pass("TextField::setTextFormat() method exists");
-	} else {
-	    DejaGnu.fail("TextField::setTextFormat() method doesn't exist");
+		DejaGnu.fail("[line "+here.lineNumber+"] tfObj is not instance of TextField");
 	}
 #else
-#end
+	if(Std.is(tfObj, TextField)) {
+		DejaGnu.pass("[line "+here.lineNumber+"] tfObj is instance of TextField");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] tfObj is not instance of TextField");
+	}
+#end //if !flash9
 
-        // Call this after finishing all tests. It prints out the totals.
+	//check_equals(typeof(tfObj.setTextFormat), 'function');
+	if(typeof(tfObj.setTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.setTextFormat is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.setTextFormat should be 'function', is "+typeof(tfObj.setTextFormat));
+	}
+	//check_equals(typeof(tfObj.getTextFormat), 'function');
+	if(typeof(tfObj.getTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.getTextFormat is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.getTextFormat should be 'function', is "+typeof(tfObj.getTextFormat));
+	}
+#if !flash9 //flash.text.TextField has no field setNewTextFormat/getNewTextFormat/addListener...
+	//check_equals(typeof(tfObj.setNewTextFormat), 'function');
+	if(typeof(tfObj.setNewTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.setNewTextFormat is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.setNewTextFormat should be 'function', is "+typeof(tfObj.setNewTextFormat));
+	}
+	//check_equals(typeof(tfObj.getNewTextFormat), 'function');
+	if(typeof(tfObj.getNewTextFormat) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.getNewTextFormat is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.getNewTextFormat should be 'function', is "+typeof(tfObj.getNewTextFormat));
+	}
+	//check_equals(typeof(tfObj.addListener), 'function');
+	if(typeof(tfObj.addListener) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.addListener is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.addListener should be 'function', is "+typeof(tfObj.addListener));
+	}
+	//check_equals(typeof(tfObj.removeListener), 'function');
+	if(typeof(tfObj.removeListener) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.removeListener is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.removeListener should be 'function', is "+typeof(tfObj.removeListener));
+	}
+	//check_equals(typeof(tfObj.getDepth), 'function');
+	if(typeof(tfObj.getDepth) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.getDepth is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.getDepth should be 'function', is "+typeof(tfObj.getDepth));
+	}
+	//check_equals(typeof(tfObj.removeTextField), 'function');
+	if(typeof(tfObj.removeTextField) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.removeTextField is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.removeTextField should be 'function', is "+typeof(tfObj.removeTextField));
+	}
+	//check_equals(typeof(tfObj.replaceSel), 'function');
+	if(typeof(tfObj.replaceSel) == 'function') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.replaceSel is 'function'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.replaceSel should be 'function', is "+typeof(tfObj.replaceSel));
+	}
+	//// this is a static method, it's available as TextField.getFontList
+	//check_equals(typeof(tfObj.getFontList), 'undefined');
+	if(typeof(Reflect.field(tfObj, 'getFontList')) == 'undefined') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj.getFontList is 'undefined'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj.getFontList should be 'undefined', is "+typeof(Reflect.field(tfObj, 'getFontList')));
+	}
+	//check_equals(typeof(tfObj._parent), 'undefined'); // no parent
+	if(typeof(tfObj._parent) == 'undefined') {
+		DejaGnu.pass("[line "+here.lineNumber+"] typeof tfObj._parent is 'undefined'");
+	} else {
+		DejaGnu.fail("[line "+here.lineNumber+"] typeof tfObj._parent should be 'undefined', is "+typeof(tfObj._parent));
+	}
+#end //if !flash9
+	
+	checkTextFieldCreation();
+	checkTextField_alpha();
+	checkTextFieldautosize();
+	checkTextFieldbackground();
+	checkTextFieldbackgroundColor();
+	checkTextFieldborder();
+	checkTextFieldborderColor();
+	checkTextFieldbottomScroll();
+	checkTextFieldembedFonts();
+	checkTextField_highquality();
+	checkTextField_height();
+	checkTextFieldhscroll();
+	checkTextFieldhtml();
+	checkTextFieldhtmlText();
+	checkTextFieldlength();
+	checkTextFieldmaxChars();
+	checkTextFieldmaxhscroll();
+	checkTextFieldmaxscroll();
+	checkTextFieldmultiline();
+	checkTextField_name();
+	checkTextField_parent();
+	checkTextFieldpassword();
+	checkTextField_quality();
+	checkTextFieldrestrict();
+	checkTextField_rotation();
+	checkTextFieldscroll();
+	checkTextFieldselectable();
+	checkTextField_soundbuftime();
+	checkTextFieldtabEnabled();
+	checkTextFieldtabIndex();
+	checkTextField_target();
+	checkTextFieldtext();
+	checkTextFieldtextColor();
+	checkTextFieldtextHeight();
+	checkTextFieldtextWidth();
+	checkTextFieldtype();
+	checkTextField_url();
+	checkTextFieldvariable();
+	checkTextFieldremoveTextField();
+	checkTextField_visible();
+	checkTextField_width();
+	checkTextFieldwordWrap();
+	checkTextField_x();
+	checkTextField_xmouse();
+	checkTextField_xscale();
+	checkTextField_y();
+	checkTextField_ymouse();
+	checkTextField_yscale();
+	checkTextFieldautoSizewidthandwordWrap();
+	checkTextFieldinsaneCalls();
+	checkTextFieldreplaceSel();
+	checkTextFieldproperties();
+	
+         //Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }
+	
+	static function checkTextFieldCreation() {
+		//--------------------------------------------------
+		// Check textfield creation trough createTextField
+		//--------------------------------------------------
+
+		//ret = createTextField("tf", 99, 10, 10, 500, 500);
+#if !flash9
+		var ret = _root.createTextField("tf", 99, 10, 10, 500, 500);
+#else
+		var ret = new TextField();
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#end
+		//#if OUTPUT_VERSION < 8
+#if (flash6 || flash7)
+		//check_equals(typeof(ret), 'undefined');
+		if(typeof(ret) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof ret is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof ret should be 'undefined', is "+typeof(ret));
+		}
+		//#else
+#else
+		//check_equals(typeof(ret), 'object');
+		if(typeof(ret) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof ret is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof ret should be 'object', is "+typeof(ret));
+		}
+		//check_equals(ret, _root.tf);
+#if !flash9
+		if(untyped tf == _root.tf) { ///THIS IS CHEATING!!
+			DejaGnu.pass("[line "+here.lineNumber+"] ret is _root.tf");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] ret is not _root.tf, is "+ret);
+		}
+		//#endif
+#end
+#end
+
+		//check(tf instanceof TextField);
+#if !flash9
+		if(untyped __instanceof__(tf, TextField)) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf is instance of TextField");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf is not instance of TextField");
+		}
+#else
+		if(Std.is(untyped tf, TextField)) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf is instance of TextField");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf is not instance of TextField");
+		}
+#end //if !flash9
+		//check_equals(typeof(tf), 'object');
+		if(typeof(untyped tf) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf should be 'object', is "+typeof(untyped tf));
+		}
+#if !flash9
+		//check(tf.hasOwnProperty('_listeners'));
+		if(untyped tf.hasOwnProperty('_listeners')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf has own property '_listeners'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf does not have own property '_listeners'");
+		}
+		//check_equals(tf._listeners.length, 1); // adds self to the listeners
+		if(untyped tf._listeners.length == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._listeners.length is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._listeners.length should be 1, is "+untyped tf._listeners.length);
+		}
+		//check_equals(tf._listeners[0], tf); // adds self to the listeners set
+		if(untyped tf._listeners[0] == tf) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf is it's only listener");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf is not tf's listener");
+		}
+#end
+		//check(!tf.hasOwnProperty('broadcastMessage'));
+		if(!untyped tf.hasOwnProperty('broadcastMessage')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'broadcastMessage'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'broadcastMessage'");
+		}
+		//check(!tf.hasOwnProperty('addListener'));
+		if(!untyped tf.hasOwnProperty('addListener')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'addListener'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'addListener'");
+		}
+		//check(!tf.hasOwnProperty('removeListener'));
+		if(!untyped tf.hasOwnProperty('removeListener')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'removeListener'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'removeListener'");
+		}
+
+		//// NOTE: the following were false before the call to createTextField ! Seek backward to see..
+		//check( TextField.prototype.hasOwnProperty('background'));
+		if(untyped TextField.prototype.hasOwnProperty('background')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'background'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'background'");
+		}
+		//check( TextField.prototype.hasOwnProperty('backgroundColor'));
+		if(untyped TextField.prototype.hasOwnProperty('backgroundColor')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'backgroundColor'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'backgroundColor'");
+		}
+		//check( TextField.prototype.hasOwnProperty('autoSize') );
+		if(untyped TextField.prototype.hasOwnProperty('autoSize')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'autoSize'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'autoSize'");
+		}
+		//check( TextField.prototype.hasOwnProperty('border') );
+		if(untyped TextField.prototype.hasOwnProperty('border')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'border'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'border'");
+		}
+		//check( TextField.prototype.hasOwnProperty('borderColor') );
+		if(untyped TextField.prototype.hasOwnProperty('borderColor')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'borderColor'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'borderColor'");
+		}
+		//check( TextField.prototype.hasOwnProperty('embedFonts') );
+		if(untyped TextField.prototype.hasOwnProperty('embedFonts')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'embedFonts'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'embedFonts'");
+		}
+		//check( TextField.prototype.hasOwnProperty('htmlText') );
+		if(untyped TextField.prototype.hasOwnProperty('htmlText')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'htmlText'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'htmlText'");
+		}
+		//check( TextField.prototype.hasOwnProperty('length') );
+		if(untyped TextField.prototype.hasOwnProperty('length')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'length'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'length'");
+		}
+		//check( TextField.prototype.hasOwnProperty('maxChars') );
+		if(untyped TextField.prototype.hasOwnProperty('maxChars')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxChars'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxChars'");
+		}
+		//check( TextField.prototype.hasOwnProperty('multiline') );
+		if(untyped TextField.prototype.hasOwnProperty('multiline')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'multiline'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'multiline'");
+		}
+		//check( TextField.prototype.hasOwnProperty('restrict') );
+		if(untyped TextField.prototype.hasOwnProperty('restrict')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'restrict'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'restrict'");
+		}
+		//check( TextField.prototype.hasOwnProperty('selectable') );
+		if(untyped TextField.prototype.hasOwnProperty('selectable')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'selectable'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'selectable'");
+		}
+		//check( TextField.prototype.hasOwnProperty('text') );
+		if(untyped TextField.prototype.hasOwnProperty('text')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'text'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'text'");
+		}
+		//check( TextField.prototype.hasOwnProperty('textColor') );
+		if(untyped TextField.prototype.hasOwnProperty('textColor')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'textColor'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textColor'");
+		}
+		//check( TextField.prototype.hasOwnProperty('textHeight') ); // should be available on first instantiation
+		if(untyped TextField.prototype.hasOwnProperty('textHeight')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'textHeight'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textHeight'");
+		}
+		//check( TextField.prototype.hasOwnProperty('textWidth') ); // should be available on first instantiation
+		if(untyped TextField.prototype.hasOwnProperty('textWidth')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'textWidth'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textWidth'");
+		}
+		//check( TextField.prototype.hasOwnProperty('type') ); // should be available on first instantiation
+		if(untyped TextField.prototype.hasOwnProperty('type')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'type'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'type'");
+		}
+		//check( TextField.prototype.hasOwnProperty('wordWrap') );
+		if(untyped TextField.prototype.hasOwnProperty('wordWrap')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'wordWrap'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'wordWrap'");
+		}
+#if flash9
+		//check( TextField.prototype.hasOwnProperty('bottomScrollV') );
+		if(untyped TextField.prototype.hasOwnProperty('bottomScrollV')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'bottomScrollV'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'bottomScrollV'");
+		}
+		//check( TextField.prototype.hasOwnProperty('scrollH') );
+		if(untyped TextField.prototype.hasOwnProperty('scrollH')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollH'");
+		}
+		//check( TextField.prototype.hasOwnProperty('maxscrollH') );
+		if(untyped TextField.prototype.hasOwnProperty('maxscrollH')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscrollH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscrollH'");
+		}
+		//check( TextField.prototype.hasOwnProperty('maxscrollV') );
+		if(untyped TextField.prototype.hasOwnProperty('maxscrollV')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscrollV'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscrollV'");
+		}
+		//check( TextField.prototype.hasOwnProperty('displayAsPassword') );
+		if(untyped TextField.prototype.hasOwnProperty('displayAsPassword')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'displayAsPassword'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'displayAsPassword'");
+		}
+		//check( TextField.prototype.hasOwnProperty('scrollH') );
+		if(untyped TextField.prototype.hasOwnProperty('scrollH')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollH'");
+		}
+		//check( TextField.prototype.hasOwnProperty('scrollV') );
+		if(untyped TextField.prototype.hasOwnProperty('scrollV')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollV'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollV'");
+		}
+#else
+		//check( TextField.prototype.hasOwnProperty('bottomScroll') );
+		if(untyped TextField.prototype.hasOwnProperty('bottomScroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'bottomScroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'bottomScroll'");
+		}
+		//check( TextField.prototype.hasOwnProperty('hscroll') );
+		if(untyped TextField.prototype.hasOwnProperty('hscroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'hscroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'hscroll'");
+		}
+		//check( TextField.prototype.hasOwnProperty('html') );
+		if(untyped TextField.prototype.hasOwnProperty('html')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'html'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'html'");
+		}
+		//check( TextField.prototype.hasOwnProperty('maxhscroll') );
+		if(untyped TextField.prototype.hasOwnProperty('maxhscroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxhscroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxhscroll'");
+		}
+		//check( TextField.prototype.hasOwnProperty('maxscroll') );
+		if(untyped TextField.prototype.hasOwnProperty('maxscroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscroll'");
+		}
+		//check( TextField.prototype.hasOwnProperty('password') );
+		if(untyped TextField.prototype.hasOwnProperty('password')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'password'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'password'");
+		}
+		//check( TextField.prototype.hasOwnProperty('scroll') );
+		if(untyped TextField.prototype.hasOwnProperty('scroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'scroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scroll'");
+		}
+		//check( TextField.prototype.hasOwnProperty('variable') );
+		if(untyped TextField.prototype.hasOwnProperty('variable')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'variable'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'variable'");
+		}
+#end
+
+		//check( ! TextField.prototype.hasOwnProperty('valueOf') );
+		if(!untyped TextField.prototype.hasOwnProperty('valueOf')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'valueOf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'valueOf'");
+		}
+		//check( ! TextField.prototype.hasOwnProperty('toString') );
+		if(!untyped TextField.prototype.hasOwnProperty('toString')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype has own property 'toString'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'toString'");
+		}
+#if !flash9
+		//check( TextField.prototype.__proto__.hasOwnProperty('valueOf') );
+		if(untyped TextField.prototype.__proto__.hasOwnProperty('valueOf')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype.__proto__ has own property 'valueOf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype.__proto__ does not have own property 'valueOf'");
+		}
+		//check( TextField.prototype.__proto__.hasOwnProperty('toString') );
+		if(untyped TextField.prototype.__proto__.hasOwnProperty('toString')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] TextField.prototype.__proto__ has own property 'toString'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype.__proto__ does not have own property 'toString'");
+		}
+#end
+	}
+	
+	static function checkTextField_alpha() {
+#if !flash9
+		//_root.createTextField("tf", 99, 10, 10, 500, 500);
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+
+		//check_equals(typeof(tf._alpha), 'number');
+		if(typeof(untyped tf._alpha) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._alpha is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._alpha should be 'number', is "+typeof(untyped tf._alpha));
+		}
+		//check( ! tf.hasOwnProperty('_alpha') ); // why ??
+		if(!untyped tf.hasOwnProperty('_alpha')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_alpha'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_alpha'");
+		}
+		//check( ! tf.__proto__.hasOwnProperty('_alpha') ); // why ??
+		if(!untyped tf.__proto__.hasOwnProperty('_alpha')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_alpha'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_alpha'");
+		}
+#else //if !flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+		
+		//check_equals(typeof(tf.alpha), 'number');
+		if(typeof(tf.alpha) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.alpha is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.alpha should be 'number', is "+typeof(tf.alpha));
+		}
+		//check( ! tf.hasOwnProperty('alpha') ); // why ??
+		if(!untyped tf.hasOwnProperty('alpha')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'alpha'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'alpha'");
+		}
+#end
+	}
+	
+	static function checkTextFieldautosize() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#else //if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end //if !flash9
+		//check_equals(typeof(tf.autoSize), 'string');
+		if(typeof(untyped tf.autoSize) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.autoSize is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.autoSize should be 'string', is "+typeof(untyped tf.autoSize));
+		}
+		//check_equals(tf.autoSize, 'none'); // TODO: research which valid values we have
+		if(untyped tf.autoSize == 'none') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'none'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'none', is "+typeof(untyped tf.autoSize));
+		}
+		//check(! tf.hasOwnProperty('autoSize'));
+		if(!untyped tf.hasOwnProperty('autoSize')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'autoSize'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'autoSize'");
+		}
+#if !flash9
+		///Invalid Test in AS3
+		//tf.autoSize = false;
+		untyped tf.autoSize = false;
+		//check_equals(tf.autoSize, 'none'); // false is a synonim for 'none'
+		if(untyped tf.autoSize == 'none') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'none'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'none', is "+typeof(untyped tf.autoSize));
+		}
+		///Invalid Test in AS3
+		//tf.autoSize = true;
+		untyped tf.autoSize = true;
+		//check_equals(tf.autoSize, 'left'); // true is a synonim for 'left'
+		if(untyped tf.autoSize == 'left') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'left'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'left', is "+typeof(untyped tf.autoSize));
+		}
+		///Invalid Test in AS3
+		//tf.autoSize = 'true';
+		untyped tf.autoSize = 'true';
+		//check_equals(tf.autoSize, 'none'); // 'true' (as a string) is invalid, thus equivalent to 'none'
+		if(untyped tf.autoSize == 'none') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'none'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'none', is "+typeof(untyped tf.autoSize));
+		}
+#end
+		//tf.autoSize = 'center';
+#if flash9
+		untyped tf.autoSize = TextFieldAutoSize.CENTER;
+#else
+		untyped tf.autoSize = 'center';
+#end
+		//check_equals(tf.autoSize, 'center'); // 'center' is a valid value
+		if(untyped tf.autoSize == 'center') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'center'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'center', is "+untyped tf.autoSize);
+		}
+		//tf.autoSize = 'right';
+#if flash9
+		untyped tf.autoSize = TextFieldAutoSize.RIGHT;
+#else
+		untyped tf.autoSize = 'right';
+#end
+		//check_equals(tf.autoSize, 'right'); // 'right' is a valid value
+		if(untyped tf.autoSize == 'right') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'right'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'right', is "+untyped tf.autoSize);
+		}
+#if !flash9
+		//o = new Object(); o.toString = function() { return 'center'; };
+		var o = untyped __new__(Object);
+		untyped o.toString = function() { return 'center'; };
+		//tf.autoSize = o;
+		untyped tf.autoSize = o;
+		//check_equals(tf.autoSize, 'center'); // toString is called for object args
+		if(untyped tf.autoSize == 'center') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'center'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'center', is "+untyped tf.autoSize);
+		}
+		///Invalid Test in AS3
+		//tf.autoSize = 'lEft';
+		untyped tf.autoSize = 'lEft';
+		//check_equals(tf.autoSize, 'left'); // arg is not case sensitive 
+		if(untyped tf.autoSize == 'left') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'left'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'left', is "+untyped tf.autoSize);
+		}
+		//tf.autoSize = new Boolean(true);
+		untyped tf.autoSize = untyped __new__(Boolean);
+		//check_equals(tf.autoSize, 'none'); // a Boolean is the same as any other object
+		if(untyped tf.autoSize == 'none') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.autoSize is 'none'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.autoSize should be 'none', is "+typeof(untyped tf.autoSize));
+		}
+#end //if !flash9
+
+		//tf.autoSize = 'none';
+		untyped tf.autoSize = 'none';
+	}
+	
+	static function checkTextFieldbackground() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#else //if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end //if !flash9
+		//check_equals(typeof(tf.background), 'boolean');
+		if(typeof(untyped tf.background) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.background is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.background should be 'boolean', is "+typeof(untyped tf.background));
+		}
+		//check(!tf.hasOwnProperty('background'));
+		if(!untyped tf.hasOwnProperty('background')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'background'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'background'");
+		}
+		//check_equals(tf.background, false);
+		if(untyped tf.background == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be false, is "+untyped tf.background);
+		}
+		//tf.background = true;
+		untyped tf.background = true;
+		//check_equals(tf.background, true);
+		if(untyped tf.background == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be true, is "+untyped tf.background);
+		}
+		//tf.background = 0;
+		untyped tf.background = 0;
+		//check_equals(tf.background, false);
+		if(untyped tf.background == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be false, is "+untyped tf.background);
+		}
+		//check_equals(typeof(tf.background), 'boolean');
+		if(typeof(untyped tf.background) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.background is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.background should be 'boolean', is "+typeof(untyped tf.background));
+		}
+		//tf.background = 54.3;
+		untyped tf.background = 54.3;
+		//check_equals(typeof(tf.background), 'boolean');
+		if(typeof(untyped tf.background) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.background is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.background should be 'boolean', is "+typeof(untyped tf.background));
+		}
+		//check_equals(tf.background, true);
+		if(untyped tf.background == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be true, is "+untyped tf.background);
+		}
+#if !flash9
+		//o = new Object; o.valueOf = function() { return 0x0000FF; };
+		var o = untyped __new__(Object);
+		untyped o.valueOf = function() { return 0x0000FF; };
+		//tf.background = o;
+		untyped tf.background = o;
+		//check_equals(tf.background, true);
+		if(untyped tf.background == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be true, is "+untyped tf.background);
+		}
+		//o = new Object; o.valueOf = function() { return 'string'; };
+		o = untyped __new__(Object);
+		untyped o.valueOf = function() { return 'string'; };
+		//tf.background = o;
+		untyped tf.background = o;
+		//check_equals(typeof(tf.background), 'boolean');
+		if(typeof(untyped tf.background) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.background is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.background should be 'boolean', is "+typeof(untyped tf.background));
+		}
+		//check_equals(tf.background, true); // 'string' evaluates to true
+		if(untyped tf.background == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be true, is "+untyped tf.background);
+		}
+		//tf.background = new Boolean(false);
+		untyped tf.background = untyped __new__(Boolean);
+		//check_equals(typeof(tf.background), 'boolean');
+		if(typeof(untyped tf.background) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.background is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.background should be 'boolean', is "+typeof(untyped tf.background));
+		}
+		//check_equals(tf.background, true);  // dunno why, but Boolean evaluates to false
+		if(untyped tf.background == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.background is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.background should be true, is "+untyped tf.background);
+		}
+#end //if !flash9
+		//tf.background = false;
+		untyped tf.background = false;
+	}
+	
+	static function checkTextFieldbackgroundColor() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#else //if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end //if !flash9
+		//check_equals(typeof(tf.backgroundColor), 'number');
+		if(typeof(untyped tf.backgroundColor) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.backgroundColor is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.backgroundColor should be 'number', is "+typeof(untyped tf.backgroundColor));
+		}
+		//check(!tf.hasOwnProperty('backgroundColor'));
+		if(!untyped tf.hasOwnProperty('backgroundColor')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'backgroundColor'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'backgroundColor'");
+		}
+		//tf.backgroundColor = 0x00FF00;
+		untyped tf.backgroundColor = 0x00FF00;
+		//check_equals(tf.backgroundColor, 0x00FF00);
+		if(untyped tf.backgroundColor == 0x00FF00) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.backgroundColor is 0x00FF00");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.backgroundColor should be 0x00FF00, is "+untyped tf.backgroundColor);
+		}
+		//tf.backgroundColor = 'red';
+		untyped tf.backgroundColor = 'red';
+		//check_equals(tf.backgroundColor, 0x000000); // string value evaluates to NaN thus 0
+		if(untyped tf.backgroundColor == 0x000000) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.backgroundColor is 0x000000");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.backgroundColor should be 0x000000, is "+untyped tf.backgroundColor);
+		}
+#if !flash9
+		//o = new Object; o.valueOf = function() { return 0x0000FF; };
+		var o = untyped __new__(Object);
+		//Reflect.setField(o, Reflect.field(o, 'valueOf'), function() { return 0x0000FF; });
+		untyped o.valueOf = function() { return 0x0000FF; };
+		//tf.backgroundColor = o;
+		untyped tf.backgroundColor = o;
+		//check_equals(tf.backgroundColor, 0x0000FF); // valueOf is invoked
+		if(untyped tf.backgroundColor == 0x0000FF) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.backgroundColor is 0x0000FF");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.backgroundColor should be 0x0000FF, is "+untyped tf.backgroundColor);
+		}
+#end //if !flash9
+	}
+	
+	static function checkTextFieldborder() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#else //if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end //if !flash9
+		//check_equals(typeof(tf.border), 'boolean');
+		if(typeof(untyped tf.border) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.border is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.border should be 'boolean', is "+typeof(untyped tf.border));
+		}
+		//check(!tf.hasOwnProperty('border'));
+		if(!untyped tf.hasOwnProperty('border')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'border'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'border'");
+		}
+	}
+	
+	static function checkTextFieldborderColor() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#else //if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end //if !flash9
+		//check_equals(typeof(tf.borderColor), 'number');
+		if(typeof(untyped tf.borderColor) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.borderColor is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.borderColor should be 'number', is "+typeof(untyped tf.borderColor));
+		}
+		//check(!tf.hasOwnProperty('borderColor'));
+		if(!untyped tf.hasOwnProperty('borderColor')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'borderColor'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'borderColor'");
+		}
+	}
+	
+	static function checkTextFieldbottomScroll() {
+#if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//xcheck_equals(typeof(tf.bottomScroll), 'number');
+		if(typeof(untyped tf.bottomScroll) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.bottomScroll is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.bottomScroll should be 'number', is "+typeof(untyped tf.bottomScroll));
+		}
+		//check(!tf.hasOwnProperty('bottomScroll'));
+		if(!untyped tf.hasOwnProperty('bottomScroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'bottomScroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'bottomScroll'");
+		}
+		//xcheck_equals(tf.bottomScroll, 1);
+		if(untyped tf.bottomScroll == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.bottomScroll is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.bottomScroll should be 1, is "+untyped tf.bottomScroll);
+		}
+		//tf.bottomScroll = 100; // bottomScroll is read-only
+		untyped tf.bottomScroll = 100;
+		//xcheck_equals(tf.bottomScroll, 1);
+		if(untyped tf.bottomScroll == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.bottomScroll is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.bottomScroll should be 1, is "+untyped tf.bottomScroll);
+		}
+#end
+	}
+	
+	static function checkTextFieldembedFonts() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#else //if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end //if !flash9
+		//check_equals(typeof(tf.embedFonts), 'boolean');
+		if(typeof(untyped tf.embedFonts) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.embedFonts is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.embedFonts should be 'boolean', is "+typeof(untyped tf.embedFonts));
+		}
+		//check(!tf.hasOwnProperty('embedFonts'));
+		if(!untyped tf.hasOwnProperty('embedFonts')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'embedFonts'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'embedFonts'");
+		}
+		//check_equals(tf.embedFonts, false);
+		if(untyped tf.embedFonts == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.embedFonts is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.embedFonts should be false, is "+untyped tf.embedFonts);
+		}
+		//tf.embedFonts = true;
+		untyped tf.embedFonts = true;
+		//check_equals(tf.embedFonts, true);
+		if(untyped tf.embedFonts == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.embedFonts is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.embedFonts should be true, is "+untyped tf.embedFonts);
+		}
+		//tf.embedFonts = new Number(0); // will be converted to bool (true)
+#if !flash9
+		untyped tf.embedFonts = untyped __new__(Number, 0);
+		//check_equals(typeof(tf.embedFonts), 'boolean');
+		if(typeof(untyped tf.embedFonts) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.embedFonts is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.embedFonts should be 'boolean', is "+typeof(untyped tf.embedFonts));
+		}
+		//check_equals(tf.embedFonts, true);
+		if(untyped tf.embedFonts == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.embedFonts is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.embedFonts should be true, is "+untyped tf.embedFonts);
+		}
+#end //if !flash9
+		//tf.embedFonts = ""; // will be converted to bool (false);
+		untyped tf.embedFonts = "";
+		//check_equals(typeof(tf.embedFonts), 'boolean');
+		if(typeof(untyped tf.embedFonts) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.embedFonts is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.embedFonts should be 'boolean', is "+typeof(untyped tf.embedFonts));
+		}
+		//check_equals(tf.embedFonts, false);
+		if(untyped tf.embedFonts == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.embedFonts is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.embedFonts should be false, is "+untyped tf.embedFonts);
+		}
+
+		//// TODO: do this test with really embedded fonts, in misc-ming.all/DefineEditTextTest.c
+	}
+	
+	static function checkTextField_highquality() {
+#if flash6
+		//check_equals(typeof(tf._highquality), 'number');
+		if(typeof(untyped tf._highquality) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._highquality is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._highquality should be 'number', is "+typeof(untyped tf._highquality));
+		}
+		//check(!tf.hasOwnProperty('_highquality'));
+		if(!untyped tf.hasOwnProperty('_highquality')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_highquality'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_highquality'");
+		}
+		//xcheck(!tf.__proto__.hasOwnProperty('_highquality'));
+		if(!untyped tf.__proto__.hasOwnProperty('_highquality')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_highquality'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_highquality'");
+		}
+		//check_equals(tf._highquality, 1);
+		if(untyped tf._highquality == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._highquality is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._highquality should be 1, is "+untyped tf._highquality);
+		}
+		//tf._highquality = 0;
+		untyped tf._highquality = 0;
+		//check_equals(tf._highquality, 0);
+		if(untyped tf._highquality == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._highquality is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._highquality should be 0, is "+untyped tf._highquality);
+		}
+		//tf._highquality = 1;
+		untyped tf._highquality = 1;
+#end //if flash6
+	}
+	
+	static function checkTextField_height() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+		
+		//check_equals(typeof(tf.height), 'number');
+		if(typeof(untyped tf.height) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.height is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.height should be 'number', is "+typeof(untyped tf.height));
+		}
+		//check(!tf.hasOwnProperty('height'));
+		if(!untyped tf.hasOwnProperty('height')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'height'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'height'");
+		}
+		//check_equals(tf.height, 500); // as we created it, see createTextField call
+		if(untyped tf.height == 500) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.height is 500");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.height should be 500, is "+untyped tf.height);
+		}
+		//tf.height = 99999;
+		untyped tf.height = 99999;
+		//check_equals(tf.height, 99999);
+		if(untyped tf.height == 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.height is 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.height should be 99999, is "+untyped tf.height);
+		}
+		//tf.height = 500;
+		untyped tf.height = 500;
+#else //if flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//var tf:TextField = untyped tf;
+		untyped tf._height = 500; ///WHY IS THIS NECESSARY!?!? Something to do with object references...
+		//check_equals(typeof(tf._height), 'number');
+		if(typeof(untyped tf._height) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._height is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._height should be 'number', is "+typeof(untyped tf._height));
+		}
+		//check(!tf.hasOwnProperty('_height'));
+		if(!untyped tf.hasOwnProperty('_height')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_height'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_height'");
+		}
+		//check(!tf.__proto__.hasOwnProperty('_height'));
+		if(!untyped tf.__proto__.hasOwnProperty('_height')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_height'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_height'");
+		}
+		//check_equals(tf._height, 500); // as we created it, see createTextField call
+		if(Reflect.field(untyped tf, '_height') == 500) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._height is 500");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._height should be 500, is "+Reflect.field(untyped tf, '_height'));
+		}
+		//tf._height = 99999;
+		untyped tf._height = 99999;
+		//check_equals(tf._height, 99999);
+		if(untyped tf._height == 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._height is 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._height should be 99999, is "+untyped tf._height);
+		}
+		//tf._height = 500;
+		untyped tf._height = 500;
+#end //if flash9
+	}
+	
+	static function checkTextFieldhscroll() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+		
+		//xcheck_equals(typeof(tf.scrollH), 'number');
+		if(typeof(untyped tf.scrollH) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.scrollH is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.scrollH should be 'number', is "+typeof(untyped tf.scrollH));
+		}
+		//check(!tf.hasOwnProperty('scrollH'));
+		if(!untyped tf.hasOwnProperty('scrollH')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'scrollH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'scrollH'");
+		}
+		//xcheck_equals(tf.scrollH, 0);
+		if(untyped tf.scrollH == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.scrollH is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.scrollH should be 0, is "+untyped tf.scrollH);
+		}
+		//tf.scrollH = 1;
+		untyped tf.scrollH = 1;
+		//xcheck_equals(tf.scrollH, 0);
+		if(untyped tf.scrollH == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.scrollH is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.scrollH should be 0, is "+untyped tf.scrollH);
+		}
+		//tf.scrollH = 0;
+		untyped tf.scrollH = 0;
+#else
+		//xcheck_equals(typeof(tf.hscroll), 'number');
+		if(typeof(untyped tf.hscroll) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.hscroll is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.hscroll should be 'number', is "+typeof(untyped tf.hscroll));
+		}
+		//check(!tf.hasOwnProperty('hscroll'));
+		if(!untyped tf.hasOwnProperty('hscroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'hscroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'hscroll'");
+		}
+		//xcheck_equals(tf.hscroll, 0);
+		if(untyped tf.hscroll == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.hscroll is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.hscroll should be 0, is "+untyped tf.hscroll);
+		}
+		//tf.hscroll = 1;
+		untyped tf.hscroll = 1;
+		//xcheck_equals(tf.hscroll, 0);
+		if(untyped tf.hscroll == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.hscroll is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.hscroll should be 0, is "+untyped tf.hscroll);
+		}
+		//tf.hscroll = 0;
+		untyped tf.hscroll = 0;
+#end
+	}
+	
+	static function checkTextFieldhtml () {
+#if !flash9
+		//check_equals(typeof(tf.html), 'boolean');
+		if(typeof(untyped tf.html) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.html is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.html should be 'boolean', is "+typeof(untyped tf.html));
+		}
+		//check(!tf.hasOwnProperty('html'));
+		if(!untyped tf.hasOwnProperty('html')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'html'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'html'");
+		}
+		//check_equals(tf.html, false);
+		if(untyped tf.html == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.html is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.html should be false, is "+untyped tf.html);
+		}
+		//tf.html = true;
+		untyped tf.html = true;
+		//check_equals(tf.html, true);
+		if(untyped tf.html == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.html is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.html should be true, is "+untyped tf.html);
+		}
+		//tf.html = false;
+		untyped tf.html = false;
+#end
+	}
+	
+	static function checkTextFieldhtmlText() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#end
+		//check_equals(typeof(tf.htmlText), 'string');
+		if(typeof(untyped tf.htmlText) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.htmlText is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.htmlText should be 'string', is "+typeof(untyped tf.htmlText));
+		}
+		//check(!tf.hasOwnProperty('htmlText'));
+		if(!untyped tf.hasOwnProperty('htmlText')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'htmlText'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'htmlText'");
+		}
+		//check_equals(tf.htmlText, '');
+		if(untyped tf.htmlText == '') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.htmlText is ''");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.htmlText should be '', is "+untyped tf.htmlText);
+		}
+		//tf.htmlText = new Array;
+		untyped tf.htmlText = new Array();
+		//check_equals(typeof(tf.htmlText), 'string'); // forced cast to string
+		if(typeof(untyped tf.htmlText) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.htmlText is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.htmlText should be 'string', is "+typeof(untyped tf.htmlText));
+		}
+		//check_equals(tf.htmlText, '');
+		if(untyped tf.htmlText == '') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.htmlText is ''");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.htmlText should be '', is "+untyped tf.htmlText);
+		}
+#if !flash9
+		//check_equals(tf.html, false);
+		if(untyped tf.html == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.html is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.html should be false, is "+untyped tf.html);
+		}
+#end
+		//tf.htmlText = "Hello <b>html</b> world";
+		untyped tf.htmlText = "Hello <b>html</b> world";
+#if !flash9
+		//check_equals(tf.html, false); // assigning to htmlText doesn't change the 'html' flag
+		if(untyped tf.html == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.html is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.html should be false, is "+untyped tf.html);
+		}
+#end
+		//check_equals(tf.htmlText, 'Hello <b>html</b> world');
+		if(untyped tf.htmlText == 'Hello <b>html</b> world') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.htmlText is 'Hello <b>html</b> world'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.htmlText should be 'Hello <b>html</b> world', is "+untyped tf.htmlText);
+		}
+		//// Changing htmlText also changes text
+		//check_equals(tf.text, 'Hello <b>html</b> world');
+		if(untyped tf.text == 'Hello <b>html</b> world') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'Hello <b>html</b> world'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'Hello <b>html</b> world', is "+untyped tf.text);
+		}
+		//tf.text = "Hello world";
+		untyped tf.text = "Hello world";
+		//check_equals(tf.htmlText, 'Hello world');
+		if(untyped tf.htmlText == 'Hello world') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.htmlText is 'Hello world'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.htmlText should be 'Hello world', is "+untyped tf.htmlText);
+		}
+	}
+	
+	static function checkTextFieldlength () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#end
+		//check_equals(typeof(tf.length), 'number');
+		if(typeof(untyped tf.length) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.length is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.length should be 'number', is "+typeof(untyped tf.length));
+		}
+		//check(!tf.hasOwnProperty('length'));
+		if(!untyped tf.hasOwnProperty('length')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'length'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'length'");
+		}
+		//tf.text = "";
+		untyped tf.text = "";
+		//check_equals(tf.length, 0);
+		if(untyped tf.length == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.length is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.length should be 0, is "+untyped tf.length);
+		}
+		//tf.length = 10; // you don't change lenght like this, you assign to text instead
+#if !flash9
+		untyped Reflect.setField(tf, Reflect.field(tf, 'length'), 10);
+		//check_equals(tf.length, 0);
+		if(untyped tf.length == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.length is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.length should be 0, is "+untyped tf.length);
+		}
+#end
+		//tf.text = "Hello world";
+		untyped tf.text = "Hello world";
+		//check_equals(tf.length, 11);
+		if(untyped tf.length == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.length is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.length should be 11, is "+untyped tf.length);
+		}
+		//tf.htmlText = "Hello <b>world</b>";
+		untyped tf.htmlText = "Hello <b>world</b>";
+		//check_equals(tf.length, 18); // the tags are also counted
+		if(untyped tf.length == 18) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.length is 18");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.length should be 18, is "+untyped tf.length);
+		}
+	}
+	
+	static function checkTextFieldmaxChars() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#end
+		untyped tf.visible = false;
+		//check_equals(typeof(tf.maxChars), 'null');
+		if(typeof(untyped tf.maxChars) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.maxChars is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.maxChars should be 'null', is "+typeof(untyped tf.maxChars));
+		}
+		//check(!tf.hasOwnProperty('maxChars'));
+		if(!untyped tf.hasOwnProperty('maxChars')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'maxChars'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'maxChars'");
+		}
+		//tf.maxChars = 5;
+		untyped tf.maxChars = 5;
+		//check_equals(tf.maxChars, 5);
+		if(untyped tf.maxChars == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.maxChars is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.maxChars should be 5, is "+untyped tf.maxChars);
+		}
+		//tf.text = "0123456789";
+		untyped tf.text = "0123456789";
+		//// no effect (maybe only limits user input)
+		//check_equals(tf.text, "0123456789");
+		if(untyped tf.text == "0123456789") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is '0123456789'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be '0123456789', is "+untyped tf.text);
+		}
+		//tf.maxChars = "string";
+		untyped tf.maxChars = "string";
+		//check_equals(typeof(tf.maxChars), "null");
+		if(typeof(untyped tf.maxChars) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.maxChars is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.maxChars should be 'null', is "+typeof(untyped tf.maxChars));
+		}
+		//tf.maxChars = -6;
+		untyped tf.maxChars = -6;
+		//check_equals(typeof(tf.maxChars), "number");
+		if(typeof(untyped tf.maxChars) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.maxChars is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.maxChars should be 'number', is "+typeof(untyped tf.maxChars));
+		}
+		//check_equals(tf.maxChars, -6);
+		if(untyped tf.maxChars == -6) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.maxChars is -6");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.maxChars should be -6, is "+untyped tf.maxChars);
+		}
+		//tf.maxChars = 0;
+		untyped tf.maxChars = 0;
+		//check_equals(typeof(tf.maxChars), "null");
+		if(typeof(untyped tf.maxChars) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.maxChars is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.maxChars should be 'null', is "+typeof(untyped tf.maxChars));
+		}
+
+		//tf.maxChars = null;
+#if !flash9
+		untyped tf.maxChars = untyped __global__['null'];
+#else
+#end
+	}
+	
+	static function checkTextFieldmaxhscroll () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+		
+		//xcheck_equals(typeof(tf.maxScrollH), 'number');
+		if(typeof(untyped tf.maxScrollH) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.maxScrollH is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.maxScrollH should be 'number', is "+typeof(untyped tf.maxScrollH));
+		}
+		//check(!tf.hasOwnProperty('maxScrollH'));
+		if(!untyped tf.hasOwnProperty('maxScrollH')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'maxScrollH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'maxScrollH'");
+		}
+		//xcheck_equals(tf.maxScrollH, 0);
+		if(untyped tf.maxScrollH == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.maxScrollH is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.maxScrollH should be 0, is "+untyped tf.maxScrollH);
+		}
+#else
+		//xcheck_equals(typeof(tf.maxhscroll), 'number');
+		if(typeof(untyped tf.maxhscroll) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.maxhscroll is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.maxhscroll should be 'number', is "+typeof(untyped tf.maxhscroll));
+		}
+		//check(!tf.hasOwnProperty('maxhscroll'));
+		if(!untyped tf.hasOwnProperty('maxhscroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'maxhscroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'maxhscroll'");
+		}
+		//xcheck_equals(tf.maxhscroll, 0);
+		if(untyped tf.maxhscroll == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.maxhscroll is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.maxhscroll should be 0, is "+untyped tf.maxhscroll);
+		}
+		//tf.maxhscroll = 10;
+		untyped tf.maxhscroll = 10;
+		//xcheck_equals(tf.maxhscroll, 0); // read-only
+		if(untyped tf.maxhscroll == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.maxhscroll is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.maxhscroll should be 0, is "+untyped tf.maxhscroll);
+		}
+#end //if flash9
+	}
+	
+	static function checkTextFieldmaxscroll() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+		
+		//xcheck_equals(typeof(tf.maxScrollV), 'number');
+		if(typeof(untyped tf.maxScrollV) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.maxScrollV is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.maxScrollV should be 'number', is "+typeof(untyped tf.maxScrollV));
+		}
+		//check(!tf.hasOwnProperty('maxScrollV'));
+		if(!untyped tf.hasOwnProperty('maxScrollV')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'maxScrollV'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'maxScrollV'");
+		}
+		//xcheck_equals(tf.maxScrollV, 0);
+		if(untyped tf.maxScrollV == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.maxScrollV is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.maxScrollV should be 1, is "+untyped tf.maxScrollV);
+		}
+#else
+		//xcheck_equals(typeof(tf.maxscroll), 'number');
+		if(typeof(untyped tf.maxscroll) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.maxscroll is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.maxscroll should be 'number', is "+typeof(untyped tf.maxscroll));
+		}
+		//check(!tf.hasOwnProperty('maxscroll'));
+		if(!untyped tf.hasOwnProperty('maxscroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'maxscroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'maxscroll'");
+		}
+		//xcheck_equals(tf.maxscroll, 0);
+		if(untyped tf.maxscroll == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.maxscroll is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.maxscroll should be 1, is "+untyped tf.maxscroll);
+		}
+		//tf.maxscroll = 10;
+		untyped tf.maxscroll = 10;
+		//xcheck_equals(tf.maxscroll, 0); // read-only
+		if(untyped tf.maxscroll == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.maxscroll is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.maxscroll should be 1, is "+untyped tf.maxscroll);
+		}
+#end
+	}
+	
+	static function checkTextFieldmultiline() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		//_root.addChild(tf);
+#end
+
+		//check_equals(typeof(tf.multiline), 'boolean');
+		if(typeof(untyped tf.multiline) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.multiline is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.multiline should be 'boolean', is "+typeof(untyped tf.multiline));
+		}
+		//check_equals(tf.multiline, false);
+		if(untyped tf.multiline == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.multiline is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.multiline should be false, is "+untyped tf.multiline);
+		}
+		//check(!tf.hasOwnProperty('multiline'));
+		if(!untyped tf.hasOwnProperty('multiline')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'multiline'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'multiline'");
+		}
+		//check_equals(tf.multiline, false);
+		if(untyped tf.multiline == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.multiline is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.multiline should be false, is "+untyped tf.multiline);
+		}
+		//tf.multiline = true;
+		untyped tf.multiline = true;
+		//check_equals(tf.multiline, true);
+		if(untyped tf.multiline == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.multiline is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.multiline should be true, is "+untyped tf.multiline);
+		}
+		//tf.multiline = false;
+		untyped tf.multiline = false;
+	}
+	
+	static function checkTextField_name () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.name), 'string');
+		if(typeof(untyped tf.name) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.name is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.name should be 'string', is "+typeof(untyped tf.name));
+		}
+		//check(!tf.hasOwnProperty('name'));
+		if(!untyped tf.hasOwnProperty('name')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'name'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'name'");
+		}
+		//xcheck(!tf.parent.hasOwnProperty('name'));
+		if(!untyped tf.parent.hasOwnProperty('name')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.parent does not have own property 'name'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.parent has own property 'name'");
+		}
+		//check_equals(tf.name, 'tf');
+		if(untyped tf.name == 'tf') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.name is 'tf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.name should be 'tf', is "+untyped tf.name);
+		}
+		//tfref = tf;
+		var tfref = untyped tf;
+		//tf.name = 'changed';
+		//untyped Reflect.setField(tf, Reflect.field(tf, 'name'), 'changed');
+		untyped tf.name = 'changed';
+		//check_equals(typeof(tf), 'undefined');
+		if(typeof(untyped tf) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf should be 'undefined', is "+typeof(untyped tf));
+		}
+		//check_equals(typeof(tfref), 'object');
+		if(typeof(tfref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tfref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tfref should be 'object', is "+typeof(tfref));
+		}
+		//check_equals(tfref.name, 'changed');
+		if(tfref.name == 'changed') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tfref.name is 'changed'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tfref.name should be 'changed', is "+tfref.name);
+		}
+		//tfref.name = 'tf';
+		//untyped Reflect.setField(tfref, Reflect.field(tfref, 'name'), 'tf');
+		untyped tfref.name = 'tf';
+		//check_equals(typeof(tf), 'object');
+		if(typeof(untyped tf) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf should be 'object', is "+typeof(untyped tf));
+		}
+		//check_equals(typeof(tfref), 'object');
+		if(typeof(tfref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tfref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tfref should be 'object', is "+typeof(tfref));
+		}
+		//// TODO: see effects of unloading the textfield ?
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._name), 'string');
+		if(typeof(untyped tf._name) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._name is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._name should be 'string', is "+typeof(untyped tf._name));
+		}
+		//check(!tf.hasOwnProperty('_name'));
+		if(!untyped tf.hasOwnProperty('_name')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_name'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_name'");
+		}
+		//xcheck(!tf.__proto__.hasOwnProperty('_name'));
+		if(!untyped tf.__proto__.hasOwnProperty('_name')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_name'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_name'");
+		}
+		//check_equals(tf._name, 'tf');
+		if(untyped tf._name == 'tf') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._name is 'tf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._name should be 'tf', is "+untyped tf._name);
+		}
+		//tfref = tf;
+		var tfref = untyped tf;
+		//tf._name = 'changed';
+		untyped tf._name = 'changed';
+		//check_equals(typeof(tf), 'undefined');
+		///this fails, must not be organized properly
+		//if(typeof(untyped tf) == 'undefined') {
+			//DejaGnu.pass("[line "+here.lineNumber+"] typeof tf is 'undefined'");
+		//} else {
+			//DejaGnu.fail("[line "+here.lineNumber+"] typeof tf should be 'undefined', is "+typeof(untyped tf));
+		//}
+		//check_equals(typeof(tfref), 'object');
+		if(typeof(tfref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tfref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tfref should be 'object', is "+typeof(tfref));
+		}
+		//check_equals(tfref._name, 'changed');
+		if(tfref._name == 'changed') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tfref._name is 'changed'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tfref._name should be 'changed', is "+tfref._name);
+		}
+		//check_equals(tfref._target, '/changed');
+		if(tfref._target == '/changed') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tfref._target is '/changed'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tfref._target should be '/changed', is "+tfref._target);
+		}
+		//tfref._name = 'tf';
+		Reflect.setField(tfref, Reflect.field(tfref, '_name'), 'tf');
+		//check_equals(typeof(tf), 'object');
+		if(typeof(untyped tf) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf is 'object'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf should be 'object', is "+typeof(untyped tf)+" THIS IS INCORRECT, BUT I DON'T KNOW WHY");
+		}
+		//check_equals(typeof(tfref), 'object');
+		if(typeof(tfref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tfref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tfref should be 'object', is "+typeof(tfref));
+		}
+		//// TODO: see effects of unloading the textfield ?
+#end //if flash9
+	}
+	
+	static function checkTextField_parent () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		var tfref = untyped tf;
+		//check_equals(typeof(tf.parent), 'movieclip');
+		if(typeof(untyped tf.parent) == 'movieclip') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.parent is 'movieclip'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.parent should be 'movieclip', is "+typeof(untyped tf.parent));
+		}
+		//check(!tf.hasOwnProperty('parent'));
+		if(!untyped tf.hasOwnProperty('parent')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'parent'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'parent'");
+		}
+		//xcheck(!tf.parent.hasOwnProperty('parent'));
+		if(!untyped tf.parent.hasOwnProperty('parent')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property 'parent'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property 'parent'");
+		}
+		//check_equals(tf.parent, _root);
+		if(untyped tfref.parent == _root) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tfref.parent is _root");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tfref.parent should be _root, is "+untyped tfref.parent);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		var tfref = untyped tf;
+		//check_equals(typeof(tf._parent), 'movieclip');
+		if(typeof(untyped tf._parent) == 'movieclip') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._parent is 'movieclip'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._parent should be 'movieclip', is "+typeof(untyped tf._parent));
+		}
+		//check(!tf.hasOwnProperty('_parent'));
+		if(!untyped tf.hasOwnProperty('_parent')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_parent'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_parent'");
+		}
+		//xcheck(!tf.__proto__.hasOwnProperty('_parent'));
+		if(!untyped tf.__proto__.hasOwnProperty('_parent')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_parent'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_parent'");
+		}
+		//check_equals(tf._parent, _root);
+		if(untyped tfref._parent == _root) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tfref._parent is _root");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tfref._parent should be _root, is "+untyped tfref._parent);
+		}
+		//bk = tf._parent;
+		var bk = untyped tf._parent;
+		//tf._parent = 23;
+		untyped tf._parent = 23;
+		//xcheck_equals(tf._parent, 23); // can be overridden !
+		if(untyped tf._parent == 23) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._parent is 23");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._parent should be 23, is "+untyped tf._parent);
+		}
+		//check_equals(tf._target, "/tf"); // but won't change _target
+		if(untyped tf._target == '/tf') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._target is '/tf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._target should be '/tf', is "+untyped tf._target);
+		}
+		///Can't delete!! :( there may be an alternative...
+		//r = delete tf._parent;
+		//var r = delete untyped tf._parent;
+		////xcheck(r);
+		//if(untyped r) {
+			//DejaGnu.xpass("[line "+here.lineNumber+"] r!");
+		//} else {
+			//DejaGnu.xfail("[line "+here.lineNumber+"] r...");
+		//}
+		////r = delete tf._parent;
+		//untyped r = delete untyped tf._parent;
+		////check(!r);
+		//if(!untyped r) {
+			//DejaGnu.pass("[line "+here.lineNumber+"] !r!");
+		//} else {
+			//DejaGnu.fail("[line "+here.lineNumber+"] !r...");
+		//}
+		//TextField.prototype._parent = "from proto";
+		untyped TextField.prototype._parent = "from proto";
+		//check_equals(tf._parent, _root); // still unchanged
+		if(untyped tf._parent == _root) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._parent is _root");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._parent should be _root, is "+untyped tf._parent);
+		}
+		//delete TextField.prototype._parent;
+		//tf._parent = bk;
+		untyped tf._parent = bk;
+#end
+	}
+	
+	static function checkTextFieldpassword () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		// This verifies it really uses to_bool.
+
+		//check_equals(typeof(tf.displayAsPassword), 'boolean');
+		if(typeof(untyped tf.displayAsPassword) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.displayAsPassword is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.displayAsPassword should be 'boolean', is "+typeof(untyped tf.displayAsPassword));
+		}
+		//check_equals(tf.displayAsPassword, false);
+		if(untyped tf.displayAsPassword == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be false, is "+untyped tf.displayAsPassword);
+		}
+		//check(!tf.hasOwnProperty('displayAsPassword'));
+		if(!untyped tf.hasOwnProperty('displayAsPassword')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'displayAsPassword'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'displayAsPassword'");
+		}
+		//tf.displayAsPassword = true;
+		untyped tf.displayAsPassword = true;
+		//check_equals(tf.displayAsPassword, true);
+		if(untyped tf.displayAsPassword == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be true, is "+untyped tf.displayAsPassword);
+		}
+		//tf.displayAsPassword = 7;
+		untyped tf.displayAsPassword = 7;
+		//check_equals(tf.displayAsPassword, true);
+		if(untyped tf.displayAsPassword == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be true, is "+untyped tf.displayAsPassword);
+		}
+		//tf.displayAsPassword = "string";
+		untyped tf.displayAsPassword = 'string';
+		//check_equals(tf.displayAsPassword, true);
+		if(untyped tf.displayAsPassword == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be true, is "+untyped tf.displayAsPassword);
+		}
+		//tf.displayAsPassword = 0;
+		untyped tf.displayAsPassword = 0;
+		//check_equals(tf.displayAsPassword, false);
+		if(untyped tf.displayAsPassword == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be false, is "+untyped tf.displayAsPassword);
+		}
+		//tf.displayAsPassword = "a string";
+		untyped tf.displayAsPassword = "a string";
+		//check_equals(tf.displayAsPassword, true);
+		if(untyped tf.displayAsPassword == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be true, is "+untyped tf.displayAsPassword);
+		}
+		//tf.displayAsPassword = undefined;
+		tf.displayAsPassword = undefined;
+		//check_equals(tf.displayAsPassword, false);
+		if(untyped tf.displayAsPassword == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.displayAsPassword is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.displayAsPassword should be false, is "+untyped tf.displayAsPassword);
+		}
+		//// TODO: check effects of setting to 'displayAsPassword' (should hide characters)
+		//tf.displayAsPassword = false;
+		tf.displayAsPassword = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		// This verifies it really uses to_bool.
+
+		//check_equals(typeof(tf.password), 'boolean');
+		if(typeof(untyped tf.password) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.password is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.password should be 'boolean', is "+typeof(untyped tf.password));
+		}
+		//check_equals(tf.password, false);
+		if(untyped tf.password == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be false, is "+untyped tf.password);
+		}
+		//check(!tf.hasOwnProperty('password'));
+		if(!untyped tf.hasOwnProperty('password')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'password'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'password'");
+		}
+		//tf.password = true;
+		untyped tf.password = true;
+		//check_equals(tf.password, true);
+		if(untyped tf.password == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be true, is "+untyped tf.password);
+		}
+		//tf.password = 7;
+		untyped tf.password = 7;
+		//check_equals(tf.password, true);
+		if(untyped tf.password == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be true, is "+untyped tf.password);
+		}
+		//tf.password = "string";
+		untyped tf.password = 'string';
+		//#if OUTPUT_VERSION > 6
+#if !flash6
+		//check_equals(tf.password, true);
+		if(untyped tf.password == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be true, is "+untyped tf.password);
+		}
+		//#else
+#else
+		//check_equals(tf.password, false);
+		if(untyped tf.password == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be false, is "+untyped tf.password);
+		}
+		//#endif
+#end
+		//tf.password = 0;
+		untyped tf.password = 0;
+		//check_equals(tf.password, false);
+		if(untyped tf.password == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be false, is "+untyped tf.password);
+		}
+		//tf.password = "a string";
+		untyped tf.password = "a string";
+#if !flash6
+		//check_equals(tf.password, true);
+		if(untyped tf.password == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be true, is "+untyped tf.password);
+		}
+		//#else
+#else
+		//check_equals(tf.password, false);
+		if(untyped tf.password == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be false, is "+untyped tf.password);
+		}
+		//#endif
+#end
+		//tf.password = undefined;
+		untyped tf.password = undefined;
+		//check_equals(tf.password, false);
+		if(untyped tf.password == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.password is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.password should be false, is "+untyped tf.password);
+		}
+		//// TODO: check effects of setting to 'password' (should hide characters)
+		//tf.password = false;
+		untyped tf.password = false;
+#end
+	}
+	
+	static function checkTextField_quality () {
+#if !flash9
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._quality), 'string');
+		if(typeof(untyped tf._quality) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._quality is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._quality should be 'string', is "+typeof(untyped tf._quality));
+		}
+		//check(!tf.hasOwnProperty('_quality'));
+		if(!untyped tf.hasOwnProperty('_quality')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_quality'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_quality'");
+		}
+		//xcheck(!tf.__proto__.hasOwnProperty('_quality'));
+		if(!untyped tf.__proto__.hasOwnProperty('_quality')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_quality'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_quality'");
+		}
+		//check(!tf.__proto__.__proto__.hasOwnProperty('_quality'));
+		if(!untyped tf.__proto__.__proto__.hasOwnProperty('_quality')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__.__proto__ does not have own property '_quality'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__.__proto__ has own property '_quality'");
+		}
+		//check(!tf.__proto__.__proto__.__proto__.hasOwnProperty('_quality'));
+		if(!untyped tf.__proto__.__proto__.__proto__.hasOwnProperty('_quality')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__.__proto__.__proto__ does not have own property '_quality'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__.__proto__.__proto__ has own property '_quality'");
+		}
+		//check_equals(tf._quality, "HIGH");
+		if(untyped tf._quality == "HIGH") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._quality is 'HIGH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._quality should be 'HIGH', is "+untyped tf._quality);
+		}
+		//tf._quality = "FAKE VALUE";
+		untyped tf._quality = "FAKE VALUE";
+		//check_equals(tf._quality, "HIGH");
+		if(untyped tf._quality == "HIGH") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._quality is 'HIGH'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._quality should be 'HIGH', is "+untyped tf._quality);
+		}
+		//tf._quality = "LOW";
+		untyped tf._quality = "LOW";
+		//check_equals(tf._quality, "LOW");
+		if(untyped tf._quality == "LOW") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._quality is 'LOW'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._quality should be 'LOW', is "+untyped tf._quality);
+		}
+		//tf._quality = "HIGH";
+		untyped tf._quality = "HIGH";
+#end
+	}
+	
+	static function checkTextFieldrestrict () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//xcheck_equals(typeof(tf.restrict), 'null');
+		if(typeof(untyped tf.restrict) == 'null') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.restrict is 'null'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.restrict should be 'null', is "+typeof(untyped tf.restrict));
+		}
+		//check(!tf.hasOwnProperty('restrict'));
+		if(!untyped tf.hasOwnProperty('restrict')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'restrict'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'restrict'");
+		}
+		//tf.text = "Hello World";
+		untyped tf.text = "Hello World";
+		//tf.restrict = "olH";
+		untyped tf.restrict = "olH";
+		//check_equals(tf.text, "Hello World");
+		if(untyped tf.text == "Hello World") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is still 'Hello World'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should still be 'Hello World, is "+untyped tf.text);
+		}
+		//tf.text = "Hello World"; // override
+		untyped tf.text = "Hello World";
+		//// doesn't influence explicit setting, only GUI modification
+		//// of the textfield (TODO: test with a MovieTester)
+		//check_equals(tf.text, "Hello World");
+		if(untyped tf.text == "Hello World") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is still 'Hello World'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should still be 'Hello World, is "+untyped tf.text);
+		}
+	}
+	
+	static function checkTextField_rotation () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//xcheck_equals(typeof(tf.rotation), 'number');
+		if(typeof(untyped tf.rotation) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.rotation is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.rotation should be 'number', is "+typeof(untyped tf.rotation));
+		}
+		//check(!tf.hasOwnProperty('rotation'));
+		if(!untyped tf.hasOwnProperty('rotation')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'rotation'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'rotation'");
+		}
+		//xcheck_equals(tf.rotation, 0);
+		if(untyped tf.rotation == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.rotation is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.rotation should be 0, is "+untyped tf.rotation);
+		}
+		//tf.rotation = 10;
+		untyped tf.rotation = 10;
+		//check_equals(tf.rotation, 10);
+		if(untyped tf.rotation == 10) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.rotation is 10");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.rotation should be 10, is "+untyped tf.rotation);
+		}
+		//tf.rotation = 0;
+		untyped tf.rotation = 0;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//xcheck_equals(typeof(tf._rotation), 'number');
+		if(typeof(untyped tf._rotation) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._rotation is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._rotation should be 'number', is "+typeof(untyped tf._rotation));
+		}
+		//check(!tf.hasOwnProperty('_rotation'));
+		if(!untyped tf.hasOwnProperty('_rotation')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_rotation'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_rotation'");
+		}
+		//check(!tf.__proto__.hasOwnProperty('_rotation'));
+		if(!untyped tf.__proto__.hasOwnProperty('_rotation')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_rotation'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_rotation'");
+		}
+		//xcheck_equals(tf._rotation, 0);
+		if(untyped tf._rotation == 0) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._rotation is 0");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._rotation should be 0, is "+untyped tf._rotation);
+		}
+		//tf._rotation = 10;
+		untyped tf._rotation = 10;
+		//check_equals(tf._rotation, 10);
+		if(untyped tf._rotation == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._rotation is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._rotation should be 10, is "+untyped tf._rotation);
+		}
+		//tf._rotation = 0;
+		untyped tf._rotation = 0;
+#end
+	}
+	
+	static function checkTextFieldscroll () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		// TODO: better test for this, might do nothing if there's no scrollin
+		//xcheck_equals(typeof(tf.scrollV), 'number');
+		if(typeof(untyped tf.scrollV) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf.scrollV is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf.scrollV should be 'number', is "+typeof(untyped tf.scrollV));
+		}
+		//check( ! tf.hasOwnProperty('scrollV') ); 
+		if(!untyped tf.hasOwnProperty('scrollV')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'scrollV'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'scrollV'");
+		}
+		//xcheck_equals(tf.scrollV, 1);
+		if(untyped tf.scrollV == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.scrollV is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.scrollV should be 1, is "+untyped tf.scrollV);
+		}
+		//tf.scrollV = 10;
+		untyped tf.scrollV = 10;
+		//xcheck_equals(tf.scrollV, 1); // read-only
+		if(untyped tf.scrollV == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.scrollV is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.scrollV should be 1, is "+untyped tf.scrollV);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		// TODO: better test for this, might do nothing if there's no scrollin
+		//xcheck_equals(typeof(tf.scroll), 'number');
+		if(typeof(untyped tf.scroll) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.scroll is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.scroll should be 'number', is "+typeof(untyped tf.scroll));
+		}
+		//check( ! tf.hasOwnProperty('scroll') ); 
+		if(!untyped tf.hasOwnProperty('scroll')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'scroll'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'scroll'");
+		}
+		//xcheck_equals(tf.scroll, 1);
+		if(untyped tf.scroll == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.scroll is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.scroll should be 1, is "+untyped tf.scroll);
+		}
+		//tf.scroll = 10;
+		untyped tf.scroll = 10;
+		//xcheck_equals(tf.scroll, 1); // read-only
+		if(untyped tf.scroll == 1) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.scroll is 1");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.scroll should be 1, is "+untyped tf.scroll);
+		}
+#end
+	}
+	
+	static function checkTextFieldselectable () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.selectable), 'boolean');
+		if(typeof(untyped tf.selectable) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.selectable is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.selectable should be 'boolean', is "+typeof(untyped tf.selectable));
+		}
+		//check( ! tf.hasOwnProperty('selectable') ); 
+		if(!untyped tf.hasOwnProperty('selectable')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'selectable'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'selectable'");
+		}
+		//check_equals(tf.selectable, true);
+		if(untyped tf.selectable == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.selectable is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.selectable should be true, is "+untyped tf.selectable);
+		}
+		//tf.selectable = false;
+		untyped tf.selectable = false;
+		//check_equals(tf.selectable, false);
+		if(untyped tf.selectable == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.selectable is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.selectable should be false, is "+untyped tf.selectable);
+		}
+		//tf.selectable = "Hello";
+		untyped tf.selectable = "Hello";
+		//check_equals(typeof(tf.selectable), 'boolean');
+		if(typeof(untyped tf.selectable) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.selectable is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.selectable should be 'boolean', is "+typeof(untyped tf.selectable));
+		}
+		//tf.selectable = true;
+		untyped tf.selectable = true;
+	}
+	
+	static function checkTextField_soundbuftime () {
+#if !flash9
+		//xcheck_equals(typeof(tf._soundbuftime), 'number');
+		if(typeof(untyped tf._soundbuftime) == 'number') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._soundbuftime is 'number'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._soundbuftime should be 'number', is "+typeof(untyped tf._soundbuftime));
+		}
+		//check( ! tf.hasOwnProperty('_soundbuftime') ); 
+		if(!untyped tf.hasOwnProperty('_soundbuftime')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_soundbuftime'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_soundbuftime'");
+		}
+		//check( ! tf.__proto__.hasOwnProperty('_soundbuftime') );
+		if(!untyped tf.__proto__.hasOwnProperty('_soundbuftime')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_soundbuftime'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_soundbuftime'");
+		}
+		//xcheck_equals(tf._soundbuftime, 5); // the default is 5, it seems
+		if(untyped tf._soundbuftime == 5) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._soundbuftime is 5");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._soundbuftime should be 5, is "+untyped tf._soundbuftime);
+		}
+#end
+	}
+	
+	static function checkTextFieldtabEnabled () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.tabEnabled), 'undefined');
+		if(typeof(untyped tf.tabEnabled) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.tabEnabled is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.tabEnabled should be 'undefined', is "+typeof(untyped tf.tabEnabled));
+		}
+		//check( ! tf.hasOwnProperty('tabEnabled') ); 
+		if(!untyped tf.hasOwnProperty('tabEnabled')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'tabEnabled'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'tabEnabled'");
+		}
+		//check( ! tf.__proto__.hasOwnProperty('tabEnabled') ); 
+		if(!untyped tf.__proto__.hasOwnProperty('tabEnabled')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property 'tabEnabled'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property 'tabEnabled'");
+		}
+		//tf.tabEnabled = false;
+		untyped tf.tabEnabled = false;
+		//check_equals(tf.tabEnabled, false);
+		if(untyped tf.tabEnabled == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.tabEnabled is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.tabEnabled should be false, is "+untyped tf.tabEnabled);
+		}
+		///I can't delete!!
+		//delete(tf.tabEnabled);
+	}
+	
+	static function checkTextFieldtabIndex () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.tabIndex), 'undefined');
+		if(typeof(untyped tf.tabIndex) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.tabIndex is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.tabIndex should be 'undefined', is "+typeof(untyped tf.tabIndex));
+		}
+		//check( ! tf.hasOwnProperty('tabIndex') ); 
+		if(!untyped tf.hasOwnProperty('tabIndex')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'tabIndex'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'tabIndex'");
+		}
+		//check( ! tf.__proto__.hasOwnProperty('tabIndex') ); 
+		if(!untyped tf.__proto__.hasOwnProperty('tabIndex')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property 'tabIndex'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property 'tabIndex'");
+		}
+		//tf.tabIndex = 9;
+		untyped tf.tabIndex = 9;
+		//check_equals(tf.tabIndex, 9);
+		if(untyped tf.tabIndex == 9) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.tabIndex is 9");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.tabIndex should be 9, is "+untyped tf.tabIndex);
+		}
+		///I can't delete!!!
+		//delete(tf.tabIndex);
+	}
+	
+	static function checkTextField_target () {
+#if !flash9
+		//check_equals(typeof(tf._target), 'string');
+		if(typeof(untyped tf._target) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._target is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._target should be 'string', is "+typeof(untyped tf._target));
+		}
+		//check( ! tf.hasOwnProperty('_target') ); 
+		if(!untyped tf.hasOwnProperty('_target')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_target'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_target'");
+		}
+		///TODO: This test fails...
+		//check( ! tf.__proto__.hasOwnProperty('_target') ); 
+		if(!untyped tf.__proto__.hasOwnProperty('_target')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_target'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_target'");
+		}
+		//check_equals(tf._target, '/tf');
+		if(untyped tf._target == '/tf') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._target is '/tf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._target should be '/tf', is "+untyped tf._target);
+		}
+		//// TODO: check the effect of changing _name on the _target value
+		//tf._target = "fake_target"; // read-only
+		untyped tf._target = "fake_target";
+		//check_equals(tf._target, '/tf');
+		if(untyped tf._target == '/tf') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._target is '/tf'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._target should be '/tf', is "+untyped tf._target);
+		}
+#end
+	}
+	
+	static function checkTextFieldtext () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		untyped tf.text = "Hello World"; ///From before...
+		//check_equals(typeof(tf.text), 'string');
+		if(typeof(untyped tf.text) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.text is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.text should be 'string', is "+typeof(untyped tf.text));
+		}
+		//check( ! tf.hasOwnProperty('text') ); 
+		if(!untyped tf.hasOwnProperty('text')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'text'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'text'");
+		}
+		//check_equals(tf.text, 'Hello World');
+		if(untyped tf.text == 'Hello World') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'Hello World'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'Hello World', is "+untyped tf.text);
+		}
+		//tf.text = "hello world";
+		untyped tf.text = "hello world";
+		//check_equals(tf.text, 'hello world');
+		if(untyped tf.text == 'hello world') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'hello world'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'hello world', is "+untyped tf.text);
+		}
+		//check_equals(tf.length, 11); // number of characters in "hello world"
+		if(untyped tf.length == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.length is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.length should be 11, is "+untyped tf.length);
+		}
+	}
+	
+	static function checkTextFieldtextColor () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.textColor), 'number');
+		if(typeof(untyped tf.textColor) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.textColor is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.textColor should be 'number', is "+typeof(untyped tf.textColor));
+		}
+		//check( ! tf.hasOwnProperty('textColor') ); 
+		if(!untyped tf.hasOwnProperty('textColor')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'textColor'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'textColor'");
+		}
+		//check_equals(tf.textColor, 0);
+		if(untyped tf.textColor == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.textColor is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textColor should be 0, is "+untyped tf.textColor);
+		}
+		//tf.textColor = 0xFF0000;
+		untyped tf.textColor = 0xFF0000;
+		//check_equals(tf.textColor, 0xFF0000);
+		if(untyped tf.textColor == 0xFF0000) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.textColor is 0xFF0000");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textColor should be 0xFF0000, is "+untyped tf.textColor);
+		}
+		//// TODO: check color (use misc-ming.all/DefineEditTextTest.swf and a test runner with check_pixel)
+	}
+	
+	static function checkTextFieldtextHeight () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.textHeight), 'number');
+		if(typeof(untyped tf.textHeight) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.textHeight is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.textHeight should be 'number', is "+typeof(untyped tf.textHeight));
+		}
+		//check( ! tf.hasOwnProperty('textHeight') ); 
+		if(!untyped tf.hasOwnProperty('textHeight')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'textHeight'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'textHeight'");
+		}
+		//currentHeight = tf.textHeight; // WARNING: this might depend on the default font height
+		var currentHeight = untyped tf.textHeight;
+#if !flash9
+		//tf.textHeight = 1000;
+		untyped tf.textHeight = 1000;
+		//check_equals(tf.textHeight, currentHeight); // was read-only (I think)
+		if(untyped tf.textHeight == currentHeight) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.textHeight is currentHeight");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textHeight should be currentHeight, is "+untyped tf.textHeight);
+		}
+#end
+	}
+	
+		static function checkTextFieldtextWidth () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.textWidth), 'number');
+		if(typeof(untyped tf.textWidth) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.textWidth is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.textWidth should be 'number', is "+typeof(untyped tf.textWidth));
+		}
+		//check( ! tf.hasOwnProperty('textWidth') ); 
+		if(!untyped tf.hasOwnProperty('textWidth')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'textWidth'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'textWidth'");
+		}
+		//currentWidth = tf.textWidth; // WARNING: this might depend on the default font width
+		var currentWidth = untyped tf.textWidth;
+#if !flash9
+		//tf.textWidth = 1000;
+		untyped tf.textWidth = 1000;
+		//check_equals(tf.textWidth, currentWidth); // was read-only (I think)
+		if(untyped tf.textWidth == currentWidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is currentHeight");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be currentHeight, is "+untyped tf.textWidth);
+		}
+#end
+	}
+	
+	static function checkTextFieldtype () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.type), 'string');
+		if(typeof(untyped tf.type) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.type is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.type should be 'string', is "+typeof(untyped tf.type));
+		}
+		//check( ! tf.hasOwnProperty('type') ); 
+		if(!untyped tf.hasOwnProperty('type')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'type'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'type'");
+		}
+		//check_equals(tf.type, 'dynamic'); 
+		if(untyped tf.type == 'dynamic') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.type is 'dynamic'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.type should be 'dynamic', is "+untyped tf.type);
+		}
+		//tf.type = "input";
+		untyped tf.type = "input";
+		//check_equals(tf.type, 'input'); 
+		if(untyped tf.type == 'input') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.type is 'input'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.type should be 'input', is "+untyped tf.type);
+		}
+		//tf.type = new Array();
+		untyped tf.type = new Array();
+		//check_equals(typeof(tf.type), 'string');  // invalid assignment
+		if(typeof(untyped tf.type) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.type is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.type should be 'string', is "+typeof(untyped tf.type));
+		}
+		//check_equals(tf.type, 'input');  // keeps previous value
+		if(untyped tf.type == 'input') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.type is 'input'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.type should be 'input', is "+untyped tf.type);
+		}
+		//tf.type = "dynamic";
+		untyped tf.type = "dynamic";
+		//check_equals(tf.type, 'dynamic');
+		if(untyped tf.type == 'dynamic') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.type is 'dynamic'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.type should be 'dynamic', is "+untyped tf.type);
+		}
+		//tf.type = new Array();
+		untyped tf.type = new Array();
+		//check_equals(tf.type, 'dynamic'); // keeps previous value 
+		if(untyped tf.type == 'dynamic') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.type is 'dynamic'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.type should be 'dynamic', is "+untyped tf.type);
+		}
+#if !flash9
+		//o = {}; o.toString = function() { return 'Input'; };
+		var o = untyped __new__(Object);
+		untyped o.toString = function() { return 'Input'; };
+		//tf.type = o;
+		untyped tf.type = o;
+		//check_equals(tf.type, 'input');
+		if(untyped tf.type == 'input') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.type is 'input'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.type should be 'input', is "+untyped tf.type);
+		}
+#end
+	}
+	
+	static function checkTextField_url () {
+#if !flash9
+		//xcheck_equals(typeof(tf._url), 'string');
+		if(typeof(untyped tf._url) == 'string') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._url is 'string'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._url should be 'string', is "+typeof(untyped tf._url));
+		}
+		//check( ! tf.hasOwnProperty('_url') ); 
+		if(!untyped tf.hasOwnProperty('_url')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_url'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_url'");
+		}
+		//check( ! tf.__proto__.hasOwnProperty('_url') ); 
+		if(!untyped tf.hasOwnProperty('_url')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_url'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_url'");
+		}
+		//xcheck_equals(tf._url, _root._url);
+		if(untyped tf._url == _root._url) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._url is _root._url");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
+		}
+		//tf._url = "fake url";
+		untyped tf._url = "fake url";
+		//xcheck_equals(tf._url, _root._url); // read-only
+		if(untyped tf._url == _root._url) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._url is _root._url");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
+		}
+#end
+	}
+	
+	static function checkTextFieldvariable () {
+#if !flash9
+		untyped tf.text = "hello world"; ///From before...
+		//check_equals(typeof(tf.variable), 'null');
+		if(typeof(untyped tf.variable) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.variable is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.variable should be 'null', is "+typeof(untyped tf.variable));
+		}
+		//check( ! tf.hasOwnProperty('variable') ); 
+		if(!untyped tf.hasOwnProperty('variable')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'variable'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'variable'");
+		} 
+		//tf.variable = _level0.inputVar;
+		untyped tf.variable = _level0.inputVar;
+		//check_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
+		if(typeof(untyped tf.variable) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.variable is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.variable should be 'null', is "+typeof(untyped tf.variable));
+		}
+		//tf.variable = 2;
+		untyped tf.variable = 2;
+		//check_equals(typeof(tf.variable), 'string'); 
+		if(typeof(untyped tf.variable) == 'string') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.variable is 'string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.variable should be 'string', is "+typeof(untyped tf.variable));
+		}
+		//check_equals(tf.variable, '2'); 
+		if(untyped tf.variable == '2') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.variable is '2'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.variable should be '2', is "+untyped tf.variable);
+		}
+		//tf.variable = undefined;
+		untyped tf.variable = undefined;
+		//check_equals(typeof(tf.variable), 'null'); 
+		if(typeof(untyped tf.variable) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.variable is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.variable should be 'null', is "+typeof(untyped tf.variable));
+		}
+		//tf.variable = 2;
+		untyped tf.variable = 2;
+		//tf.variable = null;
+		untyped tf.variable = null;
+		//check_equals(typeof(tf.variable), 'null'); 
+		if(typeof(untyped tf.variable) == 'null') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.variable is 'null'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.variable should be 'null', is "+typeof(untyped tf.variable));
+		}
+		//tf.variable = "_level0.inputVar";
+		untyped tf.variable = "_level0.inputVar";
+		//check_equals(tf.variable, '_level0.inputVar'); 
+		if(untyped tf.variable == '_level0.inputVar') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.variable is '_level0.inputVar'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.variable should be '_level0.inputVar', is "+untyped tf.variable);
+		}
+		//xcheck_equals(typeof(_level0.inputVar), 'undefined');
+		if(typeof(_level0.inputVar) == 'undefined') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] typeof _level0.inputVar is 'undefined'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] typeof _level0.inputVar should be 'undefined', is "+typeof(_level0.inputVar));
+		}
+		//check_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
+		if(untyped tf.text == 'hello world') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'hello world'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'hello world', is "+untyped tf.text);
+		}
+		//xcheck(!_level0.hasOwnProperty('inputVar'));
+		if(!untyped _level0.hasOwnProperty('inputVar')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] _level0 does not have own property 'inputVar'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] _level0 has own property 'inputVar'");
+		} 
+		//_level0.inputVar = "dynamic variable";
+		_level0.inputVar = "dynamic variable";
+		//check_equals(tf.text, "dynamic variable");
+		if(untyped tf.text == 'dynamic variable') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'dynamic variable'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'dynamic variable', is "+untyped tf.text);
+		}
+		//tf.text = "back-propagated";
+		untyped tf.text = "back-propagated";
+		//check_equals(_level0.inputVar, "back-propagated");
+		if(untyped _level0.inputVar == 'back-propagated') {
+			DejaGnu.pass("[line "+here.lineNumber+"] _level0.inputVar is 'back-propagated'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _level0.inputVar should be 'back-propagated', is "+untyped _level0.inputVar);
+		}
+		//o = new Object();
+		var o = untyped __new__(Object);
+		//tf.variable = "_level0.o.t"; // non-existent member (yet)
+		untyped tf.variable = "_level0.o.t";
+		//check_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
+		if(untyped tf.text == 'back-propagated') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'back-propagated'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'back-propagated', is "+untyped tf.text);
+		}
+		//o.t = "from object"; // here we create _level0.o.t
+		untyped o.t = "from object";
+		//check_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
+		if(untyped tf.text == 'back-propagated') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'back-propagated'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'back-propagated', is "+untyped tf.text);
+		}
+		//tf.text = "back-to-object"; // instead, assigning to TextField.text updates the object
+		untyped tf.text = "back-to-object";
+		///TODO: This test fails...
+		//check_equals(o.t, "back-to-object");  
+		if(untyped o.t == 'back-to-object') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] o.t is 'back-to-object'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] o.t should be 'back-to-object', is "+untyped o.t);
+		}
+		//o.t = "from object again"; // but updates to the object still don't update the TextField
+		o.t = "from object again";
+		//check_equals(tf.text, "back-to-object");  // assigning to the object doesn't trigger update of text ?
+		if(untyped tf.text == 'back-to-object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'back-to-object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'back-to-object', is "+untyped tf.text);
+		}
+		//tf.variable = "_level0.o.t"; // We re-assign TextField.variable, now the variable exists
+		untyped tf.variable = "_level0.o.t";
+		//xcheck_equals(tf.text, "from object again");  // this time the TextField.text is updated
+		if(untyped tf.text == 'from object again') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.text is 'from object again'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.text should be 'from object again', is "+untyped tf.text);
+		}
+		//check_equals(o.t, "from object again");
+		if(untyped o.t == 'from object again') {
+			DejaGnu.pass("[line "+here.lineNumber+"] o.t is 'from object again'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] o.t should be 'from object again', is "+untyped o.t);
+		}
+		//o.t = "and forever";
+		untyped o.t = "and forever";
+		//xcheck_equals(tf.text, "from object again"); // but updating o.t still doesn't trigger update of the text ?
+		if(untyped tf.text == 'from object again') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.text is 'from object again'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.text should be 'from object again', is "+untyped tf.text);
+		}
+		//tf.text = "and forever back";
+		untyped tf.text = "and forever back";
+		///TODO: This test fails...
+		//check_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
+		if(untyped o.t == 'and forever back') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] o.t is 'and forever back'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] o.t should be 'and forever back', is "+untyped o.t);
+		}
+#end
+	}
+	
+	static function checkTextFieldremoveTextField () {
+#if !flash9
+		//createTextField("hardref", 23, 10, 10, 160, 200);
+		_root.createTextField("hardref", 23, 10, 10, 160, 200);
+		//hardref.prop = 5;
+		untyped hardref.prop = 5;
+		//softref = hardref;
+		var softref = untyped hardref;
+		//check_equals(typeof(hardref), 'object');
+		if(typeof(untyped hardref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof hardref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof hardref should be 'object', is "+typeof(untyped hardref));
+		}
+		//check_equals(typeof(softref), 'object');
+		if(typeof(softref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof softref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof softref should be 'object', is "+typeof(softref));
+		}
+		//check_equals(softref.prop, 5);
+		if(softref.prop == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] softref.prop is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] softref.prop should be 5, is "+softref.prop);
+		}
+		//check_equals(softref.getDepth(), 23);
+		if(softref.getDepth() == 23) {
+			DejaGnu.pass("[line "+here.lineNumber+"] softref.getDepth() is 23");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] softref.getDepth() should be 23, is "+softref.getDepth());
+		}
+		//hardref.removeTextField();
+		untyped hardref.removeTextField();
+		//check_equals(typeof(hardref), 'undefined');
+		if(typeof(untyped hardref) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof hardref is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof hardref should be 'undefined', is "+typeof(untyped hardref));
+		}
+		//check_equals(typeof(softref), 'movieclip'); // a dangling character ref is always reported to be a 'movieclip' (historical reasons probably)
+		if(typeof(softref) == 'movieclip') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof softref is 'movieclip'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof softref should be 'movieclip', is "+typeof(softref));
+		}
+		//check_equals(typeof(softref.prop), 'undefined');
+		if(typeof(softref.prop) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof softref.prop is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof softref.prop should be 'undefined', is "+typeof(softref.prop));
+		}
+		//createEmptyMovieClip("hardref", 24);
+		_root.createEmptyMovieClip("hardref", 24);
+		//check_equals(typeof(hardref), 'movieclip');
+		if(typeof(untyped hardref) == 'movieclip') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof hardref is 'movieclip'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof hardref should be 'movieclip', is "+typeof(untyped hardref));
+		}
+		//hardref.prop = 7;
+		untyped hardref.prop = 7;
+		//check_equals(typeof(softref), 'movieclip');
+		if(typeof(softref) == 'movieclip') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof softref is 'movieclip'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof softref should be 'movieclip', is "+typeof(softref));
+		}
+		//check_equals(softref.prop, 7); // and it's actually also rebound to one if available
+		if(softref.prop == 7) {
+			DejaGnu.pass("[line "+here.lineNumber+"] softref.prop is 7");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] softref.prop should be 7, is "+softref.prop);
+		}
+		//hardref.removeMovieClip();
+		untyped hardref.removeMovieClip();
+		//createTextField("hardref", 25, 10, 10, 160, 200);
+		_root.createTextField("hardref", 25, 10, 10, 160, 200);
+		//hardref.prop = 9;
+		untyped hardref.prop = 9;
+		//check_equals(typeof(softref), 'object'); // changes type on rebind
+		if(typeof(softref) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof softref is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof softref should be 'object', is "+typeof(softref));
+		}
+		//check_equals(softref.prop, 9);
+		if(softref.prop == 9) {
+			DejaGnu.pass("[line "+here.lineNumber+"] softref.prop is 9");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] softref.prop should be 9, is "+softref.prop);
+		}
+#end
+	}
+	
+	static function checkTextField_visible () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		
+		//check_equals(typeof(tf.visible), 'boolean');
+		if(typeof(untyped tf.visible) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.visible is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.visible should be 'boolean', is "+typeof(untyped tf.visible));
+		}
+		//check( ! tf.hasOwnProperty('visible') ); 
+		if(!untyped tf.hasOwnProperty('visible')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'visible'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'visible'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('visible') ); 
+		if(!untyped tf.parent.hasOwnProperty('visible')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'visible'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'visible'");
+		}
+		//check_equals(tf.visible, true);
+		if(untyped tf.visible == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.visible is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.visible should be true, is "+untyped tf.visible);
+		}
+		//tf.visible = false;
+		untyped tf.visible = false;
+		//check_equals(tf.visible, false);
+		if(untyped tf.visible == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.visible is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.visible should be false, is "+untyped tf.visible);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._visible), 'boolean');
+		if(typeof(untyped tf._visible) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._visible is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._visible should be 'boolean', is "+typeof(untyped tf._visible));
+		}
+		//check( ! tf.hasOwnProperty('_visible') ); 
+		if(!untyped tf.hasOwnProperty('_visible')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_visible'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_visible'");
+		} 
+		//check( ! tf.__proto__.hasOwnProperty('_visible') ); 
+		if(!untyped tf.__proto__.hasOwnProperty('_visible')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_visible'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_visible'");
+		}
+		//check_equals(tf._visible, true);
+		if(untyped tf._visible == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._visible is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._visible should be true, is "+untyped tf._visible);
+		}
+		//tf._visible = false;
+		untyped tf._visible = false;
+		//check_equals(tf._visible, false);
+		if(untyped tf._visible == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._visible is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._visible should be false, is "+untyped tf._visible);
+		}
+#end
+	}
+	
+	static function checkTextField_width () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.width), 'number');
+		if(typeof(untyped tf.width) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.width is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.width should be 'number', is "+typeof(untyped tf.width));
+		}
+		//check( ! tf.hasOwnProperty('width') ); 
+		if(!untyped tf.hasOwnProperty('width')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'width'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'width'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('width') ); 
+		if(!untyped tf.parent.hasOwnProperty('width')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'width'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'width'");
+		}
+		//check_equals(tf.width, 500); // as it was set by createTextField, see above
+		if(untyped tf.width == 500) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is 500");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be 500, is "+untyped tf.width);
+		}
+		//tf.width = 99999;
+		untyped tf.width = 99999;
+		//check_equals(tf.width, 99999); 
+		if(untyped tf.width == 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be 99999, is "+untyped tf.width);
+		}
+		//b = tf.getBounds(_root); bs = printBounds(b);
+		var b = untyped tf.getBounds(_root);
+		var bs = printBounds(b);
+		//check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+		if(bs == 'xmin:10 ymin:10 xmax:100009 ymax:510') {
+			DejaGnu.pass("[line "+here.lineNumber+"] bs is 'xmin:10 ymin:10 xmax:100009 ymax:510'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] bs should be 'xmin:10 ymin:10 xmax:100009 ymax:510', is "+bs);
+		}
+		//tf.autoSize = false;
+		untyped tf.autoSize = false;
+		//tf.text = 'small'; // doesn't reset bounds (being autoSize false);
+		untyped tf.text = 'small';
+		//check_equals(tf.width, 99999); 
+		if(untyped tf.width == 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be 99999, is "+untyped tf.width);
+		}
+		//b = tf.getBounds(_root); bs = printBounds(b);
+		b = untyped tf.getBounds(_root);
+		bs = printBounds(b);
+		//check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+		if(bs == 'xmin:10 ymin:10 xmax:100009 ymax:510') {
+			DejaGnu.pass("[line "+here.lineNumber+"] bs is 'xmin:10 ymin:10 xmax:100009 ymax:510'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] bs should be 'xmin:10 ymin:10 xmax:100009 ymax:510', is "+bs);
+		}
+
+		//tf.autoSize = true; // changes width !!
+		untyped tf.autoSize = true;
+		//check(tf.width < 99999); 
+		if(untyped tf.width < 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is less than 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be less than 99999, is "+untyped tf.width);
+		}
+		//ow = tf.width;
+		var ow = untyped tf.width;
+
+		//tf.autoSize = false;  // doesn't reset to last manually set one
+		untyped tf.autoSize = false;
+		//check_equals(tf.width, ow);
+		if(untyped tf.width == ow) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is ow");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be ow, is "+untyped tf.width);
+		}
+
+		//tf.width = 500;
+		untyped tf.width = 500;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._width), 'number');
+		if(typeof(untyped tf._width) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._width is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._width should be 'number', is "+typeof(untyped tf._width));
+		}
+		//check( ! tf.hasOwnProperty('_width') ); 
+		if(!untyped tf.hasOwnProperty('_width')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_width'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_width'");
+		} 
+		//check( ! tf.__proto__.hasOwnProperty('_width') ); 
+		if(!untyped tf.__proto__.hasOwnProperty('_width')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_width'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_width'");
+		}
+		//check_equals(tf._width, 500); // as it was set by createTextField, see above
+		if(untyped tf._width == 500) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is 500");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be 500, is "+untyped tf._width);
+		}
+		//tf._width = 99999;
+		untyped tf._width = 99999;
+		//check_equals(tf._width, 99999); 
+		if(untyped tf._width == 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be 99999, is "+untyped tf._width);
+		}
+		//b = tf.getBounds(_root); bs = printBounds(b);
+		var b = untyped tf.getBounds(_root);
+		var bs = printBounds(b);
+		//check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+		if(bs == 'xmin:10 ymin:10 xmax:100009 ymax:510') {
+			DejaGnu.pass("[line "+here.lineNumber+"] bs is 'xmin:10 ymin:10 xmax:100009 ymax:510'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] bs should be 'xmin:10 ymin:10 xmax:100009 ymax:510', is "+bs);
+		}
+		//tf.autoSize = false;
+		untyped tf.autoSize = false;
+		//tf.text = 'small'; // doesn't reset bounds (being autoSize false);
+		untyped tf.text = 'small';
+		//check_equals(tf._width, 99999); 
+		if(untyped tf._width == 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be 99999, is "+untyped tf._width);
+		}
+		//b = tf.getBounds(_root); bs = printBounds(b);
+		b = untyped tf.getBounds(_root);
+		bs = printBounds(b);
+		//check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+		if(bs == 'xmin:10 ymin:10 xmax:100009 ymax:510') {
+			DejaGnu.pass("[line "+here.lineNumber+"] bs is 'xmin:10 ymin:10 xmax:100009 ymax:510'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] bs should be 'xmin:10 ymin:10 xmax:100009 ymax:510', is "+bs);
+		}
+
+		//tf.autoSize = true; // changes width !!
+		untyped tf.autoSize = true;
+		//check(tf._width < 99999); 
+		if(untyped tf._width < 99999) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is less than 99999");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be less than 99999, is "+untyped tf._width);
+		}
+		//ow = tf._width;
+		var ow = untyped tf._width;
+
+		//tf.autoSize = false;  // doesn't reset to last manually set one
+		untyped tf.autoSize = false;
+		//check_equals(tf._width, ow);
+		if(untyped tf._width == ow) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is ow");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be ow, is "+untyped tf._width);
+		}
+
+		//tf._width = 500;
+		untyped tf._width = 500;
+#end
+	}
+	
+	static function checkTextFieldwordWrap () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//check_equals(typeof(tf.wordWrap), 'boolean');
+		if(typeof(untyped tf.wordWrap) == 'boolean') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.wordWrap is 'boolean'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.wordWrap should be 'boolean', is "+typeof(untyped tf.wordWrap));
+		}
+		//check( ! tf.hasOwnProperty('wordWrap') ); 
+		if(!untyped tf.hasOwnProperty('wordWrap')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'wordWrap'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'wordWrap'");
+		} 
+		//check_equals(tf.wordWrap, false);
+		if(untyped tf.wordWrap == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.wordWrap is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.wordWrap should be false, is "+untyped tf.wordWrap);
+		}
+		//// TODO: check what can be assigned to wordWrap and what not...
+	}
+	
+	static function checkTextField_x () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.x), 'number');
+		if(typeof(untyped tf.x) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.x is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.x should be 'number', is "+typeof(untyped tf.x));
+		}
+		//check( ! tf.hasOwnProperty('x') ); 
+		if(!untyped tf.hasOwnProperty('x')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'x'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'x'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('x') );
+		if(!untyped tf.parent.hasOwnProperty('x')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'x'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'x'");
+		}
+		//check_equals(tf.x, 10); // as set by createTextField
+		if(untyped tf.x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.x should be 10, is "+untyped tf.x);
+		}
+		//tf.x = 20;
+		untyped tf.x = 20;
+		//check_equals(tf.x, 20);
+		if(untyped tf.x == 20) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.x is 20");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.x should be 20, is "+untyped tf.x);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._x), 'number');
+		if(typeof(untyped tf._x) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._x is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._x should be 'number', is "+typeof(untyped tf._x));
+		}
+		//check( ! tf.hasOwnProperty('_x') ); 
+		if(!untyped tf.hasOwnProperty('_x')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_x'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_x'");
+		} 
+		//check( ! tf.__proto__.hasOwnProperty('_x') );
+		if(!untyped tf.__proto__.hasOwnProperty('_x')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_x'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_x'");
+		}
+		//check_equals(tf._x, 10); // as set by createTextField
+		if(untyped tf._x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._x should be 10, is "+untyped tf._x);
+		}
+		//tf._x = 20;
+		untyped tf._x = 20;
+		//check_equals(tf._x, 20);
+		if(untyped tf._x == 20) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._x is 20");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._x should be 20, is "+untyped tf._x);
+		}
+#end
+	}
+	
+	static function checkTextField_xmouse () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.mouseX), 'number');
+		if(typeof(untyped tf.mouseX) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.mouseX is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.mouseX should be 'number', is "+typeof(untyped tf.mouseX));
+		}
+		//check( ! tf.hasOwnProperty('mouseX') ); 
+		if(!untyped tf.hasOwnProperty('mouseX')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'mouseX'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'mouseX'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('mouseX') );
+		if(!untyped tf.parent.hasOwnProperty('mouseX')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'mouseX'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'mouseX'");
+		}
+		//currXmouse = tf.mouseX; // unsafe, if user moves the mouse while running the test
+		var currXmouse = untyped tf.mouseX;
+		//check_equals(tf.mouseX, currXmouse); // possibly unsafe, if user moves the mouse while running the test
+		if(untyped tf.mouseX == currXmouse) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.mouseX is currXmouse");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.mouseX should be "+currXmouse+", is "+untyped tf.mouseX);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._xmouse), 'number');
+		if(typeof(untyped tf._xmouse) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._xmouse is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._xmouse should be 'number', is "+typeof(untyped tf._xmouse));
+		}
+		//check( ! tf.hasOwnProperty('_xmouse') ); 
+		if(!untyped tf.hasOwnProperty('_xmouse')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_xmouse'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_xmouse'");
+		}
+		///TODO: This test fails...
+		//check( ! tf.__proto__.hasOwnProperty('_xmouse') );
+		if(!untyped tf.__proto__.hasOwnProperty('_xmouse')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_xmouse'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_xmouse'");
+		}
+		//currXmouse = tf._xmouse; // unsafe, if user moves the mouse while running the test
+		var currXmouse = untyped tf._xmouse;
+		//tf._xmouse = "a string";
+		untyped tf._xmouse = "a string";
+		//check_equals(typeof(tf._xmouse), 'number');
+		if(typeof(untyped tf._xmouse) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._xmouse is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._xmouse should be 'number', is "+typeof(untyped tf._xmouse));
+		}
+		//check_equals(tf._xmouse, currXmouse); // possibly unsafe, if user moves the mouse while running the test
+		if(untyped tf._xmouse == currXmouse) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._xmouse is currXmouse");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._xmouse should be "+currXmouse+", is "+untyped tf._xmouse);
+		}
+#end
+	}
+	
+	static function checkTextField_xscale () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.scaleX), 'number');
+		if(typeof(untyped tf.scaleX) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.scaleX is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.scaleX should be 'number', is "+typeof(untyped tf.scaleX));
+		}
+		//check( ! tf.hasOwnProperty('scaleX') ); 
+		if(!untyped tf.hasOwnProperty('scaleX')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'scaleX'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'scaleX'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('scaleX') );
+		if(!untyped tf.parent.hasOwnProperty('scaleX')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'scaleX'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'scaleX'");
+		}
+		//check_equals(tf.scaleX, 100); 
+		if(untyped tf.scaleX == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.scaleX is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.scaleX should be 100, is "+untyped tf.scaleX);
+		}
+		//// check how .textWidth and ._width change when changing scaleX
+		//currTextWidth = tf.textWidth;
+		var currTextWidth = untyped tf.textWidth;
+		//currWidth = tf._width;
+		var currWidth = untyped tf.width;
+		//tf.scaleX = 200;
+		untyped tf.scaleX = 200;
+		//note("textWidth: scaleX=100: "+currTextWidth+"; scaleX=200: "+tf.textWidth);
+		DejaGnu.note("textWidth: scaleX=100:"+currTextWidth+"; scaleX=200: "+untyped tf.textWidth);
+		//// check_equals(tf.textWidth, currTextWidth*2); // not clear what does textWidth depend on
+		//xcheck_equals(tf._width, currWidth*2);
+		if(untyped tf.width == currWidth*2) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._width is "+currWidth*2);
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._width should be "+currWidth*2+", is "+untyped tf.width);
+		}
+		//tf.scaleX = 100;
+		untyped tf.scaleX = 100;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._xscale), 'number');
+		if(typeof(untyped tf._xscale) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._xscale is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._xscale should be 'number', is "+typeof(untyped tf._xscale));
+		}
+		//check( ! tf.hasOwnProperty('_xscale') ); 
+		if(!untyped tf.hasOwnProperty('_xscale')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_xscale'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_xscale'");
+		}
+		///TODO: This test fails...
+		//check( ! tf.__proto__.hasOwnProperty('_xscale') );
+		if(!untyped tf.__proto__.hasOwnProperty('_xscale')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_xscale'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_xscale'");
+		}
+		//check_equals(tf._xscale, 100); 
+		if(untyped tf._xscale == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._xscale is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._xscale should be 100, is "+untyped tf._xscale);
+		}
+		//// check how .textWidth and ._width change when changing _xscale
+		//currTextWidth = tf.textWidth;
+		var currTextWidth = untyped tf.textWidth;
+		//currWidth = tf._width;
+		var currWidth = untyped tf._width;
+		//tf._xscale = 200;
+		untyped tf._xscale = 200;
+		//note("textWidth: _xscale=100: "+currTextWidth+"; _xscale=200: "+tf.textWidth);
+		DejaGnu.note("textWidth: _xscale=100:"+currTextWidth+"; _xscale=200: "+untyped tf.textWidth);
+		//// check_equals(tf.textWidth, currTextWidth*2); // not clear what does textWidth depend on
+		//xcheck_equals(tf._width, currWidth*2);
+		if(untyped tf._width == currWidth*2) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._width is "+currWidth*2);
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._width should be "+currWidth*2+", is "+untyped tf._width);
+		}
+		//tf._xscale = 100;
+		untyped tf._xscale = 100;
+#end
+	}
+	
+		static function checkTextField_y () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.x), 'number');
+		if(typeof(untyped tf.y) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.y is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.y should be 'number', is "+typeof(untyped tf.y));
+		}
+		//check( ! tf.hasOwnProperty('y') ); 
+		if(!untyped tf.hasOwnProperty('y')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'y'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'y'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('y') );
+		if(!untyped tf.parent.hasOwnProperty('y')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'y'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'y'");
+		}
+		//check_equals(tf.y, 10); // as set by createTeytField
+		if(untyped tf.y == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.y is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.y should be 10, is "+untyped tf.y);
+		}
+		//tf.y = 20;
+		untyped tf.y = 5;
+		//check_equals(tf.y, 20);
+		if(untyped tf.y == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.y is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.y should be 5, is "+untyped tf.y);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._y), 'number');
+		if(typeof(untyped tf._y) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._y is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._y should be 'number', is "+typeof(untyped tf._y));
+		}
+		//check( ! tf.hasOwnProperty('_y') ); 
+		if(!untyped tf.hasOwnProperty('_y')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_y'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_y'");
+		} 
+		//check( ! tf.__proto__.hasOwnProperty('_y') );
+		if(!untyped tf.__proto__.hasOwnProperty('_y')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_y'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_y'");
+		}
+		//check_equals(tf._y, 10); // as set by createTextField
+		if(untyped tf._y == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._y is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._y should be 10, is "+untyped tf._y);
+		}
+		//tf._y = 5;
+		untyped tf._y = 5;
+		//check_equals(tf._y, 5);
+		if(untyped tf._y == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._y is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._y should be 5, is "+untyped tf._y);
+		}
+#end
+	}
+	
+	static function checkTextField_ymouse () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.mouseY), 'number');
+		if(typeof(untyped tf.mouseY) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.mouseY is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.mouseY should be 'number', is "+typeof(untyped tf.mouseY));
+		}
+		//check( ! tf.hasOwnProperty('mouseY') ); 
+		if(!untyped tf.hasOwnProperty('mouseY')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'mouseY'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'mouseY'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('mouseY') );
+		if(!untyped tf.parent.hasOwnProperty('mouseY')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'mouseY'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'mouseY'");
+		}
+		//currYmouse = tf.mouseY; // unsafe, if user moves the mouse while running the test
+		var currYmouse = untyped tf.mouseY;
+		//check_equals(tf.mouseY, currYmouse); // possibly unsafe, if user moves the mouse while running the test
+		if(untyped tf.mouseY == currYmouse) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.mouseY is currYmouse");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.mouseY should be "+currYmouse+", is "+untyped tf.mouseY);
+		}
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._ymouse), 'number');
+		if(typeof(untyped tf._ymouse) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._ymouse is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._ymouse should be 'number', is "+typeof(untyped tf._ymouse));
+		}
+		//check( ! tf.hasOwnProperty('_ymouse') ); 
+		if(!untyped tf.hasOwnProperty('_ymouse')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_ymouse'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_ymouse'");
+		}
+		///TODO: This test fails...
+		//check( ! tf.__proto__.hasOwnProperty('_ymouse') );
+		if(!untyped tf.__proto__.hasOwnProperty('_ymouse')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_ymouse'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_ymouse'");
+		}
+		//currYmouse = tf._ymouse; // unsafe, if user moves the mouse while running the test
+		var currYmouse = untyped tf._ymouse;
+		//tf._ymouse = "a string";
+		untyped tf._ymouse = "a string";
+		//check_equals(typeof(tf._ymouse), 'number');
+		if(typeof(untyped tf._ymouse) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._ymouse is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._ymouse should be 'number', is "+typeof(untyped tf._ymouse));
+		}
+		//check_equals(tf._ymouse, currYmouse); // possibly unsafe, if user moves the mouse while running the test
+		if(untyped tf._ymouse == currYmouse) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._ymouse is "+currYmouse);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._ymouse should be "+currYmouse+", is "+untyped tf._ymouse);
+		}
+#end
+	}
+	
+	static function checkTextField_yscale () {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		
+		//check_equals(typeof(tf.scaleY), 'number');
+		if(typeof(untyped tf.scaleY) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf.scaleY is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf.scaleY should be 'number', is "+typeof(untyped tf.scaleY));
+		}
+		//check( ! tf.hasOwnProperty('scaleY') ); 
+		if(!untyped tf.hasOwnProperty('scaleY')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property 'scaleY'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'scaleY'");
+		} 
+		//check( ! tf.parent.hasOwnProperty('scaleY') );
+		if(!untyped tf.parent.hasOwnProperty('scaleY')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.parent does not have own property 'scaleY'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.parent has own property 'scaleY'");
+		}
+		//check_equals(tf.scaleY, 100); 
+		if(untyped tf.scaleY == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.scaleY is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.scaleY should be 100, is "+untyped tf.scaleY);
+		}
+		//// check how .textHeight and ._width change when changing scaleX
+		//currTextHeight = tf.textHeight;
+		var currTextHeight = untyped tf.textHeight;
+		//currHeight = tf._width;
+		var currHeight = untyped tf.height;
+		//tf.scaleY = 200;
+		untyped tf.scaleY = 200;
+		//note("textHeight: scaleY=100: "+currTextHeight+"; scaleY=200: "+tf.textHeight);
+		DejaGnu.note("textHeight: scaleY=100:"+currTextHeight+"; scaleY=200: "+untyped tf.textHeight);
+		//// check_equals(tf.textHeight, currTextHeight*2); // not clear what does textHeight depend on
+		//xcheck_equals(tf._height, currHeight*2);
+		if(untyped tf.height == currHeight*2) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._height is "+currHeight*2);
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._height should be "+currHeight*2+", is "+untyped tf.height);
+		}
+		//tf.scaleY = 100;
+		untyped tf.scaleY = 100;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+		//check_equals(typeof(tf._yscale), 'number');
+		if(typeof(untyped tf._yscale) == 'number') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._yscale is 'number'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._yscale should be 'number', is "+typeof(untyped tf._yscale));
+		}
+		//check( ! tf.hasOwnProperty('_yscale') ); 
+		if(!untyped tf.hasOwnProperty('_yscale')) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf does not have own property '_yscale'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property '_yscale'");
+		}
+		///TODO: This test fails...
+		//check( ! tf.__proto__.hasOwnProperty('_yscale') );
+		if(!untyped tf.__proto__.hasOwnProperty('_yscale')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_yscale'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_yscale'");
+		}
+		//check_equals(tf._yscale, 100); 
+		if(untyped tf._yscale == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._yscale is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._yscale should be 100, is "+untyped tf._yscale);
+		}
+		//// check how .textHeight and ._height change when changing _xscale
+		//currTextHeight = tf.textHeight;
+		var currTextHeight = untyped tf.textHeight;
+		//currHeight = tf._height;
+		var currHeight = untyped tf._height;
+		//tf._yscale = 200;
+		untyped tf._yscale = 200;
+		//note("textHeight: _yscale=100: "+currTextHeight+"; _yscale=200: "+tf.textHeight);
+		DejaGnu.note("textHeight: _yscale=100:"+currTextHeight+"; _yscale=200: "+untyped tf.textHeight);
+		//// check_equals(tf.textHeight, currTextHeight*2); // not clear what does textHeight depend on
+		//xcheck_equals(tf._height, currHeight*2);
+		if(untyped tf._height == currHeight*2) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf._height is "+currHeight*2);
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf._height should be "+currHeight*2+", is "+untyped tf._height);
+		}
+		//tf._yscale = 100;
+		untyped tf._yscale = 100;
+#end
+	}
+	
+	static function checkTextFieldautoSizewidthandwordWrap() {
+#if flash9
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+#else
+		_root.createTextField("tf", 99, 10, 10, 500, 500);
+#end
+		//tf._width = 10; // "hello world" text should overflow this
+#if flash9
+		untyped tf.width = 10;
+#else
+		untyped tf._width = 10;
+#end
+		//tf.text = "Hello world";
+		untyped tf.text = "Hello world";
+		//tf.autoSize = 'none';
+		untyped tf.autoSize = 'none';
+		//tf.wordWrap = false;
+		untyped tf.wordWrap = false;
+		//check_equals(tf._width, 10);
+#if flash9
+		if(untyped tf.width == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be 10, is "+untyped tf.width);
+		}
+#else
+		if(untyped tf._width == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be 10, is "+untyped tf._width);
+		}
+#end
+		//origTextWidth = tf.textWidth;
+		var origTextWidth = untyped tf.textWidth;
+		//tf.autoSize = 'center';
+		untyped tf.autoSize = 'center';
+		//check(tf._width > 10);
+#if flash9
+		if(untyped tf.width > 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is greater than 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be greater than 10, is "+untyped tf.width);
+		}
+#else
+		if(untyped tf._width > 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is greater than 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be greater than 10, is "+untyped tf._width);
+		}
+#end
+		//check_equals(tf.textWidth, origTextWidth); // textWidth isn't influenced by autoSize 
+		if(untyped tf.textWidth == origTextWidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is "+origTextWidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be "+origTextWidth+", is "+untyped tf.textWidth);
+		}
+		//tf.autoSize = 'none';
+		untyped tf.autoSize = 'none';
+		//tf.wordWrap = true;
+		untyped tf.wordWrap = true;
+		//note("After setting wordWrap flat: textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
+		DejaGnu.note("After setting wordWrap flat: textWidth: "+untyped tf.textWidth+" origTextWidth:"+origTextWidth);
+		//check_equals(tf.textWidth, origTextWidth);
+		if(untyped tf.textWidth == origTextWidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is "+origTextWidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be "+origTextWidth+", is "+untyped tf.textWidth);
+		}
+		//tf._width = 10;
+#if flash9
+		untyped tf.width = 10;
+#else
+		untyped tf._width = 10;
+#end
+		//note("After reducing _width: textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
+		DejaGnu.note("After reducing _width: textWidth: "+untyped tf.textWidth+" origTextWidth:"+origTextWidth);
+		//check_equals(tf._width, 10);
+		#if flash9
+		if(untyped tf.width == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.width is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be 10, is "+untyped tf.width);
+		}
+#else
+		if(untyped tf._width == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be 10, is "+untyped tf._width);
+		}
+#end
+
+		//#if OUTPUT_VERSION < 8
+#if (flash6 || flash7)
+		 //xcheck_equals(origTextWidth, tf.textWidth);
+		 if(origTextWidth == untyped tf.textWidth) {
+			 DejaGnu.xpass("[line "+here.lineNumber+"] tf.textWidth is "+origTextWidth);
+		 } else {
+			 DejaGnu.xfail("[line "+here.lineNumber+"] tf.textWidth should be "+origTextWidth+", is "+untyped tf.textWidth);
+		 }
+		//#else
+#else
+		 //check(origTextWidth > tf.textWidth);
+		 if(origTextWidth > untyped tf.textWidth) {
+			 DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is less than "+origTextWidth);
+		 } else {
+			 DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be less than "+origTextWidth+", is "+untyped tf.textWidth);
+		 }
+		//#endif
+#end
+
+		//// test that adding a newline doesn't change the bounds width
+		//// see bug #22216
+#if flash9
+		//tf.autoSize = 'center';
+		untyped tf.autoSize = TextFieldAutoSize.CENTER;
+		//tf.text = "single line";
+		untyped tf.text = "single line";
+		//linewidth = tf._width;
+		var linewidth = untyped tf.width;
+		//tf.text = "single line\n";
+		untyped tf.text = "single line\n";
+		//check_equals(tf._width, linewidth);
+		if(untyped tf.width == linewidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.wdth is "+linewidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.width should be "+linewidth+", is "+untyped tf.width);
+		}
+#else
+		//tf.autoSize = 'center';
+		untyped tf.autoSize = 'center';
+		//tf.text = "single line";
+		untyped tf.text = "single line";
+		//linewidth = tf._width;
+		var linewidth = untyped tf._width;
+		//tf.text = "single line\n";
+		untyped tf.text = "single line\n";
+		//check_equals(tf._width, linewidth);
+		if(untyped tf._width == linewidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+linewidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+linewidth+", is "+untyped tf._width);
+		}
+#end
+
+		//// Test that setting autoSize = none
+		//// doesn't reset the bounding box.
+		//// See bug #24266
+		////
+#if flash9
+		//oldwidth = tf._width;
+		var oldwidth = untyped tf.width;
+		//note("width: "+oldwidth);
+		DejaGnu.note("width: "+oldwidth);
+		//check(oldwidth>0); // or the test is invalid
+		if(oldwidth > untyped 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] oldwidth is greater than 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be greater than 0, is "+oldwidth);
+		}
+		//tf.autoSize = 'none'; // tf was created with bounds 0,0
+		untyped tf.autoSize = TextFieldAutoSize.NONE;
+		//check_equals(tf.width, oldwidth); // but _width didn't change to that
+		if(untyped tf.width == oldwidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+oldwidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+oldwidth+", is "+untyped tf.width);
+		}
+#else
+		//oldwidth = tf._width;
+		var oldwidth = untyped tf._width;
+		//note("width: "+oldwidth);
+		DejaGnu.note("width: "+oldwidth);
+		//check(oldwidth>0); // or the test is invalid
+		if(oldwidth > untyped 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] oldwidth is greater than 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be greater than 0, is "+oldwidth);
+		}
+		//tf.autoSize = 'none'; // tf was created with bounds 0,0
+		untyped tf.autoSize = 'none';
+		//check_equals(tf._width, oldwidth); // but _width didn't change to that
+		if(untyped tf._width == oldwidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+oldwidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+oldwidth+", is "+untyped tf._width);
+		}
+#end
+		
+		//// Test that when autoSize != none,
+		//// and wordWrap is true, text box isn't
+		//// reset. See #24348
+		////
+		//tf.wordWrap = false;
+		untyped tf.wordWrap = false;
+#if flash9
+		//check_equals(tf._width, oldwidth); // text takes more width with wordWrap false
+		if(untyped tf.width == oldwidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+oldwidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+oldwidth+", is "+untyped tf.width);
+		}
+		//note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+		DejaGnu.note("width on wordWrap="+untyped tf.wordWrap+" autoSize="+untyped tf.autoSize+": "+untyped tf.width);
+		//tf.autoSize = 'center';
+		untyped tf.autoSize = TextFieldAutoSize.CENTER;
+		//note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+		DejaGnu.note("width on wordWrap="+untyped tf.wordWrap+" autoSize="+untyped tf.autoSize+": "+untyped tf.width);
+		//check(tf._width > oldwidth);
+		if(oldwidth < untyped tf.width) {
+			 DejaGnu.pass("[line "+here.lineNumber+"] tf._width is greater than "+oldwidth);
+		 } else {
+			 DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be greater than "+oldwidth+", is "+untyped tf.width);
+		 }
+		//oldwidth = tf._width;
+		oldwidth = untyped tf.width;
+		//tf.wordWrap = true;
+		untyped tf.wordWrap = true;
+		//note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+		DejaGnu.note("width on wordWrap="+untyped tf.wordWrap+" autoSize="+untyped tf.autoSize+": "+untyped tf.width);
+		//check_equals(tf._width, oldwidth);  // wordWrap change didn't reset the bbox
+		if(untyped tf.width == oldwidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+oldwidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+oldwidth+", is "+untyped tf.width);
+		}
+#else
+		//check_equals(tf._width, oldwidth); // text takes more width with wordWrap false
+		if(untyped tf._width == oldwidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+oldwidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+oldwidth+", is "+untyped tf._width);
+		}
+		//note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+		DejaGnu.note("width on wordWrap="+untyped tf.wordWrap+" autoSize="+untyped tf.autoSize+": "+untyped tf._width);
+		//tf.autoSize = 'center';
+		untyped tf.autoSize = 'center';
+		//note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+		DejaGnu.note("width on wordWrap="+untyped tf.wordWrap+" autoSize="+untyped tf.autoSize+": "+untyped tf._width);
+		//check(tf._width > oldwidth);
+		if(oldwidth < untyped tf._width) {
+			 DejaGnu.pass("[line "+here.lineNumber+"] tf._width is greater than "+oldwidth);
+		 } else {
+			 DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be greater than "+oldwidth+", is "+untyped tf._width);
+		 }
+		//oldwidth = tf._width;
+		oldwidth = untyped tf._width;
+		//tf.wordWrap = true;
+		untyped tf.wordWrap = true;
+		//note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+		DejaGnu.note("width on wordWrap="+untyped tf.wordWrap+" autoSize="+untyped tf.autoSize+": "+untyped tf._width);
+		//check_equals(tf._width, oldwidth);  // wordWrap change didn't reset the bbox
+		if(untyped tf._width == oldwidth) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+oldwidth);
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+oldwidth+", is "+untyped tf._width);
+		}
+#end
+	}
+	
+	static function checkTextFieldinsaneCalls () {
+#if flash9
+		//ret = createTextField("tf2", 99, 5, 6, -1, -2);
+		var tf2 = new TextField();
+		tf2.height = -1;
+		tf2.width = -2;
+		tf2.x = 5;
+		tf2.y = 6;
+		_root.addChild(tf2);
+		tf2.visible = false;
+		
+		//check_equals(typeof(tf2), 'object');
+		if(typeof(untyped tf2) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf2 is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf2 should be 'object', is "+typeof(untyped tf2));
+		}
+		//check_equals(tf2._width, 1);
+		if(untyped tf2.width == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2.width is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2.width should be 1, is "+untyped tf2.width);
+		}
+		//check_equals(tf2._height, 2);
+		if(untyped tf2.height == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2.height is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2.height should be 2, is "+untyped tf2.height);
+		}
+		//check_equals(tf2._x, 5);
+		if(untyped tf2.x == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2.x is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2.x should be 5, is "+untyped tf2.x);
+		}
+		//check_equals(tf2._y, 6);
+		if(untyped tf2.y == 6) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2.y is 6");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2.y should be 6, is "+untyped tf2.y);
+		}
+		//createTextField("tf3", 99, 10.87, 10.12, NAN, 50.74);
+		var tf3 = new TextField();
+		tf3.height = Math.NaN;
+		tf3.width = 50.74;
+		tf3.x = 10.87;
+		tf3.y = 10.12;
+		_root.addChild(tf3);
+		tf3.visible = false;
+		//check_equals(tf3.x, 10);
+		if(untyped tf3.x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3.x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3.x should be 10, is "+untyped tf3.x);
+		}
+		//checkequals(tf3.y, 10);
+		if(untyped tf3.y == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3.y is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3.y should be 10, is "+untyped tf3.y);
+		}
+		//checkequals(tf3.width, 0);
+		if(untyped tf3.width == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3.width is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3.width should be 0, is "+untyped tf3.width);
+		}
+		//checkequals(tf3.height, 50);
+		if(untyped tf3.height == 50) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3.height is 50");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3.height should be 50, is "+untyped tf3.height);
+		}
+		//createTextField("tf4", 99, 10, 50, NAN, "20");
+		var tf4 = new TextField();
+		tf4.height = Math.NaN;
+		tf4.width = untyped "20";
+		tf4.x = 10;
+		tf4.y = 50;
+		_root.addChild(tf4);
+		tf4.visible = false;
+		//check_equals(tf4._width, 0);
+		if(untyped tf4.width == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf4.width is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf4.width should be 0, is "+untyped tf4.width);
+		}
+		//check_equals(tf4._height, 20);
+		if(untyped tf4.height == 20) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf4.height is 20");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf4.height should be 20, is "+untyped tf4.height);
+		}
+		///This series is believed to be impossible in AS3
+		//createTextField(3, "101", "10", '100', '32', '15');
+		//check_equals(_root[3].x, 10);
+		//check_equals(_root[3].y, 100);
+		//check_equals(_root[3].width, 32);
+		//check_equals(_root[3].height, 15);
+		//// One argument more
+		//createTextField("tf5", 102, 10, 130, 3, 2, 12);
+		//check_equals(tf5._name, "tf5");
+		//check_equals(tf5._target, "/tf5");
+		//check_equals(tf5.getDepth(), 102);
+		//check_equals(tf5._x, 10);
+		//check_equals(tf5._y, 130);
+		//check_equals(tf5._width, 3);
+		//check_equals(tf5._height, 2);
+		//// One argument missing
+		//createTextField("tf6", 103, 10, 10, 160);
+		//check_equals(typeof(tf6), 'undefined');
+#else
+		//ret = createTextField("tf2", 99, 5, 6, -1, -2);
+		_root.createTextField("tf2", 99, 5, 6, -1, -2);
+		//check_equals(typeof(tf2), 'object');
+		if(typeof(untyped tf2) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf2 is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf2 should be 'object', is "+typeof(untyped tf2));
+		}
+		//check_equals(tf2._width, 1);
+		if(untyped tf2._width == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2._width is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2._width should be 1, is "+untyped tf2._width);
+		}
+		//check_equals(tf2._height, 2);
+		if(untyped tf2._height == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2._height is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2._height should be 2, is "+untyped tf2._height);
+		}
+		//check_equals(tf2._x, 5);
+		if(untyped tf2._x == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2._x is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2._x should be 5, is "+untyped tf2._x);
+		}
+		//check_equals(tf2._y, 6);
+		if(untyped tf2._y == 6) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf2._y is 6");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf2._y should be 6, is "+untyped tf2._y);
+		}
+		//createTextField("tf3", 99, 10.87, 10.12, NAN, 50.74);
+		_root.createTextField("tf3", 99, 10.87, 10.12, Math.NaN, 50.74);
+		//check_equals(tf3._x, 10);
+		if(untyped tf3._x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3._x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3._x should be 10, is "+untyped tf3._x);
+		}
+		//check_equals(tf3._y, 10);
+		if(untyped tf3._y == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3._y is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3._y should be 10, is "+untyped tf3._y);
+		}
+		//check_equals(tf3._width, 0);
+		if(untyped tf3._width == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3._width is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3._width should be 0, is "+untyped tf3._width);
+		}
+		//check_equals(tf3._height, 50);
+		if(untyped tf3._height == 50) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf3._height is 50");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf3._height should be 50, is "+untyped tf3._height);
+		}
+		//createTextField("tf4", 99, 10, 50, NAN, "20");
+		_root.createTextField("tf4", 99, 10, 1050, Math.NaN, untyped "20");
+		//check_equals(tf4._width, 0);
+		if(untyped tf4._width == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf4._width is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf4._width should be 0, is "+untyped tf4._width);
+		}
+		//check_equals(tf4._height, 20);
+		if(untyped tf4._height == 20) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf4._height is 20");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf4._height should be 20, is "+untyped tf4._height);
+		}
+		//createTextField(3, "101", "10", '100', '32', '15');
+		_root.createTextField(untyped 3, untyped "101", untyped "10", untyped '100', untyped '32', untyped '15');
+		//check_equals(_root[3].getDepth(), 101);
+		if(untyped _root[3].getDepth() == 101) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root[3].getDepth() is 101");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root[3].getDepth() should be 101, is "+untyped _root[3].getDepth());
+		}
+		//check_equals(_root[3]._x, 10);
+		if(untyped _root[3]._x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root[3]._x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root[3]._x should be 10, is "+untyped _root[3]._x);
+		}
+		//check_equals(_root[3]._y, 100);
+		if(untyped _root[3]._y == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root[3]._y is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root[3]._y should be 100, is "+untyped _root[3]._y);
+		}
+		//check_equals(_root[3]._width, 32);
+		if(untyped _root[3]._width == 32) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root[3]._width is 32");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root[3]._width should be 32, is "+untyped _root[3]._width);
+		}
+		//check_equals(_root[3]._height, 15);
+		if(untyped _root[3]._height == 15) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root[3]._height is 15");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root[3]._height should be 15, is "+untyped _root[3]._height);
+		}
+		//// One argument more
+		//createTextField("tf5", 102, 10, 130, 3, 2, 12);
+		//untyped _root.createTextField("tf5", 102, 10, 130, 3, 2, 12);
+		Reflect.callMethod(_root, Reflect.field(_root, 'createTextField'), ["tf5", 102, 10, 130, 3, 2, 12]);
+		//check_equals(tf5._name, "tf5");
+		if(untyped tf5._name == "tf5") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5._name is 'tf5'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5._name should be 'tf5', is "+untyped tf5._name);
+		}
+		//check_equals(tf5._target, "/tf5");
+		if(untyped tf5._target == "/tf5") {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5._target is '/tf5'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5._target should be '/tf5', is "+untyped tf5._target);
+		}
+		//check_equals(tf5.getDepth(), 102);
+		if(untyped tf5.getDepth() == 102) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5.getDepth() is 102");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5.getDepth() should be 102, is "+untyped tf5.getDepth());
+		}
+		//check_equals(tf5._x, 10);
+		if(untyped tf5._x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5._x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5._x should be 10, is "+untyped tf5._x);
+		}
+		//check_equals(tf5._y, 130);
+		if(untyped tf5._y == 130) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5._y is 130");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5._y should be 130, is "+untyped tf5._y);
+		}
+		//check_equals(tf5._width, 3);
+		if(untyped tf5._width == 3) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5._width is 3");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5._width should be 3, is "+untyped tf5._width);
+		}
+		//check_equals(tf5._height, 2);
+		if(untyped tf5._height == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] tf5._height is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] tf5._height should be 2, is "+untyped tf5._height);
+		}
+		//// One argument missing
+		//createTextField("tf6", 103, 10, 10, 160);
+		//untyped _root.createTextField("tf6", 103, 10, 10, 160);
+		Reflect.callMethod(_root, Reflect.field(_root, 'createTextField'), ["tf6", 103, 10, 10, 160]);
+		//check_equals(typeof(tf6), 'undefined');
+		if(typeof(untyped tf6) == 'undefined') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf6 is 'undefined'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf6 should be 'undefined', is "+typeof(untyped tf6));
+		}
+#end
+	}
+	
+	static function checkTextFieldreplaceSel () {
+#if flash9
+		//createTextField('repl1', 99, 10, 10, 10, 10);
+		var repl1 = new TextField();
+		repl1.height = 500;
+		repl1.width = 500;
+		repl1.x = 10;
+		repl1.y = 10;
+		_root.addChild(repl1);
+		repl1.visible = false;
+		
+		//Selection.setFocus(repl1);
+		_root.stage.focus = repl1;
+		//check_equals(_root.stage.focus, '_level0.repl1');
+		if(_root.stage.focus == repl1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.stage.focus is '_level0.repl1'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.stage.focus should be '_level0.repl1', is "+_root.stage.focus);
+		}
+		//repl1.text = "Text in a string";
+		untyped repl1.text = "Text in a string";
+
+		//ret = repl1.replaceSelectedText("More ");
+		var ret = untyped repl1.replaceSelectedText("More ");
+		///// Check that the selection start and end indices are adjusted.
+		//check_equals(repl1.selectionBeginIndex, 5);
+		if(repl1.selectionBeginIndex == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 5, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 5);
+		if(repl1.selectionEndIndex == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 5, is "+repl1.selectionEndIndex);
+		}
+		//check_equals(repl1.text, "More Text in a string");
+		if(untyped repl1.text == "More Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'More Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'More Text in a string', is "+untyped repl1.text);
+		}
+
+		//ret = repl1.replaceSelectedText("");
+		ret = untyped repl1.replaceSelectedText("");
+		//check_equals(repl1.selectionEndIndex, 5);
+		if(repl1.selectionEndIndex == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 5, is "+repl1.selectionEndIndex);
+		}
+		//check_equals(repl1.text, "More Text in a string");
+		if(untyped repl1.text == "More Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'More Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'More Text in a string', is "+untyped repl1.text);
+		}
+
+
+		//Selection.setSelection(0, 1);
+		repl1.setSelection(0, 1);
+		//ret = repl1.replaceSelectedText("HU");
+		ret = untyped repl1.replaceSelectedText("HU");
+		//check_equals(ret, undefined);
+		if(ret == undefined) {
+			DejaGnu.pass("[line "+here.lineNumber+"] ret is undefined");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] ret should be undefined, is "+ret);
+		}
+		//check_equals(repl1.text, "HUore Text in a string");
+		if(untyped repl1.text == "HUore Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUore Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUore Text in a string', is "+untyped repl1.text);
+		}
+
+		//check_equals(repl1.selectionBeginIndex, 2);
+		if(repl1.selectionBeginIndex == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 2, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 2);
+		if(repl1.selectionEndIndex == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 2, is "+repl1.selectionEndIndex);
+		}
+
+		//repl1.setSelection2, 5);
+		repl1.setSelection(2, 5);
+		//ret = repl1.replaceSelectedText("HUU");
+		ret = untyped repl1.replaceSelectedText("HUU");
+		//check_equals(ret, undefined);
+		if(ret == undefined) {
+			DejaGnu.pass("[line "+here.lineNumber+"] ret is undefined");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] ret should be undefined, is "+ret);
+		}
+		//check_equals(repl1.text, "HUHUU Text in a string");
+		if(untyped repl1.text == "HUHUU Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text in a string', is "+untyped repl1.text);
+		}
+
+		//check_equals(repl1.selectionBeginIndex, 5);
+		if(repl1.selectionBeginIndex == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 5, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 5);
+		if(repl1.selectionEndIndex == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 5, is "+repl1.selectionEndIndex);
+		}
+
+		//repl1.setSelection10, 13);
+		repl1.setSelection(10, 13);
+		//repl1.replaceSelectedText(7);
+		untyped repl1.replaceSelectedText(untyped 7);
+		//check_equals(repl1.text, "HUHUU Text7 a string");
+		if(untyped repl1.text == "HUHUU Text7 a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text7 a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text7 a string', is "+untyped repl1.text);
+		}
+		//check_equals(repl1.selectionBeginIndex, 11);
+		if(repl1.selectionBeginIndex == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 11, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 11);
+		if(repl1.selectionEndIndex == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 11, is "+repl1.selectionEndIndex);
+		}
+
+		//repl1.setSelection10, 13);
+		repl1.setSelection(10, 13);
+		//repl1.replaceSelectedText(new Object());
+		var o = {};
+		untyped o.toString = function() { return "[object Object]"; };
+		untyped repl1.replaceSelectedText(untyped o);
+		//check_equals(repl1.text, "HUHUU Text[object Object] string");
+		if(untyped repl1.text == "HUHUU Text[object Object] string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text[object Object] string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text[object Object] string', is "+untyped repl1.text);
+		}
+		//check_equals(repl1.selectionBeginIndex, 25);
+		if(repl1.selectionBeginIndex == 25) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 25");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 25, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 25);
+		if(repl1.selectionEndIndex == 25) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 25");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 25, is "+repl1.selectionEndIndex);
+		}
+
+		//repl1.setSelection1, 20);
+		repl1.setSelection(1, 20);
+		//repl1.replaceSelectedText("");
+		untyped repl1.replaceSelectedText("");
+		//check_equals(repl1.text, "Hject] string");
+		if(untyped repl1.text == "Hject] string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'Hject] string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'Hject] string', is "+untyped repl1.text);
+		}
+		//check_equals(repl1.selectionBeginIndex, 1);
+		if(repl1.selectionBeginIndex == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 1, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 1);
+		if(repl1.selectionEndIndex == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 1, is "+repl1.selectionEndIndex);
+		}
+
+		//repl1.text = "New text";
+		untyped repl1.text = "New text";
+
+		//repl1.setSelection2, 5);
+		repl1.setSelection(2, 5);
+		//repl1.replaceSelectedText();
+		//untyped repl1.replaceSelectedText();
+		Reflect.callMethod(repl1, Reflect.field(repl1, 'replaceSelectedText'), []);
+		//check_equals(repl1.text, "New text");
+		if(untyped repl1.text == "New text") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'New text'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'New text', is "+untyped repl1.text);
+		}
+		//check_equals(repl1.selectionBeginIndex, 2);
+		if(repl1.selectionBeginIndex == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionBeginIndex is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionBeginIndex should be 2, is "+repl1.selectionBeginIndex);
+		}
+		//check_equals(repl1.selectionEndIndex, 5);
+		if(repl1.selectionEndIndex == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.selectionEndIndex is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.selectionEndIndex should be 5, is "+repl1.selectionEndIndex);
+		}
+#else
+		//createTextField('repl1', 99, 10, 10, 10, 10);
+		_root.createTextField('repl1', 99, 10, 10, 10, 10);
+		//Selection.setFocus(repl1);
+		Selection.setFocus(untyped repl1);
+		//check_equals(Selection.getFocus(), '_level0.repl1');
+		if(Selection.getFocus() == '_level0.repl1') {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getFocus() is '_level0.repl1'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getFocus() should be '_level0.repl1', is "+Selection.getFocus());
+		}
+		//repl1.text = "Text in a string";
+		untyped repl1.text = "Text in a string";
+
+		//ret = repl1.replaceSel("More ");
+		var ret = untyped repl1.replaceSel("More ");
+		///// Check that the selection start and end indices are adjusted.
+		//check_equals(Selection.getBeginIndex(), 5);
+		if(Selection.getBeginIndex() == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 5, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 5);
+		if(Selection.getEndIndex() == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 5, is "+Selection.getEndIndex());
+		}
+		//check_equals(repl1.text, "More Text in a string");
+		if(untyped repl1.text == "More Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'More Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'More Text in a string', is "+untyped repl1.text);
+		}
+
+		//ret = repl1.replaceSel("");
+		ret = untyped repl1.replaceSel("");
+		//check_equals(Selection.getEndIndex(), 5);
+		if(Selection.getEndIndex() == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 5, is "+Selection.getEndIndex());
+		}
+		//check_equals(repl1.text, "More Text in a string");
+		if(untyped repl1.text == "More Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'More Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'More Text in a string', is "+untyped repl1.text);
+		}
+
+
+		//repl1.setSelection0, 1);
+		Selection.setSelection(0, 1);
+		//ret = repl1.replaceSel("HU");
+		ret = untyped repl1.replaceSel("HU");
+		//check_equals(ret, undefined);
+		if(ret == undefined) {
+			DejaGnu.pass("[line "+here.lineNumber+"] ret is undefined");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] ret should be undefined, is "+ret);
+		}
+		//check_equals(repl1.text, "HUore Text in a string");
+		if(untyped repl1.text == "HUore Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUore Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUore Text in a string', is "+untyped repl1.text);
+		}
+
+		//check_equals(Selection.getBeginIndex(), 2);
+		if(Selection.getBeginIndex() == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 2, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 2);
+		if(Selection.getEndIndex() == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 2, is "+Selection.getEndIndex());
+		}
+
+		//Selection.setSelection(2, 5);
+		Selection.setSelection(2, 5);
+		//ret = repl1.replaceSel("HUU");
+		ret = untyped repl1.replaceSel("HUU");
+		//check_equals(ret, undefined);
+		if(ret == undefined) {
+			DejaGnu.pass("[line "+here.lineNumber+"] ret is undefined");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] ret should be undefined, is "+ret);
+		}
+		//check_equals(repl1.text, "HUHUU Text in a string");
+		if(untyped repl1.text == "HUHUU Text in a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text in a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text in a string', is "+untyped repl1.text);
+		}
+
+		//check_equals(Selection.getBeginIndex(), 5);
+		if(Selection.getBeginIndex() == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 5, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 5);
+		if(Selection.getEndIndex() == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 5, is "+Selection.getEndIndex());
+		}
+
+		//Selection.setSelection(10, 13);
+		Selection.setSelection(10, 13);
+		//repl1.replaceSel(7);
+		untyped repl1.replaceSel(7);
+		//check_equals(repl1.text, "HUHUU Text7 a string");
+		if(untyped repl1.text == "HUHUU Text7 a string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text7 a string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text7 a string', is "+untyped repl1.text);
+		}
+		//check_equals(Selection.getBeginIndex(), 11);
+		if(Selection.getBeginIndex() == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 11, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 11);
+		if(Selection.getEndIndex() == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 11, is "+Selection.getEndIndex());
+		}
+
+		//Selection.setSelection(10, 13);
+		Selection.setSelection(10, 13);
+		//repl1.replaceSel(new Object());
+		untyped repl1.replaceSel(untyped __new__(Object));
+		//check_equals(repl1.text, "HUHUU Text[object Object] string");
+		if(untyped repl1.text == "HUHUU Text[object Object] string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text[object Object] string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text[object Object] string', is "+untyped repl1.text);
+		}
+		//check_equals(Selection.getBeginIndex(), 25);
+		if(Selection.getBeginIndex() == 25) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 25");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 25, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 25);
+		if(Selection.getEndIndex() == 25) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 25");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 25, is "+Selection.getEndIndex());
+		}
+
+		//Selection.setSelection(1, 20);
+		Selection.setSelection(1, 20);
+		//repl1.replaceSel("");
+		untyped repl1.replaceSel("");
+		//#if OUTPUT_VERSION < 8
+#if (flash6 || flash7)
+		//check_equals(repl1.text, "HUHUU Text[object Object] string");
+		if(untyped repl1.text == "HUHUU Text[object Object] string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'HUHUU Text[object Object] string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'HUHUU Text[object Object] string', is "+untyped repl1.text);
+		}
+		//check_equals(Selection.getBeginIndex(), 1);
+		if(Selection.getBeginIndex() == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 1, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 20);
+		if(Selection.getEndIndex() == 20) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 20");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 20, is "+Selection.getEndIndex());
+		}
+		//#else
+#else //if !(flash6 || flash7)
+		//check_equals(repl1.text, "Hject] string");
+		if(untyped repl1.text == "Hject] string") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'Hject] string'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'Hject] string', is "+untyped repl1.text);
+		}
+		//check_equals(Selection.getBeginIndex(), 1);
+		if(Selection.getBeginIndex() == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 1, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 1);
+		if(Selection.getEndIndex() == 1) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 1");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 1, is "+Selection.getEndIndex());
+		}
+		//#endif
+#end //if !(flash6 ||flash7)
+
+		//repl1.text = "New text";
+		untyped repl1.text = "New text";
+
+		//Selection.setSelection(2, 5);
+		Selection.setSelection(2, 5);
+		//repl1.replaceSel();
+		untyped repl1.replaceSel();
+		//check_equals(repl1.text, "New text");
+		if(untyped repl1.text == "New text") {
+			DejaGnu.pass("[line "+here.lineNumber+"] repl1.text is 'New text'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] repl1.text should be 'New text', is "+untyped repl1.text);
+		}
+		//check_equals(Selection.getBeginIndex(), 2);
+		if(Selection.getBeginIndex() == 2) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getBeginIndex() is 2");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getBeginIndex() should be 2, is "+Selection.getBeginIndex());
+		}
+		//check_equals(Selection.getEndIndex(), 5);
+		if(Selection.getEndIndex() == 5) {
+			DejaGnu.pass("[line "+here.lineNumber+"] Selection.getEndIndex() is 5");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] Selection.getEndIndex() should be 5, is "+Selection.getEndIndex());
+		}
+#end
+	}
+	
+	static function checkTextFieldproperties () {
+#if flash9
+		//_root.visible = true; // just to be sure
+		_root.visible = true;
+		//_root.xscale = _root.yscale = 100;
+		_root.scaleX = _root.scaleY = 100;
+		//_root.createTextField('htf',0,0,0,0,0);
+		var htf = new TextField();
+		htf.height = 0;
+		htf.width = 0;
+		htf.x = 0;
+		htf.y = 0;
+		_root.addChild(htf);
+		htf.visible = false;
+		var tf = new TextField();
+		tf.height = 500;
+		tf.width = 500;
+		tf.x = 10;
+		tf.y = 10;
+		_root.addChild(tf);
+		tf.visible = false;
+		//check_equals(typeof(htf), 'object');
+		if(typeof(untyped htf) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof htf is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof htf should be 'object', is "+typeof(untyped htf));
+		}
+		//tf = htf;
+		untyped tf = untyped htf;
+		//with(tf) {
+			//_x=10;
+			//_y=11;
+			//_visible=false;
+			//_xscale=200;
+			//_yscale=201;
+			//_parent='fake_parent';
+			//_name='fake_name';
+			//_target='fake';
+		//}
+		untyped tf.x = 10;
+		untyped tf.y = 11;
+		untyped tf.visible = false;
+		untyped tf.xscale = 200;
+		untyped tf.yscale = 201;
+		//untyped tf.parent = untyped 'fake_parent';
+		Reflect.setField(tf, Reflect.field(tf, 'parent'), 'fake_parent');
+		untyped tf.name = 'fake_name';
+		untyped tf.target = 'fake';
+
+		//check_equals(_root.x, 0);
+		if(_root.x == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.x is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.x should be 0, is "+_root.x);
+		}
+		//check_equals(_root.y, 0);
+		if(_root.y == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.y is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.y should be 0, is "+_root.y);
+		}
+		//check_equals(_root.visible, true);
+		if(_root.visible == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.visible is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.visible should be true, is "+_root.visible);
+		}
+		//check_equals(_root.xscale, 100);
+		if(_root.scaleX == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.scaleX is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.scaleX should be 100, is "+_root.scaleX);
+		}
+		//check_equals(_root.yscale, 100);
+		if(_root.scaleY == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.scaleY is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.scaleY should be 100, is "+_root.scaleY);
+		}
+		//xcheck_equals(_root.parent, 'fake_parent');
+		if(_root.parent == untyped 'fake_parent') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] _root.parent is 'fake_parent'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] _root.parent should be 'fake_parent', is "+_root.parent);
+		}
+		//check_equals(_root.name, '');
+		if(_root.name == '') {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root.name is ''");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root.name should be '', is "+_root.name);
+		}
+
+		//check_equals(_root.x, 10);
+		if(untyped tf.x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.x should be 10, is "+untyped tf.x);
+		}
+		//check_equals(untyped tf.y, 11);
+		if(untyped tf.y == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.y is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.y should be 11, is "+untyped tf.y);
+		}
+		//check_equals(untyped tf.visible, false);
+		if(untyped tf.visible == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.visible is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.visible should be false, is "+untyped tf.visible);
+		}
+		//check_equals(untyped tf.xscale, 200);
+		if(untyped tf.xscale == 200) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.xscale is 200");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.xscale should be 200, is "+untyped tf.xscale);
+		}
+		//check_equals(untyped tf.yscale, 201);
+		if(untyped tf.yscale == 201) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.yscale is 201");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.yscale should be 201, is "+untyped tf.yscale);
+		}
+		//check_equals(untyped tf.target, '/fake_name');
+		if(untyped tf.target == '/fake_name') {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.target is '/fake_name'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.target should be '/fake_name', is "+untyped tf.target);
+		}
+		//xcheck_equals(untyped tf.parent, 'fake_parent');
+		if(untyped tf.parent == 'fake_parent') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] untyped tf.parent is 'fake_parent'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] untyped tf.parent should be 'fake_parent', is "+untyped tf.parent);
+		}
+		//check_equals(untyped tf.name, 'fake_name');
+		if(untyped tf.name == 'fake_name') {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf.name is 'fake_name'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf.name should be 'fake_name', is "+untyped tf.name);
+		}
+
+		//_root.visible = true;
+		_root.visible = true;
+		//_root.x = _root.y = 0;
+		_root.x = _root.y = 0;
+		//_root.xscale = _root.yscale = 100;
+		_root.scaleX = _root.scaleY = 100;
+#else
+		//_root._visible = true; // just to be sure
+		_root._visible = true;
+		//_root._xscale = _root._yscale = 100;
+		_root._xscale = _root._yscale = 100;
+		//_root.createTextField('htf',0,0,0,0,0);
+		_root.createTextField('htf', 0, 0, 0, 0, 0);
+		//check_equals(typeof(htf), 'object');
+		if(typeof(untyped htf) == 'object') {
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof htf is 'object'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof htf should be 'object', is "+typeof(untyped htf));
+		}
+		//tf = htf;
+		untyped tf = untyped htf;
+		//with(tf) {
+			//_x=10;
+			//_y=11;
+			//_visible=false;
+			//_xscale=200;
+			//_yscale=201;
+			//_parent='fake_parent';
+			//_name='fake_name';
+			//_target='fake';
+		//}
+		untyped tf._x = 10;
+		untyped tf._y = 11;
+		untyped tf._visible = false;
+		untyped tf._xscale = 200;
+		untyped tf._yscale = 201;
+		untyped tf._parent = 'fake_parent';
+		untyped tf._name = 'fake_name';
+		untyped tf._target = 'fake';
+
+		//check_equals(_root._x, 0);
+		if(_root._x == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._x is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._x should be 0, is "+_root._x);
+		}
+		//check_equals(_root._y, 0);
+		if(_root._y == 0) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._y is 0");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._y should be 0, is "+_root._y);
+		}
+		//check_equals(_root._visible, true);
+		if(_root._visible == true) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._visible is true");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._visible should be true, is "+_root._visible);
+		}
+		//check_equals(_root._xscale, 100);
+		if(_root._xscale == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._xscale is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._xscale should be 100, is "+_root._xscale);
+		}
+		//check_equals(_root._yscale, 100);
+		if(_root._yscale == 100) {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._yscale is 100");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._yscale should be 100, is "+_root._yscale);
+		}
+		//check_equals(_root._target, '/');
+		if(_root._target == '/') {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._target is '/'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._target should be '/', is "+_root._target);
+		}
+		//xcheck_equals(_root._parent, 'fake_parent');
+		if(_root._parent == untyped 'fake_parent') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] _root._parent is 'fake_parent'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] _root._parent should be 'fake_parent', is "+_root._parent);
+		}
+		//check_equals(_root._name, '');
+		if(_root._name == '') {
+			DejaGnu.pass("[line "+here.lineNumber+"] _root._name is ''");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] _root._name should be '', is "+_root._name);
+		}
+
+		//check_equals(_root._x, 10);
+		if(untyped tf._x == 10) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._x is 10");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._x should be 10, is "+untyped tf._x);
+		}
+		//check_equals(untyped tf._y, 11);
+		if(untyped tf._y == 11) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._y is 11");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._y should be 11, is "+untyped tf._y);
+		}
+		//check_equals(untyped tf._visible, false);
+		if(untyped tf._visible == false) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._visible is false");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._visible should be false, is "+untyped tf._visible);
+		}
+		//check_equals(untyped tf._xscale, 200);
+		if(untyped tf._xscale == 200) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._xscale is 200");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._xscale should be 200, is "+untyped tf._xscale);
+		}
+		//check_equals(untyped tf._yscale, 201);
+		if(untyped tf._yscale == 201) {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._yscale is 201");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._yscale should be 201, is "+untyped tf._yscale);
+		}
+		//check_equals(untyped tf._target, '/fake_name');
+		if(untyped tf._target == '/fake_name') {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._target is '/fake_name'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._target should be '/fake_name', is "+untyped tf._target);
+		}
+		//xcheck_equals(untyped tf._parent, 'fake_parent');
+		if(untyped tf._parent == 'fake_parent') {
+			DejaGnu.xpass("[line "+here.lineNumber+"] untyped tf._parent is 'fake_parent'");
+		} else {
+			DejaGnu.xfail("[line "+here.lineNumber+"] untyped tf._parent should be 'fake_parent', is "+untyped tf._parent);
+		}
+		//check_equals(untyped tf._name, 'fake_name');
+		if(untyped tf._name == 'fake_name') {
+			DejaGnu.pass("[line "+here.lineNumber+"] untyped tf._name is 'fake_name'");
+		} else {
+			DejaGnu.fail("[line "+here.lineNumber+"] untyped tf._name should be 'fake_name', is "+untyped tf._name);
+		}
+
+		//_root._visible = true;
+		_root._visible = true;
+		//_root._x = _root._y = 0;
+		_root._x = _root._y = 0;
+		//_root._xscale = _root._yscale = 100;
+		_root._xscale = _root._yscale = 100;
+#end
+	}
 }
 
 // local Variables:

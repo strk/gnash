@@ -624,7 +624,7 @@ TextField::on_event(const event_id& ev)
 		}
         case event_id::KEY_PRESS:
         {
-            if ( getType() != typeInput ) break; // not an input field
+            //if ( getType() != typeInput ) break; // not an input field
             setHtml(false); //editable html fields are not yet implemented
             std::wstring s = _text;
 
