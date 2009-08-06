@@ -303,6 +303,9 @@ TextField::removeTextField()
 void
 TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 {
+    if (!(_textRecords.size() > 0)) {
+        return;
+    }
     boost::uint16_t x;
     boost::uint16_t y;
     boost::uint16_t h;
