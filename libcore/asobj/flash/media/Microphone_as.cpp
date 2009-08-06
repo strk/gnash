@@ -105,7 +105,7 @@ attachMicrophoneProperties(as_object& o)
     getset = gl->createFunction(microphone_silenceLevel);
     o.init_property("silenceLevel", *getset, *getset);
     getset = gl->createFunction(microphone_silenceTimeout);
-    o.init_property("silenceTimeOut", *getset, *getset);
+    o.init_property("silenceTimeout", *getset, *getset);
     getset = gl->createFunction(microphone_useEchoSuppression);
     o.init_property("useEchoSuppression", *getset, *getset);
 }
@@ -119,7 +119,8 @@ attachMicrophoneInterface(as_object& o)
 	o.init_member("setRate", gl->createFunction(microphone_setrate));
 	o.init_member("setSilenceLevel",
             gl->createFunction(microphone_setsilencelevel));
-	o.init_member("setUseEchoSuppression", gl->createFunction(microphone_setuseechosuppression));
+	o.init_member("setUseEchoSuppression",
+            gl->createFunction(microphone_setuseechosuppression));
     
 }
 
@@ -174,13 +175,17 @@ microphone_new(const fn_call& fn)
 {
     Global_as* gl = getGlobal(fn);
     as_object* proto = getMicrophoneInterface();
-    return new gl->createObject(proto);
+    return gl->createObject(proto);
 }
 
 // AS2 static accessor.
 as_value
 microphone_get(const fn_call& fn)
 {
+
+    // TODO: this should return the *same* object when the same device
+    // is returned, not a new object.
+    // TODO: check what the function returns when there is no microphone.
     boost::intrusive_ptr<as_object> obj = new microphone_as_object;
     
     int numargs = fn.nargs;
@@ -363,8 +368,6 @@ microphone_muted(const fn_call& fn)
     return as_value();
 }
 
-//i don't know why this is throwing errors, i believe my code is correct, but
-//for some reason it can't get the intrusive this_ptr...
 as_value
 microphone_name(const fn_call& fn)
 {
@@ -388,7 +391,8 @@ microphone_name(const fn_call& fn)
 
 
 as_value
-microphone_names(const fn_call& fn) {
+microphone_names(const fn_call& fn)
+{
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
     
@@ -421,7 +425,8 @@ microphone_names(const fn_call& fn) {
 
 
 as_value
-microphone_rate(const fn_call& fn) {
+microphone_rate(const fn_call& fn)
+{
     boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
         (fn.this_ptr);
         
@@ -462,8 +467,8 @@ microphone_silenceLevel(const fn_call& fn) {
 as_value
 microphone_silenceTimeout(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -481,9 +486,10 @@ microphone_silenceTimeout(const fn_call& fn)
 }
 
 as_value
-microphone_useEchoSuppression(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr = ensureType<microphone_as_object>
-        (fn.this_ptr);
+microphone_useEchoSuppression(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object>(fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
