@@ -164,10 +164,16 @@ public:
 };
 #endif
 
-// AS2 ctor
+// AS2 static accessor.
 as_value
 camera_get(const fn_call& fn)
 {
+
+    // TODO: this should return the same object when the same device is
+    // meant, not a new object each time. It will be necessary to query
+    // the MediaHandler for this, and possibly to store the as_objects
+    // somewhere.
+
     boost::intrusive_ptr<as_object> obj = new camera_as_object;  
 
     int numargs = fn.nargs;
@@ -177,7 +183,7 @@ camera_get(const fn_call& fn)
     return as_value(obj.get()); // will keep alive
 }
 
-// AS3 ctor
+// AS3 static accessor.
 as_value
 camera_getCamera(const fn_call& fn)
 {
@@ -306,8 +312,10 @@ camera_setmotionlevel(const fn_call& fn)
     return as_value();
 }
 
+
 as_value
-camera_setquality(const fn_call& fn) {
+camera_setquality(const fn_call& fn)
+{
     log_unimpl ("Camera::quality can be set, but it's not implemented");
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
         (fn.this_ptr);
@@ -347,8 +355,11 @@ camera_setquality(const fn_call& fn) {
     }
     return as_value();
 }
+
+
 as_value
-camera_activitylevel(const fn_call& fn) {
+camera_activitylevel(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -365,8 +376,10 @@ camera_activitylevel(const fn_call& fn) {
 
     return as_value();
 }
+
 as_value
-camera_bandwidth(const fn_call& fn) {
+camera_bandwidth(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -383,9 +396,11 @@ camera_bandwidth(const fn_call& fn) {
 
     return as_value();
 }
+
 //as3 capitalization
 as_value
-camera_currentFPS(const fn_call& fn) {
+camera_currentFPS(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -404,7 +419,8 @@ camera_currentFPS(const fn_call& fn) {
 
 //as3 capitalization
 as_value
-camera_currentFps(const fn_call& fn) {
+camera_currentFps(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -422,7 +438,8 @@ camera_currentFps(const fn_call& fn) {
 }
 
 as_value
-camera_fps(const fn_call& fn) {
+camera_fps(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -440,7 +457,8 @@ camera_fps(const fn_call& fn) {
 }
 
 as_value
-camera_height(const fn_call& fn) {
+camera_height(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -458,7 +476,8 @@ camera_height(const fn_call& fn) {
 }
 
 as_value
-camera_index(const fn_call& fn) {
+camera_index(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -476,7 +495,8 @@ camera_index(const fn_call& fn) {
 }
 
 as_value
-camera_motionLevel(const fn_call& fn) {
+camera_motionLevel(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -495,7 +515,8 @@ camera_motionLevel(const fn_call& fn) {
 }
 
 as_value
-camera_motionTimeout(const fn_call& fn) {
+camera_motionTimeout(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -533,7 +554,8 @@ camera_muted(const fn_call& fn) {
 }
 
 as_value
-camera_name(const fn_call& fn) {
+camera_name(const fn_call& fn)
+{
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -584,8 +606,10 @@ camera_names(const fn_call& fn)
 
 
 as_value
-camera_quality(const fn_call& fn) {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+camera_quality(const fn_call& fn)
+{
+    boost::intrusive_ptr<camera_as_object> ptr =
+        ensureType<camera_as_object>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) // getter
     {
