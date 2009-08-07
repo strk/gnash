@@ -40,7 +40,8 @@ namespace media {
 namespace gst {
     
     //initializes the Gstreamer interface
-    VideoInputGst::VideoInputGst() {
+    VideoInputGst::VideoInputGst() 
+    {
         gst_init(NULL,NULL);
         
         int devSelection;
@@ -66,7 +67,8 @@ namespace gst {
         webcamCreateSaveBin(_globalWebcam);
     }
     
-    VideoInputGst::~VideoInputGst() {
+    VideoInputGst::~VideoInputGst() 
+    {
         log_unimpl("Video Input destructor");
     }
     
@@ -74,7 +76,8 @@ namespace gst {
     //which contain important information about the hardware camera
     //inputs available on the machine
     void
-    VideoInputGst::findVidDevs() {
+    VideoInputGst::findVidDevs() 
+    {
         _numdevs = 0;
         
         //find video test sources
@@ -311,7 +314,8 @@ namespace gst {
     //pulls webcam device selection from gnashrc (will eventually tie into
     //gui)
     int
-    VideoInputGst::makeWebcamDeviceSelection() {
+    VideoInputGst::makeWebcamDeviceSelection()
+    {
         int dev_select;
         dev_select = rcfile.getWebcamDevice();
         if (dev_select == -1) {
@@ -434,7 +438,8 @@ namespace gst {
 
     //probe the selected camera for the formats it supports
     void
-    VideoInputGst::getSupportedFormats(GnashWebcam *cam, GstCaps *caps) {
+    VideoInputGst::getSupportedFormats(GnashWebcam *cam, GstCaps *caps) 
+    {
         gint i;
         gint num_structs;
         
@@ -537,7 +542,8 @@ namespace gst {
 
     //create a bin containing the source and a connector ghostpad
     gboolean
-    VideoInputGst::webcamCreateSourceBin(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamCreateSourceBin(GnashWebcamPrivate *webcam) 
+    {
         GError *error = NULL;
         gchar *command = NULL;
         
@@ -659,7 +665,8 @@ namespace gst {
     
     gboolean
     VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
-            int fps) {
+            int fps) 
+    {
         
         for (int i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
             int val = std::ceil(
@@ -673,7 +680,8 @@ namespace gst {
     }
     
     gboolean
-    VideoInputGst::webcamChangeSourceBin(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamChangeSourceBin(GnashWebcamPrivate *webcam) 
+    {
         GError *error = NULL;
         gchar *command = NULL;
         
@@ -844,7 +852,8 @@ namespace gst {
     //capabilities as well as save-to-file or buffer capabilities (both
     //implemented as bin ghostpads)
     gboolean
-    VideoInputGst::webcamCreateMainBin(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamCreateMainBin(GnashWebcamPrivate *webcam) 
+    {
         GstElement *tee, *video_display_queue, *save_queue;
         gboolean ok;
         GstPad  *pad;
@@ -927,7 +936,8 @@ namespace gst {
     }
 
     gboolean
-    VideoInputGst::webcamCreateDisplayBin(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamCreateDisplayBin(GnashWebcamPrivate *webcam) 
+    {
         GstElement *video_scale, *video_sink;
         gboolean ok;
         GstPad  *pad;
@@ -976,7 +986,8 @@ namespace gst {
     //make link between display_queue src ghostpad in main_bin and
     //the elements necessary to display video to screen (_videoDisplayBin)
     gboolean
-    VideoInputGst::webcamMakeVideoDisplayLink(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamMakeVideoDisplayLink(GnashWebcamPrivate *webcam) 
+    {
         if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_display_bin") == NULL) {
             gst_object_ref(webcam->_videoDisplayBin);
             gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoDisplayBin);
@@ -1002,7 +1013,8 @@ namespace gst {
     
     //break the link that displays the webcam video to the screen
     gboolean
-    VideoInputGst::webcamBreakVideoDisplayLink(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamBreakVideoDisplayLink(GnashWebcamPrivate *webcam) 
+    {
         if (webcam->_pipelineIsPlaying == true) {
             GstStateChangeReturn state;
             state = gst_element_set_state(webcam->_pipeline, GST_STATE_NULL);
@@ -1033,7 +1045,8 @@ namespace gst {
     
     //make link to saveQueue in main bin
     gboolean
-    VideoInputGst::webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamMakeVideoSaveLink(GnashWebcamPrivate *webcam) 
+    {
         if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_save_bin") == NULL) {
             gst_object_ref(webcam->_videoSaveBin);
             gst_bin_add(GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
@@ -1059,7 +1072,8 @@ namespace gst {
     
     //break link to saveQueue in main bin
     gboolean
-    VideoInputGst::webcamBreakVideoSaveLink(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamBreakVideoSaveLink(GnashWebcamPrivate *webcam) 
+    {
         if (webcam->_pipelineIsPlaying == true) {
             GstStateChangeReturn state;
             state = gst_element_set_state(webcam->_pipeline, GST_STATE_NULL);
@@ -1100,7 +1114,8 @@ namespace gst {
     //create a bin to take the video stream and dump it out to
     //an ogg file
     gboolean
-    VideoInputGst::webcamCreateSaveBin(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamCreateSaveBin(GnashWebcamPrivate *webcam) 
+    {
         GstElement *video_save_csp, *video_save_rate, *video_save_scale, *video_enc;
         GstElement *mux;
         GstPad     *pad;
@@ -1194,7 +1209,8 @@ namespace gst {
     
     //start the pipeline and run the g_main_loop
     gboolean
-    VideoInputGst::webcamPlay(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamPlay(GnashWebcamPrivate *webcam) 
+    {
         GstStateChangeReturn state;
         GstBus *bus;
         gint ret;
@@ -1214,7 +1230,8 @@ namespace gst {
     }
     
     gboolean
-    VideoInputGst::webcamStop(GnashWebcamPrivate *webcam) {
+    VideoInputGst::webcamStop(GnashWebcamPrivate *webcam) 
+    {
         GstStateChangeReturn state;
         
         state = gst_element_set_state (webcam->_pipeline, GST_STATE_NULL);

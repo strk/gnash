@@ -54,10 +54,13 @@ public:
     int get_height() {return _height;};
     
     void set_index(int i) {_index = i;};
+    // livedocs say that this should return a number, but when testing with
+    // flashplayer it appears to actually return a string.
     std::string get_index() {
         char buffer[2];
         sprintf(buffer, "%i", _index);
-        return buffer;};
+        return buffer;
+    };
     
     void set_keyFrameInterval(int i) {_keyFrameInterval = i;};
     int get_keyFrameInterval() {return _keyFrameInterval;};

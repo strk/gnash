@@ -169,6 +169,19 @@
 	  for the plugin, so you have to explicitly start any movie on a webpage. This option is <emphasis>off</emphasis> by default.
 	  </entry>
 	</row>
+    
+    <entry>webcamDevice</entry>
+	  <entry>integer</entry>
+	  <entry>The integer value (index into vector of video devices) that represents the default webcam.
+      To easily get this entry run utilities/findwebcams (only works with Gstreamer right now)</entry>
+	</row>
+    
+    <entry>microphoneDevice</entry>
+	  <entry>integer</entry>
+	  <entry>The integer value (index into vector of microphone devices) that represents the default microphone.
+      To easily get this entry run utilities/findmicrophones (only works with Gstreamer right now)</entry>
+	</row>
+    
 	<row>
 	  <entry>flashVersionString</entry>
 	  <entry>string</entry>

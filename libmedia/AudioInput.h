@@ -26,6 +26,10 @@
 namespace gnash {
 namespace media {
 
+/// \class AudioInput
+/// This is the base class that talks to Microphone_as.cpp. It is basically
+/// exactly what's specified in the livedocs. Most of the real work is done
+/// in the AudioInputGst or AudioInputFFMPEG source files, respectively.
 class AudioInput {
 	
 public:

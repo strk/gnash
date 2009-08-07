@@ -35,7 +35,8 @@ namespace {
 namespace gnash {
 namespace media {
 namespace gst {
-	AudioInputGst::AudioInputGst() {
+	AudioInputGst::AudioInputGst() 
+    {
 		gst_init(NULL,NULL);
         
         findAudioDevs();
@@ -59,7 +60,8 @@ namespace gst {
 	}
     
     void
-    AudioInputGst::findAudioDevs() {
+    AudioInputGst::findAudioDevs() 
+    {
         _numdevs = 0;
         
         //enumerate audio test sources
@@ -118,7 +120,8 @@ namespace gst {
     }
     
     bool
-    AudioInputGst::checkSupportedFormats(GstCaps *caps) {
+    AudioInputGst::checkSupportedFormats(GstCaps *caps) 
+    {
         gint num_structs;
         
         num_structs = gst_caps_get_size (caps);
@@ -317,7 +320,8 @@ namespace gst {
     } 
     
     gboolean
-    AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio) {
+    AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio) 
+    {
         GError *error = NULL;
         gchar *command = NULL;
         if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
@@ -355,7 +359,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio) {
+    AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio) 
+    {
         GstElement *tee, *audioPlaybackQueue, *saveQueue;
         gboolean ok;
         GstPad  *pad;
@@ -433,7 +438,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::audioCreatePlaybackBin(GnashAudioPrivate *audio) {
+    AudioInputGst::audioCreatePlaybackBin(GnashAudioPrivate *audio) 
+    {
         GstElement* autosink;
         GstPad* pad;
         gboolean ok;
@@ -457,7 +463,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::makeAudioSourcePlaybackLink(GnashAudioPrivate *audio) {
+    AudioInputGst::makeAudioSourcePlaybackLink(GnashAudioPrivate *audio) 
+    {
         if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "playbackBin") == NULL) {
             gst_object_ref(audio->_audioPlaybackBin);
             gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
@@ -482,7 +489,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::breakAudioSourcePlaybackLink(GnashAudioPrivate *audio) {
+    AudioInputGst::breakAudioSourcePlaybackLink(GnashAudioPrivate *audio) 
+    {
         if (audio->_pipelineIsPlaying == true) {
             audioStop(audio);
         }
@@ -548,7 +556,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio) {
+    AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio) 
+    {
         GstElement *audioConvert, *audioEnc, *filesink;
         GstPad* pad;
         
@@ -594,7 +603,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::makeAudioSourceSaveLink (GnashAudioPrivate* audio) {
+    AudioInputGst::makeAudioSourceSaveLink (GnashAudioPrivate* audio) 
+    {
         if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "audioSaveBin") == NULL) {
             gst_object_ref(audio->_audioSaveBin);
             gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioSaveBin);
@@ -619,7 +629,8 @@ namespace gst {
     }
     
     gboolean
-    AudioInputGst::breakAudioSourceSaveLink (GnashAudioPrivate *audio) {
+    AudioInputGst::breakAudioSourceSaveLink (GnashAudioPrivate *audio) 
+    {
         if (audio->_pipelineIsPlaying == true) {
             audioStop(audio);
         }
@@ -654,7 +665,8 @@ namespace gst {
     }
     
     bool
-    AudioInputGst::audioPlay(GnashAudioPrivate *audio) {
+    AudioInputGst::audioPlay(GnashAudioPrivate *audio) 
+    {
         GstStateChangeReturn state;
         GstBus *bus;
         gint ret;
@@ -675,7 +687,8 @@ namespace gst {
     }
     
     bool
-    AudioInputGst::audioStop(GnashAudioPrivate *audio) {
+    AudioInputGst::audioStop(GnashAudioPrivate *audio) 
+    {
         GstStateChangeReturn state;
         
         state = gst_element_set_state (audio->_pipeline, GST_STATE_NULL);
@@ -689,7 +702,8 @@ namespace gst {
     }
     
     int
-    AudioInputGst::makeAudioDevSelection() {
+    AudioInputGst::makeAudioDevSelection() 
+    {
         int devselect = -1;
         devselect = rcfile.getAudioInputDevice();
         if (devselect == -1) {
