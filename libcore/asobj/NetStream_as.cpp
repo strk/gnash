@@ -109,22 +109,12 @@ void
 NetStream_as::init(as_object& global, const ObjectURI& uri)
 {
 
-    // This is going to be the global NetStream "class"/"function"
-    static boost::intrusive_ptr<as_object> cl;
-
-    if ( cl == NULL )
-    {
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getNetStreamInterface();
-        cl = gl->createClass(&netstream_new, proto);
-        // replicate all interface to class, to be able to access
-        // all methods as static functions
-        attachNetStreamInterface(*cl);
-             
-    }
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getNetStreamInterface();
+    as_object* cl = gl->createClass(&netstream_new, proto);
 
     // Register _global.String
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }
