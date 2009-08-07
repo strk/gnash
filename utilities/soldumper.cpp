@@ -141,7 +141,7 @@ main(int argc, char *argv[])
     // print the  usage message.
     if (argc < 2) {
         usage(cerr);
-        exit(0);
+        exit(1);
     }
 
     // get the file name from the command line
