@@ -33,7 +33,6 @@
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
 
-//#include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
 #include <SDL.h>
@@ -78,6 +77,21 @@ namespace sound {
 void
 SDL_sound_handler::initAudio()
 {
+    // NOTE: we open and close the audio card for the sole purpose
+    //       of throwing an exception on error (unavailable audio
+    //       card). Normally we'd want to open the audio card only
+    //       when needed (it has a cost in number of wakeups).
+    //
+    openAudio();
+    closeAudio();
+
+}
+
+void
+SDL_sound_handler::openAudio()
+{
+    if ( _audioOpened ) return; // nothing to do
+
     // This is our sound settings
     audioSpec.freq = 44100;
 
@@ -95,25 +109,10 @@ SDL_sound_handler::initAudio()
     //512 - not enough for  videostream
     audioSpec.samples = 2048;   
 
-    // NOTE: we open and close the audio card for the sole purpose
-    //       of throwing an exception on error (unavailable audio
-    //       card). Normally we'd want to open the audio card only
-    //       when needed (it has a cost in number of wakeups).
-    //
-    openAudio();
-    closeAudio();
-
-}
-
-void
-SDL_sound_handler::openAudio()
-{
-    if ( _audioOpened ) return; // nothing to do
-
     if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
             boost::format fmt = boost::format(
-            _("Unable to open SDL audio: %s"))
-            % SDL_GetError();
+                _("Unable to open SDL audio: %s"))
+                % SDL_GetError();
         throw SoundException(fmt.str());
     }
 
