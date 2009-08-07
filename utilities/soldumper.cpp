@@ -63,7 +63,19 @@ namespace boost
 #endif
 
 const char *SOLDUMPER_VERSION = "0.5";
-static void usage ();
+
+/// \brief  Display the command line arguments
+static void
+usage ()
+{
+    cerr << _("This program dumps the internal data of a .sol file")
+         << endl;
+    cerr << _("Usage: soldumper [h] filename") << endl;
+    cerr << _("-h\tHelp") << endl;
+    cerr << _("-f\tForce local directory access") << endl;
+    cerr << _("-l\tList all .sol files in default dir") << endl;
+    exit (-1);
+}
 
 int
 main(int argc, char *argv[])
@@ -191,19 +203,6 @@ main(int argc, char *argv[])
     }
 
     sol.dump();
-}
-
-/// \brief  Display the command line arguments
-static void
-usage ()
-{
-    cerr << _("This program dumps the internal data of a .sol file")
-         << endl;
-    cerr << _("Usage: soldumper [h] filename") << endl;
-    cerr << _("-h\tHelp") << endl;
-    cerr << _("-f\tForce local directory access") << endl;
-    cerr << _("-l\tList all .sol files in default dir") << endl;
-    exit (-1);
 }
 
 // Local Variables:
