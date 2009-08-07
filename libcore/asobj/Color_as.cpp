@@ -58,12 +58,6 @@ class Color_as: public as_object
 
 public:
 
-	Color_as()
-		:
-		as_object(getColorInterface()),
-		_sprite(0)
-	{}
-
 	Color_as(MovieClip* sp)
 		:
 		as_object(getColorInterface()),
@@ -136,20 +130,15 @@ void registerColorNative(as_object& o)
 }
 
 // extern (used by Global.cpp)
-void color_class_init(as_object& global, const ObjectURI& uri)
+void
+color_class_init(as_object& global, const ObjectURI& uri)
 {
-	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<as_object> cl;
-
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getColorInterface();
-        cl = gl->createClass(&color_ctor, proto);
-	}
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getColorInterface();
+    as_object* cl = gl->createClass(&color_ctor, proto);
 
 	// Register _global.Color
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }
