@@ -54,7 +54,11 @@ namespace gst {
         devSelection = makeWebcamDeviceSelection();
         _devSelection = devSelection;
         //also set _index for actionscript accessibility
-        _index = devSelection;
+        if (devSelection < 10) {
+            _index = devSelection;
+        } else {
+            log_error("too high an index value, will cause segfault");
+        }
         
         transferToPrivate(devSelection);
         webcamCreateMainBin(_globalWebcam);
@@ -106,7 +110,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (!g_strcmp0(dev_name, "null")) {
+            if (g_strcmp0(dev_name, "null") == 0) {
                 log_trace("No v4l video sources. Checking for other vid inputs");
             }
             else { 
@@ -143,7 +147,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (g_strcmp0(dev_name, "null")) {
+            if (g_strcmp0(dev_name, "null") == 0) {
                 log_trace("no v4l2 video sources found.");
             }
             else { 

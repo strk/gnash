@@ -32,15 +32,19 @@ check_equals(typeof(Camera), 'function');
 
 //trace("NOTE: System.capabilities.hasVideoEncoder:  " + System.capabilities.hasVideoEncoder);
 
-// test the Camera constuctor
+/*
+ This is not the proper way to construct a camera object. According to the
+ livedoc the constructor for Camera is Camera.get(). Flashplayer ignores
+ the call to new Camera.
+ test the Camera constuctor
 check(Camera);
 var cameraObj = new Camera;
 check(cameraObj);
 var cameraObj2 = new Camera();
 check(cameraObj2);
-
 check(cameraObj != cameraObj2);
 check_equals(typeof(cameraObj), 'object');
+*/
 
 // These properties are never present before Camera.get() is called.
 check(!Camera.prototype.hasOwnProperty("activityLevel"));
@@ -106,12 +110,81 @@ check_equals(Camera.setMode, undefined);
 check_equals(Camera.setMotionLevel, undefined);
 check_equals(Camera.setQuality, undefined);
 
-check(cameraObj.setMode); 
-check(cameraObj.setMotionLevel);
-check(cameraObj.setQuality);
-check_equals(typeof(cameraObj.setMode), "function");
-check_equals(typeof(cameraObj.setMotionLevel), "function");
-check_equals(typeof(cameraObj.setQuality), "function");
+// test Camera::setMode
+check_equals ( typeof(cam.setMode), 'function' );
+
+// test Camera::setMotionLevel
+check_equals ( typeof(cam.setMotionLevel), 'function' );
+
+// test Camrea::setQuality
+check_equals ( typeof(cam.setQuality), 'function');
+
+// check properties
+check_equals ( typeof(cam.activityLevel), 'number' );
+check_equals ( typeof(cam.bandwidth), 'number');
+check_equals ( typeof(cam.currentFps), 'number');
+check_equals ( typeof(cam.fps), 'number');
+check_equals ( typeof(cam.height), 'number');
+check_equals ( typeof(cam.index), 'string'); //differs from spec, testing real bhvior
+check_equals ( typeof(cam.motionLevel), 'number');
+check_equals ( typeof(cam.motionTimeout), 'number');
+check_equals ( typeof(cam.muted), 'boolean');
+check_equals ( typeof(cam.name), 'string');
+xcheck_equals ( typeof(cam.names), 'undefined');
+check_equals ( typeof(cam.quality), 'number');
+check_equals ( typeof(cam.width), 'number');
+
+// check initialized values as in spec (gnash initializes to default)
+check_equals ( cam.activityLevel, -1 );
+check_equals ( cam.bandwidth, 16384);
+check_equals ( cam.height, 120);
+check_equals ( cam.motionLevel, 50);
+check_equals ( cam.motionTimeout, 2000);
+check_equals ( cam.muted, true);
+check_equals ( cam.width, 160);
+
+// setting and getting
+
+// check Camera::setMode with no args
+cam.setMode();
+check_equals ( cam.width, 160);
+check_equals ( cam.height, 120);
+check_equals ( cam.fps, 15);
+
+// check Camera::setMode with all arguments set
+cam.setMode(320, 280, 30, false);
+check_equals ( cam.width, 320);
+check_equals ( cam.height, 280);
+check_equals ( cam.fps, 30);
+
+// check Camera::setMotionLevel with no args
+cam.setMotionLevel();
+check_equals (cam.motionLevel, 50);
+check_equals (cam.motionTimeout, 2000);
+
+// check Camera::setMotionLevel with all arguments set
+cam.setMotionLevel(75, 3000);
+check_equals (cam.motionLevel, 75);
+check_equals (cam.motionTimeout, 3000);
+
+// check Camera::setMotionLevel with bad motionLevel argument
+cam.setMotionLevel(200, 2000);
+check_equals (cam.motionLevel, 100);
+
+// check Camera::setQuality with no args
+cam.setQuality();
+check_equals (cam.bandwidth, 16384);
+check_equals (cam.quality, 0);
+
+// check Camera::setQuality with all arguments set
+cam.setQuality(18000, 75);
+check_equals (cam.bandwidth, 18000);
+check_equals (cam.quality, 75);
+
+// check Camera::setQuality with bad quality value
+cam.setQuality(18000, 420);
+check_equals (cam.bandwidth, 18000);
+check_equals (cam.quality, 100);
 
 #endif // OUTPUT_VERSION >= 6
 totals();

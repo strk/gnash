@@ -96,7 +96,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if (g_strcmp0(dev_name, "null") ||
+            if ((g_strcmp0(dev_name, "null") == 0) ||
                     (std::strstr(dev_name, "Monitor") != NULL)) {
                 log_trace("No pulse audio input devices.");
             }
@@ -118,7 +118,7 @@ namespace gst {
     }
     
     bool
-    AudioInputGst::checkSupportedFormats(GnashAudio* /*aud*/, GstCaps *caps) {
+    AudioInputGst::checkSupportedFormats(GstCaps *caps) {
         gint num_structs;
         
         num_structs = gst_caps_get_size (caps);
@@ -203,7 +203,7 @@ namespace gst {
                     log_error("%s: Template pad isn't an object for some reason",
                         __FUNCTION__);
                 }
-                bool ok = checkSupportedFormats(data_struct, caps);
+                bool ok = checkSupportedFormats(caps);
                 if (ok) {
                     log_error("The input device you selected isn't supported (yet)");
                 } else {
@@ -255,8 +255,9 @@ namespace gst {
             audioStop(audio);
         }
         
-        //delete the old source bin if necessary
-        if (!GST_ELEMENT_PARENT(audio->_audioSourceBin)) {
+        //delete the old source bin if necessary (please don't delete the == NULL
+        //here as it breaks things.)
+        if (!(GST_ELEMENT_PARENT(audio->_audioSourceBin) == NULL)) {
             gst_bin_remove(GST_BIN(audio->_audioMainBin),
                     audio->_audioSourceBin);
             audio->_audioSourceBin = NULL;
@@ -663,7 +664,6 @@ namespace gst {
         ret = gst_bus_add_watch (bus, audio_bus_call, audio);
         gst_object_unref (bus);
         
-        //tfthen = gst_util_get_timestamp ();
         state = gst_element_set_state (audio->_pipeline, GST_STATE_PLAYING);
         
         if (state != GST_STATE_CHANGE_FAILURE) {

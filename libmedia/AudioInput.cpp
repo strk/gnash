@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "AudioInput.h"
+#include "gnashconfig.h"
 
 namespace gnash {
 namespace media {
@@ -26,10 +27,23 @@ namespace media {
         :
         //actionscript default values
         _activityLevel(-1),
-        _gain(5000),
+//Gstreamer uses different values for the gain parameter, thus this doesn't
+//exactly match the AS livedocs, but when you get the value back it will be
+//correct (see libcore/asobj/flash/Microphone_as.cpp:gain)
+#ifdef USE_GST
+        _gain(0),
+#else
+        _gain(50),
+#endif
         _index(0),
-        _muted(false),
+        _muted(true),
+//Again, gstreamer wants a different value for the _rate parameter (in hz) whereas
+//AS wants the value in khz. Thus, the ifdefs
+#ifdef USE_GST
         _rate(8000),
+#else
+        _rate(8),
+#endif
         _silenceLevel(10),
         _silenceTimeout(2000), // in milliseconds
         _useEchoSuppression(false)

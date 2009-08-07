@@ -71,12 +71,11 @@ gint findVidDevs(std::vector<data*>& vidVect) {
     GstPropertyProbe *probe;
     GValueArray *devarr;
     element = NULL;
-    gint i;
     
     element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
         GValue *val;
         gchar *dev_name = NULL;
         
@@ -85,7 +84,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (dev_name == "null") {
+        if (g_strcmp0(dev_name, "null") == 0) {
             g_print("no v4l video sources found\n");
         }
         else { 
@@ -110,7 +109,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
     element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
         GValue *val;
         gchar *dev_name = NULL;
         
@@ -119,7 +118,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (dev_name == "null") {
+        if (g_strcmp0(dev_name, "null") == 0) {
             g_print("no v4l2 video sources found.\n");
         }
         else {
@@ -150,7 +149,6 @@ int main () {
     gst_init(NULL, NULL);
     gint numdevs = 0;
     std::vector<data*> vidVector;
-    gint i;
     
     int fromrc = rcfile.getWebcamDevice();
     
@@ -159,7 +157,7 @@ int main () {
         numdevs = findVidDevs(vidVector);
         g_print("\nINFO: these devices were ignored because they are supported by both");
         g_print("\nvideo4linux and video4linux2:\n\n");
-        for (i = 0; i < numdevs; ++i) {
+        for (size_t i = 0; i < numdevs; ++i) {
             if (vidVector[i]->duplicate == true) {
                 g_print("    %s (%s)\n", vidVector[i]->deviceName, vidVector[i]->deviceType);
             }
@@ -168,7 +166,7 @@ int main () {
         g_print("\nv4l sources will not be printed in the list below.\n");
         g_print("\nFound %d video devices: \n\n", (numdevs - numDuplicates));
         gint counter = 0;
-        for (i = 0; i < numdevs; ++i)
+        for (size_t i = 0; i < numdevs; ++i)
         {
             if (i == 0 && (vidVector[i] != 0)) {
                 g_print("    %d. Video Test Source (videotestsrc)\n", i, i);
@@ -218,5 +216,5 @@ int main () {
             g_print("and running this program again\n");
         }
     }
-    return 1;
+    return 0;
 }

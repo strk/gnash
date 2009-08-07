@@ -282,13 +282,11 @@ public:
     
     /// \brief This function checks the format information enumerated in
     ///  getSelectedCaps and makes sure that Gnash can handle said input.
-    /// @param aud A pointer to a GnashAudio class that represents the
-    ///  selected device.
     /// @param caps A pointer to the capabilities of the device as enumerated
     ///  in the getSelectedCaps function
     /// @return A boolean value (true means that the device has at least one 
     ///  supported format, false means that the device has no supported formats)
-    bool checkSupportedFormats(GnashAudio *aud, GstCaps *caps);
+    bool checkSupportedFormats(GstCaps *caps);
     
     /// \brief This function transfers the selected audio device from a GnashAudio
     ///  class to a GnashAudioPrivate class. This function is called once the

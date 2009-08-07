@@ -22,6 +22,7 @@
 #include <boost/cstdint.hpp> // for C99 int types
 #include <string>
 #include <vector>
+#include <ostream>
 
 namespace gnash {
 namespace media {
@@ -53,11 +54,15 @@ public:
     int get_height() {return _height;};
     
     void set_index(int i) {_index = i;};
-    int get_index() {return _index;};
+    std::string get_index() {
+        char buffer[2];
+        sprintf(buffer, "%i", _index);
+        return buffer;};
     
     void set_keyFrameInterval(int i) {_keyFrameInterval = i;};
     int get_keyFrameInterval() {return _keyFrameInterval;};
     
+    void set_loopback(bool l) {_loopback = l;};
     bool get_loopback() {return _loopback;};
     
     void set_motionLevel(int m) {_motionLevel = m;};

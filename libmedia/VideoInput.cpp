@@ -34,7 +34,7 @@ namespace media {
         _loopback = false;
         _motionLevel = 50;
         _motionTimeout = 2000;  //millisecs
-        _muted = false;  //security (false = allow, true = decline)
+        _muted = true;  //security (false = allow, true = decline)
         _quality = 0;
         _width = 160;
     } 

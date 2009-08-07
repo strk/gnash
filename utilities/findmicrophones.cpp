@@ -69,12 +69,11 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
     GstPropertyProbe *probe;
     GValueArray *devarr;
     element = NULL;
-    gint i;
     
     element = gst_element_factory_make ("pulsesrc", "pulsesrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
         GValue *val;
         gchar *dev_name = NULL;
         
@@ -83,7 +82,7 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (dev_name == "null") {
+        if (g_strcmp0(dev_name, "null") == 0) {
             g_print("no pulse audio sources found\n");
         }
         else if ((strstr(dev_name, "Monitor") != NULL)) {
