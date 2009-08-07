@@ -303,7 +303,7 @@ TextField::removeTextField()
 void
 TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 {
-    if (!(_textRecords.size() > 0)) {
+    if (_textRecords.empty()) {
         return;
     }
     boost::uint16_t x;
@@ -474,9 +474,7 @@ TextField::setRestrict(const std::string& restrict)
                     for (unsigned int p = *rit; p <= q; (++p)){
                         _restrictedchars.insert(char(p));
                     }
-                    ++rit;
-                    ++rit;
-                    ++rit;
+                    rit += 3;
                 } else {
                     log_error("invalid restrict string");
                     return;
@@ -624,7 +622,6 @@ TextField::on_event(const event_id& ev)
 		}
         case event_id::KEY_PRESS:
         {
-            //if ( getType() != typeInput ) break; // not an input field
             setHtml(false); //editable html fields are not yet implemented
             std::wstring s = _text;
 
@@ -648,10 +645,6 @@ TextField::on_event(const event_id& ev)
             size_t manylines = _line_starts.size();
             LineStarts::iterator linestartit = _line_starts.begin();
             LineStarts::const_iterator linestartend = _line_starts.end();
-            size_t cursorrecord = cursorRecord();
-            SWF::TextRecord record = _textRecords[cursorrecord];
-            //std::vector<GlyphEntry>::const_iterator pos_in_record = record.glyphs().begin();
-            //pos_in_record += m_cursor - _recordStarts[cursorRecord];
 
             switch (c)
             {
@@ -833,14 +826,14 @@ TextField::on_event(const event_id& ev)
                         }
                     }
                     setTextValue(s);
-                    break;
             }
             onChanged();
+            set_invalidated();
         }
 
         default:
             return false;
-    }
+    };
     return true;
 }
 
