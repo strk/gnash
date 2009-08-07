@@ -74,7 +74,6 @@ usage(ostream &o)
     o << _("-h\tHelp") << endl;
     o << _("-f\tForce local directory access") << endl;
     o << _("-l\tList all .sol files in default dir") << endl;
-    exit (-1);
 }
 
 int
@@ -113,6 +112,7 @@ main(int argc, char *argv[])
         switch (c) {
           case 'h':
             usage(cerr);
+	    exit(0);
             break;
             
 	  case 'v':
