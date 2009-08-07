@@ -66,14 +66,14 @@ const char *SOLDUMPER_VERSION = "0.5";
 
 /// \brief  Display the command line arguments
 static void
-usage ()
+usage(ostream &o)
 {
-    cerr << _("This program dumps the internal data of a .sol file")
+    o << _("This program dumps the internal data of a .sol file")
          << endl;
-    cerr << _("Usage: soldumper [h] filename") << endl;
-    cerr << _("-h\tHelp") << endl;
-    cerr << _("-f\tForce local directory access") << endl;
-    cerr << _("-l\tList all .sol files in default dir") << endl;
+    o << _("Usage: soldumper [h] filename") << endl;
+    o << _("-h\tHelp") << endl;
+    o << _("-f\tForce local directory access") << endl;
+    o << _("-l\tList all .sol files in default dir") << endl;
     exit (-1);
 }
 
@@ -98,7 +98,7 @@ main(int argc, char *argv[])
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
-        usage();
+        usage(cerr);
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
@@ -112,7 +112,7 @@ main(int argc, char *argv[])
     while ((c = getopt (argc, argv, "hvfl")) != -1) {
         switch (c) {
           case 'h':
-            usage ();
+            usage(cerr);
             break;
             
 	  case 'v':
@@ -131,7 +131,7 @@ main(int argc, char *argv[])
 	      break;
 
           default:
-            usage ();
+            usage(cerr);
             break;
         }
     }
@@ -140,7 +140,7 @@ main(int argc, char *argv[])
     // If no command line arguments have been supplied, do nothing but
     // print the  usage message.
     if (argc < 2) {
-        usage();
+        usage(cerr);
         exit(0);
     }
 
