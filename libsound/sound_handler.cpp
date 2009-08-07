@@ -689,7 +689,8 @@ sound_handler::unmute()
 void
 sound_handler::reset()
 {
-    sound_handler::delete_all_sounds();
+    // Do not delete sounds on reset or there'd be nothing to play
+    // on restart. For a new SWF, we need a new sound_handler.
     sound_handler::stop_all_sounds();
 }
 
