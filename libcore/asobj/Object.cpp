@@ -113,13 +113,26 @@ object_class_init(as_object& where, const ObjectURI& uri)
 as_object*
 getObjectInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( o == NULL )
-	{
-		o = new as_object(); // end of the inheritance chain
-		attachObjectInterface(*o);
-	}
-	return o.get();
+    VM& vm = VM::get();
+    
+    if (isAS3(vm)) {
+        static boost::intrusive_ptr<as_object> o;
+        if ( o == NULL )
+        {
+            o = new as_object(); // end of the inheritance chain
+            attachObjectInterface(*o);
+        }
+        return o.get();
+    }
+
+    static boost::intrusive_ptr<as_object> o;
+    if ( o == NULL )
+    {
+        o = new as_object(); // end of the inheritance chain
+        attachObjectInterface(*o);
+    }
+    return o.get();
+
 }
 
 

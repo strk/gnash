@@ -62,6 +62,23 @@ namespace gnash {
 class Machine
 {
 public:
+
+    /// Create an AS3 interpreter.
+	Machine(VM& vm);
+
+    /// Initialize the AS resources
+    //
+    /// This extra step is necessary because the Machine is initialized
+    /// and owned by the AVM1 machine(VM). All access to Machine currently
+    /// occurs through VM, but since the VM's Machine pointer is null until
+    /// the Machine ctor has completed, we cannot construct AS resources
+    /// until after the ctor is complete, because AS resource creation
+    /// accesses the Machine through the VM's pointer...
+    //
+    /// TODO: fix the mess.
+    void init();
+
+
 	// Flash specific members.
 	/// The DisplayObject which initiated these actions.
 	DisplayObject *getTarget();
@@ -216,9 +233,6 @@ public:
 	as_value executeFunction(asMethod* function, const fn_call& fn);
 
 	void instantiateClass(std::string className, as_object* global);
-
-	Machine(VM& vm);
-
     /// Return the Global object for this Machine.
     //
     /// This should be different from the AVM1 global object because the VMs

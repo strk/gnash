@@ -154,6 +154,11 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     _classes(this, 0),
     _vm(vm)
 {
+}
+
+void
+AVM2Global::registerClasses()
+{
     
     init_member("trace", createFunction(global_trace));
     init_member("escape", createFunction(global_escape));
@@ -165,7 +170,7 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
     function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
     
-    _classes.declareAll(avm2Classes(vm.getStringTable()));
+    _classes.declareAll(avm2Classes(_vm.getStringTable()));
 
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
     
@@ -177,6 +182,7 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
     _classes.getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_STRING);
     _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
+
 }
     
 as_object*
