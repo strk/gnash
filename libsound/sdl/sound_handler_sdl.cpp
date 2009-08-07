@@ -160,7 +160,6 @@ void
 SDL_sound_handler::reset()
 {
     boost::mutex::scoped_lock lock(_mutex);
-    sound_handler::delete_all_sounds();
     sound_handler::stop_all_sounds();
 }
 
