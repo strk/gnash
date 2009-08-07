@@ -57,10 +57,9 @@ selection_class_init(as_object& global, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
 
-	static boost::intrusive_ptr<as_object> obj = 
-        new as_object(getObjectInterface());
+	as_object* obj = new as_object(getObjectInterface());
 	attachSelectionInterface(*obj);
-	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
+	global.init_member(getName(uri), obj, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

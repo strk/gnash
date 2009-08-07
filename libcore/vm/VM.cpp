@@ -73,7 +73,7 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 
 #ifdef ENABLE_AVM2
 	_singleton->_machine = new Machine(*_singleton);
-	assert(_singleton->getGlobal());
+    _singleton->_machine->init();
 #endif
 
 	return *_singleton;

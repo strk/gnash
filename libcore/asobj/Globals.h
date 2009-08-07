@@ -123,6 +123,8 @@ public:
 	AVM2Global(Machine& m, VM& vm);
 	~AVM2Global() {}
     
+    void registerClasses();
+    
     /// Create an ActionScript function
     virtual builtin_function* createFunction(Global_as::ASFunction function);
 

@@ -332,10 +332,21 @@ Machine::Machine(VM& vm)
         mCurrentFunction(0),
         _vm(vm)
 {
+               
+}
+
+void
+Machine::init()
+{
+
     // TODO: The Global constructor needs the Machine and VM to be more or less
     // fully constructed, so we might think how to do this better.
-    _global = new AVM2Global(*this, _vm);
-               
+    AVM2Global* g = new AVM2Global(*this, _vm);
+    _global = g;
+    
+    AVM2Switcher switcher(_vm);
+    g->registerClasses();
+
 }
 
 Global_as*

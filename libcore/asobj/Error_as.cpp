@@ -46,7 +46,8 @@ namespace {
 
 
 // extern 
-void Error_class_init(as_object& where, const ObjectURI& uri)
+void
+Error_class_init(as_object& where, const ObjectURI& uri)
 {
     
     Global_as* gl = getGlobal(where);
