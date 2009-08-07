@@ -81,28 +81,22 @@ void registerObjectNative(as_object& global)
 void
 object_class_init(as_object& where, const ObjectURI& uri)
 {
-	// This is going to be the global Object "class"/"function"
-	static boost::intrusive_ptr<as_object> cl=NULL;
 
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getObjectInterface();
-        cl = gl->createClass(object_ctor, proto);
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getObjectInterface();
+    boost::intrusive_ptr<as_object> cl = gl->createClass(object_ctor, proto);
 
-        // The as_function ctor takes care of initializing these, but they
-        // are different for the Object class.
-        const int readOnly = PropFlags::readOnly;
-        cl->set_member_flags(NSV::PROP_uuPROTOuu, readOnly);
-        cl->set_member_flags(NSV::PROP_CONSTRUCTOR, readOnly);
-        cl->set_member_flags(NSV::PROP_PROTOTYPE, readOnly);
+    // The as_function ctor takes care of initializing these, but they
+    // are different for the Object class.
+    const int readOnly = PropFlags::readOnly;
+    cl->set_member_flags(NSV::PROP_uuPROTOuu, readOnly);
+    cl->set_member_flags(NSV::PROP_CONSTRUCTOR, readOnly);
+    cl->set_member_flags(NSV::PROP_PROTOTYPE, readOnly);
 
-        VM& vm = getVM(where);
-        const int flags = as_object::DefaultFlags | PropFlags::readOnly;
-		cl->init_member("registerClass", vm.getNative(101, 8), flags);
+    VM& vm = getVM(where);
+    const int readOnlyFlags = as_object::DefaultFlags | PropFlags::readOnly;
+    cl->init_member("registerClass", vm.getNative(101, 8), readOnlyFlags);
 		     
-	}
-
 	// Register _global.Object (should only be visible in SWF5 up)
 	int flags = PropFlags::dontEnum; 
 	where.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
