@@ -135,12 +135,14 @@ public:
     }
 
 	float recordWidth() const {
-		float width=0.0;
-		for (size_t i=0; i < glyphs().size(); ++i)
+		float width = 0.0f;
+		for (size_t i = 0; i < glyphs().size(); ++i)
 		{
 			width += glyphs()[i].advance;
 		}
+        return width;
 	}
+
     boost::uint16_t textHeight() const {
         return _textHeight;
     }
