@@ -97,7 +97,7 @@ main(int argc, char *argv[])
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
-        usage(cerr);
+        usage(cout);
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
@@ -111,7 +111,7 @@ main(int argc, char *argv[])
     while ((c = getopt (argc, argv, "hvfl")) != -1) {
         switch (c) {
           case 'h':
-            usage(cerr);
+            usage(cout);
 	    exit(0);
             break;
             
