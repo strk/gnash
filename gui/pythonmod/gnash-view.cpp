@@ -28,6 +28,7 @@
 
 #include "VM.h"
 #include "movie_definition.h"
+#include "MovieFactory.h"
 #include "movie_root.h" // for Abstract callbacks
 #include "Renderer.h"
 #include "sound_handler.h"
@@ -269,7 +270,7 @@ gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
     if( view->stage.get() != NULL) {
     	view->stage->set_display_viewport(0, 0, allocation->width, allocation->height);
 
-        gnash::Renderer *renderer = gnash_canvas_get_renderer(view->canvas);
+        boost::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
         float xscale = allocation->width / view->movie_definition->get_width_pixels();
         float yscale = allocation->height / view->movie_definition->get_height_pixels();
 		renderer->set_scale(xscale, yscale);
@@ -455,7 +456,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     }
 
     // Load the actual movie.
-    view->movie_definition.reset(gnash::createMovie(url,
+    view->movie_definition.reset(gnash::MovieFactory::makeMovie(url,
             *view->run_info, url.str().c_str(), false));
 
     g_return_if_fail(view->movie_definition.get() != NULL);
@@ -509,7 +510,7 @@ gnash_view_display(GnashView *view)
     gnash::InvalidatedRanges changed_ranges;
     changed_ranges.setWorld();
 
-    gnash::Renderer *renderer = gnash_canvas_get_renderer(view->canvas);
+    boost::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
     renderer->set_invalidated_regions(changed_ranges);
     gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
 
