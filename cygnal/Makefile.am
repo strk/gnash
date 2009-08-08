@@ -37,8 +37,6 @@ SUBDIRS = \
 DIST_SUBDIRS  = testsuite cgi-bin
 
 sysconf_DATA = cygnalrc
-EXTRA_DIST = cygnalrc.in
-CLEANFILES = cygnalrc
 
 AM_CPPFLAGS = # -Wall
 
@@ -78,8 +76,10 @@ noinst_HEADERS = \
 	cygnal.h \
 	rtmp_server.h \
 	http_server.h \
+	handler.h \
 	proc.h \
-	crc.h
+	crc.h \
+	serverSO.h
 
 bin_PROGRAMS = cygnal
 noinst_LTLIBRARIES = libcygnal.la
@@ -87,11 +87,18 @@ noinst_LTLIBRARIES = libcygnal.la
 cygnal_SOURCES = cygnal.cpp
 cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
-libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp  proc.cpp
+libcygnal_la_SOURCES = \
+	crc.cpp \
+	cvm.cpp \
+	rtmp_server.cpp \
+	http_server.cpp \
+	proc.cpp \
+	handler.cpp \
+	serverSO.cpp
+
 libcygnal_la_LIBADD = 
 
-
-cygnalrc: $(srcdir)/cygnalrc.in Makefile
+cygnalrc: cygnalrc.in Makefile
 	cat $(srcdir)/$@.in >$@
 
 # Rebuild with GCC 4.x Mudflap support
