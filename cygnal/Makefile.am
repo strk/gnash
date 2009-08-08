@@ -28,6 +28,9 @@ if USE_CGI
 CGI_DIR = cgi-bin
 endif
 
+EXTRA_DIST = cygnalrc.in
+CLEANFILES = cygnalrc
+
 SUBDIRS = \
 	$(TEST_DIR) \
 	$(CGI_BIN)
