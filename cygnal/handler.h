@@ -26,9 +26,10 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 //#include <boost/thread/condition.hpp>
+
+#include <vector>
 #include <string>
 #include <deque>
-#include <map>
 
 #ifdef HAVE_POLL
 # include <sys/poll.h>
@@ -75,35 +76,53 @@ public:
     ///     Send the onSync message to all connectec cients
     bool sync() { return sync(_in_fd); };
     bool sync(int in_fd);
-    
+
+    // Access the name field
+    void setName(const std::string &x) { _name = x; };
+    std::string &getName() { return _name; }
+
+    void addSOL(boost::shared_ptr<amf::Element> x) {
+	_sol.push_back(x);
+    };
 // Dump internal data.
     void dump();    
 
-    size_t addFile(int x) { _clients.push_back(x); };
-	
 protected:
-    ///	    Each incoming request has one of 4 states the server has to handle
-    ///	    to send a response.
+    /// Add a client to the list for output messages.
+    size_t addClient(int x) { _clients.push_back(x); };
+    /// Add a remote machine to the list for inpput messages.
+    size_t addRemote(int x) { _remote.push_back(x); };	
+
+    /// \var _name
+    ///	    The name of the path this handler is supporting.
+    std::string				_name;
+    ///	    Each incoming request has one of 4 states the server has
+    ///     to handle to send a response.
     
     /// \var _clients
-    ///	is the array of all clients connected to this server for this
-    ///	application. This is where all the output goes.
+    ///	    is the array of all clients connected to this server for
+    ///     this application. This is where all the output goes.
     std::vector<int>			_clients;
     /// \var _remote
-    ///	connections are network connections to other processes,
-    ///	possibly on another computer.
-    boost::shared_ptr<cygnal::Proc>	_remote;
+    ///	    This is network connections to other processes,
+    ///	    on other computers.
+    std::vector<int>			_remote;
+    /// \var _local
+    ///    These are local process we're responsible for
+    ///    starting and stopping.
+    boost::shared_ptr<cygnal::Proc>	_local;
     /// \var _plugins
-    ///	is for the dynamically loaded applications
-    boost::shared_ptr<gnash::SharedLib>	_plugin;
+    ///	    is for the dynamically loaded applications
+    boost::shared_ptr<gnash::SharedLib> _plugin;
     /// \var _file
-    ///	is for disk based files
+    ///	    is for disk based files
     std::vector<boost::shared_ptr<gnash::DiskStream> > _file;
     /// \var _sol
-    ///	is for remote SharedObjects
+    ///	    is for remote SharedObjects
     std::vector<boost::shared_ptr<amf::Element> > _sol;
     /// \var _in_fd
-    ///	    The file descriptor of the incoming data
+    ///	    The file descriptor of the incoming data for an
+    ///     Invoke message.
     int _in_fd;
     
 // Remote Shared Objects. References are an index into this vector.
