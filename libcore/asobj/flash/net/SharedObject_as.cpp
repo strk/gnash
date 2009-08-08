@@ -935,7 +935,7 @@ sharedobject_send(const fn_call& fn)
         ensureType<SharedObject_as>(fn.this_ptr);
 
     if (obj->isConnected() == false) {
-	obj->connectToServer(this->getURI());
+	obj->connectToServer(obj->getURI());
     }
     
     return as_value();
