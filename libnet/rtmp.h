@@ -36,8 +36,11 @@
 namespace gnash
 {
 
+const boost::uint8_t RTMP_VERSION = 0x3;
 const boost::uint8_t RTMP_HANDSHAKE = 0x3;
 const int  RTMP_HANDSHAKE_SIZE = 1536;
+const int  RTMP_RANDOM_SIZE = 1528;
+const int  RTMP_HANDSHAKE_HEADER_SIZE = 8;
 const int  MAX_AMF_INDEXES = 64;
 
 const int  RTMP_HEADSIZE_MASK = 0xc0;
@@ -47,6 +50,7 @@ const int  RTMP_AUDIO_PACKET_SIZE = 64;
 const int  RTMP_MAX_HEADER_SIZE = 12;
 const int  PING_MSG_SIZE = 6;
 const int  RTMP_SYSTEM_CHANNEL = 2;
+
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
@@ -211,6 +215,10 @@ public:
 	RTMPMsg::rtmp_source_e   src_dest;
 	content_types_e type;
     } rtmp_head_t;
+    typedef struct {
+	boost::uint32_t uptime;
+	boost::uint8_t version[4];
+    } rtmp_handshake_head_t;
     typedef enum {
         HEADER_12 = 0x0,
         HEADER_8  = 0x40,
@@ -343,6 +351,7 @@ public:
     CQue	_queues[MAX_AMF_INDEXES];
 //    queues_t    _channels;
     amf::Buffer	_buffer;
+    rtmp_handshake_head_t _handshake_header;
 };
 
 } // end of gnash namespace
