@@ -846,24 +846,19 @@ NetConnection_as::connect(const std::string& uri)
 
     URL url(uri, getRunResources(*this).baseURL());
 
-    if ( url.protocol() == "rtmp" )
-    {
-        LOG_ONCE(log_unimpl("NetConnection.connect(%s): RTMP not "
-                    "yet supported", url) );
-        notifyStatus(CONNECT_FAILED);
-        return;
-    }
-
-    if ( url.protocol() != "http" )
-    {
+    if ((url.protocol() != "rtmp")
+	|| (url.protocol() != "rtmpt")
+	|| (url.protocol() != "rtmpts")
+	|| (url.protocol() != "https")
+	|| (url.protocol() == "http")) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("NetConnection.connect(%s): invalid connection "
-            "protocol", url);
-        );
+		 log_aserror("NetConnection.connect(%s): invalid connection "
+			     "protocol", url);
+				   );
         notifyStatus(CONNECT_FAILED);
         return;
     }
-
+    
     // This is for HTTP remoting
 
     if (!URLAccessManager::allow(url)) {

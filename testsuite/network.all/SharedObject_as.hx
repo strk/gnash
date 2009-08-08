@@ -69,25 +69,30 @@ class SharedObject_as {
 	    DejaGnu.note("No RTMP port specified, defaulting to "+rtmpport);
 	}
 	
-	var nc:NetConnection = new NetConnection();
 	// The Adobe flash player only supports remoting with RTMP
 	rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/fitcDemo";
-	
+
+	var nc:NetConnection = new NetConnection();
+// 	addEventListeners();
+	nc.connect(rtmpuri);
+	DejaGnu.note("Connecting to "+rtmpuri);
+
 #if flash9
-        var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, true);
+        var x1:SharedObject = SharedObject.getRemote("rsoltest", nc.uri, true);
 #else
-	var x1:SharedObject = SharedObject.getRemote("sharedobjecttest", rtmpuri, true);
+	var x1:SharedObject = SharedObject.getRemote("rsoltest", nc.uri, true);
 #end         
+
         if (Std.is(x1, SharedObject)) {
             DejaGnu.pass("SharedObject class exists");
         } else {
             DejaGnu.fail("SharedObject class doesn't exist");
         }
-        DejaGnu.note("SharedObject type is "+Type.typeof(x1));
+//        DejaGnu.note("SharedObject type is "+Type.typeof(x1));
 
 // 	var ns:NetStream = new NetStream(nc);
 #if flash9
-//	nc.addEventListener(NetStatusEvent.NET_STATUS, ncOnStatus);
+	nc.addEventListener(NetStatusEvent.NET_STATUS, ncOnStatus);
 #else
 	nc.setID = function(id) {
 	    DejaGnu.note("Got a setID() from "+rtmpuri);
@@ -106,11 +111,12 @@ class SharedObject_as {
 //  	    DejaGnu.note(e.description);
 #end
   	x1.connect(nc);
+// 	x1.addEventListener(SyncEvent.SYNC, syncHandler);
 
-// 	Reflect.callMethod(x1, Reflect.field(x1, "connect"), []);
-	DejaGnu.note("Connecting to "+rtmpuri);
+	x1.data.whoami = "me";
+	x1.send("rsoltest", "Hello World");
 
-	x1.send("sharedobjecttest", "Hello World");
+	DejaGnu.note("Sent SharedObject to "+rtmpuri);
 
 #if flash9
 	x1.setDirty("data");

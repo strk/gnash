@@ -36,8 +36,11 @@
 namespace gnash
 {
 
+const boost::uint8_t RTMP_VERSION = 0x3;
 const boost::uint8_t RTMP_HANDSHAKE = 0x3;
 const int  RTMP_HANDSHAKE_SIZE = 1536;
+const int  RTMP_RANDOM_SIZE = 1528;
+const int  RTMP_HANDSHAKE_HEADER_SIZE = 8;
 const int  MAX_AMF_INDEXES = 64;
 
 const int  RTMP_HEADSIZE_MASK = 0xc0;
@@ -47,6 +50,7 @@ const int  RTMP_AUDIO_PACKET_SIZE = 64;
 const int  RTMP_MAX_HEADER_SIZE = 12;
 const int  PING_MSG_SIZE = 6;
 const int  RTMP_SYSTEM_CHANNEL = 2;
+
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
@@ -82,17 +86,38 @@ public:
     typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
     typedef enum {
-	RAW=0x0,
-	ADPCM=0x01,
-	MP3=0x02,
-	NELLYMOSER_8khz=0x05,
-	NEYYNOSER=0x6
+	RAW     = 0x0001,
+	ADPCM   = 0x0002,
+	MP3     = 0x0004,
+	INTEL   = 0x0005,
+	CELT    = 0x0008,		// unique to Gnash
+	NELLY8  = 0x0020,
+	NELLY   = 0x0040,
+	G711A   = 0x0080,
+	G711U   = 0x0100,
+	NELLY16 = 0x0200,
+	AAC     = 0x0400,
+	SPEEX   = 0x0800,
+	DEFAULT_AUDIO_SET = 0x0267,
+	ALLAUDIO = 0x0fff
     } audiocodecs_e;
     typedef enum {
-	H263=0x2,
-	SCREEN0x3,
-	VP6=0x4
+	UNUSED   = 0x0001,
+	JPEG     = 0x0002,
+	SORENSON = 0x4,
+	ADOBE    = 0x0008,
+	VP6      = 0x0010,
+	VP6ALPHA = 0x0020,
+	SCREEN2  = 0x0040,
+	H264     = 0x0080,
+	DEFAULT_VIDEO_SET = 0x007c,
+	ALLVIDEO = 0x00ff
     } videocodecs_e;
+    typedef enum {
+	SEEK = 0x1,
+	AMF0 = 0x0,
+	AMF3 = 0x3
+    } videofunction_e;
     // The second byte of the AMF file/stream is appears to be 0x00 if the
     // client is the Flash Player and 0x01 if the client is the FlashCom
     // server.
@@ -113,19 +138,19 @@ public:
         INVOKE = 0x14,
 	FLV_DATA = 0x16
     } content_types_e;
-//     typedef enum {
-//         CONNECT = 0x1,
-//         DISCONNECT = 0x2,
-//         SET_ATTRIBUTE = 0x3,
-//         UPDATE_DATA = 0x4,
-//         UPDATE_ATTRIBUTE = 0x5,
-//         SEND_MESSAGE = 0x6,
-//         STATUS = 0x7,
-//         CLEAR_DATA = 0x8,
-//         DELETE_DATA = 0x9,
-//         DELETE_ATTRIBUTE = 0xa,
-//         INITIAL_DATA = 0xb
-//     } sharedobj_types_e;
+     typedef enum {
+         CREATE = 0x1,		// Client sends event
+         DELETE = 0x2,		// Client sends event
+         REQUEST_CHANGE = 0x3,	// Client sends event
+         CHANGE = 0x4,		// Server sends event
+         SUCCESS_CLIENT = 0x5,	// Server sends event
+         SEND_MESSAGE = 0x6,	// Client sends event
+         STATUS = 0x7,		// Server sends evetn
+         CLEAR = 0x8,		// Server sends event
+         DELETE_SLOT = 0x9,	// Server sends event
+         REQUEST_DELETE_SLOT = 0xa,// Client sends event
+         SUCCESS_SERVER = 0xb	// Server sends event
+     } sharedobj_types_e;
     typedef enum {
 	PING_CLEAR  = 0x0,	// clear the stream
 	PING_PLAY   = 0x1,	// clear the playing buffer
@@ -190,6 +215,10 @@ public:
 	RTMPMsg::rtmp_source_e   src_dest;
 	content_types_e type;
     } rtmp_head_t;
+    typedef struct {
+	boost::uint32_t uptime;
+	boost::uint8_t version[4];
+    } rtmp_handshake_head_t;
     typedef enum {
         HEADER_12 = 0x0,
         HEADER_8  = 0x40,
@@ -322,6 +351,7 @@ public:
     CQue	_queues[MAX_AMF_INDEXES];
 //    queues_t    _channels;
     amf::Buffer	_buffer;
+    rtmp_handshake_head_t _handshake_header;
 };
 
 } // end of gnash namespace

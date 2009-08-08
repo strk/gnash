@@ -276,7 +276,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, ":hwvapr:gf:d:")) != -1) {
+    while ((c = getopt (argc, argv, ":hwvapr:gf:d:n")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -297,6 +297,9 @@ main(int argc, char *argv[])
 #else
               log_error (_("The debugger has been disabled at configuration time"));
 #endif
+	  case 'n':
+	      dbglogfile.setNetwork(true); 
+	      break;
 	  case 'a':
 #if VERBOSE_ACTION
 	      dbglogfile.setActionDump(true); 
