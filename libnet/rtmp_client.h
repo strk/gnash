@@ -45,9 +45,9 @@ public:
 
     bool handShakeWait();
 //    bool handShakeResponse();
-    bool clientFinish();
-    DSOEXPORT bool clientFinish(amf::Buffer &data);
-    DSOEXPORT bool handShakeRequest();
+    boost::shared_ptr<amf::Buffer> clientFinish();
+    DSOEXPORT  boost::shared_ptr<amf::Buffer> clientFinish(amf::Buffer &data);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> handShakeRequest();
     
     // These are used for creating the primary objects
     // Create the initial object sent to the server, which
