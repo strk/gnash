@@ -146,6 +146,12 @@ processLog_parse(const boost::format& fmt)
 }
 
 void
+processLog_network(const boost::format& fmt)
+{
+	dbglogfile.log(N_("NETWORK"), fmt.str());
+}
+
+void
 processLog_error(const boost::format& fmt)
 {
 	dbglogfile.log(N_("ERROR"), fmt.str());

@@ -136,8 +136,16 @@ public:
         _actiondump = x;
     }
 
+    void setNetwork(int x) {
+        _network = x;
+    }
+
     int getActionDump() const {
         return _actiondump;
+    }
+    
+    int getNetwork() const {
+        return _network;
     }
     
     void setParserDump (int x) {
@@ -204,6 +212,9 @@ private:
     /// Whether to dump all SWF actions
     bool _actiondump;
 
+    /// Whether to dump all networking actions
+    bool _network;
+
     /// Whether to dump parser output
     bool _parserdump;
 
@@ -223,6 +234,7 @@ private:
 
 };
 
+DSOEXPORT void processLog_network(const boost::format& fmt);
 DSOEXPORT void processLog_error(const boost::format& fmt);
 DSOEXPORT void processLog_unimpl(const boost::format& fmt);
 DSOEXPORT void processLog_trace(const boost::format& fmt);
@@ -251,7 +263,7 @@ DSOEXPORT void processLog_abc(const boost::format& fmt);
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
 #define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) \
-    (amferror) (security) (action) (parse) (trace) (abc)
+    (amferror) (security) (action) (parse) (trace) (abc) (network)
 
 /// This actually creates the template functions using the TOKENIZE
 /// functions above. The templates look like this:
@@ -342,6 +354,10 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length,
 #define VERBOSE_MALFORMED_AMF 1
 #endif
 
+// Define to 0 this to remove Networking verbosity at compile-time
+#ifndef VERBOSE_NETWORKING
+#define VERBOSE_NETWORKING 1
+#endif
 
 #if VERBOSE_PARSE
 #define IF_VERBOSE_PARSE(x) do { if ( LogFile::getDefaultInstance().getParserDump() ) { x; } } while (0);
@@ -353,6 +369,12 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length,
 #define IF_VERBOSE_ACTION(x) do { if ( LogFile::getDefaultInstance().getActionDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ACTION(x)
+#endif
+
+#if VERBOSE_ACTION
+#define IF_VERBOSE_NETWORK(x) do { if ( LogFile::getDefaultInstance().getNetwork() ) { x; } } while (0);
+#else
+#define IF_VERBOSE_NETWORK(x)
 #endif
 
 #if VERBOSE_ASCODING_ERRORS
