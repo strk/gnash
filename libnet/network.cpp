@@ -833,7 +833,7 @@ Network::readNet(int fd, byte_t *data, int nbytes)
 int
 Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 {
-//    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     fd_set              fdset;
     int                 ret = -1;
@@ -962,14 +962,14 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 int
 Network::writeNet(amf::Buffer *buffer)
 {
-//    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     return writeNet(buffer->reference(), buffer->allocated());
 };
 
 int
 Network::writeNet(int fd, amf::Buffer *buffer)
 {
-//    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer->reference(), buffer->allocated());
 };
 
@@ -977,7 +977,7 @@ Network::writeNet(int fd, amf::Buffer *buffer)
 int
 Network::writeNet(amf::Buffer &buffer)
 {
-//    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     return writeNet(buffer.reference(), buffer.allocated());
 };
 
@@ -985,20 +985,21 @@ Network::writeNet(amf::Buffer &buffer)
 int
 Network::writeNet(int fd, amf::Buffer &buffer)
 {
-//    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer.reference(), buffer.allocated());
 };
 
 int
 Network::writeNet(const std::string& data)
 {
-//    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     return writeNet(reinterpret_cast<const byte_t *>(data.c_str()), data.size());
 }
 
 int
 Network::writeNet(const byte_t *data, int nbytes)
 {
+//     GNASH_REPORT_FUNCTION;
     return writeNet(_sockfd, data, nbytes, _timeout);
 }
 
@@ -1017,12 +1018,15 @@ Network::writeNet(const byte_t *data, int nbytes)
 int
 Network::writeNet(int fd, const byte_t *data, int nbytes)
 {
+//     GNASH_REPORT_FUNCTION;
     return writeNet(fd, data, nbytes, _timeout);
 }
 
 int
 Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 {
+//     GNASH_REPORT_FUNCTION;
+
     fd_set              fdset;
     int                 ret = -1;
 
