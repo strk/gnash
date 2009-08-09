@@ -67,6 +67,7 @@ extern "C"{
 #include "arg_parser.h"
 #include "GnashException.h"
 #include "GnashSleep.h" // for usleep comptibility.
+#include "URL.h"
 
 // classes internal to Cygnal
 #include "rtmp_server.h"
@@ -176,7 +177,7 @@ usage()
 	<< _("  -h,  --help          Print this help and exit") << endl
 	<< _("  -V,  --version       Print version information and exit") << endl
 	<< _("  -v,  --verbose       Output verbose debug info") << endl
-	<< _("  -m,  --multithread   Enable Multi Threading") << endl
+	<< _("  -s,  --singlethread  Disable Multi Threading") << endl
 	<< _("  -n,  --netdebug      Turn on net debugging messages") << endl
 	<< _("  -o   --only-port     Only use port for debugging") << endl
 	<< _("  -p   --port-offset   Port offset for debugging") << endl
@@ -790,7 +791,15 @@ connection_handler(Network::thread_params_t *args)
 	    if (args->port == (port_offset + RTMPT_PORT)) {
 		http_handler(args);
 	    } else if (args->port == (port_offset + RTMP_PORT)) {
-		rtmp_handler(args);
+#if 1
+		RTMPServer rtmp;
+		boost::shared_ptr<amf::Element> tcurl = 
+		    rtmp.processClientHandShake(args->netfd);
+		URL url(tcurl->to_string());
+		log_network("Client wants path: %s", url.path());
+#else
+ 		rtmp_handler(args);
+#endif
 	    }
 	}
 	
