@@ -31,6 +31,7 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 #include "log.h"
 #include "rc.h"
 #include "amf.h"
@@ -533,12 +534,7 @@ RTMPClient::handShakeRequest()
     // which should always be 0x3.
     *handshake = RTMP_VERSION;
 
-    // Get the uptime for the header
-    // yes, we loose precision here but it's only a 4 byte field
-    time_t t;
-    time(&t);
-    boost::uint32_t tt = t;
-    *handshake += tt;
+    *handshake += RTMP::getTime();
 
     // This next field in the header for the RTMP handshake should be zeros
     *handshake += zero;
@@ -607,7 +603,7 @@ RTMPClient::clientFinish(amf::Buffer &data)
 	}
     } while (!done);
 
-    if (handshake1->allocated() == max_size) {
+    if (handshake1->allocated() == boost::lexical_cast<size_t>(max_size)) {
 	log_network (_("Read data block in handshake, got %d bytes."),
 		   handshake1->allocated());
     } else {
