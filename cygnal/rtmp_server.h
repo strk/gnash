@@ -40,9 +40,17 @@ class RTMPServer : public gnash::RTMP
 public:
     RTMPServer();
     ~RTMPServer();
-//    bool processClientHandShake(int fd, amf::Buffer &buf);
-    bool handShakeResponse(int fd, amf::Buffer &buf);
-    boost::shared_ptr<amf::Buffer> serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake2);
+
+    /// \method 
+    ///     This method is called after the initial network connection
+    ///     is established. It reads in the handshake from the client,
+    ///     responds appropriately, and then extracts the initial AMF
+    ///     object, which is always of type NetConnection, doing an
+    ///     INVOKE operation of ::connect(). serverFinish() is
+    ///     actually used to extract the AMF data from the packet, and
+    ///     handShakeResponse() is used to construct the response packet.
+    boost::shared_ptr<amf::Element> processClientHandShake(int fd);
+
     bool packetSend(amf::Buffer &buf);
     bool packetRead(amf::Buffer &buf);
     
@@ -69,13 +77,30 @@ public:
 
     double createClientID();
     double createStreamID();
+
     void setStreamID(double id) { _streamid = id; };
     double getStreamID() { return _streamid; };
 
     void dump();
-  private:
+
+private:
+    /// \method serverFinish
+    ///     This is only called by processClientHandshake() to compare
+    ///     the handshakes to make sure they match, and to extract the
+    ///     initial AMF data from packet.
+    boost::shared_ptr<amf::Buffer> serverFinish(int fd,
+			amf::Buffer &handshake1, amf::Buffer &handshake2);
+    /// \method handShakeResponse
+    ///     This is only called by processClientHandshake() to
+    ///     construct the handshake response to the client.
+    bool handShakeResponse(int fd, amf::Buffer &buf);
+    
+    /// This is used by the boost tokenizer functions, and is defined
+    /// here purely for convienience.
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
+
+
     gnash::DiskStream::filetype_e  _filetype;
     std::string		_docroot;
     std::string		_filespec;

@@ -1086,7 +1086,7 @@ RTMP::recvMsg(int fd)
     //bool nopacket = true;
 
     // Read really big packets, they get split into the smaller ones when 'split'
-    boost::shared_ptr<amf::Buffer> buf(new Buffer(7096));
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(3074));
     do {
 	ret = readNet(fd, buf->reference()+ret, buf->size()-ret, _timeout);
 //	cerr << __PRETTY_FUNCTION__ << ": " << ret << endl;
