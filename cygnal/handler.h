@@ -84,14 +84,17 @@ public:
     void addSOL(boost::shared_ptr<amf::Element> x) {
 	_sol.push_back(x);
     };
-// Dump internal data.
+
+    // Dump internal data.
     void dump();    
 
 protected:
-    /// Add a client to the list for output messages.
-    size_t addClient(int x) { _clients.push_back(x); };
-    /// Add a remote machine to the list for inpput messages.
-    size_t addRemote(int x) { _remote.push_back(x); };	
+    /// \method addClient
+    ///     Add a client to the list for output messages.
+    size_t addClient(int x) { _clients.push_back(x); return _clients.size(); };
+    /// \method addRemote
+    ///     Add a remote machine to the list for inpput messages.
+    size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };	
 
     /// \var _name
     ///	    The name of the path this handler is supporting.
