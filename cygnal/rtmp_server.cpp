@@ -90,8 +90,7 @@ RTMPServer::processClientHandShake(int fd)
     GNASH_REPORT_FUNCTION;
     RTMPServer *rtmp = new RTMPServer;
 
-    log_debug(_("Processing RTMP Handshake for fd #%d, tid %ld"),
-	      fd, get_thread_id());
+    log_network(_("Processing RTMP Handshake for fd #%d"), fd);
     
 #ifdef USE_STATISTICS
     struct timespec start;
@@ -114,28 +113,30 @@ RTMPServer::processClientHandShake(int fd)
     // a connection.
     boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(fd);
     // See if we have data in the handshake, we should have 1537 bytes
-    if (handshake1 == 0) {
-	log_error("failed to read the handshake from the client.");
+    if (!handshake1) {
+	log_error("Failed to read the handshake from the client.");
 	return tcurl;		// nc is empty
+    } else {
+	log_network("Read first handshake from the client.");
     }
     
     // Send our response to the handshake, which primarily is the bytes
-    // we just recieved.
+    // we just received.
     rtmp->handShakeResponse(fd, *handshake1);
     
+    // Read the response from the client from the handshale reponse we
+    // just sent.
     boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(fd);
     // See if we have data in the handshake, we should have 1536 bytes
     if (handshake2 == 0) {
 	log_error("failed to read the handshake from the client.");
 	return tcurl;		// nc is empty
+    } else {
+	log_network("Read second handshake from the client.");
     }
+    
     // Don't assume the data we just read is a handshake.
     pkt = rtmp->serverFinish(fd, *handshake1, *handshake2);
-    if (pkt == 0) {
-	log_error("failed to read data from the end of the handshake from the client!");
-	return tcurl;		// nc is empty
-    }
-
     // Wmake sure e got data before trying to procdess it
     if (pkt->empty()) {
 	log_error("Didn't receive any data in handshake!");
@@ -157,13 +158,46 @@ RTMPServer::processClientHandShake(int fd)
     // Get the actual start of the data
     boost::uint8_t *ptr = pkt->reference() + qhead->head_size;
 
+    // See if we have enough data to go past the chunksize, which is
+    // probable. If so, all chunks are the default size of 128, the
+    // same size as used for video packets. This means every chunksize
+    // boundary is an RTMP header byte that must be removed, or the
+    // data in the NetConnection::connect() packet will be
+    // corrupted. There is probably a better way to do this, but for
+    // now build a copy of the data but skip over the RTMP header
+    // bytes every chunk size biundary. All RTMP headers at this stage
+    // are 1 byte ones.
+    boost::scoped_ptr<amf::Buffer> newptr(new amf::Buffer(qhead->bodysize));
+    if (qhead->bodysize > RTMP_VIDEO_PACKET_SIZE) {
+	log_network("De chunkifying the NetConnection packet.");
+	size_t nbytes = 0;
+	while (nbytes < qhead->bodysize) {
+	    size_t chunk = RTMP_VIDEO_PACKET_SIZE;
+	    if ((qhead->bodysize - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
+		chunk = qhead->bodysize - nbytes;
+	    }
+	    newptr->append(ptr + nbytes, chunk);
+	    nbytes += chunk + 1;
+	}
+    } else {
+	newptr->copy(ptr, qhead->bodysize);
+    }
+
     // extract the body of the message from the packet
-    boost::shared_ptr<RTMPMsg> body = rtmp->decodeMsgBody(ptr, qhead->bodysize);
+    boost::shared_ptr<RTMPMsg> body = rtmp->decodeMsgBody(newptr->begin(), qhead->bodysize);
+    if (!body) {
+	log_error("failed to read the body of the handshake data from the client.");
+	return tcurl;		// nc is empty
+    } else {
+	log_network("Read handshake data body from the client.");
+    }
 
     // make sure this is actually a NetConnection packet.
     if (body->getMethodName() != "connect") {
 	log_error("Didn't receive NetConnection object in handshake!");
 	return tcurl;		// nc is empty
+    } else {
+	log_network("Got NetConnection INVOKE ::connect().");
     }
     
     tcurl  = body->findProperty("tcUrl");
@@ -180,8 +214,6 @@ RTMPServer::processClientHandShake(int fd)
 	log_error("Couldn't send Ping to client!");
     }
 #endif
-
-    nc.reset(new amf::Element);
 
     return tcurl;
 }
@@ -226,8 +258,8 @@ RTMPServer::handShakeResponse(int fd, amf::Buffer &handshake)
     *zeros += timestamp;
 
     // the second field is always zero
-    timestamp = 0;
-    *zeros += timestamp;
+    boost::uint32_t pad = 0;
+    *zeros += pad;
 
     // the data starts after the vesion and header bytes
     size_t offset = RTMP_HANDSHAKE_VERSION_SIZE + RTMP_HANDSHAKE_HEADER_SIZE;
@@ -268,18 +300,25 @@ RTMPServer::serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake
 
     // the first field of the header is the timestamp of the original
     // packet sent by this server.
-    boost::uint32_t timestamp1 = boost::lexical_cast<boost::uint32_t>
+    boost::uint32_t timestamp1 = *reinterpret_cast<boost::uint32_t *>
 	(handshake1.reference() + RTMP_HANDSHAKE_VERSION_SIZE);
 
     // the second field of the header is the timestamp of the previous
     // packet sent by this server.
-    boost::uint32_t timestamp2 = boost::lexical_cast<boost::uint32_t>
+    boost::uint32_t timestamp2 = *reinterpret_cast<boost::uint32_t *>
 	(handshake1.reference() + RTMP_HANDSHAKE_VERSION_SIZE + sizeof(boost::uint32_t));
 
     log_network("The timestamp delta is %d", timestamp2 - timestamp1);
 
+    // This is the location in the second handshake to the random data
+    // block used in the handshake.
+    size_t pkt_size = RTMP_HANDSHAKE_VERSION_SIZE + RTMP_HANDSHAKE_SIZE;
     // the handshakes are supposed to match.
-    int diff = std::memcmp(handshake1.begin(), handshake2.begin(), RTMP_HANDSHAKE_SIZE);
+    int diff = std::memcmp(handshake1.begin()
+	   + RTMP_HANDSHAKE_VERSION_SIZE + RTMP_HANDSHAKE_HEADER_SIZE,
+			   handshake2.begin()
+	   + pkt_size + RTMP_HANDSHAKE_HEADER_SIZE,
+			   RTMP_RANDOM_SIZE);
     if (diff <= 1) {
 	log_network (_("Handshake Finish Data matched"));
     } else {
@@ -291,14 +330,14 @@ RTMPServer::serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake
     // buffer. Normally we  try to avoid copying anything around, but
     // as this is only used once for each connection, there isn't a
     // real performance hit from it.
-    size_t pkt_size = RTMP_HANDSHAKE_VERSION_SIZE + RTMP_HANDSHAKE_SIZE;
     size_t amf_size = handshake2.allocated() - pkt_size;
     if (handshake2.allocated() >= pkt_size) {
 	log_network("Got AMF data in handshake, %d bytes for fd #%d",
 		    amf_size, fd);
-	buf.reset(new Buffer(handshake2.allocated() - RTMP_HANDSHAKE_SIZE));
+	buf.reset(new Buffer(amf_size));
 	// populate the buffer with the AMF data
-	buf->copy(handshake2.reference() + pkt_size, amf_size);
+	boost::uint8_t *ptr = handshake2.reference() + RTMP_HANDSHAKE_SIZE;
+	buf->copy(ptr, amf_size);
     }
     
     return buf;
