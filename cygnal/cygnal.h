@@ -18,12 +18,13 @@
 #ifndef __CYGNAL_H__
 #define __CYGNAL_H__
 
+#include "handler.h"
+
 /// \namespace cygnal
 ///
 /// This namespace is for all the Cygnal specific classes not used by
 /// anything else in Gnash.
-namespace cygnal {
-    
+namespace cygnal {    
 
 /// \class cygnal::Cygnal
     
@@ -34,12 +35,17 @@ public:
 	std::string hostname;
 	short	    port;
 	bool        connected;
+	std::vector<std::string> supported;
     } peer_t;
     static Cygnal& getDefaultInstance();
     ~Cygnal();
 
     bool loadPeersFile();
     bool loadPeersFile(const std::string &filespec);
+
+    void probePeers();
+    void probePeers(peer_t &peer);
+    void probePeers(std::vector<boost::shared_ptr<peer_t> > &peers);
 
     void dump();
 

@@ -290,6 +290,41 @@ Cygnal::loadPeersFile(const std::string &filespec)
 }
 
 void
+Cygnal::probePeers()
+{
+//     GNASH_REPORT_FUNCTION;
+    
+    probePeers(_peers);
+}
+
+void
+Cygnal::probePeers(peer_t &peer)
+{    
+//     GNASH_REPORT_FUNCTION;
+    Network net;
+
+    if (!net.createClient(peer.hostname, peer.port)) {
+	log_network("cuoldn't connect to %S:%D",
+		    peer.hostname, peer.port);
+    }
+
+    peer.connected = false;
+}
+
+void
+Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
+{
+//     GNASH_REPORT_FUNCTION;
+
+// 	createClient();
+    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
+    for (it = _peers.begin(); it != _peers.end(); it++) {
+	boost::shared_ptr<Cygnal::peer_t> peer = *it;
+	probePeers(*peer);
+    }
+}
+
+void
 Cygnal::dump()
 {
     std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
@@ -389,6 +424,7 @@ main(int argc, char *argv[])
 	      break;
 	  case 'n':
 	      netdebug = true;
+	      dbglogfile.setNetwork(true);
 	      break;
 	  case 'o':	
 	      only_port = parser.argument<int>(i);
@@ -406,7 +442,8 @@ main(int argc, char *argv[])
     if (only_port) {
 	crcfile.setThreadingFlag(false);
     }
-    
+
+    // load the file of peers. A peer is another instance of Cygnal
     cyg.loadPeersFile();
     cyg.dump();
 
