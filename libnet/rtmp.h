@@ -21,12 +21,13 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
+#include <time.h>
 
 #include "amf.h"
 #include "element.h"
-// #include "handler.h"
 #include "network.h"
 #include "buffer.h"
 #include "rtmp_msg.h"
@@ -36,21 +37,75 @@
 namespace gnash
 {
 
+/// \page RTMP RTMP Protocol
+/// \section rtmp_handshake RTMP Handshake
+///     The headers and data for the initial RTMP handshake differ from
+///     what is used by RTMP during normal message processing. The layout
+///     is this:
+///     [version (1 byte)]
+///     [1st timestamp (4 bytes)]
+///     [2nd timestamp (4 bytes)]
+///     [1528 bytes of random data]
+///
+///     The handshake process is client sends a handhsake request to the
+///     server. This is 1537 bytes (version + handshake).
+///     The server then responds with a 3073 byte packet, which is the
+///     version byte plus two 1536 byte packets, the second one being the
+///     the same random data as we originally sent, but with the header
+///     changed.
+///
+/// \section rtmp_packet RTMP Packet
+///     An RTMP packet has a variablew length header field, followed by data
+///     encoded in AMF format. The header can be one of 1, 4, 8, or 12 bytes.
+///     
+
+
+/// \var RTMP_HANDSHAKE_VERSION_SIZE
+///     The RTMP version field of the handshake is 1 byte large
+const int  RTMP_HANDSHAKE_VERSION_SIZE = 1;
+/// \var RTMP_VERSION
+///     The RTMP version number for now is always a 3.
 const boost::uint8_t RTMP_VERSION = 0x3;
-const boost::uint8_t RTMP_HANDSHAKE = 0x3;
-const int  RTMP_HANDSHAKE_SIZE = 1536;
-const int  RTMP_RANDOM_SIZE = 1528;
+/// \var
+///    This is the total size of an RTMP packet, not including the
+///    version field.
+const int  RTMP_HANDSHAKE_SIZE	= 1536;
+/// \var
+///    This is the size of the random data section in the RTMP handshake
+const int  RTMP_RANDOM_SIZE	= 1528;
+/// \var
+///    The RTMP handshake header if always 2 32bit words. (8 bytes)
 const int  RTMP_HANDSHAKE_HEADER_SIZE = 8;
-const int  MAX_AMF_INDEXES = 64;
 
-const int  RTMP_HEADSIZE_MASK = 0xc0;
-const char RTMP_INDEX_MASK = 0x3f;
+/// \var
+///    This is the maximum number of channels supported in a single
+///    RTMP connection.
+const int  MAX_AMF_INDEXES	= 64;
+
+/// \par RTMP Header
+///
+/// \var 
+///     This is a mask to get to the upper 2 bits of the header
+const int  RTMP_HEADSIZE_MASK	= 0xc0;
+/// \var 
+///     This is a mask to get to the lower 6 bits of the header
+const char RTMP_INDEX_MASK	= 0x3f;
+/// \var 
+///     All video data packets are 128 bytes
 const int  RTMP_VIDEO_PACKET_SIZE = 128;
+/// \var 
+///     All audio data packets are 64 bytes
 const int  RTMP_AUDIO_PACKET_SIZE = 64;
+/// \var 
+///     While the RTMP header can be one of 4 sizes, this is the
+///     maximum size used
 const int  RTMP_MAX_HEADER_SIZE = 12;
-const int  PING_MSG_SIZE = 6;
+/// \var 
+///     All System Ping messages are 6 bytes
+const int  PING_MSG_SIZE	= 6;
+/// \var 
+///     This is a reserved channel for system messages
 const int  RTMP_SYSTEM_CHANNEL = 2;
-
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
@@ -337,6 +392,17 @@ public:
     boost::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
+
+    /// \method getTime
+    ///    The time on most systems these days is a 64 bit long, but swf
+    ///    is old, so it only uses a 32 bit integer instead. We know casting
+    ///    looses precision, but that's just the way it is in RTMP.
+    boost::uint32_t getTime() {
+	time_t t;
+	time(&t);
+	return boost::lexical_cast<boost::uint32_t>(t);
+    };
+
     void dump();
   protected:
     AMFProperties _properties;
