@@ -88,7 +88,6 @@ boost::shared_ptr<amf::Element>
 RTMPServer::processClientHandShake(int fd)
 {
     GNASH_REPORT_FUNCTION;
-    RTMPServer *rtmp = new RTMPServer;
 
     log_network(_("Processing RTMP Handshake for fd #%d"), fd);
     
@@ -98,7 +97,7 @@ RTMPServer::processClientHandShake(int fd)
 #endif
     
     // Adjust the timeout for reading from the network
-    rtmp->setTimeout(10);
+    RTMP::setTimeout(10);
     
     // These store the information we need from the initial
     /// NetConnection object.
@@ -111,7 +110,7 @@ RTMPServer::processClientHandShake(int fd)
     
     // Read the handshake bytes sent by the client when requesting
     // a connection.
-    boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(fd);
+    boost::shared_ptr<amf::Buffer> handshake1 = RTMP::recvMsg(fd);
     // See if we have data in the handshake, we should have 1537 bytes
     if (!handshake1) {
 	log_error("Failed to read the handshake from the client.");
@@ -122,11 +121,11 @@ RTMPServer::processClientHandShake(int fd)
     
     // Send our response to the handshake, which primarily is the bytes
     // we just received.
-    rtmp->handShakeResponse(fd, *handshake1);
+    handShakeResponse(fd, *handshake1);
     
     // Read the response from the client from the handshale reponse we
     // just sent.
-    boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(fd);
+    boost::shared_ptr<amf::Buffer> handshake2 = RTMP::recvMsg(fd);
     // See if we have data in the handshake, we should have 1536 bytes
     if (handshake2 == 0) {
 	log_error("failed to read the handshake from the client.");
@@ -136,7 +135,7 @@ RTMPServer::processClientHandShake(int fd)
     }
     
     // Don't assume the data we just read is a handshake.
-    pkt = rtmp->serverFinish(fd, *handshake1, *handshake2);
+    pkt = serverFinish(fd, *handshake1, *handshake2);
     // Wmake sure e got data before trying to procdess it
     if (pkt->empty()) {
 	log_error("Didn't receive any data in handshake!");
@@ -184,7 +183,7 @@ RTMPServer::processClientHandShake(int fd)
     }
 
     // extract the body of the message from the packet
-    boost::shared_ptr<RTMPMsg> body = rtmp->decodeMsgBody(newptr->begin(), qhead->bodysize);
+    boost::shared_ptr<RTMPMsg> body = RTMP::decodeMsgBody(newptr->begin(), qhead->bodysize);
     if (!body) {
 	log_error("failed to read the body of the handshake data from the client.");
 	return tcurl;		// nc is empty
@@ -206,14 +205,30 @@ RTMPServer::processClientHandShake(int fd)
 #if 1
     // Send a ping to reset the new stream
     boost::shared_ptr<amf::Buffer> ping_reset =
-	rtmp->encodePing(RTMP::PING_RESET, 0);
-    if (rtmp->sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+	encodePing(RTMP::PING_RESET, 0);
+    if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
 		      ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
 	log_debug("Sent Ping to client");
     } else {
 	log_error("Couldn't send Ping to client!");
     }
 #endif
+
+    boost::shared_ptr<amf::Buffer> response =
+	encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+    if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+		      ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
+	log_debug("Sent Ping to client");
+    } else {
+	log_error("Couldn't send Ping to client!");
+    }
+
+    if (RTMP::sendMsg(fd, 3, RTMP::HEADER_12, response->allocated(),
+		      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
+	log_error("Sent response to client.");
+    } else {
+	log_error("Couldn't send response to client!");
+    }
 
     return tcurl;
 }
