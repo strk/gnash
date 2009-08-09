@@ -24,17 +24,48 @@
 /// anything else in Gnash.
 namespace cygnal {
     
+
+/// \class cygnal::Cygnal
+    
+class Cygnal
+{
+public:
+    typedef struct {
+	std::string hostname;
+	short	    port;
+	bool        connected;
+    } peer_t;
+    static Cygnal& getDefaultInstance();
+    ~Cygnal();
+
+    bool loadPeersFile();
+    bool loadPeersFile(const std::string &filespec);
+
+    void dump();
+
+private:
+    void addPeer(boost::shared_ptr<peer_t> x) {
+	_peers.push_back(x);
+    };
+
+    std::vector<boost::shared_ptr<peer_t> > _peers;
+};
+
 /// \class cygnal::ThreadCounter of threads currently
 ///     active. This is primarily so the counter can be wrapped with a
 ///     mutex to be thread safe, as threads delete themseleves.
 class ThreadCounter
 {
-  public:
+public:
+
     ThreadCounter() : _tids(0) {};
     void increment() { boost::mutex::scoped_lock lk(_tid_mutex); ++_tids; };
     void decrement() { boost::mutex::scoped_lock lk(_tid_mutex); --_tids; };
     int num_of_tids() { return _tids; };
-  private:
+
+    bool getPeers();
+
+private:
     boost::mutex  _tid_mutex;
     int           _tids;
     boost::thread _tid_handle;

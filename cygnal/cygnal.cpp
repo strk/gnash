@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <sys/stat.h>
 #include <list>
 #include <map>
 #include <iostream>
@@ -185,6 +186,123 @@ usage()
 	<< endl;
 }
 
+
+Cygnal&
+Cygnal::getDefaultInstance()
+{
+//     GNASH_REPORT_FUNCTION;
+    static Cygnal o;
+    return o;
+}
+
+
+Cygnal::~Cygnal()
+{
+//     GNASH_REPORT_FUNCTION;
+}
+
+bool
+Cygnal::loadPeersFile()
+{
+    GNASH_REPORT_FUNCTION;
+
+    loadPeersFile("./peers.conf");
+
+    loadPeersFile("/etc/peers.conf");
+
+    // Check the users home directory    
+#ifndef __amigaos4__
+    char *home = std::getenv("HOME");
+#else
+    //on AmigaOS we have a GNASH: assign that point to program dir
+    char *home = "/gnash";
+#endif
+
+    string homefile = home;
+    homefile += "/peers.conf";
+
+    loadPeersFile(homefile);
+}
+
+bool
+Cygnal::loadPeersFile(const std::string &filespec)
+{
+//     GNASH_REPORT_FUNCTION;
+
+    struct stat stats;
+    std::ifstream in;
+    std::string line;
+    string host;
+    string portstr;
+    short  port;
+    
+    // Make sufre the file exists
+    if (stat(filespec.c_str(), &stats) != 0) {
+        return false;
+    }
+
+    in.open(filespec.c_str());
+    
+    if (!in) {
+	log_error(": couldn't open file: ", filespec);
+	return false;
+    }
+
+    // Read in each line and parse it
+    size_t lineno = 0;
+    while (std::getline(in, line)) {
+
+        ++lineno;
+
+        // Ignore comment and empty lines
+        if (line.empty() || line[0] == '#') {
+	    continue;
+	}
+
+        std::istringstream ss(line);
+        
+        // Get the first token
+        if (! (ss >> host)) {
+            // Empty line 
+            continue;
+        }
+        
+        // 'action' should never be empty, or (ss >> action) 
+        // above would have failed
+
+        if (host[0] == '#') {
+	    continue; // discard comments
+	}
+
+        // Get second token
+        if (!(ss >> portstr)) {
+            // Do we need to warn here as well?
+            continue;
+        }
+
+	// Create a new peer item
+	boost::shared_ptr<peer_t> peer(new Cygnal::peer_t);
+	peer->hostname = host;
+	peer->port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
+
+	addPeer(peer);
+    }    
+}
+
+void
+Cygnal::dump()
+{
+    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
+    for (it = _peers.begin(); it != _peers.end(); it++) {
+	cerr << "Remote Peer: " << (*it)->hostname
+	     << ":" << (*it)->port << endl;
+    }
+}
+
+// This is the global object for Cygnl
+// The debug log used by all the gnash libraries.
+static Cygnal& cyg = Cygnal::getDefaultInstance();
+
 int
 main(int argc, char *argv[])
 {
@@ -289,6 +407,9 @@ main(int argc, char *argv[])
 	crcfile.setThreadingFlag(false);
     }
     
+    cyg.loadPeersFile();
+    cyg.dump();
+
     // Trap ^C (SIGINT) so we can kill all the threads
     act1.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act1, NULL);
