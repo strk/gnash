@@ -18,6 +18,12 @@
 #ifndef __CYGNAL_H__
 #define __CYGNAL_H__
 
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <vector>
+#include <string>
+#include <map>
+
 #include "handler.h"
 
 /// \namespace cygnal
@@ -47,14 +53,22 @@ public:
     void probePeers(peer_t &peer);
     void probePeers(std::vector<boost::shared_ptr<peer_t> > &peers);
 
+    void addHandler(const std::string &path, boost::shared_ptr<Handler> x) {
+ 	_handlers[path] = x;
+    };
+
+    boost::shared_ptr<Handler> findHandler(const std::string &path);
+    void removeHandler(const std::string &path);
+
     void dump();
 
 private:
     void addPeer(boost::shared_ptr<peer_t> x) {
-	_peers.push_back(x);
+ 	_peers.push_back(x);
     };
 
     std::vector<boost::shared_ptr<peer_t> > _peers;
+    std::map<std::string, boost::shared_ptr<Handler> > _handlers;
 };
 
 /// \class cygnal::ThreadCounter of threads currently

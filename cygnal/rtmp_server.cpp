@@ -196,14 +196,14 @@ RTMPServer::processClientHandShake(int fd)
 	log_error("Didn't receive NetConnection object in handshake!");
 	return tcurl;		// nc is empty
     } else {
-	log_network("Got NetConnection INVOKE ::connect().");
+	log_network("Got NetConnection ::connect() INVOKE.");
     }
     
+    // Get the data for the two field we want.
     tcurl  = body->findProperty("tcUrl");
     swfurl  = body->findProperty("swfUrl");
     
-#if 1
-    // Send a ping to reset the new stream
+    // Send a ping to the client to reset the new NetConnection,
     boost::shared_ptr<amf::Buffer> ping_reset =
 	encodePing(RTMP::PING_RESET, 0);
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
@@ -212,17 +212,12 @@ RTMPServer::processClientHandShake(int fd)
     } else {
 	log_error("Couldn't send Ping to client!");
     }
-#endif
 
+    // Send the packet to notify the client that the
+    // NetConnection::connect() was sucessful. After the client
+    // receives this, the handhsake is completed.
     boost::shared_ptr<amf::Buffer> response =
 	encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-    if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-		      ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
-	log_debug("Sent Ping to client");
-    } else {
-	log_error("Couldn't send Ping to client!");
-    }
-
     if (RTMP::sendMsg(fd, 3, RTMP::HEADER_12, response->allocated(),
 		      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
 	log_error("Sent response to client.");

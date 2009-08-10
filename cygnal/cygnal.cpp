@@ -286,7 +286,7 @@ Cygnal::loadPeersFile(const std::string &filespec)
 	peer->hostname = host;
 	peer->port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
 
-	addPeer(peer);
+	_peers.push_back(peer);
     }    
 }
 
@@ -323,6 +323,31 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
 	boost::shared_ptr<Cygnal::peer_t> peer = *it;
 	probePeers(*peer);
     }
+}
+
+void
+Cygnal::removeHandler(const std::string &path)
+{
+//     GNASH_REPORT_FUNCTION;
+    map<std::string, boost::shared_ptr<Handler> >::iterator it;
+    it = _handlers.find(path);
+    if (it != _handlers.end()) {
+	_handlers.erase(it);
+    }
+}
+
+boost::shared_ptr<Handler>
+Cygnal::findHandler(const std::string &path)
+{
+//     GNASH_REPORT_FUNCTION;
+    map<std::string, boost::shared_ptr<Handler> >::iterator it;
+    boost::shared_ptr<Handler> hand;
+    it = _handlers.find(path);
+    if (it != _handlers.end()) {
+	hand = (*it).second;
+    }
+
+    return hand;
 }
 
 void
