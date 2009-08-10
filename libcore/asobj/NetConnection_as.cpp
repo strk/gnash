@@ -850,7 +850,7 @@ NetConnection_as::connect(const std::string& uri)
 	|| (url.protocol() != "rtmpt")
 	|| (url.protocol() != "rtmpts")
 	|| (url.protocol() != "https")
-	|| (url.protocol() == "http")) {
+	|| (url.protocol() != "http")) {
         IF_VERBOSE_ASCODING_ERRORS(
 		 log_aserror("NetConnection.connect(%s): invalid connection "
 			     "protocol", url);

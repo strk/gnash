@@ -872,13 +872,16 @@ sharedobject_connect(const fn_call& fn)
     // So we have to make sure the NetCnnection object we get
     // passed is already had the URI specified to connect to.
     if (fn.nargs > 1) {
-	const as_value& uri = fn.arg(1);
-	const VM& vm = getVM(fn);
- 	const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+#if 0
+        const as_value& uri = fn.arg(1);
+        const VM& vm = getVM(fn);
+        const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+#endif
     }
     
     boost::intrusive_ptr<NetConnection_as> nc =
-	boost::dynamic_pointer_cast<NetConnection_as>(						     fn.arg(0).to_object(*getGlobal(fn)));
+	boost::dynamic_pointer_cast<NetConnection_as>(
+            fn.arg(0).to_object(*getGlobal(fn)));
 
     // This is always set without validification.fooc->setURI(uriStr);
     string str = nc->getURI();

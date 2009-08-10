@@ -32,19 +32,22 @@ check_equals(typeof(Camera), 'function');
 
 //trace("NOTE: System.capabilities.hasVideoEncoder:  " + System.capabilities.hasVideoEncoder);
 
-/*
- This is not the proper way to construct a camera object. According to the
- livedoc the constructor for Camera is Camera.get(). Flashplayer ignores
- the call to new Camera.
- test the Camera constuctor
-check(Camera);
+// This is not the proper way to construct a camera object. According to the
+// livedoc a camera should be retrieved using Camera.get(). The constructor
+// returns an object with camera functions.
+
+//test the Camera constuctor
+check_equals(typeof(Camera), "function");
+
 var cameraObj = new Camera;
 check(cameraObj);
 var cameraObj2 = new Camera();
 check(cameraObj2);
 check(cameraObj != cameraObj2);
 check_equals(typeof(cameraObj), 'object');
-*/
+check_equals(typeof(cameraObj.setCursor), "function");
+check_equals(typeof(cameraObj.setKeyFrameInterval), "function");
+check_equals(typeof(cameraObj.setLoopback), "function");
 
 // These properties are never present before Camera.get() is called.
 check(!Camera.prototype.hasOwnProperty("activityLevel"));
@@ -109,15 +112,14 @@ else {
 check_equals(Camera.setMode, undefined);
 check_equals(Camera.setMotionLevel, undefined);
 check_equals(Camera.setQuality, undefined);
+check_equals(Camera.setCursor, undefined);
 
-// test Camera::setMode
 check_equals ( typeof(cam.setMode), 'function' );
-
-// test Camera::setMotionLevel
 check_equals ( typeof(cam.setMotionLevel), 'function' );
-
-// test Camrea::setQuality
 check_equals ( typeof(cam.setQuality), 'function');
+check_equals ( typeof(cam.setCursor), 'function');
+check_equals ( typeof(cam.setKeyFrameInterval), 'function');
+check_equals ( typeof(cam.setLoopback), 'function');
 
 // check properties
 check_equals ( typeof(cam.activityLevel), 'number' );
@@ -130,7 +132,7 @@ check_equals ( typeof(cam.motionLevel), 'number');
 check_equals ( typeof(cam.motionTimeout), 'number');
 check_equals ( typeof(cam.muted), 'boolean');
 check_equals ( typeof(cam.name), 'string');
-xcheck_equals ( typeof(cam.names), 'undefined');
+check_equals ( typeof(cam.names), 'undefined');
 check_equals ( typeof(cam.quality), 'number');
 check_equals ( typeof(cam.width), 'number');
 

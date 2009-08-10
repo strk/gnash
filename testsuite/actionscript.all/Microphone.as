@@ -55,18 +55,12 @@ check(!Microphone.prototype.hasOwnProperty("silenceLevel"));
 check(!Microphone.prototype.hasOwnProperty("silenceTimeOut"));
 check(!Microphone.prototype.hasOwnProperty("useEchoSuppression"));
 
-/*
-There is no such thing as 'new Microphone'. If you ever want to get a new
-Microphone object, the proper call is f = Microphone.get()
-*/
-//f = new Microphone;
+f = new Microphone;
 
-// Called with new, Microphone returns an object with static
-// properties.
-//check_equals(typeof(f), 'object');
-//check_equals(typeof(f.setGain), 'function')
-//check_equals(typeof(f.gain), 'undefined')
-//check_equals(typeof(f.rate), 'undefined')
+check_equals(typeof(f), 'object');
+check_equals(typeof(f.setGain), 'function')
+check_equals(typeof(f.gain), 'undefined')
+check_equals(typeof(f.rate), 'undefined')
 
 // Still not present
 check(!Microphone.prototype.hasOwnProperty("get"));
