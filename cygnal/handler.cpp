@@ -48,6 +48,17 @@ using namespace boost;
 namespace cygnal
 {
 
+const char *proto_str[] = {
+    "NONE",
+    "HTTP",
+    "RTMP",
+    "RTMPT",
+    "RTMPTS",
+    "RTMPE",
+    "RTMPS",
+    "DTN"
+};
+
 map<int, Handler *> DSOEXPORT handlers;
 
 Handler::Handler()
@@ -88,6 +99,10 @@ void
 Handler::dump()
 {
 //    GNASH_REPORT_FUNCTION;
+    for (size_t i = 0; i < _clients.size(); i++) {
+	cerr << "Client on fd #" << _clients[i] << " is using  "
+	     << proto_str[_protocol[i]] << endl;
+    }
 }
 
 } // end of gnash namespace

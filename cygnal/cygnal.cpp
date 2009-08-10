@@ -108,6 +108,7 @@ static void cntrlc_handler(int sig);
 static void hup_handler(int sig);
 
 void connection_handler(Network::thread_params_t *args);
+void event_handler(Network::thread_params_t *args);
 void dispatch_handler(Network::thread_params_t *args);
 void admin_handler(Network::thread_params_t *args);
 
@@ -332,6 +333,7 @@ Cygnal::removeHandler(const std::string &path)
     map<std::string, boost::shared_ptr<Handler> >::iterator it;
     it = _handlers.find(path);
     if (it != _handlers.end()) {
+	boost::mutex::scoped_lock lock(_mutex);
 	_handlers.erase(it);
     }
 }
@@ -821,7 +823,22 @@ connection_handler(Network::thread_params_t *args)
 		boost::shared_ptr<amf::Element> tcurl = 
 		    rtmp.processClientHandShake(args->netfd);
 		URL url(tcurl->to_string());
-		log_network("Client wants path: %s", url.path());
+		boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
+		if (!hand) {
+		    log_network("Creating new Handler for: %s for fd %#d",
+				url.path(), args->netfd);
+		    hand.reset(new Handler);
+		} else {
+		    log_network("Using existing Handler for: %s for fd %#d",
+				url.path(), args->netfd);
+		}
+		hand->addClient(args->netfd, Handler::RTMP);
+		args->handler = reinterpret_cast<void *>(hand.get());
+
+		event_handler(args);
+
+		// We're done, close this network connection
+		rtmp.closeNet(args->netfd);
 #else
  		rtmp_handler(args);
 #endif
@@ -916,6 +933,75 @@ dispatch_handler(Network::thread_params_t *args)
     
 } // end of dispatch_handler
 
+
+void
+event_handler(Network::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+    Network net;
+    
+    Handler *hand = reinterpret_cast<Handler *>(args->handler);
+    hand->dump();
+    int retries = 100;
+
+    int timeout = 500;
+    bool done = false;
+
+    do {
+	net.setTimeout(timeout);
+	fd_set hits;
+	// Wait for something from one of the file descriptors
+	hits = net.waitForNetData(hand->getClients());
+	int max = 0;
+	// We need to calculate the highest numbered file descriptor
+	// for select. We may want to do this elsewhere, as it could
+	// be a performance hit as the number of file descriptors gets
+	// larger.
+	for (size_t i = 0; i<hand->getClients().size(); i++) {
+	    if (hand->getClients()[i] > max) {
+		max = hand->getClients()[i];
+	    }
+	}
+	
+	// See if we have any data waiting behind any of the file
+	// descriptors.
+	for (int i=0; i <= max + 1; i++) {
+	    if (FD_ISSET(i, &hits)) {
+		FD_CLR(i, &hits);
+		log_network("Got a hit for fd #%d, protocol %d", i,
+			    hand->getProtocol(i));
+		switch (hand->getProtocol(i)) {
+		  case Handler::NONE:
+		      break;
+		  case Handler::HTTP:
+		      http_handler(args);
+		      break;
+		  case  Handler::RTMP:
+		      args->netfd = i;
+		      rtmp_handler(args);
+		      break;
+		  case Handler::RTMPT:
+		      http_handler(args);
+		      break;		      
+		  case  Handler::RTMPTS:
+		      break;
+		  case  Handler::RTMPE:
+		      break;
+		  case  Handler::RTMPS:
+		      break;
+		  case  Handler::DTN:
+		      break;
+		  default:
+		      log_error("Unsupported network protocol for fd #%d, %d",
+				args->netfd, hand->getProtocol(i));
+		      done = true;
+		      break;
+		}
+	    }
+	}
+    } while (!done);
+	
+} // end of event_handler
 
 // local Variables:
 // mode: C++

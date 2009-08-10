@@ -72,9 +72,9 @@ public:
     typedef enum {
 	NONE,
 	HTTP,
+	RTMP,
 	RTMPT,
 	RTMPTS,
-	RTMP,
 	RTMPE,
 	RTMPS,
 	DTN
@@ -96,21 +96,26 @@ public:
 	_sol.push_back(x);
     };
 
-    // Dump internal data.
-    void dump();    
-
-protected:
     /// \method addClient
     ///     Add a client to the list for output messages.
     size_t addClient(int x, protocols_supported_e proto);
     /// \method removeClient
     ///     Remove a client from the list for messages.
     void removeClient(int x);
+    /// \var getClients
+    ///     Get the vector of file descriptors for this handler.
+    std::vector<int> &getClients() { return _clients; };
+
+    protocols_supported_e getProtocol(int x) { return _protocol[x]; };
     
     /// \method addRemote
-    ///     Add a remote machine to the list for inpput messages.
+    ///     Add a remote machine to the list for input messages.
     size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };
     
+    // Dump internal data.
+    void dump();    
+
+protected:
     /// \var _name
     ///	    The name of the path this handler is supporting.
     std::string				_name;
