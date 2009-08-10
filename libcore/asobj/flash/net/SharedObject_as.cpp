@@ -966,7 +966,9 @@ sharedobject_flush(const fn_call& fn)
     }
 
     /// If there is no data member, returns undefined.
-    if (!obj->data()) return as_value();
+    if (!obj->data()) {
+        return as_value();
+    }
 
     // If there is an object data member, returns the success of flush().
     return as_value(obj->flush(space));

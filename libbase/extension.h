@@ -64,8 +64,8 @@ public:
     /// @param dir       A directory to scan.
     bool scanAndLoad(const std::string& dir, as_object &where);
 
-	// open a module, initialize the module within Gnash. Known function name.
-	bool initModuleWithFunc(const std::string& module, const std::string& func, as_object &obj);
+    // open a module, initialize the module within Gnash. Known function name.
+    bool initModuleWithFunc(const std::string& module, const std::string& func, as_object &obj);
     bool initNewObject(as_object &obj);
     void dumpModules();
 private:

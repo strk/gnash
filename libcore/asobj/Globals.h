@@ -105,7 +105,7 @@ protected:
 private:
 
     void loadExtensions();
-	Extension _et;
+    Extension _et;
 
     ClassHierarchy _classes;
     VM& _vm;
