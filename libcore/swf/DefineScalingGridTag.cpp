@@ -28,8 +28,8 @@ namespace gnash {
 namespace SWF {
 
 void
-DefineScalingGridTag::loader(SWFStream& in, TagType tag, movie_definition& md,
-        const RunResources& r)
+DefineScalingGridTag::loader(SWFStream& in, TagType /*tag*/,
+        movie_definition& /*md*/, const RunResources& /*r*/)
 {
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();
