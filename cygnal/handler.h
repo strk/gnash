@@ -69,11 +69,22 @@ public:
 	QUIT,
     } admin_cmd_e;
     
+    typedef enum {
+	NONE,
+	HTTP,
+	RTMPT,
+	RTMPTS,
+	RTMP,
+	RTMPE,
+	RTMPS,
+	DTN
+    } protocols_supported_e;
+    
      DSOEXPORT Handler();
     ~Handler();
 
     /// \var sync
-    ///     Send the onSync message to all connectec cients
+    ///     Send the onSync message to all connected clients
     bool sync() { return sync(_in_fd); };
     bool sync(int in_fd);
 
@@ -91,17 +102,25 @@ public:
 protected:
     /// \method addClient
     ///     Add a client to the list for output messages.
-    size_t addClient(int x) { _clients.push_back(x); return _clients.size(); };
+    size_t addClient(int x, protocols_supported_e proto);
+    /// \method removeClient
+    ///     Remove a client from the list for messages.
+    void removeClient(int x);
+    
     /// \method addRemote
     ///     Add a remote machine to the list for inpput messages.
-    size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };	
-
+    size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };
+    
     /// \var _name
     ///	    The name of the path this handler is supporting.
     std::string				_name;
     ///	    Each incoming request has one of 4 states the server has
     ///     to handle to send a response.
-    
+
+    /// \var _protocol
+    ///    this is the map of which protocol is being used by which
+    ///    file descriptor.
+    std::map<int, protocols_supported_e> _protocol;
     /// \var _clients
     ///	    is the array of all clients connected to this server for
     ///     this application. This is where all the output goes.
@@ -110,6 +129,7 @@ protected:
     ///	    This is network connections to other processes,
     ///	    on other computers.
     std::vector<int>			_remote;
+
     /// \var _local
     ///    These are local process we're responsible for
     ///    starting and stopping.
@@ -127,6 +147,9 @@ protected:
     ///	    The file descriptor of the incoming data for an
     ///     Invoke message.
     int _in_fd;
+
+private:    
+    boost::mutex _mutex;
     
 // Remote Shared Objects. References are an index into this vector.
 //    std::map<std::string, boost::shared_ptr<handler_t> > _handlers;

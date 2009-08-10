@@ -68,6 +68,21 @@ Handler::sync(int in_fd)
 
 }
 
+size_t
+Handler::addClient(int x, protocols_supported_e proto) {
+    boost::mutex::scoped_lock lock(_mutex);
+    _clients.push_back(x);
+    _protocol[x] = proto;
+    
+    return _clients.size();
+};
+
+void
+Handler::removeClient(int x) {
+    boost::mutex::scoped_lock lock(_mutex);
+    _clients.erase(_clients.begin()+x);
+};
+
 // Dump internal data.
 void
 Handler::dump()
