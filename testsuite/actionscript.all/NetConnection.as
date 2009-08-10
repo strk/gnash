@@ -59,6 +59,13 @@ check_equals(tmp.isConnected, false);
 tmp.isConnected = 56;
 check_equals(tmp.isConnected, false);
 
+#if 0
+// Provided this connection is allowed, the player creates a connection.
+// Because the Adobe player has a different sandbox method from Gnash,
+// we can't test this connection *and* the blacklisted one.
+
+// Starting this connection also causes different results later.
+
 // test the NetConnection::connect method
 if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv") )
 {
@@ -69,6 +76,7 @@ else
 {
 	pass("NetConnection::connect() initialized correctly");
 }
+#endif
 
 statuses = new Array;
 tmp.onStatus = function(info) {
@@ -80,12 +88,15 @@ tmp.onStatus = function(info) {
 result = "";
 level = "";
 
+statuses = new Array();
 ret = tmp.connect();
 check_equals(ret, undefined);
 check_equals(tmp.isConnected, false);
 check_equals(result, "");
 check_equals(level, "");
+check_equals(statuses.toString(), "");
 
+statuses = new Array();
 ret = tmp.connect("");
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
@@ -93,6 +104,7 @@ check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "");
+check_equals(statuses.toString(), "NetConnection.Connect.Failed");
 
 ret = tmp.connect("null");
 check_equals(ret, false);
@@ -184,7 +196,8 @@ check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 
 
-// Close() doesn't reset uri
+// Close() doesn't reset uri if no connection is made. It does seem to
+// reset it if a connection is genuinely closed.
 tmp.close();
 check_equals(tmp.uri, "http://www.blacklistedserver.org");
 
@@ -290,7 +303,7 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 
-check_totals(119);
+check_totals(120);
 
 
 
