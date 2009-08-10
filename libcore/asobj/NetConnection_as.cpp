@@ -847,10 +847,11 @@ NetConnection_as::connect(const std::string& uri)
     URL url(uri, getRunResources(*this).baseURL());
 
     if ((url.protocol() != "rtmp")
-	&& (url.protocol() != "rtmpt")
-	&& (url.protocol() != "rtmpts")
-	&& (url.protocol() != "https")
-	&& (url.protocol() != "http")) {
+        && (url.protocol() != "rtmpt")
+        && (url.protocol() != "rtmpts")
+        && (url.protocol() != "https")
+        && (url.protocol() != "http")) {
+
         IF_VERBOSE_ASCODING_ERRORS(
 		 log_aserror("NetConnection.connect(%s): invalid connection "
 			     "protocol", url);
