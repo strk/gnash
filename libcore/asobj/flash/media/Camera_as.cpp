@@ -47,6 +47,7 @@ as_value camera_setmode(const fn_call& fn);
 as_value camera_setmotionlevel(const fn_call& fn);
 as_value camera_setquality(const fn_call& fn);
 as_value camera_setLoopback(const fn_call& fn);
+as_value camera_setCursor(const fn_call& fn);
 as_value camera_setKeyFrameInterval(const fn_call& fn);
 
 as_value camera_activitylevel(const fn_call& fn);
@@ -99,8 +100,7 @@ attachCameraInterface(as_object& o)
     o.init_member("setMode", gl->createFunction(camera_setmode));
     o.init_member("setMotionLevel", gl->createFunction(camera_setmotionlevel));
     o.init_member("setQuality", gl->createFunction(camera_setquality));
-// setCursor is not in the specs for Camera (as2 or 3)
-//    o.init_member("setCursor", gl->createFunction(camera_setCursor));
+    o.init_member("setCursor", gl->createFunction(camera_setCursor));
     o.init_member("setLoopback", gl->createFunction(camera_setLoopback));
     o.init_member("setKeyFrameInterval",
             gl->createFunction(camera_setKeyFrameInterval));
@@ -678,6 +678,13 @@ camera_setLoopback(const fn_call& fn)
 }
 
 as_value
+camera_setCursor(const fn_call& /*fn*/)
+{
+    LOG_ONCE(log_unimpl("Camera.setCursor"));
+    return as_value();
+}
+
+as_value
 camera_setKeyFrameInterval(const fn_call& fn)
 {
     boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
@@ -685,7 +692,7 @@ camera_setKeyFrameInterval(const fn_call& fn)
     
     int numargs = fn.nargs;
     if (numargs > 1) {
-        log_error("%s: Too many arguments", __FUNCTION__);
+        log_error("%s: Too many arguments", "Camera.setKeyFrameInterval");
     } else {
         ptr->set_loopback(fn.arg(0).to_int());
     }
