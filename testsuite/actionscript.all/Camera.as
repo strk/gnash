@@ -130,7 +130,7 @@ check_equals ( typeof(cam.motionLevel), 'number');
 check_equals ( typeof(cam.motionTimeout), 'number');
 check_equals ( typeof(cam.muted), 'boolean');
 check_equals ( typeof(cam.name), 'string');
-xcheck_equals ( typeof(cam.names), 'undefined');
+check_equals ( typeof(cam.names), 'undefined');
 check_equals ( typeof(cam.quality), 'number');
 check_equals ( typeof(cam.width), 'number');
 
