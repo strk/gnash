@@ -20,6 +20,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <vector>
 #include <string>
 #include <map>
@@ -69,6 +70,8 @@ private:
 
     std::vector<boost::shared_ptr<peer_t> > _peers;
     std::map<std::string, boost::shared_ptr<Handler> > _handlers;
+
+    boost::mutex _mutex;
 };
 
 /// \class cygnal::ThreadCounter of threads currently
