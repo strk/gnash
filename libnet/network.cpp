@@ -1352,14 +1352,19 @@ Network::waitForNetData(vector<int> &data)
 {
     GNASH_REPORT_FUNCTION;
 
+    int max = 0;
+    
     fd_set fdset;
     FD_ZERO(&fdset);
     
     for (size_t i = 0; i<data.size(); i++) {
 	FD_SET(data[i], &fdset);
+	if (data[i] > max) {
+	    max = data[i];
+	}
     }
 
-    return waitForNetData(data.size(), fdset);
+    return waitForNetData(max+1, fdset);
 }
 
 fd_set
@@ -1367,10 +1372,10 @@ Network::waitForNetData(int limit, fd_set files)
 {
     GNASH_REPORT_FUNCTION;
 
-    // select modifies this the set of file descriptors, and we don't
+    // select modifies the set of file descriptors, and we don't
     // want to modify the one passed as an argument, so we make a copy.
     fd_set fdset = files;
-    
+
     // Reset the timeout value, since select modifies it on return
     int timeout = _timeout;
     if (timeout <= 0) {
@@ -1415,6 +1420,8 @@ Network::waitForNetData(int limit, fd_set files)
 	log_debug (_("Waiting for data for fdset, timed out waiting for data"));
 	FD_ZERO(&fdset);
     }
+
+    log_network("select() saw activity on %d file descriptors.", ret);
 
     return fdset;
 }
