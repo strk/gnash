@@ -1096,69 +1096,6 @@ rtmp_handler(Network::thread_params_t *args)
 
     RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
     
-    // This handler is called everytime there is RTMP data on a socket to process the
-    // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
-    // only want to initialize the handshake once. This becomes important as the handshake
-    // is always sent as a large data block, 1536 bytes. Once we start reading packets,
-    // the default size is adjustable via the ChunkSize command.
-    if (initialize) {
-	// Read the handshake bytes sent by the client when requesting
-	// a connection.
-	boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(args->netfd);
-	// See if we have data in the handshake, we should have 1537 bytes
-	if (handshake1 == 0) {
-	    log_error("failed to read the handshake from the client.");
-	    return false;
-	}
-
-	// Send our response to the handshake, which primarily is the bytes
-	// we just recieved.
-// FIXME:	rtmp->handShakeResponse(args->netfd, *handshake1);
-    
-	boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(args->netfd);
-	// See if we have data in the handshake, we should have 1536 bytes
-	if (handshake2 == 0) {
-	    log_error("failed to read the handshake from the client.");
-	    return false;
-	}
-	// Don't assume the data we just read is a handshake.
-// FIXME: 	pkt = rtmp->serverFinish(args->netfd, *handshake1, *handshake2);
-	if (pkt == 0) {
-	    log_error("failed to read data from the end of the handshake from the client!");
-	    return false;
-	}
-	// We got data
-	if (pkt->allocated() > 0) {
-	    initialize = false;
-	}
-
-	// Send a ping to reset the new stream
-	boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_RESET, 0);
-	if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-			  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
-	    log_debug("Sent Ping to client");
-	} else {
-	    log_error("Couldn't send Ping to client!");
-	}
-
-    } else {
-	// Read the handshake bytes sent by the client when requesting
-	// a connection.
-    }
-
-    // See if this is a Red5 style echo test.
-    string::size_type pos;
-    if (tcurl) {
-	filespec = tcurl->to_string();
-	pos = filespec.rfind("/");
-	if (pos != string::npos) {
-	    if (filespec.substr(pos, filespec.size()-pos) == "/echo") {
-		log_debug("Red5 echo test request!");
-		echo = true;
-	    }
-	}
-    }
-    
     // Keep track of the network statistics
     // See if we have any messages waiting. After the initial connect, this is
     // the main loop for processing messages.
@@ -1183,8 +1120,23 @@ rtmp_handler(Network::thread_params_t *args)
 	    if (pkt->allocated()) {
 		boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 		boost::shared_ptr<RTMP::rtmp_head_t> qhead;
-		cerr << "FIXME1 incoming Que has " << que->size() << " messages." << endl;
 		for (size_t i=0; i<que->size(); i++) {
+#if 1
+		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
+//			que->at(i)->dump();
+		    if (bufptr) {
+			bufptr->dump();
+			qhead = rtmp->decodeHeader(bufptr->reference());
+			log_debug("Message for channel #%d", qhead->channel);
+			tmpptr = bufptr->reference() + qhead->head_size;
+			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
+			    boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
+			    log_debug("Processed Ping message from client, type %d", ping->type);
+			}
+		    }
+		    body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
+		    body->dump();
+#else
 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
 //			que->at(i)->dump();
 		    if (bufptr) {
@@ -1237,31 +1189,6 @@ rtmp_handler(Network::thread_params_t *args)
 					    }
 					    log_debug("Base path to files from connect is: %s", basepath);
 										
-					}
-					swfurl = body->findProperty("swfUrl");
-					if (swfurl) {
-					    log_debug("SWF filename making request is: %s", swfurl->to_string());
-					    // See if this is a Red5 style echo test.
-					    string::size_type pos;
-					    filespec = swfurl->to_string();
-					    pos = filespec.rfind("/");
-					    if (pos != string::npos) {
-						if (filespec.substr(pos, filespec.size()-pos) == "/echo_test.swf") {
-						    log_debug("Red5 echo test request!");
-						    echo = true;
-						}
-					    }
-					}
-					
-					response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-					
-					// Send a ping to reset the new stream
-					boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_RESET, 0);
-					if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-							  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
-					    log_debug("Sent Ping to client");
-					} else {
-					    log_error("Couldn't send Ping to client!");
 					}
 					
 				    }
@@ -1320,12 +1247,11 @@ rtmp_handler(Network::thread_params_t *args)
 		    } else {
 			log_error("Message contains no data!");
 		    }
+#endif
 		} // end of processing all the messages in the que
 		
 		// we're done processing these packets, so get rid of them
 		pkt.reset();
-
-
 		
 #if 0    
 		// This is support for the Red5 'echo_test', which exercises encoding and
