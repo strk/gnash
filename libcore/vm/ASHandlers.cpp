@@ -76,15 +76,6 @@ static gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 
 namespace gnash {
 
-namespace SWF { // gnash::SWF
-
-//
-// Utility: construct an object using given constructor.
-// This is used by both ActionNew and ActionNewMethod and
-// hides differences between builtin and actionscript-defined
-// constructors.
-//
-
 namespace {
 
     as_object* construct_object(as_function* ctor_as_func, as_environment& env,
@@ -92,34 +83,8 @@ namespace {
     as_object* convertToObject(Global_as& gl, const as_value& val);
 }
 
+namespace SWF { // gnash::SWF
 
-namespace {
-
-as_object*
-convertToObject(Global_as& gl, const as_value& val)
-{
-
-    try {
-        return val.to_object(gl).get();
-    }
-    catch (const GnashException& gl) {
-        return 0;
-    }
-
-}
-
-as_object*
-construct_object(as_function* ctor_as_func, as_environment& env,
-        unsigned int nargs)
-{
-    assert(ctor_as_func);
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->reserve(nargs);
-    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop());
-    return ctor_as_func->constructInstance(env, args).get();
-}
-
-}
 
 
 static void unsupported_action_handler(ActionExec& thread)
@@ -1479,8 +1444,6 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
     
 //    TODO: This doesn't work quite right, yet.
     as_environment& env = thread.env;
-
-    
 
     as_value objval = env.pop();
     as_object *obj = convertToObject(*getGlobal(thread.env), objval);
@@ -4181,5 +4144,39 @@ SWFHandlers::action_name(ActionType x) const
 }
 
 } // namespace gnash::SWF
+
+/// Helper functions.
+namespace {
+
+as_object*
+convertToObject(Global_as& gl, const as_value& val)
+{
+
+    try {
+        return val.to_object(gl).get();
+    }
+    catch (const GnashException& gl) {
+        return 0;
+    }
+
+}
+
+// Utility: construct an object using given constructor.
+// This is used by both ActionNew and ActionNewMethod and
+// hides differences between builtin and actionscript-defined
+// constructors.
+as_object*
+construct_object(as_function* ctor_as_func, as_environment& env,
+        unsigned int nargs)
+{
+    assert(ctor_as_func);
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->reserve(nargs);
+    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop());
+    return ctor_as_func->constructInstance(env, args).get();
+}
+
+}
+
 
 } // namespace gnash
