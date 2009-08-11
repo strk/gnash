@@ -31,9 +31,9 @@ CGI_DIR = cgi-bin
 EXTRA_DIST = cygnalrc.in
 CLEANFILES = cygnalrc
 
-SUBDIRS = \
-	$(TEST_DIR) \
-	$(CGI_BIN)
+SUBDIRS = . \
+	$(CGI_DIR) \
+	$(TEST_DIR)
 
 # these need to be included in a distribution, even if not part
 # of the top level configure options.
