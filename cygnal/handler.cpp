@@ -80,7 +80,9 @@ Handler::sync(int in_fd)
 }
 
 size_t
-Handler::addClient(int x, protocols_supported_e proto) {
+Handler::addClient(int x, protocols_supported_e proto)
+{
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _clients.push_back(x);
     _protocol[x] = proto;
@@ -89,10 +91,27 @@ Handler::addClient(int x, protocols_supported_e proto) {
 };
 
 void
-Handler::removeClient(int x) {
+Handler::removeClient(int x)
+{
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _clients.erase(_clients.begin()+x);
 };
+
+bool 
+Handler::initialized()
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_file.empty()
+	&& (_clients.size() == 1)
+	&& !_local
+	&& _remote.empty()
+	&& !_plugin) {
+	return false;
+    }
+
+    return true;
+}
 
 // Dump internal data.
 void

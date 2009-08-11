@@ -111,7 +111,9 @@ public:
     /// \method addRemote
     ///     Add a remote machine to the list for input messages.
     size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };
-    
+
+    bool initialized();
+
     // Dump internal data.
     void dump();    
 
