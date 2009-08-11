@@ -84,15 +84,38 @@ namespace SWF { // gnash::SWF
 // hides differences between builtin and actionscript-defined
 // constructors.
 //
-static as_object*
+
+namespace {
+
+    as_object* construct_object(as_function* ctor_as_func, as_environment& env,
+            unsigned int nargs);
+    as_object* convertToObject(Global& gl, as_value& val);
+}
+
+as_object*
+convertToObject(Global& gl, as_value& val)
+{
+
+    try {
+        return val.to_object(gl);
+    }
+    catch (const GnashException& gl) {
+        return 0;
+    }
+
+}
+
+as_object*
 construct_object(as_function* ctor_as_func, as_environment& env,
         unsigned int nargs)
 {
     assert(ctor_as_func);
-    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value> );
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
     args->reserve(nargs);
     for (size_t i=0; i<nargs; ++i) args->push_back(env.pop());
     return ctor_as_func->constructInstance(env, args).get();
+}
+
 }
 
 
