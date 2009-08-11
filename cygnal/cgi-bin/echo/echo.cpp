@@ -48,6 +48,15 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
 
+extern "C" {
+    void
+    echo_class_init()
+    {
+	GNASH_REPORT_FUNCTION;
+	// do whatever is required
+    }
+} // end of extern C
+
 int
 main(int argc, char *argv[])
 {

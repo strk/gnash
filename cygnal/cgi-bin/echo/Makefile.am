@@ -18,9 +18,11 @@
 AUTOMAKE_OPTIONS = 
 
 # this is where Gnash plugins get installed
-cgidir = $(libdir)/gnash/cygnal
+cgidir = $(libdir)/cygnal
 
-bin_PROGRAMS = echo gateway
+bin_PROGRAMS = gateway
+
+cgi_LTLIBRARIES = echo.la
 
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
@@ -31,26 +33,26 @@ GNASH_LIBS = \
 	$(NULL)
 
 INCLUDES = \
-            -I$(top_srcdir)/libbase \
-	    -I$(top_srcdir)/libamf \
-	    -I$(top_srcdir)/libnet \
-	    -I$(top_srcdir)/libcore \
-	    -I$(top_srcdir)/cygnal \
-	    $(BOOST_CFLAGS)
+        -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/cygnal \
+	$(BOOST_CFLAGS)
 
-echo_SOURCES = echo.cpp echo.h
-echo_LDFLAGS = # -module -avoid-version -no-undefined
-echo_LDADD =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
+echo_la_SOURCES = echo.cpp echo.h
+echo_la_LDFLAGS = -module -avoid-version -no-undefined
+echo_la_LIBADD  =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
 gateway_SOURCES = gateway.cpp echo.h 
 gateway_LDFLAGS = # -module -avoid-version -no-undefined
-gateway_LDADD = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
+gateway_LDADD   = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
 
 CLEANFILES = \
       gnash-dbg.log
 
-# install-cgiLTLIBRARIES: $(cgi_LTLIBRARIES)
-# 	test -d "$(DESTDIR)$(cgidir)" || $(mkinstalldirs) "$(DESTDIR)$(cgidir)"
-# 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(cgi_LTLIBRARIES) "$(DESTDIR)$(cgidir)/$(cgi_LTLIBRARIES)"
-# 	$(RM) $(DESTDIR)$(cgidir)/*.a 
+install-cgiLTLIBRARIES: $(cgi_LTLIBRARIES)
+	test -d "$(DESTDIR)$(cgidir)" || $(mkinstalldirs) "$(DESTDIR)$(cgidir)"
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(cgi_LTLIBRARIES) "$(DESTDIR)$(cgidir)/$(cgi_LTLIBRARIES)"
+	$(RM) $(DESTDIR)$(cgidir)/*.a $(DESTDIR)$(cgidir)/*.la

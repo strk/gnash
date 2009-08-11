@@ -58,6 +58,11 @@ private:
     
 };  
 
+extern "C" {
+    void echo_class_init(); 
+    /// Return an  instance
+}
+
 } // end of cygnal namespace
 #endif  // end of __ECHO_H__
 
