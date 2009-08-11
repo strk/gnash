@@ -160,9 +160,19 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         std::ostringstream data;
         toString(data, true);
 
-    	std::string getURL = urlstr + "?" + data.str();
-        log_debug("Using GET method for sendAndLoad: %s", getURL);
-        str = ri.streamProvider().getStream(getURL);
+        const std::string& dataString = data.str();
+
+        // Any data must be added to the existing querystring.
+        if (!dataString.empty()) {
+
+            std::string existingQS = url.querystring();
+            if (!existingQS.empty()) existingQS += "&";
+
+            url.set_querystring(existingQS + data.str());
+        }
+
+        log_debug("Using GET method for sendAndLoad: %s", url.str());
+        str = ri.streamProvider().getStream(url.str());
     }
 
 	log_security(_("Loading from url: '%s'"), url.str());

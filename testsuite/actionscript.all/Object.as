@@ -220,6 +220,23 @@ check_equals( copy.test, 4 );
 check_equals( obj3.test, 4 );
 check (copy.__proto__.constructor == Object);
 
+o = new Object("hello");
+check_equals(o.toString(), "hello");
+check_equals(o.valueOf(), "hello");
+
+o = new Object(5);
+check_equals(o.toString(), "5");
+check_equals(o.valueOf(), 5);
+
+o = new Object(undefined);
+check_equals(o.toString(), "[object Object]");
+check_equals(typeof(o.valueOf()), "object");
+check_equals(o.valueOf(), o);
+
+o = new Object(null);
+check_equals(o.toString(), "[object Object]");
+check_equals(typeof(o.valueOf()), "object");
+check_equals(o.valueOf(), o);
 
 //---------------------------------------------
 // Test addProperty / hasOwnProperty (SWF6 up)
@@ -901,11 +918,42 @@ check_equals(typeof(result), "string");
 check_equals(resolveCalled, 3);
 check_equals(result, "quibbleDibblePropertyWithASillyName");
 
+////////////////////////////////
+
+// Messing about here with global classes may ruin later tests, so don't add
+// them after this.
+
+s = "hi";
+n = 7;
+b = true;
+
+delete String;
+
+o = new Object(s);
+check_equals(typeof(o), "undefined");
+o = new Object(n);
+check_equals(typeof(o), "object");
+check_equals(o.toString(), "7");
+o = new Object(b);
+check_equals(typeof(o), "object");
+check_equals(o.toString(), "true");
+
+delete Number;
+o = new Object(n);
+check_equals(typeof(o), "undefined");
+o = new Object(b);
+check_equals(typeof(o), "object");
+check_equals(o.toString(), "true");
+
+delete Boolean;
+o = new Object(b);
+check_equals(typeof(o), "undefined");
+
 #if OUTPUT_VERSION <= 5
-totals(97);
+totals(116);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(285);
+totals(304);
 #endif
 

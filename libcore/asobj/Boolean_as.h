@@ -29,9 +29,6 @@ class Global_as;
 
 /// Initialize the global Boolean class
 void boolean_class_init(as_object& global, const ObjectURI& uri);
-
-/// Return a Boolean instance (in case the core lib needs it)
-as_object* init_boolean_instance(Global_as& g, bool val);
   
 } // end of gnash namespace
 

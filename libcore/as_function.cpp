@@ -174,6 +174,11 @@ as_function::constructInstance(const as_environment& env,
             // reasonable, but anything else shouldn't be caught here.
 			log_debug("Native function called as constructor threw exception: "
                     "%s", ex.what());
+
+            // If a constructor throws an exception, throw it back to the
+            // caller. This is the only way to signal that a constructor
+            // did not return anything.
+            throw;
 		}
 
 		if (ret.is_object()) newobj = ret.to_object(*getGlobal(env));
@@ -182,7 +187,9 @@ as_function::constructInstance(const as_environment& env,
 			newobj = new as_object();
 		}
 
-		assert(newobj); // we assume builtin functions do return objects !!
+        // There should always be an object by this stage. Failed constructors
+        // are handled in the catch.
+		assert(newobj); 
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked). NOTE that we assume the builtin constructors

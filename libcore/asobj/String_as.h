@@ -31,15 +31,6 @@ class Global_as;
 // Initialize the global String class
 void string_class_init(as_object& global, const ObjectURI& uri);
 
-/// Return a String instance (possibibly NULL!)
-//
-/// This function will use the native String constructor in SWF5, but
-/// any function registered by user as the _global.String for SWF6 and higher.
-/// In the second case, not finding a proper constructor might result in
-/// returning the NULL object.
-///
-as_object* init_string_instance(Global_as& g, const std::string& val);
-
 void registerStringNative(as_object& global);
 
 }

@@ -198,7 +198,8 @@ getNumberInterface()
 
 
 // extern (used by Global.cpp)
-void number_class_init(as_object& global, const ObjectURI& uri)
+void
+number_class_init(as_object& global, const ObjectURI& uri)
 {
     boost::intrusive_ptr<as_object> cl = getNumberClass(*getGlobal(global));
 
@@ -208,20 +209,4 @@ void number_class_init(as_object& global, const ObjectURI& uri)
 
 }
 
-as_object*
-init_number_instance(Global_as& g, double val)
-{
-    boost::intrusive_ptr<as_object> cl = getNumberClass(g);
-    as_function* ctor = cl->to_function();
-    if (!ctor) return 0;
-
-    as_environment env(getVM(g));
-
-    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    args->push_back(val);
-
-    return ctor->constructInstance(env, args).get();
-}
-
-  
 } // namespace gnash

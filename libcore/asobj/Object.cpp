@@ -170,31 +170,24 @@ as_value
 object_ctor(const fn_call& fn)
 {
     Global_as* gl = getGlobal(fn);
+    as_object* proto = getObjectInterface();
 
 	if (fn.nargs == 1) {
-
         as_object* obj = fn.arg(0).to_object(*gl).get();
-
-        /// If it's not an object, return a simple object, not null.
-        if (!obj) return gl->createObject();
-
-		return as_value(obj);
+        if (obj) return as_value(obj);
 	}
 
-	if (fn.nargs) {
+	if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(_("Too many args to Object constructor"));
 		);
 	}
 
     if (!fn.isInstantiation()) {
-        return gl->createObject();;
+        return gl->createObject();
     }
 
-    as_object* proto = getObjectInterface();
-    boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
-
-	return as_value(obj.get()); 
+    return gl->createObject(proto);
 }
 
 
