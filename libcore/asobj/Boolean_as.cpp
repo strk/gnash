@@ -38,7 +38,6 @@ namespace {
     as_value boolean_valueof(const fn_call& fn);
     as_value boolean_ctor(const fn_call& fn);
     void attachBooleanInterface(as_object& o);
-    as_object* getBooleanClass(Global_as& g);
     as_object* getBooleanInterface();
 }
 
@@ -68,31 +67,22 @@ private:
 };
 
 // extern (used by Global.cpp)
-void boolean_class_init(as_object& global, const ObjectURI& uri)
+void
+boolean_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the global Boolean "class"/"function"
-    boost::intrusive_ptr<as_object> cl = getBooleanClass(*getGlobal(global));
+    as_object* proto = getBooleanInterface();
+    Global_as* gl = getGlobal(where);
+    as_object* cl = gl->createClass(&boolean_ctor, proto);
 
     // Register _global.Boolean
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }
 
 namespace {
 
-as_object*
-getBooleanClass(Global_as& g)
-{
-    static as_object* cl = 0;
-
-    if (!cl) {
-        as_object* proto = getBooleanInterface();
-        cl = g.createClass(&boolean_ctor, proto);
-        VM::get().addStatic(cl);
-    }
-    return cl;
-}
 
 void
 attachBooleanInterface(as_object& o)
