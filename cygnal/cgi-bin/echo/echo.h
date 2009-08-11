@@ -32,6 +32,7 @@
 #include "buffer.h"
 #include "element.h"
 #include "http.h"
+#include "cygnal.h"
 
 // cygnal headers
 #include "rtmp_server.h"
@@ -59,8 +60,10 @@ private:
 };  
 
 extern "C" {
-    void echo_class_init(); 
-    /// Return an  instance
+    boost::shared_ptr<Cygnal::cygnal_init_t> echo_class_init(); 
+    // the standard API
+    size_t echo_read_func(boost::uint8_t *data, size_t size);
+    size_t echo_write_func(boost::uint8_t *data, size_t size);
 }
 
 } // end of cygnal namespace

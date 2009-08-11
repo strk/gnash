@@ -26,6 +26,7 @@ cgi_LTLIBRARIES = echo.la
 
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(PTHREAD_LIBS) \

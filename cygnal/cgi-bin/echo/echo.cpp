@@ -35,6 +35,7 @@
 
 // cygnal headers
 #include "echo.h"
+#include "cygnal.h"
 
 using namespace amf;
 using namespace gnash;
@@ -48,13 +49,36 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
 
+static EchoTest echo;
+
 extern "C" {
-    void
+    
+    boost::shared_ptr<Cygnal::cygnal_init_t>
     echo_class_init()
     {
 	GNASH_REPORT_FUNCTION;
-	// do whatever is required
+        // the standard API
+        
+        boost::shared_ptr<Cygnal::cygnal_init_t> init(new Cygnal::cygnal_init_t);
+//     init.read_func = read_func;
+//     init.write_func = write_func;
+        
+        return init;
     }
+
+    size_t echo_read_func(boost::uint8_t *data, size_t size)
+    {
+	GNASH_REPORT_FUNCTION;
+
+        GNASH_REPORT_RETURN;
+    }
+    size_t echo_write_func(boost::uint8_t *data, size_t size)
+    {
+	GNASH_REPORT_FUNCTION;
+
+        GNASH_REPORT_RETURN;
+    }
+    
 } // end of extern C
 
 int
