@@ -220,6 +220,31 @@ check_equals( copy.test, 4 );
 check_equals( obj3.test, 4 );
 check (copy.__proto__.constructor == Object);
 
+o = new Object("hello");
+check_equals(o.toString(), "hello");
+check_equals(o.valueOf(), "hello");
+
+o = new Object(5);
+check_equals(o.toString(), "5");
+check_equals(o.valueOf(), 5);
+
+o = new Object(undefined);
+xcheck_equals(o.toString(), "[object Object]");
+xcheck_equals(typeof(o.valueOf()), "object");
+#if OUTPUT_VERSION < 6
+check_equals(o.valueOf(), o);
+#else
+xcheck_equals(o.valueOf(), o);
+#endif
+
+o = new Object(null);
+xcheck_equals(o.toString(), "[object Object]");
+xcheck_equals(typeof(o.valueOf()), "object");
+#if OUTPUT_VERSION < 6
+check_equals(o.valueOf(), o);
+#else
+xcheck_equals(o.valueOf(), o);
+#endif
 
 //---------------------------------------------
 // Test addProperty / hasOwnProperty (SWF6 up)
@@ -902,10 +927,10 @@ check_equals(resolveCalled, 3);
 check_equals(result, "quibbleDibblePropertyWithASillyName");
 
 #if OUTPUT_VERSION <= 5
-totals(97);
+totals(107);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(285);
+totals(295);
 #endif
 
