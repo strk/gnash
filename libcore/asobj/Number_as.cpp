@@ -37,7 +37,6 @@ namespace gnash {
 
 namespace {
     as_object* getNumberInterface();
-    as_object* getNumberClass();
 }
 
 class Number_as : public as_object
@@ -135,9 +134,7 @@ void
 attachNumberInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-
     o.init_member("toString", gl->createFunction(number_toString));
-
     o.init_member("valueOf", gl->createFunction(number_valueOf));
 }
 
@@ -145,9 +142,7 @@ void
 attachNumberStaticInterface(as_object& o)
 {
     // constant flags
-    const int cflags = PropFlags::dontEnum | 
-        PropFlags::dontDelete | 
-        PropFlags::readOnly;
+    const int cflags = as_object::DefaultFlags | PropFlags::readOnly;
 
     // Set __proto__ and constructor to constant.
     as_value null; null.set_null();
@@ -162,22 +157,6 @@ attachNumberStaticInterface(as_object& o)
             as_value(std::numeric_limits<double>::infinity()), cflags);
     o.init_member("NEGATIVE_INFINITY",
             as_value(-std::numeric_limits<double>::infinity()), cflags);
-}
-
-as_object*
-getNumberClass(Global_as& gl)
-{
-    // This is going to be the global Number "class"/"function"
-    static as_object* cl = 0;
-
-    as_object* proto = getNumberInterface();
-    if (!cl) {
-        cl = gl.createClass(&number_ctor, proto);
-        attachNumberStaticInterface(*cl);
-        VM::get().addStatic(cl);
-    }
-
-    return cl;
 }
 
 as_object*
@@ -199,12 +178,15 @@ getNumberInterface()
 
 // extern (used by Global.cpp)
 void
-number_class_init(as_object& global, const ObjectURI& uri)
+number_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl = getNumberClass(*getGlobal(global));
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getNumberInterface();
+    as_object* cl = gl->createClass(&number_ctor, proto);
+    attachNumberStaticInterface(*cl);
 
     // Register _global.Number
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }
