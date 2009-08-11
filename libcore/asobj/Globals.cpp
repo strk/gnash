@@ -213,7 +213,36 @@ AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 as_object*
 AVM1Global::createString(const std::string& s)
 {
-    return init_string_instance(*this, s);
+    // This is not really correct. If there is no String class, to_object()
+    // returns an undefined value, not a null object. The behaviour is the
+    // same for versions 5 to 8.
+
+    as_value clval;
+
+    if (!get_member(NSV::CLASS_STRING, &clval) ) {
+        log_debug("UNTESTED: String instantiation requested but "
+                "_global doesn't contain a 'String' symbol. Returning "
+                "the NULL object.");
+        return 0;
+    }
+    
+    if (!clval.is_function()) {
+        log_debug("UNTESTED: String instantiation requested but "
+                "_global.String is not a function (%s). Returning "
+                "the NULL object.", clval);
+        return 0;
+    }
+    
+    as_function* ctor = clval.to_as_function();
+
+    if (!ctor) return 0;
+
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(s);
+    as_environment env(_vm);
+    as_object* ret = ctor->constructInstance(env, args).get();
+
+    return ret;
 }
 
 as_object*
@@ -257,7 +286,36 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 as_object*
 AVM2Global::createString(const std::string& s)
 {
-    return init_string_instance(*this, s);
+
+    // What AVM2 does for createString is untested, so we do the same
+    // as AVM1 for now.
+
+    as_value clval;
+
+    if (!get_member(NSV::CLASS_STRING, &clval) ) {
+        log_debug("UNTESTED: String instantiation requested but "
+                "_global doesn't contain a 'String' symbol. Returning "
+                "the NULL object.");
+        return 0;
+    }
+    
+    if (!clval.is_function()) {
+        log_debug("UNTESTED: String instantiation requested but "
+                "_global.String is not a function (%s). Returning "
+                "the NULL object.", clval);
+        return 0;
+    }
+    
+    as_function* ctor = clval.to_as_function();
+
+    if (!ctor) return 0;
+
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(s);
+    as_environment env(_vm);
+    as_object* ret = ctor->constructInstance(env, args).get();
+
+    return ret;
 }
 
 as_object*

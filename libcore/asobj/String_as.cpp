@@ -110,49 +110,8 @@ private:
     std::string _string;
 };
 
-as_object*
-init_string_instance(Global_as& g, const std::string& val)
-{
-	as_environment env(getVM(g));
-
-	int swfVersion = getSWFVersion(g);
-
-	boost::intrusive_ptr<as_function> ctor;
-
-	if ( swfVersion < 6 ) {
-		as_object* sc = getStringConstructor(g);
-        if (sc) ctor = sc->to_function();
-	}
-	else {
-		as_value clval;
-
-		if (!g.get_member(NSV::CLASS_STRING, &clval) ) {
-			log_debug("UNTESTED: String instantiation requested but "
-                    "_global doesn't contain a 'String' symbol. Returning "
-                    "the NULL object.");
-			return ctor.get();
-		}
-		else if (!clval.is_function()) {
-			log_debug("UNTESTED: String instantiation requested but "
-                    "_global.String is not a function (%s). Returning "
-                    "the NULL object.", clval);
-			return ctor.get();
-		}
-		else {
-			ctor = clval.to_as_function();
-		}
-	}
-
-    if (!ctor.get()) return ctor.get();
-
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(val);
-	boost::intrusive_ptr<as_object> ret = ctor->constructInstance(env, args);
-
-	return ret.get();
-}
-
-void registerStringNative(as_object& global)
+void
+registerStringNative(as_object& global)
 {
     VM& vm = getVM(global);
 	vm.registerNative(as_object::tostring_method, 251, 1);
