@@ -133,7 +133,7 @@ Extension::scanAndLoad(as_object& where)
     std::vector<std::string>::iterator it;
     for (it = _modules.begin(); it != _modules.end(); it++) {
         const std::string& mod = *it;
-        log_security(_("Loading module: %s"), mod);
+        log_security(_("Loading module: %s from %s"), mod, _pluginsdir);
         initModule(mod, where);
     }
     return true;
@@ -146,7 +146,7 @@ Extension::initModule(const std::string& module, as_object &where)
     SharedLib *sl;
     std::string symbol(module);
 
-    log_security(_("Initializing module: \"%s\""), symbol);
+    log_security(_("Initializing module: \"%s\" from %"), symbol, _pluginsdir);
     
     if (_plugins[module] == 0) {
         sl = new SharedLib(module);
