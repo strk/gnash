@@ -24,9 +24,9 @@ if TESTSUITE
 TEST_DIR = #testsuite
 endif
 
-if USE_CGI
+#if USE_CGI
 CGI_DIR = cgi-bin
-endif
+#endif
 
 EXTRA_DIST = cygnalrc.in
 CLEANFILES = cygnalrc
