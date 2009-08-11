@@ -41,12 +41,9 @@ namespace {
 
 class Number_as : public as_object
 {
-    // the number value
-    double _val;
-
 public:
 
-    Number_as(double val = 0.0)
+    Number_as(double val)
         :
         as_object(getNumberInterface()),
         _val(val)
@@ -69,6 +66,12 @@ public:
     {
         return _val;
     }
+
+private:
+    
+    // the number value
+    double _val;
+
 
 };
 

@@ -69,7 +69,6 @@ namespace {
     size_t validIndex(const std::wstring& subject, int index);
     void attachStringInterface(as_object& o);
     as_object* getStringInterface();
-    as_object* getStringConstructor(Global_as& gl);
 
     inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
             const std::string& function);
@@ -134,17 +133,18 @@ registerStringNative(as_object& global)
 
 // extern (used by Global.cpp)
 void
-string_class_init(as_object& global, const ObjectURI& uri)
+string_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the global String "class"/"function"
-    boost::intrusive_ptr<as_object> cl =
-        getStringConstructor(*getGlobal(global));
+    
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getStringInterface();
+    as_object* cl = gl->createClass(&string_ctor, proto);
 
-    // Register _global.String (should be only visible from SWF5 up)
-    // TODO: register as ASnative(251, 0)
-    // TODO: register as ASnative(3, 0) for SWF5 ?
+    cl->init_member("fromCharCode", getVM(*gl).getNative(251, 14)); 
+
     int flags = PropFlags::dontEnum; 
-    global.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
+    where.init_member(getName(uri), cl, flags, getNamespace(uri));
 }
 
 
@@ -174,17 +174,31 @@ attachStringInterface(as_object& o)
 as_object*
 getStringInterface()
 {
+
+    if (isAS3(VM::get())) {
+        static boost::intrusive_ptr<as_object> o;
+
+        if ( o == NULL )
+        {
+            o = new as_object(getObjectInterface());
+            VM::get().addStatic(o.get());
+
+            attachStringInterface(*o);
+        }
+        return o.get();
+    }
+
     static boost::intrusive_ptr<as_object> o;
 
     if ( o == NULL )
     {
         o = new as_object(getObjectInterface());
-	    VM::get().addStatic(o.get());
+        VM::get().addStatic(o.get());
 
         attachStringInterface(*o);
     }
-
     return o.get();
+
 }
 
 // all the arguments will be converted to string and concatenated.
@@ -584,7 +598,6 @@ string_indexOf(const fn_call& fn)
 as_value
 string_fromCharCode(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
     const int version = getSWFVersion(fn);
 
@@ -823,23 +836,6 @@ string_ctor(const fn_call& fn)
 
 	return as_value(obj.get());
 }
-
-as_object*
-getStringConstructor(Global_as& gl)
-{
-    // This is going to be the global String "class"/"function"
-
-    static as_object* cl = 0;
-
-    as_object* proto = getStringInterface();
-    if (!cl) {
-        cl = gl.createClass(&string_ctor, proto);
-	    cl->init_member("fromCharCode", getVM(gl).getNative(251, 14)); 
-    }
-
-    return cl;
-}
-
 
 /// Check the number of arguments, returning false if there
 /// aren't enough, or true if there are either enough or too many.
