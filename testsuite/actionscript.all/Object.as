@@ -938,7 +938,7 @@ b = true;
 delete String;
 
 o = new Object(s);
-check_equals(typeof(o), "undefined");
+xcheck_equals(typeof(o), "undefined");
 o = new Object(n);
 check_equals(typeof(o), "object");
 check_equals(o.toString(), "7");
@@ -948,14 +948,14 @@ check_equals(o.toString(), "true");
 
 delete Number;
 o = new Object(n);
-check_equals(typeof(o), "undefined");
+xcheck_equals(typeof(o), "undefined");
 o = new Object(b);
 check_equals(typeof(o), "object");
 check_equals(o.toString(), "true");
 
 delete Boolean;
 o = new Object(b);
-check_equals(typeof(o), "undefined");
+xcheck_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
 totals(116);
