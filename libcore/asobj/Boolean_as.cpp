@@ -46,12 +46,7 @@ class Boolean_as: public as_object
 
 public:
 
-    Boolean_as()
-        :
-        as_object(getBooleanInterface())
-    {}
-
-    Boolean_as(bool val)
+    explicit Boolean_as(bool val)
         :
         as_object(getBooleanInterface())
     {
