@@ -60,7 +60,7 @@ private:
 };  
 
 extern "C" {
-    boost::shared_ptr<Cygnal::cygnal_init_t> echo_class_init(); 
+    boost::shared_ptr<Handler::cygnal_init_t> echo_class_init(); 
     // the standard API
     size_t echo_read_func(boost::uint8_t *data, size_t size);
     size_t echo_write_func(boost::uint8_t *data, size_t size);

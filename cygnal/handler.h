@@ -50,12 +50,15 @@
 
 #include "diskstream.h"
 #include "sharedlib.h"
+#include "extension.h"
 
 // _definst_ is the default instance name
 namespace cygnal
 {
 
-class Handler
+class Cygnal;
+
+class Handler : public gnash::Extension
 {
 public:
     /// \enum admin_cmd_e
@@ -80,6 +83,12 @@ public:
 	DTN
     } protocols_supported_e;
     
+    typedef size_t (*cygnal_io_t )(boost::uint8_t *data, size_t size);
+    typedef struct {
+  	cygnal_io_t read_func;
+  	cygnal_io_t write_func;
+	protocols_supported_e protocol;
+    } cygnal_init_t;
      DSOEXPORT Handler();
     ~Handler();
 
@@ -111,12 +120,32 @@ public:
     ///     Add a remote machine to the list for input messages.
     size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };
 
+    void setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &init);
+    void setPlugin(Handler::cygnal_io_t read_ptr, Handler::cygnal_io_t write_ptr );
+
+    /// Initialize the named module within Cygnal
+    //
+    boost::shared_ptr<cygnal_init_t> initModule(const std::string& module);
+
+    /// \method initialized
+    ///     See if any of the cgi-bins has been loaded.
     bool initialized();
 
     // Dump internal data.
     void dump();    
 
 protected:
+
+    size_t writeToPlugin(amf::Buffer &buf) {
+	return writeToPlugin(buf.begin(), buf.allocated()); };
+    size_t writeToPlugin(boost::uint8_t *data, size_t size);
+
+    size_t readFromPlugin(amf::Buffer &buf) {
+	return readFromPlugin(buf.begin(), buf.allocated()); };
+    boost::shared_ptr<amf::Buffer> readFromPlugin();
+    boost::shared_ptr<amf::Buffer> readFromPlugin(int x);
+    size_t readFromPlugin(boost::uint8_t *data, size_t size);
+
     /// \var _name
     ///	    The name of the path this handler is supporting.
     std::string				_name;
@@ -142,7 +171,7 @@ protected:
     boost::shared_ptr<cygnal::Proc>	_local;
     /// \var _plugins
     ///	    is for the dynamically loaded applications
-    boost::shared_ptr<gnash::SharedLib> _plugin;
+    boost::shared_ptr<cygnal_init_t>	_plugin;
     /// \var _file
     ///	    is for disk based files
     std::vector<boost::shared_ptr<gnash::DiskStream> > _file;

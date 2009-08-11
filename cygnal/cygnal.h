@@ -36,16 +36,10 @@ namespace cygnal {
 
 /// \class cygnal::Cygnal
     
-    class Cygnal : public gnash::Extension
+class Cygnal
 {
 public:
-    typedef size_t (*cygnal_io_t )(boost::uint8_t *data, size_t size);
-    typedef struct {
-  	cygnal_io_t read_func;
-  	cygnal_io_t write_func;
-	Handler::protocols_supported_e protocol;
-    } cygnal_init_t;
-    typedef cygnal_init_t (*initentry_t)();
+    typedef Handler::cygnal_init_t (*initentry_t)();
     
     typedef struct {
 	std::string hostname;
@@ -71,12 +65,6 @@ public:
     boost::shared_ptr<Handler> findHandler(const std::string &path);
     void removeHandler(const std::string &path);
 
-    /// Initialize the named module within Gnash
-    //
-    /// @param symbol   The name of the module to find and
-    ///                 initialize.
-    /// @param obj      The object to attach the module to.
-    bool initModule(const std::string& module);
 
     void dump();
 

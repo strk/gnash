@@ -36,6 +36,7 @@
 // cygnal headers
 #include "echo.h"
 #include "cygnal.h"
+#include "handler.h"
 
 using namespace amf;
 using namespace gnash;
@@ -53,13 +54,13 @@ static EchoTest echo;
 
 extern "C" {
     
-    boost::shared_ptr<Cygnal::cygnal_init_t>
+    boost::shared_ptr<Handler::cygnal_init_t>
     echo_class_init()
     {
 	GNASH_REPORT_FUNCTION;
         // the standard API
         
-        boost::shared_ptr<Cygnal::cygnal_init_t> init(new Cygnal::cygnal_init_t);
+        boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
 //     init.read_func = read_func;
 //     init.write_func = write_func;
         

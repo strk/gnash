@@ -327,60 +327,6 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
     }
 }
 
-bool
-Cygnal::initModule(const std::string& module)
-{
-//     GNASH_REPORT_FUNCTION;
-
-    SharedLib *sl;
-    std::string symbol(module);
-
-    log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
-    
-    _pluginsdir = "/usr/local/lib/cygnal/";
-    lt_dlsetsearchpath(_pluginsdir.c_str());
-
-    if (_plugins[module] == 0) {
-        sl = new SharedLib(module);
-        sl->openLib();
-        _plugins[module] = sl;
-    } else {
-        sl = _plugins[module];
-    }
-
-    // Look for the "module"_read_init function we'll use to get data
-    // from the cgi-bin as a dynamically loadable plugin.
-    symbol.append("_read_func");
-    
-    Cygnal::cygnal_io_t read_symptr = reinterpret_cast<Cygnal::cygnal_io_t>
-	(sl->getInitEntry(symbol));
-
-     if (!read_symptr) {    
-         log_error(_("Couldn't get %s symbol"), symbol);
- 	 return false;
-     }
-
-     boost::uint8_t foo[10];	// FIXME: testing crap
-
-     read_symptr(foo, 10);
-
-     // Look for the "module"_write_init function we'll use to send data
-     // to the cgi-bin as a dynamically loadable plugin.
-     symbol = module;
-     symbol.append("_write_func");
-     Cygnal::cygnal_io_t write_symptr = reinterpret_cast<Cygnal::cygnal_io_t>
-	(sl->getInitEntry(symbol));
-
-     if (!write_symptr) {    
-         log_error(_("Couldn't get %s symbol"), symbol);
-	 return false;
-     }
-
-     write_symptr(foo, 10);
-    
-    return true;
-}
-
 void
 Cygnal::removeHandler(const std::string &path)
 {
@@ -531,13 +477,6 @@ main(int argc, char *argv[])
     // load the file of peers. A peer is another instance of Cygnal
     cyg.loadPeersFile();
 
-    char *env = std::getenv("CYGNAL_PLUGINS");
-    if (!env) {
-        cyg.scanDir("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/cygnal/cygnal/cgi-bin/echo/.libs:/usr/local/lib/cygnal");
-    }
-    else {
-        cyg.scanDir(env);
-    }
 //    cyg.dump();
 
     // Trap ^C (SIGINT) so we can kill all the threads
@@ -902,9 +841,21 @@ connection_handler(Network::thread_params_t *args)
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
 
-		const string str("echo");
- 		cyg.initModule(str);
+		string str(url.path());
+		if (str[0] == '/') {
+		    str.erase(0,1);
+		}
+		char *env = std::getenv("CYGNAL_PLUGINS");
+		if (!env) {
+		    hand->scanDir("/usr/lib/cygnal:/usr/local/lib/cygnal");
+		}
+		else {
+		    hand->scanDir(env);
+		}
+		boost::shared_ptr<Handler::cygnal_init_t> init = 
+		    hand->initModule(str);
 		
+		hand->setPlugin(init);
 		event_handler(args);
 
 		// We're done, close this network connection
