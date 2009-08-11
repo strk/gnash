@@ -84,15 +84,15 @@ namespace SWF { // gnash::SWF
 // hides differences between builtin and actionscript-defined
 // constructors.
 //
-static boost::intrusive_ptr<as_object>
-construct_object(as_function* ctor_as_func,
-    as_environment& env, unsigned int nargs)
+static as_object*
+construct_object(as_function* ctor_as_func, as_environment& env,
+        unsigned int nargs)
 {
     assert(ctor_as_func);
     std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value> );
     args->reserve(nargs);
-    for (unsigned int i=0; i<nargs; ++i) args->push_back(env.pop());
-    return ctor_as_func->constructInstance(env, args);
+    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop());
+    return ctor_as_func->constructInstance(env, args).get();
 }
 
 
@@ -2862,22 +2862,22 @@ SWFHandlers::ActionNew(ActionExec& thread)
         return;
     }
 
-    boost::intrusive_ptr<as_object> newobj = construct_object(constructor.get(),
-            env, nargs);
-
+    // It is possible for constructors to fail, for instance if a
+    // conversion to object calls a built-in constructor that has been
+    // deleted. BitmapData also fails to construct anything under
+    // some circumstances.
+    try {
+        as_object* newobj = construct_object(constructor.get(), env, nargs);
 #ifdef USE_DEBUGGER
-#ifndef GNASH_USE_GC
-    // WARNING: new_obj.to_object(*getGlobal(thread.env)) can return a newly allocated
-    //          thing into the intrusive_ptr, so the debugger
-    //          will be left with a deleted object !!
-    //          Rob: we don't want to use void pointers here..
-    newobj->add_ref(); // this will leak, but at least debugger won't end up
-                         // with a dangling reference...
-#endif //ndef GNASH_USE_GC
-        debugger.addSymbol(newobj.get(), classname);
+        debugger.addSymbol(newobj, classname);
 #endif
-
-    env.push(as_value(newobj));
+        env.push(newobj);
+        return;
+    }
+    catch (GnashException& ) {
+        env.push(as_value());
+        return;
+    }
 
 }
 
@@ -3543,10 +3543,19 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
     }
 
     // Construct the object
-    boost::intrusive_ptr<as_object> new_obj = construct_object(method.get(),
-            env, nargs);
-
-    env.push(as_value(new_obj));
+    // It is possible for constructors to fail, for instance if a
+    // conversion to object calls a built-in constructor that has been
+    // deleted. BitmapData also fails to construct anything under
+    // some circumstances.
+    try {
+        as_object* newobj = construct_object(method.get(), env, nargs);
+        env.push(newobj);
+        return;
+    }
+    catch (GnashException& ) {
+        env.push(as_value());
+        return;
+    }
 
 }
 
