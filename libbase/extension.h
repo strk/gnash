@@ -68,7 +68,7 @@ public:
     bool initModuleWithFunc(const std::string& module, const std::string& func, as_object &obj);
     bool initNewObject(as_object &obj);
     void dumpModules();
-private:
+protected:
 
     /// Initialize the named module within Gnash
     //
