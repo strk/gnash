@@ -926,11 +926,42 @@ check_equals(typeof(result), "string");
 check_equals(resolveCalled, 3);
 check_equals(result, "quibbleDibblePropertyWithASillyName");
 
+////////////////////////////////
+
+// Messing about here with global classes may ruin later tests, so don't add
+// them after this.
+
+s = "hi";
+n = 7;
+b = true;
+
+delete String;
+
+o = new Object(s);
+check_equals(typeof(o), "undefined");
+o = new Object(n);
+check_equals(typeof(o), "object");
+check_equals(o.toString(), "7");
+o = new Object(b);
+check_equals(typeof(o), "object");
+check_equals(o.toString(), "true");
+
+delete Number;
+o = new Object(n);
+check_equals(typeof(o), "undefined");
+o = new Object(b);
+check_equals(typeof(o), "object");
+check_equals(o.toString(), "true");
+
+delete Boolean;
+o = new Object(b);
+check_equals(typeof(o), "undefined");
+
 #if OUTPUT_VERSION <= 5
-totals(107);
+totals(116);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(295);
+totals(304);
 #endif
 
