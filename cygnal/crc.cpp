@@ -123,7 +123,7 @@ CRcInitFile::loadFiles()
 bool
 CRcInitFile::parseFile(const std::string& filespec)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     struct stat stats;
     string action;
     string variable;
