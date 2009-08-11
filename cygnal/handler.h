@@ -132,13 +132,8 @@ public:
     bool initialized();
 
     // Dump internal data.
-    void dump();    
+    void dump();  
 
-protected:
-
-    size_t writeToPlugin(amf::Buffer &buf) {
-	return writeToPlugin(buf.begin(), buf.allocated()); };
-    size_t writeToPlugin(boost::uint8_t *data, size_t size);
 
     size_t readFromPlugin(amf::Buffer &buf) {
 	return readFromPlugin(buf.begin(), buf.allocated()); };
@@ -146,6 +141,11 @@ protected:
     boost::shared_ptr<amf::Buffer> readFromPlugin(int x);
     size_t readFromPlugin(boost::uint8_t *data, size_t size);
 
+    size_t writeToPlugin(amf::Buffer &buf) {
+	return writeToPlugin(buf.begin(), buf.allocated()); };
+    size_t writeToPlugin(boost::uint8_t *data, size_t size);
+
+protected:
     /// \var _name
     ///	    The name of the path this handler is supporting.
     std::string				_name;

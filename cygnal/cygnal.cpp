@@ -855,7 +855,6 @@ connection_handler(Network::thread_params_t *args)
 		boost::shared_ptr<Handler::cygnal_init_t> init = 
 		    hand->initModule(str);
 		
-		hand->setPlugin(init);
 		event_handler(args);
 
 		// We're done, close this network connection
@@ -1023,6 +1022,7 @@ event_handler(Network::thread_params_t *args)
 		      break;
 		  case  Handler::RTMP:
 		      args->netfd = i;
+		      args->filespec = path;
 		      rtmp_handler(args);
 		      break;
 		  case Handler::RTMPT:
