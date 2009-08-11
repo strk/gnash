@@ -294,18 +294,18 @@ std::string
 URL::str() const
 {
     std::string ret = _proto + "://" + _host;
-	if ( _port != "" )
-	{
+
+    if (!_port.empty()) {
 		ret += ":" + _port;
 	}
     
-        ret += _path;
-	if ( _querystring != "" )
-	{
+    ret += _path;
+
+    if (!_querystring.empty()) {
 		ret += "?" + _querystring;
 	}
-	if ( _anchor != "" )
-	{
+
+    if (!_anchor.empty()) {
 		ret += "#" + _anchor;
 	}
 	return ret;
@@ -346,14 +346,14 @@ URL::split_querystring_from_path()
 
 	// extract the parameters from the URL
 
-    	size_t qmpos = _path.find("?");
+    std::string::size_type qmpos = _path.find("?");
 	if (qmpos == std::string::npos)
 	{
 		// no query string
 		return;
 	}
 
-	_querystring = _path.substr(qmpos+1);
+	_querystring = _path.substr(qmpos + 1);
 
 	// update _path
 	_path.erase(qmpos);
