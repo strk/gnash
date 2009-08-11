@@ -34,6 +34,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "cgi-bin/echo/echo.h"
+
 #include "gettext.h"
 //#include "cvm.h"
 
@@ -326,6 +328,40 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
     }
 }
 
+bool
+Cygnal::initModule(const std::string& module)
+{
+//     GNASH_REPORT_FUNCTION;
+
+    SharedLib *sl;
+    std::string symbol(module);
+
+    log_security(_("Initializing module: \"%s\""), symbol);
+    
+    _pluginsdir = "/usr/local/lib/cygnal/";
+    lt_dlsetsearchpath(_pluginsdir.c_str());
+
+    if (_plugins[module] == 0) {
+        sl = new SharedLib(module);
+        sl->openLib();
+        _plugins[module] = sl;
+    } else {
+        sl = _plugins[module];
+    }
+    
+    symbol.append("_class_init");
+    
+    SharedLib::initentry *symptr = sl->getInitEntry(symbol);
+
+     if (!symptr) {    
+//         symptr(where);
+//     } else {
+         log_error(_("Couldn't get class_init symbol"));
+     }
+    
+    return true;
+}
+
 void
 Cygnal::removeHandler(const std::string &path)
 {
@@ -465,7 +501,9 @@ main(int argc, char *argv[])
 	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
         }
     }
-
+    
+    crcfile.setDocumentRoot(docroot);
+    
     // If a port is specified, we only want to run single threaded.
     if (only_port) {
 	crcfile.setThreadingFlag(false);
@@ -473,7 +511,12 @@ main(int argc, char *argv[])
 
     // load the file of peers. A peer is another instance of Cygnal
     cyg.loadPeersFile();
-    cyg.dump();
+//    cyg.dump();
+
+    cyg.scanDir("/usr/local/lib/cygnal");
+    const string str("echo");
+    cyg.initModule(str);
+//     echo_class_init();
 
     // Trap ^C (SIGINT) so we can kill all the threads
     act1.sa_handler = cntrlc_handler;
@@ -823,17 +866,19 @@ connection_handler(Network::thread_params_t *args)
 		boost::shared_ptr<amf::Element> tcurl = 
 		    rtmp.processClientHandShake(args->netfd);
 		URL url(tcurl->to_string());
+		std::string key = url.hostname() + url.path();
 		boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
 		if (!hand) {
 		    log_network("Creating new Handler for: %s for fd %#d",
-				url.path(), args->netfd);
+				key, args->netfd);
 		    hand.reset(new Handler);
 		} else {
 		    log_network("Using existing Handler for: %s for fd %#d",
-				url.path(), args->netfd);
+				key, args->netfd);
 		}
 		hand->addClient(args->netfd, Handler::RTMP);
 		args->handler = reinterpret_cast<void *>(hand.get());
+		args->filespec = key;
 
 		event_handler(args);
 
@@ -938,14 +983,38 @@ void
 event_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
+
     Network net;
     
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    hand->dump();
+    //    hand->dump();
     int retries = 100;
 
     int timeout = 500;
     bool done = false;
+    
+    // Extract the hostname and path to the cgi-bin sandbox.
+    string host;
+    string path;
+    string::size_type pos = args->filespec.find("/", 0);
+    if (pos != string::npos) {
+	host = args->filespec.substr(0, pos);
+	path = args->filespec.substr(pos+1, args->filespec.size());
+    }
+
+    if (host.empty()) {
+	log_error("No hostname supplied for handler!");
+	return;
+    }
+    if (path.empty()) {
+	log_error("No pathname supplied for handler!");
+	return;
+    }
+
+    hand->setName(path);
+    if (!hand->initialized()) {
+	log_network("starting Handler for %s", path);
+    }
 
     do {
 	net.setTimeout(timeout);

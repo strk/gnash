@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 
+#include "extension.h"
 #include "handler.h"
 
 /// \namespace cygnal
@@ -35,13 +36,14 @@ namespace cygnal {
 
 /// \class cygnal::Cygnal
     
-class Cygnal
+    class Cygnal : public gnash::Extension
 {
 public:
     typedef struct {
 	std::string hostname;
 	short	    port;
 	bool        connected;
+	Handler::protocols_supported_e protocol;
 	std::vector<std::string> supported;
     } peer_t;
     static Cygnal& getDefaultInstance();
@@ -60,6 +62,13 @@ public:
 
     boost::shared_ptr<Handler> findHandler(const std::string &path);
     void removeHandler(const std::string &path);
+
+    /// Initialize the named module within Gnash
+    //
+    /// @param symbol   The name of the module to find and
+    ///                 initialize.
+    /// @param obj      The object to attach the module to.
+    bool initModule(const std::string& module);
 
     void dump();
 
