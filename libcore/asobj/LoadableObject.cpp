@@ -160,9 +160,9 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         std::ostringstream data;
         toString(data, true);
 
-    	std::string getURL = urlstr + "?" + data.str();
-        log_debug("Using GET method for sendAndLoad: %s", getURL);
-        str = ri.streamProvider().getStream(getURL);
+        url.set_querystring(data.str());
+        log_debug("Using GET method for sendAndLoad: %s", url.str());
+        str = ri.streamProvider().getStream(url.str());
     }
 
 	log_security(_("Loading from url: '%s'"), url.str());
