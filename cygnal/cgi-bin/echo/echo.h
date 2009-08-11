@@ -55,8 +55,12 @@ public:
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Element &el);
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Buffer &data);
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);
+
+    boost::shared_ptr<amf::Buffer> getResponse() { return _response; };
+    void setResponse(boost::shared_ptr<amf::Buffer> &x) { _response = x; };
+
 private:
-    
+    boost::shared_ptr<amf::Buffer> _response;    
 };  
 
 extern "C" {

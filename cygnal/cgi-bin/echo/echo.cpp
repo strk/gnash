@@ -51,7 +51,7 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 static bool netdebug = false;
 
 static EchoTest echo;
-
+	
 extern "C" {
     
     boost::shared_ptr<Handler::cygnal_init_t>
@@ -70,12 +70,40 @@ extern "C" {
     size_t echo_read_func(boost::uint8_t *data, size_t size)
     {
 	GNASH_REPORT_FUNCTION;
+	
+	size_t safe = 0;
+	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
 
+	if (size < buf->allocated()) {
+	    safe = buf->allocated();
+	} else {
+	    safe = size;
+	}
+	std::copy(buf->begin(), buf->begin() + safe, data);
+	
+// 	log_network("%s", hexify(data, safe, true));
+
+        return buf->allocated();
+	    
         GNASH_REPORT_RETURN;
     }
+
     size_t echo_write_func(boost::uint8_t *data, size_t size)
     {
 	GNASH_REPORT_FUNCTION;
+
+	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
+
+        vector<boost::shared_ptr<amf::Element> > request =
+	    echo.parseEchoRequest(data, size);
+        if (request[3]) {
+            buf = echo.formatEchoResponse(request[1]->to_number(), *request[3]);
+            echo.setResponse(buf);
+	}
+
+// 	log_network("%s", hexify(buf->reference(), buf->allocated(), true));
+
+	return buf->allocated();
 
         GNASH_REPORT_RETURN;
     }
