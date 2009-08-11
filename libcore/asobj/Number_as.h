@@ -33,9 +33,6 @@ class Global_as;
 /// Initialize the global Number class
 void number_class_init(as_object& global, const ObjectURI& uri);
 
-/// Return a Number instance
-as_object* init_number_instance(Global_as& g, double val);
-
 }
 
 #endif // GNASH_NUMBER_H
