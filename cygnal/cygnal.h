@@ -39,6 +39,14 @@ namespace cygnal {
     class Cygnal : public gnash::Extension
 {
 public:
+    typedef size_t (*cygnal_io_t )(boost::uint8_t *data, size_t size);
+    typedef struct {
+  	cygnal_io_t read_func;
+  	cygnal_io_t write_func;
+	Handler::protocols_supported_e protocol;
+    } cygnal_init_t;
+    typedef cygnal_init_t (*initentry_t)();
+    
     typedef struct {
 	std::string hostname;
 	short	    port;

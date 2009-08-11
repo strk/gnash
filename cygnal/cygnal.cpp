@@ -34,8 +34,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "cgi-bin/echo/echo.h"
-
 #include "gettext.h"
 //#include "cvm.h"
 
@@ -225,7 +223,7 @@ Cygnal::loadPeersFile()
     string homefile = home;
     homefile += "/peers.conf";
 
-    loadPeersFile(homefile);
+    return loadPeersFile(homefile);
 }
 
 bool
@@ -238,7 +236,6 @@ Cygnal::loadPeersFile(const std::string &filespec)
     std::string line;
     string host;
     string portstr;
-    short  port;
     
     // Make sufre the file exists
     if (stat(filespec.c_str(), &stats) != 0) {
@@ -291,6 +288,8 @@ Cygnal::loadPeersFile(const std::string &filespec)
 
 	_peers.push_back(peer);
     }    
+
+    return true;
 }
 
 void
@@ -336,7 +335,7 @@ Cygnal::initModule(const std::string& module)
     SharedLib *sl;
     std::string symbol(module);
 
-    log_security(_("Initializing module: \"%s\""), symbol);
+    log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
     
     _pluginsdir = "/usr/local/lib/cygnal/";
     lt_dlsetsearchpath(_pluginsdir.c_str());
@@ -348,16 +347,36 @@ Cygnal::initModule(const std::string& module)
     } else {
         sl = _plugins[module];
     }
-    
-    symbol.append("_class_init");
-    
-    SharedLib::initentry *symptr = sl->getInitEntry(symbol);
 
-     if (!symptr) {    
-//         symptr(where);
-//     } else {
-         log_error(_("Couldn't get class_init symbol"));
+    // Look for the "module"_read_init function we'll use to get data
+    // from the cgi-bin as a dynamically loadable plugin.
+    symbol.append("_read_func");
+    
+    Cygnal::cygnal_io_t read_symptr = reinterpret_cast<Cygnal::cygnal_io_t>
+	(sl->getInitEntry(symbol));
+
+     if (!read_symptr) {    
+         log_error(_("Couldn't get %s symbol"), symbol);
+ 	 return false;
      }
+
+     boost::uint8_t foo[10];	// FIXME: testing crap
+
+     read_symptr(foo, 10);
+
+     // Look for the "module"_write_init function we'll use to send data
+     // to the cgi-bin as a dynamically loadable plugin.
+     symbol = module;
+     symbol.append("_write_func");
+     Cygnal::cygnal_io_t write_symptr = reinterpret_cast<Cygnal::cygnal_io_t>
+	(sl->getInitEntry(symbol));
+
+     if (!write_symptr) {    
+         log_error(_("Couldn't get %s symbol"), symbol);
+	 return false;
+     }
+
+     write_symptr(foo, 10);
     
     return true;
 }
@@ -511,12 +530,15 @@ main(int argc, char *argv[])
 
     // load the file of peers. A peer is another instance of Cygnal
     cyg.loadPeersFile();
-//    cyg.dump();
 
-    cyg.scanDir("/usr/local/lib/cygnal");
-    const string str("echo");
-    cyg.initModule(str);
-//     echo_class_init();
+    char *env = std::getenv("CYGNAL_PLUGINS");
+    if (!env) {
+        cyg.scanDir("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/cygnal/cygnal/cgi-bin/echo/.libs:/usr/local/lib/cygnal");
+    }
+    else {
+        cyg.scanDir(env);
+    }
+//    cyg.dump();
 
     // Trap ^C (SIGINT) so we can kill all the threads
     act1.sa_handler = cntrlc_handler;
@@ -880,6 +902,9 @@ connection_handler(Network::thread_params_t *args)
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
 
+		const string str("echo");
+ 		cyg.initModule(str);
+		
 		event_handler(args);
 
 		// We're done, close this network connection
@@ -942,7 +967,7 @@ dispatch_handler(Network::thread_params_t *args)
 			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
  			if (it->fd > 0) {
 			    // Call the protocol handler for this network connection
-			    bool ret = net->getEntry(it->fd)(args);
+			    /* bool ret = */ net->getEntry(it->fd)(args);
 			// Call the protocol handler for this network connection
 // 			bool ret = net->getEntry(it->fd)(args);
 			
@@ -988,7 +1013,7 @@ event_handler(Network::thread_params_t *args)
     
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
     //    hand->dump();
-    int retries = 100;
+//     int retries = 100;
 
     int timeout = 500;
     bool done = false;

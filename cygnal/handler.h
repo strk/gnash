@@ -105,7 +105,6 @@ public:
     /// \var getClients
     ///     Get the vector of file descriptors for this handler.
     std::vector<int> &getClients() { return _clients; };
-
     protocols_supported_e getProtocol(int x) { return _protocol[x]; };
     
     /// \method addRemote
