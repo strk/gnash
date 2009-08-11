@@ -147,6 +147,8 @@ namespace {
     as_value global_setInterval(const fn_call& fn);
     
     void registerNatives(as_object& global);
+    template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
+            string_table::key className);
 }
 
 AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
@@ -216,45 +218,23 @@ AVM1Global::createString(const std::string& s)
     // This is not really correct. If there is no String class, to_object()
     // returns an undefined value, not a null object. The behaviour is the
     // same for versions 5 to 8.
-
-    as_value clval;
-
-    if (!get_member(NSV::CLASS_STRING, &clval) ) {
-        log_debug("UNTESTED: String instantiation requested but "
-                "_global doesn't contain a 'String' symbol. Returning "
-                "the NULL object.");
-        return 0;
-    }
-    
-    if (!clval.is_function()) {
-        log_debug("UNTESTED: String instantiation requested but "
-                "_global.String is not a function (%s). Returning "
-                "the NULL object.", clval);
-        return 0;
-    }
-    
-    as_function* ctor = clval.to_as_function();
-
-    if (!ctor) return 0;
-
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(s);
-    as_environment env(_vm);
-    as_object* ret = ctor->constructInstance(env, args).get();
-
-    return ret;
+    return constructObject(*this, s, NSV::CLASS_STRING);
 }
 
 as_object*
 AVM1Global::createNumber(double d)
 {
-    return init_number_instance(*this, d);
+    // This is not really correct. If there is no String class, to_object()
+    // returns an undefined value, not a null object. The behaviour is the
+    // same for versions 5 to 8.
+    return constructObject(*this, d, NSV::CLASS_NUMBER);
+
 }
 
 as_object*
 AVM1Global::createBoolean(bool b)
 {
-    return init_boolean_instance(*this, b);
+    return constructObject(*this, b, NSV::CLASS_BOOLEAN);
 }
     
 as_object*
@@ -286,48 +266,21 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 as_object*
 AVM2Global::createString(const std::string& s)
 {
-
     // What AVM2 does for createString is untested, so we do the same
     // as AVM1 for now.
-
-    as_value clval;
-
-    if (!get_member(NSV::CLASS_STRING, &clval) ) {
-        log_debug("UNTESTED: String instantiation requested but "
-                "_global doesn't contain a 'String' symbol. Returning "
-                "the NULL object.");
-        return 0;
-    }
-    
-    if (!clval.is_function()) {
-        log_debug("UNTESTED: String instantiation requested but "
-                "_global.String is not a function (%s). Returning "
-                "the NULL object.", clval);
-        return 0;
-    }
-    
-    as_function* ctor = clval.to_as_function();
-
-    if (!ctor) return 0;
-
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(s);
-    as_environment env(_vm);
-    as_object* ret = ctor->constructInstance(env, args).get();
-
-    return ret;
+    return constructObject(*this, s, NSV::CLASS_STRING);
 }
 
 as_object*
 AVM2Global::createNumber(double d)
 {
-    return init_number_instance(*this, d);
+    return constructObject(*this, d, NSV::CLASS_NUMBER);
 }
 
 as_object*
 AVM2Global::createBoolean(bool b)
 {
-    return init_boolean_instance(*this, b);
+    return constructObject(*this, b, NSV::CLASS_BOOLEAN);
 }
 
 void 
@@ -1199,6 +1152,44 @@ global_clearInterval(const fn_call& fn)
 	return as_value(ret);
 }
 
+
+/// Construct an instance of the specified global class.
+//
+/// If the class is not present or is not a constructor function, this
+/// function throws an ActionTypeError.
+//
+/// TODO: consider whether ActionTypeError is an appropriate exception.
+/// TODO: test the other failure cases.
+template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
+        string_table::key className)
+{
+    as_value clval;
+
+    // This is tested in actionscript.all/Object.as to return an 
+    // undefined value. We throw the exception back to the VM, which pushes
+    // an undefined value onto the stack.
+    if (!gl.get_member(className, &clval) ) {
+        throw ActionTypeError();
+    }
+    
+    // This is not properly tested.
+    if (!clval.is_function()) {
+        throw ActionTypeError();
+    }
+    
+    as_function* ctor = clval.to_as_function();
+
+    // This is also not properly tested.
+    if (!ctor) throw ActionTypeError();
+
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(arg);
+    as_environment env(getVM(gl));
+    as_object* ret = ctor->constructInstance(env, args).get();
+
+    return ret;
+
+}
 
 void
 registerNatives(as_object& global)
