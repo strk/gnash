@@ -140,6 +140,7 @@ test_perms:
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Nothing to install here now."
 	@echo "Use \"make install-plugin\" to install the Firefox plugin to $(DESTDIR)$(plugindir)."
+	$(RM) $(DESTDIR)$(plugindir)/*.a $(DESTDIR)$(plugindir)/*.la
 
 if !WIN32
 install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
