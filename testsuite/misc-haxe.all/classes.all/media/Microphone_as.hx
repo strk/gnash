@@ -130,18 +130,23 @@ class Microphone_as {
 	} else {
 	    DejaGnu.xfail("Microphone::silenceTimeout property doesn't exist");
 	}
-#else
-	if (typeof(x1.silenceTimeOut) == "number") {
-	    DejaGnu.pass("Microphone::silenceTimeOut property exists");
-	} else {
-	    DejaGnu.fail("Microphone::silenceTimeOut property doesn't exist");
-	}
-#end
 	if (typeof(x1.useEchoSuppression) == "boolean") {
 	    DejaGnu.pass("Microphone::useEchoSuppression property exists");
 	} else {
 	    DejaGnu.fail("Microphone::useEchoSuppression property doesn't exist");
 	}
+#else
+	if (typeof(untyped x1.silenceTimeout) == "number") {
+	    DejaGnu.pass("Microphone::silenceTimeOut property exists");
+	} else {
+	    DejaGnu.fail("Microphone::silenceTimeOut property doesn't exist");
+	}
+	if (typeof(x1.useEchoSuppression) == "number") {
+	    DejaGnu.pass("Microphone::useEchoSuppression property exists");
+	} else {
+	    DejaGnu.fail("Microphone::useEchoSuppression property doesn't exist");
+	}
+#end
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
@@ -205,16 +210,16 @@ class Microphone_as {
     
     //now try bad values
     x1.setRate(10000000);
-    if (x1.rate == 11) {
+    if (x1.rate == 44) {
         DejaGnu.pass("setRate(10000000) returned the proper default");
     } else {
-        DejaGnu.fail("setRate(10000000) didn't return the proper default (11)");
+        DejaGnu.fail("setRate(10000000) didn't return the proper default (44)");
     }
     x1.setRate(-1);
-    if (x1.rate == 11) {
+    if (x1.rate == 5) {
         DejaGnu.pass("setRate(-1) returned the proper default");
     } else {
-        DejaGnu.fail("setRate(-1) didn't return the proper default (11)");
+        DejaGnu.fail("setRate(-1) didn't return the proper default (5)");
     }
     
     //test setgain
@@ -241,13 +246,13 @@ class Microphone_as {
     
     //try bad values
     x1.setGain(300);
-    if (x1.gain == 50) {
+    if (x1.gain == 100) {
         DejaGnu.pass("setGain(300) returned the default value");
     } else {
         DejaGnu.fail("setGain(300) didn't return the default value");
     }
     x1.setGain(-20);
-    if (x1.gain == 50) {
+    if (x1.gain == 0) {
         DejaGnu.pass("setGain(-20) returned the default value");
     } else {
         DejaGnu.fail("setGain(-20) didn't return the default value");
@@ -267,13 +272,13 @@ class Microphone_as {
 #if !flash9
     //try some values now
     x1.setSilenceLevel(0, 2000);
-    if ((x1.silenceLevel == 0) && (x1.silenceTimeOut == 2000)) {
+    if ((x1.silenceLevel == 0) && (untyped x1.silenceTimeout == 2000)) {
         DejaGnu.pass("setSilenceLevel(0,2000) worked");
     } else {
         DejaGnu.fail("setSilenceLevel(0,2000) failed");
     }
     x1.setSilenceLevel(100, 5500);
-    if ((x1.silenceLevel == 100) && (x1.silenceTimeOut == 5500)) {
+    if ((x1.silenceLevel == 100) && (untyped x1.silenceTimeout == 5500)) {
         DejaGnu.pass("setSilenceLevel(100,5500) worked");
     } else {
         DejaGnu.fail("setSilenceLevel(100,5500) failed");
@@ -281,14 +286,14 @@ class Microphone_as {
     
     //try bad values now
     x1.setSilenceLevel(200, -1000);
-    if ((x1.silenceLevel == 100) && (x1.silenceTimeOut == 5500)) {
+    if ((x1.silenceLevel == 100) && (untyped x1.silenceTimeout == 0)) {
         DejaGnu.pass("setSilenceLevel(200,-1000) worked as intended");
     } else {
         DejaGnu.fail("setSilenceLevel(200,-1000) didn't work as intended");
     }
     
     x1.setSilenceLevel(-10000, 8000);
-    if ((x1.silenceLevel == 100) && (x1.silenceTimeOut == 8000)) {
+    if ((x1.silenceLevel == 0) && (untyped x1.silenceTimeout == 8000)) {
         DejaGnu.pass("setSilenceLevel(-10000, 8000) worked as intended");
     } else {
         DejaGnu.fail("setSilenceLevel(-10000, 8000) didn't work as intended");

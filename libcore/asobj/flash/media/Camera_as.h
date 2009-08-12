@@ -22,6 +22,10 @@
 
 #include <memory> // for auto_ptr
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 namespace gnash {
 
 class as_object;
@@ -29,6 +33,14 @@ class ObjectURI;
 
 /// Initialize the global Camera class
 void camera_class_init(as_object& where, const ObjectURI& uri);
+
+#ifdef USE_GST
+class camera_as_object;
+#endif
+
+#ifdef USE_FFMPEG
+class camera_as_object;
+#endif
 
 /// Return a Camera instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_camera_instance();

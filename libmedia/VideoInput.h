@@ -24,13 +24,15 @@
 #include <vector>
 #include <ostream>
 #include <cstdio>
+#include <map>
+
+#include "asobj/flash/media/Camera_as.h"
 
 namespace gnash {
 namespace media {
 
-
 class VideoInput {
-    
+
 public:
 
     VideoInput();
@@ -55,13 +57,7 @@ public:
     int get_height() {return _height;};
     
     void set_index(int i) {_index = i;};
-    // livedocs say that this should return a number, but when testing with
-    // flashplayer it appears to actually return a string.
-    std::string get_index() {
-        char buffer[2];
-        sprintf(buffer, "%i", _index);
-        return buffer;
-    };
+    int get_index() {return _index;};
     
     void set_keyFrameInterval(int i) {_keyFrameInterval = i;};
     int get_keyFrameInterval() {return _keyFrameInterval;};
@@ -107,6 +103,8 @@ protected:
     int _quality;
     int _width;
 
+    //TODO: use this map to implement the Camera::get function
+    //static std::map<int, camera_as_object*> _mapGet;
 };
 
     

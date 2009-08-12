@@ -62,7 +62,7 @@ class Camera_as {
 // is primarily useful only to test completeness of the API implementation.
 
 	#if flash9
-	if (Type.typeof(x1.activityLevel) == ValueType.TFloat) {
+	if (typeof(x1.activityLevel) == "number") {
 	    DejaGnu.pass("Camera::activityLevel property exists");
 	} else {
 	    DejaGnu.fail("Camera::activityLevel property doesn't exist");
@@ -72,12 +72,12 @@ class Camera_as {
 	} else {
 	    DejaGnu.fail("Camera::bandwidth property doesn't exist");
 	}
-	if (Type.typeof(x1.currentFPS) == ValueType.TFloat) {
+	if (typeof(x1.currentFPS) == "number") {
 	    DejaGnu.pass("Camera::currentFPS property exists");
 	} else {
 	    DejaGnu.fail("Camera::currentFPS property doesn't exist");
 	}
-	if (Type.typeof(x1.fps) == ValueType.TFloat) {
+	if (typeof(x1.fps) == "number") {
 	    DejaGnu.pass("Camera::fps property exists");
 	} else {
 	    DejaGnu.fail("Camera::fps property doesn't exist");
@@ -97,7 +97,7 @@ class Camera_as {
 	} else {
 	    DejaGnu.fail("Camera::keyFrameInterval property doesn't exist");
 	}
-	if (x1.loopback == (false||true)) {
+	if (typeof(x1.loopback) == "boolean") {
 	    DejaGnu.pass("Camera::loopback property exists");
 	} else {
 	    DejaGnu.fail("Camera::loopback property doesn't exist");
@@ -112,14 +112,14 @@ class Camera_as {
 	} else {
 	    DejaGnu.fail("Camera::motionTimeout property doesn't exist");
 	}
-	if (x1.muted == (false || true)) {
+	if (typeof(x1.muted) == "boolean") {
 	    DejaGnu.pass("Camera::muted property exists");
 	} else {
 	    DejaGnu.fail("Camera::muted property doesn't exist");
 	}
 	//FIXME: it would be nice if this checked to make sure the name is 
 	//a string
-	if (Type.typeof(x1.name) == ValueType.TObject) {
+	if (typeof(x1.name) == "string") {
 	    DejaGnu.pass("Camera::name property exists");
 	} else {
 	    DejaGnu.fail("Camera::name property doesn't exist");
@@ -161,10 +161,10 @@ class Camera_as {
 	} else {
 	    DejaGnu.fail("Camera::height property doesn't exist");
 	}
-	if (typeof(x1.index) == "number") {
+	if (typeof(x1.index) == "string") {
 	    DejaGnu.pass("Camera::index property exists");
 	} else {
-	    DejaGnu.fail("Camera::index property doesn't exist");
+	    DejaGnu.fail("Camera::index property doesn't exist ");
 	}
 	if (typeof(x1.motionLevel) == "number") {
 	    DejaGnu.pass("Camera::motionLevel property exists");

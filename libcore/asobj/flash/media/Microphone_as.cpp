@@ -255,12 +255,19 @@ microphone_setgain(const fn_call& fn)
             ptr->set_gain(argument);
 #endif
         } else {
-            //set to default gain if bad value was passed
+            //set to highest or lowest gain if bad value was passed
 #ifdef USE_GST
-            ptr->set_gain(0);
+        if (argument < 0) {
+            ptr->set_gain(-60);
+        } else if (argument > 100) {
+            ptr->set_gain(60);
+        }
 #endif
 #ifdef USE_FFMPEG
-            ptr->set_gain(50);
+        if (argument < 0) {
+            ptr->set_gain(0);
+        } else if (arument > 100) {
+            ptr->set_gain(100);
 #endif
         }
     }
@@ -628,12 +635,18 @@ microphone_setsilencelevel(const fn_call& fn) {
                 ptr->set_silenceLevel(argument);
             } else {
                 log_error("%s: argument 1 out of acceptable range", __FUNCTION__);
+                if (argument < 0) {
+                    ptr->set_silenceLevel(0);
+                } else if (argument > 100) {
+                    ptr->set_silenceLevel(100);
+                }
             }
             double argument2 = fn.arg(1).to_number();
-            if (argument2 > 0) {
+            if (argument2 >= 0) {
                 ptr->set_silenceTimeout(argument2);
             } else {
                 log_error("%s: argument 2 out of acceptable range", __FUNCTION__);
+                ptr->set_silenceTimeout(0);
             }
         } else {
             double argument = fn.arg(0).to_number();
@@ -642,6 +655,11 @@ microphone_setsilencelevel(const fn_call& fn) {
                 ptr->set_silenceLevel(argument);
             } else {
                 log_error("%s: argument 1 out of acceptable range", __FUNCTION__);
+                if (argument < 0) {
+                    ptr->set_silenceLevel(0);
+                } else if (argument > 100) {
+                    ptr->set_silenceLevel(100);
+                }
             }
         }
     }

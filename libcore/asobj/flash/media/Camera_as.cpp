@@ -30,6 +30,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 #include "Array_as.h"
+#include <sstream>
 
 #ifdef USE_GST
 #include "gst/VideoInputGst.h"
@@ -153,8 +154,7 @@ getCameraInterface()
 }
 
 #ifdef USE_GST
-class camera_as_object: public as_object, public media::gst::VideoInputGst
-{
+class camera_as_object: public as_object, public media::gst::VideoInputGst {
 
 public:
 
@@ -162,21 +162,17 @@ public:
         :
         as_object(getCameraInterface())
     {}
-
 };
 #endif
 
 #ifdef USE_FFMPEG
-class camera_as_object: public as_object, public media::VideoInput
-{
-
+class camera_as_object: public as_object, public media::VideoInput {
 public:
 
     camera_as_object()
         :
         as_object(getCameraInterface())
     {}
-
 };
 #endif
 
@@ -508,7 +504,18 @@ camera_index(const fn_call& fn)
 
     if ( fn.nargs == 0 ) // getter
     {
-        return as_value(ptr->get_index());
+        //livedocs say that this function should return an integer, but in testing
+        //the pp appears to, in practice, return the value as a string
+        int value = ptr->get_index();
+        char val = value + '0';
+        
+        std::stringstream ss;
+        std::string str;
+        ss << val;
+        ss >> str;
+        as_value name(str);
+        name.convert_to_string();
+        return (name);
     }
     else // setter
     {
