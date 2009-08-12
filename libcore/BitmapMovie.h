@@ -46,8 +46,10 @@ public:
 
 	virtual ~BitmapMovie() {}
     
-    /// This is a no-op for a BitmapMovie, as it never changes.
-	virtual void advance() { }
+    /// BitmapMovies do need an advance method.
+    //
+    /// This may be for play() or other inherited methods.
+	virtual void advance() { MovieClip::advance(); }
 
     virtual float frameRate() const {
         return _def->get_frame_rate();
