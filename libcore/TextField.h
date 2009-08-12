@@ -758,7 +758,7 @@ private:
 	boost::uint16_t _rightMargin;
 
 	boost::uint16_t _fontHeight;
-
+	
 	boost::intrusive_ptr<const Font> _font;
 
 	bool m_has_focus;

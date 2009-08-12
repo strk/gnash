@@ -245,7 +245,6 @@ textformat_display(const fn_call& fn)
 	}
 
 	return ret;
-	//return as_value();
 }
 
 as_value
@@ -278,6 +277,7 @@ textformat_tabStops(const fn_call& fn)
 		
 	if (!fn.nargs)
 	{
+		ret.set_null();
 		return ret;
 	}
 	

@@ -16,11 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-// Loop through all text records 
-//	- check yOffset and yHeight and if ymouse is in range
-//	- if it is, then check xoffset, etc.
-//	- if it is, then break		(all in onevent)
-//	
+// Things implemented:
+//	- setTextFormat does not discard target, url, tabStops, display or
+//	  bullets
+//	- Above five fields are now implemented (except for target != blank)
+
+// Things to work on:
+//	- Cannot figure out how to open firefox in different ways--this
+//	  is what target is supposed to do
+//	- For the url cases (url property and anchor tag in html) we should
+//	  change the mouse cursor to the hand cursor standard for linkable 
+//    text
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -66,7 +72,6 @@
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
-#define PIXEL_RATIO 20
 
 // Define the following to get detailed log information about
 // textfield bounds and HTML tags:
@@ -208,7 +213,7 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     _blockIndent(0),
     _leftMargin(0), 
     _rightMargin(0), 
-    _fontHeight(12 * PIXEL_RATIO), 
+    _fontHeight(12 * 20), 
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
@@ -584,38 +589,72 @@ TextField::on_event(const event_id& ev)
 			int x_mouse = pixelsToTwips(root.getXMouseLoc());
 			int y_mouse = pixelsToTwips(root.getYMouseLoc());
 			
-			SWFMatrix n = this->getMatrix();
+			SWFMatrix m = this->getMatrix();
 			
-			x_mouse -= n.get_x_translation();
-			y_mouse -= n.get_y_translation();
+			x_mouse -= m.get_x_translation();
+			y_mouse -= m.get_y_translation();
 			
 			SWF::TextRecord rec;
 			
 			for (size_t i=0; i < _textRecords.size(); ++i) {
-				if ((x_mouse >  _textRecords[i].xOffset()) && 
-				   (x_mouse < _textRecords[i].xOffset()+_textRecords[i].recordWidth()) &&
-				   (y_mouse > _textRecords[i].yOffset()-_textRecords[i].textHeight()) &&
-				   (y_mouse < _textRecords[i].yOffset())) {
-					   rec = _textRecords[i];
-					   break;
-				}
+				if 	((x_mouse >  _textRecords[i].xOffset()) && 
+					(x_mouse < _textRecords[i].xOffset()+_textRecords[i].recordWidth()) &&
+					(y_mouse > _textRecords[i].yOffset()-_textRecords[i].textHeight()) &&
+					(y_mouse < _textRecords[i].yOffset())) {
+						rec = _textRecords[i];
+						break;
+					}
 			}
 			
-			if ( rec.getURL()!=" " ) {
-				if (rec.getTarget() == "BLANK") {
-					std::string call = "firefox -remote 'openurl("+rec.getURL()+")'";
-					system(call.data());
+			std::string target = rec.getTarget();
+			
+			for (size_t i=0; i < target.size(); ++i) {
+				target[i] = toupper(target[i]);
+			}	
+			
+			if ( target[0] == '_' ) {
+				target.erase(0);
+			}
+			
+			// Resolve compiler warning: system returns an int
+			int s = 0;
+			
+			log_debug("url: %s", rec.getURL());
+			log_debug("target: %s", target);
+			
+			std::string call = "";
+			
+			if ( rec.getURL()!="" ) {
+				if (target == "BLANK") {
+					call = "firefox " + rec.getURL() + "&";
+					s = system(call.data());
 				}
 				
-				else if (rec.getTarget() == "SELF") {
+				else if (target == "PARENT") {
+					call = "firefox " + rec.getURL() + "&";
+					s = system(call.data());
+					
+					LOG_ONCE( log_unimpl("Setting target to 'parent' --"
+								" will default to 'blank'") );
 				}
 				
-				else if (rec.getTarget() == "PARENT") {
+				else if (target == "TOP") {
+					call = "firefox " + rec.getURL() + "&";
+					s = system(call.data());
+					
+					LOG_ONCE( log_unimpl("Setting target to 'top' --"
+								" will default to 'blank'") );
 				}
 				
-				else if(rec.getTarget() == "TOP") {
+				else if (target == "SELF" || target == "")	{
+					call = "firefox " + rec.getURL() + "&";
+					s = system(call.data());
+					
+					LOG_ONCE( log_debug("If target not specified -- "
+								"will default to 'self'") );
+					LOG_ONCE( log_unimpl("Setting target to 'self' --"
+								" will default to 'blank'") );
 				}
-				
 			}
 
 			break;
@@ -1761,7 +1800,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "A") {
                             //anchor
-                            log_unimpl("<a> html tag in TextField");
 							rgba color;
 							color.fromShortString("#0000FF");
 							newrec.setColor(color);
@@ -1806,33 +1844,34 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                 std::string firstchar = attloc->second.substr(0,1);
                                 if (firstchar == "+") {
                                     newrec.setTextHeight(rec.textHeight() +
-                                        (PIXEL_RATIO * std::strtol(
+                                        
+										(pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10)));
+                                        NULL,10))));
                                     newrec.setYOffset(PADDING_TWIPS +
                                         newrec.textHeight() +
                                         (fontLeading - fontDescent));
-                                    _fontHeight += PIXEL_RATIO * std::strtol(
+                                    _fontHeight += pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10);
+                                        NULL,10));
                                 } else if (firstchar == "-") {
                                     newrec.setTextHeight(rec.textHeight() -
-                                        (PIXEL_RATIO * std::strtol(
+                                        (pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10)));
+                                        NULL,10))));
                                     newrec.setYOffset(PADDING_TWIPS +
                                         newrec.textHeight() +
                                         (fontLeading - fontDescent));
-                                    _fontHeight -= PIXEL_RATIO * std::strtol(
+                                    _fontHeight -= pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10);
+                                        NULL,10));
                                 } else {
-                                    newrec.setTextHeight(PIXEL_RATIO * std::strtol(
-                                        attloc->second.data(), NULL, 10));
+                                    newrec.setTextHeight(pixelsToTwips(std::strtol(
+                                        attloc->second.data(), NULL, 10)));
                                     newrec.setYOffset(PADDING_TWIPS + newrec.textHeight() +
                                         (fontLeading - fontDescent));
-                                    _fontHeight = PIXEL_RATIO * std::strtol(
-                                        attloc->second.data(), NULL, 10);
+                                    _fontHeight = pixelsToTwips(std::strtol(
+                                        attloc->second.data(), NULL, 10));
                                 }
                             }
                             handleChar(it, e, x, y, newrec, last_code,
@@ -1891,8 +1930,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("BLOCKINDENT");
                             if (attloc != attributes.end()) {
                                 //textformat BLOCKINDENT attribute
-                                setBlockIndent(PIXEL_RATIO * std::strtol(
-                                        attloc->second.data(), NULL, 10));
+                                setBlockIndent(pixelsToTwips(std::strtol(
+                                        attloc->second.data(), NULL, 10)));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     originalindent + originalblockindent) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1905,8 +1944,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("INDENT");
                             if (attloc != attributes.end()) {
                                 //textformat INDENT attribute
-                                setIndent(PIXEL_RATIO * std::strtol(
-                                    attloc->second.data(), NULL, 10));
+                                setIndent(pixelsToTwips(std::strtol(
+                                    attloc->second.data(), NULL, 10)));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     originalindent + getBlockIndent()) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1919,14 +1958,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("LEADING");
                             if (attloc != attributes.end()) {
                                 //textformat LEADING attribute
-                                setLeading(PIXEL_RATIO * std::strtol(
-                                        attloc->second.data(), NULL, 10));
+                                setLeading(pixelsToTwips(std::strtol(
+                                        attloc->second.data(), NULL, 10)));
                             }
                             attloc = attributes.find("LEFTMARGIN");
                             if (attloc != attributes.end()) {
                                 //textformat LEFTMARGIN attribute
-                                setLeftMargin(PIXEL_RATIO * std::strtol(
-                                        attloc->second.data(), NULL, 10));
+                                setLeftMargin(pixelsToTwips(std::strtol(
+                                        attloc->second.data(), NULL, 10)));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     getIndent() + getBlockIndent()) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1939,8 +1978,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("RIGHTMARGIN");
                             if (attloc != attributes.end()) {
                                 //textformat RIGHTMARGIN attribute
-                                setRightMargin(PIXEL_RATIO * std::strtol(
-                                        attloc->second.data(), NULL, 10));
+                                setRightMargin(pixelsToTwips(std::strtol(
+                                        attloc->second.data(), NULL, 10)));
                                 //FIXME:Should not apply this to this line if we are not at
                                 //beginning of line. Not sure how to do that.
                             }
@@ -2722,9 +2761,9 @@ void
 TextField::setTabStops(const std::vector<int>& tabStops)
 {
 	_tabStops.resize(tabStops.size());
-	for (size_t i = 0; i < tabStops.size(); i ++)
-	{
-		_tabStops[i] = PIXEL_RATIO * tabStops[i];
+	
+	for (size_t i = 0; i < tabStops.size(); i ++) {
+		_tabStops[i] = pixelsToTwips(tabStops[i]);
 	}
 	
     set_invalidated();
@@ -3496,9 +3535,6 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     // TODO: add font color and some more
-
-    LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url and target") );
-
     text->setTextFormat(*tf);
     return as_value();
 
@@ -3507,7 +3543,7 @@ textfield_setTextFormat(const fn_call& fn)
 as_value
 textfield_setNewTextFormat(const fn_call& fn)
 {
-    //boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     //UNUSED(text);
 
     LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate "
@@ -3521,8 +3557,6 @@ as_value
 textfield_password(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    //LOG_ONCE(log_unimpl("TextField.password"));
 
     if (!fn.nargs)
     {
