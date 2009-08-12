@@ -130,20 +130,14 @@ AsBroadcaster::initialize(as_object& o)
     }
     
     Global_as* gl = getGlobal(o);
-    o.set_member(NSV::PROP_BROADCAST_MESSAGE,
-            gl->createFunction(asbroadcaster_broadcastMessage));
+    
+    // The function returned by ASnative(101, 12) is attached, even though
+    // this may not exist (e.g. if _global.ASnative is altered)
+    const as_value& asn = gl->callMethod(NSV::PROP_AS_NATIVE, 101, 12);
+    o.set_member(NSV::PROP_BROADCAST_MESSAGE, asn);
 
     o.set_member(NSV::PROP_uLISTENERS, new Array_as());
 
-#ifndef NDEBUG
-    assert(o.get_member(NSV::PROP_uLISTENERS, &tmp));
-    assert(tmp.is_object());
-    assert(o.get_member(NSV::PROP_BROADCAST_MESSAGE, &tmp));
-    assert(tmp.is_function());
-
-    // The following properties may be overridden in the AsBroadcaster object
-    // and thus unavailable: addListener, removeListener
-#endif
 }
 
 as_object*

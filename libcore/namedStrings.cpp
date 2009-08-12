@@ -34,6 +34,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "a", NSV::PROP_A ),
 	string_table::svt( "addListener", NSV::PROP_ADD_LISTENER ),
 	string_table::svt( "align", NSV::PROP_ALIGN ),
+	string_table::svt( "ASnative", NSV::PROP_AS_NATIVE ),
 	string_table::svt( "_alpha", NSV::PROP_uALPHA ),
 	string_table::svt( "b", NSV::PROP_B ),
 	string_table::svt( "blockIndent", NSV::PROP_BLOCK_INDENT ),
