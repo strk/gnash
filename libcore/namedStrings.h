@@ -128,6 +128,7 @@ enum NamedStrings {
         PROP_A,
         PROP_ADD_LISTENER,
         PROP_ALIGN,
+        PROP_AS_NATIVE,
         PROP_B,
         PROP_BLOCK_INDENT,
         PROP_BOLD,
