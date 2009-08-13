@@ -95,12 +95,13 @@ NetConnection_as::init(as_object& global)
     static boost::intrusive_ptr<builtin_function> cl;
 
     if (cl == NULL) {
-        cl=new builtin_function(&netconnection_new,
-                getNetConnectionInterface());
+        Global_as* gl = getGlobal(global);
+        as_object* proto = getNetConnectionInterface();
+        cl = gl->createClass(&netconnection_new, proto);
+
         // replicate all interface to class, to be able to access
         // all methods as static functions
-        attachNetConnectionInterface(*cl);
-             
+        attachNetConnectionInterface(*cl);             
     }
 
     // Register _global.String
@@ -144,9 +145,7 @@ NetConnection_as::validateURL() const
 {
      GNASH_REPORT_FUNCTION;
 
-#if 0
-    const movie_root& mr = _vm.getRoot();
-    URL uri(_uri, mr.runInfo().baseURL());
+     URL uri(_uri, getRunResources(*this).baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -156,7 +155,6 @@ NetConnection_as::validateURL() const
         log_security(_("Gnash is not allowed to open this url: %s"), uriStr);
         return "";
     }
-#endif
 
     log_debug(_("Connection to movie: %s"), uriStr);
 
@@ -254,8 +252,7 @@ NetConnection_as::connect(const std::string& uri)
         return;
     }
 
-    const movie_root& mr = _vm.getRoot();
-    URL url(uri, mr.runInfo().baseURL());
+    URL url(uri, getRunResources(*this).baseURL());
 
 #if 0
     log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
