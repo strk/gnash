@@ -20,10 +20,9 @@
 //	- setTextFormat does not discard target, url, tabStops, display or
 //	  bullets
 //	- Above five fields are now implemented (except for target != blank)
+//		- Call movie_root getURL function to properly open url and target
 
 // Things to work on:
-//	- Cannot figure out how to open firefox in different ways--this
-//	  is what target is supposed to do
 //	- For the url cases (url property and anchor tag in html) we should
 //	  change the mouse cursor to the hand cursor standard for linkable 
 //    text
