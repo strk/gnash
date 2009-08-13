@@ -685,8 +685,11 @@ BitmapData_ctor(const fn_call& fn)
 {
 
 	if (fn.nargs < 2) {
-	    // TODO: should fail if not enough arguments are passed.
-        return as_value();
+        IF_VERBOSE_ASCODING_ERRORS(
+             log_aserror("BitmapData constructor requires at least two "
+                 "arguments. Will not construct a BitmapData");
+        );
+        throw ActionTypeError();
 	}
 
     size_t width, height;
@@ -709,8 +712,13 @@ BitmapData_ctor(const fn_call& fn)
     }
     
     // FIXME: Should fail to construct the object.
-    if (width > 2880 || height > 2880) return as_value();
-    if (width < 1 || height < 1) return as_value();
+    if (width > 2880 || height > 2880 || width < 1 || height < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+             log_aserror("BitmapData width and height must be between "
+                 "1 and 2880. Will not construct a BitmapData");
+        );
+        throw ActionTypeError();
+    }
 
     boost::intrusive_ptr<BitmapData_as> obj =
                 new BitmapData_as(width, height, transparent, fillColor);

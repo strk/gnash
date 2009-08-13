@@ -954,12 +954,79 @@ global_asnew(const fn_call& /*fn*/)
     return as_value();
 }
 
-// ASSetNative function
-// TODO: find dox 
+
+/// ASSetNative(targetObject, major, properties, minor)
+//
+/// Sets a series of properties on targetObject using the native table.
+/// The third argument is generally documented to be an array, but in fact
+/// it is always converted to a string and parsed.
 as_value
-global_assetnative(const fn_call& /*fn*/)
+global_assetnative(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl("ASSetNative"));
+
+    if (fn.nargs < 3) {
+        return as_value();
+    }
+
+    Global_as* gl = getGlobal(fn);
+
+    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    if (!targetObject) {
+        return as_value();
+    }
+
+    const int major = fn.arg(1).to_int();
+    if (major < 0) return as_value();
+
+    const std::string& props = fn.arg(2).to_string();
+    const int minor = fn.nargs > 3 ? std::max(fn.arg(3).to_int(), 0) : 0;
+
+    std::string::const_iterator pos = props.begin();
+
+    VM& vm = getVM(fn);
+
+    size_t i = 0;
+
+    // pos is always the position after the last located property.
+    while (pos != props.end()) {
+
+        // If there are no further commas, find the end of the string.
+        std::string::const_iterator comma = std::find(pos, props.end(), ',');
+
+        const char num = *pos;
+        
+        int flag;
+
+        switch (num) {
+            case '6':
+                flag = PropFlags::onlySWF6Up;
+                ++pos;
+                break;
+            case '7':
+                flag = PropFlags::onlySWF7Up;
+                ++pos;
+                break;
+            case '8':
+                flag = PropFlags::onlySWF8Up;
+                ++pos;
+                break;
+            case '9':
+                flag = PropFlags::onlySWF9Up;
+                ++pos;
+                break;
+            default:
+                flag = 0;
+
+        }
+        const std::string& property = std::string(pos, comma);
+        if (!property.empty()) {
+            targetObject->init_member(property,
+                    vm.getNative(major, minor + i), flag);
+        }
+        if (comma == props.end()) break;
+        pos = comma + 1;
+        ++i;
+    }
     return as_value();
 }
 

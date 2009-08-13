@@ -124,13 +124,12 @@ TextFormat_as::registerNative(as_object& o)
 TextFormat_as::TextFormat_as()
 	:
 	as_object(getTextFormatInterface()),
-	
 	_flags(0),
 	_underline(false),
 	_bold(false),
-	_display(),
 	_italic(false),
 	_bullet(false),
+    _display(),
 	_align(TextField::ALIGN_LEFT),
 	_blockIndent(-1),
 	_color(),
@@ -153,18 +152,12 @@ TextFormat_as::TextFormat_as()
 void
 TextFormat_as::init(as_object& global, const ObjectURI& uri)
 {
-	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<as_object> cl;
 
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getTextFormatInterface();
-        cl = gl->createClass(&textformat_new, proto);
-	}
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getTextFormatInterface();
+    as_object* cl = gl->createClass(&textformat_new, proto);
 
-	// Register _global.Color
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

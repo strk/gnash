@@ -471,16 +471,46 @@ check_equals (int("0x-7.8 "), 0);
 // END OF TEST
 //------------------------------------------------------------
 
+// Test _global.ASSetNative
+
+o = new Object();
+ASSetNative(o, 103, "q, w, e,6z,6u,7u, 7i, t,z,u");
+r = "";
+for (i in o) { r+=i + ","; };
+check_equals(r, " t, 7i,u,z, e, w,q,");
+
+// Check that toString() is called.
+var o = new Object ();
+var a = ["i", "u"];
+a.toString = function() { trace ("toString called"); return "o, j"; };
+ASSetNative (o, 200, a, 10);
+
+r = "";
+for (i in o) { r += i + ","; };
+// It's not what's in the array (i, u), but what's returned by its toString
+// method ("o,j");
+check_equals(r, " j,o,");
+
+// The function is not dependent on the present of the ASnative function.
+ASnative = 56;
+o = new Object();
+ASSetNative (o, 200, "k,j,l", 10);
+
+r = "";
+for (i in o) { r += i + ","; };
+check_equals(r, "l,j,k,");
+
+
 #if OUTPUT_VERSION == 5
-	check_totals(155); // SWF5
+	check_totals(158); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(189); // SWF6
+	check_totals(192); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(171); // SWF7
+	check_totals(174); // SWF7
 #  else
-	check_totals(158); // SWF8+
+	check_totals(161); // SWF8+
 #  endif
 # endif
 #endif
