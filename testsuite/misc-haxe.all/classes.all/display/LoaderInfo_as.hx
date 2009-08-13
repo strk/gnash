@@ -49,22 +49,27 @@ import DejaGnu;
 class LoaderInfo_as {
     static function main() {
 	
-	#if flash9
-	var loader:Loader = new Loader();
-	//var loader = new flash.display.Loader();
-	var x1 = loader.contentLoaderInfo;
-	loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, function(e) {
-		trace(e);
-	});
+		#if flash9
+		
+				DejaGnu.note("\nIf test does not run properly -- ie: error of some" +
+					" sort, then check line212 and make sure there is a" +
+					" valid url path for a swf\n");
+					
+		var loader:Loader = new Loader();
+		//var loader = new flash.display.Loader();
+		var x1 = loader.contentLoaderInfo;
+		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, function(e) {
+			trace(e);
+		});
 
-	loader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(e) {
+		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(e) {
 
 		// Make sure we actually get a valid class        
 		if (Std.is(x1, LoaderInfo)) {
  		    DejaGnu.pass("LoaderInfo class exists");
-        	} else {
+        } else {
                     DejaGnu.fail("LoaderInfo lass doesn't exist");
-        	}
+        }
 
 		// Tests to see if all the properties exist. All these do is test for
 		// existance of a property, and don't test the functionality at all. This
@@ -150,6 +155,7 @@ class LoaderInfo_as {
 	 	} else {
 	 	    DejaGnu.fail("LoaderInfo::sharedEvents property doesn't exist");
 	 	}
+		
 		// For older versions (FP<9), the swfVersion returned type int.  However
 		// for new versions (FP>=9) it returned the class SWFVersion.  This test
 		// to see which version the swf is.  
@@ -193,8 +199,8 @@ class LoaderInfo_as {
 		// existance of a method, and don't test the functionality at all. This
 		// is primarily useful only to test completeness of the API implementation.
 
-		// FIXME: method doesn't exist (maybe haXe problem)
-	 	/*if (Type.typeof(LoaderInfo.getLoaderInfoByDefinition)==TFunction) {
+		// FIXME: method doesn't exist (maybe haXe problem)	
+		/*if (Type.typeof(LoaderInfo.getLoaderInfoByDefinition)==TFunction) {
 	 	    DejaGnu.pass("LoaderInfo::getLoaderInfoByDefinition() method exists");
 	 	} else {
 	 	    DejaGnu.fail("LoaderInfo::getLoaderInfoByDefinition() method doesn't exist");
@@ -203,8 +209,9 @@ class LoaderInfo_as {
 		DejaGnu.done();
 	});
 	
-	// Specify file where .swf resides
-	loader.load(new URLRequest("/home/sharad/Desktop/cubes.swf"));
+	// Specify file where .swf resides -- user can simply replace their username in the
+	// appropriate spot below
+	loader.load(new URLRequest("/home/user_name/gnash/trunk/testsuite/car_smash.swf"));
 	
 	#end
     }
