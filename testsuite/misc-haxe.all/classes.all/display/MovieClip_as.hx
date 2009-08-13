@@ -385,11 +385,28 @@ class MovieClip_as {
 	} else {
 	    DejaGnu.fail("MovieClip::attachAudio method doesn't exist");
 	}
+#if !(flash6 || flash7)
 	if (Type.typeof(x1.attachBitmap) == ValueType.TFunction) {
 	    DejaGnu.pass("MovieClip::attachBitmap() method exists");
 	} else {
 	    DejaGnu.fail("MovieClip::attachBitmap() method doesn't exist");
 	}
+	if (Type.typeof(x1.beginBitmapFill) == ValueType.TFunction) {
+	    DejaGnu.pass("MovieClip::beginBitmapFill() method exists");
+	} else {
+	    DejaGnu.fail("MovieClip::beginBitmapFill() method doesn't exist");
+	}
+	if (Type.typeof(x1.getRect) == ValueType.TFunction) {
+	    DejaGnu.pass("MovieClip::getRect() method exists");
+	} else {
+	    DejaGnu.fail("MovieClip::getRect() method doesn't exist");
+	}
+	if (Type.typeof(x1.lineGradientStyle) == ValueType.TFunction) {
+	    DejaGnu.pass("MovieClip::lineGradientStyle method exists");
+	} else {
+	    DejaGnu.fail("MovieClip::lineGradientStyle method doesn't exist");
+	}
+#end
 	if (Type.typeof(x1.attachMovie) == ValueType.TFunction) {
 	    DejaGnu.pass("MovieClip::attachMovie() method exists");
 	} else {
@@ -400,11 +417,7 @@ class MovieClip_as {
 	} else {
 	    DejaGnu.fail("MovieClip::attachVideo() method doesn't exist");
 	}
-	if (Type.typeof(x1.beginBitmapFill) == ValueType.TFunction) {
-	    DejaGnu.pass("MovieClip::beginBitmapFill() method exists");
-	} else {
-	    DejaGnu.fail("MovieClip::beginBitmapFill() method doesn't exist");
-	}
+
 	if (Type.typeof(x1.beginFill) == ValueType.TFunction) {
 	    DejaGnu.pass("MovieClip::beginFill() method exists");
 	} else {
@@ -477,11 +490,6 @@ class MovieClip_as {
 	    DejaGnu.fail("MovieClip::getNextHighestDepth method doesn't exist");
 	}
 #end
-	if (Type.typeof(x1.getRect) == ValueType.TFunction) {
-	    DejaGnu.pass("MovieClip::getRect() method exists");
-	} else {
-	    DejaGnu.fail("MovieClip::getRect() method doesn't exist");
-	}
 	if (Type.typeof(x1.getSWFVersion) == ValueType.TFunction) {
 	    DejaGnu.pass("MovieClip::getSWFVersion() method exists");
 	} else {
@@ -516,11 +524,6 @@ class MovieClip_as {
 	    DejaGnu.pass("MovieClip::hitTest() method exists");
 	} else {
 	    DejaGnu.fail("MovieClip::hitTest() method doesn't exist");
-	}
-	if (Type.typeof(x1.lineGradientStyle) == ValueType.TFunction) {
-	    DejaGnu.pass("MovieClip::lineGradientStyle method exists");
-	} else {
-	    DejaGnu.fail("MovieClip::lineGradientStyle method doesn't exist");
 	}
 	if (Type.typeof(x1.lineStyle) == ValueType.TFunction) {
 	    DejaGnu.pass("MovieClip::lineStyle() method exists");
