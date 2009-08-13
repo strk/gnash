@@ -139,7 +139,9 @@ color_gettransform(const fn_call& fn)
 
 	// Convert to as_object
 
-	as_object* ret = new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(fn);
+    as_object* proto = getObjectInterface();
+	as_object* ret = gl->createObject(proto);
 
 	ret->init_member("ra", double(cx.ra / 2.56));
 	ret->init_member("ga", double(cx.ga / 2.56));
@@ -167,6 +169,7 @@ color_setrgb(const fn_call& fn)
 	}
 
     MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    if (!sp) return as_value();
 
 	boost::int32_t color = fn.arg(0).to_int();
 
