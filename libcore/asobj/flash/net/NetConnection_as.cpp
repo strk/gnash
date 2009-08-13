@@ -53,6 +53,7 @@
 #include "network.h"
 #include "rtmp.h"
 #include "rtmp_client.h"
+#include "Global_as.h"
 
 using namespace std;
 
@@ -92,7 +93,7 @@ void
 NetConnection_as::init(as_object& global)
 {
     // This is going to be the global NetConnection "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
+    static boost::intrusive_ptr<as_object> cl;
 
     if (cl == NULL) {
         Global_as* gl = getGlobal(global);
@@ -306,8 +307,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 {
 //     GNASH_REPORT_FUNCTION;
 
-    const movie_root& mr = _vm.getRoot();
-    URL url(_uri, mr.runInfo().baseURL());
+    URL url(_uri, getRunResources(*this).baseURL());
 
     string app;		// the application name
     string path;	// the path to the file on the server
@@ -484,7 +484,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     boost::shared_ptr<amf::Buffer> buf = top.encodeAMFPacket();
 //     top.dump();
 
-    VM& vm = asCallback->getVM();
+    VM& vm = getVM(*asCallback);
     tdata->st = &vm.getStringTable();
     tdata->nas = this;
 // 	tdata->vm = vm;
@@ -495,7 +495,6 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
  	log_debug("Requesting HTTP response...");
 	// "/echo/gateway"
 	amf::Buffer &request = _http_client->formatRequest(url.path(),
-							   url.hostname(),
 							   HTTP::HTTP_POST);
 	_http_client->formatContentLength(buf->allocated());
 	// All HTTP messages are followed by a blank line.
@@ -528,7 +527,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
-    const RunInfo& ri = _vm.getRoot().runInfo();
+    const RunResources& ri = getRunResources(*this);
 
     const StreamProvider& streamProvider = ri.streamProvider();
 
@@ -583,7 +582,7 @@ netconnection_call(const fn_call& fn)
     if (fn.nargs > 1) {
 
         if (fn.arg(1).is_object()) {
-            asCallback = (fn.arg(1).to_object());
+	    asCallback = (fn.arg(1).to_object(*getGlobal(fn)));
         }
         else {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -635,10 +634,12 @@ netconnection_uri(const fn_call& fn)
 void
 attachNetConnectionInterface(as_object& o)
 {
-    o.init_member("connect", new builtin_function(netconnection_connect));
-    o.init_member("addHeader", new builtin_function(netconnection_addHeader));
-    o.init_member("call", new builtin_function(netconnection_call));
-    o.init_member("close", new builtin_function(netconnection_close));
+    Global_as* gl = getGlobal(o);
+    
+    o.init_member("connect", gl->createFunction(netconnection_connect));
+    o.init_member("addHeader", gl->createFunction(netconnection_addHeader));
+    o.init_member("call", gl->createFunction(netconnection_call));
+    o.init_member("close", gl->createFunction(netconnection_close));
 }
 
 void
@@ -705,7 +706,7 @@ netconnection_connect(const fn_call& fn)
 
     const as_value& uri = fn.arg(0);
     
-    const VM& vm = ptr->getVM();
+    const VM& vm = getVM(fn);
     const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
     
     // This is always set without validification.
