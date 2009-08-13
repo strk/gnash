@@ -43,15 +43,16 @@ class Boolean_as {
 	//     So far I have been unable to find a workaround for this. For now we
 	//     will be unable to compile these test for flash9.
 	#if flash9
-	DejaGnu.note("These tests do not currently compile in flash version 9");
+	DejaGnu.note("These tests do not currently compile in flash version 9: see comments in Boolean_as.hx");
+    
 	#else
 	
 	//check_equals(typeof(Boolean), 'function');
 	if ( untyped __typeof__(Boolean) == 'function') {
 			DejaGnu.pass("Boolean class exists");
-		} else {
+    } else {
 			DejaGnu.fail("Boolean class does not exist");
-		}
+    }
 	//check_equals(typeof(Boolean()), 'undefined');
 	if ( untyped __typeof__(Boolean()) == 'undefined') {
 		DejaGnu.pass("Call to Boolean() returns null");

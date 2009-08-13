@@ -39,7 +39,7 @@ import DejaGnu;
 class LineScaleMode_as {
     static function main() {
 
-	#if flash9
+#if flash9
    	// Make sure we actually get a valid class        
 	if (Type.typeof(LineScaleMode)==TObject) {
 	    DejaGnu.pass("LineScaleMode class exists.");
@@ -69,10 +69,13 @@ class LineScaleMode_as {
         } else {
             DejaGnu.fail("LineScaleMode.VERTICAL constant doesn't exist");
         }
+#else
+        DejaGnu.note("LineScaleMode did not exist in versions prior to SWF9");
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
+
     }
 }
 

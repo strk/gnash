@@ -39,7 +39,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Proxy_as {
     static function main() {
-	#if flash9
+        
+#if flash9
         var x1:Proxy = new Proxy();
 
         // Make sure we actually get a valid class        
@@ -53,9 +54,13 @@ class Proxy_as {
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
 
+
+#else
+    DejaGnu.note("Proxy class did not exist in versions prior to SWF 9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

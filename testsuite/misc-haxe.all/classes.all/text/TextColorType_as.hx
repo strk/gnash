@@ -42,8 +42,7 @@ class TextColorType_as {
 //        var x1:TextColorType = new TextColorType();
 
 
-//Si:
-//Check the followings:
+
 #if flash9
         // Make sure we actually get a valid class        
         if (Type.typeof(TextColorType)== TObject) {
@@ -63,10 +62,14 @@ class TextColorType_as {
             DejaGnu.fail("TextColorType LIGHT_COLOR doesn't exist");
         }
 
-#end
+
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+
+#else
+    DejaGnu.note("TextColorType did not exist before SWF9");
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

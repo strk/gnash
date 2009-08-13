@@ -33,6 +33,7 @@ import flash.TextFormat;
 import flash.Lib;
 import Type;
 import Std;
+import haxe.PosInfos;
 
 // import our testing API
 import DejaGnu;

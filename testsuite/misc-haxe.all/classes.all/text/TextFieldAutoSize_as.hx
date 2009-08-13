@@ -39,7 +39,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class TextFieldAutoSize_as {
     static function main() {
-	#if flash9
+        
+#if flash9
 	// Make sure we actually get a valid class        
 	if (Type.typeof(TextFieldAutoSize)==TObject) {
 	    DejaGnu.pass("TextFieldAutoSize class exists.");
@@ -71,9 +72,13 @@ class TextFieldAutoSize_as {
             DejaGnu.fail("TextFieldAutoSize.RIGHT constant doesn't exist");
         }
 
+#else
+    DejaGnu.note("TextFieldAutosize did not exist before SWF9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
+
     }
 }
 

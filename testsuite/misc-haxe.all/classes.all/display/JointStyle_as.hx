@@ -39,16 +39,16 @@ import DejaGnu;
 class JointStyle_as {
     static function main() {
 
-	#if flash9
-   	// Make sure we actually get a valid class        
-	if (Type.typeof(JointStyle)==TObject) {
-	    DejaGnu.pass("JointStyle class exists.");
-	} else {
-	    DejaGnu.fail("JointStyle class doesn't exist");
-	}
+#if flash9
+        // Make sure we actually get a valid class        
+        if (Type.typeof(JointStyle)==TObject) {
+            DejaGnu.pass("JointStyle class exists.");
+        } else {
+            DejaGnu.fail("JointStyle class doesn't exist");
+        }
 
-	// Tests to see if all the constants exist. All these do is test for
-	// existance of a constants, and don't test the functionality at all. 
+        // Tests to see if all the constants exist. All these do is test for
+        // existance of a constants, and don't test the functionality at all. 
         if (Type.typeof(JointStyle.BEVEL)!= null) {
             DejaGnu.pass("JointStyle.BEVEL constant exists");
         } else {
@@ -65,9 +65,12 @@ class JointStyle_as {
             DejaGnu.fail("JointStyle.ROUND constant doesn't exist");
         }
 
+#else
+        DejaGnu.note("JointStyle did not exist in version prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
+	
     }
 }
 

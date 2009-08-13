@@ -43,7 +43,7 @@ import DejaGnu;
 class SimpleButton_as {
     static function main() {
 	
-	#if flash9
+#if flash9
         var x1:SimpleButton = new SimpleButton();
 	var x2:DisplayObject = new Shape();
 
@@ -111,9 +111,11 @@ class SimpleButton_as {
 // 	    DejaGnu.fail("SimpleButton::SimpleButton() method doesn't exist");
 // 	}
 
+#else
+    DejaGnu.note("SimpleButton did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

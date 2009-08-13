@@ -205,15 +205,16 @@ class LoaderInfo_as {
 	 	} else {
 	 	    DejaGnu.fail("LoaderInfo::getLoaderInfoByDefinition() method doesn't exist");
 	 	}*/
-	       
+
+#else
+    DejaGnu.note("LoaderInfo did not exist in versions prior to SWF9");
+#end
 		DejaGnu.done();
-	});
 	
 	// Specify file where .swf resides -- user can simply replace their username in the
 	// appropriate spot below
 	loader.load(new URLRequest("/home/user_name/gnash/trunk/testsuite/car_smash.swf"));
 	
-	#end
     }
 }
 

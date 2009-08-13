@@ -49,6 +49,8 @@ class SecurityDomain_as {
         } else {
             DejaGnu.fail("SecurityDomain class doesn't exist");
         }
+#else
+    DejaGnu.note("SecurityDomain did not exist in versions prior to SWF9");
 #end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

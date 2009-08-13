@@ -56,9 +56,12 @@ class Shape_as {
  	    DejaGnu.fail("Shape::graphics property doesn't exist");
  	}
 
+#else
+    DejaGnu.note("Shape class did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-#end
+
     }
 }
 

@@ -48,41 +48,76 @@ class AccessibilityProperties_as {
         if (x1 != null) {
             DejaGnu.pass("AccessibilityProperties class exists");
         } else {
-            DejaGnu.fail("AccessibilityProperties lass doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (Std.is(x1.description, String)) {
+    // Tests to see if all the properties exist. All these do is test for
+    // existance of a property, and don't test the functionality at all. This
+    // is primarily useful only to test completeness of the API implementation.
+    if ( untyped x1.hasOwnProperty('description') ) {
 	    DejaGnu.pass("AccessibilityProperties::description property exists");
 	} else {
-	    DejaGnu.fail("AccessibilityProperties::description property doesn't exist");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties::description property doesn't exist");
 	}
-	if (Type.typeof(x1.forceSimple) == ValueType.TBool) {
+    if ( untyped __typeof__(x1.description) == 'string') {
+        DejaGnu.pass("AccessibilityProperties.description is a string");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties.description is not a string");
+    }
+    
+	if ( untyped x1.hasOwnProperty('forceSimple')) {
 	    DejaGnu.pass("AccessibilityProperties::forceSimple property exists");
 	} else {
-	    DejaGnu.fail("AccessibilityProperties::forceSimple property doesn't exist");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties::forceSimple property doesn't exist");
 	}
-	if (Std.is(x1.name, String)) {
+    if ( untyped __typeof__(x1.forceSimple) == 'boolean') {
+        DejaGnu.pass("AccessibilityProperties.forceSimple is a boolean");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties.forceSimple is not a boolean");
+    }
+    
+	if ( untyped x1.hasOwnProperty('name')) {
 	    DejaGnu.pass("AccessibilityProperties::name property exists");
 	} else {
-	    DejaGnu.fail("AccessibilityProperties::name property doesn't exist");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties::name property doesn't exist");
 	}
-	if (Type.typeof(x1.noAutoLabeling) == ValueType.TBool) {
+    if ( untyped __typeof__(x1.name) == 'string') {
+        DejaGnu.pass("AccessibilityProperties.name is a string");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties.name is not a string");
+    }
+    
+	if (untyped x1.hasOwnProperty('noAutoLabeling')) {
 	    DejaGnu.pass("AccessibilityProperties::noAutoLabeling property exists");
 	} else {
-	    DejaGnu.fail("AccessibilityProperties::noAutoLabeling property doesn't exist");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties::noAutoLabeling property doesn't exist");
 	}
-	if (Std.is(x1.shortcut, String)) {
+    if ( untyped __typeof__(x1.noAutoLabeling) == 'boolean') {
+        DejaGnu.pass("AccessibilityProperties.noAutoLabeling is a boolean");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties.noAutoLabeling is not a boolean");
+    }
+    
+	if (untyped x1.hasOwnProperty('shortcut')) {
 	    DejaGnu.pass("AccessibilityProperties::shortcut property exists");
 	} else {
-	    DejaGnu.fail("AccessibilityProperties::shortcut property doesn't exist");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties::shortcut property doesn't exist");
 	}
-	if (Std.is(x1.silent, String)) {
+    if (untyped __typeof__(x1.shortcut) == 'string') {
+        DejaGnu.pass("AccessibilityProperties.shortcut is a string");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties.shortcut is not a string");
+    }
+    
+	if (untyped x1.hasOwnProperty('silent')) {
 	    DejaGnu.pass("AccessibilityProperties::silent property exists");
 	} else {
-	    DejaGnu.fail("AccessibilityProperties::silent property doesn't exist");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties::silent property doesn't exist");
 	}
+    if (untyped __typeof__(x1.silent) == 'boolean') {
+        DejaGnu.pass("AccessibilityProperties.silent is a boolean");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]AccessibilityProperties.silent is not a boolean");
+    }
 	#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();

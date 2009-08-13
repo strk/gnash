@@ -92,10 +92,13 @@ class Loader_as {
 	} else {
 	    DejaGnu.fail("Loader::unload() method doesn't exist");
 	}
+    
+#else
+    DejaGnu.note("Loader did not exist in versions prior to SWF9");
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

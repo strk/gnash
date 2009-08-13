@@ -109,11 +109,13 @@ class LoaderContext_as {
  	    DejaGnu.fail("LoaderContext.securityDomain property doesn't exist");
  	}
 
+#else
+    DejaGnu.note("LoaderContext did not exist in versions prior to SWF9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
 
-#else
-#end
     }
 }
 

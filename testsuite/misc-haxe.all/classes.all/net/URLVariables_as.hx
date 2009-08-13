@@ -50,9 +50,12 @@ class URLVariables_as {
             DejaGnu.fail("URLVariables class doesn't exist");
         }
 
+#else
+    DejaGnu.note("URLVariables did not exist before SWF9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

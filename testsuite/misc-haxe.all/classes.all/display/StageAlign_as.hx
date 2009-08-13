@@ -91,9 +91,12 @@ class StageAlign_as {
             DejaGnu.fail("StageAlign.TOP_RIGHT constant doesn't exist");
         }
 
+#else
+    DejaGnu.note("StageAlign did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
+
     }
 }
 

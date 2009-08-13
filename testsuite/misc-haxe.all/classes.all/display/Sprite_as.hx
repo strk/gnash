@@ -41,6 +41,7 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Sprite_as {
     static function main() {
+        
 #if flash9
         var x1:Sprite = new Sprite();
         var x2:Sprite = new Sprite();
@@ -103,9 +104,12 @@ class Sprite_as {
 	    DejaGnu.fail("Sprite::stopDrag() method doesn't exist");
 	}
 
+#else
+    DejaGnu.note("Sprite did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-#end
+
     }
 }
 

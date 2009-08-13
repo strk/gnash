@@ -73,6 +73,10 @@ class TextFormatAlign_as {
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
+
+
+#else
+    DejaGnu.note("TextFormatAlign did not exist before SWF9");
 #end
 
         // Call this after finishing all tests. It prints out the totals.

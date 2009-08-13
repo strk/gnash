@@ -96,7 +96,11 @@ class IMEConversionMode_as {
         }
 
         // Call this after finishing all tests. It prints out the totals.
+#else
+        DejaGnu.note("The IMEConversionMode class did not exist in versions prior to SWF9");
+        
 #end
+        
         DejaGnu.done();
     }
 }
