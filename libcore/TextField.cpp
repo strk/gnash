@@ -606,55 +606,9 @@ TextField::on_event(const event_id& ev)
 					}
 			}
 			
-			std::string target = rec.getTarget();
-			
-			for (size_t i=0; i < target.size(); ++i) {
-				target[i] = toupper(target[i]);
-			}	
-			
-			if ( target[0] == '_' ) {
-				target.erase(0);
-			}
-			
-			// Resolve compiler warning: system returns an int
-			int s = 0;
-			
-			log_debug("url: %s", rec.getURL());
-			log_debug("target: %s", target);
-			
-			std::string call = "";
-			
-			if ( rec.getURL()!="" ) {
-				if (target == "BLANK") {
-					call = "firefox " + rec.getURL() + "&";
-					s = system(call.data());
-				}
-				
-				else if (target == "PARENT") {
-					call = "firefox " + rec.getURL() + "&";
-					s = system(call.data());
-					
-					LOG_ONCE( log_unimpl("Setting target to 'parent' --"
-								" will default to 'blank'") );
-				}
-				
-				else if (target == "TOP") {
-					call = "firefox " + rec.getURL() + "&";
-					s = system(call.data());
-					
-					LOG_ONCE( log_unimpl("Setting target to 'top' --"
-								" will default to 'blank'") );
-				}
-				
-				else if (target == "SELF" || target == "")	{
-					call = "firefox " + rec.getURL() + "&";
-					s = system(call.data());
-					
-					LOG_ONCE( log_debug("If target not specified -- "
-								"will default to 'self'") );
-					LOG_ONCE( log_unimpl("Setting target to 'self' --"
-								" will default to 'blank'") );
-				}
+			if (!rec.getURL().empty()) {
+				   root.getURL(rec.getURL(), rec.getTarget(), "",
+								MovieClip::METHOD_NONE);
 			}
 
 			break;
