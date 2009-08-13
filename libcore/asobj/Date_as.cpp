@@ -145,7 +145,6 @@ namespace {
     template<bool utc> as_value date_setSeconds(const fn_call& fn);
     as_value date_setYear(const fn_call& fn);
     as_value date_tostring(const fn_call& fn);
-    as_value date_valueof(const fn_call& fn);
     as_value date_UTC(const fn_call& fn);
 
     void fillGnashTime(double time, GnashTime& gt);
@@ -340,7 +339,6 @@ void truncateDouble(T& target, double value)
 void
 attachDateInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
 
     o.init_member("getFullYear", vm.getNative(103, 0));
@@ -380,7 +378,9 @@ attachDateInterface(as_object& o)
     o.init_member("setUTCMinutes", vm.getNative(103, 141));
     o.init_member("setUTCSeconds", vm.getNative(103, 142));
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
-    o.init_member("valueOf", gl->createFunction(date_valueof));
+
+    string_table& st = getStringTable(o);
+    o.init_member("valueOf", o.getMember(st.find("getTime")));
 
 }   
 
@@ -388,7 +388,8 @@ void
 attachDateStaticInterface(as_object& o)
 {
     VM& vm = getVM(o);
-    o.init_member("UTC", vm.getNative(103, 257));
+    const int flags = as_object::DefaultFlags | PropFlags::readOnly;
+    o.init_member("UTC", vm.getNative(103, 257), flags);
 }
 
 as_object*
@@ -1342,17 +1343,9 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
     return(0.0);
 }
 
-/// \brief Date.valueOf() returns the number of milliseconds since midnight
+/// \brief Date.getTime() returns the number of milliseconds since midnight
 /// January 1, 1970 00:00 UTC, for a Date. The return value can be a fractional
 /// number of milliseconds.
-as_value
-date_valueof(const fn_call& fn)
-{
-    boost::intrusive_ptr<Date_as> date = ensureType<Date_as>(fn.this_ptr);
-    return as_value(date->getTimeValue());
-}
-
-
 as_value date_getTime(const fn_call& fn)
 {
     boost::intrusive_ptr<Date_as> date = ensureType<Date_as>(fn.this_ptr);
