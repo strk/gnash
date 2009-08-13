@@ -209,20 +209,21 @@ Date_as::toString() const
 void
 Date_as::init(as_object& global, const ObjectURI& uri)
 {
-    // This is going to be the global Date "class"/"function"
-    static boost::intrusive_ptr<as_object> cl;
 
-    if ( cl == NULL ) {
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getDateInterface();
-        cl = gl->createClass(&date_new, proto);
-        
-        // replicate static interface to class (Date.UTC)
-        attachDateStaticInterface(*cl);
-    }
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getDateInterface();
+    as_object* cl = gl->createClass(&date_new, proto);
+    
+    const int flags = PropFlags::readOnly;
+    cl->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+    cl->set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
+    cl->set_member_flags(NSV::PROP_PROTOTYPE, flags);
+
+    // Attach static interface to class (Date.UTC)
+    attachDateStaticInterface(*cl);
 
     // Register _global.Date
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }
