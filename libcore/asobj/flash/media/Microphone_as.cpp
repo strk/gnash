@@ -257,17 +257,18 @@ microphone_setgain(const fn_call& fn)
         } else {
             //set to highest or lowest gain if bad value was passed
 #ifdef USE_GST
-        if (argument < 0) {
-            ptr->set_gain(-60);
-        } else if (argument > 100) {
-            ptr->set_gain(60);
-        }
+            if (argument < 0) {
+                ptr->set_gain(-60);
+            } else if (argument > 100) {
+                ptr->set_gain(60);
+            }
 #endif
 #ifdef USE_FFMPEG
-        if (argument < 0) {
-            ptr->set_gain(0);
-        } else if (arument > 100) {
-            ptr->set_gain(100);
+            if (argument < 0) {
+                ptr->set_gain(0);
+            } else if (argument > 100) {
+                ptr->set_gain(100);
+            }
 #endif
         }
     }
