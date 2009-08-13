@@ -68,7 +68,7 @@ class LoaderInfo_as {
 		if (Std.is(x1, LoaderInfo)) {
  		    DejaGnu.pass("LoaderInfo class exists");
         } else {
-                    DejaGnu.fail("LoaderInfo lass doesn't exist");
+            DejaGnu.fail("LoaderInfo lass doesn't exist");
         }
 
 		// Tests to see if all the properties exist. All these do is test for
@@ -211,9 +211,10 @@ class LoaderInfo_as {
 	
 	// Specify file where .swf resides -- user can simply replace their username in the
 	// appropriate spot below
-	loader.load(new URLRequest("/home/user_name/gnash/trunk/testsuite/car_smash.swf"));
-	
-	#end
+	loader.load(new URLRequest("/home/user_name/gnash/trunk/testsuite/samples/car_smash.swf"));
+#else
+	DejaGnu.note("LoaderInfo is not valid in versions 8 and below");
+#end
     }
 }
 
