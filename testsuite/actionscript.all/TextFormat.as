@@ -61,7 +61,7 @@ check(tfObj.hasOwnProperty('getTextExtent'));
 xcheck_equals(typeof(tfObj.display), 'string');
 xcheck_equals(tfObj.display, 'block');
 check_equals(typeof(tfObj.bullet), 'null');
-xcheck_equals(typeof(tfObj.tabStops), 'null');
+check_equals(typeof(tfObj.tabStops), 'null');
 check_equals(typeof(tfObj.blockIndent), 'null');
 check_equals(typeof(tfObj.leading), 'null');
 check_equals(typeof(tfObj.indent), 'null');
@@ -83,7 +83,7 @@ tfObj = new TextFormat("fname", 2, 30, true, false, true, 'http', 'tgt', 'cEnter
 xcheck_equals(typeof(tfObj.display), 'string');
 xcheck_equals(tfObj.display, 'block');
 check_equals(typeof(tfObj.bullet), 'null');
-xcheck_equals(typeof(tfObj.tabStops), 'null');
+check_equals(typeof(tfObj.tabStops), 'null');
 check_equals(typeof(tfObj.blockIndent), 'null');
 check_equals(tfObj.leading, 4);
 check_equals(tfObj.indent, 12);
