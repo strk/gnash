@@ -35,8 +35,6 @@
 
 #include <sstream>
 
-// Define this to debug color settings
-//#define GNASH_DEBUG_COLOR 1
 
 namespace gnash {
 
@@ -49,77 +47,12 @@ namespace {
     as_value color_ctor(const fn_call& fn);
 
     as_object* getColorInterface();
+    inline void parseColorTransProp(as_object& obj, string_table::key key,
+            boost::int16_t& target, bool scale);
 }
 
-
-
-class Color_as: public as_object
-{
-
-public:
-
-	Color_as(MovieClip* sp)
-		:
-		as_object(getColorInterface()),
-		_sprite(sp)
-	{}
-
-	/// Mark associated sprite as reachable
-	//
-	/// Drop sprite instance reference if sprite
-	/// was unloaded.
-	///
-	void markReachableResources() const
-	{
-		if ( checkSprite() )
-		{
-			assert ( ! _sprite->unloaded() );
-			_sprite->setReachable();
-		}
-		markAsObjectReachable();
-	}
-
-	MovieClip* getSprite() const
-	{
-		checkSprite();
-		return _sprite;
-	}
-
-	cxform getTransform() const
-	{
-		cxform ret;
-		if ( checkSprite() ) ret = _sprite->get_user_cxform();
-		return ret;
-	}
-
-	void setTransform(const cxform& newTrans) 
-	{
-		if (!checkSprite()) return;
-		_sprite->set_user_cxform(newTrans);
-	}
-
-private:
-
-	/// Drop reference to sprite if unloaded
-	//
-	/// Return true if we have a non-unloaded sprite
-	///
-	bool checkSprite() const
-	{
-		if ( ! _sprite ) return false;
-		if ( _sprite->unloaded() )
-		{
-			_sprite = 0;
-			return false;
-		}
-		return true;
-	}
-
-	mutable MovieClip* _sprite;
-
-};
-
-void registerColorNative(as_object& o)
+void
+registerColorNative(as_object& o)
 {
 	VM& vm = getVM(o);
 
@@ -178,18 +111,18 @@ getColorInterface()
 as_value
 color_getrgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-	MovieClip* sp = obj->getSprite();
-	if ( ! sp ) return as_value();
+    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    if (!sp) return as_value();
 
-	const cxform& trans = obj->getTransform();
+	const cxform& trans = sp->get_user_cxform();
 
-	int r = (int)trans.rb;
-	int g = (int)trans.gb;
-	int b = (int)trans.bb;
+    const int r = trans.rb;
+    const int g = trans.gb;
+    const int b = trans.bb;
 
-	boost::int32_t rgb = (r<<16) | (g<<8) | b;
+    const boost::int32_t rgb = (r<<16) | (g<<8) | b;
 
 	return as_value(rgb);
 }
@@ -197,19 +130,12 @@ color_getrgb(const fn_call& fn)
 as_value
 color_gettransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-	MovieClip* sp = obj->getSprite();
-	if ( ! sp )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.getTransform(%s) : no or unloaded sprite associated with the Color object"), ss.str());
-		);
-		return as_value();
-	}
+    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    if (!sp) return as_value();
 
-	const cxform& cx = obj->getTransform();
+	const cxform& cx = sp->get_user_cxform();
 
 	// Convert to as_object
 
@@ -231,62 +157,41 @@ color_gettransform(const fn_call& fn)
 as_value
 color_setrgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
-
-	if ( fn.nargs < 1 )
-	{
+	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+	
+    if (!fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Color.setRGB() : missing argument"));
 		);
 		return as_value();
 	}
 
+    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+
 	boost::int32_t color = fn.arg(0).to_int();
 
-	int r = (color&0xFF0000) >> 16;
-	int g = (color&0x00FF00) >> 8;
-	int b = (color&0x0000FF);
+	const int r = (color & 0xff0000) >> 16;
+	const int g = (color & 0x00ff00) >> 8;
+	const int b = (color & 0x0000ff);
 
-	cxform newTrans = obj->getTransform();
-	newTrans.rb = (boost::int16_t)r;
-	newTrans.gb = (boost::int16_t)g;
-	newTrans.bb = (boost::int16_t)b;
+	cxform newTrans = sp->get_user_cxform();
+	newTrans.rb = static_cast<boost::int16_t>(r);
+	newTrans.gb = static_cast<boost::int16_t>(g);
+	newTrans.bb = static_cast<boost::int16_t>(b);
 	newTrans.ra = 0;
 	newTrans.ga = 0;
 	newTrans.ba = 0;
 
-	obj->setTransform(newTrans);
+    sp->set_user_cxform(newTrans);
 
 	return as_value();
 }
-
-inline void
-parseColorTransProp (as_object& obj, string_table::key key,
-        boost::int16_t *target, bool scale)
-{
-	as_value tmp;
-	double d;
-
-	if ( ! obj.get_member(key, &tmp) ) {
-        return;
-    }
-    
-	d = tmp.to_number();
-	if ( scale ) {   
-        *target = (boost::int16_t)(d * 2.56);
-    }
-	else {
-        *target = (boost::int16_t)d;
-    }
-}
-
 as_value
 color_settransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-	if ( fn.nargs < 1 )
-	{
+	if (!fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Color.setTransform() : missing argument"));
 		);
@@ -294,58 +199,36 @@ color_settransform(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object(*getGlobal(fn));
-	if ( ! trans )
-	{
+
+    if (!trans) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.setTransform(%s) : first argument doesn't "
-                            "cast to an object"), ss.str());
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("Color.setTransform(%s) : first argument doesn't "
+                                "cast to an object"), ss.str());
 		);
 		return as_value();
 	}
 
-	MovieClip* sp = obj->getSprite();
-	if ( ! sp )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.setTransform(%s) : no or unloaded sprite "
-                        "associated with the Color object"), ss.str());
-		);
-		return as_value();
-	}
+    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    if (!sp) return as_value();
 
 	string_table& st = getStringTable(*obj);
 
-	cxform newTrans = obj->getTransform();
+	cxform newTrans = sp->get_user_cxform();
 
 	// multipliers
-	parseColorTransProp(*trans, st.find("ra"), &newTrans.ra, true);
-	parseColorTransProp(*trans, st.find("ga"), &newTrans.ga, true);
-	parseColorTransProp(*trans, st.find("ba"), &newTrans.ba, true);
-	parseColorTransProp(*trans, st.find("aa"), &newTrans.aa, true);
+	parseColorTransProp(*trans, st.find("ra"), newTrans.ra, true);
+	parseColorTransProp(*trans, st.find("ga"), newTrans.ga, true);
+	parseColorTransProp(*trans, st.find("ba"), newTrans.ba, true);
+	parseColorTransProp(*trans, st.find("aa"), newTrans.aa, true);
 
 	// offsets
-	parseColorTransProp(*trans, st.find("rb"), &newTrans.rb, false);
-	parseColorTransProp(*trans, st.find("gb"), &newTrans.gb, false);
-	parseColorTransProp(*trans, st.find("bb"), &newTrans.bb, false);
-	parseColorTransProp(*trans, st.find("ab"), &newTrans.ab, false);
+	parseColorTransProp(*trans, st.find("rb"), newTrans.rb, false);
+	parseColorTransProp(*trans, st.find("gb"), newTrans.gb, false);
+	parseColorTransProp(*trans, st.find("bb"), newTrans.bb, false);
+	parseColorTransProp(*trans, st.find("ab"), newTrans.ab, false);
 
-	obj->setTransform(newTrans);
-
-#ifdef GNASH_DEBUG_COLOR 
-	std::stringstream ss; 
-	as_value tmp;
-	if (trans->get_member(st.find("ra"), &tmp)) ss << " ra:" << tmp.to_number();
-	if (trans->get_member(st.find("ga"), &tmp)) ss << " ga:" << tmp.to_number();
-	if (trans->get_member(st.find("ba"), &tmp)) ss << " ba:" << tmp.to_number();
-	if (trans->get_member(st.find("aa"), &tmp)) ss << " aa:" << tmp.to_number();
-	if (trans->get_member(st.find("rb"), &tmp)) ss << " rb:" << tmp.to_number();
-	if (trans->get_member(st.find("gb"), &tmp)) ss << " gb:" << tmp.to_number();
-	if (trans->get_member(st.find("bb"), &tmp)) ss << " bb:" << tmp.to_number();
-	if (trans->get_member(st.find("ab"), &tmp)) ss << " ab:" << tmp.to_number();
-	log_debug("Color.setTransform(%s) : TESTING", ss.str());
-#endif
+	sp->set_user_cxform(newTrans);
 
 	return as_value();
 }
@@ -353,48 +236,34 @@ color_settransform(const fn_call& fn)
 as_value
 color_ctor(const fn_call& fn)
 {
-	MovieClip* sp=0;
-	if ( fn.nargs )
-	{
-		const as_value& arg = fn.arg(0);
-
-		// TODO: check what should happen if the argument is
-		//       a not-unloaded sprite but another exist with same
-		//       target at lower depth (always looking up would return
-		//       the lowest depth)
-		sp = arg.to_sprite();
-		if ( ! sp )
-		{
-			// must be a target..
-			DisplayObject* ch = fn.env().find_target(arg.to_string());
-			if ( ch )
-			{
-				sp = ch->to_movie();
-				IF_VERBOSE_ASCODING_ERRORS(
-				if ( ! sp )
-				{
-				std::stringstream ss; fn.dump_args(ss);
-				log_aserror(_("new Color(%s) : first argument evaluates "
-                                "to DisplayObject %s which is a %s (not a sprite)"),
-					            ss.str(), ch->getTarget(), typeName(*ch));
-				}
-				);
-			}
-			else
-			{
-				IF_VERBOSE_ASCODING_ERRORS(
-				std::stringstream ss; fn.dump_args(ss);
-				log_aserror(_("new Color(%s) : first argument doesn't evaluate or point to a DisplayObject"),
-					ss.str());
-				)
-			}
-		}
-	}
-
-	boost::intrusive_ptr<as_object> obj = new Color_as(sp);
 	
+    as_object* proto = getColorInterface();
+    boost::intrusive_ptr<as_object> obj = new as_object(proto);
+
+    as_value target;
+    if (fn.nargs) target = fn.arg(0);
+
+    obj->set_member(NSV::PROP_TARGET, target); 
+
 	return as_value(obj.get()); // will keep alive
 }
+
+inline void
+parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t&
+        target, bool scale)
+{
+	as_value tmp;
+	if (!obj.get_member(key, &tmp)) return;
+    
+	const double d = tmp.to_number();
+	if ( scale ) {   
+        target = static_cast<boost::int16_t>(d * 2.56);
+    }
+	else {
+        target = static_cast<boost::int16_t>(d);
+    }
+}
+
 
 } // anonymous namespace 
 } // end of gnash namespace
