@@ -134,6 +134,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "Stage", NSV::PROP_iSTAGE ),
 	string_table::svt( "status", NSV::PROP_STATUS ),
 	string_table::svt( "super", NSV::PROP_SUPER ),
+	string_table::svt( "target", NSV::PROP_TARGET ),
 	string_table::svt( "_target", NSV::PROP_uTARGET ),
 	string_table::svt( "text", NSV::PROP_TEXT ),
 	string_table::svt( "textColor", NSV::PROP_TEXT_COLOR ),

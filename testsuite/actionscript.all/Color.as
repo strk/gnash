@@ -28,6 +28,9 @@ rcsid="$Id: Color.as,v 1.20 2008/05/23 02:30:21 zoulunkai Exp $";
 //--------------------------------
 // Color was introduced in SWF5
 //--------------------------------
+#if OUTPUT_VERSION < 6
+Color.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
 
 check_equals ( typeof(Color), 'function')
 check_equals ( typeof(Color.prototype), 'object')
@@ -40,12 +43,10 @@ check_equals ( typeof(Color.setRGB), 'undefined')
 check_equals ( typeof(Color.getTransform), 'undefined')
 check_equals ( typeof(Color.setTransform), 'undefined')
 
-#if OUTPUT_VERSION > 5
 check ( Color.prototype.hasOwnProperty('getRGB') );
 check ( Color.prototype.hasOwnProperty('setRGB') );
 check ( Color.prototype.hasOwnProperty('getTransform') );
 check ( Color.prototype.hasOwnProperty('setTransform') );
-#endif
 
 //-----------------------------------------------------------
 // test the Color constuctor
@@ -58,15 +59,53 @@ check ( colorObj instanceof Object );
 check_equals ( typeof(colorObj.getRGB()), 'undefined' );
 check_equals ( typeof(colorObj.getTransform()), 'undefined' );
 
+check(colorObj.hasOwnProperty("target"));
+check_equals(colorObj.target, undefined);
+
 colorObj = new Color(__shared_assets);
 check_equals ( typeof(colorObj), 'object')
 check ( colorObj instanceof Color );
 check ( colorObj instanceof Object );
+check(colorObj.hasOwnProperty("target"));
+check_equals(colorObj.target.toString(), "[object Object]");
 
 invalidColorObj = new Color(4);
 check_equals ( typeof(colorObj), 'object')
 check ( colorObj instanceof Color );
 check ( colorObj instanceof Object );
+check(invalidColorObj.hasOwnProperty("target"));
+check_equals(invalidColorObj.target.toString(), "4");
+
+called = "";
+o = {};
+o.toString = function() { called += "."; return "_root"; };
+
+// Check that target.toString() is called on each method, but not on
+// construction
+
+f = new Color(o);
+check_equals(called, "");
+
+rgb = f.getRGB();
+check_equals(called, ".");
+
+f.setRGB(rgb);
+check_equals(called, "..");
+
+// If o is a MovieClip, toString is not called.
+called = "";
+o = _root;
+o.toString = function() { called += ":"; return "mc"; };
+f = new Color(o);
+check_equals(called, "");
+
+rgb = f.getRGB();
+check_equals(called, "");
+
+f.setRGB(rgb);
+check_equals(called, "");
+
+
 
 //-----------------------------------------------------------
 // test the Color::getRGB method

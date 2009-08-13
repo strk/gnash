@@ -207,6 +207,7 @@ enum NamedStrings {
         PROP_SPLICE,
         PROP_STATUS,
         PROP_SUPER,
+        PROP_TARGET,
         PROP_TEXT,
         PROP_TEXT_COLOR,
         PROP_TEXT_HEIGHT,
