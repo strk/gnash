@@ -76,6 +76,37 @@ check ( colorObj instanceof Object );
 check(invalidColorObj.hasOwnProperty("target"));
 check_equals(invalidColorObj.target.toString(), "4");
 
+called = "";
+o = {};
+o.toString = function() { called += "."; return "_root"; };
+
+// Check that target.toString() is called on each method, but not on
+// construction
+
+f = new Color(o);
+check_equals(called, "");
+
+rgb = f.getRGB();
+check_equals(called, ".");
+
+f.setRGB(rgb);
+check_equals(called, "..");
+
+// If o is a MovieClip, toString is not called.
+called = "";
+o = _root;
+o.toString = function() { called += ":"; return "mc"; };
+f = new Color(o);
+check_equals(called, "");
+
+rgb = f.getRGB();
+check_equals(called, "");
+
+f.setRGB(rgb);
+check_equals(called, "");
+
+
+
 //-----------------------------------------------------------
 // test the Color::getRGB method
 //-----------------------------------------------------------

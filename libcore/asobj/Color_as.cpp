@@ -49,6 +49,7 @@ namespace {
     as_object* getColorInterface();
     inline void parseColorTransProp(as_object& obj, string_table::key key,
             boost::int16_t& target, bool scale);
+    inline MovieClip* getTarget(as_object* obj, const fn_call& fn);
 }
 
 void
@@ -121,7 +122,7 @@ color_getrgb(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    MovieClip* sp = getTarget(obj.get(), fn);
     if (!sp) return as_value();
 
 	const cxform& trans = sp->get_user_cxform();
@@ -140,7 +141,7 @@ color_gettransform(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    MovieClip* sp = getTarget(obj.get(), fn);
     if (!sp) return as_value();
 
 	const cxform& cx = sp->get_user_cxform();
@@ -176,7 +177,7 @@ color_setrgb(const fn_call& fn)
 		return as_value();
 	}
 
-    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    MovieClip* sp = getTarget(obj.get(), fn);
     if (!sp) return as_value();
 
 	boost::int32_t color = fn.arg(0).to_int();
@@ -220,7 +221,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-    MovieClip* sp = obj->getMember(NSV::PROP_TARGET).to_sprite();
+    MovieClip* sp = getTarget(obj.get(), fn);
     if (!sp) return as_value();
 
 	string_table& st = getStringTable(*obj);
@@ -283,6 +284,18 @@ parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t&
     }
 }
 
+// First try to convert target to a MovieClip. If that fails, convert to 
+// a string and look up the target.
+inline MovieClip*
+getTarget(as_object* obj, const fn_call& fn)
+{
+    const as_value& target = obj->getMember(NSV::PROP_TARGET);
+    MovieClip* sp = target.to_sprite();
+    if (sp) return sp;
+    DisplayObject* d = fn.env().find_target(target.to_string());
+    if (d) return d->to_movie();
+    return 0;
+}
 
 } // anonymous namespace 
 } // end of gnash namespace
