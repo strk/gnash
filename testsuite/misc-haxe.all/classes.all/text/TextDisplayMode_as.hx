@@ -41,8 +41,6 @@ class TextDisplayMode_as {
     static function main() {
         //var x1:TextDisplayMode = new TextDisplayMode();
 
-//Si:
-//Check the following:
 
 #if flash9
         // Make sure we actually get a valid class        
@@ -75,7 +73,10 @@ class TextDisplayMode_as {
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
         // Call this after finishing all tests. It prints out the totals.
+#else
+    DejaGnu.note("TextDisplayMode did not exist before SWF9");
 #end
+
         DejaGnu.done();
     }
 }

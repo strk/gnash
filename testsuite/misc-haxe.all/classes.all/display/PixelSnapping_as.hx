@@ -39,8 +39,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class PixelSnapping_as {
     static function main() {
-
-	#if flash9
+        
+#if flash9
    	// Make sure we actually get a valid class        
 	if (Type.typeof(PixelSnapping)==TObject) {
 	    DejaGnu.pass("PixelSnapping class exists.");
@@ -68,9 +68,11 @@ class PixelSnapping_as {
             DejaGnu.fail("PixelSnapping.NEVER doesn't exist");
         }
 
+#else
+    DejaGnu.note("PixelSnapping class did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

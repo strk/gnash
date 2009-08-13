@@ -39,7 +39,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class StyleSheet_as {
     static function main() {
-	#if flash9
+        
+#if flash9
         var x1:StyleSheet = new StyleSheet();
 
         // Make sure we actually get a valid class        
@@ -89,9 +90,13 @@ class StyleSheet_as {
 	    DejaGnu.note("transform: " + Type.typeof(x1.transform));
 	}
 
+
+#else
+    DejaGnu.note("StyleSheet did not exist before SWF9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

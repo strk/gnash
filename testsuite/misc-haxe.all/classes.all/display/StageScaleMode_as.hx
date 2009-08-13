@@ -39,7 +39,7 @@ import DejaGnu;
 class StageScaleMode_as {
     static function main() {
 
-	#if flash9
+#if flash9
 	// Make sure we actually get a valid class        
 	if (Type.typeof(StageScaleMode)==TObject) {
 	    DejaGnu.pass("StageScaleMode class exists.");
@@ -73,9 +73,12 @@ class StageScaleMode_as {
             DejaGnu.fail("StageScaleMode.SHOW_ALL constant doesn't exist");
         }
 
+#else
+    DejaGnu.note("StageScaleMode did not exist in versions before SWF9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

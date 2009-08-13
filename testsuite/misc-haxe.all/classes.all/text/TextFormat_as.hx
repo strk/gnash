@@ -33,6 +33,7 @@ import flash.TextFormat;
 import flash.Lib;
 import Type;
 import Std;
+import haxe.PosInfos;
 
 // import our testing API
 import DejaGnu;
@@ -635,10 +636,10 @@ class TextFormat_as {
 	    DejaGnu.xfail("tfObj.display does not equal to 'block'.");
 	}
 	
-	if (Std.string(untyped __typeof__(tfObj.tabStops)) == 'null') {
-		DejaGnu.xpass("Good, tfObj.tabStops is a  'null'.");
+	if (untyped __typeof__(tfObj.tabStops) == 'null') {
+        DejaGnu.xpass("[ln:"+here.lineNumber+"]Good, tfObj.tabStops is a  'null'.");
 	} else {
-	    DejaGnu.xfail("Wrong, tfObj.tabStops is not 'null'.");
+        DejaGnu.xfail("[ln:"+here.lineNumber+"]Wrong, tfObj.tabStops is not 'null'.");
 	}
 
 	if (untyped tfObj.leading == 4) {
@@ -740,10 +741,13 @@ class TextFormat_as {
 	    DejaGnu.fail("Wrong, tfObj.display is not 'undefined'.");
 	}
 
-	if (Std.string(untyped __typeof__(tfObj.tabStops)) == 'undefined') {
-		DejaGnu.pass("Good, tfObj.tabStops is 'undefined'.");
+    DejaGnu.note("tabStops: " + untyped __typeof__(tfObj.tabStops));
+    DejaGnu.note("tabStops: " + tfObj.tabStops);
+    DejaGnu.note("tabStops: " + untyped tfObj.hasOwnProperty(tabStops));
+	if ( untyped __typeof__(tfObj.tabStops) == 'null') {
+        DejaGnu.pass("[ln:"+here.lineNumber+"]Good, tfObj.tabStops is 'null'.");
 	} else {
-	    DejaGnu.fail("Wrong, tfObj.tabStops is not 'undefined'.");
+        DejaGnu.fail("[ln:"+here.lineNumber+"]Wrong, tfObj.tabStops is not 'null'.");
 	}
 
 	if (tfObj.target == "tgt") {

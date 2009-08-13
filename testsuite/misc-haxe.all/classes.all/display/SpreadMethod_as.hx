@@ -39,7 +39,7 @@ import DejaGnu;
 class SpreadMethod_as {
     static function main() {
 
-	#if flash9
+#if flash9
    	// Make sure we actually get a valid class        
 	if (Type.typeof(SpreadMethod)==TObject) {
 	    DejaGnu.pass("SpreadMethod class exists.");
@@ -67,9 +67,11 @@ class SpreadMethod_as {
             DejaGnu.fail("SpreadMethod.REPEAT constant doesn't exist");
         }
 
+#else
+    DejaGnu.note("SpreadMethod did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

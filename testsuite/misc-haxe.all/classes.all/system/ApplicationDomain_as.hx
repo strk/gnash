@@ -36,20 +36,18 @@ import Std;
 // import our testing API
 import DejaGnu;
 
-// Class must be named with the _as3 suffix, as that's the same name as the file.
+// Class must be named with the _as suffix, as that's the same name as the file.
 
 
 class ApplicationDomain_as {
     static function main() {
 #if flash9
         var x1:ApplicationDomain = new ApplicationDomain();
-	var x2:ApplicationDomain = new ApplicationDomain(x1);
+        var x2:ApplicationDomain = new ApplicationDomain(x1);
 
-//	DejaGnu.note("Type of x1" + Type.typeof(x1) );
-//	DejaGnu.note("Type of ApplicationDomain" + Type.typeof(ApplicationDomain) );
 
         // Make sure we actually get a valid class        
-        if (Type.typeof(ApplicationDomain)==TObject && x1 != null) {
+        if (Type.typeof(ApplicationDomain) == TObject && x1 != null) {
             DejaGnu.pass("ApplicationDomain class exists");
         } else {
             DejaGnu.fail("ApplicationDomain class doesn't exist");
@@ -58,21 +56,13 @@ class ApplicationDomain_as {
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
 
-//Si:
-//Check completed
-
-//	DejaGnu.note("Type of ApplicationDomain.currentDomain " + Type.typeof(ApplicationDomain.currentDomain) );
-//	DejaGnu.note("Type " + Type.typeof(x1.ByteArray) );
-//	DejaGnu.note("Type " + Type.typeof(x1.MIN_DOMAIN_MEMORY_LENGTH) );
-//	DejaGnu.note("Type " + Type.typeof(ApplicationDomain.parentDomain) );
-//	DejaGnu.note("Type " + Type.typeof(x1.parentDomain) );
 
  	if (Std.is(ApplicationDomain.currentDomain,ApplicationDomain)  ) {
  	    DejaGnu.pass("ApplicationDomain.currentDomain property exists");
  	} else {
  	    DejaGnu.fail("ApplicationDomain.currentDomain property doesn't exist");
  	}
-//Si
+
 //The definition of the class is really weird!
 //I made it passed right now!
 //Please check it later!
@@ -85,9 +75,10 @@ class ApplicationDomain_as {
  	    DejaGnu.fail("ApplicationDomain.parentDomain property doesn't exist");
  	}
 
-//Si:
+
 //Adobe may have these properties, we do not.
 //allowLoadBytesCodeExecuiton does not exist!
+//  What? FIXME
 	
 // 	if (x1.domainMemory == ByteArray) {
 //	    DejaGnu.pass("ApplicationDomain.domainMemory property exists");
@@ -104,7 +95,7 @@ class ApplicationDomain_as {
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
 
-//Si:
+
 //Check Functions!
 //Check completed!
 
@@ -119,6 +110,8 @@ class ApplicationDomain_as {
 	    DejaGnu.fail("ApplicationDomain::hasDefinition() method doesn't exist");
 	}
 
+#else
+    DejaGnu.note("Application domain does not exist prior to SWF 9");
 #end
 
         // Call this after finishing all tests. It prints out the totals.

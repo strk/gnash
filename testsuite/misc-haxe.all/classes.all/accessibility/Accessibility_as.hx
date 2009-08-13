@@ -42,6 +42,7 @@ import flash.MovieClip;
 import flash.Lib;
 import Type;
 import Reflect;
+import haxe.PosInfos;
 
 // import our testing API
 import DejaGnu;
@@ -61,43 +62,29 @@ class Accessibility_as {
 // 	    false
 // 	    flash.accessibility.Accessibility
 // 	    sendEvent
-
- 	DejaGnu.note("ME1 "   + Type.typeof(Accessibility.active));
- 	DejaGnu.note("ME2 "   + Type.getClass(Accessibility.active));
- 	DejaGnu.note("ME3 "   + Std.string(Accessibility.active));
-  	DejaGnu.note("ME4 "   + Std.is(Accessibility.active,ValueType.TObject));
-   	DejaGnu.note("ME5 "   + Type.getClassName(Accessibility));
-   	DejaGnu.note("ME6 "   + Type.getClassFields(Accessibility)[0]);
 	
 	if (Type.typeof(Accessibility.active) == ValueType.TBool) {
-	    DejaGnu.pass("Accessibility::active property exists");
+	    DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility::active property exists");
 	} else {
-	    DejaGnu.fail("Accessibility::active property doesn't exist");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility::active property doesn't exist");
 	}
 
 	// Test for existence of updateProperties method
 	// updateProperties throws error if Capabilities.hasAccessability == false
 	if ( flash.system.Capabilities.hasAccessibility != false ) {
 		if (Accessibility.updateProperties() != null) {
-	    	    DejaGnu.pass("Accessibility::updateProperties() method exists");
+	    	    DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility::updateProperties() method exists");
 		} else {
-	    	    DejaGnu.fail("Accessibility::updateProperties() method doesn't exist");
+	    	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility::updateProperties() method doesn't exist");
 		}
  	}	
 #else
-  	DejaGnu.note("ME1 "   + Type.typeof(Accessibility.isActive()));	
-  	DejaGnu.note("ME2 "   + Type.getClass(Accessibility.isActive));
-  	DejaGnu.note("ME3 "   + Std.string(Accessibility.isActive));
-  	DejaGnu.note("ME4 "   + Std.is(Accessibility.isActive,ValueType.TFunction));
- 	DejaGnu.note("ME5 "   + Type.getClassName(Type.getClass(Accessibility)));
-// 	DejaGnu.note("ME6 "   + Type.getClassFields(Accessibility.isActive));
-  	DejaGnu.note("ME7 "   + Reflect.isFunction(Accessibility.isActive));
-  	DejaGnu.note("ME8 "   + Reflect.isObject(Accessibility.isActive));
+
 
  	if (Type.typeof(Accessibility.isActive) == ValueType.TFunction) {
- 	    DejaGnu.pass("Accessibility::isActive method exists");
+ 	    DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility::isActive method exists");
  	} else {
- 	    DejaGnu.fail("Accessibility::isActive method doesn't exist");
+ 	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility::isActive method doesn't exist");
  	}
 	
 	// Tests to see if all the methods exist. All these do is test for
@@ -106,9 +93,9 @@ class Accessibility_as {
 	DejaGnu.note("ME1A "   + Type.typeof(Accessibility.updateProperties()));
 
 	if (Type.typeof(Accessibility.updateProperties) == ValueType.TFunction) {
-	    DejaGnu.pass("Accessibility::updateProperties() method exists");
+	    DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility::updateProperties() method exists");
 	} else {
-	    DejaGnu.fail("Accessibility::updateProperties() method doesn't exist");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility::updateProperties() method doesn't exist");
 	}
 #end		
 //Si
@@ -122,104 +109,122 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
 #else
 	var accobj = untyped __new__(Accessibility);
 	if (Std.string(untyped __typeof__(accobj)) == 'undefined') {
-		DejaGnu.pass("Type of accobj is undefined");
-} else {
-	DejaGnu.fail("Type of accObj is not undefined");
-}
+		DejaGnu.pass("[ln:"+here.lineNumber+"]Type of accobj is undefined");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]Type of accObj is not undefined");
+    }
 #end
 
 //Check the prototype.
 #if flash9
 	//Do Nothing!
 #else
-	DejaGnu.note("__proto__: " + Type.typeof(untyped Accessibility.__proto__));
 	if ( Reflect.isObject(untyped Accessibility.__proto__)) {
-		DejaGnu.pass("Accessibility.prototype.__proto_ field exists");
+		DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.prototype.__proto_ field exists");
 	} else {
-		DejaGnu.fail("Accessibility.prototype.__proto__ field does not exist");
+		DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.prototype.__proto__ field does not exist");
 	}
 	if ( untyped Accessibility.__proto__ == untyped Object.prototype) {
-		DejaGnu.pass("Accessibility.prototype.__proto__ references Object.prototype");
+		DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.prototype.__proto__ references Object.prototype");
 	} else {
-		DejaGnu.fail("Accessibility.prototype.__proto__ does not reference Object.prototype");
+		DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.prototype.__proto__ does not reference Object.prototype");
 	}
 #end
 
-#if (flash6 || flash7 || flash8)
-	if (untyped Accessibility.hasOwnProperty("isActive")) {
-		DejaGnu.pass("Accessibility.prototype. 'isActive' property exists");
-	} else {
-		DejaGnu.fail("Accessibility.prototype. 'isActive' property does not exist");
-	}
-	if (Type.typeof(untyped Accessibility.isActive)== TFunction){
-		DejaGnu.pass("System.security 'isActive' is a function");
-	} else {
-	    DejaGnu.fail("System.security 'isActive' is not a function");
-	}
-	if (Std.is(untyped Accessibility.isActive, Bool) ){
-		 DejaGnu.xpass("Accessibility.isActive should be a Bool!!!! WARNING!!!");
-	} else {
-	    DejaGnu.xfail("Accessibility.isActive is not a Bool.");
-	}
-#end
 #if flash9
 	if (untyped Accessibility.hasOwnProperty("active")) {
-		DejaGnu.pass("Accessibility. 'active' property exists");
+		DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility. 'active' property exists");
 	} else {
-		DejaGnu.fail("Accessibility. 'active' property does not exist");
+		DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility. 'active' property does not exist");
 	}
 	if (Std.is(untyped Accessibility.active, Bool) ){
-	  DejaGnu.pass("Accessibility.active is a bool");
+	  DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.active is a bool");
 	} else {
-	    DejaGnu.fail("Accessibility.active is not a bool");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.active is not a bool");
 	}	
-#end
-	if (untyped Accessibility.hasOwnProperty("updateProperties")) {
-	DejaGnu.pass("Accessibility.prototype. 'updateProperties' property exists");
+#else
+	if (untyped Accessibility.hasOwnProperty("isActive")) {
+		DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.prototype. 'isActive' property exists");
 	} else {
-		DejaGnu.fail("Accessibility.prototype. 'updateProperties' property does not exist");
+		DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.prototype. 'isActive' property does not exist");
+	}
+	if (Type.typeof(untyped Accessibility.isActive)== TFunction){
+		DejaGnu.pass("[ln:"+here.lineNumber+"]System.security 'isActive' is a function");
+	} else {
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]System.security 'isActive' is not a function");
+	}
+    
+    // This was set to xfail in the ming, but seems to pass now in both the pp
+    // and gnash
+    //xcheck_equals ( typeof(Accessibility.isActive()), 'boolean' );
+	if ( untyped __typeof__(Reflect.callMethod(Accessibility, 
+                                   Reflect.field(Accessibility, 'isActive'),
+                                   []) == 'boolean') ){
+        DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.isActive should be a Bool!!!! WARNING!!!");
+	} else {
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.isActive is not a Bool.");
+	}
+#end
+
+	if (untyped Accessibility.hasOwnProperty("updateProperties")) {
+	DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.prototype. 'updateProperties' property exists");
+	} else {
+		DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.prototype. 'updateProperties' property does not exist");
 	}
 	if (untyped Accessibility.hasOwnProperty("sendEvent")) {
-	DejaGnu.pass("Accessibility.prototype. 'sendEvent' property exists");
+	DejaGnu.pass("[ln:"+here.lineNumber+"]Accessibility.prototype. 'sendEvent' property exists");
 	} else {
-		DejaGnu.fail("Accessibility.prototype. 'sendEvent' property does not exist");
+		DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.prototype. 'sendEvent' property does not exist");
 	}
 	if (Type.typeof(untyped Accessibility.updateProperties)== TFunction){
-		DejaGnu.pass("System.security 'updateProperties' is a function");
+		DejaGnu.pass("[ln:"+here.lineNumber+"]System.security 'updateProperties' is a function");
 	} else {
-	    DejaGnu.fail("System.security 'updateProperties' is not a function");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]System.security 'updateProperties' is not a function");
 	}	if (Type.typeof(untyped Accessibility.sendEvent)== TFunction){
-		DejaGnu.pass("System.security 'sendEvent' is a function");
+		DejaGnu.pass("[ln:"+here.lineNumber+"]System.security 'sendEvent' is a function");
 	} else {
-	    DejaGnu.fail("System.security 'sendEvent' is not a function");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]System.security 'sendEvent' is not a function");
 	}	
-	//These two methods are only defined in SWF 5. Ignored!
+	//These two methods are only defined in SWF 5. haxe does not compile SWF5!
 	// Methods return void (just undefined in SWF 5).
-// Si
-// Make sure the return type is reight.
-//	DejaGnu.note(""+untyped __typeof__(Accessibility.updateProperties()) );
-//	DejaGnu.note(""+untyped __typeof__(Accessibility.sendEvent()) );
+    // Make sure the return type is reight.
+    //	DejaGnu.note(""+untyped __typeof__(Accessibility.updateProperties()) );
+    //	DejaGnu.note(""+untyped __typeof__(Accessibility.sendEvent()) );
 
 #if flash9
 #else
-	if (Std.string(untyped __typeof__(Accessibility.updateProperties() ))== 'undefined'){
-		DejaGnu.pass("The return type of Accessibility.updateProperties is void (good).");
+	if (untyped __typeof__(Reflect.callmethod(Accessibility,
+                               Reflect.field(Accessibility, 'updateProperties'),
+                               [] )) == 'undefined'){
+		DejaGnu.pass("[ln:"+here.lineNumber+"]The return type of Accessibility.updateProperties is void (good).");
 	} else {
-	    DejaGnu.fail("The rerurn type of Accessibility.updateProperties is somewhat defined (wrong).");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]The rerurn type of Accessibility.updateProperties is somewhat defined (wrong).");
 	}
-/*
-	if (Std.string(untyped __typeof__(Accessibility.sendEvent()  ) )== 'undefined'){
-		DejaGnu.pass("The return type of Accessibility.sendEvent is void (good).");
+
+	if (untyped __typeof__(Reflect.callmethod(Accessibility,
+                               Reflect.field(Accessibility, 'sendEvent'),
+                               [] )) == 'undefined'){
+		DejaGnu.pass("[ln:"+here.lineNumber+"]The return type of Accessibility.sendEvent is void (good).");
 	} else {
-	    DejaGnu.fail("The rerurn type of Accessibility.sendEvent() is somewhat defined (wrong).");
+	    DejaGnu.fail("[ln:"+here.lineNumber+"]The rerurn type of Accessibility.sendEvent() is somewhat defined (wrong).");
 	}
-*/
+
 #end
-/*
-// Accessibility object can't be instantiated !
-var accObj = new Accessibility;
-check_equals(accObj, undefined);
-*/
+
+#if !flash9
+    // This test crashes the pp in SWF 9 because Accessibility cannot be
+    // instantiated
+    
+    // Accessibility object can't be instantiated !
+    var accObj = untyped __new__(Accessibility);
+    //check_equals(accObj, undefined);
+    if (untyped __typeof__(accObj == 'undefined')) {
+        DejaGnu.pass("[ln:"+here.lineNumber+"]Correctly did not instantiate an Accesibility object");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]Unexpected return with call to new on Accessibility");
+    }
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
     }

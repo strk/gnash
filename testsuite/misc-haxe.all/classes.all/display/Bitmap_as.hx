@@ -50,35 +50,39 @@ class Bitmap_as {
         } else {
             DejaGnu.fail("Bitmap lass doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	var d1:BitmapData = new BitmapData(20, 30, false, 0xeeddee);
-	x1.bitmapData = d1;
-	if (Std.is(x1.bitmapData, BitmapData)) {
-	    DejaGnu.pass("Bitmap::bitmapData property exists");
-	} else {
-	    DejaGnu.fail("Bitmap::bitmapData property doesn't exist");
-	}
-	DejaGnu.note(""+Type.typeof(x1.bitmapData));
-	if (Std.is(x1.pixelSnapping, String)) {
-	    DejaGnu.pass("Bitmap::pixelSnapping property exists");
-	} else {
-	    DejaGnu.fail("Bitmap::pixelSnapping property doesn't exist");
-	}
-	if (Type.typeof(x1.smoothing) == ValueType.TBool) {
-	    DejaGnu.pass("Bitmap::smoothing property exists");
-	} else {
-	    DejaGnu.fail("Bitmap::smoothing property doesn't exist");
-	}
+        // Tests to see if all the properties exist. All these do is test for
+        // existance of a property, and don't test the functionality at all. 
+        // This is primarily useful only to test completeness of the API
+        // implementation.
+         
+        var d1:BitmapData = new BitmapData(20, 30, false, 0xeeddee);
+        x1.bitmapData = d1;
+        
+        if (Std.is(x1.bitmapData, BitmapData)) {
+            DejaGnu.pass("Bitmap::bitmapData property exists");
+        } else {
+            DejaGnu.fail("Bitmap::bitmapData property doesn't exist");
+        }
+        DejaGnu.note(""+Type.typeof(x1.bitmapData));
+        if (Std.is(x1.pixelSnapping, String)) {
+            DejaGnu.pass("Bitmap::pixelSnapping property exists");
+        } else {
+            DejaGnu.fail("Bitmap::pixelSnapping property doesn't exist");
+        }
+        if (Type.typeof(x1.smoothing) == ValueType.TBool) {
+            DejaGnu.pass("Bitmap::smoothing property exists");
+        } else {
+            DejaGnu.fail("Bitmap::smoothing property doesn't exist");
+        }
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-
+#else
+        DejaGnu.note("Bitmap only exists in SWF 9 and up");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-#end
     }
 }
 

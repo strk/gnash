@@ -61,9 +61,13 @@ class TextFieldType_as {
             DejaGnu.fail("TextFieldType.INPUT constant doesn't exist");
         } 
 
+
+#else
+    DejaGnu.note("TextFieldType did not exist before SWF9");
+#end
+
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

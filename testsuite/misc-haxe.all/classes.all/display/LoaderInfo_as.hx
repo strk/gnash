@@ -58,7 +58,8 @@ class LoaderInfo_as {
 	});
 
 	loader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(e) {
-
+        });
+        
 		// Make sure we actually get a valid class        
 		if (Std.is(x1, LoaderInfo)) {
  		    DejaGnu.pass("LoaderInfo class exists");
@@ -199,14 +200,15 @@ class LoaderInfo_as {
 	 	} else {
 	 	    DejaGnu.fail("LoaderInfo::getLoaderInfoByDefinition() method doesn't exist");
 	 	}*/
-	       
+
+#else
+    DejaGnu.note("LoaderInfo did not exist in versions prior to SWF9");
+#end
 		DejaGnu.done();
-	});
 	
 	// Specify file where .swf resides
 	loader.load(new URLRequest("/home/sharad/Desktop/cubes.swf"));
 	
-	#end
     }
 }
 

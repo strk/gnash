@@ -39,7 +39,7 @@ import DejaGnu;
 class StageQuality_as {
     static function main() {
 
-	#if flash9
+#if flash9
    	// Make sure we actually get a valid class        
 	if (Type.typeof(StageQuality)==TObject) {
 	    DejaGnu.pass("StageQuality class exists.");
@@ -70,9 +70,12 @@ class StageQuality_as {
             DejaGnu.fail("StageQuality.MEDIUM constant doesn't exist");
         }
 
+#else
+    DejaGnu.note("StageQuality did not exist before SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
+
     }
 }
 

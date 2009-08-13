@@ -39,7 +39,8 @@ import DejaGnu;
 // Class must be named with the _as suffix, as that's the same name as the file.
 class Responder_as {
     static function main() {
-	#if flash9
+        
+#if flash9
         var x1:Responder = new Responder(null, null);
 
         // Make sure we actually get a valid class        
@@ -49,9 +50,11 @@ class Responder_as {
             DejaGnu.fail("Responder class doesn't exist");
         }
 
+#else
+    DejaGnu.note("Responder did not exist in versions prior to SWF9");
+#end
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

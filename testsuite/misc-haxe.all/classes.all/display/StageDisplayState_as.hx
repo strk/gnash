@@ -65,10 +65,14 @@ class StageDisplayState_as {
 	//         } else {
 	//             DejaGnu.fail("StageDisplayState.FULL_SCREEN_INTERACTIVE constant doesn't exist");
 	//         }
+  
+    
+#else
+    DejaGnu.note("StageDisplayState did not exist before SWF9");
+#end
 
         // Call this after finishing all tests. It prints out the totals.
         DejaGnu.done();
-	#end
     }
 }
 

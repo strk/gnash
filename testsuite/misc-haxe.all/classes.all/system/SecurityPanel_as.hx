@@ -50,6 +50,9 @@ class SecurityPanel_as {
         } else {
             DejaGnu.fail("SecurityPanel class doesn't exist");
         }
+        
+#else
+    DejaGnu.note("SecurityPanel did not exist in versions prior to SWF9");
 #end
 
         // Call this after finishing all tests. It prints out the totals.
