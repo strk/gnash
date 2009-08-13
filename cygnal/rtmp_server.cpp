@@ -1306,9 +1306,11 @@ rtmp_handler(Network::thread_params_t *args)
 		log_error("Never read any data from fd #%d", args->netfd);
 #if 0
 		// Send a ping to reset the new stream
-		boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_CLEAR, 0);
-		if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-				  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
+		boost::shared_ptr<amf::Buffer> ping_reset =
+		    rtmp->encodePing(RTMP::PING_CLEAR, 0);
+		if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+			  RTMP::HEADER_12, ping_reset->size(),
+			  RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
 		    log_debug("Sent Ping to client");
 		} else {
 		    log_error("Couldn't send Ping to client!");
