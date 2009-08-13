@@ -70,6 +70,12 @@ color_class_init(as_object& global, const ObjectURI& uri)
     as_object* proto = getColorInterface();
     as_object* cl = gl->createClass(&color_ctor, proto);
 
+    // This has to be done after createClass is called, as that modifies
+    // proto.
+    const int protect = as_object::DefaultFlags | PropFlags::readOnly;
+    proto->set_member_flags(NSV::PROP_uuPROTOuu, protect); 
+    proto->set_member_flags(NSV::PROP_CONSTRUCTOR, protect); 
+
 	// Register _global.Color
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
@@ -101,7 +107,9 @@ getColorInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(getObjectInterface());
+        as_object* proto = getObjectInterface();
+		o = new as_object(proto);
+
 		attachColorInterface(*o);
 	}
 	return o.get();
@@ -236,17 +244,25 @@ color_settransform(const fn_call& fn)
 	return as_value();
 }
 
+/// The first argument is set as the target property.
+//
+/// The target property is used to change the MovieClip's color.
+/// The pp calls ASSetPropFlags on all Color properties during construction,
+/// adding the readOnly flag. Because Gnash adds the __constructor__ property
+/// during construction, we have no control over its flags.
 as_value
 color_ctor(const fn_call& fn)
 {
 	
     as_object* proto = getColorInterface();
     boost::intrusive_ptr<as_object> obj = new as_object(proto);
-
+    
     as_value target;
     if (fn.nargs) target = fn.arg(0);
 
-    obj->set_member(NSV::PROP_TARGET, target); 
+    const int flags = as_object::DefaultFlags | PropFlags::readOnly;
+
+    obj->init_member(NSV::PROP_TARGET, target, flags); 
 
 	return as_value(obj.get()); // will keep alive
 }
