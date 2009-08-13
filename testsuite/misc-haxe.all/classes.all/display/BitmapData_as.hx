@@ -923,9 +923,9 @@ class BitmapData_as {
         bmp = new BitmapData(10000, 3);
         //xcheck_equals(typeof(bmp), "undefined");
         if (untyped __typeof__(bmp) == 'undefined') {
-            DejaGnu.xpass("Ctor BitmapData(10000, 3) returned 'undefined'");
+            DejaGnu.pass("Ctor BitmapData(10000, 3) returned 'undefined'");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]Ctor BitmapData(10000, 3) returned an object instead of 'undefined'");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]Ctor BitmapData(10000, 3) returned an object instead of 'undefined'");
         }
         //check_equals(bmp.height, undefined);
         if ( bmp.height == null) {
@@ -938,9 +938,9 @@ class BitmapData_as {
         bmp = new BitmapData(0, 10000);
         //xcheck_equals(typeof(bmp), "undefined");
         if (untyped __typeof__(bmp) == 'undefined') {
-            DejaGnu.xpass("Ctor BitmapData(0, 10000) returned 'undefined'");
+            DejaGnu.pass("Ctor BitmapData(0, 10000) returned 'undefined'");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]Ctor BitmapData(0, 10000) returned an object instead of 'undefined'");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]Ctor BitmapData(0, 10000) returned an object instead of 'undefined'");
         }
         //check_equals(bmp.height, undefined);
         if ( bmp.height == null) {
@@ -953,9 +953,9 @@ class BitmapData_as {
         bmp = new BitmapData(2880, 2881);
         //xcheck_equals(typeof(bmp), "undefined");
         if (untyped __typeof__(bmp) == 'undefined') {
-            DejaGnu.xpass("Ctor BitmapData(2880, 2881) returned 'undefined'");
+            DejaGnu.pass("Ctor BitmapData(2880, 2881) returned 'undefined'");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]Ctor BitmapData(2880, 2881) returned an object instead of 'undefined'");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]Ctor BitmapData(2880, 2881) returned an object instead of 'undefined'");
         }
         //check_equals(bmp.height, undefined);
         if ( bmp.height == null) {
@@ -968,9 +968,9 @@ class BitmapData_as {
         bmp = new BitmapData(0, 2880);
         //xcheck_equals(bmp, undefined);
         if (untyped __typeof__(bmp) == 'undefined') {
-            DejaGnu.xpass("Ctor BitmapData(0, 2880) returned 'undefined'");
+            DejaGnu.pass("Ctor BitmapData(0, 2880) returned 'undefined'");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]Ctor BitmapData(0, 2880) returned an object instead of 'undefined'");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]Ctor BitmapData(0, 2880) returned an object instead of 'undefined'");
         }
         //check_equals(bmp.height, undefined);
         if ( bmp.height == null) {
@@ -983,9 +983,9 @@ class BitmapData_as {
         bmp = new BitmapData(0, 2879);
         //xcheck_equals(bmp, undefined);
         if (untyped __typeof__(bmp) == 'undefined') {
-            DejaGnu.xpass("Ctor BitmapData(0, 2879) returned 'undefined'");
+            DejaGnu.pass("Ctor BitmapData(0, 2879) returned 'undefined'");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]Ctor BitmapData(0, 2879) returned an object instead of 'undefined'");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]Ctor BitmapData(0, 2879) returned an object instead of 'undefined'");
         }
         //check_equals(bmp.height, undefined);
         if ( bmp.height == null) {
@@ -998,9 +998,9 @@ class BitmapData_as {
         bmp = new BitmapData(-1, 10, false, 0xff);
         //xcheck_equals(bmp, undefined);
         if (untyped __typeof__(bmp) == 'undefined') {
-            DejaGnu.xpass("Ctor BitmapData(-1, 10, false, 0xff) returned 'undefined'");
+            DejaGnu.pass("Ctor BitmapData(-1, 10, false, 0xff) returned 'undefined'");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]Ctor BitmapData(-1, 10, false, 0xff) returned an object instead of 'undefined'");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]Ctor BitmapData(-1, 10, false, 0xff) returned an object instead of 'undefined'");
         }
         //check_equals(bmp.height, undefined)
         if ( bmp.height == null) {
