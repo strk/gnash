@@ -218,7 +218,7 @@ extras = 0;
     push 'stackfirst'
     push 'a'
     getvariable
-    enumerate
+    enumerate2
     setregister r:0
     push 'r0', r:0
     setvariable
