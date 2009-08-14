@@ -45,28 +45,28 @@ class TextRenderer_as {
 // existance of a property, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
 #if flash9
-	if (Std.is(TextRenderer.displayMode, TextDisplayMode)) {
+	if (Std.is(TextRenderer.displayMode, String)) {
 	    DejaGnu.pass("TextRenderer.displayMode property exists");
 	} else {
 	    DejaGnu.fail("TextRenderer.displayMode property doesn't exist");
 	}
-//FIXME: This property does not exist in the Adobe specs
+	//FIXME: This property does not exist in the Adobe specs
 	if (Std.is(TextRenderer.antiAliasType, AntiAliasType)) {
 	    DejaGnu.pass("TextRenderer.antiAliasType property exists");
 	} else {
-	    DejaGnu.fail("TextRenderer.antiAliasType property doesn't exist");
+	    DejaGnu.xfail("TextRenderer.antiAliasType property doesn't exist");
 	}
 #end
 	//FIXME: This property does not appear to have been implemented
-	if (Type.typeof(TextRenderer.maxLevel) == ValueType.TFloat) {
-	    DejaGnu.xpass("TextRenderer.maxLevel property exists");
+	if (Type.typeof(TextRenderer.maxLevel) == ValueType.TInt) {
+	    DejaGnu.pass("TextRenderer.maxLevel property exists");
 	} else {
-	    DejaGnu.xfail("TextRenderer.maxLevel property doesn't exist, returns type "+Type.typeof(TextRenderer.maxLevel));
+	    DejaGnu.xfail("TextRenderer.maxLevel property doesn't exist");
 	}
 
-// Tests to see if all the methods exist. All these do is test for
-// existance of a method, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
+	// Tests to see if all the methods exist. All these do is test for
+	// existance of a method, and don't test the functionality at all. This
+	// is primarily useful only to test completeness of the API implementation.
 #if flash9
 	if (Type.typeof(TextRenderer.setAdvancedAntiAliasingTable) == ValueType.TFunction) {
 	    DejaGnu.pass("TextRenderer::setAdvancedAntiAliasingTable() method exists");
@@ -80,8 +80,8 @@ class TextRenderer_as {
 	    DejaGnu.xfail("TextRenderer::setAdvancedAntialiasingTable() method doesn't exist");
 	}
 #end
-        // Call this after finishing all tests. It prints out the totals.
-        DejaGnu.done();
+	// Call this after finishing all tests. It prints out the totals.
+	DejaGnu.done();
 #else
 	DejaGnu.note("This class (TextRenderer) is only available in flash8 and flash9");
 #end
