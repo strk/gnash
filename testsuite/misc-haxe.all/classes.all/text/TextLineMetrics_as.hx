@@ -48,42 +48,43 @@ class TextLineMetrics_as {
         } else {
             DejaGnu.fail("TextLineMetrics class doesn't exist");
         }
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-	if (Type.typeof(x1.ascent) == ValueType.TFloat) {
-	    DejaGnu.pass("TextLineMetrics.ascent property exists");
-	} else {
-	    DejaGnu.fail("TextLineMetrics.ascent property doesn't exist");
-	}
-	if (Type.typeof(x1.descent) == ValueType.TFloat) {
-	    DejaGnu.pass("TextLineMetrics.descent property exists");
-	} else {
-	    DejaGnu.fail("TextLineMetrics.descent property doesn't exist");
-	}
-	if (Type.typeof(x1.height) == ValueType.TFloat) {
-	    DejaGnu.pass("TextLineMetrics.height property exists");
-	} else {
-	    DejaGnu.fail("TextLineMetrics.height property doesn't exist");
-	}
-	if (Type.typeof(x1.leading) == ValueType.TFloat) {
-	    DejaGnu.pass("TextLineMetrics.leading property exists");
-	} else {
-	    DejaGnu.fail("TextLineMetrics.leading property doesn't exist");
-	}
-	if (Type.typeof(x1.width) == ValueType.TFloat) {
-	    DejaGnu.pass("TextLineMetrics.width property exists");
-	} else {
-	    DejaGnu.fail("TextLineMetrics.width property doesn't exist");
-	}
-	if (Type.typeof(x1.x) == ValueType.TFloat) {
-	    DejaGnu.pass("TextLineMetrics.x property exists");
-	} else {
-	    DejaGnu.fail("TextLineMetrics.x property doesn't exist");
-	}
+		
+		// Tests to see if all the properties exist. All these do is test for
+		// existance of a property, and don't test the functionality at all. This
+		// is primarily useful only to test completeness of the API implementation.
+		if (Type.typeof(x1.ascent) == ValueType.TFloat) {
+			DejaGnu.pass("TextLineMetrics.ascent property exists");
+		} else {
+			DejaGnu.fail("TextLineMetrics.ascent property doesn't exist");
+		}
+		if (Type.typeof(x1.descent) == ValueType.TFloat) {
+			DejaGnu.pass("TextLineMetrics.descent property exists");
+		} else {
+			DejaGnu.fail("TextLineMetrics.descent property doesn't exist");
+		}
+		if (Type.typeof(x1.height) == ValueType.TFloat) {
+			DejaGnu.pass("TextLineMetrics.height property exists");
+		} else {
+			DejaGnu.fail("TextLineMetrics.height property doesn't exist");
+		}
+		if (Type.typeof(x1.leading) == ValueType.TInt) {
+			DejaGnu.pass("TextLineMetrics.leading property exists");
+		} else {
+			DejaGnu.fail("TextLineMetrics.leading property doesn't exist");
+		}
+		if (Type.typeof(x1.width) == ValueType.TInt) {
+			DejaGnu.pass("TextLineMetrics.width property exists");
+		} else {
+			DejaGnu.fail("TextLineMetrics.width property doesn't exist");
+		}
+		if (Type.typeof(x1.x) == ValueType.TInt) {
+			DejaGnu.pass("TextLineMetrics.x property exists");
+		} else {
+			DejaGnu.fail("TextLineMetrics.x property doesn't exist");
+		}
 
-     // Call this after finishing all tests. It prints out the totals.
-        DejaGnu.done();
+		// Call this after finishing all tests. It prints out the totals.
+		DejaGnu.done();
 #else
 	DejaGnu.note("This class (TextLineMetrics) is only available in flash9");
 #end
