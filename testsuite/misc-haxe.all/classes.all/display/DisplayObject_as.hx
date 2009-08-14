@@ -52,195 +52,256 @@ class DisplayObject_as {
         var l1:DisplayObject = new Loader();
         var r1:Rectangle = new Rectangle(1,1,1,1);
 
-        // Make sure we actually get a valid class        
-        if (Std.is(x1, DisplayObject)) {
-            DejaGnu.pass("DisplayObject class exists");
+        // Make sure we actually get a valid class
+        if (untyped __typeof__(DisplayObject) == 'object') {
+          DejaGnu.pass("DisplayObject class exists");
         } else {
-            DejaGnu.fail("DisplayObject lass doesn't exist");
+          DejaGnu.fail("DisplayObject class does not exist");
+        }
+        if (Std.is(x1, DisplayObject)) {
+            DejaGnu.pass("Shape correctly inherits DisplayObject");
+        } else {
+            DejaGnu.fail("Shape does not correctly inherit DisplayObject");
         }
         
-// Tests to see if all the properties exist. All these do is test for
-// existance of a property, and don't test the functionality at all. This
-// is primarily useful only to test completeness of the API implementation.
-//Determine if the accessibilityProperties property of x1 exists by setting it and testing it
-        var accessProps:AccessibilityProperties = new AccessibilityProperties();
-		accessProps.name = "Test";
-		x1.accessibilityProperties = accessProps;
-        if (Std.is(x1.accessibilityProperties, AccessibilityProperties)) {
+        //---------------------------------------------------------------------
+        // Property Existence
+        //---------------------------------------------------------------------
+        DejaGnu.note("**** Property Existence testing ****");
+        if (untyped x1.hasOwnProperty('accessibilityProperties')) {
             DejaGnu.pass("DisplayObject::accessibilityProperties property exists");
         } else {
-            DejaGnu.fail("DisplayObject::accessibilityProperties property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+
+                         "]DisplayObject::accessibilityProperties property"+
+                         " doesn't exist");
         }
-        if (Type.typeof(x1.alpha) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('alpha')) {
             DejaGnu.pass("DisplayObject::alpha property exists");
         } else {
-            DejaGnu.fail("DisplayObject::alpha property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::alpha"+
+                         " property doesn't exist");
         }
-        if (Std.is(x1.blendMode, String)) {
+        if (untyped x1.hasOwnProperty('blendMode')) {
             DejaGnu.pass("DisplayObject::blendMode property exists");
         } else {
-            DejaGnu.fail("DisplayObject::blendMode property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::blendMode"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.cacheAsBitmap) == ValueType.TBool) {
+        if (untyped x1.hasOwnProperty('cacheAsBitmap')) {
             DejaGnu.pass("DisplayObject::cacheAsBitmap property exists");
         } else {
-            DejaGnu.fail("DisplayObject::cacheAsBitmap property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::cacheAsBitmap"+
+                         " property doesn't exist");
         }
-        if (Std.is(x1.filters, Array)) {
+        if (untyped x1.hasOwnProperty('filters')) {
             DejaGnu.pass("DisplayObject::filters property exists");
         } else {
-            DejaGnu.fail("DisplayObject::filters property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::filters"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.height) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('height')) {
             DejaGnu.pass("DisplayObject::height property exists");
         } else {
-            DejaGnu.fail("DisplayObject::height property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::height"+
+                         " property doesn't exist");
+        }
+        if (untyped x1.hasOwnProperty('loaderInfo')) {
+            DejaGnu.pass("DisplayObject::loaderInfo property exists");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::loaderInfo"+
+                         " property does not exist");
         }
     //Determine if the mask property of x1 exists by setting it and testing it
-            var m1:Sprite = new Sprite();
-            x1.mask = m1;
-        if (Std.is(x1.mask, DisplayObject)) {
+        if (untyped x1.hasOwnProperty('mask')) {
             DejaGnu.pass("DisplayObject::mask property exists");
         } else {
-            DejaGnu.fail("DisplayObject::mask property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::mask property"+
+                         " does not exist");
         }
-//Determine if the loaderInfo property of x1 exists by setting it and testing it
-//	var urlRequest:URLRequest = new URLRequest("../classes.all/TEST.jpg");
-//	loader.load(urlRequest);
-// 	if (Std.is(x1.loaderInfo, LoaderInfo)) {
-// 	    DejaGnu.pass("DisplayObject::loaderInfo property exists");
-// 	} else {
-// 	    DejaGnu.fail("DisplayObject::loaderInfo property doesn't exist");
-// 	}
-        if (Type.typeof(x1.mouseX) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('mouseX')) {
             DejaGnu.pass("DisplayObject::mouseX property exists");
         } else {
-            DejaGnu.fail("DisplayObject::mouseX property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::mouseX"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.mouseY) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('mouseY')) {
             DejaGnu.pass("DisplayObject::mouseY property exists");
         } else {
-            DejaGnu.fail("DisplayObject::mouseY property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::mouseY"+
+                         " property doesn't exist");
         }
-        if (Std.is(x1.name, String)) {
+        if (untyped x1.hasOwnProperty('name')) {
             DejaGnu.pass("DisplayObject::name property exists");
         } else {
-            DejaGnu.fail("DisplayObject::name property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::name property"+
+                         " doesn't exist");
         }
-        if (Type.typeof(x1.opaqueBackground) == ValueType.TNull) {
+        if (untyped x1.hasOwnProperty('opaqueBackground')) {
             DejaGnu.pass("DisplayObject::opaqueBackground property exists");
         } else {
-            DejaGnu.fail("DisplayObject::opaqueBackground property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+
+                         "]DisplayObject::opaqueBackground property doesn't"+
+                         " exist");
         }
-//Determine if the parent property of x1 exists by setting it and testing it
-        m1.addChild(x1);
-        if (Std.is(x1.parent, DisplayObjectContainer)) {
+        if (untyped x1.hasOwnProperty('parent')) {
             DejaGnu.pass("DisplayObject::parent property exists");
         } else {
-            DejaGnu.fail("DisplayObject::parent property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::parent"+
+                         " property does not exist");
         }
-        m1.addChild(l1);
-//Determine if the stage property of x1 exists by setting it and testing it
-        flash.Lib.current.stage.addChild(x1);
-        if (Std.is(x1.stage, Stage)) {
-            DejaGnu.pass("DisplayObject::stage property exists");
-        } else {
-            DejaGnu.fail("DisplayObject::stage property doesn't exist");
-        }
-        if (Std.is(l1.root, DisplayObject)) {
+        if (untyped x1.hasOwnProperty('root')) {
             DejaGnu.pass("DisplayObject::root property exists");
         } else {
-            DejaGnu.fail("DisplayObject::root property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::root property"+
+                         " doesn't exist");
         }
-        DejaGnu.note("Type of l1.root is "+Type.typeof(l1.root));
-        if (Type.typeof(x1.rotation) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('rotation')) {
             DejaGnu.pass("DisplayObject::rotation property exists");
         } else {
-            DejaGnu.fail("DisplayObject::rotation property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::rotation"+
+                         " property doesn't exist");
         }
-//Determine if the scale9Grid property of x1 exists by setting it and testing it
-        x1.graphics.drawRect(0,0,10,10);
-        x1.scale9Grid = r1;
-        if (Std.is(x1.scale9Grid, Rectangle)) {
+        if (untyped x1.hasOwnProperty('scale9Grid')) {
             DejaGnu.pass("DisplayObject::scale9Grid property exists");
         } else {
-            DejaGnu.fail("DisplayObject::scale9Grid property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scale9Grid"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.scaleX) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('scaleX')) {
             DejaGnu.pass("DisplayObject::scaleX property exists");
         } else {
-            DejaGnu.fail("DisplayObject::scaleX property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scaleX"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.scaleY) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('scaleY')) {
             DejaGnu.pass("DisplayObject::scaleY property exists");
         } else {
-            DejaGnu.fail("DisplayObject::scaleY property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scaleY"+
+                         " property doesn't exist");
         }
-//Determine if the scrollRect property of x1 exists by setting it and testing it
-        x1.scrollRect = r1;
-        if (Std.is(x1.scrollRect, Rectangle)) {
+        if (untyped x1.hasOwnProperty('scrollRect')) {
             DejaGnu.pass("DisplayObject::scrollRect property exists");
         } else {
-            DejaGnu.fail("DisplayObject::scrollRect property doesn't exist"); 
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scrollRect"+
+                         " property doesn't exist"); 
         }
-        if (Std.is(x1.transform, Transform)) {
+        if (untyped x1.hasOwnProperty('stage')) {
+            DejaGnu.pass("DisplayObject::stage property exists");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::stage"+
+                         "property doesn't exist");
+        }
+        if (untyped x1.hasOwnProperty('transform')) {
             DejaGnu.pass("DisplayObject::transform property exists");
         } else {
-            DejaGnu.fail("DisplayObject::transform property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::transform"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.visible) == ValueType.TBool) {
+        if (untyped x1.hasOwnProperty('visible')) {
             DejaGnu.pass("DisplayObject::visible property exists");
         } else {
-            DejaGnu.fail("DisplayObject::visible property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::visible"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.width) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('width')) {
             DejaGnu.pass("DisplayObject::width property exists");
         } else {
-            DejaGnu.fail("DisplayObject::width property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::width"+
+                         " property doesn't exist");
         }
-        if (Type.typeof(x1.x) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('x')) {
             DejaGnu.pass("DisplayObject::x property exists");
         } else {
-            DejaGnu.fail("DisplayObject::x property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::x property"+
+                         " doesn't exist");
         }
-        if (Type.typeof(x1.y) == ValueType.TFloat) {
+        if (untyped x1.hasOwnProperty('y')) {
             DejaGnu.pass("DisplayObject::y property exists");
         } else {
-            DejaGnu.fail("DisplayObject::y property doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::y property"+
+                         " doesn't exist");
         }
 
 // Tests to see if all the methods exist. All these do is test for
 // existance of a method, and don't test the functionality at all. This
 // is primarily useful only to test completeness of the API implementation.
-        if (Type.typeof(x1.getBounds) == ValueType.TFunction) {
+        //----------------------------------------------------------------------
+        // Method Existence
+        //----------------------------------------------------------------------
+        if (untyped x1.hasOwnProperty('getBounds')) {
             DejaGnu.pass("DisplayObject::getBounds() method exists");
         } else {
-            DejaGnu.fail("DisplayObject::getBounds() method doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::getBounds()"+
+                         " method doesn't exist");
         }
-        if (Type.typeof(x1.getRect) == ValueType.TFunction) {
+        if (untyped __typeof__(x1.getBounds) == 'function') {
+            DejaGnu.pass("getBounds() is a function");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]getBounds() is not a function");
+        }
+        
+        if (untyped x1.hasOwnProperty('getRect')) {
             DejaGnu.pass("DisplayObject::getRect() method exists");
         } else {
-            DejaGnu.fail("DisplayObject::getRect() method doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::getRect()"+
+                         " method doesn't exist");
         }
-        if (Type.typeof(x1.globalToLocal) == ValueType.TFunction) {
+        if (untyped __typeof__(x1.getRect) == 'function') {
+            DejaGnu.pass("getRect() is a function");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]getRect() is not a function");
+        }
+        
+        if (untyped x1.hasOwnProperty('globalToLocal')) {
             DejaGnu.pass("DisplayObject::globalToLocal() method exists");
         } else {
-            DejaGnu.fail("DisplayObject::globalToLocal() method doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+
+                        "]DisplayObject::globalToLocal() method doesn't exist");
         }
-        if (Type.typeof(x1.hitTestObject) == ValueType.TFunction) {
+        if (untyped __typeof__(x1.globalToLocal) == 'function') {
+            DejaGnu.pass("globalToLocal() is a function");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]globalToLocal() is not a"+
+                         " function");
+        }
+
+        if (untyped x1.hasOwnProperty('hitTestObject')) {
             DejaGnu.pass("DisplayObject::hitTestObject() method exists");
         } else {
-            DejaGnu.fail("DisplayObject::hitTestObject() method doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+
+                        "]DisplayObject::hitTestObject() method doesn't exist");
         }
-        if (Type.typeof(x1.hitTestPoint) == ValueType.TFunction) {
+        if (untyped __typeof__(x1.hitTestObject) == 'function') {
+            DejaGnu.pass("hitTestObject() is a function");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]hitTestObject() is not a"+
+                         " function");
+        }
+        
+        if (untyped x1.hasOwnProperty('hitTestPoint')) {
             DejaGnu.pass("DisplayObject::hitTestPoint() method exists");
         } else {
-            DejaGnu.fail("DisplayObject::hitTestPoint() method doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+
+                         "]DisplayObject::hitTestPoint() method doesn't exist");
         }
-        if (Type.typeof(x1.localToGlobal) == ValueType.TFunction) {
+        if (untyped __typeof__(x1.hitTestPoint) == 'function') {
+            DejaGnu.pass("hitTestPoint() is a function");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]hitTestPoint() is not a"+
+                         " function");
+        }
+        
+        if (untyped x1.hasOwnProperty('localToGlobal')) {
             DejaGnu.pass("DisplayObject::localToGlobal() method exists");
         } else {
-            DejaGnu.fail("DisplayObject::localToGlobal() method doesn't exist");
+            DejaGnu.fail("[ln:"+here.lineNumber+
+                        "]DisplayObject::localToGlobal() method doesn't exist");
+        }
+        if (untyped __typeof__(x1.localToGlobal) == 'function') {
+            DejaGnu.pass("localToGlobal() is a function");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"]localToGlobal() is not a"+
+                         " function");
         }
 #else
         DejaGnu.note("Display Object did not exist in versions prior to SWF 9");
