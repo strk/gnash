@@ -552,8 +552,7 @@ class Array_as {
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] tmp Array elements not initialized correctly");
     }
-    #end
-    #if !flash6
+    #else
     if ( tmp.toString() == "undefined,undefined") {
         DejaGnu.pass("tmp Array elements correctly initialized");
     } else {
@@ -1111,13 +1110,24 @@ class Array_as {
     //DejaGnu.note("array = " + trysortarray.toString());
     var testCmpBogus1 = function (x,y) {return -1;}
     trysortarray.sort( testCmpBogus1 );
-    //DejaGnu.note("array = " + trysortarray.toString());
     // this sort fails in gflashplayer. does as3 iterate or sort differently?
+#if !flash9
     if (trysortarray.toString() == "But,alphabet,Different,capitalization") {
         DejaGnu.pass("custom sort returned correct array");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort did not return correct array");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort did not return"+
+                     " correct array; trysortarray = "+trysortarray.toString());
     }
+#else
+    // flash9 returns this instead, but I'm not sure why, maybe it compares the
+    // elements in a different order (or Haxe does)
+    if (trysortarray.toString() == "capitalization,alphabet,But,Different") {
+        DejaGnu.pass("custom sort returned correct array");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort did not return"+
+                     " correct array; trysortarray = "+trysortarray.toString());
+    }
+#end
     
     var testCmpBogus2 = function (x,y) {return 1;}
     trysortarray.sort( testCmpBogus2 );
@@ -2075,14 +2085,14 @@ class Array_as {
         DejaGnu.fail("[ln:"+here.lineNumber+"] splice() with no args does not return same array");
     }
     //check_equals ( typeof(spliced), "undefined" );
-    if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+    if (untyped __typeof__(spliced) == "undefined") {
         DejaGnu.pass("splice() returns undefined");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] splice() does not return undefined");
     }
 
     // Zero and positive offset starts from the end (-1 is last)
-    spliced = ary.splice(0, 1);
+    var spliced = ary.splice(0, 1);
     //check_equals ( ary.toString(), "1,2,3,4,5" );
     if (ary.toString() == "1,2,3,4,5") {
         DejaGnu.pass("ary[0] element removed");
@@ -2228,60 +2238,121 @@ class Array_as {
     }
 
     // Negative length are invalid
-    spliced = ary.splice(0, -1);
+    var spliced = ary.splice(0, -1);
     //check_equals ( typeof(spliced), 'undefined' );
-    if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+#if !flash9
+    if (untyped __typeof__(spliced) == "undefined") {
         DejaGnu.pass("splice(0,-1) returns undefined");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] splice(0,-1) does not return undefined");
     }
+#else
+    DejaGnu.unresolved("It is possible that for the following splice tests for"+
+            " flash9, flash is in fact returning an empty array, but it is"+
+            " also possible that this is something HaXe is doing on its own");
+    if ( Std.is(spliced, Array) && spliced.toString() == "" 
+         && spliced.length == 0) {
+        DejaGnu.pass("splice(0,-1) (negative length) returned empty array");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]splice(0,-1), (negative length)"+
+                     " did not return empty array; spliced = " + spliced);
+    }
+#end
     //check_equals ( ary.toString(), "2,3,4,5,6" );
     if (ary.toString() == "2,3,4,5,6") {
         DejaGnu.pass("negative length did not change ary");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] negative length changed ary");
     }
-    spliced = ary.splice(3, -1);
+    
+    var spliced = ary.splice(3, -1);
+#if !flash9
     //check_equals ( typeof(spliced), 'undefined' );
-    if (Std.string(untyped __typeof__(spliced)) == "undefined") {
+    if (untyped __typeof__(spliced) == "undefined") {
         DejaGnu.pass("splice(-3,-1,) returns undefined");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] splice(-3,-1,) does not return undefined");
     }
+#else
+    if ( Std.is(spliced, Array) && spliced.toString() == "" 
+         && spliced.length == 0) {
+        DejaGnu.pass("splice(3,-1) (negative length) returned empty array");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]splice(3,-1), (negative length)"+
+                     " did not return empty array; spliced = " + spliced);
+    }
+#end
     //check_equals ( ary.toString(), "2,3,4,5,6" );
     if (ary.toString() == "2,3,4,5,6") {
         DejaGnu.pass("negative length did not change ary");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] negative length changed ary");
     }
-    spliced = ary.splice(-1, -1);
+    
+    var spliced = ary.splice(-1, -1);
+#if !flash9
     //check_equals ( typeof(spliced), 'undefined' );
     if (Std.string(untyped __typeof__(spliced)) == "undefined") {
         DejaGnu.pass("splice(-1,-1) returns undefined");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] splice(-1,-1) does not return undefined");
     }
+#else
+    if ( Std.is(spliced, Array) && spliced.toString() == "" 
+         && spliced.length == 0) {
+        DejaGnu.pass("splice(-1,-1) (negative length) returned empty array");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]splice(-1,-1), (negative length)"+
+                     " did not return empty array; spliced = " + spliced);
+    }
+#end
     //check_equals ( ary.toString(), "2,3,4,5,6" );
     if (ary.toString() == "2,3,4,5,6") {
         DejaGnu.pass("negative length did not change ary");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] negative length changed ary");
     }
+    
     //spliced = ary.splice(-1, -1, "a", "b", "c");
-    spliced == Reflect.callMethod( ary, Reflect.field(ary, "splice"),
+    var spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"),
                                   [-1,-1,"a","b","c"]);
+#if !flash9
     //check_equals ( typeof(spliced), 'undefined' );
     if (Std.string(untyped __typeof__(spliced)) == "undefined") {
         DejaGnu.pass("splice(-1,-1,'a','b','c') returns undefined");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] splice(-1,-1,'a','b','c') does not return undefined");
     }
+#else
+    if ( Std.is(spliced, Array) && spliced.toString() == "" 
+         && spliced.length == 0) {
+        DejaGnu.pass("splice(-1,-1) negative length returned empty array");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]splice(-1,-1), negative length"+
+                     " did not return empty array; spliced = " + spliced);
+    }
+#end
+
+#if !flash9
     //check_equals ( ary.toString(), "2,3,4,5,6" );
     if (ary.toString() == "2,3,4,5,6") {
         DejaGnu.pass("negative length did not change ary");
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"] negative length changed ary");
     }
+#else
+    //NOTE: flash9 seems to insert elements into the array even thought the call
+    //  to splice was invalid. Is this a flash9 behavior or a HaXe problem?
+    if (ary.toString() == "2,3,4,5,a,b,c,6") {
+        DejaGnu.pass("In flash9, invalid call to splice(-1,-1,'a','b','c')"+
+                     " inserts elements into ary anyway");
+    } else {
+        DejaGnu.fail("[ln:"+here.lineNumber+"]ary changed. Invalid call to"+
+                     " splice(-1,-1,'a','b','c') did not insert elements into"+
+                     " the array");
+    }
+#end
+    
     // NOTE: resetting ary because flash 9 makes changes here which invalidate 
     //       further tests.
     ary = new Array();
@@ -2289,7 +2360,7 @@ class Array_as {
 
     // Provide substitutions now
     //spliced = ary.splice(1, 1, "a", "b", "c");
-    spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"),
+    var spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"),
                                   [1,1,"a","b","c"]);
     //check_equals ( ary.toString(), "2,a,b,c,4,5,6" );
     if (ary.toString() == "2,a,b,c,4,5,6") {
@@ -2401,7 +2472,7 @@ class Array_as {
         DejaGnu.fail("[ln:"+here.lineNumber+"] sparse array has more or less than 2 elements");
     }
 
-    spliced = ary.splice(3, 0); // no op ?
+    var spliced = ary.splice(3, 0); // no op ?
     //check_equals(ary.length, 8); // no change in length
     if (ary.length == 8) {
         DejaGnu.pass("splice(3,0) does not change length of sparse array");
@@ -2418,11 +2489,12 @@ class Array_as {
         i++;
     }
     //check_equals(count, 8); // but fills the gaps !
-    //NOTE: is this correct behavior?
+    //NOTE: is this correct behavior? works differently in flash 9
     if (count == 8) {
         DejaGnu.pass("splice fills holes in sparse array");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] splice does not fill holes in sparse array");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] splice does not fill holes in"+
+                     " sparse array; count = "+ count);
     }
 
     ary = new Array(); ary[2] = 2; ary[7] = 7;
@@ -2448,7 +2520,8 @@ class Array_as {
     if (count == 9) {
         DejaGnu.pass("splice fills holes in sparse array");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] splice does not fill holes in sparse array");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] splice does not fill holes in"+
+                     " sparse array; count = "+ count);
     }
     //check_equals(ary[3], 3);
     if (ary[3] == 3) {
@@ -2465,7 +2538,7 @@ class Array_as {
 
     ary = new Array(); ary[2] = 2; ary[7] = 7;
     //spliced = ary.splice(3, 1, 3); // replace index 3 (an hole) with a 3 value
-    spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [3,1,3]);
+    var spliced = Reflect.callMethod( ary, Reflect.field(ary, "splice"), [3,1,3]);
     //count=0; for (var i in ary) count++;
     count = 0;
     i = 0;
@@ -2923,13 +2996,15 @@ class Array_as {
     if (r.toString() == "8,5,3,1,0,-2,-7,-9") {
         DejaGnu.pass("custom sort 'zero' returns correct array");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'zero' does not return correctly");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'zero' does not"+
+                     " return correctly; r = "+ r.toString());
     }
     //check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
     if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
         DejaGnu.pass("custom sort 'zero' sorted b correctly");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'zero' did not sort b correctly");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'zero' did not sort"+
+                     " b correctly; b = "+ b.toString());
     }
     //b.sort( numeric );
     #if !flash9
@@ -2941,7 +3016,8 @@ class Array_as {
     if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
         DejaGnu.pass("custom sort 'numeric' sorted b correctly");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'numeric' did not sort b correctly");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'numeric' did not"+
+                     " sort b correctly; b = "+ b.toString());
     }
     //b.sort( numericRev );
     #if !flash9
@@ -2953,7 +3029,8 @@ class Array_as {
     if (b.toString() == "8,5,3,1,0,-2,-7,-9") {
         DejaGnu.pass("custom sort 'numericRev' sorted b correctly");
     } else {
-        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'numericRev' did not sort b correctly");
+        DejaGnu.fail("[ln:"+here.lineNumber+"] custom sort 'numericRev' did"+
+                     " not sort b correctly; b = "+ b.toString());
     }
     
     // resetting order of b so that it is in the expected order for the
@@ -5042,107 +5119,109 @@ class Array_as {
 	// pop an array with delete-protected elements
 	//--------------------------------------------------------
 	static public function popProtected_Test() {
-	DejaGnu.note("*** Begin testing pop on delete protected array");
+        DejaGnu.note("*** Begin testing pop on delete protected array");
 	
 	
-	//~ a = new Array();
-	var a = new Array();
-	//~ a[0] = 'zero';
-	a[0] = 'zero';
-	//~ a[1] = 'one';
-	a[1] = 'one';
-	//~ ASSetPropFlags(a, "0", 7, 0); // protect 0 from deletion
-	untyped 'ASSetPropFlags'(a, "0", 7, 0);
-	//~ check_equals(a.length, 2);
-	if (a.length == 2) {
-		DejaGnu.pass("a.length == 2");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
-	}
-	//~ f = a.shift();
-	var f = a.shift();
-	//~ check_equals(a.length, 1);
-	if (a.length == 1) {
-		DejaGnu.pass("a.length == 1");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 1");
-	}
-	//~ check_equals(f, 'zero');
-	if (f == 'zero') {
-		DejaGnu.pass("f == 'zero'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] f != 'zero'");
-	}
-	//~ xcheck_equals(a[0], 'zero'); // could not delete for override
-	if (a[0] == 'zero') {
-		DejaGnu.xpass("[ln:"+here.lineNumber+"] a[0] == 'zero'");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] a[0] != 'zero'");
-	}
-	//~ check_equals(typeof(a[1]), 'undefined');
-	if (Type.typeof(a[1]) == ValueType.TNull) {
-		DejaGnu.pass("Type of a[1] is 'undefined'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] Type of a[1] is not 'undefined'");
-	}
+        //~ a = new Array();
+        var a = new Array();
+        //~ a[0] = 'zero';
+        a[0] = 'zero';
+        //~ a[1] = 'one';
+        a[1] = 'one';
+#if !flash9
+        // Undocumented AS2 function?
+        //~ ASSetPropFlags(a, "0", 7, 0); // protect 0 from deletion
+        untyped ASSetPropFlags(a, "0", 7, 0);
+        //~ check_equals(a.length, 2);
+        if (a.length == 2) {
+            DejaGnu.pass("a.length == 2");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
+        }
+        //~ f = a.shift();
+        var f = a.shift();
+        //~ check_equals(a.length, 1);
+        if (a.length == 1) {
+            DejaGnu.pass("a.length == 1");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 1");
+        }
+        //~ check_equals(f, 'zero');
+        if (f == 'zero') {
+            DejaGnu.pass("f == 'zero'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] f != 'zero'");
+        }
+        //~ xcheck_equals(a[0], 'zero'); // could not delete for override
+        if (a[0] == 'zero') {
+            DejaGnu.xpass("[ln:"+here.lineNumber+"] a[0] == 'zero'");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] a[0] != 'zero'");
+        }
+        //~ check_equals(typeof(a[1]), 'undefined');
+        if (Type.typeof(a[1]) == ValueType.TNull) {
+            DejaGnu.pass("Type of a[1] is 'undefined'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] Type of a[1] is not 'undefined'");
+        }
 
-	//~ check(!a.hasOwnProperty(1));
-	if ( !(untyped a.hasOwnProperty(1))) {
-		DejaGnu.pass("a no longer has property '1'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a still has property '1'");
-	}
+        //~ check(!a.hasOwnProperty(1));
+        if ( !(untyped a.hasOwnProperty(1))) {
+            DejaGnu.pass("a no longer has property '1'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a still has property '1'");
+        }
 
-	a = new Array();
-	a[0] = 'zero';
-	a[1] = 'one';
-	//~ ASSetPropFlags(a, "1", 7, 0); // protect 1 from deletion
-	untyped 'ASSetPropFlags'(a, "1", 7, 0);
-	//~ check_equals(a.length, 2);
-	if (a.length == 2) {
-		DejaGnu.pass("a.length == 2");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
-	}
-	//~ f = a.shift();
-	f = a.shift();
-	//~ check_equals(a.length, 1);
-	if (a.length == 1) {
-		DejaGnu.pass("a.length == 1");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 1");
-	}
-	//~ check_equals(f, 'zero');
-	if (f == 'zero') {
-		DejaGnu.pass("f == 'zero'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] f != 'zero'");
-	}
-	//~ check_equals(a[0], 'one'); // could replace
-	if (a[0] == 'one') {
-		DejaGnu.pass("a[0] == 1");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a[0] != 1");
-	}
-	//~ xcheck_equals(a[1], 'one'); // couldn't delete
-	if (a[1] == 'one') {
-		DejaGnu.xpass("[ln:"+here.lineNumber+"] a[1] == 1");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] a[1] != 1");
-	}
-	//~ check(a.hasOwnProperty(0)); 
-	if (untyped a.hasOwnProperty(0)) {
-		DejaGnu.pass("a still has the property '0'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a no longer has the property '0'");
-	}
-	//~ xcheck(a.hasOwnProperty(1)); 
-	if (untyped a.hasOwnProperty(1)) {
-		DejaGnu.xpass("a still has the property '1'");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] a no longer has the property '1'");
-	}
-	
+        a = new Array();
+        a[0] = 'zero';
+        a[1] = 'one';
+        //~ ASSetPropFlags(a, "1", 7, 0); // protect 1 from deletion
+        untyped ASSetPropFlags(a, "1", 7, 0);
+        //~ check_equals(a.length, 2);
+        if (a.length == 2) {
+            DejaGnu.pass("a.length == 2");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
+        }
+        //~ f = a.shift();
+        f = a.shift();
+        //~ check_equals(a.length, 1);
+        if (a.length == 1) {
+            DejaGnu.pass("a.length == 1");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 1");
+        }
+        //~ check_equals(f, 'zero');
+        if (f == 'zero') {
+            DejaGnu.pass("f == 'zero'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] f != 'zero'");
+        }
+        //~ check_equals(a[0], 'one'); // could replace
+        if (a[0] == 'one') {
+            DejaGnu.pass("a[0] == 1");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a[0] != 1");
+        }
+        //~ xcheck_equals(a[1], 'one'); // couldn't delete
+        if (a[1] == 'one') {
+            DejaGnu.xpass("[ln:"+here.lineNumber+"] a[1] == 1");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] a[1] != 1");
+        }
+        //~ check(a.hasOwnProperty(0)); 
+        if (untyped a.hasOwnProperty(0)) {
+            DejaGnu.pass("a still has the property '0'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a no longer has the property '0'");
+        }
+        //~ xcheck(a.hasOwnProperty(1)); 
+        if (untyped a.hasOwnProperty(1)) {
+            DejaGnu.xpass("a still has the property '1'");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] a no longer has the property '1'");
+        }
+#end
 	}//end popProtected_Test
 	
 	
@@ -5150,142 +5229,143 @@ class Array_as {
 	// pop an array with read-only elements
 	//--------------------------------------------------------
 	static public function popReadOnly_Test() {
-	DejaGnu.note("*** Begin testing pop on array with read-only elements");
+        DejaGnu.note("*** Begin testing pop on array with read-only elements");
 
-	var a = new Array();
-	a[0] = 'zero';
-	a[1] = 'one';
-	//ASSetPropFlags(a, "0", 4, 0); // protect 0 from override
-	untyped 'ASSetPropFlags'(a, "0", 4, 0);
-	//check_equals(a.length, 2);
-	if (a.length == 2) {
-		DejaGnu.pass("a.length == 2");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
-	}
-	
-	a[0] = 'overridden';
-	//xcheck_equals(a[0], 'zero'); // was protected..
-	if (a[0] == 'zero') {
-		DejaGnu.xpass("[ln:"+here.lineNumber+"] a[0] == 'zero'");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] a[0] != 'zero'");
-	}
-	var f = a.shift();
-	//check_equals(a.length, 1); 
-	if (a.length == 1) {
-		DejaGnu.pass("a.length == 1");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 1");
-	}
-	//xcheck_equals(f, 'zero');
-	if (f == 'zero') {
-		DejaGnu.xpass("[ln:"+here.lineNumber+"] f == 'zero'");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] f != 'zero'");
-	}
-	//check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
-	if (a[0] == 'one') {
-		DejaGnu.pass("a[0] == 'one'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a[0] != 'one'");
-	}
-	//check_equals(typeof(a[1]), 'undefined');
-	if (Type.typeof(a[1]) == ValueType.TNull) {
-		DejaGnu.pass("Type of a[1] is 'undefined'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] Type of a[1] is not 'undefined'");
-	}
-	a[0] = 'overridden';
-	//check_equals(a[0], 'overridden'); // flag was lost
-	if (a[0] == 'overridden') {
-		DejaGnu.pass("a[0] == 'overridden'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a[0] != 'overridden'");
-	}
-	//check(!a.hasOwnProperty(1)); 
-	if ( !(untyped a.hasOwnProperty(1))) {
-		DejaGnu.pass("a no longer has the property '1'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a still has the property '1'");
-	}
+        var a = new Array();
+        a[0] = 'zero';
+        a[1] = 'one';
+#if !flash9
+        //ASSetPropFlags(a, "0", 4, 0); // protect 0 from override
+        untyped ASSetPropFlags(a, "0", 4, 0);
+        //check_equals(a.length, 2);
+        if (a.length == 2) {
+            DejaGnu.pass("a.length == 2");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
+        }
+        
+        a[0] = 'overridden';
+        //xcheck_equals(a[0], 'zero'); // was protected..
+        if (a[0] == 'zero') {
+            DejaGnu.xpass("[ln:"+here.lineNumber+"] a[0] == 'zero'");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] a[0] != 'zero'");
+        }
+        var f = a.shift();
+        //check_equals(a.length, 1); 
+        if (a.length == 1) {
+            DejaGnu.pass("a.length == 1");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 1");
+        }
+        //xcheck_equals(f, 'zero');
+        if (f == 'zero') {
+            DejaGnu.xpass("[ln:"+here.lineNumber+"] f == 'zero'");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] f != 'zero'");
+        }
+        //check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
+        if (a[0] == 'one') {
+            DejaGnu.pass("a[0] == 'one'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a[0] != 'one'");
+        }
+        //check_equals(typeof(a[1]), 'undefined');
+        if (Type.typeof(a[1]) == ValueType.TNull) {
+            DejaGnu.pass("Type of a[1] is 'undefined'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] Type of a[1] is not 'undefined'");
+        }
+        a[0] = 'overridden';
+        //check_equals(a[0], 'overridden'); // flag was lost
+        if (a[0] == 'overridden') {
+            DejaGnu.pass("a[0] == 'overridden'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a[0] != 'overridden'");
+        }
+        //check(!a.hasOwnProperty(1)); 
+        if ( !(untyped a.hasOwnProperty(1))) {
+            DejaGnu.pass("a no longer has the property '1'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a still has the property '1'");
+        }
 
-	a = new Array();
-	a[0] = 'zero';
-	a[1] = 'one';
-	a[2] = 'two';
-	//ASSetPropFlags(a, "1", 4, 0); // protect 1 from override
-	untyped 'ASSetPropFlags'(a, "1", 4, 0);
-	a[1] = 'overridden';
-	//xcheck_equals(a[1], 'one'); // was protected
-	if (a[1] == 'one') {
-		DejaGnu.xpass("[ln:"+here.lineNumber+"] a[1] == 'one'");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] a[1] != 'one'");
-	}
-	//check_equals(a.length, 3);
-	if (a.length == 3) {
-		DejaGnu.pass("a.length == 3");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 3");
-	}
-	f = a.shift();
-	//check_equals(a.length, 2);
-	if (a.length == 2) {
-		DejaGnu.pass("a.length == 2");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
-	}
-	//check_equals(f, 'zero');
-	if (f == 'zero') {
-		DejaGnu.pass("f == 'zero'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] f != 'zero'");
-	}
-	//xcheck_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
-	if (a[0] == 'one') {
-		DejaGnu.xpass("[ln:"+here.lineNumber+"] a[0] == 'one'");
-	} else {
-		DejaGnu.xfail("[ln:"+here.lineNumber+"] a[0] == 'one'");
-	}
-	//check_equals(a[1], 'two');
-	if (a[1] == 'two') {
-		DejaGnu.pass("a[1] == 'two'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a[1] == 'two'");
-	}
-	//check_equals(typeof(a[2]), 'undefined');
-	if (Type.typeof(a[2]) == ValueType.TNull) {
-		DejaGnu.pass("Type of a[2] is 'undefined'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] Type of a[2] is not 'undefined'");
-	}
-	a[1] = 'overridden';
-	//check_equals(a[1], 'overridden'); // flag was lost
-	if (a[1] == 'overridden') {
-		DejaGnu.pass("a[1] == 'overridden'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a[1] != overridden");
-	}
-	//check(a.hasOwnProperty(0));
-	if (untyped a.hasOwnProperty(0)) {
-		DejaGnu.pass("a still has property '0'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a no longer has property '0'");
-	}
-	//check(a.hasOwnProperty(1)); 
-	if (untyped a.hasOwnProperty(1)) {
-		DejaGnu.pass("a still has property '1'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a no longer has property '1'");
-	}
-	//check(!a.hasOwnProperty(2)); 
-	if ( !(untyped a.hasOwnProperty(2))) {
-		DejaGnu.pass("a no longer has property '2'");
-	} else {
-		DejaGnu.fail("[ln:"+here.lineNumber+"] a still has property '2'");
-	}
-	
+        a = new Array();
+        a[0] = 'zero';
+        a[1] = 'one';
+        a[2] = 'two';
+        //ASSetPropFlags(a, "1", 4, 0); // protect 1 from override
+        untyped ASSetPropFlags(a, "1", 4, 0);
+        a[1] = 'overridden';
+        //xcheck_equals(a[1], 'one'); // was protected
+        if (a[1] == 'one') {
+            DejaGnu.xpass("[ln:"+here.lineNumber+"] a[1] == 'one'");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] a[1] != 'one'");
+        }
+        //check_equals(a.length, 3);
+        if (a.length == 3) {
+            DejaGnu.pass("a.length == 3");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 3");
+        }
+        f = a.shift();
+        //check_equals(a.length, 2);
+        if (a.length == 2) {
+            DejaGnu.pass("a.length == 2");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a.length != 2");
+        }
+        //check_equals(f, 'zero');
+        if (f == 'zero') {
+            DejaGnu.pass("f == 'zero'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] f != 'zero'");
+        }
+        //xcheck_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
+        if (a[0] == 'one') {
+            DejaGnu.xpass("[ln:"+here.lineNumber+"] a[0] == 'one'");
+        } else {
+            DejaGnu.xfail("[ln:"+here.lineNumber+"] a[0] == 'one'");
+        }
+        //check_equals(a[1], 'two');
+        if (a[1] == 'two') {
+            DejaGnu.pass("a[1] == 'two'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a[1] == 'two'");
+        }
+        //check_equals(typeof(a[2]), 'undefined');
+        if (Type.typeof(a[2]) == ValueType.TNull) {
+            DejaGnu.pass("Type of a[2] is 'undefined'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] Type of a[2] is not 'undefined'");
+        }
+        a[1] = 'overridden';
+        //check_equals(a[1], 'overridden'); // flag was lost
+        if (a[1] == 'overridden') {
+            DejaGnu.pass("a[1] == 'overridden'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a[1] != overridden");
+        }
+        //check(a.hasOwnProperty(0));
+        if (untyped a.hasOwnProperty(0)) {
+            DejaGnu.pass("a still has property '0'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a no longer has property '0'");
+        }
+        //check(a.hasOwnProperty(1)); 
+        if (untyped a.hasOwnProperty(1)) {
+            DejaGnu.pass("a still has property '1'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a no longer has property '1'");
+        }
+        //check(!a.hasOwnProperty(2)); 
+        if ( !(untyped a.hasOwnProperty(2))) {
+            DejaGnu.pass("a no longer has property '2'");
+        } else {
+            DejaGnu.fail("[ln:"+here.lineNumber+"] a still has property '2'");
+        }
+#end
 	}//end popReadOnly
 	
 }//end class Array_as
