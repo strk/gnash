@@ -57,8 +57,8 @@ public:
 	/// Text format display values
 	enum TextFormatDisplay
 	{
-		BLOCK = 0,
-		INLINE = 1
+		TEXTFORMAT_BLOCK = 0,
+		TEXTFORMAT_INLINE = 1
 	};
 	
 	/// Possible autoSize values

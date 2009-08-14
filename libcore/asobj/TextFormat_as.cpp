@@ -660,12 +660,12 @@ TextField::TextFormatDisplay
 parseDisplayString(const std::string& display)
 {
 	StringNoCaseEqual cmp;
-	if (cmp(display, "inline")) return TextField::INLINE;
-	if (cmp(display, "block")) return TextField::BLOCK;
+	if (cmp(display, "inline")) return TextField::TEXTFORMAT_INLINE;
+	if (cmp(display, "block")) return TextField::TEXTFORMAT_BLOCK;
 	
     // Is this correct? We have to return something here...
 	log_debug("Invalid display string %s ", display);
-    return TextField::BLOCK;
+    return TextField::TEXTFORMAT_BLOCK;
 }
 
 const char* 
@@ -692,9 +692,9 @@ getDisplayString(TextField::TextFormatDisplay a)
 {
 	switch (a)
 	{
-		case TextField::INLINE:
+		case TextField::TEXTFORMAT_INLINE:
 			return "inline";
-		case TextField::BLOCK:
+		case TextField::TEXTFORMAT_BLOCK:
 			return "block";
 		default:
 			log_error("Unknown display value: %d ", a);

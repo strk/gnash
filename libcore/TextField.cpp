@@ -1951,7 +1951,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             setTabStops(originaltabstops);
                         } else if (s == "P") {
                             //paragraph
-                            if (_display == BLOCK)
+                            if (_display == TEXTFORMAT_BLOCK)
                             {
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,

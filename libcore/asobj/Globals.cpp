@@ -979,7 +979,7 @@ global_assetnative(const fn_call& fn)
     if (major < 0) return as_value();
 
     const std::string& props = fn.arg(2).to_string();
-    const int minor = fn.nargs > 3 ? std::max(fn.arg(3).to_int(), 0) : 0;
+    const int minor = fn.nargs > 3 ? std::max(fn.arg(3).to_int(), (boost::int32_t)0) : 0;
 
     std::string::const_iterator pos = props.begin();
 

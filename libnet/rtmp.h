@@ -32,6 +32,7 @@
 #include "rtmp_msg.h"
 #include "cque.h"
 #include "dsodefs.h"
+#include "utility.h"
 
 namespace gnash
 {
