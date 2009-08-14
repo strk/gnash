@@ -68,16 +68,12 @@ class Security_as {
 #end
 
 #if flash8
-	DejaGnu.note( "Security.sandboxType may be not defined right? " + Type.typeof(Security.sandboxType) );
-//Si:
-//Can not pass the test here!
-//The Security.sandboxType is not well defined for flash8
-
-//	if (Std.is(Security.sandboxType, String) ) {
-	if (Type.typeof(Security.sandboxType)==TNull ) {
+	// For pp, Security.sandboxType returns a string, hence the xfail 
+	// when run in the pp
+	if (Type.typeof(Security.sandboxType) == ValueType.TNull) {
 	    DejaGnu.pass("Security.sandboxType property exists");
 	} else {
-	    DejaGnu.fail("Security.sandboxType property doesn't exist");
+	    DejaGnu.xfail("Security.sandboxType property doesn't exist");
 	}
 #end
 
@@ -100,13 +96,14 @@ class Security_as {
 	    DejaGnu.fail("Security::allowDomain() method doesn't exist");
 	}
     var ret = Security.allowDomain("cnn.com");
-    DejaGnu.note("ret = " + ret);
 
+#if !flash6
 	if (Type.typeof(Security.allowInsecureDomain) == TFunction) {
 	    DejaGnu.pass("Security::allowInsecureDomain() method exists");
 	} else {
 	    DejaGnu.fail("Security::allowInsecureDomain() method doesn't exist");
 	}
+#end
 	if (Type.typeof(Security.loadPolicyFile) == TFunction) {
 	    DejaGnu.pass("Security::loadPolicyFile() method exists");
 	} else {
