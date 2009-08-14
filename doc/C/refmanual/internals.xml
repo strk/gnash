@@ -51,7 +51,7 @@
 		dealing with streamed video and sound as well as decoding
 		embedded media frames. Besides the standard SWF formats
 		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, &app; can 
-		decode other formats supports by gstreamer or ffmpeg, 
+		decode other formats supports by Gstreamer or FFmpeg, 
 		including the free OGG container and free codecs.
 	</para>
       </sect3>

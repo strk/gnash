@@ -163,11 +163,11 @@
     
     <glossentry>
       <glossterm>
-	ffmpeg
+	FFmpeg
       </glossterm>
       <glossdef>
 	<para>
-	  ffmpeg is an audio and video decoding library which can be 
+	  FFmpeg is an audio and video decoding library which can be 
 	  used by Gnash to decode mp3, FLV and other media types.  
 	</para>
       </glossdef>
@@ -528,7 +528,7 @@
 	  are independent of each other: you can use it for a task and
 	  not for the other if you wish.  This version of Gnash does not
           implement menus in the SDL GUI; the SDL sound handler is the
-          most feature rich, supporting video through ffmpeg. 
+          most feature rich, supporting video through FFmpeg. 
 	</para>
       </glossdef>
     </glossentry>
@@ -548,7 +548,7 @@
 	</para>
 	<para>
 	  There are currently two sound handlers available in &app;:
-	  ffmpeg and Gstreamer.  The ffmpeg sound handler uses SDL for
+	  FFmpeg and Gstreamer.  The ffmpeg sound handler uses SDL for
 	  mixing.
 	  The Gstreamer-sound handler uses the available 
 	  plugins to decode the audio, so it might not work if some 

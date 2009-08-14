@@ -165,7 +165,7 @@
 	  </entry>
 	  <entry>  <para>
 	    Select the specified media decoder and sound engine.
-	    FFMPEG uses the SDL sound engine; GST uses its own.
+	    FFmpeg uses the SDL sound engine; GST uses its own.
 	    <option>GST</option> is the default decoder.
 	  </para>
 	  <para>

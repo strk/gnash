@@ -35,11 +35,11 @@
       </para>
 
       <para>
-	Gnash uses ffmpeg for codecs, so any file supported by Mplayer
+	Gnash uses FFmpeg for codecs, so any file supported by Mplayer
 	should work with Gnash. Gnash supports the loading of patent
 	free codecs like Ogg Vorbis or Theora from disk based files,
 	while work is being done to support these codecs when embedded
-	in a SWF file. Ffmpeg contains the codecs used by the current
+	in a SWF file. FFmpeg contains the codecs used by the current
 	SWF definition, FLV, VP6 (ON2), H.263, H.264, and MP3.
       </para>
 
