@@ -1061,6 +1061,24 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
     return true;
 }
 
+size_t
+RTMPServer::sendToClient(std::vector<int> &fds, amf::Buffer &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    return sendToClient(fds, data.reference(), data.allocated());
+}
+
+size_t
+RTMPServer::sendToClient(std::vector<int> &fds, boost::uint8_t *data,
+		      size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+    std::vector<int>::iterator it;
+    for (it=fds.begin(); it< fds.end(); it++) {
+	writeNet(data, size);
+    }
+}
+
 // This is the thread for all incoming RTMP connections
 bool
 rtmp_handler(Network::thread_params_t *args)

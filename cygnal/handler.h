@@ -131,10 +131,6 @@ public:
     ///     See if any of the cgi-bins has been loaded.
     bool initialized();
 
-    // Dump internal data.
-    void dump();  
-
-
     size_t readFromPlugin(amf::Buffer &buf) {
 	return readFromPlugin(buf.begin(), buf.allocated()); };
     boost::shared_ptr<amf::Buffer> readFromPlugin();
@@ -144,6 +140,9 @@ public:
     size_t writeToPlugin(amf::Buffer &buf) {
 	return writeToPlugin(buf.begin(), buf.allocated()); };
     size_t writeToPlugin(boost::uint8_t *data, size_t size);
+
+    // Dump internal data.
+    void dump();  
 
 protected:
     /// \var _name

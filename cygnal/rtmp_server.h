@@ -81,6 +81,10 @@ public:
     void setStreamID(double id) { _streamid = id; };
     double getStreamID() { return _streamid; };
 
+    size_t sendToClient(std::vector<int> &fds, boost::uint8_t *data,
+			size_t size);
+    size_t sendToClient(std::vector<int> &fds,amf::Buffer &data);
+
     void dump();
 
 private:
