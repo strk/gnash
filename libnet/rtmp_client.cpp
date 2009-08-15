@@ -291,9 +291,11 @@ RTMPClient::connectToServer(const std::string &/* url */)
 	}
 	
 	boost::scoped_ptr<amf::Buffer> handshake2(new amf::Buffer
-		  ((RTMP_HANDSHAKE_SIZE * 2) + ncbuf->allocated()));
+		  ((RTMP_HANDSHAKE_SIZE * 2) + ncbuf->allocated()
+		   + RTMP_MAX_HEADER_SIZE));
 
 	*handshake2 = handshake1;
+	*handshake2 += head;
 	*handshake2 += ncbuf;
 
 	// Finish the handshake process, which has to have the
@@ -303,7 +305,9 @@ RTMPClient::connectToServer(const std::string &/* url */)
 #if 0
 	if (!clientFinish(*handshake2)) {
 #else
-	if (!clientFinish(*ncbuf)) {
+	    *handshake2 = head;
+	    *handshake2 += ncbuf;
+	if (!clientFinish(*handshake2)) {
 #endif
 	    log_error("RTMP handshake completion failed!");
 //	    return (false);
