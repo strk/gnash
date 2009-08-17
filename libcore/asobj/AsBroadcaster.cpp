@@ -40,8 +40,6 @@ namespace {
     as_value asbroadcaster_broadcastMessage(const fn_call& fn);
     as_value asbroadcaster_initialize(const fn_call& fn);
     as_value asbroadcaster_ctor(const fn_call& fn);
-
-    as_object* getAsBroadcasterInterface();
 }
 
 
@@ -117,19 +115,23 @@ public:
 void 
 AsBroadcaster::initialize(as_object& o)
 {
-    as_object* asb = getAsBroadcaster();
+    Global_as* gl = getGlobal(o);
 
-    as_value tmp;
+    // Find _global.AsBroadcaster.
+    as_object* asb =
+        gl->getMember(NSV::CLASS_AS_BROADCASTER).to_object(*gl).get();
 
-    if (asb->get_member(NSV::PROP_ADD_LISTENER, &tmp)) {
-        o.set_member(NSV::PROP_ADD_LISTENER, tmp);
-    }
+    // If it's not an object, these are left undefined, but they are
+    // always attached to the initialized object.
+    as_value al, rl;
 
-    if (asb->get_member(NSV::PROP_REMOVE_LISTENER, &tmp)) {
-        o.set_member(NSV::PROP_REMOVE_LISTENER, tmp);
+    if (asb) {
+        al = asb->getMember(NSV::PROP_ADD_LISTENER);
+        rl = asb->getMember(NSV::PROP_REMOVE_LISTENER);
     }
     
-    Global_as* gl = getGlobal(o);
+    o.set_member(NSV::PROP_ADD_LISTENER, al);
+    o.set_member(NSV::PROP_REMOVE_LISTENER, rl);
     
     // The function returned by ASnative(101, 12) is attached, even though
     // this may not exist (e.g. if _global.ASnative is altered)
@@ -140,39 +142,26 @@ AsBroadcaster::initialize(as_object& o)
 
 }
 
-as_object*
-AsBroadcaster::getAsBroadcaster()
+void
+attachAsBroadcasterStaticInterface(as_object& o)
 {
-    VM& vm = VM::get();
+    const int flags = PropFlags::dontEnum |
+                      PropFlags::dontDelete |
+                      PropFlags::onlySWF6Up;
 
-    static boost::intrusive_ptr<as_object> obj = NULL;
-    if ( ! obj )
-    {
-        as_object* proto = getAsBroadcasterInterface();
-        Global_as* gl = vm.getGlobal();
-        obj = gl->createClass(asbroadcaster_ctor, proto); 
-        vm.addStatic(obj.get()); // correct ?
+    Global_as* gl = getGlobal(o);
 
-        const int flags = PropFlags::dontEnum |
-                          PropFlags::dontDelete |
-                          PropFlags::onlySWF6Up;
+    o.init_member("initialize",
+            gl->createFunction(asbroadcaster_initialize), flags);
+    o.init_member(NSV::PROP_ADD_LISTENER,
+            gl->createFunction(asbroadcaster_addListener), flags);
+    o.init_member(NSV::PROP_REMOVE_LISTENER,
+            gl->createFunction(asbroadcaster_removeListener), flags);
 
-        // NOTE: we may add NSV::PROP_INITIALIZE, unavailable at
-        // time of writing. Anyway, since AsBroadcaster is the only
-        // class we know using an 'initialize' method we might as
-        // well save the string_table size in case we'll not load
-        // the class.
-        obj->init_member("initialize",
-                gl->createFunction(asbroadcaster_initialize), flags);
-        obj->init_member(NSV::PROP_ADD_LISTENER,
-                gl->createFunction(asbroadcaster_addListener), flags);
-        obj->init_member(NSV::PROP_REMOVE_LISTENER,
-                gl->createFunction(asbroadcaster_removeListener), flags);
-        obj->init_member(NSV::PROP_BROADCAST_MESSAGE, vm.getNative(101, 12),
-                flags);
-    }
+    VM& vm = getVM(o);
+    o.init_member(NSV::PROP_BROADCAST_MESSAGE, vm.getNative(101, 12),
+            flags);
 
-    return obj.get();
 }
 
 
@@ -187,9 +176,16 @@ AsBroadcaster::registerNative(as_object& global)
 void
 AsBroadcaster::init(as_object& global, const ObjectURI& uri)
 {
-    // _global.AsBroadcaster is NOT a class, but a simple object
-    global.init_member(getName(uri), AsBroadcaster::getAsBroadcaster(),
-            as_object::DefaultFlags, getNamespace(uri));
+    Global_as* gl = getGlobal(global);
+
+    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* cl = gl->createClass(asbroadcaster_ctor, proto); 
+
+    attachAsBroadcasterStaticInterface(*cl);
+
+    // AsBroadcaster is a class, even though it doesn't look much like one.
+    global.init_member(getName(uri), cl, as_object::DefaultFlags,
+            getNamespace(uri));
 }
 
 
@@ -444,23 +440,11 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
 
 }
 
-as_object*
-getAsBroadcasterInterface()
-{
-    static boost::intrusive_ptr<as_object> o=NULL;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-    }
-    return o.get();
-}
-
+// The constructor does nothing at all.
 as_value
 asbroadcaster_ctor(const fn_call& /*fn*/)
 {
-    as_object* obj = new as_object(getAsBroadcasterInterface());
-    return as_value(obj);
+    return as_value();
 }
 
 } // anonymous namespace
