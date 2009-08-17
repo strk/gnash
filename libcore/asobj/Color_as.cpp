@@ -46,7 +46,7 @@ namespace {
     as_value color_settransform(const fn_call& fn);
     as_value color_ctor(const fn_call& fn);
 
-    as_object* getColorInterface();
+    void attachColorInterface(as_object& o);
     inline void parseColorTransProp(as_object& obj, string_table::key key,
             boost::int16_t& target, bool scale);
     inline MovieClip* getTarget(as_object* obj, const fn_call& fn);
@@ -68,8 +68,10 @@ void
 color_class_init(as_object& global, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(global);
-    as_object* proto = getColorInterface();
+    as_object* proto = gl->createObject(getObjectInterface());
     as_object* cl = gl->createClass(&color_ctor, proto);
+
+    attachColorInterface(*proto);
 
     // This has to be done after createClass is called, as that modifies
     // proto.
@@ -101,21 +103,6 @@ attachColorInterface(as_object& o)
 	o.init_member("getTransform", vm.getNative(700, 3), flags);
 
 }
-
-as_object*
-getColorInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-        as_object* proto = getObjectInterface();
-		o = new as_object(proto);
-
-		attachColorInterface(*o);
-	}
-	return o.get();
-}
-
 
 as_value
 color_getrgb(const fn_call& fn)
