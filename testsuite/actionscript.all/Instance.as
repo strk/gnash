@@ -121,4 +121,33 @@ o = new flash.display.BitmapData();
 check_equals(typeof(o), "undefined");
 check_equals(o, undefined);
 
-check_totals(34);
+// Check object.prototype
+// It seems this can't be changed under any circumstances.
+delete Object.prototype;
+check_equals(typeof(Object.prototype), "object");
+Object.prototype = 6;
+check_equals(typeof(Object.prototype), "object");
+check_equals(Object.prototype.toString(), "[object Object]");
+ASSetPropFlags(Object, null, 0);
+delete Object.prototype;
+check_equals(typeof(Object.prototype), "object");
+
+// String.prototype can be changed.
+String.prototype = 8;
+check_equals(typeof(String.prototype), "number");
+check_equals(String.prototype, 8);
+s = new String("hello");
+xcheck_equals(s, undefined);
+xcheck_equals(s.__proto__, 8);
+check_equals(typeof(s), "object");
+check(!s instanceOf String);
+
+s = new Object("hello");
+xcheck_equals(s, undefined);
+
+Cl = function() {};
+Cl.prototype = 8;
+c = new Cl();
+check_equals(c.__proto__, 8);
+
+check_totals(46);
