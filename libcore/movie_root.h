@@ -103,7 +103,6 @@
 // Forward declarations
 namespace gnash {
     class ExecutableCode; // for ActionQueue
-    class Stage_as;
     class URL;
     class Timer;
     class MovieClip;
@@ -131,7 +130,7 @@ struct DepthComparator
 /// Loading a new top-level movie does not create a new movie_root.
 //
 /// The 'Stage' part of movie_root is accessible through the ActionScript
-/// Stage object, implemented in Stage_as.
+/// Stage object, implemented in Stage_as.cpp.
 //
 /// The movie_root class is responsible for accepting and passing on
 /// user events (mouse or key events), for maintaining the heart-beat
@@ -1006,7 +1005,7 @@ private:
     //
     /// Can return NULL if it's been deleted or not
     /// yet initialized.
-    boost::intrusive_ptr<Stage_as> getStageObject();
+    as_object* getStageObject();
 
     /// Return the singleton Selection object
     //

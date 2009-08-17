@@ -523,15 +523,15 @@ movie_root::getSelectionObject() const
     return sel;
 }
 
-boost::intrusive_ptr<Stage_as>
+as_object*
 movie_root::getStageObject()
 {
 	as_value v;
 	assert ( VM::isInitialized() ); // return NULL;
 	Global_as* global = _vm.getGlobal();
-	if ( ! global ) return NULL;
-	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
-	return boost::dynamic_pointer_cast<Stage_as>(v.to_object(*global));
+	if (!global) return 0;
+	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return 0;
+	return v.to_object(*global).get();
 }
 		
 void
@@ -544,11 +544,14 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 	m_viewport_width = w;
 	m_viewport_height = h;
 
-	if ( _scaleMode == noScale ) // rescale not allowed, notify Stage (if any)
-	{
+	if (_scaleMode == noScale) {
 		//log_debug("Rescaling disabled");
-		boost::intrusive_ptr<Stage_as> stage = getStageObject();
-		if ( stage ) stage->notifyResize();
+		as_object* stage = getStageObject();
+		if (stage) {
+            log_debug("notifying Stage listeners about a resize");
+            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
+        }
+
 	}
 
 	assert(testInvariant());
@@ -1535,10 +1538,12 @@ movie_root::setStageScaleMode(ScaleMode sm)
     _scaleMode = sm;
     callInterface("Stage.align");    
 
-    if ( notifyResize )
-    {
-        boost::intrusive_ptr<Stage_as> stage = getStageObject();
-        if ( stage ) stage->notifyResize();
+    if (notifyResize) {
+        as_object* stage = getStageObject();
+        if (stage) {
+            log_debug("notifying Stage listeners about a resize");
+            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
+        }
     }
 }
 
@@ -1547,9 +1552,11 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
-    boost::intrusive_ptr<Stage_as> stage = getStageObject();
+    as_object* stage = getStageObject();
     if (stage) {
-        stage->notifyFullScreen((_displayState == DISPLAYSTATE_FULLSCREEN));
+        log_debug("notifying Stage listeners about fullscreen state");
+        const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;
+        stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
     }
 
 	if (!_interfaceHandler) return; // No registered callback
