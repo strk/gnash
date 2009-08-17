@@ -255,8 +255,7 @@ as_value
 color_ctor(const fn_call& fn)
 {
 	
-    as_object* proto = getColorInterface();
-    boost::intrusive_ptr<as_object> obj = new as_object(proto);
+    as_object* obj = fn.this_ptr.get();
     
     as_value target;
     if (fn.nargs) target = fn.arg(0);
@@ -265,7 +264,7 @@ color_ctor(const fn_call& fn)
 
     obj->init_member(NSV::PROP_TARGET, target, flags); 
 
-	return as_value(obj.get()); // will keep alive
+	return as_value(); 
 }
 
 inline void
