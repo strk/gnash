@@ -44,15 +44,9 @@ check_equals(typeof(o), "object");
 check_equals(typeof(o.__proto__), "undefined");
 ASSetPropFlags(o, null, 6, 1);
 #if OUTPUT_VERSION < 7
-    #if OUTPUT_VERSION == 6
-    // SWF6 passes
     check_equals(typeof(o.constructor), "function");
-    #else
-    // SWF5 doesn't
-    xcheck_equals(typeof(o.constructor), "function");
-    #endif
 #else
-check_equals(typeof(o.constructor), "undefined");
+    check_equals(typeof(o.constructor), "undefined");
 #endif
 #if OUTPUT_VERSION > 5
 check_equals(typeof(o.__constructor__), "function");
@@ -69,15 +63,9 @@ o = new Math.cos();
 check_equals(typeof(o), "object");
 check_equals(typeof(o.__proto__), "undefined");
 #if OUTPUT_VERSION < 7
-    #if OUTPUT_VERSION == 6
-    // SWF6 passes
     check_equals(typeof(o.constructor), "function");
-    #else
-    // SWF5 doesn't
-    xcheck_equals(typeof(o.constructor), "function");
-    #endif
 #else
-check_equals(typeof(o.constructor), "undefined");
+    check_equals(typeof(o.constructor), "undefined");
 #endif
 check_equals(o.toString(), undefined);
 check_equals(o.valueOf(), undefined);
@@ -89,15 +77,9 @@ o = new Mouse.hide();
 check_equals(typeof(o), "object");
 check_equals(typeof(o.__proto__), "undefined");
 #if OUTPUT_VERSION < 7
-    #if OUTPUT_VERSION == 6
-    // SWF6 passes
     check_equals(typeof(o.constructor), "function");
-    #else
-    // SWF5 doesn't
-    xcheck_equals(typeof(o.constructor), "function");
-    #endif
 #else
-check_equals(typeof(o.constructor), "undefined");
+    check_equals(typeof(o.constructor), "undefined");
 #endif
 check_equals(o.toString(), undefined);
 check_equals(o.valueOf(), undefined);
