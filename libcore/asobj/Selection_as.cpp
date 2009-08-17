@@ -46,7 +46,6 @@ namespace {
     as_value selection_setFocus(const fn_call& fn);
     as_value selection_setSelection(const fn_call& fn);
 
-    as_object* getSelectionInterface();
     void attachSelectionInterface(as_object& o);
 }
 
@@ -98,18 +97,6 @@ attachSelectionInterface(as_object& o)
     /// Handles addListener, removeListener, and _listeners.
     AsBroadcaster::initialize(o);
  
-}
-
-as_object*
-getSelectionInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachSelectionInterface(*o);
-	}
-	return o.get();
 }
 
 as_value
