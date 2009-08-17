@@ -144,110 +144,64 @@ as_function::constructInstance(const as_environment& env,
 
 	int swfversion = getSWFVersion(env);
 
-	boost::intrusive_ptr<as_object> newobj;
+	as_value proto;
+    get_member(NSV::PROP_PROTOTYPE, &proto);
+    bool has_proto = !proto.is_undefined();
+		
+    // Create an empty object, with a ref to the constructor's prototype.
+    // TODO: The prototype should not be converted to an object!
+    as_object* newobj = new as_object(proto.to_object(*getGlobal(env)));
+    
+    // Add a __constructor__ member to the new object, but only for SWF6 up
+    // (to be checked). NOTE that we assume the builtin constructors
+    // won't set __constructor__ to some other value...
+    int flags = PropFlags::dontEnum | 
+                PropFlags::onlySWF6Up; 
 
-	as_value us;
-	
-    get_member(NSV::PROP_PROTOTYPE, &us);
-	
-    bool has_proto = !us.is_undefined();
+    newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-    // a built-in class takes care of assigning a prototype
-    // TODO: change this
-    if (isBuiltin()) {
-		IF_VERBOSE_ACTION (
-            log_action(_("it's a built-in class"));
-		)
+    // Also for SWF5+ only?
+    if (swfversion < 7) {
+        newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
+    }
 
-		fn_call fn(0, env, args, 0, true);
-		as_value ret;
+    fn_call fn(newobj, env, args, newobj->get_super(), true);
+    as_value ret;
 
-		try {
-			ret = call(fn);
-		}
-        catch (GnashException& ex) {
-            // Catching a std::exception here can mask all sorts of bad 
-            // behaviour, as (for instance) a poorly constructed string may
-            // smash the stack, throw an exception, but not abort.
-            // This is very effective at confusing debugging tools.
-            // We only throw GnashExceptions. A std::bad_alloc may also be
-            // reasonable, but anything else shouldn't be caught here.
-			log_debug("Native function called as constructor threw exception: "
-                    "%s", ex.what());
+    try {
+        ret = call(fn);
+    }
+    catch (GnashException& ex) {
+        // Catching a std::exception here can mask all sorts of bad 
+        // behaviour, as (for instance) a poorly constructed string may
+        // smash the stack, throw an exception, but not abort.
+        // This is very effective at confusing debugging tools.
+        // We only throw GnashExceptions. A std::bad_alloc may also be
+        // reasonable, but anything else shouldn't be caught here.
+        log_debug("Native function called as constructor threw exception: "
+                "%s", ex.what());
 
-            // If a constructor throws an exception, throw it back to the
-            // caller. This is the only way to signal that a constructor
-            // did not return anything.
-            throw;
-		}
+        // If a constructor throws an exception, throw it back to the
+        // caller. This is the only way to signal that a constructor
+        // did not return anything.
+        throw;
+    }
 
-		if (ret.is_object()) newobj = ret.to_object(*getGlobal(env));
-		else {
-			log_debug("Native function called as constructor returned %s", ret);
-			newobj = new as_object();
-		}
+    // Some built-in constructors do things properly and operate on the
+    // 'this' pointer. Others return a new object. This is to handle those
+    // cases.
+    if (isBuiltin() && ret.is_object()) {
+        newobj = ret.to_object(*getGlobal(env)).get();
 
-        // There should always be an object by this stage. Failed constructors
-        // are handled in the catch.
-		assert(newobj); 
-
-		// Add a __constructor__ member to the new object, but only for SWF6 up
-		// (to be checked). NOTE that we assume the builtin constructors
-		// won't set __constructor__ to some other value...
-		int flags = PropFlags::dontEnum | 
-                    PropFlags::onlySWF6Up; 
-
-		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
+        newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
+                flags);
 
         // Also for SWF5+ only?
-		if (swfversion < 7) {
-			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
-		}
-
+        if (swfversion < 7) {
+            newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
+                    flags);
+        }
     }
-	else {
-		// Set up the prototype.
-		as_value proto;
-
-		// We can safely call as_object::get_member here as member name is 
-		// a literal string in lowercase. (we should likely avoid calling
-		// get_member as a whole actually, and use a getProto() or similar
-		// method directly instead) TODO
-		/*bool func_has_prototype=*/ get_member(NSV::PROP_PROTOTYPE, &proto);
-
-		// User could have dropped the prototype.
-		// see construct-properties-#.swf from swfdec testsuite
-
-		IF_VERBOSE_ACTION(
-            log_action(_("constructor prototype is %s"), proto);
-		);
-
-		// Create an empty object, with a ref to the constructor's prototype.
-		newobj = new as_object(proto.to_object(*getGlobal(env)));
-
-		// Add a __constructor__ member to the new object, but only for SWF6 up
-		// (to be checked)
-        // Can delete, hidden in swf5 
-		int flags = PropFlags::dontEnum | 
-                    PropFlags::onlySWF6Up; 
-
-		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
-
-		if (swfversion < 7) {
-			newobj->init_member(NSV::PROP_CONSTRUCTOR, this, flags);
-		}
-
-		// Super is computed from the object we're constructing,
-		// It will work as long as we did set it's __proto__ and __constructor__
-		// properties already.
-		as_object* super = newobj->get_super();
-
-		// Call the actual constructor function; new_obj is its 'this'.
-
-		// We don't need the function result.
-		fn_call fn(newobj.get(), env, args, super, true);
-		call(fn);
-	}
 
 	if (!has_proto) set_member(NSV::PROP_PROTOTYPE, as_value(newobj));
     
