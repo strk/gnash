@@ -159,7 +159,7 @@ as_function::constructInstance(const as_environment& env,
             log_action(_("it's a built-in class"));
 		)
 
-		fn_call fn(0, env, args);
+		fn_call fn(0, env, args, 0, true);
 		as_value ret;
 
 		try {
@@ -245,7 +245,7 @@ as_function::constructInstance(const as_environment& env,
 		// Call the actual constructor function; new_obj is its 'this'.
 
 		// We don't need the function result.
-		fn_call fn(newobj.get(), env, args, super);
+		fn_call fn(newobj.get(), env, args, super, true);
 		call(fn);
 	}
 

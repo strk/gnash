@@ -68,6 +68,7 @@ public:
         super(fn.super),
 		nargs(fn.nargs),
         callerDef(fn.callerDef),
+        _new(false),
         _env(fn._env),
         _args(fn._args.get() ? new std::vector<as_value>(*fn._args) : 0)
 	{
@@ -79,6 +80,7 @@ public:
         super(sup),
         nargs(fn.nargs),
         callerDef(fn.callerDef),
+        _new(false),
 		_env(fn._env),
         _args(fn._args.get() ? new std::vector<as_value>(*fn._args) : 0)
 	{
@@ -91,6 +93,7 @@ public:
 		super(sup),
 		nargs(nargs_in),
         callerDef(0),
+        _new(false),
 		_env(env_in)
 	{
 		assert(first_in + 1 == env_in.stack_size());
@@ -98,12 +101,14 @@ public:
 	}
 
 	fn_call(as_object* this_in, const as_environment& env_in,
-			std::auto_ptr<std::vector<as_value> > args, as_object* sup = 0)
+			std::auto_ptr<std::vector<as_value> > args, as_object* sup = 0,
+            bool isNew = false)
 		:
 		this_ptr(this_in),
 		super(sup),
 		nargs(args->size()),
         callerDef(0),
+        _new(isNew),
 		_env(env_in),
 		_args(args)
 	{
@@ -115,6 +120,7 @@ public:
 		super(0),
 		nargs(0),
         callerDef(0),
+        _new(false),
 		_env(env_in)
 	{
 	}
@@ -134,7 +140,7 @@ public:
 		// For the future, we might use an explicit flag instead
 		// as I belive there are some cases in which 'this' is
 		// undefined even in a normal function call.
-		return (this_ptr == 0);
+		return _new;
 	}
 
 	/// Access a particular argument.
@@ -191,6 +197,8 @@ public:
 	}
 
 private:
+
+    bool _new;
 
 	/// The ActionScript environment in which the function call is taking
 	/// place. This contains, among other things, the function arguments.
