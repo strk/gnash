@@ -145,12 +145,14 @@ as_function::constructInstance(const as_environment& env,
 	int swfversion = getSWFVersion(env);
 
 	as_value proto;
-    get_member(NSV::PROP_PROTOTYPE, &proto);
-    bool has_proto = !proto.is_undefined();
+    bool has_proto = get_member(NSV::PROP_PROTOTYPE, &proto);
+    if (!has_proto) log_debug("No prototype");
+    else log_debug("Has prototype");
 		
     // Create an empty object, with a ref to the constructor's prototype.
     // TODO: The prototype should not be converted to an object!
-    as_object* newobj = new as_object(proto.to_object(*getGlobal(env)));
+    as_object* newobj = new as_object();
+    if (has_proto) newobj->set_prototype(proto.to_object(*getGlobal(env)));
     
     // Add a __constructor__ member to the new object, but only for SWF6 up
     // (to be checked). NOTE that we assume the builtin constructors
@@ -160,9 +162,9 @@ as_function::constructInstance(const as_environment& env,
 
     newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-    // Also for SWF5+ only?
     if (swfversion < 7) {
-        newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
+        newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
+               PropFlags::dontEnum);
     }
 
     fn_call fn(newobj, env, args, newobj->get_super(), true);
@@ -199,12 +201,10 @@ as_function::constructInstance(const as_environment& env,
         // Also for SWF5+ only?
         if (swfversion < 7) {
             newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
-                    flags);
+                    PropFlags::dontEnum);
         }
     }
 
-	if (!has_proto) set_member(NSV::PROP_PROTOTYPE, as_value(newobj));
-    
 	return newobj;
 }
 
