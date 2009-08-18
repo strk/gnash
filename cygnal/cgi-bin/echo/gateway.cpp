@@ -327,8 +327,8 @@ GatewayTest::formatEchoResponse(const std::string &num, boost::uint8_t *data, si
     // FIXME: this is a hack ! Calculate a real size!
     formatContentLength(size+29);
     
-    // Pretend to be Red5 server
-    formatServer("Jetty(6.1.7)");
+    // Don't pretend to be the Red5 server
+    formatServer("Cygnal(0.8.6)");
     
     // All HTTP messages are followed by a blank line.
     terminateHeader();
