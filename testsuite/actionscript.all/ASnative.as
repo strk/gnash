@@ -278,7 +278,7 @@ xcheck_equals (typeof(f.data), "object");
 // Check that ASnative returns a new function, not the same one.
 a = ASnative(2106, 204);
 b = ASnative(2106, 204);
-xcheck(a != b);
+check(a != b);
 
 // Test ASconstructor
 
