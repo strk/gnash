@@ -309,10 +309,6 @@ ASSetNative(f.prototype, 107, "valueOf,toString");
 xcheck_equals(typeof(obj), "object");
 check_equals(obj.toString(), undefined);
 
-obj.__proto__ = Boolean.prototype;
-xcheck_equals(typeof(obj), "object");
-check_equals(obj.toString(), undefined);
-
 // Attach number natives to prototype again and it works.
 ASSetNative(f.prototype, 106, "valueOf,toString");
 check_equals(obj.toString(), "6");
