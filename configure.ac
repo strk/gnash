@@ -2389,6 +2389,7 @@ plugin/win32/Makefile
 cygnal/Makefile
 cygnal/cgi-bin/Makefile
 cygnal/cgi-bin/echo/Makefile
+cygnal/cgi-bin/fitcDemo/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
 )
