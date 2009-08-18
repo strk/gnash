@@ -275,19 +275,6 @@ public:
     /// does nothing.
     virtual void queueLoad(std::auto_ptr<IOChannel> /*str*/) {};
 
-    /// Return the numeric value of this object
-    //
-    /// The default implementation converts the text value
-    /// to a number, override for a more performant implementation
-    ///
-    virtual double get_numeric_value() const
-    {
-        double d = 0;
-        std::istringstream is(get_text_value());
-        is >> d;
-        return d;
-    }
-
     /// Return the "primitive" value of this object
     //
     /// The default implementation returns an Object value,

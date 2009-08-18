@@ -84,12 +84,6 @@ public:
         :
         as_object(getTextRendererInterface())
     {}
-
-    // override from as_object ?
-    //std::string get_text_value() const { return "TextRenderer"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 
 

@@ -50,16 +50,14 @@ public:
     {
     }
 
+    double value() const {
+        return _val;
+    }
+
     // override from as_object
     std::string get_text_value() const
     {
         return as_value::doubleToString(_val);
-    }
-
-    // override from as_object
-    double get_numeric_value() const
-    {
-        return _val;
     }
 
     as_value get_primitive_value() const 
@@ -72,7 +70,6 @@ private:
     // the number value
     double _val;
 
-
 };
 
 namespace {
@@ -84,7 +81,7 @@ number_toString(const fn_call& fn)
     // This is so trace(Number.prototype) doesn't return 0 ...
     boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
 
-    double val = obj->get_numeric_value();
+    double val = obj->value();
     unsigned radix = 10;
 
     if ( fn.nargs ) 
