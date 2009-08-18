@@ -53,15 +53,10 @@ namespace {
 
 // extern (used by Global.cpp)
 void
-selection_class_init(as_object& global, const ObjectURI& uri)
+selection_class_init(as_object& where, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
-
-	as_object* obj = new as_object(getObjectInterface());
-	attachSelectionInterface(*obj);
-	global.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinObject(where, attachSelectionInterface, uri);
 }
 
 void

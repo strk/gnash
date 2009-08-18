@@ -264,17 +264,8 @@ stage_displaystate(const fn_call& fn)
 void
 stage_class_init(as_object& where, const ObjectURI& uri)
 {
-
-    // Stage is an object, not a class.
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    as_object* obj = gl->createObject(proto);
-
-	attachStageInterface(*obj);
+    as_object* obj = registerBuiltinObject(where, attachStageInterface, uri);
     AsBroadcaster::initialize(*obj);
-	
-    where.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
 }
 
 } // end of gnash namespace

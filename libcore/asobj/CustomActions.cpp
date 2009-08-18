@@ -45,20 +45,9 @@ namespace {
 
 // extern (used by Global.cpp)
 void 
-customactions_class_init(as_object& global, const ObjectURI& uri)
+customactions_class_init(as_object& where, const ObjectURI& uri)
 {
-
-    // CustomActions is a simple object, not a class.
-    Global_as* gl = getGlobal(global);
-    as_object* proto = getObjectInterface();
-    as_object* obj = gl->createObject(proto);
-
-    attachCustomActionsInterface(*obj);
-
-	// Register _global.CustomActions
-	global.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinObject(where, attachCustomActionsInterface, uri);
 }
 
 

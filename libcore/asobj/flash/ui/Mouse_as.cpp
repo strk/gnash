@@ -57,16 +57,7 @@ Mouse_as::registerNative(as_object& o)
 void
 mouse_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the global Mouse "class"/"function"
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
-    attachMouseInterface(*obj);
-
-    // Register _global.Mouse
-    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinObject(where, attachMouseInterface, uri);
 }
 
 
