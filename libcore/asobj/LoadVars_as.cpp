@@ -25,6 +25,7 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
 #include "as_value.h" // for setting up a fn_call
 #include "VM.h"
@@ -142,22 +143,16 @@ void
 loadvars_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global LoadVars "class"/"function"
-	static boost::intrusive_ptr<as_object> cl;
-
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getLoadVarsInterface();
-        cl = gl->createClass(&loadvars_ctor, proto);
-	}
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getLoadVarsInterface();
+    as_object* cl = gl->createClass(&loadvars_ctor, proto);
 
 	// Register _global.LoadVars, only visible for SWF6 up
 	int swf6flags = PropFlags::dontEnum | 
                     PropFlags::dontDelete | 
                     PropFlags::onlySWF6Up;
 
-	global.init_member(getName(uri), cl.get(), swf6flags,
-			getNamespace(uri));
+	global.init_member(getName(uri), cl, swf6flags, getNamespace(uri));
 
 }
 

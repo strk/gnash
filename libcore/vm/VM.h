@@ -41,7 +41,7 @@ namespace gnash {
 	class VM;
 	class fn_call;
 	class movie_root;
-	class builtin_function;
+	class NativeFunction;
     class SharedObjectLibrary;
 	class as_value;
 	class as_object;
@@ -256,8 +256,8 @@ public:
 
 	void registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y);
 
-	/// Return a newly created builtin_function or null
-	builtin_function* getNative(unsigned int x, unsigned int y);
+	/// Return a native function or null
+	NativeFunction* getNative(unsigned int x, unsigned int y) const;
 
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)

@@ -40,14 +40,7 @@ namespace {
 void
 stagequality_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    static boost::intrusive_ptr<as_object> obj =
-        gl->createObject(proto);
-
-    attachStageQualityStaticInterface(*obj);
-    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinObject(where, attachStageQualityStaticInterface, uri);
 }
 
 namespace {

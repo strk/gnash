@@ -32,13 +32,28 @@
 
 namespace gnash {
 
-as_value customactions_get(const fn_call& fn);
-as_value customactions_install(const fn_call& fn);
-as_value customactions_list(const fn_call& fn);
-as_value customactions_uninstall(const fn_call& fn);
-as_value customactions_ctor(const fn_call& fn);
+namespace {
 
-static void
+    as_value customactions_get(const fn_call& fn);
+    as_value customactions_install(const fn_call& fn);
+    as_value customactions_list(const fn_call& fn);
+    as_value customactions_uninstall(const fn_call& fn);
+    as_value customactions_ctor(const fn_call& fn);
+    void attachCustomActionsInterface(as_object& o);
+
+}
+
+// extern (used by Global.cpp)
+void 
+customactions_class_init(as_object& where, const ObjectURI& uri)
+{
+    registerBuiltinObject(where, attachCustomActionsInterface, uri);
+}
+
+
+namespace {
+
+void
 attachCustomActionsInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
@@ -48,83 +63,35 @@ attachCustomActionsInterface(as_object& o)
 	o.init_member("uninstall", gl->createFunction(customactions_uninstall));
 }
 
-static as_object*
-getCustomActionsInterface()
+as_value
+customactions_get(const fn_call& /*fn*/)
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachCustomActionsInterface(*o);
-	}
-	return o.get();
-}
-
-class customactions_as_object: public as_object
-{
-
-public:
-
-	customactions_as_object()
-		:
-		as_object(getCustomActionsInterface())
-	{}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "CustomActions"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-};
-
-as_value customactions_get(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value customactions_install(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value customactions_list(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value customactions_uninstall(const fn_call& /*fn*/) {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-customactions_ctor(const fn_call& /* fn */)
+customactions_install(const fn_call& /*fn*/)
 {
-	boost::intrusive_ptr<as_object> obj = new customactions_as_object;
-	
-	return as_value(obj.get()); // will keep alive
+    log_unimpl (__FUNCTION__);
+    return as_value();
 }
 
-// extern (used by Global.cpp)
-void customactions_class_init(as_object& global, const ObjectURI& uri)
+as_value
+customactions_list(const fn_call& /*fn*/)
 {
-	// This is going to be the global CustomActions "class"/"function"
-	static boost::intrusive_ptr<as_object> cl;
-
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getCustomActionsInterface();
-        cl = gl->createClass(&customactions_ctor, proto);
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachCustomActionsInterface(*cl);
-		     
-	}
-
-	// Register _global.CustomActions
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
-
+    log_unimpl (__FUNCTION__);
+    return as_value();
 }
 
+as_value
+customactions_uninstall(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+}
 
 } // end of gnash namespace
 

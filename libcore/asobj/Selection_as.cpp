@@ -28,6 +28,7 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" 
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h"
 #include "TextField.h"
@@ -46,22 +47,16 @@ namespace {
     as_value selection_setFocus(const fn_call& fn);
     as_value selection_setSelection(const fn_call& fn);
 
-    as_object* getSelectionInterface();
     void attachSelectionInterface(as_object& o);
 }
 
 
 // extern (used by Global.cpp)
 void
-selection_class_init(as_object& global, const ObjectURI& uri)
+selection_class_init(as_object& where, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
-
-	as_object* obj = new as_object(getObjectInterface());
-	attachSelectionInterface(*obj);
-	global.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinObject(where, attachSelectionInterface, uri);
 }
 
 void
@@ -98,18 +93,6 @@ attachSelectionInterface(as_object& o)
     /// Handles addListener, removeListener, and _listeners.
     AsBroadcaster::initialize(o);
  
-}
-
-as_object*
-getSelectionInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachSelectionInterface(*o);
-	}
-	return o.get();
 }
 
 as_value

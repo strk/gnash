@@ -20,6 +20,7 @@
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
+#include "Object.h"
 
 // Forward declarations
 namespace gnash {
@@ -76,6 +77,27 @@ public:
 
     virtual VM& getVM() const = 0;
 };
+
+typedef void(*Properties)(as_object&);
+
+/// Register a built-in object
+//
+/// @return the built-in object with properties attached.
+inline as_object*
+registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
+{
+
+    // This is going to be the global Mouse "class"/"function"
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getObjectInterface();
+    as_object* obj = gl->createObject(proto);
+    p(*obj);
+    
+    where.init_member(getName(uri), obj, as_object::DefaultFlags,
+            getNamespace(uri));
+
+    return obj;
+}
 
 } // namespace gnash
 

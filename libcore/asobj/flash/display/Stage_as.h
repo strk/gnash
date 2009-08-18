@@ -43,20 +43,6 @@ namespace gnash {
 /// appear to need this (not ASnative). The ASnative functions
 /// are available from SWF5
 
-class Stage_as: public as_object
-{
-
-public:
-    
-	Stage_as();
-	
-	/// Notify all listeners about a resize event
-	void notifyResize();
-	
-	void notifyFullScreen(bool fs);
-
-};
-
 /// Register native functions with the VM.
 void registerStageNative(as_object& o);
 

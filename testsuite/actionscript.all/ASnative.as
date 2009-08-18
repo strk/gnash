@@ -275,8 +275,82 @@ ret = a(f, "level1/level2/settings", "/", undefined);
 xcheck_equals(ret, true);
 xcheck_equals (typeof(f.data), "object");
 
-#if OUTPUT_VERSION > 5
-check_totals(83);
+// Check that ASnative returns a new function, not the same one.
+a = ASnative(2106, 204);
+b = ASnative(2106, 204);
+#if OUTPUT_VERSION < 6
+check(a == b);
 #else
-check_totals(80);
+check(a != b);
+#endif
+
+/// Test ASconstructor
+//
+/// The important things seem to be:
+/// 1. a new prototype is created every time; it's not the same object.
+/// 2. native functions may only work with an appropriate prototype.
+
+// This is _global.Number
+f = ASconstructor(106, 2);
+xcheck_equals(typeof(f), "function");
+xcheck_equals(typeof(f.prototype), "object");
+
+// Attach number natives and it works.
+ASSetNative(f.prototype, 106, "valueOf,toString");
+
+obj = new f(6);
+check_equals(obj.__proto__, f.prototype);
+#if OUTPUT_VERSION > 5
+check(obj.__proto__ != Number.prototype);
+#else
+check_equals(obj.__proto__, undefined);
+#endif
+
+xcheck_equals(typeof(obj), "object");
+xcheck_equals(obj.toString(), "6");
+
+// Attach boolean natives and it fails.
+ASSetNative(f.prototype, 107, "valueOf,toString");
+xcheck_equals(typeof(obj), "object");
+check_equals(obj.toString(), undefined);
+
+// Attach number natives to prototype again and it works.
+ASSetNative(f.prototype, 106, "valueOf,toString");
+xcheck_equals(obj.toString(), "6");
+
+g = ASnative(106, 2);
+xcheck_equals(typeof(g), "function");
+check_equals(typeof(g.prototype), "undefined");
+
+// This is the ASnative function Number.toString. It does not attach
+// Number.prototype, so the Number.toString function fails.
+f = ASconstructor(106, 1);
+ASSetNative(f.prototype, 106, "valueOf,toString");
+xcheck_equals(typeof(f), "function");
+xcheck_equals(typeof(f.prototype), "object");
+obj = new f(6);
+xcheck_equals(typeof(obj), "object");
+check_equals(obj.toString(), undefined);
+
+obj = new f();
+check_equals(obj.toString(), undefined);
+
+ba = ASnative;
+ASnative = 78;
+
+// ASconstructor doesn't rely on ASnative.
+f = ASconstructor(106, 2);
+xcheck_equals(typeof(f), "function");
+xcheck_equals(typeof(f.prototype), "object");
+
+g = ASnative(106, 2);
+check_equals(typeof(g), "undefined");
+check_equals(typeof(g.prototype), "undefined");
+
+ASnative = ba;
+
+#if OUTPUT_VERSION > 5
+check_totals(104);
+#else
+check_totals(101);
 #endif

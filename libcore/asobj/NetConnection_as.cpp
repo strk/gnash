@@ -691,22 +691,12 @@ void
 NetConnection_as::init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global NetConnection "class"/"function"
-    static boost::intrusive_ptr<as_object> cl;
-
-    if ( cl == NULL )
-    {
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getNetConnectionInterface();
-        cl = gl->createClass(&netconnection_new, proto);
-
-        // replicate all interface to class, to be able to access
-        // all methods as static functions
-        attachNetConnectionInterface(*cl);
-             
-    }
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getNetConnectionInterface();
+    as_object* cl = gl->createClass(&netconnection_new, proto);
 
     // Register _global.String
-    global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 

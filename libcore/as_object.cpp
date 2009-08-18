@@ -587,13 +587,12 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 }
 
 void
-as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
+as_object::set_prototype(const as_value& proto, int flags)
 {
 	// TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
 	// TODO: check triggers !!
-	_members.setValue(NSV::PROP_uuPROTOuu, as_value(proto.get()), *this, 0,
-            flags);
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0, flags);
 }
 
 void

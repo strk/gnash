@@ -29,6 +29,7 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" // for ActionException
 #include "VM.h"
 #include "Object.h" // for getObjectInterface()
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
@@ -67,10 +68,6 @@ void registerStageNative(as_object& o)
 static void
 attachStageInterface(as_object& o)
 {
-    const int version = getSWFVersion(o);
-
-    if ( version < 5 ) return;
-
     o.init_property("scaleMode", &stage_scalemode, &stage_scalemode);
     o.init_property("align", &stage_align, &stage_align);
     o.init_property("width", &stage_width, &stage_width);
@@ -78,38 +75,6 @@ attachStageInterface(as_object& o)
     o.init_property("showMenu", &stage_showMenu, &stage_showMenu);
     o.init_property("displayState", &stage_displaystate, &stage_displaystate);
 
-}
-
-
-Stage_as::Stage_as()
-	:
-	as_object(getObjectInterface())
-{
-	attachStageInterface(*this);
-
-	const int swfversion = getSWFVersion(*this);
-	if ( swfversion > 5 )
-	{
-		AsBroadcaster::initialize(*this);
-	}
-}
-
-
-void
-Stage_as::notifyFullScreen(bool fs)
-{
-    // Should we notify resize here, or does movie_root do it anyway
-    // when the gui changes size?
-	log_debug("notifying Stage listeners about fullscreen state");
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
-}
-
-
-void
-Stage_as::notifyResize()
-{
-	log_debug("notifying Stage listeners about a resize");
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
 }
 
 
@@ -257,19 +222,17 @@ stage_showMenu(const fn_call& fn)
 
     movie_root& m = getRoot(fn);
 
-	if ( fn.nargs == 0 ) // getter
-	{
+	if (!fn.nargs) {
 		return as_value(m.getShowMenuState());
 	}
-	else // setter
-	{
-		LOG_ONCE(log_unimpl("Stage.showMenu implemented by setting gnashrc option and for gtk only"));
 
-		bool state = fn.arg(0).to_bool();
-		
-		m.setShowMenuState( state );
-		return as_value();
-	}
+    LOG_ONCE(log_unimpl("Stage.showMenu implemented by setting gnashrc "
+                "option and for gtk only"));
+
+    bool state = fn.arg(0).to_bool();
+    
+    m.setShowMenuState(state);
+    return as_value();
 }
 
 as_value
@@ -298,11 +261,11 @@ stage_displaystate(const fn_call& fn)
 }
 
 // extern (used by Global.cpp)
-void stage_class_init(as_object& where, const ObjectURI& uri)
+void
+stage_class_init(as_object& where, const ObjectURI& uri)
 {
-	static boost::intrusive_ptr<as_object> obj = new Stage_as();
-	where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    as_object* obj = registerBuiltinObject(where, attachStageInterface, uri);
+    AsBroadcaster::initialize(*obj);
 }
 
 } // end of gnash namespace

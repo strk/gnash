@@ -26,6 +26,7 @@
 #include "Array_as.h"
 #include "log.h"
 #include "builtin_function.h" // for Array class
+#include "NativeFunction.h" 
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
 #include "Global_as.h"

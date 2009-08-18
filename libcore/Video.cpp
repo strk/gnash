@@ -300,17 +300,11 @@ void
 video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
-	static boost::intrusive_ptr<as_object> cl;
-
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(global);
-        cl = gl->createClass(&video_ctor, getVideoInterface(global));
-		getVM(global).addStatic(cl.get());
-	}
+    Global_as* gl = getGlobal(global);
+    as_object* cl = gl->createClass(&video_ctor, getVideoInterface(global));
 
 	// Register _global.Video
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -347,7 +341,6 @@ getVideoInterface(as_object& where)
 		getVM(where).addStatic(proto.get());
 
 		attachVideoInterface(*proto);
-		//proto->init_member("constructor", gl->createFunction(video_ctor));
 	}
 	return proto.get();
 }

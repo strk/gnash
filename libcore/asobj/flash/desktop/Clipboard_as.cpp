@@ -28,6 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "Object.h"
 
 namespace gnash {
 
@@ -40,31 +41,19 @@ namespace {
 
 }
 
-class Clipboard_as : public as_object
-{
-
-public:
-
-    Clipboard_as()
-        :
-        as_object(getClipboardInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void clipboard_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getObjectInterface();
 
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getClipboardInterface();
-        cl = gl->createClass(&clipboard_ctor, proto);
-        attachClipboardStaticInterface(*cl);
-    }
+    as_object* cl = gl->createClass(&clipboard_ctor, proto);
+
+    attachClipboardInterface(*proto);
+    attachClipboardStaticInterface(*cl);
 
     // Register _global.Clipboard
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -81,23 +70,10 @@ attachClipboardStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getClipboardInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachClipboardInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 clipboard_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Clipboard_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

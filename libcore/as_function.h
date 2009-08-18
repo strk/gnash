@@ -24,7 +24,7 @@
 // Forward declarations
 namespace gnash {
 	class fn_call;
-	class builtin_function;
+	class NativeFunction;
 	class Global_as;
 }
 
@@ -107,7 +107,7 @@ public:
 	}
 
 	/// Return the built-in Function constructor
-	static boost::intrusive_ptr<builtin_function> getFunctionConstructor();
+	static NativeFunction* getFunctionConstructor();
 
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources. Override from GcResource
@@ -167,6 +167,7 @@ private:
 
 /// Initialize the global Function constructor
 void function_class_init(as_object& global, const ObjectURI& uri);
+void registerFunctionNative(as_object& global);
 
 } // gnash namespace
 

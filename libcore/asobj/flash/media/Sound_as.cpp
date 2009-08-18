@@ -118,19 +118,13 @@ void
 Sound_as::init(as_object& where, const ObjectURI& uri)
 {
 
-    // This is going to be the global Sound "class"/"function"
-    static boost::intrusive_ptr<as_object> cl;
-
-    if ( cl == NULL )
-    {
-        as_object* iface = getSoundInterface();
-        Global_as* gl = getGlobal(where);
-        cl = gl->createClass(&sound_new, iface);
-        iface->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
-    }
+    as_object* iface = getSoundInterface();
+    Global_as* gl = getGlobal(where);
+    as_object* cl = gl->createClass(&sound_new, iface);
+    iface->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
 
     // Register _global.String
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

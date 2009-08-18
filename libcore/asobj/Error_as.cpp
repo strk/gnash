@@ -40,7 +40,6 @@ namespace {
     as_value error_toString(const fn_call& fn);
     as_value error_ctor(const fn_call& fn);
 
-    as_object* getErrorInterface();
     void attachErrorInterface(as_object& o);
 }
 
@@ -52,8 +51,11 @@ Error_class_init(as_object& where, const ObjectURI& uri)
     
     Global_as* gl = getGlobal(where);
 
-    boost::intrusive_ptr<as_object> cl =
-        gl->createClass(&error_ctor, getErrorInterface());
+	as_object* proto = gl->createObject(getObjectInterface());
+    boost::intrusive_ptr<as_object> cl = gl->createClass(&error_ctor, proto);
+
+    // Attach properties to the class prototype.
+    attachErrorInterface(*proto);
 
 	// Register _global.Error
 	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
@@ -62,24 +64,6 @@ Error_class_init(as_object& where, const ObjectURI& uri)
 
 
 namespace {
-
-as_object*
-getErrorInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachErrorInterface(*o);
-
-	}
-
-	return o.get();
-}
-
 
 void
 attachErrorInterface(as_object& o)
@@ -111,16 +95,15 @@ error_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-    as_object* proto = getErrorInterface();
-	boost::intrusive_ptr<as_object> err = new as_object(proto);
-	
+    as_object* err = fn.this_ptr.get();
+
     string_table& st = getStringTable(fn);
-    if (fn.nargs > 0)
-	{
+
+    if (fn.nargs) {
 		err->set_member(st.find("message"), fn.arg(0));
 	}
 
-	return as_value(err.get()); // will keep alive
+	return as_value();
 }
 
 }

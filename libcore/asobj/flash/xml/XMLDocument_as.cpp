@@ -30,6 +30,7 @@
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"
 #include "builtin_function.h"
+#include "NativeFunction.h"
 #include "VM.h"
 #include "namedStrings.h"
 #include "StringPredicates.h"
@@ -623,16 +624,11 @@ void
 XMLDocument_as::init(as_object& where, const ObjectURI& uri)
 {
 
-    static boost::intrusive_ptr<as_object> cl;
-
-    if ( cl == NULL )
-    {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getXMLInterface();
-        cl = gl->createClass(&xml_new, proto);
-    }
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getXMLInterface();
+    as_object* cl = gl->createClass(&xml_new, proto);
     
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

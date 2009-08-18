@@ -36,38 +36,53 @@
 
 namespace gnash {
 
-static as_value ExternalInterface_addCallback(const fn_call& fn);
-static as_value ExternalInterface_call(const fn_call& fn);
-static as_value ExternalInterface_uArgumentsToXML(const fn_call& fn);
-static as_value ExternalInterface_uArgumentsToAS(const fn_call& fn);
-static as_value ExternalInterface_uAddCallback(const fn_call& fn);
-static as_value ExternalInterface_uArrayToAS(const fn_call& fn);
-static as_value ExternalInterface_uArrayToJS(const fn_call& fn);
-static as_value ExternalInterface_uArrayToXML(const fn_call& fn);
-static as_value ExternalInterface_uCallIn(const fn_call& fn);
-static as_value ExternalInterface_uCallOut(const fn_call& fn);
-static as_value ExternalInterface_uEscapeXML(const fn_call& fn);
-static as_value ExternalInterface_uEvalJS(const fn_call& fn);
-static as_value ExternalInterface_uInitJS(const fn_call& fn);
-static as_value ExternalInterface_uJsQuoteString(const fn_call& fn);
-static as_value ExternalInterface_uObjectID(const fn_call& fn);
-static as_value ExternalInterface_uObjectToAS(const fn_call& fn);
-static as_value ExternalInterface_uObjectToJS(const fn_call& fn);
-static as_value ExternalInterface_uObjectToXML(const fn_call& fn);
-static as_value ExternalInterface_uToAS(const fn_call& fn);
-static as_value ExternalInterface_uToJS(const fn_call& fn);
-static as_value ExternalInterface_uToXML(const fn_call& fn);
-static as_value ExternalInterface_uUnescapeXML(const fn_call& fn);
-static as_value ExternalInterface_available(const fn_call& fn);
+namespace {
+    as_value externalinterface_addCallback(const fn_call& fn);
+    as_value externalinterface_call(const fn_call& fn);
+    as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+    as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+    as_value externalinterface_uAddCallback(const fn_call& fn);
+    as_value externalinterface_uArrayToAS(const fn_call& fn);
+    as_value externalinterface_uArrayToJS(const fn_call& fn);
+    as_value externalinterface_uArrayToXML(const fn_call& fn);
+    as_value externalinterface_uCallIn(const fn_call& fn);
+    as_value externalinterface_uCallOut(const fn_call& fn);
+    as_value externalinterface_uEscapeXML(const fn_call& fn);
+    as_value externalinterface_uEvalJS(const fn_call& fn);
+    as_value externalinterface_uInitJS(const fn_call& fn);
+    as_value externalinterface_uJsQuoteString(const fn_call& fn);
+    as_value externalinterface_uObjectID(const fn_call& fn);
+    as_value externalinterface_uObjectToAS(const fn_call& fn);
+    as_value externalinterface_uObjectToJS(const fn_call& fn);
+    as_value externalinterface_uObjectToXML(const fn_call& fn);
+    as_value externalinterface_uToAS(const fn_call& fn);
+    as_value externalinterface_uToJS(const fn_call& fn);
+    as_value externalinterface_uToXML(const fn_call& fn);
+    as_value externalinterface_uUnescapeXML(const fn_call& fn);
+    as_value externalinterface_available(const fn_call& fn);
+    as_value externalinterface_uctor(const fn_call& fn);
+    as_value externalInterfaceConstructor(const fn_call& fn);
 
-as_value ExternalInterface_uctor(const fn_call& fn);
+}
 
-static void
+// extern 
+void
+externalinterface_class_init(as_object& where, const ObjectURI& uri)
+{
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(getName(uri), externalInterfaceConstructor,
+            flags, getNamespace(uri));
+}
+
+namespace {
+
+void
 attachExternalInterfaceInterface(as_object& /*o*/)
 {
 }
 
-static void
+void
 attachExternalInterfaceStaticProperties(as_object& o)
 {
     const int flags = PropFlags::dontEnum |
@@ -76,251 +91,214 @@ attachExternalInterfaceStaticProperties(as_object& o)
 
     Global_as* gl = getGlobal(o);
     o.init_member("addCallback", gl->createFunction(
-                ExternalInterface_addCallback), flags);
-    o.init_member("call", gl->createFunction(ExternalInterface_call), flags);
+                externalinterface_addCallback), flags);
+    o.init_member("call", gl->createFunction(externalinterface_call), flags);
     o.init_member("_argumentsToXML",
-            gl->createFunction(ExternalInterface_uArgumentsToXML), flags);
+            gl->createFunction(externalinterface_uArgumentsToXML), flags);
     o.init_member("_argumentsToAS",
-            gl->createFunction(ExternalInterface_uArgumentsToAS), flags);
+            gl->createFunction(externalinterface_uArgumentsToAS), flags);
     o.init_member("_addCallback",
-            gl->createFunction(ExternalInterface_uAddCallback), flags);
+            gl->createFunction(externalinterface_uAddCallback), flags);
     o.init_member("_arrayToAS",
-            gl->createFunction(ExternalInterface_uArrayToAS), flags);
+            gl->createFunction(externalinterface_uArrayToAS), flags);
     o.init_member("_arrayToJS",
-            gl->createFunction(ExternalInterface_uArrayToJS), flags);
+            gl->createFunction(externalinterface_uArrayToJS), flags);
     o.init_member("_arrayToXML",
-            gl->createFunction(ExternalInterface_uArrayToXML), flags);
+            gl->createFunction(externalinterface_uArrayToXML), flags);
     o.init_member("_callIn",
-            gl->createFunction(ExternalInterface_uCallIn), flags);
+            gl->createFunction(externalinterface_uCallIn), flags);
     o.init_member("_callOut",
-            gl->createFunction(ExternalInterface_uCallOut), flags);
+            gl->createFunction(externalinterface_uCallOut), flags);
     o.init_member("_escapeXML",
-            gl->createFunction(ExternalInterface_uEscapeXML), flags);
+            gl->createFunction(externalinterface_uEscapeXML), flags);
     o.init_member("_evalJS",
-            gl->createFunction(ExternalInterface_uEvalJS), flags);
+            gl->createFunction(externalinterface_uEvalJS), flags);
     o.init_member("_initJS",
-            gl->createFunction(ExternalInterface_uInitJS), flags);
+            gl->createFunction(externalinterface_uInitJS), flags);
     o.init_member("_jsQuoteString",
-            gl->createFunction(ExternalInterface_uJsQuoteString), flags);
+            gl->createFunction(externalinterface_uJsQuoteString), flags);
     o.init_member("_objectID",
-            gl->createFunction(ExternalInterface_uObjectID), flags);
+            gl->createFunction(externalinterface_uObjectID), flags);
     o.init_member("_objectToAS",
-            gl->createFunction(ExternalInterface_uObjectToAS), flags);
+            gl->createFunction(externalinterface_uObjectToAS), flags);
     o.init_member("_objectToJS",
-            gl->createFunction(ExternalInterface_uObjectToJS), flags);
+            gl->createFunction(externalinterface_uObjectToJS), flags);
     o.init_member("_objectToXML",
-            gl->createFunction(ExternalInterface_uObjectToXML), flags);
+            gl->createFunction(externalinterface_uObjectToXML), flags);
     o.init_member("_toAS",
-            gl->createFunction(ExternalInterface_uToAS), flags);
+            gl->createFunction(externalinterface_uToAS), flags);
     o.init_member("_toJS",
-            gl->createFunction(ExternalInterface_uToJS), flags);
+            gl->createFunction(externalinterface_uToJS), flags);
     o.init_member("_toXML",
-            gl->createFunction(ExternalInterface_uToXML), flags);
+            gl->createFunction(externalinterface_uToXML), flags);
     o.init_member("_unescapeXML",
-            gl->createFunction(ExternalInterface_uUnescapeXML), flags);
+            gl->createFunction(externalinterface_uUnescapeXML), flags);
 
     int protectedFlags = PropFlags::dontEnum |
                          PropFlags::dontDelete |
                          PropFlags::isProtected;
 
     o.init_member("available",
-            gl->createFunction(ExternalInterface_available), protectedFlags);
+            gl->createFunction(externalinterface_available), protectedFlags);
 }
 
-static as_object*
-getExternalInterfaceInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
 
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachExternalInterfaceInterface(*o);
-
-	}
-
-	return o.get();
-}
-
-class ExternalInterface_as: public as_object
-{
-
-public:
-
-	ExternalInterface_as()
-		:
-		as_object(getExternalInterfaceInterface())
-	{}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "ExternalInterface"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-};
-
-
-
-static as_value
-ExternalInterface_addCallback(const fn_call& /*fn*/)
-{
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-static as_value
-ExternalInterface_call(const fn_call& /*fn*/)
+as_value
+externalinterface_addCallback(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uArgumentsToXML(const fn_call& /*fn*/)
+externalinterface_call(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uArgumentsToAS(const fn_call& /*fn*/)
+externalinterface_uArgumentsToXML(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uAddCallback(const fn_call& /*fn*/)
+externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uArrayToAS(const fn_call& /*fn*/)
+externalinterface_uAddCallback(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uArrayToJS(const fn_call& /*fn*/)
+externalinterface_uArrayToAS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uArrayToXML(const fn_call& /*fn*/)
+externalinterface_uArrayToJS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uCallIn(const fn_call& /*fn*/)
+externalinterface_uArrayToXML(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uCallOut(const fn_call& /*fn*/)
+externalinterface_uCallIn(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uEscapeXML(const fn_call& /*fn*/)
+externalinterface_uCallOut(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uEvalJS(const fn_call& /*fn*/)
+externalinterface_uEscapeXML(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uInitJS(const fn_call& /*fn*/)
+externalinterface_uEvalJS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uJsQuoteString(const fn_call& /*fn*/)
+externalinterface_uInitJS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uObjectID(const fn_call& /*fn*/)
+externalinterface_uJsQuoteString(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uObjectToAS(const fn_call& /*fn*/)
+externalinterface_uObjectID(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uObjectToJS(const fn_call& /*fn*/)
+externalinterface_uObjectToAS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uObjectToXML(const fn_call& /*fn*/)
+externalinterface_uObjectToJS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uToAS(const fn_call& /*fn*/)
+externalinterface_uObjectToXML(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uToJS(const fn_call& /*fn*/)
+externalinterface_uToAS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uToXML(const fn_call& /*fn*/)
+externalinterface_uToJS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_uUnescapeXML(const fn_call& /*fn*/)
+externalinterface_uToXML(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
 as_value
-ExternalInterface_available(const fn_call& /*fn*/)
+externalinterface_uUnescapeXML(const fn_call& /*fn*/)
+{
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+as_value
+externalinterface_available(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -328,52 +306,31 @@ ExternalInterface_available(const fn_call& /*fn*/)
 
 
 as_value
-ExternalInterface_ctor(const fn_call& fn)
+externalinterface_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new ExternalInterface_as;
-
-	if ( fn.nargs )
-	{
+	if (fn.nargs) {
 		std::stringstream ss;
 		fn.dump_args(ss);
-		LOG_ONCE( log_unimpl("ExternalInterface(%s): %s", ss.str(), _("arguments discarded")) );
+		LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
+                    _("arguments discarded")) );
 	}
 
-	return as_value(obj.get()); // will keep alive
+	return as_value(); 
 }
 
-as_object*
-getFlashExternalExternalInterfaceConstructor(Global_as& global)
+as_value
+externalInterfaceConstructor(const fn_call& fn)
 {
-    static as_object* cl=NULL;
-    if ( ! cl )
-    {
-        as_object* proto = getExternalInterfaceInterface();
-        cl = global.createClass(&ExternalInterface_ctor, proto);
-        VM::get().addStatic(cl);
-	    attachExternalInterfaceStaticProperties(*cl);
-    }
+    log_debug("Loading flash.external.ExternalInterface class");
+    Global_as* gl = getGlobal(fn);
+    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* cl = gl->createClass(&externalinterface_ctor, proto);
+
+    attachExternalInterfaceInterface(*proto);
+    attachExternalInterfaceStaticProperties(*cl);
     return cl;
 }
 
-
-static as_value
-get_flash_external_external_interface_constructor(const fn_call& fn)
-{
-    log_debug("Loading flash.external.ExternalInterface class");
-    return getFlashExternalExternalInterfaceConstructor(*getVM(fn).getGlobal());
 }
-
-
-// extern 
-void externalinterface_class_init(as_object& where, const ObjectURI& uri)
-{
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(getName(uri),
-            get_flash_external_external_interface_constructor, flags,
-            getNamespace(uri));
-}
-
 
 } // end of gnash namespace

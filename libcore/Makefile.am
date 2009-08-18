@@ -223,6 +223,7 @@ EXTENSIONS_API = \
 	CharacterProxy.h \
 	StringPredicates.h \
 	builtin_function.h \
+	NativeFunction.h \
 	as_function.h \
 	namedStrings.h \
 	as_environment.h \

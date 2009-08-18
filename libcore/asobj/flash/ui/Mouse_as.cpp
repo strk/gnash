@@ -24,6 +24,7 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" 
 #include "VM.h" // for registerNative
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
@@ -56,16 +57,7 @@ Mouse_as::registerNative(as_object& o)
 void
 mouse_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the global Mouse "class"/"function"
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
-    attachMouseInterface(*obj);
-
-    // Register _global.Mouse
-    where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinObject(where, attachMouseInterface, uri);
 }
 
 
