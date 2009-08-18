@@ -83,18 +83,18 @@ noinst_HEADERS = \
 	AsBroadcaster.h \
 	Boolean_as.h \
 	Camera.h \
-	Color_as.h	\
+	Color_as.h \
 	CustomActions.h	\
 	Date_as.h \
-	Error_as.h	\
-	Math_as.h	\
+	Error_as.h \
+	Math_as.h \
 	Globals.h\
 	Global_as.h\
 	int_as.h \
 	LoadVars_as.h \
 	Microphone.h \
 	MovieClipLoader.h \
-	NetConnection_as.h	\
+	NetConnection_as.h \
 	NetStream_as.h \
 	Number_as.h \
 	PlayHead.h \

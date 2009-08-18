@@ -310,7 +310,8 @@ RTMP::decodeHeader(boost::uint8_t *in)
 // 	log_network(_("The body size is: %d"), head->bodysize);
     } else {
 	// If the body size is zero, we reuse the last body size field
-	// from the previous message,
+	// from the previous message, 1 and 4 bytes headers all
+	// reuse the previous body size.
 	head->bodysize = _bodysize[head->channel];
 	log_network("Using previous body size of %d for channel %d",
 		    head->bodysize, head->channel);
