@@ -36,7 +36,6 @@ namespace {
     as_value contextmenuitem_ctor(const fn_call& fn);
     as_value contextmenuitem_copy(const fn_call& fn);
     void attachContextMenuItemInterface(as_object& o);
-    as_object* getContextMenuItemInterface();
 
 }
 
@@ -44,16 +43,12 @@ namespace {
 void
 contextmenuitem_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getContextMenuItemInterface();
-        cl = gl->createClass(&contextmenuitem_ctor, proto);
-    }
-
+    Global_as* gl = getGlobal(where);
+    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* cl = gl->createClass(&contextmenuitem_ctor, proto);
+    attachContextMenuItemInterface(*proto);
     // Register _global.ContextMenuItem
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -70,47 +65,34 @@ attachContextMenuItemInterface(as_object& o)
     o.init_member("copy", gl->createFunction(contextmenuitem_copy), flags);
 }
 
-as_object*
-getContextMenuItemInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object(getObjectInterface());
-        attachContextMenuItemInterface(*o);
-        VM::get().addStatic(o.get());
-    }
-    return o.get();
-}
-
 as_value
 contextmenuitem_copy(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
-    as_value caption, separatorBefore, visible, enabled, onSelect;
+    Global_as* gl = getGlobal(fn);
     string_table& st = getStringTable(fn);
 
-    ptr->get_member(st.find("caption"), &caption);
-    ptr->get_member(st.find("separatorBefore"), &separatorBefore);
-    ptr->get_member(st.find("visible"), &visible);
-    ptr->get_member(NSV::PROP_ON_SELECT, &onSelect);
-    ptr->get_member(NSV::PROP_ENABLED, &enabled);
+    as_function* ctor =
+        gl->getMember(st.find("ContextMenuItem")).to_as_function();
 
-    as_object* c = new as_object(getContextMenuItemInterface());
-    c->set_member(st.find("caption"), caption);
-    c->set_member(st.find("separatorBefore"), separatorBefore);
-    c->set_member(st.find("visible"), visible);
-    c->set_member(NSV::PROP_ON_SELECT, onSelect);
-    c->set_member(NSV::PROP_ENABLED, enabled);
-    
-    return as_value(c);
+    if (!ctor) return as_value();
+
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>());
+    args->push_back(ptr->getMember(st.find("caption")));
+    args->push_back(ptr->getMember(NSV::PROP_ON_SELECT));
+    args->push_back(ptr->getMember(st.find("separatorBefore")));
+    args->push_back(ptr->getMember(NSV::PROP_ENABLED));
+    args->push_back(ptr->getMember(st.find("visible")));
+
+    return ctor->constructInstance(fn.env(), args);
 }
 
 
 as_value
 contextmenuitem_ctor(const fn_call& fn)
 {
-    as_object* obj = new as_object(getContextMenuItemInterface());
+    as_object* obj = fn.this_ptr.get();
 
     string_table& st = getStringTable(fn);
 
@@ -121,7 +103,7 @@ contextmenuitem_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_ENABLED, fn.nargs > 3 ? fn.arg(3) : true);
     obj->set_member(st.find("visible"), fn.nargs > 4 ? fn.arg(4) : true);
 
-    return obj; 
+    return as_value(); 
 }
 
 } // anonymous namespace 

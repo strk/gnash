@@ -446,17 +446,11 @@ XMLNode_as::getXMLNodeInterface()
 void
 XMLNode_as::init(as_object& where, const ObjectURI& uri)
 {
-    // This is the global XMLNode_as "class"
-    static boost::intrusive_ptr<as_object> cl;
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getXMLNodeInterface();
+    as_object* cl = gl->createClass(&xmlnode_new, proto);
 
-    if ( cl == NULL )
-    {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getXMLNodeInterface();
-        cl = gl->createClass(&xmlnode_new, proto);
-    }
-
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
 }

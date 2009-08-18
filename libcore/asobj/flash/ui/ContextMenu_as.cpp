@@ -52,16 +52,12 @@ namespace {
 void
 contextmenu_class_init(as_object& where, const ObjectURI& uri)
 {
-	static boost::intrusive_ptr<as_object> cl;
-
-	if (cl == NULL) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getContextMenuInterface();
-        cl = gl->createClass(contextmenu_ctor, proto);
-	}
+    Global_as* gl = getGlobal(where);
+    as_object* proto = getContextMenuInterface();
+    as_object* cl = gl->createClass(contextmenu_ctor, proto);
 
 	// Register _global.ContextMenu
-	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 

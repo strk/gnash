@@ -230,15 +230,10 @@ void
 moviecliploader_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Number "class"/"function"
-	static boost::intrusive_ptr<as_object> cl = NULL;
-
-	if (cl == NULL)
-	{
-        Global_as* gl = getGlobal(global);
-		cl = gl->createClass(&moviecliploader_new,
+    Global_as* gl = getGlobal(global);
+    as_object* cl = gl->createClass(&moviecliploader_new,
                 getMovieClipLoaderInterface());
-	}
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri)); 
 }
 
