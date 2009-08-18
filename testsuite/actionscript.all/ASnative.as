@@ -283,15 +283,46 @@ check(a == b);
 #else
 check(a != b);
 #endif
-// Test ASconstructor
 
+/// Test ASconstructor
+//
+/// The important things seem to be:
+/// 1. a new prototype is created every time; it's not the same object.
+/// 2. native functions may only work with an appropriate prototype.
+
+// This is _global.Number
 f = ASconstructor(106, 2);
 xcheck_equals(typeof(f), "function");
 xcheck_equals(typeof(f.prototype), "object");
 
+// Attach number natives and it works.
+ASSetNative(f.prototype, 106, "valueOf,toString");
+
+obj = new f(6);
+check_equals(obj.__proto__, f.prototype);
+xcheck(obj.__proto__ != Number.prototype);
+xcheck_equals(typeof(obj), "object");
+xcheck_equals(obj.toString(), "6");
+
+// Attach boolean natives and it fails.
+ASSetNative(f.prototype, 107, "valueOf,toString");
+xcheck_equals(typeof(obj), "object");
+check_equals(obj.toString(), undefined);
+
+// Attach number natives to prototype again and it works.
+ASSetNative(f.prototype, 106, "valueOf,toString");
+check_equals(obj.toString(), "6");
+
 g = ASnative(106, 2);
 xcheck_equals(typeof(g), "function");
 check_equals(typeof(g.prototype), "undefined");
+
+f = ASconstructor(106, 1);
+xcheck_equals(typeof(f), "function");
+xcheck_equals(typeof(f.prototype), "object");
+
+obj = new f();
+xcheck_equals(obj.toString(), "[object Object]");
 
 ba = ASnative;
 ASnative = 78;
@@ -308,7 +339,7 @@ check_equals(typeof(g.prototype), "undefined");
 ASnative = ba;
 
 #if OUTPUT_VERSION > 5
-check_totals(92);
+check_totals(102);
 #else
-check_totals(89);
+check_totals(99);
 #endif
