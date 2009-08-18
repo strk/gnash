@@ -69,7 +69,7 @@ extern "C" {
 
     size_t echo_read_func(boost::uint8_t *data, size_t size)
     {
-	GNASH_REPORT_FUNCTION;
+// 	GNASH_REPORT_FUNCTION;
 	
 	size_t safe = 0;
 	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
@@ -85,12 +85,12 @@ extern "C" {
 
         return buf->allocated();
 	    
-        GNASH_REPORT_RETURN;
+//         GNASH_REPORT_RETURN;
     }
 
     size_t echo_write_func(boost::uint8_t *data, size_t size)
     {
-	GNASH_REPORT_FUNCTION;
+// 	GNASH_REPORT_FUNCTION;
 
 	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
 
@@ -105,7 +105,7 @@ extern "C" {
 
 	return buf->allocated();
 
-        GNASH_REPORT_RETURN;
+//         GNASH_REPORT_RETURN;
     }
     
 } // end of extern C
@@ -264,7 +264,14 @@ EchoTest::formatEchoResponse(double num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
-    return formatEchoResponse(num, data->reference(), data->allocated());
+    if (data) {
+	return formatEchoResponse(num, data->reference(), data->allocated());
+    } else {
+	log_error("Couldn't encode element: %s", el.getName());
+	el.dump();
+    }
+
+    return data;
 }
 
 boost::shared_ptr<amf::Buffer>
