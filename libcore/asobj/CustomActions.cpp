@@ -32,13 +32,39 @@
 
 namespace gnash {
 
-as_value customactions_get(const fn_call& fn);
-as_value customactions_install(const fn_call& fn);
-as_value customactions_list(const fn_call& fn);
-as_value customactions_uninstall(const fn_call& fn);
-as_value customactions_ctor(const fn_call& fn);
+namespace {
 
-static void
+    as_value customactions_get(const fn_call& fn);
+    as_value customactions_install(const fn_call& fn);
+    as_value customactions_list(const fn_call& fn);
+    as_value customactions_uninstall(const fn_call& fn);
+    as_value customactions_ctor(const fn_call& fn);
+    void attachCustomActionsInterface(as_object& o);
+
+}
+
+// extern (used by Global.cpp)
+void 
+customactions_class_init(as_object& global, const ObjectURI& uri)
+{
+
+    // CustomActions is a simple object, not a class.
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getObjectInterface();
+    as_object* obj = gl->createObject(proto);
+
+    attachCustomActionsInterface(*obj);
+
+	// Register _global.CustomActions
+	global.init_member(getName(uri), obj, as_object::DefaultFlags,
+            getNamespace(uri));
+
+}
+
+
+namespace {
+
+void
 attachCustomActionsInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
@@ -76,24 +102,7 @@ customactions_uninstall(const fn_call& /*fn*/)
     return as_value();
 }
 
-// extern (used by Global.cpp)
-void 
-customactions_class_init(as_object& global, const ObjectURI& uri)
-{
-
-    // CustomActions is a simple object, not a class.
-    Global_as* gl = getGlobal(global);
-    as_object* proto = getObjectInterface();
-    as_object* obj = gl->createObject(proto);
-
-    attachCustomActionsInterface(*obj);
-
-	// Register _global.CustomActions
-	global.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
-
 }
-
 
 } // end of gnash namespace
 
