@@ -202,7 +202,7 @@ AVM1Global::createFunction(Global_as::ASFunction function)
 {
     builtin_function* f = new builtin_function(*this, function);
     f->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor().get());
+            as_function::getFunctionConstructor());
     return f;
 }
 
@@ -211,7 +211,7 @@ AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
     as_object* cl = new builtin_function(*this, ctor, prototype);
     cl->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor().get());
+            as_function::getFunctionConstructor());
     return cl;
 }
 
@@ -257,7 +257,7 @@ AVM2Global::createFunction(Global_as::ASFunction function)
 {
     builtin_function* f = new builtin_function(*this, function);
     f->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor().get());
+            as_function::getFunctionConstructor());
     return f;
 }
 
@@ -268,7 +268,7 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
     // constructor member.
     as_object* cl = new builtin_function(*this, ctor, prototype);
     cl->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor().get());
+            as_function::getFunctionConstructor());
     return cl;
 }
 
@@ -1291,6 +1291,7 @@ registerNatives(as_object& global)
     vm.registerNative(global_clearInterval, 250, 1);
 
     registerObjectNative(global);
+    registerFunctionNative(global);
     registerStringNative(global);
     registerArrayNative(global);
     registerMovieClipNative(global);

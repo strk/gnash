@@ -23,7 +23,7 @@
 #include "action_buffer.h"
 #include "ActionExec.h" // for operator()
 #include "VM.h" // for storing _global in a local register
-#include "builtin_function.h" // for Function constructor
+#include "NativeFunction.h" // for Function constructor
 #include "Object.h" // for getObjectInterface
 #include "Global_as.h" // for getObjectInterface
 #include "namedStrings.h"
@@ -56,8 +56,7 @@ swf_function::swf_function(const action_buffer& ab, as_environment& env,
 {
 	assert( m_start_pc < m_action_buffer.size() );
 
-	init_member("constructor", 
-            as_value(as_function::getFunctionConstructor().get()));
+	init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor());
 }
 
 /*private static*/

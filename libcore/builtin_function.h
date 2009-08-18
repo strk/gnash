@@ -18,9 +18,9 @@
 #ifndef GNASH_BUILTIN_FUNCTION_H
 #define GNASH_BUILTIN_FUNCTION_H
 
-#include "as_function.h" // for inheritance
-#include "fn_call.h" // for call operator
-// #include "as_environment.h" // for FrameGuard
+#include "as_function.h" 
+#include "fn_call.h" 
+#include "as_environment.h" 
 #include "namedStrings.h"
 
 #include <cassert>
@@ -29,7 +29,14 @@ namespace gnash {
 
 
 
-/// Any built-in function/class should be of this type
+/// This is a special type of function implementing AS-code in C++
+//
+/// Many functions (including classes) are implemented in ActionScript in
+/// the reference player. Gnash implements them in C++, but they must
+/// be treated like swf-defined functions.
+//
+/// They are distinct from NativeFunctions, which are part of the player and
+/// do not go through the ActionScript interpreter.
 class builtin_function : public as_function
 {
     typedef as_value (*ASFunction)(const fn_call& fn);
@@ -65,13 +72,11 @@ public:
 	///	    to get a default interface instead.
     /// @param useThisAsCtor
     ///     Used only by getFunctionConstructor().
-	builtin_function(Global_as& gl, ASFunction func, as_object* iface,
-            bool useThisAsCtor = false)
+	builtin_function(Global_as& gl, ASFunction func, as_object* iface)
 		:
 		as_function(gl, iface),
 		_func(func)
 	{
-		if (useThisAsCtor) init_member(NSV::PROP_CONSTRUCTOR, this);
 	}
 
 	/// Invoke this function or this Class constructor
@@ -89,8 +94,8 @@ public:
 		// specifying for a builtin_function whether or not
 		// it should be considered 'native'.
 		// If not 'native', we'd push a CallFrame on stack...
-		//
-		//as_environment::FrameGuard guard(fn.env(), this);
+        as_environment env = fn.env();
+		as_environment::FrameGuard guard(env, this);
 
 		assert(_func);
 		return _func(fn);

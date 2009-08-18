@@ -26,7 +26,14 @@
 
 namespace gnash {
 
-/// Any built-in function/class should be of this type
+/// This class implements functions native to the player.
+//
+/// They are not implemented in ActionScript in the reference player, but
+/// rather have access to internal functions.
+//
+/// Native functions include methods for handling SharedObjects, NetConnections
+/// and MovieClips, but also constructors for types such as String, Number,
+/// Array, Boolean, and MovieClip.
 class NativeFunction : public as_function
 {
     typedef as_value (*ASFunction)(const fn_call& fn);

@@ -289,7 +289,7 @@ VM::getNative(unsigned int x, unsigned int y) const
 
     NativeFunction* f = new NativeFunction(*_global, fun);
     f->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor().get());
+            as_function::getFunctionConstructor());
     return f;
 }
 

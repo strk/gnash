@@ -114,6 +114,7 @@ void
 registerStringNative(as_object& global)
 {
     VM& vm = getVM(global);
+    vm.registerNative(string_ctor, 251, 0);
 	vm.registerNative(as_object::tostring_method, 251, 1);
 	vm.registerNative(string_toString, 251, 2);
 	vm.registerNative(string_oldToUpper, 102, 0);
@@ -138,13 +139,16 @@ string_class_init(as_object& where, const ObjectURI& uri)
 {
     // This is going to be the global String "class"/"function"
     
-    Global_as* gl = getGlobal(where);
+    VM& vm = getVM(where);
+
     as_object* proto = getStringInterface();
-    as_object* cl = gl->createClass(&string_ctor, proto);
+    as_object* cl = vm.getNative(251, 0);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
 
-    cl->init_member("fromCharCode", getVM(*gl).getNative(251, 14)); 
+    cl->init_member("fromCharCode", vm.getNative(251, 14)); 
 
-    int flags = PropFlags::dontEnum; 
+    const int flags = PropFlags::dontEnum; 
     where.init_member(getName(uri), cl, flags, getNamespace(uri));
 }
 

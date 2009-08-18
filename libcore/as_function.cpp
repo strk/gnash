@@ -29,6 +29,7 @@
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "NativeFunction.h"
 
 #include <iostream>
 
@@ -119,16 +120,20 @@ as_function::getPrototype()
 	return proto.to_object(*VM::get().getGlobal());
 }
 
-boost::intrusive_ptr<builtin_function>
+NativeFunction*
 as_function::getFunctionConstructor()
 {
-	static boost::intrusive_ptr<builtin_function> func = NULL;
+	static NativeFunction* func = 0;
 	if ( ! func )
 	{
         Global_as* gl = VM::get().getGlobal();
-		func = new builtin_function(*gl, function_ctor, getFunctionPrototype(),
-                true);
-		VM::get().addStatic(func.get());
+		func = new NativeFunction(*gl, function_ctor);
+        as_object* proto = getFunctionPrototype();
+
+        func->init_member(NSV::PROP_PROTOTYPE, proto);
+        func->init_member(NSV::PROP_CONSTRUCTOR, func);
+		proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
+		VM::get().addStatic(func);
 	}
 	return func;
 }
@@ -210,16 +215,23 @@ as_function::constructInstance(const as_environment& env,
 
 
 void
+registerFunctionNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(function_call, 101, 10);
+    vm.registerNative(function_apply, 101, 11);
+}
+
+void
 function_class_init(as_object& global, const ObjectURI& uri)
 {
-	boost::intrusive_ptr<builtin_function> func = 
-        as_function::getFunctionConstructor();
+    NativeFunction* func = as_function::getFunctionConstructor();
 
 	// Register _global.Function, only visible for SWF6 up
 	int swf6flags = PropFlags::dontEnum | 
                     PropFlags::dontDelete | 
                     PropFlags::onlySWF6Up;
-	global.init_member(getName(uri), func.get(), swf6flags, getNamespace(uri));
+	global.init_member(getName(uri), func, swf6flags, getNamespace(uri));
 }
 
 namespace {
@@ -244,15 +256,14 @@ getFunctionPrototype()
 		// then create a new one. 
 		proto->set_prototype(getObjectInterface());
 
-		VM::get().addStatic(proto.get());
+        VM& vm = VM::get();
 
-		const int flags = PropFlags::dontDelete | 
-                          PropFlags::dontEnum | 
-                          PropFlags::onlySWF6Up; 
+		vm.addStatic(proto.get());
 
-		proto->init_member("apply", gl->createFunction(function_apply),
-                flags);
-		proto->init_member("call", gl->createFunction(function_call), flags);
+		const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up; 
+
+		proto->init_member("call", vm.getNative(101, 10), flags);
+		proto->init_member("apply", vm.getNative(101, 11), flags);
 	}
 
 	return proto.get();
