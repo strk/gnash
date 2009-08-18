@@ -278,10 +278,34 @@ xcheck_equals (typeof(f.data), "object");
 // Check that ASnative returns a new function, not the same one.
 a = ASnative(2106, 204);
 b = ASnative(2106, 204);
-check(a != b);
+xcheck(a != b);
+
+// Test ASconstructor
+
+f = ASconstructor(106, 2);
+xcheck_equals(typeof(f), "function");
+xcheck_equals(typeof(f.prototype), "object");
+
+g = ASnative(106, 2);
+xcheck_equals(typeof(g), "function");
+check_equals(typeof(g.prototype), "undefined");
+
+ba = ASnative;
+ASnative = 78;
+
+// ASconstructor doesn't rely on ASnative.
+f = ASconstructor(106, 2);
+xcheck_equals(typeof(f), "function");
+xcheck_equals(typeof(f.prototype), "object");
+
+g = ASnative(106, 2);
+xcheck_equals(typeof(g), "undefined");
+check_equals(typeof(g.prototype), "undefined");
+
+ASnative = ba;
 
 #if OUTPUT_VERSION > 5
-check_totals(84);
+check_totals(92);
 #else
-check_totals(81);
+check_totals(89);
 #endif
