@@ -85,16 +85,9 @@ registerMathNative(as_object& proto)
 
 
 void
-math_class_init(as_object& global, const ObjectURI& uri)
+math_class_init(as_object& where, const ObjectURI& uri)
 {
-    // Create built-in math object. It is not a class.
-    as_object* proto = getObjectInterface();
-    Global_as* gl = getGlobal(global);
-	boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
-
-	attachMathInterface(*obj);
-	global.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinObject(where, attachMathInterface, uri);
 }
 
 namespace {
