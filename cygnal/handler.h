@@ -177,6 +177,11 @@ protected:
     /// \var _sol
     ///	    is for remote SharedObjects
     std::vector<boost::shared_ptr<amf::Element> > _sol;
+    ///var _bodysize;
+    ///     is to store the body size of the previous packet for this
+    ///     channel. 4 and 1 byte heades don't use the length field,
+    ///     they just use the previous vaue for this field.
+    std::map<int, size_t>			_bodysize;
     /// \var _in_fd
     ///	    The file descriptor of the incoming data for an
     ///     Invoke message.
