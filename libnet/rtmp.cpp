@@ -173,27 +173,22 @@ RTMP::headerSize(boost::uint8_t header)
     
     int headersize = -1;
 
-//    cerr << "Header size value: " << (void *)header << std::endl;
-    
-    switch (header & RTMP_HEADSIZE_MASK) {
-      case HEADER_12:
-          headersize = 12;
-          break;
-      case HEADER_8:
-          headersize = 8;
-          break;
-      case HEADER_4:
-          headersize = 4;
-          break;
-      case HEADER_1:
-          headersize = 1;
-          break;
-      default:
-          log_error(_("AMF Header size bits (0x%X) out of range"),
-          		header & RTMP_HEADSIZE_MASK);
-          headersize = 1;
-          break;
+    if ((header & RTMP_HEADSIZE_MASK) == 0) {
+	headersize = 12;
+    } else if (header & 0x80) {
+	headersize = 4;
+    } else if (header & 0x40) {
+	headersize = 8;
+    } else if (header & 0xc0) {
+	headersize = 1;
+    } else {
+	log_error(_("AMF Header size bits (0x%X) out of range"),
+		  header & RTMP_HEADSIZE_MASK);
+	headersize = 1;
     };
+
+//     cerr << "Header size value: " << (void *)header
+// 	 << " Header size is: " << headersize<< std::endl;
 
     return headersize;
 }
@@ -275,17 +270,25 @@ RTMP::decodeHeader(boost::uint8_t *in)
     boost::uint8_t *tmpptr = in;
 
     head->channel = *tmpptr & RTMP_INDEX_MASK;
-//     log_debug (_("The AMF channel index is %d"), head->channel);
+//     log_network (_("The AMF channel index is %d"), head->channel);
     
     head->head_size = headerSize(*tmpptr++);
-//     log_debug (_("The header size is %d"), head->head_size);
+//     log_network (_("The header size is %d"), head->head_size);
 
+//     cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in, head->head_size, false) << endl;    
+
+    // Make sure the header size is in range, it has to be between
+    // 1-12 bytes.
     if (head->head_size > RTMP_MAX_HEADER_SIZE) {
+	log_error("RTMP Header size can't be more then %d bytes!!",
+		  RTMP_MAX_HEADER_SIZE);
+	head.reset();
+	return head;
+    } else if (head->head_size == 0) {
+	log_error("RTMP Header size can't be zaero!");
 	head.reset();
 	return head;
     }
-    
-//     cerr << "FIXME3: " << hexify(in, head->head_size, false) << endl;    
     
     if (head->head_size >= 4) {
         _mystery_word = *tmpptr++;
@@ -293,14 +296,33 @@ RTMP::decodeHeader(boost::uint8_t *in)
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
 
 //         log_debug(_("The mystery word is: %d"), _mystery_word);
+    } else {
+	_mystery_word = 0;
     }
+
 
     if (head->head_size >= 8) {
         head->bodysize = *tmpptr++;
         head->bodysize = (head->bodysize << 8) + *tmpptr++;
         head->bodysize = (head->bodysize << 8) + *tmpptr++;
         head->bodysize = head->bodysize & 0xffffff;
-//         log_debug(_("The body size is: %d"), head->bodysize);
+	_bodysize[head->channel] = head->bodysize;
+// 	log_network(_("The body size is: %d"), head->bodysize);
+    } else {
+	// If the body size is zero, we reuse the last body size field
+	// from the previous message,
+	head->bodysize = _bodysize[head->channel];
+	log_network("Using previous body size of %d for channel %d",
+		    head->bodysize, head->channel);
+    }
+
+    // the bodysize is limited to two bytes, so if we think we have
+    // more than that, something probably screwed up.
+    if (head->bodysize > 65535) {
+	log_error("Suspicious large RTMP packet body size! %d",
+		  head->bodysize);
+	head.reset();
+	return head;
     }
 
     if (head->head_size >= 8) {
@@ -312,27 +334,21 @@ RTMP::decodeHeader(boost::uint8_t *in)
 // 	} else {
 // 	    log_debug(_("The type is: 0x%x"), head->type);
 // 	}
+    } else {
+	head->type = RTMP::NONE;
     }
-
-    if (head->head_size == 1) {
-	if (head->channel == RTMP_SYSTEM_CHANNEL) {
-	    head->bodysize = sizeof(boost::uint16_t) * 3;
-// 	    log_debug("Got a one byte header system message: %s", hexify(in, head->bodysize, false));
-	} else {
-// 	    log_debug("Got a continuation packet for channel #%d", head->channel);
-	    head->bodysize = _lastsize[head->channel];
-	}
-    }
-
-    log_debug("RTMP %s: channel: %d, header_size %d, bodysize: %d",
-  	      ((head->head_size == 1) ? "same" : content_str[head->type]),
-	      head->channel, head->head_size, head->bodysize);
 
     if (head->head_size == 12) {
         head->src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
 //         log_debug(_("The source/destination is: %x"), head->src_dest);
     }
+
+    log_debug("RTMP %s: channel: %d, head size %d, body size: %d",
+  	      ((head->head_size == 1) ? "same" : content_str[head->type]),
+	      head->channel,
+	      head->head_size,
+	      head->bodysize);
 
     return head;
 
@@ -1178,7 +1194,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 //  		cerr << "New packet for channel #" << rthead->channel << " of size "
 //  		     << (rthead->head_size + rthead->bodysize) << endl;
 		// give it some memory to store data in. We store
-		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
+		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size + 1));
 		// Each RTMP connection has 64 channels, so we store
 		// the header with the data so that info is accessible
 		// via the Buffer for processing later. All the data
