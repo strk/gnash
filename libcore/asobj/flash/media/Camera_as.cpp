@@ -661,11 +661,9 @@ camera_quality(const fn_call& fn)
 }
 
 as_value
-camera_new(const fn_call& fn)
+camera_new(const fn_call& /*fn*/)
 {
-    as_object* proto = getCameraInterface();
-    Global_as* gl = getGlobal(fn);
-    return gl->createObject(proto);
+    return as_value();
 }
 
 as_value

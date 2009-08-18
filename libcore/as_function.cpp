@@ -247,9 +247,6 @@ getFunctionPrototype()
 		// Initialize Function prototype
 		proto = new as_object();
         
-        // TODO: get a Global_as passed in.
-        Global_as* gl = getGlobal(*proto);
-
 		// We initialize the __proto__ member separately, as getObjectInterface
 		// will end up calling getFunctionPrototype again and we want that
 		// call to return the still-not-completely-constructed prototype rather
@@ -271,11 +268,9 @@ getFunctionPrototype()
 }
 
 as_value
-function_ctor(const fn_call& /* fn */)
+function_ctor(const fn_call& /*fn*/)
 {
-	boost::intrusive_ptr<as_object> func = 
-        new as_object(getFunctionPrototype());
-	return as_value(func.get());
+	return as_value();
 }
 
 

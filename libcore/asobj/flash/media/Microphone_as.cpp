@@ -177,11 +177,9 @@ public:
 // There is a constructor for Microphone that returns an object with
 // the correct properties, but it is not usable.
 as_value
-microphone_ctor(const fn_call& fn)
+microphone_ctor(const fn_call& /*fn*/)
 {
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = getMicrophoneInterface();
-    return gl->createObject(proto);
+    return as_value();
 }
 
 // AS2 static accessor.
