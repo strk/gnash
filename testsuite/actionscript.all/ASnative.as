@@ -278,8 +278,11 @@ xcheck_equals (typeof(f.data), "object");
 // Check that ASnative returns a new function, not the same one.
 a = ASnative(2106, 204);
 b = ASnative(2106, 204);
+#if OUTPUT_VERSION < 6
+check(a == b);
+#else
 check(a != b);
-
+#endif
 // Test ASconstructor
 
 f = ASconstructor(106, 2);
