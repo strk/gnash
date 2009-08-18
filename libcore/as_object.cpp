@@ -1149,8 +1149,7 @@ as_value
 as_object::valueof_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
-
-	return obj->get_primitive_value();
+	return obj;
 }
 
 boost::intrusive_ptr<as_object>

@@ -98,10 +98,6 @@ public:
         return _string;
     }
 
-    as_value get_primitive_value() const {
-        return as_value(_string);
-    }
-
     const std::string& str() {
         return _string;
     }

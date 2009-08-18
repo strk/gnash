@@ -60,12 +60,6 @@ public:
         return as_value::doubleToString(_val);
     }
 
-    // Drop?
-    as_value get_primitive_value() const 
-    {
-        return _val;
-    }
-
 private:
     
     // the number value
