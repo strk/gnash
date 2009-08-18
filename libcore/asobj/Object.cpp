@@ -62,7 +62,8 @@ init_object_instance()
 	return new as_object(getObjectInterface());
 }
 
-void registerObjectNative(as_object& global)
+void
+registerObjectNative(as_object& global)
 {
     VM& vm = getVM(global);
 
