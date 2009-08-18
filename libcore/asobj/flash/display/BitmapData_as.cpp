@@ -224,24 +224,9 @@ BitmapData_as::dispose()
     updateAttachedBitmaps();
 }
 
-as_object*
-getFlashDisplayBitmapDataConstructor(as_object& where)
-{
-    static as_object* cl = NULL;
-    if ( ! cl )
-    {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getBitmapDataInterface();
-        cl = gl->createClass(&BitmapData_ctor, proto);
-        VM::get().addStatic(cl);
-        attachBitmapDataStaticProperties(*cl);
-    }
-    return cl;
-}
-
-
 // extern 
-void bitmapdata_class_init(as_object& where, const ObjectURI& uri)
+void
+bitmapdata_class_init(as_object& where, const ObjectURI& uri)
 {
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
@@ -677,7 +662,11 @@ as_value
 get_flash_display_bitmap_data_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.display.BitmapData class");
-    return getFlashDisplayBitmapDataConstructor(*getVM(fn).getGlobal());
+    Global_as* gl = getGlobal(fn);
+    as_object* proto = getBitmapDataInterface();
+    as_object* cl = gl->createClass(&BitmapData_ctor, proto);
+    attachBitmapDataStaticProperties(*cl);
+    return cl;
 }
 
 as_value
