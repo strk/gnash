@@ -36,6 +36,7 @@
 #include <utility> // for std::pair
 #include <set>
 #include <sstream>
+#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -149,6 +150,12 @@ struct ObjectURI
     string_table::key name;
     string_table::key ns;
 
+};
+
+class Proxy
+{
+public:
+    virtual ~Proxy() {};
 };
 
 
@@ -1070,6 +1077,14 @@ public:
 
     static as_value valueof_method(const fn_call& fn);
 
+    void setProxy(Proxy* p) {
+        _proxy.reset(p);
+    }
+
+    Proxy* proxy() const {
+        return _proxy.get();
+    }
+
 protected:
 
     /// Enumerate any non-proper properties
@@ -1138,6 +1153,8 @@ protected:
 
 private:
  
+    boost::scoped_ptr<Proxy> _proxy;
+
     /// The global object whose scope contains this object.
     VM& _vm;   
 
@@ -1210,6 +1227,26 @@ ensureType (boost::intrusive_ptr<as_object> obj)
     if (!ret) {
         std::string target = typeName(ret.get());
         std::string source = typeName(obj.get());
+
+        std::string msg = "builtin method or gettersetter for " +
+            target + " called from " + source + " instance.";
+
+        throw ActionTypeError(msg);
+    }
+    return ret;
+}
+
+template<typename T>
+T*
+checkType(as_object* obj)
+{
+    if (!obj) throw ActionTypeError();
+
+    T* ret = dynamic_cast<T*>(obj->proxy());
+
+    if (!ret) {
+        std::string target = typeName(ret);
+        std::string source = typeName(obj);
 
         std::string msg = "builtin method or gettersetter for " +
             target + " called from " + source + " instance.";

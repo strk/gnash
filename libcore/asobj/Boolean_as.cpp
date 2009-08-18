@@ -41,16 +41,15 @@ namespace {
     as_object* getBooleanInterface();
 }
 
-class Boolean_as: public as_object
+class Boolean_as: public Proxy
 {
 
 public:
 
     explicit Boolean_as(bool val)
         :
-        as_object(getBooleanInterface())
+        _val(val)
     {
-        _val = val;
     }
     
     bool value() const { return _val; }
@@ -106,10 +105,8 @@ getBooleanInterface()
 as_value
 boolean_tostring(const fn_call& fn)
 {
-    boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
-    
+    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr.get());
     if (obj->value()) return as_value("true");
-
     return as_value("false");
 }
 
@@ -117,25 +114,24 @@ boolean_tostring(const fn_call& fn)
 as_value
 boolean_valueof(const fn_call& fn) 
 {
-    boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
-
+    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr.get());
     return as_value(obj->value());
 }
 
 as_value
 boolean_ctor(const fn_call& fn)
 {
-    if (fn.nargs > 0)
-    {
-        bool val = fn.arg(0).to_bool();
-        if ( ! fn.isInstantiation() ) return as_value(val);
-        
-        return as_value(new Boolean_as(val));
+
+    if (!fn.isInstantiation()) {
+        if (!fn.nargs) return as_value();
+        return as_value(fn.arg(0).to_bool());
     }
 
-    if (!fn.isInstantiation()) return as_value();
-        
-    return as_value(new Boolean_as(false));
+    const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
+
+    as_object* obj = fn.this_ptr.get();
+    obj->setProxy(new Boolean_as(val));
+    return as_value();
 
 }
 
