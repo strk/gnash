@@ -300,12 +300,16 @@ ASSetNative(f.prototype, 106, "valueOf,toString");
 
 obj = new f(6);
 check_equals(obj.__proto__, f.prototype);
-xcheck(obj.__proto__ != Number.prototype);
+check(obj.__proto__ != Number.prototype);
 xcheck_equals(typeof(obj), "object");
 xcheck_equals(obj.toString(), "6");
 
 // Attach boolean natives and it fails.
 ASSetNative(f.prototype, 107, "valueOf,toString");
+xcheck_equals(typeof(obj), "object");
+check_equals(obj.toString(), undefined);
+
+obj.__proto__ = Boolean.prototype;
 xcheck_equals(typeof(obj), "object");
 check_equals(obj.toString(), undefined);
 
@@ -317,12 +321,18 @@ g = ASnative(106, 2);
 xcheck_equals(typeof(g), "function");
 check_equals(typeof(g.prototype), "undefined");
 
+// This is the ASnative function Number.toString. It does not attach
+// Number.prototype, so the Number.toString function fails.
 f = ASconstructor(106, 1);
+ASSetNative(f.prototype, 106, "valueOf,toString");
 xcheck_equals(typeof(f), "function");
 xcheck_equals(typeof(f.prototype), "object");
+obj = new f(6);
+xcheck_equals(typeof(obj), "object");
+check_equals(obj.toString(), undefined);
 
 obj = new f();
-xcheck_equals(obj.toString(), "[object Object]");
+check_equals(obj.toString(), undefined);
 
 ba = ASnative;
 ASnative = 78;
@@ -339,7 +349,7 @@ check_equals(typeof(g.prototype), "undefined");
 ASnative = ba;
 
 #if OUTPUT_VERSION > 5
-check_totals(102);
+check_totals(104);
 #else
-check_totals(99);
+check_totals(101);
 #endif
