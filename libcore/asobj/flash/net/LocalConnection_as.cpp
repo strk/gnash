@@ -104,8 +104,8 @@ LocalConnection_as::LocalConnection_as()
     _domain(getDomain())
 {
     log_debug("The domain for this host is: %s", _domain);
-	setconnected(false);
-	
+    setconnected(false);
+    
 }
 
 LocalConnection_as::~LocalConnection_as()
@@ -207,21 +207,12 @@ LocalConnection_as::getDomain()
 void
 LocalConnection_as::init(as_object& glob, const ObjectURI& uri)
 {
-	// This is going to be the global Number "class"/"function"
-	static as_object* cl = NULL;
+    // This is going to be the global Number "class"/"function"
+    Global_as* gl = getGlobal(glob);
+    as_object* proto = getLocalConnectionInterface();
+    as_object* cl = gl->createClass(&localconnection_new, proto);
 
-	if ( cl == NULL )
-	{
-        Global_as* gl = getGlobal(glob);
-		cl = gl->createClass(&localconnection_new,
-                getLocalConnectionInterface());
-
-        // FIXME: why do we need to register ourself here ?
-		VM::get().addStatic(cl);
-	}
-
-
-	int swf6flags = PropFlags::dontEnum | 
+    int swf6flags = PropFlags::dontEnum | 
                     PropFlags::dontDelete | 
                     PropFlags::onlySWF6Up;
 
@@ -279,16 +270,16 @@ localconnection_connect(const fn_call& fn)
         return as_value(false);
     }
     
-	std::string connection_name;
-	//connection_name=fn.arg(0).to_string();
-	//log_debug("The arg(0) is: %s", connection_name);
-	
+    std::string connection_name;
+    //connection_name=fn.arg(0).to_string();
+    //log_debug("The arg(0) is: %s", connection_name);
+    
     if (fn.arg(0).to_string()=="") {
         return as_value(false);
     }
-       	connection_name = ptr->domain();	
-    	connection_name +=":";
-    	connection_name += fn.arg(0).to_string();
+           connection_name = ptr->domain();    
+        connection_name +=":";
+        connection_name += fn.arg(0).to_string();
    
     ptr->connect(connection_name);
 
@@ -318,7 +309,7 @@ localconnection_send(const fn_call& fn)
     // At least 2 args (connection name, function) required.
 
    log_debug(_("The number of args is %d \n"), fn.nargs) ;
-	 
+     
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream os;
@@ -327,7 +318,7 @@ localconnection_send(const fn_call& fn)
                     "arguments"), os.str());
         );
         return as_value(false);
-		
+        
     }
 
     // Both the first two arguments must be a string
@@ -356,18 +347,18 @@ localconnection_send(const fn_call& fn)
 //Si added
     int numarg=fn.nargs;
     for (int i=0; i!=numarg; i++)
-		log_debug(_(" *** The value of the arg[ %d ] : %s ***"),i,fn.arg(i).to_string() ); 
-	
-	const std::string & connectionName= fn.arg(0).to_string();
-	const std::string & methodName=     fn.arg(1).to_string();
-		
-	std::vector< amf::Element * >  argument_to_send;
-	
-	for (int i=2; i!=numarg; i++){
-		amf::Element* temp_ptr = fn.arg(i).to_element().get();
-		argument_to_send.push_back(temp_ptr);
-	}
-	
+        log_debug(_(" *** The value of the arg[ %d ] : %s ***"),i,fn.arg(i).to_string() ); 
+    
+    const std::string & connectionName= fn.arg(0).to_string();
+    const std::string & methodName=     fn.arg(1).to_string();
+        
+    std::vector< amf::Element * >  argument_to_send;
+    
+    for (int i=2; i!=numarg; i++){
+        amf::Element* temp_ptr = fn.arg(i).to_element().get();
+        argument_to_send.push_back(temp_ptr);
+    }
+    
     ptr->amf::LcShm::send(connectionName,methodName,argument_to_send);
 //end of Si added
 
@@ -410,7 +401,7 @@ getLocalConnectionInterface()
     if ( o == NULL )
     {
         o = new as_object(getObjectInterface());
-	    VM::get().addStatic(o.get());
+        VM::get().addStatic(o.get());
 
         attachLocalConnectionInterface(*o);
     }
