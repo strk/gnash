@@ -204,12 +204,8 @@ microphone_get(const fn_call& fn)
 as_value
 microphone_getMicrophone(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        ptr = new microphone_as_object;
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr
+        = ensureType<microphone_as_object> (fn.this_ptr);
     int numargs = fn.nargs;
     if (numargs > 0) {
         log_debug("%s: the mic is automatically chosen from gnashrc", __FUNCTION__);
@@ -221,14 +217,8 @@ microphone_getMicrophone(const fn_call& fn)
 as_value 
 microphone_setgain(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: you must first initialize the microphone before setting vals",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
     
     int numargs = fn.nargs;
     if (numargs != 1) {
@@ -277,14 +267,8 @@ microphone_setgain(const fn_call& fn)
 as_value
 microphone_setrate(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: you must first initialize the microphone before setting vals",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
     
     int numargs = fn.nargs;
     const int32_t argument = fn.arg(0).to_int();
@@ -323,15 +307,10 @@ microphone_setrate(const fn_call& fn)
 }
 
 as_value
-microphone_activityLevel(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+microphone_activityLevel(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -349,15 +328,10 @@ microphone_activityLevel(const fn_call& fn) {
 }
 
 as_value
-microphone_gain(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+microphone_gain(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -385,16 +359,11 @@ microphone_gain(const fn_call& fn) {
 }
 
 as_value
-microphone_index(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    };
-        
+microphone_index(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
+    
     if ( fn.nargs == 0 ) // getter
     {
         return as_value(ptr->get_index());
@@ -412,14 +381,9 @@ microphone_index(const fn_call& fn) {
 as_value
 microphone_muted(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
+    
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Microphone::muted is always false (always allows access)");
@@ -438,14 +402,8 @@ microphone_muted(const fn_call& fn)
 as_value
 microphone_name(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -502,14 +460,8 @@ microphone_names(const fn_call& fn)
 as_value
 microphone_rate(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
     
     if ( fn.nargs == 0 ) // getter
     {
@@ -531,16 +483,11 @@ microphone_rate(const fn_call& fn)
 }
 
 as_value
-microphone_silenceLevel(const fn_call& fn) {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
-        
+microphone_silenceLevel(const fn_call& fn)
+{
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
+
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Microphone::silenceLevel can be set, but is unimplemented");
@@ -559,14 +506,8 @@ microphone_silenceLevel(const fn_call& fn) {
 as_value
 microphone_silenceTimeout(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -586,14 +527,9 @@ microphone_silenceTimeout(const fn_call& fn)
 as_value
 microphone_useEchoSuppression(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: microphone object not yet initialized, call new",
-            __FUNCTION__);
-        return as_value();
-    }
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
+    
     if ( fn.nargs == 0 ) // getter
     {
         log_unimpl("Microphone::useEchoSuppression can be set, but is "
@@ -612,16 +548,13 @@ microphone_useEchoSuppression(const fn_call& fn)
 
 
 as_value
-microphone_setsilencelevel(const fn_call& fn) {
-    log_unimpl ("Microphone::setSilenceLevel can be set, but it's not implemented");
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: can't set values until you have a new microphone object",
-            __FUNCTION__);
-        return as_value();
-    }
+microphone_setsilencelevel(const fn_call& fn)
+{
+    log_unimpl ("Microphone::setSilenceLevel can be set, but it's not "
+            "implemented");
+
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
     
     int numargs = fn.nargs;
     if (numargs > 2) {
@@ -668,16 +601,11 @@ microphone_setsilencelevel(const fn_call& fn) {
 as_value 
 microphone_setuseechosuppression(const fn_call& fn)
 {
-    log_unimpl ("Microphone::setUseEchoSuppression can be set, but it's not implemented");
-    boost::intrusive_ptr<microphone_as_object> ptr;
-    try {
-        ptr = ensureType<microphone_as_object> (fn.this_ptr);
-    } catch (ActionTypeError& e) {
-        log_error("%s: can't set values until you create a new microphone object",
-            __FUNCTION__);
-        return as_value();
-    }
-        
+    log_unimpl ("Microphone::setUseEchoSuppression can be set, but it's not "
+            "implemented");
+    boost::intrusive_ptr<microphone_as_object> ptr =
+        ensureType<microphone_as_object> (fn.this_ptr);
+    
     int numargs = fn.nargs;
     if (numargs > 1) {
         log_error("%s: Too many arguments", __FUNCTION__);
