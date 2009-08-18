@@ -1061,8 +1061,7 @@ public:
     /// public: set_member("__proto__", anyting)
     /// will do just the same
     ///
-    void set_prototype(boost::intrusive_ptr<as_object> proto,
-            int flags = DefaultFlags);
+    void set_prototype(const as_value& proto, int flags = DefaultFlags);
 
     /// @{ Common ActionScript methods for DisplayObjects
     /// TODO: make protected
