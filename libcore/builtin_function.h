@@ -49,8 +49,6 @@ public:
 		as_function(gl),
 		_func(func)
 	{
-		init_member(NSV::PROP_CONSTRUCTOR,
-                as_function::getFunctionConstructor().get());
 	}
 
 	/// Construct a builtin function with the given interface (possibly none)
@@ -74,10 +72,6 @@ public:
 		_func(func)
 	{
 		if (useThisAsCtor) init_member(NSV::PROP_CONSTRUCTOR, this);
-		else {
-			init_member(NSV::PROP_CONSTRUCTOR,
-                    as_function::getFunctionConstructor().get());
-		}
 	}
 
 	/// Invoke this function or this Class constructor

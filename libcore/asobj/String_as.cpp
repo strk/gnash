@@ -822,7 +822,7 @@ string_ctor(const fn_call& fn)
 {
 	std::string str;
 	
-	if (fn.nargs )
+	if (fn.nargs)
 	{
 		str = fn.arg(0).to_string();
 	}

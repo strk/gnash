@@ -161,23 +161,20 @@ AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
 void
 AVM2Global::registerClasses()
 {
+   
+    const string_table::key NS_GLOBAL(0);
+    
+    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
     
     init_member("trace", createFunction(global_trace));
     init_member("escape", createFunction(global_escape));
-   
-    const string_table::key NS_GLOBAL(0);
 
-    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
-    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
-    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
-    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
-    
     _classes.declareAll(avm2Classes(_vm.getStringTable()));
-
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
-    
     _classes.getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
-
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_OBJECT);
     _classes.getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_ARRAY);
@@ -202,14 +199,19 @@ AVM1Global::createObject(as_object* prototype)
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(*this, function);
+    builtin_function* f = new builtin_function(*this, function);
+    f->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor().get());
+    return f;
 }
 
 as_object*
 AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
-    return new builtin_function(*this, ctor, prototype);
-
+    as_object* cl = new builtin_function(*this, ctor, prototype);
+    cl->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor().get());
+    return cl;
 }
 
 as_object*
@@ -252,7 +254,10 @@ AVM2Global::createObject(as_object* prototype)
 builtin_function*
 AVM2Global::createFunction(Global_as::ASFunction function)
 {
-    return new builtin_function(*this, function);
+    builtin_function* f = new builtin_function(*this, function);
+    f->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor().get());
+    return f;
 }
 
 as_object*
@@ -260,7 +265,10 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
     // TODO: this should attach the function to the prototype as its
     // constructor member.
-    return new builtin_function(*this, ctor, prototype);
+    as_object* cl = new builtin_function(*this, ctor, prototype);
+    cl->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor().get());
+    return cl;
 }
 
 as_object*
@@ -302,6 +310,13 @@ AVM1Global::registerClasses()
 {
     registerNatives(*this);
 
+    const string_table::key NS_GLOBAL(0);
+
+    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+
     // No idea why, but it seems there's a NULL _global.o 
     // defined at player startup...
     // Probably due to the AS-based initialization 
@@ -328,13 +343,6 @@ AVM1Global::registerClasses()
     init_member("clearTimeout", createFunction(global_clearInterval));
 
     _classes.declareAll(avm1Classes());
-
-    const string_table::key NS_GLOBAL(0);
-
-    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
-    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
-    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
-    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
 
     // SWF8 visibility:
     const string_table::key NS_FLASH = getStringTable(*this).find("flash");
