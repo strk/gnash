@@ -811,7 +811,51 @@ connection_handler(Network::thread_params_t *args)
 	    }
 	    if (networks[tid] == 0) {
 		networks[tid] = tnet;
+#if 1
+		RTMPServer rtmp;
+		boost::shared_ptr<amf::Element> tcurl = 
+		    rtmp.processClientHandShake(args->netfd);
+		if (!tcurl) {
+// 		    log_error("Couldn't read the tcUrl variable!");
+		    net.closeNet(args->netfd);
+		    return;
+		}
+		URL url(tcurl->to_string());
+		std::string key = url.hostname() + url.path();
+		boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
+		if (!hand) {
+		    log_network("Creating new Handler for: %s for fd %#d",
+				key, args->netfd);
+		    hand.reset(new Handler);
+		} else {
+		    log_network("Using existing Handler for: %s for fd %#d",
+				key, args->netfd);
+		}
+		hand->addClient(args->netfd, Handler::RTMP);
+		args->handler = reinterpret_cast<void *>(hand.get());
+		args->filespec = key;
+
+		string str(url.path());
+		if (str[0] == '/') {
+		    str.erase(0,1);
+		}
+		char *env = std::getenv("CYGNAL_PLUGINS");
+		if (!env) {
+		    hand->scanDir("/usr/lib/cygnal:/usr/local/lib/cygnal");
+		}
+		else {
+		    hand->scanDir(env);
+		}
+		boost::shared_ptr<Handler::cygnal_init_t> init = 
+		    hand->initModule(str);
+		
+		event_handler(args);
+
+		// We're done, close this network connection
+		rtmp.closeNet(args->netfd);
+#else
 		boost::thread handler(boost::bind(&dispatch_handler, targs));
+#endif
 	    }
 	} else {
 	    // When in single threaded mode, just call the protocol
