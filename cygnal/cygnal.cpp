@@ -124,7 +124,7 @@ struct sigaction  act1, act2;
 // same read-only value.
 
 // This is the default path to look in for files to be streamed.
-const char *docroot = 0;
+static string docroot;
 
 // This is the number of times a thread loop continues, for debugging only
 int thread_retries = 10;
@@ -410,7 +410,7 @@ main(int argc, char *argv[])
     }    
     
     if (crcfile.getDocumentRoot().size() > 0) {
-        docroot = crcfile.getDocumentRoot().c_str();
+        docroot = crcfile.getDocumentRoot();
         log_debug (_("Document Root for media files is: %s"),
 		       docroot);
     } else {
@@ -446,7 +446,7 @@ main(int argc, char *argv[])
 	      crcfile.setPortOffset(port_offset);
 	      break;
 	  case 'r':
-	      docroot = parser.argument(i).c_str();
+	      docroot = parser.argument(i);
 	      break;
 	  case 's':
 	      crcfile.setThreadingFlag(false);
@@ -826,6 +826,11 @@ connection_handler(Network::thread_params_t *args)
 		RTMPServer rtmp;
 		boost::shared_ptr<amf::Element> tcurl = 
 		    rtmp.processClientHandShake(args->netfd);
+		if (!tcurl) {
+// 		    log_error("Couldn't read the tcUrl variable!");
+		    net.closeNet(args->netfd);
+		    return;
+		}
 		URL url(tcurl->to_string());
 		std::string key = url.hostname() + url.path();
 		boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
@@ -1023,7 +1028,10 @@ event_handler(Network::thread_params_t *args)
 		  case  Handler::RTMP:
 		      args->netfd = i;
 		      args->filespec = path;
-		      rtmp_handler(args);
+		      if (!rtmp_handler(args)) {
+			  // Done with this network connection
+			  return;
+		      }
 		      break;
 		  case Handler::RTMPT:
 		      http_handler(args);
