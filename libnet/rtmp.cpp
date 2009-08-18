@@ -1174,6 +1174,10 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	// Decode the header of the packet to get the header size, the
 	// body size, and the channel, all of which we need.
 	rthead = decodeHeader(ptr);
+	if (!rthead) {
+	    channels.reset();
+	    return channels;
+	}
 	// System channel messages are always on channel 2, and get
 	// processed differently.
 	// FIXME: skip system messages for now!

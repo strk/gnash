@@ -149,7 +149,7 @@ RTMPClient::encodeConnect(const char *uri,
     
     tcUrl = uri;
     app = filename;    
-    swfUrl = "mediaplayer.swf";
+    swfUrl = "http://localhost:1935/demos/videoConference.swf";
     pageUrl = "http://gnashdev.org";
     
     log_network("URL is %s", url);
@@ -203,7 +203,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     }  
 
     ElementSharedPtr flashVer(new amf::Element);
-    flashVer->makeString("flashVer", "LNX 9,0,31,0");
+    flashVer->makeString("flashVer", version);
     obj->addProperty(flashVer);
     
     ElementSharedPtr swfUrlnode(new amf::Element);
@@ -277,10 +277,32 @@ RTMPClient::connectToServer(const std::string &/* url */)
 	// We build this here so we can get the total encoded
 	// size of the object.
 	boost::shared_ptr<amf::Buffer> ncbuf = encodeConnect();
+
+	// As at this point we don't have an RTMP connection,
+	// we can't use the regular sendMsg(), that handles the RTMP
+	// headers for continuation packets. We know a this point it's
+	// always one by, so we just add it by hand. It doesn't matter
+	// as long as the channel number matches the one used to
+	// create the initial RTMP packet header.
+	boost::scoped_ptr<amf::Buffer> newbuf(new amf::Buffer(ncbuf->size() + 5));
+	size_t nbytes = 0;
+	size_t chunk = RTMP_VIDEO_PACKET_SIZE;
+	do {
+	    // The last packet is smaller
+	    if ((ncbuf->allocated() - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
+		chunk = ncbuf->allocated() - nbytes;
+	    }
+	    newbuf->append(ncbuf->reference() + nbytes, chunk);
+ 	    nbytes  += chunk;
+	    if (chunk == RTMP_VIDEO_PACKET_SIZE) {
+		boost::uint8_t headone = 0xc3;
+		*newbuf += headone;
+	    }
+	} while (nbytes < ncbuf->allocated());
+
 	boost::shared_ptr<amf::Buffer> head = encodeHeader(0x3,
 			    RTMP::HEADER_12, ncbuf->allocated(),
 			    RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
-	
 
 	// Build the first handshake packet, and send it to the
 	// server.
@@ -291,23 +313,23 @@ RTMPClient::connectToServer(const std::string &/* url */)
 	}
 	
 	boost::scoped_ptr<amf::Buffer> handshake2(new amf::Buffer
-		  ((RTMP_HANDSHAKE_SIZE * 2) + ncbuf->allocated()
+		  ((RTMP_HANDSHAKE_SIZE * 2) + newbuf->allocated()
 		   + RTMP_MAX_HEADER_SIZE));
-
-	*handshake2 = handshake1;
-	*handshake2 += head;
-	*handshake2 += ncbuf;
 
 	// Finish the handshake process, which has to have the
 	// NetConnection::connect() as part of the buffer, or Red5
 	// refuses to answer.
 	setTimeout(20);
 #if 0
+	*handshake2 = handshake1;
+	*handshake2 += head;
+ 	*handshake2 += ncbuf;
 	if (!clientFinish(*handshake2)) {
 #else
-	    *handshake2 = head;
-	    *handshake2 += ncbuf;
-	if (!clientFinish(*handshake2)) {
+	*handshake2 = head;
+	handshake2->append(newbuf->reference(), newbuf->allocated());
+	handshake2->dump();
+        if (!clientFinish(*handshake2)) {
 #endif
 	    log_error("RTMP handshake completion failed!");
 //	    return (false);
