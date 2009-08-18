@@ -299,7 +299,7 @@ xcheck_equals(typeof(f), "function");
 xcheck_equals(typeof(f.prototype), "object");
 
 g = ASnative(106, 2);
-xcheck_equals(typeof(g), "undefined");
+check_equals(typeof(g), "undefined");
 check_equals(typeof(g.prototype), "undefined");
 
 ASnative = ba;
