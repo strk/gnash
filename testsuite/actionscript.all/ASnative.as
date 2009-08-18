@@ -300,7 +300,12 @@ ASSetNative(f.prototype, 106, "valueOf,toString");
 
 obj = new f(6);
 check_equals(obj.__proto__, f.prototype);
+#if OUTPUT_VERSION > 5
 check(obj.__proto__ != Number.prototype);
+#else
+check_equals(obj.__proto__, undefined);
+#endif
+
 xcheck_equals(typeof(obj), "object");
 xcheck_equals(obj.toString(), "6");
 
@@ -311,7 +316,7 @@ check_equals(obj.toString(), undefined);
 
 // Attach number natives to prototype again and it works.
 ASSetNative(f.prototype, 106, "valueOf,toString");
-check_equals(obj.toString(), "6");
+xcheck_equals(obj.toString(), "6");
 
 g = ASnative(106, 2);
 xcheck_equals(typeof(g), "function");

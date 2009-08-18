@@ -1114,26 +1114,19 @@ getButtonInterface()
 static as_value
 button_ctor(const fn_call& /* fn */)
 {
-  boost::intrusive_ptr<as_object> clip = new as_object(getButtonInterface());
-  return as_value(clip.get());
+    return as_value();
 }
 
 void
 Button::init(as_object& global, const ObjectURI& uri)
 {
-  // This is going to be the global Button "class"/"function"
-  static boost::intrusive_ptr<as_object> cl=NULL;
+    // This is going to be the global Button "class"/"function"
+    Global_as* gl = getGlobal(global);
+    as_object* proto = getButtonInterface();
+    as_object* cl = gl->createClass(&button_ctor, proto);
 
-  if ( cl == NULL )
-  {
-        Global_as* gl = getGlobal(global);
-        as_object* proto = getButtonInterface();
-        cl = gl->createClass(&button_ctor, proto);
-    VM::get().addStatic(cl.get());
-  }
-
-  // Register _global.MovieClip
-  global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    // Register _global.MovieClip
+    global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 

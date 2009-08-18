@@ -1,4 +1,4 @@
-// externalinterface_as.cpp:  ActionScript "ExternalInterface" class, for Gnash.
+// ExternalInterface_as.cpp:  ActionScript "ExternalInterface" class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "externalinterface_as.h"
+#include "ExternalInterface_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -63,19 +63,7 @@ namespace {
     as_value externalinterface_uctor(const fn_call& fn);
     as_value externalInterfaceConstructor(const fn_call& fn);
 
-    as_object* getExternalInterfaceInterface();
 }
-
-class externalinterface_as: public as_object
-{
-
-public:
-
-	externalinterface_as()
-		:
-		as_object(getExternalInterfaceInterface())
-	{}
-};
 
 // extern 
 void
@@ -153,26 +141,6 @@ attachExternalInterfaceStaticProperties(as_object& o)
     o.init_member("available",
             gl->createFunction(externalinterface_available), protectedFlags);
 }
-
-as_object*
-getExternalInterfaceInterface()
-{
-	boost::intrusive_ptr<as_object> o;
-
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachExternalInterfaceInterface(*o);
-
-	}
-
-	return o.get();
-}
-
 
 
 as_value
@@ -340,16 +308,14 @@ externalinterface_available(const fn_call& /*fn*/)
 as_value
 externalinterface_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new externalinterface_as;
-
-	if ( fn.nargs )
-	{
+	if (fn.nargs) {
 		std::stringstream ss;
 		fn.dump_args(ss);
-		LOG_ONCE( log_unimpl("ExternalInterface(%s): %s", ss.str(), _("arguments discarded")) );
+		LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
+                    _("arguments discarded")) );
 	}
 
-	return as_value(obj.get()); // will keep alive
+	return as_value(); 
 }
 
 as_value
@@ -357,8 +323,10 @@ externalInterfaceConstructor(const fn_call& fn)
 {
     log_debug("Loading flash.external.ExternalInterface class");
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getExternalInterfaceInterface();
+    as_object* proto = gl->createObject(getObjectInterface());
     as_object* cl = gl->createClass(&externalinterface_ctor, proto);
+
+    attachExternalInterfaceInterface(*proto);
     attachExternalInterfaceStaticProperties(*cl);
     return cl;
 }
