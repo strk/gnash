@@ -60,6 +60,7 @@ public:
         return as_value::doubleToString(_val);
     }
 
+    // Drop?
     as_value get_primitive_value() const 
     {
         return _val;
@@ -108,7 +109,7 @@ number_valueOf(const fn_call& fn)
     // This is so trace(Number.prototype == Object) return true in swf5 ?
     boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
 
-    return obj->get_primitive_value();
+    return obj->value();
 }
 
 as_value
