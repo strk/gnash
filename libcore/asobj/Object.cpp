@@ -23,10 +23,11 @@
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
-#include "builtin_function.h" // need builtin_function
-#include "movie_definition.h" // for get_exported_resource
-#include "sprite_definition.h" // for get_movie_definition()
-#include "VM.h" // for SWF version (attachObjectInterface)
+#include "builtin_function.h" 
+#include "NativeFunction.h" 
+#include "movie_definition.h" 
+#include "sprite_definition.h"
+#include "VM.h" 
 #include "namedStrings.h" // for NSV::PROP_TO_STRING
 #include "Global_as.h"
 

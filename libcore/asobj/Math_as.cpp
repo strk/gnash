@@ -20,13 +20,6 @@
 //
 // This file implements methods of the ActionScript Math class.
 //
-// They are all static methods; there is no Math class object as such.
-//
-// TODO:
-//	min(), max() and pow(1) return NaN here; they should return
-//	Infinity, -Infinity and 1 respectively
-//
-
 
 #include "VM.h" // get random generator
 #include "fn_call.h"
@@ -34,6 +27,7 @@
 #include "Math_as.h"
 #include "log.h"
 #include "builtin_function.h" 
+#include "NativeFunction.h" 
 #include "Object.h" // for getObjectInterface
 #include "GnashNumeric.h"
 

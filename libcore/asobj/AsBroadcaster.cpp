@@ -26,6 +26,7 @@
 #include "AsBroadcaster.h"
 #include "fn_call.h"
 #include "builtin_function.h"
+#include "NativeFunction.h" 
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
 #include "Global_as.h"

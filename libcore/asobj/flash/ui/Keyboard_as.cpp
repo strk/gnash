@@ -30,6 +30,7 @@
 #include "action.h" // for call_method
 #include "VM.h" // for registerNative
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" 
 #include "Object.h"
 #include "AsBroadcaster.h" //for initializing self as a broadcaster
 #include "namedStrings.h"

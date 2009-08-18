@@ -24,6 +24,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "Global_as.h"
 #include "builtin_function.h"
+#include "NativeFunction.h" 
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
 

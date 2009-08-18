@@ -26,6 +26,7 @@
 #include "PropFlags.h"
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
+#include "NativeFunction.h" 
 #include "Array_as.h"
 #include "AsBroadcaster.h"
 #include "Boolean_as.h"

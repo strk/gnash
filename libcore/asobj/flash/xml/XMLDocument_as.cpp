@@ -30,6 +30,7 @@
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"
 #include "builtin_function.h"
+#include "NativeFunction.h"
 #include "VM.h"
 #include "namedStrings.h"
 #include "StringPredicates.h"

@@ -24,13 +24,14 @@
 #include "VM.h"
 #include "flash/net/SharedObject_as.h" // for SharedObjectLibrary
 #include "smart_ptr.h" // GNASH_USE_GC
+#include "NativeFunction.h"
 #include "builtin_function.h"
 #include "movie_definition.h"
 #include "Movie.h"
 #include "movie_root.h"
 #include "Globals.h"
 #include "Global_as.h"
-#include "rc.h" //for overriding default version string with rcfile
+#include "rc.h" 
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
 
@@ -274,15 +275,22 @@ VM::registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y)
     //log_debug("Registering function %p as ASnative(%d, %d) ", (void*)fun, x, y);
     assert(fun);
     assert(!_asNativeTable[x][y]);
-    _asNativeTable[x][y]=fun;
+    _asNativeTable[x][y] = fun;
 }
 
-builtin_function*
-VM::getNative(unsigned int x, unsigned int y)
+NativeFunction*
+VM::getNative(unsigned int x, unsigned int y) const
 {
-	as_c_function_ptr fun = _asNativeTable[x][y];
-	if (fun) return _global->createFunction(fun);
-	return 0;
+    AsNativeTable::const_iterator row = _asNativeTable.find(x);
+    if (row == _asNativeTable.end()) return 0;
+    FuncMap::const_iterator col = row->second.find(y);
+    if (col == row->second.end()) return 0;
+    as_c_function_ptr fun = col->second;
+
+    NativeFunction* f = new NativeFunction(*_global, fun);
+    f->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor().get());
+    return f;
 }
 
 } // end of namespace gnash

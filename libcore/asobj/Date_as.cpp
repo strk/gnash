@@ -74,6 +74,7 @@
 #include "Global_as.h"
 #include "GnashException.h"
 #include "builtin_function.h"
+#include "NativeFunction.h" 
 #include "Object.h" // for getObjectInterface
 #include "ClockTime.h"
 #include "VM.h"

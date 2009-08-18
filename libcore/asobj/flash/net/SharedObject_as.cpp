@@ -37,6 +37,7 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" 
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "Property.h"

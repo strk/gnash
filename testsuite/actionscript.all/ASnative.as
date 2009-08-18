@@ -275,8 +275,13 @@ ret = a(f, "level1/level2/settings", "/", undefined);
 xcheck_equals(ret, true);
 xcheck_equals (typeof(f.data), "object");
 
+// Check that ASnative returns a new function, not the same one.
+a = ASnative(2106, 204);
+b = ASnative(2106, 204);
+check(a != b);
+
 #if OUTPUT_VERSION > 5
-check_totals(83);
+check_totals(84);
 #else
-check_totals(80);
+check_totals(81);
 #endif
