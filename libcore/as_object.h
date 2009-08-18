@@ -275,23 +275,6 @@ public:
     /// does nothing.
     virtual void queueLoad(std::auto_ptr<IOChannel> /*str*/) {};
 
-    /// Return the "primitive" value of this object
-    //
-    /// The default implementation returns an Object value,
-    /// other objects can override this function
-    /// to provide another "preferred" primitive. Primitive
-    /// values are: undefined, null, boolean, string, number, object.
-    ///
-    /// See ECMA-2.6.2 (section 4.3.2).
-    ///
-    virtual as_value get_primitive_value() const
-    {
-        // Since as_value(const as_object*) doesn't exist
-        // we have to cast the value to non-const, or
-        // the as_value will result as beeing a BOOLEAN ! (?)
-        return as_value(const_cast<as_object*>(this)); 
-    }
-
     /// Set a member value
     //
     ///
