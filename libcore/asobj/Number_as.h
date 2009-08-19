@@ -33,6 +33,8 @@ class Global_as;
 /// Initialize the global Number class
 void number_class_init(as_object& global, const ObjectURI& uri);
 
+void registerNumberNative(as_object& global);
+
 }
 
 #endif // GNASH_NUMBER_H

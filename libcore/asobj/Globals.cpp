@@ -906,6 +906,50 @@ global_assetpropflags(const fn_call& fn)
     return as_value();
 }
 
+// ASconstructor function
+// See: http://osflash.org/flashcoders/undocumented/asnative?s=asnative
+as_value
+global_asconstructor(const fn_call& fn)
+{
+
+    if (fn.nargs < 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(    
+        log_aserror(_("ASNative(%s): needs at least two arguments"),
+            fn.dump_args());
+        )
+        return as_value();
+    }
+
+    const int sx = fn.arg(0).to_int();
+    const int sy = fn.arg(1).to_int();
+
+    if (sx < 0 || sy < 0) {
+        IF_VERBOSE_ASCODING_ERRORS(    
+            log_aserror(_("ASconstructor(%s): args must be 0 or above"),
+                fn.dump_args());
+        )
+        return as_value();
+    }
+
+    const unsigned int x = static_cast<unsigned int>(sx);
+    const unsigned int y = static_cast<unsigned int>(sy);
+
+    VM& vm = getVM(fn);
+    as_function* fun = vm.getNative(x, y);
+    if (!fun) {
+        log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
+        return as_value();
+    }
+
+    Global_as* gl = getGlobal(fn);
+    as_object* proto = getObjectInterface();
+    fun->set_prototype(gl->createObject(proto));
+
+    return as_value(fun);
+        
+}
+
 // ASNative function
 // See: http://osflash.org/flashcoders/undocumented/asnative?s=asnative
 as_value
@@ -926,19 +970,12 @@ global_asnative(const fn_call& fn)
     const int sx = fn.arg(0).to_int();
     const int sy = fn.arg(1).to_int();
 
-    if ( sx < 0 )
-    {
+    if (sx < 0 || sy < 0) {
         IF_VERBOSE_ASCODING_ERRORS(    
-        log_aserror(_("ASNative(%s): first arg must be >= 0"), fn.dump_args());
+            log_aserror(_("ASnative(%s): args must be 0 or above"),
+                fn.dump_args());
         )
-        return ret;
-    }
-    if ( sy < 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(    
-        log_aserror(_("ASNative(%s): second arg must be >= 0"), fn.dump_args());
-        )
-        return ret;
+        return as_value();
     }
 
     const unsigned int x = static_cast<unsigned int>(sx);
@@ -1045,15 +1082,6 @@ as_value
 global_assetnativeaccessor(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
-    return as_value();
-}
-
-// ASconstructor function
-// TODO: find dox 
-as_value
-global_asconstructor(const fn_call& /*fn*/)
-{
-    LOG_ONCE(log_unimpl("ASconstructor"));
     return as_value();
 }
 
@@ -1294,6 +1322,8 @@ registerNatives(as_object& global)
     registerFunctionNative(global);
     registerStringNative(global);
     registerArrayNative(global);
+    registerNumberNative(global);
+    registerBooleanNative(global);
     registerMovieClipNative(global);
     registerSelectionNative(global);
     registerColorNative(global);

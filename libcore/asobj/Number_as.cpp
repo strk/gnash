@@ -25,8 +25,9 @@
 #include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "as_value.h" // for doubleToString
-#include "builtin_function.h" // need builtin_function
-#include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "builtin_function.h"
+#include "NativeFunction.h"
+#include "VM.h"
 #include "Object.h" // for getObjectInterface
 
 #include <sstream>
@@ -117,9 +118,9 @@ number_ctor(const fn_call& fn)
 void
 attachNumberInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(number_toString));
-    o.init_member("valueOf", gl->createFunction(number_valueOf));
+    VM& vm = getVM(o);
+    o.init_member("valueOf", vm.getNative(106, 0));
+    o.init_member("toString", vm.getNative(106, 1));
 }
 
 void
@@ -160,6 +161,15 @@ number_class_init(as_object& where, const ObjectURI& uri)
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
+}
+
+void
+registerNumberNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(number_valueOf, 106, 0);
+    vm.registerNative(number_toString, 106, 1);
+    vm.registerNative(number_ctor, 106, 2);
 }
 
 } // namespace gnash

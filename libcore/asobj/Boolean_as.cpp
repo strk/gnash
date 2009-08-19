@@ -27,8 +27,9 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h"
 #include "GnashException.h"
-#include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "VM.h" 
 #include "Object.h" // for getObjectInterface
 
 namespace gnash {
@@ -75,16 +76,24 @@ boolean_class_init(as_object& where, const ObjectURI& uri)
 
 }
 
+void
+registerBooleanNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(boolean_valueof, 107, 0);
+    vm.registerNative(boolean_tostring, 107, 1);
+    vm.registerNative(boolean_ctor, 107, 2);
+}
+
 namespace {
 
 
 void
 attachBooleanInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
-    o.init_member("toString", gl->createFunction(boolean_tostring));
-    o.init_member("valueOf", gl->createFunction(boolean_valueof));
+    VM& vm = getVM(o);
+    o.init_member("valueOf", vm.getNative(107, 0));
+    o.init_member("toString", vm.getNative(107, 1));
 }
 
 as_object*
