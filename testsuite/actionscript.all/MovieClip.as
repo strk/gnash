@@ -2342,7 +2342,7 @@ check_equals(_level0.t1.getSWFVersion(), undefined);
 #else
 xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 #endif
-xcheck_equals(_level0.t1.toString(), "[object Object]");
+check_equals(_level0.t1.toString(), "[object Object]");
 _level0.t1.getSWFVersion = MovieClip.prototype.getSWFVersion;
 xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 
