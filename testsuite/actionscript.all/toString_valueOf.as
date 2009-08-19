@@ -184,6 +184,9 @@ check(str3 == 102);
 // Check what String.valueOf returns for non String objects.
 
 svo = String.prototype.valueOf;
+
+check_equals(svo(), "_level0");
+
 f = function() {};
 f.vo = svo;
 check_equals(f.vo(), "[type Function]");
@@ -496,7 +499,7 @@ s.toString = ts;
 check_equals(s.toString(), "[object Object]");
 
 #if OUTPUT_VERSION < 6
- check_totals(130);
+ check_totals(131);
 #else
- check_totals(148);
+ check_totals(149);
 #endif

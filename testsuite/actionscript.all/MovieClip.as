@@ -2339,10 +2339,11 @@ xcheck_equals(o.getSWFVersion(), -1);
 createTextField("t1", 3, 0, 100, 100, 100);
 #if OUTPUT_VERSION > 5
 check_equals(_level0.t1.getSWFVersion(), undefined);
+check_equals(_level0.t1.toString(), "[object Object]");
 #else
 xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
+xcheck_equals(_level0.t1.toString(), "[object Object]");
 #endif
-check_equals(_level0.t1.toString(), "[object Object]");
 _level0.t1.getSWFVersion = MovieClip.prototype.getSWFVersion;
 xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 
