@@ -477,9 +477,15 @@ check_equals(o.toStringCalls, 1);
 check_equals(typeof(a), "string");
 check_equals(a, "[type Object]");
 
+// Check that Object.prototype.toString returns "[object Object]"
+ts = Object.prototype.toString;
+check_equals(ts(), "[object Object]");
+s = new String("hh");
+s.toString = ts;
+check_equals(s.toString(), "[object Object]");
 
 #if OUTPUT_VERSION < 6
- check_totals(126);
+ check_totals(127);
 #else
- check_totals(144);
+ check_totals(145);
 #endif
