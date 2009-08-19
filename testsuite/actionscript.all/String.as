@@ -1076,6 +1076,7 @@ check_equals( b, "f");
 
 var stringInstance = new String();
 check (stringInstance.__proto__ != undefined);
+check_equals(stringInstance.__proto__.valueOf, "[type Object]");
 check (stringInstance.__proto__ == String.prototype);
 check_equals (typeOf(String.prototype.constructor), 'function');
 check (String.prototype.constructor == String);
@@ -1300,7 +1301,7 @@ check(!String.prototype.hasOwnProperty('length'));
 
 //----- END OF TESTS
 
-var baseTests = 319;
+var baseTests = 320;
 var asmTests = 23;
 var ge6Tests = 16;
 
