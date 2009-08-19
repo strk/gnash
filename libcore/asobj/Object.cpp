@@ -195,14 +195,17 @@ object_ctor(const fn_call& fn)
 }
 
 /// Object.toString returns one of two values: [type Function] if it is a 
-/// function, [object Object] if it is an object.
+/// function, [object Object] if it is an object. Gnash wrongly regards super
+/// as a function, so we have to handle that too.
 as_value
 object_toString(const fn_call& fn)
 {
     as_object* obj = fn.this_ptr.get();
 
-    if (!obj || !obj->to_function()) return as_value("[object Object]");
-    return as_value("[type Function]");
+    if (obj && obj->to_function() && !obj->isSuper()) {
+        return as_value("[type Function]");
+    }
+    return as_value("[object Object]");
 }
 
 as_value
