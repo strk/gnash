@@ -119,8 +119,12 @@ String.prototype = 8;
 check_equals(typeof(String.prototype), "number");
 check_equals(String.prototype, 8);
 s = new String("hello");
+#if OUTPUT_VERSION == 5
+check_equals(s, undefined);
+#else
 xcheck_equals(s, undefined);
-xcheck_equals(s.__proto__, 8);
+#endif
+check_equals(s.__proto__, 8);
 check_equals(typeof(s), "object");
 check(!s instanceOf String);
 
