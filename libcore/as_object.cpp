@@ -67,29 +67,24 @@ class as_super : public as_function
 {
 public:
 
-	as_super(Global_as& gl, as_function* ctor, as_object* proto)
+	as_super(Global_as& gl, as_object* super)
 		:
         as_function(gl),
-		_ctor(ctor),
-		_proto(proto)
+		_super(super)
 	{
-		set_prototype(proto);
+		set_prototype(prototype());
 	}
 
 	virtual bool isSuper() const { return true; }
 
 	virtual as_object* get_super(const char* fname=0);
 
-	std::string get_text_value() const
-	{
-		return "[object Object]";
-	}
-
 	// Fetching members from 'super' yelds a lookup on the associated prototype
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0)
 	{
-		if ( _proto ) return _proto->get_member(name, val, nsname);
+        as_object* proto = prototype();
+		if (proto) return proto->get_member(name, val, nsname);
 		log_debug("Super has no associated prototype");
 		return false;
 	}
@@ -108,8 +103,12 @@ public:
 	/// Dispatch.
 	virtual as_value operator()(const fn_call& fn)
 	{
-		//log_debug("Super call operator. fn.this_ptr is %p", fn.this_ptr);
-		if ( _ctor ) return _ctor->call(fn);
+        std::auto_ptr<std::vector<as_value> > args(
+            new std::vector<as_value>(fn.getArgs()));
+        fn_call fn2(fn.this_ptr.get(), fn.env(), args, fn.super, true);
+        assert(fn2.isInstantiation());
+        as_function* ctor = constructor();
+		if (ctor) return ctor->call(fn2);
 		log_debug("Super has no associated constructor");
 		return as_value();
 	}
@@ -118,15 +117,21 @@ protected:
 
 	virtual void markReachableResources() const
 	{
-		if ( _ctor ) _ctor->setReachable();
-		if ( _proto ) _proto->setReachable();
+		if (_super) _super->setReachable();
 		markAsFunctionReachable();
 	}
 
 private:
 
-	as_function* _ctor;
-	as_object* _proto;
+    as_object* prototype() {
+        return _super ? _super->get_prototype().get() : 0;
+    }
+
+    as_function* constructor() {
+        return _super ? _super->get_constructor() : 0;
+    }
+
+	as_object* _super;
 };
 
 as_object*
@@ -138,83 +143,37 @@ as_super::get_super(const char* fname)
 
 	// Our class prototype is __proto__.
 	as_object* proto = get_prototype().get(); 
-	if ( ! proto )
-	{
-		return new as_super(*getGlobal(*this), 0, 0);
-	}
+	if (!proto) return new as_super(*getGlobal(*this), 0);
 
-	// proto's __proto__ is superProto 
-	as_object* superProto = proto->get_prototype().get();
+    if (!fname || getSWFVersion(*this) <= 6) {
+        return new as_super(*getGlobal(*this), proto);
+    }
 
-	// proto's __constructor__ is superCtor
-	as_function* superCtor = proto->get_constructor();
-	assert(superCtor == get_constructor());
+    string_table& st = getStringTable(*this);
+    string_table::key k = st.find(fname);
 
-	//log_debug("super %p proto is %p, its prototype %p", this, proto, proto->get_prototype());
+    as_object* owner = 0;
+    proto->findProperty(k, 0, &owner);
+    if (!owner) return 0;
 
-	if ( fname && getSWFVersion(*this) > 6)
-	{
-		as_object* owner = 0;
-		string_table& st = getStringTable(*this);
-		string_table::key k = st.find(fname);
+    if (owner == proto) return new as_super(*getGlobal(*this), proto);
 
-		proto->findProperty(k, 0, &owner);
-		if ( ! owner )
-		{
-			//log_debug("get_super: can't find property %s", fname);
-			return 0;
-		}
+    as_object* tmp = proto;
+    while (tmp && tmp->get_prototype() != owner) {
+        tmp = tmp->get_prototype().get();
+    }
+    // ok, now 'tmp' should be the object whose __proto__ member
+    // contains the actual named method.
+    //
+    // in the C:B:A:F case this would be B when calling
+    // super.myName() from C.prototype.myName()
+    
+    // well, since we found the property, it must be somewhere!
+    assert(tmp); 
 
-		//log_debug("object containing method %s is %p, its __proto__ is %p", fname, owner, owner->get_prototype());
+    if (tmp != proto) { return new as_super(*getGlobal(*this), tmp); }
+    return new as_super(*getGlobal(*this), owner);
 
-		assert(owner);
-
-		if ( owner != proto )
-		{
-			as_object* tmp = proto;
-			while (tmp && tmp->get_prototype() != owner) tmp = tmp->get_prototype().get();
-			// ok, now 'tmp' should be the object whose __proto__ member contains
-			// the actual named method.
-			//
-			// in the C:B:A:F case this would be B when calling super.myName() from
-			// C.prototype.myName()
-			//
-
-			assert(tmp); // well, since we found the property, it must be somewhere!
-
-			//log_debug("tmp is %p", tmp);
-
-			if ( tmp != proto )
-			{
-				//assert(superProto == tmp->get_prototype().get());
-
-				//superCtor = superProto->get_constructor();
-				superCtor = tmp->get_constructor();
-				//if ( ! superCtor ) log_debug("superProto (owner) has no __constructor__");
-			}
-			else
-			{
-				//log_debug("tmp == proto");
-				superCtor = owner->get_constructor(); // most likely..
-				if ( superProto ) superProto = superProto->get_prototype().get();
-			}
-		}
-		else
-		{
-			// TODO: check if we've anything to do here...
-			//log_debug("owner == proto == %p", owner);
-			//if ( superProto ) superProto = superProto->get_prototype().get();
-			//superCtor = superProto->get_constructor();
-			//if ( superProto )
-			//{
-			//	superCtor = superProto->get_constructor();
-			//} // else superCtor = NULL ?
-		}
-	}
-
-	as_object* super = new as_super(*getGlobal(*this), superCtor, superProto);
-
-	return super;
 }
 
 
@@ -252,6 +211,7 @@ const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
 	:
+    _proxy(0),
 	_vm(getVM(gl)),
 	_members(_vm)
 {
@@ -259,6 +219,7 @@ as_object::as_object(Global_as& gl)
 
 as_object::as_object()
 	:
+    _proxy(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
@@ -266,6 +227,7 @@ as_object::as_object()
 
 as_object::as_object(as_object* proto)
 	:
+    _proxy(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
@@ -274,6 +236,7 @@ as_object::as_object(as_object* proto)
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
+    _proxy(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
@@ -287,6 +250,7 @@ as_object::as_object(const as_object& other)
 #else
 	GcResource(), 
 #endif
+    _proxy(0),
 	_vm(VM::get()),
 	_members(other._members)
 {
@@ -432,13 +396,7 @@ as_object::get_super(const char* fname)
 		if (owner != this) proto = owner; 
 	}
 
-	// proto's __proto__ is superProto 
-	as_object* superProto = proto ? proto->get_prototype().get() : 0;
-
-	// proto's __constructor__ is superCtor
-	as_function* superCtor = proto ? proto->get_constructor() : 0;
-
-	as_object* super = new as_super(*getGlobal(*this), superCtor, superProto);
+	as_object* super = new as_super(*getGlobal(*this), proto);
 
 	return super;
 }
@@ -1129,23 +1087,6 @@ bool
 as_object::hasOwnProperty(string_table::key key, string_table::key nsname)
 {
 	return getOwnProperty(key, nsname) != NULL;
-}
-
-as_value
-as_object::tostring_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
-
-	std::string text_val = obj->get_text_value();
-	return as_value(text_val);
-}
-
-as_value
-as_object::valueof_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
-
-	return obj->get_primitive_value();
 }
 
 boost::intrusive_ptr<as_object>

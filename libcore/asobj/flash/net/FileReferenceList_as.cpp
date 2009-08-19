@@ -88,12 +88,6 @@ public:
         :
         as_object(getFileReferenceListInterface())
     {}
-
-    // override from as_object ?
-    //std::string get_text_value() const { return "FileReferenceList"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 
 

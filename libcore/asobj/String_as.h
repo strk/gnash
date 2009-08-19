@@ -21,6 +21,7 @@
 #define GNASH_STRING_H
 
 #include <string>
+#include "as_object.h"
 
 namespace gnash {
 
@@ -28,7 +29,22 @@ class as_object;
 class ObjectURI;
 class Global_as;
 
-// Initialize the global String class
+class String_as : public Proxy
+{
+
+public:
+
+    explicit String_as(const std::string& s);
+
+    const std::string& value() {
+        return _string;
+    }
+
+private:
+    std::string _string;
+};
+
+/// Initialize the global String class
 void string_class_init(as_object& global, const ObjectURI& uri);
 
 void registerStringNative(as_object& global);

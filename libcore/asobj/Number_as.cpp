@@ -25,8 +25,9 @@
 #include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "as_value.h" // for doubleToString
-#include "builtin_function.h" // need builtin_function
-#include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "builtin_function.h"
+#include "NativeFunction.h"
+#include "VM.h"
 #include "Object.h" // for getObjectInterface
 
 #include <sstream>
@@ -35,35 +36,17 @@
 
 namespace gnash {
 
-namespace {
-    as_object* getNumberInterface();
-}
-
-class Number_as : public as_object
+class Number_as : public Proxy
 {
 public:
 
     Number_as(double val)
         :
-        as_object(getNumberInterface()),
         _val(val)
     {
     }
 
-    // override from as_object
-    std::string get_text_value() const
-    {
-        return as_value::doubleToString(_val);
-    }
-
-    // override from as_object
-    double get_numeric_value() const
-    {
-        return _val;
-    }
-
-    as_value get_primitive_value() const 
-    {
+    double value() const {
         return _val;
     }
 
@@ -71,7 +54,6 @@ private:
     
     // the number value
     double _val;
-
 
 };
 
@@ -82,9 +64,9 @@ number_toString(const fn_call& fn)
 {
     // Number.toString must only work for number object, not generic ones.
     // This is so trace(Number.prototype) doesn't return 0 ...
-    boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
+    Number_as* obj = checkType<Number_as>(fn.this_ptr.get());
 
-    double val = obj->get_numeric_value();
+    double val = obj->value();
     unsigned radix = 10;
 
     if ( fn.nargs ) 
@@ -109,9 +91,9 @@ number_valueOf(const fn_call& fn)
 {
     // Number.valueOf must only work for number object, not generic ones.
     // This is so trace(Number.prototype == Object) return true in swf5 ?
-    boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
+    Number_as* obj = checkType<Number_as>(fn.this_ptr.get());
 
-    return obj->get_primitive_value();
+    return obj->value();
 }
 
 as_value
@@ -128,17 +110,17 @@ number_ctor(const fn_call& fn)
         return as_value(val);
     }
 
-    Number_as* obj = new Number_as(val);
+    fn.this_ptr->setProxy(new Number_as(val));
     
-    return as_value(obj); // will keep alive
+    return as_value(); 
 }
 
 void
 attachNumberInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(number_toString));
-    o.init_member("valueOf", gl->createFunction(number_valueOf));
+    VM& vm = getVM(o);
+    o.init_member("valueOf", vm.getNative(106, 0));
+    o.init_member("toString", vm.getNative(106, 1));
 }
 
 void
@@ -162,20 +144,6 @@ attachNumberStaticInterface(as_object& o)
             as_value(-std::numeric_limits<double>::infinity()), cflags);
 }
 
-as_object*
-getNumberInterface()
-{
-    static boost::intrusive_ptr<as_object> o=NULL;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        attachNumberInterface(*o);
-    }
-
-    return o.get();
-}
-
-
 } // anonymous namespace
 
 
@@ -184,14 +152,24 @@ void
 number_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
-    as_object* proto = getNumberInterface();
+    as_object* proto = gl->createObject(getObjectInterface());
     as_object* cl = gl->createClass(&number_ctor, proto);
+    attachNumberInterface(*proto);
     attachNumberStaticInterface(*cl);
 
     // Register _global.Number
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
+}
+
+void
+registerNumberNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(number_valueOf, 106, 0);
+    vm.registerNative(number_toString, 106, 1);
+    vm.registerNative(number_ctor, 106, 2);
 }
 
 } // namespace gnash

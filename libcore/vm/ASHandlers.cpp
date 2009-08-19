@@ -3153,7 +3153,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     const VM& vm = getVM(env);
 
     int swfVersion = vm.getSWFVersion();
-    if ( swfVersion <= 5 )
+    if (swfVersion <= 5)
     {
         as_value op1 = env.top(0);
         try { op1 = op1.to_primitive(); }

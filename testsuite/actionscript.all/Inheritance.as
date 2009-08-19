@@ -560,6 +560,55 @@ check (  ob instanceof C );
 
 #endif // MING_SUPPORTS_ASM_IMPLEMENTS
 
+CtorA = function() {
+    this.a = 4;
+};
+
+CtorB = function() {
+    this.b = "string";
+};
+
+PrA = {};
+PrA.__proto__ = { vv:8 };
+
+PrB = {};
+PrB.__proto__ = { gg:"moo" };
+
+tests = 0;
+
+#if OUTPUT_VERSION > 5
+
+// Check that changing __proto__.__constructor also changes super(), and the
+// same for __proto__.__proto__
+Obj = function() {
+    check_equals(this.a, undefined);
+    check_equals(this.b, undefined);
+    check_equals(super.vv, 8);
+    check_equals(super.gg, undefined);
+    
+    this.__proto__.__constructor__ = CtorA;
+    super();
+    check_equals(this.a, 4);
+    check_equals(this.b, undefined);
+
+
+    this.__proto__.__constructor__ = CtorB;
+    super();
+    check_equals(this.a, 4);
+    check_equals(this.b, "string");
+
+    this.__proto__.__proto__ = PrB;
+    check_equals(super.vv, undefined);
+    check_equals(super.gg, "moo");
+
+    tests += 10;
+};  
+
+Obj.prototype = PrA;
+f = new Obj();
+
+#endif
+
 //------------------------------------------------
 // END OF TEST
 //------------------------------------------------
@@ -567,17 +616,17 @@ check (  ob instanceof C );
 #if OUTPUT_VERSION < 6
 
 # ifdef MING_SUPPORTS_ASM_IMPLEMENTS
-    check_totals(106); 
+    check_totals(106 + tests); 
 # else
-    check_totals(102); 
+    check_totals(102 + tests); 
 # endif
 
 #else // SWF6,7,8
 
 # ifdef MING_SUPPORTS_ASM_IMPLEMENTS
-    check_totals(163);
+    check_totals(163 + tests);
 # else
-    check_totals(159); 
+    check_totals(159 + tests); 
 # endif
 
 #endif

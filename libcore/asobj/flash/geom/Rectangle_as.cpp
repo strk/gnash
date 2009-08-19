@@ -125,12 +125,6 @@ public:
         :
         as_object(getRectangleInterface())
     {}
-
-    // override from as_object ?
-    //std::string get_text_value() const { return "Rectangle"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 
 

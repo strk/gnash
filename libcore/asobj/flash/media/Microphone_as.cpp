@@ -184,7 +184,7 @@ microphone_ctor(const fn_call& /*fn*/)
 
 // AS2 static accessor.
 as_value
-microphone_get(const fn_call& fn)
+microphone_get(const fn_call& /*fn*/)
 {
     static size_t newcount = 0;
     static boost::intrusive_ptr<microphone_as_object> permaMicPtr;

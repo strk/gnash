@@ -99,12 +99,6 @@ public:
 		:
 		as_object(getDisplacementMapFilterInterface())
 	{}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "DisplacementMapFilter"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
 };
 
 

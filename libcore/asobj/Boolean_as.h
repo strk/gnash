@@ -29,7 +29,9 @@ class Global_as;
 
 /// Initialize the global Boolean class
 void boolean_class_init(as_object& global, const ObjectURI& uri);
-  
+
+void registerBooleanNative(as_object& global);
+
 } // end of gnash namespace
 
 #endif

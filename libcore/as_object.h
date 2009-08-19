@@ -36,6 +36,7 @@
 #include <utility> // for std::pair
 #include <set>
 #include <sstream>
+#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -149,6 +150,12 @@ struct ObjectURI
     string_table::key name;
     string_table::key ns;
 
+};
+
+class Proxy
+{
+public:
+    virtual ~Proxy() {};
 };
 
 
@@ -267,36 +274,6 @@ public:
     /// Loads data from an IOChannel. The default implementation
     /// does nothing.
     virtual void queueLoad(std::auto_ptr<IOChannel> /*str*/) {};
-
-    /// Return the numeric value of this object
-    //
-    /// The default implementation converts the text value
-    /// to a number, override for a more performant implementation
-    ///
-    virtual double get_numeric_value() const
-    {
-        double d = 0;
-        std::istringstream is(get_text_value());
-        is >> d;
-        return d;
-    }
-
-    /// Return the "primitive" value of this object
-    //
-    /// The default implementation returns an Object value,
-    /// other objects can override this function
-    /// to provide another "preferred" primitive. Primitive
-    /// values are: undefined, null, boolean, string, number, object.
-    ///
-    /// See ECMA-2.6.2 (section 4.3.2).
-    ///
-    virtual as_value get_primitive_value() const
-    {
-        // Since as_value(const as_object*) doesn't exist
-        // we have to cast the value to non-const, or
-        // the as_value will result as beeing a BOOLEAN ! (?)
-        return as_value(const_cast<as_object*>(this)); 
-    }
 
     /// Set a member value
     //
@@ -1063,12 +1040,13 @@ public:
     ///
     void set_prototype(const as_value& proto, int flags = DefaultFlags);
 
-    /// @{ Common ActionScript methods for DisplayObjects
-    /// TODO: make protected
+    void setProxy(Proxy* p) {
+        _proxy.reset(p);
+    }
 
-    static as_value tostring_method(const fn_call& fn);
-
-    static as_value valueof_method(const fn_call& fn);
+    Proxy* proxy() const {
+        return _proxy.get();
+    }
 
 protected:
 
@@ -1138,6 +1116,8 @@ protected:
 
 private:
  
+    boost::scoped_ptr<Proxy> _proxy;
+
     /// The global object whose scope contains this object.
     VM& _vm;   
 
@@ -1210,6 +1190,41 @@ ensureType (boost::intrusive_ptr<as_object> obj)
     if (!ret) {
         std::string target = typeName(ret.get());
         std::string source = typeName(obj.get());
+
+        std::string msg = "builtin method or gettersetter for " +
+            target + " called from " + source + " instance.";
+
+        throw ActionTypeError(msg);
+    }
+    return ret;
+}
+
+
+/// Check whether the object is an instance of a known type.
+//
+/// This is used to check the type of certain objects when it can't be
+/// done through ActionScript and properties. Examples include conversion
+/// of Date and String objects.
+template<typename T>
+bool
+isInstanceOf(as_object* obj, T*& proxy)
+{
+    proxy = dynamic_cast<T*>(obj->proxy());
+    return proxy;
+}
+
+/// An equivalent to ensureType that works with the proxy object.
+template<typename T>
+T*
+checkType(as_object* obj)
+{
+    if (!obj) throw ActionTypeError();
+
+    T* ret = dynamic_cast<T*>(obj->proxy());
+
+    if (!ret) {
+        std::string target = typeName(ret);
+        std::string source = typeName(obj);
 
         std::string msg = "builtin method or gettersetter for " +
             target + " called from " + source + " instance.";

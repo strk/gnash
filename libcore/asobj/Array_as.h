@@ -165,12 +165,6 @@ public:
     /// Convert array to string.
 	std::string toString() const;
 
-	// override from as_object
-	std::string get_text_value() const
-	{
-		return toString();
-	}
-
 	unsigned int size() const;
 
 	void resize(unsigned int);

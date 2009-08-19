@@ -24,7 +24,7 @@
 
 namespace gnash {
 
-class Date_as : public as_object
+class Date_as : public Proxy
 {
 public:
 
@@ -33,10 +33,6 @@ public:
     void setTimeValue(const double& value) { _timeValue = value; }
 
     double getTimeValue() const { return _timeValue; }
-
-    static void registerNative(as_object& global);
-
-    static void init(as_object& where, const ObjectURI& uri);
 
     std::string toString() const;
 
@@ -48,6 +44,9 @@ private:
 
 };
 
+void registerDateNative(as_object& global);
+
+void date_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 

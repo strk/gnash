@@ -105,11 +105,6 @@ public:
         as_object(getFileReferenceInterface())
     {}
 
-    // override from as_object ?
-    //std::string get_text_value() const { return "FileReference"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
 };
 
 

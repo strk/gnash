@@ -99,13 +99,6 @@ public:
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }
 
-	/// TODO: check if a user-defined 'toString'
-	///       will be used when available.
-	std::string get_text_value() const
-	{
-		return "[type Function]";
-	}
-
 	/// Return the built-in Function constructor
 	static NativeFunction* getFunctionConstructor();
 

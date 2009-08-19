@@ -27,8 +27,9 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h"
 #include "GnashException.h"
-#include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "VM.h" 
 #include "Object.h" // for getObjectInterface
 
 namespace gnash {
@@ -41,16 +42,15 @@ namespace {
     as_object* getBooleanInterface();
 }
 
-class Boolean_as: public as_object
+class Boolean_as: public Proxy
 {
 
 public:
 
     explicit Boolean_as(bool val)
         :
-        as_object(getBooleanInterface())
+        _val(val)
     {
-        _val = val;
     }
     
     bool value() const { return _val; }
@@ -76,16 +76,24 @@ boolean_class_init(as_object& where, const ObjectURI& uri)
 
 }
 
+void
+registerBooleanNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(boolean_valueof, 107, 0);
+    vm.registerNative(boolean_tostring, 107, 1);
+    vm.registerNative(boolean_ctor, 107, 2);
+}
+
 namespace {
 
 
 void
 attachBooleanInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
-    o.init_member("toString", gl->createFunction(boolean_tostring));
-    o.init_member("valueOf", gl->createFunction(boolean_valueof));
+    VM& vm = getVM(o);
+    o.init_member("valueOf", vm.getNative(107, 0));
+    o.init_member("toString", vm.getNative(107, 1));
 }
 
 as_object*
@@ -106,10 +114,8 @@ getBooleanInterface()
 as_value
 boolean_tostring(const fn_call& fn)
 {
-    boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
-    
+    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr.get());
     if (obj->value()) return as_value("true");
-
     return as_value("false");
 }
 
@@ -117,25 +123,24 @@ boolean_tostring(const fn_call& fn)
 as_value
 boolean_valueof(const fn_call& fn) 
 {
-    boost::intrusive_ptr<Boolean_as> obj = ensureType<Boolean_as>(fn.this_ptr);
-
+    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr.get());
     return as_value(obj->value());
 }
 
 as_value
 boolean_ctor(const fn_call& fn)
 {
-    if (fn.nargs > 0)
-    {
-        bool val = fn.arg(0).to_bool();
-        if ( ! fn.isInstantiation() ) return as_value(val);
-        
-        return as_value(new Boolean_as(val));
+
+    if (!fn.isInstantiation()) {
+        if (!fn.nargs) return as_value();
+        return as_value(fn.arg(0).to_bool());
     }
 
-    if (!fn.isInstantiation()) return as_value();
-        
-    return as_value(new Boolean_as(false));
+    const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
+
+    as_object* obj = fn.this_ptr.get();
+    obj->setProxy(new Boolean_as(val));
+    return as_value();
 
 }
 

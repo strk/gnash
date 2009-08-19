@@ -294,6 +294,8 @@ public:
 	const char* typeOf() const;
 
 	/// Get the primitive type of this value
+    //
+    /// Only used in AVM2
 	primitive_types ptype() const;
 
 	// Chad: Document
@@ -475,15 +477,6 @@ public:
 	/// or NULL if it is not an ActionScript function.
 	as_function*	to_as_function() const;
 
-	/// Convert this value to a primitive type
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value& convert_to_primitive();
-
 	/// Return value as a primitive type
 	//
 	/// Primitive types are: undefined, null, boolean, string, number.
@@ -515,7 +508,7 @@ public:
 	///
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
-	as_value& convert_to_primitive(AsType hint);
+	as_value& convert_to_primitive();
 
 	/// Force type to number.
 	void convert_to_number();

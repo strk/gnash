@@ -39,6 +39,7 @@
 #include "SimpleBuffer.h"
 #include "StringPredicates.h"
 #include "Global_as.h"
+#include "String_as.h"
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 
@@ -54,7 +55,7 @@
 //#define GNASH_DEBUG_EQUALITY 1
 
 // Define the macro below to make to_primitive verbose
-// #define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
+//#define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
 
 // Define this macro to make soft references activity verbose
 #define GNASH_DEBUG_SOFT_REFERENCES
@@ -378,6 +379,11 @@ as_value::to_string() const
 		case AS_FUNCTION:
 		case OBJECT:
 		{
+            as_object* obj = m_type == AS_FUNCTION ? getFun().get() :
+                                                     getObj().get();
+            String_as* s;
+            if (isInstanceOf(obj, s)) return s->value();
+
 			try
 			{
 				as_value ret = to_primitive(STRING);
@@ -385,9 +391,7 @@ as_value::to_string() const
 				// specification, but seems required for compatibility with the
 				// reference player.
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" %s.to_primitive(STRING) returned %s", 
-						*this,
-						ret);
+				log_debug(" %s.to_primitive(STRING) returned %s", *this, ret);
 #endif
 				if ( ret.is_string() ) return ret.to_string();
 			}
@@ -428,34 +432,29 @@ as_value::to_string_versioned(int version) const
 	return to_string();
 }
 
+/// This is only used in AVM2.
 primitive_types
 as_value::ptype() const
 {
-	VM& vm = VM::get();
-	int swfVersion = vm.getSWFVersion();
 
 	switch (m_type)
 	{
-	case STRING: return PTYPE_STRING;
-	case NUMBER: return PTYPE_NUMBER;
-	case AS_FUNCTION:
-	case UNDEFINED:
-	case NULLTYPE:
-	case MOVIECLIP:
-		return PTYPE_NUMBER;
-	case OBJECT:
-	{
-		as_object* obj = getObj().get();
-		// Date objects should return TYPE_STRING (but only from SWF6 up)
-		// See ECMA-262 8.6.2.6
-		if ( swfVersion > 5 && obj->isDateObject() ) return PTYPE_STRING;
-		return PTYPE_NUMBER;
-	}
-	case BOOLEAN:
-		return PTYPE_BOOLEAN;
-	default:
-		break; // Should be only exceptions here.
-	}
+        case STRING: return PTYPE_STRING;
+        case NUMBER: return PTYPE_NUMBER;
+        case AS_FUNCTION:
+        case UNDEFINED:
+        case NULLTYPE:
+        case MOVIECLIP:
+            return PTYPE_NUMBER;
+        case OBJECT:
+        {
+            return PTYPE_NUMBER;
+        }
+        case BOOLEAN:
+            return PTYPE_BOOLEAN;
+        default:
+            break; // Should be only exceptions here.
+        }
 	return PTYPE_NUMBER;
 }
 
@@ -468,10 +467,10 @@ as_value::to_primitive() const
 
 	AsType hint = NUMBER;
 
-	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
-	{
-		hint = STRING;
-	}
+	if (m_type == OBJECT && swfVersion > 5) {
+        Date_as* d;
+        if (isInstanceOf(getObj().get(), d)) hint = STRING;
+    }
 
 	return to_primitive(hint);
 }
@@ -484,12 +483,13 @@ as_value::convert_to_primitive()
 
 	AsType hint = NUMBER;
 
-	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
-	{
-		hint = STRING;
-	}
+	if (m_type == OBJECT && swfVersion > 5) {
+        Date_as* d;
+        if (isInstanceOf<Date_as>(getObj().get(), d)) hint = STRING;
+    }
 
-	return convert_to_primitive(hint);
+    *this = to_primitive(hint);
+    return *this;
 }
 
 // Conversion to primitive value.
@@ -518,7 +518,7 @@ as_value::to_primitive(AsType hint) const
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function())) 
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");
@@ -550,14 +550,6 @@ as_value::to_primitive(AsType hint) const
 		// text representation for that object is used
 		// instead.
 		//
-		if ( ! obj->useCustomToString() )
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" not using custom toString");
-#endif
-			return as_value(obj->get_text_value());
-		}
-
 		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
                 (!method.is_function()) ) // ECMA says ! is_object()
 		{
@@ -591,112 +583,6 @@ as_value::to_primitive(AsType hint) const
 	return ret;
 
 }
-
-// Conversion to primitive value.
-as_value&
-as_value::convert_to_primitive(AsType hint) 
-{
-	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
-	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
-
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
-#endif 
-
-	// TODO: implement as_object::DefaultValue (ECMA-262 - 8.6.2.6)
-
-	as_value method;
-	as_object* obj = NULL;
-
-	if (hint == NUMBER)
-	{
-		if ( m_type == MOVIECLIP )
-		{
-			set_double(NaN);
-			return *this;
-		}
-		if ( m_type == OBJECT ) obj = getObj().get();
-		else obj = getFun().get();
-
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
-                (!method.is_object()) ) // ECMA says ! is_object()
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" valueOf not found");
-#endif
-			// Returning undefined here instead of throwing
-			// a TypeError passes tests in actionscript.all/Object.as
-			// and many swfdec tests, with no new failures (though
-			// perhaps we aren't testing enough).
-			set_undefined();
-			return *this;
-            
-		}
-	}
-	else
-	{
-		assert(hint==STRING);
-
-		if ( m_type == MOVIECLIP )
-		{
-			set_string(getCharacterProxy().getTarget());
-			return *this;
-		}
-
-		if ( m_type == OBJECT ) obj = getObj().get();
-		else obj = getFun().get();
-
-		// @@ Moock says, "the value that results from
-		// calling toString() on the object".
-		//
-		// When the toString() method doesn't exist, or
-		// doesn't return a valid number, the default
-		// text representation for that object is used
-		// instead.
-		//
-		if ( ! obj->useCustomToString() )
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" not using custom toString");
-#endif
-			set_string(obj->get_text_value());
-			return *this;
-		}
-
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || 
-                (!method.is_function()) ) // ECMA says ! is_object()
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" toString not found");
-#endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || 
-                    (!method.is_function()) ) // ECMA says ! is_object()
-			{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" valueOf not found");
-#endif
-				throw ActionTypeError();
-			}
-		}
-	}
-
-	assert(obj);
-
-	as_environment env(getVM(*obj));
-	as_value ret = call_method0(method, env, obj);
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-	log_debug("to_primitive: method call returned %s", ret);
-#endif
-	if ( ret.m_type == OBJECT || ret.m_type == AS_FUNCTION ) // not a primitive 
-	{
-		throw ActionTypeError();
-	}
-
-	*this = ret;
-
-	return *this;
-}
-
 
 bool
 as_value::parseNonDecimalInt(const std::string& s, double& d, bool whole)
@@ -2087,14 +1973,10 @@ as_value::newAdd(const as_value& op2)
 		convert_to_string_versioned(version);
 		string_concat(v2.to_string_versioned(version));
 	}
-	else
-	{
+	else {
 		// use numeric semantic
 		double v2num = v2.to_number();
-		//log_debug(_("v2 num = %g"), v2num);
 		double v1num = to_number();
-		//log_debug(_("v1 num = %g"), v1num);
-
 		set_double(v2num + v1num); 
 
 	}
@@ -2468,8 +2350,16 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read date: %e", dub);
 #endif
-            as_object* obj = new Date_as(dub);
-			ret.set_as_object(obj);
+
+            Global_as* gl = vm.getGlobal();
+            as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
+            if (ctor) {
+                std::auto_ptr<std::vector<as_value> > args(
+                        new std::vector<as_value>());
+                args->push_back(dub);
+                ret.set_as_object(ctor->constructInstance(as_environment(vm),
+                            args));
+            }
 
 			if (b + 2 > end) {
 				log_error(_("AMF0 read: premature end of input reading "
@@ -2526,52 +2416,14 @@ as_value::writeAMF0(SimpleBuffer& buf,
             as_object* obj = to_object(*vm.getGlobal()).get();
             assert(obj);
             OffsetTable::iterator it = offsetTable.find(obj);
-            if ( it == offsetTable.end() )
-            {
-                size_t idx = offsetTable.size()+1; // 1 for the first, etc...
+            if (it == offsetTable.end()) {
+                size_t idx = offsetTable.size() + 1; // 1 for the first, etc...
                 offsetTable[obj] = idx;
-
-                Array_as* ary = dynamic_cast<Array_as*>(obj);
-                if ( ary )
+                
+                Date_as* date;
+                if (isInstanceOf(obj, date))
                 {
-                    size_t len = ary->size();
-                    if ( allowStrict && ary->isStrict() )
-                    {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-                        log_debug(_("writeAMF0: serializing array of %d "
-                                    "elements as STRICT_ARRAY (index %d)"),
-                                    len, idx);
-#endif
-                        buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
-                        buf.appendNetworkLong(len);
-
-                        as_value elem;
-                        for (size_t i=0; i<len; ++i)
-                        {
-                            elem = ary->at(i);
-                            if ( ! elem.writeAMF0(buf, offsetTable, vm, allowStrict) )
-                            {
-                                log_error("Problems serializing strict array member %d=%s", i, elem);
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                    else 
-                    {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-                        log_debug(_("writeAMF0: serializing array of %d "
-                                    "elements as ECMA_ARRAY (index %d) [allowStrict:%d, isStrict:%d]"),
-                                    len, idx, allowStrict, ary->isStrict());
-#endif
-                        buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
-                        buf.appendNetworkLong(len);
-                    }
-                }
-                else if ( obj->isDateObject() )
-                {
-                    const Date_as& date = dynamic_cast<const Date_as&>(*obj);
-                    double d = date.getTimeValue(); 
+                    double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                     log_debug(_("writeAMF0: serializing date object "
                                 "with index %d and value %g"), idx, d);
@@ -2588,8 +2440,44 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
                     return true;
                 }
-                else
-                {
+
+                Array_as* ary = dynamic_cast<Array_as*>(obj);
+                if (ary) {
+                    const size_t len = ary->size();
+                    if (allowStrict && ary->isStrict()) {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                        log_debug(_("writeAMF0: serializing array of %d "
+                                    "elements as STRICT_ARRAY (index %d)"),
+                                    len, idx);
+#endif
+                        buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                        buf.appendNetworkLong(len);
+
+                        as_value elem;
+                        for (size_t i = 0; i < len; ++i) {
+                            elem = ary->at(i);
+                            if (!elem.writeAMF0(buf, offsetTable, vm,
+                                        allowStrict)) {
+                                log_error("Problems serializing strict array "
+                                        "member %d=%s", i, elem);
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    // A normal array.
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                    log_debug(_("writeAMF0: serializing array of %d "
+                                "elements as ECMA_ARRAY (index %d) "
+                                "[allowStrict:%d, isStrict:%d]"),
+                                len, idx, allowStrict, ary->isStrict());
+#endif
+                    buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
+                    buf.appendNetworkLong(len);
+                }
+                else {
+                    // It's a simple object
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                     log_debug(_("writeAMF0: serializing object (or function) "
                                 "with index %d"), idx);
@@ -2599,8 +2487,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
                 PropsBufSerializer props(buf, vm, offsetTable, allowStrict);
                 obj->visitNonHiddenPropertyValues(props);
-                if ( ! props.success() ) 
-                {
+                if (!props.success()) {
                     log_error("Could not serialize object");
                     return false;
                 }
@@ -2608,17 +2495,13 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 buf.appendByte(amf::Element::OBJECT_END_AMF0);
                 return true;
             }
-            else // object already seen
-            {
-                size_t idx = it->second;
+            size_t idx = it->second;
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                log_debug(_("writeAMF0: serializing object (or function) "
-                            "as reference to %d"), idx);
+            log_debug(_("writeAMF0: serializing object (or function) "
+                        "as reference to %d"), idx);
 #endif
-                buf.appendByte(amf::Element::REFERENCE_AMF0);
-                buf.appendNetworkShort(idx);
-                return true;
-            }
+            buf.appendByte(amf::Element::REFERENCE_AMF0);
+            buf.appendNetworkShort(idx);
             return true;
         }
 

@@ -181,6 +181,20 @@ str3 = str1+str2;
 check(str3 == "102"); 
 check(str3 == 102); 
 
+// Check what String.valueOf returns for non String objects.
+
+svo = String.prototype.valueOf;
+
+check_equals(svo(), "_level0");
+
+f = function() {};
+f.vo = svo;
+check_equals(f.vo(), "[type Function]");
+
+d = new Boolean(false);
+d.vo = svo;
+check_equals(d.vo(), "false");
+
 String.prototype.toString = function () {return "TO_STRING";};
 String.prototype.valueOf = function () {return "TO_VALUE";};
 
@@ -477,9 +491,15 @@ check_equals(o.toStringCalls, 1);
 check_equals(typeof(a), "string");
 check_equals(a, "[type Object]");
 
+// Check that Object.prototype.toString returns "[object Object]"
+ts = Object.prototype.toString;
+check_equals(ts(), "[object Object]");
+s = new String("hh");
+s.toString = ts;
+check_equals(s.toString(), "[object Object]");
 
 #if OUTPUT_VERSION < 6
- check_totals(126);
+ check_totals(131);
 #else
- check_totals(144);
+ check_totals(149);
 #endif
