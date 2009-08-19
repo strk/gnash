@@ -80,11 +80,6 @@ public:
 
 	virtual as_object* get_super(const char* fname=0);
 
-	std::string get_text_value() const
-	{
-		return "[object Object]";
-	}
-
 	// Fetching members from 'super' yelds a lookup on the associated prototype
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0)
@@ -108,8 +103,11 @@ public:
 	/// Dispatch.
 	virtual as_value operator()(const fn_call& fn)
 	{
-		//log_debug("Super call operator. fn.this_ptr is %p", fn.this_ptr);
-		if ( _ctor ) return _ctor->call(fn);
+        std::auto_ptr<std::vector<as_value> > args(
+                new std::vector<as_value>(fn.getArgs()));
+        fn_call fn2(fn.this_ptr.get(), fn.env(), args, fn.super, true);
+        assert(fn2.isInstantiation());
+		if (_ctor) return _ctor->call(fn2);
 		log_debug("Super has no associated constructor");
 		return as_value();
 	}

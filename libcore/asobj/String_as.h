@@ -49,15 +49,6 @@ void string_class_init(as_object& global, const ObjectURI& uri);
 
 void registerStringNative(as_object& global);
 
-/// Some value conversions, notably to_string(), need to know whether an
-/// Object is a String object or not. As this can't be done purely through
-/// AS properties, it's necessary to expose a method like this.
-inline bool
-isStringObject(as_object* obj, String_as*& s) {
-    s = dynamic_cast<String_as*>(obj->proxy());
-    return s;
-}
-
 }
 
 #endif // GNASH_STRING_H

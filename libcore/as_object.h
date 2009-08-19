@@ -1199,6 +1199,21 @@ ensureType (boost::intrusive_ptr<as_object> obj)
     return ret;
 }
 
+
+/// Check whether the object is an instance of a known type.
+//
+/// This is used to check the type of certain objects when it can't be
+/// done through ActionScript and properties. Examples include conversion
+/// of Date and String objects.
+template<typename T>
+bool
+isInstanceOf(as_object* obj, T*& proxy)
+{
+    proxy = dynamic_cast<T*>(obj->proxy());
+    return proxy;
+}
+
+/// An equivalent to ensureType that works with the proxy object.
 template<typename T>
 T*
 checkType(as_object* obj)
