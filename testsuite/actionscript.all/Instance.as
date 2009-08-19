@@ -129,7 +129,11 @@ check_equals(typeof(s), "object");
 check(!s instanceOf String);
 
 s = new Object("hello");
+#if OUTPUT_VERSION == 5
+check_equals(s, undefined);
+#else
 xcheck_equals(s, undefined);
+#endif
 
 Cl = function() {};
 Cl.prototype = 8;
