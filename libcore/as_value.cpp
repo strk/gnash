@@ -2419,6 +2419,27 @@ as_value::writeAMF0(SimpleBuffer& buf,
             if (it == offsetTable.end()) {
                 size_t idx = offsetTable.size() + 1; // 1 for the first, etc...
                 offsetTable[obj] = idx;
+                
+                Date_as* date;
+                if (isInstanceOf(obj, date))
+                {
+                    double d = date->getTimeValue(); 
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                    log_debug(_("writeAMF0: serializing date object "
+                                "with index %d and value %g"), idx, d);
+#endif
+                    buf.appendByte(amf::Element::DATE_AMF0);
+
+                    // This actually only swaps on little-endian machines
+                    amf::swapBytes(&d, 8);
+                    buf.append(&d, 8);
+
+                    // This should be timezone
+                    boost::uint16_t tz=0; 
+                    buf.appendNetworkShort(tz);
+
+                    return true;
+                }
 
                 Array_as* ary = dynamic_cast<Array_as*>(obj);
                 if (ary) {
@@ -2454,36 +2475,15 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #endif
                     buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
                     buf.appendNetworkLong(len);
-                    return true;
                 }
-
-                Date_as* date;
-                if (isInstanceOf(obj, date))
-                {
-                    double d = date->getTimeValue(); 
+                else {
+                    // It's a simple object
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                    log_debug(_("writeAMF0: serializing date object "
-                                "with index %d and value %g"), idx, d);
+                    log_debug(_("writeAMF0: serializing object (or function) "
+                                "with index %d"), idx);
 #endif
-                    buf.appendByte(amf::Element::DATE_AMF0);
-
-                    // This actually only swaps on little-endian machines
-                    amf::swapBytes(&d, 8);
-                    buf.append(&d, 8);
-
-                    // This should be timezone
-                    boost::uint16_t tz=0; 
-                    buf.appendNetworkShort(tz);
-
-                    return true;
+                    buf.appendByte(amf::Element::OBJECT_AMF0);
                 }
-
-                // It's a simple object
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-                log_debug(_("writeAMF0: serializing object (or function) "
-                            "with index %d"), idx);
-#endif
-                buf.appendByte(amf::Element::OBJECT_AMF0);
 
                 PropsBufSerializer props(buf, vm, offsetTable, allowStrict);
                 obj->visitNonHiddenPropertyValues(props);
