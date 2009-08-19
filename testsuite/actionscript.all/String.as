@@ -1076,7 +1076,12 @@ check_equals( b, "f");
 
 var stringInstance = new String();
 check (stringInstance.__proto__ != undefined);
+#if OUTPUT_VERSION > 5
 check_equals("" + stringInstance.__proto__.valueOf, "[type Function]");
+#else
+check_equals("" + stringInstance.__proto__.valueOf, "");
+#endif
+
 check (stringInstance.__proto__ == String.prototype);
 check_equals (typeOf(String.prototype.constructor), 'function');
 check (String.prototype.constructor == String);
