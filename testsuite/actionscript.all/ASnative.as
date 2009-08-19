@@ -292,8 +292,8 @@ check(a != b);
 
 // This is _global.Number
 f = ASconstructor(106, 2);
-xcheck_equals(typeof(f), "function");
-xcheck_equals(typeof(f.prototype), "object");
+check_equals(typeof(f), "function");
+check_equals(typeof(f.prototype), "object");
 
 // Attach number natives and it works.
 ASSetNative(f.prototype, 106, "valueOf,toString");
@@ -306,28 +306,28 @@ check(obj.__proto__ != Number.prototype);
 check_equals(obj.__proto__, undefined);
 #endif
 
-xcheck_equals(typeof(obj), "object");
-xcheck_equals(obj.toString(), "6");
+check_equals(typeof(obj), "object");
+check_equals(obj.toString(), "6");
 
 // Attach boolean natives and it fails.
 ASSetNative(f.prototype, 107, "valueOf,toString");
-xcheck_equals(typeof(obj), "object");
+check_equals(typeof(obj), "object");
 check_equals(obj.toString(), undefined);
 
 // Attach number natives to prototype again and it works.
 ASSetNative(f.prototype, 106, "valueOf,toString");
-xcheck_equals(obj.toString(), "6");
+check_equals(obj.toString(), "6");
 
 g = ASnative(106, 2);
-xcheck_equals(typeof(g), "function");
+check_equals(typeof(g), "function");
 check_equals(typeof(g.prototype), "undefined");
 
 // This is the ASnative function Number.toString. It does not attach
 // Number.prototype, so the Number.toString function fails.
 f = ASconstructor(106, 1);
 ASSetNative(f.prototype, 106, "valueOf,toString");
-xcheck_equals(typeof(f), "function");
-xcheck_equals(typeof(f.prototype), "object");
+check_equals(typeof(f), "function");
+check_equals(typeof(f.prototype), "object");
 obj = new f(6);
 xcheck_equals(typeof(obj), "object");
 check_equals(obj.toString(), undefined);
@@ -340,8 +340,8 @@ ASnative = 78;
 
 // ASconstructor doesn't rely on ASnative.
 f = ASconstructor(106, 2);
-xcheck_equals(typeof(f), "function");
-xcheck_equals(typeof(f.prototype), "object");
+check_equals(typeof(f), "function");
+check_equals(typeof(f.prototype), "object");
 
 g = ASnative(106, 2);
 check_equals(typeof(g), "undefined");

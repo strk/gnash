@@ -944,7 +944,7 @@ global_asconstructor(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
     as_object* proto = getObjectInterface();
-    fun->set_prototype(gl->createObject(proto));
+    fun->init_member(NSV::PROP_PROTOTYPE, gl->createObject(proto));
 
     return as_value(fun);
         
