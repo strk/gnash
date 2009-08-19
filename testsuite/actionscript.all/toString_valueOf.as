@@ -485,7 +485,7 @@ s.toString = ts;
 check_equals(s.toString(), "[object Object]");
 
 #if OUTPUT_VERSION < 6
- check_totals(127);
+ check_totals(128);
 #else
- check_totals(145);
+ check_totals(146);
 #endif
