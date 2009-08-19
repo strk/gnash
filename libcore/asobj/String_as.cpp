@@ -76,36 +76,11 @@ namespace {
             const std::string& function);
 }
 
-class String_as : public as_object
+String_as::String_as(const std::string& s)
+    :
+    _string(s)
 {
-
-public:
-
-    explicit String_as(const std::string& s)
-            :
-            as_object(getStringInterface()),
-            _string(s)
-    {
-        std::wstring wstr = utf8::decodeCanonicalString(
-                _string, getSWFVersion(*this));
-        init_member(NSV::PROP_LENGTH, wstr.size(), 
-                PropFlags::dontDelete | PropFlags::dontEnum); 
-    }
-
-
-    bool useCustomToString() const { return false; }
-
-    std::string get_text_value() const {
-        return _string;
-    }
-
-    const std::string& str() {
-        return _string;
-    }
-
-private:
-    std::string _string;
-};
+}
 
 void
 registerStringNative(as_object& global)
@@ -822,8 +797,8 @@ string_valueOf(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<String_as> obj = ensureType<String_as>(fn.this_ptr);
-    return as_value(obj->str());
+    String_as* str = checkType<String_as>(fn.this_ptr.get());
+    return as_value(str->value());
 }
 
 
@@ -832,19 +807,22 @@ string_ctor(const fn_call& fn)
 {
 	std::string str;
 	
-	if (fn.nargs)
-	{
+	if (fn.nargs) {
 		str = fn.arg(0).to_string();
 	}
 
-	if ( ! fn.isInstantiation() )
+	if (!fn.isInstantiation())
 	{
 		return as_value(str);
 	}
 	
-	boost::intrusive_ptr<String_as> obj = new String_as(str);
+    as_object* obj = fn.this_ptr.get();
 
-	return as_value(obj.get());
+    obj->setProxy(new String_as(str));
+    std::wstring wstr = utf8::decodeCanonicalString(str, getSWFVersion(fn));
+    obj->init_member(NSV::PROP_LENGTH, wstr.size(), as_object::DefaultFlags);
+
+	return as_value();
 }
 
 /// Check the number of arguments, returning false if there

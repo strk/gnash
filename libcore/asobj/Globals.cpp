@@ -452,7 +452,7 @@ avm1Classes()
            NS_GLOBAL, 5))
         (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
@@ -520,7 +520,7 @@ avm2Classes(string_table& st)
            NS_GLOBAL, 5))
         (N(qname_class_init, NSV::CLASS_QNAME, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
 
@@ -1305,7 +1305,7 @@ registerNatives(as_object& global)
 
     AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);
-    Date_as::registerNative(global);
+    registerDateNative(global);
     Mouse_as::registerNative(global);
 
     // LoadableObject has natives shared between LoadVars and XML, so 

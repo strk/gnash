@@ -39,6 +39,7 @@
 #include "SimpleBuffer.h"
 #include "StringPredicates.h"
 #include "Global_as.h"
+#include "String_as.h"
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 
@@ -378,6 +379,11 @@ as_value::to_string() const
 		case AS_FUNCTION:
 		case OBJECT:
 		{
+            as_object* obj = m_type == AS_FUNCTION ? getFun().get() :
+                                                     getObj().get();
+            String_as* s;
+            if (isStringObject(obj, s)) return s->value();
+
 			try
 			{
 				as_value ret = to_primitive(STRING);
@@ -385,9 +391,7 @@ as_value::to_string() const
 				// specification, but seems required for compatibility with the
 				// reference player.
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" %s.to_primitive(STRING) returned %s", 
-						*this,
-						ret);
+				log_debug(" %s.to_primitive(STRING) returned %s", *this, ret);
 #endif
 				if ( ret.is_string() ) return ret.to_string();
 			}
@@ -428,6 +432,7 @@ as_value::to_string_versioned(int version) const
 	return to_string();
 }
 
+/// This is only used in AVM2.
 primitive_types
 as_value::ptype() const
 {
@@ -436,26 +441,22 @@ as_value::ptype() const
 
 	switch (m_type)
 	{
-	case STRING: return PTYPE_STRING;
-	case NUMBER: return PTYPE_NUMBER;
-	case AS_FUNCTION:
-	case UNDEFINED:
-	case NULLTYPE:
-	case MOVIECLIP:
-		return PTYPE_NUMBER;
-	case OBJECT:
-	{
-		as_object* obj = getObj().get();
-		// Date objects should return TYPE_STRING (but only from SWF6 up)
-		// See ECMA-262 8.6.2.6
-		if ( swfVersion > 5 && obj->isDateObject() ) return PTYPE_STRING;
-		return PTYPE_NUMBER;
-	}
-	case BOOLEAN:
-		return PTYPE_BOOLEAN;
-	default:
-		break; // Should be only exceptions here.
-	}
+        case STRING: return PTYPE_STRING;
+        case NUMBER: return PTYPE_NUMBER;
+        case AS_FUNCTION:
+        case UNDEFINED:
+        case NULLTYPE:
+        case MOVIECLIP:
+            return PTYPE_NUMBER;
+        case OBJECT:
+        {
+            return PTYPE_NUMBER;
+        }
+        case BOOLEAN:
+            return PTYPE_BOOLEAN;
+        default:
+            break; // Should be only exceptions here.
+        }
 	return PTYPE_NUMBER;
 }
 
@@ -468,7 +469,8 @@ as_value::to_primitive() const
 
 	AsType hint = NUMBER;
 
-	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
+	if (m_type == OBJECT && swfVersion > 5 &&
+            dynamic_cast<Date_as*>(getObj()->proxy()))
 	{
 		hint = STRING;
 	}
@@ -484,8 +486,9 @@ as_value::convert_to_primitive()
 
 	AsType hint = NUMBER;
 
-	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
-	{
+	if (m_type == OBJECT && swfVersion > 5 &&
+            dynamic_cast<Date_as*>(getObj()->proxy())) {
+
 		hint = STRING;
 	}
 
@@ -550,14 +553,6 @@ as_value::to_primitive(AsType hint) const
 		// text representation for that object is used
 		// instead.
 		//
-		if ( ! obj->useCustomToString() )
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" not using custom toString");
-#endif
-			return as_value(obj->get_text_value());
-		}
-
 		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
                 (!method.is_function()) ) // ECMA says ! is_object()
 		{
@@ -654,15 +649,6 @@ as_value::convert_to_primitive(AsType hint)
 		// text representation for that object is used
 		// instead.
 		//
-		if ( ! obj->useCustomToString() )
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" not using custom toString");
-#endif
-			set_string(obj->get_text_value());
-			return *this;
-		}
-
 		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || 
                 (!method.is_function()) ) // ECMA says ! is_object()
 		{
@@ -2468,8 +2454,16 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read date: %e", dub);
 #endif
-            as_object* obj = new Date_as(dub);
-			ret.set_as_object(obj);
+
+            Global_as* gl = vm.getGlobal();
+            as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
+            if (ctor) {
+                std::auto_ptr<std::vector<as_value> > args(
+                        new std::vector<as_value>());
+                args->push_back(dub);
+                ret.set_as_object(ctor->constructInstance(as_environment(vm),
+                            args));
+            }
 
 			if (b + 2 > end) {
 				log_error(_("AMF0 read: premature end of input reading "
@@ -2568,9 +2562,10 @@ as_value::writeAMF0(SimpleBuffer& buf,
                         buf.appendNetworkLong(len);
                     }
                 }
-                else if ( obj->isDateObject() )
+                else if (dynamic_cast<Date_as*>(obj->proxy()))
                 {
-                    const Date_as& date = dynamic_cast<const Date_as&>(*obj);
+                    const Date_as& date =
+                        dynamic_cast<const Date_as&>(*obj->proxy());
                     double d = date.getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                     log_debug(_("writeAMF0: serializing date object "

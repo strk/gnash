@@ -294,6 +294,8 @@ public:
 	const char* typeOf() const;
 
 	/// Get the primitive type of this value
+    //
+    /// Only used in AVM2
 	primitive_types ptype() const;
 
 	// Chad: Document
