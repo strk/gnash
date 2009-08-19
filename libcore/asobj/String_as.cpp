@@ -63,6 +63,7 @@ namespace {
     as_value string_toUpperCase(const fn_call& fn);
     as_value string_toLowerCase(const fn_call& fn);
     as_value string_toString(const fn_call& fn);
+    as_value string_valueOf(const fn_call& fn);
     as_value string_oldToLower(const fn_call& fn);
     as_value string_oldToUpper(const fn_call& fn);
     as_value string_ctor(const fn_call& fn);
@@ -111,7 +112,7 @@ registerStringNative(as_object& global)
 {
     VM& vm = getVM(global);
     vm.registerNative(string_ctor, 251, 0);
-	vm.registerNative(as_object::tostring_method, 251, 1);
+	vm.registerNative(string_valueOf, 251, 1);
 	vm.registerNative(string_toString, 251, 2);
 	vm.registerNative(string_oldToUpper, 102, 0);
 	vm.registerNative(string_toUpperCase, 251, 3);
@@ -809,6 +810,14 @@ string_oldToUpper(const fn_call& fn)
     return as_value(str);
 }
 
+/// This returns as_value.toString() value of an object. For Strings this is
+/// a string, for objects "[type Object]" or "[type Function]", for Booleans
+/// "true" or "false", etc.
+as_value
+string_valueOf(const fn_call& fn)
+{
+    return as_value(fn.this_ptr).to_string();
+}
 
 as_value
 string_toString(const fn_call& fn)

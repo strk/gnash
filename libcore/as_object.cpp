@@ -1136,22 +1136,6 @@ as_object::hasOwnProperty(string_table::key key, string_table::key nsname)
 	return getOwnProperty(key, nsname) != NULL;
 }
 
-as_value
-as_object::tostring_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
-
-	std::string text_val = obj->get_text_value();
-	return as_value(text_val);
-}
-
-as_value
-as_object::valueof_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
-	return obj;
-}
-
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {

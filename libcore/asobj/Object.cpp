@@ -50,6 +50,8 @@ namespace {
     as_value object_unwatch(const fn_call&);
     as_value object_toLocaleString(const fn_call&);
     as_value object_ctor(const fn_call& fn);
+    as_value object_valueOf(const fn_call& fn);
+    as_value object_toString(const fn_call& fn);
 
     void attachObjectInterface(as_object& o);
 
@@ -70,8 +72,8 @@ registerObjectNative(as_object& global)
 	vm.registerNative(object_watch, 101, 0); 
 	vm.registerNative(object_unwatch, 101, 1); 
 	vm.registerNative(object_addproperty, 101, 2); 
-	vm.registerNative(as_object::valueof_method, 101, 3); 
-	vm.registerNative(as_object::tostring_method, 101, 4); 
+	vm.registerNative(object_valueOf, 101, 3); 
+	vm.registerNative(object_toString, 101, 4); 
 	vm.registerNative(object_hasOwnProperty, 101, 5); 
 	vm.registerNative(object_isPrototypeOf, 101, 6); 
 	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
@@ -190,6 +192,23 @@ object_ctor(const fn_call& fn)
     }
 
     return gl->createObject(proto);
+}
+
+/// Object.toString returns one of two values: [type Function] if it is a 
+/// function, [object Object] if it is an object.
+as_value
+object_toString(const fn_call& fn)
+{
+    as_object* obj = fn.this_ptr.get();
+
+    if (!obj || !obj->to_function()) return as_value("[object Object]");
+    return as_value("[type Function]");
+}
+
+as_value
+object_valueOf(const fn_call& fn)
+{
+	return fn.this_ptr;
 }
 
 

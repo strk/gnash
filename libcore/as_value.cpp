@@ -54,7 +54,7 @@
 //#define GNASH_DEBUG_EQUALITY 1
 
 // Define the macro below to make to_primitive verbose
-// #define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
+//#define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
 
 // Define this macro to make soft references activity verbose
 #define GNASH_DEBUG_SOFT_REFERENCES
@@ -518,7 +518,7 @@ as_value::to_primitive(AsType hint) const
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function())) 
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");

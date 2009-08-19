@@ -1040,13 +1040,6 @@ public:
     ///
     void set_prototype(const as_value& proto, int flags = DefaultFlags);
 
-    /// @{ Common ActionScript methods for DisplayObjects
-    /// TODO: make protected
-
-    static as_value tostring_method(const fn_call& fn);
-
-    static as_value valueof_method(const fn_call& fn);
-
     void setProxy(Proxy* p) {
         _proxy.reset(p);
     }
