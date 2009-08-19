@@ -2073,14 +2073,10 @@ as_value::newAdd(const as_value& op2)
 		convert_to_string_versioned(version);
 		string_concat(v2.to_string_versioned(version));
 	}
-	else
-	{
+	else {
 		// use numeric semantic
 		double v2num = v2.to_number();
-		//log_debug(_("v2 num = %g"), v2num);
 		double v1num = to_number();
-		//log_debug(_("v1 num = %g"), v1num);
-
 		set_double(v2num + v1num); 
 
 	}
