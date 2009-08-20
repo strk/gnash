@@ -175,18 +175,12 @@ AsBroadcaster::registerNative(as_object& global)
 
 
 void
-AsBroadcaster::init(as_object& global, const ObjectURI& uri)
+AsBroadcaster::init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(global);
-
-    as_object* proto = gl->createObject(getObjectInterface());
-    as_object* cl = gl->createClass(asbroadcaster_ctor, proto); 
-
-    attachAsBroadcasterStaticInterface(*cl);
-
     // AsBroadcaster is a class, even though it doesn't look much like one.
-    global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    // Its prototype has no properties.
+    registerBuiltinClass(where, asbroadcaster_ctor, 0,
+            attachAsBroadcasterStaticInterface, uri);
 }
 
 
