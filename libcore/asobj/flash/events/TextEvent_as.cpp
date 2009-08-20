@@ -55,20 +55,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textevent_class_init(as_object& where, const ObjectURI& uri)
+void
+textevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getTextEventInterface();
-        cl = gl->createClass(&textevent_ctor, proto);
-        attachTextEventStaticInterface(*cl);
-    }
-
-    // Register _global.TextEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, textevent_ctor, attachTextEventInterface, 
+        attachTextEventStaticInterface, uri);
 }
 
 namespace {

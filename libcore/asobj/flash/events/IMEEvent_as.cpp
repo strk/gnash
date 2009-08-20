@@ -54,20 +54,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void imeevent_class_init(as_object& where, const ObjectURI& uri)
+void
+imeevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIMEEventInterface();
-        cl = gl->createClass(&imeevent_ctor, proto);
-        attachIMEEventStaticInterface(*cl);
-    }
-
-    // Register _global.IMEEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, imeevent_ctor, attachIMEEventInterface, 
+        attachIMEEventStaticInterface, uri);
 }
 
 namespace {

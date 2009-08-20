@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void csmsettings_class_init(as_object& where, const ObjectURI& uri)
+void
+csmsettings_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getCSMSettingsInterface();
-        cl = gl->createClass(&csmsettings_ctor, proto);
-        attachCSMSettingsStaticInterface(*cl);
-    }
-
-    // Register _global.CSMSettings
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, csmsettings_ctor, attachCSMSettingsInterface, 
+        attachCSMSettingsStaticInterface, uri);
 }
 
 namespace {

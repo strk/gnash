@@ -1,4 +1,4 @@
-// FileReferenceList_as.cpp:  ActionScript "FileReferenceList" class, for Gnash.
+// filereferencelist_as.cpp:  ActionScript "FileReferenceList" class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -36,22 +36,26 @@
 
 namespace gnash {
 
-static as_value FileReferenceList_addListener(const fn_call& fn);
-static as_value FileReferenceList_browse(const fn_call& fn);
-static as_value FileReferenceList_removeListener(const fn_call& fn);
-static as_value FileReferenceList_fileList_getset(const fn_call& fn);
+static as_value filereferencelist_addListener(const fn_call& fn);
+static as_value filereferencelist_browse(const fn_call& fn);
+static as_value filereferencelist_removeListener(const fn_call& fn);
+static as_value filereferencelist_fileList_getset(const fn_call& fn);
+as_value filereferencelist_ctor(const fn_call& fn);
 
+static void
+attachFileReferenceListStaticInterface(as_object& /*o*/)
+{
 
-as_value FileReferenceList_ctor(const fn_call& fn);
+}
 
 static void
 attachFileReferenceListInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    o.init_member("addListener", gl->createFunction(FileReferenceList_addListener));
-    o.init_member("browse", gl->createFunction(FileReferenceList_browse));
-    o.init_member("removeListener", gl->createFunction(FileReferenceList_removeListener));
-    o.init_property("fileList", FileReferenceList_fileList_getset, FileReferenceList_fileList_getset);
+    o.init_member("addListener", gl->createFunction(filereferencelist_addListener));
+    o.init_member("browse", gl->createFunction(filereferencelist_browse));
+    o.init_member("removeListener", gl->createFunction(filereferencelist_removeListener));
+    o.init_property("fileList", filereferencelist_fileList_getset, filereferencelist_fileList_getset);
 }
 
 static void
@@ -60,104 +64,54 @@ attachFileReferenceListStaticProperties(as_object& /*o*/)
    
 }
 
-static as_object*
-getFileReferenceListInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-
-    if ( ! o )
-    {
-        // TODO: check if this class should inherit from Object
-        //       or from a different class
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachFileReferenceListInterface(*o);
-
-    }
-
-    return o.get();
-}
-
-class FileReferenceList_as: public as_object
-{
-
-public:
-
-    FileReferenceList_as()
-        :
-        as_object(getFileReferenceListInterface())
-    {}
-};
-
-
 static as_value
-FileReferenceList_addListener(const fn_call& fn)
+filereferencelist_addListener(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 static as_value
-FileReferenceList_browse(const fn_call& fn)
+filereferencelist_browse(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 static as_value
-FileReferenceList_removeListener(const fn_call& fn)
+filereferencelist_removeListener(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 static as_value
-FileReferenceList_fileList_getset(const fn_call& fn)
+filereferencelist_fileList_getset(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 
 
 as_value
-FileReferenceList_ctor(const fn_call& fn)
+filereferencelist_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new FileReferenceList_as;
-
-    if ( fn.nargs )
-    {
+    if (fn.nargs) {
         std::stringstream ss;
         fn.dump_args(ss);
-        LOG_ONCE( log_unimpl("FileReferenceList(%s): %s", ss.str(), _("arguments discarded")) );
+        LOG_ONCE(
+            log_unimpl("FileReferenceList(%s): %s", ss.str(),
+                 _("arguments discarded"))
+        );
     }
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 // extern 
-void filereferencelist_class_init(as_object& where, const ObjectURI& uri)
+void
+filereferencelist_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the FileReferenceList "class"/"function"
-    // in the 'where' package
-    boost::intrusive_ptr<as_object> cl;
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getFileReferenceListInterface();
-    cl = gl->createClass(&FileReferenceList_ctor, proto);
-    attachFileReferenceListStaticProperties(*cl);
-
-    // Register _global.FileReferenceList
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, filereferencelist_ctor,
+            attachFileReferenceListInterface, 
+            attachFileReferenceListStaticInterface, uri);
 }
 
 } // end of gnash namespace

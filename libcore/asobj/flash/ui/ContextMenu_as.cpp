@@ -51,14 +51,8 @@ namespace {
 void
 contextmenu_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject(getObjectInterface());
-    as_object* cl = gl->createClass(contextmenu_ctor, proto);
-    attachContextMenuInterface(*proto);
-
-	// Register _global.ContextMenu
-	where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, contextmenu_ctor, attachContextMenuInterface,
+            attachContextMenuStaticInterface, uri);
 }
 
 

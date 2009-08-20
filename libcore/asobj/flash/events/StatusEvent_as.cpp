@@ -54,20 +54,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void statusevent_class_init(as_object& where, const ObjectURI& uri)
+void
+statusevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getStatusEventInterface();
-        cl = gl->createClass(&statusevent_ctor, proto);
-        attachStatusEventStaticInterface(*cl);
-    }
-
-    // Register _global.StatusEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, statusevent_ctor, attachStatusEventInterface, 
+        attachStatusEventStaticInterface, uri);
 }
 
 namespace {

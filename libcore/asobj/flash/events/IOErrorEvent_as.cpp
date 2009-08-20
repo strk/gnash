@@ -54,20 +54,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void ioerrorevent_class_init(as_object& where, const ObjectURI& uri)
+void
+ioerrorevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIOErrorEventInterface();
-        cl = gl->createClass(&ioerrorevent_ctor, proto);
-        attachIOErrorEventStaticInterface(*cl);
-    }
-
-    // Register _global.IOErrorEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, ioerrorevent_ctor, attachIOErrorEventInterface, 
+        attachIOErrorEventStaticInterface, uri);
 }
 
 namespace {

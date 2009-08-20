@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void id3info_class_init(as_object& where, const ObjectURI& uri)
+void
+id3info_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-	Global_as* gl = getGlobal(where);
-        as_object* proto = getID3InfoInterface();
-        cl = gl->createClass(&id3info_ctor, proto);
-        attachID3InfoStaticInterface(*cl);
-    }
-
-    // Register _global.ID3Info
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, id3info_ctor, attachID3InfoInterface, 
+        attachID3InfoStaticInterface, uri);
 }
 
 namespace {

@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void filefilter_class_init(as_object& where, const ObjectURI& uri)
+void
+filefilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getFileFilterInterface();
-        cl = gl->createClass(&filefilter_ctor, proto);
-        attachFileFilterStaticInterface(*cl);
-    }
-
-    // Register _global.FileFilter
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, filefilter_ctor, attachFileFilterInterface, 
+        attachFileFilterStaticInterface, uri);
 }
 
 namespace {

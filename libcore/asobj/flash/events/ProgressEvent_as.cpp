@@ -55,20 +55,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void progressevent_class_init(as_object& where, const ObjectURI& uri)
+void
+progressevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getProgressEventInterface();
-        cl = gl->createClass(&progressevent_ctor, proto);
-        attachProgressEventStaticInterface(*cl);
-    }
-
-    // Register _global.ProgressEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, progressevent_ctor, attachProgressEventInterface, 
+        attachProgressEventStaticInterface, uri);
 }
 
 namespace {

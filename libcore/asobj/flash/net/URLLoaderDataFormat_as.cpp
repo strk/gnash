@@ -36,19 +36,21 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    void attachURLLoaderDataFormatStaticInterface(as_object& o);
+    void
+attachURLLoaderDataFormatStaticInterface(as_object& o);
 }
 
 // extern (used by Global.cpp)
 void
 urlloaderdataformat_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    as_object* o = gl->createObject(proto);
-    attachURLLoaderDataFormatStaticInterface(*o);
-    where.init_member(getName(uri), o, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, attachURLLoaderDataFormatStaticInterface(as_object& o);
+}
+
+// extern (used by Global.cpp)
+void
+urlloaderdataformat_ctor, attachObjectInterface, 
+        attachObjectStaticInterface, uri);
 }
 
 namespace {

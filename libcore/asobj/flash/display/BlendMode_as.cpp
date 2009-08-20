@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void blendmode_class_init(as_object& where, const ObjectURI& uri)
+void
+blendmode_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getBlendModeInterface();
-        cl = gl->createClass(&blendmode_ctor, proto);
-        attachBlendModeStaticInterface(*cl);
-    }
-
-    // Register _global.BlendMode
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, blendmode_ctor, attachBlendModeInterface, 
+        attachBlendModeStaticInterface, uri);
 }
 
 namespace {

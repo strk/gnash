@@ -53,20 +53,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void sprite_class_init(as_object& where, const ObjectURI& uri)
+void
+sprite_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getSpriteInterface();
-        cl = gl->createClass(&sprite_ctor, proto);
-        attachSpriteStaticInterface(*cl);
-    }
-
-    // Register _global.Sprite
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, sprite_ctor, attachSpriteInterface, 
+        attachSpriteStaticInterface, uri);
 }
 
 namespace {

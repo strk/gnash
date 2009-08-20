@@ -53,20 +53,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void applicationdomain_class_init(as_object& where, const ObjectURI& uri)
+void
+applicationdomain_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getApplicationDomainInterface();
-        cl = gl->createClass(&applicationdomain_ctor, proto);
-        attachApplicationDomainStaticInterface(*cl);
-    }
-
-    // Register _global.ApplicationDomain
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, applicationdomain_ctor, attachApplicationDomainInterface, 
+        attachApplicationDomainStaticInterface, uri);
 }
 
 namespace {

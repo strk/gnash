@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void framelabel_class_init(as_object& where, const ObjectURI& uri)
+void
+framelabel_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getFrameLabelInterface();
-        cl = gl->createClass(&framelabel_ctor, proto);
-        attachFrameLabelStaticInterface(*cl);
-    }
-
-    // Register _global.FrameLabel
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, framelabel_ctor, attachFrameLabelInterface, 
+        attachFrameLabelStaticInterface, uri);
 }
 
 namespace {

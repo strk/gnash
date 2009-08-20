@@ -104,7 +104,7 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
     Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
     as_object* obj = gl->createObject(proto);
-    p(*obj);
+    if (p) p(*obj);
     
     where.init_member(getName(uri), obj, as_object::DefaultFlags,
             getNamespace(uri));
@@ -138,10 +138,10 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
     as_object* cl = gl->createClass(ctor, proto);
  
     // Attach class properties to class
-    c(*cl);
+    if (c) c(*cl);
 
     // Attach prototype properties to prototype
-    p(*proto);
+    if (p) p(*proto);
 
     // Register class with specified object.
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
