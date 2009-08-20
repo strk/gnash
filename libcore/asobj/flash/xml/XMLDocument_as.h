@@ -121,9 +121,6 @@ public:
     ///
     void parseXML(const std::string& xml);
 
-    // An event handler that returns a what?
-    bool onLoad();
-
     /// Escape using XML entities.
     //
     /// Note this is not the same as a URL escape.

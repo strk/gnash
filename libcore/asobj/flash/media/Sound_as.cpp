@@ -226,7 +226,7 @@ Sound_as::probeAudio()
 void
 Sound_as::markReachableResources() const
 {
-    if ( _attachedCharacter ) _attachedCharacter->setReachable();
+    if (_attachedCharacter) _attachedCharacter->setReachable();
 }
 #endif // GNASH_USE_GC
 
@@ -287,8 +287,7 @@ Sound_as::getVolume(int& volume)
     {
         //log_debug("Sound has an attached DisplayObject");
         DisplayObject* ch = _attachedCharacter->get();
-        if ( ! ch )
-        {
+        if (! ch) {
             log_debug("Character attached to Sound was unloaded and "
                     "couldn't rebind");
             return false;
@@ -296,13 +295,11 @@ Sound_as::getVolume(int& volume)
         volume = ch->getVolume();
         return true;
     }
-    //else log_debug("Sound has NO attached DisplayObject, _soundHandler is %p, soundId is %d", _soundHandler, soundId);
 
     // If we're not attached to a DisplayObject we'll need to query
     // sound_handler for volume. If we have no sound handler, we
     // can't do much, so we'll return false
-    if (!_soundHandler)
-    {
+    if (!_soundHandler) {
         log_debug("We have no sound handler here...");
         return false;
     }
@@ -311,14 +308,8 @@ Sound_as::getVolume(int& volume)
     // the final output as a whole.
     // If soundId is -1 we're controlling as a whole
     //
-    if ( soundId == -1 )
-    {
-        volume = _soundHandler->getFinalVolume();
-    }
-    else
-    {
-        volume = _soundHandler->get_volume(soundId);
-    }
+    if (soundId == -1) volume = _soundHandler->getFinalVolume(); 
+    else volume = _soundHandler->get_volume(soundId);
 
     return true;
 }
@@ -788,7 +779,9 @@ as_value
 sound_new(const fn_call& fn)
 {
 
-    as_object* obj = fn.this_ptr;
+    as_object* so = fn.this_ptr;
+    Sound_as* s(new Sound_as(so));
+    so->setProxy(s);
 
     if (fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -799,9 +792,6 @@ sound_new(const fn_call& fn)
             }
         );
 
-        Sound_as* s = new Sound_as(obj);
-
-        obj->setProxy(s);
 
         const as_value& arg0 = fn.arg(0);
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
@@ -1028,7 +1018,7 @@ sound_getvolume(const fn_call& fn)
     }
 
     int volume;
-    if ( so->getVolume(volume) ) return as_value(volume);
+    if (so->getVolume(volume)) return as_value(volume);
     return as_value();
 }
 

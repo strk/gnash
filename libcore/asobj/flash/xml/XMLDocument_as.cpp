@@ -588,15 +588,6 @@ XMLDocument_as::parseXML(const std::string& xml)
 
 }
 
-bool
-XMLDocument_as::onLoad()
-{
-    log_debug(_("%s: FIXME: onLoad Default event handler"), __FUNCTION__);
-
-    return(_loaded);
-}
-
-
 void
 XMLDocument_as::clear()
 {

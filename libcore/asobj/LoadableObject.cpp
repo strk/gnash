@@ -314,7 +314,7 @@ LoadableObject::registerNative(as_object& o)
 as_value
 LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = checkType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesLoaded;
     string_table& st = getStringTable(fn);
@@ -325,7 +325,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 as_value
 LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = checkType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesTotal;
     string_table& st = getStringTable(fn);
@@ -452,7 +452,7 @@ namespace {
 as_value
 loadableobject_decode(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = checkType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
 	if (!fn.nargs) return as_value(false);
 
