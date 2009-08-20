@@ -42,7 +42,6 @@ namespace {
     as_value contextmenu_ctor(const fn_call& fn);
 
     void attachContextMenuInterface(as_object& o);
-    void attachContextMenuStaticInterface(as_object& o);
     as_object* setBuiltInItems();
 
 }
@@ -52,7 +51,7 @@ void
 contextmenu_class_init(as_object& where, const ObjectURI& uri)
 {
     registerBuiltinClass(where, contextmenu_ctor, attachContextMenuInterface,
-            attachContextMenuStaticInterface, uri);
+            0, uri);
 }
 
 
