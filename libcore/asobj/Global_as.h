@@ -131,7 +131,7 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
 /// @return         the built-in class with prototype and properties attached.
 inline as_object*
 registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
-        Properties p, Properties c, const ObjectURI& uri)
+        Properties c, Properties p, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
     as_object* proto = gl->createObject(getObjectInterface());
