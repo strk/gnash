@@ -43,6 +43,7 @@ namespace {
 void
 urlrequestmethod_class_init(as_object& where, const ObjectURI& uri)
 {
+    registerBuiltinObject(where, attachURLRequestMethodStaticInterface, uri);
     Global_as* gl = getGlobal(where);
     as_object* proto = getObjectInterface();
     as_object* o = gl->createObject(proto);

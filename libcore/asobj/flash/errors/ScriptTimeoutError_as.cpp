@@ -36,36 +36,15 @@ namespace {
     as_value scripttimeouterror_ctor(const fn_call& fn);
     void attachScriptTimeoutErrorInterface(as_object& o);
     void attachScriptTimeoutErrorStaticInterface(as_object& o);
-    as_object* getScriptTimeoutErrorInterface();
-
 }
 
-class ScriptTimeoutError_as : public as_object
-{
-
-public:
-
-    ScriptTimeoutError_as()
-        :
-        as_object(getScriptTimeoutErrorInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void scripttimeouterror_class_init(as_object& where, const ObjectURI& uri)
+void
+scripttimeouterror_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getScriptTimeoutErrorInterface();
-        cl = gl->createClass(&scripttimeouterror_ctor, proto);
-        attachScriptTimeoutErrorStaticInterface(*cl);
-    }
-
-    // Register _global.ScriptTimeoutError
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, scripttimeouterror_ctor,
+            attachScriptTimeoutErrorInterface,
+            attachScriptTimeoutErrorStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +60,10 @@ attachScriptTimeoutErrorStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getScriptTimeoutErrorInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachScriptTimeoutErrorInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 scripttimeouterror_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ScriptTimeoutError_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -48,18 +48,7 @@ namespace {
 void
 Error_class_init(as_object& where, const ObjectURI& uri)
 {
-    
-    Global_as* gl = getGlobal(where);
-
-	as_object* proto = gl->createObject(getObjectInterface());
-    boost::intrusive_ptr<as_object> cl = gl->createClass(&error_ctor, proto);
-
-    // Attach properties to the class prototype.
-    attachErrorInterface(*proto);
-
-	// Register _global.Error
-	where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, error_ctor, attachErrorInterface, 0, uri);   
 }
 
 
@@ -95,7 +84,7 @@ error_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-    as_object* err = fn.this_ptr.get();
+    as_object* err = fn.this_ptr;
 
     string_table& st = getStringTable(fn);
 

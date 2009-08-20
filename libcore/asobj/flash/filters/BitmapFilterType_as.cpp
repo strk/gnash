@@ -41,10 +41,7 @@ namespace {
 void
 bitmapfiltertype_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl = new as_object(getObjectInterface());
-    attachBitmapFilterTypeStaticInterface(*cl);
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinObject(where, attachBitmapFilterTypeStaticInterface, uri);
 }
 
 namespace {

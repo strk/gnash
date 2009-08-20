@@ -43,13 +43,8 @@ namespace {
 void
 contextmenuitem_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject(getObjectInterface());
-    as_object* cl = gl->createClass(&contextmenuitem_ctor, proto);
-    attachContextMenuItemInterface(*proto);
-    // Register _global.ContextMenuItem
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, contextmenuitem_ctor,
+            attachContextMenuItemInterface, 0, uri);
 }
 
 namespace {
@@ -78,12 +73,12 @@ contextmenuitem_copy(const fn_call& fn)
 
     if (!ctor) return as_value();
 
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>());
-    args->push_back(ptr->getMember(st.find("caption")));
-    args->push_back(ptr->getMember(NSV::PROP_ON_SELECT));
-    args->push_back(ptr->getMember(st.find("separatorBefore")));
-    args->push_back(ptr->getMember(NSV::PROP_ENABLED));
-    args->push_back(ptr->getMember(st.find("visible")));
+    fn_call::Args args;
+    args += ptr->getMember(st.find("caption")),
+        ptr->getMember(NSV::PROP_ON_SELECT),
+        ptr->getMember(st.find("separatorBefore")),
+        ptr->getMember(NSV::PROP_ENABLED),
+        ptr->getMember(st.find("visible"));
 
     return ctor->constructInstance(fn.env(), args);
 }
@@ -92,7 +87,7 @@ contextmenuitem_copy(const fn_call& fn)
 as_value
 contextmenuitem_ctor(const fn_call& fn)
 {
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
 
     string_table& st = getStringTable(fn);
 

@@ -36,36 +36,14 @@ namespace {
     as_value ioerror_ctor(const fn_call& fn);
     void attachIOErrorInterface(as_object& o);
     void attachIOErrorStaticInterface(as_object& o);
-    as_object* getIOErrorInterface();
-
 }
 
-class IOError_as : public as_object
-{
-
-public:
-
-    IOError_as()
-        :
-        as_object(getIOErrorInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void ioerror_class_init(as_object& where, const ObjectURI& uri)
+void
+ioerror_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIOErrorInterface();
-        cl = gl->createClass(&ioerror_ctor, proto);
-        attachIOErrorStaticInterface(*cl);
-    }
-
-    // Register _global.IOError
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, ioerror_ctor, attachIOErrorInterface,
+            attachIOErrorStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +59,10 @@ attachIOErrorStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getIOErrorInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIOErrorInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 ioerror_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IOError_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

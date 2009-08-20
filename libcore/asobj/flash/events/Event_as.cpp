@@ -69,36 +69,14 @@ namespace {
     as_value event_ctor(const fn_call& fn);
     void attachEventInterface(as_object& o);
     void attachEventStaticInterface(as_object& o);
-    as_object* getEventInterface();
-
 }
 
-class Event_as : public as_object
-{
-
-public:
-
-    Event_as()
-        :
-        as_object(getEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void event_class_init(as_object& where, const ObjectURI& uri)
+void
+event_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getEventInterface();
-        cl = gl->createClass(&event_ctor, proto);
-        attachEventStaticInterface(*cl);
-    }
-
-    // Register _global.Event
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, event_ctor, attachEventInterface, 
+        attachEventStaticInterface, uri);
 }
 
 namespace {
@@ -148,343 +126,233 @@ attachEventStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-event_formatToString(const fn_call& fn)
+event_formatToString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_isDefaultPrevented(const fn_call& fn)
+event_isDefaultPrevented(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_preventDefault(const fn_call& fn)
+event_preventDefault(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_stopImmediatePropagation(const fn_call& fn)
+event_stopImmediatePropagation(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_stopPropagation(const fn_call& fn)
+event_stopPropagation(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_toString(const fn_call& fn)
+event_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_ACTIVATE(const fn_call& fn)
+event_ACTIVATE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_ADDED(const fn_call& fn)
+event_ADDED(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_ADDED_TO_STAGE(const fn_call& fn)
+event_ADDED_TO_STAGE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_CANCEL(const fn_call& fn)
+event_CANCEL(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_CHANGE(const fn_call& fn)
+event_CHANGE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_CLOSE(const fn_call& fn)
+event_CLOSE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_COMPLETE(const fn_call& fn)
+event_COMPLETE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_CONNECT(const fn_call& fn)
+event_CONNECT(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_DEACTIVATE(const fn_call& fn)
+event_DEACTIVATE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_DISPLAYING(const fn_call& fn)
+event_DISPLAYING(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_ENTER_FRAME(const fn_call& fn)
+event_ENTER_FRAME(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_FULLSCREEN(const fn_call& fn)
+event_FULLSCREEN(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_ID3(const fn_call& fn)
+event_ID3(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_INIT(const fn_call& fn)
+event_INIT(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_MOUSE_LEAVE(const fn_call& fn)
+event_MOUSE_LEAVE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_OPEN(const fn_call& fn)
+event_OPEN(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_REMOVED(const fn_call& fn)
+event_REMOVED(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_REMOVED_FROM_STAGE(const fn_call& fn)
+event_REMOVED_FROM_STAGE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_RENDER(const fn_call& fn)
+event_RENDER(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_RESIZE(const fn_call& fn)
+event_RESIZE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_SCROLL(const fn_call& fn)
+event_SCROLL(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_SELECT(const fn_call& fn)
+event_SELECT(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_SOUND_COMPLETE(const fn_call& fn)
+event_SOUND_COMPLETE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_TAB_CHILDREN_CHANGE(const fn_call& fn)
+event_TAB_CHILDREN_CHANGE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_TAB_ENABLED_CHANGE(const fn_call& fn)
+event_TAB_ENABLED_CHANGE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_TAB_INDEX_CHANGE(const fn_call& fn)
+event_TAB_INDEX_CHANGE(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-event_UNLOAD(const fn_call& fn)
+event_UNLOAD(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -492,9 +360,7 @@ event_UNLOAD(const fn_call& fn)
 as_value
 event_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Event_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

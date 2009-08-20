@@ -37,36 +37,15 @@ namespace {
     as_value iexternalizable_ctor(const fn_call& fn);
     void attachIExternalizableInterface(as_object& o);
     void attachIExternalizableStaticInterface(as_object& o);
-    as_object* getIExternalizableInterface();
-
 }
 
-class IExternalizable_as : public as_object
-{
-
-public:
-
-    IExternalizable_as()
-        :
-        as_object(getIExternalizableInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void iexternalizable_class_init(as_object& where, const ObjectURI& uri)
+void
+iexternalizable_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIExternalizableInterface();
-        cl = gl->createClass(&iexternalizable_ctor, proto);
-        attachIExternalizableStaticInterface(*cl);
-    }
-
-    // Register _global.IExternalizable
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, iexternalizable_ctor,
+            attachIExternalizableInterface,
+            attachIExternalizableStaticInterface, uri);
 }
 
 namespace {
@@ -83,23 +62,9 @@ attachIExternalizableStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getIExternalizableInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIExternalizableInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-iexternalizable_writeExternal(const fn_call& fn)
+iexternalizable_writeExternal(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IExternalizable_as> ptr =
-        ensureType<IExternalizable_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -107,9 +72,7 @@ iexternalizable_writeExternal(const fn_call& fn)
 as_value
 iexternalizable_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IExternalizable_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

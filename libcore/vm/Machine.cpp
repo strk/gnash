@@ -1391,8 +1391,9 @@ Machine::execute()
                     as_value result;
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     boost::uint32_t argc = mStream->read_V32();
-                    std::auto_ptr< std::vector<as_value> > args =
-                        get_args(argc);
+
+                    fn_call::Args args;
+                    get_args(argc, args);
 
                     if (a.isRuntime()) {
                         _stack.drop(completeName(a));
@@ -1508,7 +1509,8 @@ Machine::execute()
                 case SWF::ABC_ACTION_CONSTRUCTSUPER:
                 {
                     boost::uint32_t argc = mStream->read_V32();
-                    get_args(argc);
+                    fn_call::Args args;
+                    get_args(argc, args);
                     
                     as_object* obj = _stack.top(argc).to_object(*_global).get();
 
@@ -1546,7 +1548,8 @@ Machine::execute()
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     
                     boost::uint32_t argc = mStream->read_V32();
-                    std::auto_ptr<std::vector<as_value> > args = get_args(argc);
+                    fn_call::Args args;
+                    get_args(argc, args);
                     
                     log_abc("CONSTRUCT_PROP: will try to construct property "
                             "%s on object %s", mST.value(a.getGlobalName()),
@@ -1718,8 +1721,10 @@ Machine::execute()
                     as_environment env = as_environment(_vm);
                     as_value property = new_class->getMember(
                             NSV::PROP_uuCONSTRUCTORuu, 0);
+
+                    fn_call::Args args;
                     as_value value = call_method(property, env, new_class,
-                            get_args(0));
+                            args);
 
                     log_abc("NEWCLASS(%2%) finished. Return: %1%", value,
                             mST.value(c->getName()));
@@ -3004,10 +3009,10 @@ Machine::immediateFunction(const as_function* func, as_object* thisptr,
     assert(func);
 
 	// TODO: Set up the fn to use the stack
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    fn_call::Args args;
     size_t st = 0;
     while (st < stack_in) {
-        args->push_back(_stack.top(st));
+        args += _stack.top(st);
         ++st;
     }
 
@@ -3307,16 +3312,14 @@ Machine::print_scope_stack()
 	log_abc("%s", ss.str());
 }	
 
-std::auto_ptr<std::vector<as_value> >
-Machine::get_args(unsigned int argc)
+void
+Machine::get_args(size_t argc, fn_call::Args& args)
 {
-	std::auto_ptr<std::vector<as_value> > args = 
-        std::auto_ptr<std::vector<as_value> >(new std::vector<as_value>);
-	args->resize(argc);
-	for (unsigned int i = argc; i > 0; --i) {
-		args->at(i-1) = pop_stack();
+    std::vector<as_value> v(argc);
+	for (size_t i = argc; i > 0; --i) {
+		v.at(i-1) = pop_stack();
 	}
-	return args;
+    args.swap(v);
 }
 
 void

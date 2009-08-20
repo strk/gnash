@@ -107,10 +107,8 @@ generic_callback(GtkWidget * /*widget*/, gpointer data)
     as_value	val;
     as_environment env(VM::get());
 
-    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    args->push_back(handler);
-    args->push_back(event);
-    args->push_back(handler);
+    fn_call::Args args;
+    args += handler, event, handler;
 
     as_object obj = val.to_object(*getGlobal(fn));
 

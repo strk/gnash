@@ -136,17 +136,11 @@ Transform_colorTransform(const fn_call& fn)
         }
 
         // Construct a ColorTransform from the sprite cxform.
-        std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
         const cxform& c = ptr->getColorTransform();
 
-        args->push_back(c.ra / factor);
-        args->push_back(c.ga / factor);
-        args->push_back(c.ba / factor);
-        args->push_back(c.aa / factor);
-        args->push_back(c.rb);
-        args->push_back(c.gb);
-        args->push_back(c.bb);
-        args->push_back(c.ab);
+        fn_call::Args args;
+        args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
+             c.rb, c.gb, c.bb, c.ab;
 
         boost::intrusive_ptr<as_object> colorTransformObj =
             colorTransformCtor->constructInstance(fn.env(), args);
@@ -255,15 +249,15 @@ Transform_matrix(const fn_call& fn)
             return as_value();
         }
 
-        std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
         const SWFMatrix& m = ptr->getMatrix();
 
-        args->push_back(m.sx / factor);
-        args->push_back(m.shx / factor);
-        args->push_back(m.shy / factor);
-        args->push_back(m.sy / factor);
-        args->push_back(twipsToPixels(m.tx));
-        args->push_back(twipsToPixels(m.ty));                                
+        fn_call::Args args;
+        args += m.sx / factor,
+                m.shx / factor,
+                m.shy / factor,
+                m.sy / factor,
+                twipsToPixels(m.tx),
+                twipsToPixels(m.ty);
 
         boost::intrusive_ptr<as_object> matrixObj =
             matrixCtor->constructInstance(fn.env(), args);

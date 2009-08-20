@@ -20,10 +20,10 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance
+#include "fn_call.h"
 
 // Forward declarations
 namespace gnash {
-	class fn_call;
 	class NativeFunction;
 	class Global_as;
 }
@@ -87,7 +87,7 @@ public:
 	///	Arguments for the constructor invocation
 	///
 	boost::intrusive_ptr<as_object> constructInstance(const as_environment& env,
-			std::auto_ptr<std::vector<as_value> > args);
+			fn_call::Args& args);
 
 	/// Get this function's "prototype" member (exported interface).
 	///

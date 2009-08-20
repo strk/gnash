@@ -2354,9 +2354,8 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             Global_as* gl = vm.getGlobal();
             as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
             if (ctor) {
-                std::auto_ptr<std::vector<as_value> > args(
-                        new std::vector<as_value>());
-                args->push_back(dub);
+                fn_call::Args args;
+                args += dub;
                 ret.set_as_object(ctor->constructInstance(as_environment(vm),
                             args));
             }

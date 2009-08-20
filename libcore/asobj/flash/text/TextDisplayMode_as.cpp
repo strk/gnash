@@ -43,12 +43,7 @@ namespace {
 void
 textdisplaymode_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    as_object* o = gl->createObject(proto);
-    attachTextDisplayModeStaticInterface(*o);
-    where.init_member(getName(uri), o, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinObject(where, attachTextDisplayModeStaticInterface, uri);
 }
 
 namespace {

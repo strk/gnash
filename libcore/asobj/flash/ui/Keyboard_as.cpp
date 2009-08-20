@@ -131,7 +131,7 @@ Keyboard_as::get_last_key() const
     return _lastKeyEvent;
 }
 
-static as_value
+as_value
 key_is_accessible(const fn_call& fn)
 {
 
@@ -144,7 +144,7 @@ key_is_accessible(const fn_call& fn)
 
 
 /// Return the ascii number of the last key pressed.
-static as_value   
+as_value   
 key_get_ascii(const fn_call& fn)
 {
     boost::intrusive_ptr<Keyboard_as> ko = 
@@ -156,7 +156,7 @@ key_get_ascii(const fn_call& fn)
 }
 
 /// Returns the keycode of the last key pressed.
-static as_value   
+as_value   
 key_get_code(const fn_call& fn)
 {
     boost::intrusive_ptr<Keyboard_as> ko = 
@@ -168,7 +168,7 @@ key_get_code(const fn_call& fn)
 }
 
 /// Return true if the specified (first arg keycode) key is pressed.
-static as_value   
+as_value   
 key_is_down(const fn_call& fn)
 {
     boost::intrusive_ptr<Keyboard_as> ko = 
@@ -199,7 +199,7 @@ key_is_down(const fn_call& fn)
 /// Given the keycode of NUM_LOCK or CAPSLOCK, returns true if
 /// the associated state is on.
 ///
-static as_value   
+as_value   
 key_is_toggled(const fn_call& /* fn */)
 {
     log_unimpl("Key.isToggled");

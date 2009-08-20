@@ -2769,9 +2769,10 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     debugger.matchBreakPoint(function_name, true);
 #endif
 
-    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    args->reserve(nargs);
-    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
+    fn_call::Args args;
+    for (size_t i = 0; i < nargs; ++i) {
+        args += env.pop();
+    } 
 
     as_value result = call_method(function, env, this_ptr,
                   args, super, &(thread.code.getMovieDefinition()));
@@ -3451,9 +3452,10 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
 #endif
 
-    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    args->reserve(nargs);
-    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
+    fn_call::Args args;
+    for (size_t i = 0; i < nargs; ++i) {
+        args += env.pop();
+    } 
 
     as_value result = call_method(method_val, env, this_ptr, 
             args, super, &(thread.code.getMovieDefinition()));
@@ -4170,9 +4172,10 @@ construct_object(as_function* ctor_as_func, as_environment& env,
         unsigned int nargs)
 {
     assert(ctor_as_func);
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->reserve(nargs);
-    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop());
+    fn_call::Args args;
+    for (size_t i = 0; i < nargs; ++i) {
+        args += env.pop();
+    } 
     return ctor_as_func->constructInstance(env, args).get();
 }
 

@@ -419,9 +419,8 @@ Matrix_deltaTransformPoint(const fn_call& fn)
         return as_value();
     }
 
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(point(0));
-    args->push_back(point(1));
+    fn_call::Args args;
+    args += point(0), point(1);
 
     as_value ret = pointCtor->constructInstance(fn.env(), args);
 
@@ -734,9 +733,8 @@ Matrix_transformPoint(const fn_call& fn)
         return as_value();
     }
 
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(point(0) + tx.to_number());
-    args->push_back(point(1) + ty.to_number());
+    fn_call::Args args;
+    args += point(0) + tx.to_number(), point(1) + ty.to_number();
 
     as_value ret = pointCtor->constructInstance(fn.env(), args);
 

@@ -139,8 +139,7 @@ as_function::getFunctionConstructor()
 }
 
 boost::intrusive_ptr<as_object>
-as_function::constructInstance(const as_environment& env,
-	std::auto_ptr<std::vector<as_value> > args)
+as_function::constructInstance(const as_environment& env, fn_call::Args& args)
 {
 
 #ifndef GNASH_USE_GC
@@ -380,8 +379,7 @@ function_call(const fn_call& fn)
 	else {
 		// Get the object to use as 'this' reference
 		as_value this_val = fn.arg(0);
-		boost::intrusive_ptr<as_object> this_ptr =
-            this_val.to_object(*getGlobal(fn));
+		as_object* this_ptr = this_val.to_object(*getGlobal(fn)).get();
 
 		if (!this_ptr) {
 			// If the first argument is not an object, we should

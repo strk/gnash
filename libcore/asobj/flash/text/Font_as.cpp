@@ -54,20 +54,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void font_class_init(as_object& where, const ObjectURI& uri)
+void
+font_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getFontInterface();
-        cl = gl->createClass(&font_ctor, proto);
-        attachFontStaticInterface(*cl);
-    }
-
-    // Register _global.Font
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, font_ctor, attachFontInterface, 
+        attachFontStaticInterface, uri);
 }
 
 namespace {

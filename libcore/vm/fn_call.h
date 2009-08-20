@@ -42,6 +42,51 @@ namespace gnash {
 
 namespace gnash {
 
+/// A class to contain transferable arguments for a fn_call.
+//
+/// The operators += and , are implemented for intuitive syntax:
+//
+/// FunctionArgs<as_value> args; args += 0.0, "string", NaN.
+//
+/// This may have unexpected side effects if it is used in unexpected ways,
+/// so stick to using such lists, or use operator += repeatedly.
+//
+/// The arguments can be moved to another container, and this happens when
+/// the FunctionArgs object is passed to fn_call. It will still be valid
+/// afterwards, but will contain no arguments.
+template<typename T>
+class FunctionArgs
+{
+public:
+
+    typedef typename std::vector<T>::size_type size_type;
+    typedef std::vector<T> container_type;
+    typedef T value_type;
+
+    FunctionArgs() {}
+
+    FunctionArgs& operator+=(const T& t) {
+        _v.push_back(t);
+        return *this;
+    }
+
+    FunctionArgs& operator,(const T& t) {
+        _v.push_back(t);
+        return *this;
+    }
+
+    void swap(std::vector<T>& to) {
+        std::swap(_v, to);
+    }
+
+    size_type size() const {
+        return _v.size();
+    }
+
+private:
+    std::vector<T> _v;
+};
+
 
 /// \brief
 /// Parameters/environment for builtin or user-defined functions
@@ -49,15 +94,17 @@ namespace gnash {
 class fn_call
 {
 public:
+    typedef FunctionArgs<as_value> Args;
+
 	/// The as_object (or a pointer derived thereof) on which this call
 	/// is taking place.
-	boost::intrusive_ptr<as_object> this_ptr;
+	as_object* this_ptr;
 
 	/// The "super" object in this function call context
 	as_object* super;
 
 	/// Number of arguments to this ActionScript function call.
-	unsigned int nargs;
+    Args::size_type nargs;
 
     /// Definition containing caller code. 0 if spontaneous (system event).
     const movie_definition* callerDef;
@@ -70,7 +117,7 @@ public:
         callerDef(fn.callerDef),
         _new(false),
         _env(fn._env),
-        _args(fn._args.get() ? new std::vector<as_value>(*fn._args) : 0)
+        _args(fn._args)
 	{
 	}
 
@@ -82,7 +129,7 @@ public:
         callerDef(fn.callerDef),
         _new(false),
 		_env(fn._env),
-        _args(fn._args.get() ? new std::vector<as_value>(*fn._args) : 0)
+        _args(fn._args)
 	{
 	}
 
@@ -101,17 +148,16 @@ public:
 	}
 
 	fn_call(as_object* this_in, const as_environment& env_in,
-			std::auto_ptr<std::vector<as_value> > args, as_object* sup = 0,
-            bool isNew = false)
+            Args& args, as_object* sup = 0, bool isNew = false)
 		:
 		this_ptr(this_in),
 		super(sup),
-		nargs(args->size()),
+		nargs(args.size()),
         callerDef(0),
         _new(isNew),
-		_env(env_in),
-		_args(args)
+		_env(env_in)
 	{
+        args.swap(_args);
 	}
 
 	fn_call(as_object* this_in, const as_environment& env_in)
@@ -144,20 +190,20 @@ public:
 	}
 
 	/// Access a particular argument.
-	const as_value& arg(unsigned int n) const
+	const Args::value_type& arg(unsigned int n) const
 	{
 		assert(n < nargs);
-		return (*_args)[n]; 
+		return _args[n]; 
 	}
 
-    const std::vector<as_value>& getArgs() const {
-        return *_args;
+    const Args::container_type& getArgs() const {
+        return _args;
     }
 
 	void drop_bottom()
 	{
-		assert(_args.get() && !_args->empty());
-        _args->erase(_args->begin());
+		assert(!_args.empty());
+        _args.erase(_args.begin());
 		--nargs;
 	}
 
@@ -169,7 +215,7 @@ public:
 	/// Dump arguments to given output stream
 	void dump_args(std::ostream& os) const
 	{
-		for (unsigned int i=0; i<nargs; ++i)
+		for (size_t i = 0; i < nargs; ++i)
 		{
 			if ( i ) os << ", ";
 			os << arg(i).toDebugString();
@@ -186,14 +232,14 @@ public:
 
 	void resetArgs()
 	{
-		nargs=0;
-		_args->clear();
+		nargs = 0;
+		_args.clear();
 	}
 
-	void pushArg(const as_value& arg)
+	void pushArg(const Args::value_type& arg)
 	{
 		++nargs;
-		_args->push_back(arg);
+		_args.push_back(arg);
 	}
 
 private:
@@ -205,13 +251,14 @@ private:
 	const as_environment& _env;
 
 	/// The actual arguments
-	std::auto_ptr< std::vector<as_value> > _args;
+    Args::container_type _args;
 
-	void readArgs(const as_environment& env, int first_in, int nargs)
+	void readArgs(const as_environment& env, int first_in, size_t nargs)
 	{
-		_args.reset(new std::vector<as_value>);
-		for (int i=0; i<nargs; ++i)
-			_args->push_back(env.bottom(first_in - i));
+		_args.clear();
+		for (size_t i = 0; i < nargs; ++i) {
+			_args.push_back(env.bottom(first_in - i));
+        }
 	}
 
 };

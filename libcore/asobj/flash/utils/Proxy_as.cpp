@@ -45,36 +45,14 @@ namespace {
     as_value proxy_ctor(const fn_call& fn);
     void attachProxyInterface(as_object& o);
     void attachProxyStaticInterface(as_object& o);
-    as_object* getProxyInterface();
-
 }
 
-class Proxy_as : public as_object
-{
-
-public:
-
-    Proxy_as()
-        :
-        as_object(getProxyInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void proxy_class_init(as_object& where, const ObjectURI& uri)
+void
+proxy_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getProxyInterface();
-        cl = gl->createClass(&proxy_ctor, proto);
-        attachProxyStaticInterface(*cl);
-    }
-
-    // Register _global.Proxy
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, proxy_ctor, attachProxyInterface,
+            attachProxyStaticInterface, uri);
 }
 
 namespace {
@@ -100,103 +78,65 @@ attachProxyStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getProxyInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachProxyInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-proxy_deleteProperty(const fn_call& fn)
+proxy_deleteProperty(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_getDescendants(const fn_call& fn)
+proxy_getDescendants(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_getProperty(const fn_call& fn)
+proxy_getProperty(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_hasProperty(const fn_call& fn)
+proxy_hasProperty(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_isAttribute(const fn_call& fn)
+proxy_isAttribute(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_nextName(const fn_call& fn)
+proxy_nextName(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_nextNameIndex(const fn_call& fn)
+proxy_nextNameIndex(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_nextValue(const fn_call& fn)
+proxy_nextValue(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-proxy_setProperty(const fn_call& fn)
+proxy_setProperty(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Proxy_as> ptr =
-        ensureType<Proxy_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -204,9 +144,7 @@ proxy_setProperty(const fn_call& fn)
 as_value
 proxy_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Proxy_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

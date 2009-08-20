@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void bitmap_class_init(as_object& where, const ObjectURI& uri)
+void
+bitmap_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getBitmapInterface();
-        cl = gl->createClass(&bitmap_ctor, proto);
-        attachBitmapStaticInterface(*cl);
-    }
-
-    // Register _global.Bitmap
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, bitmap_ctor, attachBitmapInterface, 
+        attachBitmapStaticInterface, uri);
 }
 
 namespace {

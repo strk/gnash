@@ -38,36 +38,14 @@ namespace {
     as_value httpstatusevent_ctor(const fn_call& fn);
     void attachHTTPStatusEventInterface(as_object& o);
     void attachHTTPStatusEventStaticInterface(as_object& o);
-    as_object* getHTTPStatusEventInterface();
-
 }
 
-class HTTPStatusEvent_as : public as_object
-{
-
-public:
-
-    HTTPStatusEvent_as()
-        :
-        as_object(getHTTPStatusEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void httpstatusevent_class_init(as_object& where, const ObjectURI& uri)
+void
+httpstatusevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getHTTPStatusEventInterface();
-        cl = gl->createClass(&httpstatusevent_ctor, proto);
-        attachHTTPStatusEventStaticInterface(*cl);
-    }
-
-    // Register _global.HTTPStatusEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, httpstatusevent_ctor, attachHTTPStatusEventInterface, 
+        attachHTTPStatusEventStaticInterface, uri);
 }
 
 namespace {
@@ -85,33 +63,16 @@ attachHTTPStatusEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getHTTPStatusEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachHTTPStatusEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-httpstatusevent_toString(const fn_call& fn)
+httpstatusevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<HTTPStatusEvent_as> ptr =
-        ensureType<HTTPStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-httpstatusevent_HTTP_STATUS(const fn_call& fn)
+httpstatusevent_HTTP_STATUS(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<HTTPStatusEvent_as> ptr =
-        ensureType<HTTPStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -119,9 +80,8 @@ httpstatusevent_HTTP_STATUS(const fn_call& fn)
 as_value
 httpstatusevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new HTTPStatusEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

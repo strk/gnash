@@ -56,7 +56,11 @@ void
 selection_class_init(as_object& where, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
-    registerBuiltinObject(where, attachSelectionInterface, uri);
+    as_object* proto = registerBuiltinObject(where, attachSelectionInterface,
+            uri);
+
+    /// Handles addListener, removeListener, and _listeners.
+    AsBroadcaster::initialize(*proto);
 }
 
 void
@@ -89,9 +93,6 @@ attachSelectionInterface(as_object& o)
 	o.init_member("getFocus", vm.getNative(600, 3), flags);
 	o.init_member("setFocus", vm.getNative(600, 4), flags);
 	o.init_member("setSelection", vm.getNative(600, 5), flags);
-
-    /// Handles addListener, removeListener, and _listeners.
-    AsBroadcaster::initialize(o);
  
 }
 

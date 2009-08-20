@@ -38,36 +38,14 @@ namespace {
     as_value asyncerrorevent_ctor(const fn_call& fn);
     void attachAsyncErrorEventInterface(as_object& o);
     void attachAsyncErrorEventStaticInterface(as_object& o);
-    as_object* getAsyncErrorEventInterface();
-
 }
 
-class AsyncErrorEvent_as : public as_object
-{
-
-public:
-
-    AsyncErrorEvent_as()
-        :
-        as_object(getAsyncErrorEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void asyncerrorevent_class_init(as_object& where, const ObjectURI& uri)
+void
+asyncerrorevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getAsyncErrorEventInterface();
-        cl = gl->createClass(&asyncerrorevent_ctor, proto);
-        attachAsyncErrorEventStaticInterface(*cl);
-    }
-
-    // Register _global.AsyncErrorEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, asyncerrorevent_ctor, attachAsyncErrorEventInterface, 
+        attachAsyncErrorEventStaticInterface, uri);
 }
 
 namespace {
@@ -85,33 +63,16 @@ attachAsyncErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getAsyncErrorEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachAsyncErrorEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-asyncerrorevent_toString(const fn_call& fn)
+asyncerrorevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<AsyncErrorEvent_as> ptr =
-        ensureType<AsyncErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-asyncerrorevent_ASYNC_ERROR(const fn_call& fn)
+asyncerrorevent_ASYNC_ERROR(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<AsyncErrorEvent_as> ptr =
-        ensureType<AsyncErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -119,9 +80,8 @@ asyncerrorevent_ASYNC_ERROR(const fn_call& fn)
 as_value
 asyncerrorevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new AsyncErrorEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

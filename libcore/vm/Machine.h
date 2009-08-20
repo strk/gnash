@@ -27,6 +27,7 @@
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
+#include "fn_call.h"
 
 namespace gnash {
     class Global_as;
@@ -287,7 +288,7 @@ private:
 
 	void print_scope_stack();
 
-	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc);
+	void get_args(size_t argc, fn_call::Args& args);
 	
 	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
 

@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void textlinemetrics_class_init(as_object& where, const ObjectURI& uri)
+void
+textlinemetrics_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getTextLineMetricsInterface();
-        cl = gl->createClass(&textlinemetrics_ctor, proto);
-        attachTextLineMetricsStaticInterface(*cl);
-    }
-
-    // Register _global.TextLineMetrics
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, textlinemetrics_ctor, attachTextLineMetricsInterface, 
+        attachTextLineMetricsStaticInterface, uri);
 }
 
 namespace {

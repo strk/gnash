@@ -54,20 +54,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void printjob_class_init(as_object& where, const ObjectURI& uri)
+void
+printjob_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getPrintJobInterface();
-        cl = gl->createClass(&printjob_ctor, proto);
-        attachPrintJobStaticInterface(*cl);
-    }
-
-    // Register _global.PrintJob
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, printjob_ctor, attachPrintJobInterface, 
+        attachPrintJobStaticInterface, uri);
 }
 
 namespace {

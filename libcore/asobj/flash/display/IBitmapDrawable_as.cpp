@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void ibitmapdrawable_class_init(as_object& where, const ObjectURI& uri)
+void
+ibitmapdrawable_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIBitmapDrawableInterface();
-        cl = gl->createClass(&ibitmapdrawable_ctor, proto);
-        attachIBitmapDrawableStaticInterface(*cl);
-    }
-
-    // Register _global.IBitmapDrawable
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, ibitmapdrawable_ctor, attachIBitmapDrawableInterface, 
+        attachIBitmapDrawableStaticInterface, uri);
 }
 
 namespace {

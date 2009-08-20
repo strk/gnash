@@ -1286,8 +1286,9 @@ template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
     // This is also not properly tested.
     if (!ctor) throw ActionTypeError();
 
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(arg);
+    fn_call::Args args;
+    args += arg;
+
     as_environment env(getVM(gl));
     as_object* ret = ctor->constructInstance(env, args).get();
 

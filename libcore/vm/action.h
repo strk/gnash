@@ -25,6 +25,7 @@
 
 #include "as_object.h"
 #include "smart_ptr.h"
+#include "fn_call.h"
 
 #include <vector>
 #include <memory>
@@ -52,7 +53,7 @@ namespace gnash {
             const as_environment& env,
         // this is ourself
 		as_object* this_ptr,
-		std::auto_ptr<std::vector<as_value> > args,
+        fn_call::Args& args,
         // the super object
         as_object* super=0,
         // the movie_definition containing caller code

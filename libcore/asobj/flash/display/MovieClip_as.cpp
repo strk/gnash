@@ -1429,8 +1429,8 @@ movieclip_getTextSnapshot(const fn_call& fn)
     }
 
     // Construct a flash.geom.Transform object with "this" as argument.
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(obj.get());
+    fn_call::Args args;
+    args += obj.get();
 
     boost::intrusive_ptr<as_object> ts =
         tsCtor->constructInstance(fn.env(), args);
@@ -2625,8 +2625,8 @@ movieclip_transform(const fn_call& fn)
     }
 
     // Construct a flash.geom.Transform object with "this" as argument.
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    args->push_back(ptr.get());
+    fn_call::Args args;
+    args += ptr.get();
 
     boost::intrusive_ptr<as_object> newTrans =
         transCtor->constructInstance(fn.env(), args);

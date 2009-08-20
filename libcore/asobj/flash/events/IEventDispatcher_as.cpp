@@ -40,36 +40,15 @@ namespace {
     as_value ieventdispatcher_ctor(const fn_call& fn);
     void attachIEventDispatcherInterface(as_object& o);
     void attachIEventDispatcherStaticInterface(as_object& o);
-    as_object* getIEventDispatcherInterface();
-
 }
 
-class IEventDispatcher_as : public as_object
-{
-
-public:
-
-    IEventDispatcher_as()
-        :
-        as_object(getIEventDispatcherInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void ieventdispatcher_class_init(as_object& where, const ObjectURI& uri)
+void
+ieventdispatcher_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIEventDispatcherInterface();
-        cl = gl->createClass(&ieventdispatcher_ctor, proto);
-        attachIEventDispatcherStaticInterface(*cl);
-    }
-
-    // Register _global.IEventDispatcher
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, ieventdispatcher_ctor,
+            attachIEventDispatcherInterface,
+            attachIEventDispatcherStaticInterface, uri);
 }
 
 namespace {
@@ -89,53 +68,30 @@ attachIEventDispatcherStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getIEventDispatcherInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIEventDispatcherInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-ieventdispatcher_dispatchEvent(const fn_call& fn)
+ieventdispatcher_dispatchEvent(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IEventDispatcher_as> ptr =
-        ensureType<IEventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-ieventdispatcher_hasEventListener(const fn_call& fn)
+ieventdispatcher_hasEventListener(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IEventDispatcher_as> ptr =
-        ensureType<IEventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-ieventdispatcher_removeEventListener(const fn_call& fn)
+ieventdispatcher_removeEventListener(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IEventDispatcher_as> ptr =
-        ensureType<IEventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-ieventdispatcher_willTrigger(const fn_call& fn)
+ieventdispatcher_willTrigger(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IEventDispatcher_as> ptr =
-        ensureType<IEventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -143,9 +99,7 @@ ieventdispatcher_willTrigger(const fn_call& fn)
 as_value
 ieventdispatcher_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IEventDispatcher_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

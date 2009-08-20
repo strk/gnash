@@ -70,7 +70,6 @@ namespace {
 
     size_t validIndex(const std::wstring& subject, int index);
     void attachStringInterface(as_object& o);
-    as_object* getStringInterface();
 
     inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
             const std::string& function);
@@ -112,11 +111,14 @@ string_class_init(as_object& where, const ObjectURI& uri)
     // This is going to be the global String "class"/"function"
     
     VM& vm = getVM(where);
+    Global_as* gl = getGlobal(where);
 
-    as_object* proto = getStringInterface();
+    as_object* proto = gl->createObject(getObjectInterface());
     as_object* cl = vm.getNative(251, 0);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
+    attachStringInterface(*proto);
 
     cl->init_member("fromCharCode", vm.getNative(251, 14)); 
 
@@ -146,36 +148,6 @@ attachStringInterface(as_object& o)
 	o.init_member("substring", vm.getNative(251, 11));
 	o.init_member("split", vm.getNative(251, 12));
 	o.init_member("substr", vm.getNative(251, 13));
-}
-
-as_object*
-getStringInterface()
-{
-
-    if (isAS3(VM::get())) {
-        static boost::intrusive_ptr<as_object> o;
-
-        if ( o == NULL )
-        {
-            o = new as_object(getObjectInterface());
-            VM::get().addStatic(o.get());
-
-            attachStringInterface(*o);
-        }
-        return o.get();
-    }
-
-    static boost::intrusive_ptr<as_object> o;
-
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachStringInterface(*o);
-    }
-    return o.get();
-
 }
 
 // all the arguments will be converted to string and concatenated.
@@ -797,7 +769,7 @@ string_valueOf(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    String_as* str = checkType<String_as>(fn.this_ptr.get());
+    String_as* str = checkType<String_as>(fn.this_ptr);
     return as_value(str->value());
 }
 
@@ -816,7 +788,7 @@ string_ctor(const fn_call& fn)
 		return as_value(str);
 	}
 	
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
 
     obj->setProxy(new String_as(str));
     std::wstring wstr = utf8::decodeCanonicalString(str, getSWFVersion(fn));

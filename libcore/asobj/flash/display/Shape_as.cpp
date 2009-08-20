@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void shape_class_init(as_object& where, const ObjectURI& uri)
+void
+shape_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getShapeInterface();
-        cl = gl->createClass(&shape_ctor, proto);
-        attachShapeStaticInterface(*cl);
-    }
-
-    // Register _global.Shape
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, shape_ctor, attachShapeInterface, 
+        attachShapeStaticInterface, uri);
 }
 
 namespace {

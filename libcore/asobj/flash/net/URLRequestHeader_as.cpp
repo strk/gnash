@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void urlrequestheader_class_init(as_object& where, const ObjectURI& uri)
+void
+urlrequestheader_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getURLRequestHeaderInterface();
-        cl = gl->createClass(&urlrequestheader_ctor, proto);
-        attachURLRequestHeaderStaticInterface(*cl);
-    }
-
-    // Register _global.URLRequestHeader
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, urlrequestheader_ctor, attachURLRequestHeaderInterface, 
+        attachURLRequestHeaderStaticInterface, uri);
 }
 
 namespace {

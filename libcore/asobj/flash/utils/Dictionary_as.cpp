@@ -36,36 +36,14 @@ namespace {
     as_value dictionary_ctor(const fn_call& fn);
     void attachDictionaryInterface(as_object& o);
     void attachDictionaryStaticInterface(as_object& o);
-    as_object* getDictionaryInterface();
-
 }
 
-class Dictionary_as : public as_object
-{
-
-public:
-
-    Dictionary_as()
-        :
-        as_object(getDictionaryInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void dictionary_class_init(as_object& where, const ObjectURI& uri)
+void
+dictionary_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getDictionaryInterface();
-        cl = gl->createClass(&dictionary_ctor, proto);
-        attachDictionaryStaticInterface(*cl);
-    }
-
-    // Register _global.Dictionary
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, dictionary_ctor, attachDictionaryInterface,
+            attachDictionaryStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +59,10 @@ attachDictionaryStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getDictionaryInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachDictionaryInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 dictionary_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Dictionary_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

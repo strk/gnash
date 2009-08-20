@@ -28,7 +28,9 @@
 
 namespace gnash {
 
-static as_value
+namespace {
+
+as_value
 get_flash_external_package(const fn_call& fn)
 {
 
@@ -39,10 +41,12 @@ get_flash_external_package(const fn_call& fn)
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;
 
-	externalinterface_class_init(*pkg,
+    externalinterface_class_init(*pkg,
             ObjectURI(st.find("ExternalInterface"), global));
 
     return pkg;
+}
+
 }
 
 void

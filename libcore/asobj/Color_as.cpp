@@ -66,23 +66,19 @@ registerColorNative(as_object& o)
 
 // extern (used by Global.cpp)
 void
-color_class_init(as_object& global, const ObjectURI& uri)
+color_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(global);
-    as_object* proto = gl->createObject(getObjectInterface());
-    as_object* cl = gl->createClass(&color_ctor, proto);
+    as_object* cl = registerBuiltinClass(where, color_ctor,
+            attachColorInterface, 0, uri);
 
-    attachColorInterface(*proto);
+    as_object* proto =
+        cl->getMember(NSV::PROP_PROTOTYPE).to_object(*getGlobal(where)).get();
 
-    // This has to be done after createClass is called, as that modifies
-    // proto.
+    if (!proto) return;
+
     const int protect = as_object::DefaultFlags | PropFlags::readOnly;
     proto->set_member_flags(NSV::PROP_uuPROTOuu, protect); 
     proto->set_member_flags(NSV::PROP_CONSTRUCTOR, protect); 
-
-	// Register _global.Color
-	global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
 
 }
 
@@ -243,7 +239,7 @@ as_value
 color_ctor(const fn_call& fn)
 {
 	
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
     
     as_value target;
     if (fn.nargs) target = fn.arg(0);

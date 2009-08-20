@@ -49,36 +49,15 @@ namespace {
     as_value idatainput_ctor(const fn_call& fn);
     void attachIDataInputInterface(as_object& o);
     void attachIDataInputStaticInterface(as_object& o);
-    as_object* getIDataInputInterface();
 
 }
 
-class IDataInput_as : public as_object
-{
-
-public:
-
-    IDataInput_as()
-        :
-        as_object(getIDataInputInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void idatainput_class_init(as_object& where, const ObjectURI& uri)
+void
+idatainput_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIDataInputInterface();
-        cl = gl->createClass(&idatainput_ctor, proto);
-        attachIDataInputStaticInterface(*cl);
-    }
-
-    // Register _global.IDataInput
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, idatainput_ctor, attachIDataInputInterface,
+            attachIDataInputStaticInterface, uri);
 }
 
 namespace {
@@ -107,143 +86,93 @@ attachIDataInputStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getIDataInputInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIDataInputInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-idatainput_readByte(const fn_call& fn)
+idatainput_readByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readBytes(const fn_call& fn)
+idatainput_readBytes(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readDouble(const fn_call& fn)
+idatainput_readDouble(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readFloat(const fn_call& fn)
+idatainput_readFloat(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readInt(const fn_call& fn)
+idatainput_readInt(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readMultiByte(const fn_call& fn)
+idatainput_readMultiByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readObject(const fn_call& fn)
+idatainput_readObject(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readShort(const fn_call& fn)
+idatainput_readShort(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readUnsignedByte(const fn_call& fn)
+idatainput_readUnsignedByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readUnsignedInt(const fn_call& fn)
+idatainput_readUnsignedInt(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readUnsignedShort(const fn_call& fn)
+idatainput_readUnsignedShort(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readUTF(const fn_call& fn)
+idatainput_readUTF(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-idatainput_readUTFBytes(const fn_call& fn)
+idatainput_readUTFBytes(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<IDataInput_as> ptr =
-        ensureType<IDataInput_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -251,9 +180,7 @@ idatainput_readUTFBytes(const fn_call& fn)
 as_value
 idatainput_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IDataInput_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

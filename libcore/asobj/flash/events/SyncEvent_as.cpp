@@ -38,36 +38,14 @@ namespace {
     as_value syncevent_ctor(const fn_call& fn);
     void attachSyncEventInterface(as_object& o);
     void attachSyncEventStaticInterface(as_object& o);
-    as_object* getSyncEventInterface();
-
 }
 
-class SyncEvent_as : public as_object
-{
-
-public:
-
-    SyncEvent_as()
-        :
-        as_object(getSyncEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void syncevent_class_init(as_object& where, const ObjectURI& uri)
+void
+syncevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getSyncEventInterface();
-        cl = gl->createClass(&syncevent_ctor, proto);
-        attachSyncEventStaticInterface(*cl);
-    }
-
-    // Register _global.SyncEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, syncevent_ctor, attachSyncEventInterface, 
+        attachSyncEventStaticInterface, uri);
 }
 
 namespace {
@@ -85,33 +63,16 @@ attachSyncEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getSyncEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSyncEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-syncevent_toString(const fn_call& fn)
+syncevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<SyncEvent_as> ptr =
-        ensureType<SyncEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-syncevent_SYNC(const fn_call& fn)
+syncevent_SYNC(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<SyncEvent_as> ptr =
-        ensureType<SyncEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -119,9 +80,8 @@ syncevent_SYNC(const fn_call& fn)
 as_value
 syncevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SyncEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

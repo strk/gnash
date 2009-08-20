@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void sample_class_init(as_object& where, const ObjectURI& uri)
+void
+sample_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getSampleInterface();
-        cl = gl->createClass(&sample_ctor, proto);
-        attachSampleStaticInterface(*cl);
-    }
-
-    // Register _global.Sample
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, sample_ctor, attachSampleInterface, 
+        attachSampleStaticInterface, uri);
 }
 
 namespace {

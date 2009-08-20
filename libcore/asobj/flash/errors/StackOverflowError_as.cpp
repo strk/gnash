@@ -36,36 +36,15 @@ namespace {
     as_value stackoverflowerror_ctor(const fn_call& fn);
     void attachStackOverflowErrorInterface(as_object& o);
     void attachStackOverflowErrorStaticInterface(as_object& o);
-    as_object* getStackOverflowErrorInterface();
-
 }
 
-class StackOverflowError_as : public as_object
-{
-
-public:
-
-    StackOverflowError_as()
-        :
-        as_object(getStackOverflowErrorInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void stackoverflowerror_class_init(as_object& where, const ObjectURI& uri)
+void
+stackoverflowerror_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getStackOverflowErrorInterface();
-        cl = gl->createClass(&stackoverflowerror_ctor, proto);
-        attachStackOverflowErrorStaticInterface(*cl);
-    }
-
-    // Register _global.StackOverflowError
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, stackoverflowerror_ctor,
+            attachStackOverflowErrorInterface,
+            attachStackOverflowErrorStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +60,10 @@ attachStackOverflowErrorStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getStackOverflowErrorInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachStackOverflowErrorInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 stackoverflowerror_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new StackOverflowError_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

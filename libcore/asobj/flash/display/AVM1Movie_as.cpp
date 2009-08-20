@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void avm1movie_class_init(as_object& where, const ObjectURI& uri)
+void
+avm1movie_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getAVM1MovieInterface();
-        cl = gl->createClass(&avm1movie_ctor, proto);
-        attachAVM1MovieStaticInterface(*cl);
-    }
-
-    // Register _global.AVM1Movie
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, avm1movie_ctor, attachAVM1MovieInterface, 
+        attachAVM1MovieStaticInterface, uri);
 }
 
 namespace {

@@ -200,7 +200,7 @@ object_ctor(const fn_call& fn)
 as_value
 object_toString(const fn_call& fn)
 {
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
 
     if (obj && obj->to_function() && !obj->isSuper()) {
         return as_value("[type Function]");
@@ -473,7 +473,7 @@ object_isPrototypeOf(const fn_call& fn)
 as_value
 object_watch(const fn_call& fn)
 {
-	as_object* obj = fn.this_ptr.get();
+	as_object* obj = fn.this_ptr;
 
 	if ( fn.nargs < 2 )
 	{
@@ -510,7 +510,7 @@ object_watch(const fn_call& fn)
 as_value
 object_unwatch(const fn_call& fn)
 {
-	as_object* obj = fn.this_ptr.get();
+	as_object* obj = fn.this_ptr;
 
 	if ( fn.nargs < 1 )
 	{

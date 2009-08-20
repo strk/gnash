@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void objectencoding_class_init(as_object& where, const ObjectURI& uri)
+void
+objectencoding_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getObjectEncodingInterface();
-        cl = gl->createClass(&objectencoding_ctor, proto);
-        attachObjectEncodingStaticInterface(*cl);
-    }
-
-    // Register _global.ObjectEncoding
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, objectencoding_ctor, attachObjectEncodingInterface, 
+        attachObjectEncodingStaticInterface, uri);
 }
 
 namespace {

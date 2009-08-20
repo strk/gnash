@@ -153,8 +153,9 @@ Timer::execute()
     as_environment env(vm); 
 
     // Copy args 
-    std::auto_ptr<std::vector<as_value> > args(
-            new std::vector<as_value>(_args));
+    fn_call::Args::container_type argsCopy(_args);
+    fn_call::Args args;
+    args.swap(argsCopy);
 
     call_method(timer_method, env, _object.get(), args, super);
 

@@ -36,36 +36,14 @@ namespace {
     as_value eventphase_ctor(const fn_call& fn);
     void attachEventPhaseInterface(as_object& o);
     void attachEventPhaseStaticInterface(as_object& o);
-    as_object* getEventPhaseInterface();
-
 }
 
-class EventPhase_as : public as_object
-{
-
-public:
-
-    EventPhase_as()
-        :
-        as_object(getEventPhaseInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void eventphase_class_init(as_object& where, const ObjectURI& uri)
+void
+eventphase_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getEventPhaseInterface();
-        cl = gl->createClass(&eventphase_ctor, proto);
-        attachEventPhaseStaticInterface(*cl);
-    }
-
-    // Register _global.EventPhase
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, eventphase_ctor, attachEventPhaseInterface, 
+        attachEventPhaseStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +59,11 @@ attachEventPhaseStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getEventPhaseInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachEventPhaseInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 eventphase_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new EventPhase_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

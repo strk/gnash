@@ -36,36 +36,16 @@ namespace {
     as_value contextmenubuiltinitems_ctor(const fn_call& fn);
     void attachContextMenuBuiltInItemsInterface(as_object& o);
     void attachContextMenuBuiltInItemsStaticInterface(as_object& o);
-    as_object* getContextMenuBuiltInItemsInterface();
 
 }
 
-class ContextMenuBuiltInItems_as : public as_object
-{
-
-public:
-
-    ContextMenuBuiltInItems_as()
-        :
-        as_object(getContextMenuBuiltInItemsInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void contextmenubuiltinitems_class_init(as_object& where, const ObjectURI& uri)
+void
+contextmenubuiltinitems_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getContextMenuBuiltInItemsInterface();
-        cl = gl->createClass(&contextmenubuiltinitems_ctor, proto);
-        attachContextMenuBuiltInItemsStaticInterface(*cl);
-    }
-
-    // Register _global.ContextMenuBuiltInItems
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, contextmenubuiltinitems_ctor,
+            attachContextMenuBuiltInItemsInterface,
+            attachContextMenuBuiltInItemsStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +61,10 @@ attachContextMenuBuiltInItemsStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getContextMenuBuiltInItemsInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachContextMenuBuiltInItemsInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 contextmenubuiltinitems_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ContextMenuBuiltInItems_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -43,32 +43,12 @@ namespace {
 
 }
 
-class ContextMenuEvent_as : public as_object
-{
-
-public:
-
-    ContextMenuEvent_as()
-        :
-        as_object(getContextMenuEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void contextmenuevent_class_init(as_object& where, const ObjectURI& uri)
+void
+contextmenuevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getContextMenuEventInterface();
-        cl = gl->createClass(&contextmenuevent_ctor, proto);
-        attachContextMenuEventStaticInterface(*cl);
-    }
-
-    // Register _global.ContextMenuEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, contextmenuevent_ctor, attachContextMenuEventInterface, 
+        attachContextMenuEventStaticInterface, uri);
 }
 
 namespace {
@@ -88,43 +68,23 @@ attachContextMenuEventStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getContextMenuEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachContextMenuEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-contextmenuevent_toString(const fn_call& fn)
+contextmenuevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ContextMenuEvent_as> ptr =
-        ensureType<ContextMenuEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-contextmenuevent_MENU_ITEM_SELECT(const fn_call& fn)
+contextmenuevent_MENU_ITEM_SELECT(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ContextMenuEvent_as> ptr =
-        ensureType<ContextMenuEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-contextmenuevent_MENU_SELECT(const fn_call& fn)
+contextmenuevent_MENU_SELECT(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ContextMenuEvent_as> ptr =
-        ensureType<ContextMenuEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -132,9 +92,8 @@ contextmenuevent_MENU_SELECT(const fn_call& fn)
 as_value
 contextmenuevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ContextMenuEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

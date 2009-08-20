@@ -43,32 +43,12 @@ namespace {
 
 }
 
-class DataEvent_as : public as_object
-{
-
-public:
-
-    DataEvent_as()
-        :
-        as_object(getDataEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void dataevent_class_init(as_object& where, const ObjectURI& uri)
+void
+dataevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getDataEventInterface();
-        cl = gl->createClass(&dataevent_ctor, proto);
-        attachDataEventStaticInterface(*cl);
-    }
-
-    // Register _global.DataEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, dataevent_ctor, attachDataEventInterface, 
+        attachDataEventStaticInterface, uri);
 }
 
 namespace {
@@ -88,43 +68,23 @@ attachDataEventStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getDataEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachDataEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-dataevent_toString(const fn_call& fn)
+dataevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<DataEvent_as> ptr =
-        ensureType<DataEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-dataevent_DATA(const fn_call& fn)
+dataevent_DATA(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<DataEvent_as> ptr =
-        ensureType<DataEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-dataevent_UPLOAD_COMPLETE_DATA(const fn_call& fn)
+dataevent_UPLOAD_COMPLETE_DATA(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<DataEvent_as> ptr =
-        ensureType<DataEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -132,9 +92,8 @@ dataevent_UPLOAD_COMPLETE_DATA(const fn_call& fn)
 as_value
 dataevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new DataEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

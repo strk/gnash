@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void capabilities_class_init(as_object& where, const ObjectURI& uri)
+void
+capabilities_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getCapabilitiesInterface();
-        cl = gl->createClass(&capabilities_ctor, proto);
-        attachCapabilitiesStaticInterface(*cl);
-    }
-
-    // Register _global.Capabilities
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, capabilities_ctor, attachCapabilitiesInterface, 
+        attachCapabilitiesStaticInterface, uri);
 }
 
 namespace {

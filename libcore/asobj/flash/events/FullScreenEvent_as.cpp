@@ -38,36 +38,15 @@ namespace {
     as_value fullscreenevent_ctor(const fn_call& fn);
     void attachFullScreenEventInterface(as_object& o);
     void attachFullScreenEventStaticInterface(as_object& o);
-    as_object* getFullScreenEventInterface();
 
 }
 
-class FullScreenEvent_as : public as_object
-{
-
-public:
-
-    FullScreenEvent_as()
-        :
-        as_object(getFullScreenEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void fullscreenevent_class_init(as_object& where, const ObjectURI& uri)
+void
+fullscreenevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getFullScreenEventInterface();
-        cl = gl->createClass(&fullscreenevent_ctor, proto);
-        attachFullScreenEventStaticInterface(*cl);
-    }
-
-    // Register _global.FullScreenEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, fullscreenevent_ctor, attachFullScreenEventInterface, 
+        attachFullScreenEventStaticInterface, uri);
 }
 
 namespace {
@@ -85,33 +64,16 @@ attachFullScreenEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getFullScreenEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFullScreenEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-fullscreenevent_toString(const fn_call& fn)
+fullscreenevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<FullScreenEvent_as> ptr =
-        ensureType<FullScreenEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-fullscreenevent_FULL_SCREEN(const fn_call& fn)
+fullscreenevent_FULL_SCREEN(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<FullScreenEvent_as> ptr =
-        ensureType<FullScreenEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -119,9 +81,8 @@ fullscreenevent_FULL_SCREEN(const fn_call& fn)
 as_value
 fullscreenevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new FullScreenEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

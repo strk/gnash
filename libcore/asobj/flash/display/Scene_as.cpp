@@ -52,20 +52,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void scene_class_init(as_object& where, const ObjectURI& uri)
+void
+scene_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getSceneInterface();
-        cl = gl->createClass(&scene_ctor, proto);
-        attachSceneStaticInterface(*cl);
-    }
-
-    // Register _global.Scene
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, scene_ctor, attachSceneInterface, 
+        attachSceneStaticInterface, uri);
 }
 
 namespace {

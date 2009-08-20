@@ -38,36 +38,14 @@ namespace {
     as_value securityerrorevent_ctor(const fn_call& fn);
     void attachSecurityErrorEventInterface(as_object& o);
     void attachSecurityErrorEventStaticInterface(as_object& o);
-    as_object* getSecurityErrorEventInterface();
-
 }
 
-class SecurityErrorEvent_as : public as_object
-{
-
-public:
-
-    SecurityErrorEvent_as()
-        :
-        as_object(getSecurityErrorEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void securityerrorevent_class_init(as_object& where, const ObjectURI& uri)
+void
+securityerrorevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getSecurityErrorEventInterface();
-        cl = gl->createClass(&securityerrorevent_ctor, proto);
-        attachSecurityErrorEventStaticInterface(*cl);
-    }
-
-    // Register _global.SecurityErrorEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, securityerrorevent_ctor, attachSecurityErrorEventInterface, 
+        attachSecurityErrorEventStaticInterface, uri);
 }
 
 namespace {
@@ -85,33 +63,16 @@ attachSecurityErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getSecurityErrorEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSecurityErrorEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-securityerrorevent_toString(const fn_call& fn)
+securityerrorevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<SecurityErrorEvent_as> ptr =
-        ensureType<SecurityErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-securityerrorevent_SECURITY_ERROR(const fn_call& fn)
+securityerrorevent_SECURITY_ERROR(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<SecurityErrorEvent_as> ptr =
-        ensureType<SecurityErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -119,9 +80,8 @@ securityerrorevent_SECURITY_ERROR(const fn_call& fn)
 as_value
 securityerrorevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SecurityErrorEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

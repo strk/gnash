@@ -55,20 +55,11 @@ public:
 };
 
 // extern (used by Global.cpp)
-void stackframe_class_init(as_object& where, const ObjectURI& uri)
+void
+stackframe_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getStackFrameInterface();
-        cl = gl->createClass(&stackframe_ctor, proto);
-        attachStackFrameStaticInterface(*cl);
-    }
-
-    // Register _global.StackFrame
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, stackframe_ctor, attachStackFrameInterface, 
+        attachStackFrameStaticInterface, uri);
 }
 
 namespace {

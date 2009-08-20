@@ -434,9 +434,8 @@ Rectangle_bottomRight_getset(const fn_call& fn)
             return as_value();
         }
 
-        std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-        args->push_back(right);
-        args->push_back(bottom);
+        fn_call::Args args;
+        args += right, bottom;
 
         as_value ret = pointCtor->constructInstance(fn.env(), args);
         return ret;
@@ -528,9 +527,8 @@ Rectangle_size_getset(const fn_call& fn)
             return as_value();
         }
 
-        std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-        args->push_back(w);
-        args->push_back(h);
+        fn_call::Args args;
+        args += w, h;
 
         ret = pointCtor->constructInstance(fn.env(), args);
     }
@@ -595,9 +593,8 @@ Rectangle_topLeft_getset(const fn_call& fn)
             return as_value();
         }
 
-        std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-        args->push_back(x);
-        args->push_back(y);
+        fn_call::Args args;
+        args += x, y;
 
         ret = pointCtor->constructInstance(fn.env(), args);
 

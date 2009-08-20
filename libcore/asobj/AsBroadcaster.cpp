@@ -175,18 +175,12 @@ AsBroadcaster::registerNative(as_object& global)
 
 
 void
-AsBroadcaster::init(as_object& global, const ObjectURI& uri)
+AsBroadcaster::init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(global);
-
-    as_object* proto = gl->createObject(getObjectInterface());
-    as_object* cl = gl->createClass(asbroadcaster_ctor, proto); 
-
-    attachAsBroadcasterStaticInterface(*cl);
-
     // AsBroadcaster is a class, even though it doesn't look much like one.
-    global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    // Its prototype has no properties.
+    registerBuiltinClass(where, asbroadcaster_ctor, 0,
+            attachAsBroadcasterStaticInterface, uri);
 }
 
 
@@ -248,9 +242,8 @@ asbroadcaster_addListener(const fn_call& fn)
     if ( ! obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
-            (void*)fn.this_ptr.get(),
-            fn.dump_args());
+        log_aserror(_("%p.addListener(%s): this object has no _listeners "
+                "member"), (void*)fn.this_ptr, fn.dump_args());
         );
         return as_value(true); // odd, but seems the case..
     }
@@ -260,9 +253,8 @@ asbroadcaster_addListener(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%p.addListener(%s): this object's _listener isn't "
-                "an object: %s"),
-            (void*)fn.this_ptr.get(),
-            fn.dump_args(), listenersValue);
+                "an object: %s"), (void*)fn.this_ptr, fn.dump_args(),
+                listenersValue);
         );
         return as_value(false); // TODO: check this
     }
@@ -275,9 +267,10 @@ asbroadcaster_addListener(const fn_call& fn)
     if ( ! listeners )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener isn't an array: %s -- will call 'push' on it anyway"),
-            (void*)fn.this_ptr.get(),
-            fn.dump_args(), listenersValue);
+        log_aserror(_("%p.addListener(%s): this object's _listener isn't "
+                "an array: %s -- will call 'push' on it anyway"),
+                (void*)fn.this_ptr,
+                fn.dump_args(), listenersValue);
         );
 
         listenersObj->callMethod(NSV::PROP_PUSH, newListener);
@@ -308,7 +301,7 @@ asbroadcaster_removeListener(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%p.addListener(%s): this object has no _listeners "
-                "member"), (void*)fn.this_ptr.get(), fn.dump_args());
+                "member"), (void*)fn.this_ptr, fn.dump_args());
         );
         return as_value(false); // TODO: check this
     }
@@ -318,7 +311,7 @@ asbroadcaster_removeListener(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%p.addListener(%s): this object's _listener isn't "
-                "an object: %s"), (void*)fn.this_ptr.get(), fn.dump_args(),
+                "an object: %s"), (void*)fn.this_ptr, fn.dump_args(),
                 listenersValue);
         );
         return as_value(false); // TODO: check this
@@ -337,7 +330,7 @@ asbroadcaster_removeListener(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%p.addListener(%s): this object's _listener isn't an "
-                "array: %s"), (void*)fn.this_ptr.get(), fn.dump_args(),
+                "array: %s"), (void*)fn.this_ptr, fn.dump_args(),
                 listenersValue);
         );
 
@@ -390,7 +383,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%p.addListener(%s): this object has no "
-                    "_listeners member"), (void*)fn.this_ptr.get(),
+                    "_listeners member"), (void*)fn.this_ptr,
                     fn.dump_args());
         );
         return as_value(); // TODO: check this
@@ -401,7 +394,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%p.addListener(%s): this object's _listener "
-                "isn't an object: %s"), (void*)fn.this_ptr.get(),
+                "isn't an object: %s"), (void*)fn.this_ptr,
                 fn.dump_args(), listenersValue);
         );
         return as_value(); // TODO: check this
@@ -415,7 +408,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%p.addListener(%s): this object's _listener "
-                "isn't an array: %s"), (void*)fn.this_ptr.get(),
+                "isn't an array: %s"), (void*)fn.this_ptr,
                 fn.dump_args(), listenersValue);
         );
         return as_value(); // TODO: check this
@@ -425,7 +418,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("%p.broadcastMessage() needs an argument", 
-            (void*)fn.this_ptr.get());
+            (void*)fn.this_ptr);
         );
         return as_value();
     }

@@ -38,36 +38,14 @@ namespace {
     as_value netstatusevent_ctor(const fn_call& fn);
     void attachNetStatusEventInterface(as_object& o);
     void attachNetStatusEventStaticInterface(as_object& o);
-    as_object* getNetStatusEventInterface();
-
 }
 
-class NetStatusEvent_as : public as_object
-{
-
-public:
-
-    NetStatusEvent_as()
-        :
-        as_object(getNetStatusEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void netstatusevent_class_init(as_object& where, const ObjectURI& uri)
+void
+netstatusevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getNetStatusEventInterface();
-        cl = gl->createClass(&netstatusevent_ctor, proto);
-        attachNetStatusEventStaticInterface(*cl);
-    }
-
-    // Register _global.NetStatusEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, netstatusevent_ctor, attachNetStatusEventInterface, 
+        attachNetStatusEventStaticInterface, uri);
 }
 
 namespace {
@@ -85,33 +63,16 @@ attachNetStatusEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getNetStatusEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachNetStatusEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-netstatusevent_toString(const fn_call& fn)
+netstatusevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<NetStatusEvent_as> ptr =
-        ensureType<NetStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-netstatusevent_NET_STATUS(const fn_call& fn)
+netstatusevent_NET_STATUS(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<NetStatusEvent_as> ptr =
-        ensureType<NetStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -119,9 +80,8 @@ netstatusevent_NET_STATUS(const fn_call& fn)
 as_value
 netstatusevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new NetStatusEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

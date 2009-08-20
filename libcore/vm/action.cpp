@@ -49,8 +49,8 @@ namespace gnash {
 
 /// @param this_ptr     this is ourself.
 as_value
-call_method(const as_value& method, const as_environment& env, as_object* this_ptr,
-        std::auto_ptr< std::vector<as_value> > args, as_object* super,
+call_method(const as_value& method, const as_environment& env,
+        as_object* this_ptr, fn_call::Args& args, as_object* super,
         const movie_definition* callerDef)
 {
 	as_value val;
@@ -88,8 +88,7 @@ as_value
 call_method0(const as_value& method, const as_environment& env,
         as_object* this_ptr)
 {
-    // TODO: avoid allocating a vector here
-    std::auto_ptr< std::vector<as_value> > args(new std::vector<as_value>);
+    fn_call::Args args;
     return call_method(method, env, this_ptr, args);
 }
 

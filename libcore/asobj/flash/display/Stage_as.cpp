@@ -40,16 +40,28 @@
 
 namespace gnash {
 
-static as_value stage_scalemode(const fn_call& fn);
-static as_value stage_align(const fn_call& fn);
-static as_value stage_showMenu(const fn_call& fn);
-static as_value stage_width(const fn_call& fn);
-static as_value stage_height(const fn_call& fn);
-static as_value stage_displaystate(const fn_call& fn);
-static const char* getScaleModeString(movie_root::ScaleMode sm);
-static const char* getDisplayStateString(movie_root::DisplayState ds);
+namespace {
+    as_value stage_scalemode(const fn_call& fn);
+    as_value stage_align(const fn_call& fn);
+    as_value stage_showMenu(const fn_call& fn);
+    as_value stage_width(const fn_call& fn);
+    as_value stage_height(const fn_call& fn);
+    as_value stage_displaystate(const fn_call& fn);
+    const char* getScaleModeString(movie_root::ScaleMode sm);
+    const char* getDisplayStateString(movie_root::DisplayState ds);
+    void attachStageInterface(as_object& o);
+}
 
-void registerStageNative(as_object& o)
+// extern (used by Global.cpp)
+void
+stage_class_init(as_object& where, const ObjectURI& uri)
+{
+    as_object* obj = registerBuiltinObject(where, attachStageInterface, uri);
+    AsBroadcaster::initialize(*obj);
+}
+
+void
+registerStageNative(as_object& o)
 {
 	VM& vm = getVM(o);
 	
@@ -65,7 +77,9 @@ void registerStageNative(as_object& o)
     vm.registerNative(stage_showMenu, 666, 10);
 }
 
-static void
+namespace {
+
+void
 attachStageInterface(as_object& o)
 {
     o.init_property("scaleMode", &stage_scalemode, &stage_scalemode);
@@ -260,12 +274,6 @@ stage_displaystate(const fn_call& fn)
     return as_value();
 }
 
-// extern (used by Global.cpp)
-void
-stage_class_init(as_object& where, const ObjectURI& uri)
-{
-    as_object* obj = registerBuiltinObject(where, attachStageInterface, uri);
-    AsBroadcaster::initialize(*obj);
-}
+} // anonymous namespace 
 
 } // end of gnash namespace
