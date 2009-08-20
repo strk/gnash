@@ -36,36 +36,15 @@ namespace {
     as_value invalidswferror_ctor(const fn_call& fn);
     void attachInvalidSWFErrorInterface(as_object& o);
     void attachInvalidSWFErrorStaticInterface(as_object& o);
-    as_object* getInvalidSWFErrorInterface();
-
 }
 
-class InvalidSWFError_as : public as_object
-{
-
-public:
-
-    InvalidSWFError_as()
-        :
-        as_object(getInvalidSWFErrorInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void invalidswferror_class_init(as_object& where, const ObjectURI& uri)
+void
+invalidswferror_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getInvalidSWFErrorInterface();
-        cl = gl->createClass(&invalidswferror_ctor, proto);
-        attachInvalidSWFErrorStaticInterface(*cl);
-    }
-
-    // Register _global.InvalidSWFError
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, invalidswferror_class_init,
+            attachInvalidSWFErrorInterface,
+            attachInvalidSWFErrorStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +60,10 @@ attachInvalidSWFErrorStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getInvalidSWFErrorInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachInvalidSWFErrorInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 invalidswferror_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new InvalidSWFError_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

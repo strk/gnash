@@ -36,36 +36,14 @@ namespace {
     as_value eoferror_ctor(const fn_call& fn);
     void attachEOFErrorInterface(as_object& o);
     void attachEOFErrorStaticInterface(as_object& o);
-    as_object* getEOFErrorInterface();
-
 }
 
-class EOFError_as : public as_object
-{
-
-public:
-
-    EOFError_as()
-        :
-        as_object(getEOFErrorInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void eoferror_class_init(as_object& where, const ObjectURI& uri)
+void
+eoferror_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getEOFErrorInterface();
-        cl = gl->createClass(&eoferror_ctor, proto);
-        attachEOFErrorStaticInterface(*cl);
-    }
-
-    // Register _global.EOFError
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, eoferror_ctor, attachEOFErrorInterface,
+            attachEOFErrorStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +59,10 @@ attachEOFErrorStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getEOFErrorInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachEOFErrorInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 eoferror_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new EOFError_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

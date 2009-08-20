@@ -36,36 +36,15 @@ namespace {
     as_value illegaloperationerror_ctor(const fn_call& fn);
     void attachIllegalOperationErrorInterface(as_object& o);
     void attachIllegalOperationErrorStaticInterface(as_object& o);
-    as_object* getIllegalOperationErrorInterface();
-
 }
 
-class IllegalOperationError_as : public as_object
-{
-
-public:
-
-    IllegalOperationError_as()
-        :
-        as_object(getIllegalOperationErrorInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void illegaloperationerror_class_init(as_object& where, const ObjectURI& uri)
+void
+illegaloperationerror_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getIllegalOperationErrorInterface();
-        cl = gl->createClass(&illegaloperationerror_ctor, proto);
-        attachIllegalOperationErrorStaticInterface(*cl);
-    }
-
-    // Register _global.IllegalOperationError
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, illegaloperationerror_ctor,
+            attachIllegalOperationErrorInterface,
+            attachIllegalOperationErrorStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +60,10 @@ attachIllegalOperationErrorStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getIllegalOperationErrorInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIllegalOperationErrorInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 illegaloperationerror_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IllegalOperationError_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
