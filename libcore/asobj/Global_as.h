@@ -121,9 +121,9 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
 /// may also call native functions.
 //
 /// @param c        a pointer to a function that will attach properties to the
-///                 class itself
+///                 class itself. These are known as static properties.
 /// @param p        a pointer to a function that will attach properties to the
-///                 class prototype
+///                 class prototype. These are instance properties.
 /// @param ctor     the constructor function for the new class.
 /// @param where    the object to which the created object will be attached
 /// @param uri      an ObjectURI describing the name and namespace of the
@@ -131,7 +131,7 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
 /// @return         the built-in class with prototype and properties attached.
 inline as_object*
 registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
-        Properties c, Properties p, const ObjectURI& uri)
+        Properties p, Properties c, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
     as_object* proto = gl->createObject(getObjectInterface());
