@@ -52,8 +52,8 @@ Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 
 	as_environment env(getVM(this_ptr));
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(value);
+    fn_call::Args args;
+    args += value;
 
 	fn_call fn(&this_ptr, env, args);
 

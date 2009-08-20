@@ -194,7 +194,7 @@ as_value
 loadvars_onData(const fn_call& fn)
 {
 
-	as_object* thisPtr = fn.this_ptr.get();
+	as_object* thisPtr = fn.this_ptr;
 	if (!thisPtr) return as_value();
 
 	// See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as

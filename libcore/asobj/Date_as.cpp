@@ -425,7 +425,7 @@ as_value
 date_new(const fn_call& fn)
 {
 
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
     if (!fn.isInstantiation()) {
         obj = new as_object();
         obj->set_prototype(getDateInterface());
@@ -548,7 +548,7 @@ inline as_value timeElement(T dateFunc, boost::int32_t GnashTime::* element,
 as_value
 date_getYear(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::year, date->getTimeValue());
 }
 
@@ -557,7 +557,7 @@ date_getYear(const fn_call& fn)
 as_value
 date_getFullYear(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(
             localTime, &GnashTime::year, date->getTimeValue(), 1900);
 }
@@ -567,7 +567,7 @@ date_getFullYear(const fn_call& fn)
 as_value
 date_getMonth(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::month, date->getTimeValue());
 }
 
@@ -576,7 +576,7 @@ date_getMonth(const fn_call& fn)
 as_value
 date_getDate(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::monthday, date->getTimeValue());
 }
 
@@ -586,7 +586,7 @@ date_getDate(const fn_call& fn)
 as_value
 date_getDay(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::weekday, date->getTimeValue());
 }
 
@@ -596,7 +596,7 @@ date_getDay(const fn_call& fn)
 as_value
 date_getHours(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::hour, date->getTimeValue());
 }
 
@@ -607,7 +607,7 @@ date_getHours(const fn_call& fn)
 as_value
 date_getMinutes(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::minute, date->getTimeValue());
 }
 
@@ -617,7 +617,7 @@ date_getMinutes(const fn_call& fn)
 as_value
 date_getSeconds(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::second, date->getTimeValue());
 }
 
@@ -629,7 +629,7 @@ date_getSeconds(const fn_call& fn)
 as_value
 date_getMilliseconds(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(
             localTime, &GnashTime::millisecond, date->getTimeValue());
 }
@@ -640,7 +640,7 @@ date_getMilliseconds(const fn_call& fn)
 as_value
 date_getUTCFullYear(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::year,
            date->getTimeValue(), 1900);
 }
@@ -648,21 +648,21 @@ date_getUTCFullYear(const fn_call& fn)
 as_value
 date_getUTCYear(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::year, date->getTimeValue());
 }
 
 as_value
 date_getUTCMonth(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::month, date->getTimeValue());
 }
 
 as_value
 date_getutcdate(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(
             universalTime, &GnashTime::monthday, date->getTimeValue());
 }
@@ -671,7 +671,7 @@ date_getutcdate(const fn_call& fn)
 as_value
 date_getUTCDay(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(
                 universalTime, &GnashTime::weekday, date->getTimeValue());
 }
@@ -679,7 +679,7 @@ date_getUTCDay(const fn_call& fn)
 as_value
 date_getUTCHours(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(
                 universalTime, &GnashTime::hour, date->getTimeValue());
 }
@@ -687,7 +687,7 @@ date_getUTCHours(const fn_call& fn)
 as_value
 date_getUTCMinutes(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::minute, date->getTimeValue());
 }
 
@@ -710,7 +710,7 @@ localTimeZoneOffset(double time)
 as_value
 date_getTimezoneOffset(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return as_value(-localTimeZoneOffset(date->getTimeValue()));
 }
 
@@ -732,7 +732,7 @@ date_getTimezoneOffset(const fn_call& fn)
 as_value
 date_setTime(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -844,7 +844,7 @@ template<bool utc>
 as_value
 date_setfullyear(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -895,7 +895,7 @@ date_setfullyear(const fn_call& fn)
 as_value
 date_setYear(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     // assert(fn.nargs == 1);
     if (fn.nargs < 1) {
@@ -949,7 +949,7 @@ template<bool utc>
 as_value
 date_setmonth(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     // assert(fn.nargs >= 1 && fn.nargs <= 2);
     if (fn.nargs < 1) {
@@ -1005,7 +1005,7 @@ template<bool utc>
 as_value
 date_setDate(const fn_call& fn)
 {
-  Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+  Date_as* date = checkType<Date_as>(fn.this_ptr);
 
   if (fn.nargs < 1) {
       IF_VERBOSE_ASCODING_ERRORS(
@@ -1045,7 +1045,7 @@ template<bool utc>
 as_value
 date_setHours(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     // assert(fn.nargs >= 1 && fn.nargs <= 4);
     if (fn.nargs < 1) {
@@ -1090,7 +1090,7 @@ template<bool utc>
 as_value
 date_setMinutes(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     //assert(fn.nargs >= 1 && fn.nargs <= 3);
     if (fn.nargs < 1) {
@@ -1131,7 +1131,7 @@ template<bool utc>
 as_value
 date_setSeconds(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     // assert(fn.nargs >= 1 && fn.nargs <= 2);
     if (fn.nargs < 1) {
@@ -1170,7 +1170,7 @@ template<bool utc>
 as_value
 date_setMilliseconds(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1212,7 +1212,7 @@ date_setMilliseconds(const fn_call& fn)
 as_value
 date_tostring(const fn_call& fn) 
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return as_value(date->toString());
 }
 
@@ -1355,7 +1355,7 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
 /// number of milliseconds.
 as_value date_getTime(const fn_call& fn)
 {
-    Date_as* date = checkType<Date_as>(fn.this_ptr.get());
+    Date_as* date = checkType<Date_as>(fn.this_ptr);
     return as_value(date->getTimeValue());
 }
 

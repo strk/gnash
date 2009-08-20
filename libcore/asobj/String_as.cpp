@@ -797,7 +797,7 @@ string_valueOf(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    String_as* str = checkType<String_as>(fn.this_ptr.get());
+    String_as* str = checkType<String_as>(fn.this_ptr);
     return as_value(str->value());
 }
 
@@ -816,7 +816,7 @@ string_ctor(const fn_call& fn)
 		return as_value(str);
 	}
 	
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
 
     obj->setProxy(new String_as(str));
     std::wstring wstr = utf8::decodeCanonicalString(str, getSWFVersion(fn));

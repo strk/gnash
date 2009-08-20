@@ -243,7 +243,7 @@ as_value
 color_ctor(const fn_call& fn)
 {
 	
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
     
     as_value target;
     if (fn.nargs) target = fn.arg(0);

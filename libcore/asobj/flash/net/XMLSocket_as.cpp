@@ -389,10 +389,8 @@ XMLSocket_as::checkForIncomingData()
 
         const std::string& s = *it;
 
-        std::auto_ptr<std::vector<as_value> > args(
-                new std::vector<as_value>);
-
-        args->push_back(s);
+        fn_call::Args args;
+        args += s;
         
         fn_call call(this, env, args);
 

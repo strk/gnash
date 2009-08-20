@@ -352,7 +352,7 @@ swf_function::operator()(const fn_call& fn)
 	// in case of problems (most interesting action limits)
 	try 
 	{
-		ActionExec exec(*this, m_env, &result, fn.this_ptr.get());
+		ActionExec exec(*this, m_env, &result, fn.this_ptr);
 		exec();
 	}
 	catch (ActionLimitException& ale) // expected and sane 

@@ -95,7 +95,7 @@ error_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-    as_object* err = fn.this_ptr.get();
+    as_object* err = fn.this_ptr;
 
     string_table& st = getStringTable(fn);
 

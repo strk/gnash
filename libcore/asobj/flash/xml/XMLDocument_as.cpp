@@ -868,7 +868,7 @@ as_value
 xml_ondata(const fn_call& fn)
 {
 
-    as_object* thisPtr = fn.this_ptr.get();
+    as_object* thisPtr = fn.this_ptr;
     assert(thisPtr);
 
     // See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;

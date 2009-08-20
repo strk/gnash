@@ -354,23 +354,21 @@ public:
     const as_environment& _env;
 
     as_value_custom(as_function& comparator, bool (*zc)(const int), 
-        boost::intrusive_ptr<as_object> this_ptr, const as_environment& env)
+            as_object* this_ptr, const as_environment& env)
         :
         _comp(comparator),
         _zeroCmp(zc),
         _env(env)
     {
-        _object = this_ptr.get();
+        _object = this_ptr;
     }
 
     bool operator() (const as_value& a, const as_value& b)
     {
         as_value cmp_method(&_comp);
         as_value ret(0.0);
-
-	    std::auto_ptr<std::vector<as_value> > args (new std::vector<as_value>);
-	    args->push_back(b);
-	    args->push_back(a);
+        fn_call::Args args;
+        args += b, a;
         ret = call_method(cmp_method, _env, _object, args);
 
         return (*_zeroCmp)(ret.to_int());
@@ -1290,7 +1288,7 @@ array_to_string(const fn_call& fn)
         (
     log_action(_("array_to_string called, nargs = %d, "
             "this_ptr = %p"),
-            fn.nargs, (void*)fn.this_ptr.get());
+            fn.nargs, (void*)fn.this_ptr);
     log_action(_("to_string result is: %s"), ret);
         );
 

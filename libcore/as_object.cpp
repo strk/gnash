@@ -103,9 +103,14 @@ public:
 	/// Dispatch.
 	virtual as_value operator()(const fn_call& fn)
 	{
-        std::auto_ptr<std::vector<as_value> > args(
-            new std::vector<as_value>(fn.getArgs()));
-        fn_call fn2(fn.this_ptr.get(), fn.env(), args, fn.super, true);
+
+        // TODO: this is a hack to make sure objects are constructed, not
+        // converted (fn.isInstantiation() must be true).
+        fn_call::Args::container_type argsIn(fn.getArgs());
+        fn_call::Args args;
+        args.swap(argsIn);
+
+        fn_call fn2(fn.this_ptr, fn.env(), args, fn.super, true);
         assert(fn2.isInstantiation());
         as_function* ctor = constructor();
 		if (ctor) return ctor->call(fn2);
@@ -1152,8 +1157,8 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0)
 
 	as_environment env(_vm);
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(arg0);
+    fn_call::Args args;
+    args += arg0;
 
 	return call_method(method, env, this, args);
 }
@@ -1171,9 +1176,8 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0,
 
 	as_environment env(_vm);
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(arg0);
-	args->push_back(arg1);
+    fn_call::Args args;
+    args += arg0, arg1;
 
 	return call_method(method, env, this, args);
 }
@@ -1192,10 +1196,8 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(arg0);
-	args->push_back(arg1);
-	args->push_back(arg2);
+    fn_call::Args args;
+    args += arg0, arg1, arg2;
 
 	ret = call_method(method, env, this, args);
 
@@ -1215,11 +1217,8 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0,
 
 	as_environment env(_vm);
 
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(arg0);
-	args->push_back(arg1);
-	args->push_back(arg2);
-	args->push_back(arg3);
+    fn_call::Args args;
+    args += arg0, arg1, arg2, arg3;
 
 	return call_method(method, env, this, args);
 
@@ -1349,11 +1348,8 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 	try {
 		as_environment env(VM::get()); // TODO: get VM in some other way 
 
-		std::auto_ptr<std::vector<as_value> > args (new std::vector<as_value>);
-		args->push_back(_propname);
-		args->push_back(oldval);
-		args->push_back(newval);
-		args->push_back(_customArg);
+        fn_call::Args args;
+        args += _propname, oldval, newval, _customArg;
 
 		fn_call fn(&this_obj, env, args);
 

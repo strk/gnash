@@ -114,7 +114,7 @@ getBooleanInterface()
 as_value
 boolean_tostring(const fn_call& fn)
 {
-    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr.get());
+    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr);
     if (obj->value()) return as_value("true");
     return as_value("false");
 }
@@ -123,7 +123,7 @@ boolean_tostring(const fn_call& fn)
 as_value
 boolean_valueof(const fn_call& fn) 
 {
-    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr.get());
+    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr);
     return as_value(obj->value());
 }
 
@@ -138,7 +138,7 @@ boolean_ctor(const fn_call& fn)
 
     const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
 
-    as_object* obj = fn.this_ptr.get();
+    as_object* obj = fn.this_ptr;
     obj->setProxy(new Boolean_as(val));
     return as_value();
 

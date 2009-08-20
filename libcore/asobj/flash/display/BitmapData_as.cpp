@@ -603,13 +603,8 @@ BitmapData_rectangle(const fn_call& fn)
         return -1;
     }
 
-    // Construct a Rectangle from the data.
-    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-    
-    args->push_back(0.0);
-    args->push_back(0.0);
-	args->push_back(ptr->getWidth());
-	args->push_back(ptr->getHeight());
+    fn_call::Args args;
+    args += 0.0, 0.0, ptr->getWidth(), ptr->getHeight();
 
     boost::intrusive_ptr<as_object> newRect =
             rectCtor->constructInstance(fn.env(), args);
