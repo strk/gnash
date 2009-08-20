@@ -44,17 +44,6 @@ namespace {
 
 }
 
-class Timer_as : public as_object
-{
-
-public:
-
-    Timer_as()
-        :
-        as_object(getTimerInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 timer_class_init(as_object& where, const ObjectURI& uri)
@@ -80,53 +69,30 @@ attachTimerStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getTimerInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachTimerInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-timer_start(const fn_call& fn)
+timer_start(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Timer_as> ptr =
-        ensureType<Timer_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-timer_stop(const fn_call& fn)
+timer_stop(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Timer_as> ptr =
-        ensureType<Timer_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-timer_timer(const fn_call& fn)
+timer_timer(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Timer_as> ptr =
-        ensureType<Timer_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-timer_timerComplete(const fn_call& fn)
+timer_timerComplete(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Timer_as> ptr =
-        ensureType<Timer_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -134,9 +100,7 @@ timer_timerComplete(const fn_call& fn)
 as_value
 timer_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Timer_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
