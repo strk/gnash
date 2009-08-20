@@ -221,13 +221,13 @@ private:
 
 }
 
-class XMLSocket_as : public as_object {
-
+class XMLSocket_as : public UpdatableProxy
+{
 public:
 
     typedef std::vector<std::string> MessageList;
 
-    XMLSocket_as();
+    XMLSocket_as(as_object* owner);
     ~XMLSocket_as();
     
     /// True when the XMLSocket is not trying to connect.
@@ -276,9 +276,9 @@ private:
 };
 
   
-XMLSocket_as::XMLSocket_as()
+XMLSocket_as::XMLSocket_as(as_object* owner)
     :
-    as_object(getXMLSocketInterface()),
+    UpdatableProxy(owner),
     _ready(false)
 {
 }
@@ -305,13 +305,13 @@ XMLSocket_as::advanceState()
             // If connection failed, notify onConnect and stop callback.
             // This means advanceState() will not be called again until
             // XMLSocket.connect() is invoked.
-            callMethod(NSV::PROP_ON_CONNECT, false);
-            getRoot(*this).removeAdvanceCallback(this);
+            _owner->callMethod(NSV::PROP_ON_CONNECT, false);
+            getRoot(*_owner).removeAdvanceCallback(this);
             return;    
         }
 
         // Connection succeeded.
-        callMethod(NSV::PROP_ON_CONNECT, true);
+        _owner->callMethod(NSV::PROP_ON_CONNECT, true);
         _ready = true;
     }
 
@@ -331,7 +331,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
     _connection.connect(host, port);
     
     // Start callbacks on advance.
-    getRoot(*this).addAdvanceCallback(this);
+    getRoot(*_owner).addAdvanceCallback(this);
     
     return true;
 }
@@ -339,7 +339,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 void
 XMLSocket_as::close()
 {
-    getRoot(*this).removeAdvanceCallback(this);
+    getRoot(*_owner).removeAdvanceCallback(this);
     _connection.close();
     _ready = false;
 }
@@ -351,8 +351,8 @@ XMLSocket_as::getEventHandler(const std::string& name)
 	boost::intrusive_ptr<as_function> ret;
 
 	as_value tmp;
-	string_table& st = getStringTable(*this);
-	if (!get_member(st.find(name), &tmp) ) return ret;
+	string_table& st = getStringTable(*_owner);
+	if (!_owner->get_member(st.find(name), &tmp) ) return ret;
 	ret = tmp.to_as_function();
 	return ret;
 }
@@ -375,7 +375,7 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    as_environment env(getVM(*this)); 
+    as_environment env(getVM(*_owner)); 
 
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {
@@ -392,7 +392,7 @@ XMLSocket_as::checkForIncomingData()
         fn_call::Args args;
         args += s;
         
-        fn_call call(this, env, args);
+        fn_call call(_owner, env, args);
 
         onDataHandler->call(call);
     }
@@ -420,19 +420,8 @@ XMLSocket_as::send(std::string str)
 void
 xmlsocket_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is the global XMLSocket class
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getXMLSocketInterface();
-        cl = gl->createClass(&xmlsocket_new, proto);
-    }
-    
-    // Register _global.XMLSocket
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinClass(where, xmlsocket_new, attachXMLSocketInterface,
+            0, uri);
 }
 
 
@@ -450,8 +439,8 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("XMLSocket.connect(%s) called"), ss.str());
 #endif
 
-    boost::intrusive_ptr<XMLSocket_as> ptr =
-        ensureType<XMLSocket_as>(fn.this_ptr);
+    XMLSocket_as* ptr =
+        checkType<XMLSocket_as>(fn.this_ptr);
 
     if (ptr->ready()) {
         log_error(_("XMLSocket.connect() called while already "
@@ -491,8 +480,8 @@ xmlsocket_connect(const fn_call& fn)
 as_value
 xmlsocket_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLSocket_as> ptr =
-        ensureType<XMLSocket_as>(fn.this_ptr);
+    XMLSocket_as* ptr =
+        checkType<XMLSocket_as>(fn.this_ptr);
 
     const std::string& str = fn.arg(0).to_string();
     ptr->send(str);
@@ -508,19 +497,20 @@ xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<XMLSocket_as> ptr =
-        ensureType<XMLSocket_as>(fn.this_ptr);
+    XMLSocket_as* ptr =
+        checkType<XMLSocket_as>(fn.this_ptr);
 
     ptr->close();
     return as_value();
 }
 
 as_value
-xmlsocket_new(const fn_call& /*fn*/)
+xmlsocket_new(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<as_object> xmlsock_obj = new XMLSocket_as;
-    return as_value(xmlsock_obj);
+    as_object* obj = fn.this_ptr;
+    obj->setProxy(new XMLSocket_as(obj));
+    return as_value();
 }
 
 as_value
@@ -528,9 +518,6 @@ xmlsocket_onData(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
    
-    boost::intrusive_ptr<XMLSocket_as> ptr = 
-        ensureType<XMLSocket_as>(fn.this_ptr);
-
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Builtin XMLSocket.onData() needs an argument"));
@@ -553,7 +540,7 @@ xmlsocket_onData(const fn_call& fn)
     boost::intrusive_ptr<as_object> xml = new XMLDocument_as(xmlin);
     as_value arg(xml.get());
 
-    ptr->callMethod(NSV::PROP_ON_XML, arg);
+    fn.this_ptr->callMethod(NSV::PROP_ON_XML, arg);
 
     return as_value();
 }

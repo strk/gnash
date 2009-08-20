@@ -67,20 +67,19 @@ namespace {
     as_value netstream_receiveVideo(const fn_call& fn);
     as_value netstream_send(const fn_call& fn);
 
-    as_object* getNetStreamInterface();
     void attachNetStreamInterface(as_object& o);
     
     // TODO: see where this can be done more centrally.
-    void executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm);
+    void executeTag(const SimpleBuffer& _buffer, as_object* thisPtr);
 }
 
 /// Contruct a NetStream object.
 //
 /// The default size needed to begin playback (m_bufferTime) of media
 /// is 100 milliseconds.
-NetStream_as::NetStream_as()
+NetStream_as::NetStream_as(as_object* owner)
     :
-    as_object(getNetStreamInterface()),
+    UpdatableProxy(owner),
     _netCon(0),
     m_bufferTime(100), 
     m_newFrameReady(false),
@@ -96,9 +95,9 @@ NetStream_as::NetStream_as()
 
     // TODO: figure out if we should take another path to get to the clock
     _playbackClock(
-            new InterruptableVirtualClock(getVM(*this).getClock())),
+            new InterruptableVirtualClock(getVM(*_owner).getClock())),
     _playHead(_playbackClock.get()), 
-    _soundHandler(getRunResources(*this).soundHandler()),
+    _soundHandler(getRunResources(*_owner).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _audioStreamer(_soundHandler),
     _statusCode(invalidStatus)
@@ -106,17 +105,10 @@ NetStream_as::NetStream_as()
 }
 
 void
-NetStream_as::init(as_object& global, const ObjectURI& uri)
+netstream_class_init(as_object& where, const ObjectURI& uri)
 {
-
-    Global_as* gl = getGlobal(global);
-    as_object* proto = getNetStreamInterface();
-    as_object* cl = gl->createClass(&netstream_new, proto);
-
-    // Register _global.String
-    global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBuiltinClass(where, netstream_new, attachNetStreamInterface,
+            0, uri);
 }
 
 
@@ -130,9 +122,9 @@ NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
   log_debug(" Invoking onMetaData");
 #endif
 
-    string_table::key func = getStringTable(*this).find(funcname);
+    string_table::key func = getStringTable(*_owner).find(funcname);
 
-    callMethod(func, as_value(info_obj));
+    _owner->callMethod(func, as_value(info_obj));
 }
 
 
@@ -156,7 +148,7 @@ NetStream_as::processStatusNotifications()
     // Must be a new object every time.
     as_object* o = getStatusObject(code);
 
-    callMethod(NSV::PROP_ON_STATUS, o);
+    _owner->callMethod(NSV::PROP_ON_STATUS, o);
 }
 
 void
@@ -278,30 +270,23 @@ NetStream_as::setAudioController(DisplayObject* ch)
 void
 NetStream_as::markReachableResources() const
 {
-
-    if (_netCon) _netCon->setReachable();
-
+    if (_netCon) _netCon->markReachableResources();
     if (_statusHandler) _statusHandler->setReachable();
-
     if (_audioController) _audioController->setReachable();
-
     if (_invalidatedVideoCharacter) _invalidatedVideoCharacter->setReachable();
-
-    // Invoke generic as_object marker
-    markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
 
 void
 NetStream_as::stopAdvanceTimer()
 {
-    getRoot(*this).removeAdvanceCallback(this);
+    getRoot(*_owner).removeAdvanceCallback(this);
 }
 
 void
 NetStream_as::startAdvanceTimer()
 {
-    getRoot(*this).addAdvanceCallback(this);
+    getRoot(*_owner).addAdvanceCallback(this);
 }
 
 
@@ -439,7 +424,7 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
         log_error("NetStream: Could not create Video decoder: %s", e.what());
 
         // This is important enough to let the user know.
-        movie_root& m = getRoot(*this);
+        movie_root& m = getRoot(*_owner);
         m.errorInterface(e.what());
     }
 
@@ -467,7 +452,7 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
         log_error("Could not create Audio decoder: %s", e.what());
 
         // This is important enough to let the user know.
-        movie_root& m = getRoot(*this);
+        movie_root& m = getRoot(*_owner);
         m.errorInterface(e.what());
     }
 
@@ -1362,7 +1347,7 @@ NetStream_as::advanceState()
 
     for (media::MediaParser::OrderedMetaTags::iterator i = tags.begin(),
             e = tags.end(); i != e; ++i) {
-        executeTag(**i, this, getVM(*this));
+        executeTag(**i, _owner);
     }
 }
 
@@ -1581,19 +1566,17 @@ as_value
 netstream_new(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<NetStream_as> netstream_obj = new NetStream_as;
+    as_object* obj = fn.this_ptr;
 
-    if (fn.nargs > 0)
-    {
-        boost::intrusive_ptr<NetConnection_as> ns =
-            boost::dynamic_pointer_cast<NetConnection_as>(
-                    fn.arg(0).to_object(*getGlobal(fn)));
-        if ( ns )
-        {
-            netstream_obj->setNetCon(ns);
+    NetStream_as* ns = new NetStream_as(obj);
+
+    if (fn.nargs) {
+
+        NetConnection_as* nc;
+        if (isInstanceOf(fn.arg(0).to_object(*getGlobal(fn)).get(), nc)) {
+            ns->setNetCon(nc);
         }
-        else
-        {
+        else {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("First argument "
                     "to NetStream constructor "
@@ -1602,15 +1585,17 @@ netstream_new(const fn_call& fn)
             );
         }
     }
-    return as_value(netstream_obj.get());
+    obj->setProxy(ns);
+
+
+    return as_value();
 
 }
 
 as_value
 netstream_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = checkType<NetStream_as>(fn.this_ptr);
     ns->close();
     return as_value();
 }
@@ -1618,8 +1603,8 @@ netstream_close(const fn_call& fn)
 as_value
 netstream_pause(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = 
+        checkType<NetStream_as>(fn.this_ptr);
     
     // mode: -1 ==> toogle, 0==> pause, 1==> play
     NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
@@ -1637,8 +1622,8 @@ netstream_pause(const fn_call& fn)
 as_value
 netstream_play(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -1665,8 +1650,8 @@ netstream_play(const fn_call& fn)
 as_value
 netstream_seek(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = 
+        checkType<NetStream_as>(fn.this_ptr);
 
     boost::uint32_t time = 0;
     if (fn.nargs > 0)
@@ -1684,8 +1669,8 @@ netstream_setbuffertime(const fn_call& fn)
 
     //GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
 
     // TODO: should we do anything if given no args ?
     //       are we sure setting bufferTime to 0 is what we have to do ?
@@ -1705,8 +1690,8 @@ netstream_setbuffertime(const fn_call& fn)
 as_value
 netstream_attachAudio(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.attachAudio"));
@@ -1717,8 +1702,8 @@ netstream_attachAudio(const fn_call& fn)
 as_value
 netstream_attachVideo(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.attachVideo"));
@@ -1729,8 +1714,8 @@ netstream_attachVideo(const fn_call& fn)
 as_value
 netstream_publish(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = 
+        checkType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.publish"));
@@ -1741,8 +1726,8 @@ netstream_publish(const fn_call& fn)
 as_value
 netstream_receiveAudio(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.receiveAudio"));
@@ -1753,8 +1738,8 @@ netstream_receiveAudio(const fn_call& fn)
 as_value
 netstream_receiveVideo(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.receiveVideo"));
@@ -1765,8 +1750,8 @@ netstream_receiveVideo(const fn_call& fn)
 as_value
 netstream_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.send"));
@@ -1780,8 +1765,8 @@ netstream_time(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
 
     assert(fn.nargs == 0); // we're a getter
     return as_value(double(ns->time()/1000.0));
@@ -1791,8 +1776,8 @@ netstream_time(const fn_call& fn)
 as_value
 netstream_bytesloaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
 
     if ( ! ns->isConnected() )
     {
@@ -1806,8 +1791,8 @@ netstream_bytesloaded(const fn_call& fn)
 as_value
 netstream_bytestotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = 
+        checkType<NetStream_as>(fn.this_ptr);
 
     if ( ! ns->isConnected() )
     {
@@ -1821,8 +1806,8 @@ netstream_bytestotal(const fn_call& fn)
 as_value
 netstream_currentFPS(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = 
+        checkType<NetStream_as>(fn.this_ptr);
 
     if ( ! ns->isConnected() )
     {
@@ -1838,8 +1823,8 @@ netstream_currentFPS(const fn_call& fn)
 as_value
 netstream_bufferLength(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = 
+        checkType<NetStream_as>(fn.this_ptr);
 
     // NetStream_as::bufferLength returns milliseconds, we want
     // to return *fractional* seconds.
@@ -1851,8 +1836,8 @@ netstream_bufferLength(const fn_call& fn)
 as_value
 netstream_bufferTime(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns =
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns =
+        checkType<NetStream_as>(fn.this_ptr);
 
     // We return bufferTime in seconds
     double ret = ns->bufferTime() / 1000.0;
@@ -1863,19 +1848,14 @@ netstream_bufferTime(const fn_call& fn)
 as_value
 netstream_liveDelay(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = checkType<NetStream_as>(fn.this_ptr);
 
     LOG_ONCE(log_unimpl("NetStream.liveDelay getter/setter"));
 
-    if ( fn.nargs == 0 ) 
-    {
+    if (fn.nargs == 0) {
         return as_value();
     }
-    else 
-    {
-        return as_value();
-    }
+    return as_value();
 }
 
 void
@@ -1910,23 +1890,11 @@ attachNetStreamInterface(as_object& o)
 
 }
 
-as_object*
-getNetStreamInterface()
-{
-
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        attachNetStreamInterface(*o);
-    }
-
-    return o.get();
-}
-
 void
-executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm)
+executeTag(const SimpleBuffer& _buffer, as_object* thisPtr)
 {
+    VM& vm = getVM(*thisPtr);
+
 	const boost::uint8_t* ptr = _buffer.data();
 	const boost::uint8_t* endptr = ptr + _buffer.size();
 

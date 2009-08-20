@@ -37,7 +37,7 @@ namespace gnash {
 //
 /// Provides interfaces to load data from an URL
 ///
-class NetConnection_as: public as_object
+class NetConnection_as: public UpdatableProxy
 {
 public:
 
@@ -52,10 +52,8 @@ public:
         CALL_BADVERSION
     };
 
-	NetConnection_as();
+	NetConnection_as(as_object* owner);
 	~NetConnection_as();
-
-    static void init(as_object& global, const ObjectURI& uri);
 
     /// Process connection stuff
     virtual void advanceState();
@@ -90,8 +88,6 @@ public:
 
     /// Get an stream by name
     std::auto_ptr<IOChannel> getStream(const std::string& name);
-
-protected:
 
 	/// Mark responders associated with remoting calls
 	void markReachableResources() const;

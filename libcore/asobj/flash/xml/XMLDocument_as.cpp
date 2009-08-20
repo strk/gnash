@@ -699,6 +699,7 @@ xml_new(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLDocument_as> xml_obj;
   
+
     if ( fn.nargs > 0 )
     {
         if ( fn.arg(0).is_object() )
@@ -724,11 +725,13 @@ xml_new(const fn_call& fn)
         else
         {
             xml_obj = new XMLDocument_as(xml_in);
+            xml_obj->setProxy(new LoadableObject(xml_obj.get()));
             return as_value(xml_obj.get());
         }
     }
 
     xml_obj = new XMLDocument_as;
+    xml_obj->setProxy(new LoadableObject(xml_obj.get()));
 
     return as_value(xml_obj.get());
 }

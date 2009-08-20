@@ -168,7 +168,7 @@ public:
 /// This class is responsible for handlign external
 /// media files. Provides interfaces for playback control.
 ///
-class NetStream_as : public as_object
+class NetStream_as : public UpdatableProxy
 {
 
 public:
@@ -179,11 +179,9 @@ public:
       pauseModeUnPause = 1  
     };
 
-    NetStream_as();
+    NetStream_as(as_object* owner);
 
     ~NetStream_as();
-
-    static void init(as_object& global, const ObjectURI& uri);
 
     PlayHead::PlaybackStatus playbackState() const {
         return _playHead.getState();
@@ -251,7 +249,7 @@ public:
     /// @param nc
     ///     The NetConnection object to use for network access
     ///
-    void setNetCon(boost::intrusive_ptr<NetConnection_as> nc) {
+    void setNetCon(NetConnection_as* nc) {
         _netCon = nc;
     }
 
@@ -308,6 +306,8 @@ public:
         _invalidatedVideoCharacter = ch;
     }
 
+    virtual void markReachableResources() const;
+
     /// Callback used by sound_handler to get audio data
     //
     /// This is a sound_handler::aux_streamer_ptr type.
@@ -351,7 +351,7 @@ protected:
         invalidTime
     };
 
-    boost::intrusive_ptr<NetConnection_as> _netCon;
+    NetConnection_as* _netCon;
 
     boost::scoped_ptr<CharacterProxy> _audioController;
 
@@ -414,17 +414,6 @@ protected:
 
     // The position in the inputfile, only used when not playing a FLV
     long inputPos;
-
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources of a NetStream_as, for the GC
-    //
-    /// Reachable resources are:
-    /// - associated NetConnection object (_netCon)
-    /// - DisplayObject to invalidate on video updates (_invalidatedVideoCharacter)
-    /// - onStatus event handler (m_statusHandler)
-    ///
-    virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
 
     /// Unplug the advance timer callback
     void stopAdvanceTimer();
@@ -597,6 +586,8 @@ private:
     boost::mutex statusMutex;
 
 };
+
+void netstream_class_init(as_object& global, const ObjectURI& uri);
 
 } // gnash namespace
 

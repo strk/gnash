@@ -45,8 +45,9 @@ namespace {
     as_value loadableobject_sendAndLoad(const fn_call& fn);
 }
 
-LoadableObject::LoadableObject()
+LoadableObject::LoadableObject(as_object* owner)
     :
+    UpdatableProxy(owner),
     _bytesLoaded(-1),
     _bytesTotal(-1)
 {
@@ -56,7 +57,7 @@ LoadableObject::LoadableObject()
 LoadableObject::~LoadableObject()
 {
     deleteAllChecked(_loadThreads);
-    getRoot(*this).removeAdvanceCallback(this);
+    getRoot(*_owner).removeAdvanceCallback(this);
 }
 
 
@@ -64,7 +65,7 @@ void
 LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
-    movie_root& m = getRoot(*this);
+    movie_root& m = getRoot(*_owner);
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
@@ -90,7 +91,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = getRunResources(*this);
+    const RunResources& ri = getRunResources(*_owner);
 	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
@@ -100,7 +101,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
         NetworkAdapter::RequestHeaders headers;
 
-        if (get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+        if (_owner->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
         {
 
             /// Read in our custom headers if they exist and are an
@@ -137,7 +138,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
         as_value contentType;
 
-        if (get_member(NSV::PROP_CONTENT_TYPE, &contentType))
+        if (_owner->get_member(NSV::PROP_CONTENT_TYPE, &contentType))
         {
             // This should not overwrite anything set in 
             // LoadVars.addRequestHeader();
@@ -186,9 +187,9 @@ LoadableObject::load(const std::string& urlstr)
 {
     // Set loaded property to false; will be updated (hopefully)
     // when loading is complete.
-	set_member(NSV::PROP_LOADED, false);
+	_owner->set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = getRunResources(*this);
+    const RunResources& ri = getRunResources(*_owner);
 	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
@@ -206,7 +207,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
     // We don't need to check before adding a timer, but
     // this may optimize slightly (it was already in the code).
     if (_loadThreads.empty()) {
-        getRoot(*this).addAdvanceCallback(this);
+        getRoot(*_owner).addAdvanceCallback(this);
     }
 
     std::auto_ptr<LoadThread> lt (new LoadThread(str));
@@ -236,7 +237,7 @@ LoadableObject::advanceState()
 
         /// An empty file is the same as a failure.
         if (lt->failed() || (lt->completed() && !lt->size())) {
-            callMethod(NSV::PROP_ON_DATA, as_value());
+            _owner->callMethod(NSV::PROP_ON_DATA, as_value());
             it = _loadThreads.erase(it);
             delete lt; 
         }
@@ -269,12 +270,12 @@ LoadableObject::advanceState()
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
-            string_table& st = getStringTable(*this);
-            set_member(st.find("_bytesLoaded"), _bytesLoaded);
-            set_member(st.find("_bytesTotal"), _bytesTotal);
+            string_table& st = getStringTable(*_owner);
+            _owner->set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            _owner->set_member(st.find("_bytesTotal"), _bytesTotal);
             
             // might push_front on the list..
-            callMethod(NSV::PROP_ON_DATA, dataVal);
+            _owner->callMethod(NSV::PROP_ON_DATA, dataVal);
 
         }
         else
@@ -282,17 +283,17 @@ LoadableObject::advanceState()
             _bytesTotal = lt->getBytesTotal();
             _bytesLoaded = lt->getBytesLoaded();
             
-            string_table& st = getStringTable(*this);
-            set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            string_table& st = getStringTable(*_owner);
+            _owner->set_member(st.find("_bytesLoaded"), _bytesLoaded);
             // TODO: should this really be set on each iteration?
-            set_member(st.find("_bytesTotal"), _bytesTotal);
+            _owner->set_member(st.find("_bytesTotal"), _bytesTotal);
             ++it;
         }
     }
 
     if (_loadThreads.empty()) 
     {
-        getRoot(*this).removeAdvanceCallback(this);
+        getRoot(*_owner).removeAdvanceCallback(this);
     }
 
 }
@@ -313,7 +314,7 @@ LoadableObject::registerNative(as_object& o)
 as_value
 LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = checkType<as_object>(fn.this_ptr);
 
     as_value bytesLoaded;
     string_table& st = getStringTable(fn);
@@ -324,7 +325,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 as_value
 LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = checkType<as_object>(fn.this_ptr);
 
     as_value bytesTotal;
     string_table& st = getStringTable(fn);
@@ -338,13 +339,10 @@ as_value
 LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 {
     
-    boost::intrusive_ptr<LoadableObject> ptr = 
-        ensureType<LoadableObject>(fn.this_ptr);   
-
     as_value customHeaders;
     as_object* array;
 
-    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+    if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
         array = customHeaders.to_object(*getGlobal(fn)).get();
         if (!array)
@@ -364,7 +362,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         const int flags = PropFlags::dontEnum |
                           PropFlags::dontDelete;
 
-        ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
+        fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
     }
 
     if (fn.nargs == 0)
@@ -454,7 +452,7 @@ namespace {
 as_value
 loadableobject_decode(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = checkType<as_object>(fn.this_ptr);
 
 	if (!fn.nargs) return as_value(false);
 
@@ -484,8 +482,7 @@ loadableobject_decode(const fn_call& fn)
 as_value
 loadableobject_sendAndLoad(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadableObject> ptr =
-	                ensureType<LoadableObject>(fn.this_ptr);
+	LoadableObject* ptr = checkType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -536,8 +533,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 as_value
 loadableobject_load(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadableObject> obj = 
-        ensureType<LoadableObject>(fn.this_ptr);
+	LoadableObject* obj = checkType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -559,8 +555,8 @@ loadableobject_load(const fn_call& fn)
 	obj->load(urlstr);
     
     string_table& st = getStringTable(fn);
-    obj->set_member(st.find("_bytesLoaded"), 0.0);
-    obj->set_member(st.find("_bytesTotal"), as_value());
+    fn.this_ptr->set_member(st.find("_bytesLoaded"), 0.0);
+    fn.this_ptr->set_member(st.find("_bytesTotal"), as_value());
 
     return as_value(true);
 
@@ -570,8 +566,7 @@ loadableobject_load(const fn_call& fn)
 as_value
 loadableobject_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoadableObject> ptr =
-        ensureType<LoadableObject>(fn.this_ptr);
+    LoadableObject* ptr = checkType<LoadableObject>(fn.this_ptr);
  
     std::ostringstream os;
     fn.dump_args(os);

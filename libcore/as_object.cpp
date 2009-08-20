@@ -212,6 +212,14 @@ public:
 
 } // end of anonymous namespace
 
+
+/// Destructor of UpdatableProxy needs definition of movie_root.
+UpdatableProxy::~UpdatableProxy()
+{
+    getRoot(*_owner).removeAdvanceCallback(this);
+}
+
+
 const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
@@ -1325,6 +1333,9 @@ as_object::markAsObjectReachable() const
 	{
 		it->second.setReachable();
 	}
+
+    /// Proxy objects can contain references to other as_objects.
+    if (_proxy) _proxy->markReachableResources();
 }
 #endif // GNASH_USE_GC
 

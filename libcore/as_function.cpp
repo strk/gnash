@@ -150,8 +150,6 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
 
 	as_value proto;
     bool has_proto = get_member(NSV::PROP_PROTOTYPE, &proto);
-    if (!has_proto) log_debug("No prototype");
-    else log_debug("Has prototype");
 		
     // Create an empty object, with a ref to the constructor's prototype.
     // TODO: The prototype should not be converted to an object!

@@ -1680,13 +1680,13 @@ movie_root::flushHigherPriorityActionQueues()
 }
 
 void
-movie_root::addAdvanceCallback(as_object* obj)
+movie_root::addAdvanceCallback(UpdatableProxy* obj)
 {
     _objectCallbacks.insert(obj);
 }
 
 void
-movie_root::removeAdvanceCallback(as_object* obj)
+movie_root::removeAdvanceCallback(UpdatableProxy* obj)
 {
     _objectCallbacks.erase(obj);
 }
@@ -1756,12 +1756,12 @@ movie_root::executeAdvanceCallbacks()
 
     // Copy it, as the call can change the original, which is not only 
     // bad for invalidating iterators, but also allows infinite recursion.
-    std::vector<as_object*> currentCallbacks;
+    std::vector<UpdatableProxy*> currentCallbacks;
     std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::back_inserter(currentCallbacks));
 
     std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
-            std::mem_fun(&as_object::advanceState));
+            std::mem_fun(&UpdatableProxy::advanceState));
 
     processActionQueue();
 }
@@ -1849,7 +1849,7 @@ movie_root::markReachableResources() const
     }
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
-            std::mem_fun(&as_object::setReachable));
+            std::mem_fun(&Proxy::markReachableResources));
 
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)

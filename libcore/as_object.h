@@ -152,12 +152,50 @@ struct ObjectURI
 
 };
 
+/// This is the base class for type-specific object data. 
+//
+/// ActionScript classes with particular type restrictions or type traits
+/// should set the Object's _proxy member to a subclass of this class.
 class Proxy
 {
 public:
     virtual ~Proxy() {};
+
+    virtual void markReachableResources() {}
 };
 
+
+/// A type that requires periodic updates from the core (movie_root).
+//
+/// Objects with this type of proxy can be registered with movie_root, and
+/// recieve a callback on every advance.
+class UpdatableProxy : public Proxy
+{
+public:
+    UpdatableProxy(as_object* owner)
+        :
+        _owner(owner)
+    {}
+
+    /// Make sure we are removed from the list of callbacks on destruction.
+    virtual ~UpdatableProxy();
+
+    /// UpdatableProxy objects must have an advanceState method.
+    virtual void advanceState() = 0;
+
+    as_object& owner() const {
+        return *_owner;
+    }
+
+protected:
+
+    /// The as_object that owns this Proxy.
+    //
+    /// Because we are deleted on destruction of the owner, this pointer will
+    /// never be invalid.
+    as_object* _owner;
+
+};
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -211,12 +249,6 @@ public:
     /// Most API properties, including classes and objects, have these flags.
     static const int DefaultFlags = PropFlags::dontDelete |
                                     PropFlags::dontEnum;
-
-    /// A function to be called on movie_root::advance()
-    //
-    /// This is used for requesting an object to update its state and if
-    /// required to notify any AS callbacks. 
-    virtual void advanceState() { }
 
     /// Is any non-hidden property in this object ?
     bool hasNonHiddenProperties() const {

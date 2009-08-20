@@ -81,14 +81,14 @@ namespace {
     as_object* getSoundInterface();
 }
 
-Sound_as::Sound_as() 
+Sound_as::Sound_as(as_object* owner) 
     :
-    as_object(getSoundInterface()),
+    UpdatableProxy(owner),
     _attachedCharacter(0),
     soundId(-1),
     externalSound(false),
     isStreaming(false),
-    _soundHandler(getRunResources(*this).soundHandler()),
+    _soundHandler(getRunResources(*_owner).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _startTime(0),
     _leftOverData(),
@@ -115,7 +115,7 @@ Sound_as::~Sound_as()
 
 // extern (used by Global.cpp)
 void
-Sound_as::init(as_object& where, const ObjectURI& uri)
+sound_class_init(as_object& where, const ObjectURI& uri)
 {
 
     as_object* iface = getSoundInterface();
@@ -134,7 +134,7 @@ void
 Sound_as::startProbeTimer()
 {
     _probeTimer = 1;
-    getRoot(*this).addAdvanceCallback(this);
+    getRoot(*_owner).addAdvanceCallback(this);
 }
 
 /*private*/
@@ -147,7 +147,7 @@ Sound_as::stopProbeTimer()
 
     if ( _probeTimer )
     {
-        getRoot(*this).removeAdvanceCallback(this);
+        getRoot(*_owner).removeAdvanceCallback(this);
         log_debug(" sound callback removed");
         _probeTimer = 0;
     }
@@ -180,7 +180,7 @@ Sound_as::probeAudio()
             stopProbeTimer();
 
             // dispatch onSoundComplete 
-            callMethod(NSV::PROP_ON_SOUND_COMPLETE);
+            _owner->callMethod(NSV::PROP_ON_SOUND_COMPLETE);
         }
     }
     else
@@ -227,7 +227,6 @@ void
 Sound_as::markReachableResources() const
 {
     if ( _attachedCharacter ) _attachedCharacter->setReachable();
-    markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
 
@@ -348,7 +347,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     /// changed that.
     _startTime=0;
 
-    const RunResources& rr = getRunResources(*this);
+    const RunResources& rr = getRunResources(*_owner);
     URL url(file, rr.baseURL());
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -788,17 +787,21 @@ getSoundInterface()
 as_value
 sound_new(const fn_call& fn)
 {
-    Sound_as* sound_obj = new Sound_as();
 
-    if ( fn.nargs )
-    {
+    as_object* obj = fn.this_ptr;
+
+    if (fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-        if ( fn.nargs > 1 )
-        {
-            std::stringstream ss; fn.dump_args(ss);
-            log_aserror("new Sound(%d) : args after first one ignored", ss.str());
-        }
+            if (fn.nargs > 1) {
+                std::stringstream ss; fn.dump_args(ss);
+                log_aserror("new Sound(%d) : args after first one ignored",
+                    ss.str());
+            }
         );
+
+        Sound_as* s = new Sound_as(obj);
+
+        obj->setProxy(s);
 
         const as_value& arg0 = fn.arg(0);
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
@@ -806,8 +809,7 @@ sound_new(const fn_call& fn)
             as_object* obj = arg0.to_object(*getGlobal(fn)).get();
             DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
             IF_VERBOSE_ASCODING_ERRORS(
-            if ( ! ch )
-            {
+            if (!ch) {
                 std::stringstream ss; fn.dump_args(ss);
                 log_aserror("new Sound(%s) : first argument isn't null "
                     "nor undefined, and doesn't cast to a DisplayObject. "
@@ -815,11 +817,11 @@ sound_new(const fn_call& fn)
                     ss.str());
             }
             );
-            sound_obj->attachCharacter(ch);
+            s->attachCharacter(ch);
         }
     }
        
-    return as_value(sound_obj);
+    return as_value();
 }
 
 as_value
@@ -828,7 +830,7 @@ sound_start(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- start sound"));
     )
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
     int loop = 0;
     double secondOffset = 0;
 
@@ -853,7 +855,7 @@ sound_stop(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- stop sound "));
     )
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
 
     int si = -1;
 
@@ -906,7 +908,7 @@ sound_attachsound(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
 
     const std::string& name = fn.arg(0).to_string();
     if (name.empty()) {
@@ -954,7 +956,7 @@ sound_attachsound(const fn_call& fn)
 as_value
 sound_getbytesloaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
     long loaded = so->getBytesLoaded();
     if (loaded < 0) return as_value();
     return as_value(loaded);
@@ -963,7 +965,7 @@ sound_getbytesloaded(const fn_call& fn)
 as_value
 sound_getbytestotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
     long total = so->getBytesTotal();
     if (total < 0) return as_value();
     return as_value(total);
@@ -1015,7 +1017,7 @@ as_value
 sound_getvolume(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
 
     if ( fn.nargs )
     {
@@ -1033,7 +1035,7 @@ sound_getvolume(const fn_call& fn)
 as_value
 sound_loadsound(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -1090,7 +1092,7 @@ sound_setvolume(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);    
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);    
     int volume = (int) fn.arg(0).to_number();
 
     so->setVolume(volume);
@@ -1100,7 +1102,7 @@ sound_setvolume(const fn_call& fn)
 as_value
 sound_duration(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
     return as_value(so->getDuration());
 }
 
@@ -1127,7 +1129,7 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
 as_value
 sound_position(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* so = checkType<Sound_as>(fn.this_ptr);
 
     return as_value(so->getPosition());
 }
@@ -1136,8 +1138,7 @@ sound_position(const fn_call& fn)
 as_value
 sound_load(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1146,8 +1147,7 @@ sound_load(const fn_call& fn)
 as_value
 sound_play(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1156,8 +1156,7 @@ sound_play(const fn_call& fn)
 as_value
 sound_complete(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1166,8 +1165,7 @@ sound_complete(const fn_call& fn)
 as_value
 sound_id3(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1176,8 +1174,7 @@ sound_id3(const fn_call& fn)
 as_value
 sound_ioError(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1186,8 +1183,7 @@ sound_ioError(const fn_call& fn)
 as_value
 sound_open(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1196,19 +1192,18 @@ sound_open(const fn_call& fn)
 as_value
 sound_progress(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound_as> ptr =
-        ensureType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = checkType<Sound_as>(fn.this_ptr);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-sound_ctor(const fn_call& /*fn*/)
+sound_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new Sound_as;
-
-    return as_value(obj.get()); // will keep alive
+    as_object* obj = fn.this_ptr;
+    obj->setProxy(new Sound_as(obj));
+    return as_value();
 }
 
 } // anonymous namespace 

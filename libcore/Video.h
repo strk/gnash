@@ -78,7 +78,7 @@ public:
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
 	/// Set the input stream for this video
-	void setStream(boost::intrusive_ptr<NetStream_as> ns);
+	void setStream(NetStream_as* ns);
 
     void clear();
 
@@ -130,7 +130,7 @@ private:
 	const boost::intrusive_ptr<const SWF::DefineVideoStreamTag> m_def;
 
     // Who owns this ? Should it be an intrusive ptr ?
-	boost::intrusive_ptr<NetStream_as> _ns;
+	NetStream_as* _ns;
 
 	/// Playing an embbeded video stream ?
 	bool _embeddedStream;

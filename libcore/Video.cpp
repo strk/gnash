@@ -289,7 +289,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
-Video::setStream(boost::intrusive_ptr<NetStream_as> ns)
+Video::setStream(NetStream_as* ns)
 {
 	_ns = ns;
 	_ns->setInvalidatedVideo(this);
@@ -322,7 +322,7 @@ Video::getBounds() const
 void
 Video::markReachableResources() const
 {
-	if ( _ns ) _ns->setReachable();
+	if ( _ns ) _ns->markReachableResources();
 
 	// Invoke DisplayObject's version of reachability mark
 	markDisplayObjectReachable();
@@ -429,11 +429,8 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<NetStream_as> ns = 
-        boost::dynamic_pointer_cast<NetStream_as>(
-                fn.arg(0).to_object(*getGlobal(fn)));
-	if (ns)
-	{
+	NetStream_as* ns;
+    if (isInstanceOf(fn.arg(0).to_object(*getGlobal(fn)).get(), ns)) {
 		video->setStream(ns);
 	}
 	else

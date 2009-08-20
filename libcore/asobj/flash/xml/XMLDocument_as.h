@@ -45,7 +45,7 @@ class LoaderThread;
 //
 /// This class interface is identical in AS3 and AS2; it is probably 
 /// included in AS3 for backward compatibility.
-class XMLDocument_as : public XMLNode_as, public LoadableObject
+class XMLDocument_as : public XMLNode_as
 {
 public:
 

@@ -36,11 +36,11 @@ namespace gnash {
 /// It is a virtual base class because XML_as also inherits from XMLNode.
 //
 /// It may not be copied.
-class LoadableObject : public virtual as_object, private boost::noncopyable
+class LoadableObject : public UpdatableProxy
 {
 public:
 
-    LoadableObject();
+    LoadableObject(as_object* owner);
 
     virtual ~LoadableObject();
 
@@ -106,7 +106,7 @@ protected:
     /// @param o        The ostream to write the string to.
     /// @param encode   Whether URL encoding is necessary. How this
     ///                 is done depends on the type of object.
-    virtual void toString(std::ostream& o, bool encode) const = 0;
+    virtual void toString(std::ostream& /*o*/, bool /*encode*/) const {}
 
     typedef std::list<LoadThread*> LoadThreadList;
 
