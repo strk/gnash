@@ -77,14 +77,14 @@ getSecurityErrorEventInterface()
 }
 
 as_value
-securityerrorevent_toString(const fn_call& fn)
+securityerrorevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-securityerrorevent_SECURITY_ERROR(const fn_call& fn)
+securityerrorevent_SECURITY_ERROR(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

@@ -40,36 +40,15 @@ namespace {
     as_value keyboardevent_ctor(const fn_call& fn);
     void attachKeyboardEventInterface(as_object& o);
     void attachKeyboardEventStaticInterface(as_object& o);
-    as_object* getKeyboardEventInterface();
-
 }
 
-class KeyboardEvent_as : public as_object
-{
-
-public:
-
-    KeyboardEvent_as()
-        :
-        as_object(getKeyboardEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void keyboardevent_class_init(as_object& where, const ObjectURI& uri)
+void
+keyboardevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getKeyboardEventInterface();
-        cl = gl->createClass(&keyboardevent_ctor, proto);
-        attachKeyboardEventStaticInterface(*cl);
-    }
-
-    // Register _global.KeyboardEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, keyboardevent_ctor,
+            attachKeyboardEventInterface,
+            attachKeyboardEventStaticInterface, uri);
 }
 
 namespace {
@@ -89,46 +68,29 @@ attachKeyboardEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getKeyboardEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachKeyboardEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-keyboardevent_toString(const fn_call& fn)
+keyboardevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-keyboardevent_updateAfterEvent(const fn_call& fn)
+keyboardevent_updateAfterEvent(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<KeyboardEvent_as> ptr =
-        ensureType<KeyboardEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-keyboardevent_KEY_DOWN(const fn_call& fn)
+keyboardevent_KEY_DOWN(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<KeyboardEvent_as> ptr =
-        ensureType<KeyboardEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-keyboardevent_KEY_UP(const fn_call& fn)
+keyboardevent_KEY_UP(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -137,8 +99,7 @@ keyboardevent_KEY_UP(const fn_call& fn)
 as_value
 keyboardevent_ctor(const fn_call& /*fn*/)
 {
-
-    return as_value(); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

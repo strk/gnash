@@ -77,14 +77,14 @@ getFullScreenEventInterface()
 }
 
 as_value
-fullscreenevent_toString(const fn_call& fn)
+fullscreenevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-fullscreenevent_FULL_SCREEN(const fn_call& fn)
+fullscreenevent_FULL_SCREEN(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

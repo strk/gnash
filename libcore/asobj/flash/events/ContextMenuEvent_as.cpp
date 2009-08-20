@@ -69,14 +69,14 @@ attachContextMenuEventStaticInterface(as_object& /*o*/)
 }
 
 as_value
-contextmenuevent_toString(const fn_call& fn)
+contextmenuevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-contextmenuevent_MENU_ITEM_SELECT(const fn_call& fn)
+contextmenuevent_MENU_ITEM_SELECT(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

@@ -77,14 +77,14 @@ getStatusEventInterface()
 }
 
 as_value
-statusevent_toString(const fn_call& fn)
+statusevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-statusevent_STATUS(const fn_call& fn)
+statusevent_STATUS(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

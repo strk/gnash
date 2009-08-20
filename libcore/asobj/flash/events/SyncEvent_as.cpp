@@ -77,14 +77,14 @@ getSyncEventInterface()
 }
 
 as_value
-syncevent_toString(const fn_call& fn)
+syncevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-syncevent_SYNC(const fn_call& fn)
+syncevent_SYNC(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

@@ -48,36 +48,15 @@ namespace {
     as_value mouseevent_ctor(const fn_call& fn);
     void attachMouseEventInterface(as_object& o);
     void attachMouseEventStaticInterface(as_object& o);
-    as_object* getMouseEventInterface();
-
 }
 
-class MouseEvent_as : public as_object
-{
-
-public:
-
-    MouseEvent_as()
-        :
-        as_object(getMouseEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void mouseevent_class_init(as_object& where, const ObjectURI& uri)
+void
+mouseevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getMouseEventInterface();
-        cl = gl->createClass(&mouseevent_ctor, proto);
-        attachMouseEventStaticInterface(*cl);
-    }
-
-    // Register _global.MouseEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, mouseevent_ctor,
+            attachMouseEventInterface,
+            attachMouseEventStaticInterface, uri);
 }
 
 namespace {
@@ -106,121 +85,86 @@ attachMouseEventStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getMouseEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachMouseEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-mouseevent_toString(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_updateAfterEvent(const fn_call& fn)
+mouseevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-mouseevent_CLICK(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_DOUBLE_CLICK(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_MOUSE_DOWN(const fn_call& fn)
+mouseevent_updateAfterEvent(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-mouseevent_MOUSE_MOVE(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_MOUSE_OUT(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_MOUSE_OVER(const fn_call& fn)
+mouseevent_CLICK(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-mouseevent_MOUSE_UP(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_MOUSE_WHEEL(const fn_call& fn)
-{
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-mouseevent_ROLL_OUT(const fn_call& fn)
+mouseevent_DOUBLE_CLICK(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-mouseevent_ROLL_OVER(const fn_call& fn)
+mouseevent_MOUSE_DOWN(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_MOUSE_MOVE(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_MOUSE_OUT(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_MOUSE_OVER(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_MOUSE_UP(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_MOUSE_WHEEL(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_ROLL_OUT(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+mouseevent_ROLL_OVER(const fn_call& /*fn*/)
+{
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -228,8 +172,7 @@ mouseevent_ROLL_OVER(const fn_call& fn)
 as_value
 mouseevent_ctor(const fn_call& /*fn*/)
 {
-
-    return as_value(); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

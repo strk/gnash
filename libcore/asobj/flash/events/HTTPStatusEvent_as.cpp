@@ -77,14 +77,14 @@ getHTTPStatusEventInterface()
 }
 
 as_value
-httpstatusevent_toString(const fn_call& fn)
+httpstatusevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-httpstatusevent_HTTP_STATUS(const fn_call& fn)
+httpstatusevent_HTTP_STATUS(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

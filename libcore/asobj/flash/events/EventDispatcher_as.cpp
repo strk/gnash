@@ -42,36 +42,16 @@ namespace {
     as_value eventdispatcher_ctor(const fn_call& fn);
     void attachEventDispatcherInterface(as_object& o);
     void attachEventDispatcherStaticInterface(as_object& o);
-    as_object* getEventDispatcherInterface();
 
 }
 
-class EventDispatcher_as : public as_object
-{
-
-public:
-
-    EventDispatcher_as()
-        :
-        as_object(getEventDispatcherInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void eventdispatcher_class_init(as_object& where, const ObjectURI& uri)
+void
+eventdispatcher_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getEventDispatcherInterface();
-        cl = gl->createClass(&eventdispatcher_ctor, proto);
-        attachEventDispatcherStaticInterface(*cl);
-    }
-
-    // Register _global.EventDispatcher
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, eventdispatcher_ctor,
+            attachEventDispatcherInterface,
+            attachEventDispatcherStaticInterface, uri);
 }
 
 namespace {
@@ -94,67 +74,44 @@ attachEventDispatcherStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getEventDispatcherInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachEventDispatcherInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-eventdispatcher_dispatchEvent(const fn_call& fn)
-{
-    boost::intrusive_ptr<EventDispatcher_as> ptr =
-        ensureType<EventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-eventdispatcher_hasEventListener(const fn_call& fn)
+eventdispatcher_dispatchEvent(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-eventdispatcher_removeEventListener(const fn_call& fn)
-{
-    boost::intrusive_ptr<EventDispatcher_as> ptr =
-        ensureType<EventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-eventdispatcher_willTrigger(const fn_call& fn)
-{
-    boost::intrusive_ptr<EventDispatcher_as> ptr =
-        ensureType<EventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-eventdispatcher_activate(const fn_call& fn)
+eventdispatcher_hasEventListener(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-eventdispatcher_deactivate(const fn_call& fn)
+eventdispatcher_removeEventListener(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<EventDispatcher_as> ptr =
-        ensureType<EventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+eventdispatcher_willTrigger(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+eventdispatcher_activate(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+eventdispatcher_deactivate(const fn_call& /*fn*/)
+{
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -162,8 +119,7 @@ eventdispatcher_deactivate(const fn_call& fn)
 as_value
 eventdispatcher_ctor(const fn_call& /*fn*/)
 {
-
-    return as_value(); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

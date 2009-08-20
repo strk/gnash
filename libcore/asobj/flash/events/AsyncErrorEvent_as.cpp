@@ -77,14 +77,14 @@ getAsyncErrorEventInterface()
 }
 
 as_value
-asyncerrorevent_toString(const fn_call& fn)
+asyncerrorevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-asyncerrorevent_ASYNC_ERROR(const fn_call& fn)
+asyncerrorevent_ASYNC_ERROR(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

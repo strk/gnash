@@ -77,14 +77,14 @@ getNetStatusEventInterface()
 }
 
 as_value
-netstatusevent_toString(const fn_call& fn)
+netstatusevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-netstatusevent_NET_STATUS(const fn_call& fn)
+netstatusevent_NET_STATUS(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();

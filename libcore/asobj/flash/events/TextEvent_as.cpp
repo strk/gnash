@@ -39,8 +39,6 @@ namespace {
     as_value textevent_ctor(const fn_call& fn);
     void attachTextEventInterface(as_object& o);
     void attachTextEventStaticInterface(as_object& o);
-    as_object* getTextEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -68,37 +66,23 @@ attachTextEventStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getTextEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachTextEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-textevent_toString(const fn_call& fn)
+textevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-textevent_LINK(const fn_call& fn)
+textevent_LINK(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-textevent_TEXT_INPUT(const fn_call& fn)
+textevent_TEXT_INPUT(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<TextEvent_as> ptr =
-        ensureType<TextEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -106,8 +90,7 @@ textevent_TEXT_INPUT(const fn_call& fn)
 as_value
 textevent_ctor(const fn_call& /*fn*/)
 {
-
-    return as_value(); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

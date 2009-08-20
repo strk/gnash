@@ -39,16 +39,15 @@ namespace {
     as_value progressevent_ctor(const fn_call& fn);
     void attachProgressEventInterface(as_object& o);
     void attachProgressEventStaticInterface(as_object& o);
-    as_object* getProgressEventInterface();
-
 }
 
 // extern (used by Global.cpp)
 void
 progressevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, progressevent_ctor, attachProgressEventInterface, 
-        attachProgressEventStaticInterface, uri);
+    registerBuiltinClass(where, progressevent_ctor,
+            attachProgressEventInterface, 
+            attachProgressEventStaticInterface, uri);
 }
 
 namespace {
@@ -68,37 +67,23 @@ attachProgressEventStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getProgressEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachProgressEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-progressevent_toString(const fn_call& fn)
+progressevent_toString(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-progressevent_PROGRESS(const fn_call& fn)
+progressevent_PROGRESS(const fn_call& /*fn*/)
 {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-progressevent_SOCKET_DATA(const fn_call& fn)
+progressevent_SOCKET_DATA(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ProgressEvent_as> ptr =
-        ensureType<ProgressEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -106,8 +91,7 @@ progressevent_SOCKET_DATA(const fn_call& fn)
 as_value
 progressevent_ctor(const fn_call& /*fn*/)
 {
-
-    return as_value(); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 
