@@ -38,7 +38,6 @@ namespace {
     as_value fullscreenevent_ctor(const fn_call& fn);
     void attachFullScreenEventInterface(as_object& o);
     void attachFullScreenEventStaticInterface(as_object& o);
-    as_object* getFullScreenEventInterface();
 
 }
 
@@ -63,17 +62,6 @@ attachFullScreenEventInterface(as_object& o)
 void
 attachFullScreenEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getFullScreenEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFullScreenEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

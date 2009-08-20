@@ -36,20 +36,7 @@ namespace {
     as_value eventphase_ctor(const fn_call& fn);
     void attachEventPhaseInterface(as_object& o);
     void attachEventPhaseStaticInterface(as_object& o);
-    as_object* getEventPhaseInterface();
-
 }
-
-class EventPhase_as : public as_object
-{
-
-public:
-
-    EventPhase_as()
-        :
-        as_object(getEventPhaseInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -70,17 +57,6 @@ void
 attachEventPhaseStaticInterface(as_object& /*o*/)
 {
 
-}
-
-as_object*
-getEventPhaseInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachEventPhaseInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

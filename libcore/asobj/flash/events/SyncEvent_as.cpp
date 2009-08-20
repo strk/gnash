@@ -38,8 +38,6 @@ namespace {
     as_value syncevent_ctor(const fn_call& fn);
     void attachSyncEventInterface(as_object& o);
     void attachSyncEventStaticInterface(as_object& o);
-    as_object* getSyncEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -63,17 +61,6 @@ attachSyncEventInterface(as_object& o)
 void
 attachSyncEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getSyncEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSyncEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

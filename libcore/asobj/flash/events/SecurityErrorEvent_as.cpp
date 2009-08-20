@@ -38,8 +38,6 @@ namespace {
     as_value securityerrorevent_ctor(const fn_call& fn);
     void attachSecurityErrorEventInterface(as_object& o);
     void attachSecurityErrorEventStaticInterface(as_object& o);
-    as_object* getSecurityErrorEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -63,17 +61,6 @@ attachSecurityErrorEventInterface(as_object& o)
 void
 attachSecurityErrorEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getSecurityErrorEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSecurityErrorEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

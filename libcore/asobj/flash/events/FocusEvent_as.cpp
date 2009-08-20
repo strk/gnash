@@ -41,36 +41,14 @@ namespace {
     as_value focusevent_ctor(const fn_call& fn);
     void attachFocusEventInterface(as_object& o);
     void attachFocusEventStaticInterface(as_object& o);
-    as_object* getFocusEventInterface();
-
 }
 
-class FocusEvent_as : public as_object
-{
-
-public:
-
-    FocusEvent_as()
-        :
-        as_object(getFocusEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void focusevent_class_init(as_object& where, const ObjectURI& uri)
+void
+focusevent_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getFocusEventInterface();
-        cl = gl->createClass(&focusevent_ctor, proto);
-        attachFocusEventStaticInterface(*cl);
-    }
-
-    // Register _global.FocusEvent
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, focusevent_ctor, attachFocusEventInterface,
+             attachFocusEventStaticInterface, uri);
 }
 
 namespace {
@@ -89,17 +67,6 @@ attachFocusEventInterface(as_object& o)
 void
 attachFocusEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getFocusEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFocusEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

@@ -38,8 +38,6 @@ namespace {
     as_value ioerrorevent_ctor(const fn_call& fn);
     void attachIOErrorEventInterface(as_object& o);
     void attachIOErrorEventStaticInterface(as_object& o);
-    as_object* getIOErrorEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -63,17 +61,6 @@ attachIOErrorEventInterface(as_object& o)
 void
 attachIOErrorEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getIOErrorEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIOErrorEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

@@ -38,8 +38,6 @@ namespace {
     as_value netstatusevent_ctor(const fn_call& fn);
     void attachNetStatusEventInterface(as_object& o);
     void attachNetStatusEventStaticInterface(as_object& o);
-    as_object* getNetStatusEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -63,17 +61,6 @@ attachNetStatusEventInterface(as_object& o)
 void
 attachNetStatusEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getNetStatusEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachNetStatusEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

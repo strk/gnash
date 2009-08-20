@@ -38,8 +38,6 @@ namespace {
     as_value asyncerrorevent_ctor(const fn_call& fn);
     void attachAsyncErrorEventInterface(as_object& o);
     void attachAsyncErrorEventStaticInterface(as_object& o);
-    as_object* getAsyncErrorEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -63,17 +61,6 @@ attachAsyncErrorEventInterface(as_object& o)
 void
 attachAsyncErrorEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getAsyncErrorEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachAsyncErrorEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

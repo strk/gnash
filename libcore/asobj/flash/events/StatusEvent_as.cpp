@@ -38,8 +38,6 @@ namespace {
     as_value statusevent_ctor(const fn_call& fn);
     void attachStatusEventInterface(as_object& o);
     void attachStatusEventStaticInterface(as_object& o);
-    as_object* getStatusEventInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -63,17 +61,6 @@ attachStatusEventInterface(as_object& o)
 void
 attachStatusEventStaticInterface(as_object& /*o*/)
 {
-}
-
-as_object*
-getStatusEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachStatusEventInterface(*o);
-    }
-    return o.get();
 }
 
 as_value
