@@ -42,7 +42,7 @@ namespace {
 void
 invalidswferror_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, invalidswferror_class_init,
+    registerBuiltinClass(where, invalidswferror_ctor,
             attachInvalidSWFErrorInterface,
             attachInvalidSWFErrorStaticInterface, uri);
 }
