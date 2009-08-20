@@ -111,7 +111,6 @@ namespace {
 
     // Forward declarations
     
-    as_object* getDateInterface();
     void attachDateInterface(as_object& o);
     void attachDateStaticInterface(as_object& o);
 
@@ -211,8 +210,9 @@ date_class_init(as_object& global, const ObjectURI& uri)
 {
 
     Global_as* gl = getGlobal(global);
-    as_object* proto = getDateInterface();
+    as_object* proto = gl->createObject(getObjectInterface());
     as_object* cl = gl->createClass(&date_new, proto);
+    attachDateInterface(*proto);
     
     const int flags = PropFlags::readOnly;
     cl->set_member_flags(NSV::PROP_uuPROTOuu, flags);
@@ -393,20 +393,6 @@ attachDateStaticInterface(as_object& o)
     o.init_member("UTC", vm.getNative(103, 257), flags);
 }
 
-as_object*
-getDateInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( !o )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-        attachDateInterface(*o);
-    }
-    return o.get();
-}
-
-
 /// \brief Date constructor
 //
 /// The constructor has three forms: 0 args, 1 arg and 2-7 args.
@@ -426,11 +412,15 @@ date_new(const fn_call& fn)
 {
 
     as_object* obj = fn.this_ptr;
+
+    // The Date ctor called as a conversion function constructs a new
+    // date.
     if (!fn.isInstantiation()) {
-        obj = new as_object();
-        obj->set_prototype(getDateInterface());
-        obj->setProxy(new Date_as);
-        return obj;
+        Global_as* gl = getGlobal(fn);
+        as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
+        if (!ctor) return as_value();
+        fn_call::Args args;
+        return ctor->constructInstance(fn.env(), args);
     }
 
     // Reject all date specifications containing Infinities and NaNs.

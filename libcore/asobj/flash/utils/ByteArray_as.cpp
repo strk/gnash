@@ -68,17 +68,6 @@ namespace {
 
 }
 
-class ByteArray_as : public as_object
-{
-
-public:
-
-    ByteArray_as()
-        :
-        as_object(getByteArrayInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 bytearray_class_init(as_object& where, const ObjectURI& uri)
@@ -128,293 +117,198 @@ attachByteArrayStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getByteArrayInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachByteArrayInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-bytearray_readBoolean(const fn_call& fn)
+bytearray_readBoolean(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readByte(const fn_call& fn)
+bytearray_readByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readBytes(const fn_call& fn)
+bytearray_readBytes(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readDouble(const fn_call& fn)
+bytearray_readDouble(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readFloat(const fn_call& fn)
+bytearray_readFloat(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readInt(const fn_call& fn)
+bytearray_readInt(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readMultiByte(const fn_call& fn)
+bytearray_readMultiByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readObject(const fn_call& fn)
+bytearray_readObject(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readShort(const fn_call& fn)
+bytearray_readShort(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readUnsignedByte(const fn_call& fn)
+bytearray_readUnsignedByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readUnsignedInt(const fn_call& fn)
+bytearray_readUnsignedInt(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readUnsignedShort(const fn_call& fn)
+bytearray_readUnsignedShort(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readUTF(const fn_call& fn)
+bytearray_readUTF(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_readUTFBytes(const fn_call& fn)
+bytearray_readUTFBytes(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_toString(const fn_call& fn)
+bytearray_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_uncompress(const fn_call& fn)
+bytearray_uncompress(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeBoolean(const fn_call& fn)
+bytearray_writeBoolean(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeByte(const fn_call& fn)
+bytearray_writeByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeBytes(const fn_call& fn)
+bytearray_writeBytes(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeDouble(const fn_call& fn)
+bytearray_writeDouble(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeFloat(const fn_call& fn)
+bytearray_writeFloat(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeInt(const fn_call& fn)
+bytearray_writeInt(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeMultiByte(const fn_call& fn)
+bytearray_writeMultiByte(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeObject(const fn_call& fn)
+bytearray_writeObject(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeShort(const fn_call& fn)
+bytearray_writeShort(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeUnsignedInt(const fn_call& fn)
+bytearray_writeUnsignedInt(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeUTF(const fn_call& fn)
+bytearray_writeUTF(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-bytearray_writeUTFBytes(const fn_call& fn)
+bytearray_writeUTFBytes(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ByteArray_as> ptr =
-        ensureType<ByteArray_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -422,9 +316,7 @@ bytearray_writeUTFBytes(const fn_call& fn)
 as_value
 bytearray_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ByteArray_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

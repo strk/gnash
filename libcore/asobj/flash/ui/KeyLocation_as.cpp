@@ -36,36 +36,15 @@ namespace {
     as_value keylocation_ctor(const fn_call& fn);
     void attachKeyLocationInterface(as_object& o);
     void attachKeyLocationStaticInterface(as_object& o);
-    as_object* getKeyLocationInterface();
 
 }
 
-class KeyLocation_as : public as_object
-{
-
-public:
-
-    KeyLocation_as()
-        :
-        as_object(getKeyLocationInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void keylocation_class_init(as_object& where, const ObjectURI& uri)
+void
+keylocation_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getKeyLocationInterface();
-        cl = gl->createClass(&keylocation_ctor, proto);
-        attachKeyLocationStaticInterface(*cl);
-    }
-
-    // Register _global.KeyLocation
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, keylocation_ctor, attachKeyLocationInterface,
+            attachKeyLocationStaticInterface, uri);
 }
 
 namespace {
@@ -81,23 +60,10 @@ attachKeyLocationStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getKeyLocationInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachKeyLocationInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 keylocation_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new KeyLocation_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
