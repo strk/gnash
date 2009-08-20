@@ -40,32 +40,12 @@ namespace {
 
 }
 
-class Endian_as : public as_object
-{
-
-public:
-
-    Endian_as()
-        :
-        as_object(getEndianInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void endian_class_init(as_object& where, const ObjectURI& uri)
+void
+endian_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getEndianInterface();
-        cl = gl->createClass(&endian_ctor, proto);
-        attachEndianStaticInterface(*cl);
-    }
-
-    // Register _global.Endian
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, &endian_ctor, attachEndianStaticInterface,
+            attachEndianInterface, uri);
 }
 
 namespace {
@@ -81,23 +61,10 @@ attachEndianStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getEndianInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachEndianInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 endian_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Endian_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

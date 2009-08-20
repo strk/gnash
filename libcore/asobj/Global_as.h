@@ -82,7 +82,20 @@ typedef void(*Properties)(as_object&);
 
 /// Register a built-in object
 //
-/// @return the built-in object with properties attached.
+/// This is used for simple objects that are part of the player API.
+//
+/// In the reference player these objects are always constructed in
+/// ActionScript, though their functions may be native.
+//
+/// They include (AS2) Mouse, Selection and Stage, and (AS3) all constant
+/// enumeration objects.
+//
+/// @param p        a pointer to a function that will attach properties to the
+///                 object
+/// @param where    the object to which the created object will be attached
+/// @param uri      an ObjectURI describing the name and namespace of the
+///                 created object.
+/// @return         the built-in object with properties attached.
 inline as_object*
 registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
 {
@@ -97,6 +110,43 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
             getNamespace(uri));
 
     return obj;
+}
+
+/// Register a built-in class
+//
+/// This is used for classes that are part of the player API.
+//
+/// In the reference player these classes are always constructed in
+/// ActionScript, though their functions may be native, and the constructor
+/// may also call native functions.
+//
+/// @param c        a pointer to a function that will attach properties to the
+///                 class itself
+/// @param p        a pointer to a function that will attach properties to the
+///                 class prototype
+/// @param ctor     the constructor function for the new class.
+/// @param where    the object to which the created object will be attached
+/// @param uri      an ObjectURI describing the name and namespace of the
+///                 created object.
+/// @return         the built-in class with prototype and properties attached.
+inline as_object*
+registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
+        Properties p, Properties c, const ObjectURI& uri)
+{
+    Global_as* gl = getGlobal(where);
+    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* cl = gl->createClass(ctor, proto);
+ 
+    // Attach class properties to class
+    c(*cl);
+
+    // Attach prototype properties to prototype
+    p(*proto);
+
+    // Register class with specified object.
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
+            getNamespace(uri));
+    return cl;
 }
 
 } // namespace gnash
