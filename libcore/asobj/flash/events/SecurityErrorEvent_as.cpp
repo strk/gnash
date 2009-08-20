@@ -110,9 +110,8 @@ securityerrorevent_SECURITY_ERROR(const fn_call& fn)
 as_value
 securityerrorevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SecurityErrorEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

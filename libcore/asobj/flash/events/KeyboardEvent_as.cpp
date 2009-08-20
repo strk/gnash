@@ -143,9 +143,8 @@ keyboardevent_KEY_UP(const fn_call& fn)
 as_value
 keyboardevent_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new KeyboardEvent_as;
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 
