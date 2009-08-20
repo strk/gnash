@@ -163,9 +163,6 @@ event_formatToString(const fn_call& fn)
 as_value
 event_isDefaultPrevented(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -193,9 +190,6 @@ event_stopImmediatePropagation(const fn_call& fn)
 as_value
 event_stopPropagation(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -223,9 +217,6 @@ event_ACTIVATE(const fn_call& fn)
 as_value
 event_ADDED(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -253,9 +244,6 @@ event_CANCEL(const fn_call& fn)
 as_value
 event_CHANGE(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -283,9 +271,6 @@ event_COMPLETE(const fn_call& fn)
 as_value
 event_CONNECT(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -313,9 +298,6 @@ event_DISPLAYING(const fn_call& fn)
 as_value
 event_ENTER_FRAME(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -343,9 +325,6 @@ event_ID3(const fn_call& fn)
 as_value
 event_INIT(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -373,9 +352,6 @@ event_OPEN(const fn_call& fn)
 as_value
 event_REMOVED(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -403,9 +379,6 @@ event_RENDER(const fn_call& fn)
 as_value
 event_RESIZE(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -433,9 +406,6 @@ event_SELECT(const fn_call& fn)
 as_value
 event_SOUND_COMPLETE(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -463,9 +433,6 @@ event_TAB_ENABLED_CHANGE(const fn_call& fn)
 as_value
 event_TAB_INDEX_CHANGE(const fn_call& fn)
 {
-    boost::intrusive_ptr<Event_as> ptr =
-        ensureType<Event_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

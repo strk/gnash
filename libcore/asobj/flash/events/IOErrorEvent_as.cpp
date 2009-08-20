@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class IOErrorEvent_as : public as_object
-{
-
-public:
-
-    IOErrorEvent_as()
-        :
-        as_object(getIOErrorEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 ioerrorevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getIOErrorEventInterface()
 as_value
 ioerrorevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<IOErrorEvent_as> ptr =
-        ensureType<IOErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ ioerrorevent_toString(const fn_call& fn)
 as_value
 ioerrorevent_IO_ERROR(const fn_call& fn)
 {
-    boost::intrusive_ptr<IOErrorEvent_as> ptr =
-        ensureType<IOErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

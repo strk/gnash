@@ -118,9 +118,6 @@ eventdispatcher_dispatchEvent(const fn_call& fn)
 as_value
 eventdispatcher_hasEventListener(const fn_call& fn)
 {
-    boost::intrusive_ptr<EventDispatcher_as> ptr =
-        ensureType<EventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -148,9 +145,6 @@ eventdispatcher_willTrigger(const fn_call& fn)
 as_value
 eventdispatcher_activate(const fn_call& fn)
 {
-    boost::intrusive_ptr<EventDispatcher_as> ptr =
-        ensureType<EventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

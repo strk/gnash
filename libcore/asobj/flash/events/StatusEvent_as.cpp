@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class StatusEvent_as : public as_object
-{
-
-public:
-
-    StatusEvent_as()
-        :
-        as_object(getStatusEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 statusevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getStatusEventInterface()
 as_value
 statusevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<StatusEvent_as> ptr =
-        ensureType<StatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ statusevent_toString(const fn_call& fn)
 as_value
 statusevent_STATUS(const fn_call& fn)
 {
-    boost::intrusive_ptr<StatusEvent_as> ptr =
-        ensureType<StatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

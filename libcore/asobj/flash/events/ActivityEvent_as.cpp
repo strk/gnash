@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class ActivityEvent_as : public as_object
-{
-
-public:
-
-    ActivityEvent_as()
-        :
-        as_object(getActivityEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 activityevent_class_init(as_object& where, const ObjectURI& uri)
@@ -76,33 +65,16 @@ attachActivityEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getActivityEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachActivityEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-activityevent_toString(const fn_call& fn)
+activityevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ActivityEvent_as> ptr =
-        ensureType<ActivityEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-activityevent_ACTIVITY(const fn_call& fn)
+activityevent_ACTIVITY(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ActivityEvent_as> ptr =
-        ensureType<ActivityEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -110,8 +82,7 @@ activityevent_ACTIVITY(const fn_call& fn)
 as_value
 activityevent_ctor(const fn_call& /*fn*/)
 {
-
-    return as_value(); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

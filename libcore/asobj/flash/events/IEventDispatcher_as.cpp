@@ -103,9 +103,6 @@ getIEventDispatcherInterface()
 as_value
 ieventdispatcher_dispatchEvent(const fn_call& fn)
 {
-    boost::intrusive_ptr<IEventDispatcher_as> ptr =
-        ensureType<IEventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -133,9 +130,6 @@ ieventdispatcher_removeEventListener(const fn_call& fn)
 as_value
 ieventdispatcher_willTrigger(const fn_call& fn)
 {
-    boost::intrusive_ptr<IEventDispatcher_as> ptr =
-        ensureType<IEventDispatcher_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

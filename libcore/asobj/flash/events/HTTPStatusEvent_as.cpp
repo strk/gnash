@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class HTTPStatusEvent_as : public as_object
-{
-
-public:
-
-    HTTPStatusEvent_as()
-        :
-        as_object(getHTTPStatusEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 httpstatusevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getHTTPStatusEventInterface()
 as_value
 httpstatusevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<HTTPStatusEvent_as> ptr =
-        ensureType<HTTPStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ httpstatusevent_toString(const fn_call& fn)
 as_value
 httpstatusevent_HTTP_STATUS(const fn_call& fn)
 {
-    boost::intrusive_ptr<HTTPStatusEvent_as> ptr =
-        ensureType<HTTPStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

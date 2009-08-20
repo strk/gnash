@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class SecurityErrorEvent_as : public as_object
-{
-
-public:
-
-    SecurityErrorEvent_as()
-        :
-        as_object(getSecurityErrorEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 securityerrorevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getSecurityErrorEventInterface()
 as_value
 securityerrorevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<SecurityErrorEvent_as> ptr =
-        ensureType<SecurityErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ securityerrorevent_toString(const fn_call& fn)
 as_value
 securityerrorevent_SECURITY_ERROR(const fn_call& fn)
 {
-    boost::intrusive_ptr<SecurityErrorEvent_as> ptr =
-        ensureType<SecurityErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

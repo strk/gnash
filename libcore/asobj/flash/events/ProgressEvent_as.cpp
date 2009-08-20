@@ -43,17 +43,6 @@ namespace {
 
 }
 
-class ProgressEvent_as : public as_object
-{
-
-public:
-
-    ProgressEvent_as()
-        :
-        as_object(getProgressEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 progressevent_class_init(as_object& where, const ObjectURI& uri)
@@ -93,9 +82,6 @@ getProgressEventInterface()
 as_value
 progressevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<ProgressEvent_as> ptr =
-        ensureType<ProgressEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -103,9 +89,6 @@ progressevent_toString(const fn_call& fn)
 as_value
 progressevent_PROGRESS(const fn_call& fn)
 {
-    boost::intrusive_ptr<ProgressEvent_as> ptr =
-        ensureType<ProgressEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

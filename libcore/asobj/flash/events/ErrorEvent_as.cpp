@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class ErrorEvent_as : public as_object
-{
-
-public:
-
-    ErrorEvent_as()
-        :
-        as_object(getErrorEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 errorevent_class_init(as_object& where, const ObjectURI& uri)
@@ -76,33 +65,16 @@ attachErrorEventStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getErrorEventInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachErrorEventInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-errorevent_toString(const fn_call& fn)
+errorevent_toString(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ErrorEvent_as> ptr =
-        ensureType<ErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-errorevent_ERROR(const fn_call& fn)
+errorevent_ERROR(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<ErrorEvent_as> ptr =
-        ensureType<ErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -110,7 +82,6 @@ errorevent_ERROR(const fn_call& fn)
 as_value
 errorevent_ctor(const fn_call& /*fn*/)
 {
-
     return as_value(); // will keep alive
 }
 

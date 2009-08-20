@@ -103,9 +103,6 @@ getKeyboardEventInterface()
 as_value
 keyboardevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<KeyboardEvent_as> ptr =
-        ensureType<KeyboardEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -133,9 +130,6 @@ keyboardevent_KEY_DOWN(const fn_call& fn)
 as_value
 keyboardevent_KEY_UP(const fn_call& fn)
 {
-    boost::intrusive_ptr<KeyboardEvent_as> ptr =
-        ensureType<KeyboardEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

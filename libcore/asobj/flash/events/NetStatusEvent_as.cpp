@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class NetStatusEvent_as : public as_object
-{
-
-public:
-
-    NetStatusEvent_as()
-        :
-        as_object(getNetStatusEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 netstatusevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getNetStatusEventInterface()
 as_value
 netstatusevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStatusEvent_as> ptr =
-        ensureType<NetStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ netstatusevent_toString(const fn_call& fn)
 as_value
 netstatusevent_NET_STATUS(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetStatusEvent_as> ptr =
-        ensureType<NetStatusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

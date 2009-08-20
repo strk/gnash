@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class FullScreenEvent_as : public as_object
-{
-
-public:
-
-    FullScreenEvent_as()
-        :
-        as_object(getFullScreenEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 fullscreenevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getFullScreenEventInterface()
 as_value
 fullscreenevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<FullScreenEvent_as> ptr =
-        ensureType<FullScreenEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ fullscreenevent_toString(const fn_call& fn)
 as_value
 fullscreenevent_FULL_SCREEN(const fn_call& fn)
 {
-    boost::intrusive_ptr<FullScreenEvent_as> ptr =
-        ensureType<FullScreenEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class AsyncErrorEvent_as : public as_object
-{
-
-public:
-
-    AsyncErrorEvent_as()
-        :
-        as_object(getAsyncErrorEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 asyncerrorevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getAsyncErrorEventInterface()
 as_value
 asyncerrorevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<AsyncErrorEvent_as> ptr =
-        ensureType<AsyncErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ asyncerrorevent_toString(const fn_call& fn)
 as_value
 asyncerrorevent_ASYNC_ERROR(const fn_call& fn)
 {
-    boost::intrusive_ptr<AsyncErrorEvent_as> ptr =
-        ensureType<AsyncErrorEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

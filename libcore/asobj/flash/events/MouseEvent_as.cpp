@@ -130,9 +130,6 @@ mouseevent_toString(const fn_call& fn)
 as_value
 mouseevent_updateAfterEvent(const fn_call& fn)
 {
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -160,9 +157,6 @@ mouseevent_DOUBLE_CLICK(const fn_call& fn)
 as_value
 mouseevent_MOUSE_DOWN(const fn_call& fn)
 {
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -190,9 +184,6 @@ mouseevent_MOUSE_OUT(const fn_call& fn)
 as_value
 mouseevent_MOUSE_OVER(const fn_call& fn)
 {
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -220,9 +211,6 @@ mouseevent_MOUSE_WHEEL(const fn_call& fn)
 as_value
 mouseevent_ROLL_OUT(const fn_call& fn)
 {
-    boost::intrusive_ptr<MouseEvent_as> ptr =
-        ensureType<MouseEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

@@ -115,9 +115,6 @@ focusevent_toString(const fn_call& fn)
 as_value
 focusevent_FOCUS_IN(const fn_call& fn)
 {
-    boost::intrusive_ptr<FocusEvent_as> ptr =
-        ensureType<FocusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -145,9 +142,6 @@ focusevent_KEY_FOCUS_CHANGE(const fn_call& fn)
 as_value
 focusevent_MOUSE_FOCUS_CHANGE(const fn_call& fn)
 {
-    boost::intrusive_ptr<FocusEvent_as> ptr =
-        ensureType<FocusEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

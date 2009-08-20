@@ -103,9 +103,6 @@ getTimerEventInterface()
 as_value
 timerevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<TimerEvent_as> ptr =
-        ensureType<TimerEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -133,9 +130,6 @@ timerevent_TIMER(const fn_call& fn)
 as_value
 timerevent_TIMER_COMPLETE(const fn_call& fn)
 {
-    boost::intrusive_ptr<TimerEvent_as> ptr =
-        ensureType<TimerEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

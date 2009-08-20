@@ -43,17 +43,6 @@ namespace {
 
 }
 
-class TextEvent_as : public as_object
-{
-
-public:
-
-    TextEvent_as()
-        :
-        as_object(getTextEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 textevent_class_init(as_object& where, const ObjectURI& uri)
@@ -93,9 +82,6 @@ getTextEventInterface()
 as_value
 textevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextEvent_as> ptr =
-        ensureType<TextEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -103,9 +89,6 @@ textevent_toString(const fn_call& fn)
 as_value
 textevent_LINK(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextEvent_as> ptr =
-        ensureType<TextEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }

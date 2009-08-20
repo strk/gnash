@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class SyncEvent_as : public as_object
-{
-
-public:
-
-    SyncEvent_as()
-        :
-        as_object(getSyncEventInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 syncevent_class_init(as_object& where, const ObjectURI& uri)
@@ -90,9 +79,6 @@ getSyncEventInterface()
 as_value
 syncevent_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<SyncEvent_as> ptr =
-        ensureType<SyncEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -100,9 +86,6 @@ syncevent_toString(const fn_call& fn)
 as_value
 syncevent_SYNC(const fn_call& fn)
 {
-    boost::intrusive_ptr<SyncEvent_as> ptr =
-        ensureType<SyncEvent_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
