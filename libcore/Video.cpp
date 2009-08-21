@@ -432,7 +432,7 @@ video_attach(const fn_call& fn)
     as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
 	NetStream_as* ns;
 
-    if (isInstanceOf(obj, ns)) {
+    if (isNativeType(obj, ns)) {
 		video->setStream(ns);
 	}
 	else {

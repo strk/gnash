@@ -382,7 +382,7 @@ as_value::to_string() const
             as_object* obj = m_type == AS_FUNCTION ? getFun().get() :
                                                      getObj().get();
             String_as* s;
-            if (isInstanceOf(obj, s)) return s->value();
+            if (isNativeType(obj, s)) return s->value();
 
 			try
 			{
@@ -469,7 +469,7 @@ as_value::to_primitive() const
 
 	if (m_type == OBJECT && swfVersion > 5) {
         Date_as* d;
-        if (isInstanceOf(getObj().get(), d)) hint = STRING;
+        if (isNativeType(getObj().get(), d)) hint = STRING;
     }
 
 	return to_primitive(hint);
@@ -485,7 +485,7 @@ as_value::convert_to_primitive()
 
 	if (m_type == OBJECT && swfVersion > 5) {
         Date_as* d;
-        if (isInstanceOf<Date_as>(getObj().get(), d)) hint = STRING;
+        if (isNativeType<Date_as>(getObj().get(), d)) hint = STRING;
     }
 
     *this = to_primitive(hint);
@@ -2420,7 +2420,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 offsetTable[obj] = idx;
                 
                 Date_as* date;
-                if (isInstanceOf(obj, date))
+                if (isNativeType(obj, date))
                 {
                     double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE

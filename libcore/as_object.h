@@ -1253,7 +1253,7 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 /// of Date and String objects.
 template<typename T>
 bool
-isInstanceOf(as_object* obj, T*& proxy)
+isNativeType(as_object* obj, T*& proxy)
 {
     if (!obj) return false;
     proxy = dynamic_cast<T*>(obj->proxy());
