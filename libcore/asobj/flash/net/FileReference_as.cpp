@@ -42,12 +42,12 @@ static as_value filereference_cancel(const fn_call& fn);
 static as_value filereference_download(const fn_call& fn);
 static as_value filereference_removeListener(const fn_call& fn);
 static as_value filereference_upload(const fn_call& fn);
-static as_value filereference_creationDate_getset(const fn_call& fn);
-static as_value filereference_creator_getset(const fn_call& fn);
-static as_value filereference_modificationDate_getset(const fn_call& fn);
-static as_value filereference_name_getset(const fn_call& fn);
-static as_value filereference_size_getset(const fn_call& fn);
-static as_value filereference_type_getset(const fn_call& fn);
+static as_value filereference_creationDate(const fn_call& fn);
+static as_value filereference_creator(const fn_call& fn);
+static as_value filereference_modificationDate(const fn_call& fn);
+static as_value filereference_name(const fn_call& fn);
+static as_value filereference_size(const fn_call& fn);
+static as_value filereference_type(const fn_call& fn);
 as_value filereference_ctor(const fn_call& fn);
 
 void attachFileReferenceStaticInterface(as_object& /*o*/)
@@ -65,18 +65,12 @@ attachFileReferenceInterface(as_object& o)
     o.init_member("download", gl->createFunction(filereference_download));
     o.init_member("removeListener", gl->createFunction(filereference_removeListener));
     o.init_member("upload", gl->createFunction(filereference_upload));
-    o.init_property("creationDate", filereference_creationDate_getset, filereference_creationDate_getset);
-    o.init_property("creator", filereference_creator_getset, filereference_creator_getset);
-    o.init_property("modificationDate", filereference_modificationDate_getset, filereference_modificationDate_getset);
-    o.init_property("name", filereference_name_getset, filereference_name_getset);
-    o.init_property("size", filereference_size_getset, filereference_size_getset);
-    o.init_property("type", filereference_type_getset, filereference_type_getset);
-}
-
-static void
-attachFileReferenceStaticProperties(as_object& /*o*/)
-{
-   
+    o.init_property("creationDate", filereference_creationDate, filereference_creationDate);
+    o.init_property("creator", filereference_creator, filereference_creator);
+    o.init_property("modificationDate", filereference_modificationDate, filereference_modificationDate);
+    o.init_property("name", filereference_name, filereference_name);
+    o.init_property("size", filereference_size, filereference_size);
+    o.init_property("type", filereference_type, filereference_type);
 }
 
 static as_value
@@ -116,37 +110,37 @@ filereference_upload(const fn_call& /*fn*/)
 }
 
 static as_value
-filereference_creationDate_getset(const fn_call& /*fn*/)
+filereference_creationDate(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
 static as_value
-filereference_creator_getset(const fn_call& /*fn*/)
+filereference_creator(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
 static as_value
-filereference_modificationDate_getset(const fn_call& /*fn*/)
+filereference_modificationDate(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
 static as_value
-filereference_name_getset(const fn_call& /*fn*/)
+filereference_name(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
 static as_value
-filereference_size_getset(const fn_call& /*fn*/)
+filereference_size(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
 static as_value
-filereference_type_getset(const fn_call& /*fn*/)
+filereference_type(const fn_call& /*fn*/)
 {
     return as_value();
 }

@@ -212,11 +212,19 @@ public:
 
 } // end of anonymous namespace
 
+
+/// Destructor of ActiveRelay needs definition of movie_root.
+ActiveRelay::~ActiveRelay()
+{
+    getRoot(*_owner).removeAdvanceCallback(this);
+}
+
+
 const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
 	:
-    _proxy(0),
+    _relay(0),
 	_vm(getVM(gl)),
 	_members(_vm)
 {
@@ -224,7 +232,7 @@ as_object::as_object(Global_as& gl)
 
 as_object::as_object()
 	:
-    _proxy(0),
+    _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
@@ -232,7 +240,7 @@ as_object::as_object()
 
 as_object::as_object(as_object* proto)
 	:
-    _proxy(0),
+    _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
@@ -241,7 +249,7 @@ as_object::as_object(as_object* proto)
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
-    _proxy(0),
+    _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
@@ -255,7 +263,7 @@ as_object::as_object(const as_object& other)
 #else
 	GcResource(), 
 #endif
-    _proxy(0),
+    _relay(0),
 	_vm(VM::get()),
 	_members(other._members)
 {
@@ -1325,6 +1333,9 @@ as_object::markAsObjectReachable() const
 	{
 		it->second.setReachable();
 	}
+
+    /// Proxy objects can contain references to other as_objects.
+    if (_relay) _relay->setReachable();
 }
 #endif // GNASH_USE_GC
 

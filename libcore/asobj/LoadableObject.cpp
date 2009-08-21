@@ -45,8 +45,9 @@ namespace {
     as_value loadableobject_sendAndLoad(const fn_call& fn);
 }
 
-LoadableObject::LoadableObject()
+LoadableObject::LoadableObject(as_object* owner)
     :
+    ActiveRelay(owner),
     _bytesLoaded(-1),
     _bytesTotal(-1)
 {
@@ -56,7 +57,7 @@ LoadableObject::LoadableObject()
 LoadableObject::~LoadableObject()
 {
     deleteAllChecked(_loadThreads);
-    getRoot(*this).removeAdvanceCallback(this);
+    getRoot(owner()).removeAdvanceCallback(this);
 }
 
 
@@ -64,20 +65,19 @@ void
 LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
-    movie_root& m = getRoot(*this);
+    movie_root& m = getRoot(owner());
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
     // encoded.
     // TODO: test properly.
-    std::ostringstream data;
-    toString(data, !post);
+    const std::string& str = as_value(&owner()).to_string();
 
     // Only GET and POST are possible here.
     MovieClip::VariablesMethod method = post ? MovieClip::METHOD_POST :
                                                MovieClip::METHOD_GET;
 
-    m.getURL(urlstr, target, data.str(), method);
+    m.getURL(urlstr, target, str, method);
 
 }
 
@@ -90,7 +90,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = getRunResources(*this);
+    const RunResources& ri = getRunResources(owner());
 	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
@@ -100,7 +100,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
         NetworkAdapter::RequestHeaders headers;
 
-        if (get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+        if (owner().get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
         {
 
             /// Read in our custom headers if they exist and are an
@@ -137,7 +137,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
         as_value contentType;
 
-        if (get_member(NSV::PROP_CONTENT_TYPE, &contentType))
+        if (owner().get_member(NSV::PROP_CONTENT_TYPE, &contentType))
         {
             // This should not overwrite anything set in 
             // LoadVars.addRequestHeader();
@@ -148,20 +148,16 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         // Convert the object to a string to send. XML should
         // not be URL encoded for the POST method, LoadVars
         // is always URL encoded.
-        std::ostringstream data;
-        toString(data, false);
+        const std::string& strval = as_value(&owner()).to_string();
 
         /// It doesn't matter if there are no request headers.
-        str = ri.streamProvider().getStream(url, data.str(), headers);
+        str = ri.streamProvider().getStream(url, strval, headers);
     }
 	else
     {
         // Convert the object to a string to send. XML should
         // not be URL encoded for the GET method.
-        std::ostringstream data;
-        toString(data, true);
-
-        const std::string& dataString = data.str();
+        const std::string& dataString = as_value(&owner()).to_string();
 
         // Any data must be added to the existing querystring.
         if (!dataString.empty()) {
@@ -169,7 +165,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
             std::string existingQS = url.querystring();
             if (!existingQS.empty()) existingQS += "&";
 
-            url.set_querystring(existingQS + data.str());
+            url.set_querystring(existingQS + dataString);
         }
 
         log_debug("Using GET method for sendAndLoad: %s", url.str());
@@ -177,7 +173,11 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     }
 
 	log_security(_("Loading from url: '%s'"), url.str());
-    target.queueLoad(str);
+	
+    LoadableObject* loadObject;
+    if (isNativeType(&target, loadObject)) {
+        loadObject->queueLoad(str);
+    }
 	
 }
 
@@ -186,9 +186,9 @@ LoadableObject::load(const std::string& urlstr)
 {
     // Set loaded property to false; will be updated (hopefully)
     // when loading is complete.
-	set_member(NSV::PROP_LOADED, false);
+	owner().set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = getRunResources(*this);
+    const RunResources& ri = getRunResources(owner());
 	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
@@ -203,10 +203,8 @@ void
 LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 {
 
-    // We don't need to check before adding a timer, but
-    // this may optimize slightly (it was already in the code).
     if (_loadThreads.empty()) {
-        getRoot(*this).addAdvanceCallback(this);
+        getRoot(owner()).addAdvanceCallback(this);
     }
 
     std::auto_ptr<LoadThread> lt (new LoadThread(str));
@@ -224,7 +222,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 }
 
 void
-LoadableObject::advanceState()
+LoadableObject::update()
 {
 
     if (_loadThreads.empty()) return;
@@ -236,7 +234,7 @@ LoadableObject::advanceState()
 
         /// An empty file is the same as a failure.
         if (lt->failed() || (lt->completed() && !lt->size())) {
-            callMethod(NSV::PROP_ON_DATA, as_value());
+            owner().callMethod(NSV::PROP_ON_DATA, as_value());
             it = _loadThreads.erase(it);
             delete lt; 
         }
@@ -269,12 +267,12 @@ LoadableObject::advanceState()
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
-            string_table& st = getStringTable(*this);
-            set_member(st.find("_bytesLoaded"), _bytesLoaded);
-            set_member(st.find("_bytesTotal"), _bytesTotal);
+            string_table& st = getStringTable(owner());
+            owner().set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            owner().set_member(st.find("_bytesTotal"), _bytesTotal);
             
             // might push_front on the list..
-            callMethod(NSV::PROP_ON_DATA, dataVal);
+            owner().callMethod(NSV::PROP_ON_DATA, dataVal);
 
         }
         else
@@ -282,17 +280,17 @@ LoadableObject::advanceState()
             _bytesTotal = lt->getBytesTotal();
             _bytesLoaded = lt->getBytesLoaded();
             
-            string_table& st = getStringTable(*this);
-            set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            string_table& st = getStringTable(owner());
+            owner().set_member(st.find("_bytesLoaded"), _bytesLoaded);
             // TODO: should this really be set on each iteration?
-            set_member(st.find("_bytesTotal"), _bytesTotal);
+            owner().set_member(st.find("_bytesTotal"), _bytesTotal);
             ++it;
         }
     }
 
     if (_loadThreads.empty()) 
     {
-        getRoot(*this).removeAdvanceCallback(this);
+        getRoot(owner()).removeAdvanceCallback(this);
     }
 
 }
@@ -338,13 +336,10 @@ as_value
 LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 {
     
-    boost::intrusive_ptr<LoadableObject> ptr = 
-        ensureType<LoadableObject>(fn.this_ptr);   
-
     as_value customHeaders;
     as_object* array;
 
-    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+    if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
         array = customHeaders.to_object(*getGlobal(fn)).get();
         if (!array)
@@ -364,7 +359,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         const int flags = PropFlags::dontEnum |
                           PropFlags::dontDelete;
 
-        ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
+        fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
     }
 
     if (fn.nargs == 0)
@@ -484,8 +479,7 @@ loadableobject_decode(const fn_call& fn)
 as_value
 loadableobject_sendAndLoad(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadableObject> ptr =
-	                ensureType<LoadableObject>(fn.this_ptr);
+	LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -513,7 +507,8 @@ loadableobject_sendAndLoad(const fn_call& fn)
 		return as_value(false);
 	}
 
-
+    // TODO: if this isn't an XML or LoadVars, it won't work, but we should
+    // check how far things get before it fails.
 	boost::intrusive_ptr<as_object> target =
         fn.arg(1).to_object(*getGlobal(fn));
 
@@ -536,8 +531,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 as_value
 loadableobject_load(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadableObject> obj = 
-        ensureType<LoadableObject>(fn.this_ptr);
+	LoadableObject* obj = ensureNativeType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -559,8 +553,8 @@ loadableobject_load(const fn_call& fn)
 	obj->load(urlstr);
     
     string_table& st = getStringTable(fn);
-    obj->set_member(st.find("_bytesLoaded"), 0.0);
-    obj->set_member(st.find("_bytesTotal"), as_value());
+    fn.this_ptr->set_member(st.find("_bytesLoaded"), 0.0);
+    fn.this_ptr->set_member(st.find("_bytesTotal"), as_value());
 
     return as_value(true);
 
@@ -570,8 +564,7 @@ loadableobject_load(const fn_call& fn)
 as_value
 loadableobject_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoadableObject> ptr =
-        ensureType<LoadableObject>(fn.this_ptr);
+    LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
  
     std::ostringstream os;
     fn.dump_args(os);

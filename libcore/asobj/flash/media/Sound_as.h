@@ -47,17 +47,16 @@ class CharacterProxy;
 	
 	class fn_call;
 	class as_object;
-class ObjectURI;
-	class Sound_as : public as_object
-	{
+    class ObjectURI;
 
-	public:
-		Sound_as();
-		
-		~Sound_as();
-		
-		static void init(as_object& where, const ObjectURI& uri);
-		
+class Sound_as : public ActiveRelay
+{
+
+public:
+    Sound_as(as_object* owner);
+    
+    ~Sound_as();
+    
 	/// Make this sound control the given DisplayObject
     //
     /// NOTE: 0 is accepted, to implement an "invalid"
@@ -168,7 +167,7 @@ private:
     /// Unregister the probe timer
     void stopProbeTimer();
 
-    virtual void advanceState();
+    virtual void update();
 
     /// Probe audio
     void probeAudio();
@@ -186,7 +185,9 @@ private:
     bool isAttached() const {
         return _inputStream!=0;
     }
-	};
+};
+
+void sound_class_init(as_object& where, const ObjectURI& uri);
 
 } // gnash namespace
 

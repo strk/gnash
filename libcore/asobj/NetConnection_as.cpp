@@ -53,7 +53,6 @@ namespace gnash {
 namespace {
     void attachProperties(as_object& o);
     void attachNetConnectionInterface(as_object& o);
-    as_object* getNetConnectionInterface();
     as_value netconnection_isConnected(const fn_call& fn);
     as_value netconnection_uri(const fn_call& fn);
     as_value netconnection_connect(const fn_call& fn);
@@ -71,7 +70,7 @@ namespace {
 
 }
 
-//---- ConnectionHandler --------------------------------------------------------------
+//---- ConnectionHandler -------------------------------------------------
 
 /// Abstract connection handler class
 //
@@ -114,7 +113,12 @@ public:
     ///
     /// Return true if wants to be advanced again, false otherwise.
     ///
-    virtual bool advance()=0;
+    virtual bool advance() = 0;
+
+    /// ConnectionHandlers may store references to as_objects
+    //
+    /// These include callback objects.
+    virtual void setReachable() const = 0;
 
     /// Return true if the connection has pending calls 
     //
@@ -123,19 +127,7 @@ public:
     /// queued and only really dropped when advance returns
     /// false
     ///
-    virtual bool hasPendingCalls() const=0;
-
-    /// Mark reachable resources, if any. 
-    virtual void setReachable() const
-    {
-        // NOTE: usually this function gets
-        //       called *by* the _nc's setReachable
-        //       but we do this just to be safe
-        //       in case the _nc object is deleted
-        //       and doesn't properly drops us
-        //
-        _nc.setReachable();
-    }
+    virtual bool hasPendingCalls() const = 0;
 
     virtual ~ConnectionHandler() {}
 
@@ -144,7 +136,9 @@ protected:
     /// Construct a connection handler bound to the given NetConnection object
     //
     /// The binding is used to notify statuses and errors
-    ///
+    //
+    /// The NetConnection_as owns all ConnectionHandlers, so there is no
+    /// need to mark it reachable.
     ConnectionHandler(NetConnection_as& nc)
         :
         _nc(nc)
@@ -208,7 +202,6 @@ public:
         {
             i->second->setReachable();
         }
-        ConnectionHandler::setReachable();
     }
 
     // See dox in NetworkHandler class
@@ -302,7 +295,7 @@ HTTPRemotingHandler::advance()
     if(_connection)
     {
 
-        VM& vm = getVM(_nc);
+        VM& vm = getVM(_nc.owner());
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("have connection");
@@ -435,14 +428,14 @@ HTTPRemotingHandler::advance()
 
                         { // method call for each header
                           // FIXME: it seems to me that the call should happen
-                            VM& vm = getVM(_nc);
+                            VM& vm = getVM(_nc.owner());
                             string_table& st = vm.getStringTable();
                             string_table::key key = st.find(headerName);
 #ifdef GNASH_DEBUG_REMOTING
                             log_debug("Calling NetConnection.%s(%s)",
                                     headerName, tmp);
 #endif
-                            _nc.callMethod(key, tmp);
+                            _nc.owner().callMethod(key, tmp);
                         }
                     }
                 }
@@ -525,7 +518,7 @@ HTTPRemotingHandler::advance()
 
                             // if actionscript specified a callback object, call it
                             boost::intrusive_ptr<as_object> callback = pop_callback(id);
-                            if(callback) {
+                            if (callback) {
 
                                 string_table::key methodKey;
                                 if ( methodName == "onResult" ) {
@@ -585,7 +578,7 @@ HTTPRemotingHandler::advance()
         // TODO: it might be useful for a Remoting Handler to have a 
         // StreamProvider member
         const StreamProvider& sp =
-            getRunResources(_nc).streamProvider();
+            getRunResources(_nc.owner()).streamProvider();
 
         _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
 
@@ -636,7 +629,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
     buf->appendNetworkLong(args.size()-firstArg);
 
-    VM& vm = getVM(_nc);
+    VM& vm = getVM(_nc.owner());
 
     for (unsigned int i = firstArg; i < args.size(); ++i)
     {
@@ -675,29 +668,14 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 
 //----- NetConnection_as ----------------------------------------------------
 
-NetConnection_as::NetConnection_as()
+NetConnection_as::NetConnection_as(as_object* owner)
     :
-    as_object(getNetConnectionInterface()),
+    ActiveRelay(owner),
     _queuedConnections(),
     _currentConnection(0),
     _uri(),
     _isConnected(false)
 {
-    attachProperties(*this);
-}
-
-// extern (used by Global.cpp)
-void
-NetConnection_as::init(as_object& global, const ObjectURI& uri)
-{
-    // This is going to be the global NetConnection "class"/"function"
-    Global_as* gl = getGlobal(global);
-    as_object* proto = getNetConnectionInterface();
-    as_object* cl = gl->createClass(&netconnection_new, proto);
-
-    // Register _global.String
-    global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
 }
 
 // here to have HTTPRemotingHandler definition available
@@ -706,18 +684,24 @@ NetConnection_as::~NetConnection_as()
     deleteAllChecked(_queuedConnections);
 }
 
+// extern (used by Global.cpp)
+void
+netconnection_class_init(as_object& where, const ObjectURI& uri)
+{
+    registerBuiltinClass(where, netconnection_new,
+            attachNetConnectionInterface, 0, uri);
+}
+
 
 void
 NetConnection_as::markReachableResources() const
 {
-    if ( _currentConnection.get() ) _currentConnection->setReachable();
-    for (std::list<ConnectionHandler*>::const_iterator
-            i=_queuedConnections.begin(), e=_queuedConnections.end();
-            i!=e; ++i)
-    {
-        (*i)->setReachable();
-    }
-    markAsObjectReachable();
+    owner().setReachable();
+
+    std::for_each(_queuedConnections.begin(), _queuedConnections.end(),
+            std::mem_fun(&ConnectionHandler::setReachable));
+
+    if (_currentConnection.get()) _currentConnection->setReachable();
 }
 
 
@@ -729,7 +713,7 @@ std::string
 NetConnection_as::validateURL() const
 {
 
-    URL uri(_uri, getRunResources(*this).baseURL());
+    URL uri(_uri, getRunResources(owner()).baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -759,7 +743,7 @@ NetConnection_as::notifyStatus(StatusCode code)
     o->init_member("code", info.first, flags);
     o->init_member("level", info.second, flags);
 
-    callMethod(NSV::PROP_ON_STATUS, o);
+    owner().callMethod(NSV::PROP_ON_STATUS, o);
 
 }
 
@@ -834,7 +818,7 @@ NetConnection_as::connect(const std::string& uri)
         return;
     }
 
-    URL url(uri, getRunResources(*this).baseURL());
+    URL url(uri, getRunResources(owner()).baseURL());
 
     if ((url.protocol() != "rtmp")
         && (url.protocol() != "rtmpt")
@@ -905,7 +889,7 @@ NetConnection_as::close()
 void
 NetConnection_as::setURI(const std::string& uri)
 {
-    init_readonly_property("uri", &netconnection_uri);
+    owner().init_readonly_property("uri", &netconnection_uri);
     _uri = uri;
 }
 
@@ -932,7 +916,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
-    const RunResources& ri = getRunResources(*this);
+    const RunResources& ri = getRunResources(owner());
 
     const StreamProvider& streamProvider = ri.streamProvider();
 
@@ -952,19 +936,19 @@ NetConnection_as::getStream(const std::string& name)
 void
 NetConnection_as::startAdvanceTimer() 
 {
-    getRoot(*this).addAdvanceCallback(this);
+    getRoot(owner()).addAdvanceCallback(this);
     log_debug("startAdvanceTimer: registered NetConnection timer");
 }
 
 void
 NetConnection_as::stopAdvanceTimer() 
 {
-    getRoot(*this).removeAdvanceCallback(this);
+    getRoot(owner()).removeAdvanceCallback(this);
     log_debug("stopAdvanceTimer: deregistered NetConnection timer");
 }
 
 void
-NetConnection_as::advanceState()
+NetConnection_as::update()
 {
     // Advance
 
@@ -973,28 +957,26 @@ NetConnection_as::advanceState()
             _queuedConnections.size());
 #endif
 
-    while ( ! _queuedConnections.empty() )
-    {
+    while (!_queuedConnections.empty()) {
         ConnectionHandler* ch = _queuedConnections.front();
-        if ( ! ch->advance() )
-        {
+
+        if (!ch->advance()) {
             log_debug("ConnectionHandler done, dropping");
             _queuedConnections.pop_front();
             delete ch;
         }
+
         else break; // queues handling is serialized
     }
 
-    if ( _currentConnection.get() ) 
-    {
+    if (_currentConnection.get()) {
         _currentConnection->advance();
     }
 
     // Advancement of a connection might trigger creation
     // of a new connection, so we won't stop the advance
     // timer in that case
-    if ( _queuedConnections.empty() && ! _currentConnection.get() )
-    {
+    if (_queuedConnections.empty() && ! _currentConnection.get()) {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("stopping advance timer");
 #endif
@@ -1037,8 +1019,7 @@ namespace {
 as_value
 netconnection_call(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection_as> ptr = 
-        ensureType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     if (fn.nargs < 1)
     {
@@ -1081,8 +1062,7 @@ netconnection_call(const fn_call& fn)
 as_value
 netconnection_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection_as> ptr =
-        ensureType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     ptr->close();
 
@@ -1094,8 +1074,7 @@ netconnection_close(const fn_call& fn)
 as_value
 netconnection_isConnected(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection_as> ptr =
-        ensureType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->isConnected());
 }
@@ -1103,8 +1082,7 @@ netconnection_isConnected(const fn_call& fn)
 as_value
 netconnection_uri(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection_as> ptr =
-        ensureType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->getURI());
 }
@@ -1126,32 +1104,18 @@ attachProperties(as_object& o)
     o.init_readonly_property("isConnected", &netconnection_isConnected);
 }
 
-as_object*
-getNetConnectionInterface()
-{
-
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        attachNetConnectionInterface(*o);
-    }
-
-    return o.get();
-}
-
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
 /// \return nothing from the function call.
 /// \note The return value is returned through the fn.result member.
 as_value
-netconnection_new(const fn_call& /* fn */)
+netconnection_new(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
 
-    NetConnection_as* nc = new NetConnection_as;
-
-    return as_value(nc);
+    as_object* obj = fn.this_ptr;
+    obj->setRelay(new NetConnection_as(obj));
+    attachProperties(*obj);
+    return as_value();
 }
 
 
@@ -1171,8 +1135,7 @@ as_value
 netconnection_connect(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<NetConnection_as> ptr =
-        ensureType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
     
     if (fn.nargs < 1)
     {
@@ -1213,8 +1176,7 @@ netconnection_connect(const fn_call& fn)
 as_value
 netconnection_addHeader(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection_as> ptr =
-        ensureType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
     UNUSED(ptr);
 
     log_unimpl("NetConnection.addHeader()");

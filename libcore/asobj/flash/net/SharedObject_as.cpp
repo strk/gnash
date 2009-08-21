@@ -47,8 +47,8 @@
 #include "network.h"
 #include "rtmp_client.h"
 #include "URL.h"
-
 #include "NetConnection_as.h"
+
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -61,7 +61,6 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 using namespace amf;
-using namespace std;
 
 namespace gnash {
 
@@ -430,7 +429,7 @@ SharedObject_as::close()
 
 /// Process the connect(uri) method.
 void
-SharedObject_as::connect(NetConnection_as */* obj */, const std::string& /* uri */)
+SharedObject_as::connect(NetConnection_as* /*obj*/, const std::string& /*uri*/)
 {
     GNASH_REPORT_FUNCTION;
    
@@ -880,12 +879,13 @@ sharedobject_connect(const fn_call& fn)
 #endif
     }
     
-    boost::intrusive_ptr<NetConnection_as> nc =
-	boost::dynamic_pointer_cast<NetConnection_as>(
-            fn.arg(0).to_object(*getGlobal(fn)));
+    NetConnection_as* nc;
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), nc)) {
+        return as_value();
+    }
 
     // This is always set without validification.fooc->setURI(uriStr);
-    string str = nc->getURI();
+    std::string str = nc->getURI();
     obj->setPath(str);
     URL uri = nc->getURI();
     Network *net = new Network;

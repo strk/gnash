@@ -152,11 +152,22 @@ struct ObjectURI
 
 };
 
-class Proxy
+/// This is the base class for type-specific object data. 
+//
+/// ActionScript classes with particular type restrictions or type traits
+/// should set the Object's _relay member to a subclass of this class.
+//
+/// The simplest native types, such as Boolean or String, inherit from this
+/// type.
+class Relay
 {
 public:
-    virtual ~Proxy() {};
+    virtual ~Relay() {};
+
+    /// A Relay itself is not a GC object, but may point to GC resources.
+    virtual void setReachable() {}
 };
+
 
 
 /// \brief
@@ -212,12 +223,6 @@ public:
     static const int DefaultFlags = PropFlags::dontDelete |
                                     PropFlags::dontEnum;
 
-    /// A function to be called on movie_root::advance()
-    //
-    /// This is used for requesting an object to update its state and if
-    /// required to notify any AS callbacks. 
-    virtual void advanceState() { }
-
     /// Is any non-hidden property in this object ?
     bool hasNonHiddenProperties() const {
         return _members.hasNonHiddenProperties();
@@ -270,10 +275,6 @@ public:
     /// a custom toString method, when available, for converting the object
     /// to a string.
     virtual bool useCustomToString() const { return true; }
-
-    /// Loads data from an IOChannel. The default implementation
-    /// does nothing.
-    virtual void queueLoad(std::auto_ptr<IOChannel> /*str*/) {};
 
     /// Set a member value
     //
@@ -1040,12 +1041,12 @@ public:
     ///
     void set_prototype(const as_value& proto, int flags = DefaultFlags);
 
-    void setProxy(Proxy* p) {
-        _proxy.reset(p);
+    void setRelay(Relay* p) {
+        _relay.reset(p);
     }
 
-    Proxy* proxy() const {
-        return _proxy.get();
+    Relay* relay() const {
+        return _relay.get();
     }
 
 protected:
@@ -1116,7 +1117,7 @@ protected:
 
 private:
  
-    boost::scoped_ptr<Proxy> _proxy;
+    boost::scoped_ptr<Relay> _relay;
 
     /// The global object whose scope contains this object.
     VM& _vm;   
@@ -1172,6 +1173,51 @@ getNamespace(const ObjectURI& o)
     return o.ns;
 }
 
+/// A type that requires periodic updates from the core (movie_root).
+//
+/// Objects with this type of relay can be registered with movie_root, and
+/// recieve a callback on every advance.
+//
+/// This type of Proxy holds a reference to its parent as_object (owner). 
+/// If a reference to this ActiveRelay is held by another object,
+/// it must be marked reachable so that its owner is not deleted by the GC.
+class ActiveRelay : public Relay
+{
+public:
+    ActiveRelay(as_object* owner)
+        :
+        _owner(owner)
+    {}
+
+    /// Make sure we are removed from the list of callbacks on destruction.
+    virtual ~ActiveRelay();
+
+    /// ActiveRelay objects must have an advanceState method.
+    virtual void update() = 0;
+
+    /// Mark any other reachable resources, and finally mark our owner
+    virtual void setReachable() {
+        markReachableResources();
+        _owner->setReachable();
+    }
+
+    as_object& owner() const {
+        return *_owner;
+    }
+
+protected:
+
+    virtual void markReachableResources() const {}
+
+private:
+
+    /// The as_object that owns this Proxy.
+    //
+    /// Because we are deleted on destruction of the owner, this pointer will
+    /// never be invalid.
+    as_object* _owner;
+
+};
 
 /// Template which does a dynamic cast for as_object pointers.
 //
@@ -1180,10 +1226,9 @@ getNamespace(const ObjectURI& o)
 /// @tparam T the class to which the obj pointer should be cast.
 /// @param obj the pointer to be cast.
 /// @return If the cast succeeds, the pointer cast to the requested type.
-///         Otherwise, NULL.
 template <typename T>
 boost::intrusive_ptr<T>
-ensureType (boost::intrusive_ptr<as_object> obj)
+ensureType(boost::intrusive_ptr<as_object> obj)
 {
     boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
 
@@ -1205,29 +1250,45 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 /// This is used to check the type of certain objects when it can't be
 /// done through ActionScript and properties. Examples include conversion
 /// of Date and String objects.
+//
+/// @tparam T       The expected native type
+/// @param obj      The object whose type should be tested
+/// @param relay    This points to the native type information if the object
+///                 is of the expected type
+/// @return         If the object is of the expected type, true; otherwise
+///                 false.
 template<typename T>
 bool
-isInstanceOf(as_object* obj, T*& proxy)
+isNativeType(as_object* obj, T*& relay)
 {
-    proxy = dynamic_cast<T*>(obj->proxy());
-    return proxy;
+    if (!obj) return false;
+    relay = dynamic_cast<T*>(obj->relay());
+    return relay;
 }
 
-/// An equivalent to ensureType that works with the proxy object.
+/// Ensure that the object is of a particular native type.
+//
+/// This checks that the object's relay member is the expected type.
+/// If not, the function throws an exception, which results in an undefined
+/// value being returned from the AS function.
+/// @tparam T   The expected native type.
+/// @param obj  The object whose type should be tested.
+/// @return     If the cast succeeds, the pointer cast to the requested type,
+///             otherwise the function does not return.
 template<typename T>
 T*
-checkType(as_object* obj)
+ensureNativeType(as_object* obj)
 {
     if (!obj) throw ActionTypeError();
 
-    T* ret = dynamic_cast<T*>(obj->proxy());
+    T* ret = dynamic_cast<T*>(obj->relay());
 
     if (!ret) {
         std::string target = typeName(ret);
         std::string source = typeName(obj);
 
-        std::string msg = "builtin method or gettersetter for " +
-            target + " called from " + source + " instance.";
+        std::string msg = "Function for " + target + "object called from "
+            + source + " instance.";
 
         throw ActionTypeError(msg);
     }

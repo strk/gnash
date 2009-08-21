@@ -24,7 +24,7 @@
 
 namespace gnash {
 
-class Date_as : public Proxy
+class Date_as : public Relay
 {
 public:
 

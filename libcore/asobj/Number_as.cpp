@@ -36,7 +36,7 @@
 
 namespace gnash {
 
-class Number_as : public Proxy
+class Number_as : public Relay
 {
 public:
 
@@ -64,7 +64,7 @@ number_toString(const fn_call& fn)
 {
     // Number.toString must only work for number object, not generic ones.
     // This is so trace(Number.prototype) doesn't return 0 ...
-    Number_as* obj = checkType<Number_as>(fn.this_ptr);
+    Number_as* obj = ensureNativeType<Number_as>(fn.this_ptr);
 
     double val = obj->value();
     unsigned radix = 10;
@@ -91,7 +91,7 @@ number_valueOf(const fn_call& fn)
 {
     // Number.valueOf must only work for number object, not generic ones.
     // This is so trace(Number.prototype == Object) return true in swf5 ?
-    Number_as* obj = checkType<Number_as>(fn.this_ptr);
+    Number_as* obj = ensureNativeType<Number_as>(fn.this_ptr);
 
     return obj->value();
 }
@@ -110,7 +110,7 @@ number_ctor(const fn_call& fn)
         return as_value(val);
     }
 
-    fn.this_ptr->setProxy(new Number_as(val));
+    fn.this_ptr->setRelay(new Number_as(val));
     
     return as_value(); 
 }
@@ -151,9 +151,14 @@ attachNumberStaticInterface(as_object& o)
 void
 number_class_init(as_object& where, const ObjectURI& uri)
 {
+    VM& vm = getVM(where);
     Global_as* gl = getGlobal(where);
+
     as_object* proto = gl->createObject(getObjectInterface());
-    as_object* cl = gl->createClass(&number_ctor, proto);
+    as_object* cl = vm.getNative(106, 2);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
     attachNumberInterface(*proto);
     attachNumberStaticInterface(*cl);
 

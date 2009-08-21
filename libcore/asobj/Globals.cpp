@@ -448,7 +448,7 @@ avm1Classes()
            NS_GLOBAL, 5))
         (N(selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
+        (N(sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
@@ -480,9 +480,9 @@ avm1Classes()
            NSV::CLASS_OBJECT, NS_GLOBAL, 6))
         (N(customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS,
            NSV::CLASS_OBJECT, NS_GLOBAL, 6))
-        (N(NetConnection_as::init, NSV::CLASS_NET_CONNECTION,
+        (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION,
            NSV::CLASS_OBJECT, NS_GLOBAL, 6))
-        (N(NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
+        (N(netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
            NS_GLOBAL, 6))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
@@ -588,7 +588,7 @@ avm2Classes(string_table& st)
            NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
 
         // Media classes
-        (N(Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
+        (N(sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_MEDIA, 5))
         (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_DISPLAYOBJECT,
            NSV::NS_FLASH_MEDIA, 6))
@@ -604,9 +604,9 @@ avm2Classes(string_table& st)
            NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5))
         (N(LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
-        (N(NetConnection_as::init, NSV::CLASS_NET_CONNECTION,
+        (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
-        (N(NetStream_as::init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
+        (N(netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_NET, 6))
         
         // Error classes
@@ -1333,6 +1333,7 @@ registerNatives(as_object& global)
     registerStageNative(global);
     registerSharedObjectNative(global);
     registerKeyboardNative(global);
+    registerNetStreamNative(global);
 
     AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);

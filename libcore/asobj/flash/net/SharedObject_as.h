@@ -22,13 +22,10 @@
 #include <string>
 #include <map>
 
-#include "NetConnection_as.h"
-
 // Forward declarations
 namespace gnash {
     class as_object;
     class Network;
-//     class NetConnection_as;
     class ObjectURI;
     class SharedObject_as;
     class VM;

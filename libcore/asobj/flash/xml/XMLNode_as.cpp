@@ -750,7 +750,6 @@ xmlnode_removeNode(const fn_call& fn)
 }
 
 
-// TODO: shouldn't overriding get_text_value() be fine ?
 as_value
 xmlnode_toString(const fn_call& fn)
 {

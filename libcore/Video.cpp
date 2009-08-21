@@ -289,7 +289,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
-Video::setStream(boost::intrusive_ptr<NetStream_as> ns)
+Video::setStream(NetStream_as* ns)
 {
 	_ns = ns;
 	_ns->setInvalidatedVideo(this);
@@ -322,7 +322,7 @@ Video::getBounds() const
 void
 Video::markReachableResources() const
 {
-	if ( _ns ) _ns->setReachable();
+	if (_ns) _ns->setReachable();
 
 	// Invoke DisplayObject's version of reachability mark
 	markDisplayObjectReachable();
@@ -429,15 +429,13 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<NetStream_as> ns = 
-        boost::dynamic_pointer_cast<NetStream_as>(
-                fn.arg(0).to_object(*getGlobal(fn)));
-	if (ns)
-	{
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+	NetStream_as* ns;
+
+    if (isNativeType(obj, ns)) {
 		video->setStream(ns);
 	}
-	else
-	{
+	else {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
 			fn.arg(0));

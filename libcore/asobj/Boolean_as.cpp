@@ -42,7 +42,7 @@ namespace {
     as_object* getBooleanInterface();
 }
 
-class Boolean_as: public Proxy
+class Boolean_as: public Relay
 {
 
 public:
@@ -65,11 +65,16 @@ private:
 void
 boolean_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the global Boolean "class"/"function"
-    as_object* proto = getBooleanInterface();
+    VM& vm = getVM(where);
     Global_as* gl = getGlobal(where);
-    as_object* cl = gl->createClass(&boolean_ctor, proto);
 
+    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* cl = vm.getNative(107, 2);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
+    attachBooleanInterface(*proto);
+    
     // Register _global.Boolean
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
@@ -96,25 +101,10 @@ attachBooleanInterface(as_object& o)
     o.init_member("toString", vm.getNative(107, 1));
 }
 
-as_object*
-getBooleanInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachBooleanInterface(*o);
-    }
-    return o.get();
-}
-
-
 as_value
 boolean_tostring(const fn_call& fn)
 {
-    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr);
+    Boolean_as* obj = ensureNativeType<Boolean_as>(fn.this_ptr);
     if (obj->value()) return as_value("true");
     return as_value("false");
 }
@@ -123,7 +113,7 @@ boolean_tostring(const fn_call& fn)
 as_value
 boolean_valueof(const fn_call& fn) 
 {
-    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr);
+    Boolean_as* obj = ensureNativeType<Boolean_as>(fn.this_ptr);
     return as_value(obj->value());
 }
 
@@ -139,7 +129,7 @@ boolean_ctor(const fn_call& fn)
     const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
 
     as_object* obj = fn.this_ptr;
-    obj->setProxy(new Boolean_as(val));
+    obj->setRelay(new Boolean_as(val));
     return as_value();
 
 }

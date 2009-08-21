@@ -36,25 +36,15 @@ namespace {
     as_value accessibilityproperties_ctor(const fn_call& fn);
     void attachAccessibilityPropertiesInterface(as_object& o);
     void attachAccessibilityPropertiesStaticInterface(as_object& o);
-    as_object* getAccessibilityPropertiesInterface();
-
 }
 
 // extern (used by Global.cpp)
 void
 accessibilityproperties_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject();
-
-    as_object* cl = gl->createClass(&accessibilityproperties_ctor, proto);
-
-    attachAccessibilityPropertiesInterface(*proto);
-    attachAccessibilityPropertiesStaticInterface(*cl);
-
-    // Register _global.AccessibilityProperties
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, accessibilityproperties_ctor,
+            attachAccessibilityPropertiesInterface,
+            attachAccessibilityPropertiesStaticInterface, uri);
 }
 
 namespace {

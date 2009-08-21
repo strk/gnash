@@ -50,110 +50,14 @@ namespace {
 	as_value loadvars_getBytesLoaded(const fn_call& fn);
 	as_value loadvars_getBytesTotal(const fn_call& fn);
 	as_value loadvars_onData(const fn_call& fn);
-	as_value loadvars_onLoad(const fn_call& fn);
-	
-    as_object* getLoadVarsInterface();
 	void attachLoadVarsInterface(as_object& o);
 }
 
-//--------------------------------------------
-
-/// LoadVars ActionScript class
-//
-class LoadVars_as : public LoadableObject
-{
-
-public:
-
-	/// @param env
-	/// 	Environment to use for event handlers calls
-	///
-	LoadVars_as();
-
-	~LoadVars_as() {};
-
-    /// Convert the LoadVars Object to a string.
-    //
-    /// @param o        The ostream to write the string to.
-    /// @param encode   Whether URL encoding is necessary. This is
-    ///                 ignored because LoadVars objects are always
-    ///                 URL encoded.
-    void toString(std::ostream& o, bool encode) const;
-
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark all reachable resources, for the GC
-	//
-	/// There are no special reachable resources here
-	///
-	virtual void markReachableResources() const
-	{
-
-		// Invoke generic as_object marker
-		markAsObjectReachable();
-	}
-
-#endif // GNASH_USE_GC
-
-private:
-
-	boost::intrusive_ptr<as_function> _onLoad;
-
-};
-
-
-void
-LoadVars_as::toString(std::ostream& o, bool /*post*/) const
-{
-
-	typedef PropertyList::SortedPropertyList VarMap;
-	VarMap vars;
-
-	enumerateProperties(vars);
-
-    as_object* global = getGlobal(*this);
-    assert(global);
-
-    // LoadVars.toString() calls _global.escape().
-	for (VarMap::const_iterator it=vars.begin(), itEnd=vars.end();
-			it != itEnd; ++it) {
-
-        if (it != vars.begin()) o << "&";
-        const std::string& var = 
-            global->callMethod(NSV::PROP_ESCAPE, it->first).to_string();
-        const std::string& val = 
-            global->callMethod(NSV::PROP_ESCAPE, it->second).to_string();
-        o << var << "=" << val;
-	}
-
-}
-
-
-
-LoadVars_as::LoadVars_as()
-		:
-		as_object(getLoadVarsInterface())
-{
-}
-
-
 // extern (used by Global.cpp)
 void
-loadvars_class_init(as_object& global, const ObjectURI& uri)
+loadvars_class_init(as_object& where, const ObjectURI& uri)
 {
-	// This is going to be the global LoadVars "class"/"function"
-    Global_as* gl = getGlobal(global);
-    as_object* proto = getLoadVarsInterface();
-    as_object* cl = gl->createClass(&loadvars_ctor, proto);
-
-	// Register _global.LoadVars, only visible for SWF6 up
-	int swf6flags = PropFlags::dontEnum | 
-                    PropFlags::dontDelete | 
-                    PropFlags::onlySWF6Up;
-
-	global.init_member(getName(uri), cl, swf6flags, getNamespace(uri));
-
+    registerBuiltinClass(where, loadvars_ctor, attachLoadVarsInterface, 0, uri);
 }
 
 namespace {
@@ -177,17 +81,6 @@ attachLoadVarsInterface(as_object& o)
 	o.init_member("toString", gl->createFunction(loadvars_tostring));
 	o.init_member("onData", gl->createFunction(loadvars_onData));
 	o.init_member("onLoad", gl->createFunction(loadvars_onLoad));
-}
-
-as_object*
-getLoadVarsInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if (!o) {
-		o = new as_object(getObjectInterface());
-		attachLoadVarsInterface(*o);
-	}
-	return o.get();
 }
 
 as_value
@@ -230,12 +123,28 @@ loadvars_onLoad(const fn_call& /*fn*/)
 as_value
 loadvars_tostring(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars_as> ptr =
-        ensureType<LoadVars_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
-    std::ostringstream data;
-    ptr->toString(data, true);
-    return as_value(data.str()); 
+	typedef PropertyList::SortedPropertyList VarMap;
+	VarMap vars;
+
+	ptr->enumerateProperties(vars);
+
+    as_object* global = getGlobal(*ptr);
+    std::ostringstream o;
+    
+    // LoadVars.toString() calls _global.escape().
+	for (VarMap::const_iterator it=vars.begin(), itEnd=vars.end();
+			it != itEnd; ++it) {
+
+        if (it != vars.begin()) o << "&";
+        const std::string& var = 
+            global->callMethod(NSV::PROP_ESCAPE, it->first).to_string();
+        const std::string& val = 
+            global->callMethod(NSV::PROP_ESCAPE, it->second).to_string();
+        o << var << "=" << val;
+	}
+    return as_value(o.str()); 
 }
 
 as_value
@@ -244,19 +153,19 @@ loadvars_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-	boost::intrusive_ptr<as_object> obj = new LoadVars_as;
+	as_object* obj = fn.this_ptr;
+    obj->setRelay(new LoadableObject(obj));
 
-	if ( fn.nargs )
-	{
-        IF_VERBOSE_ASCODING_ERRORS(
-		    std::ostringstream ss;
-		    fn.dump_args(ss);
-		    log_aserror("new LoadVars(%s) - arguments discarded",
+    IF_VERBOSE_ASCODING_ERRORS(
+        if (fn.nargs) {
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("new LoadVars(%s) - arguments discarded",
                 ss.str());
-        );
-	}
+        }
+    );
 	
-	return as_value(obj.get()); // will keep alive
+	return as_value(); // will keep alive
 }
 
 } // anonymous namespace
