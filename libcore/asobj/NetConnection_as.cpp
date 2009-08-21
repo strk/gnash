@@ -53,7 +53,6 @@ namespace gnash {
 namespace {
     void attachProperties(as_object& o);
     void attachNetConnectionInterface(as_object& o);
-    as_object* getNetConnectionInterface();
     as_value netconnection_isConnected(const fn_call& fn);
     as_value netconnection_uri(const fn_call& fn);
     as_value netconnection_connect(const fn_call& fn);
@@ -1103,20 +1102,6 @@ void
 attachProperties(as_object& o)
 {
     o.init_readonly_property("isConnected", &netconnection_isConnected);
-}
-
-as_object*
-getNetConnectionInterface()
-{
-
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        attachNetConnectionInterface(*o);
-    }
-
-    return o.get();
 }
 
 /// \brief callback to instantiate a new NetConnection object.
