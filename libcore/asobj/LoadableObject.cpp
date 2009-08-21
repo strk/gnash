@@ -176,8 +176,10 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
 	log_security(_("Loading from url: '%s'"), url.str());
 	
-    LoadableObject* targetObject = ensureNativeType<LoadableObject>(&target);
-    targetObject->queueLoad(str);
+    LoadableObject* loadObject;
+    if (isNativeType(&target, loadObject)) {
+        loadObject->queueLoad(str);
+    }
 	
 }
 
