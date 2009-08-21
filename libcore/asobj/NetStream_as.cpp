@@ -1614,7 +1614,7 @@ netstream_new(const fn_call& fn)
 as_value
 netstream_close(const fn_call& fn)
 {
-    NetStream_as* ns = checkType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = ensureNativeType<NetStream_as>(fn.this_ptr);
     ns->close();
     return as_value();
 }
@@ -1623,7 +1623,7 @@ as_value
 netstream_pause(const fn_call& fn)
 {
     NetStream_as* ns = 
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     
     // mode: -1 ==> toogle, 0==> pause, 1==> play
     NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
@@ -1642,7 +1642,7 @@ as_value
 netstream_play(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -1670,7 +1670,7 @@ as_value
 netstream_seek(const fn_call& fn)
 {
     NetStream_as* ns = 
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     boost::uint32_t time = 0;
     if (fn.nargs > 0)
@@ -1689,7 +1689,7 @@ netstream_setbuffertime(const fn_call& fn)
     //GNASH_REPORT_FUNCTION;
 
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     // TODO: should we do anything if given no args ?
     //       are we sure setting bufferTime to 0 is what we have to do ?
@@ -1710,7 +1710,7 @@ as_value
 netstream_attachAudio(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.attachAudio"));
@@ -1722,7 +1722,7 @@ as_value
 netstream_attachVideo(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.attachVideo"));
@@ -1734,7 +1734,7 @@ as_value
 netstream_publish(const fn_call& fn)
 {
     NetStream_as* ns = 
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.publish"));
@@ -1746,7 +1746,7 @@ as_value
 netstream_receiveAudio(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.receiveAudio"));
@@ -1758,7 +1758,7 @@ as_value
 netstream_receiveVideo(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.receiveVideo"));
@@ -1770,7 +1770,7 @@ as_value
 netstream_send(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.send"));
@@ -1785,7 +1785,7 @@ netstream_time(const fn_call& fn)
     //GNASH_REPORT_FUNCTION;
 
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     assert(fn.nargs == 0); // we're a getter
     return as_value(double(ns->time()/1000.0));
@@ -1796,7 +1796,7 @@ as_value
 netstream_bytesloaded(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     if ( ! ns->isConnected() )
     {
@@ -1811,7 +1811,7 @@ as_value
 netstream_bytestotal(const fn_call& fn)
 {
     NetStream_as* ns = 
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     if ( ! ns->isConnected() )
     {
@@ -1826,7 +1826,7 @@ as_value
 netstream_currentFPS(const fn_call& fn)
 {
     NetStream_as* ns = 
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     if ( ! ns->isConnected() )
     {
@@ -1843,7 +1843,7 @@ as_value
 netstream_bufferLength(const fn_call& fn)
 {
     NetStream_as* ns = 
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     // NetStream_as::bufferLength returns milliseconds, we want
     // to return *fractional* seconds.
@@ -1856,7 +1856,7 @@ as_value
 netstream_bufferTime(const fn_call& fn)
 {
     NetStream_as* ns =
-        checkType<NetStream_as>(fn.this_ptr);
+        ensureNativeType<NetStream_as>(fn.this_ptr);
 
     // We return bufferTime in seconds
     double ret = ns->bufferTime() / 1000.0;
@@ -1867,7 +1867,7 @@ netstream_bufferTime(const fn_call& fn)
 as_value
 netstream_liveDelay(const fn_call& fn)
 {
-    NetStream_as* ns = checkType<NetStream_as>(fn.this_ptr);
+    NetStream_as* ns = ensureNativeType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.liveDelay getter/setter"));

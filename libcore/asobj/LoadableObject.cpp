@@ -482,7 +482,7 @@ loadableobject_decode(const fn_call& fn)
 as_value
 loadableobject_sendAndLoad(const fn_call& fn)
 {
-	LoadableObject* ptr = checkType<LoadableObject>(fn.this_ptr);
+	LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -533,7 +533,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 as_value
 loadableobject_load(const fn_call& fn)
 {
-	LoadableObject* obj = checkType<LoadableObject>(fn.this_ptr);
+	LoadableObject* obj = ensureNativeType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -566,7 +566,7 @@ loadableobject_load(const fn_call& fn)
 as_value
 loadableobject_send(const fn_call& fn)
 {
-    LoadableObject* ptr = checkType<LoadableObject>(fn.this_ptr);
+    LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
  
     std::ostringstream os;
     fn.dump_args(os);

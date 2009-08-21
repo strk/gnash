@@ -104,7 +104,7 @@ attachBooleanInterface(as_object& o)
 as_value
 boolean_tostring(const fn_call& fn)
 {
-    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr);
+    Boolean_as* obj = ensureNativeType<Boolean_as>(fn.this_ptr);
     if (obj->value()) return as_value("true");
     return as_value("false");
 }
@@ -113,7 +113,7 @@ boolean_tostring(const fn_call& fn)
 as_value
 boolean_valueof(const fn_call& fn) 
 {
-    Boolean_as* obj = checkType<Boolean_as>(fn.this_ptr);
+    Boolean_as* obj = ensureNativeType<Boolean_as>(fn.this_ptr);
     return as_value(obj->value());
 }
 

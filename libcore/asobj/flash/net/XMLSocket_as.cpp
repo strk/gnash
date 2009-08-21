@@ -440,7 +440,7 @@ xmlsocket_connect(const fn_call& fn)
 #endif
 
     XMLSocket_as* ptr =
-        checkType<XMLSocket_as>(fn.this_ptr);
+        ensureNativeType<XMLSocket_as>(fn.this_ptr);
 
     if (ptr->ready()) {
         log_error(_("XMLSocket.connect() called while already "
@@ -481,7 +481,7 @@ as_value
 xmlsocket_send(const fn_call& fn)
 {
     XMLSocket_as* ptr =
-        checkType<XMLSocket_as>(fn.this_ptr);
+        ensureNativeType<XMLSocket_as>(fn.this_ptr);
 
     const std::string& str = fn.arg(0).to_string();
     ptr->send(str);
@@ -498,7 +498,7 @@ xmlsocket_close(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     
     XMLSocket_as* ptr =
-        checkType<XMLSocket_as>(fn.this_ptr);
+        ensureNativeType<XMLSocket_as>(fn.this_ptr);
 
     ptr->close();
     return as_value();

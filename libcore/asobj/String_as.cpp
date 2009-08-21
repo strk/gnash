@@ -769,7 +769,7 @@ string_valueOf(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    String_as* str = checkType<String_as>(fn.this_ptr);
+    String_as* str = ensureNativeType<String_as>(fn.this_ptr);
     return as_value(str->value());
 }
 

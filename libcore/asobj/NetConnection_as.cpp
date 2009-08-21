@@ -1011,7 +1011,7 @@ as_value
 netconnection_call(const fn_call& fn)
 {
     NetConnection_as* ptr = 
-        checkType<NetConnection_as>(fn.this_ptr); 
+        ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     if (fn.nargs < 1)
     {
@@ -1055,7 +1055,7 @@ as_value
 netconnection_close(const fn_call& fn)
 {
     NetConnection_as* ptr =
-        checkType<NetConnection_as>(fn.this_ptr); 
+        ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     ptr->close();
 
@@ -1068,7 +1068,7 @@ as_value
 netconnection_isConnected(const fn_call& fn)
 {
     NetConnection_as* ptr =
-        checkType<NetConnection_as>(fn.this_ptr); 
+        ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->isConnected());
 }
@@ -1077,7 +1077,7 @@ as_value
 netconnection_uri(const fn_call& fn)
 {
     NetConnection_as* ptr =
-        checkType<NetConnection_as>(fn.this_ptr); 
+        ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->getURI());
 }
@@ -1145,7 +1145,7 @@ netconnection_connect(const fn_call& fn)
 {
 
     NetConnection_as* ptr =
-        checkType<NetConnection_as>(fn.this_ptr); 
+        ensureNativeType<NetConnection_as>(fn.this_ptr); 
     
     if (fn.nargs < 1)
     {
@@ -1186,7 +1186,7 @@ netconnection_connect(const fn_call& fn)
 as_value
 netconnection_addHeader(const fn_call& fn)
 {
-    NetConnection_as* ptr = checkType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
     UNUSED(ptr);
 
     log_unimpl("NetConnection.addHeader()");

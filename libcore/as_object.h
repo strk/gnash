@@ -1263,7 +1263,7 @@ isNativeType(as_object* obj, T*& proxy)
 /// An equivalent to ensureType that works with the proxy object.
 template<typename T>
 T*
-checkType(as_object* obj)
+ensureNativeType(as_object* obj)
 {
     if (!obj) throw ActionTypeError();
 
