@@ -62,7 +62,9 @@ const char *proto_str[] = {
 map<int, Handler *> DSOEXPORT handlers;
 
 Handler::Handler()
-    : _in_fd(0)
+    : _streams(2),		// streams 0 and 1 appear to be
+				// reserved by the system.      
+      _in_fd(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -224,7 +226,7 @@ bool
 Handler::initialized()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_file.empty()
+    if (_files.empty()
 	&& (_clients.size() == 1)
 	&& !_local
 	&& _remote.empty()
@@ -233,6 +235,105 @@ Handler::initialized()
     }
 
     return true;
+}
+
+int 
+Handler::createStream()
+{
+    GNASH_REPORT_FUNCTION;
+
+    return createStream("");
+}
+
+int
+Handler::createStream(const std::string &filespec)
+{
+    GNASH_REPORT_FUNCTION;
+
+    int streamid = _streams;
+
+    if (filespec.empty()) {
+	return -1;
+    }
+    _streams++;
+    return streamid;
+}
+
+int
+Handler::playStream()
+{
+    GNASH_REPORT_FUNCTION;
+
+    return -1;
+}
+
+int
+Handler::playStream(const std::string &filespec)
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Publish a live RTMP stream
+int
+Handler::publishStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return publishStream("", Handler::LIVE);
+}
+
+int
+Handler::publishStream(const std::string &filespec, Handler::pub_stream_e op)
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Seek within the RTMP stream
+int
+Handler::seekStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+int
+Handler::seekStream(int offset)
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Pause the RTMP stream
+int
+Handler::pauseStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Pause the RTMP stream
+int
+Handler::togglePause()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Resume the paused RTMP stream
+int
+Handler::resumeStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Close the RTMP stream
+int
+Handler::closeStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
 }
 
 // Dump internal data.

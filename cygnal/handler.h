@@ -82,7 +82,11 @@ public:
 	RTMPS,
 	DTN
     } protocols_supported_e;
-    
+    typedef enum {
+	RECORD,
+	LIVE,
+	APPEND
+    } pub_stream_e;
     typedef size_t (*cygnal_io_t )(boost::uint8_t *data, size_t size);
     typedef struct {
   	cygnal_io_t read_func;
@@ -141,10 +145,47 @@ public:
 	return writeToPlugin(buf.begin(), buf.allocated()); };
     size_t writeToPlugin(boost::uint8_t *data, size_t size);
 
+    // These methods handle control of the file streaming 
+
+    /// \fn     int createStream()
+    int createStream();
+    /// \overload int createStream(const std::string &filespec)
+    /// @param filespec The spec of the file to stream
+    int createStream(const std::string &filespec);
+
+    /// \fn playStream
+    ///    Play the specified file as a stream
+    int playStream();
+    /// \overload int playStream(const std::string &filespec)
+    int playStream(const std::string &filespec);
+
+    // Publish a live RTMP stream
+    int publishStream();
+    int publishStream(const std::string &filespec, pub_stream_e op);
+
+    // Seek within the RTMP stream
+    int seekStream();
+    int seekStream(int offset);
+
+    // Pause the RTMP stream
+    int pauseStream();
+    // Pause the RTMP stream
+    int togglePause();
+
+    // Resume the paused RTMP stream
+    int resumeStream();
+
+    // Close the RTMP stream
+    int closeStream();
+
     // Dump internal data.
     void dump();  
 
 protected:
+    /// \var _streams
+    ///    This is a counter of how many streams have been allocated
+    ///    by the server.
+    int _streams;
     /// \var _name
     ///	    The name of the path this handler is supporting.
     std::string				_name;
@@ -173,7 +214,7 @@ protected:
     boost::shared_ptr<cygnal_init_t>	_plugin;
     /// \var _file
     ///	    is for disk based files
-    std::vector<boost::shared_ptr<gnash::DiskStream> > _file;
+    std::vector<boost::shared_ptr<gnash::DiskStream> > _files;
     /// \var _sol
     ///	    is for remote SharedObjects
     std::vector<boost::shared_ptr<amf::Element> > _sol;
