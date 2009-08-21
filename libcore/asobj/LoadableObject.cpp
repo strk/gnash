@@ -71,13 +71,13 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
     // XML should not be encoded. LoadVars is always
     // encoded.
     // TODO: test properly.
-    const as_value& str = owner().callMethod(NSV::PROP_TO_STRING);
+    const std::string& str = as_value(&owner()).to_string();
 
     // Only GET and POST are possible here.
     MovieClip::VariablesMethod method = post ? MovieClip::METHOD_POST :
                                                MovieClip::METHOD_GET;
 
-    m.getURL(urlstr, target, str.to_string(), method);
+    m.getURL(urlstr, target, str, method);
 
 }
 
@@ -148,18 +148,16 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         // Convert the object to a string to send. XML should
         // not be URL encoded for the POST method, LoadVars
         // is always URL encoded.
-        const as_value& strval = owner().callMethod(NSV::PROP_TO_STRING);
+        const std::string& strval = as_value(&owner()).to_string();
 
         /// It doesn't matter if there are no request headers.
-        str = ri.streamProvider().getStream(url, strval.to_string(), headers);
+        str = ri.streamProvider().getStream(url, strval, headers);
     }
 	else
     {
         // Convert the object to a string to send. XML should
         // not be URL encoded for the GET method.
-        const as_value& strval = owner().callMethod(NSV::PROP_TO_STRING);
-
-        const std::string& dataString = strval.to_string();
+        const std::string& dataString = as_value(&owner()).to_string();
 
         // Any data must be added to the existing querystring.
         if (!dataString.empty()) {
