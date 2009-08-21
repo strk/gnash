@@ -274,11 +274,11 @@ check(!tf.hasOwnProperty('borderColor'));
 
 // Check TextField.bottomScroll
 
-xcheck_equals(typeof(tf.bottomScroll), 'number');
+check_equals(typeof(tf.bottomScroll), 'number');
 check(!tf.hasOwnProperty('bottomScroll'));
-xcheck_equals(tf.bottomScroll, 1);
+check_equals(tf.bottomScroll, 1);
 tf.bottomScroll = 100; // bottomScroll is read-only
-xcheck_equals(tf.bottomScroll, 1);
+check_equals(tf.bottomScroll, 1);
 
 // Check TextField.embedFonts
 
@@ -317,9 +317,9 @@ tf._height = 500;
 
 // Check TextField.hscroll
 
-xcheck_equals(typeof(tf.hscroll), 'number');
+check_equals(typeof(tf.hscroll), 'number');
 check(!tf.hasOwnProperty('hscroll'));
-xcheck_equals(tf.hscroll, 0);
+check_equals(tf.hscroll, 0);
 tf.hscroll = 1;
 xcheck_equals(tf.hscroll, 0);
 tf.hscroll = 0;
@@ -386,19 +386,19 @@ tf.maxChars = null;
 
 // Check TextField.maxhscroll
 
-xcheck_equals(typeof(tf.maxhscroll), 'number');
+check_equals(typeof(tf.maxhscroll), 'number');
 check(!tf.hasOwnProperty('maxhscroll'));
-xcheck_equals(tf.maxhscroll, 0);
+check_equals(tf.maxhscroll, 0);
 tf.maxhscroll = 10;
-xcheck_equals(tf.maxhscroll, 0); // read-only
+check_equals(tf.maxhscroll, 0); // read-only
 
 // Check TextField.maxscroll
 
 check_equals(typeof(tf.maxscroll), 'number');
 check(!tf.hasOwnProperty('maxscroll'));
-xcheck_equals(tf.maxscroll, 1);
+check_equals(tf.maxscroll, 1);
 tf.maxscroll = 10;
-xcheck_equals(tf.maxscroll, 1); // read-only
+check_equals(tf.maxscroll, 1); // read-only
 
 // Check TextField.multiline
 
@@ -502,9 +502,9 @@ tf._quality = "HIGH";
 
 // Check TextField.restrict (the set of characters a user can input)
 
-xcheck_equals(typeof(tf.restrict), 'null');
+check_equals(typeof(tf.restrict), 'null');
 check(!tf.hasOwnProperty('restrict'));
-xcheck_equals(typeof(tf.restrict), 'null');
+check_equals(typeof(tf.restrict), 'null');
 tf.text = "Hello World";
 tf.restrict = "olH";
 check_equals(typeof(tf.restrict), 'string');
@@ -552,9 +552,9 @@ tf._rotation = 0;
 // TODO: better test for this, might do nothing if there's no scrollin
 check_equals(typeof(tf.scroll), 'number');
 check( ! tf.hasOwnProperty('scroll') ); 
-xcheck_equals(tf.scroll, 1);
+check_equals(tf.scroll, 1);
 tf.scroll = 10;
-xcheck_equals(tf.scroll, 1); // read-only
+xcheck_equals(tf.scroll, 1); // read-only // is it?
 
 // Check TextField.selectable
 

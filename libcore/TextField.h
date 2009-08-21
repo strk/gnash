@@ -532,6 +532,11 @@ public:
 		return _tabStops;
 	}
 
+	bool isRestrict() const
+	{
+		return _restrictDefined;
+	}
+	
 	const std::string& getRestrict() const
 	{
 		return _restrict;
@@ -547,6 +552,21 @@ public:
 		return _maxScroll;
 	}
 
+	size_t getHScroll() const
+	{
+		return _hScroll;
+	}
+
+	size_t getMaxHScroll() const
+	{
+		return _maxHScroll;
+	}
+
+	size_t getBottomScroll() const
+	{
+		return _bottomScroll;
+	}
+
 	void setUnderlined(bool v);
 	void setTabStops(const std::vector<int>& tabStops);
 	void setBullet(bool b);
@@ -560,6 +580,18 @@ public:
 	}
 	void setMaxScroll(size_t maxScroll) {
 		_maxScroll = maxScroll;
+		format_text();
+	}
+	void setHScroll(size_t hScroll) {
+		_hScroll = hScroll;
+		format_text();
+	}
+	void setMaxHScroll(size_t maxHScroll) {
+		_maxHScroll = maxHScroll;
+		format_text();
+	}
+	void setbottomScroll(size_t bottomScroll) {
+		_bottomScroll = bottomScroll;
 		format_text();
 	}
 
@@ -766,6 +798,9 @@ private:
 	size_t _glyphcount;
 	size_t _scroll;
 	size_t _maxScroll;
+	size_t _hScroll;
+	size_t _maxHScroll;
+	size_t _bottomScroll;
 	/// Called in display(), this sets the cursor using m_cursor and _textRecords
 	//
 	/// @param renderer
@@ -784,6 +819,7 @@ private:
 
     /// Corresponds to the maxChars property.
     size_t _maxChars;
+	
 	/// The flag keeping status of TextVariable registration
 	//
 	/// It will be set to true if there's no need to register
