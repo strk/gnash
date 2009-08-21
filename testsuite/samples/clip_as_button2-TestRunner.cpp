@@ -24,6 +24,7 @@
 #include "GnashException.h"
 #include "MovieClip.h"
 #include "DisplayObject.h"
+#include "TextField.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -78,7 +79,9 @@ main(int /*argc*/, char** /*argv*/)
 	rgba cyan(0, 255, 204, 255);
 	rgba green(0,255,102,255);
 
-	const DisplayObject* text = tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset);
+	const TextField* text =
+		dynamic_cast<const TextField*>(
+			tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset));
 	check(text);
 	check_equals(string(text->get_text_value()), msg_empty);
 	check(!tester.isMouseOverMouseEntity());
