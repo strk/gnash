@@ -1255,6 +1255,7 @@ template<typename T>
 bool
 isInstanceOf(as_object* obj, T*& proxy)
 {
+    if (!obj) return false;
     proxy = dynamic_cast<T*>(obj->proxy());
     return proxy;
 }
