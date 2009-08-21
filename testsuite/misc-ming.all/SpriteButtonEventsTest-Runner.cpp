@@ -24,6 +24,7 @@
 #include "MovieClip.h"
 #include "DisplayObject.h"
 #include "DisplayList.h"
+#include "TextField.h"
 #include "log.h"
 
 #include "check.h"
@@ -34,7 +35,7 @@ using namespace gnash;
 using namespace std;
 
 void
-test_mouse_activity(MovieTester& tester, const DisplayObject* text, const DisplayObject* text2, bool covered, bool enabled)
+test_mouse_activity(MovieTester& tester, const TextField* text, const TextField* text2, bool covered, bool enabled)
 {
 	rgba red(255,0,0,255);
 	rgba covered_red(127,126,0,255); // red, covered by 50% black
@@ -210,13 +211,16 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_frame_count(), 5);
 	check_equals(root->get_current_frame(), 0);
 
-	const DisplayObject* text = tester.findDisplayItemByName(*root, "textfield");
+	const TextField* text = dynamic_cast<const TextField*>(
+		tester.findDisplayItemByName(*root, "textfield"));
 	check(text);
 
-	const DisplayObject* text2 = tester.findDisplayItemByName(*root, "textfield2");
+	const TextField* text2 = dynamic_cast<const TextField*>(
+		tester.findDisplayItemByName(*root, "textfield2"));
 	check(text2);
 
-	const DisplayObject* text3 = tester.findDisplayItemByName(*root, "textfield3");
+	const TextField* text3 = dynamic_cast<const TextField*>(
+		tester.findDisplayItemByName(*root, "textfield3"));
 	check(text3);
 
 	tester.advance();
@@ -259,7 +263,8 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(root->get_current_frame(), fno);
 
 		info (("testing mouse activity in frame %d", root->get_current_frame()));
-		test_mouse_activity(tester, text, text2, square_front!=NULL, fno != root->get_frame_count()-1);
+		test_mouse_activity(tester, text, text2,
+				square_front!=NULL, fno != root->get_frame_count()-1);
 
 		// TODO: test key presses !
 		//       They seem NOT to trigger immediate redraw

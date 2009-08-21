@@ -23,6 +23,7 @@
 #include "MovieTester.h"
 #include "MovieClip.h"
 #include "DisplayObject.h"
+#include "TextField.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -34,7 +35,7 @@ using namespace gnash;
 using namespace std;
 
 void
-test_mouse_activity(MovieTester& tester, const DisplayObject* text, const DisplayObject* text2, bool covered, bool enabled)
+test_mouse_activity(MovieTester& tester, const TextField* text, const TextField* text2, bool covered, bool enabled)
 {
 	rgba red(255,0,0,255);
 	rgba dark_red(128,0,0,255);
@@ -237,13 +238,16 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_current_frame(), 0);
 
-	const DisplayObject* text = tester.findDisplayItemByName(*root, "textfield");
+	const TextField* text = dynamic_cast<const TextField*>(
+		tester.findDisplayItemByName(*root, "textfield"));
 	check(text);
 
-	const DisplayObject* text2 = tester.findDisplayItemByName(*root, "textfield2");
+	const TextField* text2 = dynamic_cast<const TextField*>(
+		tester.findDisplayItemByName(*root, "textfield2"));
 	check(text2);
 
-	const DisplayObject* text3 = tester.findDisplayItemByName(*root, "textfield3");
+	const TextField* text3 = dynamic_cast<const TextField*>(
+		tester.findDisplayItemByName(*root, "textfield3"));
 	check(text3);
 
 	check_equals(string(text->get_text_value()), idleString);
