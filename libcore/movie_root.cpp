@@ -1761,7 +1761,7 @@ movie_root::executeAdvanceCallbacks()
             std::back_inserter(currentCallbacks));
 
     std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
-            std::mem_fun(&UpdatableProxy::advanceState));
+            std::mem_fun(&UpdatableProxy::update));
 
     processActionQueue();
 }
@@ -1849,7 +1849,7 @@ movie_root::markReachableResources() const
     }
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
-            std::mem_fun(&Proxy::markReachableResources));
+            std::mem_fun(&Proxy::setReachable));
 
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)

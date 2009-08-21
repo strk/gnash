@@ -258,7 +258,7 @@ public:
     void close();
 
     /// Called on advance() when socket is connected
-    virtual void advanceState();
+    virtual void update();
 
 private:
 
@@ -291,7 +291,7 @@ XMLSocket_as::~XMLSocket_as()
 }
 
 void
-XMLSocket_as::advanceState()
+XMLSocket_as::update()
 {
     // Wait until something has happened with the connection
     if (!_connection.complete()) return;
@@ -303,15 +303,15 @@ XMLSocket_as::advanceState()
         if (!connected()) {
 
             // If connection failed, notify onConnect and stop callback.
-            // This means advanceState() will not be called again until
+            // This means update() will not be called again until
             // XMLSocket.connect() is invoked.
-            _owner->callMethod(NSV::PROP_ON_CONNECT, false);
-            getRoot(*_owner).removeAdvanceCallback(this);
+            owner().callMethod(NSV::PROP_ON_CONNECT, false);
+            getRoot(owner()).removeAdvanceCallback(this);
             return;    
         }
 
         // Connection succeeded.
-        _owner->callMethod(NSV::PROP_ON_CONNECT, true);
+        owner().callMethod(NSV::PROP_ON_CONNECT, true);
         _ready = true;
     }
 
@@ -331,7 +331,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
     _connection.connect(host, port);
     
     // Start callbacks on advance.
-    getRoot(*_owner).addAdvanceCallback(this);
+    getRoot(owner()).addAdvanceCallback(this);
     
     return true;
 }
@@ -339,7 +339,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 void
 XMLSocket_as::close()
 {
-    getRoot(*_owner).removeAdvanceCallback(this);
+    getRoot(owner()).removeAdvanceCallback(this);
     _connection.close();
     _ready = false;
 }
@@ -351,8 +351,8 @@ XMLSocket_as::getEventHandler(const std::string& name)
 	boost::intrusive_ptr<as_function> ret;
 
 	as_value tmp;
-	string_table& st = getStringTable(*_owner);
-	if (!_owner->get_member(st.find(name), &tmp) ) return ret;
+	string_table& st = getStringTable(owner());
+	if (!owner().get_member(st.find(name), &tmp) ) return ret;
 	ret = tmp.to_as_function();
 	return ret;
 }
@@ -375,7 +375,7 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    as_environment env(getVM(*_owner)); 
+    as_environment env(getVM(owner())); 
 
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {
@@ -392,7 +392,7 @@ XMLSocket_as::checkForIncomingData()
         fn_call::Args args;
         args += s;
         
-        fn_call call(_owner, env, args);
+        fn_call call(&owner(), env, args);
 
         onDataHandler->call(call);
     }

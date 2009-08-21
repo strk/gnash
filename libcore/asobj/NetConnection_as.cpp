@@ -71,7 +71,7 @@ namespace {
 
 }
 
-//---- ConnectionHandler --------------------------------------------------------------
+//---- ConnectionHandler -------------------------------------------------
 
 /// Abstract connection handler class
 //
@@ -114,7 +114,7 @@ public:
     ///
     /// Return true if wants to be advanced again, false otherwise.
     ///
-    virtual bool advance()=0;
+    virtual bool advance() = 0;
 
     /// Return true if the connection has pending calls 
     //
@@ -123,7 +123,7 @@ public:
     /// queued and only really dropped when advance returns
     /// false
     ///
-    virtual bool hasPendingCalls() const=0;
+    virtual bool hasPendingCalls() const = 0;
 
     virtual ~ConnectionHandler() {}
 
@@ -132,7 +132,9 @@ protected:
     /// Construct a connection handler bound to the given NetConnection object
     //
     /// The binding is used to notify statuses and errors
-    ///
+    //
+    /// The NetConnection_as owns all ConnectionHandlers, so there is no
+    /// need to mark it reachable.
     ConnectionHandler(NetConnection_as& nc)
         :
         _nc(nc)
@@ -672,6 +674,12 @@ NetConnection_as::NetConnection_as(as_object* owner)
 {
 }
 
+// here to have HTTPRemotingHandler definition available
+NetConnection_as::~NetConnection_as()
+{
+    deleteAllChecked(_queuedConnections);
+}
+
 // extern (used by Global.cpp)
 void
 netconnection_class_init(as_object& where, const ObjectURI& uri)
@@ -680,17 +688,11 @@ netconnection_class_init(as_object& where, const ObjectURI& uri)
             attachNetConnectionInterface, 0, uri);
 }
 
-// here to have HTTPRemotingHandler definition available
-NetConnection_as::~NetConnection_as()
-{
-    deleteAllChecked(_queuedConnections);
-}
-
 
 void
 NetConnection_as::markReachableResources() const
 {
-    _owner->setReachable();
+    owner().setReachable();
 }
 
 
@@ -702,7 +704,7 @@ std::string
 NetConnection_as::validateURL() const
 {
 
-    URL uri(_uri, getRunResources(*_owner).baseURL());
+    URL uri(_uri, getRunResources(owner()).baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -732,7 +734,7 @@ NetConnection_as::notifyStatus(StatusCode code)
     o->init_member("code", info.first, flags);
     o->init_member("level", info.second, flags);
 
-    _owner->callMethod(NSV::PROP_ON_STATUS, o);
+    owner().callMethod(NSV::PROP_ON_STATUS, o);
 
 }
 
@@ -807,7 +809,7 @@ NetConnection_as::connect(const std::string& uri)
         return;
     }
 
-    URL url(uri, getRunResources(*_owner).baseURL());
+    URL url(uri, getRunResources(owner()).baseURL());
 
     if ((url.protocol() != "rtmp")
         && (url.protocol() != "rtmpt")
@@ -878,7 +880,7 @@ NetConnection_as::close()
 void
 NetConnection_as::setURI(const std::string& uri)
 {
-    _owner->init_readonly_property("uri", &netconnection_uri);
+    owner().init_readonly_property("uri", &netconnection_uri);
     _uri = uri;
 }
 
@@ -905,7 +907,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
-    const RunResources& ri = getRunResources(*_owner);
+    const RunResources& ri = getRunResources(owner());
 
     const StreamProvider& streamProvider = ri.streamProvider();
 
@@ -925,19 +927,19 @@ NetConnection_as::getStream(const std::string& name)
 void
 NetConnection_as::startAdvanceTimer() 
 {
-    getRoot(*_owner).addAdvanceCallback(this);
+    getRoot(owner()).addAdvanceCallback(this);
     log_debug("startAdvanceTimer: registered NetConnection timer");
 }
 
 void
 NetConnection_as::stopAdvanceTimer() 
 {
-    getRoot(*_owner).removeAdvanceCallback(this);
+    getRoot(owner()).removeAdvanceCallback(this);
     log_debug("stopAdvanceTimer: deregistered NetConnection timer");
 }
 
 void
-NetConnection_as::advanceState()
+NetConnection_as::update()
 {
     // Advance
 
@@ -946,28 +948,26 @@ NetConnection_as::advanceState()
             _queuedConnections.size());
 #endif
 
-    while ( ! _queuedConnections.empty() )
-    {
+    while (!_queuedConnections.empty()) {
         ConnectionHandler* ch = _queuedConnections.front();
-        if ( ! ch->advance() )
-        {
+
+        if (!ch->advance()) {
             log_debug("ConnectionHandler done, dropping");
             _queuedConnections.pop_front();
             delete ch;
         }
+
         else break; // queues handling is serialized
     }
 
-    if ( _currentConnection.get() ) 
-    {
+    if (_currentConnection.get()) {
         _currentConnection->advance();
     }
 
     // Advancement of a connection might trigger creation
     // of a new connection, so we won't stop the advance
     // timer in that case
-    if ( _queuedConnections.empty() && ! _currentConnection.get() )
-    {
+    if (_queuedConnections.empty() && ! _currentConnection.get()) {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("stopping advance timer");
 #endif

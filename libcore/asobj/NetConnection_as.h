@@ -56,7 +56,7 @@ public:
 	~NetConnection_as();
 
     /// Process connection stuff
-    virtual void advanceState();
+    virtual void update();
 
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;

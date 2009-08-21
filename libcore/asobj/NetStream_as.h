@@ -239,7 +239,7 @@ public:
     /// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
     /// used to find the next video frame to be shown, though this might
     /// change.
-    void advanceState();
+    void update();
     
     /// Returns the current framerate in frames per second.
     double getCurrentFPS()  { return 0; }
@@ -481,7 +481,7 @@ private:
 
     /// Update the image/videoframe to be returned by next get_video() call.
     //
-    /// Used by advanceState().
+    /// Used by update().
     ///
     /// Note that get_video will be called by Video::display(), which
     /// is usually called right after Video::advance(), so the result
@@ -588,6 +588,8 @@ private:
 };
 
 void netstream_class_init(as_object& global, const ObjectURI& uri);
+
+void registerNetStreamNative(as_object& global);
 
 } // gnash namespace
 

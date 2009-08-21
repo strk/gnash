@@ -167,7 +167,7 @@ private:
     /// Unregister the probe timer
     void stopProbeTimer();
 
-    virtual void advanceState();
+    virtual void update();
 
     /// Probe audio
     void probeAudio();

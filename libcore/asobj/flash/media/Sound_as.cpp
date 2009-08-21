@@ -88,7 +88,7 @@ Sound_as::Sound_as(as_object* owner)
     soundId(-1),
     externalSound(false),
     isStreaming(false),
-    _soundHandler(getRunResources(*_owner).soundHandler()),
+    _soundHandler(getRunResources(*owner).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _startTime(0),
     _leftOverData(),
@@ -134,7 +134,7 @@ void
 Sound_as::startProbeTimer()
 {
     _probeTimer = 1;
-    getRoot(*_owner).addAdvanceCallback(this);
+    getRoot(owner()).addAdvanceCallback(this);
 }
 
 /*private*/
@@ -147,14 +147,14 @@ Sound_as::stopProbeTimer()
 
     if ( _probeTimer )
     {
-        getRoot(*_owner).removeAdvanceCallback(this);
+        getRoot(owner()).removeAdvanceCallback(this);
         log_debug(" sound callback removed");
         _probeTimer = 0;
     }
 }
 
 void
-Sound_as::advanceState()
+Sound_as::update()
 {
     probeAudio();
 }
@@ -180,7 +180,7 @@ Sound_as::probeAudio()
             stopProbeTimer();
 
             // dispatch onSoundComplete 
-            _owner->callMethod(NSV::PROP_ON_SOUND_COMPLETE);
+            owner().callMethod(NSV::PROP_ON_SOUND_COMPLETE);
         }
     }
     else
@@ -338,7 +338,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     /// changed that.
     _startTime=0;
 
-    const RunResources& rr = getRunResources(*_owner);
+    const RunResources& rr = getRunResources(owner());
     URL url(file, rr.baseURL());
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();

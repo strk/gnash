@@ -97,7 +97,7 @@ public:
 
     /// Scan the LoadThread queue (_loadThreads) to see if any of
     /// them completed. If any did, invoke the onData event
-    virtual void advanceState();
+    virtual void update();
 
 protected:
 

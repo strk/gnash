@@ -57,7 +57,7 @@ LoadableObject::LoadableObject(as_object* owner)
 LoadableObject::~LoadableObject()
 {
     deleteAllChecked(_loadThreads);
-    getRoot(*_owner).removeAdvanceCallback(this);
+    getRoot(owner()).removeAdvanceCallback(this);
 }
 
 
@@ -65,7 +65,7 @@ void
 LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
-    movie_root& m = getRoot(*_owner);
+    movie_root& m = getRoot(owner());
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
@@ -91,7 +91,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = getRunResources(*_owner);
+    const RunResources& ri = getRunResources(owner());
 	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
@@ -101,7 +101,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
         NetworkAdapter::RequestHeaders headers;
 
-        if (_owner->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+        if (owner().get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
         {
 
             /// Read in our custom headers if they exist and are an
@@ -138,7 +138,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
         as_value contentType;
 
-        if (_owner->get_member(NSV::PROP_CONTENT_TYPE, &contentType))
+        if (owner().get_member(NSV::PROP_CONTENT_TYPE, &contentType))
         {
             // This should not overwrite anything set in 
             // LoadVars.addRequestHeader();
@@ -187,9 +187,9 @@ LoadableObject::load(const std::string& urlstr)
 {
     // Set loaded property to false; will be updated (hopefully)
     // when loading is complete.
-	_owner->set_member(NSV::PROP_LOADED, false);
+	owner().set_member(NSV::PROP_LOADED, false);
 
-    const RunResources& ri = getRunResources(*_owner);
+    const RunResources& ri = getRunResources(owner());
 	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
@@ -207,7 +207,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
     // We don't need to check before adding a timer, but
     // this may optimize slightly (it was already in the code).
     if (_loadThreads.empty()) {
-        getRoot(*_owner).addAdvanceCallback(this);
+        getRoot(owner()).addAdvanceCallback(this);
     }
 
     std::auto_ptr<LoadThread> lt (new LoadThread(str));
@@ -225,7 +225,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 }
 
 void
-LoadableObject::advanceState()
+LoadableObject::update()
 {
 
     if (_loadThreads.empty()) return;
@@ -237,7 +237,7 @@ LoadableObject::advanceState()
 
         /// An empty file is the same as a failure.
         if (lt->failed() || (lt->completed() && !lt->size())) {
-            _owner->callMethod(NSV::PROP_ON_DATA, as_value());
+            owner().callMethod(NSV::PROP_ON_DATA, as_value());
             it = _loadThreads.erase(it);
             delete lt; 
         }
@@ -270,12 +270,12 @@ LoadableObject::advanceState()
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
-            string_table& st = getStringTable(*_owner);
-            _owner->set_member(st.find("_bytesLoaded"), _bytesLoaded);
-            _owner->set_member(st.find("_bytesTotal"), _bytesTotal);
+            string_table& st = getStringTable(owner());
+            owner().set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            owner().set_member(st.find("_bytesTotal"), _bytesTotal);
             
             // might push_front on the list..
-            _owner->callMethod(NSV::PROP_ON_DATA, dataVal);
+            owner().callMethod(NSV::PROP_ON_DATA, dataVal);
 
         }
         else
@@ -283,17 +283,17 @@ LoadableObject::advanceState()
             _bytesTotal = lt->getBytesTotal();
             _bytesLoaded = lt->getBytesLoaded();
             
-            string_table& st = getStringTable(*_owner);
-            _owner->set_member(st.find("_bytesLoaded"), _bytesLoaded);
+            string_table& st = getStringTable(owner());
+            owner().set_member(st.find("_bytesLoaded"), _bytesLoaded);
             // TODO: should this really be set on each iteration?
-            _owner->set_member(st.find("_bytesTotal"), _bytesTotal);
+            owner().set_member(st.find("_bytesTotal"), _bytesTotal);
             ++it;
         }
     }
 
     if (_loadThreads.empty()) 
     {
-        getRoot(*_owner).removeAdvanceCallback(this);
+        getRoot(owner()).removeAdvanceCallback(this);
     }
 
 }

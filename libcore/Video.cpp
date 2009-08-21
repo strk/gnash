@@ -322,7 +322,7 @@ Video::getBounds() const
 void
 Video::markReachableResources() const
 {
-	if ( _ns ) _ns->markReachableResources();
+	if (_ns) _ns->setReachable();
 
 	// Invoke DisplayObject's version of reachability mark
 	markDisplayObjectReachable();
@@ -429,12 +429,13 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
 	NetStream_as* ns;
-    if (isInstanceOf(fn.arg(0).to_object(*getGlobal(fn)).get(), ns)) {
+
+    if (obj && isInstanceOf(obj, ns)) {
 		video->setStream(ns);
 	}
-	else
-	{
+	else {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
 			fn.arg(0));

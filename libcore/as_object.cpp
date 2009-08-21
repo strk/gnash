@@ -1335,7 +1335,7 @@ as_object::markAsObjectReachable() const
 	}
 
     /// Proxy objects can contain references to other as_objects.
-    if (_proxy) _proxy->markReachableResources();
+    if (_proxy) _proxy->setReachable();
 }
 #endif // GNASH_USE_GC
 

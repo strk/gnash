@@ -156,46 +156,19 @@ struct ObjectURI
 //
 /// ActionScript classes with particular type restrictions or type traits
 /// should set the Object's _proxy member to a subclass of this class.
+//
+/// The simplest native types, such as Boolean or String, inherit from this
+/// type.
 class Proxy
 {
 public:
     virtual ~Proxy() {};
 
-    virtual void markReachableResources() {}
+    /// A Proxy itself is not a GC object, but may point to GC resources.
+    virtual void setReachable() {}
 };
 
 
-/// A type that requires periodic updates from the core (movie_root).
-//
-/// Objects with this type of proxy can be registered with movie_root, and
-/// recieve a callback on every advance.
-class UpdatableProxy : public Proxy
-{
-public:
-    UpdatableProxy(as_object* owner)
-        :
-        _owner(owner)
-    {}
-
-    /// Make sure we are removed from the list of callbacks on destruction.
-    virtual ~UpdatableProxy();
-
-    /// UpdatableProxy objects must have an advanceState method.
-    virtual void advanceState() = 0;
-
-    as_object& owner() const {
-        return *_owner;
-    }
-
-protected:
-
-    /// The as_object that owns this Proxy.
-    //
-    /// Because we are deleted on destruction of the owner, this pointer will
-    /// never be invalid.
-    as_object* _owner;
-
-};
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -1204,6 +1177,47 @@ getNamespace(const ObjectURI& o)
     return o.ns;
 }
 
+/// A type that requires periodic updates from the core (movie_root).
+//
+/// Objects with this type of proxy can be registered with movie_root, and
+/// recieve a callback on every advance.
+class UpdatableProxy : public Proxy
+{
+public:
+    UpdatableProxy(as_object* owner)
+        :
+        _owner(owner)
+    {}
+
+    /// Make sure we are removed from the list of callbacks on destruction.
+    virtual ~UpdatableProxy();
+
+    /// UpdatableProxy objects must have an advanceState method.
+    virtual void update() = 0;
+
+    /// Mark any other reachable resources, and finally mark our owner
+    virtual void setReachable() {
+        markReachableResources();
+        _owner->setReachable();
+    }
+
+    as_object& owner() const {
+        return *_owner;
+    }
+
+protected:
+
+    virtual void markReachableResources() const {}
+
+private:
+
+    /// The as_object that owns this Proxy.
+    //
+    /// Because we are deleted on destruction of the owner, this pointer will
+    /// never be invalid.
+    as_object* _owner;
+
+};
 
 /// Template which does a dynamic cast for as_object pointers.
 //
