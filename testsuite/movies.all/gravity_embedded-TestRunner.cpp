@@ -26,6 +26,7 @@
 #include "DisplayList.h"
 #include "log.h"
 #include "VM.h"
+#include "TextField.h"
 
 #include "check.h"
 #include <string>
@@ -76,7 +77,10 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(loaded->get_height(), 2056);
 	check_equals(loaded->get_width(), 2056);
 
-	const DisplayObject* text = tester.findDisplayItemByDepth(*root, 7+DisplayObject::staticDepthOffset);
+	const TextField* text = 
+            dynamic_cast<const TextField*>(
+                tester.findDisplayItemByDepth(
+                    *root, 7 +DisplayObject::staticDepthOffset));
 	check(text);
 	
 	check_equals(string(text->get_text_value()), "50");

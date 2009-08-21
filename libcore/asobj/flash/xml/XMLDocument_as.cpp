@@ -72,7 +72,7 @@ namespace {
 	
 	
     as_value xmldocument_ctor(const fn_call& fn);
-    void attachXMLProperties(as_object& /*o*/);
+    void attachXMLProperties(as_object& o);
 	void attachXMLInterface(as_object& o);
     as_object* getXMLInterface();
 
@@ -84,11 +84,6 @@ XMLDocument_as::XMLDocument_as()
     _loaded(-1), 
     _status(XML_OK)
 {
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("Creating XML data at %p"), this);
-#endif
-
-    attachXMLProperties(*this);
 }
 
 // Parse the ASCII XML string into an XMLNode tree
@@ -98,10 +93,6 @@ XMLDocument_as::XMLDocument_as(const std::string& xml)
     _loaded(-1), 
     _status(XML_OK)
 {
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("Creating XML data at %p"), this);
-#endif
-
     parseXML(xml);
 }
 
@@ -635,11 +626,11 @@ XMLDocument_as::registerNative(as_object& where)
 
 namespace {
 void
-attachXMLProperties(as_object& /*o*/)
+attachXMLProperties(as_object& o)
 {
-    // if we use a proper member here hasOwnProperty() would return true
-    // but we want it to return false instead. See XML.as
-    //o.init_member("status", as_value(XML::sOK));
+    const int flags = 0;
+    o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
+    o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 }
 
 
@@ -667,8 +658,6 @@ attachXMLInterface(as_object& o)
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
     o.init_member("onData", gl->createFunction(xml_ondata), flags);
 
-    o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
-    o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 }
 
 as_object*
@@ -695,24 +684,25 @@ getXMLInterface()
 as_value
 xml_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLDocument_as> xml_obj;
 
-    if ( fn.nargs > 0 )
-    {
-        if ( fn.arg(0).is_object() )
-        {
-            boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
-            xml_obj = dynamic_cast<XMLDocument_as*>(obj.get());
-            if ( xml_obj )
-            {
-                log_debug(_("Cloned the XML object at %p"),
-                       (void *)xml_obj.get());
-                return as_value(xml_obj->cloneNode(true).get());
+    XMLDocument_as* xml_obj;
+
+    if (fn.nargs > 0) {
+
+        // Copy constructor clones nodes.
+        if (fn.arg(0).is_object()) {
+            as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+            xml_obj = dynamic_cast<XMLDocument_as*>(obj);
+
+            if (xml_obj) {
+                as_object* clone = xml_obj->cloneNode(true).get();
+                attachXMLProperties(*clone);
+                return as_value(clone);
             }
         }
 
         const std::string& xml_in = fn.arg(0).to_string();
-        if ( xml_in.empty() )
+        if (xml_in.empty())
         {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("First arg given to XML constructor (%s) "
@@ -722,15 +712,17 @@ xml_new(const fn_call& fn)
         else
         {
             xml_obj = new XMLDocument_as(xml_in);
-            xml_obj->setRelay(new LoadableObject(xml_obj.get()));
-            return as_value(xml_obj.get());
+            xml_obj->setRelay(new LoadableObject(xml_obj));
+            attachXMLProperties(*xml_obj);
+            return as_value(xml_obj);
         }
     }
 
     xml_obj = new XMLDocument_as;
-    xml_obj->setRelay(new LoadableObject(xml_obj.get()));
+    xml_obj->setRelay(new LoadableObject(xml_obj));
+    attachXMLProperties(*xml_obj);
 
-    return as_value(xml_obj.get());
+    return as_value(xml_obj);
 }
 
 /// Only available as ASnative.
