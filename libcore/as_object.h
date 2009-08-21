@@ -1183,20 +1183,20 @@ getNamespace(const ObjectURI& o)
 /// recieve a callback on every advance.
 //
 /// This type of Proxy holds a reference to its parent as_object (owner). 
-/// If a reference to this UpdatableProxy is held by another object,
+/// If a reference to this ActiveRelay is held by another object,
 /// it must be marked reachable so that its owner is not deleted by the GC.
-class UpdatableProxy : public Relay
+class ActiveRelay : public Relay
 {
 public:
-    UpdatableProxy(as_object* owner)
+    ActiveRelay(as_object* owner)
         :
         _owner(owner)
     {}
 
     /// Make sure we are removed from the list of callbacks on destruction.
-    virtual ~UpdatableProxy();
+    virtual ~ActiveRelay();
 
-    /// UpdatableProxy objects must have an advanceState method.
+    /// ActiveRelay objects must have an advanceState method.
     virtual void update() = 0;
 
     /// Mark any other reachable resources, and finally mark our owner

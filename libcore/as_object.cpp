@@ -213,8 +213,8 @@ public:
 } // end of anonymous namespace
 
 
-/// Destructor of UpdatableProxy needs definition of movie_root.
-UpdatableProxy::~UpdatableProxy()
+/// Destructor of ActiveRelay needs definition of movie_root.
+ActiveRelay::~ActiveRelay()
 {
     getRoot(*_owner).removeAdvanceCallback(this);
 }

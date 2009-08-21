@@ -1680,13 +1680,13 @@ movie_root::flushHigherPriorityActionQueues()
 }
 
 void
-movie_root::addAdvanceCallback(UpdatableProxy* obj)
+movie_root::addAdvanceCallback(ActiveRelay* obj)
 {
     _objectCallbacks.insert(obj);
 }
 
 void
-movie_root::removeAdvanceCallback(UpdatableProxy* obj)
+movie_root::removeAdvanceCallback(ActiveRelay* obj)
 {
     _objectCallbacks.erase(obj);
 }
@@ -1756,12 +1756,12 @@ movie_root::executeAdvanceCallbacks()
 
     // Copy it, as the call can change the original, which is not only 
     // bad for invalidating iterators, but also allows infinite recursion.
-    std::vector<UpdatableProxy*> currentCallbacks;
+    std::vector<ActiveRelay*> currentCallbacks;
     std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::back_inserter(currentCallbacks));
 
     std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
-            std::mem_fun(&UpdatableProxy::update));
+            std::mem_fun(&ActiveRelay::update));
 
     processActionQueue();
 }

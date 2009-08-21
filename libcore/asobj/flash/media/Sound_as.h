@@ -49,7 +49,7 @@ class CharacterProxy;
 	class as_object;
     class ObjectURI;
 
-class Sound_as : public UpdatableProxy
+class Sound_as : public ActiveRelay
 {
 
 public:

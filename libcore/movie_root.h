@@ -343,9 +343,9 @@ public:
     ///
     unsigned int add_interval_timer(std::auto_ptr<Timer> timer);
 
-    void addAdvanceCallback(UpdatableProxy* obj);
+    void addAdvanceCallback(ActiveRelay* obj);
 
-    void removeAdvanceCallback(UpdatableProxy* obj);
+    void removeAdvanceCallback(ActiveRelay* obj);
 
     /// Remove timer identified by given integer
     //
@@ -1034,7 +1034,7 @@ private:
     MouseButtonState  m_mouse_button_state;
 
     /// Objects requesting a callback on every movie_root::advance()
-    typedef std::set<UpdatableProxy*> ObjectCallbacks;
+    typedef std::set<ActiveRelay*> ObjectCallbacks;
     ObjectCallbacks _objectCallbacks;
 
     typedef std::map<int, Timer*> TimerMap;

@@ -47,7 +47,7 @@ namespace {
 
 LoadableObject::LoadableObject(as_object* owner)
     :
-    UpdatableProxy(owner),
+    ActiveRelay(owner),
     _bytesLoaded(-1),
     _bytesTotal(-1)
 {

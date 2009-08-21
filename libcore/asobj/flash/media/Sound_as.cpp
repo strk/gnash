@@ -83,7 +83,7 @@ namespace {
 
 Sound_as::Sound_as(as_object* owner) 
     :
-    UpdatableProxy(owner),
+    ActiveRelay(owner),
     _attachedCharacter(0),
     soundId(-1),
     externalSound(false),

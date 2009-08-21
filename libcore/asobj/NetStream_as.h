@@ -168,7 +168,7 @@ public:
 /// This class is responsible for handlign external
 /// media files. Provides interfaces for playback control.
 ///
-class NetStream_as : public UpdatableProxy
+class NetStream_as : public ActiveRelay
 {
 
 public:

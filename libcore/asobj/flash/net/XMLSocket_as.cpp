@@ -221,7 +221,7 @@ private:
 
 }
 
-class XMLSocket_as : public UpdatableProxy
+class XMLSocket_as : public ActiveRelay
 {
 public:
 
@@ -278,7 +278,7 @@ private:
   
 XMLSocket_as::XMLSocket_as(as_object* owner)
     :
-    UpdatableProxy(owner),
+    ActiveRelay(owner),
     _ready(false)
 {
 }

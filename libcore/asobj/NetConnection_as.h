@@ -37,7 +37,7 @@ namespace gnash {
 //
 /// Provides interfaces to load data from an URL
 ///
-class NetConnection_as: public UpdatableProxy
+class NetConnection_as: public ActiveRelay
 {
 public:
 

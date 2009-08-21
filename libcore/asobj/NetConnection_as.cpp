@@ -666,7 +666,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 
 NetConnection_as::NetConnection_as(as_object* owner)
     :
-    UpdatableProxy(owner),
+    ActiveRelay(owner),
     _queuedConnections(),
     _currentConnection(0),
     _uri(),

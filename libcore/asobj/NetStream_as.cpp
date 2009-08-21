@@ -80,7 +80,7 @@ namespace {
 /// is 100 milliseconds.
 NetStream_as::NetStream_as(as_object* owner)
     :
-    UpdatableProxy(owner),
+    ActiveRelay(owner),
     _netCon(0),
     m_bufferTime(100), 
     m_newFrameReady(false),

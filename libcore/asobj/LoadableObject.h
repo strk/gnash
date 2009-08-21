@@ -36,7 +36,7 @@ namespace gnash {
 /// It is a virtual base class because XML_as also inherits from XMLNode.
 //
 /// It may not be copied.
-class LoadableObject : public UpdatableProxy
+class LoadableObject : public ActiveRelay
 {
 public:
 
