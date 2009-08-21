@@ -68,6 +68,7 @@ extern "C"{
 #include "GnashException.h"
 #include "GnashSleep.h" // for usleep comptibility.
 #include "URL.h"
+#include "rtmp_client.h"
 
 // classes internal to Cygnal
 #include "rtmp_server.h"
@@ -236,6 +237,8 @@ Cygnal::loadPeersFile(const std::string &filespec)
     std::string line;
     string host;
     string portstr;
+    string cgi;
+    vector<string> supported;
     
     // Make sufre the file exists
     if (stat(filespec.c_str(), &stats) != 0) {
@@ -281,6 +284,11 @@ Cygnal::loadPeersFile(const std::string &filespec)
             continue;
         }
 
+        while (ss >> cgi) {
+	    supported.push_back(cgi);
+            continue;
+        }
+
 	// Create a new peer item
 	boost::shared_ptr<peer_t> peer(new Cygnal::peer_t);
 	peer->hostname = host;
@@ -304,14 +312,31 @@ void
 Cygnal::probePeers(peer_t &peer)
 {    
 //     GNASH_REPORT_FUNCTION;
-    Network net;
+    RTMPClient net;
+    stringstream uri;
 
-    if (!net.createClient(peer.hostname, peer.port)) {
-	log_network("cuoldn't connect to %S:%D",
-		    peer.hostname, peer.port);
+    uri << peer.hostname;
+//     uri << ":";
+//     uri << peer.port;
+    
+    vector<string>::iterator it;
+//     for (it = peer.cgis.begin(); it <= peer.cgis.end(); ++it)
+ {
+	log_network("Constructed: %s", uri.str());
+	
+	URL url(uri.str());
+	if (!net.connectToServer(uri.str())) {
+	    log_network("Couldn't connect to %s", uri.str());
+	    peer.connected = false;
+	} else {
+	    peer.connected = false;
+	}
+// 	string newuri = uri.str();
+// 	newuri += "/" *it+;
+//     }
+//     uri << peer.supported[0];
     }
 
-    peer.connected = false;
 }
 
 void
@@ -321,9 +346,12 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
 
 // 	createClient();
     std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
-    for (it = _peers.begin(); it != _peers.end(); it++) {
+    for (it = peers.begin(); it != peers.end(); it++) {
 	boost::shared_ptr<Cygnal::peer_t> peer = *it;
 	probePeers(*peer);
+	if (peer->connected) {
+	    log_network("We are happy!");
+	}
     }
 }
 
@@ -476,6 +504,7 @@ main(int argc, char *argv[])
 
     // load the file of peers. A peer is another instance of Cygnal
     cyg.loadPeersFile();
+    cyg.probePeers();
 
 //    cyg.dump();
 

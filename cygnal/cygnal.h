@@ -56,6 +56,7 @@ public:
 
     void probePeers();
     void probePeers(peer_t &peer);
+    void probePeers(boost::shared_ptr<peer_t> peer);
     void probePeers(std::vector<boost::shared_ptr<peer_t> > &peers);
 
     void addHandler(const std::string &path, boost::shared_ptr<Handler> x) {
@@ -74,6 +75,7 @@ private:
     };
 
     std::vector<boost::shared_ptr<peer_t> > _peers;
+    std::vector<boost::shared_ptr<peer_t> > _active_peers;
     std::map<std::string, boost::shared_ptr<Handler> > _handlers;
 
     boost::mutex _mutex;
