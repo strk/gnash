@@ -429,17 +429,17 @@ date_new(const fn_call& fn)
     // for now, we just use rogue_date_args' algorithm
     double foo;
     if (( foo = rogue_date_args(fn, 7)) != 0.0) {
-        obj->setProxy(new Date_as(foo));
+        obj->setRelay(new Date_as(foo));
         return as_value();
     }
 
     if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         // Time now
-        obj->setProxy(new Date_as);
+        obj->setRelay(new Date_as);
     }
     else if (fn.nargs == 1) {
         // Set the value in milliseconds since 1970 UTC
-        obj->setProxy(new Date_as(fn.arg(0).to_number()));
+        obj->setRelay(new Date_as(fn.arg(0).to_number()));
     }
     else {
         // Create a time from the supplied (at least 2) arguments.
@@ -490,7 +490,7 @@ date_new(const fn_call& fn)
         // due to shortcomings in the timezoneoffset calculation, but should
         // be internally consistent.
         double localTime = makeTimeValue(gt);
-        obj->setProxy(new Date_as(
+        obj->setRelay(new Date_as(
                 localTime - clocktime::getTimeZoneOffset(localTime) * 60000));
     }
     

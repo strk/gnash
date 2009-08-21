@@ -155,16 +155,16 @@ struct ObjectURI
 /// This is the base class for type-specific object data. 
 //
 /// ActionScript classes with particular type restrictions or type traits
-/// should set the Object's _proxy member to a subclass of this class.
+/// should set the Object's _relay member to a subclass of this class.
 //
 /// The simplest native types, such as Boolean or String, inherit from this
 /// type.
-class Proxy
+class Relay
 {
 public:
-    virtual ~Proxy() {};
+    virtual ~Relay() {};
 
-    /// A Proxy itself is not a GC object, but may point to GC resources.
+    /// A Relay itself is not a GC object, but may point to GC resources.
     virtual void setReachable() {}
 };
 
@@ -1045,12 +1045,12 @@ public:
     ///
     void set_prototype(const as_value& proto, int flags = DefaultFlags);
 
-    void setProxy(Proxy* p) {
-        _proxy.reset(p);
+    void setRelay(Relay* p) {
+        _relay.reset(p);
     }
 
-    Proxy* proxy() const {
-        return _proxy.get();
+    Relay* relay() const {
+        return _relay.get();
     }
 
 protected:
@@ -1121,7 +1121,7 @@ protected:
 
 private:
  
-    boost::scoped_ptr<Proxy> _proxy;
+    boost::scoped_ptr<Relay> _relay;
 
     /// The global object whose scope contains this object.
     VM& _vm;   
@@ -1179,13 +1179,13 @@ getNamespace(const ObjectURI& o)
 
 /// A type that requires periodic updates from the core (movie_root).
 //
-/// Objects with this type of proxy can be registered with movie_root, and
+/// Objects with this type of relay can be registered with movie_root, and
 /// recieve a callback on every advance.
 //
 /// This type of Proxy holds a reference to its parent as_object (owner). 
 /// If a reference to this UpdatableProxy is held by another object,
 /// it must be marked reachable so that its owner is not deleted by the GC.
-class UpdatableProxy : public Proxy
+class UpdatableProxy : public Relay
 {
 public:
     UpdatableProxy(as_object* owner)
@@ -1257,22 +1257,22 @@ ensureType(boost::intrusive_ptr<as_object> obj)
 //
 /// @tparam T       The expected native type
 /// @param obj      The object whose type should be tested
-/// @param proxy    This points to the native type information if the object
+/// @param relay    This points to the native type information if the object
 ///                 is of the expected type
 /// @return         If the object is of the expected type, true; otherwise
 ///                 false.
 template<typename T>
 bool
-isNativeType(as_object* obj, T*& proxy)
+isNativeType(as_object* obj, T*& relay)
 {
     if (!obj) return false;
-    proxy = dynamic_cast<T*>(obj->proxy());
-    return proxy;
+    relay = dynamic_cast<T*>(obj->relay());
+    return relay;
 }
 
 /// Ensure that the object is of a particular native type.
 //
-/// This checks that the object's proxy member is the expected type.
+/// This checks that the object's relay member is the expected type.
 /// If not, the function throws an exception, which results in an undefined
 /// value being returned from the AS function.
 /// @tparam T   The expected native type.
@@ -1285,7 +1285,7 @@ ensureNativeType(as_object* obj)
 {
     if (!obj) throw ActionTypeError();
 
-    T* ret = dynamic_cast<T*>(obj->proxy());
+    T* ret = dynamic_cast<T*>(obj->relay());
 
     if (!ret) {
         std::string target = typeName(ret);

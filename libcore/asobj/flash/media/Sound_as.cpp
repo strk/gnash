@@ -781,7 +781,7 @@ sound_new(const fn_call& fn)
 
     as_object* so = fn.this_ptr;
     Sound_as* s(new Sound_as(so));
-    so->setProxy(s);
+    so->setRelay(s);
 
     if (fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1192,7 +1192,7 @@ as_value
 sound_ctor(const fn_call& fn)
 {
     as_object* obj = fn.this_ptr;
-    obj->setProxy(new Sound_as(obj));
+    obj->setRelay(new Sound_as(obj));
     return as_value();
 }
 

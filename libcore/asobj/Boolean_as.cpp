@@ -129,7 +129,7 @@ boolean_ctor(const fn_call& fn)
     const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
 
     as_object* obj = fn.this_ptr;
-    obj->setProxy(new Boolean_as(val));
+    obj->setRelay(new Boolean_as(val));
     return as_value();
 
 }

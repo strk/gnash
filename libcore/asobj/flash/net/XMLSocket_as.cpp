@@ -509,7 +509,7 @@ xmlsocket_new(const fn_call& fn)
 {
 
     as_object* obj = fn.this_ptr;
-    obj->setProxy(new XMLSocket_as(obj));
+    obj->setRelay(new XMLSocket_as(obj));
     return as_value();
 }
 

@@ -1122,7 +1122,7 @@ netconnection_new(const fn_call& fn)
 {
 
     as_object* obj = fn.this_ptr;
-    obj->setProxy(new NetConnection_as(obj));
+    obj->setRelay(new NetConnection_as(obj));
     attachProperties(*obj);
     return as_value();
 }

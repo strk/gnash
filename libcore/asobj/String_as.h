@@ -29,7 +29,7 @@ class as_object;
 class ObjectURI;
 class Global_as;
 
-class String_as : public Proxy
+class String_as : public Relay
 {
 
 public:

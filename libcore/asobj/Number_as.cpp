@@ -110,7 +110,7 @@ number_ctor(const fn_call& fn)
         return as_value(val);
     }
 
-    fn.this_ptr->setProxy(new Number_as(val));
+    fn.this_ptr->setRelay(new Number_as(val));
     
     return as_value(); 
 }

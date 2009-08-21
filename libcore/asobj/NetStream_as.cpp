@@ -1604,7 +1604,7 @@ netstream_new(const fn_call& fn)
             );
         }
     }
-    obj->setProxy(ns);
+    obj->setRelay(ns);
 
 
     return as_value();
