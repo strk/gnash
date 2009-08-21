@@ -263,14 +263,19 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 }
     
 bool
-RTMPClient::connectToServer(const std::string &/* url */)
+RTMPClient::connectToServer(const std::string &url)
 {
     GNASH_REPORT_FUNCTION;
+
+    URL uri(url);
 
     // If we're currently not connected, build and send the
     // initial handshake packet.
     if (connected() == false) {
-	createClient();
+	short port = strtol(uri.port().c_str(), NULL, 0) & 0xffff;
+	if (!createClient(uri.hostname(), port)) {
+	    return false;
+	}
 
 	// Build the NetConnection Packet, which seems to need
 	// to be on the end of the second block of handshake data.

@@ -87,8 +87,10 @@ public:
     double _connections;
 };
 
+#if 0
 // This is the thread for all incoming RTMP connections
 void rtmp_handler(Network::thread_params_t *args);
+#endif
 
 } // end of gnash namespace
 // end of _RTMP_CLIENT_H_
