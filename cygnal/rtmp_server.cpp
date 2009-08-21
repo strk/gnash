@@ -136,9 +136,10 @@ RTMPServer::processClientHandShake(int fd)
     
     // Don't assume the data we just read is a handshake.
     pkt = serverFinish(fd, *handshake1, *handshake2);
-    // Wmake sure e got data before trying to procdess it
-    if (pkt->empty()) {
+    // Wmake sure we got data before trying to process it
+    if (!pkt) {
 	log_error("Didn't receive any data in handshake!");
+	tcurl.reset(new amf::Element);
 	return tcurl;		// nc is empty
     }
     
@@ -174,7 +175,7 @@ RTMPServer::processClientHandShake(int fd)
     boost::scoped_ptr<amf::Buffer> newptr(new amf::Buffer(qhead->bodysize));
     if (qhead->bodysize > RTMP_VIDEO_PACKET_SIZE) {
 	log_network("De chunkifying the NetConnection packet.");
-	size_t nbytes = 0;
+	int nbytes = 0;
 	while (nbytes < qhead->bodysize) {
 	    size_t chunk = RTMP_VIDEO_PACKET_SIZE;
 	    if ((qhead->bodysize - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
@@ -1103,7 +1104,7 @@ rtmp_handler(Network::thread_params_t *args)
     bool done = false;
     boost::shared_ptr<RTMPMsg> body;
     static bool initialize = true;
-    bool sendfile = false;
+//     bool sendfile = false;
     log_debug(_("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\""),
 	      args->netfd, args->filespec);
     
@@ -1122,7 +1123,7 @@ rtmp_handler(Network::thread_params_t *args)
 
     string basepath = docroot;
 
-    RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
+//     RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
     
     // Keep track of the network statistics
     // See if we have any messages waiting. After the initial connect, this is
@@ -1148,6 +1149,7 @@ rtmp_handler(Network::thread_params_t *args)
 	    if (pkt->allocated()) {
 		boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 		if (!que) {
+		    // FIXME: send _error result
 		    return false;
 		}
 		boost::shared_ptr<RTMP::rtmp_head_t> qhead;
@@ -1303,11 +1305,36 @@ rtmp_handler(Network::thread_params_t *args)
 			{
 			body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
 			log_network("INVOKEing method \"%s\"", body->getMethodName());
-			size_t ret = hand->writeToPlugin(tmpptr, qhead->bodysize);
+			/* size_t ret = */ hand->writeToPlugin(tmpptr, qhead->bodysize);
 			log_network("%s", hexify(tmpptr, qhead->bodysize, true));
 // 			log_network("RET is: %d", ret);
+			// These next Invoke methods are for the
+			// NetStream class, which lile NetConnection,
+			// is a speacial one handled directly by the
+			// server instead of any cgi-bin plugins.
+			if (body->getMethodName() == "createStream") {
+ 			    /* int streamid = */ hand->createStream();
+			} else if (body->getMethodName() == "play") {
+			    hand->playStream();
+			} else if (body->getMethodName() == "seek") {
+			    hand->seekStream();
+			} else if (body->getMethodName() == "pause") {
+			    hand->pauseStream();
+			} else if (body->getMethodName() == "close") {
+			    hand->closeStream();
+			} else if (body->getMethodName() == "resume") {
+			    hand->resumeStream();
+			} else if (body->getMethodName() == "publish") {
+			    hand->publishStream();
+			} else if (body->getMethodName() == "togglePause") {
+			    hand->togglePause();
+			}
+			
+			// This is a server installation specific  method.
+			if (body->getMethodName() == "FCSubscribe") {
 			}
 			break;
+			}
 		    case RTMP::AUDIO_DATA:
 			break;
 		    default:
