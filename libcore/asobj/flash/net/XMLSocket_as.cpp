@@ -24,7 +24,6 @@
 #include "GnashSystemFDHeaders.h"
 #include "network.h"
 #include "utility.h"
-#include "xml/XMLDocument_as.h"
 #include "net/XMLSocket_as.h"
 #include "as_function.h"
 #include "movie_root.h"
@@ -55,7 +54,6 @@ namespace {
     // These are the event handlers called for this object
     as_value xmlsocket_onData(const fn_call& fn);
 
-    as_object* getXMLSocketInterface();
     void attachXMLSocketInterface(as_object& o);
 }
 
@@ -507,7 +505,6 @@ xmlsocket_close(const fn_call& fn)
 as_value
 xmlsocket_new(const fn_call& fn)
 {
-
     as_object* obj = fn.this_ptr;
     obj->setRelay(new XMLSocket_as(obj));
     return as_value();
@@ -537,23 +534,24 @@ xmlsocket_onData(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> xml = new XMLDocument_as(xmlin);
-    as_value arg(xml.get());
 
-    fn.this_ptr->callMethod(NSV::PROP_ON_XML, arg);
+    Global_as* gl = getGlobal(fn);
+    as_function* ctor = gl->getMember(NSV::CLASS_XML).to_as_function();
+
+    fn_call::Args args;
+    args += xmlin;
+
+    as_value xml;
+    if (ctor) {
+        xml = ctor->constructInstance(fn.env(), args);
+    }
+
+    // The built-in function calls:
+    //
+    //      this.onXML(new XML(src));
+    fn.this_ptr->callMethod(NSV::PROP_ON_XML, xml);
 
     return as_value();
-}
-
-as_object*
-getXMLSocketInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if (!o) {
-        o = new as_object(getObjectInterface());
-        attachXMLSocketInterface(*o);
-    }
-    return o.get();
 }
 
 void
