@@ -276,10 +276,6 @@ public:
     /// to a string.
     virtual bool useCustomToString() const { return true; }
 
-    /// Loads data from an IOChannel. The default implementation
-    /// does nothing.
-    virtual void queueLoad(std::auto_ptr<IOChannel> /*str*/) {};
-
     /// Set a member value
     //
     ///
