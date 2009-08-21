@@ -605,13 +605,20 @@ Network::createClient(const string &hostname, short port)
 #else
             ::shutdown(_sockfd, SHUT_RDWR);
 #endif
+	    ::close(_sockfd);
             _sockfd = -1;
             return false;
         }
 
         if (ret == 0) {
+#ifdef HAVE_WINSOCK_H
+            ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+#else
+            ::shutdown(_sockfd, SHUT_RDWR);
+#endif
             log_error(_("The connect() socket for fd %d timed out waiting "
                         "to write"), _sockfd);
+	    ::close(_sockfd);
             continue;
         }
 
@@ -633,6 +640,12 @@ Network::createClient(const string &hostname, short port)
             if (ret == -1) {
                 log_error(_("The connect() socket for fd %d never was "
                             "available for writing"), _sockfd);
+#ifdef HAVE_WINSOCK_H
+		::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+#else
+		::shutdown(_sockfd, SHUT_RDWR);
+#endif
+		::close(_sockfd);
                 _sockfd = -1;
                 assert(!_connected);
                 return false;
