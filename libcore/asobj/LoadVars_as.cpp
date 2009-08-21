@@ -81,6 +81,7 @@ attachLoadVarsInterface(as_object& o)
 	o.init_member("toString", gl->createFunction(loadvars_tostring));
 	o.init_member("onData", gl->createFunction(loadvars_onData));
 	o.init_member("onLoad", gl->createFunction(loadvars_onLoad));
+    o.init_member("contentType", "application/x-www-form-urlencoded");
 }
 
 as_value

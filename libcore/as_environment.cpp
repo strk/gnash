@@ -90,7 +90,7 @@ as_environment::get_variable(const std::string& varname,
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("find_object(\"%s\") [ varname = '%s' - "
                         "current target = '%s' ] failed"),
-                        path, varname, m_target ? m_target->get_text_value() : "<null>");
+                        path, varname, m_target);
             as_value tmp = get_variable_raw(path, scopeStack, retTarget);
             if ( ! tmp.is_undefined() )
             {
@@ -753,7 +753,7 @@ as_environment::find_object(const std::string& path,
 
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Invoking get_path_element(%s) on object "
-                    "%p (%s)"), subpart, (void *)env, env->get_text_value());
+                    "%p"), subpart, (void *)env);
 #endif
 
             as_object* element = env->get_path_element(subpartKey);

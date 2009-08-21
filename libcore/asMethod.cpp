@@ -70,7 +70,6 @@ asMethod::setOwner(asClass *pOwner)
 	if (!_prototype) {
 		log_debug("ERROR _prototype is null.");
 	}
-	log_debug("Prototype text value: %s",_prototype->get_text_value());
 	_prototype->set_member(NSV::PROP_PROTOTYPE, pOwner->getPrototype());
 }
 
