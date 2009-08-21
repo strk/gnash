@@ -681,6 +681,7 @@ getXMLInterface()
         as_function* ctor = gl->getMember(NSV::CLASS_XMLNODE).to_as_function();
         if (!ctor) return 0;
 
+        // XML.prototype is an XMLNode(1, "");
         fn_call::Args args;
         args += 1, "";
         o = ctor->constructInstance(as_environment(VM::get()), args);
