@@ -116,6 +116,11 @@ public:
     ///
     virtual bool advance() = 0;
 
+    /// ConnectionHandlers may store references to as_objects
+    //
+    /// These include callback objects.
+    virtual void setReachable() const = 0;
+
     /// Return true if the connection has pending calls 
     //
     /// This will be used on NetConnection.close(): if current
@@ -514,7 +519,7 @@ HTTPRemotingHandler::advance()
 
                             // if actionscript specified a callback object, call it
                             boost::intrusive_ptr<as_object> callback = pop_callback(id);
-                            if(callback) {
+                            if (callback) {
 
                                 string_table::key methodKey;
                                 if ( methodName == "onResult" ) {
@@ -693,6 +698,11 @@ void
 NetConnection_as::markReachableResources() const
 {
     owner().setReachable();
+
+    std::for_each(_queuedConnections.begin(), _queuedConnections.end(),
+            std::mem_fun(&ConnectionHandler::setReachable));
+
+    if (_currentConnection.get()) _currentConnection->setReachable();
 }
 
 
@@ -1010,8 +1020,7 @@ namespace {
 as_value
 netconnection_call(const fn_call& fn)
 {
-    NetConnection_as* ptr = 
-        ensureNativeType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     if (fn.nargs < 1)
     {
@@ -1054,8 +1063,7 @@ netconnection_call(const fn_call& fn)
 as_value
 netconnection_close(const fn_call& fn)
 {
-    NetConnection_as* ptr =
-        ensureNativeType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     ptr->close();
 
@@ -1067,8 +1075,7 @@ netconnection_close(const fn_call& fn)
 as_value
 netconnection_isConnected(const fn_call& fn)
 {
-    NetConnection_as* ptr =
-        ensureNativeType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->isConnected());
 }
@@ -1076,8 +1083,7 @@ netconnection_isConnected(const fn_call& fn)
 as_value
 netconnection_uri(const fn_call& fn)
 {
-    NetConnection_as* ptr =
-        ensureNativeType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->getURI());
 }
@@ -1144,8 +1150,7 @@ as_value
 netconnection_connect(const fn_call& fn)
 {
 
-    NetConnection_as* ptr =
-        ensureNativeType<NetConnection_as>(fn.this_ptr); 
+    NetConnection_as* ptr = ensureNativeType<NetConnection_as>(fn.this_ptr); 
     
     if (fn.nargs < 1)
     {
