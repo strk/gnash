@@ -429,7 +429,7 @@ SharedObject_as::close()
 
 /// Process the connect(uri) method.
 void
-SharedObject_as::connect(NetConnection_as */* obj */, const std::string& /* uri */)
+SharedObject_as::connect(NetConnection_as* /*obj*/, const std::string& /*uri*/)
 {
     GNASH_REPORT_FUNCTION;
    
