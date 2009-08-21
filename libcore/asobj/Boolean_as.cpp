@@ -65,11 +65,16 @@ private:
 void
 boolean_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the global Boolean "class"/"function"
-    as_object* proto = getBooleanInterface();
+    VM& vm = getVM(where);
     Global_as* gl = getGlobal(where);
-    as_object* cl = gl->createClass(&boolean_ctor, proto);
 
+    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* cl = vm.getNative(107, 2);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
+    attachBooleanInterface(*proto);
+    
     // Register _global.Boolean
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
@@ -95,21 +100,6 @@ attachBooleanInterface(as_object& o)
     o.init_member("valueOf", vm.getNative(107, 0));
     o.init_member("toString", vm.getNative(107, 1));
 }
-
-as_object*
-getBooleanInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachBooleanInterface(*o);
-    }
-    return o.get();
-}
-
 
 as_value
 boolean_tostring(const fn_call& fn)
