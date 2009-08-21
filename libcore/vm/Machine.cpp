@@ -870,11 +870,12 @@ Machine::execute()
                 {
                     as_value scope_value = pop_stack();
                     if (!scope_value.to_object(*_global).get()) {
+                        // Should throw an exception.
                         IF_VERBOSE_ASCODING_ERRORS(
                         log_aserror(_("Can't push a null value onto the "
                                 "scope stack (%s)."), scope_value);
                         );
-                        scope_value = as_value(_global->createObject());
+                        break;
                     }	
                     push_scope_stack(scope_value);
                     break;
