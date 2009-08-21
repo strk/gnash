@@ -152,7 +152,10 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     m_cursor(0u),
     _glyphcount(0u),
     _scroll(0u),
-    _maxScroll(0u),
+    _maxScroll(1u),
+    _hScroll(0u),
+    _maxHScroll(0u),
+    _bottomScroll(0u),
     _multiline(def.multiline()),
     _password(def.password()),
     _maxChars(def.maxChars()),
@@ -218,7 +221,10 @@ TextField::TextField(DisplayObject* parent, const rect& bounds)
     m_cursor(0u),
     _glyphcount(0u),
     _scroll(0u),
-    _maxScroll(0u),
+    _maxScroll(1u),
+    _hScroll(0u),
+    _maxHScroll(0u),
+    _bottomScroll(0u),
     _multiline(false),
     _password(false),
     _maxChars(0),
@@ -3542,7 +3548,13 @@ textfield_restrict(const fn_call& fn)
 
     if (!fn.nargs) {
         // Getter
-        return as_value(text->getRestrict());
+        if (text->isRestrict()) {
+            return as_value(text->getRestrict());
+        } else {
+            as_value null;
+            null.set_null();
+            return null;
+        }
     }
     // Setter
     text->setRestrict(fn.arg(0).to_string());
@@ -3555,7 +3567,16 @@ textfield_bottomScroll(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.bottomScroll"));
+    LOG_ONCE(log_unimpl("TextField.bottomScroll is not complete"));
+
+
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(1 + text->getBottomScroll());
+    }
+    // Setter
+    //text->setBottomScroll(int(fn.arg(0).to_number())); READ-ONLY
 
     return as_value();
 }
@@ -3566,7 +3587,16 @@ textfield_maxhscroll(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.maxhscroll"));
+        LOG_ONCE(log_unimpl("TextField.maxhscroll is not complete"));
+
+
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(text->getMaxHScroll());
+    }
+    // Setter
+    //text->setMaxHScroll(int(fn.arg(0).to_number())); READ-ONLY
 
     return as_value();
 }
@@ -3679,10 +3709,10 @@ textfield_scroll(const fn_call& fn)
     if (!fn.nargs)
     {
         // Getter
-        return as_value(text->getScroll());
+        return as_value(1 + text->getScroll());
     }
     // Setter
-    text->setScroll(int(fn.arg(0).to_number()));
+    text->setScroll(int(fn.arg(0).to_number()) - 1); //zero is the first number, everybody knows that.
 
     return as_value();
 }
@@ -3693,7 +3723,15 @@ textfield_hscroll(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.hscroll()"));
+    LOG_ONCE(log_unimpl("TextField._hscroll is not complete"));
+
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(text->getHScroll());
+    }
+    // Setter
+    text->setHScroll(int(fn.arg(0).to_number()));
 
     return as_value();
 }
@@ -3704,13 +3742,15 @@ textfield_maxscroll(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
     UNUSED(text);
 
+    LOG_ONCE(log_unimpl("TextField.maxscroll is not complete"));
+
     if (!fn.nargs)
     {
         // Getter
         return as_value(text->getMaxScroll());
     }
     // Setter
-    text->setMaxScroll(int(fn.arg(0).to_number()));
+    //text->setMaxScroll(int(fn.arg(0).to_number())); READ-ONLY
 
     return as_value();
 }
