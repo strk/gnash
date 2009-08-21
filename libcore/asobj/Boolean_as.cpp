@@ -42,7 +42,7 @@ namespace {
     as_object* getBooleanInterface();
 }
 
-class Boolean_as: public Proxy
+class Boolean_as: public Relay
 {
 
 public:

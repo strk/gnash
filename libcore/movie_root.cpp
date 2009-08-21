@@ -1849,7 +1849,7 @@ movie_root::markReachableResources() const
     }
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
-            std::mem_fun(&Proxy::setReachable));
+            std::mem_fun(&ActiveRelay::setReachable));
 
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)

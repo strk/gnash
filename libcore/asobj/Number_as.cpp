@@ -36,7 +36,7 @@
 
 namespace gnash {
 
-class Number_as : public Proxy
+class Number_as : public Relay
 {
 public:
 
