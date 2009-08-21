@@ -71,14 +71,13 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
     // XML should not be encoded. LoadVars is always
     // encoded.
     // TODO: test properly.
-    std::ostringstream data;
-    toString(data, !post);
+    const as_value& str = owner().callMethod(NSV::PROP_TO_STRING);
 
     // Only GET and POST are possible here.
     MovieClip::VariablesMethod method = post ? MovieClip::METHOD_POST :
                                                MovieClip::METHOD_GET;
 
-    m.getURL(urlstr, target, data.str(), method);
+    m.getURL(urlstr, target, str.to_string(), method);
 
 }
 
@@ -149,20 +148,18 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         // Convert the object to a string to send. XML should
         // not be URL encoded for the POST method, LoadVars
         // is always URL encoded.
-        std::ostringstream data;
-        toString(data, false);
+        const as_value& strval = owner().callMethod(NSV::PROP_TO_STRING);
 
         /// It doesn't matter if there are no request headers.
-        str = ri.streamProvider().getStream(url, data.str(), headers);
+        str = ri.streamProvider().getStream(url, strval.to_string(), headers);
     }
 	else
     {
         // Convert the object to a string to send. XML should
         // not be URL encoded for the GET method.
-        std::ostringstream data;
-        toString(data, true);
+        const as_value& strval = owner().callMethod(NSV::PROP_TO_STRING);
 
-        const std::string& dataString = data.str();
+        const std::string& dataString = strval.to_string();
 
         // Any data must be added to the existing querystring.
         if (!dataString.empty()) {
@@ -170,7 +167,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
             std::string existingQS = url.querystring();
             if (!existingQS.empty()) existingQS += "&";
 
-            url.set_querystring(existingQS + data.str());
+            url.set_querystring(existingQS + dataString);
         }
 
         log_debug("Using GET method for sendAndLoad: %s", url.str());
@@ -178,7 +175,9 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     }
 
 	log_security(_("Loading from url: '%s'"), url.str());
-    target.queueLoad(str);
+	
+    LoadableObject* targetObject = ensureNativeType<LoadableObject>(&target);
+    targetObject->queueLoad(str);
 	
 }
 
@@ -204,8 +203,6 @@ void
 LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 {
 
-    // We don't need to check before adding a timer, but
-    // this may optimize slightly (it was already in the code).
     if (_loadThreads.empty()) {
         getRoot(owner()).addAdvanceCallback(this);
     }
@@ -510,7 +507,8 @@ loadableobject_sendAndLoad(const fn_call& fn)
 		return as_value(false);
 	}
 
-
+    // TODO: if this isn't an XML or LoadVars, it won't work, but we should
+    // check how far things get before it fails.
 	boost::intrusive_ptr<as_object> target =
         fn.arg(1).to_object(*getGlobal(fn));
 

@@ -101,13 +101,6 @@ public:
 
 protected:
 
-    /// Convert the Loadable Object to a string.
-    //
-    /// @param o        The ostream to write the string to.
-    /// @param encode   Whether URL encoding is necessary. How this
-    ///                 is done depends on the type of object.
-    virtual void toString(std::ostream& /*o*/, bool /*encode*/) const {}
-
     typedef std::list<LoadThread*> LoadThreadList;
 
     /// Queue of load requests

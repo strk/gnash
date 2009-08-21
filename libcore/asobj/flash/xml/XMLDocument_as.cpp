@@ -53,7 +53,6 @@ namespace {
     as_object* getXMLInterface();
 	void attachXMLInterface(as_object& o);
 	void attachXMLProperties(as_object& o);
-	//left as xml to not break everything else (these exist in AS2&3)
     as_value xml_new(const fn_call& fn);
     as_value xml_createElement(const fn_call& fn);
     as_value xml_createTextNode(const fn_call& fn);
@@ -678,7 +677,14 @@ getXMLInterface()
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL )
     {
-        o = new as_object(XMLNode_as::getXMLNodeInterface());
+        Global_as* gl = VM::get().getGlobal();
+        as_function* ctor = gl->getMember(NSV::CLASS_XMLNODE).to_as_function();
+        if (!ctor) return 0;
+
+        fn_call::Args args;
+        args += 1, "";
+        o = ctor->constructInstance(as_environment(VM::get()), args);
+
         VM::get().addStatic(o.get());
         attachXMLInterface(*o);
     }
@@ -689,7 +695,6 @@ as_value
 xml_new(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLDocument_as> xml_obj;
-  
 
     if ( fn.nargs > 0 )
     {
@@ -726,7 +731,6 @@ xml_new(const fn_call& fn)
 
     return as_value(xml_obj.get());
 }
-
 
 /// Only available as ASnative.
 as_value
