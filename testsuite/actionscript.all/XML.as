@@ -867,12 +867,12 @@ myxml.onLoad = function(success)
 #endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(400);
+		check_totals(406);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(435);
+		check_totals(441);
 # else
-		check_totals(416);
+		check_totals(422);
 # endif
 #endif
 		play();
@@ -1032,5 +1032,14 @@ h = new XML("<tag></tag><!doctype d><?xMl decl?><!dOcType new><?XMl new?>");
 check_equals(h.toString(), "<?xMl decl?><?XMl new?><!dOcType new><tag />");
 check_equals(h.xmlDecl, "<?xMl decl?><?XMl new?>");
 
+h.xmlDecl = 7;
+check_equals(typeof(h.xmlDecl), "string");
+check_equals(h.xmlDecl, "7");
+check_equals(h.toString(), "7<!dOcType new><tag />");
+
+h.docTypeDecl = 98;
+check_equals(typeof(h.docTypeDecl), "string");
+check_equals(h.docTypeDecl, "98");
+check_equals(h.toString(), "798<tag />");
 stop();
 

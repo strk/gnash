@@ -822,7 +822,8 @@ xml_parseXML(const fn_call& fn)
 as_value
 xml_xmlDecl(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLDocument_as> ptr = ensureType<XMLDocument_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLDocument_as> ptr =
+        ensureType<XMLDocument_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -835,7 +836,7 @@ xml_xmlDecl(const fn_call& fn)
     // Setter
 
     const std::string& xml = fn.arg(0).to_string();
-    ptr->setDocTypeDecl(xml);
+    ptr->setXMLDecl(xml);
     
     return as_value();
 
