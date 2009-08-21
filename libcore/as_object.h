@@ -1181,6 +1181,10 @@ getNamespace(const ObjectURI& o)
 //
 /// Objects with this type of proxy can be registered with movie_root, and
 /// recieve a callback on every advance.
+//
+/// This type of Proxy holds a reference to its parent as_object (owner). 
+/// If a reference to this UpdatableProxy is held by another object,
+/// it must be marked reachable so that its owner is not deleted by the GC.
 class UpdatableProxy : public Proxy
 {
 public:
@@ -1226,10 +1230,9 @@ private:
 /// @tparam T the class to which the obj pointer should be cast.
 /// @param obj the pointer to be cast.
 /// @return If the cast succeeds, the pointer cast to the requested type.
-///         Otherwise, NULL.
 template <typename T>
 boost::intrusive_ptr<T>
-ensureType (boost::intrusive_ptr<as_object> obj)
+ensureType(boost::intrusive_ptr<as_object> obj)
 {
     boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
 
@@ -1251,6 +1254,13 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 /// This is used to check the type of certain objects when it can't be
 /// done through ActionScript and properties. Examples include conversion
 /// of Date and String objects.
+//
+/// @tparam T       The expected native type
+/// @param obj      The object whose type should be tested
+/// @param proxy    This points to the native type information if the object
+///                 is of the expected type
+/// @return         If the object is of the expected type, true; otherwise
+///                 false.
 template<typename T>
 bool
 isNativeType(as_object* obj, T*& proxy)
@@ -1260,7 +1270,15 @@ isNativeType(as_object* obj, T*& proxy)
     return proxy;
 }
 
-/// An equivalent to ensureType that works with the proxy object.
+/// Ensure that the object is of a particular native type.
+//
+/// This checks that the object's proxy member is the expected type.
+/// If not, the function throws an exception, which results in an undefined
+/// value being returned from the AS function.
+/// @tparam T   The expected native type.
+/// @param obj  The object whose type should be tested.
+/// @return     If the cast succeeds, the pointer cast to the requested type,
+///             otherwise the function does not return.
 template<typename T>
 T*
 ensureNativeType(as_object* obj)
@@ -1273,8 +1291,8 @@ ensureNativeType(as_object* obj)
         std::string target = typeName(ret);
         std::string source = typeName(obj);
 
-        std::string msg = "builtin method or gettersetter for " +
-            target + " called from " + source + " instance.";
+        std::string msg = "Function for " + target + "object called from "
+            + source + " instance.";
 
         throw ActionTypeError(msg);
     }
