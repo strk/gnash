@@ -45,6 +45,7 @@ public:
 	std::string hostname;
 	short	    port;
 	bool        connected;
+	int         fd;
 	Handler::protocols_supported_e protocol;
 	std::vector<std::string> supported;
     } peer_t;
@@ -66,6 +67,7 @@ public:
     boost::shared_ptr<Handler> findHandler(const std::string &path);
     void removeHandler(const std::string &path);
 
+    std::vector<boost::shared_ptr<peer_t> > & getActive() { return _active_peers; };
 
     void dump();
 
