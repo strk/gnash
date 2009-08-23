@@ -338,14 +338,15 @@ Fileio::unlink(const std::string &filespec)
 void
 Fileio::scandir(const std::string& dir, as_value* result) 
 {
+//    GNASH_REPORT_FUNCTION;
 
 	struct dirent **namelist;
 	
 	int n = ::scandir(dir.c_str(), &namelist, 0, alphasort);
 	
 	if (n<0) {
-		result->set_bool(false);
-		return;
+	    result->set_bool(false);
+	    return;
 	}
 	
 	Array_as* array = new Array_as();	
