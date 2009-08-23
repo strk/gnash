@@ -178,6 +178,10 @@ public:
     // Close the RTMP stream
     int closeStream();
 
+
+    void setFCSubscribe(const std::string &x) { _fcsubscribe = x; };
+    std::string &getFCSubscribe() { return _fcsubscribe; }
+
     // Dump internal data.
     void dump();  
 
@@ -227,6 +231,11 @@ protected:
     ///	    The file descriptor of the incoming data for an
     ///     Invoke message.
     int _in_fd;
+
+    /// \var _fcssubscribe
+    ///    This is a string sometimes sent by the client with what
+    ///    appears to be a unique ID number.
+    std::string		_fcsubscribe;
 
 private:    
     boost::mutex _mutex;

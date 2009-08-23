@@ -1330,8 +1330,11 @@ rtmp_handler(Network::thread_params_t *args)
 			    hand->togglePause();
 			}
 			
+			    body->dump();
 			// This is a server installation specific  method.
 			if (body->getMethodName() == "FCSubscribe") {
+			    hand->setFCSubscribe(body->at(0)->to_string());
+
 			}
 			break;
 			}
