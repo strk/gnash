@@ -75,10 +75,11 @@ Handler::~Handler()
 }
 
 bool
-Handler::sync(int in_fd)
+Handler::sync(int /* in_fd */)
 {
 //    GNASH_REPORT_FUNCTION;
 
+    return false;
 }
 
 size_t
@@ -101,26 +102,24 @@ Handler::removeClient(int x)
 }
 
 void 
-Handler::setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &init)
+Handler::setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &/* init */)
 {
 //    GNASH_REPORT_FUNCTION;
 //     _plugin.reset(init.get());
 }
 
 void
-Handler::setPlugin(Handler::cygnal_io_t read_ptr, Handler::cygnal_io_t write_ptr )
+Handler::setPlugin(Handler::cygnal_io_t /* read_ptr */, Handler::cygnal_io_t /* write_ptr */)
 {
 //    GNASH_REPORT_FUNCTION;
 
     _plugin.reset(new Handler::cygnal_init_t);
-//     _plugin->read_func = reinterpret_cast<void *>(read_ptr);
-//     _plugin->write_func = write_ptr;    
 }
 
 boost::shared_ptr<Handler::cygnal_init_t>
 Handler::initModule(const std::string& module)
 {
-//     GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     SharedLib *sl;
     std::string symbol(module);
@@ -268,7 +267,7 @@ Handler::playStream()
 }
 
 int
-Handler::playStream(const std::string &filespec)
+Handler::playStream(const std::string &/* filespec */)
 {
     GNASH_REPORT_FUNCTION;
     return -1;
@@ -283,7 +282,8 @@ Handler::publishStream()
 }
 
 int
-Handler::publishStream(const std::string &filespec, Handler::pub_stream_e op)
+Handler::publishStream(const std::string &/*filespec */, Handler::pub_stream_e /* op
+									   */)
 {
     GNASH_REPORT_FUNCTION;
     return -1;
@@ -298,7 +298,7 @@ Handler::seekStream()
 }
 
 int
-Handler::seekStream(int offset)
+Handler::seekStream(int /* offset */)
 {
     GNASH_REPORT_FUNCTION;
     return -1;
