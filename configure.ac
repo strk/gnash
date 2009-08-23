@@ -2390,6 +2390,7 @@ cygnal/Makefile
 cygnal/cgi-bin/Makefile
 cygnal/cgi-bin/echo/Makefile
 cygnal/cgi-bin/fitcDemo/Makefile
+cygnal/cgi-bin/oflaDemo/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
 )

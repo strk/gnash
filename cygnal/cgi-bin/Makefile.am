@@ -17,4 +17,4 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = echo fitcDemo # oflademo
+SUBDIRS = echo fitcDemo oflaDemo
