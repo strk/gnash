@@ -316,27 +316,22 @@ Cygnal::probePeers(peer_t &peer)
     stringstream uri;
 
     uri << peer.hostname;
-//     uri << ":";
-//     uri << peer.port;
     
     vector<string>::iterator it;
-//     for (it = peer.cgis.begin(); it <= peer.cgis.end(); ++it)
- {
-	log_network("Constructed: %s", uri.str());
+    for (it = peer.supported.begin(); it <= peer.supported.end(); ++it) {
+	string tmp = uri.str();
+//	tmp += (*it);
+// 	log_network("Constructed: %s/%s", uri.str(), *it);
 	
 	URL url(uri.str());
-	if (!net.connectToServer(uri.str())) {
+	if (!(peer.fd = net.connectToServer(uri.str()))) {
 	    log_network("Couldn't connect to %s", uri.str());
 	    peer.connected = false;
 	} else {
-	    peer.connected = false;
+	    peer.connected = true;
+// 	    peer.fd = net.getFileFd();
 	}
-// 	string newuri = uri.str();
-// 	newuri += "/" *it+;
-//     }
-//     uri << peer.supported[0];
     }
-
 }
 
 void
@@ -350,7 +345,9 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
 	boost::shared_ptr<Cygnal::peer_t> peer = *it;
 	probePeers(*peer);
 	if (peer->connected) {
-	    log_network("We are happy!");
+	    log_network("%s is active on fd #%d.", peer->hostname,
+			peer->fd);
+ 	    _active_peers.push_back(*it);
 	}
     }
 }
@@ -761,7 +758,7 @@ connection_handler(Network::thread_params_t *args)
 #endif	
     size_t nfds = crcfile.getFDThread();
     
-    log_debug("This system is configured for %d file descriptors to be watched by each thread.", nfds);
+//     log_debug("This system is configured for %d file descriptors to be watched by each thread.", nfds);
     
     // Get the next thread ID to hand off handling this file
     // descriptor to. If the limit for threads per cpu hasn't been
@@ -774,9 +771,6 @@ connection_handler(Network::thread_params_t *args)
     } else {
 	spawn_limit = ncpus * nfds;
     }
-    log_debug("Spawn limit is: %d", spawn_limit);
-
-//    Handler *hand = new Handler;
 
     args->handler = &net;
     boost::thread handler;
@@ -856,6 +850,12 @@ connection_handler(Network::thread_params_t *args)
 		    log_network("Creating new Handler for: %s for fd %#d",
 				key, args->netfd);
 		    hand.reset(new Handler);
+		    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
+		    std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
+		    for (it = active.begin(); it < active.end(); ++it) {
+			Cygnal::peer_t *peer = (*it).get();
+			hand->addRemote(peer->fd);
+		    }
 		} else {
 		    log_network("Using existing Handler for: %s for fd %#d",
 				key, args->netfd);
@@ -864,20 +864,26 @@ connection_handler(Network::thread_params_t *args)
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
 
+		string cgiroot;
+		char *env = std::getenv("CYGNAL_PLUGINS");
+		if (!env) {
+		    cgiroot = env;
+		}
+		if (crcfile.getCgiRoot().size() > 0) {
+		    cgiroot += ":" + crcfile.getCgiRoot();
+		    log_debug (_("Cygnal Plugin paths are: %s"), cgiroot);
+		} else {
+		    cgiroot = "/usr/local/lib/cygnal:/usr/lib/cygnal";
+		}
+		hand->scanDir(cgiroot);
 		string str(url.path());
 		if (str[0] == '/') {
 		    str.erase(0,1);
 		}
-		char *env = std::getenv("CYGNAL_PLUGINS");
-		if (!env) {
-		    hand->scanDir("/usr/lib/cygnal:/usr/local/lib/cygnal");
-		}
-		else {
-		    hand->scanDir(env);
-		}
 		boost::shared_ptr<Handler::cygnal_init_t> init = 
 		    hand->initModule(str);
 		
+		// this is where the real work gets done.
 		event_handler(args);
 
 		// We're done, close this network connection
@@ -922,12 +928,11 @@ connection_handler(Network::thread_params_t *args)
 		string str(url.path());
 		if (str[0] == '/') {
 		    str.erase(0,1);
-		}
+		}\
 		char *env = std::getenv("CYGNAL_PLUGINS");
 		if (!env) {
-		    hand->scanDir("/usr/lib/cygnal:/usr/local/lib/cygnal");
-		}
-		else {
+		    hand->scanDir("/usr/local/lib/cygnal:/usr/lib/cygnal");
+		} else {
 		    hand->scanDir(env);
 		}
 		boost::shared_ptr<Handler::cygnal_init_t> init = 
