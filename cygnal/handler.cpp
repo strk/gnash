@@ -131,7 +131,7 @@ Handler::initModule(const std::string& module)
 
     // Update the list of loaded plugins so we only load them once.
     if (_plugins[module] == 0) {
-        sl = new SharedLib(module);
+        sl = new SharedLib(module, "CYGNAL_PLUGINS");
         sl->openLib();
         _plugins[module] = sl;
     } else {

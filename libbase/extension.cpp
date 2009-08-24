@@ -142,6 +142,7 @@ Extension::scanAndLoad(as_object& where)
 bool
 Extension::initModule(const std::string& module, as_object &where)
 {
+    GNASH_REPORT_FUNCTION;
 
     SharedLib *sl;
     std::string symbol(module);
@@ -149,7 +150,7 @@ Extension::initModule(const std::string& module, as_object &where)
     log_security(_("Initializing module: \"%s\" from %"), symbol, _pluginsdir);
     
     if (_plugins[module] == 0) {
-        sl = new SharedLib(module);
+        sl = new SharedLib(module, "GNASH_PLUGINS");
         sl->openLib();
         _plugins[module] = sl;
     } else {
@@ -173,6 +174,8 @@ bool
 Extension::initModuleWithFunc(const std::string& module, const std::string& func,
     as_object &obj)
 {
+    GNASH_REPORT_FUNCTION;
+
     SharedLib *sl;
 
     log_security(_("Initializing module: \"%s\""), module);
@@ -207,7 +210,7 @@ Extension::scanDir()
 bool
 Extension::scanDir(const std::string& dirlist)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     Tok t(dirlist, Sep(":"));
     for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {

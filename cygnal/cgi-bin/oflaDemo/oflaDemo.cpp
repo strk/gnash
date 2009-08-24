@@ -262,6 +262,7 @@ demoService::getListOfAvailableFiles(const std::string &path,
 
     _path = path;		// store for later
 
+    // If we don't have any files yet, look for some.
     if (_media.size() == 0) {
 	    log_debug(_("Scanning directory \"%s\" for %s files"), path, type);
 	    DIR *libdir = opendir(path.c_str());
@@ -280,17 +281,16 @@ demoService::getListOfAvailableFiles(const std::string &path,
 		// We don't want to see hidden files either.
 		if (name.at(0) == '.') {
 		    continue;
-		}            
-                
+		}
 		const std::string::size_type pos = name.find_last_of('.');
-		
 		if (pos == std::string::npos) {
 		    continue;
 		}
 		
 		const std::string suffix = name.substr(pos);
 		name.erase(pos);
-		
+
+		// We only wat this type of file.
 		if (suffix == type) {
 		    log_debug(_("Gnash media file name: %s"), name);
 		    _media.push_back(name);
@@ -323,6 +323,9 @@ vector<boost::shared_ptr<amf::Element > >
 OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
+
+    demoService demo;
+    demo.getListOfAvailableFiles("foo"); // FIXME: put a real path here
 
     AMF amf;
     vector<boost::shared_ptr<amf::Element > > headers;

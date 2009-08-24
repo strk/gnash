@@ -50,6 +50,7 @@ public:
 
     /// return the list of FLV files we've found
     std::vector<std::string> &getListOfAvailableFiles(const std::string &path);
+
     /// return the list of FLV files we've found of the specified type
     std::vector<std::string> &getListOfAvailableFiles(const std::string &path,
 						     const std::string &type);

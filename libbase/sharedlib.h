@@ -55,6 +55,7 @@ public:
     
     SharedLib();
     SharedLib(const std::string& filespec);
+    SharedLib(const std::string& filespec, const std::string& envvar);
     ~SharedLib();
 
     bool openLib();

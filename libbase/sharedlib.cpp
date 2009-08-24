@@ -73,6 +73,11 @@ SharedLib::SharedLib()
 
 SharedLib::SharedLib(const std::string& filespec)
 {
+    GNASH_REPORT_FUNCTION;
+}
+
+SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
+{
 //    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
@@ -90,7 +95,7 @@ SharedLib::SharedLib(const std::string& filespec)
     }
     std::string pluginsdir = PLUGINSDIR;
     
-    char *env = std::getenv ("GNASH_PLUGINS");
+    char *env = std::getenv (envvar.c_str());
     if (env) pluginsdir = env;
    
 
@@ -159,7 +164,7 @@ SharedLib::openLib (const std::string& filespec)
 SharedLib::initentry *
 SharedLib::getInitEntry (const std::string& symbol)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
     scoped_lock lock(_libMutex);
