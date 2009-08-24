@@ -26,6 +26,8 @@
 #include <cstdio>
 #include <map>
 
+#include "dsodefs.h" //DSOEXPORT
+
 #include "asobj/flash/media/Camera_as.h"
 
 namespace gnash {
@@ -35,7 +37,7 @@ class VideoInput {
 
 public:
 
-    VideoInput();
+    DSOEXPORT VideoInput();
 
     // virtual classes need a virtual destructor !
     virtual ~VideoInput() {}

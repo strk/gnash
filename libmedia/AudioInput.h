@@ -22,6 +22,7 @@
 #include <boost/cstdint.hpp> // for C99 int types
 #include <string>
 #include <vector>
+#include "dsodefs.h" //DSOEXPORT
 
 namespace gnash {
 namespace media {
@@ -34,7 +35,7 @@ class AudioInput {
 	
 public:
 
-	AudioInput();
+	DSOEXPORT AudioInput();
 
 	// virtual classes need a virtual destructor !
 	virtual ~AudioInput() {}
