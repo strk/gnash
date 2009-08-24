@@ -37,7 +37,7 @@
 namespace gnash
 {
 
-class RTMPClient : public RTMP
+class DSOEXPORT RTMPClient : public RTMP
 {
 public:
     DSOEXPORT RTMPClient();
