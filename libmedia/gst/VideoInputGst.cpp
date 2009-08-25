@@ -114,7 +114,7 @@ namespace gst {
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
             if (g_strcmp0(dev_name, "null") == 0) {
-                log_trace("No v4l video sources. Checking for other vid inputs");
+                log_debug("No v4l video sources. Checking for other vid inputs");
             }
             else { 
                 _vidVect.push_back(new GnashWebcam);
@@ -151,7 +151,7 @@ namespace gst {
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
             if (g_strcmp0(dev_name, "null") == 0) {
-                log_trace("no v4l2 video sources found.");
+                log_debug("no v4l2 video sources found.");
             }
             else { 
                 _vidVect.push_back(new GnashWebcam);
@@ -247,7 +247,7 @@ namespace gst {
                 gst_value_get_fraction_numerator (fraction_range_max);
             denominator_max = 
                 gst_value_get_fraction_denominator (fraction_range_max);
-            log_trace ("FractionRange: %d/%d - %d/%d",
+            log_debug ("FractionRange: %d/%d - %d/%d",
                 numerator_min, denominator_min, numerator_max, denominator_max);
 
             video_format->numFramerates =
@@ -319,12 +319,12 @@ namespace gst {
         int dev_select;
         dev_select = rcfile.getWebcamDevice();
         if (dev_select == -1) {
-            log_trace("%s: No webcam selected in rc file, setting to videotestsource",
+            log_debug("%s: No webcam selected in rc file, setting to videotestsource",
                 __FUNCTION__);
             rcfile.setWebcamDevice(0);
             dev_select = rcfile.getWebcamDevice();
         } else {
-            log_trace("Camera %d specified in gnashrc file, using that one.",
+            log_debug("Camera %d specified in gnashrc file, using that one.",
                 dev_select);
         }
         //make sure that the device selected is actually valid
@@ -548,7 +548,7 @@ namespace gst {
         gchar *command = NULL;
         
         if(webcam->_webcamDevice == NULL) {
-            log_trace("%s: You don't have any webcams chosen, using videotestsrc",
+            log_debug("%s: You don't have any webcams chosen, using videotestsrc",
                 __FUNCTION__);
             webcam->_webcamSourceBin = gst_parse_bin_from_description (
                 "videotestsrc name=video_source ! capsfilter name=capsfilter",
@@ -694,7 +694,7 @@ namespace gst {
         webcam->_webcamSourceBin = NULL;
         
         if(webcam->_webcamDevice == NULL) {
-            log_trace("%s: You don't have any webcams chosen, using videotestsrc",
+            log_debug("%s: You don't have any webcams chosen, using videotestsrc",
                 __FUNCTION__);
             webcam->_webcamSourceBin = gst_parse_bin_from_description (
                 "videotestsrc name=video_source ! capsfilter name=capsfilter",
@@ -1185,7 +1185,7 @@ namespace gst {
       switch (GST_MESSAGE_TYPE (msg)) {
 
         case GST_MESSAGE_EOS:
-            log_trace ("End of stream");
+            log_debug ("End of stream");
             break;
         
         case GST_MESSAGE_ERROR: {
