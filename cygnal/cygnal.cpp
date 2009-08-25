@@ -113,6 +113,10 @@ void event_handler(Network::thread_params_t *args);
 void dispatch_handler(Network::thread_params_t *args);
 void admin_handler(Network::thread_params_t *args);
 
+// This is the global object for Cygnl
+// The debug log used by all the gnash libraries.
+static Cygnal& cyg = Cygnal::getDefaultInstance();
+
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
 
@@ -387,10 +391,6 @@ Cygnal::dump()
 	     << ":" << (*it)->port << endl;
     }
 }
-
-// This is the global object for Cygnl
-// The debug log used by all the gnash libraries.
-static Cygnal& cyg = Cygnal::getDefaultInstance();
 
 int
 main(int argc, char *argv[])
@@ -840,7 +840,7 @@ connection_handler(Network::thread_params_t *args)
 		    rtmp.processClientHandShake(args->netfd);
 		if (!tcurl) {
 // 		    log_error("Couldn't read the tcUrl variable!");
-		    net.closeNet(args->netfd);
+		    rtmp.closeNet(args->netfd);
 		    return;
 		}
 		URL url(tcurl->to_string());
@@ -850,6 +850,7 @@ connection_handler(Network::thread_params_t *args)
 		    log_network("Creating new Handler for: %s for fd %#d",
 				key, args->netfd);
 		    hand.reset(new Handler);
+		    hand->setNetConnection(rtmp.getNetConnection());
 		    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
 		    std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
 		    for (it = active.begin(); it < active.end(); ++it) {
@@ -928,7 +929,7 @@ connection_handler(Network::thread_params_t *args)
 		string str(url.path());
 		if (str[0] == '/') {
 		    str.erase(0,1);
-		}\
+		}
 		char *env = std::getenv("CYGNAL_PLUGINS");
 		if (!env) {
 		    hand->scanDir("/usr/local/lib/cygnal:/usr/lib/cygnal");
@@ -937,8 +938,12 @@ connection_handler(Network::thread_params_t *args)
 		}
 		boost::shared_ptr<Handler::cygnal_init_t> init = 
 		    hand->initModule(str);
-		
-		event_handler(args);
+
+		if (init) {
+		    event_handler(args);
+		} else {
+		    log_error("Couldn't load plugin for %s", key); 
+		}
 
 		// We're done, close this network connection
 		rtmp.closeNet(args->netfd);

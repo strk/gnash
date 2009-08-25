@@ -79,7 +79,6 @@ private:
     std::vector<boost::shared_ptr<peer_t> > _peers;
     std::vector<boost::shared_ptr<peer_t> > _active_peers;
     std::map<std::string, boost::shared_ptr<Handler> > _handlers;
-
     boost::mutex _mutex;
 };
 
@@ -94,9 +93,6 @@ public:
     void increment() { boost::mutex::scoped_lock lk(_tid_mutex); ++_tids; };
     void decrement() { boost::mutex::scoped_lock lk(_tid_mutex); --_tids; };
     int num_of_tids() { return _tids; };
-
-    bool getPeers();
-
 private:
     boost::mutex  _tid_mutex;
     int           _tids;
