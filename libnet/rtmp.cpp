@@ -897,7 +897,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 
     // First send the full header, afterwards we only use continuation
     // headers, which are only one byte.
-    gnashSleep(100000);
+//    gnashSleep(100000);  FIXME: why is this here ?
     ret = writeNet(fd, head->reference(), head->size());
     if (ret == -1) {
 	log_error("Couldn't write the RTMP header!");
