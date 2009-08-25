@@ -85,6 +85,9 @@ public:
 			size_t size);
     size_t sendToClient(std::vector<int> &fds,amf::Buffer &data);
 
+    void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
+    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
     void dump();
 
 private:
@@ -112,6 +115,12 @@ private:
     std::map<boost::uint16_t, amf::Element> _references;
     std::vector<double>	_clientids;
     double		_streamid;
+    /// \var _netconnect
+    ///    This store the data from the NetConnection ActionScript
+    ///    object we get as the final part of the handshake process
+    ///    that is used to set up the connection. This has all the
+    ///    file paths and other information needed by the server.
+    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
 };
 
 // This is the thread for all incoming RTMP connections

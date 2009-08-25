@@ -189,8 +189,8 @@ RTMPServer::processClientHandShake(int fd)
     }
 
     // extract the body of the message from the packet
-    boost::shared_ptr<RTMPMsg> body = RTMP::decodeMsgBody(newptr->begin(), qhead->bodysize);
-    if (!body) {
+    _netconnect = RTMP::decodeMsgBody(newptr->begin(), qhead->bodysize);
+    if (!_netconnect) {
 	log_error("failed to read the body of the handshake data from the client.");
 	return tcurl;		// nc is empty
     } else {
@@ -198,17 +198,17 @@ RTMPServer::processClientHandShake(int fd)
     }
 
     // make sure this is actually a NetConnection packet.
-    if (body->getMethodName() != "connect") {
+    if (_netconnect->getMethodName() != "connect") {
 	log_error("Didn't receive NetConnection object in handshake!");
 	return tcurl;		// nc is empty
     } else {
 	log_network("Got NetConnection ::connect() INVOKE.");
-	body->dump();
+	_netconnect->dump();	// FIXME: debug crap
     }
     
     // Get the data for the two field we want.
-    tcurl  = body->findProperty("tcUrl");
-    swfurl  = body->findProperty("swfUrl");
+    tcurl  = _netconnect->findProperty("tcUrl");
+    swfurl  = _netconnect->findProperty("swfUrl");
     
     // Send a ping to the client to reset the new NetConnection,
     boost::shared_ptr<amf::Buffer> ping_reset =
@@ -1018,7 +1018,7 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
     
     size_t filesize = filestream->getFileSize();
     size_t bytes_read = 0;
-    int ret;
+    int ret = 0;
     size_t page = 0;
     if (filesize) {
 #ifdef USE_STATS_CACHE
@@ -1084,10 +1084,14 @@ RTMPServer::sendToClient(std::vector<int> &fds, boost::uint8_t *data,
 		      size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
+    size_t ret = 0;
+    
     std::vector<int>::iterator it;
     for (it=fds.begin(); it< fds.end(); it++) {
-	writeNet(data, size);
+	ret = writeNet(data, size);
     }
+    
+    return ret;
 }
 
 // This is the thread for all incoming RTMP connections
