@@ -140,8 +140,21 @@ Handler::initModule(const std::string& module)
 
     _plugin.reset(new Handler::cygnal_init_t);
 
+    symbol = module;
+    symbol.append("_init_func");
+    Handler::cygnal_io_init_t init_symptr = reinterpret_cast<Handler::cygnal_io_init_t>
+	(sl->getInitEntry(symbol));
+    if (!init_symptr) {
+	log_network(_("No %s symbol in plugin"), symbol);
+    } else {
+	boost::shared_ptr<cygnal_init_t> info = init_symptr(_netconnect);
+	log_network("Initialized Plugin: \"%s\": %s", info->version,
+		    info->description);
+    }
+    
     // Look for the "module"_read_init function we'll use to get data
     // from the cgi-bin as a dynamically loadable plugin.
+    symbol = module;
     symbol.append("_read_func");
     
     Handler::cygnal_io_t read_symptr = reinterpret_cast<Handler::cygnal_io_t>
@@ -170,10 +183,6 @@ Handler::initModule(const std::string& module)
 
      _plugin->write_func = write_symptr;
 
-//      boost::uint8_t foo[10];	// FIXME: testing crap
-//      read_symptr(foo, 10);
-//      write_symptr(foo, 10);
-    
     return _plugin;
 }
 

@@ -25,6 +25,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 //#include <boost/thread/condition.hpp>
 
 #include <vector>
@@ -52,6 +53,10 @@
 #include "sharedlib.h"
 #include "extension.h"
 
+#include "rtmp.h"
+#include "rtmp_msg.h"
+#include "rtmp_server.h"
+
 // _definst_ is the default instance name
 namespace cygnal
 {
@@ -71,7 +76,8 @@ public:
 	INTERVAL,
 	QUIT,
     } admin_cmd_e;
-    
+
+    /// This enum contains the list of all supported protocols.
     typedef enum {
 	NONE,
 	HTTP,
@@ -82,18 +88,28 @@ public:
 	RTMPS,
 	DTN
     } protocols_supported_e;
+    /// This enum contains the possible values for streaming video
+    /// types.
     typedef enum {
 	RECORD,
 	LIVE,
 	APPEND
     } pub_stream_e;
-    typedef size_t (*cygnal_io_t )(boost::uint8_t *data, size_t size);
+    /// This typedef is only used for the io function that must be
+    /// supported by the plugin.
+    typedef size_t (*cygnal_io_t)(boost::uint8_t *data, size_t size);
     typedef struct {
+	const char *version;
+	const char *description;
   	cygnal_io_t read_func;
   	cygnal_io_t write_func;
 	protocols_supported_e protocol;
     } cygnal_init_t;
-     DSOEXPORT Handler();
+    /// This typedef is only used for the init function optionally
+    /// supported by the plugin.
+    typedef boost::shared_ptr<cygnal_init_t>(*cygnal_io_init_t)(boost::shared_ptr<gnash::RTMPMsg> &msg);
+
+    DSOEXPORT Handler();
     ~Handler();
 
     /// \var sync
@@ -178,13 +194,16 @@ public:
     // Close the RTMP stream
     int closeStream();
 
-
     void setFCSubscribe(const std::string &x) { _fcsubscribe = x; };
     std::string &getFCSubscribe() { return _fcsubscribe; }
 
+    void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
+    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
+    
     // Dump internal data.
-    void dump();  
-
+    void dump();
+    
 protected:
     /// \var _streams
     ///    This is a counter of how many streams have been allocated
@@ -237,6 +256,12 @@ protected:
     ///    appears to be a unique ID number.
     std::string		_fcsubscribe;
 
+    /// \var _netconnect
+    ///    This store the data from the NetConnection ActionScript
+    ///    object we get as the final part of the handshake process
+    ///    that is used to set up the connection. This has all the
+    ///    file paths and other information needed by the server.
+    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
 private:    
     boost::mutex _mutex;
     
