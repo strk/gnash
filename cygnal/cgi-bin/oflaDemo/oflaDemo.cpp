@@ -37,6 +37,7 @@
 #include "oflaDemo.h"
 #include "cygnal.h"
 #include "handler.h"
+#include "rtmp_server.h"
 
 #if defined(WIN32) || defined(_WIN32)
 int        lt_dlsetsearchpath   (const char *search_path);
@@ -81,16 +82,19 @@ static OflaDemoTest oflaDemo;
 	
 extern "C" {
     
+    // the standard API
     boost::shared_ptr<Handler::cygnal_init_t>
-    oflaDemo_class_init()
+    oflaDemo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
     {
 	GNASH_REPORT_FUNCTION;
-        // the standard API
         
         boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
-//     init.read_func = read_func;
-//     init.write_func = write_func;
-        
+        if (msg) {
+            oflaDemo.setNetConnection(msg);
+        }
+
+        init->version = "OflaDemo 0.1 (Gnash)";
+        init->description = "Streaming Video test for Cygnal.";
         return init;
     }
 
@@ -100,7 +104,9 @@ extern "C" {
 	
 	size_t safe = 0;
 	boost::shared_ptr<amf::Buffer> buf = oflaDemo.getResponse();
-
+        if (!buf) {
+            return -1;
+        }
 	if (size < buf->allocated()) {
 	    safe = buf->allocated();
 	} else {
@@ -123,6 +129,25 @@ extern "C" {
 
         vector<boost::shared_ptr<amf::Element> > request =
 	    oflaDemo.parseOflaDemoRequest(data, size);
+        if (request.size() == 0) {
+            // Send the packet to notify the client that the
+            // NetConnection::connect() was sucessful. After the client
+            // receives this, the handhsake is completed.
+            boost::shared_ptr<amf::Buffer> error =
+                oflaDemo.encodeResult(RTMPMsg::NC_CALL_FAILED);
+            // This builds the full header,which is required as the first part
+            // of the packet.
+            boost::shared_ptr<amf::Buffer> head = oflaDemo.encodeHeader(0x3,
+                                          RTMP::HEADER_12, error->allocated(),
+                                          RTMP::INVOKE, RTMPMsg::FROM_SERVER);
+            boost::scoped_ptr<amf::Buffer> response(new amf::Buffer(
+                                   error->allocated() + head->allocated()));
+            *response = head;
+            *response += error;
+            log_error("Couldn't send response to client!");
+            
+            return - 1;
+        }
         if (request[3]) {
             buf = oflaDemo.formatOflaDemoResponse(request[1]->to_number(), *request[3]);
             oflaDemo.setResponse(buf);
@@ -325,6 +350,9 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 //    GNASH_REPORT_FUNCTION;
 
     demoService demo;
+
+    boost::shared_ptr<gnash::RTMPMsg> getNetConnection();
+    
     demo.getListOfAvailableFiles("foo"); // FIXME: put a real path here
 
     AMF amf;
@@ -332,26 +360,6 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 
     // The first element is the name of the test, 'oflaDemo'
     boost::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);
-    ptr += amf.totalsize();
-    headers.push_back(el1);
-
-    // The second element is the number of the test,
-    boost::shared_ptr<amf::Element> el2 = amf.extractAMF(ptr, ptr+size);
-    ptr += amf.totalsize();
-    headers.push_back(el2);
-
-    // This one has always been a NULL object from my tests
-    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(ptr, ptr+size);
-    ptr += amf.totalsize();
-    headers.push_back(el3);
-
-    // This one has always been an NULL or Undefined object from my tests
-    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(ptr, ptr+size);
-    if (!el4) {
-	log_error("Couldn't reliably extract the oflaDemo data!");
-    }
-    ptr += amf.totalsize();
-    headers.push_back(el4);
     
     return headers;
 }

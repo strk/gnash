@@ -79,13 +79,17 @@ public:
     boost::shared_ptr<amf::Buffer> getResponse() { return _response; };
     void setResponse(boost::shared_ptr<amf::Buffer> &x) { _response = x; };
 
+    void setHandler(boost::shared_ptr<cygnal::Handler> x) { _hand = x; };
+    
 private:
-    boost::shared_ptr<amf::Buffer> _response;    
+    boost::shared_ptr<amf::Buffer> _response;
+    boost::shared_ptr<cygnal::Handler> _hand;
 }; 
 
+// the standard API
 extern "C" {
-    boost::shared_ptr<Handler::cygnal_init_t> oflaDemo_class_init(); 
-    // the standard API
+    boost::shared_ptr<Handler::cygnal_init_t>oflaDemo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
+    
     size_t oflaDemo_read_func(boost::uint8_t *data, size_t size);
     size_t oflaDemo_write_func(boost::uint8_t *data, size_t size);
 }

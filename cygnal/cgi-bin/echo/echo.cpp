@@ -54,16 +54,19 @@ static EchoTest echo;
 	
 extern "C" {
     
+    // the standard API
     boost::shared_ptr<Handler::cygnal_init_t>
-    echo_class_init()
+    echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
     {
 	GNASH_REPORT_FUNCTION;
-        // the standard API
-        
         boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
-//     init.read_func = read_func;
-//     init.write_func = write_func;
         
+        if (msg) {
+            echo.setNetConnection(msg);
+        }
+        
+        init->version = "Echo 0.1 (Gnash)";
+        init->description = "Echo test for Cygnal.";
         return init;
     }
 

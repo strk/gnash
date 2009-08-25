@@ -36,6 +36,7 @@
 
 // cygnal headers
 #include "rtmp_server.h"
+#include "handler.h"
 
 namespace cygnal
 {
@@ -61,11 +62,13 @@ public:
 
 private:
     boost::shared_ptr<amf::Buffer> _response;    
+    boost::shared_ptr<Handler::cygnal_init_t> _info;
 };  
 
+// the standard API
 extern "C" {
-    boost::shared_ptr<Handler::cygnal_init_t> echo_class_init(); 
-    // the standard API
+    boost::shared_ptr<Handler::cygnal_init_t>echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
+    
     size_t echo_read_func(boost::uint8_t *data, size_t size);
     size_t echo_write_func(boost::uint8_t *data, size_t size);
 }
