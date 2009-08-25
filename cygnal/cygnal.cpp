@@ -918,6 +918,7 @@ connection_handler(Network::thread_params_t *args)
 		    log_network("Creating new Handler for: %s for fd %#d",
 				key, args->netfd);
 		    hand.reset(new Handler);
+		    hand->setNetConnection(rtmp.getNetConnection());
 		} else {
 		    log_network("Using existing Handler for: %s for fd %#d",
 				key, args->netfd);

@@ -32,8 +32,10 @@
 #include "buffer.h"
 #include "network.h"
 #include "element.h"
+#include "URL.h"
 
 // cygnal headers
+#include "crc.h"
 #include "oflaDemo.h"
 #include "cygnal.h"
 #include "handler.h"
@@ -73,13 +75,16 @@ using namespace cygnal;
 
 static void usage (void);
 
+// The user config for Cygnal is loaded and parsed here:
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
+	
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
 
 static OflaDemoTest oflaDemo;
-	
+
 extern "C" {
     
     // the standard API
@@ -91,10 +96,14 @@ extern "C" {
         boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
         if (msg) {
             oflaDemo.setNetConnection(msg);
+        } else {
+            log_error("No NetConnection message supplied to oflaDemo!");
         }
 
         init->version = "OflaDemo 0.1 (Gnash)";
-        init->description = "Streaming Video test for Cygnal.";
+        init->description = "streaming Video test for Cygnal.\n"
+            "\tThis supplies the server side functionality required for\n"
+            "\tCygnal to handle the Red5 OflaDemo test"; 
         return init;
     }
 
@@ -116,7 +125,11 @@ extern "C" {
 	
 // 	log_network("%s", hexify(data, safe, true));
 
-        return buf->allocated();
+        if (buf) {
+            return buf->allocated();
+        } else {
+            return 0;
+        }
 	    
 //         GNASH_REPORT_RETURN;
     }
@@ -129,6 +142,7 @@ extern "C" {
 
         vector<boost::shared_ptr<amf::Element> > request =
 	    oflaDemo.parseOflaDemoRequest(data, size);
+        
         if (request.size() == 0) {
             // Send the packet to notify the client that the
             // NetConnection::connect() was sucessful. After the client
@@ -148,15 +162,14 @@ extern "C" {
             
             return - 1;
         }
-        if (request[3]) {
-            buf = oflaDemo.formatOflaDemoResponse(request[1]->to_number(), *request[3]);
-            oflaDemo.setResponse(buf);
-	}
 
 // 	log_network("%s", hexify(buf->reference(), buf->allocated(), true));
 
-	return buf->allocated();
-
+        if (buf) {
+            return buf->allocated();
+        } else {
+            return 0;
+        }
 //         GNASH_REPORT_RETURN;
     }
     
@@ -283,7 +296,7 @@ std::vector<std::string> &
 demoService::getListOfAvailableFiles(const std::string &path,
 				    const std::string &type)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     _path = path;		// store for later
 
@@ -347,20 +360,69 @@ OflaDemoTest::~OflaDemoTest()
 vector<boost::shared_ptr<amf::Element > >
 OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     demoService demo;
-
-    boost::shared_ptr<gnash::RTMPMsg> getNetConnection();
-    
-    demo.getListOfAvailableFiles("foo"); // FIXME: put a real path here
-
     AMF amf;
     vector<boost::shared_ptr<amf::Element > > headers;
 
-    // The first element is the name of the test, 'oflaDemo'
     boost::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);
+    if (!el1) {
+        log_error("No AMF data in message!");
+        return headers;
+    }
     
+    string method = el1->to_string();    
+    ptr += amf.totalsize();
+    headers.push_back(el1);
+
+    // The second element is a number
+    boost::shared_ptr<amf::Element> el2 = amf.extractAMF(ptr, ptr+size);
+    if (!el2) {
+        log_error("No AMF data in message!");
+        return headers;
+    }
+    ptr += amf.totalsize();
+    headers.push_back(el2);
+
+    if (method == "demoService.getListOfAvailableFLVs") {
+        // Get the path from the NetConnection object we recieved from the
+        // client at the end of the handshake process.
+        boost::shared_ptr<amf::Element> version;
+        boost::shared_ptr<amf::Element> tcurl;
+        boost::shared_ptr<amf::Element> swfurl;
+        
+        boost::shared_ptr<gnash::RTMPMsg> msg = getNetConnection();
+        if (msg) {
+            version  = msg->findProperty("flashVer");
+            if (version) {
+                log_network("Flash player client version is: %s",
+                            version->to_string());
+            }
+            tcurl  = msg->findProperty("tcUrl");
+            swfurl  = msg->findProperty("swfUrl");
+        } else {
+            log_error("No NetConnection message!");
+            return headers;
+        }
+        if (tcurl) {
+            string docroot;
+            URL url(tcurl->to_string());
+            if (crcfile.getDocumentRoot().size() > 0) {
+                docroot = crcfile.getDocumentRoot();
+                log_debug (_("Document Root for media files is: %s"),
+                           docroot);
+            } else {
+                docroot = "/var/www/html";
+            }
+            std::string key = docroot + "/";
+            key += url.hostname() + url.path();
+            demo.getListOfAvailableFiles(key);
+        }
+    } else {
+        log_error("Unknown oflaDemp method \"%s\" to INVOKE!", el1->getName());
+    }
+
     return headers;
 }
 

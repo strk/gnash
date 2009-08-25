@@ -78,12 +78,20 @@ public:
 
     boost::shared_ptr<amf::Buffer> getResponse() { return _response; };
     void setResponse(boost::shared_ptr<amf::Buffer> &x) { _response = x; };
-
-    void setHandler(boost::shared_ptr<cygnal::Handler> x) { _hand = x; };
     
+    void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
+    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
+
+    /// \var _netconnect
+    ///    This store the data from the NetConnection ActionScript
+    ///    object we get as the final part of the handshake process
+    ///    that is used to set up the connection. This has all the
+    ///    file paths and other information needed by the server.
+    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
 private:
     boost::shared_ptr<amf::Buffer> _response;
-    boost::shared_ptr<cygnal::Handler> _hand;
+    boost::shared_ptr<Handler::cygnal_init_t> _info;
 }; 
 
 // the standard API
