@@ -57,10 +57,13 @@ namespace {
     as_value xml_createElement(const fn_call& fn);
     as_value xml_createTextNode(const fn_call& fn);
     as_value xml_parseXML(const fn_call& fn);
-    as_value xml_ondata(const fn_call& fn);
+    as_value xml_onData(const fn_call& fn);
+    as_value xml_onLoad(const fn_call& fn);
     as_value xml_xmlDecl(const fn_call& fn);
     as_value xml_docTypeDecl(const fn_call& fn);
     as_value xml_escape(const fn_call& fn);
+    as_value xml_loaded(const fn_call& fn);
+    as_value xml_status(const fn_call& fn);
 
     bool textAfterWhitespace(const std::string& xml,
             std::string::const_iterator& it);
@@ -71,7 +74,6 @@ namespace {
             std::string& content);
 	
 	
-    as_value xmldocument_ctor(const fn_call& fn);
     void attachXMLProperties(as_object& o);
 	void attachXMLInterface(as_object& o);
     as_object* getXMLInterface();
@@ -81,7 +83,7 @@ namespace {
 XMLDocument_as::XMLDocument_as() 
     :
     as_object(getXMLInterface()),
-    _loaded(-1), 
+    _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK)
 {
 }
@@ -90,7 +92,7 @@ XMLDocument_as::XMLDocument_as()
 XMLDocument_as::XMLDocument_as(const std::string& xml)
     :
     as_object(getXMLInterface()),
-    _loaded(-1), 
+    _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK)
 {
     parseXML(xml);
@@ -143,56 +145,6 @@ XMLDocument_as::toString(std::ostream& o, bool encode) const
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
 
     XMLNode_as::toString(o, encode);
-}
-
-bool
-XMLDocument_as::get_member(string_table::key name, as_value *val,
-        string_table::key nsname)
-{
-    if (name == NSV::PROP_STATUS) 
-    {
-        val->set_int(_status);
-        return true;
-    }
-    else if (name == NSV::PROP_LOADED)
-    {
-        if ( _loaded < 0 ) val->set_undefined();
-        else val->set_bool(_loaded);
-        return true;
-    }
-
-    return as_object::get_member(name, val, nsname);
-}
-
-bool
-XMLDocument_as::set_member(string_table::key name, const as_value& val, 
-    string_table::key nsname, bool ifFound)
-{
-    if (name == NSV::PROP_STATUS)
-    {
-        // TODO: this should really be a proper property (see XML.as)
-        if ( ! val.is_number() )
-        {
-            _status = static_cast<ParseStatus>(
-                    std::numeric_limits<boost::int32_t>::min());
-        }
-        else
-        {
-            unsigned int statusNumber = static_cast<int>(val.to_number());
-            _status = static_cast<ParseStatus>(statusNumber);
-        }
-        return true;
-    }
-    else if (name == NSV::PROP_LOADED)
-    {
-        // TODO: this should really be a proper property
-        bool b = val.to_bool();
-        if ( b ) _loaded = 1;
-        else _loaded = 0;
-        return true;
-    }
-
-    return as_object::set_member(name, val, nsname, ifFound);
 }
 
 void
@@ -631,6 +583,12 @@ attachXMLProperties(as_object& o)
     const int flags = 0;
     o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
     o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
+
+    as_object* proto = o.get_prototype().get();
+    if (!proto) return;
+    proto->init_property("loaded", xml_loaded, xml_loaded);
+    proto->init_property("status", xml_status, xml_status);
+
 }
 
 
@@ -656,7 +614,8 @@ attachXMLInterface(as_object& o)
     o.init_member("parseXML", vm.getNative(253, 10), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
-    o.init_member("onData", gl->createFunction(xml_ondata), flags);
+    o.init_member("onData", gl->createFunction(xml_onData), flags);
+    o.init_member("onLoad", gl->createFunction(xml_onLoad), flags);
 
 }
 
@@ -723,6 +682,50 @@ xml_new(const fn_call& fn)
     attachXMLProperties(*xml_obj);
 
     return as_value(xml_obj);
+}
+
+/// This is attached to the prototype (an XMLNode) on construction of XML
+//
+/// It has the curious effect of giving the XML object an inherited 'loaded'
+/// property that fails when called on the prototype, because the prototype
+/// is of type XMLNode.
+as_value
+xml_loaded(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLDocument_as> ptr =
+        ensureType<XMLDocument_as>(fn.this_ptr);
+
+    if (!fn.nargs) {
+        XMLDocument_as::LoadStatus ls = ptr->loaded();
+        if (ls == XMLDocument_as::XML_LOADED_UNDEFINED) return as_value();
+        return as_value(static_cast<bool>(ls));
+    }
+    ptr->setLoaded(
+            static_cast<XMLDocument_as::LoadStatus>(fn.arg(0).to_bool()));
+    return as_value();
+}
+
+as_value
+xml_status(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLDocument_as> ptr =
+        ensureType<XMLDocument_as>(fn.this_ptr);
+    
+    if (!fn.nargs) {
+        return as_value(ptr->status());
+    }
+
+    const double status = fn.arg(0).to_number();
+    if (isNaN(status) ||
+            status > std::numeric_limits<boost::int32_t>::max() ||
+            status < std::numeric_limits<boost::int32_t>::min()) {
+
+        ptr->setStatus(static_cast<XMLDocument_as::ParseStatus>(
+                    std::numeric_limits<boost::int32_t>::min()));
+    }
+
+    ptr->setStatus(static_cast<XMLDocument_as::ParseStatus>(status));
+    return as_value();
 }
 
 /// Only available as ASnative.
@@ -856,8 +859,15 @@ xml_docTypeDecl(const fn_call& fn)
 
 }
 
+/// XML.prototype has an empty onLoad function defined.
 as_value
-xml_ondata(const fn_call& fn)
+xml_onLoad(const fn_call& /*fn*/)
+{
+    return as_value();
+}
+
+as_value
+xml_onData(const fn_call& fn)
 {
 
     as_object* thisPtr = fn.this_ptr;
@@ -940,14 +950,6 @@ parseNodeWithTerminator(const std::string& xml,
     it = end + terminator.length();
 
     return true;
-}
-
-as_value
-xmldocument_ctor(const fn_call& /*fn*/)
-{
-    boost::intrusive_ptr<as_object> obj = new XMLDocument_as;
-
-    return as_value(obj.get()); // will keep alive
 }
 
 } // anonymous namespace 

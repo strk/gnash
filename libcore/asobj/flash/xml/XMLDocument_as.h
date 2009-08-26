@@ -62,6 +62,12 @@ public:
             XML_MISSING_OPEN_TAG = -10
     };
 
+    enum LoadStatus {
+        XML_LOADED_UNDEFINED = -1,
+        XML_LOADED_FALSE = false,
+        XML_LOADED_TRUE = true
+    };
+
     XMLDocument_as();
 
     XMLDocument_as(const std::string& xml);
@@ -96,20 +102,6 @@ public:
         _docTypeDecl = docType;
     }
 
-    /// This is overridden to provide the 'status' and 'loaded' members,
-    /// which are NOT proper properties !
-    /// See actionscript.all/XML.as
-    ///
-    bool get_member(string_table::key name, as_value *val,
-		string_table::key nsname = 0);
-
-    /// This is overridden to provide the 'status' and 'loaded' members,
-    /// which are NOT proper properties !
-    /// See actionscript.all/XML.as
-    ///
-    bool set_member(string_table::key name, const as_value& val,
-                string_table::key nsname = 0, bool ifFound=false);
-
     // Methods
 
     /// Parses an XML document into the specified XML object tree.
@@ -134,6 +126,22 @@ public:
     XMLNode_as* createElement(const std::string& name);
 
     XMLNode_as* createTextNode(const std::string& name);
+
+    ParseStatus status() const {
+        return _status;
+    }
+
+    void setStatus(ParseStatus st) {
+        _status = st;
+    }
+
+    LoadStatus loaded() const {
+        return _loaded;
+    }
+
+    void setLoaded(LoadStatus st) {
+        _loaded = st;
+    }
 
 private:
 
@@ -175,7 +183,7 @@ private:
     // -1 if never asked to load anything
     //  0 if asked to load but not yet loaded (or failure)
     //  1 if successfully loaded
-    int _loaded;
+    LoadStatus _loaded;
 
     ParseStatus _status;	
  
