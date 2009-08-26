@@ -47,7 +47,7 @@ check(! XML.prototype.hasOwnProperty("loaded"));
 check(! XML.prototype.hasOwnProperty("attributes"));
 check(! XML.prototype.hasOwnProperty("nodeValue"));
 check(XML.prototype.hasOwnProperty("onData"));
-xcheck(XML.prototype.hasOwnProperty("onLoad")); // it seems it wouldn't do anything anyway, would it ?
+check(XML.prototype.hasOwnProperty("onLoad")); // it seems it wouldn't do anything anyway, would it ?
 check(XML.prototype.hasOwnProperty("createElement") );
 check(XML.prototype.hasOwnProperty("addRequestHeader") );
 check(XML.prototype.hasOwnProperty("createTextNode") );
@@ -123,9 +123,19 @@ check(! tmp.hasOwnProperty("length"));
 
 check_equals(typeof(tmp.status), 'number');
 check(! tmp.hasOwnProperty("status"));
-xcheck(tmp.__proto__.hasOwnProperty('status') );
+check(tmp.__proto__.hasOwnProperty('status') );
 
 tmp = new XML();
+
+// These are added on construction
+check(tmp.__proto__.hasOwnProperty("status"));
+check(tmp.__proto__.hasOwnProperty("loaded"));
+
+// These aren't
+check(!tmp.__proto__.hasOwnProperty("toString"));
+check(!tmp.hasOwnProperty("toString"));
+
+/// Setting status always results in a number.
 check_equals(tmp.status, 0);
 tmp.status = -1;
 check_equals(tmp.status, -1);
@@ -136,11 +146,25 @@ tmp.status = o;
 check_equals(typeof(tmp.status), 'number');
 check_equals(tmp.status, -2147483648.0); // 0xFFFFFFFF
 tmp.status = 7;
+check_equals(tmp.status, 7); 
+
 returnFour = function() { return 4; };
 o.toString = returnFour;
 tmp.status = o;
 check_equals(typeof(tmp.status), 'number');
 check_equals(tmp.status, -2147483648.0); // 0xFFFFFFFF
+
+o.valueOf = function() { return 5; };
+tmp.status = o;
+check_equals(typeof(tmp.status), 'number');
+check_equals(tmp.status, 5); 
+
+tmp.status = 34e+45;
+check_equals(typeof(tmp.status), 'number');
+check_equals(tmp.status, -2147483648.0); // 0xFFFFFFFF
+
+tmp.status = -100000;
+check_equals(tmp.status, -100000);
 
 check_equals(typeof(tmp.loaded), 'undefined');
 check(! tmp.hasOwnProperty("loaded"));
@@ -152,7 +176,11 @@ tmp.loaded = 0;
 check_equals(typeof(tmp.loaded), 'boolean');
 check(!tmp.loaded);
 check(! tmp.hasOwnProperty("loaded"));
+check(tmp.__proto__.hasOwnProperty("loaded"));
 
+tmp.loaded = true;
+check_equals(tmp.loaded, true);
+check_equals(tmp.__proto__.loaded, undefined);
 
 // test the XML constuctor
 if (tmp) {
@@ -867,12 +895,12 @@ myxml.onLoad = function(success)
 #endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(406);
+		check_totals(419);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(441);
+		check_totals(454);
 # else
-		check_totals(422);
+		check_totals(435);
 # endif
 #endif
 		play();

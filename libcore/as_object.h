@@ -268,11 +268,6 @@ public:
     ///
     void dump_members(std::map<std::string, as_value>& to);
 
-    /// Return true if instances of this ActionScript class should use 
-    /// a custom toString method, when available, for converting the object
-    /// to a string.
-    virtual bool useCustomToString() const { return true; }
-
     /// Set a member value
     //
     ///
@@ -676,11 +671,6 @@ public:
     ///
     virtual as_object* get_path_element(string_table::key key);
 
-    /// Chad: Document
-    bool isQName() const { return false; /* TODO: Implement */ }
-    bool isXML() const { return false; /* TODO */ }
-    bool isDictionary() const { return false; /* TODO */ }
-
     /// Get the super object of this object.
     ///
     /// The super should be __proto__ if this is a prototype object
@@ -867,18 +857,8 @@ public:
         return const_cast<as_object*>(this)->toDisplayObject();
     }
 
-    /// Return true if this is a Date object.
-    //
-    /// This is needed for special handling of Date objects
-    /// by the as_value::to_primitive method, also described
-    /// in ECMA-262 "8.6.2.6 [[DefaultValue]] (hint)"
-    /// 
-    ///
-    virtual bool isDateObject() { return false; }
-
     /// Return true if this is a 'super' object
     virtual bool isSuper() const { return false; }
-
 
     /// Add an interface to the list of interfaces.
     /// Used by instanceOf
@@ -1038,10 +1018,30 @@ public:
     ///
     void set_prototype(const as_value& proto, int flags = DefaultFlags);
 
+    /// Set the as_object's Relay object.
+    //
+    /// This is a pointer to a native object that contains special type
+    /// characteristics. Setting the Relay object allows native functions
+    /// to get or set non-ActionScript properties.
+    //
+    /// This function should only be used in native functions such as
+    /// constructors and special creation functions like
+    /// MovieClip.createTextField(). As Relay objects are not available to
+    /// ActionScript, this should never appear in built-in functions.
     void setRelay(Relay* p) {
         _relay.reset(p);
     }
 
+    /// Access the as_object's Relay object.
+    //
+    /// The Relay object is a polymorphic object containing native type
+    /// characteristics. It is rarely useful to use this function directly.
+    /// Instead use the convenience functions ensureNativeType() and
+    /// isNativeType() to access the Relay object.
+    //
+    /// Relay objects are not available to ActionScript, so this object
+    /// should not be used in built-in functions (that is, functions
+    /// implemented in ActionScript).
     Relay* relay() const {
         return _relay.get();
     }
@@ -1114,15 +1114,19 @@ protected:
 
 private:
  
+    /// The polymorphic Relay object for native types.
+    //
+    /// This is owned by the as_object and destroyed when the as_object's
+    /// destructor is called.
     boost::scoped_ptr<Relay> _relay;
 
-    /// The global object whose scope contains this object.
+    /// The VM containing this object.
     VM& _vm;   
 
     /// Properties of this objects 
     PropertyList _members;
 
-    /// Don't allow implicit copy, must think about behaviour
+    /// Don't allow implicit copy.
     as_object& operator=(const as_object&);
 
     /// \brief

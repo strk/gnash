@@ -2248,9 +2248,10 @@ Machine::execute()
                 /// Do: If obj is not XML based, throw TypeError
                 case SWF::ABC_ACTION_CHECKFILTER:
                 {
-                    if (!_stack.top(0).is_object() ||
-                            !_stack.top(0).to_object(*_global)->isXML())
+                    if (!_stack.top(0).is_object()) { 
+                        // TODO: check whether it is an XML object.
                         throw ASTypeError();
+                    }
                     break;
                 }
 
@@ -2965,10 +2966,6 @@ Machine::completeName(asName& name, int offset)
 	if (name.isRuntime())
 	{
 		as_value obj = _stack.top(offset);
-		if (obj.is_object() && obj.to_object(*_global)->isQName()) {
-			name.fill(obj.to_object(*_global).get());
-            ++size;
-        }
 
 		if (name.isRtns()) {
 			++size; // Ignore the Namespace.
