@@ -31,7 +31,20 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
+#if !defined(_MSC_VER)
+# include <unistd.h>
+# include <sys/stat.h>
+# include <sys/types.h>
+# include <dirent.h>
+# include <cerrno>
+#else
+#include <io.h>
+#define dup _dup
+#endif
+
 // Gnash headers
+
+#include "GnashFileUtilities.h"
 #include "amf.h"
 #include "arg_parser.h"
 #include "buffer.h"
@@ -286,65 +299,77 @@ demoService::getListOfAvailableFiles(const std::string &path,
 				    const std::string &type)
 {
     GNASH_REPORT_FUNCTION;
+    struct dirent **namelist;
 
     _path = path;		// store for later
 
     // If we don't have any files yet, look for some.
     if (_stats.size() == 0) {
-	    log_debug(_("Scanning directory \"%s\" for %s files"), path, type);
-	    DIR *libdir = opendir(path.c_str());
-	    
-	    if (!libdir) {
-		log_error(_("Can't open directory %s"), path);
-		return _stats;
-	    }   
-	    
-	    struct dirent *entry;
-	    
-	    while ((entry = readdir(libdir)) != NULL) {
-		// We only want media files that end with the suffix.
-		std::string name(entry->d_name);
-		
-		// We don't want to see hidden files either.
-		if (name.at(0) == '.') {
-		    continue;
-		}
-		const std::string::size_type pos = name.find_last_of('.');
-		if (pos == std::string::npos) {
-		    continue;
-		}
-		
-		const std::string suffix = name.substr(pos);
-
-		// We only want this type of file.
-		if (suffix == type) {
-		    log_debug(_("Gnash media file name: %s"), name);
-                    string filespec = path + "/";
-                    filespec += name;
-                    struct stat st;
-                    if (stat(filespec.c_str(), &st) == 0) {
-                        boost::shared_ptr<demoService::filestats_t> stats(new filestats_t);
-                        stats->name = name;
-                        stringstream ss;
+        struct dirent *entry;
+#ifndef HAVE_SCANDIR
+        log_debug(_("Scanning directory \"%s\" for %s files"), path, type);
+        DIR *libdir = opendir(path.c_str());
+	
+        if (!libdir) {
+            log_error(_("Can't open directory %s"), path);
+            return _stats;
+        }
+        while ((entry = readdir(libdir)) != NULL) {
+#else
+	// The Adobe media server and Red5 sort the directories
+	// alphabetically, so we do too.
+	int ret = scandir(path.c_str(), &namelist, 0, alphasort);
+	for (int i=0; i<ret; ++i) {
+	    entry = namelist[i];
+#endif	
+	    // We only want media files that end with the suffix.
+	    std::string name(entry->d_name);
+            
+	    // We don't want to see hidden files either.
+	    if (name.at(0) == '.') {
+		continue;
+	    }
+	    const std::string::size_type pos = name.find_last_of('.');
+	    if (pos == std::string::npos) {
+		continue;
+	    }
+            
+	    const std::string suffix = name.substr(pos);
+            
+            // We only want this type of file.
+            if (suffix == type) {
+                log_debug(_("Gnash media file name: %s"), name);
+                string filespec = path + "/";
+                filespec += name;
+                struct stat st;
+                if (stat(filespec.c_str(), &st) == 0) {
+                    boost::shared_ptr<demoService::filestats_t> stats(new filestats_t);
+                    stats->name = name;
+                    stringstream ss;
                         ss << st.st_size;
                         stats->size = ss.str();
-                        struct tm *modified = gmtime(&st.st_mtime);
+                        // This originally used gmtime(), but then
+                        // packet sniffing showed the Adobe player
+                        // uses localtime.
+                        struct tm *modified = localtime(&st.st_mtime);
                         // we know the max the date string will be is 24.
                         char modstr[24];
-                        if (strftime(modstr, 24, "%m/%d/%y %H:%M:%S", modified)) {
+                        if (strftime(modstr, 24, "%d/%m/%y %H:%M:%S", modified)) {
                             stats->last = modstr;
                         }
                         _stats.push_back(stats);
-                    }
-		} else {
-		    continue;
-		}
-	    }
-	    
-	    if (closedir(libdir) != 0) {
-		return _stats;
-	    }
-    }
+                }
+            } else {
+                continue;
+            }
+        }
+        
+#ifndef HAVE_SCANDIR
+        if (closedir(libdir) != 0) {
+            return _stats;
+        }
+#endif
+   }
     
     return _stats;
 }
@@ -477,34 +502,18 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
             total_size += encnull->allocated();
 
             boost::shared_ptr<amf::Buffer> result(new amf::Buffer(total_size+amf::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));            
-            // _response.reset(new amf::Buffer(total_size+amf::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));
-
+            _response.reset(new amf::Buffer(total_size+amf::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));
+#if 0
             boost::shared_ptr<amf::Buffer> head = encodeHeader(0x3,
 			    RTMP::HEADER_8, total_size,
 			    RTMP::INVOKE, RTMPMsg::FROM_SERVER);
             *result = head;
-            *result += methodenc;
-            *result += sidenc;
-            *result += encnull;
-            *result += topenc;
-            
-            boost::scoped_ptr<amf::Buffer> newbuf(new amf::Buffer(result->size() + 5));
-            size_t nbytes = 0;
-            size_t chunk = RTMP_VIDEO_PACKET_SIZE;
-            do {
-                // The last packet is smaller
-                if ((result->allocated() - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
-                    chunk = result->allocated() - nbytes;
-                }
-                newbuf->append(result->reference() + nbytes, chunk);
-                nbytes  += chunk;
-                if (chunk == RTMP_VIDEO_PACKET_SIZE) {
-                    boost::uint8_t headone = 0xc3;
-                    *newbuf += headone;
-                }
-            } while (nbytes < result->allocated());
-            _response.reset(new amf::Buffer(total_size + newbuf->allocated()));
-            *_response += *newbuf;
+#endif
+            *_response += methodenc;
+            *_response += sidenc;
+            *_response += encnull;
+            *_response += topenc;
+
 #if 0
             // Followed by all the encoded objects and properties
             vector<boost::shared_ptr<amf::Buffer> >::iterator rit;
@@ -591,3 +600,8 @@ usage (void)
 	 << _("  -p,  --netdebug      port for network") << endl
          << endl;
 }
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
