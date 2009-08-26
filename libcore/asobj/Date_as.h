@@ -36,8 +36,6 @@ public:
 
     std::string toString() const;
 
-    bool isDateObject() { return true; }
-
 private:
 
     double _timeValue;
