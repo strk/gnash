@@ -381,4 +381,12 @@ check_equals(ns.nodeName, "tag");
 check_equals(ns.localName, "tag");
 check_equals(ns.prefix, "");
 
+// xmlDecl and docTypeDecl don't work for XMLNode
+xn = new XMLNode(1, "");
+xn.xmlDecl = "hello";
+xn.docTypeDecl = "dtd";
+check_equals(xn.toString(), "< />");
+
+
+
 check_totals(175);
