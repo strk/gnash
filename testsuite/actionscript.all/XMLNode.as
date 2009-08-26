@@ -389,4 +389,4 @@ check_equals(xn.toString(), "< />");
 
 
 
-check_totals(175);
+check_totals(176);
