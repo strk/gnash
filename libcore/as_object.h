@@ -268,11 +268,6 @@ public:
     ///
     void dump_members(std::map<std::string, as_value>& to);
 
-    /// Return true if instances of this ActionScript class should use 
-    /// a custom toString method, when available, for converting the object
-    /// to a string.
-    virtual bool useCustomToString() const { return true; }
-
     /// Set a member value
     //
     ///
@@ -675,11 +670,6 @@ public:
     ///
     ///
     virtual as_object* get_path_element(string_table::key key);
-
-    /// Chad: Document
-    bool isQName() const { return false; /* TODO: Implement */ }
-    bool isXML() const { return false; /* TODO */ }
-    bool isDictionary() const { return false; /* TODO */ }
 
     /// Get the super object of this object.
     ///
