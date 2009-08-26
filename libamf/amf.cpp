@@ -434,7 +434,7 @@ AMF::encodeECMAArray(const amf::Element &data)
 	buf.reset(new amf::Buffer(5));
     }
     *buf = Element::ECMA_ARRAY_AMF0;
-    length = 1;
+    length = 0;
     swapBytes(&length, sizeof(boost::uint32_t));
     *buf += length;
 
