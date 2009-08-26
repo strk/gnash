@@ -21,10 +21,15 @@
 #endif
 
 #include <string>
+#include <sstream>
 #include <log.h>
 #include <iostream>
 #include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 // Gnash headers
 #include "amf.h"
@@ -107,29 +112,14 @@ extern "C" {
         return init;
     }
 
-    size_t oflaDemo_read_func(boost::uint8_t *data, size_t size)
+    boost::shared_ptr<amf::Buffer> oflaDemo_read_func()
     {
 // 	GNASH_REPORT_FUNCTION;
 	
-	size_t safe = 0;
 	boost::shared_ptr<amf::Buffer> buf = oflaDemo.getResponse();
-        if (!buf) {
-            return -1;
-        }
-	if (size < buf->allocated()) {
-	    safe = buf->allocated();
-	} else {
-	    safe = size;
-	}
-	std::copy(buf->begin(), buf->begin() + safe, data);
-	
 // 	log_network("%s", hexify(data, safe, true));
 
-        if (buf) {
-            return buf->allocated();
-        } else {
-            return 0;
-        }
+        return buf;
 	    
 //         GNASH_REPORT_RETURN;
     }
@@ -284,15 +274,14 @@ demoService::~demoService()
 //    GNASH_REPORT_FUNCTION;
 }
 
-
-std::vector<std::string> &
+std::vector<boost::shared_ptr<demoService::filestats_t> > &
 demoService::getListOfAvailableFiles(const std::string &path)
 {
 //    GNASH_REPORT_FUNCTION;
     return getListOfAvailableFiles(path, ".flv");
 }
 
-std::vector<std::string> &
+std::vector<boost::shared_ptr<demoService::filestats_t> > &
 demoService::getListOfAvailableFiles(const std::string &path,
 				    const std::string &type)
 {
@@ -301,13 +290,13 @@ demoService::getListOfAvailableFiles(const std::string &path,
     _path = path;		// store for later
 
     // If we don't have any files yet, look for some.
-    if (_media.size() == 0) {
+    if (_stats.size() == 0) {
 	    log_debug(_("Scanning directory \"%s\" for %s files"), path, type);
 	    DIR *libdir = opendir(path.c_str());
 	    
 	    if (!libdir) {
 		log_error(_("Can't open directory %s"), path);
-		return _media;
+		return _stats;
 	    }   
 	    
 	    struct dirent *entry;
@@ -326,23 +315,38 @@ demoService::getListOfAvailableFiles(const std::string &path,
 		}
 		
 		const std::string suffix = name.substr(pos);
-		name.erase(pos);
 
-		// We only wat this type of file.
+		// We only want this type of file.
 		if (suffix == type) {
 		    log_debug(_("Gnash media file name: %s"), name);
-		    _media.push_back(name);
+                    string filespec = path + "/";
+                    filespec += name;
+                    struct stat st;
+                    if (stat(filespec.c_str(), &st) == 0) {
+                        boost::shared_ptr<demoService::filestats_t> stats(new filestats_t);
+                        stats->name = name;
+                        stringstream ss;
+                        ss << st.st_size;
+                        stats->size = ss.str();
+                        struct tm *modified = gmtime(&st.st_mtime);
+                        // we know the max the date string will be is 24.
+                        char modstr[24];
+                        if (strftime(modstr, 24, "%m/%d/%y %H:%M:%S", modified)) {
+                            stats->last = modstr;
+                        }
+                        _stats.push_back(stats);
+                    }
 		} else {
 		    continue;
 		}
 	    }
 	    
 	    if (closedir(libdir) != 0) {
-		return _media;
+		return _stats;
 	    }
     }
     
-    return _media;
+    return _stats;
 }
 
 OflaDemoTest::OflaDemoTest()
@@ -418,6 +422,98 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
             std::string key = docroot + "/";
             key += url.hostname() + url.path();
             demo.getListOfAvailableFiles(key);
+            std::vector<boost::shared_ptr<demoService::filestats_t> > &mediafiles = demo.getFileStats(); 
+            // std::vector<demoService::filestats_t> mediafiles = demo.getListOfAvailableFiles(key); 
+            std::vector<boost::shared_ptr<demoService::filestats_t> >::iterator it;
+            // Make the top level object
+            Element toparr;
+            toparr.makeECMAArray();
+            
+            size_t total_size = 0;
+            vector<boost::shared_ptr<amf::Buffer> > buffers;
+            for (it=mediafiles.begin(); it<mediafiles.end(); ++it) {
+                vector<boost::shared_ptr<amf::Element> > data;
+                
+                boost::shared_ptr<demoService::filestats_t> file = *it;
+                boost::shared_ptr<amf::Element> obj(new amf::Element);
+                obj->makeECMAArray();
+                obj->setName(file->name);
+                
+                boost::shared_ptr<amf::Element> modified(new amf::Element);
+                modified->makeString("lastModified", file->last);
+                obj->addProperty(modified);
+
+                boost::shared_ptr<amf::Element> name(new amf::Element);
+                name->makeString("name", file->name);
+                obj->addProperty(name);
+
+                boost::shared_ptr<amf::Element> size(new amf::Element);
+                size->makeString("size", file->size);
+                obj->addProperty(size);
+
+                data.push_back(obj);
+                toparr.addProperty(obj);
+            }
+            
+            boost::shared_ptr<amf::Buffer> topenc = toparr.encode();
+            total_size += topenc->allocated();
+            
+            // Start with the method name for the INVOKE
+            amf::Element method;
+            method.makeString("_result");
+            boost::shared_ptr<amf::Buffer> methodenc  = method.encode();
+            total_size += methodenc->allocated();
+            
+            // Add the stream ID
+            amf::Element sid;
+            sid.makeNumber(2); // FIXME: needs a real value!
+            boost::shared_ptr<amf::Buffer> sidenc  = sid.encode();
+            total_size += sidenc->allocated();
+
+            // There there is always a NULL object to start the data
+            Element null;
+            null.makeNull();
+            boost::shared_ptr<amf::Buffer> encnull  = null.encode();
+            total_size += encnull->allocated();
+
+            boost::shared_ptr<amf::Buffer> result(new amf::Buffer(total_size+amf::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));            
+            // _response.reset(new amf::Buffer(total_size+amf::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));
+
+            boost::shared_ptr<amf::Buffer> head = encodeHeader(0x3,
+			    RTMP::HEADER_8, total_size,
+			    RTMP::INVOKE, RTMPMsg::FROM_SERVER);
+            *result = head;
+            *result += methodenc;
+            *result += sidenc;
+            *result += encnull;
+            *result += topenc;
+            
+            boost::scoped_ptr<amf::Buffer> newbuf(new amf::Buffer(result->size() + 5));
+            size_t nbytes = 0;
+            size_t chunk = RTMP_VIDEO_PACKET_SIZE;
+            do {
+                // The last packet is smaller
+                if ((result->allocated() - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
+                    chunk = result->allocated() - nbytes;
+                }
+                newbuf->append(result->reference() + nbytes, chunk);
+                nbytes  += chunk;
+                if (chunk == RTMP_VIDEO_PACKET_SIZE) {
+                    boost::uint8_t headone = 0xc3;
+                    *newbuf += headone;
+                }
+            } while (nbytes < result->allocated());
+            _response.reset(new amf::Buffer(total_size + newbuf->allocated()));
+            *_response += *newbuf;
+#if 0
+            // Followed by all the encoded objects and properties
+            vector<boost::shared_ptr<amf::Buffer> >::iterator rit;
+            for (rit=buffers.begin(); rit<buffers.end(); ++rit) {
+                boost::shared_ptr<amf::Buffer> buf = *rit;
+                *_response += buf;
+                std::vector<boost::shared_ptr<amf::Element> > data1;
+            }
+#endif
         }
     } else {
         log_error("Unknown oflaDemp method \"%s\" to INVOKE!", el1->getName());

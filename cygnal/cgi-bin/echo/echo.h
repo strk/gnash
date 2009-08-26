@@ -79,7 +79,7 @@ private:
 extern "C" {
     boost::shared_ptr<Handler::cygnal_init_t>echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
     
-    size_t echo_read_func(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<amf::Buffer> echo_read_func();
     size_t echo_write_func(boost::uint8_t *data, size_t size);
 }
 

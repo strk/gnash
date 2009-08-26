@@ -44,20 +44,27 @@ namespace cygnal
     ///    This class support the Red5 server functions used by some
     ///    of their demos.
 class demoService {
-public:    
+public:
+
+    typedef struct {
+	std::string name;
+	std::string last;
+	std::string size;
+    } filestats_t ;
     demoService();
     ~demoService();
 
     /// return the list of FLV files we've found
-    std::vector<std::string> &getListOfAvailableFiles(const std::string &path);
+    std::vector<boost::shared_ptr<filestats_t> > &getListOfAvailableFiles(const std::string &path);
 
     /// return the list of FLV files we've found of the specified type
-    std::vector<std::string> &getListOfAvailableFiles(const std::string &path,
-						     const std::string &type);
-
+    std::vector<boost::shared_ptr<filestats_t> > &getListOfAvailableFiles(const std::string &path,
+									  const std::string &type);
+    std::vector<boost::shared_ptr<filestats_t> > &getFileStats() { return _stats; };
+    
 private:
-    std::string _path;
-    std::vector<std::string> _media;
+    std::string				_path;
+    std::vector<boost::shared_ptr<filestats_t> >	_stats;
 };
     
 class OflaDemoTest : public cygnal::RTMPServer
@@ -98,7 +105,7 @@ private:
 extern "C" {
     boost::shared_ptr<Handler::cygnal_init_t>oflaDemo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
     
-    size_t oflaDemo_read_func(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<amf::Buffer> oflaDemo_read_func();
     size_t oflaDemo_write_func(boost::uint8_t *data, size_t size);
 }
 

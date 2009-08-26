@@ -74,23 +74,16 @@ extern "C" {
         return init;
     }
 
-    size_t echo_read_func(boost::uint8_t *data, size_t size)
+    boost::shared_ptr<amf::Buffer> echo_read_func()
     {
 // 	GNASH_REPORT_FUNCTION;
 	
 	size_t safe = 0;
 	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
 
-	if (size < buf->allocated()) {
-	    safe = buf->allocated();
-	} else {
-	    safe = size;
-	}
-	std::copy(buf->begin(), buf->begin() + safe, data);
-	
 // 	log_network("%s", hexify(data, safe, true));
 
-        return buf->allocated();
+        return buf;
 	    
 //         GNASH_REPORT_RETURN;
     }
