@@ -430,6 +430,8 @@ XMLNode_as::registerNative(as_object& where)
     vm.registerNative(xmlnode_appendChild, 253, 4);
     vm.registerNative(xmlnode_hasChildNodes, 253, 5);
     vm.registerNative(xmlnode_toString, 253, 6);
+    vm.registerNative(xmlnode_getNamespaceForPrefix, 253, 7);
+    vm.registerNative(xmlnode_getPrefixForNamespace, 253, 8);
 }
 
 as_object*
@@ -460,8 +462,6 @@ namespace {
 void
 attachXMLNodeInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    // These need to be full-featured AS functions (builtin_function)
     
     VM& vm = getVM(o);
 
@@ -474,11 +474,8 @@ attachXMLNodeInterface(as_object& o)
     o.init_member("appendChild", vm.getNative(253, 4), noFlags);
     o.init_member("hasChildNodes", vm.getNative(253, 5), noFlags);
     o.init_member("toString", vm.getNative(253, 6), noFlags);
-    o.init_member("getPrefixForNamespace", gl->createFunction(
-                xmlnode_getPrefixForNamespace), noFlags);
-    o.init_member("getNamespaceForPrefix", gl->createFunction(
-                xmlnode_getNamespaceForPrefix), noFlags);
-
+    o.init_member("getNamespaceForPrefix", vm.getNative(253, 7), noFlags);
+    o.init_member("getPrefixForNamespace", vm.getNative(253, 8), noFlags);
 
     const int protectedFlags = PropFlags::isProtected;
 
