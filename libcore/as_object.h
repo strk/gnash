@@ -857,15 +857,6 @@ public:
         return const_cast<as_object*>(this)->toDisplayObject();
     }
 
-    /// Return true if this is a Date object.
-    //
-    /// This is needed for special handling of Date objects
-    /// by the as_value::to_primitive method, also described
-    /// in ECMA-262 "8.6.2.6 [[DefaultValue]] (hint)"
-    /// 
-    ///
-    virtual bool isDateObject() { return false; }
-
     /// Return true if this is a 'super' object
     virtual bool isSuper() const { return false; }
 
