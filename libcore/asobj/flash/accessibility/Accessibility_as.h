@@ -34,6 +34,8 @@ class ObjectURI;
 /// Initialize the global Accessibility class
 void accessibility_class_init(as_object& where, const ObjectURI& uri);
 
+void registerAccessibilityNative(as_object& global);
+
 } // gnash namespace
 
 // GNASH_ASOBJ3_ACCESSIBILITY_H

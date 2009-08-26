@@ -1,4 +1,4 @@
-// Accessibility_as.cpp:  ActionScript "Accessibility" class, for Gnash.
+// accessibility_as.cpp:  ActionScript "Accessibility" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -21,13 +21,14 @@
 #include "gnashconfig.h"
 #endif
 
-#include "accessibility/Accessibility_as.h"
+#include "Accessibility_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
+#include "builtin_function.h"
+#include "NativeFunction.h"
 #include "Object.h" // for AS inheritance
 
 namespace gnash {
@@ -39,10 +40,10 @@ namespace {
     void attachAccessibilityAS3StaticInterface(as_object& o);
     as_object* getAccessibilityInterface();
 
-    as_value Accessibility_isActive(const fn_call& fn);
-    as_value Accessibility_active(const fn_call& fn);
-    as_value Accessibility_updateProperties(const fn_call& fn);
-    as_value Accessibility_sendEvent(const fn_call& fn);
+    as_value accessibility_isActive(const fn_call& fn);
+    as_value accessibility_active(const fn_call& fn);
+    as_value accessibility_updateProperties(const fn_call& fn);
+    as_value accessibility_sendEvent(const fn_call& fn);
 }
 
 // extern (used by Global.cpp)
@@ -68,54 +69,60 @@ accessibility_class_init(as_object& where, const ObjectURI& uri)
             getNamespace(uri));
 }
 
+void
+registerAccessibilityNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(accessibility_isActive, 1999, 0);
+    vm.registerNative(accessibility_sendEvent, 1999, 1);
+    vm.registerNative(accessibility_updateProperties, 1999, 2);
+}
+
 namespace {
 
 void
 attachAccessibilityAS3StaticInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    o.init_member("active", gl->createFunction(Accessibility_active));
+    o.init_member("active", gl->createFunction(accessibility_active));
 }
 
 void
 attachAccessibilityStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    
     const int flags = PropFlags::dontDelete |
                       PropFlags::readOnly;
 
-    o.init_member("isActive",
-            gl->createFunction(Accessibility_isActive), flags);
-    o.init_member("sendEvent",
-            gl->createFunction(Accessibility_sendEvent), flags);
-    o.init_member("updateProperties",
-            gl->createFunction(Accessibility_updateProperties), flags);
+    VM& vm = getVM(o);
+
+    o.init_member("isActive", vm.getNative(1999, 0), flags);
+    o.init_member("sendEvent", vm.getNative(1999, 1), flags);
+    o.init_member("updateProperties", vm.getNative(1999, 2), flags);
 }
 
 as_value
-Accessibility_isActive(const fn_call& /*fn*/)
+accessibility_isActive(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 as_value
-Accessibility_active(const fn_call& /*fn*/)
+accessibility_active(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value(false);
 }
 
 as_value
-Accessibility_updateProperties(const fn_call& /*fn*/)
+accessibility_updateProperties(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 as_value
-Accessibility_sendEvent(const fn_call& /*fn*/)
+accessibility_sendEvent(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
