@@ -124,7 +124,6 @@ RTMPClient::encodeConnect(const char *uri,
 
     protocol = url.protocol();
     hostname = url.hostname();
-    log_network("hostname: %s", hostname);
     portstr = url.port();
     query = url.querystring();
 

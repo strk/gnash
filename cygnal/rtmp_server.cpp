@@ -1310,8 +1310,8 @@ rtmp_handler(Network::thread_params_t *args)
 			body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
 			log_network("INVOKEing method \"%s\"", body->getMethodName());
 			/* size_t ret = */ hand->writeToPlugin(tmpptr, qhead->bodysize);
-			log_network("%s", hexify(tmpptr, qhead->bodysize, true));
-// 			log_network("RET is: %d", ret);
+			// log_network("%s", hexify(tmpptr, qhead->bodysize, true));
+
 			// These next Invoke methods are for the
 			// NetStream class, which lile NetConnection,
 			// is a speacial one handled directly by the
@@ -1334,7 +1334,8 @@ rtmp_handler(Network::thread_params_t *args)
 			    hand->togglePause();
 			}
 			
-			    body->dump();
+			// body->dump();
+
 			// This is a server installation specific  method.
 			if (body->getMethodName() == "FCSubscribe") {
 			    hand->setFCSubscribe(body->at(0)->to_string());
@@ -1352,14 +1353,11 @@ rtmp_handler(Network::thread_params_t *args)
 // 		    body->dump();
 
 		    size_t ret = hand->writeToPlugin(tmpptr, qhead->bodysize);
-// 		    log_network("RET is: %d", ret);
-		    ret = hand->readFromPlugin(tmpptr, qhead->bodysize);
- 		    if (ret) {
-			log_network("%s", hexify(tmpptr, qhead->bodysize, true));
-			log_network("%s", hexify(tmpptr, qhead->bodysize, false));
+		    boost::shared_ptr<amf::Buffer> result = hand->readFromPlugin();
+ 		    if (result) {
 			if (rtmp->sendMsg(args->netfd, 0x3, RTMP::HEADER_8, ret,
-					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, tmpptr, ret)) {
-			    log_debug("Sent echo test response response to client.");
+					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
+			    log_debug("Sent response to client.");
 			}
  		    }
 		    
