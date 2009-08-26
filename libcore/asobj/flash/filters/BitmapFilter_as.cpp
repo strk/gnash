@@ -20,6 +20,7 @@
 #include "BitmapFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
+#include "NativeFunction.h"
 #include "Object.h"
 #include "Global_as.h"
 
@@ -53,6 +54,13 @@ bitmapfilter_class_init(as_object& where, const ObjectURI& uri)
 		    flags, getNamespace(uri));
 }
 
+void
+registerBitmapFilterNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(bitmapfilter_clone, 1112, 1);
+}
+
 as_object*
 getBitmapFilterInterface()
 {
@@ -70,9 +78,9 @@ namespace {
 void
 attachBitmapFilterInterface(as_object& o)
 {
-    const int flags = 0;
-    Global_as* gl = getGlobal(o);
-    o.init_member("clone", gl->createFunction(bitmapfilter_clone), flags);
+    const int flags = PropFlags::onlySWF8Up;
+    VM& vm = getVM(o);
+    o.init_member("clone", vm.getNative(1112, 1), flags);
 }
 
 as_value

@@ -189,6 +189,8 @@ private:
 
 void sound_class_init(as_object& where, const ObjectURI& uri);
 
+void registerSoundNative(as_object& global);
+
 } // gnash namespace
 
 // GNASH_ASOBJ3_SOUND_H

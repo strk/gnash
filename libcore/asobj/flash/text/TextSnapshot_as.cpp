@@ -29,7 +29,8 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
+#include "builtin_function.h" 
+#include "NativeFunction.h"
 #include "Object.h" // for getObjectInterface
 #include "StaticText.h"
 #include "DisplayList.h"
@@ -72,20 +73,19 @@ namespace {
 }
 
 // extern (used by Global.cpp)
-void TextSnapshot_as::init(as_object& where, const ObjectURI& uri)
+void
+TextSnapshot_as::init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
 
+    static boost::intrusive_ptr<as_object> cl;
     if (!cl) {
         Global_as* gl = getGlobal(where);
         as_object* proto = getTextSnapshotInterface();
         cl = gl->createClass(&textsnapshot_ctor, proto);
         attachTextSnapshotStaticInterface(*cl);
-    }
-
-    // Register _global.TextSnapshot
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+   }
+   where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+               getNamespace(uri));
 }
 
 /// The member _textFields is initialized here unnecessarily to show
@@ -354,6 +354,23 @@ TextSnapshot_as::findText(boost::int32_t start, const std::string& text,
 
 }
 
+void
+registerTextSnapshotNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(textsnapshot_ctor, 1067, 0);
+    vm.registerNative(textsnapshot_getCount, 1067, 1);
+    vm.registerNative(textsnapshot_setSelected, 1067, 2);
+    vm.registerNative(textsnapshot_getSelected, 1067, 3);
+    vm.registerNative(textsnapshot_getText, 1067, 4);
+    vm.registerNative(textsnapshot_getSelectedText, 1067, 5);
+    vm.registerNative(textsnapshot_hitTestTextNearPos, 1067, 6);
+    vm.registerNative(textsnapshot_findText, 1067, 7);
+    vm.registerNative(textsnapshot_setSelectColor, 1067, 8);
+    vm.registerNative(textsnapshot_getTextRunInfo, 1067, 9);
+
+}
+
 namespace {
 
 class TextFinder
@@ -399,25 +416,16 @@ attachTextSnapshotInterface(as_object& o)
 
     const int flags = PropFlags::onlySWF6Up;
 
-    Global_as* gl = getGlobal(o);
-	o.init_member("findText", gl->createFunction(textsnapshot_findText),
-            flags);
-	o.init_member("getCount", gl->createFunction(textsnapshot_getCount),
-            flags);
-	o.init_member("getTextRunInfo",
-            gl->createFunction(textsnapshot_getTextRunInfo), flags);
-	o.init_member("getSelected",
-            gl->createFunction(textsnapshot_getSelected), flags);
-	o.init_member("getSelectedText",
-            gl->createFunction(textsnapshot_getSelectedText), flags);
-	o.init_member("getText",
-            gl->createFunction(textsnapshot_getText), flags);
-	o.init_member("hitTestTextNearPos",
-            gl->createFunction(textsnapshot_hitTestTextNearPos), flags);
-	o.init_member("setSelectColor",
-            gl->createFunction(textsnapshot_setSelectColor), flags);
-	o.init_member("setSelected",
-            gl->createFunction(textsnapshot_setSelected), flags);
+    VM& vm = getVM(o);
+	o.init_member("getCount", vm.getNative(1067, 1), flags);
+	o.init_member("setSelected", vm.getNative(1067, 2), flags);
+	o.init_member("getSelected", vm.getNative(1067, 3), flags);
+	o.init_member("getText", vm.getNative(1067, 4), flags);
+	o.init_member("getSelectedText", vm.getNative(1067, 5), flags);
+	o.init_member("hitTestTextNearPos", vm.getNative(1067, 6), flags);
+	o.init_member("findText", vm.getNative(1067, 7), flags);
+	o.init_member("setSelectColor", vm.getNative(1067, 8), flags);
+	o.init_member("getTextRunInfo", vm.getNative(1067, 9), flags);
 }
 
 as_object*

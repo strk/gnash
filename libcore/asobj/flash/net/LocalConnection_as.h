@@ -18,58 +18,14 @@
 #ifndef GNASH_ASOBJ_LOCALCONNECTION_H
 #define GNASH_ASOBJ_LOCALCONNECTION_H
 
-#include <string>
-#include <map>
-#include <boost/cstdint.hpp> 
-
-#include "as_object.h" // for inheritance
-#include "fn_call.h"
-#include "lcshm.h"
-
 namespace gnash {
-  
-class LocalConnection_as : public as_object, public amf::LcShm
-{
 
-public:
+class as_object;
+class ObjectURI;
 
-    LocalConnection_as();
-    ~LocalConnection_as();
+void registerLocalConnectionNative(as_object& global);
 
-    void close();
-
-//    void connect(const std::string& name);
-
-    const std::string& domain() {
-        return _domain;
-    }
-
-   // send(const string &  name , const string &  domainname ,vector<boost::shared_ptr<amf::Element> >  & data )
-
-    const std::string& name() { return _name; };
-
-//  Moved to lcshm class
-//  bool connected() { return _connected; };
-    
-    static void init(as_object& glob, const ObjectURI& uri);
-
-private:
-    
-    /// Work out the domain.
-    //
-    /// Called once on construction to set _domain, though it will do
-    /// no harm to call it again.
-    std::string getDomain();
-    
-//  Moved to lcshm class	
-//  bool _connected;
-    std::string _name;
-
-    // The immutable domain of this LocalConnection_as, based on the 
-    // originating SWF's domain.
-    const std::string _domain;
-    
-};
+void localconnection_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 

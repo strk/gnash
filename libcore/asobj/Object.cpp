@@ -148,14 +148,7 @@ attachObjectInterface(as_object& o)
 
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));
-
-    as_object* lsProto = getObjectInterface();
-
-    // TODO: this is probably an abuse of the 'createClass' function, but it
-    // gets the correct results.
-	o.init_member("toLocaleString", 
-            gl->createClass(object_toLocaleString,
-                gl->createObject(lsProto)));
+	o.init_member("toLocaleString", gl->createFunction(object_toLocaleString));
 
 	int swf6flags = PropFlags::dontEnum | 
         PropFlags::dontDelete | 

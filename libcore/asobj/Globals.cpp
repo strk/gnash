@@ -56,6 +56,7 @@
 #include "flash/display/Bitmap_as.h"
 #include "flash/events/Event_as.h"
 #include "flash/events/EventDispatcher_as.h"
+#include "flash/filters/BitmapFilter_as.h"
 #include "flash/net/LocalConnection_as.h"
 #include "flash/net/XMLSocket_as.h"
 #include "flash/net/SharedObject_as.h"
@@ -477,7 +478,7 @@ avm1Classes()
            NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT,
            NS_GLOBAL, 6))
-        (N(LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION,
+        (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION,
            NSV::CLASS_OBJECT, NS_GLOBAL, 6))
         (N(customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS,
            NSV::CLASS_OBJECT, NS_GLOBAL, 6))
@@ -603,7 +604,7 @@ avm2Classes(string_table& st)
            NSV::NS_FLASH_NET, 5))
         (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5))
-        (N(LocalConnection_as::init, NSV::CLASS_LOCALCONNECTION,
+        (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
         (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
@@ -1340,6 +1341,10 @@ registerNatives(as_object& global)
     registerNetStreamNative(global);
     registerCameraNative(global);
     registerMicrophoneNative(global);
+    registerTextSnapshotNative(global);
+    registerSoundNative(global);
+    registerLocalConnectionNative(global);
+    registerBitmapFilterNative(global);
 
     AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);
