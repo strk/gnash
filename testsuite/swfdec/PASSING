@@ -72,6 +72,7 @@ asbroadcaster-override-5.swf:1a3dacf6579b150773097362b546ee7e
 asbroadcaster-override-6.swf:cc28cc39d8a841d68d42ad6328c3ac6e
 asbroadcaster-override-7.swf:5834d9f0de106265f5ff479d789d2f35
 asbroadcaster-override-8.swf:017c5505a342570726c90b81297626dc
+asbroadcaster-properties-5.swf:577ad0de1cd33a97f6e2f146c61acc5f
 asnative-create-5.swf:d10ce975ae57f9a6e29c8fc97eb01489
 asnative-create-6.swf:79aa26f566218edbdecdb46e88be7a1a
 asnative-create-7.swf:b3f18c999ed081ac39132ec6a9df2cb0
@@ -217,6 +218,8 @@ context-menu-item-5.swf:b125dc8033d2337139faccd752edc3cf
 context-menu-item-6.swf:bed4cac31e3e05d22fa5478078e1790a
 context-menu-item-7.swf:e3339c3aa296505f3477d88d2f9033a2
 context-menu-item-8.swf:9d586baebe529587c5b3522f73255810
+context-menu-item-properties-7.swf:365f0cdca8562904857714770b2fa0d1
+context-menu-item-properties-8.swf:d2b9e88c1c1212e8e960374fc78c3133
 conversion-functions-6.swf:29f141b5a2d03886c152342fdbea9b25
 conversion-functions-7.swf:8bc3951e61b7fefa82d24fb037929350
 conversion-functions-8.swf:4a68346aaa982e32b2882a49e34faa07
@@ -428,6 +431,10 @@ equality-old-5.swf:7e7bb8e312a001c579c1e3677ef896c4
 equality-old-6.swf:57bfbb9065a0e63cd77bf6c584bcf347
 equality-old-7.swf:6eecbe10ad56bad25f0f4eaf61e441dc
 equality-old-8.swf:c78101432ebbc3c41fc27735379cfb78
+error-properties-5.swf:c89351f53b9ba814595c093065bf0f3b
+error-properties-6.swf:9253b6390cb6ce417e254095d246f91c
+error-properties-7.swf:9258d3f8ea8409484f107168a4526347
+error-properties-8.swf:d011695853e978e0f6006730e37cba8b
 event-order.swf:6cb896771a691dc394226c3f542b1bec
 export-case-5.swf:8b37704408e27ffb8b51c63179c7702c
 export-case-6.swf:7c3106de02ed0a94ed0bc816bf526c02
@@ -601,6 +608,9 @@ loadvars-decode-return-5.swf:7d961f35feb3d46db0725e93c26bb90a
 loadvars-decode-return-6.swf:b087145545a09db783e43093e1ed6731
 loadvars-decode-return-7.swf:86b9a3bf16c7f8927a63b048b7886dbf
 loadvars-decode-return-8.swf:4a634352da2b0ab1a85746f566fe1fb3
+loadvars-properties-6.swf:9632efb3c425c1ebaf88bd7a56ab5eee
+loadvars-properties-7.swf:b456091bba1827d6ff4773485b247c39
+loadvars-properties-8.swf:aecfd3e5a0f5f3c892f9aba1a1bb8a51
 local-connection-properties-6.swf:396dc9cb0b3a2228c835f2ac284116b5
 local-connection-properties-7.swf:cea39463c752388d55e00442b6c24e35
 local-connection-properties-8.swf:8181bc0d301a99df5bc3e20766a35c83
@@ -630,6 +640,7 @@ matrix-construct-5.swf:bfc2176f4495b5f7465afd1a6f489ead
 matrix-properties-5.swf:a80d726dfde5b460add76a7532e7ee01
 matrix-properties-6.swf:a7934cc5476219b199a40c4feb627dfe
 matrix-properties-7.swf:144e6c666febf556bec9864ee234a54a
+matrix-properties-8.swf:74105c50f0364f4fcf3d6745c42fae33
 microphone-properties-5.swf:26a2019cc8d42c41630cac3eaf435412
 microphone-properties-6.swf:0463204be0bb721bac2e642cc2c0696d
 microphone-properties-7.swf:111e7119fcf0b3e270503e4df247b27f

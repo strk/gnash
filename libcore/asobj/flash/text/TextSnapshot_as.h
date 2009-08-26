@@ -111,6 +111,8 @@ private:
 
 };
 
+void registerTextSnapshotNative(as_object& global);
+
 } // gnash namespace
 
 // GNASH_ASOBJ3_TEXTSNAPSHOT_H

@@ -23,11 +23,6 @@
 #endif
 
 #include "GnashSystemIOHeaders.h"
-#include <cerrno>
-#include <cstring>
-#include <boost/cstdint.hpp> // for boost::?int??_t
-#include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
 
 #include "VM.h"
 #include "movie_root.h"
@@ -39,12 +34,18 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h"
+#include "NativeFunction.h"
 #include "amf.h"
 #include "lcshm.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "StringPredicates.h"
 
+#include <cerrno>
+#include <cstring>
+#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 using namespace amf;
 
 // http://www.osflash.org/localconnection
@@ -87,29 +88,63 @@ namespace gnash {
 namespace {
     as_value localconnection_connect(const fn_call& fn);
     as_value localconnection_domain(const fn_call& fn);
+    as_value localconnection_send(const fn_call& fn);
     as_value localconnection_new(const fn_call& fn);
+    as_value localconnection_close(const fn_call& fn);
 
     bool validFunctionName(const std::string& func);
 
+    void attachLocalConnectionInterface(as_object& o);
     as_object* getLocalConnectionInterface();
 }
-
+  
 // \class LocalConnection_as
 /// \brief Open a connection between two SWF movies so they can send
 /// each other Flash Objects to be executed.
 ///
-LocalConnection_as::LocalConnection_as()
+/// TODO: don't use multiple inheritance.
+class LocalConnection_as : public ActiveRelay, public amf::LcShm
+{
+
+public:
+
+    LocalConnection_as(as_object* owner);
+    virtual ~LocalConnection_as() {}
+
+    void close();
+
+    const std::string& domain() {
+        return _domain;
+    }
+
+    const std::string& name() { return _name; };
+
+    // TODO: implement this to check for changes.
+    virtual void update() {}
+
+private:
+    
+    /// Work out the domain.
+    //
+    /// Called once on construction to set _domain, though it will do
+    /// no harm to call it again.
+    std::string getDomain();
+    
+    std::string _name;
+
+    // The immutable domain of this LocalConnection_as, based on the 
+    // originating SWF's domain.
+    const std::string _domain;
+    
+};
+
+LocalConnection_as::LocalConnection_as(as_object* owner)
     :
-    as_object(getLocalConnectionInterface()),    
+    ActiveRelay(owner),
     _domain(getDomain())
 {
     log_debug("The domain for this host is: %s", _domain);
     setconnected(false);
-    
-}
-
-LocalConnection_as::~LocalConnection_as()
-{
 }
 
 /// \brief Closes (disconnects) the LocalConnection object.
@@ -167,7 +202,7 @@ std::string
 LocalConnection_as::getDomain()
 {
     
-    URL url(getRoot(*this).getOriginalURL());
+    URL url(getRoot(owner()).getOriginalURL());
 
     if (url.hostname().empty()) {
         return "localhost";
@@ -176,7 +211,7 @@ LocalConnection_as::getDomain()
     // Adjust the name based on the swf version. Prior to v7, the nodename part
     // was removed. For v7 or later. the full hostname is returned. The
     // localhost is always just the localhost.
-    if (getSWFVersion(*this) > 6) {
+    if (getSWFVersion(owner()) > 6) {
         return url.hostname();
     }
 
@@ -205,18 +240,20 @@ LocalConnection_as::getDomain()
 }
 
 void
-LocalConnection_as::init(as_object& glob, const ObjectURI& uri)
+localconnection_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the global Number "class"/"function"
-    Global_as* gl = getGlobal(glob);
-    as_object* proto = getLocalConnectionInterface();
-    as_object* cl = gl->createClass(&localconnection_new, proto);
+    registerBuiltinClass(where, localconnection_new,
+            attachLocalConnectionInterface, 0, uri);
+}
 
-    int swf6flags = PropFlags::dontEnum | 
-                    PropFlags::dontDelete | 
-                    PropFlags::onlySWF6Up;
-
-    glob.init_member(gnash::getName(uri), cl, swf6flags, getNamespace(uri));
+void
+registerLocalConnectionNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(localconnection_connect, 2200, 0);
+    vm.registerNative(localconnection_send, 2200, 1);
+    vm.registerNative(localconnection_close, 2200, 2);
+    vm.registerNative(localconnection_domain, 2200, 3);
 }
 
 
@@ -225,22 +262,22 @@ namespace {
 
 /// Instantiate a new LocalConnection object within a flash movie
 as_value
-localconnection_new(const fn_call& /* fn */)
+localconnection_new(const fn_call& fn)
 {
-    LocalConnection_as *obj = new LocalConnection_as;
-
-    return as_value(obj);
+    // TODO: this doesn't happen on construction.
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    obj->setRelay(new LocalConnection_as(obj));
+    return as_value();
 }
 
 /// The callback for LocalConnection::close()
 as_value
 localconnection_close(const fn_call& fn)
 {
+    LocalConnection_as* relay =
+        ensureNativeType<LocalConnection_as>(fn.this_ptr);
     
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
-    
-    ptr->close();
+    relay->close();
     return as_value();
 }
 
@@ -248,11 +285,11 @@ localconnection_close(const fn_call& fn)
 as_value
 localconnection_connect(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
+    LocalConnection_as* relay =
+        ensureNativeType<LocalConnection_as>(fn.this_ptr);
 
     // If already connected, don't try again until close() is called.
-    if (ptr->getconnected()) return false;
+    if (relay->getconnected()) return false;
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -270,18 +307,15 @@ localconnection_connect(const fn_call& fn)
         return as_value(false);
     }
     
-    std::string connection_name;
-    //connection_name=fn.arg(0).to_string();
-    //log_debug("The arg(0) is: %s", connection_name);
-    
-    if (fn.arg(0).to_string()=="") {
+    if (fn.arg(0).to_string().empty()) {
         return as_value(false);
     }
-           connection_name = ptr->domain();    
-        connection_name +=":";
-        connection_name += fn.arg(0).to_string();
+
+    std::string connection_name = relay->domain();    
+    connection_name +=":";
+    connection_name += fn.arg(0).to_string();
    
-    ptr->connect(connection_name);
+    relay->connect(connection_name);
 
     // We don't care whether connected or not.
     return as_value(true);
@@ -291,10 +325,10 @@ localconnection_connect(const fn_call& fn)
 as_value
 localconnection_domain(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
+    LocalConnection_as* relay =
+        ensureNativeType<LocalConnection_as>(fn.this_ptr);
 
-    return as_value(ptr->domain());
+    return as_value(relay->domain());
 }
 
 /// LocalConnection.send()
@@ -303,8 +337,8 @@ localconnection_domain(const fn_call& fn)
 as_value
 localconnection_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection_as> ptr =
-        ensureType<LocalConnection_as>(fn.this_ptr);
+    LocalConnection_as* relay =
+        ensureNativeType<LocalConnection_as>(fn.this_ptr);
 
     // At least 2 args (connection name, function) required.
 
@@ -344,24 +378,19 @@ localconnection_send(const fn_call& fn)
         return as_value(false);
     }
 
-//Si added
-    int numarg=fn.nargs;
-    for (int i=0; i!=numarg; i++)
-        log_debug(_(" *** The value of the arg[ %d ] : %s ***"),i,fn.arg(i).to_string() ); 
     
-    const std::string & connectionName= fn.arg(0).to_string();
-    const std::string & methodName=     fn.arg(1).to_string();
+    const std::string& connectionName = fn.arg(0).to_string();
+    const std::string& methodName = fn.arg(1).to_string();
         
-    std::vector< amf::Element * >  argument_to_send;
+    std::vector<amf::Element*> argument_to_send;
     
-    for (int i=2; i!=numarg; i++){
+    const size_t numargs = fn.nargs;
+    for (size_t i = 2; i != numargs; ++i) {
         amf::Element* temp_ptr = fn.arg(i).to_element().get();
         argument_to_send.push_back(temp_ptr);
     }
     
-    ptr->amf::LcShm::send(connectionName,methodName,argument_to_send);
-//end of Si added
-
+    relay->amf::LcShm::send(connectionName, methodName, argument_to_send);
 
     // Now we have a valid call.
 
@@ -385,28 +414,11 @@ localconnection_send(const fn_call& fn)
 void
 attachLocalConnectionInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("close", gl->createFunction(localconnection_close));
-    o.init_member("connect", gl->createFunction(localconnection_connect));
-    o.init_member("domain", gl->createFunction(localconnection_domain));
-    o.init_member("send", gl->createFunction(localconnection_send));
-}
-
-as_object*
-getLocalConnectionInterface()
-{
-
-    static boost::intrusive_ptr<as_object> o;
-
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachLocalConnectionInterface(*o);
-    }
-
-    return o.get();
+    VM& vm = getVM(o);
+    o.init_member("connect", vm.getNative(2200, 0));
+    o.init_member("send", vm.getNative(2200, 1));
+    o.init_member("close", vm.getNative(2200, 2));
+    o.init_member("domain", vm.getNative(2200, 3));
 }
 
 /// These names are invalid as a function name.

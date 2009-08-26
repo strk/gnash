@@ -33,6 +33,7 @@
 #include "Global_as.h"
 #include "GnashException.h" // for ActionException
 #include "builtin_function.h" // need builtin_function
+#include "NativeFunction.h" // need builtin_function
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "Object.h"
 #include "VM.h"
@@ -127,6 +128,29 @@ sound_class_init(as_object& where, const ObjectURI& uri)
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
+}
+
+void
+registerSoundNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(sound_getpan, 500, 0);
+    vm.registerNative(sound_gettransform, 500, 1);
+    vm.registerNative(sound_getvolume, 500, 2);
+    vm.registerNative(sound_setpan, 500, 3);
+    vm.registerNative(sound_settransform, 500, 4);
+    vm.registerNative(sound_setvolume, 500, 5);
+    vm.registerNative(sound_stop, 500, 6);
+    vm.registerNative(sound_attachsound, 500, 7);
+    vm.registerNative(sound_start, 500, 8);
+    vm.registerNative(sound_getDuration, 500, 9);
+    vm.registerNative(sound_setDuration, 500, 10);
+    vm.registerNative(sound_getPosition, 500, 11);
+    vm.registerNative(sound_setPosition, 500, 12);
+    vm.registerNative(sound_loadsound, 500, 13);
+    vm.registerNative(sound_getbytesloaded, 500, 14);
+    vm.registerNative(sound_getbytestotal, 500, 15);
+    vm.registerNative(sound_areSoundsInaccessible, 500, 16);
 }
 
 /*private*/
@@ -704,48 +728,38 @@ namespace {
 void
 attachSoundInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
 
     int flags = PropFlags::dontEnum | 
                 PropFlags::dontDelete | 
                 PropFlags::readOnly;
 
-    o.init_member("attachSound", gl->createFunction(sound_attachsound),
-            flags);
-    o.init_member("getPan", gl->createFunction(sound_getpan), flags);
-    o.init_member("setPan", gl->createFunction(sound_setpan), flags);
-    o.init_member("start", gl->createFunction(sound_start), flags);
-    o.init_member("stop", gl->createFunction(sound_stop), flags);
-    o.init_member("getTransform", gl->createFunction(sound_gettransform),
-            flags);
-    o.init_member("setTransform", gl->createFunction(sound_settransform),
-            flags);
-    o.init_member("getVolume", gl->createFunction(sound_getvolume), flags);
-    o.init_member("setVolume", gl->createFunction(sound_setvolume), flags);
+    VM& vm = getVM(o);
+    o.init_member("getPan", vm.getNative(500, 0), flags);
+    o.init_member("getTransform", vm.getNative(500, 1), flags);
+    o.init_member("getVolume", vm.getNative(500, 2), flags);
+    o.init_member("setPan", vm.getNative(500, 3), flags);
+    o.init_member("setTransform", vm.getNative(500, 4), flags);
+    o.init_member("setVolume", vm.getNative(500, 5), flags);
+    o.init_member("stop", vm.getNative(500, 6), flags);
+    o.init_member("attachSound", vm.getNative(500, 7), flags);
+    o.init_member("start", vm.getNative(500, 8), flags);
 
     int flagsn6 = flags | PropFlags::onlySWF6Up;
 
-    o.init_member("getDuration", 
-            gl->createFunction(sound_getDuration), flagsn6);
-    o.init_member("setDuration", 
-            gl->createFunction(sound_setDuration), flagsn6);
-    o.init_member("loadSound", gl->createFunction(sound_loadsound), flagsn6);
-    o.init_member("getPosition", 
-            gl->createFunction(sound_getPosition), flagsn6);
-    o.init_member("setPosition", 
-            gl->createFunction(sound_setPosition), flagsn6);
-    o.init_member("getBytesLoaded", 
-            gl->createFunction(sound_getbytesloaded), flagsn6);
-    o.init_member("getBytesTotal", 
-            gl->createFunction(sound_getbytestotal), flagsn6);
+    o.init_member("getDuration", vm.getNative(500, 9), flagsn6);
+    o.init_member("setDuration", vm.getNative(500, 10), flagsn6);
+    o.init_member("getPosition", vm.getNative(500, 11), flagsn6); 
+    o.init_member("setPosition", vm.getNative(500, 12), flagsn6);
+    o.init_member("loadSound", vm.getNative(500, 13), flagsn6);
+    o.init_member("getBytesLoaded", vm.getNative(500, 14), flagsn6); 
+    o.init_member("getBytesTotal", vm.getNative(500, 15), flagsn6);
 
     int flagsn9 = PropFlags::dontEnum | 
                   PropFlags::dontDelete | 
                   PropFlags::readOnly | 
                   PropFlags::onlySWF9Up;
 
-    o.init_member("areSoundsInaccessible", 
-            gl->createFunction(sound_areSoundsInaccessible), flagsn9);
+    o.init_member("areSoundsInaccessible", vm.getNative(500, 16), flagsn9);
 
     // Properties
     //there's no such thing as an ID3 member (swfdec shows)

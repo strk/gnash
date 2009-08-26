@@ -16,10 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_MICROPHONE_H__
-#define __GNASH_ASOBJ_MICROPHONE_H__
-
-#include <memory> // for auto_ptr
+#ifndef GNASH_ASOBJ_MICROPHONE_H
+#define GNASH_ASOBJ_MICROPHONE_H
 
 namespace gnash {
 
@@ -29,10 +27,8 @@ class ObjectURI;
 /// Initialize the global Microphone class
 void microphone_class_init(as_object& where, const ObjectURI& uri);
 
-/// Return a Microphone instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_microphone_instance();
-  
+void registerMicrophoneNative(as_object& global);
+
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_MICROPHONE_H__
 #endif

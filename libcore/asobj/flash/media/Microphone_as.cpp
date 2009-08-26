@@ -27,7 +27,8 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
+#include "builtin_function.h"
+#include "NativeFunction.h"
 #include "Object.h" // for getObjectInterface
 #include "Array_as.h"
 #include <cmath>
@@ -69,14 +70,10 @@ attachMicrophoneStaticInterface(as_object& o)
 
     const int flags = 0;
 
-    // get() is a function with an Object() as prototype.
-    as_object* proto = gl->createObject(getObjectInterface());
-
-    // TODO: avoid the creative abuse of createClass.
-	o.init_member("get", gl->createClass(microphone_get, proto), flags);
-
-    boost::intrusive_ptr<builtin_function> getset =
-        gl->createFunction(microphone_names);
+	o.init_member("get", gl->createFunction(microphone_get), flags);
+ 
+    VM& vm = getVM(o);   
+    NativeFunction* getset = vm.getNative(2102, 201);
     o.init_property("names", *getset, *getset);
 }
 
@@ -119,14 +116,15 @@ attachMicrophoneProperties(as_object& o)
 static void
 attachMicrophoneInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
 
-	o.init_member("setGain", gl->createFunction(microphone_setgain));
-	o.init_member("setRate", gl->createFunction(microphone_setrate));
-	o.init_member("setSilenceLevel",
-            gl->createFunction(microphone_setsilencelevel));
-	o.init_member("setUseEchoSuppression",
-            gl->createFunction(microphone_setuseechosuppression));
+    VM& vm = getVM(o);
+
+    const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+
+	o.init_member("setSilenceLevel", vm.getNative(2104, 0), flags);
+	o.init_member("setRate", vm.getNative(2104, 1), flags);
+	o.init_member("setGain", vm.getNative(2104, 2), flags);
+	o.init_member("setUseEchoSuppression", vm.getNative(2104, 3), flags);
     
 }
 
@@ -637,6 +635,17 @@ microphone_class_init(as_object& where, const ObjectURI& uri)
 	where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 
+}
+
+void
+registerMicrophoneNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(microphone_names, 2104, 201);
+    vm.registerNative(microphone_setsilencelevel, 2104, 0);
+    vm.registerNative(microphone_setrate, 2104, 1);
+    vm.registerNative(microphone_setgain, 2104, 2);
+    vm.registerNative(microphone_setuseechosuppression, 2104, 3);
 }
 
 

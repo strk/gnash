@@ -34,6 +34,8 @@ class ObjectURI;
 /// Initialize the global XMLSocket class
 void xmlsocket_class_init(as_object& where, const ObjectURI& uri);
 
+void registerXMLSocketNative(as_object& global);
+
 } // gnash namespace
 
 // GNASH_ASOBJ3_XMLSOCKET_H

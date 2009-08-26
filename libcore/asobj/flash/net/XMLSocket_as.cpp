@@ -31,6 +31,7 @@
 #include "Global_as.h"
 #include "VM.h"
 #include "builtin_function.h" 
+#include "NativeFunction.h" 
 #include "URLAccessManager.h"
 #include "Object.h" // for getObjectInterface
 #include "Global_as.h" 
@@ -422,6 +423,14 @@ xmlsocket_class_init(as_object& where, const ObjectURI& uri)
             0, uri);
 }
 
+void
+registerXMLSocketNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(xmlsocket_connect, 400, 0);
+    vm.registerNative(xmlsocket_send, 400, 1);
+    vm.registerNative(xmlsocket_close, 400, 2);
+}
 
 namespace {
 
@@ -557,20 +566,14 @@ xmlsocket_onData(const fn_call& fn)
 void
 attachXMLSocketInterface(as_object& o)
 {
+
+    VM& vm = getVM(o);
+    o.init_member("connect", vm.getNative(400, 0));
+    o.init_member("send", vm.getNative(400, 1));
+    o.init_member("close", vm.getNative(400, 2));
+
     Global_as* gl = getGlobal(o);
-    o.init_member("connect", gl->createFunction(xmlsocket_connect));
-    o.init_member("send", gl->createFunction(xmlsocket_send));
-    o.init_member("close", gl->createFunction(xmlsocket_close));
-
-
-    // all this crap to satisfy swfdec testsuite... (xml-socket-properties*)
-    as_object* onDataIface = new as_object(getObjectInterface());
-
-    // It's not really a class, but a constructor function with an object
-    // prototype, so looks in every way like an AS2 class.
-    as_object* onDataFun = gl->createClass(xmlsocket_onData, onDataIface);
-    o.init_member("onData", onDataFun);
-    onDataIface->init_member(NSV::PROP_CONSTRUCTOR, onDataFun);
+    o.init_member("onData", gl->createFunction(xmlsocket_onData));
 }
 
 } // anonymous namespace

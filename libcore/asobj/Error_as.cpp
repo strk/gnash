@@ -59,7 +59,9 @@ attachErrorInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
     int flags = 0;
+
     o.init_member("toString", gl->createFunction(error_toString), flags);
+    
     o.init_member("message", "Error", flags);
     o.init_member("name", "Error", flags);
 }
