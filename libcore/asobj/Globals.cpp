@@ -200,7 +200,8 @@ AVM1Global::createObject(as_object* prototype)
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    builtin_function* f = new builtin_function(*this, function);
+    as_object* proto = createObject(getObjectInterface());
+    builtin_function* f = new builtin_function(*this, function, proto);
     f->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return f;
@@ -1330,10 +1331,15 @@ registerNatives(as_object& global)
     registerColorNative(global);
     registerMathNative(global);
     registerSystemNative(global);
+    registerAccessibilityNative(global);
     registerStageNative(global);
+    registerVideoNative(global);
+    registerXMLSocketNative(global);
     registerSharedObjectNative(global);
     registerKeyboardNative(global);
     registerNetStreamNative(global);
+    registerCameraNative(global);
+    registerMicrophoneNative(global);
 
     AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);

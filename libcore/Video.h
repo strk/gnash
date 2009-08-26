@@ -150,6 +150,8 @@ private:
 
 void video_class_init(as_object& global, const ObjectURI& uri);
 
+void registerVideoNative(as_object& global);
+
 }	// end namespace gnash
 
 

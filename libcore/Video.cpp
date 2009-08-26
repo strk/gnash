@@ -26,6 +26,7 @@
 #include "NetStream_as.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
+#include "NativeFunction.h" 
 #include "movie_root.h"
 #include "VM.h"
 #include "Object.h"
@@ -308,6 +309,15 @@ video_class_init(as_object& global, const ObjectURI& uri)
             getNamespace(uri));
 }
 
+void
+registerVideoNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(video_ctor, 667, 0);
+    vm.registerNative(video_attach, 667, 1);
+    vm.registerNative(video_clear, 667, 2);
+}
+
 rect
 Video::getBounds() const
 {
@@ -348,9 +358,9 @@ getVideoInterface(as_object& where)
 void
 attachVideoInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-	o.init_member("attachVideo", gl->createFunction(video_attach));
-	o.init_member("clear", gl->createFunction(video_clear));
+    VM& vm = getVM(o);
+	o.init_member("attachVideo", vm.getNative(667, 1));
+	o.init_member("clear", vm.getNative(667, 2));
 }
 
 void

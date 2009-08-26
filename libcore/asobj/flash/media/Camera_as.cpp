@@ -26,9 +26,10 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "Object.h" // for getObjectInterface
+#include "smart_ptr.h" 
+#include "builtin_function.h" 
+#include "NativeFunction.h" 
+#include "Object.h" 
 #include "Array_as.h"
 #include <sstream>
 
@@ -74,14 +75,10 @@ attachCameraStaticInterface(as_object& o)
     
     const int flags = 0;
 
-    // get() is a function with an Object() as prototype.
-    as_object* proto = gl->createObject(getObjectInterface());
+	o.init_member("get", gl->createFunction(camera_get), flags);
 
-    // TODO: avoid the creative abuse of createClass.
-	o.init_member("get", gl->createClass(camera_get, proto), flags);
-
-    boost::intrusive_ptr<builtin_function> getset =
-        gl->createFunction(camera_names);
+    VM& vm = getVM(o);
+    NativeFunction* getset = vm.getNative(2102, 201);
     o.init_property("names", *getset, *getset);
 
 }
@@ -96,15 +93,16 @@ attachCameraAS3StaticInterface(as_object& o)
 static void
 attachCameraInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
     
-    o.init_member("setMode", gl->createFunction(camera_setmode));
-    o.init_member("setMotionLevel", gl->createFunction(camera_setmotionlevel));
-    o.init_member("setQuality", gl->createFunction(camera_setquality));
-    o.init_member("setCursor", gl->createFunction(camera_setCursor));
-    o.init_member("setLoopback", gl->createFunction(camera_setLoopback));
-    o.init_member("setKeyFrameInterval",
-            gl->createFunction(camera_setKeyFrameInterval));
+    const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+
+    VM& vm = getVM(o);
+    o.init_member("setMode", vm.getNative(2102, 0), flags);
+    o.init_member("setQuality", vm.getNative(2102, 1), flags);
+    o.init_member("setKeyFrameInterval", vm.getNative(2102, 2), flags);
+    o.init_member("setMotionLevel", vm.getNative(2102, 3), flags);
+    o.init_member("setLoopback", vm.getNative(2102, 4), flags);
+    o.init_member("setCursor", vm.getNative(2102, 5), flags);
 
 }
 
@@ -754,6 +752,18 @@ camera_class_init(as_object& where, const ObjectURI& uri)
 
 }
 
+void
+registerCameraNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(camera_names, 2102, 201);
+    vm.registerNative(camera_setmode, 2102, 0);
+    vm.registerNative(camera_setquality, 2102, 1);
+    vm.registerNative(camera_setKeyFrameInterval, 2102, 2);
+    vm.registerNative(camera_setmotionlevel, 2102, 3);
+    vm.registerNative(camera_setLoopback, 2102, 4);
+    vm.registerNative(camera_setCursor, 2102, 5);
+}
 
 } // end of gnash namespace
 

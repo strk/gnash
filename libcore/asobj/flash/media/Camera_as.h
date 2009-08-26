@@ -17,10 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_CAMERA_H__
-#define __GNASH_ASOBJ_CAMERA_H__
-
-#include <memory> // for auto_ptr
+#ifndef GNASH_ASOBJ_CAMERA_H
+#define GNASH_ASOBJ_CAMERA_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -34,20 +32,10 @@ class ObjectURI;
 /// Initialize the global Camera class
 void camera_class_init(as_object& where, const ObjectURI& uri);
 
-#ifdef USE_GST
-class camera_as_object;
-#endif
+void registerCameraNative(as_object& global);
 
-#ifdef USE_FFMPEG
-class camera_as_object;
-#endif
-
-/// Return a Camera instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_camera_instance();
-  
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_CAMERA_H__
 #endif
 
 
