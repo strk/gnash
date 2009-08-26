@@ -152,7 +152,11 @@ tmp.loaded = 0;
 check_equals(typeof(tmp.loaded), 'boolean');
 check(!tmp.loaded);
 check(! tmp.hasOwnProperty("loaded"));
+xcheck(tmp.__proto__.hasOwnProperty("loaded"));
 
+tmp.loaded = true;
+check_equals(tmp.loaded, true);
+check_equals(tmp.__proto__.loaded, undefined);
 
 // test the XML constuctor
 if (tmp) {
@@ -867,12 +871,12 @@ myxml.onLoad = function(success)
 #endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(406);
+		check_totals(409);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(441);
+		check_totals(444);
 # else
-		check_totals(422);
+		check_totals(425);
 # endif
 #endif
 		play();

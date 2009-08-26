@@ -385,7 +385,7 @@ check_equals(ns.prefix, "");
 xn = new XMLNode(1, "");
 xn.xmlDecl = "hello";
 xn.docTypeDecl = "dtd";
-check_equals(xn.toString(), "< />");
+xcheck_equals(xn.toString(), "< />");
 
 
 
