@@ -98,10 +98,11 @@ public:
     /// This typedef is only used for the io function that must be
     /// supported by the plugin.
     typedef size_t (*cygnal_io_t)(boost::uint8_t *data, size_t size);
+    typedef boost::shared_ptr<amf::Buffer> (*cygnal_io_read_t)();
     typedef struct {
 	const char *version;
 	const char *description;
-  	cygnal_io_t read_func;
+  	cygnal_io_read_t read_func;
   	cygnal_io_t write_func;
 	protocols_supported_e protocol;
     } cygnal_init_t;
@@ -151,11 +152,7 @@ public:
     ///     See if any of the cgi-bins has been loaded.
     bool initialized();
 
-    size_t readFromPlugin(amf::Buffer &buf) {
-	return readFromPlugin(buf.begin(), buf.allocated()); };
-    boost::shared_ptr<amf::Buffer> readFromPlugin();
-    boost::shared_ptr<amf::Buffer> readFromPlugin(int x);
-    size_t readFromPlugin(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<amf::Buffer> &readFromPlugin();
 
     size_t writeToPlugin(amf::Buffer &buf) {
 	return writeToPlugin(buf.begin(), buf.allocated()); };

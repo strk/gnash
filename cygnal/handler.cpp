@@ -157,7 +157,7 @@ Handler::initModule(const std::string& module)
     symbol = module;
     symbol.append("_read_func");
     
-    Handler::cygnal_io_t read_symptr = reinterpret_cast<Handler::cygnal_io_t>
+    Handler::cygnal_io_read_t read_symptr = reinterpret_cast<Handler::cygnal_io_read_t>
 	(sl->getInitEntry(symbol));
 
      if (!read_symptr) {    
@@ -199,35 +199,17 @@ Handler::writeToPlugin(boost::uint8_t *data, size_t size)
     return ret;
 }
 
-boost::shared_ptr<amf::Buffer>
+boost::shared_ptr<amf::Buffer> &
 Handler::readFromPlugin()
 {
-//    GNASH_REPORT_FUNCTION;
-    return readFromPlugin(amf::NETBUFSIZE);
-}
-
-boost::shared_ptr<amf::Buffer>
-Handler::readFromPlugin(int size)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(size));
-
+    GNASH_REPORT_FUNCTION;
     size_t ret = 0;
-    ret = readFromPlugin(buf->reference(), size);
-
-    return buf;
-}
-
-size_t 
-Handler::readFromPlugin(boost::uint8_t *data, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;
-    size_t ret = 0;
+    boost::shared_ptr<amf::Buffer> buf;
     if (_plugin) {
-	ret = _plugin->read_func(data, size);
+	buf = _plugin->read_func();
     }
 
-    return ret;
+    return buf;
 }
 
 bool 
