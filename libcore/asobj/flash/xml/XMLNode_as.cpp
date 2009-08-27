@@ -434,17 +434,6 @@ XMLNode_as::registerNative(as_object& where)
     vm.registerNative(xmlnode_getPrefixForNamespace, 253, 8);
 }
 
-as_object*
-XMLNode_as::getXMLNodeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL ) {
-        o = new as_object(getObjectInterface());
-        attachXMLNodeInterface(*o);
-    }
-    return o.get();
-}
-
 void
 XMLNode_as::init(as_object& where, const ObjectURI& uri)
 {
@@ -458,6 +447,18 @@ XMLNode_as::init(as_object& where, const ObjectURI& uri)
 }
 
 namespace {
+
+as_object*
+getXMLNodeInterface()
+{
+    static boost::intrusive_ptr<as_object> o;
+    if ( o == NULL ) {
+        o = new as_object(getObjectInterface());
+        attachXMLNodeInterface(*o);
+    }
+    return o.get();
+}
+
 
 void
 attachXMLNodeInterface(as_object& o)
