@@ -255,29 +255,31 @@ as_value
 colortransform_toString(const fn_call& fn)
 {
 
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
 
-    // We need the as_value to_string method, but using ptr->get_member
-    // is unnecessary when we can read directly from the object.
-    as_value alphaMultiplier(relay->getAlphaMultiplier());
-    as_value alphaOffset(relay->getAlphaOffset());
-    as_value blueMultiplier(relay->getBlueMultiplier());
-    as_value blueOffset(relay->getBlueOffset());
-    as_value greenMultiplier(relay->getGreenMultiplier());
-    as_value greenOffset(relay->getGreenOffset());
-    as_value redMultiplier(relay->getRedMultiplier());
-    as_value redOffset(relay->getRedOffset());
+    string_table& st = getStringTable(fn);
+
+    const as_value& am = ptr->getMember(st.find("alphaMultiplier"));
+    const as_value& ao = ptr->getMember(st.find("alphaOffset"));
+    const as_value& bm = ptr->getMember(st.find("blueMultiplier"));
+    const as_value& bo = ptr->getMember(st.find("blueOffset"));
+    const as_value& gm = ptr->getMember(st.find("greenMultiplier"));
+    const as_value& go = ptr->getMember(st.find("greenOffset"));
+    const as_value& rm = ptr->getMember(st.find("redMultiplier"));
+    const as_value& ro = ptr->getMember(st.find("redOffset"));
    
     std::ostringstream ss;
     
-    ss << "(redMultiplier=" << redMultiplier.to_string() << ", "
-       << "greenMultiplier=" << greenMultiplier.to_string() << ", "
-       << "blueMultiplier=" << blueMultiplier.to_string() << ", "
-       << "alphaMultiplier=" << alphaMultiplier.to_string() << ", "
-       << "redOffset=" << redOffset.to_string() << ", "
-       << "greenOffset=" << greenOffset.to_string() << ", "
-       << "blueOffset=" << blueOffset.to_string() << ", "
-       << "alphaOffset=" << alphaOffset.to_string() << ")";
+    const int version = getSWFVersion(fn);
+
+    ss << "(redMultiplier=" << rm.to_string_versioned(version) << ", "
+       << "greenMultiplier=" << gm.to_string_versioned(version) << ", "
+       << "blueMultiplier=" << bm.to_string_versioned(version) << ", "
+       << "alphaMultiplier=" << am.to_string_versioned(version) << ", "
+       << "redOffset=" << ro.to_string_versioned(version) << ", "
+       << "greenOffset=" << go.to_string_versioned(version) << ", "
+       << "blueOffset=" << bo.to_string_versioned(version) << ", "
+       << "alphaOffset=" << ao.to_string_versioned(version) << ")";
        
     return as_value(ss.str());
 
