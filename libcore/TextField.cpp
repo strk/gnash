@@ -51,7 +51,7 @@
 #include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
-#include "TextFormat_as.h" // for getTextFormat/setTextFormat
+#include "TextFormat_as.h"
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 #include "Global_as.h"
@@ -3403,12 +3403,30 @@ textfield_getNewTextFormat(const fn_call& fn)
     return as_value();
 }
 
+
+// This is a bit of a messy compromise. We call the TextFormat ctor (this
+// is necessary because prototype properties are not attached until that is
+// done). Then we access the relay object directly. This is because there
+// aren't enough known parameters to the TextFormat constructor to handle
+// all the values, and it isn't tested properly.
 as_value
 textfield_getTextFormat(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    boost::intrusive_ptr<TextFormat_as> tf = new TextFormat_as;
+    Global_as* gl = getGlobal(fn);
+    as_function* ctor = gl->getMember(NSV::CLASS_TEXT_FORMAT).to_as_function();
+
+    if (!ctor) return as_value();
+
+    fn_call::Args args;
+    as_object* textformat = ctor->constructInstance(fn.env(), args).get();
+    TextFormat_as* tf;
+
+    if (!isNativeType(textformat, tf)) {
+        return as_value();
+    }
+
     tf->alignSet(text->getTextAlignment());
     tf->sizeSet(text->getFontHeight());
     tf->indentSet(text->getIndent());
@@ -3434,7 +3452,7 @@ textfield_getTextFormat(const fn_call& fn)
             "tabStops, bullet and display")
     );
 
-    return as_value(tf.get());
+    return as_value(textformat);
 }
 
 as_value
@@ -3459,28 +3477,17 @@ textfield_setTextFormat(const fn_call& fn)
                 "unhandled by Gnash", ss.str());
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
-    if ( ! obj )
-    {
+    TextFormat_as* tf;
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), tf)) {
+
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), 
-            _("first argument is not an object"))
-        );
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), 
+                _("first argument is not a TextFormat"))
+            );
         return as_value();
     }
 
-    TextFormat_as* tf = dynamic_cast<TextFormat_as*>(obj);
-    if ( ! tf )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
-            _("first argument is not a TextFormat"))
-        );
-        return as_value();
-    }
-    
     if (isAS3(fn)) {
         // TODO: current font finding assumes we have a parent, which isn't
         // necessarily the case in AS3. It seems the AS2 implementation is

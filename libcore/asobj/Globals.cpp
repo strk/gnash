@@ -451,7 +451,7 @@ avm1Classes()
         (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
+        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
@@ -540,7 +540,7 @@ avm2Classes(string_table& st)
         // Text classes
         (N(textfield_class_init, NSV::CLASS_TEXT_FIELD,
            NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_TEXT, 3))
-        (N(TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
+        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
         (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
@@ -1403,7 +1403,7 @@ registerNatives(as_object& global)
     registerColorTransformNative(global);
 
     AsBroadcaster::registerNative(global);
-    TextFormat_as::registerNative(global);
+    registerTextFormatNative(global);
     registerDateNative(global);
     Mouse_as::registerNative(global);
 

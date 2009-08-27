@@ -23,6 +23,7 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h" // for getter/setter properties
+#include "NativeFunction.h" // for getter/setter properties
 #include "namedStrings.h"
 #include "VM.h"
 #include "RGBA.h" // for rgba type
@@ -80,11 +81,14 @@ TextFormat_as::displaySet(const std::string& display)
 }
 
 void
-TextFormat_as::registerNative(as_object& o)
+registerTextFormatNative(as_object& o)
 {
     VM& vm = getVM(o);
     
-    //vm.registerNative(110, 0) // [_global] TextFormat
+    // TODO: find out native accessors for kerning, letterSpacing.
+    // TODO: these functions are probably split into getters and setters
+    // instead of one function for both. Needs testing.
+    vm.registerNative(textformat_new, 110, 0);
     vm.registerNative(textformat_font, 110, 1);
     vm.registerNative(textformat_font, 110, 2);
     vm.registerNative(textformat_size, 110, 3);
@@ -118,12 +122,10 @@ TextFormat_as::registerNative(as_object& o)
     vm.registerNative(textformat_bullet, 110, 31);
     vm.registerNative(textformat_bullet, 110, 32);
     vm.registerNative(textformat_getTextExtent, 110, 33);
-
 }
 
 TextFormat_as::TextFormat_as()
 	:
-	as_object(getTextFormatInterface()),
 	_flags(0),
 	_underline(false),
 	_bold(false),
@@ -142,19 +144,17 @@ TextFormat_as::TextFormat_as()
 	_target(),
 	_url()
 {
-    Global_as* gl = getGlobal(*this);
-	init_member("getTextExtent", gl->createFunction(textformat_getTextExtent));
 }
 
 
 
 // extern (used by Global.cpp)
 void
-TextFormat_as::init(as_object& global, const ObjectURI& uri)
+textformat_class_init(as_object& global, const ObjectURI& uri)
 {
 
     Global_as* gl = getGlobal(global);
-    as_object* proto = getTextFormatInterface();
+    as_object* proto = gl->createObject();;
     as_object* cl = gl->createClass(&textformat_new, proto);
 
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -166,13 +166,21 @@ TextFormat_as::init(as_object& global, const ObjectURI& uri)
 namespace {
 
 /// new TextFormat([font, [size, [color, [bold, [italic, [underline, [url, [target, [align,[leftMargin, [rightMargin, [indent, [leading]]]]]]]]]]]]])
+//
+/// This is a native function responsible for:
+/// 1. attaching properties to TextFormat.prototype
+/// 2. adding a getTextExtent member to the constructed object
+/// 3. attaching the TextFormat_as relay object.
+/// 4. setting the appropriate native properties of TextFormat_as
 as_value
 textformat_new(const fn_call& fn)
 {
 
-	boost::intrusive_ptr<TextFormat_as> tf = new TextFormat_as;
-	
-	const unsigned int args = fn.nargs;
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+
+    std::auto_ptr<TextFormat_as> tf(new TextFormat_as);
+
+	const size_t args = fn.nargs;
 	
 	switch (args)
 	{
@@ -214,27 +222,38 @@ textformat_new(const fn_call& fn)
 	        break;
 	}
 	
-	return as_value(tf.get());
+    obj->setRelay(tf.release());
+    as_object* proto = obj->get_prototype().get();
+    if (proto) attachTextFormatInterface(*proto);
+
+    const int flags = 0;
+    
+    // This is a weird function with no children.
+    VM& vm = getVM(fn);
+    NativeFunction* gte = vm.getNative(110, 33);
+    gte->clearProperties();
+	obj->init_member("getTextExtent", gte, flags);
+
+	return as_value();
 }
 
 as_value
 textformat_display(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-    ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->displayDefined() ) {
-            ret.set_string(getDisplayString(ptr->display()));
+		if ( relay->displayDefined() ) {
+            ret.set_string(getDisplayString(relay->display()));
         }
         else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->displaySet(fn.arg(0).to_string());
+		relay->displaySet(fn.arg(0).to_string());
 	}
 
 	return ret;
@@ -243,19 +262,19 @@ textformat_display(const fn_call& fn)
 as_value
 textformat_bullet(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->bulletDefined() ) ret.set_bool(ptr->bullet());
+		if ( relay->bulletDefined() ) ret.set_bool(relay->bullet());
 		else ret.set_null();
 	}
 	else // setter
 	{
 	    // Boolean
-		ptr->bulletSet(fn.arg(0).to_bool());
+		relay->bulletSet(fn.arg(0).to_bool());
 	}
 
 	return ret;
@@ -264,7 +283,7 @@ textformat_bullet(const fn_call& fn)
 as_value
 textformat_tabStops(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 	
 	as_value ret;
 		
@@ -274,8 +293,10 @@ textformat_tabStops(const fn_call& fn)
 		return ret;
 	}
 	
-	boost::intrusive_ptr<Array_as> tStops = 
-            ensureType<Array_as>(fn.arg(0).to_object(*getGlobal(fn)));
+    as_object* arg = fn.arg(0).to_object(*getGlobal(fn)).get();
+    Array_as* tStops = dynamic_cast<Array_as*>(arg);
+
+    if (!tStops) return as_value();
 			
 	std::vector<int> tabStops(tStops->size());
 
@@ -290,7 +311,7 @@ textformat_tabStops(const fn_call& fn)
 	}
 	else 				// setter
 	{
-		ptr->tabStopsSet(tabStops);
+		relay->tabStopsSet(tabStops);
 	}
 	
 	return ret;
@@ -299,18 +320,20 @@ textformat_tabStops(const fn_call& fn)
 as_value
 textformat_blockIndent(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->blockIndentDefined() ) ret.set_double(twipsToPixels(ptr->blockIndent()));
+		if (relay->blockIndentDefined()) {
+            ret.set_double(twipsToPixels(relay->blockIndent()));
+        }
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->blockIndentSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->blockIndentSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -319,18 +342,18 @@ textformat_blockIndent(const fn_call& fn)
 as_value
 textformat_leading(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->leadingDefined() ) ret.set_double(twipsToPixels(ptr->leading()));
+		if ( relay->leadingDefined() ) ret.set_double(twipsToPixels(relay->leading()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->leadingSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->leadingSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -339,18 +362,18 @@ textformat_leading(const fn_call& fn)
 as_value
 textformat_indent(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->indentDefined() ) ret.set_double(twipsToPixels(ptr->indent()));
+		if ( relay->indentDefined() ) ret.set_double(twipsToPixels(relay->indent()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->indentSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->indentSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -359,18 +382,18 @@ textformat_indent(const fn_call& fn)
 as_value
 textformat_rightMargin(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->rightMarginDefined() ) ret.set_double(twipsToPixels(ptr->rightMargin()));
+		if ( relay->rightMarginDefined() ) ret.set_double(twipsToPixels(relay->rightMargin()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->rightMarginSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->rightMarginSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -379,21 +402,20 @@ textformat_rightMargin(const fn_call& fn)
 as_value
 textformat_leftMargin(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if (ptr->leftMarginDefined()) {
-            ret.set_double(twipsToPixels(ptr->leftMargin()));
+		if (relay->leftMarginDefined()) {
+            ret.set_double(twipsToPixels(relay->leftMargin()));
         }
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->leftMarginSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->leftMarginSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -402,21 +424,20 @@ textformat_leftMargin(const fn_call& fn)
 as_value
 textformat_align(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->alignDefined() ) {
-            ret.set_string(getAlignString(ptr->align()));
+		if ( relay->alignDefined() ) {
+            ret.set_string(getAlignString(relay->align()));
         }
         else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->alignSet(fn.arg(0).to_string());
+		relay->alignSet(fn.arg(0).to_string());
 	}
 
 	return ret;
@@ -425,19 +446,18 @@ textformat_align(const fn_call& fn)
 as_value
 textformat_underline(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->underlinedDefined() ) ret.set_bool(ptr->underlined());
+		if ( relay->underlinedDefined() ) ret.set_bool(relay->underlined());
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->underlinedSet(fn.arg(0).to_bool());
+		relay->underlinedSet(fn.arg(0).to_bool());
 	}
 
 	return ret;
@@ -446,19 +466,18 @@ textformat_underline(const fn_call& fn)
 as_value
 textformat_italic(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->italicedDefined() ) ret.set_bool(ptr->italiced());
+		if ( relay->italicedDefined() ) ret.set_bool(relay->italiced());
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->italicedSet(fn.arg(0).to_bool());
+		relay->italicedSet(fn.arg(0).to_bool());
 	}
 
 	return ret;
@@ -467,19 +486,18 @@ textformat_italic(const fn_call& fn)
 as_value
 textformat_bold(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->boldDefined() ) ret.set_bool(ptr->bold());
+		if ( relay->boldDefined() ) ret.set_bool(relay->bold());
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->boldSet(fn.arg(0).to_bool());
+		relay->boldSet(fn.arg(0).to_bool());
 	}
 
 	return ret;
@@ -488,19 +506,18 @@ textformat_bold(const fn_call& fn)
 as_value
 textformat_target(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->targetDefined() ) ret.set_string(ptr->target());
+		if ( relay->targetDefined() ) ret.set_string(relay->target());
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->targetSet(fn.arg(0).to_string());
+		relay->targetSet(fn.arg(0).to_string());
 	}
 
 	return ret;
@@ -509,19 +526,18 @@ textformat_target(const fn_call& fn)
 as_value
 textformat_url(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->urlDefined() ) ret.set_string(ptr->url());
+		if ( relay->urlDefined() ) ret.set_string(relay->url());
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->urlSet(fn.arg(0).to_string());
+		relay->urlSet(fn.arg(0).to_string());
 	}
 
 	return ret;
@@ -530,21 +546,20 @@ textformat_url(const fn_call& fn)
 as_value
 textformat_color(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->colorDefined() )  ret.set_double(ptr->color().toRGB());
+		if ( relay->colorDefined() )  ret.set_double(relay->color().toRGB());
 		else ret.set_null();
 	}
 	else // setter
 	{
 		rgba newcolor;
 		newcolor.parseRGB(fn.arg(0).to_int());
-		ptr->colorSet(newcolor);
+		relay->colorSet(newcolor);
 	}
 
 	return ret;
@@ -553,19 +568,18 @@ textformat_color(const fn_call& fn)
 as_value
 textformat_size(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr =
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->sizeDefined() ) ret.set_double(twipsToPixels(ptr->size()));
+		if ( relay->sizeDefined() ) ret.set_double(twipsToPixels(relay->size()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->sizeSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->sizeSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -574,19 +588,18 @@ textformat_size(const fn_call& fn)
 as_value
 textformat_font(const fn_call& fn)
 {
-	boost::intrusive_ptr<TextFormat_as> ptr = 
-        ensureType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 
 	as_value ret;
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->fontDefined() ) ret.set_string(ptr->font());
+		if (relay->fontDefined()) ret.set_string(relay->font());
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->fontSet(fn.arg(0).to_string());
+		relay->fontSet(fn.arg(0).to_string());
 	}
 
 	return ret;
@@ -594,8 +607,10 @@ textformat_font(const fn_call& fn)
 
 
 as_value
-textformat_getTextExtent(const fn_call& /*fn*/)
+textformat_getTextExtent(const fn_call& fn)
 {
+    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    UNUSED(relay);
 	LOG_ONCE( log_unimpl("TextFormat.getTextExtent") );
 	return as_value();
 }
@@ -604,42 +619,63 @@ textformat_getTextExtent(const fn_call& /*fn*/)
 void
 attachTextFormatInterface(as_object& o)
 {
-	int flags = 0; // for sure we want to enum, dunno about deleting yet
+	int flags = 0;
 
-	o.init_property("display", textformat_display, textformat_display, flags);
-	o.init_property("bullet", textformat_bullet, textformat_bullet, flags);
-	o.init_property("tabStops", textformat_tabStops, 
-            textformat_tabStops, flags);
-	o.init_property("blockIndent", textformat_blockIndent, 
-            textformat_blockIndent, flags);
-	o.init_property("leading", textformat_leading, textformat_leading, flags);
-	o.init_property("indent", textformat_indent, textformat_indent, flags);
-	o.init_property("rightMargin", textformat_rightMargin, 
-            textformat_rightMargin, flags);
-	o.init_property("leftMargin", textformat_leftMargin, 
-            textformat_leftMargin, flags);
-	o.init_property("align", textformat_align, textformat_align, flags);
-	o.init_property("underline", textformat_underline, 
-            textformat_underline, flags);
-	o.init_property("italic", textformat_italic, textformat_italic, flags);
-	o.init_property("bold", textformat_bold, textformat_bold, flags);
-	o.init_property("target", textformat_target, textformat_target, flags);
-	o.init_property("url", textformat_url, textformat_url, flags);
-	o.init_property("color", textformat_color, textformat_color, flags);
-	o.init_property("size", textformat_size, textformat_size, flags);
-	o.init_property("font", textformat_font, textformat_font, flags);
-}
+    NativeFunction* get;
+    NativeFunction* set;
 
-as_object*
-getTextFormatInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if (!o) {
-		o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-		attachTextFormatInterface(*o);
-	}
-	return o.get();
+    VM& vm = getVM(o);
+
+    get = vm.getNative(110, 1);
+    set = vm.getNative(110, 2);
+	o.init_property("font", *get, *set, flags);
+    get = vm.getNative(110, 3);
+    set = vm.getNative(110, 4);
+	o.init_property("size", *get, *set, flags);
+    get = vm.getNative(110, 5);
+    set = vm.getNative(110, 6);
+	o.init_property("color", *get, *set, flags);
+    get = vm.getNative(110, 7);
+    set = vm.getNative(110, 8);
+	o.init_property("url", *get, *set, flags);
+    get = vm.getNative(110, 9);
+    set = vm.getNative(110, 10);
+	o.init_property("target", *get, *set, flags);
+    get = vm.getNative(110, 11);
+    set = vm.getNative(110, 12);
+	o.init_property("bold", *get, *set, flags);
+    get = vm.getNative(110, 13);
+    set = vm.getNative(110, 14);
+	o.init_property("italic", *get, *set, flags);
+    get = vm.getNative(110, 15);
+    set = vm.getNative(110, 16);
+	o.init_property("underline", *get, *set, flags);
+    get = vm.getNative(110, 17);
+    set = vm.getNative(110, 18);
+	o.init_property("align", *get, *set, flags);
+    get = vm.getNative(110, 19);
+    set = vm.getNative(110, 20);
+	o.init_property("leftMargin", *get, *set, flags);
+    get = vm.getNative(110, 21);
+    set = vm.getNative(110, 22);
+	o.init_property("rightMargin", *get, *set, flags);
+    get = vm.getNative(110, 23);
+    set = vm.getNative(110, 24);
+	o.init_property("indent", *get, *set, flags);
+    get = vm.getNative(110, 25);
+    set = vm.getNative(110, 26);
+	o.init_property("leading", *get, *set, flags);
+    get = vm.getNative(110, 27);
+    set = vm.getNative(110, 28);
+	o.init_property("blockIndent", *get, *set, flags);
+    get = vm.getNative(110, 29);
+    set = vm.getNative(110, 30);
+	o.init_property("tabStops", *get, *set, flags);
+    get = vm.getNative(110, 31);
+    set = vm.getNative(110, 32);
+	o.init_property("bullet", *get, *set, flags);
+
+    o.init_property("display", textformat_display, textformat_display, flags);
 }
 
 
