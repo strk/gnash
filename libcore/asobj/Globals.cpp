@@ -138,6 +138,7 @@ namespace {
     as_value global_parsefloat(const fn_call& fn);
     as_value global_parseint(const fn_call& fn);
     as_value global_assetpropflags(const fn_call& fn);
+    as_value global_assetuperror(const fn_call& fn);
     as_value global_asnative(const fn_call& fn);
     as_value global_asnew(const fn_call& fn);
     as_value global_assetnative(const fn_call& fn);
@@ -148,6 +149,9 @@ namespace {
     as_value global_clearTimeout(const fn_call& fn);
     as_value global_clearInterval(const fn_call& fn);
     as_value global_setInterval(const fn_call& fn);
+
+    // This is a help function for the silly AsSetupError function.
+    as_value local_errorConstructor(const fn_call& fn);
     
     void registerNatives(as_object& global);
     template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
@@ -326,6 +330,7 @@ AVM1Global::registerClasses()
     init_member("ASSetPropFlags", _vm.getNative(1, 0));
     init_member("ASSetNative", _vm.getNative(4, 0));
     init_member("ASSetNativeAccessor", _vm.getNative(4, 1));
+    init_member("AsSetupError", createFunction(global_assetuperror));
     init_member("updateAfterEvent", _vm.getNative(9, 0));
     init_member("trace", _vm.getNative(100, 4));
 
@@ -1149,6 +1154,57 @@ global_updateAfterEvent(const fn_call& /*fn*/)
     return as_value();
 }
 
+as_value
+local_errorConstructor(const fn_call& fn)
+{
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    const as_value& arg = fn.nargs ? fn.arg(0) : as_value();
+    string_table& st = getStringTable(fn);
+    obj->set_member(st.find("message"), arg);
+    return as_value();
+}
+
+
+/// Sets a range of Error subclasses.
+as_value
+global_assetuperror(const fn_call& fn)
+{
+    if (!fn.nargs) return as_value();
+
+    // This should actually call String.split, but since our Array is
+    // wrong we may as well do it like this for now.
+    const std::string& errors = fn.arg(0).to_string();
+
+    std::string::const_iterator pos = errors.begin();
+
+    Global_as* gl = getGlobal(fn);
+
+    // pos is always the position after the last located error.
+    for (;;) {
+
+        // If there are no further commas, find the end of the string.
+        std::string::const_iterator comma = std::find(pos, errors.end(), ',');
+
+        const std::string& err = std::string(pos, comma);
+
+        string_table& st = getStringTable(fn);
+
+        as_function* ctor = gl->getMember(NSV::CLASS_ERROR).to_as_function();
+        if (ctor) {
+            fn_call::Args args;
+            as_object* proto = ctor->constructInstance(fn.env(), args).get();
+
+            // Not really sure what the point of this is.
+            gl->createClass(local_errorConstructor, proto);
+            proto->set_member(st.find("name"), err);
+            proto->set_member(st.find("message"), err);
+        }
+        
+        if (comma == errors.end()) break;
+        pos = comma + 1;
+    }
+    return as_value();
+}
 
 as_value
 global_setInterval(const fn_call& fn)
@@ -1319,8 +1375,9 @@ global_clearInterval(const fn_call& fn)
 //
 /// TODO: consider whether ActionTypeError is an appropriate exception.
 /// TODO: test the other failure cases.
-template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
-        string_table::key className)
+template<typename T>
+as_object*
+constructObject(Global_as& gl, const T& arg, string_table::key className)
 {
     as_value clval;
 
