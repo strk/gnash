@@ -31,6 +31,7 @@
 #include "movie_root.h"
 #include "VM.h"
 #include "builtin_function.h"
+#include "NativeFunction.h"
 #include "fn_call.h" 
 #include "ExecutableCode.h"
 #include "namedStrings.h"
@@ -307,6 +308,7 @@ attachButtonInterface(as_object& o)
     
     const int unprotected = 0;
     o.init_member(NSV::PROP_ENABLED, true, unprotected);
+    o.init_member("useHandCursor", true, unprotected);
 
 }
 
@@ -1118,7 +1120,7 @@ button_ctor(const fn_call& /* fn */)
 }
 
 void
-Button::init(as_object& global, const ObjectURI& uri)
+button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
     Global_as* gl = getGlobal(global);
@@ -1128,6 +1130,12 @@ Button::init(as_object& global, const ObjectURI& uri)
     // Register _global.MovieClip
     global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
+}
+
+void
+registerButtonNative(as_object& /*global*/)
+{
+    // TODO: button.getDepth
 }
 
 #ifdef USE_SWFTREE

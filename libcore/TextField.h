@@ -873,6 +873,8 @@ private:
 /// Initialize the global TextField class
 void textfield_class_init(as_object& global, const ObjectURI& uri);
 
+void registerTextFieldNative(as_object& global);
+
 } // namespace gnash
 
 #endif 

@@ -444,7 +444,7 @@ avm1Classes()
         (N(math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4))
         (N(boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT,
+        (N(button_class_init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
@@ -545,8 +545,8 @@ avm2Classes(string_table& st)
            NSV::NS_FLASH_DISPLAY, 3))
         (N(stage_class_init, NSV::CLASS_STAGE, NSV::CLASS_MOVIE_CLIP,
            NSV::NS_FLASH_DISPLAY, 1))
-        (N(Button::init, st.find("SimpleButton"), NSV::CLASS_INTERACTIVEOBJECT,
-           NSV::NS_FLASH_DISPLAY, 5))
+        (N(button_class_init, st.find("SimpleButton"),
+           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY, 5))
 
         // Text classes
         (N(textfield_class_init, NSV::CLASS_TEXT_FIELD,
@@ -1334,6 +1334,8 @@ registerNatives(as_object& global)
     registerSystemNative(global);
     registerAccessibilityNative(global);
     registerStageNative(global);
+    registerTextFieldNative(global);
+    registerButtonNative(global);
     registerVideoNative(global);
     registerXMLSocketNative(global);
     registerSharedObjectNative(global);
