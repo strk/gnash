@@ -272,7 +272,7 @@ NetStream_as::getStatusObject(StatusCode code)
     // Enumerable and deletable.
     const int flags = 0;
 
-    as_object* o = new as_object(getObjectInterface());
+    getGlobal(owner())->createObject();
     o->init_member("code",  info.first, flags);
     o->init_member("level", info.second, flags);
 
@@ -647,18 +647,6 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 #endif 
             return video;
         }
-
-#if 0 // TODO: check if the video is a cue point, if so, call processNotify(onCuePoint, object..)
-          // NOTE: should only be done for SWF>=8 ?
-        if ( 1 ) // frame->isKeyFrame() )
-        {
-            as_object* infoObj = new as_object();
-            string_table& st = getVM().getStringTable();
-            infoObj->set_member(st.find("time"), as_value(double(frame->timestamp())));
-            infoObj->set_member(st.find("type"), as_value("navigation"));
-            processNotify("onCuePoint", infoObj);
-        }
-#endif
 
         assert( _videoDecoder.get() ); 
         
