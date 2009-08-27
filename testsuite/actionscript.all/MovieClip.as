@@ -72,6 +72,7 @@ check(MovieClip.prototype.hasOwnProperty("transform"));
 check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
 check(MovieClip.prototype.hasOwnProperty("_lockroot"));
 check(MovieClip.prototype.hasOwnProperty("beginBitmapFill"));
+check(MovieClip.prototype.hasOwnProperty("beginMeshFill"));
 check(MovieClip.prototype.hasOwnProperty("getRect"));
 check(MovieClip.prototype.hasOwnProperty("lineGradientStyle"));
 check(MovieClip.prototype.hasOwnProperty("getInstanceAtDepth"));
@@ -111,19 +112,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(334); // SWF5
+	check_totals(335); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(899); // SWF6
+	check_totals(900); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(916); // SWF7
+	check_totals(917); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1006); // SWF8+
+	check_totals(1007); // SWF8+
 #endif
 
 	play();
