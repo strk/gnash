@@ -323,7 +323,7 @@ externalInterfaceConstructor(const fn_call& fn)
 {
     log_debug("Loading flash.external.ExternalInterface class");
     Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* proto = gl->createObject();
     as_object* cl = gl->createClass(&externalinterface_ctor, proto);
 
     attachExternalInterfaceInterface(*proto);

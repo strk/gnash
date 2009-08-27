@@ -28,8 +28,8 @@ namespace gnash {
 namespace SWF {
 
 void
-SetTabIndexTag::loader(SWFStream& in, TagType tag, movie_definition& md,
-        const RunResources& r)
+SetTabIndexTag::loader(SWFStream& in, TagType /*tag*/, movie_definition& /*md*/,
+        const RunResources& /*r*/)
 {
     in.ensureBytes(2);
     boost::uint16_t depth = in.read_u16();
@@ -40,6 +40,7 @@ SetTabIndexTag::loader(SWFStream& in, TagType tag, movie_definition& md,
 
     in.ensureBytes(2);
     boost::uint16_t tab_index = in.read_u16();
+    UNUSED(tab_index);
 
     log_unimpl("SetTabIndexTag");
 

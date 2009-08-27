@@ -21,25 +21,22 @@
 #ifndef GNASH_TEXTFORMAT_H
 #define GNASH_TEXTFORMAT_H
 
-#include "as_object.h" // for inheritance of TextFormat
-#include "TextField.h" // for TextAlignment enum
-#include "RGBA.h" // for rgba
-#include <boost/cstdint.hpp> // for boost::uint32_t
+#include "as_object.h" 
+#include "TextField.h"
+#include "RGBA.h" 
+
+#include <boost/cstdint.hpp> 
 #include <string>
 
 namespace gnash {  
 
-class TextFormat_as : public as_object
+/// TODO: SWF8 has two additional members: kerning and letterSpacing.
+class TextFormat_as : public Relay
 {
 public:
   
 	TextFormat_as();
 	~TextFormat_as() {}
-
-    static void registerNative(as_object& global);
-
-    /// Initialize the global Color class
-    static void init(as_object& global, const ObjectURI& uri);
 
 	/// Return a Boolean value that indicates whether the text is underlined.
 	bool underlined() const { return _underline; }
@@ -259,7 +256,11 @@ private:
 	/// If url is an empty string, the text does not have a hyperlink
 	std::string	 _url;	
 };
- 
+
+void textformat_class_init(as_object& global, const ObjectURI& uri);
+
+void registerTextFormatNative(as_object& global);
+
 } // end of gnash namespace
 
 #endif

@@ -34,7 +34,7 @@
 #include <sstream>
 
 namespace gnash {
-class XMLNode_as : public virtual as_object, boost::noncopyable
+class XMLNode_as : public virtual as_object
 {
 public:
 
@@ -59,9 +59,6 @@ public:
 
     // Initialize the global XMLNode class
     static void init(as_object& where, const ObjectURI& uri);
-
-    // Used by XML_as
-    static as_object* getXMLNodeInterface();
 
     /// Register ASnative methods
     static void registerNative(as_object& where);

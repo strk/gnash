@@ -2935,8 +2935,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     // TODO: see if this could call the ASnative function(101, 9).
     Global_as* gl = getGlobal(env);
-    as_object* proto = getObjectInterface();
-    as_object* obj = gl->createObject(proto);
+    as_object* obj = gl->createObject();
 
     obj->init_member(NSV::PROP_CONSTRUCTOR, gl->getMember(NSV::CLASS_OBJECT));
 

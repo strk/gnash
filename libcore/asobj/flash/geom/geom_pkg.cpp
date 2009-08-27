@@ -17,7 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Object.h" // for getObjectInterface
+#include "Object.h"
+#include "Global_as.h" 
 #include "as_object.h"
 #include "string_table.h"
 #include "VM.h"
@@ -36,7 +37,9 @@ static as_value
 get_flash_geom_package(const fn_call& fn)
 {
     log_debug("Loading flash.geom package");
-    as_object *pkg = new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(fn);
+
+    as_object *pkg = gl->createObject();
 	
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;

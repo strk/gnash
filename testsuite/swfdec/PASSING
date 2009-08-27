@@ -184,10 +184,19 @@ color-setTransform-empty.swf:2a72a5273ab8713ee289ff1726b0959c
 color-setTransform-full.swf:7a8e59cef9592c4546f07fb9f391c61a
 color-setTransform-negative.swf:0bc0510c35fc5c82de31b0db887fe535
 color-transform-concat-5.swf:92f467ed0cee02fbc9618a17c382ef3b
+color-transform-concat-6.swf:10677612a1795de193f9a8a7b99eaaa5
+color-transform-concat-7.swf:df14e747698a6513f73990f6726944b0
+color-transform-construct-6.swf:ce54eb919f4069cd3ab70f84bfd31670
+color-transform-construct-7.swf:7c50d7d221a731c2296789f434b718e4
 color-transform-construct-8.swf:d68ee06d60eb6612648365ab75f6b794
+color-transform-multipliers-offsets-6.swf:39d6b281f35c71a689670546925bfd81
+color-transform-multipliers-offsets-7.swf:f8d2e159086669b8b3cfb212c183f64d
 color-transform-multipliers-offsets-8.swf:6e4558a870ddbf941365171accb8cf18
 color-transform-properties-5.swf:74bd1e74d40fd8741000366645b7c776
 color-transform-properties-5.swf:7e620e53cb1e19d5793e3198e9f08993
+color-transform-properties-6.swf:3946bb0de3a610f1a690b43b1fe48f70
+color-transform-properties-7.swf:f1e3056a0a679136529e317550797e63
+color-transform-properties-8.swf:23fff32f746e8267cf86d464e52727df
 comparisons-4.swf:e0bb89e492f3f35e51b1beb190935a14
 comparisons-5.swf:d4dfeb4ec80ec1f5a7390eb699e269ee
 comparisons-6.swf:5a7bf1ffb3a4dd23828d6e180f1871b0
@@ -1250,6 +1259,7 @@ text-field-type-of-7.swf:7593f12ceefba6925ce6abcbc01751bf
 text-field-type-of-8.swf:bac748e2b13ba9331c27f5ee45109ac4
 textformat-init-5.swf:52dec30885359d5bdda450588076eb10
 textformat-init-5.swf:d45b857148b96635af7d18855cb067ae
+textformat-properties-7.swf:390495b699f387f9647c8cf47afa2175
 text-snapshot-properties-5.swf:caf502463913e8aa1959715f629b92aa
 text-snapshot-properties-6.swf:b17d4634477fa1e2a5a095fba489d3ed
 text-snapshot-properties-7.swf:48ce09024d43af945101025c62b9848a

@@ -50,8 +50,8 @@ namespace {
     as_value system_showsettings(const fn_call& fn);
     as_value system_exactsettings(const fn_call& fn);
     as_value system_usecodepage(const fn_call& fn);
-    as_object* getSystemSecurityInterface(as_object& o);
-    as_object* getSystemCapabilitiesInterface(as_object& o);
+    void attachSystemSecurityInterface(as_object& o);
+    void attachSystemCapabilitiesInterface(as_object& o);
     void attachSystemInterface(as_object& proto);
     
     // AS3 functions.
@@ -67,14 +67,7 @@ namespace {
 void
 system_class_init(as_object& where, const ObjectURI& uri)
 {
-	// _global.System is NOT a class, but a simple object, see System.as
-
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-	boost::intrusive_ptr<as_object> obj = gl->createObject(proto);
-	attachSystemInterface(*obj);
-	where.init_member(getName(uri), obj.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinObject(where, attachSystemInterface, uri);
 }
 
 
@@ -127,30 +120,22 @@ addAllowDataAccess( const std::string& url )
 
 namespace {
 
-as_object*
-getSystemSecurityInterface(as_object& o)
+void
+attachSystemSecurityInterface(as_object& o)
 {
     VM& vm = getVM(o);
+    o.init_member("allowDomain", vm.getNative(12, 0));
 
-	static boost::intrusive_ptr<as_object> proto;
-	if ( proto == NULL )
-	{
-		proto = new as_object(getObjectInterface());
-		proto->init_member("allowDomain", vm.getNative(12, 0));
-
-        Global_as* gl = getGlobal(o);
-		// TODO: only available when SWF >= 7 
-		proto->init_member("allowInsecureDomain",
-                gl->createFunction(system_security_allowinsecuredomain));
-
-		proto->init_member("loadPolicyFile",
-                gl->createFunction(system_security_loadpolicyfile));
-	}
-	return proto.get();
+    Global_as* gl = getGlobal(o);
+    // TODO: only available when SWF >= 7 
+    o.init_member("allowInsecureDomain",
+            gl->createFunction(system_security_allowinsecuredomain));
+    o.init_member("loadPolicyFile",
+            gl->createFunction(system_security_loadpolicyfile));
 }
 
-as_object*
-getSystemCapabilitiesInterface(as_object& o)
+void
+attachSystemCapabilitiesInterface(as_object& o)
 {
 	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -288,45 +273,38 @@ getSystemCapabilitiesInterface(as_object& o)
 			<< "&WD="   << trueFalse(windowlessDisable)
 			<< "&TLS="	<< trueFalse(hasTLS);
 	
-	static boost::intrusive_ptr<as_object> proto;
-	if ( proto == NULL )
-	{
-		const int flags = PropFlags::dontDelete
-		                | PropFlags::dontEnum
-		                | PropFlags::readOnly;
+    const int flags = PropFlags::dontDelete
+                    | PropFlags::dontEnum
+                    | PropFlags::readOnly;
 
-		proto = new as_object(getObjectInterface());
-
-		proto->init_member("version", version, flags);
-		proto->init_member("playerType", playerType, flags);
-		proto->init_member("os", os, flags);
-		proto->init_member("manufacturer", manufacturer, flags);
-		proto->init_member("language", language, flags);
-		proto->init_member("hasAudio", hasAudio, flags);
-		proto->init_member("screenResolutionX", screenResolutionX, flags);
-		proto->init_member("screenResolutionY", screenResolutionY, flags);
-		proto->init_member("screenColor", screenColor, flags);
-		proto->init_member("screenDPI", screenDPI, flags);
-		proto->init_member("pixelAspectRatio", pixelAspectRatio, flags);
-		proto->init_member("serverString", serverString.str(), flags);
-		proto->init_member("avHardwareDisable", avHardwareDisable, flags);
-		proto->init_member("hasAudioEncoder", hasAudioEncoder, flags);
-		proto->init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
-		proto->init_member("hasIME", hasIME, flags);
-		proto->init_member("hasMP3", hasMP3, flags);
-		proto->init_member("hasPrinting", hasPrinting, flags);
-		proto->init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
-		proto->init_member("hasScreenPlayback", hasScreenPlayback, flags);
-		proto->init_member("hasStreamingAudio", hasStreamingAudio, flags);
-		proto->init_member("hasStreamingVideo", hasStreamingVideo, flags);
-		proto->init_member("hasVideoEncoder", hasVideoEncoder, flags);
-		proto->init_member("hasAccessibility", hasAccessibility, flags);
-		proto->init_member("isDebugger", isDebugger, flags);
-		proto->init_member("localFileReadDisable", localFileReadDisable, flags);
-		proto->init_member("hasTLS", hasTLS, flags);
-		proto->init_member("windowlessDisable", windowlessDisable, flags);
-	}
-	return proto.get();
+    o.init_member("version", version, flags);
+    o.init_member("playerType", playerType, flags);
+    o.init_member("os", os, flags);
+    o.init_member("manufacturer", manufacturer, flags);
+    o.init_member("language", language, flags);
+    o.init_member("hasAudio", hasAudio, flags);
+    o.init_member("screenResolutionX", screenResolutionX, flags);
+    o.init_member("screenResolutionY", screenResolutionY, flags);
+    o.init_member("screenColor", screenColor, flags);
+    o.init_member("screenDPI", screenDPI, flags);
+    o.init_member("pixelAspectRatio", pixelAspectRatio, flags);
+    o.init_member("serverString", serverString.str(), flags);
+    o.init_member("avHardwareDisable", avHardwareDisable, flags);
+    o.init_member("hasAudioEncoder", hasAudioEncoder, flags);
+    o.init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
+    o.init_member("hasIME", hasIME, flags);
+    o.init_member("hasMP3", hasMP3, flags);
+    o.init_member("hasPrinting", hasPrinting, flags);
+    o.init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
+    o.init_member("hasScreenPlayback", hasScreenPlayback, flags);
+    o.init_member("hasStreamingAudio", hasStreamingAudio, flags);
+    o.init_member("hasStreamingVideo", hasStreamingVideo, flags);
+    o.init_member("hasVideoEncoder", hasVideoEncoder, flags);
+    o.init_member("hasAccessibility", hasAccessibility, flags);
+    o.init_member("isDebugger", isDebugger, flags);
+    o.init_member("localFileReadDisable", localFileReadDisable, flags);
+    o.init_member("hasTLS", hasTLS, flags);
+    o.init_member("windowlessDisable", windowlessDisable, flags);
 }
 
 /// Convert a string to the type passed in, making sure the target variable
@@ -335,23 +313,26 @@ template<typename T>
 inline void
 convertValue(const std::string& in, T& val)
 {
-    val = T();
     std::istringstream is(in);
-    is >> val;
+    if (!(is >> val)) val = T();
 } 
 
 void
 attachSystemInterface(as_object& proto)
 {
     Global_as* gl = getGlobal(proto);
-	VM& vm = getVM(proto);
 
-	proto.init_member("security", getSystemSecurityInterface(proto));
-	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
+    string_table& st = getStringTable(proto);
+    registerBuiltinObject(proto, attachSystemSecurityInterface,
+            ObjectURI(st.find("security"), 0));
+    registerBuiltinObject(proto, attachSystemCapabilitiesInterface,
+            ObjectURI(st.find("capabilities"), 0));
+
 	proto.init_member("setClipboard", 
             gl->createFunction(system_setClipboard));
+	
+    VM& vm = getVM(proto);
 	proto.init_member("showSettings", vm.getNative(2107, 0));
-
 	proto.init_property("useCodepage", &system_usecodepage,
             &system_usecodepage);
 
@@ -448,8 +429,7 @@ system_resume(const fn_call& /*fn*/)
 as_value
 system_exactsettings(const fn_call& fn)
 {
-	static boost::intrusive_ptr<as_object> obj =
-        ensureType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
     // Getter
     if (fn.nargs == 0)

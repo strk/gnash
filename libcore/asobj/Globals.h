@@ -74,8 +74,6 @@ public:
     
     virtual as_object* createObject();
     
-    virtual as_object* createObject(as_object* prototype);
-    
     virtual const ClassHierarchy& classHierarchy() const {
         return _classes;
     }
@@ -141,8 +139,6 @@ public:
     virtual as_object* createBoolean(bool b);
 
     virtual as_object* createObject();
-    
-    virtual as_object* createObject(as_object* prototype);
 
     virtual const ClassHierarchy& classHierarchy() const {
         return _classes;

@@ -57,9 +57,12 @@
 #include "flash/events/Event_as.h"
 #include "flash/events/EventDispatcher_as.h"
 #include "flash/filters/BitmapFilter_as.h"
+#include "flash/geom/ColorTransform_as.h"
 #include "flash/net/LocalConnection_as.h"
 #include "flash/net/XMLSocket_as.h"
 #include "flash/net/SharedObject_as.h"
+#include "flash/net/NetConnection_as.h"
+#include "flash/net/NetStream_as.h"
 #include "flash/system/System_as.h"
 #include "flash/text/TextSnapshot_as.h"
 #include "flash/text/TextFieldAutoSize_as.h"
@@ -80,8 +83,6 @@
 #include "flash/xml/XMLNode_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
-#include "NetConnection_as.h"
-#include "NetStream_as.h"
 #include "TextFormat_as.h"
 #include "Video.h"
 #include "extension.h"
@@ -189,19 +190,13 @@ AVM2Global::registerClasses()
 as_object*
 AVM1Global::createObject()
 {
-    return new as_object;
+    return new as_object(getObjectInterface());
 }
 
-as_object*
-AVM1Global::createObject(as_object* prototype)
-{
-    return new as_object(prototype);
-}
-    
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    as_object* proto = createObject(getObjectInterface());
+    as_object* proto = createObject();
     builtin_function* f = new builtin_function(*this, function, proto);
     f->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
@@ -245,13 +240,7 @@ AVM1Global::createBoolean(bool b)
 as_object*
 AVM2Global::createObject()
 {
-    return new as_object;
-}
-
-as_object*
-AVM2Global::createObject(as_object* prototype)
-{
-    return new as_object(prototype);
+    return new as_object(getObjectInterface());
 }
 
 builtin_function*
@@ -444,7 +433,7 @@ avm1Classes()
         (N(math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4))
         (N(boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT,
+        (N(button_class_init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
@@ -462,7 +451,7 @@ avm1Classes()
         (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
+        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
@@ -545,13 +534,13 @@ avm2Classes(string_table& st)
            NSV::NS_FLASH_DISPLAY, 3))
         (N(stage_class_init, NSV::CLASS_STAGE, NSV::CLASS_MOVIE_CLIP,
            NSV::NS_FLASH_DISPLAY, 1))
-        (N(Button::init, st.find("SimpleButton"), NSV::CLASS_INTERACTIVEOBJECT,
-           NSV::NS_FLASH_DISPLAY, 5))
+        (N(button_class_init, st.find("SimpleButton"),
+           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY, 5))
 
         // Text classes
         (N(textfield_class_init, NSV::CLASS_TEXT_FIELD,
            NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_TEXT, 3))
-        (N(TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
+        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
         (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
@@ -945,8 +934,7 @@ global_asconstructor(const fn_call& fn)
     }
 
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getObjectInterface();
-    fun->init_member(NSV::PROP_PROTOTYPE, gl->createObject(proto));
+    fun->init_member(NSV::PROP_PROTOTYPE, gl->createObject());
 
     return as_value(fun);
         
@@ -1027,7 +1015,8 @@ global_assetnative(const fn_call& fn)
     if (major < 0) return as_value();
 
     const std::string& props = fn.arg(2).to_string();
-    const int minor = fn.nargs > 3 ? std::max(fn.arg(3).to_int(), (boost::int32_t)0) : 0;
+    const int minor =
+        fn.nargs > 3 ? std::max<boost::int32_t>(fn.arg(3).to_int(), 0) : 0;
 
     std::string::const_iterator pos = props.begin();
 
@@ -1078,11 +1067,75 @@ global_assetnative(const fn_call& fn)
     return as_value();
 }
 
-// ASSetNativeAccessor function
-// TODO: find dox 
+// This is like ASSetNative, but attaches getter/setters.
 as_value
-global_assetnativeaccessor(const fn_call& /*fn*/)
+global_assetnativeaccessor(const fn_call& fn)
 {
+    if (fn.nargs < 3) {
+        return as_value();
+    }
+
+    Global_as* gl = getGlobal(fn);
+
+    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    if (!targetObject) {
+        return as_value();
+    }
+
+    const int major = fn.arg(1).to_int();
+    if (major < 0) return as_value();
+
+    const std::string& props = fn.arg(2).to_string();
+    const int minor =
+        fn.nargs > 3 ? std::max<boost::int32_t>(fn.arg(3).to_int(), 0) : 0;
+
+    std::string::const_iterator pos = props.begin();
+
+    VM& vm = getVM(fn);
+
+    size_t i = 0;
+
+    // pos is always the position after the last located property.
+    while (pos != props.end()) {
+
+        // If there are no further commas, find the end of the string.
+        std::string::const_iterator comma = std::find(pos, props.end(), ',');
+
+        const char num = *pos;
+        
+        int flag;
+
+        switch (num) {
+            case '6':
+                flag = PropFlags::onlySWF6Up;
+                ++pos;
+                break;
+            case '7':
+                flag = PropFlags::onlySWF7Up;
+                ++pos;
+                break;
+            case '8':
+                flag = PropFlags::onlySWF8Up;
+                ++pos;
+                break;
+            case '9':
+                flag = PropFlags::onlySWF9Up;
+                ++pos;
+                break;
+            default:
+                flag = 0;
+
+        }
+        const std::string& property = std::string(pos, comma);
+        if (!property.empty()) {
+            NativeFunction* getset = vm.getNative(major, minor + i);
+            targetObject->init_property(property, *getset, *getset, flag);
+        }
+        if (comma == props.end()) break;
+        pos = comma + 1;
+        ++i;
+    }
+    return as_value();
     LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
     return as_value();
 }
@@ -1334,6 +1387,8 @@ registerNatives(as_object& global)
     registerSystemNative(global);
     registerAccessibilityNative(global);
     registerStageNative(global);
+    registerTextFieldNative(global);
+    registerButtonNative(global);
     registerVideoNative(global);
     registerXMLSocketNative(global);
     registerSharedObjectNative(global);
@@ -1345,9 +1400,10 @@ registerNatives(as_object& global)
     registerSoundNative(global);
     registerLocalConnectionNative(global);
     registerBitmapFilterNative(global);
+    registerColorTransformNative(global);
 
     AsBroadcaster::registerNative(global);
-    TextFormat_as::registerNative(global);
+    registerTextFormatNative(global);
     registerDateNative(global);
     Mouse_as::registerNative(global);
 

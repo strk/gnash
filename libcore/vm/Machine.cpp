@@ -1622,7 +1622,7 @@ Machine::execute()
             /// NB: This builds an object from its properties, it's not a constructor.
                 case SWF::ABC_ACTION_NEWOBJECT:
                 {
-                    as_object *obj = _global->createObject(getObjectInterface());
+                    as_object *obj = _global->createObject();
                     boost::uint32_t argc = mStream->read_V32();
                     int i = argc;
                     while (i--)

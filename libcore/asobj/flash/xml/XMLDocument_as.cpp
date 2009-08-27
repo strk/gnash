@@ -551,8 +551,9 @@ XMLDocument_as::ignoreWhite() const
     return val.to_bool();
 }
 
-
-// extern (used by Global.cpp)
+// TODO: XML.prototype is assigned after the class has been constructed, so it
+// replaces the original prototype and does not have a 'constructor'
+// property.
 void
 XMLDocument_as::init(as_object& where, const ObjectURI& uri)
 {
@@ -571,9 +572,9 @@ XMLDocument_as::registerNative(as_object& where)
 {
     VM& vm = getVM(where);
     vm.registerNative(xml_escape, 100, 5);
-    vm.registerNative(xml_createElement, 253, 8);
-    vm.registerNative(xml_createTextNode, 253, 9);
-    vm.registerNative(xml_parseXML, 253, 10);
+    vm.registerNative(xml_createElement, 253, 10);
+    vm.registerNative(xml_createTextNode, 253, 11);
+    vm.registerNative(xml_parseXML, 253, 12);
 }
 
 namespace {
@@ -604,14 +605,14 @@ attachXMLInterface(as_object& o)
     // No flags:
     o.init_member("addRequestHeader", gl->createFunction(
                 LoadableObject::loadableobject_addRequestHeader), flags);
-    o.init_member("createElement", vm.getNative(253, 8), flags);
-    o.init_member("createTextNode", vm.getNative(253, 9), flags);
+    o.init_member("createElement", vm.getNative(253, 10), flags);
+    o.init_member("createTextNode", vm.getNative(253, 11), flags);
     o.init_member("getBytesLoaded", gl->createFunction(
                 LoadableObject::loadableobject_getBytesLoaded), flags);
     o.init_member("getBytesTotal", gl->createFunction(
                 LoadableObject::loadableobject_getBytesTotal), flags);
     o.init_member("load", vm.getNative(301, 0), flags);
-    o.init_member("parseXML", vm.getNative(253, 10), flags); 
+    o.init_member("parseXML", vm.getNative(253, 12), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
     o.init_member("onData", gl->createFunction(xml_onData), flags);

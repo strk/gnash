@@ -42,15 +42,16 @@
 #include "as_environment.h" // for parse_path
 #include "action.h" // for as_standard_member enum
 #include "VM.h"
-#include "builtin_function.h" // for getter/setter properties
-#include "Font.h" // for using the _font member
-#include "fontlib.h" // for searching or adding fonts the _font member
+#include "builtin_function.h" 
+#include "NativeFunction.h"
+#include "Font.h" 
+#include "fontlib.h" 
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
-#include "TextFormat_as.h" // for getTextFormat/setTextFormat
+#include "TextFormat_as.h"
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 #include "Global_as.h"
@@ -2568,6 +2569,20 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
             getNamespace(uri));
 }
 
+void
+registerTextFieldNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(textfield_replaceSel, 104, 100);
+    vm.registerNative(textfield_getTextFormat, 104, 101);
+    vm.registerNative(textfield_setTextFormat, 104, 102);
+    vm.registerNative(textfield_removeTextField, 104, 103);
+    vm.registerNative(textfield_getNewTextFormat, 104, 104);
+    vm.registerNative(textfield_setNewTextFormat, 104, 105);
+    vm.registerNative(textfield_getDepth, 104, 106);
+    vm.registerNative(textfield_replaceText, 104, 107);
+}
+
 bool
 TextField::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
@@ -3388,12 +3403,30 @@ textfield_getNewTextFormat(const fn_call& fn)
     return as_value();
 }
 
+
+// This is a bit of a messy compromise. We call the TextFormat ctor (this
+// is necessary because prototype properties are not attached until that is
+// done). Then we access the relay object directly. This is because there
+// aren't enough known parameters to the TextFormat constructor to handle
+// all the values, and it isn't tested properly.
 as_value
 textfield_getTextFormat(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    boost::intrusive_ptr<TextFormat_as> tf = new TextFormat_as;
+    Global_as* gl = getGlobal(fn);
+    as_function* ctor = gl->getMember(NSV::CLASS_TEXT_FORMAT).to_as_function();
+
+    if (!ctor) return as_value();
+
+    fn_call::Args args;
+    as_object* textformat = ctor->constructInstance(fn.env(), args).get();
+    TextFormat_as* tf;
+
+    if (!isNativeType(textformat, tf)) {
+        return as_value();
+    }
+
     tf->alignSet(text->getTextAlignment());
     tf->sizeSet(text->getFontHeight());
     tf->indentSet(text->getIndent());
@@ -3419,7 +3452,7 @@ textfield_getTextFormat(const fn_call& fn)
             "tabStops, bullet and display")
     );
 
-    return as_value(tf.get());
+    return as_value(textformat);
 }
 
 as_value
@@ -3444,28 +3477,17 @@ textfield_setTextFormat(const fn_call& fn)
                 "unhandled by Gnash", ss.str());
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
-    if ( ! obj )
-    {
+    TextFormat_as* tf;
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), tf)) {
+
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), 
-            _("first argument is not an object"))
-        );
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), 
+                _("first argument is not a TextFormat"))
+            );
         return as_value();
     }
 
-    TextFormat_as* tf = dynamic_cast<TextFormat_as*>(obj);
-    if ( ! tf )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
-            _("first argument is not a TextFormat"))
-        );
-        return as_value();
-    }
-    
     if (isAS3(fn)) {
         // TODO: current font finding assumes we have a parent, which isn't
         // necessarily the case in AS3. It seems the AS2 implementation is
@@ -3811,8 +3833,6 @@ textfield_ctor(const fn_call& fn)
 void
 attachTextFieldInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
 
@@ -3846,35 +3866,22 @@ attachTextFieldInterface(as_object& o)
     o.init_property(NSV::PROP_uYSCALE,
             DisplayObject::yscale_getset, DisplayObject::yscale_getset);
  
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
-    o.init_member("setTextFormat", 
-            gl->createFunction(textfield_setTextFormat), swf6Flags);
-    o.init_member("getTextFormat", 
-            gl->createFunction(textfield_getTextFormat), swf6Flags);
-    o.init_member("setNewTextFormat",
-            gl->createFunction(textfield_setNewTextFormat), swf6Flags);
-    o.init_member("getNewTextFormat",
-            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
-    o.init_member("getNewTextFormat",
-            gl->createFunction(textfield_getNewTextFormat), swf6Flags);
-    o.init_member("getDepth",
-            gl->createFunction(textfield_getDepth), swf6Flags);
-    o.init_member("removeTextField",
-            gl->createFunction(textfield_removeTextField), swf6Flags);
-    o.init_member("replaceSel",
-            gl->createFunction(textfield_replaceSel), swf6Flags);
+    VM& vm = getVM(o);
+    o.init_member("replaceSel", vm.getNative(104, 100), swf6Flags);
+    o.init_member("getTextFormat", vm.getNative(104, 101), swf6Flags);
+    o.init_member("setTextFormat", vm.getNative(104, 102), swf6Flags);
+    o.init_member("removeTextField", vm.getNative(104, 103), swf6Flags);
+    o.init_member("getNewTextFormat", vm.getNative(104, 104), swf6Flags);
+    o.init_member("setNewTextFormat",vm.getNative(104, 105), swf6Flags);
+    o.init_member("getDepth", vm.getNative(104, 106), swf6Flags);
 
     // SWF7 or higher
-    const int swf7Flags = flags | PropFlags::onlySWF7Up;
+    const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
 
-    o.init_member("replaceText",
-            gl->createFunction(textfield_replaceText), swf7Flags);
+    o.init_member("replaceText",vm.getNative(104, 107), swf7Flags);
 
 }
 

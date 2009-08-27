@@ -61,15 +61,38 @@ public:
     /// an object (the prototype) with a constructor.
     virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
 
+    /// Create a String object
+    //
+    /// This calls the String constructor. If that has been changed, this
+    /// function may not produce a String object. This is generally
+    /// expected behaviour.
     virtual as_object* createString(const std::string& s) = 0;
 
+    /// Create a Number object
+    //
+    /// This calls the Number constructor. If that has been changed, this
+    /// function may not produce a Number object. This is generally
+    /// expected behaviour.
     virtual as_object* createNumber(double d) = 0;
 
+    /// Create a Boolean object
+    //
+    /// This calls the Boolean constructor. If that has been changed, this
+    /// function may not produce a Boolean object. This is generally
+    /// expected behaviour.
     virtual as_object* createBoolean(bool b) = 0;
 
+    /// Create an Object
+    //
+    /// This function returns an Object with Object.prototype as its
+    /// __proto__ member. It should probably call the Object constructor,
+    /// but Gnash creates some of its classes on demand. If the Object class
+    /// has changed before this happens, Gnash's behaviour would differ from
+    /// the reference player's.
+    //
+    /// TODO: think whether it's better to return the original Object class,
+    /// a possibly altered one, or allow both.
     virtual as_object* createObject() = 0;
-    
-    virtual as_object* createObject(as_object* prototype) = 0;
 
     virtual Global_as& global() {
         return *this;
@@ -102,8 +125,7 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
 
     // This is going to be the global Mouse "class"/"function"
     Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    as_object* obj = gl->createObject(proto);
+    as_object* obj = gl->createObject();
     if (p) p(*obj);
     
     where.init_member(getName(uri), obj, as_object::DefaultFlags,
@@ -134,7 +156,7 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
         Properties p, Properties c, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject(getObjectInterface());
+    as_object* proto = gl->createObject();
     as_object* cl = gl->createClass(ctor, proto);
  
     // Attach class properties to class
