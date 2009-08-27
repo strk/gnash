@@ -133,8 +133,7 @@ color_gettransform(const fn_call& fn)
 	// Convert to as_object
 
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getObjectInterface();
-	as_object* ret = gl->createObject(proto);
+	as_object* ret = gl->createObject();
 
 	ret->init_member("ra", double(cx.ra / 2.56));
 	ret->init_member("ga", double(cx.ga / 2.56));
