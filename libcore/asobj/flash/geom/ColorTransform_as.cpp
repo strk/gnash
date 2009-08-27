@@ -113,9 +113,10 @@ attachColorTransformInterface(as_object& o)
     VM& vm = getVM(o);
     o.init_member("concat", vm.getNative(1105, 1), flags);
 
-    flags = PropFlags::isProtected;
+    flags = PropFlags::isProtected |
+            PropFlags::onlySWF8Up;
 
-    /// These are all protected:
+    /// These are all protected and have SWF8 visibility
     Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(colortransform_toString),
             flags);
