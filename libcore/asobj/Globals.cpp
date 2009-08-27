@@ -192,16 +192,10 @@ AVM1Global::createObject()
     return new as_object(getObjectInterface());
 }
 
-as_object*
-AVM1Global::createObject(as_object* prototype)
-{
-    return new as_object(getObjectInterface());
-}
-    
 builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
-    as_object* proto = createObject(getObjectInterface());
+    as_object* proto = createObject();
     builtin_function* f = new builtin_function(*this, function, proto);
     f->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
@@ -244,12 +238,6 @@ AVM1Global::createBoolean(bool b)
     
 as_object*
 AVM2Global::createObject()
-{
-    return new as_object(getObjectInterface());
-}
-
-as_object*
-AVM2Global::createObject(as_object* prototype)
 {
     return new as_object(getObjectInterface());
 }
@@ -945,8 +933,7 @@ global_asconstructor(const fn_call& fn)
     }
 
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getObjectInterface();
-    fun->init_member(NSV::PROP_PROTOTYPE, gl->createObject(proto));
+    fun->init_member(NSV::PROP_PROTOTYPE, gl->createObject());
 
     return as_value(fun);
         
