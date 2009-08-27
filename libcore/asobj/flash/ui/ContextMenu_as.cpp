@@ -42,7 +42,7 @@ namespace {
     as_value contextmenu_ctor(const fn_call& fn);
 
     void attachContextMenuInterface(as_object& o);
-    as_object* setBuiltInItems();
+    void setBuiltInItems(as_object& o, bool setting);
 
 }
 
@@ -91,7 +91,9 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     string_table& st = getStringTable(fn);
-    as_object* builtIns = new as_object;
+
+    Global_as* gl = getGlobal(fn);
+    as_object* builtIns = gl->createObject();
     setBuiltInItems(*builtIns, false);
     ptr->set_member(st.find("builtInItems"), builtIns);
     return as_value();
