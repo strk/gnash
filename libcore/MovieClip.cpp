@@ -55,7 +55,6 @@
 #include "namedStrings.h"
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
-#include "NetStream_as.h"
 #include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"

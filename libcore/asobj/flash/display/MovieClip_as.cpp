@@ -26,7 +26,7 @@
 #include "display/MovieClip_as.h"
 #include "display/DisplayObjectContainer_as.h"
 #include "display/BitmapData_as.h"
-#include "NetStream_as.h"
+#include "net/NetStream_as.h"
 #include "movie_root.h"
 #include "GnashNumeric.h"
 #include "as_value.h"
@@ -640,18 +640,8 @@ movieclip_attachAudio(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
-    if ( ! obj )
-    { 
-        std::stringstream ss; fn.dump_args(ss);
-        // TODO: find out what to do here
-        log_error("MovieClip.attachAudio(%s): first arg doesn't cast to "
-                "an object", ss.str());
-        return as_value();
-    }
-
-    NetStream_as* ns = dynamic_cast<NetStream_as*>(obj);
-    if ( ! ns )
+    NetStream_as* ns;
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), ns))
     { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
