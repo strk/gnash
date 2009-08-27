@@ -86,6 +86,7 @@ namespace {
     as_value movieclip_hitTest(const fn_call& fn);
     as_value movieclip_globalToLocal(const fn_call& fn);
     as_value movieclip_localToGlobal(const fn_call& fn);
+    as_value movieclip_lockroot(const fn_call& fn);
     as_value movieclip_swapDepths(const fn_call& fn);
     as_value movieclip_scrollRect(const fn_call& fn);
     as_value movieclip_getInstanceAtDepth(const fn_call& fn);
@@ -97,6 +98,7 @@ namespace {
     as_value movieclip_forceSmoothing(const fn_call& fn);
     as_value movieclip_cacheAsBitmap(const fn_call& fn);
     as_value movieclip_lineGradientStyle(const fn_call& fn);
+    as_value movieclip_beginMeshFill(const fn_call& fn);
     as_value movieclip_getRect(const fn_call& fn);
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
@@ -170,9 +172,7 @@ registerMovieClipNative(as_object& where)
 {
     VM& vm = getVM(where);
 
-    // Natives are always here    (at least in swf5 I guess)
     vm.registerNative(movieclip_attachMovie, 900, 0); 
-    // TODO: generalize to DisplayObject::swapDepths_method ?
     vm.registerNative(movieclip_swapDepths, 900, 1); 
     vm.registerNative(movieclip_localToGlobal, 900, 2);
     vm.registerNative(movieclip_globalToLocal, 900, 3);
@@ -182,7 +182,6 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_getBytesLoaded, 900, 7);
     vm.registerNative(movieclip_attachAudio, 900, 8);
     vm.registerNative(movieclip_attachVideo, 900, 9);
-    // TODO: generalize to DisplayObject::getDepth_method ?
     vm.registerNative(movieclip_getDepth, 900, 10);
     vm.registerNative(movieclip_setMask, 900, 11); 
     vm.registerNative(movieclip_play, 900, 12); 
@@ -195,6 +194,25 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_removeMovieClip, 900, 19);
     vm.registerNative(movieclip_startDrag, 900, 20);
     vm.registerNative(movieclip_stopDrag, 900, 21);
+    vm.registerNative(movieclip_getNextHighestDepth, 900, 22);
+    vm.registerNative(movieclip_getInstanceAtDepth, 900, 23);
+    vm.registerNative(movieclip_getSWFVersion, 900, 24);
+    vm.registerNative(movieclip_attachBitmap, 900, 25);
+    vm.registerNative(movieclip_getRect, 900, 26);
+    
+    vm.registerNative(movieclip_tabIndex, 900, 200);
+    
+    vm.registerNative(movieclip_lockroot, 900, 300);
+    
+    vm.registerNative(movieclip_cacheAsBitmap, 900, 401);
+    vm.registerNative(movieclip_opaqueBackground, 900, 402);
+    vm.registerNative(movieclip_scrollRect, 900, 403);
+
+    vm.registerNative(movieclip_filters, 900, 417);
+    vm.registerNative(movieclip_transform, 900, 418);
+    vm.registerNative(DisplayObject::blendMode, 900, 500);
+    vm.registerNative(movieclip_forceSmoothing, 900, 502);
+
     vm.registerNative(movieclip_createEmptyMovieClip, 901, 0);
     vm.registerNative(movieclip_beginFill, 901, 1);
     vm.registerNative(movieclip_beginGradientFill, 901, 2);
@@ -204,7 +222,8 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_lineStyle, 901, 6);
     vm.registerNative(movieclip_endFill, 901, 7);
     vm.registerNative(movieclip_clear, 901, 8);
-
+    
+    vm.registerNative(movieclip_scale9Grid, 901, 12);
     vm.registerNative(movieclip_createTextField, 104, 200);
 
 }
@@ -320,6 +339,10 @@ attachMovieClipAS2Interface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
     VM& vm = getVM(o);
+    
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+    const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
+    const int swf8Flags = as_object::DefaultFlags | PropFlags::onlySWF8Up;
 
     o.init_member("attachMovie", vm.getNative(900, 0)); 
     o.init_member("swapDepths", vm.getNative(900, 1));
@@ -329,6 +352,10 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("getBounds", vm.getNative(900, 5));
     o.init_member("getBytesTotal", vm.getNative(900, 6));
     o.init_member("getBytesLoaded", vm.getNative(900, 7));
+    o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
+    o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
+    o.init_member("getDepth", vm.getNative(900, 10), swf6Flags);
+    o.init_member("setMask", vm.getNative(900, 11), swf6Flags);
     o.init_member("play", vm.getNative(900, 12));
     o.init_member("stop", vm.getNative(900, 13));
     o.init_member("nextFrame", vm.getNative(900, 14));
@@ -339,48 +366,21 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("removeMovieClip", vm.getNative(900, 19));
     o.init_member("startDrag", vm.getNative(900, 20));
     o.init_member("stopDrag", vm.getNative(900, 21));
+    o.init_member("getNextHighestDepth", vm.getNative(900, 22), swf7Flags);
+    o.init_member("getInstanceAtDepth", vm.getNative(900, 23), swf7Flags);
+    o.init_member("getSWFVersion", vm.getNative(900, 24));
+    o.init_member("attachBitmap", vm.getNative(900, 25), swf8Flags); 
+    o.init_member("getRect", vm.getNative(900, 26), swf8Flags);
+
     o.init_member("loadMovie", gl->createFunction(movieclip_loadMovie));
-    o.init_member("loadVariables", gl->createFunction(
-                movieclip_loadVariables));
-    o.init_member("unloadMovie", gl->createFunction(
-                movieclip_unloadMovie));
+    o.init_member("loadVariables", gl->createFunction(movieclip_loadVariables));
+    o.init_member("unloadMovie", gl->createFunction( movieclip_unloadMovie));
     o.init_member("getURL", gl->createFunction(movieclip_getURL));
-    o.init_member("getSWFVersion", gl->createFunction(
-                movieclip_getSWFVersion));
     o.init_member("meth", gl->createFunction(movieclip_meth));
+
     o.init_member("enabled", true);
     o.init_member("useHandCursor", true);
-    o.init_property("_lockroot", &MovieClip::lockroot_getset,
-          &MovieClip::lockroot_getset);
-    o.init_member("beginBitmapFill", gl->createFunction(
-                movieclip_beginBitmapFill));
-    o.init_member("getRect", gl->createFunction(
-                movieclip_getRect));
-    o.init_member("lineGradientStyle", gl->createFunction(
-                movieclip_lineGradientStyle));
-    o.init_member("attachBitmap", gl->createFunction(
-                movieclip_attachBitmap));
-    o.init_property("blendMode", &DisplayObject::blendMode,
-            &DisplayObject::blendMode);
-    o.init_property("cacheAsBitmap", &movieclip_cacheAsBitmap, 
-            &movieclip_cacheAsBitmap);
-    o.init_property("filters", &movieclip_filters, &movieclip_filters);
-    o.init_property("forceSmoothing", &movieclip_forceSmoothing,
-            &movieclip_forceSmoothing);
-    o.init_property("opaqueBackground", &movieclip_opaqueBackground,
-            &movieclip_opaqueBackground);
-    o.init_property("scale9Grid", &movieclip_scale9Grid,
-            movieclip_scale9Grid);
-    o.init_property("scrollRect", &movieclip_scrollRect,
-        &movieclip_scrollRect);
-    o.init_property("tabIndex", &movieclip_tabIndex, &movieclip_tabIndex);
 
-    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-
-    o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
-    o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
-    o.init_member("getDepth", vm.getNative(900, 10), swf6Flags);
-    o.init_member("setMask", vm.getNative(900, 11), swf6Flags);
     o.init_member("createEmptyMovieClip", vm.getNative(901, 0), swf6Flags);
     o.init_member("beginFill", vm.getNative(901, 1), swf6Flags);
     o.init_member("beginGradientFill", vm.getNative(901, 2), swf6Flags);
@@ -390,21 +390,39 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("lineStyle", vm.getNative(901, 6), swf6Flags);
     o.init_member("endFill", vm.getNative(901, 7), swf6Flags);
     o.init_member("clear", vm.getNative(901, 8), swf6Flags);
+    o.init_member("lineGradientStyle", vm.getNative(901, 9), swf8Flags);
+    o.init_member("beginMeshFill", vm.getNative(901, 10), swf8Flags);
+    o.init_member("beginBitmapFill", vm.getNative(901, 11), swf8Flags);
+
+    // Accessors
+
+    NativeFunction* getset;
+
+    getset = vm.getNative(900, 200);
+    o.init_property("tabIndex", *getset, *getset);
+    getset = vm.getNative(900, 300);
+    o.init_property("_lockroot", *getset, *getset);
+    getset = vm.getNative(900, 401);
+    o.init_property("cacheAsBitmap", *getset, *getset, swf8Flags);
+    getset = vm.getNative(900, 402);
+    o.init_property("opaqueBackground", *getset, *getset, swf8Flags);
+    getset = vm.getNative(900, 403);
+    o.init_property("scrollRect", *getset, *getset, swf8Flags);
+    getset = vm.getNative(900, 417);
+    o.init_property("filters", *getset, *getset, swf8Flags);
+    getset = vm.getNative(900, 418);
+    o.init_property("transform", *getset, *getset, swf8Flags);
+    getset = vm.getNative(900, 500);
+    o.init_property("blendMode", *getset, *getset, swf8Flags);
+    getset = vm.getNative(900, 502);
+    o.init_property("forceSmoothing", *getset, *getset, swf8Flags);
+    getset = vm.getNative(901, 12);
+    o.init_property("scale9Grid", *getset, *getset, swf8Flags);
+
+    // External functions.
     o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
-
-    const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
-
-    o.init_member("getNextHighestDepth", gl->createFunction(
-                movieclip_getNextHighestDepth), swf7Flags);
-    o.init_member("getInstanceAtDepth", gl->createFunction(
-                movieclip_getInstanceAtDepth), swf7Flags);
-    
-    const int swf8Flags = as_object::DefaultFlags | PropFlags::onlySWF8Up;
-
-    o.init_property("transform", &movieclip_transform, &movieclip_transform,
-            swf8Flags);
 
 }
 
@@ -2622,6 +2640,28 @@ movieclip_transform(const fn_call& fn)
         transCtor->constructInstance(fn.env(), args);
 
     return as_value(newTrans.get());
+}
+
+as_value
+movieclip_beginMeshFill(const fn_call& /*fn*/)
+{
+
+    LOG_ONCE(log_unimpl("MovieClip.beginMeshFill"));
+    return as_value();
+}
+
+
+as_value
+movieclip_lockroot(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+
+    if (!fn.nargs) {
+        return as_value(ptr->getLockRoot());
+    }
+    
+    ptr->setLockRoot(fn.arg(0).to_bool());
+    return as_value();
 }
 
 // =======================
