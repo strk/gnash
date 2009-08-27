@@ -222,8 +222,11 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_lineStyle, 901, 6);
     vm.registerNative(movieclip_endFill, 901, 7);
     vm.registerNative(movieclip_clear, 901, 8);
-    
+    vm.registerNative(movieclip_lineGradientStyle, 901, 9);
+    vm.registerNative(movieclip_beginMeshFill, 901, 10);
+    vm.registerNative(movieclip_beginBitmapFill, 901, 11);
     vm.registerNative(movieclip_scale9Grid, 901, 12);
+
     vm.registerNative(movieclip_createTextField, 104, 200);
 
 }
