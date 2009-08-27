@@ -272,7 +272,7 @@ NetStream_as::getStatusObject(StatusCode code)
     // Enumerable and deletable.
     const int flags = 0;
 
-    getGlobal(owner())->createObject();
+    as_object* o = getGlobal(owner())->createObject();
     o->init_member("code",  info.first, flags);
     o->init_member("level", info.second, flags);
 
