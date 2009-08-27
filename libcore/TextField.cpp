@@ -3869,13 +3869,12 @@ attachTextFieldInterface(as_object& o)
     o.init_member("removeTextField", vm.getNative(104, 103), swf6Flags);
     o.init_member("getNewTextFormat", vm.getNative(104, 104), swf6Flags);
     o.init_member("setNewTextFormat",vm.getNative(104, 105), swf6Flags);
-    o.init_member("getNewTextFormat",vm.getNative(104, 106), swf6Flags);
-    o.init_member("getDepth", vm.getNative(104, 107), swf6Flags);
+    o.init_member("getDepth", vm.getNative(104, 106), swf6Flags);
 
     // SWF7 or higher
     const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
 
-    o.init_member("replaceText",vm.getNative(104, 108), swf7Flags);
+    o.init_member("replaceText",vm.getNative(104, 107), swf7Flags);
 
 }
 
