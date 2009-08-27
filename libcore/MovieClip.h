@@ -767,7 +767,6 @@ public:
     ///
     void constructAsScriptObject();
 
-
     /// Return true if getAsRoot() should return the *relative* root,
     /// false otherwise.
     bool getLockRoot() const { return _lockroot; }
@@ -775,9 +774,6 @@ public:
     /// Set whether getAsRoot() should return the *relative* root,
     /// false otherwise. True for relative root.
     void setLockRoot(bool lr) { _lockroot=lr; }
-
-    /// Getter-setter for MovieClip._lockroot
-    static as_value lockroot_getset(const fn_call& fn);
 
     /// \brief
     /// Return version of the SWF definition of this instance

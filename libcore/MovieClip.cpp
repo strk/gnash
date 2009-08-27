@@ -2599,23 +2599,6 @@ MovieClip::getAsRoot()
     return parent->getAsRoot();
 }
 
-as_value
-MovieClip::lockroot_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-
-    as_value rv;
-    if ( fn.nargs == 0 ) // getter
-    {
-        rv.set_bool(ptr->getLockRoot());
-    }
-    else // setter
-    {
-        ptr->setLockRoot(fn.arg(0).to_bool());
-    }
-    return rv;
-
-}
 
 void
 MovieClip::setStreamSoundId(int id)
