@@ -107,38 +107,35 @@ namespace {
 void
 attachColorTransformInterface(as_object& o)
 {
-    int flags = 0;
+    const int flags = 0;
     
-    /// This has no flags:
+    /// These have no flags:
     VM& vm = getVM(o);
     o.init_member("concat", vm.getNative(1105, 1), flags);
-
-    flags = PropFlags::isProtected |
-            PropFlags::onlySWF8Up;
-
-    /// These are all protected and have SWF8 visibility
     Global_as* gl = getGlobal(o);
     o.init_member("toString", gl->createFunction(colortransform_toString),
             flags);
 
+    /// These all have SWF8 visibility
+    const int swf8 = PropFlags::onlySWF8Up;
     NativeFunction* getset = vm.getNative(1105, 101);
-    o.init_property("alphaMultiplier", *getset, *getset, flags);
+    o.init_property("alphaMultiplier", *getset, *getset, swf8);
     getset = vm.getNative(1105, 102);
-    o.init_property("redMultiplier", *getset, *getset, flags);
+    o.init_property("redMultiplier", *getset, *getset, swf8);
     getset = vm.getNative(1105, 103);
-    o.init_property("greenMultiplier",*getset, *getset, flags);
+    o.init_property("greenMultiplier",*getset, *getset, swf8);
     getset = vm.getNative(1105, 104);
-    o.init_property("blueMultiplier", *getset, *getset, flags);
+    o.init_property("blueMultiplier", *getset, *getset, swf8);
     getset = vm.getNative(1105, 105);
-    o.init_property("alphaOffset", *getset, *getset, flags);
+    o.init_property("alphaOffset", *getset, *getset, swf8);
     getset = vm.getNative(1105, 106);
-    o.init_property("redOffset", *getset, *getset, flags);
+    o.init_property("redOffset", *getset, *getset, swf8);
     getset = vm.getNative(1105, 107);
-    o.init_property("greenOffset", *getset, *getset, flags);
+    o.init_property("greenOffset", *getset, *getset, swf8);
     getset = vm.getNative(1105, 108);
-    o.init_property("blueOffset", *getset, *getset, flags);
+    o.init_property("blueOffset", *getset, *getset, swf8);
     getset = vm.getNative(1105, 109);
-    o.init_property("rgb", *getset, *getset, flags);
+    o.init_property("rgb", *getset, *getset, swf8);
 }
 
 
