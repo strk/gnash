@@ -1846,7 +1846,7 @@ AM_CONDITIONAL([QT_OS9], [test "$platform" = "OS9"])
 AM_CONDITIONAL([QT_WIN32], [test "$platform" = "Win32"])
 
 dnl Need GLIB for both GTK and GST
-if test x$build_gtk = xyes -o x${Media_handler} = "xgst"; then
+if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
   GNASH_PATH_GLIB
 fi
 
