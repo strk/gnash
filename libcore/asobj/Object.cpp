@@ -167,7 +167,6 @@ as_value
 object_ctor(const fn_call& fn)
 {
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getObjectInterface();
 
 	if (fn.nargs == 1) {
         as_object* obj = fn.arg(0).to_object(*gl).get();
@@ -184,7 +183,7 @@ object_ctor(const fn_call& fn)
         return new as_object();
     }
 
-    return gl->createObject(proto);
+    return gl->createObject();
 }
 
 /// Object.toString returns one of two values: [type Function] if it is a 
