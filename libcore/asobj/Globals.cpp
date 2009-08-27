@@ -189,13 +189,13 @@ AVM2Global::registerClasses()
 as_object*
 AVM1Global::createObject()
 {
-    return new as_object;
+    return new as_object(getObjectInterface());
 }
 
 as_object*
 AVM1Global::createObject(as_object* prototype)
 {
-    return new as_object(prototype);
+    return new as_object(getObjectInterface());
 }
     
 builtin_function*
@@ -245,13 +245,13 @@ AVM1Global::createBoolean(bool b)
 as_object*
 AVM2Global::createObject()
 {
-    return new as_object;
+    return new as_object(getObjectInterface());
 }
 
 as_object*
 AVM2Global::createObject(as_object* prototype)
 {
-    return new as_object(prototype);
+    return new as_object(getObjectInterface());
 }
 
 builtin_function*

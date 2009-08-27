@@ -181,7 +181,7 @@ object_ctor(const fn_call& fn)
 	}
 
     if (!fn.isInstantiation()) {
-        return gl->createObject();
+        return new as_object();
     }
 
     return gl->createObject(proto);

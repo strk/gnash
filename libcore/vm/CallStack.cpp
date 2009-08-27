@@ -24,7 +24,7 @@ namespace gnash {
 
 CallFrame::CallFrame(as_function* funcPtr)
 	:
-	locals(getGlobal(*funcPtr)->createObject()),
+	locals(new as_object),
 	func(funcPtr)
 {
 }
