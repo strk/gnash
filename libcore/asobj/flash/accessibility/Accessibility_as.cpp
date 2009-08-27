@@ -52,12 +52,11 @@ accessibility_class_init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as* gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
 
     const int flags = as_object::DefaultFlags | PropFlags::readOnly;
 
     // This object has unusual properties.
-    as_object* obj = gl->createObject(proto);
+    as_object* obj = gl->createObject();
     obj->set_member_flags(NSV::PROP_uuPROTOuu, flags);
     obj->init_member(NSV::PROP_CONSTRUCTOR, gl->getMember(NSV::CLASS_OBJECT),
             flags);
