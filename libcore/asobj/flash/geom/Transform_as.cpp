@@ -174,10 +174,10 @@ Transform_colorTransform(const fn_call& fn)
     
     // TODO: check whether this is necessary (probable), 
     // or whether it can be any object.
-    boost::intrusive_ptr<ColorTransform_as> transform =
-        dynamic_cast<ColorTransform_as*>(obj.get());
-    if (!transform)
-    {
+    ColorTransform_as* transform;
+
+    if (!isNativeType(obj.get(), transform)) {
+
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);

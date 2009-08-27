@@ -27,8 +27,8 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "builtin_function.h" 
+#include "NativeFunction.h"
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
 
@@ -36,226 +36,239 @@
 
 namespace gnash {
 
-static as_value ColorTransform_concat(const fn_call& fn);
-static as_value ColorTransform_toString(const fn_call& fn);
-static as_value ColorTransform_alphaMultiplier_getset(const fn_call& fn);
-static as_value ColorTransform_alphaOffset_getset(const fn_call& fn);
-static as_value ColorTransform_blueMultiplier_getset(const fn_call& fn);
-static as_value ColorTransform_blueOffset_getset(const fn_call& fn);
-static as_value ColorTransform_greenMultiplier_getset(const fn_call& fn);
-static as_value ColorTransform_greenOffset_getset(const fn_call& fn);
-static as_value ColorTransform_redMultiplier_getset(const fn_call& fn);
-static as_value ColorTransform_redOffset_getset(const fn_call& fn);
-static as_value ColorTransform_rgb_getset(const fn_call& fn);
+namespace {
 
-as_value ColorTransform_ctor(const fn_call& fn);
+    as_value colortransform_concat(const fn_call& fn);
+    as_value colortransform_toString(const fn_call& fn);
+    as_value colortransform_alphaMultiplier(const fn_call& fn);
+    as_value colortransform_alphaOffset(const fn_call& fn);
+    as_value colortransform_blueMultiplier(const fn_call& fn);
+    as_value colortransform_blueOffset(const fn_call& fn);
+    as_value colortransform_greenMultiplier(const fn_call& fn);
+    as_value colortransform_greenOffset(const fn_call& fn);
+    as_value colortransform_redMultiplier(const fn_call& fn);
+    as_value colortransform_redOffset(const fn_call& fn);
+    as_value colortransform_rgb(const fn_call& fn);
+    as_value colortransform_ctor(const fn_call& fn);
+
+    void attachColorTransformInterface(as_object& o);
+    as_value get_flash_geom_color_transform_constructor(const fn_call& fn);
+
+}
 
 
-static void
+
+ColorTransform_as::ColorTransform_as(double rm, double gm,
+                                     double bm, double am,
+                                     double ro, double go,
+                                     double bo, double ao)
+		:
+        _alphaMultiplier(am),
+        _alphaOffset(ao),
+        _blueMultiplier(bm),
+        _blueOffset(bo),
+        _greenMultiplier(gm),
+        _greenOffset(go),
+        _redMultiplier(rm),
+        _redOffset(ro)
+{
+}
+
+// extern 
+void
+colortransform_class_init(as_object& where, const ObjectURI& uri)
+{
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(getName(uri),
+            get_flash_geom_color_transform_constructor, flags,
+            getNamespace(uri));
+}
+
+void
+registerColorTransformNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(colortransform_ctor, 1105, 0);
+    vm.registerNative(colortransform_concat, 1105, 1);
+    vm.registerNative(colortransform_alphaMultiplier, 1105, 101);
+    vm.registerNative(colortransform_redMultiplier, 1105, 102);
+    vm.registerNative(colortransform_greenMultiplier, 1105, 103);
+    vm.registerNative(colortransform_blueMultiplier, 1105, 104);
+    vm.registerNative(colortransform_alphaOffset, 1105, 105);
+    vm.registerNative(colortransform_redOffset, 1105, 106);
+    vm.registerNative(colortransform_greenOffset, 1105, 107);
+    vm.registerNative(colortransform_blueOffset, 1105, 108);
+    vm.registerNative(colortransform_rgb, 1105, 109);
+}
+
+namespace {
+
+void
 attachColorTransformInterface(as_object& o)
 {
     int flags = 0;
+    
     /// This has no flags:
-    Global_as* gl = getGlobal(o);
-
-    o.init_member("concat", gl->createFunction(ColorTransform_concat), flags);
+    VM& vm = getVM(o);
+    o.init_member("concat", vm.getNative(1105, 1), flags);
 
     flags = PropFlags::isProtected;
 
     /// These are all protected:
-    o.init_member("toString", gl->createFunction(ColorTransform_toString),
+    Global_as* gl = getGlobal(o);
+    o.init_member("toString", gl->createFunction(colortransform_toString),
             flags);
 
-    o.init_property("alphaMultiplier", ColorTransform_alphaMultiplier_getset,
-            ColorTransform_alphaMultiplier_getset, flags);
-    o.init_property("alphaOffset", ColorTransform_alphaOffset_getset,
-            ColorTransform_alphaOffset_getset, flags);
-    o.init_property("blueMultiplier", ColorTransform_blueMultiplier_getset,
-            ColorTransform_blueMultiplier_getset, flags);
-    o.init_property("blueOffset", ColorTransform_blueOffset_getset,
-            ColorTransform_blueOffset_getset, flags);
-    o.init_property("greenMultiplier", ColorTransform_greenMultiplier_getset,
-            ColorTransform_greenMultiplier_getset, flags);
-    o.init_property("greenOffset", ColorTransform_greenOffset_getset,
-            ColorTransform_greenOffset_getset, flags);
-    o.init_property("redMultiplier", ColorTransform_redMultiplier_getset,
-            ColorTransform_redMultiplier_getset, flags);
-    o.init_property("redOffset", ColorTransform_redOffset_getset,
-            ColorTransform_redOffset_getset, flags);
-    o.init_property("rgb", ColorTransform_rgb_getset,
-            ColorTransform_rgb_getset, flags);
+    NativeFunction* getset = vm.getNative(1105, 101);
+    o.init_property("alphaMultiplier", *getset, *getset, flags);
+    getset = vm.getNative(1105, 102);
+    o.init_property("redMultiplier", *getset, *getset, flags);
+    getset = vm.getNative(1105, 103);
+    o.init_property("greenMultiplier",*getset, *getset, flags);
+    getset = vm.getNative(1105, 104);
+    o.init_property("blueMultiplier", *getset, *getset, flags);
+    getset = vm.getNative(1105, 105);
+    o.init_property("alphaOffset", *getset, *getset, flags);
+    getset = vm.getNative(1105, 106);
+    o.init_property("redOffset", *getset, *getset, flags);
+    getset = vm.getNative(1105, 107);
+    o.init_property("greenOffset", *getset, *getset, flags);
+    getset = vm.getNative(1105, 108);
+    o.init_property("blueOffset", *getset, *getset, flags);
+    getset = vm.getNative(1105, 109);
+    o.init_property("rgb", *getset, *getset, flags);
 }
 
 
-static as_object*
-getColorTransformInterface()
+as_value
+colortransform_alphaMultiplier(const fn_call& fn)
 {
-	static boost::intrusive_ptr<as_object> o;
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
 
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachColorTransformInterface(*o);
-
-	}
-
-	return o.get();
-}
-
-
-static as_value
-ColorTransform_alphaMultiplier_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getAlphaMultiplier());
+    if (!fn.nargs) {
+        return as_value(relay->getAlphaMultiplier());
     }
     
-    // Setter
-    ptr->setAlphaMultiplier(fn.arg(0).to_number());
+    relay->setAlphaMultiplier(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_alphaOffset_getset(const fn_call& fn)
+as_value
+colortransform_alphaOffset(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getAlphaOffset());
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+    if (!fn.nargs) {
+        return as_value(relay->getAlphaOffset());
     }
     
-    // Setter
-    ptr->setAlphaOffset(fn.arg(0).to_number());
+    relay->setAlphaOffset(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_blueMultiplier_getset(const fn_call& fn)
+as_value
+colortransform_blueMultiplier(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getBlueMultiplier());
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+    if (!fn.nargs) {
+        return as_value(relay->getBlueMultiplier());
     }
     
-    // Setter
-    ptr->setBlueMultiplier(fn.arg(0).to_number());
+    relay->setBlueMultiplier(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_blueOffset_getset(const fn_call& fn)
+as_value
+colortransform_blueOffset(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getBlueOffset());
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+    if (!fn.nargs) {
+        return as_value(relay->getBlueOffset());
     }
     
-    // Setter
-    ptr->setBlueOffset(fn.arg(0).to_number());
+    relay->setBlueOffset(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_greenMultiplier_getset(const fn_call& fn)
+as_value
+colortransform_greenMultiplier(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getGreenMultiplier());
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+    if (!fn.nargs) {
+        return as_value(relay->getGreenMultiplier());
     }
     
-    // Setter
-    ptr->setGreenMultiplier(fn.arg(0).to_number());
+    relay->setGreenMultiplier(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_greenOffset_getset(const fn_call& fn)
+as_value
+colortransform_greenOffset(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getGreenOffset());
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+    
+    if (!fn.nargs) {
+        return as_value(relay->getGreenOffset());
     }
     
-    // Setter
-    ptr->setGreenOffset(fn.arg(0).to_number());
+    relay->setGreenOffset(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_redMultiplier_getset(const fn_call& fn)
+as_value
+colortransform_redMultiplier(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getRedMultiplier());
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+
+    if (!fn.nargs) {
+        return as_value(relay->getRedMultiplier());
     }
     
-    // Setter
-    ptr->setRedMultiplier(fn.arg(0).to_number());
+    relay->setRedMultiplier(fn.arg(0).to_number());
 	return as_value();
 }
 
-static as_value
-ColorTransform_redOffset_getset(const fn_call& fn)
+as_value
+colortransform_redOffset(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
     if (!fn.nargs)
     {
         // Getter
-        return as_value(ptr->getRedOffset());
+        return as_value(relay->getRedOffset());
     }
     
     // Setter
-    ptr->setRedOffset(fn.arg(0).to_number());
+    relay->setRedOffset(fn.arg(0).to_number());
 	return as_value();
 }
 
 
-static as_value
-ColorTransform_concat(const fn_call& fn)
+as_value
+colortransform_concat(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-	UNUSED(ptr);
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(relay);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 
-static as_value
-ColorTransform_toString(const fn_call& fn)
+as_value
+colortransform_toString(const fn_call& fn)
 {
 
-    // Must be a ColorTransform
-	boost::intrusive_ptr<ColorTransform_as> ptr = 
-        ensureType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
 
     // We need the as_value to_string method, but using ptr->get_member
     // is unnecessary when we can read directly from the object.
-    as_value alphaMultiplier(ptr->getAlphaMultiplier());
-    as_value alphaOffset(ptr->getAlphaOffset());
-    as_value blueMultiplier(ptr->getBlueMultiplier());
-    as_value blueOffset(ptr->getBlueOffset());
-    as_value greenMultiplier(ptr->getGreenMultiplier());
-    as_value greenOffset(ptr->getGreenOffset());
-    as_value redMultiplier(ptr->getRedMultiplier());
-    as_value redOffset(ptr->getRedOffset());
+    as_value alphaMultiplier(relay->getAlphaMultiplier());
+    as_value alphaOffset(relay->getAlphaOffset());
+    as_value blueMultiplier(relay->getBlueMultiplier());
+    as_value blueOffset(relay->getBlueOffset());
+    as_value greenMultiplier(relay->getGreenMultiplier());
+    as_value greenOffset(relay->getGreenOffset());
+    as_value redMultiplier(relay->getRedMultiplier());
+    as_value redOffset(relay->getRedOffset());
    
     std::ostringstream ss;
     
@@ -277,17 +290,20 @@ ColorTransform_toString(const fn_call& fn)
 // The getter merely bit-shifts the values without checking for
 // validity. We fmod the double values to avoid undefined behaviour
 // on overflow.
-static as_value
-ColorTransform_rgb_getset(const fn_call& fn)
+as_value
+colortransform_rgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
         // Getter
-        boost::uint32_t r = static_cast<boost::uint32_t>(std::fmod(ptr->getRedOffset(), 4294967296.0));
-        boost::uint32_t g = static_cast<boost::uint32_t>(std::fmod(ptr->getGreenOffset(), 4294967296.0));
-        boost::uint32_t b = static_cast<boost::uint32_t>(std::fmod(ptr->getBlueOffset(), 4294967296.0));
+        boost::uint32_t r = static_cast<boost::uint32_t>(
+                std::fmod(relay->getRedOffset(), 4294967296.0));
+        boost::uint32_t g = static_cast<boost::uint32_t>(
+                std::fmod(relay->getGreenOffset(), 4294967296.0));
+        boost::uint32_t b = static_cast<boost::uint32_t>(
+                std::fmod(relay->getBlueOffset(), 4294967296.0));
         boost::uint32_t rgb = (r << 16) + (g << 8) + b;
 
         return as_value(rgb);
@@ -296,12 +312,12 @@ ColorTransform_rgb_getset(const fn_call& fn)
     // Setter
 
     boost::uint32_t rgb = fn.arg(0).to_int();
-    ptr->setRedOffset((rgb & 0xFF0000) >> 16);
-    ptr->setGreenOffset((rgb & 0x00FF00) >> 8);
-    ptr->setBlueOffset(rgb & 0x0000FF);
-    ptr->setRedMultiplier(0);
-    ptr->setGreenMultiplier(0);
-    ptr->setBlueMultiplier(0);
+    relay->setRedOffset((rgb & 0xFF0000) >> 16);
+    relay->setGreenOffset((rgb & 0x00FF00) >> 8);
+    relay->setBlueOffset(rgb & 0x0000FF);
+    relay->setRedMultiplier(0);
+    relay->setGreenMultiplier(0);
+    relay->setBlueMultiplier(0);
 
 	return as_value();
 }
@@ -311,8 +327,10 @@ ColorTransform_rgb_getset(const fn_call& fn)
 // There must be a minimum of 8 arguments, or the default values are
 // used. Extra arguments are discarded.
 as_value
-ColorTransform_ctor(const fn_call& fn)
+colortransform_ctor(const fn_call& fn)
 {
+
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
 
     // Default arguments.
     if (fn.nargs < 8)
@@ -324,10 +342,9 @@ ColorTransform_ctor(const fn_call& fn)
                         "Constructing with default values", ss.str());
         );
 
-	    boost::intrusive_ptr<as_object> obj =
-	                new ColorTransform_as(1, 1, 1, 1, 0, 0, 0, 0);
+        obj->setRelay(new ColorTransform_as(1, 1, 1, 1, 0, 0, 0, 0));
 
-	    return as_value(obj.get());
+	    return as_value();
         
     }
 
@@ -336,59 +353,35 @@ ColorTransform_ctor(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("ColorTransform(%s): discarding extra arguments", ss.str());
+            log_aserror("ColorTransform(%s): discarding extra arguments",
+                ss.str());
         );
     }
 
-	boost::intrusive_ptr<as_object> obj = new ColorTransform_as(
-	                        fn.arg(0).to_number(),
-	                        fn.arg(1).to_number(),
-	                        fn.arg(2).to_number(),
-	                        fn.arg(3).to_number(),
-	                        fn.arg(4).to_number(),
-	                        fn.arg(5).to_number(),
-	                        fn.arg(6).to_number(),
-	                        fn.arg(7).to_number());
+	obj->setRelay(new ColorTransform_as(fn.arg(0).to_number(),
+                                        fn.arg(1).to_number(),
+                                        fn.arg(2).to_number(),
+                                        fn.arg(3).to_number(),
+                                        fn.arg(4).to_number(),
+                                        fn.arg(5).to_number(),
+                                        fn.arg(6).to_number(),
+                                        fn.arg(7).to_number()));
 
-    return as_value(obj.get());
+    return as_value();
 }
 
 
-static as_value
+as_value
 get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
-    as_object* proto = getColorTransformInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&ColorTransform_ctor, proto);
+    as_object* proto = gl->createObject();
+    as_object* cl = gl->createClass(&colortransform_ctor, proto);
+    attachColorTransformInterface(*proto);
+    return cl;
 }
 
-
-ColorTransform_as::ColorTransform_as(double rm, double gm,
-                                     double bm, double am,
-                                     double ro, double go,
-                                     double bo, double ao)
-		:
-		as_object(getColorTransformInterface()),
-        _alphaMultiplier(am),
-        _alphaOffset(ao),
-        _blueMultiplier(bm),
-        _blueOffset(bo),
-        _greenMultiplier(gm),
-        _greenOffset(go),
-        _redMultiplier(rm),
-        _redOffset(ro)
-{
-}
-
-// extern 
-void colortransform_class_init(as_object& where, const ObjectURI& uri)
-{
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(getName(uri),
-            get_flash_geom_color_transform_constructor, flags,
-            getNamespace(uri));
-}
+} // anonymous namespace
 
 } // end of gnash namespace

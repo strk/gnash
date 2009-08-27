@@ -30,7 +30,7 @@ namespace gnash {
 
 // This is used directly by flash.geom.Transform, as it is
 // much more efficient than a pseudo-ActionScript implementation.
-class ColorTransform_as: public as_object
+class ColorTransform_as : public Relay
 {
 
 public:
@@ -38,7 +38,7 @@ public:
 	ColorTransform_as(double rm, double gm, double bm, double am,
 	                  double ro, double go, double bo, double ao);
 
-    // TODO: is all this really necessary? Tests show that the ColorTransform
+    // Tests show that the ColorTransform
     // object has its own properties on initialization, so they have
     // getter-setters and are *not* simple properties. Storing and
     // manipulating as doubles (they cannot be anything else - see ctor) is
@@ -77,9 +77,10 @@ private:
 
 };
 
-
 /// Initialize the global ColorTransform class
 void colortransform_class_init(as_object& where, const ObjectURI& uri);
+
+void registerColorTransformNative(as_object& global);
 
 } // end of gnash namespace
 

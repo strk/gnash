@@ -57,6 +57,7 @@
 #include "flash/events/Event_as.h"
 #include "flash/events/EventDispatcher_as.h"
 #include "flash/filters/BitmapFilter_as.h"
+#include "flash/geom/ColorTransform_as.h"
 #include "flash/net/LocalConnection_as.h"
 #include "flash/net/XMLSocket_as.h"
 #include "flash/net/SharedObject_as.h"
@@ -1014,7 +1015,8 @@ global_assetnative(const fn_call& fn)
     if (major < 0) return as_value();
 
     const std::string& props = fn.arg(2).to_string();
-    const int minor = fn.nargs > 3 ? std::max(fn.arg(3).to_int(), (boost::int32_t)0) : 0;
+    const int minor =
+        fn.nargs > 3 ? std::max<boost::int32_t>(fn.arg(3).to_int(), 0) : 0;
 
     std::string::const_iterator pos = props.begin();
 
@@ -1065,11 +1067,75 @@ global_assetnative(const fn_call& fn)
     return as_value();
 }
 
-// ASSetNativeAccessor function
-// TODO: find dox 
+// This is like ASSetNative, but attaches getter/setters.
 as_value
-global_assetnativeaccessor(const fn_call& /*fn*/)
+global_assetnativeaccessor(const fn_call& fn)
 {
+    if (fn.nargs < 3) {
+        return as_value();
+    }
+
+    Global_as* gl = getGlobal(fn);
+
+    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    if (!targetObject) {
+        return as_value();
+    }
+
+    const int major = fn.arg(1).to_int();
+    if (major < 0) return as_value();
+
+    const std::string& props = fn.arg(2).to_string();
+    const int minor =
+        fn.nargs > 3 ? std::max<boost::int32_t>(fn.arg(3).to_int(), 0) : 0;
+
+    std::string::const_iterator pos = props.begin();
+
+    VM& vm = getVM(fn);
+
+    size_t i = 0;
+
+    // pos is always the position after the last located property.
+    while (pos != props.end()) {
+
+        // If there are no further commas, find the end of the string.
+        std::string::const_iterator comma = std::find(pos, props.end(), ',');
+
+        const char num = *pos;
+        
+        int flag;
+
+        switch (num) {
+            case '6':
+                flag = PropFlags::onlySWF6Up;
+                ++pos;
+                break;
+            case '7':
+                flag = PropFlags::onlySWF7Up;
+                ++pos;
+                break;
+            case '8':
+                flag = PropFlags::onlySWF8Up;
+                ++pos;
+                break;
+            case '9':
+                flag = PropFlags::onlySWF9Up;
+                ++pos;
+                break;
+            default:
+                flag = 0;
+
+        }
+        const std::string& property = std::string(pos, comma);
+        if (!property.empty()) {
+            NativeFunction* getset = vm.getNative(major, minor + i);
+            targetObject->init_property(property, *getset, *getset, flag);
+        }
+        if (comma == props.end()) break;
+        pos = comma + 1;
+        ++i;
+    }
+    return as_value();
     LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
     return as_value();
 }
@@ -1334,6 +1400,7 @@ registerNatives(as_object& global)
     registerSoundNative(global);
     registerLocalConnectionNative(global);
     registerBitmapFilterNative(global);
+    registerColorTransformNative(global);
 
     AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);
