@@ -61,6 +61,7 @@ AM_CPPFLAGS = \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
+	$(GLIB_CFLAGS) \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PYTHON_LIBS) \
