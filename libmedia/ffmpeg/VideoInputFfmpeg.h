@@ -16,12 +16,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_VIDEOINPUTGST_H
-#define GNASH_VIDEOINPUTGST_H
+#ifndef GNASH_VIDEOINPUTFFMPEG_H
+#define GNASH_VIDEOINPUTFFMPEG_H
 
 #include <boost/cstdint.hpp> // for C99 int types
 #include "VideoInput.h"
-#include "gst/gst.h"
 
 namespace gnash {
 namespace media {
@@ -31,13 +30,16 @@ class VideoInputFfmpeg : public VideoInput
 {
 public:
 
-    /// Constructor for the VideoInputGst class
+    /// Constructor for the VideoInputFfmpeg class
+    //
+    /// TODO: most of these properties need not be stored, but should rather
+    /// be queried from the input device.
     VideoInputFfmpeg();
     
     /// Destructor for the VideoInputGst class
-    ~VideoInputFfmpeg();
+    virtual ~VideoInputFfmpeg();
     
-    static void getNames(std::vector<std::string>& names) {}
+    static void getNames(std::vector<std::string>& /*names*/) {}
     
     /// Return the current activity level of the webcam
     //
@@ -118,19 +120,6 @@ public:
     /// @return True if the pipeline was stopped correctly, false otherwise.
     bool stop();
     
-    /// Set this VideoInput's webcam to the device corresponding to an index.
-    //
-    ///       Now transfer the
-    ///       important information from the GnashWebcam structure to the
-    ///       GnashWebcamPrivate structure which is larger because it has
-    ///       space to store Gstreamer pipeline, element and bin elements.
-    ///       See definition of GnashWebcamPrivate for more info.
-    ///
-    /// @param dev_select The index of the camera the user wants to
-    ///            select.
-    /// @return    If the device index doesn't exist, return false
-    bool setWebcam(size_t index);
-
 private:
 
     /// TODO: see which of these need to be retrieved from the camera,
@@ -182,8 +171,8 @@ private:
 };
 
 
-} //gst namespace
-} // gnash.media namespace 
+} // ffmpeg namespace
+} // media namespace 
 } // gnash namespace
 
 #endif 

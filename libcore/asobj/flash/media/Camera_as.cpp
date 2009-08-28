@@ -32,9 +32,10 @@
 #include "Object.h" 
 #include "Array_as.h"
 #include "MediaHandler.h"
+#include "VideoInput.h"
+
 #include <sstream>
 
-#include "VideoInput.h"
 
 namespace gnash {
 

@@ -139,6 +139,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/VideoDecoderFfmpeg.cpp \
 		ffmpeg/AudioResamplerFfmpeg.cpp \
 		ffmpeg/VideoConverterFfmpeg.cpp \
+		ffmpeg/VideoInputFfmpeg.cpp \
 		$(NULL)
 
    noinst_HEADERS += \

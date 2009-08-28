@@ -48,16 +48,24 @@ class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
 {
 public:
 
-	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
+	virtual std::auto_ptr<MediaParser>
+        createMediaParser(std::auto_ptr<IOChannel> stream);
 
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info);
+	virtual std::auto_ptr<VideoDecoder>
+        createVideoDecoder(const VideoInfo& info);
 	
 	virtual std::auto_ptr<VideoConverter>
-		createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat);
+		createVideoConverter(ImgBuf::Type4CC srcFormat,
+                ImgBuf::Type4CC dstFormat);
 
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info);
+	virtual std::auto_ptr<AudioDecoder>
+        createAudioDecoder(const AudioInfo& info);
 
     virtual size_t getInputPaddingSize() const;
+    
+    virtual VideoInput* getVideoInput(size_t index);
+
+    virtual void cameraNames(std::vector<std::string>& names) const;
 
 };
 

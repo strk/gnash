@@ -31,6 +31,22 @@
 namespace gnash {
 namespace media {
 
+/// This is the interface for video input devices.
+//
+/// Each VideoInput should represent exactly one webcam (or similar device).
+//
+/// The interface for querying the camera is provisionally done, but needs
+/// more testing of how it actually works. Most of the values are faked. 
+//
+/// TODO: separate the process of finding cameras from this class.
+///       It could be implemented as a static method. The available cameras
+///       and all created VideoInput objects should be stored in a
+///       MediaHandler, mapped by an index for retrieval by ActionScript.
+//
+/// TODO: design a useful interface for starting, stopping and attaching
+///       the video data. VideoInputGst has some functionality here, but it
+///       is not generic enough, relying on too many gst-specific
+///       implementation details.
 class VideoInput {
 
 public:

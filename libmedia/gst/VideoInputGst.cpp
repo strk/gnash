@@ -348,7 +348,7 @@ VideoInputGst::requestMode(size_t width, size_t height, double fps,
     std::cerr << "Changing source bin" << std::endl;
     // I don't know what the point is of this. It was previously in Camera_as,
     // where it certainly shouldn't be.
-    webcamChangeSourceBin(_devSelection);
+    webcamChangeSourceBin();
     std::cerr << "Changed source bin" << std::endl;
 
 }
