@@ -23,6 +23,7 @@
 #include "AudioDecoderGst.h"
 #include "MediaParserGst.h"
 #include "VideoConverterGst.h"
+#include "VideoInputGst.h"
 #include "FLVParser.h"
 
 #ifdef DECODING_SPEEX
@@ -151,6 +152,20 @@ MediaHandlerGst::createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC
     }
     
     return converter;
+}
+
+VideoInput*
+MediaHandlerGst::getVideoInput(size_t /*index*/)
+{
+    // FIXME: these should be stored in the media handler, not newly
+    // created each time. The documentation is correct, implementation wrong.
+    return new VideoInputGst();
+}
+
+void
+MediaHandlerGst::cameraNames(std::vector<std::string>& names) const
+{
+    VideoInputGst::getNames(names);
 }
 
 } // gnash.media.gst namespace

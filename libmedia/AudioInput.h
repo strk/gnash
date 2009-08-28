@@ -87,4 +87,4 @@ protected:
 } // gnash.media namespace 
 } // gnash namespace
 
-#endif // __AUDIOINPUT_H__
+#endif 

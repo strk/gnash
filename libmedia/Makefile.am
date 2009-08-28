@@ -70,7 +70,6 @@ libgnashmedia_la_SOURCES = \
 	FLVParser.cpp \
 	AudioResampler.cpp \
 	AudioInput.cpp \
-	VideoInput.cpp \
 	$(NULL)
 
 noinst_HEADERS = \

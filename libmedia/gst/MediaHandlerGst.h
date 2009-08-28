@@ -48,14 +48,22 @@ class DSOEXPORT MediaHandlerGst : public MediaHandler
 {
 public:
 
-	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
+	virtual std::auto_ptr<MediaParser>
+        createMediaParser(std::auto_ptr<IOChannel> stream);
 
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info);
+	virtual std::auto_ptr<VideoDecoder>
+        createVideoDecoder(const VideoInfo& info);
 
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info);
+	virtual std::auto_ptr<AudioDecoder>
+        createAudioDecoder(const AudioInfo& info);
 	
-	virtual std::auto_ptr<VideoConverter> createVideoConverter(ImgBuf::Type4CC srcFormat,
-	                                                       ImgBuf::Type4CC dstFormat);
+	virtual std::auto_ptr<VideoConverter>
+        createVideoConverter(ImgBuf::Type4CC srcFormat,
+                ImgBuf::Type4CC dstFormat);
+    
+    virtual VideoInput* getVideoInput(size_t index);
+
+    virtual void cameraNames(std::vector<std::string>& names) const;
 };
 
 
@@ -63,4 +71,4 @@ public:
 } // gnash.media namespace 
 } // namespace gnash
 
-#endif // __MEDIAHANDLERGST_H__
+#endif 
