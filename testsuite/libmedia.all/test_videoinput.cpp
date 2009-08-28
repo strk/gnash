@@ -74,8 +74,7 @@ void test_client()
 	
     VideoInputGst vig;
 
-    int devselect;
-	devselect = vig.makeWebcamDeviceSelection();
+	int devselect = vig.makeWebcamDeviceSelection();
     
     bool ret = vig.setWebcam(devselect);
     if (!ret) {
@@ -131,7 +130,7 @@ void test_client()
     
     g_print("        NOTE: the output window will close automatically\n");
     
-    sleep(5);
+    sleep(2);
     result = vig.stop();
     if (result != true) {
         runtest.fail("webcamStop() function reported an error");
@@ -141,7 +140,6 @@ void test_client()
 
     struct stat st;
     std::string file = "./vidoutput.ogg";
-#if 0
     
     if (stat(file.c_str(), &st) == 0) {
         runtest.pass("vidoutput.ogg file is in testsuite/libmedia.all");
@@ -173,7 +171,7 @@ void test_client()
         runtest.pass("play() still works after breaking display link");
     }
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = vig.stop();
     if (result != true) {
@@ -214,7 +212,7 @@ void test_client()
         runtest.pass("play() still works after relinking display");
     }
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = vig.stop();
     if (result != true) {
@@ -244,7 +242,7 @@ void test_client()
     }
     
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = vig.stop();
     if (result != true) {
@@ -265,22 +263,29 @@ void test_client()
     
     //end unit tests
     
-#endif
-
     //tests more similar to execution flow
     gst::VideoInputGst* video = new VideoInputGst;
     if (video == NULL) {
         runtest.fail("new VideoInputGst didn't work");
-    } else {
+    } else { 
         runtest.pass("new VideoInputGst returned a value");
     }
+	
+    devselect = video->makeWebcamDeviceSelection();
+    
+    ret = video->setWebcam(devselect);
+    
+    video->init();
+    
+    video->webcamCreateSaveBin();
+    video->webcamMakeVideoSaveLink();
     
     //get global webcam reference for use below
     result = video->webcamMakeVideoDisplayLink();
     if (result != true) {
-        runtest.fail("webcamMakeVideoDisplayLink reported errors");
+        runtest.xfail("webcamMakeVideoDisplayLink reported errors");
     } else {
-        runtest.pass("webcamMakeVideoDisplayLink reported no errors");
+        runtest.xpass("webcamMakeVideoDisplayLink reported no errors");
     }
     
     result = video->play();
@@ -291,7 +296,7 @@ void test_client()
     }
 
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = video->stop();
     if (result != true) {
@@ -312,7 +317,7 @@ void test_client()
     }
 
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = video->stop();
     if (result != true) {
@@ -323,9 +328,9 @@ void test_client()
     
     result = video->webcamMakeVideoSaveLink();
     if (result != true) {
-        runtest.fail("webcamMakeVideoSaveLink reported errors");
+        runtest.xfail("webcamMakeVideoSaveLink reported errors");
     } else {
-        runtest.pass("webcamMakeVideoSaveLink reported no errors");
+        runtest.xpass("webcamMakeVideoSaveLink reported no errors");
     }
     
     result = video->play();
@@ -336,7 +341,7 @@ void test_client()
     }
 
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = video->stop();
     if (result != true) {
@@ -369,7 +374,7 @@ void test_client()
     }
     
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = video->stop();
     if (result != true) {
@@ -410,7 +415,7 @@ void test_client()
     }
     
     g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
+    sleep(2);
     
     result = video->stop();
     if (result != true) {
