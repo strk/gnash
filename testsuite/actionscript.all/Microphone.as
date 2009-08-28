@@ -79,7 +79,7 @@ check(!Microphone.prototype.hasOwnProperty("useEchoSuppression"));
 
 // Documented to be an array.
 check ( Microphone.hasOwnProperty("names"));
-xcheck_equals (typeof (Microphone.names), 'object');
+check_equals (typeof (Microphone.names), 'object');
 
 // test the Microphone constuctor
 var microphoneObj = Microphone.get();

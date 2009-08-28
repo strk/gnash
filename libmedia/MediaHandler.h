@@ -38,6 +38,8 @@ namespace gnash {
 		class AudioDecoder;
 		class AudioInfo;
 		class VideoInfo;
+        class VideoInput;
+        class AudioInput;
 	}
 }
 
@@ -88,8 +90,8 @@ public:
 	/// NOTE: the default implementation returns an FLVParser for FLV input
 	///       or 0 for others.
 	///
-	virtual std::auto_ptr<MediaParser> createMediaParser(
-            std::auto_ptr<IOChannel> stream);
+	virtual std::auto_ptr<MediaParser>
+        createMediaParser(std::auto_ptr<IOChannel> stream);
 
 	/// Create a VideoDecoder for decoding what's specified in the VideoInfo
 	//
@@ -97,7 +99,8 @@ public:
 	///             the sound correctly.
     /// @return     Will always return a valid VideoDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info)=0;
+	virtual std::auto_ptr<VideoDecoder>
+        createVideoDecoder(const VideoInfo& info)=0;
 
 	/// Create an AudioDecoder for decoding what's specified in the AudioInfo
 	//
@@ -105,16 +108,34 @@ public:
 	///             the sound correctly.
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info)=0;
+	virtual std::auto_ptr<AudioDecoder>
+        createAudioDecoder(const AudioInfo& info)=0;
 
     /// Create an VideoConverter for converting between color spaces.
     //
     /// @param srcFormat The source image color space
     /// @param dstFormat The destination image color space
     ///
-    /// @return A valid VideoConverter or a NULL auto_ptr if a fatal error occurs.
+    /// @return A valid VideoConverter or a NULL auto_ptr if a fatal error
+    ///         occurs.
     virtual std::auto_ptr<VideoConverter>
-        createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)=0;
+        createVideoConverter(ImgBuf::Type4CC srcFormat,
+                ImgBuf::Type4CC dstFormat)=0;
+
+    /// Return a VideoInput
+    //
+    /// This is always owned by the MediaHandler, but will remain alive
+    /// as long as it is referenced by a Camera object.
+    //
+    /// @param index    The index of the VideoInput to return.
+    /// @return         A Video Input corresponding to the specified index
+    ///                 or null if it is not available. 
+    virtual VideoInput* getVideoInput(size_t index) = 0;
+
+    /// Return a list of available cameras.
+    //
+    /// This is re-generated every time the function is called.
+    virtual void cameraNames(std::vector<std::string>& names) const = 0;
 
     /// Return the number of bytes padding needed for input buffers
     //

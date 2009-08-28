@@ -70,7 +70,6 @@ libgnashmedia_la_SOURCES = \
 	FLVParser.cpp \
 	AudioResampler.cpp \
 	AudioInput.cpp \
-	VideoInput.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -140,6 +139,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/VideoDecoderFfmpeg.cpp \
 		ffmpeg/AudioResamplerFfmpeg.cpp \
 		ffmpeg/VideoConverterFfmpeg.cpp \
+		ffmpeg/VideoInputFfmpeg.cpp \
 		$(NULL)
 
    noinst_HEADERS += \
@@ -150,6 +150,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/AudioResamplerFfmpeg.h \
 		ffmpeg/ffmpegHeaders.h \
 		ffmpeg/VideoConverterFfmpeg.h \
+		ffmpeg/VideoInputFfmpeg.h \
 		$(NULL)
 
    libgnashmedia_la_LIBADD += \

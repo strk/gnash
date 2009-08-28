@@ -31,15 +31,11 @@
 #include "NativeFunction.h" 
 #include "Object.h" 
 #include "Array_as.h"
+#include "MediaHandler.h"
+#include "VideoInput.h"
+
 #include <sstream>
 
-#ifdef USE_GST
-#include "gst/VideoInputGst.h"
-#endif
-
-#ifdef USE_FFMPEG
-#include "VideoInput.h"
-#endif
 
 namespace gnash {
 
@@ -54,8 +50,7 @@ as_value camera_setKeyFrameInterval(const fn_call& fn);
 
 as_value camera_activitylevel(const fn_call& fn);
 as_value camera_bandwidth(const fn_call& fn);
-as_value camera_currentFPS(const fn_call& fn); //as3
-as_value camera_currentFps(const fn_call& fn); //as2
+as_value camera_currentFps(const fn_call& fn);
 as_value camera_fps(const fn_call& fn);
 as_value camera_height(const fn_call& fn);
 as_value camera_index(const fn_call& fn);
@@ -151,28 +146,92 @@ getCameraInterface()
     return o.get();
 }
 
-#ifdef USE_GST
-class camera_as_object: public as_object, public media::gst::VideoInputGst {
-
+class Camera_as: public as_object
+{
 public:
 
-    camera_as_object()
+    Camera_as(media::VideoInput* input)
         :
-        as_object(getCameraInterface())
-    {}
-};
-#endif
+        as_object(getCameraInterface()),
+        _input(input),
+        _loopback(false)
+    {
+        assert(input);
+    }
 
-#ifdef USE_FFMPEG
-class camera_as_object: public as_object, public media::VideoInput {
-public:
+    bool muted() const {
+        return _input->muted();
+    }
 
-    camera_as_object()
-        :
-        as_object(getCameraInterface())
-    {}
+    size_t width() const {
+        return _input->width();
+    }
+
+    size_t height() const {
+        return _input->height();
+    }
+
+    double fps() const {
+        return _input->fps();
+    }
+
+    double currentFPS() const {
+        return _input->currentFPS();
+    }
+
+    double activityLevel() const {
+        return _input->activityLevel();
+    }
+
+    double bandwidth() const {
+        return _input->bandwidth();
+    }
+
+    size_t index() const {
+        return _input->index();
+    }
+
+    void setMode(size_t width, size_t height, double fps, bool favorArea) {
+        _input->requestMode(width, height, fps, favorArea);
+    }
+
+    void setMotionLevel(size_t level, double timeout) {
+        _input->setMotionLevel(level);
+        _input->setMotionTimeout(timeout);
+    }
+
+    double motionLevel() const {
+        return _input->motionLevel();
+    }
+
+    double motionTimeout() const {
+        return _input->motionTimeout();
+    }
+
+    const std::string& name() const {
+        return _input->name();
+    }
+
+    size_t quality() const {
+        return _input->quality();
+    }
+
+    void setQuality(double bandwidth, size_t quality) {
+        _input->setBandwidth(bandwidth);
+        _input->setQuality(quality);
+    }
+
+    void setLoopback(bool b) {
+        _loopback = b;
+    }
+
+private:
+
+    media::VideoInput* _input;
+
+    // TODO: see whether this should be handled in the VideoInput class
+    bool _loopback;
 };
-#endif
 
 // AS2 static accessor.
 as_value
@@ -189,22 +248,36 @@ camera_get(const fn_call& fn)
     // meant, not a new object each time. It will be necessary to query
     // the MediaHandler for this, and possibly to store the as_objects
     // somewhere.
-    boost::intrusive_ptr<as_object> obj = new camera_as_object; 
-     
-
-    int numargs = fn.nargs;
-    if (numargs > 0) {
-        log_debug("%s: the camera is automatically chosen from gnashrc",
-                __FUNCTION__);
+    //
+    media::MediaHandler* handler = media::MediaHandler::get();
+    if (!handler) {
+        log_error(_("No MediaHandler exists! Cannot create a Camera object"));
+        return as_value();
     }
-    return as_value(obj.get()); // will keep alive
+    media::VideoInput* input = handler->getVideoInput(0);
+
+    if (!input) {
+        // TODO: what should happen if the index is not available?
+        return as_value();
+    }
+
+    boost::intrusive_ptr<as_object> obj = new Camera_as(input); 
+
+    const size_t nargs = fn.nargs;
+    if (nargs > 0) {
+        log_debug("%s: the camera is automatically chosen from gnashrc",
+                "Camera.get()");
+    }
+    return as_value(obj.get()); 
 }
 
 // AS3 static accessor.
 as_value
 camera_getCamera(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new camera_as_object;
+    media::VideoInput* input = media::MediaHandler::get()->getVideoInput(0);
+    
+    boost::intrusive_ptr<as_object> obj = new Camera_as(input);
     
     int numargs = fn.nargs;
     if (numargs > 0) {
@@ -216,66 +289,21 @@ camera_getCamera(const fn_call& fn)
 as_value
 camera_setmode(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
     
-    int numargs = fn.nargs;
-    switch (numargs) {
-        case 4:
-            ptr->set_width(fn.arg(0).to_int());
-            ptr->set_height(fn.arg(1).to_int());
-            ptr->set_fps(fn.arg(2).to_int());
-            log_unimpl("Camera_as::setmode argument 4 (favorArea)");
-#ifdef USE_GST
-                ptr->webcamChangeSourceBin(ptr->getGlobalWebcam());
-#endif
-            break;
-        case 3:
-            ptr->set_width(fn.arg(0).to_int());
-            ptr->set_height(fn.arg(1).to_int());
-            ptr->set_fps(fn.arg(2).to_int());
-#ifdef USE_GST
-                ptr->webcamChangeSourceBin(ptr->getGlobalWebcam());
-#endif
-            break;
-        case 2:
-            ptr->set_width(fn.arg(0).to_int());
-            ptr->set_height(fn.arg(1).to_int());
-            if (ptr->get_fps() != 15) {
-                ptr->set_fps(15);
-            }
-#ifdef USE_GST
-                ptr->webcamChangeSourceBin(ptr->getGlobalWebcam());
-#endif
-            break;
-        case 1:
-            ptr->set_width(fn.arg(0).to_int()); //set to the specified width argument
-            if (ptr->get_height() != 120) {
-                ptr->set_height(120);
-            }
-            if (ptr->get_fps() != 15) {
-                ptr->set_fps(15);
-            }
-#ifdef USE_GST
-                ptr->webcamChangeSourceBin(ptr->getGlobalWebcam());
-#endif
-            break;
-        case 0:
-            log_debug("%s: no arguments passed, using default values", __FUNCTION__);
-            if (ptr->get_width() != 160) {
-                ptr->set_width(160);
-            }
-            if (ptr->get_height() != 120) {
-                ptr->set_height(120);
-            }
-            if (ptr->get_fps() != 15) {
-                ptr->set_fps(15);
-            }
-#ifdef USE_GST
-                ptr->webcamChangeSourceBin(ptr->getGlobalWebcam());
-#endif
-            break;
-    }
-    
+    const size_t nargs = fn.nargs;
+
+    const double width = nargs ? fn.arg(0).to_number() : 160;
+    const double height = nargs > 1 ? fn.arg(1).to_number() : 120;
+    const double fps = nargs >  2? fn.arg(2).to_number() : 15;
+    const bool favorArea = nargs > 3 ? fn.arg(3).to_bool() : true;
+
+    // TODO: handle overflow
+    const size_t reqWidth = std::max<double>(width, 0);
+    const size_t reqHeight = std::max<double>(height, 0);
+
+    ptr->setMode(reqWidth, reqHeight, fps, favorArea);
+
     return as_value();
 }
 
@@ -283,51 +311,18 @@ as_value
 camera_setmotionlevel(const fn_call& fn)
 {
     log_unimpl ("Camera::motionLevel can be set, but it's not implemented");
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>
         (fn.this_ptr);
     
-    int numargs = fn.nargs;
-    if (numargs > 2) {
-        log_error("%s: Too many arguments", __FUNCTION__);
-    } else {
-        switch (numargs) {
-            case 0:
-                log_debug("%s: no args passed, using defaults", __FUNCTION__);
-                if (ptr->get_motionLevel() != 50) {
-                    ptr->set_motionLevel(50);
-                }
-                if (ptr->get_motionTimeout() != 2000) {
-                    ptr->set_motionTimeout(2000);
-                }
-                break;
-            case 1:
-            {
-                double argument = fn.arg(0).to_number();
-                if ((argument >= 0) && (argument <= 100)) { 
-                    ptr->set_motionLevel(argument);
-                } else {
-                    log_error("%s: bad value passed for first argument", __FUNCTION__);
-                    ptr->set_motionLevel(100);
-                }
-                if (ptr->get_motionTimeout() != 2000) {
-                    ptr->set_motionTimeout(2000);
-                }
-                break;
-            }
-            case 2:
-            {
-                double argument1 = fn.arg(0).to_number();
-                if ((argument1 >= 0) && (argument1 <= 100)) {
-                    ptr->set_motionLevel(argument1);
-                } else {
-                    log_error("%s: bad value passed for first argument", __FUNCTION__);
-                    ptr->set_motionLevel(100);
-                }
-                ptr->set_motionTimeout(fn.arg(1).to_number());
-                break;
-            }
-        }
-    }
+    const size_t nargs = fn.nargs;
+
+    const double ml = nargs > 0 ? fn.arg(0).to_number() : 50;
+    const double mt = nargs > 1 ? fn.arg(1).to_number() : 2000;
+
+    const size_t motionLevel = (ml >= 0 && ml <= 100) ? ml : 100;
+
+    ptr->setMotionLevel(motionLevel, mt);
+
     return as_value();
 }
 
@@ -336,43 +331,18 @@ as_value
 camera_setquality(const fn_call& fn)
 {
     log_unimpl ("Camera::quality can be set, but it's not implemented");
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>
         (fn.this_ptr);
-    
-    int numargs = fn.nargs;
-    if (numargs > 2) {
-        log_error("%s: Too many arguments", __FUNCTION__);
-    } else {
-        switch (numargs) {
-            case 0:
-                log_debug("%s: No arguments passed, using defaults", __FUNCTION__);
-                if (ptr->get_bandwidth() != 16384) {
-                    ptr->set_bandwidth(16384);
-                }
-                if (ptr->get_quality() != 0) {
-                    ptr->set_quality(0);
-                }
-                break;
-            case 1:
-                ptr->set_bandwidth(fn.arg(0).to_number());
-                if (ptr->get_quality() != 0) {
-                    ptr->set_quality(0);
-                }
-                break;
-            case 2:
-            {
-                double argument2 = fn.arg(1).to_number();
-                ptr->set_bandwidth(fn.arg(0).to_number());
-                if ((argument2 >= 0) && (argument2 <= 100)) {
-                    ptr->set_quality(fn.arg(1).to_number());
-                } else {
-                    log_error("%s: Second argument not in range 0-100", __FUNCTION__);
-                    ptr->set_quality(100);
-                }
-                break;
-            }
-        }
-    }
+
+    const size_t nargs = fn.nargs;
+
+    const double b = nargs > 0 ? fn.arg(0).to_number() : 16384;
+    const double q = nargs > 1 ? fn.arg(1).to_number() : 0;
+
+    size_t quality = (q < 0 || q > 100) ? 100 : q;
+
+    ptr->setQuality(b, quality);
+
     return as_value();
 }
 
@@ -380,19 +350,16 @@ camera_setquality(const fn_call& fn)
 as_value
 camera_activitylevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Camera::activityLevel only has default value");
-        return as_value(ptr->get_activityLevel());
+        return as_value(ptr->activityLevel());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set activity property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -400,59 +367,32 @@ camera_activitylevel(const fn_call& fn)
 as_value
 camera_bandwidth(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Camera::bandwidth only has default value");
-        return as_value(ptr->get_bandwidth());
+        return as_value(ptr->bandwidth());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set bandwidth property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
 
-//as3 capitalization
-as_value
-camera_currentFPS(const fn_call& fn)
-{
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_currentFPS());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set currentFPS property of Camera"));
-        );
-    }
-
-    return as_value();
-}
-
-//as3 capitalization
 as_value
 camera_currentFps(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_currentFPS());
+    if (!fn.nargs) {
+        return as_value(ptr->currentFPS());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set currentFPS property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -460,18 +400,15 @@ camera_currentFps(const fn_call& fn)
 as_value
 camera_fps(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_fps());
+    if (!fn.nargs) {
+        return as_value(ptr->fps());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set fps property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -479,18 +416,15 @@ camera_fps(const fn_call& fn)
 as_value
 camera_height(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_height());
+    if (!fn.nargs) {
+        return as_value(ptr->height());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set height property of Camera, use setMode"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -498,29 +432,22 @@ camera_height(const fn_call& fn)
 as_value
 camera_index(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
+    if (!fn.nargs) 
     {
-        //livedocs say that this function should return an integer, but in testing
-        //the pp appears to, in practice, return the value as a string
-        int value = ptr->get_index();
-        char val = value + '0';
+        // livedocs say that this function should return an integer,
+        // but in testing the pp returns the value as a string
+        int value = ptr->index();
         
-        std::stringstream ss;
-        std::string str;
-        ss << val;
-        ss >> str;
-        as_value name(str);
-        name.convert_to_string();
-        return (name);
+        std::ostringstream ss;
+        ss << value;
+        return as_value(ss.str());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set index property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -528,19 +455,16 @@ camera_index(const fn_call& fn)
 as_value
 camera_motionLevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Camera::motionLevel only has default value");
-        return as_value(ptr->get_motionLevel());
+        return as_value(ptr->motionLevel());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set motionLevel property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -548,39 +472,33 @@ camera_motionLevel(const fn_call& fn)
 as_value
 camera_motionTimeout(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
-        (fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Camera::motionTimeout");
-        return as_value(ptr->get_motionTimeout());
+        return as_value(ptr->motionTimeout());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set motionTimeout property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
 
 as_value
-camera_muted(const fn_call& fn) {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+camera_muted(const fn_call& fn)
+{
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        log_unimpl("Camera::muted");
-        return as_value(ptr->get_muted());
+    if (!fn.nargs) {
+        log_unimpl("Camera.muted");
+        return as_value(ptr->muted());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set muted property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -588,18 +506,15 @@ camera_muted(const fn_call& fn) {
 as_value
 camera_name(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_name());
+    if (!fn.nargs) {
+        return as_value(ptr->name());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set name property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -614,23 +529,15 @@ camera_names(const fn_call& fn)
         return as_value();
     }
 
-    // TODO: this is a static function, not a member function. Because there
-    // is no this pointer, it cannot use camera_as_object to get the
-    // names. It will have to query the MediaHandler directly (much of the
-    // rest of the code should do this too).
-    boost::intrusive_ptr<camera_as_object> ptr =
-        ensureType<camera_as_object>(fn.this_ptr);
+    std::vector<std::string> names;
+    media::MediaHandler::get()->cameraNames(names);
     
-    //transfer from vector to an array
-    std::vector<std::string> vect;
-    vect = ptr->get_names();
-    
-    const size_t size = vect.size();
+    const size_t size = names.size();
     
     boost::intrusive_ptr<Array_as> data = new Array_as;
 
     for (size_t i = 0; i < size; ++i) {
-        data->push(vect[i]);
+        data->push(names[i]);
     }
     
     return as_value(data.get());
@@ -640,20 +547,16 @@ camera_names(const fn_call& fn)
 as_value
 camera_quality(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr =
-        ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Camera::quality has only default values");
-        return as_value(ptr->get_quality());
+        return as_value(ptr->quality());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set quality property of Camera"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -667,15 +570,18 @@ camera_new(const fn_call& /*fn*/)
 as_value
 camera_setLoopback(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
-        (fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
     
-    int numargs = fn.nargs;
-    if (numargs > 1) {
-        log_error("%s: Too many arguments", __FUNCTION__);
-    } else {
-        ptr->set_loopback(fn.arg(0).to_bool());
+    if (!fn.nargs) {
+        // TODO: log AS error.
+        return as_value();
     }
+
+    if (fn.nargs > 1) {
+        log_aserror("%s: Too many arguments", "Camera.setLoopback");
+    }
+
+    ptr->setLoopback(fn.arg(0).to_bool());
     
     return as_value();
 }
@@ -688,37 +594,25 @@ camera_setCursor(const fn_call& /*fn*/)
 }
 
 as_value
-camera_setKeyFrameInterval(const fn_call& fn)
+camera_setKeyFrameInterval(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<camera_as_object> ptr = ensureType<camera_as_object>
-        (fn.this_ptr);
-    
-    int numargs = fn.nargs;
-    if (numargs > 1) {
-        log_error("%s: Too many arguments", "Camera.setKeyFrameInterval");
-    } else {
-        ptr->set_loopback(fn.arg(0).to_int());
-    }
-    
+    LOG_ONCE(log_unimpl("Camera.setKeyFrameInterval"));
     return as_value();
 }
 
 as_value
 camera_width(const fn_call& fn)
 {
-    boost::intrusive_ptr<camera_as_object> ptr =
-        ensureType<camera_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr =
+        ensureType<Camera_as>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_width());
+    if (!fn.nargs) {
+        return as_value(ptr->width());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set width property of Camera, use setMode"));
-        );
-    }
+    );
 
     return as_value();
 }

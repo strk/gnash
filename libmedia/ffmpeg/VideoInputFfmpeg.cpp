@@ -1,4 +1,4 @@
-// VideoInput.cpp: Video input base class source file.
+// VideoInputFfmpeg.h: Video input processing using Gstreamer
 // 
 //   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -16,28 +16,43 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "VideoInput.h"
+#include "VideoInputFfmpeg.h"
 
 namespace gnash {
 namespace media {
-    
-    //constructor
-    VideoInput::VideoInput() {
-        //initialize variables
-        _activityLevel = -1.0;
-        _bandwidth = 16384;
-        _currentFPS = 0;
-        _fps = 15.0;
-        _height = 120;
-        _index = 0;
-        _keyFrameInterval = 15;
-        _loopback = false;
-        _motionLevel = 50;
-        _motionTimeout = 2000;  //millisecs
-        _muted = true;  //security (false = allow, true = decline)
-        _quality = 0;
-        _width = 160;
-    } 
-    
-} //media namespace
-} //gnash namespace
+namespace ffmpeg {
+
+VideoInputFfmpeg::VideoInputFfmpeg()
+    :
+    _activityLevel(-1.0),
+    _bandwidth(16384),
+    _currentFPS(0),
+    _fps(15.0),
+    _height(120),
+    _width(160),
+    _index(0),
+    _motionLevel(50),
+    _motionTimeout(2000),
+    _muted(true),
+    _quality(0)
+{
+}
+
+void
+VideoInputFfmpeg::requestMode(size_t width, size_t height, double fps,
+        bool favorArea)
+{
+    // TODO: check what mode is available and set the best match.
+    _width = width;
+    _height = height;
+    _fps = fps;
+}
+
+
+VideoInputFfmpeg::~VideoInputFfmpeg()
+{
+}
+
+}
+}
+}

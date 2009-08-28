@@ -28,89 +28,106 @@
 
 #include "dsodefs.h" //DSOEXPORT
 
-#include "asobj/flash/media/Camera_as.h"
-
 namespace gnash {
 namespace media {
 
+/// This is the interface for video input devices.
+//
+/// Each VideoInput should represent exactly one webcam (or similar device).
+//
+/// The interface for querying the camera is provisionally done, but needs
+/// more testing of how it actually works. Most of the values are faked. 
+//
+/// TODO: separate the process of finding cameras from this class.
+///       It could be implemented as a static method. The available cameras
+///       and all created VideoInput objects should be stored in a
+///       MediaHandler, mapped by an index for retrieval by ActionScript.
+//
+/// TODO: design a useful interface for starting, stopping and attaching
+///       the video data. VideoInputGst has some functionality here, but it
+///       is not generic enough, relying on too many gst-specific
+///       implementation details.
 class VideoInput {
 
 public:
 
-    DSOEXPORT VideoInput();
+    DSOEXPORT VideoInput() {}
 
     // virtual classes need a virtual destructor !
     virtual ~VideoInput() {}
        
-    //setters and getters
-    void set_activityLevel(double a) {_activityLevel = a;};
-    double get_activityLevel () {return _activityLevel;};
+    /// Return the current activity level of the webcam
+    //
+    /// @return     A double specifying the amount of motion currently
+    ///             detected by the camera.
+    virtual double activityLevel() const = 0;
     
-    void set_bandwidth(int b) {_bandwidth = b;};
-    int get_bandwidth() {return _bandwidth;};
+    /// The maximum available bandwidth for outgoing connections
+    //
+    /// TODO: see if this should really be here.
+    virtual size_t bandwidth() const = 0;
     
-    void set_currentFPS(double f) {_currentFPS=f;};
-    double get_currentFPS() {return _currentFPS;};
-    
-    void set_fps(double f) {_fps = f;};
-    double get_fps() {return _fps;};
-    
-    void set_height(int h) {_height = h;};
-    int get_height() {return _height;};
-    
-    void set_index(int i) {_index = i;};
-    int get_index() {return _index;};
-    
-    void set_keyFrameInterval(int i) {_keyFrameInterval = i;};
-    int get_keyFrameInterval() {return _keyFrameInterval;};
-    
-    void set_loopback(bool l) {_loopback = l;};
-    bool get_loopback() {return _loopback;};
-    
-    void set_motionLevel(int m) {_motionLevel = m;};
-    int get_motionLevel() {return _motionLevel;};
-    
-    void set_motionTimeout(int m) {_motionTimeout = m;};
-    int get_motionTimeout() {return _motionTimeout;};
-    
-    void set_muted(bool m) {_muted = m;};
-    bool get_muted() {return _muted;};
-    
-    void set_name(std::string name) {_name = name;};
-    std::string get_name() {return _name;};
+    /// Set the bandwidth for outgoing connections.
+    virtual void setBandwidth(size_t bandwidth) = 0;
 
-    std::vector<std::string> get_names() {return _names;};
-
-    void set_quality(int q) {_quality = q;};
-    int get_quality() {return _quality;};
+    /// The current frame rate of the webcam
+    //
+    /// @return     A double specifying the webcam's current FPS
+    virtual double currentFPS() const = 0;
     
-    void set_width(int w) {_width = w;};
-    int get_width() {return _width;};
+    /// The maximum FPS rate of the webcam
+    //
+    /// @return     A double specifying the webcam's maximum FPS
+    virtual double fps() const = 0;
 
-protected:
-    //specified in AS livedocs
-    double _activityLevel;
-    int _bandwidth;
-    double _currentFPS;
-    double _fps;
-    int _height;
-    int _index;
-    int _keyFrameInterval;
-    bool _loopback;
-    int _motionLevel;
-    int _motionTimeout;
-    bool _muted;
-    std::string _name;
-    std::vector<std::string> _names;
-    int _quality;
-    int _width;
+    /// Return the height of the webcam's frame
+    virtual size_t height() const = 0;
+    
+    /// Return the width of the webcam's frame
+    virtual size_t width() const = 0;
+    
+    /// The index of the camera
+    virtual size_t index() const = 0;
+    
+    /// Request a native mode most closely matching the passed variables.
+    //
+    /// @param width            The required width
+    /// @param height           The required height
+    /// @param fps              The required frame rate
+    /// @param favorArea        How to match the requested mode.
+    virtual void requestMode(size_t width, size_t height, double fps,
+            bool favorArea) = 0;
 
-    //TODO: use this map to implement the Camera::get function
-    //static std::map<int, camera_as_object*> _mapGet;
+    /// Set the amount of motion required before notifying the core
+    virtual void setMotionLevel(int m) = 0;
+
+    /// Return the current motionLevel setting
+    virtual int motionLevel() const = 0;
+    
+    /// Set time without motion in milliseconds before core is notified
+    virtual void setMotionTimeout(int m) = 0;
+
+    /// Return the current motionTimeout setting.
+    virtual int motionTimeout() const = 0;
+    
+    virtual void mute(bool m) = 0;
+    virtual bool muted() const = 0;
+    
+    /// Return the name of this webcam
+    //
+    /// @return     a string specifying the name of the webcam.
+    virtual const std::string& name() const = 0;
+
+    /// Set the quality of the webcam
+    virtual void setQuality(int q) = 0;
+
+    /// Return the current quality of the webcam
+    virtual int quality() const = 0;
+
 };
 
     
-} // gnash.media namespace 
+} // media namespace 
 } // gnash namespace
 
-#endif // __VIDEOINPUT_H__
+#endif 

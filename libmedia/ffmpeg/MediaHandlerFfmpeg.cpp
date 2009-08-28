@@ -25,6 +25,7 @@
 #include "GnashException.h"
 #include "FLVParser.h"
 #include "VideoConverterFfmpeg.h"
+#include "VideoInputFfmpeg.h"
 
 #include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
@@ -114,6 +115,18 @@ MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
     }
 
 	return ret;
+}
+
+VideoInput*
+MediaHandlerFfmpeg::getVideoInput(size_t /*index*/)
+{
+    return new VideoInputFfmpeg();
+}
+
+void
+MediaHandlerFfmpeg::cameraNames(std::vector<std::string>& /*names*/) const
+{
+    log_unimpl("FFmpeg: camera names");
 }
 
 size_t
