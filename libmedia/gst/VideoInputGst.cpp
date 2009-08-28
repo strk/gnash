@@ -324,7 +324,6 @@ VideoInputGst::VideoInputGst()
 
 VideoInputGst::~VideoInputGst() 
 {
-    log_unimpl("Video Input destructor");
 }
 
 bool
@@ -346,9 +345,11 @@ VideoInputGst::requestMode(size_t width, size_t height, double fps,
 
     UNUSED(favorArea);
 
+    std::cerr << "Changing source bin" << std::endl;
     // I don't know what the point is of this. It was previously in Camera_as,
     // where it certainly shouldn't be.
     webcamChangeSourceBin(_devSelection);
+    std::cerr << "Changed source bin" << std::endl;
 
 }
 
@@ -958,22 +959,23 @@ VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
 }
 
 gboolean
-VideoInputGst::webcamChangeSourceBin(size_t index) 
+VideoInputGst::webcamChangeSourceBin() 
 {
     GError *error = NULL;
     gchar *command = NULL;
     
-    setWebcam(index);
+    assert(_globalWebcam);
 
-    GnashWebcamPrivate* webcam = _globalWebcam;
-    
-    if(webcam->_pipelineIsPlaying == true) {
+    if (_globalWebcam->_pipelineIsPlaying == true) {
         stop();
     }
 
     //delete the old source bin
-    gst_bin_remove(GST_BIN(webcam->_webcamMainBin), webcam->_webcamSourceBin);
-    webcam->_webcamSourceBin = NULL;
+    gst_bin_remove(GST_BIN(_globalWebcam->_webcamMainBin),
+            _globalWebcam->_webcamSourceBin);
+    _globalWebcam->_webcamSourceBin = NULL;
+    
+    GnashWebcamPrivate* webcam = _globalWebcam;
     
     if(webcam->_webcamDevice == NULL) {
         log_debug("%s: You don't have any webcams chosen, using videotestsrc",
@@ -1518,23 +1520,24 @@ bool
 VideoInputGst::play() 
 {
     GnashWebcamPrivate* webcam = _globalWebcam;
+    assert(_globalWebcam);
 
     GstStateChangeReturn state;
     GstBus *bus;
     gint ret;
-        //setup bus to watch pipeline for messages
-        bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));
-        ret = gst_bus_add_watch (bus, bus_call, webcam);
-        gst_object_unref (bus);
-        
-        state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
-        
-        if (state != GST_STATE_CHANGE_FAILURE) {
-            webcam->_pipelineIsPlaying = true;
-            return true;
-        } else {
-            return false;
-        }
+    //setup bus to watch pipeline for messages
+    bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));
+    ret = gst_bus_add_watch (bus, bus_call, webcam);
+    gst_object_unref (bus);
+    
+    state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
+    
+    if (state != GST_STATE_CHANGE_FAILURE) {
+        webcam->_pipelineIsPlaying = true;
+        return true;
+    }
+    
+    return false;
 }
 
 bool

@@ -100,9 +100,9 @@ void test_client()
     
     bool result = vig.init();
     if (result != true) {
-        runtest.fail("the webcamCreateMainBin() function reported an error");
+        runtest.fail("Webcam inititalization");
     } else {
-        runtest.pass("the webcamCreateMainBin() function isn't reporting errors");
+        runtest.pass("Webcam initialization was okay");
     }
     
     result = false;
@@ -141,6 +141,7 @@ void test_client()
 
     struct stat st;
     std::string file = "./vidoutput.ogg";
+#if 0
     
     if (stat(file.c_str(), &st) == 0) {
         runtest.pass("vidoutput.ogg file is in testsuite/libmedia.all");
@@ -264,6 +265,8 @@ void test_client()
     
     //end unit tests
     
+#endif
+
     //tests more similar to execution flow
     gst::VideoInputGst* video = new VideoInputGst;
     if (video == NULL) {
@@ -421,68 +424,7 @@ void test_client()
     } else {
         runtest.pass("no vidoutput.ogg file wasn't created");
     }
-    
-    //pass bad values
-    g_print("        NOTE: changing values to bad vals....\n");
-    video->requestMode(8000, 6000, 200, true);
-    
-    result = video->play();
-    if (result != true) {
-        runtest.fail("play reported errors");
-    } else {
-        runtest.pass("play reported no errors");
-    }
 
-    g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
-    
-    result = video->stop();
-    if (result != true) {
-        runtest.fail("webcamStop reported errors");
-    } else {
-        runtest.pass("webcamStop reported no errors");
-    }
-
-    if (stat(file.c_str(), &st) == 0) {
-        runtest.fail("a vidoutput.ogg file was created, and it shouldn't be");
-    } else {
-        runtest.pass("no vidoutput.ogg file wasn't created");
-    }
-    
-    //reset to good vals
-    g_print("        NOTE: changing back to legit vals....\n");
-    
-    video->requestMode(320, 240, 30, true);
-    
-    result = video->webcamMakeVideoSaveLink();
-    if (result != true) {
-        runtest.fail("webcamMakeVideoSaveLink reported an error");
-    } else {
-        runtest.pass("webcamMakeVideoSaveLink reported no errors");
-    }
-    
-    result = video->play();
-    if (result != true) {
-        runtest.fail("play reported errors");
-    } else {
-        runtest.pass("play reported no errors");
-    }
-
-    g_print("        NOTE: sleeping for 5 seconds here....\n");
-    sleep(5);
-    
-    result = video->stop();
-    if (result != true) {
-        runtest.fail("webcamStop reported errors");
-    } else {
-        runtest.pass("webcamStop reported no errors");
-    }
-
-    if (stat(file.c_str(), &st) == 0) {
-        runtest.pass("the a new vidoput.ogg file was created");
-    } else {
-        runtest.fail("there's no new vidoutput.ogg file!");
-    }
 }
 
 

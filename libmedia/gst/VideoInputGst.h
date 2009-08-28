@@ -23,10 +23,6 @@
 #include "VideoInput.h"
 #include "gst/gst.h"
 
-// This is ugly, yes, but less ugly than making all methods public
-// just for the testsuite.
-void test_client();
-
 namespace gnash {
 namespace media {
 /// \namespace gst
@@ -119,8 +115,6 @@ class VideoInputGst : public VideoInput
 {
 public:
  
-    friend void test_client();
-
     /// Constructor for the VideoInputGst class
     VideoInputGst();
     
@@ -381,11 +375,9 @@ private:
     /// \brief Function is called when changes have been made to certain variables
     ///      that effect the video source's capabilities (specifically resolution
     ///      and fps values)
-    /// @param webcam A pointer to the GnashWebcamPrivate data structure where
-    ///      changes have been made to resolution or fps variables
     /// @return True if the changes to the source's capabilities happened succesfully
     ///      false otherwise.
-    gboolean webcamChangeSourceBin(size_t index);
+    gboolean webcamChangeSourceBin();
     
     /// \brief Function creates the main bin. For more information on pipeline
     ///       implementation and this function in general see the definition of

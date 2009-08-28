@@ -149,6 +149,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/AudioResamplerFfmpeg.h \
 		ffmpeg/ffmpegHeaders.h \
 		ffmpeg/VideoConverterFfmpeg.h \
+		ffmpeg/VideoInputFfmpeg.h \
 		$(NULL)
 
    libgnashmedia_la_LIBADD += \
