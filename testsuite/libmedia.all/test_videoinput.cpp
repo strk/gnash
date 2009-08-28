@@ -271,21 +271,12 @@ void test_client()
         runtest.pass("new VideoInputGst returned a value");
     }
 	
-    devselect = video->makeWebcamDeviceSelection();
-    
-    ret = video->setWebcam(devselect);
-    
-    video->init();
-    
-    video->webcamCreateSaveBin();
-    video->webcamMakeVideoSaveLink();
-    
     //get global webcam reference for use below
     result = video->webcamMakeVideoDisplayLink();
     if (result != true) {
-        runtest.xfail("webcamMakeVideoDisplayLink reported errors");
+        runtest.fail("webcamMakeVideoDisplayLink reported errors");
     } else {
-        runtest.xpass("webcamMakeVideoDisplayLink reported no errors");
+        runtest.pass("webcamMakeVideoDisplayLink reported no errors");
     }
     
     result = video->play();
@@ -328,9 +319,9 @@ void test_client()
     
     result = video->webcamMakeVideoSaveLink();
     if (result != true) {
-        runtest.xfail("webcamMakeVideoSaveLink reported errors");
+        runtest.fail("webcamMakeVideoSaveLink reported errors");
     } else {
-        runtest.xpass("webcamMakeVideoSaveLink reported no errors");
+        runtest.pass("webcamMakeVideoSaveLink reported no errors");
     }
     
     result = video->play();
