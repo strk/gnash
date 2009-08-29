@@ -67,7 +67,9 @@
 #endif // __MACH__
 
 #if !defined(WIN32) && (!defined(__MACH__) || defined(GUI_GTK))
-# define GL_GLEXT_PROTOTYPES
+#ifndef GL_GLEXT_PROTOTYPES
+# define GL_GLEXT_PROTOTYPES 1
+#endif
 # include <GL/gl.h>
 # include <GL/glx.h>
 # include <GL/glu.h>
