@@ -15,14 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "gtk_glue.h"
+#ifndef GTK_GLU_GTKGLEXT_H
+#define GTK_GLU_GTKGLEXT_H
 
-#include <gtk/gtk.h>
-#ifndef _WIN32
-#include <gdk/gdkx.h>
-#else
-#include <gdk/gdk.h>
-#endif
+#include "gtk_glue.h"
 
 #include <gtk/gtkgl.h>
 
@@ -52,3 +48,6 @@ class GtkGlExtGlue : public GtkGlue
 };
 
 }
+
+// end of GNASH_GTK_GLEXT_H
+#endif
