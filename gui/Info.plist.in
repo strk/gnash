@@ -20,17 +20,23 @@
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleTypeExtensions</key>
+	<key>CFBundleDocumentTypes</key>
 	<array>
-		<string>swf</string>
-		<string>SWF</string>
-	</array>
-	<key>CFBundleTypeName</key>
-	<string>Flash File</string>
-	<key>CFBundleTypeOSTypes</key>
-	<array>
-		<string>swf</string>
-		<string>SWF</string>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>swf</string>
+				<string>SWF</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>GnashG.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Adobe Flash File</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>@VERSION@</string>
