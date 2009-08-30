@@ -20,6 +20,9 @@
 
 
 #if defined(NOT_SGI_GL) || defined(__APPLE_CC__)
+# ifdef __APPLE_CC__
+# include <AGL/agl.h>
+# endif
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>
