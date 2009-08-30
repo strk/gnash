@@ -76,7 +76,7 @@
 # include <GL/gl.h>
 # include <GL/glx.h>
 # include <GL/glu.h>
-#enduf
+#endif
 #ifndef APIENTRY
 # define APIENTRY
 #endif
