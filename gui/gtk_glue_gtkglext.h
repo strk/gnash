@@ -18,6 +18,7 @@
 #ifndef GTK_GLU_GTKGLEXT_H
 #define GTK_GLU_GTKGLEXT_H
 
+#include "Renderer_ogl.h"
 #include "gtk_glue.h"
 
 #include <gtk/gtkgl.h>
