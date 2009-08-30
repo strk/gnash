@@ -7,11 +7,12 @@
 	<key>CFBundleExecutable</key>
 	<string>Gnash</string>
 	<key>CFBundleGetInfoString</key>
-	<string>GNU SWF Player.</string>
+	<string>GNU SWF Player.
+Copyright (C) 2007-2009 Free Software Foundation, Inc.</string>
 	<key>CFBundleIconFile</key>
 	<string>GnashG</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.gnash.aqua</string>
+	<string>org.gnash.aqua</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
@@ -31,6 +32,10 @@
 		<string>SWF</string>
 	</array>
 	<key>CFBundleVersion</key>
+	<string>@VERSION@</string>
+	<key>CFBundleName</key>
+	<string>Gnash</string>
+	<key>CFBundleShortVersionString</key>
 	<string>@VERSION@</string>
 	<key>LSRequiresCarbon</key>
 	<true/>
