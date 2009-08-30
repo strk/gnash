@@ -59,7 +59,7 @@ class DSOEXPORT AquaGui : public Gui
 	public:
 	AquaGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~AquaGui();
-    virtual bool init(int argc, char ***argv);
+    virtual bool init(int argc, char **argv[]);
     virtual void setCursor(gnash_cursor_type newcursor);
     virtual bool createWindow(const char* title, int width, int height);
     virtual bool run();

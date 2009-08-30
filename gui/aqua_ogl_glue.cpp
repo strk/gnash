@@ -16,9 +16,6 @@
 
 
 #include "aqua_ogl_glue.h"
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <OpenGL/glext.h>
 #include "log.h"
 
 #define OVERSIZE 1.0f
@@ -45,12 +42,7 @@ AquaOglGlue::~AquaOglGlue()
 }
 
 
-bool
-#ifdef FIX_I810_LOD_BIAS
-AquaOglGlue::init(int argc, char** argv[])
-#else
-AquaOglGlue::init(int, char***)
-#endif
+bool AquaOglGlue::init(int argc, char **argv[])
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef FIX_I810_LOD_BIAS

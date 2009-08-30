@@ -19,10 +19,8 @@
 #ifndef AQUA_OGL_GLUE_H
 #define AQUA_OGL_GLUE_H
 
-#include "aqua_glue.h"
 #include "Renderer_ogl.h"
-#include <AGL/agl.h>
-
+#include "aqua_glue.h"
 
 namespace gnash
 {
@@ -33,7 +31,7 @@ class AquaOglGlue : public AquaGlue
     AquaOglGlue();
     virtual ~AquaOglGlue();
 
-    bool init(int argc, char ***argv);
+    bool init(int argc, char **argv[]);
     Renderer* createRenderHandler();
     bool prepDrawingArea(int width, int height, AGLDrawable drawable);
     void setInvalidatedRegions(const InvalidatedRanges& /* ranges */);

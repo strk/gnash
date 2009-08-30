@@ -21,21 +21,31 @@
 #include "gnashconfig.h"
 #endif
 
+#if defined(_WIN32) || defined(WIN32)
+# include "getopt_win32.h"
+#else
 extern "C"{
-#ifdef HAVE_GETOPT_H
-	#include <getopt.h>
-#endif
+# ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+# endif
+# ifndef __GNUC__
+  extern int getopt(int, char *const *, const char *);
+# endif
 }
+#endif // Win32
+
 
 #include "gnash.h"
-#include "gui.h"
 #include "aquasup.h"
 #include "log.h"
 #include "movie_root.h"
+#include "RunResources.h"
 
 #include "Renderer.h"
 
 #include <Carbon/Carbon.h>
+
+using namespace std;
 
 namespace gnash {
 
@@ -118,10 +128,10 @@ bool AquaGui::init(int argc, char **argv[]) /* Self-explainatory */
       	
   	_glue.init(argc, argv);
 
-    _renderer = _glue.createRenderHandler();
+    _renderer.reset(_glue.createRenderHandler());
     if(!_renderer)return false;
 
-    set_Renderer(_renderer);
+	_runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
     return true;
 
 }

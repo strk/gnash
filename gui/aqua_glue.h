@@ -19,6 +19,11 @@
 #ifndef AQUA_GLUE_H
 #define AQUA_GLUE_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+
 #include "gnash.h"
 #include "snappingrange.h"
 #include <AGL/agl.h>
