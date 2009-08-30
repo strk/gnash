@@ -21,9 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-#if defined(_WIN32) || defined(WIN32)
-# include "getopt_win32.h"
-#else
 extern "C"{
 # ifdef HAVE_GETOPT_H
 #  include <getopt.h>
@@ -32,8 +29,6 @@ extern "C"{
   extern int getopt(int, char *const *, const char *);
 # endif
 }
-#endif // Win32
-
 
 #include "gnash.h"
 #include "aquasup.h"
@@ -209,7 +204,7 @@ bool AquaGui::createMenu()
 	GetIndMenuItemWithCommandID(NULL, kHICommandPreferences, 1, &rApplicationMenu, outIndex);
 
 	/* Enable 'About' */
-	InsertMenuItemTextWithCFString(rApplicationMenu, CFSTR("About gnash"), (short) 0, 0, kHICommandAbout);
+	InsertMenuItemTextWithCFString(rApplicationMenu, CFSTR("About Gnash"), (short) 0, 0, kHICommandAbout);
 
 	return true;
 }
