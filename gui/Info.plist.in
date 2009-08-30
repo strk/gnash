@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Gnash</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Copyright (C) 2007-2009 Free Software Foundation, Inc.</string>
+	<string>GNU SWF Player.</string>
 	<key>CFBundleIconFile</key>
 	<string>GnashG</string>
 	<key>CFBundleIdentifier</key>
@@ -16,7 +16,6 @@
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-<!-- four-character Mac OS 9-style creator code -->
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleTypeExtensions</key>
@@ -33,6 +32,14 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>@VERSION@</string>
+	<key>LSRequiresCarbon</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright (C) 2007-2009 Free Software Foundation, Inc.</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.4.0</string>
+	<key>LSUIPresentationMode</key>
+	<integer>0</integer>
 	<key>SUFeedURL</key>
 	<string>http://www.gnashdev.org/update.xml</string>
 </dict>
