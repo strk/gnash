@@ -43,7 +43,7 @@
 #include "log.h"
 #include "gui.h"
 
-//#include "Renderer.h"
+#include "RunResources.h"
 
 using namespace std;
 //using namespace fltk;
@@ -91,16 +91,25 @@ FltkCairoGlue::initBuffer(int width, int height)
     // CAIRO_FORMAT_RGB24 actualy means a 32-bit RGB word with the upper 8 bits
     // unused. Therefore we have allocated a 32-bit buffer.
 
+   if (_cairo_surface)
+        cairo_surface_destroy(_cairo_surface);
+    if (_cairo_handle)
+        cairo_destroy(_cairo_handle);
+
     _cairo_surface =
       cairo_image_surface_create_for_data (_offscreenbuf, CAIRO_FORMAT_RGB24,
                                            width, height, _stride);
 
     _cairo_handle = cairo_create(_cairo_surface);
 
-    renderer::cairo::set_handle(_cairo_handle);
+    cairo_set_source_surface(_cairo_handle, cairo_get_target(_cairo_handle), 0, 0);
+    renderer::cairo::set_context(_renderer, _cairo_handle);
+
+    //renderer::cairo::set_handle(_cairo_handle);
 
     if (firstTime) {
-      set_Renderer(_renderer);
+      //set_Renderer(_renderer);
+      _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
       firstTime = false;
     }
 

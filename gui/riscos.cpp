@@ -28,6 +28,8 @@
 #include "Renderer.h"
 #include "log.h"
 
+#include "RunResources.h"
+
 //#include <iostream>
 
 namespace gnash
@@ -106,8 +108,9 @@ RiscosGui::init(int argc, char **argv[])
     glue.prepFramebuffer((void *)vduvals[0], _screen_width, _screen_height);
 #endif
 
-    _renderer = glue.createRenderHandler();
-    set_Renderer(_renderer);
+    _renderer.reset(glue.createRenderHandler());
+    //set_Renderer(_renderer);
+    _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
     // hack?
     _renderer->set_scale(1.0f, 1.0f);
 
