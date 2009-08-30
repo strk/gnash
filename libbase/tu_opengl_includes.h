@@ -70,9 +70,13 @@
 #ifndef GL_GLEXT_PROTOTYPES
 # define GL_GLEXT_PROTOTYPES 1
 #endif
+#ifdef __MACH__
+# include <OpenGL/glext.h>
+#else
 # include <GL/gl.h>
 # include <GL/glx.h>
 # include <GL/glu.h>
+#enduf
 #ifndef APIENTRY
 # define APIENTRY
 #endif
