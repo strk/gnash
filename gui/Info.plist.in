@@ -30,6 +30,10 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>GnashG.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/x-shockwave-flash</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Adobe Flash File</string>
 			<key>LSHandlerRank</key>
