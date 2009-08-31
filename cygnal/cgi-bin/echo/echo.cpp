@@ -324,3 +324,8 @@ usage (void)
 	 << _("  -p,  --netdebug      port for network") << endl
          << endl;
 }
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

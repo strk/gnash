@@ -1137,11 +1137,11 @@ rtmp_handler(Network::thread_params_t *args)
     rtmp->setTimeout(30);
 //    boost::shared_ptr<amf::Buffer> buf;
  
-    // This is the main message processing loop for rtmp. All message received require
-    // a response.
+    // This is the main message processing loop for rtmp. All message
+    // received require a response.
     do {
-	// If there is no data left from the previous chunk, process that before
-	// reading more data.
+	// If there is no data left from the previous chunk, process
+	// that before reading more data.
 	if (pkt != 0) {
 	    log_network("data left from previous packet");
 	} else {
@@ -1354,7 +1354,7 @@ rtmp_handler(Network::thread_params_t *args)
 
 		    size_t ret = hand->writeToPlugin(tmpptr, qhead->bodysize);
 		    boost::shared_ptr<amf::Buffer> result = hand->readFromPlugin();
- 		    if (result) {
+ 		    if (result) { // FIXME: this needs a real channel number
 			if (rtmp->sendMsg(args->netfd, 0x3, RTMP::HEADER_8, ret,
 					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
 			    log_debug("Sent response to client.");
@@ -1369,7 +1369,7 @@ rtmp_handler(Network::thread_params_t *args)
 
 		
 	    } else {
-		log_error("Never read any data from fd #%d", args->netfd);
+		log_network("Never read any data from fd #%d", args->netfd);
 #if 0
 		// Send a ping to reset the new stream
 		boost::shared_ptr<amf::Buffer> ping_reset =
@@ -1383,7 +1383,7 @@ rtmp_handler(Network::thread_params_t *args)
 		}
 #endif
 		initialize = true;
-		return false;
+		return true;
 	    }
 	} else {
 	    log_error("Communication error with client using fd #%d", args->netfd);
