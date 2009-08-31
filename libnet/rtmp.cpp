@@ -40,7 +40,6 @@
 #include "cque.h"
 #include "network.h"
 #include "element.h"
-// #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
 #include "GnashSleep.h"
@@ -187,15 +186,11 @@ RTMP::headerSize(boost::uint8_t header)
 	headersize = 1;
     };
 
-//     cerr << "Header size value: " << (void *)header
-// 	 << " Header size is: " << headersize<< std::endl;
-
     return headersize;
 }
 
 RTMP::RTMP() 
     : _handshake(0),
-//       _handler(0),
       _packet_size(0),
       _mystery_word(0),
       _timeout(1)
@@ -313,8 +308,12 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	// from the previous message, 1 and 4 bytes headers all
 	// reuse the previous body size.
 	head->bodysize = _bodysize[head->channel];
-	log_network("Using previous body size of %d for channel %d",
-		    head->bodysize, head->channel);
+	if (head->bodysize == 0) {
+	    log_network("Using previous body size of %d for channel %d",
+			head->bodysize, head->channel);
+	} else {
+	    log_error("Previous body size for channel %d is zero!");
+	}
     }
 
     // the bodysize is limited to two bytes, so if we think we have
@@ -875,7 +874,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
 	      RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size)
 {
-//  GNASH_REPORT_FUNCTION;
+// GNASH_REPORT_FUNCTION;
     int ret = 0;
     
     // We got some bogus parameters
@@ -883,26 +882,47 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	log_error("Bogus size parameter in %s!", __PRETTY_FUNCTION__);
 	return false;
     }
+
+    // FIXME: This is a temporary hack to make it easier to read hex
+    // dumps from network packet sniffing so all the data is in one
+    // buffer. This matches the Adobe behaviour, but for Gnash/Cygnal,
+    // is a performance hit.
     
-    // This builds the full header,which is required as the first part
+    // Figure out how many packets it'll take to send this data.
+    int pkts = size/_chunksize[channel];
+    boost::shared_ptr<amf::Buffer> bigbuf(new amf::Buffer(size+pkts+100));
+	
+    // This builds the full header, which is required as the first part
     // of the packet.
-    boost::shared_ptr<amf::Buffer> head = encodeHeader(channel, head_size, total_size,
-						       type, routing);
+    boost::shared_ptr<amf::Buffer> head = encodeHeader(channel, head_size,
+					total_size, type, routing);
     // When more data is sent than fits in the chunksize for this
     // channel, it gets broken into chunksize pieces, and each piece
     // after the first packet is sent gets a one byte header instead.
+#if 0
     boost::shared_ptr<amf::Buffer> cont_head = encodeHeader(channel, RTMP::HEADER_1);
+#else
+    boost::shared_ptr<amf::Buffer> cont_head(new amf::Buffer(1));
+    boost::uint8_t foo = 0xc3;
+    *cont_head = foo;
+#endif
+    
     size_t partial = _chunksize[channel];
     size_t nbytes = 0;
 
     // First send the full header, afterwards we only use continuation
     // headers, which are only one byte.
-//    gnashSleep(100000);  FIXME: why is this here ?
+#if 0
     ret = writeNet(fd, head->reference(), head->size());
     if (ret == -1) {
-	log_error("Couldn't write the RTMP header!");
+	log_error("Couldn't write the full 12 byte RTMP header!");
 	return false;
-    }    
+    } else {
+	log_network("Wrote the full 12 byte RTMP header.");
+    }
+#else
+    *bigbuf = head;
+#endif
 
     // now send the data
     while (nbytes <= size) {
@@ -914,17 +934,47 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	// After the first packet, only send the single byte
 	// continuation packet.
 	if (nbytes > 0) {
+#if 0
 	    ret = writeNet(fd, *cont_head);
+	    if (ret == -1) {
+		log_error("Couldn't write the full 1 byte RTMP continuation header!");
+		return false;
+	    } else {
+		log_network("Wrote the full 1 byte RTMP continuation header");
+	    }
+#else
+	    *bigbuf += cont_head;
+#endif
 	}
 	// write the data to the client
+#if 0
 	ret = writeNet(fd, data + nbytes, partial);
 	if (ret == -1) {
 	    log_error("Couldn't write the RTMP body!");
 	    return false;
+	} else {
+	    log_network("Wrote %d bytes of the RTMP body, %d bytes left.",
+			ret, size-nbytes);
 	}
+#else
+	bigbuf->append(data + nbytes, partial);
+#endif
 	// adjust the accumulator.
 	nbytes += _chunksize[channel];
     };
+    
+#if 1
+    bigbuf->dump();
+    
+    ret = writeNet(fd, *bigbuf);
+    if (ret == -1) {
+	log_error("Couldn't write the RTMP packet!");
+	return false;
+    } else {
+	log_network("Wrote the RTMP packet.");
+    }
+#endif
+
     return true;
 }
 
