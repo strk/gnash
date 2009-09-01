@@ -134,7 +134,6 @@ GUI_CPPFLAGS += -DGUI_AQUA
 
 bundle_name = Gnash.app
 
-
 if  HAVE_OPENGL
 noinst_LTLIBRARIES += libgnashaqua_ogl.la
 libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \

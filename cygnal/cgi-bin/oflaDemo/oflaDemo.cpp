@@ -400,7 +400,7 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
         log_error("No AMF data in message!");
         return headers;
     }
-    
+
     string method = el1->to_string();    
     ptr += amf.totalsize();
     headers.push_back(el1);
