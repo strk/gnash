@@ -18,7 +18,7 @@
 AUTOMAKE_OPTIONS = 
 
 # this is where Gnash plugins get installed
-cgidir = $(libdir)/cygnal
+cgidir = $(libdir)/cygnal/plugins
 
 bin_PROGRAMS = gateway
 
