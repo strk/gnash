@@ -193,7 +193,24 @@ public:
         INVOKE = 0x14,
 	FLV_DATA = 0x16
     } content_types_e;
-     typedef enum {
+    typedef enum {
+	CHUNKSIZE = 0x1,
+	ABORT=0x2,
+	ACK=0x3,
+	USER=0x4,
+	WINDOW=0x5,
+	BANDWIDTH=0x6
+    } control_types_e;
+    typedef enum {
+	STREAM_START=0x0,
+	STREAM_EOF=0x1,
+	STREAM_NODATA=0x2,
+	STREAM_BUFFER=0x3,
+	STREAM_LIVE=0x4,
+	STREAM_PING=0x6,
+	STREAM_PONG=0x7
+    } stream_control_e;
+    typedef enum {
          CREATE = 0x1,		// Client sends event
          DELETE = 0x2,		// Client sends event
          REQUEST_CHANGE = 0x3,	// Client sends event

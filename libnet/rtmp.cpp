@@ -265,13 +265,13 @@ RTMP::decodeHeader(boost::uint8_t *in)
     boost::uint8_t *tmpptr = in;
 
     head->channel = *tmpptr & RTMP_INDEX_MASK;
-    log_network (_("The AMF channel index is %d"), head->channel);
+    // log_network (_("The AMF channel index is %d"), head->channel);
     
     head->head_size = headerSize(*tmpptr++);
-    log_network (_("The header size is %d"), head->head_size);
+    // log_network (_("The header size is %d"), head->head_size);
 
-    cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in,
-    head->head_size, false) << endl; 
+    // cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in,
+    // head->head_size, false) << endl; 
 
     // Make sure the header size is in range, it has to be between
     // 1-12 bytes.
@@ -1332,7 +1332,8 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		    _lastsize[rthead->channel] = rthead->bodysize;
 // 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
 // 			 << ", read " << pktsize << " bytes." << endl;
-		    ptr += pktsize;
+		    // FIXME: why is this off by 1 byte ?
+		    ptr += pktsize - 1;
 		} else {
 		    log_error("Packet size out of range! %d, %d", rthead->bodysize, pktsize);
 		}
