@@ -97,7 +97,7 @@ extern "C"{
 #define POLLRDHUP 0
 #endif
 
-//using gnash::log_debug;
+//using gnash::log_network;
 using namespace std;
 using namespace gnash;
 using namespace cygnal;
@@ -436,7 +436,7 @@ main(int argc, char *argv[])
     
     if (crcfile.getDocumentRoot().size() > 0) {
         docroot = crcfile.getDocumentRoot();
-        log_debug (_("Document Root for media files is: %s"),
+        log_network (_("Document Root for media files is: %s"),
 		       docroot);
     } else {
         docroot = "/var/www/html/software/tests/";
@@ -464,7 +464,7 @@ main(int argc, char *argv[])
 	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
-	      log_debug (_("Verbose output turned on"));
+	      log_network (_("Verbose output turned on"));
 	      break;
 	  case 'p':
 	      port_offset = parser.argument<int>(i);
@@ -564,7 +564,7 @@ main(int argc, char *argv[])
       // Wait for all the threads to die
       alldone.wait(lk);
       
-      log_debug (_("Cygnal done..."));
+      log_network (_("Cygnal done..."));
     
       delete rtmp_data;
       delete http_data;
@@ -576,7 +576,7 @@ main(int argc, char *argv[])
 static void
 cntrlc_handler (int sig)
 {
-    log_debug(_("Got a %d interrupt"), sig);
+    log_network(_("Got a %d interrupt"), sig);
 //    sigaction (SIGINT, &act, NULL);
     exit(-1);
 }
@@ -619,9 +619,9 @@ admin_handler(Network::thread_params_t *args)
     Handler::admin_cmd_e cmd = Handler::POLL;
     net.createServer(args->port);
     while (retries > 0) {
-	log_debug(_("Starting Admin Handler for port %d"), args->port);
+	log_network(_("Starting Admin Handler for port %d"), args->port);
 	net.newConnection(true);
-	log_debug(_("Got an incoming Admin request"));
+	log_network(_("Got an incoming Admin request"));
 	sleep(1);
 	do {
 	    Network::byte_t data[ADMINPKTSIZE+1];
@@ -629,7 +629,7 @@ admin_handler(Network::thread_params_t *args)
 	    const char *ptr = reinterpret_cast<const char *>(data);
 	    ret = net.readNet(data, ADMINPKTSIZE, 100);
 	    if (ret < 0) {
-		log_debug("no more admin data, exiting...\n");
+		log_network("no more admin data, exiting...\n");
 		if ((ret == 0) && cmd != Handler::POLL) {
 		    break;
 		}
@@ -717,7 +717,7 @@ admin_handler(Network::thread_params_t *args)
 		  break;
 	    };
 	} while (ret > 0);
-        log_debug("admin_handler: Done...!\n");
+        log_network("admin_handler: Done...!\n");
 	net.closeNet();		// this shuts down this socket connection
     }
     net.closeConnection();		// this shuts down the server on this connection
@@ -744,7 +744,7 @@ connection_handler(Network::thread_params_t *args)
 	log_error("Can't start Connection Handler for fd #%d, port %hd", fd, args->port);
 	return;
     } else {
-	log_debug("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
+	log_network("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
     }
 
     // Get the number of cpus in this system. For multicore
@@ -754,11 +754,11 @@ connection_handler(Network::thread_params_t *args)
     // handling part of the total active file descriptors.
 #ifdef HAVE_SYSCONF
     long ncpus = sysconf(_SC_NPROCESSORS_ONLN);
-    log_debug("This system has %d cpus.", ncpus);
+    log_network("This system has %d cpus.", ncpus);
 #endif	
     size_t nfds = crcfile.getFDThread();
     
-//     log_debug("This system is configured for %d file descriptors to be watched by each thread.", nfds);
+//     log_network("This system is configured for %d file descriptors to be watched by each thread.", nfds);
     
     // Get the next thread ID to hand off handling this file
     // descriptor to. If the limit for threads per cpu hasn't been
@@ -785,7 +785,7 @@ connection_handler(Network::thread_params_t *args)
 
 	// Rotate in a range of 0 to the limit.
 	tid = (tid + 1) % (spawn_limit + 1);
-	log_debug("thread ID %d for fd #%d", tid, fd);
+	log_network("thread ID %d for fd #%d", tid, fd);
 	
 	// Wait for a connection to this tcp/ip from a client. If set
 	// to true, this will block until a request comes in. If set
@@ -794,11 +794,11 @@ connection_handler(Network::thread_params_t *args)
 	// things when you have a heavily threaded application.
 	args->netfd = net.newConnection(true, fd);
 	if (args->netfd <= 0) {
-	    log_debug("No new network connections");
+	    log_network("No new network connections");
 	    continue;
 	}
 	
-	log_debug("New network connection for fd #%d", args->netfd);
+	log_network("New network connection for fd #%d", args->netfd);
     
 	struct pollfd fds;
 	fds.fd = args->netfd;
@@ -806,14 +806,14 @@ connection_handler(Network::thread_params_t *args)
 	if (crcfile.getThreadingFlag() == true) {
 	    // Each dispatch thread gets it's own argument data and
 	    // network connection data.
-	    log_debug("Multi-threaded mode for server on fd #%d", fd);
+	    log_network("Multi-threaded mode for server on fd #%d", fd);
 	    Network::thread_params_t *targs = new Network::thread_params_t;
 	    Network *tnet = 0;
 	    targs->netfd = args->netfd;
 	    // If we haven't spawned up to our max allowed, start a
 	    // new dispatch thread to handle data.
 	    if (networks[tid] == 0) {
-		log_debug("Starting new dispatch thread for tid #%d", tid);
+		log_network("Starting new dispatch thread for tid #%d", tid);
 		tids.increment();
 		tnet = new Network;
 		tnet->setFileFd(args->netfd);
@@ -822,7 +822,7 @@ connection_handler(Network::thread_params_t *args)
 		targs->filespec = docroot;
 		targs->tid = tid;
 	    } else {
-		log_debug("Not starting new HTTP thread, spawned already for tid #%d", tid);
+		log_network("Not starting new HTTP thread, spawned already for tid #%d", tid);
 		tnet = networks[tid];
 	    }
 	    if (args->port == (port_offset + RTMPT_PORT)) {
@@ -872,9 +872,9 @@ connection_handler(Network::thread_params_t *args)
 		}
 		if (crcfile.getCgiRoot().size() > 0) {
 		    cgiroot += ":" + crcfile.getCgiRoot();
-		    log_debug (_("Cygnal Plugin paths are: %s"), cgiroot);
+		    log_network (_("Cygnal Plugin paths are: %s"), cgiroot);
 		} else {
-		    cgiroot = "/usr/local/lib/cygnal:/usr/lib/cygnal";
+		    cgiroot = PLUGINSDIR;
 		}
 		hand->scanDir(cgiroot);
 		string str(url.path());
@@ -898,7 +898,7 @@ connection_handler(Network::thread_params_t *args)
 	    // handler directly. As this is primarily only used when
 	    // debugging Cygnal itself, we don't want the extra
 	    // overhead of the distpatch_handler.
-	    log_debug("Single threaded mode for fd #%d", args->netfd);
+	    log_network("Single threaded mode for fd #%d", args->netfd);
 	    if (args->port == (port_offset + RTMPT_PORT)) {
 		http_handler(args);
 	    } else if (args->port == (port_offset + RTMP_PORT)) {
@@ -933,7 +933,7 @@ connection_handler(Network::thread_params_t *args)
 		}
 		char *env = std::getenv("CYGNAL_PLUGINS");
 		if (!env) {
-		    hand->scanDir("/usr/local/lib/cygnal:/usr/lib/cygnal");
+		    hand->scanDir(PLUGINSDIR);
 		} else {
 		    hand->scanDir(env);
 		}
@@ -954,10 +954,10 @@ connection_handler(Network::thread_params_t *args)
 	    }
 	}
 	
-	log_debug("Number of active Threads is %d", tids.num_of_tids());
+	log_network("Number of active Threads is %d", tids.num_of_tids());
 	
 //	net.closeNet(args->netfd); 		// this shuts down this socket connection
-	log_debug("Restarting loop for next connection for port %d...", args->port);
+	log_network("Restarting loop for next connection for port %d...", args->port);
     } while(!done);
     
     // All threads should wake up now.
@@ -993,7 +993,7 @@ dispatch_handler(Network::thread_params_t *args)
 		    // We got an error, which isn't always a crises, as some are normal
 		    // if the client disconnects while we're talking to it.
 		    if ((it->revents & POLLRDHUP) || (it->revents & POLLNVAL))  {
-			log_debug("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
+			log_network("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
 				  it->revents, it->fd);
  			if (it->fd > 0) {
 			    net->erasePollFD(it->fd);
@@ -1003,14 +1003,14 @@ dispatch_handler(Network::thread_params_t *args)
 			break;
 		    } else {
 			// We got some data, so process it
-			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
+			log_network("Got something on fd #%d, 0x%x", it->fd, it->revents);
  			if (it->fd > 0) {
 			    // Call the protocol handler for this network connection
 			    /* bool ret = */ net->getEntry(it->fd)(args);
 			// Call the protocol handler for this network connection
 // 			bool ret = net->getEntry(it->fd)(args);
 			
-//			log_debug("Handler returned %s", (ret) ? "true" : "false");
+//			log_network("Handler returned %s", (ret) ? "true" : "false");
 			    // FIXME: we currently force a 'close connection' at the end
 			    // of sending a file, since apache does too. This pretty much
 			    // blows persistance,
@@ -1027,12 +1027,12 @@ dispatch_handler(Network::thread_params_t *args)
 		vector<struct pollfd>::const_iterator it;
 		if (hits) {
 		    for (it = hits->begin(); it != hits->end(); it++) {
-			log_debug("Need to disconnect fd #%d, it got an error.", (*it).fd);
+			log_network("Need to disconnect fd #%d, it got an error.", (*it).fd);
 		    }
 		}
 	    }
         } else {
-	    log_debug("nothing to wait for...");
+	    log_network("nothing to wait for...");
 	    if (crcfile.getThreadingFlag()) {
 		done = true;
 	    }
