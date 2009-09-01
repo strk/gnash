@@ -209,11 +209,40 @@ RTMPServer::processClientHandShake(int fd)
     // Get the data for the two field we want.
     tcurl  = _netconnect->findProperty("tcUrl");
     swfurl  = _netconnect->findProperty("swfUrl");
-    
+
+    // Send a onBWDone to the client to start the new NetConnection,
+    boost::shared_ptr<amf::Buffer> bwdone = encodeBWDone(2.0);
+    if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_12,
+		      bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
+	log_network("Sent onBWDone to client");
+    } else {
+	log_error("Couldn't send onBWDone to client!");
+	tcurl.reset();
+	return tcurl;		// nc is empty
+    }
+
+#if 1
+    sleep(1);
+    // Send a Set Client Window Size to the client
+    boost::shared_ptr<amf::Buffer> winsize(new amf::Buffer(sizeof(boost::uint32_t)));
+    boost::uint32_t swapped = 0x20000;
+    swapBytes(&swapped, sizeof(boost::uint32_t));
+    *winsize += swapped;
+    if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+		      winsize->size(), RTMP::SERVER, RTMPMsg::FROM_CLIENT, *winsize)) {
+	log_network("Sent set Client Window Size to client");
+    } else {
+	log_error("Couldn't send set Client Window Size to client!");
+	tcurl.reset();
+	return tcurl;		// nc is empty
+    }
+#endif
+
+    sleep(1);
     // Send a ping to the client to reset the new NetConnection,
     boost::shared_ptr<amf::Buffer> ping_reset =
 	encodePing(RTMP::PING_RESET, 0);
-    if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+    if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_8,
 		      ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
 	log_network("Sent Ping to client");
     } else {
@@ -222,12 +251,13 @@ RTMPServer::processClientHandShake(int fd)
 	return tcurl;		// nc is empty
     }
 
+    sleep(1);
     // Send the packet to notify the client that the
     // NetConnection::connect() was sucessful. After the client
     // receives this, the handhsake is completed.
     boost::shared_ptr<amf::Buffer> response =
 	encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-    if (RTMP::sendMsg(fd, 3, RTMP::HEADER_12, response->allocated(),
+    if (RTMP::sendMsg(fd, 3, RTMP::HEADER_8, response->allocated(),
 		      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
 	log_network("Sent response to client.");
     } else {
@@ -880,13 +910,43 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
     return buf;
 }
 
+// Encode a onBWDone message for the client. These are of a fixed size.
+boost::shared_ptr<amf::Buffer>
+RTMPServer::encodeBWDone(double id)
+{
+//    GNASH_REPORT_FUNCTION;
+    string command = "onBWDone";
+
+    Element cmd;
+    cmd.makeString(command);
+
+    Element num;
+    num.makeNumber(id);
+
+    Element null;
+    null.makeNull();
+
+    boost::shared_ptr<amf::Buffer> enccmd  = cmd.encode();
+    boost::shared_ptr<amf::Buffer> encnum  = num.encode();
+    boost::shared_ptr<amf::Buffer> encnull  = null.encode();
+
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(enccmd->size()
+						       + encnum->size()
+						       + encnull->size()));
+
+    *buf += enccmd;
+    *buf += encnum;
+    *buf += encnull;
+	
+    return buf;
+}
+
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<boost::shared_ptr<amf::Element > >
 RTMPServer::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-
     AMF amf;
     vector<boost::shared_ptr<amf::Element > > headers;
 
@@ -1158,7 +1218,6 @@ rtmp_handler(Network::thread_params_t *args)
 		}
 		boost::shared_ptr<RTMP::rtmp_head_t> qhead;
 		for (size_t i=0; i<que->size(); i++) {
-#if 1
 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
 			// que->at(i)->dump();
 		    if (bufptr) {
@@ -1170,11 +1229,22 @@ rtmp_handler(Network::thread_params_t *args)
  			log_network("Message for channel #%d", qhead->channel);
 			tmpptr = bufptr->reference() + qhead->head_size;
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
-			    boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
-			    log_network("Processed Ping message from client, type %d", ping->type);
+			    if (qhead->type == RTMP::PING) {
+				boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
+				log_network("Processed Ping message from client, type %d",
+					    ping->type);
+			    } else if (qhead->type == RTMP::AUDIO_DATA) {
+				log_network("Got the 1st Audio packet!");
+			    } else if (qhead->type == RTMP::VIDEO_DATA) {
+				log_network("Got the 1st Video packet!");
+			    } else if (qhead->type == RTMP::SERVER) {
+				log_network("Got the Window Set Size packet!");
+			    } else {
+				log_network("Got unknown system message!");
+				bufptr->dump();
+			    }
 			}
 		    }
-#else
 // 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
 // //			que->at(i)->dump();
 // 		    if (bufptr) {
@@ -1285,75 +1355,72 @@ rtmp_handler(Network::thread_params_t *args)
 // 		    } else {
 // 			log_error("Message contains no data!");
 // 		    }
-#endif
 		    switch (qhead->type) {
-		    case RTMP::CHUNK_SIZE:
-			break;
-		    case RTMP::BYTES_READ:
-			break;
-		    case RTMP::PING:
-			break;
-		    case RTMP::SERVER:
-			break;
-		    case RTMP::CLIENT:
-			break;
-		    case RTMP::VIDEO_DATA:
-			break;
-		    case RTMP::NOTIFY:
-			break;
-		    case RTMP::SHARED_OBJ:
-			body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
-			log_network("SharedObject name is \"%s\"", body->getMethodName());
-			break;
-		    case RTMP::INVOKE:
-		    {
-			body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
-			log_network("INVOKEing method \"%s\"", body->getMethodName());
-			// log_network("%s", hexify(tmpptr, qhead->bodysize, true));
-
-			// These next Invoke methods are for the
-			// NetStream class, which like NetConnection,
-			// is a speacial one handled directly by the
-			// server instead of any cgi-bin plugins.
-			if (body->getMethodName() == "createStream") {
- 			    /* int streamid = */ hand->createStream();
-			} else if (body->getMethodName() == "play") {
-			    hand->playStream();
-			} else if (body->getMethodName() == "seek") {
-			    hand->seekStream();
-			} else if (body->getMethodName() == "pause") {
-			    hand->pauseStream();
-			} else if (body->getMethodName() == "close") {
-			    hand->closeStream();
-			} else if (body->getMethodName() == "resume") {
-			    hand->resumeStream();
-			} else if (body->getMethodName() == "publish") {
-			    hand->publishStream();
-			} else if (body->getMethodName() == "togglePause") {
-			    hand->togglePause();
-			// This is a server installation specific  method.
-			} else if (body->getMethodName() == "FCSubscribe") {
-			    hand->setFCSubscribe(body->at(0)->to_string());
-			} else {
-			    /* size_t ret = */ hand->writeToPlugin(tmpptr, qhead->bodysize);
-			    boost::shared_ptr<amf::Buffer> result = hand->readFromPlugin();
-			    if (result) {
-				if (rtmp->sendMsg(args->netfd, qhead->channel,
-						  RTMP::HEADER_8, result->allocated(),
-						  RTMP::INVOKE, RTMPMsg::FROM_SERVER,
-						  *result)) {
-				    log_network("Sent response to client.");
-				}
-			    }
-			    
-			}
-		    }	
-		        break;
-		    case RTMP::AUDIO_DATA:
-			break;
-		    default:
-			log_error (_("ERROR: Unidentified AMF header data type 0x%x"), qhead->type);
-			break;
+		      case RTMP::CHUNK_SIZE:
+			  break;
+		      case RTMP::BYTES_READ:
+			  break;
+		      case RTMP::PING:
+			  break;
+		      case RTMP::SERVER:
+			  break;
+		      case RTMP::CLIENT:
+			  break;
+		      case RTMP::VIDEO_DATA:
+			  break;
+		      case RTMP::NOTIFY:
+			  break;
+		      case RTMP::SHARED_OBJ:
+			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
+			  log_network("SharedObject name is \"%s\"", body->getMethodName());
+			  break;
+		      case RTMP::INVOKE:
+			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
+			  log_network("INVOKEing method \"%s\"", body->getMethodName());
+			  // log_network("%s", hexify(tmpptr, qhead->bodysize, true));
+			  
+			  // These next Invoke methods are for the
+			  // NetStream class, which like NetConnection,
+			  // is a speacial one handled directly by the
+			  // server instead of any cgi-bin plugins.
+			  if (body->getMethodName() == "createStream") {
+			      /* int streamid = */ hand->createStream();
+			  } else if (body->getMethodName() == "play") {
+			      hand->playStream();
+			  } else if (body->getMethodName() == "seek") {
+			      hand->seekStream();
+			  } else if (body->getMethodName() == "pause") {
+			      hand->pauseStream();
+			  } else if (body->getMethodName() == "close") {
+			      hand->closeStream();
+			  } else if (body->getMethodName() == "resume") {
+			      hand->resumeStream();
+			  } else if (body->getMethodName() == "publish") {
+			      hand->publishStream();
+			  } else if (body->getMethodName() == "togglePause") {
+			      hand->togglePause();
+			      // This is a server installation specific  method.
+			  } else if (body->getMethodName() == "FCSubscribe") {
+			      hand->setFCSubscribe(body->at(0)->to_string());
+			  } else {
+			      /* size_t ret = */ hand->writeToPlugin(tmpptr, qhead->bodysize);
+			      boost::shared_ptr<amf::Buffer> result = hand->readFromPlugin();
+			      if (result) {
+				  if (rtmp->sendMsg(args->netfd, qhead->channel,
+						    RTMP::HEADER_8, result->allocated(),
+						    RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+						    *result)) {
+				      log_network("Sent response to client.");
+				  }
+			      }
+			      
+			  }
+			  break;
+		      case RTMP::AUDIO_DATA:
+			  break;
+		      default:
+			  log_error (_("ERROR: Unidentified AMF header data type 0x%x"), qhead->type);
+			  break;
 		    };
     
 // 		    body->dump();

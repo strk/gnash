@@ -1118,6 +1118,8 @@ event_handler(Network::thread_params_t *args)
 		      }
 		      break;
 		  case Handler::RTMPT:
+		      args->netfd = i;
+		      args->filespec = path;
 		      http_handler(args);
 		      break;		      
 		  case  Handler::RTMPTS:
