@@ -41,7 +41,10 @@ DIST_SUBDIRS  = testsuite cgi-bin
 
 sysconf_DATA = cygnalrc
 
-AM_CPPFLAGS = # -Wall
+# this is where Cygnal plugins get installed
+pluginsdir = $(libdir)/cygnal/plugins
+
+AM_CPPFLAGS = 	-DPLUGINSDIR=\"$(pluginsdir)\"
 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
