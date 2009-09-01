@@ -30,7 +30,17 @@
 #include <list>
 #include <map>
 #include <vector>
+#if defined(WIN32) || defined(_WIN32)
+# define LIBLTDL_DLL_IMPORT 1
+#endif
+#ifdef HAVE_DLFCN_H
+# include <dlfcn.h>
+#endif
+#ifdef HAVE_LIBGEN_H
+# include <libgen.h>
+#endif
 
+#include "ltdl.h"
 #include "log.h"
 #include "network.h"
 #include "buffer.h"
@@ -124,14 +134,13 @@ Handler::initModule(const std::string& module)
     SharedLib *sl;
     std::string symbol(module);
 
-    log_security(_("Initializing module: \"%s\""), symbol);
+    _pluginsdir = PLUGINSDIR;
+    log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
     
-    _pluginsdir = "/usr/local/lib/cygnal/";
-    lt_dlsetsearchpath(_pluginsdir.c_str());
-
     // Update the list of loaded plugins so we only load them once.
     if (_plugins[module] == 0) {
         sl = new SharedLib(module, "CYGNAL_PLUGINS");
+	lt_dlsetsearchpath(_pluginsdir.c_str());
         sl->openLib();
         _plugins[module] = sl;
     } else {
