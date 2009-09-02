@@ -141,6 +141,10 @@ public:
     typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
     typedef enum {
+	ENCODE_AMF0=0x0,
+	ENCODE_AMF3=0x3
+    } encoding_types_e;
+    typedef enum {
 	RAW     = 0x0001,
 	ADPCM   = 0x0002,
 	MP3     = 0x0004,
@@ -179,28 +183,23 @@ public:
     typedef enum {
         NONE = 0x0,
         CHUNK_SIZE = 0x1,
-        UNKNOWN = 0x2,
+        ABORT = 0x2,
         BYTES_READ = 0x3,
-        PING = 0x4,
-        SERVER = 0x5,
-        CLIENT = 0x6,
-        UNKNOWN2 = 0x7,
+        PING = 0x4,		// USER
+        WINDOW_SIZE = 0x5,
+        SET_BANDWITH = 0x6,
+        ROUTE = 0x7,
         AUDIO_DATA = 0x8,
         VIDEO_DATA = 0x9,
-        UNKNOWN3 = 0xa,
+        SHARED_OBJ = 0xa,
+	AMF3_NOTIFY=0xf,
+	AMF3_SHARED_OBJ=0x10,
+	AMF3_INVOKE=0x11,
         NOTIFY = 0x12,
-        SHARED_OBJ = 0x13,
+        // SHARED_OBJ = 0x13,
         INVOKE = 0x14,
-	FLV_DATA = 0x16
+	FLV_DATA = 0x16,
     } content_types_e;
-    typedef enum {
-	CHUNKSIZE = 0x1,
-	ABORT=0x2,
-	ACK=0x3,
-	USER=0x4,
-	WINDOW=0x5,
-	BANDWIDTH=0x6
-    } control_types_e;
     typedef enum {
 	STREAM_START=0x0,
 	STREAM_EOF=0x1,
@@ -209,7 +208,7 @@ public:
 	STREAM_LIVE=0x4,
 	STREAM_PING=0x6,
 	STREAM_PONG=0x7
-    } stream_control_e;
+    } user_control_e;
     typedef enum {
          CREATE = 0x1,		// Client sends event
          DELETE = 0x2,		// Client sends event

@@ -293,12 +293,12 @@ RTMPClient::connectToServer(const std::string &url)
 	size_t chunk = RTMP_VIDEO_PACKET_SIZE;
 	do {
 	    // The last packet is smaller
-	    if ((ncbuf->allocated() - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
+	    if ((ncbuf->allocated() - nbytes) < static_cast<size_t>(RTMP_VIDEO_PACKET_SIZE)) {
 		chunk = ncbuf->allocated() - nbytes;
 	    }
 	    newbuf->append(ncbuf->reference() + nbytes, chunk);
  	    nbytes  += chunk;
-	    if (chunk == RTMP_VIDEO_PACKET_SIZE) {
+	    if (chunk == static_cast<size_t>(RTMP_VIDEO_PACKET_SIZE)) {
 		boost::uint8_t headone = 0xc3;
 		*newbuf += headone;
 	    }
@@ -775,8 +775,8 @@ RTMPClient::recvResponse()
 		  case RTMP::CHUNK_SIZE:
 		      log_unimpl("Server message data packet");
 		      break;
-		  case RTMP::UNKNOWN:	
-		      log_unimpl("Unknown data packet");
+		  case RTMP::ABORT:
+		      log_unimpl("Abort packet");
 		      break;
 		  case RTMP::BYTES_READ:
 		      log_unimpl("Bytes Read data packet");
@@ -787,14 +787,14 @@ RTMPClient::recvResponse()
 		      log_network("Got a Ping type %s", ping_str[ping->type]);
 		      break;
 		  }
-		  case RTMP::SERVER:
-		      log_unimpl("Server message data packet");
+		  case RTMP::WINDOW_SIZE:
+		      log_unimpl("Set Window Size message data packet");
 		      break;
-		  case RTMP::CLIENT:
-		      log_unimpl("Client message data packet");
+		  case RTMP::SET_BANDWITH:
+		      log_unimpl("Set Bandwidthmessage data packet");
 		      break;
-		  case RTMP::UNKNOWN2:
-		      log_unimpl("Unknown2 data packet");
+		  case RTMP::ROUTE:
+		      log_unimpl("Route from other server packet");
 		      break;
 		  case RTMP::AUDIO_DATA:
 		  {
@@ -812,14 +812,20 @@ RTMPClient::recvResponse()
 		      }
 		      break;
 		  }
-		  case RTMP::UNKNOWN3:
-		      log_unimpl("Unknown3 data packet message");
+		  case RTMP::SHARED_OBJ:
+		      log_unimpl("AMF0 Shared Object data packet message");
+		      break;
+		  case RTMP::AMF3_NOTIFY:
+		      log_unimpl("AMF3 Notify data packet message");
+		      break;
+		  case RTMP::AMF3_SHARED_OBJ:
+		      log_unimpl("AMF3 Shared Object data packet message");
+		      break;
+		  case RTMP::AMF3_INVOKE:
+		      log_unimpl("AMF0 Invoke packet message");
 		      break;
 		  case RTMP::NOTIFY:
-		      log_unimpl("Notify data packet message");
-		      break;
-		  case RTMP::SHARED_OBJ:
-		      log_unimpl("Shared Object data packet message");
+		      log_unimpl("AMF0 Notify data packet message");
 		      break;
 		  case RTMP::INVOKE:
 		  {
