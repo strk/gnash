@@ -781,7 +781,7 @@ RTMPClient::recvResponse()
 		  case RTMP::BYTES_READ:
 		      log_unimpl("Bytes Read data packet");
 		      break;
-		  case RTMP::PING:
+		  case RTMP::USER:
 		  {
 		      boost::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
 		      log_network("Got a Ping type %s", ping_str[ping->type]);

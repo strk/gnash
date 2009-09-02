@@ -241,7 +241,7 @@ RTMPServer::processClientHandShake(int fd)
     boost::shared_ptr<amf::Buffer> ping_reset =
 	encodePing(RTMP::PING_RESET, 0);
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_8,
-		      ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
+		      ping_reset->size(), RTMP::USER, RTMPMsg::FROM_SERVER, *ping_reset)) {
 	log_network("Sent Ping to client");
     } else {
 	log_error("Couldn't send Ping to client!");
@@ -508,7 +508,7 @@ RTMPServer::packetRead(amf::Buffer &buf)
       case BYTES_READ:
 	  decodeBytesRead();
 	  break;
-      case PING:
+      case USER:
       {
 	  boost::shared_ptr<rtmp_ping_t> ping = decodePing(ptr);
 	  switch (ping->type) {
@@ -1241,7 +1241,7 @@ rtmp_handler(Network::thread_params_t *args)
  			log_network("Message for channel #%d", qhead->channel);
 			tmpptr = bufptr->reference() + qhead->head_size;
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
-			    if (qhead->type == RTMP::PING) {
+			    if (qhead->type == RTMP::USER) {
 				boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
 				log_network("Processed Ping message from client, type %d",
 					    ping->type);
@@ -1370,7 +1370,7 @@ rtmp_handler(Network::thread_params_t *args)
 		    switch (qhead->type) {
 		      case RTMP::CHUNK_SIZE:
 		      case RTMP::BYTES_READ:
-		      case RTMP::PING:
+		      case RTMP::USER:
 		      case RTMP::WINDOW_SIZE:
 		      case RTMP::SET_BANDWITH:
 		      case RTMP::ROUTE:

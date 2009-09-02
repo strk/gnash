@@ -542,7 +542,7 @@ test_header()
 
      boost::shared_ptr<amf::Buffer> buf2(new Buffer("02 00 00 00 00 00 06 04 00 00 00 00"));
      boost::shared_ptr<amf::Buffer> head2 = client.encodeHeader(0x2, RTMP::HEADER_12, PING_MSG_SIZE,
-                                     RTMP::PING, RTMPMsg::FROM_SERVER);
+                                     RTMP::USER, RTMPMsg::FROM_SERVER);
 //     cerr << hexify(head2->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
      if ((memcmp(buf2->reference(), head2->reference(), 8) == 0)) {
          runtest.pass("Encoded RTMP header(Ping 0)");
@@ -552,7 +552,7 @@ test_header()
 
      boost::shared_ptr<amf::Buffer> buf3(new Buffer("02 ff e3 6c 00 00 06 04 00 00 00 00"));
      boost::shared_ptr<amf::Buffer> head3 = client.encodeHeader(0x2, RTMP::HEADER_12, PING_MSG_SIZE,
-                                     RTMP::PING, RTMPMsg::FROM_SERVER);
+                                     RTMP::USER, RTMPMsg::FROM_SERVER);
 //     cerr << hexify(head3->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
      if ((memcmp(buf2->reference(), head3->reference(), 8) == 0)) {
          runtest.pass("Encoded RTMP header(Ping 1)");
@@ -562,7 +562,7 @@ test_header()
 
      boost::shared_ptr<RTMP::rtmp_head_t> header2 = client.decodeHeader(*buf3);
      if ((header2->channel == 0x2) && (header2->head_size == RTMP_MAX_HEADER_SIZE)
-         && (header2->bodysize == 6) && (header2->type ==  RTMP::PING)) {
+         && (header2->bodysize == 6) && (header2->type ==  RTMP::USER)) {
          runtest.pass("Decoded RTMP header(Ping)");
      } else {
          runtest.fail("Decoded RTMP header(Ping)");

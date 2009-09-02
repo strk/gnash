@@ -185,7 +185,7 @@ public:
         CHUNK_SIZE = 0x1,
         ABORT = 0x2,
         BYTES_READ = 0x3,
-        PING = 0x4,		// USER
+        USER = 0x4,
         WINDOW_SIZE = 0x5,
         SET_BANDWITH = 0x6,
         ROUTE = 0x7,
@@ -196,7 +196,6 @@ public:
 	AMF3_SHARED_OBJ=0x10,
 	AMF3_INVOKE=0x11,
         NOTIFY = 0x12,
-        // SHARED_OBJ = 0x13,
         INVOKE = 0x14,
 	FLV_DATA = 0x16,
     } content_types_e;
