@@ -222,14 +222,13 @@ RTMPServer::processClientHandShake(int fd)
     }
 
 #if 1
-    sleep(1);
     // Send a Set Client Window Size to the client
     boost::shared_ptr<amf::Buffer> winsize(new amf::Buffer(sizeof(boost::uint32_t)));
     boost::uint32_t swapped = 0x20000;
     swapBytes(&swapped, sizeof(boost::uint32_t));
     *winsize += swapped;
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-		      winsize->size(), RTMP::SERVER, RTMPMsg::FROM_CLIENT, *winsize)) {
+		      winsize->size(), RTMP::WINDOW_SIZE, RTMPMsg::FROM_CLIENT, *winsize)) {
 	log_network("Sent set Client Window Size to client");
     } else {
 	log_error("Couldn't send set Client Window Size to client!");
@@ -238,7 +237,6 @@ RTMPServer::processClientHandShake(int fd)
     }
 #endif
 
-    sleep(1);
     // Send a ping to the client to reset the new NetConnection,
     boost::shared_ptr<amf::Buffer> ping_reset =
 	encodePing(RTMP::PING_RESET, 0);
@@ -251,7 +249,6 @@ RTMPServer::processClientHandShake(int fd)
 	return tcurl;		// nc is empty
     }
 
-    sleep(1);
     // Send the packet to notify the client that the
     // NetConnection::connect() was sucessful. After the client
     // receives this, the handhsake is completed.
@@ -533,27 +530,42 @@ RTMPServer::packetRead(amf::Buffer &buf)
 	  };
 	  break;
       }
-      case SERVER:
+      case WINDOW_SIZE:
 	  decodeServer();
 	  break;
-      case CLIENT:
+      case SET_BANDWITH:
 	  decodeClient();
 	  break;
+      case ROUTE:
+	  log_unimpl("Route");
+	  break;
+      case AUDIO_DATA:	  
+	  decodeAudioData();
+          break;
       case VIDEO_DATA:
 	  decodeVideoData();
-	  break;
-      case NOTIFY:
-	  decodeNotify();
 	  break;
       case SHARED_OBJ:
 	  decodeSharedObj();
 	  break;
+      case AMF3_NOTIFY:
+	  log_unimpl("AMF3 Notify");
+	  break;
+      case AMF3_SHARED_OBJ:
+	  log_unimpl("AMF3 Shared Object");
+	  break;
+      case AMF3_INVOKE:
+	  log_unimpl("AMF3 Invoke");
+	  break;
+      case NOTIFY:
+	  decodeNotify();
+	  break;
       case INVOKE:
 	  decodeInvoke();
           break;
-      case AUDIO_DATA:	  
-	  decodeAudioData();
-          break;
+      case FLV_DATA:
+	  log_unimpl("FLV Dat");
+	  break;
       default:
           log_error (_("ERROR: Unidentified RTMP message content type 0x%x"), _header.type);
           break;
@@ -813,7 +825,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
     boost::shared_ptr<amf::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
     *buf += strbuf;
     *buf += numbuf;
-    boost::uint8_t byte = static_cast<boost::uint8_t>(RTMP::SERVER & 0x000000ff);
+    boost::uint8_t byte = static_cast<boost::uint8_t>(RTMP::WINDOW_SIZE & 0x000000ff);
     *buf += byte;
     *buf += topbuf;
 
@@ -1237,7 +1249,7 @@ rtmp_handler(Network::thread_params_t *args)
 				log_network("Got the 1st Audio packet!");
 			    } else if (qhead->type == RTMP::VIDEO_DATA) {
 				log_network("Got the 1st Video packet!");
-			    } else if (qhead->type == RTMP::SERVER) {
+			    } else if (qhead->type == RTMP::WINDOW_SIZE) {
 				log_network("Got the Window Set Size packet!");
 			    } else {
 				log_network("Got unknown system message!");
@@ -1357,18 +1369,14 @@ rtmp_handler(Network::thread_params_t *args)
 // 		    }
 		    switch (qhead->type) {
 		      case RTMP::CHUNK_SIZE:
-			  break;
 		      case RTMP::BYTES_READ:
-			  break;
 		      case RTMP::PING:
-			  break;
-		      case RTMP::SERVER:
-			  break;
-		      case RTMP::CLIENT:
-			  break;
+		      case RTMP::WINDOW_SIZE:
+		      case RTMP::SET_BANDWITH:
+		      case RTMP::ROUTE:
 		      case RTMP::VIDEO_DATA:
-			  break;
 		      case RTMP::NOTIFY:
+			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
 		      case RTMP::SHARED_OBJ:
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
