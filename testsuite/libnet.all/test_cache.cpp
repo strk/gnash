@@ -32,6 +32,10 @@
 extern int optind, getopt(int, char *const *, const char *);
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 #include <sys/types.h>
 #include <iostream>
 #include <string>
