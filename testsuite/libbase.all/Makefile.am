@@ -18,7 +18,8 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-LDADD = $(top_builddir)/libbase/libgnashbase.la 
+LDADD = $(top_builddir)/libbase/libgnashbase.la \
+	$(LIBINTL)
 
 # AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
 # AM_CPPFLAGS
