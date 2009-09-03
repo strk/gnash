@@ -240,6 +240,8 @@ scrollkeeper-update -q || :
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
+%{_bindir}/findmicrophones
+%{_bindir}/findwebcams
 %{_bindir}/dumpshm
 %{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so
@@ -268,6 +270,7 @@ scrollkeeper-update -q || :
 %files cygnal
 %defattr(-,root,root,-)
 %{_bindir}/cygnal
+%{_prefix}/etc/cygnalrc
 
 %files devel
 %{_prefix}/include/gnash/*.h
