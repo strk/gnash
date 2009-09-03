@@ -198,16 +198,15 @@ RTMP::RTMP()
 //    GNASH_REPORT_FUNCTION;
 
     // Initialize all of the queues
-    for (int i=0; i<MAX_AMF_INDEXES; i++)
-    {
+    for (int i=0; i<MAX_AMF_INDEXES; i++) {
         // Name is only used for debugging
         boost::format fmt("channel #%s");
         std::string name = (fmt % i).str();
-	    _queues[i].setName(name.c_str());
-
+	_queues[i].setName(name.c_str());
+	
         // each channel can have a different chunksize
-	    _chunksize[i] = RTMP_VIDEO_PACKET_SIZE;
-	    _lastsize[i] = 0;
+	_chunksize[i] = RTMP_VIDEO_PACKET_SIZE;
+	_lastsize[i] = 0;
     }
 }
 
@@ -540,27 +539,34 @@ RTMP::dump()
     }
 }
 
-// A Ping packet has two parameters that are always specified, and 2 that are optional.
-// The first two bytes are the ping type, as in rtmp_ping_e, the second is the ping
-// target, which is always zero as far as we can tell.
+// A Ping packet has two parameters that are always specified, and 2
+// that are optional. The first two bytes are the ping type, as in
+// rtmp_ping_e, the second is the ping target, which is always zero as
+// far as we can tell. 
 //
 // More notes from: http://jira.red5.org/confluence/display/docs/Ping
-// type 0: Clear the stream. No third and fourth parameters. The second parameter could be 0.
-// After the connection is established, a Ping 0,0 will be sent from server to client. The
-// message will also be sent to client on the start of Play and in response of a Seek or
-// Pause/Resume request. This Ping tells client to re-calibrate the clock with the timestamp
-// of the next packet server sends.
+// type 0: Clear the stream. No third and fourth parameters. The
+// second parameter could be 0. After the connection is established, a
+// Ping 0,0 will be sent from server to client. The message will also
+// be sent to client on the start of Play and in response of a Seek or
+// Pause/Resume request. This Ping tells client to re-calibrate the
+// clock with the timestamp of the next packet server sends.
+//
 // type 1: Tell the stream to clear the playing buffer.
-// type 3: Buffer time of the client. The third parameter is the buffer time in millisecond.
-// type 4: Reset a stream. Used together with type 0 in the case of VOD. Often sent before type 0.
-// type 6: Ping the client from server. The second parameter is the current time.
-// type 7: Pong reply from client. The second parameter is the time the server sent with his
-//         ping request.
+// type 3: Buffer time of the client. The third parameter is the
+// buffer time in millisecond. 
+// type 4: Reset a stream. Used together with type 0 in the case of
+// VOD. Often sent before type 0. 
+// type 6: Ping the client from server. The second parameter is the
+// current time. 
+// type 7: Pong reply from client. The second parameter is the time
+// the server sent with his ping request.
 
-// A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 0",
-// which is the Ping type byte, followed by two shorts that are the parameters. Only the first
-// two paramters are required.
-// This seems to be a ping message, 12 byte header, system channel 2
+// A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00
+// 00 00 00 00 00 00 00 0", which is the Ping type byte, followed by
+// two shorts that are the parameters. Only the first two paramters
+// are required. This seems to be a ping message, 12 byte header,
+// system channel 2 
 // 02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 00
 boost::shared_ptr<RTMP::rtmp_ping_t>
 RTMP::decodePing(boost::uint8_t *data)
@@ -596,43 +602,68 @@ RTMP::decodePing(amf::Buffer &buf)
     return decodePing(buf.reference());
 }
 
-// Decode the result we get from the server after we've made a request.
-//
-// 03 00 00 00 00 00 81 14 00 00 00 00 02 00 07 5f  ..............._
-// 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05  result.?........
-// 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00  ...application..
-// 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00  .level...status.
-// 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43  .description...C
-// 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65  onnection succee
-// 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74  ded...code...Net
-// 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65  Connection.Conne
-// 63 74 2e 53 75 63 63 65 73 73 00 00 c3 09        ct.Success....
-//
-// 43 00 00 00 00 00 48 14 02 00 06 5f 65 72 72 6f  C.....H...._erro
-// 72 00 40 00 00 00 00 00 00 00 05 03 00 04 63 6f  r.@...........co
-// 64 65 02 00 19 4e 65 74 43 6f 6e 6e 65 63 74 69  de...NetConnecti
-// 6f 6e 2e 43 61 6c 6c 2e 46 61 69 6c 65 64 00 05  on.Call.Failed..
-// 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 00 09  level...error...
-//
-// T 127.0.0.1:1935 -> 127.0.0.1:38167 [AP]
-// 44 00 00 00 00 00 b2 14 02 00 08 6f 6e 53 74 61  D..........onSta
-// 74 75 73 00 3f f0 00 00 00 00 00 00 05 03 00 08  tus.?...........
-// 63 6c 69 65 6e 74 69 64 00 3f f0 00 00 00 00 00  clientid.?......
-// 00 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75  ...level...statu
-// 73 00 07 64 65 74 61 69 6c 73 02 00 16 6f 6e 32  s..details...on2
-// 5f 66 6c 61 73 68 38 5f 77 5f 61 75 64 69 6f 2e  _flash8_w_audio.
-// 66 6c 76 00 0b 64 65 73 63 72 69 70 74 69 6f 6e  flv..description
-// 02 00 27 53 74 61 72 74 65 64 20 70 6c 61 79 69  ..'Started playi
-// 6e 67 20 6f 6e 32 5f 66 c4 6c 61 73 68 38 5f 77  ng on2_f.lash8_w
-// 5f 61 75 64 69 6f 2e 66 6c 76 2e 00 04 63 6f 64  _audio.flv...cod
-// 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c  e...NetStream.Pl
-// 61 79 2e 53 74 61 72 74 00 00 09                 ay.Start...
-//
-// ^^^_result^?^^^^^^^^^^^application^^^level^^^status^^description^^^Connection succeeded.^^code^^^NetConnection.Connect.Success^^^^
-// 02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 53 75 63 63 65 73 73 00 00 c3 09 
-// 10629:3086592224] 20:01:20 DEBUG: read 29 bytes from fd 3 from port 0
-// C^^^^^^^^^^onBWDone^@^^^^^^^^
-// 43 00 00 00 00 00 15 14 02 00 08 6f 6e 42 57 44 6f 6e 65 00 40 00 00 00 00 00 00 00 05
+boost::shared_ptr<RTMP::user_event_t>
+RTMP::decodeUser(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(data);
+    boost::shared_ptr<user_event_t> user(new RTMP::user_event_t);
+
+    boost::uint16_t type = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
+    boost::uint16_t eventid = static_cast<user_control_e>(type);
+    ptr += sizeof(boost::uint16_t);
+
+    boost::uint32_t param1 = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr));
+    ptr += sizeof(boost::uint32_t);
+
+    user->type = static_cast<user_control_e>(type);
+    user->param1 = param1;
+    user->param2 = 0;
+    
+    // All events have only 4 bytes of data, except Set Buffer, which
+    // uses 8 bytes. The 4 bytes is usually the Stream ID except for
+    // Ping and Pong events, which carry a time stamp instead.
+    switch (eventid) {
+      case STREAM_START:
+	  log_unimpl("Stream Start");
+	  break;
+      case STREAM_EOF:
+	  log_unimpl("Stream EOF");
+	  break;
+      case STREAM_NODATA:
+	  log_unimpl("Stream No Data");
+	  break;
+      case STREAM_BUFFER:
+      {
+	  boost::uint32_t param2 = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr));
+	  ptr += sizeof(boost::uint32_t);
+	  user->param2 = param2;
+	  break;
+      }
+      case STREAM_LIVE:
+	  log_unimpl("Stream Live");
+	  break;
+      case STREAM_PING:
+	  log_unimpl("Stream Ping");
+	  break;
+      case STREAM_PONG:
+	  log_unimpl("Stream Pong");
+	  break;
+      default:
+	  log_unimpl("Unknown User Control message %d!", 1);
+	  break;
+    };
+
+    return user;
+}
+boost::shared_ptr<RTMP::user_event_t>
+RTMP::decodeUser(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    return decodeUser(buf.reference());
+}
+
 boost::shared_ptr<RTMPMsg>
 RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 {
@@ -653,12 +684,13 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 	return msg;
     }
 
-    // The stream ID is the second data object. All messages have these two objects
-    // at the minimum.
+    // The stream ID is the second data object. All messages have
+    // these two objects at the minimum.
     boost::shared_ptr<amf::Element> streamid = amf_obj.extractAMF(ptr, tooFar);
     if (streamid) {
-	// Most onStatus messages have the stream ID, but the Data Start onStatus
-	// message is basically just a marker that an FLV file is coming next.
+	// Most onStatus messages have the stream ID, but the Data
+	// Start onStatus message is basically just a marker that an
+	// FLV file is coming next. 
 	if (streamid->getType() == Element::NUMBER_AMF0) {
 	    ptr += AMF0_NUMBER_SIZE + 1;
 	}
@@ -680,10 +712,11 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
  	status = true;
     }
     
-    // Then there are a series of AMF objects, often a higher level ActionScript object with
-    // properties attached.
+    // Then there are a series of AMF objects, often a higher level
+    // ActionScript object with properties attached.
     while (ptr < tooFar) {
-	// These pointers get deleted automatically when the msg object is deleted
+	// These pointers get deleted automatically when the msg
+	// object is deleted 
         boost::shared_ptr<amf::Element> el = amf_obj.extractAMF(ptr, tooFar);
 	ptr += amf_obj.totalsize();
         if (el == 0) {

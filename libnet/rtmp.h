@@ -181,45 +181,45 @@ public:
     // client is the Flash Player and 0x01 if the client is the FlashCom
     // server.
     typedef enum {
-        NONE = 0x0,
-        CHUNK_SIZE = 0x1,
-        ABORT = 0x2,
-        BYTES_READ = 0x3,
-        USER = 0x4,
-        WINDOW_SIZE = 0x5,
+        NONE         = 0x0,
+        CHUNK_SIZE   = 0x1,
+        ABORT        = 0x2,
+        BYTES_READ   = 0x3,
+        USER         = 0x4,
+        WINDOW_SIZE  = 0x5,
         SET_BANDWITH = 0x6,
-        ROUTE = 0x7,
-        AUDIO_DATA = 0x8,
-        VIDEO_DATA = 0x9,
-        SHARED_OBJ = 0xa,
-	AMF3_NOTIFY=0xf,
-	AMF3_SHARED_OBJ=0x10,
-	AMF3_INVOKE=0x11,
-        NOTIFY = 0x12,
-        INVOKE = 0x14,
-	FLV_DATA = 0x16,
+        ROUTE        = 0x7,
+        AUDIO_DATA   = 0x8,
+        VIDEO_DATA   = 0x9,
+        SHARED_OBJ   = 0xa,
+	AMF3_NOTIFY  = 0xf,
+	AMF3_SHARED_OBJ = 0x10,
+	AMF3_INVOKE  = 0x11,
+        NOTIFY       = 0x12,
+        INVOKE       = 0x14,
+	FLV_DATA     = 0x16,
     } content_types_e;
     typedef enum {
-	STREAM_START=0x0,
-	STREAM_EOF=0x1,
-	STREAM_NODATA=0x2,
-	STREAM_BUFFER=0x3,
-	STREAM_LIVE=0x4,
-	STREAM_PING=0x6,
-	STREAM_PONG=0x7
+	STREAM_START  = 0x0,
+	STREAM_EOF    = 0x1,
+	STREAM_NODATA = 0x2,
+	STREAM_BUFFER = 0x3,
+	STREAM_LIVE   = 0x4,
+	STREAM_PING   = 0x6,
+	STREAM_PONG   = 0x7
     } user_control_e;
     typedef enum {
-         CREATE = 0x1,		// Client sends event
-         DELETE = 0x2,		// Client sends event
-         REQUEST_CHANGE = 0x3,	// Client sends event
-         CHANGE = 0x4,		// Server sends event
-         SUCCESS_CLIENT = 0x5,	// Server sends event
-         SEND_MESSAGE = 0x6,	// Client sends event
-         STATUS = 0x7,		// Server sends evetn
-         CLEAR = 0x8,		// Server sends event
-         DELETE_SLOT = 0x9,	// Server sends event
-         REQUEST_DELETE_SLOT = 0xa,// Client sends event
-         SUCCESS_SERVER = 0xb	// Server sends event
+         CREATE         = 0x1,	    // Client sends event
+         DELETE         = 0x2,	    // Client sends event
+         REQUEST_CHANGE = 0x3,	    // Client sends event
+         CHANGE         = 0x4,	    // Server sends event
+         SUCCESS_CLIENT = 0x5,	    // Server sends event
+         SEND_MESSAGE   = 0x6,	    // Client sends event
+         STATUS         = 0x7,	    // Server sends evetn
+         CLEAR          = 0x8,	    // Server sends event
+         DELETE_SLOT    = 0x9,	    // Server sends event
+         REQUEST_DELETE_SLOT = 0xa, // Client sends event
+         SUCCESS_SERVER = 0xb	    // Server sends event
      } sharedobj_types_e;
     typedef enum {
 	PING_CLEAR  = 0x0,	// clear the stream
@@ -243,6 +243,11 @@ public:
 	boost::uint16_t param2;
 	boost::uint16_t param3;
     } rtmp_ping_t;
+    typedef struct {
+	user_control_e type;
+	boost::uint32_t param1;
+	boost::uint32_t param2;	// only used by 
+    } user_event_t;
     typedef enum {
         RTMP_STATE_HANDSHAKE_SEND,
         RTMP_STATE_HANDSHAKE_RECV,
@@ -340,6 +345,9 @@ public:
     
     virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
     boost::shared_ptr<rtmp_ping_t> decodePing(amf::Buffer &buf);
+    
+    virtual boost::shared_ptr<user_event_t> decodeUser(boost::uint8_t *data);
+    boost::shared_ptr<user_event_t> decodeUser(amf::Buffer &buf);
     
     // These are handlers for the various types
     virtual boost::shared_ptr<amf::Buffer> encodeChunkSize();

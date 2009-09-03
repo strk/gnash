@@ -1242,9 +1242,38 @@ rtmp_handler(Network::thread_params_t *args)
 			tmpptr = bufptr->reference() + qhead->head_size;
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
 			    if (qhead->type == RTMP::USER) {
-				boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
-				log_network("Processed Ping message from client, type %d",
-					    ping->type);
+				boost::shared_ptr<RTMP::user_event_t> user
+				    = rtmp->decodeUser(tmpptr);
+				switch (user->type) {
+				  case RTMP::STREAM_START:
+				      log_unimpl("Stream Start");
+				      break;
+				  case RTMP::STREAM_EOF:
+				      log_unimpl("Stream EOF");
+				      break;
+				  case RTMP::STREAM_NODATA:
+				      log_unimpl("Stream No Data");
+				      break;
+				  case RTMP::STREAM_BUFFER:
+				      log_unimpl("Stream Set Buffer");
+				      break;
+				  case RTMP::STREAM_LIVE:
+				      log_unimpl("Stream Live");
+				      break;
+				  case RTMP::STREAM_PING:
+				  {
+				      boost::shared_ptr<RTMP::rtmp_ping_t> ping
+					  = rtmp->decodePing(tmpptr);
+				      log_network("Processed Ping message from client, type %d",
+						  ping->type);
+				      break;
+				  }
+				  case RTMP::STREAM_PONG:
+				      log_unimpl("Stream Pong");
+				      break;
+				  default:
+				      break;
+				};
 			    } else if (qhead->type == RTMP::AUDIO_DATA) {
 				log_network("Got the 1st Audio packet!");
 			    } else if (qhead->type == RTMP::VIDEO_DATA) {
@@ -1370,17 +1399,28 @@ rtmp_handler(Network::thread_params_t *args)
 		    switch (qhead->type) {
 		      case RTMP::CHUNK_SIZE:
 		      case RTMP::BYTES_READ:
+		      case RTMP::ABORT:
 		      case RTMP::USER:
 		      case RTMP::WINDOW_SIZE:
 		      case RTMP::SET_BANDWITH:
 		      case RTMP::ROUTE:
+		      case RTMP::AUDIO_DATA:
 		      case RTMP::VIDEO_DATA:
-		      case RTMP::NOTIFY:
-			  log_unimpl("RTMP type %d", qhead->type);
-			  break;
 		      case RTMP::SHARED_OBJ:
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
 			  log_network("SharedObject name is \"%s\"", body->getMethodName());
+			  break;
+		      case RTMP::AMF3_NOTIFY:
+			  log_unimpl("RTMP type %d", qhead->type);
+			  break;
+		      case RTMP::AMF3_SHARED_OBJ:
+			  log_unimpl("RTMP type %d", qhead->type);
+			  break;
+		      case RTMP::AMF3_INVOKE:
+			  log_unimpl("RTMP type %d", qhead->type);
+			  break;
+		      case RTMP::NOTIFY:
+			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
 		      case RTMP::INVOKE:
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
@@ -1424,7 +1464,8 @@ rtmp_handler(Network::thread_params_t *args)
 			      
 			  }
 			  break;
-		      case RTMP::AUDIO_DATA:
+		      case RTMP::FLV_DATA:
+			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
 		      default:
 			  log_error (_("ERROR: Unidentified AMF header data type 0x%x"), qhead->type);
