@@ -141,7 +141,7 @@ public:
     } content_types_e;
      typedef enum {
          CREATE = 0x1,		// Client sends event
-         DELETE = 0x2,		// Client sends event
+         DELETE_OBJ = 0x2,	// Client sends event
          REQUEST_CHANGE = 0x3,	// Client sends event
          CHANGE = 0x4,		// Server sends event
          SUCCESS_CLIENT = 0x5,	// Server sends event
