@@ -77,6 +77,8 @@ AC_DEFUN([GNASH_PATH_KDE4],
   dnl haven't spcified a custom path.
   if test x"${build_kde4}" = xyes; then
     kde4_prefix=
+    dnl FreeBSD puts kde4-config in /usr/local
+    pathlist="${pathlist}:/usr/local/kde4/bin"
     AC_PATH_PROG(KDE4_CONFIG, kde4-config, ,[${pathlist}])
     if test "x$KDE4_CONFIG" != "x" ; then
       kde4_prefix=`$KDE4_CONFIG --prefix`
