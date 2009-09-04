@@ -37,7 +37,7 @@
 #include "gst/AudioInputGst.h"
 #endif
 
-#ifdef USE_FFMPEG
+#ifndef USE_GST
 #include "AudioInput.h"
 #endif
 
@@ -156,7 +156,9 @@ public:
 };
 #endif
 
-#ifdef USE_FFMPEG
+// FIXME: this should be USE_FFMPEG, but Microphone has no ffmpeg
+// support yet.
+#ifndef USE_GST
 class microphone_as_object: public as_object, public media::AudioInput
 {
 
