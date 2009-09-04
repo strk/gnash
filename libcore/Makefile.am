@@ -312,6 +312,7 @@ if WIN32
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioInput.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-AudioResampler.lo 
