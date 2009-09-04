@@ -37,9 +37,7 @@
 #include "gst/AudioInputGst.h"
 #endif
 
-#ifndef USE_GST
 #include "AudioInput.h"
-#endif
 
 namespace gnash {
 
