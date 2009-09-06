@@ -464,7 +464,7 @@ main(int argc, char *argv[])
 	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
-	      log_network (_("Verbose output turned on"));
+	      LOG_ONCE(log_network (_("Verbose output turned on")))
 	      break;
 	  case 'p':
 	      port_offset = parser.argument<int>(i);
@@ -494,12 +494,8 @@ main(int argc, char *argv[])
     
     crcfile.setDocumentRoot(docroot);
     
-    // If a port is specified, we only want to run single threaded.
-    if (only_port) {
-	crcfile.setThreadingFlag(false);
-    }
-
-    // load the file of peers. A peer is another instance of Cygnal
+    // load the file of peers. A peer is another instance of Cygnal we
+    // can use for distributed processing.
     cyg.loadPeersFile();
     cyg.probePeers();
 
@@ -512,9 +508,13 @@ main(int argc, char *argv[])
     sigaction (SIGHUP, &act2, NULL);
 //    sigaction (SIGPIPE, &act, NULL);
 
+    // Lock a mutex the main() waits in before exiting. This is
+    // because all the actually processing is done by other threads.
     boost::mutex::scoped_lock lk(alldone_mutex);
     
-    // Admin handler    
+    // Start the Admin handler. This allows one to connect to Cygnal
+    // at port 1111 and dump statistics to the terminal for tuning
+    // purposes.
     if (admin) {
 	Network::thread_params_t admin_data;
 	admin_data.port = gnash::ADMIN_PORT;
@@ -524,6 +524,15 @@ main(int argc, char *argv[])
 //    Cvm cvm;
 //    cvm.loadMovie("/tmp/out.swf");
     
+    // If a only-port is specified, we only want to run single
+    // threaded. As all the rest of the code checks the config value
+    // setting, this overrides that in the memory, but doesn't change
+    // the file itself. This feature is really only for debugging,
+    // where it's easier to work with one protocol at a time.
+    if (only_port) {
+	crcfile.setThreadingFlag(false);
+    }
+
     // Incomming connection handler for port 80, HTTP and
     // RTMPT. As port 80 requires root access, cygnal supports a
     // "port offset" for debugging and development of the
@@ -531,10 +540,12 @@ main(int argc, char *argv[])
     // for which protocol, we pass the info to the start thread so
     // it knows which handler to invoke. 
     Network::thread_params_t *http_data = new Network::thread_params_t;
-    if ((only_port == 0) || (only_port == gnash::RTMPT_PORT)) {
-	http_data->port = port_offset + gnash::RTMPT_PORT;
+    if ((only_port == 0) || (only_port == gnash::HTTP_PORT)) {
+	http_data->tid = 0;
 	http_data->netfd = 0;
 	http_data->filespec = docroot;
+	http_data->protocol = Network::HTTP;
+	http_data->port = port_offset + gnash::HTTP_PORT;
 	if (crcfile.getThreadingFlag()) {
 	    boost::thread http_thread(boost::bind(&connection_handler, http_data));
 	} else {
@@ -542,14 +553,16 @@ main(int argc, char *argv[])
 	}
     }
     
-    
+    // Incomming connection handler for port 1935, RTMPT and
+    // RTMPTE. This supports the same port offset as the HTTP handler,
+    // just to keep things consistent.
     Network::thread_params_t *rtmp_data = new Network::thread_params_t;
-    // Incomming connection handler for port 1935, RTMP. As RTMP
-    // is not a priviledged port, we just open it without an offset.
     if ((only_port == 0) || (only_port == gnash::RTMP_PORT)) {
-	rtmp_data->port = port_offset + gnash::RTMP_PORT;
+	rtmp_data->tid = 0;
 	rtmp_data->netfd = 0;
 	rtmp_data->filespec = docroot;
+	http_data->protocol = Network::RTMP;
+	rtmp_data->port = port_offset + gnash::RTMP_PORT;
 	if (crcfile.getThreadingFlag()) {
 	    boost::thread rtmp_thread(boost::bind(&connection_handler, rtmp_data));
 	} else {
@@ -557,19 +570,16 @@ main(int argc, char *argv[])
 	}
     }
     
-    // wait for the thread to finish
-//     http_thread.join();
-//     rtmp_thread.join();
-
-      // Wait for all the threads to die
-      alldone.wait(lk);
-      
-      log_network (_("Cygnal done..."));
+    // Wait for all the threads to die.
+    alldone.wait(lk);
     
-      delete rtmp_data;
-      delete http_data;
+    log_network (_("Cygnal done..."));
 
-      return(0);
+    // Delete the data we allowcated to pass to each connection_handler.
+    delete rtmp_data;
+    delete http_data;
+    
+    return(0);
 }
 
 // Trap Control-C (SIGINT) so we can cleanly exit
@@ -729,7 +739,7 @@ admin_handler(Network::thread_params_t *args)
 void
 connection_handler(Network::thread_params_t *args)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     int fd = 0;
     Network net;
     bool done = false;
@@ -754,7 +764,7 @@ connection_handler(Network::thread_params_t *args)
     // handling part of the total active file descriptors.
 #ifdef HAVE_SYSCONF
     long ncpus = sysconf(_SC_NPROCESSORS_ONLN);
-    log_network("This system has %d cpus.", ncpus);
+    LOG_ONCE(log_network("This system has %d cpus.", ncpus));
 #endif	
     size_t nfds = crcfile.getFDThread();
     
@@ -796,45 +806,58 @@ connection_handler(Network::thread_params_t *args)
 	if (args->netfd <= 0) {
 	    log_network("No new network connections");
 	    continue;
+	} else {
+	    log_network("New network connection for fd #%d", args->netfd);
 	}
 	
-	log_network("New network connection for fd #%d", args->netfd);
-    
 	struct pollfd fds;
 	fds.fd = args->netfd;
 	fds.events = POLLIN | POLLRDHUP;
+	
+	// If in multi-threaded mode (the default), start a thread
+	// with a connection_handler for each port we're interested
+	// in. Each port of course has a different protocol.
 	if (crcfile.getThreadingFlag() == true) {
 	    // Each dispatch thread gets it's own argument data and
 	    // network connection data.
-	    log_network("Multi-threaded mode for server on fd #%d", fd);
-	    Network::thread_params_t *targs = new Network::thread_params_t;
+
+	    //
+	    // Start threaded HTTP handler
+	    //
+	    log_network("Threaded HTTP handler for server on fd #%d", fd);
+	    Network::thread_params_t *hargs = new Network::thread_params_t;
 	    Network *tnet = 0;
-	    targs->netfd = args->netfd;
+	    hargs->netfd = args->netfd;
+	    hargs->protocol = args->protocol;
+	    hargs->filespec = docroot;
+	    hargs->tid = tid;
 	    // If we haven't spawned up to our max allowed, start a
 	    // new dispatch thread to handle data.
 	    if (networks[tid] == 0) {
-		log_network("Starting new dispatch thread for tid #%d", tid);
+		log_network("Starting new dispatch thread for fd #%d, tid #%d",
+			    args->netfd, tid);
 		tids.increment();
 		tnet = new Network;
-		tnet->setFileFd(args->netfd);
-		targs->netfd = args->netfd;
-		targs->handler = tnet;
-		targs->filespec = docroot;
-		targs->tid = tid;
+		boost::shared_ptr<Handler> hand(new Handler);
+		hand->addClient(hargs->netfd, Network::HTTP);
+		hargs->handler = reinterpret_cast<void *>(hand.get());
 	    } else {
 		log_network("Not starting new HTTP thread, spawned already for tid #%d", tid);
 		tnet = networks[tid];
 	    }
-	    if (args->port == (port_offset + RTMPT_PORT)) {
-		boost::bind(http_handler, targs);
-		tnet->addPollFD(fds, http_handler);
-	    } else if (args->port == (port_offset + RTMP_PORT)) {
-		boost::bind(rtmp_handler, targs);
-		tnet->addPollFD(fds, rtmp_handler);
-	    }
+	    // if (args->port == (port_offset + RTMPT_PORT)) {
+	    // 	boost::bind(http_handler, targs);
+	    // 	tnet->addPollFD(fds, http_handler);
+	    // } else if (args->port == (port_offset + RTMP_PORT)) {
+	    // 	boost::bind(rtmp_handler, targs);
+	    // 	tnet->addPollFD(fds, rtmp_handler);
+	    // }
+	    
+	    //
+	    // Start threaded RTMP handler
+	    //
 	    if (networks[tid] == 0) {
 		networks[tid] = tnet;
-#if 1
 		RTMPServer rtmp;
 		boost::shared_ptr<amf::Element> tcurl = 
 		    rtmp.processClientHandShake(args->netfd);
@@ -861,7 +884,7 @@ connection_handler(Network::thread_params_t *args)
 		    log_network("Using existing Handler for: %s for fd %#d",
 				key, args->netfd);
 		}
-		hand->addClient(args->netfd, Handler::RTMP);
+		hand->addClient(args->netfd, Network::RTMP);
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
 
@@ -889,9 +912,6 @@ connection_handler(Network::thread_params_t *args)
 
 		// We're done, close this network connection
 		rtmp.closeNet(args->netfd);
-#else
-		boost::thread handler(boost::bind(&dispatch_handler, targs));
-#endif
 	    }
 	} else {
 	    // When in single threaded mode, just call the protocol
@@ -902,7 +922,6 @@ connection_handler(Network::thread_params_t *args)
 	    if (args->port == (port_offset + RTMPT_PORT)) {
 		http_handler(args);
 	    } else if (args->port == (port_offset + RTMP_PORT)) {
-#if 1
 		RTMPServer rtmp;
 		boost::shared_ptr<amf::Element> tcurl = 
 		    rtmp.processClientHandShake(args->netfd);
@@ -923,7 +942,7 @@ connection_handler(Network::thread_params_t *args)
 		    log_network("Using existing Handler for: %s for fd %#d",
 				key, args->netfd);
 		}
-		hand->addClient(args->netfd, Handler::RTMP);
+		hand->addClient(args->netfd, Network::RTMP);
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
 
@@ -948,9 +967,6 @@ connection_handler(Network::thread_params_t *args)
 
 		// We're done, close this network connection
 		rtmp.closeNet(args->netfd);
-#else
- 		rtmp_handler(args);
-#endif
 	    }
 	}
 	
@@ -965,6 +981,7 @@ connection_handler(Network::thread_params_t *args)
 
 } // end of connection_handler
 
+#if 0
 void
 dispatch_handler(Network::thread_params_t *args)
 {
@@ -1041,7 +1058,7 @@ dispatch_handler(Network::thread_params_t *args)
     tids.decrement();
     
 } // end of dispatch_handler
-
+#endif
 
 void
 event_handler(Network::thread_params_t *args)
@@ -1104,12 +1121,12 @@ event_handler(Network::thread_params_t *args)
 		log_network("Got a hit for fd #%d, protocol %d", i,
 			    hand->getProtocol(i));
 		switch (hand->getProtocol(i)) {
-		  case Handler::NONE:
+		  case Network::NONE:
 		      break;
-		  case Handler::HTTP:
+		  case Network::HTTP:
 		      http_handler(args);
 		      break;
-		  case  Handler::RTMP:
+		  case Network::RTMP:
 		      args->netfd = i;
 		      args->filespec = path;
 		      if (!rtmp_handler(args)) {
@@ -1117,18 +1134,18 @@ event_handler(Network::thread_params_t *args)
 			  return;
 		      }
 		      break;
-		  case Handler::RTMPT:
+		  case Network::RTMPT:
 		      args->netfd = i;
 		      args->filespec = path;
 		      http_handler(args);
 		      break;		      
-		  case  Handler::RTMPTS:
+		  case Network::RTMPTS:
 		      break;
-		  case  Handler::RTMPE:
+		  case Network::RTMPE:
 		      break;
-		  case  Handler::RTMPS:
+		  case Network::RTMPS:
 		      break;
-		  case  Handler::DTN:
+		  case Network::DTN:
 		      break;
 		  default:
 		      log_error("Unsupported network protocol for fd #%d, %d",

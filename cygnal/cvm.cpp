@@ -91,8 +91,6 @@ const char *GPROC_VERSION = "1.0";
 using namespace std;
 using namespace gnash;
 
-static void usage (const char *);
-
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -224,7 +222,6 @@ vm_main(int argc, char *argv[])
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
-        usage(argv[0]);
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
@@ -262,7 +259,6 @@ vm_main(int argc, char *argv[])
     while ((c = getopt (argc, argv, ":hwvapr:gf:d:")) != -1) {
 	switch (c) {
 	  case 'h':
-	      usage (argv[0]);
               dbglogfile.removeLog();
 	      exit(0);
 	  case 'w':
@@ -325,7 +321,6 @@ vm_main(int argc, char *argv[])
     // No file names were supplied
     if (infiles.empty()) {
 	    std::cerr << "no input files" << std::endl;
-	    usage(argv[0]);
         dbglogfile.removeLog();
 	    exit(1);
     }
@@ -334,7 +329,6 @@ vm_main(int argc, char *argv[])
     {
         // We're not ready for multiple runs yet.
         std::cerr << "Multiple input files not supported." << std::endl;
-        usage(argv[0]);
         dbglogfile.removeLog();
         exit(1);
     }
@@ -581,55 +575,6 @@ play_movie(const std::string& filename, const RunResources& runResources)
     return md;
 }
 
-static void
-usage (const char *name)
-{
-    printf(
-	_("gprocessor -- an SWF preprocessor for Gnash.\n"
-	"\n"
-	"usage: %s [options] <file>\n"
-	"\n"
-	"Preprocesses the given SWF movie files.  Optionally write preprocessed shape\n"
-	"and font data to cache files, so the associated SWF files can be loaded\n"
-	"faster.\n"
-	"\n"
-        "%s%s%s%s"), name, _(
-	"options:\n"
-	"\n"
-	"  --help(-h)  Print this info.\n"	
-	"  --version   Print the version numbers.\n"	
-	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"	
-	"  -v          Be verbose; i.e. print log messages to stdout\n"
-          ),
-#if VERBOSE_PARSE
-	_("  -vp         Be verbose about movie parsing\n"),
-#else
-	"",
-#endif
-#if VERBOSE_ACTION
-	_("  -va         Be verbose about ActionScript\n"),
-#else
-	"",
-#endif
-	_(
-	"  -d [<ms>]\n"
-	"              Milliseconds delay between advances (0 by default).\n"
-	"              If '-1' the delay will be computed from the FPS.\n"
-	"  -r <times>  Allow the given number of complete runs.\n"
-	"              Keep looping undefinitely if set to 0.\n"
-	"              Default is 1 (end as soon as the last frame is reached).\n"
-	"  -f <frames>  \n"
-	"              Allow the given number of frame advancements.\n"
-	"              Keep advancing untill any other stop condition\n"
-        "              is encountered if set to 0 (default).\n")
-	);
-}
-
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: t

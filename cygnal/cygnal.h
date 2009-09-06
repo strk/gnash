@@ -46,7 +46,7 @@ public:
 	short	    port;
 	bool        connected;
 	int         fd;
-	Handler::protocols_supported_e protocol;
+	gnash::Network::protocols_supported_e protocol;
 	std::vector<std::string> supported;
     } peer_t;
     static Cygnal& getDefaultInstance();

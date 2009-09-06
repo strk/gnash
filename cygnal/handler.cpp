@@ -61,6 +61,7 @@ namespace cygnal
 const char *proto_str[] = {
     "NONE",
     "HTTP",
+    "HTTPS",
     "RTMP",
     "RTMPT",
     "RTMPTS",
@@ -93,7 +94,7 @@ Handler::sync(int /* in_fd */)
 }
 
 size_t
-Handler::addClient(int x, protocols_supported_e proto)
+Handler::addClient(int x, Network::protocols_supported_e proto)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
@@ -208,11 +209,10 @@ Handler::writeToPlugin(boost::uint8_t *data, size_t size)
     return ret;
 }
 
-boost::shared_ptr<amf::Buffer> &
+boost::shared_ptr<amf::Buffer>
 Handler::readFromPlugin()
 {
     GNASH_REPORT_FUNCTION;
-    size_t ret = 0;
     boost::shared_ptr<amf::Buffer> buf;
     if (_plugin) {
 	buf = _plugin->read_func();
