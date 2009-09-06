@@ -182,7 +182,7 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     if test x"$FOP" != x -a x"$docbook_styles" != x ; then :
     elif test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ; then :
     else
-      AC_MSG_WARN([No suitable fop nor pdfxmltex, PDF format files can't be generated])
+      AC_MSG_WARN([No suitable fop nor pdfxmltex, PDF format files can't be generated - hint: apt-get install xmltex fop])
     fi
   fi
 
