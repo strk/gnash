@@ -277,7 +277,7 @@ Network::newConnection(bool block, int fd)
         return -1;
     }
     if (_debug) {
-	log_debug(_("Trying to accept net traffic on fd #%d for port %d"), fd, _port);
+	log_debug(_("Waiting to accept net traffic on fd #%d for port %d"), fd, _port);
     }
 
 #ifdef HAVE_PSELECT

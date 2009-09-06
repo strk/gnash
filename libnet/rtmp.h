@@ -265,7 +265,7 @@ public:
 // 	std::vector<boost::shared_ptr<amf::Element> > objs;
 //     } rtmp_msg_t;
     typedef enum {
-        RTMP_ERR_UNDEF=0,
+        RTMP_ERR_UNDEF,
         RTMP_ERR_NOTFOUND,
         RTMP_ERR_PERM,
         RTMP_ERR_DISKFULL,

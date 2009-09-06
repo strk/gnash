@@ -56,6 +56,7 @@
 #include "rtmp.h"
 #include "rtmp_msg.h"
 #include "rtmp_server.h"
+#include "network.h"
 
 // _definst_ is the default instance name
 namespace cygnal
@@ -76,18 +77,6 @@ public:
 	INTERVAL,
 	QUIT,
     } admin_cmd_e;
-
-    /// This enum contains the list of all supported protocols.
-    typedef enum {
-	NONE,
-	HTTP,
-	RTMP,
-	RTMPT,
-	RTMPTS,
-	RTMPE,
-	RTMPS,
-	DTN
-    } protocols_supported_e;
     /// This enum contains the possible values for streaming video
     /// types.
     typedef enum {
@@ -104,7 +93,7 @@ public:
 	const char *description;
   	cygnal_io_read_t read_func;
   	cygnal_io_t write_func;
-	protocols_supported_e protocol;
+	gnash::Network::protocols_supported_e protocol;
     } cygnal_init_t;
     /// This typedef is only used for the init function optionally
     /// supported by the plugin.
@@ -128,14 +117,15 @@ public:
 
     /// \method addClient
     ///     Add a client to the list for output messages.
-    size_t addClient(int x, protocols_supported_e proto);
+    size_t addClient(int x, gnash::Network::protocols_supported_e proto);
     /// \method removeClient
     ///     Remove a client from the list for messages.
     void removeClient(int x);
     /// \var getClients
     ///     Get the vector of file descriptors for this handler.
     std::vector<int> &getClients() { return _clients; };
-    protocols_supported_e getProtocol(int x) { return _protocol[x]; };
+    gnash::Network::protocols_supported_e getProtocol(int x) { return _protocol[x]; };
+    void setProtocol(int fd, gnash::Network::protocols_supported_e x) { _protocol[fd] = x; };
     
     /// \method addRemote
     ///     Add a remote machine to the list for input messages.
@@ -152,7 +142,7 @@ public:
     ///     See if any of the cgi-bins has been loaded.
     bool initialized();
 
-    boost::shared_ptr<amf::Buffer> &readFromPlugin();
+    boost::shared_ptr<amf::Buffer> readFromPlugin();
 
     size_t writeToPlugin(amf::Buffer &buf) {
 	return writeToPlugin(buf.begin(), buf.allocated()); };
@@ -215,7 +205,7 @@ protected:
     /// \var _protocol
     ///    this is the map of which protocol is being used by which
     ///    file descriptor.
-    std::map<int, protocols_supported_e> _protocol;
+    std::map<int, gnash::Network::protocols_supported_e> _protocol;
     /// \var _clients
     ///	    is the array of all clients connected to this server for
     ///     this application. This is where all the output goes.
