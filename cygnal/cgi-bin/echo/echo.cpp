@@ -78,7 +78,6 @@ extern "C" {
     {
 // 	GNASH_REPORT_FUNCTION;
 	
-	size_t safe = 0;
 	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
 
 // 	log_network("%s", hexify(data, safe, true));

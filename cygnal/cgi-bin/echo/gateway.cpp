@@ -137,7 +137,6 @@ main(int argc, char *argv[])
     // Wait for data, and when we get it, process it.
     boost::shared_ptr<amf::Buffer> content;
     vector<boost::shared_ptr<amf::Element> > headers;
-    int ret = 0;
     net.setTimeout(10);
     do {
         netfd = net.newConnection(false, fd);
