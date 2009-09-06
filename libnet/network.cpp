@@ -1399,8 +1399,8 @@ Network::waitForNetData(int limit, fd_set files)
     sigset_t pending, sigmask;
     sigprocmask(SIG_BLOCK, &sigmask, NULL);
 
-    tval.tv_sec = timeout;
-    tval.tv_nsec = 0;
+    tval.tv_sec = 0;
+    tval.tv_nsec = timeout * 1000;
     int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
     sigpending(&pending);
     if (sigismember(&pending, SIGINT)) {
@@ -1414,9 +1414,9 @@ Network::waitForNetData(int limit, fd_set files)
 	sigwait(&sigmask, &sig);
     }
 #else
-    struct timeval        tval;
-    tval.tv_sec = timeout;
-    tval.tv_usec = 0;
+    struct timeval tval;
+    tval.tv_sec = 0;
+    tval.tv_usec = timeout;
     int ret = select(limit+1, &fdset, NULL, NULL, &tval);
     FD_ZERO(&fdset);
 #endif

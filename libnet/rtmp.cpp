@@ -197,6 +197,8 @@ RTMP::RTMP()
 {
 //    GNASH_REPORT_FUNCTION;
 
+    _bodysize.resize(MAX_AMF_INDEXES);
+    
     // Initialize all of the queues
     for (int i=0; i<MAX_AMF_INDEXES; i++) {
         // Name is only used for debugging
@@ -207,6 +209,7 @@ RTMP::RTMP()
         // each channel can have a different chunksize
 	_chunksize[i] = RTMP_VIDEO_PACKET_SIZE;
 	_lastsize[i] = 0;
+	_bodysize[i] = 0;
     }
 }
 
@@ -270,7 +273,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
     // log_network (_("The header size is %d"), head->head_size);
 
     // cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in,
-    // head->head_size, false) << endl; 
+    // 				head->head_size, false) << endl; 
 
     // Make sure the header size is in range, it has to be between
     // 1-12 bytes.
@@ -301,7 +304,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
         head->bodysize = (head->bodysize << 8) + *tmpptr++;
         head->bodysize = head->bodysize & 0xffffff;
 	_bodysize[head->channel] = head->bodysize;
-// 	log_network(_("The body size is: %d"), head->bodysize);
+ 	log_network(_("The body size is: %d"), head->bodysize);
     } else {
 	// If the body size is zero, we reuse the last body size field
 	// from the previous message, 1 and 4 bytes headers all
@@ -311,7 +314,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	    log_network("Using previous body size of %d for channel %d",
 			head->bodysize, head->channel);
 	} else {
-	    log_error("Previous body size for channel %d is zero!");
+	    log_error("Previous body size for channel %d is zero!", head->channel);
 	    head.reset();
 	    return head;
 	}
@@ -1191,14 +1194,15 @@ RTMP::recvMsg(int fd)
     boost::shared_ptr<amf::Buffer> buf(new Buffer(3074));
     do {
 	ret = readNet(fd, buf->reference()+ret, buf->size()-ret, _timeout);
-//	cerr << __PRETTY_FUNCTION__ << ": " << ret << endl;
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
 	    buf->setSeekPointer(buf->reference() + ret);
 	}
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
-	    log_network("no data for fd #%d, done reading this packet...", fd);
+	    log_network("no data for fd #%d, done reading this packet, read %d bytes...", fd,
+ 		        buf->allocated());
+	    buf.reset();
  	    break;
  	}
 	if ((ret == 1) && (*(buf->reference()) == 0xff)) {
