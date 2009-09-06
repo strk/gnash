@@ -132,12 +132,13 @@ public:
     } protocols_supported_e;
     // This is used to pass parameters to a thread using boost::bind
     typedef struct {
-	int netfd;
+	int tid;
 	int port;
-	protocols_supported_e protocol;
+	int netfd;
+	void *entry;
 	void *handler;
 	std::string filespec;
-	int tid;
+	protocols_supported_e protocol;
     } thread_params_t;
     typedef boost::uint8_t byte_t;
     typedef bool entry_t (thread_params_t *);

@@ -232,16 +232,16 @@ protected:
     ///     is to store the body size of the previous packet for this
     ///     channel. 4 and 1 byte heades don't use the length field,
     ///     they just use the previous vaue for this field.
-    std::map<int, size_t>			_bodysize;
+    std::map<int, size_t>		_bodysize;
     /// \var _in_fd
     ///	    The file descriptor of the incoming data for an
     ///     Invoke message.
-    int _in_fd;
+    int					_in_fd;
 
     /// \var _fcssubscribe
     ///    This is a string sometimes sent by the client with what
     ///    appears to be a unique ID number.
-    std::string		_fcsubscribe;
+    std::string				_fcsubscribe;
 
     /// \var _netconnect
     ///    This store the data from the NetConnection ActionScript
@@ -250,7 +250,7 @@ protected:
     ///    file paths and other information needed by the server.
     boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
 private:    
-    boost::mutex _mutex;
+    boost::mutex			_mutex;
     
 // Remote Shared Objects. References are an index into this vector.
 //    std::map<std::string, boost::shared_ptr<handler_t> > _handlers;

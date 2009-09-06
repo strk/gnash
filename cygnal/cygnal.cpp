@@ -823,16 +823,10 @@ connection_handler(Network::thread_params_t *args)
 			proto_str[args->protocol], tid, fd);
 	}
 	
-	struct pollfd fds;
-	fds.fd = args->netfd;
-	fds.events = POLLIN | POLLRDHUP;
+	// struct pollfd fds;
+	// fds.fd = args->netfd;
+	// fds.events = POLLIN | POLLRDHUP;
 
-#if 0
-	// If in multi-threaded mode (the default), start a thread
-	// with a connection_handler for each port we're interested
-	// in. Each port of course has a different protocol.
-	if (crcfile.getThreadingFlag() == true) {
-#endif
 	// Each dispatch thread gets it's own argument data and
 	// network connection data.
 
@@ -845,6 +839,7 @@ connection_handler(Network::thread_params_t *args)
 	    Network *tnet = 0;
 	    hargs->netfd = args->netfd;
 	    hargs->protocol = args->protocol;
+	    hargs->entry = new HTTPServer;
 	    hargs->filespec = docroot;
 	    hargs->tid = tid;
 	    // If we haven't spawned up to our max allowed, start a
@@ -892,6 +887,7 @@ connection_handler(Network::thread_params_t *args)
 			    proto_str[args->protocol], key, args->netfd);
 		hand.reset(new Handler);
 		cyg.addHandler(key, hand);
+		args->entry = new RTMPServer;
 		hand->setNetConnection(rtmp.getNetConnection());
 		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
 		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
@@ -924,74 +920,26 @@ connection_handler(Network::thread_params_t *args)
 		
 		// this is where the real work gets done.
 		if (init) {
-		    event_handler(args);
+		    // If in multi-threaded mode (the default), start a thread
+		    // with a connection_handler for each port we're interested
+		    // in. Each port of course has a different protocol.
+		    if (crcfile.getThreadingFlag() == true) {
+			boost::thread event_thread(boost::bind(&event_handler, args));
+		    } else {
+			event_handler(args);
+			// We're done, close this network connection
+			net.closeNet(args->netfd);
+		    }
 		} else {
 		    log_error("Couldn't load plugin for %s", key); 
 		}
 
-		// We're done, close this network connection
-		rtmp.closeNet(args->netfd);
+		// // We're done, close this network connection
+		// if (crcfile.getThreadingFlag() == true) {
+		//     net.closeNet(args->netfd);
+		// }
 	    }
-	} // end of if RTMP
-	
-#if 0
-	} else {
-	    // When in single threaded mode, just call the protocol
-	    // handler directly. As this is primarily only used when
-	    // debugging Cygnal itself, we don't want the extra
-	    // overhead of the distpatch_handler.
-	    log_network("Single threaded mode for fd #%d", args->netfd);
-	    if (args->protocol == Network::HTTP) {
-		http_handler(args);
-	    } else if (args->protocol == Network::RTMP) {
-		RTMPServer rtmp;
-		boost::shared_ptr<amf::Element> tcurl = 
-		    rtmp.processClientHandShake(args->netfd);
-		if (!tcurl) {
-// 		    log_error("Couldn't read the tcUrl variable!");
-		    net.closeNet(args->netfd);
-		    return;
-		}
-		URL url(tcurl->to_string());
-		std::string key = url.hostname() + url.path();
-		boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
-		if (!hand) {
-		    log_network("Creating new Handler for: %s for fd %#d",
-				key, args->netfd);
-		    hand.reset(new Handler);
-		    hand->setNetConnection(rtmp.getNetConnection());
-		} else {
-		    log_network("Using existing Handler for: %s for fd %#d",
-				key, args->netfd);
-		}
-		hand->addClient(args->netfd, Network::RTMP);
-		args->handler = reinterpret_cast<void *>(hand.get());
-		args->filespec = key;
-		
-		string str(url.path());
-		if (str[0] == '/') {
-		    str.erase(0,1);
-		}
-		char *env = std::getenv("CYGNAL_PLUGINS");
-		if (!env) {
-		    hand->scanDir(PLUGINSDIR);
-		} else {
-		    hand->scanDir(env);
-		}
-		boost::shared_ptr<Handler::cygnal_init_t> init = 
-		    hand->initModule(str);
-		
-		if (init) {
-		    event_handler(args);
-		} else {
-		    log_error("Couldn't load plugin for %s", key); 
-		}
-		
-		// We're done, close this network connection
-		rtmp.closeNet(args->netfd);
-	    }
-	} // end of if RTMP
-#endif
+	} // end of if RTMP	
 	
 	log_network("Number of active Threads is %d", tids.num_of_tids());
 	

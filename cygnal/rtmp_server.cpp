@@ -1180,7 +1180,8 @@ rtmp_handler(Network::thread_params_t *args)
     GNASH_REPORT_FUNCTION;
 
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    RTMPServer *rtmp = new RTMPServer;
+    RTMPServer *rtmp = reinterpret_cast<RTMPServer *>(args->entry);
+    // RTMPServer *rtmp = new RTMPServer;
     
     string docroot = args->filespec;
     string url, filespec;
@@ -1520,6 +1521,7 @@ rtmp_handler(Network::thread_params_t *args)
 	    }
 	} else {
 	    log_error("Communication error with client using fd #%d", args->netfd);
+	    rtmp->closeNet(args->netfd);
 	    initialize = true;
 	    return false;
 	}
