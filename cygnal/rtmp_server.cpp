@@ -105,6 +105,7 @@ RTMPServer::processClientHandShake(int fd)
     boost::shared_ptr<amf::Buffer>  pkt;
     boost::shared_ptr<amf::Element> tcurl;
     boost::shared_ptr<amf::Element> swfurl;
+    boost::shared_ptr<amf::Element> encoding;
 
 //     RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
     
@@ -206,22 +207,29 @@ RTMPServer::processClientHandShake(int fd)
 	_netconnect->dump();	// FIXME: debug crap
     }
     
-    // Get the data for the two field we want.
+    // Get the data for the fields we want.
     tcurl  = _netconnect->findProperty("tcUrl");
     swfurl  = _netconnect->findProperty("swfUrl");
+    encoding  = _netconnect->findProperty("objectEncoding");
 
-    // Send a onBWDone to the client to start the new NetConnection,
-    boost::shared_ptr<amf::Buffer> bwdone = encodeBWDone(2.0);
-    if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_12,
-		      bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
-	log_network("Sent onBWDone to client");
-    } else {
-	log_error("Couldn't send onBWDone to client!");
-	tcurl.reset();
-	return tcurl;		// nc is empty
+    // based on the Red5 tests, I see two behaviours with this next
+    // packet. If only gets sent when the "objectEncoding" field of
+    // the NetConnection object is in the initial packet. When this is
+    // supplied, it's more remoting than streaming, so sending this
+    // causes Async I/O errors in the client.
+    if (!encoding) {
+	// Send a onBWDone to the client to start the new NetConnection,
+	boost::shared_ptr<amf::Buffer> bwdone = encodeBWDone(2.0);
+	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_12,
+			  bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
+	    log_network("Sent onBWDone to client");
+	} else {
+	    log_error("Couldn't send onBWDone to client!");
+	    tcurl.reset();
+	    return tcurl;		// nc is empty
+	}
     }
-
-#if 1
+    
     // Send a Set Client Window Size to the client
     boost::shared_ptr<amf::Buffer> winsize(new amf::Buffer(sizeof(boost::uint32_t)));
     boost::uint32_t swapped = 0x20000;
@@ -235,7 +243,6 @@ RTMPServer::processClientHandShake(int fd)
 	tcurl.reset();
 	return tcurl;		// nc is empty
     }
-#endif
 
     // Send a ping to the client to reset the new NetConnection,
     boost::shared_ptr<amf::Buffer> ping_reset =
@@ -1233,7 +1240,7 @@ rtmp_handler(Network::thread_params_t *args)
 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
 			// que->at(i)->dump();
 		    if (bufptr) {
-			// bufptr->dump();
+			bufptr->dump();
 			qhead = rtmp->decodeHeader(bufptr->reference());
 			if (!qhead) {
 			    return false;
@@ -1450,6 +1457,8 @@ rtmp_handler(Network::thread_params_t *args)
 			      // This is a server installation specific  method.
 			  } else if (body->getMethodName() == "FCSubscribe") {
 			      hand->setFCSubscribe(body->at(0)->to_string());
+			  } else if (body->getMethodName() == "_error") {
+			      log_error("Received an _error message from the client!");
 			  } else {
 			      /* size_t ret = */ hand->writeToPlugin(tmpptr, qhead->bodysize);
 			      boost::shared_ptr<amf::Buffer> result = hand->readFromPlugin();
