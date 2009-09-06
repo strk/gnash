@@ -174,6 +174,18 @@ static boost::mutex	alldone_mutex;
 static boost::condition	noclients;
 static boost::mutex	noclients_mutex;
 
+const char *proto_str[] = {
+    "NONE",
+    "HTTP",
+    "HTTPS",
+    "RTMP",
+    "RTMPT",
+    "RTMPTS",
+    "RTMPE",
+    "RTMPS",
+    "DTN"
+};
+
 static void
 usage()
 {
@@ -561,7 +573,7 @@ main(int argc, char *argv[])
 	rtmp_data->tid = 0;
 	rtmp_data->netfd = 0;
 	rtmp_data->filespec = docroot;
-	http_data->protocol = Network::RTMP;
+	rtmp_data->protocol = Network::RTMP;
 	rtmp_data->port = port_offset + gnash::RTMP_PORT;
 	if (crcfile.getThreadingFlag()) {
 	    boost::thread rtmp_thread(boost::bind(&connection_handler, rtmp_data));
@@ -751,15 +763,17 @@ connection_handler(Network::thread_params_t *args)
     // Start a server on this tcp/ip port.
     fd = net.createServer(args->port);
     if (fd <= 0) {
-	log_error("Can't start Connection Handler for fd #%d, port %hd", fd, args->port);
+	log_error("Can't start %s Connection Handler for fd #%d, port %hd",
+		  proto_str[args->protocol], fd, args->port);
 	return;
     } else {
-	log_network("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
+	log_network("Starting %s Connection Handler for fd #%d, port %hd",
+		    proto_str[args->protocol], fd, args->port);
     }
 
     // Get the number of cpus in this system. For multicore
     // systems we'll get better load balancing if we keep all the
-    // cpus busy. So a pool of threrads is started for each cpu,
+    // cpus busy. So a pool of threads is started for each cpu,
     // the default being just one. Each thread is reponsible for
     // handling part of the total active file descriptors.
 #ifdef HAVE_SYSCONF
@@ -781,9 +795,6 @@ connection_handler(Network::thread_params_t *args)
     } else {
 	spawn_limit = ncpus * nfds;
     }
-
-    args->handler = &net;
-    boost::thread handler;
     
     // FIXME: this may run forever, we probably want a cleaner way to
     // test for the end of time.
@@ -795,7 +806,8 @@ connection_handler(Network::thread_params_t *args)
 
 	// Rotate in a range of 0 to the limit.
 	tid = (tid + 1) % (spawn_limit + 1);
-	log_network("thread ID %d for fd #%d", tid, fd);
+	log_network("%s handler: thread ID #%d, fd #%d", proto_str[args->protocol], tid,
+		    fd);
 	
 	// Wait for a connection to this tcp/ip from a client. If set
 	// to true, this will block until a request comes in. If set
@@ -804,26 +816,30 @@ connection_handler(Network::thread_params_t *args)
 	// things when you have a heavily threaded application.
 	args->netfd = net.newConnection(true, fd);
 	if (args->netfd <= 0) {
-	    log_network("No new network connections");
+	    log_network("No new %s network connections", proto_str[args->protocol]);
 	    continue;
 	} else {
-	    log_network("New network connection for fd #%d", args->netfd);
+	    log_network("*** New %s network connection for thread ID #%d, fd #%d ***",
+			proto_str[args->protocol], tid, fd);
 	}
 	
 	struct pollfd fds;
 	fds.fd = args->netfd;
 	fds.events = POLLIN | POLLRDHUP;
-	
+
+#if 0
 	// If in multi-threaded mode (the default), start a thread
 	// with a connection_handler for each port we're interested
 	// in. Each port of course has a different protocol.
 	if (crcfile.getThreadingFlag() == true) {
-	    // Each dispatch thread gets it's own argument data and
-	    // network connection data.
+#endif
+	// Each dispatch thread gets it's own argument data and
+	// network connection data.
 
-	    //
-	    // Start threaded HTTP handler
-	    //
+	//
+	// Setup HTTP handler
+	//
+	if (args->protocol == Network::HTTP) {
 	    log_network("Threaded HTTP handler for server on fd #%d", fd);
 	    Network::thread_params_t *hargs = new Network::thread_params_t;
 	    Network *tnet = 0;
@@ -834,10 +850,9 @@ connection_handler(Network::thread_params_t *args)
 	    // If we haven't spawned up to our max allowed, start a
 	    // new dispatch thread to handle data.
 	    if (networks[tid] == 0) {
-		log_network("Starting new dispatch thread for fd #%d, tid #%d",
+		log_network("Starting new event handler thread for fd #%d, tid #%d",
 			    args->netfd, tid);
 		tids.increment();
-		tnet = new Network;
 		boost::shared_ptr<Handler> hand(new Handler);
 		hand->addClient(hargs->netfd, Network::HTTP);
 		hargs->handler = reinterpret_cast<void *>(hand.get());
@@ -845,49 +860,49 @@ connection_handler(Network::thread_params_t *args)
 		log_network("Not starting new HTTP thread, spawned already for tid #%d", tid);
 		tnet = networks[tid];
 	    }
-	    // if (args->port == (port_offset + RTMPT_PORT)) {
-	    // 	boost::bind(http_handler, targs);
-	    // 	tnet->addPollFD(fds, http_handler);
-	    // } else if (args->port == (port_offset + RTMP_PORT)) {
-	    // 	boost::bind(rtmp_handler, targs);
-	    // 	tnet->addPollFD(fds, rtmp_handler);
-	    // }
+	    if (args->protocol == Network::HTTP) {
+		boost::bind(http_handler, hargs);
+		// 	tnet->addPollFD(fds, http_handler);
+		// } else if (args->port == (port_offset + RTMP_PORT)) {
+		//       boost::bind(rtmp_handler, targs);
+		// 	tnet->addPollFD(fds, rtmp_handler);
+	    }
 	    
-	    //
-	    // Start threaded RTMP handler
-	    //
-	    if (networks[tid] == 0) {
-		networks[tid] = tnet;
-		RTMPServer rtmp;
-		boost::shared_ptr<amf::Element> tcurl = 
-		    rtmp.processClientHandShake(args->netfd);
-		if (!tcurl) {
+	    // this is where the real work gets done.
+	    event_handler(hargs);
+	} // end of if HTTP
+	
+	//
+	// Setup RTMP handler
+	//
+	if (args->protocol == Network::RTMP) {
+	    RTMPServer rtmp;
+	    boost::shared_ptr<amf::Element> tcurl = 
+		rtmp.processClientHandShake(args->netfd);
+	    if (!tcurl) {
 // 		    log_error("Couldn't read the tcUrl variable!");
-		    rtmp.closeNet(args->netfd);
-		    return;
-		}
-		URL url(tcurl->to_string());
-		std::string key = url.hostname() + url.path();
-		boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
-		if (!hand) {
-		    log_network("Creating new Handler for: %s for fd %#d",
-				key, args->netfd);
-		    hand.reset(new Handler);
-		    hand->setNetConnection(rtmp.getNetConnection());
-		    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
-		    std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
-		    for (it = active.begin(); it < active.end(); ++it) {
-			Cygnal::peer_t *peer = (*it).get();
-			hand->addRemote(peer->fd);
-		    }
-		} else {
-		    log_network("Using existing Handler for: %s for fd %#d",
-				key, args->netfd);
+		rtmp.closeNet(args->netfd);
+		return;
+	    }
+	    URL url(tcurl->to_string());
+	    std::string key = url.hostname() + url.path();
+	    boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
+	    if (!hand) {
+		log_network("Creating new %s Handler for: %s for fd %#d",
+			    proto_str[args->protocol], key, args->netfd);
+		hand.reset(new Handler);
+		cyg.addHandler(key, hand);
+		hand->setNetConnection(rtmp.getNetConnection());
+		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
+		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
+		for (it = active.begin(); it < active.end(); ++it) {
+		    Cygnal::peer_t *peer = (*it).get();
+		    hand->addRemote(peer->fd);
 		}
 		hand->addClient(args->netfd, Network::RTMP);
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
-
+		
 		string cgiroot;
 		char *env = std::getenv("CYGNAL_PLUGINS");
 		if (!env) {
@@ -908,20 +923,27 @@ connection_handler(Network::thread_params_t *args)
 		    hand->initModule(str);
 		
 		// this is where the real work gets done.
-		event_handler(args);
+		if (init) {
+		    event_handler(args);
+		} else {
+		    log_error("Couldn't load plugin for %s", key); 
+		}
 
 		// We're done, close this network connection
 		rtmp.closeNet(args->netfd);
 	    }
+	} // end of if RTMP
+	
+#if 0
 	} else {
 	    // When in single threaded mode, just call the protocol
 	    // handler directly. As this is primarily only used when
 	    // debugging Cygnal itself, we don't want the extra
 	    // overhead of the distpatch_handler.
 	    log_network("Single threaded mode for fd #%d", args->netfd);
-	    if (args->port == (port_offset + RTMPT_PORT)) {
+	    if (args->protocol == Network::HTTP) {
 		http_handler(args);
-	    } else if (args->port == (port_offset + RTMP_PORT)) {
+	    } else if (args->protocol == Network::RTMP) {
 		RTMPServer rtmp;
 		boost::shared_ptr<amf::Element> tcurl = 
 		    rtmp.processClientHandShake(args->netfd);
@@ -945,7 +967,7 @@ connection_handler(Network::thread_params_t *args)
 		hand->addClient(args->netfd, Network::RTMP);
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
-
+		
 		string str(url.path());
 		if (str[0] == '/') {
 		    str.erase(0,1);
@@ -958,17 +980,18 @@ connection_handler(Network::thread_params_t *args)
 		}
 		boost::shared_ptr<Handler::cygnal_init_t> init = 
 		    hand->initModule(str);
-
+		
 		if (init) {
 		    event_handler(args);
 		} else {
 		    log_error("Couldn't load plugin for %s", key); 
 		}
-
+		
 		// We're done, close this network connection
 		rtmp.closeNet(args->netfd);
 	    }
-	}
+	} // end of if RTMP
+#endif
 	
 	log_network("Number of active Threads is %d", tids.num_of_tids());
 	
@@ -978,7 +1001,7 @@ connection_handler(Network::thread_params_t *args)
     
     // All threads should wake up now.
     alldone.notify_all();
-
+    
 } // end of connection_handler
 
 #if 0
@@ -990,7 +1013,7 @@ dispatch_handler(Network::thread_params_t *args)
 //    Handler *hand = reinterpret_cast<Handler *>(args->handler);
     Network *net = reinterpret_cast<Network *>(args->handler);
 //    Network net;
-    int timeout = 5000;
+    int timeout = 30;
     bool done = false;
 
     do {
@@ -1066,13 +1089,10 @@ event_handler(Network::thread_params_t *args)
     GNASH_REPORT_FUNCTION;
 
     Network net;
+    int timeout = 30;
+    bool done = false;
     
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    //    hand->dump();
-//     int retries = 100;
-
-    int timeout = 500;
-    bool done = false;
     
     // Extract the hostname and path to the cgi-bin sandbox.
     string host;
@@ -1093,10 +1113,11 @@ event_handler(Network::thread_params_t *args)
     }
 
     hand->setName(path);
+#if 0
     if (!hand->initialized()) {
-	log_network("starting Handler for %s", path);
+	log_network("Starting Handler for %s", path);
     }
-
+#endif
     do {
 	net.setTimeout(timeout);
 	fd_set hits;
@@ -1118,19 +1139,25 @@ event_handler(Network::thread_params_t *args)
 	for (int i=0; i <= max + 1; i++) {
 	    if (FD_ISSET(i, &hits)) {
 		FD_CLR(i, &hits);
-		log_network("Got a hit for fd #%d, protocol %d", i,
-			    hand->getProtocol(i));
+		log_network("Got a hit for fd #%d, protocol %s", i,
+			    proto_str[hand->getProtocol(i)]);
 		switch (hand->getProtocol(i)) {
 		  case Network::NONE:
+		      log_error("No protocol specified!");
 		      break;
 		  case Network::HTTP:
-		      http_handler(args);
+		      args->netfd = i;
+		      args->filespec = path;
+		      if (!http_handler(args)) {
+			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, path);
+			  return;
+		      }		      
 		      break;
 		  case Network::RTMP:
 		      args->netfd = i;
 		      args->filespec = path;
 		      if (!rtmp_handler(args)) {
-			  // Done with this network connection
+			  log_network("Done with RTMP connection for fd #%d, CGI %s", i, path);
 			  return;
 		      }
 		      break;

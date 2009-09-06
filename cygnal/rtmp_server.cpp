@@ -1181,6 +1181,7 @@ rtmp_handler(Network::thread_params_t *args)
 
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
     RTMPServer *rtmp = new RTMPServer;
+    
     string docroot = args->filespec;
     string url, filespec;
     url = docroot;
@@ -1470,7 +1471,7 @@ rtmp_handler(Network::thread_params_t *args)
 				      log_network("Sent response to client.");
 				  }
 			      }
-			      
+			      done = true;
 			  }
 			  break;
 		      case RTMP::FLV_DATA:

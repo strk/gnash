@@ -972,15 +972,15 @@ http_handler(Network::thread_params_t *args)
     bool done = false;
 //    www.setHandler(net);
 
-    log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
+    log_network(_("Starting HTTP Handler for fd #%d, tid %d"),
+	      args->netfd, args->tid);
     
     string docroot = args->filespec;
 
 //     cgis.setDocroot(args->filespec);
     
     www->setDocRoot(docroot);
-    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
+    log_network("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
     do {
