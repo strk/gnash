@@ -28,7 +28,11 @@
 
 
 extern "C" {
+#ifdef HAVE_PNG_H
 #include <png.h>
+#else
+#warning "This system doesn't have png.h installed!"
+#endif
 }
 
 // Forward declarations
