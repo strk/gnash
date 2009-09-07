@@ -61,13 +61,12 @@ endif
 		--disable-dependency-tracking \
 		--disable-rpath \
 		--enable-cygnal \
-		--enable-ssl \
 		--enable-avm2 \
 		--enable-python \
 		--enable-jemalloc \
 		--enable-sdkinstall \
 		--disable-testsuite \
-		--enable-media=ffmpeg \
+		--enable-media=gst \
 		--enable-gui=gtk,kde4 \
 		--enable-renderer=agg \
 		--with-plugins-install=system
