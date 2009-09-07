@@ -45,7 +45,7 @@ echo_la_SOURCES = echo.cpp echo.h
 echo_la_LDFLAGS = -module -avoid-version -no-undefined
 echo_la_LIBADD  =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
-gateway_SOURCES = gateway.cpp echo.h 
+gateway_SOURCES = gateway.cpp gateway.h 
 gateway_LDFLAGS = # -module -avoid-version -no-undefined
 gateway_LDADD   = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
