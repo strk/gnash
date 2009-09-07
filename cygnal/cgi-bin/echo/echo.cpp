@@ -68,7 +68,7 @@ extern "C" {
         }
         
         init->version = "Echo Test 0.1 (Gnash)";
-        init->description = "echo test for Cygnal.\n"
+        init->description = "echo RTMP test for Cygnal.\n"
             "\tThis supplies the server side functionality equired for\n"
             "\tCygnal to handle the Red5 Echo test"; 
         return init;

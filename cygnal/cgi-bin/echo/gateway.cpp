@@ -47,6 +47,40 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
 
+static GatewayTest gateway;
+	
+extern "C" {
+    
+    // the standard API
+    boost::shared_ptr<Handler::cygnal_init_t>
+    gateway_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
+    {
+	GNASH_REPORT_FUNCTION;
+        boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
+        
+        init->version = "Gateway Test 0.1 (Gnash)";
+        init->description = "gateway RTMPT test for Cygnal.\n"
+            "\tThis supplies the server side functionality equired for\n"
+            "\tCygnal to handle the Red5 Gateway test"; 
+        return init;
+    }
+
+    boost::shared_ptr<amf::Buffer> gateway_read_func()
+    {
+// 	GNASH_REPORT_FUNCTION;
+	
+//      GNASH_REPORT_RETURN;
+    }
+
+    size_t gateway_write_func(boost::uint8_t *data, size_t size)
+    {
+// 	GNASH_REPORT_FUNCTION;
+
+//      GNASH_REPORT_RETURN;
+    }
+    
+} // end of extern C
+
 int
 main(int argc, char *argv[])
 {
