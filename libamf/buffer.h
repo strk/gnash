@@ -114,7 +114,7 @@ public:
     /// \brief Test to see if the buffer has any data.
     ///
     /// @return true or false
-    bool empty() { return (_seekptr) ? true : false; };
+    bool empty() { return (_seekptr) ? false : true; };
 
     /// \brief Resize the buffer that holds the data.
     ///		The new size of the current data is based on the

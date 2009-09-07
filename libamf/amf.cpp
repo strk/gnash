@@ -434,7 +434,7 @@ AMF::encodeECMAArray(const amf::Element &data)
 	buf.reset(new amf::Buffer(5));
     }
     *buf = Element::ECMA_ARRAY_AMF0;
-    length = 1;
+    length = 0;
     swapBytes(&length, sizeof(boost::uint32_t));
     *buf += length;
 
@@ -1235,11 +1235,17 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 // 	log_debug("No Property name, object done %x, %x", (void *)in, (void *)tooFar);
 	return el;
     }
-    
+
+#if 0    
     if (length + tmpptr > tooFar) {
 	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
 	length = tooFar - tmpptr;
     }    
+#else
+    if (length > SANE_STR_SIZE) {
+	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
+    }    
+#endif
     
     // name is just debugging help to print cleaner, and should be removed later
 //    log_debug(_("AMF property name length is: %d"), length);

@@ -1,0 +1,75 @@
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+ "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+    
+    <!ENTITY appversion "0.8.6">
+    <!ENTITY manrevision "0.3">
+    <!ENTITY date "Sug 2009">
+    <!ENTITY app "<application>Cygnal</application>">
+    <!ENTITY appname "Gnash">
+
+    <!ENTITY legal            SYSTEM "legal.xml">
+    <!ENTITY fdl-app          SYSTEM "fdl-appendix.xml"> 
+    <!ENTITY programmers      SYSTEM "app_authors.xml">
+    <!ENTITY introduction     SYSTEM "introduction.xml">
+    <!ENTITY security         SYSTEM "security.xml">
+    <!ENTITY bugreport        SYSTEM "bugreport.xml">
+
+    <!ENTITY acknowledgments  SYSTEM "usermanual/acknowledgments.xml">
+    <!ENTITY conventions      SYSTEM "usermanual/conventions.xml">
+
+ ]
+>
+
+<!-- TRANSLATOR NOTE: do not change the id, just the lang -->
+<book lang="en" id="index">
+  <title>Gnash User Manual</title>
+  <titleabbrev>Gnash User</titleabbrev>
+
+<!-- =============Document Header ============================ -->
+
+<bookinfo>
+  <title>Cygnal Manual</title>
+  <copyright>
+    <year>2009</year>
+    <holder>Free Software Foundation</holder>
+  </copyright>
+  
+  <!-- TRANSLATOR NOTE: uncomment this section
+       
+       <copyright>
+       <year>2008</year>
+       <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+       </copyright>
+       
+  -->
+  
+  &legal;
+  &revisionhistory;
+  
+    <releaseinfo>
+        This manual describes version &appversion; of &appname;.
+    </releaseinfo>
+
+  </bookinfo>
+
+  
+<!-- ============= Introduction ============================== -->
+  &introduction;
+
+<!-- ============= Document Body ============================= -->
+
+<!--   &usage; -->
+<!--   &installation; -->
+<!--   &bugreport; -->
+<!--   &glossary; -->
+
+
+<!-- ============= Authors =================================== -->
+  &programmers;
+<!--  &writers; -->
+
+<!-- ============= Application License ======================= -->
+  &fdl-app;
+
+</book>

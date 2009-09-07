@@ -21,12 +21,13 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
+#include <time.h>
 
 #include "amf.h"
 #include "element.h"
-// #include "handler.h"
 #include "network.h"
 #include "buffer.h"
 #include "rtmp_msg.h"
@@ -37,21 +38,75 @@
 namespace gnash
 {
 
+/// \page RTMP RTMP Protocol
+/// \section rtmp_handshake RTMP Handshake
+///     The headers and data for the initial RTMP handshake differ from
+///     what is used by RTMP during normal message processing. The layout
+///     is this:
+///     [version (1 byte)]
+///     [1st timestamp (4 bytes)]
+///     [2nd timestamp (4 bytes)]
+///     [1528 bytes of random data]
+///
+///     The handshake process is client sends a handhsake request to the
+///     server. This is 1537 bytes (version + handshake).
+///     The server then responds with a 3073 byte packet, which is the
+///     version byte plus two 1536 byte packets, the second one being the
+///     the same random data as we originally sent, but with the header
+///     changed.
+///
+/// \section rtmp_packet RTMP Packet
+///     An RTMP packet has a variablew length header field, followed by data
+///     encoded in AMF format. The header can be one of 1, 4, 8, or 12 bytes.
+///     
+
+
+/// \var RTMP_HANDSHAKE_VERSION_SIZE
+///     The RTMP version field of the handshake is 1 byte large
+const int  RTMP_HANDSHAKE_VERSION_SIZE = 1;
+/// \var RTMP_VERSION
+///     The RTMP version number for now is always a 3.
 const boost::uint8_t RTMP_VERSION = 0x3;
-const boost::uint8_t RTMP_HANDSHAKE = 0x3;
-const int  RTMP_HANDSHAKE_SIZE = 1536;
-const int  RTMP_RANDOM_SIZE = 1528;
+/// \var
+///    This is the total size of an RTMP packet, not including the
+///    version field.
+const int  RTMP_HANDSHAKE_SIZE	= 1536;
+/// \var
+///    This is the size of the random data section in the RTMP handshake
+const int  RTMP_RANDOM_SIZE	= 1528;
+/// \var
+///    The RTMP handshake header if always 2 32bit words. (8 bytes)
 const int  RTMP_HANDSHAKE_HEADER_SIZE = 8;
-const int  MAX_AMF_INDEXES = 64;
 
-const int  RTMP_HEADSIZE_MASK = 0xc0;
-const char RTMP_INDEX_MASK = 0x3f;
+/// \var
+///    This is the maximum number of channels supported in a single
+///    RTMP connection.
+const int  MAX_AMF_INDEXES	= 64;
+
+/// \par RTMP Header
+///
+/// \var 
+///     This is a mask to get to the upper 2 bits of the header
+const int  RTMP_HEADSIZE_MASK	= 0xc0;
+/// \var 
+///     This is a mask to get to the lower 6 bits of the header
+const char RTMP_INDEX_MASK	= 0x3f;
+/// \var 
+///     All video data packets are 128 bytes
 const int  RTMP_VIDEO_PACKET_SIZE = 128;
+/// \var 
+///     All audio data packets are 64 bytes
 const int  RTMP_AUDIO_PACKET_SIZE = 64;
+/// \var 
+///     While the RTMP header can be one of 4 sizes, this is the
+///     maximum size used
 const int  RTMP_MAX_HEADER_SIZE = 12;
-const int  PING_MSG_SIZE = 6;
+/// \var 
+///     All System Ping messages are 6 bytes
+const int  PING_MSG_SIZE	= 6;
+/// \var 
+///     This is a reserved channel for system messages
 const int  RTMP_SYSTEM_CHANNEL = 2;
-
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
@@ -86,6 +141,10 @@ class DSOEXPORT RTMP : public Network
 public:
     typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
+    typedef enum {
+	ENCODE_AMF0=0x0,
+	ENCODE_AMF3=0x3
+    } encoding_types_e;
     typedef enum {
 	RAW     = 0x0001,
 	ADPCM   = 0x0002,
@@ -123,34 +182,45 @@ public:
     // client is the Flash Player and 0x01 if the client is the FlashCom
     // server.
     typedef enum {
-        NONE = 0x0,
-        CHUNK_SIZE = 0x1,
-        UNKNOWN = 0x2,
-        BYTES_READ = 0x3,
-        PING = 0x4,
-        SERVER = 0x5,
-        CLIENT = 0x6,
-        UNKNOWN2 = 0x7,
-        AUDIO_DATA = 0x8,
-        VIDEO_DATA = 0x9,
-        UNKNOWN3 = 0xa,
-        NOTIFY = 0x12,
-        SHARED_OBJ = 0x13,
-        INVOKE = 0x14,
-	FLV_DATA = 0x16
+        NONE         = 0x0,
+        CHUNK_SIZE   = 0x1,
+        ABORT        = 0x2,
+        BYTES_READ   = 0x3,
+        USER         = 0x4,
+        WINDOW_SIZE  = 0x5,
+        SET_BANDWITH = 0x6,
+        ROUTE        = 0x7,
+        AUDIO_DATA   = 0x8,
+        VIDEO_DATA   = 0x9,
+        SHARED_OBJ   = 0xa,
+	AMF3_NOTIFY  = 0xf,
+	AMF3_SHARED_OBJ = 0x10,
+	AMF3_INVOKE  = 0x11,
+        NOTIFY       = 0x12,
+        INVOKE       = 0x14,
+	FLV_DATA     = 0x16,
     } content_types_e;
-     typedef enum {
-         CREATE = 0x1,		// Client sends event
-         DELETE_OBJ = 0x2,	// Client sends event
-         REQUEST_CHANGE = 0x3,	// Client sends event
-         CHANGE = 0x4,		// Server sends event
-         SUCCESS_CLIENT = 0x5,	// Server sends event
-         SEND_MESSAGE = 0x6,	// Client sends event
-         STATUS = 0x7,		// Server sends evetn
-         CLEAR = 0x8,		// Server sends event
-         DELETE_SLOT = 0x9,	// Server sends event
-         REQUEST_DELETE_SLOT = 0xa,// Client sends event
-         SUCCESS_SERVER = 0xb	// Server sends event
+    typedef enum {
+	STREAM_START  = 0x0,
+	STREAM_EOF    = 0x1,
+	STREAM_NODATA = 0x2,
+	STREAM_BUFFER = 0x3,
+	STREAM_LIVE   = 0x4,
+	STREAM_PING   = 0x6,
+	STREAM_PONG   = 0x7
+    } user_control_e;
+    typedef enum {
+         CREATE         = 0x1,	    // Client sends event
+         DELETE         = 0x2,	    // Client sends event
+         REQUEST_CHANGE = 0x3,	    // Client sends event
+         CHANGE         = 0x4,	    // Server sends event
+         SUCCESS_CLIENT = 0x5,	    // Server sends event
+         SEND_MESSAGE   = 0x6,	    // Client sends event
+         STATUS         = 0x7,	    // Server sends evetn
+         CLEAR          = 0x8,	    // Server sends event
+         DELETE_SLOT    = 0x9,	    // Server sends event
+         REQUEST_DELETE_SLOT = 0xa, // Client sends event
+         SUCCESS_SERVER = 0xb	    // Server sends event
      } sharedobj_types_e;
     typedef enum {
 	PING_CLEAR  = 0x0,	// clear the stream
@@ -174,6 +244,11 @@ public:
 	boost::uint16_t param2;
 	boost::uint16_t param3;
     } rtmp_ping_t;
+    typedef struct {
+	user_control_e type;
+	boost::uint32_t param1;
+	boost::uint32_t param2;	// only used by 
+    } user_event_t;
     typedef enum {
         RTMP_STATE_HANDSHAKE_SEND,
         RTMP_STATE_HANDSHAKE_RECV,
@@ -191,7 +266,7 @@ public:
 // 	std::vector<boost::shared_ptr<amf::Element> > objs;
 //     } rtmp_msg_t;
     typedef enum {
-        RTMP_ERR_UNDEF=0,
+        RTMP_ERR_UNDEF,
         RTMP_ERR_NOTFOUND,
         RTMP_ERR_PERM,
         RTMP_ERR_DISKFULL,
@@ -272,6 +347,9 @@ public:
     virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
     boost::shared_ptr<rtmp_ping_t> decodePing(amf::Buffer &buf);
     
+    virtual boost::shared_ptr<user_event_t> decodeUser(boost::uint8_t *data);
+    boost::shared_ptr<user_event_t> decodeUser(amf::Buffer &buf);
+    
     // These are handlers for the various types
     virtual boost::shared_ptr<amf::Buffer> encodeChunkSize();
     virtual void decodeChunkSize();
@@ -338,6 +416,17 @@ public:
     boost::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
+
+    /// \method getTime
+    ///    The time on most systems these days is a 64 bit long, but swf
+    ///    is old, so it only uses a 32 bit integer instead. We know casting
+    ///    looses precision, but that's just the way it is in RTMP.
+    boost::uint32_t getTime() {
+	time_t t;
+	time(&t);
+	return boost::lexical_cast<boost::uint32_t>(t);
+    };
+
     void dump();
   protected:
     AMFProperties _properties;
@@ -348,6 +437,8 @@ public:
     int         _mystery_word;
     size_t	_chunksize[MAX_AMF_INDEXES];
     size_t	_lastsize[MAX_AMF_INDEXES];
+    std::vector<size_t> _bodysize;
+    std::vector<content_types_e> _type;
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
 //    queues_t    _channels;

@@ -171,4 +171,21 @@ onMetaData #5	<- flv file
 .Reset 12 bytes
 .Play  8 bytes
 
+-----------------------------------------------------------
+The main process also handles communication with other Cygnal instances.
 
+Invoke and SharedObjects are sent to the cgi-bin. SharedObjects are
+send to all the clients connected for that sandbox by the main process.
+The main process has a map of the other server processes (usually cgi-bins)
+and multimedia streams.
+
+Video/Audio Streams are routed by the main process, and never go to the
+cgi-bin. All multimedia streams should have the abilty to add a filter
+before reading or writing the raw data.
+
+Output to clients just reads a file descriptor, and sends it. Doesn't matter
+if it's network or diskfile. File streaming should work like the cgi-bins,
+where it has to parse the NetStream and FCSSubscribe messages.
+
+Should add a pass-through mode, where messages can be routed to another machine
+and port, like Red5 for their server side applications.

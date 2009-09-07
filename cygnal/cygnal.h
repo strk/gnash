@@ -18,23 +18,82 @@
 #ifndef __CYGNAL_H__
 #define __CYGNAL_H__
 
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <vector>
+#include <string>
+#include <map>
+
+#include "extension.h"
+#include "handler.h"
+
 /// \namespace cygnal
 ///
 /// This namespace is for all the Cygnal specific classes not used by
 /// anything else in Gnash.
-namespace cygnal {
+namespace cygnal {    
+
+/// \class cygnal::Cygnal
     
+class Cygnal
+{
+public:
+    typedef Handler::cygnal_init_t (*initentry_t)();
+    
+    typedef struct {
+	std::string hostname;
+	short	    port;
+	bool        connected;
+	int         fd;
+	gnash::Network::protocols_supported_e protocol;
+	std::vector<std::string> supported;
+    } peer_t;
+    static Cygnal& getDefaultInstance();
+    ~Cygnal();
+
+    bool loadPeersFile();
+    bool loadPeersFile(const std::string &filespec);
+
+    void probePeers();
+    void probePeers(peer_t &peer);
+    void probePeers(boost::shared_ptr<peer_t> peer);
+    void probePeers(std::vector<boost::shared_ptr<peer_t> > &peers);
+
+    void addHandler(const std::string &path, boost::shared_ptr<Handler> x) {
+ 	_handlers[path] = x;
+    };
+
+    boost::shared_ptr<Handler> findHandler(const std::string &path);
+    void removeHandler(const std::string &path);
+
+    std::vector<boost::shared_ptr<peer_t> > & getActive() { return _active_peers; };
+
+    void dump();
+
+private:
+    void addPeer(boost::shared_ptr<peer_t> x) {
+ 	_peers.push_back(x);
+    };
+
+    std::vector<boost::shared_ptr<peer_t> > _peers;
+    std::vector<boost::shared_ptr<peer_t> > _active_peers;
+    std::map<std::string, boost::shared_ptr<Handler> > _handlers;
+    boost::mutex _mutex;
+};
+
 /// \class cygnal::ThreadCounter of threads currently
 ///     active. This is primarily so the counter can be wrapped with a
 ///     mutex to be thread safe, as threads delete themseleves.
 class ThreadCounter
 {
-  public:
+public:
+
     ThreadCounter() : _tids(0) {};
     void increment() { boost::mutex::scoped_lock lk(_tid_mutex); ++_tids; };
     void decrement() { boost::mutex::scoped_lock lk(_tid_mutex); --_tids; };
     int num_of_tids() { return _tids; };
-  private:
+private:
     boost::mutex  _tid_mutex;
     int           _tids;
     boost::thread _tid_handle;

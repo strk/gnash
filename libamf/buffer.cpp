@@ -157,7 +157,7 @@ Buffer::Buffer(size_t nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     _nbytes = nbytes;
-    init(nbytes);
+    init(_nbytes);
 }
 
 /// \brief Create a new Buffer with a hex string.

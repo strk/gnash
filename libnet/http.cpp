@@ -431,7 +431,7 @@ HTTP::processGetRequest(int fd)
     // See if the file is in the cache and already opened.
     boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
     if (filestream) {
-	cerr << "FIXME: found file in cache!" << endl;
+	log_network("FIXME: found file in cache!");
     } else {
 	filestream.reset(new DiskStream);
 //	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
@@ -1150,8 +1150,8 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
     // FIXME: this is a hack ! Calculate a real size!
     formatContentLength(size+29);
     
-    // Pretend to be Red5 server
-    formatServer("Jetty(6.1.7)");
+    // Don't pretend to be the Red5 server
+    formatServer("Cygnal (0.8.6)");
     
     // All HTTP messages are followed by a blank line.
     terminateHeader();

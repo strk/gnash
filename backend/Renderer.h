@@ -400,11 +400,15 @@ public:
     {
         if ((worldbounds.isNull() || worldbounds.isWorld())) return worldbounds;
 
-        return world_to_pixel(rect(worldbounds.getMinX(),
-                    worldbounds.getMinY(), worldbounds.getMaxX(),
-                    worldbounds.getMaxY()));    
+	// We always get compiler warnings on casting floats to int
+	// here, so we cast it ourselves to get rid of the warning
+	// message. Note that in both cases this rounds the float to
+	// an integer by dropping the decimal part.
+        return world_to_pixel(rect(static_cast<int>(worldbounds.getMinX()),
+				   static_cast<int>(worldbounds.getMinY()),
+				   static_cast<int>(worldbounds.getMaxX()),
+				   static_cast<int>(worldbounds.getMaxY())));
     }
-    
         
     /// \brief
     /// Checks if the given bounds are (partially) in the current drawing

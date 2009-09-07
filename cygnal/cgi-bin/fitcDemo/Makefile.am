@@ -18,11 +18,9 @@
 AUTOMAKE_OPTIONS = 
 
 # this is where Gnash plugins get installed
-cgidir = $(libdir)/cygnal/plugins
+cgidir = $(libdir)/cygnal
 
-bin_PROGRAMS = gateway
-
-cgi_LTLIBRARIES = echo.la
+cgi_LTLIBRARIES = fitcDemo.la
 
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
@@ -41,14 +39,9 @@ INCLUDES = \
 	-I$(top_srcdir)/cygnal \
 	$(BOOST_CFLAGS)
 
-echo_la_SOURCES = echo.cpp echo.h
-echo_la_LDFLAGS = -module -avoid-version -no-undefined
-echo_la_LIBADD  =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
-
-gateway_SOURCES = gateway.cpp echo.h 
-gateway_LDFLAGS = # -module -avoid-version -no-undefined
-gateway_LDADD   = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
-
+fitcDemo_la_SOURCES = fitcDemo.cpp fitcDemo.h
+fitcDemo_la_LDFLAGS = -module -avoid-version -no-undefined
+fitcDemo_la_LIBADD  =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
 CLEANFILES = \
       gnash-dbg.log

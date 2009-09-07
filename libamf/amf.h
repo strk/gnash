@@ -146,7 +146,8 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeString(boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeString(boost::uint8_t *data,
+						  size_t size);
 
     /// Encode a String object to its serialized representation.
     //
@@ -192,7 +193,8 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeXMLObject(const boost::uint8_t *data, size_t nbytes);
+    static boost::shared_ptr<Buffer> encodeXMLObject(const boost::uint8_t *data,
+						     size_t nbytes);
 
     /// Encode a Typed Object to its serialized representation.
     //
@@ -222,7 +224,8 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeMovieClip(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeMovieClip(const boost::uint8_t *data,
+						     size_t size);
 
     /// Encode an ECMA Array to its serialized representation.
     //
@@ -245,7 +248,8 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeLongString(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeLongString(const boost::uint8_t *data,
+						      size_t size);
 
     /// Encode a Record Set to its serialized representation.
     //
@@ -255,7 +259,8 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeRecordSet(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeRecordSet(const boost::uint8_t *data,
+						     size_t size);
 
     /// Encode a Date to its serialized representation.
     //

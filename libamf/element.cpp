@@ -467,15 +467,20 @@ Element::encode(bool notobject)
 //    GNASH_REPORT_FUNCTION;
     size_t size = 0;
     boost::shared_ptr<Buffer> buf;
+
     if (_type == Element::OBJECT_AMF0) {
 	// Calculate the total size of the output buffer
 	// needed to hold the encoded properties
+	if (_name) {
+	    size = getNameSize() + AMF_HEADER_SIZE;
+	}
 	for (size_t i=0; i<_properties.size(); i++) {
 	    size += _properties[i]->getDataSize();
 	    size += _properties[i]->getNameSize();
 	    size += AMF_PROP_HEADER_SIZE;
 	}
-	buf.reset(new Buffer(size+24)); // FIXME: why are we several bytes off ?
+	log_debug("Size of Element \"%s\" is: %d", _name, size);
+	buf.reset(new Buffer(size+AMF_PROP_HEADER_SIZE));
 	if (!notobject) {
 	    *buf = Element::OBJECT_AMF0;
 	}

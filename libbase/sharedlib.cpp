@@ -59,6 +59,7 @@ lt_dlhandle lt_dlopenext       (const char *filename);
 # define PLUGINSDIR "./"
 #endif
 
+using namespace std;
 
 namespace gnash {
 
@@ -73,7 +74,12 @@ SharedLib::SharedLib()
 
 SharedLib::SharedLib(const std::string& filespec)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+}
+
+SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
+{
+    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
@@ -88,13 +94,16 @@ SharedLib::SharedLib(const std::string& filespec)
 //     } else {
 //         log_debug ("Initialized ltdl");
     }
-    std::string pluginsdir = PLUGINSDIR;
     
-    char *env = std::getenv ("GNASH_PLUGINS");
-    if (env) pluginsdir = env;
-   
-
-    lt_dlsetsearchpath(pluginsdir.c_str());
+    string pluginsdir;
+    char *env = std::getenv (envvar.c_str());
+    if (env) {
+        pluginsdir = env;
+    } else {
+        pluginsdir = PLUGINSDIR;
+    }
+    
+    // lt_dladdsearchdir(pluginsdir.c_str());
 }
 
 SharedLib::~SharedLib()
@@ -159,7 +168,7 @@ SharedLib::openLib (const std::string& filespec)
 SharedLib::initentry *
 SharedLib::getInitEntry (const std::string& symbol)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
     scoped_lock lock(_libMutex);

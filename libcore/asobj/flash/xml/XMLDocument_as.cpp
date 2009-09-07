@@ -725,7 +725,7 @@ xml_status(const fn_call& fn)
                     std::numeric_limits<boost::int32_t>::min()));
     }
 
-    ptr->setStatus(static_cast<XMLDocument_as::ParseStatus>(status));
+    ptr->setStatus(static_cast<XMLDocument_as::ParseStatus>(int(status)));
     return as_value();
 }
 

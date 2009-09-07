@@ -277,7 +277,7 @@ Network::newConnection(bool block, int fd)
         return -1;
     }
     if (_debug) {
-	log_debug(_("Trying to accept net traffic on fd #%d for port %d"), fd, _port);
+	log_debug(_("Waiting to accept net traffic on fd #%d for port %d"), fd, _port);
     }
 
 #ifdef HAVE_PSELECT
@@ -605,13 +605,20 @@ Network::createClient(const string &hostname, short port)
 #else
             ::shutdown(_sockfd, SHUT_RDWR);
 #endif
+	    ::close(_sockfd);
             _sockfd = -1;
             return false;
         }
 
         if (ret == 0) {
+#ifdef HAVE_WINSOCK_H
+            ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+#else
+            ::shutdown(_sockfd, SHUT_RDWR);
+#endif
             log_error(_("The connect() socket for fd %d timed out waiting "
                         "to write"), _sockfd);
+	    ::close(_sockfd);
             continue;
         }
 
@@ -633,6 +640,12 @@ Network::createClient(const string &hostname, short port)
             if (ret == -1) {
                 log_error(_("The connect() socket for fd %d never was "
                             "available for writing"), _sockfd);
+#ifdef HAVE_WINSOCK_H
+		::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+#else
+		::shutdown(_sockfd, SHUT_RDWR);
+#endif
+		::close(_sockfd);
                 _sockfd = -1;
                 assert(!_connected);
                 return false;
@@ -765,6 +778,7 @@ Network::readNet()
 int
 Network::readNet(int fd, amf::Buffer &buffer)
 {
+//    GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), _timeout);
     if (ret > 0) {
 	buffer.resize(ret);
@@ -797,7 +811,7 @@ Network::readNet(amf::Buffer &buffer, int timeout)
 int
 Network::readNet(int fd, amf::Buffer &buffer, int timeout)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), timeout);
     buffer.setSeekPointer(ret);
 #if 0
@@ -1350,27 +1364,32 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 fd_set
 Network::waitForNetData(vector<int> &data)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
+    int max = 0;
+    
     fd_set fdset;
     FD_ZERO(&fdset);
     
     for (size_t i = 0; i<data.size(); i++) {
 	FD_SET(data[i], &fdset);
+	if (data[i] > max) {
+	    max = data[i];
+	}
     }
 
-    return waitForNetData(data.size(), fdset);
+    return waitForNetData(max+1, fdset);
 }
 
 fd_set
 Network::waitForNetData(int limit, fd_set files)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
-    // select modifies this the set of file descriptors, and we don't
+    // select modifies the set of file descriptors, and we don't
     // want to modify the one passed as an argument, so we make a copy.
     fd_set fdset = files;
-    
+
     // Reset the timeout value, since select modifies it on return
     int timeout = _timeout;
     if (timeout <= 0) {
@@ -1381,8 +1400,8 @@ Network::waitForNetData(int limit, fd_set files)
     sigset_t pending, sigmask;
     sigprocmask(SIG_BLOCK, &sigmask, NULL);
 
-    tval.tv_sec = timeout;
-    tval.tv_nsec = 0;
+    tval.tv_sec = 0;
+    tval.tv_nsec = timeout * 1000;
     int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
     sigpending(&pending);
     if (sigismember(&pending, SIGINT)) {
@@ -1396,9 +1415,9 @@ Network::waitForNetData(int limit, fd_set files)
 	sigwait(&sigmask, &sig);
     }
 #else
-    struct timeval        tval;
-    tval.tv_sec = timeout;
-    tval.tv_usec = 0;
+    struct timeval tval;
+    tval.tv_sec = 0;
+    tval.tv_usec = timeout;
     int ret = select(limit+1, &fdset, NULL, NULL, &tval);
     FD_ZERO(&fdset);
 #endif
@@ -1412,9 +1431,11 @@ Network::waitForNetData(int limit, fd_set files)
     }
     
     if (ret == 0) {
-	log_debug (_("Waiting for data for fdset, timed out waiting for data"));
+	// log_debug (_("Waiting for data for fdset, timed out waiting for data"));
 	FD_ZERO(&fdset);
     }
+
+    log_network("select() saw activity on %d file descriptors.", ret);
 
     return fdset;
 }

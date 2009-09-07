@@ -1,4 +1,4 @@
-// Red5 server side support for the echo_test via RTMP
+// Red5 server side support for the fitcDemo_test via RTMP
 // 
 //   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -34,7 +34,7 @@
 #include "element.h"
 
 // cygnal headers
-#include "echo.h"
+#include "fitcDemo.h"
 #include "cygnal.h"
 #include "handler.h"
 
@@ -50,54 +50,55 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
 
-static EchoTest echo;
+static FitcDemoTest fitcDemo;
 	
 extern "C" {
     
-    // the standard API
     boost::shared_ptr<Handler::cygnal_init_t>
-    echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
+    fitcDemo_class_init()
     {
 	GNASH_REPORT_FUNCTION;
+        // the standard API
+        
         boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
+//     init.read_func = read_func;
+//     init.write_func = write_func;
         
-        if (msg) {
-            echo.setNetConnection(msg);
-        } else {
-            log_error("No NetConnection message supplied to Echo Test!");
-        }
-        
-        init->version = "Echo Test 0.1 (Gnash)";
-        init->description = "echo test for Cygnal.\n"
-            "\tThis supplies the server side functionality equired for\n"
-            "\tCygnal to handle the Red5 Echo test"; 
         return init;
     }
 
-    boost::shared_ptr<amf::Buffer> echo_read_func()
+    size_t fitcDemo_read_func(boost::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 	
-	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
+	size_t safe = 0;
+	boost::shared_ptr<amf::Buffer> buf = fitcDemo.getResponse();
 
+	if (size < buf->allocated()) {
+	    safe = buf->allocated();
+	} else {
+	    safe = size;
+	}
+	std::copy(buf->begin(), buf->begin() + safe, data);
+	
 // 	log_network("%s", hexify(data, safe, true));
 
-        return buf;
+        return buf->allocated();
 	    
 //         GNASH_REPORT_RETURN;
     }
 
-    size_t echo_write_func(boost::uint8_t *data, size_t size)
+    size_t fitcDemo_write_func(boost::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 
-	boost::shared_ptr<amf::Buffer> buf = echo.getResponse();
+	boost::shared_ptr<amf::Buffer> buf = fitcDemo.getResponse();
 
         vector<boost::shared_ptr<amf::Element> > request =
-	    echo.parseEchoRequest(data, size);
+	    fitcDemo.parseFitcDemoRequest(data, size);
         if (request[3]) {
-            buf = echo.formatEchoResponse(request[1]->to_number(), *request[3]);
-            echo.setResponse(buf);
+            buf = fitcDemo.formatFitcDemoResponse(request[1]->to_number(), *request[3]);
+            fitcDemo.setResponse(buf);
 	}
 
 // 	log_network("%s", hexify(buf->reference(), buf->allocated(), true));
@@ -115,7 +116,7 @@ main(int argc, char *argv[])
     int port = CGIBIN_PORT;
     bool done = false;
     
-    dbglogfile.setLogFilename("echo-test.log");
+    dbglogfile.setLogFilename("fitcDemo-test.log");
 //    dbglogfile.setWriteDisk(true);
 
     const Arg_parser::Option opts[] =
@@ -166,7 +167,7 @@ main(int argc, char *argv[])
         }
     }
 
-    EchoTest net;
+    FitcDemoTest net;
     int netfd;
     
     if (infile.empty()) {
@@ -194,41 +195,41 @@ main(int argc, char *argv[])
             }
         }
         
-        vector<boost::shared_ptr<amf::Element> > request = net.parseEchoRequest(
+        vector<boost::shared_ptr<amf::Element> > request = net.parseFitcDemoRequest(
             bufptr->reference(), bufptr->allocated());
         if (request[3]) {
-            boost::shared_ptr<amf::Buffer> result = net.formatEchoResponse(request[1]->to_number(), *request[3]);
+            boost::shared_ptr<amf::Buffer> result = net.formatFitcDemoResponse(request[1]->to_number(), *request[3]);
             if (net.writeNet(netfd, *result)) {
-                log_debug("Sent echo test response response to client.");
+                log_debug("Sent fitcDemo test response response to client.");
             }
         } else {
-            log_error("Couldn't send echo test response to client!");
+            log_error("Couldn't send fitcDemo test response to client!");
             done = true;
         }
     } while (!done);
 }
 
-EchoTest::EchoTest()
+FitcDemoTest::FitcDemoTest()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-EchoTest::~EchoTest()
+FitcDemoTest::~FitcDemoTest()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-// Parse an Echo Request message coming from the Red5 echo_test. This
+// Parse an FitcDemo Request message coming from the Red5 fitcDemo_test. This
 // method should only be used for testing purposes.
 vector<boost::shared_ptr<amf::Element > >
-EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
+FitcDemoTest::parseFitcDemoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
     AMF amf;
     vector<boost::shared_ptr<amf::Element > > headers;
 
-    // The first element is the name of the test, 'echo'
+    // The first element is the name of the test, 'fitcDemo'
     boost::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el1);
@@ -246,7 +247,7 @@ EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
     // This one has always been an NULL or Undefined object from my tests
     boost::shared_ptr<amf::Element> el4 = amf.extractAMF(ptr, ptr+size);
     if (!el4) {
-	log_error("Couldn't reliably extract the echo data!");
+	log_error("Couldn't reliably extract the fitcDemo data!");
     }
     ptr += amf.totalsize();
     headers.push_back(el4);
@@ -254,17 +255,17 @@ EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
     return headers;
 }
 
-// format a response to the 'echo' test used for testing Gnash. This
+// format a response to the 'fitcDemo' test used for testing Gnash. This
 // is only used for testing by developers. The format appears to be
 // a string '_result', followed by the number of the test, and then two
 // NULL objects.
 boost::shared_ptr<amf::Buffer>
-EchoTest::formatEchoResponse(double num, amf::Element &el)
+FitcDemoTest::formatFitcDemoResponse(double num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
     if (data) {
-	return formatEchoResponse(num, data->reference(), data->allocated());
+	return formatFitcDemoResponse(num, data->reference(), data->allocated());
     } else {
 	log_error("Couldn't encode element: %s", el.getName());
 	el.dump();
@@ -274,20 +275,20 @@ EchoTest::formatEchoResponse(double num, amf::Element &el)
 }
 
 boost::shared_ptr<amf::Buffer>
-EchoTest::formatEchoResponse(double num, amf::Buffer &data)
+FitcDemoTest::formatFitcDemoResponse(double num, amf::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    return formatEchoResponse(num, data.reference(), data.allocated());
+    return formatFitcDemoResponse(num, data.reference(), data.allocated());
 }
 
 boost::shared_ptr<amf::Buffer>
-EchoTest::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
+FitcDemoTest::formatFitcDemoResponse(double num, boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
     string result = "_result";
-    Element echo;
-    echo.makeString(result);
+    Element fitcDemo;
+    fitcDemo.makeString(result);
 
     Element index;
     index.makeNumber(num);
@@ -295,15 +296,15 @@ EchoTest::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
     Element null;
     null.makeNull();
 
-    boost::shared_ptr<amf::Buffer> encecho = echo.encode();
+    boost::shared_ptr<amf::Buffer> encfitcDemo = fitcDemo.encode();
     boost::shared_ptr<amf::Buffer> encidx  = index.encode();   
     boost::shared_ptr<amf::Buffer> encnull  = null.encode();   
 
-    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(encecho->size()
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(encfitcDemo->size()
 						       + encidx->size()
 						       + encnull->size() + size));
 
-    *buf = encecho;
+    *buf = encfitcDemo;
     *buf += encidx;
     *buf += encnull;
     buf->append(data, size);
@@ -323,8 +324,3 @@ usage (void)
 	 << _("  -p,  --netdebug      port for network") << endl
          << endl;
 }
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:

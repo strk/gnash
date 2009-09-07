@@ -30,7 +30,17 @@
 #include <list>
 #include <map>
 #include <vector>
+#if defined(WIN32) || defined(_WIN32)
+# define LIBLTDL_DLL_IMPORT 1
+#endif
+#ifdef HAVE_DLFCN_H
+# include <dlfcn.h>
+#endif
+#ifdef HAVE_LIBGEN_H
+# include <libgen.h>
+#endif
 
+#include "ltdl.h"
 #include "log.h"
 #include "network.h"
 #include "buffer.h"
@@ -51,7 +61,9 @@ namespace cygnal
 map<int, Handler *> DSOEXPORT handlers;
 
 Handler::Handler()
-    : _in_fd(0)
+    : _streams(2),		// streams 0 and 1 appear to be
+				// reserved by the system.      
+      _in_fd(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -62,17 +74,277 @@ Handler::~Handler()
 }
 
 bool
-Handler::sync(int in_fd)
+Handler::sync(int /* in_fd */)
 {
 //    GNASH_REPORT_FUNCTION;
 
+    return false;
+}
+
+size_t
+Handler::addClient(int x, Network::protocols_supported_e proto)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_mutex);
+    _clients.push_back(x);
+    _protocol[x] = proto;
+    
+    return _clients.size();
+};
+
+void
+Handler::removeClient(int x)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_mutex);
+    _clients.erase(_clients.begin()+x);
+}
+
+void 
+Handler::setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &/* init */)
+{
+//    GNASH_REPORT_FUNCTION;
+//     _plugin.reset(init.get());
+}
+
+void
+Handler::setPlugin(Handler::cygnal_io_t /* read_ptr */, Handler::cygnal_io_t /* write_ptr */)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    _plugin.reset(new Handler::cygnal_init_t);
+}
+
+boost::shared_ptr<Handler::cygnal_init_t>
+Handler::initModule(const std::string& module)
+{
+    GNASH_REPORT_FUNCTION;
+
+    SharedLib *sl;
+    std::string symbol(module);
+
+    _pluginsdir = PLUGINSDIR;
+    log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
+    
+    // Update the list of loaded plugins so we only load them once.
+    if (_plugins[module] == 0) {
+        sl = new SharedLib(module, "CYGNAL_PLUGINS");
+	lt_dlsetsearchpath(_pluginsdir.c_str());
+        sl->openLib();
+        _plugins[module] = sl;
+    } else {
+        sl = _plugins[module];
+    }
+
+    _plugin.reset(new Handler::cygnal_init_t);
+
+    symbol = module;
+    symbol.append("_init_func");
+    Handler::cygnal_io_init_t init_symptr = reinterpret_cast<Handler::cygnal_io_init_t>
+	(sl->getInitEntry(symbol));
+    if (!init_symptr) {
+	log_network(_("No %s symbol in plugin"), symbol);
+    } else {
+	boost::shared_ptr<cygnal_init_t> info = init_symptr(_netconnect);
+	log_network("Initialized Plugin: \"%s\": %s", info->version,
+		    info->description);
+    }
+    
+    // Look for the "module"_read_init function we'll use to get data
+    // from the cgi-bin as a dynamically loadable plugin.
+    symbol = module;
+    symbol.append("_read_func");
+    
+    Handler::cygnal_io_read_t read_symptr = reinterpret_cast<Handler::cygnal_io_read_t>
+	(sl->getInitEntry(symbol));
+
+     if (!read_symptr) {    
+         log_error(_("Couldn't get %s symbol"), symbol);
+	 _plugin.reset();
+ 	 return _plugin;
+     }
+
+     _plugin->read_func = read_symptr;
+
+     // Look for the "module"_write_init function we'll use to send data
+     // to the cgi-bin as a dynamically loadable plugin.
+     symbol = module;
+     symbol.append("_write_func");
+     Handler::cygnal_io_t write_symptr = reinterpret_cast<Handler::cygnal_io_t>
+	(sl->getInitEntry(symbol));
+
+     if (!write_symptr) {    
+         log_error(_("Couldn't get %s symbol"), symbol);
+	 _plugin.reset();
+	 return _plugin;
+     }
+
+     _plugin->write_func = write_symptr;
+
+    return _plugin;
+}
+
+size_t
+Handler::writeToPlugin(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+
+    size_t ret = 0;
+    if (_plugin) {
+	ret = _plugin->write_func(data, size);
+    }
+
+    return ret;
+}
+
+boost::shared_ptr<amf::Buffer>
+Handler::readFromPlugin()
+{
+    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf;
+    if (_plugin) {
+	buf = _plugin->read_func();
+    }
+
+    return buf;
+}
+
+bool 
+Handler::initialized()
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_files.empty()
+	&& (_clients.size() == 1)
+	&& !_local
+	&& _remote.empty()
+	&& !_plugin) {
+	return false;
+    }
+
+    return true;
+}
+
+int 
+Handler::createStream()
+{
+    GNASH_REPORT_FUNCTION;
+
+    return createStream("");
+}
+
+int
+Handler::createStream(const std::string &filespec)
+{
+    GNASH_REPORT_FUNCTION;
+
+    int streamid = _streams;
+
+    if (filespec.empty()) {
+	return -1;
+    }
+    _streams++;
+    return streamid;
+}
+
+int
+Handler::playStream()
+{
+    GNASH_REPORT_FUNCTION;
+
+    return -1;
+}
+
+int
+Handler::playStream(const std::string &/* filespec */)
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Publish a live RTMP stream
+int
+Handler::publishStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return publishStream("", Handler::LIVE);
+}
+
+int
+Handler::publishStream(const std::string &/*filespec */, Handler::pub_stream_e /* op
+									   */)
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Seek within the RTMP stream
+int
+Handler::seekStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+int
+Handler::seekStream(int /* offset */)
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Pause the RTMP stream
+int
+Handler::pauseStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Pause the RTMP stream
+int
+Handler::togglePause()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Resume the paused RTMP stream
+int
+Handler::resumeStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
+}
+
+// Close the RTMP stream
+int
+Handler::closeStream()
+{
+    GNASH_REPORT_FUNCTION;
+    return -1;
 }
 
 // Dump internal data.
 void
 Handler::dump()
 {
+    const char *proto_str[] = {
+	"NONE",
+	"HTTP",
+	"HTTPS",
+	"RTMP",
+	"RTMPT",
+	"RTMPTS",
+	"RTMPE",
+	"RTMPS",
+	"DTN"
+    };
+
 //    GNASH_REPORT_FUNCTION;
+    for (size_t i = 0; i < _clients.size(); i++) {
+	cerr << "Client on fd #" << _clients[i] << " is using  "
+	     << proto_str[_protocol[i]] << endl;
+    }
 }
 
 } // end of gnash namespace

@@ -17,7 +17,9 @@ BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel glib2-devel
 BuildRequires:  atk-devel pango-devel
 BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
-BuildRequires:  SDL-devel
+BuildRequires:  SDL-devel pygtk2-devel libungif-devel
+BuildRequires:  gstreamer-devel openssl-devel gstreamer-plugins-base-deve
+
 # YellowDog doesn't ship ffmpeg
 %if %{distribution} != "ydl6"
 BuildRequires:  ffmpeg-devel

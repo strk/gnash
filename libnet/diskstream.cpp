@@ -231,11 +231,11 @@ DiskStream::DiskStream(const string &str, amf::Buffer &buf)
     _pagesize = si.dwPageSize;
 #else
 #ifdef __amigaos4__
-	uint32 PageSize;
-
-	IExec->GetCPUInfoTags(
-               GCIT_ExecPageSize, &PageSize, 
-               TAG_DONE);
+    uint32 PageSize;
+    
+    IExec->GetCPUInfoTags(
+	GCIT_ExecPageSize, &PageSize, 
+	TAG_DONE);
     _pagesize = PageSize;
 #else
 #error "Need to define the memory page size without sysconf()!"

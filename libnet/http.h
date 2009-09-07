@@ -301,6 +301,8 @@ public:
     size_t DSOEXPORT sizeChunks() { return _que.size(); };
 
     boost::shared_ptr<amf::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
+
+    http_method_e getOperation() { return _cmd; };
     
 protected:
     // Examine the beginning of the data for an HTTP request command

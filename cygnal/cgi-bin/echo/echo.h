@@ -32,9 +32,11 @@
 #include "buffer.h"
 #include "element.h"
 #include "http.h"
+#include "cygnal.h"
 
 // cygnal headers
 #include "rtmp_server.h"
+#include "handler.h"
 
 namespace cygnal
 {
@@ -54,9 +56,32 @@ public:
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Element &el);
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Buffer &data);
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);
-private:
+
+    boost::shared_ptr<amf::Buffer> getResponse() { return _response; };
+    void setResponse(boost::shared_ptr<amf::Buffer> &x) { _response = x; };
+
+    void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
+    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
     
+private:
+    boost::shared_ptr<amf::Buffer> _response;    
+    boost::shared_ptr<Handler::cygnal_init_t> _info;
+    /// \var _netconnect
+    ///    This store the data from the NetConnection ActionScript
+    ///    object we get as the final part of the handshake process
+    ///    that is used to set up the connection. This has all the
+    ///    file paths and other information needed by the server.
+    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;    
 };  
+
+// the standard API
+extern "C" {
+    boost::shared_ptr<Handler::cygnal_init_t>echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
+    
+    boost::shared_ptr<amf::Buffer> echo_read_func();
+    size_t echo_write_func(boost::uint8_t *data, size_t size);
+}
 
 } // end of cygnal namespace
 #endif  // end of __ECHO_H__

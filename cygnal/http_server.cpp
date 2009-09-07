@@ -616,8 +616,8 @@ HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, siz
     // FIXME: this is a hack ! Calculate a real size!
     formatContentLength(size+29);
     
-    // Pretend to be Red5 server
-    formatServer("Jetty(6.1.7)");
+    // Don't pretend to be the Red5 server
+    formatServer("Cygnal (0.8.6)");
     
     // All HTTPServer messages are followed by a blank line.
     terminateHeader();
@@ -962,8 +962,8 @@ extern "C" {
 bool
 http_handler(Network::thread_params_t *args)
 {
-//    GNASH_REPORT_FUNCTION;
-//    struct thread_params thread_data;
+    GNASH_REPORT_FUNCTION;
+
     string url, filespec, parameters;
     HTTPServer *www = new HTTPServer;
     bool result = false;
@@ -972,15 +972,14 @@ http_handler(Network::thread_params_t *args)
     bool done = false;
 //    www.setHandler(net);
 
-    log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
+    log_network(_("Starting HTTP Handler for fd #%d, tid %d"),
+	      args->netfd, args->tid);
     
-    string docroot = args->filespec;
+    www->setDocRoot(crcfile.getDocumentRoot());
 
-//     cgis.setDocroot(args->filespec);
-    
-    www->setDocRoot(docroot);
-    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
+    log_network("Docroot for HTTP files is %s", crcfile.getDocumentRoot());
+
+    log_network("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
     do {

@@ -24,16 +24,16 @@ if TESTSUITE
 TEST_DIR = #testsuite
 endif
 
-if USE_CGI
+#if USE_CGI
 CGI_DIR = cgi-bin
-endif
+#endif
 
 EXTRA_DIST = cygnalrc.in
 CLEANFILES = cygnalrc
 
-SUBDIRS = \
-	$(TEST_DIR) \
-	$(CGI_BIN)
+SUBDIRS = . \
+	$(CGI_DIR) \
+	$(TEST_DIR)
 
 # these need to be included in a distribution, even if not part
 # of the top level configure options.
@@ -41,7 +41,10 @@ DIST_SUBDIRS  = testsuite cgi-bin
 
 sysconf_DATA = cygnalrc
 
-AM_CPPFLAGS = # -Wall
+# this is where Cygnal plugins get installed
+pluginsdir = $(libdir)/cygnal/plugins
+
+AM_CPPFLAGS = 	-DPLUGINSDIR=\"$(pluginsdir)\"
 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \

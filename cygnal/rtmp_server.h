@@ -40,9 +40,17 @@ class RTMPServer : public gnash::RTMP
 public:
     RTMPServer();
     ~RTMPServer();
-//    bool processClientHandShake(int fd, amf::Buffer &buf);
-    bool handShakeResponse(int fd, amf::Buffer &buf);
-    boost::shared_ptr<amf::Buffer> serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake2);
+
+    /// \method 
+    ///     This method is called after the initial network connection
+    ///     is established. It reads in the handshake from the client,
+    ///     responds appropriately, and then extracts the initial AMF
+    ///     object, which is always of type NetConnection, doing an
+    ///     INVOKE operation of ::connect(). serverFinish() is
+    ///     actually used to extract the AMF data from the packet, and
+    ///     handShakeResponse() is used to construct the response packet.
+    boost::shared_ptr<amf::Element> processClientHandShake(int fd);
+
     bool packetSend(amf::Buffer &buf);
     bool packetRead(amf::Buffer &buf);
     
@@ -52,8 +60,13 @@ public:
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid);
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &streamid);
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid, double &clientid);
+
+    // Encode a Ping for the client
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
+
+    // Encode a onBWDone message for the client
+    boost::shared_ptr<amf::Buffer> encodeBWDone(double id);
 
     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
@@ -69,13 +82,37 @@ public:
 
     double createClientID();
     double createStreamID();
+
     void setStreamID(double id) { _streamid = id; };
     double getStreamID() { return _streamid; };
 
+    size_t sendToClient(std::vector<int> &fds, boost::uint8_t *data,
+			size_t size);
+    size_t sendToClient(std::vector<int> &fds,amf::Buffer &data);
+
+    void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
+    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
     void dump();
-  private:
+
+private:
+    /// \method serverFinish
+    ///     This is only called by processClientHandshake() to compare
+    ///     the handshakes to make sure they match, and to extract the
+    ///     initial AMF data from packet.
+    boost::shared_ptr<amf::Buffer> serverFinish(int fd,
+			amf::Buffer &handshake1, amf::Buffer &handshake2);
+    /// \method handShakeResponse
+    ///     This is only called by processClientHandshake() to
+    ///     construct the handshake response to the client.
+    bool handShakeResponse(int fd, amf::Buffer &buf);
+    
+    /// This is used by the boost tokenizer functions, and is defined
+    /// here purely for convienience.
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
+
+
     gnash::DiskStream::filetype_e  _filetype;
     std::string		_docroot;
     std::string		_filespec;
@@ -83,6 +120,12 @@ public:
     std::map<boost::uint16_t, amf::Element> _references;
     std::vector<double>	_clientids;
     double		_streamid;
+    /// \var _netconnect
+    ///    This store the data from the NetConnection ActionScript
+    ///    object we get as the final part of the handshake process
+    ///    that is used to set up the connection. This has all the
+    ///    file paths and other information needed by the server.
+    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
 };
 
 // This is the thread for all incoming RTMP connections

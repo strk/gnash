@@ -1671,6 +1671,7 @@ fi
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(memmove)
+AC_CHECK_FUNCS(scandir)         dnl supported by BSD and Linux, but you never know...
 dnl AC_CHECK_FUNC(strndup, AC_DEFINE(HAVE_STRNDUP, 1, [Has strndup()] ))
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
 dnl AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
@@ -2389,6 +2390,8 @@ plugin/win32/Makefile
 cygnal/Makefile
 cygnal/cgi-bin/Makefile
 cygnal/cgi-bin/echo/Makefile
+cygnal/cgi-bin/fitcDemo/Makefile
+cygnal/cgi-bin/oflaDemo/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
 )

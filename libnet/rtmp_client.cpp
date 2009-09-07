@@ -31,6 +31,7 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 #include "log.h"
 #include "rc.h"
 #include "amf.h"
@@ -123,7 +124,6 @@ RTMPClient::encodeConnect(const char *uri,
 
     protocol = url.protocol();
     hostname = url.hostname();
-    log_network("hostname: %s", hostname);
     portstr = url.port();
     query = url.querystring();
 
@@ -148,7 +148,7 @@ RTMPClient::encodeConnect(const char *uri,
     
     tcUrl = uri;
     app = filename;    
-    swfUrl = "mediaplayer.swf";
+    swfUrl = "http://localhost:1935/demos/videoConference.swf";
     pageUrl = "http://gnashdev.org";
     
     log_network("URL is %s", url);
@@ -202,7 +202,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     }  
 
     ElementSharedPtr flashVer(new amf::Element);
-    flashVer->makeString("flashVer", "LNX 9,0,31,0");
+    flashVer->makeString("flashVer", version);
     obj->addProperty(flashVer);
     
     ElementSharedPtr swfUrlnode(new amf::Element);
@@ -262,24 +262,51 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 }
     
 bool
-RTMPClient::connectToServer(const std::string &/* url */)
+RTMPClient::connectToServer(const std::string &url)
 {
     GNASH_REPORT_FUNCTION;
+
+    URL uri(url);
 
     // If we're currently not connected, build and send the
     // initial handshake packet.
     if (connected() == false) {
-	createClient();
+	short port = strtol(uri.port().c_str(), NULL, 0) & 0xffff;
+	if (!createClient(uri.hostname(), port)) {
+	    return false;
+	}
 
 	// Build the NetConnection Packet, which seems to need
 	// to be on the end of the second block of handshake data.
 	// We build this here so we can get the total encoded
 	// size of the object.
 	boost::shared_ptr<amf::Buffer> ncbuf = encodeConnect();
+
+	// As at this point we don't have an RTMP connection,
+	// we can't use the regular sendMsg(), that handles the RTMP
+	// headers for continuation packets. We know a this point it's
+	// always one by, so we just add it by hand. It doesn't matter
+	// as long as the channel number matches the one used to
+	// create the initial RTMP packet header.
+	boost::scoped_ptr<amf::Buffer> newbuf(new amf::Buffer(ncbuf->size() + 5));
+	size_t nbytes = 0;
+	size_t chunk = RTMP_VIDEO_PACKET_SIZE;
+	do {
+	    // The last packet is smaller
+	    if ((ncbuf->allocated() - nbytes) < static_cast<size_t>(RTMP_VIDEO_PACKET_SIZE)) {
+		chunk = ncbuf->allocated() - nbytes;
+	    }
+	    newbuf->append(ncbuf->reference() + nbytes, chunk);
+ 	    nbytes  += chunk;
+	    if (chunk == static_cast<size_t>(RTMP_VIDEO_PACKET_SIZE)) {
+		boost::uint8_t headone = 0xc3;
+		*newbuf += headone;
+	    }
+	} while (nbytes < ncbuf->allocated());
+
 	boost::shared_ptr<amf::Buffer> head = encodeHeader(0x3,
 			    RTMP::HEADER_12, ncbuf->allocated(),
 			    RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
-	
 
 	// Build the first handshake packet, and send it to the
 	// server.
@@ -290,19 +317,23 @@ RTMPClient::connectToServer(const std::string &/* url */)
 	}
 	
 	boost::scoped_ptr<amf::Buffer> handshake2(new amf::Buffer
-		  ((RTMP_HANDSHAKE_SIZE * 2) + ncbuf->allocated()));
-
-	*handshake2 = handshake1;
-	*handshake2 += ncbuf;
+		  ((RTMP_HANDSHAKE_SIZE * 2) + newbuf->allocated()
+		   + RTMP_MAX_HEADER_SIZE));
 
 	// Finish the handshake process, which has to have the
 	// NetConnection::connect() as part of the buffer, or Red5
 	// refuses to answer.
 	setTimeout(20);
 #if 0
+	*handshake2 = handshake1;
+	*handshake2 += head;
+ 	*handshake2 += ncbuf;
 	if (!clientFinish(*handshake2)) {
 #else
-	if (!clientFinish(*ncbuf)) {
+	*handshake2 = head;
+	handshake2->append(newbuf->reference(), newbuf->allocated());
+	handshake2->dump();
+        if (!clientFinish(*handshake2)) {
 #endif
 	    log_error("RTMP handshake completion failed!");
 //	    return (false);
@@ -533,12 +564,7 @@ RTMPClient::handShakeRequest()
     // which should always be 0x3.
     *handshake = RTMP_VERSION;
 
-    // Get the uptime for the header
-    // yes, we loose precision here but it's only a 4 byte field
-    time_t t;
-    time(&t);
-    boost::uint32_t tt = t;
-    *handshake += tt;
+    *handshake += RTMP::getTime();
 
     // This next field in the header for the RTMP handshake should be zeros
     *handshake += zero;
@@ -607,7 +633,7 @@ RTMPClient::clientFinish(amf::Buffer &data)
 	}
     } while (!done);
 
-    if (handshake1->allocated() == max_size) {
+    if (handshake1->allocated() == boost::lexical_cast<size_t>(max_size)) {
 	log_network (_("Read data block in handshake, got %d bytes."),
 		   handshake1->allocated());
     } else {
@@ -749,26 +775,26 @@ RTMPClient::recvResponse()
 		  case RTMP::CHUNK_SIZE:
 		      log_unimpl("Server message data packet");
 		      break;
-		  case RTMP::UNKNOWN:	
-		      log_unimpl("Unknown data packet");
+		  case RTMP::ABORT:
+		      log_unimpl("Abort packet");
 		      break;
 		  case RTMP::BYTES_READ:
 		      log_unimpl("Bytes Read data packet");
 		      break;
-		  case RTMP::PING:
+		  case RTMP::USER:
 		  {
 		      boost::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
 		      log_network("Got a Ping type %s", ping_str[ping->type]);
 		      break;
 		  }
-		  case RTMP::SERVER:
-		      log_unimpl("Server message data packet");
+		  case RTMP::WINDOW_SIZE:
+		      log_unimpl("Set Window Size message data packet");
 		      break;
-		  case RTMP::CLIENT:
-		      log_unimpl("Client message data packet");
+		  case RTMP::SET_BANDWITH:
+		      log_unimpl("Set Bandwidthmessage data packet");
 		      break;
-		  case RTMP::UNKNOWN2:
-		      log_unimpl("Unknown2 data packet");
+		  case RTMP::ROUTE:
+		      log_unimpl("Route from other server packet");
 		      break;
 		  case RTMP::AUDIO_DATA:
 		  {
@@ -786,14 +812,20 @@ RTMPClient::recvResponse()
 		      }
 		      break;
 		  }
-		  case RTMP::UNKNOWN3:
-		      log_unimpl("Unknown3 data packet message");
+		  case RTMP::SHARED_OBJ:
+		      log_unimpl("AMF0 Shared Object data packet message");
+		      break;
+		  case RTMP::AMF3_NOTIFY:
+		      log_unimpl("AMF3 Notify data packet message");
+		      break;
+		  case RTMP::AMF3_SHARED_OBJ:
+		      log_unimpl("AMF3 Shared Object data packet message");
+		      break;
+		  case RTMP::AMF3_INVOKE:
+		      log_unimpl("AMF0 Invoke packet message");
 		      break;
 		  case RTMP::NOTIFY:
-		      log_unimpl("Notify data packet message");
-		      break;
-		  case RTMP::SHARED_OBJ:
-		      log_unimpl("Shared Object data packet message");
+		      log_unimpl("AMF0 Notify data packet message");
 		      break;
 		  case RTMP::INVOKE:
 		  {

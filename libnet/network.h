@@ -118,13 +118,27 @@ struct pollfd {
 ///	side of a network connection.
 class DSOEXPORT Network {
 public:
+    /// This enum contains the list of all supported protocols.
+    typedef enum {
+	NONE,
+	HTTP,
+	HTTPS,
+	RTMP,
+	RTMPT,
+	RTMPTS,
+	RTMPE,
+	RTMPS,
+	DTN
+    } protocols_supported_e;
     // This is used to pass parameters to a thread using boost::bind
     typedef struct {
-	int netfd;
+	int tid;
 	int port;
+	int netfd;
+	void *entry;
 	void *handler;
 	std::string filespec;
-	int tid;
+	protocols_supported_e protocol;
     } thread_params_t;
     typedef boost::uint8_t byte_t;
     typedef bool entry_t (thread_params_t *);
