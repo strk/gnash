@@ -35,6 +35,8 @@
 #include <fcntl.h>
 
 #include "gettext.h"
+#include "bzrversion.h"
+
 //#include "cvm.h"
 
 extern "C"{
@@ -448,8 +450,6 @@ main(int argc, char *argv[])
     
     if (crcfile.getDocumentRoot().size() > 0) {
         docroot = crcfile.getDocumentRoot();
-        log_network (_("Document Root for media files is: %s"),
-		       docroot);
     } else {
         docroot = "/var/www/html/software/tests/";
     }
@@ -504,6 +504,7 @@ main(int argc, char *argv[])
         }
     }
     
+    log_network (_("Document Root for media files is: %s"), docroot);
     crcfile.setDocumentRoot(docroot);
     
     // load the file of peers. A peer is another instance of Cygnal we
@@ -616,9 +617,9 @@ hup_handler (int /* sig */)
 static void
 version_and_copyright()
 {
-    cout << "Cygnal " << VERSION << endl
+    cout << "Cygnal: " << BRANCH_NICK << "_" << BRANCH_REVNO << endl
         << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.\n"
+        << _("Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.\n"
         "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute copies of Cygnal under the terms of the GNU General\n"
         "Public License V3. For more information, see the file named COPYING.\n")
