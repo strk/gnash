@@ -431,7 +431,7 @@ HTTP::processGetRequest(int fd)
     // See if the file is in the cache and already opened.
     boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
     if (filestream) {
-	cerr << "FIXME: found file in cache!" << endl;
+	log_network("FIXME: found file in cache!");
     } else {
 	filestream.reset(new DiskStream);
 //	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;

@@ -71,6 +71,7 @@ namespace {
 
 CQue incoming;
 
+
 // extern std::map<int, Handler *> handlers;
 
 const char *content_str[] = {
@@ -198,6 +199,7 @@ RTMP::RTMP()
 //    GNASH_REPORT_FUNCTION;
 
     _bodysize.resize(MAX_AMF_INDEXES);
+    _type.resize(MAX_AMF_INDEXES);
     
     // Initialize all of the queues
     for (int i=0; i<MAX_AMF_INDEXES; i++) {
@@ -210,6 +212,7 @@ RTMP::RTMP()
 	_chunksize[i] = RTMP_VIDEO_PACKET_SIZE;
 	_lastsize[i] = 0;
 	_bodysize[i] = 0;
+	_type[i] = RTMP::NONE;
     }
 }
 
@@ -323,8 +326,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
     // the bodysize is limited to two bytes, so if we think we have
     // more than that, something probably screwed up.
     if (head->bodysize > 65535) {
-	log_error("Suspicious large RTMP packet body size! %d",
-		  head->bodysize);
+	log_error("Suspicious large RTMP packet body size! %d", head->bodysize);
 	head.reset();
 	return head;
     }
@@ -332,14 +334,17 @@ RTMP::decodeHeader(boost::uint8_t *in)
     if (head->head_size >= 8) {
 	boost::uint8_t byte = *tmpptr;
         head->type = (content_types_e)byte;
+	_type[head->channel] = head->type;
         tmpptr++;
-// 	if (head->type <= RTMP::INVOKE ) {
-// 	    log_network(_("The type is: %s"), content_str[head->type]);
-// 	} else {
-// 	    log_network(_("The type is: 0x%x"), head->type);
-// 	}
+ 	// if (head->type <= RTMP::INVOKE ) {
+ 	//     log_network(_("The type is: %s"), content_str[head->type]);
+ 	// } else {
+ 	//     log_network(_("The type is: 0x%x"), head->type);
+ 	// }
     } else {
-	head->type = RTMP::NONE;
+	log_network("Using previous type of %d for channel %d",
+		    head->type, head->channel);
+	head->type = _type[head->channel];
     }
 
     if (head->head_size == 12) {
@@ -355,7 +360,6 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	      head->bodysize);
 
     return head;
-
 }
 
 /// \brief \ Each RTMP header consists of the following:
@@ -966,7 +970,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
     while (nbytes <= size) {
 	// The last bit of data is usually less than the packet size,
 	// so we write less data of course.
-	if ((size - nbytes) < static_cast<signed int>(_chunksize[channel])) {
+	if ((size - nbytes) < _chunksize[channel]) {
 	    partial = size - nbytes;
 	}
 	// After the first packet, only send the single byte

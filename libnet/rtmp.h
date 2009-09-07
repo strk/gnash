@@ -437,6 +437,7 @@ public:
     size_t	_chunksize[MAX_AMF_INDEXES];
     size_t	_lastsize[MAX_AMF_INDEXES];
     std::vector<size_t> _bodysize;
+    std::vector<content_types_e> _type;
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
 //    queues_t    _channels;

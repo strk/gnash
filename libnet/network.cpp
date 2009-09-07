@@ -1363,7 +1363,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 fd_set
 Network::waitForNetData(vector<int> &data)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     int max = 0;
     
@@ -1383,7 +1383,7 @@ Network::waitForNetData(vector<int> &data)
 fd_set
 Network::waitForNetData(int limit, fd_set files)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // select modifies the set of file descriptors, and we don't
     // want to modify the one passed as an argument, so we make a copy.
