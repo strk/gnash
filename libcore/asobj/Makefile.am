@@ -123,6 +123,7 @@ endif
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashmedia.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
