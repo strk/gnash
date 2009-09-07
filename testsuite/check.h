@@ -9,8 +9,7 @@
 #include <iostream>
 #include <string>
 
-// TODO: ensure dejagnu.h defines xpass/xfail too (seems a new feature :()
-#undef HAVE_DEJAGNU_H // missing xcheck/xfail !
+#define HAVE_DEJAGNU_H 1 // we ship our own now...
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 
