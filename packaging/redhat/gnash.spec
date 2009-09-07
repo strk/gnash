@@ -1,7 +1,7 @@
 Name:           gnash
-Version:        20090213
+Version:        20090907
 Release:        1
-Distribution:	fc10
+Distribution:	fc11
 #Distribution:	ydl6
 Summary:        GNU SWF player
 
@@ -15,17 +15,19 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel glib2-devel
-BuildRequires:  atk-devel pango-devel
+BuildRequires:  atk-devel pango-devel openssl-devel
 BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
 BuildRequires:  SDL-devel pygtk2-devel libungif-devel
-BuildRequires:  gstreamer-devel openssl-devel gstreamer-plugins-base-devel
+BuildRequires:  gstreamer-devel gstreamer-ffmpeg gstreamer-plugins-base-devel
+# These are for the kde4 support
+BuildRequires:  kdelibs-devel kdebase-devel qt-devel
 
 # YellowDog doesn't ship ffmpeg
 %if %{distribution} != "ydl6"
 BuildRequires:  ffmpeg-devel
 %endif
 # Mandriva uses different names for the X11 library packages
-%if %{distribution} != "fc10"
+%if %{distribution} != "fc11"
 BuildRequires:  libx11_6-devel libxt_6-devel
 %else
 BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel 
@@ -34,7 +36,7 @@ BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel
 # Installation requirements
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
 # Mandriva uses differ names for the X11 library packages
-%if %{distribution} != "fc10"
+%if %{distribution} != "fc11"
 Requires: libx11_6 libxt_6
 %else
 Requires: libX11 libXt 
@@ -88,10 +90,21 @@ application.
 %description devel
 Gnash header files can be used to write external Gnash extensions.
 
+%package klash4
+Summary:   Konqueror SWF player plugin for KDE 4
+Requires:  %{name} = %{version}-%{release}
+Requires:  kdelibs kdelibs qt gnash
+Group:     Applications/Multimedia
+
+%description klash4
+The gnash SWF player plugin for Konqueror in KDE4.
+
 %prep
 %setup -q
 
 %build
+
+[ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
 
 # handle cross building rpms. This gets messy when building for two
 # archtectures with the same CPU type, like x86-Linux -> OLPC. We have
@@ -107,13 +120,13 @@ Gnash header files can be used to write external Gnash extensions.
 # if not defined, assume this is a native package.
 %{?do_cross_compile:%define cross_compile 0}
 
-# FIXME: this ia a bad hack! Although all this does work correctly and
+# FIXME: this is a bad hack! Although all this does work correctly and
 # build an RPM, it's set for an geode-olpc, so the actual hardware
 # won't let us install it.
 # %define cross_compile 0
 # %define olpc 0
 
-# Build rpms for an ARM based processor, in our case the Nokia 770/800
+# Build rpms for an ARM based processor, in our case the Nokia 770/800/810
 # tablet. 
 %ifarch arm
 RPM_TARGET=%{_target}
@@ -121,9 +134,7 @@ RPM_TARGET=%{_target}
 
 %if %{cross_compile}
 # cross building an RPM. This works as long as you have a good cross
-# compiler installed. We currently do want to cross compile the
-# Mozilla plugin, but not the Konqueror one till we make KDE work
-# better than it does now.
+# compiler installed.
   CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
   RENDERER="--enable-renderer=agg"		# could be opengl
   %ifarch arm
@@ -131,21 +142,17 @@ RPM_TARGET=%{_target}
   %else
     SOUND="--enable-media=gst"			# could also be sdl
   %endif
-# The OLPC is a weird case, it's basically an i386-linux toolchain
-# targeted towards Fedora Core 6. The machine itself is too limited to
-# build RPMs on, so we do it this way.
-  %if olpc
-    CROSS_OPTS="$CROSS_OPTS --disable-kparts --disable-menus"
-    SOUND="--enable-media=gst --enable-jemalloc"
-    GUI="--enable-gui=gtk"
-    RENDERER="$RENDERER --with-pixelformat=RGB565"
-  %endif
 %else
 # Native RPM build
   CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
-  GUI="--enable-gui=gtk"
-  SOUND="--enable-media=ffmpeg --enable-jemalloc"
-  RENDERER="" # --enable-render=ogl
+  # these are actually the default values, but this way they get added
+  # to the build so they appear in "gnash --version".
+  GUI="--enable-gui=gtk,kde4"	# could be kde3, aqua, sdl
+  SOUND="--enable-media=gst"	# could be ffmpeg
+  OTHER="--enable-jemalloc --enable-cygnal"
+  RENDERER="--enable-renderer=agg"		# could be opengl or cairo
+  # These are not the defaults
+  OPTIONAL="--enable-avm2 --enable-python"
 %endif
 
 %if %{distribution} != "ydl6"
@@ -167,6 +174,8 @@ RPM_TARGET=%{_target}
 	$CROSS_OPTS \
 	$SOUND $GUI \
 	$RENDERER \
+	$OTHER \
+	$OPTIONAL \
 	--disable-dependency-tracking \
 	--disable-testsuite \
 	--disable-rpath \
@@ -174,30 +183,36 @@ RPM_TARGET=%{_target}
 
 make $(MAKEFLAGS) dumpconfig all
 %else
+# uncommenting these will produce huge volumes of debug info from the
+# shell, but sometimes that's what you need to do.
+# export CONFIG_SHELL="sh -x"
+# sh -x ./configure
 ./configure \
 	$CROSS_OPTS \
 	$SOUND $GUI \
 	$RENDERER \
+	$OTHER \
+	$OPTIONAL \
 	--disable-dependency-tracking \
 	--disable-rpath \
-	--enable-cygnal \
-	--enable-ssl \
-	--enable-avm2 \
-	--enable-python \
-	--enable-jemalloc \
 	--enable-sdkinstall \
 	--disable-testsuite \
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
-        --with-npapi-install=system 
-#	--with-npapi-plugindir=%{_libdir}/mozilla/plugins
+	--with-plugins-install=system
+
+        # --with-kde4-pluginprefix=%{_prefix} \
+	# --with-kde4-plugindir=%{_libdir}/kde4/plugins \
+        # --with-kde4-servicesdir=%{_prefix}/share/kde4/services \
+        # --with-kde4-appsdatadir=%{_prefix}/share/kde4/apps/klash \
+        # --with-kde4-configdir=${_datadir}/config
 
 make $(MAKEFLAGS) dumpconfig all
 %endif
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
-# do that for release buulds, as the performance will suffer.
+# do that for release builds, as the performance will suffer.
 
 %install
 strip gui/.libs/*-gnash
@@ -273,6 +288,7 @@ scrollkeeper-update -q || :
 %defattr(-,root,root,-)
 %{_bindir}/cygnal
 %{_prefix}/etc/cygnalrc
+%{_libdir}/cygnal/plugins/*.so*
 
 %files devel
 %{_prefix}/include/gnash/*.h
@@ -282,7 +298,21 @@ scrollkeeper-update -q || :
 %{_prefix}/include/gnash/*.h
 %{_prefix}/lib/python*/site-packages/gtk-2.0/gnash.*
 
+%files klash4
+%defattr(-,root,root,-)
+%{_bindir}/gnash
+%if !%{cross_compile}
+%{_bindir}/kde4-gnash
+%{_libdir}/kde4/libklashpart.*
+%{_prefix}/share/kde4/apps/klash/klashpartui.rc
+%{_prefix}/share/kde4/apps/klash/pluginsinfo
+%{_prefix}/share/kde4/services/klash_part.desktop
+%endif
+
 %changelog
+* Sat Sep 07 2009 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- add kde4 support for klash.
+
 * Sat Jun 13 2009 Rob Savoye <rob@welcomehome.org> - trunk
 - Add support for packaging the gtk & python widget
 
