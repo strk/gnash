@@ -778,6 +778,7 @@ Network::readNet()
 int
 Network::readNet(int fd, amf::Buffer &buffer)
 {
+//    GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), _timeout);
     if (ret > 0) {
 	buffer.resize(ret);
@@ -810,7 +811,7 @@ Network::readNet(amf::Buffer &buffer, int timeout)
 int
 Network::readNet(int fd, amf::Buffer &buffer, int timeout)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), timeout);
     buffer.setSeekPointer(ret);
 #if 0
@@ -1430,7 +1431,7 @@ Network::waitForNetData(int limit, fd_set files)
     }
     
     if (ret == 0) {
-	log_debug (_("Waiting for data for fdset, timed out waiting for data"));
+	// log_debug (_("Waiting for data for fdset, timed out waiting for data"));
 	FD_ZERO(&fdset);
     }
 
