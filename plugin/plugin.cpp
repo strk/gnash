@@ -37,8 +37,8 @@
 
 #define PLUGIN_DESCRIPTION \
   "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU SWF Player. \
-  Copyright &copy; 2006, 2007, 2008 <a href=\"http://www.fsf.org\">Free Software \
-  Foundation</a>, Inc. <br> \
+  Copyright (C) 2006, 2007, 2008, 2009 <a href=\"http://www.fsf.org\">Free \
+  Software Foundation</a>, Inc. <br> \
   Gnash comes with NO WARRANTY, to the extent permitted by law. \
   You may redistribute copies of Gnash under the terms of the \
   <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public \
