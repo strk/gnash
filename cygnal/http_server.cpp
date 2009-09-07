@@ -962,8 +962,8 @@ extern "C" {
 bool
 http_handler(Network::thread_params_t *args)
 {
-//    GNASH_REPORT_FUNCTION;
-//    struct thread_params thread_data;
+    GNASH_REPORT_FUNCTION;
+
     string url, filespec, parameters;
     HTTPServer *www = new HTTPServer;
     bool result = false;
@@ -975,11 +975,10 @@ http_handler(Network::thread_params_t *args)
     log_network(_("Starting HTTP Handler for fd #%d, tid %d"),
 	      args->netfd, args->tid);
     
-    string docroot = args->filespec;
+    www->setDocRoot(crcfile.getDocumentRoot());
 
-//     cgis.setDocroot(args->filespec);
-    
-    www->setDocRoot(docroot);
+    log_network("Docroot for HTTP files is %s", crcfile.getDocumentRoot());
+
     log_network("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.

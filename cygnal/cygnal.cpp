@@ -834,49 +834,60 @@ connection_handler(Network::thread_params_t *args)
 	// Setup HTTP handler
 	//
 	if (args->protocol == Network::HTTP) {
-	    log_network("Threaded HTTP handler for server on fd #%d", fd);
+	    boost::shared_ptr<Handler> hand(new Handler);
 	    Network::thread_params_t *hargs = new Network::thread_params_t;
-	    Network *tnet = 0;
+	    HTTPServer *http = new HTTPServer;
+#if 0
+	    http->recvMsg(args->netfd);
+	    boost::shared_ptr<amf::Buffer> buf(http->peekChunk());
+	    http->processHeaderFields(*buf);
+	    string hostname;
+	    string::size_type pos = http->getField("host").find(":", 0);
+	    if (pos != string::npos) {
+		hostname += http->getField("host").substr(0, pos);
+	    } else {
+		hostname += "localhost";
+	    }
+	    hargs->filespec = hostname + http->getFilespec();
+#else
+	    hargs->filespec = docroot;
+#endif
 	    hargs->netfd = args->netfd;
 	    hargs->protocol = args->protocol;
-	    hargs->entry = new HTTPServer;
-	    hargs->filespec = docroot;
+	    hargs->entry = http;
 	    hargs->tid = tid;
-	    // If we haven't spawned up to our max allowed, start a
-	    // new dispatch thread to handle data.
-	    if (networks[tid] == 0) {
-		log_network("Starting new event handler thread for fd #%d, tid #%d",
-			    args->netfd, tid);
-		tids.increment();
-		boost::shared_ptr<Handler> hand(new Handler);
-		hand->addClient(hargs->netfd, Network::HTTP);
-		hargs->handler = reinterpret_cast<void *>(hand.get());
+	    log_network("Starting new event handler thread for fd #%d, tid #%d",
+			args->netfd, tid);
+	    tids.increment();
+	    hand->addClient(hargs->netfd, Network::HTTP);
+	    hargs->handler = reinterpret_cast<void *>(hand.get());
+	    boost::bind(http_handler, hargs);
+
+	    // If in multi-threaded mode (the default), start a thread
+	    // with a connection_handler for each port we're interested
+	    // in. Each port of course has a different protocol.
+#if 0
+	    if (crcfile.getThreadingFlag() == true) {
+		boost::thread event_thread(boost::bind(&event_handler, hargs));
 	    } else {
-		log_network("Not starting new HTTP thread, spawned already for tid #%d", tid);
-		tnet = networks[tid];
-	    }
-	    if (args->protocol == Network::HTTP) {
-		boost::bind(http_handler, hargs);
-		// 	tnet->addPollFD(fds, http_handler);
-		// } else if (args->port == (port_offset + RTMP_PORT)) {
-		//       boost::bind(rtmp_handler, targs);
-		// 	tnet->addPollFD(fds, rtmp_handler);
-	    }
-	    
-	    // this is where the real work gets done.
-	    event_handler(hargs);
+#endif
+		event_handler(hargs);
+		// We're done, close this network connection
+		net.closeNet(args->netfd);
+	    // }
+	    // delete http;
 	} // end of if HTTP
 	
 	//
 	// Setup RTMP handler
 	//
 	if (args->protocol == Network::RTMP) {
-	    RTMPServer rtmp;
+	    RTMPServer *rtmp = new RTMPServer;
 	    boost::shared_ptr<amf::Element> tcurl = 
-		rtmp.processClientHandShake(args->netfd);
+		rtmp->processClientHandShake(args->netfd);
 	    if (!tcurl) {
 // 		    log_error("Couldn't read the tcUrl variable!");
-		rtmp.closeNet(args->netfd);
+		rtmp->closeNet(args->netfd);
 		return;
 	    }
 	    URL url(tcurl->to_string());
@@ -887,8 +898,8 @@ connection_handler(Network::thread_params_t *args)
 			    proto_str[args->protocol], key, args->netfd);
 		hand.reset(new Handler);
 		cyg.addHandler(key, hand);
-		args->entry = new RTMPServer;
-		hand->setNetConnection(rtmp.getNetConnection());
+		args->entry = rtmp;
+		// hand->setNetConnection(rtmp->getNetConnection());
 		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
 		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
 		for (it = active.begin(); it < active.end(); ++it) {
@@ -939,6 +950,7 @@ connection_handler(Network::thread_params_t *args)
 		//     net.closeNet(args->netfd);
 		// }
 	    }
+	    // delete rtmp;
 	} // end of if RTMP	
 	
 	log_network("Number of active Threads is %d", tids.num_of_tids());
@@ -946,7 +958,7 @@ connection_handler(Network::thread_params_t *args)
 //	net.closeNet(args->netfd); 		// this shuts down this socket connection
 	log_network("Restarting loop for next connection for port %d...", args->port);
     } while(!done);
-    
+
     // All threads should wake up now.
     alldone.notify_all();
     
@@ -1051,15 +1063,17 @@ event_handler(Network::thread_params_t *args)
 	path = args->filespec.substr(pos+1, args->filespec.size());
     }
 
-    if (host.empty()) {
-	log_error("No hostname supplied for handler!");
-	return;
+    if (args->protocol != Network::HTTP) {
+	if (host.empty()) {
+	    log_error("No hostname supplied for handler!");
+	    return;
+	}
+	if (path.empty()) {
+	    log_error("No pathname supplied for handler!");
+	    return;
+	}
     }
-    if (path.empty()) {
-	log_error("No pathname supplied for handler!");
-	return;
-    }
-
+    
     hand->setName(path);
 #if 0
     if (!hand->initialized()) {

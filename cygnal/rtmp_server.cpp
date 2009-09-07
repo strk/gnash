@@ -1433,6 +1433,10 @@ rtmp_handler(Network::thread_params_t *args)
 			  break;
 		      case RTMP::INVOKE:
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
+			  if (!body) {
+			      log_error("Error INVOKING method \"%s\"!", body->getMethodName());
+			      continue;
+			  }
 			  log_network("INVOKEing method \"%s\"", body->getMethodName());
 			  // log_network("%s", hexify(tmpptr, qhead->bodysize, true));
 			  
