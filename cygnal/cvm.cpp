@@ -45,6 +45,7 @@
 #include "movie_root.h"
 #include "log.h"
 #include "rc.h"
+#include "handler.h"
 #include "URL.h"
 #include "GnashException.h"
 #include "debugger.h"
@@ -91,8 +92,6 @@ const char *GPROC_VERSION = "1.0";
 using namespace std;
 using namespace gnash;
 
-static void usage (const char *);
-
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -100,6 +99,8 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 #endif
 }
+
+namespace cygnal {
 
 struct movie_data
 {
@@ -224,7 +225,6 @@ vm_main(int argc, char *argv[])
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
-        usage(argv[0]);
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
@@ -262,7 +262,6 @@ vm_main(int argc, char *argv[])
     while ((c = getopt (argc, argv, ":hwvapr:gf:d:")) != -1) {
 	switch (c) {
 	  case 'h':
-	      usage (argv[0]);
               dbglogfile.removeLog();
 	      exit(0);
 	  case 'w':
@@ -325,16 +324,13 @@ vm_main(int argc, char *argv[])
     // No file names were supplied
     if (infiles.empty()) {
 	    std::cerr << "no input files" << std::endl;
-	    usage(argv[0]);
         dbglogfile.removeLog();
 	    exit(1);
     }
 
-    if (infiles.size() > 1)
-    {
+    if (infiles.size() > 1) {
         // We're not ready for multiple runs yet.
         std::cerr << "Multiple input files not supported." << std::endl;
-        usage(argv[0]);
         dbglogfile.removeLog();
         exit(1);
     }
@@ -359,20 +355,19 @@ vm_main(int argc, char *argv[])
 
     // Play through all the movies.
     for (std::vector<std::string>::const_iterator i = infiles.begin(), 
-            e = infiles.end(); i != e; ++i)
-    {
+            e = infiles.end(); i != e; ++i) {
 
         RunResources runResources(*i);
         runResources.setSoundHandler(soundHandler);
-
-	    boost::intrusive_ptr<gnash::movie_definition> m =
+	
+	boost::intrusive_ptr<gnash::movie_definition> m =
             play_movie(*i, runResources);
-	    if (!m) {
-	        if (s_stop_on_errors) {
-		    // Fail.
+	if (!m) {
+	    if (s_stop_on_errors) {
+		// Fail.
                 std::cerr << "error playing through movie " << *i << std::endl;
-		        std::exit(1);
-	        }
+		std::exit(1);
+	    }
         }
 	
         movie_data	md;
@@ -401,18 +396,13 @@ play_movie(const std::string& filename, const RunResources& runResources)
 
     URL url(filename);
 
-    try
-    {
-      if (filename == "-")
-      {
+    try {
+      if (filename == "-") {
          std::auto_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
          md = gnash::MovieFactory::makeMovie(in, filename, runResources, false);
-      }
-      else
-      {
-         if ( url.protocol() == "file" )
-         {
+      } else {
+         if ( url.protocol() == "file" ) {
              const std::string& path = url.path();
 #if 1 // add the *directory* the movie was loaded from to the local sandbox path
              size_t lastSlash = path.find_last_of('/');
@@ -427,8 +417,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
          md = gnash::MovieFactory::makeMovie(url, runResources, NULL, false);
       }
     }
-    catch (GnashException& ge)
-    {
+    catch (GnashException& ge) {
       md = NULL;
       fprintf(stderr, "%s\n", ge.what());
     }
@@ -460,8 +449,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     std::auto_ptr<Movie> mi ( md->createMovie() );
 
     m.setRootMovie( mi.release() );
-    if ( quitrequested )  // setRootMovie would execute actions in first frame
-    {
+    if ( quitrequested ) { // setRootMovie would execute actions in first frame
         quitrequested = false;
         return md;
     }
@@ -502,8 +490,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
 
         m.display(); // FIXME: for which reason are we calling display here ??
         ++nadvances;
-        if ( limit_advances && nadvances >= limit_advances)
-        {
+        if ( limit_advances && nadvances >= limit_advances) {
             log_debug("exiting after %d advances", nadvances);
             break;
         }
@@ -511,8 +498,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         size_t curr_frame = m.get_current_frame();
         
         // We reached the end, done !
-        if (curr_frame >= md->get_frame_count() - 1 )
-        {
+        if (curr_frame >= md->get_frame_count() - 1 ) {
             if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
             {
                 log_debug("exiting after %d" 
@@ -522,16 +508,13 @@ play_movie(const std::string& filename, const RunResources& runResources)
         }
 
         // We didn't advance 
-        if (curr_frame == last_frame)
-        {
+        if (curr_frame == last_frame) {
             // Max stop counts reached, kick it
-            if ( secondsSinceLastAdvance() > waitforadvance )
-            {
+            if ( secondsSinceLastAdvance() > waitforadvance ) {
                 stop_count=0;
 
                 // Kick the movie.
-                if ( last_frame + 1 > md->get_frame_count() -1 )
-                {
+                if ( last_frame + 1 > md->get_frame_count() -1 ) {
                     fprintf(stderr, "Exiting after %g seconds in STOP mode at last frame\n", waitforadvance);
                     break;
                 }
@@ -551,20 +534,16 @@ play_movie(const std::string& filename, const RunResources& runResources)
         }
         
         // We looped back.  Skip ahead...
-        else if (m.get_current_frame() < last_frame)
-        {
+        else if (m.get_current_frame() < last_frame) {
             if ( last_frame > latest_frame ) latest_frame = last_frame;
-            if ( ++loop_back_count > allowloopbacks )
-            {
+            if ( ++loop_back_count > allowloopbacks ) {
                 log_debug("%d loop backs; jumping one-after "
                         "latest frame (%d)",
                         loop_back_count, latest_frame+1);
                 m.goto_frame(latest_frame + 1);
                 loop_back_count = 0;
             }
-        }
-        else
-        {
+        } else {
             kick_count = 0;
             stop_count = 0;
             resetLastAdvanceTimer();
@@ -581,55 +560,8 @@ play_movie(const std::string& filename, const RunResources& runResources)
     return md;
 }
 
-static void
-usage (const char *name)
-{
-    printf(
-	_("gprocessor -- an SWF preprocessor for Gnash.\n"
-	"\n"
-	"usage: %s [options] <file>\n"
-	"\n"
-	"Preprocesses the given SWF movie files.  Optionally write preprocessed shape\n"
-	"and font data to cache files, so the associated SWF files can be loaded\n"
-	"faster.\n"
-	"\n"
-        "%s%s%s%s"), name, _(
-	"options:\n"
-	"\n"
-	"  --help(-h)  Print this info.\n"	
-	"  --version   Print the version numbers.\n"	
-	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"	
-	"  -v          Be verbose; i.e. print log messages to stdout\n"
-          ),
-#if VERBOSE_PARSE
-	_("  -vp         Be verbose about movie parsing\n"),
-#else
-	"",
-#endif
-#if VERBOSE_ACTION
-	_("  -va         Be verbose about ActionScript\n"),
-#else
-	"",
-#endif
-	_(
-	"  -d [<ms>]\n"
-	"              Milliseconds delay between advances (0 by default).\n"
-	"              If '-1' the delay will be computed from the FPS.\n"
-	"  -r <times>  Allow the given number of complete runs.\n"
-	"              Keep looping undefinitely if set to 0.\n"
-	"              Default is 1 (end as soon as the last frame is reached).\n"
-	"  -f <frames>  \n"
-	"              Allow the given number of frame advancements.\n"
-	"              Keep advancing untill any other stop condition\n"
-        "              is encountered if set to 0 (default).\n")
-	);
 }
 
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: t
