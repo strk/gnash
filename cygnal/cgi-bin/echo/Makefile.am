@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS =
 # this is where Gnash plugins get installed
 cgidir = $(libdir)/cygnal/plugins
 
-cgi_LTLIBRARIES = echo.la gateway.la
+cgi_LTLIBRARIES = echo.la # gateway.la
 
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
@@ -43,9 +43,9 @@ echo_la_SOURCES = echo.cpp echo.h
 echo_la_LDFLAGS = -module -avoid-version -no-undefined
 echo_la_LIBADD  =  $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
-gateway_la_SOURCES = gateway.cpp gateway.h 
-gateway_la_LDFLAGS = -module -avoid-version -no-undefined
-gateway_la_LIBADD   = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
+# gateway_la_SOURCES = gateway.cpp gateway.h 
+# gateway_la_LDFLAGS = -module -avoid-version -no-undefined
+# gateway_la_LIBADD   = $(GNASH_LIBS) $(top_builddir)/cygnal/libcygnal.la
 
 CLEANFILES = \
       gnash-dbg.log
