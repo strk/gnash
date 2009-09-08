@@ -41,7 +41,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
       fi
     else
       AC_CACHE_CHECK([for docbook styles path],[gnash_cv_path_docbook_styles],[
-      dirlist="/usr/share/xml/docbook/stylesheet/nwalsh /usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
+      dirlist="/usr/share/xml/docbook/stylesheet/nwalsh /usr/share/xml/docbook/stylesheet/nwalsh/current /usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
       for i in $dirlist; do
         if test -f $i/html/docbook.xsl; then
           gnash_cv_path_docbook_styles="`(cd $i; pwd)`"
