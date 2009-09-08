@@ -17,10 +17,10 @@ BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel glib2-devel
 BuildRequires:  atk-devel pango-devel openssl-devel
 BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
-BuildRequires:  SDL-devel pygtk2-devel libungif-devel
-BuildRequires:  gstreamer-devel gstreamer-ffmpeg gstreamer-plugins-base-devel
+BuildRequires:  pygtk2-devel giflib-devel
+BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
-BuildRequires:  kdelibs-devel kdebase-devel qt-devel
+BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
 
 # YellowDog doesn't ship ffmpeg
 %if %{distribution} != "ydl6"
@@ -35,6 +35,7 @@ BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel
 
 # Installation requirements
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
+Requires:  gstreamer gstreamer-ffmpeg gstreamer-plugins-base
 # Mandriva uses differ names for the X11 library packages
 %if %{distribution} != "fc11"
 Requires: libx11_6 libxt_6
@@ -93,7 +94,7 @@ Gnash header files can be used to write external Gnash extensions.
 %package klash4
 Summary:   Konqueror SWF player plugin for KDE 4
 Requires:  %{name} = %{version}-%{release}
-Requires:  kdelibs kdelibs qt gnash
+Requires:  kdelibs >= 4, kdebase >= 4, qt >= 4, gnash
 Group:     Applications/Multimedia
 
 %description klash4
@@ -104,7 +105,8 @@ The gnash SWF player plugin for Konqueror in KDE4.
 
 %build
 
-[ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
+# For QT3
+# [ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
 
 # handle cross building rpms. This gets messy when building for two
 # archtectures with the same CPU type, like x86-Linux -> OLPC. We have
