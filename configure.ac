@@ -264,7 +264,7 @@ AC_ARG_ENABLE(jemalloc,
   yes) jemalloc=yes ;;
   no)  jemalloc=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
-esac],jemalloc=no)
+esac],jemalloc=yes)
 
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
 if test x"${netbsd}" = x"yes"; then
@@ -610,7 +610,14 @@ dnl        build_riscos=yes
     if test "x$val" = "x$enableval"; then
       break;
     fi
-  done,build_gtk=yes;build_kde3=yes;build_qt3=yes;
+  done,build_gtk=yes;
+if test x$openbsd_os = xopenbsd; then
+  build_kde3=yes;
+  build_qt3=yes;
+else
+  build_kde4=yes;
+  build_qt4=yes;
+fi
 )
 
 add_renderer=
@@ -1818,6 +1825,11 @@ AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 dnl
 dnl gstreamer should take care of libxml2 and glib cflags/libs
 dnl
+if test x$cross_compiling = xyes; then
+  if test x$media_handler = xgst; then
+    GNASH_PKG_FIND(libxml2, [libxml/parser.h], [XML2 library], init)   
+  fi
+fi
 
 GNASH_PATH_QT3
 GNASH_PATH_KDE3
@@ -1985,12 +1997,22 @@ if test "$media_handler" = "gst"; then
        fi
     done
   fi
-  GNASH_PKG_FIND(gstreamer_plugins_base, [gst/interfaces/probeprobe.h], [gstreamer interfaces library], gst_mixer_type_get_type, [0.10])
+  GNASH_PKG_FIND(gstreamer_plugins_base, [gst/interfaces/probeprobe.h], [gstreamer interfaces library], gst_property_probe_probe_and_get_values_name, [0.10])
   GNASH_PKG_FIND(gstreamer_app, [gst/app/gstappsink.h], [gstreamer app library], call_gmon_start, [0.10])
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
-  GNASH_PKG_FIND(gstpbutils, [gstreamer-0.10/gst/pbutils/install-plugins.h], [gstreamer PB Utils library], gst_install_plugins_supported, [0.10])
+  dnl if cross compiling, we're usually not going to be able to pop up
+  dnl the codec installer to download the package to install, so disable
+  dnl it if cross compiling with gstreamer support.
+  if test x$cross_compiling = xno; then
+    GNASH_PKG_FIND(gstpbutils, [gstreamer-0.10/gst/pbutils/install-plugins.h], [gstreamer PB Utils library], gst_install_plugins_supported, [0.10])
+  fi
+  dnl when cross compiling Gstreamer, not all supplied SDKs include all the
+  dnl development libraries since most devices don't need to support plugin
+  dnl development, only the runtime. In these caes we often have the header
+  dnl files but not the libraries.
   if test x"${has_gstreamer_plugins_base}" = xyes; then
     GSTREAMER_LIBS="-lgstinterfaces-0.10 $(GSTREAMER_LIBS)"
+    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
   fi
   if test x"${media_handler_specified}" = xfalse; then
     if test x"$GSTREAMER_LIBS" = x; then
