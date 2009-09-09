@@ -26,6 +26,7 @@
 #include "dejagnu.h"
 #include "fn_call.h"
 #include "as_object.h"
+#include "Globals.h"
 #include "builtin_function.h" // need builtin_function
 
 using namespace std;
@@ -47,7 +48,8 @@ static void
 attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-
+    Global_as* gl = getGlobal(*obj);
+    
     obj->init_member("pass", gl->createFunction(dejagnu_pass));
     obj->init_member("fail", gl->createFunction(dejagnu_fail));
     obj->init_member("totals", gl->createFunction(dejagnu_totals));
@@ -158,17 +160,17 @@ extern "C" {
     {
 //	GNASH_REPORT_FUNCTION;
 	// This is going to be the global "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	as_object *cl;
 	if (cl == NULL) {
         as_object* proto = getInterface();
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(obj);
         cl = gl->createClass(&dejagnu_ctor, proto);
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
- 	    attachInterface(cl.get());
+ 	    attachInterface(cl);
 	}
 	
-	obj.init_member("DejaGnu", cl.get());
+	obj.init_member("DejaGnu", cl);
     }
 } // end of extern C
 

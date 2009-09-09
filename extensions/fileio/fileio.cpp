@@ -602,13 +602,13 @@ init_fileio_instance()
 
 extern "C" {
     void
-    fileio_class_init(as_object& where, const ObjectURI& uri)
+    fileio_class_init(as_object& where, const ObjectURI& /* uri */)
     {
 //	GNASH_REPORT_FUNCTION;
 	Global_as* gl = getGlobal(where);
 	
 	// This is going to be the global "class"/"function"
-	as_object *cl;
+	as_object *cl = 0;
 	if (cl == NULL) {
         as_object* proto = getInterface();
         cl = gl->createClass(&fileio_ctor, proto);
@@ -616,10 +616,12 @@ extern "C" {
 // 	    // all methods as static functions
  	    //attachInterface(*cl);
 	}
-	
+#if 0	
 	where.init_member(getName(uri), cl, as_object::DefaultFlags,
 			  getNamespace(uri));
-	// where.init_member("FileIO", cl.get());
+#else
+	where.init_member("FileIO", cl);
+#endif
     }
 } // end of extern C
 
