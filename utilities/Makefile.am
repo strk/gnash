@@ -63,6 +63,8 @@ AM_CPPFLAGS = \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(GSTREAMER_CFLAGS) \
 	$(GSTREAMER_PLUGINS_BASE_CFLAGS) \
+	$(LIBXML2_CFLAGS) \
+	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(MYSQL_CFLAGS) \
@@ -81,15 +83,21 @@ endif
 if USE_GST_ENGINE
  AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
- GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
+ GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS) $(LIBXML2_LIBS)
+if CROSS_COMPILING
+  GNASH_LIBS +=	$(LIBXML2_LIBS) $(GLIB_LIBS)
+endif
 endif
 
 bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
 #check_PROGRAMS = gdebug.swf
 
 if USE_GST_ENGINE
- bin_PROGRAMS += findwebcams
- bin_PROGRAMS += findmicrophones
+ # seems kindof silly to build these for an embedded target
+if !CROSS_COMPILING
+   bin_PROGRAMS += findwebcams
+   bin_PROGRAMS += findmicrophones
+endif
 endif
 
 gprocessor_SOURCES = processor.cpp
