@@ -1435,7 +1435,9 @@ Network::waitForNetData(int limit, fd_set files)
 	FD_ZERO(&fdset);
     }
 
-    log_network("select() saw activity on %d file descriptors.", ret);
+    if (ret) {
+	log_network("select() saw activity on %d file descriptors.", ret);
+    }
 
     return fdset;
 }

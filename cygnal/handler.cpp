@@ -227,7 +227,7 @@ Handler::initialized()
 int 
 Handler::createStream()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     return createStream("");
 }
@@ -235,7 +235,7 @@ Handler::createStream()
 int
 Handler::createStream(const std::string &filespec)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     int streamid = _streams;
 

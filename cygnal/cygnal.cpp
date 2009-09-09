@@ -900,7 +900,7 @@ connection_handler(Network::thread_params_t *args)
 		hand.reset(new Handler);
 		cyg.addHandler(key, hand);
 		args->entry = rtmp;
-		// hand->setNetConnection(rtmp->getNetConnection());
+		hand->setNetConnection(rtmp->getNetConnection());
 		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
 		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
 		for (it = active.begin(); it < active.end(); ++it) {

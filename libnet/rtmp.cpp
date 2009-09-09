@@ -77,25 +77,26 @@ CQue incoming;
 const char *content_str[] = {
     "None",
     "Chunk Size",
-    "Unknown",
+    "Abort",
     "Bytes Read",
-    "Ping",
-    "Server",
-    "Client",
-    "Unknown2",
+    "User",
+    "Window Size",
+    "Set Bandwidth",
+    "Route",
     "Audio Data",
     "Video Data",
-    "Unknown3",
+    "Shared Object",
     "Blank 0xb",
     "Blank 0xc",
     "Blank 0xd",
     "Blank 0xe",
-    "Blank 0xf",
-    "Blank 0x10",
-    "Blank 0x11",
+    "AMF3 Notify",
+    "AMF3 Shared Object",
+    "AMF3_INVOKE",
     "Notify",
-    "Shared object",
+    "Blank 0x13",
     "Invoke",
+    "Blank 0x15",
     "FLV Data"
 };
 
@@ -336,15 +337,19 @@ RTMP::decodeHeader(boost::uint8_t *in)
         head->type = (content_types_e)byte;
 	_type[head->channel] = head->type;
         tmpptr++;
- 	// if (head->type <= RTMP::INVOKE ) {
- 	//     log_network(_("The type is: %s"), content_str[head->type]);
- 	// } else {
- 	//     log_network(_("The type is: 0x%x"), head->type);
- 	// }
+#if 0
+	if (head->type <= RTMP::INVOKE ) {
+	    log_network(_("The type is: %s"), content_str[head->type]);
+	} else {
+	    log_network(_("The type is: 0x%x"), head->type);
+	}
+#endif
     } else {
-	log_network("Using previous type of %d for channel %d",
-		    head->type, head->channel);
-	head->type = _type[head->channel];
+	if ((_type[head->channel] >= RTMP::NONE) && (_type[head->channel] <= RTMP::FLV_DATA)) {
+	    log_network("Using previous type of %d for channel %d",
+			head->type, head->channel);
+	    head->type = _type[head->channel];
+	}
     }
 
     if (head->head_size == 12) {
