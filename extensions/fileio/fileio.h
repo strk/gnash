@@ -62,7 +62,7 @@ private:
 };
 
 extern "C" {
-    void fileio_class_init(as_object &obj);  
+    void fileio_class_init(as_object& global, const ObjectURI& uri);  
     /// Return an  instance
 }
 

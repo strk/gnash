@@ -34,6 +34,7 @@
 #include "fn_call.h"
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
+#include "Globals.h"
 #include "fileio.h"
 #include "Array_as.h"  // used by scandir()
 
@@ -78,6 +79,8 @@ attachInterface(as_object& obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
+    Global_as* gl = getGlobal(obj);
+    
     obj.init_member("fopen", gl->createFunction(fileio_fopen));
     obj.init_member("fread", gl->createFunction(fileio_fread));
     obj.init_member("fgetc", gl->createFunction(fileio_fgetc));
@@ -599,21 +602,24 @@ init_fileio_instance()
 
 extern "C" {
     void
-    fileio_class_init(as_object &obj)
+    fileio_class_init(as_object& where, const ObjectURI& uri)
     {
 //	GNASH_REPORT_FUNCTION;
+	Global_as* gl = getGlobal(where);
+	
 	// This is going to be the global "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	as_object *cl;
 	if (cl == NULL) {
         as_object* proto = getInterface();
-        Global_as* gl = getGlobal(global);
         cl = gl->createClass(&fileio_ctor, proto);
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
  	    //attachInterface(*cl);
 	}
 	
-	obj.init_member("FileIO", cl.get());
+	where.init_member(getName(uri), cl, as_object::DefaultFlags,
+			  getNamespace(uri));
+	// where.init_member("FileIO", cl.get());
     }
 } // end of extern C
 
