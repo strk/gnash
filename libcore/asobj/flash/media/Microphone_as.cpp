@@ -565,7 +565,7 @@ microphone_setsilencelevel(const fn_call& fn)
             }
             double argument2 = fn.arg(1).to_number();
             if (argument2 >= 0) {
-                ptr->set_silenceTimeout(argument2);
+                ptr->set_silenceTimeout(int(argument2));
             } else {
                 log_error("%s: argument 2 out of acceptable range", __FUNCTION__);
                 ptr->set_silenceTimeout(0);
