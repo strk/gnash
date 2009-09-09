@@ -35,6 +35,7 @@ libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/libcore	\
 	$(PTHREAD_CFLAGS) \
+	$(LIBXML2_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GLIB_CFLAGS) \

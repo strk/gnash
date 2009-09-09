@@ -80,12 +80,12 @@ namespace gst {
             _numdevs += 1;
         }
         
-        
+#ifdef HAS_GSTREAMER_PLUGINS_BASE
         //detect pulse audio sources
         GstPropertyProbe *probe;
         GValueArray *devarr;
         element = NULL;
-        
+
         element = gst_element_factory_make ("pulsesrc", "pulsesrc");
         probe = GST_PROPERTY_PROBE (element);
         devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
@@ -98,7 +98,7 @@ namespace gst {
             gst_element_set_state (element, GST_STATE_PLAYING);
             g_object_get (element, "device-name", &dev_name, NULL);
             gst_element_set_state (element, GST_STATE_NULL);
-            if ((g_strcmp0(dev_name, "null") == 0) ||
+            if ((strcmp(dev_name, "null") == 0) ||
                     (std::strstr(dev_name, "Monitor") != NULL)) {
                 log_trace("No pulse audio input devices.");
             }
@@ -117,6 +117,7 @@ namespace gst {
         if (devarr) {
             g_value_array_free (devarr);
         }
+#endif
     }
     
     bool
@@ -266,7 +267,7 @@ namespace gst {
             audio->_audioSourceBin = NULL;
         }
         
-        if (g_strcmp0(audio->_deviceName, "audiotest") == 0) {
+        if (strcmp(audio->_deviceName, "audiotest") == 0) {
             log_trace("%s: You don't have any mics chosen, using audiotestsrc",
                 __FUNCTION__);
             audio->_audioSourceBin = gst_parse_bin_from_description (
@@ -324,7 +325,7 @@ namespace gst {
     {
         GError *error = NULL;
         gchar *command = NULL;
-        if(g_strcmp0(audio->_deviceName, "audiotest") == 0) {
+        if(strcmp(audio->_deviceName, "audiotest") == 0) {
             log_trace("%s: You don't have any mics chosen, using audiotestsrc",
                 __FUNCTION__);
             audio->_audioSourceBin = gst_parse_bin_from_description (

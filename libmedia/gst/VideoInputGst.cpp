@@ -373,6 +373,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
         cam.setProductName(g_strdup_printf("videotest"));
     }
     
+#ifdef HAS_GSTREAMER_PLUGINS_BASE
     //find v4l devices
     GstPropertyProbe *probe;
     GValueArray *devarr;
@@ -390,7 +391,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (g_strcmp0(dev_name, "null") == 0) {
+        if (strcmp(dev_name, "null") == 0) {
             log_debug("No v4l video sources. Checking for other vid inputs");
         }
         else { 
@@ -428,7 +429,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (g_strcmp0(dev_name, "null") == 0) {
+        if (strcmp(dev_name, "null") == 0) {
             log_debug("no v4l2 video sources found.");
         }
         else { 
@@ -447,6 +448,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     if (devarr) {
         g_value_array_free (devarr);
     }
+#endif
 }
 
 
@@ -1022,7 +1024,7 @@ VideoInputGst::webcamChangeSourceBin()
         
         //check here to make sure the fps value is supported (only valid for
         //non test sources)
-        if (! g_strcmp0(webcam->_webcamDevice->getGstreamerSrc(), "videotestsrc") == 0) {
+        if (! strcmp(webcam->_webcamDevice->getGstreamerSrc(), "videotestsrc") == 0) {
             int newFps = _fps;
             if (checkForSupportedFramerate(webcam, newFps)) {
                 log_debug("checkforsupportedfr returned true");
