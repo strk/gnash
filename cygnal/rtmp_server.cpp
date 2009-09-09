@@ -644,7 +644,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 
     Element *number = new Element;
     // add The server ID
-    number->makeNumber(streamid);	// FIXME: needs a real value, which should increment
+    number->makeNumber(streamid);
 
     Element top;
 //    top.makeObject("application");
@@ -1453,6 +1453,14 @@ rtmp_handler(Network::thread_params_t *args)
 			  // server instead of any cgi-bin plugins.
 			  if (body->getMethodName() == "createStream") {
 			      /* int streamid = */ hand->createStream();
+			      double streamid  = body->getStreamID();
+			      log_network("StreamID is: %g", streamid);
+			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, streamid);
+			      if (rtmp->sendMsg(args->netfd, qhead->channel,
+						RTMP::HEADER_8, response->allocated(),
+						RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+						*response)) {
+				  }
 			  } else if (body->getMethodName() == "play") {
 			      hand->playStream();
 			  } else if (body->getMethodName() == "seek") {
