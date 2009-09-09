@@ -1240,14 +1240,14 @@ rtmp_handler(Network::thread_params_t *args)
 		boost::shared_ptr<RTMP::rtmp_head_t> qhead;
 		for (size_t i=0; i<que->size(); i++) {
 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
-			// que->at(i)->dump();
+		    // que->at(i)->dump();
 		    if (bufptr) {
-			bufptr->dump();
+			// bufptr->dump();
 			qhead = rtmp->decodeHeader(bufptr->reference());
 			if (!qhead) {
 			    return false;
 			}
- 			log_network("Message for channel #%d", qhead->channel);
+ 			// log_network("Message for channel #%d", qhead->channel);
 			tmpptr = bufptr->reference() + qhead->head_size;
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
 			    if (qhead->type == RTMP::USER) {
@@ -1264,7 +1264,7 @@ rtmp_handler(Network::thread_params_t *args)
 				      log_unimpl("Stream No Data");
 				      break;
 				  case RTMP::STREAM_BUFFER:
-				      log_unimpl("Stream Set Buffer");
+				      log_unimpl("Stream Set Buffer: %d", user->param2);
 				      break;
 				  case RTMP::STREAM_LIVE:
 				      log_unimpl("Stream Live");
@@ -1410,8 +1410,15 @@ rtmp_handler(Network::thread_params_t *args)
 		      case RTMP::BYTES_READ:
 		      case RTMP::ABORT:
 		      case RTMP::USER:
+			  // already handled as this is a system channel message
+			  return true;
+			  break;
 		      case RTMP::WINDOW_SIZE:
+			  log_unimpl("Set Window Size");
+			  break;
 		      case RTMP::SET_BANDWITH:
+			  log_unimpl("Set Bandwidth");
+			  break;
 		      case RTMP::ROUTE:
 		      case RTMP::AUDIO_DATA:
 		      case RTMP::VIDEO_DATA:
