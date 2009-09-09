@@ -635,17 +635,12 @@ RTMP::decodeUser(boost::uint8_t *data)
     
     // All events have only 4 bytes of data, except Set Buffer, which
     // uses 8 bytes. The 4 bytes is usually the Stream ID except for
-    // Ping and Pong events, which carry a time stamp instead.
+    // Ping and Pong events, which carry a time stamp instead. We
+    // don't actually do anything here, we just parse the data.
     switch (eventid) {
       case STREAM_START:
-	  log_unimpl("Stream Start");
-	  break;
       case STREAM_EOF:
-	  log_unimpl("Stream EOF");
-	  break;
       case STREAM_NODATA:
-	  log_unimpl("Stream No Data");
-	  break;
       case STREAM_BUFFER:
       {
 	  boost::uint32_t param2 = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr));
@@ -654,13 +649,8 @@ RTMP::decodeUser(boost::uint8_t *data)
 	  break;
       }
       case STREAM_LIVE:
-	  log_unimpl("Stream Live");
-	  break;
       case STREAM_PING:
-	  log_unimpl("Stream Ping");
-	  break;
       case STREAM_PONG:
-	  log_unimpl("Stream Pong");
 	  break;
       default:
 	  log_unimpl("Unknown User Control message %d!", 1);
