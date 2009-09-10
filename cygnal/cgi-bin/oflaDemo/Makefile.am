@@ -27,6 +27,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/libltdl/libltdlc.la \
 	$(PTHREAD_LIBS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
@@ -36,6 +37,7 @@ INCLUDES = \
         -I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/cygnal \
 	$(BOOST_CFLAGS)
 
