@@ -107,6 +107,8 @@ private:
     void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
                 unsigned int nSamples, float volume);
 
+	void MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume);
+
 public:
 
     AOS4_sound_handler();
