@@ -51,7 +51,6 @@ AM_LDFLAGS = \
 	../libcore/libgnashcore.la \
 	../libnet/libgnashnet.la \
 	../libamf/libgnashamf.la \
-	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \

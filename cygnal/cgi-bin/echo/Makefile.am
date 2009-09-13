@@ -27,7 +27,6 @@ GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/libltdl/libltdlc.la \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
