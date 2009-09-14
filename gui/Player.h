@@ -220,8 +220,10 @@ private:
 
 	void setFlashVars(const std::string& varstr);
 
+    typedef std::map<std::string, std::string, StringNoCaseLessThan> Params;
+
 	// Movie parameters (for -P)
-	std::map<std::string, std::string> params;
+	Params params;
 
 	unsigned int _bitDepth;
 

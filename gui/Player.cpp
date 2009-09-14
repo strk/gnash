@@ -346,8 +346,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _url = infile;
     }
 
-    typedef std::map<std::string, std::string> Params;
-
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
@@ -384,17 +382,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     setFlashVars(URL(_url).querystring());
     
     // Add FlashVars.
-    StringNoCaseEqual noCaseCompare;
-    for (std::map<std::string,std::string>::const_iterator it=params.begin(),
-        itEnd=params.end(); it != itEnd; ++it)
-    {
-        if (noCaseCompare(it->first, "flashvars"))
-        {
-            setFlashVars(it->second);
-            continue;
-        }
-    }
-
+    Params::const_iterator fv = params.find("flashvars");
+    if (fv != params.end()) setFlashVars(fv->second);
 
     // Load the actual movie.
     _movieDef = load_movie();
