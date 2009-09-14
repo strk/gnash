@@ -346,14 +346,14 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _url = infile;
     }
 
-    // These flags are here so we can construct
-    // the correct URL for base url later.
-    // If the URL class was not immutable we could do something smarter...
-    bool hasOverriddenBaseUrl=false;
-    std::string overriddenBaseUrl;
+    typedef std::map<std::string, std::string> Params;
 
-    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
-                                       : URL(_baseurl);
+
+    // Parse player parameters. These are not passed to the SWF, but rather
+    // control stage properties etc.
+    Params::const_iterator it = params.find("base");
+    const URL baseURL = (it == params.end()) ? _baseurl :
+                                               URL(it->second, _baseurl);
 
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources(baseURL.str()));
@@ -373,7 +373,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Initialize gui (we need argc/argv for this)
     // note that this will also initialize the renderer
     // which is *required* during movie loading
-    if ( ! _gui->init(argc, &argv) )
+    if (!_gui->init(argc, &argv))
     {
         std::cerr << "Could not initialize gui." << std::endl;
         return EXIT_FAILURE;
@@ -383,21 +383,14 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // testsuite/misc-ming.all/FlashVarsTest*)
     setFlashVars(URL(_url).querystring());
     
-    // Parse parameters
+    // Add FlashVars.
     StringNoCaseEqual noCaseCompare;
-    for ( std::map<std::string,std::string>::const_iterator it=params.begin(),
+    for (std::map<std::string,std::string>::const_iterator it=params.begin(),
         itEnd=params.end(); it != itEnd; ++it)
     {
-        if ( noCaseCompare(it->first, "flashvars") )
+        if (noCaseCompare(it->first, "flashvars"))
         {
             setFlashVars(it->second);
-            continue;
-        }
-
-        if ( noCaseCompare(it->first, "base") )
-        {
-            hasOverriddenBaseUrl=true;
-            overriddenBaseUrl=it->second;
             continue;
         }
     }
