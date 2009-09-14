@@ -26,7 +26,6 @@
 #include "Movie.h" // for implicit upcast to MovieClip
 #include "VM.h"
 #include "ExecutableCode.h"
-#include "flash/display/Stage_as.h"
 #include "URL.h"
 #include "namedStrings.h"
 #include "GnashException.h"
@@ -1517,13 +1516,15 @@ movie_root::setStageScaleMode(ScaleMode sm)
     if ( _scaleMode == sm ) return; // nothing to do
 
     bool notifyResize = false;
-    if ( sm == noScale || _scaleMode == noScale )
-    {
-        // If we go from or to noScale, we notify a resize
-        // if and only if display viewport is != then actual
-        // movie size
-        const movie_definition* md = _rootMovie->definition();
+    
+    // If we go from or to noScale, we notify a resize
+    // if and only if display viewport is != then actual
+    // movie size. If there is not yet a _rootMovie (when scaleMode
+    // is passed as a parameter to the player), we also don't notify a 
+    // resize.
+    if (_rootMovie && (sm == noScale || _scaleMode == noScale)) {
 
+        const movie_definition* md = _rootMovie->definition();
         log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d "
                 "Def:%dx%d", m_viewport_width, m_viewport_height,
                 md->get_width_pixels(), md->get_height_pixels());
@@ -2469,6 +2470,37 @@ movie_root::addChildAt(DisplayObject* ch, int depth)
 {
     setInvalidated();
     _rootMovie->addChildAt(ch, depth);
+}
+
+short
+stringToStageAlign(const std::string& str)
+{
+    short am = 0;
+
+    // Easy enough to do bitwise - std::bitset is not
+    // really necessary!
+    if (str.find_first_of("lL") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_L;
+    } 
+
+    if (str.find_first_of("tT") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_T;
+    } 
+
+    if (str.find_first_of("rR") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_R;
+    } 
+
+    if (str.find_first_of("bB") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_B;
+    }
+
+    return am;
+
 }
 
 } // namespace gnash

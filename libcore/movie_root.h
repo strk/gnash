@@ -1220,6 +1220,8 @@ private:
     unsigned int _lastMovieAdvancement;
 };
 
+short stringToStageAlign(const std::string& s);
+
 } // namespace gnash
 
 #endif // GNASH_MOVIE_ROOT_H
