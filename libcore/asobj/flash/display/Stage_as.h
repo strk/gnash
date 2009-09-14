@@ -19,12 +19,10 @@
 #ifndef GNASH_ASOBJ_STAGE_H
 #define GNASH_ASOBJ_STAGE_H
 
-#include "as_object.h" // for inheritance
-#include "movie_root.h" // for access to scaleMode
-
-#include <list>
-
 namespace gnash {
+
+class ObjectURI;
+class as_object;
 
 /// This is the Stage ActionScript object.
 //
@@ -48,7 +46,7 @@ void registerStageNative(as_object& o);
 
 /// Initialize the global Stage class
 void stage_class_init(as_object& where, const ObjectURI& uri);
-  
+
 } // end of gnash namespace
 
 #endif
