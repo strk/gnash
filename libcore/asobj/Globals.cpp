@@ -23,6 +23,7 @@
 #endif
 
 #include "as_object.h"
+#include "movie_root.h"
 #include "PropFlags.h"
 #include "as_value.h"
 #include "as_function.h" // for function_class_init

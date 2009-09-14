@@ -185,6 +185,8 @@ stage_height(const fn_call& fn)
 }
 
 
+
+
 as_value
 stage_align(const fn_call& fn)
 {
@@ -199,29 +201,8 @@ stage_align(const fn_call& fn)
 	else // setter
 	{
 		const std::string& str = fn.arg(0).to_string();
-        short am = 0;
 
-        // Easy enough to do bitwise - std::bitset is not
-        // really necessary!
-        if (str.find_first_of("lL") != std::string::npos)
-        {
-            am |= 1 << movie_root::STAGE_ALIGN_L;
-        } 
-
-        if (str.find_first_of("tT") != std::string::npos)
-        {
-            am |= 1 << movie_root::STAGE_ALIGN_T;
-        } 
-
-        if (str.find_first_of("rR") != std::string::npos)
-        {
-            am |= 1 << movie_root::STAGE_ALIGN_R;
-        } 
-    
-        if (str.find_first_of("bB") != std::string::npos)
-        {
-            am |= 1 << movie_root::STAGE_ALIGN_B;
-        }
+        const short am = stringToStageAlign(str);
 
         m.setStageAlignment(am);
 
