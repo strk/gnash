@@ -376,6 +376,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
         std::cerr << "Could not initialize gui." << std::endl;
         return EXIT_FAILURE;
     }
+    
 
     // Parse querystring (before FlashVars, see
     // testsuite/misc-ming.all/FlashVarsTest*)
@@ -420,7 +421,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _gui->createWindow(_url.c_str(), _width, _height);
 
     movie_root root(*_movieDef, _gui->getClock(), *_runResources);
-
+    
     _callbacksHandler.reset(new CallbacksHandler(*_gui, *this)); 
     
     // Register Player to receive events from the core (Mouse, Stage,
@@ -434,6 +435,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
 
     _gui->setStage(&root);
+    
 
     // When startStopped is true, stop here after the stage has been 
     // registered, but before the movie has started. Initial loading
@@ -475,6 +477,33 @@ Player::run(int argc, char* argv[], const std::string& infile,
     if (!_windowID && _hideMenu) {
         _gui->hideMenu();
     }
+    
+    // Now handle stage alignment and scale mode. This should be done after
+    // the GUI is created, after its stage member is set, and after the
+    // interface callbacks are registered.
+    it = params.find("salign");
+    if (it != params.end()) {
+        log_debug("Setting align");
+        const short align = stringToStageAlign(it->second);
+        root.setStageAlignment(align);
+    }
+
+    it = params.find("scale");
+    if (it != params.end()) {
+		
+        StringNoCaseEqual noCaseCompare;
+        const std::string& str = it->second;
+		
+        movie_root::ScaleMode mode = movie_root::showAll;
+
+		if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
+		else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
+		else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
+
+        log_debug("Setting scale mode");
+	    root.setStageScaleMode(mode);
+    }
+
     
     _gui->run();
 
