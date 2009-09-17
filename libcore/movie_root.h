@@ -1220,7 +1220,7 @@ private:
     unsigned int _lastMovieAdvancement;
 };
 
-short stringToStageAlign(const std::string& s);
+DSOEXPORT short stringToStageAlign(const std::string& s);
 
 } // namespace gnash
 
