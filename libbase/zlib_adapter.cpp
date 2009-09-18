@@ -184,7 +184,7 @@ InflaterIOChannel::inflate_from_stream(void* dst, std::streamsize bytes)
 
 	if (m_error) return 0;
 
-	m_zstream.next_out = (unsigned char*) dst;
+	m_zstream.next_out = static_cast<unsigned char*>(dst);
 	m_zstream.avail_out = bytes;
 
 	for (;;)
