@@ -71,7 +71,7 @@ SdlCairoGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
     if (!_screen) {
         fprintf(stderr, "SDL_SetVideoMode() failed.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     
     int stride=width * 4;

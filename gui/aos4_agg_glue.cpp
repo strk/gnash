@@ -249,7 +249,7 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
     if (!_window) 
     {
         log_error (_("prepDrawingArea() failed.\n"));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 	
     _stride = width * depth_bytes;

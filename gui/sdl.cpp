@@ -177,7 +177,7 @@ SDLGui::init(int argc, char **argv[])
     // doesn't. Otherwise the SDL event loop just polls.
     if (SDL_Init(SDL_INIT_VIDEO)) {
         fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     atexit(SDL_Quit);

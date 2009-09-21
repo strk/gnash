@@ -268,7 +268,7 @@ DumpGui::init_dumpfile()
     if (!_fileStream) {
         log_error(_("Unable to write file '%s'."), _fileOutput);
         std::cerr << "# FATAL:  Unable to write file '" << _fileOutput << "'" << std::endl;
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     
     // Yes, this should go to cout.  The user needs to know this
