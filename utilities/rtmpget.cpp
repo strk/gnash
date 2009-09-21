@@ -118,7 +118,7 @@ main(int argc, char *argv[])
     // print the  usage message.
     if (argc < 2) {
         usage();
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
    const Arg_parser::Option opts[] =
@@ -168,10 +168,10 @@ main(int argc, char *argv[])
               case 'h':
                   version_and_copyright();
                   usage();
-                  exit(0);
+                  exit(EXIT_SUCCESS);
               case 'V':
                   version_and_copyright();
-                  exit(0);
+                  exit(EXIT_SUCCESS);
               case 'v':
                   dbglogfile.setVerbosity();
                   log_debug (_("Verbose output turned on"));
@@ -196,7 +196,7 @@ main(int argc, char *argv[])
                   break;
               case 'd':
                   rcfile.dump();
-                  exit(0);
+                  exit(EXIT_SUCCESS);
                   break;
               case 0:
                   infiles.push_back(parser.argument(i));
@@ -226,7 +226,7 @@ main(int argc, char *argv[])
     client.toggleDebug(netdebug);
     if (client.createClient(hostname, port) == false) {
         log_error("Can't connect to RTMP server %s", hostname);
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
     
     if (! client.handShakeRequest()) {
@@ -259,7 +259,7 @@ main(int argc, char *argv[])
     
     if (!msg1) {
         log_error("No response from INVOKE of NetConnection connect");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     msg1->dump();
@@ -267,7 +267,7 @@ main(int argc, char *argv[])
         log_debug("Sent NetConnection Connect message sucessfully");
     } else {
         log_error("Couldn't send NetConnection Connect message,");
-        //exit(-1);
+        //exit(EXIT_FAILURE);
     }
 
     // make the createStream for ID 3 encoded object
@@ -280,7 +280,7 @@ main(int argc, char *argv[])
 
     if (!msg2) {
         log_error("No response from INVOKE of NetStream::createStream");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     log_debug("Sent NetStream::createStream message successfully:"); msg2->dump();
@@ -291,7 +291,7 @@ main(int argc, char *argv[])
     } else {
         if (msg2->getMethodName() == "close") { 
             log_debug("Got close packet!!! Exiting...");
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
         log_error("Got no properties from NetStream::createStream invocation, arbitrarily taking 0 as streamID");
         streamID = 0.0;
@@ -312,7 +312,7 @@ main(int argc, char *argv[])
             log_debug("Sent NetStream::play message sucessfully.");
         } else {
             log_error("Couldn't send NetStream::play message,");
-//          exit(-1);
+//          exit(EXIT_FAILURE);
         }
     }
 
@@ -321,12 +321,12 @@ main(int argc, char *argv[])
         BufferSharedPtr msgs = client.recvMsg(1);   // use a 1 second timeout
         if (msgs == 0) {
             log_error("Never got any data!");
-            exit(-1);
+            exit(EXIT_FAILURE);
         }
         RTMP::queues_t *que = client.split(msgs);
         if (que == 0) {
             log_error("Never got any messages!");
-            exit(-1);
+            exit(EXIT_FAILURE);
         }
 
 #if 0
@@ -391,7 +391,7 @@ main(int argc, char *argv[])
     close(fd);
 #endif    
 
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 // Trap Control-C so we can cleanly exit
@@ -400,7 +400,7 @@ cntrlc_handler (int /*sig*/)
 {
     log_debug(_("Got an interrupt"));
 
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 static void

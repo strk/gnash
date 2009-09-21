@@ -98,12 +98,12 @@ main(int argc, char *argv[])
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
         usage(cout);
-        exit(0);
+        exit(EXIT_SUCCESS);
       }
       if (strcmp("--version", argv[c]) == 0) {
         printf (_("Gnash soldumper version: %s, Gnash version: %s\n"),
 		   SOLDUMPER_VERSION, VERSION);
-        exit(0);
+        exit(EXIT_SUCCESS);
       }
     }
  
@@ -112,7 +112,7 @@ main(int argc, char *argv[])
         switch (c) {
           case 'h':
             usage(cout);
-	    exit(0);
+	    exit(EXIT_SUCCESS);
             break;
             
 	  case 'v':
@@ -141,7 +141,7 @@ main(int argc, char *argv[])
     // print the  usage message.
     if (argc < 2) {
         usage(cerr);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     // get the file name from the command line
@@ -182,7 +182,7 @@ main(int argc, char *argv[])
                 }
             }
         }
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     
     string newspec;
