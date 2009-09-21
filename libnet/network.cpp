@@ -101,7 +101,7 @@ Network::Network()
     wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
     if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
         log_error(_("Could not find a usable WinSock DLL"));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 #endif
 
@@ -1567,7 +1567,7 @@ cntrlc_handler (int sig)
 {
     sig_number = sig;
     log_debug(_("Got an %d interrupt while blocked on pselect()"), sig);
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 } // end of gnash namespace

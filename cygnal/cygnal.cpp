@@ -464,10 +464,10 @@ main(int argc, char *argv[])
 	  case 'h':
 	      version_and_copyright();
 	      usage();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	  case 'V':
 	      version_and_copyright();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	  case 't':
 	      crcfile.setTestingFlag(true);
 	      break;
@@ -497,7 +497,7 @@ main(int argc, char *argv[])
 	      break;
 	  case 'd':
 	      crcfile.dump();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	      break;
 	  default:
 	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
@@ -601,7 +601,7 @@ cntrlc_handler (int sig)
 {
     log_network(_("Got a %d interrupt"), sig);
 //    sigaction (SIGINT, &act, NULL);
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 // Trap SIGHUP so we can 

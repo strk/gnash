@@ -75,7 +75,7 @@ main(int argc, char *argv[])
     // See if the file actually exists, otherwise we can't spawn it
     if (stat(procname.c_str(), &procstats) == -1) {
 	cout << "Invalid filename: " << procname << endl;
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     // Check the MD5, as a minimal security check
@@ -84,7 +84,7 @@ main(int argc, char *argv[])
         cout << "MD5 matches for " << procname << endl;
     } else {
         cout << "ERROR: MD5 doesn't match! for " << procname << endl;
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
     
     // make a copy of ourself, the child gets replaced by the file to
@@ -94,14 +94,14 @@ main(int argc, char *argv[])
     // childpid is -1, if the fork failed, so print out an error message
     if (childpid == -1) {
       cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
-      exit(-1);
+      exit(EXIT_FAILURE);
     }
 
     // childpid is a positive integer, if we are the parent, and
     // fork() worked, so exit cleanly
     if (childpid > 0) {
       cout << "Forked sucessfully, child process PID is " << childpid << endl;
-      exit(0);
+      exit(EXIT_SUCCESS);
     }
     
     // setup the command line for the executable we want to launch

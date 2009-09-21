@@ -247,7 +247,7 @@ void FreetypeGlyphsProvider::init()
 	{
 		std::cerr << boost::format(_("Can't init FreeType! Error "
 					"= %d")) % error << std::endl;
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 

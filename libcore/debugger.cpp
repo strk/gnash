@@ -148,7 +148,7 @@ Debugger::console(as_environment &env)
 	    // Quit Gnash.
 	  case 'Q':
 	  case 'q':
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	      break;
 	      // Continue executing.
 	  case 'c':

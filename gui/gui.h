@@ -123,10 +123,10 @@ public:
 
     /// End main rendering loop, making the call to run() return.
     //
-    /// The default implementation calls exit(0), which isn't nice.
+    /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
     /// Please implement the proper main loop quitter in the subclasses.
     ///
-    virtual void quit()  { std::exit(0); }
+    virtual void quit()  { std::exit(EXIT_SUCCESS); }
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.

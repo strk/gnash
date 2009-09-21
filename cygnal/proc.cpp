@@ -173,7 +173,7 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
 	// Start the desired executable
 	execv(path.c_str(), cmd_line);
 	perror(path.c_str());
-	exit(0);
+	exit(EXIT_SUCCESS);
     }
     
     return (true);

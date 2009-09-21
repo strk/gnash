@@ -115,7 +115,7 @@ AOS4_sound_handler::AOS4_sound_handler(const std::string& wavefile)
         file_stream.open(wavefile.c_str());
         if (file_stream.fail()) {
             std::cerr << "Unable to write file '" << wavefile << std::endl;
-            exit(1);
+            exit(EXIT_FAILURE);
         } else {
                 write_wave_header(file_stream);
                 std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
