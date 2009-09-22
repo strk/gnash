@@ -60,22 +60,23 @@ namespace {
 void
 attachGlowFilterInterface(as_object& o)
 {
+    const int flags = PropFlags::onlySWF8Up;
     o.init_property("color", glowfilter_color, 
-        glowfilter_color);
+        glowfilter_color, flags);
     o.init_property("alpha", glowfilter_alpha, 
-        glowfilter_alpha);
+        glowfilter_alpha, flags);
     o.init_property("inner", glowfilter_inner, 
-        glowfilter_inner);
+        glowfilter_inner, flags);
     o.init_property("blurX", glowfilter_blurX, 
-        glowfilter_blurX);
+        glowfilter_blurX, flags);
     o.init_property("blurY", glowfilter_blurY, 
-        glowfilter_blurY);
+        glowfilter_blurY, flags);
     o.init_property("strength", glowfilter_strength, 
-        glowfilter_strength);
+        glowfilter_strength, flags);
     o.init_property("quality", glowfilter_quality, 
-        glowfilter_quality);
+        glowfilter_quality, flags);
     o.init_property("knockout", glowfilter_knockout, 
-        glowfilter_knockout);
+        glowfilter_knockout, flags);
 
 }
 
