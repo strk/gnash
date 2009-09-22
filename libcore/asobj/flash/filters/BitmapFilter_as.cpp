@@ -73,9 +73,14 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
 {
     Global_as* gl = getGlobal(where);
 
-    as_environment env(getVM(where));
-    as_value bf(env.find_object("flash.filters.BitmapFilter"));
-    as_function* constructor = bf.to_as_function();
+    string_table& st = getStringTable(where);
+
+    // We should be looking for flash.filters.BitmapFilter, but as this
+    // triggers a lookup of the flash.filters package while we are creating
+    // it, so entering infinite recursion, we'll cheat and assume that
+    // the object 'where' is the filters package.
+    as_function* constructor =
+        where.getMember(st.find("BitmapFilter")).to_as_function();
     
     as_object* proto;
     if (constructor) {
@@ -118,6 +123,7 @@ bitmapfilter_new(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     obj->setRelay(new BitmapFilter_as);
+    return as_value();
 }
 
 /// TODO: there are no tests for how this works, so it's not implemented.
