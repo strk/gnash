@@ -20,116 +20,96 @@
 #include "BevelFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
-#include "flash/filters/BitmapFilter_as.h"
 #include "Global_as.h"
 
 namespace gnash {
 
-class BevelFilter_as : public as_object, public BevelFilter
-{
-public:
-    static as_value distance_gs(const fn_call& fn);
-    static as_value angle_gs(const fn_call& fn);
-    static as_value highlightColor_gs(const fn_call& fn);
-    static as_value highlightAlpha_gs(const fn_call& fn);
-    static as_value shadowColor_gs(const fn_call& fn);
-    static as_value shadowAlpha_gs(const fn_call& fn);
-    static as_value blurX_gs(const fn_call& fn);
-    static as_value blurY_gs(const fn_call& fn);
-    static as_value strength_gs(const fn_call& fn);
-    static as_value quality_gs(const fn_call& fn);
-    static as_value type_gs(const fn_call& fn);
-    static as_value knockout_gs(const fn_call& fn);
-    static as_value bitmap_clone(const fn_call& fn);
+namespace {
+    as_value bevelfilter_new(const fn_call& fn);
+    as_value bevelfilter_distance(const fn_call& fn);
+    as_value bevelfilter_angle(const fn_call& fn);
+    as_value bevelfilter_highlightColor(const fn_call& fn);
+    as_value bevelfilter_highlightAlpha(const fn_call& fn);
+    as_value bevelfilter_shadowColor(const fn_call& fn);
+    as_value bevelfilter_shadowAlpha(const fn_call& fn);
+    as_value bevelfilter_blurX(const fn_call& fn);
+    as_value bevelfilter_blurY(const fn_call& fn);
+    as_value bevelfilter_strength(const fn_call& fn);
+    as_value bevelfilter_quality(const fn_call& fn);
+    as_value bevelfilter_type(const fn_call& fn);
+    as_value bevelfilter_knockout(const fn_call& fn);
 
-    public: BevelFilter_as(as_object *obj)
-	    :
-	    as_object(obj)
-    {}
-    
-    static as_object* Interface();
-    static void attachInterface(as_object& o);
-    static void attachProperties(as_object& o);
-    static void registerCtor(as_object& where);
-    static as_value ctor(const fn_call& fn);
-private:
-    static boost::intrusive_ptr<as_object> s_interface;
-
-};
-
-
-boost::intrusive_ptr<as_object> BevelFilter_as::s_interface;
-
-as_object*
-BevelFilter_as::Interface() {
-    if (BevelFilter_as::s_interface == NULL) {
-        BevelFilter_as::s_interface = new as_object (getBitmapFilterInterface());
-        VM::get().addStatic(BevelFilter_as::s_interface.get());
-        BevelFilter_as::attachInterface(*BevelFilter_as::s_interface);
-    }
-    return BevelFilter_as::s_interface.get();
+    void attachBevelFilterInterface(as_object& o);
 }
 
+/// TODO: should this inherit from BitmapFilter_as (relay)? This might
+/// make cloning easier, but needs some testing first.
+class BevelFilter_as : public Relay, public BevelFilter
+{
+public:
+    BevelFilter_as() {}
+};
 
+/// The prototype of flash.filters.BevelFilter is a new BitmapFilter.
 void
 bevelfilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl;
-    if (cl != NULL) return;
     Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&BevelFilter_as::ctor, BevelFilter_as::Interface());
-    VM::get().addStatic(cl.get());
-    BevelFilter_as::attachInterface(*cl);
-    where.init_member(getName(uri) , cl.get(), as_object::DefaultFlags,
+    string_table& st = getStringTable(where);
+
+    as_function* ctor =
+        gl->getMember(st.find("flash.filters.BitmapFilter")).to_as_function();
+    
+    as_object* proto;
+    if (ctor) {
+        fn_call::Args args;
+        VM& vm = getVM(where);
+        proto = ctor->constructInstance(as_environment(vm), args).get();
+    }
+    else proto = 0;
+
+    as_object* cl = gl->createClass(bevelfilter_new, proto);
+    attachBevelFilterInterface(*proto);
+    where.init_member(getName(uri) , cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
+namespace {
 
 void
-BevelFilter_as::attachInterface(as_object& o)
+attachBevelFilterInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> gs;
-
-    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
-
-}
-
-
-void
-BevelFilter_as::attachProperties(as_object& o) {
-    boost::intrusive_ptr<builtin_function> gs;
-    o.init_property("distance" , BevelFilter_as::distance_gs, 
-        BevelFilter_as::distance_gs);
-    o.init_property("angle" , BevelFilter_as::angle_gs, 
-        BevelFilter_as::angle_gs);
-    o.init_property("highlightColor" , BevelFilter_as::highlightColor_gs, 
-        BevelFilter_as::highlightColor_gs);
-    o.init_property("highlightAlpha" , BevelFilter_as::highlightAlpha_gs, 
-        BevelFilter_as::highlightAlpha_gs);
-    o.init_property("shadowColor" , BevelFilter_as::shadowColor_gs, 
-        BevelFilter_as::shadowColor_gs);
-    o.init_property("shadowAlpha" , BevelFilter_as::shadowAlpha_gs, 
-        BevelFilter_as::shadowAlpha_gs);
-    o.init_property("blurX" , BevelFilter_as::blurX_gs, 
-        BevelFilter_as::blurX_gs);
-    o.init_property("blurY" , BevelFilter_as::blurY_gs, 
-        BevelFilter_as::blurY_gs);
-    o.init_property("strength" , BevelFilter_as::strength_gs, 
-        BevelFilter_as::strength_gs);
-    o.init_property("quality" , BevelFilter_as::quality_gs, 
-        BevelFilter_as::quality_gs);
-    o.init_property("type" , BevelFilter_as::type_gs, 
-        BevelFilter_as::type_gs);
-    o.init_property("knockout" , BevelFilter_as::knockout_gs, 
-        BevelFilter_as::knockout_gs);
+    o.init_property("distance", bevelfilter_distance, 
+        bevelfilter_distance);
+    o.init_property("angle", bevelfilter_angle, 
+        bevelfilter_angle);
+    o.init_property("highlightColor", bevelfilter_highlightColor, 
+        bevelfilter_highlightColor);
+    o.init_property("highlightAlpha", bevelfilter_highlightAlpha, 
+        bevelfilter_highlightAlpha);
+    o.init_property("shadowColor", bevelfilter_shadowColor, 
+        bevelfilter_shadowColor);
+    o.init_property("shadowAlpha", bevelfilter_shadowAlpha, 
+        bevelfilter_shadowAlpha);
+    o.init_property("blurX", bevelfilter_blurX, 
+        bevelfilter_blurX);
+    o.init_property("blurY", bevelfilter_blurY, 
+        bevelfilter_blurY);
+    o.init_property("strength", bevelfilter_strength, 
+        bevelfilter_strength);
+    o.init_property("quality", bevelfilter_quality, 
+        bevelfilter_quality);
+    o.init_property("type", bevelfilter_type, 
+        bevelfilter_type);
+    o.init_property("knockout", bevelfilter_knockout, 
+        bevelfilter_knockout);
 
 }
 
 as_value
-BevelFilter_as::distance_gs(const fn_call& fn)
+bevelfilter_distance(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_distance );
     }
@@ -140,21 +120,21 @@ BevelFilter_as::distance_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::angle_gs(const fn_call& fn)
+bevelfilter_angle(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-        return as_value(ptr->m_angle );
+        return as_value(ptr->m_angle);
     }
-    float sp_angle = fn.arg(0).to_number<float> ();
+    double sp_angle = fn.arg(0).to_number();
     ptr->m_angle = sp_angle;
     return as_value();
 }
 
 as_value
-BevelFilter_as::highlightColor_gs(const fn_call& fn)
+bevelfilter_highlightColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_highlightColor );
     }
@@ -164,9 +144,9 @@ BevelFilter_as::highlightColor_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::highlightAlpha_gs(const fn_call& fn)
+bevelfilter_highlightAlpha(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_highlightAlpha );
     }
@@ -176,9 +156,9 @@ BevelFilter_as::highlightAlpha_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::shadowColor_gs(const fn_call& fn)
+bevelfilter_shadowColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_shadowColor );
     }
@@ -188,9 +168,9 @@ BevelFilter_as::shadowColor_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::shadowAlpha_gs(const fn_call& fn)
+bevelfilter_shadowAlpha(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_shadowAlpha );
     }
@@ -200,9 +180,9 @@ BevelFilter_as::shadowAlpha_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::blurX_gs(const fn_call& fn)
+bevelfilter_blurX(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
@@ -212,9 +192,9 @@ BevelFilter_as::blurX_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::blurY_gs(const fn_call& fn)
+bevelfilter_blurY(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
@@ -224,9 +204,9 @@ BevelFilter_as::blurY_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::strength_gs(const fn_call& fn)
+bevelfilter_strength(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
@@ -236,9 +216,9 @@ BevelFilter_as::strength_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::quality_gs(const fn_call& fn)
+bevelfilter_quality(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
@@ -248,9 +228,9 @@ BevelFilter_as::quality_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::knockout_gs(const fn_call& fn)
+bevelfilter_knockout(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
@@ -260,20 +240,9 @@ BevelFilter_as::knockout_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::bitmap_clone(const fn_call& fn)
+bevelfilter_type(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
-    boost::intrusive_ptr<BevelFilter_as> obj = new BevelFilter_as(*ptr);
-    boost::intrusive_ptr<as_object> r = obj;
-    r->set_prototype(ptr->get_prototype());
-    r->copyProperties(*ptr);
-    return as_value(r);
-}
-
-as_value
-BevelFilter_as::type_gs(const fn_call& fn)
-{
-    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
 
     if (fn.nargs == 0)
     {
@@ -315,13 +284,12 @@ BevelFilter_as::type_gs(const fn_call& fn)
 }
 
 as_value
-BevelFilter_as::ctor(const fn_call& )
+bevelfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new BevelFilter_as(BevelFilter_as::Interface());
-
-    BevelFilter_as::attachProperties(*obj);
-    return as_value(obj.get());
-
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new BevelFilter_as);
+    return as_value();
 }
 
+}
 }
