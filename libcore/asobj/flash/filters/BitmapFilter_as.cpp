@@ -112,8 +112,13 @@ getBitmapFilterConstructor(const fn_call& fn)
 {
     log_debug("Loading flash.filters.BitmapFilter class");
     Global_as* gl = getGlobal(fn);
+    VM& vm = getVM(fn);
+    
     as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&bitmapfilter_new, proto);
+    as_object* cl = vm.getNative(1112, 0);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+    
     attachBitmapFilterInterface(*proto);
     return cl;
 }
