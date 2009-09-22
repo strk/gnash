@@ -27,18 +27,9 @@ namespace gnash {
 
 namespace {
     as_value blurfilter_new(const fn_call& fn);
-    as_value blurfilter_distance(const fn_call& fn);
-    as_value blurfilter_angle(const fn_call& fn);
-    as_value blurfilter_highlightColor(const fn_call& fn);
-    as_value blurfilter_highlightAlpha(const fn_call& fn);
-    as_value blurfilter_shadowColor(const fn_call& fn);
-    as_value blurfilter_shadowAlpha(const fn_call& fn);
     as_value blurfilter_blurX(const fn_call& fn);
     as_value blurfilter_blurY(const fn_call& fn);
-    as_value blurfilter_strength(const fn_call& fn);
     as_value blurfilter_quality(const fn_call& fn);
-    as_value blurfilter_type(const fn_call& fn);
-    as_value blurfilter_knockout(const fn_call& fn);
 
     void attachBlurFilterInterface(as_object& o);
 }
