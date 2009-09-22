@@ -33,9 +33,6 @@ void bitmapfilter_class_init(as_object& where, const ObjectURI& uri);
 
 void registerBitmapFilterNative(as_object& global);
 
-/// Get the interface, for inheritance.
-as_object *getBitmapFilterInterface();
-
 } // end of gnash namespace
 
 #endif

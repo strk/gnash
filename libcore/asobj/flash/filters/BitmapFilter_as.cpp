@@ -28,20 +28,25 @@ namespace gnash {
 
 namespace {
     
-    as_value bitmapfilter_ctor(const fn_call& fn);
+    as_value bitmapfilter_new(const fn_call& fn);
     as_value bitmapfilter_clone(const fn_call& fn);
     as_value getBitmapFilterConstructor(const fn_call& fn);
     void attachBitmapFilterInterface(as_object& o);
 }
  
-// TODO: Use composition, not inheritance.
-class BitmapFilter_as : public as_object, public BitmapFilter
+/// This may need a reference to its owner as_object
+//
+/// TODO: is BitmapFilter GC collected?
+class BitmapFilter_as : public Relay
 {
 public:
-    BitmapFilter_as(as_object *obj)
-	    :
-        as_object(obj)
+    BitmapFilter_as()
+        :
+        _filter(new BitmapFilter)
     {}
+
+private:
+    BitmapFilter* _filter;
 };
 
 
@@ -58,19 +63,8 @@ void
 registerBitmapFilterNative(as_object& global)
 {
     VM& vm = getVM(global);
+    vm.registerNative(bitmapfilter_new, 1112, 0);
     vm.registerNative(bitmapfilter_clone, 1112, 1);
-}
-
-as_object*
-getBitmapFilterInterface()
-{
-    static as_object* o;
-    if (!o) {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o);
-        attachBitmapFilterInterface(*o);
-    }
-    return o;
 }
 
 namespace {
@@ -86,29 +80,28 @@ attachBitmapFilterInterface(as_object& o)
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
-    as_object* proto = getBitmapFilterInterface();
+    log_debug("Loading flash.filters.BitmapFilter class");
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&bitmapfilter_ctor, proto);
+    as_object* proto = gl->createObject();
+    as_object* cl = gl->createClass(&bitmapfilter_new, proto);
+    attachBitmapFilterInterface(*proto);
+    return cl;
 }
 
 as_value
-bitmapfilter_ctor(const fn_call& /*fn*/)
+bitmapfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj =
-        new BitmapFilter_as(getBitmapFilterInterface());
-    return as_value(obj);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new BitmapFilter_as);
 }
 
+/// TODO: there are no tests for how this works, so it's not implemented.
 as_value
 bitmapfilter_clone(const fn_call& fn)
 {
-    boost::intrusive_ptr<BitmapFilter_as> to_copy = ensureType<BitmapFilter_as> (fn.this_ptr);
-    boost::intrusive_ptr<BitmapFilter_as> filter = new BitmapFilter_as(*to_copy);
-    filter->set_prototype(filter->get_prototype());
-    filter->copyProperties(*filter);
-    boost::intrusive_ptr<as_object> r = filter;
-
-    return as_value(r);
+    BitmapFilter_as* relay = ensureNativeType<BitmapFilter_as>(fn.this_ptr);
+    UNUSED(relay);
+    return as_value();
 }
 } // anonymous namespace
 } // gnash namespace
