@@ -48,7 +48,6 @@ public:
         m_quality(quality), m_inner(inner), m_knockout(knockout)
     { return; }
 
-protected:
     boost::uint32_t m_color; // RGB color.
     boost::uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
