@@ -90,8 +90,9 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     }
     else proto = 0;
 
-    as_object* cl = gl->createClass(ctor, proto);
+    as_object* cl = gl->createClass(ctor, gl->createObject());
     if (proto) p(*proto);
+    cl->set_member(NSV::PROP_PROTOTYPE, proto);
     where.init_member(getName(uri) , cl, as_object::DefaultFlags,
             getNamespace(uri));
 
