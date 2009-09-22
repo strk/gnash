@@ -63,9 +63,10 @@ namespace {
 void
 attachBlurFilterInterface(as_object& o)
 {
-    o.init_property("blurX", blurfilter_blurX, blurfilter_blurX);
-    o.init_property("blurY", blurfilter_blurY, blurfilter_blurY);
-    o.init_property("quality", blurfilter_quality, blurfilter_quality);
+    const int flags = PropFlags::onlySWF8Up;
+    o.init_property("blurX", blurfilter_blurX, blurfilter_blurX, flags);
+    o.init_property("blurY", blurfilter_blurY, blurfilter_blurY, flags);
+    o.init_property("quality", blurfilter_quality, blurfilter_quality, flags);
 }
 
 as_value
