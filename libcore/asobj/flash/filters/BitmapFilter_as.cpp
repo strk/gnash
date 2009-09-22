@@ -28,20 +28,25 @@ namespace gnash {
 
 namespace {
     
-    as_value bitmapfilter_ctor(const fn_call& fn);
+    as_value bitmapfilter_new(const fn_call& fn);
     as_value bitmapfilter_clone(const fn_call& fn);
     as_value getBitmapFilterConstructor(const fn_call& fn);
     void attachBitmapFilterInterface(as_object& o);
 }
  
-// TODO: Use composition, not inheritance.
-class BitmapFilter_as : public as_object, public BitmapFilter
+/// This may need a reference to its owner as_object
+//
+/// TODO: is BitmapFilter GC collected?
+class BitmapFilter_as : public Relay
 {
 public:
-    BitmapFilter_as(as_object *obj)
-	    :
-        as_object(obj)
+    BitmapFilter_as()
+        :
+        _filter(new BitmapFilter)
     {}
+
+private:
+    BitmapFilter* _filter;
 };
 
 
@@ -58,19 +63,43 @@ void
 registerBitmapFilterNative(as_object& global)
 {
     VM& vm = getVM(global);
+    vm.registerNative(bitmapfilter_new, 1112, 0);
     vm.registerNative(bitmapfilter_clone, 1112, 1);
 }
 
-as_object*
-getBitmapFilterInterface()
+void
+registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
+        Properties p, const ObjectURI& uri)
 {
-    static as_object* o;
-    if (!o) {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o);
-        attachBitmapFilterInterface(*o);
+    Global_as* gl = getGlobal(where);
+
+    string_table& st = getStringTable(where);
+
+    // We should be looking for flash.filters.BitmapFilter, but as this
+    // triggers a lookup of the flash.filters package while we are creating
+    // it, so entering infinite recursion, we'll cheat and assume that
+    // the object 'where' is the filters package.
+    as_function* constructor =
+        where.getMember(st.find("BitmapFilter")).to_as_function();
+    
+    as_object* proto;
+    if (constructor) {
+        fn_call::Args args;
+        VM& vm = getVM(where);
+        proto = constructor->constructInstance(as_environment(vm), args).get();
     }
-    return o;
+    else proto = 0;
+
+    as_object* cl = gl->createClass(ctor, gl->createObject());
+    if (proto) p(*proto);
+
+    // The startup script overwrites the prototype assigned by ASconstructor,
+    // so the new prototype doesn't have a constructor property. We do the
+    // same here.
+    cl->set_member(NSV::PROP_PROTOTYPE, proto);
+    where.init_member(getName(uri) , cl, as_object::DefaultFlags,
+            getNamespace(uri));
+
 }
 
 namespace {
@@ -86,29 +115,34 @@ attachBitmapFilterInterface(as_object& o)
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
-    as_object* proto = getBitmapFilterInterface();
+    log_debug("Loading flash.filters.BitmapFilter class");
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&bitmapfilter_ctor, proto);
+    VM& vm = getVM(fn);
+    
+    as_object* proto = gl->createObject();
+    as_object* cl = vm.getNative(1112, 0);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+    
+    attachBitmapFilterInterface(*proto);
+    return cl;
 }
 
 as_value
-bitmapfilter_ctor(const fn_call& /*fn*/)
+bitmapfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj =
-        new BitmapFilter_as(getBitmapFilterInterface());
-    return as_value(obj);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new BitmapFilter_as);
+    return as_value();
 }
 
+/// TODO: there are no tests for how this works, so it's not implemented.
 as_value
 bitmapfilter_clone(const fn_call& fn)
 {
-    boost::intrusive_ptr<BitmapFilter_as> to_copy = ensureType<BitmapFilter_as> (fn.this_ptr);
-    boost::intrusive_ptr<BitmapFilter_as> filter = new BitmapFilter_as(*to_copy);
-    filter->set_prototype(filter->get_prototype());
-    filter->copyProperties(*filter);
-    boost::intrusive_ptr<as_object> r = filter;
-
-    return as_value(r);
+    BitmapFilter_as* relay = ensureNativeType<BitmapFilter_as>(fn.this_ptr);
+    UNUSED(relay);
+    return as_value();
 }
 } // anonymous namespace
 } // gnash namespace

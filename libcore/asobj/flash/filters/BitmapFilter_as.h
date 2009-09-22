@@ -23,6 +23,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "Global_as.h"
+
 namespace gnash {
 
 class as_object;
@@ -33,8 +35,8 @@ void bitmapfilter_class_init(as_object& where, const ObjectURI& uri);
 
 void registerBitmapFilterNative(as_object& global);
 
-/// Get the interface, for inheritance.
-as_object *getBitmapFilterInterface();
+void registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
+        Properties p, const ObjectURI& uri);
 
 } // end of gnash namespace
 

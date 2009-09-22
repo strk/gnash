@@ -21,90 +21,49 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "Global_as.h"
-
 #include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class BlurFilter_as : public as_object, public BlurFilter
+namespace {
+    as_value blurfilter_new(const fn_call& fn);
+    as_value blurfilter_blurX(const fn_call& fn);
+    as_value blurfilter_blurY(const fn_call& fn);
+    as_value blurfilter_quality(const fn_call& fn);
+
+    void attachBlurFilterInterface(as_object& o);
+}
+
+/// TODO: should this inherit from BitmapFilter_as (relay)? This might
+/// make cloning easier, but needs some testing first.
+class BlurFilter_as : public Relay, public BlurFilter
 {
 public:
-    static as_value blurX_gs(const fn_call& fn);
-    static as_value blurY_gs(const fn_call& fn);
-    static as_value quality_gs(const fn_call& fn);
-    static as_value bitmap_clone(const fn_call& fn);
-
-    BlurFilter_as(as_object *obj)
-	    :
-        as_object(obj)
-    {
-    }
-    
-    static as_object* Interface();
-    static void attachInterface(as_object& o);
-    static void attachProperties(as_object& o);
-    static void registerCtor(as_object& where);
-    static as_value ctor(const fn_call& fn);
-private:
-    static boost::intrusive_ptr<as_object> s_interface;
-
+    BlurFilter_as() {}
 };
-
-
-boost::intrusive_ptr<as_object> BlurFilter_as::s_interface;
-
-as_object*
-BlurFilter_as::Interface() {
-    if (BlurFilter_as::s_interface == NULL) {
-        BlurFilter_as::s_interface = new as_object(getBitmapFilterInterface());
-        VM::get().addStatic(BlurFilter_as::s_interface.get());
-        BlurFilter_as::attachInterface(*BlurFilter_as::s_interface);
-    }
-    return BlurFilter_as::s_interface.get();
-}
 
 void
 blurfilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-    if (!cl) return;
-
-    Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&BlurFilter_as::ctor, BlurFilter_as::Interface());
-    BlurFilter_as::attachInterface(*cl);
-
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBitmapClass(where, blurfilter_new, attachBlurFilterInterface,
+            uri);
 }
 
+namespace {
 
 void
-BlurFilter_as::attachInterface(as_object& o) {
-    Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> gs;
-
-    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
-
-}
-
-void
-BlurFilter_as::attachProperties(as_object& o)
+attachBlurFilterInterface(as_object& o)
 {
-    boost::intrusive_ptr<builtin_function> gs;
-    o.init_property("blurX" , BlurFilter_as::blurX_gs, 
-        BlurFilter_as::blurX_gs);
-    o.init_property("blurY" , BlurFilter_as::blurY_gs, 
-        BlurFilter_as::blurY_gs);
-    o.init_property("quality" , BlurFilter_as::quality_gs, 
-        BlurFilter_as::quality_gs);
-
+    const int flags = PropFlags::onlySWF8Up;
+    o.init_property("blurX", blurfilter_blurX, blurfilter_blurX, flags);
+    o.init_property("blurY", blurfilter_blurY, blurfilter_blurY, flags);
+    o.init_property("quality", blurfilter_quality, blurfilter_quality, flags);
 }
 
 as_value
-BlurFilter_as::blurX_gs(const fn_call& fn)
+blurfilter_blurX(const fn_call& fn)
 {
-    
-    boost::intrusive_ptr<BlurFilter_as> ptr = ensureType<BlurFilter_as>(fn.this_ptr);
+    BlurFilter_as* ptr = ensureNativeType<BlurFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
@@ -114,11 +73,11 @@ BlurFilter_as::blurX_gs(const fn_call& fn)
 }
 
 as_value
-BlurFilter_as::blurY_gs(const fn_call& fn)
+blurfilter_blurY(const fn_call& fn)
 {
-	boost::intrusive_ptr<BlurFilter_as> ptr = ensureType<BlurFilter_as>(fn.this_ptr);
+    BlurFilter_as* ptr = ensureNativeType<BlurFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-        return as_value(ptr->m_blurY );
+		return as_value(ptr->m_blurY );
     }
     float sp_blurY = fn.arg(0).to_number<float> ();
     ptr->m_blurY = sp_blurY;
@@ -126,11 +85,11 @@ BlurFilter_as::blurY_gs(const fn_call& fn)
 }
 
 as_value
-BlurFilter_as::quality_gs(const fn_call& fn)
+blurfilter_quality(const fn_call& fn)
 {
-	boost::intrusive_ptr<BlurFilter_as> ptr = ensureType<BlurFilter_as>(fn.this_ptr);
+    BlurFilter_as* ptr = ensureNativeType<BlurFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-        return as_value(ptr->m_quality );
+		return as_value(ptr->m_quality );
     }
     boost::uint8_t sp_quality = fn.arg(0).to_number<boost::uint8_t> ();
     ptr->m_quality = sp_quality;
@@ -138,24 +97,13 @@ BlurFilter_as::quality_gs(const fn_call& fn)
 }
 
 as_value
-BlurFilter_as::bitmap_clone(const fn_call& fn)
+blurfilter_new(const fn_call& fn)
 {
-	boost::intrusive_ptr<BlurFilter_as> ptr = ensureType<BlurFilter_as>(fn.this_ptr);
-    boost::intrusive_ptr<BlurFilter_as> obj = new BlurFilter_as(*ptr);
-    boost::intrusive_ptr<as_object> r = obj;
-    r->set_prototype(ptr->get_prototype());
-    r->copyProperties(*ptr);
-    return as_value(r);
-}
-
-as_value
-BlurFilter_as::ctor(const fn_call& )
-{
-    boost::intrusive_ptr<as_object> obj = new BlurFilter_as(BlurFilter_as::Interface());
-
-    BlurFilter_as::attachProperties(*obj);
-    return as_value(obj);
-
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new BlurFilter_as);
+    return as_value();
 }
 
 }
+}
+

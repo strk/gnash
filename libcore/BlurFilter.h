@@ -42,7 +42,6 @@ public:
         m_blurX(blurX), m_blurY(blurY), m_quality(quality)
     { return; }
 
-protected:
     float m_blurX; // How much horizontal blur.
     float m_blurY; // How much vertical blur.
     boost::uint8_t m_quality; // How many passes to take.

@@ -44,15 +44,16 @@ get_flash_filters_package(const fn_call& fn)
 {
 
     log_debug("Loading flash.filters package");
-    as_object *pkg = new as_object(getObjectInterface());
+    Global_as* gl = getGlobal(fn);
+    as_object* pkg = gl->createObject();
 
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;
 
-    bevelfilter_class_init(*pkg,
-            ObjectURI(st.find("BevelFilter"), global));
     bitmapfilter_class_init(*pkg,
             ObjectURI(st.find("BitmapFilter"), global));
+    bevelfilter_class_init(*pkg,
+            ObjectURI(st.find("BevelFilter"), global));
     blurfilter_class_init(*pkg,
             ObjectURI(st.find("BlurFilter"), global));
     colormatrixfilter_class_init(*pkg,

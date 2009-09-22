@@ -20,166 +20,129 @@
 #include "GradientBevelFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
-#include "BitmapFilter_as.h"
 #include "Global_as.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class GradientBevelFilter_as : public as_object, public GradientBevelFilter
-{
-public:
-    static as_value distance_gs(const fn_call& fn);
-    static as_value angle_gs(const fn_call& fn);
-    static as_value colors_gs(const fn_call& fn);
-    static as_value alphas_gs(const fn_call& fn);
-    static as_value ratios_gs(const fn_call& fn);
-    static as_value blurX_gs(const fn_call& fn);
-    static as_value blurY_gs(const fn_call& fn);
-    static as_value strength_gs(const fn_call& fn);
-    static as_value quality_gs(const fn_call& fn);
-    static as_value type_gs(const fn_call& fn);
-    static as_value knockout_gs(const fn_call& fn);
-    static as_value bitmap_clone(const fn_call& fn);
+namespace {
+    as_value gradientbevelfilter_new(const fn_call& fn);
+    as_value gradientbevelfilter_distance(const fn_call& fn);
+    as_value gradientbevelfilter_angle(const fn_call& fn);
+    as_value gradientbevelfilter_alphas(const fn_call& fn);
+    as_value gradientbevelfilter_colors(const fn_call& fn);
+    as_value gradientbevelfilter_ratios(const fn_call& fn);
+    as_value gradientbevelfilter_blurX(const fn_call& fn);
+    as_value gradientbevelfilter_blurY(const fn_call& fn);
+    as_value gradientbevelfilter_strength(const fn_call& fn);
+    as_value gradientbevelfilter_quality(const fn_call& fn);
+    as_value gradientbevelfilter_type(const fn_call& fn);
+    as_value gradientbevelfilter_knockout(const fn_call& fn);
 
-
-    GradientBevelFilter_as(as_object *obj)
-        :
-        as_object(obj)
-    {}
-    
-    static as_object* Interface();
-    static void attachInterface(as_object& o);
-    static void attachProperties(as_object& o);
-    static as_value ctor(const fn_call& fn);
-private:
-    static boost::intrusive_ptr<as_object> s_interface;
-
-};
-
-
-boost::intrusive_ptr<as_object> GradientBevelFilter_as::s_interface;
-
-as_object*
-GradientBevelFilter_as::Interface() {
-    if (GradientBevelFilter_as::s_interface == NULL) {
-        GradientBevelFilter_as::s_interface = new as_object (getBitmapFilterInterface());
-        VM::get().addStatic(GradientBevelFilter_as::s_interface.get());
-        GradientBevelFilter_as::attachInterface(*GradientBevelFilter_as::s_interface);
-    }
-
-    return GradientBevelFilter_as::s_interface.get();
+    void attachGradientBevelFilterInterface(as_object& o);
 }
 
+/// TODO: should this inherit from BitmapFilter_as (relay)? This might
+/// make cloning easier, but needs some testing first.
+class GradientBevelFilter_as : public Relay, public GradientBevelFilter
+{
+public:
+    GradientBevelFilter_as() {}
+};
+
+/// The prototype of flash.filters.GradientBevelFilter is a new BitmapFilter.
 void
 gradientbevelfilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl;
-    if (cl != NULL) return;
-    Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&GradientBevelFilter_as::ctor, GradientBevelFilter_as::Interface());
-    VM::get().addStatic(cl.get());
-    GradientBevelFilter_as::attachInterface(*cl);
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBitmapClass(where, gradientbevelfilter_new,
+            attachGradientBevelFilterInterface, uri);
 }
 
+namespace {
 
 void
-GradientBevelFilter_as::attachInterface(as_object& o)
+attachGradientBevelFilterInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> gs;
-
-    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
-
-}
-
-
-void
-GradientBevelFilter_as::attachProperties(as_object& o) {
-    o.init_property("distance" , GradientBevelFilter_as::distance_gs, 
-        GradientBevelFilter_as::distance_gs);
-
-    o.init_property("angle" , GradientBevelFilter_as::angle_gs, 
-        GradientBevelFilter_as::angle_gs);
-    o.init_property("colors" , GradientBevelFilter_as::colors_gs, 
-        GradientBevelFilter_as::colors_gs);
-
-    o.init_property("ratios" , GradientBevelFilter_as::ratios_gs, 
-        GradientBevelFilter_as::ratios_gs);
-
-    o.init_property("blurX" , GradientBevelFilter_as::blurX_gs, 
-        GradientBevelFilter_as::blurX_gs);
-    o.init_property("blurY" , GradientBevelFilter_as::blurY_gs, 
-        GradientBevelFilter_as::blurY_gs);
-
-    o.init_property("strength" , GradientBevelFilter_as::strength_gs, 
-        GradientBevelFilter_as::strength_gs);
-
-    o.init_property("quality" , GradientBevelFilter_as::quality_gs, 
-        GradientBevelFilter_as::quality_gs);
-
-    o.init_property("type" , GradientBevelFilter_as::type_gs, 
-        GradientBevelFilter_as::type_gs);
-    o.init_property("knockout" , GradientBevelFilter_as::knockout_gs, 
-        GradientBevelFilter_as::knockout_gs);
+    const int flags = PropFlags::onlySWF8Up;
+    o.init_property("distance", gradientbevelfilter_distance, 
+        gradientbevelfilter_distance, flags);
+    o.init_property("angle", gradientbevelfilter_angle, 
+        gradientbevelfilter_angle, flags);
+    o.init_property("alphas", gradientbevelfilter_alphas, 
+        gradientbevelfilter_alphas, flags);
+    o.init_property("colors", gradientbevelfilter_colors, 
+        gradientbevelfilter_colors, flags);
+    o.init_property("ratios", gradientbevelfilter_ratios, 
+        gradientbevelfilter_ratios, flags);
+    o.init_property("blurX", gradientbevelfilter_blurX, 
+        gradientbevelfilter_blurX, flags);
+    o.init_property("blurY", gradientbevelfilter_blurY, 
+        gradientbevelfilter_blurY, flags);
+    o.init_property("strength", gradientbevelfilter_strength, 
+        gradientbevelfilter_strength, flags);
+    o.init_property("quality", gradientbevelfilter_quality, 
+        gradientbevelfilter_quality, flags);
+    o.init_property("type", gradientbevelfilter_type, 
+        gradientbevelfilter_type, flags);
+    o.init_property("knockout", gradientbevelfilter_knockout, 
+        gradientbevelfilter_knockout, flags);
 
 }
 
 as_value
-GradientBevelFilter_as::distance_gs(const fn_call& fn)
+gradientbevelfilter_distance(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
- if (fn.nargs == 0) {
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    if (fn.nargs == 0) {
         return as_value(ptr->m_distance );
     }
-    float sp_distance = fn.arg(0).to_number<float> ();
+    
+    float sp_distance = fn.arg(0).to_number();
     ptr->m_distance = sp_distance;
     return as_value();
 }
 
 as_value
-GradientBevelFilter_as::angle_gs(const fn_call& fn)
+gradientbevelfilter_angle(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
- if (fn.nargs == 0) {
-        return as_value(ptr->m_angle );
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    if (fn.nargs == 0) {
+        return as_value(ptr->m_angle);
     }
-    float sp_angle = fn.arg(0).to_number<float> ();
+    double sp_angle = fn.arg(0).to_number();
     ptr->m_angle = sp_angle;
     return as_value();
 }
 
-
 as_value
-GradientBevelFilter_as::colors_gs(const fn_call& fn)
+gradientbevelfilter_alphas(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
     return as_value();
 }
 
-
 as_value
-GradientBevelFilter_as::alphas_gs(const fn_call& fn)
+gradientbevelfilter_colors(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
     return as_value();
 }
 
-
 as_value
-GradientBevelFilter_as::ratios_gs(const fn_call& fn)
+gradientbevelfilter_ratios(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
     return as_value();
 }
 
-
 as_value
-GradientBevelFilter_as::blurX_gs(const fn_call& fn)
+gradientbevelfilter_blurX(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
- if (fn.nargs == 0) {
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
     float sp_blurX = fn.arg(0).to_number<float> ();
@@ -187,24 +150,22 @@ GradientBevelFilter_as::blurX_gs(const fn_call& fn)
     return as_value();
 }
 
-
 as_value
-GradientBevelFilter_as::blurY_gs(const fn_call& fn)
+gradientbevelfilter_blurY(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
- if (fn.nargs == 0) {
-        return as_value(ptr->m_blurY );
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    if (fn.nargs == 0) {
+		return as_value(ptr->m_blurY );
     }
     float sp_blurY = fn.arg(0).to_number<float> ();
     ptr->m_blurY = sp_blurY;
     return as_value();
 }
 
-
 as_value
-GradientBevelFilter_as::strength_gs(const fn_call& fn)
+gradientbevelfilter_strength(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
@@ -214,23 +175,23 @@ GradientBevelFilter_as::strength_gs(const fn_call& fn)
 }
 
 as_value
-GradientBevelFilter_as::quality_gs(const fn_call& fn)
+gradientbevelfilter_quality(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-        return as_value(ptr->m_quality );
+		return as_value(ptr->m_quality );
     }
     boost::uint8_t sp_quality = fn.arg(0).to_number<boost::uint8_t> ();
-     ptr->m_quality = sp_quality;
+    ptr->m_quality = sp_quality;
     return as_value();
 }
 
 as_value
-GradientBevelFilter_as::knockout_gs(const fn_call& fn)
+gradientbevelfilter_knockout(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-        return as_value(ptr->m_knockout );
+		return as_value(ptr->m_knockout );
     }
     bool sp_knockout = fn.arg(0).to_bool ();
     ptr->m_knockout = sp_knockout;
@@ -238,20 +199,9 @@ GradientBevelFilter_as::knockout_gs(const fn_call& fn)
 }
 
 as_value
-GradientBevelFilter_as::bitmap_clone(const fn_call& fn)
+gradientbevelfilter_type(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
-    boost::intrusive_ptr<GradientBevelFilter_as> obj = new GradientBevelFilter_as(*ptr);
-    boost::intrusive_ptr<as_object> r = obj;
-    r->set_prototype(ptr->get_prototype());
-    r->copyProperties(*ptr);
-    return as_value(r);
-}
-
-as_value
-GradientBevelFilter_as::type_gs(const fn_call& fn)
-{
-    boost::intrusive_ptr<GradientBevelFilter_as> ptr = ensureType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
 
     if (fn.nargs == 0)
     {
@@ -259,15 +209,18 @@ GradientBevelFilter_as::type_gs(const fn_call& fn)
         {
             case GradientBevelFilter::FULL_BEVEL:
                 return as_value("full");
+
                 break;
 
             default:
             case GradientBevelFilter::INNER_BEVEL:
                 return as_value("inner");
+
                 break;
 
             case GradientBevelFilter::OUTER_BEVEL:
                 return as_value("outer");
+
                 break;
 
         }
@@ -290,13 +243,13 @@ GradientBevelFilter_as::type_gs(const fn_call& fn)
 }
 
 as_value
-GradientBevelFilter_as::ctor(const fn_call& )
+gradientbevelfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new GradientBevelFilter_as(GradientBevelFilter_as::Interface());
-
-    GradientBevelFilter_as::attachProperties(*obj);
-    return as_value(obj.get());
-
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new GradientBevelFilter_as);
+    return as_value();
 }
 
 }
+}
+
