@@ -64,30 +64,31 @@ namespace {
 void
 attachBevelFilterInterface(as_object& o)
 {
+    const int flags = PropFlags::onlySWF8Up;
     o.init_property("distance", bevelfilter_distance, 
-        bevelfilter_distance);
+        bevelfilter_distance, flags);
     o.init_property("angle", bevelfilter_angle, 
-        bevelfilter_angle);
+        bevelfilter_angle, flags);
     o.init_property("highlightColor", bevelfilter_highlightColor, 
-        bevelfilter_highlightColor);
+        bevelfilter_highlightColor, flags);
     o.init_property("highlightAlpha", bevelfilter_highlightAlpha, 
-        bevelfilter_highlightAlpha);
+        bevelfilter_highlightAlpha, flags);
     o.init_property("shadowColor", bevelfilter_shadowColor, 
-        bevelfilter_shadowColor);
+        bevelfilter_shadowColor, flags);
     o.init_property("shadowAlpha", bevelfilter_shadowAlpha, 
-        bevelfilter_shadowAlpha);
+        bevelfilter_shadowAlpha, flags);
     o.init_property("blurX", bevelfilter_blurX, 
-        bevelfilter_blurX);
+        bevelfilter_blurX, flags);
     o.init_property("blurY", bevelfilter_blurY, 
-        bevelfilter_blurY);
+        bevelfilter_blurY, flags);
     o.init_property("strength", bevelfilter_strength, 
-        bevelfilter_strength);
+        bevelfilter_strength, flags);
     o.init_property("quality", bevelfilter_quality, 
-        bevelfilter_quality);
+        bevelfilter_quality, flags);
     o.init_property("type", bevelfilter_type, 
-        bevelfilter_type);
+        bevelfilter_type, flags);
     o.init_property("knockout", bevelfilter_knockout, 
-        bevelfilter_knockout);
+        bevelfilter_knockout, flags);
 
 }
 
