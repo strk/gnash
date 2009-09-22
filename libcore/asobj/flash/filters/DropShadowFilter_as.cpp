@@ -63,28 +63,29 @@ namespace {
 void
 attachDropShadowFilterInterface(as_object& o)
 {
+    const int flags = PropFlags::onlySWF8Up;
     o.init_property("color", dropshadowfilter_color, 
-        dropshadowfilter_color);
+        dropshadowfilter_color, flags);
     o.init_property("alpha", dropshadowfilter_alpha, 
-        dropshadowfilter_alpha);
+        dropshadowfilter_alpha, flags);
     o.init_property("inner", dropshadowfilter_inner, 
-        dropshadowfilter_inner);
+        dropshadowfilter_inner, flags);
     o.init_property("hideObject", dropshadowfilter_hideObject, 
-        dropshadowfilter_hideObject);
+        dropshadowfilter_hideObject, flags);
     o.init_property("distance", dropshadowfilter_distance, 
-        dropshadowfilter_distance);
+        dropshadowfilter_distance, flags);
     o.init_property("angle", dropshadowfilter_angle, 
-        dropshadowfilter_angle);
+        dropshadowfilter_angle, flags);
     o.init_property("blurX", dropshadowfilter_blurX, 
-        dropshadowfilter_blurX);
+        dropshadowfilter_blurX, flags);
     o.init_property("blurY", dropshadowfilter_blurY, 
-        dropshadowfilter_blurY);
+        dropshadowfilter_blurY, flags);
     o.init_property("strength", dropshadowfilter_strength, 
-        dropshadowfilter_strength);
+        dropshadowfilter_strength, flags);
     o.init_property("quality", dropshadowfilter_quality, 
-        dropshadowfilter_quality);
+        dropshadowfilter_quality, flags);
     o.init_property("knockout", dropshadowfilter_knockout, 
-        dropshadowfilter_knockout);
+        dropshadowfilter_knockout, flags);
 
 }
 
