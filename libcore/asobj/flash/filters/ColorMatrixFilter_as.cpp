@@ -53,8 +53,9 @@ namespace {
 void
 attachColorMatrixFilterInterface(as_object& o)
 {
+    const int flags = PropFlags::onlySWF8Up;
     o.init_property("matrix", colormatrixfilter_matrix, 
-        colormatrixfilter_matrix);
+        colormatrixfilter_matrix, flags);
 }
 
 as_value
