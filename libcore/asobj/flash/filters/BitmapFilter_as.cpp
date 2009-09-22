@@ -92,6 +92,10 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
 
     as_object* cl = gl->createClass(ctor, gl->createObject());
     if (proto) p(*proto);
+
+    // The startup script overwrites the prototype assigned by ASconstructor,
+    // so the new prototype doesn't have a constructor property. We do the
+    // same here.
     cl->set_member(NSV::PROP_PROTOTYPE, proto);
     where.init_member(getName(uri) , cl, as_object::DefaultFlags,
             getNamespace(uri));
