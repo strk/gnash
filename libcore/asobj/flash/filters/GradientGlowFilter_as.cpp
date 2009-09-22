@@ -64,28 +64,29 @@ namespace {
 void
 attachGradientGlowFilterInterface(as_object& o)
 {
+    const int flags = PropFlags::onlySWF8Up;
     o.init_property("distance", gradientglowfilter_distance, 
-        gradientglowfilter_distance);
+        gradientglowfilter_distance, flags);
     o.init_property("angle", gradientglowfilter_angle, 
-        gradientglowfilter_angle);
+        gradientglowfilter_angle, flags);
     o.init_property("colors", gradientglowfilter_colors, 
-        gradientglowfilter_colors);
+        gradientglowfilter_colors, flags);
     o.init_property("alphas", gradientglowfilter_alphas, 
-        gradientglowfilter_alphas);
+        gradientglowfilter_alphas, flags);
     o.init_property("ratios", gradientglowfilter_ratios, 
-        gradientglowfilter_ratios);
+        gradientglowfilter_ratios, flags);
     o.init_property("blurX", gradientglowfilter_blurX, 
-        gradientglowfilter_blurX);
+        gradientglowfilter_blurX, flags);
     o.init_property("blurY", gradientglowfilter_blurY, 
-        gradientglowfilter_blurY);
+        gradientglowfilter_blurY, flags);
     o.init_property("strength", gradientglowfilter_strength, 
-        gradientglowfilter_strength);
+        gradientglowfilter_strength, flags);
     o.init_property("quality", gradientglowfilter_quality, 
-        gradientglowfilter_quality);
+        gradientglowfilter_quality, flags);
     o.init_property("type", gradientglowfilter_type, 
-        gradientglowfilter_type);
+        gradientglowfilter_type, flags);
     o.init_property("knockout", gradientglowfilter_knockout, 
-        gradientglowfilter_knockout);
+        gradientglowfilter_knockout, flags);
 
 }
 
