@@ -21,178 +21,155 @@
 #include "VM.h"
 #include "Global_as.h"
 #include "builtin_function.h"
-#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class GradientGlowFilter_as : public as_object, public GradientGlowFilter
-{
-public:
-    static as_value distance_gs(const fn_call& fn);
-    static as_value angle_gs(const fn_call& fn);
-    static as_value colors_gs(const fn_call& fn);
-    static as_value alphas_gs(const fn_call& fn);
-    static as_value ratios_gs(const fn_call& fn);
-    static as_value blurX_gs(const fn_call& fn);
-    static as_value blurY_gs(const fn_call& fn);
-    static as_value strength_gs(const fn_call& fn);
-    static as_value quality_gs(const fn_call& fn);
-    static as_value type_gs(const fn_call& fn);
-    static as_value knockout_gs(const fn_call& fn);
-    static as_value bitmap_clone(const fn_call& fn);
+namespace {
+    as_value gradientglowfilter_new(const fn_call& fn);
+    as_value gradientglowfilter_distance(const fn_call& fn);
+    as_value gradientglowfilter_angle(const fn_call& fn);
+    as_value gradientglowfilter_colors(const fn_call& fn);
+    as_value gradientglowfilter_alphas(const fn_call& fn);
+    as_value gradientglowfilter_ratios(const fn_call& fn);
+    as_value gradientglowfilter_shadowAlpha(const fn_call& fn);
+    as_value gradientglowfilter_blurX(const fn_call& fn);
+    as_value gradientglowfilter_blurY(const fn_call& fn);
+    as_value gradientglowfilter_strength(const fn_call& fn);
+    as_value gradientglowfilter_quality(const fn_call& fn);
+    as_value gradientglowfilter_type(const fn_call& fn);
+    as_value gradientglowfilter_knockout(const fn_call& fn);
 
-    GradientGlowFilter_as(as_object *obj)
-        :
-        as_object(obj)
-    {}
-    
-    static as_object* Interface();
-    static void attachInterface(as_object& o);
-    static void attachProperties(as_object& o);
-    static as_value ctor(const fn_call& fn);
- 
-private:
-    static boost::intrusive_ptr<as_object> s_interface;
-
-};
-
-
-boost::intrusive_ptr<as_object> GradientGlowFilter_as::s_interface;
-
-
-as_object*
-GradientGlowFilter_as::Interface()
-{
-    if (GradientGlowFilter_as::s_interface == NULL) {
-        GradientGlowFilter_as::s_interface = new as_object (getBitmapFilterInterface());
-        VM::get().addStatic(GradientGlowFilter_as::s_interface.get());
-        GradientGlowFilter_as::attachInterface(*GradientGlowFilter_as::s_interface);
-    }
-    return GradientGlowFilter_as::s_interface.get();
+    void attachGradientGlowFilterInterface(as_object& o);
 }
 
+/// TODO: should this inherit from BitmapFilter_as (relay)? This might
+/// make cloning easier, but needs some testing first.
+class GradientGlowFilter_as : public Relay, public GradientGlowFilter
+{
+public:
+    GradientGlowFilter_as() {}
+};
+
+/// The prototype of flash.filters.GradientGlowFilter is a new BitmapFilter.
 void
 gradientglowfilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl;
-    if (cl != NULL) return;
     Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&GradientGlowFilter_as::ctor, GradientGlowFilter_as::Interface());
-    VM::get().addStatic(cl.get());
-    GradientGlowFilter_as::attachInterface(*cl);
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    string_table& st = getStringTable(where);
+
+    as_function* ctor =
+        gl->getMember(st.find("flash.filters.BitmapFilter")).to_as_function();
+    
+    as_object* proto;
+    if (ctor) {
+        fn_call::Args args;
+        VM& vm = getVM(where);
+        proto = ctor->constructInstance(as_environment(vm), args).get();
+    }
+    else proto = 0;
+
+    as_object* cl = gl->createClass(gradientglowfilter_new, proto);
+    attachGradientGlowFilterInterface(*proto);
+    where.init_member(getName(uri) , cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
+namespace {
 
 void
-GradientGlowFilter_as::attachInterface(as_object& o)
+attachGradientGlowFilterInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-	boost::intrusive_ptr<builtin_function> gs;
-
-    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
-
-}
-
-
-void
-GradientGlowFilter_as::attachProperties(as_object& o)
-{
-	boost::intrusive_ptr<builtin_function> gs;
-
-    o.init_property("distance" , GradientGlowFilter_as::distance_gs, 
-        GradientGlowFilter_as::distance_gs);
-    o.init_property("angle" , GradientGlowFilter_as::angle_gs, 
-        GradientGlowFilter_as::angle_gs);
-
-    o.init_property("alphas" , GradientGlowFilter_as::alphas_gs, 
-        GradientGlowFilter_as::alphas_gs);
-
-    o.init_property("ratios" , GradientGlowFilter_as::ratios_gs, 
-        GradientGlowFilter_as::ratios_gs);
-    o.init_property("blurX" , GradientGlowFilter_as::blurX_gs, 
-        GradientGlowFilter_as::blurX_gs);
-
-    o.init_property("blurY" , GradientGlowFilter_as::blurY_gs, 
-        GradientGlowFilter_as::blurY_gs);
-
-    o.init_property("strength" , GradientGlowFilter_as::strength_gs, 
-        GradientGlowFilter_as::strength_gs);
-
-    o.init_property("quality" , GradientGlowFilter_as::quality_gs, 
-        GradientGlowFilter_as::quality_gs);
-    o.init_property("type" , GradientGlowFilter_as::type_gs, 
-        GradientGlowFilter_as::type_gs);
-
-    o.init_property("knockout" , GradientGlowFilter_as::knockout_gs, 
-        GradientGlowFilter_as::knockout_gs);
+    o.init_property("distance", gradientglowfilter_distance, 
+        gradientglowfilter_distance);
+    o.init_property("angle", gradientglowfilter_angle, 
+        gradientglowfilter_angle);
+    o.init_property("colors", gradientglowfilter_colors, 
+        gradientglowfilter_colors);
+    o.init_property("alphas", gradientglowfilter_alphas, 
+        gradientglowfilter_alphas);
+    o.init_property("ratios", gradientglowfilter_ratios, 
+        gradientglowfilter_ratios);
+    o.init_property("blurX", gradientglowfilter_blurX, 
+        gradientglowfilter_blurX);
+    o.init_property("blurY", gradientglowfilter_blurY, 
+        gradientglowfilter_blurY);
+    o.init_property("strength", gradientglowfilter_strength, 
+        gradientglowfilter_strength);
+    o.init_property("quality", gradientglowfilter_quality, 
+        gradientglowfilter_quality);
+    o.init_property("type", gradientglowfilter_type, 
+        gradientglowfilter_type);
+    o.init_property("knockout", gradientglowfilter_knockout, 
+        gradientglowfilter_knockout);
 
 }
 
 as_value
-GradientGlowFilter_as::distance_gs(const fn_call& fn)
+gradientglowfilter_distance(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_distance );
+        return as_value(ptr->m_distance );
     }
-    float sp_distance = fn.arg(0).to_number<float> ();
+    
+    float sp_distance = fn.arg(0).to_number();
     ptr->m_distance = sp_distance;
     return as_value();
 }
 
 as_value
-GradientGlowFilter_as::angle_gs(const fn_call& fn)
+gradientglowfilter_angle(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_angle );
+        return as_value(ptr->m_angle);
     }
-    float sp_angle = fn.arg(0).to_number<float> ();
+    double sp_angle = fn.arg(0).to_number();
     ptr->m_angle = sp_angle;
     return as_value();
 }
 
 as_value
-GradientGlowFilter_as::colors_gs(const fn_call& fn)
+gradientglowfilter_colors(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
-    return as_value();
-}
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
 
-
-as_value
-GradientGlowFilter_as::alphas_gs(const fn_call& fn)
-{
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
     return as_value();
 }
 
 as_value
-GradientGlowFilter_as::ratios_gs(const fn_call& fn)
+gradientglowfilter_alphas(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
     return as_value();
 }
 
 as_value
-GradientGlowFilter_as::blurX_gs(const fn_call& fn)
+gradientglowfilter_ratios(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    return as_value();
+}
+
+as_value
+gradientglowfilter_blurX(const fn_call& fn)
+{
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_blurX );
+        return as_value(ptr->m_blurX );
     }
     float sp_blurX = fn.arg(0).to_number<float> ();
     ptr->m_blurX = sp_blurX;
     return as_value();
 }
 
-
 as_value
-GradientGlowFilter_as::blurY_gs(const fn_call& fn)
+gradientglowfilter_blurY(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
@@ -202,11 +179,11 @@ GradientGlowFilter_as::blurY_gs(const fn_call& fn)
 }
 
 as_value
-GradientGlowFilter_as::strength_gs(const fn_call& fn)
+gradientglowfilter_strength(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
-		return as_value(ptr->m_strength );
+        return as_value(ptr->m_strength );
     }
     float sp_strength = fn.arg(0).to_number<float> ();
     ptr->m_strength = sp_strength;
@@ -214,9 +191,9 @@ GradientGlowFilter_as::strength_gs(const fn_call& fn)
 }
 
 as_value
-GradientGlowFilter_as::quality_gs(const fn_call& fn)
+gradientglowfilter_quality(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
@@ -226,9 +203,9 @@ GradientGlowFilter_as::quality_gs(const fn_call& fn)
 }
 
 as_value
-GradientGlowFilter_as::knockout_gs(const fn_call& fn)
+gradientglowfilter_knockout(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
@@ -238,20 +215,9 @@ GradientGlowFilter_as::knockout_gs(const fn_call& fn)
 }
 
 as_value
-GradientGlowFilter_as::bitmap_clone(const fn_call& fn)
+gradientglowfilter_type(const fn_call& fn)
 {
-	boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
-    boost::intrusive_ptr<GradientGlowFilter_as> obj = new GradientGlowFilter_as(*ptr);
-    boost::intrusive_ptr<as_object> r = obj;
-    r->set_prototype(ptr->get_prototype());
-    r->copyProperties(*ptr);
-    return as_value(r);
-}
-
-as_value
-GradientGlowFilter_as::type_gs(const fn_call& fn)
-{
-    boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
 
     if (fn.nargs == 0)
     {
@@ -259,15 +225,18 @@ GradientGlowFilter_as::type_gs(const fn_call& fn)
         {
             case GradientGlowFilter::FULL_GLOW:
                 return as_value("full");
+
                 break;
 
             default:
             case GradientGlowFilter::INNER_GLOW:
                 return as_value("inner");
+
                 break;
 
             case GradientGlowFilter::OUTER_GLOW:
                 return as_value("outer");
+
                 break;
 
         }
@@ -290,13 +259,13 @@ GradientGlowFilter_as::type_gs(const fn_call& fn)
 }
 
 as_value
-GradientGlowFilter_as::ctor(const fn_call& )
+gradientglowfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new GradientGlowFilter_as(GradientGlowFilter_as::Interface());
-
-    GradientGlowFilter_as::attachProperties(*obj);
-    return as_value(obj.get());
-
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new GradientGlowFilter_as);
+    return as_value();
 }
 
 }
+}
+
