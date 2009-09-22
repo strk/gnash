@@ -67,6 +67,31 @@ registerBitmapFilterNative(as_object& global)
     vm.registerNative(bitmapfilter_clone, 1112, 1);
 }
 
+void
+registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
+        Properties p, const ObjectURI& uri)
+{
+    Global_as* gl = getGlobal(where);
+
+    as_environment env(getVM(where));
+    as_value bf(env.find_object("flash.filters.BitmapFilter"));
+    as_function* constructor = bf.to_as_function();
+    
+    as_object* proto;
+    if (constructor) {
+        fn_call::Args args;
+        VM& vm = getVM(where);
+        proto = constructor->constructInstance(as_environment(vm), args).get();
+    }
+    else proto = 0;
+
+    as_object* cl = gl->createClass(ctor, proto);
+    if (proto) p(*proto);
+    where.init_member(getName(uri) , cl, as_object::DefaultFlags,
+            getNamespace(uri));
+
+}
+
 namespace {
 
 void

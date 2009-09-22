@@ -21,7 +21,6 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "Global_as.h"
-
 #include "BitmapFilter_as.h"
 
 namespace gnash {
@@ -52,28 +51,11 @@ public:
     BlurFilter_as() {}
 };
 
-/// The prototype of flash.filters.BlurFilter is a new BitmapFilter.
 void
 blurfilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    string_table& st = getStringTable(where);
-
-    as_function* ctor =
-        gl->getMember(st.find("flash.filters.BitmapFilter")).to_as_function();
-    
-    as_object* proto;
-    if (ctor) {
-        fn_call::Args args;
-        VM& vm = getVM(where);
-        proto = ctor->constructInstance(as_environment(vm), args).get();
-    }
-    else proto = 0;
-
-    as_object* cl = gl->createClass(blurfilter_new, proto);
-    attachBlurFilterInterface(*proto);
-    where.init_member(getName(uri) , cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBitmapClass(where, blurfilter_new, attachBlurFilterInterface,
+            uri);
 }
 
 namespace {
