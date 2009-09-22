@@ -117,6 +117,8 @@ beginFill-values-7.swf:d02c60a25c48eedefe9b6a44654741ef
 beginFill-values-8.swf:6413d81730e062f9ded5052440cb3144
 bevel-filter-properties-5.swf:019bb55478951055973b5f953b2e82ef
 bevel-filter-properties-5.swf:0ec31af3035594a9cbcb1ba8a645ad4c
+bevel-filter-properties-7.swf:ad15fef8887d813c6d450559eb6f697d
+bevel-filter-properties-8.swf:2180c600eaf3513bf4d5b7abce1d7a83
 bitmapdata-getters-5.swf:b32dce961f672c8c7ae32d5cee3d8f45
 bitmapdata-getters-6.swf:305acbd129fc45f26837dec9f24720ca
 bitmapdata-getters-7.swf:93e7771bb9f3ad11318b18c136555649
@@ -134,6 +136,8 @@ BlurFilter-construct-6.swf:9f183e7e0a35fbe488aa7c447dced20c
 BlurFilter-construct-7.swf:c38a6f916e3bc1a0141c9c78d23e0aa0
 blur-filter-properties-5.swf:4c29ecc04df379ced45039fdbb79eb9c
 blur-filter-properties-5.swf:f2e1d9ccc47765bd6c88095b19974c7b
+blur-filter-properties-7.swf:b6873d493b6eed04fc626a0d6fa16c2a
+blur-filter-properties-8.swf:4f3ccb90f6b6cee360432cfd8c9f7488
 boolean-6.swf:5bd542a9133a3abd9a2c7bcd960e816b
 boolean-7.swf:4124413f55f405ad865a05403bc24662
 boolean-8.swf:c3c872988d25c8e49c11e5e337ea1e69
@@ -181,6 +185,8 @@ color1.swf:3cc52a41193d342cfdfaeffe56edc3db
 color-getters.swf:4cee4418f75171e7bf423759a468b36b
 color-matrix-filter-properties-5.swf:2349ffbd77298b0dea59d6ed618c382b
 color-matrix-filter-properties-5.swf:cc51e1cb7864d648f958ffef649d5464
+color-matrix-filter-properties-7.swf:584a31bbd059b354169fc47fce089b55
+color-matrix-filter-properties-8.swf:16258fad9126858838fcb66acd619382
 color-new.swf:b19cf3d46f416b919eb312da473b6756
 color-setRGB.swf:0841414e9ac7d2f9b57e40aec3d2f44f
 color-setTransform-empty.swf:2a72a5273ab8713ee289ff1726b0959c
@@ -237,6 +243,8 @@ conversion-functions-7.swf:8bc3951e61b7fefa82d24fb037929350
 conversion-functions-8.swf:4a68346aaa982e32b2882a49e34faa07
 convolution-filter-properties-5.swf:96e15de475e31c328e201c152ffd2f42
 convolution-filter-properties-5.swf:db6e2ddcbee195363a53c276bfc460d7
+convolution-filter-properties-7.swf:76115d033238f862563eb53d646a6d6c
+convolution-filter-properties-8.swf:4dbd723608f87a7fc4437429be5a97d7
 countdown.swf:db94f8e7bb5a46cbf210c94a19fa068d
 crash-0.5.2-cvs-return-from-block-5.swf:4aab3181976e557d6e0457ff7e0a6403
 crash-0.5.2-cvs-return-from-block-6.swf:c1c585c3c888f13d69f9646c0f2fb928
@@ -415,6 +423,8 @@ DoInitAction-this.swf:d747ea8f0ead68e586dd4a7aadaded90
 double.swf:8b18d5d6a4168afe60c583c27e704b7d
 drop-shadow-filter-properties-5.swf:68ec26c24ecb04174a484d810dab523f
 drop-shadow-filter-properties-5.swf:827a880fc55b1afb96515f0d64a064b6
+drop-shadow-filter-properties-7.swf:3b02293df6f980aff90968423cba04e5
+drop-shadow-filter-properties-8.swf:6796725f3b3e10e7702ed4d773281cf6
 duplicateMovieClip-events-5.swf:503662305ff666f692c310f307947134
 duplicateMovieClip-events-6.swf:2f262bee780053fc72e8a8440bb38d6e
 duplicateMovieClip-events-7.swf:69aee6d163d81eb06dc13f1c4c527c3a
@@ -558,6 +568,8 @@ global-variable-properties-7.swf:5f2609296a34202f4a2e8a45fc75fefc
 global-variable-properties-8.swf:79a56139ee730d611953dcf941209610
 glow-filter-properties-5.swf:10d87d4cbd9c1f4c41a817f67cf3f530
 glow-filter-properties-5.swf:b3d05908aaa98c7115ec1727d695a16a
+glow-filter-properties-7.swf:9123eda3b74587369d299c25dc688f6c
+glow-filter-properties-8.swf:81e69a2fae2de611a20d1f8ffee08247
 goto1.swf:6f35a27cb3aee7f282eccb3b16290c70
 goto2.swf:f845271dd90a84b3919ca9000d66cd25
 goto3.swf:c9db121dc7744f6f76d4b6f6cdb9847f
@@ -568,8 +580,12 @@ gotolabel-multiple.swf:9b7e815d0ec8b35cae93165ad9a54fcd
 gotolabel.swf:0b25cdd19455cac05676955bbb14e445
 gradient-bevel-filter-properties-5.swf:4e4322654b7b7368fdc5499cff81654f
 gradient-bevel-filter-properties-5.swf:b0d435175adc96e6300b4a522aae7d47
+gradient-bevel-filter-properties-7.swf:3de225638ab3d71320c2cdc51a073fba
+gradient-bevel-filter-properties-8.swf:96f6869c5f34d8e7740c2e9c8ff572f2
 gradient-glow-filter-properties-5.swf:719ca44e28c6f4fd8ca97ed2c1386fdd
 gradient-glow-filter-properties-5.swf:dd43dd6eb377ad30efd52286f1ce0b1b
+gradient-glow-filter-properties-7.swf:df4ee4cb483420ee262338efac0ccdaa
+gradient-glow-filter-properties-8.swf:9fa97b59fcb7d52aad3f3f51e5ccaa0d
 height1.swf:245da260d32dbc48a5f38566ee70171b
 height3.swf:2b7547493377ae1c0163c8273a4073f7
 height4.swf:8d36c180d196b49608f996db21a421bc
@@ -1289,6 +1305,7 @@ Transform-matrix-6.swf:45c037253c5fbac0a80753a5d194f60c
 Transform-matrix-7.swf:c4110453b8151dd87efff882e5b312ca
 transform-properties-5.swf:9332e41f53db6ec456387efffd9e12a7
 transform-properties-5.swf:b0386824584340e1d0a80f986ce779b9
+transform-properties-6.swf:482c65962803ec5b48558f9f31585360
 transform-properties-7.swf:3b06ecd463038959132e9cae56e58b3b
 transform-properties-8.swf:47331702f04553a41f57842ebfd081f8
 transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
