@@ -388,7 +388,7 @@ typedef unsigned short      sa_family_t;
 struct sockaddr_un {
     sa_family_t sun_family; /* AF_UNIX */
     char sun_path[UNIX_PATH_MAX];   /* pathname */
-}
+};
 
 #endif /* _WIN32 */
 
