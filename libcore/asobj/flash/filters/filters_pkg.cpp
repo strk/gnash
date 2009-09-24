@@ -39,7 +39,9 @@
 
 namespace gnash {
 
-static as_value
+namespace {
+
+as_value
 get_flash_filters_package(const fn_call& fn)
 {
 
@@ -73,6 +75,8 @@ get_flash_filters_package(const fn_call& fn)
     
     return pkg;
 }
+
+} // anonymous namespace
 
 void
 flash_filters_package_init(as_object& where, const ObjectURI& uri)
