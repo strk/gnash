@@ -1,4 +1,4 @@
-This is gnash_ref.info, produced by makeinfo version 4.11 from stdin.
+This is gnash_ref.info, produced by makeinfo version 4.13 from stdin.
 
 START-INFO-DIR-ENTRY
 * Gnash Reference Manual: (gnash_ref).   [MISSING TEXT]
@@ -169,10 +169,10 @@ doesn't. You can find daily snapshots of the latest CVS tree at:
 http://www.gnashdev.org/dev_snapshots
 (http://www.gnashdev.org/dev_snapshots/).
 
-   Gnash uses ffmpeg for codecs, so any file supported by Mplayer
+   Gnash uses FFmpeg for codecs, so any file supported by Mplayer
 should work with Gnash. Gnash supports the loading of patent free
 codecs like Ogg Vorbis or Theora from disk based files, while work is
-being done to support these codecs when embedded in a SWF file. Ffmpeg
+being done to support these codecs when embedded in a SWF file. FFmpeg
 contains the codecs used by the current SWF defintion, FLV, VP6 (ON2),
 H.263, H.264, and MP3.
 
@@ -499,7 +499,7 @@ gst-ffmpeg Possibly               gst-ffmpegThis       `gstreamer0.8-ffmpeg-dev'
            Required              allows     package               
                                  you to     is                    
                                  use the    required              
-                                 FFMPEG     if you                
+                                 FFmpeg     if you                
                                  decoder    would                 
                                  with       like to               
                                  Gstreamer. use                   
@@ -507,7 +507,7 @@ gst-ffmpeg Possibly               gst-ffmpegThis       `gstreamer0.8-ffmpeg-dev'
                                             as a                  
                                             video                 
                                             handler.              
-FFMPEG     Possibly               FFMPEG    If you     `ffmpeg-dev'`ffmpeg-devel'`ffmpeg'
+FFmpeg     Possibly               FFmpeg    If you     `ffmpeg-dev'`ffmpeg-devel'`ffmpeg'
            Required              is a       would                 
                                  video      like                  
                                  handler.   video                 
@@ -534,7 +534,7 @@ FFMPEG     Possibly               FFMPEG    If you     `ffmpeg-dev'`ffmpeg-devel
                                             without               
                                             Gstreamer             
                                             support,              
-                                            ffmpeg                
+                                            FFmpeg                
                                             can be                
                                             used                  
                                             directly.             
@@ -985,7 +985,7 @@ Option                               Function
                                      in newer versions (summer 2005) of
                                      libMesa.
 `--enable-media=ffmpeg|gst|none'      Select the specified media decoder
-                                     and sound engine.  FFMPEG uses the
+                                     and sound engine.  FFmpeg uses the
                                      SDL sound engine; GST uses its own.
                                      `GST' is the default decoder.  ?
                                      [undisplayable block object] You
@@ -1703,8 +1703,8 @@ File: gnash_ref.info,  Node: libgnashmedia,  Next: libgnashamf,  Prev: libgnashs
 Libgnashmedia handles Gnash's audio and video capabilities, dealing
 with streamed video and sound as well as decoding embedded media
 frames. Besides the standard SWF formats FLV, MPEG4, Nellymoser, ADPCM,
-MP3 and RAW, Gnash can decode other formats supports by gstreamer or
-ffmpeg, including the free OGG container and free codecs.
+MP3 and RAW, Gnash can decode other formats supports by Gstreamer or
+FFmpeg, including the free OGG container and free codecs.
 
 
 File: gnash_ref.info,  Node: libgnashamf,  Next: libgnashbackend,  Prev: libgnashmedia,  Up: The Libraries

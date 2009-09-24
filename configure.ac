@@ -907,6 +907,7 @@ ltver=1.x
 fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
+AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
 if test $ltmajor -eq 1; then
 	AC_LIBLTDL_CONVENIENCE
 	AC_LIBTOOL_DLOPEN
@@ -926,8 +927,9 @@ dnl fi
 	AC_CONFIG_FILES([libltdl/Makefile])
 fi
 AC_PROG_LIBTOOL
-AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
+
+dnl Don't ever install libltdl
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" = xyes)
 AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
 
 AC_C_CONST

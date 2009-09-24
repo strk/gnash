@@ -28,6 +28,17 @@ LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
 endif
 endif
 
+if !LIBLTDL2
+libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
+if CONVENIENCE_LTDL
+noinst_LTLIBRARIES = libltdlc.la
+libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+
+libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
+libltdl_la_LIBADD = $(LIBADD_DL)
+
 sysconf_DATA = gnashrc gnashpluginrc
 
 edit = sed \
@@ -205,17 +216,6 @@ if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm
 endif
-
-if !LIBLTDL2
-libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
-if CONVENIENCE_LTDL
-noinst_LTLIBRARIES = libltdlc.la
-libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-endif
-
-libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
-libltdl_la_LIBADD = $(LIBADD_DL)
 
 if WIN32
   libltdl_la_LDFLAGS += -static

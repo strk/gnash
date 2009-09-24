@@ -198,7 +198,7 @@ public:
 	AMF3_INVOKE  = 0x11,
         NOTIFY       = 0x12,
         INVOKE       = 0x14,
-	FLV_DATA     = 0x16,
+	FLV_DATA     = 0x16
     } content_types_e;
     typedef enum {
 	STREAM_START  = 0x0,

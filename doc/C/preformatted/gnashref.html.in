@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash Reference Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash Reference Manual</h1></div><div><p class="releaseinfo">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash Reference Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.74.3"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash Reference Manual</h1></div><div><p class="releaseinfo">
       This manual describes version 0.8.5 of Gnash.
     </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
@@ -78,11 +78,11 @@
       at: <a class="ulink" href="http://www.gnashdev.org/dev_snapshots/" target="_top">
       http://www.gnashdev.org/dev_snapshots</a>.
     </p><p>
-      Gnash uses ffmpeg for codecs, so any file supported by Mplayer
+      Gnash uses FFmpeg for codecs, so any file supported by Mplayer
       should work with Gnash. Gnash supports the loading of patent
       free codecs like Ogg Vorbis or Theora from disk based files,
       while work is being done to support these codecs when embedded
-      in a SWF file. Ffmpeg contains the codecs used by the current
+      in a SWF file. FFmpeg contains the codecs used by the current
       SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
     </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="build"></a>Chapter 2. Building from Source</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="building_overview"></a>Overview</h2></div></div></div><p>
       The typical process of building from source will involve 
@@ -255,19 +255,19 @@
 	    If you would like video playback, you must
 	    install one of the video handlers.
 	  </td><td align="left"><code class="filename">libgstreamer0.8-dev</code></td><td align="left"><code class="filename">gstreamer-devel</code></td><td align="left"><code class="filename">gstreamer-0.10</code></td></tr><tr><td align="left">gst-ffmpeg</td><td align="left">Possibly Required</td><td align="left"> </td><td align="left">
-	    gst-ffmpeg allows you to use the FFMPEG decoder
+	    gst-ffmpeg allows you to use the FFmpeg decoder
 	    with Gstreamer.
 	  </td><td align="left">
 	    This package is required if you would like to
 	    use Gstreamer as a video handler.
-	  </td><td align="left"><code class="filename">gstreamer0.8-ffmpeg-dev</code></td><td align="left"><code class="filename">gstreamer-ffmpeg-devel</code></td><td align="left"><code class="filename">gstreamer-ffmpeg</code></td></tr><tr><td align="left">FFMPEG</td><td align="left">Possibly Required</td><td align="left"> </td><td align="left">
-	    FFMPEG is a video handler.
+	  </td><td align="left"><code class="filename">gstreamer0.8-ffmpeg-dev</code></td><td align="left"><code class="filename">gstreamer-ffmpeg-devel</code></td><td align="left"><code class="filename">gstreamer-ffmpeg</code></td></tr><tr><td align="left">FFmpeg</td><td align="left">Possibly Required</td><td align="left"> </td><td align="left">
+	    FFmpeg is a video handler.
 	  </td><td align="left">
 	    If you would like video playback, you must
 	    install one of the video handlers. When using the
 	    gstreamer-ffmpeg plugin, ffmpeg doesn't need to be
 	    installed, as it's part of the plugin. For systems
-	    without Gstreamer support, ffmpeg can be used directly.
+	    without Gstreamer support, FFmpeg can be used directly.
 	  </td><td align="left"><code class="filename">ffmpeg-dev</code></td><td align="left"><code class="filename">ffmpeg-devel</code></td><td align="left"><code class="filename">ffmpeg</code></td></tr><tr><td align="left">JPEG</td><td align="left">Required</td><td align="left"> </td><td align="left">
 	    <a class="ulink" href="http://www.ijg.org/" target="_top">JPEG</a>
 	    is a lossy image format which is heavily used for images.
@@ -548,7 +548,7 @@
 	  fixed in newer versions (summer 2005) of libMesa.</td></tr><tr><td align="left"><code class="option">--enable-media=ffmpeg|gst|none</code>
 	  </td><td align="left">  <p>
 	    Select the specified media decoder and sound engine.
-	    FFMPEG uses the SDL sound engine; GST uses its own.
+	    FFmpeg uses the SDL sound engine; GST uses its own.
 	    <code class="option">GST</code> is the default decoder.
 	  </p>
 	  <p>
@@ -1154,7 +1154,7 @@
 		dealing with streamed video and sound as well as decoding
 		embedded media frames. Besides the standard SWF formats
 		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, <span class="application">Gnash</span> can 
-		decode other formats supports by gstreamer or ffmpeg, 
+		decode other formats supports by Gstreamer or FFmpeg, 
 		including the free OGG container and free codecs.
 	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashamf"></a>libgnashamf</h4></div></div></div><p>
 	  AMF is the data format used internally by SWF files. This is
@@ -1898,7 +1898,7 @@
 	  Note that you do NOT need access to the SWF source code in order
 	  to implement a Movie tester for it.  Some knowledge about the 
 	  expected behavior suffices.
-	</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="newclass"></a>Chapter 4. Adding New ActionScript Class</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#prototype">Prototype</a></span></dt><dt><span class="sect1"><a href="#declaration">Declaration</a></span></dt><dt><span class="sect1"><a href="#instantiation">Instantiation</a></span></dt><dt><span class="sect1"><a href="#methods">Methods</a></span></dt><dt><span class="sect1"><a href="#properties">Dynamic Properties</a></span></dt><dt><span class="sect1"><a href="#as_value">The <span class="emphasis"><em>as_value</em></span> Object Type</a></span></dt><dd><dl><dt><span class="sect2"><a href="#data_types">Data Types</a></span></dt><dt><span class="sect2"><a href="#is_methods">Determining the Type</a></span></dt><dt><span class="sect2"><a href="#to_methods">Fetching the Value</a></span></dt><dt><span class="sect2"><a href="#set_methods">Setting the Value and Type</a></span></dt><dt><span class="sect2"><a href="#further_as_value_reading">Further Reading</a></span></dt></dl></dd><dt><span class="sect1"><a href="#asobject">Object ActionScript Class</a></span></dt><dd><dl><dt><span class="sect2"><a href="#objectmethods">The Methods of the  Class</a></span></dt><dt><span class="sect2"><a href="#objectprops">The Properties of the Object Class</a></span></dt><dt><span class="sect2"><a href="#objectconf">Object Class Conformance</a></span></dt></dl></dd></dl></div><p>
+	</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="newclass"></a>Chapter 4. Adding New ActionScript Class</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#prototype">Prototype</a></span></dt><dt><span class="sect1"><a href="#declaration">Declaration</a></span></dt><dt><span class="sect1"><a href="#instantiation">Instantiation</a></span></dt><dt><span class="sect1"><a href="#methods">Methods</a></span></dt><dt><span class="sect1"><a href="#properties">Dynamic Properties</a></span></dt><dt><span class="sect1"><a href="#as_value">The as_value Object Type</a></span></dt><dd><dl><dt><span class="sect2"><a href="#data_types">Data Types</a></span></dt><dt><span class="sect2"><a href="#is_methods">Determining the Type</a></span></dt><dt><span class="sect2"><a href="#to_methods">Fetching the Value</a></span></dt><dt><span class="sect2"><a href="#set_methods">Setting the Value and Type</a></span></dt><dt><span class="sect2"><a href="#further_as_value_reading">Further Reading</a></span></dt></dl></dd><dt><span class="sect1"><a href="#asobject">Object ActionScript Class</a></span></dt><dd><dl><dt><span class="sect2"><a href="#objectmethods">The Methods of the  Class</a></span></dt><dt><span class="sect2"><a href="#objectprops">The Properties of the Object Class</a></span></dt><dt><span class="sect2"><a href="#objectconf">Object Class Conformance</a></span></dt></dl></dd></dl></div><p>
     In this document, the term 'ActionScript class' refers to the
     C++ class which is instantiated by Gnash when some ActionScript
     code instantiates a corresponding class.  The C++ class

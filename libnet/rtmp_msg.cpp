@@ -175,7 +175,7 @@ RTMPMsg::operator[](size_t index)
     
     boost::shared_ptr<amf::Element> el;
     return el;
-};
+}
 
 /// \brief Find the named property for this Object.
 ///

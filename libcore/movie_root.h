@@ -511,7 +511,7 @@ public:
     enum StageHorizontalAlign {
         STAGE_H_ALIGN_C,
         STAGE_H_ALIGN_L,
-        STAGE_H_ALIGN_R,
+        STAGE_H_ALIGN_R
     };
 
     /// The possible vertical position of the Stage

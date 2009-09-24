@@ -388,7 +388,7 @@ typedef unsigned short      sa_family_t;
 struct sockaddr_un {
     sa_family_t sun_family; /* AF_UNIX */
     char sun_path[UNIX_PATH_MAX];   /* pathname */
-};
+}
 
 #endif /* _WIN32 */
 
@@ -978,14 +978,14 @@ Network::writeNet(amf::Buffer *buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(buffer->reference(), buffer->allocated());
-};
+}
 
 int
 Network::writeNet(int fd, amf::Buffer *buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer->reference(), buffer->allocated());
-};
+}
 
 // Write to the connection
 int
@@ -993,7 +993,7 @@ Network::writeNet(amf::Buffer &buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(buffer.reference(), buffer.allocated());
-};
+}
 
 // Write to the connection
 int
@@ -1001,7 +1001,7 @@ Network::writeNet(int fd, amf::Buffer &buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer.reference(), buffer.allocated());
-};
+}
 
 int
 Network::writeNet(const std::string& data)
@@ -1201,7 +1201,7 @@ Network::getPollFDPtr()
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     return &_pollfds[0];
-};
+}
 
 void
 Network::erasePollFD(int fd)
