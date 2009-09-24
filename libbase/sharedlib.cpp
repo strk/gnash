@@ -103,7 +103,7 @@ SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
         pluginsdir = PLUGINSDIR;
     }
     
-    // lt_dladdsearchdir(pluginsdir.c_str());
+    //lt_dladdsearchdir(pluginsdir.c_str());
 }
 
 SharedLib::~SharedLib()
@@ -128,26 +128,10 @@ SharedLib::openLib()
 bool
 SharedLib::openLib (const std::string& filespec)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-#if 0
-    // ltdl should use the same mallocation as us
-    lt_dlmalloc = (lt_ptr (*) (size_t)) xmalloc;
-    lt_dlfree = (void (*) (lt_ptr)) free;
-    
-#endif
-    
-    // Make sure preloaded modules are initialised
-//  LTDL_SET_PRELOADED_SYMBOLS();
     
     scoped_lock lock(_libMutex);
-    
-//     // libtool's dynamic library loader is already initialized in constructor
-    
-//     cerr << "Searching in " << lt_dlgetsearchpath()
-//          << "for database drivers" << endl;
 
-//    log_debug ("Trying to open shared library \"%s\"", filespec);
+    log_debug ("Trying to open shared library \"%s\"", filespec);
     _dlhandle = lt_dlopenext (filespec.c_str());
     
     if (_dlhandle == NULL) {
