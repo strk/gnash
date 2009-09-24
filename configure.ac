@@ -2006,7 +2006,7 @@ if test "$media_handler" = "gst"; then
   dnl the codec installer to download the package to install, so disable
   dnl it if cross compiling with gstreamer support.
   if test x$cross_compiling = xno; then
-    GNASH_PKG_FIND(gstpbutils, [gstreamer-0.10/gst/pbutils/install-plugins.h], [gstreamer PB Utils library], gst_install_plugins_supported, [0.10])
+    GNASH_PKG_FIND(gstpbutils, [gst/pbutils/install-plugins.h], [gstreamer PB Utils library], gst_install_plugins_supported, [0.10])
   fi
   dnl when cross compiling Gstreamer, not all supplied SDKs include all the
   dnl development libraries since most devices don't need to support plugin
