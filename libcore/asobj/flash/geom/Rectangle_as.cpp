@@ -39,44 +39,62 @@
 
 namespace gnash {
 
-static as_value Rectangle_clone(const fn_call& fn);
-static as_value Rectangle_contains(const fn_call& fn);
-static as_value Rectangle_containsPoint(const fn_call& fn);
-static as_value Rectangle_containsRectangle(const fn_call& fn);
-static as_value Rectangle_equals(const fn_call& fn);
-static as_value Rectangle_inflate(const fn_call& fn);
-static as_value Rectangle_inflatePoint(const fn_call& fn);
-static as_value Rectangle_intersection(const fn_call& fn);
-static as_value Rectangle_intersects(const fn_call& fn);
-static as_value Rectangle_isEmpty(const fn_call& fn);
-static as_value Rectangle_offset(const fn_call& fn);
-static as_value Rectangle_offsetPoint(const fn_call& fn);
-static as_value Rectangle_setEmpty(const fn_call& fn);
-static as_value Rectangle_toString(const fn_call& fn);
-static as_value Rectangle_union(const fn_call& fn);
-static as_value Rectangle_bottom_getset(const fn_call& fn);
-static as_value Rectangle_bottomRight_getset(const fn_call& fn);
-static as_value Rectangle_left_getset(const fn_call& fn);
-static as_value Rectangle_right_getset(const fn_call& fn);
-static as_value Rectangle_size_getset(const fn_call& fn);
-static as_value Rectangle_top_getset(const fn_call& fn);
-static as_value Rectangle_topLeft_getset(const fn_call& fn);
+namespace {
+    as_value Rectangle_clone(const fn_call& fn);
+    as_value Rectangle_contains(const fn_call& fn);
+    as_value Rectangle_containsPoint(const fn_call& fn);
+    as_value Rectangle_containsRectangle(const fn_call& fn);
+    as_value Rectangle_equals(const fn_call& fn);
+    as_value Rectangle_inflate(const fn_call& fn);
+    as_value Rectangle_inflatePoint(const fn_call& fn);
+    as_value Rectangle_intersection(const fn_call& fn);
+    as_value Rectangle_intersects(const fn_call& fn);
+    as_value Rectangle_isEmpty(const fn_call& fn);
+    as_value Rectangle_offset(const fn_call& fn);
+    as_value Rectangle_offsetPoint(const fn_call& fn);
+    as_value Rectangle_setEmpty(const fn_call& fn);
+    as_value Rectangle_toString(const fn_call& fn);
+    as_value Rectangle_union(const fn_call& fn);
+    as_value Rectangle_bottom(const fn_call& fn);
+    as_value Rectangle_bottomRight(const fn_call& fn);
+    as_value Rectangle_left(const fn_call& fn);
+    as_value Rectangle_right(const fn_call& fn);
+    as_value Rectangle_size(const fn_call& fn);
+    as_value Rectangle_top(const fn_call& fn);
+    as_value Rectangle_topLeft(const fn_call& fn);
+    as_value Rectangle_ctor(const fn_call& fn);
+    as_value get_flash_geom_rectangle_constructor(const fn_call& fn);
+
+}
+
+void
+rectangle_class_init(as_object& where, const ObjectURI& uri)
+{
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(getName(uri),
+            get_flash_geom_rectangle_constructor, flags, getNamespace(uri));
+}
 
 
-as_value Rectangle_ctor(const fn_call& fn);
+namespace {
 
-static void
+void
 attachRectangleInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
     o.init_member("clone", gl->createFunction(Rectangle_clone), 0);
     o.init_member("contains", gl->createFunction(Rectangle_contains), 0);
-    o.init_member("containsPoint", gl->createFunction(Rectangle_containsPoint), 0);
-    o.init_member("containsRectangle", gl->createFunction(Rectangle_containsRectangle), 0);
+    o.init_member("containsPoint",
+            gl->createFunction(Rectangle_containsPoint), 0);
+    o.init_member("containsRectangle",
+            gl->createFunction(Rectangle_containsRectangle), 0);
     o.init_member("equals", gl->createFunction(Rectangle_equals), 0);
     o.init_member("inflate", gl->createFunction(Rectangle_inflate), 0);
-    o.init_member("inflatePoint", gl->createFunction(Rectangle_inflatePoint), 0);
-    o.init_member("intersection", gl->createFunction(Rectangle_intersection), 0);
+    o.init_member("inflatePoint",
+            gl->createFunction(Rectangle_inflatePoint), 0);
+    o.init_member("intersection",
+            gl->createFunction(Rectangle_intersection), 0);
     o.init_member("intersects", gl->createFunction(Rectangle_intersects), 0);
     o.init_member("isEmpty", gl->createFunction(Rectangle_isEmpty), 0);
     o.init_member("offset", gl->createFunction(Rectangle_offset), 0);
@@ -84,51 +102,24 @@ attachRectangleInterface(as_object& o)
     o.init_member("setEmpty", gl->createFunction(Rectangle_setEmpty), 0);
     o.init_member("toString", gl->createFunction(Rectangle_toString), 0);
     o.init_member("union", gl->createFunction(Rectangle_union), 0);
-    o.init_property("bottom", Rectangle_bottom_getset, Rectangle_bottom_getset, 0);
-    o.init_property("bottomRight", Rectangle_bottomRight_getset,
-            Rectangle_bottomRight_getset, 0);
-    o.init_property("left", Rectangle_left_getset,
-            Rectangle_left_getset, 0);
-    o.init_property("right", Rectangle_right_getset,
-            Rectangle_right_getset, 0);
-    o.init_property("size", Rectangle_size_getset,
-            Rectangle_size_getset, 0);
-    o.init_property("top", Rectangle_top_getset,
-            Rectangle_top_getset, 0);
-    o.init_property("topLeft", Rectangle_topLeft_getset,
-            Rectangle_topLeft_getset, 0);
+    o.init_property("bottom",
+            Rectangle_bottom, Rectangle_bottom, 0);
+    o.init_property("bottomRight", Rectangle_bottomRight,
+            Rectangle_bottomRight, 0);
+    o.init_property("left", Rectangle_left,
+            Rectangle_left, 0);
+    o.init_property("right", Rectangle_right,
+            Rectangle_right, 0);
+    o.init_property("size", Rectangle_size,
+            Rectangle_size, 0);
+    o.init_property("top", Rectangle_top,
+            Rectangle_top, 0);
+    o.init_property("topLeft", Rectangle_topLeft,
+            Rectangle_topLeft, 0);
 }
 
 
-static as_object*
-getRectangleInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-
-    if ( ! o )
-    {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachRectangleInterface(*o);
-    }
-
-    return o.get();
-}
-
-class Rectangle_as: public as_object
-{
-
-public:
-
-    Rectangle_as()
-        :
-        as_object(getRectangleInterface())
-    {}
-};
-
-
-static as_value
+as_value
 Rectangle_clone(const fn_call& fn)
 {
     // The object will be interpreted as a rectangle. Any Rectangle
@@ -142,23 +133,22 @@ Rectangle_clone(const fn_call& fn)
     ptr->get_member(NSV::PROP_WIDTH, &w);
     ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-    boost::intrusive_ptr<as_object> obj = new Rectangle_as;
+    as_function* ctor = getClassConstructor(fn, "flash.geom.Rectangle");
+    if (!ctor) return as_value();
 
-    obj->set_member(NSV::PROP_X, x);
-    obj->set_member(NSV::PROP_Y, y);
-    obj->set_member(NSV::PROP_WIDTH, w);
-    obj->set_member(NSV::PROP_HEIGHT, h);
+    fn_call::Args args;
+    args += x, y, w, h;
 
-    return as_value(obj.get()); // will keep alive
+    return ctor->constructInstance(fn.env(), args).get();
 }
 
-static as_value
+as_value
 Rectangle_contains(const fn_call& fn)
 {
     //fn.arg(0) => x coordinate
     //fn.arg(1) => y coordinate
 
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value rect_x_as, rect_width_as, rect_y_as, rect_height_as;
 
@@ -236,73 +226,73 @@ Rectangle_contains(const fn_call& fn)
 
 }
 
-static as_value
+as_value
 Rectangle_containsPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_containsRectangle(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_equals(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_inflate(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_inflatePoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_intersection(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_intersects(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_isEmpty(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value w;
     ptr->get_member(NSV::PROP_WIDTH, &w);
@@ -323,37 +313,37 @@ Rectangle_isEmpty(const fn_call& fn)
     return as_value(false);
 }
 
-static as_value
+as_value
 Rectangle_offset(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_offsetPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_setEmpty(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
+as_value
 Rectangle_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value x, y, w, h;
 
@@ -372,19 +362,19 @@ Rectangle_toString(const fn_call& fn)
     return as_value(ss.str());
 }
 
-static as_value
+as_value
 Rectangle_union(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
-static as_value
-Rectangle_bottom_getset(const fn_call& fn)
+as_value
+Rectangle_bottom(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value ret;
 
@@ -408,11 +398,11 @@ Rectangle_bottom_getset(const fn_call& fn)
     return ret;
 }
 
-static as_value
-Rectangle_bottomRight_getset(const fn_call& fn)
+as_value
+Rectangle_bottomRight(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = 
-        ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = 
+        ensureType<as_object>(fn.this_ptr);
 
     if (!fn.nargs) {
 
@@ -449,10 +439,10 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 
 }
 
-static as_value
-Rectangle_left_getset(const fn_call& fn)
+as_value
+Rectangle_left(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value ret;
 
@@ -478,10 +468,10 @@ Rectangle_left_getset(const fn_call& fn)
     return ret;
 }
 
-static as_value
-Rectangle_right_getset(const fn_call& fn)
+as_value
+Rectangle_right(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value ret;
 
@@ -505,10 +495,10 @@ Rectangle_right_getset(const fn_call& fn)
     return ret;
 }
 
-static as_value
-Rectangle_size_getset(const fn_call& fn)
+as_value
+Rectangle_size(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value ret;
 
@@ -518,10 +508,7 @@ Rectangle_size_getset(const fn_call& fn)
         ptr->get_member(NSV::PROP_WIDTH, &w);
         ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-        as_value point(fn.env().find_object("flash.geom.Point"));
-
-        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
-
+        as_function* pointCtor = getClassConstructor(fn, "flash.geom.Point");
         if (!pointCtor) {
             log_error("Failed to construct flash.geom.Point!");
             return as_value();
@@ -542,10 +529,10 @@ Rectangle_size_getset(const fn_call& fn)
     return ret;
 }
 
-static as_value
-Rectangle_top_getset(const fn_call& fn)
+as_value
+Rectangle_top(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value ret;
 
@@ -571,10 +558,10 @@ Rectangle_top_getset(const fn_call& fn)
     return ret;
 }
 
-static as_value
-Rectangle_topLeft_getset(const fn_call& fn)
+as_value
+Rectangle_topLeft(const fn_call& fn)
 {
-    boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value ret;
 
@@ -584,10 +571,7 @@ Rectangle_topLeft_getset(const fn_call& fn)
         ptr->get_member(NSV::PROP_X, &x);
         ptr->get_member(NSV::PROP_Y, &y);
 
-        as_value point(fn.env().find_object("flash.geom.Point"));
-
-        boost::intrusive_ptr<as_function> pointCtor = point.to_as_function();
-
+        as_function* pointCtor = getClassConstructor(fn, "flash.geom.Point");
         if (!pointCtor) {
             log_error("Failed to construct flash.geom.Point!");
             return as_value();
@@ -613,7 +597,8 @@ Rectangle_topLeft_getset(const fn_call& fn)
 as_value
 Rectangle_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new Rectangle_as;
+
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
 
     as_value x;
     as_value y;
@@ -651,27 +636,17 @@ Rectangle_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_WIDTH, w);
     obj->set_member(NSV::PROP_HEIGHT, h);
 
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
-static as_value
+as_value
 get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Rectangle class");
-
-    as_object* proto = getRectangleInterface();
     Global_as* gl = getGlobal(fn);
+    as_object* proto = gl->createObject();
+    attachRectangleInterface(*proto);
     return gl->createClass(&Rectangle_ctor, proto);
 }
-
-// extern 
-void
-rectangle_class_init(as_object& where, const ObjectURI& uri)
-{
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(getName(uri),
-            get_flash_geom_rectangle_constructor, flags, getNamespace(uri));
-}
-
+} // anonymous namespace
 } // end of gnash namespace
