@@ -69,7 +69,7 @@ registerBitmapFilterNative(as_object& global)
 
 void
 registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
-        Properties p, const ObjectURI& uri)
+        Global_as::Properties p, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
 
