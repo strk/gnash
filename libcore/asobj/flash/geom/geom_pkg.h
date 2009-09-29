@@ -21,11 +21,9 @@
 namespace gnash {
 
 class as_object;
-
 void flash_geom_package_init(as_object& pkg, const ObjectURI& uri);
 
-} // end of gnash namespace
+} // gnash namespace
 
-// __FLASH_GEOM_PACKAGE_H__
 #endif
 
