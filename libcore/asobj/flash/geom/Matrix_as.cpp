@@ -27,7 +27,6 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" 
-#include "Point_as.h"
 
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
@@ -133,10 +132,8 @@ as_object*
 instanceOfMatrix(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
-    
-    as_value matrixClass(fn.env().find_object("flash.geom.Matrix"));
 
-    as_function* ctor = matrixClass.to_as_function();
+    as_function* ctor = getClassConstructor(fn, "flash.geom.Matrix");
     if (obj->instanceOf(ctor)) return obj.get();
     return 0;
 }
@@ -712,7 +709,7 @@ matrix_transformPoint(const fn_call& fn)
     
     as_object* obj = arg.to_object(*getGlobal(fn)).get();
     assert(obj);
-    if (!obj->instanceOf(getFlashGeomPointConstructor(fn))) {
+    if (!obj->instanceOf(getClassConstructor(fn, "flash.geom.Point"))) {
         /// Isn't a point.
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
