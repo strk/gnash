@@ -36,9 +36,6 @@ class fn_call;
 /// Initialize the global Point class
 void point_class_init(as_object& where, const ObjectURI& uri);
 
-/// Return the Point constructor, for use by Rectangle 
-as_function* getFlashGeomPointConstructor(const fn_call& fn);
-
 } // end of gnash namespace
 
 #endif

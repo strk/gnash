@@ -33,79 +33,76 @@
 
 namespace gnash {
 
-static as_value Point_add(const fn_call& fn);
-static as_value Point_clone(const fn_call& fn);
-static as_value Point_equals(const fn_call& fn);
-static as_value Point_normalize(const fn_call& fn);
-static as_value Point_offset(const fn_call& fn);
-static as_value Point_subtract(const fn_call& fn);
-static as_value Point_toString(const fn_call& fn);
-static as_value Point_length_getset(const fn_call& fn);
+namespace {
 
-static as_value Point_distance(const fn_call& fn);
-static as_value Point_interpolate(const fn_call& fn);
-static as_value Point_polar(const fn_call& fn);
+    as_value point_add(const fn_call& fn);
+    as_value point_clone(const fn_call& fn);
+    as_value point_equals(const fn_call& fn);
+    as_value point_normalize(const fn_call& fn);
+    as_value point_offset(const fn_call& fn);
+    as_value point_subtract(const fn_call& fn);
+    as_value point_toString(const fn_call& fn);
+    as_value point_length(const fn_call& fn);
+    as_value point_distance(const fn_call& fn);
+    as_value point_interpolate(const fn_call& fn);
+    as_value point_polar(const fn_call& fn);
+    as_value point_ctor(const fn_call& fn);
 
-as_value Point_ctor(const fn_call& fn);
+    as_value get_flash_geom_point_constructor(const fn_call& fn);
 
-static void
-attachPointInterface(as_object& o)
-{
-    int fl=0; // flags...
-
-    Global_as* gl = getGlobal(o);
-    o.init_member("add", gl->createFunction(Point_add), fl);
-    o.init_member("clone", gl->createFunction(Point_clone), fl);
-    o.init_member("equals", gl->createFunction(Point_equals), fl);
-    o.init_member("normalize", gl->createFunction(Point_normalize), fl);
-    o.init_member("offset", gl->createFunction(Point_offset), fl);
-    o.init_member("subtract", gl->createFunction(Point_subtract), fl);
-    o.init_member("toString", gl->createFunction(Point_toString), fl);
-    o.init_property("length", Point_length_getset, Point_length_getset, fl);
 }
 
-static void
+void
+point_class_init(as_object& where, const ObjectURI& uri)
+{
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(getName(uri),
+            get_flash_geom_point_constructor, flags, getNamespace(uri));
+}
+
+namespace {
+
+as_value
+constructPoint(const fn_call& fn, const as_value& x, const as_value& y)
+{
+    as_function* ctor = getClassConstructor(fn, "flash.geom.Point");
+    if (!ctor) return as_value();
+
+    fn_call::Args args;
+    args += x, y;
+
+    return ctor->constructInstance(fn.env(), args).get();
+}
+
+void
+attachPointInterface(as_object& o)
+{
+    const int fl = 0;
+
+    Global_as* gl = getGlobal(o);
+    o.init_member("add", gl->createFunction(point_add), fl);
+    o.init_member("clone", gl->createFunction(point_clone), fl);
+    o.init_member("equals", gl->createFunction(point_equals), fl);
+    o.init_member("normalize", gl->createFunction(point_normalize), fl);
+    o.init_member("offset", gl->createFunction(point_offset), fl);
+    o.init_member("subtract", gl->createFunction(point_subtract), fl);
+    o.init_member("toString", gl->createFunction(point_toString), fl);
+    o.init_property("length", point_length, point_length, fl);
+}
+
+void
 attachPointStaticProperties(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    o.init_member("distance", gl->createFunction(Point_distance), 0);
-    o.init_member("interpolate", gl->createFunction(Point_interpolate), 0);
-    o.init_member("polar", gl->createFunction(Point_polar), 0);
-}
-
-static as_object*
-getPointInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-
-    if ( ! o )
-    {
-        // TODO: check if this class should inherit from Object
-        //       or from a different class
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachPointInterface(*o);
-
-    }
-
-    return o.get();
+    o.init_member("distance", gl->createFunction(point_distance), 0);
+    o.init_member("interpolate", gl->createFunction(point_interpolate), 0);
+    o.init_member("polar", gl->createFunction(point_polar), 0);
 }
 
 
-class Point_as: public as_object
-{
-public:
-    Point_as()
-        :
-        as_object(getPointInterface())
-    {}
-        
-};
-
-
-static as_value
-Point_add(const fn_call& fn)
+as_value
+point_add(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
@@ -163,15 +160,11 @@ Point_add(const fn_call& fn)
     x.newAdd(x1);
     y.newAdd(y1);
 
-    boost::intrusive_ptr<as_object> ret = new Point_as;
-    ret->set_member(NSV::PROP_X, x);
-    ret->set_member(NSV::PROP_Y, y);
-
-    return as_value(ret.get());
+    return constructPoint(fn, x, y);
 }
 
-static as_value
-Point_clone(const fn_call& fn)
+as_value
+point_clone(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
@@ -179,15 +172,11 @@ Point_clone(const fn_call& fn)
     ptr->get_member(NSV::PROP_X, &x);
     ptr->get_member(NSV::PROP_Y, &y);
 
-    boost::intrusive_ptr<as_object> ret = new Point_as;
-    ret->set_member(NSV::PROP_X, x);
-    ret->set_member(NSV::PROP_Y, y);
-
-    return as_value(ret.get());
+    return constructPoint(fn, x, y);
 }
 
-static as_value
-Point_equals(const fn_call& fn)
+as_value
+point_equals(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
@@ -211,7 +200,7 @@ Point_equals(const fn_call& fn)
     }
     as_object* o = arg1.to_object(*getGlobal(fn)).get();
     assert(o);
-    if ( ! o->instanceOf(getFlashGeomPointConstructor(fn)) )
+    if (!o->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -232,10 +221,10 @@ Point_equals(const fn_call& fn)
     return as_value(x.equals(x1) && y.equals(y1));
 }
 
-static as_value
-Point_normalize(const fn_call& fn)
+as_value
+point_normalize(const fn_call& fn)
 {
-    boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value argval;
 
@@ -286,10 +275,10 @@ Point_normalize(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-Point_offset(const fn_call& fn)
+as_value
+point_offset(const fn_call& fn)
 {
-    boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -311,10 +300,10 @@ Point_offset(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-Point_subtract(const fn_call& fn)
+as_value
+point_subtract(const fn_call& fn)
 {
-    boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -370,17 +359,13 @@ Point_subtract(const fn_call& fn)
     x.set_double(x.to_number() - x1.to_number());
     y.set_double(y.to_number() - y1.to_number());
 
-    boost::intrusive_ptr<as_object> ret = new Point_as;
-    ret->set_member(NSV::PROP_X, x);
-    ret->set_member(NSV::PROP_Y, y);
-
-    return as_value(ret.get());
+    return constructPoint(fn, x, y);
 }
 
-static as_value
-Point_toString(const fn_call& fn)
+as_value
+point_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -396,10 +381,10 @@ Point_toString(const fn_call& fn)
     return as_value(ss.str());
 }
 
-static as_value
-Point_length_getset(const fn_call& fn)
+as_value
+point_length(const fn_call& fn)
 {
-    boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
 
     if ( ! fn.nargs ) // getter
     {
@@ -412,18 +397,19 @@ Point_length_getset(const fn_call& fn)
         double l = std::sqrt(x*x+y*y);
         return as_value(l);
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set read-only property %s"), "Point.length");
-        );
-        return as_value();
-    }
+
+    IF_VERBOSE_ASCODING_ERRORS(
+    log_aserror(_("Attempt to set read-only property %s"), "Point.length");
+    );
+    return as_value();
 }
 
-static as_value
-Point_distance(const fn_call& fn)
+
+/// Static member function.
+as_value
+point_distance(const fn_call& fn)
 {
+
     if ( fn.nargs < 2 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -452,7 +438,7 @@ Point_distance(const fn_call& fn)
     }
     as_object* o1 = arg1.to_object(*getGlobal(fn)).get();
     assert(o1);
-    if ( ! o1->instanceOf(getFlashGeomPointConstructor(fn)) )
+    if (!o1->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -495,8 +481,8 @@ Point_distance(const fn_call& fn)
     return as_value(dist);
 }
 
-static as_value
-Point_interpolate(const fn_call& fn)
+as_value
+point_interpolate(const fn_call& fn)
 {
     as_value x0val;
     as_value y0val;
@@ -561,29 +547,22 @@ Point_interpolate(const fn_call& fn)
     double y1 = y1val.to_number();
     double mu = muval.to_number();
 
-    // newX = b.x + ( muval * (a.x - b.x) );
-    // newY = b.y + ( muval * (a.y - b.y) );
-
     as_value xoff = mu * (x0 - x1);
     as_value yoff = mu * (y0 - y1);
-
-    //log_debug("xoff:%s, yoff:%s, x1val:%s, y1val:%s", xoff, yoff, x1val, y1val);
 
     as_value x = x1val; // copy to avoid changing stack value
     x.newAdd(xoff);
     as_value y = y1val; // copy to avoid changing stack value
     y.newAdd(yoff);
 
-    boost::intrusive_ptr<as_object> ret = new Point_as;
-    ret->set_member(NSV::PROP_X, as_value(x));
-    ret->set_member(NSV::PROP_Y, as_value(y));
-
-    return as_value(ret.get());
+    return constructPoint(fn, x, y);
 }
 
-static as_value
-Point_polar(const fn_call& fn)
+/// Static member function.
+as_value
+point_polar(const fn_call& fn)
 {
+
     as_value lval; // length
     as_value aval; // angle (radians)
 
@@ -615,19 +594,15 @@ Point_polar(const fn_call& fn)
 
     as_value xval(x);
     as_value yval(y);
-    boost::intrusive_ptr<as_object> obj = new Point_as;
-
-    obj->set_member(NSV::PROP_X, x);
-    obj->set_member(NSV::PROP_Y, y);
-    
-    return as_value(obj.get());
+    return constructPoint(fn, x, y);
 }
 
 
 as_value
-Point_ctor(const fn_call& fn)
+point_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new Point_as;
+
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
 
     as_value x;
     as_value y;
@@ -655,36 +630,22 @@ Point_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_X, x);
     obj->set_member(NSV::PROP_Y, y);
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
-// extern 
-as_function*
-getFlashGeomPointConstructor(const fn_call& fn)
-{
-    as_value point(fn.env().find_object("flash.geom.Point"));
-    return point.to_as_function();
-}
 
-static
-as_value get_flash_geom_point_constructor(const fn_call& fn)
+as_value
+get_flash_geom_point_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Point class");
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getPointInterface();
-    as_object* cl = gl->createClass(&Point_ctor, proto);
+    as_object* proto = gl->createObject();
+    as_object* cl = gl->createClass(&point_ctor, proto);
+    attachPointInterface(*proto);
     attachPointStaticProperties(*cl);
     return cl;
 }
 
-// extern 
-void
-point_class_init(as_object& where, const ObjectURI& uri)
-{
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(getName(uri),
-            get_flash_geom_point_constructor, flags, getNamespace(uri));
 }
 
 } // end of gnash namespace
