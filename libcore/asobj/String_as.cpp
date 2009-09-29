@@ -73,6 +73,10 @@ namespace {
 
     inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
             const std::string& function);
+
+    inline int getStringVersioned(const fn_call& fn, const as_value& arg,
+            std::string& str);
+
 }
 
 String_as::String_as(const std::string& s)
@@ -86,21 +90,21 @@ registerStringNative(as_object& global)
 {
     VM& vm = getVM(global);
     vm.registerNative(string_ctor, 251, 0);
-	vm.registerNative(string_valueOf, 251, 1);
-	vm.registerNative(string_toString, 251, 2);
-	vm.registerNative(string_oldToUpper, 102, 0);
-	vm.registerNative(string_toUpperCase, 251, 3);
-	vm.registerNative(string_oldToLower, 102, 1);
-	vm.registerNative(string_toLowerCase, 251, 4);
-	vm.registerNative(string_charAt, 251, 5);
-	vm.registerNative(string_charCodeAt, 251, 6);
-	vm.registerNative(string_concat, 251, 7);
-	vm.registerNative(string_indexOf, 251, 8);
-	vm.registerNative(string_lastIndexOf, 251, 9);
-	vm.registerNative(string_slice, 251, 10);
-	vm.registerNative(string_substring, 251, 11);
-	vm.registerNative(string_split, 251, 12);
-	vm.registerNative(string_substr, 251, 13);
+    vm.registerNative(string_valueOf, 251, 1);
+    vm.registerNative(string_toString, 251, 2);
+    vm.registerNative(string_oldToUpper, 102, 0);
+    vm.registerNative(string_toUpperCase, 251, 3);
+    vm.registerNative(string_oldToLower, 102, 1);
+    vm.registerNative(string_toLowerCase, 251, 4);
+    vm.registerNative(string_charAt, 251, 5);
+    vm.registerNative(string_charCodeAt, 251, 6);
+    vm.registerNative(string_concat, 251, 7);
+    vm.registerNative(string_indexOf, 251, 8);
+    vm.registerNative(string_lastIndexOf, 251, 9);
+    vm.registerNative(string_slice, 251, 10);
+    vm.registerNative(string_substring, 251, 11);
+    vm.registerNative(string_split, 251, 12);
+    vm.registerNative(string_substr, 251, 13);
     vm.registerNative(string_fromCharCode, 251, 14);
 }
 
@@ -133,21 +137,21 @@ namespace {
 void
 attachStringInterface(as_object& o)
 {
-	VM& vm = getVM(o);
+    VM& vm = getVM(o);
 
-	o.init_member("valueOf", vm.getNative(251, 1));
-	o.init_member("toString", vm.getNative(251, 2));
-	o.init_member("toUpperCase", vm.getNative(251, 3));
-	o.init_member("toLowerCase", vm.getNative(251, 4));
-	o.init_member("charAt", vm.getNative(251, 5));
-	o.init_member("charCodeAt", vm.getNative(251, 6));
-	o.init_member("concat", vm.getNative(251, 7));
-	o.init_member("indexOf", vm.getNative(251, 8));
-	o.init_member("lastIndexOf", vm.getNative(251, 9));
-	o.init_member("slice", vm.getNative(251, 10));
-	o.init_member("substring", vm.getNative(251, 11));
-	o.init_member("split", vm.getNative(251, 12));
-	o.init_member("substr", vm.getNative(251, 13));
+    o.init_member("valueOf", vm.getNative(251, 1));
+    o.init_member("toString", vm.getNative(251, 2));
+    o.init_member("toUpperCase", vm.getNative(251, 3));
+    o.init_member("toLowerCase", vm.getNative(251, 4));
+    o.init_member("charAt", vm.getNative(251, 5));
+    o.init_member("charCodeAt", vm.getNative(251, 6));
+    o.init_member("concat", vm.getNative(251, 7));
+    o.init_member("indexOf", vm.getNative(251, 8));
+    o.init_member("lastIndexOf", vm.getNative(251, 9));
+    o.init_member("slice", vm.getNative(251, 10));
+    o.init_member("substring", vm.getNative(251, 11));
+    o.init_member("split", vm.getNative(251, 12));
+    o.init_member("substr", vm.getNative(251, 13));
 }
 
 // all the arguments will be converted to string and concatenated.
@@ -155,15 +159,13 @@ as_value
 string_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
-
-    const int swfVersion = fn.env().get_version();
-
     as_value val(fn.this_ptr);
-    
-    std::string str = val.to_string();
 
-    for (unsigned int i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_string_versioned(swfVersion);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
+
+    for (size_t i = 0; i < fn.nargs; i++) {
+        str += fn.arg(i).to_string_versioned(version);
     }
 
     return as_value(str);
@@ -177,21 +179,8 @@ string_slice(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    /// version to use is the one of the SWF containing caller code.
-    /// If callerDef is null, this calls is spontaneous (system-event?)
-    /// in which case we should research on which version should drive
-    /// behaviour.
-    /// NOTE: it is unlikely that a system event triggers string_split so
-    ///       in most cases a null callerDef means the caller forgot to 
-    ///       set the field (ie: a programmatic error)
-    if ( ! fn.callerDef )
-    {
-        log_error("No fn_call::callerDef in string_slice call");
-    }
-    const int version = fn.callerDef ? fn.callerDef->get_version() :
-        getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -203,7 +192,7 @@ string_slice(const fn_call& fn)
 
     if (fn.nargs >= 2)
     {
-    	end = validIndex(wstr, fn.arg(1).to_int());
+        end = validIndex(wstr, fn.arg(1).to_int());
 
     } 
 
@@ -246,21 +235,8 @@ string_split(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    /// version to use is the one of the SWF containing caller code.
-    /// If callerDef is null, this calls is spontaneous (system-event?)
-    /// in which case we should research on which version should drive
-    /// behaviour.
-    /// NOTE: it is unlikely that a system event triggers string_split so
-    ///       in most cases a null callerDef means the caller forgot to 
-    ///       set the field (ie: a programmatic error)
-    if (!fn.callerDef ) {
-        log_error("No fn_call::callerDef in string_split call");
-    }
-
-    const int version = fn.callerDef ? fn.callerDef->get_version() :
-        getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -305,8 +281,8 @@ string_split(const fn_call& fn)
         {
             // Condition 3 (plus a shortcut if the string itself
             // is empty).
-	        array->push(str);
-	        return as_value(array.get());            
+            array->push(str);
+            return as_value(array.get());            
         }
     }
     else
@@ -325,18 +301,19 @@ string_split(const fn_call& fn)
         // the delimiter is defined.
         if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
-	        int limit = fn.arg(1).to_int();
-	        if (limit < 1) {
-	            // Return empty array if 
-	            return as_value(array.get());
-	        }
+            int limit = fn.arg(1).to_int();
+            if (limit < 1) {
+                // Return empty array if 
+                return as_value(array.get());
+            }
             max = clamp<size_t>(limit, 0, max);
         }
 
-        // If the delimiter is empty, put each DisplayObject in an
+        // If the delimiter is empty, put each character in an
         // array element.
-        if ( delim.empty() ) {
-            for (size_t i = 0, e = wstr.size(); i < e; ++i) {
+        if (delim.empty()) {
+            for (size_t i = 0, e = std::min<size_t>(wstr.size(), max);
+                    i < e; ++i) {
                 array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
             return as_value(array.get());
@@ -351,8 +328,8 @@ string_split(const fn_call& fn)
         pos = wstr.find(delim, pos);
 
         array->push(utf8::encodeCanonicalString(
-               		wstr.substr(prevpos, pos - prevpos),
-               		version));
+                       wstr.substr(prevpos, pos - prevpos),
+                       version));
         if (pos == std::wstring::npos) break;
         num++;
         prevpos = pos + delimiterSize;
@@ -372,11 +349,12 @@ string_lastIndexOf(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     if (!checkArgs(fn, 1, 2, "String.lastIndexOf()")) return as_value(-1);
 
-    const std::string& toFind = fn.arg(0).to_string();
+    const std::string& toFind = fn.arg(0).to_string_versioned(version);
 
     int start = str.size();
 
@@ -408,9 +386,8 @@ string_substr(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -423,15 +400,15 @@ string_substr(const fn_call& fn)
     if (fn.nargs >= 2 && !fn.arg(1).is_undefined())
     {
         num = fn.arg(1).to_int();
-	    if ( num < 0 )
-	    {
-		    if ( -num <= start ) num = 0;
-		    else
-		    {
-			    num = wstr.length() + num;
-			    if ( num < 0 ) return as_value("");
-		    }
-	    }
+        if ( num < 0 )
+        {
+            if ( -num <= start ) num = 0;
+            else
+            {
+                num = wstr.length() + num;
+                if ( num < 0 ) return as_value("");
+            }
+        }
     }
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, num), version));
@@ -448,18 +425,19 @@ string_substring(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     if (!checkArgs(fn, 1, 2, "String.substring()")) return as_value(str);
 
-    int start = fn.arg(0).to_int();
+    const as_value& s = fn.arg(0);
+
+    int start = s.to_int();
     int end = wstr.size();
 
-    if (start < 0) {
+    if (s.is_undefined() || start < 0) {
         start = 0;
     }
 
@@ -467,7 +445,7 @@ string_substring(const fn_call& fn)
         return as_value("");
     }
 
-    if (fn.nargs >= 2) {
+    if (fn.nargs >= 2 && !fn.arg(1).is_undefined()) {
         int num = fn.arg(1).to_int();
 
         if (num < 0) {
@@ -502,16 +480,17 @@ string_indexOf(const fn_call& fn)
  
     /// Do not return before this, because the toString method should always
     /// be called. (TODO: test).   
-    const std::string& str = val.to_string();
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     if (!checkArgs(fn, 1, 2, "String.indexOf")) return as_value(-1);
-
-    const int version = getSWFVersion(fn);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     const as_value& tfarg = fn.arg(0); // to find arg
-    const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string(), version);
+    const std::wstring& toFind =
+        utf8::decodeCanonicalString(tfarg.to_string_versioned(version),
+                version);
 
     size_t start = 0;
 
@@ -520,16 +499,16 @@ string_indexOf(const fn_call& fn)
         const as_value& saval = fn.arg(1); // start arg val
         int start_arg = saval.to_int();
         if ( start_arg > 0 ) start = (size_t) start_arg;
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		if ( start_arg < 0 )
-		{
-			log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
-				tfarg, saval, start_arg);
-		}
-		);
-	}
+    else
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        if ( start_arg < 0 )
+        {
+            log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
+                tfarg, saval, start_arg);
+        }
+        );
+    }
     }
 
     size_t pos = wstr.find(toFind, start);
@@ -591,9 +570,8 @@ string_charCodeAt(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
@@ -603,7 +581,7 @@ string_charCodeAt(const fn_call& fn)
         )
         as_value rv;
         rv.set_nan();
-        return rv;	// Same as for out-of-range arg
+        return rv;    // Same as for out-of-range arg
     }
 
     IF_VERBOSE_ASCODING_ERRORS(
@@ -629,9 +607,8 @@ string_charAt(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     if (!checkArgs(fn, 1, 1, "String.charAt()")) return as_value("");
 
@@ -665,9 +642,10 @@ string_toUpperCase(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
 
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
-    std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
@@ -702,9 +680,10 @@ string_toLowerCase(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
-    std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
@@ -763,7 +742,8 @@ string_oldToUpper(const fn_call& fn)
 as_value
 string_valueOf(const fn_call& fn)
 {
-    return as_value(fn.this_ptr).to_string();
+    const int version = getSWFVersion(fn);
+    return as_value(fn.this_ptr).to_string_versioned(version);
 }
 
 as_value
@@ -777,24 +757,51 @@ string_toString(const fn_call& fn)
 as_value
 string_ctor(const fn_call& fn)
 {
-	std::string str;
-	
-	if (fn.nargs) {
-		str = fn.arg(0).to_string();
-	}
+    const int version = getSWFVersion(fn);
 
-	if (!fn.isInstantiation())
-	{
-		return as_value(str);
-	}
-	
+    std::string str;
+
+    if (fn.nargs) {
+        str = fn.arg(0).to_string_versioned(version);
+    }
+
+    if (!fn.isInstantiation())
+    {
+        return as_value(str);
+    }
+    
     as_object* obj = fn.this_ptr;
 
     obj->setRelay(new String_as(str));
     std::wstring wstr = utf8::decodeCanonicalString(str, getSWFVersion(fn));
     obj->init_member(NSV::PROP_LENGTH, wstr.size(), as_object::DefaultFlags);
 
-	return as_value();
+    return as_value();
+}
+    
+inline int
+getStringVersioned(const fn_call& fn, const as_value& val, std::string& str)
+{
+
+    /// version to use is the one of the SWF containing caller code.
+    /// If callerDef is null, this calls is spontaneous (system-event?)
+    /// in which case we should research on which version should drive
+    /// behaviour.
+    /// NOTE: it is unlikely that a system event triggers string_split so
+    ///       in most cases a null callerDef means the caller forgot to 
+    ///       set the field (ie: a programmatic error)
+    if (!fn.callerDef) {
+        log_error("No fn_call::callerDef in string function call");
+    }
+
+    const int version = fn.callerDef ? fn.callerDef->get_version() :
+        getSWFVersion(fn);
+    
+    str = val.to_string_versioned(version);
+
+    return version;
+
+
 }
 
 /// Check the number of arguments, returning false if there

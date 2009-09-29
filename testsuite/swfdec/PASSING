@@ -1162,6 +1162,9 @@ string-equals-old-5.swf:e7607dd394339e9f2f7d2480d08b21fe
 string-equals-old-6.swf:844e29987eed887d1544e1fbe6f60fa7
 string-equals-old-7.swf:bdcdb87e9b4458b6935e97f4f2714bf3
 string-equals-old-8.swf:3d1bb9216c301b464060f39b2be1eb41
+string-extract-6.swf:58e6955386f659e8d1d202b6a4a7caf9
+string-extract-7.swf:bb979fa7229873dcad33b4accff0b0a6
+string-extract-8.swf:2feec91356658d931daa4fbef88b93b5
 string-fake-5.swf:bb9f63e0726197e7ed3fc318f30acd1c
 string-fake-6.swf:586770ef07ba221bf025ba2dc182d352
 string-fake-7.swf:905bc581e468d939900f55564f82a8fc
@@ -1199,6 +1202,8 @@ string-properties-8.swf:b5d56ec26bad2fa2c7833f44e5148fd8
 string-slice-5.swf:a98bdbd8ce5ff3cfd5406d3a9d04de33
 string-slice-6.swf:cfe7fde1085617b6673fda9895162e32
 string-slice-7.swf:eaed0b05db4e5a01579a94f283f8a068
+string-split-6.swf:bd648b69bcbac7c8fb63e1ed082b0f1b
+string-split-7.swf:a2eb96d582621937150b87b18d73bfa7
 String-split-count-values-6.swf:6eccd6c628bf489d48935de4bfa6ef5a
 String-split-count-values-7.swf:1b1b8fe98fa48ed7c15455cd990d1ad7
 String-split-count-values-8.swf:390b83821fbfb9497d0660d1f57da85a
