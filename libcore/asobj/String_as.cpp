@@ -90,21 +90,21 @@ registerStringNative(as_object& global)
 {
     VM& vm = getVM(global);
     vm.registerNative(string_ctor, 251, 0);
-	vm.registerNative(string_valueOf, 251, 1);
-	vm.registerNative(string_toString, 251, 2);
-	vm.registerNative(string_oldToUpper, 102, 0);
-	vm.registerNative(string_toUpperCase, 251, 3);
-	vm.registerNative(string_oldToLower, 102, 1);
-	vm.registerNative(string_toLowerCase, 251, 4);
-	vm.registerNative(string_charAt, 251, 5);
-	vm.registerNative(string_charCodeAt, 251, 6);
-	vm.registerNative(string_concat, 251, 7);
-	vm.registerNative(string_indexOf, 251, 8);
-	vm.registerNative(string_lastIndexOf, 251, 9);
-	vm.registerNative(string_slice, 251, 10);
-	vm.registerNative(string_substring, 251, 11);
-	vm.registerNative(string_split, 251, 12);
-	vm.registerNative(string_substr, 251, 13);
+    vm.registerNative(string_valueOf, 251, 1);
+    vm.registerNative(string_toString, 251, 2);
+    vm.registerNative(string_oldToUpper, 102, 0);
+    vm.registerNative(string_toUpperCase, 251, 3);
+    vm.registerNative(string_oldToLower, 102, 1);
+    vm.registerNative(string_toLowerCase, 251, 4);
+    vm.registerNative(string_charAt, 251, 5);
+    vm.registerNative(string_charCodeAt, 251, 6);
+    vm.registerNative(string_concat, 251, 7);
+    vm.registerNative(string_indexOf, 251, 8);
+    vm.registerNative(string_lastIndexOf, 251, 9);
+    vm.registerNative(string_slice, 251, 10);
+    vm.registerNative(string_substring, 251, 11);
+    vm.registerNative(string_split, 251, 12);
+    vm.registerNative(string_substr, 251, 13);
     vm.registerNative(string_fromCharCode, 251, 14);
 }
 
@@ -137,21 +137,21 @@ namespace {
 void
 attachStringInterface(as_object& o)
 {
-	VM& vm = getVM(o);
+    VM& vm = getVM(o);
 
-	o.init_member("valueOf", vm.getNative(251, 1));
-	o.init_member("toString", vm.getNative(251, 2));
-	o.init_member("toUpperCase", vm.getNative(251, 3));
-	o.init_member("toLowerCase", vm.getNative(251, 4));
-	o.init_member("charAt", vm.getNative(251, 5));
-	o.init_member("charCodeAt", vm.getNative(251, 6));
-	o.init_member("concat", vm.getNative(251, 7));
-	o.init_member("indexOf", vm.getNative(251, 8));
-	o.init_member("lastIndexOf", vm.getNative(251, 9));
-	o.init_member("slice", vm.getNative(251, 10));
-	o.init_member("substring", vm.getNative(251, 11));
-	o.init_member("split", vm.getNative(251, 12));
-	o.init_member("substr", vm.getNative(251, 13));
+    o.init_member("valueOf", vm.getNative(251, 1));
+    o.init_member("toString", vm.getNative(251, 2));
+    o.init_member("toUpperCase", vm.getNative(251, 3));
+    o.init_member("toLowerCase", vm.getNative(251, 4));
+    o.init_member("charAt", vm.getNative(251, 5));
+    o.init_member("charCodeAt", vm.getNative(251, 6));
+    o.init_member("concat", vm.getNative(251, 7));
+    o.init_member("indexOf", vm.getNative(251, 8));
+    o.init_member("lastIndexOf", vm.getNative(251, 9));
+    o.init_member("slice", vm.getNative(251, 10));
+    o.init_member("substring", vm.getNative(251, 11));
+    o.init_member("split", vm.getNative(251, 12));
+    o.init_member("substr", vm.getNative(251, 13));
 }
 
 // all the arguments will be converted to string and concatenated.
@@ -192,7 +192,7 @@ string_slice(const fn_call& fn)
 
     if (fn.nargs >= 2)
     {
-    	end = validIndex(wstr, fn.arg(1).to_int());
+        end = validIndex(wstr, fn.arg(1).to_int());
 
     } 
 
@@ -281,8 +281,8 @@ string_split(const fn_call& fn)
         {
             // Condition 3 (plus a shortcut if the string itself
             // is empty).
-	        array->push(str);
-	        return as_value(array.get());            
+            array->push(str);
+            return as_value(array.get());            
         }
     }
     else
@@ -301,11 +301,11 @@ string_split(const fn_call& fn)
         // the delimiter is defined.
         if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
-	        int limit = fn.arg(1).to_int();
-	        if (limit < 1) {
-	            // Return empty array if 
-	            return as_value(array.get());
-	        }
+            int limit = fn.arg(1).to_int();
+            if (limit < 1) {
+                // Return empty array if 
+                return as_value(array.get());
+            }
             max = clamp<size_t>(limit, 0, max);
         }
 
@@ -327,8 +327,8 @@ string_split(const fn_call& fn)
         pos = wstr.find(delim, pos);
 
         array->push(utf8::encodeCanonicalString(
-               		wstr.substr(prevpos, pos - prevpos),
-               		version));
+                       wstr.substr(prevpos, pos - prevpos),
+                       version));
         if (pos == std::wstring::npos) break;
         num++;
         prevpos = pos + delimiterSize;
@@ -399,15 +399,15 @@ string_substr(const fn_call& fn)
     if (fn.nargs >= 2 && !fn.arg(1).is_undefined())
     {
         num = fn.arg(1).to_int();
-	    if ( num < 0 )
-	    {
-		    if ( -num <= start ) num = 0;
-		    else
-		    {
-			    num = wstr.length() + num;
-			    if ( num < 0 ) return as_value("");
-		    }
-	    }
+        if ( num < 0 )
+        {
+            if ( -num <= start ) num = 0;
+            else
+            {
+                num = wstr.length() + num;
+                if ( num < 0 ) return as_value("");
+            }
+        }
     }
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, num), version));
@@ -498,16 +498,16 @@ string_indexOf(const fn_call& fn)
         const as_value& saval = fn.arg(1); // start arg val
         int start_arg = saval.to_int();
         if ( start_arg > 0 ) start = (size_t) start_arg;
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		if ( start_arg < 0 )
-		{
-			log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
-				tfarg, saval, start_arg);
-		}
-		);
-	}
+    else
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        if ( start_arg < 0 )
+        {
+            log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
+                tfarg, saval, start_arg);
+        }
+        );
+    }
     }
 
     size_t pos = wstr.find(toFind, start);
@@ -580,7 +580,7 @@ string_charCodeAt(const fn_call& fn)
         )
         as_value rv;
         rv.set_nan();
-        return rv;	// Same as for out-of-range arg
+        return rv;    // Same as for out-of-range arg
     }
 
     IF_VERBOSE_ASCODING_ERRORS(
@@ -760,22 +760,22 @@ string_ctor(const fn_call& fn)
 
     std::string str;
 
-	if (fn.nargs) {
-		str = fn.arg(0).to_string_versioned(version);
-	}
+    if (fn.nargs) {
+        str = fn.arg(0).to_string_versioned(version);
+    }
 
-	if (!fn.isInstantiation())
-	{
-		return as_value(str);
-	}
-	
+    if (!fn.isInstantiation())
+    {
+        return as_value(str);
+    }
+    
     as_object* obj = fn.this_ptr;
 
     obj->setRelay(new String_as(str));
     std::wstring wstr = utf8::decodeCanonicalString(str, getSWFVersion(fn));
     obj->init_member(NSV::PROP_LENGTH, wstr.size(), as_object::DefaultFlags);
 
-	return as_value();
+    return as_value();
 }
     
 inline int
