@@ -28,7 +28,7 @@
 
 namespace gnash {
 
-Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
+Bitmap::Bitmap(BitmapData_as* bd, DisplayObject* parent,
         int id)
     :
     DisplayObject(parent, id),

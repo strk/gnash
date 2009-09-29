@@ -76,16 +76,15 @@ namespace {
 
     void attachBitmapDataInterface(as_object& o);
     void attachBitmapDataStaticProperties(as_object& o);
-    as_object* getBitmapDataInterface();
     as_value get_flash_display_bitmap_data_constructor(const fn_call& fn);
 
 }
 
 
-BitmapData_as::BitmapData_as(size_t width, size_t height,
-	              bool transparent, boost::uint32_t fillColor)
-		:
-    as_object(getBitmapDataInterface()),
+BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
+              bool transparent, boost::uint32_t fillColor)
+    :
+    _owner(owner),
     _width(width),
     _height(height),
     _transparent(transparent),
@@ -94,11 +93,11 @@ BitmapData_as::BitmapData_as(size_t width, size_t height,
 }
 
 void
-BitmapData_as::markReachableResources() const
+BitmapData_as::setReachable() 
 {
     std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
             std::mem_fun(&DisplayObject::setReachable));
-    markAsObjectReachable();
+    _owner->setReachable();
 }
 
 
@@ -241,7 +240,7 @@ namespace {
 as_value
 bitmapdata_applyFilter(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -250,7 +249,7 @@ bitmapdata_applyFilter(const fn_call& fn)
 as_value
 bitmapdata_clone(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -259,7 +258,7 @@ bitmapdata_clone(const fn_call& fn)
 as_value
 bitmapdata_colorTransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -268,7 +267,7 @@ bitmapdata_colorTransform(const fn_call& fn)
 as_value
 bitmapdata_copyChannel(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -277,8 +276,7 @@ bitmapdata_copyChannel(const fn_call& fn)
 as_value
 bitmapdata_copyPixels(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = 
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -289,8 +287,7 @@ bitmapdata_dispose(const fn_call& fn)
 {
     // Should free the memory storing the bitmap.
     // All properties afterwards are -1 (even the rectangle)
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
     ptr->dispose();
 	return as_value();
 }
@@ -298,8 +295,7 @@ bitmapdata_dispose(const fn_call& fn)
 as_value
 bitmapdata_draw(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     std::ostringstream os;
     fn.dump_args(os);
@@ -341,8 +337,7 @@ bitmapdata_draw(const fn_call& fn)
 as_value
 bitmapdata_fillRect(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     if (fn.nargs < 2) return as_value();
     
@@ -383,7 +378,7 @@ bitmapdata_fillRect(const fn_call& fn)
 as_value
 bitmapdata_floodFill(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -392,7 +387,7 @@ bitmapdata_floodFill(const fn_call& fn)
 as_value
 bitmapdata_generateFilterRect(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -401,7 +396,7 @@ bitmapdata_generateFilterRect(const fn_call& fn)
 as_value
 bitmapdata_getColorBoundsRect(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -410,8 +405,7 @@ bitmapdata_getColorBoundsRect(const fn_call& fn)
 as_value
 bitmapdata_getPixel(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     if (fn.nargs < 2)
     {
@@ -429,8 +423,7 @@ bitmapdata_getPixel(const fn_call& fn)
 as_value
 bitmapdata_getPixel32(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     if (fn.nargs < 2)
     {
@@ -449,7 +442,7 @@ bitmapdata_getPixel32(const fn_call& fn)
 as_value
 bitmapdata_hitTest(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -458,7 +451,7 @@ bitmapdata_hitTest(const fn_call& fn)
 as_value
 bitmapdata_merge(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -467,7 +460,7 @@ bitmapdata_merge(const fn_call& fn)
 as_value
 bitmapdata_noise(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -476,7 +469,7 @@ bitmapdata_noise(const fn_call& fn)
 as_value
 bitmapdata_paletteMap(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -485,7 +478,7 @@ bitmapdata_paletteMap(const fn_call& fn)
 as_value
 bitmapdata_perlinNoise(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -494,7 +487,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
 as_value
 bitmapdata_pixelDissolve(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -503,7 +496,7 @@ bitmapdata_pixelDissolve(const fn_call& fn)
 as_value
 bitmapdata_scroll(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -512,8 +505,7 @@ bitmapdata_scroll(const fn_call& fn)
 as_value
 bitmapdata_setPixel(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -537,8 +529,7 @@ bitmapdata_setPixel(const fn_call& fn)
 as_value
 bitmapdata_setPixel32(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -562,8 +553,7 @@ bitmapdata_setPixel32(const fn_call& fn)
 as_value
 bitmapdata_threshold(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -572,8 +562,7 @@ bitmapdata_threshold(const fn_call& fn)
 as_value
 bitmapdata_height(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -587,8 +576,7 @@ bitmapdata_height(const fn_call& fn)
 as_value
 bitmapdata_rectangle(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = 
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
@@ -615,8 +603,7 @@ bitmapdata_rectangle(const fn_call& fn)
 as_value
 bitmapdata_transparent(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -629,8 +616,7 @@ bitmapdata_transparent(const fn_call& fn)
 as_value
 bitmapdata_width(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -645,8 +631,7 @@ bitmapdata_width(const fn_call& fn)
 as_value
 bitmapdata_loadBitmap(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr =
-        ensureType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -658,7 +643,8 @@ get_flash_display_bitmap_data_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.display.BitmapData class");
     Global_as* gl = getGlobal(fn);
-    as_object* proto = getBitmapDataInterface();
+    as_object* proto = gl->createObject();
+    attachBitmapDataInterface(*proto);
     as_object* cl = gl->createClass(&bitmapdata_ctor, proto);
     attachBitmapDataStaticProperties(*cl);
     return cl;
@@ -667,7 +653,7 @@ get_flash_display_bitmap_data_constructor(const fn_call& fn)
 as_value
 bitmapdata_ctor(const fn_call& fn)
 {
-
+    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
 	if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
              log_aserror("BitmapData constructor requires at least two "
@@ -704,10 +690,10 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
     }
 
-    boost::intrusive_ptr<BitmapData_as> obj =
-                new BitmapData_as(width, height, transparent, fillColor);
+    ptr->setRelay(
+            new BitmapData_as(ptr, width, height, transparent, fillColor));
 
-	return as_value(obj.get()); // will keep alive
+	return as_value(); 
 }
 
 void
@@ -754,21 +740,6 @@ attachBitmapDataStaticProperties(as_object& o)
 {
     Global_as* gl = getGlobal(o);
     o.init_member("loadBitmap", gl->createFunction(bitmapdata_loadBitmap));
-}
-
-as_object*
-getBitmapDataInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-
-	if (!o) {
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachBitmapDataInterface(*o);
-	}
-
-	return o.get();
 }
 
 } // anonymous namespace
