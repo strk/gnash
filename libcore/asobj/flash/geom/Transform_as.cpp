@@ -42,29 +42,41 @@ namespace gnash {
 
 namespace {
 
-    as_value Transform_colorTransform(const fn_call& fn);
-    as_value Transform_concatenatedColorTransform(const fn_call& fn);
-    as_value Transform_concatenatedMatrix(const fn_call& fn);
-    as_value Transform_matrix(const fn_call& fn);
-    as_value Transform_pixelBounds(const fn_call& fn);
-    as_value Transform_ctor(const fn_call& fn);
+    as_value transform_colorTransform(const fn_call& fn);
+    as_value transform_concatenatedColorTransform(const fn_call& fn);
+    as_value transform_concatenatedMatrix(const fn_call& fn);
+    as_value transform_matrix(const fn_call& fn);
+    as_value transform_pixelBounds(const fn_call& fn);
+    as_value transform_ctor(const fn_call& fn);
     void attachTransformInterface(as_object& o);
     as_object* getTransformInterface();
     as_value get_flash_geom_transform_constructor(const fn_call& fn);
+    
+    // Handle overflows from AS ColorTransform double.
+    inline boost::int16_t
+    truncateDouble(double d)
+    {
+
+        if (d > std::numeric_limits<boost::int16_t>::max() ||
+            d < std::numeric_limits<boost::int16_t>::min())
+        {
+           return std::numeric_limits<boost::int16_t>::min();
+        }
+        return static_cast<boost::int16_t>(d);
+    }
 }
 
 
 
-class Transform_as: public as_object
+class Transform_as : public Relay
 {
 
 public:
 
-	Transform_as(MovieClip& movieClip)
-		:
-		as_object(getTransformInterface()),
-		_movieClip(movieClip)
-	{}
+    Transform_as(MovieClip& movieClip)
+        :
+        _movieClip(movieClip)
+    {}
 
     const SWFMatrix& getMatrix() const { return _movieClip.getMatrix(); }
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
@@ -73,10 +85,9 @@ public:
 
 protected:
 
-    void markReachableResources() const
+    virtual void markReachableResources() const
     {
         _movieClip.setReachable();
-        markAsObjectReachable();
     }
 
 private:
@@ -85,20 +96,6 @@ private:
 
 };
 
-// Handle overflows from AS ColorTransform double. Doubtful
-// whether it will really be inlined, but that's the compiler's
-// business.
-static inline boost::int16_t
-truncateDouble(double d)
-{
-
-    if (d > std::numeric_limits<boost::int16_t>::max() ||
-        d < std::numeric_limits<boost::int16_t>::min())
-    {
-       return std::numeric_limits<boost::int16_t>::min();
-    }
-    return static_cast<boost::int16_t>(d);
-}
 
 // extern 
 void
@@ -107,20 +104,19 @@ transform_class_init(as_object& where, const ObjectURI& uri)
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
     where.init_destructive_property(getName(uri), 
-		    get_flash_geom_transform_constructor, flags, getNamespace(uri));
+            get_flash_geom_transform_constructor, flags, getNamespace(uri));
 
 }
 
 namespace {
 
 as_value
-Transform_colorTransform(const fn_call& fn)
+transform_colorTransform(const fn_call& fn)
 {
 
     const double factor = 256.0;
 
-	boost::intrusive_ptr<Transform_as> ptr = 
-        ensureType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
 
     if (!fn.nargs) {
 
@@ -136,7 +132,7 @@ Transform_colorTransform(const fn_call& fn)
         }
 
         // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = ptr->getColorTransform();
+        const cxform& c = relay->getColorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
@@ -197,33 +193,31 @@ Transform_colorTransform(const fn_call& fn)
     c.bb = truncateDouble(transform->getBlueOffset());
     c.ab = truncateDouble(transform->getAlphaOffset());
   
-    ptr->setColorTransform(c);
+    relay->setColorTransform(c);
     
     return as_value();
 }
 
 as_value
-Transform_concatenatedColorTransform(const fn_call& fn)
+transform_concatenatedColorTransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<Transform_as> ptr = 
-        ensureType<Transform_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    UNUSED(relay);
+    LOG_ONCE(log_unimpl (__FUNCTION__));
+    return as_value();
 }
 
 as_value
-Transform_concatenatedMatrix(const fn_call& fn)
+transform_concatenatedMatrix(const fn_call& fn)
 {
-	boost::intrusive_ptr<Transform_as> ptr = 
-        ensureType<Transform_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    UNUSED(relay);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
-Transform_matrix(const fn_call& fn)
+transform_matrix(const fn_call& fn)
 {
 
     const double factor = 65536.0;
@@ -233,8 +227,7 @@ Transform_matrix(const fn_call& fn)
     // would that work?)?
     // This should work by passing a new matrix, in which case we should just
     // set our _movieClip's matrix from the AS matrix.
-	boost::intrusive_ptr<Transform_as> ptr = 
-        ensureType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -249,7 +242,7 @@ Transform_matrix(const fn_call& fn)
             return as_value();
         }
 
-        const SWFMatrix& m = ptr->getMatrix();
+        const SWFMatrix& m = relay->getMatrix();
 
         fn_call::Args args;
         args += m.sx / factor,
@@ -308,27 +301,25 @@ Transform_matrix(const fn_call& fn)
     m.set_x_translation(pixelsToTwips(tx.to_number()));
     m.set_y_translation(pixelsToTwips(ty.to_number()));
 
-    ptr->setMatrix(m);
+    relay->setMatrix(m);
 
     return as_value();
 
 }
 
 as_value
-Transform_pixelBounds(const fn_call& fn)
+transform_pixelBounds(const fn_call& fn)
 {
-	boost::intrusive_ptr<Transform_as> ptr = 
-        ensureType<Transform_as>(fn.this_ptr);
-
-    UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    UNUSED(relay);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 
 
 as_value
-Transform_ctor(const fn_call& fn)
+transform_ctor(const fn_call& fn)
 {
 
     if (!fn.nargs) {
@@ -339,26 +330,25 @@ Transform_ctor(const fn_call& fn)
             log_aserror("flash.geom.Transform(%s): needs one argument",
                 ss.str());
         );
-        return as_value();
+        throw ActionTypeError();
     }
 
     // TODO: what about more than one argument? 
-	if (fn.nargs > 1) {
-		std::stringstream ss;
-		fn.dump_args(ss);
-		LOG_ONCE(log_unimpl("Transform(%s): %s", ss.str(),
+    if (fn.nargs > 1) {
+        std::stringstream ss;
+        fn.dump_args(ss);
+        LOG_ONCE(log_unimpl("Transform(%s): %s", ss.str(),
                     _("arguments discarded")) );
-	}
+    }
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
     boost::intrusive_ptr<MovieClip> mc =
         ensureType<MovieClip>(fn.arg(0).to_object(*getGlobal(fn)));
 
-	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    obj->setRelay(new Transform_as(*mc));
 
-    // We have a movie clip. Do we construct the various properties, or are they
-    // constructed on demand?
-	return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 as_value
@@ -366,26 +356,9 @@ get_flash_geom_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Transform class");
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&Transform_ctor, getTransformInterface());
-}
-
-as_object*
-getTransformInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-
-	if (!o) {
-
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		VM::get().addStatic(o.get());
-
-		attachTransformInterface(*o);
-
-	}
-
-	return o.get();
+    as_object* proto = gl->createObject();
+    attachTransformInterface(*proto);
+    return gl->createClass(&transform_ctor, proto);
 }
 
 void
@@ -393,17 +366,17 @@ attachTransformInterface(as_object& o)
 {
     const int protectedFlags = PropFlags::isProtected;
 
-    o.init_property("matrix", Transform_matrix, Transform_matrix,
+    o.init_property("matrix", transform_matrix, transform_matrix,
             protectedFlags);
-    o.init_property("concatenatedMatrix", Transform_concatenatedMatrix,
-            Transform_concatenatedMatrix, protectedFlags);
-    o.init_property("colorTransform", Transform_colorTransform,
-            Transform_colorTransform, protectedFlags);
+    o.init_property("concatenatedMatrix", transform_concatenatedMatrix,
+            transform_concatenatedMatrix, protectedFlags);
+    o.init_property("colorTransform", transform_colorTransform,
+            transform_colorTransform, protectedFlags);
     o.init_property("concatenatedColorTransform",
-            Transform_concatenatedColorTransform,
-            Transform_concatenatedColorTransform, protectedFlags);
-    o.init_property("pixelBounds", Transform_pixelBounds,
-            Transform_pixelBounds, protectedFlags);
+            transform_concatenatedColorTransform,
+            transform_concatenatedColorTransform, protectedFlags);
+    o.init_property("pixelBounds", transform_pixelBounds,
+            transform_pixelBounds, protectedFlags);
 }
 
 } // anonymous namespace

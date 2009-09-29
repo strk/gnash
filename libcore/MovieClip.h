@@ -648,7 +648,7 @@ public:
     void removeMovieClip();
 
     /// Create a Bitmap DisplayObject at the specified depth.
-    void attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth);
+    void attachBitmap(BitmapData_as* bd, int depth);
 
     /// Render this MovieClip to a GnashImage using the passed transform
     //

@@ -45,7 +45,7 @@ class Bitmap : public DisplayObject
 {
 public:
 
-	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
+	Bitmap(BitmapData_as* bd, DisplayObject* parent,
             int id);
 	
     Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
@@ -101,7 +101,7 @@ private:
 
     const boost::intrusive_ptr<const BitmapMovieDefinition> _def;
 
-    boost::intrusive_ptr<BitmapData_as> _bitmapData;
+    BitmapData_as* _bitmapData;
 
     /// The current bitmap information is stored here.
     boost::intrusive_ptr<BitmapInfo> _bitmapInfo;

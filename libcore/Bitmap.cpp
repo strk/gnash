@@ -28,7 +28,7 @@
 
 namespace gnash {
 
-Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
+Bitmap::Bitmap(BitmapData_as* bd, DisplayObject* parent,
         int id)
     :
     DisplayObject(parent, id),
@@ -45,6 +45,7 @@ Bitmap::Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
     :
     DisplayObject(parent, id),
     _def(def),
+    _bitmapData(0),
     _bitmapInfo(0),
     _width(twipsToPixels(def->get_frame_size().width())),
     _height(twipsToPixels(def->get_frame_size().height()))

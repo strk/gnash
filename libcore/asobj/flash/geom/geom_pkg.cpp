@@ -33,7 +33,9 @@
 
 namespace gnash {
 
-static as_value
+namespace {
+
+as_value
 get_flash_geom_package(const fn_call& fn)
 {
     log_debug("Loading flash.geom package");
@@ -52,6 +54,8 @@ get_flash_geom_package(const fn_call& fn)
 	transform_class_init(*pkg, ObjectURI(st.find("Transform"), global));
 
     return pkg;
+}
+
 }
 
 void

@@ -2506,9 +2506,9 @@ movieclip_attachBitmap(const fn_call& fn)
     }
 
     as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
-    boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
+    BitmapData_as* bd;
 
-    if (!bd) {
+    if (!isNativeType(obj, bd)) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_debug("MovieClip.attachBitmap: first argument should be a "
                 "BitmapData", fn.arg(1));

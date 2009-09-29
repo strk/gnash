@@ -31,6 +31,7 @@
 #include "smart_ptr.h"
 #include "PropFlags.h" // for enum
 #include "GnashException.h"
+#include "Relay.h"
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -151,23 +152,6 @@ struct ObjectURI
     string_table::key ns;
 
 };
-
-/// This is the base class for type-specific object data. 
-//
-/// ActionScript classes with particular type restrictions or type traits
-/// should set the Object's _relay member to a subclass of this class.
-//
-/// The simplest native types, such as Boolean or String, inherit from this
-/// type.
-class Relay
-{
-public:
-    virtual ~Relay() {};
-
-    /// A Relay itself is not a GC object, but may point to GC resources.
-    virtual void setReachable() {}
-};
-
 
 
 /// \brief
@@ -1174,51 +1158,6 @@ getNamespace(const ObjectURI& o)
     return o.ns;
 }
 
-/// A type that requires periodic updates from the core (movie_root).
-//
-/// Objects with this type of relay can be registered with movie_root, and
-/// recieve a callback on every advance.
-//
-/// This type of Proxy holds a reference to its parent as_object (owner). 
-/// If a reference to this ActiveRelay is held by another object,
-/// it must be marked reachable so that its owner is not deleted by the GC.
-class ActiveRelay : public Relay
-{
-public:
-    ActiveRelay(as_object* owner)
-        :
-        _owner(owner)
-    {}
-
-    /// Make sure we are removed from the list of callbacks on destruction.
-    virtual ~ActiveRelay();
-
-    /// ActiveRelay objects must have an advanceState method.
-    virtual void update() = 0;
-
-    /// Mark any other reachable resources, and finally mark our owner
-    virtual void setReachable() {
-        markReachableResources();
-        _owner->setReachable();
-    }
-
-    as_object& owner() const {
-        return *_owner;
-    }
-
-protected:
-
-    virtual void markReachableResources() const {}
-
-private:
-
-    /// The as_object that owns this Proxy.
-    //
-    /// Because we are deleted on destruction of the owner, this pointer will
-    /// never be invalid.
-    as_object* _owner;
-
-};
 
 /// Template which does a dynamic cast for as_object pointers.
 //

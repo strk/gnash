@@ -15,15 +15,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef FLASH_GEOM_PACKAGE_H
-#define FLASH_GEOM_PACKAGE_H
+#include "movie_root.h"
+#include "as_object.h"
+#include "Relay.h"
 
 namespace gnash {
 
-class as_object;
-void flash_geom_package_init(as_object& pkg, const ObjectURI& uri);
 
-} // gnash namespace
+/// Destructor of ActiveRelay needs definition of movie_root.
+ActiveRelay::~ActiveRelay()
+{
+    getRoot(*_owner).removeAdvanceCallback(this);
+}
 
-#endif
 
+void
+ActiveRelay::setReachable()
+{
+    markReachableResources();
+    _owner->setReachable();
+}
+
+}

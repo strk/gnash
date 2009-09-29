@@ -1397,7 +1397,7 @@ MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
 }
 
 void
-MovieClip::attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth)
+MovieClip::attachBitmap(BitmapData_as* bd, int depth)
 {
     DisplayObject* ch = new Bitmap(bd, this, 0);
     attachCharacter(*ch, depth, 0);
