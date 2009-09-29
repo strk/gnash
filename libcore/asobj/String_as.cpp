@@ -309,10 +309,11 @@ string_split(const fn_call& fn)
             max = clamp<size_t>(limit, 0, max);
         }
 
-        // If the delimiter is empty, put each DisplayObject in an
+        // If the delimiter is empty, put each character in an
         // array element.
-        if ( delim.empty() ) {
-            for (size_t i = 0, e = wstr.size(); i < e; ++i) {
+        if (delim.empty()) {
+            for (size_t i = 0, e = std::min<size_t>(wstr.size(), max);
+                    i < e; ++i) {
                 array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
             return as_value(array.get());
