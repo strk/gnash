@@ -91,6 +91,7 @@ namespace {
 
     as_value get_flash_geom_matrix_constructor(const fn_call& fn);
     as_value matrix_ctor(const fn_call& fn);
+    as_object* instanceOfMatrix(const fn_call& fn);
 }
 
 void
