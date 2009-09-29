@@ -20,41 +20,6 @@ EXTRA_DIST = gnashrc.in gnashpluginrc.in
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-if INSTALL_LTDL
-if !LIBLTDL2
-include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
-LIBLTDLLIB = libltdl.la
-LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
-endif
-endif
-
-if !LIBLTDL2
-libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
-if CONVENIENCE_LTDL
-noinst_LTLIBRARIES = libltdlc.la
-libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-endif
-
-libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
-libltdl_la_LIBADD = $(LIBADD_DL)
-
-sysconf_DATA = gnashrc gnashpluginrc
-
-edit = sed \
-	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
-	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
-	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
-	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
-	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
-	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
-
-gnashrc: gnashrc.in Makefile
-	$(edit) '$(srcdir)/$@.in' >$@
-
-gnashpluginrc: gnashpluginrc.in
-	$(edit) '$(srcdir)/$@.in' >$@
-
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
 pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
@@ -94,20 +59,6 @@ libgnashbase_la_LIBADD = \
 	$(LIBADD_DL) \
 	$(NULL)
 
-if WIN32
-  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
-endif
-
-# Maybe use jemalloc, which handles memory fragmentation for
-# ECAMscript languages better than the regular system malloc.
-# This is controlled by the --enable-jemalloc (disabled by default)
-# configure option.
-if JEMALLOC
-MALLOC = jemalloc.c
-else
-MALLOC = 
-endif
-
 libgnashbase_la_SOURCES = \
 	extension.cpp \
 	$(MALLOC) \
@@ -135,6 +86,56 @@ libgnashbase_la_SOURCES = \
 	BitsReader.cpp \
 	arg_parser.cpp \
 	$(NULL)
+
+if INSTALL_LTDL
+if !LIBLTDL2
+include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
+LIBLTDLLIB = libltdl.la
+LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
+endif
+endif
+
+if !LIBLTDL2
+libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
+if CONVENIENCE_LTDL
+noinst_LTLIBRARIES = libltdlc.la
+libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+
+libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
+libltdl_la_LIBADD = $(LIBADD_DL)
+
+sysconf_DATA = gnashrc gnashpluginrc
+
+edit = sed \
+	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
+	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
+	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
+	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
+
+gnashrc: gnashrc.in Makefile
+	$(edit) '$(srcdir)/$@.in' >$@
+
+gnashpluginrc: gnashpluginrc.in
+	$(edit) '$(srcdir)/$@.in' >$@
+
+
+if WIN32
+  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
+endif
+
+# Maybe use jemalloc, which handles memory fragmentation for
+# ECAMscript languages better than the regular system malloc.
+# This is controlled by the --enable-jemalloc (disabled by default)
+# configure option.
+if JEMALLOC
+MALLOC = jemalloc.c
+else
+MALLOC = 
+endif
 
 if USE_PNG
 libgnashbase_la_SOURCES += GnashImagePng.cpp
