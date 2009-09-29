@@ -73,6 +73,10 @@ namespace {
 
     inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
             const std::string& function);
+
+    inline int getStringVersioned(const fn_call& fn, const as_value& arg,
+            std::string& str);
+
 }
 
 String_as::String_as(const std::string& s)
@@ -155,15 +159,13 @@ as_value
 string_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
-
-    const int swfVersion = fn.env().get_version();
-
     as_value val(fn.this_ptr);
-    
-    std::string str = val.to_string();
 
-    for (unsigned int i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_string_versioned(swfVersion);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
+
+    for (size_t i = 0; i < fn.nargs; i++) {
+        str += fn.arg(i).to_string_versioned(version);
     }
 
     return as_value(str);
@@ -177,21 +179,8 @@ string_slice(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    /// version to use is the one of the SWF containing caller code.
-    /// If callerDef is null, this calls is spontaneous (system-event?)
-    /// in which case we should research on which version should drive
-    /// behaviour.
-    /// NOTE: it is unlikely that a system event triggers string_split so
-    ///       in most cases a null callerDef means the caller forgot to 
-    ///       set the field (ie: a programmatic error)
-    if ( ! fn.callerDef )
-    {
-        log_error("No fn_call::callerDef in string_slice call");
-    }
-    const int version = fn.callerDef ? fn.callerDef->get_version() :
-        getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -246,21 +235,8 @@ string_split(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    /// version to use is the one of the SWF containing caller code.
-    /// If callerDef is null, this calls is spontaneous (system-event?)
-    /// in which case we should research on which version should drive
-    /// behaviour.
-    /// NOTE: it is unlikely that a system event triggers string_split so
-    ///       in most cases a null callerDef means the caller forgot to 
-    ///       set the field (ie: a programmatic error)
-    if (!fn.callerDef ) {
-        log_error("No fn_call::callerDef in string_split call");
-    }
-
-    const int version = fn.callerDef ? fn.callerDef->get_version() :
-        getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -372,11 +348,12 @@ string_lastIndexOf(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     if (!checkArgs(fn, 1, 2, "String.lastIndexOf()")) return as_value(-1);
 
-    const std::string& toFind = fn.arg(0).to_string();
+    const std::string& toFind = fn.arg(0).to_string_versioned(version);
 
     int start = str.size();
 
@@ -408,9 +385,8 @@ string_substr(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -448,18 +424,19 @@ string_substring(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     if (!checkArgs(fn, 1, 2, "String.substring()")) return as_value(str);
 
-    int start = fn.arg(0).to_int();
+    const as_value& s = fn.arg(0);
+
+    int start = s.to_int();
     int end = wstr.size();
 
-    if (start < 0) {
+    if (s.is_undefined() || start < 0) {
         start = 0;
     }
 
@@ -467,7 +444,7 @@ string_substring(const fn_call& fn)
         return as_value("");
     }
 
-    if (fn.nargs >= 2) {
+    if (fn.nargs >= 2 && !fn.arg(1).is_undefined()) {
         int num = fn.arg(1).to_int();
 
         if (num < 0) {
@@ -502,16 +479,17 @@ string_indexOf(const fn_call& fn)
  
     /// Do not return before this, because the toString method should always
     /// be called. (TODO: test).   
-    const std::string& str = val.to_string();
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     if (!checkArgs(fn, 1, 2, "String.indexOf")) return as_value(-1);
-
-    const int version = getSWFVersion(fn);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     const as_value& tfarg = fn.arg(0); // to find arg
-    const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string(), version);
+    const std::wstring& toFind =
+        utf8::decodeCanonicalString(tfarg.to_string_versioned(version),
+                version);
 
     size_t start = 0;
 
@@ -591,9 +569,8 @@ string_charCodeAt(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
@@ -629,9 +606,8 @@ string_charAt(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const std::string& str = val.to_string();
-
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
     if (!checkArgs(fn, 1, 1, "String.charAt()")) return as_value("");
 
@@ -665,9 +641,10 @@ string_toUpperCase(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
 
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
-    std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
@@ -702,9 +679,10 @@ string_toLowerCase(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    const int version = getSWFVersion(fn);
+    std::string str;
+    const int version = getStringVersioned(fn, val, str);
 
-    std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
@@ -763,7 +741,8 @@ string_oldToUpper(const fn_call& fn)
 as_value
 string_valueOf(const fn_call& fn)
 {
-    return as_value(fn.this_ptr).to_string();
+    const int version = getSWFVersion(fn);
+    return as_value(fn.this_ptr).to_string_versioned(version);
 }
 
 as_value
@@ -777,10 +756,12 @@ string_toString(const fn_call& fn)
 as_value
 string_ctor(const fn_call& fn)
 {
-	std::string str;
-	
+    const int version = getSWFVersion(fn);
+
+    std::string str;
+
 	if (fn.nargs) {
-		str = fn.arg(0).to_string();
+		str = fn.arg(0).to_string_versioned(version);
 	}
 
 	if (!fn.isInstantiation())
@@ -795,6 +776,31 @@ string_ctor(const fn_call& fn)
     obj->init_member(NSV::PROP_LENGTH, wstr.size(), as_object::DefaultFlags);
 
 	return as_value();
+}
+    
+inline int
+getStringVersioned(const fn_call& fn, const as_value& val, std::string& str)
+{
+
+    /// version to use is the one of the SWF containing caller code.
+    /// If callerDef is null, this calls is spontaneous (system-event?)
+    /// in which case we should research on which version should drive
+    /// behaviour.
+    /// NOTE: it is unlikely that a system event triggers string_split so
+    ///       in most cases a null callerDef means the caller forgot to 
+    ///       set the field (ie: a programmatic error)
+    if (!fn.callerDef) {
+        log_error("No fn_call::callerDef in string function call");
+    }
+
+    const int version = fn.callerDef ? fn.callerDef->get_version() :
+        getSWFVersion(fn);
+    
+    str = val.to_string_versioned(version);
+
+    return version;
+
+
 }
 
 /// Check the number of arguments, returning false if there
