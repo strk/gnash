@@ -884,28 +884,16 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     
     const as_value& strval = env.top(2);
 
-    // input checks
-    if ( strval.is_undefined() || strval.is_null() )
-    {
-    IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Undefined or null string passed to ActionSubString, "
-        "returning undefined"));
-        );
-        env.drop(2);
-        env.top(0).set_undefined();
-        return;
-    }
-    
+    // Undefined values should resolve to 0.
     int size = env.top(0).to_int();
     int start = env.top(1).to_int();
 
-    // We don't need to_string_versioned because undefined values have
-    // already been dealt with.
     const int version = env.get_version();
     const std::wstring wstr = utf8::decodeCanonicalString(
-                                strval.to_string(), version);
+                                strval.to_string_versioned(version), version);
+    
 
-    if ( size < 0 )
+    if (size < 0)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Negative size passed to ActionSubString, "
@@ -914,8 +902,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
         size = wstr.length();
     }
 
-    if ( size == 0 || wstr.empty() )
-    {
+    if (size == 0 || wstr.empty()) {
         env.drop(2);
         env.top(0).set_string("");
         return;
@@ -1788,27 +1775,23 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
+    const as_value& arg0 = env.top(0);
+    const as_value& arg1 = env.top(1);
 
+    // Undefined values should resolve to 0.
     int size = env.top(0).to_int();
     int start = env.top(1).to_int();
+
     as_value& string_val = env.top(2);
 
     IF_VERBOSE_ACTION(
-    log_action(" ActionMbSubString(%s, %d, %d)", string_val, start, size);
+    log_action(" ActionMbSubString(%s, %d, %d)", string_val, arg0, arg1);
     );
 
     env.drop(2);
 
-    if (string_val.is_undefined() || string_val.is_null())
-    {
-        log_error(_("Undefined or null string passed to ActionMBSubString, "
-            "returning undefined"));
-        env.top(0).set_undefined();
-        return;
-    }
-
-    std::string str = string_val.to_string();
+    const int version = env.get_version();
+    std::string str = string_val.to_string_versioned(version);
     int length = 0;
     std::vector<int> offsets;
 
