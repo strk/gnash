@@ -66,86 +66,83 @@
 
 namespace gnash {
 
-typedef boost::numeric::ublas::c_matrix<double, 3, 3> MatrixType;
-typedef boost::numeric::ublas::c_vector<double, 2> PointType;
 
 // Forward declarations
-static as_value Matrix_clone(const fn_call& fn);
-static as_value Matrix_concat(const fn_call& fn);
-static as_value Matrix_createBox(const fn_call& fn);
-static as_value Matrix_createGradientBox(const fn_call& fn);
-static as_value Matrix_deltaTransformPoint(const fn_call& fn);
-static as_value Matrix_identity(const fn_call& fn);
-static as_value Matrix_invert(const fn_call& fn);
-static as_value Matrix_rotate(const fn_call& fn);
-static as_value Matrix_scale(const fn_call& fn);
-static as_value Matrix_toString(const fn_call& fn);
-static as_value Matrix_transformPoint(const fn_call& fn);
-static as_value Matrix_translate(const fn_call& fn);
-static void fillMatrix(MatrixType& matrix, as_object& matrixObject);
-static PointType transformPoint(as_object* const pointObject, as_object* const matrixObject);
+namespace {
 
-as_value Matrix_ctor(const fn_call& fn);
+    typedef boost::numeric::ublas::c_matrix<double, 3, 3> MatrixType;
+    typedef boost::numeric::ublas::c_vector<double, 2> PointType;
 
-static void
+    as_value matrix_clone(const fn_call& fn);
+    as_value matrix_concat(const fn_call& fn);
+    as_value matrix_createBox(const fn_call& fn);
+    as_value matrix_createGradientBox(const fn_call& fn);
+    as_value matrix_deltaTransformPoint(const fn_call& fn);
+    as_value matrix_identity(const fn_call& fn);
+    as_value matrix_invert(const fn_call& fn);
+    as_value matrix_rotate(const fn_call& fn);
+    as_value matrix_scale(const fn_call& fn);
+    as_value matrix_toString(const fn_call& fn);
+    as_value matrix_transformPoint(const fn_call& fn);
+    as_value matrix_translate(const fn_call& fn);
+    void fillMatrix(MatrixType& matrix, as_object& matrixObject);
+    PointType transformPoint(as_object* const pointObject,
+            as_object* const matrixObject);
+
+    as_value get_flash_geom_matrix_constructor(const fn_call& fn);
+    as_value matrix_ctor(const fn_call& fn);
+}
+
+void
+matrix_class_init(as_object& where, const ObjectURI& uri)
+{
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(getName(uri),
+            get_flash_geom_matrix_constructor, flags, getNamespace(uri));
+}
+
+
+namespace {
+
+void
 attachMatrixInterface(as_object& o)
 {
     int fl = 0;
 
     Global_as* gl = getGlobal(o);
-    o.init_member("clone", gl->createFunction(Matrix_clone), fl);
-    o.init_member("concat", gl->createFunction(Matrix_concat), fl);
-    o.init_member("createBox", gl->createFunction(Matrix_createBox), fl);
+    o.init_member("clone", gl->createFunction(matrix_clone), fl);
+    o.init_member("concat", gl->createFunction(matrix_concat), fl);
+    o.init_member("createBox", gl->createFunction(matrix_createBox), fl);
     o.init_member("createGradientBox",
-            gl->createFunction(Matrix_createGradientBox), fl);
+            gl->createFunction(matrix_createGradientBox), fl);
     o.init_member("deltaTransformPoint",
-            gl->createFunction(Matrix_deltaTransformPoint), fl);
-    o.init_member("identity", gl->createFunction(Matrix_identity), fl);
-    o.init_member("invert", gl->createFunction(Matrix_invert), fl);
-    o.init_member("rotate", gl->createFunction(Matrix_rotate), fl);
-    o.init_member("scale", gl->createFunction(Matrix_scale), fl);
-    o.init_member("toString", gl->createFunction(Matrix_toString), fl);
+            gl->createFunction(matrix_deltaTransformPoint), fl);
+    o.init_member("identity", gl->createFunction(matrix_identity), fl);
+    o.init_member("invert", gl->createFunction(matrix_invert), fl);
+    o.init_member("rotate", gl->createFunction(matrix_rotate), fl);
+    o.init_member("scale", gl->createFunction(matrix_scale), fl);
+    o.init_member("toString", gl->createFunction(matrix_toString), fl);
     o.init_member("transformPoint",
-            gl->createFunction(Matrix_transformPoint), fl);
-    o.init_member("translate", gl->createFunction(Matrix_translate), fl);
+            gl->createFunction(matrix_transformPoint), fl);
+    o.init_member("translate", gl->createFunction(matrix_translate), fl);
 }
 
-
-static as_object*
-getMatrixInterface()
+as_object*
+instanceOfMatrix(const fn_call& fn)
 {
-    static boost::intrusive_ptr<as_object> o;
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    
+    as_value matrixClass(fn.env().find_object("flash.geom.Matrix"));
 
-    if ( ! o )
-    {
-        // Inherits from Object.
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-
-        attachMatrixInterface(*o);
-
-    }
-
-    return o.get();
+    as_function* ctor = matrixClass.to_as_function();
+    if (obj->instanceOf(ctor)) return obj.get();
+    return 0;
 }
-
-class Matrix_as: public as_object
-{
-
-public:
-
-    Matrix_as()
-        :
-        as_object(getMatrixInterface())
-    {
-    }
-
-};
-
 
 /// Return an exact copy of the matrix.
-static as_value
-Matrix_clone(const fn_call& fn)
+as_value
+matrix_clone(const fn_call& fn)
 {
     // It doesn't matter whether it is a matrix or not; a new Matrix
     // is created using any Matrix properties the object may have.
@@ -159,20 +156,24 @@ Matrix_clone(const fn_call& fn)
     ptr->get_member(NSV::PROP_TX, &tx);
     ptr->get_member(NSV::PROP_TY, &ty);
 
-    boost::intrusive_ptr<as_object> ret = new Matrix_as;
-    ret->set_member(NSV::PROP_A, a);
-    ret->set_member(NSV::PROP_B, b);
-    ret->set_member(NSV::PROP_C, c);
-    ret->set_member(NSV::PROP_D, d);
-    ret->set_member(NSV::PROP_TX, tx);
-    ret->set_member(NSV::PROP_TY, ty);
-    
-    return as_value(ret.get());
+    fn_call::Args args;
+    args += a, b, c, d, tx, ty;
+
+    as_value matrixClass(fn.env().find_object("flash.geom.Matrix"));
+
+    as_function* ctor = matrixClass.to_as_function();
+    if (!ctor) {
+        return as_value();
+    }
+
+    as_object* o = ctor->constructInstance(fn.env(), args).get();
+
+    return as_value(o);
 }
 
 // A full, normal concatenation, so use full 3x3 matrices.
-static as_value
-Matrix_concat(const fn_call& fn)
+as_value
+matrix_concat(const fn_call& fn)
 {
     // Doesn't have to be a Matrix.
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -239,8 +240,8 @@ Matrix_concat(const fn_call& fn)
 /// The translation values can be any as_value; the others (because mathematical
 /// operations are applied to them), result in NaN if anything other than a number
 /// is passed, so we treat them as doubles from the beginning.
-static as_value
-Matrix_createBox(const fn_call& fn)
+as_value
+matrix_createBox(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -298,17 +299,19 @@ Matrix_createBox(const fn_call& fn)
 
 
 // Like createBox, but with strange offsets applied.
-static as_value
-Matrix_createGradientBox(const fn_call& fn)
+as_value
+matrix_createGradientBox(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    as_object* ptr = instanceOfMatrix(fn);
+    if (!ptr) return as_value();
 
     if (fn.nargs < 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.createGradientBox(%s): needs at least two arguments", ss.str());
+            log_aserror("Matrix.createGradientBox(%s): needs at least "
+                "two arguments", ss.str());
         );
         return as_value();
     }
@@ -371,8 +374,8 @@ Matrix_createGradientBox(const fn_call& fn)
 /// elements (tx, ty) do not have any effect.
 ///
 /// Returns a new Point, leaving the object passed untouched.
-static as_value
-Matrix_deltaTransformPoint(const fn_call& fn)
+as_value
+matrix_deltaTransformPoint(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -434,8 +437,8 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 /// | 0   1   0 |
 ///(| 0   0   1 |)
 /// Returns void.
-static as_value
-Matrix_identity(const fn_call& fn)
+as_value
+matrix_identity(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -451,14 +454,14 @@ Matrix_identity(const fn_call& fn)
 }
 
 
-static inline double
+inline double
 getMinorDeterminant(const MatrixType& m)
 {
     return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
 }
 
-static as_value
-Matrix_invert(const fn_call& fn)
+as_value
+matrix_invert(const fn_call& fn)
 {
 
     // Doesn't have to be a Matrix
@@ -505,11 +508,12 @@ Matrix_invert(const fn_call& fn)
 }
 
 
-static as_value
-Matrix_rotate(const fn_call& fn)
+as_value
+matrix_rotate(const fn_call& fn)
 {
     // Apparently has to be a Matrix.
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    as_object* ptr = instanceOfMatrix(fn);
+    if (!ptr) return as_value();
 
     if (fn.nargs < 1)
     {
@@ -578,11 +582,12 @@ Matrix_rotate(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-Matrix_scale(const fn_call& fn)
+as_value
+matrix_scale(const fn_call& fn)
 {
     // Apparently does have to be a Matrix.
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    as_object* ptr = instanceOfMatrix(fn);
+    if (!ptr) return as_value();
 
     if (fn.nargs < 2)
     {
@@ -646,8 +651,8 @@ Matrix_scale(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-Matrix_toString(const fn_call& fn)
+as_value
+matrix_toString(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -675,8 +680,8 @@ Matrix_toString(const fn_call& fn)
     return as_value(ss.str());
 }
 
-static as_value
-Matrix_transformPoint(const fn_call& fn)
+as_value
+matrix_transformPoint(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -741,8 +746,8 @@ Matrix_transformPoint(const fn_call& fn)
     return as_value(ret);
 }
 
-static as_value
-Matrix_translate(const fn_call& fn)
+as_value
+matrix_translate(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -778,7 +783,7 @@ Matrix_translate(const fn_call& fn)
 // after which the translation can be applied if necessary
 // (transformPoint) or not if not (deltaTransformPoint). Just
 // make sure the objects are what they're supposed to be.
-static PointType
+PointType
 transformPoint(as_object* const pointObject, as_object* const matrixObject)
 {
     // Get the point co-ordinates.
@@ -824,7 +829,7 @@ transformPoint(as_object* const pointObject, as_object* const matrixObject)
 }
 
 // A helper function to create a boost matrix from a Matrix object
-static void fillMatrix(MatrixType& matrix,
+void fillMatrix(MatrixType& matrix,
                          as_object& matrixObject)
 {
 
@@ -860,9 +865,9 @@ static void fillMatrix(MatrixType& matrix,
 // If at least one argument is passed, any missing arguments are undefined.
 // Extra arguments are discarded
 as_value
-Matrix_ctor(const fn_call& fn)
+matrix_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = new Matrix_as;
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     
     as_value a, b, c, d, tx, ty;
 
@@ -909,26 +914,19 @@ Matrix_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_B, b);
     obj->set_member(NSV::PROP_A, a);
 
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 
-static as_value
+as_value
 get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
-    as_object* proto = getMatrixInterface();
     Global_as* gl = getGlobal(fn);
-    return gl->createClass(&Matrix_ctor, proto);
+    as_object* proto = gl->createObject();
+    attachMatrixInterface(*proto);
+    return gl->createClass(&matrix_ctor, proto);
 }
 
-// extern 
-void matrix_class_init(as_object& where, const ObjectURI& uri)
-{
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(getName(uri),
-            get_flash_geom_matrix_constructor, flags, getNamespace(uri));
-}
-
+} // anonymous namespace
 } // end of gnash namespace
