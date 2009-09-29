@@ -87,6 +87,13 @@ libgnashbase_la_SOURCES = \
 	arg_parser.cpp \
 	$(NULL)
 
+if USE_PNG
+libgnashbase_la_SOURCES += GnashImagePng.cpp
+endif
+if USE_GIF
+libgnashbase_la_SOURCES += GnashImageGif.cpp
+endif
+
 if INSTALL_LTDL
 if !LIBLTDL2
 include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
@@ -135,13 +142,6 @@ if JEMALLOC
 MALLOC = jemalloc.c
 else
 MALLOC = 
-endif
-
-if USE_PNG
-libgnashbase_la_SOURCES += GnashImagePng.cpp
-endif
-if USE_GIF
-libgnashbase_la_SOURCES += GnashImageGif.cpp
 endif
 
 noinst_HEADERS = \
