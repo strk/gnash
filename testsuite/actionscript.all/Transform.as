@@ -48,7 +48,7 @@ check(Transform.prototype.hasOwnProperty("pixelBounds"));
 
 // Cannot be instantiated without MovieClip argument.
 t = new Transform;
-xcheck_equals(t, undefined);
+check_equals(t, undefined);
 
 t = Transform();
 check_equals(t, undefined);
