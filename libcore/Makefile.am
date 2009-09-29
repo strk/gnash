@@ -59,6 +59,7 @@ libgnashcore_la_SOURCES = \
 	ClassHierarchy.cpp \
 	as_environment.cpp \
 	as_function.cpp	\
+	Relay.cpp \
 	as_object.cpp \
 	as_value.cpp \
 	DisplayObjectContainer.cpp \
@@ -216,6 +217,7 @@ noinst_HEADERS += \
 endif
 
 EXTENSIONS_API = \
+	Relay.h \
 	as_object.h \
 	Property.h \
 	PropertyList.h \
