@@ -51,6 +51,19 @@ namespace {
     void attachTransformInterface(as_object& o);
     as_object* getTransformInterface();
     as_value get_flash_geom_transform_constructor(const fn_call& fn);
+    
+    // Handle overflows from AS ColorTransform double.
+    inline boost::int16_t
+    truncateDouble(double d)
+    {
+
+        if (d > std::numeric_limits<boost::int16_t>::max() ||
+            d < std::numeric_limits<boost::int16_t>::min())
+        {
+           return std::numeric_limits<boost::int16_t>::min();
+        }
+        return static_cast<boost::int16_t>(d);
+    }
 }
 
 
@@ -83,20 +96,6 @@ private:
 
 };
 
-// Handle overflows from AS ColorTransform double. Doubtful
-// whether it will really be inlined, but that's the compiler's
-// business.
-static inline boost::int16_t
-truncateDouble(double d)
-{
-
-    if (d > std::numeric_limits<boost::int16_t>::max() ||
-        d < std::numeric_limits<boost::int16_t>::min())
-    {
-       return std::numeric_limits<boost::int16_t>::min();
-    }
-    return static_cast<boost::int16_t>(d);
-}
 
 // extern 
 void
