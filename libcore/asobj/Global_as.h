@@ -21,6 +21,7 @@
 
 #include "as_object.h" // for inheritance
 #include "Object.h"
+#include "fn_call.h"
 
 // Forward declarations
 namespace gnash {
@@ -28,7 +29,6 @@ namespace gnash {
 	class Machine;
 	class as_value;
 	class VM;
-	class fn_call;
 	class ClassHierarchy;
 }
 
@@ -47,6 +47,7 @@ class Global_as : public as_object
 public:
 
     typedef as_value(*ASFunction)(const fn_call& fn);
+    typedef void(*Properties)(as_object&);
 
     virtual const ClassHierarchy& classHierarchy() const = 0;
     virtual ClassHierarchy& classHierarchy() = 0;
@@ -101,7 +102,6 @@ public:
     virtual VM& getVM() const = 0;
 };
 
-typedef void(*Properties)(as_object&);
 
 /// Register a built-in object
 //
@@ -120,7 +120,8 @@ typedef void(*Properties)(as_object&);
 ///                 created object.
 /// @return         the built-in object with properties attached.
 inline as_object*
-registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
+registerBuiltinObject(as_object& where, Global_as::Properties p,
+        const ObjectURI& uri)
 {
 
     // This is going to be the global Mouse "class"/"function"
@@ -153,7 +154,7 @@ registerBuiltinObject(as_object& where, Properties p, const ObjectURI& uri)
 /// @return         the built-in class with prototype and properties attached.
 inline as_object*
 registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
-        Properties p, Properties c, const ObjectURI& uri)
+        Global_as::Properties p, Global_as::Properties c, const ObjectURI& uri)
 {
     Global_as* gl = getGlobal(where);
     as_object* proto = gl->createObject();
@@ -169,6 +170,17 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
     return cl;
+}
+
+
+/// Convenience function for finding a class constructor.
+//
+/// Only currently useful in AS2.
+inline as_function*
+getClassConstructor(const fn_call& fn, const std::string& s)
+{
+    const as_value ctor(fn.env().find_object(s));
+    return ctor.to_as_function();
 }
 
 } // namespace gnash
