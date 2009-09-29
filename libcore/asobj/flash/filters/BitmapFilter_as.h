@@ -35,8 +35,13 @@ void bitmapfilter_class_init(as_object& where, const ObjectURI& uri);
 
 void registerBitmapFilterNative(as_object& global);
 
+
+/// Convenience function only for BitmapFilter subclasses.
+//
+/// This implements the AS code necessary for defining subclasses of
+/// BitmapFilter in AS2.
 void registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
-        Properties p, const ObjectURI& uri);
+        Global_as::Properties p, const ObjectURI& uri);
 
 } // end of gnash namespace
 
