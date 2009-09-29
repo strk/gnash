@@ -44,35 +44,35 @@ namespace gnash {
 
 namespace {
 
-    as_value BitmapData_applyFilter(const fn_call& fn);
-    as_value BitmapData_clone(const fn_call& fn);
-    as_value BitmapData_colorTransform(const fn_call& fn);
-    as_value BitmapData_copyChannel(const fn_call& fn);
-    as_value BitmapData_copyPixels(const fn_call& fn);
-    as_value BitmapData_dispose(const fn_call& fn);
-    as_value BitmapData_draw(const fn_call& fn);
-    as_value BitmapData_fillRect(const fn_call& fn);
-    as_value BitmapData_floodFill(const fn_call& fn);
-    as_value BitmapData_generateFilterRect(const fn_call& fn);
-    as_value BitmapData_getColorBoundsRect(const fn_call& fn);
-    as_value BitmapData_getPixel(const fn_call& fn);
-    as_value BitmapData_getPixel32(const fn_call& fn);
-    as_value BitmapData_hitTest(const fn_call& fn);
-    as_value BitmapData_merge(const fn_call& fn);
-    as_value BitmapData_noise(const fn_call& fn);
-    as_value BitmapData_paletteMap(const fn_call& fn);
-    as_value BitmapData_perlinNoise(const fn_call& fn);
-    as_value BitmapData_pixelDissolve(const fn_call& fn);
-    as_value BitmapData_scroll(const fn_call& fn);
-    as_value BitmapData_setPixel(const fn_call& fn);
-    as_value BitmapData_setPixel32(const fn_call& fn);
-    as_value BitmapData_threshold(const fn_call& fn);
-    as_value BitmapData_height(const fn_call& fn);
-    as_value BitmapData_rectangle(const fn_call& fn);
-    as_value BitmapData_transparent(const fn_call& fn);
-    as_value BitmapData_width(const fn_call& fn);
-    as_value BitmapData_loadBitmap(const fn_call& fn);
-    as_value BitmapData_ctor(const fn_call& fn);
+    as_value bitmapdata_applyFilter(const fn_call& fn);
+    as_value bitmapdata_clone(const fn_call& fn);
+    as_value bitmapdata_colorTransform(const fn_call& fn);
+    as_value bitmapdata_copyChannel(const fn_call& fn);
+    as_value bitmapdata_copyPixels(const fn_call& fn);
+    as_value bitmapdata_dispose(const fn_call& fn);
+    as_value bitmapdata_draw(const fn_call& fn);
+    as_value bitmapdata_fillRect(const fn_call& fn);
+    as_value bitmapdata_floodFill(const fn_call& fn);
+    as_value bitmapdata_generateFilterRect(const fn_call& fn);
+    as_value bitmapdata_getColorBoundsRect(const fn_call& fn);
+    as_value bitmapdata_getPixel(const fn_call& fn);
+    as_value bitmapdata_getPixel32(const fn_call& fn);
+    as_value bitmapdata_hitTest(const fn_call& fn);
+    as_value bitmapdata_merge(const fn_call& fn);
+    as_value bitmapdata_noise(const fn_call& fn);
+    as_value bitmapdata_paletteMap(const fn_call& fn);
+    as_value bitmapdata_perlinNoise(const fn_call& fn);
+    as_value bitmapdata_pixelDissolve(const fn_call& fn);
+    as_value bitmapdata_scroll(const fn_call& fn);
+    as_value bitmapdata_setPixel(const fn_call& fn);
+    as_value bitmapdata_setPixel32(const fn_call& fn);
+    as_value bitmapdata_threshold(const fn_call& fn);
+    as_value bitmapdata_height(const fn_call& fn);
+    as_value bitmapdata_rectangle(const fn_call& fn);
+    as_value bitmapdata_transparent(const fn_call& fn);
+    as_value bitmapdata_width(const fn_call& fn);
+    as_value bitmapdata_loadBitmap(const fn_call& fn);
+    as_value bitmapdata_ctor(const fn_call& fn);
 
     void attachBitmapDataInterface(as_object& o);
     void attachBitmapDataStaticProperties(as_object& o);
@@ -239,7 +239,7 @@ bitmapdata_class_init(as_object& where, const ObjectURI& uri)
 namespace {
 
 as_value
-BitmapData_applyFilter(const fn_call& fn)
+bitmapdata_applyFilter(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -248,7 +248,7 @@ BitmapData_applyFilter(const fn_call& fn)
 }
 
 as_value
-BitmapData_clone(const fn_call& fn)
+bitmapdata_clone(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -257,7 +257,7 @@ BitmapData_clone(const fn_call& fn)
 }
 
 as_value
-BitmapData_colorTransform(const fn_call& fn)
+bitmapdata_colorTransform(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -266,7 +266,7 @@ BitmapData_colorTransform(const fn_call& fn)
 }
 
 as_value
-BitmapData_copyChannel(const fn_call& fn)
+bitmapdata_copyChannel(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -275,7 +275,7 @@ BitmapData_copyChannel(const fn_call& fn)
 }
 
 as_value
-BitmapData_copyPixels(const fn_call& fn)
+bitmapdata_copyPixels(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = 
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -285,7 +285,7 @@ BitmapData_copyPixels(const fn_call& fn)
 }
 
 as_value
-BitmapData_dispose(const fn_call& fn)
+bitmapdata_dispose(const fn_call& fn)
 {
     // Should free the memory storing the bitmap.
     // All properties afterwards are -1 (even the rectangle)
@@ -296,7 +296,7 @@ BitmapData_dispose(const fn_call& fn)
 }
 
 as_value
-BitmapData_draw(const fn_call& fn)
+bitmapdata_draw(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -339,7 +339,7 @@ BitmapData_draw(const fn_call& fn)
 }
 
 as_value
-BitmapData_fillRect(const fn_call& fn)
+bitmapdata_fillRect(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -381,7 +381,7 @@ BitmapData_fillRect(const fn_call& fn)
 
 // Fills the bitmap with a colour starting at point x, y.
 as_value
-BitmapData_floodFill(const fn_call& fn)
+bitmapdata_floodFill(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -390,7 +390,7 @@ BitmapData_floodFill(const fn_call& fn)
 }
 
 as_value
-BitmapData_generateFilterRect(const fn_call& fn)
+bitmapdata_generateFilterRect(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -399,7 +399,7 @@ BitmapData_generateFilterRect(const fn_call& fn)
 }
 
 as_value
-BitmapData_getColorBoundsRect(const fn_call& fn)
+bitmapdata_getColorBoundsRect(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -408,7 +408,7 @@ BitmapData_getColorBoundsRect(const fn_call& fn)
 }
 
 as_value
-BitmapData_getPixel(const fn_call& fn)
+bitmapdata_getPixel(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -427,7 +427,7 @@ BitmapData_getPixel(const fn_call& fn)
 }
 
 as_value
-BitmapData_getPixel32(const fn_call& fn)
+bitmapdata_getPixel32(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -447,7 +447,7 @@ BitmapData_getPixel32(const fn_call& fn)
 
 
 as_value
-BitmapData_hitTest(const fn_call& fn)
+bitmapdata_hitTest(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -456,7 +456,7 @@ BitmapData_hitTest(const fn_call& fn)
 }
 
 as_value
-BitmapData_merge(const fn_call& fn)
+bitmapdata_merge(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -465,7 +465,7 @@ BitmapData_merge(const fn_call& fn)
 }
 
 as_value
-BitmapData_noise(const fn_call& fn)
+bitmapdata_noise(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -474,7 +474,7 @@ BitmapData_noise(const fn_call& fn)
 }
 
 as_value
-BitmapData_paletteMap(const fn_call& fn)
+bitmapdata_paletteMap(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -483,7 +483,7 @@ BitmapData_paletteMap(const fn_call& fn)
 }
 
 as_value
-BitmapData_perlinNoise(const fn_call& fn)
+bitmapdata_perlinNoise(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -492,7 +492,7 @@ BitmapData_perlinNoise(const fn_call& fn)
 }
 
 as_value
-BitmapData_pixelDissolve(const fn_call& fn)
+bitmapdata_pixelDissolve(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -501,7 +501,7 @@ BitmapData_pixelDissolve(const fn_call& fn)
 }
 
 as_value
-BitmapData_scroll(const fn_call& fn)
+bitmapdata_scroll(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -510,7 +510,7 @@ BitmapData_scroll(const fn_call& fn)
 }
 
 as_value
-BitmapData_setPixel(const fn_call& fn)
+bitmapdata_setPixel(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -535,7 +535,7 @@ BitmapData_setPixel(const fn_call& fn)
 }
 
 as_value
-BitmapData_setPixel32(const fn_call& fn)
+bitmapdata_setPixel32(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -560,7 +560,7 @@ BitmapData_setPixel32(const fn_call& fn)
 }
 
 as_value
-BitmapData_threshold(const fn_call& fn)
+bitmapdata_threshold(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -570,7 +570,7 @@ BitmapData_threshold(const fn_call& fn)
 }
 
 as_value
-BitmapData_height(const fn_call& fn)
+bitmapdata_height(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -585,7 +585,7 @@ BitmapData_height(const fn_call& fn)
 }
 
 as_value
-BitmapData_rectangle(const fn_call& fn)
+bitmapdata_rectangle(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = 
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -613,7 +613,7 @@ BitmapData_rectangle(const fn_call& fn)
 }
 
 as_value
-BitmapData_transparent(const fn_call& fn)
+bitmapdata_transparent(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -627,7 +627,7 @@ BitmapData_transparent(const fn_call& fn)
 }
 
 as_value
-BitmapData_width(const fn_call& fn)
+bitmapdata_width(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -643,7 +643,7 @@ BitmapData_width(const fn_call& fn)
 
 
 as_value
-BitmapData_loadBitmap(const fn_call& fn)
+bitmapdata_loadBitmap(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr =
         ensureType<BitmapData_as>(fn.this_ptr);
@@ -659,13 +659,13 @@ get_flash_display_bitmap_data_constructor(const fn_call& fn)
     log_debug("Loading flash.display.BitmapData class");
     Global_as* gl = getGlobal(fn);
     as_object* proto = getBitmapDataInterface();
-    as_object* cl = gl->createClass(&BitmapData_ctor, proto);
+    as_object* cl = gl->createClass(&bitmapdata_ctor, proto);
     attachBitmapDataStaticProperties(*cl);
     return cl;
 }
 
 as_value
-BitmapData_ctor(const fn_call& fn)
+bitmapdata_ctor(const fn_call& fn)
 {
 
 	if (fn.nargs < 2) {
@@ -714,38 +714,38 @@ void
 attachBitmapDataInterface(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    o.init_member("applyFilter", gl->createFunction(BitmapData_applyFilter));
-    o.init_member("clone", gl->createFunction(BitmapData_clone));
+    o.init_member("applyFilter", gl->createFunction(bitmapdata_applyFilter));
+    o.init_member("clone", gl->createFunction(bitmapdata_clone));
     o.init_member("colorTransform", gl->createFunction(
-                BitmapData_colorTransform));
-    o.init_member("copyChannel", gl->createFunction(BitmapData_copyChannel));
-    o.init_member("copyPixels", gl->createFunction(BitmapData_copyPixels));
-    o.init_member("dispose", gl->createFunction(BitmapData_dispose));
-    o.init_member("draw", gl->createFunction(BitmapData_draw));
-    o.init_member("fillRect", gl->createFunction(BitmapData_fillRect));
-    o.init_member("floodFill", gl->createFunction(BitmapData_floodFill));
+                bitmapdata_colorTransform));
+    o.init_member("copyChannel", gl->createFunction(bitmapdata_copyChannel));
+    o.init_member("copyPixels", gl->createFunction(bitmapdata_copyPixels));
+    o.init_member("dispose", gl->createFunction(bitmapdata_dispose));
+    o.init_member("draw", gl->createFunction(bitmapdata_draw));
+    o.init_member("fillRect", gl->createFunction(bitmapdata_fillRect));
+    o.init_member("floodFill", gl->createFunction(bitmapdata_floodFill));
     o.init_member("generateFilterRect", gl->createFunction(
-                BitmapData_generateFilterRect));
+                bitmapdata_generateFilterRect));
     o.init_member("getColorBoundsRect", gl->createFunction(
-                BitmapData_getColorBoundsRect));
-    o.init_member("getPixel", gl->createFunction(BitmapData_getPixel));
-    o.init_member("getPixel32", gl->createFunction(BitmapData_getPixel32));
-    o.init_member("hitTest", gl->createFunction(BitmapData_hitTest));
-    o.init_member("merge", gl->createFunction(BitmapData_merge));
-    o.init_member("noise", gl->createFunction(BitmapData_noise));
-    o.init_member("paletteMap", gl->createFunction(BitmapData_paletteMap));
-    o.init_member("perlinNoise", gl->createFunction(BitmapData_perlinNoise));
+                bitmapdata_getColorBoundsRect));
+    o.init_member("getPixel", gl->createFunction(bitmapdata_getPixel));
+    o.init_member("getPixel32", gl->createFunction(bitmapdata_getPixel32));
+    o.init_member("hitTest", gl->createFunction(bitmapdata_hitTest));
+    o.init_member("merge", gl->createFunction(bitmapdata_merge));
+    o.init_member("noise", gl->createFunction(bitmapdata_noise));
+    o.init_member("paletteMap", gl->createFunction(bitmapdata_paletteMap));
+    o.init_member("perlinNoise", gl->createFunction(bitmapdata_perlinNoise));
     o.init_member("pixelDissolve", gl->createFunction(
-                BitmapData_pixelDissolve));
-    o.init_member("scroll", gl->createFunction(BitmapData_scroll));
-    o.init_member("setPixel", gl->createFunction(BitmapData_setPixel));
-    o.init_member("setPixel32", gl->createFunction(BitmapData_setPixel32));
-    o.init_member("threshold", gl->createFunction(BitmapData_threshold));
-    o.init_property("height", BitmapData_height, BitmapData_height);
-    o.init_property("rectangle", BitmapData_rectangle, BitmapData_rectangle);
-    o.init_property("transparent", BitmapData_transparent,
-            BitmapData_transparent);
-    o.init_property("width", BitmapData_width, BitmapData_width);
+                bitmapdata_pixelDissolve));
+    o.init_member("scroll", gl->createFunction(bitmapdata_scroll));
+    o.init_member("setPixel", gl->createFunction(bitmapdata_setPixel));
+    o.init_member("setPixel32", gl->createFunction(bitmapdata_setPixel32));
+    o.init_member("threshold", gl->createFunction(bitmapdata_threshold));
+    o.init_property("height", bitmapdata_height, bitmapdata_height);
+    o.init_property("rectangle", bitmapdata_rectangle, bitmapdata_rectangle);
+    o.init_property("transparent", bitmapdata_transparent,
+            bitmapdata_transparent);
+    o.init_property("width", bitmapdata_width, bitmapdata_width);
 
 }
 
@@ -753,7 +753,7 @@ void
 attachBitmapDataStaticProperties(as_object& o)
 {
     Global_as* gl = getGlobal(o);
-    o.init_member("loadBitmap", gl->createFunction(BitmapData_loadBitmap));
+    o.init_member("loadBitmap", gl->createFunction(bitmapdata_loadBitmap));
 }
 
 as_object*
