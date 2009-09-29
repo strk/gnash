@@ -428,7 +428,17 @@ AbcBlock::locateClass(const std::string& className)
 
     for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
             i != _namespacePool.end(); ++i) {
-        if (_stringPool[(*i)->getAbcURI()] == nsstr) {
+        
+        const size_t key = (*i)->getAbcURI();
+
+        log_abc("Namespace ABC uri: %s; global URI: %s, string: %s, "
+                "pool size: %s",
+            key, (*i)->getURI(), _stringTable->value((*i)->getURI()),
+            _stringPool.size());
+
+        assert(key < _stringPool.size());
+
+        if (_stringPool[key] == nsstr) {
             a.setNamespace(*i);
             break;
         }
@@ -513,9 +523,9 @@ AbcBlock::read_double_constants()
 {
 	boost::uint32_t count = _stream->read_V32();
 	_doublePool.resize(count);
-	if (count)
-		_doublePool[0] = 0.0;
-	for (unsigned int i = 1; i < count; ++i)
+	if (count) _doublePool[0] = 0.0;
+
+	for (size_t i = 1; i < count; ++i)
 	{
 		_doublePool[i] = _stream->read_d64();
 		log_abc("Double %u=%lf", i, _doublePool[i]);
@@ -532,16 +542,17 @@ AbcBlock::read_string_constants()
 	log_abc("There are %u string constants.", count);
 	_stringPool.resize(count);
 	_stringPoolTableIDs.resize(count);
-	if (count)
-	{
+
+    if (count) {
 		_stringPool[0] = "";
 		_stringPoolTableIDs[0] = 0;
 	}
-	for (unsigned int i = 1; i < count; ++i)
-	{
+
+    for (size_t i = 1; i < count; ++i) {
 		boost::uint32_t length = _stream->read_V32();
 		_stream->read_string_with_length(length, _stringPool[i]);
-		log_abc("Adding string constant to string pool: index=%u %s", i, _stringPool[i]);
+		log_abc("Adding string constant to string pool: index=%u %s",
+                i, _stringPool[i]);
 		_stringPoolTableIDs[i] = 0;
 	}
 	return true;
@@ -557,11 +568,11 @@ AbcBlock::read_namespaces()
 	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u namespaces.", count);
 	_namespacePool.resize(count);
-	if (count)
-	{
+	if (count) {
 		_namespacePool[0] = mCH->getGlobalNs();
 	}
-	for (unsigned int i = 1; i < count; ++i)
+
+	for (size_t i = 1; i < count; ++i)
 	{
 		NamespaceConstant kind =
             static_cast<NamespaceConstant>(_stream->read_u8());
