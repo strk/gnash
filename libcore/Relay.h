@@ -26,11 +26,23 @@ namespace gnash {
 
 /// This is the base class for type-specific object data. 
 //
-/// ActionScript classes with particular type restrictions or type traits
-/// should set the Object's _relay member to a subclass of this class.
+/// A Relay is a polymorphic object that contains arbitrary native
+/// type information. Native functions may access the Relay object, determine
+/// its derived type, and change its state.
+//
+/// The base class does nothing. It provides a virtual function to mark
+/// GC resources if necessary in subclasses.
 //
 /// The simplest native types, such as Boolean or String, inherit from this
-/// type.
+/// base class directly. They have no GC resources and simply store a 
+/// C++ type such as a boolean, double, or std::string, which native functions
+/// can access and manipulate.
+//
+/// More complex types may derive from a subclass of Relay that provides
+/// specific functionality such as updates from the VM.
+//
+/// An as_object with a non-null _relay member is a native class, as this
+/// information cannot be accessed by normal ActionScript functions.
 class Relay
 {
 public:
@@ -41,17 +53,21 @@ public:
 };
 
 
-/// A type that requires periodic updates from the core (movie_root).
+/// A native type that requires periodic updates from the core (movie_root).
 //
 /// Objects with this type of relay can be registered with movie_root, and
 /// recieve a callback on every advance.
 //
-/// This type of Proxy holds a reference to its parent as_object (owner). 
+/// This type of Relay holds a reference to its parent as_object (owner). 
 /// If a reference to this ActiveRelay is held by another object,
 /// it must be marked reachable so that its owner is not deleted by the GC.
+//
+/// The function setReachable() is called on every GC run. It calls
+/// markReachableResources() and marks its owner. 
 class ActiveRelay : public Relay
 {
 public:
+
     ActiveRelay(as_object* owner)
         :
         _owner(owner)
@@ -64,19 +80,26 @@ public:
     virtual void update() = 0;
 
     /// Mark any other reachable resources, and finally mark our owner
+    //
+    /// Do not override this function.
     virtual void setReachable();
 
+    /// Return the as_object that this Relay is attached to.
     as_object& owner() const {
         return *_owner;
     }
 
 protected:
 
+    /// Mark any reachable resources other than the owner.
+    //
+    /// Override this function if the subclass holds references to GC
+    /// resources other than the owner.
     virtual void markReachableResources() const {}
 
 private:
 
-    /// The as_object that owns this Proxy.
+    /// The as_object that owns this Relay.
     //
     /// Because we are deleted on destruction of the owner, this pointer will
     /// never be invalid as long as 'this' is valid.
