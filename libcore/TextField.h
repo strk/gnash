@@ -196,12 +196,8 @@ public:
     /// end is never less than start.
     void setSelection(int start, int end);
 
-	/// We have a "text" member.
-	bool set_member(string_table::key name, const as_value& val, 
-		string_table::key nsname = 0, bool ifFound=false);
-
-	bool get_member(string_table::key name, as_value* val, 
-		string_table::key nsname = 0);
+    virtual void setWidth(double width);
+    virtual void setHeight(double height);
 
 	/// Draw the dynamic string.
 	void display(Renderer& renderer);

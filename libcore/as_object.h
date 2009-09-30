@@ -1030,6 +1030,14 @@ public:
         return _relay.get();
     }
 
+    /// Indicate that this object is a DisplayObject
+    //
+    /// This enables DisplayObject properties such as _x and _y. A flag
+    /// is used to avoid RTTI on every get and set of properties.
+    void setDisplayObject() {
+        _displayObject = true;
+    }
+
 protected:
 
     /// Enumerate any non-proper properties
@@ -1098,6 +1106,12 @@ protected:
 
 private:
  
+    /// DisplayObjects have properties not in the AS inheritance chain
+    //
+    /// These magic properties are invoked in get_member only if the
+    /// object is a DisplayObject
+    bool _displayObject;
+
     /// The polymorphic Relay object for native types.
     //
     /// This is owned by the as_object and destroyed when the as_object's

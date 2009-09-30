@@ -548,7 +548,9 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
         }
         return true;
     }
-
+    
+    if (getDisplayObjectProperty(*this, name_key, *val)) return true;
+    
     // Try items on our display list.
     DisplayObject* ch;
     if (getSWFVersion(*this) >= 7 ) {

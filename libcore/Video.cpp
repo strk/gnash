@@ -67,8 +67,13 @@ Video::Video(const SWF::DefineVideoStreamTag* const def,
 {
 
 	set_prototype(getVideoInterface(*this));
+
+    // TODO: For AS2 a genuine Video object can only be created from a 
+    // SWF tag. 
 	if (_embeddedStream)
 	{
+        // TODO: this should happen using the native creation function
+        // once Video is a Relay.
 		attachVideoProperties(*this);
 		initializeDecoder();
         
@@ -383,47 +388,7 @@ attachPrototypeProperties(as_object& proto)
 void
 attachVideoProperties(as_object& o)
 {
-
-	as_c_function_ptr gettersetter;
-
-	gettersetter = &DisplayObject::x_getset;
-	o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::y_getset;
-	o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::xscale_getset;
-	o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::yscale_getset;
-	o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::xmouse_get;
-	o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
-
-	gettersetter = &DisplayObject::ymouse_get;
-	o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
-
-	gettersetter = &DisplayObject::alpha_getset;
-	o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::visible_getset;
-	o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::width_getset;
-	o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::height_getset;
-	o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::rotation_getset;
-	o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::parent_getset;
-	o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::target_getset;
-	o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
+    attachDisplayObjectProperties(o);
 }
 
 as_value
@@ -504,13 +469,7 @@ video_clear(const fn_call& fn)
 as_value
 video_ctor(const fn_call& /* fn */)
 {
-	log_debug("new Video() TESTING !");
-
-	// I'm not sure We can rely on the def and parent values being accepted 
-    // as NULL. Not till we add some testing...
-	boost::intrusive_ptr<DisplayObject> obj = new Video(NULL, NULL, -1);
-	obj->setDynamic();
-	return as_value(obj.get()); // will keep alive
+	return as_value(); // will keep alive
 }
 
 } // anonymous namespace

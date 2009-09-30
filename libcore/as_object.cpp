@@ -38,6 +38,7 @@
 #include "as_function.h"
 #include "Global_as.h" 
 #include "GnashAlgorithm.h"
+#include "DisplayObject.h"
 
 #include <set>
 #include <string>
@@ -218,6 +219,7 @@ const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(getVM(gl)),
 	_members(_vm)
@@ -226,6 +228,7 @@ as_object::as_object(Global_as& gl)
 
 as_object::as_object()
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -234,6 +237,7 @@ as_object::as_object()
 
 as_object::as_object(as_object* proto)
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -243,6 +247,7 @@ as_object::as_object(as_object* proto)
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -252,11 +257,7 @@ as_object::as_object(boost::intrusive_ptr<as_object> proto)
 
 as_object::as_object(const as_object& other)
 	:
-#ifndef GNASH_USE_GC
-	ref_counted(),
-#else
-	GcResource(), 
-#endif
+    _displayObject(other._displayObject),
     _relay(0),
 	_vm(VM::get()),
 	_members(other._members)
@@ -326,14 +327,25 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-
+/// Current order of property lookup
+//
+/// If DisplayObject:
+///     DisplayObject magic properties
+///     (DisplayList, TextField variables?)
+/// Own properties up __proto__ chain
+/// __resolve.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
-	Property* prop = findProperty(name, nsname);
+    
+    if (_displayObject) {
+        if (getDisplayObjectProperty(*this, name, *val)) return true;
+    }
 	
+	Property* prop = findProperty(name, nsname);
+
     if (!prop) {
 
         /// If the property isn't found, try the __resolve property.
@@ -363,6 +375,7 @@ as_object::get_member(string_table::key name, as_value* val,
 		log_error(_("Caught exception: %s"), exc.what());
 		return false;
 	}
+
 }
 
 
@@ -671,6 +684,11 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		return true;
 	}
+
+    if (_displayObject) {
+        if (setDisplayObjectProperty(*this, key, val)) return true;
+        // Execute triggers?
+    }
 
 	// Else, add new property...
 	if (ifFound) return false;

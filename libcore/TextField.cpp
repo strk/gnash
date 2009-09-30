@@ -1015,237 +1015,6 @@ TextField::setTextFormat(TextFormat_as& tf)
     format_text();
 }
 
-bool
-TextField::set_member(string_table::key name,
-        const as_value& val, string_table::key nsname, bool ifFound)
-{
-
-    // FIXME: Turn all standard members into getter/setter properties
-    //        of the TextField class. See attachTextFieldInterface()
-    // @@ TODO need to inherit basic stuff like _x, _y, _xscale, _yscale etc ?
-
-    switch (name)
-    {
-    default:
-        break;
-    case NSV::PROP_uX:
-    {
-        SWFMatrix m = getMatrix();
-        double x = infinite_to_zero( val.to_number() );
-        m.tx = pixelsToTwips(x);    
-        setMatrix(m); // no need to update caches when only changing translation
-
-        // m_accept_anim_moves = false;
-        return true;
-    }
-    case NSV::PROP_uY:
-    {
-        SWFMatrix m = getMatrix();
-        double y = infinite_to_zero( val.to_number() );
-        m.ty = pixelsToTwips(y);
-        setMatrix(m); // no need to update caches when only changing translation
-
-        // m_accept_anim_moves = false; 
-        return true;
-    }
-    case NSV::PROP_uWIDTH:
-    {
-        double nw = val.to_number(); 
-        if (!isFinite(nw) )
-        {
-            // might be our fault, see the TODO above 
-            // (missing to pass as_environment out..)
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._width to %g"), nw);
-            );
-            return true;
-        }
-
-        if ( nw < 0 )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._width to a "
-                    "negative number: %g, toggling sign"), nw);
-            );
-            nw = -nw;
-        }
-
-        if ( _bounds.width() == pixelsToTwips(nw) )
-        {
-#ifdef GNASH_DEBUG_TEXTFIELDS
-            log_debug("TextField width already == %g, nothing to do to "
-                    "change it", nw);
-#endif
-            return true; // nothing to do
-        }
-        if ( _bounds.is_null() )
-        {
-#ifdef GNASH_DEBUG_TEXTFIELDS
-            log_debug("NULL TextField bounds : %s", _bounds);
-#endif
-            return true;
-        }
-
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Chaging TextField width to %g", nw);
-#endif
-
-        set_invalidated();
-
-        // Modify TextField drawing rectangle
-        // TODO: check which anchor point we should use !
-        boost::int32_t xmin = _bounds.get_x_min();
-        boost::int32_t ymin = _bounds.get_y_min();
-        boost::int32_t ymax = _bounds.get_y_max();
-        boost::int32_t xmax = xmin + pixelsToTwips(nw);
-
-        assert(xmin <= xmax);
-        _bounds.set_to_rect(xmin, ymin, xmax, ymax);
-        assert( _bounds.width() == pixelsToTwips(nw) );
-
-        // previously truncated text might get visible now
-        // TODO: if nested masks were implemented we would 
-        // not need to reformat text here
-        format_text();
-
-        return true;
-    }
-    case NSV::PROP_uHEIGHT:
-    {
-        double nh = val.to_number(); 
-        if (!isFinite(nh) )
-        {
-            // might be our fault, see the TODO above (missing to pass
-            // as_environment out..)
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._height to %g"), nh);
-            );
-            return true;
-        }
-
-        if ( nh < 0.0f )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._height to a negative "
-                    "number: %g, toggling sign"), nh);
-            );
-            nh = -nh;
-        }
-
-        if ( _bounds.height() == pixelsToTwips(nh) )
-        {
-#ifdef GNASH_DEBUG_TEXTFIELDS
-            log_debug("TextField height already == %g, nothing to do to "
-                    "change it", nh);
-#endif // GNASH_DEBUG_TEXTFIELDS
-            return true; // nothing to do
-        }
-        if ( _bounds.is_null() )
-        {
-            return true;
-        }
-
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Changing TextField height to %g", nh);
-#endif // GNASH_DEBUG_TEXTFIELDS
-        set_invalidated();
-
-        // Modify TextField drawing rectangle
-        // TODO: check which anchor point we should use !
-        boost::int32_t xmin = _bounds.get_x_min();
-        boost::int32_t xmax = _bounds.get_x_max();
-        boost::int32_t ymin = _bounds.get_y_min();
-        _bounds.set_to_rect(xmin, ymin, xmax, ymin + pixelsToTwips(nh) );
-
-        assert(_bounds.height() == pixelsToTwips(nh));
-
-        // previously truncated text might get visible now
-        // TODO: if nested masks were implemented we would 
-        // not need to reformat text here
-        format_text();
-
-        return true;
-    }
-    case NSV::PROP_uVISIBLE:
-    {
-        set_visible(val.to_bool());
-        return true;
-    }
-    case NSV::PROP_uALPHA:
-    {
-        // @@ TODO this should be generic to class DisplayObject!
-        // Arg is in percent.
-        cxform    cx = get_cxform();
-        cx.aa = (boost::int16_t)(val.to_number() * 2.56);
-        set_cxform(cx);
-        return true;
-    }
-    // @@ TODO see TextField members in Flash MX docs
-    }    // end switch
-
-
-    return as_object::set_member(name, val, nsname, ifFound);
-}
-
-bool
-TextField::get_member(string_table::key name, as_value* val,
-    string_table::key nsname)
-{
-
-    // FIXME: Turn all standard members into getter/setter properties
-    //        of the TextField class. See attachTextFieldInterface()
-
-    switch (name)
-    {
-    default:
-        break;
-    case NSV::PROP_uVISIBLE:
-    {
-        val->set_bool(visible());
-        return true;
-    }
-    case NSV::PROP_uALPHA:
-    {
-        // @@ TODO this should be generic to class DisplayObject!
-        const cxform&    cx = get_cxform();
-        val->set_double(cx.aa / 2.56);
-        return true;
-    }
-    case NSV::PROP_uX:
-    {
-        SWFMatrix    m = getMatrix();    
-        val->set_double(twipsToPixels(m.tx));
-        return true;
-    }
-    case NSV::PROP_uY:
-    {
-        SWFMatrix    m = getMatrix();    
-        val->set_double(twipsToPixels(m.ty));
-        return true;
-    }
-    case NSV::PROP_uWIDTH:
-    {
-        val->set_double(twipsToPixels(get_width()));
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Got TextField width == %s", *val);
-#endif // GNASH_DEBUG_TEXTFIELDS
-        return true;
-    }
-    case NSV::PROP_uHEIGHT:
-    {
-        val->set_double(twipsToPixels(get_height()));
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Got TextField height == %s", *val);
-#endif // GNASH_DEBUG_TEXTFIELDS
-        return true;
-    }
-    }    // end switch
-
-    return as_object::get_member(name, val, nsname);
-    
-}
-    
-
 float
 TextField::align_line(TextAlignment align,
         int last_line_start_record, float x)
@@ -1502,9 +1271,9 @@ TextField::format_text()
             last_line_start_record);
     
     // Expand bounding box to include the whole text (if autoSize)
-    if ( _autoSize != autoSizeNone )
+    if (_autoSize != autoSizeNone)
     {
-        _bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
+        _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
     // Add the last line to our output.
@@ -1580,8 +1349,7 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     // Expand bounding box to include last column of text ...
     if ( _autoSize != autoSizeNone ) 
     {
-        _bounds.expand_to_point(x + PADDING_TWIPS,
-            y + PADDING_TWIPS);
+        _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
     // new paragraphs get the indent.
@@ -2984,6 +2752,43 @@ TextField::markReachableResources() const
     markDisplayObjectReachable();
 }
 
+void
+TextField::setWidth(double newwidth)
+{
+	const rect& bounds = getBounds();
+	const double oldwidth = bounds.width();
+	assert(oldwidth >= 0); 
+
+    const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
+    const double rot = rotation() * PI / 180.0;
+
+    SWFMatrix m = getMatrix();
+    const double yscale = m.get_y_scale();
+    m.set_scale_rotation(xscale, yscale, rot);
+
+    // TextField does not update the cache, unlike MovieClip.
+    setMatrix(m, false); 
+}
+
+void
+TextField::setHeight(double newheight)
+{
+	const rect& bounds = getBounds();
+
+	const double oldheight = bounds.height();
+	assert(oldheight >= 0); 
+
+    const double yscale = oldheight ? (newheight / oldheight) : 0;
+    const double rot = rotation() * PI / 180.0;
+
+    SWFMatrix m = getMatrix();
+    const double xscale = m.get_x_scale();
+    m.set_scale_rotation(xscale, yscale, rot);
+    
+    // TextField does not update the cache, unlike MovieClip.
+    setMatrix(m, false);
+}
+
 /// TextField interface functions
 
 namespace {
@@ -3836,36 +3641,6 @@ attachTextFieldInterface(as_object& o)
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
 
-    int propFlags = PropFlags::dontDelete
-        |PropFlags::dontEnum
-        |PropFlags::readOnly
-        |PropFlags::isProtected;
-
-    // Parent seems to not be a normal property
-    o.init_property(NSV::PROP_uPARENT, &DisplayObject::parent_getset,
-            &DisplayObject::parent_getset);
-
-    // Target seems to not be a normal property
-    o.init_property(NSV::PROP_uTARGET, &DisplayObject::target_getset,
-            &DisplayObject::target_getset);
-
-    // _name should be a property of the instance, not the prototype
-    o.init_property(NSV::PROP_uNAME, &DisplayObject::name_getset,
-            &DisplayObject::name_getset);
-
-    o.init_property(NSV::PROP_uXMOUSE,
-            DisplayObject::xmouse_get, DisplayObject::xmouse_get, propFlags);
-    o.init_property(NSV::PROP_uYMOUSE,
-            DisplayObject::ymouse_get, DisplayObject::ymouse_get, propFlags);
-    o.init_property(NSV::PROP_uHIGHQUALITY,
-            DisplayObject::highquality, DisplayObject::highquality);
-    o.init_property(NSV::PROP_uQUALITY,
-            DisplayObject::quality, DisplayObject::quality);
-    o.init_property(NSV::PROP_uXSCALE,
-            DisplayObject::xscale_getset, DisplayObject::xscale_getset);
-    o.init_property(NSV::PROP_uYSCALE,
-            DisplayObject::yscale_getset, DisplayObject::yscale_getset);
- 
     // SWF6 or higher
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 

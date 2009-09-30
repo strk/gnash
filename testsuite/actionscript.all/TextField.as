@@ -299,7 +299,7 @@ check_equals(tf.embedFonts, false);
 
 check_equals(typeof(tf._highquality), 'number');
 check(!tf.hasOwnProperty('_highquality'));
-xcheck(!tf.__proto__.hasOwnProperty('_highquality'));
+check(!tf.__proto__.hasOwnProperty('_highquality'));
 check_equals(tf._highquality, 1);
 tf._highquality = 0;
 check_equals(tf._highquality, 0);
@@ -418,7 +418,7 @@ tf.multiline = false;
 
 check_equals(typeof(tf._name), 'string');
 check(!tf.hasOwnProperty('_name'));
-xcheck(!tf.__proto__.hasOwnProperty('_name'));
+check(!tf.__proto__.hasOwnProperty('_name'));
 check_equals(tf._name, 'tf');
 tfref = tf;
 tf._name = 'changed';
@@ -437,7 +437,7 @@ check_equals(typeof(tfref), 'object');
 
 check_equals(typeof(tf._parent), 'movieclip');
 check(!tf.hasOwnProperty('_parent'));
-xcheck(!tf.__proto__.hasOwnProperty('_parent'));
+check(!tf.__proto__.hasOwnProperty('_parent'));
 check_equals(tf._parent, _root);
 bk = tf._parent;
 tf._parent = 23;
@@ -490,7 +490,7 @@ tf.password = false;
 // TODO: check this, might be a string
 check_equals(typeof(tf._quality), 'string');
 check(!tf.hasOwnProperty('_quality'));
-xcheck(!tf.__proto__.hasOwnProperty('_quality'));
+check(!tf.__proto__.hasOwnProperty('_quality'));
 check(!tf.__proto__.__proto__.hasOwnProperty('_quality'));
 check(!tf.__proto__.__proto__.__proto__.hasOwnProperty('_quality'));
 check_equals(tf._quality, "HIGH");
@@ -539,10 +539,10 @@ xcheck_equals(typeof(tf.restrict), "null");
 
 // Check TextField._rotation
 
-xcheck_equals(typeof(tf._rotation), 'number');
+check_equals(typeof(tf._rotation), 'number');
 check(!tf.hasOwnProperty('_rotation'));
 check(!tf.__proto__.hasOwnProperty('_rotation'));
-xcheck_equals(tf._rotation, 0);
+check_equals(tf._rotation, 0);
 tf._rotation = 10;
 check_equals(tf._rotation, 10);
 tf._rotation = 0;
@@ -569,7 +569,7 @@ tf.selectable = true;
 
 // Check TextField._soundbuftime
 
-xcheck_equals(typeof(tf._soundbuftime), 'number');
+check_equals(typeof(tf._soundbuftime), 'number');
 check( ! tf.hasOwnProperty('_soundbuftime') ); 
 check( ! tf.__proto__.hasOwnProperty('_soundbuftime') ); 
 xcheck_equals(tf._soundbuftime, 5); // the default is 5, it seems
@@ -598,7 +598,7 @@ delete(tf.tabIndex);
 
 check_equals(typeof(tf._target), 'string');
 check( ! tf.hasOwnProperty('_target') ); 
-xcheck( ! tf.__proto__.hasOwnProperty('_target') ); 
+check( ! tf.__proto__.hasOwnProperty('_target') ); 
 check_equals(tf._target, '/tf');
 // TODO: check the effect of changing _name on the _target value
 tf._target = "fake_target"; // read-only
@@ -659,12 +659,12 @@ check_equals(tf.type, 'input');
 
 // Check TextField._url (url of the SWF that created the textfield)
 
-xcheck_equals(typeof(tf._url), 'string');
+check_equals(typeof(tf._url), 'string');
 check( ! tf.hasOwnProperty('_url') ); 
 check( ! tf.__proto__.hasOwnProperty('_url') ); 
-xcheck_equals(tf._url, _root._url);
+check_equals(tf._url, _root._url);
 tf._url = "fake url";
-xcheck_equals(tf._url, _root._url); // read-only
+check_equals(tf._url, _root._url); // read-only
 
 //-------------------------------------------------------------------------
 // Check TextField.variable (variable name associated with the textfield)
@@ -816,7 +816,7 @@ check_equals(tf._x, 20);
 
 check_equals(typeof(tf._xmouse), 'number');
 check( ! tf.hasOwnProperty('_xmouse') );
-xcheck( ! tf.__proto__.hasOwnProperty('_xmouse') );
+check( ! tf.__proto__.hasOwnProperty('_xmouse') );
 currXmouse = tf._xmouse; // unsafe, if user moves the mouse while running the test
 tf._xmouse = "a string";
 check_equals(typeof(tf._xmouse), 'number');
@@ -828,7 +828,7 @@ check_equals(tf._xmouse, currXmouse); // possibly unsafe, if user moves the mous
 
 check_equals(typeof(tf._xscale), 'number');
 check( ! tf.hasOwnProperty('_xscale') );
-xcheck( ! tf.__proto__.hasOwnProperty('_xscale') );
+check( ! tf.__proto__.hasOwnProperty('_xscale') );
 check_equals(tf._xscale, 100); 
 // check how .textWidth and ._width change when changing _xscale
 currTextWidth = tf.textWidth;
@@ -856,7 +856,7 @@ check_equals(tf._y, 5);
 
 check_equals(typeof(tf._ymouse), 'number');
 check( ! tf.hasOwnProperty('_ymouse') );
-xcheck( ! tf.__proto__.hasOwnProperty('_ymouse') );
+check( ! tf.__proto__.hasOwnProperty('_ymouse') );
 currYmouse = tf._ymouse;
 tf._ymouse = "a string";
 check_equals(typeof(tf._ymouse), 'number');
@@ -868,7 +868,7 @@ check_equals(tf._ymouse, currYmouse); // possibly unsafe, if user moves the mous
 
 check_equals(typeof(tf._yscale), 'number');
 check( ! tf.hasOwnProperty('_yscale') );
-xcheck( ! tf.__proto__.hasOwnProperty('_yscale') );
+check( ! tf.__proto__.hasOwnProperty('_yscale') );
 check_equals(tf._yscale, 100); 
 // check how .textHeight and ._height change based on _yscale
 currTextHeight = tf.textHeight;
@@ -876,7 +876,7 @@ currHeight = tf._height;
 tf._yscale = 200;
 note("textHeight: _yscale=100: "+currTextHeight+"; _yscale=200: "+tf.textHeight);
 // check_equals(tf.textHeight, currTextHeight*2); // not clear what does textHeight depend on
-xcheck_equals(tf._height, currHeight*2);
+check_equals(tf._height, currHeight*2);
 tf._yscale = 100;
 
 //-------------------------------------------------------------------------
@@ -901,7 +901,7 @@ note("After reducing _width: textWidth: "+tf.textWidth+" origTextWidth:"+origTex
 check_equals(tf._width, 10);
 
 #if OUTPUT_VERSION < 8
- xcheck_equals(origTextWidth, tf.textWidth); 
+ check_equals(origTextWidth, tf.textWidth); 
 #else
  check(origTextWidth > tf.textWidth); 
 #endif

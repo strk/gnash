@@ -240,7 +240,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf2.textWidth);");
   xcheck(mo, "tf2.textWidth >= 76 && tf2.textWidth <= 80");
 
-  xcheck_equals(mo, "tf3._width", "1344");
+  check_equals(mo, "tf3._width", "1344");
   check_equals(mo, "tf3._height", "20");
   xcheck_equals(mo, "tf3._x", "18");
   xcheck_equals(mo, "tf3._y", "88");
@@ -249,7 +249,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf3.textWidth);");
   xcheck(mo, "tf3.textWidth >= 225 && tf3.textWidth <= 235");
 
-  xcheck_equals(mo, "tf4._width", "1344");
+  check_equals(mo, "tf4._width", "1344");
   check_equals(mo, "tf4._height", "20");
   xcheck_equals(mo, "tf4._x", "18");
   xcheck_equals(mo, "tf4._y", "118");
@@ -258,7 +258,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf4.textWidth);");
   xcheck(mo, "tf4.textWidth >= 153 && tf4.textWidth <= 159");
 
-  xcheck_equals(mo, "tf5._width", "1344");
+  check_equals(mo, "tf5._width", "1344");
   check_equals(mo, "tf5._height", "20");
   xcheck_equals(mo, "tf5._x", "18");
   xcheck_equals(mo, "tf5._y", "148");
@@ -267,7 +267,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf5.textWidth);");
   xcheck(mo, "tf5.textWidth >= 183 && tf5.textWidth <= 189");
 
-  xcheck_equals(mo, "tf6._width", "1344");
+  check_equals(mo, "tf6._width", "1344");
   check_equals(mo, "tf6._height", "20");
   xcheck_equals(mo, "tf6._x", "18");
   xcheck_equals(mo, "tf6._y", "178");
@@ -276,7 +276,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf6.textWidth);");
   xcheck(mo, "tf6.textWidth >= 189 && tf6.textWidth <= 199");
 
-  xcheck_equals(mo, "tf7._width", "1344");
+  check_equals(mo, "tf7._width", "1344");
   check_equals(mo, "tf7._height", "20");
   xcheck_equals(mo, "tf7._x", "18");
   xcheck_equals(mo, "tf7._y", "208");
@@ -285,7 +285,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf7.textWidth);");
   xcheck(mo, "tf7.textWidth >= 240 && tf7.textWidth <= 254");
 
-  xcheck_equals(mo, "tf8._width", "672");
+  check_equals(mo, "tf8._width", "672");
   check_equals(mo, "tf8._height", "20");
   xcheck_equals(mo, "tf8._x", "34");
   xcheck_equals(mo, "tf8._y", "238");
@@ -294,7 +294,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf8.textWidth);");
   xcheck(mo, "tf8.textWidth >= 217 && tf8.textWidth <= 227");
 
-  xcheck_equals(mo, "tf9._width", "672");
+  check_equals(mo, "tf9._width", "672");
   check_equals(mo, "tf9._height", "20");
   xcheck_equals(mo, "tf9._x", "34");
   xcheck_equals(mo, "tf9._y", "268");
@@ -303,7 +303,7 @@ main(int argc, char** argv)
   add_actions(mo, "trace(tf9.textWidth);");
   xcheck(mo, "tf9.textWidth >= 144 && tf9.textWidth <= 152");
 
-  xcheck_equals(mo, "tf10._width", "16.8");
+  check_equals(mo, "tf10._width", "16.8");
   check_equals(mo, "tf10._height", "20");
   xcheck_equals(mo, "tf10._x", "49.6");
   xcheck_equals(mo, "tf10._y", "298");
@@ -314,7 +314,7 @@ main(int argc, char** argv)
 
   // The textHeight for the following two fields varies.
   check_equals(mo, "tf11._width", "84");
-  xcheck_equals(mo, "tf11._height", "80");
+  check_equals(mo, "tf11._height", "80");
   xcheck_equals(mo, "tf11._x", "48");
   xcheck_equals(mo, "tf11._y", "322");
   xcheck_equals(mo, "tf11.textHeight", "23");
@@ -323,7 +323,7 @@ main(int argc, char** argv)
   xcheck(mo, "tf11.textWidth >= 84 && tf11.textWidth <= 88");
 
   check_equals(mo, "tf12._width", "84");
-  xcheck_equals(mo, "tf12._height", "160");
+  check_equals(mo, "tf12._height", "160");
   xcheck_equals(mo, "tf12._x", "48");
   xcheck_equals(mo, "tf12._y", "404");
   xcheck_equals(mo, "tf12.textHeight", "23");
