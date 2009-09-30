@@ -2785,9 +2785,9 @@ class TextField_as {
 #if !flash9
 		//xcheck_equals(typeof(tf._soundbuftime), 'number');
 		if(typeof(untyped tf._soundbuftime) == 'number') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._soundbuftime is 'number'");
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._soundbuftime is 'number'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._soundbuftime should be 'number', is "+typeof(untyped tf._soundbuftime));
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._soundbuftime should be 'number', is "+typeof(untyped tf._soundbuftime));
 		}
 		//check( ! tf.hasOwnProperty('_soundbuftime') ); 
 		if(!untyped tf.hasOwnProperty('_soundbuftime')) {
@@ -3184,9 +3184,9 @@ class TextField_as {
 #if !flash9
 		//xcheck_equals(typeof(tf._url), 'string');
 		if(typeof(untyped tf._url) == 'string') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._url is 'string'");
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._url is 'string'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._url should be 'string', is "+typeof(untyped tf._url));
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._url should be 'string', is "+typeof(untyped tf._url));
 		}
 		//check( ! tf.hasOwnProperty('_url') ); 
 		if(!untyped tf.hasOwnProperty('_url')) {
@@ -3202,17 +3202,17 @@ class TextField_as {
 		}
 		//xcheck_equals(tf._url, _root._url);
 		if(untyped tf._url == _root._url) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._url is _root._url");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._url is _root._url");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
 		}
 		//tf._url = "fake url";
 		untyped tf._url = "fake url";
 		//xcheck_equals(tf._url, _root._url); // read-only
 		if(untyped tf._url == _root._url) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._url is _root._url");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._url is _root._url");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
 		}
 #end
 	}
