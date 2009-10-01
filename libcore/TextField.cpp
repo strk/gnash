@@ -2448,12 +2448,12 @@ TextField::setEmbedFonts(bool use)
 }
 
 void
-TextField::setWordWrap(bool on)
+TextField::setWordWrap(bool wrap)
 {
-    if ( _wordWrap != on )
-    {
+    if (_wordWrap != wrap) {
+
         set_invalidated();
-        _wordWrap=on;
+        _wordWrap = wrap;
         format_text();
     }
 }
@@ -2755,9 +2755,7 @@ TextField::markReachableResources() const
 void
 TextField::setWidth(double newwidth)
 {
-	rect bounds = getBounds();
-    log_debug("xmin: %d, width: %d", twipsToPixels(bounds.get_x_min()),
-            twipsToPixels(newwidth));
+	const rect& bounds = getBounds();
     _bounds.set_to_rect(bounds.get_x_min(),
             bounds.get_y_min(),
             bounds.get_x_min() + newwidth,
@@ -2767,9 +2765,7 @@ TextField::setWidth(double newwidth)
 void
 TextField::setHeight(double newheight)
 {
-	rect bounds = getBounds();
-    log_debug("ymin: %d, width: %d", twipsToPixels(bounds.get_y_min()),
-            twipsToPixels(newheight));
+	const rect& bounds = getBounds();
     _bounds.set_to_rect(bounds.get_x_min(),
             bounds.get_y_min(),
             bounds.get_x_max(),
