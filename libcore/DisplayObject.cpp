@@ -900,7 +900,7 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     }
 
     os.str("");
-    os << get_width() << "x" << get_height();
+    os << getBounds().width() << "x" << getBounds().height();
 	tr.append_child(it, StringPair(_("Dimensions"), os.str()));	
 
 	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
