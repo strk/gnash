@@ -1423,28 +1423,28 @@ movieclip_getBounds(const fn_call& fn)
         tgtwmat.invert().transform(bounds);
     }
 
-    // Magic numbers here... dunno why
-    double xMin = 6710886.35;
-    double yMin = 6710886.35;
-    double xMax = 6710886.35;
-    double yMax = 6710886.35;
+    double xMin, yMin, xMax, yMax;
 
-    if ( !bounds.is_null() )
-    {
+    if (!bounds.is_null()) {
         // Round to the twip
         xMin = twipsToPixels(bounds.get_x_min());
         yMin = twipsToPixels(bounds.get_y_min());
         xMax = twipsToPixels(bounds.get_x_max());
         yMax = twipsToPixels(bounds.get_y_max());
     }
+    else {
+        const double magicMin = 6710886.35;
+        xMin = yMin = xMax = yMax = magicMin;
+    }
 
-    boost::intrusive_ptr<as_object> bounds_obj(new as_object());
-    bounds_obj->init_member("xMin", as_value(xMin));
-    bounds_obj->init_member("yMin", as_value(yMin));
-    bounds_obj->init_member("xMax", as_value(xMax));
-    bounds_obj->init_member("yMax", as_value(yMax));
+    // This is a bare object.
+    as_object* bounds_obj = new as_object();
+    bounds_obj->init_member("xMin", xMin);
+    bounds_obj->init_member("yMin", yMin);
+    bounds_obj->init_member("xMax", xMax);
+    bounds_obj->init_member("yMax", yMax);
 
-    return as_value(bounds_obj.get());
+    return as_value(bounds_obj);
 }
 
 as_value
