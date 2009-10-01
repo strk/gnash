@@ -107,9 +107,7 @@ namespace {
     as_value movieclip_totalFrames(const fn_call& fn);
     as_value movieclip_framesLoaded(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
-    as_value movieclip_url(const fn_call& fn);
     as_value movieclip_focusRect(const fn_call& fn);
-    as_value movieclip_soundbuftime(const fn_call& fn);
 
     // =============================================
     // AS3 methods
@@ -244,42 +242,6 @@ attachMovieClipAS2Properties(DisplayObject& o)
 
     as_c_function_ptr gettersetter;
 
-    gettersetter = DisplayObject::x_getset;
-    o.init_property(NSV::PROP_uX, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::y_getset;
-    o.init_property(NSV::PROP_uY, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::xscale_getset;
-    o.init_property(NSV::PROP_uXSCALE, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::yscale_getset;
-    o.init_property(NSV::PROP_uYSCALE, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::xmouse_get;
-    o.init_readonly_property(NSV::PROP_uXMOUSE, gettersetter);
-
-    gettersetter = DisplayObject::ymouse_get;
-    o.init_readonly_property(NSV::PROP_uYMOUSE, gettersetter);
-
-    gettersetter = DisplayObject::alpha_getset;
-    o.init_property(NSV::PROP_uALPHA, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::visible_getset;
-    o.init_property(NSV::PROP_uVISIBLE, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::width_getset;
-    o.init_property(NSV::PROP_uWIDTH, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::height_getset;
-    o.init_property(NSV::PROP_uHEIGHT, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::rotation_getset;
-    o.init_property(NSV::PROP_uROTATION, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::parent_getset;
-    o.init_property(NSV::PROP_uPARENT, gettersetter, gettersetter);
-
     gettersetter = movieclip_currentFrame;
     o.init_property(NSV::PROP_uCURRENTFRAME, gettersetter, gettersetter);
 
@@ -289,29 +251,11 @@ attachMovieClipAS2Properties(DisplayObject& o)
     gettersetter = movieclip_framesLoaded;
     o.init_property(NSV::PROP_uFRAMESLOADED, gettersetter, gettersetter);
 
-    gettersetter = DisplayObject::target_getset;
-    o.init_property(NSV::PROP_uTARGET, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::name_getset;
-    o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
-
     gettersetter = movieclip_dropTarget;
     o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
 
-    gettersetter = movieclip_url;
-    o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::quality;
-    o.init_property(NSV::PROP_uQUALITY, gettersetter, gettersetter);
-    
-    gettersetter = DisplayObject::highquality;
-    o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
-
     gettersetter = movieclip_focusRect;
     o.init_property(NSV::PROP_uFOCUSRECT, gettersetter, gettersetter);
-
-    gettersetter = movieclip_soundbuftime;
-    o.init_property(NSV::PROP_uSOUNDBUFTIME, gettersetter, gettersetter);
 
 }
 
@@ -1479,28 +1423,28 @@ movieclip_getBounds(const fn_call& fn)
         tgtwmat.invert().transform(bounds);
     }
 
-    // Magic numbers here... dunno why
-    double xMin = 6710886.35;
-    double yMin = 6710886.35;
-    double xMax = 6710886.35;
-    double yMax = 6710886.35;
+    double xMin, yMin, xMax, yMax;
 
-    if ( !bounds.is_null() )
-    {
+    if (!bounds.is_null()) {
         // Round to the twip
         xMin = twipsToPixels(bounds.get_x_min());
         yMin = twipsToPixels(bounds.get_y_min());
         xMax = twipsToPixels(bounds.get_x_max());
         yMax = twipsToPixels(bounds.get_y_max());
     }
+    else {
+        const double magicMin = 6710886.35;
+        xMin = yMin = xMax = yMax = magicMin;
+    }
 
-    boost::intrusive_ptr<as_object> bounds_obj(new as_object());
-    bounds_obj->init_member("xMin", as_value(xMin));
-    bounds_obj->init_member("yMin", as_value(yMin));
-    bounds_obj->init_member("xMax", as_value(xMax));
-    bounds_obj->init_member("yMax", as_value(yMax));
+    // This is a bare object.
+    as_object* bounds_obj = new as_object();
+    bounds_obj->init_member("xMin", xMin);
+    bounds_obj->init_member("yMin", yMin);
+    bounds_obj->init_member("xMax", xMax);
+    bounds_obj->init_member("yMax", yMax);
 
-    return as_value(bounds_obj.get());
+    return as_value(bounds_obj);
 }
 
 as_value
@@ -2573,14 +2517,6 @@ movieclip_dropTarget(const fn_call& fn)
     return ptr->getDropTarget();
 }
 
-as_value
-movieclip_url(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_root()->url());
-}
-
 // TODO: move this to DisplayObject class, _focusrect seems a generic property
 as_value
 movieclip_focusRect(const fn_call& fn)
@@ -2601,24 +2537,6 @@ movieclip_focusRect(const fn_call& fn)
     return as_value();
 }
 
-as_value
-movieclip_soundbuftime(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // Number of seconds before sound starts to stream.
-        return as_value(0.0);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._soundbuftime setting") );
-    }
-    return as_value();
-}
 
 as_value
 movieclip_transform(const fn_call& fn)

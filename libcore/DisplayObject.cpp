@@ -34,6 +34,7 @@
 #include "namedStrings.h"
 #include "gnash.h" // Quality
 #include "GnashNumeric.h"
+#include "Global_as.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -55,8 +56,16 @@ namespace {
     const BlendModeMap& getBlendModeMap();
     bool blendModeMatches(const BlendModeMap::value_type& val,
             const std::string& mode);
-}
+    
+    typedef as_value(*Getter)(DisplayObject&);
+    typedef std::map<string_table::key, Getter> Getters;
+    typedef void(*Setter)(DisplayObject&, const as_value&);
+    typedef std::map<string_table::key, Setter> Setters;
 
+    const Getters displayObjectGetters();
+    const Setters displayObjectSetters();
+
+}
 
 // Define static const members.
 const int DisplayObject::lowerAccessibleBound;
@@ -92,6 +101,9 @@ DisplayObject::DisplayObject(DisplayObject* parent, int id)
 {
     assert((!parent && m_id == -1) || ((parent) && m_id >= 0));
     assert(m_old_invalidated_ranges.isNull());
+
+    // This informs the core that the object is a DisplayObject.
+    setDisplayObject();
 }
 
 /*protected static*/
@@ -108,8 +120,7 @@ SWFMatrix
 DisplayObject::getWorldMatrix(bool includeRoot) const
 {
 	SWFMatrix m;
-	if (m_parent)
-	{
+	if (m_parent) {
 	    m = m_parent->getWorldMatrix(includeRoot);
 	}
     if (m_parent || includeRoot) m.concatenate(getMatrix());
@@ -268,395 +279,9 @@ DisplayObject::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 	m_old_invalidated_ranges.add(ranges);
 }
 
-//---------------------------------------------------------------------
-//
-// Shared ActionScript getter-setters
-//
-//---------------------------------------------------------------------
-
-as_value
-DisplayObject::quality(const fn_call& fn)
+void
+attachDisplayObjectProperties(as_object& o)
 {
-    boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
-
-    movie_root& mr = getRoot(*ptr);
-
-    if (!fn.nargs)
-    {
-        switch (mr.getQuality())
-        {
-            case QUALITY_BEST:
-                return as_value("BEST");
-            case QUALITY_HIGH:
-                return as_value("HIGH");
-            case QUALITY_MEDIUM:
-                return as_value("MEDIUM");
-            case QUALITY_LOW:
-                return as_value("LOW");
-        }
-    }
-
-    /// Setter
-
-    if (!fn.arg(0).is_string()) return as_value();
-
-    const std::string& q = fn.arg(0).to_string();
-
-    StringNoCaseEqual noCaseCompare;
-
-    if (noCaseCompare(q, "BEST")) mr.setQuality(QUALITY_BEST);
-    else if (noCaseCompare(q, "HIGH")) {
-        mr.setQuality(QUALITY_HIGH);
-    }
-    else if (noCaseCompare(q, "MEDIUM")) {
-        mr.setQuality(QUALITY_MEDIUM);
-    }
-    else if (noCaseCompare(q, "LOW")) {
-            mr.setQuality(QUALITY_LOW);
-    }
-
-    return as_value();
-}
-
-as_value
-DisplayObject::highquality(const fn_call& fn)
-{
-    boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
-
-    movie_root& mr = getRoot(*ptr);
-    
-    if (!fn.nargs)
-    {
-        switch (mr.getQuality())
-        {
-            case QUALITY_BEST:
-                return as_value(2.0);
-            case QUALITY_HIGH:
-                return as_value(1.0);
-            case QUALITY_MEDIUM:
-            case QUALITY_LOW:
-                return as_value(0.0);
-        }
-    }
-    
-    double q = fn.arg(0).to_number();
-
-    if (q < 0) mr.setQuality(QUALITY_HIGH);
-    else if (q > 2) mr.setQuality(QUALITY_BEST);
-    else {
-        int i = static_cast<int>(q);
-        switch(i)
-        {
-            case 0:
-                mr.setQuality(QUALITY_LOW);
-                break;
-            case 1:
-                mr.setQuality(QUALITY_HIGH);
-                break;
-            case 2:
-                mr.setQuality(QUALITY_BEST);
-                break;
-        }
-    }
-
-    return as_value();
-}
-
-
-as_value
-DisplayObject::x_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		SWFMatrix m = ptr->getMatrix();
-		rv = as_value(twipsToPixels(m.get_x_translation()));
-	}
-	else // setter
-	{
-        const as_value& val = fn.arg(0);
-
-        // Undefined or null are ignored
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 (not NaN)
-        //       on to_number
-        if (val.is_undefined() || val.is_null() )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._x to %s, refused"),
-                ptr->getTarget(), val);
-			);
-            return rv;
-        }
-
-		const double newx = val.to_number();
-
-        // NaN is skipped, Infinite isn't
-        if (isNaN(newx))
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._x to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, newx);
-			);
-            return rv;
-        }
-
-		SWFMatrix m = ptr->getMatrix();
-        // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
-		m.set_x_translation(pixelsToTwips(infinite_to_zero(newx)));
-		ptr->setMatrix(m); // no need to update caches when only changing translation
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-	return rv;
-
-}
-
-as_value
-DisplayObject::y_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		SWFMatrix m = ptr->getMatrix();
-		rv = as_value(twipsToPixels(m.get_y_translation()));
-	}
-	else // setter
-	{
-        const as_value& val = fn.arg(0);
-
-        // Undefined or null are ignored
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 (not NaN)
-        //       on to_number
-        if (val.is_undefined() || val.is_null() )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._y to %s, refused"),
-                ptr->getTarget(), val);
-			);
-            return rv;
-        }
-
-		const double newy = val.to_number();
-
-        // NaN is skipped, infinite isn't
-        if (isNaN(newy))
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._y to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, newy);
-			);
-            return rv;
-        }
-
-		SWFMatrix m = ptr->getMatrix();
-        // NOTE: infinite_to_zero is wrong here, 
-        // see actionscript.all/setProperty.as
-		m.set_y_translation(pixelsToTwips(infinite_to_zero(newy)));
-		ptr->setMatrix(m); // no need to update caches when only changing translation
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-	return rv;
-
-}
-
-as_value
-DisplayObject::xscale_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->_xscale);
-	}
-	else // setter
-	{
-		const as_value& val = fn.arg(0);
-
-		// Handle bogus values
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 on to_number
-		if (val.is_undefined() || val.is_null())
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._xscale to %s, refused"),
-                ptr->getTarget(), val);
-			);
-			return as_value();
-		}
-
-		const double scale_percent = val.to_number();
-
-        // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-		if (isNaN(scale_percent))
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._xscale to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, scale_percent);
-			);
-			return as_value();
-		}
-
-		// input is in percent
-		ptr->set_x_scale(scale_percent);
-	}
-	return rv;
-
-}
-
-as_value
-DisplayObject::yscale_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		return ptr->_yscale;
-	}
-	else // setter
-	{
-		const as_value& val = fn.arg(0);
-
-        // Undefined or null are ignored
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 (not NaN)
-        //       on to_number
-		if (val.is_undefined() || val.is_null())
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._yscale to %s, refused"),
-                ptr->getTarget(), val);
-			);
-			return as_value();
-		}
-
-		const double scale_percent = val.to_number();
-
-        // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-		if (isNaN(scale_percent))
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._yscale to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, scale_percent);
-			);
-			return as_value();
-		}
-
-
-		// input is in percent
-		ptr->set_y_scale(scale_percent);
-	}
-	return rv;
-
-}
-
-as_value
-DisplayObject::xmouse_get(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
-
-	// Local coord of mouse IN PIXELS.
-	boost::int32_t x, y, buttons;
-	getRoot(*ptr).get_mouse_state(x, y, buttons);
-
-	SWFMatrix m = ptr->getWorldMatrix();
-    point a(pixelsToTwips(x), pixelsToTwips(y));
-    
-    m.invert().transform(a);
-    return as_value(twipsToPixels(a.x));
-}
-
-as_value
-DisplayObject::ymouse_get(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
-
-	// Local coord of mouse IN PIXELS.
-	boost::int32_t x, y, buttons;
-	getRoot(*ptr).get_mouse_state(x, y, buttons);
-
-	SWFMatrix m = ptr->getWorldMatrix();
-    point a(pixelsToTwips(x), pixelsToTwips(y));
-    m.invert().transform(a);
-    return as_value(twipsToPixels(a.y));
-}
-
-as_value
-DisplayObject::alpha_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = as_value(ptr->get_cxform().aa / 2.56);
-	}
-	else // setter
-	{
-		const as_value& val = fn.arg(0);
-
-        // Undefined or null are ignored
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 (not NaN)
-        //       on to_number
-        if (val.is_undefined() || val.is_null() )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._alpha to %s, refused"),
-                ptr->getTarget(), val);
-			);
-            return rv;
-        }
-
-        // The new internal alpha value is input / 100.0 * 256.
-        // We test for finiteness later, but the multiplication
-        // won't make any difference.
-		const double newAlpha = val.to_number() * 2.56;
-
-        // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-        if (isNaN(newAlpha))
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._alpha to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, newAlpha);
-			);
-            return rv;
-        }
-
-        cxform cx = ptr->get_cxform();
-
-        // Overflows are *not* truncated, but set to -32768.
-        if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
-            newAlpha < std::numeric_limits<boost::int16_t>::min())
-        {
-            cx.aa = std::numeric_limits<boost::int16_t>::min();
-        }
-        else
-        {
-            cx.aa = static_cast<boost::int16_t>(newAlpha);
-        }
-
-        ptr->set_cxform(cx);
-		ptr->transformedByScript();  
-	}
-	return rv;
-
 }
 
 as_value
@@ -728,93 +353,6 @@ DisplayObject::blendMode(const fn_call& fn)
 
 }
 
-
-/// _visible can be set with true/false, but also
-/// 0 and 1.
-as_value
-DisplayObject::visible_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if (!fn.nargs) // getter
-	{
-		rv = as_value(ptr->visible());
-	}
-	else // setter
-	{
-        const as_value& val = fn.arg(0);
-
-        // Undefined or null are ignored
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 (not NaN)
-        //       on to_number
-        if (val.is_undefined() || val.is_null() )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._visible to %s, refused"),
-                ptr->getTarget(), val);
-			);
-            return rv;
-        }
-
-        /// We cast to number and rely (mostly) on C++'s automatic
-        /// cast to bool, as string "0" should be converted to
-        /// its numeric equivalent, not interpreted as 'true', which
-        /// SWF7+ does for strings.
-        double d = val.to_number();
-
-        // Infinite or NaN is skipped
-        if (isInf(d) || isNaN(d))
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._visible to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, d);
-			);
-            return rv;
-        }
-
-		ptr->set_visible(d);
-
-		ptr->transformedByScript();
-	}
-	return rv;
-
-}
-
-as_value
-DisplayObject::width_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	// Bounds are used for both getter and setter
-	rect bounds = ptr->getBounds();
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{ 
-		SWFMatrix m = ptr->getMatrix();
-		m.transform(bounds);
-		double w = twipsToPixels( bounds.width() );
-		rv = as_value(w);
-	}
-	else // setter
-	{
-		const double newwidth = pixelsToTwips(fn.arg(0).to_number());
-		if ( newwidth <= 0 )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Setting _width=%g of DisplayObject %s (%s)"),
-				newwidth/20, ptr->getTarget(), typeName(*ptr));
-			);
-		}
-
-		ptr->set_width(newwidth);
-	}
-	return rv;
-}
-
 void
 DisplayObject::set_visible(bool visible)
 {
@@ -830,174 +368,60 @@ DisplayObject::set_visible(bool visible)
     }
     _visible = visible;      
 }
+
 void
-DisplayObject::set_width(double newwidth)
+DisplayObject::setWidth(double newwidth)
 {
-	rect bounds = getBounds();
-#if 0
-	if ( bounds.is_null() ) {
-		log_unimpl("FIXME: when setting _width of null-bounds DisplayObject it seems we're supposed to change _yscale too (see MovieClip.as)");
-	}
-#endif
+	const rect& bounds = getBounds();
 	const double oldwidth = bounds.width();
-	assert(oldwidth >= 0); // can't be negative can it?
+	assert(oldwidth >= 0); 
 
-        double yscale = std::abs(_yscale / 100.0); // see MovieClip.as. TODO: this is likely same as m.get_y_scale..
-        double xscale = oldwidth ? (newwidth / oldwidth) : 0; // avoid division by zero
-        double rotation = _rotation * PI / 180.0;
-
-        SWFMatrix m = getMatrix();
-        m.set_scale_rotation(xscale, yscale, rotation);
-        setMatrix(m, true); // let caches be updated
-}
-
-as_value
-DisplayObject::height_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	// Bounds are used for both getter and setter
-	rect bounds = ptr->getBounds();
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		SWFMatrix m = ptr->getMatrix();
-		m.transform(bounds);
-		double h = twipsToPixels(bounds.height());      
-		rv = as_value(h);
-	}
-	else // setter
-	{
-
-		const double newheight = pixelsToTwips(fn.arg(0).to_number());
-		if ( newheight <= 0 )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Setting _height=%g of DisplayObject %s (%s)"),
-			                newheight / 20, ptr->getTarget(), typeName(*ptr));
-			);
-		}
-
-		ptr->set_height(newheight);
-	}
-
-	return rv;
-}
-
-void
-DisplayObject::set_height(double newheight)
-{
-	const rect bounds = getBounds();
-
-#if 0
-	if ( bounds.is_null() ) {
-		log_unimpl("FIXME: when setting _height of null-bounds DisplayObject it seems we're supposed to change _xscale too (see MovieClip.as)");
-	}
-#endif
-	const double oldheight = bounds.height();
-	assert(oldheight >= 0); // can't be negative can it?
-
-    double yscale = oldheight ? (newheight / oldheight) : 0; // avoid division by zero
-    double xscale = _xscale / 100.0;
-    double rotation = _rotation * PI / 180.0;
+    const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
+    const double rotation = _rotation * PI / 180.0;
 
     SWFMatrix m = getMatrix();
+    const double yscale = m.get_y_scale(); 
     m.set_scale_rotation(xscale, yscale, rotation);
-    setMatrix(m, true); // let caches be updated
+    setMatrix(m, true); 
 }
 
 as_value
-DisplayObject::rotation_getset(const fn_call& fn)
+getHeight(DisplayObject& o)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		return ptr->_rotation;
-	}
-	else // setter
-	{
-		const as_value& val = fn.arg(0);
-
-        // Undefined or null are ignored
-		// NOTE: we explicitly check is_undefined and is_null
-		//       because for SWF4 they result in 0 (not NaN)
-        //       on to_number
-        if (val.is_undefined() || val.is_null() )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._rotation to %s, refused"),
-                ptr->getTarget(), val);
-			);
-            return rv;
-        }
-
-		// input is in degrees
-		double  rotation_val = val.to_number();
-
-        // NaN is skipped, Infinity isn't
-        if (isNaN(rotation_val))
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set %s._rotation to %s "
-                "(evaluating to number %g) refused"),
-                ptr->getTarget(), val, rotation_val);
-			);
-            return rv;
-        }
-
-		ptr->set_rotation(rotation_val);
-	}
-	return rv;
+	rect bounds = o.getBounds();
+    const SWFMatrix m = o.getMatrix();
+    m.transform(bounds);
+    return twipsToPixels(bounds.height());      
 }
 
-as_value
-DisplayObject::parent_getset(const fn_call& fn)
+void
+setHeight(DisplayObject& o, const as_value& val)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
-
-	boost::intrusive_ptr<as_object> p = ptr->get_parent();
-	as_value rv;
-	if (p)
-	{
-		rv = as_value(p);
-	}
-	return rv;
+    const double newheight = pixelsToTwips(val.to_number());
+    if (newheight <= 0) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Setting _height=%g of DisplayObject %s (%s)"),
+                        newheight / 20, o.getTarget(), typeName(o));
+        );
+    }
+    o.setHeight(newheight);
 }
 
-as_value
-DisplayObject::target_getset(const fn_call& fn)
+void
+DisplayObject::setHeight(double newheight)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+	const rect& bounds = getBounds();
 
-	return as_value(ptr->getTargetPath());
-}
+	const double oldheight = bounds.height();
+	assert(oldheight >= 0); 
 
-as_value
-DisplayObject::name_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<DisplayObject> ptr =
-        ensureType<DisplayObject>(fn.this_ptr);
+    const double yscale = oldheight ? (newheight / oldheight) : 0;
+    const double rotation = _rotation * PI / 180.0;
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		const std::string& name = ptr->get_name();
-		if ( getSWFVersion(*ptr) < 6 && name.empty() )
-		{
-			return as_value();
-		} 
-		else
-		{
-			return as_value(name);
-		}
-	}
-	else // setter
-	{
-		ptr->set_name(fn.arg(0).to_string().c_str());
-	}
-
-	return as_value();
+    SWFMatrix m = getMatrix();
+    const double xscale = m.get_x_scale();
+    m.set_scale_rotation(xscale, yscale, rotation);
+    setMatrix(m, true);
 }
 
 void
@@ -1138,6 +562,9 @@ DisplayObject::getUserDefinedEventHandler(string_table::key key) const
 	return func;
 }
 
+/// Set the real and cached x scale.
+//
+/// Cached rotation and y scale are not updated.
 void
 DisplayObject::set_x_scale(double scale_percent)
 {
@@ -1167,25 +594,27 @@ DisplayObject::set_x_scale(double scale_percent)
 	transformedByScript(); 
 }
 
+/// Set the real and cached rotation.
+//
+/// Cached scale values are not updated.
 void
 DisplayObject::set_rotation(double rot)
 {
 	// Translate to the -180 .. 180 range
-	rot = std::fmod (rot, 360.0);
+	rot = std::fmod(rot, 360.0);
 	if (rot > 180.0) rot -= 360.0;
 	else if (rot < -180.0) rot += 360.0;
 
-	//log_debug("_rotation: %d", rot);
-
 	double rotation = rot * PI / 180.0;
 
-	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
-
-    // TODO: check if there's any case we should use _yscale here
     if (_xscale < 0 ) rotation += PI; 
 
 	SWFMatrix m = getMatrix();
     m.set_rotation(rotation);
+
+    // Update the matrix from the cached x scale to avoid accumulating
+    // errors.
+    m.set_x_scale(std::abs(scaleX() / 100.0));
 	setMatrix(m); // we update the cache ourselves
 
 	_rotation = rot;
@@ -1193,6 +622,10 @@ DisplayObject::set_rotation(double rot)
 	transformedByScript(); 
 }
 
+
+/// Set the real and cached y scale.
+//
+/// Cached rotation and x scale are not updated.
 void
 DisplayObject::set_y_scale(double scale_percent)
 {
@@ -1494,8 +927,506 @@ DisplayObject::getAsRoot()
     return get_root();
 }
 
+bool
+getDisplayObjectProperty(as_object& obj, string_table::key key,
+        as_value& val)
+{
+
+    const Getters& getters = displayObjectGetters();
+
+    Getters::const_iterator it = getters.find(key);
+    if (it == getters.end()) return false;
+
+    DisplayObject& o = static_cast<DisplayObject&>(obj);
+
+    val = (*it->second)(o);
+    return true;
+}
+    
+
+bool
+setDisplayObjectProperty(as_object& obj, string_table::key key, 
+        const as_value& val)
+{
+
+    const Setters& setters = displayObjectSetters();
+
+    Setters::const_iterator it = setters.find(key);
+    if (it == setters.end()) return false;
+
+    DisplayObject& o = static_cast<DisplayObject&>(obj);
+
+    Setter s = it->second;
+
+    // Read-only.
+    if (!s) return true;
+    
+    if (val.is_undefined() || val.is_null()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Attempt to set property to %s, refused"),
+                o.getTarget(), val);
+        );
+        return true;
+    }
+
+    (*s)(o, val);
+    return true;
+
+}
 
 namespace {
+
+as_value
+getQuality(DisplayObject& o)
+{
+    movie_root& mr = getRoot(o);
+    switch (mr.getQuality())
+    {
+        case QUALITY_BEST:
+            return as_value("BEST");
+        case QUALITY_HIGH:
+            return as_value("HIGH");
+        case QUALITY_MEDIUM:
+            return as_value("MEDIUM");
+        case QUALITY_LOW:
+            return as_value("LOW");
+    }
+
+    return as_value();
+
+}
+
+void
+setQuality(DisplayObject& o, const as_value& val)
+{
+    movie_root& mr = getRoot(o);
+
+    if (!val.is_string()) return;
+
+    const std::string& q = val.to_string();
+
+    StringNoCaseEqual noCaseCompare;
+
+    if (noCaseCompare(q, "BEST")) mr.setQuality(QUALITY_BEST);
+    else if (noCaseCompare(q, "HIGH")) {
+        mr.setQuality(QUALITY_HIGH);
+    }
+    else if (noCaseCompare(q, "MEDIUM")) {
+        mr.setQuality(QUALITY_MEDIUM);
+    }
+    else if (noCaseCompare(q, "LOW")) {
+            mr.setQuality(QUALITY_LOW);
+    }
+
+    return;
+}
+
+as_value
+getURL(DisplayObject& o)
+{
+    return as_value(o.get_root()->url());
+}
+
+as_value
+getHighQuality(DisplayObject& o)
+{
+    movie_root& mr = getRoot(o);
+    switch (mr.getQuality())
+    {
+        case QUALITY_BEST:
+            return as_value(2.0);
+        case QUALITY_HIGH:
+            return as_value(1.0);
+        case QUALITY_MEDIUM:
+        case QUALITY_LOW:
+            return as_value(0.0);
+    }
+    return as_value();
+}
+
+void
+setHighQuality(DisplayObject& o, const as_value& val)
+{
+    movie_root& mr = getRoot(o);
+
+    const double q = val.to_number();
+
+    if (q < 0) mr.setQuality(QUALITY_HIGH);
+    else if (q > 2) mr.setQuality(QUALITY_BEST);
+    else {
+        int i = static_cast<int>(q);
+        switch(i)
+        {
+            case 0:
+                mr.setQuality(QUALITY_LOW);
+                break;
+            case 1:
+                mr.setQuality(QUALITY_HIGH);
+                break;
+            case 2:
+                mr.setQuality(QUALITY_BEST);
+                break;
+        }
+    }
+
+}
+
+void
+setY(DisplayObject& o, const as_value& val)
+{
+
+    const double newy = val.to_number();
+
+    // NaN is skipped, Infinite isn't
+    if (isNaN(newy))
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._y to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, newy);
+        );
+        return;
+    }
+
+    SWFMatrix m = o.getMatrix();
+    // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
+    m.set_y_translation(pixelsToTwips(infinite_to_zero(newy)));
+    o.setMatrix(m); 
+    o.transformedByScript();
+}
+
+as_value
+getY(DisplayObject& o)
+{
+    SWFMatrix m = o.getMatrix();
+    return twipsToPixels(m.get_y_translation());
+}
+
+void
+setX(DisplayObject& o, const as_value& val)
+{
+
+    const double newx = val.to_number();
+
+    // NaN is skipped, Infinite isn't
+    if (isNaN(newx))
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._x to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, newx);
+        );
+        return;
+    }
+
+    SWFMatrix m = o.getMatrix();
+    // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
+    m.set_x_translation(pixelsToTwips(infinite_to_zero(newx)));
+    o.setMatrix(m); 
+    o.transformedByScript();
+}
+
+as_value
+getX(DisplayObject& o)
+{
+    SWFMatrix m = o.getMatrix();
+    return twipsToPixels(m.get_x_translation());
+}
+
+void
+setScaleX(DisplayObject& o, const as_value& val)
+{
+
+    const double scale_percent = val.to_number();
+
+    // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
+    if (isNaN(scale_percent))
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._xscale to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, scale_percent);
+        );
+        return;
+    }
+
+    // input is in percent
+    o.set_x_scale(scale_percent);
+
+}
+
+as_value
+getScaleX(DisplayObject& o)
+{
+    return o.scaleX();
+}
+
+void
+setScaleY(DisplayObject& o, const as_value& val)
+{
+
+    const double scale_percent = val.to_number();
+
+    // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
+    if (isNaN(scale_percent))
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._yscale to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, scale_percent);
+        );
+        return;
+    }
+
+    // input is in percent
+    o.set_y_scale(scale_percent);
+
+}
+
+as_value
+getScaleY(DisplayObject& o)
+{
+    return o.scaleY();
+}
+
+as_value
+getVisible(DisplayObject& o)
+{
+    return o.visible();
+}
+
+void
+setVisible(DisplayObject& o, const as_value& val)
+{
+
+    /// We cast to number and rely (mostly) on C++'s automatic
+    /// cast to bool, as string "0" should be converted to
+    /// its numeric equivalent, not interpreted as 'true', which
+    /// SWF7+ does for strings.
+    double d = val.to_number();
+
+    // Infinite or NaN is skipped
+    if (isInf(d) || isNaN(d)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._visible to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, d);
+        );
+        return;
+    }
+
+    o.set_visible(d);
+
+    o.transformedByScript();
+}
+
+as_value
+getAlpha(DisplayObject& o)
+{
+    return as_value(o.get_cxform().aa / 2.56);
+}
+
+void
+setAlpha(DisplayObject& o, const as_value& val)
+{
+
+    // The new internal alpha value is input / 100.0 * 256.
+    // We test for finiteness later, but the multiplication
+    // won't make any difference.
+    const double newAlpha = val.to_number() * 2.56;
+
+    // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
+    if (isNaN(newAlpha)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._alpha to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, newAlpha);
+        );
+        return;
+    }
+
+    cxform cx = o.get_cxform();
+
+    // Overflows are *not* truncated, but set to -32768.
+    if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
+        newAlpha < std::numeric_limits<boost::int16_t>::min()) {
+        cx.aa = std::numeric_limits<boost::int16_t>::min();
+    }
+    else {
+        cx.aa = static_cast<boost::int16_t>(newAlpha);
+    }
+
+    o.set_cxform(cx);
+    o.transformedByScript();  
+
+}
+
+as_value
+getMouseX(DisplayObject& o)
+{
+	// Local coord of mouse IN PIXELS.
+	boost::int32_t x, y, buttons;
+	getRoot(o).get_mouse_state(x, y, buttons);
+
+	SWFMatrix m = o.getWorldMatrix();
+    point a(pixelsToTwips(x), pixelsToTwips(y));
+    
+    m.invert().transform(a);
+    return as_value(twipsToPixels(a.x));
+}
+
+as_value
+getMouseY(DisplayObject& o)
+{
+	// Local coord of mouse IN PIXELS.
+	boost::int32_t x, y, buttons;
+	getRoot(o).get_mouse_state(x, y, buttons);
+
+	SWFMatrix m = o.getWorldMatrix();
+    point a(pixelsToTwips(x), pixelsToTwips(y));
+    m.invert().transform(a);
+    return as_value(twipsToPixels(a.y));
+}
+
+as_value
+getRotation(DisplayObject& o)
+{
+    return o.rotation();
+}
+
+
+void
+setRotation(DisplayObject& o, const as_value& val)
+{
+
+    // input is in degrees
+    const double rotation_val = val.to_number();
+
+    // NaN is skipped, Infinity isn't
+    if (isNaN(rotation_val))
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set %s._rotation to %s "
+            "(evaluating to number %g) refused"),
+            o.getTarget(), val, rotation_val);
+        );
+        return;
+    }
+    o.set_rotation(rotation_val);
+}
+
+
+as_value
+getParent(DisplayObject& o)
+{
+    as_object* p = o.get_parent();
+    return p ? p : as_value();
+}
+
+as_value
+getTarget(DisplayObject& o)
+{
+    return o.getTargetPath();
+}
+
+as_value
+getNameProperty(DisplayObject& o)
+{
+    const std::string& name = o.get_name();
+    if (getSWFVersion(o) < 6 && name.empty()) return as_value(); 
+    return as_value(name);
+}
+
+void
+setName(DisplayObject& o, const as_value& val)
+{
+    o.set_name(val.to_string().c_str());
+}
+
+void
+setSoundBufTime(DisplayObject& /*o*/, const as_value& /*val*/)
+{
+    LOG_ONCE(log_unimpl("_soundbuftime setting"));
+}
+
+as_value
+getSoundBufTime(DisplayObject& /*o*/)
+{
+    return as_value(0.0);
+}
+
+as_value
+getWidth(DisplayObject& o)
+{
+	rect bounds = o.getBounds();
+    const SWFMatrix& m = o.getMatrix();
+    m.transform(bounds);
+    return twipsToPixels(bounds.width());
+}
+
+void
+setWidth(DisplayObject& o, const as_value& val)
+{
+    const double newwidth = pixelsToTwips(val.to_number());
+    if (newwidth <= 0) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Setting _width=%g of DisplayObject %s (%s)"),
+            newwidth/20, o.getTarget(), typeName(o));
+        );
+    }
+    o.setWidth(newwidth);
+}
+
+const Getters
+displayObjectGetters()
+{
+    static const Getters getters = boost::assign::map_list_of
+        (NSV::PROP_uX, getX)
+        (NSV::PROP_uY, getY)
+        (NSV::PROP_uXSCALE, getScaleX)
+        (NSV::PROP_uYSCALE, getScaleY)
+        (NSV::PROP_uROTATION, getRotation)
+        (NSV::PROP_uHIGHQUALITY, getHighQuality)
+        (NSV::PROP_uQUALITY, getQuality)
+        (NSV::PROP_uALPHA, getAlpha)
+        (NSV::PROP_uWIDTH, getWidth)
+        (NSV::PROP_uURL, getURL)
+        (NSV::PROP_uHEIGHT, getHeight)
+        (NSV::PROP_uNAME, getNameProperty)
+        (NSV::PROP_uVISIBLE, getVisible)
+        (NSV::PROP_uSOUNDBUFTIME, getSoundBufTime)
+        (NSV::PROP_uPARENT, getParent)
+        (NSV::PROP_uTARGET, getTarget)
+        (NSV::PROP_uXMOUSE, getMouseX)
+        (NSV::PROP_uYMOUSE, getMouseY);
+    return getters;
+}
+const Setters
+displayObjectSetters()
+{
+    const Setter n = 0;
+
+    static const Setters setters = boost::assign::map_list_of
+        (NSV::PROP_uX, setX)
+        (NSV::PROP_uY, setY)
+        (NSV::PROP_uXSCALE, setScaleX)
+        (NSV::PROP_uYSCALE, setScaleY)
+        (NSV::PROP_uROTATION, setRotation)
+        (NSV::PROP_uHIGHQUALITY, setHighQuality)
+        (NSV::PROP_uQUALITY, setQuality)
+        (NSV::PROP_uALPHA, setAlpha)
+        (NSV::PROP_uWIDTH, setWidth)
+        (NSV::PROP_uHEIGHT, setHeight)
+        (NSV::PROP_uNAME, setName)
+        (NSV::PROP_uVISIBLE, setVisible)
+        (NSV::PROP_uSOUNDBUFTIME, setSoundBufTime)
+        (NSV::PROP_uPARENT, n)
+        (NSV::PROP_uURL, n)
+        (NSV::PROP_uTARGET, n)
+        (NSV::PROP_uXMOUSE, n)
+        (NSV::PROP_uYMOUSE, n);
+    return setters;
+}
 
 
 const BlendModeMap&

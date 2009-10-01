@@ -252,59 +252,15 @@ static bool isCharacterNull(DisplayObject* ch, bool includeUnloaded)
     return (!ch || (!includeUnloaded && ch->unloaded()));
 }
 
+void
+attachButtonProperties(as_object& o)
+{
+    attachDisplayObjectProperties(o);
+}
+
 static void
 attachButtonInterface(as_object& o)
 {
-
-    as_c_function_ptr gettersetter;
-
-    o.init_property(NSV::PROP_uQUALITY, DisplayObject::quality,
-            DisplayObject::quality);
-    
-    o.init_property(NSV::PROP_uHIGHQUALITY, DisplayObject::highquality,
-            DisplayObject::highquality);
-
-    gettersetter = &DisplayObject::x_getset;
-    o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::y_getset;
-    o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::xscale_getset;
-    o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::yscale_getset;
-    o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::xmouse_get;
-    o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
-
-    gettersetter = &DisplayObject::ymouse_get;
-    o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
-
-    gettersetter = &DisplayObject::alpha_getset;
-    o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::visible_getset;
-    o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::width_getset;
-    o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::height_getset;
-    o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::rotation_getset;
-    o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::parent_getset;
-    o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
-    
-    gettersetter = &DisplayObject::target_getset;
-    o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
-
-    gettersetter = DisplayObject::name_getset;
-    o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
     
     const int unprotected = 0;
     o.init_member(NSV::PROP_ENABLED, true, unprotected);
@@ -323,6 +279,9 @@ Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
 {
 
     set_prototype(getButtonInterface());
+
+    // TODO: should be done in a creation function.
+    attachButtonProperties(*this);
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {

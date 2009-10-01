@@ -61,6 +61,18 @@ namespace gnash {
 
 namespace gnash {
 
+/// Attaches common DisplayObject properties such as _height, _x, _visible
+//
+/// This should be called by DisplayObject subclasses to ensure that
+/// the correct properties are attached.
+void attachDisplayObjectProperties(as_object& o);
+
+bool setDisplayObjectProperty(as_object& obj, string_table::key key,
+        const as_value& val);
+
+bool getDisplayObjectProperty(as_object& obj, string_table::key key,
+        as_value& val);
+
 /// DisplayObject is the base class for all DisplayList objects.
 //
 /// It represents a single active element in a movie. This class does not
@@ -245,24 +257,23 @@ public:
     /// Set the width of this DisplayObject, modifying its SWFMatrix
     //
     /// This is used when setting _width
-    /// See width_getset
     ///
-    /// @param w new width, in TWIPS. TODO: should this be an integer ?
-    ///
-    void set_width(double width);
+    /// @param w new width, in TWIPS. 
+    //
+    /// TextField does this differently (caches not updated).
+    virtual void setWidth(double width);
 
     /// Set the height of this DisplayObject, modifying its SWFMatrix
     //
     /// This is used when setting _height
-    /// See height_getset
     ///
-    /// @param h new height, in TWIPS. TODO: should this be an integer ?
+    /// @param h new height, in TWIPS. 
     ///
-    void set_height(double height);
+    virtual void setHeight(double height);
 
     const cxform& get_cxform() const { return m_color_transform; }
 
-    void  set_cxform(const cxform& cx) 
+    void set_cxform(const cxform& cx) 
     {       
         if (cx != m_color_transform) {
             set_invalidated(__FILE__, __LINE__);
@@ -936,58 +947,20 @@ public:
     /// Default is a no-op. TextField implements this function.
     virtual void killFocus() {}
   
-    /// Getter-setter for _highquality.
-    static as_value highquality(const fn_call& fn);
-  
-    /// Getter-setter for _quality.
-    static as_value quality(const fn_call& fn);
-  
+    double rotation() const {
+        return _rotation;
+    }
+
+    double scaleX() const {
+        return _xscale;
+    }
+
+    double scaleY() const {
+        return _yscale;
+    }
+
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
-  
-    /// Getter-setter for _x
-    static as_value x_getset(const fn_call& fn);
-  
-    /// Getter-setter for _y
-    static as_value y_getset(const fn_call& fn);
-  
-    /// Getter-setter for _xscale
-    static as_value xscale_getset(const fn_call& fn);
-  
-    /// Getter-setter for _yscale
-    static as_value yscale_getset(const fn_call& fn);
-  
-    /// Getter-setter for _xmouse
-    static as_value xmouse_get(const fn_call& fn);
-  
-    /// Getter-setter for _ymouse
-    static as_value ymouse_get(const fn_call& fn);
-  
-    /// Getter-setter for _alpha
-    static as_value alpha_getset(const fn_call& fn);
-  
-    /// Getter-setter for _visible
-    static as_value visible_getset(const fn_call& fn);
-  
-    /// Getter-setter for _width
-    static as_value width_getset(const fn_call& fn);
-  
-    /// Getter-setter for _height
-    static as_value height_getset(const fn_call& fn);
-  
-    /// Getter-setter for _rotation
-    static as_value rotation_getset(const fn_call& fn);
-  
-    /// Getter-setter for _parent 
-    static as_value parent_getset(const fn_call& fn);
-  
-    /// Getter-setter for _target 
-    static as_value target_getset(const fn_call& fn);
-  
-    /// Getter-setter for _name
-    static as_value name_getset(const fn_call& fn);
-  
-    /// @} Common ActionScript getter-setters for DisplayObjects
   
 protected:
 
@@ -1099,6 +1072,7 @@ protected:
     /// Will be set by set_invalidated() and used by
     /// get_invalidated_bounds().
     InvalidatedRanges m_old_invalidated_ranges;
+    
 
 private:
 
