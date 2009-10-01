@@ -891,7 +891,7 @@ bool FBGui::check_mouse()
     // button
     if (btn != mouse_btn) {
       mouse_btn = btn;
-      
+printf("clicked: %d\n", btn);      
       notify_mouse_clicked(btn, 1);  // mark=??
       //log_debug(_("mouse click! %d"), btn);
     }    
@@ -999,6 +999,7 @@ bool FBGui::check_mouse()
     
     if (new_btn != mouse_btn) {
       mouse_btn = new_btn;      
+printf("clicked: %d\n", mouse_btn);      
       notify_mouse_clicked(mouse_btn, 1);  // mask=?
       activity = true;
     }
@@ -1164,9 +1165,8 @@ bool FBGui::check_mouse()
   // Assuming we will never read less than one full struct...  
   
   while ((loops++ < 100) && (read(input_fd, &ev, sizeof ev) == (sizeof ev))) {
-  
+
     if (ev.type == EV_SYN) {    // synchronize (apply information)
-    
       if ((new_mouse_x != mouse_x) || (new_mouse_y != mouse_y)) {
       
         mouse_x = new_mouse_x;
@@ -1201,7 +1201,7 @@ bool FBGui::check_mouse()
       }
 
       if (coordinatedebug)
-        printf("% 5d / % 5d / % 5d\n", mouse_x, mouse_y, mouse_btn);
+        printf("DEBUG: % 5d / % 5d / % 5d\n", mouse_x, mouse_y, mouse_btn);
       
     }
   
@@ -1215,6 +1215,7 @@ bool FBGui::check_mouse()
     if (ev.type == EV_ABS) {    // absolute coordinate
       if (ev.code == ABS_X) new_mouse_x = ev.value;
       if (ev.code == ABS_Y) new_mouse_y = ev.value;
+      if (ev.code == ABS_PRESSURE) new_mouse_btn = ev.value >= 128;
     }
     
     if (ev.type == EV_REL) {    // relative movement
