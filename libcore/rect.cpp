@@ -25,6 +25,9 @@
 
 namespace gnash {
 
+const boost::int32_t rect::rectNull;
+const boost::int32_t rect::rectMax;
+
 void rect::read(SWFStream& in)
 {
     in.align();
@@ -51,37 +54,9 @@ void rect::read(SWFStream& in)
     } 
 }
 
-point
-rect::get_point(int i) const
-// Get one of the rect verts.
-{
-    assert( !is_null() );
-    
-    point p;
-    switch(i)
-    {
-    case 0:
-        p.x = _xMin; p.y = _yMin;
-        break;
-    case 1:
-        p.x = _xMax; p.y = _yMin;
-        break;
-    case 2:
-        p.x = _xMax; p.y = _yMax;
-        break;
-    case 3:
-        p.x = _xMin; p.y = _yMax;
-        break;
-    default:
-        assert(0);
-        break;
-    }
-    return p;
-}
-
-
-void    rect::enclose_transformed_rect(const SWFMatrix& m, const rect& r)
 // Set ourself to bound a rectangle that has been transformed by m.  
+void
+rect::enclose_transformed_rect(const SWFMatrix& m, const rect& r)
 {   
     boost::int32_t  x1 = r.get_x_min();
     boost::int32_t  y1 = r.get_y_min();
