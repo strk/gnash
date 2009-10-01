@@ -79,7 +79,7 @@ public:
     /// Container DisplayObjects (sprite and buttons) return the composite
     /// bounds of all their children, appropriately transformed with
     /// their local SWFMatrix.
-    virtual rect getBounds() const = 0;
+    virtual SWFRect getBounds() const = 0;
 
     /// \brief
     /// Return the topmost entity covering the given point

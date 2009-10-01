@@ -958,10 +958,10 @@ movie_root::doMouseDrag()
 
 	if ( m_drag_state.hasBounds() )
 	{
-		rect bounds;
+		SWFRect bounds;
 		// bounds are in local coordinate space
 		bounds.enclose_transformed_rect(parent_world_mat, m_drag_state.getBounds());
-		// Clamp mouse coords within a defined rect.
+		// Clamp mouse coords within a defined SWFRect.
 		bounds.clamp(world_mouse);
 	}
 
@@ -1104,7 +1104,7 @@ movie_root::display()
 	clearInvalidated();
 
 	// TODO: should we consider the union of all levels bounds ?
-	const rect& frame_size = _rootMovie->get_frame_size();
+	const SWFRect& frame_size = _rootMovie->get_frame_size();
 	if ( frame_size.is_null() )
 	{
 		// TODO: check what we should do if other levels
@@ -1133,7 +1133,7 @@ movie_root::display()
 		if (movie->visible() == false) continue;
 
 		// null frame size ? don't display !
-		const rect& sub_frame_size = movie->get_frame_size();
+		const SWFRect& sub_frame_size = movie->get_frame_size();
 
 		if ( sub_frame_size.is_null() )
 		{

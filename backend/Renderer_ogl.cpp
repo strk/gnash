@@ -677,7 +677,7 @@ public:
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
   virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m,
-          const rect* bounds, bool /*smooth*/)
+          const SWFRect* bounds, bool /*smooth*/)
   {
     GLint index;
 
@@ -708,7 +708,7 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(GnashImage* frame, const SWFMatrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(GnashImage* frame, const SWFMatrix* m, const SWFRect* bounds)
   {
   
     if (frame->type() == GNASH_IMAGE_RGBA)
@@ -762,7 +762,7 @@ public:
 
   // FIXME
   geometry::Range2d<int>
-  world_to_pixel(const rect& worldbounds)
+  world_to_pixel(const SWFRect& worldbounds)
   {
     // TODO: verify this is correct
     geometry::Range2d<int> ret(worldbounds.getRange());

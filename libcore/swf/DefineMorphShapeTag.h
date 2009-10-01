@@ -91,7 +91,7 @@ private:
     ShapeRecord _shape1;
     ShapeRecord _shape2;
     
-    rect _bounds;
+    SWFRect _bounds;
 
 };
 

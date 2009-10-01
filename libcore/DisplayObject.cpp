@@ -256,7 +256,7 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     ranges.add(m_old_invalidated_ranges);
     if (visible() && (m_invalidated||force))
     {
-        rect bounds;        
+        SWFRect bounds;        
         bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
         ranges.add(bounds.getRange());                        
     }        
@@ -372,7 +372,7 @@ DisplayObject::set_visible(bool visible)
 void
 DisplayObject::setWidth(double newwidth)
 {
-	const rect& bounds = getBounds();
+	const SWFRect& bounds = getBounds();
 	const double oldwidth = bounds.width();
 	assert(oldwidth >= 0); 
 
@@ -388,7 +388,7 @@ DisplayObject::setWidth(double newwidth)
 as_value
 getHeight(DisplayObject& o)
 {
-	rect bounds = o.getBounds();
+	SWFRect bounds = o.getBounds();
     const SWFMatrix m = o.getMatrix();
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
@@ -410,7 +410,7 @@ setHeight(DisplayObject& o, const as_value& val)
 void
 DisplayObject::setHeight(double newheight)
 {
-	const rect& bounds = getBounds();
+	const SWFRect& bounds = getBounds();
 
 	const double oldheight = bounds.height();
 	assert(oldheight >= 0); 
@@ -864,7 +864,7 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 bool 
 DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
-  rect mybounds = getBounds();
+  SWFRect mybounds = getBounds();
   getWorldMatrix().transform(mybounds);
   
   return renderer.bounds_in_clipping_area(mybounds.getRange());  
@@ -1370,7 +1370,7 @@ getSoundBufTime(DisplayObject& /*o*/)
 as_value
 getWidth(DisplayObject& o)
 {
-	rect bounds = o.getBounds();
+	SWFRect bounds = o.getBounds();
     const SWFMatrix& m = o.getMatrix();
     m.transform(bounds);
     return twipsToPixels(bounds.width());

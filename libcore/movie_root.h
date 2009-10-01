@@ -1019,7 +1019,6 @@ private:
     /// Process all actions in the queue
     void processActionQueue();
 
-    // TODO: use Range2d<int> ?
     int m_viewport_x0, m_viewport_y0;
 
     /// Width and height of viewport, in pixels

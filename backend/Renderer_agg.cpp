@@ -349,7 +349,7 @@ public:
         const agg::gray8 black(0);
                 
         // region can't be world as it should be intersected with 
-        // the visible rect
+        // the visible SWFRect
         assert(!region.isWorld());
 
         unsigned int left = region.getMinX();
@@ -607,7 +607,7 @@ public:
     }
 
     void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
-        const rect* bounds, bool smooth)
+        const SWFRect* bounds, bool smooth)
     {
     
         // NOTE: Assuming that the source image is RGB 8:8:8
@@ -909,7 +909,7 @@ public:
   /// rendering of characters outside a particular clipping range.
   /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
   /// *must* be initialized prior to using those function.
-  void select_clipbounds(const rect& objectBounds, const SWFMatrix& source_mat)
+  void select_clipbounds(const SWFRect& objectBounds, const SWFMatrix& source_mat)
   {
     
     SWFMatrix mat = stage_matrix;
@@ -924,7 +924,7 @@ public:
       return;
     }   
 
-    rect bounds;    
+    SWFRect bounds;    
     bounds.set_null();
     bounds.expand_to_transformed_rect(mat, objectBounds);
     
@@ -967,7 +967,7 @@ public:
             const SWFMatrix& worldMat)
     {
         // check if the character needs to be rendered at all
-        rect cur_bounds;
+        SWFRect cur_bounds;
 
         cur_bounds.expand_to_transformed_rect(worldMat, shape.getBounds());
                 
@@ -1881,7 +1881,7 @@ public:
     float world_x, float world_y)
   {
     // negative pixels seems ok here... we don't 
-    // clip to valid range, use world_to_pixel(rect&)
+    // clip to valid range, use world_to_pixel(SWFRect&)
     // and Intersect() against valid range instead.
     point p(world_x, world_y);
     stage_matrix.transform(p);
@@ -1889,7 +1889,7 @@ public:
     y = (int)p.y;
   }
 
-  geometry::Range2d<int> world_to_pixel(const rect& wb)
+  geometry::Range2d<int> world_to_pixel(const SWFRect& wb)
   {
       using namespace gnash::geometry;
 
@@ -1931,7 +1931,7 @@ public:
     set_invalidated_regions(ranges);
   }
   
-  virtual void set_invalidated_region(const rect& bounds) {
+  virtual void set_invalidated_region(const SWFRect& bounds) {
   
     // NOTE: Both single and multi ranges are supported by AGG renderer.
     

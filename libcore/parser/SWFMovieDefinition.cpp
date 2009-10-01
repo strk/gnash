@@ -330,7 +330,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	_str.reset(new SWFStream(_in.get()));
 
 	m_frame_size.read(*_str);
-	// If the rect is malformed, rect::read would already 
+	// If the SWFRect is malformed, SWFRect::read would already 
 	// print an error. We check again here just to give 
 	// the error are better context.
 	if ( m_frame_size.is_null() )

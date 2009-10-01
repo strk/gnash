@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "rect.h"
+#include "SWFRect.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
@@ -25,10 +25,10 @@
 
 namespace gnash {
 
-const boost::int32_t rect::rectNull;
-const boost::int32_t rect::rectMax;
+const boost::int32_t SWFRect::rectNull;
+const boost::int32_t SWFRect::rectMax;
 
-void rect::read(SWFStream& in)
+void SWFRect::read(SWFStream& in)
 {
     in.align();
     in.ensureBits(5);
@@ -40,7 +40,7 @@ void rect::read(SWFStream& in)
     _yMin = in.read_sint(nbits);
     _yMax = in.read_sint(nbits);
 
-    // Check if this rect is valid.
+    // Check if this SWFRect is valid.
     if (_xMax < _xMin || _yMax < _yMin)
     {
         // We set invalid rectangles to NULL, but we might instead
@@ -56,7 +56,7 @@ void rect::read(SWFStream& in)
 
 // Set ourself to bound a rectangle that has been transformed by m.  
 void
-rect::enclose_transformed_rect(const SWFMatrix& m, const rect& r)
+SWFRect::enclose_transformed_rect(const SWFMatrix& m, const SWFRect& r)
 {   
     boost::int32_t  x1 = r.get_x_min();
     boost::int32_t  y1 = r.get_y_min();
@@ -80,8 +80,8 @@ rect::enclose_transformed_rect(const SWFMatrix& m, const rect& r)
 }
 
 void
-rect::expand_to_rect(const rect& r) 
-// Expand ourself to enclose the given rect.
+SWFRect::expand_to_rect(const SWFRect& r) 
+// Expand ourself to enclose the given SWFRect.
 {    
     if( r.is_null() ) {
         return;
@@ -98,8 +98,8 @@ rect::expand_to_rect(const rect& r)
 }   
 
 void
-rect::expand_to_transformed_rect(const SWFMatrix& m, const rect& r)
-// Expand ourself to a transformed rect.
+SWFRect::expand_to_transformed_rect(const SWFMatrix& m, const SWFRect& r)
+// Expand ourself to a transformed SWFRect.
 {   
     if ( r.is_null() )
     {
@@ -131,7 +131,7 @@ rect::expand_to_transformed_rect(const SWFMatrix& m, const rect& r)
     expand_to(p3.x, p3.y);
 }
 
-void    rect::set_lerp(const rect& a, const rect& b, float t)
+void    SWFRect::set_lerp(const SWFRect& a, const SWFRect& b, float t)
 // Set this to the lerp of a and b.
 {
     assert( !a.is_null() );
@@ -144,7 +144,7 @@ void    rect::set_lerp(const rect& a, const rect& b, float t)
 }
 
 void
-rect::clamp(point& p) const
+SWFRect::clamp(point& p) const
 {
     assert( !is_null() );
     p.x = gnash::clamp<boost::int32_t>(p.x, _xMin, _xMax);
@@ -152,7 +152,7 @@ rect::clamp(point& p) const
 }
 
 std::string
-rect::toString() const
+SWFRect::toString() const
 {
     std::stringstream ss;
     ss << *this;

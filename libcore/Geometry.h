@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-    class rect; 
+    class SWFRect; 
 }
 
 namespace gnash { 
@@ -272,7 +272,7 @@ public:
         assert(empty());
     }
 
-    /// Expand given rect to include bounds of this path
+    /// Expand given SWFRect to include bounds of this path
     //
     /// @param r
     ///    The rectangle to expand with our own bounds
@@ -286,7 +286,7 @@ public:
     ///    SWF version to use.
     ///
     void
-    expandBounds(rect& r, unsigned int thickness, int swfVersion) const
+    expandBounds(SWFRect& r, unsigned int thickness, int swfVersion) const
     {
         const Path&    p = *this;
         size_t nedges = m_edges.size();

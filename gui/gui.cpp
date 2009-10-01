@@ -1009,7 +1009,7 @@ Gui::want_redraw()
 }
 
 void
-Gui::setInvalidatedRegion(const rect& /*bounds*/)
+Gui::setInvalidatedRegion(const SWFRect& /*bounds*/)
 {
 }
 
@@ -1019,10 +1019,10 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	// fallback to single regions
 	geometry::Range2d<float> full = ranges.getFullArea();
 	
-	rect bounds;
+	SWFRect bounds;
 	
 	if (full.isFinite())
-		bounds = rect(full.getMinX(), full.getMinY(), full.getMaxX(), full.getMaxY());
+		bounds = SWFRect(full.getMinX(), full.getMinY(), full.getMaxX(), full.getMaxY());
 	else
 	if (full.isWorld())
 		bounds.set_world();

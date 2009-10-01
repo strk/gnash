@@ -51,7 +51,7 @@ class RiscosGui : public Gui
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
-    virtual void setInvalidatedRegion(const rect& bounds);
+    virtual void setInvalidatedRegion(const SWFRect& bounds);
 
 
  private:

@@ -21,7 +21,7 @@
 #include "GnashImage.h"
 #include "fill_style.h"
 #include "DynamicShape.h"
-#include "rect.h"
+#include "SWFRect.h"
 #include "Renderer.h"
 #include "VM.h"
 #include "movie_root.h"
@@ -37,7 +37,7 @@ Bitmap::Bitmap(BitmapData_as* bd, DisplayObject* parent,
     _width(_bitmapData->getWidth()),
     _height(_bitmapData->getHeight())
 {
-    _shape.setBounds(rect(0, 0, pixelsToTwips(_width), pixelsToTwips(_height)));
+    _shape.setBounds(SWFRect(0, 0, pixelsToTwips(_width), pixelsToTwips(_height)));
 }
 
 Bitmap::Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
@@ -95,13 +95,13 @@ Bitmap::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 
     ranges.add(m_old_invalidated_ranges);
 
-    rect bounds;
+    SWFRect bounds;
     bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds()); 
     ranges.add(bounds.getRange());
 
 }
 
-rect
+SWFRect
 Bitmap::getBounds() const
 {
     return _shape.getBounds();

@@ -20,7 +20,7 @@
 #ifndef GNASH_DRAG_STATE_H
 #define GNASH_DRAG_STATE_H
 
-#include "rect.h" // for composition
+#include "SWFRect.h" // for composition
 #include "smart_ptr.h" // we keep DisplayObject being dragged by intrusive_ptr
 
 namespace gnash
@@ -36,10 +36,9 @@ class drag_state
 
 	bool _hasbounds;
 
-	/// Boundaries to constraint the drag into.
+	/// Boundaries to constrain the drag into.
 	/// Coordinates in TWIPS.
-	/// TODO: use Range2d<float> directly ?
-	rect _bounds;
+	SWFRect _bounds;
 
 	boost::intrusive_ptr<DisplayObject> _displayObject;
 
@@ -86,9 +85,9 @@ public:
 	///
 	/// Note that if hasBounds() is false
 	/// the returned rectangle is the NULL
-	/// rectangle - see rect::is_null().
+	/// rectangle - see SWFRect::is_null().
 	///
-	const rect& getBounds() const { return _bounds; }
+	const SWFRect& getBounds() const { return _bounds; }
 
 	/// \brief
 	/// Set the boundaries to constraint
@@ -97,7 +96,7 @@ public:
 	/// Coordinates of the rectangle are
 	/// expected in TWIPS.
 	///
-	void setBounds(const rect& bounds) {
+	void setBounds(const SWFRect& bounds) {
 		_bounds = bounds;
 		_hasbounds = true;
 	}

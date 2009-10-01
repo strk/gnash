@@ -21,7 +21,7 @@
 #include "InteractiveObject.h" // for inheritance
 #include "styles.h" // for line_style
 #include "Range2d.h"
-#include "rect.h" // for inlines
+#include "SWFRect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
 
 #include <vector>
@@ -114,8 +114,8 @@ public:
     //
     /// Notably, the default textHeight is 12pt (240 twips).
 	/// @param parent A pointer to the DisplayObject parent of this TextField
-	/// @param bounds A rect specifying the bounds of this TextField
-    TextField(DisplayObject* parent, const rect& bounds);
+	/// @param bounds A SWFRect specifying the bounds of this TextField
+    TextField(DisplayObject* parent, const SWFRect& bounds);
 
 	~TextField();
 
@@ -204,8 +204,8 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-	/// \brief Get bounding rect of this TextField
-	virtual rect getBounds() const
+	/// \brief Get bounding SWFRect of this TextField
+	virtual SWFRect getBounds() const
 	{
 		return _bounds;
 	}
@@ -597,7 +597,7 @@ public:
 
 	void setTextFormat(TextFormat_as& tf);
 
-	const rect& getTextBoundingBox() const
+	const SWFRect& getTextBoundingBox() const
 	{
 		return m_text_bounding_box;
 	}
@@ -754,7 +754,7 @@ private:
 	bool _restrictDefined;
 
 	/// bounds of dynamic text, as laid out
-	rect m_text_bounding_box;
+	SWFRect m_text_bounding_box;
 
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
@@ -858,7 +858,7 @@ private:
 	/// extended to fit text or hide text overflowing it.
 	/// See the setAutoSize() method to change that.
 	///
-	rect _bounds;
+	SWFRect _bounds;
 
     /// Represents the selected part of the text. The second element must
     /// never be less than the first.

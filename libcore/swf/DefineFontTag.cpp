@@ -321,7 +321,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
         // Bounds table.
         {
-            rect dummy_rect;
+            SWFRect dummy_rect;
             // TODO: shouldn't we log_unimpl here ??
             for (size_t i = 0; i < nGlyphs; i++) dummy_rect.read(in);
         }

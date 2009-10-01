@@ -26,7 +26,7 @@
 
 #include "DefinitionTag.h"
 #include "SWF.h"
-#include "rect.h" // for composition
+#include "SWFRect.h" // for composition
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
 
 #include <boost/shared_array.hpp>
@@ -107,7 +107,7 @@ public:
             movie_definition& m);
 
 	/// Return local video bounds in twips
-	const rect&	bounds() const
+	const SWFRect&	bounds() const
 	{
 		return m_bound;
 	}
@@ -189,7 +189,7 @@ private:
 	media::videoCodecType m_codec_id;
 
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
-	rect m_bound;
+	SWFRect m_bound;
 
     // Mutable for locking in const member functions.
 	mutable boost::mutex _video_mutex;

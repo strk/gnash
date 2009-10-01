@@ -24,7 +24,6 @@
 #include "fn_call.h"
 #include "as_value.h"
 #include "flash/net/NetStream_as.h"
-#include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "NativeFunction.h" 
 #include "movie_root.h"
@@ -147,7 +146,7 @@ Video::display(Renderer& renderer)
 	assert(m_def);
 
 	SWFMatrix m = getWorldMatrix();
-	const rect& bounds = m_def->bounds();
+	const SWFRect& bounds = m_def->bounds();
 
 	GnashImage* img = getVideoFrame();
 	if (img)
@@ -288,7 +287,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	// case I think add_invalidated_bouns would never be invoked on us...
 	assert ( m_def );
 
-	rect bounds;	
+	SWFRect bounds;	
 	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
 	
 	ranges.add(bounds.getRange());            
@@ -323,14 +322,14 @@ registerVideoNative(as_object& global)
     vm.registerNative(video_clear, 667, 2);
 }
 
-rect
+SWFRect
 Video::getBounds() const
 {
 	if (_embeddedStream) return m_def->bounds();
 
 	// TODO: return the bounds of the dynamically
 	//       loaded video if not embedded ?
-	return rect();
+	return SWFRect();
 }
 
 #ifdef GNASH_USE_GC

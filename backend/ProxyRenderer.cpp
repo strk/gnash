@@ -88,7 +88,7 @@ namespace render
 
 	// Draws the video frames
 	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
-            const rect* bounds, bool smooth)
+            const SWFRect* bounds, bool smooth)
     {
 		if (s_Renderer) {
             return s_Renderer->drawVideoFrame(frame, mat, bounds, smooth);
@@ -170,7 +170,7 @@ void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
 		if (s_Renderer) s_Renderer->drawGlyph(rec, color, mat);
 }
 
-bool bounds_in_clipping_area(const rect& bounds) {
+bool bounds_in_clipping_area(const SWFRect& bounds) {
 	return bounds_in_clipping_area(bounds.getRange());
   if (s_Renderer) 
     return s_Renderer->bounds_in_clipping_area(bounds);

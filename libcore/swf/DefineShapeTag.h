@@ -46,7 +46,7 @@ public:
         const;
 	
     /// Get cached bounds of this shape.
-    const rect& bounds() const { return _shape.getBounds(); }
+    const SWFRect& bounds() const { return _shape.getBounds(); }
 
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm) const;

@@ -26,7 +26,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
-#include "rect.h"    // for rect 
+#include "SWFRect.h"    // for SWFRect 
 #include "Point2d.h" // for Point2d
 
 #include <iostream> 
@@ -161,7 +161,7 @@ public:
     ///
     void    transform(geometry::Range2d<float>& r) const;
 
-    void    transform(rect& r) const;
+    void    transform(SWFRect& r) const;
     
     /// Invert this SWFMatrix and return the result.
     SWFMatrix& invert();

@@ -87,7 +87,7 @@ libgnashcore_la_SOURCES = \
 	SWFMovie.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
-	rect.cpp \
+	SWFRect.cpp \
 	MovieClip.cpp \
 	swf/SWF.cpp \
 	swf/TagLoadersTable.cpp	\
@@ -234,7 +234,7 @@ EXTENSIONS_API = \
 	MouseButtonState.h \
 	drag_state.h \
 	InteractiveObject.h \
-	rect.h \
+	SWFRect.h \
 	GnashKey.h \
 	Movie.h \
 	RunResources.h \

@@ -1126,11 +1126,11 @@ movieclip_hitTest(const fn_call& fn)
                 return as_value();
             }
 
-            rect thisbounds = movieclip->getBounds();
+            SWFRect thisbounds = movieclip->getBounds();
             SWFMatrix thismat = movieclip->getWorldMatrix();
             thismat.transform(thisbounds);
 
-            rect tgtbounds = target->getBounds();
+            SWFRect tgtbounds = target->getBounds();
             SWFMatrix tgtmat = target->getWorldMatrix();
             tgtmat.transform(tgtbounds);
 
@@ -1397,7 +1397,7 @@ movieclip_getBounds(const fn_call& fn)
     boost::intrusive_ptr<DisplayObject> movieclip =
         ensureType<DisplayObject>(fn.this_ptr);
 
-    rect bounds = movieclip->getBounds();
+    SWFRect bounds = movieclip->getBounds();
 
     if ( fn.nargs > 0 )
     {
@@ -2372,7 +2372,7 @@ movieclip_startDrag(const fn_call& fn)
                 }
             );
 
-            rect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+            SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
                     pixelsToTwips(x1), pixelsToTwips(y1));
             st.setBounds(bounds);
         }

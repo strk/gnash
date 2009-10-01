@@ -29,7 +29,7 @@
 namespace gnash {
 	class DisplayObject;
 	class SWFMatrix;
-	class rect;
+	class SWFRect;
     namespace SWF {
         class TextRecord;
     }
