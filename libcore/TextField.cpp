@@ -2755,38 +2755,25 @@ TextField::markReachableResources() const
 void
 TextField::setWidth(double newwidth)
 {
-	const rect& bounds = getBounds();
-	const double oldwidth = bounds.width();
-	assert(oldwidth >= 0); 
-
-    const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
-    const double rot = rotation() * PI / 180.0;
-
-    SWFMatrix m = getMatrix();
-    const double yscale = m.get_y_scale();
-    m.set_scale_rotation(xscale, yscale, rot);
-
-    // TextField does not update the cache, unlike MovieClip.
-    setMatrix(m, false); 
+	rect bounds = getBounds();
+    log_debug("xmin: %d, width: %d", twipsToPixels(bounds.get_x_min()),
+            twipsToPixels(newwidth));
+    _bounds.set_to_rect(bounds.get_x_min(),
+            bounds.get_y_min(),
+            bounds.get_x_min() + newwidth,
+            bounds.get_y_max());
 }
 
 void
 TextField::setHeight(double newheight)
 {
-	const rect& bounds = getBounds();
-
-	const double oldheight = bounds.height();
-	assert(oldheight >= 0); 
-
-    const double yscale = oldheight ? (newheight / oldheight) : 0;
-    const double rot = rotation() * PI / 180.0;
-
-    SWFMatrix m = getMatrix();
-    const double xscale = m.get_x_scale();
-    m.set_scale_rotation(xscale, yscale, rot);
-    
-    // TextField does not update the cache, unlike MovieClip.
-    setMatrix(m, false);
+	rect bounds = getBounds();
+    log_debug("ymin: %d, width: %d", twipsToPixels(bounds.get_y_min()),
+            twipsToPixels(newheight));
+    _bounds.set_to_rect(bounds.get_x_min(),
+            bounds.get_y_min(),
+            bounds.get_x_max(),
+            bounds.get_y_min() + newheight);
 }
 
 /// TextField interface functions
