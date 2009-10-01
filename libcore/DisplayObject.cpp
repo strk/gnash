@@ -562,6 +562,9 @@ DisplayObject::getUserDefinedEventHandler(string_table::key key) const
 	return func;
 }
 
+/// Set the real and cached x scale.
+//
+/// Cached rotation and y scale are not updated.
 void
 DisplayObject::set_x_scale(double scale_percent)
 {
@@ -591,25 +594,27 @@ DisplayObject::set_x_scale(double scale_percent)
 	transformedByScript(); 
 }
 
+/// Set the real and cached rotation.
+//
+/// Cached scale values are not updated.
 void
 DisplayObject::set_rotation(double rot)
 {
 	// Translate to the -180 .. 180 range
-	rot = std::fmod (rot, 360.0);
+	rot = std::fmod(rot, 360.0);
 	if (rot > 180.0) rot -= 360.0;
 	else if (rot < -180.0) rot += 360.0;
 
-	//log_debug("_rotation: %d", rot);
-
 	double rotation = rot * PI / 180.0;
 
-	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
-
-    // TODO: check if there's any case we should use _yscale here
     if (_xscale < 0 ) rotation += PI; 
 
 	SWFMatrix m = getMatrix();
     m.set_rotation(rotation);
+
+    // Update the matrix from the cached x scale to avoid accumulating
+    // errors.
+    m.set_x_scale(std::abs(scaleX() / 100.0));
 	setMatrix(m); // we update the cache ourselves
 
 	_rotation = rot;
@@ -617,6 +622,10 @@ DisplayObject::set_rotation(double rot)
 	transformedByScript(); 
 }
 
+
+/// Set the real and cached y scale.
+//
+/// Cached rotation and x scale are not updated.
 void
 DisplayObject::set_y_scale(double scale_percent)
 {
