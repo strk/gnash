@@ -4162,9 +4162,9 @@ class TextField_as {
 #else
 		 //check(origTextWidth > tf.textWidth);
 		 if(origTextWidth > untyped tf.textWidth) {
-			 DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is less than "+origTextWidth);
+			 DejaGnu.xpass("[line "+here.lineNumber+"] tf.textWidth is less than "+origTextWidth);
 		 } else {
-			 DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be less than "+origTextWidth+", is "+untyped tf.textWidth);
+			 DejaGnu.xfail("[line "+here.lineNumber+"] tf.textWidth should be less than "+origTextWidth+", is "+untyped tf.textWidth);
 		 }
 		//#endif
 #end
