@@ -31,7 +31,7 @@
 #include <vector>
 
 #ifdef ENABLE_NLS
-# include <locale>
+# include <clocale>
 #endif
 
 #include "log.h"

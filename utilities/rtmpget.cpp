@@ -22,8 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gettext.h"
-
 // classes internal to Gnash
 #include "gnash.h"
 #include "network.h"
@@ -43,12 +41,8 @@
 #include "element.h"
 #include "URL.h"
 
-// classes internal to Cygnal
-#include "buffer.h"
-#include "handler.h"
-
 #ifdef ENABLE_NLS
-#include <locale.h>
+#include <clocale>
 #endif
 
 #include <string>
@@ -152,7 +146,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }    
 
-#if 0
+#if 1
     string app; // the application name
     string path; // the path to the file on the server
     string tcUrl; // the tcUrl field
@@ -408,7 +402,7 @@ version_and_copyright()
 {
     cout << "rtmpget " << VERSION << endl
         << endl
-        << _("Copyright (C) 2008 Free Software Foundation, Inc.\n"
+        << _("Copyright (C) 2008, 2009 Free Software Foundation, Inc.\n"
         "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute copies of Cygnal under the terms of the GNU General\n"
         "Public License.  For more information, see the file named COPYING.\n")

@@ -46,7 +46,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
-#include <locale>
+#include <clocale>
 #include <sstream>
 #include <iomanip>
 #include <string>

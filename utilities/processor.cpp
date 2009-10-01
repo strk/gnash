@@ -35,7 +35,7 @@
 #include <ctime>
 
 #ifdef ENABLE_NLS
-#include <locale>
+#include <clocale>
 #endif
 
 #include "MovieFactory.h"
