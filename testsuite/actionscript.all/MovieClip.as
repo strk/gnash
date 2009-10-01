@@ -458,7 +458,7 @@ check(!mc.__proto__.hasOwnProperty("_level"));
 check(!mc.hasOwnProperty("_target"));
 check(!mc.hasOwnProperty("_url"));
 check(!mc.hasOwnProperty("_soundbuftime"));
-xcheck(!mc.hasOwnProperty("_focusrect"));
+check(!mc.hasOwnProperty("_focusrect"));
 xcheck(!mc.hasOwnProperty("_framesloaded"));
 check(!mc.hasOwnProperty("_lockroot"));
 check(!mc.hasOwnProperty("_highquality"));
