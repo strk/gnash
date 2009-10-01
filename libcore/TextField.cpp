@@ -176,7 +176,6 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _bounds(def.bounds()),
     _selection(0, 0)
 {
-
     // WARNING! remember to set the font *before* setting text value!
     boost::intrusive_ptr<const Font> f = def.getFont();
     if (!f) f = fontlib::get_default_font(); 
@@ -358,7 +357,6 @@ TextField::cursorRecord()
 void
 TextField::display(Renderer& renderer)
 {
-
     registerTextVariable();
 
     const bool drawBorder = getDrawBorder();
@@ -414,6 +412,7 @@ TextField::display(Renderer& renderer)
     _displayRecords.clear();
     float scale = getFontHeight() / (float)_font->unitsPerEM(_embedFonts);
     float fontLeading = _font->leading() * scale;
+
     //offset the lines
     int yoffset = (getFontHeight() + fontLeading) + PADDING_TWIPS;
     size_t recordline;
@@ -1024,7 +1023,6 @@ TextField::align_line(TextAlignment align,
     float right_margin = getRightMargin();
 
     float extra_space = (width - right_margin) - x - PADDING_TWIPS;
-
     //assert(extra_space >= 0.0f);
     if (extra_space <= 0.0f)
     {
@@ -1053,11 +1051,10 @@ TextField::align_line(TextAlignment align,
         // Shift all the way to the right.
         shift_right = extra_space;
     }
-
     // Shift the beginnings of the records on this line.
-    for (unsigned int i = last_line_start_record; i < _displayRecords.size(); ++i)
+    for (unsigned int i = last_line_start_record; i < _textRecords.size(); ++i)
     {
-        SWF::TextRecord& rec = _displayRecords[i];
+        SWF::TextRecord& rec = _textRecords[i];
 
         //if ( rec.hasXOffset() ) // why?
             rec.setXOffset(rec.xOffset() + shift_right); 
@@ -1266,10 +1263,10 @@ TextField::format_text()
     std::wstring::const_iterator it = _text.begin();
     const std::wstring::const_iterator e = _text.end();
 
-    ///handleChar takes care of placing the glyphs
+    ///handleChar takes care of placing the glyphs    
     handleChar(it, e, x, y, rec, last_code, last_space_glyph,
             last_line_start_record);
-    
+                
     // Expand bounding box to include the whole text (if autoSize)
     if (_autoSize != autoSizeNone)
     {
@@ -1277,11 +1274,16 @@ TextField::format_text()
     }
 
     // Add the last line to our output.
-	_textRecords.push_back(rec);
+    _textRecords.push_back(rec);
+	
+    // align the last (or single) line
+    align_line(getTextAlignment(), last_line_start_record, x);
+	
 
     scrollLines();
 	
     set_invalidated(); //redraw
+    
 }
 
 void
@@ -2690,6 +2692,7 @@ TextField::getTextAlignment()
     if ( _autoSize == autoSizeCenter ) textAlignment = ALIGN_CENTER;
     else if ( _autoSize == autoSizeLeft ) textAlignment = ALIGN_LEFT;
     else if ( _autoSize == autoSizeRight ) textAlignment = ALIGN_RIGHT;
+
     return textAlignment;
 }
     
