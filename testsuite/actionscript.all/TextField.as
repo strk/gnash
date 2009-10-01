@@ -543,9 +543,14 @@ check_equals(typeof(tf._rotation), 'number');
 check(!tf.hasOwnProperty('_rotation'));
 check(!tf.__proto__.hasOwnProperty('_rotation'));
 check_equals(tf._rotation, 0);
+check_equals(tf._width, 500);
 tf._rotation = 10;
 check_equals(tf._rotation, 10);
+check_equals(tf._width, 579.2);
+check_equals(tf._xscale, 100.0);
 tf._rotation = 0;
+check_equals(tf._width, 500.0);
+check_equals(tf._xscale, 100.0);
 
 // Check TextField.scroll
 
@@ -836,7 +841,7 @@ currWidth = tf._width;
 tf._xscale = 200;
 note("textWidth: _xscale=100: "+currTextWidth+"; _xscale=200: "+tf.textWidth);
 // check_equals(tf.textWidth, currTextWidth*2); // not clear what does textWidth depend on
-xcheck_equals(tf._width, currWidth*2);
+check_equals(tf._width, currWidth*2);
 tf._xscale = 100;
 
 //-------------------------------------------------------------------------
@@ -1096,11 +1101,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(477);
+     check_totals(482);
 #elif OUTPUT_VERSION == 7
- check_totals(480);
+ check_totals(485);
 #elif OUTPUT_VERSION == 8
- check_totals(481);
+ check_totals(486);
 #endif
 
 #endif
