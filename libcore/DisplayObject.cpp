@@ -614,6 +614,8 @@ DisplayObject::set_rotation(double rot)
 
     // Update the matrix from the cached x scale to avoid accumulating
     // errors.
+    // TODO: also update y scale? The x scale update is needed to keep
+    // TextField correct; no tests for y scale.
     m.set_x_scale(std::abs(scaleX() / 100.0));
 	setMatrix(m); // we update the cache ourselves
 
@@ -934,7 +936,12 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
 
     const Getters& getters = displayObjectGetters();
 
-    Getters::const_iterator it = getters.find(key);
+    // The magic properties are case insensitive in all versions!
+    string_table& st = getStringTable(obj);
+    const std::string& propname = st.value(key);
+    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
+
+    Getters::const_iterator it = getters.find(noCaseKey);
     if (it == getters.end()) return false;
 
     DisplayObject& o = static_cast<DisplayObject&>(obj);
@@ -951,7 +958,12 @@ setDisplayObjectProperty(as_object& obj, string_table::key key,
 
     const Setters& setters = displayObjectSetters();
 
-    Setters::const_iterator it = setters.find(key);
+    // The magic properties are case insensitive in all versions!
+    string_table& st = getStringTable(obj);
+    const std::string& propname = st.value(key);
+    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
+
+    Setters::const_iterator it = setters.find(noCaseKey);
     if (it == setters.end()) return false;
 
     DisplayObject& o = static_cast<DisplayObject&>(obj);
@@ -1377,6 +1389,20 @@ setWidth(DisplayObject& o, const as_value& val)
     o.setWidth(newwidth);
 }
 
+as_value
+getFocusRect(DisplayObject& /*o*/)
+{
+    as_value null;
+    null.set_null();
+    return as_value(null);
+}
+
+void
+setFocusRect(DisplayObject& /*o*/, const as_value& /*val*/)
+{
+    LOG_ONCE(log_unimpl("_focusrect setting"));
+}
+
 const Getters
 displayObjectGetters()
 {
@@ -1395,12 +1421,14 @@ displayObjectGetters()
         (NSV::PROP_uNAME, getNameProperty)
         (NSV::PROP_uVISIBLE, getVisible)
         (NSV::PROP_uSOUNDBUFTIME, getSoundBufTime)
+        (NSV::PROP_uFOCUSRECT, getFocusRect)
         (NSV::PROP_uPARENT, getParent)
         (NSV::PROP_uTARGET, getTarget)
         (NSV::PROP_uXMOUSE, getMouseX)
         (NSV::PROP_uYMOUSE, getMouseY);
     return getters;
 }
+
 const Setters
 displayObjectSetters()
 {
@@ -1420,6 +1448,7 @@ displayObjectSetters()
         (NSV::PROP_uNAME, setName)
         (NSV::PROP_uVISIBLE, setVisible)
         (NSV::PROP_uSOUNDBUFTIME, setSoundBufTime)
+        (NSV::PROP_uFOCUSRECT, setFocusRect)
         (NSV::PROP_uPARENT, n)
         (NSV::PROP_uURL, n)
         (NSV::PROP_uTARGET, n)
