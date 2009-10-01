@@ -25,7 +25,7 @@
 #include <boost/shared_ptr.hpp>
 #include <dirent.h>
 #include <iostream>
-#include <stdarg.h>
+#include <cstdarg>
 #include <cstring>
 #include <string>
 #include <vector>
