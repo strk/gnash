@@ -50,7 +50,7 @@
 # include <netdb.h>
 # include <sys/param.h>
 # include <sys/select.h>
-#include <signal.h>
+#include <csignal>
 #ifdef HAVE_POLL_H
 # include <poll.h>
 #else 

@@ -31,7 +31,7 @@
 #include <sys/mman.h>
 #elif defined(__amigaos4__)
 #include <proto/exec.h>
-#include <stdlib.h> //for malloc/free
+#include <cstdlib> //for malloc/free
 #else
 #include <windows.h>
 #endif

@@ -18,12 +18,12 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string>
 #include <cstring>
-#include <signal.h>
+#include <csignal>
 #include <iostream>
 #include <cstdlib>
 
