@@ -197,8 +197,8 @@ check( TextField.prototype.__proto__.hasOwnProperty('toString') );
 // Check TextField._alpha
 
 check_equals(typeof(tf._alpha), 'number');
-check( ! tf.hasOwnProperty('_alpha') ); // why ??
-check( ! tf.__proto__.hasOwnProperty('_alpha') ); // why ??
+check( ! tf.hasOwnProperty('_alpha') ); 
+check( ! tf.__proto__.hasOwnProperty('_alpha') ); 
 
 // Check TextField.autoSize
 
@@ -579,6 +579,19 @@ check( ! tf.hasOwnProperty('_soundbuftime') );
 check( ! tf.__proto__.hasOwnProperty('_soundbuftime') ); 
 xcheck_equals(tf._soundbuftime, 5); // the default is 5, it seems
 
+// These seem to be only MovieClip properties.
+
+check_equals(typeof(tf._currentframe), 'undefined');
+check_equals(typeof(tf._totalframes), 'undefined');
+check_equals(typeof(tf._framesloaded), 'undefined');
+
+// Check TextField._focusrect
+check_equals(typeof(tf._focusrect), 'null');
+check_equals(typeof(tf._focusRect), 'null');
+check(! tf.hasOwnProperty('_focusrect') ); 
+check(! tf.__proto__.hasOwnProperty('_focusrect') ); 
+
+
 // Check TextField.tabEnabled
 
 check_equals(typeof(tf.tabEnabled), 'undefined');
@@ -809,6 +822,7 @@ check_equals(tf.wordWrap, false);
 //-------------------------------------------------------------------------
 
 check_equals(typeof(tf._x), 'number');
+check_equals(typeof(tf._X), 'number');
 check( ! tf.hasOwnProperty('_x') );
 check( ! tf.__proto__.hasOwnProperty('_x') );
 check_equals(tf._x, 10); // as set by createTextField
@@ -1101,11 +1115,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(482);
+     check_totals(490);
 #elif OUTPUT_VERSION == 7
- check_totals(485);
+ check_totals(493);
 #elif OUTPUT_VERSION == 8
- check_totals(486);
+ check_totals(494);
 #endif
 
 #endif
