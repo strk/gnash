@@ -1392,9 +1392,8 @@ setWidth(DisplayObject& o, const as_value& val)
 as_value
 getFocusRect(DisplayObject& /*o*/)
 {
-    as_value null;
-    null.set_null();
-    return as_value(null);
+    LOG_ONCE(log_unimpl("_focusrect"));
+    return as_value(true);
 }
 
 void

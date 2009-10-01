@@ -586,8 +586,10 @@ check_equals(typeof(tf._totalframes), 'undefined');
 check_equals(typeof(tf._framesloaded), 'undefined');
 
 // Check TextField._focusrect
-check_equals(typeof(tf._focusrect), 'null');
-check_equals(typeof(tf._focusRect), 'null');
+check(tf._focusrect !== 'null');
+check(tf._focusRect !== 'null');
+xcheck_equals(typeof(tf._focusrect), 'null');
+xcheck_equals(typeof(tf._focusRect), 'null');
 check(! tf.hasOwnProperty('_focusrect') ); 
 check(! tf.__proto__.hasOwnProperty('_focusrect') ); 
 
@@ -1115,11 +1117,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(490);
+     check_totals(492);
 #elif OUTPUT_VERSION == 7
- check_totals(493);
+ check_totals(495);
 #elif OUTPUT_VERSION == 8
- check_totals(494);
+ check_totals(496);
 #endif
 
 #endif
