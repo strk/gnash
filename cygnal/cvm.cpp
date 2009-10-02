@@ -37,7 +37,6 @@
 # include <locale>
 #endif
 
-#include "gettext.h"
 #include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"

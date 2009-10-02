@@ -41,7 +41,6 @@
 #include "MovieFactory.h"
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
-#include "gettext.h"
 #include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"

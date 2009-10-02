@@ -34,7 +34,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "gettext.h"
 #include "bzrversion.h"
 
 //#include "cvm.h"
@@ -78,7 +77,6 @@ extern "C"{
 
 #include "handler.h"
 #include "cache.h"
-#include "gettext.h"
 #include "cygnal.h"
 
 #ifdef ENABLE_NLS
