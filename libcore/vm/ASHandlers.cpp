@@ -52,7 +52,6 @@
 
 #include <string>
 #include <vector>
-#include <clocale>
 #include <cstdlib> // std::mbstowcs
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>

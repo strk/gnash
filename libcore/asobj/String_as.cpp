@@ -42,7 +42,7 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
-#include <clocale>
+#include <locale>
 #include <stdexcept>
 
 namespace gnash {
