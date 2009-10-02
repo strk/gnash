@@ -441,24 +441,6 @@ public:
         return 0;
     }
 
-    /// Returns local, untransformed height of this DisplayObject in TWIPS
-    //
-    /// Use getBounds() if you need more then simply the height.
-    ///
-    boost::int32_t get_height() const
-    {
-        return getBounds().height();
-    }
-
-    /// Returns local, untransformed width of this DisplayObject in TWIPS
-    //
-    /// Use getBounds() if you need more then simply the width.
-    ///
-    boost::int32_t get_width() const
-    {
-        return getBounds().width();
-    }
-
 	virtual rect getBounds() const = 0;
 
     /// Return true if the given point falls in this DisplayObject's bounds

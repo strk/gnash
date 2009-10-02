@@ -74,8 +74,8 @@ main(int /*argc*/, char** /*argv*/)
 	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(tmp, as_value(50));
 
-	check_equals(loaded->get_height(), 2056);
-	check_equals(loaded->get_width(), 2056);
+	check_equals(loaded->getBounds().height(), 2056);
+	check_equals(loaded->getBounds().width(), 2056);
 
 	const TextField* text = 
             dynamic_cast<const TextField*>(
