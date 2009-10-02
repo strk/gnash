@@ -26,8 +26,6 @@
 // If we don't have support for mallinfo(), this code is useless
 #if HAVE_MALLINFO
 
-#include <cstdlib>
-#include <malloc.h>
 #include <vector>
 
 #include "log.h"
