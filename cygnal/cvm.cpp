@@ -34,7 +34,7 @@
 #include <ctime>
 
 #ifdef ENABLE_NLS
-#include <clocale>
+# include <locale>
 #endif
 
 #include "gettext.h"

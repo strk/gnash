@@ -60,7 +60,7 @@ extern char *optarg;
 #include <cerrno>
 
 #ifdef ENABLE_NLS
-# include <clocale>
+# include <locale>
 #endif
 
 #include "log.h"

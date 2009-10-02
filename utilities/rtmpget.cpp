@@ -42,7 +42,7 @@
 #include "URL.h"
 
 #ifdef ENABLE_NLS
-#include <clocale>
+# include <locale>
 #endif
 
 #include <string>

@@ -25,7 +25,7 @@
 #include <cstring>
 
 #ifdef ENABLE_NLS
-# include <clocale>
+# include <locale>
 #endif
 
 extern "C"{

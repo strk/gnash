@@ -82,7 +82,7 @@ extern "C"{
 #include "cygnal.h"
 
 #ifdef ENABLE_NLS
-#include <clocale>
+# include <locale>
 #endif
 
 #include <boost/date_time/gregorian/gregorian.hpp>
