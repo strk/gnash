@@ -22,12 +22,11 @@
 
 #include <string>
 #include <sstream>
-#include <log.h>
 #include <iostream>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <time.h>
+#include <ctime>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -51,6 +50,7 @@
 #include "network.h"
 #include "element.h"
 #include "URL.h"
+#include "log.h"
 
 // cygnal headers
 #include "crc.h"
