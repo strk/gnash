@@ -792,7 +792,7 @@ public:
     _width  = fabsf(x1 - x0);
     _height = fabsf(y1 - y0);
 
-    glScalef((static_cast<float>(twipsToPixels(_width)) /
+    glScalef(static_cast<float>(twipsToPixels(_width)) /
     static_cast<float>(viewport_width),
     static_cast<float>(twipsToPixels(_height)) / 
     static_cast<float>(viewport_height), 1.0f);
