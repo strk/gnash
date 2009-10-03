@@ -534,7 +534,7 @@ fileio_fseek(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
-    long c = (long) fn.arg(0).to_number();
+    long c = static_cast<long>(fn.arg(0).to_number());
     return as_value(ptr->fseek(c));
 }
 

@@ -410,7 +410,8 @@ TextField::display(Renderer& renderer)
     }
 
     _displayRecords.clear();
-    float scale = getFontHeight() / (float)_font->unitsPerEM(_embedFonts);
+    float scale = getFontHeight() /
+    static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
 
     //offset the lines
@@ -1187,7 +1188,8 @@ TextField::format_text()
     }
 
     boost::uint16_t fontHeight = getFontHeight();
-    float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float scale = fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
@@ -1290,7 +1292,8 @@ void
 TextField::scrollLines()
 {
     boost::uint16_t fontHeight = getFontHeight();
-    float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts);
+    float scale = fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
     if (_linesindisplay > 0) { //no need to place lines if we can't fit any
@@ -1337,7 +1340,8 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
     
-    float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float scale = _fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
@@ -1422,7 +1426,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
     
-    float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float scale = _fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();

@@ -139,7 +139,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     // Index the strings.
     for (int ct = 0; ct < count; ct++) {
         // Point into the current action buffer.
-        m_dictionary[ct] = (const char*) &m_buffer[3 + i];
+        m_dictionary[ct] = reinterpret_cast<const char*>(&m_buffer[3 + i]);
 
         while (m_buffer[3 + i]) {
             // safety check.
@@ -512,7 +512,7 @@ convert_float_little(const void *p)
         break;
     case 0x3f80:    // big-endian host
         {
-        const boost::uint8_t *cp = (const boost::uint8_t *) p;
+        const boost::uint8_t *cp = static_cast<const boost::uint8_t *>(p);
         u.c.c0 = cp[3];
         u.c.c1 = cp[2];
         u.c.c2 = cp[1];
@@ -533,7 +533,7 @@ convert_float_little(const void *p)
 double
 convert_double_wacky(const void *p)
 {
-    const boost::uint8_t *cp = (const boost::uint8_t *)p;    // Handy uchar version
+    const boost::uint8_t *cp = static_cast<const boost::uint8_t *>(p);    // Handy uchar version
     union {
         double    d;
         boost::uint64_t    i;
@@ -565,7 +565,7 @@ convert_double_wacky(const void *p)
     // exactly representable and that has different values in the
     // four 16-bit words.
     // 0x11223344 is represented as 0x41b1 2233 4400 0000 (bigendian)
-    u.d = (double) 0x11223344;
+    u.d = static_cast<double>(0x11223344);
     switch (u.s.s0) {
     case 0x0000:    // pure little-endian host: swap words only.
         memcpy(&u.l.l1, cp, 4);

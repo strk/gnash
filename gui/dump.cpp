@@ -164,7 +164,8 @@ DumpGui::run()
     unsigned int sleep_usecs;
 
     if (gettimeofday(&tv, NULL) == 0) {
-        timer_start = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
+        timer_start = static_cast<double>(tv.tv_sec) +
+	static_cast<double>(tv.tv_usec) / 1000000.0;
     }
     else {
         log_error(_("Unable to call gettimeofday."));
@@ -179,8 +180,8 @@ DumpGui::run()
 
     double timer_current = timer_start;
     double timer_nextframe = timer_start;
-    double interval_s = (double)_interval / 1000.0;
-    double timer_exit = timer_start + ((double)_timeout / 1000.0);
+    double interval_s = static_cast<double>(_interval) / 1000.0;
+    double timer_exit = timer_start + (static_cast<double>(_timeout) / 1000.0);
 
     while (!_terminate_request) {
   
@@ -189,10 +190,11 @@ DumpGui::run()
         // polling loop
         while (timer_current < timer_nextframe) {
             // sleep for 95% of remaining usecs, floored at 50
-            sleep_usecs = (int)((timer_nextframe - timer_current) * 950000.0);
+            sleep_usecs = static_cast<int>(((timer_nextframe - timer_current) * 950000.0));
             gnashSleep((sleep_usecs < 50) ? 50 : sleep_usecs);
             if (gettimeofday(&tv, NULL) == 0) {
-                timer_current = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
+                timer_current = static_cast<double>(tv.tv_sec) +
+		static_cast<double>(tv.tv_usec) / 1000000.0;
             } else {
                 log_error(_("Unable to call gettimeofday."));
                 return false;
@@ -212,7 +214,7 @@ DumpGui::run()
     if ((timer_current - timer_start) != 0.0) {
         std::cout << "TIME=" << (timer_current - timer_start) << std::endl;
         std::cout << "FPS_ACTUAL=" << 
-            ((double)(_framecount-1) / (timer_current - timer_start)) << std::endl;
+            (static_cast<double>((_framecount-1)) / (timer_current - timer_start)) << std::endl;
     }
     return true;
 }
@@ -227,7 +229,7 @@ void
 DumpGui::setInterval(unsigned int interval)
 {
     std::cout << "INTERVAL=" << interval << std::endl;
-    std::cout << "FPS_DESIRED=" << (1000.0 / (double)interval) << std::endl;
+    std::cout << "FPS_DESIRED=" << (1000.0 / static_cast<double>(interval)) << std::endl;
     _interval = interval;
 }
 

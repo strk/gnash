@@ -713,7 +713,9 @@ admin_handler(Network::thread_params_t *args)
 		      clock_gettime (CLOCK_REALTIME, &now);
 		      // Incoming que stats
  		      CQue::que_stats_t *stats = hand->statsin();
-		      float diff = (float)((now.tv_sec - stats->start.tv_sec) + ((now.tv_nsec - stats->start.tv_nsec)/1e9));
+		      float diff = static_cast<float>(((now.tv_sec -
+		      stats->start.tv_sec) + ((now.tv_nsec -
+		      stats->start.tv_nsec)/1e9)));
 		      response << fd
 			       << "," << stats->totalbytes
 			       << "," << diff

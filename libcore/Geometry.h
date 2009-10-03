@@ -99,8 +99,8 @@ public:
         boost::int32_t pdx = p.x - A.x;
         boost::int32_t pdy = p.y - A.y;
 
-        double u = ( (double)(pdx) * dx + (double)(pdy) * dy ) /
-            ( (double)(dx)*dx + (double)(dy)*dy );
+        double u = (static_cast<double>(pdx) * dx + static_cast<double>(pdy) * dy ) /
+            (static_cast<double>(dx)*dx + static_cast<double>(dy)*dy );
 
         if (u <= 0)
         {
@@ -436,7 +436,7 @@ public:
                 point p0(A.x, A.y);
                 for (int i=1; i<=segCount; ++i)
                 {
-                    float t1 = (float)(i) / segCount;
+                    float t1 = static_cast<float>(i) / segCount;
                     point p1 = Edge::pointOnCurve(A, C, B, t1);
 
                     // distance from point and segment being an approximation 

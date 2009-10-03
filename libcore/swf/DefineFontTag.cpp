@@ -316,7 +316,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         in.ensureBytes(nGlyphs*2);
         for (size_t i = 0; i < nGlyphs; i++)
         {
-            _glyphTable[i].advance = (float) in.read_s16();
+            _glyphTable[i].advance = static_cast<float>(in.read_s16());
         }
 
         // Bounds table.
@@ -351,9 +351,9 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
                 char0 = in.read_u8();
                 char1 = in.read_u8();
             }
-            float	adjustment = (float) in.read_s16();
+            float adjustment =  static_cast<float>(in.read_s16());
 
-            kerning_pair	k;
+            kerning_pair k;
             k.m_char0 = char0;
             k.m_char1 = char1;
 

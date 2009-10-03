@@ -360,7 +360,8 @@ bool FBGui::run()
   double start_timer;
   
   if (!gettimeofday(&tv, NULL))
-    start_timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
+    start_timer = static_cast<double>(tv.tv_sec) +
+    static_cast<double>(tv.tv_usec) / 1000000.0;
   else
     start_timer = 0.0;
     
@@ -983,8 +984,10 @@ bool FBGui::check_mouse()
     */
     
     
-    new_x = (int)(((double)new_x - 355) / (1702 - 355) * 1536 + 256);
-    new_y = (int)(((double)new_y - 482) / (1771 - 482) * 1536 + 256);
+    new_x = static_cast<int>(((static_cast<double>(new_x )- 355) / (1702 - 355)
+    * 1536 + 256));
+    new_y = static_cast<int>(((static_cast<double>(new_y) - 482) / (1771 - 482)
+    * 1536 + 256));
     
     
     new_x = new_x * m_stage_width / 2048;

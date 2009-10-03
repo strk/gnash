@@ -153,8 +153,8 @@ public:
 		// infrequent.  So let's just do it the simple
 		// way.
 		if (num_bytes > 0) {
-			while (num_bytes > (long) src->m_pub.bytes_in_buffer) {
-				num_bytes -= (long) src->m_pub.bytes_in_buffer;
+			while (num_bytes > static_cast<long>(src->m_pub.bytes_in_buffer)) {
+				num_bytes -= static_cast<long>(src->m_pub.bytes_in_buffer);
 				fill_input_buffer(cinfo);
 			}
 			// Handle remainder.
@@ -234,7 +234,7 @@ JpegImageInput::~JpegImageInput()
 {
 	finishImage();
 
-	rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
+	rw_source_IOChannel* src = reinterpret_cast<rw_source_IOChannel*>(m_cinfo.src);
 	delete src;
 	m_cinfo.src = NULL;
 

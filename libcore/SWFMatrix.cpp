@@ -203,15 +203,15 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 void
 SWFMatrix::set_x_scale(double xscale)
 {
-    double rot_x = atan2((double)shx, (double)sx);
-    sx  =  DoubleToFixed16(xscale * cos(rot_x));
-    shx =  DoubleToFixed16(xscale * sin(rot_x)); 
+    double rot_x = std::atan2(static_cast<double>(shx), static_cast<double>(sx));
+    sx  =  DoubleToFixed16(xscale * std::cos(rot_x));
+    shx =  DoubleToFixed16(xscale * std::sin(rot_x)); 
 }
 
 void
 SWFMatrix::set_y_scale(double yscale)
 {
-    double rot_y = std::atan2((double)(-shy), (double)(sy));
+    double rot_y = std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
 
     shy = -DoubleToFixed16(yscale * std::sin(rot_y));
     sy  =  DoubleToFixed16(yscale * std::cos(rot_y));
@@ -227,8 +227,9 @@ SWFMatrix::set_scale(double xscale, double yscale)
 void
 SWFMatrix::set_rotation(double rotation)
 {   
-    double rot_x = atan2((double)shx,    (double)sx);
-    double rot_y = atan2((double)(-shy), (double)sy);
+    double rot_x = std::atan2(static_cast<double>(shx), static_cast<double>(sx));
+    double rot_y = std::atan2(static_cast<double>(-shy),
+    static_cast<double>(sy));
     double scale_x = get_x_scale();
     double scale_y = get_y_scale();
  
@@ -334,20 +335,20 @@ SWFMatrix::invert()
 double
 SWFMatrix::get_x_scale() const
 {
-    return sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0;
+    return std::sqrt((static_cast<double>(sx) * sx + static_cast<double>(shx) * shx)) / 65536.0;
 }
 
 double
 SWFMatrix::get_y_scale() const
 {
-    return sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0;
+    return std::sqrt((static_cast<double>(sy) * sy + static_cast<double>(shy) * shy)) / 65536.0;
 }
 
 double
 SWFMatrix::get_rotation() const
 {
     // more successes in misc-ming.all/SWFMatrix_test.c
-    return atan2(static_cast<double>(shx), sx); 
+    return std::atan2(static_cast<double>(shx), sx); 
 }
 
 // private
