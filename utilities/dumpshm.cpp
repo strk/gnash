@@ -341,7 +341,7 @@ usage (void)
 {
     cerr << _("This program dumps the internal data of a shared memory segment")
          << endl;
-    cerr << _("Usage: dumpmem [hdsanlif] filename") << endl;
+    cerr << _("Usage: dumpshm [hdsanlif] filename") << endl;
     cerr << _("-h\tHelp") << endl;
     cerr << _("-i\tList segments") << endl;
     cerr << _("-r\tDump SYSV segments") << endl;

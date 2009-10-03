@@ -113,7 +113,7 @@ Shm::attach(key_t key, bool /* nuke */)
 	    // Get the shared memory id for this segment
 	    _shmfd = shmget(_shmkey, _size, 0);
 	}
-	_addr = (char *)shmat(_shmfd, 0, 0);
+	_addr = static_cast<char *>(shmat(_shmfd, 0, 0));
 	if (_addr <= 0) {
 	    log_debug("WARNING: shmat() failed: %s\n", strerror(errno));
 	    return false;
@@ -126,8 +126,8 @@ Shm::attach(key_t key, bool /* nuke */)
 	log_debug("WARNING: CreateFileMapping failed: %ld\n", GetLastError());
         return false;
     }
-    _addr = (char *) MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
-            0, 0, _size);
+    _addr = static_cast<char *>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
+            0, 0, _size));
     if (_addr == NULL) {
 	log_debug("WARNING: MapViewOfFile() failed: %ld\n", GetLastError());
 	return false;
@@ -314,21 +314,21 @@ Shm::attach(char const *filespec, bool nuke)
 	}
 #else  // else of HAVE_SHM_OPEN
 # ifdef HAVE_SHMAT
-	_addr = (char *)shmat(_shmfd, 0, 0);
+	_addr = static_cast<char *>(shmat(_shmfd, 0, 0));
 	if (_addr <= 0) {
 	    log_error("shmat() failed: %s\n", strerror(errno));
 	    return false;
 	}
 # else
 #  ifdef __riscos__
-        _addr = (char *)malloc(_size);
+        _addr = static_cast<char *>(malloc(_size));
         if (_addr == 0) {
             log_error("malloc() failed\n");
             return false;
         }
 #  else
-	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
-				       0, 0, _size);
+	_addr = static_cast<char *>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
+				       0, 0, _size));
 # endif
 #endif
 #endif
@@ -363,7 +363,7 @@ Shm::attach(char const *filespec, bool nuke)
 					     _shmfd, static_cast<off_t>(0)));
 #else
 	    //                 off = (off_t)((long)addr - (long)_addr);
-	    _addr = static_cast<char *>(mmap((char *)addr,
+	    _addr = static_cast<char *>(mmap(reinterpret_cast<char *>(addr),
 					     _size, PROT_READ|PROT_WRITE,
 					     MAP_FIXED|MAP_SHARED, _shmfd, 0));
 #endif
@@ -375,14 +375,14 @@ Shm::attach(char const *filespec, bool nuke)
 #else  // HAVE_SHM_OPEN
 # ifdef HAVE_SHMAT	    
 	shmdt(_addr);
-	_addr = (char *)shmat(_shmfd, (void *)addr, 0);
+	_addr = static_cast<char *>(shmat(_shmfd, reinterpret_cast<void *>(addr), 0));
 # else
 #  ifdef __riscos__
         _addr = _addr;
 #  else
 	CloseHandle(_shmhandle);	
-	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
-			       0, 0, _size);
+	_addr = static_cast<char *>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
+			       0, 0, _size));
 #  endif
 # endif // end of HAVE_SHMAT
 	}
