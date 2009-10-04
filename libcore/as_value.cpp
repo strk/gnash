@@ -1940,48 +1940,47 @@ as_value::as_value(const amf::Element& el)
     }
 }
 
-as_value&
-as_value::newAdd(const as_value& op2)
+void
+newAdd(as_value& left, const as_value& right, VM& vm)
 {
-	as_value v2=op2;
+    // We can't change the original value.
+    as_value r(right);
 
-	try { convert_to_primitive(); }
+    // The order of the operations is important: right is converted to
+    // primitive before left.
+
+	try { r = r.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
-		log_debug("%s.to_primitive() threw an error during as_value operator+",
-			*this);
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewAdd"), r);
 	}
-
-	try { v2 = v2.to_primitive(); }
+	
+    try { left = left.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
-		log_debug("%s.to_primitive() threw an error during as_value operator+",
-			op2);
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewAdd"), left);
 	}
 
 #if GNASH_DEBUG
-	log_debug(_("(%s + %s) [primitive conversion done]"),
-			*this,
-			v2);
+	log_debug(_("(%s + %s) [primitive conversion done]"), left, r);
 #endif
 
-	if (is_string() || v2.is_string() )
-	{
+	if (left.is_string() || r.is_string()) {
+
 		// use string semantic
-
-		int version = VM::get().getSWFVersion();
-		convert_to_string_versioned(version);
-		string_concat(v2.to_string_versioned(version));
-	}
-	else {
-		// use numeric semantic
-		double v2num = v2.to_number();
-		double v1num = to_number();
-		set_double(v2num + v1num); 
-
+		const int version = vm.getSWFVersion();
+		left.convert_to_string_versioned(version);
+		left.string_concat(r.to_string_versioned(version));
+        return;
 	}
 
-	return *this;
+    // Otherwise use numeric semantic
+    const double v1num = left.to_number();
+    const double v2num = r.to_number();
+    left.set_double(v2num + v1num); 
+
 }
 
 as_value

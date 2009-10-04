@@ -348,22 +348,21 @@ matrix_createGradientBox(const fn_call& fn)
     const double c = -std::sin(rotation) * widthX * 10 / gradientSquareMax;
     const double d = std::cos(rotation) * widthY * 10 / gradientSquareMax;
     
-    ptr->set_member(NSV::PROP_A, as_value(a));
-    ptr->set_member(NSV::PROP_B, as_value(b));
-    ptr->set_member(NSV::PROP_C, as_value(c));
-    ptr->set_member(NSV::PROP_D, as_value(d));
+    ptr->set_member(NSV::PROP_A, a);
+    ptr->set_member(NSV::PROP_B, b);
+    ptr->set_member(NSV::PROP_C, c);
+    ptr->set_member(NSV::PROP_D, d);
     
     // The translation is offset by half the size of the corresponding
     // dimension. Or rather, half the dimension is added to the translation,
     // whether it's a number or not.
-    tx.newAdd(widthX / 2.0);
-    ty.newAdd(widthY / 2.0);
+    VM& vm = getVM(fn);
+    newAdd(tx, widthX / 2.0, vm);
+    newAdd(ty, widthY / 2.0, vm);
 
     ptr->set_member(NSV::PROP_TX, tx);
     ptr->set_member(NSV::PROP_TY, ty);
     
-    return as_value();
-
     return as_value();
 }
 

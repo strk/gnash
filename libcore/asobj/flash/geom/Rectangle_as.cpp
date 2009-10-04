@@ -181,11 +181,13 @@ Rectangle_contains(const fn_call& fn)
         return as_value();
     }
 
+    VM& vm = getVM(fn);
+    
     as_value rect_x1_as = rect_x_as;
-    rect_x1_as.newAdd(rect_width_as);
+    newAdd(rect_x1_as, rect_width_as, vm);
 
     as_value rect_y1_as = rect_y_as;
-    rect_y1_as.newAdd(rect_height_as);
+    newAdd(rect_y1_as, rect_height_as, vm);
 
     if ( rect_x_as.is_null() || rect_x_as.is_undefined() ||
          rect_y_as.is_null() || rect_y_as.is_undefined() ||
@@ -383,7 +385,8 @@ Rectangle_bottom(const fn_call& fn)
         as_value height;
         ptr->get_member(NSV::PROP_Y, &ret);
         ptr->get_member(NSV::PROP_HEIGHT, &height);
-        ret.newAdd(height);
+        VM& vm = getVM(fn);
+        newAdd(ret, height, vm);
     }
     else // setter
     {
@@ -406,14 +409,15 @@ Rectangle_bottomRight(const fn_call& fn)
 
     if (!fn.nargs) {
 
-        as_value x,y,w,h;
+        as_value x, y, w, h;
         ptr->get_member(NSV::PROP_X, &x);
         ptr->get_member(NSV::PROP_Y, &y);
         ptr->get_member(NSV::PROP_WIDTH, &w);
         ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-        as_value right = x.newAdd(w);
-        as_value bottom = y.newAdd(h);
+        VM& vm = getVM(fn);
+        newAdd(x, w, vm);
+        newAdd(y, h, vm);
 
         as_value point(fn.env().find_object("flash.geom.Point"));
 
@@ -425,7 +429,7 @@ Rectangle_bottomRight(const fn_call& fn)
         }
 
         fn_call::Args args;
-        args += right, bottom;
+        args += x, y;
 
         as_value ret = pointCtor->constructInstance(fn.env(), args);
         return ret;
@@ -461,7 +465,8 @@ Rectangle_left(const fn_call& fn)
         as_value w;
         ptr->get_member(NSV::PROP_WIDTH, &w);
 
-        w.newAdd(oldx.subtract(newx));
+        VM& vm = getVM(fn);
+        newAdd(w, oldx.subtract(newx), vm);
         ptr->set_member(NSV::PROP_WIDTH, w);
     }
 
@@ -480,7 +485,8 @@ Rectangle_right(const fn_call& fn)
         as_value width;
         ptr->get_member(NSV::PROP_X, &ret);
         ptr->get_member(NSV::PROP_WIDTH, &width);
-        ret.newAdd(width);
+        VM& vm = getVM(fn);
+        newAdd(ret, width, vm);
     }
     else // setter
     {
@@ -551,7 +557,8 @@ Rectangle_top(const fn_call& fn)
         as_value h;
         ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-        h.newAdd(oldy.subtract(newy));
+        VM& vm = getVM(fn);
+        newAdd(h, oldy.subtract(newy), vm);
         ptr->set_member(NSV::PROP_HEIGHT, h);
     }
 

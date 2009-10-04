@@ -635,10 +635,7 @@ public:
 	bool equals(const as_value& v) const;
 
 	/// Sets this value to this string plus the given string.
-	void	string_concat(const std::string& str);
-
-	/// Equivalent of ActionNewAdd
-	as_value& newAdd(const as_value& v1);
+	void string_concat(const std::string& str);
 
 	/// Equivalent of ActionNewLessThan
 	as_value newLessThan(const as_value& op2_in) const;
@@ -725,6 +722,18 @@ private:
 	}
 
 };
+
+
+/// Carry out ActionNewAdd
+//
+/// @param left     The as_value to add to.
+/// @param right    The as_value to add.
+/// @param vm       The VM executing the operation.
+//
+/// TODO:           Consider whether it would be better to pass something
+///                 other than the VM. But it is a VM operation, so it
+///                 is logically sound.
+void newAdd(as_value& left, const as_value& right, VM& vm);
 
 typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 

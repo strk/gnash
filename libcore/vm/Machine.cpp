@@ -2444,7 +2444,7 @@ Machine::execute()
                 /// Stack Out:
                 /// a + b (double if numeric)
                 case SWF::ABC_ACTION_ADD:
-                    _stack.top(1) = _stack.top(1).newAdd(_stack.top(0));
+                    newAdd(_stack.top(1), _stack.top(0), _vm);
                     _stack.drop(1);
                     break;
                 
