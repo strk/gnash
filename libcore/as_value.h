@@ -640,8 +640,6 @@ public:
 	/// Equivalent of ActionNewLessThan
 	as_value newLessThan(const as_value& op2_in) const;
 
-	// Equivalent of ActionSubtract
-	as_value& subtract(const as_value& o);
 
 	/// Set any object value as reachable (for the GC)
 	//
@@ -735,7 +733,13 @@ private:
 ///                 is logically sound.
 void newAdd(as_value& left, const as_value& right, VM& vm);
 
-typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+
+/// Carry out ActionSubtract
+//
+/// @param left     The as_value to subtract from.
+/// @param right    The as_value to subtract.
+/// @param vm       The VM executing the operation.
+void subtract(as_value& left, const as_value& right, VM& vm);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 	return os << v.toDebugString();

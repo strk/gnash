@@ -709,12 +709,8 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 void
 SWFHandlers::ActionSubtract(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    
-    const double operand2 = env.top(0).to_number();
-    const double operand1 = env.top(1).to_number();
-    env.top(1) = operand1 - operand2;
+    subtract(env.top(1), env.top(0), getVM(env));
     env.drop(1);
 }
 

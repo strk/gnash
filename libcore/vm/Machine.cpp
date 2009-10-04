@@ -2455,7 +2455,7 @@ Machine::execute()
                 /// Stack Out:
                 ///  a - b (double)
                 case SWF::ABC_ACTION_SUBTRACT:
-                    _stack.top(1) = _stack.top(1).subtract(_stack.top(0));
+                    subtract(_stack.top(1), _stack.top(0), _vm);
                     _stack.drop(1);
                     break;
 

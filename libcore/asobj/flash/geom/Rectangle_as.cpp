@@ -393,9 +393,10 @@ Rectangle_bottom(const fn_call& fn)
         as_value y;
         ptr->get_member(NSV::PROP_Y, &y);
 
-        as_value bottom = fn.arg(0);
-        as_value newh = bottom.subtract(y);
-        ptr->set_member(NSV::PROP_HEIGHT, newh);
+        as_value height = fn.arg(0);
+        VM& vm = getVM(fn);
+        subtract(height, y, vm);
+        ptr->set_member(NSV::PROP_HEIGHT, height);
     }
 
     return ret;
@@ -466,7 +467,8 @@ Rectangle_left(const fn_call& fn)
         ptr->get_member(NSV::PROP_WIDTH, &w);
 
         VM& vm = getVM(fn);
-        newAdd(w, oldx.subtract(newx), vm);
+        subtract(oldx, newx, vm);
+        newAdd(w, oldx, vm);
         ptr->set_member(NSV::PROP_WIDTH, w);
     }
 
@@ -493,9 +495,10 @@ Rectangle_right(const fn_call& fn)
         as_value x;
         ptr->get_member(NSV::PROP_X, &x);
 
-        as_value right = fn.arg(0);
-        as_value neww = right.subtract(x);
-        ptr->set_member(NSV::PROP_WIDTH, neww);
+        VM& vm = getVM(fn);
+        as_value width = fn.arg(0);
+        subtract(width, x, vm);
+        ptr->set_member(NSV::PROP_WIDTH, width);
     }
 
     return ret;
@@ -558,7 +561,8 @@ Rectangle_top(const fn_call& fn)
         ptr->get_member(NSV::PROP_HEIGHT, &h);
 
         VM& vm = getVM(fn);
-        newAdd(h, oldy.subtract(newy), vm);
+        subtract(oldy, newy, vm);
+        newAdd(h, oldy, vm);
         ptr->set_member(NSV::PROP_HEIGHT, h);
     }
 

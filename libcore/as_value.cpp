@@ -2028,13 +2028,12 @@ as_value::newLessThan(const as_value& op2_in) const
     return ret;
 }
 
-as_value&
-as_value::subtract(const as_value& op2)
+void
+subtract(as_value& left, const as_value& right, VM& /*vm*/)
 {
-	double operand1 = to_number();
-	double operand2 = op2.to_number();
-	set_double(operand1 - operand2);
-	return *this;
+	double operand1 = left.to_number();
+	double operand2 = right.to_number();
+	left.set_double(operand1 - operand2);
 }
 
 
