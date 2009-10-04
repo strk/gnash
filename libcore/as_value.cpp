@@ -1026,13 +1026,6 @@ as_value::set_null()
 }
 
 void
-as_value::set_unsupported()
-{
-	m_type = UNSUPPORTED;
-	_value = boost::blank();
-}
-
-void
 as_value::set_as_object(as_object* obj)
 {
 	if ( ! obj )
@@ -1918,7 +1911,6 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
 #endif
-	  set_unsupported();
 	  break;
       }
       case amf::Element::RECORD_SET_AMF0:

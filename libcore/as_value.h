@@ -120,10 +120,6 @@ public:
 		NULLTYPE,
 		NULLTYPE_EXCEPT,
 
-		/// NULL value
-		UNSUPPORTED,
-		UNSUPPORTED_EXCEPT,
-
 		/// Boolean value
 		BOOLEAN,
 		BOOLEAN_EXCEPT,
@@ -567,26 +563,6 @@ public:
 	/// Set this value to the NULL value
 	void set_null();
 
-	/// Set this value to the Unsupported value
-	void set_unsupported();
-
-	/// Equality operator, follows strict equality semantic
-	//
-	/// See strictly_equals
-	///
-	bool operator==(const as_value& v) const
-	{
-		return strictly_equals(v);
-	}
-
-	/// Inequality operator, follows strict inequality semantic
-	//
-	/// See strictly_equals
-	///
-	bool operator!=(const as_value& v) const {
-		return ! ( *this  == v );
-	}
-
 	void operator=(const as_value& v);
 
 	bool is_undefined() const { return (m_type == UNDEFINED); }
@@ -595,14 +571,11 @@ public:
 
 	bool is_bool() const { return (m_type == BOOLEAN); }
 
-	bool is_unsupported() const { return (m_type == UNSUPPORTED); }
-
         bool is_exception() const
 	{ return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
 		|| m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
 		|| m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
-		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT
-		|| m_type == UNSUPPORTED_EXCEPT);
+		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
 	}
 
 	// Flag or unflag an as_value as an exception -- this gets flagged
@@ -648,6 +621,12 @@ public:
 	void setReachable() const;
 
 private:
+
+    /// Use the relevant equality function, not operator==
+    bool operator==(const as_value& v) const;
+
+    /// Use the relevant inequality function, not operator!=
+    bool operator!=(const as_value& v) const;
 
 	/// Compare values of the same type
 	//
