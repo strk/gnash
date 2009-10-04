@@ -1128,20 +1128,6 @@ as_object::get_prototype()
 	return tmp.to_object(*getGlobal(*this));
 }
 
-bool
-as_object::on_event(const event_id& id )
-{
-	as_value event_handler;
-
-	if (get_member(id.functionKey(), &event_handler) )
-	{
-		call_method0(event_handler, as_environment(_vm), this);
-		return true;
-	}
-
-	return false;
-}
-
 as_value
 as_object::getMember(string_table::key name, string_table::key nsname)
 {

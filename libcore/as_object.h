@@ -277,9 +277,6 @@ public:
     virtual bool set_member(string_table::key key, const as_value& val,
         string_table::key nsname = 0, bool ifFound=false);
 
-
-    virtual bool on_event(const event_id& id );
-
     /// Reserve a slot
     ///
     /// Reserves a slot for a property to follow.
