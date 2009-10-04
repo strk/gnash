@@ -52,7 +52,7 @@ namespace gnash
 // Forward declarations.
 namespace {
     /// Match blend modes.
-    typedef std::map<MovieClip::BlendMode, std::string> BlendModeMap;
+    typedef std::map<DisplayObject::BlendMode, std::string> BlendModeMap;
     const BlendModeMap& getBlendModeMap();
     bool blendModeMatches(const BlendModeMap::value_type& val,
             const std::string& mode);
@@ -936,7 +936,10 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
 
     const Getters& getters = displayObjectGetters();
 
-    // The magic properties are case insensitive in all versions!
+    // TODO: _root and _global also seem to be magic properties, but are
+    // case sensitive in version 7 and above
+
+    // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
@@ -958,7 +961,12 @@ setDisplayObjectProperty(as_object& obj, string_table::key key,
 
     const Setters& setters = displayObjectSetters();
 
-    // The magic properties are case insensitive in all versions!
+    // TODO: _root and _global also seem to be magic properties, but are
+    // case sensitive in version 7 and above. They are tested to exist for
+    // TextField, MovieClip, and Button but do not belong to the
+    // inheritance chain.
+
+    // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
