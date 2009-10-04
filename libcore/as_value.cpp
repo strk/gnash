@@ -977,40 +977,6 @@ as_value::to_as_function() const
     return NULL;
 }
 
-// Force type to number.
-void
-as_value::convert_to_boolean()
-{
-    set_bool(to_bool());
-}
-
-// Force type to number.
-void
-as_value::convert_to_number()
-{
-    set_double(to_number());
-}
-
-// Force type to string.
-void
-as_value::convert_to_string()
-{
-    std::string ns = to_string();
-    m_type = STRING;	// force type.
-    _value = ns;
-}
-
-
-void
-as_value::convert_to_string_versioned(int version)
-    // Force type to string.
-{
-    std::string ns = to_string_versioned(version);
-    m_type = STRING;	// force type.
-    _value = ns;
-}
-
-
 void
 as_value::set_undefined()
 {
@@ -1963,7 +1929,7 @@ newAdd(as_value& left, const as_value& right, VM& vm)
 
 		// use string semantic
 		const int version = vm.getSWFVersion();
-		left.convert_to_string_versioned(version);
+		convertToString(left, vm);
 		left.string_concat(r.to_string_versioned(version));
         return;
 	}
@@ -2575,6 +2541,29 @@ as_value::writeAMF0(SimpleBuffer& buf,
     }
 }
 
+/// Force type to number.
+as_value&
+convertToNumber(as_value& v, VM& /*vm*/)
+{
+    v.set_double(v.to_number());
+    return v;
+}
+
+/// Force type to string.
+as_value&
+convertToString(as_value& v, VM& vm)
+{
+    v.set_string(v.to_string_versioned(vm.getSWFVersion()));
+    return v;
+}
+
+/// Force type to bool.
+as_value&
+convertToBoolean(as_value& v, VM& /*vm*/)
+{
+    v.set_bool(v.to_bool());
+    return v;
+}
 } // namespace gnash
 
 

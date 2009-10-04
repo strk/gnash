@@ -782,7 +782,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
     env.top(1).set_bool(op1.to_number() == op2.to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -796,7 +796,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
     env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -830,7 +830,7 @@ SWFHandlers::ActionLogicalNot(ActionExec& thread)
     env.top(0).set_bool(! env.top(0).to_bool());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(0).convert_to_number();
+    if (env.get_version() < 5) convertToNumber(env.top(0), getVM(env));
 }
 
 void
@@ -1066,7 +1066,7 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
     as_environment& env = thread.env;
 
     const int version = env.get_version();
-    env.top(1).convert_to_string_versioned(version);
+    convertToString(env.top(1), getVM(env));
     env.top(1).string_concat(env.top(0).to_string_versioned(version));
     env.drop(1);
 }
@@ -3122,16 +3122,14 @@ void
 SWFHandlers::ActionToNumber(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).convert_to_number();
+    convertToNumber(env.top(0), getVM(env));
 }
 
 void
 SWFHandlers::ActionToString(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
-    const int version = env.get_version();
-    env.top(0).convert_to_string_versioned(version);
+    convertToString(env.top(0), getVM(env));
 }
 
 void

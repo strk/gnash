@@ -500,26 +500,6 @@ public:
 	///
 	as_value& convert_to_primitive();
 
-	/// Force type to number.
-	void convert_to_number();
-
-	/// Force type to string.
-	void convert_to_string();
-    
-	/// Force type to bool.
-	void convert_to_boolean();
-    
-	/// Force type to string.
-	//
-	/// uses swf-version-aware converter
-    ///
-	/// @param version
-    ///     SWF version for which the operation is desired.
-	///
-	/// @see to_string_versioned
-	///
-	void convert_to_string_versioned(int version);
-
 	// These set_*()'s are more type-safe; should be used
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
@@ -706,6 +686,14 @@ private:
 ///                 is logically sound.
 void newAdd(as_value& left, const as_value& right, VM& vm);
 
+/// Force type to number.
+as_value& convertToNumber(as_value& v, VM& vm);
+
+/// Force type to string.
+as_value& convertToString(as_value& v, VM& vm);
+
+/// Force type to bool.
+as_value& convertToBoolean(as_value& v, VM& vm);
 
 /// Carry out ActionSubtract
 //
