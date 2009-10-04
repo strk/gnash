@@ -305,12 +305,6 @@ public:
 		return m_type == AS_FUNCTION;
 	}
 
-	/// Return true if this value is a AS function
-	bool is_as_function() const
-	{
-		return m_type == AS_FUNCTION;
-	}
-
 	/// Return true if this value is strictly a string
 	//
 	/// Note that you usually DON'T need to call this
