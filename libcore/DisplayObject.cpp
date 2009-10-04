@@ -280,7 +280,7 @@ DisplayObject::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 }
 
 void
-attachDisplayObjectProperties(as_object& o)
+attachDisplayObjectProperties(as_object& /*o*/)
 {
 }
 
