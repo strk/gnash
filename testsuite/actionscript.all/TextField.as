@@ -432,6 +432,21 @@ check_equals(typeof(tfref), 'object');
 // TODO: see effects of unloading the textfield ?
 
 //-------------------------------------------------------------------------
+// Check TextField._root and _global
+//-------------------------------------------------------------------------
+
+xcheck(tf._root);
+xcheck_equals(_root, _root.tf._root);
+
+xcheck(tf._global);
+xcheck_equals(_global, _root.tf._global);
+
+#if OUTPUT_VERSION > 6
+xcheck(tf._root != tf._ROOT);
+xcheck(tf._root != tf._GLOBAL);
+#endif 
+
+//-------------------------------------------------------------------------
 // Check TextField._parent
 //-------------------------------------------------------------------------
 
@@ -1117,11 +1132,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(492);
+     check_totals(496);
 #elif OUTPUT_VERSION == 7
- check_totals(495);
+ check_totals(501);
 #elif OUTPUT_VERSION == 8
- check_totals(496);
+ check_totals(502);
 #endif
 
 #endif
