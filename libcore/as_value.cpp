@@ -2031,8 +2031,8 @@ as_value::newLessThan(const as_value& op2_in) const
 void
 subtract(as_value& left, const as_value& right, VM& /*vm*/)
 {
-	double operand1 = left.to_number();
-	double operand2 = right.to_number();
+	const double operand2 = right.to_number();
+	const double operand1 = left.to_number();
 	left.set_double(operand1 - operand2);
 }
 
