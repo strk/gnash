@@ -321,13 +321,27 @@ check(_global.hasOwnProperty("color"));
 
 #endif
 
+// Case sensitivity
+// These DisplayObject properties are case-insensitive in all versions
+
+check_equals(_root._x, _root._X);
+check_equals(_root._y, _root._Y);
+check_equals(_root._width, _root._wIDth);
+check_equals(_root._height, _root._HEIGHT);
+check_equals(_root._xmouse, _root._XmousE);
+check_equals(_root._ymouse, _root._yMouse);
+check_equals(_root._soundbuftime, _root._soundBufTIME);
+check_equals(_root._focusrect, _root._FOCUSRECT);
+check_equals(_root._quality, _root._QUALITY);
+check_equals(_root._highquality, _root._highQUALITY);
+
 
 #if OUTPUT_VERSION <= 5
- check_totals(23);
+ check_totals(33);
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(52);
+ check_totals(62);
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(46);
+ check_totals(56);
 #endif
