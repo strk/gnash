@@ -35,7 +35,7 @@ namespace {
         SWF::TagType tag, movie_definition& md, const RunResources& r);
     void readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
         SWF::TagType tag, movie_definition& md, const RunResources& r);
-    void computeBounds(rect& bounds, const ShapeRecord::Paths& paths,
+    void computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
         const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
 
@@ -229,13 +229,13 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
     
         IF_VERBOSE_PARSE(
             std::string b = _bounds.toString();
-            log_parse(_("  bound rect: %s"), b);
+            log_parse(_("  bound SWFRect: %s"), b);
         );
     
         // TODO: Store and use these. Unfinished.
         if (tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_)
         {
-            rect tbound;
+            SWFRect tbound;
             tbound.read(in);
             in.ensureBytes(1);
             static_cast<void>(in.read_u8());
@@ -614,7 +614,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
 #ifdef GNASH_DEBUG_SHAPE_BOUNDS
     else
     {
-        rect computedBounds;
+        SWFRect computedBounds;
         computeBounds(computedBounds, _paths, _lineStyles, m->get_version());
         if ( computedBounds != m_bounds )
         {
@@ -689,7 +689,7 @@ readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
 
 // Find the bounds of this shape, and store them in the given rectangle.
 void
-computeBounds(rect& bounds, const ShapeRecord::Paths& paths,
+computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
         const ShapeRecord::LineStyles& lineStyles, int swfVersion)
 {
     bounds.set_null();

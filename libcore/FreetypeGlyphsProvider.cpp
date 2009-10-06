@@ -203,7 +203,7 @@ private:
 	}
     
     void expandBounds(int x, int y) {
-        rect bounds = _shape.getBounds();
+        SWFRect bounds = _shape.getBounds();
         if (_currPath->size() == 1) _currPath->expandBounds(bounds, 0, 6);
         else {
             bounds.expand_to_circle(x, y, 0);
@@ -212,7 +212,7 @@ private:
     }
 
     void expandBounds(int ax, int ay, int cx, int cy) {
-        rect bounds = _shape.getBounds();
+        SWFRect bounds = _shape.getBounds();
         if (_currPath->size() == 1) _currPath->expandBounds(bounds, 0, 6);
         else {
             bounds.expand_to_circle(ax, ay, 0);
@@ -495,7 +495,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 
 	FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	rect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
+	SWFRect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
 	log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
 			code, bound.toString());
 #endif

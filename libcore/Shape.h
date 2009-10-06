@@ -57,7 +57,7 @@ public:
 
 	virtual void display(Renderer& renderer);
 
-    virtual rect getBounds() const {
+    virtual SWFRect getBounds() const {
         return _def ? _def->bounds() : _shape->getBounds();
     }
     

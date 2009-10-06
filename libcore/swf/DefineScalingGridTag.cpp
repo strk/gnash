@@ -38,7 +38,7 @@ DefineScalingGridTag::loader(SWFStream& in, TagType /*tag*/,
             log_parse("DefineScalingGridTag: id = %d", id);
     );
 
-    rect inner;
+    SWFRect inner;
     inner.read(in);
 
     log_unimpl("DefineScalingGridTag");

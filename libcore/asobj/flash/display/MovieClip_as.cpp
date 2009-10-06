@@ -107,7 +107,6 @@ namespace {
     as_value movieclip_totalFrames(const fn_call& fn);
     as_value movieclip_framesLoaded(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
-    as_value movieclip_focusRect(const fn_call& fn);
 
     // =============================================
     // AS3 methods
@@ -253,9 +252,6 @@ attachMovieClipAS2Properties(DisplayObject& o)
 
     gettersetter = movieclip_dropTarget;
     o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
-
-    gettersetter = movieclip_focusRect;
-    o.init_property(NSV::PROP_uFOCUSRECT, gettersetter, gettersetter);
 
 }
 
@@ -1130,11 +1126,11 @@ movieclip_hitTest(const fn_call& fn)
                 return as_value();
             }
 
-            rect thisbounds = movieclip->getBounds();
+            SWFRect thisbounds = movieclip->getBounds();
             SWFMatrix thismat = movieclip->getWorldMatrix();
             thismat.transform(thisbounds);
 
-            rect tgtbounds = target->getBounds();
+            SWFRect tgtbounds = target->getBounds();
             SWFMatrix tgtmat = target->getWorldMatrix();
             tgtmat.transform(tgtbounds);
 
@@ -1401,7 +1397,7 @@ movieclip_getBounds(const fn_call& fn)
     boost::intrusive_ptr<DisplayObject> movieclip =
         ensureType<DisplayObject>(fn.this_ptr);
 
-    rect bounds = movieclip->getBounds();
+    SWFRect bounds = movieclip->getBounds();
 
     if ( fn.nargs > 0 )
     {
@@ -2376,7 +2372,7 @@ movieclip_startDrag(const fn_call& fn)
                 }
             );
 
-            rect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+            SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
                     pixelsToTwips(x1), pixelsToTwips(y1));
             st.setBounds(bounds);
         }
@@ -2516,27 +2512,6 @@ movieclip_dropTarget(const fn_call& fn)
 
     return ptr->getDropTarget();
 }
-
-// TODO: move this to DisplayObject class, _focusrect seems a generic property
-as_value
-movieclip_focusRect(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // Is a yellow rectangle visible around a focused movie clip (?)
-        // We don't support focuserct settings
-        return as_value(false);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._focusrect setting") );
-    }
-    return as_value();
-}
-
 
 as_value
 movieclip_transform(const fn_call& fn)

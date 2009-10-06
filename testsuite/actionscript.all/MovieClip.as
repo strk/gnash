@@ -112,19 +112,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(335); // SWF5
+	check_totals(346); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(900); // SWF6
+	check_totals(911); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(917); // SWF7
+	check_totals(928); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1007); // SWF8+
+	check_totals(1018); // SWF8+
 #endif
 
 	play();
@@ -359,6 +359,7 @@ else
 }
 
 check(mc._focusrect != undefined);
+check_equals(mc._focusrect, true);
 check(mc._framesloaded != undefined);
 check(mc._height != undefined);
 check(mc._highquality != undefined);
@@ -457,7 +458,7 @@ check(!mc.__proto__.hasOwnProperty("_level"));
 check(!mc.hasOwnProperty("_target"));
 check(!mc.hasOwnProperty("_url"));
 check(!mc.hasOwnProperty("_soundbuftime"));
-xcheck(!mc.hasOwnProperty("_focusrect"));
+check(!mc.hasOwnProperty("_focusrect"));
 xcheck(!mc.hasOwnProperty("_framesloaded"));
 check(!mc.hasOwnProperty("_lockroot"));
 check(!mc.hasOwnProperty("_highquality"));
@@ -2194,6 +2195,10 @@ check_equals(_root.focusEnabled, false);
 _root.focusEnabled = "hello";
 check_equals(_root.focusEnabled, "hello");
 
+
+// Note: Flash Player 10 seems to handle this differently: setting the
+// blendMode to 2 gets 'multiply' not 'layer'.
+
 #if OUTPUT_VERSION > 7
 check_equals(_root.blendMode, "normal");
 check_equals(typeof(_root.blendMode), "string");
@@ -2351,6 +2356,22 @@ xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 o.meth = MovieClip.prototype.meth;
 check_equals(o.meth("post"), 2);
 check_equals(o.meth(), 0);
+
+// Case sensitivity
+
+// Note: we have changed the _x gettersetter for _level0. This means that
+// _x and _X are not the same.
+
+check_equals(_level1._x, _level1._X);
+check_equals(_level1._y, _level1._Y);
+check_equals(_level1._width, _level1._wIDth);
+check_equals(_level1._height, _level1._HEIGHT);
+check_equals(_level1._xmouse, _level1._XmousE);
+check_equals(_level1._ymouse, _level1._yMouse);
+check_equals(_level1._soundbuftime, _level1._soundBufTIME);
+check_equals(_level1._focusrect, _level1._FOCUSRECT);
+check_equals(_level1._quality, _level1._QUALITY);
+check_equals(_level1._highquality, _level1._highQUALITY);
 
 
 //endOfTest();

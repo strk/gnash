@@ -20,7 +20,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
-#include "rect.h" // for composition
+#include "SWFRect.h" // for composition
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
@@ -82,7 +82,7 @@ public:
 		return _framerate;
 	}
 
-	virtual const rect& get_frame_size() const {
+	virtual const SWFRect& get_frame_size() const {
 		return _framesize;
 	}
 
@@ -138,7 +138,7 @@ protected:
 private:
 
 	int _version;
-	rect _framesize;
+	SWFRect _framesize;
 	size_t _framecount;
 	float _framerate;
 	std::string _url;

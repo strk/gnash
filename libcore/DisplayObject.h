@@ -26,12 +26,11 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance
-#include "rect.h" // for composition (invalidated bounds)
+#include "SWFRect.h" // for composition (invalidated bounds)
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "log.h"
 #include "snappingrange.h"
-#include "Range2d.h"
 #ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
@@ -441,7 +440,7 @@ public:
         return 0;
     }
 
-	virtual rect getBounds() const = 0;
+	virtual SWFRect getBounds() const = 0;
 
     /// Return true if the given point falls in this DisplayObject's bounds
     //
@@ -451,7 +450,7 @@ public:
     ///                 This ignores _root's transform. 
     bool pointInBounds(boost::int32_t x, boost::int32_t y) const
     {
-        rect bounds = getBounds();
+        SWFRect bounds = getBounds();
         SWFMatrix wm = getWorldMatrix(false);
         wm.transform(bounds);
         return bounds.point_test(x, y);

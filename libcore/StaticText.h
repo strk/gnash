@@ -86,7 +86,7 @@ public:
 
     void setSelectionColor(boost::uint32_t color);
 
-    virtual rect getBounds() const {
+    virtual SWFRect getBounds() const {
         return _def->bounds();
     }
 

@@ -276,7 +276,7 @@ SWFMatrix::transform(geometry::Range2d<float>& r) const
 }
 
 void 
-SWFMatrix::transform(rect& r) const
+SWFMatrix::transform(SWFRect& r) const
 {
     if ( r.is_null() ) return;
 

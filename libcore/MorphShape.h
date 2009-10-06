@@ -55,7 +55,7 @@ public:
 
 	virtual void display(Renderer& renderer);
 
-    virtual rect getBounds() const;
+    virtual SWFRect getBounds() const;
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
  

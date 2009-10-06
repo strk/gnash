@@ -59,7 +59,7 @@ public:
 		return pointInBounds(x, y);
 	}
 
-	virtual rect getBounds() const;
+	virtual SWFRect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
 	virtual void advance();

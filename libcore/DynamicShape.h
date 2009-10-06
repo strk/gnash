@@ -75,11 +75,11 @@ public:
 	/// Close an existing filled path, if any.
 	void endFill();
 
-    const rect& getBounds() const {
+    const SWFRect& getBounds() const {
         return _shape.getBounds();
     }
 
-    void setBounds(const rect& bounds) {
+    void setBounds(const SWFRect& bounds) {
         _shape.setBounds(bounds);
     }
 

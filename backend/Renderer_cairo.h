@@ -39,9 +39,9 @@ public:
     BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im);
 
     void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
-                                const rect* bounds, bool smooth);
+                                const SWFRect* bounds, bool smooth);
 
-    geometry::Range2d<int> world_to_pixel(const rect& worldbounds);
+    geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds);
     point pixel_to_world(int x, int y);
 
     void set_color(const rgba& c);

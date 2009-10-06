@@ -138,7 +138,7 @@
 /// a hint and the GUI /is/ allowed to further process and alter the information
 /// in any way.
 /// 
-/// As for the integer/float discussion: I used rect (floats) because all
+/// As for the integer/float discussion: I used SWFRect (floats) because all
 /// the bounds calculation involves floats anyway and so it's probably
 /// faster than converting between ints and floats all the way.
 
@@ -153,7 +153,7 @@
 // Forward declarations.
 namespace gnash {
     class BitmapInfo;
-    class rect;
+    class SWFRect;
     class rgba;
     class SWFMatrix;
     class cxform;
@@ -250,12 +250,12 @@ public:
     ///   renderer has to find the correct scaling for the video inside the
     ///   bounds.                                
     ///
-    /// @param bounds The minX/minY fields of this rect are always zero. 
+    /// @param bounds The minX/minY fields of this SWFRect are always zero. 
     ///   The width and height determine the size of the Flash video instance
     ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
     ///
     virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
-            const rect* bounds, bool smooth) = 0;
+            const SWFRect* bounds, bool smooth) = 0;
 
     /// Draw a line-strip directly, using a thin, solid line.
     //
@@ -328,7 +328,7 @@ public:
     ///
     /// For more info see page \ref region_update.
     ///
-    virtual void set_invalidated_region(const rect& /*bounds*/) {}
+    virtual void set_invalidated_region(const SWFRect& /*bounds*/) {}
 
     virtual void set_invalidated_regions(const InvalidatedRanges& /*ranges*/)
     {        
@@ -378,7 +378,7 @@ public:
     /// ==================================================================
     
     /// Converts world coordinates to pixel coordinates
-    virtual geometry::Range2d<int> world_to_pixel(const rect& worldbounds) = 0;
+    virtual geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds) = 0;
     
     /// Converts pixel coordinates to world coordinates (TWIPS)
     virtual point pixel_to_world(int x, int y) = 0;
@@ -404,7 +404,7 @@ public:
 	// here, so we cast it ourselves to get rid of the warning
 	// message. Note that in both cases this rounds the float to
 	// an integer by dropping the decimal part.
-        return world_to_pixel(rect(static_cast<int>(worldbounds.getMinX()),
+        return world_to_pixel(SWFRect(static_cast<int>(worldbounds.getMinX()),
 				   static_cast<int>(worldbounds.getMinY()),
 				   static_cast<int>(worldbounds.getMaxX()),
 				   static_cast<int>(worldbounds.getMaxY())));
@@ -422,12 +422,12 @@ public:
     /// handler for better performance.
     /// 'bounds' contains TWIPS coordinates.
     ///
-    /// TODO: Take a Range2d<T> rather then a gnash::rect ?
+    /// TODO: Take a Range2d<T> rather then a gnash::SWFRect ?
     ///             Would T==int be good ? TWIPS as integer types ?
     ///
     /// See also gnash::renderer::bounds_in_clipping_area
     ///
-    virtual bool bounds_in_clipping_area(const rect& bounds) {
+    virtual bool bounds_in_clipping_area(const SWFRect& bounds) {
         return bounds_in_clipping_area(bounds.getRange());
     }
     

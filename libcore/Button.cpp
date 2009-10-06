@@ -747,10 +747,10 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     );
 }
 
-rect
+SWFRect
 Button::getBounds() const
 {
-    rect allBounds;
+    SWFRect allBounds;
 
     typedef std::vector<const DisplayObject*> Chars;
     Chars actChars;
@@ -759,7 +759,7 @@ Button::getBounds() const
     {
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
-        rect lclBounds = ch->getBounds();
+        SWFRect lclBounds = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         allBounds.expand_to_transformed_rect(m, lclBounds);
     }

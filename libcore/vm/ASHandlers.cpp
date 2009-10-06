@@ -1329,7 +1329,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
             std::swap(x1, x0);
         }
 
-        rect bounds(x0, y0, x1, y1);
+        SWFRect bounds(x0, y0, x1, y1);
         st.setBounds(bounds);
 
         env.drop(4);

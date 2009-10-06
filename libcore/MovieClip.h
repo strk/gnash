@@ -137,7 +137,7 @@ public:
     virtual MovieClip* getAsRoot();
 
     /// Get the composite bounds of all component drawing elements
-    virtual rect getBounds() const;
+    virtual SWFRect getBounds() const;
 
     // See dox in DisplayObject.h
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
@@ -187,9 +187,9 @@ public:
         return isDynamic() ? 0 : _def->get_bytes_loaded();
     }
 
-    const rect& get_frame_size() const
+    const SWFRect& get_frame_size() const
     {
-        static const rect r;
+        static const SWFRect r;
         return _def ? _def->get_frame_size() : r;
     }
 
@@ -657,7 +657,7 @@ public:
             const SWFMatrix& mat = SWFMatrix(), 
             const cxform& cx = cxform(),
             DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
-            const rect& clipRect = rect(),
+            const SWFRect& clipRect = SWFRect(),
             bool smooth = false);
 
     /// @name Drawing API

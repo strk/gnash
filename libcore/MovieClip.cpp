@@ -362,18 +362,18 @@ private:
 class BoundsFinder
 {
 public:
-    BoundsFinder(rect& b) : _bounds(b) {}
+    BoundsFinder(SWFRect& b) : _bounds(b) {}
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
         if ( ch->unloaded() ) return;
-        rect chb = ch->getBounds();
+        SWFRect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
     }
 
 private:
-    rect& _bounds;
+    SWFRect& _bounds;
 };
 
 /// A DisplayList visitor used to extract script DisplayObjects
@@ -708,7 +708,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y,
 {
     
     // Set textfield bounds
-    rect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
+    SWFRect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
 
     // Create an instance
     boost::intrusive_ptr<DisplayObject> txt_char = new TextField(this, bounds);
@@ -1392,7 +1392,7 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth,
 
 std::auto_ptr<GnashImage>
 MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-            DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
+            DisplayObject::BlendMode /* bm */, const SWFRect& /* clipRect */,
             bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
@@ -1968,7 +1968,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
     _displayList.add_invalidated_bounds(ranges, force||m_invalidated);
 
     /// Add drawable.
-    rect bounds;
+    SWFRect bounds;
     bounds.expand_to_transformed_rect(getWorldMatrix(), _drawable.getBounds());
     ranges.add(bounds.getRange());
 
@@ -2430,13 +2430,13 @@ MovieClip::removeMovieClip()
 
 }
 
-rect
+SWFRect
 MovieClip::getBounds() const
 {
-    rect bounds;
+    SWFRect bounds;
     BoundsFinder f(bounds);
     const_cast<DisplayList&>(_displayList).visitAll(f);
-    rect drawableBounds = _drawable.getBounds();
+    SWFRect drawableBounds = _drawable.getBounds();
     bounds.expand_to_rect(drawableBounds);
     
     return bounds;

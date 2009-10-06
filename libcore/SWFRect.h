@@ -38,7 +38,7 @@ namespace gnash {
 /// \brief
 /// Rectangle class, see swf defined rectangle record.
 ///
-class rect
+class SWFRect
 {
 
 public:
@@ -65,10 +65,10 @@ public:
     static const boost::int32_t rectMax = 0x7fffffff;
     
     /// Ouput operator
-    friend std::ostream& operator<< (std::ostream& os, const rect& rect);
+    friend std::ostream& operator<< (std::ostream& os, const SWFRect& SWFRect);
 
     /// Construct a NULL rectangle
-    rect()
+    SWFRect()
         :
        _xMin(rectNull),
        _yMin(rectNull),
@@ -77,7 +77,7 @@ public:
     {}
 
     /// Construct a rectangle with given coordinates
-    rect(int xmin, int ymin, int xmax, int ymax)
+    SWFRect(int xmin, int ymin, int xmax, int ymax)
         :
         _xMin(xmin),
         _yMin(ymin),
@@ -154,7 +154,7 @@ public:
         return _yMax;
     }
     
-    /// Return true if the given point is inside this rect.
+    /// Return true if the given point is inside this SWFRect.
     bool point_test(boost::int32_t x, boost::int32_t y) const
     {
         if (is_null()) return false;
@@ -195,7 +195,7 @@ public:
     /// Set ourself to bound a rectangle that has been transformed by m.  
     /// This is an axial bound of an oriented (and/or
     /// sheared, scaled, etc) box.
-    void enclose_transformed_rect(const SWFMatrix& m, const rect& r);
+    void enclose_transformed_rect(const SWFMatrix& m, const SWFRect& r);
     
     /// Expand this rectangle to enclose the given circle.
     void expand_to_circle(boost::int32_t x, boost::int32_t y, boost::int32_t radius)
@@ -216,14 +216,14 @@ public:
         }
     }
       
-    /// Same as enclose_transformed_rect but expanding the current rect instead
+    /// Same as enclose_transformed_rect but expanding the current SWFRect instead
     /// of replacing it.
-    DSOEXPORT void expand_to_transformed_rect(const SWFMatrix& m, const rect& r);
+    DSOEXPORT void expand_to_transformed_rect(const SWFMatrix& m, const SWFRect& r);
     
-    /// Makes union of the given and the current rect
-    DSOEXPORT void expand_to_rect(const rect& r);
+    /// Makes union of the given and the current SWFRect
+    DSOEXPORT void expand_to_rect(const SWFRect& r);
     
-    void set_lerp(const rect& a, const rect& b, float t);
+    void set_lerp(const SWFRect& a, const SWFRect& b, float t);
 
     /// \brief
     /// Make sure that the given point falls in this rectangle, 
@@ -236,7 +236,7 @@ public:
     {
         if (is_null())
         {
-           // Range2d has a differnt idea about what is a null rect.
+           // Range2d has a differnt idea about what is a null SWFRect.
            return geometry::Range2d<float>(geometry::nullRange); //null range
         }
         else if( is_world() ) 
@@ -273,7 +273,7 @@ private:
 
 
 inline std::ostream&
-operator<< (std::ostream& os, const rect& r)
+operator<< (std::ostream& os, const SWFRect& r)
 {
     if( !r.is_null() ) {
         os << "RECT(" 

@@ -74,11 +74,11 @@ MorphShape::currentRatio() const
     return get_ratio() / 65535.0;
 }
 
-rect
+SWFRect
 MorphShape::getBounds() const
 {
     // TODO: optimize this more.
-    rect bounds = _shape.getBounds();
+    SWFRect bounds = _shape.getBounds();
     bounds.expand_to_rect(_def->shape2().getBounds());
     return bounds;
 }

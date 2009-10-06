@@ -20,7 +20,7 @@
 
 #include "DefinitionTag.h" // for inheritance
 #include "styles.h" 
-#include "rect.h" // for composition
+#include "SWFRect.h" // for composition
 #include "SWF.h"
 #include "movie_definition.h"
 #include "SWFMatrix.h"
@@ -52,7 +52,7 @@ public:
 	/// Draw the string.
 	void display(Renderer& renderer, const StaticText& inst) const;
 	
-	const rect& bounds() const {
+	const SWFRect& bounds() const {
         // TODO: There is a _matrix field in the definition(!) that's
         // currently ignored. Don't know if it needs to be transformed... 
         return _rect; 
@@ -83,7 +83,7 @@ private:
         read(in, m, tag);
     }
 
-	rect _rect;
+	SWFRect _rect;
 
     SWFMatrix _matrix;
 

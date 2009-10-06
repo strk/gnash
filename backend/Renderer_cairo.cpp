@@ -447,7 +447,7 @@ Renderer_cairo::createBitmapInfo(std::auto_ptr<GnashImage> im)
 
 void
 Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
-                               const rect* bounds, bool /*smooth*/)
+                               const SWFRect* bounds, bool /*smooth*/)
 {
 
     if (baseframe->type() == GNASH_IMAGE_RGBA)
@@ -519,7 +519,7 @@ Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
 
   
 geometry::Range2d<int>
-Renderer_cairo::world_to_pixel(const rect& worldbounds)
+Renderer_cairo::world_to_pixel(const SWFRect& worldbounds)
 {
     double xmin = worldbounds.get_x_min(),
            ymin = worldbounds.get_y_min(),

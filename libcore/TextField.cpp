@@ -196,7 +196,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
 
 }
 
-TextField::TextField(DisplayObject* parent, const rect& bounds)
+TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
     :
     // the id trick is to fool assertions in DisplayObject ctor
     InteractiveObject(parent, parent ? 0 : -1),
@@ -451,7 +451,7 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
 
     const SWFMatrix& wm = getWorldMatrix();
 
-    rect bounds = getBounds();
+    SWFRect bounds = getBounds();
     bounds.expand_to_rect(m_text_bounding_box); 
     wm.transform(bounds);
     ranges.add(bounds.getRange());            
@@ -2763,7 +2763,7 @@ TextField::markReachableResources() const
 void
 TextField::setWidth(double newwidth)
 {
-	const rect& bounds = getBounds();
+	const SWFRect& bounds = getBounds();
     _bounds.set_to_rect(bounds.get_x_min(),
             bounds.get_y_min(),
             bounds.get_x_min() + newwidth,
@@ -2773,7 +2773,7 @@ TextField::setWidth(double newwidth)
 void
 TextField::setHeight(double newheight)
 {
-	const rect& bounds = getBounds();
+	const SWFRect& bounds = getBounds();
     _bounds.set_to_rect(bounds.get_x_min(),
             bounds.get_y_min(),
             bounds.get_x_max(),
@@ -3618,7 +3618,7 @@ textfield_ctor(const fn_call& fn)
         obj = new as_object(proto);
     }
     else {
-        rect nullRect;
+        SWFRect nullRect;
         obj = new TextField(0, nullRect);
     }
 

@@ -19,7 +19,7 @@
 #ifndef GNASH_FREETYPE_H
 #define GNASH_FREETYPE_H
 
-#include "rect.h"
+#include "SWFRect.h"
 #include "smart_ptr.h" // for intrusive_ptr
 
 #include <string>

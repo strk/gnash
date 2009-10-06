@@ -191,7 +191,7 @@ RiscosGui::setInterval(unsigned int interval)
 }
 
 void
-RiscosGui::setInvalidatedRegion(const rect& bounds)
+RiscosGui::setInvalidatedRegion(const SWFRect& bounds)
 {
     // Note: Bounds coordinates are in TWIPS
 
@@ -269,13 +269,13 @@ RiscosGui::run()
           return false;
         }
         while (more) {
-//          rect bounds(block.redraw.clip.x0 / 2, block.redraw.clip.y0 / 2,
+//          SWFRect bounds(block.redraw.clip.x0 / 2, block.redraw.clip.y0 / 2,
 //                      block.redraw.clip.x1 / 2, block.redraw.clip.y1 / 2);
-//          log_debug("Clip rect: (%d, %d)(%d, %d)\n",
+//          log_debug("Clip SWFRect: (%d, %d)(%d, %d)\n",
 //                  block.redraw.clip.x0 / 2, block.redraw.clip.y0 / 2,
 //                  block.redraw.clip.x1 / 2, block.redraw.clip.y1 / 2);
           // TODO: Make this use the clipping rectangle (convert to TWIPS)
-          rect bounds(-1e10f, -1e10f, 1e10f, 1e10f);
+          SWFRect bounds(-1e10f, -1e10f, 1e10f, 1e10f);
 #ifdef RENDERER_AGG
           setInvalidatedRegion(bounds);
 #endif

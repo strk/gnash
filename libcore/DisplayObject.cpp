@@ -256,7 +256,7 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     ranges.add(m_old_invalidated_ranges);
     if (visible() && (m_invalidated||force))
     {
-        rect bounds;        
+        SWFRect bounds;        
         bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
         ranges.add(bounds.getRange());                        
     }        
@@ -372,7 +372,7 @@ DisplayObject::set_visible(bool visible)
 void
 DisplayObject::setWidth(double newwidth)
 {
-	const rect& bounds = getBounds();
+	const SWFRect& bounds = getBounds();
 	const double oldwidth = bounds.width();
 	assert(oldwidth >= 0); 
 
@@ -388,7 +388,7 @@ DisplayObject::setWidth(double newwidth)
 as_value
 getHeight(DisplayObject& o)
 {
-	rect bounds = o.getBounds();
+	SWFRect bounds = o.getBounds();
     const SWFMatrix m = o.getMatrix();
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
@@ -410,7 +410,7 @@ setHeight(DisplayObject& o, const as_value& val)
 void
 DisplayObject::setHeight(double newheight)
 {
-	const rect& bounds = getBounds();
+	const SWFRect& bounds = getBounds();
 
 	const double oldheight = bounds.height();
 	assert(oldheight >= 0); 
@@ -614,6 +614,8 @@ DisplayObject::set_rotation(double rot)
 
     // Update the matrix from the cached x scale to avoid accumulating
     // errors.
+    // TODO: also update y scale? The x scale update is needed to keep
+    // TextField correct; no tests for y scale.
     m.set_x_scale(std::abs(scaleX() / 100.0));
 	setMatrix(m); // we update the cache ourselves
 
@@ -862,7 +864,7 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 bool 
 DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
-  rect mybounds = getBounds();
+  SWFRect mybounds = getBounds();
   getWorldMatrix().transform(mybounds);
   
   return renderer.bounds_in_clipping_area(mybounds.getRange());  
@@ -934,7 +936,12 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
 
     const Getters& getters = displayObjectGetters();
 
-    Getters::const_iterator it = getters.find(key);
+    // The magic properties are case insensitive in all versions!
+    string_table& st = getStringTable(obj);
+    const std::string& propname = st.value(key);
+    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
+
+    Getters::const_iterator it = getters.find(noCaseKey);
     if (it == getters.end()) return false;
 
     DisplayObject& o = static_cast<DisplayObject&>(obj);
@@ -951,7 +958,12 @@ setDisplayObjectProperty(as_object& obj, string_table::key key,
 
     const Setters& setters = displayObjectSetters();
 
-    Setters::const_iterator it = setters.find(key);
+    // The magic properties are case insensitive in all versions!
+    string_table& st = getStringTable(obj);
+    const std::string& propname = st.value(key);
+    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
+
+    Setters::const_iterator it = setters.find(noCaseKey);
     if (it == setters.end()) return false;
 
     DisplayObject& o = static_cast<DisplayObject&>(obj);
@@ -1358,7 +1370,7 @@ getSoundBufTime(DisplayObject& /*o*/)
 as_value
 getWidth(DisplayObject& o)
 {
-	rect bounds = o.getBounds();
+	SWFRect bounds = o.getBounds();
     const SWFMatrix& m = o.getMatrix();
     m.transform(bounds);
     return twipsToPixels(bounds.width());
@@ -1375,6 +1387,19 @@ setWidth(DisplayObject& o, const as_value& val)
         );
     }
     o.setWidth(newwidth);
+}
+
+as_value
+getFocusRect(DisplayObject& /*o*/)
+{
+    LOG_ONCE(log_unimpl("_focusrect"));
+    return as_value(true);
+}
+
+void
+setFocusRect(DisplayObject& /*o*/, const as_value& /*val*/)
+{
+    LOG_ONCE(log_unimpl("_focusrect setting"));
 }
 
 const Getters
@@ -1395,12 +1420,14 @@ displayObjectGetters()
         (NSV::PROP_uNAME, getNameProperty)
         (NSV::PROP_uVISIBLE, getVisible)
         (NSV::PROP_uSOUNDBUFTIME, getSoundBufTime)
+        (NSV::PROP_uFOCUSRECT, getFocusRect)
         (NSV::PROP_uPARENT, getParent)
         (NSV::PROP_uTARGET, getTarget)
         (NSV::PROP_uXMOUSE, getMouseX)
         (NSV::PROP_uYMOUSE, getMouseY);
     return getters;
 }
+
 const Setters
 displayObjectSetters()
 {
@@ -1420,6 +1447,7 @@ displayObjectSetters()
         (NSV::PROP_uNAME, setName)
         (NSV::PROP_uVISIBLE, setVisible)
         (NSV::PROP_uSOUNDBUFTIME, setSoundBufTime)
+        (NSV::PROP_uFOCUSRECT, setFocusRect)
         (NSV::PROP_uPARENT, n)
         (NSV::PROP_uURL, n)
         (NSV::PROP_uTARGET, n)

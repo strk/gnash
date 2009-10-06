@@ -54,7 +54,7 @@ class DSOEXPORT DumpGui : public Gui
     void setTimeout(unsigned int timeout);
     bool setupEvents() { return true; }
     void setFullscreen() { return; }
-    void setInvalidatedRegion(const rect& /*bounds*/) { return; }
+    void setInvalidatedRegion(const SWFRect& /*bounds*/) { return; }
     void setInvalidatedRegions(const InvalidatedRanges& /*ranges*/) { return; }
     void setCursor(gnash_cursor_type /*newcursor*/) { return; }
     void setRenderHandlerSize(int width, int height);

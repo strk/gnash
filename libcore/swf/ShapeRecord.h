@@ -21,7 +21,7 @@
 #include "Geometry.h"
 #include "fill_style.h"
 #include "styles.h"
-#include "rect.h"
+#include "SWFRect.h"
 
 #include <vector>
 
@@ -94,7 +94,7 @@ public:
         return _paths;
     }
 
-    const rect& getBounds() const {
+    const SWFRect& getBounds() const {
         return _bounds;
     }
 
@@ -132,7 +132,7 @@ public:
         _lineStyles.push_back(ls);
     }
 
-    void setBounds(const rect& bounds) {
+    void setBounds(const SWFRect& bounds) {
         _bounds = bounds;
     }
 
@@ -151,7 +151,7 @@ private:
     FillStyles _fillStyles;
     LineStyles _lineStyles;
     Paths _paths;
-    rect _bounds;
+    SWFRect _bounds;
 
 };
 
