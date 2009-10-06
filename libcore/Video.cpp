@@ -43,7 +43,6 @@ namespace {
     as_object* getVideoInterface(as_object& where);
     void attachPrototypeProperties(as_object& o);
     void attachVideoInterface(as_object& o);
-    void attachVideoProperties(as_object& o);
     as_value video_ctor(const fn_call& fn);
     as_value video_attach(const fn_call& fn);
     as_value video_clear(const fn_call& fn);
@@ -73,7 +72,6 @@ Video::Video(const SWF::DefineVideoStreamTag* const def,
 	{
         // TODO: this should happen using the native creation function
         // once Video is a Relay.
-		attachVideoProperties(*this);
 		initializeDecoder();
         
         attachPrototypeProperties(*get_prototype());
@@ -382,12 +380,6 @@ attachPrototypeProperties(as_object& proto)
 
     proto.init_property("height", &video_height, &video_height, flags);
     proto.init_property("width", &video_width, &video_width, flags);
-}
-
-void
-attachVideoProperties(as_object& o)
-{
-    attachDisplayObjectProperties(o);
 }
 
 as_value

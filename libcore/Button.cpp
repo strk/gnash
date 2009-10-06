@@ -252,12 +252,6 @@ static bool isCharacterNull(DisplayObject* ch, bool includeUnloaded)
     return (!ch || (!includeUnloaded && ch->unloaded()));
 }
 
-void
-attachButtonProperties(as_object& o)
-{
-    attachDisplayObjectProperties(o);
-}
-
 static void
 attachButtonInterface(as_object& o)
 {
@@ -279,9 +273,6 @@ Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
 {
 
     set_prototype(getButtonInterface());
-
-    // TODO: should be done in a creation function.
-    attachButtonProperties(*this);
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {
