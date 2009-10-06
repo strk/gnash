@@ -493,46 +493,7 @@ bool
 MovieClip::get_member(string_table::key name_key, as_value* val,
     string_table::key nsname)
 {
-    // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a DisplayObject protected method take
-    //       care of these ?
-    //       Duplicates code in DisplayObject::getPathElementSeparator too.
-    if (getMovieVersion() > 4 && name_key == NSV::PROP_uROOT)
-    {
-        // getAsRoot() will take care of _lockroot
-        val->set_as_object(getAsRoot());
-        return true;
-    }
 
-    // NOTE: availability of _global doesn't depend on VM version
-    //             but on actual movie version. Example: if an SWF4 loads
-    //             an SWF6 (to, say, _level2), _global will be unavailable
-    //             to the SWF4 code but available to the SWF6 one.
-    //
-    if (getMovieVersion() > 5 && name_key == NSV::PROP_uGLOBAL) 
-    {
-        // The "_global" ref was added in SWF6
-        val->set_as_object(getGlobal(*this));
-        return true;
-    }
-
-    const std::string& name = getStringTable(*this).value(name_key);
-
-    movie_root& mr = getRoot(*this);
-    unsigned int levelno;
-    if ( mr.isLevelTarget(name, levelno) )
-    {
-        Movie* mo = mr.getLevel(levelno).get();
-        if ( mo )
-        {
-            val->set_as_object(mo);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     // Own members take precendence over display list items 
     // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
@@ -549,6 +510,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
         return true;
     }
     
+    const std::string& name = getStringTable(*this).value(name_key);
     if (getDisplayObjectProperty(*this, name_key, *val)) return true;
     
     // Try items on our display list.
