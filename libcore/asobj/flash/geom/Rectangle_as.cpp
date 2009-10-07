@@ -30,7 +30,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 #include "as_value.h"
 #include "namedStrings.h"
 #include "GnashNumeric.h" // isFinite

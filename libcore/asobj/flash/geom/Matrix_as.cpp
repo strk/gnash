@@ -26,7 +26,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" 
+#include "VM.h"
 
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
