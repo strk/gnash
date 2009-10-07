@@ -293,6 +293,64 @@ VM::getNative(unsigned int x, unsigned int y) const
     return f;
 }
 
+///////////////////////////////////////////////////////////////////////
+//
+// Value ops
+//
+///////////////////////////////////////////////////////////////////////
+
+void
+newAdd(as_value& left, const as_value& right, VM& vm)
+{
+    // We can't change the original value.
+    as_value r(right);
+
+    // The order of the operations is important: right is converted to
+    // primitive before left.
+
+	try { r = r.to_primitive(); }
+	catch (ActionTypeError& e)
+	{
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewAdd"), r);
+	}
+	
+    try { left = left.to_primitive(); }
+	catch (ActionTypeError& e)
+	{
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewAdd"), left);
+	}
+
+#if GNASH_DEBUG
+	log_debug(_("(%s + %s) [primitive conversion done]"), left, r);
+#endif
+
+	if (left.is_string() || r.is_string()) {
+
+		// use string semantic
+		const int version = vm.getSWFVersion();
+		convertToString(left, vm);
+		left.string_concat(r.to_string_versioned(version));
+        return;
+	}
+
+    // Otherwise use numeric semantic
+    const double v1num = left.to_number();
+    const double v2num = r.to_number();
+    left.set_double(v2num + v1num); 
+
+}
+
+void
+subtract(as_value& left, const as_value& right, VM& /*vm*/)
+{
+	const double operand2 = right.to_number();
+	const double operand1 = left.to_number();
+	left.set_double(operand1 - operand2);
+}
+
+
 } // end of namespace gnash
 
 
