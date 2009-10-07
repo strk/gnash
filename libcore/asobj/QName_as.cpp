@@ -62,32 +62,17 @@ public:
 void
 qname_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl;
 
     Global_as* gl = getGlobal(where);
-    as_object* proto = getQNameInterface();
-    cl = gl->createClass(&qname_ctor, proto);
+    as_object* proto = gl->createObject();
+    as_object* cl = gl->createClass(&qname_ctor, proto);
 
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
 
 namespace {
-
-as_object*
-getQNameInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-
-    if (!o) {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-    }
-
-    return o.get();
-}
-
 
 void
 attachQNameInterface(as_object& o)
@@ -111,11 +96,11 @@ qname_uri(const fn_call& /*fn*/)
 }
 
 as_value
-qname_ctor(const fn_call& /*fn*/)
+qname_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ns = new QName_as;
-    attachQNameInterface(*ns);
-    return as_value(ns.get()); 
+    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    attachQNameInterface(*obj);
+    return as_value(); 
 }
 
 } // anonymous namespace

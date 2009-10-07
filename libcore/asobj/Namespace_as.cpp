@@ -45,51 +45,16 @@ namespace {
     void attachNamespaceInterface(as_object& o);
 }
 
-
-class Namespace_as : public as_object
-{
-
-public:
-
-    Namespace_as()
-        :
-        as_object(getNamespaceInterface())
-    {}
-
-};
-
-
 // extern 
 void
 namespace_class_init(as_object& where, const ObjectURI& uri)
 {
-    boost::intrusive_ptr<as_object> cl;
-    
-    Global_as* gl = getGlobal(where);
-    as_object* proto = getNamespaceInterface();
-    cl = gl->createClass(&namespace_ctor, proto);
-
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, namespace_ctor, attachNamespaceInterface,
+            0, uri);
 }
 
 
 namespace {
-
-as_object*
-getNamespaceInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-
-    if (!o) {
-        o = new as_object(getObjectInterface());
-        VM::get().addStatic(o.get());
-        attachNamespaceInterface(*o);
-    }
-
-    return o.get();
-}
-
 
 void
 attachNamespaceInterface(as_object& o)
@@ -116,9 +81,9 @@ namespace_uri(const fn_call& /*fn*/)
 as_value
 namespace_ctor(const fn_call& /*fn*/)
 {
+    // TODO: probably needs Relay.
     log_unimpl("Namespace");
-    boost::intrusive_ptr<as_object> ns = new Namespace_as;
-    return as_value(ns.get()); 
+    return as_value(); 
 }
 
 } // anonymous namespace
