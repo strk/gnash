@@ -362,21 +362,28 @@ private:
 
 /// Carry out ActionNewAdd
 //
-/// @param left     The as_value to add to.
-/// @param right    The as_value to add.
+/// @param op1      The as_value to add to.
+/// @param op2      The as_value to add.
 /// @param vm       The VM executing the operation.
 //
 /// TODO:           Consider whether it would be better to pass something
 ///                 other than the VM. But it is a VM operation, so it
 ///                 is logically sound.
-void newAdd(as_value& left, const as_value& right, VM& vm);
+void newAdd(as_value& op1, const as_value& op2, VM& vm);
 
 /// Carry out ActionSubtract
 //
-/// @param left     The as_value to subtract from.
-/// @param right    The as_value to subtract.
+/// @param op1      The as_value to subtract from.
+/// @param op2      The as_value to subtract.
 /// @param vm       The VM executing the operation.
-void subtract(as_value& left, const as_value& right, VM& vm);
+void subtract(as_value& op1, const as_value& op2, VM& vm);
+
+/// Carry out ActionSubtract
+//
+/// @param op1      The first comparand.
+/// @param op2      The second comparand.
+/// @param vm       The VM executing the operation.
+as_value newLessThan(const as_value& op1, const as_value& op2, VM& vm);
 
 /// Return true if the VM is executing AS3 (ABC bytecode).
 inline bool

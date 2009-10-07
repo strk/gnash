@@ -300,13 +300,13 @@ VM::getNative(unsigned int x, unsigned int y) const
 ///////////////////////////////////////////////////////////////////////
 
 void
-newAdd(as_value& left, const as_value& right, VM& vm)
+newAdd(as_value& op1, const as_value& op2, VM& vm)
 {
     // We can't change the original value.
-    as_value r(right);
+    as_value r(op2);
 
-    // The order of the operations is important: right is converted to
-    // primitive before left.
+    // The order of the operations is important: op2 is converted to
+    // primitive before op1.
 
 	try { r = r.to_primitive(); }
 	catch (ActionTypeError& e)
@@ -315,39 +315,82 @@ newAdd(as_value& left, const as_value& right, VM& vm)
                 "ActionNewAdd"), r);
 	}
 	
-    try { left = left.to_primitive(); }
+    try { op1 = op1.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
         log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewAdd"), left);
+                "ActionNewAdd"), op1);
 	}
 
 #if GNASH_DEBUG
-	log_debug(_("(%s + %s) [primitive conversion done]"), left, r);
+	log_debug(_("(%s + %s) [primitive conversion done]"), op1, r);
 #endif
 
-	if (left.is_string() || r.is_string()) {
+	if (op1.is_string() || r.is_string()) {
 
 		// use string semantic
 		const int version = vm.getSWFVersion();
-		convertToString(left, vm);
-		left.string_concat(r.to_string_versioned(version));
+		convertToString(op1, vm);
+		op1.string_concat(r.to_string_versioned(version));
         return;
 	}
 
     // Otherwise use numeric semantic
-    const double v1num = left.to_number();
-    const double v2num = r.to_number();
-    left.set_double(v2num + v1num); 
+    const double num1 = op1.to_number();
+    const double num2 = r.to_number();
+    op1.set_double(num2 + num1); 
 
 }
 
 void
-subtract(as_value& left, const as_value& right, VM& /*vm*/)
+subtract(as_value& op1, const as_value& op2, VM& /*vm*/)
 {
-	const double operand2 = right.to_number();
-	const double operand1 = left.to_number();
-	left.set_double(operand1 - operand2);
+	const double num2 = op2.to_number();
+	const double num1 = op1.to_number();
+	op1.set_double(num1 - num2);
+}
+
+as_value
+newLessThan(const as_value& op1, const as_value& op2, VM& vm)
+{
+
+    as_value operand1(op1);
+    as_value operand2(op2);
+
+    try { operand1 = op1.to_primitive(as_value::NUMBER); }
+    catch (ActionTypeError& e)
+    {
+        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
+            op1);
+    }
+
+    try { operand2 = op2.to_primitive(as_value::NUMBER); }
+    catch (ActionTypeError& e)
+    {
+        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
+            op2);
+    }
+    
+    if (operand2.is_object() && !operand2.is_sprite()) {
+        return false;
+    }
+
+    if (operand1.is_string() && operand2.is_string())
+    {
+        const std::string& s1 = operand1.to_string();
+        const std::string& s2 = operand2.to_string();
+        if (s1.empty()) return false;
+        if (s2.empty()) return true;
+        return as_value(s1 < s2);
+    }
+
+    const double num1 = operand1.to_number();
+    const double num2 = operand2.to_number();
+
+    if (isNaN(num1) || isNaN(num2)) {
+        return as_value();
+    }
+    return as_value(num1 < num2);
 }
 
 

@@ -584,10 +584,6 @@ public:
 	/// Sets this value to this string plus the given string.
 	void string_concat(const std::string& str);
 
-	/// Equivalent of ActionNewLessThan
-	as_value newLessThan(const as_value& op2_in) const;
-
-
 	/// Set any object value as reachable (for the GC)
 	//
 	/// Object values are values stored by pointer (objects and functions)
