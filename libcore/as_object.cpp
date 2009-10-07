@@ -72,8 +72,8 @@ public:
     bool operator()()
     {
         ++_iterations;
-        log_debug("Iterated: %s", _iterations);
-		if ((_iterations > 255 && _version == 5) || _iterations > 257) {
+        // See swfdec/prototype-recursion-get-?.swf
+		if (_iterations > 256) {
 			throw ActionLimitException("Lookup depth exceeded.");
         }
         _object = _object->get_prototype().get();
