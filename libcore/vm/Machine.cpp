@@ -722,7 +722,7 @@ Machine::execute()
                     as_value b = pop_stack();
                     as_value a = pop_stack();
                     const boost::int32_t bytes = mStream->read_S24();
-                    const bool jump = a.newLessThan(b).to_bool();
+                    const bool jump = newLessThan(a, b, _vm).to_bool();
                     if (jump) {
                         log_abc("Jumping... %d bytes.", bytes);
                         mStream->seekBy(bytes);

@@ -74,9 +74,6 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
-// Initialize unnamed instance count
-unsigned int DisplayObject::_lastUnnamedInstanceNum = 0;
-
 DisplayObject::DisplayObject(DisplayObject* parent, int id)
     :
     m_parent(parent),
@@ -106,12 +103,12 @@ DisplayObject::DisplayObject(DisplayObject* parent, int id)
     setDisplayObject();
 }
 
-/*protected static*/
 std::string
 DisplayObject::getNextUnnamedInstanceName()
 {
-	std::stringstream ss;
-	ss << "instance" << ++_lastUnnamedInstanceNum;
+    movie_root& mr = getRoot(*this);
+	std::ostringstream ss;
+	ss << "instance" << mr.nextUnnamedInstance();
 	return ss.str();
 }
 
@@ -933,21 +930,48 @@ bool
 getDisplayObjectProperty(as_object& obj, string_table::key key,
         as_value& val)
 {
+    
+    DisplayObject& o = static_cast<DisplayObject&>(obj);
+
+    // These properties have normal case-sensitivity.
+    // They are tested to exist for TextField, MovieClip, and Button
+    // but do not belong to the inheritance chain.
+    switch (key)
+    {
+        default:
+            break;
+        case NSV::PROP_uROOT:
+            if (getSWFVersion(o) < 5) break;
+            val = o.getAsRoot();
+            return true;
+        case NSV::PROP_uGLOBAL:
+            if (getSWFVersion(o) < 6) break;
+            val = getGlobal(o);
+            return true;
+    }
+    
+    string_table& st = getStringTable(obj);
+    const std::string& propname = st.value(key);
+
+    // Check _level0.._level9
+    movie_root& mr = getRoot(o);
+    unsigned int levelno;
+    if (mr.isLevelTarget(propname, levelno)) {
+        Movie* mo = mr.getLevel(levelno).get();
+        if (mo) {
+            val = mo;
+            return true;
+        }
+        return false;
+    }
 
     const Getters& getters = displayObjectGetters();
 
-    // TODO: _root and _global also seem to be magic properties, but are
-    // case sensitive in version 7 and above
-
     // These magic properties are case insensitive in all versions!
-    string_table& st = getStringTable(obj);
-    const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
 
     Getters::const_iterator it = getters.find(noCaseKey);
     if (it == getters.end()) return false;
-
-    DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     val = (*it->second)(o);
     return true;
@@ -960,11 +984,6 @@ setDisplayObjectProperty(as_object& obj, string_table::key key,
 {
 
     const Setters& setters = displayObjectSetters();
-
-    // TODO: _root and _global also seem to be magic properties, but are
-    // case sensitive in version 7 and above. They are tested to exist for
-    // TextField, MovieClip, and Button but do not belong to the
-    // inheritance chain.
 
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(obj);

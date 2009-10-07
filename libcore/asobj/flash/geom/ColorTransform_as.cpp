@@ -30,7 +30,7 @@
 #include "builtin_function.h" 
 #include "NativeFunction.h"
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 
 #include <sstream>
 

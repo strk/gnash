@@ -30,7 +30,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 #include "as_value.h"
 #include "namedStrings.h"
 #include "GnashNumeric.h" // isFinite
@@ -208,19 +208,19 @@ Rectangle_contains(const fn_call& fn)
     
     // NOTE: order of tests is important, see actionscript.all/Rectangle.as
 
-    as_value ret = x_as.newLessThan(rect_x_as);
+    as_value ret = newLessThan(x_as, rect_x_as, vm);
     if ( ret.is_undefined() ) return as_value();
     if ( ret.to_bool() ) return as_value(false); 
 
-    ret = x_as.newLessThan(rect_x1_as);
+    ret = newLessThan(x_as, rect_x1_as, vm);
     if ( ret.is_undefined() ) return as_value();
     if ( ! ret.to_bool() ) return as_value(false); 
 
-    ret = y_as.newLessThan(rect_y_as);
+    ret = newLessThan(y_as, rect_y_as, vm);
     if ( ret.is_undefined() ) return as_value();
     if ( ret.to_bool() ) return as_value(false); 
 
-    ret = y_as.newLessThan(rect_y1_as);
+    ret = newLessThan(y_as, rect_y1_as, vm);
     if ( ret.is_undefined() ) return as_value();
     if ( ! ret.to_bool() ) return as_value(false); 
 

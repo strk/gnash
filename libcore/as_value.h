@@ -584,10 +584,6 @@ public:
 	/// Sets this value to this string plus the given string.
 	void string_concat(const std::string& str);
 
-	/// Equivalent of ActionNewLessThan
-	as_value newLessThan(const as_value& op2_in) const;
-
-
 	/// Set any object value as reachable (for the GC)
 	//
 	/// Object values are values stored by pointer (objects and functions)
@@ -675,17 +671,6 @@ private:
 };
 
 
-/// Carry out ActionNewAdd
-//
-/// @param left     The as_value to add to.
-/// @param right    The as_value to add.
-/// @param vm       The VM executing the operation.
-//
-/// TODO:           Consider whether it would be better to pass something
-///                 other than the VM. But it is a VM operation, so it
-///                 is logically sound.
-void newAdd(as_value& left, const as_value& right, VM& vm);
-
 /// Force type to number.
 as_value& convertToNumber(as_value& v, VM& vm);
 
@@ -694,13 +679,6 @@ as_value& convertToString(as_value& v, VM& vm);
 
 /// Force type to bool.
 as_value& convertToBoolean(as_value& v, VM& vm);
-
-/// Carry out ActionSubtract
-//
-/// @param left     The as_value to subtract from.
-/// @param right    The as_value to subtract.
-/// @param vm       The VM executing the operation.
-void subtract(as_value& left, const as_value& right, VM& vm);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 	return os << v.toDebugString();

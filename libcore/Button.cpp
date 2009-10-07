@@ -504,18 +504,16 @@ Button::mouseEvent(const event_id& event)
         const SWF::DefineButtonSoundTag::ButtonSound& bs = 
             _def->buttonSound(bi);
 
-        // DisplayObject zero is considered as null DisplayObject
+        // character zero is considered as null character
         if (!bs.soundID) break;
 
         // No actual sound ?
         if (!bs.sample) break;
 
-        if (bs.soundInfo.stopPlayback)
-        {
+        if (bs.soundInfo.stopPlayback) {
             s->stop_sound(bs.sample->m_sound_handler_id);
         }
-        else
-        {
+        else {
             const SWF::SoundInfoRecord& sinfo = bs.soundInfo;
 
             const sound::SoundEnvelopes* env = 
@@ -549,9 +547,7 @@ Button::mouseEvent(const event_id& event)
 
     // check for built-in event handler.
     std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
-    if ( code.get() )
-    {
-        //log_debug(_("Got statically-defined handler for event: %s"), event);
+    if (code.get()) {
         mr.pushAction(code, movie_root::apDOACTION);
     }
 
@@ -876,21 +872,16 @@ Button::markReachableResources() const
     _def->setReachable();
 
     // Mark state DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
-            i!=e; ++i)
+    for (DisplayObjects::const_iterator i = _stateCharacters.begin(),
+            e = _stateCharacters.end(); i != e; ++i)
     {
         DisplayObject* ch = *i;
-        if ( ch ) ch->setReachable();
+        if (ch) ch->setReachable();
     }
 
     // Mark hit DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
-            e=_hitCharacters.end(); i != e; ++i)
-    {
-        DisplayObject* ch = *i;
-        assert ( ch );
-        ch->setReachable();
-    }
+    std::for_each(_hitCharacters.begin(), _hitCharacters.end(),
+            std::mem_fun(&as_object::setReachable));
 
     // DisplayObject class members
     markDisplayObjectReachable();
@@ -909,9 +900,8 @@ Button::unload()
             e = _stateCharacters.end(); i != e; ++i)
     {
         DisplayObject* ch = *i;
-        if ( ! ch ) continue;
-        if ( ch->unloaded() ) continue;
-        if ( ch->unload() ) childsHaveUnload = true;
+        if (!ch || ch->unloaded()) continue;
+        if (ch->unload()) childsHaveUnload = true;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -932,13 +922,10 @@ Button::destroy()
 {
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
-            e=_stateCharacters.end(); i != e; ++i)
-    {
+            e=_stateCharacters.end(); i != e; ++i) {
         DisplayObject* ch = *i;
-        if ( ! ch ) continue;
-        if ( ch->isDestroyed() ) continue;
+        if (!ch || ch->isDestroyed()) continue;
         ch->destroy();
-        *i = 0;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -950,79 +937,6 @@ Button::destroy()
     _hitCharacters.clear();
 
     DisplayObject::destroy();
-}
-
-bool
-Button::get_member(string_table::key name_key, as_value* val,
-    string_table::key nsname)
-{
-    // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a DisplayObject:: protected method take
-    //       care of these ?
-    //       Duplicates code in DisplayObject::getPathElementSeparator too..
-    //
-    if (name_key == NSV::PROP_uROOT) {
-        // getAsRoot() will take care of _lockroot
-        val->set_as_object(getAsRoot());
-        return true;
-    }
-
-    // NOTE: availability of _global doesn't depend on VM version
-    //             but on actual movie version. Example: if an SWF4 loads
-    //             an SWF6 (to, say, _level2), _global will be unavailable
-    //             to the SWF4 code but available to the SWF6 one.
-    //
-    // see MovieClip.as
-    if (getMovieVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
-        // The "_global" ref was added in SWF6
-        val->set_as_object(getGlobal(*this));
-        return true;
-    }
-
-    const std::string& name = getStringTable(*this).value(name_key);
-
-    movie_root& mr = getRoot(*this);
-    unsigned int levelno;
-    if ( mr.isLevelTarget(name, levelno) ) {
-        Movie* mo = mr.getLevel(levelno).get();
-        if ( mo ) {
-            val->set_as_object(mo);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    // TOCHECK : Try object members, BEFORE display list items
-    //
-    if (as_object::get_member(name_key, val, nsname))
-    {
-
-    // ... trying to be useful to Flash coders ...
-    // The check should actually be performed before any return
-    // prior to the one due to a match in the DisplayList.
-    // It's off by default anyway, so not a big deal.
-    // See bug #18457
-#define CHECK_FOR_NAME_CLASHES 1
-#ifdef CHECK_FOR_NAME_CLASHES
-        IF_VERBOSE_ASCODING_ERRORS(
-        if ( getChildByName(name) )
-        {
-            log_aserror(_("A button member (%s) clashes with "
-                    "the name of an existing DisplayObject "
-                    "in its display list.    "
-                    "The member will hide the "
-                    "DisplayObject"), name);
-        }
-        );
-#endif
-
-        return true;
-    }
-
-    return false;
-
 }
 
 int
@@ -1107,7 +1021,7 @@ Button::mouseStateName(MouseState s)
         case MOUSESTATE_DOWN: return "DOWN";
         case MOUSESTATE_OVER: return "OVER";
         case MOUSESTATE_HIT: return "HIT";
-        default: return "UNKNOWN (error?)";
+        default: std::abort();
     }
 }
 

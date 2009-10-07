@@ -345,6 +345,46 @@ private:
 
 };
 
+/////////////////////////////////////////////////////////////////////////////
+///
+/// VM ops on as_value.
+///
+/// These are currently used in:
+/// 1. VM (AVM1)
+/// 2. Machine (AVM2)
+/// 3. Gnash's C++ implementation of ActionScript.
+///
+/// Usage 3 replicates VM behaviour, but does not use the VM's stack or other
+/// resources. This can lead to different behaviour, for instance when there
+/// are limits on the stack size. Such cases are probably rare.
+///
+/////////////////////////////////////////////////////////////////////////////
+
+/// Carry out ActionNewAdd
+//
+/// @param op1      The as_value to add to.
+/// @param op2      The as_value to add.
+/// @param vm       The VM executing the operation.
+//
+/// TODO:           Consider whether it would be better to pass something
+///                 other than the VM. But it is a VM operation, so it
+///                 is logically sound.
+void newAdd(as_value& op1, const as_value& op2, VM& vm);
+
+/// Carry out ActionSubtract
+//
+/// @param op1      The as_value to subtract from.
+/// @param op2      The as_value to subtract.
+/// @param vm       The VM executing the operation.
+void subtract(as_value& op1, const as_value& op2, VM& vm);
+
+/// Carry out ActionSubtract
+//
+/// @param op1      The first comparand.
+/// @param op2      The second comparand.
+/// @param vm       The VM executing the operation.
+as_value newLessThan(const as_value& op1, const as_value& op2, VM& vm);
+
 /// Return true if the VM is executing AS3 (ABC bytecode).
 inline bool
 isAS3(VM& vm)

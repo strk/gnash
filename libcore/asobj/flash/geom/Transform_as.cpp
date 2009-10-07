@@ -30,7 +30,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 #include "MovieClip.h" // For MovieClip
 #include "ColorTransform_as.h"
 #include "GnashNumeric.h"

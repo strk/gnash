@@ -26,7 +26,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 #include "GnashNumeric.h"
 
 #include <sstream>
@@ -625,7 +625,8 @@ point_ctor(const fn_call& fn)
             IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss;
                 fn.dump_args(ss);
-                log_aserror("flash.geom.Point(%s): %s", ss.str(), _("arguments after the first two discarded"));
+                log_aserror("flash.geom.Point(%s): %s", ss.str(),
+                    _("arguments after the first two discarded"));
             );
         } while(0);
     }

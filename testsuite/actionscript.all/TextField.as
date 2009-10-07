@@ -435,15 +435,22 @@ check_equals(typeof(tfref), 'object');
 // Check TextField._root and _global
 //-------------------------------------------------------------------------
 
-xcheck(tf._root);
-xcheck_equals(_root, _root.tf._root);
+check(tf._root);
+check_equals(_root, _root.tf._root);
 
-xcheck(tf._global);
-xcheck_equals(_global, _root.tf._global);
+check(tf._global);
+check_equals(_global, _root.tf._global);
+
+check(tf._level0);
+
+// They would exist if they had been loaded...
+check(!tf._level1);
+check(!tf._level2);
 
 #if OUTPUT_VERSION > 6
-xcheck(tf._root != tf._ROOT);
-xcheck(tf._root != tf._GLOBAL);
+check(tf._root != tf._ROOT);
+check(tf._root != tf._GLOBAL);
+check(tf._level0 != tf._LEVEL0);
 #endif 
 
 //-------------------------------------------------------------------------
@@ -1132,11 +1139,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(496);
+     check_totals(499);
 #elif OUTPUT_VERSION == 7
- check_totals(501);
+ check_totals(505);
 #elif OUTPUT_VERSION == 8
- check_totals(502);
+ check_totals(506);
 #endif
 
 #endif
