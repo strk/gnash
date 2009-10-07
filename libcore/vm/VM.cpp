@@ -363,6 +363,10 @@ newLessThan(const as_value& op1, const as_value& op2, VM& vm)
         log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
             op1);
     }
+    
+    if (operand1.is_object() && !operand1.is_sprite()) {
+        return false;
+    }
 
     try { operand2 = op2.to_primitive(as_value::NUMBER); }
     catch (ActionTypeError& e)
