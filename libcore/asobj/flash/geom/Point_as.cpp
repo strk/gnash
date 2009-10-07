@@ -157,8 +157,9 @@ point_add(const fn_call& fn)
         }
     }
 
-    x.newAdd(x1);
-    y.newAdd(y1);
+    VM& vm = getVM(fn);
+    newAdd(x, x1, vm);
+    newAdd(y, y1, vm);
 
     return constructPoint(fn, x, y);
 }
@@ -291,8 +292,9 @@ point_offset(const fn_call& fn)
         if ( fn.nargs > 1 ) yoff = fn.arg(1);
     }
 
-    x.newAdd(xoff);
-    y.newAdd(yoff);
+    VM& vm = getVM(fn);
+    newAdd(x, xoff, vm);
+    newAdd(y, yoff, vm);
 
     ptr->set_member(NSV::PROP_X, x);
     ptr->set_member(NSV::PROP_Y, y);
@@ -550,10 +552,11 @@ point_interpolate(const fn_call& fn)
     as_value xoff = mu * (x0 - x1);
     as_value yoff = mu * (y0 - y1);
 
+    VM& vm = getVM(fn);
     as_value x = x1val; // copy to avoid changing stack value
-    x.newAdd(xoff);
+    newAdd(x, xoff, vm);
     as_value y = y1val; // copy to avoid changing stack value
-    y.newAdd(yoff);
+    newAdd(y, yoff, vm);
 
     return constructPoint(fn, x, y);
 }

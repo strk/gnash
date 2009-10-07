@@ -985,7 +985,7 @@ array_sort(const fn_call& fn)
     {
         flags=static_cast<boost::uint8_t>(fn.arg(0).to_number());
     }
-    else if (fn.arg(0).is_as_function())
+    else if (fn.arg(0).is_function())
     {
 
         // Get comparison function

@@ -120,10 +120,6 @@ public:
 		NULLTYPE,
 		NULLTYPE_EXCEPT,
 
-		/// NULL value
-		UNSUPPORTED,
-		UNSUPPORTED_EXCEPT,
-
 		/// Boolean value
 		BOOLEAN,
 		BOOLEAN_EXCEPT,
@@ -305,12 +301,6 @@ public:
 	/// Return true if this value is callable
 	/// (AS_FUNCTION).
 	bool is_function() const
-	{
-		return m_type == AS_FUNCTION;
-	}
-
-	/// Return true if this value is a AS function
-	bool is_as_function() const
 	{
 		return m_type == AS_FUNCTION;
 	}
@@ -510,26 +500,6 @@ public:
 	///
 	as_value& convert_to_primitive();
 
-	/// Force type to number.
-	void convert_to_number();
-
-	/// Force type to string.
-	void convert_to_string();
-    
-	/// Force type to bool.
-	void convert_to_boolean();
-    
-	/// Force type to string.
-	//
-	/// uses swf-version-aware converter
-    ///
-	/// @param version
-    ///     SWF version for which the operation is desired.
-	///
-	/// @see to_string_versioned
-	///
-	void convert_to_string_versioned(int version);
-
 	// These set_*()'s are more type-safe; should be used
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
@@ -567,26 +537,6 @@ public:
 	/// Set this value to the NULL value
 	void set_null();
 
-	/// Set this value to the Unsupported value
-	void set_unsupported();
-
-	/// Equality operator, follows strict equality semantic
-	//
-	/// See strictly_equals
-	///
-	bool operator==(const as_value& v) const
-	{
-		return strictly_equals(v);
-	}
-
-	/// Inequality operator, follows strict inequality semantic
-	//
-	/// See strictly_equals
-	///
-	bool operator!=(const as_value& v) const {
-		return ! ( *this  == v );
-	}
-
 	void operator=(const as_value& v);
 
 	bool is_undefined() const { return (m_type == UNDEFINED); }
@@ -595,14 +545,11 @@ public:
 
 	bool is_bool() const { return (m_type == BOOLEAN); }
 
-	bool is_unsupported() const { return (m_type == UNSUPPORTED); }
-
         bool is_exception() const
 	{ return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
 		|| m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
 		|| m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
-		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT
-		|| m_type == UNSUPPORTED_EXCEPT);
+		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
 	}
 
 	// Flag or unflag an as_value as an exception -- this gets flagged
@@ -635,16 +582,11 @@ public:
 	bool equals(const as_value& v) const;
 
 	/// Sets this value to this string plus the given string.
-	void	string_concat(const std::string& str);
-
-	/// Equivalent of ActionNewAdd
-	as_value& newAdd(const as_value& v1);
+	void string_concat(const std::string& str);
 
 	/// Equivalent of ActionNewLessThan
 	as_value newLessThan(const as_value& op2_in) const;
 
-	// Equivalent of ActionSubtract
-	as_value& subtract(const as_value& o);
 
 	/// Set any object value as reachable (for the GC)
 	//
@@ -653,6 +595,12 @@ public:
 	void setReachable() const;
 
 private:
+
+    /// Use the relevant equality function, not operator==
+    bool operator==(const as_value& v) const;
+
+    /// Use the relevant inequality function, not operator!=
+    bool operator!=(const as_value& v) const;
 
 	/// Compare values of the same type
 	//
@@ -726,7 +674,33 @@ private:
 
 };
 
-typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+
+/// Carry out ActionNewAdd
+//
+/// @param left     The as_value to add to.
+/// @param right    The as_value to add.
+/// @param vm       The VM executing the operation.
+//
+/// TODO:           Consider whether it would be better to pass something
+///                 other than the VM. But it is a VM operation, so it
+///                 is logically sound.
+void newAdd(as_value& left, const as_value& right, VM& vm);
+
+/// Force type to number.
+as_value& convertToNumber(as_value& v, VM& vm);
+
+/// Force type to string.
+as_value& convertToString(as_value& v, VM& vm);
+
+/// Force type to bool.
+as_value& convertToBoolean(as_value& v, VM& vm);
+
+/// Carry out ActionSubtract
+//
+/// @param left     The as_value to subtract from.
+/// @param right    The as_value to subtract.
+/// @param vm       The VM executing the operation.
+void subtract(as_value& left, const as_value& right, VM& vm);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 	return os << v.toDebugString();

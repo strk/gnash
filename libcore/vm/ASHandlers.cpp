@@ -708,12 +708,8 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 void
 SWFHandlers::ActionSubtract(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    
-    const double operand2 = env.top(0).to_number();
-    const double operand1 = env.top(1).to_number();
-    env.top(1) = operand1 - operand2;
+    subtract(env.top(1), env.top(0), getVM(env));
     env.drop(1);
 }
 
@@ -785,7 +781,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
     env.top(1).set_bool(op1.to_number() == op2.to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -799,7 +795,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
     env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -833,7 +829,7 @@ SWFHandlers::ActionLogicalNot(ActionExec& thread)
     env.top(0).set_bool(! env.top(0).to_bool());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(0).convert_to_number();
+    if (env.get_version() < 5) convertToNumber(env.top(0), getVM(env));
 }
 
 void
@@ -1069,7 +1065,7 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
     as_environment& env = thread.env;
 
     const int version = env.get_version();
-    env.top(1).convert_to_string_versioned(version);
+    convertToString(env.top(1), getVM(env));
     env.top(1).string_concat(env.top(0).to_string_versioned(version));
     env.drop(1);
 }
@@ -3008,52 +3004,10 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 void
 SWFHandlers::ActionNewAdd(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    as_value v1 = env.top(0);
-    as_value v2 = env.top(1);
+    newAdd(env.top(1), env.top(0), getVM(env));
 
-    try { v1 = v1.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("%s.to_primitive() threw an error during ActionNewAdd"),
-            env.top(0));
-    }
-
-    try { v2 = v2.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("%s.to_primitive() threw an error during ActionNewAdd"),
-            env.top(1));
-    }
-
-#if GNASH_DEBUG
-    log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),
-                v1, v2);
-#endif
-
-    if (v1.is_string() || v2.is_string())
-    {
-        // NOTE: I've tested that we should change behaviour
-        //       based on code definition version, not top-level
-        //       SWF version. Just not automated yet.
-        //
-        const int version = thread.code.getDefinitionVersion();
-        v2.convert_to_string_versioned(version);
-        v2.string_concat(v1.to_string_versioned(version));
-        env.top(1) = v2;
-    }
-    else
-    {
-        // use numeric semantic
-        const double v2num = v2.to_number();
-        const double v1num = v1.to_number();
-
-        v2.set_double(v2num + v1num); 
-
-        env.top(1) = v2;
-    }
     env.drop(1);
 }
 
@@ -3167,16 +3121,14 @@ void
 SWFHandlers::ActionToNumber(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).convert_to_number();
+    convertToNumber(env.top(0), getVM(env));
 }
 
 void
 SWFHandlers::ActionToString(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
-    const int version = env.get_version();
-    env.top(0).convert_to_string_versioned(version);
+    convertToString(env.top(0), getVM(env));
 }
 
 void

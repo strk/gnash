@@ -1021,24 +1021,6 @@ Button::get_member(string_table::key name_key, as_value* val,
         return true;
     }
 
-    // Try items on our display list.
-    DisplayObject* ch = getChildByName(name);
-
-    if (ch) {
-        // Found object.
-
-        // If the object is an ActionScript referenciable one we
-        // return it, otherwise we return ourselves
-        if ( ch->isActionScriptReferenceable() ) {
-            val->set_as_object(ch);
-        }
-        else {
-            val->set_as_object(this);
-        }
-
-        return true;
-    }
-
     return false;
 
 }

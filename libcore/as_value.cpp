@@ -977,40 +977,6 @@ as_value::to_as_function() const
     return NULL;
 }
 
-// Force type to number.
-void
-as_value::convert_to_boolean()
-{
-    set_bool(to_bool());
-}
-
-// Force type to number.
-void
-as_value::convert_to_number()
-{
-    set_double(to_number());
-}
-
-// Force type to string.
-void
-as_value::convert_to_string()
-{
-    std::string ns = to_string();
-    m_type = STRING;	// force type.
-    _value = ns;
-}
-
-
-void
-as_value::convert_to_string_versioned(int version)
-    // Force type to string.
-{
-    std::string ns = to_string_versioned(version);
-    m_type = STRING;	// force type.
-    _value = ns;
-}
-
-
 void
 as_value::set_undefined()
 {
@@ -1022,13 +988,6 @@ void
 as_value::set_null()
 {
 	m_type = NULLTYPE;
-	_value = boost::blank();
-}
-
-void
-as_value::set_unsupported()
-{
-	m_type = UNSUPPORTED;
 	_value = boost::blank();
 }
 
@@ -1918,7 +1877,6 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
 #endif
-	  set_unsupported();
 	  break;
       }
       case amf::Element::RECORD_SET_AMF0:
@@ -1940,48 +1898,47 @@ as_value::as_value(const amf::Element& el)
     }
 }
 
-as_value&
-as_value::newAdd(const as_value& op2)
+void
+newAdd(as_value& left, const as_value& right, VM& vm)
 {
-	as_value v2=op2;
+    // We can't change the original value.
+    as_value r(right);
 
-	try { convert_to_primitive(); }
+    // The order of the operations is important: right is converted to
+    // primitive before left.
+
+	try { r = r.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
-		log_debug("%s.to_primitive() threw an error during as_value operator+",
-			*this);
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewAdd"), r);
 	}
-
-	try { v2 = v2.to_primitive(); }
+	
+    try { left = left.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
-		log_debug("%s.to_primitive() threw an error during as_value operator+",
-			op2);
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewAdd"), left);
 	}
 
 #if GNASH_DEBUG
-	log_debug(_("(%s + %s) [primitive conversion done]"),
-			*this,
-			v2);
+	log_debug(_("(%s + %s) [primitive conversion done]"), left, r);
 #endif
 
-	if (is_string() || v2.is_string() )
-	{
+	if (left.is_string() || r.is_string()) {
+
 		// use string semantic
-
-		int version = VM::get().getSWFVersion();
-		convert_to_string_versioned(version);
-		string_concat(v2.to_string_versioned(version));
-	}
-	else {
-		// use numeric semantic
-		double v2num = v2.to_number();
-		double v1num = to_number();
-		set_double(v2num + v1num); 
-
+		const int version = vm.getSWFVersion();
+		convertToString(left, vm);
+		left.string_concat(r.to_string_versioned(version));
+        return;
 	}
 
-	return *this;
+    // Otherwise use numeric semantic
+    const double v1num = left.to_number();
+    const double v2num = r.to_number();
+    left.set_double(v2num + v1num); 
+
 }
 
 as_value
@@ -2029,13 +1986,12 @@ as_value::newLessThan(const as_value& op2_in) const
     return ret;
 }
 
-as_value&
-as_value::subtract(const as_value& op2)
+void
+subtract(as_value& left, const as_value& right, VM& /*vm*/)
 {
-	double operand1 = to_number();
-	double operand2 = op2.to_number();
-	set_double(operand1 - operand2);
-	return *this;
+	const double operand2 = right.to_number();
+	const double operand1 = left.to_number();
+	left.set_double(operand1 - operand2);
 }
 
 
@@ -2585,6 +2541,29 @@ as_value::writeAMF0(SimpleBuffer& buf,
     }
 }
 
+/// Force type to number.
+as_value&
+convertToNumber(as_value& v, VM& /*vm*/)
+{
+    v.set_double(v.to_number());
+    return v;
+}
+
+/// Force type to string.
+as_value&
+convertToString(as_value& v, VM& vm)
+{
+    v.set_string(v.to_string_versioned(vm.getSWFVersion()));
+    return v;
+}
+
+/// Force type to bool.
+as_value&
+convertToBoolean(as_value& v, VM& /*vm*/)
+{
+    v.set_bool(v.to_bool());
+    return v;
+}
 } // namespace gnash
 
 
