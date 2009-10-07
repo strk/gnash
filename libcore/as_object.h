@@ -54,6 +54,7 @@ namespace gnash {
     class asName;
     class RunResources;
     class Global_as;
+    class PrototypeRecursor;
 }
 
 namespace gnash {
@@ -1102,7 +1103,9 @@ protected:
 #endif // GNASH_USE_GC
 
 private:
- 
+
+    class PrototypeRecursor;
+
     /// DisplayObjects have properties not in the AS inheritance chain
     //
     /// These magic properties are invoked in get_member only if the

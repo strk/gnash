@@ -51,6 +51,56 @@
 
 namespace gnash {
 
+class
+as_object::PrototypeRecursor
+{
+public:
+    PrototypeRecursor(as_object* top, const ObjectURI& property)
+        :
+        _object(top),
+        _version(getSWFVersion(*top)),
+        _property(property),
+        _iterations(0)
+    {
+        _visited.insert(top);
+    }
+
+    bool operator()()
+    {
+        ++_iterations;
+        log_debug("Iterated: %s", _iterations);
+		if ((_iterations > 255 && _version == 5) || _iterations > 257) {
+			throw ActionLimitException("Lookup depth exceeded.");
+        }
+        _object = _object->get_prototype().get();
+        if (!_visited.insert(_object).second) return 0;
+        return _object;
+    }
+
+    as_object* currentObject() const {
+        return _object;
+    }
+
+    Property* getProperty(as_object** owner = 0) const {
+        assert(_object);
+        Property* prop = _object->_members.getProperty(getName(_property),
+                getNamespace(_property));
+        
+        if (prop && prop->visible(_version)) {
+            if (owner) *owner = _object;
+            return prop;
+        }
+        return 0;
+    }
+
+private:
+    as_object* _object;
+    const int _version;
+    const ObjectURI _property;
+    std::set<as_object*> _visited;
+    size_t _iterations;
+};
+
 // Anonymous namespace used for module-static defs
 namespace {
 
@@ -327,28 +377,39 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-/// Current order of property lookup
+/// Current order of property lookup:
 //
-/// If DisplayObject:
-///     DisplayObject magic properties
-///     (DisplayList, TextField variables?)
-/// Own properties up __proto__ chain
-/// __resolve.
+/// Object:
+///     Own properties
+///     Magic display object properties
+/// recurse to prototype and do the same
+/// __resolve property.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
-    
-    if (_displayObject) {
-        if (getDisplayObjectProperty(*this, name, *val)) return true;
-    }
-	
-	Property* prop = findProperty(name, nsname);
 
+    PrototypeRecursor pr(this, ObjectURI(name, nsname));
+	
+	Property* prop(0);
+    do {
+
+        // Look for own properties first
+        prop = pr.getProperty();
+        if (prop) break;
+        as_object* obj = pr.currentObject();
+
+        // Look for magic properties second
+        if (obj && obj->_displayObject) {
+            if (getDisplayObjectProperty(*obj, name, *val)) return true;
+        }
+    } while (pr());
+
+    // If the property isn't found or doesn't apply to any objects in the
+    // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        /// If the property isn't found, try the __resolve property.
         prop = findProperty(NSV::PROP_uuRESOLVE, nsname);
         if (!prop) return false;
 
@@ -493,31 +554,12 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 		return 0;
 	}
 
-	// keep track of visited objects, avoid infinite loops.
-	std::set<as_object*> visited;
+    PrototypeRecursor pr(this, ObjectURI(key, nsname));
 
-	int i = 0;
-
-	boost::intrusive_ptr<as_object> obj = this;
-		
-    // This recursion prevention seems not to exist in the PP.
-    // Instead, it stops when its general timeout for the
-    // execution of scripts is reached.
-	while (obj && visited.insert(obj.get()).second)
-	{
-		++i;
-		if ((i > 255 && swfVersion == 5) || i > 257)
-			throw ActionLimitException("Lookup depth exceeded.");
-
-		Property* prop = obj->_members.getProperty(key, nsname);
-		if (prop && prop->visible(swfVersion) )
-		{
-			if (owner) *owner = obj.get();
-			return prop;
-		}
-		else
-			obj = obj->get_prototype();
-	}
+    do {
+        Property* prop = pr.getProperty(owner);
+        if (prop) return prop;
+    } while (pr());
 
 	// No Property found
 	return NULL;
