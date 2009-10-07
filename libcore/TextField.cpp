@@ -584,7 +584,7 @@ TextField::setSelection(int start, int end)
     _selection = std::make_pair(start, end);
 }
 bool
-TextField::on_event(const event_id& ev)
+TextField::notifyEvent(const event_id& ev)
 {    
     switch (ev.id())
     {

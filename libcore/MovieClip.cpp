@@ -749,10 +749,11 @@ MovieClip::queueActions(ActionList& actions)
         const action_buffer* buf = *it;
         queueAction(*buf);
     }
+
 }
 
 bool
-MovieClip::on_event(const event_id& id)
+MovieClip::notifyEvent(const event_id& id)
 {
     testInvariant();
 
@@ -2038,7 +2039,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         constructAsScriptObject(); 
 
         // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
-        // testsuite/swfdec/clone-sprite-events.c not to call on_event
+        // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
         // immediately.
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
     }
@@ -2092,7 +2093,7 @@ MovieClip::constructAsScriptObject()
 
             // Call event handlers *after* setting up the __proto__
             // but *before* calling the registered class constructor
-            on_event(event_id::CONSTRUCT);
+            notifyEvent(event_id::CONSTRUCT);
             eventHandlersInvoked = true;
 
             int swfversion = getSWFVersion(*this);
@@ -2137,7 +2138,7 @@ MovieClip::constructAsScriptObject()
     /// Invoke event handlers if not done yet
     if ( ! eventHandlersInvoked )
     {
-        on_event(event_id::CONSTRUCT);
+        notifyEvent(event_id::CONSTRUCT);
     }
 }
 
@@ -2316,7 +2317,7 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
     }
 
     // We want to call a clip-event too if available, see bug #22116
-    on_event(event_id::DATA);
+    notifyEvent(event_id::DATA);
 }
 
 /*private*/

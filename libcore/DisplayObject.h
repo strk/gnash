@@ -604,14 +604,14 @@ public:
     //
     /// Must be overridden or will always return false.
     ///
-    virtual bool on_event(const event_id& /* id */)
+    virtual bool notifyEvent(const event_id& /* id */)
     {
         return false;
     }
 
     /// Queue event in the global action queue.
     //
-    /// on_event(id) will be called by execution of the queued
+    /// notifyEvent(id) will be called by execution of the queued
     /// action
     ///
     void queueEvent(const event_id& id, int lvl);

@@ -110,7 +110,7 @@ public:
 
     virtual void mouseEvent(const event_id& id)
     {
-        on_event(id);
+        notifyEvent(id);
     }
 
     /// Return true if the given point falls in this DisplayObject's shape
