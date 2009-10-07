@@ -65,6 +65,10 @@ public:
         _visited.insert(top);
     }
 
+    /// Iterate to the next object in the inheritance chain.
+    //
+    /// @return     false if there is no next object. In this case calling
+    ///             the other functions will abort.
     bool operator()()
     {
         ++_iterations;
@@ -77,10 +81,19 @@ public:
         return _object;
     }
 
+    /// Return the object reached in searching the chain.
+    //
+    /// This will abort if there is no current object, so make sure
+    /// operator() returns true and that the PrototypeRecursor was
+    /// initialized with a valid as_object.
     as_object* currentObject() const {
+        assert(_object);
         return _object;
     }
 
+    /// Return the wanted property if it exists and is visible.
+    //
+    /// This will abort if there is no current object.
     Property* getProperty(as_object** owner = 0) const {
         assert(_object);
         Property* prop = _object->_members.getProperty(getName(_property),
@@ -398,10 +411,10 @@ as_object::get_member(string_table::key name, as_value* val,
         // Look for own properties first
         prop = pr.getProperty();
         if (prop) break;
-        as_object* obj = pr.currentObject();
-
+        
         // Look for magic properties second
-        if (obj && obj->_displayObject) {
+        as_object* obj = pr.currentObject();
+        if (obj->_displayObject) {
             if (getDisplayObjectProperty(*obj, name, *val)) return true;
         }
     } while (pr());
