@@ -1514,14 +1514,6 @@ MovieClip::replace_display_object(DisplayObject* ch, int depth,
             use_old_cxform, use_old_matrix);
 }
 
-int
-MovieClip::get_id_at_depth(int depth)
-{
-    DisplayObject* ch = _displayList.getDisplayObjectAtDepth(depth);
-    if ( ! ch ) return -1;
-    return ch->get_id();
-}
-
 void
 MovieClip::increment_frame_and_check_for_loop()
 {

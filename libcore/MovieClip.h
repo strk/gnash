@@ -479,11 +479,6 @@ public:
     /// Execute a single action buffer (DOACTION block)
     void execute_action(const action_buffer& ab);
 
-    /// For debugging -- return the id of the DisplayObject
-    /// at the specified depth.
-    /// Return -1 if nobody's home.
-    int get_id_at_depth(int depth);
-
     MovieClip* to_movie () { return this; }
 
     /// The various methods for sending data in requests.
