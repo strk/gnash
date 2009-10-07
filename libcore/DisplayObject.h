@@ -346,7 +346,7 @@ public:
         {
             // TODO: fix this !
             log_error("Our mask maskee is not us");
-            return NULL; // for correctness;
+            return NULL; 
         }
         return _mask;
     }
@@ -698,7 +698,7 @@ public:
     /// clear_invalidated() is called in between.
     ///
     /// NOTE: Marking a DisplayObject as invalidated automatically marks
-    ///             it's parent as being invalidated.
+    ///             its parent as being invalidated.
     ///
     /// @see \ref region_update
     ///
@@ -715,7 +715,7 @@ public:
     /// Called by a child to signalize it has changed visibily. The
     /// difference to set_invalidated() is that *this* DisplayObject does
     /// not need to redraw itself completely. This function will 
-    /// recursively inform all it's parents of the change.
+    /// recursively inform all its parents of the change.
     void set_child_invalidated();
     
 
@@ -878,7 +878,7 @@ public:
 #endif
     
     /// Used to assign a name to unnamed instances
-    static std::string getNextUnnamedInstanceName();
+    std::string getNextUnnamedInstanceName();
 
     enum BlendMode
     {
@@ -1087,9 +1087,6 @@ private:
     int m_ratio;
     int m_clip_depth;
     Events _event_handlers;
-
-    /// Used to assign a name to unnamed instances
-    static unsigned int _lastUnnamedInstanceNum;
 
     /// Set to yes when this instance has been unloaded
     bool _unloaded;

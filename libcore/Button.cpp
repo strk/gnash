@@ -504,18 +504,16 @@ Button::mouseEvent(const event_id& event)
         const SWF::DefineButtonSoundTag::ButtonSound& bs = 
             _def->buttonSound(bi);
 
-        // DisplayObject zero is considered as null DisplayObject
+        // character zero is considered as null character
         if (!bs.soundID) break;
 
         // No actual sound ?
         if (!bs.sample) break;
 
-        if (bs.soundInfo.stopPlayback)
-        {
+        if (bs.soundInfo.stopPlayback) {
             s->stop_sound(bs.sample->m_sound_handler_id);
         }
-        else
-        {
+        else {
             const SWF::SoundInfoRecord& sinfo = bs.soundInfo;
 
             const sound::SoundEnvelopes* env = 
@@ -549,9 +547,7 @@ Button::mouseEvent(const event_id& event)
 
     // check for built-in event handler.
     std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
-    if ( code.get() )
-    {
-        //log_debug(_("Got statically-defined handler for event: %s"), event);
+    if (code.get()) {
         mr.pushAction(code, movie_root::apDOACTION);
     }
 
@@ -876,21 +872,16 @@ Button::markReachableResources() const
     _def->setReachable();
 
     // Mark state DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
-            i!=e; ++i)
+    for (DisplayObjects::const_iterator i = _stateCharacters.begin(),
+            e = _stateCharacters.end(); i != e; ++i)
     {
         DisplayObject* ch = *i;
-        if ( ch ) ch->setReachable();
+        if (ch) ch->setReachable();
     }
 
     // Mark hit DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
-            e=_hitCharacters.end(); i != e; ++i)
-    {
-        DisplayObject* ch = *i;
-        assert ( ch );
-        ch->setReachable();
-    }
+    std::for_each(_hitCharacters.begin(), _hitCharacters.end(),
+            std::mem_fun(&as_object::setReachable));
 
     // DisplayObject class members
     markDisplayObjectReachable();
@@ -909,9 +900,8 @@ Button::unload()
             e = _stateCharacters.end(); i != e; ++i)
     {
         DisplayObject* ch = *i;
-        if ( ! ch ) continue;
-        if ( ch->unloaded() ) continue;
-        if ( ch->unload() ) childsHaveUnload = true;
+        if (!ch || ch->unloaded()) continue;
+        if (ch->unload()) childsHaveUnload = true;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -932,13 +922,10 @@ Button::destroy()
 {
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
-            e=_stateCharacters.end(); i != e; ++i)
-    {
+            e=_stateCharacters.end(); i != e; ++i) {
         DisplayObject* ch = *i;
-        if ( ! ch ) continue;
-        if ( ch->isDestroyed() ) continue;
+        if (!ch || ch->isDestroyed()) continue;
         ch->destroy();
-        *i = 0;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -1034,7 +1021,7 @@ Button::mouseStateName(MouseState s)
         case MOUSESTATE_DOWN: return "DOWN";
         case MOUSESTATE_OVER: return "OVER";
         case MOUSESTATE_HIT: return "HIT";
-        default: return "UNKNOWN (error?)";
+        default: std::abort();
     }
 }
 

@@ -127,7 +127,8 @@ movie_root::movie_root(const movie_definition& def,
 	_recursionLimit(256),
 	_timeoutLimit(15),
 	_movieAdvancementDelay(83), // ~12 fps by default
-	_lastMovieAdvancement(0)
+	_lastMovieAdvancement(0),
+	_unnamedInstance(0)
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
@@ -142,6 +143,13 @@ movie_root::disableScripts()
 	// to avoid invalidating iterators as we've
 	// been probably called during processing
 	// of the queue.
+}
+
+    
+size_t
+movie_root::nextUnnamedInstance()
+{
+    return ++_unnamedInstance;
 }
 
 void

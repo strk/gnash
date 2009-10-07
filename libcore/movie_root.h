@@ -417,6 +417,9 @@ public:
         _rootMovie->setPlayState(s);
     }
 
+    /// Get a unique number for unnamed instances.
+    size_t nextUnnamedInstance();
+
     /// Notify still loaded DisplayObject listeners for key events
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
@@ -1217,6 +1220,9 @@ private:
 
     // time of last movie advancement, in milliseconds
     unsigned int _lastMovieAdvancement;
+
+    size_t _unnamedInstance;
+
 };
 
 DSOEXPORT short stringToStageAlign(const std::string& s);

@@ -74,9 +74,6 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
-// Initialize unnamed instance count
-unsigned int DisplayObject::_lastUnnamedInstanceNum = 0;
-
 DisplayObject::DisplayObject(DisplayObject* parent, int id)
     :
     m_parent(parent),
@@ -106,12 +103,12 @@ DisplayObject::DisplayObject(DisplayObject* parent, int id)
     setDisplayObject();
 }
 
-/*protected static*/
 std::string
 DisplayObject::getNextUnnamedInstanceName()
 {
-	std::stringstream ss;
-	ss << "instance" << ++_lastUnnamedInstanceNum;
+    movie_root& mr = getRoot(*this);
+	std::ostringstream ss;
+	ss << "instance" << mr.nextUnnamedInstance();
 	return ss.str();
 }
 
