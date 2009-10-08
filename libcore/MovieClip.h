@@ -522,6 +522,14 @@ public:
     void loadVariables(const std::string& urlstr,
             VariablesMethod sendVarsMethod);
 
+    /// Get special MovieClip properties
+    //
+    /// These are properties not attached as genuine members to the MovieClip
+    /// object. Currently they include DisplayList members and TextField
+    /// variables.
+    //
+    /// TODO: work out if there is a better way of doing this, such as
+    /// attaching special properties as real members.
     bool getMovieClipProperty(string_table::key name, as_value& val);
 
     // See dox in as_object.h
