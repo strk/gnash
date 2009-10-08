@@ -556,6 +556,13 @@ as_environment::find_target(const std::string& path_in) const
 }
 
 as_object*
+getElement(as_object* obj, string_table::key key)
+{
+    //Global_as* gl = getGlobal(*obj); 
+    return obj->get_path_element(key);
+}
+
+as_object*
 as_environment::find_object(const std::string& path,
         const ScopeStack* scopeStack) const
 {
@@ -573,7 +580,7 @@ as_environment::find_object(const std::string& path,
     
     VM& vm = _vm;
     string_table& st = vm.getStringTable();
-    int swfVersion = vm.getSWFVersion(); 
+    int swfVersion = vm.getSWFVersion();
 
     as_object* env = 0;
     env = m_target; 
@@ -586,24 +593,21 @@ as_environment::find_object(const std::string& path,
     {
         // Absolute path.  Start at the (AS) root (handle _lockroot)
         MovieClip* root = 0;
-        if ( m_target ) root = m_target->getAsRoot();
+        if (m_target) root = m_target->getAsRoot();
         else {
-            if ( _original_target )
-            {
+            if (_original_target) {
                 log_debug("current target is undefined on "
                         "as_environment::find_object, we'll use original");
                 root = _original_target->getAsRoot();
             }
-            else
-            {
+            else {
                 log_debug("both current and original target are undefined "
                         "on as_environment::find_object, we'll return 0");
                 return 0;
             }
         }
 
-        if ( ! *(++p) )
-        {
+        if (!*(++p)) {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Path is '/', return the root (%p)"), (void*)root);
 #endif
@@ -620,8 +624,7 @@ as_environment::find_object(const std::string& path,
 
     }
 #ifdef DEBUG_TARGET_FINDING 
-    else
-    {
+    else {
         log_debug(_("Relative path, start at (%s)"), m_target->getTarget());
     }
 #endif
@@ -631,35 +634,30 @@ as_environment::find_object(const std::string& path,
     std::string subpart;
     while (1)
     {
-        while ( *p == ':' ) ++p;
+        while (*p == ':') ++p;
 
         // No more components to scan
-        if ( ! *p )
-        {
+        if (!*p) {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Path is %s, returning whatever we were up to"), path);
 #endif
-
             return env;
         }
 
 
         const char* next_slash = next_slash_or_dot(p);
         subpart = p;
-        if (next_slash == p)
-        {
+        if (next_slash == p) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("invalid path '%s' (p=next_slash=%s)"),
                 path, next_slash);
             );
             return NULL;
         }
-        else if (next_slash)
-        {
-            if ( *next_slash == '.' )
+        else if (next_slash) {
+            if (*next_slash == '.')
             {
-                if ( ! dot_allowed )
-                {
+                if (!dot_allowed) {
                     IF_VERBOSE_ASCODING_ERRORS(
                     log_aserror(_("invalid path '%s' (dot not allowed "
                             "after having seen a slash)"), path);
@@ -667,8 +665,7 @@ as_environment::find_object(const std::string& path,
                     return NULL;
                 }
             }
-            else if ( *next_slash == '/' )
-            {
+            else if (*next_slash == '/') {
                 dot_allowed = false;
             }
 
@@ -679,8 +676,7 @@ as_environment::find_object(const std::string& path,
         assert(subpart[0] != ':');
 
         // No more components to scan
-        if ( subpart.empty() )
-        {
+        if (subpart.empty()) {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("No more subparts, env is %p"), (void*)env);
 #endif
@@ -689,15 +685,12 @@ as_environment::find_object(const std::string& path,
 
         string_table::key subpartKey = st.find(subpart);
 
-        if ( ! firstElementParsed )
-        {
-            as_object* element = NULL;
+        if (!firstElementParsed) {
+            as_object* element(0);
 
             do {
-
                 // Try scope stack
-                if ( scopeStack )
-                {
+                if (scopeStack) {
                     for (size_t i = scopeStack->size(); i > 0; --i)
                     {
                         // const_cast needed due to non-const 
@@ -705,37 +698,32 @@ as_environment::find_object(const std::string& path,
                         as_object* obj = 
                             const_cast<as_object*>((*scopeStack)[i-1].get());
                         
-                        element = obj->get_path_element(subpartKey);
-                        if ( element ) break;
+                        element = getElement(obj, subpartKey);
+                        if (element) break;
                     }
-                    if ( element ) break;
+                    if (element) break;
                 }
 
                 // Try current target  (if any)
                 assert(env == m_target);
-                if ( env )
-                {
-                    element = env->get_path_element(subpartKey);
-                    if ( element ) break;
+                if (env) {
+                    element = getElement(env, subpartKey);
+                    if (element) break;
                 }
-                // else if ( _original_target) // TODO: try orig target too ?
 
                 // Looking for _global ?
                 as_object* global = _vm.getGlobal();
-                if ( swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL )
+                if (swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL)
                 {
                     element = global;
                     break;
                 }
-
                 // Try globals
-                element = global->get_path_element(subpartKey);
-                //if ( element ) break;
+                element = getElement(global, subpartKey);
 
             } while (0);
 
-            if ( ! element ) 
-            {
+            if (!element) {
 #ifdef DEBUG_TARGET_FINDING 
                 log_debug("subpart %s of path %s not found in any "
                 "scope stack element", subpart, path);
@@ -746,8 +734,7 @@ as_environment::find_object(const std::string& path,
             env = element;
             firstElementParsed = true;
         }
-        else
-        {
+        else {
 
             assert(env);
 
@@ -756,9 +743,8 @@ as_environment::find_object(const std::string& path,
                     "%p"), subpart, (void *)env);
 #endif
 
-            as_object* element = env->get_path_element(subpartKey);
-            if ( ! element )
-            {
+            as_object* element = getElement(env, subpartKey);
+            if (!element) {
 #ifdef DEBUG_TARGET_FINDING 
                 log_debug(_("Path element %s not found in "
                             "object %p"), subpart, (void *)env);
