@@ -708,10 +708,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 {
 
     const ObjectURI uri(key, nsname);
-
-    Property* prop = findUpdatableProperty(uri);
-
-#if 0
+    
     PrototypeRecursor<Exists> pr(this, uri);
 
 	Property* prop = pr.getProperty();
@@ -720,6 +717,10 @@ as_object::set_member(string_table::key key, const as_value& val,
 	// even if invisible.
 	if (!prop) { 
 
+        if (_displayObject) {
+            if (setDisplayObjectProperty(*this, key, val)) return true;
+            // TODO: should we execute triggers?
+        }
 
         const int version = getSWFVersion(*this);
         while (pr()) {
@@ -728,10 +729,11 @@ as_object::set_member(string_table::key key, const as_value& val,
                         prop->visible(version)) {
                     break;
                 }
+                else prop = 0;
             }
         }
     }
-#endif
+
     if (prop) {
 
 		if (prop->isReadOnly()) {
@@ -752,11 +754,6 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		return true;
 	}
-
-    if (_displayObject) {
-        if (setDisplayObjectProperty(*this, key, val)) return true;
-        // TODO: should we execute triggers?
-    }
 
 	// Else, add new property...
 	if (ifFound) return false;
