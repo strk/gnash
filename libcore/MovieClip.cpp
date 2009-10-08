@@ -486,33 +486,14 @@ MovieClip::getDisplayObjectAtDepth(int depth)
     return _displayList.getDisplayObjectAtDepth(depth);
 }
 
-// Set *val to the value of the named member and
+// Set val to the value of the named member and
 // return true, if we have the named member.
-// Otherwise leave *val alone and return false.
+// Otherwise leave val alone and return false.
 bool
-MovieClip::get_member(string_table::key name_key, as_value* val,
-    string_table::key nsname)
+MovieClip::getMovieClipProperty(string_table::key name_key, as_value& val)
 {
-
-
-    // Own members take precendence over display list items 
-    // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
-    as_object* owner = NULL;
-    Property* prop = findProperty(name_key, nsname, &owner);
-    if ( prop && owner == this ) 
-    {
-        try { *val = prop->getValue(*this); }
-        catch (ActionLimitException&) { throw; }
-        catch (ActionTypeError& ex) {
-            log_error(_("Caught exception: %s"), ex.what());
-            return false;
-        }
-        return true;
-    }
-    
     const std::string& name = getStringTable(*this).value(name_key);
-    if (getDisplayObjectProperty(*this, name_key, *val)) return true;
-    
+
     // Try items on our display list.
     DisplayObject* ch;
     if (getSWFVersion(*this) >= 7 ) {
@@ -524,15 +505,10 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
 
             // If the object is an ActionScript referenciable one we
             // return it, otherwise we return ourselves
-            if ( ch->isActionScriptReferenceable() )
-            {
-                val->set_as_object(ch);
+            if (ch->isActionScriptReferenceable()) {
+                val = ch;
             }
-            else
-            {
-                val->set_as_object(this);
-            }
-
+            else val = this;
             return true;
     }
 
@@ -546,27 +522,11 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
             boost::intrusive_ptr<TextField> tf = i->get();
             if ( tf->getTextDefined() )
             {
-                val->set_string(tf->get_text_value());
+                val = tf->get_text_value();
                 return true;
             }
         }
     }
-
-    // Inherited members come last 
-    // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
-    if ( prop )
-    {
-        assert(owner != this);
-        try { *val = prop->getValue(*this); }
-        catch (ActionLimitException&) { throw; }
-        catch (ActionTypeError& ex)
-        {
-                log_error(_("Caught exception: %s"), ex.what());
-                return false;
-        }
-        return true;
-    }
-
 
     return false;
 
