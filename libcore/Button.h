@@ -192,16 +192,6 @@ private:
 	///
 	void get_active_records(ActiveRecords& list, MouseState state);
 
-	/// Return any state DisplayObject whose name matches the given string
-	//
-	/// NOTE: both active and inactive childs are scanned for
-	///
-	/// @param name
-	///	Name to match, search is case sensitive for SWF7 and higher,
-	///     case insensitive up to SWF6.
-	///
-	DisplayObject* getChildByName(const std::string& name);
-
 	/// \brief
 	/// Return version of the SWF containing
 	/// the button definition this is an instance of.
