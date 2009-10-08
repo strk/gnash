@@ -918,6 +918,19 @@ check_equals(typeof(result), "string");
 check_equals(resolveCalled, 3);
 check_equals(result, "quibbleDibblePropertyWithASillyName");
 
+result = undefined;
+
+g = {};
+g.udef();
+check_equals(typeof(result), "undefined");
+check_equals(resolveCalled, 3);
+
+g.__proto__ = o;
+g.udef();
+check_equals(typeof(result), "string");
+check_equals(result, "udef");
+check_equals(resolveCalled, 4);
+
 ////////////////////////////////
 
 // Messing about here with global classes may ruin later tests, so don't add
@@ -950,10 +963,10 @@ o = new Object(b);
 check_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
-totals(116);
+totals(121);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(304);
+totals(309);
 #endif
 
