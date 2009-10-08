@@ -104,7 +104,7 @@ public:
         // TODO: there is recursion prevention anyway; is this extra 
         // check for circularity really necessary?
         if (!_visited.insert(_object).second) return 0;
-        return _object;
+        return _object && !_object->_displayObject;
     }
 
     /// Return the object reached in searching the chain.
