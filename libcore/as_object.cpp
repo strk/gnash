@@ -417,13 +417,13 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-/// Current order of property lookup:
+
+/// Order of property lookup:
 //
-/// Object:
-///     Own properties
-///     Magic display object properties
-/// recurse to prototype and do the same
-/// __resolve property.
+/// 1. Own properties.
+/// 2. If DisplayObject, magic properties
+/// 3. Own properties of all __proto__ objects (a DisplayObject ends the chain).
+/// 4. __resolve properties of this object and all __proto__ objects.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
@@ -432,19 +432,15 @@ as_object::get_member(string_table::key name, as_value* val,
 
     PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname));
 	
-	Property* prop(0);
-    do {
-
-        // Look for own properties first
-        prop = pr.getProperty();
-        if (prop) break;
-        
-        // Look for magic properties second
-        as_object* obj = pr.currentObject();
-        if (obj->_displayObject) {
-            if (getDisplayObjectProperty(*obj, name, *val)) return true;
+	Property* prop = pr.getProperty();
+    if (!prop) {
+        if (_displayObject) {
+            if (getDisplayObjectProperty(*this, name, *val)) return true;
         }
-    } while (pr());
+        while (pr()) {
+            if ((prop = pr.getProperty())) break;
+        }
+    }
 
     // If the property isn't found or doesn't apply to any objects in the
     // inheritance chain, try the __resolve property.
@@ -459,6 +455,7 @@ as_object::get_member(string_table::key name, as_value* val,
         const std::string& undefinedName = st.value(name);
         log_debug("__resolve exists, calling with '%s'", undefinedName);
 
+        // TODO: we've found the property, don't search for it again.
         *val = callMethod(NSV::PROP_uuRESOLVE, undefinedName);
         return true;
     }
