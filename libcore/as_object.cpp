@@ -601,9 +601,6 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 	// 
 	if ( prop )	return prop;  // TODO: what about visible ?
 
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu) return NULL;
-
 	std::set<as_object*> visited;
 	visited.insert(this);
 
