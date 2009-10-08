@@ -351,7 +351,7 @@ subtract(as_value& op1, const as_value& op2, VM& /*vm*/)
 }
 
 as_value
-newLessThan(const as_value& op1, const as_value& op2, VM& vm)
+newLessThan(const as_value& op1, const as_value& op2, VM& /* vm */)
 {
 
     as_value operand1(op1);
