@@ -1308,7 +1308,7 @@ as_object::get_path_element(string_table::key key)
 //#define DEBUG_TARGET_FINDING 1
 
 	as_value tmp;
-	if ( ! get_member(key, &tmp ) )
+	if (!get_member(key, &tmp))
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s not found in object %p",
@@ -1316,7 +1316,7 @@ as_object::get_path_element(string_table::key key)
 #endif
 		return NULL;
 	}
-	if ( ! tmp.is_object() )
+	if (!tmp.is_object())
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s of object %p is not an object (%s)",
