@@ -2711,10 +2711,14 @@ TextField::onChanged()
 
 /// This is called by movie_root when focus is applied to this TextField.
 //
-/// The return value is true if the TextField can recieve focus.
+/// The return value is true if the TextField can receive focus.
+/// The swfdec testsuite suggests that version 5 textfields cannot ever
+/// handle focus.
 bool
 TextField::handleFocus()
 {
+
+    if (getSWFVersion(*this) < 6) return false;
 
     set_invalidated();
 
