@@ -521,10 +521,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* get_path_element(string_table::key key)
-    {
-        return getPathElementSeparator(key);
-    }
+    virtual as_object* get_path_element(string_table::key key);
 
     /// Advance this DisplayObject to next frame.
     //
