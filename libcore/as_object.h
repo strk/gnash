@@ -54,7 +54,6 @@ namespace gnash {
     class asName;
     class RunResources;
     class Global_as;
-    class PrototypeRecursor;
 }
 
 namespace gnash {
