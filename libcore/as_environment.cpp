@@ -570,8 +570,7 @@ as_environment::find_object(const std::string& path,
     log_debug(_("find_object(%s) called"), path);
 #endif
 
-    if (path.empty())
-    {
+    if (path.empty()) {
 #ifdef DEBUG_TARGET_FINDING 
         log_debug(_("Returning m_target (empty path)"));
 #endif
