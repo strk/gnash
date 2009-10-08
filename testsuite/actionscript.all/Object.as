@@ -931,6 +931,24 @@ check_equals(typeof(result), "string");
 check_equals(result, "udef");
 check_equals(resolveCalled, 4);
 
+/// Check DisplayObject property lookup.
+
+/// Apparently no DisplayObjects are included in the prototype
+/// recursion.
+
+nonk = {};
+nonk.__proto__ = _root;
+_root.bobo = "hi there";
+_root.__proto__.ubble = "U!";
+
+check(!nonk._width);
+check(!nonk.bobo);
+check(!nonk.ubble);
+
+check(nonk.__proto__._width);
+check_equals(nonk.__proto__.bobo, "hi there");
+check(nonk.__proto__);
+
 ////////////////////////////////
 
 // Messing about here with global classes may ruin later tests, so don't add
@@ -963,10 +981,10 @@ o = new Object(b);
 check_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
-totals(121);
+totals(127);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(309);
+totals(315);
 #endif
 
