@@ -418,10 +418,12 @@ as_object::add_property(const std::string& name, as_function& getter,
 
 /// Order of property lookup:
 //
-/// 1. Own properties.
+/// 1. Visible own properties.
 /// 2. If DisplayObject, magic properties
-/// 3. Own properties of all __proto__ objects (a DisplayObject ends the chain).
-/// 4. __resolve properties of this object and all __proto__ objects.
+/// 3. Visible own properties of all __proto__ objects (a DisplayObject
+///    ends the chain).
+/// 4. __resolve property of this object and all __proto__ objects (a Display
+///    Object ends the chain). This should ignore visibility but doesn't.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
@@ -701,7 +703,12 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     
 }
 
-// Handles read_only and static properties properly.
+/// Order of property lookup:
+//
+/// 1. Own properties even if invisible or not getter-setters. 
+/// 2. If DisplayObject, magic properties
+/// 3. Visible own getter-setter properties of all __proto__ objects
+///    (a DisplayObject ends the chain).
 bool
 as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
