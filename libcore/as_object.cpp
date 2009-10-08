@@ -65,6 +65,14 @@ namespace {
 
     };
 
+    class Exists
+    {
+    public:
+        Exists(as_object*) {}
+        bool operator()(const Property* const) const {
+            return true;
+        }
+    };
 }
 
 template<typename T>
@@ -105,16 +113,6 @@ public:
         // check for circularity really necessary?
         if (!_visited.insert(_object).second) return 0;
         return _object && !_object->_displayObject;
-    }
-
-    /// Return the object reached in searching the chain.
-    //
-    /// This will abort if there is no current object, so make sure
-    /// operator() returns true and that the PrototypeRecursor was
-    /// initialized with a valid as_object.
-    as_object* currentObject() const {
-        assert(_object);
-        return _object;
     }
 
     /// Return the wanted property if it exists and satisfies the predicate.
@@ -401,7 +399,7 @@ as_object::add_property(const std::string& name, as_function& getter,
 			cacheVal = trig.call(cacheVal, as_value(), *this);
 
 			// The trigger call could have deleted the property,
-			// so we check for its existance again, and do NOT put
+			// so we check for its existence again, and do NOT put
 			// it back in if it was deleted
 			prop = _members.getProperty(k);
 			if ( ! prop )
@@ -420,10 +418,12 @@ as_object::add_property(const std::string& name, as_function& getter,
 
 /// Order of property lookup:
 //
-/// 1. Own properties.
+/// 1. Visible own properties.
 /// 2. If DisplayObject, magic properties
-/// 3. Own properties of all __proto__ objects (a DisplayObject ends the chain).
-/// 4. __resolve properties of this object and all __proto__ objects.
+/// 3. Visible own properties of all __proto__ objects (a DisplayObject
+///    ends the chain).
+/// 4. __resolve property of this object and all __proto__ objects (a Display
+///    Object ends the chain). This should ignore visibility but doesn't.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
@@ -590,39 +590,26 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 Property*
 as_object::findUpdatableProperty(const ObjectURI& uri)
 {
-    const string_table::key key = getName(uri), nsname = getNamespace(uri);
 
 	const int swfVersion = getSWFVersion(*this);
 
-	Property* prop = _members.getProperty(key, nsname);
-	// 
+    PrototypeRecursor<Exists> pr(this, uri);
+
+	Property* prop = pr.getProperty();
+
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
-	// 
-	if ( prop )	return prop;  // TODO: what about visible ?
+	if (prop) return prop; 
 
-	std::set<as_object*> visited;
-	visited.insert(this);
-
-	int i = 0;
-
-	boost::intrusive_ptr<as_object> obj = get_prototype();
-
-    // TODO: does this recursion protection exist in the PP?
-	while (obj && visited.insert(obj.get()).second)
-	{
-		++i;
-		if ((i > 255 && swfVersion == 5) || i > 257)
-			throw ActionLimitException("Property lookup depth exceeded.");
-
-		Property* p = obj->_members.getProperty(key, nsname);
-		if (p && (p->isGetterSetter() | p->isStatic()) && p->visible(swfVersion))
-		{
-			return p; // What should we do if this is not a getter/setter ?
-		}
-		obj = obj->get_prototype();
+    while (pr()) {
+        if ((prop = pr.getProperty())) {
+            if ((prop->isStatic() || prop->isGetterSetter()) &&
+                    prop->visible(swfVersion)) {
+                return prop;
+            }
+        }
 	}
-	return NULL;
+	return 0;
 }
 
 void
@@ -702,7 +689,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
             boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
                     
     // The trigger call could have deleted the property,
-    // so we check for its existance again, and do NOT put
+    // so we check for its existence again, and do NOT put
     // it back in if it was deleted
     prop = findUpdatableProperty(uri);
     if (!prop) {
@@ -716,15 +703,44 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     
 }
 
-// Handles read_only and static properties properly.
+/// Order of property lookup:
+//
+/// 1. Own properties even if invisible or not getter-setters. 
+/// 2. If DisplayObject, magic properties
+/// 3. Visible own getter-setter properties of all __proto__ objects
+///    (a DisplayObject ends the chain).
 bool
 as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
 
-    ObjectURI uri(key, nsname);
-	Property* prop = findUpdatableProperty(uri);
-	
+    const ObjectURI uri(key, nsname);
+    
+    PrototypeRecursor<Exists> pr(this, uri);
+
+	Property* prop = pr.getProperty();
+
+	// We won't scan the inheritance chain if we find a member,
+	// even if invisible.
+	if (!prop) { 
+
+        if (_displayObject) {
+            if (setDisplayObjectProperty(*this, key, val)) return true;
+            // TODO: should we execute triggers?
+        }
+
+        const int version = getSWFVersion(*this);
+        while (pr()) {
+            if ((prop = pr.getProperty())) {
+                if ((prop->isStatic() || prop->isGetterSetter()) &&
+                        prop->visible(version)) {
+                    break;
+                }
+                else prop = 0;
+            }
+        }
+    }
+
     if (prop) {
 
 		if (prop->isReadOnly()) {
@@ -745,11 +761,6 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		return true;
 	}
-
-    if (_displayObject) {
-        if (setDisplayObjectProperty(*this, key, val)) return true;
-        // Execute triggers?
-    }
 
 	// Else, add new property...
 	if (ifFound) return false;
