@@ -51,6 +51,96 @@
 
 namespace gnash {
 
+namespace {
+
+    class IsVisible
+    {
+    public:
+        IsVisible(as_object* obj) : _version(getSWFVersion(*obj)) {}
+        bool operator()(const Property* const prop) const {
+            return prop->visible(_version);
+        }
+    private:
+        const int _version;
+
+    };
+
+}
+
+template<typename T>
+class
+as_object::PrototypeRecursor
+{
+public:
+    PrototypeRecursor(as_object* top, const ObjectURI& property)
+        :
+        _object(top),
+        _name(getName(property)),
+        _ns(getNamespace(property)),
+        _iterations(0),
+        _condition(top)
+    {
+        _visited.insert(top);
+    }
+
+    /// Iterate to the next object in the inheritance chain.
+    //
+    /// This function throws an ActionLimitException when the maximum
+    /// number of recursions is reached.
+    //
+    /// @return     false if there is no next object. In this case calling
+    ///             the other functions will abort.
+    bool operator()()
+    {
+        ++_iterations;
+
+        // See swfdec/prototype-recursion-get-?.swf
+		if (_iterations > 256) {
+			throw ActionLimitException("Lookup depth exceeded.");
+        }
+
+        _object = _object->get_prototype().get();
+
+        // TODO: there is recursion prevention anyway; is this extra 
+        // check for circularity really necessary?
+        if (!_visited.insert(_object).second) return 0;
+        return _object && !_object->_displayObject;
+    }
+
+    /// Return the object reached in searching the chain.
+    //
+    /// This will abort if there is no current object, so make sure
+    /// operator() returns true and that the PrototypeRecursor was
+    /// initialized with a valid as_object.
+    as_object* currentObject() const {
+        assert(_object);
+        return _object;
+    }
+
+    /// Return the wanted property if it exists and satisfies the predicate.
+    //
+    /// This will abort if there is no current object.
+    Property* getProperty(as_object** owner = 0) const {
+
+        assert(_object);
+        Property* prop = _object->_members.getProperty(_name, _ns);
+        
+        if (prop && _condition(prop)) {
+            if (owner) *owner = _object;
+            return prop;
+        }
+        return 0;
+    }
+
+private:
+    as_object* _object;
+    const string_table::key _name;
+    const string_table::key _ns;
+    std::set<const as_object*> _visited;
+    size_t _iterations;
+    T _condition;
+};
+
 // Anonymous namespace used for module-static defs
 namespace {
 
@@ -327,28 +417,35 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-/// Current order of property lookup
+
+/// Order of property lookup:
 //
-/// If DisplayObject:
-///     DisplayObject magic properties
-///     (DisplayList, TextField variables?)
-/// Own properties up __proto__ chain
-/// __resolve.
+/// 1. Own properties.
+/// 2. If DisplayObject, magic properties
+/// 3. Own properties of all __proto__ objects (a DisplayObject ends the chain).
+/// 4. __resolve properties of this object and all __proto__ objects.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
-    
-    if (_displayObject) {
-        if (getDisplayObjectProperty(*this, name, *val)) return true;
-    }
-	
-	Property* prop = findProperty(name, nsname);
 
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname));
+	
+	Property* prop = pr.getProperty();
+    if (!prop) {
+        if (_displayObject) {
+            if (getDisplayObjectProperty(*this, name, *val)) return true;
+        }
+        while (pr()) {
+            if ((prop = pr.getProperty())) break;
+        }
+    }
+
+    // If the property isn't found or doesn't apply to any objects in the
+    // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        /// If the property isn't found, try the __resolve property.
         prop = findProperty(NSV::PROP_uuRESOLVE, nsname);
         if (!prop) return false;
 
@@ -358,6 +455,7 @@ as_object::get_member(string_table::key name, as_value* val,
         const std::string& undefinedName = st.value(name);
         log_debug("__resolve exists, calling with '%s'", undefinedName);
 
+        // TODO: we've found the property, don't search for it again.
         *val = callMethod(NSV::PROP_uuRESOLVE, undefinedName);
         return true;
     }
@@ -477,47 +575,13 @@ Property*
 as_object::findProperty(string_table::key key, string_table::key nsname, 
 	as_object **owner)
 {
-	int swfVersion = getSWFVersion(*this);
 
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu && !nsname)
-	{
-		Property* prop = _members.getProperty(key, nsname);
-		// TODO: add ignoreVisibility parameter to allow using 
-        // __proto__ even when not visible ?
-		if (prop && prop->visible(swfVersion))
-		{
-			if (owner) *owner = this;
-			return prop;
-		}
-		return 0;
-	}
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname));
 
-	// keep track of visited objects, avoid infinite loops.
-	std::set<as_object*> visited;
-
-	int i = 0;
-
-	boost::intrusive_ptr<as_object> obj = this;
-		
-    // This recursion prevention seems not to exist in the PP.
-    // Instead, it stops when its general timeout for the
-    // execution of scripts is reached.
-	while (obj && visited.insert(obj.get()).second)
-	{
-		++i;
-		if ((i > 255 && swfVersion == 5) || i > 257)
-			throw ActionLimitException("Lookup depth exceeded.");
-
-		Property* prop = obj->_members.getProperty(key, nsname);
-		if (prop && prop->visible(swfVersion) )
-		{
-			if (owner) *owner = obj.get();
-			return prop;
-		}
-		else
-			obj = obj->get_prototype();
-	}
+    do {
+        Property* prop = pr.getProperty(owner);
+        if (prop) return prop;
+    } while (pr());
 
 	// No Property found
 	return NULL;
@@ -536,9 +600,6 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 	// even if invisible.
 	// 
 	if ( prop )	return prop;  // TODO: what about visible ?
-
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu) return NULL;
 
 	std::set<as_object*> visited;
 	visited.insert(this);

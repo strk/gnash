@@ -363,7 +363,7 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_property("scale9Grid", *getset, *getset, swf8Flags);
 
     // External functions.
-    o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
+    o.init_member("createTextField", vm.getNative(104, 200));
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 

@@ -930,7 +930,6 @@ bool
 getDisplayObjectProperty(as_object& obj, string_table::key key,
         as_value& val)
 {
-    
     DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     // These properties have normal case-sensitivity.
@@ -971,10 +970,20 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
 
     Getters::const_iterator it = getters.find(noCaseKey);
-    if (it == getters.end()) return false;
+    if (it != getters.end()) {
+        val = (*it->second)(o);
+        return true;
+    }
 
-    val = (*it->second)(o);
-    return true;
+    // Check MovieClip such as TextField variables.
+    // TODO: check if there's a better way to find these properties.
+    //
+    // Some tests in the swfdec testsuite suggest that these properties are
+    // checked only after the magic properties.
+    MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
+    if (mc && mc->getMovieClipProperty(key, val)) return true;
+
+    return false;
 }
     
 

@@ -522,14 +522,8 @@ public:
     void loadVariables(const std::string& urlstr,
             VariablesMethod sendVarsMethod);
 
-    //
-    // ActionScript support
-    //
+    bool getMovieClipProperty(string_table::key name, as_value& val);
 
-    // See dox in as_object.h
-    bool get_member(string_table::key name, as_value* val, 
-        string_table::key nsname = 0);
-        
     // See dox in as_object.h
     virtual bool set_member(string_table::key name, const as_value& val,
         string_table::key nsname = 0, bool ifFound=false);
@@ -570,7 +564,7 @@ public:
         int newdepth, as_object* init_object=NULL);
         
     /// Dispatch event handler(s), if any.
-    virtual bool on_event(const event_id& id);
+    virtual bool notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
     as_environment& get_environment() {

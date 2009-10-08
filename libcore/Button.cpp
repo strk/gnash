@@ -310,7 +310,7 @@ Button::isEnabled()
 
 
 bool
-Button::on_event(const event_id& id)
+Button::notifyEvent(const event_id& id)
 {
     if (unloaded())
     {

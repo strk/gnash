@@ -315,6 +315,7 @@ crash-0.7.1-uncompressed-half-samples-5.swf:660401da7dc98ec2773acc603203d577
 crash-0.7.1-uncompressed-half-samples-6.swf:7ea0fa524a97ac33fa2f76c13ac9c09c
 crash-0.7.1-uncompressed-half-samples-7.swf:bd828f2702ae2d96c31f0ec74e8eb2d9
 crash-0.7.1-uncompressed-half-samples-8.swf:8043058b7c22459d2f8ef3f69884cf04
+crash-0.7.2-TextField-replace-infloop-5.swf:f36e906743e23c4918becdb34d6c08cf
 crash-0.7.2-TextField-replace-infloop-6.swf:a75b13bb89ab3f2fc673ba2af3fa856f
 crash-0.7.5-draw-on-disposed-bitmap-5.swf:073596b26cce990e4a32088da6c19f4c
 crash-0.7.5-draw-on-disposed-bitmap-6.swf:63105692441eb2330261237f05b02d32
@@ -324,6 +325,7 @@ crash-0.7.5-duplicate-5.swf:9f5686125627308ea6c4cddfa1897bd5
 crash-0.7.5-duplicate-6.swf:559cd7f51f4c2bb03ad3fb8050aac403
 crash-0.7.5-duplicate-7.swf:87c22c444cf6d4a71bafbd1e357028be
 crash-0.7.5-duplicate-8.swf:90c1a16d3f22dc579abca718da6822dd
+crash-0.7.5-textlayout-5.swf:9972229778edebb4772da9c90c591b8f
 crash-0.8.0-huffmann-table-5.swf:6819164ec8cc6299bbd6d0d05a7428d8
 crash-0.8.0-huffmann-table-6.swf:a269bc06dd35de125087b2444622f130
 crash-0.8.0-huffmann-table-7.swf:2134c93509e1fc5d2eff527e79e1ea60
@@ -955,9 +957,14 @@ propflags-set-prototype-8.swf:66e0e45b17020fa046ea8742873aae7c
 propflags-set-prototype-9.swf:17684d704cf7f8c6b69e81f15bab8823
 prototype-addProperty-5.swf:1d9ac80542b3a9238ed09e78bdb8c563
 prototype-addProperty-6.swf:e4a54c188bd5ef8bde1d99ad06317644
+prototype-movie-5.swf:dfc767bc182145cc5588b90c42096a36
+prototype-movie-6.swf:076e99fae7f4d43132022b0666a0eefe
+prototype-movie-7.swf:d96c27b56d0da8fb93bf46ba0c9ea15d
+prototype-movie-8.swf:aedd31cfc64ec96c744def4927523de8
 prototype-propflags-5.swf:43f4ffa51653f54d0182610a01db8f1f
 prototype-propflags-8.swf:3c6f02bf6a3348879f3f50c28ee599cb
 prototype-recursion-addProperty-5.swf:cb268cb74f2ebda340868ef624c02672
+prototype-recursion-get-5.swf:fbb029ff389d27c79338d8bc7248137b
 prototype-recursion-get-6.swf:47fa73c88db1f3acedd832e2ddec6315
 prototype-recursion-get-7.swf:766d65bdfdb4a79073728607ce8dc0d3
 prototype-recursion-get-8.swf:9e1f31c39062dffaa99e9db4ca28838f
@@ -987,6 +994,7 @@ remove-depths-5.swf:1fabff7e05aaa1149898e320b8149313
 remove-depths-6.swf:0c3bb7456c11fbff848efc03a29efe30
 remove-depths-7.swf:4172052b6f6e97339c52d6315c1c139b
 remove-depths-8.swf:55303aac24d7e87427ba716c1d50e631
+remove-movie-5.swf:dc86624c3d6fd8e32d2a272ab4e04413
 removesprite-depths-5.swf:03c73fab9efd3909214def0f6b233486
 removesprite-depths-6.swf:039c217ab8233668d64bffd2e7a6ef79
 removesprite-depths-7.swf:b792dc92c63978c09f9c937a2d5a24cf
@@ -1271,11 +1279,13 @@ targetpath-6.swf:100f7f5ac0740ce49f0a2dac8ee10ab8
 targetpath-6.swf:a359790235e622d7d7c3d30376dcee2c
 targetpath-7.swf:4e4f761384cb7fc41954c04f009ca55f
 targetpath-7.swf:b280daedd3a8f4e3d0defd38ff2c2b2a
+text-field-autosize-layout-update-5.swf:3d7958ab7feba680bf7b2a22e8774542
 text-field-get-text-format-5.swf:1e3a1b39de01a627e3d9cf327b6fcefa
 text-field-hscroll-5.swf:f0b6b2bdc087164334da9fad1ca0140a
 text-field-hscroll-6.swf:7d69d4a6bcadb7dccaaa620f1262f482
 text-field-hscroll-7.swf:5d363482002e2bed17c793dff9c7671b
 text-field-hscroll-8.swf:7f0fb367212b71f3e52076fd743c886b
+text-field-html-new-format-5.swf:478143758da9587b72ec18b712b37acb
 text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
 text-field-init-native-5.swf:881f1f6314617bd2d789fa99f9765e60
 text-field-init-native-6.swf:39c6fb4139696e3334b64fb4e48376e1
@@ -1283,12 +1293,14 @@ text-field-init-native-7.swf:167277605ec309a453caa1b713afbc45
 text-field-init-native-8.swf:86e8f2d4419f1747735f180d22030701
 text-field-replace-text-5.swf:571ec2f1d311c65f98e5e7f76392cb9e
 text-field-replace-text-5.swf:e89d3694aef9f668e714916e8db3195f
+text-field-scroll-5.swf:0753abed58f12bc1bcfef6785730e5c9
 text-field-set-text-format-5.swf:f576da900f9e9b8d911f6791d4114983
 text-field-tag-variable-change.swf:4c03970cb4293453219d053f3c07d024
 text-field-tag-variable.swf:a9e93d3ab26a08dafb196ffd7450e4f7
 text-field-type-of-6.swf:8a88f247b547bccb14060801c9cf6443
 text-field-type-of-7.swf:7593f12ceefba6925ce6abcbc01751bf
 text-field-type-of-8.swf:bac748e2b13ba9331c27f5ee45109ac4
+text-field-variable-5.swf:20821d0f34ab14b27bbc55f27c70c57f
 textformat-init-5.swf:52dec30885359d5bdda450588076eb10
 textformat-init-5.swf:d45b857148b96635af7d18855cb067ae
 textformat-properties-7.swf:390495b699f387f9647c8cf47afa2175

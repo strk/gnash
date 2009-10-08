@@ -139,7 +139,7 @@ public:
 	}	
 
 	/// This function is called as a user-input handler
-	bool on_event(const event_id& id);	
+	bool notifyEvent(const event_id& id);	
 
 	const std::string& getVariableName() const
 	{

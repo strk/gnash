@@ -1222,13 +1222,13 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 			if(down)
 			{
 				// KEY_UP and KEY_DOWN events are unrelated to any key!
-				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
+				ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
 				// Pass the unique Gnash key code!
-				ch->on_event(event_id(event_id::KEY_PRESS, k));
+				ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
 			}
 			else
 			{
-				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
+				ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
 			}
 		}
 	}
@@ -1272,7 +1272,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		DisplayObject* const ch = *iter;
 		if (!ch->unloaded())
 		{
-			ch->on_event(event);
+			ch->notifyEvent(event);
 		}
 	}
 

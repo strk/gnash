@@ -172,7 +172,7 @@ private:
 
 };
 
-/// Generic event  (constructed by id, invoked using on_event
+/// Generic event  (constructed by id, invoked using notifyEvent
 class QueuedEvent: public ExecutableCode {
 
 public:
@@ -194,7 +194,7 @@ public:
         // don't execute any events for destroyed DisplayObject.
         if( !_target->isDestroyed() )
         {
-            _target->on_event(_eventId);
+            _target->notifyEvent(_eventId);
         }
     }
 
