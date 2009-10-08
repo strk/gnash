@@ -768,16 +768,6 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
     return false; 
 }
 
-as_object*
-Button::get_path_element(string_table::key key)
-{
-    as_object* ch = getPathElementSeparator(key);
-    if ( ch ) return ch;
-
-    const std::string& name = getStringTable(*this).value(key);
-    return getChildByName(name); // possibly NULL
-}
-
 DisplayObject *
 Button::getChildByName(const std::string& name)
 {

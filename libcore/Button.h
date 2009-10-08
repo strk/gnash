@@ -102,9 +102,6 @@ public:
 		return true; // buttons can be referenced 
 	}
 	
-	/// Overridden to look in button records for a match
-	virtual as_object* get_path_element(string_table::key key);
-
 	virtual void mouseEvent(const event_id& event);
 
     virtual bool handleFocus();
