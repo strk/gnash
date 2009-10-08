@@ -51,6 +51,23 @@
 
 namespace gnash {
 
+namespace {
+
+    class IsVisible
+    {
+    public:
+        IsVisible(as_object* obj) : _version(getSWFVersion(*obj)) {}
+        bool operator()(const Property* const prop) const {
+            return prop->visible(_version);
+        }
+    private:
+        const int _version;
+
+    };
+
+}
+
+template<typename T>
 class
 as_object::PrototypeRecursor
 {
@@ -58,25 +75,34 @@ public:
     PrototypeRecursor(as_object* top, const ObjectURI& property)
         :
         _object(top),
-        _version(getSWFVersion(*top)),
-        _property(property),
-        _iterations(0)
+        _name(getName(property)),
+        _ns(getNamespace(property)),
+        _iterations(0),
+        _condition(top)
     {
         _visited.insert(top);
     }
 
     /// Iterate to the next object in the inheritance chain.
     //
+    /// This function throws an ActionLimitException when the maximum
+    /// number of recursions is reached.
+    //
     /// @return     false if there is no next object. In this case calling
     ///             the other functions will abort.
     bool operator()()
     {
         ++_iterations;
+
         // See swfdec/prototype-recursion-get-?.swf
 		if (_iterations > 256) {
 			throw ActionLimitException("Lookup depth exceeded.");
         }
+
         _object = _object->get_prototype().get();
+
+        // TODO: there is recursion prevention anyway; is this extra 
+        // check for circularity really necessary?
         if (!_visited.insert(_object).second) return 0;
         return _object;
     }
@@ -91,15 +117,15 @@ public:
         return _object;
     }
 
-    /// Return the wanted property if it exists and is visible.
+    /// Return the wanted property if it exists and satisfies the predicate.
     //
     /// This will abort if there is no current object.
     Property* getProperty(as_object** owner = 0) const {
+
         assert(_object);
-        Property* prop = _object->_members.getProperty(getName(_property),
-                getNamespace(_property));
+        Property* prop = _object->_members.getProperty(_name, _ns);
         
-        if (prop && prop->visible(_version)) {
+        if (prop && _condition(prop)) {
             if (owner) *owner = _object;
             return prop;
         }
@@ -108,10 +134,11 @@ public:
 
 private:
     as_object* _object;
-    const int _version;
-    const ObjectURI _property;
-    std::set<as_object*> _visited;
+    const string_table::key _name;
+    const string_table::key _ns;
+    std::set<const as_object*> _visited;
     size_t _iterations;
+    T _condition;
 };
 
 // Anonymous namespace used for module-static defs
@@ -403,7 +430,7 @@ as_object::get_member(string_table::key name, as_value* val,
 {
 	assert(val);
 
-    PrototypeRecursor pr(this, ObjectURI(name, nsname));
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname));
 	
 	Property* prop(0);
     do {
@@ -551,23 +578,8 @@ Property*
 as_object::findProperty(string_table::key key, string_table::key nsname, 
 	as_object **owner)
 {
-	int swfVersion = getSWFVersion(*this);
 
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu && !nsname)
-	{
-		Property* prop = _members.getProperty(key, nsname);
-		// TODO: add ignoreVisibility parameter to allow using 
-        // __proto__ even when not visible ?
-		if (prop && prop->visible(swfVersion))
-		{
-			if (owner) *owner = this;
-			return prop;
-		}
-		return 0;
-	}
-
-    PrototypeRecursor pr(this, ObjectURI(key, nsname));
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname));
 
     do {
         Property* prop = pr.getProperty(owner);

@@ -1104,7 +1104,7 @@ protected:
 
 private:
 
-    class PrototypeRecursor;
+    template<typename T> class PrototypeRecursor;
 
     /// DisplayObjects have properties not in the AS inheritance chain
     //
