@@ -768,46 +768,6 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
     return false; 
 }
 
-as_object*
-Button::get_path_element(string_table::key key)
-{
-    as_object* ch = getPathElementSeparator(key);
-    if ( ch ) return ch;
-
-    const std::string& name = getStringTable(*this).value(key);
-    return getChildByName(name); // possibly NULL
-}
-
-DisplayObject *
-Button::getChildByName(const std::string& name)
-{
-    // Get all currently active DisplayObjects, including unloaded
-    DisplayObjects actChars;
-    getActiveCharacters(actChars, true);
-
-    // Lower depth first for duplicated names, so we sort
-    std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
-
-    for (DisplayObjects::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
-    {
-
-        DisplayObject* const child = *i;
-        const std::string& childname = child->get_name();
- 
-        if (getSWFVersion(*this) >= 7 )
-        {
-            if ( childname == name ) return child;
-        }
-        else
-        {
-            StringNoCaseEqual noCaseCompare;
-            if ( noCaseCompare(childname, name) ) return child;
-        }
-    }
-
-    return NULL;
-}
-
 void
 Button::stagePlacementCallback(as_object* initObj)
 {

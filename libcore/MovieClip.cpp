@@ -835,7 +835,7 @@ MovieClip::notifyEvent(const event_id& id)
 as_object*
 MovieClip::get_path_element(string_table::key key)
 {
-    as_object* obj = getPathElementSeparator(key);
+    as_object* obj = DisplayObject::get_path_element(key);
     if (obj) return obj;
 
     std::string name = getStringTable(*this).value(key);

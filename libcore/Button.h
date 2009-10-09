@@ -102,9 +102,6 @@ public:
 		return true; // buttons can be referenced 
 	}
 	
-	/// Overridden to look in button records for a match
-	virtual as_object* get_path_element(string_table::key key);
-
 	virtual void mouseEvent(const event_id& event);
 
     virtual bool handleFocus();
@@ -194,16 +191,6 @@ private:
 	///	The state we're interested in
 	///
 	void get_active_records(ActiveRecords& list, MouseState state);
-
-	/// Return any state DisplayObject whose name matches the given string
-	//
-	/// NOTE: both active and inactive childs are scanned for
-	///
-	/// @param name
-	///	Name to match, search is case sensitive for SWF7 and higher,
-	///     case insensitive up to SWF6.
-	///
-	DisplayObject* getChildByName(const std::string& name);
 
 	/// \brief
 	/// Return version of the SWF containing
