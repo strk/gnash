@@ -454,14 +454,6 @@ as_environment::set_variable_raw(const std::string& varname,
     }
 }
 
-void
-as_environment::set_variable_raw( const std::string& varname,
-        const as_value& val)
-{
-    static ScopeStack empty_scopeStack;
-    set_variable_raw(varname, val, empty_scopeStack);
-}
-
 // Set/initialize the value of the local variable.
 void
 as_environment::set_local(const std::string& varname, const as_value& val)
