@@ -336,14 +336,6 @@ as_environment::delVariableRaw(const std::string& varname,
     return _vm.getGlobal()->delProperty(varkey).second;
 }
 
-// varname must be a plain variable name; no path parsing.
-as_value
-as_environment::get_variable_raw(const std::string& varname) const
-{
-    static ScopeStack empty_scopeStack;
-    return get_variable_raw(varname, empty_scopeStack);
-}
-
 // Given a path to variable, set its value.
 void
 as_environment::set_variable(const std::string& varname, const as_value& val,
@@ -876,7 +868,7 @@ as_environment::dump_global_registers(std::ostream& out) const
 
 bool
 as_environment::findLocal(const std::string& varname, as_value& ret,
-        as_object** retTarget)
+        as_object** retTarget) const
 {
     if (_localFrames.empty()) return false;
 

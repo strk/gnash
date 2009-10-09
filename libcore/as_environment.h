@@ -47,9 +47,6 @@ public:
     /// A stack of objects used for variables/members lookup
     typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
-    /// The variables container (case-insensitive)
-    typedef std::map<std::string, as_value, StringNoCaseLessThan> Variables;
-
     typedef std::vector<as_value> Registers;
 
     as_environment(VM& vm);
@@ -517,15 +514,6 @@ private:
     ///
     void popCallFrame();
     
-    /// Return the (possibly UNDEFINED) value of the named variable.
-    //
-    /// @param varname 
-    /// Variable name. Can not contain path elements.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. 
-    ///
-    as_value get_variable_raw(const std::string& varname) const;
-
     /// Given a variable name, set its value (no support for path)
     //
     /// If no variable with that name is found, a new one
@@ -565,12 +553,8 @@ private:
     ///
     /// @return true if the variable was found, false otherwise
     ///
-    bool findLocal(const std::string& varname, as_value& ret, as_object** retTarget=NULL);
-
-    bool findLocal(const std::string& varname, as_value& ret, as_object** retTarget=NULL) const
-    {
-        return const_cast<as_environment*>(this)->findLocal(varname, ret, retTarget);
-    }
+    bool findLocal(const std::string& varname, as_value& ret,
+            as_object** retTarget = 0) const;
 
     /// Delete a variable from the given as_object
     //
