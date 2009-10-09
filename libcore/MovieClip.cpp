@@ -486,9 +486,14 @@ MovieClip::getDisplayObjectAtDepth(int depth)
     return _displayList.getDisplayObjectAtDepth(depth);
 }
 
-// Set val to the value of the named member and
-// return true, if we have the named member.
-// Otherwise leave val alone and return false.
+/// This handles special properties of MovieClip.
+//
+/// The only genuine special properties are DisplayList members. These
+/// are accessible as properties and are enumerated, but not ownProperties
+/// of a MovieClip.
+//
+/// The TextField variables should probably be handled in a more generic
+/// way.
 bool
 MovieClip::getMovieClipProperty(string_table::key name_key, as_value& val)
 {

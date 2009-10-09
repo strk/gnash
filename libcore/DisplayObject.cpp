@@ -154,53 +154,10 @@ DisplayObject::get_world_cxform() const
 as_object*
 DisplayObject::get_path_element(string_table::key key)
 {
-	if (getSWFVersion(*this) > 4 && key == NSV::PROP_uROOT)
-	{
-		// getAsRoot() will handle _lockroot 
-		return getAsRoot();
-	}
-
-	const std::string& name = getStringTable(*this).value(key);
-
-	if (name == ".." || key == NSV::PROP_uPARENT )
-	{
-		// Never NULL
-		DisplayObject* parent = get_parent();
-		if ( ! parent )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			// AS code trying to access something before the root
-			log_aserror(_("ActionScript code trying to reference"
-				" a nonexistent parent with '..' "
-				" (a nonexistent parent probably only "
-				"occurs in the root MovieClip)."
-				" Returning NULL. "));
-			);
-			return NULL;
-		}
-		return parent;
-	}
-
-	// TODO: is it correct to check for _level here ?
-	//       would it be valid at all if not the very first element
-	//       in a path ?
-	unsigned int levelno;
-
-    movie_root& mr = getRoot(*this);
-	if (mr.isLevelTarget(name, levelno) ) {
-		return mr.getLevel(levelno).get();
-	}
-
-
-	std::string namei = name;
-	if (getSWFVersion(*this) < 7) boost::to_lower(namei);
-
-	if (name == "." || namei == "this") 
-	{
-	    return this;
-	}
-
-	return NULL;
+	string_table& st = getStringTable(*this);
+    if (key == st.find("..")) return get_parent();
+	if (key == st.find(".") || key == st.find("this")) return this;
+	return 0;
 }
 
 void 
