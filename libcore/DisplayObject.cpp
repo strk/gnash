@@ -160,14 +160,13 @@ DisplayObject::get_path_element(string_table::key key)
 		return getAsRoot();
 	}
 
-	const std::string& name = getStringTable(*this).value(key);
-
-	if (name == ".." || key == NSV::PROP_uPARENT )
+	string_table& st = getStringTable(*this);
+	
+    if (key == st.find("..") || key == NSV::PROP_uPARENT )
 	{
 		// Never NULL
 		DisplayObject* parent = get_parent();
-		if ( ! parent )
-		{
+		if (!parent) {
 			IF_VERBOSE_ASCODING_ERRORS(
 			// AS code trying to access something before the root
 			log_aserror(_("ActionScript code trying to reference"
@@ -181,22 +180,7 @@ DisplayObject::get_path_element(string_table::key key)
 		return parent;
 	}
 
-	// TODO: is it correct to check for _level here ?
-	//       would it be valid at all if not the very first element
-	//       in a path ?
-	unsigned int levelno;
-
-    movie_root& mr = getRoot(*this);
-	if (mr.isLevelTarget(name, levelno) ) {
-		return mr.getLevel(levelno).get();
-	}
-
-
-	std::string namei = name;
-	if (getSWFVersion(*this) < 7) boost::to_lower(namei);
-
-	if (name == "." || namei == "this") 
-	{
+	if (key == st.find(".") || key == st.find("this")) {
 	    return this;
 	}
 
