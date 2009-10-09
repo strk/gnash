@@ -154,37 +154,10 @@ DisplayObject::get_world_cxform() const
 as_object*
 DisplayObject::get_path_element(string_table::key key)
 {
-	if (getSWFVersion(*this) > 4 && key == NSV::PROP_uROOT)
-	{
-		// getAsRoot() will handle _lockroot 
-		return getAsRoot();
-	}
-
 	string_table& st = getStringTable(*this);
-	
-    if (key == st.find("..") || key == NSV::PROP_uPARENT )
-	{
-		// Never NULL
-		DisplayObject* parent = get_parent();
-		if (!parent) {
-			IF_VERBOSE_ASCODING_ERRORS(
-			// AS code trying to access something before the root
-			log_aserror(_("ActionScript code trying to reference"
-				" a nonexistent parent with '..' "
-				" (a nonexistent parent probably only "
-				"occurs in the root MovieClip)."
-				" Returning NULL. "));
-			);
-			return NULL;
-		}
-		return parent;
-	}
-
-	if (key == st.find(".") || key == st.find("this")) {
-	    return this;
-	}
-
-	return NULL;
+    if (key == st.find("..")) return get_parent();
+	if (key == st.find(".") || key == st.find("this")) return this;
+	return 0;
 }
 
 void 
