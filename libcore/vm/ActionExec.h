@@ -196,16 +196,6 @@ private:
 
 	bool _returning;
 
-	/// Warn about a stack underrun and fix it 
-	//
-	/// The fix is padding the stack with undefined
-	/// values for the missing slots.
-	/// 
-	/// @param required
-	///	Number of items required.
-	///
-	void fixStackUnderrun(size_t required);
-
 	bool _abortOnUnload;
 
     /// Program counter (offset of current action tag)
