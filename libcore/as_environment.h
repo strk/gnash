@@ -134,29 +134,14 @@ public:
     }
 
     /// Drop 'count' values off the top of the stack.
-    //
-    /// Throw StackException if there's not enough to drop
-    ///
     void drop(size_t count)
     {
         // in case count > stack size, just drop all, forget about
         // exceptions...
         _stack.drop(std::min(count, _stack.size()));
-        //size_t ssize = m_stack.size();
-        //assert ( ssize >= count );
-        //m_stack.resize(ssize - count);
     }
 
-    /// Insert 'count' undefined values before 'offset'.
-    //
-    /// An offset of 0 will prepend the values,
-    /// An offset of size() [too far] will append the values.
-    ///
-    void padStack(size_t offset, size_t count);
-
     size_t stack_size() const { return _stack.size(); }
-
-    /// @}  end of stack access/manipulation 
 
     /// \brief
     /// Return the (possibly UNDEFINED) value of the named variable
@@ -613,20 +598,7 @@ private:
         return const_cast<as_environment*>(this)->findLocal(varname, ret, retTarget);
     }
 
-    /// Find a variable in the given as_object
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @param ret
-    /// If a variable is found it's assigned to this parameter.
-    /// Untouched if the variable is not found.
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool findLocal(as_object* locals, const std::string& name, as_value& ret);
-
-    /// Delete a local variable
+    /// Delete a variable from the given as_object
     //
     /// @param varname
     /// Name of the local variable
@@ -634,15 +606,6 @@ private:
     /// @return true if the variable was found and deleted, false otherwise
     ///
     bool delLocal(const std::string& varname);
-
-    /// Delete a variable from the given as_object
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool delLocal(as_object* locals, const std::string& varname);
 
     /// Set a local variable, if it exists.
     //

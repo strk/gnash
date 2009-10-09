@@ -754,26 +754,6 @@ ActionExec::getObjectMember(as_object& obj, const std::string& var,
     return obj.get_member(st.find(var), &val);
 }
 
-/*private*/
-void
-ActionExec::fixStackUnderrun(size_t required)
-{
-    size_t slots_left = env.stack_size() - _initialStackSize;
-    size_t missing = required-slots_left;
-
-    // FIXME, the IF_VERBOSE used to be commented out.  strk, know why?
-    IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Stack underrun: %d elements required, "
-        "%d/%d available. "
-        "Fixing by inserting %d undefined values on the"
-        " missing slots."),
-        required, _initialStackSize, env.stack_size(),
-        missing);
-    );
-
-    env.padStack(_initialStackSize, missing);
-}
-
 as_object*
 ActionExec::getTarget()
 {
