@@ -276,7 +276,7 @@ attachButtonInterface(as_object& o)
     o.init_property("tabIndex", *vm.getNative(105, 1), *vm.getNative(105, 2),
             swf8Flags);
     
-    o.init_member("getDepth", vm.getNative(105, 3));
+    o.init_member("getDepth", vm.getNative(105, 3), unprotected);
 
     NativeFunction* gs;
     gs = vm.getNative(105, 4);
