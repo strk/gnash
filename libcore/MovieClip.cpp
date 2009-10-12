@@ -454,7 +454,7 @@ MovieClip::~MovieClip()
 }
 
 int
-MovieClip::getMovieVersion() const
+MovieClip::getDefinitionVersion() const
 {
     return _swf->version();
 }
@@ -2514,7 +2514,7 @@ MovieClip::getAsRoot()
     // SWF version is > 6
     int topSWFVersion = getRoot(*this).getRootMovie().version();
 
-    if (getMovieVersion() > 6 || topSWFVersion > 6) {
+    if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;
     }
 

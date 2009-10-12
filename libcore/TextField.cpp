@@ -1981,6 +1981,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
     }
 }
 
+int
+TextField::getDefinitionVersion() const
+{
+    // TODO: work out if this correct.
+    return get_root()->getDefinitionVersion();
+}
+
+
 TextField::VariableRef
 TextField::parseTextVariableRef(const std::string& variableName) const
 {

@@ -900,7 +900,7 @@ Button::destroy()
 }
 
 int
-Button::getMovieVersion() const
+Button::getDefinitionVersion() const
 {
     return _def->getSWFVersion();
 }

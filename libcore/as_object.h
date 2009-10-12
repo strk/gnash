@@ -1027,6 +1027,11 @@ public:
         return _relay.get();
     }
 
+    /// Return true if this is a DisplayObject.
+    bool displayObject() const {
+        return _displayObject;
+    }
+
     /// Indicate that this object is a DisplayObject
     //
     /// This enables DisplayObject properties such as _x and _y. A flag
@@ -1218,6 +1223,12 @@ isNativeType(as_object* obj, T*& relay)
     relay = dynamic_cast<T*>(obj->relay());
     return relay;
 }
+
+/// An overload of isNativeType for DisplayObjects
+//
+/// This uses the DisplayObject flag.
+bool
+isNativeType(as_object* obj, DisplayObject*& relay);
 
 /// Ensure that the object is of a particular native type.
 //

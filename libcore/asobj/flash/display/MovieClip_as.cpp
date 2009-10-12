@@ -1326,10 +1326,9 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(movieclip->getMovieVersion());
+    DisplayObject* o;
+    if (!isNativeType(fn.this_ptr, o)) return as_value(-1);
+    return as_value(o->getDefinitionVersion());
 }
 
 // MovieClip.meth(<string>) : Number

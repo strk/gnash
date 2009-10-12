@@ -209,6 +209,11 @@ public:
     ///
     int getWorldVolume() const;
 
+    /// DisplayObjects can return the version of the SWF they were parsed from.
+    virtual int getDefinitionVersion() const {
+        return -1;
+    }
+
     /// Get local transform SWFMatrix for this DisplayObject
     const SWFMatrix& getMatrix() const { return m_matrix; }
 

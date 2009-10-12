@@ -192,10 +192,8 @@ private:
 	///
 	void get_active_records(ActiveRecords& list, MouseState state);
 
-	/// \brief
-	/// Return version of the SWF containing
-	/// the button definition this is an instance of.
-    int getMovieVersion() const;
+	/// Return version of the SWF containing the button definition.
+    virtual int getDefinitionVersion() const;
 
 };
 

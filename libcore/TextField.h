@@ -105,7 +105,6 @@ public:
 		_htmltags["P"] = htmlptag;
 		//_htmltags.insert(std::make_pair("P",ptag*()));
 	}
-	
 
     /// Constructs a TextField as specified in a DefineEditText tag.
 	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def, int id);
@@ -133,6 +132,11 @@ public:
 	// Text fields need to handle cxform specially 
 	virtual cxform get_world_cxform() const;
 	
+    /// Return the version of the SWF this was parsed from.
+    //
+    /// TODO: work out what this means for dynamic TextFields.
+    virtual int getDefinitionVersion() const;
+
     bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
