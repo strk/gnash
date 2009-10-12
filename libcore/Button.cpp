@@ -174,6 +174,16 @@ frame loop:
 namespace gnash {
 
 namespace {
+    as_value button_blendMode(const fn_call& fn);
+    as_value button_cacheAsBitmap(const fn_call& fn);
+    as_value button_filters(const fn_call& fn);
+    as_value button_scale9Grid(const fn_call& fn);
+    as_value button_setTabIndex(const fn_call& fn);
+    as_value button_getTabIndex(const fn_call& fn);
+    as_value button_getDepth(const fn_call& fn);
+}
+
+namespace {
 
 class ButtonActionExecutor {
 public:
@@ -259,6 +269,24 @@ attachButtonInterface(as_object& o)
     const int unprotected = 0;
     o.init_member(NSV::PROP_ENABLED, true, unprotected);
     o.init_member("useHandCursor", true, unprotected);
+    
+    const int swf8Flags = PropFlags::onlySWF8Up;
+    VM& vm = getVM(o);
+
+    o.init_property("tabIndex", *vm.getNative(105, 1), *vm.getNative(105, 2),
+            swf8Flags);
+    
+    o.init_member("getDepth", vm.getNative(105, 3));
+
+    NativeFunction* gs;
+    gs = vm.getNative(105, 4);
+    o.init_property("scale9Grid", *gs, *gs, swf8Flags);
+    gs = vm.getNative(105, 5);
+    o.init_property("filters", *gs, *gs, swf8Flags);
+    gs = vm.getNative(105, 6);
+    o.init_property("cacheAsBitmap", *gs, *gs, swf8Flags);
+    gs = vm.getNative(105, 7);
+    o.init_property("blendMode", *gs, *gs, swf8Flags);
 
 }
 
@@ -938,9 +966,16 @@ button_class_init(as_object& global, const ObjectURI& uri)
 }
 
 void
-registerButtonNative(as_object& /*global*/)
+registerButtonNative(as_object& global)
 {
-    // TODO: button.getDepth
+    VM& vm = getVM(global);
+    vm.registerNative(button_setTabIndex, 105, 1);
+    vm.registerNative(button_getTabIndex, 105, 2);
+    vm.registerNative(button_getDepth, 105, 3);
+    vm.registerNative(button_scale9Grid, 105, 4);
+    vm.registerNative(button_filters, 105, 5);
+    vm.registerNative(button_cacheAsBitmap, 105, 6);
+    vm.registerNative(button_blendMode, 105, 7);
 }
 
 #ifdef USE_SWFTREE
@@ -984,6 +1019,65 @@ Button::mouseStateName(MouseState s)
     }
 }
 
+namespace {
+
+as_value
+button_blendMode(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_cacheAsBitmap(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_filters(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_scale9Grid(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_getTabIndex(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_setTabIndex(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_getDepth(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr).get();
+    UNUSED(obj);
+    return as_value();
+}
+
+} // anonymous namespace
 } // end of namespace gnash
 
 
