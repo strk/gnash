@@ -47,7 +47,7 @@ public:
 
 	DummyCharacter(DisplayObject* parent)
 		:
-		InteractiveObject(parent, parent ? 0 : -1)
+		InteractiveObject(parent)
 	{
 	}
 
