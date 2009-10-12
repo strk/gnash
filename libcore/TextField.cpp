@@ -3178,13 +3178,10 @@ textfield_variable(const fn_call& fn)
 as_value
 textfield_getDepth(const fn_call& fn)
 {
-    // TODO: make this a DisplayObject::getDepth_method function...
+    // Unlike MovieClip.getDepth this works only for TextFields.
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    int n = text->get_depth();
-
+    const int n = text->get_depth();
     return as_value(n);
-
 }
 
 as_value

@@ -672,9 +672,9 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
 as_value
 movieclip_getDepth(const fn_call& fn)
 {
-    // TODO: make this a DisplayObject::getDepth_method function...
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
+    // Unlike TextField.getDepth this works for any DisplayObject
+    boost::intrusive_ptr<DisplayObject> movieclip = 
+        ensureType<DisplayObject>(fn.this_ptr);
 
     const int n = movieclip->get_depth();
 
