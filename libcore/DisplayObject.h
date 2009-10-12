@@ -96,7 +96,7 @@ class DisplayObject : public as_object, boost::noncopyable
 {
 public:
 
-    DisplayObject(DisplayObject* parent, int id);
+    DisplayObject(DisplayObject* parent);
 
     virtual ~DisplayObject() {}
 
@@ -170,9 +170,6 @@ public:
         return m_parent->get_environment();
     }
 
-    // Accessors for basic display info.
-    int get_id() const { return m_id; }
-
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
     /// the DisplayObject has no parent.
@@ -208,6 +205,11 @@ public:
     ///       null, undefined or no argument to constructor.
     ///
     int getWorldVolume() const;
+
+    /// DisplayObjects can return the version of the SWF they were parsed from.
+    virtual int getDefinitionVersion() const {
+        return -1;
+    }
 
     /// Get local transform SWFMatrix for this DisplayObject
     const SWFMatrix& getMatrix() const { return m_matrix; }
@@ -1059,8 +1061,6 @@ private:
 
     /// Build the _target member recursive on parent
     std::string computeTargetPath() const;
-
-    int m_id;
 
     int m_depth;
     cxform m_color_transform;

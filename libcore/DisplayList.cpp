@@ -753,9 +753,8 @@ DisplayList::dump() const
             endIt = _charsByDepth.end(); it != endIt; ++it) {
 
         const DisplayItem& dobj = *it;
-        log_debug(_("Item %d at depth %d (char id %d, name %s, type %s)"),
-            num, dobj->get_depth(), dobj->get_id(),
-            dobj->get_name(), typeName(*dobj));
+        log_debug(_("Item %d at depth %d (char name %s, type %s)"),
+            num, dobj->get_depth(), dobj->get_name(), typeName(*dobj));
         num++;
     }
 }
@@ -1143,9 +1142,8 @@ operator<< (std::ostream& os, const DisplayList& dl)
 
         const DisplayItem& item = *it; 
         if (it != dl._charsByDepth.begin()) os << " | ";
-        os << "ch id:" << item->get_id()
-            << " name:" << item->get_name()
-            << " depth:" << item->get_depth();
+        os << " name:" << item->get_name()
+           << " depth:" << item->get_depth();
     }
 
     return os;

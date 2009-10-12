@@ -146,6 +146,10 @@ boolean-properties-6.swf:606b0b8883de19dce98bbeb9c91e0215
 boolean-properties-7.swf:f01da3f46a6a70f22682ad6655e1be6a
 boolean-properties-8.swf:bcb5f70be1ae877fb31c198925ba1375
 builtin-construction-5.swf:c3bcb8608999fa7a42a04b22e9e4929a
+button-properties-5.swf:fedec2281d5dc7dede06a97b0bbd99c7
+button-properties-6.swf:1b1446f8218029e92e527901ea267ce2
+button-properties-7.swf:44605cb6a7b2649c18d155434cc57b83
+button-properties-8.swf:794f9c47e03aa3b0c75eeff87ba8a140
 call-arguments-5.swf:422c391a2abd3e864eb8ed8a1e05ad31
 callfunction-stack.swf:21d0c957f4caf0eb0ccd0dcadaf17500
 camera-properties-5.swf:495e39b641f89aa49a927cf0a8413028
@@ -538,6 +542,9 @@ getBounds-local_to_global-6.swf:89fcd93d8c9c39621b93fa652b440537
 getBounds-local_to_global-7.swf:184bf53fab95a2f0614118ce2aae3ec9
 getBounds-local_to_global-8.swf:a0011c41fa749a423c024b23e138f13f
 get-depth-5.swf:3bcb54d583b5b4bfb8b332ccb821d064
+get-depth-6.swf:e03348f551a9e6a34ff0b7b9948dc79c
+get-depth-7.swf:165c1dfd22a8d70853b6d966917ab962
+get-depth-8.swf:29c5ebbf38ad27cd1fd996c6a5ca9f76
 getsetproperty-target-5.swf:03e0f34befd1de66083128dd7810d211
 getsetproperty-target-6.swf:cd70c0eac0ac31400859178f7d877fe1
 getsetproperty-target-7.swf:d7d730794e6318c1b69a7e946cb2fedd
@@ -564,6 +571,10 @@ getvariable-various-5.swf:a79d72c6daacf8d745aba5c194edf998
 getvariable-various-6.swf:1488b4d8e200bcad7027ae618a6c08d2
 getvariable-various-7.swf:d8a5c5449de5bcc427877c655033811e
 getvariable-various-8.swf:7211050a012850e666db0fa4032abc72
+global-function-properties-5.swf:fa9650886ed073bb2423b4d4da1ac247
+global-function-properties-6.swf:6a47348c50727ccec51e857401ba5c1d
+global-function-properties-7.swf:92e4978f6b2edd010f5bc32f499e918b
+global-function-properties-8.swf:1c092b3ef149f62f1744cc85ed70ab4a
 global-variable-properties-5.swf:dcc9514f7d195414152b7fe1ec630c63
 global-variable-properties-6.swf:82a3684af003d93e1fc8d7df8c05e347
 global-variable-properties-7.swf:5f2609296a34202f4a2e8a45fc75fefc
@@ -637,6 +648,8 @@ loadobject-addrequestheader-7.swf:08fa4107345b54263b0df3aae95d9d8b
 loadobject-addrequestheader-8.swf:50ab764a31bff4a679a86e48d7000343
 loadvariables-5.swf:a24997be9ca59d8da2216f9527d0279a
 loadvars-5.swf:378a93e3fc7821a72f61332dcfa6cbf7
+loadvars-decode-7.swf:c56b42214f26888edba5d991f711c209
+loadvars-decode-8.swf:ed7cb98e1a1ec7f7e6a6730a3d884f9a
 loadvars-decode-return-5.swf:7d961f35feb3d46db0725e93c26bb90a
 loadvars-decode-return-6.swf:b087145545a09db783e43093e1ed6731
 loadvars-decode-return-7.swf:86b9a3bf16c7f8927a63b048b7886dbf
@@ -702,6 +715,10 @@ movieclip-get-swf-version-load-5.swf:9dce6c61d27b304a590ac0206daee064
 movieclip-get-swf-version-load-6.swf:d246d697a86c555d0858dde03e471610
 movieclip-get-swf-version-load-7.swf:e9e67de054ea546c767af5dca82ecd6a
 movieclip-get-swf-version-load-8.swf:a0ee7aae28219fa92f4036c7fd2f0174
+movieclip-get-swf-version-object-5.swf:c6ca6fe3a07dfcd74397cf87cbeb7754
+movieclip-get-swf-version-object-6.swf:c36e6620c2b193f6c8bac7693904ec4e
+movieclip-get-swf-version-object-7.swf:c75023287829bab42227a4a5b38de3a6
+movieclip-get-swf-version-object-8.swf:5f1bae8461aeaf8f05dfdd8ae377d1f9
 movieclip-hittest-5.swf:60c92ba987df3a6019ced7ed3ae063b6
 movieclip-hittest-parent-5.swf:2dd3e6daa46ad81705a6f239971e5520
 movieclip-hittest-target-5.swf:6d484ea1799df7f08eac134be82bacd4

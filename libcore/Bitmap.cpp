@@ -28,10 +28,9 @@
 
 namespace gnash {
 
-Bitmap::Bitmap(BitmapData_as* bd, DisplayObject* parent,
-        int id)
+Bitmap::Bitmap(BitmapData_as* bd, DisplayObject* parent)
     :
-    DisplayObject(parent, id),
+    DisplayObject(parent),
     _bitmapData(bd),
     _bitmapInfo(0),
     _width(_bitmapData->getWidth()),
@@ -40,10 +39,9 @@ Bitmap::Bitmap(BitmapData_as* bd, DisplayObject* parent,
     _shape.setBounds(SWFRect(0, 0, pixelsToTwips(_width), pixelsToTwips(_height)));
 }
 
-Bitmap::Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
-        int id)
+Bitmap::Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent)
     :
-    DisplayObject(parent, id),
+    DisplayObject(parent),
     _def(def),
     _bitmapData(0),
     _bitmapInfo(0),

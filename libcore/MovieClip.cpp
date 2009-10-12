@@ -415,9 +415,9 @@ private:
 
 
 MovieClip::MovieClip(const movie_definition* const def, Movie* r,
-        DisplayObject* parent, int id)
+        DisplayObject* parent)
     :
-    DisplayObjectContainer(parent, id),
+    DisplayObjectContainer(parent),
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
@@ -454,7 +454,7 @@ MovieClip::~MovieClip()
 }
 
 int
-MovieClip::getMovieVersion() const
+MovieClip::getDefinitionVersion() const
 {
     return _swf->version();
 }
@@ -616,7 +616,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 DisplayObject*
 MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
-    MovieClip* movieclip = new MovieClip(0, _swf, this, 0);
+    MovieClip* movieclip = new MovieClip(0, _swf, this);
     movieclip->set_name(name);
     movieclip->setDynamic();
 
@@ -674,7 +674,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     }
 
     boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(_def.get(),
-            _swf, parent, get_id());
+            _swf, parent);
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();
@@ -1329,7 +1329,7 @@ MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
 void
 MovieClip::attachBitmap(BitmapData_as* bd, int depth)
 {
-    DisplayObject* ch = new Bitmap(bd, this, 0);
+    DisplayObject* ch = new Bitmap(bd, this);
     attachCharacter(*ch, depth, 0);
 }
 
@@ -1357,8 +1357,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     
     if (existing_char) return NULL;
 
-    boost::intrusive_ptr<DisplayObject> ch =
-        cdef->createDisplayObject(this, tag->getID());
+    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1436,8 +1435,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         return;
     }
 
-    boost::intrusive_ptr<DisplayObject> ch = 
-        cdef->createDisplayObject(this, tag->getID());
+    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
 
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?
@@ -2514,7 +2512,7 @@ MovieClip::getAsRoot()
     // SWF version is > 6
     int topSWFVersion = getRoot(*this).getRootMovie().version();
 
-    if (getMovieVersion() > 6 || topSWFVersion > 6) {
+    if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;
     }
 

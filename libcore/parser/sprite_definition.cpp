@@ -41,12 +41,12 @@
 namespace gnash {
 
 DisplayObject*
-sprite_definition::createDisplayObject(DisplayObject* parent, int id) const
+sprite_definition::createDisplayObject(DisplayObject* parent) const
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
-	MovieClip* si = new MovieClip(this, parent->get_root(), parent, id);
+	MovieClip* si = new MovieClip(this, parent->get_root(), parent);
 	return si;
 }
 

@@ -127,10 +127,9 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
-        int id)
+TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
     :
-    InteractiveObject(parent, id),
+    InteractiveObject(parent),
     _tag(&def),
     _textDefined(def.hasText()),
     _htmlTextDefined(def.hasText()),
@@ -198,8 +197,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
 
 TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
     :
-    // the id trick is to fool assertions in DisplayObject ctor
-    InteractiveObject(parent, parent ? 0 : -1),
+    InteractiveObject(parent),
     _textDefined(false),
     _htmlTextDefined(false),
     _restrictDefined(false),
@@ -1981,6 +1979,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
     }
 }
 
+int
+TextField::getDefinitionVersion() const
+{
+    // TODO: work out if this correct.
+    return get_root()->getDefinitionVersion();
+}
+
+
 TextField::VariableRef
 TextField::parseTextVariableRef(const std::string& variableName) const
 {
@@ -3172,13 +3178,10 @@ textfield_variable(const fn_call& fn)
 as_value
 textfield_getDepth(const fn_call& fn)
 {
-    // TODO: make this a DisplayObject::getDepth_method function...
+    // Unlike MovieClip.getDepth this works only for TextFields.
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    int n = text->get_depth();
-
+    const int n = text->get_depth();
     return as_value(n);
-
 }
 
 as_value

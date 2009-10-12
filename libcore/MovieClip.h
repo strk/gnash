@@ -121,7 +121,7 @@ public:
     ///     definition, which should know its id...
     ///
     MovieClip(const movie_definition* const def, Movie* root,
-            DisplayObject* parent, int id);
+            DisplayObject* parent);
 
     virtual ~MovieClip();
 
@@ -710,14 +710,14 @@ public:
     void lineTo(boost::int32_t x, boost::int32_t y)
     {
         set_invalidated();
-        _drawable.lineTo(x, y, getMovieVersion());
+        _drawable.lineTo(x, y, getDefinitionVersion());
     }
 
     void curveTo(boost::int32_t cx, boost::int32_t cy, 
                  boost::int32_t ax, boost::int32_t ay)
     {
         set_invalidated();
-        _drawable.curveTo(cx, cy, ax, ay, getMovieVersion());
+        _drawable.curveTo(cx, cy, ax, ay, getDefinitionVersion());
     }
 
     void clear()
@@ -772,11 +772,8 @@ public:
     /// false otherwise. True for relative root.
     void setLockRoot(bool lr) { _lockroot=lr; }
 
-    /// \brief
-    /// Return version of the SWF definition of this instance
-    /// as been parsed from.
-    //
-    int getMovieVersion() const;
+    /// Return the version of the SWF this MovieClip was parsed from.
+    virtual int getDefinitionVersion() const;
 
 protected:
 

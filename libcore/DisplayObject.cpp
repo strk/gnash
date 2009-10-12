@@ -74,12 +74,11 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
-DisplayObject::DisplayObject(DisplayObject* parent, int id)
+DisplayObject::DisplayObject(DisplayObject* parent)
     :
     m_parent(parent),
     m_invalidated(true),
     m_child_invalidated(true),
-    m_id(id),
     m_depth(0),
     _xscale(100),
     _yscale(100),
@@ -96,7 +95,6 @@ DisplayObject::DisplayObject(DisplayObject* parent, int id)
     _scriptTransformed(false),
     _dynamicallyCreated(false)
 {
-    assert((!parent && m_id == -1) || ((parent) && m_id >= 0));
     assert(m_old_invalidated_ranges.isNull());
 
     // This informs the core that the object is a DisplayObject.

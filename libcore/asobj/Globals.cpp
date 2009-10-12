@@ -150,6 +150,10 @@ namespace {
     as_value global_clearTimeout(const fn_call& fn);
     as_value global_clearInterval(const fn_call& fn);
     as_value global_setInterval(const fn_call& fn);
+    
+    // These are present in the standalone, not sure about the plugin.
+    as_value global_enableDebugConsole(const fn_call& fn);
+    as_value global_showRedrawRegions(const fn_call& fn);
 
     // This is a help function for the silly AsSetupError function.
     as_value local_errorConstructor(const fn_call& fn);
@@ -337,13 +341,22 @@ AVM1Global::registerClasses()
 
     init_member("setInterval", _vm.getNative(250, 0));
     init_member("clearInterval", _vm.getNative(250, 1));
-    init_member("setTimeout", createFunction(global_setTimeout));
-    init_member("clearTimeout", createFunction(global_clearInterval));
+    init_member("setTimeout", _vm.getNative(250, 2));
+ 
+    // This is an odd function with no properties. There ought to be
+    // a better way of implementing this. See also TextFormat.getTextExtent.
+    as_function* edc = createFunction(global_enableDebugConsole);
+    edc->clearProperties();
+    init_member("enableDebugConsole", edc);
+    init_member("showRedrawRegions", _vm.getNative(1021, 1));
+    
+    string_table& st = getStringTable(*this);
+    init_member("clearTimeout", getMember(st.find("clearInterval")));
 
     _classes.declareAll(avm1Classes());
 
     // SWF8 visibility:
-    const string_table::key NS_FLASH = getStringTable(*this).find("flash");
+    const string_table::key NS_FLASH = st.find("flash");
     flash_package_init(*this, ObjectURI(NS_FLASH, NS_GLOBAL)); 
 
     const int version = _vm.getSWFVersion();
@@ -1368,7 +1381,19 @@ global_clearInterval(const fn_call& fn)
 	return as_value(ret);
 }
 
+as_value
+global_showRedrawRegions(const fn_call& /*fn*/)
+{
+    LOG_ONCE(log_unimpl("_global.showRedrawRegions"));
+    return as_value();
+}
 
+as_value
+global_enableDebugConsole(const fn_call& /*fn*/)
+{
+    LOG_ONCE(log_unimpl("_global.enableDebugConsole"));
+    return as_value();
+}
 /// Construct an instance of the specified global class.
 //
 /// If the class is not present or is not a constructor function, this
@@ -1431,6 +1456,9 @@ registerNatives(as_object& global)
     vm.registerNative(global_isfinite, 200, 19);
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
+    vm.registerNative(global_setTimeout, 250, 2);
+    
+    vm.registerNative(global_showRedrawRegions, 1021, 1);
 
     registerObjectNative(global);
     registerFunctionNative(global);

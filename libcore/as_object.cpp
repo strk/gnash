@@ -1460,6 +1460,14 @@ as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
     _members.visitNonHiddenValues(visitor, *this);
 }
 
+bool
+isNativeType(as_object* obj, DisplayObject*& relay)
+{
+    if (!obj || !obj->displayObject()) return false;
+    relay = static_cast<DisplayObject*>(obj);
+    return true;
+}
+
 /// Get the VM from an as_object
 VM&
 getVM(const as_object& o)

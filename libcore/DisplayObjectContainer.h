@@ -48,9 +48,9 @@ class DisplayObjectContainer : public InteractiveObject
 
 public:
     
-    DisplayObjectContainer(DisplayObject* parent, int id)
+    DisplayObjectContainer(DisplayObject* parent)
         :
-        InteractiveObject(parent, id)
+        InteractiveObject(parent)
     {}
 
     virtual ~DisplayObjectContainer();

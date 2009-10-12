@@ -50,7 +50,9 @@ class DummyMovieDefinition : public SWFMovieDefinition
 
 public:
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int /* id */) { return 0; }
+    virtual DisplayObject* createDisplayObject(DisplayObject*) {
+        return 0;
+    }
 
 
 	/// Default constructor

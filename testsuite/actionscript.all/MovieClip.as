@@ -118,15 +118,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(903); // SWF6
+	check_totals(910); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(920); // SWF7
+	check_totals(927); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1010); // SWF8+
+	check_totals(1017); // SWF8+
 #endif
 
 	play();
@@ -2343,7 +2343,7 @@ o = {};
 
 check_equals(_root.getSWFVersion(), OUTPUT_VERSION);
 o.getSWFVersion = MovieClip.prototype.getSWFVersion;
-xcheck_equals(o.getSWFVersion(), -1);
+check_equals(o.getSWFVersion(), -1);
 createTextField("t1", 3, 0, 100, 100, 100);
 #if OUTPUT_VERSION > 5
 check_equals(_level0.t1.getSWFVersion(), undefined);
@@ -2353,11 +2353,58 @@ xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 xcheck_equals(_level0.t1.toString(), "[object Object]");
 #endif
 _level0.t1.getSWFVersion = MovieClip.prototype.getSWFVersion;
-xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
+check_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 
 o.meth = MovieClip.prototype.meth;
 check_equals(o.meth("post"), 2);
 check_equals(o.meth(), 0);
 
+// Check that MovieClip data is separate from Relay data.
+
+#if OUTPUT_VERSION > 5
+
+// Run the Date constructor
+dc = function(const) {
+	this.__proto__.__constructor__ = const;
+	super();
+};
+
+createEmptyMovieClip("mc", 3);
+mc.lineStyle(2, 0, 100);
+mc.lineTo(100, 100);
+o = new Object();
+o.getTime = Date.prototype.getTime;
+mc.getTime = Date.prototype.getTime;
+
+mc.dc = dc;
+o.dc = dc;
+
+mc.dc(Date);
+o.dc(Date);
+
+check_equals(typeof(o.getTime()), "number");
+
+// mc is now a Date.
+check_equals(typeof(mc.getTime()), "number");
+
+mc.lineStyle(2, 0xff, 100);
+mc.lineTo(60, 20);
+
+// But it is still a MovieClip.
+check_equals(mc._x, 17);
+
+mc.toString = Boolean.prototype.toString;
+check_equals(mc.toString(), undefined);
+
+mc.dc(Boolean);
+
+// mc is now a Boolean
+check_equals(typeof(mc.getTime()), "undefined");
+check_equals(mc.toString(), "false");
+
+// But it is still a MovieClip
+check_equals(mc._x, 17);
+
+#endif
 
 //endOfTest();

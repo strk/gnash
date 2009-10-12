@@ -549,7 +549,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<DisplayObject> newch =
-        exported_movie->createDisplayObject(movieclip.get(), 0);
+        exported_movie->createDisplayObject(movieclip.get());
 
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
@@ -672,9 +672,9 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
 as_value
 movieclip_getDepth(const fn_call& fn)
 {
-    // TODO: make this a DisplayObject::getDepth_method function...
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
+    // Unlike TextField.getDepth this works for any DisplayObject
+    boost::intrusive_ptr<DisplayObject> movieclip = 
+        ensureType<DisplayObject>(fn.this_ptr);
 
     const int n = movieclip->get_depth();
 
@@ -1326,10 +1326,9 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(movieclip->getMovieVersion());
+    DisplayObject* o;
+    if (!isNativeType(fn.this_ptr, o)) return as_value(-1);
+    return as_value(o->getDefinitionVersion());
 }
 
 // MovieClip.meth(<string>) : Number
@@ -2573,7 +2572,7 @@ movieclip_as3_ctor(const fn_call& fn)
     // a MovieClip.
     Movie* m = getRoot(fn).topLevelMovie();
 
-    return new MovieClip(0, m, 0, -1);
+    return new MovieClip(0, m, 0);
 }
 
 
