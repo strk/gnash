@@ -27,7 +27,7 @@ BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
     _def(def)
 {
     assert(def);
-    boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this, 1);
+    boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this);
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
     placeDisplayObject(ch.get(), depth);

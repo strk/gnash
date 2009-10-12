@@ -70,8 +70,7 @@ public:
 		MOUSESTATE_HIT
 	};
 
-	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
-            int id);
+	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent);
 
 	~Button();
 	

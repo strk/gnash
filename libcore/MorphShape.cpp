@@ -28,9 +28,9 @@ namespace gnash
 
 
 MorphShape::MorphShape(const SWF::DefineMorphShapeTag* const def,
-        DisplayObject* parent, int id)
+        DisplayObject* parent)
     :
-    DisplayObject(parent, id),
+    DisplayObject(parent),
     _def(def),
     _shape(_def->shape1())
 {

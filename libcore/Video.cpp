@@ -52,10 +52,9 @@ namespace {
     as_value video_height(const fn_call& fn);
 }
 
-Video::Video(const SWF::DefineVideoStreamTag* const def,
-		DisplayObject* parent, int id)
+Video::Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent)
 	:
-	DisplayObject(parent, id),
+	DisplayObject(parent),
 	m_def(def),
 	_ns(0),
 	_embeddedStream(m_def ? true : false),

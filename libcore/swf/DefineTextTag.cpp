@@ -40,9 +40,9 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineTextTag::createDisplayObject(DisplayObject* parent, int id) const
+DefineTextTag::createDisplayObject(DisplayObject* parent) const
 {
-    return new StaticText(this, parent, id);
+    return new StaticText(this, parent);
 }
 
 bool

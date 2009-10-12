@@ -51,7 +51,7 @@ public:
 
 	Movie(const movie_definition* const def, DisplayObject* parent)
         :
-        MovieClip(def, this, parent, parent ? 0 : -1)
+        MovieClip(def, this, parent)
     {}
 
 	virtual ~Movie() {}

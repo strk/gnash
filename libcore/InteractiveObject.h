@@ -43,9 +43,9 @@ class InteractiveObject : public DisplayObject
 
 public:
 
-	InteractiveObject(DisplayObject* parent, int id)
+	InteractiveObject(DisplayObject* parent)
 		:
-		DisplayObject(parent, id)
+		DisplayObject(parent)
 	{
 	}
 

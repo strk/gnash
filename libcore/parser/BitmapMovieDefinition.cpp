@@ -48,10 +48,10 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 }
 
 DisplayObject*
-BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id) const
+BitmapMovieDefinition::createDisplayObject(DisplayObject* parent) const
 {
     /// What should we do if construction of the bitmap fails?
-    return new Bitmap(this, parent, id);
+    return new Bitmap(this, parent);
 }
 
 #ifdef GNASH_USE_GC

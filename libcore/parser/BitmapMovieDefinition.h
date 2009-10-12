@@ -60,7 +60,7 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, Renderer* renderer,
             const std::string& url);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int) const;
+    virtual DisplayObject* createDisplayObject(DisplayObject*) const;
 
 	virtual int	get_version() const {
 		return _version;

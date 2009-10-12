@@ -127,10 +127,9 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
-        int id)
+TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
     :
-    InteractiveObject(parent, id),
+    InteractiveObject(parent),
     _tag(&def),
     _textDefined(def.hasText()),
     _htmlTextDefined(def.hasText()),
@@ -198,8 +197,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
 
 TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
     :
-    // the id trick is to fool assertions in DisplayObject ctor
-    InteractiveObject(parent, parent ? 0 : -1),
+    InteractiveObject(parent),
     _textDefined(false),
     _htmlTextDefined(false),
     _restrictDefined(false),

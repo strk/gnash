@@ -549,7 +549,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<DisplayObject> newch =
-        exported_movie->createDisplayObject(movieclip.get(), 0);
+        exported_movie->createDisplayObject(movieclip.get());
 
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
@@ -2572,7 +2572,7 @@ movieclip_as3_ctor(const fn_call& fn)
     // a MovieClip.
     Movie* m = getRoot(fn).topLevelMovie();
 
-    return new MovieClip(0, m, 0, -1);
+    return new MovieClip(0, m, 0);
 }
 
 

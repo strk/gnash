@@ -208,7 +208,7 @@ public:
     virtual ~DefineButtonTag();
 
     /// Create a mutable instance of our definition.
-    DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
+    DisplayObject* createDisplayObject(DisplayObject* parent) const;
 
     /// Access the ButtonRecords directly. Used for modifying the
     /// Cxform by a DefineButtonCxform tag.

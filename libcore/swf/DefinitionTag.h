@@ -50,8 +50,7 @@ public:
     /// Calling this function creates a new DisplayObject from the
     /// DefinitionTag and adds it as a child of the specified parent
     /// DisplayObject.
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent,
-            int id) const = 0;
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const = 0;
 	
 };
 

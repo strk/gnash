@@ -121,7 +121,7 @@ public:
     ///     definition, which should know its id...
     ///
     MovieClip(const movie_definition* const def, Movie* root,
-            DisplayObject* parent, int id);
+            DisplayObject* parent);
 
     virtual ~MovieClip();
 

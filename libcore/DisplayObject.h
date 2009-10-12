@@ -96,7 +96,7 @@ class DisplayObject : public as_object, boost::noncopyable
 {
 public:
 
-    DisplayObject(DisplayObject* parent, int id);
+    DisplayObject(DisplayObject* parent);
 
     virtual ~DisplayObject() {}
 
@@ -169,9 +169,6 @@ public:
         assert(m_parent != NULL);
         return m_parent->get_environment();
     }
-
-    // Accessors for basic display info.
-    int get_id() const { return m_id; }
 
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
@@ -1064,8 +1061,6 @@ private:
 
     /// Build the _target member recursive on parent
     std::string computeTargetPath() const;
-
-    int m_id;
 
     int m_depth;
     cxform m_color_transform;

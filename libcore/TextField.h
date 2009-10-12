@@ -107,7 +107,7 @@ public:
 	}
 
     /// Constructs a TextField as specified in a DefineEditText tag.
-	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def, int id);
+	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def);
 
     /// Constructs a TextField with default values and the specified bounds.
     //
