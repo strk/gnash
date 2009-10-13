@@ -913,9 +913,10 @@ getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 //
 /// Lookup order:
 //
-/// 1. Objects on the DisplayList of a MovieClip
-/// 2. DisplayObject magic properties (_x, _y etc).
-/// 3. MovieClips' TextField variables (this is probably not the best
+/// 1. _level0.._level9
+/// 2. Objects on the DisplayList of a MovieClip
+/// 3. DisplayObject magic properties (_x, _y etc).
+/// 4. MovieClips' TextField variables (this is probably not the best
 ///    way to do it, but as it is done like this, this must be called here.
 ///    It will cause an infinite recursion otherwise.
 bool
@@ -923,6 +924,23 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
         as_value& val)
 {
     assert(obj.displayObject());
+    
+    string_table& st = getStringTable(obj);
+    const std::string& propname = st.value(key);
+    
+    DisplayObject& o = static_cast<DisplayObject&>(obj);
+
+    // Check _level0.._level9
+    movie_root& mr = getRoot(o);
+    unsigned int levelno;
+    if (mr.isLevelTarget(propname, levelno)) {
+        Movie* mo = mr.getLevel(levelno).get();
+        if (mo) {
+            val = mo;
+            return true;
+        }
+        return false;
+    }
     
     MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
     if (mc) {
@@ -932,8 +950,6 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
            return true;
         }
     }
-    
-    DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     // These properties have normal case-sensitivity.
     // They are tested to exist for TextField, MovieClip, and Button
@@ -952,20 +968,6 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
             return true;
     }
     
-    string_table& st = getStringTable(obj);
-    const std::string& propname = st.value(key);
-
-    // Check _level0.._level9
-    movie_root& mr = getRoot(o);
-    unsigned int levelno;
-    if (mr.isLevelTarget(propname, levelno)) {
-        Movie* mo = mr.getLevel(levelno).get();
-        if (mo) {
-            val = mo;
-            return true;
-        }
-        return false;
-    }
 
 
     // These magic properties are case insensitive in all versions!
