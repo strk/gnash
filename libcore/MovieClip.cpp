@@ -495,27 +495,10 @@ MovieClip::getDisplayObjectAtDepth(int depth)
 /// The TextField variables should probably be handled in a more generic
 /// way.
 bool
-MovieClip::getMovieClipProperty(string_table::key name_key, as_value& val)
+MovieClip::getTextFieldVariables(string_table::key name_key, as_value& val)
 {
+
     const std::string& name = getStringTable(*this).value(name_key);
-
-    // Try items on our display list.
-    DisplayObject* ch;
-    if (getSWFVersion(*this) >= 7 ) {
-        ch = _displayList.getDisplayObjectByName(name);
-    }
-    else ch = _displayList.getDisplayObjectByName_i(name);
-    if (ch) {
-            // Found object.
-
-            // If the object is an ActionScript referenciable one we
-            // return it, otherwise we return ourselves
-            if (ch->isActionScriptReferenceable()) {
-                val = ch;
-            }
-            else val = this;
-            return true;
-    }
 
     // Try textfield variables
     TextFields* etc = get_textfield_variable(name);
@@ -843,31 +826,13 @@ MovieClip::get_path_element(string_table::key key)
     as_object* obj = DisplayObject::get_path_element(key);
     if (obj) return obj;
 
-    std::string name = getStringTable(*this).value(key);
-
     // See if we have a match on the display list.
-    DisplayObject* ch;
-    if (getSWFVersion(*this) >= 7 ) ch = 
-        _displayList.getDisplayObjectByName(name);
+    DisplayObject* ch = getDisplayListObject(key);
+    if (ch) return ch;
 
-    else ch = _displayList.getDisplayObjectByName_i(name);
-
-            // TODO: should we check for isActionScriptReferenceable here ?
-    if ( ch )
-    {
-        // If the object is an ActionScript referenciable one we
-        // return it, otherwise we return ourselves
-        if ( ch->isActionScriptReferenceable() ) return ch;
-        else return this;
-    }
-
+    std::string name = getStringTable(*this).value(key);
+    
     // See if it's a member
-
-    // NOTE: direct use of the base class's get_member avoids
-    //             triggering a call to MovieClip::get_member
-    //             which would scan the child DisplayObjects again
-    //             w/out a need for it
-
     as_value tmp;
     if ( !as_object::get_member(key, &tmp, 0) )
     {
@@ -1856,6 +1821,30 @@ MovieClip::get_textfield_variable(const std::string& name)
     else return &(it->second);
 } 
 
+
+DisplayObject*
+MovieClip::getDisplayListObject(string_table::key key)
+{
+
+    const std::string& name = getStringTable(*this).value(key);
+
+    // Try items on our display list.
+    DisplayObject* ch;
+    if (getSWFVersion(*this) >= 7 ) {
+        ch = _displayList.getDisplayObjectByName(name);
+    }
+    else ch = _displayList.getDisplayObjectByName_i(name);
+    if (!ch) return 0;
+
+    // Found object.
+
+    // If the object is an ActionScript referenciable one we
+    // return it, otherwise we return ourselves
+    if (ch->isActionScriptReferenceable()) {
+        return ch;
+    }
+    return this;
+}
 
 void 
 MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, 

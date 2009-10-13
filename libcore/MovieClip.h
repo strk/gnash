@@ -522,15 +522,22 @@ public:
     void loadVariables(const std::string& urlstr,
             VariablesMethod sendVarsMethod);
 
-    /// Get special MovieClip properties
+    /// Get TextField variables
     //
-    /// These are properties not attached as genuine members to the MovieClip
-    /// object. Currently they include DisplayList members and TextField
-    /// variables.
+    /// TODO: this is unlikely to be the best way of doing it, and it would
+    /// simplify things if this function could be dropped.
+    bool getTextFieldVariables(string_table::key name, as_value& val);
+
+    /// Search for a named object on the DisplayList
     //
-    /// TODO: work out if there is a better way of doing this, such as
-    /// attaching special properties as real members.
-    bool getMovieClipProperty(string_table::key name, as_value& val);
+    /// These are properties, but not attached as genuine members to the
+    /// MovieClip object. They take priority over DisplayObject magic
+    /// properties and inherited properties, but not over own properties.
+    //
+    /// @param name     The name of the object. This function handles
+    ///                 case-sensitivity.
+    /// @return         The object if found, otherwise 0.
+    DisplayObject* getDisplayListObject(string_table::key name);
 
     // See dox in as_object.h
     virtual bool set_member(string_table::key name, const as_value& val,

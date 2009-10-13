@@ -103,9 +103,6 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_currentFrame(const fn_call& fn);
-    as_value movieclip_totalFrames(const fn_call& fn);
-    as_value movieclip_framesLoaded(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
 
     // =============================================
@@ -238,20 +235,6 @@ attachMovieClipAS2Properties(DisplayObject& o)
     // initialize this if we don't have a parent
     if (!o.get_parent()) o.init_member("$version",
             getVM(o).getPlayerVersion(), 0); 
-
-    as_c_function_ptr gettersetter;
-
-    gettersetter = movieclip_currentFrame;
-    o.init_property(NSV::PROP_uCURRENTFRAME, gettersetter, gettersetter);
-
-    gettersetter = movieclip_totalFrames;
-    o.init_property(NSV::PROP_uTOTALFRAMES, gettersetter, gettersetter);
-
-    gettersetter = movieclip_framesLoaded;
-    o.init_property(NSV::PROP_uFRAMESLOADED, gettersetter, gettersetter);
-
-    gettersetter = movieclip_dropTarget;
-    o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
 
 }
 
@@ -638,10 +621,8 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
 
-    if (fn.nargs != 2)
-    {
-        if (fn.nargs < 2)
-        {
+    if (fn.nargs != 2) {
+        if (fn.nargs < 2) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("createEmptyMovieClip needs "
                     "2 args, but %d given,"
@@ -650,15 +631,12 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
             );
             return as_value();
         }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("createEmptyMovieClip takes "
-                    "2 args, but %d given, discarding"
-                    " the excess"),
-                    fn.nargs);
-            )
-        }
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("createEmptyMovieClip takes "
+                "2 args, but %d given, discarding"
+                " the excess"),
+                fn.nargs);
+        )
     }
 
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
@@ -1239,19 +1217,21 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.this_ptr);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("MovieClip.getInstanceAtDepth(): missing depth argument");
+        log_aserror("MovieClip.getInstanceAtDepth(): missing or "
+            "undefined depth argument");
         );
         return as_value();
     }
 
-    int depth = fn.arg(0).to_int();
+    const int depth = fn.arg(0).to_int();
+
     boost::intrusive_ptr<DisplayObject> ch = mc->getDisplayObjectAtDepth(depth);
  
     // we want 'undefined', not 'null'
     if (!ch) return as_value();
+
     return as_value(ch.get());
 }
 
@@ -2475,42 +2455,6 @@ movieclip_as2_ctor(const fn_call& fn)
     return as_value(clip.get());
 }
 
-
-as_value
-movieclip_currentFrame(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(std::min(ptr->get_loaded_frames(),
-                ptr->get_current_frame() + 1));
-}
-
-as_value
-movieclip_totalFrames(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_frame_count());
-}
-
-as_value
-movieclip_framesLoaded(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_loaded_frames());
-}
-
-as_value
-movieclip_dropTarget(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return ptr->getDropTarget();
-}
 
 as_value
 movieclip_transform(const fn_call& fn)

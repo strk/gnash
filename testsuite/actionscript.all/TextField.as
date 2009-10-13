@@ -601,11 +601,18 @@ check( ! tf.hasOwnProperty('_soundbuftime') );
 check( ! tf.__proto__.hasOwnProperty('_soundbuftime') ); 
 xcheck_equals(tf._soundbuftime, 5); // the default is 5, it seems
 
-// These seem to be only MovieClip properties.
-
+// These seem to be only valid for MovieClips, but they are still read-only
 check_equals(typeof(tf._currentframe), 'undefined');
+tf._currentframe = "6";
+check_equals(tf._currentframe, undefined);
+
 check_equals(typeof(tf._totalframes), 'undefined');
+tf._totalframes = 67;
+check_equals(tf._totalframes, undefined);
+
 check_equals(typeof(tf._framesloaded), 'undefined');
+tf._framesloaded = "hi";
+check_equals(tf._framesloaded, undefined);
 
 // Check TextField._focusrect
 check(tf._focusrect !== 'null');
@@ -1139,11 +1146,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(499);
+     check_totals(502);
 #elif OUTPUT_VERSION == 7
- check_totals(505);
+ check_totals(508);
 #elif OUTPUT_VERSION == 8
- check_totals(506);
+ check_totals(509);
 #endif
 
 #endif

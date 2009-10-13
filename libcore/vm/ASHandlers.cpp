@@ -49,6 +49,7 @@
 #include "StringPredicates.h" 
 #include "GnashNumeric.h"
 #include "Global_as.h"
+#include "DisplayObject.h"
 
 #include <string>
 #include <vector>
@@ -368,49 +369,6 @@ SWFHandlers::get_handlers()
     return handlers;
 }
 
-/// @todo: make properties available outside, for
-///        example for Machine.cpp
-/// @todo: consider sorting named strings so that
-///        the first 22 or more elements have
-///        the corresponding property number (drops
-///        one level of indirection).
-///
-static const string_table::key&
-propertyKey(unsigned int val)
-{
-    static const string_table::key invalidKey=0;
-
-    if ( val > 21u ) return invalidKey;
-
-    static const string_table::key props[22] = {
-        NSV::PROP_uX, // 0
-        NSV::PROP_uY, // 1
-        NSV::PROP_uXSCALE, // 2
-        NSV::PROP_uYSCALE, // 3
-        NSV::PROP_uCURRENTFRAME, // 4
-        NSV::PROP_uTOTALFRAMES, // 5
-        NSV::PROP_uALPHA, // 6
-        NSV::PROP_uVISIBLE, // 7
-        NSV::PROP_uWIDTH, // 8
-        NSV::PROP_uHEIGHT, // 9
-        NSV::PROP_uROTATION, // 10
-        NSV::PROP_uTARGET, // 11
-        NSV::PROP_uFRAMESLOADED, // 12
-        NSV::PROP_uNAME, // 13
-        NSV::PROP_uDROPTARGET, // 14
-        NSV::PROP_uURL, // 15
-        NSV::PROP_uHIGHQUALITY, // 16
-        NSV::PROP_uFOCUSRECT, // 17
-        NSV::PROP_uSOUNDBUFTIME, // 18
-        NSV::PROP_uQUALITY, // 19
-        NSV::PROP_uXMOUSE, // 20
-        NSV::PROP_uYMOUSE // 21
-    };
-
-    return props[val];
-}
-
-
 const SWFHandlers&
 SWFHandlers::instance()
 {
@@ -421,8 +379,6 @@ SWFHandlers::instance()
 void
 SWFHandlers::execute(ActionType type, ActionExec& thread) const
 {
-//    It is very heavy operation
-//    if ( _handlers[type].getName() == "unsupported" ) return false;
     try {
         get_handlers()[type].execute(thread);
     }
@@ -1100,21 +1056,8 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     unsigned int prop_number =
         static_cast<unsigned int>(env.top(0).to_number());
 
-    if (target)
-    {
-        string_table::key propKey = propertyKey(prop_number);
-        if ( propKey == 0 )
-        {
-            log_error(_("invalid property query, property "
-                "number %d"), prop_number);
-            env.top(1) = as_value();
-        }
-        else
-        {
-            as_value val;
-            target->get_member(propKey, &val);
-            env.top(1) = val;
-        }
+    if (target) {
+        getIndexedProperty(prop_number, *target, env.top(1));
     }
     else
     {
@@ -1141,20 +1084,8 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 
     as_value prop_val = env.top(0);
 
-    if (target)
-    {
-        string_table::key propKey = propertyKey(prop_number);
-        if ( propKey == 0 )
-        {
-            // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
-            IF_VERBOSE_MALFORMED_SWF (
-            log_swferror(_("invalid set_property, property number %d"), prop_number);
-            )
-        }
-        else
-        {
-            target->set_member(propKey, prop_val);
-        }
+    if (target) {
+        setIndexedProperty(prop_number, *target, prop_val);
     }
     else
     {
