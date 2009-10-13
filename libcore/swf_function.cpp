@@ -268,7 +268,6 @@ swf_function::operator()(const fn_call& fn)
 			DisplayObject* tgtch = m_env.get_target();
             if (tgtch) {
                 as_object* parent = tgtch->get_parent();
-                //m_env.local_register(current_reg) = parent;
                 m_env.setRegister(current_reg, parent);
                 ++current_reg;
             }
@@ -277,7 +276,6 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			//m_env.local_register(current_reg).set_as_object(global);
 			m_env.setRegister(current_reg, as_value(global));
 			++current_reg;
 		}
@@ -304,7 +302,6 @@ swf_function::operator()(const fn_call& fn)
 				if (i < fn.nargs) {
 					// Pass argument into a register.
 					const int reg = m_args[i].m_register;
-					//m_env.local_register(reg) = fn.arg(i);
 					m_env.setRegister(reg, fn.arg(i));
 				}
                 // If no argument was passed, no need to setup a register
