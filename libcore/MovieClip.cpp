@@ -495,15 +495,8 @@ MovieClip::getDisplayObjectAtDepth(int depth)
 /// The TextField variables should probably be handled in a more generic
 /// way.
 bool
-MovieClip::getMovieClipProperty(string_table::key name_key, as_value& val)
+MovieClip::getTextFieldVariables(string_table::key name_key, as_value& val)
 {
-
-    // Try items on our display list.
-    DisplayObject* ch = getDisplayListObject(name_key);
-    if (ch) {
-        val = ch;
-        return true;
-    }
 
     const std::string& name = getStringTable(*this).value(name_key);
 

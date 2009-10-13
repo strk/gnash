@@ -903,12 +903,36 @@ getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
     doGet(prop, o, val);
 }
 
+
+/// DisplayObject property lookup 
+//
+/// This function is only called on the first object in the inheritance chain
+/// after the object's own properties have been checked.
+/// In AS2, any DisplayObject marks the end of the inheritance chain for
+/// lookups.
+//
+/// Lookup order:
+//
+/// 1. Objects on the DisplayList of a MovieClip
+/// 2. DisplayObject magic properties (_x, _y etc).
+/// 3. MovieClips' TextField variables (this is probably not the best
+///    way to do it, but as it is done like this, this must be called here.
+///    It will cause an infinite recursion otherwise.
 bool
 getDisplayObjectProperty(as_object& obj, string_table::key key,
         as_value& val)
 {
     assert(obj.displayObject());
-
+    
+    MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
+    if (mc) {
+        DisplayObject* ch = mc->getDisplayListObject(key);
+        if (ch) {
+           val = ch;
+           return true;
+        }
+    }
+    
     DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     // These properties have normal case-sensitivity.
@@ -951,11 +975,7 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
 
     // Check MovieClip such as TextField variables.
     // TODO: check if there's a better way to find these properties.
-    //
-    // Some tests in the swfdec testsuite suggest that these properties are
-    // checked only after the magic properties.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
-    if (mc && mc->getMovieClipProperty(key, val)) return true;
+    if (mc && mc->getTextFieldVariables(key, val)) return true;
 
     return false;
 }
