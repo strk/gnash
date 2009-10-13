@@ -65,6 +65,9 @@ namespace {
     const Getters displayObjectGetters();
     const Setters displayObjectSetters();
 
+    bool doSet(string_table::key prop, DisplayObject& o, const as_value& val);
+    bool doGet(string_table::key prop, DisplayObject& o, as_value& val);
+    string_table::key getPropertyByIndex(size_t index);
 }
 
 // Define static const members.
@@ -881,10 +884,31 @@ DisplayObject::getAsRoot()
     return get_root();
 }
 
+void
+setIndexedProperty(size_t index, DisplayObject& o, const as_value& val)
+{
+    string_table::key prop = getPropertyByIndex(index);
+    if (!prop) return;
+    doSet(prop, o, val);
+}
+
+void
+getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
+{
+    string_table::key prop = getPropertyByIndex(index);
+    if (!prop) {
+        val.set_undefined();
+        return;
+    }
+    doGet(prop, o, val);
+}
+
 bool
 getDisplayObjectProperty(as_object& obj, string_table::key key,
         as_value& val)
 {
+    assert(obj.displayObject());
+
     DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     // These properties have normal case-sensitivity.
@@ -919,16 +943,11 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
         return false;
     }
 
-    const Getters& getters = displayObjectGetters();
 
     // These magic properties are case insensitive in all versions!
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
 
-    Getters::const_iterator it = getters.find(noCaseKey);
-    if (it != getters.end()) {
-        val = (*it->second)(o);
-        return true;
-    }
+    if (doGet(noCaseKey, o, val)) return true;
 
     // Check MovieClip such as TextField variables.
     // TODO: check if there's a better way to find these properties.
@@ -946,35 +965,12 @@ bool
 setDisplayObjectProperty(as_object& obj, string_table::key key, 
         const as_value& val)
 {
-
-    const Setters& setters = displayObjectSetters();
-
+    assert(obj.displayObject());
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
-
-    Setters::const_iterator it = setters.find(noCaseKey);
-    if (it == setters.end()) return false;
-
-    DisplayObject& o = static_cast<DisplayObject&>(obj);
-
-    Setter s = it->second;
-
-    // Read-only.
-    if (!s) return true;
-    
-    if (val.is_undefined() || val.is_null()) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set property to %s, refused"),
-                o.getTarget(), val);
-        );
-        return true;
-    }
-
-    (*s)(o, val);
-    return true;
-
+    return doSet(noCaseKey, static_cast<DisplayObject&>(obj), val);
 }
 
 namespace {
@@ -1393,6 +1389,122 @@ setFocusRect(DisplayObject& /*o*/, const as_value& /*val*/)
     LOG_ONCE(log_unimpl("_focusrect setting"));
 }
 
+as_value
+getDropTarget(DisplayObject& o)
+{
+    // This property only applies to MovieClips.
+    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    if (!mc) return as_value();
+    return as_value(mc->getDropTarget());
+}
+
+as_value
+getCurrentFrame(DisplayObject& o)
+{
+    // This property only applies to MovieClips.
+    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    if (!mc) return as_value();
+    const int currframe =
+        std::min(mc->get_loaded_frames(), mc->get_current_frame() + 1);
+    return as_value(currframe);
+}
+
+as_value
+getFramesLoaded(DisplayObject& o)
+{
+    // This property only applies to MovieClips.
+    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    if (!mc) return as_value();
+    return as_value(mc->get_frame_count());
+}
+
+as_value
+getTotalFrames(DisplayObject& o)
+{
+    // This property only applies to MovieClips.
+    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    if (!mc) return as_value();
+    return as_value(mc->get_loaded_frames());
+}
+
+
+string_table::key
+getPropertyByIndex(size_t index)
+{
+
+    // This is a magic number; defining it here makes sure that the
+    // table is really this size.
+    const size_t size = 22;
+
+    if (index >= size) return 0;
+
+    static const string_table::key props[size] = {
+        NSV::PROP_uX,
+        NSV::PROP_uY,
+        NSV::PROP_uXSCALE,
+        NSV::PROP_uYSCALE,
+        NSV::PROP_uCURRENTFRAME,
+        NSV::PROP_uTOTALFRAMES,
+        NSV::PROP_uALPHA,
+        NSV::PROP_uVISIBLE,
+        NSV::PROP_uWIDTH,
+        NSV::PROP_uHEIGHT,
+        NSV::PROP_uROTATION, 
+        NSV::PROP_uTARGET, 
+        NSV::PROP_uFRAMESLOADED, 
+        NSV::PROP_uNAME, 
+        NSV::PROP_uDROPTARGET, 
+        NSV::PROP_uURL, 
+        NSV::PROP_uHIGHQUALITY, 
+        NSV::PROP_uFOCUSRECT, 
+        NSV::PROP_uSOUNDBUFTIME, 
+        NSV::PROP_uQUALITY, 
+        NSV::PROP_uXMOUSE, 
+        NSV::PROP_uYMOUSE 
+    };
+    return props[index];
+}
+
+bool
+doGet(string_table::key prop, DisplayObject& o, as_value& val)
+{
+    const Getters& getters = displayObjectGetters();
+    const Getters::const_iterator it = getters.find(prop);
+    if (it == getters.end()) return false;
+
+    val = (*it->second)(o);
+    return true;
+}
+
+
+/// Do the actual setProperty
+//
+/// Return true if the property is a DisplayObject property, regardless of
+/// whether it was successfully set or not.
+bool
+doSet(string_table::key prop, DisplayObject& o, const as_value& val)
+{
+    const Setters& setters = displayObjectSetters();
+    const Setters::const_iterator it = setters.find(prop);
+    if (it == setters.end()) return false;
+
+    const Setter s = it->second;
+
+    // Read-only.
+    if (!s) return true;
+    
+    if (val.is_undefined() || val.is_null()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Attempt to set property to %s, refused"),
+                o.getTarget(), val);
+        );
+        return true;
+    }
+
+    (*s)(o, val);
+    return true;
+}
+
 const Getters
 displayObjectGetters()
 {
@@ -1412,6 +1524,10 @@ displayObjectGetters()
         (NSV::PROP_uVISIBLE, getVisible)
         (NSV::PROP_uSOUNDBUFTIME, getSoundBufTime)
         (NSV::PROP_uFOCUSRECT, getFocusRect)
+        (NSV::PROP_uDROPTARGET, getDropTarget)
+        (NSV::PROP_uCURRENTFRAME, getCurrentFrame)
+        (NSV::PROP_uFRAMESLOADED, getFramesLoaded)
+        (NSV::PROP_uTOTALFRAMES, getTotalFrames)
         (NSV::PROP_uPARENT, getParent)
         (NSV::PROP_uTARGET, getTarget)
         (NSV::PROP_uXMOUSE, getMouseX)
@@ -1439,6 +1555,10 @@ displayObjectSetters()
         (NSV::PROP_uVISIBLE, setVisible)
         (NSV::PROP_uSOUNDBUFTIME, setSoundBufTime)
         (NSV::PROP_uFOCUSRECT, setFocusRect)
+        (NSV::PROP_uDROPTARGET, n)
+        (NSV::PROP_uCURRENTFRAME, n)
+        (NSV::PROP_uFRAMESLOADED, n)
+        (NSV::PROP_uTOTALFRAMES, n)
         (NSV::PROP_uPARENT, n)
         (NSV::PROP_uURL, n)
         (NSV::PROP_uTARGET, n)

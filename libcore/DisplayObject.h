@@ -66,11 +66,30 @@ namespace gnash {
 /// the correct properties are attached.
 void attachDisplayObjectProperties(as_object& o);
 
+/// Set special properties
+//
+/// This will abort if called with a non DisplayObject. It sets the magic
+/// properties of DisplayObjects.
 bool setDisplayObjectProperty(as_object& obj, string_table::key key,
         const as_value& val);
 
+/// Get special properties
+//
+/// This will abort if called with a non DisplayObject. It gets the magic
+/// properties of DisplayObjects and handles special MovieClip properties
+/// such as DisplayList members.
 bool getDisplayObjectProperty(as_object& obj, string_table::key key,
         as_value& val);
+
+/// Get a property by its numeric index.
+//
+/// By ASHandlers to get the DisplayObject properties indexed by number
+void getIndexedProperty(size_t index, DisplayObject& o, as_value& val);
+
+/// Set a property by its numeric index.
+//
+/// By ASHandlers to set the DisplayObject properties indexed by number
+void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 
 /// DisplayObject is the base class for all DisplayList objects.
 //

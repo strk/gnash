@@ -103,9 +103,6 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_currentFrame(const fn_call& fn);
-    as_value movieclip_totalFrames(const fn_call& fn);
-    as_value movieclip_framesLoaded(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
 
     // =============================================
@@ -238,20 +235,6 @@ attachMovieClipAS2Properties(DisplayObject& o)
     // initialize this if we don't have a parent
     if (!o.get_parent()) o.init_member("$version",
             getVM(o).getPlayerVersion(), 0); 
-
-    as_c_function_ptr gettersetter;
-
-    gettersetter = movieclip_currentFrame;
-    o.init_property(NSV::PROP_uCURRENTFRAME, gettersetter, gettersetter);
-
-    gettersetter = movieclip_totalFrames;
-    o.init_property(NSV::PROP_uTOTALFRAMES, gettersetter, gettersetter);
-
-    gettersetter = movieclip_framesLoaded;
-    o.init_property(NSV::PROP_uFRAMESLOADED, gettersetter, gettersetter);
-
-    gettersetter = movieclip_dropTarget;
-    o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
 
 }
 
@@ -2472,42 +2455,6 @@ movieclip_as2_ctor(const fn_call& fn)
     return as_value(clip.get());
 }
 
-
-as_value
-movieclip_currentFrame(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(std::min(ptr->get_loaded_frames(),
-                ptr->get_current_frame() + 1));
-}
-
-as_value
-movieclip_totalFrames(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_frame_count());
-}
-
-as_value
-movieclip_framesLoaded(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_loaded_frames());
-}
-
-as_value
-movieclip_dropTarget(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return ptr->getDropTarget();
-}
 
 as_value
 movieclip_transform(const fn_call& fn)
