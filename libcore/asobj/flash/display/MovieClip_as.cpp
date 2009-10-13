@@ -638,10 +638,8 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
 
-    if (fn.nargs != 2)
-    {
-        if (fn.nargs < 2)
-        {
+    if (fn.nargs != 2) {
+        if (fn.nargs < 2) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("createEmptyMovieClip needs "
                     "2 args, but %d given,"
@@ -650,15 +648,12 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
             );
             return as_value();
         }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("createEmptyMovieClip takes "
-                    "2 args, but %d given, discarding"
-                    " the excess"),
-                    fn.nargs);
-            )
-        }
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("createEmptyMovieClip takes "
+                "2 args, but %d given, discarding"
+                " the excess"),
+                fn.nargs);
+        )
     }
 
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
@@ -1239,19 +1234,21 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.this_ptr);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("MovieClip.getInstanceAtDepth(): missing depth argument");
+        log_aserror("MovieClip.getInstanceAtDepth(): missing or "
+            "undefined depth argument");
         );
         return as_value();
     }
 
-    int depth = fn.arg(0).to_int();
+    const int depth = fn.arg(0).to_int();
+
     boost::intrusive_ptr<DisplayObject> ch = mc->getDisplayObjectAtDepth(depth);
  
     // we want 'undefined', not 'null'
     if (!ch) return as_value();
+
     return as_value(ch.get());
 }
 
