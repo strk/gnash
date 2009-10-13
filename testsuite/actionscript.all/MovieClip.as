@@ -451,7 +451,7 @@ check(!mc.__proto__.hasOwnProperty("_rotation"));
 check(!MovieClip.prototype.hasOwnProperty("_rotation"));
 
 check_equals(typeof(mc._totalframes), 'number');
-xcheck(!mc.hasOwnProperty("_totalframes"));
+check(!mc.hasOwnProperty("_totalframes"));
 check(!mc.__proto__.hasOwnProperty("_totalframes"));
 check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
 
@@ -461,7 +461,7 @@ check(!mc.hasOwnProperty("_target"));
 check(!mc.hasOwnProperty("_url"));
 check(!mc.hasOwnProperty("_soundbuftime"));
 check(!mc.hasOwnProperty("_focusrect"));
-xcheck(!mc.hasOwnProperty("_framesloaded"));
+check(!mc.hasOwnProperty("_framesloaded"));
 check(!mc.hasOwnProperty("_lockroot"));
 check(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
@@ -2000,7 +2000,7 @@ asm {
 	setvariable
 };
 // setMember did set the prop, didn't call the setter
-xcheck_equals(propinspect, 20);
+check_equals(propinspect, 20);
 #endif //MING_SUPPORTS_ASM
 
 createEmptyMovieClip('mc', 10);
