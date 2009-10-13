@@ -681,49 +681,45 @@ movieclip_swapDepths(const fn_call& fn)
 
     // Lower bound of source depth below which swapDepth has no effect
     // (below Timeline/static zone)
-    if ( this_depth < DisplayObject::lowerAccessibleBound )
+    if (this_depth < DisplayObject::lowerAccessibleBound)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss;
             fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): won't swap a clip below "
-                    "depth %d (%d)"),
-            movieclip->getTarget(), ss.str(), DisplayObject::lowerAccessibleBound,
+                "depth %d (%d)"), movieclip->getTarget(), ss.str(),
+                DisplayObject::lowerAccessibleBound,
                 this_depth);
-        );
+        )
         return as_value();
     }
 
-    typedef boost::intrusive_ptr<DisplayObject> CharPtr;
-    typedef boost::intrusive_ptr<MovieClip> SpritePtr;
-
-    SpritePtr this_parent = dynamic_cast<MovieClip*>(
-            movieclip->get_parent());
+    MovieClip* this_parent = dynamic_cast<MovieClip*>(movieclip->get_parent());
 
     //CharPtr target = NULL;
     int target_depth = 0;
 
     // movieclip.swapDepth(movieclip)
-    if ( SpritePtr target_movieclip = fn.arg(0).to_sprite() )
-    {
-        if ( movieclip == target_movieclip )
-        {
+    if (MovieClip* target_movieclip = fn.arg(0).to_sprite()) {
+
+        if (movieclip == target_movieclip) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("%s.swapDepths(%s): invalid call, swapping to self?"),
-                movieclip->getTarget(), target_movieclip->getTarget());
-            );
+                log_aserror(_("%s.swapDepths(%s): invalid call, "
+                    "swapping to self?"), movieclip->getTarget(),
+                    target_movieclip->getTarget());
+            )
             return as_value();
         }
 
-        SpritePtr target_parent =
+        MovieClip* target_parent =
             dynamic_cast<MovieClip*>(movieclip->get_parent());
-        if ( this_parent != target_parent )
-        {
+
+        if (this_parent != target_parent) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("%s.swapDepths(%s): invalid call, the two "
+                log_aserror(_("%s.swapDepths(%s): invalid call, the two "
                     "DisplayObjects don't have the same parent"),
-                movieclip->getTarget(), target_movieclip->getTarget());
-            );
+                    movieclip->getTarget(), target_movieclip->getTarget());
+            )
             return as_value();
         }
 
@@ -733,7 +729,7 @@ movieclip_swapDepths(const fn_call& fn)
         // to avoid unecessary bounds invalidation and immunizing
         // the instance from subsequent PlaceObject tags attempting
         // to transform it.
-        if ( movieclip->get_depth() == target_depth )
+        if (movieclip->get_depth() == target_depth)
         {
             IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
@@ -746,28 +742,35 @@ movieclip_swapDepths(const fn_call& fn)
     }
 
     // movieclip.swapDepth(depth)
-    else
-    {
-        double td = fn.arg(0).to_number();
-        if ( isNaN(td) )
-        {
+    else {
+        
+        const double td = fn.arg(0).to_number();
+        if (isNaN(td)) {
             IF_VERBOSE_ASCODING_ERRORS(
-            std::stringstream ss; fn.dump_args(ss);
-            log_aserror(_("%s.swapDepths(%s): first argument invalid "
-                "(neither a movieclip nor a number)"),
-                movieclip->getTarget(), ss.str());
-            );
+                std::stringstream ss; fn.dump_args(ss);
+                log_aserror(_("%s.swapDepths(%s): first argument invalid "
+                    "(neither a movieclip nor a number)"),
+                    movieclip->getTarget(), ss.str());
+            )
+            return as_value();
+        }
+        if (td > DisplayObject::upperAccessibleBound) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                std::stringstream ss; fn.dump_args(ss);
+                log_aserror(_("%s.swapDepths(%s): requested depth is above "
+                    "the accessible range."),
+                    movieclip->getTarget(), ss.str());
+            )
             return as_value();
         }
 
-        target_depth = int(td);
+        target_depth = static_cast<int>(td);
 
         // Check we're not swapping the our own depth so
         // to avoid unecessary bounds invalidation and immunizing
         // the instance from subsequent PlaceObjec tags attempting
         // to transform it.
-        if ( movieclip->get_depth() == target_depth )
-        {
+        if (movieclip->get_depth() == target_depth) {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): ignored, DisplayObject already "
@@ -776,19 +779,13 @@ movieclip_swapDepths(const fn_call& fn)
             );
             return as_value();
         }
-
-
         // TODO : check other kind of validities ?
-
-
     }
 
-    if ( this_parent )
-    {
+    if (this_parent) {
         this_parent->swapDepths(movieclip.get(), target_depth);
     }
-    else
-    {
+    else {
         movie_root& root = getRoot(fn);
         root.swapLevels(movieclip, target_depth);
         return as_value();
