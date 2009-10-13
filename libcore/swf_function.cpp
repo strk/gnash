@@ -264,85 +264,71 @@ swf_function::operator()(const fn_call& fn)
 			}
 		}
 
-		if (m_function2_flags & SUPPRESS_SUPER)
-		{
+		if (m_function2_flags & SUPPRESS_SUPER) {
 			// Don't put 'super' in a local var.
 		}
-		else if ( super && swfversion > 5 )
-		{
+		else if (super && swfversion > 5) {
 			// TOCHECK: should we still set it if unavailable ?
 			// Put 'super' in a local var (SWF6+ only)
 			m_env.add_local("super", as_value(super));
 		}
 
-		if (m_function2_flags & PRELOAD_ROOT) 
-		{
+		if (m_function2_flags & PRELOAD_ROOT) {
 			// Put '_root' (if any) in a register.
 			DisplayObject* tgtch = m_env.get_target();
-			if ( tgtch )
-			{
-				// NOTE: _lockroot will be hanlded by getAsRoot()
+			if (tgtch) {
+				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = tgtch->getAsRoot();
 				m_env.setRegister(current_reg, as_value(r));
-				current_reg++;
+				++current_reg;
 			}
 		}
 
-		if (m_function2_flags & PRELOAD_PARENT)
-		{
+		if (m_function2_flags & PRELOAD_PARENT) {
 			// Put '_parent' in a register.
-			as_value parent = m_env.get_variable("_parent");
+			as_value parent = m_env.get_variable("_parent", _scopeStack);
 			//m_env.local_register(current_reg) = parent;
 			m_env.setRegister(current_reg, parent);
-			current_reg++;
+			++current_reg;
 		}
 
-		if (m_function2_flags & PRELOAD_GLOBAL)
-		{
+		if (m_function2_flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
 			//m_env.local_register(current_reg).set_as_object(global);
 			m_env.setRegister(current_reg, as_value(global));
-			current_reg++;
+			++current_reg;
 		}
 
 		// Handle the explicit args.
 		// This must be done after implicit ones,
-		// as the explicit override the implicits: see swfdec/definefunction2-override
-		for (size_t i=0, n=m_args.size(); i<n; ++i)
-		{
-			if ( ! m_args[i].m_register ) // not a register, declare as local
-			{
-				if ( i < fn.nargs )
-				{
+		// as the explicit override the implicits:
+        // see swfdec/definefunction2-override
+		for (size_t i = 0, n = m_args.size(); i < n; ++i) {
+            // not a register, declare as local
+			if (!m_args[i].m_register) {
+				if (i < fn.nargs) {
 					// Conventional arg passing: create a local var.
 					m_env.add_local(m_args[i].m_name, fn.arg(i));
 				}
-				else
-				{
+				else {
 					// Still declare named arguments, even if
 					// they are not passed from caller
 					// See bug #22203
 					m_env.declare_local(m_args[i].m_name);
 				}
 			}
-			else
-			{
-				if ( i < fn.nargs )
-				{
+			else {
+				if (i < fn.nargs) {
 					// Pass argument into a register.
-					int	reg = m_args[i].m_register;
+					const int reg = m_args[i].m_register;
 					//m_env.local_register(reg) = fn.arg(i);
 					m_env.setRegister(reg, fn.arg(i));
 				}
-				else
-				{
-					// The argument was not passed, no
-					// need to setup a register I guess..
-				}
+                // If no argument was passed, no need to setup a register
+                // I guess.
 			}
 		}
-
 	}
 
 	as_value result;

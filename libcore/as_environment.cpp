@@ -162,13 +162,6 @@ as_environment::get_variable(const std::string& varname,
     }
 }
 
-as_value
-as_environment::get_variable(const std::string& varname) const
-{
-    static ScopeStack empty_scopeStack;
-    return get_variable(varname, empty_scopeStack);
-}
-
 static bool
 validRawVariableName(const std::string& varname)
 {
@@ -369,13 +362,6 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     else {
         set_variable_raw(varname, val, scopeStack);
     }
-}
-
-void
-as_environment::set_variable(const std::string& varname, const as_value& val)
-{
-    static ScopeStack empty_scopeStack;
-    set_variable(varname, val, empty_scopeStack);
 }
 
 // No path rigamarole.

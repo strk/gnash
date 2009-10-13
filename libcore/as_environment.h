@@ -129,18 +129,6 @@ public:
     size_t stack_size() const { return _stack.size(); }
 
     /// \brief
-    /// Return the (possibly UNDEFINED) value of the named variable
-    //
-    /// @param varname 
-    /// Variable name. Can contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. Note that
-    ///       ActionExec performs the conversion
-    ///       before calling this method.
-    as_value get_variable(const std::string& varname) const;
-
-    /// \brief
     /// Delete a variable, w/out support for the path, using
     /// a ScopeStack.
     //
@@ -176,26 +164,6 @@ public:
     ///
     as_value get_variable(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
-
-    /// \brief
-    /// Given a path to variable, set its value.
-    /// Variable name can contain path elements.
-    //
-    /// @param path 
-    /// Variable path.
-    /// TODO: should be case-insensitive up to SWF6.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. Note that
-    ///       ActionExec performs the conversion
-    ///       before calling this method.
-    ///
-    /// @param val
-    /// The value to assign to the variable, if found.
-    ///
-    /// TODO: make this function return some info about the
-    ///       variable being found and set ?
-    ///
-    void set_variable(const std::string& path, const as_value& val);
 
     /// \brief
     /// Given a path to variable, set its value.
