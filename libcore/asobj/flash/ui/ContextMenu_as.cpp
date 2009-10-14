@@ -118,7 +118,7 @@ contextmenu_copy(const fn_call& fn)
     
     string_table& st = getStringTable(fn);
     as_value onSelect, builtInItems;
-    as_value customItems = new Array_as;;
+    as_value customItems = gl->createArray();
 
     ptr->get_member(NSV::PROP_ON_SELECT, &onSelect);
     ptr->get_member(st.find("builtInItems"), &builtInItems);
@@ -163,7 +163,7 @@ contextmenu_ctor(const fn_call& fn)
     obj->set_member(st.find("builtInItems"), builtInItems);
 
     // There is an empty customItems array.
-    Array_as* customItems = new Array_as();
+    as_object* customItems = gl->createArray();
     obj->set_member(st.find("customItems"), customItems);
 
     return as_value();

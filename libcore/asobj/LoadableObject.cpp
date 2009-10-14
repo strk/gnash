@@ -340,9 +340,11 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     as_value customHeaders;
     as_object* array;
 
+    Global_as* gl = getGlobal(fn);
+
     if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object(*getGlobal(fn));
+        array = customHeaders.to_object(*gl);
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -354,7 +356,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     }
     else
     {
-        array = new Array_as;
+        array = gl->createArray();
         // This property is always initialized on the first call to
         // addRequestHeaders.
         const int flags = PropFlags::dontEnum |
@@ -378,7 +380,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         // This must be an array. Keys / values are pushed in valid
         // pairs to the _customHeaders array.    
         boost::intrusive_ptr<as_object> obj =
-            fn.arg(0).to_object(*getGlobal(fn));
+            fn.arg(0).to_object(*gl);
         Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
 
         if (!headerArray)
