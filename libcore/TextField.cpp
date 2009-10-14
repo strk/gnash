@@ -2362,6 +2362,7 @@ registerTextFieldNative(as_object& global)
     vm.registerNative(textfield_setNewTextFormat, 104, 105);
     vm.registerNative(textfield_getDepth, 104, 106);
     vm.registerNative(textfield_replaceText, 104, 107);
+    vm.registerNative(textfield_getFontList, 104, 201);
 }
 
 bool
@@ -3659,11 +3660,8 @@ attachTextFieldStaticMembers(as_object& o)
 {
     // SWF6 or higher
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-
-    Global_as* gl = getGlobal(o);
-    o.init_member("getFontList",
-            gl->createFunction(textfield_getFontList), swf6Flags);
-
+    VM& vm = getVM(o);
+    o.init_member("getFontList", vm.getNative(104, 201), swf6Flags);
 }
 
 /// This is called when a prototype should be added
