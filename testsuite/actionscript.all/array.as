@@ -1459,6 +1459,41 @@ check_equals(a[1], 'overridden'); // flag was lost
  check(!a.hasOwnProperty(2)); 
 #endif
 
+/// Test array functions on normal objects for a better idea of what goes
+/// on.
+
+fakeArray = function() {
+    o = {};
+    o[1] = "one";
+    o[2] = "two";
+    o[3] = "three";
+    o[4] = "four";
+    o[5] = "five";
+    o[6] = "six";
+    o[7] = "seven";
+
+    // This is deliberately less than the actual length!
+    o.length = 7;
+    return o;
+};
+
+traceProps = function(obj) {
+        s = "";
+        for (i in obj) { s += i + ","; };
+        return s;
+};
+
+o = fakeArray();
+o.shift = Array.prototype.shift;
+
+// Order of property creation.
+check_equals(traceProps(o), "shift,length,7,6,5,4,3,2,1,");
+
+o.shift();
+// Properties are readded from 0 to 5 and length is set to previous length
+// - 1. Because length is a normal property in our fake array, it doesn't
+// remove 6 or 7.
+xcheck_equals(traceProps(o), "5,4,3,2,1,0,shift,length,7,6,");
 
 // TODO: test ASnative-returned functions:
 //
@@ -1478,11 +1513,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(501);
+ check_totals(503);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(562);
+  check_totals(564);
 # else
-  check_totals(572);
+  check_totals(574);
 # endif
 #endif
