@@ -144,10 +144,6 @@ public:
 	///
 	void push(const as_value& val);
 
-	void unshift(const as_value& val);
-
-	as_value shift();
-
 	as_value pop();
 
 	as_value at(unsigned int index) const;
@@ -401,19 +397,6 @@ private:
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
 	int index_requested(string_table::key name);
 
-	/// Shift all elements to the left by count positions
-	//
-	/// Pre-condition: size of the array must be >= count
-	/// Post-condition: size of the array will reduce by 'count'
-	///
-	void shiftElementsLeft(unsigned int count);
-
-	/// Shift all elements to the right by count positions
-	//
-	/// Pre-condition: none
-	/// Post-condition: size of the array will incremented by 'count'
-	///
-	void shiftElementsRight(unsigned int count);
 };
 
 

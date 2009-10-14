@@ -614,13 +614,6 @@ Array_as::push(const as_value& val)
         elements[s] = val;
 }
 
-void
-Array_as::unshift(const as_value& val)
-{
-        shiftElementsRight(1);
-        elements[0] = val;
-}
-
 as_value
 Array_as::pop()
 {
@@ -637,26 +630,6 @@ Array_as::pop()
 
     as_value ret = elements[s - 1];
     elements.resize(s - 1);
-
-    return ret;
-}
-
-as_value
-Array_as::shift()
-{
-    const ArrayContainer::size_type s = elements.size();
-
-    // If the array is empty, report an error and return undefined!
-    if ( ! s )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("tried to shift element from front of empty array, returning undef"));
-        );
-        return as_value(); // undefined
-    }
-
-    as_value ret = elements[0];
-    shiftElementsLeft(1);
 
     return ret;
 }
@@ -1189,16 +1162,43 @@ array_push(const fn_call& fn)
 static as_value
 array_unshift(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+ 
+    //for (int i=fn.nargs-1; i>=0; i--) array->unshift(fn.arg(i));
+    //return as_value();
 
-        IF_VERBOSE_ACTION (
-    log_action(_("calling array unshift, pushing %d values onto front of array"), fn.nargs);
-        );
+    if (!fn.nargs) return as_value();
 
-    for (int i=fn.nargs-1; i>=0; i--)
-        array->unshift(fn.arg(i));
+    const size_t shift = fn.nargs;
 
-    return as_value(array->size());
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const double size = length.to_number();
+    if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
+
+    string_table& st = getStringTable(fn);
+    as_value ret = array->getMember(st.find("0"));
+    
+    array->set_member(NSV::PROP_LENGTH, size + shift);
+
+    for (size_t i = size + shift - 1; i >= shift ; --i) {
+        std::ostringstream current, next;
+        next << (i - shift);
+        current << i;
+        const string_table::key nextkey = st.find(next.str());
+        const string_table::key currentkey = st.find(current.str());
+        array->delProperty(currentkey);
+        array->set_member(currentkey, array->getMember(nextkey));
+    }
+
+    for (size_t i = shift; i > 0; --i) {
+        std::ostringstream current;
+        current << (i - 1);
+        array->set_member(st.find(current.str()), fn.arg(i - 1));
+    }
+
+    return as_value(size + shift);
 }
 
 // Callback to pop a value from the back of an array
@@ -1221,16 +1221,29 @@ array_pop(const fn_call& fn)
 static as_value
 array_shift(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    // Get our index, log, then return result
-    as_value rv = array->shift();
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const double size = length.to_number();
+    if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
 
-    IF_VERBOSE_ACTION (
-    log_action(_("calling array shift, result:%s, new array size:%d"),
-        rv, array->size());
-    );
-    return rv;
+    string_table& st = getStringTable(fn);
+    as_value ret = array->getMember(st.find("0"));
+
+    for (size_t i = 0; i < size - 1; ++i) {
+        std::ostringstream current, next;
+        next << (i + 1);
+        current << i;
+        const string_table::key nextkey = st.find(next.str());
+        const string_table::key currentkey = st.find(current.str());
+        array->delProperty(currentkey);
+        array->set_member(currentkey, array->getMember(nextkey));
+    }
+
+    array->set_member(NSV::PROP_LENGTH, size - 1);
+    return ret;
 }
 
 // Callback to reverse the position of the elements in an array
@@ -1562,44 +1575,6 @@ Array_as::enumerateNonProperties(as_environment& env) const
         ss.str(""); ss << idx;
         env.push(as_value(ss.str()));
     }
-}
-
-void
-Array_as::shiftElementsLeft(unsigned int count)
-{
-    ArrayContainer& v = elements;
-
-    if ( count >= v.size() )
-    {
-	// NOTE: v.clear() would NOT set size to 0 !!
-        v.resize(0);
-        return;
-    }
-
-    for (unsigned int i=0; i<count; ++i) v.erase_element(i);
-
-    for (iterator i=v.begin(), e=v.end(); i!=e; ++i)
-    {
-        int currentIndex = i.index();
-        int newIndex = currentIndex-count;
-        v[newIndex] = *i;
-    }
-    v.resize(v.size()-count);
-}
-
-void
-Array_as::shiftElementsRight(unsigned int count)
-{
-    ArrayContainer& v = elements;
-
-    v.resize(v.size()+count);
-        for (ArrayContainer::reverse_iterator i=v.rbegin(), e=v.rend(); i!=e; ++i)
-    {
-        int currentIndex = i.index();
-        int newIndex = currentIndex+count;
-        v[newIndex] = *i;
-    }
-    while (count--) v.erase_element(count);
 }
 
 void

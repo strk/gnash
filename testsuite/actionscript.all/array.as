@@ -1473,7 +1473,7 @@ fakeArray = function() {
     o[7] = "seven";
 
     // This is deliberately less than the actual length!
-    o.length = 7;
+    o.length = 6;
     return o;
 };
 
@@ -1493,7 +1493,19 @@ o.shift();
 // Properties are readded from 0 to 5 and length is set to previous length
 // - 1. Because length is a normal property in our fake array, it doesn't
 // remove 6 or 7.
-xcheck_equals(traceProps(o), "5,4,3,2,1,0,shift,length,7,6,");
+xcheck_equals(traceProps(o), "4,3,2,1,0,shift,length,7,6,5,");
+
+
+o = fakeArray();
+o.unshift = Array.prototype.unshift;
+
+// Order of property creation.
+check_equals(traceProps(o), "unshift,length,7,6,5,4,3,2,1,");
+
+o.unshift("new");
+// Length is set to previous length + 1, properties are readded in reverse
+// order.
+xcheck_equals(traceProps(o), "0,1,2,3,4,5,6,unshift,length,7,")
 
 // TODO: test ASnative-returned functions:
 //
@@ -1513,11 +1525,11 @@ xcheck_equals(traceProps(o), "5,4,3,2,1,0,shift,length,7,6,");
 
 
 #if OUTPUT_VERSION < 6
- check_totals(503);
+ check_totals(505);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(564);
+  check_totals(566);
 # else
-  check_totals(574);
+  check_totals(576);
 # endif
 #endif
