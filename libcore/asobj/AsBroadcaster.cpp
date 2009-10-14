@@ -303,67 +303,34 @@ asbroadcaster_removeListener(const fn_call& fn)
         return as_value(false); // TODO: check this
     }
 
-    boost::intrusive_ptr<as_object> listenersObj =
+    boost::intrusive_ptr<as_object> listeners =
         listenersValue.to_object(*getGlobal(fn));
-    assert(listenersObj);
+    assert(listeners);
 
-    as_value listenerToRemove; assert(listenerToRemove.is_undefined());
-    if ( fn.nargs ) listenerToRemove = fn.arg(0);
+    as_value listenerToRemove; 
+    if (fn.nargs) listenerToRemove = fn.arg(0);
 
-    boost::intrusive_ptr<Array_as> listeners = 
-        boost::dynamic_pointer_cast<Array_as>(listenersObj);
-    if ( ! listeners )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener isn't an "
-                "array: %s"), (void*)fn.this_ptr, fn.dump_args(),
-                listenersValue);
-        );
-
-        // TODO: implement brute force scan of pseudo-array
-        unsigned int length = 
-            listenersObj->getMember(NSV::PROP_LENGTH).to_int();
-
-        string_table& st = getStringTable(fn);
-
-        for (unsigned int i=0; i<length; ++i)
-        {
-            as_value iVal(i);
-            std::string n = iVal.to_string();
-            as_value v = listenersObj->getMember(st.find(n));
-            if ( v.equals(listenerToRemove) )
-            {
-                listenersObj->callMethod(NSV::PROP_SPLICE, iVal, as_value(1));
-                return as_value(true); 
-            }
+    // Remove the first listener matching the new value
+    // See http://www.senocular.com/flash/tutorials/
+    // listenersasbroadcaster/?page=2
+    
+    // This is an ActionScript-like implementation, which is why it looks
+    // like poor C++.
+    int length = listeners->getMember(NSV::PROP_LENGTH).to_int();
+    int i = 0;
+    string_table& st = getStringTable(fn);
+    while (i < length) {
+        std::ostringstream s;
+        s << i;
+        as_value el =
+            listeners->getMember(st.find(s.str()));
+        if (el.equals(listenerToRemove)) {
+            listeners->callMethod(NSV::PROP_SPLICE, s.str(), 1);
+            return as_value(true);
         }
-
-        return as_value(false); // TODO: check this
+        ++i;
     }
-    else
-    {
-        // Remove the first listener matching the new value
-        // See http://www.senocular.com/flash/tutorials/
-        // listenersasbroadcaster/?page=2
-        
-        // This is an ActionScript-like implementation, which is why it looks
-        // like poor C++.
-        int length = listenersObj->getMember(NSV::PROP_LENGTH).to_int();
-        int i = 0;
-        string_table& st = getStringTable(fn);
-        while (i < length) {
-            std::ostringstream s;
-            s << i;
-            as_value el =
-                listenersObj->getMember(st.find(s.str()));
-            if (el.equals(listenerToRemove)) {
-                listeners->callMethod(NSV::PROP_SPLICE, s.str(), 1);
-                return as_value(true);
-            }
-            ++i;
-        }
-        return as_value(false);
-    }
+    return as_value(false);
 
 }
 
