@@ -718,12 +718,6 @@ Array_as::concat(const Array_as& other)
     }
 }
 
-std::string
-Array_as::toString() const
-{
-    return join(",");
-}
-
 unsigned int
 Array_as::size() const
 {
@@ -1276,23 +1270,32 @@ array_join(const fn_call& fn)
 }
 
 // Callback to convert array to a string
-// TODO CHECKME: rely on Object.toString  ? (
 static as_value
-array_to_string(const fn_call& fn)
+array_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> array = ensureType<as_object>(fn.this_ptr);
 
-    std::string ret = array->toString();
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
 
-        IF_VERBOSE_ACTION
-        (
-    log_action(_("array_to_string called, nargs = %d, "
-            "this_ptr = %p"),
-            fn.nargs, (void*)fn.this_ptr);
-    log_action(_("to_string result is: %s"), ret);
-        );
+    const double size = length.to_number();
+    if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
 
-    return as_value(ret);
+    std::string s;
+
+    string_table& st = getStringTable(fn);
+    const int version = getSWFVersion(fn);
+
+    for (size_t i = 0; i < size; ++i) {
+        std::ostringstream os;
+        os << i;
+        if (i) s +=",";
+        as_value el;
+        array->get_member(st.find(os.str()), &el);
+        s += el.to_string_versioned(version);
+    }
+
+    return as_value(s);
 }
 
 /// concatenates the elements specified in the parameters with
@@ -1478,54 +1481,18 @@ attachArrayInterface(as_object& proto)
 {
     VM& vm = getVM(proto);
 
-    // Array.push
-    vm.registerNative(array_push, 252, 1);
     proto.init_member("push", vm.getNative(252, 1));
-
-    // Array.pop
-    vm.registerNative(array_pop, 252, 2);
     proto.init_member("pop", vm.getNative(252, 2));
-
-    // Array.concat
-    vm.registerNative(array_concat, 252, 3);
     proto.init_member("concat", vm.getNative(252, 3));
-
-    // Array.shift
-    vm.registerNative(array_shift, 252, 4);
     proto.init_member("shift", vm.getNative(252, 4));
-
-    // Array.unshift
-    vm.registerNative(array_unshift, 252, 5);
     proto.init_member("unshift", vm.getNative(252, 5));
-
-    // Array.slice
-    vm.registerNative(array_slice, 252, 6);
     proto.init_member("slice", vm.getNative(252, 6));
-
-    // Array.join
-    vm.registerNative(array_join, 252, 7);
     proto.init_member("join", vm.getNative(252, 7));
-
-    // Array.splice
-    vm.registerNative(array_splice, 252, 8);
     proto.init_member("splice", vm.getNative(252, 8));
-
-    // Array.toString
-    vm.registerNative(array_to_string, 252, 9);
     proto.init_member("toString", vm.getNative(252, 9));
-
-    // Array.sort
-    vm.registerNative(array_sort, 252, 10);
     proto.init_member("sort", vm.getNative(252, 10));
-
-    // Array.reverse
-    vm.registerNative(array_reverse, 252, 11);
     proto.init_member("reverse", vm.getNative(252, 11));
-
-    // Array.sortOn
-    vm.registerNative(array_sortOn, 252, 12);
     proto.init_member("sortOn", vm.getNative(252, 12));
-
 }
 
 static as_object*
@@ -1547,6 +1514,18 @@ registerArrayNative(as_object& global)
 {
     VM& vm = getVM(global);
     vm.registerNative(array_new, 252, 0);
+    vm.registerNative(array_push, 252, 1);
+    vm.registerNative(array_pop, 252, 2);
+    vm.registerNative(array_concat, 252, 3);
+    vm.registerNative(array_shift, 252, 4);
+    vm.registerNative(array_unshift, 252, 5);
+    vm.registerNative(array_slice, 252, 6);
+    vm.registerNative(array_join, 252, 7);
+    vm.registerNative(array_splice, 252, 8);
+    vm.registerNative(array_toString, 252, 9);
+    vm.registerNative(array_sort, 252, 10);
+    vm.registerNative(array_reverse, 252, 11);
+    vm.registerNative(array_sortOn, 252, 12);
 }
 
 // this registers the "Array" member on a "Global"

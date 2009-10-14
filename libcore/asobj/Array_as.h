@@ -162,9 +162,6 @@ public:
     ///     String to use as separator between elements
 	std::string join(const std::string& separator) const;
 
-    /// Convert array to string.
-	std::string toString() const;
-
 	unsigned int size() const;
 
 	void resize(unsigned int);
