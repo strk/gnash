@@ -2797,12 +2797,8 @@ namespace {
 void
 attachPrototypeProperties(as_object& o)
 {
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
     boost::intrusive_ptr<builtin_function> getset;
 
@@ -3661,12 +3657,8 @@ attachTextFieldInterface(as_object& o)
 void
 attachTextFieldStaticMembers(as_object& o)
 {
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
     Global_as* gl = getGlobal(o);
     o.init_member("getFontList",
