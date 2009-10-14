@@ -331,6 +331,36 @@ LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
     return bytesTotal;
 }
 
+class GetHeaders
+{
+public:
+
+    GetHeaders(as_object& target)
+        :
+        _target(target),
+        _i(0)
+    {}
+
+    void operator()(const as_value& val)
+    {
+        // Store even elements and continue
+        if (!(_i++ % 2)) {
+            _key = val;
+            return;
+        }
+
+        // Both elements apparently must be strings, or we move onto the 
+        // next pair.
+        if (!val.is_string() || !_key.is_string()) return;
+        _target.callMethod(NSV::PROP_PUSH, _key, val);
+    }
+
+private:
+    as_value _key;
+    as_object& _target;
+    size_t _i;
+};
+
 /// Can take either a two strings as arguments or an array of strings,
 /// alternately header and value.
 as_value
@@ -354,15 +384,11 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
             return as_value();
         }
     }
-    else
-    {
+    else {
         array = gl->createArray();
         // This property is always initialized on the first call to
-        // addRequestHeaders.
-        const int flags = PropFlags::dontEnum |
-                          PropFlags::dontDelete;
-
-        fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
+        // addRequestHeaders. It has default properties.
+        fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array);
     }
 
     if (fn.nargs == 0)
@@ -392,23 +418,9 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
             return as_value();
         }
 
-        Array_as::const_iterator e = headerArray->end();
-        --e;
 
-        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
-        {
-            // Only even indices can be a key, and they must be a string.
-            if (i.index() % 2) continue;
-            if (!(*i).is_string()) continue;
-            
-            // Only the immediately following odd number can be 
-            // a value, and it must also be a string.
-            const as_value& val = headerArray->at(i.index() + 1);
-            if (val.is_string())
-            {
-                array->callMethod(NSV::PROP_PUSH, *i, val);
-            }
-        }
+        GetHeaders gh(*array);
+        foreachArray(*headerArray, gh);
         return as_value();
     }
         
