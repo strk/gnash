@@ -195,7 +195,7 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
     // 'this' pointer. Others return a new object. This is to handle those
     // cases.
     if (isBuiltin() && ret.is_object()) {
-        newobj = ret.to_object(*getGlobal(env)).get();
+        newobj = ret.to_object(*getGlobal(env));
 
         newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
                 flags);
@@ -294,7 +294,7 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+		as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
 
         if (!obj) obj = new as_object; 
 
@@ -377,7 +377,7 @@ function_call(const fn_call& fn)
 	else {
 		// Get the object to use as 'this' reference
 		as_value this_val = fn.arg(0);
-		as_object* this_ptr = this_val.to_object(*getGlobal(fn)).get();
+		as_object* this_ptr = this_val.to_object(*getGlobal(fn));
 
 		if (!this_ptr) {
 			// If the first argument is not an object, we should
@@ -397,7 +397,7 @@ function_call(const fn_call& fn)
 		}
 		else {
 			new_fn_call.this_ptr = this_ptr;
-			as_object* proto = this_ptr->get_prototype().get();
+			as_object* proto = this_ptr->get_prototype();
             if (proto) {
                 new_fn_call.super = this_ptr->get_super();
             }

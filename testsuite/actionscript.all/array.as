@@ -1459,6 +1459,65 @@ check_equals(a[1], 'overridden'); // flag was lost
  check(!a.hasOwnProperty(2)); 
 #endif
 
+/// Test array functions on normal objects for a better idea of what goes
+/// on.
+
+fakeArray = function() {
+    o = {};
+    o[1] = "one";
+    o[2] = "two";
+    o[3] = "three";
+    o[4] = "four";
+    o[5] = "five";
+    o[6] = "six";
+    o[7] = "seven";
+
+    // This is deliberately less than the actual length!
+    o.length = 6;
+    return o;
+};
+
+traceProps = function(obj) {
+        s = "";
+        for (i in obj) { s += i + ","; };
+        return s;
+};
+
+o = fakeArray();
+o.shift = Array.prototype.shift;
+
+// Order of property creation.
+check_equals(traceProps(o), "shift,length,7,6,5,4,3,2,1,");
+
+o.shift();
+// Properties are readded from 0 to 5.
+check_equals(traceProps(o), "4,3,2,1,0,shift,length,7,6,5,");
+xcheck_equals(o.length, 6);
+
+o = fakeArray();
+o.unshift = Array.prototype.unshift;
+
+// Order of property creation.
+check_equals(traceProps(o), "unshift,length,7,6,5,4,3,2,1,");
+
+o.unshift("new");
+// Properties are readded in reverse order.
+check_equals(traceProps(o), "0,1,2,3,4,5,6,unshift,length,7,")
+xcheck_equals(o.length, 6);
+
+
+o = fakeArray();
+o.pop = Array.prototype.pop;
+
+// Order of property creation.
+check_equals(traceProps(o), "pop,length,7,6,5,4,3,2,1,");
+
+val = o.pop();
+check_equals(val, "five");
+// Length is not decremented, property 5 is deleted.
+check_equals(traceProps(o), "pop,length,7,6,4,3,2,1,");
+xcheck_equals(o.length, 6);
+
 
 // TODO: test ASnative-returned functions:
 //
@@ -1478,11 +1537,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(501);
+ check_totals(511);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(562);
-# else
   check_totals(572);
+# else
+  check_totals(582);
 # endif
 #endif

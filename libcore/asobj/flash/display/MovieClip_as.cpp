@@ -60,7 +60,6 @@ namespace {
     as_value movieclip_beginBitmapFill(const fn_call& fn);
     as_value movieclip_createEmptyMovieClip(const fn_call& fn);
     as_value movieclip_removeMovieClip(const fn_call& fn);
-    as_value movieclip_createTextField(const fn_call& fn);
     as_value movieclip_curveTo(const fn_call& fn);
     as_value movieclip_beginFill(const fn_call& fn);
     as_value movieclip_prevFrame(const fn_call& fn);
@@ -221,8 +220,6 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_beginBitmapFill, 901, 11);
     vm.registerNative(movieclip_scale9Grid, 901, 12);
 
-    vm.registerNative(movieclip_createTextField, 104, 200);
-
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
@@ -350,6 +347,44 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
+}
+
+//createEmptyMovieClip(name:String, depth:Number) : MovieClip
+as_value
+movieclip_createEmptyMovieClip(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+
+    if (fn.nargs != 2) {
+        if (fn.nargs < 2) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("createEmptyMovieClip needs "
+                    "2 args, but %d given,"
+                    " returning undefined"),
+                    fn.nargs);
+            );
+            return as_value();
+        }
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("createEmptyMovieClip takes "
+                "2 args, but %d given, discarding"
+                " the excess"),
+                fn.nargs);
+        )
+    }
+
+    // TODO: improve MovieClip ctor (and don't use it here anyway).
+    Movie* m = getRoot(fn).topLevelMovie();
+    MovieClip* mc = new MovieClip(0, m, ptr.get());
+
+    mc->set_name(fn.arg(0).to_string());
+    mc->setDynamic();
+
+    // Unlike other MovieClip methods, the depth argument of an empty movie clip
+    // can be any number. All numbers are converted to an int32_t, and are valid
+    // depths even when outside the usual bounds.
+    DisplayObject* ch = ptr->addDisplayListObject(mc, fn.arg(1).to_int());
+    return as_value(ch);
 }
 
 
@@ -585,7 +620,7 @@ movieclip_attachAudio(const fn_call& fn)
     }
 
     NetStream_as* ns;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), ns))
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), ns))
     { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
@@ -613,39 +648,6 @@ movieclip_attachVideo(const fn_call& fn)
     return as_value();
 }
 
-
-//createEmptyMovieClip(name:String, depth:Number) : MovieClip
-as_value
-movieclip_createEmptyMovieClip(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    if (fn.nargs != 2) {
-        if (fn.nargs < 2) {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("createEmptyMovieClip needs "
-                    "2 args, but %d given,"
-                    " returning undefined"),
-                    fn.nargs);
-            );
-            return as_value();
-        }
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("createEmptyMovieClip takes "
-                "2 args, but %d given, discarding"
-                " the excess"),
-                fn.nargs);
-        )
-    }
-
-    // Unlike other MovieClip methods, the depth argument of an empty movie clip
-    // can be any number. All numbers are converted to an int32_t, and are valid
-    // depths even when outside the usual bounds.
-    DisplayObject* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string(),
-            fn.arg(1).to_int());
-    return as_value(ch);
-}
 
 as_value
 movieclip_getDepth(const fn_call& fn)
@@ -1144,57 +1146,6 @@ movieclip_hitTest(const fn_call& fn)
 
     return as_value();
 
-}
-
-as_value
-movieclip_createTextField(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    if (fn.nargs < 6) // name, depth, x, y, width, height
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("createTextField called with %d args, "
-            "expected 6 - returning undefined"), fn.nargs);
-        );
-        return as_value();
-    }
-
-    std::string txt_name = fn.arg(0).to_string();
-
-    int txt_depth = fn.arg(1).to_int();
-
-    int txt_x = fn.arg(2).to_int();
-
-    int txt_y = fn.arg(3).to_int();
-
-    int txt_width = fn.arg(4).to_int();
-    if ( txt_width < 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("createTextField: negative width (%d)"
-            " - reverting sign"), txt_width);
-        );
-        txt_width = -txt_width;
-    }
-
-    int txt_height = fn.arg(5).to_int();
-    if ( txt_height < 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("createTextField: negative height (%d)"
-            " - reverting sign"), txt_height);
-        );
-        txt_height = -txt_height;
-    }
-
-    boost::intrusive_ptr<DisplayObject> txt = movieclip->add_textfield(txt_name,
-            txt_depth, txt_x, txt_y, txt_width, txt_height);
-
-    // createTextField returns void, it seems
-    if (getSWFVersion(fn) > 7) return as_value(txt.get());
-    else return as_value(); 
 }
 
 //getNextHighestDepth() : Number
@@ -2421,7 +2372,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
     BitmapData_as* bd;
 
     if (!isNativeType(obj, bd)) {
@@ -2443,13 +2394,8 @@ movieclip_attachBitmap(const fn_call& fn)
 as_value
 movieclip_as2_ctor(const fn_call& fn)
 {
-
     assert(!isAS3(fn));
-
-    boost::intrusive_ptr<as_object> clip = 
-        new as_object(getMovieClipAS2Interface());
-
-    return as_value(clip.get());
+    return as_value();
 }
 
 

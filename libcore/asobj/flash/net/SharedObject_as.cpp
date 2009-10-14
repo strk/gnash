@@ -880,7 +880,7 @@ sharedobject_connect(const fn_call& fn)
     }
     
     NetConnection_as* nc;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), nc)) {
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), nc)) {
         return as_value();
     }
 

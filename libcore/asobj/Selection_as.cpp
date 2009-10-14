@@ -221,7 +221,7 @@ selection_setFocus(const fn_call& fn)
     else {
         /// Try converting directly to DisplayObject.
         ch = dynamic_cast<DisplayObject*>(
-                focus.to_object(*getGlobal(fn)).get());
+                focus.to_object(*getGlobal(fn)));
     }
 
     // If the argument does not resolve to a DisplayObject, do nothing.

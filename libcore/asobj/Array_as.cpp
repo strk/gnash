@@ -47,6 +47,23 @@ namespace gnash {
 
 typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
+inline string_table::key
+arrayKey(string_table& st, size_t i)
+{
+    std::ostringstream os;
+    os << i;
+    return st.find(os.str());
+}
+
+namespace {
+
+string_table::key getKey(const fn_call& fn, size_t i) {
+    string_table& st = getStringTable(fn);
+    return arrayKey(st, i);
+}
+
+}
+
 static as_object* getArrayInterface();
 static void attachArrayProperties(as_object& proto);
 static void attachArrayInterface(as_object& proto);
@@ -607,61 +624,6 @@ Array_as::index_requested(string_table::key name)
 }
 
 void
-Array_as::push(const as_value& val)
-{
-        const ArrayContainer::size_type s = elements.size();
-        elements.resize(s+1);
-        elements[s] = val;
-}
-
-void
-Array_as::unshift(const as_value& val)
-{
-        shiftElementsRight(1);
-        elements[0] = val;
-}
-
-as_value
-Array_as::pop()
-{
-    // If the array is empty, report an error and return undefined!
-    const ArrayContainer::size_type s = elements.size();
-
-    if ( ! s )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("tried to pop element from back of empty array, returning undef"));
-        );
-        return as_value(); // undefined
-    }
-
-    as_value ret = elements[s - 1];
-    elements.resize(s - 1);
-
-    return ret;
-}
-
-as_value
-Array_as::shift()
-{
-    const ArrayContainer::size_type s = elements.size();
-
-    // If the array is empty, report an error and return undefined!
-    if ( ! s )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("tried to shift element from front of empty array, returning undef"));
-        );
-        return as_value(); // undefined
-    }
-
-    as_value ret = elements[0];
-    shiftElementsLeft(1);
-
-    return ret;
-}
-
-void
 Array_as::reverse()
 {
     const ArrayContainer::size_type s = elements.size();
@@ -709,21 +671,6 @@ Array_as::join(const std::string& separator) const
 
 }
 
-void
-Array_as::concat(const Array_as& other)
-{
-    for (ArrayContainer::size_type i = 0, e = other.size(); i < e; i++)
-    {
-        push(other.at(i));
-    }
-}
-
-std::string
-Array_as::toString() const
-{
-    return join(",");
-}
-
 unsigned int
 Array_as::size() const
 {
@@ -761,20 +708,6 @@ Array_as::slice(unsigned int start, unsigned int one_past_end)
 
     return newarray;
 
-}
-
-bool
-Array_as::removeFirst(const as_value& v)
-{
-    for (iterator it = elements.begin(), e = elements.end(); it != e; ++it)
-    {
-        if ( v.equals(*it) )
-        {
-            splice(it.index(), 1);
-            return true;
-        }
-    }
-    return false;
 }
 
 /* virtual public, overriding as_object::get_member */
@@ -844,20 +777,6 @@ Array_as::resize(unsigned int newsize)
     elements.resize(newsize);
 }
 
-void
-Array_as::set_indexed(unsigned int index,
-    const as_value& val)
-{
-    if (index >= elements.size())
-    {
-        // make sure the vector is large enough.
-        elements.resize(index + 1);
-    }
-
-    elements[index] = val;
-    return;
-}
-
 /* virtual public, overriding as_object::set_member */
 bool
 Array_as::set_member(string_table::key name,
@@ -892,7 +811,7 @@ Array_as::get_indices(std::deque<indexed_as_value> elems)
     for (std::deque<indexed_as_value>::const_iterator it = elems.begin();
         it != elems.end(); ++it)
     {
-        intIndexes->push(as_value(it->vec_index));
+        intIndexes->callMethod(NSV::PROP_PUSH, it->vec_index);
     }
     return intIndexes;
 }
@@ -1176,67 +1095,119 @@ array_sortOn(const fn_call& fn)
 }
 
 // Callback to push values to the back of an array
-static as_value
+as_value
 array_push(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+ 
+    if (!fn.nargs) return as_value();
 
-        IF_VERBOSE_ACTION (
-    log_action(_("calling array push, pushing %d values onto back of array"),fn.nargs);
-        );
+    const size_t shift = fn.nargs;
 
-    for (unsigned int i=0;i<fn.nargs;i++)
-        array->push(fn.arg(i));
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
+    if (size < 0) return as_value();
 
-    return as_value(array->size());
+    for (size_t i = 0; i < fn.nargs; ++i) {
+        array->set_member(getKey(fn, size + i), fn.arg(i));
+    }
+    
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size + shift);
+
+    return as_value(size + shift);
 }
 
 // Callback to push values to the front of an array
 static as_value
 array_unshift(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
-        IF_VERBOSE_ACTION (
-    log_action(_("calling array unshift, pushing %d values onto front of array"), fn.nargs);
-        );
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+ 
+    if (!fn.nargs) return as_value();
 
-    for (int i=fn.nargs-1; i>=0; i--)
-        array->unshift(fn.arg(i));
+    const size_t shift = fn.nargs;
 
-    return as_value(array->size());
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
+    if (size < 0) return as_value();
+
+    string_table& st = getStringTable(fn);
+    as_value ret = array->getMember(st.find("0"));
+    
+    for (size_t i = size + shift - 1; i >= shift ; --i) {
+        const string_table::key nextkey = getKey(fn, i - shift);
+        const string_table::key currentkey = getKey(fn, i);
+        array->delProperty(currentkey);
+        array->set_member(currentkey, array->getMember(nextkey));
+    }
+
+    for (size_t i = shift; i > 0; --i) {
+        const size_t index = i - 1;
+        array->set_member(getKey(fn, index), fn.arg(index));
+    }
+ 
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size + shift);
+
+    return as_value(size + shift);
 }
 
 // Callback to pop a value from the back of an array
 static as_value
 array_pop(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
-    // Get our index, log, then return result
-    as_value rv = array->pop();
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    IF_VERBOSE_ACTION (
-    log_action(_("calling array pop, result:%s, new array size:%d"),
-        rv, array->size());
-    );
-        return rv;
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
+    if (size < 1) return as_value();
+
+    const string_table::key ind = getKey(fn, size - 1);
+    as_value ret = array->getMember(ind);
+    array->delProperty(ind);
+    
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size - 1);
+
+    return ret;
 }
 
 // Callback to pop a value from the front of an array
 static as_value
 array_shift(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    // Get our index, log, then return result
-    as_value rv = array->shift();
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
 
-    IF_VERBOSE_ACTION (
-    log_action(_("calling array shift, result:%s, new array size:%d"),
-        rv, array->size());
-    );
-    return rv;
+    // An array with no elements has nothing to return.
+    if (size < 1) return as_value();
+
+    as_value ret = array->getMember(getKey(fn, 0));
+
+    for (size_t i = 0; i < static_cast<size_t>(size - 1); ++i) {
+        const string_table::key nextkey = getKey(fn, i + 1);
+        const string_table::key currentkey = getKey(fn, i);
+        array->delProperty(currentkey);
+        array->set_member(currentkey, array->getMember(nextkey));
+    }
+    
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size - 1);
+
+    return ret;
 }
 
 // Callback to reverse the position of the elements in an array
@@ -1256,51 +1227,68 @@ array_reverse(const fn_call& fn)
     return rv;
 }
 
-// Callback to convert array to a string with optional custom separator (default ',')
-static as_value
+as_value
+join(as_object* array, const std::string& separator)
+{
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
+
+    const double size = length.to_int();
+    if (size < 0) return as_value("");
+
+    std::string s;
+
+    string_table& st = getStringTable(*array);
+    const int version = getSWFVersion(*array);
+
+    for (size_t i = 0; i < size; ++i) {
+        std::ostringstream os;
+        os << i;
+        if (i) s += separator;
+        as_value el;
+        array->get_member(st.find(os.str()), &el);
+        s += el.to_string_versioned(version);
+    }
+    return as_value(s);
+}
+
+as_value
 array_join(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    std::string separator = ",";
-    int version = getSWFVersion(fn);
+    const int version = getSWFVersion(fn);
+    const std::string separator =
+        fn.nargs ? fn.arg(0).to_string_versioned(version) : ",";
 
-    if (fn.nargs > 0)
-    {
-        separator = fn.arg(0).to_string_versioned(version);
-    }
-
-    std::string ret = array->join(separator);
-
-    return as_value(ret);
+    return join(array, separator);
 }
 
 // Callback to convert array to a string
-// TODO CHECKME: rely on Object.toString  ? (
-static as_value
-array_to_string(const fn_call& fn)
+as_value
+array_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
-
-    std::string ret = array->toString();
-
-        IF_VERBOSE_ACTION
-        (
-    log_action(_("array_to_string called, nargs = %d, "
-            "this_ptr = %p"),
-            fn.nargs, (void*)fn.this_ptr);
-    log_action(_("to_string result is: %s"), ret);
-        );
-
-    return as_value(ret);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+    return join(array, ",");
 }
+
+class PushToArray
+{
+public:
+    PushToArray(as_object& obj) : _obj(obj) {}
+    void operator()(const as_value& val) {
+        _obj.callMethod(NSV::PROP_PUSH, val);
+    }
+private:
+    as_object& _obj;
+};
 
 /// concatenates the elements specified in the parameters with
 /// the elements in my_array, and creates a new array. If the
 /// value parameters specify an array, the elements of that
 /// array are concatenated, rather than the array itself. The
 /// array my_array is left unchanged.
-static as_value
+as_value
 array_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
@@ -1308,23 +1296,29 @@ array_concat(const fn_call& fn)
     // use copy ctor
     Array_as* newarray = new Array_as();
 
-    for (size_t i=0, e=array->size(); i<e; i++)
-        newarray->push(array->at(i));
+    PushToArray push(*newarray);
+    if (!foreachArray(*array, push)) return as_value();
 
-    for (unsigned int i=0; i<fn.nargs; i++)
-    {
+    for (size_t i = 0; i < fn.nargs; ++i) {
+
         // Array args get concatenated by elements
-        boost::intrusive_ptr<Array_as> other =
-            boost::dynamic_pointer_cast<Array_as>(
-                    fn.arg(i).to_object(*getGlobal(fn)));
-        if ( other )
-        {
-            newarray->concat(*other);
+        // The type is checked using instanceOf.
+        const as_value& arg = fn.arg(i);
+
+        Global_as* gl = getGlobal(fn);
+        as_object* other = arg.to_object(*gl);
+
+        if (other) {
+            
+            // If it's not an array, we want to carry on and add it as an
+            // object.
+            if (other->instanceOf(getClassConstructor(fn, "Array"))) {
+                // Do we care if it has no length property?
+                foreachArray(*other, push);
+                continue;
+            }
         }
-        else
-        {
-            newarray->push(fn.arg(i));
-        }
+        newarray->callMethod(NSV::PROP_PUSH, fn.arg(i));
     }
 
     return as_value(newarray);        
@@ -1444,7 +1438,7 @@ array_new(const fn_call& fn)
         as_value    index_number;
         for (unsigned int i = 0; i < fn.nargs; i++)
         {
-            ao->push(fn.arg(i));
+            ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
         }
     }
 
@@ -1478,54 +1472,18 @@ attachArrayInterface(as_object& proto)
 {
     VM& vm = getVM(proto);
 
-    // Array.push
-    vm.registerNative(array_push, 252, 1);
     proto.init_member("push", vm.getNative(252, 1));
-
-    // Array.pop
-    vm.registerNative(array_pop, 252, 2);
     proto.init_member("pop", vm.getNative(252, 2));
-
-    // Array.concat
-    vm.registerNative(array_concat, 252, 3);
     proto.init_member("concat", vm.getNative(252, 3));
-
-    // Array.shift
-    vm.registerNative(array_shift, 252, 4);
     proto.init_member("shift", vm.getNative(252, 4));
-
-    // Array.unshift
-    vm.registerNative(array_unshift, 252, 5);
     proto.init_member("unshift", vm.getNative(252, 5));
-
-    // Array.slice
-    vm.registerNative(array_slice, 252, 6);
     proto.init_member("slice", vm.getNative(252, 6));
-
-    // Array.join
-    vm.registerNative(array_join, 252, 7);
     proto.init_member("join", vm.getNative(252, 7));
-
-    // Array.splice
-    vm.registerNative(array_splice, 252, 8);
     proto.init_member("splice", vm.getNative(252, 8));
-
-    // Array.toString
-    vm.registerNative(array_to_string, 252, 9);
     proto.init_member("toString", vm.getNative(252, 9));
-
-    // Array.sort
-    vm.registerNative(array_sort, 252, 10);
     proto.init_member("sort", vm.getNative(252, 10));
-
-    // Array.reverse
-    vm.registerNative(array_reverse, 252, 11);
     proto.init_member("reverse", vm.getNative(252, 11));
-
-    // Array.sortOn
-    vm.registerNative(array_sortOn, 252, 12);
     proto.init_member("sortOn", vm.getNative(252, 12));
-
 }
 
 static as_object*
@@ -1547,6 +1505,18 @@ registerArrayNative(as_object& global)
 {
     VM& vm = getVM(global);
     vm.registerNative(array_new, 252, 0);
+    vm.registerNative(array_push, 252, 1);
+    vm.registerNative(array_pop, 252, 2);
+    vm.registerNative(array_concat, 252, 3);
+    vm.registerNative(array_shift, 252, 4);
+    vm.registerNative(array_unshift, 252, 5);
+    vm.registerNative(array_slice, 252, 6);
+    vm.registerNative(array_join, 252, 7);
+    vm.registerNative(array_splice, 252, 8);
+    vm.registerNative(array_toString, 252, 9);
+    vm.registerNative(array_sort, 252, 10);
+    vm.registerNative(array_reverse, 252, 11);
+    vm.registerNative(array_sortOn, 252, 12);
 }
 
 // this registers the "Array" member on a "Global"
@@ -1589,44 +1559,6 @@ Array_as::enumerateNonProperties(as_environment& env) const
 }
 
 void
-Array_as::shiftElementsLeft(unsigned int count)
-{
-    ArrayContainer& v = elements;
-
-    if ( count >= v.size() )
-    {
-	// NOTE: v.clear() would NOT set size to 0 !!
-        v.resize(0);
-        return;
-    }
-
-    for (unsigned int i=0; i<count; ++i) v.erase_element(i);
-
-    for (iterator i=v.begin(), e=v.end(); i!=e; ++i)
-    {
-        int currentIndex = i.index();
-        int newIndex = currentIndex-count;
-        v[newIndex] = *i;
-    }
-    v.resize(v.size()-count);
-}
-
-void
-Array_as::shiftElementsRight(unsigned int count)
-{
-    ArrayContainer& v = elements;
-
-    v.resize(v.size()+count);
-        for (ArrayContainer::reverse_iterator i=v.rbegin(), e=v.rend(); i!=e; ++i)
-    {
-        int currentIndex = i.index();
-        int newIndex = currentIndex+count;
-        v[newIndex] = *i;
-    }
-    while (count--) v.erase_element(count);
-}
-
-void
 Array_as::splice(unsigned int start, unsigned int count, const std::vector<as_value>* replace, Array_as* receive)
 {
     size_t sz = elements.size();
@@ -1661,7 +1593,7 @@ Array_as::splice(unsigned int start, unsigned int count, const std::vector<as_va
     if ( receive )
     {
         for (size_t i=start; i<start+count; ++i )
-            receive->push(elements[i]);
+            receive->callMethod(NSV::PROP_PUSH, elements[i]);
     }
 
     elements = newelements;

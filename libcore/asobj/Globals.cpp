@@ -240,6 +240,16 @@ AVM1Global::createNumber(double d)
 
 }
 
+/// This serves the purpose of hiding the Array_as type from the
+/// implementation, which at least enforces good behaviour from users.
+//
+/// TODO: it could well already call the Array constructor.
+as_object*
+AVM1Global::createArray()
+{
+    return new Array_as();
+}
+
 as_object*
 AVM1Global::createBoolean(bool b)
 {
@@ -290,6 +300,14 @@ as_object*
 AVM2Global::createBoolean(bool b)
 {
     return constructObject(*this, b, NSV::CLASS_BOOLEAN);
+}
+
+/// This serves the purpose of hiding the Array_as type from the
+/// implementation, which at least enforces good behaviour from users.
+as_object*
+AVM2Global::createArray()
+{
+    return new Array_as();
 }
 
 void 
@@ -1025,7 +1043,7 @@ global_assetnative(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    as_object* targetObject = fn.arg(0).to_object(*gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1096,7 +1114,7 @@ global_assetnativeaccessor(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    as_object* targetObject = fn.arg(0).to_object(*gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1171,7 +1189,7 @@ global_updateAfterEvent(const fn_call& /*fn*/)
 as_value
 local_errorConstructor(const fn_call& fn)
 {
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
     const as_value& arg = fn.nargs ? fn.arg(0) : as_value();
     string_table& st = getStringTable(fn);
     obj->set_member(st.find("message"), arg);

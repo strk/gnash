@@ -286,7 +286,7 @@ public:
     static bool parseNonDecimalInt(const std::string& s, double& d,
             bool whole = true);
 
-	/// Return the primitive type of this value, as a string.
+	/// Return the primitive type of this value as a string.
 	const char* typeOf() const;
 
 	/// Get the primitive type of this value
@@ -294,14 +294,10 @@ public:
     /// Only used in AVM2
 	primitive_types ptype() const;
 
-	// Chad: Document
-	bool conforms_to(string_table::key name);
-
 	/// \brief
 	/// Return true if this value is callable
 	/// (AS_FUNCTION).
-	bool is_function() const
-	{
+	bool is_function() const {
 		return m_type == AS_FUNCTION;
 	}
 
@@ -435,7 +431,7 @@ public:
     /// @param global   The global object object for the conversion. This
     ///                 contains the prototypes or constructors necessary for
     ///                 conversion.
-	boost::intrusive_ptr<as_object> to_object(Global_as& global) const;
+	as_object* to_object(Global_as& global) const;
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
@@ -510,8 +506,11 @@ public:
 
 	void set_bool(bool val);
 
-	void set_sprite(MovieClip& sp);
-
+    /// Set this as_value to a DisplayObject
+    //
+    /// as_value itself does not distinguish between MovieClips and other
+    /// types of DisplayObject; TextFields initially appear as type
+    /// "movieclip".
 	void setDisplayObject(DisplayObject& sp);
 
 	void set_int(int val) { set_double(val); }
@@ -545,19 +544,26 @@ public:
 
 	bool is_bool() const { return (m_type == BOOLEAN); }
 
-        bool is_exception() const
-	{ return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
-		|| m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
-		|| m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
-		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
+    bool is_exception() const {
+        return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
+                || m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
+                || m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
+                || m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
 	}
 
 	// Flag or unflag an as_value as an exception -- this gets flagged
 	// when an as_value is 'thrown'.
-	void flag_exception() 
-	{ if (!is_exception()) m_type = static_cast<AsType>(static_cast<int>(m_type) + 1); }
-	void unflag_exception()
-	{ if (is_exception()) m_type = static_cast<AsType>(static_cast<int>(m_type) - 1); }
+	void flag_exception() {
+        if (!is_exception()) {
+            m_type = static_cast<AsType>(static_cast<int>(m_type) + 1);
+        }
+    }
+
+	void unflag_exception() {
+        if (is_exception()) {
+            m_type = static_cast<AsType>(static_cast<int>(m_type) - 1);
+        }
+    }
 
 	/// Return true if this value is strictly equal to the given one
 	//
@@ -606,10 +612,7 @@ private:
 
 	AsType m_type;
 
-	typedef MovieClip* SpritePtr;
 	typedef DisplayObject* CharacterPtr;
-	typedef boost::intrusive_ptr<as_function> AsFunPtr;
-	typedef boost::intrusive_ptr<as_object> AsObjPtr;
 	
 	/// AsValueType handles the following AS types:
 	//
@@ -620,24 +623,17 @@ private:
 	/// 5. MovieClip
 	/// 6. String
     typedef boost::variant<boost::blank, double,
-            bool, AsObjPtr, CharacterProxy,	std::string> AsValueType;
+            bool, as_object*, CharacterProxy, std::string> AsValueType;
     
     AsValueType _value;
 
-
 	/// Get the function pointer variant member (we assume m_type == FUNCTION)
-	AsFunPtr getFun() const;
+	as_function* getFun() const;
 
 	/// Get the object pointer variant member (we assume m_type == OBJECT)
-	AsObjPtr getObj() const;
+	as_object* getObj() const;
 
-	/// Get the sprite pointer variant member (we assume m_type == MOVIECLIP)
-	//
-	/// NOTE: this is possibly NULL !
-	///
-	SpritePtr getSprite(bool skipRebinding=false) const;
-
-	/// Get the DisplayObject pointer variant member (we assume m_type == MOVIECLIP)
+	/// Get the DisplayObject variant member (we assume m_type == MOVIECLIP)
 	//
 	/// NOTE: this is possibly NULL !
 	///
@@ -648,22 +644,19 @@ private:
 	CharacterProxy getCharacterProxy() const;
 
 	/// Get the number variant member (we assume m_type == NUMBER)
-	double getNum() const
-	{
+	double getNum() const {
 		assert(m_type == NUMBER);
 		return boost::get<double>(_value);
 	}
 
 	/// Get the boolean variant member (we assume m_type == BOOLEAN)
-	bool getBool() const
-	{
+	bool getBool() const {
 		assert(m_type == BOOLEAN);
 		return boost::get<bool>(_value);
 	}
 
 	/// Get the boolean variant member (we assume m_type == STRING)
-	const std::string& getStr() const
-	{
+	const std::string& getStr() const {
 		assert(m_type == STRING);
 		return boost::get<std::string>(_value);
 	}

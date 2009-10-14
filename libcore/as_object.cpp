@@ -107,7 +107,7 @@ public:
 			throw ActionLimitException("Lookup depth exceeded.");
         }
 
-        _object = _object->get_prototype().get();
+        _object = _object->get_prototype();
 
         // TODO: there is recursion prevention anyway; is this extra 
         // check for circularity really necessary?
@@ -218,7 +218,7 @@ protected:
 private:
 
     as_object* prototype() {
-        return _super ? _super->get_prototype().get() : 0;
+        return _super ? _super->get_prototype() : 0;
     }
 
     as_function* constructor() {
@@ -236,7 +236,7 @@ as_super::get_super(const char* fname)
 	// Our class superclass prototype is __proto__.__proto__
 
 	// Our class prototype is __proto__.
-	as_object* proto = get_prototype().get(); 
+	as_object* proto = get_prototype(); 
 	if (!proto) return new as_super(*getGlobal(*this), 0);
 
     if (!fname || getSWFVersion(*this) <= 6) {
@@ -254,7 +254,7 @@ as_super::get_super(const char* fname)
 
     as_object* tmp = proto;
     while (tmp && tmp->get_prototype() != owner) {
-        tmp = tmp->get_prototype().get();
+        tmp = tmp->get_prototype();
     }
     // ok, now 'tmp' should be the object whose __proto__ member
     // contains the actual named method.
@@ -486,7 +486,7 @@ as_object::getByIndex(int index)
 	as_object *obj = this;
 	while (depth--)
 	{
-		obj = obj->get_prototype().get();
+		obj = obj->get_prototype();
 		if (!obj)
 			return NULL;
 	}
@@ -502,7 +502,7 @@ as_object::get_super(const char* fname)
 	// Our class superclass prototype is __proto__.__proto__
 
 	// Our class prototype is __proto__.
-	as_object* proto = get_prototype().get();
+	as_object* proto = get_prototype();
 
 	if ( fname && getSWFVersion(*this) > 6)
 	{
@@ -542,7 +542,7 @@ skip_duplicates:
 	as_object *obj = this;
 	while (i--)
 	{
-		obj = obj->get_prototype().get();
+		obj = obj->get_prototype();
 		if (!obj)
 			return 0;
 	}
@@ -550,7 +550,7 @@ skip_duplicates:
 	const Property *p = obj->_members.getOrderAfter(index);
 	if (!p)
 	{
-		obj = obj->get_prototype().get();
+		obj = obj->get_prototype();
 		if (!obj)
 			return 0;
 		p = obj->_members.getOrderAfter(0);
@@ -940,7 +940,7 @@ as_object::instanceOf(as_object* ctor)
 #endif
 		return false;
 	}
-	as_object* ctorProto = protoVal.to_object(*getGlobal(*this)).get();
+	as_object* ctorProto = protoVal.to_object(*getGlobal(*this));
 	if ( ! ctorProto )
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
@@ -957,7 +957,7 @@ as_object::instanceOf(as_object* ctor)
 	as_object* obj = this;
 	while (obj && visited.insert(obj).second )
 	{
-		as_object* thisProto = obj->get_prototype().get();
+		as_object* thisProto = obj->get_prototype();
 		if ( ! thisProto )
 		{
 			break;
@@ -1186,14 +1186,14 @@ as_object::hasOwnProperty(string_table::key key, string_table::key nsname)
 	return getOwnProperty(key, nsname) != NULL;
 }
 
-boost::intrusive_ptr<as_object>
-as_object::get_prototype()
+as_object*
+as_object::get_prototype() const
 {
 	int swfVersion = getSWFVersion(*this);
 
 	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
-	if ( ! prop ) return 0;
-	if ( ! prop->visible(swfVersion) ) return 0;
+	if (!prop) return 0;
+	if (!prop->visible(swfVersion)) return 0;
 
 	as_value tmp = prop->getValue(*this);
 
@@ -1325,7 +1325,7 @@ as_object::get_path_element(string_table::key key)
 		return NULL;
 	}
 
-	return tmp.to_object(*getGlobal(*this)).get();
+	return tmp.to_object(*getGlobal(*this));
 }
 
 void

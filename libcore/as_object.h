@@ -983,12 +983,7 @@ public:
     ///
     /// NOTE: can return NULL (and it is expected to do for Object.prototype)
     ///
-    boost::intrusive_ptr<as_object> get_prototype();
-
-    const boost::intrusive_ptr<as_object> get_prototype() const {
-        // cast away constness
-        return const_cast<as_object*>(this)->get_prototype();
-    }
+    as_object* get_prototype() const;
 
     /// Set this object's '__proto__' member
     //
@@ -1185,14 +1180,14 @@ getNamespace(const ObjectURI& o)
 /// @param obj the pointer to be cast.
 /// @return If the cast succeeds, the pointer cast to the requested type.
 template <typename T>
-boost::intrusive_ptr<T>
-ensureType(boost::intrusive_ptr<as_object> obj)
+T*
+ensureType(as_object* obj)
 {
-    boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
+    T* ret = dynamic_cast<T*>(obj);
 
     if (!ret) {
-        std::string target = typeName(ret.get());
-        std::string source = typeName(obj.get());
+        std::string target = typeName(ret);
+        std::string source = typeName(obj);
 
         std::string msg = "builtin method or gettersetter for " +
             target + " called from " + source + " instance.";

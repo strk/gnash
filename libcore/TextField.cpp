@@ -88,6 +88,8 @@ namespace {
     void attachPrototypeProperties(as_object& proto);
     void attachTextFieldStaticMembers(as_object& o);
 
+    as_value textfield_createTextField(const fn_call& fn);
+
     as_value textfield_variable(const fn_call& fn);
     as_value textfield_setTextFormat(const fn_call& fn);
     as_value textfield_getTextFormat(const fn_call& fn);
@@ -254,17 +256,12 @@ TextField::init()
 {
 
     as_object* proto = getTextFieldInterface(getVM(*this));
- 
-    // This is an instantiation, so attach properties to the
-    // prototype.
-    // TODO: is it correct to do it here, or can some TextFields
-    // be constructed without attaching these?
     attachPrototypeProperties(*proto);
-
+ 
     set_prototype(proto);
 
-    Array_as* ar = new Array_as();
-    ar->push(this);
+    as_object* ar = getGlobal(*this)->createArray();
+    ar->callMethod(NSV::PROP_PUSH, this);
     set_member(NSV::PROP_uLISTENERS, ar);
     
     registerTextVariable();
@@ -2362,6 +2359,9 @@ registerTextFieldNative(as_object& global)
     vm.registerNative(textfield_setNewTextFormat, 104, 105);
     vm.registerNative(textfield_getDepth, 104, 106);
     vm.registerNative(textfield_replaceText, 104, 107);
+
+    vm.registerNative(textfield_createTextField, 104, 200);
+    vm.registerNative(textfield_getFontList, 104, 201);
 }
 
 bool
@@ -2797,12 +2797,8 @@ namespace {
 void
 attachPrototypeProperties(as_object& o)
 {
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
     boost::intrusive_ptr<builtin_function> getset;
 
@@ -2865,6 +2861,68 @@ attachPrototypeProperties(as_object& o)
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
+
+/// This is in fact a property of MovieClip, but it is more a TextField
+/// function, as its major number (104) in the native table shows.
+as_value
+textfield_createTextField(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+    
+    // name, depth, x, y, width, height
+    if (fn.nargs < 6) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField called with %d args, "
+            "expected 6 - returning undefined"), fn.nargs);
+        );
+        return as_value();
+    }
+
+    const std::string& name = fn.arg(0).to_string();
+    int depth = fn.arg(1).to_int();
+    int x = fn.arg(2).to_int();
+    int y = fn.arg(3).to_int();
+    int width = fn.arg(4).to_int();
+
+    if (width < 0) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField: negative width (%d)"
+            " - reverting sign"), width);
+        );
+        width = -width;
+    }
+
+    int height = fn.arg(5).to_int();
+    if ( height < 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField: negative height (%d)"
+            " - reverting sign"), height);
+        );
+        height = -height;
+    }
+    // Set textfield bounds
+    SWFRect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
+
+    // Create an instance
+    DisplayObject* tf = new TextField(ptr.get(), bounds);
+
+    // Give name and mark as dynamic
+    tf->set_name(name);
+    tf->setDynamic();
+
+    // Set _x and _y
+    SWFMatrix matrix;
+    matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
+    // update caches (although shouldn't be needed as we only set translation)
+    tf->setMatrix(matrix, true); 
+
+    DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
+
+    // createTextField returns void, it seems
+    if (getSWFVersion(fn) > 7) return as_value(txt);
+    return as_value(); 
+}
 
 as_value
 textfield_background(const fn_call& fn)
@@ -3281,7 +3339,7 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     TextFormat_as* tf;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), tf)) {
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), tf)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
@@ -3661,17 +3719,10 @@ attachTextFieldInterface(as_object& o)
 void
 attachTextFieldStaticMembers(as_object& o)
 {
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
-
-    Global_as* gl = getGlobal(o);
-    o.init_member("getFontList",
-            gl->createFunction(textfield_getFontList), swf6Flags);
-
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+    VM& vm = getVM(o);
+    o.init_member("getFontList", vm.getNative(104, 201), swf6Flags);
 }
 
 /// This is called when a prototype should be added

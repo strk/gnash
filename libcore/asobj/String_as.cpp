@@ -28,7 +28,6 @@
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "log.h"
-#include "Array_as.h"
 #include "as_value.h"
 #include "GnashException.h"
 #include "movie_definition.h" 
@@ -240,13 +239,14 @@ string_split(const fn_call& fn)
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    boost::intrusive_ptr<Array_as> array(new Array_as());
+    Global_as* gl = getGlobal(fn);
+    as_object* array = gl->createArray();
 
     if (fn.nargs == 0)
     {
         // Condition 1:
-        array->push(str);
-        return as_value(array.get());
+        array->callMethod(NSV::PROP_PUSH, str);
+        return as_value(array);
     }
 
     const std::wstring& delim = utf8::decodeCanonicalString(
@@ -257,8 +257,8 @@ string_split(const fn_call& fn)
         (version >= 6 && fn.arg(0).is_undefined()))
     {
         // Condition 2:
-        array->push(str);
-        return as_value(array.get());
+        array->callMethod(NSV::PROP_PUSH, str);
+        return as_value(array);
     }
 
     size_t max = wstr.size() + 1;
@@ -272,7 +272,7 @@ string_split(const fn_call& fn)
             if (limit < 1)
             {
                 // Return empty array.
-                return as_value(array.get());
+                return as_value(array);
             }
             max = clamp<size_t>(limit, 0, max);
         }
@@ -281,8 +281,8 @@ string_split(const fn_call& fn)
         {
             // Condition 3 (plus a shortcut if the string itself
             // is empty).
-            array->push(str);
-            return as_value(array.get());            
+            array->callMethod(NSV::PROP_PUSH, str);
+            return as_value(array);            
         }
     }
     else
@@ -293,8 +293,8 @@ string_split(const fn_call& fn)
             // If the string itself is empty, SWF6 returns a 0-sized
             // array only if the delimiter is also empty. Otherwise
             // it returns an array with 1 empty element.
-            if (delimiterSize) array->push(str);
-            return as_value(array.get());
+            if (delimiterSize) array->callMethod(NSV::PROP_PUSH, str);
+            return as_value(array);
         }
 
         // If we reach this point, the string is not empty and
@@ -304,7 +304,7 @@ string_split(const fn_call& fn)
             int limit = fn.arg(1).to_int();
             if (limit < 1) {
                 // Return empty array if 
-                return as_value(array.get());
+                return as_value(array);
             }
             max = clamp<size_t>(limit, 0, max);
         }
@@ -314,9 +314,10 @@ string_split(const fn_call& fn)
         if (delim.empty()) {
             for (size_t i = 0, e = std::min<size_t>(wstr.size(), max);
                     i < e; ++i) {
-                array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
+                array->callMethod(NSV::PROP_PUSH,
+                       utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
-            return as_value(array.get());
+            return as_value(array);
         }
 
     }
@@ -327,16 +328,16 @@ string_split(const fn_call& fn)
     while (num < max) {
         pos = wstr.find(delim, pos);
 
-        array->push(utf8::encodeCanonicalString(
-                       wstr.substr(prevpos, pos - prevpos),
-                       version));
+        array->callMethod(NSV::PROP_PUSH, utf8::encodeCanonicalString(
+                       wstr.substr(prevpos, pos - prevpos), version));
+
         if (pos == std::wstring::npos) break;
         num++;
         prevpos = pos + delimiterSize;
         pos++;
     }
 
-    return as_value(array.get());
+    return as_value(array);
 }
 
 /// String.lastIndexOf[string[, pos]]

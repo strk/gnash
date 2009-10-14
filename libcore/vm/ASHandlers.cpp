@@ -28,7 +28,6 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "Array_as.h"
 #include "swf_function.h"
 #include "as_function.h"
 #include "fn_call.h"
@@ -2810,7 +2809,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     assert(array_size >= 0); // TODO: trigger this !!
 
     // Call the array constructor, to create an empty array.
-    as_value result = array_new(fn_call(NULL, env));
+    as_value result = getGlobal(env)->createArray();
 
     boost::intrusive_ptr<as_object> ao = convertToObject(*getGlobal(thread.env), result);
     assert(ao);
@@ -3961,7 +3960,7 @@ convertToObject(Global_as& gl, const as_value& val)
 {
 
     try {
-        return val.to_object(gl).get();
+        return val.to_object(gl);
     }
     catch (const GnashException& gl) {
         return 0;

@@ -20,6 +20,7 @@
 
 #include "as_object.h" // for inheritance
 #include "smart_ptr.h" // GNASH_USE_GC
+#include "namedStrings.h"
 
 #include <deque>
 #include <vector>
@@ -53,8 +54,6 @@ struct ContainerFiller {
 	ContainerFiller(T& c): cont(c) {}
 	void visit(as_value& v) { cont.push_back(v); }
 };
-
-struct blank {};
 
 /// The Array ActionScript object
 class Array_as : public as_object
@@ -137,39 +136,19 @@ public:
 
 	Array_as::const_iterator end();
 
-	/// Push an element to the end of the array
-	//
-	/// @param val
-	/// 	The element to add 
-	///
-	void push(const as_value& val);
-
-	void unshift(const as_value& val);
-
-	as_value shift();
-
-	as_value pop();
-
 	as_value at(unsigned int index) const;
 
 	Array_as* get_indices(std::deque<indexed_as_value> origElems);
 
 	void reverse();
 
-	void set_indexed(unsigned int index, const as_value &v);
-
 	/// @param separator
     ///     String to use as separator between elements
 	std::string join(const std::string& separator) const;
 
-    /// Convert array to string.
-	std::string toString() const;
-
 	unsigned int size() const;
 
 	void resize(unsigned int);
-
-	void concat(const Array_as& other);
 
 	/// \brief
 	/// Return a newly created array containing elements
@@ -192,21 +171,6 @@ public:
 	///
 	boost::intrusive_ptr<Array_as> slice(
 		unsigned int start, unsigned int one_past_end);
-
-	/// Remove first element matching the given value
-	//
-	/// Return true if any element was removed, false otherwise
-	///
-	/// NOTE: if an element is removed, holes in the array will be
-	///       filled.
-	///
-	/// @param v
-	///	The value to compare elements against
-	///
-	/// @param env
-	///	The environment to use when comparing (needed by as_value::equals)
-	///
-	bool removeFirst(const as_value& v);
 
 	/// \brief
 	/// Replace count elements from start with given values, optionally
@@ -404,31 +368,32 @@ private:
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
 	int index_requested(string_table::key name);
 
-	/// Shift all elements to the left by count positions
-	//
-	/// Pre-condition: size of the array must be >= count
-	/// Post-condition: size of the array will reduce by 'count'
-	///
-	void shiftElementsLeft(unsigned int count);
-
-	/// Shift all elements to the right by count positions
-	//
-	/// Pre-condition: none
-	/// Post-condition: size of the array will incremented by 'count'
-	///
-	void shiftElementsRight(unsigned int count);
 };
 
+string_table::key arrayKey(string_table& st, size_t i);
+
+template<typename T>
+bool foreachArray(as_object& array, T& pred)
+{
+    as_value length;
+    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
+    
+    const int size = length.to_int();
+    if (size < 0) return false;
+
+    string_table& st = getStringTable(array);
+
+    for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
+        pred(array.getMember(arrayKey(st, i)));
+    }
+    return true;
+}
 
 /// Initialize the global.Array object
 // needed by SWFHandlers::ActionInitArray
 void array_class_init(as_object& global, const ObjectURI& uri);
 
 void registerArrayNative(as_object& global);
-
-/// Constructor for ActionScript class Array.
-// needed by SWFHandlers::ActionInitArray
-as_value array_new(const fn_call& fn);
 
 }
 

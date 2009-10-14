@@ -30,7 +30,6 @@
 #include "builtin_function.h" 
 #include "NativeFunction.h" 
 #include "Object.h" 
-#include "Array_as.h"
 #include "MediaHandler.h"
 #include "VideoInput.h"
 
@@ -534,13 +533,14 @@ camera_names(const fn_call& fn)
     
     const size_t size = names.size();
     
-    boost::intrusive_ptr<Array_as> data = new Array_as;
+    Global_as* gl = getGlobal(fn);
+    as_object* data = gl->createArray();
 
     for (size_t i = 0; i < size; ++i) {
-        data->push(names[i]);
+        data->callMethod(NSV::PROP_PUSH, names[i]);
     }
     
-    return as_value(data.get());
+    return as_value(data);
 } 
 
 

@@ -72,7 +72,7 @@ color_class_init(as_object& where, const ObjectURI& uri)
             attachColorInterface, 0, uri);
 
     as_object* proto =
-        cl->getMember(NSV::PROP_PROTOTYPE).to_object(*getGlobal(where)).get();
+        cl->getMember(NSV::PROP_PROTOTYPE).to_object(*getGlobal(where));
 
     if (!proto) return;
 

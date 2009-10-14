@@ -82,19 +82,6 @@ private:
 	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
 	boost::uint16_t	m_function2_flags;
 
-	/// Return an 'arguments' object.
-	//
-	/// The 'arguments' variable is an array with an additional
-	/// 'callee' member, set to the function being called.
-	///
-	/// NOTE: the callee as_object will be stored in an as_value, thus
-	///       getting wrapped into an intrusive_ptr. Make sure you have
-	///	  a reference on it!
-	///	  
-	///
-	static Array_as* getArguments(swf_function& callee, const fn_call& fn,
-            as_object* caller);
-
 public:
 
 	enum SWFDefineFunction2Flags

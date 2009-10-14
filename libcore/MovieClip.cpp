@@ -597,47 +597,15 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 }
 
 DisplayObject*
-MovieClip::add_empty_movieclip(const std::string& name, int depth)
+MovieClip::addDisplayListObject(DisplayObject* obj, int depth)
 {
-    MovieClip* movieclip = new MovieClip(0, _swf, this);
-    movieclip->set_name(name);
-    movieclip->setDynamic();
-
     // TODO: only call set_invalidated if this DisplayObject actually overrides
     //             an existing one !
     set_invalidated(); 
-
-    _displayList.placeDisplayObject(movieclip, depth);     
-
-    return movieclip;
+    _displayList.placeDisplayObject(obj, depth);     
+    return obj;
 }
 
-boost::intrusive_ptr<DisplayObject>
-MovieClip::add_textfield(const std::string& name, int depth, int x, int y,
-        float width, float height)
-{
-    
-    // Set textfield bounds
-    SWFRect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
-
-    // Create an instance
-    boost::intrusive_ptr<DisplayObject> txt_char = new TextField(this, bounds);
-
-    // Give name and mark as dynamic
-    txt_char->set_name(name);
-    txt_char->setDynamic();
-
-    // Set _x and _y
-    SWFMatrix txt_matrix;
-    txt_matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
-    // update caches (although shouldn't be needed as we only set translation)
-    txt_char->setMatrix(txt_matrix, true); 
-
-    // Here we add the DisplayObject to the displayList.    
-    _displayList.placeDisplayObject(txt_char.get(), depth); 
-
-    return txt_char;
-}
 
 boost::intrusive_ptr<MovieClip> 
 MovieClip::duplicateMovieClip(const std::string& newname, int depth,
@@ -847,7 +815,7 @@ MovieClip::get_path_element(string_table::key key)
         return tmp.to_sprite(true);
     }
 
-    return tmp.to_object(*getGlobal(*this)).get();
+    return tmp.to_object(*getGlobal(*this));
 }
 
 bool

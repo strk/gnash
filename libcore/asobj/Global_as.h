@@ -83,6 +83,13 @@ public:
     /// expected behaviour.
     virtual as_object* createBoolean(bool b) = 0;
 
+    /// Create an Array object
+    //
+    /// This calls the Array constructor. If that has been changed, this
+    /// function may not produce an Array object. This is generally
+    /// expected behaviour.
+    virtual as_object* createArray() = 0;
+
     /// Create an Object
     //
     /// This function returns an Object with Object.prototype as its

@@ -128,7 +128,7 @@ point_add(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(*getGlobal(fn)).get();
+        as_object* o = arg1.to_object(*getGlobal(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -199,7 +199,7 @@ point_equals(const fn_call& fn)
         );
         return as_value(false);
     }
-    as_object* o = arg1.to_object(*getGlobal(fn)).get();
+    as_object* o = arg1.to_object(*getGlobal(fn));
     assert(o);
     if (!o->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -305,7 +305,7 @@ point_offset(const fn_call& fn)
 as_value
 point_subtract(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
+    as_object* ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -329,7 +329,7 @@ point_subtract(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(*getGlobal(fn)).get();
+        as_object* o = arg1.to_object(*getGlobal(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -367,7 +367,7 @@ point_subtract(const fn_call& fn)
 as_value
 point_toString(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
+    as_object* ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -386,7 +386,7 @@ point_toString(const fn_call& fn)
 as_value
 point_length(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
+    as_object* ptr = ensureType<as_object>(fn.this_ptr);
 
     if ( ! fn.nargs ) // getter
     {
@@ -438,7 +438,7 @@ point_distance(const fn_call& fn)
         );
         return as_value();
     }
-    as_object* o1 = arg1.to_object(*getGlobal(fn)).get();
+    as_object* o1 = arg1.to_object(*getGlobal(fn));
     assert(o1);
     if (!o1->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -450,7 +450,7 @@ point_distance(const fn_call& fn)
     }
 
     const as_value& arg2 = fn.arg(1);
-    as_object* o2 = arg2.to_object(*getGlobal(fn)).get();
+    as_object* o2 = arg2.to_object(*getGlobal(fn));
     assert(o2);
     // it seems there's no need to check arg2 (see actionscript.all/Point.as)
 
@@ -510,7 +510,7 @@ point_interpolate(const fn_call& fn)
         );
 
         const as_value& p0val = fn.arg(0);
-        as_object* p0 = p0val.to_object(*getGlobal(fn)).get();
+        as_object* p0 = p0val.to_object(*getGlobal(fn));
         if ( ! p0 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -525,7 +525,7 @@ point_interpolate(const fn_call& fn)
         }
 
         const as_value& p1val = fn.arg(1);
-        as_object* p1 = p1val.to_object(*getGlobal(fn)).get();
+        as_object* p1 = p1val.to_object(*getGlobal(fn));
         if ( ! p1 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -605,7 +605,7 @@ as_value
 point_ctor(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
 
     as_value x;
     as_value y;

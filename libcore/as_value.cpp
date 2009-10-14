@@ -315,12 +315,10 @@ as_value::as_value(as_function* func)
     :
     m_type(AS_FUNCTION)
 {
-	if ( func )
-	{
-		_value = boost::intrusive_ptr<as_object>(func);
+	if (func) {
+		_value = func;
 	}
-	else
-	{
+	else {
 		m_type = NULLTYPE;
 		_value = boost::blank();
 	}
@@ -379,8 +377,7 @@ as_value::to_string() const
 		case AS_FUNCTION:
 		case OBJECT:
 		{
-            as_object* obj = m_type == AS_FUNCTION ? getFun().get() :
-                                                     getObj().get();
+            as_object* obj = m_type == AS_FUNCTION ? getFun() : getObj();
             String_as* s;
             if (isNativeType(obj, s)) return s->value();
 
@@ -469,7 +466,7 @@ as_value::to_primitive() const
 
 	if (m_type == OBJECT && swfVersion > 5) {
         Date_as* d;
-        if (isNativeType(getObj().get(), d)) hint = STRING;
+        if (isNativeType(getObj(), d)) hint = STRING;
     }
 
 	return to_primitive(hint);
@@ -485,7 +482,7 @@ as_value::convert_to_primitive()
 
 	if (m_type == OBJECT && swfVersion > 5) {
         Date_as* d;
-        if (isNativeType<Date_as>(getObj().get(), d)) hint = STRING;
+        if (isNativeType<Date_as>(getObj(), d)) hint = STRING;
     }
 
     *this = to_primitive(hint);
@@ -515,8 +512,8 @@ as_value::to_primitive(AsType hint) const
 			return as_value(NaN);
 		}
 #endif
-		if ( m_type == OBJECT ) obj = getObj().get();
-		else obj = getFun().get();
+		if ( m_type == OBJECT ) obj = getObj();
+		else obj = getFun();
 
 		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function())) 
 		{
@@ -539,8 +536,8 @@ as_value::to_primitive(AsType hint) const
 			return as_value(getCharacterProxy().getTarget());
 		}
 
-		if ( m_type == OBJECT ) obj = getObj().get();
-		else obj = getFun().get();
+		if ( m_type == OBJECT ) obj = getObj();
+		else obj = getFun();
 
 		// @@ Moock says, "the value that results from
 		// calling toString() on the object".
@@ -902,21 +899,19 @@ as_value::to_bool() const
 }
 	
 // Return value as an object.
-boost::intrusive_ptr<as_object>
+as_object*
 as_value::to_object(Global_as& global) const
 {
-	typedef boost::intrusive_ptr<as_object> ptr;
-
 	switch (m_type)
 	{
 		case OBJECT:
 			return getObj();
 
 		case AS_FUNCTION:
-			return getFun().get();
+			return getFun();
 
 		case MOVIECLIP:
-			return ptr(toDisplayObject());
+			return toDisplayObject();
 
 		case STRING:
 			return global.createString(getStr());
@@ -952,12 +947,6 @@ as_value::toDisplayObject(bool allowUnloaded) const
 }
 
 void
-as_value::set_sprite(MovieClip& sprite)
-{
-	setDisplayObject(sprite);
-}
-
-void
 as_value::setDisplayObject(DisplayObject& sprite)
 {
 	m_type = MOVIECLIP;
@@ -971,7 +960,7 @@ as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
 	    // OK.
-	    return getFun().get();
+	    return getFun();
     }
 
     return NULL;
@@ -999,10 +988,10 @@ as_value::set_as_object(as_object* obj)
 		set_null();
 		return;
 	}
-	DisplayObject* sp = obj->toDisplayObject();
-	if ( sp )
-	{
-		setDisplayObject(*sp);
+    if (obj->displayObject()) {
+        // The static cast is fine as long as the as_object is genuinely
+        // a DisplayObject.
+		setDisplayObject(static_cast<DisplayObject&>(*obj));
 		return;
 	}
 	as_function* func = obj->to_function();
@@ -1014,7 +1003,7 @@ as_value::set_as_object(as_object* obj)
 	if (m_type != OBJECT || getObj() != obj)
 	{
 		m_type = OBJECT;
-		_value = boost::intrusive_ptr<as_object>(obj);
+		_value = obj;
 	}
 }
 
@@ -1027,12 +1016,12 @@ as_value::set_as_object(boost::intrusive_ptr<as_object> obj)
 void
 as_value::set_as_function(as_function* func)
 {
-    if (m_type != AS_FUNCTION || getFun().get() != func)
+    if (m_type != AS_FUNCTION || getFun() != func)
     {
 	m_type = AS_FUNCTION;
 	if (func)
 	{
-		_value = boost::intrusive_ptr<as_object>(func);
+		_value = func;
 	}
 	else
 	{
@@ -1040,13 +1029,6 @@ as_value::set_as_function(as_function* func)
 		_value = boost::blank(); // to properly destroy anything else might be stuffed into it
 	}
     }
-}
-
-bool
-as_value::conforms_to(string_table::key /*name*/)
-{
-	// TODO: Implement
-	return false;
 }
 
 bool
@@ -1087,7 +1069,7 @@ as_value::equals(const as_value& v) const
     /// Compare to same type
     if ( obj_or_func && v_obj_or_func )
     {
-        return boost::get<AsObjPtr>(_value) == boost::get<AsObjPtr>(v._value); 
+        return boost::get<as_object*>(_value) == boost::get<as_object*>(v._value); 
     }
 
     if ( m_type == v.m_type ) return equalsSameType(v);
@@ -1373,13 +1355,13 @@ as_value::toDebugString() const
             return ret.str();
 		case OBJECT:
 		{
-			as_object* obj = getObj().get();
+			as_object* obj = getObj();
 			ret = boost::format("[object(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
 			return ret.str();
 		}
 		case AS_FUNCTION:
 		{
-			as_function* obj = getFun().get();
+			as_function* obj = getFun();
 			ret = boost::format("[function(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
 			return ret.str();
 		}
@@ -1566,14 +1548,14 @@ as_value::setReachable() const
 	{
 		case OBJECT:
 		{
-			as_value::AsObjPtr op = getObj();
+			as_object* op = getObj();
 			if (op)
 				op->setReachable();
 			break;
 		}
 		case AS_FUNCTION:
 		{
-			as_value::AsFunPtr fp = getFun();
+			as_function* fp = getFun();
 			if (fp)
 				fp->setReachable();
 			break;
@@ -1589,18 +1571,18 @@ as_value::setReachable() const
 #endif // GNASH_USE_GC
 }
 
-as_value::AsFunPtr
+as_function*
 as_value::getFun() const
 {
 	assert(m_type == AS_FUNCTION);
-	return boost::get<AsObjPtr>(_value)->to_function();
+	return boost::get<as_object*>(_value)->to_function();
 }
 
-as_value::AsObjPtr
+as_object*
 as_value::getObj() const
 {
 	assert(m_type == OBJECT);
-	return boost::get<AsObjPtr>(_value);
+	return boost::get<as_object*>(_value);
 }
 
 CharacterProxy
@@ -1614,15 +1596,6 @@ as_value::CharacterPtr
 as_value::getCharacter(bool allowUnloaded) const
 {
 	return getCharacterProxy().get(allowUnloaded);
-}
-
-as_value::SpritePtr
-as_value::getSprite(bool allowUnloaded) const
-{
-	assert(m_type == MOVIECLIP);
-	DisplayObject* ch = getCharacter(allowUnloaded);
-	if ( ! ch ) return 0;
-	return ch->to_movie();
 }
 
 void
@@ -1704,6 +1677,7 @@ as_value::as_value(const amf::Element& el)
     
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
+    Global_as* gl = vm.getGlobal();
 
     switch (el.getType()) {
       case amf::Element::NOTYPE:
@@ -1813,7 +1787,9 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
 #endif
-          Array_as* obj = new Array_as;
+
+          as_object* obj = gl->createArray();
+
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
 		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
@@ -1834,9 +1810,9 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
 #endif
-          Array_as* obj = new Array_as;
+          as_object* obj = gl->createArray();
           size_t len = el.propertySize();
-          obj->resize(len);
+          obj->set_member(NSV::PROP_LENGTH, len);
 
           for (size_t i=0; i < el.propertySize(); i++) {
               const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
@@ -1947,6 +1923,8 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 		}
 	}
 
+    Global_as* gl = vm.getGlobal();
+
 	switch (amf_type)
     {
 
@@ -2032,89 +2010,89 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
 		case amf::Element::STRICT_ARRAY_AMF0:
         {
-				boost::intrusive_ptr<Array_as> array(new Array_as());
-                objRefs.push_back(array.get());
+            as_object* array = gl->createArray();
+            objRefs.push_back(array);
 
-                boost::uint32_t li = readNetworkLong(b); b += 4;
+            boost::uint32_t li = readNetworkLong(b); b += 4;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
+            log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
 #endif
-				as_value arrayElement;
-				for(size_t i = 0; i < li; ++i)
-				{
-					if ( ! amf0_read_value(b, end, arrayElement, -1,
-                                objRefs, vm) )
-					{
-						return false;
-					}
-					array->push(arrayElement);
-				}
+            as_value arrayElement;
+            for (size_t i = 0; i < li; ++i)
+            {
+                if ( ! amf0_read_value(b, end, arrayElement, -1,
+                            objRefs, vm) )
+                {
+                    return false;
+                }
+                array->callMethod(NSV::PROP_PUSH, arrayElement);
+            }
 
-				ret.set_as_object(array);
-				return true;
+            ret.set_as_object(array);
+            return true;
         }
 
 		case amf::Element::ECMA_ARRAY_AMF0:
         {
-				Array_as* obj = new Array_as(); // GC-managed...
-                objRefs.push_back(obj);
+            as_object* obj = gl->createArray();
+            objRefs.push_back(obj);
 
-                // set the value immediately, so if there's any problem parsing
-                // (like premature end of buffer) we still get something.
-				ret.set_as_object(obj);
+            // set the value immediately, so if there's any problem parsing
+            // (like premature end of buffer) we still get something.
+            ret.set_as_object(obj);
 
-                boost::uint32_t li = readNetworkLong(b); b += 4;
-                
-                log_debug("array size: %d", li);
-                
-                // the count specifies array size, so to have that even if none of the members are indexed
-                // if short, will be incremented everytime an indexed member is found
-                obj->resize(li);
+            boost::uint32_t li = readNetworkLong(b); b += 4;
+            
+            log_debug("array size: %d", li);
+            
+            // the count specifies array size, so to have that even if none of the members are indexed
+            // if short, will be incremented everytime an indexed member is found
+            obj->set_member(NSV::PROP_LENGTH, li);
 
-                // TODO: do boundary checking (if b >= end...)
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
-#endif
-				as_value objectElement;
-				string_table& st = vm.getStringTable();
-				for (;;)
-				{
-                    if ( b+2 >= end )
-                    {
-                        log_error("MALFORMED SOL: premature end of ECMA_ARRAY "
-                                "block");
-                        break;
-                    }
-					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
-
-                    // end of ECMA_ARRAY is signalled by an empty string
-                    // followed by an OBJECT_END_AMF0 (0x09) byte
-                    if ( ! strlen )
-                    {
-                        // expect an object terminator here
-                        if ( *b++ != amf::Element::OBJECT_END_AMF0 )
-                        {
-                            log_error("MALFORMED SOL: empty member name not "
-                                    "followed by OBJECT_END_AMF0 byte");
-                        }
-                        break;
-                    }
-
-					std::string name(reinterpret_cast<const char*>(b), strlen);
+            // TODO: do boundary checking (if b >= end...)
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
+            log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
 #endif
-					b += strlen;
-					if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
-					{
-						return false;
-					}
-					obj->set_member(st.find(name), objectElement);
-				}
+            as_value objectElement;
+            string_table& st = vm.getStringTable();
+            for (;;)
+            {
+                if ( b+2 >= end )
+                {
+                    log_error("MALFORMED SOL: premature end of ECMA_ARRAY "
+                            "block");
+                    break;
+                }
+                boost::uint16_t strlen = readNetworkShort(b); b+=2; 
 
-				return true;
+                // end of ECMA_ARRAY is signalled by an empty string
+                // followed by an OBJECT_END_AMF0 (0x09) byte
+                if ( ! strlen )
+                {
+                    // expect an object terminator here
+                    if ( *b++ != amf::Element::OBJECT_END_AMF0 )
+                    {
+                        log_error("MALFORMED SOL: empty member name not "
+                                "followed by OBJECT_END_AMF0 byte");
+                    }
+                    break;
+                }
+
+                std::string name(reinterpret_cast<const char*>(b), strlen);
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+                log_debug("amf0 ECMA_ARRAY prop name is %s", name);
+#endif
+                b += strlen;
+                if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
+                {
+                    return false;
+                }
+                obj->set_member(st.find(name), objectElement);
+            }
+
+            return true;
         }
 
 		case amf::Element::OBJECT_AMF0:
@@ -2211,7 +2189,6 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			log_debug("amf0 read date: %e", dub);
 #endif
 
-            Global_as* gl = vm.getGlobal();
             as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
             if (ctor) {
                 fn_call::Args args;
@@ -2272,7 +2249,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
         case OBJECT:
         {
-            as_object* obj = to_object(*vm.getGlobal()).get();
+            as_object* obj = to_object(*vm.getGlobal());
             assert(obj);
             OffsetTable::iterator it = offsetTable.find(obj);
             if (it == offsetTable.end()) {

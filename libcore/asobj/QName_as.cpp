@@ -98,7 +98,7 @@ qname_uri(const fn_call& /*fn*/)
 as_value
 qname_ctor(const fn_call& fn)
 {
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
     attachQNameInterface(*obj);
     return as_value(); 
 }

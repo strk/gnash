@@ -120,7 +120,7 @@ AsBroadcaster::initialize(as_object& o)
 
     // Find _global.AsBroadcaster.
     as_object* asb =
-        gl->getMember(NSV::CLASS_AS_BROADCASTER).to_object(*gl).get();
+        gl->getMember(NSV::CLASS_AS_BROADCASTER).to_object(*gl);
 
     // If it's not an object, these are left undefined, but they are
     // always attached to the initialized object.
@@ -139,7 +139,7 @@ AsBroadcaster::initialize(as_object& o)
     const as_value& asn = gl->callMethod(NSV::PROP_AS_NATIVE, 101, 12);
     o.set_member(NSV::PROP_BROADCAST_MESSAGE, asn);
 
-    o.set_member(NSV::PROP_uLISTENERS, new Array_as());
+    o.set_member(NSV::PROP_uLISTENERS, gl->createArray());
 
 }
 
@@ -256,30 +256,16 @@ asbroadcaster_addListener(const fn_call& fn)
                 "an object: %s"), (void*)fn.this_ptr, fn.dump_args(),
                 listenersValue);
         );
-        return as_value(false); // TODO: check this
+        // TODO: check this
+        return as_value(false); 
     }
 
-    boost::intrusive_ptr<as_object> listenersObj =
-        listenersValue.to_object(*getGlobal(fn));
-    assert(listenersObj);
+    as_object* listeners = listenersValue.to_object(*getGlobal(fn));
 
-    boost::intrusive_ptr<Array_as> listeners = boost::dynamic_pointer_cast<Array_as>(listenersObj);
-    if ( ! listeners )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener isn't "
-                "an array: %s -- will call 'push' on it anyway"),
-                (void*)fn.this_ptr,
-                fn.dump_args(), listenersValue);
-        );
+    // We checked is_object() above.
+    assert(listeners); 
 
-        listenersObj->callMethod(NSV::PROP_PUSH, newListener);
-
-    }
-    else
-    {
-        listeners->push(newListener);
-    }
+    listeners->callMethod(NSV::PROP_PUSH, newListener);
 
     return as_value(true);
 
@@ -359,10 +345,24 @@ asbroadcaster_removeListener(const fn_call& fn)
         // Remove the first listener matching the new value
         // See http://www.senocular.com/flash/tutorials/
         // listenersasbroadcaster/?page=2
-        // TODO: make this call as a normal (don't want to
-        // rely on _listeners type at all)
-        bool removed = listeners->removeFirst(listenerToRemove);
-        return as_value(removed);
+        
+        // This is an ActionScript-like implementation, which is why it looks
+        // like poor C++.
+        int length = listenersObj->getMember(NSV::PROP_LENGTH).to_int();
+        int i = 0;
+        string_table& st = getStringTable(fn);
+        while (i < length) {
+            std::ostringstream s;
+            s << i;
+            as_value el =
+                listenersObj->getMember(st.find(s.str()));
+            if (el.equals(listenerToRemove)) {
+                listeners->callMethod(NSV::PROP_SPLICE, s.str(), 1);
+                return as_value(true);
+            }
+            ++i;
+        }
+        return as_value(false);
     }
 
 }
@@ -401,8 +401,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     }
 
     boost::intrusive_ptr<Array_as> listeners =
-        boost::dynamic_pointer_cast<Array_as>(
-                listenersValue.to_object(*getGlobal(fn)));
+        dynamic_cast<Array_as*>(listenersValue.to_object(*getGlobal(fn)));
 
     if ( ! listeners )
     {

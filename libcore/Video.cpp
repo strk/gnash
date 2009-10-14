@@ -394,7 +394,7 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
 	NetStream_as* ns;
 
     if (isNativeType(obj, ns)) {

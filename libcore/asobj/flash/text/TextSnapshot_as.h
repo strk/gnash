@@ -30,7 +30,6 @@
 namespace gnash {
 
 	class StaticText;
-    class Array_as;
     namespace SWF {
         class TextRecord;
     }
@@ -73,7 +72,7 @@ public:
 
     std::string getSelectedText(bool newlines) const;
 
-    void getTextRunInfo(size_t start, size_t end, Array_as& ri) const;
+    void getTextRunInfo(size_t start, size_t end, as_object& ri) const;
 
 protected:
 

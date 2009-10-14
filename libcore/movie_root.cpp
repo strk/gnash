@@ -525,7 +525,7 @@ movie_root::getSelectionObject() const
     as_value s;
     if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object(*global).get();
+    as_object* sel = s.to_object(*global);
    
     return sel;
 }
@@ -538,7 +538,7 @@ movie_root::getStageObject()
 	Global_as* global = _vm.getGlobal();
 	if (!global) return 0;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return 0;
-	return v.to_object(*global).get();
+	return v.to_object(*global);
 }
 		
 void

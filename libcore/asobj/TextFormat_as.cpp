@@ -176,7 +176,7 @@ as_value
 textformat_new(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
 
     std::auto_ptr<TextFormat_as> tf(new TextFormat_as);
 
@@ -223,7 +223,7 @@ textformat_new(const fn_call& fn)
 	}
 	
     obj->setRelay(tf.release());
-    as_object* proto = obj->get_prototype().get();
+    as_object* proto = obj->get_prototype();
     if (proto) attachTextFormatInterface(*proto);
 
     const int flags = 0;
@@ -293,7 +293,7 @@ textformat_tabStops(const fn_call& fn)
 		return ret;
 	}
 	
-    as_object* arg = fn.arg(0).to_object(*getGlobal(fn)).get();
+    as_object* arg = fn.arg(0).to_object(*getGlobal(fn));
     Array_as* tStops = dynamic_cast<Array_as*>(arg);
 
     if (!tStops) return as_value();

@@ -298,7 +298,8 @@ public:
 	///	ownership of returned Propery is kept by the PropertyList,
 	///	so plase *don't* delete it !
 	///
-	Property* getProperty(string_table::key key, string_table::key nsId = 0);
+	Property* getProperty(string_table::key key, string_table::key nsId = 0)
+        const;
 
 	/// Get a property, if existing, by order
 	///
