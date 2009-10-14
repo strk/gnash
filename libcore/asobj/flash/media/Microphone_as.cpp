@@ -429,7 +429,7 @@ microphone_names(const fn_call& fn)
     boost::intrusive_ptr<Array_as> data = new Array_as;
     
     for (size_t i=0; i < size; ++i) {
-        data->push(vect[i]);
+        data->callMethod(NSV::PROP_PUSH, vect[i]);
     }
         
     if ( fn.nargs == 0 ) // getter

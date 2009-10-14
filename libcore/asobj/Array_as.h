@@ -137,13 +137,6 @@ public:
 
 	Array_as::const_iterator end();
 
-	/// Push an element to the end of the array
-	//
-	/// @param val
-	/// 	The element to add 
-	///
-	void push(const as_value& val);
-
 	as_value pop();
 
 	as_value at(unsigned int index) const;

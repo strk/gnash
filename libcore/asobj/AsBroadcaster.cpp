@@ -278,7 +278,7 @@ asbroadcaster_addListener(const fn_call& fn)
     }
     else
     {
-        listeners->push(newListener);
+        listeners->callMethod(NSV::PROP_PUSH, newListener);
     }
 
     return as_value(true);

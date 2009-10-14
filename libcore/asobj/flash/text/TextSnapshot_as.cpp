@@ -233,7 +233,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
-                ri.push(el);
+                ri.callMethod(NSV::PROP_PUSH, el);
 
                 ++pos;
                 x += k->advance;

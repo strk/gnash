@@ -245,7 +245,7 @@ string_split(const fn_call& fn)
     if (fn.nargs == 0)
     {
         // Condition 1:
-        array->push(str);
+        array->callMethod(NSV::PROP_PUSH, str);
         return as_value(array.get());
     }
 
@@ -257,7 +257,7 @@ string_split(const fn_call& fn)
         (version >= 6 && fn.arg(0).is_undefined()))
     {
         // Condition 2:
-        array->push(str);
+        array->callMethod(NSV::PROP_PUSH, str);
         return as_value(array.get());
     }
 
@@ -281,7 +281,7 @@ string_split(const fn_call& fn)
         {
             // Condition 3 (plus a shortcut if the string itself
             // is empty).
-            array->push(str);
+            array->callMethod(NSV::PROP_PUSH, str);
             return as_value(array.get());            
         }
     }
@@ -293,7 +293,7 @@ string_split(const fn_call& fn)
             // If the string itself is empty, SWF6 returns a 0-sized
             // array only if the delimiter is also empty. Otherwise
             // it returns an array with 1 empty element.
-            if (delimiterSize) array->push(str);
+            if (delimiterSize) array->callMethod(NSV::PROP_PUSH, str);
             return as_value(array.get());
         }
 
@@ -314,7 +314,8 @@ string_split(const fn_call& fn)
         if (delim.empty()) {
             for (size_t i = 0, e = std::min<size_t>(wstr.size(), max);
                     i < e; ++i) {
-                array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
+                array->callMethod(NSV::PROP_PUSH,
+                       utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
             return as_value(array.get());
         }
@@ -327,9 +328,9 @@ string_split(const fn_call& fn)
     while (num < max) {
         pos = wstr.find(delim, pos);
 
-        array->push(utf8::encodeCanonicalString(
-                       wstr.substr(prevpos, pos - prevpos),
-                       version));
+        array->callMethod(NSV::PROP_PUSH, utf8::encodeCanonicalString(
+                       wstr.substr(prevpos, pos - prevpos), version));
+
         if (pos == std::wstring::npos) break;
         num++;
         prevpos = pos + delimiterSize;

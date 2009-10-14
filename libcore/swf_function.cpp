@@ -75,8 +75,9 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn,
 	Array_as* arguments = new Array_as();
 	for (unsigned int i=0; i<fn.nargs; ++i)
 	{
-		arguments->push(fn.arg(i));
+		arguments->callMethod(NSV::PROP_PUSH, fn.arg(i));
 	}
+
 	arguments->init_member(NSV::PROP_CALLEE, &callee);
 
 	arguments->init_member(NSV::PROP_CALLER, as_value(caller));

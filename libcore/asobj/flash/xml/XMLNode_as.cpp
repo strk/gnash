@@ -931,7 +931,7 @@ xmlnode_childNodes(const fn_call& fn)
                     it != itEnd; ++it )
     {
         boost::intrusive_ptr<XMLNode_as> node = *it;
-        ary->push(as_value(node.get()));
+        ary->callMethod(NSV::PROP_PUSH, node.get());
     }
 
     return as_value(ary.get());

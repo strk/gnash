@@ -537,7 +537,7 @@ camera_names(const fn_call& fn)
     boost::intrusive_ptr<Array_as> data = new Array_as;
 
     for (size_t i = 0; i < size; ++i) {
-        data->push(names[i]);
+        data->callMethod(NSV::PROP_PUSH, names[i]);
     }
     
     return as_value(data.get());

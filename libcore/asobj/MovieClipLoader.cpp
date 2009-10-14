@@ -145,7 +145,7 @@ MovieClipLoader::MovieClipLoader()
 {
 
 	Array_as* ar = new Array_as();
-	ar->push(this);
+	ar->callMethod(NSV::PROP_PUSH, this);
 	set_member(NSV::PROP_uLISTENERS, ar);
 }
 

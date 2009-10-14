@@ -619,14 +619,6 @@ Array_as::index_requested(string_table::key name)
     return int(value);
 }
 
-void
-Array_as::push(const as_value& val)
-{
-        const ArrayContainer::size_type s = elements.size();
-        elements.resize(s+1);
-        elements[s] = val;
-}
-
 as_value
 Array_as::pop()
 {
@@ -700,7 +692,7 @@ Array_as::concat(const Array_as& other)
 {
     for (ArrayContainer::size_type i = 0, e = other.size(); i < e; i++)
     {
-        push(other.at(i));
+        callMethod(NSV::PROP_PUSH, other.at(i));
     }
 }
 
@@ -872,7 +864,7 @@ Array_as::get_indices(std::deque<indexed_as_value> elems)
     for (std::deque<indexed_as_value>::const_iterator it = elems.begin();
         it != elems.end(); ++it)
     {
-        intIndexes->push(as_value(it->vec_index));
+        intIndexes->callMethod(NSV::PROP_PUSH, it->vec_index);
     }
     return intIndexes;
 }
@@ -1347,7 +1339,7 @@ array_concat(const fn_call& fn)
     Array_as* newarray = new Array_as();
 
     for (size_t i=0, e=array->size(); i<e; i++)
-        newarray->push(array->at(i));
+        newarray->callMethod(NSV::PROP_PUSH, array->at(i));
 
     for (unsigned int i=0; i<fn.nargs; i++)
     {
@@ -1361,7 +1353,7 @@ array_concat(const fn_call& fn)
         }
         else
         {
-            newarray->push(fn.arg(i));
+            newarray->callMethod(NSV::PROP_PUSH, fn.arg(i));
         }
     }
 
@@ -1482,7 +1474,7 @@ array_new(const fn_call& fn)
         as_value    index_number;
         for (unsigned int i = 0; i < fn.nargs; i++)
         {
-            ao->push(fn.arg(i));
+            ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
         }
     }
 
@@ -1637,7 +1629,7 @@ Array_as::splice(unsigned int start, unsigned int count, const std::vector<as_va
     if ( receive )
     {
         for (size_t i=start; i<start+count; ++i )
-            receive->push(elements[i]);
+            receive->callMethod(NSV::PROP_PUSH, elements[i]);
     }
 
     elements = newelements;
