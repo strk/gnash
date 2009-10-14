@@ -151,8 +151,6 @@ public:
 
 	void resize(unsigned int);
 
-	void concat(const Array_as& other);
-
 	/// \brief
 	/// Return a newly created array containing elements
 	/// from 'start' up to but not including 'end'.

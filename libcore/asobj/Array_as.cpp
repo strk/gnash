@@ -667,15 +667,6 @@ Array_as::join(const std::string& separator) const
 
 }
 
-void
-Array_as::concat(const Array_as& other)
-{
-    for (ArrayContainer::size_type i = 0, e = other.size(); i < e; i++)
-    {
-        callMethod(NSV::PROP_PUSH, other.at(i));
-    }
-}
-
 unsigned int
 Array_as::size() const
 {
@@ -1290,23 +1281,51 @@ array_concat(const fn_call& fn)
     // use copy ctor
     Array_as* newarray = new Array_as();
 
-    for (size_t i=0, e=array->size(); i<e; i++)
-        newarray->callMethod(NSV::PROP_PUSH, array->at(i));
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
+    if (size < 0) return as_value();
 
-    for (unsigned int i=0; i<fn.nargs; i++)
-    {
+    for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
+        newarray->callMethod(NSV::PROP_PUSH, array->getMember(getKey(fn, i)));
+    }
+
+    for (size_t i = 0; i < fn.nargs; ++i) {
+
         // Array args get concatenated by elements
-        boost::intrusive_ptr<Array_as> other =
-            dynamic_cast<Array_as*>( fn.arg(i).to_object(*getGlobal(fn)));
+        // The type is checked using instanceOf.
+        const as_value& arg = fn.arg(i);
 
-        if ( other )
-        {
-            newarray->concat(*other);
+        Global_as* gl = getGlobal(fn);
+        as_object* other = arg.to_object(*gl);
+
+        if (other) {
+            
+            as_function* array =
+                as_value(fn.env().find_object("Array")).to_as_function();
+
+            // If it's not an array, we want to carry on and add it as an
+            // object.
+            if (other->instanceOf(array)) {
+                
+                // Not sure what happens if it's an array and has no length
+                // property.
+                as_value otherlength;
+                if (other->get_member(NSV::PROP_LENGTH, &otherlength)) {
+                    const int othersize = otherlength.to_int();
+                    if (othersize > 0) {
+                        for (size_t j = 0; j < othersize; ++j)
+                        {
+                            newarray->callMethod(NSV::PROP_PUSH,
+                                    other->getMember(getKey(fn, j)));
+                        }
+                    }
+                }
+                continue;
+            }
         }
-        else
-        {
-            newarray->callMethod(NSV::PROP_PUSH, fn.arg(i));
-        }
+        newarray->callMethod(NSV::PROP_PUSH, fn.arg(i));
     }
 
     return as_value(newarray);        
