@@ -369,7 +369,6 @@ private:
 
 };
 
-
 /// Initialize the global.Array object
 // needed by SWFHandlers::ActionInitArray
 void array_class_init(as_object& global, const ObjectURI& uri);

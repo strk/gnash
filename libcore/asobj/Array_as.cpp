@@ -1302,12 +1302,9 @@ array_concat(const fn_call& fn)
 
         if (other) {
             
-            as_function* array =
-                as_value(fn.env().find_object("Array")).to_as_function();
-
             // If it's not an array, we want to carry on and add it as an
             // object.
-            if (other->instanceOf(array)) {
+            if (other->instanceOf(getClassConstructor(fn, "Array"))) {
                 
                 // Not sure what happens if it's an array and has no length
                 // property.
@@ -1315,7 +1312,8 @@ array_concat(const fn_call& fn)
                 if (other->get_member(NSV::PROP_LENGTH, &otherlength)) {
                     const int othersize = otherlength.to_int();
                     if (othersize > 0) {
-                        for (size_t j = 0; j < othersize; ++j)
+                        for (size_t j = 0; j < static_cast<size_t>(othersize);
+                                ++j)
                         {
                             newarray->callMethod(NSV::PROP_PUSH,
                                     other->getMember(getKey(fn, j)));
