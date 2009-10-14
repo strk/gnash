@@ -510,8 +510,11 @@ public:
 
 	void set_bool(bool val);
 
-	void set_sprite(MovieClip& sp);
-
+    /// Set this as_value to a DisplayObject
+    //
+    /// as_value itself does not distinguish between MovieClips and other
+    /// types of DisplayObject; TextFields initially appear as type
+    /// "movieclip".
 	void setDisplayObject(DisplayObject& sp);
 
 	void set_int(int val) { set_double(val); }

@@ -952,12 +952,6 @@ as_value::toDisplayObject(bool allowUnloaded) const
 }
 
 void
-as_value::set_sprite(MovieClip& sprite)
-{
-	setDisplayObject(sprite);
-}
-
-void
 as_value::setDisplayObject(DisplayObject& sprite)
 {
 	m_type = MOVIECLIP;
