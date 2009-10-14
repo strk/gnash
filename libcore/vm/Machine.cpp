@@ -21,7 +21,6 @@
 #include "as_object.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
-#include "Array_as.h"
 #include "AbcBlock.h"
 #include "fn_call.h"
 #include "abc_function.h"
@@ -1650,7 +1649,8 @@ Machine::execute()
                 {
                     boost::uint32_t asize = mStream->read_V32();
                     boost::uint32_t i = asize;
-                    as_object* arr = new Array_as;
+
+                    as_object* arr = _global->createArray();
                     while (i--) {
                         arr->callMethod(NSV::PROP_PUSH, pop_stack());
                     }
