@@ -271,6 +271,17 @@ function_ctor(const fn_call& /*fn*/)
 }
 
 
+class PushFunctionArgs
+{
+public:
+    PushFunctionArgs(fn_call& fn) : _fn(fn) {}
+    void operator()(const as_value& val) {
+        _fn.pushArg(val);
+    }
+private:
+    fn_call& _fn;
+};
+
 as_value
 function_apply(const fn_call& fn)
 {
@@ -317,37 +328,11 @@ function_apply(const fn_call& fn)
 			boost::intrusive_ptr<as_object> arg1 = 
                 fn.arg(1).to_object(*getGlobal(fn));
 
-			if (!arg1) {
-				IF_VERBOSE_ASCODING_ERRORS(
-					log_aserror(_("Second arg of Function.apply"
-						" is %s (expected array)"
-						" - considering as call with no args"),
-						fn.arg(1));
-				);
-				goto call_it;
-			}
-
-			boost::intrusive_ptr<Array_as> arg_array = 
-					boost::dynamic_pointer_cast<Array_as>(arg1);
-
-			if ( ! arg_array )
-			{
-				IF_VERBOSE_ASCODING_ERRORS(
-					log_aserror(_("Second arg of Function.apply"
-						" is of type %s, with value %s"
-						" (expected array)"
-						" - considering as call with no args"),
-						fn.arg(1).typeOf(), fn.arg(1).to_string());
-				);
-				goto call_it;
-			}
-
-			const size_t nelems = arg_array->size();
-
-			for (size_t i = 0; i < nelems; ++i) {
-				new_fn_call.pushArg(arg_array->at(i));
-			}
-
+            if (arg1) {
+                PushFunctionArgs pa(new_fn_call);
+                foreachArray(*arg1, pa);
+            }
+            else goto call_it;
 		}
 	}
 
