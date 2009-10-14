@@ -139,7 +139,7 @@ AsBroadcaster::initialize(as_object& o)
     const as_value& asn = gl->callMethod(NSV::PROP_AS_NATIVE, 101, 12);
     o.set_member(NSV::PROP_BROADCAST_MESSAGE, asn);
 
-    o.set_member(NSV::PROP_uLISTENERS, new Array_as());
+    o.set_member(NSV::PROP_uLISTENERS, gl->createArray());
 
 }
 
@@ -256,30 +256,16 @@ asbroadcaster_addListener(const fn_call& fn)
                 "an object: %s"), (void*)fn.this_ptr, fn.dump_args(),
                 listenersValue);
         );
-        return as_value(false); // TODO: check this
+        // TODO: check this
+        return as_value(false); 
     }
 
-    boost::intrusive_ptr<as_object> listenersObj =
-        listenersValue.to_object(*getGlobal(fn));
-    assert(listenersObj);
+    as_object* listeners = listenersValue.to_object(*getGlobal(fn));
 
-    boost::intrusive_ptr<Array_as> listeners = boost::dynamic_pointer_cast<Array_as>(listenersObj);
-    if ( ! listeners )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener isn't "
-                "an array: %s -- will call 'push' on it anyway"),
-                (void*)fn.this_ptr,
-                fn.dump_args(), listenersValue);
-        );
+    // We checked is_object() above.
+    assert(listeners); 
 
-        listenersObj->callMethod(NSV::PROP_PUSH, newListener);
-
-    }
-    else
-    {
-        listeners->callMethod(NSV::PROP_PUSH, newListener);
-    }
+    listeners->callMethod(NSV::PROP_PUSH, newListener);
 
     return as_value(true);
 
