@@ -1677,6 +1677,7 @@ as_value::as_value(const amf::Element& el)
     
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
+    Global_as* gl = vm.getGlobal();
 
     switch (el.getType()) {
       case amf::Element::NOTYPE:
@@ -1786,7 +1787,9 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
 #endif
-          Array_as* obj = new Array_as;
+
+          as_object* obj = gl->createArray();
+
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
 		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
@@ -1807,9 +1810,9 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
 #endif
-          Array_as* obj = new Array_as;
+          as_object* obj = gl->createArray();
           size_t len = el.propertySize();
-          obj->resize(len);
+          obj->set_member(NSV::PROP_LENGTH, len);
 
           for (size_t i=0; i < el.propertySize(); i++) {
               const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
@@ -1920,6 +1923,8 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 		}
 	}
 
+    Global_as* gl = vm.getGlobal();
+
 	switch (amf_type)
     {
 
@@ -2005,89 +2010,89 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
 		case amf::Element::STRICT_ARRAY_AMF0:
         {
-				boost::intrusive_ptr<Array_as> array(new Array_as());
-                objRefs.push_back(array.get());
+            as_object* array = gl->createArray();
+            objRefs.push_back(array);
 
-                boost::uint32_t li = readNetworkLong(b); b += 4;
+            boost::uint32_t li = readNetworkLong(b); b += 4;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
+            log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
 #endif
-				as_value arrayElement;
-				for(size_t i = 0; i < li; ++i)
-				{
-					if ( ! amf0_read_value(b, end, arrayElement, -1,
-                                objRefs, vm) )
-					{
-						return false;
-					}
-					array->callMethod(NSV::PROP_PUSH, arrayElement);
-				}
+            as_value arrayElement;
+            for (size_t i = 0; i < li; ++i)
+            {
+                if ( ! amf0_read_value(b, end, arrayElement, -1,
+                            objRefs, vm) )
+                {
+                    return false;
+                }
+                array->callMethod(NSV::PROP_PUSH, arrayElement);
+            }
 
-				ret.set_as_object(array);
-				return true;
+            ret.set_as_object(array);
+            return true;
         }
 
 		case amf::Element::ECMA_ARRAY_AMF0:
         {
-				Array_as* obj = new Array_as(); // GC-managed...
-                objRefs.push_back(obj);
+            as_object* obj = gl->createArray();
+            objRefs.push_back(obj);
 
-                // set the value immediately, so if there's any problem parsing
-                // (like premature end of buffer) we still get something.
-				ret.set_as_object(obj);
+            // set the value immediately, so if there's any problem parsing
+            // (like premature end of buffer) we still get something.
+            ret.set_as_object(obj);
 
-                boost::uint32_t li = readNetworkLong(b); b += 4;
-                
-                log_debug("array size: %d", li);
-                
-                // the count specifies array size, so to have that even if none of the members are indexed
-                // if short, will be incremented everytime an indexed member is found
-                obj->resize(li);
+            boost::uint32_t li = readNetworkLong(b); b += 4;
+            
+            log_debug("array size: %d", li);
+            
+            // the count specifies array size, so to have that even if none of the members are indexed
+            // if short, will be incremented everytime an indexed member is found
+            obj->set_member(NSV::PROP_LENGTH, li);
 
-                // TODO: do boundary checking (if b >= end...)
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
-#endif
-				as_value objectElement;
-				string_table& st = vm.getStringTable();
-				for (;;)
-				{
-                    if ( b+2 >= end )
-                    {
-                        log_error("MALFORMED SOL: premature end of ECMA_ARRAY "
-                                "block");
-                        break;
-                    }
-					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
-
-                    // end of ECMA_ARRAY is signalled by an empty string
-                    // followed by an OBJECT_END_AMF0 (0x09) byte
-                    if ( ! strlen )
-                    {
-                        // expect an object terminator here
-                        if ( *b++ != amf::Element::OBJECT_END_AMF0 )
-                        {
-                            log_error("MALFORMED SOL: empty member name not "
-                                    "followed by OBJECT_END_AMF0 byte");
-                        }
-                        break;
-                    }
-
-					std::string name(reinterpret_cast<const char*>(b), strlen);
+            // TODO: do boundary checking (if b >= end...)
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
+            log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
 #endif
-					b += strlen;
-					if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
-					{
-						return false;
-					}
-					obj->set_member(st.find(name), objectElement);
-				}
+            as_value objectElement;
+            string_table& st = vm.getStringTable();
+            for (;;)
+            {
+                if ( b+2 >= end )
+                {
+                    log_error("MALFORMED SOL: premature end of ECMA_ARRAY "
+                            "block");
+                    break;
+                }
+                boost::uint16_t strlen = readNetworkShort(b); b+=2; 
 
-				return true;
+                // end of ECMA_ARRAY is signalled by an empty string
+                // followed by an OBJECT_END_AMF0 (0x09) byte
+                if ( ! strlen )
+                {
+                    // expect an object terminator here
+                    if ( *b++ != amf::Element::OBJECT_END_AMF0 )
+                    {
+                        log_error("MALFORMED SOL: empty member name not "
+                                "followed by OBJECT_END_AMF0 byte");
+                    }
+                    break;
+                }
+
+                std::string name(reinterpret_cast<const char*>(b), strlen);
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+                log_debug("amf0 ECMA_ARRAY prop name is %s", name);
+#endif
+                b += strlen;
+                if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
+                {
+                    return false;
+                }
+                obj->set_member(st.find(name), objectElement);
+            }
+
+            return true;
         }
 
 		case amf::Element::OBJECT_AMF0:
@@ -2184,7 +2189,6 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			log_debug("amf0 read date: %e", dub);
 #endif
 
-            Global_as* gl = vm.getGlobal();
             as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
             if (ctor) {
                 fn_call::Args args;
