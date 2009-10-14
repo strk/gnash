@@ -255,22 +255,24 @@ inline bool abstractEquality(const as_value& a, const as_value& b,
     else return a.equals(b);
 }								
 
+/// NB: the stubbed but unimplemented as_value::conforms_to no longer exists,
+/// but the code is left here for later reference.
 #define ABSTRACT_TYPELATE(st, checkval, matchval)							\
 {																			\
 	bool *store = &st;														\
-	as_value &a = checkval; /* Don't call checkval multiple times */		\
+	/*as_value &a = checkval;  Don't call checkval multiple times */		\
 	as_value &b = matchval; /* Don't call matchval multiple times */		\
 	*store = true;															\
 	if (b.is_object())														\
 	{																		\
 		as_value v;															\
 		b.to_object(*_global)->get_member(NSV::INTERNAL_TYPE, &v);					\
-		if (!a.conforms_to(mST.find(v.to_string())))						\
+		if (true) /*(!a.conforms_to(mST.find(v.to_string()))) */	\
 			*store = false;													\
 	}																		\
 	else if (b.is_string())													\
 	{																		\
-		if (!a.conforms_to(mST.find(b.to_string())))						\
+		if (true) /*(!a.conforms_to(mST.find(b.to_string())))	*/   	    \
 			*store = false;													\
 	}																		\
 	else																	\
@@ -2687,8 +2689,8 @@ Machine::execute()
                 {
                     asName a = pool_name(mStream->read_V32(), mPoolObject);
                     _stack.drop(completeName(a));
-                    // TODO: Namespace stuff?
-                    _stack.top(0).set_bool(_stack.top(0).conforms_to(a.getABCName()));
+                    // TODO: Implement it.
+                    //_stack.top(0).set_bool(_stack.top(0).conforms_to(a.getABCName()));
                 }
 
                 /// 0xB3 ABC_ACTION_ISTYPELATE
