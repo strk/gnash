@@ -54,8 +54,6 @@ struct ContainerFiller {
 	void visit(as_value& v) { cont.push_back(v); }
 };
 
-struct blank {};
-
 /// The Array ActionScript object
 class Array_as : public as_object
 {
