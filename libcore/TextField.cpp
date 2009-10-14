@@ -88,6 +88,8 @@ namespace {
     void attachPrototypeProperties(as_object& proto);
     void attachTextFieldStaticMembers(as_object& o);
 
+    as_value textfield_createTextField(const fn_call& fn);
+
     as_value textfield_variable(const fn_call& fn);
     as_value textfield_setTextFormat(const fn_call& fn);
     as_value textfield_getTextFormat(const fn_call& fn);
@@ -2362,6 +2364,8 @@ registerTextFieldNative(as_object& global)
     vm.registerNative(textfield_setNewTextFormat, 104, 105);
     vm.registerNative(textfield_getDepth, 104, 106);
     vm.registerNative(textfield_replaceText, 104, 107);
+
+    vm.registerNative(textfield_createTextField, 104, 200);
     vm.registerNative(textfield_getFontList, 104, 201);
 }
 
@@ -2862,6 +2866,69 @@ attachPrototypeProperties(as_object& o)
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
+
+/// This is in fact a property of MovieClip, but it is more a TextField
+/// function, as its major number (104) in the native table shows.
+//
+as_value
+textfield_createTextField(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+    
+    // name, depth, x, y, width, height
+    if (fn.nargs < 6) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField called with %d args, "
+            "expected 6 - returning undefined"), fn.nargs);
+        );
+        return as_value();
+    }
+
+    const std::string& name = fn.arg(0).to_string();
+    int depth = fn.arg(1).to_int();
+    int x = fn.arg(2).to_int();
+    int y = fn.arg(3).to_int();
+    int width = fn.arg(4).to_int();
+
+    if (width < 0) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField: negative width (%d)"
+            " - reverting sign"), width);
+        );
+        width = -width;
+    }
+
+    int height = fn.arg(5).to_int();
+    if ( height < 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField: negative height (%d)"
+            " - reverting sign"), height);
+        );
+        height = -height;
+    }
+    // Set textfield bounds
+    SWFRect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
+
+    // Create an instance
+    DisplayObject* tf = new TextField(ptr.get(), bounds);
+
+    // Give name and mark as dynamic
+    tf->set_name(name);
+    tf->setDynamic();
+
+    // Set _x and _y
+    SWFMatrix matrix;
+    matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
+    // update caches (although shouldn't be needed as we only set translation)
+    tf->setMatrix(matrix, true); 
+
+    DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
+
+    // createTextField returns void, it seems
+    if (getSWFVersion(fn) > 7) return as_value(txt);
+    return as_value(); 
+}
 
 as_value
 textfield_background(const fn_call& fn)

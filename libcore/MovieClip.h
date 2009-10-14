@@ -318,10 +318,8 @@ public:
     ///
     DisplayObject* getDisplayObjectAtDepth(int depth);
 
-    DisplayObject* add_empty_movieclip(const std::string& name, int depth);
-
-    boost::intrusive_ptr<DisplayObject> add_textfield(const std::string& name,
-            int depth, int x, int y, float width, float height);
+    /// Attach a DisplayObject at the specified depth.
+    DisplayObject* addDisplayListObject(DisplayObject* obj, int depth);
 
     /// Place a DisplayObject or mask to the DisplayList.
     //
