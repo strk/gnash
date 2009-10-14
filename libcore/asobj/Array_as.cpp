@@ -47,6 +47,19 @@ namespace gnash {
 
 typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
+namespace {
+
+    string_table::key getKey(const fn_call& fn, size_t i) {
+        string_table& st = getStringTable(fn);
+        std::ostringstream os;
+        os << i;
+        return st.find(os.str());
+    }
+
+
+}
+
+
 static as_object* getArrayInterface();
 static void attachArrayProperties(as_object& proto);
 static void attachArrayInterface(as_object& proto);
@@ -1162,11 +1175,9 @@ array_push(const fn_call& fn)
 static as_value
 array_unshift(const fn_call& fn)
 {
+
     as_object* array = ensureType<as_object>(fn.this_ptr);
  
-    //for (int i=fn.nargs-1; i>=0; i--) array->unshift(fn.arg(i));
-    //return as_value();
-
     if (!fn.nargs) return as_value();
 
     const size_t shift = fn.nargs;
@@ -1175,28 +1186,25 @@ array_unshift(const fn_call& fn)
     if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
     
     const double size = length.to_number();
-    if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
+    if (!isFinite(size) || isNaN(size) || size < 0) return as_value();
 
     string_table& st = getStringTable(fn);
     as_value ret = array->getMember(st.find("0"));
     
-    array->set_member(NSV::PROP_LENGTH, size + shift);
-
     for (size_t i = size + shift - 1; i >= shift ; --i) {
-        std::ostringstream current, next;
-        next << (i - shift);
-        current << i;
-        const string_table::key nextkey = st.find(next.str());
-        const string_table::key currentkey = st.find(current.str());
+        const string_table::key nextkey = getKey(fn, i - shift);
+        const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
         array->set_member(currentkey, array->getMember(nextkey));
     }
 
     for (size_t i = shift; i > 0; --i) {
-        std::ostringstream current;
-        current << (i - 1);
-        array->set_member(st.find(current.str()), fn.arg(i - 1));
+        const size_t index = i - 1;
+        array->set_member(getKey(fn, index), fn.arg(index));
     }
+ 
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size + shift);
 
     return as_value(size + shift);
 }
@@ -1205,16 +1213,23 @@ array_unshift(const fn_call& fn)
 static as_value
 array_pop(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
-    // Get our index, log, then return result
-    as_value rv = array->pop();
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    IF_VERBOSE_ACTION (
-    log_action(_("calling array pop, result:%s, new array size:%d"),
-        rv, array->size());
-    );
-        return rv;
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const double size = length.to_number();
+    if (!isFinite(size) || isNaN(size) || size < 1) return as_value();
+
+    const string_table::key ind = getKey(fn, size - 1);
+    as_value ret = array->getMember(ind);
+    array->delProperty(ind);
+    
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size - 1);
+
+    return ret;
 }
 
 // Callback to pop a value from the front of an array
@@ -1229,20 +1244,18 @@ array_shift(const fn_call& fn)
     const double size = length.to_number();
     if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
 
-    string_table& st = getStringTable(fn);
-    as_value ret = array->getMember(st.find("0"));
+    as_value ret = array->getMember(getKey(fn, 0));
 
     for (size_t i = 0; i < size - 1; ++i) {
-        std::ostringstream current, next;
-        next << (i + 1);
-        current << i;
-        const string_table::key nextkey = st.find(next.str());
-        const string_table::key currentkey = st.find(current.str());
+        const string_table::key nextkey = getKey(fn, i + 1);
+        const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
         array->set_member(currentkey, array->getMember(nextkey));
     }
-
+    
+    // TODO: this is wrong, but Gnash relies on it.
     array->set_member(NSV::PROP_LENGTH, size - 1);
+
     return ret;
 }
 
