@@ -698,12 +698,11 @@ Array_as::slice(unsigned int start, unsigned int one_past_end)
 #endif
 
     size_t newsize = one_past_end - start;
-    newarray->elements.resize(newsize);
 
     // maybe there's a standard algorithm for this ?
     for (unsigned int i=start; i<one_past_end; ++i)
     {
-        newarray->elements[i-start] = elements[i];
+        newarray->callMethod(NSV::PROP_PUSH, elements[i]);
     }
 
     return newarray;
