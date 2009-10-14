@@ -304,6 +304,7 @@ textformat_tabStops(const fn_call& fn)
 	}
 	
     as_object* arg = fn.arg(0).to_object(*getGlobal(fn));
+    if (!arg) return as_value();
 
 	std::vector<int> tabStops;
 
