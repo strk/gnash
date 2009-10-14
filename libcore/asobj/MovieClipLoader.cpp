@@ -39,7 +39,6 @@
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
-#include "Array_as.h" // for _listeners construction
 #include "ExecutableCode.h"
 
 #include <string>
