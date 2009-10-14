@@ -1250,31 +1250,9 @@ array_reverse(const fn_call& fn)
     return rv;
 }
 
-// Callback to convert array to a string with optional custom separator (default ',')
-static as_value
-array_join(const fn_call& fn)
+as_value
+join(as_object* array, const std::string& separator)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
-
-    std::string separator = ",";
-    int version = getSWFVersion(fn);
-
-    if (fn.nargs > 0)
-    {
-        separator = fn.arg(0).to_string_versioned(version);
-    }
-
-    std::string ret = array->join(separator);
-
-    return as_value(ret);
-}
-
-// Callback to convert array to a string
-static as_value
-array_toString(const fn_call& fn)
-{
-    boost::intrusive_ptr<as_object> array = ensureType<as_object>(fn.this_ptr);
-
     as_value length;
     if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
 
@@ -1283,19 +1261,38 @@ array_toString(const fn_call& fn)
 
     std::string s;
 
-    string_table& st = getStringTable(fn);
-    const int version = getSWFVersion(fn);
+    string_table& st = getStringTable(*array);
+    const int version = getSWFVersion(*array);
 
     for (size_t i = 0; i < size; ++i) {
         std::ostringstream os;
         os << i;
-        if (i) s +=",";
+        if (i) s += separator;
         as_value el;
         array->get_member(st.find(os.str()), &el);
         s += el.to_string_versioned(version);
     }
-
     return as_value(s);
+}
+
+static as_value
+array_join(const fn_call& fn)
+{
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+
+    const int version = getSWFVersion(fn);
+    const std::string separator =
+        fn.nargs ? fn.arg(0).to_string_versioned(version) : ",";
+
+    return join(array, separator);
+}
+
+// Callback to convert array to a string
+static as_value
+array_toString(const fn_call& fn)
+{
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+    return join(array, ",");
 }
 
 /// concatenates the elements specified in the parameters with
