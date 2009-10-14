@@ -715,20 +715,6 @@ Array_as::slice(unsigned int start, unsigned int one_past_end)
 
 }
 
-bool
-Array_as::removeFirst(const as_value& v)
-{
-    for (iterator it = elements.begin(), e = elements.end(); it != e; ++it)
-    {
-        if ( v.equals(*it) )
-        {
-            splice(it.index(), 1);
-            return true;
-        }
-    }
-    return false;
-}
-
 /* virtual public, overriding as_object::get_member */
 bool
 Array_as::get_member(string_table::key name, as_value *val,

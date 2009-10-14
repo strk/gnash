@@ -359,10 +359,24 @@ asbroadcaster_removeListener(const fn_call& fn)
         // Remove the first listener matching the new value
         // See http://www.senocular.com/flash/tutorials/
         // listenersasbroadcaster/?page=2
-        // TODO: make this call as a normal (don't want to
-        // rely on _listeners type at all)
-        bool removed = listeners->removeFirst(listenerToRemove);
-        return as_value(removed);
+        
+        // This is an ActionScript-like implementation, which is why it looks
+        // like poor C++.
+        int length = listenersObj->getMember(NSV::PROP_LENGTH).to_int();
+        int i = 0;
+        string_table& st = getStringTable(fn);
+        while (i < length) {
+            std::ostringstream s;
+            s << i;
+            as_value el =
+                listenersObj->getMember(st.find(s.str()));
+            if (el.equals(listenerToRemove)) {
+                listeners->callMethod(NSV::PROP_SPLICE, s.str(), 1);
+                return as_value(true);
+            }
+            ++i;
+        }
+        return as_value(false);
     }
 
 }

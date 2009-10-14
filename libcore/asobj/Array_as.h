@@ -175,21 +175,6 @@ public:
 	boost::intrusive_ptr<Array_as> slice(
 		unsigned int start, unsigned int one_past_end);
 
-	/// Remove first element matching the given value
-	//
-	/// Return true if any element was removed, false otherwise
-	///
-	/// NOTE: if an element is removed, holes in the array will be
-	///       filled.
-	///
-	/// @param v
-	///	The value to compare elements against
-	///
-	/// @param env
-	///	The environment to use when comparing (needed by as_value::equals)
-	///
-	bool removeFirst(const as_value& v);
-
 	/// \brief
 	/// Replace count elements from start with given values, optionally
 	/// returning the erased ones.
