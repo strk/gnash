@@ -673,35 +673,6 @@ Array_as::reverse()
     elements = newelements;
 }
 
-std::string
-Array_as::join(const std::string& separator) const
-{
-    // TODO - confirm this is the right format!
-    // Reportedly, flash version 7 on linux, and Flash 8 on IE look like
-    // "(1,2,3)" and "1,2,3" respectively - which should we mimic?
-    // Using no parentheses until confirmed for sure
-    //
-    // We should change output based on SWF version --strk 2006-04-28
-
-    std::string temp;
-
-    const ArrayContainer::size_type s = elements.size();
-
-    if ( s ) 
-    {
-        int swfversion = getSWFVersion(*this);
-
-        for (size_t i = 0; i < s; ++i)
-        {
-            if ( i ) temp += separator;
-            temp += elements[i].to_string_versioned(swfversion);
-        }
-    }
-
-    return temp;
-
-}
-
 unsigned int
 Array_as::size() const
 {

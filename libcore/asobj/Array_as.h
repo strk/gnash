@@ -140,10 +140,6 @@ public:
 
 	void reverse();
 
-	/// @param separator
-    ///     String to use as separator between elements
-	std::string join(const std::string& separator) const;
-
 	unsigned int size() const;
 
 	void resize(unsigned int);
