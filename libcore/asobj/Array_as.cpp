@@ -796,20 +796,6 @@ Array_as::resize(unsigned int newsize)
     elements.resize(newsize);
 }
 
-void
-Array_as::set_indexed(unsigned int index,
-    const as_value& val)
-{
-    if (index >= elements.size())
-    {
-        // make sure the vector is large enough.
-        elements.resize(index + 1);
-    }
-
-    elements[index] = val;
-    return;
-}
-
 /* virtual public, overriding as_object::set_member */
 bool
 Array_as::set_member(string_table::key name,

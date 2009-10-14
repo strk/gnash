@@ -1649,12 +1649,10 @@ Machine::execute()
                 case SWF::ABC_ACTION_NEWARRAY:
                 {
                     boost::uint32_t asize = mStream->read_V32();
-                    log_abc("Creating array of size %u",asize);
-                    Array_as *arr = new Array_as;
-                    arr->resize(asize);
                     boost::uint32_t i = asize;
+                    as_object* arr = new Array_as;
                     while (i--) {
-                        arr->set_indexed(i, pop_stack());
+                        arr->callMethod(NSV::PROP_PUSH, pop_stack());
                     }
                     push_stack(as_value(arr));
                     break;

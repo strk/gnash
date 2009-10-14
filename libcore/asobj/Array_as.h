@@ -143,8 +143,6 @@ public:
 
 	void reverse();
 
-	void set_indexed(unsigned int index, const as_value &v);
-
 	/// @param separator
     ///     String to use as separator between elements
 	std::string join(const std::string& separator) const;
