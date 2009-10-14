@@ -169,7 +169,7 @@ object_ctor(const fn_call& fn)
     Global_as* gl = getGlobal(fn);
 
 	if (fn.nargs == 1) {
-        as_object* obj = fn.arg(0).to_object(*gl).get();
+        as_object* obj = fn.arg(0).to_object(*gl);
         if (obj) return as_value(obj);
 	}
 

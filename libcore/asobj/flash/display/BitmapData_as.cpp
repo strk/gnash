@@ -356,7 +356,7 @@ bitmapdata_fillRect(const fn_call& fn)
     }
 
     // This can be any object with the right properties.   
-    as_object* obj = arg.to_object(*getGlobal(fn)).get();
+    as_object* obj = arg.to_object(*getGlobal(fn));
     assert(obj);
     
     as_value x, y, w, h;
@@ -653,7 +653,7 @@ get_flash_display_bitmap_data_constructor(const fn_call& fn)
 as_value
 bitmapdata_ctor(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
+    as_object* ptr = ensureType<as_object>(fn.this_ptr);
 	if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
              log_aserror("BitmapData constructor requires at least two "

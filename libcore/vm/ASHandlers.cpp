@@ -3961,7 +3961,7 @@ convertToObject(Global_as& gl, const as_value& val)
 {
 
     try {
-        return val.to_object(gl).get();
+        return val.to_object(gl);
     }
     catch (const GnashException& gl) {
         return 0;

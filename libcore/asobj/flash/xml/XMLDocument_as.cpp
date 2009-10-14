@@ -585,7 +585,7 @@ attachXMLProperties(as_object& o)
     o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
     o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 
-    as_object* proto = o.get_prototype().get();
+    as_object* proto = o.get_prototype();
     if (!proto) return;
     proto->init_property("loaded", xml_loaded, xml_loaded);
     proto->init_property("status", xml_status, xml_status);
@@ -651,7 +651,7 @@ xml_new(const fn_call& fn)
 
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
-            as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+            as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
             xml_obj = dynamic_cast<XMLDocument_as*>(obj);
 
             if (xml_obj) {

@@ -1580,7 +1580,7 @@ netstream_new(const fn_call& fn)
     if (fn.nargs) {
 
         NetConnection_as* nc;
-        if (isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), nc)) {
+        if (isNativeType(fn.arg(0).to_object(*getGlobal(fn)), nc)) {
             ns->setNetCon(nc);
         }
         else {

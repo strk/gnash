@@ -379,8 +379,7 @@ as_value::to_string() const
 		case AS_FUNCTION:
 		case OBJECT:
 		{
-            as_object* obj = m_type == AS_FUNCTION ? getFun().get() :
-                                                     getObj().get();
+            as_object* obj = m_type == AS_FUNCTION ? getFun() : getObj();
             String_as* s;
             if (isNativeType(obj, s)) return s->value();
 
@@ -469,7 +468,7 @@ as_value::to_primitive() const
 
 	if (m_type == OBJECT && swfVersion > 5) {
         Date_as* d;
-        if (isNativeType(getObj().get(), d)) hint = STRING;
+        if (isNativeType(getObj(), d)) hint = STRING;
     }
 
 	return to_primitive(hint);
@@ -485,7 +484,7 @@ as_value::convert_to_primitive()
 
 	if (m_type == OBJECT && swfVersion > 5) {
         Date_as* d;
-        if (isNativeType<Date_as>(getObj().get(), d)) hint = STRING;
+        if (isNativeType<Date_as>(getObj(), d)) hint = STRING;
     }
 
     *this = to_primitive(hint);
@@ -515,8 +514,8 @@ as_value::to_primitive(AsType hint) const
 			return as_value(NaN);
 		}
 #endif
-		if ( m_type == OBJECT ) obj = getObj().get();
-		else obj = getFun().get();
+		if ( m_type == OBJECT ) obj = getObj();
+		else obj = getFun();
 
 		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function())) 
 		{
@@ -539,8 +538,8 @@ as_value::to_primitive(AsType hint) const
 			return as_value(getCharacterProxy().getTarget());
 		}
 
-		if ( m_type == OBJECT ) obj = getObj().get();
-		else obj = getFun().get();
+		if ( m_type == OBJECT ) obj = getObj();
+		else obj = getFun();
 
 		// @@ Moock says, "the value that results from
 		// calling toString() on the object".
@@ -902,21 +901,19 @@ as_value::to_bool() const
 }
 	
 // Return value as an object.
-boost::intrusive_ptr<as_object>
+as_object*
 as_value::to_object(Global_as& global) const
 {
-	typedef boost::intrusive_ptr<as_object> ptr;
-
 	switch (m_type)
 	{
 		case OBJECT:
 			return getObj();
 
 		case AS_FUNCTION:
-			return getFun().get();
+			return getFun();
 
 		case MOVIECLIP:
-			return ptr(toDisplayObject());
+			return toDisplayObject();
 
 		case STRING:
 			return global.createString(getStr());
@@ -965,7 +962,7 @@ as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
 	    // OK.
-	    return getFun().get();
+	    return getFun();
     }
 
     return NULL;
@@ -993,10 +990,10 @@ as_value::set_as_object(as_object* obj)
 		set_null();
 		return;
 	}
-	DisplayObject* sp = obj->toDisplayObject();
-	if ( sp )
-	{
-		setDisplayObject(*sp);
+    if (obj->displayObject()) {
+        // The static cast is fine as long as the as_object is genuinely
+        // a DisplayObject.
+		setDisplayObject(static_cast<DisplayObject&>(*obj));
 		return;
 	}
 	as_function* func = obj->to_function();
@@ -1021,7 +1018,7 @@ as_value::set_as_object(boost::intrusive_ptr<as_object> obj)
 void
 as_value::set_as_function(as_function* func)
 {
-    if (m_type != AS_FUNCTION || getFun().get() != func)
+    if (m_type != AS_FUNCTION || getFun() != func)
     {
 	m_type = AS_FUNCTION;
 	if (func)
@@ -1081,7 +1078,7 @@ as_value::equals(const as_value& v) const
     /// Compare to same type
     if ( obj_or_func && v_obj_or_func )
     {
-        return boost::get<AsObjPtr>(_value) == boost::get<AsObjPtr>(v._value); 
+        return boost::get<ObjPtr>(_value) == boost::get<ObjPtr>(v._value); 
     }
 
     if ( m_type == v.m_type ) return equalsSameType(v);
@@ -1367,13 +1364,13 @@ as_value::toDebugString() const
             return ret.str();
 		case OBJECT:
 		{
-			as_object* obj = getObj().get();
+			as_object* obj = getObj();
 			ret = boost::format("[object(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
 			return ret.str();
 		}
 		case AS_FUNCTION:
 		{
-			as_function* obj = getFun().get();
+			as_function* obj = getFun();
 			ret = boost::format("[function(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
 			return ret.str();
 		}
@@ -1560,14 +1557,14 @@ as_value::setReachable() const
 	{
 		case OBJECT:
 		{
-			as_value::AsObjPtr op = getObj();
+			as_object* op = getObj();
 			if (op)
 				op->setReachable();
 			break;
 		}
 		case AS_FUNCTION:
 		{
-			as_value::AsFunPtr fp = getFun();
+			as_function* fp = getFun();
 			if (fp)
 				fp->setReachable();
 			break;
@@ -1583,18 +1580,18 @@ as_value::setReachable() const
 #endif // GNASH_USE_GC
 }
 
-as_value::AsFunPtr
+as_function*
 as_value::getFun() const
 {
 	assert(m_type == AS_FUNCTION);
-	return boost::get<AsObjPtr>(_value)->to_function();
+	return boost::get<ObjPtr>(_value)->to_function();
 }
 
-as_value::AsObjPtr
+as_object*
 as_value::getObj() const
 {
 	assert(m_type == OBJECT);
-	return boost::get<AsObjPtr>(_value);
+	return boost::get<ObjPtr>(_value).get();
 }
 
 CharacterProxy
@@ -1608,15 +1605,6 @@ as_value::CharacterPtr
 as_value::getCharacter(bool allowUnloaded) const
 {
 	return getCharacterProxy().get(allowUnloaded);
-}
-
-as_value::SpritePtr
-as_value::getSprite(bool allowUnloaded) const
-{
-	assert(m_type == MOVIECLIP);
-	DisplayObject* ch = getCharacter(allowUnloaded);
-	if ( ! ch ) return 0;
-	return ch->to_movie();
 }
 
 void
@@ -2266,7 +2254,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
         case OBJECT:
         {
-            as_object* obj = to_object(*vm.getGlobal()).get();
+            as_object* obj = to_object(*vm.getGlobal());
             assert(obj);
             OffsetTable::iterator it = offsetTable.find(obj);
             if (it == offsetTable.end()) {

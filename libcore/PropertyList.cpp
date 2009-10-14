@@ -65,7 +65,7 @@ PropertyList::operator=(const PropertyList& pl)
 // something in namespace 0.
 static inline
 PropertyList::container::iterator
-iterator_find(PropertyList::container &p, string_table::key name,
+iterator_find(const PropertyList::container &p, string_table::key name,
 	string_table::key nsId)
 {
 	if (nsId)
@@ -251,13 +251,10 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 }
 
 Property*
-PropertyList::getProperty(string_table::key key, string_table::key nsId)
+PropertyList::getProperty(string_table::key key, string_table::key nsId) const
 {
 	container::iterator found = iterator_find(_props, key, nsId);
-	if (found == _props.end())
-	{
-		return NULL;
-	}
+	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(*found));
 }
 

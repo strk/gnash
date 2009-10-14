@@ -345,7 +345,7 @@ transform_ctor(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> mc =
         ensureType<MovieClip>(fn.arg(0).to_object(*getGlobal(fn)));
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
     obj->setRelay(new Transform_as(*mc));
 
     return as_value(); 

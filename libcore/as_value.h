@@ -435,7 +435,7 @@ public:
     /// @param global   The global object object for the conversion. This
     ///                 contains the prototypes or constructors necessary for
     ///                 conversion.
-	boost::intrusive_ptr<as_object> to_object(Global_as& global) const;
+	as_object* to_object(Global_as& global) const;
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
@@ -609,11 +609,10 @@ private:
 
 	AsType m_type;
 
-	typedef MovieClip* SpritePtr;
 	typedef DisplayObject* CharacterPtr;
-	typedef boost::intrusive_ptr<as_function> AsFunPtr;
-	typedef boost::intrusive_ptr<as_object> AsObjPtr;
 	
+    typedef boost::intrusive_ptr<as_object> ObjPtr;
+
 	/// AsValueType handles the following AS types:
 	//
 	/// 1. undefined / null
@@ -623,24 +622,17 @@ private:
 	/// 5. MovieClip
 	/// 6. String
     typedef boost::variant<boost::blank, double,
-            bool, AsObjPtr, CharacterProxy,	std::string> AsValueType;
+            bool, ObjPtr, CharacterProxy, std::string> AsValueType;
     
     AsValueType _value;
 
-
 	/// Get the function pointer variant member (we assume m_type == FUNCTION)
-	AsFunPtr getFun() const;
+	as_function* getFun() const;
 
 	/// Get the object pointer variant member (we assume m_type == OBJECT)
-	AsObjPtr getObj() const;
+	as_object* getObj() const;
 
-	/// Get the sprite pointer variant member (we assume m_type == MOVIECLIP)
-	//
-	/// NOTE: this is possibly NULL !
-	///
-	SpritePtr getSprite(bool skipRebinding=false) const;
-
-	/// Get the DisplayObject pointer variant member (we assume m_type == MOVIECLIP)
+	/// Get the DisplayObject variant member (we assume m_type == MOVIECLIP)
 	//
 	/// NOTE: this is possibly NULL !
 	///

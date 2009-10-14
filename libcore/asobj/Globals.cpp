@@ -1025,7 +1025,7 @@ global_assetnative(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    as_object* targetObject = fn.arg(0).to_object(*gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1096,7 +1096,7 @@ global_assetnativeaccessor(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    as_object* targetObject = fn.arg(0).to_object(*gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1171,7 +1171,7 @@ global_updateAfterEvent(const fn_call& /*fn*/)
 as_value
 local_errorConstructor(const fn_call& fn)
 {
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
     const as_value& arg = fn.nargs ? fn.arg(0) : as_value();
     string_table& st = getStringTable(fn);
     obj->set_member(st.find("message"), arg);

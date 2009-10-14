@@ -620,7 +620,7 @@ movieclip_attachAudio(const fn_call& fn)
     }
 
     NetStream_as* ns;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), ns))
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), ns))
     { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
@@ -2372,7 +2372,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
     BitmapData_as* bd;
 
     if (!isNativeType(obj, bd)) {

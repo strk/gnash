@@ -120,7 +120,7 @@ AsBroadcaster::initialize(as_object& o)
 
     // Find _global.AsBroadcaster.
     as_object* asb =
-        gl->getMember(NSV::CLASS_AS_BROADCASTER).to_object(*gl).get();
+        gl->getMember(NSV::CLASS_AS_BROADCASTER).to_object(*gl);
 
     // If it's not an object, these are left undefined, but they are
     // always attached to the initialized object.
@@ -401,8 +401,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     }
 
     boost::intrusive_ptr<Array_as> listeners =
-        boost::dynamic_pointer_cast<Array_as>(
-                listenersValue.to_object(*getGlobal(fn)));
+        dynamic_cast<Array_as*>(listenersValue.to_object(*getGlobal(fn)));
 
     if ( ! listeners )
     {

@@ -256,13 +256,8 @@ TextField::init()
 {
 
     as_object* proto = getTextFieldInterface(getVM(*this));
- 
-    // This is an instantiation, so attach properties to the
-    // prototype.
-    // TODO: is it correct to do it here, or can some TextFields
-    // be constructed without attaching these?
     attachPrototypeProperties(*proto);
-
+ 
     set_prototype(proto);
 
     Array_as* ar = new Array_as();
@@ -2869,7 +2864,6 @@ attachPrototypeProperties(as_object& o)
 
 /// This is in fact a property of MovieClip, but it is more a TextField
 /// function, as its major number (104) in the native table shows.
-//
 as_value
 textfield_createTextField(const fn_call& fn)
 {
@@ -3345,7 +3339,7 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     TextFormat_as* tf;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), tf)) {
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), tf)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);

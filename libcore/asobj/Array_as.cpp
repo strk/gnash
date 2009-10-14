@@ -1315,8 +1315,8 @@ array_concat(const fn_call& fn)
     {
         // Array args get concatenated by elements
         boost::intrusive_ptr<Array_as> other =
-            boost::dynamic_pointer_cast<Array_as>(
-                    fn.arg(i).to_object(*getGlobal(fn)));
+            dynamic_cast<Array_as*>( fn.arg(i).to_object(*getGlobal(fn)));
+
         if ( other )
         {
             newarray->concat(*other);

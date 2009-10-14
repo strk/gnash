@@ -107,7 +107,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
             /// Read in our custom headers if they exist and are an
             /// array.
             Array_as* array = dynamic_cast<Array_as*>(
-                            customHeaders.to_object(*getGlobal(target)).get());
+                            customHeaders.to_object(*getGlobal(target)));
                             
             if (array)
             {
@@ -342,7 +342,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 
     if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object(*getGlobal(fn)).get();
+        array = customHeaders.to_object(*getGlobal(fn));
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
