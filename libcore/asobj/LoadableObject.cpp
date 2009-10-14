@@ -46,6 +46,71 @@ namespace {
     as_value loadableobject_sendAndLoad(const fn_call& fn);
 }
 
+/// Functors for use with foreachArray
+namespace {
+
+class WriteHeaders
+{
+public:
+
+    WriteHeaders(NetworkAdapter::RequestHeaders& headers)
+        :
+        _headers(headers),
+        _i(0)
+    {}
+
+    void operator()(const as_value& val)
+    {
+        // Store even elements and continue
+        if (!(_i++ % 2)) {
+            _key = val;
+            return;
+        }
+
+        // Both elements apparently must be strings, or we move onto the 
+        // next pair.
+        if (!val.is_string() || !_key.is_string()) return;
+        _headers[_key.to_string()] = val.to_string();
+    }
+
+private:
+    as_value _key;
+    NetworkAdapter::RequestHeaders _headers;
+    size_t _i;
+};
+
+class GetHeaders
+{
+public:
+
+    GetHeaders(as_object& target)
+        :
+        _target(target),
+        _i(0)
+    {}
+
+    void operator()(const as_value& val)
+    {
+        // Store even elements and continue
+        if (!(_i++ % 2)) {
+            _key = val;
+            return;
+        }
+
+        // Both elements apparently must be strings, or we move onto the 
+        // next pair.
+        if (!val.is_string() || !_key.is_string()) return;
+        _target.callMethod(NSV::PROP_PUSH, _key, val);
+    }
+
+private:
+    as_value _key;
+    as_object& _target;
+    size_t _i;
+};
+
+}
+
 LoadableObject::LoadableObject(as_object* owner)
     :
     ActiveRelay(owner),
@@ -95,8 +160,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     URL url(urlstr, ri.baseURL());
 
     std::auto_ptr<IOChannel> str;
-    if (post)
-    {
+    if (post) {
         as_value customHeaders;
 
         NetworkAdapter::RequestHeaders headers;
@@ -106,33 +170,10 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
             /// Read in our custom headers if they exist and are an
             /// array.
-            Array_as* array = dynamic_cast<Array_as*>(
-                            customHeaders.to_object(*getGlobal(target)));
-                            
-            if (array)
-            {
-                Array_as::const_iterator e = array->end();
-                --e;
-
-                for (Array_as::const_iterator i = array->begin(); i != e; ++i)
-                {
-                    // Only even indices can be a header.
-                    if (i.index() % 2) continue;
-                    if (! (*i).is_string()) continue;
-                    
-                    // Only the immediately following odd number can be 
-                    // a value.
-                    if (array->at(i.index() + 1).is_string())
-                    {
-                        const std::string& name = (*i).to_string();
-                        const std::string& val =
-                                    array->at(i.index() + 1).to_string();
-                                    
-                        // Values should overwrite existing ones.
-                        headers[name] = val;
-                    }
-                    
-                }
+            as_object* array = customHeaders.to_object(*getGlobal(target));
+            if (array) {
+                WriteHeaders wh(headers);
+                foreachArray(*array, wh);
             }
         }
 
@@ -331,35 +372,6 @@ LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
     return bytesTotal;
 }
 
-class GetHeaders
-{
-public:
-
-    GetHeaders(as_object& target)
-        :
-        _target(target),
-        _i(0)
-    {}
-
-    void operator()(const as_value& val)
-    {
-        // Store even elements and continue
-        if (!(_i++ % 2)) {
-            _key = val;
-            return;
-        }
-
-        // Both elements apparently must be strings, or we move onto the 
-        // next pair.
-        if (!val.is_string() || !_key.is_string()) return;
-        _target.callMethod(NSV::PROP_PUSH, _key, val);
-    }
-
-private:
-    as_value _key;
-    as_object& _target;
-    size_t _i;
-};
 
 /// Can take either a two strings as arguments or an array of strings,
 /// alternately header and value.
@@ -403,21 +415,17 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     
     if (fn.nargs == 1)
     {
-        // This must be an array. Keys / values are pushed in valid
-        // pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> obj =
-            fn.arg(0).to_object(*gl);
-        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
+        // This must be an array (or something like it). Keys / values are
+        // pushed in valid pairs to the _customHeaders array.    
+        boost::intrusive_ptr<as_object> headerArray = fn.arg(0).to_object(*gl);
 
-        if (!headerArray)
-        {
+        if (!headerArray) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("XML.addRequestHeader: single argument "
                                 "is not an array"));
             );
             return as_value();
         }
-
 
         GetHeaders gh(*array);
         foreachArray(*headerArray, gh);
