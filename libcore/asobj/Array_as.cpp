@@ -62,6 +62,46 @@ string_table::key getKey(const fn_call& fn, size_t i) {
     return arrayKey(st, i);
 }
 
+template<typename T>
+bool foreachArray(as_object& array, int start, int end, T& pred)
+{
+    as_value length;
+    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
+    
+    const int size = length.to_int();
+    if (size < 0) return false;
+
+    if (start < 0) start = size + start;
+    if (start >= size) return false;
+    start = std::max(start, 0);
+
+    if (end < 0) end = size + end;
+    end = std::max(start, end);
+    end = std::min<size_t>(end, size);
+
+    assert(start >= 0);
+    assert(end >= start);
+    assert(size >= end);
+
+    string_table& st = getStringTable(array);
+
+    for (size_t i = start; i < static_cast<size_t>(end); ++i) {
+        pred(array.getMember(arrayKey(st, i)));
+    }
+    return true;
+}
+
+class PushToArray
+{
+public:
+    PushToArray(as_object& obj) : _obj(obj) {}
+    void operator()(const as_value& val) {
+        _obj.callMethod(NSV::PROP_PUSH, val);
+    }
+private:
+    as_object& _obj;
+};
+
 }
 
 static as_object* getArrayInterface();
@@ -560,15 +600,6 @@ Array_as::Array_as()
     attachArrayProperties(*this);
 }
 
-Array_as::Array_as(const Array_as& other)
-    :
-    as_object(other),
-    elements(other.elements)
-{
-    //IF_VERBOSE_ACTION (
-    //log_action("%s: %p", __FUNCTION__, (void*)this);
-    //)
-}
 
 Array_as::~Array_as() 
 {
@@ -682,31 +713,6 @@ Array_as::at(unsigned int index) const
 {
     if ( index > elements.size()-1 ) return as_value();
     else return elements[index];
-}
-
-boost::intrusive_ptr<Array_as>
-Array_as::slice(unsigned int start, unsigned int one_past_end)
-{
-    assert(one_past_end >= start);
-    assert(one_past_end <= size());
-    assert(start <= size());
-
-    boost::intrusive_ptr<Array_as> newarray(new Array_as);
-
-#ifdef GNASH_DEBUG
-    log_debug(_("Array.slice(%u, %u) called"), start, one_past_end);
-#endif
-
-    size_t newsize = one_past_end - start;
-
-    // maybe there's a standard algorithm for this ?
-    for (unsigned int i=start; i<one_past_end; ++i)
-    {
-        newarray->callMethod(NSV::PROP_PUSH, elements[i]);
-    }
-
-    return newarray;
-
 }
 
 /* virtual public, overriding as_object::get_member */
@@ -1271,17 +1277,6 @@ array_toString(const fn_call& fn)
     return join(array, ",");
 }
 
-class PushToArray
-{
-public:
-    PushToArray(as_object& obj) : _obj(obj) {}
-    void operator()(const as_value& val) {
-        _obj.callMethod(NSV::PROP_PUSH, val);
-    }
-private:
-    as_object& _obj;
-};
-
 /// concatenates the elements specified in the parameters with
 /// the elements in my_array, and creates a new array. If the
 /// value parameters specify an array, the elements of that
@@ -1325,17 +1320,12 @@ array_concat(const fn_call& fn)
 
 // Callback to slice part of an array to a new array
 // without changing the original
-static as_value
+as_value
 array_slice(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    // start and end index of the part we're slicing
-    int startindex, endindex;
-    unsigned int arraysize = array->size();
-
-    if (fn.nargs > 2)
-    {
+    if (fn.nargs > 2) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("More than 2 arguments to Array.slice, "
             "and I don't know what to do with them.  "
@@ -1343,47 +1333,20 @@ array_slice(const fn_call& fn)
         );
     }
 
-    // They passed no arguments: simply duplicate the array
-    // and return the new one
-    if (fn.nargs < 1)
-    {
-        Array_as* newarray = new Array_as(*array);
-        return as_value(newarray);
-    }
-
-
-    startindex = fn.arg(0).to_int();
-
-    // if the index is negative, it means "places from the end"
-    // where -1 is the last element
-    if (startindex < 0) startindex = startindex + arraysize;
+    int startindex = fn.nargs ? fn.arg(0).to_int() : 0;
 
     // if we sent at least two arguments, setup endindex
-    if (fn.nargs >= 2)
-    {
-        endindex = fn.arg(1).to_int();
+    int endindex = fn.nargs > 1 ? fn.arg(1).to_int() :
+        std::numeric_limits<int>::max();
 
-        // if the index is negative, it means
-        // "places from the end" where -1 is the last element
-        if (endindex < 0) endindex = endindex + arraysize;
-    }
-    else
-    {
-        // They didn't specify where to end,
-        // so choose the end of the array
-        endindex = arraysize;
-    }
+    Global_as* gl = getGlobal(fn);
+    as_object* newarray = gl->createArray();
 
-    if ( startindex < 0 ) startindex = 0;
-    else if ( static_cast<size_t>(startindex) > arraysize ) startindex = arraysize;
+    PushToArray push(*newarray);
 
-    if ( endindex < startindex ) endindex = startindex;
-    else if ( static_cast<size_t>(endindex)  > arraysize ) endindex = arraysize;
+    foreachArray(*array, startindex, endindex, push);
 
-    boost::intrusive_ptr<Array_as> newarray(array->slice(
-        startindex, endindex));
-
-    return as_value(newarray.get());        
+    return as_value(newarray);        
 }
 
 static as_value

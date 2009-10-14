@@ -117,8 +117,6 @@ public:
 
 	Array_as();
 
-	Array_as(const Array_as& other);
-
 	~Array_as();
 
     /// Return true if this is a strict array
@@ -149,28 +147,6 @@ public:
 	unsigned int size() const;
 
 	void resize(unsigned int);
-
-	/// \brief
-	/// Return a newly created array containing elements
-	/// from 'start' up to but not including 'end'.
-	//
-	///
-	/// NOTE: assertions are:
-	///
-	///	assert(one_past_end >= start);
-	///	assert(one_past_end <= size());
-	///	assert(start <= size());
-	///
-	/// @param start
-	///	index to first element to include in result
-	///	0-based index.
-	///
-	/// @param one_past_end
-	///	index to one-past element to include in result
-	///	0-based index.
-	///
-	boost::intrusive_ptr<Array_as> slice(
-		unsigned int start, unsigned int one_past_end);
 
 	/// \brief
 	/// Replace count elements from start with given values, optionally
