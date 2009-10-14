@@ -30,7 +30,6 @@
 #include "builtin_function.h"
 #include "NativeFunction.h"
 #include "Object.h" // for getObjectInterface
-#include "Array_as.h"
 #include <cmath>
 
 #ifdef USE_GST
@@ -426,7 +425,8 @@ microphone_names(const fn_call& fn)
     
     size_t size = vect.size();
     
-    boost::intrusive_ptr<Array_as> data = new Array_as;
+    Global_as* gl = getGlobal(fn);
+    as_object* data = gl->createArray();
     
     for (size_t i=0; i < size; ++i) {
         data->callMethod(NSV::PROP_PUSH, vect[i]);
@@ -434,7 +434,7 @@ microphone_names(const fn_call& fn)
         
     if ( fn.nargs == 0 ) // getter
     {
-        return as_value(data.get());
+        return as_value(data);
     }
     else // setter
     {

@@ -23,7 +23,6 @@
 
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"
-#include "Array_as.h"
 #include "Object.h"
 #include "VM.h"
 #include "log.h"
@@ -922,7 +921,9 @@ as_value
 xmlnode_childNodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
-    boost::intrusive_ptr<Array_as> ary = new Array_as();
+ 
+    Global_as* gl = getGlobal(fn);
+    as_object* ary = gl->createArray();
 
     typedef XMLNode_as::Children Children;
 
@@ -934,7 +935,7 @@ xmlnode_childNodes(const fn_call& fn)
         ary->callMethod(NSV::PROP_PUSH, node.get());
     }
 
-    return as_value(ary.get());
+    return as_value(ary);
 }
 
 

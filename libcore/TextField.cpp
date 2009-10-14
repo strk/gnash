@@ -260,7 +260,7 @@ TextField::init()
  
     set_prototype(proto);
 
-    Array_as* ar = new Array_as();
+    as_object* ar = getGlobal(*this)->createArray();
     ar->callMethod(NSV::PROP_PUSH, this);
     set_member(NSV::PROP_uLISTENERS, ar);
     

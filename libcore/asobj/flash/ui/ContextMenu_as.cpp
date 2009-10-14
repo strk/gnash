@@ -31,7 +31,6 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
-#include "Array_as.h"
 
 namespace gnash {
 
@@ -131,7 +130,7 @@ contextmenu_copy(const fn_call& fn)
 
     // The customItems object is a deep copy, but only of elements that are
     // instances of ContextMenuItem (have its prototype as a __proto__ member).
-    as_object* nc = new Array_as;
+    as_object* nc = gl->createArray();
     as_object* customs;
 
     if (customItems.is_object() &&
