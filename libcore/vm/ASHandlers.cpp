@@ -28,7 +28,6 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "Array_as.h"
 #include "swf_function.h"
 #include "as_function.h"
 #include "fn_call.h"
