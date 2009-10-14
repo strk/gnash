@@ -395,10 +395,6 @@ void array_class_init(as_object& global, const ObjectURI& uri);
 
 void registerArrayNative(as_object& global);
 
-/// Constructor for ActionScript class Array.
-// needed by SWFHandlers::ActionInitArray
-as_value array_new(const fn_call& fn);
-
 }
 
 #endif
