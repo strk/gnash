@@ -84,7 +84,7 @@ public:
     }
 
     /// Call a method on the given value
-    void visit(as_value& v)
+    void operator()(const as_value& v)
     {
         boost::intrusive_ptr<as_object> o = v.to_object(*getGlobal(_fn));
         if ( ! o ) return;
@@ -367,21 +367,9 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
         return as_value(); // TODO: check this
     }
 
-    boost::intrusive_ptr<Array_as> listeners =
-        dynamic_cast<Array_as*>(listenersValue.to_object(*getGlobal(fn)));
+    as_object* listeners = listenersValue.to_object(*getGlobal(fn));
 
-    if ( ! listeners )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener "
-                "isn't an array: %s"), (void*)fn.this_ptr,
-                fn.dump_args(), listenersValue);
-        );
-        return as_value(); // TODO: check this
-    }
-
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("%p.broadcastMessage() needs an argument", 
             (void*)fn.this_ptr);
@@ -390,11 +378,11 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     }
 
     BroadcasterVisitor visitor(fn); 
-    listeners->visitAll(visitor);
+    foreachArray(*listeners, visitor);
 
-    unsigned int dispatched = visitor.eventsDispatched();
+    const size_t dispatched = visitor.eventsDispatched();
 
-    if ( dispatched ) return as_value(true);
+    if (dispatched) return as_value(true);
 
     return as_value(); 
 
