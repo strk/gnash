@@ -315,12 +315,10 @@ as_value::as_value(as_function* func)
     :
     m_type(AS_FUNCTION)
 {
-	if ( func )
-	{
-		_value = boost::intrusive_ptr<as_object>(func);
+	if (func) {
+		_value = func;
 	}
-	else
-	{
+	else {
 		m_type = NULLTYPE;
 		_value = boost::blank();
 	}
@@ -1005,7 +1003,7 @@ as_value::set_as_object(as_object* obj)
 	if (m_type != OBJECT || getObj() != obj)
 	{
 		m_type = OBJECT;
-		_value = boost::intrusive_ptr<as_object>(obj);
+		_value = obj;
 	}
 }
 
@@ -1023,7 +1021,7 @@ as_value::set_as_function(as_function* func)
 	m_type = AS_FUNCTION;
 	if (func)
 	{
-		_value = boost::intrusive_ptr<as_object>(func);
+		_value = func;
 	}
 	else
 	{
@@ -1031,13 +1029,6 @@ as_value::set_as_function(as_function* func)
 		_value = boost::blank(); // to properly destroy anything else might be stuffed into it
 	}
     }
-}
-
-bool
-as_value::conforms_to(string_table::key /*name*/)
-{
-	// TODO: Implement
-	return false;
 }
 
 bool
@@ -1078,7 +1069,7 @@ as_value::equals(const as_value& v) const
     /// Compare to same type
     if ( obj_or_func && v_obj_or_func )
     {
-        return boost::get<ObjPtr>(_value) == boost::get<ObjPtr>(v._value); 
+        return boost::get<as_object*>(_value) == boost::get<as_object*>(v._value); 
     }
 
     if ( m_type == v.m_type ) return equalsSameType(v);
@@ -1584,14 +1575,14 @@ as_function*
 as_value::getFun() const
 {
 	assert(m_type == AS_FUNCTION);
-	return boost::get<ObjPtr>(_value)->to_function();
+	return boost::get<as_object*>(_value)->to_function();
 }
 
 as_object*
 as_value::getObj() const
 {
 	assert(m_type == OBJECT);
-	return boost::get<ObjPtr>(_value).get();
+	return boost::get<as_object*>(_value);
 }
 
 CharacterProxy
