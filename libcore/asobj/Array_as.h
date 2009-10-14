@@ -137,8 +137,6 @@ public:
 
 	Array_as::const_iterator end();
 
-	as_value pop();
-
 	as_value at(unsigned int index) const;
 
 	Array_as* get_indices(std::deque<indexed_as_value> origElems);

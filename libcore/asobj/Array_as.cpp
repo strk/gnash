@@ -619,26 +619,6 @@ Array_as::index_requested(string_table::key name)
     return int(value);
 }
 
-as_value
-Array_as::pop()
-{
-    // If the array is empty, report an error and return undefined!
-    const ArrayContainer::size_type s = elements.size();
-
-    if ( ! s )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("tried to pop element from back of empty array, returning undef"));
-        );
-        return as_value(); // undefined
-    }
-
-    as_value ret = elements[s - 1];
-    elements.resize(s - 1);
-
-    return ret;
-}
-
 void
 Array_as::reverse()
 {
