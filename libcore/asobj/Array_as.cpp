@@ -47,18 +47,22 @@ namespace gnash {
 
 typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
-namespace {
-
-    string_table::key getKey(const fn_call& fn, size_t i) {
-        string_table& st = getStringTable(fn);
-        std::ostringstream os;
-        os << i;
-        return st.find(os.str());
-    }
-
-
+inline string_table::key
+arrayKey(string_table& st, size_t i)
+{
+    std::ostringstream os;
+    os << i;
+    return st.find(os.str());
 }
 
+namespace {
+
+string_table::key getKey(const fn_call& fn, size_t i) {
+    string_table& st = getStringTable(fn);
+    return arrayKey(st, i);
+}
+
+}
 
 static as_object* getArrayInterface();
 static void attachArrayProperties(as_object& proto);
@@ -1268,12 +1272,23 @@ array_toString(const fn_call& fn)
     return join(array, ",");
 }
 
+class PushToArray
+{
+public:
+    PushToArray(as_object& obj) : _obj(obj) {}
+    void operator()(const as_value& val) {
+        _obj.callMethod(NSV::PROP_PUSH, val);
+    }
+private:
+    as_object& _obj;
+};
+
 /// concatenates the elements specified in the parameters with
 /// the elements in my_array, and creates a new array. If the
 /// value parameters specify an array, the elements of that
 /// array are concatenated, rather than the array itself. The
 /// array my_array is left unchanged.
-static as_value
+as_value
 array_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
@@ -1281,15 +1296,8 @@ array_concat(const fn_call& fn)
     // use copy ctor
     Array_as* newarray = new Array_as();
 
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
-    if (size < 0) return as_value();
-
-    for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
-        newarray->callMethod(NSV::PROP_PUSH, array->getMember(getKey(fn, i)));
-    }
+    PushToArray push(*newarray);
+    if (!foreachArray(*array, push)) return as_value();
 
     for (size_t i = 0; i < fn.nargs; ++i) {
 
@@ -1305,21 +1313,8 @@ array_concat(const fn_call& fn)
             // If it's not an array, we want to carry on and add it as an
             // object.
             if (other->instanceOf(getClassConstructor(fn, "Array"))) {
-                
-                // Not sure what happens if it's an array and has no length
-                // property.
-                as_value otherlength;
-                if (other->get_member(NSV::PROP_LENGTH, &otherlength)) {
-                    const int othersize = otherlength.to_int();
-                    if (othersize > 0) {
-                        for (size_t j = 0; j < static_cast<size_t>(othersize);
-                                ++j)
-                        {
-                            newarray->callMethod(NSV::PROP_PUSH,
-                                    other->getMember(getKey(fn, j)));
-                        }
-                    }
-                }
+                // Do we care if it has no length property?
+                foreachArray(*other, push);
                 continue;
             }
         }

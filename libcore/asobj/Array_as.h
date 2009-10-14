@@ -20,6 +20,7 @@
 
 #include "as_object.h" // for inheritance
 #include "smart_ptr.h" // GNASH_USE_GC
+#include "namedStrings.h"
 
 #include <deque>
 #include <vector>
@@ -368,6 +369,25 @@ private:
 	int index_requested(string_table::key name);
 
 };
+
+string_table::key arrayKey(string_table& st, size_t i);
+
+template<typename T>
+bool foreachArray(as_object& array, T& pred)
+{
+    as_value length;
+    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
+    
+    const int size = length.to_int();
+    if (size < 0) return false;
+
+    string_table& st = getStringTable(array);
+
+    for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
+        pred(array.getMember(arrayKey(st, i)));
+    }
+    return true;
+}
 
 /// Initialize the global.Array object
 // needed by SWFHandlers::ActionInitArray
