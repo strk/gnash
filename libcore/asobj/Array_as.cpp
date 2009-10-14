@@ -1156,19 +1156,29 @@ array_sortOn(const fn_call& fn)
 }
 
 // Callback to push values to the back of an array
-static as_value
+as_value
 array_push(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+ 
+    if (!fn.nargs) return as_value();
 
-        IF_VERBOSE_ACTION (
-    log_action(_("calling array push, pushing %d values onto back of array"),fn.nargs);
-        );
+    const size_t shift = fn.nargs;
 
-    for (unsigned int i=0;i<fn.nargs;i++)
-        array->push(fn.arg(i));
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
+    if (size < 0) return as_value();
 
-    return as_value(array->size());
+    for (size_t i = 0; i < fn.nargs; ++i) {
+        array->set_member(getKey(fn, size + i), fn.arg(i));
+    }
+    
+    // TODO: this is wrong, but Gnash relies on it.
+    array->set_member(NSV::PROP_LENGTH, size + shift);
+
+    return as_value(size + shift);
 }
 
 // Callback to push values to the front of an array
@@ -1185,8 +1195,8 @@ array_unshift(const fn_call& fn)
     as_value length;
     if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
     
-    const double size = length.to_number();
-    if (!isFinite(size) || isNaN(size) || size < 0) return as_value();
+    const int size = length.to_int();
+    if (size < 0) return as_value();
 
     string_table& st = getStringTable(fn);
     as_value ret = array->getMember(st.find("0"));
@@ -1219,8 +1229,8 @@ array_pop(const fn_call& fn)
     as_value length;
     if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
     
-    const double size = length.to_number();
-    if (!isFinite(size) || isNaN(size) || size < 1) return as_value();
+    const int size = length.to_int();
+    if (size < 1) return as_value();
 
     const string_table::key ind = getKey(fn, size - 1);
     as_value ret = array->getMember(ind);
@@ -1241,12 +1251,14 @@ array_shift(const fn_call& fn)
     as_value length;
     if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
     
-    const double size = length.to_number();
-    if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
+    const int size = length.to_int();
+
+    // An array with no elements has nothing to return.
+    if (size < 1) return as_value();
 
     as_value ret = array->getMember(getKey(fn, 0));
 
-    for (size_t i = 0; i < size - 1; ++i) {
+    for (size_t i = 0; i < static_cast<size_t>(size - 1); ++i) {
         const string_table::key nextkey = getKey(fn, i + 1);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
@@ -1282,8 +1294,8 @@ join(as_object* array, const std::string& separator)
     as_value length;
     if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
 
-    const double size = length.to_number();
-    if (!isFinite(size) || isNaN(size) || size < 0) return as_value("");
+    const double size = length.to_int();
+    if (size < 0) return as_value("");
 
     std::string s;
 
@@ -1301,7 +1313,7 @@ join(as_object* array, const std::string& separator)
     return as_value(s);
 }
 
-static as_value
+as_value
 array_join(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
@@ -1314,7 +1326,7 @@ array_join(const fn_call& fn)
 }
 
 // Callback to convert array to a string
-static as_value
+as_value
 array_toString(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
