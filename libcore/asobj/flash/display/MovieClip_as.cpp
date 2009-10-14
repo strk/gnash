@@ -2443,13 +2443,8 @@ movieclip_attachBitmap(const fn_call& fn)
 as_value
 movieclip_as2_ctor(const fn_call& fn)
 {
-
     assert(!isAS3(fn));
-
-    boost::intrusive_ptr<as_object> clip = 
-        new as_object(getMovieClipAS2Interface());
-
-    return as_value(clip.get());
+    return as_value();
 }
 
 
