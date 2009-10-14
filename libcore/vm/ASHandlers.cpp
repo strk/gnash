@@ -2809,7 +2809,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     assert(array_size >= 0); // TODO: trigger this !!
 
     // Call the array constructor, to create an empty array.
-    as_value result = array_new(fn_call(NULL, env));
+    as_value result = getGlobal(env)->createArray();
 
     boost::intrusive_ptr<as_object> ao = convertToObject(*getGlobal(thread.env), result);
     assert(ao);
