@@ -288,7 +288,7 @@ public:
         _v.push_back(val.to_number());
     }
 private:
-    std::vector<int> _v;
+    std::vector<int>& _v;
 };
 
 as_value
