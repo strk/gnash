@@ -37,6 +37,10 @@ addProperty-set-prototypes-8.swf:f5f6a0305a91b7cf09448d60bb86ddae
 and-or-5.swf:a734facbc191156759ad278e25c3f308
 and-or-6.swf:a3a02811b62c07c4d2dd6d6d547f1d2f
 and-or-7.swf:b4c3eb73aa8e0403e8d141516b25c9c6
+arguments-properties-5.swf:b6cc55d99c634b93ba165ef3b260773e
+arguments-properties-6.swf:50791d04c6e61b979acd669d07cbf020
+arguments-properties-7.swf:702ef669c7c91b474a1148a4ca9e988d
+arguments-properties-8.swf:69c543519ab2cb034179121b7f334a3a
 array-init.swf:dc3e0f1daa53a2574efdb75f98579f10
 array-movieclip-5.swf:99c50528aa81f1ef5184d6ae35b14419
 array-movieclip-6.swf:dcef7fcaf030813f6e53823231ce16e1
@@ -47,6 +51,10 @@ array-new-6.swf:2852d9745de89063970f44e6e7620bc2
 array-new-7.swf:77c4510eed0fd37d8654f761800edcce
 array-new-8.swf:8b26fcd892b0cd7a1cd2832d3844d00d
 array-new-override-5.swf:5016b51c60e30ee262b3cb022ba4c58f
+array-properties-5.swf:e4b9235bdad5543e29893d8166c16a9a
+array-properties-6.swf:822c1697e2f36bdfc87574a100583c78
+array-properties-7.swf:bd3778e753752345ae8c2d72b3ccaf3a
+array-properties-8.swf:0c1b9f40c4f736592b7673dbdd7ed7da
 array-sort-custom-call-5.swf:3bfe136dfda4403b1984aae59fde2144
 array-sort-custom-call-6.swf:d2517fbff896c1586947664ea20befa7
 array-sort-custom-call-7.swf:6293fd0f9a5cc6498ebcbe3d90aeca69
@@ -73,6 +81,9 @@ asbroadcaster-override-6.swf:cc28cc39d8a841d68d42ad6328c3ac6e
 asbroadcaster-override-7.swf:5834d9f0de106265f5ff479d789d2f35
 asbroadcaster-override-8.swf:017c5505a342570726c90b81297626dc
 asbroadcaster-properties-5.swf:577ad0de1cd33a97f6e2f146c61acc5f
+asbroadcaster-properties-6.swf:84104e706af43d2475ca3205bf29a0d7
+asbroadcaster-properties-7.swf:903c541124f61a03b0ca9dac94d58ad5
+asbroadcaster-properties-8.swf:f2505bf99e20b7ebc3c1f6299afb62bc
 asnative-create-5.swf:d10ce975ae57f9a6e29c8fc97eb01489
 asnative-create-6.swf:79aa26f566218edbdecdb46e88be7a1a
 asnative-create-7.swf:b3f18c999ed081ac39132ec6a9df2cb0
@@ -233,6 +244,9 @@ constructor-madness-8.swf:5357273baf6b66f6af0223cb1d13b144
 constructor-prototype.swf:22505f0f8dd8440972a298110d697e3b
 constructor-relay-5.swf:2d1a814c37f55485d66624cb97c58e03
 construct-properties-5.swf:2683d3e400600e0288470ca5b6fbe94c
+construct-properties-6.swf:d8c0a2d334d05f749723a6838ed74846
+construct-properties-7.swf:de42399270c7f000cb4c1ce45a0cc960
+construct-properties-8.swf:854f7cddf97ab71b44b5f3bba3b193ef
 context-menu-5.swf:867624e2cb2c3d47dc07270d756152db
 context-menu-6.swf:9124c06f1cc4725684717eb3641837bd
 context-menu-7.swf:fc22bea201998188714399c2de1ac1f5
