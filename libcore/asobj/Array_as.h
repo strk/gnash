@@ -53,8 +53,6 @@ public:
 	typedef ArrayContainer::const_iterator const_iterator;
 	typedef ArrayContainer::iterator iterator;
 
-	typedef std::list<as_value> ValueList;
-
     // see dox in as_object.h
 	virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
 
