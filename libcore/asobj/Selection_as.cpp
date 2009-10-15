@@ -56,11 +56,17 @@ void
 selection_class_init(as_object& where, const ObjectURI& uri)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
-    as_object* proto = registerBuiltinObject(where, attachSelectionInterface,
+    as_object* o = registerBuiltinObject(where, attachSelectionInterface,
             uri);
 
     /// Handles addListener, removeListener, and _listeners.
-    AsBroadcaster::initialize(*proto);
+    AsBroadcaster::initialize(*o);
+
+    // All properties are protected using ASSetPropFlags.
+    string_table& st = getStringTable(where);
+    Global_as* gl = getGlobal(where);
+    as_object* null = 0;
+    gl->callMethod(st.find("ASSetPropFlags"), o, null, 7);
 }
 
 void
