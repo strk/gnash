@@ -1519,6 +1519,27 @@ check_equals(traceProps(o), "pop,length,7,6,4,3,2,1,");
 xcheck_equals(o.length, 6);
 
 
+o = fakeArray();
+o.reverse = Array.prototype.reverse;
+
+// Order of property creation.
+check_equals(traceProps(o), "reverse,length,7,6,5,4,3,2,1,");
+
+o.reverse();
+
+// Length is unchanged, Properties are swapped from the outside
+check_equals(traceProps(o), "3,2,4,1,5,0,reverse,length,7,6,");
+check_equals(o.length, 6);
+
+// Check with an uneven length to see what happens to the middle property.
+o = fakeArray();
+o.reverse = Array.prototype.reverse;
+o.length = 5;
+o.reverse();
+// The middle property is left alone...
+check_equals(traceProps(o), "3,1,4,0,reverse,length,7,6,5,2,");
+check_equals(o.length, 5);
+
 // TODO: test ASnative-returned functions:
 //
 // ASnative(252, 1) - [Array.prototype] push
@@ -1537,11 +1558,11 @@ xcheck_equals(o.length, 6);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(511);
+ check_totals(516);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(572);
+  check_totals(577);
 # else
-  check_totals(582);
+  check_totals(587);
 # endif
 #endif
