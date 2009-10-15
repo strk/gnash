@@ -126,6 +126,8 @@ AsBroadcaster::initialize(as_object& o)
     // always attached to the initialized object.
     as_value al, rl;
 
+    const int flags = as_object::DefaultFlags;
+
     if (asb) {
         al = asb->getMember(NSV::PROP_ADD_LISTENER);
         rl = asb->getMember(NSV::PROP_REMOVE_LISTENER);
@@ -139,7 +141,15 @@ AsBroadcaster::initialize(as_object& o)
     const as_value& asn = gl->callMethod(NSV::PROP_AS_NATIVE, 101, 12);
     o.set_member(NSV::PROP_BROADCAST_MESSAGE, asn);
 
+    // This corresponds to  "_listeners = [];", which is different from
+    // _listeners = new Array();
     o.set_member(NSV::PROP_uLISTENERS, gl->createArray());
+ 
+    // This function should call ASSetPropFlags on these four properties.
+    o.set_member_flags(NSV::PROP_BROADCAST_MESSAGE, flags);
+    o.set_member_flags(NSV::PROP_ADD_LISTENER, flags);
+    o.set_member_flags(NSV::PROP_REMOVE_LISTENER, flags);
+    o.set_member_flags(NSV::PROP_uLISTENERS, flags);
 
 }
 
