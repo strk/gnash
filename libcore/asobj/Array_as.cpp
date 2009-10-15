@@ -118,15 +118,16 @@ private:
     as_object& _obj;
 };
 
-class PushToVector
+template<typename T>
+class PushToContainer
 {
 public:
-    PushToVector(std::vector<as_value>& v) : _v(v) {}
+    PushToContainer(T& v) : _v(v) {}
     void operator()(const as_value& val) {
         _v.push_back(val);
     }
 private:
-    std::vector<as_value>& _v;
+    T& _v;
 };
 
 
@@ -142,6 +143,94 @@ private:
     std::vector<indexed_as_value>& _v;
     size_t _i;
 };
+
+        
+/// \brief
+/// Attempt to sort the array using given values comparator, avc.
+/// If two or more elements in the array are equal, as determined
+/// by the equality comparator ave, then the array is not sorted
+/// and 0 is returned. Otherwise the array is sorted and returned.
+///
+/// @param avc
+///	boolean functor or function comparing two as_value& objects
+///     used to determine sort-order
+///
+/// @param ave
+///	boolean functor or function comparing two as_value& objects
+///     used to determine equality
+///
+template <class AVCMP, class AVEQ>
+bool sort(as_object& o, AVCMP avc, AVEQ ave)
+{
+    // IMPORTANT NOTE
+    //
+    // As for ISO/IEC 14882:2003 - 23.2.2.4.29 
+    // the sort algorithm relies on the assumption
+    // that the comparator function implements
+    // a Strict Weak Ordering operator:
+    // http://www.sgi.com/tech/stl/StrictWeakOrdering.html
+    //
+    // Invalid comparator can lead to undefined behaviour,
+    // including invalid memory access and infinite loops.
+    //
+    // Pragmatically, it seems that std::list::sort is
+    // more robust in this reguard, so we'll sort a list
+    // instead of the queue. We want to sort a copy anyway
+    // to avoid the comparator changing the original container.
+
+    typedef std::list<as_value> SortContainer;
+
+    SortContainer v;
+    PushToContainer<SortContainer> pv(v);
+    foreachArray(o, pv);
+
+    const size_t size = v.size(); 
+
+    v.sort(avc);
+
+    if (std::adjacent_find(v.begin(), v.end(), ave) != v.end()) return false;
+
+    string_table& st = getStringTable(o);
+
+    SortContainer::const_iterator it = v.begin();
+
+    for (size_t i = 0; i < size; ++i) {
+        if (i >= v.size()) {
+            break;
+        }
+        o.set_member(arrayKey(st, i), *it);
+        ++it;
+    }
+    return true;
+}
+
+
+template <class AVCMP>
+void sort(as_object& o, AVCMP avc) 
+{
+
+    typedef std::list<as_value> SortContainer;
+
+    SortContainer v;
+    PushToContainer<SortContainer> pv(v);
+    foreachArray(o, pv);
+
+    const size_t size = v.size(); 
+
+    v.sort(avc);
+
+    string_table& st = getStringTable(o);
+
+    SortContainer::const_iterator it = v.begin();
+
+    for (size_t i = 0; i < size; ++i) {
+        if (it == v.end()) {
+            break;
+        }
+        o.set_member(arrayKey(st, i), *it);
+        ++it;
+    }
+}
 
 /// \brief
 /// Return a new array containing sorted index of this array.
@@ -1035,7 +1124,7 @@ array_splice(const fn_call& fn)
     // to do a simple copy in-place without overwriting values that still
     // need to be shifted. The algorithm could certainly be improved though.
     std::vector<as_value> v;
-    PushToVector pv(v);
+    PushToContainer<std::vector<as_value> > pv(v);
     foreachArray(*array, pv);
 
     const size_t newelements = fn.nargs > 2 ? fn.nargs - 2 : 0;
@@ -1069,12 +1158,12 @@ array_splice(const fn_call& fn)
 as_value
 array_sort(const fn_call& fn)
 {
-    Array_as* array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
     
     const int version = getSWFVersion(*array);
     
     if (!fn.nargs) {
-        array->sort(as_value_lt(version));
+        sort(*array, as_value_lt(version));
         return as_value(array);
     }
     
@@ -1109,7 +1198,7 @@ array_sort(const fn_call& fn)
             return sortIndexed(*array, avc);
         }
 
-        array->sort(avc);
+        sort(*array, avc);
         return as_value(array);
         // note: custom AS function sorting apparently ignores the 
         // UniqueSort flag which is why it is also ignored here
@@ -1129,17 +1218,17 @@ array_sort(const fn_call& fn)
     if (do_unique) {
         as_cmp_fn eq = get_basic_eq(flags, version);
         if (do_index) return sortIndexed(*array, comp, eq);
-        return array->sort(comp, eq);
+        return sort(*array, comp, eq) ? as_value(array) : as_value(0.0);
     }
     if (do_index) return sortIndexed(*array, comp);
-    array->sort(comp);
+    sort(*array, comp);
     return as_value(array);
 }
 
 as_value
 array_sortOn(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
@@ -1166,15 +1255,15 @@ array_sortOn(const fn_call& fn)
                     *getGlobal(fn));
             if (do_index)
                 return sortIndexed(*array, avc, ave);
-            return array->sort(avc, ave);
+            return sort(*array, avc, ave) ? as_value(array) : as_value(0.0);
         }
         
         if (do_index) {
             return sortIndexed(*array, avc);
         }
 
-        array->sort(avc);
-        return as_value(array.get());
+        sort(*array, avc);
+        return as_value(array);
     }
 
     // case: sortOn(["prop1", "prop2"] ...)
@@ -1258,11 +1347,11 @@ array_sortOn(const fn_call& fn)
         {
             as_value_multiprop_eq ave(prp, eq, *getGlobal(fn));
             if (do_index) return sortIndexed(*array, avc, ave);
-            return array->sort(avc, ave);
+            return sort(*array, avc, ave) ? as_value(array) : as_value(0.0);
         }
         if (do_index) return sortIndexed(*array, avc);
-        array->sort(avc);
-        return as_value(array.get());
+        sort(*array, avc);
+        return as_value(array);
 
     }
     IF_VERBOSE_ASCODING_ERRORS(
@@ -1271,7 +1360,7 @@ array_sortOn(const fn_call& fn)
     if (fn.nargs == 0 )
         return as_value();
 
-    return as_value(array.get());
+    return as_value(array);
 }
 
 // Callback to push values to the back of an array

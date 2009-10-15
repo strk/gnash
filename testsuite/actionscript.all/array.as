@@ -1595,6 +1595,20 @@ check_equals(o[0], undefined);
 // Elements were shifted up.
 check_equals(o[6], "three");
 
+// Sort
+
+o = fakeArray();
+o.sort = Array.prototype.sort;
+
+// Order of property creation.
+check_equals(traceProps(o), "sort,length,7,6,5,4,3,2,1,");
+
+check_equals(o.length, 6);
+o.sort();
+xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+o.sort();
+xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+
 // TODO: test ASnative-returned functions:
 //
 // ASnative(252, 1) - [Array.prototype] push
@@ -1613,11 +1627,11 @@ check_equals(o[6], "three");
 
 
 #if OUTPUT_VERSION < 6
- check_totals(534);
+ check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(595);
+  check_totals(599);
 # else
-  check_totals(605);
+  check_totals(609);
 # endif
 #endif

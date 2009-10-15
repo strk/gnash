@@ -38,12 +38,7 @@ namespace gnash {
 
 namespace gnash {
 
-template <class T>
-struct ContainerFiller {
-	T& cont;
-	ContainerFiller(T& c): cont(c) {}
-	void visit(as_value& v) { cont.push_back(v); }
-};
+string_table::key arrayKey(string_table& st, size_t i);
 
 /// The Array ActionScript object
 class Array_as : public as_object
@@ -59,21 +54,6 @@ public:
 	typedef ArrayContainer::iterator iterator;
 
 	typedef std::list<as_value> ValueList;
-
-	/// Visit all elements 
-	//
-	/// The visitor class will have to expose a visit(as_value&) method
-	///
-	template<class V> void visitAll(V& v)
-	{
-		// NOTE: we copy the elements as the visitor might call arbitrary code
-		//       possibly modifying the container itself.
-		ArrayContainer copy = elements;
-
-		// iterating this way will skip holes
-		for (Array_as::iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
-			v.visit(*i);
-	}
 
     // see dox in as_object.h
 	virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
@@ -128,101 +108,6 @@ public:
 
 	void resize(unsigned int);
 
-	/// \brief
-	/// Sort the array, using given values comparator
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///
-	template <class AVCMP>
-	void sort(AVCMP avc)
-	{
-		// IMPORTANT NOTE
-		//
-		// As for ISO/IEC 14882:2003 - 23.2.2.4.29 
-		// the sort algorithm relies on the assumption
-		// that the comparator function implements
-		// a Strict Weak Ordering operator:
-		// http://www.sgi.com/tech/stl/StrictWeakOrdering.html
-		//
-		// Invalid comparator can lead to undefined behaviour,
-		// including invalid memory access and infinite loops.
-		//
-		// Pragmatically, it seems that std::list::sort is
-		// more robust in this reguard, so we'll sort a list
-		// instead of the queue. We want to sort a copy anyway
-		// to avoid the comparator changing the original container.
-		//
-		ValueList nelem;
-		ContainerFiller<ValueList> filler(nelem);
-		visitAll(filler);
-
-		size_t oldSize = elements.size(); // custom comparator might change input size
-		nelem.sort(avc);
-		elements.resize(oldSize, false);
-		size_t idx=0;
-		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
-		{
-			elements[idx++] = *i;
-        }
-	}
-
-	/// \brief
-	/// Attempt to sort the array using given values comparator, avc.
-	/// If two or more elements in the array are equal, as determined
-	/// by the equality comparator ave, then the array is not sorted
-	/// and 0 is returned. Otherwise the array is sorted and returned.
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine sort-order
-	///
-	/// @param ave
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine equality
-	///
-	template <class AVCMP, class AVEQ>
-	as_value sort(AVCMP avc, AVEQ ave)
-	{
-		// IMPORTANT NOTE
-		//
-		// As for ISO/IEC 14882:2003 - 23.2.2.4.29 
-		// the sort algorithm relies on the assumption
-		// that the comparator function implements
-		// a Strict Weak Ordering operator:
-		// http://www.sgi.com/tech/stl/StrictWeakOrdering.html
-		//
-		// Invalid comparator can lead to undefined behaviour,
-		// including invalid memory access and infinite loops.
-		//
-		// Pragmatically, it seems that std::list::sort is
-		// more robust in this reguard, so we'll sort a list
-		// instead of the queue. We want to sort a copy anyway
-		// to avoid the comparator changing the original container.
-		//
-
-		typedef std::list<as_value> ValueList;
-		ValueList nelem;
-		ContainerFiller<ValueList> filler(nelem);
-		visitAll(filler);
-
-		size_t oldSize = elements.size(); // custom comparator might change input size
-
-		nelem.sort(avc);
-
-		if (std::adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
-			return as_value(0.0);
-
-		elements.resize(oldSize, false);
-		size_t idx=0;
-		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
-		{
-			elements[idx++] = *i;
-		}
-
-		return as_value(this);
-	}
-
     /// Why is this overridden?
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0);
@@ -265,8 +150,6 @@ private:
 	int index_requested(string_table::key name);
 
 };
-
-string_table::key arrayKey(string_table& st, size_t i);
 
 template<typename T>
 bool foreachArray(as_object& array, T& pred)
