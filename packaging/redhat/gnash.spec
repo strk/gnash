@@ -22,10 +22,10 @@ BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
 
-# YellowDog doesn't ship ffmpeg
-%if %{distribution} != "ydl6"
-BuildRequires:  ffmpeg-devel
-%endif
+# # YellowDog doesn't ship ffmpeg
+# %if %{distribution} != "ydl6"
+# BuildRequires:  ffmpeg-devel
+# %endif
 # Mandriva uses different names for the X11 library packages
 %if %{distribution} != "fc11"
 BuildRequires:  libx11_6-devel libxt_6-devel
@@ -43,10 +43,10 @@ Requires: libx11_6 libxt_6
 Requires: libX11 libXt 
 %endif
 Requires: agg boost libcurl SDL
-# YellowDog doesn't ship ffmpeg
-%if %{distribution} != "ydl6"
-Requires: ffmpeg
-%endif
+# # YellowDog doesn't ship ffmpeg
+# %if %{distribution} != "ydl6"
+# Requires: ffmpeg
+# %endif
 
 # BuildRequires:  scrollkeeper
 
