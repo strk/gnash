@@ -38,27 +38,12 @@ namespace gnash {
 
 namespace gnash {
 
-struct indexed_as_value : public as_value
-{
-	int vec_index;
-
-	indexed_as_value(const as_value& val, int index)
-	: as_value(val)
-	{
-		vec_index = index;
-	}
-};
-
 template <class T>
 struct ContainerFiller {
 	T& cont;
 	ContainerFiller(T& c): cont(c) {}
 	void visit(as_value& v) { cont.push_back(v); }
 };
-
-void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
-
-void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
 
 /// The Array ActionScript object
 class Array_as : public as_object

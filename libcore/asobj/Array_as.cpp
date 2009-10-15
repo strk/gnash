@@ -49,6 +49,8 @@ namespace gnash {
 // Forward declarations
 namespace {
     
+    class indexed_as_value;
+
     typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
     as_object* getArrayInterface();
@@ -85,10 +87,25 @@ namespace {
         return a > 0;
     }
 
+    void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
+
+    void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
+
 }
 
 /// Function objects for foreachArray()
 namespace {
+
+struct indexed_as_value : public as_value
+{
+	int vec_index;
+
+	indexed_as_value(const as_value& val, int index)
+	: as_value(val)
+	{
+		vec_index = index;
+	}
+};
 
 class PushToArray
 {
@@ -660,13 +677,6 @@ Array_as::~Array_as()
 {
 }
 
-void
-getIndexedElements(as_object& array, std::vector<indexed_as_value>& v)
-{
-    PushToIndexedVector pv(v);
-    foreachArray(array, pv);
-}
-
 Array_as::const_iterator
 Array_as::begin()
 {
@@ -811,15 +821,6 @@ Array_as::set_member(string_table::key name,
     }
 
     return as_object::set_member(name,val, nsname, ifFound);
-}
-
-void
-pushIndices(as_object& o, const std::vector<indexed_as_value>& elems)
-{
-    for (std::vector<indexed_as_value>::const_iterator it = elems.begin();
-        it != elems.end(); ++it) {
-        o.callMethod(NSV::PROP_PUSH, it->vec_index);
-    }
 }
 
 void
@@ -1603,6 +1604,21 @@ bool foreachArray(as_object& array, int start, int end, T& pred)
     return true;
 }
 
+void
+pushIndices(as_object& o, const std::vector<indexed_as_value>& elems)
+{
+    for (std::vector<indexed_as_value>::const_iterator it = elems.begin();
+        it != elems.end(); ++it) {
+        o.callMethod(NSV::PROP_PUSH, it->vec_index);
+    }
+}
+
+void
+getIndexedElements(as_object& array, std::vector<indexed_as_value>& v)
+{
+    PushToIndexedVector pv(v);
+    foreachArray(array, pv);
+}
 
 } // anonymous namespace
 
