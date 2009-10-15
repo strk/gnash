@@ -1540,6 +1540,61 @@ o.reverse();
 check_equals(traceProps(o), "3,1,4,0,reverse,length,7,6,5,2,");
 check_equals(o.length, 5);
 
+// Array.splice
+
+// This is different from other functions in that it doesn't delete and
+// readd properties so much.
+
+o = fakeArray();
+o.splice = Array.prototype.splice;
+
+// Order of property creation.
+check_equals(traceProps(o), "splice,length,7,6,5,4,3,2,1,");
+
+// Note: this function *does* set length!
+check_equals(o.length, 6);
+o.splice(2, 3, "new1", "new2");
+
+check_equals(traceProps(o), "0,splice,length,7,6,5,4,3,2,1,");
+check_equals(o.length, 5);
+
+// The spliced elements are there.
+check_equals(o[2], "new1");
+check_equals(o[3], "new2");
+
+// The new 0 element is undefined.
+check_equals(o[0], undefined);
+
+// The last element is shifted down (because 3 elements were deleted).
+check_equals(o[4], "five");
+
+// Same again with different arguments
+
+o = fakeArray();
+o.splice = Array.prototype.splice;
+
+// Order of property creation.
+check_equals(traceProps(o), "splice,length,7,6,5,4,3,2,1,");
+
+// Note: this function *does* set length!
+check_equals(o.length, 6);
+o.splice(2, 1, "new1", "new2", "new3", "new4");
+
+check_equals(traceProps(o), "8,0,splice,length,7,6,5,4,3,2,1,");
+check_equals(o.length, 9);
+
+// The spliced elements are there.
+check_equals(o[2], "new1");
+check_equals(o[3], "new2");
+check_equals(o[4], "new3");
+check_equals(o[5], "new4");
+
+// The new 0 element is undefined.
+check_equals(o[0], undefined);
+
+// Elements were shifted up.
+check_equals(o[6], "three");
+
 // TODO: test ASnative-returned functions:
 //
 // ASnative(252, 1) - [Array.prototype] push
@@ -1558,11 +1613,11 @@ check_equals(o.length, 5);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(516);
+ check_totals(534);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(577);
+  check_totals(595);
 # else
-  check_totals(587);
+  check_totals(605);
 # endif
 #endif
