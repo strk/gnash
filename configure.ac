@@ -2857,9 +2857,9 @@ if test "$media_handler" = "gst"; then
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
     fi
     if test x"$has_gstreamer_plugins_base" = "xno"; then
-    echo "                        Install it from http://www.gstreamer.net" >&3
-    echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
-      echo "                      or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&3
+      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
+      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
     fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
