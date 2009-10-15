@@ -38,6 +38,7 @@ namespace gnash {
 
 namespace gnash {
 
+size_t arrayLength(as_object& array);
 string_table::key arrayKey(string_table& st, size_t i);
 
 /// The Array ActionScript object
@@ -150,20 +151,16 @@ private:
 };
 
 template<typename T>
-bool foreachArray(as_object& array, T& pred)
+void foreachArray(as_object& array, T& pred)
 {
-    as_value length;
-    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
-    
-    const int size = length.to_int();
-    if (size < 0) return false;
+    size_t size = arrayLength(array);
+    if (!size) return;
 
     string_table& st = getStringTable(array);
 
     for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
         pred(array.getMember(arrayKey(st, i)));
     }
-    return true;
 }
 
 /// Initialize the global.Array object

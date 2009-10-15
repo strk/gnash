@@ -76,7 +76,7 @@ namespace {
     string_table::key getKey(const fn_call& fn, size_t i);
 
     /// Implementation of foreachArray that takes a start and end range.
-    template<typename T> bool foreachArray(as_object& array, int start,
+    template<typename T> void foreachArray(as_object& array, int start,
             int end, T& pred);
 
     inline bool int_lt_or_eq (int a) {
@@ -912,6 +912,17 @@ Array_as::set_member(string_table::key name,
     return as_object::set_member(name,val, nsname, ifFound);
 }
 
+size_t
+arrayLength(as_object& array)
+{
+    as_value length;
+    if (!array.get_member(NSV::PROP_LENGTH, &length)) return 0;
+    
+    const int size = length.to_int();
+    if (size < 0) return 0;
+    return size;
+}
+
 void
 registerArrayNative(as_object& global)
 {
@@ -1088,11 +1099,7 @@ array_splice(const fn_call& fn)
         return as_value();
     }
     
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
-    if (size < 0) return as_value();
+    const size_t size = arrayLength(*array);
 
     //----------------
     // Get start offset
@@ -1373,11 +1380,7 @@ array_push(const fn_call& fn)
 
     const size_t shift = fn.nargs;
 
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
-    if (size < 0) return as_value();
+    const size_t size = arrayLength(*array);
 
     for (size_t i = 0; i < fn.nargs; ++i) {
         array->set_member(getKey(fn, size + i), fn.arg(i));
@@ -1400,11 +1403,7 @@ array_unshift(const fn_call& fn)
 
     const size_t shift = fn.nargs;
 
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
-    if (size < 0) return as_value();
+    const size_t size = arrayLength(*array);
 
     string_table& st = getStringTable(fn);
     as_value ret = array->getMember(st.find("0"));
@@ -1434,10 +1433,7 @@ array_pop(const fn_call& fn)
 
     as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
+    const size_t size = arrayLength(*array);
     if (size < 1) return as_value();
 
     const string_table::key ind = getKey(fn, size - 1);
@@ -1456,11 +1452,7 @@ array_shift(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
-
+    const size_t size = arrayLength(*array);
     // An array with no elements has nothing to return.
     if (size < 1) return as_value();
 
@@ -1485,11 +1477,7 @@ array_reverse(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
-    
-    const int size = length.to_int();
-
+    const size_t size = arrayLength(*array);
     // An array with 0 or 1 elements has nothing to reverse.
     if (size < 2) return as_value();
 
@@ -1536,11 +1524,11 @@ array_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
-    // use copy ctor
-    Array_as* newarray = new Array_as();
+    Global_as* gl = getGlobal(fn);
+    as_object* newarray = gl->createArray();
 
     PushToArray push(*newarray);
-    if (!foreachArray(*array, push)) return as_value();
+    foreachArray(*array, push);
 
     for (size_t i = 0; i < fn.nargs; ++i) {
 
@@ -1613,18 +1601,15 @@ array_new(const fn_call& fn)
     }
     else if (fn.nargs == 1 && fn.arg(0).is_number() )
     {
-        // TODO: limit max size !!
         int newSize = fn.arg(0).to_int();
-        if ( newSize < 0 ) newSize = 0;
-        else ao->resize(newSize);
-        ao->set_member(NSV::PROP_LENGTH, newSize);
+        if (newSize < 0) newSize = 0;
+        else {
+            ao->set_member(NSV::PROP_LENGTH, newSize);
+        }
     }
-    else
-    {
+    else {
         // Use the arguments as initializers.
-        as_value    index_number;
-        for (unsigned int i = 0; i < fn.nargs; i++)
-        {
+        for (size_t i = 0; i < fn.nargs; i++) {
             ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
         }
     }
@@ -1635,11 +1620,9 @@ array_new(const fn_call& fn)
 as_value
 join(as_object* array, const std::string& separator)
 {
+    const size_t size = arrayLength(*array);
     as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
-
-    const double size = length.to_int();
-    if (size < 0) return as_value("");
+    if (size < 1) return as_value("");
 
     std::string s;
 
@@ -1665,16 +1648,13 @@ getKey(const fn_call& fn, size_t i)
 }
 
 template<typename T>
-bool foreachArray(as_object& array, int start, int end, T& pred)
+void foreachArray(as_object& array, int start, int end, T& pred)
 {
-    as_value length;
-    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
-    
-    const int size = length.to_int();
-    if (size < 0) return false;
+    const int size = arrayLength(array);
+    if (!size) return;
 
     if (start < 0) start = size + start;
-    if (start >= size) return false;
+    if (start >= size) return;
     start = std::max(start, 0);
 
     if (end < 0) end = size + end;
@@ -1690,7 +1670,6 @@ bool foreachArray(as_object& array, int start, int end, T& pred)
     for (size_t i = start; i < static_cast<size_t>(end); ++i) {
         pred(array.getMember(arrayKey(st, i)));
     }
-    return true;
 }
 
 void
