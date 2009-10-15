@@ -60,29 +60,6 @@ public:
     // see dox in as_object.h
 	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const;
 
-	/// Sort flags
-	enum SortFlags {
-
-		/// Case-insensitive (z precedes A)
-		fCaseInsensitive	= (1<<0), // 1
-
-		/// Descending order (b precedes a)
-		fDescending		= (1<<1), // 2
-
-		/// If two or more elements in the array
-		/// have identical sort fields, return 0
-		/// and don't modify the array.
-		/// Otherwise proceed to sort the array.
-		fUniqueSort		= (1<<2), // 4
-
-		/// Don't modify the array, rather return
-		/// a new array containing indexes into it
-		/// in sorted order.
-		fReturnIndexedArray	= (1<<3), // 8
-
-		/// Numerical sort (9 preceeds 10)
-		fNumeric		= (1<<4) // 16
-	};
 
 	Array_as();
 

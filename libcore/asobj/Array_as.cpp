@@ -25,15 +25,15 @@
 #include "as_value.h"
 #include "Array_as.h"
 #include "log.h"
-#include "builtin_function.h" // for Array class
+#include "builtin_function.h"
 #include "NativeFunction.h" 
-#include "as_function.h" // for sort user-defined comparator
+#include "as_function.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "GnashException.h"
-#include "action.h" // for call_method
-#include "VM.h" // for PROPNAME, registerNative
-#include "Object.h" // for getObjectInterface()
+#include "action.h" 
+#include "VM.h" 
+#include "Object.h" 
 #include "GnashNumeric.h"
 
 #include <string>
@@ -42,12 +42,29 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 
-//#define GNASH_DEBUG 
-
 namespace gnash {
 
 // Forward declarations
 namespace {
+	
+    /// Sort flags
+	enum SortFlags {
+		/// Case-insensitive (z precedes A)
+		SORT_CASE_INSENSITIVE = (1<<0), // 1
+		/// Descending order (b precedes a)
+		SORT_DESCENDING	= (1<<1), // 2
+		/// If two or more elements in the array
+		/// have identical sort fields, return 0
+		/// and don't modify the array.
+		/// Otherwise proceed to sort the array.
+		SORT_UNIQUE	= (1<<2), // 4
+		/// Don't modify the array, rather return
+		/// a new array containing indexes into it
+		/// in sorted order.
+		SORT_RETURN_INDEX = (1<<3), // 8
+		/// Numerical sort (9 precedes 10)
+		SORT_NUMERIC = (1<<4) // 16
+	};
     
     class indexed_as_value;
 
@@ -474,15 +491,15 @@ struct as_value_num_nocase_eq : public as_value_lt
 
 // Return basic as_value comparison functor for corresponding sort flag
 // Note:
-// fUniqueSort and fReturnIndexedArray must first be stripped from the flag
+// SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
 get_basic_cmp(boost::uint8_t flags, int version)
 {
     as_cmp_fn f;
 
-    // fUniqueSort and fReturnIndexedArray must be stripped by caller
-    assert(flags^Array_as::fUniqueSort);
-    assert(flags^Array_as::fReturnIndexedArray);
+    // SORT_UNIQUE and SORT_RETURN_INDEX must be stripped by caller
+    assert(flags^SORT_UNIQUE);
+    assert(flags^SORT_RETURN_INDEX);
 
     switch ( flags )
     {
@@ -490,35 +507,35 @@ get_basic_cmp(boost::uint8_t flags, int version)
             f = as_value_lt(version);
             return f;
 
-        case Array_as::fDescending:
+        case SORT_DESCENDING:
             f = as_value_gt(version);
             return f;
 
-        case Array_as::fCaseInsensitive: 
+        case SORT_CASE_INSENSITIVE: 
             f = as_value_nocase_lt(version);
             return f;
 
-        case Array_as::fCaseInsensitive | 
-                Array_as::fDescending:
+        case SORT_CASE_INSENSITIVE | 
+                SORT_DESCENDING:
             f = as_value_nocase_gt(version);
             return f;
 
-        case Array_as::fNumeric: 
+        case SORT_NUMERIC: 
             f = as_value_num_lt(version);
             return f;
 
-        case Array_as::fNumeric | Array_as::fDescending:
+        case SORT_NUMERIC | SORT_DESCENDING:
             f = as_value_num_gt(version);
             return f;
 
-        case Array_as::fCaseInsensitive | 
-                Array_as::fNumeric:
+        case SORT_CASE_INSENSITIVE | 
+                SORT_NUMERIC:
             f = as_value_num_nocase_lt(version);
             return f;
 
-        case Array_as::fCaseInsensitive | 
-                Array_as::fNumeric |
-                Array_as::fDescending:
+        case SORT_CASE_INSENSITIVE | 
+                SORT_NUMERIC |
+                SORT_DESCENDING:
             f = as_value_num_nocase_gt(version);
             return f;
 
@@ -531,12 +548,12 @@ get_basic_cmp(boost::uint8_t flags, int version)
 
 // Return basic as_value equality functor for corresponding sort flag
 // Note:
-// fUniqueSort and fReturnIndexedArray must first be stripped from the flag
+// SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
 get_basic_eq(boost::uint8_t flags, int version)
 {
     as_cmp_fn f;
-    flags &= ~(Array_as::fDescending);
+    flags &= ~(SORT_DESCENDING);
 
     switch ( flags )
     {
@@ -544,16 +561,16 @@ get_basic_eq(boost::uint8_t flags, int version)
             f = as_value_eq(version);
             return f;
 
-        case Array_as::fCaseInsensitive: 
+        case SORT_CASE_INSENSITIVE: 
             f = as_value_nocase_eq(version);
             return f;
 
-        case Array_as::fNumeric: 
+        case SORT_NUMERIC: 
             f = as_value_num_eq(version);
             return f;
 
-        case Array_as::fCaseInsensitive | 
-                Array_as::fNumeric:
+        case SORT_CASE_INSENSITIVE | 
+                SORT_NUMERIC:
             f = as_value_num_nocase_eq(version);
             return f;
 
@@ -712,15 +729,15 @@ private:
     const as_object& _obj;
 };
 
-// Convenience function to strip fUniqueSort and fReturnIndexedArray from sort
+// Convenience function to strip SORT_UNIQUE and SORT_RETURN_INDEX from sort
 // flag. Presence of flags recorded in douniq and doindex.
 inline boost::uint8_t
 flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 {
-    *douniq = (flgs & Array_as::fUniqueSort);
-    *doindex = (flgs & Array_as::fReturnIndexedArray);
-    flgs &= ~(Array_as::fReturnIndexedArray);
-    flgs &= ~(Array_as::fUniqueSort);
+    *douniq = (flgs & SORT_UNIQUE);
+    *doindex = (flgs & SORT_RETURN_INDEX);
+    flgs &= ~(SORT_RETURN_INDEX);
+    flgs &= ~(SORT_UNIQUE);
     return flgs;
 }
 
@@ -733,7 +750,7 @@ get_multi_flags(Array_as::const_iterator itBegin,
     Array_as::const_iterator it = itBegin;
     std::deque<boost::uint8_t> flgs;
 
-    // extract fUniqueSort and fReturnIndexedArray from first flag
+    // extract SORT_UNIQUE and SORT_RETURN_INDEX from first flag
     if (it != itEnd)
     {
         boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
@@ -744,8 +761,8 @@ get_multi_flags(Array_as::const_iterator itBegin,
     while (it != itEnd)
     {
         boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
-        flag &= ~(Array_as::fReturnIndexedArray);
-        flag &= ~(Array_as::fUniqueSort);
+        flag &= ~(SORT_RETURN_INDEX);
+        flag &= ~(SORT_UNIQUE);
         flgs.push_back(flag);
     }
     return flgs;
@@ -1046,11 +1063,11 @@ void
 attachArrayStatics(as_object& proto)
 {
     int flags = 0; // these are not protected
-    proto.init_member("CASEINSENSITIVE", Array_as::fCaseInsensitive, flags);
-    proto.init_member("DESCENDING", Array_as::fDescending, flags);
-    proto.init_member("UNIQUESORT", Array_as::fUniqueSort, flags);
-    proto.init_member("RETURNINDEXEDARRAY", Array_as::fReturnIndexedArray, flags);
-    proto.init_member("NUMERIC", Array_as::fNumeric, flags);
+    proto.init_member("CASEINSENSITIVE", SORT_CASE_INSENSITIVE, flags);
+    proto.init_member("DESCENDING", SORT_DESCENDING, flags);
+    proto.init_member("UNIQUESORT", SORT_UNIQUE, flags);
+    proto.init_member("RETURNINDEXEDARRAY", SORT_RETURN_INDEX, flags);
+    proto.init_member("NUMERIC", SORT_NUMERIC, flags);
 }
 
 void
@@ -1193,7 +1210,7 @@ array_sort(const fn_call& fn)
             flags=static_cast<boost::uint8_t>(fn.arg(1).to_number());
         }
 
-        if (flags & Array_as::fDescending) icmp = &int_lt_or_eq;
+        if (flags & SORT_DESCENDING) icmp = &int_lt_or_eq;
         else icmp = &int_gt;
 
         const as_environment& env = fn.env();
@@ -1201,7 +1218,7 @@ array_sort(const fn_call& fn)
         as_value_custom avc = 
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
 
-        if ((flags & Array_as::fReturnIndexedArray)) {
+        if ((flags & SORT_RETURN_INDEX)) {
             return sortIndexed(*array, avc);
         }
 
@@ -1522,7 +1539,7 @@ array_toString(const fn_call& fn)
 as_value
 array_concat(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
     Global_as* gl = getGlobal(fn);
     as_object* newarray = gl->createArray();
@@ -1590,28 +1607,28 @@ as_value
 array_new(const fn_call& fn)
 {
     IF_VERBOSE_ACTION (
-    log_action(_("array_new called, nargs = %d"), fn.nargs);
+        log_action(_("array_new called, nargs = %d"), fn.nargs);
     );
 
-    Array_as* ao = new Array_as;
+    // TODO: use the this_ptr
+    as_object* ao = new Array_as;
 
-    if (fn.nargs == 0)
-    {
-        // Empty array.
+    if (fn.nargs == 0) {
+        return ao;
     }
-    else if (fn.nargs == 1 && fn.arg(0).is_number() )
-    {
+
+    if (fn.nargs == 1 && fn.arg(0).is_number()) {
         int newSize = fn.arg(0).to_int();
         if (newSize < 0) newSize = 0;
         else {
             ao->set_member(NSV::PROP_LENGTH, newSize);
         }
+        return ao;
     }
-    else {
-        // Use the arguments as initializers.
-        for (size_t i = 0; i < fn.nargs; i++) {
-            ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
-        }
+
+    // Use the arguments as initializers.
+    for (size_t i = 0; i < fn.nargs; i++) {
+        ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
     }
 
     return as_value(ao);
