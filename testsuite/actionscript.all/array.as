@@ -313,14 +313,14 @@ xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But
 
 function testCmpBogus5 (x,y) { trysortarray.pop(); return -1; }
 trysortarray.sort( testCmpBogus5 );
-xcheck_equals ( trysortarray.length , 0 );
+check_equals ( trysortarray.length , 0 );
 
 function testCmpBogus6 (x,y) { trysortarray.pop(); return 1; }
 trysortarray = new Array(1,2,3,4);
 check_equals ( trysortarray.toString(), "1,2,3,4" );
 check_equals ( trysortarray.length, 4 );
 trysortarray.sort( testCmpBogus6 );
-check_equals ( trysortarray.length, 4 );
+xcheck_equals ( trysortarray.length, 4 );
 xcheck_equals ( trysortarray.toString(), "2,3,4,1" );
 
 
@@ -739,7 +739,7 @@ check_equals(c[8], undefined);
 check_equals(c[0], 'zero');
 c.length = -1;
 // it seems Gnash needs to store the 'length' property as a normal property
-xcheck_equals(c.length, -1);
+check_equals(c.length, -1);
 check_equals(c[0], undefined);
 
 //-------------------------------
