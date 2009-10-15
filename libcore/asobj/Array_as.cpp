@@ -1508,47 +1508,6 @@ Array_as::enumerateNonProperties(as_environment& env) const
     }
 }
 
-void
-Array_as::splice(unsigned int start, unsigned int count, const std::vector<as_value>* replace, Array_as* receive)
-{
-    size_t sz = elements.size();
-
-    assert ( start <= sz );
-    assert ( start+count <= sz );
-
-    size_t newsize = sz-count;
-    if ( replace ) newsize += replace->size();
-    ArrayContainer newelements(newsize);
-
-    size_t ni=0;
-
-    // add initial portion
-    for (size_t i=0; i<start; ++i )
-    {
-        newelements[ni++] = elements[i];
-    }
-
-    // add replacement, if any
-    if ( replace )
-    {
-        for (size_t i=0, e=replace->size(); i<e; ++i) 
-            newelements[ni++] = replace->at(i);
-    }    
-
-    // add final portion
-    for (size_t i=start+count; i<sz; ++i )
-        newelements[ni++] = elements[i];
-
-    // push trimmed data to the copy array, if any
-    if ( receive )
-    {
-        for (size_t i=start; i<start+count; ++i )
-            receive->callMethod(NSV::PROP_PUSH, elements[i]);
-    }
-
-    elements = newelements;
-}
-
 #ifdef GNASH_USE_GC
 void
 Array_as::markReachableResources() const

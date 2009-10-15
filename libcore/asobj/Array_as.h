@@ -143,26 +143,6 @@ public:
 	void resize(unsigned int);
 
 	/// \brief
-	/// Replace count elements from start with given values, optionally
-	/// returning the erased ones.
-	//
-	/// @param start
-	///	First element to remove. Will abort if invalid.
-	///
-	/// @param count
-	///	Number of elements to remove. Will abort if > then available.
-	///
-	/// @param replace
-	///	If not null, use as a replacement for the cutted values
-	///
-	/// @param copy
-	///	If not null, an array to push cutted values to.
-	///
-	void splice(unsigned int start, unsigned int count, 
-			const std::vector<as_value>* replace=NULL,
-			Array_as* copy=NULL);
-
-	/// \brief
 	/// Sort the array, using given values comparator
 	///
 	/// @param avc
