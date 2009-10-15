@@ -21,6 +21,7 @@
 #include "as_object.h" // for inheritance
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "namedStrings.h"
+#include "Global_as.h"
 
 #include <deque>
 #include <vector>
@@ -56,6 +57,8 @@ struct ContainerFiller {
 };
 
 void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
+
+void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
 
 /// The Array ActionScript object
 class Array_as : public as_object
@@ -135,8 +138,6 @@ public:
 	Array_as::const_iterator end();
 
 	as_value at(unsigned int index) const;
-
-	Array_as* get_indices(const std::vector<indexed_as_value>& origElems);
 
 	unsigned int size() const;
 
@@ -235,49 +236,6 @@ public:
 		}
 
 		return as_value(this);
-	}
-
-	/// \brief
-	/// Return a new array containing sorted index of this array
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///
-	template <class AVCMP>
-	Array_as* sort_indexed(AVCMP avc)
-	{
-        std::vector<indexed_as_value> v;
-        getIndexedElements(*this, v);
-		std::sort(v.begin(), v.end(), avc);
-		return get_indices(v);
-	}
-
-	/// \brief
-	/// Return a new array containing sorted index of this array.
-	/// If two or more elements in the array are equal, as determined
-	/// by the equality comparator ave, then 0 is returned instead.
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine sort-order
-	///
-	/// @param ave
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine equality
-	///
-	template <class AVCMP, class AVEQ>
-	as_value sort_indexed(AVCMP avc, AVEQ ave)
-	{
-		std::vector<indexed_as_value> v;
-
-        getIndexedElements(*this, v);
-
-		std::sort(v.begin(), v.end(), avc);
-
-		if (std::adjacent_find(v.begin(), v.end(), ave) != v.end() )
-			return as_value(0.0);
-
-		return get_indices(v);
 	}
 
     /// Why is this overridden?

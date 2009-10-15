@@ -126,6 +126,56 @@ private:
     size_t _i;
 };
 
+/// \brief
+/// Return a new array containing sorted index of this array.
+/// If two or more elements in the array are equal, as determined
+/// by the equality comparator ave, then 0 is returned instead.
+///
+/// @param avc
+///	boolean functor or function comparing two as_value& objects
+///     used to determine sort-order
+///
+/// @param ave
+///	boolean functor or function comparing two as_value& objects
+///     used to determine equality
+///
+template <class AVCMP, class AVEQ>
+as_value sortIndexed(as_object& array, AVCMP avc, AVEQ ave)
+{
+    std::vector<indexed_as_value> v;
+
+    getIndexedElements(array, v);
+
+    std::sort(v.begin(), v.end(), avc);
+
+    if (std::adjacent_find(v.begin(), v.end(), ave) != v.end()) {
+        return as_value(0.0);
+    }
+
+    as_object* o = getGlobal(array)->createArray();
+    pushIndices(*o, v);
+    return o;
+}
+
+
+/// \brief
+/// Return a new array containing sorted index of this array
+///
+/// @param avc
+///	boolean functor or function comparing two as_value& objects
+///
+template <class AVCMP>
+as_object* sortIndexed(as_object& array, AVCMP avc)
+{
+    std::vector<indexed_as_value> v;
+    getIndexedElements(array, v);
+    std::sort(v.begin(), v.end(), avc);
+    as_object* o = getGlobal(array)->createArray();
+    pushIndices(*o, v);
+    return o;
+}
+
+
 // simple as_value strict-weak-ordering comparison functors:
 // string comparison, ascending (default sort method)
 struct as_value_lt
@@ -763,17 +813,13 @@ Array_as::set_member(string_table::key name,
     return as_object::set_member(name,val, nsname, ifFound);
 }
 
-Array_as*
-Array_as::get_indices(const std::vector<indexed_as_value>& elems)
+void
+pushIndices(as_object& o, const std::vector<indexed_as_value>& elems)
 {
-    Array_as* intIndexes = new Array_as();
-
     for (std::vector<indexed_as_value>::const_iterator it = elems.begin();
-        it != elems.end(); ++it)
-    {
-        intIndexes->callMethod(NSV::PROP_PUSH, it->vec_index);
+        it != elems.end(); ++it) {
+        o.callMethod(NSV::PROP_PUSH, it->vec_index);
     }
-    return intIndexes;
 }
 
 void
@@ -1059,7 +1105,7 @@ array_sort(const fn_call& fn)
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
 
         if ((flags & Array_as::fReturnIndexedArray)) {
-            return as_value(array->sort_indexed(avc));
+            return sortIndexed(*array, avc);
         }
 
         array->sort(avc);
@@ -1081,10 +1127,10 @@ array_sort(const fn_call& fn)
 
     if (do_unique) {
         as_cmp_fn eq = get_basic_eq(flags, version);
-        if (do_index) return array->sort_indexed(comp, eq);
+        if (do_index) return sortIndexed(*array, comp, eq);
         return array->sort(comp, eq);
     }
-    if (do_index) return as_value(array->sort_indexed(comp));
+    if (do_index) return sortIndexed(*array, comp);
     array->sort(comp);
     return as_value(array);
 }
@@ -1118,12 +1164,12 @@ array_sortOn(const fn_call& fn)
             as_value_prop ave(propField, get_basic_eq(flags, version), 
                     *getGlobal(fn));
             if (do_index)
-                return array->sort_indexed(avc, ave);
+                return sortIndexed(*array, avc, ave);
             return array->sort(avc, ave);
         }
         
         if (do_index) {
-            return as_value(array->sort_indexed(avc));
+            return sortIndexed(*array, avc);
         }
 
         array->sort(avc);
@@ -1210,10 +1256,10 @@ array_sortOn(const fn_call& fn)
         if (do_unique)
         {
             as_value_multiprop_eq ave(prp, eq, *getGlobal(fn));
-            if (do_index) return array->sort_indexed(avc, ave);
+            if (do_index) return sortIndexed(*array, avc, ave);
             return array->sort(avc, ave);
         }
-        if (do_index) return as_value(array->sort_indexed(avc));
+        if (do_index) return sortIndexed(*array, avc);
         array->sort(avc);
         return as_value(array.get());
 
