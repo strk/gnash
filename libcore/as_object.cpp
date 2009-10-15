@@ -1024,68 +1024,9 @@ as_object::dump_members(std::map<std::string, as_value>& to)
 	_members.dump(*this, to);
 }
 
-class FlagsSetterVisitor
-{
-public:
-	FlagsSetterVisitor(string_table& st, PropertyList& pl,
-            int setTrue, int setFalse)
-		:
-		_st(st),
-		_pl(pl),
-		_setTrue(setTrue),
-		_setFalse(setFalse)
-	{}
-
-	void operator()(const as_value& v) {
-		string_table::key key = _st.find(v.to_string());
-		_pl.setFlags(key, _setTrue, _setFalse);
-	}
-
-private:
-	string_table& _st;
-	PropertyList& _pl;
-	const int _setTrue;
-	const int _setFalse;
-};
-
 void
 as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 {
-	if (props_val.is_string())
-	{
-		std::string propstr = PROPNAME(props_val.to_string()); 
-
-		for(;;)
-		{
-			std::string prop;
-			size_t next_comma=propstr.find(",");
-			if ( next_comma == std::string::npos )
-			{
-				prop=propstr;
-			} 
-			else
-			{
-				prop=propstr.substr(0,next_comma);
-				propstr=propstr.substr(next_comma+1);
-			}
-
-			// set_member_flags will take care of case conversion
-			if (!set_member_flags(getStringTable(*this).find(prop), set_true, set_false) )
-			{
-				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror(_("Can't set propflags on object "
-					"property %s "
-					"(either not found or protected)"),	prop);
-				);
-			}
-
-			if ( next_comma == std::string::npos )
-			{
-				break;
-			}
-		}
-		return;
-	}
 
 	if (props_val.is_null()) {
 		// Take all the members of the object
@@ -1093,11 +1034,35 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	as_object* ary = props_val.to_object(*getGlobal(*this));
+    std::string propstr = props_val.to_string();
 
-	FlagsSetterVisitor visitor(getStringTable(*this), _members, set_true,
-            set_false);
-	foreachArray(*ary, visitor);
+    for (;;) {
+
+        std::string prop;
+        size_t next_comma=propstr.find(",");
+        if (next_comma == std::string::npos) {
+            prop = propstr;
+        } 
+        else {
+            prop = propstr.substr(0,next_comma);
+            propstr = propstr.substr(next_comma+1);
+        }
+
+        // set_member_flags will take care of case conversion
+        if (!set_member_flags(getStringTable(*this).find(prop), set_true, set_false) )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Can't set propflags on object "
+                "property %s "
+                "(either not found or protected)"),	prop);
+            );
+        }
+
+        if (next_comma == std::string::npos) {
+            break;
+        }
+    }
+    return;
 }
 
 
