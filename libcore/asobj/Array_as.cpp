@@ -1190,17 +1190,28 @@ array_shift(const fn_call& fn)
 static as_value
 array_reverse(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
+    as_object* array = ensureType<as_object>(fn.this_ptr);
 
-    array->reverse();
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
 
-    as_value rv(array.get()); 
+    // An array with 0 or 1 elements has nothing to reverse.
+    if (size < 2) return as_value();
 
-    IF_VERBOSE_ACTION (
-    log_action(_("called array reverse, result:%s, new array size:%d"),
-        rv, array->size());
-    );
-    return rv;
+    for (size_t i = 0; i < static_cast<size_t>(size) / 2; ++i) {
+        const string_table::key bottomkey = getKey(fn, i);
+        const string_table::key topkey = getKey(fn, size - i - 1);
+        const as_value top = array->getMember(topkey);
+        const as_value bottom = array->getMember(bottomkey);
+        array->delProperty(topkey);
+        array->delProperty(bottomkey);
+        array->set_member(bottomkey, top);
+        array->set_member(topkey, bottom);
+    }
+
+    return array;
 }
 
 as_value
