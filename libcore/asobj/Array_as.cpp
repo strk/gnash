@@ -102,6 +102,17 @@ private:
     as_object& _obj;
 };
 
+class PushToVector
+{
+public:
+    PushToVector(std::vector<as_value>& v) : _v(v) {}
+    void operator()(const as_value& val) {
+        _v.push_back(val);
+    }
+private:
+    std::vector<as_value>& _v;
+};
+
 }
 
 static as_object* getArrayInterface();
@@ -776,65 +787,79 @@ Array_as::get_indices(std::deque<indexed_as_value> elems)
 static as_value
 array_splice(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
-
-#ifdef GNASH_DEBUG
-    std::stringstream ss;
-    fn.dump_args(ss);
-    log_debug(_("Array(%s).splice(%s) called"), array->toString(), ss.str());
-#endif
-
-    if (fn.nargs < 1)
-    {
+    as_object* array = ensureType<as_object>(fn.this_ptr);
+    
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Array.splice() needs at least 1 argument, call ignored"));
+            log_aserror(_("Array.splice() needs at least 1 argument, "
+                    "call ignored"));
         );
         return as_value();
     }
-
-    unsigned origlen = array->size();
+    
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value();
+    
+    const int size = length.to_int();
+    if (size < 0) return as_value();
 
     //----------------
     // Get start offset
     //----------------
-    unsigned startoffset;
-    int start = fn.arg(0).to_int();
-    if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
-    startoffset = clamp<int>(start, 0, origlen);
-#ifdef GNASH_DEBUG
-    if ( startoffset != start )
-        log_debug(_("Array.splice: start:%d became %u"), start, startoffset);
-#endif
 
-    //----------------
-    // Get length
-    //----------------
-    unsigned len = origlen - start;
-    if (fn.nargs > 1)
-    {
-        int lenval = fn.arg(1).to_int();
-        if ( lenval < 0 )
-        {
+    int start = fn.arg(0).to_int();
+    if (start < 0) start = size + start; 
+    start = clamp<int>(start, 0, size);
+
+    // Get length to delete
+    size_t remove = size - start;
+    
+    if (fn.nargs > 1) {
+        int remval = fn.arg(1).to_int();
+        if (remval < 0) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Array.splice(%d,%d): negative length given, call ignored"),
-                start, lenval);
+                log_aserror(_("Array.splice(%d,%d): negative length "
+                        "given, call ignored"), start, remval);
             );
             return as_value();
         }
-        len = clamp<int>(lenval, 0, origlen-startoffset);
+        remove = clamp<int>(remval, 0, size - start);
     }
 
-    //----------------
-    // Get replacement
-    //----------------
-    std::vector<as_value> replace;
-    for (unsigned i=2; i<fn.nargs; ++i)
-    {
-        replace.push_back(fn.arg(i));
+    Global_as* gl = getGlobal(fn);
+    as_object* ret = gl->createArray();
+
+    // Copy the original array values for reinsertion. It's not possible
+    // to do a simple copy in-place without overwriting values that still
+    // need to be shifted. The algorithm could certainly be improved though.
+    std::vector<as_value> v;
+    PushToVector pv(v);
+    foreachArray(*array, pv);
+
+    const size_t newelements = fn.nargs > 2 ? fn.nargs - 2 : 0;
+    
+    // Push removed elements to the new array.
+    for (size_t i = 0; i < remove; ++i) {
+        const size_t key = getKey(fn, start + i);
+        ret->callMethod(NSV::PROP_PUSH, array->getMember(key));
     }
 
-    Array_as* ret = new Array_as();
-    array->splice(startoffset, len, &replace, ret);
+    // Shift elements in 'this' array by simple assignment, not delete
+    // and readd.
+    for (size_t i = 0; i < static_cast<size_t>(size - remove); ++i) {
+        const bool started = (i >= static_cast<size_t>(start));
+        const size_t index = started ? i + remove : i;
+        const size_t target = started ? i + newelements : i;
+        array->set_member(getKey(fn, target), v[index]);
+    }
+
+    // Insert the replacement elements in the gap we left.
+    for (size_t i = 0; i < newelements; ++i) {
+        array->set_member(getKey(fn, start + i), fn.arg(i + 2));
+    }
+    
+    // This one is correct!
+    array->set_member(NSV::PROP_LENGTH, size + newelements - remove);
 
     return as_value(ret);
 }
