@@ -1024,13 +1024,11 @@ as_object::dump_members(std::map<std::string, as_value>& to)
 	_members.dump(*this, to);
 }
 
-class FlagsSetterVisitor {
-	string_table& _st;
-	PropertyList& _pl;
-	int _setTrue;
-	int _setFalse;
+class FlagsSetterVisitor
+{
 public:
-	FlagsSetterVisitor(string_table& st, PropertyList& pl, int setTrue, int setFalse)
+	FlagsSetterVisitor(string_table& st, PropertyList& pl,
+            int setTrue, int setFalse)
 		:
 		_st(st),
 		_pl(pl),
@@ -1038,11 +1036,16 @@ public:
 		_setFalse(setFalse)
 	{}
 
-	void visit(as_value& v)
-	{
+	void operator()(const as_value& v) {
 		string_table::key key = _st.find(v.to_string());
 		_pl.setFlags(key, _setTrue, _setFalse);
 	}
+
+private:
+	string_table& _st;
+	PropertyList& _pl;
+	const int _setTrue;
+	const int _setFalse;
 };
 
 void
@@ -1084,41 +1087,17 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	if (props_val.is_null())
-	{
+	if (props_val.is_null()) {
 		// Take all the members of the object
 		_members.setFlagsAll(set_true, set_false);
-
-		// Are we sure we need to descend to __proto__ ?
-		// should we recurse then ?
-#if 0
-		if (m_prototype)
-		{
-			m_prototype->_members.setFlagsAll(set_true, set_false);
-		}
-#endif
 		return;
 	}
 
-	boost::intrusive_ptr<as_object> props = props_val.to_object(*getGlobal(*this));
-	Array_as* ary = dynamic_cast<Array_as*>(props.get());
-	if ( ! ary )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to AsSetPropFlags: "
-			"invalid second argument %s "
-			"(expected string, null or an array)"),
-			props_val);
-		);
-		return;
-	}
+	as_object* ary = props_val.to_object(*getGlobal(*this));
 
-	// The passed argument has to be considered an array
-	//std::pair<size_t, size_t> result = 
 	FlagsSetterVisitor visitor(getStringTable(*this), _members, set_true,
             set_false);
-	ary->visitAll(visitor);
-	//_members.setFlagsAll(props->_members, set_true, set_false);
+	foreachArray(*ary, visitor);
 }
 
 
