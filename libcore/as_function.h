@@ -126,17 +126,6 @@ protected:
 	///
 	as_function(Global_as& gl);
 
-	/// Construct a function with given interface (possibly none)
-	//
-	/// @param iface
-	///	The interface exported by this class (its 'prototype' member).
-	///	If NULL, no prototype will be set (this is used for some
-	///	corner cases like TextField in SWF5 or below).
-	///	If not NULL, a 'constructor' member will be added to the
-	///	prototype, pointing to 'this'.
-	///
-	as_function(Global_as& gl, as_object* iface);
-
 #ifdef GNASH_USE_GC
 	/// Mark prototype (properties) as being reachable and invoke
 	/// the as_object class marker.

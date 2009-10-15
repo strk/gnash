@@ -206,7 +206,11 @@ builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
     as_object* proto = createObject();
-    builtin_function* f = new builtin_function(*this, function, proto);
+    builtin_function* f = new builtin_function(*this, function);
+    
+    proto->init_member(NSV::PROP_CONSTRUCTOR, f); 
+    
+    f->init_member(NSV::PROP_PROTOTYPE, proto);
     f->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return f;
@@ -215,7 +219,12 @@ AVM1Global::createFunction(Global_as::ASFunction function)
 as_object*
 AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
-    as_object* cl = new builtin_function(*this, ctor, prototype);
+    as_object* cl = new builtin_function(*this, ctor);
+    
+    if (prototype) {
+        prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
+        cl->init_member(NSV::PROP_PROTOTYPE, prototype);
+    }
     cl->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return cl;
@@ -277,8 +286,12 @@ as_object*
 AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
     // TODO: this should attach the function to the prototype as its
-    // constructor member.
-    as_object* cl = new builtin_function(*this, ctor, prototype);
+    as_object* cl = new builtin_function(*this, ctor);
+    
+    if (prototype) {
+        prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
+        cl->init_member(NSV::PROP_PROTOTYPE, prototype);
+    }
     cl->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return cl;

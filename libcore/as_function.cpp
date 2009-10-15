@@ -61,22 +61,6 @@ namespace {
 // the Function class itself, which would be a member
 // of the _global object for each movie instance.
 
-as_function::as_function(Global_as& gl, as_object* iface)
-	:
-	as_object(gl)
-{
-	int flags = PropFlags::dontDelete |
-	            PropFlags::dontEnum |
-	            PropFlags::onlySWF6Up;
-
-    init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
-
-	if (iface) {
-		iface->init_member(NSV::PROP_CONSTRUCTOR, this); 
-		init_member(NSV::PROP_PROTOTYPE, as_value(iface));
-	}
-}
-
 as_function::as_function(Global_as& gl)
 	:
 	as_object(gl)
