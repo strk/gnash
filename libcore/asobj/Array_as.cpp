@@ -116,7 +116,6 @@ private:
 }
 
 static as_object* getArrayInterface();
-static void attachArrayProperties(as_object& proto);
 static void attachArrayInterface(as_object& proto);
 static void attachArrayStatics(as_object& proto);
 
@@ -605,10 +604,7 @@ Array_as::Array_as()
     as_object(getArrayInterface()), // pass Array inheritance
     elements(0)
 {
-    //IF_VERBOSE_ACTION (
-    //log_action("%s: %p", __FUNCTION__, (void*)this);
-    //)
-    attachArrayProperties(*this);
+    init_member(NSV::PROP_LENGTH, 0.0);
 }
 
 
@@ -755,18 +751,23 @@ Array_as::set_member(string_table::key name,
     // if we were sent a valid array index and not a normal member
     if (index >= 0)
     {
-        if ( size_t(index) >= elements.size() )
+        if (size_t(index) >= elements.size())
         {
             // if we're setting index (x), the vector
             // must be size (x+1)
             elements.resize(index+1);
         }
 
+        as_object::set_member(NSV::PROP_LENGTH, elements.size());
         // set the appropriate index and return
         elements[index] = val;
         return true;
     }
 
+    if (name == NSV::PROP_LENGTH) {
+        elements.resize(std::max(val.to_int(), 0));
+        // Don't return before as_object has set the value!
+    }
 
     return as_object::set_member(name,val, nsname, ifFound);
 }
@@ -1337,31 +1338,6 @@ array_slice(const fn_call& fn)
     return as_value(newarray);        
 }
 
-static as_value
-array_length(const fn_call& fn)
-{
-    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
-
-    if ( fn.nargs ) // setter
-    {
-        int length = fn.arg(0).to_int();
-        if ( length < 0 ) // TODO: set a max limit too ?
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("Attempt to set Array.length to a negative value %d", length);
-            )
-            length = 0;
-        }
-
-        array->resize(length);
-        return as_value();
-    }
-    else // getter
-    {
-        return as_value(array->size());
-    }
-}
-
 as_value
 array_new(const fn_call& fn)
 {
@@ -1381,6 +1357,7 @@ array_new(const fn_call& fn)
         int newSize = fn.arg(0).to_int();
         if ( newSize < 0 ) newSize = 0;
         else ao->resize(newSize);
+        ao->set_member(NSV::PROP_LENGTH, newSize);
     }
     else
     {
@@ -1398,12 +1375,6 @@ array_new(const fn_call& fn)
 
     return as_value(ao.get());
     //return as_value(ao);
-}
-
-static void
-attachArrayProperties(as_object& proto)
-{
-    proto.init_property(NSV::PROP_LENGTH, &array_length, &array_length);
 }
 
 static void
@@ -1475,23 +1446,26 @@ registerArrayNative(as_object& global)
 // 'constructor'
 //
 void
-array_class_init(as_object& glob, const ObjectURI& uri)
+array_class_init(as_object& where, const ObjectURI& uri)
 {
-    // This is going to be the global Array "class"/"function"
-    static as_object* ar = 0;
+    static as_object* cl = 0;
 
-    if ( ar == NULL )
-    {
-        Global_as* gl = getGlobal(glob);
+    if (cl == NULL) {
+
+        // This is going to be the global Array "class"/"function"
+        VM& vm = getVM(where);
+
         as_object* proto = getArrayInterface();
-        ar = gl->createClass(&array_new, proto);
+        cl = vm.getNative(252, 0);
+        cl->init_member(NSV::PROP_PROTOTYPE, proto);
+        proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
 
         // Attach static members
-        attachArrayStatics(*ar);
+        attachArrayStatics(*cl);
     }
 
-    int flags = PropFlags::dontEnum; // |PropFlags::onlySWF5Up; 
-    glob.init_member(getName(uri), ar, flags, getNamespace(uri));
+    const int flags = PropFlags::dontEnum; 
+    where.init_member(getName(uri), cl, flags, getNamespace(uri));
 }
 
 void
