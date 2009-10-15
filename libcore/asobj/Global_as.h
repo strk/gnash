@@ -85,9 +85,7 @@ public:
 
     /// Create an Array object
     //
-    /// This calls the Array constructor. If that has been changed, this
-    /// function may not produce an Array object. This is generally
-    /// expected behaviour.
+    /// This creates an Array object without calling the Array constructor.
     virtual as_object* createArray() = 0;
 
     /// Create an Object
