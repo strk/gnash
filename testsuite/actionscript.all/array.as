@@ -211,8 +211,8 @@ check(!gaparray.hasOwnProperty('1'));
 gaparray.sort();
 check_equals(gaparray.length, 17);
 #if OUTPUT_VERSION < 7
- xcheck_equals(gaparray[0], undefined); // this is 16 with gnash
- xcheck_equals(gaparray[1], undefined); // this is 4 with gnash
+ check_equals(gaparray[0], undefined); // this is 16 with gnash
+ check_equals(gaparray[1], undefined); // this is 4 with gnash
 #else
  check_equals(gaparray[0], '16');
  check_equals(gaparray[1], '4');
@@ -231,8 +231,8 @@ check_equals(gaparray[12], undefined);
 check_equals(gaparray[13], undefined);
 check_equals(gaparray[14], undefined);
 #if OUTPUT_VERSION < 7
-  xcheck_equals(gaparray[15], '16'); // this is at [0] with gnash
-  xcheck_equals(gaparray[16], '4'); // this is at [1] with gnash
+  check_equals(gaparray[15], '16'); // this is at [0] with gnash
+  check_equals(gaparray[16], '4'); // this is at [1] with gnash
 #else
   check_equals(gaparray[15], undefined);
   check_equals(gaparray[16], undefined);
@@ -240,16 +240,16 @@ check_equals(gaparray[14], undefined);
 
 #if OUTPUT_VERSION > 5
 #if OUTPUT_VERSION < 7
- xcheck(gaparray.hasOwnProperty('15'));
- xcheck(gaparray.hasOwnProperty('16'));
- xcheck(gaparray.hasOwnProperty('4')); // a-ha!
+ check(gaparray.hasOwnProperty('15'));
+ check(gaparray.hasOwnProperty('16'));
+ check(gaparray.hasOwnProperty('4')); // a-ha!
  xcheck(!gaparray.hasOwnProperty('0'));
 #else
- xcheck(gaparray.hasOwnProperty('16'));
- xcheck(gaparray.hasOwnProperty('4')); 
+ check(gaparray.hasOwnProperty('16'));
+ check(gaparray.hasOwnProperty('4')); 
  check(gaparray.hasOwnProperty('1'));
  check(gaparray.hasOwnProperty('0'));
- xcheck(gaparray.hasOwnProperty('2'));
+ check(gaparray.hasOwnProperty('2'));
 #endif
 #endif
 
@@ -313,14 +313,14 @@ xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But
 
 function testCmpBogus5 (x,y) { trysortarray.pop(); return -1; }
 trysortarray.sort( testCmpBogus5 );
-check_equals ( trysortarray.length , 0 );
+xcheck_equals ( trysortarray.length , 0 );
 
 function testCmpBogus6 (x,y) { trysortarray.pop(); return 1; }
 trysortarray = new Array(1,2,3,4);
 check_equals ( trysortarray.toString(), "1,2,3,4" );
 check_equals ( trysortarray.length, 4 );
 trysortarray.sort( testCmpBogus6 );
-xcheck_equals ( trysortarray.length, 4 );
+check_equals ( trysortarray.length, 4 );
 xcheck_equals ( trysortarray.toString(), "2,3,4,1" );
 
 
