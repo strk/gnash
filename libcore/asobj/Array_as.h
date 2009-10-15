@@ -138,8 +138,6 @@ public:
 
 	Array_as* get_indices(std::deque<indexed_as_value> origElems);
 
-	void reverse();
-
 	unsigned int size() const;
 
 	void resize(unsigned int);

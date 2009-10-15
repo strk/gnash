@@ -654,25 +654,6 @@ Array_as::index_requested(string_table::key name)
     return int(value);
 }
 
-void
-Array_as::reverse()
-{
-    const ArrayContainer::size_type s = elements.size();
-    if ( s < 2 ) return; // nothing to do (CHECKME: might be a single hole!)
-
-    // We create another container, as we want to fill the gaps
-    // There could likely be an in-place version for this, but
-    // filling the gaps would need more care
-    ArrayContainer newelements(s);
-
-    for (size_t i = 0, n = s - 1; i < s; ++i, --n)
-    {
-        newelements[i] = elements[n];
-    }
-
-    elements = newelements;
-}
-
 unsigned int
 Array_as::size() const
 {
