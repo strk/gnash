@@ -908,6 +908,7 @@ fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
+AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
 if test $ltmajor -eq 1; then
 	AC_LIBLTDL_CONVENIENCE
 	AC_LIBTOOL_DLOPEN
