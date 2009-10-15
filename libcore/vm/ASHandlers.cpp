@@ -2810,13 +2810,10 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     
     Global_as* gl = getGlobal(env);
 
-    // Call the array constructor, to create an empty array.
     as_value result = gl->createArray();
 
     as_object* ao = convertToObject(*getGlobal(thread.env), result);
     assert(ao);
-
-    ao->init_member(NSV::PROP_CONSTRUCTOR, gl->getMember(NSV::CLASS_ARRAY));
 
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
