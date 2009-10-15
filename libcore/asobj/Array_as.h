@@ -55,6 +55,8 @@ struct ContainerFiller {
 	void visit(as_value& v) { cont.push_back(v); }
 };
 
+void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
+
 /// The Array ActionScript object
 class Array_as : public as_object
 {
@@ -128,15 +130,13 @@ public:
     ///
     bool isStrict() const;
 
-	std::deque<indexed_as_value> get_indexed_elements();
-
 	Array_as::const_iterator begin();
 
 	Array_as::const_iterator end();
 
 	as_value at(unsigned int index) const;
 
-	Array_as* get_indices(std::deque<indexed_as_value> origElems);
+	Array_as* get_indices(const std::vector<indexed_as_value>& origElems);
 
 	unsigned int size() const;
 
@@ -246,9 +246,10 @@ public:
 	template <class AVCMP>
 	Array_as* sort_indexed(AVCMP avc)
 	{
-		std::deque<indexed_as_value> ielem = get_indexed_elements();
-		std::sort(ielem.begin(), ielem.end(), avc);
-		return get_indices(ielem);
+        std::vector<indexed_as_value> v;
+        getIndexedElements(*this, v);
+		std::sort(v.begin(), v.end(), avc);
+		return get_indices(v);
 	}
 
 	/// \brief
@@ -267,14 +268,16 @@ public:
 	template <class AVCMP, class AVEQ>
 	as_value sort_indexed(AVCMP avc, AVEQ ave)
 	{
-		std::deque<indexed_as_value> ielem = get_indexed_elements();
+		std::vector<indexed_as_value> v;
 
-		std::sort(ielem.begin(), ielem.end(), avc);
+        getIndexedElements(*this, v);
 
-		if (std::adjacent_find(ielem.begin(), ielem.end(), ave) != ielem.end() )
+		std::sort(v.begin(), v.end(), avc);
+
+		if (std::adjacent_find(v.begin(), v.end(), ave) != v.end() )
 			return as_value(0.0);
 
-		return get_indices(ielem);
+		return get_indices(v);
 	}
 
     /// Why is this overridden?

@@ -40,56 +40,55 @@
 #include <algorithm>
 #include <cmath>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/lexical_cast.hpp>
 
 //#define GNASH_DEBUG 
 
 namespace gnash {
 
-typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
-
-inline string_table::key
-arrayKey(string_table& st, size_t i)
-{
-    std::ostringstream os;
-    os << i;
-    return st.find(os.str());
-}
-
+// Forward declarations
 namespace {
-
-string_table::key getKey(const fn_call& fn, size_t i) {
-    string_table& st = getStringTable(fn);
-    return arrayKey(st, i);
-}
-
-template<typename T>
-bool foreachArray(as_object& array, int start, int end, T& pred)
-{
-    as_value length;
-    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
     
-    const int size = length.to_int();
-    if (size < 0) return false;
+    typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
-    if (start < 0) start = size + start;
-    if (start >= size) return false;
-    start = std::max(start, 0);
+    as_object* getArrayInterface();
+    void attachArrayInterface(as_object& proto);
+    void attachArrayStatics(as_object& proto);
 
-    if (end < 0) end = size + end;
-    end = std::max(start, end);
-    end = std::min<size_t>(end, size);
+    as_value join(as_object* array, const std::string& separator);
 
-    assert(start >= 0);
-    assert(end >= start);
-    assert(size >= end);
+    as_value array_new(const fn_call& fn);
+    as_value array_slice(const fn_call& fn);
+    as_value array_concat(const fn_call& fn);
+    as_value array_toString(const fn_call& fn);
+    as_value array_join(const fn_call& fn);
+    as_value array_reverse(const fn_call& fn);
+    as_value array_shift(const fn_call& fn);
+    as_value array_pop(const fn_call& fn);
+    as_value array_unshift(const fn_call& fn);
+    as_value array_push(const fn_call& fn);
+    as_value array_sortOn(const fn_call& fn);
+    as_value array_sort(const fn_call& fn);
+    as_value array_splice(const fn_call& fn);
 
-    string_table& st = getStringTable(array);
+    string_table::key getKey(const fn_call& fn, size_t i);
 
-    for (size_t i = start; i < static_cast<size_t>(end); ++i) {
-        pred(array.getMember(arrayKey(st, i)));
+    /// Implementation of foreachArray that takes a start and end range.
+    template<typename T> bool foreachArray(as_object& array, int start,
+            int end, T& pred);
+
+    inline bool int_lt_or_eq (int a) {
+        return a <= 0;
     }
-    return true;
+
+    inline bool int_gt (int a) {
+        return a > 0;
+    }
+
 }
+
+/// Function objects for foreachArray()
+namespace {
 
 class PushToArray
 {
@@ -113,24 +112,21 @@ private:
     std::vector<as_value>& _v;
 };
 
-}
 
-static as_object* getArrayInterface();
-static void attachArrayInterface(as_object& proto);
-static void attachArrayStatics(as_object& proto);
-
-inline static bool int_lt_or_eq (int a)
+class PushToIndexedVector
 {
-    return a <= 0;
-}
-
-inline static bool int_gt (int a)
-{
-    return a > 0;
-}
+public:
+    PushToIndexedVector(std::vector<indexed_as_value>& v) : _v(v), _i(0) {}
+    void operator()(const as_value& val) {
+        _v.push_back(indexed_as_value(val, _i));
+        ++_i;
+    }
+private:
+    std::vector<indexed_as_value>& _v;
+    size_t _i;
+};
 
 // simple as_value strict-weak-ordering comparison functors:
-
 // string comparison, ascending (default sort method)
 struct as_value_lt
 {
@@ -562,7 +558,7 @@ private:
 
 // Convenience function to strip fUniqueSort and fReturnIndexedArray from sort
 // flag. Presence of flags recorded in douniq and doindex.
-static inline boost::uint8_t
+inline boost::uint8_t
 flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 {
     *douniq = (flgs & Array_as::fUniqueSort);
@@ -599,6 +595,8 @@ get_multi_flags(Array_as::const_iterator itBegin,
     return flgs;
 }
 
+}
+
 Array_as::Array_as()
     :
     as_object(getArrayInterface()), // pass Array inheritance
@@ -612,18 +610,11 @@ Array_as::~Array_as()
 {
 }
 
-std::deque<indexed_as_value>
-Array_as::get_indexed_elements()
+void
+getIndexedElements(as_object& array, std::vector<indexed_as_value>& v)
 {
-    std::deque<indexed_as_value> indexed_elements;
-    int i = 0;
-
-    for (Array_as::const_iterator it = elements.begin(), e = elements.end();
-        it != e; ++it)
-    {
-        indexed_elements.push_back(indexed_as_value(*it, i++));
-    }
-    return indexed_elements;
+    PushToIndexedVector pv(v);
+    foreachArray(array, pv);
 }
 
 Array_as::const_iterator
@@ -773,11 +764,11 @@ Array_as::set_member(string_table::key name,
 }
 
 Array_as*
-Array_as::get_indices(std::deque<indexed_as_value> elems)
+Array_as::get_indices(const std::vector<indexed_as_value>& elems)
 {
     Array_as* intIndexes = new Array_as();
 
-    for (std::deque<indexed_as_value>::const_iterator it = elems.begin();
+    for (std::vector<indexed_as_value>::const_iterator it = elems.begin();
         it != elems.end(); ++it)
     {
         intIndexes->callMethod(NSV::PROP_PUSH, it->vec_index);
@@ -785,7 +776,170 @@ Array_as::get_indices(std::deque<indexed_as_value> elems)
     return intIndexes;
 }
 
-static as_value
+void
+registerArrayNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(array_new, 252, 0);
+    vm.registerNative(array_push, 252, 1);
+    vm.registerNative(array_pop, 252, 2);
+    vm.registerNative(array_concat, 252, 3);
+    vm.registerNative(array_shift, 252, 4);
+    vm.registerNative(array_unshift, 252, 5);
+    vm.registerNative(array_slice, 252, 6);
+    vm.registerNative(array_join, 252, 7);
+    vm.registerNative(array_splice, 252, 8);
+    vm.registerNative(array_toString, 252, 9);
+    vm.registerNative(array_sort, 252, 10);
+    vm.registerNative(array_reverse, 252, 11);
+    vm.registerNative(array_sortOn, 252, 12);
+}
+
+void
+array_class_init(as_object& where, const ObjectURI& uri)
+{
+    static as_object* cl = 0;
+
+    if (cl == NULL) {
+
+        // This is going to be the global Array "class"/"function"
+        VM& vm = getVM(where);
+
+        as_object* proto = getArrayInterface();
+        cl = vm.getNative(252, 0);
+        cl->init_member(NSV::PROP_PROTOTYPE, proto);
+        proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
+        // Attach static members
+        attachArrayStatics(*cl);
+    }
+
+    const int flags = PropFlags::dontEnum; 
+    where.init_member(getName(uri), cl, flags, getNamespace(uri));
+}
+
+void
+Array_as::enumerateNonProperties(as_environment& env) const
+{
+    std::stringstream ss; 
+    for (const_iterator it = elements.begin(),
+        itEnd = elements.end(); it != itEnd; ++it)
+    {
+        int idx = it.index();
+        // enumerated values need to be strings, not numbers
+        ss.str(""); ss << idx;
+        env.push(as_value(ss.str()));
+    }
+}
+
+#ifdef GNASH_USE_GC
+void
+Array_as::markReachableResources() const
+{
+    for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
+    {
+        (*i).setReachable();
+    }
+    markAsObjectReachable();
+}
+#endif // GNASH_USE_GC
+
+void
+Array_as::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    std::stringstream ss; 
+    string_table& st = getStringTable(*this);
+    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    {
+        int idx = i.index();
+        ss.str(""); ss << idx;
+        string_table::key k = st.find(ss.str());
+        visitor.accept(k, *i);
+    }
+
+    // visit proper properties
+    as_object::visitPropertyValues(visitor);
+}
+
+void
+Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    std::stringstream ss; 
+    string_table& st = getStringTable(*this);
+    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    {
+        // TODO: skip hidden ones
+        int idx = i.index();
+        ss.str(""); ss << idx;
+        string_table::key k = st.find(ss.str());
+        visitor.accept(k, *i);
+    }
+
+    // visit proper properties
+    as_object::visitNonHiddenPropertyValues(visitor);
+}
+
+bool
+Array_as::isStrict() const
+{
+    if ( hasNonHiddenProperties() ) return false;
+    return true;
+}
+
+// Used by foreachArray, declared in Array_as.h
+string_table::key
+arrayKey(string_table& st, size_t i)
+{
+    return st.find(boost::lexical_cast<std::string>(i));
+}
+
+namespace {
+
+void
+attachArrayStatics(as_object& proto)
+{
+    int flags = 0; // these are not protected
+    proto.init_member("CASEINSENSITIVE", Array_as::fCaseInsensitive, flags);
+    proto.init_member("DESCENDING", Array_as::fDescending, flags);
+    proto.init_member("UNIQUESORT", Array_as::fUniqueSort, flags);
+    proto.init_member("RETURNINDEXEDARRAY", Array_as::fReturnIndexedArray, flags);
+    proto.init_member("NUMERIC", Array_as::fNumeric, flags);
+}
+
+void
+attachArrayInterface(as_object& proto)
+{
+    VM& vm = getVM(proto);
+
+    proto.init_member("push", vm.getNative(252, 1));
+    proto.init_member("pop", vm.getNative(252, 2));
+    proto.init_member("concat", vm.getNative(252, 3));
+    proto.init_member("shift", vm.getNative(252, 4));
+    proto.init_member("unshift", vm.getNative(252, 5));
+    proto.init_member("slice", vm.getNative(252, 6));
+    proto.init_member("join", vm.getNative(252, 7));
+    proto.init_member("splice", vm.getNative(252, 8));
+    proto.init_member("toString", vm.getNative(252, 9));
+    proto.init_member("sort", vm.getNative(252, 10));
+    proto.init_member("reverse", vm.getNative(252, 11));
+    proto.init_member("sortOn", vm.getNative(252, 12));
+}
+
+as_object*
+getArrayInterface()
+{
+    static boost::intrusive_ptr<as_object> proto = NULL;
+    if ( proto == NULL )
+    {
+        proto = new as_object(getObjectInterface());
+        getVM(*proto).addStatic(proto.get());
+
+        attachArrayInterface(*proto);
+    }
+    return proto.get();
+}
+
+as_value
 array_splice(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
@@ -865,31 +1019,26 @@ array_splice(const fn_call& fn)
     return as_value(ret);
 }
 
-static as_value
+as_value
 array_sort(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = 
-        ensureType<Array_as>(fn.this_ptr);
+    Array_as* array = ensureType<Array_as>(fn.this_ptr);
     
     const int version = getSWFVersion(*array);
     
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         array->sort(as_value_lt(version));
-        return as_value(array.get());
+        return as_value(array);
     }
     
     if (fn.arg(0).is_undefined()) return as_value();
 
     boost::uint8_t flags = 0;
 
-    if ( fn.nargs == 1 && fn.arg(0).is_number() )
-    {
-        flags=static_cast<boost::uint8_t>(fn.arg(0).to_number());
+    if (fn.nargs == 1 && fn.arg(0).is_number()) {
+        flags = static_cast<boost::uint8_t>(fn.arg(0).to_number());
     }
-    else if (fn.arg(0).is_function())
-    {
-
+    else if (fn.arg(0).is_function()) {
         // Get comparison function
         as_function* as_func = fn.arg(0).to_as_function();
 
@@ -909,44 +1058,41 @@ array_sort(const fn_call& fn)
         as_value_custom avc = 
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
 
-        if ((flags & Array_as::fReturnIndexedArray))
-        {
+        if ((flags & Array_as::fReturnIndexedArray)) {
             return as_value(array->sort_indexed(avc));
         }
 
         array->sort(avc);
-        return as_value(array.get());
+        return as_value(array);
         // note: custom AS function sorting apparently ignores the 
         // UniqueSort flag which is why it is also ignored here
     }
     else
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Sort called with invalid arguments."));
+            log_aserror(_("Sort called with invalid arguments."));
         )
-        return as_value(array.get());
+        return as_value(array);
     }
+
     bool do_unique, do_index;
     flags = flag_preprocess(flags, &do_unique, &do_index);
     as_cmp_fn comp = get_basic_cmp(flags, version);
 
-    if (do_unique)
-    {
-        as_cmp_fn eq =
-            get_basic_eq(flags, version);
+    if (do_unique) {
+        as_cmp_fn eq = get_basic_eq(flags, version);
         if (do_index) return array->sort_indexed(comp, eq);
         return array->sort(comp, eq);
     }
     if (do_index) return as_value(array->sort_indexed(comp));
     array->sort(comp);
-    return as_value(array.get());
+    return as_value(array);
 }
 
-static as_value
+as_value
 array_sortOn(const fn_call& fn)
 {
-    boost::intrusive_ptr<Array_as> array = 
-        ensureType<Array_as>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
@@ -955,27 +1101,31 @@ array_sortOn(const fn_call& fn)
     string_table& st = getStringTable(fn);
 
     // cases: sortOn("prop) and sortOn("prop", Array.FLAG)
-    if ( fn.nargs > 0 && fn.arg(0).is_string() )
+    if (fn.nargs > 0 && fn.arg(0).is_string()) 
     {
-        string_table::key propField = st.find(fn.arg(0).to_string_versioned(version));
+        string_table::key propField =
+            st.find(fn.arg(0).to_string_versioned(version));
 
-        if ( fn.nargs > 1 && fn.arg(1).is_number() )
-        {
+        if (fn.nargs > 1 && fn.arg(1).is_number()) {
             flags = static_cast<boost::uint8_t>(fn.arg(1).to_number());
             flags = flag_preprocess(flags, &do_unique, &do_index);
         }
+
         as_value_prop avc(propField, get_basic_cmp(flags, version),
                 *getGlobal(fn));
-        if (do_unique)
-        {
+
+        if (do_unique) {
             as_value_prop ave(propField, get_basic_eq(flags, version), 
                     *getGlobal(fn));
             if (do_index)
                 return array->sort_indexed(avc, ave);
             return array->sort(avc, ave);
         }
-        if (do_index)
+        
+        if (do_index) {
             return as_value(array->sort_indexed(avc));
+        }
+
         array->sort(avc);
         return as_value(array.get());
     }
@@ -993,7 +1143,7 @@ array_sortOn(const fn_call& fn)
         for (Array_as::const_iterator it = props->begin();
             it != props->end(); ++it)
         {
-            string_table::key s = st.find(PROPNAME((*it).to_string_versioned(version)));
+            string_table::key s = st.find((*it).to_string_versioned(version));
             prp.push_back(s);
         }
         
@@ -1104,7 +1254,7 @@ array_push(const fn_call& fn)
 }
 
 // Callback to push values to the front of an array
-static as_value
+as_value
 array_unshift(const fn_call& fn)
 {
 
@@ -1142,7 +1292,7 @@ array_unshift(const fn_call& fn)
 }
 
 // Callback to pop a value from the back of an array
-static as_value
+as_value
 array_pop(const fn_call& fn)
 {
 
@@ -1165,7 +1315,7 @@ array_pop(const fn_call& fn)
 }
 
 // Callback to pop a value from the front of an array
-static as_value
+as_value
 array_shift(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
@@ -1194,7 +1344,7 @@ array_shift(const fn_call& fn)
 }
 
 // Callback to reverse the position of the elements in an array
-static as_value
+as_value
 array_reverse(const fn_call& fn)
 {
     as_object* array = ensureType<as_object>(fn.this_ptr);
@@ -1220,32 +1370,6 @@ array_reverse(const fn_call& fn)
 
     return array;
 }
-
-as_value
-join(as_object* array, const std::string& separator)
-{
-    as_value length;
-    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
-
-    const double size = length.to_int();
-    if (size < 0) return as_value("");
-
-    std::string s;
-
-    string_table& st = getStringTable(*array);
-    const int version = getSWFVersion(*array);
-
-    for (size_t i = 0; i < size; ++i) {
-        std::ostringstream os;
-        os << i;
-        if (i) s += separator;
-        as_value el;
-        array->get_member(st.find(os.str()), &el);
-        s += el.to_string_versioned(version);
-    }
-    return as_value(s);
-}
-
 as_value
 array_join(const fn_call& fn)
 {
@@ -1345,7 +1469,7 @@ array_new(const fn_call& fn)
     log_action(_("array_new called, nargs = %d"), fn.nargs);
     );
 
-    boost::intrusive_ptr<Array_as> ao = new Array_as;
+    Array_as* ao = new Array_as;
 
     if (fn.nargs == 0)
     {
@@ -1369,172 +1493,72 @@ array_new(const fn_call& fn)
         }
     }
 
-    IF_VERBOSE_ACTION (
-    log_action(_("array_new setting object %p in result"), (void*)ao.get());
-    );
-
-    return as_value(ao.get());
-    //return as_value(ao);
+    return as_value(ao);
 }
 
-static void
-attachArrayStatics(as_object& proto)
+as_value
+join(as_object* array, const std::string& separator)
 {
-    int flags = 0; // these are not protected
-    proto.init_member("CASEINSENSITIVE", Array_as::fCaseInsensitive, flags);
-    proto.init_member("DESCENDING", Array_as::fDescending, flags);
-    proto.init_member("UNIQUESORT", Array_as::fUniqueSort, flags);
-    proto.init_member("RETURNINDEXEDARRAY", Array_as::fReturnIndexedArray, flags);
-    proto.init_member("NUMERIC", Array_as::fNumeric, flags);
-}
+    as_value length;
+    if (!array->get_member(NSV::PROP_LENGTH, &length)) return as_value("");
 
-static void
-attachArrayInterface(as_object& proto)
-{
-    VM& vm = getVM(proto);
+    const double size = length.to_int();
+    if (size < 0) return as_value("");
 
-    proto.init_member("push", vm.getNative(252, 1));
-    proto.init_member("pop", vm.getNative(252, 2));
-    proto.init_member("concat", vm.getNative(252, 3));
-    proto.init_member("shift", vm.getNative(252, 4));
-    proto.init_member("unshift", vm.getNative(252, 5));
-    proto.init_member("slice", vm.getNative(252, 6));
-    proto.init_member("join", vm.getNative(252, 7));
-    proto.init_member("splice", vm.getNative(252, 8));
-    proto.init_member("toString", vm.getNative(252, 9));
-    proto.init_member("sort", vm.getNative(252, 10));
-    proto.init_member("reverse", vm.getNative(252, 11));
-    proto.init_member("sortOn", vm.getNative(252, 12));
-}
+    std::string s;
 
-static as_object*
-getArrayInterface()
-{
-    static boost::intrusive_ptr<as_object> proto = NULL;
-    if ( proto == NULL )
-    {
-        proto = new as_object(getObjectInterface());
-        getVM(*proto).addStatic(proto.get());
+    string_table& st = getStringTable(*array);
+    const int version = getSWFVersion(*array);
 
-        attachArrayInterface(*proto);
+    for (size_t i = 0; i < size; ++i) {
+        std::ostringstream os;
+        os << i;
+        if (i) s += separator;
+        as_value el;
+        array->get_member(st.find(os.str()), &el);
+        s += el.to_string_versioned(version);
     }
-    return proto.get();
+    return as_value(s);
 }
 
-void
-registerArrayNative(as_object& global)
+string_table::key
+getKey(const fn_call& fn, size_t i)
 {
-    VM& vm = getVM(global);
-    vm.registerNative(array_new, 252, 0);
-    vm.registerNative(array_push, 252, 1);
-    vm.registerNative(array_pop, 252, 2);
-    vm.registerNative(array_concat, 252, 3);
-    vm.registerNative(array_shift, 252, 4);
-    vm.registerNative(array_unshift, 252, 5);
-    vm.registerNative(array_slice, 252, 6);
-    vm.registerNative(array_join, 252, 7);
-    vm.registerNative(array_splice, 252, 8);
-    vm.registerNative(array_toString, 252, 9);
-    vm.registerNative(array_sort, 252, 10);
-    vm.registerNative(array_reverse, 252, 11);
-    vm.registerNative(array_sortOn, 252, 12);
+    string_table& st = getStringTable(fn);
+    return arrayKey(st, i);
 }
 
-// this registers the "Array" member on a "Global"
-// object. "Array" is a constructor, thus an object
-// with .prototype full of exported functions + 
-// 'constructor'
-//
-void
-array_class_init(as_object& where, const ObjectURI& uri)
+template<typename T>
+bool foreachArray(as_object& array, int start, int end, T& pred)
 {
-    static as_object* cl = 0;
+    as_value length;
+    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
+    
+    const int size = length.to_int();
+    if (size < 0) return false;
 
-    if (cl == NULL) {
+    if (start < 0) start = size + start;
+    if (start >= size) return false;
+    start = std::max(start, 0);
 
-        // This is going to be the global Array "class"/"function"
-        VM& vm = getVM(where);
+    if (end < 0) end = size + end;
+    end = std::max(start, end);
+    end = std::min<size_t>(end, size);
 
-        as_object* proto = getArrayInterface();
-        cl = vm.getNative(252, 0);
-        cl->init_member(NSV::PROP_PROTOTYPE, proto);
-        proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+    assert(start >= 0);
+    assert(end >= start);
+    assert(size >= end);
 
-        // Attach static members
-        attachArrayStatics(*cl);
+    string_table& st = getStringTable(array);
+
+    for (size_t i = start; i < static_cast<size_t>(end); ++i) {
+        pred(array.getMember(arrayKey(st, i)));
     }
-
-    const int flags = PropFlags::dontEnum; 
-    where.init_member(getName(uri), cl, flags, getNamespace(uri));
-}
-
-void
-Array_as::enumerateNonProperties(as_environment& env) const
-{
-    std::stringstream ss; 
-    for (const_iterator it = elements.begin(),
-        itEnd = elements.end(); it != itEnd; ++it)
-    {
-        int idx = it.index();
-        // enumerated values need to be strings, not numbers
-        ss.str(""); ss << idx;
-        env.push(as_value(ss.str()));
-    }
-}
-
-#ifdef GNASH_USE_GC
-void
-Array_as::markReachableResources() const
-{
-    for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
-    {
-        (*i).setReachable();
-    }
-    markAsObjectReachable();
-}
-#endif // GNASH_USE_GC
-
-void
-Array_as::visitPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    std::stringstream ss; 
-    string_table& st = getStringTable(*this);
-    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
-    {
-        int idx = i.index();
-        ss.str(""); ss << idx;
-        string_table::key k = st.find(ss.str());
-        visitor.accept(k, *i);
-    }
-
-    // visit proper properties
-    as_object::visitPropertyValues(visitor);
-}
-
-void
-Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    std::stringstream ss; 
-    string_table& st = getStringTable(*this);
-    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
-    {
-        // TODO: skip hidden ones
-        int idx = i.index();
-        ss.str(""); ss << idx;
-        string_table::key k = st.find(ss.str());
-        visitor.accept(k, *i);
-    }
-
-    // visit proper properties
-    as_object::visitNonHiddenPropertyValues(visitor);
-}
-
-bool
-Array_as::isStrict() const
-{
-    if ( hasNonHiddenProperties() ) return false;
     return true;
 }
+
+
+} // anonymous namespace
 
 } // end of gnash namespace
 
