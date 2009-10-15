@@ -364,7 +364,6 @@ getArguments(swf_function& callee, const fn_call& fn,
         as_object* caller)
 { 
 
-	// Super class prototype is : obj.__proto__.constructor.prototype 
 	as_object* arguments = getGlobal(fn)->createArray();
 	for (size_t i = 0; i < fn.nargs; ++i) {
 		arguments->callMethod(NSV::PROP_PUSH, fn.arg(i));
