@@ -211,8 +211,8 @@ check(!gaparray.hasOwnProperty('1'));
 gaparray.sort();
 check_equals(gaparray.length, 17);
 #if OUTPUT_VERSION < 7
- xcheck_equals(gaparray[0], undefined); // this is 16 with gnash
- xcheck_equals(gaparray[1], undefined); // this is 4 with gnash
+ check_equals(gaparray[0], undefined); // this is 16 with gnash
+ check_equals(gaparray[1], undefined); // this is 4 with gnash
 #else
  check_equals(gaparray[0], '16');
  check_equals(gaparray[1], '4');
@@ -231,8 +231,8 @@ check_equals(gaparray[12], undefined);
 check_equals(gaparray[13], undefined);
 check_equals(gaparray[14], undefined);
 #if OUTPUT_VERSION < 7
-  xcheck_equals(gaparray[15], '16'); // this is at [0] with gnash
-  xcheck_equals(gaparray[16], '4'); // this is at [1] with gnash
+  check_equals(gaparray[15], '16'); // this is at [0] with gnash
+  check_equals(gaparray[16], '4'); // this is at [1] with gnash
 #else
   check_equals(gaparray[15], undefined);
   check_equals(gaparray[16], undefined);
@@ -240,16 +240,16 @@ check_equals(gaparray[14], undefined);
 
 #if OUTPUT_VERSION > 5
 #if OUTPUT_VERSION < 7
- xcheck(gaparray.hasOwnProperty('15'));
- xcheck(gaparray.hasOwnProperty('16'));
- xcheck(gaparray.hasOwnProperty('4')); // a-ha!
+ check(gaparray.hasOwnProperty('15'));
+ check(gaparray.hasOwnProperty('16'));
+ check(gaparray.hasOwnProperty('4')); // a-ha!
  xcheck(!gaparray.hasOwnProperty('0'));
 #else
- xcheck(gaparray.hasOwnProperty('16'));
- xcheck(gaparray.hasOwnProperty('4')); 
+ check(gaparray.hasOwnProperty('16'));
+ check(gaparray.hasOwnProperty('4')); 
  check(gaparray.hasOwnProperty('1'));
  check(gaparray.hasOwnProperty('0'));
- xcheck(gaparray.hasOwnProperty('2'));
+ check(gaparray.hasOwnProperty('2'));
 #endif
 #endif
 
@@ -739,7 +739,7 @@ check_equals(c[8], undefined);
 check_equals(c[0], 'zero');
 c.length = -1;
 // it seems Gnash needs to store the 'length' property as a normal property
-xcheck_equals(c.length, -1);
+check_equals(c.length, -1);
 check_equals(c[0], undefined);
 
 //-------------------------------
@@ -1519,6 +1519,96 @@ check_equals(traceProps(o), "pop,length,7,6,4,3,2,1,");
 xcheck_equals(o.length, 6);
 
 
+o = fakeArray();
+o.reverse = Array.prototype.reverse;
+
+// Order of property creation.
+check_equals(traceProps(o), "reverse,length,7,6,5,4,3,2,1,");
+
+o.reverse();
+
+// Length is unchanged, Properties are swapped from the outside
+check_equals(traceProps(o), "3,2,4,1,5,0,reverse,length,7,6,");
+check_equals(o.length, 6);
+
+// Check with an uneven length to see what happens to the middle property.
+o = fakeArray();
+o.reverse = Array.prototype.reverse;
+o.length = 5;
+o.reverse();
+// The middle property is left alone...
+check_equals(traceProps(o), "3,1,4,0,reverse,length,7,6,5,2,");
+check_equals(o.length, 5);
+
+// Array.splice
+
+// This is different from other functions in that it doesn't delete and
+// readd properties so much.
+
+o = fakeArray();
+o.splice = Array.prototype.splice;
+
+// Order of property creation.
+check_equals(traceProps(o), "splice,length,7,6,5,4,3,2,1,");
+
+// Note: this function *does* set length!
+check_equals(o.length, 6);
+o.splice(2, 3, "new1", "new2");
+
+check_equals(traceProps(o), "0,splice,length,7,6,5,4,3,2,1,");
+check_equals(o.length, 5);
+
+// The spliced elements are there.
+check_equals(o[2], "new1");
+check_equals(o[3], "new2");
+
+// The new 0 element is undefined.
+check_equals(o[0], undefined);
+
+// The last element is shifted down (because 3 elements were deleted).
+check_equals(o[4], "five");
+
+// Same again with different arguments
+
+o = fakeArray();
+o.splice = Array.prototype.splice;
+
+// Order of property creation.
+check_equals(traceProps(o), "splice,length,7,6,5,4,3,2,1,");
+
+// Note: this function *does* set length!
+check_equals(o.length, 6);
+o.splice(2, 1, "new1", "new2", "new3", "new4");
+
+check_equals(traceProps(o), "8,0,splice,length,7,6,5,4,3,2,1,");
+check_equals(o.length, 9);
+
+// The spliced elements are there.
+check_equals(o[2], "new1");
+check_equals(o[3], "new2");
+check_equals(o[4], "new3");
+check_equals(o[5], "new4");
+
+// The new 0 element is undefined.
+check_equals(o[0], undefined);
+
+// Elements were shifted up.
+check_equals(o[6], "three");
+
+// Sort
+
+o = fakeArray();
+o.sort = Array.prototype.sort;
+
+// Order of property creation.
+check_equals(traceProps(o), "sort,length,7,6,5,4,3,2,1,");
+
+check_equals(o.length, 6);
+o.sort();
+xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+o.sort();
+xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+
 // TODO: test ASnative-returned functions:
 //
 // ASnative(252, 1) - [Array.prototype] push
@@ -1537,11 +1627,11 @@ xcheck_equals(o.length, 6);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(511);
+ check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(572);
+  check_totals(599);
 # else
-  check_totals(582);
+  check_totals(609);
 # endif
 #endif

@@ -2807,11 +2807,12 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     const int array_size = env.pop().to_int();
     assert(array_size >= 0); // TODO: trigger this !!
+    
+    Global_as* gl = getGlobal(env);
 
-    // Call the array constructor, to create an empty array.
-    as_value result = getGlobal(env)->createArray();
+    as_value result = gl->createArray();
 
-    boost::intrusive_ptr<as_object> ao = convertToObject(*getGlobal(thread.env), result);
+    as_object* ao = convertToObject(*getGlobal(thread.env), result);
     assert(ao);
 
     // Fill the elements with the initial values from the stack.

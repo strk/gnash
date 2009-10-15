@@ -21,6 +21,7 @@
 #include "as_object.h" // for inheritance
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "namedStrings.h"
+#include "Global_as.h"
 
 #include <deque>
 #include <vector>
@@ -37,23 +38,8 @@ namespace gnash {
 
 namespace gnash {
 
-struct indexed_as_value : public as_value
-{
-	int vec_index;
-
-	indexed_as_value(const as_value& val, int index)
-	: as_value(val)
-	{
-		vec_index = index;
-	}
-};
-
-template <class T>
-struct ContainerFiller {
-	T& cont;
-	ContainerFiller(T& c): cont(c) {}
-	void visit(as_value& v) { cont.push_back(v); }
-};
+size_t arrayLength(as_object& array);
+string_table::key arrayKey(string_table& st, size_t i);
 
 /// The Array ActionScript object
 class Array_as : public as_object
@@ -68,56 +54,14 @@ public:
 	typedef ArrayContainer::const_iterator const_iterator;
 	typedef ArrayContainer::iterator iterator;
 
-	typedef std::list<as_value> ValueList;
-
-	/// Visit all elements 
-	//
-	/// The visitor class will have to expose a visit(as_value&) method
-	///
-	template<class V> void visitAll(V& v)
-	{
-		// NOTE: we copy the elements as the visitor might call arbitrary code
-		//       possibly modifying the container itself.
-		ArrayContainer copy = elements;
-
-		// iterating this way will skip holes
-		for (Array_as::iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
-			v.visit(*i);
-	}
-
     // see dox in as_object.h
 	virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
 
     // see dox in as_object.h
 	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const;
 
-	/// Sort flags
-	enum SortFlags {
-
-		/// Case-insensitive (z precedes A)
-		fCaseInsensitive	= (1<<0), // 1
-
-		/// Descending order (b precedes a)
-		fDescending		= (1<<1), // 2
-
-		/// If two or more elements in the array
-		/// have identical sort fields, return 0
-		/// and don't modify the array.
-		/// Otherwise proceed to sort the array.
-		fUniqueSort		= (1<<2), // 4
-
-		/// Don't modify the array, rather return
-		/// a new array containing indexes into it
-		/// in sorted order.
-		fReturnIndexedArray	= (1<<3), // 8
-
-		/// Numerical sort (9 preceeds 10)
-		fNumeric		= (1<<4) // 16
-	};
 
 	Array_as();
-
-	Array_as(const Array_as& other);
 
 	~Array_as();
 
@@ -130,202 +74,15 @@ public:
     ///
     bool isStrict() const;
 
-	std::deque<indexed_as_value> get_indexed_elements();
-
 	Array_as::const_iterator begin();
 
 	Array_as::const_iterator end();
 
 	as_value at(unsigned int index) const;
 
-	Array_as* get_indices(std::deque<indexed_as_value> origElems);
-
-	void reverse();
-
-	/// @param separator
-    ///     String to use as separator between elements
-	std::string join(const std::string& separator) const;
-
 	unsigned int size() const;
 
 	void resize(unsigned int);
-
-	/// \brief
-	/// Return a newly created array containing elements
-	/// from 'start' up to but not including 'end'.
-	//
-	///
-	/// NOTE: assertions are:
-	///
-	///	assert(one_past_end >= start);
-	///	assert(one_past_end <= size());
-	///	assert(start <= size());
-	///
-	/// @param start
-	///	index to first element to include in result
-	///	0-based index.
-	///
-	/// @param one_past_end
-	///	index to one-past element to include in result
-	///	0-based index.
-	///
-	boost::intrusive_ptr<Array_as> slice(
-		unsigned int start, unsigned int one_past_end);
-
-	/// \brief
-	/// Replace count elements from start with given values, optionally
-	/// returning the erased ones.
-	//
-	/// @param start
-	///	First element to remove. Will abort if invalid.
-	///
-	/// @param count
-	///	Number of elements to remove. Will abort if > then available.
-	///
-	/// @param replace
-	///	If not null, use as a replacement for the cutted values
-	///
-	/// @param copy
-	///	If not null, an array to push cutted values to.
-	///
-	void splice(unsigned int start, unsigned int count, 
-			const std::vector<as_value>* replace=NULL,
-			Array_as* copy=NULL);
-
-	/// \brief
-	/// Sort the array, using given values comparator
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///
-	template <class AVCMP>
-	void sort(AVCMP avc)
-	{
-		// IMPORTANT NOTE
-		//
-		// As for ISO/IEC 14882:2003 - 23.2.2.4.29 
-		// the sort algorithm relies on the assumption
-		// that the comparator function implements
-		// a Strict Weak Ordering operator:
-		// http://www.sgi.com/tech/stl/StrictWeakOrdering.html
-		//
-		// Invalid comparator can lead to undefined behaviour,
-		// including invalid memory access and infinite loops.
-		//
-		// Pragmatically, it seems that std::list::sort is
-		// more robust in this reguard, so we'll sort a list
-		// instead of the queue. We want to sort a copy anyway
-		// to avoid the comparator changing the original container.
-		//
-		ValueList nelem;
-		ContainerFiller<ValueList> filler(nelem);
-		visitAll(filler);
-
-		size_t oldSize = elements.size(); // custom comparator might change input size
-		nelem.sort(avc);
-		elements.resize(oldSize, false);
-		size_t idx=0;
-		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
-		{
-			elements[idx++] = *i;
-        }
-	}
-
-	/// \brief
-	/// Attempt to sort the array using given values comparator, avc.
-	/// If two or more elements in the array are equal, as determined
-	/// by the equality comparator ave, then the array is not sorted
-	/// and 0 is returned. Otherwise the array is sorted and returned.
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine sort-order
-	///
-	/// @param ave
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine equality
-	///
-	template <class AVCMP, class AVEQ>
-	as_value sort(AVCMP avc, AVEQ ave)
-	{
-		// IMPORTANT NOTE
-		//
-		// As for ISO/IEC 14882:2003 - 23.2.2.4.29 
-		// the sort algorithm relies on the assumption
-		// that the comparator function implements
-		// a Strict Weak Ordering operator:
-		// http://www.sgi.com/tech/stl/StrictWeakOrdering.html
-		//
-		// Invalid comparator can lead to undefined behaviour,
-		// including invalid memory access and infinite loops.
-		//
-		// Pragmatically, it seems that std::list::sort is
-		// more robust in this reguard, so we'll sort a list
-		// instead of the queue. We want to sort a copy anyway
-		// to avoid the comparator changing the original container.
-		//
-
-		typedef std::list<as_value> ValueList;
-		ValueList nelem;
-		ContainerFiller<ValueList> filler(nelem);
-		visitAll(filler);
-
-		size_t oldSize = elements.size(); // custom comparator might change input size
-
-		nelem.sort(avc);
-
-		if (std::adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
-			return as_value(0.0);
-
-		elements.resize(oldSize, false);
-		size_t idx=0;
-		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
-		{
-			elements[idx++] = *i;
-		}
-
-		return as_value(this);
-	}
-
-	/// \brief
-	/// Return a new array containing sorted index of this array
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///
-	template <class AVCMP>
-	Array_as* sort_indexed(AVCMP avc)
-	{
-		std::deque<indexed_as_value> ielem = get_indexed_elements();
-		std::sort(ielem.begin(), ielem.end(), avc);
-		return get_indices(ielem);
-	}
-
-	/// \brief
-	/// Return a new array containing sorted index of this array.
-	/// If two or more elements in the array are equal, as determined
-	/// by the equality comparator ave, then 0 is returned instead.
-	///
-	/// @param avc
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine sort-order
-	///
-	/// @param ave
-	///	boolean functor or function comparing two as_value& objects
-	///     used to determine equality
-	///
-	template <class AVCMP, class AVEQ>
-	as_value sort_indexed(AVCMP avc, AVEQ ave)
-	{
-		std::deque<indexed_as_value> ielem = get_indexed_elements();
-
-		std::sort(ielem.begin(), ielem.end(), avc);
-
-		if (std::adjacent_find(ielem.begin(), ielem.end(), ave) != ielem.end() )
-			return as_value(0.0);
-
-		return get_indices(ielem);
-	}
 
     /// Why is this overridden?
 	virtual bool get_member(string_table::key name, as_value* val,
@@ -370,23 +127,17 @@ private:
 
 };
 
-string_table::key arrayKey(string_table& st, size_t i);
-
 template<typename T>
-bool foreachArray(as_object& array, T& pred)
+void foreachArray(as_object& array, T& pred)
 {
-    as_value length;
-    if (!array.get_member(NSV::PROP_LENGTH, &length)) return false;
-    
-    const int size = length.to_int();
-    if (size < 0) return false;
+    size_t size = arrayLength(array);
+    if (!size) return;
 
     string_table& st = getStringTable(array);
 
     for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
         pred(array.getMember(arrayKey(st, i)));
     }
-    return true;
 }
 
 /// Initialize the global.Array object

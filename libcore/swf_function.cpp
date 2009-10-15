@@ -17,7 +17,6 @@
 
 #include "log.h"
 #include "swf_function.h"
-#include "Array_as.h"
 #include "fn_call.h"
 #include "MovieClip.h"
 #include "action_buffer.h"
@@ -364,22 +363,15 @@ as_object*
 getArguments(swf_function& callee, const fn_call& fn,
         as_object* caller)
 { 
-#ifndef GNASH_USE_GC
-	// We'll be storing the callee as_object into an as_value
-	// so you must make sure you have a reference on it before
-	// callign this function.
-	assert(callee.get_ref_count() > 0);
-#endif // ndef GNASH_USE_GC
 
-	// Super class prototype is : obj.__proto__.constructor.prototype 
 	as_object* arguments = getGlobal(fn)->createArray();
-	for (unsigned int i=0; i<fn.nargs; ++i) {
+	for (size_t i = 0; i < fn.nargs; ++i) {
 		arguments->callMethod(NSV::PROP_PUSH, fn.arg(i));
 	}
 
 	arguments->init_member(NSV::PROP_CALLEE, &callee);
 
-	arguments->init_member(NSV::PROP_CALLER, as_value(caller));
+	arguments->init_member(NSV::PROP_CALLER, caller);
 
 	return arguments;
 

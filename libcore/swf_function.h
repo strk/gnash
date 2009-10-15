@@ -34,7 +34,6 @@
 namespace gnash {
 	class action_buffer;
 	class as_environmnet;
-	class Array_as;
 }
 
 namespace gnash {

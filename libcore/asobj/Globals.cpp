@@ -247,7 +247,9 @@ AVM1Global::createNumber(double d)
 as_object*
 AVM1Global::createArray()
 {
-    return new Array_as();
+    as_object* array = new Array_as;
+    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    return array;
 }
 
 as_object*
@@ -307,7 +309,9 @@ AVM2Global::createBoolean(bool b)
 as_object*
 AVM2Global::createArray()
 {
-    return new Array_as();
+    as_object* array = new Array_as;
+    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    return array;
 }
 
 void 
