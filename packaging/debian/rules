@@ -192,12 +192,12 @@ binary-arch: build install
 #	dh_installmime
 	dh_installman
 	dh_link
-	dh_strip
+	dh_strip --dbg-package=gnash-dbg
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
-#	dh_shlibdeps
+#	dh_shlibdeps debian/tmp/usr/bin/* debian/tmp/usr/sbin/* debian/tmp/usr/lib/*
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
@@ -207,7 +207,7 @@ VERSION_ID = trunk_$(VERSION_DATE)
 get-orig-source:
 	echo Downloading gnash $(VERSION_ID) from CVS...
 	#test -e gnashd && exit
-	export CVS_RSH="ssh"; cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk/
 	#cd gnash; rm -rf `find . -name CVS`
 	tar cvfz "gnash_$(VERSION_ID).orig.tar.gz" gnash
 	mv gnash "gnash-$(VERSION_ID)"
