@@ -1210,11 +1210,13 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
-/// An overload of isNativeType for DisplayObjects
+
+/// Return the DisplayObject part of an as_object
 //
-/// This uses the DisplayObject flag.
-bool
-isNativeType(as_object* obj, DisplayObject*& relay);
+/// @param obj      The object whose DisplayObject part should be returned
+/// @return         The DisplayObject if the object is one, otherwise 0.
+DisplayObject*
+getDisplayObject(as_object* obj);
 
 /// Ensure that the object is of a particular native type.
 //
