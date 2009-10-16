@@ -812,7 +812,7 @@ MovieClip::get_path_element(string_table::key key)
     }
     if ( tmp.is_sprite() )
     {
-        return tmp.to_sprite(true);
+        return tmp.toDisplayObject(true);
     }
 
     return tmp.to_object(*getGlobal(*this));
@@ -820,7 +820,7 @@ MovieClip::get_path_element(string_table::key key)
 
 bool
 MovieClip::setTextFieldVariables(string_table::key name, const as_value& val,
-        string_table::key nsname)
+        string_table::key /*nsname*/)
 {
 
     bool found = false;
