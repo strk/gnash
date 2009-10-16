@@ -196,11 +196,6 @@ public:
     static const int DefaultFlags = PropFlags::dontDelete |
                                     PropFlags::dontEnum;
 
-    /// Is any non-hidden property in this object ?
-    bool hasNonHiddenProperties() const {
-        return _members.hasNonHiddenProperties();
-    }
-
     /// Find a property scanning the inheritance chain
     ///
     /// @param name
