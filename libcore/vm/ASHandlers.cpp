@@ -2873,23 +2873,20 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 void
 SWFHandlers::ActionTargetPath(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
 
-    boost::intrusive_ptr<MovieClip> sp = env.top(0).to_sprite();
-    if ( sp )
-    {
+    DisplayObject* sp = env.top(0).toDisplayObject();
+    if (sp) {
         env.top(0).set_string(sp->getTarget());
+        return;
     }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Argument to TargetPath(%s) doesn't cast to a MovieClip"),
-            env.top(0));
-        );
-        env.top(0).set_undefined();
-    }
+
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Argument to TargetPath(%s) doesn't cast "
+                "to a DisplayObject"), env.top(0));
+    );
+    env.top(0).set_undefined();
 }
 
 // Push a each object's member value on the stack
