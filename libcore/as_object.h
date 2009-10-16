@@ -160,12 +160,7 @@ struct ObjectURI
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object :
-#ifdef GNASH_USE_GC
-    public GcResource
-#else
-    public ref_counted
-#endif
+class as_object : public GcResource
 {
     friend class asClass;
     friend class Machine;
@@ -195,12 +190,6 @@ public:
     /// Construct an ActionScript object based on the given prototype.
     explicit as_object(boost::intrusive_ptr<as_object> proto);
     
-    /// Copy an as_object.
-    //
-    /// This is used by Array_as, but almost certainly shouldn't be. Please
-    /// don't use this function.
-    explicit as_object(const as_object& other);
-
     /// The most common flags for built-in properties.
     //
     /// Most API properties, including classes and objects, have these flags.
@@ -223,7 +212,7 @@ public:
     /// @param owner
     /// If not null, this is set to the object which contained the property.
     ///
-    /// @returns a Propery if found, NULL if not found
+    /// @returns a Property if found, NULL if not found
     ///          or not visible in current VM version
     ///
     Property* findProperty(string_table::key name, string_table::key nsname,
@@ -1103,6 +1092,13 @@ protected:
 
 private:
 
+    /// Do not allow copies.
+    as_object(const as_object& other);
+
+    /// Don't allow implicit assignment.
+    as_object& operator=(const as_object&);
+
+    /// A utility class for processing this as_object's inheritance chain
     template<typename T> class PrototypeRecursor;
 
     /// DisplayObjects have properties not in the AS inheritance chain
@@ -1122,9 +1118,6 @@ private:
 
     /// Properties of this objects 
     PropertyList _members;
-
-    /// Don't allow implicit copy.
-    as_object& operator=(const as_object&);
 
     /// \brief
     /// Find an existing property for update, only scanning the

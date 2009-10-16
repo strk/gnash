@@ -343,15 +343,6 @@ as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
-as_object::as_object(const as_object& other)
-	:
-    _displayObject(other._displayObject),
-    _relay(0),
-	_vm(VM::get()),
-	_members(other._members)
-{
-}
-
 std::pair<bool,bool>
 as_object::delProperty(string_table::key name, string_table::key nsname)
 {
@@ -1017,7 +1008,8 @@ as_object::prototypeOf(as_object& instance)
 
 	// See actionscript.all/Inheritance.as for a way to trigger this
 	IF_VERBOSE_ASCODING_ERRORS(
-	if ( obj ) log_aserror(_("Circular inheritance chain detected during isPrototypeOf call"));
+        if (obj) log_aserror(_("Circular inheritance chain detected "
+                "during isPrototypeOf call"));
 	);
 
 	return false;
