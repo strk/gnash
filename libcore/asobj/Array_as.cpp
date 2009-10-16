@@ -91,6 +91,7 @@ namespace {
     as_value array_splice(const fn_call& fn);
 
     string_table::key getKey(const fn_call& fn, size_t i);
+	int isIndex(const std::string& name);
 
     /// Implementation of foreachArray that takes a start and end range.
     template<typename T> void foreachArray(as_object& array, int start,
@@ -108,6 +109,10 @@ namespace {
 
     void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
 
+    /// Set the length property of an object only if it is a genuine array.
+    void setArrayLength(as_object& o, const int size);
+
+    void resizeArray(as_object& o, const int size);
 }
 
 /// Function objects for foreachArray()
@@ -647,17 +652,17 @@ private:
 class as_value_multiprop
 {
 public:
-    typedef std::deque<as_cmp_fn> Comps;
+    typedef std::vector<as_cmp_fn> Comps;
     Comps& _cmps;
 
-    typedef std::deque<string_table::key> Props;
+    typedef std::vector<string_table::key> Props;
     Props& _prps;
     
     const as_object& _obj;
 
     // Note: all as_cmp_fns in *cmps must implement strict weak ordering
-    as_value_multiprop(std::deque<string_table::key>& prps, 
-        std::deque<as_cmp_fn>& cmps, const as_object& o)
+    as_value_multiprop(std::vector<string_table::key>& prps, 
+        std::vector<as_cmp_fn>& cmps, const as_object& o)
         :
         _cmps(cmps),
         _prps(prps),
@@ -669,7 +674,7 @@ public:
     {
         if ( _cmps.empty() ) return false;
 
-        std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
+        std::vector<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
         boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
@@ -696,8 +701,8 @@ public:
 class as_value_multiprop_eq : public as_value_multiprop
 {
 public:
-    as_value_multiprop_eq(std::deque<string_table::key>& prps, 
-        std::deque<as_cmp_fn>& cmps, const as_object& o)
+    as_value_multiprop_eq(std::vector<string_table::key>& prps, 
+        std::vector<as_cmp_fn>& cmps, const as_object& o)
         :
         as_value_multiprop(prps, cmps, o),
         _obj(o)
@@ -741,39 +746,69 @@ flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
     return flgs;
 }
 
-// Convenience function to process and extract flags from an as_value array
-// of flags (as passed to sortOn when sorting on multiple properties)
-std::deque<boost::uint8_t> 
-get_multi_flags(Array_as::const_iterator itBegin, 
-    Array_as::const_iterator itEnd, bool* uniq, bool* index)
+
+class GetKeys
 {
-    Array_as::const_iterator it = itBegin;
-    std::deque<boost::uint8_t> flgs;
-
-    // extract SORT_UNIQUE and SORT_RETURN_INDEX from first flag
-    if (it != itEnd)
-    {
-        boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
-        flag = flag_preprocess(flag, uniq, index);
-        flgs.push_back(flag);
+public:
+    GetKeys(std::vector<string_table::key>& v, string_table& st, int version)
+        :
+        _v(v),
+        _st(st),
+        _version(version)
+    {}
+    void operator()(const as_value& val) {
+        _v.push_back(_st.find(val.to_string_versioned(_version)));
     }
+private:
+    std::vector<string_table::key>& _v;
+    string_table& _st;
+    const int _version;
+};
 
-    while (it != itEnd)
-    {
-        boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
+/// Functor to extract flags from an array-like object.
+//
+/// I don't know how accurate this code is. It was copied from the previous
+/// implementation but without using Array_as.
+class GetMultiFlags
+{
+public:
+    GetMultiFlags(std::vector<boost::uint8_t>& v)
+        :
+        _v(v),
+        _i(0),
+        _uniq(false),
+        _index(false)
+    {}
+    void operator()(const as_value& val) {
+        // extract SORT_UNIQUE and SORT_RETURN_INDEX from first flag
+        if (!_i) {
+            boost::uint8_t flag = static_cast<boost::uint8_t>(val.to_number());
+            flag = flag_preprocess(flag, &_uniq, &_index);
+            _v.push_back(flag);
+            ++_i;
+            return;
+        }
+        boost::uint8_t flag = static_cast<boost::uint8_t>(val.to_number());
         flag &= ~(SORT_RETURN_INDEX);
         flag &= ~(SORT_UNIQUE);
-        flgs.push_back(flag);
+        _v.push_back(flag);
+        ++_i;
     }
-    return flgs;
-}
+    bool unique() const { return _uniq; }
+    bool index() const { return _index; }
+
+private:
+    std::vector<boost::uint8_t>& _v;
+    size_t _i;
+    bool _uniq;
+    bool _index;
+};
 
 }
 
 Array_as::Array_as()
     :
-    as_object(getArrayInterface()), // pass Array inheritance
-    elements(0)
+    as_object(getArrayInterface())
 {
     init_member(NSV::PROP_LENGTH, 0.0);
 }
@@ -783,147 +818,36 @@ Array_as::~Array_as()
 {
 }
 
-Array_as::const_iterator
-Array_as::begin()
-{
-    return elements.begin();
-}
-
-Array_as::const_iterator
-Array_as::end()
-{
-    return elements.end();
-}
-
-int
-Array_as::index_requested(string_table::key name)
-{
-    const std::string& nameString = getStringTable(*this).value(name);
-
-    // Anything not in [0-9] makes this an invalid index
-    if ( nameString.find_first_not_of("0123456789") != std::string::npos )
-    {
-        return -1;
-    }
-
-    // TODO: do we need all this noise ? atol(3) should do !
-
-    as_value temp;
-    temp.set_string(nameString);
-    double value = temp.to_number();
-
-    // if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
-    if (!isFinite(value)) return -1;
-
-    return int(value);
-}
-
 unsigned int
 Array_as::size() const
 {
-    return elements.size();
+    return arrayLength(const_cast<Array_as&>(*this));
 }
 
 as_value
 Array_as::at(unsigned int index) const
 {
-    if ( index > elements.size()-1 ) return as_value();
-    else return elements[index];
-}
-
-/* virtual public, overriding as_object::get_member */
-bool
-Array_as::get_member(string_table::key name, as_value *val,
-    string_table::key nsname)
-{
-    // an index has been requested
-    int index = index_requested(name);
-
-    if ( index >= 0 ) // a valid index was requested
-    {
-        size_t i = index;
-        const_iterator it = elements.find(i);
-        if ( it != elements.end() && it.index() == i )
-        {
-            *val = *it;
-            return true;
-        }
-    }
-
-    return as_object::get_member(name, val, nsname);
-}
-
-bool
-Array_as::hasOwnProperty(string_table::key name, string_table::key nsname)
-{
-    // an index has been requested
-    int index = index_requested(name);
-
-    if ( index >= 0 ) // a valid index was requested
-    {
-        size_t i = index;
-        const_iterator it = elements.find(i);
-        if ( it != elements.end() && it.index() == i )
-        {
-            return true;
-        }
-    }
-
-    return as_object::hasOwnProperty(name, nsname);
-}
-
-std::pair<bool,bool> 
-Array_as::delProperty(string_table::key name, string_table::key nsname)
-{
-    // an index has been requested
-    int index = index_requested(name);
-
-    if ( index >= 0 ) // a valid index was requested
-    {
-        size_t i = index;
-        const_iterator it = elements.find(i);
-        if ( it != elements.end() && it.index() == i )
-        {
-            elements.erase_element(i);
-            return std::make_pair(true, true);
-        }
-    }
-
-    return as_object::delProperty(name, nsname);
-}
-
-void
-Array_as::resize(unsigned int newsize)
-{
-    elements.resize(newsize);
+    if (index > size() - 1) return as_value();
+    return const_cast<Array_as*>(this)->getMember(arrayKey(getStringTable(*this), index));
 }
 
 /* virtual public, overriding as_object::set_member */
 bool
-Array_as::set_member(string_table::key name,
-        const as_value& val, string_table::key nsname, bool ifFound)
+Array_as::set_member(string_table::key name, const as_value& val,
+        string_table::key nsname, bool ifFound)
 {
-    int index = index_requested(name);
-
-    // if we were sent a valid array index and not a normal member
-    if (index >= 0)
-    {
-        if (size_t(index) >= elements.size())
-        {
-            // if we're setting index (x), the vector
-            // must be size (x+1)
-            elements.resize(index+1);
-        }
-
-        as_object::set_member(NSV::PROP_LENGTH, elements.size());
-        // set the appropriate index and return
-        elements[index] = val;
-        return true;
-    }
 
     if (name == NSV::PROP_LENGTH) {
-        elements.resize(std::max(val.to_int(), 0));
-        // Don't return before as_object has set the value!
+        resizeArray(*this, val.to_int());
+    }
+    else {
+        int index = isIndex(getStringTable(*this).value(name));
+        // if we were sent a valid array index and not a normal member
+        if (index >= 0) {
+            if (static_cast<size_t>(index) >= arrayLength(*this)) {
+                setArrayLength(*this, index + 1);
+            }
+        }
     }
 
     return as_object::set_member(name,val, nsname, ifFound);
@@ -982,66 +906,13 @@ array_class_init(as_object& where, const ObjectURI& uri)
     where.init_member(getName(uri), cl, flags, getNamespace(uri));
 }
 
-void
-Array_as::enumerateNonProperties(as_environment& env) const
-{
-    std::stringstream ss; 
-    for (const_iterator it = elements.begin(),
-        itEnd = elements.end(); it != itEnd; ++it)
-    {
-        int idx = it.index();
-        // enumerated values need to be strings, not numbers
-        ss.str(""); ss << idx;
-        env.push(as_value(ss.str()));
-    }
-}
-
 #ifdef GNASH_USE_GC
 void
 Array_as::markReachableResources() const
 {
-    for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
-    {
-        (*i).setReachable();
-    }
     markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
-
-void
-Array_as::visitPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    std::stringstream ss; 
-    string_table& st = getStringTable(*this);
-    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
-    {
-        int idx = i.index();
-        ss.str(""); ss << idx;
-        string_table::key k = st.find(ss.str());
-        visitor.accept(k, *i);
-    }
-
-    // visit proper properties
-    as_object::visitPropertyValues(visitor);
-}
-
-void
-Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    std::stringstream ss; 
-    string_table& st = getStringTable(*this);
-    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
-    {
-        // TODO: skip hidden ones
-        int idx = i.index();
-        ss.str(""); ss << idx;
-        string_table::key k = st.find(ss.str());
-        visitor.accept(k, *i);
-    }
-
-    // visit proper properties
-    as_object::visitNonHiddenPropertyValues(visitor);
-}
 
 bool
 Array_as::isStrict() const
@@ -1260,8 +1131,10 @@ array_sortOn(const fn_call& fn)
     int version = getSWFVersion(fn);
     string_table& st = getStringTable(fn);
 
+    if (fn.nargs == 0) return as_value();
+
     // cases: sortOn("prop) and sortOn("prop", Array.FLAG)
-    if (fn.nargs > 0 && fn.arg(0).is_string()) 
+    if (fn.arg(0).is_string()) 
     {
         string_table::key propField =
             st.find(fn.arg(0).to_string_versioned(version));
@@ -1290,66 +1163,62 @@ array_sortOn(const fn_call& fn)
         return as_value(array);
     }
 
+#if 1
     // case: sortOn(["prop1", "prop2"] ...)
-    if (fn.nargs > 0 && fn.arg(0).is_object() ) 
+    if (fn.arg(0).is_object()) 
     {
-        boost::intrusive_ptr<Array_as> props = 
-            ensureType<Array_as>(fn.arg(0).to_object(*getGlobal(fn)));
-        std::deque<string_table::key> prp;
-        unsigned int optnum = props->size();
-        std::deque<as_cmp_fn> cmp;
-        std::deque<as_cmp_fn> eq;
+        as_object* props = fn.arg(0).to_object(*getGlobal(fn));
+        assert(props);
 
-        for (Array_as::const_iterator it = props->begin();
-            it != props->end(); ++it)
-        {
-            string_table::key s = st.find((*it).to_string_versioned(version));
-            prp.push_back(s);
-        }
+        std::vector<string_table::key> prp;
+        GetKeys gk(prp, st, version);
+        foreachArray(*props, gk);
+        
+        std::vector<as_cmp_fn> cmp;
+        std::vector<as_cmp_fn> eq;
+        
+        // Will be the same as arrayLength(*props);
+        const size_t optnum = prp.size();
         
         // case: sortOn(["prop1", "prop2"])
-        if (fn.nargs == 1)
-        {
+        if (fn.nargs == 1) {
             // assign each cmp function to the standard cmp fn
             as_cmp_fn c = get_basic_cmp(0, version);
             cmp.assign(optnum, c);
         }
         // case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
-        else if ( fn.arg(1).is_object() )
-        {
-            boost::intrusive_ptr<Array_as> farray = 
-                ensureType<Array_as>(fn.arg(1).to_object(*getGlobal(fn)));
-            if (farray->size() == optnum)
-            {
-                Array_as::const_iterator 
-                    fBegin = farray->begin(),
-                    fEnd = farray->end();
+        else if (fn.arg(1).is_object()) {
 
-                std::deque<boost::uint8_t> flgs = 
-                    get_multi_flags(fBegin, fEnd, 
-                        &do_unique, &do_index);
+            as_object* farray = fn.arg(1).to_object(*getGlobal(fn));
 
-                std::deque<boost::uint8_t>::const_iterator it = 
+            if (arrayLength(*farray) == optnum) {
+
+                std::vector<boost::uint8_t> flgs;
+                GetMultiFlags mf(flgs);
+                foreachArray(*farray, mf);
+                do_unique = mf.unique();
+                do_index = mf.index();
+
+                std::vector<boost::uint8_t>::const_iterator it = 
                     flgs.begin();
 
-                while (it != flgs.end())
+                while (it != flgs.end()) {
                     cmp.push_back(get_basic_cmp(*it++, version));
+                }
 
-                if (do_unique)
-                {
+                if (do_unique) {
                     it = flgs.begin();
                     while (it != flgs.end())
                         eq.push_back(get_basic_eq(*it++, version));
                 }
             }
-            else
-            {
+            else {
                 as_cmp_fn c = get_basic_cmp(0, version);
                 cmp.assign(optnum, c);
             }
         }
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
-        else if ( fn.arg(1).is_number() )
+        else if (fn.arg(1).is_number())
         {
             boost::uint8_t flags = 
                 static_cast<boost::uint8_t>(fn.arg(1).to_number());
@@ -1358,13 +1227,11 @@ array_sortOn(const fn_call& fn)
 
             cmp.assign(optnum, c);
             
-            if (do_unique)
-            {
+            if (do_unique) {
                 as_cmp_fn e = get_basic_eq(flags, version);
                 eq.assign(optnum, e);
             }
         }
-
         as_value_multiprop avc(prp, cmp, *getGlobal(fn));
 
         if (do_unique)
@@ -1378,11 +1245,10 @@ array_sortOn(const fn_call& fn)
         return as_value(array);
 
     }
+#endif
     IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("SortOn called with invalid arguments."));
+        log_aserror(_("SortOn called with invalid arguments."));
     )
-    if (fn.nargs == 0 )
-        return as_value();
 
     return as_value(array);
 }
@@ -1399,12 +1265,11 @@ array_push(const fn_call& fn)
 
     const size_t size = arrayLength(*array);
 
-    for (size_t i = 0; i < fn.nargs; ++i) {
+    for (size_t i = 0; i < shift; ++i) {
         array->set_member(getKey(fn, size + i), fn.arg(i));
     }
-    
-    // TODO: this is wrong, but Gnash relies on it.
-    array->set_member(NSV::PROP_LENGTH, size + shift);
+ 
+    log_debug("size: %s, shift :%s", size, shift);
 
     return as_value(size + shift);
 }
@@ -1437,8 +1302,7 @@ array_unshift(const fn_call& fn)
         array->set_member(getKey(fn, index), fn.arg(index));
     }
  
-    // TODO: this is wrong, but Gnash relies on it.
-    array->set_member(NSV::PROP_LENGTH, size + shift);
+    setArrayLength(*array, size + shift);
 
     return as_value(size + shift);
 }
@@ -1457,8 +1321,7 @@ array_pop(const fn_call& fn)
     as_value ret = array->getMember(ind);
     array->delProperty(ind);
     
-    // TODO: this is wrong, but Gnash relies on it.
-    array->set_member(NSV::PROP_LENGTH, size - 1);
+    setArrayLength(*array, size - 1);
 
     return ret;
 }
@@ -1482,8 +1345,7 @@ array_shift(const fn_call& fn)
         array->set_member(currentkey, array->getMember(nextkey));
     }
     
-    // TODO: this is wrong, but Gnash relies on it.
-    array->set_member(NSV::PROP_LENGTH, size - 1);
+    setArrayLength(*array, size - 1);
 
     return ret;
 }
@@ -1703,6 +1565,44 @@ getIndexedElements(as_object& array, std::vector<indexed_as_value>& v)
 {
     PushToIndexedVector pv(v);
     foreachArray(array, pv);
+}
+
+void
+resizeArray(as_object& o, const int size)
+{
+    // Only positive indices are deleted.
+    size_t realSize = std::max(size, 0);
+
+    const size_t currentSize = arrayLength(o);
+    if (realSize < currentSize) {
+        string_table& st = getStringTable(o);
+        for (size_t i = realSize; i < currentSize; ++i) {
+            o.delProperty(arrayKey(st, i));
+        }
+    }
+}
+
+void
+setArrayLength(as_object& o, const int size)
+{
+    Array_as* array = dynamic_cast<Array_as*>(&o);
+    if (!array) return;
+
+    resizeArray(*array, size);
+
+    // Do not call Array_as::set_member because that calls this!
+    array->as_object::set_member(NSV::PROP_LENGTH, size);
+}
+
+int
+isIndex(const std::string& nameString)
+{
+    try {
+        return boost::lexical_cast<int>(nameString);
+    }
+    catch (boost::bad_lexical_cast& e) {
+        return -1;
+    }
 }
 
 } // anonymous namespace
