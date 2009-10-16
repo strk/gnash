@@ -62,7 +62,9 @@ namespace gnash {
 /// An abstract property visitor
 class AbstractPropertyVisitor {
 public:
-    virtual void accept(string_table::key key, const as_value& val)=0;
+
+    /// This function should return false if no further visits are needed.
+    virtual bool accept(string_table::key key, const as_value& val) = 0;
     virtual ~AbstractPropertyVisitor() {}
 };
 
@@ -160,12 +162,7 @@ struct ObjectURI
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object :
-#ifdef GNASH_USE_GC
-    public GcResource
-#else
-    public ref_counted
-#endif
+class as_object : public GcResource
 {
     friend class asClass;
     friend class Machine;
@@ -195,22 +192,11 @@ public:
     /// Construct an ActionScript object based on the given prototype.
     explicit as_object(boost::intrusive_ptr<as_object> proto);
     
-    /// Copy an as_object.
-    //
-    /// This is used by Array_as, but almost certainly shouldn't be. Please
-    /// don't use this function.
-    explicit as_object(const as_object& other);
-
     /// The most common flags for built-in properties.
     //
     /// Most API properties, including classes and objects, have these flags.
     static const int DefaultFlags = PropFlags::dontDelete |
                                     PropFlags::dontEnum;
-
-    /// Is any non-hidden property in this object ?
-    bool hasNonHiddenProperties() const {
-        return _members.hasNonHiddenProperties();
-    }
 
     /// Find a property scanning the inheritance chain
     ///
@@ -223,7 +209,7 @@ public:
     /// @param owner
     /// If not null, this is set to the object which contained the property.
     ///
-    /// @returns a Propery if found, NULL if not found
+    /// @returns a Property if found, NULL if not found
     ///          or not visible in current VM version
     ///
     Property* findProperty(string_table::key name, string_table::key nsname,
@@ -732,7 +718,7 @@ public:
     ///    - (true, false) : property protected from deletion
     ///    - (true, true) : property successfully deleted
     ///
-    virtual std::pair<bool,bool> delProperty(string_table::key name,
+    std::pair<bool,bool> delProperty(string_table::key name,
             string_table::key nsname = 0);
 
     /// Get this object's own named property, if existing.
@@ -770,7 +756,7 @@ public:
     /// @return
     ///    true if the object has the property, false otherwise.
     ///
-    virtual bool hasOwnProperty(string_table::key name,
+    bool hasOwnProperty(string_table::key name,
             string_table::key nsname = 0);
 
     /// Get a property from this object (or a prototype) by ordering index.
@@ -914,19 +900,6 @@ public:
     ///
     void enumerateProperties(SortedPropertyList& to) const;
 
-    /// Get url-encoded variables
-    //
-    /// This method will be used for loadVariables and loadMovie
-    /// calls, to encode variables for sending over a network.
-    /// Variables starting with a dollar sign will be skipped,
-    /// as non-enumerable ones.
-    ///
-    /// @param data
-    ///    Output parameter, will be set to the url-encoded
-    ///     variables string, w/out any leading delimiter.
-    ///
-    void getURLEncodedVars(std::string& data);
-
     /// Visit the properties of this object by key/as_value pairs
     //
     /// The method will invoke the given visitor method
@@ -939,22 +912,10 @@ public:
     ///    reference as first argument and a const as_value reference
     ///    as second argument.
     ///
-    virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
-
-    /// Visit non-hidden properties of this object by key/as_value pairs
-    //
-    /// The method will invoke the given visitor method
-    /// passing it two arguments: key of the property and
-    /// value of it.
-    ///
-    /// @param visitor
-    ///    The visitor function. Will be invoked for each property
-    ///    of this object with a string_table::key
-    ///    reference as first argument and a const as_value reference
-    ///    as second argument.
-    ///
-    virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor)
-        const;
+    template<typename T>
+    void visitProperties(AbstractPropertyVisitor& visitor) const {
+        _members.visitValues<T>(visitor, *this);
+    }
 
     /// \brief
     /// Add a getter/setter property, if no member already has
@@ -982,17 +943,13 @@ public:
     /// of the class this object is an instance of.
     ///
     /// NOTE: can return NULL (and it is expected to do for Object.prototype)
-    ///
     as_object* get_prototype() const;
 
     /// Set this object's '__proto__' member
     //
-    /// There is no point to make this function
-    /// protected or private, as a call to the
-    /// public: set_member("__proto__", anyting)
-    /// will do just the same
-    ///
-    void set_prototype(const as_value& proto, int flags = DefaultFlags);
+    /// This does more or less what set_member("__proto__") does, but without
+    /// the lookup process.
+    void set_prototype(const as_value& proto);
 
     /// Set the as_object's Relay object.
     //
@@ -1099,10 +1056,18 @@ protected:
 
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
+
 #endif // GNASH_USE_GC
 
 private:
 
+    /// Do not allow copies.
+    as_object(const as_object& other);
+
+    /// Don't allow implicit assignment.
+    as_object& operator=(const as_object&);
+
+    /// A utility class for processing this as_object's inheritance chain
     template<typename T> class PrototypeRecursor;
 
     /// DisplayObjects have properties not in the AS inheritance chain
@@ -1120,11 +1085,8 @@ private:
     /// The VM containing this object.
     VM& _vm;   
 
-    /// Properties of this objects 
+    /// Properties of this as_object
     PropertyList _members;
-
-    /// Don't allow implicit copy.
-    as_object& operator=(const as_object&);
 
     /// \brief
     /// Find an existing property for update, only scanning the
@@ -1150,6 +1112,50 @@ private:
     TriggerContainer _trigs;
 };
 
+/// Function objects for visiting properties.
+class IsVisible
+{
+public:
+    IsVisible(int version) : _version(version) {}
+    bool operator()(const Property& prop) const {
+        return prop.visible(_version);
+    }
+private:
+    const int _version;
+};
+
+class Exists
+{
+public:
+    Exists() {}
+    bool operator()(const Property&) const {
+        return true;
+    }
+};
+
+class IsEnumerable
+{
+public:
+    IsEnumerable() {}
+    bool operator()(const Property& p) const {
+        return !p.getFlags().get_dont_enum();
+    }
+};
+
+/// Get url-encoded variables
+//
+/// This method will be used for loadVariables and loadMovie
+/// calls, to encode variables for sending over a network.
+/// Variables starting with a dollar sign will be skipped,
+/// as non-enumerable ones.
+//
+/// @param o        The object whose properties should be encoded.
+/// @param data     Output parameter, will be set to the url-encoded
+///                 variables string without any leading delimiter.
+void getURLEncodedVars(as_object& o, std::string& data);
+
+
+/// Comparator for ObjectURI so it can serve as a key in stdlib containers.
 inline bool
 operator<(const ObjectURI& a, const ObjectURI& b)
 {
@@ -1219,11 +1225,12 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
-/// An overload of isNativeType for DisplayObjects
+
+/// Return the DisplayObject part of an as_object
 //
-/// This uses the DisplayObject flag.
-bool
-isNativeType(as_object* obj, DisplayObject*& relay);
+/// @param obj      The object whose DisplayObject part should be returned
+/// @return         The DisplayObject if the object is one, otherwise 0.
+DisplayObject* getDisplayObject(as_object* obj);
 
 /// Ensure that the object is of a particular native type.
 //

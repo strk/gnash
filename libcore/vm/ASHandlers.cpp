@@ -2207,12 +2207,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //         is the target to load the resource into).
         //
         DisplayObject* curtgt = env.get_target();
-        if ( ! curtgt )
-        {
+        if (!curtgt) {
             log_error(_("CommonGetUrl: current target is undefined"));
             return;
         }
-        curtgt->getURLEncodedVars(varsToSend);
+        getURLEncodedVars(*curtgt, varsToSend);
     }
 
 
@@ -2874,23 +2873,20 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 void
 SWFHandlers::ActionTargetPath(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
 
-    boost::intrusive_ptr<MovieClip> sp = env.top(0).to_sprite();
-    if ( sp )
-    {
+    DisplayObject* sp = env.top(0).toDisplayObject();
+    if (sp) {
         env.top(0).set_string(sp->getTarget());
+        return;
     }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Argument to TargetPath(%s) doesn't cast to a MovieClip"),
-            env.top(0));
-        );
-        env.top(0).set_undefined();
-    }
+
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Argument to TargetPath(%s) doesn't cast "
+                "to a DisplayObject"), env.top(0));
+    );
+    env.top(0).set_undefined();
 }
 
 // Push a each object's member value on the stack
@@ -3008,7 +3004,6 @@ void
 SWFHandlers::ActionDup(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
     env.push(env.top(0));
 }
 
@@ -3016,10 +3011,7 @@ void
 SWFHandlers::ActionSwap(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
-    as_value    temp = env.top(1);
-    env.top(1) = env.top(0);
-    env.top(0) = temp;
+    std::swap(env.top(1), env.top(0));
 }
 
 void
@@ -3031,7 +3023,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     as_value member_name = env.top(0);
     as_value target = env.top(1);
 
-    boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), target);
+    boost::intrusive_ptr<as_object> obj =
+        convertToObject(*getGlobal(thread.env), target);
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3080,18 +3073,15 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
-    if ( member_name.empty() )
-    {
+    if (member_name.empty()) {
         IF_VERBOSE_ASCODING_ERRORS (
             // Invalid object, can't set.
-            log_aserror(_("ActionSetMember: %s.%s=%s: member name evaluates to invalid (empty) string"),
-                env.top(2),
-                env.top(1),
-                env.top(0));
+            log_aserror(_("ActionSetMember: %s.%s=%s: member name "
+                    "evaluates to invalid (empty) string"),
+                    env.top(2), env.top(1), env.top(0));
         );
     }
-    else if (obj)
-    {
+    else if (obj) {
         thread.setObjectMember(*(obj.get()), member_name, member_value);
 
         IF_VERBOSE_ACTION (
@@ -3103,14 +3093,13 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     }
     else
     {
-        // Malformed SWF ? (don't think this is possible to do with ActionScript syntax)
+        // Malformed SWF ? (don't think this is possible to do with
+        // ActionScript syntax)
         // FIXME, should this be log_swferror?
         IF_VERBOSE_ASCODING_ERRORS (
             // Invalid object, can't set.
             log_aserror(_("-- set_member %s.%s=%s on invalid object!"),
-                env.top(2),
-                member_name,
-                member_value);
+                env.top(2), member_name, member_value);
         );
     }
 
@@ -3121,14 +3110,14 @@ void
 SWFHandlers::ActionIncrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(env.top(0).to_number()+1);
+    env.top(0).set_double(env.top(0).to_number() + 1);
 }
 
 void
 SWFHandlers::ActionDecrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(env.top(0).to_number()-1);
+    env.top(0).set_double(env.top(0).to_number() - 1);
 }
 
 void

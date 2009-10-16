@@ -111,20 +111,25 @@ public:
 	/// The method will invoke the given visitor method
 	/// passing it two arguments: name of the property and
 	/// value of it.
-	///
-	/// @param visitor
-	///	The visitor function. Must take a string_table::key 
-	///	reference as first argument and a const as_value reference
-	///	as second argument. Scan by enumeration order.
+	//
+    /// @tparam V   The type of the visitor.
+    /// @tparam U   An object that may check property values. The object's
+    ///             operator() should return false if the property is not
+    ///             acceptable.
+    //
+	/// @param visitor  The visitor function. It must have the function:
+    ///                     bool accept(string_table::key, const as_value&);
+	///	                Scan is by enumeration order and stops if accept()
+    ///                 returns false.
 	///
 	/// @param this_ptr
 	///	The object reference used to extract values from properties.
 	///
-	template <class V>
-	void visitValues(V& visitor, const as_object& this_ptr) const
+	template <class U, class V>
+	void visitValues(V& visitor, const as_object& this_ptr, U cmp = U()) const
 	{
         typedef container::nth_index<1>::type ContainerByOrder;
-        
+
         // The template keyword is not required by the Standard here, but the
         // OpenBSD compiler needs it. Use of the template keyword where it is
         // not necessary is not an error.
@@ -132,56 +137,11 @@ public:
                 it = _props.template get<1>().rbegin(),
                 ie = _props.template get<1>().rend(); it != ie; ++it)
 		{
+            if (!cmp(*it)) continue;
 			as_value val = it->getValue(this_ptr);
-			visitor.accept(it->mName, val);
+			if (!visitor.accept(it->mName, val)) return;
 		}
 	}
-
-	/// Visit non hidden properties 
-	//
-	/// The method will invoke the given visitor method
-	/// passing it two arguments: name of the property and
-	/// value of it. Scan by enumeration order.
-	///
-	/// @param visitor
-	///	The visitor function. Must take a string_table::key 
-	///	reference as first argument and a const as_value reference
-	///	as second argument.
-	///
-	/// @param this_ptr
-	///	The object reference used to extract values from properties.
-	///
-	template <class V>
-	void visitNonHiddenValues(V& visitor, const as_object& this_ptr) const
-	{
-        typedef container::nth_index<1>::type ContainerByOrder;
-        
-        // The template keyword is not required by the Standard here, but the
-        // OpenBSD compiler needs it. Use of the template keyword where it is
-        // not necessary is not an error.
-        for (ContainerByOrder::const_reverse_iterator it =
-                _props.template get<1>().rbegin(),
-                ie = _props.template get<1>().rend(); it != ie; ++it)
-		{
-	        if (it->getFlags().get_dont_enum()) continue;
-			as_value val = it->getValue(this_ptr);
-			visitor.accept(it->mName, val);
-		}
-	}
-
-    /// Is any non-hidden property in this list ?
-    bool hasNonHiddenProperties() const
-    {
-        typedef container::nth_index<1>::type ContainerByOrder;
-        for (ContainerByOrder::const_reverse_iterator it = 
-                _props.get<1>().rbegin(), ie=_props.get<1>().rend();
-                it != ie; ++it)
-		{
-	        if (! it->getFlags().get_dont_enum()) return true;
-        }
-        return false;
-    }
-
 
 	/// Get the as_value value of a named property
 	//

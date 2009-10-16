@@ -26,8 +26,6 @@
 #include <deque>
 #include <vector>
 #include <memory> // for auto_ptr
-#include <boost/numeric/ublas/vector_sparse.hpp>
-
 #include <string>
 
 // Forward declarations
@@ -38,92 +36,61 @@ namespace gnash {
 
 namespace gnash {
 
+/// Get the length of an object as though it were an array
+//
+/// It may well be an array, but this also works on normal objects with a 
+/// length property
+//
+/// @param array    The object whose array length is needed.
+/// @return         The array length of the object or 0 if no length is
+///                 found.
 size_t arrayLength(as_object& array);
+
+/// Convert an integral value into an array key
+//
+/// NB this function adds a string value to the string_table for each separate
+/// integral value. It's the way the string_table works.
+//
+/// @param i        The integral value to find
+/// @return         The string table key to look up.
 string_table::key arrayKey(string_table& st, size_t i);
+
+
+/// A visitor to check whether an array is strict or not.
+//
+/// Strict arrays have no non-hidden non-numeric properties. Only real arrays
+/// are strict arrays; any users of this functor should check that first.
+class IsStrictArray : public AbstractPropertyVisitor
+{
+public:
+    IsStrictArray(string_table& st) : _strict(true), _st(st) {}
+    virtual bool accept(string_table::key key, const as_value& val);
+
+    bool strict() const {
+        return _strict;
+    }
+private:
+    bool _strict;
+    string_table& _st;
+};
 
 /// The Array ActionScript object
 class Array_as : public as_object
 {
 
-    /// Other classes shouldn't care about this, but should rather use
-    /// the public iterator / const_iterator members.
-	typedef boost::numeric::ublas::mapped_vector<as_value> ArrayContainer;
-
 public:
-
-	typedef ArrayContainer::const_iterator const_iterator;
-	typedef ArrayContainer::iterator iterator;
-
-    // see dox in as_object.h
-	virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
-
-    // see dox in as_object.h
-	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const;
-
 
 	Array_as();
 
 	~Array_as();
 
-    /// Return true if this is a strict array
-    //
-    /// Strict arrays are those whose enumerable
-    /// properties are only valid positive integer.
-    /// Telling strict apart from non-strict is needed
-    /// for AMF encoding in remoting.
-    ///
-    bool isStrict() const;
-
-	Array_as::const_iterator begin();
-
-	Array_as::const_iterator end();
-
 	as_value at(unsigned int index) const;
 
 	unsigned int size() const;
 
-	void resize(unsigned int);
-
-    /// Why is this overridden?
-	virtual bool get_member(string_table::key name, as_value* val,
-		string_table::key nsname = 0);
-
 	/// Overridden to provide array[#]=x semantic
 	virtual bool set_member(string_table::key name,
 		const as_value& val, string_table::key nsname=0, bool ifFound=false);
-
-	/// Overridden to deal with indexed elements
-	virtual std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);
-
-	/// Overridden to expose indexed elements
-	virtual bool hasOwnProperty(string_table::key name, string_table::key nsname = 0);
-
-	/// Enumerate elements
-	//
-	/// See as_object::enumerateNonProperties(as_environment&) for more info.
-	///
-	virtual void enumerateNonProperties(as_environment&) const;
-
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark array-specific reachable resources and invoke
-	/// the parent's class version (markAsObjectReachable)
-	//
-	/// array-specific reachable resources are:
-	/// 	- The elements values (elements)
-	///
-	virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
-
-private:
-
-	ArrayContainer elements;
-
-	// this function is used internally by set_member and get_member
-	// it takes a string that is the member name of the array and returns -1
-	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-	int index_requested(string_table::key name);
 
 };
 

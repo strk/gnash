@@ -812,15 +812,15 @@ MovieClip::get_path_element(string_table::key key)
     }
     if ( tmp.is_sprite() )
     {
-        return tmp.to_sprite(true);
+        return tmp.toDisplayObject(true);
     }
 
     return tmp.to_object(*getGlobal(*this));
 }
 
 bool
-MovieClip::set_member(string_table::key name,
-        const as_value& val, string_table::key nsname, bool ifFound)
+MovieClip::setTextFieldVariables(string_table::key name, const as_value& val,
+        string_table::key /*nsname*/)
 {
 
     bool found = false;
@@ -852,9 +852,6 @@ MovieClip::set_member(string_table::key name,
         log_debug(_("it's NOT a Text Variable"));
     }
 #endif
-
-    // If that didn't work call the default set_member
-    if (as_object::set_member(name, val, nsname, ifFound)) found=true;
 
     return found;
 }
@@ -2181,7 +2178,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     std::string postdata;
     
     // Encode our vars for sending.
-    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(postdata);
+    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*this, postdata);
 
     try 
     {

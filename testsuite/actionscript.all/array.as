@@ -770,10 +770,10 @@ check(c.hasOwnProperty('2'));
 c[10] = 'ten';
 check_equals(c.length, 11);
 ASSetPropFlags(c, "2", 7, 0); // protect from deletion
-xcheck( ! delete c[2] ); // gnash doesn't store prop flags here..
-xcheck_equals(c[2], 30); // so won't respect delete-protection
+check( ! delete c[2] ); // gnash doesn't store prop flags here..
+check_equals(c[2], 30); // so won't respect delete-protection
 c.length = 2;
-xcheck_equals(c[2], 30); // was protected !
+check_equals(c[2], 30); // was protected !
 check_equals(typeof(c[10]), 'undefined'); // was not protected..
 c.length = 11;
 check_equals(typeof(c[10]), 'undefined'); // and won't come back
@@ -1357,18 +1357,18 @@ check_equals(setCalls, 0);
 getCalls=0; setCalls=0;
 a[1] = 1;
 check_equals(getCalls, 0);
-xcheck_equals(setCalls, 1);
+check_equals(setCalls, 1);
 
 ret = a.addProperty('2', get, set);
 check_equals(ret, true);
 getCalls=0; setCalls=0;
 junk = a[2];
-xcheck_equals(getCalls, 1);
+check_equals(getCalls, 1);
 check_equals(setCalls, 0);
 getCalls=0; setCalls=0;
 a[2] = 2;
 check_equals(getCalls, 0);
-xcheck_equals(setCalls, 1);
+check_equals(setCalls, 1);
 
 check_equals(a.length, 3);
 ret = a.addProperty('3', get, set);
@@ -1378,7 +1378,7 @@ a.length = 3;
 getCalls=0; setCalls=0;
 a.push(2);
 check_equals(getCalls, 0);
-check_equals(setCalls, 0);
+xcheck_equals(setCalls, 0);
 
 #endif // OUTPUT_VERSION > 5
 
@@ -1394,7 +1394,7 @@ check_equals(a.length, 2);
 f = a.shift();
 check_equals(a.length, 1); 
 check_equals(f, 'zero');
-xcheck_equals(a[0], 'zero'); // could not delete for override
+check_equals(a[0], 'zero'); // could not delete for override
 check_equals(typeof(a[1]), 'undefined');
 #if OUTPUT_VERSION > 5
  check(!a.hasOwnProperty(1)); 
@@ -1409,10 +1409,10 @@ f = a.shift();
 check_equals(a.length, 1);
 check_equals(f, 'zero');
 check_equals(a[0], 'one'); // could replace
-xcheck_equals(a[1], 'one'); // couldn't delete
+check_equals(a[1], 'one'); // couldn't delete
 #if OUTPUT_VERSION > 5
  check(a.hasOwnProperty(0)); 
- xcheck(a.hasOwnProperty(1)); 
+ check(a.hasOwnProperty(1)); 
 #endif
 
 //--------------------------------------------------------
@@ -1425,10 +1425,10 @@ a[1] = 'one';
 ASSetPropFlags(a, "0", 4, 0); // protect 0 from override
 check_equals(a.length, 2);
 a[0] = 'overridden';
-xcheck_equals(a[0], 'zero'); // was protected..
+check_equals(a[0], 'zero'); // was protected..
 f = a.shift();
 check_equals(a.length, 1); 
-xcheck_equals(f, 'zero');
+check_equals(f, 'zero');
 check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
 check_equals(typeof(a[1]), 'undefined');
 a[0] = 'overridden';
@@ -1443,12 +1443,12 @@ a[1] = 'one';
 a[2] = 'two';
 ASSetPropFlags(a, "1", 4, 0); // protect 1 from override
 a[1] = 'overridden';
-xcheck_equals(a[1], 'one'); // was protected
+check_equals(a[1], 'one'); // was protected
 check_equals(a.length, 3);
 f = a.shift();
 check_equals(a.length, 2);
 check_equals(f, 'zero');
-xcheck_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
+check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
 check_equals(a[1], 'two');
 check_equals(typeof(a[2]), 'undefined');
 a[1] = 'overridden';
@@ -1492,7 +1492,7 @@ check_equals(traceProps(o), "shift,length,7,6,5,4,3,2,1,");
 o.shift();
 // Properties are readded from 0 to 5.
 check_equals(traceProps(o), "4,3,2,1,0,shift,length,7,6,5,");
-xcheck_equals(o.length, 6);
+check_equals(o.length, 6);
 
 o = fakeArray();
 o.unshift = Array.prototype.unshift;
@@ -1503,7 +1503,7 @@ check_equals(traceProps(o), "unshift,length,7,6,5,4,3,2,1,");
 o.unshift("new");
 // Properties are readded in reverse order.
 check_equals(traceProps(o), "0,1,2,3,4,5,6,unshift,length,7,")
-xcheck_equals(o.length, 6);
+check_equals(o.length, 6);
 
 
 o = fakeArray();
@@ -1516,7 +1516,7 @@ val = o.pop();
 check_equals(val, "five");
 // Length is not decremented, property 5 is deleted.
 check_equals(traceProps(o), "pop,length,7,6,4,3,2,1,");
-xcheck_equals(o.length, 6);
+check_equals(o.length, 6);
 
 
 o = fakeArray();

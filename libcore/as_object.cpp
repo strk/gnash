@@ -50,43 +50,18 @@
 
 
 namespace gnash {
-
-namespace {
-
-    class IsVisible
-    {
-    public:
-        IsVisible(as_object* obj) : _version(getSWFVersion(*obj)) {}
-        bool operator()(const Property* const prop) const {
-            return prop->visible(_version);
-        }
-    private:
-        const int _version;
-
-    };
-
-    class Exists
-    {
-    public:
-        Exists(as_object*) {}
-        bool operator()(const Property* const) const {
-            return true;
-        }
-    };
-}
-
 template<typename T>
 class
 as_object::PrototypeRecursor
 {
 public:
-    PrototypeRecursor(as_object* top, const ObjectURI& property)
+    PrototypeRecursor(as_object* top, const ObjectURI& property, T cmp = T())
         :
         _object(top),
         _name(getName(property)),
         _ns(getNamespace(property)),
         _iterations(0),
-        _condition(top)
+        _condition(cmp)
     {
         _visited.insert(top);
     }
@@ -112,7 +87,7 @@ public:
         // TODO: there is recursion prevention anyway; is this extra 
         // check for circularity really necessary?
         if (!_visited.insert(_object).second) return 0;
-        return _object && !_object->_displayObject;
+        return _object && !_object->displayObject();
     }
 
     /// Return the wanted property if it exists and satisfies the predicate.
@@ -123,7 +98,7 @@ public:
         assert(_object);
         Property* prop = _object->_members.getProperty(_name, _ns);
         
-        if (prop && _condition(prop)) {
+        if (prop && _condition(*prop)) {
             if (owner) *owner = _object;
             return prop;
         }
@@ -176,17 +151,6 @@ public:
 		if (proto) return proto->get_member(name, val, nsname);
 		log_debug("Super has no associated prototype");
 		return false;
-	}
-
-	// Setting members on 'super' is a no-op
-	virtual void set_member(string_table::key /*key*/, const as_value& /*val*/,
-		string_table::key /*nsname*/ = 0)
-	{
-		log_debug("set_member.");
-		// can't assign to super
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Can't set members on the 'super' object");
-		);
 	}
 
 	/// Dispatch.
@@ -291,11 +255,12 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	void accept(string_table::key name, const as_value& val)
+	bool accept(string_table::key name, const as_value& val)
 	{
-		if (name == NSV::PROP_uuPROTOuu) return;
+		if (name == NSV::PROP_uuPROTOuu) return true;
 		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
 		_tgt.set_member(name, val);
+        return true;
 	}
 };
 
@@ -341,15 +306,6 @@ as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	_members(_vm)
 {
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
-as_object::as_object(const as_object& other)
-	:
-    _displayObject(other._displayObject),
-    _relay(0),
-	_vm(VM::get()),
-	_members(other._members)
-{
 }
 
 std::pair<bool,bool>
@@ -430,11 +386,14 @@ as_object::get_member(string_table::key name, as_value* val,
 {
 	assert(val);
 
-    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname));
+    const int version = getSWFVersion(*this);
+
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname),
+        IsVisible(version));
 	
 	Property* prop = pr.getProperty();
     if (!prop) {
-        if (_displayObject) {
+        if (displayObject()) {
             if (getDisplayObjectProperty(*this, name, *val)) return true;
         }
         while (pr()) {
@@ -576,7 +535,10 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	as_object **owner)
 {
 
-    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname));
+    const int version = getSWFVersion(*this);
+
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname),
+        IsVisible(version));
 
     do {
         Property* prop = pr.getProperty(owner);
@@ -591,8 +553,6 @@ Property*
 as_object::findUpdatableProperty(const ObjectURI& uri)
 {
 
-	const int swfVersion = getSWFVersion(*this);
-
     PrototypeRecursor<Exists> pr(this, uri);
 
 	Property* prop = pr.getProperty();
@@ -600,6 +560,8 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
 	if (prop) return prop; 
+	
+    const int swfVersion = getSWFVersion(*this);
 
     while (pr()) {
         if ((prop = pr.getProperty())) {
@@ -613,12 +575,13 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 }
 
 void
-as_object::set_prototype(const as_value& proto, int flags)
+as_object::set_prototype(const as_value& proto)
 {
 	// TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
 	// TODO: check triggers !!
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0, flags);
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0,
+            as_object::DefaultFlags);
 }
 
 void
@@ -705,6 +668,8 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
 
 /// Order of property lookup:
 //
+/// 0. MovieClip textfield variables. TODO: this is a hack and should be
+///    eradicated.
 /// 1. Own properties even if invisible or not getter-setters. 
 /// 2. If DisplayObject, magic properties
 /// 3. Visible own getter-setter properties of all __proto__ objects
@@ -713,6 +678,13 @@ bool
 as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
+
+    bool tfVarFound = false;
+    if (displayObject()) {
+        MovieClip* mc = dynamic_cast<MovieClip*>(this);
+        if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
+        // We still need to set the member.
+    }
 
     const ObjectURI uri(key, nsname);
     
@@ -724,7 +696,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 	// even if invisible.
 	if (!prop) { 
 
-        if (_displayObject) {
+        if (displayObject()) {
             if (setDisplayObjectProperty(*this, key, val)) return true;
             // TODO: should we execute triggers?
         }
@@ -761,6 +733,10 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		return true;
 	}
+
+    // Return true if we found a textfield variable, even if it was not
+    // an own property.
+    if (tfVarFound) return true;
 
 	// Else, add new property...
 	if (ifFound) return false;
@@ -1004,7 +980,8 @@ as_object::prototypeOf(as_object& instance)
 
 	// See actionscript.all/Inheritance.as for a way to trigger this
 	IF_VERBOSE_ASCODING_ERRORS(
-	if ( obj ) log_aserror(_("Circular inheritance chain detected during isPrototypeOf call"));
+        if (obj) log_aserror(_("Circular inheritance chain detected "
+                "during isPrototypeOf call"));
 	);
 
 	return false;
@@ -1072,7 +1049,7 @@ as_object::copyProperties(const as_object& o)
 	PropsCopier copier(*this);
 
 	// TODO: check if non-visible properties should be also copied !
-	o.visitPropertyValues(copier);
+	o.visitProperties<Exists>(copier);
 }
 
 void
@@ -1273,28 +1250,25 @@ as_object::get_path_element(string_table::key key)
 }
 
 void
-as_object::getURLEncodedVars(std::string& data)
+getURLEncodedVars(as_object& o, std::string& data)
 {
-    SortedPropertyList props;
-    enumerateProperties(props);
+    PropertyList::SortedPropertyList props;
+    o.enumerateProperties(props);
 
     std::string del;
     data.clear();
     
-    for (SortedPropertyList::const_iterator i=props.begin(),
-            e=props.end(); i!=e; ++i)
-    {
-      std::string name = i->first;
-      std::string value = i->second;
-      if ( ! name.empty() && name[0] == '$' ) continue; // see bug #22006
-      URL::encode(value);
-      
-      data += del + name + "=" + value;
-      
-      del = "&";
-        
+    for (PropertyList::SortedPropertyList::const_iterator i=props.begin(),
+            e=props.end(); i!=e; ++i) {
+        std::string name = i->first;
+        std::string value = i->second;
+        if (!name.empty() && name[0] == '$') continue; // see bug #22006
+        URL::encode(value);
+
+        data += del + name + "=" + value;
+
+        del = "&";
     }
-    
 }
 
 bool
@@ -1392,24 +1366,11 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 	}
 }
 
-void
-as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+DisplayObject*
+getDisplayObject(as_object* obj)
 {
-    _members.visitValues(visitor, *this);
-}
-
-void
-as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    _members.visitNonHiddenValues(visitor, *this);
-}
-
-bool
-isNativeType(as_object* obj, DisplayObject*& relay)
-{
-    if (!obj || !obj->displayObject()) return false;
-    relay = static_cast<DisplayObject*>(obj);
-    return true;
+    if (!obj || !obj->displayObject()) return 0;
+    return &static_cast<DisplayObject&>(*obj);
 }
 
 /// Get the VM from an as_object
