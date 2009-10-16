@@ -906,14 +906,6 @@ array_class_init(as_object& where, const ObjectURI& uri)
     where.init_member(getName(uri), cl, flags, getNamespace(uri));
 }
 
-#ifdef GNASH_USE_GC
-void
-Array_as::markReachableResources() const
-{
-    markAsObjectReachable();
-}
-#endif // GNASH_USE_GC
-
 bool
 Array_as::isStrict() const
 {

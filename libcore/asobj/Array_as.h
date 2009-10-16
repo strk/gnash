@@ -26,8 +26,6 @@
 #include <deque>
 #include <vector>
 #include <memory> // for auto_ptr
-#include <boost/numeric/ublas/vector_sparse.hpp>
-
 #include <string>
 
 // Forward declarations
@@ -83,20 +81,6 @@ public:
 	/// Overridden to provide array[#]=x semantic
 	virtual bool set_member(string_table::key name,
 		const as_value& val, string_table::key nsname=0, bool ifFound=false);
-
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark array-specific reachable resources and invoke
-	/// the parent's class version (markAsObjectReachable)
-	//
-	/// array-specific reachable resources are:
-	/// 	- The elements values (elements)
-	///
-	virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
-
-private:
 
 };
 
