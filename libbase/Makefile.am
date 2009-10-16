@@ -17,6 +17,8 @@ AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
+sysconf_DATA = gnashrc gnashpluginrc
+
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
@@ -87,34 +89,6 @@ libgnashbase_la_SOURCES = \
 	arg_parser.cpp \
 	$(NULL)
 
-if USE_PNG
-libgnashbase_la_SOURCES += GnashImagePng.cpp
-endif
-if USE_GIF
-libgnashbase_la_SOURCES += GnashImageGif.cpp
-endif
-
-if INSTALL_LTDL
-if !LIBLTDL2
-include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
-LIBLTDLLIB = libltdl.la
-LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
-endif
-endif
-
-if !LIBLTDL2
-libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
-if CONVENIENCE_LTDL
-noinst_LTLIBRARIES = libltdlc.la
-libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-endif
-
-libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
-libltdl_la_LIBADD = $(LIBADD_DL)
-
-sysconf_DATA = gnashrc gnashpluginrc
-
 edit = sed \
 	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
 	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
@@ -129,6 +103,31 @@ gnashrc: gnashrc.in Makefile
 gnashpluginrc: gnashpluginrc.in
 	$(edit) '$(srcdir)/$@.in' >$@
 
+if USE_PNG
+libgnashbase_la_SOURCES += GnashImagePng.cpp
+endif
+if USE_GIF
+libgnashbase_la_SOURCES += GnashImageGif.cpp
+endif
+
+if INSTALL_LTDL
+if LIBLTDL1
+include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
+LIBLTDLLIB = libltdl.la
+LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
+endif
+endif
+
+if LIBLTDL1
+libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
+if CONVENIENCE_LTDL
+noinst_LTLIBRARIES = libltdlc.la
+libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+
+libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
+libltdl_la_LIBADD = $(LIBADD_DL)
 
 if WIN32
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm
