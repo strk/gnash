@@ -1215,8 +1215,7 @@ isNativeType(as_object* obj, T*& relay)
 //
 /// @param obj      The object whose DisplayObject part should be returned
 /// @return         The DisplayObject if the object is one, otherwise 0.
-DisplayObject*
-getDisplayObject(as_object* obj);
+DisplayObject* getDisplayObject(as_object* obj);
 
 /// Ensure that the object is of a particular native type.
 //
