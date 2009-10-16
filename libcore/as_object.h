@@ -1088,6 +1088,7 @@ protected:
 
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
+
 #endif // GNASH_USE_GC
 
 private:
@@ -1143,6 +1144,8 @@ private:
     TriggerContainer _trigs;
 };
 
+
+/// Comparator for ObjectURI so it can serve as a key in stdlib containers.
 inline bool
 operator<(const ObjectURI& a, const ObjectURI& b)
 {
