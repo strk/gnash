@@ -361,7 +361,7 @@ Fileio::scandir(const std::string& dir, as_value* result)
 	
 	for (int idx=0; idx<n; idx++) {
 		item.set_string(namelist[idx]->d_name);
-		array->push(item);
+		array->at(idx) = item;
 		free(namelist[idx]);
 	}
 	free(namelist);
