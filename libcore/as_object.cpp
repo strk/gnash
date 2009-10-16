@@ -56,23 +56,32 @@ namespace {
     class IsVisible
     {
     public:
-        IsVisible(as_object* obj) : _version(getSWFVersion(*obj)) {}
-        bool operator()(const Property* const prop) const {
-            return prop->visible(_version);
+        IsVisible(int version) : _version(version) {}
+        bool operator()(const Property& prop) const {
+            return prop.visible(_version);
         }
     private:
         const int _version;
-
     };
 
     class Exists
     {
     public:
-        Exists(as_object*) {}
-        bool operator()(const Property* const) const {
+        Exists() {}
+        bool operator()(const Property&) const {
             return true;
         }
     };
+
+    class IsEnumerable
+    {
+    public:
+        IsEnumerable() {}
+        bool operator()(const Property& p) const {
+            return !p.getFlags().get_dont_enum();
+        }
+    };
+
 }
 
 template<typename T>
@@ -80,13 +89,13 @@ class
 as_object::PrototypeRecursor
 {
 public:
-    PrototypeRecursor(as_object* top, const ObjectURI& property)
+    PrototypeRecursor(as_object* top, const ObjectURI& property, T cmp = T())
         :
         _object(top),
         _name(getName(property)),
         _ns(getNamespace(property)),
         _iterations(0),
-        _condition(top)
+        _condition(cmp)
     {
         _visited.insert(top);
     }
@@ -123,7 +132,7 @@ public:
         assert(_object);
         Property* prop = _object->_members.getProperty(_name, _ns);
         
-        if (prop && _condition(prop)) {
+        if (prop && _condition(*prop)) {
             if (owner) *owner = _object;
             return prop;
         }
@@ -421,7 +430,10 @@ as_object::get_member(string_table::key name, as_value* val,
 {
 	assert(val);
 
-    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname));
+    const int version = getSWFVersion(*this);
+
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname),
+        IsVisible(version));
 	
 	Property* prop = pr.getProperty();
     if (!prop) {
@@ -567,7 +579,10 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	as_object **owner)
 {
 
-    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname));
+    const int version = getSWFVersion(*this);
+
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname),
+        IsVisible(version));
 
     do {
         Property* prop = pr.getProperty(owner);
@@ -582,8 +597,6 @@ Property*
 as_object::findUpdatableProperty(const ObjectURI& uri)
 {
 
-	const int swfVersion = getSWFVersion(*this);
-
     PrototypeRecursor<Exists> pr(this, uri);
 
 	Property* prop = pr.getProperty();
@@ -591,6 +604,8 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
 	if (prop) return prop; 
+	
+    const int swfVersion = getSWFVersion(*this);
 
     while (pr()) {
         if ((prop = pr.getProperty())) {
@@ -1398,13 +1413,13 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 void
 as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitValues(visitor, *this);
+    _members.visitValues<Exists>(visitor, *this);
 }
 
 void
 as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitNonHiddenValues(visitor, *this);
+    _members.visitValues<IsEnumerable>(visitor, *this);
 }
 
 DisplayObject*
