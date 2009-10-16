@@ -187,17 +187,6 @@ public:
 		return false;
 	}
 
-	// Setting members on 'super' is a no-op
-	virtual void set_member(string_table::key /*key*/, const as_value& /*val*/,
-		string_table::key /*nsname*/ = 0)
-	{
-		log_debug("set_member.");
-		// can't assign to super
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Can't set members on the 'super' object");
-		);
-	}
-
 	/// Dispatch.
 	virtual as_value operator()(const fn_call& fn)
 	{

@@ -622,7 +622,7 @@ public:
     ///
     /// @return true of the named property was found, false otherwise.
     ///
-    bool get_member(string_table::key name, as_value* val,
+    virtual bool get_member(string_table::key name, as_value* val,
         string_table::key nsname = 0);
 
     /// Resolve the given relative path component
