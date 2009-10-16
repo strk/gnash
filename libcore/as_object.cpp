@@ -289,11 +289,12 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	void accept(string_table::key name, const as_value& val)
+	bool accept(string_table::key name, const as_value& val)
 	{
-		if (name == NSV::PROP_uuPROTOuu) return;
+		if (name == NSV::PROP_uuPROTOuu) return true;
 		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
 		_tgt.set_member(name, val);
+        return true;
 	}
 };
 

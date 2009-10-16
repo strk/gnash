@@ -166,7 +166,7 @@ public:
 	    _st(vm.getStringTable())
 	{}
     
-    void accept(string_table::key key, const as_value& val) 
+    bool accept(string_table::key key, const as_value& val) 
     {
 
         // Test conducted with AMFPHP:
@@ -182,7 +182,7 @@ public:
             log_debug(" skip serialization of specially-named property %s",
                     _st.value(key));
 #endif
-            return;
+            return true;
         }
 
         amf::AMF amf;
@@ -224,6 +224,7 @@ public:
         if (el) {
             _obj.addProperty(el);
         }
+        return true;
     }
 
 private:
@@ -255,15 +256,15 @@ public:
     
     bool success() const { return !_error; }
 
-    void accept(string_table::key key, const as_value& val) 
+    bool accept(string_table::key key, const as_value& val) 
     {
-        if ( _error ) return;
+        if ( _error ) return true;
 
         // Tested with SharedObject and AMFPHP
         if ( val.is_function() )
         {
             log_debug("AMF0: skip serialization of FUNCTION property");
-            return;
+            return true;
         }
 
         // Test conducted with AMFPHP:
@@ -279,7 +280,7 @@ public:
             log_debug(" skip serialization of specially-named property %s",
                     _st.value(key));
 #endif
-            return;
+            return true;
         }
 
         // write property name
@@ -290,11 +291,11 @@ public:
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
-        if ( ! val.writeAMF0(_buf, _offsetTable, _vm, _allowStrict) )
-        {
+        if (!val.writeAMF0(_buf, _offsetTable, _vm, _allowStrict)) {
             log_error("Problems serializing an object's member");
-            _error=true;
+            _error = true;
         }
+        return true;
     }
 private:
 

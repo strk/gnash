@@ -62,7 +62,9 @@ namespace gnash {
 /// An abstract property visitor
 class AbstractPropertyVisitor {
 public:
-    virtual void accept(string_table::key key, const as_value& val)=0;
+
+    /// This function should return false if no further visits are needed.
+    virtual bool accept(string_table::key key, const as_value& val) = 0;
     virtual ~AbstractPropertyVisitor() {}
 };
 

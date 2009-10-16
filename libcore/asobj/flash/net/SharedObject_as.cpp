@@ -104,7 +104,7 @@ public:
         _st(vm.getStringTable())
     {};
 
-    void accept(string_table::key key, const as_value& val) 
+    bool accept(string_table::key key, const as_value& val) 
     {
         AMF amf;
         boost::shared_ptr<amf::Element> el;
@@ -137,6 +137,7 @@ public:
         if (el) {
             _sol.addObj(el);
         }
+        return true;
     }
 
 private:
@@ -165,14 +166,13 @@ public:
     
     bool success() const { return !_error; }
 
-    virtual void accept(string_table::key key, const as_value& val) 
+    virtual bool accept(string_table::key key, const as_value& val) 
     {
-        if ( _error ) return;
+        assert(!_error);
 
-        if ( val.is_function() )
-        {
+        if ( val.is_function()) {
             log_debug("SOL: skip serialization of FUNCTION property");
-            return;
+            return true;
         }
 
         // Test conducted with AMFPHP:
@@ -188,7 +188,7 @@ public:
             log_debug(" skip serialization of specially-named property %s",
                     _st.value(key));
 #endif
-            return;
+            return true;
         }
 
         // write property name
@@ -200,14 +200,18 @@ public:
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
         // Strict array are never encoded in SharedObject
-        if ( ! val.writeAMF0(_buf, _offsetTable, _vm, false) )
+        if (!val.writeAMF0(_buf, _offsetTable, _vm, false))
         {
             log_error("Problems serializing an object's member %s=%s",
                     name, val);
             _error = true;
-        }
 
-        _buf.appendByte(0); // SOL-specific
+            // Stop visiting....
+            return false;
+        }
+        // SOL-specific
+        _buf.appendByte(0); 
+        return true;
     }
 
 private:
