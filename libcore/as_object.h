@@ -910,7 +910,7 @@ public:
     ///    reference as first argument and a const as_value reference
     ///    as second argument.
     ///
-    virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
+    void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
 
     /// Visit non-hidden properties of this object by key/as_value pairs
     //
@@ -924,7 +924,7 @@ public:
     ///    reference as first argument and a const as_value reference
     ///    as second argument.
     ///
-    virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor)
+    void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor)
         const;
 
     /// \brief
