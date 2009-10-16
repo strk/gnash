@@ -65,15 +65,6 @@ public:
 
 	~Array_as();
 
-    /// Return true if this is a strict array
-    //
-    /// Strict arrays are those whose enumerable
-    /// properties are only valid positive integer.
-    /// Telling strict apart from non-strict is needed
-    /// for AMF encoding in remoting.
-    ///
-    bool isStrict() const;
-
 	as_value at(unsigned int index) const;
 
 	unsigned int size() const;

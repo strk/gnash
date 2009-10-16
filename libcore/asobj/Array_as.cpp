@@ -906,13 +906,6 @@ array_class_init(as_object& where, const ObjectURI& uri)
     where.init_member(getName(uri), cl, flags, getNamespace(uri));
 }
 
-bool
-Array_as::isStrict() const
-{
-    if ( hasNonHiddenProperties() ) return false;
-    return true;
-}
-
 // Used by foreachArray, declared in Array_as.h
 string_table::key
 arrayKey(string_table& st, size_t i)
