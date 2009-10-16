@@ -44,6 +44,48 @@
 
 namespace gnash {
 
+namespace {
+
+/// Find a variable in the given as_object
+//
+/// @param varname
+/// Name of the local variable
+///
+/// @param ret
+/// If a variable is found it's assigned to this parameter.
+/// Untouched if the variable is not found.
+///
+/// @return true if the variable was found, false otherwise
+bool
+getLocal(as_object* locals, const std::string& name, as_value& ret)
+{
+    string_table& st = getStringTable(*locals);
+    return locals->get_member(st.find(name), &ret);
+}
+
+/// Delete a local variable
+//
+/// @param varname
+/// Name of the local variable
+///
+/// @return true if the variable was found and deleted, false otherwise
+///
+bool
+deleteLocal(as_object* locals, const std::string& varname)
+{
+    string_table& st = getStringTable(*locals);
+    return locals->delProperty(st.find(varname)).second;
+}
+
+as_object*
+getElement(as_object* obj, string_table::key key)
+{
+    //Global_as* gl = getGlobal(*obj); 
+    return obj->get_path_element(key);
+}
+
+}
+
 as_value as_environment::undefVal;
 
 as_environment::as_environment(VM& vm)
@@ -120,13 +162,6 @@ as_environment::get_variable(const std::string& varname,
     }
 }
 
-as_value
-as_environment::get_variable(const std::string& varname) const
-{
-    static ScopeStack empty_scopeStack;
-    return get_variable(varname, empty_scopeStack);
-}
-
 static bool
 validRawVariableName(const std::string& varname)
 {
@@ -183,14 +218,8 @@ as_environment::get_variable_raw(const std::string& varname,
     }
 
     // Check locals for getting them
-    if ( swfVersion < 6 ) // for SWF6 and up locals should be in the scope stack
-    {
-        if ( findLocal(varname, val, retTarget) ) 
-        {
-            return val;
-        }
-    }
-
+    // for SWF6 and up locals should be in the scope stack
+    if (swfVersion < 6 && findLocal(varname, val, retTarget)) return val;
 
     // Check current target members. TODO: shouldn't target be in scope stack ?
     if (m_target)
@@ -300,14 +329,6 @@ as_environment::delVariableRaw(const std::string& varname,
     return _vm.getGlobal()->delProperty(varkey).second;
 }
 
-// varname must be a plain variable name; no path parsing.
-as_value
-as_environment::get_variable_raw(const std::string& varname) const
-{
-    static ScopeStack empty_scopeStack;
-    return get_variable_raw(varname, empty_scopeStack);
-}
-
 // Given a path to variable, set its value.
 void
 as_environment::set_variable(const std::string& varname, const as_value& val,
@@ -341,13 +362,6 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     else {
         set_variable_raw(varname, val, scopeStack);
     }
-}
-
-void
-as_environment::set_variable(const std::string& varname, const as_value& val)
-{
-    static ScopeStack empty_scopeStack;
-    set_variable(varname, val, empty_scopeStack);
 }
 
 // No path rigamarole.
@@ -418,14 +432,6 @@ as_environment::set_variable_raw(const std::string& varname,
     }
 }
 
-void
-as_environment::set_variable_raw( const std::string& varname,
-        const as_value& val)
-{
-    static ScopeStack empty_scopeStack;
-    set_variable_raw(varname, val, empty_scopeStack);
-}
-
 // Set/initialize the value of the local variable.
 void
 as_environment::set_local(const std::string& varname, const as_value& val)
@@ -461,7 +467,6 @@ as_environment::declare_local(const std::string& varname)
         assert( ! _localFrames.empty() );
         assert( ! varname.empty() );    // null varnames are invalid!
         as_object* locals = _localFrames.back().locals;
-        //locals.push_back(as_environment::frame_slot(varname, as_value()));
         locals->set_member(_vm.getStringTable().find(varname), as_value());
     }
 }
@@ -487,16 +492,16 @@ as_environment::parse_path(const std::string& var_path_in, std::string& path,
     log_debug("path: %s, var: %s", thePath, theVar);
 #endif
 
-    if ( thePath.empty() ) return false;
+    if (thePath.empty()) return false;
 
     // this check should be performed by callers (getvariable/setvariable
     // in particular)
     size_t pathlen = thePath.length();
-    size_t i = pathlen-1;
+    size_t i = pathlen - 1;
     size_t consecutiveColons = 0;
-    while ( i && thePath[i--] == ':' )
+    while (i && thePath[i--] == ':')
     {
-        if ( ++consecutiveColons > 1 )
+        if (++consecutiveColons > 1)
         {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug("path '%s' ends with too many colon chars, not "
@@ -518,8 +523,8 @@ as_environment::parse_path(const std::string& var_path, as_object** target,
 {
     std::string path;
     std::string var;
-    if ( ! parse_path(var_path, path, var) ) return false;
-        as_object* target_ptr = find_object(path); 
+    if (!parse_path(var_path, path, var)) return false;
+    as_object* target_ptr = find_object(path); 
     if ( ! target_ptr ) return false;
 
     target_ptr->get_member(_vm.getStringTable().find(var), &val);
@@ -533,27 +538,29 @@ static const char*
 next_slash_or_dot(const char* word)
 {
     for (const char* p = word; *p; p++) {
-    if (*p == '.' && p[1] == '.') {
-        p++;
-    } else if (*p == '.' || *p == '/' || *p == ':') {
-        return p;
-    }
+        if (*p == '.' && p[1] == '.') {
+            p++;
+        } else if (*p == '.' || *p == '/' || *p == ':') {
+            return p;
+        }
     }
     
     return NULL;
 }
 
-// Find the sprite/movie referenced by the given path.
+/// Find the sprite/movie referenced by the given path.
 //
-// Supports both /slash/syntax and dot.syntax
+/// Supports both /slash/syntax and dot.syntax
 //
+/// @return     The found DisplayObject or 0 if it is not a DisplayObject.
 DisplayObject*
 as_environment::find_target(const std::string& path_in) const
 {
     as_object* o = find_object(path_in);
-    if ( o ) return o->toDisplayObject(); // can be NULL (not a DisplayObject)...
-    else return NULL;
+    if (o) return o->toDisplayObject(); 
+    return 0;
 }
+
 
 as_object*
 as_environment::find_object(const std::string& path,
@@ -563,8 +570,7 @@ as_environment::find_object(const std::string& path,
     log_debug(_("find_object(%s) called"), path);
 #endif
 
-    if (path.empty())
-    {
+    if (path.empty()) {
 #ifdef DEBUG_TARGET_FINDING 
         log_debug(_("Returning m_target (empty path)"));
 #endif
@@ -573,7 +579,7 @@ as_environment::find_object(const std::string& path,
     
     VM& vm = _vm;
     string_table& st = vm.getStringTable();
-    int swfVersion = vm.getSWFVersion(); 
+    int swfVersion = vm.getSWFVersion();
 
     as_object* env = 0;
     env = m_target; 
@@ -586,24 +592,21 @@ as_environment::find_object(const std::string& path,
     {
         // Absolute path.  Start at the (AS) root (handle _lockroot)
         MovieClip* root = 0;
-        if ( m_target ) root = m_target->getAsRoot();
+        if (m_target) root = m_target->getAsRoot();
         else {
-            if ( _original_target )
-            {
+            if (_original_target) {
                 log_debug("current target is undefined on "
                         "as_environment::find_object, we'll use original");
                 root = _original_target->getAsRoot();
             }
-            else
-            {
+            else {
                 log_debug("both current and original target are undefined "
                         "on as_environment::find_object, we'll return 0");
                 return 0;
             }
         }
 
-        if ( ! *(++p) )
-        {
+        if (!*(++p)) {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Path is '/', return the root (%p)"), (void*)root);
 #endif
@@ -620,8 +623,7 @@ as_environment::find_object(const std::string& path,
 
     }
 #ifdef DEBUG_TARGET_FINDING 
-    else
-    {
+    else {
         log_debug(_("Relative path, start at (%s)"), m_target->getTarget());
     }
 #endif
@@ -631,35 +633,30 @@ as_environment::find_object(const std::string& path,
     std::string subpart;
     while (1)
     {
-        while ( *p == ':' ) ++p;
+        while (*p == ':') ++p;
 
         // No more components to scan
-        if ( ! *p )
-        {
+        if (!*p) {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Path is %s, returning whatever we were up to"), path);
 #endif
-
             return env;
         }
 
 
         const char* next_slash = next_slash_or_dot(p);
         subpart = p;
-        if (next_slash == p)
-        {
+        if (next_slash == p) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("invalid path '%s' (p=next_slash=%s)"),
                 path, next_slash);
             );
             return NULL;
         }
-        else if (next_slash)
-        {
-            if ( *next_slash == '.' )
+        else if (next_slash) {
+            if (*next_slash == '.')
             {
-                if ( ! dot_allowed )
-                {
+                if (!dot_allowed) {
                     IF_VERBOSE_ASCODING_ERRORS(
                     log_aserror(_("invalid path '%s' (dot not allowed "
                             "after having seen a slash)"), path);
@@ -667,8 +664,7 @@ as_environment::find_object(const std::string& path,
                     return NULL;
                 }
             }
-            else if ( *next_slash == '/' )
-            {
+            else if (*next_slash == '/') {
                 dot_allowed = false;
             }
 
@@ -679,8 +675,7 @@ as_environment::find_object(const std::string& path,
         assert(subpart[0] != ':');
 
         // No more components to scan
-        if ( subpart.empty() )
-        {
+        if (subpart.empty()) {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("No more subparts, env is %p"), (void*)env);
 #endif
@@ -689,15 +684,12 @@ as_environment::find_object(const std::string& path,
 
         string_table::key subpartKey = st.find(subpart);
 
-        if ( ! firstElementParsed )
-        {
-            as_object* element = NULL;
+        if (!firstElementParsed) {
+            as_object* element(0);
 
             do {
-
                 // Try scope stack
-                if ( scopeStack )
-                {
+                if (scopeStack) {
                     for (size_t i = scopeStack->size(); i > 0; --i)
                     {
                         // const_cast needed due to non-const 
@@ -705,37 +697,32 @@ as_environment::find_object(const std::string& path,
                         as_object* obj = 
                             const_cast<as_object*>((*scopeStack)[i-1].get());
                         
-                        element = obj->get_path_element(subpartKey);
-                        if ( element ) break;
+                        element = getElement(obj, subpartKey);
+                        if (element) break;
                     }
-                    if ( element ) break;
+                    if (element) break;
                 }
 
                 // Try current target  (if any)
                 assert(env == m_target);
-                if ( env )
-                {
-                    element = env->get_path_element(subpartKey);
-                    if ( element ) break;
+                if (env) {
+                    element = getElement(env, subpartKey);
+                    if (element) break;
                 }
-                // else if ( _original_target) // TODO: try orig target too ?
 
                 // Looking for _global ?
                 as_object* global = _vm.getGlobal();
-                if ( swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL )
+                if (swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL)
                 {
                     element = global;
                     break;
                 }
-
                 // Try globals
-                element = global->get_path_element(subpartKey);
-                //if ( element ) break;
+                element = getElement(global, subpartKey);
 
             } while (0);
 
-            if ( ! element ) 
-            {
+            if (!element) {
 #ifdef DEBUG_TARGET_FINDING 
                 log_debug("subpart %s of path %s not found in any "
                 "scope stack element", subpart, path);
@@ -746,8 +733,7 @@ as_environment::find_object(const std::string& path,
             env = element;
             firstElementParsed = true;
         }
-        else
-        {
+        else {
 
             assert(env);
 
@@ -756,9 +742,8 @@ as_environment::find_object(const std::string& path,
                     "%p"), subpart, (void *)env);
 #endif
 
-            as_object* element = env->get_path_element(subpartKey);
-            if ( ! element )
-            {
+            as_object* element = getElement(env, subpartKey);
+            if (!element) {
 #ifdef DEBUG_TARGET_FINDING 
                 log_debug(_("Path element %s not found in "
                             "object %p"), subpart, (void *)env);
@@ -817,7 +802,6 @@ dump(const as_object* locals, std::ostream& out)
     PropMap props;
     const_cast<as_object*>(locals)->dump_members(props);
     
-    //log_debug("FIXME: implement dumper for local variables now that they are simple objects");
     int count = 0;
     for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
     {
@@ -868,69 +852,43 @@ as_environment::dump_global_registers(std::ostream& out) const
     if ( defined ) out << ss.str() << std::endl;
 }
 
-/*private*/
 bool
-as_environment::findLocal(const std::string& varname, as_value& ret, as_object** retTarget)
+as_environment::findLocal(const std::string& varname, as_value& ret,
+        as_object** retTarget) const
 {
-    if ( _localFrames.empty() ) return false;
-    if ( findLocal(_localFrames.back().locals, varname, ret) )
-    {
-        if ( retTarget ) *retTarget = _localFrames.back().locals;
+    if (_localFrames.empty()) return false;
+
+    if (getLocal(_localFrames.back().locals, varname, ret)) {
+
+        if (retTarget) *retTarget = _localFrames.back().locals;
         return true;
     }
+
     return false;
 }
 
-/* private */
-bool
-as_environment::findLocal(as_object* locals, const std::string& name, as_value& ret)
-{
-    // TODO: get VM passed as arg
-    return locals->get_member(_vm.getStringTable().find(name), &ret);
-}
-
-/* private */
-bool
-as_environment::delLocal(as_object* locals, const std::string& varname)
-{
-    // TODO: get VM passed as arg
-    return locals->delProperty(_vm.getStringTable().find(varname)).second;
-}
-
-/* private */
 bool
 as_environment::delLocal(const std::string& varname)
 {
-    if ( _localFrames.empty() ) return false;
-    return delLocal(_localFrames.back().locals, varname);
+    if (_localFrames.empty()) return false;
+    return deleteLocal(_localFrames.back().locals, varname);
 }
 
-/* private */
 bool
 as_environment::setLocal(const std::string& varname, const as_value& val)
 {
-    if ( _localFrames.empty() ) return false;
+    if (_localFrames.empty()) return false;
     return setLocal(_localFrames.back().locals, varname, val);
 }
 
-/* private */
 bool
-as_environment::setLocal(as_object* locals,
-        const std::string& varname, const as_value& val)
+as_environment::setLocal(as_object* locals, const std::string& varname,
+        const as_value& val)
 {
     Property* prop = locals->getOwnProperty(_vm.getStringTable().find(varname));
     if ( ! prop ) return false;
     prop->setValue(*locals, val);
     return true;
-}
-
-
-void
-as_environment::padStack(size_t /*offset*/, size_t /*count*/)
-{
-    // do nothing here, instead return undefined from top() and pop()
-    //assert( offset <= _stack.size() );
-    //m_stack.insert(m_stack.begin()+offset, count, as_value());
 }
 
 void
@@ -983,10 +941,10 @@ as_environment::set_target(DisplayObject* target)
 void
 as_environment::add_local(const std::string& varname, const as_value& val)
 {
-    assert( ! varname.empty() );    // null varnames are invalid!
-    assert( ! _localFrames.empty() );
+    assert(!varname.empty());   
+    assert(!_localFrames.empty());
+
     as_object* locals = _localFrames.back().locals;
-    //locals.push_back(frame_slot(varname, val));
     locals->set_member(_vm.getStringTable().find(varname), val);
 }
 
@@ -1017,16 +975,14 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 unsigned int
 as_environment::setRegister(unsigned int regnum, const as_value& v)
 {
-    if ( _localFrames.empty() || _localFrames.back().registers.empty() )
-    {
+    if (_localFrames.empty() || _localFrames.back().registers.empty()) {
         if ( regnum >= numGlobalRegisters ) return 0;
         m_global_register[regnum] = v;
         return 1;
     }
 
     Registers& registers = _localFrames.back().registers;
-    if ( regnum < registers.size() )
-    {
+    if (regnum < registers.size()) {
         registers[regnum] = v;
         return 2;
     }
@@ -1037,16 +993,14 @@ as_environment::setRegister(unsigned int regnum, const as_value& v)
 unsigned int
 as_environment::getRegister(unsigned int regnum, as_value& v)
 {
-    if ( _localFrames.empty() || _localFrames.back().registers.empty() )
-    {
+    if (_localFrames.empty() || _localFrames.back().registers.empty()) {
         if ( regnum >= numGlobalRegisters ) return 0;
         v = m_global_register[regnum];
         return 1;
     }
 
     Registers& registers = _localFrames.back().registers;
-    if ( regnum < registers.size() )
-    {
+    if (regnum < registers.size()) {
         v = registers[regnum];
         return 2;
     }
@@ -1057,23 +1011,15 @@ as_environment::getRegister(unsigned int regnum, as_value& v)
 void
 as_environment::markReachableResources() const
 {
-    for (size_t i=0; i<4; ++i)
-    {
+    for (size_t i = 0; i < 4; ++i) {
         m_global_register[i].setReachable();
     }
 
-    if ( m_target ) m_target->setReachable();
-    if ( _original_target ) _original_target->setReachable();
+    if (m_target) m_target->setReachable();
+    if (_original_target) _original_target->setReachable();
 
-    assert ( _localFrames.empty() );
-#if 1 // I think we expect the stack to be empty !
-    for (CallStack::const_iterator i=_localFrames.begin(), e=_localFrames.end(); i!=e; ++i)
-    {
-        i->markReachableResources();
-    }
-#endif
-
-    assert ( _stack.empty() );
+    assert (_localFrames.empty());
+    assert (_stack.empty());
 }
 #endif // GNASH_USE_GC
 

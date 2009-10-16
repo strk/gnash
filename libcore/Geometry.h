@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-    class rect; 
+    class SWFRect; 
 }
 
 namespace gnash { 
@@ -99,8 +99,8 @@ public:
         boost::int32_t pdx = p.x - A.x;
         boost::int32_t pdy = p.y - A.y;
 
-        double u = ( (double)(pdx) * dx + (double)(pdy) * dy ) /
-            ( (double)(dx)*dx + (double)(dy)*dy );
+        double u = (static_cast<double>(pdx) * dx + static_cast<double>(pdy) * dy ) /
+            (static_cast<double>(dx)*dx + static_cast<double>(dy)*dy );
 
         if (u <= 0)
         {
@@ -272,7 +272,7 @@ public:
         assert(empty());
     }
 
-    /// Expand given rect to include bounds of this path
+    /// Expand given SWFRect to include bounds of this path
     //
     /// @param r
     ///    The rectangle to expand with our own bounds
@@ -286,7 +286,7 @@ public:
     ///    SWF version to use.
     ///
     void
-    expandBounds(rect& r, unsigned int thickness, int swfVersion) const
+    expandBounds(SWFRect& r, unsigned int thickness, int swfVersion) const
     {
         const Path&    p = *this;
         size_t nedges = m_edges.size();
@@ -436,7 +436,7 @@ public:
                 point p0(A.x, A.y);
                 for (int i=1; i<=segCount; ++i)
                 {
-                    float t1 = (float)(i) / segCount;
+                    float t1 = static_cast<float>(i) / segCount;
                     point p1 = Edge::pointOnCurve(A, C, B, t1);
 
                     // distance from point and segment being an approximation 

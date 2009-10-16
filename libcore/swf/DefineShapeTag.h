@@ -42,11 +42,10 @@ public:
     virtual void display(Renderer& renderer, const DisplayObject& inst) const;
 
     // Create a Shape DisplayObject.
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
-        const;
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const;
 	
     /// Get cached bounds of this shape.
-    const rect& bounds() const { return _shape.getBounds(); }
+    const SWFRect& bounds() const { return _shape.getBounds(); }
 
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm) const;

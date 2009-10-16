@@ -133,9 +133,9 @@ DefineVideoStreamTag::addVideoFrameTag(
 }
 
 DisplayObject*
-DefineVideoStreamTag::createDisplayObject(DisplayObject* parent, int id) const
+DefineVideoStreamTag::createDisplayObject(DisplayObject* parent) const
 {
-	DisplayObject* ch = new Video(this, parent, id);
+	DisplayObject* ch = new Video(this, parent);
 	return ch;
 }
 

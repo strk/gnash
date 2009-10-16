@@ -35,7 +35,7 @@ class ObjectURI;
 class Bitmap;
 
 
-class BitmapData_as: public as_object
+class BitmapData_as : public Relay
 {
 
 public:
@@ -45,7 +45,7 @@ public:
     // The constructor sets the fill colour and the
     // immutable size of the bitmap, as well as whether
     // it can handle transparency or not.
-	BitmapData_as(size_t width, size_t height,
+	BitmapData_as(as_object* owner, size_t width, size_t height,
 	              bool transparent, boost::uint32_t fillColor);
 
     size_t getWidth() const { return _width; }
@@ -91,13 +91,15 @@ public:
         _attachedBitmaps.push_back(bitmap);
     }
 
-protected:
-
-    void markReachableResources() const;
+    /// Overrides Relay::setReachable().
+    virtual void setReachable();
 
 private:
 
     void updateAttachedBitmaps();
+
+    /// The object to which this native type class belongs to.
+    as_object* _owner;
 
     // The width of the image, max 2880. This is immutable.
     const size_t _width;

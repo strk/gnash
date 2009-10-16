@@ -61,7 +61,7 @@ namespace gnash {
 
 		/// See Renderer::drawVideoFrame (in backend/Renderer.h)
 		void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
-                const rect* bounds, bool smooth);
+                const SWFRect* bounds, bool smooth);
 
 		/// See Renderer::begin_display (in backend/Renderer.h)
 		void	begin_display(
@@ -90,7 +90,7 @@ namespace gnash {
                 const SWFMatrix& mat);
 
 		/// See Renderer::bounds_in_clipping_area (in backend/Renderer.h)
-		bool bounds_in_clipping_area(const rect& bounds);
+		bool bounds_in_clipping_area(const SWFRect& bounds);
 		bool bounds_in_clipping_area(const InvalidatedRanges& ranges);
 		bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds);
 				

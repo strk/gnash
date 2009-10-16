@@ -19,7 +19,7 @@
 #define GNASH_DUMMYMOVIEDEFINITION_H
 
 #include "SWFMovieDefinition.h" // for inheritance
-#include "rect.h" // for composition
+#include "SWFRect.h" // for composition
 #include "SWFMovie.h" // for createMovie
 
 #include <string>
@@ -42,7 +42,7 @@ namespace gnash
 class DummyMovieDefinition : public SWFMovieDefinition
 {
 	int _version;
-	rect _framesize;
+	SWFRect _framesize;
 	size_t _framecount;
 	std::vector<PlayList> _playlist;
 	float _framerate;
@@ -50,7 +50,9 @@ class DummyMovieDefinition : public SWFMovieDefinition
 
 public:
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int /* id */) { return 0; }
+    virtual DisplayObject* createDisplayObject(DisplayObject*) {
+        return 0;
+    }
 
 
 	/// Default constructor
@@ -118,7 +120,7 @@ public:
 		return _framerate;
 	}
 
-	virtual const rect& get_frame_size() const {
+	virtual const SWFRect& get_frame_size() const {
 		return _framesize;
 	}
 

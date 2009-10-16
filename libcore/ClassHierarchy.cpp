@@ -95,7 +95,7 @@ public:
                 super.set_undefined();
                 return super;
             }
-            if (!super.is_as_function())
+            if (!super.is_function())
             {
                 // Error here -- not an object.
                 log_error("%s (Superclass of %s) is not a function (%s)",
@@ -168,7 +168,7 @@ public:
                     super.set_undefined();
                     return super;
                 }
-                if (!super.is_as_function())
+                if (!super.is_function())
                 {
                     // Error here -- not an object.
                     log_error("%s (Superclass of %s) is not a function (%s)",

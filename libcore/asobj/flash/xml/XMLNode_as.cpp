@@ -23,7 +23,6 @@
 
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"
-#include "Array_as.h"
 #include "Object.h"
 #include "VM.h"
 #include "log.h"
@@ -538,7 +537,8 @@ xmlnode_appendChild(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> xml_obj = 
-        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object(*getGlobal(fn)));	
+        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(*getGlobal(fn)));
+
 	if ( ! xml_obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -582,7 +582,7 @@ xmlnode_insertBefore(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> newnode = 
-        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object(*getGlobal(fn)));
+        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(*getGlobal(fn)));
 
 	if (!newnode) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -594,7 +594,7 @@ xmlnode_insertBefore(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> pos = 
-        boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(1).to_object(*getGlobal(fn)));
+        dynamic_cast<XMLNode_as*>(fn.arg(1).to_object(*getGlobal(fn)));
 
 	if (!pos) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -921,7 +921,9 @@ as_value
 xmlnode_childNodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
-    boost::intrusive_ptr<Array_as> ary = new Array_as();
+ 
+    Global_as* gl = getGlobal(fn);
+    as_object* ary = gl->createArray();
 
     typedef XMLNode_as::Children Children;
 
@@ -930,10 +932,10 @@ xmlnode_childNodes(const fn_call& fn)
                     it != itEnd; ++it )
     {
         boost::intrusive_ptr<XMLNode_as> node = *it;
-        ary->push(as_value(node.get()));
+        ary->callMethod(NSV::PROP_PUSH, node.get());
     }
 
-    return as_value(ary.get());
+    return as_value(ary);
 }
 
 

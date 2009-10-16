@@ -26,12 +26,11 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance
-#include "rect.h" // for composition (invalidated bounds)
+#include "SWFRect.h" // for composition (invalidated bounds)
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "log.h"
 #include "snappingrange.h"
-#include "Range2d.h"
 #ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
@@ -61,6 +60,37 @@ namespace gnash {
 
 namespace gnash {
 
+/// Attaches common DisplayObject properties such as _height, _x, _visible
+//
+/// This should be called by DisplayObject subclasses to ensure that
+/// the correct properties are attached.
+void attachDisplayObjectProperties(as_object& o);
+
+/// Set special properties
+//
+/// This will abort if called with a non DisplayObject. It sets the magic
+/// properties of DisplayObjects.
+bool setDisplayObjectProperty(as_object& obj, string_table::key key,
+        const as_value& val);
+
+/// Get special properties
+//
+/// This will abort if called with a non DisplayObject. It gets the magic
+/// properties of DisplayObjects and handles special MovieClip properties
+/// such as DisplayList members.
+bool getDisplayObjectProperty(as_object& obj, string_table::key key,
+        as_value& val);
+
+/// Get a property by its numeric index.
+//
+/// By ASHandlers to get the DisplayObject properties indexed by number
+void getIndexedProperty(size_t index, DisplayObject& o, as_value& val);
+
+/// Set a property by its numeric index.
+//
+/// By ASHandlers to set the DisplayObject properties indexed by number
+void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
+
 /// DisplayObject is the base class for all DisplayList objects.
 //
 /// It represents a single active element in a movie. This class does not
@@ -85,7 +115,7 @@ class DisplayObject : public as_object, boost::noncopyable
 {
 public:
 
-    DisplayObject(DisplayObject* parent, int id);
+    DisplayObject(DisplayObject* parent);
 
     virtual ~DisplayObject() {}
 
@@ -159,9 +189,6 @@ public:
         return m_parent->get_environment();
     }
 
-    // Accessors for basic display info.
-    int get_id() const { return m_id; }
-
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
     /// the DisplayObject has no parent.
@@ -197,6 +224,11 @@ public:
     ///       null, undefined or no argument to constructor.
     ///
     int getWorldVolume() const;
+
+    /// DisplayObjects can return the version of the SWF they were parsed from.
+    virtual int getDefinitionVersion() const {
+        return -1;
+    }
 
     /// Get local transform SWFMatrix for this DisplayObject
     const SWFMatrix& getMatrix() const { return m_matrix; }
@@ -245,24 +277,23 @@ public:
     /// Set the width of this DisplayObject, modifying its SWFMatrix
     //
     /// This is used when setting _width
-    /// See width_getset
     ///
-    /// @param w new width, in TWIPS. TODO: should this be an integer ?
-    ///
-    void set_width(double width);
+    /// @param w new width, in TWIPS. 
+    //
+    /// TextField does this differently (caches not updated).
+    virtual void setWidth(double width);
 
     /// Set the height of this DisplayObject, modifying its SWFMatrix
     //
     /// This is used when setting _height
-    /// See height_getset
     ///
-    /// @param h new height, in TWIPS. TODO: should this be an integer ?
+    /// @param h new height, in TWIPS. 
     ///
-    void set_height(double height);
+    virtual void setHeight(double height);
 
     const cxform& get_cxform() const { return m_color_transform; }
 
-    void  set_cxform(const cxform& cx) 
+    void set_cxform(const cxform& cx) 
     {       
         if (cx != m_color_transform) {
             set_invalidated(__FILE__, __LINE__);
@@ -336,7 +367,7 @@ public:
         {
             // TODO: fix this !
             log_error("Our mask maskee is not us");
-            return NULL; // for correctness;
+            return NULL; 
         }
         return _mask;
     }
@@ -430,25 +461,7 @@ public:
         return 0;
     }
 
-    /// Returns local, untransformed height of this DisplayObject in TWIPS
-    //
-    /// Use getBounds() if you need more then simply the height.
-    ///
-    boost::int32_t get_height() const
-    {
-        return getBounds().height();
-    }
-
-    /// Returns local, untransformed width of this DisplayObject in TWIPS
-    //
-    /// Use getBounds() if you need more then simply the width.
-    ///
-    boost::int32_t get_width() const
-    {
-        return getBounds().width();
-    }
-
-	virtual rect getBounds() const = 0;
+	virtual SWFRect getBounds() const = 0;
 
     /// Return true if the given point falls in this DisplayObject's bounds
     //
@@ -458,7 +471,7 @@ public:
     ///                 This ignores _root's transform. 
     bool pointInBounds(boost::int32_t x, boost::int32_t y) const
     {
-        rect bounds = getBounds();
+        SWFRect bounds = getBounds();
         SWFMatrix wm = getWorldMatrix(false);
         wm.transform(bounds);
         return bounds.point_test(x, y);
@@ -529,10 +542,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* get_path_element(string_table::key key)
-    {
-        return getPathElementSeparator(key);
-    }
+    virtual as_object* get_path_element(string_table::key key);
 
     /// Advance this DisplayObject to next frame.
     //
@@ -612,14 +622,14 @@ public:
     //
     /// Must be overridden or will always return false.
     ///
-    virtual bool on_event(const event_id& /* id */)
+    virtual bool notifyEvent(const event_id& /* id */)
     {
         return false;
     }
 
     /// Queue event in the global action queue.
     //
-    /// on_event(id) will be called by execution of the queued
+    /// notifyEvent(id) will be called by execution of the queued
     /// action
     ///
     void queueEvent(const event_id& id, int lvl);
@@ -706,7 +716,7 @@ public:
     /// clear_invalidated() is called in between.
     ///
     /// NOTE: Marking a DisplayObject as invalidated automatically marks
-    ///             it's parent as being invalidated.
+    ///             its parent as being invalidated.
     ///
     /// @see \ref region_update
     ///
@@ -723,7 +733,7 @@ public:
     /// Called by a child to signalize it has changed visibily. The
     /// difference to set_invalidated() is that *this* DisplayObject does
     /// not need to redraw itself completely. This function will 
-    /// recursively inform all it's parents of the change.
+    /// recursively inform all its parents of the change.
     void set_child_invalidated();
     
 
@@ -886,7 +896,7 @@ public:
 #endif
     
     /// Used to assign a name to unnamed instances
-    static std::string getNextUnnamedInstanceName();
+    std::string getNextUnnamedInstanceName();
 
     enum BlendMode
     {
@@ -936,58 +946,20 @@ public:
     /// Default is a no-op. TextField implements this function.
     virtual void killFocus() {}
   
-    /// Getter-setter for _highquality.
-    static as_value highquality(const fn_call& fn);
-  
-    /// Getter-setter for _quality.
-    static as_value quality(const fn_call& fn);
-  
+    double rotation() const {
+        return _rotation;
+    }
+
+    double scaleX() const {
+        return _xscale;
+    }
+
+    double scaleY() const {
+        return _yscale;
+    }
+
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
-  
-    /// Getter-setter for _x
-    static as_value x_getset(const fn_call& fn);
-  
-    /// Getter-setter for _y
-    static as_value y_getset(const fn_call& fn);
-  
-    /// Getter-setter for _xscale
-    static as_value xscale_getset(const fn_call& fn);
-  
-    /// Getter-setter for _yscale
-    static as_value yscale_getset(const fn_call& fn);
-  
-    /// Getter-setter for _xmouse
-    static as_value xmouse_get(const fn_call& fn);
-  
-    /// Getter-setter for _ymouse
-    static as_value ymouse_get(const fn_call& fn);
-  
-    /// Getter-setter for _alpha
-    static as_value alpha_getset(const fn_call& fn);
-  
-    /// Getter-setter for _visible
-    static as_value visible_getset(const fn_call& fn);
-  
-    /// Getter-setter for _width
-    static as_value width_getset(const fn_call& fn);
-  
-    /// Getter-setter for _height
-    static as_value height_getset(const fn_call& fn);
-  
-    /// Getter-setter for _rotation
-    static as_value rotation_getset(const fn_call& fn);
-  
-    /// Getter-setter for _parent 
-    static as_value parent_getset(const fn_call& fn);
-  
-    /// Getter-setter for _target 
-    static as_value target_getset(const fn_call& fn);
-  
-    /// Getter-setter for _name
-    static as_value name_getset(const fn_call& fn);
-  
-    /// @} Common ActionScript getter-setters for DisplayObjects
   
 protected:
 
@@ -1099,6 +1071,7 @@ protected:
     /// Will be set by set_invalidated() and used by
     /// get_invalidated_bounds().
     InvalidatedRanges m_old_invalidated_ranges;
+    
 
 private:
 
@@ -1107,8 +1080,6 @@ private:
 
     /// Build the _target member recursive on parent
     std::string computeTargetPath() const;
-
-    int m_id;
 
     int m_depth;
     cxform m_color_transform;
@@ -1132,9 +1103,6 @@ private:
     int m_ratio;
     int m_clip_depth;
     Events _event_handlers;
-
-    /// Used to assign a name to unnamed instances
-    static unsigned int _lastUnnamedInstanceNum;
 
     /// Set to yes when this instance has been unloaded
     bool _unloaded;

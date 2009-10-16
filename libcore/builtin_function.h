@@ -58,27 +58,6 @@ public:
 	{
 	}
 
-	/// Construct a builtin function with the given interface (possibly none)
-	//
-	/// @param func
-	///	The C function to call when this as_function is invoked.
-	/// 	For classes, the function pointer is the constructor.
-	///
-	/// @param iface
-	///	The interface of this class (will be inherited by
-	///	instances of this class)
-	/// 	If the given interface is NULL no interface will be
-	/// 	provided. Use the constructor taking a single argument
-	///	    to get a default interface instead.
-    /// @param useThisAsCtor
-    ///     Used only by getFunctionConstructor().
-	builtin_function(Global_as& gl, ASFunction func, as_object* iface)
-		:
-		as_function(gl, iface),
-		_func(func)
-	{
-	}
-
 	/// Invoke this function or this Class constructor
 	virtual as_value operator()(const fn_call& fn)
 	{

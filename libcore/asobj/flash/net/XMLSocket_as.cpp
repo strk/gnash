@@ -310,8 +310,8 @@ XMLSocket_as::update()
         }
 
         // Connection succeeded.
-        owner().callMethod(NSV::PROP_ON_CONNECT, true);
         _ready = true;
+        owner().callMethod(NSV::PROP_ON_CONNECT, true);
     }
 
     // Now the connection is established we can receive data.

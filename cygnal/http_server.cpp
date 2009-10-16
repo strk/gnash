@@ -1037,7 +1037,8 @@ http_handler(Network::thread_params_t *args)
 	struct timespec end;
 	clock_gettime (CLOCK_REALTIME, &end);
 	log_debug("Processing time for GET request was %f seconds",
-		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
+		  static_cast<float>(((end.tv_sec - start.tv_sec) +
+		  ((end.tv_nsec - start.tv_nsec)/1e9))));
 #endif
     } while(done != true);
     

@@ -127,7 +127,7 @@ FltkCairoGlue::draw()
 }
 
 void
-FltkCairoGlue::invalidateRegion(const rect& bounds)
+FltkCairoGlue::invalidateRegion(const SWFRect& bounds)
 {
     return;
 }

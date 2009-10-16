@@ -25,7 +25,7 @@
 #include <boost/shared_ptr.hpp>
 #include <dirent.h>
 #include <iostream>
-#include <stdarg.h>
+#include <cstdarg>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -201,7 +201,7 @@ main(int argc, char *argv[])
 	    boost::shared_ptr<Flv::flv_header_t> head = flv.decodeHeader(buf);
 	    if (head == 0) {
 		log_error("Couldn't decode the header! %s",  hexify(buf->reference(), 9, false));
-		exit(-1);
+		exit(EXIT_FAILURE);
 	    }
 	    if ((head->type & Flv::FLV_VIDEO) && (head->type & Flv::FLV_AUDIO)) {
                 cout <<"FLV File type: Video and Audio" << endl;

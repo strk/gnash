@@ -45,11 +45,9 @@ class Bitmap : public DisplayObject
 {
 public:
 
-	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
-            int id);
+	Bitmap(BitmapData_as* bd, DisplayObject* parent);
 	
-    Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
-            int id);
+    Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent);
 
     ~Bitmap();
 
@@ -63,7 +61,7 @@ public:
 
     virtual void display(Renderer& renderer);
 
-    virtual rect getBounds() const;
+    virtual SWFRect getBounds() const;
 
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
@@ -101,7 +99,7 @@ private:
 
     const boost::intrusive_ptr<const BitmapMovieDefinition> _def;
 
-    boost::intrusive_ptr<BitmapData_as> _bitmapData;
+    BitmapData_as* _bitmapData;
 
     /// The current bitmap information is stored here.
     boost::intrusive_ptr<BitmapInfo> _bitmapInfo;

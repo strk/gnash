@@ -148,7 +148,7 @@ Debugger::console(as_environment &env)
 	    // Quit Gnash.
 	  case 'Q':
 	  case 'q':
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	      break;
 	      // Continue executing.
 	  case 'c':
@@ -569,7 +569,7 @@ Debugger::dumpStackFrame(as_environment &env)
             cerr << "\t" << i << ": ";
 	    as_value val = env.bottom(i);
 // FIXME: we want to print the name of the function
-//  	    if (val.is_as_function()) {
+//  	    if (val.is_function()) {
 // //		cerr << val.get_symbol_handle() << endl;
 // 		string name = this->lookupSymbol(val.to_object(*getGlobal(fn)));
 // 		if (name.size()) {

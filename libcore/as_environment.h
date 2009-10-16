@@ -47,9 +47,6 @@ public:
     /// A stack of objects used for variables/members lookup
     typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
-    /// The variables container (case-insensitive)
-    typedef std::map<std::string, as_value, StringNoCaseLessThan> Variables;
-
     typedef std::vector<as_value> Registers;
 
     as_environment(VM& vm);
@@ -67,22 +64,19 @@ public:
     ///
     void set_target(DisplayObject* target);
 
-    void set_original_target(DisplayObject* target) { _original_target = target; }
+    void set_original_target(DisplayObject* target) {
+        _original_target = target;
+    }
 
     DisplayObject* get_original_target() { return _original_target; }
 
     // Reset target to its original value
     void reset_target() { m_target = _original_target; }
 
-    /// @name Stack access/manipulation 
-    /// @{
-
     /// Push a value on the stack
-    void    push(const as_value& val)
-    {
+    void push(const as_value& val) {
         _stack.push(val);
     }
-
 
     /// Pops an as_value off the stack top and return it.
     as_value pop()
@@ -92,10 +86,6 @@ public:
         } catch (StackException&) {
             return undefVal;
         }
-        //assert( ! _stack.empty() );
-        //as_value result = m_stack.back();
-        //m_stack.pop_back();
-        //return result;
     }
 
     /// Get stack value at the given distance from top.
@@ -111,9 +101,6 @@ public:
         } catch (StackException&) {
             return undefVal;
         }
-        //size_t ssize = m_stack.size();
-        //assert ( ssize > dist );
-        //return m_stack[ssize - 1 - dist];
     }
 
     /// Get stack value at the given distance from bottom.
@@ -129,47 +116,17 @@ public:
         } catch (StackException&) {
             return undefVal;
         }
-        //assert ( m_stack.size() > index );
-        //return m_stack[index];
     }
 
     /// Drop 'count' values off the top of the stack.
-    //
-    /// Throw StackException if there's not enough to drop
-    ///
     void drop(size_t count)
     {
         // in case count > stack size, just drop all, forget about
         // exceptions...
         _stack.drop(std::min(count, _stack.size()));
-        //size_t ssize = m_stack.size();
-        //assert ( ssize >= count );
-        //m_stack.resize(ssize - count);
     }
 
-    /// Insert 'count' undefined values before 'offset'.
-    //
-    /// An offset of 0 will prepend the values,
-    /// An offset of size() [too far] will append the values.
-    ///
-    void padStack(size_t offset, size_t count);
-
     size_t stack_size() const { return _stack.size(); }
-
-    /// @}  end of stack access/manipulation 
-
-    /// \brief
-    /// Return the (possibly UNDEFINED) value of the named variable
-    //
-    /// @param varname 
-    /// Variable name. Can contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. Note that
-    ///       ActionExec performs the conversion
-    ///       before calling this method.
-    ///
-    as_value get_variable(const std::string& varname) const;
 
     /// \brief
     /// Delete a variable, w/out support for the path, using
@@ -185,7 +142,6 @@ public:
     ///
     /// @param scopeStack
     /// The Scope stack to use for lookups.
-    ///
     bool delVariableRaw(const std::string& varname,
             const ScopeStack& scopeStack);
 
@@ -208,40 +164,6 @@ public:
     ///
     as_value get_variable(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
-
-    /// \brief
-    /// Given a path to variable, set its value.
-    /// Variable name can contain path elements.
-    //
-    /// @param path 
-    /// Variable path.
-    /// TODO: should be case-insensitive up to SWF6.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. Note that
-    ///       ActionExec performs the conversion
-    ///       before calling this method.
-    ///
-    /// @param val
-    /// The value to assign to the variable, if found.
-    ///
-    /// TODO: make this function return some info about the
-    ///       variable being found and set ?
-    ///
-    void set_variable(const std::string& path, const as_value& val);
-
-    /// Given a variable name, set its value (no support for path)
-    //
-    /// If no variable with that name is found, a new one
-    /// will be created as a member of current target.
-    ///
-    /// @param var
-    /// Variable name. Can not contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    ///
-    /// @param val
-    /// The value to assign to the variable, if found.
-    ///
-    void set_variable_raw(const std::string& var, const as_value& val);
 
     /// \brief
     /// Given a path to variable, set its value.
@@ -289,14 +211,13 @@ public:
     void add_local(const std::string& varname, const as_value& val);
 
     /// Create the specified local var if it doesn't exist already.
-    void    declare_local(const std::string& varname);
+    void declare_local(const std::string& varname);
 
     /// Add 'count' local registers (add space to end)
     //
     /// Local registers are only meaningful within a function2 context.
     ///
-    void add_local_registers(unsigned int register_count)
-    {
+    void add_local_registers(unsigned int register_count) {
         assert(!_localFrames.empty());
         return _localFrames.back().registers.resize(register_count);
     }
@@ -358,36 +279,31 @@ public:
     //
     /// Local registers are only meaningful within a function2 context.
     ///
-    as_value& local_register(boost::uint8_t n)
-    {
+    as_value& local_register(boost::uint8_t n) {
         assert(!_localFrames.empty());
         return _localFrames.back().registers[n];
     }
 
-        /// Set the Nth local register to something
-        void set_local_register(boost::uint8_t n, as_value &val)
-    {
-        if ( ! _localFrames.empty() )
-        {
+    /// Set the Nth local register to something
+    void set_local_register(boost::uint8_t n, as_value &val) {
+        if (! _localFrames.empty()) {
             Registers& registers = _localFrames.back().registers;
-            if ( n < registers.size() )
-            {
+            if (n < registers.size()) {
                 registers[n] = val;
             }
         }
     }
 
     /// Return a reference to the Nth global register.
-    as_value& global_register(unsigned int n)
-    {
+    as_value& global_register(unsigned int n) {
         assert(n<4);
         return m_global_register[n];
     }
 
-        /// Set the Nth local register to something
-        void set_global_register(boost::uint8_t n, as_value &val) {
+    /// Set the Nth local register to something
+    void set_global_register(boost::uint8_t n, as_value &val) {
         if (n <= 4) {
-        m_global_register[n] = val;
+            m_global_register[n] = val;
         }
     }
 
@@ -533,8 +449,7 @@ private:
     VM& _vm;
 
     /// Stack of as_values in this environment
-    //std::vector<as_value> m_stack;
-    SafeStack<as_value>&    _stack;
+    SafeStack<as_value>& _stack;
 
     static const short unsigned int numGlobalRegisters = 4;
 
@@ -567,16 +482,17 @@ private:
     ///
     void popCallFrame();
     
-    /// Return the (possibly UNDEFINED) value of the named variable.
-    //
-    /// @param varname 
-    /// Variable name. Can not contain path elements.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. 
-    ///
-    as_value get_variable_raw(const std::string& varname) const;
-
     /// Given a variable name, set its value (no support for path)
+    //
+    /// If no variable with that name is found, a new one
+    /// will be created as a member of current target.
+    ///
+    /// @param var
+    /// Variable name. Can not contain path elements.
+    /// TODO: should be case-insensitive up to SWF6.
+    ///
+    /// @param val
+    /// The value to assign to the variable, if found.
     void set_variable_raw(const std::string& path, const as_value& val,
         const ScopeStack& scopeStack);
 
@@ -588,7 +504,6 @@ private:
     ///
     as_value get_variable_raw(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
-
 
     /// \brief
     /// Get a local variable given its name,
@@ -606,27 +521,10 @@ private:
     ///
     /// @return true if the variable was found, false otherwise
     ///
-    bool findLocal(const std::string& varname, as_value& ret, as_object** retTarget=NULL);
+    bool findLocal(const std::string& varname, as_value& ret,
+            as_object** retTarget = 0) const;
 
-    bool findLocal(const std::string& varname, as_value& ret, as_object** retTarget=NULL) const
-    {
-        return const_cast<as_environment*>(this)->findLocal(varname, ret, retTarget);
-    }
-
-    /// Find a variable in the given as_object
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @param ret
-    /// If a variable is found it's assigned to this parameter.
-    /// Untouched if the variable is not found.
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool findLocal(as_object* locals, const std::string& name, as_value& ret);
-
-    /// Delete a local variable
+    /// Delete a variable from the given as_object
     //
     /// @param varname
     /// Name of the local variable
@@ -634,15 +532,6 @@ private:
     /// @return true if the variable was found and deleted, false otherwise
     ///
     bool delLocal(const std::string& varname);
-
-    /// Delete a variable from the given as_object
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool delLocal(as_object* locals, const std::string& varname);
 
     /// Set a local variable, if it exists.
     //

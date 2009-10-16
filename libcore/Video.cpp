@@ -24,7 +24,6 @@
 #include "fn_call.h"
 #include "as_value.h"
 #include "flash/net/NetStream_as.h"
-#include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "NativeFunction.h" 
 #include "movie_root.h"
@@ -44,7 +43,6 @@ namespace {
     as_object* getVideoInterface(as_object& where);
     void attachPrototypeProperties(as_object& o);
     void attachVideoInterface(as_object& o);
-    void attachVideoProperties(as_object& o);
     as_value video_ctor(const fn_call& fn);
     as_value video_attach(const fn_call& fn);
     as_value video_clear(const fn_call& fn);
@@ -54,10 +52,9 @@ namespace {
     as_value video_height(const fn_call& fn);
 }
 
-Video::Video(const SWF::DefineVideoStreamTag* const def,
-		DisplayObject* parent, int id)
+Video::Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent)
 	:
-	DisplayObject(parent, id),
+	DisplayObject(parent),
 	m_def(def),
 	_ns(0),
 	_embeddedStream(m_def ? true : false),
@@ -67,9 +64,13 @@ Video::Video(const SWF::DefineVideoStreamTag* const def,
 {
 
 	set_prototype(getVideoInterface(*this));
+
+    // TODO: For AS2 a genuine Video object can only be created from a 
+    // SWF tag. 
 	if (_embeddedStream)
 	{
-		attachVideoProperties(*this);
+        // TODO: this should happen using the native creation function
+        // once Video is a Relay.
 		initializeDecoder();
         
         attachPrototypeProperties(*get_prototype());
@@ -142,7 +143,7 @@ Video::display(Renderer& renderer)
 	assert(m_def);
 
 	SWFMatrix m = getWorldMatrix();
-	const rect& bounds = m_def->bounds();
+	const SWFRect& bounds = m_def->bounds();
 
 	GnashImage* img = getVideoFrame();
 	if (img)
@@ -283,7 +284,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	// case I think add_invalidated_bouns would never be invoked on us...
 	assert ( m_def );
 
-	rect bounds;	
+	SWFRect bounds;	
 	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
 	
 	ranges.add(bounds.getRange());            
@@ -318,14 +319,14 @@ registerVideoNative(as_object& global)
     vm.registerNative(video_clear, 667, 2);
 }
 
-rect
+SWFRect
 Video::getBounds() const
 {
 	if (_embeddedStream) return m_def->bounds();
 
 	// TODO: return the bounds of the dynamically
 	//       loaded video if not embedded ?
-	return rect();
+	return SWFRect();
 }
 
 #ifdef GNASH_USE_GC
@@ -380,52 +381,6 @@ attachPrototypeProperties(as_object& proto)
     proto.init_property("width", &video_width, &video_width, flags);
 }
 
-void
-attachVideoProperties(as_object& o)
-{
-
-	as_c_function_ptr gettersetter;
-
-	gettersetter = &DisplayObject::x_getset;
-	o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::y_getset;
-	o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::xscale_getset;
-	o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::yscale_getset;
-	o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::xmouse_get;
-	o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
-
-	gettersetter = &DisplayObject::ymouse_get;
-	o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
-
-	gettersetter = &DisplayObject::alpha_getset;
-	o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::visible_getset;
-	o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::width_getset;
-	o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::height_getset;
-	o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::rotation_getset;
-	o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::parent_getset;
-	o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
-
-	gettersetter = &DisplayObject::target_getset;
-	o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
-}
-
 as_value
 video_attach(const fn_call& fn)
 {
@@ -439,7 +394,7 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
 	NetStream_as* ns;
 
     if (isNativeType(obj, ns)) {
@@ -504,13 +459,7 @@ video_clear(const fn_call& fn)
 as_value
 video_ctor(const fn_call& /* fn */)
 {
-	log_debug("new Video() TESTING !");
-
-	// I'm not sure We can rely on the def and parent values being accepted 
-    // as NULL. Not till we add some testing...
-	boost::intrusive_ptr<DisplayObject> obj = new Video(NULL, NULL, -1);
-	obj->setDynamic();
-	return as_value(obj.get()); // will keep alive
+	return as_value(); // will keep alive
 }
 
 } // anonymous namespace

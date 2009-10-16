@@ -38,6 +38,7 @@
 #include "as_function.h"
 #include "Global_as.h" 
 #include "GnashAlgorithm.h"
+#include "DisplayObject.h"
 
 #include <set>
 #include <string>
@@ -49,6 +50,69 @@
 
 
 namespace gnash {
+template<typename T>
+class
+as_object::PrototypeRecursor
+{
+public:
+    PrototypeRecursor(as_object* top, const ObjectURI& property, T cmp = T())
+        :
+        _object(top),
+        _name(getName(property)),
+        _ns(getNamespace(property)),
+        _iterations(0),
+        _condition(cmp)
+    {
+        _visited.insert(top);
+    }
+
+    /// Iterate to the next object in the inheritance chain.
+    //
+    /// This function throws an ActionLimitException when the maximum
+    /// number of recursions is reached.
+    //
+    /// @return     false if there is no next object. In this case calling
+    ///             the other functions will abort.
+    bool operator()()
+    {
+        ++_iterations;
+
+        // See swfdec/prototype-recursion-get-?.swf
+		if (_iterations > 256) {
+			throw ActionLimitException("Lookup depth exceeded.");
+        }
+
+        _object = _object->get_prototype();
+
+        // TODO: there is recursion prevention anyway; is this extra 
+        // check for circularity really necessary?
+        if (!_visited.insert(_object).second) return 0;
+        return _object && !_object->displayObject();
+    }
+
+    /// Return the wanted property if it exists and satisfies the predicate.
+    //
+    /// This will abort if there is no current object.
+    Property* getProperty(as_object** owner = 0) const {
+
+        assert(_object);
+        Property* prop = _object->_members.getProperty(_name, _ns);
+        
+        if (prop && _condition(*prop)) {
+            if (owner) *owner = _object;
+            return prop;
+        }
+        return 0;
+    }
+
+private:
+    as_object* _object;
+    const string_table::key _name;
+    const string_table::key _ns;
+    std::set<const as_object*> _visited;
+    size_t _iterations;
+    T _condition;
+};
 
 // Anonymous namespace used for module-static defs
 namespace {
@@ -89,17 +153,6 @@ public:
 		return false;
 	}
 
-	// Setting members on 'super' is a no-op
-	virtual void set_member(string_table::key /*key*/, const as_value& /*val*/,
-		string_table::key /*nsname*/ = 0)
-	{
-		log_debug("set_member.");
-		// can't assign to super
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Can't set members on the 'super' object");
-		);
-	}
-
 	/// Dispatch.
 	virtual as_value operator()(const fn_call& fn)
 	{
@@ -129,7 +182,7 @@ protected:
 private:
 
     as_object* prototype() {
-        return _super ? _super->get_prototype().get() : 0;
+        return _super ? _super->get_prototype() : 0;
     }
 
     as_function* constructor() {
@@ -147,7 +200,7 @@ as_super::get_super(const char* fname)
 	// Our class superclass prototype is __proto__.__proto__
 
 	// Our class prototype is __proto__.
-	as_object* proto = get_prototype().get(); 
+	as_object* proto = get_prototype(); 
 	if (!proto) return new as_super(*getGlobal(*this), 0);
 
     if (!fname || getSWFVersion(*this) <= 6) {
@@ -165,7 +218,7 @@ as_super::get_super(const char* fname)
 
     as_object* tmp = proto;
     while (tmp && tmp->get_prototype() != owner) {
-        tmp = tmp->get_prototype().get();
+        tmp = tmp->get_prototype();
     }
     // ok, now 'tmp' should be the object whose __proto__ member
     // contains the actual named method.
@@ -202,28 +255,24 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	void accept(string_table::key name, const as_value& val)
+	bool accept(string_table::key name, const as_value& val)
 	{
-		if (name == NSV::PROP_uuPROTOuu) return;
+		if (name == NSV::PROP_uuPROTOuu) return true;
 		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
 		_tgt.set_member(name, val);
+        return true;
 	}
 };
 
 } // end of anonymous namespace
 
 
-/// Destructor of ActiveRelay needs definition of movie_root.
-ActiveRelay::~ActiveRelay()
-{
-    getRoot(*_owner).removeAdvanceCallback(this);
-}
-
 
 const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(getVM(gl)),
 	_members(_vm)
@@ -232,6 +281,7 @@ as_object::as_object(Global_as& gl)
 
 as_object::as_object()
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -240,6 +290,7 @@ as_object::as_object()
 
 as_object::as_object(as_object* proto)
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -249,24 +300,12 @@ as_object::as_object(as_object* proto)
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
+    _displayObject(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
 {
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
-as_object::as_object(const as_object& other)
-	:
-#ifndef GNASH_USE_GC
-	ref_counted(),
-#else
-	GcResource(), 
-#endif
-    _relay(0),
-	_vm(VM::get()),
-	_members(other._members)
-{
 }
 
 std::pair<bool,bool>
@@ -316,7 +355,7 @@ as_object::add_property(const std::string& name, as_function& getter,
 			cacheVal = trig.call(cacheVal, as_value(), *this);
 
 			// The trigger call could have deleted the property,
-			// so we check for its existance again, and do NOT put
+			// so we check for its existence again, and do NOT put
 			// it back in if it was deleted
 			prop = _members.getProperty(k);
 			if ( ! prop )
@@ -333,16 +372,39 @@ as_object::add_property(const std::string& name, as_function& getter,
 }
 
 
+/// Order of property lookup:
+//
+/// 1. Visible own properties.
+/// 2. If DisplayObject, magic properties
+/// 3. Visible own properties of all __proto__ objects (a DisplayObject
+///    ends the chain).
+/// 4. __resolve property of this object and all __proto__ objects (a Display
+///    Object ends the chain). This should ignore visibility but doesn't.
 bool
 as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
-	Property* prop = findProperty(name, nsname);
+
+    const int version = getSWFVersion(*this);
+
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname),
+        IsVisible(version));
 	
+	Property* prop = pr.getProperty();
+    if (!prop) {
+        if (displayObject()) {
+            if (getDisplayObjectProperty(*this, name, *val)) return true;
+        }
+        while (pr()) {
+            if ((prop = pr.getProperty())) break;
+        }
+    }
+
+    // If the property isn't found or doesn't apply to any objects in the
+    // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        /// If the property isn't found, try the __resolve property.
         prop = findProperty(NSV::PROP_uuRESOLVE, nsname);
         if (!prop) return false;
 
@@ -352,6 +414,7 @@ as_object::get_member(string_table::key name, as_value* val,
         const std::string& undefinedName = st.value(name);
         log_debug("__resolve exists, calling with '%s'", undefinedName);
 
+        // TODO: we've found the property, don't search for it again.
         *val = callMethod(NSV::PROP_uuRESOLVE, undefinedName);
         return true;
     }
@@ -369,6 +432,7 @@ as_object::get_member(string_table::key name, as_value* val,
 		log_error(_("Caught exception: %s"), exc.what());
 		return false;
 	}
+
 }
 
 
@@ -381,7 +445,7 @@ as_object::getByIndex(int index)
 	as_object *obj = this;
 	while (depth--)
 	{
-		obj = obj->get_prototype().get();
+		obj = obj->get_prototype();
 		if (!obj)
 			return NULL;
 	}
@@ -397,7 +461,7 @@ as_object::get_super(const char* fname)
 	// Our class superclass prototype is __proto__.__proto__
 
 	// Our class prototype is __proto__.
-	as_object* proto = get_prototype().get();
+	as_object* proto = get_prototype();
 
 	if ( fname && getSWFVersion(*this) > 6)
 	{
@@ -437,7 +501,7 @@ skip_duplicates:
 	as_object *obj = this;
 	while (i--)
 	{
-		obj = obj->get_prototype().get();
+		obj = obj->get_prototype();
 		if (!obj)
 			return 0;
 	}
@@ -445,7 +509,7 @@ skip_duplicates:
 	const Property *p = obj->_members.getOrderAfter(index);
 	if (!p)
 	{
-		obj = obj->get_prototype().get();
+		obj = obj->get_prototype();
 		if (!obj)
 			return 0;
 		p = obj->_members.getOrderAfter(0);
@@ -470,47 +534,16 @@ Property*
 as_object::findProperty(string_table::key key, string_table::key nsname, 
 	as_object **owner)
 {
-	int swfVersion = getSWFVersion(*this);
 
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu && !nsname)
-	{
-		Property* prop = _members.getProperty(key, nsname);
-		// TODO: add ignoreVisibility parameter to allow using 
-        // __proto__ even when not visible ?
-		if (prop && prop->visible(swfVersion))
-		{
-			if (owner) *owner = this;
-			return prop;
-		}
-		return 0;
-	}
+    const int version = getSWFVersion(*this);
 
-	// keep track of visited objects, avoid infinite loops.
-	std::set<as_object*> visited;
+    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname),
+        IsVisible(version));
 
-	int i = 0;
-
-	boost::intrusive_ptr<as_object> obj = this;
-		
-    // This recursion prevention seems not to exist in the PP.
-    // Instead, it stops when its general timeout for the
-    // execution of scripts is reached.
-	while (obj && visited.insert(obj.get()).second)
-	{
-		++i;
-		if ((i > 255 && swfVersion == 5) || i > 257)
-			throw ActionLimitException("Lookup depth exceeded.");
-
-		Property* prop = obj->_members.getProperty(key, nsname);
-		if (prop && prop->visible(swfVersion) )
-		{
-			if (owner) *owner = obj.get();
-			return prop;
-		}
-		else
-			obj = obj->get_prototype();
-	}
+    do {
+        Property* prop = pr.getProperty(owner);
+        if (prop) return prop;
+    } while (pr());
 
 	// No Property found
 	return NULL;
@@ -519,51 +552,36 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 Property*
 as_object::findUpdatableProperty(const ObjectURI& uri)
 {
-    const string_table::key key = getName(uri), nsname = getNamespace(uri);
 
-	const int swfVersion = getSWFVersion(*this);
+    PrototypeRecursor<Exists> pr(this, uri);
 
-	Property* prop = _members.getProperty(key, nsname);
-	// 
+	Property* prop = pr.getProperty();
+
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
-	// 
-	if ( prop )	return prop;  // TODO: what about visible ?
+	if (prop) return prop; 
+	
+    const int swfVersion = getSWFVersion(*this);
 
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu) return NULL;
-
-	std::set<as_object*> visited;
-	visited.insert(this);
-
-	int i = 0;
-
-	boost::intrusive_ptr<as_object> obj = get_prototype();
-
-    // TODO: does this recursion protection exist in the PP?
-	while (obj && visited.insert(obj.get()).second)
-	{
-		++i;
-		if ((i > 255 && swfVersion == 5) || i > 257)
-			throw ActionLimitException("Property lookup depth exceeded.");
-
-		Property* p = obj->_members.getProperty(key, nsname);
-		if (p && (p->isGetterSetter() | p->isStatic()) && p->visible(swfVersion))
-		{
-			return p; // What should we do if this is not a getter/setter ?
-		}
-		obj = obj->get_prototype();
+    while (pr()) {
+        if ((prop = pr.getProperty())) {
+            if ((prop->isStatic() || prop->isGetterSetter()) &&
+                    prop->visible(swfVersion)) {
+                return prop;
+            }
+        }
 	}
-	return NULL;
+	return 0;
 }
 
 void
-as_object::set_prototype(const as_value& proto, int flags)
+as_object::set_prototype(const as_value& proto)
 {
 	// TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
 	// TODO: check triggers !!
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0, flags);
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0,
+            as_object::DefaultFlags);
 }
 
 void
@@ -634,7 +652,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
             boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
                     
     // The trigger call could have deleted the property,
-    // so we check for its existance again, and do NOT put
+    // so we check for its existence again, and do NOT put
     // it back in if it was deleted
     prop = findUpdatableProperty(uri);
     if (!prop) {
@@ -648,15 +666,53 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     
 }
 
-// Handles read_only and static properties properly.
+/// Order of property lookup:
+//
+/// 0. MovieClip textfield variables. TODO: this is a hack and should be
+///    eradicated.
+/// 1. Own properties even if invisible or not getter-setters. 
+/// 2. If DisplayObject, magic properties
+/// 3. Visible own getter-setter properties of all __proto__ objects
+///    (a DisplayObject ends the chain).
 bool
 as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
 
-    ObjectURI uri(key, nsname);
-	Property* prop = findUpdatableProperty(uri);
-	
+    bool tfVarFound = false;
+    if (displayObject()) {
+        MovieClip* mc = dynamic_cast<MovieClip*>(this);
+        if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
+        // We still need to set the member.
+    }
+
+    const ObjectURI uri(key, nsname);
+    
+    PrototypeRecursor<Exists> pr(this, uri);
+
+	Property* prop = pr.getProperty();
+
+	// We won't scan the inheritance chain if we find a member,
+	// even if invisible.
+	if (!prop) { 
+
+        if (displayObject()) {
+            if (setDisplayObjectProperty(*this, key, val)) return true;
+            // TODO: should we execute triggers?
+        }
+
+        const int version = getSWFVersion(*this);
+        while (pr()) {
+            if ((prop = pr.getProperty())) {
+                if ((prop->isStatic() || prop->isGetterSetter()) &&
+                        prop->visible(version)) {
+                    break;
+                }
+                else prop = 0;
+            }
+        }
+    }
+
     if (prop) {
 
 		if (prop->isReadOnly()) {
@@ -677,6 +733,10 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		return true;
 	}
+
+    // Return true if we found a textfield variable, even if it was not
+    // an own property.
+    if (tfVarFound) return true;
 
 	// Else, add new property...
 	if (ifFound) return false;
@@ -856,7 +916,7 @@ as_object::instanceOf(as_object* ctor)
 #endif
 		return false;
 	}
-	as_object* ctorProto = protoVal.to_object(*getGlobal(*this)).get();
+	as_object* ctorProto = protoVal.to_object(*getGlobal(*this));
 	if ( ! ctorProto )
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
@@ -873,7 +933,7 @@ as_object::instanceOf(as_object* ctor)
 	as_object* obj = this;
 	while (obj && visited.insert(obj).second )
 	{
-		as_object* thisProto = obj->get_prototype().get();
+		as_object* thisProto = obj->get_prototype();
 		if ( ! thisProto )
 		{
 			break;
@@ -920,7 +980,8 @@ as_object::prototypeOf(as_object& instance)
 
 	// See actionscript.all/Inheritance.as for a way to trigger this
 	IF_VERBOSE_ASCODING_ERRORS(
-	if ( obj ) log_aserror(_("Circular inheritance chain detected during isPrototypeOf call"));
+        if (obj) log_aserror(_("Circular inheritance chain detected "
+                "during isPrototypeOf call"));
 	);
 
 	return false;
@@ -940,101 +1001,45 @@ as_object::dump_members(std::map<std::string, as_value>& to)
 	_members.dump(*this, to);
 }
 
-class FlagsSetterVisitor {
-	string_table& _st;
-	PropertyList& _pl;
-	int _setTrue;
-	int _setFalse;
-public:
-	FlagsSetterVisitor(string_table& st, PropertyList& pl, int setTrue, int setFalse)
-		:
-		_st(st),
-		_pl(pl),
-		_setTrue(setTrue),
-		_setFalse(setFalse)
-	{}
-
-	void visit(as_value& v)
-	{
-		string_table::key key = _st.find(v.to_string());
-		_pl.setFlags(key, _setTrue, _setFalse);
-	}
-};
-
 void
 as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 {
-	if (props_val.is_string())
-	{
-		std::string propstr = PROPNAME(props_val.to_string()); 
 
-		for(;;)
-		{
-			std::string prop;
-			size_t next_comma=propstr.find(",");
-			if ( next_comma == std::string::npos )
-			{
-				prop=propstr;
-			} 
-			else
-			{
-				prop=propstr.substr(0,next_comma);
-				propstr=propstr.substr(next_comma+1);
-			}
-
-			// set_member_flags will take care of case conversion
-			if (!set_member_flags(getStringTable(*this).find(prop), set_true, set_false) )
-			{
-				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror(_("Can't set propflags on object "
-					"property %s "
-					"(either not found or protected)"),	prop);
-				);
-			}
-
-			if ( next_comma == std::string::npos )
-			{
-				break;
-			}
-		}
-		return;
-	}
-
-	if (props_val.is_null())
-	{
+	if (props_val.is_null()) {
 		// Take all the members of the object
 		_members.setFlagsAll(set_true, set_false);
-
-		// Are we sure we need to descend to __proto__ ?
-		// should we recurse then ?
-#if 0
-		if (m_prototype)
-		{
-			m_prototype->_members.setFlagsAll(set_true, set_false);
-		}
-#endif
 		return;
 	}
 
-	boost::intrusive_ptr<as_object> props = props_val.to_object(*getGlobal(*this));
-	Array_as* ary = dynamic_cast<Array_as*>(props.get());
-	if ( ! ary )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to AsSetPropFlags: "
-			"invalid second argument %s "
-			"(expected string, null or an array)"),
-			props_val);
-		);
-		return;
-	}
+    std::string propstr = props_val.to_string();
 
-	// The passed argument has to be considered an array
-	//std::pair<size_t, size_t> result = 
-	FlagsSetterVisitor visitor(getStringTable(*this), _members, set_true,
-            set_false);
-	ary->visitAll(visitor);
-	//_members.setFlagsAll(props->_members, set_true, set_false);
+    for (;;) {
+
+        std::string prop;
+        size_t next_comma=propstr.find(",");
+        if (next_comma == std::string::npos) {
+            prop = propstr;
+        } 
+        else {
+            prop = propstr.substr(0,next_comma);
+            propstr = propstr.substr(next_comma+1);
+        }
+
+        // set_member_flags will take care of case conversion
+        if (!set_member_flags(getStringTable(*this).find(prop), set_true, set_false) )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Can't set propflags on object "
+                "property %s "
+                "(either not found or protected)"),	prop);
+            );
+        }
+
+        if (next_comma == std::string::npos) {
+            break;
+        }
+    }
+    return;
 }
 
 
@@ -1044,7 +1049,7 @@ as_object::copyProperties(const as_object& o)
 	PropsCopier copier(*this);
 
 	// TODO: check if non-visible properties should be also copied !
-	o.visitPropertyValues(copier);
+	o.visitProperties<Exists>(copier);
 }
 
 void
@@ -1102,32 +1107,18 @@ as_object::hasOwnProperty(string_table::key key, string_table::key nsname)
 	return getOwnProperty(key, nsname) != NULL;
 }
 
-boost::intrusive_ptr<as_object>
-as_object::get_prototype()
+as_object*
+as_object::get_prototype() const
 {
 	int swfVersion = getSWFVersion(*this);
 
 	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
-	if ( ! prop ) return 0;
-	if ( ! prop->visible(swfVersion) ) return 0;
+	if (!prop) return 0;
+	if (!prop->visible(swfVersion)) return 0;
 
 	as_value tmp = prop->getValue(*this);
 
 	return tmp.to_object(*getGlobal(*this));
-}
-
-bool
-as_object::on_event(const event_id& id )
-{
-	as_value event_handler;
-
-	if (get_member(id.functionKey(), &event_handler) )
-	{
-		call_method0(event_handler, as_environment(_vm), this);
-		return true;
-	}
-
-	return false;
 }
 
 as_value
@@ -1238,7 +1229,7 @@ as_object::get_path_element(string_table::key key)
 //#define DEBUG_TARGET_FINDING 1
 
 	as_value tmp;
-	if ( ! get_member(key, &tmp ) )
+	if (!get_member(key, &tmp))
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s not found in object %p",
@@ -1246,7 +1237,7 @@ as_object::get_path_element(string_table::key key)
 #endif
 		return NULL;
 	}
-	if ( ! tmp.is_object() )
+	if (!tmp.is_object())
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s of object %p is not an object (%s)",
@@ -1255,32 +1246,29 @@ as_object::get_path_element(string_table::key key)
 		return NULL;
 	}
 
-	return tmp.to_object(*getGlobal(*this)).get();
+	return tmp.to_object(*getGlobal(*this));
 }
 
 void
-as_object::getURLEncodedVars(std::string& data)
+getURLEncodedVars(as_object& o, std::string& data)
 {
-    SortedPropertyList props;
-    enumerateProperties(props);
+    PropertyList::SortedPropertyList props;
+    o.enumerateProperties(props);
 
     std::string del;
     data.clear();
     
-    for (SortedPropertyList::const_iterator i=props.begin(),
-            e=props.end(); i!=e; ++i)
-    {
-      std::string name = i->first;
-      std::string value = i->second;
-      if ( ! name.empty() && name[0] == '$' ) continue; // see bug #22006
-      URL::encode(value);
-      
-      data += del + name + "=" + value;
-      
-      del = "&";
-        
+    for (PropertyList::SortedPropertyList::const_iterator i=props.begin(),
+            e=props.end(); i!=e; ++i) {
+        std::string name = i->first;
+        std::string value = i->second;
+        if (!name.empty() && name[0] == '$') continue; // see bug #22006
+        URL::encode(value);
+
+        data += del + name + "=" + value;
+
+        del = "&";
     }
-    
 }
 
 bool
@@ -1378,16 +1366,11 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 	}
 }
 
-void
-as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+DisplayObject*
+getDisplayObject(as_object* obj)
 {
-    _members.visitValues(visitor, *this);
-}
-
-void
-as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    _members.visitNonHiddenValues(visitor, *this);
+    if (!obj || !obj->displayObject()) return 0;
+    return &static_cast<DisplayObject&>(*obj);
 }
 
 /// Get the VM from an as_object

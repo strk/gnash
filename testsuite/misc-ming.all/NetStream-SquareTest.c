@@ -436,6 +436,21 @@ main(int argc, char** argv)
   check(mo, "!Video.prototype.hasOwnProperty('_yscale')");
   check(mo, "!Video.prototype.hasOwnProperty('_xmouse')");
 
+  check(mo, "!video.hasOwnProperty('_alpha')");
+  check(mo, "!video.hasOwnProperty('_height')");
+  check(mo, "!video.hasOwnProperty('_name')");
+  check(mo, "!video.hasOwnProperty('_parent')");
+  check(mo, "!video.hasOwnProperty('_rotation')");
+  check(mo, "!video.hasOwnProperty('_visible')");
+  check(mo, "!video.hasOwnProperty('_width')");
+  check(mo, "!video.hasOwnProperty('_x')");
+  check(mo, "!video.hasOwnProperty('_xmouse')");
+  check(mo, "!video.hasOwnProperty('_xscale')");
+  check(mo, "!video.hasOwnProperty('_y')");
+  check(mo, "!video.hasOwnProperty('_ymouse')");
+  check(mo, "!video.hasOwnProperty('_yscale')");
+  check(mo, "!video.hasOwnProperty('_xmouse')");
+
   add_actions(mo,
 		"video._x = 100;"
 		"video._xscale = 120;"
@@ -696,7 +711,7 @@ main(int argc, char** argv)
   check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(183); stop(); end_of_test=true;"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(197); stop(); end_of_test=true;"));
 
   SWFMovie_nextFrame(mo);
 

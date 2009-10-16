@@ -70,23 +70,18 @@ public:
 		MOUSESTATE_HIT
 	};
 
-	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
-            int id);
+	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent);
 
 	~Button();
 	
     static const char* mouseStateName(MouseState s);
-
-	// See dox in as_object.h
-	bool get_member(string_table::key name, as_value* val, 
-		string_table::key nsname = 0);
 
 	bool mouseEnabled() const { return true; }
 
     virtual bool trackAsMenu();
 
 	// called from keypress listener only
-	bool on_event(const event_id& id);
+	bool notifyEvent(const event_id& id);
 
 	void display(Renderer& renderer);
 	
@@ -106,16 +101,13 @@ public:
 		return true; // buttons can be referenced 
 	}
 	
-	/// Overridden to look in button records for a match
-	virtual as_object* get_path_element(string_table::key key);
-
 	virtual void mouseEvent(const event_id& event);
 
     virtual bool handleFocus();
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 	
-	virtual rect getBounds() const;
+	virtual SWFRect getBounds() const;
 	
 	// See dox in DisplayObject.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
@@ -199,20 +191,8 @@ private:
 	///
 	void get_active_records(ActiveRecords& list, MouseState state);
 
-	/// Return any state DisplayObject whose name matches the given string
-	//
-	/// NOTE: both active and inactive childs are scanned for
-	///
-	/// @param name
-	///	Name to match, search is case sensitive for SWF7 and higher,
-	///     case insensitive up to SWF6.
-	///
-	DisplayObject* getChildByName(const std::string& name);
-
-	/// \brief
-	/// Return version of the SWF containing
-	/// the button definition this is an instance of.
-    int getMovieVersion() const;
+	/// Return version of the SWF containing the button definition.
+    virtual int getDefinitionVersion() const;
 
 };
 

@@ -30,7 +30,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 
 #include <sstream>
 
@@ -58,11 +58,6 @@ attachFileReferenceListInterface(as_object& o)
     o.init_property("fileList", filereferencelist_fileList_getset, filereferencelist_fileList_getset);
 }
 
-static void
-attachFileReferenceListStaticProperties(as_object& /*o*/)
-{
-   
-}
 
 static as_value
 filereferencelist_addListener(const fn_call& /*fn*/)

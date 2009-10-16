@@ -41,6 +41,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
+	$(LIBXML2_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -58,6 +59,7 @@ libgnashcore_la_SOURCES = \
 	ClassHierarchy.cpp \
 	as_environment.cpp \
 	as_function.cpp	\
+	Relay.cpp \
 	as_object.cpp \
 	as_value.cpp \
 	DisplayObjectContainer.cpp \
@@ -85,7 +87,7 @@ libgnashcore_la_SOURCES = \
 	SWFMovie.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
-	rect.cpp \
+	SWFRect.cpp \
 	MovieClip.cpp \
 	swf/SWF.cpp \
 	swf/TagLoadersTable.cpp	\
@@ -215,6 +217,7 @@ noinst_HEADERS += \
 endif
 
 EXTENSIONS_API = \
+	Relay.h \
 	as_object.h \
 	Property.h \
 	PropertyList.h \
@@ -231,7 +234,7 @@ EXTENSIONS_API = \
 	MouseButtonState.h \
 	drag_state.h \
 	InteractiveObject.h \
-	rect.h \
+	SWFRect.h \
 	GnashKey.h \
 	Movie.h \
 	RunResources.h \

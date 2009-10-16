@@ -31,6 +31,7 @@
 #include "smart_ptr.h"
 #include "PropFlags.h" // for enum
 #include "GnashException.h"
+#include "Relay.h"
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -61,7 +62,9 @@ namespace gnash {
 /// An abstract property visitor
 class AbstractPropertyVisitor {
 public:
-    virtual void accept(string_table::key key, const as_value& val)=0;
+
+    /// This function should return false if no further visits are needed.
+    virtual bool accept(string_table::key key, const as_value& val) = 0;
     virtual ~AbstractPropertyVisitor() {}
 };
 
@@ -152,23 +155,6 @@ struct ObjectURI
 
 };
 
-/// This is the base class for type-specific object data. 
-//
-/// ActionScript classes with particular type restrictions or type traits
-/// should set the Object's _relay member to a subclass of this class.
-//
-/// The simplest native types, such as Boolean or String, inherit from this
-/// type.
-class Relay
-{
-public:
-    virtual ~Relay() {};
-
-    /// A Relay itself is not a GC object, but may point to GC resources.
-    virtual void setReachable() {}
-};
-
-
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -176,12 +162,7 @@ public:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object :
-#ifdef GNASH_USE_GC
-    public GcResource
-#else
-    public ref_counted
-#endif
+class as_object : public GcResource
 {
     friend class asClass;
     friend class Machine;
@@ -211,22 +192,11 @@ public:
     /// Construct an ActionScript object based on the given prototype.
     explicit as_object(boost::intrusive_ptr<as_object> proto);
     
-    /// Copy an as_object.
-    //
-    /// This is used by Array_as, but almost certainly shouldn't be. Please
-    /// don't use this function.
-    explicit as_object(const as_object& other);
-
     /// The most common flags for built-in properties.
     //
     /// Most API properties, including classes and objects, have these flags.
     static const int DefaultFlags = PropFlags::dontDelete |
                                     PropFlags::dontEnum;
-
-    /// Is any non-hidden property in this object ?
-    bool hasNonHiddenProperties() const {
-        return _members.hasNonHiddenProperties();
-    }
 
     /// Find a property scanning the inheritance chain
     ///
@@ -239,7 +209,7 @@ public:
     /// @param owner
     /// If not null, this is set to the object which contained the property.
     ///
-    /// @returns a Propery if found, NULL if not found
+    /// @returns a Property if found, NULL if not found
     ///          or not visible in current VM version
     ///
     Property* findProperty(string_table::key name, string_table::key nsname,
@@ -292,9 +262,6 @@ public:
     ///
     virtual bool set_member(string_table::key key, const as_value& val,
         string_table::key nsname = 0, bool ifFound=false);
-
-
-    virtual bool on_event(const event_id& id );
 
     /// Reserve a slot
     ///
@@ -751,7 +718,7 @@ public:
     ///    - (true, false) : property protected from deletion
     ///    - (true, true) : property successfully deleted
     ///
-    virtual std::pair<bool,bool> delProperty(string_table::key name,
+    std::pair<bool,bool> delProperty(string_table::key name,
             string_table::key nsname = 0);
 
     /// Get this object's own named property, if existing.
@@ -789,7 +756,7 @@ public:
     /// @return
     ///    true if the object has the property, false otherwise.
     ///
-    virtual bool hasOwnProperty(string_table::key name,
+    bool hasOwnProperty(string_table::key name,
             string_table::key nsname = 0);
 
     /// Get a property from this object (or a prototype) by ordering index.
@@ -933,19 +900,6 @@ public:
     ///
     void enumerateProperties(SortedPropertyList& to) const;
 
-    /// Get url-encoded variables
-    //
-    /// This method will be used for loadVariables and loadMovie
-    /// calls, to encode variables for sending over a network.
-    /// Variables starting with a dollar sign will be skipped,
-    /// as non-enumerable ones.
-    ///
-    /// @param data
-    ///    Output parameter, will be set to the url-encoded
-    ///     variables string, w/out any leading delimiter.
-    ///
-    void getURLEncodedVars(std::string& data);
-
     /// Visit the properties of this object by key/as_value pairs
     //
     /// The method will invoke the given visitor method
@@ -958,22 +912,10 @@ public:
     ///    reference as first argument and a const as_value reference
     ///    as second argument.
     ///
-    virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
-
-    /// Visit non-hidden properties of this object by key/as_value pairs
-    //
-    /// The method will invoke the given visitor method
-    /// passing it two arguments: key of the property and
-    /// value of it.
-    ///
-    /// @param visitor
-    ///    The visitor function. Will be invoked for each property
-    ///    of this object with a string_table::key
-    ///    reference as first argument and a const as_value reference
-    ///    as second argument.
-    ///
-    virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor)
-        const;
+    template<typename T>
+    void visitProperties(AbstractPropertyVisitor& visitor) const {
+        _members.visitValues<T>(visitor, *this);
+    }
 
     /// \brief
     /// Add a getter/setter property, if no member already has
@@ -1001,22 +943,13 @@ public:
     /// of the class this object is an instance of.
     ///
     /// NOTE: can return NULL (and it is expected to do for Object.prototype)
-    ///
-    boost::intrusive_ptr<as_object> get_prototype();
-
-    const boost::intrusive_ptr<as_object> get_prototype() const {
-        // cast away constness
-        return const_cast<as_object*>(this)->get_prototype();
-    }
+    as_object* get_prototype() const;
 
     /// Set this object's '__proto__' member
     //
-    /// There is no point to make this function
-    /// protected or private, as a call to the
-    /// public: set_member("__proto__", anyting)
-    /// will do just the same
-    ///
-    void set_prototype(const as_value& proto, int flags = DefaultFlags);
+    /// This does more or less what set_member("__proto__") does, but without
+    /// the lookup process.
+    void set_prototype(const as_value& proto);
 
     /// Set the as_object's Relay object.
     //
@@ -1044,6 +977,19 @@ public:
     /// implemented in ActionScript).
     Relay* relay() const {
         return _relay.get();
+    }
+
+    /// Return true if this is a DisplayObject.
+    bool displayObject() const {
+        return _displayObject;
+    }
+
+    /// Indicate that this object is a DisplayObject
+    //
+    /// This enables DisplayObject properties such as _x and _y. A flag
+    /// is used to avoid RTTI on every get and set of properties.
+    void setDisplayObject() {
+        _displayObject = true;
     }
 
 protected:
@@ -1110,10 +1056,26 @@ protected:
 
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
+
 #endif // GNASH_USE_GC
 
 private:
- 
+
+    /// Do not allow copies.
+    as_object(const as_object& other);
+
+    /// Don't allow implicit assignment.
+    as_object& operator=(const as_object&);
+
+    /// A utility class for processing this as_object's inheritance chain
+    template<typename T> class PrototypeRecursor;
+
+    /// DisplayObjects have properties not in the AS inheritance chain
+    //
+    /// These magic properties are invoked in get_member only if the
+    /// object is a DisplayObject
+    bool _displayObject;
+
     /// The polymorphic Relay object for native types.
     //
     /// This is owned by the as_object and destroyed when the as_object's
@@ -1123,11 +1085,8 @@ private:
     /// The VM containing this object.
     VM& _vm;   
 
-    /// Properties of this objects 
+    /// Properties of this as_object
     PropertyList _members;
-
-    /// Don't allow implicit copy.
-    as_object& operator=(const as_object&);
 
     /// \brief
     /// Find an existing property for update, only scanning the
@@ -1153,6 +1112,50 @@ private:
     TriggerContainer _trigs;
 };
 
+/// Function objects for visiting properties.
+class IsVisible
+{
+public:
+    IsVisible(int version) : _version(version) {}
+    bool operator()(const Property& prop) const {
+        return prop.visible(_version);
+    }
+private:
+    const int _version;
+};
+
+class Exists
+{
+public:
+    Exists() {}
+    bool operator()(const Property&) const {
+        return true;
+    }
+};
+
+class IsEnumerable
+{
+public:
+    IsEnumerable() {}
+    bool operator()(const Property& p) const {
+        return !p.getFlags().get_dont_enum();
+    }
+};
+
+/// Get url-encoded variables
+//
+/// This method will be used for loadVariables and loadMovie
+/// calls, to encode variables for sending over a network.
+/// Variables starting with a dollar sign will be skipped,
+/// as non-enumerable ones.
+//
+/// @param o        The object whose properties should be encoded.
+/// @param data     Output parameter, will be set to the url-encoded
+///                 variables string without any leading delimiter.
+void getURLEncodedVars(as_object& o, std::string& data);
+
+
+/// Comparator for ObjectURI so it can serve as a key in stdlib containers.
 inline bool
 operator<(const ObjectURI& a, const ObjectURI& b)
 {
@@ -1174,51 +1177,6 @@ getNamespace(const ObjectURI& o)
     return o.ns;
 }
 
-/// A type that requires periodic updates from the core (movie_root).
-//
-/// Objects with this type of relay can be registered with movie_root, and
-/// recieve a callback on every advance.
-//
-/// This type of Proxy holds a reference to its parent as_object (owner). 
-/// If a reference to this ActiveRelay is held by another object,
-/// it must be marked reachable so that its owner is not deleted by the GC.
-class ActiveRelay : public Relay
-{
-public:
-    ActiveRelay(as_object* owner)
-        :
-        _owner(owner)
-    {}
-
-    /// Make sure we are removed from the list of callbacks on destruction.
-    virtual ~ActiveRelay();
-
-    /// ActiveRelay objects must have an advanceState method.
-    virtual void update() = 0;
-
-    /// Mark any other reachable resources, and finally mark our owner
-    virtual void setReachable() {
-        markReachableResources();
-        _owner->setReachable();
-    }
-
-    as_object& owner() const {
-        return *_owner;
-    }
-
-protected:
-
-    virtual void markReachableResources() const {}
-
-private:
-
-    /// The as_object that owns this Proxy.
-    //
-    /// Because we are deleted on destruction of the owner, this pointer will
-    /// never be invalid.
-    as_object* _owner;
-
-};
 
 /// Template which does a dynamic cast for as_object pointers.
 //
@@ -1228,14 +1186,14 @@ private:
 /// @param obj the pointer to be cast.
 /// @return If the cast succeeds, the pointer cast to the requested type.
 template <typename T>
-boost::intrusive_ptr<T>
-ensureType(boost::intrusive_ptr<as_object> obj)
+T*
+ensureType(as_object* obj)
 {
-    boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
+    T* ret = dynamic_cast<T*>(obj);
 
     if (!ret) {
-        std::string target = typeName(ret.get());
-        std::string source = typeName(obj.get());
+        std::string target = typeName(ret);
+        std::string source = typeName(obj);
 
         std::string msg = "builtin method or gettersetter for " +
             target + " called from " + source + " instance.";
@@ -1266,6 +1224,13 @@ isNativeType(as_object* obj, T*& relay)
     relay = dynamic_cast<T*>(obj->relay());
     return relay;
 }
+
+
+/// Return the DisplayObject part of an as_object
+//
+/// @param obj      The object whose DisplayObject part should be returned
+/// @return         The DisplayObject if the object is one, otherwise 0.
+DisplayObject* getDisplayObject(as_object* obj);
 
 /// Ensure that the object is of a particular native type.
 //

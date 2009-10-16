@@ -55,9 +55,9 @@ DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
 }
 
 DisplayObject*
-DefineMorphShapeTag::createDisplayObject(DisplayObject* parent, int id) const
+DefineMorphShapeTag::createDisplayObject(DisplayObject* parent) const
 {
-    return new MorphShape(this, parent, id);
+    return new MorphShape(this, parent);
 }
 
 void
@@ -76,13 +76,13 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
         || tag == DEFINEMORPHSHAPE2
         || tag == DEFINEMORPHSHAPE2_);
 
-    rect bounds1, bounds2;
+    SWFRect bounds1, bounds2;
     bounds1.read(in);
     bounds2.read(in);
 
     if (tag == DEFINEMORPHSHAPE2 || tag == DEFINEMORPHSHAPE2_) {
         // TODO: Use these values.
-        rect innerBound1, innerBound2;
+        SWFRect innerBound1, innerBound2;
         innerBound1.read(in);
         innerBound2.read(in);
 

@@ -50,8 +50,7 @@ public:
 
     virtual ~DefineMorphShapeTag() {}
 
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
-        const;
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const;
 
     virtual void display(Renderer& renderer, const MorphShape& inst) const;
 
@@ -91,7 +90,7 @@ private:
     ShapeRecord _shape1;
     ShapeRecord _shape2;
     
-    rect _bounds;
+    SWFRect _bounds;
 
 };
 

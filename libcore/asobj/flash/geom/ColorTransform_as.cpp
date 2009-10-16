@@ -30,7 +30,7 @@
 #include "builtin_function.h" 
 #include "NativeFunction.h"
 #include "Object.h" // for AS inheritance
-#include "VM.h" // for addStatics
+#include "VM.h"
 
 #include <sstream>
 
@@ -255,7 +255,7 @@ as_value
 colortransform_toString(const fn_call& fn)
 {
 
-    as_object* ptr = ensureType<as_object>(fn.this_ptr).get();
+    as_object* ptr = ensureType<as_object>(fn.this_ptr);
 
     string_table& st = getStringTable(fn);
 
@@ -330,7 +330,7 @@ as_value
 colortransform_ctor(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
 
     // Default arguments.
     if (fn.nargs < 8)

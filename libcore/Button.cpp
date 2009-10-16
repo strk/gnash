@@ -174,6 +174,16 @@ frame loop:
 namespace gnash {
 
 namespace {
+    as_value button_blendMode(const fn_call& fn);
+    as_value button_cacheAsBitmap(const fn_call& fn);
+    as_value button_filters(const fn_call& fn);
+    as_value button_scale9Grid(const fn_call& fn);
+    as_value button_setTabIndex(const fn_call& fn);
+    as_value button_getTabIndex(const fn_call& fn);
+    as_value button_getDepth(const fn_call& fn);
+}
+
+namespace {
 
 class ButtonActionExecutor {
 public:
@@ -255,67 +265,34 @@ static bool isCharacterNull(DisplayObject* ch, bool includeUnloaded)
 static void
 attachButtonInterface(as_object& o)
 {
-
-    as_c_function_ptr gettersetter;
-
-    o.init_property(NSV::PROP_uQUALITY, DisplayObject::quality,
-            DisplayObject::quality);
-    
-    o.init_property(NSV::PROP_uHIGHQUALITY, DisplayObject::highquality,
-            DisplayObject::highquality);
-
-    gettersetter = &DisplayObject::x_getset;
-    o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::y_getset;
-    o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::xscale_getset;
-    o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::yscale_getset;
-    o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::xmouse_get;
-    o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
-
-    gettersetter = &DisplayObject::ymouse_get;
-    o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
-
-    gettersetter = &DisplayObject::alpha_getset;
-    o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::visible_getset;
-    o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::width_getset;
-    o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::height_getset;
-    o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::rotation_getset;
-    o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
-
-    gettersetter = &DisplayObject::parent_getset;
-    o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
-    
-    gettersetter = &DisplayObject::target_getset;
-    o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
-
-    gettersetter = DisplayObject::name_getset;
-    o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
     
     const int unprotected = 0;
     o.init_member(NSV::PROP_ENABLED, true, unprotected);
     o.init_member("useHandCursor", true, unprotected);
+    
+    const int swf8Flags = PropFlags::onlySWF8Up;
+    VM& vm = getVM(o);
+
+    o.init_property("tabIndex", *vm.getNative(105, 1), *vm.getNative(105, 2),
+            swf8Flags);
+    
+    o.init_member("getDepth", vm.getNative(105, 3), unprotected);
+
+    NativeFunction* gs;
+    gs = vm.getNative(105, 4);
+    o.init_property("scale9Grid", *gs, *gs, swf8Flags);
+    gs = vm.getNative(105, 5);
+    o.init_property("filters", *gs, *gs, swf8Flags);
+    gs = vm.getNative(105, 6);
+    o.init_property("cacheAsBitmap", *gs, *gs, swf8Flags);
+    gs = vm.getNative(105, 7);
+    o.init_property("blendMode", *gs, *gs, swf8Flags);
 
 }
 
-Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
-        int id)
+Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent)
     :
-    InteractiveObject(parent, id),
+    InteractiveObject(parent),
     _lastMouseFlags(FLAG_IDLE),
     _mouseFlags(FLAG_IDLE),
     _mouseState(MOUSESTATE_UP),
@@ -360,7 +337,7 @@ Button::isEnabled()
 
 
 bool
-Button::on_event(const event_id& id)
+Button::notifyEvent(const event_id& id)
 {
     if (unloaded())
     {
@@ -554,18 +531,16 @@ Button::mouseEvent(const event_id& event)
         const SWF::DefineButtonSoundTag::ButtonSound& bs = 
             _def->buttonSound(bi);
 
-        // DisplayObject zero is considered as null DisplayObject
+        // character zero is considered as null character
         if (!bs.soundID) break;
 
         // No actual sound ?
         if (!bs.sample) break;
 
-        if (bs.soundInfo.stopPlayback)
-        {
+        if (bs.soundInfo.stopPlayback) {
             s->stop_sound(bs.sample->m_sound_handler_id);
         }
-        else
-        {
+        else {
             const SWF::SoundInfoRecord& sinfo = bs.soundInfo;
 
             const sound::SoundEnvelopes* env = 
@@ -599,9 +574,7 @@ Button::mouseEvent(const event_id& event)
 
     // check for built-in event handler.
     std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
-    if ( code.get() )
-    {
-        //log_debug(_("Got statically-defined handler for event: %s"), event);
+    if (code.get()) {
         mr.pushAction(code, movie_root::apDOACTION);
     }
 
@@ -788,10 +761,10 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     );
 }
 
-rect
+SWFRect
 Button::getBounds() const
 {
-    rect allBounds;
+    SWFRect allBounds;
 
     typedef std::vector<const DisplayObject*> Chars;
     Chars actChars;
@@ -800,7 +773,7 @@ Button::getBounds() const
     {
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
-        rect lclBounds = ch->getBounds();
+        SWFRect lclBounds = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         allBounds.expand_to_transformed_rect(m, lclBounds);
     }
@@ -820,46 +793,6 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
         if (ch->pointInShape(x,y)) return true;
     }
     return false; 
-}
-
-as_object*
-Button::get_path_element(string_table::key key)
-{
-    as_object* ch = getPathElementSeparator(key);
-    if ( ch ) return ch;
-
-    const std::string& name = getStringTable(*this).value(key);
-    return getChildByName(name); // possibly NULL
-}
-
-DisplayObject *
-Button::getChildByName(const std::string& name)
-{
-    // Get all currently active DisplayObjects, including unloaded
-    DisplayObjects actChars;
-    getActiveCharacters(actChars, true);
-
-    // Lower depth first for duplicated names, so we sort
-    std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
-
-    for (DisplayObjects::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
-    {
-
-        DisplayObject* const child = *i;
-        const std::string& childname = child->get_name();
- 
-        if (getSWFVersion(*this) >= 7 )
-        {
-            if ( childname == name ) return child;
-        }
-        else
-        {
-            StringNoCaseEqual noCaseCompare;
-            if ( noCaseCompare(childname, name) ) return child;
-        }
-    }
-
-    return NULL;
 }
 
 void
@@ -926,21 +859,16 @@ Button::markReachableResources() const
     _def->setReachable();
 
     // Mark state DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
-            i!=e; ++i)
+    for (DisplayObjects::const_iterator i = _stateCharacters.begin(),
+            e = _stateCharacters.end(); i != e; ++i)
     {
         DisplayObject* ch = *i;
-        if ( ch ) ch->setReachable();
+        if (ch) ch->setReachable();
     }
 
     // Mark hit DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
-            e=_hitCharacters.end(); i != e; ++i)
-    {
-        DisplayObject* ch = *i;
-        assert ( ch );
-        ch->setReachable();
-    }
+    std::for_each(_hitCharacters.begin(), _hitCharacters.end(),
+            std::mem_fun(&as_object::setReachable));
 
     // DisplayObject class members
     markDisplayObjectReachable();
@@ -959,9 +887,8 @@ Button::unload()
             e = _stateCharacters.end(); i != e; ++i)
     {
         DisplayObject* ch = *i;
-        if ( ! ch ) continue;
-        if ( ch->unloaded() ) continue;
-        if ( ch->unload() ) childsHaveUnload = true;
+        if (!ch || ch->unloaded()) continue;
+        if (ch->unload()) childsHaveUnload = true;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -982,13 +909,10 @@ Button::destroy()
 {
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
-            e=_stateCharacters.end(); i != e; ++i)
-    {
+            e=_stateCharacters.end(); i != e; ++i) {
         DisplayObject* ch = *i;
-        if ( ! ch ) continue;
-        if ( ch->isDestroyed() ) continue;
+        if (!ch || ch->isDestroyed()) continue;
         ch->destroy();
-        *i = 0;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -1002,99 +926,8 @@ Button::destroy()
     DisplayObject::destroy();
 }
 
-bool
-Button::get_member(string_table::key name_key, as_value* val,
-    string_table::key nsname)
-{
-    // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a DisplayObject:: protected method take
-    //       care of these ?
-    //       Duplicates code in DisplayObject::getPathElementSeparator too..
-    //
-    if (name_key == NSV::PROP_uROOT) {
-        // getAsRoot() will take care of _lockroot
-        val->set_as_object(getAsRoot());
-        return true;
-    }
-
-    // NOTE: availability of _global doesn't depend on VM version
-    //             but on actual movie version. Example: if an SWF4 loads
-    //             an SWF6 (to, say, _level2), _global will be unavailable
-    //             to the SWF4 code but available to the SWF6 one.
-    //
-    // see MovieClip.as
-    if (getMovieVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
-        // The "_global" ref was added in SWF6
-        val->set_as_object(getGlobal(*this));
-        return true;
-    }
-
-    const std::string& name = getStringTable(*this).value(name_key);
-
-    movie_root& mr = getRoot(*this);
-    unsigned int levelno;
-    if ( mr.isLevelTarget(name, levelno) ) {
-        Movie* mo = mr.getLevel(levelno).get();
-        if ( mo ) {
-            val->set_as_object(mo);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    // TOCHECK : Try object members, BEFORE display list items
-    //
-    if (as_object::get_member(name_key, val, nsname))
-    {
-
-    // ... trying to be useful to Flash coders ...
-    // The check should actually be performed before any return
-    // prior to the one due to a match in the DisplayList.
-    // It's off by default anyway, so not a big deal.
-    // See bug #18457
-#define CHECK_FOR_NAME_CLASHES 1
-#ifdef CHECK_FOR_NAME_CLASHES
-        IF_VERBOSE_ASCODING_ERRORS(
-        if ( getChildByName(name) )
-        {
-            log_aserror(_("A button member (%s) clashes with "
-                    "the name of an existing DisplayObject "
-                    "in its display list.    "
-                    "The member will hide the "
-                    "DisplayObject"), name);
-        }
-        );
-#endif
-
-        return true;
-    }
-
-    // Try items on our display list.
-    DisplayObject* ch = getChildByName(name);
-
-    if (ch) {
-        // Found object.
-
-        // If the object is an ActionScript referenciable one we
-        // return it, otherwise we return ourselves
-        if ( ch->isActionScriptReferenceable() ) {
-            val->set_as_object(ch);
-        }
-        else {
-            val->set_as_object(this);
-        }
-
-        return true;
-    }
-
-    return false;
-
-}
-
 int
-Button::getMovieVersion() const
+Button::getDefinitionVersion() const
 {
     return _def->getSWFVersion();
 }
@@ -1133,9 +966,16 @@ button_class_init(as_object& global, const ObjectURI& uri)
 }
 
 void
-registerButtonNative(as_object& /*global*/)
+registerButtonNative(as_object& global)
 {
-    // TODO: button.getDepth
+    VM& vm = getVM(global);
+    vm.registerNative(button_setTabIndex, 105, 1);
+    vm.registerNative(button_getTabIndex, 105, 2);
+    vm.registerNative(button_getDepth, 105, 3);
+    vm.registerNative(button_scale9Grid, 105, 4);
+    vm.registerNative(button_filters, 105, 5);
+    vm.registerNative(button_cacheAsBitmap, 105, 6);
+    vm.registerNative(button_blendMode, 105, 7);
 }
 
 #ifdef USE_SWFTREE
@@ -1175,10 +1015,69 @@ Button::mouseStateName(MouseState s)
         case MOUSESTATE_DOWN: return "DOWN";
         case MOUSESTATE_OVER: return "OVER";
         case MOUSESTATE_HIT: return "HIT";
-        default: return "UNKNOWN (error?)";
+        default: std::abort();
     }
 }
 
+namespace {
+
+as_value
+button_blendMode(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_cacheAsBitmap(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_filters(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_scale9Grid(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_getTabIndex(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_setTabIndex(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+as_value
+button_getDepth(const fn_call& fn)
+{
+    as_object* obj = ensureType<Button>(fn.this_ptr);
+    UNUSED(obj);
+    return as_value();
+}
+
+} // anonymous namespace
 } // end of namespace gnash
 
 

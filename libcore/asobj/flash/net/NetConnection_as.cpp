@@ -594,7 +594,7 @@ HTTPRemotingHandler::advance()
     }
 
     return true;
-};
+}
 
 void
 HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,

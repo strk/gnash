@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "rect.h"
+#include "SWFRect.h"
 #include "DefinitionTag.h"
 #include "SWF.h" // for TagType definition
 #include "RGBA.h"
@@ -65,9 +65,9 @@ public:
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
 
-    const rect& bounds() const { return _rect; }
+    const SWFRect& bounds() const { return _rect; }
 
-    DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
+    DisplayObject* createDisplayObject(DisplayObject* parent) const;
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.
@@ -204,7 +204,7 @@ private:
     /// Read a tag from the SWFStream.
     void read(SWFStream& in, movie_definition& m);
 
-	rect _rect;
+	SWFRect _rect;
 
 	std::string _variableName;
 

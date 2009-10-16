@@ -29,9 +29,9 @@
 // If we don't have support for mallinfo(), this code is useless
 #ifdef HAVE_MALLINFO
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <malloc.h>
-#include <time.h>
+#include <ctime>
 #include "dsodefs.h" // DSOEXPORT
 
 namespace gnash {

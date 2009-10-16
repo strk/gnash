@@ -82,7 +82,7 @@ Cache::addPath(const std::string &name, const std::string &fullpath)
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(cache_mutex);
     _pathnames[name] = fullpath;
-};
+}
 
 void
 Cache::addResponse(const std::string &name, const std::string &response)
@@ -90,7 +90,7 @@ Cache::addResponse(const std::string &name, const std::string &response)
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(cache_mutex);
     _responses[name] = response;
-};
+}
 
 void
 Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
@@ -98,7 +98,7 @@ Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(cache_mutex);
     _files[name] = file;
-};
+}
 
 string &
 Cache::findPath(const std::string &name)
@@ -115,7 +115,7 @@ Cache::findPath(const std::string &name)
     }
 #endif
     return _pathnames[name];
-};
+}
 
 string &
 Cache::findResponse(const std::string &name)
@@ -132,7 +132,7 @@ Cache::findResponse(const std::string &name)
     }
 #endif
     return _responses[name];
-};
+}
 
 boost::shared_ptr<DiskStream> 
 Cache::findFile(const std::string &name)
@@ -149,7 +149,7 @@ Cache::findFile(const std::string &name)
     }
 #endif
     return _files[name];
-};
+}
 
 void
 Cache::removePath(const std::string &name)

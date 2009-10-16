@@ -21,7 +21,7 @@
 #include "InteractiveObject.h" // for inheritance
 #include "styles.h" // for line_style
 #include "Range2d.h"
-#include "rect.h" // for inlines
+#include "SWFRect.h" // for inlines
 #include "Font.h" // for visibility of font add_ref/drop_ref
 
 #include <vector>
@@ -91,31 +91,15 @@ public:
 		typeInput
 	};
 
-	static void htmlptag() {
-
-	}
-	
-	typedef void dotag ();
-    typedef std::map<std::string,dotag*> HTMLTags;
-	
-	HTMLTags _htmltags;
-
-	void maptags()
-	{
-		_htmltags["P"] = htmlptag;
-		//_htmltags.insert(std::make_pair("P",ptag*()));
-	}
-	
-
     /// Constructs a TextField as specified in a DefineEditText tag.
-	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def, int id);
+	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def);
 
     /// Constructs a TextField with default values and the specified bounds.
     //
     /// Notably, the default textHeight is 12pt (240 twips).
 	/// @param parent A pointer to the DisplayObject parent of this TextField
-	/// @param bounds A rect specifying the bounds of this TextField
-    TextField(DisplayObject* parent, const rect& bounds);
+	/// @param bounds A SWFRect specifying the bounds of this TextField
+    TextField(DisplayObject* parent, const SWFRect& bounds);
 
 	~TextField();
 
@@ -127,19 +111,23 @@ public:
 	//
 	/// @param x x-coordinate
 	/// @param y y-coordinate
-	InteractiveObject* topmostMouseEntity(boost::int32_t x,
-            boost::int32_t y);
+	InteractiveObject* topmostMouseEntity(boost::int32_t x, boost::int32_t y);
 
 	// Text fields need to handle cxform specially 
 	virtual cxform get_world_cxform() const;
 	
+    /// Return the version of the SWF this was parsed from.
+    //
+    /// TODO: work out what this means for dynamic TextFields.
+    virtual int getDefinitionVersion() const;
+
     bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
 	}	
 
 	/// This function is called as a user-input handler
-	bool on_event(const event_id& id);	
+	bool notifyEvent(const event_id& id);	
 
 	const std::string& getVariableName() const
 	{
@@ -177,17 +165,17 @@ public:
         return m_cursor;
     }
 
-	/// /brief get a std::pair of size_t with start/end of selection
+	/// Get a std::pair of size_t with start/end of selection
     const std::pair<size_t, size_t>& getSelection() const {
         return _selection;
     }
 
-    /// /brief Replace the current selection with the new text.
+    /// Replace the current selection with the new text.
 	//
 	/// @param replace String to replace the current selection
     void replaceSelection(const std::string& replace);
 
-    /// /brief Set the current selection
+    /// Set the current selection
     //
     /// @param start    The index of the beginning of the selection.
     /// @param end      The index of the end of the selection.
@@ -196,20 +184,23 @@ public:
     /// end is never less than start.
     void setSelection(int start, int end);
 
-	/// We have a "text" member.
-	bool set_member(string_table::key name, const as_value& val, 
-		string_table::key nsname = 0, bool ifFound=false);
-
-	bool get_member(string_table::key name, as_value* val, 
-		string_table::key nsname = 0);
+    /// Override of DisplayObject::setWidth
+    //
+    /// TextField width currently behaves differently from MovieClip width
+    virtual void setWidth(double width);
+    
+    /// Override of DisplayObject::setHeight
+    //
+    /// TextField height currently behaves differently from MovieClip height
+    virtual void setHeight(double height);
 
 	/// Draw the dynamic string.
 	void display(Renderer& renderer);
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-	/// \brief Get bounding rect of this TextField
-	virtual rect getBounds() const
+	/// Get bounding SWFRect of this TextField
+	virtual SWFRect getBounds() const
 	{
 		return _bounds;
 	}
@@ -220,7 +211,7 @@ public:
 	/// Return true if the 'background' should be drawn
 	bool getDrawBackground() const;
 
-	/// \brief Specify wheter to draw the background
+	/// Specify whether to draw the background
 	//
 	/// @param draw If true the background of this TextField will be drawn
 	void setDrawBackground(bool draw);
@@ -228,38 +219,38 @@ public:
 	/// \brief Return color of the background
 	rgba getBackgroundColor() const;
 
-	/// \brief Set color of the background
+	/// Set color of the background
 	//
 	/// Use setDrawBackground to actually use this value.
 	/// @param col RGBA Object with color information. TextField
 	/// 	background will be drawn in this color
 	void setBackgroundColor(const rgba& col);
 
-	/// \brief Return true if this TextField should have it's border visible
+	/// Return true if this TextField should have its border visible
 	bool getDrawBorder() const;
 
-	/// \brief Specify whether to draw the border
+	/// Specify whether to draw the border
 	//
 	/// @param draw If true the border of this TextField will be drawn
 	void setDrawBorder(bool draw);
 
-	/// \brief Return color of the border
+	/// Return color of the border
 	rgba getBorderColor() const;
 
-	/// \brief Set color of the border
+	/// Set color of the border
 	//
 	/// Use setDrawBorder to actually use this value.
 	/// @param col RGBA Object with color information. TextField border
 	/// 	will be drawn in this color.
 	void setBorderColor(const rgba& col);
 
-	/// \brief Return color of the text
+	/// Return color of the text
 	const rgba& getTextColor() const 
 	{
 		return _textColor;
 	}
 
-	/// \brief Set color of the text
+	/// Set color of the text
 	//
 	/// @param col RGBA Object with color information. Text in this TextField
 	/// 	will be displayed in this color.
@@ -272,12 +263,12 @@ public:
 		return _embedFonts;
 	}
 
-    /// \brief Get the current maxChars setting of the TextField
+    /// Get the current maxChars setting of the TextField
     boost::int32_t maxChars() const {
         return _maxChars;
     }
 
-    /// \brief Set the current maxChars setting of the TextField
+    /// Set the current maxChars setting of the TextField
 	//
 	/// @param max The maximum number of characters that can be
 	/// 	input by the user (Does not restrict Scripts)
@@ -285,12 +276,12 @@ public:
         _maxChars = max;
     }
 
-    /// \brief Get the current multiline setting of the TextField
+    /// Get the current multiline setting of the TextField
     bool multiline() const {
         return _multiline;
     }
 
-    /// \brief Set the current multiline setting of the TextField
+    /// Set the current multiline setting of the TextField
 	//
 	/// @param b If true "Enter" key will be recognized (Does not
 	/// 	restrict Scripts)
@@ -298,12 +289,12 @@ public:
         _multiline = b;
     }
 	
-    /// \brief Get the current password setting of the TextField
+    /// Get the current password setting of the TextField
     bool password() const {
         return _password;
     }
 
-    /// \brief Set the current password setting of the TextField
+    /// Set the current password setting of the TextField
 	//
 	/// @param b If true characters in the TextField will be displayed
 	/// 	as (*)
@@ -317,23 +308,23 @@ public:
 	/// @param use
 	void setEmbedFonts(bool use);
 
-	/// \brief Get autoSize value 
+	/// Get autoSize value 
 	AutoSizeValue getAutoSize() const
 	{
 		return _autoSize;
 	}
 
-	/// \brief Return text TextAlignment
+	/// Return text TextAlignment
     TextAlignment getTextAlignment();
 
-	/// \brief Set autoSize value 
+	/// Set autoSize value 
 	//
 	/// @param val
 	/// 	The AutoSizeValue to use
 	///
 	void setAutoSize(AutoSizeValue val);
 
-	/// \brief Parse autoSize string value
+	/// Parse autoSize string value
 	//
 	/// @param val
 	/// 	Auto size value as a string (one of none, left, center, right)
@@ -342,7 +333,7 @@ public:
 	///
 	static AutoSizeValue parseAutoSizeValue(const std::string& val);
 
-	/// \brief Return autoSize value as a string
+	/// Return autoSize value as a string
 	//
 	/// @param val
 	/// 	Auto size value 
@@ -352,20 +343,20 @@ public:
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
 
-	/// \brief Set type (input or dynamic)
+	/// Set type (input or dynamic)
 	//
 	/// @param val
 	/// 	The TypeValue to use, no-op if typeInvalid.
 	///
 	void setType(TypeValue val) { if (val != typeInvalid) _type=val; }
 
-	/// \brief Get type (input, dynamic or invalid)
+	/// Get type (input, dynamic or invalid)
 	TypeValue getType() const
 	{
 		return _type;
 	}
 
-	/// \brief Return true if this TextField is read-only
+	/// Return true if this TextField is read-only
 	bool isReadOnly() const { return _type != typeInput; }
 
 	/// Parse type string value
@@ -395,7 +386,7 @@ public:
 		return _wordWrap;
 	}
 
-	/// \brief Set wordWrap parameter 
+	/// Set wordWrap parameter 
 	//
 	/// @param on
 	///	If true text hitting bounding box limits will continue
@@ -405,14 +396,12 @@ public:
 	///
 	void setWordWrap(bool on);
 
-	/// \brief
 	/// Return true if HTML markup in text should be rendered.
-	///
 	bool doHtml() const {
 		return _html;
 	}
 
-	/// \brief Set html parameter
+	/// Set html parameter
 	//
 	/// @param on
 	///	If true HTML tags in the text will be parsed and rendered
@@ -420,7 +409,7 @@ public:
 		_html = on;
 	}
 
-	/// \brief Return true if the TextField text is selectable
+	/// Return true if the TextField text is selectable
 	bool isSelectable() const
 	{
 		return _selectable;
@@ -601,7 +590,7 @@ public:
 
 	void setTextFormat(TextFormat_as& tf);
 
-	const rect& getTextBoundingBox() const
+	const SWFRect& getTextBoundingBox() const
 	{
 		return m_text_bounding_box;
 	}
@@ -758,7 +747,7 @@ private:
 	bool _restrictDefined;
 
 	/// bounds of dynamic text, as laid out
-	rect m_text_bounding_box;
+	SWFRect m_text_bounding_box;
 
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
@@ -862,7 +851,7 @@ private:
 	/// extended to fit text or hide text overflowing it.
 	/// See the setAutoSize() method to change that.
 	///
-	rect _bounds;
+	SWFRect _bounds;
 
     /// Represents the selected part of the text. The second element must
     /// never be less than the first.

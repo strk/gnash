@@ -17,7 +17,6 @@
 
 #include "log.h"
 #include "swf_function.h"
-#include "Array_as.h"
 #include "fn_call.h"
 #include "MovieClip.h"
 #include "action_buffer.h"
@@ -34,6 +33,22 @@
 
 namespace gnash {
 
+namespace {
+
+	/// Return an 'arguments' object.
+	//
+	/// The 'arguments' variable is an array with an additional
+	/// 'callee' member, set to the function being called.
+	///
+	/// NOTE: the callee as_object will be stored in an as_value, thus
+	///       getting wrapped into an intrusive_ptr. Make sure you have
+	///	  a reference on it!
+	///	  
+	///
+	as_object* getArguments(swf_function& callee, const fn_call& fn,
+            as_object* caller);
+}
+
 swf_function::~swf_function()
 {
 #ifndef GNASH_USE_GC
@@ -44,7 +59,7 @@ swf_function::~swf_function()
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	as_function(*getGlobal(env), getGlobal(env)->createObject()),
+	as_function(*getGlobal(env)),
 	m_action_buffer(ab),
 	m_env(env),
 	_scopeStack(scopeStack),
@@ -56,34 +71,13 @@ swf_function::swf_function(const action_buffer& ab, as_environment& env,
 {
 	assert( m_start_pc < m_action_buffer.size() );
 
+    // We're stuck initializing our own prototype at the moment.
+    as_object* proto = getGlobal(env)->createObject();
+    proto->init_member(NSV::PROP_CONSTRUCTOR, this); 
+    init_member(NSV::PROP_PROTOTYPE, proto);
 	init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor());
 }
 
-/*private static*/
-Array_as* 
-swf_function::getArguments(swf_function& callee, const fn_call& fn,
-        as_object* caller)
-{ 
-#ifndef GNASH_USE_GC
-	// We'll be storing the callee as_object into an as_value
-	// so you must make sure you have a reference on it before
-	// callign this function.
-	assert(callee.get_ref_count() > 0);
-#endif // ndef GNASH_USE_GC
-
-	// Super class prototype is : obj.__proto__.constructor.prototype 
-	Array_as* arguments = new Array_as();
-	for (unsigned int i=0; i<fn.nargs; ++i)
-	{
-		arguments->push(fn.arg(i));
-	}
-	arguments->init_member(NSV::PROP_CALLEE, &callee);
-
-	arguments->init_member(NSV::PROP_CALLER, as_value(caller));
-
-	return arguments;
-
-}
 
 /// Exception safe (scoped) as_environment's target changer
 //
@@ -135,23 +129,19 @@ swf_function::operator()(const fn_call& fn)
 	DisplayObject* orig_target = m_env.get_original_target();
 
 	// Some features are version-dependant.
-	unsigned swfversion = vm.getSWFVersion();
+	const int swfversion = vm.getSWFVersion();
 	as_object *super = NULL;
-	if (swfversion > 5)
-	{
+	if (swfversion > 5) {
 		super = fn.super;
 	}
-	else
-	{
+	else {
 		// In SWF5, when 'this' is a DisplayObject it becomes
 		// the target for this function call.
 		// See actionscript.all/setProperty.as
 		// 
-		if ( fn.this_ptr )
-		{
+		if (fn.this_ptr) {
 			DisplayObject* ch = fn.this_ptr->toDisplayObject();
-			if ( ch )
-			{
+			if (ch) {
 				target = ch;
 				orig_target = ch;
 			}
@@ -176,12 +166,10 @@ swf_function::operator()(const fn_call& fn)
 		for (size_t i=0, n=m_args.size(); i<n; ++i)
 		{
 			assert(m_args[i].m_register == 0);
-			if ( i < fn.nargs )
-			{
+			if (i < fn.nargs) {
 				m_env.add_local(m_args[i].m_name, fn.arg(i));
 			}
-			else
-			{
+			else {
 				// Still declare named arguments, even if
 				// they are not passed from caller
 				// See bug #22203
@@ -194,8 +182,7 @@ swf_function::operator()(const fn_call& fn)
 		m_env.set_local("this", fn.this_ptr);
 
 		// Add 'super' (SWF6+ only)
-		if ( super && swfversion > 5 )
-		{
+		if (super && swfversion > 5) {
 			m_env.set_local("super", as_value(super));
 		}
 
@@ -213,49 +200,38 @@ swf_function::operator()(const fn_call& fn)
 		// @@ why start at 1 ? Note that starting at 0 makes	
 		// intro.swf movie fail to play correctly.
 		unsigned int current_reg = 1;
-		if ( (m_function2_flags & PRELOAD_THIS) && ! (m_function2_flags & SUPPRESS_THIS) )
-		{
+		if ((m_function2_flags & PRELOAD_THIS) &&
+                !(m_function2_flags & SUPPRESS_THIS)) {
 			// preload 'this' into a register.
 			m_env.setRegister(current_reg, as_value(fn.this_ptr)); 
 			current_reg++;
 		}
 
-		if (m_function2_flags & SUPPRESS_THIS)
-		{
-			// Don't put 'this' into a local var.
-		}
-		else
-		{
+		if (!(m_function2_flags & SUPPRESS_THIS)) {
 			// Put 'this' in a local var.
 			m_env.add_local("this", as_value(fn.this_ptr));
 		}
 
 		// Init arguments array, if it's going to be needed.
-		boost::intrusive_ptr<Array_as>	arg_array;
-		if ((m_function2_flags & PRELOAD_ARGUMENTS) || ! (m_function2_flags & SUPPRESS_ARGUMENTS))
-		{
+        as_object* arg_array = 0;
+
+		if ((m_function2_flags & PRELOAD_ARGUMENTS) || 
+                !(m_function2_flags & SUPPRESS_ARGUMENTS)) {
 			arg_array = getArguments(*this, fn, caller);
 		}
 
-		if (m_function2_flags & PRELOAD_ARGUMENTS)
-		{
+		if (m_function2_flags & PRELOAD_ARGUMENTS) {
 			// preload 'arguments' into a register.
-			m_env.setRegister(current_reg, as_value(arg_array.get()));
+			m_env.setRegister(current_reg, as_value(arg_array));
 			current_reg++;
 		}
 
-		if (m_function2_flags & SUPPRESS_ARGUMENTS)
-		{
-			// Don't put 'arguments' in a local var.
-		}
-		else
-		{
+		if (!(m_function2_flags & SUPPRESS_ARGUMENTS)) {
 			// Put 'arguments' in a local var.
-			m_env.add_local("arguments", as_value(arg_array.get()));
+			m_env.add_local("arguments", as_value(arg_array));
 		}
 
-		if ( (m_function2_flags & PRELOAD_SUPER) && swfversion > 5)
-		{
+		if ((m_function2_flags & PRELOAD_SUPER) && swfversion > 5) {
 			// Put 'super' in a register (SWF6+ only).
 			// TOCHECK: should we still set it if not available ?
 			if ( super ) {
@@ -264,85 +240,69 @@ swf_function::operator()(const fn_call& fn)
 			}
 		}
 
-		if (m_function2_flags & SUPPRESS_SUPER)
-		{
-			// Don't put 'super' in a local var.
-		}
-		else if ( super && swfversion > 5 )
-		{
-			// TOCHECK: should we still set it if unavailable ?
-			// Put 'super' in a local var (SWF6+ only)
-			m_env.add_local("super", as_value(super));
+		if (!(m_function2_flags & SUPPRESS_SUPER)) {
+		    if (super && swfversion > 5) {
+                // TOCHECK: should we still set it if unavailable ?
+                // Put 'super' in a local var (SWF6+ only)
+                m_env.add_local("super", as_value(super));
+            }
 		}
 
-		if (m_function2_flags & PRELOAD_ROOT) 
-		{
+		if (m_function2_flags & PRELOAD_ROOT) {
 			// Put '_root' (if any) in a register.
 			DisplayObject* tgtch = m_env.get_target();
-			if ( tgtch )
-			{
-				// NOTE: _lockroot will be hanlded by getAsRoot()
+			if (tgtch) {
+				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = tgtch->getAsRoot();
 				m_env.setRegister(current_reg, as_value(r));
-				current_reg++;
+				++current_reg;
 			}
 		}
 
-		if (m_function2_flags & PRELOAD_PARENT)
-		{
-			// Put '_parent' in a register.
-			as_value parent = m_env.get_variable("_parent");
-			//m_env.local_register(current_reg) = parent;
-			m_env.setRegister(current_reg, parent);
-			current_reg++;
+		if (m_function2_flags & PRELOAD_PARENT) {
+			DisplayObject* tgtch = m_env.get_target();
+            if (tgtch) {
+                as_object* parent = tgtch->get_parent();
+                m_env.setRegister(current_reg, parent);
+                ++current_reg;
+            }
 		}
 
-		if (m_function2_flags & PRELOAD_GLOBAL)
-		{
+		if (m_function2_flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			//m_env.local_register(current_reg).set_as_object(global);
 			m_env.setRegister(current_reg, as_value(global));
-			current_reg++;
+			++current_reg;
 		}
 
 		// Handle the explicit args.
 		// This must be done after implicit ones,
-		// as the explicit override the implicits: see swfdec/definefunction2-override
-		for (size_t i=0, n=m_args.size(); i<n; ++i)
-		{
-			if ( ! m_args[i].m_register ) // not a register, declare as local
-			{
-				if ( i < fn.nargs )
-				{
+		// as the explicit override the implicits:
+        // see swfdec/definefunction2-override
+		for (size_t i = 0, n = m_args.size(); i < n; ++i) {
+            // not a register, declare as local
+			if (!m_args[i].m_register) {
+				if (i < fn.nargs) {
 					// Conventional arg passing: create a local var.
 					m_env.add_local(m_args[i].m_name, fn.arg(i));
 				}
-				else
-				{
+				else {
 					// Still declare named arguments, even if
 					// they are not passed from caller
 					// See bug #22203
 					m_env.declare_local(m_args[i].m_name);
 				}
 			}
-			else
-			{
-				if ( i < fn.nargs )
-				{
+			else {
+				if (i < fn.nargs) {
 					// Pass argument into a register.
-					int	reg = m_args[i].m_register;
-					//m_env.local_register(reg) = fn.arg(i);
+					const int reg = m_args[i].m_register;
 					m_env.setRegister(reg, fn.arg(i));
 				}
-				else
-				{
-					// The argument was not passed, no
-					// need to setup a register I guess..
-				}
+                // If no argument was passed, no need to setup a register
+                // I guess.
 			}
 		}
-
 	}
 
 	as_value result;
@@ -401,5 +361,26 @@ swf_function::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
+namespace {
+
+as_object* 
+getArguments(swf_function& callee, const fn_call& fn,
+        as_object* caller)
+{ 
+
+	as_object* arguments = getGlobal(fn)->createArray();
+	for (size_t i = 0; i < fn.nargs; ++i) {
+		arguments->callMethod(NSV::PROP_PUSH, fn.arg(i));
+	}
+
+	arguments->init_member(NSV::PROP_CALLEE, &callee);
+
+	arguments->init_member(NSV::PROP_CALLER, caller);
+
+	return arguments;
+
+}
+
+}
 } // end of gnash namespace
 

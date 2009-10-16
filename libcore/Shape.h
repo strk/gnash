@@ -39,17 +39,17 @@ class Shape : public DisplayObject
 
 public:
 
-    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent, int id)
+    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent)
         :
-        DisplayObject(parent, id),
+        DisplayObject(parent),
         _shape(sh)
     {
         assert(_shape.get());
     }
 
-	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent, int id)
+	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent)
 		:
-		DisplayObject(parent, id),
+		DisplayObject(parent),
 		_def(def)
 	{
 	    assert(_def);
@@ -57,7 +57,7 @@ public:
 
 	virtual void display(Renderer& renderer);
 
-    virtual rect getBounds() const {
+    virtual SWFRect getBounds() const {
         return _def ? _def->bounds() : _shape->getBounds();
     }
     

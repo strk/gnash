@@ -362,18 +362,18 @@ private:
 class BoundsFinder
 {
 public:
-    BoundsFinder(rect& b) : _bounds(b) {}
+    BoundsFinder(SWFRect& b) : _bounds(b) {}
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
         if ( ch->unloaded() ) return;
-        rect chb = ch->getBounds();
+        SWFRect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
     }
 
 private:
-    rect& _bounds;
+    SWFRect& _bounds;
 };
 
 /// A DisplayList visitor used to extract script DisplayObjects
@@ -415,9 +415,9 @@ private:
 
 
 MovieClip::MovieClip(const movie_definition* const def, Movie* r,
-        DisplayObject* parent, int id)
+        DisplayObject* parent)
     :
-    DisplayObjectContainer(parent, id),
+    DisplayObjectContainer(parent),
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
@@ -454,7 +454,7 @@ MovieClip::~MovieClip()
 }
 
 int
-MovieClip::getMovieVersion() const
+MovieClip::getDefinitionVersion() const
 {
     return _swf->version();
 }
@@ -486,91 +486,19 @@ MovieClip::getDisplayObjectAtDepth(int depth)
     return _displayList.getDisplayObjectAtDepth(depth);
 }
 
-// Set *val to the value of the named member and
-// return true, if we have the named member.
-// Otherwise leave *val alone and return false.
+/// This handles special properties of MovieClip.
+//
+/// The only genuine special properties are DisplayList members. These
+/// are accessible as properties and are enumerated, but not ownProperties
+/// of a MovieClip.
+//
+/// The TextField variables should probably be handled in a more generic
+/// way.
 bool
-MovieClip::get_member(string_table::key name_key, as_value* val,
-    string_table::key nsname)
+MovieClip::getTextFieldVariables(string_table::key name_key, as_value& val)
 {
-    // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a DisplayObject protected method take
-    //       care of these ?
-    //       Duplicates code in DisplayObject::getPathElementSeparator too.
-    if (getMovieVersion() > 4 && name_key == NSV::PROP_uROOT)
-    {
-        // getAsRoot() will take care of _lockroot
-        val->set_as_object(getAsRoot());
-        return true;
-    }
-
-    // NOTE: availability of _global doesn't depend on VM version
-    //             but on actual movie version. Example: if an SWF4 loads
-    //             an SWF6 (to, say, _level2), _global will be unavailable
-    //             to the SWF4 code but available to the SWF6 one.
-    //
-    if (getMovieVersion() > 5 && name_key == NSV::PROP_uGLOBAL) 
-    {
-        // The "_global" ref was added in SWF6
-        val->set_as_object(getGlobal(*this));
-        return true;
-    }
 
     const std::string& name = getStringTable(*this).value(name_key);
-
-    movie_root& mr = getRoot(*this);
-    unsigned int levelno;
-    if ( mr.isLevelTarget(name, levelno) )
-    {
-        Movie* mo = mr.getLevel(levelno).get();
-        if ( mo )
-        {
-            val->set_as_object(mo);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    // Own members take precendence over display list items 
-    // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
-    as_object* owner = NULL;
-    Property* prop = findProperty(name_key, nsname, &owner);
-    if ( prop && owner == this ) 
-    {
-        try { *val = prop->getValue(*this); }
-        catch (ActionLimitException&) { throw; }
-        catch (ActionTypeError& ex) {
-            log_error(_("Caught exception: %s"), ex.what());
-            return false;
-        }
-        return true;
-    }
-
-    // Try items on our display list.
-    DisplayObject* ch;
-    if (getSWFVersion(*this) >= 7 ) {
-        ch = _displayList.getDisplayObjectByName(name);
-    }
-    else ch = _displayList.getDisplayObjectByName_i(name);
-    if (ch) {
-            // Found object.
-
-            // If the object is an ActionScript referenciable one we
-            // return it, otherwise we return ourselves
-            if ( ch->isActionScriptReferenceable() )
-            {
-                val->set_as_object(ch);
-            }
-            else
-            {
-                val->set_as_object(this);
-            }
-
-            return true;
-    }
 
     // Try textfield variables
     TextFields* etc = get_textfield_variable(name);
@@ -582,27 +510,11 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
             boost::intrusive_ptr<TextField> tf = i->get();
             if ( tf->getTextDefined() )
             {
-                val->set_string(tf->get_text_value());
+                val = tf->get_text_value();
                 return true;
             }
         }
     }
-
-    // Inherited members come last 
-    // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
-    if ( prop )
-    {
-        assert(owner != this);
-        try { *val = prop->getValue(*this); }
-        catch (ActionLimitException&) { throw; }
-        catch (ActionTypeError& ex)
-        {
-                log_error(_("Caught exception: %s"), ex.what());
-                return false;
-        }
-        return true;
-    }
-
 
     return false;
 
@@ -685,47 +597,15 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 }
 
 DisplayObject*
-MovieClip::add_empty_movieclip(const std::string& name, int depth)
+MovieClip::addDisplayListObject(DisplayObject* obj, int depth)
 {
-    MovieClip* movieclip = new MovieClip(0, _swf, this, 0);
-    movieclip->set_name(name);
-    movieclip->setDynamic();
-
     // TODO: only call set_invalidated if this DisplayObject actually overrides
     //             an existing one !
     set_invalidated(); 
-
-    _displayList.placeDisplayObject(movieclip, depth);     
-
-    return movieclip;
+    _displayList.placeDisplayObject(obj, depth);     
+    return obj;
 }
 
-boost::intrusive_ptr<DisplayObject>
-MovieClip::add_textfield(const std::string& name, int depth, int x, int y,
-        float width, float height)
-{
-    
-    // Set textfield bounds
-    rect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
-
-    // Create an instance
-    boost::intrusive_ptr<DisplayObject> txt_char = new TextField(this, bounds);
-
-    // Give name and mark as dynamic
-    txt_char->set_name(name);
-    txt_char->setDynamic();
-
-    // Set _x and _y
-    SWFMatrix txt_matrix;
-    txt_matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
-    // update caches (although shouldn't be needed as we only set translation)
-    txt_char->setMatrix(txt_matrix, true); 
-
-    // Here we add the DisplayObject to the displayList.    
-    _displayList.placeDisplayObject(txt_char.get(), depth); 
-
-    return txt_char;
-}
 
 boost::intrusive_ptr<MovieClip> 
 MovieClip::duplicateMovieClip(const std::string& newname, int depth,
@@ -745,7 +625,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     }
 
     boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(_def.get(),
-            _swf, parent, get_id());
+            _swf, parent);
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();
@@ -785,10 +665,11 @@ MovieClip::queueActions(ActionList& actions)
         const action_buffer* buf = *it;
         queueAction(*buf);
     }
+
 }
 
 bool
-MovieClip::on_event(const event_id& id)
+MovieClip::notifyEvent(const event_id& id)
 {
     testInvariant();
 
@@ -910,34 +791,16 @@ MovieClip::on_event(const event_id& id)
 as_object*
 MovieClip::get_path_element(string_table::key key)
 {
-    as_object* obj = getPathElementSeparator(key);
+    as_object* obj = DisplayObject::get_path_element(key);
     if (obj) return obj;
 
-    std::string name = getStringTable(*this).value(key);
-
     // See if we have a match on the display list.
-    DisplayObject* ch;
-    if (getSWFVersion(*this) >= 7 ) ch = 
-        _displayList.getDisplayObjectByName(name);
+    DisplayObject* ch = getDisplayListObject(key);
+    if (ch) return ch;
 
-    else ch = _displayList.getDisplayObjectByName_i(name);
-
-            // TODO: should we check for isActionScriptReferenceable here ?
-    if ( ch )
-    {
-        // If the object is an ActionScript referenciable one we
-        // return it, otherwise we return ourselves
-        if ( ch->isActionScriptReferenceable() ) return ch;
-        else return this;
-    }
-
+    std::string name = getStringTable(*this).value(key);
+    
     // See if it's a member
-
-    // NOTE: direct use of the base class's get_member avoids
-    //             triggering a call to MovieClip::get_member
-    //             which would scan the child DisplayObjects again
-    //             w/out a need for it
-
     as_value tmp;
     if ( !as_object::get_member(key, &tmp, 0) )
     {
@@ -949,15 +812,15 @@ MovieClip::get_path_element(string_table::key key)
     }
     if ( tmp.is_sprite() )
     {
-        return tmp.to_sprite(true);
+        return tmp.toDisplayObject(true);
     }
 
-    return tmp.to_object(*getGlobal(*this)).get();
+    return tmp.to_object(*getGlobal(*this));
 }
 
 bool
-MovieClip::set_member(string_table::key name,
-        const as_value& val, string_table::key nsname, bool ifFound)
+MovieClip::setTextFieldVariables(string_table::key name, const as_value& val,
+        string_table::key /*nsname*/)
 {
 
     bool found = false;
@@ -989,9 +852,6 @@ MovieClip::set_member(string_table::key name,
         log_debug(_("it's NOT a Text Variable"));
     }
 #endif
-
-    // If that didn't work call the default set_member
-    if (as_object::set_member(name, val, nsname, ifFound)) found=true;
 
     return found;
 }
@@ -1390,16 +1250,16 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth,
 
 std::auto_ptr<GnashImage>
 MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-            DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
+            DisplayObject::BlendMode /* bm */, const SWFRect& /* clipRect */,
             bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }
 
 void
-MovieClip::attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth)
+MovieClip::attachBitmap(BitmapData_as* bd, int depth)
 {
-    DisplayObject* ch = new Bitmap(bd, this, 0);
+    DisplayObject* ch = new Bitmap(bd, this);
     attachCharacter(*ch, depth, 0);
 }
 
@@ -1427,8 +1287,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     
     if (existing_char) return NULL;
 
-    boost::intrusive_ptr<DisplayObject> ch =
-        cdef->createDisplayObject(this, tag->getID());
+    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1506,8 +1365,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         return;
     }
 
-    boost::intrusive_ptr<DisplayObject> ch = 
-        cdef->createDisplayObject(this, tag->getID());
+    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
 
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?
@@ -1548,14 +1406,6 @@ MovieClip::replace_display_object(DisplayObject* ch, int depth,
     assert(ch);
     _displayList.replaceDisplayObject(ch, depth,
             use_old_cxform, use_old_matrix);
-}
-
-int
-MovieClip::get_id_at_depth(int depth)
-{
-    DisplayObject* ch = _displayList.getDisplayObjectAtDepth(depth);
-    if ( ! ch ) return -1;
-    return ch->get_id();
 }
 
 void
@@ -1937,6 +1787,30 @@ MovieClip::get_textfield_variable(const std::string& name)
 } 
 
 
+DisplayObject*
+MovieClip::getDisplayListObject(string_table::key key)
+{
+
+    const std::string& name = getStringTable(*this).value(key);
+
+    // Try items on our display list.
+    DisplayObject* ch;
+    if (getSWFVersion(*this) >= 7 ) {
+        ch = _displayList.getDisplayObjectByName(name);
+    }
+    else ch = _displayList.getDisplayObjectByName_i(name);
+    if (!ch) return 0;
+
+    // Found object.
+
+    // If the object is an ActionScript referenciable one we
+    // return it, otherwise we return ourselves
+    if (ch->isActionScriptReferenceable()) {
+        return ch;
+    }
+    return this;
+}
+
 void 
 MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, 
     bool force)
@@ -1966,7 +1840,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
     _displayList.add_invalidated_bounds(ranges, force||m_invalidated);
 
     /// Add drawable.
-    rect bounds;
+    SWFRect bounds;
     bounds.expand_to_transformed_rect(getWorldMatrix(), _drawable.getBounds());
     ranges.add(bounds.getRange());
 
@@ -2082,7 +1956,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         constructAsScriptObject(); 
 
         // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
-        // testsuite/swfdec/clone-sprite-events.c not to call on_event
+        // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
         // immediately.
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
     }
@@ -2136,7 +2010,7 @@ MovieClip::constructAsScriptObject()
 
             // Call event handlers *after* setting up the __proto__
             // but *before* calling the registered class constructor
-            on_event(event_id::CONSTRUCT);
+            notifyEvent(event_id::CONSTRUCT);
             eventHandlersInvoked = true;
 
             int swfversion = getSWFVersion(*this);
@@ -2181,7 +2055,7 @@ MovieClip::constructAsScriptObject()
     /// Invoke event handlers if not done yet
     if ( ! eventHandlersInvoked )
     {
-        on_event(event_id::CONSTRUCT);
+        notifyEvent(event_id::CONSTRUCT);
     }
 }
 
@@ -2304,7 +2178,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     std::string postdata;
     
     // Encode our vars for sending.
-    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(postdata);
+    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*this, postdata);
 
     try 
     {
@@ -2360,7 +2234,7 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
     }
 
     // We want to call a clip-event too if available, see bug #22116
-    on_event(event_id::DATA);
+    notifyEvent(event_id::DATA);
 }
 
 /*private*/
@@ -2428,13 +2302,13 @@ MovieClip::removeMovieClip()
 
 }
 
-rect
+SWFRect
 MovieClip::getBounds() const
 {
-    rect bounds;
+    SWFRect bounds;
     BoundsFinder f(bounds);
     const_cast<DisplayList&>(_displayList).visitAll(f);
-    rect drawableBounds = _drawable.getBounds();
+    SWFRect drawableBounds = _drawable.getBounds();
     bounds.expand_to_rect(drawableBounds);
     
     return bounds;
@@ -2592,7 +2466,7 @@ MovieClip::getAsRoot()
     // SWF version is > 6
     int topSWFVersion = getRoot(*this).getRootMovie().version();
 
-    if (getMovieVersion() > 6 || topSWFVersion > 6) {
+    if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;
     }
 

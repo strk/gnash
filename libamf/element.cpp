@@ -234,7 +234,7 @@ Element::getDataSize() const
 	return _buffer->size();
     }
     return 0;
-};
+}
 
 /// \brief Cast the data in this Element to a double value.
 ///
@@ -292,7 +292,7 @@ Element::to_string() const
 	return "NULL";
     }
     return 0;
-};
+}
 
 /// \brief Cast the data in this Element to a boolean value.
 ///
@@ -305,7 +305,7 @@ Element::to_bool() const
 	return *(reinterpret_cast<bool *>(_buffer->reference()));
     }
     return false;
-};
+}
 
 /// \brief Cast the data in this Element to an real pointer to data.
 ///
@@ -318,7 +318,7 @@ Element::to_reference()
 	return _buffer->reference();
     }
     return 0;
-};
+}
 
 const boost::uint8_t *
 Element::to_reference() const
@@ -328,7 +328,7 @@ Element::to_reference() const
 	return _buffer->reference();
     }
     return 0;
-};
+}
 
 /// \brief Test equivalance against another Element.
 ///	This compares all the data and the data type in the
@@ -397,7 +397,7 @@ Element::operator==(bool x)
 	*_buffer += x;
     }
     return false;
-};
+}
 
 size_t
 Element::calculateSize()
@@ -538,7 +538,7 @@ Element::operator[](size_t index)
     
     boost::shared_ptr<Element> el; 
     return el;
-};
+}
 
 /// \brief Make this Element be the same as another Element.
 ///

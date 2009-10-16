@@ -154,6 +154,7 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
 	    DejaGnu.fail("[ln:"+here.lineNumber+"]System.security 'isActive' is not a function");
 	}
     
+#if !flash6
     // This was set to xfail in the ming, but seems to pass now in both the pp
     // and gnash
     //xcheck_equals ( typeof(Accessibility.isActive()), 'boolean' );
@@ -164,6 +165,7 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
 	} else {
 	    DejaGnu.fail("[ln:"+here.lineNumber+"]Accessibility.isActive is not a Bool.");
 	}
+#end
 #end
 
 	if (untyped Accessibility.hasOwnProperty("updateProperties")) {
@@ -216,6 +218,7 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
     // instantiated
     
     // Accessibility object can't be instantiated !
+#if !flash6
     var accObj = untyped __new__(Accessibility);
     //check_equals(accObj, undefined);
     if (untyped __typeof__(accObj == 'undefined')) {
@@ -223,6 +226,7 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
     } else {
         DejaGnu.fail("[ln:"+here.lineNumber+"]Unexpected return with call to new on Accessibility");
     }
+#end
 #end
 
         // Call this after finishing all tests. It prints out the totals.

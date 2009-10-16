@@ -72,7 +72,7 @@ color_class_init(as_object& where, const ObjectURI& uri)
             attachColorInterface, 0, uri);
 
     as_object* proto =
-        cl->getMember(NSV::PROP_PROTOTYPE).to_object(*getGlobal(where)).get();
+        cl->getMember(NSV::PROP_PROTOTYPE).to_object(*getGlobal(where));
 
     if (!proto) return;
 
@@ -274,7 +274,8 @@ getTarget(as_object* obj, const fn_call& fn)
     const as_value& target = obj->getMember(NSV::PROP_TARGET);
     MovieClip* sp = target.to_sprite();
     if (sp) return sp;
-    DisplayObject* d = fn.env().find_target(target.to_string());
+    as_object* o = fn.env().find_target(target.to_string());
+    DisplayObject* d = getDisplayObject(o);
     if (d) return d->to_movie();
     return 0;
 }

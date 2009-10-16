@@ -34,7 +34,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "gettext.h"
 #include "bzrversion.h"
 
 //#include "cvm.h"
@@ -78,11 +77,10 @@ extern "C"{
 
 #include "handler.h"
 #include "cache.h"
-#include "gettext.h"
 #include "cygnal.h"
 
 #ifdef ENABLE_NLS
-#include <locale.h>
+# include <locale>
 #endif
 
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -464,10 +462,10 @@ main(int argc, char *argv[])
 	  case 'h':
 	      version_and_copyright();
 	      usage();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	  case 'V':
 	      version_and_copyright();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	  case 't':
 	      crcfile.setTestingFlag(true);
 	      break;
@@ -497,7 +495,7 @@ main(int argc, char *argv[])
 	      break;
 	  case 'd':
 	      crcfile.dump();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	      break;
 	  default:
 	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
@@ -601,7 +599,7 @@ cntrlc_handler (int sig)
 {
     log_network(_("Got a %d interrupt"), sig);
 //    sigaction (SIGINT, &act, NULL);
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 // Trap SIGHUP so we can 
@@ -715,7 +713,9 @@ admin_handler(Network::thread_params_t *args)
 		      clock_gettime (CLOCK_REALTIME, &now);
 		      // Incoming que stats
  		      CQue::que_stats_t *stats = hand->statsin();
-		      float diff = (float)((now.tv_sec - stats->start.tv_sec) + ((now.tv_nsec - stats->start.tv_nsec)/1e9));
+		      float diff = static_cast<float>(((now.tv_sec -
+		      stats->start.tv_sec) + ((now.tv_nsec -
+		      stats->start.tv_nsec)/1e9)));
 		      response << fd
 			       << "," << stats->totalbytes
 			       << "," << diff

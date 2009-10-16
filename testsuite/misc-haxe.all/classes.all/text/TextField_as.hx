@@ -107,24 +107,6 @@ class TextField_as {
 		DejaGnu.fail("[line "+here.lineNumber+"] ");
 	}
 #end
-	 //xcheck(!_level0.__shared_assets.instance1._xtrace_win instanceof TextField);
-#if !flash9
-	//if(!untyped __instanceof__(_level0.__shared_assets.instance1._xtrace_win, TextField)) {
-		//DejaGnu.xpass("[line "+here.lineNumber+"] THIS IS AN EXPECTED FAILURE!!!");
-	//} else {
-		//DejaGnu.xfail("[line "+here.lineNumber+"] ");
-	//}
-	 //xcheck_equals(typeof(_level0.__shared_assets.instance1._xtrace_win),
-				//"movieclip");
-	if(typeof(untyped _level0.__shared_assets.instance1._xtrace_win) == "movieclip") {
-		DejaGnu.xpass("[line "+here.lineNumber+"] ");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] ");
-	}
-	 //note(_level0.__shared_assets.instance1._xtrace_win.toString());
-	DejaGnu.note(untyped _level0.__shared_assets.instance1._xtrace_win.toString());
-	//#endif
-#end //if !flash9
 #end
 
 	//check_equals(typeof(TextField), 'function');
@@ -242,115 +224,7 @@ class TextField_as {
 		DejaGnu.fail("[line "+here.lineNumber+"] TextField.prototype._listeners.length should be 0, is "+untyped TextField.prototype._listeners.length);
 	}
 #end
-	//// NOTE: the following will be true after a call to createTextField ! Seek forward to see..
-	//xcheck( !TextField.prototype.hasOwnProperty('background'));
-	if(!untyped TextField.prototype.hasOwnProperty('background')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'background'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'background'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('backgroundColor'));
-	if(!untyped TextField.prototype.hasOwnProperty('backgroundColor')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'backgroundColor'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'backgroundColor'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('autoSize') );
-	if(!untyped TextField.prototype.hasOwnProperty('autoSize')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'autoSize'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'autoSize'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('border') );
-	if(!untyped TextField.prototype.hasOwnProperty('border')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'border'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'border'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
-	if(!untyped TextField.prototype.hasOwnProperty('borderColor')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'borderColor'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'borderColor'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
-	if(!untyped TextField.prototype.hasOwnProperty('embedFonts')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'embedFonts'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'embedFonts'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('htmlText') );
-	if(!untyped TextField.prototype.hasOwnProperty('htmlText')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'htmlText'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'htmlText'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('length') );
-	if(!untyped TextField.prototype.hasOwnProperty('length')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'length'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'length'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('maxChars') );
-	if(!untyped TextField.prototype.hasOwnProperty('maxChars')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxChars'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxChars'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('multiline') );
-	if(!untyped TextField.prototype.hasOwnProperty('multiline')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'multiline'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'multiline'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('restrict') );
-	if(!untyped TextField.prototype.hasOwnProperty('restrict')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'restrict'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'restrict'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('selectable') );
-	if(!untyped TextField.prototype.hasOwnProperty('selectable')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'selectable'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'selectable'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('text') );
-	if(!untyped TextField.prototype.hasOwnProperty('text')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'text'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'text'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('textColor') );
-	if(!untyped TextField.prototype.hasOwnProperty('textColor')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'textColor'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textColor'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('textHeight') ); // should be available on first instantiation
-	if(!untyped TextField.prototype.hasOwnProperty('textHeight')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'textHeight'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textHeight'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('textWidth') ); // should be available on first instantiation
-	if(!untyped TextField.prototype.hasOwnProperty('textWidth')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'textWidth'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'textWidth'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('type') ); // should be available on first instantiation
-	if(!untyped TextField.prototype.hasOwnProperty('type')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'type'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'type'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('wordWrap') );
-	if(!untyped TextField.prototype.hasOwnProperty('wordWrap')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'wordWrap'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'wordWrap'");
-	}
+
 #if flash9
 	//xcheck( !TextField.prototype.hasOwnProperty('bottomScrollV') );
 	if(!untyped TextField.prototype.hasOwnProperty('bottomScrollV')) {
@@ -393,55 +267,6 @@ class TextField_as {
 		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'scrollV'");
 	} else {
 		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scrollV'");
-	}
-#else
-	//xcheck( !TextField.prototype.hasOwnProperty('bottomScroll') );
-	if(!untyped TextField.prototype.hasOwnProperty('bottomScroll')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'bottomScroll'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'bottomScroll'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('hscroll') );
-	if(!untyped TextField.prototype.hasOwnProperty('hscroll')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'hscroll'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'hscroll'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('html') );
-	if(!untyped TextField.prototype.hasOwnProperty('html')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'html'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'html'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('maxhscroll') );
-	if(!untyped TextField.prototype.hasOwnProperty('maxhscroll')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxhscroll'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxhscroll'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('maxscroll') );
-	if(!untyped TextField.prototype.hasOwnProperty('maxscroll')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'maxscroll'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'maxscroll'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('password') );
-	if(!untyped TextField.prototype.hasOwnProperty('password')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'password'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'password'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('scroll') );
-	if(!untyped TextField.prototype.hasOwnProperty('scroll')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'scroll'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'scroll'");
-	}
-	//xcheck( !TextField.prototype.hasOwnProperty('variable') );
-	if(!untyped TextField.prototype.hasOwnProperty('variable')) {
-		DejaGnu.xpass("[line "+here.lineNumber+"] TextField.prototype has own property 'variable'");
-	} else {
-		DejaGnu.xfail("[line "+here.lineNumber+"] TextField.prototype does not have own property 'variable'");
 	}
 #end
 
@@ -1465,9 +1290,9 @@ class TextField_as {
 		}
 		//xcheck(!tf.__proto__.hasOwnProperty('_highquality'));
 		if(!untyped tf.__proto__.hasOwnProperty('_highquality')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_highquality'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_highquality'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_highquality'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_highquality'");
 		}
 		//check_equals(tf._highquality, 1);
 		if(untyped tf._highquality == 1) {
@@ -2133,9 +1958,9 @@ class TextField_as {
 		}
 		//xcheck(!tf.__proto__.hasOwnProperty('_name'));
 		if(!untyped tf.__proto__.hasOwnProperty('_name')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_name'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_name'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_name'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_name'");
 		}
 		//check_equals(tf._name, 'tf');
 		if(untyped tf._name == 'tf') {
@@ -2242,9 +2067,9 @@ class TextField_as {
 		}
 		//xcheck(!tf.__proto__.hasOwnProperty('_parent'));
 		if(!untyped tf.__proto__.hasOwnProperty('_parent')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_parent'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_parent'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_parent'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_parent'");
 		}
 		//check_equals(tf._parent, _root);
 		if(untyped tfref._parent == _root) {
@@ -2496,9 +2321,9 @@ class TextField_as {
 		}
 		//xcheck(!tf.__proto__.hasOwnProperty('_quality'));
 		if(!untyped tf.__proto__.hasOwnProperty('_quality')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_quality'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_quality'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_quality'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_quality'");
 		}
 		//check(!tf.__proto__.__proto__.hasOwnProperty('_quality'));
 		if(!untyped tf.__proto__.__proto__.hasOwnProperty('_quality')) {
@@ -2627,9 +2452,9 @@ class TextField_as {
 		_root.createTextField("tf", 99, 10, 10, 500, 500);
 		//xcheck_equals(typeof(tf._rotation), 'number');
 		if(typeof(untyped tf._rotation) == 'number') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._rotation is 'number'");
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._rotation is 'number'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._rotation should be 'number', is "+typeof(untyped tf._rotation));
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._rotation should be 'number', is "+typeof(untyped tf._rotation));
 		}
 		//check(!tf.hasOwnProperty('_rotation'));
 		if(!untyped tf.hasOwnProperty('_rotation')) {
@@ -2645,9 +2470,9 @@ class TextField_as {
 		}
 		//xcheck_equals(tf._rotation, 0);
 		if(untyped tf._rotation == 0) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._rotation is 0");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._rotation is 0");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._rotation should be 0, is "+untyped tf._rotation);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._rotation should be 0, is "+untyped tf._rotation);
 		}
 		//tf._rotation = 10;
 		untyped tf._rotation = 10;
@@ -2785,9 +2610,9 @@ class TextField_as {
 #if !flash9
 		//xcheck_equals(typeof(tf._soundbuftime), 'number');
 		if(typeof(untyped tf._soundbuftime) == 'number') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._soundbuftime is 'number'");
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._soundbuftime is 'number'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._soundbuftime should be 'number', is "+typeof(untyped tf._soundbuftime));
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._soundbuftime should be 'number', is "+typeof(untyped tf._soundbuftime));
 		}
 		//check( ! tf.hasOwnProperty('_soundbuftime') ); 
 		if(!untyped tf.hasOwnProperty('_soundbuftime')) {
@@ -2834,12 +2659,14 @@ class TextField_as {
 		} else {
 			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'tabEnabled'");
 		}
+#if !flash9
 		//check( ! tf.__proto__.hasOwnProperty('tabEnabled') ); 
 		if(!untyped tf.__proto__.hasOwnProperty('tabEnabled')) {
 			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property 'tabEnabled'");
 		} else {
 			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property 'tabEnabled'");
 		}
+#end
 		//tf.tabEnabled = false;
 		untyped tf.tabEnabled = false;
 		//check_equals(tf.tabEnabled, false);
@@ -2877,10 +2704,10 @@ class TextField_as {
 			DejaGnu.fail("[line "+here.lineNumber+"] tf has own property 'tabIndex'");
 		}
 		//check( ! tf.__proto__.hasOwnProperty('tabIndex') ); 
-		if(!untyped tf.__proto__.hasOwnProperty('tabIndex')) {
-			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property 'tabIndex'");
+		if(untyped tf.__proto__.hasOwnProperty('tabIndex')) {
+			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ has own property 'tabIndex'");
 		} else {
-			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property 'tabIndex'");
+			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ does not have own property 'tabIndex'");
 		}
 		//tf.tabIndex = 9;
 		untyped tf.tabIndex = 9;
@@ -2911,9 +2738,9 @@ class TextField_as {
 		///TODO: This test fails...
 		//check( ! tf.__proto__.hasOwnProperty('_target') ); 
 		if(!untyped tf.__proto__.hasOwnProperty('_target')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_target'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_target'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_target'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_target'");
 		}
 		//check_equals(tf._target, '/tf');
 		if(untyped tf._target == '/tf') {
@@ -3184,9 +3011,9 @@ class TextField_as {
 #if !flash9
 		//xcheck_equals(typeof(tf._url), 'string');
 		if(typeof(untyped tf._url) == 'string') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] typeof tf._url is 'string'");
+			DejaGnu.pass("[line "+here.lineNumber+"] typeof tf._url is 'string'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] typeof tf._url should be 'string', is "+typeof(untyped tf._url));
+			DejaGnu.fail("[line "+here.lineNumber+"] typeof tf._url should be 'string', is "+typeof(untyped tf._url));
 		}
 		//check( ! tf.hasOwnProperty('_url') ); 
 		if(!untyped tf.hasOwnProperty('_url')) {
@@ -3202,17 +3029,17 @@ class TextField_as {
 		}
 		//xcheck_equals(tf._url, _root._url);
 		if(untyped tf._url == _root._url) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._url is _root._url");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._url is _root._url");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
 		}
 		//tf._url = "fake url";
 		untyped tf._url = "fake url";
 		//xcheck_equals(tf._url, _root._url); // read-only
 		if(untyped tf._url == _root._url) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._url is _root._url");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._url is _root._url");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._url should be _root._url, is "+untyped tf._url);
 		}
 #end
 	}
@@ -3331,54 +3158,6 @@ class TextField_as {
 			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'back-propagated'");
 		} else {
 			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'back-propagated', is "+untyped tf.text);
-		}
-		//tf.text = "back-to-object"; // instead, assigning to TextField.text updates the object
-		untyped tf.text = "back-to-object";
-		///TODO: This test fails...
-		//check_equals(o.t, "back-to-object");  
-		if(untyped o.t == 'back-to-object') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] o.t is 'back-to-object'");
-		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] o.t should be 'back-to-object', is "+untyped o.t);
-		}
-		//o.t = "from object again"; // but updates to the object still don't update the TextField
-		o.t = "from object again";
-		//check_equals(tf.text, "back-to-object");  // assigning to the object doesn't trigger update of text ?
-		if(untyped tf.text == 'back-to-object') {
-			DejaGnu.pass("[line "+here.lineNumber+"] tf.text is 'back-to-object'");
-		} else {
-			DejaGnu.fail("[line "+here.lineNumber+"] tf.text should be 'back-to-object', is "+untyped tf.text);
-		}
-		//tf.variable = "_level0.o.t"; // We re-assign TextField.variable, now the variable exists
-		untyped tf.variable = "_level0.o.t";
-		//xcheck_equals(tf.text, "from object again");  // this time the TextField.text is updated
-		if(untyped tf.text == 'from object again') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.text is 'from object again'");
-		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.text should be 'from object again', is "+untyped tf.text);
-		}
-		//check_equals(o.t, "from object again");
-		if(untyped o.t == 'from object again') {
-			DejaGnu.pass("[line "+here.lineNumber+"] o.t is 'from object again'");
-		} else {
-			DejaGnu.fail("[line "+here.lineNumber+"] o.t should be 'from object again', is "+untyped o.t);
-		}
-		//o.t = "and forever";
-		untyped o.t = "and forever";
-		//xcheck_equals(tf.text, "from object again"); // but updating o.t still doesn't trigger update of the text ?
-		if(untyped tf.text == 'from object again') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.text is 'from object again'");
-		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.text should be 'from object again', is "+untyped tf.text);
-		}
-		//tf.text = "and forever back";
-		untyped tf.text = "and forever back";
-		///TODO: This test fails...
-		//check_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
-		if(untyped o.t == 'and forever back') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] o.t is 'and forever back'");
-		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] o.t should be 'and forever back', is "+untyped o.t);
 		}
 #end
 	}
@@ -3902,9 +3681,9 @@ class TextField_as {
 		///TODO: This test fails...
 		//check( ! tf.__proto__.hasOwnProperty('_xmouse') );
 		if(!untyped tf.__proto__.hasOwnProperty('_xmouse')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_xmouse'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_xmouse'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_xmouse'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_xmouse'");
 		}
 		//currXmouse = tf._xmouse; // unsafe, if user moves the mouse while running the test
 		var currXmouse = untyped tf._xmouse;
@@ -3994,9 +3773,9 @@ class TextField_as {
 		///TODO: This test fails...
 		//check( ! tf.__proto__.hasOwnProperty('_xscale') );
 		if(!untyped tf.__proto__.hasOwnProperty('_xscale')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_xscale'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_xscale'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_xscale'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_xscale'");
 		}
 		//check_equals(tf._xscale, 100); 
 		if(untyped tf._xscale == 100) {
@@ -4016,9 +3795,9 @@ class TextField_as {
 		//// check_equals(tf.textWidth, currTextWidth*2); // not clear what does textWidth depend on
 		//xcheck_equals(tf._width, currWidth*2);
 		if(untyped tf._width == currWidth*2) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._width is "+currWidth*2);
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._width is "+currWidth*2);
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._width should be "+currWidth*2+", is "+untyped tf._width);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._width should be "+currWidth*2+", is "+untyped tf._width);
 		}
 		//tf._xscale = 100;
 		untyped tf._xscale = 100;
@@ -4157,9 +3936,9 @@ class TextField_as {
 		///TODO: This test fails...
 		//check( ! tf.__proto__.hasOwnProperty('_ymouse') );
 		if(!untyped tf.__proto__.hasOwnProperty('_ymouse')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_ymouse'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_ymouse'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_ymouse'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_ymouse'");
 		}
 		//currYmouse = tf._ymouse; // unsafe, if user moves the mouse while running the test
 		var currYmouse = untyped tf._ymouse;
@@ -4249,9 +4028,9 @@ class TextField_as {
 		///TODO: This test fails...
 		//check( ! tf.__proto__.hasOwnProperty('_yscale') );
 		if(!untyped tf.__proto__.hasOwnProperty('_yscale')) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_yscale'");
+			DejaGnu.pass("[line "+here.lineNumber+"] tf.__proto__ does not have own property '_yscale'");
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf.__proto__ has own property '_yscale'");
+			DejaGnu.fail("[line "+here.lineNumber+"] tf.__proto__ has own property '_yscale'");
 		}
 		//check_equals(tf._yscale, 100); 
 		if(untyped tf._yscale == 100) {
@@ -4271,9 +4050,9 @@ class TextField_as {
 		//// check_equals(tf.textHeight, currTextHeight*2); // not clear what does textHeight depend on
 		//xcheck_equals(tf._height, currHeight*2);
 		if(untyped tf._height == currHeight*2) {
-			DejaGnu.xpass("[line "+here.lineNumber+"] tf._height is "+currHeight*2);
+			DejaGnu.pass("[line "+here.lineNumber+"] tf._height is "+currHeight*2);
 		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] tf._height should be "+currHeight*2+", is "+untyped tf._height);
+			DejaGnu.fail("[line "+here.lineNumber+"] tf._height should be "+currHeight*2+", is "+untyped tf._height);
 		}
 		//tf._yscale = 100;
 		untyped tf._yscale = 100;
@@ -4348,12 +4127,6 @@ class TextField_as {
 		untyped tf.wordWrap = true;
 		//note("After setting wordWrap flat: textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
 		DejaGnu.note("After setting wordWrap flat: textWidth: "+untyped tf.textWidth+" origTextWidth:"+origTextWidth);
-		//check_equals(tf.textWidth, origTextWidth);
-		if(untyped tf.textWidth == origTextWidth) {
-			DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is "+origTextWidth);
-		} else {
-			DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be "+origTextWidth+", is "+untyped tf.textWidth);
-		}
 		//tf._width = 10;
 #if flash9
 		untyped tf.width = 10;
@@ -4381,17 +4154,17 @@ class TextField_as {
 #if (flash6 || flash7)
 		 //xcheck_equals(origTextWidth, tf.textWidth);
 		 if(origTextWidth == untyped tf.textWidth) {
-			 DejaGnu.xpass("[line "+here.lineNumber+"] tf.textWidth is "+origTextWidth);
+			 DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is "+origTextWidth);
 		 } else {
-			 DejaGnu.xfail("[line "+here.lineNumber+"] tf.textWidth should be "+origTextWidth+", is "+untyped tf.textWidth);
+			 DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be "+origTextWidth+", is "+untyped tf.textWidth);
 		 }
 		//#else
 #else
 		 //check(origTextWidth > tf.textWidth);
 		 if(origTextWidth > untyped tf.textWidth) {
-			 DejaGnu.pass("[line "+here.lineNumber+"] tf.textWidth is less than "+origTextWidth);
+			 DejaGnu.xpass("[line "+here.lineNumber+"] tf.textWidth is less than "+origTextWidth);
 		 } else {
-			 DejaGnu.fail("[line "+here.lineNumber+"] tf.textWidth should be less than "+origTextWidth+", is "+untyped tf.textWidth);
+			 DejaGnu.xfail("[line "+here.lineNumber+"] tf.textWidth should be less than "+origTextWidth+", is "+untyped tf.textWidth);
 		 }
 		//#endif
 #end
@@ -5486,12 +5259,6 @@ class TextField_as {
 			DejaGnu.pass("[line "+here.lineNumber+"] _root._target is '/'");
 		} else {
 			DejaGnu.fail("[line "+here.lineNumber+"] _root._target should be '/', is "+_root._target);
-		}
-		//xcheck_equals(_root._parent, 'fake_parent');
-		if(_root._parent == untyped 'fake_parent') {
-			DejaGnu.xpass("[line "+here.lineNumber+"] _root._parent is 'fake_parent'");
-		} else {
-			DejaGnu.xfail("[line "+here.lineNumber+"] _root._parent should be 'fake_parent', is "+_root._parent);
 		}
 		//check_equals(_root._name, '');
 		if(_root._name == '') {

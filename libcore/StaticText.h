@@ -43,10 +43,9 @@ class StaticText : public DisplayObject
 {
 public:
 
-	StaticText(const SWF::DefineTextTag* const def, DisplayObject* parent,
-            int id)
+	StaticText(const SWF::DefineTextTag* const def, DisplayObject* parent)
 		:
-        DisplayObject(parent, id),
+        DisplayObject(parent),
         _def(def),
         _selectionColor(0, 255, 255, 255)
 	{
@@ -86,7 +85,7 @@ public:
 
     void setSelectionColor(boost::uint32_t color);
 
-    virtual rect getBounds() const {
+    virtual SWFRect getBounds() const {
         return _def->bounds();
     }
 

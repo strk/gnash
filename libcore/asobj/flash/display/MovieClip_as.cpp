@@ -60,7 +60,6 @@ namespace {
     as_value movieclip_beginBitmapFill(const fn_call& fn);
     as_value movieclip_createEmptyMovieClip(const fn_call& fn);
     as_value movieclip_removeMovieClip(const fn_call& fn);
-    as_value movieclip_createTextField(const fn_call& fn);
     as_value movieclip_curveTo(const fn_call& fn);
     as_value movieclip_beginFill(const fn_call& fn);
     as_value movieclip_prevFrame(const fn_call& fn);
@@ -103,13 +102,7 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_currentFrame(const fn_call& fn);
-    as_value movieclip_totalFrames(const fn_call& fn);
-    as_value movieclip_framesLoaded(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
-    as_value movieclip_url(const fn_call& fn);
-    as_value movieclip_focusRect(const fn_call& fn);
-    as_value movieclip_soundbuftime(const fn_call& fn);
 
     // =============================================
     // AS3 methods
@@ -227,8 +220,6 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_beginBitmapFill, 901, 11);
     vm.registerNative(movieclip_scale9Grid, 901, 12);
 
-    vm.registerNative(movieclip_createTextField, 104, 200);
-
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
@@ -241,77 +232,6 @@ attachMovieClipAS2Properties(DisplayObject& o)
     // initialize this if we don't have a parent
     if (!o.get_parent()) o.init_member("$version",
             getVM(o).getPlayerVersion(), 0); 
-
-    as_c_function_ptr gettersetter;
-
-    gettersetter = DisplayObject::x_getset;
-    o.init_property(NSV::PROP_uX, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::y_getset;
-    o.init_property(NSV::PROP_uY, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::xscale_getset;
-    o.init_property(NSV::PROP_uXSCALE, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::yscale_getset;
-    o.init_property(NSV::PROP_uYSCALE, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::xmouse_get;
-    o.init_readonly_property(NSV::PROP_uXMOUSE, gettersetter);
-
-    gettersetter = DisplayObject::ymouse_get;
-    o.init_readonly_property(NSV::PROP_uYMOUSE, gettersetter);
-
-    gettersetter = DisplayObject::alpha_getset;
-    o.init_property(NSV::PROP_uALPHA, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::visible_getset;
-    o.init_property(NSV::PROP_uVISIBLE, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::width_getset;
-    o.init_property(NSV::PROP_uWIDTH, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::height_getset;
-    o.init_property(NSV::PROP_uHEIGHT, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::rotation_getset;
-    o.init_property(NSV::PROP_uROTATION, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::parent_getset;
-    o.init_property(NSV::PROP_uPARENT, gettersetter, gettersetter);
-
-    gettersetter = movieclip_currentFrame;
-    o.init_property(NSV::PROP_uCURRENTFRAME, gettersetter, gettersetter);
-
-    gettersetter = movieclip_totalFrames;
-    o.init_property(NSV::PROP_uTOTALFRAMES, gettersetter, gettersetter);
-
-    gettersetter = movieclip_framesLoaded;
-    o.init_property(NSV::PROP_uFRAMESLOADED, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::target_getset;
-    o.init_property(NSV::PROP_uTARGET, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::name_getset;
-    o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
-
-    gettersetter = movieclip_dropTarget;
-    o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
-
-    gettersetter = movieclip_url;
-    o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
-
-    gettersetter = DisplayObject::quality;
-    o.init_property(NSV::PROP_uQUALITY, gettersetter, gettersetter);
-    
-    gettersetter = DisplayObject::highquality;
-    o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
-
-    gettersetter = movieclip_focusRect;
-    o.init_property(NSV::PROP_uFOCUSRECT, gettersetter, gettersetter);
-
-    gettersetter = movieclip_soundbuftime;
-    o.init_property(NSV::PROP_uSOUNDBUFTIME, gettersetter, gettersetter);
 
 }
 
@@ -423,10 +343,48 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_property("scale9Grid", *getset, *getset, swf8Flags);
 
     // External functions.
-    o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
+    o.init_member("createTextField", vm.getNative(104, 200));
     o.init_member("getTextSnapshot", 
             gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
 
+}
+
+//createEmptyMovieClip(name:String, depth:Number) : MovieClip
+as_value
+movieclip_createEmptyMovieClip(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+
+    if (fn.nargs != 2) {
+        if (fn.nargs < 2) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("createEmptyMovieClip needs "
+                    "2 args, but %d given,"
+                    " returning undefined"),
+                    fn.nargs);
+            );
+            return as_value();
+        }
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("createEmptyMovieClip takes "
+                "2 args, but %d given, discarding"
+                " the excess"),
+                fn.nargs);
+        )
+    }
+
+    // TODO: improve MovieClip ctor (and don't use it here anyway).
+    Movie* m = getRoot(fn).topLevelMovie();
+    MovieClip* mc = new MovieClip(0, m, ptr.get());
+
+    mc->set_name(fn.arg(0).to_string());
+    mc->setDynamic();
+
+    // Unlike other MovieClip methods, the depth argument of an empty movie clip
+    // can be any number. All numbers are converted to an int32_t, and are valid
+    // depths even when outside the usual bounds.
+    DisplayObject* ch = ptr->addDisplayListObject(mc, fn.arg(1).to_int());
+    return as_value(ch);
 }
 
 
@@ -609,7 +567,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<DisplayObject> newch =
-        exported_movie->createDisplayObject(movieclip.get(), 0);
+        exported_movie->createDisplayObject(movieclip.get());
 
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
@@ -662,7 +620,7 @@ movieclip_attachAudio(const fn_call& fn)
     }
 
     NetStream_as* ns;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), ns))
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), ns))
     { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
@@ -691,50 +649,12 @@ movieclip_attachVideo(const fn_call& fn)
 }
 
 
-//createEmptyMovieClip(name:String, depth:Number) : MovieClip
-as_value
-movieclip_createEmptyMovieClip(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    if (fn.nargs != 2)
-    {
-        if (fn.nargs < 2)
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("createEmptyMovieClip needs "
-                    "2 args, but %d given,"
-                    " returning undefined"),
-                    fn.nargs);
-            );
-            return as_value();
-        }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("createEmptyMovieClip takes "
-                    "2 args, but %d given, discarding"
-                    " the excess"),
-                    fn.nargs);
-            )
-        }
-    }
-
-    // Unlike other MovieClip methods, the depth argument of an empty movie clip
-    // can be any number. All numbers are converted to an int32_t, and are valid
-    // depths even when outside the usual bounds.
-    DisplayObject* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string(),
-            fn.arg(1).to_int());
-    return as_value(ch);
-}
-
 as_value
 movieclip_getDepth(const fn_call& fn)
 {
-    // TODO: make this a DisplayObject::getDepth_method function...
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
+    // Unlike TextField.getDepth this works for any DisplayObject
+    boost::intrusive_ptr<DisplayObject> movieclip = 
+        ensureType<DisplayObject>(fn.this_ptr);
 
     const int n = movieclip->get_depth();
 
@@ -763,49 +683,45 @@ movieclip_swapDepths(const fn_call& fn)
 
     // Lower bound of source depth below which swapDepth has no effect
     // (below Timeline/static zone)
-    if ( this_depth < DisplayObject::lowerAccessibleBound )
+    if (this_depth < DisplayObject::lowerAccessibleBound)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss;
             fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): won't swap a clip below "
-                    "depth %d (%d)"),
-            movieclip->getTarget(), ss.str(), DisplayObject::lowerAccessibleBound,
+                "depth %d (%d)"), movieclip->getTarget(), ss.str(),
+                DisplayObject::lowerAccessibleBound,
                 this_depth);
-        );
+        )
         return as_value();
     }
 
-    typedef boost::intrusive_ptr<DisplayObject> CharPtr;
-    typedef boost::intrusive_ptr<MovieClip> SpritePtr;
-
-    SpritePtr this_parent = dynamic_cast<MovieClip*>(
-            movieclip->get_parent());
+    MovieClip* this_parent = dynamic_cast<MovieClip*>(movieclip->get_parent());
 
     //CharPtr target = NULL;
     int target_depth = 0;
 
     // movieclip.swapDepth(movieclip)
-    if ( SpritePtr target_movieclip = fn.arg(0).to_sprite() )
-    {
-        if ( movieclip == target_movieclip )
-        {
+    if (MovieClip* target_movieclip = fn.arg(0).to_sprite()) {
+
+        if (movieclip == target_movieclip) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("%s.swapDepths(%s): invalid call, swapping to self?"),
-                movieclip->getTarget(), target_movieclip->getTarget());
-            );
+                log_aserror(_("%s.swapDepths(%s): invalid call, "
+                    "swapping to self?"), movieclip->getTarget(),
+                    target_movieclip->getTarget());
+            )
             return as_value();
         }
 
-        SpritePtr target_parent =
+        MovieClip* target_parent =
             dynamic_cast<MovieClip*>(movieclip->get_parent());
-        if ( this_parent != target_parent )
-        {
+
+        if (this_parent != target_parent) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("%s.swapDepths(%s): invalid call, the two "
+                log_aserror(_("%s.swapDepths(%s): invalid call, the two "
                     "DisplayObjects don't have the same parent"),
-                movieclip->getTarget(), target_movieclip->getTarget());
-            );
+                    movieclip->getTarget(), target_movieclip->getTarget());
+            )
             return as_value();
         }
 
@@ -815,7 +731,7 @@ movieclip_swapDepths(const fn_call& fn)
         // to avoid unecessary bounds invalidation and immunizing
         // the instance from subsequent PlaceObject tags attempting
         // to transform it.
-        if ( movieclip->get_depth() == target_depth )
+        if (movieclip->get_depth() == target_depth)
         {
             IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
@@ -828,28 +744,35 @@ movieclip_swapDepths(const fn_call& fn)
     }
 
     // movieclip.swapDepth(depth)
-    else
-    {
-        double td = fn.arg(0).to_number();
-        if ( isNaN(td) )
-        {
+    else {
+        
+        const double td = fn.arg(0).to_number();
+        if (isNaN(td)) {
             IF_VERBOSE_ASCODING_ERRORS(
-            std::stringstream ss; fn.dump_args(ss);
-            log_aserror(_("%s.swapDepths(%s): first argument invalid "
-                "(neither a movieclip nor a number)"),
-                movieclip->getTarget(), ss.str());
-            );
+                std::stringstream ss; fn.dump_args(ss);
+                log_aserror(_("%s.swapDepths(%s): first argument invalid "
+                    "(neither a movieclip nor a number)"),
+                    movieclip->getTarget(), ss.str());
+            )
+            return as_value();
+        }
+        if (td > DisplayObject::upperAccessibleBound) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                std::stringstream ss; fn.dump_args(ss);
+                log_aserror(_("%s.swapDepths(%s): requested depth is above "
+                    "the accessible range."),
+                    movieclip->getTarget(), ss.str());
+            )
             return as_value();
         }
 
-        target_depth = int(td);
+        target_depth = static_cast<int>(td);
 
         // Check we're not swapping the our own depth so
         // to avoid unecessary bounds invalidation and immunizing
         // the instance from subsequent PlaceObjec tags attempting
         // to transform it.
-        if ( movieclip->get_depth() == target_depth )
-        {
+        if (movieclip->get_depth() == target_depth) {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): ignored, DisplayObject already "
@@ -858,19 +781,13 @@ movieclip_swapDepths(const fn_call& fn)
             );
             return as_value();
         }
-
-
         // TODO : check other kind of validities ?
-
-
     }
 
-    if ( this_parent )
-    {
+    if (this_parent) {
         this_parent->swapDepths(movieclip.get(), target_depth);
     }
-    else
-    {
+    else {
         movie_root& root = getRoot(fn);
         root.swapLevels(movieclip, target_depth);
         return as_value();
@@ -1095,9 +1012,8 @@ movieclip_loadMovie(const fn_call& fn)
 
     // This is just an optimization if we aren't going
     // to send the data anyway. It might be wrong, though.
-    if (method != MovieClip::METHOD_NONE)
-    {
-        movieclip->getURLEncodedVars(data);
+    if (method != MovieClip::METHOD_NONE) {
+        getURLEncodedVars(*movieclip, data);
     }
  
     mr.loadMovie(urlstr, target, data, method);
@@ -1186,11 +1102,11 @@ movieclip_hitTest(const fn_call& fn)
                 return as_value();
             }
 
-            rect thisbounds = movieclip->getBounds();
+            SWFRect thisbounds = movieclip->getBounds();
             SWFMatrix thismat = movieclip->getWorldMatrix();
             thismat.transform(thisbounds);
 
-            rect tgtbounds = target->getBounds();
+            SWFRect tgtbounds = target->getBounds();
             SWFMatrix tgtmat = target->getWorldMatrix();
             tgtmat.transform(tgtbounds);
 
@@ -1231,57 +1147,6 @@ movieclip_hitTest(const fn_call& fn)
 
 }
 
-as_value
-movieclip_createTextField(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    if (fn.nargs < 6) // name, depth, x, y, width, height
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("createTextField called with %d args, "
-            "expected 6 - returning undefined"), fn.nargs);
-        );
-        return as_value();
-    }
-
-    std::string txt_name = fn.arg(0).to_string();
-
-    int txt_depth = fn.arg(1).to_int();
-
-    int txt_x = fn.arg(2).to_int();
-
-    int txt_y = fn.arg(3).to_int();
-
-    int txt_width = fn.arg(4).to_int();
-    if ( txt_width < 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("createTextField: negative width (%d)"
-            " - reverting sign"), txt_width);
-        );
-        txt_width = -txt_width;
-    }
-
-    int txt_height = fn.arg(5).to_int();
-    if ( txt_height < 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("createTextField: negative height (%d)"
-            " - reverting sign"), txt_height);
-        );
-        txt_height = -txt_height;
-    }
-
-    boost::intrusive_ptr<DisplayObject> txt = movieclip->add_textfield(txt_name,
-            txt_depth, txt_x, txt_y, txt_width, txt_height);
-
-    // createTextField returns void, it seems
-    if (getSWFVersion(fn) > 7) return as_value(txt.get());
-    else return as_value(); 
-}
-
 //getNextHighestDepth() : Number
 as_value
 movieclip_getNextHighestDepth(const fn_call& fn)
@@ -1299,19 +1164,21 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.this_ptr);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("MovieClip.getInstanceAtDepth(): missing depth argument");
+        log_aserror("MovieClip.getInstanceAtDepth(): missing or "
+            "undefined depth argument");
         );
         return as_value();
     }
 
-    int depth = fn.arg(0).to_int();
+    const int depth = fn.arg(0).to_int();
+
     boost::intrusive_ptr<DisplayObject> ch = mc->getDisplayObjectAtDepth(depth);
  
     // we want 'undefined', not 'null'
     if (!ch) return as_value();
+
     return as_value(ch.get());
 }
 
@@ -1372,7 +1239,7 @@ movieclip_getURL(const fn_call& fn)
 
     if (method != MovieClip::METHOD_NONE) {
         // Get encoded vars.
-        movieclip->getURLEncodedVars(vars);
+        getURLEncodedVars(*movieclip, vars);
     }
 
     movie_root& m = getRoot(fn);
@@ -1386,10 +1253,9 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(movieclip->getMovieVersion());
+    DisplayObject* o = getDisplayObject(fn.this_ptr);
+    if (!o) return as_value(-1);
+    return as_value(o->getDefinitionVersion());
 }
 
 // MovieClip.meth(<string>) : Number
@@ -1457,7 +1323,7 @@ movieclip_getBounds(const fn_call& fn)
     boost::intrusive_ptr<DisplayObject> movieclip =
         ensureType<DisplayObject>(fn.this_ptr);
 
-    rect bounds = movieclip->getBounds();
+    SWFRect bounds = movieclip->getBounds();
 
     if ( fn.nargs > 0 )
     {
@@ -1479,28 +1345,28 @@ movieclip_getBounds(const fn_call& fn)
         tgtwmat.invert().transform(bounds);
     }
 
-    // Magic numbers here... dunno why
-    double xMin = 6710886.35;
-    double yMin = 6710886.35;
-    double xMax = 6710886.35;
-    double yMax = 6710886.35;
+    double xMin, yMin, xMax, yMax;
 
-    if ( !bounds.is_null() )
-    {
+    if (!bounds.is_null()) {
         // Round to the twip
         xMin = twipsToPixels(bounds.get_x_min());
         yMin = twipsToPixels(bounds.get_y_min());
         xMax = twipsToPixels(bounds.get_x_max());
         yMax = twipsToPixels(bounds.get_y_max());
     }
+    else {
+        const double magicMin = 6710886.35;
+        xMin = yMin = xMax = yMax = magicMin;
+    }
 
-    boost::intrusive_ptr<as_object> bounds_obj(new as_object());
-    bounds_obj->init_member("xMin", as_value(xMin));
-    bounds_obj->init_member("yMin", as_value(yMin));
-    bounds_obj->init_member("xMax", as_value(xMax));
-    bounds_obj->init_member("yMax", as_value(yMax));
+    // This is a bare object.
+    as_object* bounds_obj = new as_object();
+    bounds_obj->init_member("xMin", xMin);
+    bounds_obj->init_member("yMin", yMin);
+    bounds_obj->init_member("xMax", xMax);
+    bounds_obj->init_member("yMax", yMax);
 
-    return as_value(bounds_obj.get());
+    return as_value(bounds_obj);
 }
 
 as_value
@@ -2432,7 +2298,7 @@ movieclip_startDrag(const fn_call& fn)
                 }
             );
 
-            rect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+            SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
                     pixelsToTwips(x1), pixelsToTwips(y1));
             st.setBounds(bounds);
         }
@@ -2505,10 +2371,10 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
-    boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
+    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
+    BitmapData_as* bd;
 
-    if (!bd) {
+    if (!isNativeType(obj, bd)) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_debug("MovieClip.attachBitmap: first argument should be a "
                 "BitmapData", fn.arg(1));
@@ -2527,98 +2393,10 @@ movieclip_attachBitmap(const fn_call& fn)
 as_value
 movieclip_as2_ctor(const fn_call& fn)
 {
-
     assert(!isAS3(fn));
-
-    boost::intrusive_ptr<as_object> clip = 
-        new as_object(getMovieClipAS2Interface());
-
-    return as_value(clip.get());
-}
-
-
-as_value
-movieclip_currentFrame(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(std::min(ptr->get_loaded_frames(),
-                ptr->get_current_frame() + 1));
-}
-
-as_value
-movieclip_totalFrames(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_frame_count());
-}
-
-as_value
-movieclip_framesLoaded(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_loaded_frames());
-}
-
-as_value
-movieclip_dropTarget(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-
-    return ptr->getDropTarget();
-}
-
-as_value
-movieclip_url(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-
-    return as_value(ptr->get_root()->url());
-}
-
-// TODO: move this to DisplayObject class, _focusrect seems a generic property
-as_value
-movieclip_focusRect(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // Is a yellow rectangle visible around a focused movie clip (?)
-        // We don't support focuserct settings
-        return as_value(false);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._focusrect setting") );
-    }
     return as_value();
 }
 
-as_value
-movieclip_soundbuftime(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // Number of seconds before sound starts to stream.
-        return as_value(0.0);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._soundbuftime setting") );
-    }
-    return as_value();
-}
 
 as_value
 movieclip_transform(const fn_call& fn)
@@ -2680,7 +2458,7 @@ movieclip_as3_ctor(const fn_call& fn)
     // a MovieClip.
     Movie* m = getRoot(fn).topLevelMovie();
 
-    return new MovieClip(0, m, 0, -1);
+    return new MovieClip(0, m, 0);
 }
 
 

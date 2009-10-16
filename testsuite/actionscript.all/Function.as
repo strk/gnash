@@ -441,12 +441,12 @@ function f()
         propRecorder.push(props.toString());
     }
     propRecorder.sort();
-    xcheck_equals(propRecorder.length, 5);
+    check_equals(propRecorder.length, 5);
     check_equals(propRecorder[0], '__proto__');
     check_equals(propRecorder[1], 'callee');
     check_equals(propRecorder[2], 'caller');
-    xcheck_equals(propRecorder[3], 'constructor');
-    xcheck_equals(propRecorder[4], 'length');
+    check_equals(propRecorder[3], 'constructor');
+    check_equals(propRecorder[4], 'length');
 }
 f();
 

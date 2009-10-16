@@ -176,7 +176,7 @@ as_value
 textformat_new(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
 
     std::auto_ptr<TextFormat_as> tf(new TextFormat_as);
 
@@ -223,7 +223,7 @@ textformat_new(const fn_call& fn)
 	}
 	
     obj->setRelay(tf.release());
-    as_object* proto = obj->get_prototype().get();
+    as_object* proto = obj->get_prototype();
     if (proto) attachTextFormatInterface(*proto);
 
     const int flags = 0;
@@ -280,41 +280,40 @@ textformat_bullet(const fn_call& fn)
 	return ret;
 }
 
+class PushToVector
+{
+public:
+    PushToVector(std::vector<int>& v) : _v(v) {}
+    void operator()(const as_value& val) {
+        _v.push_back(val.to_number());
+    }
+private:
+    std::vector<int>& _v;
+};
+
 as_value
 textformat_tabStops(const fn_call& fn)
 {
     TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
 	
-	as_value ret;
-		
-	if (!fn.nargs)
-	{
-		ret.set_null();
-		return ret;
-	}
-	
-    as_object* arg = fn.arg(0).to_object(*getGlobal(fn)).get();
-    Array_as* tStops = dynamic_cast<Array_as*>(arg);
-
-    if (!tStops) return as_value();
-			
-	std::vector<int> tabStops(tStops->size());
-
-	for (size_t i = 0; i !=tStops->size(); ++i)
-	{
-		tabStops[i]=tStops->at(i).to_number();
-	}
-
-	if ( fn.nargs == 0)	// getter
-	{
+    if (!fn.nargs) {
 		LOG_ONCE( log_unimpl("Getter for textformat_tabStops") );
-	}
-	else 				// setter
-	{
-		relay->tabStopsSet(tabStops);
+        as_value null;
+        null.set_null();
+        return null;
 	}
 	
-	return ret;
+    as_object* arg = fn.arg(0).to_object(*getGlobal(fn));
+    if (!arg) return as_value();
+
+	std::vector<int> tabStops;
+
+    PushToVector pv(tabStops);
+    foreachArray(*arg, pv);
+
+    relay->tabStopsSet(tabStops);
+	
+	return as_value();
 }
 
 as_value

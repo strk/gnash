@@ -32,6 +32,7 @@
 #include "lirc_ext.h"
 #include "fn_call.h"
 #include "as_object.h"
+#include "Globals.h"
 #include "builtin_function.h" // need builtin_function
 
 using namespace std;
@@ -53,6 +54,8 @@ static void
 attachInterface(as_object *obj)
 {
     GNASH_REPORT_FUNCTION;
+    Global_as* gl = getGlobal(*obj);
+
     obj->init_member("lirc_init", gl->createFunction(lirc_ext_init));
     obj->init_member("lirc_getKey", gl->createFunction(lirc_ext_getkey));
     obj->init_member("lirc_getButton", gl->createFunction(lirc_ext_getbutton));
@@ -143,17 +146,17 @@ extern "C" {
     {
 //	GNASH_REPORT_FUNCTION;
 	// This is going to be the global "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	as_object *cl;
 	if (cl == NULL) {
-        Global_as* gl = getGlobal(global);
+        Global_as* gl = getGlobal(obj);
         as_object* proto = getInterface();
         cl = gl->createClass(&lirc_ctor, proto);
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
- 	    attachInterface(cl.get());
+ 	    attachInterface(cl);
 	}
 	
-	obj.init_member("Lirc", cl.get());
+	obj.init_member("Lirc", cl);
     }
 } // end of extern C
 

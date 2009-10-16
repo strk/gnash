@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "rect.h"  // for composition
+#include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h" // for gnash::key::code type
 #include "Renderer.h" // for gnash::key::code type
@@ -123,10 +123,10 @@ public:
 
     /// End main rendering loop, making the call to run() return.
     //
-    /// The default implementation calls exit(0), which isn't nice.
+    /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
     /// Please implement the proper main loop quitter in the subclasses.
     ///
-    virtual void quit()  { std::exit(0); }
+    virtual void quit()  { std::exit(EXIT_SUCCESS); }
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.
@@ -150,7 +150,7 @@ public:
     // does not need to be implemented (optional feature),
     // but still needs to be available.
     //
-    // Why "rect" (floats)? Because the gui does not really
+    // Why "SWFRect" (floats)? Because the gui does not really
     // know about the scale the renderer currently uses... 
     //
     // <strk> but it does not about the "semantic" of the TWIPS
@@ -158,7 +158,7 @@ public:
     //        The question really is: why floats for TWIPS ?
     //        (guess this goes deep in the core/server libs)
     //
-    virtual void setInvalidatedRegion(const rect& bounds);
+    virtual void setInvalidatedRegion(const SWFRect& bounds);
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     
     // Called right before rendering anything (after setInvalidatedRegion).

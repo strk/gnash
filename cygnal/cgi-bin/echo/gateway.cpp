@@ -161,7 +161,7 @@ main(int argc, char *argv[])
     if (infile.empty()) {
         fd = net.createServer(port);
         if (fd <= 0) {
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         // Only wait for a limited time.
         net.setTimeout(10);

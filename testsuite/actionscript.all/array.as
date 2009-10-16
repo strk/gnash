@@ -211,8 +211,8 @@ check(!gaparray.hasOwnProperty('1'));
 gaparray.sort();
 check_equals(gaparray.length, 17);
 #if OUTPUT_VERSION < 7
- xcheck_equals(gaparray[0], undefined); // this is 16 with gnash
- xcheck_equals(gaparray[1], undefined); // this is 4 with gnash
+ check_equals(gaparray[0], undefined); // this is 16 with gnash
+ check_equals(gaparray[1], undefined); // this is 4 with gnash
 #else
  check_equals(gaparray[0], '16');
  check_equals(gaparray[1], '4');
@@ -231,8 +231,8 @@ check_equals(gaparray[12], undefined);
 check_equals(gaparray[13], undefined);
 check_equals(gaparray[14], undefined);
 #if OUTPUT_VERSION < 7
-  xcheck_equals(gaparray[15], '16'); // this is at [0] with gnash
-  xcheck_equals(gaparray[16], '4'); // this is at [1] with gnash
+  check_equals(gaparray[15], '16'); // this is at [0] with gnash
+  check_equals(gaparray[16], '4'); // this is at [1] with gnash
 #else
   check_equals(gaparray[15], undefined);
   check_equals(gaparray[16], undefined);
@@ -240,16 +240,16 @@ check_equals(gaparray[14], undefined);
 
 #if OUTPUT_VERSION > 5
 #if OUTPUT_VERSION < 7
- xcheck(gaparray.hasOwnProperty('15'));
- xcheck(gaparray.hasOwnProperty('16'));
- xcheck(gaparray.hasOwnProperty('4')); // a-ha!
+ check(gaparray.hasOwnProperty('15'));
+ check(gaparray.hasOwnProperty('16'));
+ check(gaparray.hasOwnProperty('4')); // a-ha!
  xcheck(!gaparray.hasOwnProperty('0'));
 #else
- xcheck(gaparray.hasOwnProperty('16'));
- xcheck(gaparray.hasOwnProperty('4')); 
+ check(gaparray.hasOwnProperty('16'));
+ check(gaparray.hasOwnProperty('4')); 
  check(gaparray.hasOwnProperty('1'));
  check(gaparray.hasOwnProperty('0'));
- xcheck(gaparray.hasOwnProperty('2'));
+ check(gaparray.hasOwnProperty('2'));
 #endif
 #endif
 
@@ -739,7 +739,7 @@ check_equals(c[8], undefined);
 check_equals(c[0], 'zero');
 c.length = -1;
 // it seems Gnash needs to store the 'length' property as a normal property
-xcheck_equals(c.length, -1);
+check_equals(c.length, -1);
 check_equals(c[0], undefined);
 
 //-------------------------------
@@ -770,10 +770,10 @@ check(c.hasOwnProperty('2'));
 c[10] = 'ten';
 check_equals(c.length, 11);
 ASSetPropFlags(c, "2", 7, 0); // protect from deletion
-xcheck( ! delete c[2] ); // gnash doesn't store prop flags here..
-xcheck_equals(c[2], 30); // so won't respect delete-protection
+check( ! delete c[2] ); // gnash doesn't store prop flags here..
+check_equals(c[2], 30); // so won't respect delete-protection
 c.length = 2;
-xcheck_equals(c[2], 30); // was protected !
+check_equals(c[2], 30); // was protected !
 check_equals(typeof(c[10]), 'undefined'); // was not protected..
 c.length = 11;
 check_equals(typeof(c[10]), 'undefined'); // and won't come back
@@ -1357,18 +1357,18 @@ check_equals(setCalls, 0);
 getCalls=0; setCalls=0;
 a[1] = 1;
 check_equals(getCalls, 0);
-xcheck_equals(setCalls, 1);
+check_equals(setCalls, 1);
 
 ret = a.addProperty('2', get, set);
 check_equals(ret, true);
 getCalls=0; setCalls=0;
 junk = a[2];
-xcheck_equals(getCalls, 1);
+check_equals(getCalls, 1);
 check_equals(setCalls, 0);
 getCalls=0; setCalls=0;
 a[2] = 2;
 check_equals(getCalls, 0);
-xcheck_equals(setCalls, 1);
+check_equals(setCalls, 1);
 
 check_equals(a.length, 3);
 ret = a.addProperty('3', get, set);
@@ -1378,7 +1378,7 @@ a.length = 3;
 getCalls=0; setCalls=0;
 a.push(2);
 check_equals(getCalls, 0);
-check_equals(setCalls, 0);
+xcheck_equals(setCalls, 0);
 
 #endif // OUTPUT_VERSION > 5
 
@@ -1394,7 +1394,7 @@ check_equals(a.length, 2);
 f = a.shift();
 check_equals(a.length, 1); 
 check_equals(f, 'zero');
-xcheck_equals(a[0], 'zero'); // could not delete for override
+check_equals(a[0], 'zero'); // could not delete for override
 check_equals(typeof(a[1]), 'undefined');
 #if OUTPUT_VERSION > 5
  check(!a.hasOwnProperty(1)); 
@@ -1409,10 +1409,10 @@ f = a.shift();
 check_equals(a.length, 1);
 check_equals(f, 'zero');
 check_equals(a[0], 'one'); // could replace
-xcheck_equals(a[1], 'one'); // couldn't delete
+check_equals(a[1], 'one'); // couldn't delete
 #if OUTPUT_VERSION > 5
  check(a.hasOwnProperty(0)); 
- xcheck(a.hasOwnProperty(1)); 
+ check(a.hasOwnProperty(1)); 
 #endif
 
 //--------------------------------------------------------
@@ -1425,10 +1425,10 @@ a[1] = 'one';
 ASSetPropFlags(a, "0", 4, 0); // protect 0 from override
 check_equals(a.length, 2);
 a[0] = 'overridden';
-xcheck_equals(a[0], 'zero'); // was protected..
+check_equals(a[0], 'zero'); // was protected..
 f = a.shift();
 check_equals(a.length, 1); 
-xcheck_equals(f, 'zero');
+check_equals(f, 'zero');
 check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
 check_equals(typeof(a[1]), 'undefined');
 a[0] = 'overridden';
@@ -1443,12 +1443,12 @@ a[1] = 'one';
 a[2] = 'two';
 ASSetPropFlags(a, "1", 4, 0); // protect 1 from override
 a[1] = 'overridden';
-xcheck_equals(a[1], 'one'); // was protected
+check_equals(a[1], 'one'); // was protected
 check_equals(a.length, 3);
 f = a.shift();
 check_equals(a.length, 2);
 check_equals(f, 'zero');
-xcheck_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
+check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
 check_equals(a[1], 'two');
 check_equals(typeof(a[2]), 'undefined');
 a[1] = 'overridden';
@@ -1459,6 +1459,155 @@ check_equals(a[1], 'overridden'); // flag was lost
  check(!a.hasOwnProperty(2)); 
 #endif
 
+/// Test array functions on normal objects for a better idea of what goes
+/// on.
+
+fakeArray = function() {
+    o = {};
+    o[1] = "one";
+    o[2] = "two";
+    o[3] = "three";
+    o[4] = "four";
+    o[5] = "five";
+    o[6] = "six";
+    o[7] = "seven";
+
+    // This is deliberately less than the actual length!
+    o.length = 6;
+    return o;
+};
+
+traceProps = function(obj) {
+        s = "";
+        for (i in obj) { s += i + ","; };
+        return s;
+};
+
+o = fakeArray();
+o.shift = Array.prototype.shift;
+
+// Order of property creation.
+check_equals(traceProps(o), "shift,length,7,6,5,4,3,2,1,");
+
+o.shift();
+// Properties are readded from 0 to 5.
+check_equals(traceProps(o), "4,3,2,1,0,shift,length,7,6,5,");
+check_equals(o.length, 6);
+
+o = fakeArray();
+o.unshift = Array.prototype.unshift;
+
+// Order of property creation.
+check_equals(traceProps(o), "unshift,length,7,6,5,4,3,2,1,");
+
+o.unshift("new");
+// Properties are readded in reverse order.
+check_equals(traceProps(o), "0,1,2,3,4,5,6,unshift,length,7,")
+check_equals(o.length, 6);
+
+
+o = fakeArray();
+o.pop = Array.prototype.pop;
+
+// Order of property creation.
+check_equals(traceProps(o), "pop,length,7,6,5,4,3,2,1,");
+
+val = o.pop();
+check_equals(val, "five");
+// Length is not decremented, property 5 is deleted.
+check_equals(traceProps(o), "pop,length,7,6,4,3,2,1,");
+check_equals(o.length, 6);
+
+
+o = fakeArray();
+o.reverse = Array.prototype.reverse;
+
+// Order of property creation.
+check_equals(traceProps(o), "reverse,length,7,6,5,4,3,2,1,");
+
+o.reverse();
+
+// Length is unchanged, Properties are swapped from the outside
+check_equals(traceProps(o), "3,2,4,1,5,0,reverse,length,7,6,");
+check_equals(o.length, 6);
+
+// Check with an uneven length to see what happens to the middle property.
+o = fakeArray();
+o.reverse = Array.prototype.reverse;
+o.length = 5;
+o.reverse();
+// The middle property is left alone...
+check_equals(traceProps(o), "3,1,4,0,reverse,length,7,6,5,2,");
+check_equals(o.length, 5);
+
+// Array.splice
+
+// This is different from other functions in that it doesn't delete and
+// readd properties so much.
+
+o = fakeArray();
+o.splice = Array.prototype.splice;
+
+// Order of property creation.
+check_equals(traceProps(o), "splice,length,7,6,5,4,3,2,1,");
+
+// Note: this function *does* set length!
+check_equals(o.length, 6);
+o.splice(2, 3, "new1", "new2");
+
+check_equals(traceProps(o), "0,splice,length,7,6,5,4,3,2,1,");
+check_equals(o.length, 5);
+
+// The spliced elements are there.
+check_equals(o[2], "new1");
+check_equals(o[3], "new2");
+
+// The new 0 element is undefined.
+check_equals(o[0], undefined);
+
+// The last element is shifted down (because 3 elements were deleted).
+check_equals(o[4], "five");
+
+// Same again with different arguments
+
+o = fakeArray();
+o.splice = Array.prototype.splice;
+
+// Order of property creation.
+check_equals(traceProps(o), "splice,length,7,6,5,4,3,2,1,");
+
+// Note: this function *does* set length!
+check_equals(o.length, 6);
+o.splice(2, 1, "new1", "new2", "new3", "new4");
+
+check_equals(traceProps(o), "8,0,splice,length,7,6,5,4,3,2,1,");
+check_equals(o.length, 9);
+
+// The spliced elements are there.
+check_equals(o[2], "new1");
+check_equals(o[3], "new2");
+check_equals(o[4], "new3");
+check_equals(o[5], "new4");
+
+// The new 0 element is undefined.
+check_equals(o[0], undefined);
+
+// Elements were shifted up.
+check_equals(o[6], "three");
+
+// Sort
+
+o = fakeArray();
+o.sort = Array.prototype.sort;
+
+// Order of property creation.
+check_equals(traceProps(o), "sort,length,7,6,5,4,3,2,1,");
+
+check_equals(o.length, 6);
+o.sort();
+xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+o.sort();
+xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
 
 // TODO: test ASnative-returned functions:
 //
@@ -1478,11 +1627,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(501);
+ check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(562);
+  check_totals(599);
 # else
-  check_totals(572);
+  check_totals(609);
 # endif
 #endif

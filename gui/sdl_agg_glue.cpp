@@ -92,7 +92,7 @@ SdlAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
     if (!_screen) {
         log_error (_("SDL_SetVideoMode() failed for SdlAggGlue."));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     int stride = width * depth_bytes;

@@ -135,6 +135,11 @@ main(int argc, char **argv)
 	SWFDisplayItem_setName(it, "square1");
 	SWFDisplayItem_setDepth(it, 2);
 
+    /* This button has one character per state. It shows that each state
+     * except HIT generates one new instance and deletes the old one.
+     * HIT deletes the old instance property and does not add a new one.
+     */
+
     add_actions(mo, "note('This is a very simple test. Do anything you like "
             "with the buttons and you should get no failures');");
 

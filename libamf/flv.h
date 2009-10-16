@@ -83,7 +83,7 @@ class DSOEXPORT Flv {
         AUDIO_55KHZ = 0x0,
         AUDIO_11KHZ = 0x1,
         AUDIO_22KHZ = 0x2,
-        AUDIO_44KHZ = 0x3,
+        AUDIO_44KHZ = 0x3
     } flv_sound_rate_e;
     /// \enum Flv::flv_sound_format_e.
     ///
@@ -95,7 +95,7 @@ class DSOEXPORT Flv {
         AUDIO_NELLYMOSER_8KHZ = 0x5,
         AUDIO_NELLYMOSER = 0x6,
         // These next are only supported by Gnash
-        AUDIO_VORBIS = 0x7,
+        AUDIO_VORBIS = 0x7
     } flv_sound_format_e;
 
     // Video Tag types
@@ -112,7 +112,7 @@ class DSOEXPORT Flv {
         VIDEO_SCREEN2 = 0x6,
         VIDEO_THEORA = 0x7,
         VIDEO_DIRAC = 0x8,
-        VIDEO_SPEEX = 0x9,
+        VIDEO_SPEEX = 0x9
     } flv_video_codec_e;
     
     /// \enum Flv::flv_video_frame_e.

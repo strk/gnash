@@ -48,7 +48,6 @@
 #include "fontlib.h" 
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
-#include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
 #include "TextFormat_as.h"
@@ -87,6 +86,8 @@ namespace {
     as_object* getTextFieldInterface(VM& vm);
     void attachPrototypeProperties(as_object& proto);
     void attachTextFieldStaticMembers(as_object& o);
+
+    as_value textfield_createTextField(const fn_call& fn);
 
     as_value textfield_variable(const fn_call& fn);
     as_value textfield_setTextFormat(const fn_call& fn);
@@ -127,10 +128,9 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
-        int id)
+TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
     :
-    InteractiveObject(parent, id),
+    InteractiveObject(parent),
     _tag(&def),
     _textDefined(def.hasText()),
     _htmlTextDefined(def.hasText()),
@@ -176,7 +176,6 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
     _bounds(def.bounds()),
     _selection(0, 0)
 {
-
     // WARNING! remember to set the font *before* setting text value!
     boost::intrusive_ptr<const Font> f = def.getFont();
     if (!f) f = fontlib::get_default_font(); 
@@ -197,10 +196,9 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
 
 }
 
-TextField::TextField(DisplayObject* parent, const rect& bounds)
+TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
     :
-    // the id trick is to fool assertions in DisplayObject ctor
-    InteractiveObject(parent, parent ? 0 : -1),
+    InteractiveObject(parent),
     _textDefined(false),
     _htmlTextDefined(false),
     _restrictDefined(false),
@@ -257,17 +255,12 @@ TextField::init()
 {
 
     as_object* proto = getTextFieldInterface(getVM(*this));
- 
-    // This is an instantiation, so attach properties to the
-    // prototype.
-    // TODO: is it correct to do it here, or can some TextFields
-    // be constructed without attaching these?
     attachPrototypeProperties(*proto);
-
+ 
     set_prototype(proto);
 
-    Array_as* ar = new Array_as();
-    ar->push(this);
+    as_object* ar = getGlobal(*this)->createArray();
+    ar->callMethod(NSV::PROP_PUSH, this);
     set_member(NSV::PROP_uLISTENERS, ar);
     
     registerTextVariable();
@@ -358,7 +351,6 @@ TextField::cursorRecord()
 void
 TextField::display(Renderer& renderer)
 {
-
     registerTextVariable();
 
     const bool drawBorder = getDrawBorder();
@@ -412,8 +404,10 @@ TextField::display(Renderer& renderer)
     }
 
     _displayRecords.clear();
-    float scale = getFontHeight() / (float)_font->unitsPerEM(_embedFonts);
+    float scale = getFontHeight() /
+    static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
+
     //offset the lines
     int yoffset = (getFontHeight() + fontLeading) + PADDING_TWIPS;
     size_t recordline;
@@ -451,7 +445,7 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
 
     const SWFMatrix& wm = getWorldMatrix();
 
-    rect bounds = getBounds();
+    SWFRect bounds = getBounds();
     bounds.expand_to_rect(m_text_bounding_box); 
     wm.transform(bounds);
     ranges.add(bounds.getRange());            
@@ -584,7 +578,7 @@ TextField::setSelection(int start, int end)
     _selection = std::make_pair(start, end);
 }
 bool
-TextField::on_event(const event_id& ev)
+TextField::notifyEvent(const event_id& ev)
 {    
     switch (ev.id())
     {
@@ -1015,237 +1009,6 @@ TextField::setTextFormat(TextFormat_as& tf)
     format_text();
 }
 
-bool
-TextField::set_member(string_table::key name,
-        const as_value& val, string_table::key nsname, bool ifFound)
-{
-
-    // FIXME: Turn all standard members into getter/setter properties
-    //        of the TextField class. See attachTextFieldInterface()
-    // @@ TODO need to inherit basic stuff like _x, _y, _xscale, _yscale etc ?
-
-    switch (name)
-    {
-    default:
-        break;
-    case NSV::PROP_uX:
-    {
-        SWFMatrix m = getMatrix();
-        double x = infinite_to_zero( val.to_number() );
-        m.tx = pixelsToTwips(x);    
-        setMatrix(m); // no need to update caches when only changing translation
-
-        // m_accept_anim_moves = false;
-        return true;
-    }
-    case NSV::PROP_uY:
-    {
-        SWFMatrix m = getMatrix();
-        double y = infinite_to_zero( val.to_number() );
-        m.ty = pixelsToTwips(y);
-        setMatrix(m); // no need to update caches when only changing translation
-
-        // m_accept_anim_moves = false; 
-        return true;
-    }
-    case NSV::PROP_uWIDTH:
-    {
-        double nw = val.to_number(); 
-        if (!isFinite(nw) )
-        {
-            // might be our fault, see the TODO above 
-            // (missing to pass as_environment out..)
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._width to %g"), nw);
-            );
-            return true;
-        }
-
-        if ( nw < 0 )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._width to a "
-                    "negative number: %g, toggling sign"), nw);
-            );
-            nw = -nw;
-        }
-
-        if ( _bounds.width() == pixelsToTwips(nw) )
-        {
-#ifdef GNASH_DEBUG_TEXTFIELDS
-            log_debug("TextField width already == %g, nothing to do to "
-                    "change it", nw);
-#endif
-            return true; // nothing to do
-        }
-        if ( _bounds.is_null() )
-        {
-#ifdef GNASH_DEBUG_TEXTFIELDS
-            log_debug("NULL TextField bounds : %s", _bounds);
-#endif
-            return true;
-        }
-
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Chaging TextField width to %g", nw);
-#endif
-
-        set_invalidated();
-
-        // Modify TextField drawing rectangle
-        // TODO: check which anchor point we should use !
-        boost::int32_t xmin = _bounds.get_x_min();
-        boost::int32_t ymin = _bounds.get_y_min();
-        boost::int32_t ymax = _bounds.get_y_max();
-        boost::int32_t xmax = xmin + pixelsToTwips(nw);
-
-        assert(xmin <= xmax);
-        _bounds.set_to_rect(xmin, ymin, xmax, ymax);
-        assert( _bounds.width() == pixelsToTwips(nw) );
-
-        // previously truncated text might get visible now
-        // TODO: if nested masks were implemented we would 
-        // not need to reformat text here
-        format_text();
-
-        return true;
-    }
-    case NSV::PROP_uHEIGHT:
-    {
-        double nh = val.to_number(); 
-        if (!isFinite(nh) )
-        {
-            // might be our fault, see the TODO above (missing to pass
-            // as_environment out..)
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._height to %g"), nh);
-            );
-            return true;
-        }
-
-        if ( nh < 0.0f )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Attempt to set TextField._height to a negative "
-                    "number: %g, toggling sign"), nh);
-            );
-            nh = -nh;
-        }
-
-        if ( _bounds.height() == pixelsToTwips(nh) )
-        {
-#ifdef GNASH_DEBUG_TEXTFIELDS
-            log_debug("TextField height already == %g, nothing to do to "
-                    "change it", nh);
-#endif // GNASH_DEBUG_TEXTFIELDS
-            return true; // nothing to do
-        }
-        if ( _bounds.is_null() )
-        {
-            return true;
-        }
-
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Changing TextField height to %g", nh);
-#endif // GNASH_DEBUG_TEXTFIELDS
-        set_invalidated();
-
-        // Modify TextField drawing rectangle
-        // TODO: check which anchor point we should use !
-        boost::int32_t xmin = _bounds.get_x_min();
-        boost::int32_t xmax = _bounds.get_x_max();
-        boost::int32_t ymin = _bounds.get_y_min();
-        _bounds.set_to_rect(xmin, ymin, xmax, ymin + pixelsToTwips(nh) );
-
-        assert(_bounds.height() == pixelsToTwips(nh));
-
-        // previously truncated text might get visible now
-        // TODO: if nested masks were implemented we would 
-        // not need to reformat text here
-        format_text();
-
-        return true;
-    }
-    case NSV::PROP_uVISIBLE:
-    {
-        set_visible(val.to_bool());
-        return true;
-    }
-    case NSV::PROP_uALPHA:
-    {
-        // @@ TODO this should be generic to class DisplayObject!
-        // Arg is in percent.
-        cxform    cx = get_cxform();
-        cx.aa = (boost::int16_t)(val.to_number() * 2.56);
-        set_cxform(cx);
-        return true;
-    }
-    // @@ TODO see TextField members in Flash MX docs
-    }    // end switch
-
-
-    return as_object::set_member(name, val, nsname, ifFound);
-}
-
-bool
-TextField::get_member(string_table::key name, as_value* val,
-    string_table::key nsname)
-{
-
-    // FIXME: Turn all standard members into getter/setter properties
-    //        of the TextField class. See attachTextFieldInterface()
-
-    switch (name)
-    {
-    default:
-        break;
-    case NSV::PROP_uVISIBLE:
-    {
-        val->set_bool(visible());
-        return true;
-    }
-    case NSV::PROP_uALPHA:
-    {
-        // @@ TODO this should be generic to class DisplayObject!
-        const cxform&    cx = get_cxform();
-        val->set_double(cx.aa / 2.56);
-        return true;
-    }
-    case NSV::PROP_uX:
-    {
-        SWFMatrix    m = getMatrix();    
-        val->set_double(twipsToPixels(m.tx));
-        return true;
-    }
-    case NSV::PROP_uY:
-    {
-        SWFMatrix    m = getMatrix();    
-        val->set_double(twipsToPixels(m.ty));
-        return true;
-    }
-    case NSV::PROP_uWIDTH:
-    {
-        val->set_double(twipsToPixels(get_width()));
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Got TextField width == %s", *val);
-#endif // GNASH_DEBUG_TEXTFIELDS
-        return true;
-    }
-    case NSV::PROP_uHEIGHT:
-    {
-        val->set_double(twipsToPixels(get_height()));
-#ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug("Got TextField height == %s", *val);
-#endif // GNASH_DEBUG_TEXTFIELDS
-        return true;
-    }
-    }    // end switch
-
-    return as_object::get_member(name, val, nsname);
-    
-}
-    
-
 float
 TextField::align_line(TextAlignment align,
         int last_line_start_record, float x)
@@ -1255,7 +1018,6 @@ TextField::align_line(TextAlignment align,
     float right_margin = getRightMargin();
 
     float extra_space = (width - right_margin) - x - PADDING_TWIPS;
-
     //assert(extra_space >= 0.0f);
     if (extra_space <= 0.0f)
     {
@@ -1284,11 +1046,10 @@ TextField::align_line(TextAlignment align,
         // Shift all the way to the right.
         shift_right = extra_space;
     }
-
     // Shift the beginnings of the records on this line.
-    for (unsigned int i = last_line_start_record; i < _displayRecords.size(); ++i)
+    for (unsigned int i = last_line_start_record; i < _textRecords.size(); ++i)
     {
-        SWF::TextRecord& rec = _displayRecords[i];
+        SWF::TextRecord& rec = _textRecords[i];
 
         //if ( rec.hasXOffset() ) // why?
             rec.setXOffset(rec.xOffset() + shift_right); 
@@ -1421,7 +1182,8 @@ TextField::format_text()
     }
 
     boost::uint16_t fontHeight = getFontHeight();
-    float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float scale = fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
@@ -1497,29 +1259,35 @@ TextField::format_text()
     std::wstring::const_iterator it = _text.begin();
     const std::wstring::const_iterator e = _text.end();
 
-    ///handleChar takes care of placing the glyphs
+    ///handleChar takes care of placing the glyphs    
     handleChar(it, e, x, y, rec, last_code, last_space_glyph,
             last_line_start_record);
-    
+                
     // Expand bounding box to include the whole text (if autoSize)
-    if ( _autoSize != autoSizeNone )
+    if (_autoSize != autoSizeNone)
     {
-        _bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
+        _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
     // Add the last line to our output.
-	_textRecords.push_back(rec);
+    _textRecords.push_back(rec);
+	
+    // align the last (or single) line
+    align_line(getTextAlignment(), last_line_start_record, x);
+	
 
     scrollLines();
 	
     set_invalidated(); //redraw
+    
 }
 
 void
 TextField::scrollLines()
 {
     boost::uint16_t fontHeight = getFontHeight();
-    float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts);
+    float scale = fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
     if (_linesindisplay > 0) { //no need to place lines if we can't fit any
@@ -1566,7 +1334,8 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
     
-    float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float scale = _fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
@@ -1580,8 +1349,7 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     // Expand bounding box to include last column of text ...
     if ( _autoSize != autoSizeNone ) 
     {
-        _bounds.expand_to_point(x + PADDING_TWIPS,
-            y + PADDING_TWIPS);
+        _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
     // new paragraphs get the indent.
@@ -1652,7 +1420,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
     
-    float scale = _fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+    float scale = _fontHeight /
+    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontDescent = _font->descent() * scale; 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
@@ -2206,6 +1975,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
     }
 }
 
+int
+TextField::getDefinitionVersion() const
+{
+    // TODO: work out if this correct.
+    return get_root()->getDefinitionVersion();
+}
+
+
 TextField::VariableRef
 TextField::parseTextVariableRef(const std::string& variableName) const
 {
@@ -2581,6 +2358,9 @@ registerTextFieldNative(as_object& global)
     vm.registerNative(textfield_setNewTextFormat, 104, 105);
     vm.registerNative(textfield_getDepth, 104, 106);
     vm.registerNative(textfield_replaceText, 104, 107);
+
+    vm.registerNative(textfield_createTextField, 104, 200);
+    vm.registerNative(textfield_getFontList, 104, 201);
 }
 
 bool
@@ -2680,12 +2460,12 @@ TextField::setEmbedFonts(bool use)
 }
 
 void
-TextField::setWordWrap(bool on)
+TextField::setWordWrap(bool wrap)
 {
-    if ( _wordWrap != on )
-    {
+    if (_wordWrap != wrap) {
+
         set_invalidated();
-        _wordWrap=on;
+        _wordWrap = wrap;
         format_text();
     }
 }
@@ -2922,6 +2702,7 @@ TextField::getTextAlignment()
     if ( _autoSize == autoSizeCenter ) textAlignment = ALIGN_CENTER;
     else if ( _autoSize == autoSizeLeft ) textAlignment = ALIGN_LEFT;
     else if ( _autoSize == autoSizeRight ) textAlignment = ALIGN_RIGHT;
+
     return textAlignment;
 }
     
@@ -2935,10 +2716,14 @@ TextField::onChanged()
 
 /// This is called by movie_root when focus is applied to this TextField.
 //
-/// The return value is true if the TextField can recieve focus.
+/// The return value is true if the TextField can receive focus.
+/// The swfdec testsuite suggests that version 5 textfields cannot ever
+/// handle focus.
 bool
 TextField::handleFocus()
 {
+
+    if (getSWFVersion(*this) < 6) return false;
 
     set_invalidated();
 
@@ -2984,6 +2769,26 @@ TextField::markReachableResources() const
     markDisplayObjectReachable();
 }
 
+void
+TextField::setWidth(double newwidth)
+{
+	const SWFRect& bounds = getBounds();
+    _bounds.set_to_rect(bounds.get_x_min(),
+            bounds.get_y_min(),
+            bounds.get_x_min() + newwidth,
+            bounds.get_y_max());
+}
+
+void
+TextField::setHeight(double newheight)
+{
+	const SWFRect& bounds = getBounds();
+    _bounds.set_to_rect(bounds.get_x_min(),
+            bounds.get_y_min(),
+            bounds.get_x_max(),
+            bounds.get_y_min() + newheight);
+}
+
 /// TextField interface functions
 
 namespace {
@@ -2991,12 +2796,8 @@ namespace {
 void
 attachPrototypeProperties(as_object& o)
 {
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
     boost::intrusive_ptr<builtin_function> getset;
 
@@ -3059,6 +2860,68 @@ attachPrototypeProperties(as_object& o)
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
+
+/// This is in fact a property of MovieClip, but it is more a TextField
+/// function, as its major number (104) in the native table shows.
+as_value
+textfield_createTextField(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+    
+    // name, depth, x, y, width, height
+    if (fn.nargs < 6) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField called with %d args, "
+            "expected 6 - returning undefined"), fn.nargs);
+        );
+        return as_value();
+    }
+
+    const std::string& name = fn.arg(0).to_string();
+    int depth = fn.arg(1).to_int();
+    int x = fn.arg(2).to_int();
+    int y = fn.arg(3).to_int();
+    int width = fn.arg(4).to_int();
+
+    if (width < 0) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField: negative width (%d)"
+            " - reverting sign"), width);
+        );
+        width = -width;
+    }
+
+    int height = fn.arg(5).to_int();
+    if ( height < 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("createTextField: negative height (%d)"
+            " - reverting sign"), height);
+        );
+        height = -height;
+    }
+    // Set textfield bounds
+    SWFRect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
+
+    // Create an instance
+    DisplayObject* tf = new TextField(ptr.get(), bounds);
+
+    // Give name and mark as dynamic
+    tf->set_name(name);
+    tf->setDynamic();
+
+    // Set _x and _y
+    SWFMatrix matrix;
+    matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
+    // update caches (although shouldn't be needed as we only set translation)
+    tf->setMatrix(matrix, true); 
+
+    DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
+
+    // createTextField returns void, it seems
+    if (getSWFVersion(fn) > 7) return as_value(txt);
+    return as_value(); 
+}
 
 as_value
 textfield_background(const fn_call& fn)
@@ -3372,13 +3235,10 @@ textfield_variable(const fn_call& fn)
 as_value
 textfield_getDepth(const fn_call& fn)
 {
-    // TODO: make this a DisplayObject::getDepth_method function...
+    // Unlike MovieClip.getDepth this works only for TextFields.
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    int n = text->get_depth();
-
+    const int n = text->get_depth();
     return as_value(n);
-
 }
 
 as_value
@@ -3478,7 +3338,7 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     TextFormat_as* tf;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)).get(), tf)) {
+    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), tf)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
@@ -3822,7 +3682,7 @@ textfield_ctor(const fn_call& fn)
         obj = new as_object(proto);
     }
     else {
-        rect nullRect;
+        SWFRect nullRect;
         obj = new TextField(0, nullRect);
     }
 
@@ -3836,36 +3696,6 @@ attachTextFieldInterface(as_object& o)
     // TextField is an AsBroadcaster
     AsBroadcaster::initialize(o);
 
-    int propFlags = PropFlags::dontDelete
-        |PropFlags::dontEnum
-        |PropFlags::readOnly
-        |PropFlags::isProtected;
-
-    // Parent seems to not be a normal property
-    o.init_property(NSV::PROP_uPARENT, &DisplayObject::parent_getset,
-            &DisplayObject::parent_getset);
-
-    // Target seems to not be a normal property
-    o.init_property(NSV::PROP_uTARGET, &DisplayObject::target_getset,
-            &DisplayObject::target_getset);
-
-    // _name should be a property of the instance, not the prototype
-    o.init_property(NSV::PROP_uNAME, &DisplayObject::name_getset,
-            &DisplayObject::name_getset);
-
-    o.init_property(NSV::PROP_uXMOUSE,
-            DisplayObject::xmouse_get, DisplayObject::xmouse_get, propFlags);
-    o.init_property(NSV::PROP_uYMOUSE,
-            DisplayObject::ymouse_get, DisplayObject::ymouse_get, propFlags);
-    o.init_property(NSV::PROP_uHIGHQUALITY,
-            DisplayObject::highquality, DisplayObject::highquality);
-    o.init_property(NSV::PROP_uQUALITY,
-            DisplayObject::quality, DisplayObject::quality);
-    o.init_property(NSV::PROP_uXSCALE,
-            DisplayObject::xscale_getset, DisplayObject::xscale_getset);
-    o.init_property(NSV::PROP_uYSCALE,
-            DisplayObject::yscale_getset, DisplayObject::yscale_getset);
- 
     // SWF6 or higher
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
@@ -3888,17 +3718,10 @@ attachTextFieldInterface(as_object& o)
 void
 attachTextFieldStaticMembers(as_object& o)
 {
-    // Standard flags.
-    const int flags = PropFlags::dontDelete
-        |PropFlags::dontEnum;
-
     // SWF6 or higher
-    const int swf6Flags = flags | PropFlags::onlySWF6Up;
-
-    Global_as* gl = getGlobal(o);
-    o.init_member("getFontList",
-            gl->createFunction(textfield_getFontList), swf6Flags);
-
+    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+    VM& vm = getVM(o);
+    o.init_member("getFontList", vm.getNative(104, 201), swf6Flags);
 }
 
 /// This is called when a prototype should be added

@@ -50,7 +50,7 @@
 # include <netdb.h>
 # include <sys/param.h>
 # include <sys/select.h>
-#include <signal.h>
+#include <csignal>
 #ifdef HAVE_POLL_H
 # include <poll.h>
 #else 
@@ -101,7 +101,7 @@ Network::Network()
     wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
     if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
         log_error(_("Could not find a usable WinSock DLL"));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 #endif
 
@@ -978,14 +978,14 @@ Network::writeNet(amf::Buffer *buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(buffer->reference(), buffer->allocated());
-};
+}
 
 int
 Network::writeNet(int fd, amf::Buffer *buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer->reference(), buffer->allocated());
-};
+}
 
 // Write to the connection
 int
@@ -993,7 +993,7 @@ Network::writeNet(amf::Buffer &buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(buffer.reference(), buffer.allocated());
-};
+}
 
 // Write to the connection
 int
@@ -1001,7 +1001,7 @@ Network::writeNet(int fd, amf::Buffer &buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer.reference(), buffer.allocated());
-};
+}
 
 int
 Network::writeNet(const std::string& data)
@@ -1201,7 +1201,7 @@ Network::getPollFDPtr()
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     return &_pollfds[0];
-};
+}
 
 void
 Network::erasePollFD(int fd)
@@ -1567,7 +1567,7 @@ cntrlc_handler (int sig)
 {
     sig_number = sig;
     log_debug(_("Got an %d interrupt while blocked on pselect()"), sig);
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 } // end of gnash namespace

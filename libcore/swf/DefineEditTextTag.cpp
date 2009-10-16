@@ -39,11 +39,11 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineEditTextTag::createDisplayObject(DisplayObject* parent, int id) const
+DefineEditTextTag::createDisplayObject(DisplayObject* parent) const
 {
 	// Resolve the font, if possible
 	getFont();
-	TextField* ch = new TextField(parent, *this, id);
+	TextField* ch = new TextField(parent, *this);
 
 	// This gives an "instance name" to the TextField, but
 	// it is not really what we need.

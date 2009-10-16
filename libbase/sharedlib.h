@@ -26,6 +26,7 @@
 #include <string>
 #include <map>
 #include "as_object.h"
+#include "dsodefs.h" // DSOEXPORT
 
 #ifdef _WIN32
 #undef DLL_EXPORT
@@ -55,15 +56,15 @@ public:
     
     SharedLib();
     SharedLib(const std::string& filespec);
-    SharedLib(const std::string& filespec, const std::string& envvar);
+    DSOEXPORT SharedLib(const std::string& filespec, const std::string& envvar);
     ~SharedLib();
 
-    bool openLib();
+    DSOEXPORT bool openLib();
     bool openLib(const std::string &filespec);
     
     // Get a C symbol from the shared library based on the name
     entrypoint *getDllSymbol (const std::string& symbol);
-    initentry *getInitEntry (const std::string& symbol);
+    DSOEXPORT initentry *getInitEntry (const std::string& symbol);
     
 private:
 

@@ -37,7 +37,6 @@
 #include "MovieClip.h"
 #include "Font.h"
 #include "swf/TextRecord.h"
-#include "Array_as.h"
 #include "RGBA.h"
 #include "GnashNumeric.h"
 
@@ -171,7 +170,7 @@ TextSnapshot_as::markReachableResources() const
 }
 
 void
-TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
+TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
 {
     std::string::size_type pos = 0;
 
@@ -233,7 +232,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
-                ri.push(el);
+                ri.callMethod(NSV::PROP_PUSH, el);
 
                 ++pos;
                 x += k->advance;
@@ -455,7 +454,8 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
     size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
     size_t end = std::max<boost::int32_t>(start + 1, fn.arg(1).to_int());
 
-    Array_as* ri = new Array_as;
+    Global_as* gl = getGlobal(fn);
+    as_object* ri = gl->createArray();;
 
     ts->getTextRunInfo(start, end, *ri);
     

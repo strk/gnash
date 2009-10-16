@@ -48,7 +48,7 @@
 
 #define PLAYERTASK_NAME       "Gnash audio task"
 #define PLAYERTASK_PRIORITY   20
-#define RESET_TIME 30 * 1000
+#define RESET_TIME 20 * 1000
 
 #define BUFSIZE  		7056 * 4
 #define AHI_BUF_SIZE 	28224u
@@ -58,6 +58,11 @@
 
 // Mixing and decoding debugging
 //#define GNASH_DEBUG_MIXING
+
+/* The volume ranges from 0 - 128 */
+#define MIX_MAXVOLUME 128
+#define ADJUST_VOLUME(s, v)	(s = (s*v)/MIX_MAXVOLUME)
+#define ADJUST_VOLUME_U8(s, v)	(s = (((s-128)*v)/MIX_MAXVOLUME)+128)
 
 int audioTaskID;
 
@@ -110,7 +115,7 @@ AOS4_sound_handler::AOS4_sound_handler(const std::string& wavefile)
         file_stream.open(wavefile.c_str());
         if (file_stream.fail()) {
             std::cerr << "Unable to write file '" << wavefile << std::endl;
-            exit(1);
+            exit(EXIT_FAILURE);
         } else {
                 write_wave_header(file_stream);
                 std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
@@ -365,6 +370,9 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
 	if (!_closing)
 	{
+		AHIRequest *req = AHIios[AHICurBuf];
+		UWORD AHIOtherBuf = AHICurBuf^1;
+
 	    boost::mutex::scoped_lock lock(_mutex);
     	if (!_closing) 
     	{
@@ -386,69 +394,112 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 	        std::fill(to, to+nSamples, 0);
     	}
 
-	    // If nothing is left to play there is no reason to keep polling.
-    	if ( ! hasInputStreams() )
-	    {
-#ifdef GNASH_DEBUG_AOS4_AUDIO_PAUSING
-    	    log_debug("Pausing AOS4 Audio...");
-#endif
-			sound_handler::pause();
-    	}
+		//memcpy(BufferPointer, inSamples, nBytes);
+		memcpy(BufferPointer, to, nSamples*2);
+
+		if (AHIReqSent[AHICurBuf])
+		{
+			if (req->ahir_Std.io_Data)
+			{
+				IExec->WaitIO((struct IORequest *)req);
+				req->ahir_Std.io_Data = NULL;
+
+				IExec->GetMsg(AHImp);
+				IExec->GetMsg(AHImp);
+			}
+		}
+
+		req->ahir_Std.io_Message.mn_Node.ln_Pri = 127;
+		req->ahir_Std.io_Command  	= CMD_WRITE;
+		req->ahir_Std.io_Offset   	= 0;
+		req->ahir_Frequency       	= (ULONG) 44100;
+		req->ahir_Volume          	= 0x10000;          // Full volume
+		req->ahir_Position        	= 0x8000;           // Centered
+		req->ahir_Std.io_Data     	= PlayBuffer[AHIOtherBuf];
+		req->ahir_Std.io_Length  	= (ULONG) nSamples*2; //BUFSIZE;
+		req->ahir_Type 			 	= AHIST_S16S;
+		req->ahir_Link            	= (AHIReqSent[AHIOtherBuf] && !IExec->CheckIO((IORequest *) AHIios[AHIOtherBuf])) ? AHIios[AHIOtherBuf] : NULL;
+
+		IExec->SendIO( (struct IORequest *) req);
+
+		AHIReqSent[AHICurBuf] = true;
+		AHICurBuf = AHIOtherBuf;
+
+		BufferPointer = PlayBuffer[AHICurBuf];
 	}
+
+
+    // If nothing is left to play there is no reason to keep polling.
+   	if ( ! hasInputStreams() )
+    {
+#ifdef GNASH_DEBUG_AOS4_AUDIO_PAUSING
+   	    log_debug("Pausing AOS4 Audio...");
+#endif
+		sound_handler::pause();
+   	}
+}
+
+void 
+AOS4_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume)
+{
+	boost::uint16_t format;
+
+	if ( volume == 0 ) 
+	{
+		return;
+	}
+
+	format = AHIST_S16S;
+
+	/* Actually we have a fixed audio format */
+	switch (format) 
+	{
+		case AHIST_S16S:
+		{
+			boost::int16_t src1, src2;
+			int dst_sample;
+			const int max_audioval = ((1<<(16-1))-1);
+			const int min_audioval = -(1<<(16-1));
+
+			len /= 2;
+			while ( len-- ) 
+			{
+				src1 = ((src[0])<<8|src[1]);
+				ADJUST_VOLUME(src1, volume);
+				src2 = ((dst[0])<<8|dst[1]);
+				src += 2;
+				dst_sample = src1+src2;
+				if ( dst_sample > max_audioval ) 
+				{
+					dst_sample = max_audioval;
+				} 
+				else
+				if ( dst_sample < min_audioval ) 
+				{
+					dst_sample = min_audioval;
+				}
+				dst[1] = dst_sample & 0xFF;
+				dst_sample >>= 8;
+				dst[0] = dst_sample & 0xFF;
+				dst += 2;
+			}
+		}
+		break;
+	}
+	
 }
 
 void
 AOS4_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
 {
-    unsigned int nBytes = nSamples*2;
-
 	if (!_closing)
 	{
-		memcpy(BufferPointer, inSamples, nBytes);
-		BufferPointer += nBytes;
-		BufferFill    += nBytes;
+	    unsigned int nBytes = nSamples*2;
 
-		if (BufferFill >= BUFSIZE)
-		{
-			//while (!AHIReqSent[AHICurBuf] || IExec->CheckIO((struct IORequest *) AHIios[AHICurBuf]))
-			{
-				//printf("playing: Buffer:%d - Bufsize: %d\n",BufferFill, BUFSIZE);
-				AHIRequest *req = AHIios[AHICurBuf];
-				UWORD AHIOtherBuf = AHICurBuf^1;
+	    boost::uint8_t *out = reinterpret_cast<boost::uint8_t*>(outSamples);
+    	boost::uint8_t* in = reinterpret_cast<boost::uint8_t*>(inSamples);
 
-				if (AHIReqSent[AHICurBuf])
-				{
-					if (req->ahir_Std.io_Data)
-					{
-						IExec->WaitIO((struct IORequest *)req);
-						req->ahir_Std.io_Data = NULL;
-
-						IExec->GetMsg(AHImp);
-						IExec->GetMsg(AHImp);
-					}
-				}
-
-				req->ahir_Std.io_Message.mn_Node.ln_Pri = 127;
-				req->ahir_Std.io_Command  	= CMD_WRITE;
-				req->ahir_Std.io_Offset   	= 0;
-				req->ahir_Frequency       	= (ULONG) 44100;
-				req->ahir_Volume          	= 0x10000;          // Full volume
-				req->ahir_Position        	= 0x8000;           // Centered
-				req->ahir_Std.io_Data     	= PlayBuffer[AHIOtherBuf];
-				req->ahir_Std.io_Length  	= (ULONG) BUFSIZE;
-				req->ahir_Type 			 	= AHIST_S16S;
-				req->ahir_Link            	= (AHIReqSent[AHIOtherBuf] && !IExec->CheckIO((IORequest *) AHIios[AHIOtherBuf])) ? AHIios[AHIOtherBuf] : NULL;
-
-				IExec->SendIO( (struct IORequest *) req);
-
-				AHIReqSent[AHICurBuf] = true;
-				AHICurBuf = AHIOtherBuf;
-
-				BufferPointer = PlayBuffer[AHICurBuf];
-				BufferFill = 0;
-			}
-			//signals = IExec->Wait(1 << AHImp->mp_SigBit);
-		}
+	    MixAudio(out, in, nBytes, MIX_MAXVOLUME*volume);
 	}
 }
 

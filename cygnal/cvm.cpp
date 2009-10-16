@@ -34,10 +34,9 @@
 #include <ctime>
 
 #ifdef ENABLE_NLS
-#include <locale>
+# include <locale>
 #endif
 
-#include "gettext.h"
 #include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"
@@ -225,12 +224,12 @@ vm_main(int argc, char *argv[])
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
-        exit(0);
+        exit(EXIT_SUCCESS);
       }
       if (strcmp("--version", argv[c]) == 0) {
         printf (_("Gnash gprocessor version: %s, Gnash version: %s\n"),
 		   GPROC_VERSION, VERSION);
-        exit(0);
+        exit(EXIT_SUCCESS);
       }
     }
  
@@ -263,7 +262,7 @@ vm_main(int argc, char *argv[])
 	switch (c) {
 	  case 'h':
               dbglogfile.removeLog();
-	      exit(0);
+	      exit(EXIT_SUCCESS);
 	  case 'w':
 	      s_do_output = true;
 	      break;
@@ -306,11 +305,11 @@ vm_main(int argc, char *argv[])
 	      break;
 	  case ':':
               fprintf(stderr, "Missing argument for switch ``%c''\n", optopt); 
-	      exit(1);
+	      exit(EXIT_FAILURE);
 	  case '?':
 	  default:
               fprintf(stderr, "Unknown switch ``%c''\n", optopt); 
-	      exit(1);
+	      exit(EXIT_FAILURE);
 	}
     }
     
@@ -325,14 +324,14 @@ vm_main(int argc, char *argv[])
     if (infiles.empty()) {
 	    std::cerr << "no input files" << std::endl;
         dbglogfile.removeLog();
-	    exit(1);
+	    exit(EXIT_FAILURE);
     }
 
     if (infiles.size() > 1) {
         // We're not ready for multiple runs yet.
         std::cerr << "Multiple input files not supported." << std::endl;
         dbglogfile.removeLog();
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 
@@ -344,7 +343,7 @@ vm_main(int argc, char *argv[])
             new gnash::media::gst::MediaHandlerGst() );
 #else
     std::cerr << "Neither SOUND_SDL nor SOUND_GST defined" << std::endl;
-    exit(1);
+    exit(EXIT_FAILURE);
 #endif
     gnash::media::MediaHandler::set(handler);
 
@@ -366,7 +365,7 @@ vm_main(int argc, char *argv[])
 	    if (s_stop_on_errors) {
 		// Fail.
                 std::cerr << "error playing through movie " << *i << std::endl;
-		std::exit(1);
+		std::exit(EXIT_FAILURE);
 	    }
         }
 	
@@ -423,7 +422,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     }
     if (md == NULL) {
         std::cerr << "error: can't play movie: "<< filename << std::endl;
-	    std::exit(1);
+	    std::exit(EXIT_FAILURE);
     }
 
     float fps = md->get_frame_rate();

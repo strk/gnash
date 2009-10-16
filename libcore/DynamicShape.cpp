@@ -217,7 +217,7 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 	_currpath->drawLineTo(x, y);
 
 	// Update bounds 
-    rect bounds = _shape.getBounds();
+    SWFRect bounds = _shape.getBounds();
 
 	unsigned thickness = _currline ? 
         _shape.lineStyles().back().getThickness() : 0;
@@ -248,7 +248,7 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);
 
-    rect bounds = _shape.getBounds();
+    SWFRect bounds = _shape.getBounds();
 
 	unsigned thickness = _currline ? 
         _shape.lineStyles().back().getThickness() : 0;

@@ -28,7 +28,6 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "Array_as.h"
 #include "swf_function.h"
 #include "as_function.h"
 #include "fn_call.h"
@@ -49,10 +48,10 @@
 #include "StringPredicates.h" 
 #include "GnashNumeric.h"
 #include "Global_as.h"
+#include "DisplayObject.h"
 
 #include <string>
 #include <vector>
-#include <locale>
 #include <cstdlib> // std::mbstowcs
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
@@ -369,49 +368,6 @@ SWFHandlers::get_handlers()
     return handlers;
 }
 
-/// @todo: make properties available outside, for
-///        example for Machine.cpp
-/// @todo: consider sorting named strings so that
-///        the first 22 or more elements have
-///        the corresponding property number (drops
-///        one level of indirection).
-///
-static const string_table::key&
-propertyKey(unsigned int val)
-{
-    static const string_table::key invalidKey=0;
-
-    if ( val > 21u ) return invalidKey;
-
-    static const string_table::key props[22] = {
-        NSV::PROP_uX, // 0
-        NSV::PROP_uY, // 1
-        NSV::PROP_uXSCALE, // 2
-        NSV::PROP_uYSCALE, // 3
-        NSV::PROP_uCURRENTFRAME, // 4
-        NSV::PROP_uTOTALFRAMES, // 5
-        NSV::PROP_uALPHA, // 6
-        NSV::PROP_uVISIBLE, // 7
-        NSV::PROP_uWIDTH, // 8
-        NSV::PROP_uHEIGHT, // 9
-        NSV::PROP_uROTATION, // 10
-        NSV::PROP_uTARGET, // 11
-        NSV::PROP_uFRAMESLOADED, // 12
-        NSV::PROP_uNAME, // 13
-        NSV::PROP_uDROPTARGET, // 14
-        NSV::PROP_uURL, // 15
-        NSV::PROP_uHIGHQUALITY, // 16
-        NSV::PROP_uFOCUSRECT, // 17
-        NSV::PROP_uSOUNDBUFTIME, // 18
-        NSV::PROP_uQUALITY, // 19
-        NSV::PROP_uXMOUSE, // 20
-        NSV::PROP_uYMOUSE // 21
-    };
-
-    return props[val];
-}
-
-
 const SWFHandlers&
 SWFHandlers::instance()
 {
@@ -422,8 +378,6 @@ SWFHandlers::instance()
 void
 SWFHandlers::execute(ActionType type, ActionExec& thread) const
 {
-//    It is very heavy operation
-//    if ( _handlers[type].getName() == "unsupported" ) return false;
     try {
         get_handlers()[type].execute(thread);
     }
@@ -709,12 +663,8 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 void
 SWFHandlers::ActionSubtract(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    
-    const double operand2 = env.top(0).to_number();
-    const double operand1 = env.top(1).to_number();
-    env.top(1) = operand1 - operand2;
+    subtract(env.top(1), env.top(0), getVM(env));
     env.drop(1);
 }
 
@@ -786,7 +736,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
     env.top(1).set_bool(op1.to_number() == op2.to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -800,7 +750,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
     env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -834,7 +784,7 @@ SWFHandlers::ActionLogicalNot(ActionExec& thread)
     env.top(0).set_bool(! env.top(0).to_bool());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) env.top(0).convert_to_number();
+    if (env.get_version() < 5) convertToNumber(env.top(0), getVM(env));
 }
 
 void
@@ -884,28 +834,16 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     
     const as_value& strval = env.top(2);
 
-    // input checks
-    if ( strval.is_undefined() || strval.is_null() )
-    {
-    IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Undefined or null string passed to ActionSubString, "
-        "returning undefined"));
-        );
-        env.drop(2);
-        env.top(0).set_undefined();
-        return;
-    }
-    
+    // Undefined values should resolve to 0.
     int size = env.top(0).to_int();
     int start = env.top(1).to_int();
 
-    // We don't need to_string_versioned because undefined values have
-    // already been dealt with.
     const int version = env.get_version();
     const std::wstring wstr = utf8::decodeCanonicalString(
-                                strval.to_string(), version);
+                                strval.to_string_versioned(version), version);
+    
 
-    if ( size < 0 )
+    if (size < 0)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Negative size passed to ActionSubString, "
@@ -914,8 +852,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
         size = wstr.length();
     }
 
-    if ( size == 0 || wstr.empty() )
-    {
+    if (size == 0 || wstr.empty()) {
         env.drop(2);
         env.top(0).set_string("");
         return;
@@ -1083,7 +1020,7 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
     as_environment& env = thread.env;
 
     const int version = env.get_version();
-    env.top(1).convert_to_string_versioned(version);
+    convertToString(env.top(1), getVM(env));
     env.top(1).string_concat(env.top(0).to_string_versioned(version));
     env.drop(1);
 }
@@ -1118,21 +1055,8 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     unsigned int prop_number =
         static_cast<unsigned int>(env.top(0).to_number());
 
-    if (target)
-    {
-        string_table::key propKey = propertyKey(prop_number);
-        if ( propKey == 0 )
-        {
-            log_error(_("invalid property query, property "
-                "number %d"), prop_number);
-            env.top(1) = as_value();
-        }
-        else
-        {
-            as_value val;
-            target->get_member(propKey, &val);
-            env.top(1) = val;
-        }
+    if (target) {
+        getIndexedProperty(prop_number, *target, env.top(1));
     }
     else
     {
@@ -1159,20 +1083,8 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 
     as_value prop_val = env.top(0);
 
-    if (target)
-    {
-        string_table::key propKey = propertyKey(prop_number);
-        if ( propKey == 0 )
-        {
-            // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
-            IF_VERBOSE_MALFORMED_SWF (
-            log_swferror(_("invalid set_property, property number %d"), prop_number);
-            )
-        }
-        else
-        {
-            target->set_member(propKey, prop_val);
-        }
+    if (target) {
+        setIndexedProperty(prop_number, *target, prop_val);
     }
     else
     {
@@ -1343,7 +1255,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
             std::swap(x1, x0);
         }
 
-        rect bounds(x0, y0, x1, y1);
+        SWFRect bounds(x0, y0, x1, y1);
         st.setBounds(bounds);
 
         env.drop(4);
@@ -1788,27 +1700,23 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
+    const as_value& arg0 = env.top(0);
+    const as_value& arg1 = env.top(1);
 
+    // Undefined values should resolve to 0.
     int size = env.top(0).to_int();
     int start = env.top(1).to_int();
+
     as_value& string_val = env.top(2);
 
     IF_VERBOSE_ACTION(
-    log_action(" ActionMbSubString(%s, %d, %d)", string_val, start, size);
+    log_action(" ActionMbSubString(%s, %d, %d)", string_val, arg0, arg1);
     );
 
     env.drop(2);
 
-    if (string_val.is_undefined() || string_val.is_null())
-    {
-        log_error(_("Undefined or null string passed to ActionMBSubString, "
-            "returning undefined"));
-        env.top(0).set_undefined();
-        return;
-    }
-
-    std::string str = string_val.to_string();
+    const int version = env.get_version();
+    std::string str = string_val.to_string_versioned(version);
     int length = 0;
     std::vector<int> offsets;
 
@@ -2299,12 +2207,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //         is the target to load the resource into).
         //
         DisplayObject* curtgt = env.get_target();
-        if ( ! curtgt )
-        {
+        if (!curtgt) {
             log_error(_("CommonGetUrl: current target is undefined"));
             return;
         }
-        curtgt->getURLEncodedVars(varsToSend);
+        getURLEncodedVars(*curtgt, varsToSend);
     }
 
 
@@ -2899,11 +2806,12 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     const int array_size = env.pop().to_int();
     assert(array_size >= 0); // TODO: trigger this !!
+    
+    Global_as* gl = getGlobal(env);
 
-    // Call the array constructor, to create an empty array.
-    as_value result = array_new(fn_call(NULL, env));
+    as_value result = gl->createArray();
 
-    boost::intrusive_ptr<as_object> ao = convertToObject(*getGlobal(thread.env), result);
+    as_object* ao = convertToObject(*getGlobal(thread.env), result);
     assert(ao);
 
     // Fill the elements with the initial values from the stack.
@@ -2965,23 +2873,20 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 void
 SWFHandlers::ActionTargetPath(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
 
-    boost::intrusive_ptr<MovieClip> sp = env.top(0).to_sprite();
-    if ( sp )
-    {
+    DisplayObject* sp = env.top(0).toDisplayObject();
+    if (sp) {
         env.top(0).set_string(sp->getTarget());
+        return;
     }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Argument to TargetPath(%s) doesn't cast to a MovieClip"),
-            env.top(0));
-        );
-        env.top(0).set_undefined();
-    }
+
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Argument to TargetPath(%s) doesn't cast "
+                "to a DisplayObject"), env.top(0));
+    );
+    env.top(0).set_undefined();
 }
 
 // Push a each object's member value on the stack
@@ -3026,118 +2931,18 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 void
 SWFHandlers::ActionNewAdd(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    as_value v1 = env.top(0);
-    as_value v2 = env.top(1);
+    newAdd(env.top(1), env.top(0), getVM(env));
 
-    try { v1 = v1.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("%s.to_primitive() threw an error during ActionNewAdd"),
-            env.top(0));
-    }
-
-    try { v2 = v2.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("%s.to_primitive() threw an error during ActionNewAdd"),
-            env.top(1));
-    }
-
-#if GNASH_DEBUG
-    log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),
-                v1, v2);
-#endif
-
-    if (v1.is_string() || v2.is_string())
-    {
-        // NOTE: I've tested that we should change behaviour
-        //       based on code definition version, not top-level
-        //       SWF version. Just not automated yet.
-        //
-        const int version = thread.code.getDefinitionVersion();
-        v2.convert_to_string_versioned(version);
-        v2.string_concat(v1.to_string_versioned(version));
-        env.top(1) = v2;
-    }
-    else
-    {
-        // use numeric semantic
-        const double v2num = v2.to_number();
-        const double v1num = v1.to_number();
-
-        v2.set_double(v2num + v1num); 
-
-        env.top(1) = v2;
-    }
     env.drop(1);
 }
 
 void
 SWFHandlers::ActionNewLessThan(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-
-    as_value operand1 = env.top(1);
-    as_value operand2 = env.top(0);
-
-    try { operand1 = operand1.to_primitive(as_value::NUMBER); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewLessThan"), operand1);
-    }
-    if ( operand1.is_object() && !operand1.is_sprite() )
-    {
-        // comparison involving an object (NOT sprite!) is always false
-        env.top(1).set_bool(false);
-        env.drop(1);
-        return;
-    }
-
-    try { operand2 = operand2.to_primitive(as_value::NUMBER); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewLessThan"), operand2);
-    }
-    if ( operand2.is_object() && !operand2.is_sprite() )
-    {
-        // comparison involving an object (NOT sprite!) is always false
-        env.top(1).set_bool(false);
-        env.drop(1);
-        return;
-    }
-
-    if ( operand1.is_string() && operand2.is_string() )
-    {
-        const std::string& s1 = operand1.to_string();
-        const std::string& s2 = operand2.to_string();
-        // Don't ask me why, but an empty string is not less than a non-empty one
-        if ( s1.empty() ) {
-            env.top(1).set_bool(false);
-        } else if ( s2.empty() ) {
-            env.top(1).set_bool(true);
-        }
-        else env.top(1).set_bool(s1 < s2);
-    }
-    else
-    {
-        const double op1 = operand1.to_number();
-        const double op2 = operand2.to_number();
-
-        if ( isNaN(op1) || isNaN(op2) )
-        {
-            env.top(1).set_undefined();
-        }
-        else
-        {
-            env.top(1).set_bool(op1<op2);
-        }
-    }
+    env.top(1) = newLessThan(env.top(1), env.top(0), getVM(env));
     env.drop(1);
 }
 
@@ -3185,23 +2990,20 @@ void
 SWFHandlers::ActionToNumber(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).convert_to_number();
+    convertToNumber(env.top(0), getVM(env));
 }
 
 void
 SWFHandlers::ActionToString(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
-    const int version = env.get_version();
-    env.top(0).convert_to_string_versioned(version);
+    convertToString(env.top(0), getVM(env));
 }
 
 void
 SWFHandlers::ActionDup(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
     env.push(env.top(0));
 }
 
@@ -3209,10 +3011,7 @@ void
 SWFHandlers::ActionSwap(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
-    as_value    temp = env.top(1);
-    env.top(1) = env.top(0);
-    env.top(0) = temp;
+    std::swap(env.top(1), env.top(0));
 }
 
 void
@@ -3224,7 +3023,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     as_value member_name = env.top(0);
     as_value target = env.top(1);
 
-    boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), target);
+    boost::intrusive_ptr<as_object> obj =
+        convertToObject(*getGlobal(thread.env), target);
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3273,18 +3073,15 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
-    if ( member_name.empty() )
-    {
+    if (member_name.empty()) {
         IF_VERBOSE_ASCODING_ERRORS (
             // Invalid object, can't set.
-            log_aserror(_("ActionSetMember: %s.%s=%s: member name evaluates to invalid (empty) string"),
-                env.top(2),
-                env.top(1),
-                env.top(0));
+            log_aserror(_("ActionSetMember: %s.%s=%s: member name "
+                    "evaluates to invalid (empty) string"),
+                    env.top(2), env.top(1), env.top(0));
         );
     }
-    else if (obj)
-    {
+    else if (obj) {
         thread.setObjectMember(*(obj.get()), member_name, member_value);
 
         IF_VERBOSE_ACTION (
@@ -3296,14 +3093,13 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     }
     else
     {
-        // Malformed SWF ? (don't think this is possible to do with ActionScript syntax)
+        // Malformed SWF ? (don't think this is possible to do with
+        // ActionScript syntax)
         // FIXME, should this be log_swferror?
         IF_VERBOSE_ASCODING_ERRORS (
             // Invalid object, can't set.
             log_aserror(_("-- set_member %s.%s=%s on invalid object!"),
-                env.top(2),
-                member_name,
-                member_value);
+                env.top(2), member_name, member_value);
         );
     }
 
@@ -3314,14 +3110,14 @@ void
 SWFHandlers::ActionIncrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(env.top(0).to_number()+1);
+    env.top(0).set_double(env.top(0).to_number() + 1);
 }
 
 void
 SWFHandlers::ActionDecrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(env.top(0).to_number()-1);
+    env.top(0).set_double(env.top(0).to_number() - 1);
 }
 
 void
@@ -4154,7 +3950,7 @@ convertToObject(Global_as& gl, const as_value& val)
 {
 
     try {
-        return val.to_object(gl).get();
+        return val.to_object(gl);
     }
     catch (const GnashException& gl) {
         return 0;

@@ -417,6 +417,9 @@ public:
         _rootMovie->setPlayState(s);
     }
 
+    /// Get a unique number for unnamed instances.
+    size_t nextUnnamedInstance();
+
     /// Notify still loaded DisplayObject listeners for key events
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
@@ -511,7 +514,7 @@ public:
     enum StageHorizontalAlign {
         STAGE_H_ALIGN_C,
         STAGE_H_ALIGN_L,
-        STAGE_H_ALIGN_R,
+        STAGE_H_ALIGN_R
     };
 
     /// The possible vertical position of the Stage
@@ -1019,7 +1022,6 @@ private:
     /// Process all actions in the queue
     void processActionQueue();
 
-    // TODO: use Range2d<int> ?
     int m_viewport_x0, m_viewport_y0;
 
     /// Width and height of viewport, in pixels
@@ -1218,7 +1220,12 @@ private:
 
     // time of last movie advancement, in milliseconds
     unsigned int _lastMovieAdvancement;
+
+    size_t _unnamedInstance;
+
 };
+
+DSOEXPORT short stringToStageAlign(const std::string& s);
 
 } // namespace gnash
 

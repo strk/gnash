@@ -43,9 +43,9 @@ class InteractiveObject : public DisplayObject
 
 public:
 
-	InteractiveObject(DisplayObject* parent, int id)
+	InteractiveObject(DisplayObject* parent)
 		:
-		DisplayObject(parent, id)
+		DisplayObject(parent)
 	{
 	}
 
@@ -79,7 +79,7 @@ public:
     /// Container DisplayObjects (sprite and buttons) return the composite
     /// bounds of all their children, appropriately transformed with
     /// their local SWFMatrix.
-    virtual rect getBounds() const = 0;
+    virtual SWFRect getBounds() const = 0;
 
     /// \brief
     /// Return the topmost entity covering the given point
@@ -110,7 +110,7 @@ public:
 
     virtual void mouseEvent(const event_id& id)
     {
-        on_event(id);
+        notifyEvent(id);
     }
 
     /// Return true if the given point falls in this DisplayObject's shape

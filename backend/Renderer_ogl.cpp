@@ -677,7 +677,7 @@ public:
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
   virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m,
-          const rect* bounds, bool /*smooth*/)
+          const SWFRect* bounds, bool /*smooth*/)
   {
     GLint index;
 
@@ -708,7 +708,7 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(GnashImage* frame, const SWFMatrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(GnashImage* frame, const SWFMatrix* m, const SWFRect* bounds)
   {
   
     if (frame->type() == GNASH_IMAGE_RGBA)
@@ -746,8 +746,8 @@ public:
 
     size_t height = frame->height();
     size_t width = frame->width();
-    float zx = w_bounds / (float) width;
-    float zy = h_bounds / (float) height;
+    float zx = w_bounds / static_cast<float>(width);
+    float zy = h_bounds / static_cast<float>(height);
     glPixelZoom(zx,  -zy);  // flip & zoom image
     glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
 
@@ -762,7 +762,7 @@ public:
 
   // FIXME
   geometry::Range2d<int>
-  world_to_pixel(const rect& worldbounds)
+  world_to_pixel(const SWFRect& worldbounds)
   {
     // TODO: verify this is correct
     geometry::Range2d<int> ret(worldbounds.getRange());
@@ -791,6 +791,11 @@ public:
     
     _width  = fabsf(x1 - x0);
     _height = fabsf(y1 - y0);
+
+    glScalef(static_cast<float>(twipsToPixels(_width)) /
+    static_cast<float>(viewport_width),
+    static_cast<float>(twipsToPixels(_height)) / 
+    static_cast<float>(viewport_height), 1.0f);
 
     // Setup the clear color. The actual clearing will happen in end_display.
     if (bg_color.m_a) {
@@ -1312,7 +1317,7 @@ public:
 
       GLfloat width_info[2];
       
-      glGetFloatv( GL_LINE_WIDTH_RANGE, width_info);          
+      glGetFloatv(GL_LINE_WIDTH_RANGE, width_info);          
       
       if (width > width_info[1]) {
         LOG_ONCE( log_unimpl("Your OpenGL implementation does not support the line width" \
@@ -1589,6 +1594,8 @@ public:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
       
+      glDisable(GL_TEXTURE_GEN_S);
+      glDisable(GL_TEXTURE_GEN_T);    
       glDisable(GL_TEXTURE_1D);
       glDisable(GL_TEXTURE_2D);      
     }

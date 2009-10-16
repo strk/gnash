@@ -35,6 +35,7 @@
 
 #include <sstream>
 #include <map>
+#include <boost/tokenizer.hpp>
 
 namespace gnash {
 
@@ -43,6 +44,71 @@ namespace {
     as_value loadableobject_load(const fn_call& fn);
     as_value loadableobject_decode(const fn_call& fn);
     as_value loadableobject_sendAndLoad(const fn_call& fn);
+}
+
+/// Functors for use with foreachArray
+namespace {
+
+class WriteHeaders
+{
+public:
+
+    WriteHeaders(NetworkAdapter::RequestHeaders& headers)
+        :
+        _headers(headers),
+        _i(0)
+    {}
+
+    void operator()(const as_value& val)
+    {
+        // Store even elements and continue
+        if (!(_i++ % 2)) {
+            _key = val;
+            return;
+        }
+
+        // Both elements apparently must be strings, or we move onto the 
+        // next pair.
+        if (!val.is_string() || !_key.is_string()) return;
+        _headers[_key.to_string()] = val.to_string();
+    }
+
+private:
+    as_value _key;
+    NetworkAdapter::RequestHeaders _headers;
+    size_t _i;
+};
+
+class GetHeaders
+{
+public:
+
+    GetHeaders(as_object& target)
+        :
+        _target(target),
+        _i(0)
+    {}
+
+    void operator()(const as_value& val)
+    {
+        // Store even elements and continue
+        if (!(_i++ % 2)) {
+            _key = val;
+            return;
+        }
+
+        // Both elements apparently must be strings, or we move onto the 
+        // next pair.
+        if (!val.is_string() || !_key.is_string()) return;
+        _target.callMethod(NSV::PROP_PUSH, _key, val);
+    }
+
+private:
+    as_value _key;
+    as_object& _target;
+    size_t _i;
+};
+
 }
 
 LoadableObject::LoadableObject(as_object* owner)
@@ -91,11 +157,10 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
     target.set_member(NSV::PROP_LOADED, false);
 
     const RunResources& ri = getRunResources(owner());
-	URL url(urlstr, ri.baseURL());
+    URL url(urlstr, ri.baseURL());
 
-	std::auto_ptr<IOChannel> str;
-	if (post)
-    {
+    std::auto_ptr<IOChannel> str;
+    if (post) {
         as_value customHeaders;
 
         NetworkAdapter::RequestHeaders headers;
@@ -105,33 +170,10 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
             /// Read in our custom headers if they exist and are an
             /// array.
-            Array_as* array = dynamic_cast<Array_as*>(
-                            customHeaders.to_object(*getGlobal(target)).get());
-                            
-            if (array)
-            {
-                Array_as::const_iterator e = array->end();
-                --e;
-
-                for (Array_as::const_iterator i = array->begin(); i != e; ++i)
-                {
-                    // Only even indices can be a header.
-                    if (i.index() % 2) continue;
-                    if (! (*i).is_string()) continue;
-                    
-                    // Only the immediately following odd number can be 
-                    // a value.
-                    if (array->at(i.index() + 1).is_string())
-                    {
-                        const std::string& name = (*i).to_string();
-                        const std::string& val =
-                                    array->at(i.index() + 1).to_string();
-                                    
-                        // Values should overwrite existing ones.
-                        headers[name] = val;
-                    }
-                    
-                }
+            as_object* array = customHeaders.to_object(*getGlobal(target));
+            if (array) {
+                WriteHeaders wh(headers);
+                foreachArray(*array, wh);
             }
         }
 
@@ -153,7 +195,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         /// It doesn't matter if there are no request headers.
         str = ri.streamProvider().getStream(url, strval, headers);
     }
-	else
+    else
     {
         // Convert the object to a string to send. XML should
         // not be URL encoded for the GET method.
@@ -172,13 +214,13 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
         str = ri.streamProvider().getStream(url.str());
     }
 
-	log_security(_("Loading from url: '%s'"), url.str());
-	
+    log_security(_("Loading from url: '%s'"), url.str());
+    
     LoadableObject* loadObject;
     if (isNativeType(&target, loadObject)) {
         loadObject->queueLoad(str);
     }
-	
+    
 }
 
 void
@@ -186,15 +228,15 @@ LoadableObject::load(const std::string& urlstr)
 {
     // Set loaded property to false; will be updated (hopefully)
     // when loading is complete.
-	owner().set_member(NSV::PROP_LOADED, false);
+    owner().set_member(NSV::PROP_LOADED, false);
 
     const RunResources& ri = getRunResources(owner());
-	URL url(urlstr, ri.baseURL());
+    URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
     std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
-	log_security(_("Loading from url: '%s'"), url.str());
+    log_security(_("Loading from url: '%s'"), url.str());
     queueLoad(str);
 }
 
@@ -244,12 +286,12 @@ LoadableObject::update()
             boost::scoped_array<char> buf(new char[dataSize + 1]);
             size_t actuallyRead = lt->read(buf.get(), dataSize);
             if ( actuallyRead != dataSize )
-			{
-				// This would be either a bug of LoadThread or an expected
-				// possibility which lacks documentation (thus a bug in
+            {
+                // This would be either a bug of LoadThread or an expected
+                // possibility which lacks documentation (thus a bug in
                 // documentation)
-				//
-			}
+                //
+            }
             buf[actuallyRead] = '\0';
 
             // Strip BOM, if any.
@@ -311,7 +353,7 @@ LoadableObject::registerNative(as_object& o)
 as_value
 LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesLoaded;
     string_table& st = getStringTable(fn);
@@ -322,13 +364,14 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 as_value
 LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value bytesTotal;
     string_table& st = getStringTable(fn);
     ptr->get_member(st.find("_bytesTotal"), &bytesTotal);
     return bytesTotal;
 }
+
 
 /// Can take either a two strings as arguments or an array of strings,
 /// alternately header and value.
@@ -339,9 +382,11 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     as_value customHeaders;
     as_object* array;
 
+    Global_as* gl = getGlobal(fn);
+
     if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object(*getGlobal(fn)).get();
+        array = customHeaders.to_object(*gl);
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -351,15 +396,11 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
             return as_value();
         }
     }
-    else
-    {
-        array = new Array_as;
+    else {
+        array = gl->createArray();
         // This property is always initialized on the first call to
-        // addRequestHeaders.
-        const int flags = PropFlags::dontEnum |
-                          PropFlags::dontDelete;
-
-        fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
+        // addRequestHeaders. It has default properties.
+        fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array);
     }
 
     if (fn.nargs == 0)
@@ -374,14 +415,11 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     
     if (fn.nargs == 1)
     {
-        // This must be an array. Keys / values are pushed in valid
-        // pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> obj =
-            fn.arg(0).to_object(*getGlobal(fn));
-        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
+        // This must be an array (or something like it). Keys / values are
+        // pushed in valid pairs to the _customHeaders array.    
+        boost::intrusive_ptr<as_object> headerArray = fn.arg(0).to_object(*gl);
 
-        if (!headerArray)
-        {
+        if (!headerArray) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("XML.addRequestHeader: single argument "
                                 "is not an array"));
@@ -389,23 +427,8 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
             return as_value();
         }
 
-        Array_as::const_iterator e = headerArray->end();
-        --e;
-
-        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
-        {
-            // Only even indices can be a key, and they must be a string.
-            if (i.index() % 2) continue;
-            if (!(*i).is_string()) continue;
-            
-            // Only the immediately following odd number can be 
-            // a value, and it must also be a string.
-            const as_value& val = headerArray->at(i.index() + 1);
-            if (val.is_string())
-            {
-                array->callMethod(NSV::PROP_PUSH, *i, val);
-            }
-        }
+        GetHeaders gh(*array);
+        foreachArray(*headerArray, gh);
         return as_value();
     }
         
@@ -449,26 +472,45 @@ namespace {
 as_value
 loadableobject_decode(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
-	if (!fn.nargs) return as_value(false);
+    if (!fn.nargs) return as_value(false);
 
-	typedef std::map<std::string, std::string> ValuesMap;
-
-	ValuesMap vals;
+    typedef std::map<std::string, std::string> ValuesMap;
+    ValuesMap vals;
 
     const int version = getSWFVersion(fn);
+    const std::string qs = fn.arg(0).to_string_versioned(version);
 
-	URL::parse_querystring(fn.arg(0).to_string_versioned(version), vals);
+    if (qs.empty()) return as_value();
 
-	string_table& st = getStringTable(fn);
-	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
-			it != itEnd; ++it)
-	{
-		ptr->set_member(st.find(it->first), as_value(it->second));
-	}
+    typedef boost::char_separator<char> Sep;
+    typedef boost::tokenizer<Sep> Tok;
+    Tok t1(qs, Sep("&"));
 
-	return as_value(); 
+    string_table& st = getStringTable(fn);
+
+    for (Tok::iterator tit=t1.begin(); tit!=t1.end(); ++tit) {
+
+        const std::string& nameval = *tit;
+
+        std::string name;
+        std::string value;
+
+        size_t eq = nameval.find("=");
+        if (eq == std::string::npos) name = nameval;
+        else {
+            name = nameval.substr(0, eq);
+            value = nameval.substr(eq + 1);
+        }
+
+        URL::decode(name);
+        URL::decode(value);
+
+        if (!name.empty()) ptr->set_member(st.find(name), value);
+    }
+
+    return as_value(); 
 }
 
 /// Returns true if the arguments are valid, otherwise false. The
@@ -479,78 +521,78 @@ loadableobject_decode(const fn_call& fn)
 as_value
 loadableobject_sendAndLoad(const fn_call& fn)
 {
-	LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
+    LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
 
-	if ( fn.nargs < 2 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("sendAndLoad() requires at least two arguments"));
-		);
-		return as_value(false);
-	}
+    if ( fn.nargs < 2 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("sendAndLoad() requires at least two arguments"));
+        );
+        return as_value(false);
+    }
 
-	const std::string& urlstr = fn.arg(0).to_string();
-	if ( urlstr.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("sendAndLoad(): invalid empty url"));
-		);
-		return as_value(false);
-	}
+    const std::string& urlstr = fn.arg(0).to_string();
+    if ( urlstr.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("sendAndLoad(): invalid empty url"));
+        );
+        return as_value(false);
+    }
 
-	if (!fn.arg(1).is_object())
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(_("sendAndLoad(): invalid target (must be an "
-		    		    "XML or LoadVars object)"));
-		);
-		return as_value(false);
-	}
+    if (!fn.arg(1).is_object())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("sendAndLoad(): invalid target (must be an "
+                        "XML or LoadVars object)"));
+        );
+        return as_value(false);
+    }
 
     // TODO: if this isn't an XML or LoadVars, it won't work, but we should
     // check how far things get before it fails.
-	boost::intrusive_ptr<as_object> target =
+    boost::intrusive_ptr<as_object> target =
         fn.arg(1).to_object(*getGlobal(fn));
 
     // According to the Flash 8 Cookbook (Joey Lott, Jeffrey Bardzell), p 427,
     // this method sends by GET unless overridden, and always by GET in the
     // standalone player. We have no tests for this, but a Twitter widget
     // gets Bad Request from the server if we send via POST.
-	bool post = false;
-	if (fn.nargs > 2) {
+    bool post = false;
+    if (fn.nargs > 2) {
         const std::string& method = fn.arg(2).to_string();
         StringNoCaseEqual nc;
         post = nc(method, "post");
     }      
 
-	ptr->sendAndLoad(urlstr, *target, post);
-	return as_value(true);
+    ptr->sendAndLoad(urlstr, *target, post);
+    return as_value(true);
 }
 
 
 as_value
 loadableobject_load(const fn_call& fn)
 {
-	LoadableObject* obj = ensureNativeType<LoadableObject>(fn.this_ptr);
+    LoadableObject* obj = ensureNativeType<LoadableObject>(fn.this_ptr);
 
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("load() requires at least one argument"));
-		);
-		return as_value(false);
-	}
+    if ( fn.nargs < 1 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("load() requires at least one argument"));
+        );
+        return as_value(false);
+    }
 
-	const std::string& urlstr = fn.arg(0).to_string();
-	if ( urlstr.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("load(): invalid empty url"));
-		);
-		return as_value(false);
-	}
+    const std::string& urlstr = fn.arg(0).to_string();
+    if ( urlstr.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("load(): invalid empty url"));
+        );
+        return as_value(false);
+    }
 
-	obj->load(urlstr);
+    obj->load(urlstr);
     
     string_table& st = getStringTable(fn);
     fn.this_ptr->set_member(st.find("_bytesLoaded"), 0.0);

@@ -61,22 +61,6 @@ namespace {
 // the Function class itself, which would be a member
 // of the _global object for each movie instance.
 
-as_function::as_function(Global_as& gl, as_object* iface)
-	:
-	as_object(gl)
-{
-	int flags = PropFlags::dontDelete |
-	            PropFlags::dontEnum |
-	            PropFlags::onlySWF6Up;
-
-    init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
-
-	if (iface) {
-		iface->init_member(NSV::PROP_CONSTRUCTOR, this); 
-		init_member(NSV::PROP_PROTOTYPE, as_value(iface));
-	}
-}
-
 as_function::as_function(Global_as& gl)
 	:
 	as_object(gl)
@@ -195,7 +179,7 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
     // 'this' pointer. Others return a new object. This is to handle those
     // cases.
     if (isBuiltin() && ret.is_object()) {
-        newobj = ret.to_object(*getGlobal(env)).get();
+        newobj = ret.to_object(*getGlobal(env));
 
         newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
                 flags);
@@ -271,6 +255,17 @@ function_ctor(const fn_call& /*fn*/)
 }
 
 
+class PushFunctionArgs
+{
+public:
+    PushFunctionArgs(fn_call& fn) : _fn(fn) {}
+    void operator()(const as_value& val) {
+        _fn.pushArg(val);
+    }
+private:
+    fn_call& _fn;
+};
+
 as_value
 function_apply(const fn_call& fn)
 {
@@ -294,7 +289,7 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object* obj = fn.arg(0).to_object(*getGlobal(fn)).get();
+		as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
 
         if (!obj) obj = new as_object; 
 
@@ -317,37 +312,11 @@ function_apply(const fn_call& fn)
 			boost::intrusive_ptr<as_object> arg1 = 
                 fn.arg(1).to_object(*getGlobal(fn));
 
-			if (!arg1) {
-				IF_VERBOSE_ASCODING_ERRORS(
-					log_aserror(_("Second arg of Function.apply"
-						" is %s (expected array)"
-						" - considering as call with no args"),
-						fn.arg(1));
-				);
-				goto call_it;
-			}
-
-			boost::intrusive_ptr<Array_as> arg_array = 
-					boost::dynamic_pointer_cast<Array_as>(arg1);
-
-			if ( ! arg_array )
-			{
-				IF_VERBOSE_ASCODING_ERRORS(
-					log_aserror(_("Second arg of Function.apply"
-						" is of type %s, with value %s"
-						" (expected array)"
-						" - considering as call with no args"),
-						fn.arg(1).typeOf(), fn.arg(1).to_string());
-				);
-				goto call_it;
-			}
-
-			const size_t nelems = arg_array->size();
-
-			for (size_t i = 0; i < nelems; ++i) {
-				new_fn_call.pushArg(arg_array->at(i));
-			}
-
+            if (arg1) {
+                PushFunctionArgs pa(new_fn_call);
+                foreachArray(*arg1, pa);
+            }
+            else goto call_it;
 		}
 	}
 
@@ -377,7 +346,7 @@ function_call(const fn_call& fn)
 	else {
 		// Get the object to use as 'this' reference
 		as_value this_val = fn.arg(0);
-		as_object* this_ptr = this_val.to_object(*getGlobal(fn)).get();
+		as_object* this_ptr = this_val.to_object(*getGlobal(fn));
 
 		if (!this_ptr) {
 			// If the first argument is not an object, we should
@@ -397,7 +366,7 @@ function_call(const fn_call& fn)
 		}
 		else {
 			new_fn_call.this_ptr = this_ptr;
-			as_object* proto = this_ptr->get_prototype().get();
+			as_object* proto = this_ptr->get_prototype();
             if (proto) {
                 new_fn_call.super = this_ptr->get_super();
             }

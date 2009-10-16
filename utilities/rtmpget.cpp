@@ -22,8 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gettext.h"
-
 // classes internal to Gnash
 #include "gnash.h"
 #include "network.h"
@@ -43,12 +41,8 @@
 #include "element.h"
 #include "URL.h"
 
-// classes internal to Cygnal
-#include "buffer.h"
-#include "handler.h"
-
 #ifdef ENABLE_NLS
-#include <locale.h>
+# include <locale>
 #endif
 
 #include <string>
@@ -118,7 +112,7 @@ main(int argc, char *argv[])
     // print the  usage message.
     if (argc < 2) {
         usage();
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
    const Arg_parser::Option opts[] =
@@ -152,7 +146,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }    
 
-#if 0
+#if 1
     string app; // the application name
     string path; // the path to the file on the server
     string tcUrl; // the tcUrl field
@@ -168,10 +162,10 @@ main(int argc, char *argv[])
               case 'h':
                   version_and_copyright();
                   usage();
-                  exit(0);
+                  exit(EXIT_SUCCESS);
               case 'V':
                   version_and_copyright();
-                  exit(0);
+                  exit(EXIT_SUCCESS);
               case 'v':
                   dbglogfile.setVerbosity();
                   log_debug (_("Verbose output turned on"));
@@ -196,7 +190,7 @@ main(int argc, char *argv[])
                   break;
               case 'd':
                   rcfile.dump();
-                  exit(0);
+                  exit(EXIT_SUCCESS);
                   break;
               case 0:
                   infiles.push_back(parser.argument(i));
@@ -226,7 +220,7 @@ main(int argc, char *argv[])
     client.toggleDebug(netdebug);
     if (client.createClient(hostname, port) == false) {
         log_error("Can't connect to RTMP server %s", hostname);
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
     
     if (! client.handShakeRequest()) {
@@ -259,7 +253,7 @@ main(int argc, char *argv[])
     
     if (!msg1) {
         log_error("No response from INVOKE of NetConnection connect");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     msg1->dump();
@@ -267,7 +261,7 @@ main(int argc, char *argv[])
         log_debug("Sent NetConnection Connect message sucessfully");
     } else {
         log_error("Couldn't send NetConnection Connect message,");
-        //exit(-1);
+        //exit(EXIT_FAILURE);
     }
 
     // make the createStream for ID 3 encoded object
@@ -280,7 +274,7 @@ main(int argc, char *argv[])
 
     if (!msg2) {
         log_error("No response from INVOKE of NetStream::createStream");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     log_debug("Sent NetStream::createStream message successfully:"); msg2->dump();
@@ -291,7 +285,7 @@ main(int argc, char *argv[])
     } else {
         if (msg2->getMethodName() == "close") { 
             log_debug("Got close packet!!! Exiting...");
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
         log_error("Got no properties from NetStream::createStream invocation, arbitrarily taking 0 as streamID");
         streamID = 0.0;
@@ -312,7 +306,7 @@ main(int argc, char *argv[])
             log_debug("Sent NetStream::play message sucessfully.");
         } else {
             log_error("Couldn't send NetStream::play message,");
-//          exit(-1);
+//          exit(EXIT_FAILURE);
         }
     }
 
@@ -321,12 +315,12 @@ main(int argc, char *argv[])
         BufferSharedPtr msgs = client.recvMsg(1);   // use a 1 second timeout
         if (msgs == 0) {
             log_error("Never got any data!");
-            exit(-1);
+            exit(EXIT_FAILURE);
         }
         RTMP::queues_t *que = client.split(msgs);
         if (que == 0) {
             log_error("Never got any messages!");
-            exit(-1);
+            exit(EXIT_FAILURE);
         }
 
 #if 0
@@ -391,7 +385,7 @@ main(int argc, char *argv[])
     close(fd);
 #endif    
 
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 // Trap Control-C so we can cleanly exit
@@ -400,7 +394,7 @@ cntrlc_handler (int /*sig*/)
 {
     log_debug(_("Got an interrupt"));
 
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 static void
@@ -408,7 +402,7 @@ version_and_copyright()
 {
     cout << "rtmpget " << VERSION << endl
         << endl
-        << _("Copyright (C) 2008 Free Software Foundation, Inc.\n"
+        << _("Copyright (C) 2008, 2009 Free Software Foundation, Inc.\n"
         "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute copies of Cygnal under the terms of the GNU General\n"
         "Public License.  For more information, see the file named COPYING.\n")

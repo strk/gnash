@@ -68,7 +68,7 @@ public:
         TYPED_OBJECT_AMF0 = 0x10,
 	AMF3_DATA         = 0x11,
 // 	// these aren't part of the AMF spec, they're used internally
- 	RTMP_HEADER       = 0x20,
+ 	RTMP_HEADER       = 0x20
 // 	FUNCTION=0x12
     } amf0_type_e;
     
@@ -90,7 +90,7 @@ public:
         ARRAY_AMF3   = 0x09,
         OBJECT_AMF3  = 0x0a,
         XML_AMF3     = 0x0b,
-        BYTES_AMF3   = 0x0c,
+        BYTES_AMF3   = 0x0c
     } amf3_type_e;
 
     /// \brief Create a new Element with no data type.

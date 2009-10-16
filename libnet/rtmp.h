@@ -198,7 +198,7 @@ public:
 	AMF3_INVOKE  = 0x11,
         NOTIFY       = 0x12,
         INVOKE       = 0x14,
-	FLV_DATA     = 0x16,
+	FLV_DATA     = 0x16
     } content_types_e;
     typedef enum {
 	STREAM_START  = 0x0,
@@ -210,8 +210,8 @@ public:
 	STREAM_PONG   = 0x7
     } user_control_e;
     typedef enum {
-         CREATE         = 0x1,	    // Client sends event
-         DELETE         = 0x2,	    // Client sends event
+         CREATE_OBJ     = 0x1,	    // Client sends event
+         DELETE_OBJ     = 0x2,	    // Client sends event
          REQUEST_CHANGE = 0x3,	    // Client sends event
          CHANGE         = 0x4,	    // Server sends event
          SUCCESS_CLIENT = 0x5,	    // Server sends event

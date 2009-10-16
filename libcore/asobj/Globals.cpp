@@ -23,6 +23,7 @@
 #endif
 
 #include "as_object.h"
+#include "movie_root.h"
 #include "PropFlags.h"
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
@@ -149,6 +150,10 @@ namespace {
     as_value global_clearTimeout(const fn_call& fn);
     as_value global_clearInterval(const fn_call& fn);
     as_value global_setInterval(const fn_call& fn);
+    
+    // These are present in the standalone, not sure about the plugin.
+    as_value global_enableDebugConsole(const fn_call& fn);
+    as_value global_showRedrawRegions(const fn_call& fn);
 
     // This is a help function for the silly AsSetupError function.
     as_value local_errorConstructor(const fn_call& fn);
@@ -201,7 +206,11 @@ builtin_function*
 AVM1Global::createFunction(Global_as::ASFunction function)
 {
     as_object* proto = createObject();
-    builtin_function* f = new builtin_function(*this, function, proto);
+    builtin_function* f = new builtin_function(*this, function);
+    
+    proto->init_member(NSV::PROP_CONSTRUCTOR, f); 
+    
+    f->init_member(NSV::PROP_PROTOTYPE, proto);
     f->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return f;
@@ -210,7 +219,12 @@ AVM1Global::createFunction(Global_as::ASFunction function)
 as_object*
 AVM1Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
-    as_object* cl = new builtin_function(*this, ctor, prototype);
+    as_object* cl = new builtin_function(*this, ctor);
+    
+    if (prototype) {
+        prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
+        cl->init_member(NSV::PROP_PROTOTYPE, prototype);
+    }
     cl->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return cl;
@@ -233,6 +247,18 @@ AVM1Global::createNumber(double d)
     // same for versions 5 to 8.
     return constructObject(*this, d, NSV::CLASS_NUMBER);
 
+}
+
+/// This serves the purpose of hiding the Array_as type from the
+/// implementation, which at least enforces good behaviour from users.
+//
+/// TODO: it could well already call the Array constructor.
+as_object*
+AVM1Global::createArray()
+{
+    as_object* array = new Array_as;
+    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    return array;
 }
 
 as_object*
@@ -260,8 +286,12 @@ as_object*
 AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
 {
     // TODO: this should attach the function to the prototype as its
-    // constructor member.
-    as_object* cl = new builtin_function(*this, ctor, prototype);
+    as_object* cl = new builtin_function(*this, ctor);
+    
+    if (prototype) {
+        prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
+        cl->init_member(NSV::PROP_PROTOTYPE, prototype);
+    }
     cl->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
     return cl;
@@ -285,6 +315,16 @@ as_object*
 AVM2Global::createBoolean(bool b)
 {
     return constructObject(*this, b, NSV::CLASS_BOOLEAN);
+}
+
+/// This serves the purpose of hiding the Array_as type from the
+/// implementation, which at least enforces good behaviour from users.
+as_object*
+AVM2Global::createArray()
+{
+    as_object* array = new Array_as;
+    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    return array;
 }
 
 void 
@@ -336,13 +376,22 @@ AVM1Global::registerClasses()
 
     init_member("setInterval", _vm.getNative(250, 0));
     init_member("clearInterval", _vm.getNative(250, 1));
-    init_member("setTimeout", createFunction(global_setTimeout));
-    init_member("clearTimeout", createFunction(global_clearInterval));
+    init_member("setTimeout", _vm.getNative(250, 2));
+ 
+    // This is an odd function with no properties. There ought to be
+    // a better way of implementing this. See also TextFormat.getTextExtent.
+    as_function* edc = createFunction(global_enableDebugConsole);
+    edc->clearProperties();
+    init_member("enableDebugConsole", edc);
+    init_member("showRedrawRegions", _vm.getNative(1021, 1));
+    
+    string_table& st = getStringTable(*this);
+    init_member("clearTimeout", getMember(st.find("clearInterval")));
 
     _classes.declareAll(avm1Classes());
 
     // SWF8 visibility:
-    const string_table::key NS_FLASH = getStringTable(*this).find("flash");
+    const string_table::key NS_FLASH = st.find("flash");
     flash_package_init(*this, ObjectURI(NS_FLASH, NS_GLOBAL)); 
 
     const int version = _vm.getSWFVersion();
@@ -1011,7 +1060,7 @@ global_assetnative(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    as_object* targetObject = fn.arg(0).to_object(*gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1082,7 +1131,7 @@ global_assetnativeaccessor(const fn_call& fn)
 
     Global_as* gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl).get();
+    as_object* targetObject = fn.arg(0).to_object(*gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1157,7 +1206,7 @@ global_updateAfterEvent(const fn_call& /*fn*/)
 as_value
 local_errorConstructor(const fn_call& fn)
 {
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
     const as_value& arg = fn.nargs ? fn.arg(0) : as_value();
     string_table& st = getStringTable(fn);
     obj->set_member(st.find("message"), arg);
@@ -1367,7 +1416,19 @@ global_clearInterval(const fn_call& fn)
 	return as_value(ret);
 }
 
+as_value
+global_showRedrawRegions(const fn_call& /*fn*/)
+{
+    LOG_ONCE(log_unimpl("_global.showRedrawRegions"));
+    return as_value();
+}
 
+as_value
+global_enableDebugConsole(const fn_call& /*fn*/)
+{
+    LOG_ONCE(log_unimpl("_global.enableDebugConsole"));
+    return as_value();
+}
 /// Construct an instance of the specified global class.
 //
 /// If the class is not present or is not a constructor function, this
@@ -1430,6 +1491,9 @@ registerNatives(as_object& global)
     vm.registerNative(global_isfinite, 200, 19);
     vm.registerNative(global_setInterval, 250, 0);
     vm.registerNative(global_clearInterval, 250, 1);
+    vm.registerNative(global_setTimeout, 250, 2);
+    
+    vm.registerNative(global_showRedrawRegions, 1021, 1);
 
     registerObjectNative(global);
     registerFunctionNative(global);

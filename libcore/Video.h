@@ -48,8 +48,7 @@ class Video : public DisplayObject
 
 public:
 	
-	Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent,
-            int id);
+	Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent);
 
 	~Video();
 
@@ -59,7 +58,7 @@ public:
 		return pointInBounds(x, y);
 	}
 
-	virtual rect getBounds() const;
+	virtual SWFRect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
 	virtual void advance();

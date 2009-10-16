@@ -346,14 +346,12 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _url = infile;
     }
 
-    // These flags are here so we can construct
-    // the correct URL for base url later.
-    // If the URL class was not immutable we could do something smarter...
-    bool hasOverriddenBaseUrl=false;
-    std::string overriddenBaseUrl;
 
-    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
-                                       : URL(_baseurl);
+    // Parse player parameters. These are not passed to the SWF, but rather
+    // control stage properties etc.
+    Params::const_iterator it = params.find("base");
+    const URL baseURL = (it == params.end()) ? _baseurl :
+                                               URL(it->second, _baseurl);
 
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources(baseURL.str()));
@@ -373,35 +371,20 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Initialize gui (we need argc/argv for this)
     // note that this will also initialize the renderer
     // which is *required* during movie loading
-    if ( ! _gui->init(argc, &argv) )
+    if (!_gui->init(argc, &argv))
     {
         std::cerr << "Could not initialize gui." << std::endl;
         return EXIT_FAILURE;
     }
+    
 
     // Parse querystring (before FlashVars, see
     // testsuite/misc-ming.all/FlashVarsTest*)
     setFlashVars(URL(_url).querystring());
     
-    // Parse parameters
-    StringNoCaseEqual noCaseCompare;
-    for ( std::map<std::string,std::string>::const_iterator it=params.begin(),
-        itEnd=params.end(); it != itEnd; ++it)
-    {
-        if ( noCaseCompare(it->first, "flashvars") )
-        {
-            setFlashVars(it->second);
-            continue;
-        }
-
-        if ( noCaseCompare(it->first, "base") )
-        {
-            hasOverriddenBaseUrl=true;
-            overriddenBaseUrl=it->second;
-            continue;
-        }
-    }
-
+    // Add FlashVars.
+    Params::const_iterator fv = params.find("flashvars");
+    if (fv != params.end()) setFlashVars(fv->second);
 
     // Load the actual movie.
     _movieDef = load_movie();
@@ -438,7 +421,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _gui->createWindow(_url.c_str(), _width, _height);
 
     movie_root root(*_movieDef, _gui->getClock(), *_runResources);
-
+    
     _callbacksHandler.reset(new CallbacksHandler(*_gui, *this)); 
     
     // Register Player to receive events from the core (Mouse, Stage,
@@ -452,6 +435,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
 
     _gui->setStage(&root);
+    
 
     // When startStopped is true, stop here after the stage has been 
     // registered, but before the movie has started. Initial loading
@@ -493,6 +477,33 @@ Player::run(int argc, char* argv[], const std::string& infile,
     if (!_windowID && _hideMenu) {
         _gui->hideMenu();
     }
+    
+    // Now handle stage alignment and scale mode. This should be done after
+    // the GUI is created, after its stage member is set, and after the
+    // interface callbacks are registered.
+    it = params.find("salign");
+    if (it != params.end()) {
+        log_debug("Setting align");
+        const short align = stringToStageAlign(it->second);
+        root.setStageAlignment(align);
+    }
+
+    it = params.find("scale");
+    if (it != params.end()) {
+		
+        StringNoCaseEqual noCaseCompare;
+        const std::string& str = it->second;
+		
+        movie_root::ScaleMode mode = movie_root::showAll;
+
+		if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
+		else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
+		else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
+
+        log_debug("Setting scale mode");
+	    root.setStageScaleMode(mode);
+    }
+
     
     _gui->run();
 

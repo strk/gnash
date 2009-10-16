@@ -26,7 +26,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
 #include "log.h"
-#include "rect.h"
+#include "SWFRect.h"
 #include "StringPredicates.h" // StringNoCaseLessThan
 
 // Forward declarations
@@ -122,10 +122,10 @@ public:
 		return m_movie_def.get_frame_rate();
 	}
 
-	const rect& get_frame_size() const
+	const SWFRect& get_frame_size() const
 	{
 		abort();
-		static const rect unused;
+		static const SWFRect unused;
 		return unused;
 	}
 
@@ -235,8 +235,7 @@ public:
 	// the parent movie's display list.
 	//
 	// overloads from SWF::DefinitionTag
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
-        const;
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const;
 
 	// See dox in movie_definition.h
 	virtual void addControlTag(SWF::ControlTag* c)

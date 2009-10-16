@@ -106,25 +106,27 @@ check(!MovieClip.prototype.hasOwnProperty("_xscale"));
 check(!MovieClip.prototype.hasOwnProperty("_y"));
 check(!MovieClip.prototype.hasOwnProperty("_ymouse"));
 check(!MovieClip.prototype.hasOwnProperty("_yscale"));
+check(!MovieClip.prototype.hasOwnProperty("_root"));
+check(!MovieClip.prototype.hasOwnProperty("_global"));
 
 
 // To be called at end of test
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(335); // SWF5
+	check_totals(338); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(900); // SWF6
+	check_totals(910); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(917); // SWF7
+	check_totals(927); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1007); // SWF8+
+	check_totals(1017); // SWF8+
 #endif
 
 	play();
@@ -146,7 +148,7 @@ check_equals(typeof(mc), "movieclip");
 check_equals(typeof(this), 'movieclip');
 check_equals(typeof(_parent), 'undefined');
 #if OUTPUT_VERSION > 5
- xcheck(!mc.hasOwnProperty('_parent'));
+ check(!mc.hasOwnProperty('_parent'));
  check(!MovieClip.prototype.hasOwnProperty('_parent'));
 #endif
 check_equals(_root, this);
@@ -359,6 +361,7 @@ else
 }
 
 check(mc._focusrect != undefined);
+check_equals(mc._focusrect, true);
 check(mc._framesloaded != undefined);
 check(mc._height != undefined);
 check(mc._highquality != undefined);
@@ -403,64 +406,64 @@ check(mc._xscale != undefined);
 
 // focused test on _* properties
 check_equals(typeof(mc._x), 'number');
-xcheck(!mc.hasOwnProperty("_x"));
+check(!mc.hasOwnProperty("_x"));
 check(!mc.__proto__.hasOwnProperty("_x"));
 check(!MovieClip.prototype.hasOwnProperty("_x"));
 
 check_equals(typeof(mc._y), 'number');
-xcheck(!mc.hasOwnProperty("_y"));
+check(!mc.hasOwnProperty("_y"));
 check(!mc.__proto__.hasOwnProperty("_y"));
 check(!MovieClip.prototype.hasOwnProperty("_y"));
 
 check_equals(typeof(mc._height), 'number');
-xcheck(!mc.hasOwnProperty("_height"));
+check(!mc.hasOwnProperty("_height"));
 check(!mc.__proto__.hasOwnProperty("_height"));
 check(!MovieClip.prototype.hasOwnProperty("_height"));
 
 check_equals(typeof(mc._width), 'number');
-xcheck(!mc.hasOwnProperty("_width"));
+check(!mc.hasOwnProperty("_width"));
 check(!mc.__proto__.hasOwnProperty("_width"));
 check(!MovieClip.prototype.hasOwnProperty("_width"));
 
 check_equals(typeof(mc._xscale), 'number');
-xcheck(!mc.hasOwnProperty("_xscale"));
+check(!mc.hasOwnProperty("_xscale"));
 check(!mc.__proto__.hasOwnProperty("_xscale"));
 check(!MovieClip.prototype.hasOwnProperty("_xscale"));
 
 check_equals(typeof(mc._yscale), 'number');
-xcheck(!mc.hasOwnProperty("_yscale"));
+check(!mc.hasOwnProperty("_yscale"));
 check(!mc.__proto__.hasOwnProperty("_yscale"));
 check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 
 check_equals(typeof(mc._xmouse), 'number');
-xcheck(!mc.hasOwnProperty("_xmouse"));
+check(!mc.hasOwnProperty("_xmouse"));
 check(!mc.__proto__.hasOwnProperty("_xmouse"));
 check(!MovieClip.prototype.hasOwnProperty("_xmouse"));
 
 check_equals(typeof(mc._ymouse), 'number');
-xcheck(!mc.hasOwnProperty("_ymouse"));
+check(!mc.hasOwnProperty("_ymouse"));
 check(!mc.__proto__.hasOwnProperty("_ymouse"));
 check(!MovieClip.prototype.hasOwnProperty("_ymouse"));
 
 check_equals(typeof(mc._rotation), 'number');
-xcheck(!mc.hasOwnProperty("_rotation"));
+check(!mc.hasOwnProperty("_rotation"));
 check(!mc.__proto__.hasOwnProperty("_rotation"));
 check(!MovieClip.prototype.hasOwnProperty("_rotation"));
 
 check_equals(typeof(mc._totalframes), 'number');
-xcheck(!mc.hasOwnProperty("_totalframes"));
+check(!mc.hasOwnProperty("_totalframes"));
 check(!mc.__proto__.hasOwnProperty("_totalframes"));
 check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
 
 check(!mc.hasOwnProperty("_level"));
 check(!mc.__proto__.hasOwnProperty("_level"));
-xcheck(!mc.hasOwnProperty("_target"));
-xcheck(!mc.hasOwnProperty("_url"));
-xcheck(!mc.hasOwnProperty("_soundbuftime"));
-xcheck(!mc.hasOwnProperty("_focusrect"));
-xcheck(!mc.hasOwnProperty("_framesloaded"));
+check(!mc.hasOwnProperty("_target"));
+check(!mc.hasOwnProperty("_url"));
+check(!mc.hasOwnProperty("_soundbuftime"));
+check(!mc.hasOwnProperty("_focusrect"));
+check(!mc.hasOwnProperty("_framesloaded"));
 check(!mc.hasOwnProperty("_lockroot"));
-xcheck(!mc.hasOwnProperty("_highquality"));
+check(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
 
 //----------------------------------------------
@@ -532,7 +535,7 @@ check_equals(mc2.getBytesLoaded(), 0);
 check_equals(mc2.getBytesTotal(), 0);
 check_equals(mc2._url, _root._url);
 
-xcheck(!mc2.hasOwnProperty('_parent'));
+check(!mc2.hasOwnProperty('_parent'));
 
 #if OUTPUT_VERSION > 6 // {
  check_equals(getInstanceAtDepth(50), mc2);
@@ -1997,7 +2000,7 @@ asm {
 	setvariable
 };
 // setMember did set the prop, didn't call the setter
-xcheck_equals(propinspect, 20);
+check_equals(propinspect, 20);
 #endif //MING_SUPPORTS_ASM
 
 createEmptyMovieClip('mc', 10);
@@ -2194,6 +2197,10 @@ check_equals(_root.focusEnabled, false);
 _root.focusEnabled = "hello";
 check_equals(_root.focusEnabled, "hello");
 
+
+// Note: Flash Player 10 seems to handle this differently: setting the
+// blendMode to 2 gets 'multiply' not 'layer'.
+
 #if OUTPUT_VERSION > 7
 check_equals(_root.blendMode, "normal");
 check_equals(typeof(_root.blendMode), "string");
@@ -2336,7 +2343,7 @@ o = {};
 
 check_equals(_root.getSWFVersion(), OUTPUT_VERSION);
 o.getSWFVersion = MovieClip.prototype.getSWFVersion;
-xcheck_equals(o.getSWFVersion(), -1);
+check_equals(o.getSWFVersion(), -1);
 createTextField("t1", 3, 0, 100, 100, 100);
 #if OUTPUT_VERSION > 5
 check_equals(_level0.t1.getSWFVersion(), undefined);
@@ -2346,11 +2353,58 @@ xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 xcheck_equals(_level0.t1.toString(), "[object Object]");
 #endif
 _level0.t1.getSWFVersion = MovieClip.prototype.getSWFVersion;
-xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
+check_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
 
 o.meth = MovieClip.prototype.meth;
 check_equals(o.meth("post"), 2);
 check_equals(o.meth(), 0);
 
+// Check that MovieClip data is separate from Relay data.
+
+#if OUTPUT_VERSION > 5
+
+// Run the Date constructor
+dc = function(const) {
+	this.__proto__.__constructor__ = const;
+	super();
+};
+
+createEmptyMovieClip("mc", 3);
+mc.lineStyle(2, 0, 100);
+mc.lineTo(100, 100);
+o = new Object();
+o.getTime = Date.prototype.getTime;
+mc.getTime = Date.prototype.getTime;
+
+mc.dc = dc;
+o.dc = dc;
+
+mc.dc(Date);
+o.dc(Date);
+
+check_equals(typeof(o.getTime()), "number");
+
+// mc is now a Date.
+check_equals(typeof(mc.getTime()), "number");
+
+mc.lineStyle(2, 0xff, 100);
+mc.lineTo(60, 20);
+
+// But it is still a MovieClip.
+check_equals(mc._x, 17);
+
+mc.toString = Boolean.prototype.toString;
+check_equals(mc.toString(), undefined);
+
+mc.dc(Boolean);
+
+// mc is now a Boolean
+check_equals(typeof(mc.getTime()), "undefined");
+check_equals(mc.toString(), "false");
+
+// But it is still a MovieClip
+check_equals(mc._x, 17);
+
+#endif
 
 //endOfTest();

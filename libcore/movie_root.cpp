@@ -26,7 +26,6 @@
 #include "Movie.h" // for implicit upcast to MovieClip
 #include "VM.h"
 #include "ExecutableCode.h"
-#include "flash/display/Stage_as.h"
 #include "URL.h"
 #include "namedStrings.h"
 #include "GnashException.h"
@@ -128,7 +127,8 @@ movie_root::movie_root(const movie_definition& def,
 	_recursionLimit(256),
 	_timeoutLimit(15),
 	_movieAdvancementDelay(83), // ~12 fps by default
-	_lastMovieAdvancement(0)
+	_lastMovieAdvancement(0),
+	_unnamedInstance(0)
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
@@ -143,6 +143,13 @@ movie_root::disableScripts()
 	// to avoid invalidating iterators as we've
 	// been probably called during processing
 	// of the queue.
+}
+
+    
+size_t
+movie_root::nextUnnamedInstance()
+{
+    return ++_unnamedInstance;
 }
 
 void
@@ -518,7 +525,7 @@ movie_root::getSelectionObject() const
     as_value s;
     if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object(*global).get();
+    as_object* sel = s.to_object(*global);
    
     return sel;
 }
@@ -531,7 +538,7 @@ movie_root::getStageObject()
 	Global_as* global = _vm.getGlobal();
 	if (!global) return 0;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return 0;
-	return v.to_object(*global).get();
+	return v.to_object(*global);
 }
 		
 void
@@ -959,10 +966,10 @@ movie_root::doMouseDrag()
 
 	if ( m_drag_state.hasBounds() )
 	{
-		rect bounds;
+		SWFRect bounds;
 		// bounds are in local coordinate space
 		bounds.enclose_transformed_rect(parent_world_mat, m_drag_state.getBounds());
-		// Clamp mouse coords within a defined rect.
+		// Clamp mouse coords within a defined SWFRect.
 		bounds.clamp(world_mouse);
 	}
 
@@ -1105,7 +1112,7 @@ movie_root::display()
 	clearInvalidated();
 
 	// TODO: should we consider the union of all levels bounds ?
-	const rect& frame_size = _rootMovie->get_frame_size();
+	const SWFRect& frame_size = _rootMovie->get_frame_size();
 	if ( frame_size.is_null() )
 	{
 		// TODO: check what we should do if other levels
@@ -1134,7 +1141,7 @@ movie_root::display()
 		if (movie->visible() == false) continue;
 
 		// null frame size ? don't display !
-		const rect& sub_frame_size = movie->get_frame_size();
+		const SWFRect& sub_frame_size = movie->get_frame_size();
 
 		if ( sub_frame_size.is_null() )
 		{
@@ -1215,13 +1222,13 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 			if(down)
 			{
 				// KEY_UP and KEY_DOWN events are unrelated to any key!
-				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
+				ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
 				// Pass the unique Gnash key code!
-				ch->on_event(event_id(event_id::KEY_PRESS, k));
+				ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
 			}
 			else
 			{
-				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
+				ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
 			}
 		}
 	}
@@ -1265,7 +1272,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		DisplayObject* const ch = *iter;
 		if (!ch->unloaded())
 		{
-			ch->on_event(event);
+			ch->notifyEvent(event);
 		}
 	}
 
@@ -1517,13 +1524,15 @@ movie_root::setStageScaleMode(ScaleMode sm)
     if ( _scaleMode == sm ) return; // nothing to do
 
     bool notifyResize = false;
-    if ( sm == noScale || _scaleMode == noScale )
-    {
-        // If we go from or to noScale, we notify a resize
-        // if and only if display viewport is != then actual
-        // movie size
-        const movie_definition* md = _rootMovie->definition();
+    
+    // If we go from or to noScale, we notify a resize
+    // if and only if display viewport is != then actual
+    // movie size. If there is not yet a _rootMovie (when scaleMode
+    // is passed as a parameter to the player), we also don't notify a 
+    // resize.
+    if (_rootMovie && (sm == noScale || _scaleMode == noScale)) {
 
+        const movie_definition* md = _rootMovie->definition();
         log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d "
                 "Def:%dx%d", m_viewport_width, m_viewport_height,
                 md->get_width_pixels(), md->get_height_pixels());
@@ -2469,6 +2478,37 @@ movie_root::addChildAt(DisplayObject* ch, int depth)
 {
     setInvalidated();
     _rootMovie->addChildAt(ch, depth);
+}
+
+short
+stringToStageAlign(const std::string& str)
+{
+    short am = 0;
+
+    // Easy enough to do bitwise - std::bitset is not
+    // really necessary!
+    if (str.find_first_of("lL") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_L;
+    } 
+
+    if (str.find_first_of("tT") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_T;
+    } 
+
+    if (str.find_first_of("rR") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_R;
+    } 
+
+    if (str.find_first_of("bB") != std::string::npos)
+    {
+        am |= 1 << movie_root::STAGE_ALIGN_B;
+    }
+
+    return am;
+
 }
 
 } // namespace gnash

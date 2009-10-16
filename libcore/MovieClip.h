@@ -121,7 +121,7 @@ public:
     ///     definition, which should know its id...
     ///
     MovieClip(const movie_definition* const def, Movie* root,
-            DisplayObject* parent, int id);
+            DisplayObject* parent);
 
     virtual ~MovieClip();
 
@@ -137,7 +137,7 @@ public:
     virtual MovieClip* getAsRoot();
 
     /// Get the composite bounds of all component drawing elements
-    virtual rect getBounds() const;
+    virtual SWFRect getBounds() const;
 
     // See dox in DisplayObject.h
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
@@ -187,9 +187,9 @@ public:
         return isDynamic() ? 0 : _def->get_bytes_loaded();
     }
 
-    const rect& get_frame_size() const
+    const SWFRect& get_frame_size() const
     {
-        static const rect r;
+        static const SWFRect r;
         return _def ? _def->get_frame_size() : r;
     }
 
@@ -318,10 +318,8 @@ public:
     ///
     DisplayObject* getDisplayObjectAtDepth(int depth);
 
-    DisplayObject* add_empty_movieclip(const std::string& name, int depth);
-
-    boost::intrusive_ptr<DisplayObject> add_textfield(const std::string& name,
-            int depth, int x, int y, float width, float height);
+    /// Attach a DisplayObject at the specified depth.
+    DisplayObject* addDisplayListObject(DisplayObject* obj, int depth);
 
     /// Place a DisplayObject or mask to the DisplayList.
     //
@@ -479,11 +477,6 @@ public:
     /// Execute a single action buffer (DOACTION block)
     void execute_action(const action_buffer& ab);
 
-    /// For debugging -- return the id of the DisplayObject
-    /// at the specified depth.
-    /// Return -1 if nobody's home.
-    int get_id_at_depth(int depth);
-
     MovieClip* to_movie () { return this; }
 
     /// The various methods for sending data in requests.
@@ -527,17 +520,28 @@ public:
     void loadVariables(const std::string& urlstr,
             VariablesMethod sendVarsMethod);
 
+    /// Get TextField variables
     //
-    // ActionScript support
-    //
+    /// TODO: this is unlikely to be the best way of doing it, and it would
+    /// simplify things if this function could be dropped.
+    bool getTextFieldVariables(string_table::key name, as_value& val);
 
-    // See dox in as_object.h
-    bool get_member(string_table::key name, as_value* val, 
+    // Set TextField variables
+    //
+    /// TODO: this is also unlikely to be the best way to do it.
+    bool setTextFieldVariables(string_table::key name, const as_value& val,
         string_table::key nsname = 0);
-        
-    // See dox in as_object.h
-    virtual bool set_member(string_table::key name, const as_value& val,
-        string_table::key nsname = 0, bool ifFound=false);
+
+    /// Search for a named object on the DisplayList
+    //
+    /// These are properties, but not attached as genuine members to the
+    /// MovieClip object. They take priority over DisplayObject magic
+    /// properties and inherited properties, but not over own properties.
+    //
+    /// @param name     The name of the object. This function handles
+    ///                 case-sensitivity.
+    /// @return         The object if found, otherwise 0.
+    DisplayObject* getDisplayListObject(string_table::key name);
 
     /// Overridden to look in DisplayList for a match
     as_object* get_path_element(string_table::key key);
@@ -575,7 +579,7 @@ public:
         int newdepth, as_object* init_object=NULL);
         
     /// Dispatch event handler(s), if any.
-    virtual bool on_event(const event_id& id);
+    virtual bool notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
     as_environment& get_environment() {
@@ -648,7 +652,7 @@ public:
     void removeMovieClip();
 
     /// Create a Bitmap DisplayObject at the specified depth.
-    void attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth);
+    void attachBitmap(BitmapData_as* bd, int depth);
 
     /// Render this MovieClip to a GnashImage using the passed transform
     //
@@ -657,7 +661,7 @@ public:
             const SWFMatrix& mat = SWFMatrix(), 
             const cxform& cx = cxform(),
             DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
-            const rect& clipRect = rect(),
+            const SWFRect& clipRect = SWFRect(),
             bool smooth = false);
 
     /// @name Drawing API
@@ -713,14 +717,14 @@ public:
     void lineTo(boost::int32_t x, boost::int32_t y)
     {
         set_invalidated();
-        _drawable.lineTo(x, y, getMovieVersion());
+        _drawable.lineTo(x, y, getDefinitionVersion());
     }
 
     void curveTo(boost::int32_t cx, boost::int32_t cy, 
                  boost::int32_t ax, boost::int32_t ay)
     {
         set_invalidated();
-        _drawable.curveTo(cx, cy, ax, ay, getMovieVersion());
+        _drawable.curveTo(cx, cy, ax, ay, getDefinitionVersion());
     }
 
     void clear()
@@ -775,11 +779,8 @@ public:
     /// false otherwise. True for relative root.
     void setLockRoot(bool lr) { _lockroot=lr; }
 
-    /// \brief
-    /// Return version of the SWF definition of this instance
-    /// as been parsed from.
-    //
-    int getMovieVersion() const;
+    /// Return the version of the SWF this MovieClip was parsed from.
+    virtual int getDefinitionVersion() const;
 
 protected:
 

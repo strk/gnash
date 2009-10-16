@@ -918,6 +918,43 @@ check_equals(typeof(result), "string");
 check_equals(resolveCalled, 3);
 check_equals(result, "quibbleDibblePropertyWithASillyName");
 
+result = undefined;
+
+g = {};
+g.udef();
+check_equals(typeof(result), "undefined");
+check_equals(resolveCalled, 3);
+
+g.__proto__ = o;
+g.udef();
+check_equals(typeof(result), "string");
+check_equals(result, "udef");
+check_equals(resolveCalled, 4);
+
+/// Check DisplayObject property lookup.
+
+/// Apparently no DisplayObjects are included in the prototype
+/// recursion.
+
+nonk = {};
+nonk.__proto__ = _root;
+_root.bobo = "hi there";
+_root.__proto__.ubble = "U!";
+
+check(!nonk._width);
+check(!nonk.bobo);
+check(!nonk.ubble);
+
+check(nonk.__proto__._width);
+check_equals(nonk.__proto__.bobo, "hi there");
+check(nonk.__proto__);
+
+_root.createTextField("tf", getNextHighestDepth(), 0, 0, 10, 10);
+nonk.__proto__ = _root.tf;
+check(nonk.__proto__);
+check(!nonk._width);
+check(nonk.__proto__._width);
+
 ////////////////////////////////
 
 // Messing about here with global classes may ruin later tests, so don't add
@@ -950,10 +987,10 @@ o = new Object(b);
 check_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
-totals(116);
+totals(130);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(304);
+totals(318);
 #endif
 

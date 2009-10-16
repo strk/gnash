@@ -72,10 +72,10 @@ main(int /*argc*/, char** /*argv*/)
 	// we need a const_cast as get_member *might* eventually
 	// change the DisplayObject (fetching _x shouldn't change it though)
 	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
-	check_equals(tmp, as_value(50));
+	check(tmp.strictly_equals(50));
 
-	check_equals(loaded->get_height(), 2056);
-	check_equals(loaded->get_width(), 2056);
+	check_equals(loaded->getBounds().height(), 2056);
+	check_equals(loaded->getBounds().width(), 2056);
 
 	const TextField* text = 
             dynamic_cast<const TextField*>(

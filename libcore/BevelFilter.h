@@ -58,7 +58,6 @@ public:
         m_quality(quality), m_type(type), m_knockout(knockout)
     { return; }
 
-protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
     boost::uint32_t m_highlightColor; // Color of the highlight.

@@ -84,7 +84,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (g_strcmp0(dev_name, "null") == 0) {
+        if (strcmp(dev_name, "null") == 0) {
             g_print("no v4l video sources found\n");
         }
         else { 
@@ -118,7 +118,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         gst_element_set_state (element, GST_STATE_PLAYING);
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
-        if (g_strcmp0(dev_name, "null") == 0) {
+        if (strcmp(dev_name, "null") == 0) {
             g_print("no v4l2 video sources found.\n");
         }
         else {
@@ -129,7 +129,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
             //mark duplicates (we like v4l2 sources more than v4l, so if
             //they're both detected, mark the v4l source as a duplicate)
             for (g=1; g < (vidVect.size()-1); g++) {
-                if (g_strcmp0(vidVect[numdevs]->deviceName,
+                if (strcmp(vidVect[numdevs]->deviceName,
                         vidVect[g]->deviceName) == 0) {
                     vidVect[g]->duplicate = true;
                     numDuplicates += 1;

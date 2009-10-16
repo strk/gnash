@@ -19,7 +19,7 @@
 #define GNASH_DUMMYCHARACTER_H
 
 #include "InteractiveObject.h" // for inheritance
-#include "rect.h" // for composition
+#include "SWFRect.h" // for composition
 #include "Movie.h" // for createMovie
 #include "snappingrange.h" // for InvalidatedRanges typedef (don't like it)
 
@@ -47,13 +47,13 @@ public:
 
 	DummyCharacter(DisplayObject* parent)
 		:
-		InteractiveObject(parent, parent ? 0 : -1)
+		InteractiveObject(parent)
 	{
 	}
 
     virtual void display(Renderer& /*renderer*/) {}
 
-    virtual rect getBounds() const { return rect(); }
+    virtual SWFRect getBounds() const { return SWFRect(); }
 
     virtual bool mouseEnabled() const { return true; }
 

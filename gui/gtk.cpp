@@ -2060,8 +2060,6 @@ GtkGui::createQualityMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    Quality curQuality = getQuality();
-
     // TODO: use to also show current quality state
 
     // Low

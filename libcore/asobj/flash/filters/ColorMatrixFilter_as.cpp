@@ -25,98 +25,55 @@
 
 namespace gnash {
 
-class ColorMatrixFilter_as : public as_object, public ColorMatrixFilter
-{
-public:
-    static as_value matrix_gs(const fn_call& fn);
-    static as_value bitmap_clone(const fn_call& fn);
+namespace {
+    as_value colormatrixfilter_new(const fn_call& fn);
+    as_value colormatrixfilter_matrix(const fn_call& fn);
 
-    ColorMatrixFilter_as(as_object *obj)
-        :
-        as_object(obj)
-    {}
-    static as_object* Interface();
-    static void attachInterface(as_object& o);
-    static void attachProperties(as_object& o);
-    static as_value ctor(const fn_call& fn);
-private:
-    static boost::intrusive_ptr<as_object> s_interface;
-
-};
-
-
-boost::intrusive_ptr<as_object> ColorMatrixFilter_as::s_interface;
-
-as_object* ColorMatrixFilter_as::Interface() {
-    if (ColorMatrixFilter_as::s_interface == NULL) {
-        ColorMatrixFilter_as::s_interface = new as_object (getBitmapFilterInterface());
-        VM::get().addStatic(ColorMatrixFilter_as::s_interface.get());
-        ColorMatrixFilter_as::attachInterface(*ColorMatrixFilter_as::s_interface);
-    }
-    return ColorMatrixFilter_as::s_interface.get();
+    void attachColorMatrixFilterInterface(as_object& o);
 }
 
+/// TODO: should this inherit from BitmapFilter_as (relay)? This might
+/// make cloning easier, but needs some testing first.
+class ColorMatrixFilter_as : public Relay, public ColorMatrixFilter
+{
+public:
+    ColorMatrixFilter_as() {}
+};
+
+/// The prototype of flash.filters.ColorMatrixFilter is a new BitmapFilter.
 void
 colormatrixfilter_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-    if (!cl) return;
-
-    Global_as* gl = getGlobal(where);
-    cl = gl->createClass(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());
-    ColorMatrixFilter_as::attachInterface(*cl);
-
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
-
+    registerBitmapClass(where, colormatrixfilter_new,
+            attachColorMatrixFilterInterface, uri);
 }
 
+namespace {
 
 void
-ColorMatrixFilter_as::attachInterface(as_object& o)
+attachColorMatrixFilterInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-	boost::intrusive_ptr<builtin_function> gs;
-
-    o.set_member(VM::get().getStringTable().find("clone"), gl->createFunction(bitmap_clone));
-
-}
-
-void
-ColorMatrixFilter_as::attachProperties(as_object& o)
-{
-	boost::intrusive_ptr<builtin_function> gs;
-
-    o.init_property("matrix" , ColorMatrixFilter_as::matrix_gs, 
-        ColorMatrixFilter_as::matrix_gs);
+    const int flags = PropFlags::onlySWF8Up;
+    o.init_property("matrix", colormatrixfilter_matrix, 
+        colormatrixfilter_matrix, flags);
 }
 
 as_value
-ColorMatrixFilter_as::matrix_gs(const fn_call& fn)
+colormatrixfilter_matrix(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorMatrixFilter_as> ptr = ensureType<ColorMatrixFilter_as>(fn.this_ptr);
+    ColorMatrixFilter_as* ptr = ensureNativeType<ColorMatrixFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
     return as_value();
 }
 
 as_value
-ColorMatrixFilter_as::bitmap_clone(const fn_call& fn)
+colormatrixfilter_new(const fn_call& fn)
 {
-	boost::intrusive_ptr<ColorMatrixFilter_as> ptr = ensureType<ColorMatrixFilter_as>(fn.this_ptr);
-    boost::intrusive_ptr<ColorMatrixFilter_as> obj = new ColorMatrixFilter_as(*ptr);
-    boost::intrusive_ptr<as_object> r = obj;
-    r->set_prototype(ptr->get_prototype());
-    r->copyProperties(*ptr);
-    return as_value(r);
-}
-
-as_value
-ColorMatrixFilter_as::ctor(const fn_call& )
-{
-    boost::intrusive_ptr<as_object> obj = new ColorMatrixFilter_as(ColorMatrixFilter_as::Interface());
-
-    ColorMatrixFilter_as::attachProperties(*obj);
-    return as_value(obj.get());
-
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    obj->setRelay(new ColorMatrixFilter_as);
+    return as_value();
 }
 
 }
+}
+

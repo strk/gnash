@@ -23,6 +23,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "Global_as.h"
+
 namespace gnash {
 
 class as_object;
@@ -33,8 +35,13 @@ void bitmapfilter_class_init(as_object& where, const ObjectURI& uri);
 
 void registerBitmapFilterNative(as_object& global);
 
-/// Get the interface, for inheritance.
-as_object *getBitmapFilterInterface();
+
+/// Convenience function only for BitmapFilter subclasses.
+//
+/// This implements the AS code necessary for defining subclasses of
+/// BitmapFilter in AS2.
+void registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
+        Global_as::Properties p, const ObjectURI& uri);
 
 } // end of gnash namespace
 

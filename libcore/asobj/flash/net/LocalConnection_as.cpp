@@ -265,7 +265,7 @@ as_value
 localconnection_new(const fn_call& fn)
 {
     // TODO: this doesn't happen on construction.
-    as_object* obj = ensureType<as_object>(fn.this_ptr).get();
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
     obj->setRelay(new LocalConnection_as(obj));
     return as_value();
 }

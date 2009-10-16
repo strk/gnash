@@ -130,12 +130,12 @@ main(int argc, char *argv[])
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
         usage();
-        exit(0);
+        exit(EXIT_SUCCESS);
       }
       if (strcmp("--version", argv[c]) == 0) {
         printf (_("Gnash dumpshm version: %s, Gnash version: %s\n"),
 		   DUMPSHM_VERSION, VERSION);
-        exit(0);
+        exit(EXIT_SUCCESS);
       }
     }
  
@@ -176,14 +176,14 @@ main(int argc, char *argv[])
     // print the  usage message.
     if (argc < 2) {
         usage();
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     
 #if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
     // Just list the shared memory segments
     if (listfiles && sysv) {
 	list_lcs();
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 #endif
     
@@ -200,7 +200,7 @@ main(int argc, char *argv[])
 	    dump_shm(convert, false);
 	}
 	
-	    exit(0);
+	    exit(EXIT_SUCCESS);
     }    
     
     if (size == 0) {
@@ -268,7 +268,7 @@ dump_shm(bool convert, bool out)
 	close(fd);
     }
     
-    exit (0);
+    exit (EXIT_SUCCESS);
 }
 
 #if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
@@ -341,13 +341,13 @@ usage (void)
 {
     cerr << _("This program dumps the internal data of a shared memory segment")
          << endl;
-    cerr << _("Usage: dumpmem [hdsanlif] filename") << endl;
+    cerr << _("Usage: dumpshm [hdsanlif] filename") << endl;
     cerr << _("-h\tHelp") << endl;
     cerr << _("-i\tList segments") << endl;
     cerr << _("-r\tDump SYSV segments") << endl;
     cerr << _("-c\tDump SYSV segments to disk") << endl;
     cerr << _("-v\tVerbose output") << endl;
-    exit (-1);
+    exit (EXIT_FAILURE);
 }
 
 /// \brief Dumps the internal data of the found ShmControl

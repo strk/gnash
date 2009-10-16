@@ -32,7 +32,7 @@
 #include "movie_definition.h" // for inheritance
 #include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
 #include "StringPredicates.h" 
-#include "rect.h"
+#include "SWFRect.h"
 #include "GnashNumeric.h"
 
 #include <map> // for CharacterDictionary
@@ -188,7 +188,7 @@ public:
 	// ...
 	size_t get_frame_count() const { return m_frame_count; }
 	float	get_frame_rate() const { return m_frame_rate; }
-	const rect& get_frame_size() const { return m_frame_size; }
+	const SWFRect& get_frame_size() const { return m_frame_size; }
 
 	float get_width_pixels() const
 	{
@@ -390,7 +390,7 @@ public:
 	///
 	Movie* createMovie(DisplayObject* parent=0);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int) const {
+    virtual DisplayObject* createDisplayObject(DisplayObject*) const {
         return 0;
     }
 
@@ -458,7 +458,7 @@ private:
 	typedef std::vector<boost::intrusive_ptr<movie_definition> > ImportVect;
 	ImportVect m_import_source_movies;
 
-	rect	m_frame_size;
+	SWFRect	m_frame_size;
 	float	m_frame_rate;
 	size_t	m_frame_count;
 	int	m_version;

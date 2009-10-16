@@ -39,7 +39,7 @@ namespace {
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)
 	{
-		return time.num / (double) time.den;
+		return time.num / static_cast<double>(time.den);
 	}
 
 } // anonymous namespace
@@ -122,7 +122,7 @@ MediaParserFfmpeg::seek(boost::uint32_t& pos)
 			return 0; // ??
 		}
 
-		newtime = timebase * (double)_formatCtx->streams[_videoStreamIndex]->cur_dts;
+		newtime = timebase * static_cast<double>(_formatCtx->streams[_videoStreamIndex]->cur_dts);
 	}
 
 	//av_free_packet( &Packet );
@@ -383,7 +383,7 @@ MediaParserFfmpeg::initializeParser()
 	if ( _formatCtx->album[0] )     log_debug(_("  Album:'%s'"), _formatCtx->album);
 
 	// Find first audio and video stream
-	for (unsigned int i = 0; i < (unsigned)_formatCtx->nb_streams; i++)
+	for (unsigned int i = 0; i < static_cast<unsigned int>(_formatCtx->nb_streams); i++)
 	{
 		AVStream* stream = _formatCtx->streams[i];
 		if ( ! stream ) 
