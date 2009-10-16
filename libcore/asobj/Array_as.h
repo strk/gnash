@@ -38,7 +38,23 @@ namespace gnash {
 
 namespace gnash {
 
+/// Get the length of an object as though it were an array
+//
+/// It may well be an array, but this also works on normal objects with a 
+/// length property
+//
+/// @param array    The object whose array length is needed.
+/// @return         The array length of the object or 0 if no length is
+///                 found.
 size_t arrayLength(as_object& array);
+
+/// Convert an integral value into an array key
+//
+/// NB this function adds a string value to the string_table for each separate
+/// integral value. It's the way the string_table works.
+//
+/// @param i        The integral value to find
+/// @return         The string table key to look up.
 string_table::key arrayKey(string_table& st, size_t i);
 
 /// The Array ActionScript object

@@ -604,12 +604,13 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 }
 
 void
-as_object::set_prototype(const as_value& proto, int flags)
+as_object::set_prototype(const as_value& proto)
 {
 	// TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
 	// TODO: check triggers !!
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0, flags);
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0,
+            as_object::DefaultFlags);
 }
 
 void

@@ -971,17 +971,13 @@ public:
     /// of the class this object is an instance of.
     ///
     /// NOTE: can return NULL (and it is expected to do for Object.prototype)
-    ///
     as_object* get_prototype() const;
 
     /// Set this object's '__proto__' member
     //
-    /// There is no point to make this function
-    /// protected or private, as a call to the
-    /// public: set_member("__proto__", anyting)
-    /// will do just the same
-    ///
-    void set_prototype(const as_value& proto, int flags = DefaultFlags);
+    /// This does more or less what set_member("__proto__") does, but without
+    /// the lookup process.
+    void set_prototype(const as_value& proto);
 
     /// Set the as_object's Relay object.
     //
@@ -1117,7 +1113,7 @@ private:
     /// The VM containing this object.
     VM& _vm;   
 
-    /// Properties of this objects 
+    /// Properties of this as_object
     PropertyList _members;
 
     /// \brief
