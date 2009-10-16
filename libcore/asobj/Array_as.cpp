@@ -806,6 +806,14 @@ private:
 
 }
 
+bool
+IsStrictArray::accept(string_table::key key, const as_value& /*val*/)
+{
+    if (isIndex(_st.value(key)) >= 0) return true;
+    _strict = false;
+    return false;
+}
+
 Array_as::Array_as()
     :
     as_object(getArrayInterface())

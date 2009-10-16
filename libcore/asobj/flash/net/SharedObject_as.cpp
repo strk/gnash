@@ -377,9 +377,8 @@ SharedObject_as::flush(int space) const
 
     std::map<as_object*, size_t> offsetTable;
     SOLPropsBufSerializer props(buf, vm, offsetTable);
-    _data->visitPropertyValues(props);
-    if ( ! props.success() ) 
-    {
+    _data->visitProperties<Exists>(props);
+    if (!props.success()) {
         log_error("Could not serialize object");
         return false;
     }

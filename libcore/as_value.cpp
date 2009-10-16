@@ -765,7 +765,7 @@ as_value::to_element() const
       {
 	  el->makeObject();
 	  PropsSerializer props(*el, vm);
-	  ptr->visitPropertyValues(props);
+	  ptr->visitProperties<Exists>(props);
 	  break;
       }
       case AS_FUNCTION:
@@ -2283,25 +2283,31 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     string_table& st = vm.getStringTable();
                     const size_t len = arrayLength(*ary);
                     if (allowStrict) {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-                        log_debug(_("writeAMF0: serializing array of %d "
-                                    "elements as STRICT_ARRAY (index %d)"),
-                                    len, idx);
-#endif
-                        buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
-                        buf.appendNetworkLong(len);
+                        IsStrictArray s(st);
+                        // Check if any non-hidden properties are non-numeric.
+                        ary->visitProperties<IsEnumerable>(s);
+                        if (s.strict()) {
 
-                        as_value elem;
-                        for (size_t i = 0; i < len; ++i) {
-                            elem = ary->getMember(arrayKey(st, i));
-                            if (!elem.writeAMF0(buf, offsetTable, vm,
-                                        allowStrict)) {
-                                log_error("Problems serializing strict array "
-                                        "member %d=%s", i, elem);
-                                return false;
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                            log_debug(_("writeAMF0: serializing array of %d "
+                                        "elements as STRICT_ARRAY (index %d)"),
+                                        len, idx);
+#endif
+                            buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                            buf.appendNetworkLong(len);
+
+                            as_value elem;
+                            for (size_t i = 0; i < len; ++i) {
+                                elem = ary->getMember(arrayKey(st, i));
+                                if (!elem.writeAMF0(buf, offsetTable, vm,
+                                            allowStrict)) {
+                                    log_error("Problems serializing strict array "
+                                            "member %d=%s", i, elem);
+                                    return false;
+                                }
                             }
+                            return true;
                         }
-                        return true;
                     }
 
                     // A normal array.
@@ -2309,7 +2315,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     log_debug(_("writeAMF0: serializing array of %d "
                                 "elements as ECMA_ARRAY (index %d) "
                                 "[allowStrict:%d, isStrict:%d]"),
-                                len, idx, allowStrict, ary->isStrict());
+                                len, idx, allowStrict, isStrict);
 #endif
                     buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
                     buf.appendNetworkLong(len);
@@ -2324,7 +2330,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 }
 
                 PropsBufSerializer props(buf, vm, offsetTable, allowStrict);
-                obj->visitNonHiddenPropertyValues(props);
+                obj->visitProperties<IsEnumerable>(props);
                 if (!props.success()) {
                     log_error("Could not serialize object");
                     return false;

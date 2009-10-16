@@ -55,6 +55,25 @@ size_t arrayLength(as_object& array);
 /// @return         The string table key to look up.
 string_table::key arrayKey(string_table& st, size_t i);
 
+
+/// A visitor to check whether an array is strict or not.
+//
+/// Strict arrays have no non-hidden non-numeric properties. Only real arrays
+/// are strict arrays; any users of this functor should check that first.
+class IsStrictArray : public AbstractPropertyVisitor
+{
+public:
+    IsStrictArray(string_table& st) : _strict(true), _st(st) {}
+    virtual bool accept(string_table::key key, const as_value& val);
+
+    bool strict() const {
+        return _strict;
+    }
+private:
+    bool _strict;
+    string_table& _st;
+};
+
 /// The Array ActionScript object
 class Array_as : public as_object
 {

@@ -912,22 +912,10 @@ public:
     ///    reference as first argument and a const as_value reference
     ///    as second argument.
     ///
-    void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
-
-    /// Visit non-hidden properties of this object by key/as_value pairs
-    //
-    /// The method will invoke the given visitor method
-    /// passing it two arguments: key of the property and
-    /// value of it.
-    ///
-    /// @param visitor
-    ///    The visitor function. Will be invoked for each property
-    ///    of this object with a string_table::key
-    ///    reference as first argument and a const as_value reference
-    ///    as second argument.
-    ///
-    void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor)
-        const;
+    template<typename T>
+    void visitProperties(AbstractPropertyVisitor& visitor) const {
+        _members.visitValues<T>(visitor, *this);
+    }
 
     /// \brief
     /// Add a getter/setter property, if no member already has
@@ -1122,6 +1110,36 @@ private:
 
     typedef std::map<ObjectURI, Trigger> TriggerContainer;
     TriggerContainer _trigs;
+};
+
+/// Function objects for visiting properties.
+class IsVisible
+{
+public:
+    IsVisible(int version) : _version(version) {}
+    bool operator()(const Property& prop) const {
+        return prop.visible(_version);
+    }
+private:
+    const int _version;
+};
+
+class Exists
+{
+public:
+    Exists() {}
+    bool operator()(const Property&) const {
+        return true;
+    }
+};
+
+class IsEnumerable
+{
+public:
+    IsEnumerable() {}
+    bool operator()(const Property& p) const {
+        return !p.getFlags().get_dont_enum();
+    }
 };
 
 /// Get url-encoded variables

@@ -50,40 +50,6 @@
 
 
 namespace gnash {
-
-namespace {
-
-    class IsVisible
-    {
-    public:
-        IsVisible(int version) : _version(version) {}
-        bool operator()(const Property& prop) const {
-            return prop.visible(_version);
-        }
-    private:
-        const int _version;
-    };
-
-    class Exists
-    {
-    public:
-        Exists() {}
-        bool operator()(const Property&) const {
-            return true;
-        }
-    };
-
-    class IsEnumerable
-    {
-    public:
-        IsEnumerable() {}
-        bool operator()(const Property& p) const {
-            return !p.getFlags().get_dont_enum();
-        }
-    };
-
-}
-
 template<typename T>
 class
 as_object::PrototypeRecursor
@@ -1083,7 +1049,7 @@ as_object::copyProperties(const as_object& o)
 	PropsCopier copier(*this);
 
 	// TODO: check if non-visible properties should be also copied !
-	o.visitPropertyValues(copier);
+	o.visitProperties<Exists>(copier);
 }
 
 void
@@ -1398,18 +1364,6 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 		_executing = false;
 		throw;
 	}
-}
-
-void
-as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    _members.visitValues<Exists>(visitor, *this);
-}
-
-void
-as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
-{
-    _members.visitValues<IsEnumerable>(visitor, *this);
 }
 
 DisplayObject*

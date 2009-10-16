@@ -117,10 +117,10 @@ public:
     ///             operator() should return false if the property is not
     ///             acceptable.
     //
-	/// @param visitor
-	///	The visitor function. Must take a string_table::key 
-	///	reference as first argument and a const as_value reference
-	///	as second argument. Scan by enumeration order.
+	/// @param visitor  The visitor function. It must have the function:
+    ///                     bool accept(string_table::key, const as_value&);
+	///	                Scan is by enumeration order and stops if accept()
+    ///                 returns false.
 	///
 	/// @param this_ptr
 	///	The object reference used to extract values from properties.
@@ -139,7 +139,7 @@ public:
 		{
             if (!cmp(*it)) continue;
 			as_value val = it->getValue(this_ptr);
-			visitor.accept(it->mName, val);
+			if (!visitor.accept(it->mName, val)) return;
 		}
 	}
 
