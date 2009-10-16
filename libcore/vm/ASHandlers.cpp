@@ -2207,12 +2207,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //         is the target to load the resource into).
         //
         DisplayObject* curtgt = env.get_target();
-        if ( ! curtgt )
-        {
+        if (!curtgt) {
             log_error(_("CommonGetUrl: current target is undefined"));
             return;
         }
-        curtgt->getURLEncodedVars(varsToSend);
+        getURLEncodedVars(*curtgt, varsToSend);
     }
 
 

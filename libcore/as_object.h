@@ -903,19 +903,6 @@ public:
     ///
     void enumerateProperties(SortedPropertyList& to) const;
 
-    /// Get url-encoded variables
-    //
-    /// This method will be used for loadVariables and loadMovie
-    /// calls, to encode variables for sending over a network.
-    /// Variables starting with a dollar sign will be skipped,
-    /// as non-enumerable ones.
-    ///
-    /// @param data
-    ///    Output parameter, will be set to the url-encoded
-    ///     variables string, w/out any leading delimiter.
-    ///
-    void getURLEncodedVars(std::string& data);
-
     /// Visit the properties of this object by key/as_value pairs
     //
     /// The method will invoke the given visitor method
@@ -1139,6 +1126,18 @@ private:
     typedef std::map<ObjectURI, Trigger> TriggerContainer;
     TriggerContainer _trigs;
 };
+
+/// Get url-encoded variables
+//
+/// This method will be used for loadVariables and loadMovie
+/// calls, to encode variables for sending over a network.
+/// Variables starting with a dollar sign will be skipped,
+/// as non-enumerable ones.
+//
+/// @param o        The object whose properties should be encoded.
+/// @param data     Output parameter, will be set to the url-encoded
+///                 variables string without any leading delimiter.
+void getURLEncodedVars(as_object& o, std::string& data);
 
 
 /// Comparator for ObjectURI so it can serve as a key in stdlib containers.

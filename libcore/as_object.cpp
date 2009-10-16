@@ -1279,28 +1279,25 @@ as_object::get_path_element(string_table::key key)
 }
 
 void
-as_object::getURLEncodedVars(std::string& data)
+getURLEncodedVars(as_object& o, std::string& data)
 {
-    SortedPropertyList props;
-    enumerateProperties(props);
+    PropertyList::SortedPropertyList props;
+    o.enumerateProperties(props);
 
     std::string del;
     data.clear();
     
-    for (SortedPropertyList::const_iterator i=props.begin(),
-            e=props.end(); i!=e; ++i)
-    {
-      std::string name = i->first;
-      std::string value = i->second;
-      if ( ! name.empty() && name[0] == '$' ) continue; // see bug #22006
-      URL::encode(value);
-      
-      data += del + name + "=" + value;
-      
-      del = "&";
-        
+    for (PropertyList::SortedPropertyList::const_iterator i=props.begin(),
+            e=props.end(); i!=e; ++i) {
+        std::string name = i->first;
+        std::string value = i->second;
+        if (!name.empty() && name[0] == '$') continue; // see bug #22006
+        URL::encode(value);
+
+        data += del + name + "=" + value;
+
+        del = "&";
     }
-    
 }
 
 bool

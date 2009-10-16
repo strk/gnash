@@ -2178,7 +2178,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     std::string postdata;
     
     // Encode our vars for sending.
-    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(postdata);
+    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*this, postdata);
 
     try 
     {

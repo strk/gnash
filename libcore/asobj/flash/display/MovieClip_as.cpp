@@ -1012,9 +1012,8 @@ movieclip_loadMovie(const fn_call& fn)
 
     // This is just an optimization if we aren't going
     // to send the data anyway. It might be wrong, though.
-    if (method != MovieClip::METHOD_NONE)
-    {
-        movieclip->getURLEncodedVars(data);
+    if (method != MovieClip::METHOD_NONE) {
+        getURLEncodedVars(*movieclip, data);
     }
  
     mr.loadMovie(urlstr, target, data, method);
@@ -1240,7 +1239,7 @@ movieclip_getURL(const fn_call& fn)
 
     if (method != MovieClip::METHOD_NONE) {
         // Get encoded vars.
-        movieclip->getURLEncodedVars(vars);
+        getURLEncodedVars(*movieclip, vars);
     }
 
     movie_root& m = getRoot(fn);
