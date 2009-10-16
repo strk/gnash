@@ -112,7 +112,7 @@ public:
         // TODO: there is recursion prevention anyway; is this extra 
         // check for circularity really necessary?
         if (!_visited.insert(_object).second) return 0;
-        return _object && !_object->_displayObject;
+        return _object && !_object->displayObject();
     }
 
     /// Return the wanted property if it exists and satisfies the predicate.
@@ -434,7 +434,7 @@ as_object::get_member(string_table::key name, as_value* val,
 	
 	Property* prop = pr.getProperty();
     if (!prop) {
-        if (_displayObject) {
+        if (displayObject()) {
             if (getDisplayObjectProperty(*this, name, *val)) return true;
         }
         while (pr()) {
@@ -705,6 +705,8 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
 
 /// Order of property lookup:
 //
+/// 0. MovieClip textfield variables. TODO: this is a hack and should be
+///    eradicated.
 /// 1. Own properties even if invisible or not getter-setters. 
 /// 2. If DisplayObject, magic properties
 /// 3. Visible own getter-setter properties of all __proto__ objects
@@ -713,6 +715,13 @@ bool
 as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
+
+    bool tfVarFound = false;
+    if (displayObject()) {
+        MovieClip* mc = dynamic_cast<MovieClip*>(this);
+        if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
+        // We still need to set the member.
+    }
 
     const ObjectURI uri(key, nsname);
     
@@ -724,7 +733,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 	// even if invisible.
 	if (!prop) { 
 
-        if (_displayObject) {
+        if (displayObject()) {
             if (setDisplayObjectProperty(*this, key, val)) return true;
             // TODO: should we execute triggers?
         }
@@ -761,6 +770,10 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		return true;
 	}
+
+    // Return true if we found a textfield variable, even if it was not
+    // an own property.
+    if (tfVarFound) return true;
 
 	// Else, add new property...
 	if (ifFound) return false;

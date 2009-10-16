@@ -526,6 +526,12 @@ public:
     /// simplify things if this function could be dropped.
     bool getTextFieldVariables(string_table::key name, as_value& val);
 
+    // Set TextField variables
+    //
+    /// TODO: this is also unlikely to be the best way to do it.
+    bool setTextFieldVariables(string_table::key name, const as_value& val,
+        string_table::key nsname = 0);
+
     /// Search for a named object on the DisplayList
     //
     /// These are properties, but not attached as genuine members to the
@@ -536,10 +542,6 @@ public:
     ///                 case-sensitivity.
     /// @return         The object if found, otherwise 0.
     DisplayObject* getDisplayListObject(string_table::key name);
-
-    // See dox in as_object.h
-    virtual bool set_member(string_table::key name, const as_value& val,
-        string_table::key nsname = 0, bool ifFound=false);
 
     /// Overridden to look in DisplayList for a match
     as_object* get_path_element(string_table::key key);
