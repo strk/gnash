@@ -622,7 +622,7 @@ public:
     ///
     /// @return true of the named property was found, false otherwise.
     ///
-    virtual bool get_member(string_table::key name, as_value* val,
+    bool get_member(string_table::key name, as_value* val,
         string_table::key nsname = 0);
 
     /// Resolve the given relative path component
@@ -716,7 +716,7 @@ public:
     ///    - (true, false) : property protected from deletion
     ///    - (true, true) : property successfully deleted
     ///
-    virtual std::pair<bool,bool> delProperty(string_table::key name,
+    std::pair<bool,bool> delProperty(string_table::key name,
             string_table::key nsname = 0);
 
     /// Get this object's own named property, if existing.
@@ -754,7 +754,7 @@ public:
     /// @return
     ///    true if the object has the property, false otherwise.
     ///
-    virtual bool hasOwnProperty(string_table::key name,
+    bool hasOwnProperty(string_table::key name,
             string_table::key nsname = 0);
 
     /// Get a property from this object (or a prototype) by ordering index.
