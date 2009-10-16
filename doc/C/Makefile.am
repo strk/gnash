@@ -75,7 +75,7 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC)  \
-	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in
+	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
@@ -87,7 +87,7 @@ MANSRC = $(dist_man_MANS:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
-TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
+TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi rtmpget.texi
 
 all-local: info html man
 
