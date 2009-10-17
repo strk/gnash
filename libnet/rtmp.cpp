@@ -170,17 +170,16 @@ const char *response_str[] = {
 int
 RTMP::headerSize(boost::uint8_t header)
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;    
+    int headersize = header & RTMP_HEADSIZE_MASK;
     
-    int headersize = -1;
-
-    if ((header & RTMP_HEADSIZE_MASK) == 0) {
+    if (headersize == 0) {
 	headersize = 12;
-    } else if (header & 0x80) {
+    } else if (headersize == 0x80) {
 	headersize = 4;
-    } else if (header & 0x40) {
+    } else if (headersize == 0x40) {
 	headersize = 8;
-    } else if (header & 0xc0) {
+    } else if (headersize == 0xc0) {
 	headersize = 1;
     } else {
 	log_error(_("AMF Header size bits (0x%X) out of range"),
@@ -271,13 +270,13 @@ RTMP::decodeHeader(boost::uint8_t *in)
     boost::uint8_t *tmpptr = in;
 
     head->channel = *tmpptr & RTMP_INDEX_MASK;
-    // log_network (_("The AMF channel index is %d"), head->channel);
+    log_network (_("The AMF channel index is %d"), head->channel);
     
     head->head_size = headerSize(*tmpptr++);
-    // log_network (_("The header size is %d"), head->head_size);
+    log_network (_("The header size is %d"), head->head_size);
 
     // cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in,
-    // 				head->head_size, false) << endl; 
+    //  				head->head_size, false) << endl;
 
     // Make sure the header size is in range, it has to be between
     // 1-12 bytes.
@@ -287,7 +286,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	head.reset();
 	return head;
     } else if (head->head_size == 0) {
-	log_error("RTMP Header size can't be zaero!");
+	log_error("RTMP Header size can't be zero!");
 	head.reset();
 	return head;
     }
@@ -296,7 +295,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
-//         log_network(_("The mystery word is: %d"), _mystery_word);
+	// log_network(_("The mystery word is: %d"), _mystery_word);
     } else {
 	_mystery_word = 0;
     }
@@ -345,7 +344,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	}
 #endif
     } else {
-	if ((_type[head->channel] >= RTMP::NONE) && (_type[head->channel] <= RTMP::FLV_DATA)) {
+	if (_type[head->channel] <= RTMP::FLV_DATA) {
 	    log_network("Using previous type of %d for channel %d",
 			head->type, head->channel);
 	    head->type = _type[head->channel];

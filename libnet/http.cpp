@@ -1247,7 +1247,7 @@ HTTP::formatRequest(const string &url, http_method_e cmd)
 HTTP::http_method_e
 HTTP::extractCommand(boost::uint8_t *data)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
 //    string body = reinterpret_cast<const char *>(data);
     HTTP::http_method_e cmd = HTTP::HTTP_NONE;
