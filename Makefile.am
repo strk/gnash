@@ -49,6 +49,7 @@ STD_DIRS = \
 	libmedia \
 	libsound \
 	libcore \
+	libgnu \
 	backend \
 	utilities \
 	gui \
@@ -93,6 +94,7 @@ EXTRA_DIST =  \
 	packaging/rpm.am \
 	packaging/gnash.xpm \
 	packaging/klash.xpm \
+	macros/gnulib-cache.m4 \
 	bzrversion.h
 
 
