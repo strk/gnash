@@ -1792,6 +1792,8 @@ fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
 
 AC_PATH_PROG(NETCAT, nc)
+dnl The name might differ between systems.
+AC_PATH_PROG(NETCAT, netcat)
 AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
 AC_PATH_PROG(WGET, wget)
 AM_CONDITIONAL(HAS_WGET, [ test x"$WGET" != x ])
