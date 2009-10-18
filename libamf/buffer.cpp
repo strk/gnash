@@ -200,15 +200,14 @@ Buffer &
 Buffer::copy(boost::uint8_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
-    _seekptr =_data.get();
     if (_data) {
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
     } else {
         boost::format msg("Not enough storage was allocated to hold the "
-        "copied data! Needs %1%, only has %2% bytes");
+			  "copied data! Needs %1%, only has %2% bytes");
         msg % nbytes % _nbytes;
-	    throw GnashException(msg.str());
+	throw GnashException(msg.str());
     }
     return *this;
 }
@@ -230,9 +229,9 @@ Buffer::append(boost::uint8_t *data, size_t nbytes)
 	    std::copy(data, data + nbytes, _seekptr);
 	    _seekptr += nbytes;
 	} else {
-        boost::format msg("Not enough storage was allocated to hold the "
-        "appended data! Needs %1%, only has %2% bytes");
-        msg % nbytes % _nbytes;
+	    boost::format msg("Not enough storage was allocated to hold the "
+			      "appended data! Needs %1%, only has %2% bytes");
+	    msg % nbytes % _nbytes;
 	    throw GnashException(msg.str());
 	}
     }
