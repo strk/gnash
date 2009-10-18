@@ -165,8 +165,10 @@ Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
     
     // Extract the properties for this metadata object.
     boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
-    ptr += amf.totalsize();
-    el->setName(name.c_str(), length);
+    if (el.get()) {
+	ptr += amf.totalsize();
+	el->setName(name.c_str(), length);
+    }
 
     return el;
 }
