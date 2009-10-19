@@ -553,7 +553,7 @@ Element::operator=(Element &el)
 //    GNASH_REPORT_FUNCTION;
     _type = el.getType();
     if (el.getNameSize()) {
-        _name = strdup(el.getName());
+	setName(el.getName());
     }
     _buffer.reset(new Buffer(el.getDataSize()));
     _buffer->copy(el.to_reference(), el.getDataSize());
