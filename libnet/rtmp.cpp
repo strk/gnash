@@ -270,13 +270,13 @@ RTMP::decodeHeader(boost::uint8_t *in)
     boost::uint8_t *tmpptr = in;
 
     head->channel = *tmpptr & RTMP_INDEX_MASK;
-    log_network (_("The AMF channel index is %d"), head->channel);
+    // log_network (_("The AMF channel index is %d"), head->channel);
     
     head->head_size = headerSize(*tmpptr++);
-    log_network (_("The header size is %d"), head->head_size);
+    // log_network (_("The header size is %d"), head->head_size);
 
     // cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in,
-    //  				head->head_size, false) << endl;
+    // 				head->head_size, false) << endl;
 
     // Make sure the header size is in range, it has to be between
     // 1-12 bytes.
@@ -299,7 +299,6 @@ RTMP::decodeHeader(boost::uint8_t *in)
     } else {
 	_mystery_word = 0;
     }
-
 
     if (head->head_size >= 8) {
         head->bodysize = *tmpptr++;
@@ -1271,6 +1270,11 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	if (rthead->channel == RTMP_SYSTEM_CHANNEL) {
  	    log_network("Got a message on the system channel!", __FUNCTION__);
 	}
+	// If the header size is 4 bytes or less, then reuse the body size
+	// of the last message for this channel.
+	if (rthead->head_size <= 4) {
+	    rthead->bodysize = _lastsize[rthead->channel];
+	}
 	// Make sure the header size we just got is in range. We can
 	// proceed as long as it is in range, but if it is out of
 	// range, we can't really continue.
@@ -1278,10 +1282,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	    // Any packet with a header size greater than 1 is a
 	    // always a new RTMP message, so create a new Buffer to
 	    // hold all the data.
-	    if (rthead->head_size <= 4) {
-		rthead->bodysize = _lastsize[rthead->channel];
-	    }
-	    if ((rthead->head_size > 1) || (ptr == data)) {
+	    if ((rthead->head_size >= 1) || (ptr == data)) {
   		// cerr << "New packet for channel #" << rthead->channel << " of size "
   		//      << (rthead->head_size + rthead->bodysize) << endl;
 		// give it some memory to store data in. We store
