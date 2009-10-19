@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.50)
 AC_INIT(gnash, trunk)
 AC_CONFIG_SRCDIR(libcore/gnash.h)
 AM_CONFIG_HEADER(gnashconfig.h)
@@ -29,10 +29,6 @@ dnl Figure out development tool stuff
 dnl --------------------------------------------------------
 
 AC_PROG_CC
-dnl Invoke GNUlib 
-gl_EARLY
-gl_INIT
-dnl
 AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
@@ -2376,7 +2372,6 @@ libcore/vm/Makefile
 libcore/parser/Makefile
 libnet/Makefile
 libamf/Makefile
-libgnu/Makefile
 backend/Makefile
 utilities/Makefile
 doc/Makefile
