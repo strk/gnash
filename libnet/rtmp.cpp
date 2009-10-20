@@ -738,18 +738,27 @@ RTMP::decodeMsgBody(amf::Buffer &buf)
     return decodeMsgBody(buf.reference(), buf.allocated());
 }
 
+// 02 00 00 00 00 00 04 01 00 00 00 00 00 00 10 00
+// id=2 timestamp=0 body_size=4 content_type=0x01 dest=0 	
+// Set chunk size 4096
 boost::shared_ptr<amf::Buffer> 
-RTMP::encodeChunkSize()
+RTMP::encodeChunkSize(int size)
 {
     GNASH_REPORT_FUNCTION;
-    log_unimpl(__PRETTY_FUNCTION__);
-    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
+
+    boost::uint32_t swapped = htonl(size);
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(sizeof(boost::uint32_t)));
+    *buf += swapped;
+
+    return buf;
 }
 
 void
 RTMP::decodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
+    // _chunksize[rthead->channel] = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
+    // log_network("Setting packet chunk size to %d.", _chunksize);
     log_unimpl(__PRETTY_FUNCTION__);
 }
     

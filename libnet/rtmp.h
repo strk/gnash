@@ -351,7 +351,7 @@ public:
     boost::shared_ptr<user_event_t> decodeUser(amf::Buffer &buf);
     
     // These are handlers for the various types
-    virtual boost::shared_ptr<amf::Buffer> encodeChunkSize();
+    virtual boost::shared_ptr<amf::Buffer> encodeChunkSize(int size);
     virtual void decodeChunkSize();
     
     virtual boost::shared_ptr<amf::Buffer> encodeBytesRead();
