@@ -1497,7 +1497,11 @@ rtmp_handler(Network::thread_params_t *args)
 // 		    }
 		    switch (qhead->type) {
 		      case RTMP::CHUNK_SIZE:
+			  log_unimpl("Set Chunk SIze");
+			  break;
 		      case RTMP::BYTES_READ:
+			  log_unimpl("Bytes Read");
+			  break;
 		      case RTMP::ABORT:
 		      case RTMP::USER:
 			  // already handled as this is a system channel message
@@ -1554,7 +1558,14 @@ rtmp_handler(Network::thread_params_t *args)
 				  }
 			  } else if (body->getMethodName() == "play") {
 			      hand->playStream(body->at(1)->to_string());
-			      // Send the Play.Retting response
+			      // Send the Set Chunk Size response
+			      response = rtmp->encodeChunkSize(4096);
+			      if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+					RTMP::HEADER_12, response->allocated(),
+					RTMP::CHUNK_SIZE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
+			      // Send the Play.Resetting response
 			      response = rtmp->encodeResult(RTMPMsg::NS_PLAY_RESET, body->at(1)->to_string(), transid);
 			      if (rtmp->sendMsg(args->netfd, qhead->channel,
 					RTMP::HEADER_8, response->allocated(),
