@@ -24,10 +24,14 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cstdlib>
+#include <cstdio>
+
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/random/uniform_real.hpp>
+#include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -618,15 +622,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 }
 
 boost::shared_ptr<amf::Buffer> 
-RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &streamid)
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid)
 {
 //    GNASH_REPORT_FUNCTION;
     double clientid = 0.0;
-    return encodeResult(status, "", streamid, clientid);
+    return encodeResult(status, "", transid, clientid);
 }
 
 boost::shared_ptr<amf::Buffer> 
-RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid, double &clientid)
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid)
 {
 //    GNASH_REPORT_FUNCTION;
 //    Buffer *buf = new Buffer;
@@ -643,8 +647,8 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
     str->makeString("_result");
 
     Element *number = new Element;
-    // add The server ID
-    number->makeNumber(streamid);
+    // add the transaction ID
+    number->makeNumber(transid);
 
     Element top;
 //    top.makeObject("application");
@@ -718,7 +722,38 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::NS_DATA_START:
       case RTMPMsg::NS_FAILED:
       case RTMPMsg::NS_INVALID_ARGUMENT:
+	  // The response to a successful pauseStream command is this
+	  // message.
       case RTMPMsg::NS_PAUSE_NOTIFY:
+      {
+	  str->makeString("onStatus");
+
+	  boost::shared_ptr<amf::Element> level(new Element);
+	  level->makeString("level", "status");
+	  top.addProperty(level);
+
+	  boost::shared_ptr<amf::Element> code(new Element);
+	  code->makeString("code", "NetStream.Pause.Notify");
+	  top.addProperty(code);
+
+	  boost::shared_ptr<amf::Element> description(new Element);
+	  string field = "Pausing ";
+	  if (!filename.empty()) {
+	      field += filename;
+	  }
+	  description->makeString("description", field);
+	  top.addProperty(description);
+	  
+	  boost::shared_ptr<amf::Element> details(new Element);
+	  details->makeString("details", filename);
+	  top.addProperty(details);
+  
+	  boost::shared_ptr<amf::Element> cid(new Element);
+	  cid->makeNumber("clientid", clientid);
+	  top.addProperty(cid);
+
+	  break;
+      }
       case RTMPMsg::NS_PLAY_COMPLETE:
       case RTMPMsg::NS_PLAY_FAILED:
       case RTMPMsg::NS_PLAY_FILE_STRUCTURE_INVALID:
@@ -753,7 +788,19 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  top.addProperty(details);
 	  
 	  boost::shared_ptr<amf::Element> cid(new Element);
+#ifdef CLIENT_ID_NUMERIC
+	  double clientid = createClientID();
 	  cid->makeNumber("clientid", clientid);
+#else
+	  string clientid;
+	  if (!_clientids[transid].empty()) {
+	      clientid =_clientids[transid].c_str();
+	  } else {
+	      clientid = createClientID();
+	      _clientids[transid] = clientid;
+	  }
+	  cid->makeString("clientid", _clientids[transid]);
+#endif
 	  top.addProperty(cid);
 
 	  break;
@@ -783,7 +830,19 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  top.addProperty(details);
   
 	  boost::shared_ptr<amf::Element> cid(new Element);
+#ifdef CLIENT_ID_NUMERIC
+	  double clientid = createClientID();
 	  cid->makeNumber("clientid", clientid);
+#else
+	  string clientid;
+	  if (!_clientids[transid].empty()) {
+	      clientid =_clientids[transid].c_str();
+	  } else {
+	      clientid = createClientID();
+	      _clientids[transid] = clientid;
+	  }
+	  cid->makeString("clientid", _clientids[transid]);
+#endif
 	  top.addProperty(cid);
 
 	  break;
@@ -798,8 +857,13 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::NS_RECORD_NOACCESS:
       case RTMPMsg::NS_RECORD_START:
       case RTMPMsg::NS_RECORD_STOP:
+	  // The reponse to a failed seekStream is this message.
       case RTMPMsg::NS_SEEK_FAILED:
+	  // The reponse to a successful seekStream is this message.
       case RTMPMsg::NS_SEEK_NOTIFY:
+	  break;
+	  // The response to a successful pauseStream command is this
+	  // message when the stream is started again.
       case RTMPMsg::NS_UNPAUSE_NOTIFY:
       case RTMPMsg::NS_UNPUBLISHED_SUCCESS:
       case RTMPMsg::SO_CREATION_FAILED:
@@ -807,19 +871,24 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::SO_NO_WRITE_ACCESS:
       case RTMPMsg::SO_PERSISTENCE_MISMATCH:
 	  break;
-      // Anything below here is specific to Gnash's implementation
+	  // The response for a createStream message is the
+	  // transaction ID, followed by the command object (usually a
+	  // NULL object), and the Stream ID. The Stream ID is just a
+	  // simple incrementing counter of streams.
       case RTMPMsg::NS_CREATE_STREAM:
       {
 	  // Don't encode as an object, just the properties
 	  notobject = true;
 
 	  boost::shared_ptr<amf::Element> id2(new Element);
+	  
 	  double sid = createStreamID();
 	  id2->makeNumber(sid);
 	  top.addProperty(id2);
 	  
 	  break;
       }
+      // There is no response to a deleteStream request.
       case RTMPMsg::NS_DELETE_STREAM:
       default:
 	  break;
@@ -1045,11 +1114,15 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
     return buf;
 }
 
-// Create a new client ID, which appears to be a random double.
+// Create a new client ID, which appears to be a random double,
+// although I also see a temporary 8 character string used often as
+// well.
+#ifdef CLIENT_ID_NUMERIC
 double 
 RTMPServer::createClientID()
 {
 //    GNASH_REPORT_FUNCTION;
+    
     boost::mt19937 seed;
     // Pick the number of errors to create based on the Buffer's data size
     boost::uniform_real<> numbers(1, 65535);
@@ -1059,6 +1132,23 @@ RTMPServer::createClientID()
 
     return id;
 }
+#else
+std::string
+RTMPServer::createClientID()
+{
+//    GNASH_REPORT_FUNCTION;
+    string id;
+    
+    boost::mt19937 seed;
+    for (size_t i=0; i < 8; i++) {
+	// Pick the number of errors to create based on the Buffer's data size
+	boost::uniform_int<> numbers(0x30, 0x7a);
+	id += numbers(seed);
+    }
+
+    return id;
+}
+#endif
 
 // Get the next streamID
 double 
@@ -1458,12 +1548,26 @@ rtmp_handler(Network::thread_params_t *args)
 			      hand->createStream(transid);
 			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, transid);
 			      if (rtmp->sendMsg(args->netfd, qhead->channel,
-						RTMP::HEADER_8, response->allocated(),
-						RTMP::INVOKE, RTMPMsg::FROM_SERVER,
-						*response)) {
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
 				  }
 			  } else if (body->getMethodName() == "play") {
 			      hand->playStream(body->at(1)->to_string());
+			      // Send the Play.Retting response
+			      response = rtmp->encodeResult(RTMPMsg::NS_PLAY_RESET, body->at(1)->to_string(), transid);
+			      if (rtmp->sendMsg(args->netfd, qhead->channel,
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
+			      // Send the Play.Start response
+			      response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, body->at(1)->to_string(), transid);
+			      if (rtmp->sendMsg(args->netfd, qhead->channel,
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
 			  } else if (body->getMethodName() == "seek") {
 			      hand->seekStream();
 			  } else if (body->getMethodName() == "pause") {

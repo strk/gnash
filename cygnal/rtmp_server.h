@@ -20,6 +20,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/array.hpp>
 #include <string>
 #include <map>
 
@@ -34,6 +35,10 @@
 
 namespace cygnal
 {
+
+// Define this if you want to use numeric client ID. Undefining this
+// create ASCII based client IDs instead.
+// #define CLIENT_ID_NUMERIC 1
 
 class RTMPServer : public gnash::RTMP
 {
@@ -57,9 +62,9 @@ public:
     // These are handlers for the various types
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status);
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename);
-    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid);
-    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &streamid);
-    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid, double &clientid);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid);
 
     // Encode a Ping for the client
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
@@ -80,7 +85,14 @@ public:
 
     bool sendFile(int fd, const std::string &filespec);
 
+    // Create a new client ID
+#ifdef CLIENT_ID_NUMERIC
     double createClientID();
+#else
+    std::string createClientID();
+#endif
+
+    // Create a new stream ID, which is simply an incrementing counter.
     double createStreamID();
 
     void setStreamID(double id) { _streamid = id; };
@@ -118,7 +130,11 @@ private:
     std::string		_filespec;
     boost::uint32_t     _filesize;
     std::map<boost::uint16_t, amf::Element> _references;
-    std::vector<double>	_clientids;
+#ifdef CLIENT_ID_NUMERIC
+    std::array<double>	_clientids;
+#else
+    boost::array<std::string, 1000>	_clientids;
+#endif
     double		_streamid;
     /// \var _netconnect
     ///    This store the data from the NetConnection ActionScript
