@@ -98,8 +98,8 @@ public:
     void setMethodName(const std::string &name) { _method = name; } ;
     std::string &getMethodName()         { return _method; };
 
-    void setStreamID(double num)         { _streamid = num; };
-    double getStreamID()	         { return _streamid; };
+    void setTransactionID(double num)         { _transid = num; };
+    double getTransactionID()	         { return _transid; };
 
     rtmp_status_e checkStatus(boost::shared_ptr<amf::Element> el);
     void setStatus(rtmp_status_e st)     { _status = st; };
@@ -128,7 +128,7 @@ public:
     rtmp_source_e	  _routing;
     rtmp_status_e	  _status;
     std::string           _method;
-    double                _streamid;
+    double                _transid;
     std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
     boost::uint8_t       _channel;
 };

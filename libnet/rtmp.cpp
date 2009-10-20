@@ -706,7 +706,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     
     double swapped = streamid->to_number();
 //     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
-    msg->setStreamID(swapped);
+    msg->setTransactionID(swapped);
 
     if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "_error") || (msg->getMethodName() == "onStatus")) {
  	status = true;

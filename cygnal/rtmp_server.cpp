@@ -1191,7 +1191,7 @@ rtmp_handler(Network::thread_params_t *args)
     static bool initialize = true;
 //     bool sendfile = false;
     log_network(_("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\""),
-	      args->netfd, args->filespec);
+		args->netfd, args->filespec);
     
 #ifdef USE_STATISTICS
     struct timespec start;
@@ -1439,6 +1439,7 @@ rtmp_handler(Network::thread_params_t *args)
 			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
 		      case RTMP::INVOKE:
+		      {
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
 			  if (!body) {
 			      log_error("Error INVOKING method \"%s\"!", body->getMethodName());
@@ -1451,30 +1452,32 @@ rtmp_handler(Network::thread_params_t *args)
 			  // NetStream class, which like NetConnection,
 			  // is a speacial one handled directly by the
 			  // server instead of any cgi-bin plugins.
+			  double transid  = body->getTransactionID();
+			  log_network("The Transaction ID from the client is: %g", transid);
 			  if (body->getMethodName() == "createStream") {
-			      /* int streamid = */ hand->createStream();
-			      double streamid  = body->getStreamID();
-			      log_network("StreamID is: %g", streamid);
-			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, streamid);
+			      hand->createStream(transid);
+			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, transid);
 			      if (rtmp->sendMsg(args->netfd, qhead->channel,
 						RTMP::HEADER_8, response->allocated(),
 						RTMP::INVOKE, RTMPMsg::FROM_SERVER,
 						*response)) {
 				  }
 			  } else if (body->getMethodName() == "play") {
-			      hand->playStream();
+			      hand->playStream(body->at(1)->to_string());
 			  } else if (body->getMethodName() == "seek") {
 			      hand->seekStream();
 			  } else if (body->getMethodName() == "pause") {
-			      hand->pauseStream();
+			      hand->pauseStream(transid);
 			  } else if (body->getMethodName() == "close") {
-			      hand->closeStream();
+			      hand->closeStream(transid);
 			  } else if (body->getMethodName() == "resume") {
-			      hand->resumeStream();
+			      hand->resumeStream(transid);
+			  } else if (body->getMethodName() == "delete") {
+			      hand->deleteStream(transid);
 			  } else if (body->getMethodName() == "publish") {
 			      hand->publishStream();
 			  } else if (body->getMethodName() == "togglePause") {
-			      hand->togglePause();
+			      hand->togglePause(transid);
 			      // This is a server installation specific  method.
 			  } else if (body->getMethodName() == "FCSubscribe") {
 			      hand->setFCSubscribe(body->at(0)->to_string());
@@ -1494,6 +1497,7 @@ rtmp_handler(Network::thread_params_t *args)
 			      done = true;
 			  }
 			  break;
+		      }
 		      case RTMP::FLV_DATA:
 			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
@@ -1539,7 +1543,7 @@ rtmp_handler(Network::thread_params_t *args)
 		return true;
 	    }
 	} else {
-	    log_error("Communication error with client using fd #%d", args->netfd);
+	    // log_error("Communication error with client using fd #%d", args->netfd);
 	    rtmp->closeNet(args->netfd);
 	    initialize = true;
 	    return false;
