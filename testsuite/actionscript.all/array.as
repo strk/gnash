@@ -1609,6 +1609,58 @@ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
 o.sort();
 xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
 
+#if OUTPUT_VERSION > 5
+
+/// This checks that Array and relay objects are not compatible (unlike
+/// DisplayObjects).
+CA = function () {
+  backup = this;
+  this.__proto__.__constructor__ = Date;
+  super ();
+  check_equals(this.length, undefined);
+  this.__proto__.__constructor__ = Array;
+  super ();
+  check_equals(backup, this);
+  check_equals(this.length, 0);
+  this[2] = 3;
+  check_equals(this.length, 3);
+  this.__proto__.__constructor__ = Date;
+  super ();
+  check_equals(this.length, 3);
+  this[6] = 3;
+  check_equals(this.length, 3);
+};
+
+o = new CA();
+
+backup = Array;
+
+/// Test what happens with []
+
+Array = 8;
+ar = [];
+check_equals(typeof(ar.constructor), "function" );
+
+h = function() {};
+h.prototype = 8;
+
+Array = h;
+
+/// The __proto__ member of native arrays is only set to an object.
+ar = [];
+check_equals(typeof(ar.constructor), "function");
+check_equals(typeof(ar.__proto__), "object");
+ar.__proto__.toString = Number.prototype.toString;
+check_equals(ar.__proto__.toString(), undefined);
+
+/// If we use the constructor, it's set to anything you like.
+ar = new Array();
+check_equals(typeof(ar.__proto__), "number");
+
+#endif
+
+
+
 // TODO: test ASnative-returned functions:
 //
 // ASnative(252, 1) - [Array.prototype] push
@@ -1630,8 +1682,8 @@ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
  check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(599);
+  check_totals(610);
 # else
-  check_totals(609);
+  check_totals(620);
 # endif
 #endif
