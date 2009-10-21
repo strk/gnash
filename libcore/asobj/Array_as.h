@@ -84,10 +84,6 @@ public:
 
 	~Array_as();
 
-	as_value at(unsigned int index) const;
-
-	unsigned int size() const;
-
 	/// Overridden to provide array[#]=x semantic
 	virtual bool set_member(string_table::key name,
 		const as_value& val, string_table::key nsname=0, bool ifFound=false);

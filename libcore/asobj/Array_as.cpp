@@ -826,19 +826,6 @@ Array_as::~Array_as()
 {
 }
 
-unsigned int
-Array_as::size() const
-{
-    return arrayLength(const_cast<Array_as&>(*this));
-}
-
-as_value
-Array_as::at(unsigned int index) const
-{
-    if (index > size() - 1) return as_value();
-    return const_cast<Array_as*>(this)->getMember(arrayKey(getStringTable(*this), index));
-}
-
 /* virtual public, overriding as_object::set_member */
 bool
 Array_as::set_member(string_table::key name, const as_value& val,
