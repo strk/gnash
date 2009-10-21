@@ -1219,8 +1219,6 @@ array_push(const fn_call& fn)
         array->set_member(getKey(fn, size + i), fn.arg(i));
     }
  
-    log_debug("size: %s, shift :%s", size, shift);
-
     return as_value(size + shift);
 }
 
