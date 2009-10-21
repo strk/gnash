@@ -2629,18 +2629,16 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     as_value function = thread.getVariable(funcname, &this_ptr);
 
-    if ( ! function.is_object() )
-    {
+    if (!function.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(_("ActionCallFunction: %s is not an object"), funcname);
         )
     }
-    else if ( ! function.is_function() )
-    {
+    else if (!function.is_function()) {
         log_error(_("ActionCallFunction: function name %s evaluated to "
                 "non-function value %s"), funcname, function);
         // Calling super ? 
-        boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), function);
+        as_object* obj = convertToObject(*getGlobal(thread.env), function);
         this_ptr = thread.getThisPointer();
         if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
         {
