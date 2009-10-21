@@ -961,7 +961,12 @@ public:
     /// constructors and special creation functions like
     /// MovieClip.createTextField(). As Relay objects are not available to
     /// ActionScript, this should never appear in built-in functions.
+    //
+    /// This function also removes Array typing from an object when a Relay
+    /// is assigned. There are tests verifying this behaviour in
+    /// actionscript.all and the swfdec testsuite.
     void setRelay(Relay* p) {
+        if (p) _array = false;
         _relay.reset(p);
     }
 
@@ -977,6 +982,14 @@ public:
     /// implemented in ActionScript).
     Relay* relay() const {
         return _relay.get();
+    }
+
+    bool array() const {
+        return _array;
+    }
+
+    void setArray() {
+        _array = true;
     }
 
     /// Return true if this is a DisplayObject.
@@ -1075,6 +1088,15 @@ private:
     /// These magic properties are invoked in get_member only if the
     /// object is a DisplayObject
     bool _displayObject;
+
+    /// An array is a special type of object.
+    //
+    /// Like DisplayObjects, Arrays handle property setting differently. We
+    /// use an extra flag to avoid checking Relay type on every property
+    /// set, but tests show that the Array constructor removes the Relay. It
+    /// would be possible to implement using a Relay, but as an Array stores
+    /// no extra native data, it's not clear what the point is.
+    bool _array;
 
     /// The polymorphic Relay object for native types.
     //

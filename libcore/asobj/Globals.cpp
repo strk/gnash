@@ -28,12 +28,12 @@
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "NativeFunction.h" 
-#include "Array_as.h"
 #include "AsBroadcaster.h"
 #include "Boolean_as.h"
 #include "Color_as.h"
 #include "CustomActions.h"
 #include "Date_as.h" 
+#include "Array_as.h" 
 #include "Error_as.h"
 #include "String_as.h"
 #include "Selection_as.h"
@@ -249,15 +249,28 @@ AVM1Global::createNumber(double d)
 
 }
 
-/// This serves the purpose of hiding the Array_as type from the
-/// implementation, which at least enforces good behaviour from users.
+/// Construct an Array.
 //
-/// TODO: it could well already call the Array constructor.
+/// This uses the _global Array class to initialize the "constructor" and
+/// "__proto__" properties. If Array.prototype is undefined, those properties
+/// are not added.
 as_object*
 AVM1Global::createArray()
 {
-    as_object* array = new Array_as;
-    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    as_object* array = new as_object(*this);
+
+    as_value ctor = getMember(NSV::CLASS_ARRAY);
+    as_object* obj = ctor.to_object(*this);
+    if (obj) {
+        as_value proto;
+        if (obj->get_member(NSV::PROP_PROTOTYPE, &proto)) {
+            array->init_member(NSV::PROP_CONSTRUCTOR, ctor);
+            array->set_prototype(obj->getMember(NSV::PROP_PROTOTYPE));
+        }
+    }
+
+    array->init_member(NSV::PROP_LENGTH, 0.0);
+    array->setArray();
     return array;
 }
 
@@ -322,7 +335,8 @@ AVM2Global::createBoolean(bool b)
 as_object*
 AVM2Global::createArray()
 {
-    as_object* array = new Array_as;
+    as_object* array = new as_object(*this);
+    array->setArray();
     array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
     return array;
 }
@@ -510,7 +524,7 @@ avm1Classes()
         (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
+        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NS_GLOBAL, 6))
         (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
@@ -596,7 +610,7 @@ avm2Classes(string_table& st)
            NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_TEXT, 3))
         (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
-        (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
+        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
         (N(textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))

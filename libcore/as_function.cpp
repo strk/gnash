@@ -138,7 +138,7 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
     // Create an empty object, with a ref to the constructor's prototype.
     // TODO: The prototype should not be converted to an object!
     as_object* newobj = new as_object();
-    if (has_proto) newobj->set_prototype(proto.to_object(*getGlobal(env)));
+    if (has_proto) newobj->set_prototype(proto);
     
     // Add a __constructor__ member to the new object, but only for SWF6 up
     // (to be checked). NOTE that we assume the builtin constructors

@@ -18,19 +18,11 @@
 #ifndef GNASH_ARRAY_H
 #define GNASH_ARRAY_H
 
-#include "as_object.h" // for inheritance
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "namedStrings.h"
+#include "as_object.h" 
 #include "Global_as.h"
-
-#include <deque>
-#include <vector>
-#include <memory> // for auto_ptr
-#include <string>
 
 // Forward declarations
 namespace gnash {
-	class fn_call;
 	class as_value;
 }
 
@@ -55,7 +47,6 @@ size_t arrayLength(as_object& array);
 /// @return         The string table key to look up.
 string_table::key arrayKey(string_table& st, size_t i);
 
-
 /// A visitor to check whether an array is strict or not.
 //
 /// Strict arrays have no non-hidden non-numeric properties. Only real arrays
@@ -74,25 +65,14 @@ private:
     string_table& _st;
 };
 
-/// The Array ActionScript object
-class Array_as : public as_object
-{
 
-public:
-
-	Array_as();
-
-	~Array_as();
-
-	as_value at(unsigned int index) const;
-
-	unsigned int size() const;
-
-	/// Overridden to provide array[#]=x semantic
-	virtual bool set_member(string_table::key name,
-		const as_value& val, string_table::key nsname=0, bool ifFound=false);
-
-};
+/// Genuine arrays handle the length property in a special way.
+//
+/// The only distinction between Arrays and Objects is that the length
+/// property is changed when an element is added, and that changing the length
+/// can result in deleted properties.
+void checkArrayLength(as_object& array, string_table::key name,
+        const as_value& val, string_table::key nsname = 0);
 
 template<typename T>
 void foreachArray(as_object& array, T& pred)

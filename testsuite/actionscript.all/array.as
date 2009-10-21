@@ -1605,9 +1605,84 @@ check_equals(traceProps(o), "sort,length,7,6,5,4,3,2,1,");
 
 check_equals(o.length, 6);
 o.sort();
-xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#if OUTPUT_VERSION > 6
+ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#else
+ xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
+#endif
 o.sort();
-xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#if OUTPUT_VERSION > 6
+ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#else
+ xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
+#endif
+
+#if OUTPUT_VERSION > 5
+
+/// This checks that Array and relay objects are not compatible (unlike
+/// DisplayObjects).
+CA = function () {
+  backup = this;
+  this.__proto__.__constructor__ = Date;
+  super ();
+  check_equals(this.length, undefined);
+  this.__proto__.__constructor__ = Array;
+  super ();
+  check_equals(backup, this);
+  check_equals(this.length, 0);
+  this[2] = 3;
+  check_equals(this.length, 3);
+  this.__proto__.__constructor__ = Date;
+  super ();
+  check_equals(this.length, 3);
+  this[6] = 3;
+  check_equals(this.length, 3);
+};
+
+o = new CA();
+
+
+/// Test what happens with []
+backup = _global.Array;
+delete _global.Array;
+
+_global.Array = 8;
+ar = [];
+check_equals(typeof(ar.constructor), "undefined");
+
+h = function() {};
+h.prototype = 8;
+
+_global.Array = h;
+
+ar = [];
+check_equals(typeof(ar.constructor), "function");
+check_equals(typeof(ar.__proto__), "number");
+check_equals(ar.__proto__, 8);
+
+/// If we use the constructor, it's set to anything you like.
+ar = new Array();
+check_equals(typeof(ar.__proto__), "number");
+
+/// Properties are only set if there is a _global.Array.prototype
+
+_global.Array = {};
+
+ar = [];
+check_equals(typeof(ar.constructor), "undefined");
+check_equals(typeof(ar.__proto__), "undefined");
+check_equals(ar.__proto__, undefined);
+
+_global.Array.prototype = "string";
+
+ar = [];
+check_equals(typeof(ar.constructor), "object");
+check_equals(typeof(ar.__proto__), "string");
+check_equals(ar.__proto__, "string");
+
+#endif
+
+
 
 // TODO: test ASnative-returned functions:
 //
@@ -1630,8 +1705,8 @@ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
  check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(599);
+  check_totals(616);
 # else
-  check_totals(609);
+  check_totals(626);
 # endif
 #endif

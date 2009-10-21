@@ -2629,18 +2629,16 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     as_value function = thread.getVariable(funcname, &this_ptr);
 
-    if ( ! function.is_object() )
-    {
+    if (!function.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(_("ActionCallFunction: %s is not an object"), funcname);
         )
     }
-    else if ( ! function.is_function() )
-    {
+    else if (!function.is_function()) {
         log_error(_("ActionCallFunction: function name %s evaluated to "
                 "non-function value %s"), funcname, function);
         // Calling super ? 
-        boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), function);
+        as_object* obj = convertToObject(*getGlobal(thread.env), function);
         this_ptr = thread.getThisPointer();
         if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
         {
@@ -2809,10 +2807,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     
     Global_as* gl = getGlobal(env);
 
-    as_value result = gl->createArray();
-
-    as_object* ao = convertToObject(*getGlobal(thread.env), result);
-    assert(ao);
+    as_object* ao = gl->createArray();
 
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
@@ -2821,7 +2816,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
                 env.pop());
     }
 
-    env.push(result);
+    env.push(ao);
 
 }
 
@@ -3735,7 +3730,6 @@ SWFHandlers::ActionTry(ActionExec& thread)
 void
 SWFHandlers::ActionWith(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
@@ -3745,9 +3739,8 @@ SWFHandlers::ActionWith(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_WITH));
 #endif
 
-    as_value with_obj_val = convertToObject(*getGlobal(thread.env), env.pop());
-    boost::intrusive_ptr<as_object> with_obj =
-        convertToObject(*getGlobal(thread.env), with_obj_val);
+    const as_value& val = env.pop();
+    as_object* with_obj = val.to_object(*getGlobal(thread.env));
 
     ++pc; // skip tag code
 
@@ -3774,21 +3767,20 @@ SWFHandlers::ActionWith(ActionExec& thread)
     // now we should be on the first action of the 'with' body
     assert(thread.getNextPC() == pc);
 
-    if ( ! with_obj )
-    {
+    if (!with_obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("with(%s) : first argument doesn't cast to an object!"),
-            with_obj_val);
+            val);
         );
         // skip the full block
         thread.adjustNextPC(block_length);
         return;
     }
 
-    // where does the 'with' block ends ?
-    unsigned block_end = thread.getNextPC() + block_length;
+    // where does the 'with' block end?
+    const size_t block_end = thread.getNextPC() + block_length;
 
-    if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
+    if (!thread.pushWithEntry(with_stack_entry(with_obj, block_end)))
     {
         // skip the full block
         thread.adjustNextPC(block_length);

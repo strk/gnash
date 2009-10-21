@@ -39,13 +39,6 @@ public:
 	{
 	}
 
-	with_stack_entry(boost::intrusive_ptr<as_object> obj, size_t end)
-		:
-		_object(obj),
-		_block_end_pc(end)
-	{
-	}
-
 	size_t end_pc()
 	{
 		return _block_end_pc;
@@ -53,21 +46,19 @@ public:
 
 	const as_object* object() const
 	{
-		return _object.get();
+		return _object;
 	}
 
 	as_object* object() 
 	{
-		return _object.get();
+		return _object;
 	}
 
 private:
 
-	boost::intrusive_ptr<as_object>	_object;
+	as_object* _object;
 	
 	size_t _block_end_pc;
-
-	
 
 };
 

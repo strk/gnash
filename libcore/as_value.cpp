@@ -2278,14 +2278,13 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     return true;
                 }
 
-                Array_as* ary = dynamic_cast<Array_as*>(obj);
-                if (ary) {
+                if (obj->array()) {
                     string_table& st = vm.getStringTable();
-                    const size_t len = arrayLength(*ary);
+                    const size_t len = arrayLength(*obj);
                     if (allowStrict) {
                         IsStrictArray s(st);
                         // Check if any non-hidden properties are non-numeric.
-                        ary->visitProperties<IsEnumerable>(s);
+                        obj->visitProperties<IsEnumerable>(s);
                         if (s.strict()) {
 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
@@ -2298,7 +2297,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
                             as_value elem;
                             for (size_t i = 0; i < len; ++i) {
-                                elem = ary->getMember(arrayKey(st, i));
+                                elem = obj->getMember(arrayKey(st, i));
                                 if (!elem.writeAMF0(buf, offsetTable, vm,
                                             allowStrict)) {
                                     log_error("Problems serializing strict array "
