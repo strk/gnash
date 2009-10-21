@@ -691,7 +691,7 @@ as_object::set_member(string_table::key key, const as_value& val,
     }
 
     // Handle the length property for arrays. NB: checkArrayLength() will
-    // call this function again...
+    // call this function again if the key is a valid index.
     if (array()) checkArrayLength(*this, key, val, nsname);
 
     const ObjectURI uri(key, nsname);

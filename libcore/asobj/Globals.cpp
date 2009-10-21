@@ -268,8 +268,8 @@ AVM1Global::createArray()
             array->set_prototype(obj->getMember(NSV::PROP_PROTOTYPE));
         }
     }
-    array->init_member(NSV::PROP_LENGTH, 0.0);
 
+    array->init_member(NSV::PROP_LENGTH, 0.0);
     array->setArray();
     return array;
 }
