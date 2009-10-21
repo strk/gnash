@@ -1605,13 +1605,13 @@ check_equals(traceProps(o), "sort,length,7,6,5,4,3,2,1,");
 
 check_equals(o.length, 6);
 o.sort();
-#if OUTPUT_VERSION < 7
+#if OUTPUT_VERSION > 6
  xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
 #else
  xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
 #endif
 o.sort();
-#if OUTPUT_VERSION < 7
+#if OUTPUT_VERSION > 6
  xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
 #else
  xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
@@ -1641,29 +1641,44 @@ CA = function () {
 
 o = new CA();
 
-backup = Array;
 
 /// Test what happens with []
+backup = _global.Array;
+delete _global.Array;
 
-Array = 8;
+_global.Array = 8;
 ar = [];
-check_equals(typeof(ar.constructor), "function" );
+check_equals(typeof(ar.constructor), "undefined");
 
 h = function() {};
 h.prototype = 8;
 
-Array = h;
+_global.Array = h;
 
-/// The __proto__ member of native arrays is only set to an object.
 ar = [];
 check_equals(typeof(ar.constructor), "function");
-check_equals(typeof(ar.__proto__), "object");
-ar.__proto__.toString = Number.prototype.toString;
-check_equals(ar.__proto__.toString(), undefined);
+check_equals(typeof(ar.__proto__), "number");
+check_equals(ar.__proto__, 8);
 
 /// If we use the constructor, it's set to anything you like.
 ar = new Array();
 check_equals(typeof(ar.__proto__), "number");
+
+/// Properties are only set if there is a _global.Array.prototype
+
+_global.Array = {};
+
+ar = [];
+check_equals(typeof(ar.constructor), "undefined");
+check_equals(typeof(ar.__proto__), "undefined");
+check_equals(ar.__proto__, undefined);
+
+_global.Array.prototype = "string";
+
+ar = [];
+check_equals(typeof(ar.constructor), "object");
+check_equals(typeof(ar.__proto__), "string");
+check_equals(ar.__proto__, "string");
 
 #endif
 
@@ -1690,8 +1705,8 @@ check_equals(typeof(ar.__proto__), "number");
  check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(610);
+  check_totals(616);
 # else
-  check_totals(620);
+  check_totals(626);
 # endif
 #endif
