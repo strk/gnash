@@ -155,8 +155,10 @@ public:
 			int depth);
 
 	/// Get the topmost sprite instance of this movie
-	const gnash::MovieClip* getRootMovie() {
-		return &_movie_root->getRootMovie();
+    //
+    /// We const_cast this because we don't care.
+	gnash::MovieClip* getRootMovie() {
+		return const_cast<Movie*>(&_movie_root->getRootMovie());
 	}
 
 	/// Notify mouse pointer movement to the given coordinate
