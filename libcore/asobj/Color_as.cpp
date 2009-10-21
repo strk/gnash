@@ -275,8 +275,7 @@ getTarget(as_object* obj, const fn_call& fn)
     MovieClip* sp = target.to_sprite();
     if (sp) return sp;
     as_object* o = fn.env().find_target(target.to_string());
-    DisplayObject* d = getDisplayObject(o);
-    if (d) return d->to_movie();
+    if (o) return o->to_movie();
     return 0;
 }
 
