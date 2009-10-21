@@ -250,16 +250,23 @@ AVM1Global::createNumber(double d)
 }
 
 /// Construct an Array.
+//
+/// This uses the _global Array class to initialize the "constructor" and
+/// "__proto__" properties. If Array.prototype is undefined, those properties
+/// are not added.
 as_object*
 AVM1Global::createArray()
 {
     as_object* array = new as_object(*this);
 
     as_value ctor = getMember(NSV::CLASS_ARRAY);
-    array->init_member(NSV::PROP_CONSTRUCTOR, ctor);
     as_object* obj = ctor.to_object(*this);
     if (obj) {
-        array->set_prototype(obj->getMember(NSV::PROP_PROTOTYPE));
+        as_value proto;
+        if (obj->get_member(NSV::PROP_PROTOTYPE, &proto)) {
+            array->init_member(NSV::PROP_CONSTRUCTOR, ctor);
+            array->set_prototype(obj->getMember(NSV::PROP_PROTOTYPE));
+        }
     }
     array->init_member(NSV::PROP_LENGTH, 0.0);
 
