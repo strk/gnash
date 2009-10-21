@@ -1605,9 +1605,17 @@ check_equals(traceProps(o), "sort,length,7,6,5,4,3,2,1,");
 
 check_equals(o.length, 6);
 o.sort();
-xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#if OUTPUT_VERSION < 7
+ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#else
+ xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
+#endif
 o.sort();
-xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#if OUTPUT_VERSION < 7
+ xcheck_equals(traceProps(o), "5,4,2,1,0,sort,length,7,6,3,");
+#else
+ xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
+#endif
 
 #if OUTPUT_VERSION > 5
 
