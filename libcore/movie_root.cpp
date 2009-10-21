@@ -574,50 +574,26 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-boost::intrusive_ptr<Keyboard_as>
+Keyboard_as*
 movie_root::getKeyObject()
 {
-	// TODO: test what happens with the global "Key" object
-	//       is removed or overridden by the user
+    Global_as* global = _vm.getGlobal();
 
-	if (!_keyobject)
-	{
-		// This isn't very performant... 
-		// it will keep trying to find it even if impossible
-		// to find.
-		// TODO: use a named string...
+    as_value kval;
+    if (!global->get_member(NSV::CLASS_KEY, &kval)) return 0;
 
-		as_value kval;
-		Global_as* global = _vm.getGlobal();
-
-		if (global->get_member(NSV::CLASS_KEY, &kval)) {
-
-			boost::intrusive_ptr<as_object> obj = kval.to_object(*global);
-			_keyobject = boost::dynamic_pointer_cast<Keyboard_as>( obj );
-		}
-	}
-
-	return _keyobject;
+    as_object* obj = kval.to_object(*global);
+    return dynamic_cast<Keyboard_as*>( obj );
 }
 
-boost::intrusive_ptr<as_object>
+as_object*
 movie_root::getMouseObject()
 {
-	// TODO: test what happens with the global "Mouse" object
-	//       is removed or overridden by the user
-	if ( ! _mouseobject )
-	{
-		as_value val;
-		Global_as* global = _vm.getGlobal();
+    Global_as* global = _vm.getGlobal();
 
-		if (global->get_member(NSV::CLASS_MOUSE, &val) )
-		{
-			//log_debug("Found member 'Mouse' in _global: %s", val);
-			_mouseobject = val.to_object(*global);
-		}
-	}
-
-	return _mouseobject;
+    as_value val;
+    if (!global->get_member(NSV::CLASS_MOUSE, &val)) return 0;
+    return val.to_object(*global);
 }
 
 
@@ -630,11 +606,10 @@ movie_root::notify_global_key(key::code k, bool down)
     //       which would need to query Key object.
     //       Testcase: http://www.ferryhalim.com/orisinal/g3/00dog.swf 
 
-	boost::intrusive_ptr<Keyboard_as> keyobject = getKeyObject();
-	if ( keyobject )
-	{
-		if (down) _keyobject->set_key_down(k);
-		else _keyobject->set_key_up(k);
+	Keyboard_as* keyobject = getKeyObject();
+	if (keyobject) {
+		if (down) keyobject->set_key_down(k);
+		else keyobject->set_key_up(k);
 	}
 	else
 	{
@@ -642,7 +617,7 @@ movie_root::notify_global_key(key::code k, bool down)
 				"exist, or isn't the expected built-in");
 	}
 
-	return _keyobject.get();
+	return keyobject;
 }
 
 bool
@@ -651,7 +626,7 @@ movie_root::notify_key_event(key::code k, bool down)
 	//
 	// First of all, notify the _global.Key object about key event
 	//
-	Keyboard_as * global_key = notify_global_key(k, down);
+	Keyboard_as* global_key = notify_global_key(k, down);
 
 	// Notify DisplayObject key listeners for clip key events
 	notify_key_listeners(k, down);
@@ -1865,12 +1840,6 @@ movie_root::markReachableResources() const
         std::for_each(q.begin(), q.end(),
                 std::mem_fun(&ExecutableCode::markReachableResources));
     }
-
-    // Mark global Key object
-    if ( _keyobject ) _keyobject->setReachable();
-
-    // Mark global Mouse object
-    if ( _mouseobject ) _mouseobject->setReachable();
 
     if (_currentFocus) _currentFocus->setReachable();
 
