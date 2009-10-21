@@ -70,7 +70,7 @@ main(int /*argc*/, char** /*argv*/)
 
     movie_root root(*md5, clock, runResources);
 
-    root.setRootMovie( md5->createMovie() );
+    root.init(md5.get(), MovieClip::MovieVariables());
 
     VM& vm = root.getVM();
 

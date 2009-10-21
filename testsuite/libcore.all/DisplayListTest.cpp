@@ -58,8 +58,8 @@ main(int /*argc*/, char** /*argv*/)
 	ManualClock clock;
     movie_root stage(*md5, clock, ri);
 
-	Movie* root = md5->createMovie();
-    stage.setRootMovie( root );
+    MovieClip::MovieVariables v;
+    stage.init(md5.get(), v);
 
 	DisplayList dlist1;
 
@@ -68,6 +68,8 @@ main(int /*argc*/, char** /*argv*/)
 	DisplayList dlist2 = dlist1;
 
 	check_equals(dlist1, dlist2);
+
+    MovieClip* root = const_cast<Movie*>(&stage.getRootMovie());
 
 	// just a couple of DisplayObjects
 	boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(root) );

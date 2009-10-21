@@ -58,7 +58,7 @@ static void usage (void);
 
 // Prototypes for test cases
 static void test_el();
-static void test_obj(as_object* o);
+static void test_obj(const as_object* o);
 static void test_isnan();
 static void test_conversion();
 
@@ -111,20 +111,19 @@ main(int argc, char *argv[])
     RunResources runResources("");
 
     // Create a bogus movie with swf version 7 support
-    boost::intrusive_ptr<movie_definition> md(
-            new DummyMovieDefinition(runResources, 7));
+    movie_definition* md = new DummyMovieDefinition(runResources, 7);
 
     ManualClock clock;
 
     movie_root stage(*md, clock, runResources);
 
-    Movie* root = md->createMovie();
-    stage.setRootMovie(root);
+    MovieClip::MovieVariables v;
+    stage.init(md, v);
 
     // run the tests
     test_isnan();
     test_el();
-    test_obj(root);
+    test_obj(&stage.getRootMovie());
     test_conversion();
    
 }
@@ -245,7 +244,7 @@ test_el()
 }
 
 void
-test_obj(as_object* o)
+test_obj(const as_object* o)
 {
     // Create an object element with some properties
     bool notest = false;

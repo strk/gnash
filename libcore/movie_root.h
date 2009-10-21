@@ -73,13 +73,13 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
 #include "drag_state.h" // for composition
-#include "flash/ui/Keyboard_as.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "Movie.h"
 #include "RunResources.h" // for initialization
 #include "gnash.h" // Quality
+#include "MovieClip.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -107,6 +107,7 @@ namespace gnash {
     class Timer;
     class MovieClip;
     class VirtualClock;
+    class Keyboard_as;
 }
 
 namespace gnash
@@ -114,7 +115,7 @@ namespace gnash
 
 struct DepthComparator
 {
-    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
+    typedef MovieClip* LevelMovie;
 
     bool operator() (const LevelMovie& d1, const LevelMovie& d2)
     {
@@ -153,38 +154,14 @@ public:
 
     ~movie_root();
 
-    /// Set the root movie, replacing the current one if any.
-    //
-    /// This is needed for the cases in which the top-level movie
-    /// is replaced by another movie by effect of a loadMovie call
-    /// or similar.
-    ///
-    /// TODO: inspect what happens about VM version
-    ///   (should the *new* movie drive VM operations?
-    ///    -- hope not ! )
-    ///
-    /// Make sure to call this method before using the movie_root,
-    /// as most operations are delegated to the associated/wrapped
-    /// Movie.
-    ///
-    /// Note that the display viewport will be updated to match
-    /// the size of given movie.
-    ///
-    /// A call to this method is equivalent to a call to setLevel(0, movie).
-    ///
-    /// @param movie
-    /// The Movie to wrap.
-    /// Will be stored in an intrusive_ptr.
-    /// Must have a depth of 0.
-    ///
-    void setRootMovie(Movie* movie);
+    void init(movie_definition* def, const MovieClip::MovieVariables& variables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
     /// POST CONDITIONS:
     /// - The returned DisplayObject has a depth equal to 'num'
     ///
-    boost::intrusive_ptr<Movie> getLevel(unsigned int num) const;
+    Movie* getLevel(unsigned int num) const;
 
     /// Load movie at the specified URL in the given level 
     //
@@ -216,7 +193,7 @@ public:
     ///    exists at the target depth the latter is moved in place of
     ///    the former, with its depth also updated.
     ///
-    void swapLevels(boost::intrusive_ptr<MovieClip> sp, int depth);
+    void swapLevels(MovieClip* sp, int depth);
 
     /// Drop level at given depth.
     //
@@ -314,7 +291,7 @@ public:
     /// in the same way.
     Movie* topLevelMovie() const
     {
-        return _rootMovie.get();
+        return _rootMovie;
     }
 
     /// Return the current nominal frame rate for the Stage.
@@ -457,7 +434,7 @@ public:
     ///
     /// @return the DisplayObject having focus or NULL of none.
     ///
-    boost::intrusive_ptr<DisplayObject> getFocus();
+    DisplayObject* getFocus();
 
     /// Set the DisplayObject having focus
     //
@@ -466,7 +443,7 @@ public:
     /// @return true if the focus operation succeeded, false if the passed
     /// DisplayObject cannot receive focus. setFocus(0) is a valid operation, so
     /// returns true (always succeeds).
-    bool setFocus(boost::intrusive_ptr<DisplayObject> to);
+    bool setFocus(DisplayObject* to);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
             bool force);
@@ -595,12 +572,12 @@ public:
     void pushAction(std::auto_ptr<ExecutableCode> code, int lvl=apDOACTION);
 
     /// Push an executable code to the ActionQueue
-    void pushAction(const action_buffer& buf,
-            boost::intrusive_ptr<DisplayObject> target, int lvl=apDOACTION);
+    void pushAction(const action_buffer& buf, DisplayObject* target,
+            int lvl=apDOACTION);
 
     /// Push a function code to the ActionQueue
-    void pushAction(boost::intrusive_ptr<as_function> func,
-            boost::intrusive_ptr<DisplayObject> target, int lvl=apDOACTION);
+    void pushAction(as_function* func, DisplayObject* target,
+            int lvl=apDOACTION);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
@@ -627,14 +604,14 @@ public:
     /// its turn comes. Characters are advanced in reverse-placement
     /// order (first registered is advanced last)
     ///
-    void addLiveChar(boost::intrusive_ptr<DisplayObject> ch)
+    void addLiveChar(DisplayObject* ch)
     {
         // Don't register the object in the list twice 
 #if GNASH_PARANOIA_LEVEL > 1
         assert(std::find(_liveChars.begin(), _liveChars.end(), ch) ==
             _liveChars.end());
 #endif
-        _liveChars.push_front(ch.get());
+        _liveChars.push_front(ch);
     }
 
     /// Cleanup all resources and run the GC collector
@@ -886,6 +863,31 @@ public:
 
 private:
 
+    /// Set the root movie, replacing the current one if any.
+    //
+    /// This is needed for the cases in which the top-level movie
+    /// is replaced by another movie by effect of a loadMovie call
+    /// or similar.
+    ///
+    /// TODO: inspect what happens about VM version
+    ///   (should the *new* movie drive VM operations?
+    ///    -- hope not ! )
+    ///
+    /// Make sure to call this method before using the movie_root,
+    /// as most operations are delegated to the associated/wrapped
+    /// Movie.
+    ///
+    /// Note that the display viewport will be updated to match
+    /// the size of given movie.
+    ///
+    /// A call to this method is equivalent to a call to setLevel(0, movie).
+    ///
+    /// @param movie
+    /// The Movie to wrap.
+    /// Must have a depth of 0.
+    ///
+    void setRootMovie(Movie* movie);
+
     const RunResources& _runResources; 
 
     /// The URL of the original root movie.
@@ -962,17 +964,6 @@ private:
     /// Delete all elements on the timers list
     void clearIntervalTimers();
 
-    /// A list of AdvanceableCharacters
-    //
-    /// This is a list (not a vector) as we want to allow
-    /// ::advance of each element to insert new DisplayObjects before
-    /// the start w/out invalidating iterators scanning the
-    /// list forward for proper movie advancement
-    typedef std::list<DisplayObject*> LiveChars;
-
-    /// The list of advanceable DisplayObject, in placement order
-    LiveChars _liveChars;
-
     /// Execute expired timers
     void executeAdvanceCallbacks();
     
@@ -980,7 +971,7 @@ private:
     void executeTimers();
 
     /// Notify the global Key ActionScript object about a key status change
-    Keyboard_as * notify_global_key(key::code k, bool down);
+    Keyboard_as* notify_global_key(key::code k, bool down);
 
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
@@ -1012,6 +1003,111 @@ private:
     //
     /// Can return 0 if it's been deleted.
     as_object* getSelectionObject() const;
+
+    /// This function should return TRUE iff any action triggered
+    /// by the event requires redraw, see \ref events_handling for
+    /// more info.
+    bool fire_mouse_event();
+
+    bool generate_mouse_button_events();
+
+    /// \brief
+    /// Return the topmost entity covering the given point
+    /// and enabled to receive mouse events.
+    //
+    /// Return NULL if no "active" entity is found under the pointer.
+    ///
+    /// Coordinates of the point are given in world coordinate space.
+    /// (twips)
+    ///
+    /// @param x
+    ///     X ordinate of the pointer, in world coordinate space (twips)
+    ///
+    /// @param y
+    ///     Y ordinate of the pointer, in world coordiante space (twips).
+    ///
+    InteractiveObject* getTopmostMouseEntity(boost::int32_t x,
+            boost::int32_t y) const;
+
+    /// Delete DisplayObjects removed from the stage
+    /// from the display lists
+    void cleanupDisplayList();
+
+    /// Advance a live DisplayObject
+    //
+    /// @param ch
+    ///     The DisplayObject to advance, will NOT be advanced if unloaded
+    ///
+    static void advanceLiveChar(DisplayObject* ch);
+
+    /// Advance all non-unloaded live chars
+    void advanceLiveChars();
+
+    /// Put the given movie at the given level 
+    //
+    /// @param movie
+    /// The Movie to store at the given level.
+    /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
+    /// its name to _level<num>
+    void setLevel(unsigned int num, Movie* movie);
+
+    /// Return the global Key object 
+    Keyboard_as* getKeyObject();
+
+    /// Return the global Mouse object 
+    as_object* getMouseObject();
+
+    /// Boundaries of the Stage are always world boundaries
+    /// and are only invalidated by changes in the background
+    /// color.
+    void setInvalidated() { _invalidated = true; }
+
+    /// Every ::display call clears the invalidated flag
+    //
+    /// See setInvalidated();
+    ///
+    void clearInvalidated() { _invalidated = false; }
+
+    /// An invalidated stage will trigger complete redraw
+    //
+    /// So, this method should return true everytime a complete
+    /// redraw is needed. This is tipically only needed when
+    /// the background changes.
+    ///
+    /// See setInvalidated() and clearInvalidated().
+    ///
+    bool isInvalidated() { return _invalidated; }
+
+    /// Return the priority level of first action queue containing actions.
+    //
+    /// Scanned in proprity order (lower first)
+    ///
+    int minPopulatedPriorityQueue() const;
+
+    /// Process all actions in the the given queue, till more actions
+    /// are found in lower levels, in which case we have an earlier
+    /// return.
+    int processActionQueue(int lvl);
+
+    bool processingActions() const
+    {
+        return (_processingActionLevel < apSIZE);
+    }
+
+    const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
+            DisplayObject* dragging) const;
+
+    void handleActionLimitHit(const std::string& ref);
+    /// A list of AdvanceableCharacters
+    //
+    /// This is a list (not a vector) as we want to allow
+    /// ::advance of each element to insert new DisplayObjects before
+    /// the start w/out invalidating iterators scanning the
+    /// list forward for proper movie advancement
+    typedef std::list<DisplayObject*> LiveChars;
+
+    /// The list of advanceable DisplayObject, in placement order
+    LiveChars _liveChars;
 
     typedef std::list<ExecutableCode*> ActionQueue;
 
@@ -1049,14 +1145,14 @@ private:
     MouseListeners m_mouse_listeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
-    boost::intrusive_ptr<DisplayObject> _currentFocus;
+    DisplayObject* _currentFocus;
 
     float m_time_remainder;
 
     /// @todo fold this into m_mouse_button_state?
     drag_state m_drag_state;
 
-    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
+    typedef MovieClip* LevelMovie;
     typedef std::map<int, LevelMovie> Levels;
 
     /// The movie instance wrapped by this movie_root
@@ -1069,82 +1165,7 @@ private:
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial
     /// stage size
-    boost::intrusive_ptr<Movie> _rootMovie;
-
-    /// This function should return TRUE iff any action triggered
-    /// by the event requires redraw, see \ref events_handling for
-    /// more info.
-    bool fire_mouse_event();
-
-    bool generate_mouse_button_events();
-
-    /// \brief
-    /// Return the topmost entity covering the given point
-    /// and enabled to receive mouse events.
-    //
-    /// Return NULL if no "active" entity is found under the pointer.
-    ///
-    /// Coordinates of the point are given in world coordinate space.
-    /// (twips)
-    ///
-    /// @param x
-    ///     X ordinate of the pointer, in world coordinate space (twips)
-    ///
-    /// @param y
-    ///     Y ordinate of the pointer, in world coordiante space (twips).
-    ///
-    InteractiveObject* getTopmostMouseEntity(boost::int32_t x,
-            boost::int32_t y) const;
-
-    /// Delete DisplayObjects removed from the stage
-    /// from the display lists
-    void cleanupDisplayList();
-
-    /// Advance a live DisplayObject
-    //
-    /// @param ch
-    ///     The DisplayObject to advance, will NOT be advanced if unloaded
-    ///
-    static void advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch);
-
-    /// Advance all non-unloaded live chars
-    void advanceLiveChars();
-
-    /// Put the given movie at the given level 
-    //
-    /// @param movie
-    /// The Movie to store at the given level.
-    /// Will be stored in an intrusive_ptr.
-    /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
-    /// its name to _level<num>
-    void setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie);
-
-    /// Return the global Key object 
-    Keyboard_as* getKeyObject();
-
-    /// Return the global Mouse object 
-    as_object* getMouseObject();
-
-    /// Boundaries of the Stage are always world boundaries
-    /// and are only invalidated by changes in the background
-    /// color.
-    void setInvalidated() { _invalidated = true; }
-
-    /// Every ::display call clears the invalidated flag
-    //
-    /// See setInvalidated();
-    ///
-    void clearInvalidated() { _invalidated = false; }
-
-    /// An invalidated stage will trigger complete redraw
-    //
-    /// So, this method should return true everytime a complete
-    /// redraw is needed. This is tipically only needed when
-    /// the background changes.
-    ///
-    /// See setInvalidated() and clearInvalidated().
-    ///
-    bool isInvalidated() { return _invalidated; }
+    Movie* _rootMovie;
 
     /// See setInvalidated
     bool _invalidated;
@@ -1153,27 +1174,8 @@ private:
     /// aborted due to action limit set or whatever else
     bool _disableScripts;
 
-    /// Return the priority level of first action queue containing actions.
-    //
-    /// Scanned in proprity order (lower first)
-    ///
-    int minPopulatedPriorityQueue() const;
-
-    /// Process all actions in the the given queue, till more actions
-    /// are found in lower levels, in which case we have an earlier
-    /// return.
-    int processActionQueue(int lvl);
-
     int _processingActionLevel;
-
-    bool processingActions() const
-    {
-        return (_processingActionLevel < apSIZE);
-    }
-
-    const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
-            DisplayObject* dragging) const;
-
+    
     /// filedescriptor to write to for host application requests
     //
     /// -1 if none
@@ -1200,8 +1202,6 @@ private:
     // The timeout in seconds for script execution, in the
     // ScriptLimits tag.    
     boost::uint16_t _timeoutLimit;
-
-    void handleActionLimitHit(const std::string& ref);
 
     // delay between movie advancement, in milliseconds
     unsigned int _movieAdvancementDelay;

@@ -108,7 +108,7 @@ selection_getBeginIndex(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
     movie_root& mr = getRoot(fn);
-    DisplayObject* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 
@@ -130,7 +130,7 @@ selection_getCaretIndex(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     movie_root& mr = getRoot(fn);
-    DisplayObject* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 
@@ -146,7 +146,7 @@ selection_getEndIndex(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     movie_root& mr = getRoot(fn);
-    DisplayObject* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 
@@ -164,8 +164,8 @@ selection_getFocus(const fn_call& fn)
     
     movie_root& mr = getRoot(fn);
 
-    boost::intrusive_ptr<DisplayObject> ch = mr.getFocus();
-    if (!ch.get()) {
+    DisplayObject* ch = mr.getFocus();
+    if (!ch) {
         as_value null;
         null.set_null();
         return null;
@@ -218,7 +218,7 @@ selection_setFocus(const fn_call& fn)
         return as_value(true);
     }
 
-    boost::intrusive_ptr<DisplayObject> ch;
+    DisplayObject* ch;
 
     if (focus.is_string()) {
         const std::string& target = focus.to_string();
@@ -246,7 +246,7 @@ selection_setSelection(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     movie_root& mr = getRoot(fn);
-    DisplayObject* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 

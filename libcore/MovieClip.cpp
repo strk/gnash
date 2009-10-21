@@ -653,7 +653,7 @@ void
 MovieClip::queueAction(const action_buffer& action)
 {
     movie_root& root = getRoot(*this);
-    root.pushAction(action, boost::intrusive_ptr<MovieClip>(this));
+    root.pushAction(action, this);
 }
 
 void
@@ -2118,7 +2118,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         }
 
         // Parse query string
-        VariableMap vars;
+        MovieVariables vars;
         url.parse_querystring(url.querystring(), vars);
         extern_movie->setVariables(vars);
 
@@ -2259,15 +2259,15 @@ MovieClip::processCompletedLoadVariableRequests()
 }
 
 void
-MovieClip::setVariables(VariableMap& vars)
+MovieClip::setVariables(const MovieVariables& vars)
 {
     string_table& st = getStringTable(*this);
-    for (VariableMap::const_iterator it=vars.begin(), itEnd=vars.end();
+    for (MovieVariables::const_iterator it=vars.begin(), itEnd=vars.end();
         it != itEnd; ++it)
     {
         const std::string& name = it->first;
         const std::string& val = it->second;
-        set_member(st.find(PROPNAME(name)), val);
+        set_member(st.find(name), val);
     }
 }
 

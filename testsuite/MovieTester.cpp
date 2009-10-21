@@ -150,13 +150,10 @@ MovieTester::MovieTester(const std::string& url)
 	dbglogfile.setVerbosity(1);
 
 	
-	std::auto_ptr<Movie> mi ( _movie_def->createMovie() );
-
-	// Set _movie before calling ::render
-	_movie = mi.get();
 
 	// Finally, place the root movie on the stage ...
-        _movie_root->setRootMovie( mi.release() );
+    MovieClip::MovieVariables v;
+    _movie_root->init(_movie_def, v);
 
 	// ... and render it
 	render();
@@ -166,7 +163,6 @@ void
 MovieTester::render(boost::shared_ptr<Renderer> h,
         InvalidatedRanges& invalidated_regions) 
 {
-	assert(_movie);
 
     // This is a bit dangerous, as there isn't really support for swapping
     // renderers during runtime; though the only problem is likely to be
@@ -209,7 +205,8 @@ MovieTester::render()
 	_movie_root->add_invalidated_bounds(_invalidatedBounds, false);
 
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
-	std::cout << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds << std::endl;
+    const MovieClip* r = getRootMovie();
+	std::cout << "frame " << r->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds << std::endl;
 #endif
 
 	// Force full redraw by using a WORLD invalidated ranges
@@ -627,8 +624,8 @@ void
 MovieTester::restart() 
 {
 	_movie_root->clear(); // restart();
-	_movie = _movie_def->createMovie();
-	_movie_root->setRootMovie(_movie);
+    MovieClip::MovieVariables v;
+	_movie_root->init(_movie_def, v);
 
 	// Set _movie before calling ::render
 	render();

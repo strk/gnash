@@ -317,7 +317,7 @@ DisplayObject::set_visible(bool visible)
     // invisible (see Selection.as).
     if (_visible && !visible) {
         movie_root& mr = getRoot(*this);
-        if (mr.getFocus().get() == this) {
+        if (mr.getFocus() == this) {
             mr.setFocus(0);
         }
     }
@@ -464,7 +464,7 @@ DisplayObject::unload()
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-	bool hasEvent = hasEventHandler(event_id::UNLOAD);
+	const bool hasEvent = hasEventHandler(event_id::UNLOAD);
 
 	_unloaded = true;
 
@@ -487,34 +487,29 @@ DisplayObject::hasEventHandler(const event_id& id) const
 	Events::const_iterator it = _event_handlers.find(id);
 	if (it != _event_handlers.end()) return true;
 
-	boost::intrusive_ptr<as_function> method = 
-        getUserDefinedEventHandler(id.functionKey());
-	if (method) return true;
-
-	return false;
+	as_function* method = getUserDefinedEventHandler(id.functionKey());
+    return (method);
 }
 
-boost::intrusive_ptr<as_function>
+as_function*
 DisplayObject::getUserDefinedEventHandler(const std::string& name) const
 {
 	string_table::key key = getStringTable(*this).find(name);
 	return getUserDefinedEventHandler(key);
 }
 
-boost::intrusive_ptr<as_function>
+as_function*
 DisplayObject::getUserDefinedEventHandler(string_table::key key) const 
 {
 	as_value tmp;
 
-	boost::intrusive_ptr<as_function> func;
-
 	// const cast is needed due to getter/setter members possibly
 	// modifying this object even when only get !
-	if ( const_cast<DisplayObject*>(this)->get_member(key, &tmp) )
+	if (const_cast<DisplayObject*>(this)->get_member(key, &tmp))
 	{
-		func = tmp.to_as_function();
+		return tmp.to_as_function();
 	}
-	return func;
+	return 0;
 }
 
 /// Set the real and cached x scale.
@@ -934,7 +929,7 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
     movie_root& mr = getRoot(o);
     unsigned int levelno;
     if (mr.isLevelTarget(propname, levelno)) {
-        Movie* mo = mr.getLevel(levelno).get();
+        Movie* mo = mr.getLevel(levelno);
         if (mo) {
             val = mo;
             return true;

@@ -484,11 +484,11 @@ play_movie(const std::string& filename, const RunResources& runResources)
 
     md->completeLoad();
 
-    std::auto_ptr<Movie> mi ( md->createMovie() );
+    MovieClip::MovieVariables v;
+    m.init(md.get(), v);
 
-    m.setRootMovie( mi.release() );
-    if ( quitrequested )  // setRootMovie would execute actions in first frame
-    {
+    if (quitrequested) {
+        // setRootMovie would execute actions in first frame
         quitrequested = false;
         return md;
     }
