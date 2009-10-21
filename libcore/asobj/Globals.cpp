@@ -524,7 +524,7 @@ avm1Classes()
         (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
+        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NS_GLOBAL, 6))
         (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
@@ -610,7 +610,7 @@ avm2Classes(string_table& st)
            NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_TEXT, 3))
         (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
-        (N(TextSnapshot_as::init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
+        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_TEXT, 5))
         (N(textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))

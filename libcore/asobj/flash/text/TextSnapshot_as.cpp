@@ -46,8 +46,81 @@
 
 namespace gnash {
 
+class TextSnapshot_as : public Relay
+{
+
+public:
+
+    typedef std::vector<const SWF::TextRecord*> Records;
+
+    /// Should remain in the order of insertion
+    /// We should only ever iterate from begin to end, so there's no
+    /// performance issue.
+    typedef std::vector<std::pair<StaticText*, Records> > TextFields;
+
+    /// Construct a TextSnapshot_as from a MovieClip.
+    //
+    /// @param mc       The MovieClip to search for static text. If 0, the
+    ///                 TextSnapshot is invalid, which should be reflected in
+    ///                 AS return values.
+    TextSnapshot_as(const MovieClip* mc);
+
+    std::string getText(boost::int32_t start, boost::int32_t end,
+            bool nl) const;
+
+    boost::int32_t findText(boost::int32_t start, const std::string& text,
+            bool ignoreCase) const;
+
+    bool valid() const { return _valid; }
+
+    size_t getCount() const { return _count; }
+
+    void setSelected(size_t start, size_t end, bool selected);
+    
+    bool getSelected(size_t start, size_t end) const;
+
+    std::string getSelectedText(bool newlines) const;
+
+    void getTextRunInfo(size_t start, size_t end, as_object& ri) const;
+
+protected:
+
+    virtual void setReachable() const;
+
+private:
+
+    /// Generate a string from the TextRecords in this TextSnapshot.
+    //
+    /// @param to           The string to write to
+    /// @param newline      If true, newlines are written after every
+    ///                     StaticText in this TextSnapshot
+    /// @param selectedOnly Only write DisplayObject that are selected to.
+    /// @param start        The start index
+    /// @param len          The number of StaticText DisplayObjects to traverse.
+    ///                     This includes non-selected DisplayObjects.
+    void makeString(std::string& to, bool newline = false,
+            bool selectedOnly = false,
+            std::string::size_type start = 0,
+            std::string::size_type len = std::string::npos) const;
+
+    TextFields _textFields;
+
+    /// Whether the object is valid, i.e. it was constructed with a MovieClip.
+    //
+    /// This should be deducible from another member, but since there seems
+    /// to be no point in storing the MovieClip this bool will do instead.
+    const bool _valid;
+
+    /// The number of DisplayObjects
+    //
+    /// There is no need to store this, but it is quicker than counting
+    /// afresh every time.
+    const size_t _count;
+
+};
 // Forward declarations
 namespace {
+
     void attachTextSnapshotStaticInterface(as_object& o);
     
     as_value textsnapshot_findText(const fn_call& fn);
@@ -62,7 +135,6 @@ namespace {
     as_value textsnapshot_ctor(const fn_call& fn);
 
     void attachTextSnapshotInterface(as_object& o);
-    as_object* getTextSnapshotInterface();
 
     size_t getTextFields(const MovieClip* mc,
             TextSnapshot_as::TextFields& fields);
@@ -71,19 +143,19 @@ namespace {
 
 }
 
+
 // extern (used by Global.cpp)
 void
-TextSnapshot_as::init(as_object& where, const ObjectURI& uri)
+textsnapshot_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    static boost::intrusive_ptr<as_object> cl;
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getTextSnapshotInterface();
-        cl = gl->createClass(&textsnapshot_ctor, proto);
-        attachTextSnapshotStaticInterface(*cl);
-   }
-   where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    Global_as* gl = getGlobal(where);
+    as_object* proto = gl->createObject();
+    as_object* cl = gl->createClass(&textsnapshot_ctor, proto);
+    attachTextSnapshotStaticInterface(*cl);
+    attachTextSnapshotInterface(*proto);
+
+   where.init_member(getName(uri), cl, as_object::DefaultFlags,
                getNamespace(uri));
 }
 
@@ -91,7 +163,6 @@ TextSnapshot_as::init(as_object& where, const ObjectURI& uri)
 /// that it is constructed before it is used.
 TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
     :
-    as_object(getTextSnapshotInterface()),
     _textFields(),
     _valid(mc),
     _count(getTextFields(mc, _textFields))
@@ -163,10 +234,9 @@ TextSnapshot_as::getSelected(size_t start, size_t end) const
 }
 
 void
-TextSnapshot_as::markReachableResources() const
+TextSnapshot_as::setReachable() const
 {
     std::for_each(_textFields.begin(), _textFields.end(), setTextReachable);
-    markAsObjectReachable();
 }
 
 void
@@ -427,23 +497,11 @@ attachTextSnapshotInterface(as_object& o)
 	o.init_member("getTextRunInfo", vm.getNative(1067, 9), flags);
 }
 
-as_object*
-getTextSnapshotInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachTextSnapshotInterface(*o);
-	}
-	return o.get();
-}
 
 as_value
 textsnapshot_getTextRunInfo(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
     
     if (!ts->valid()) return as_value();
 
@@ -465,8 +523,7 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
 as_value
 textsnapshot_findText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
     
     if (!ts->valid()) return as_value();
 
@@ -490,8 +547,7 @@ textsnapshot_findText(const fn_call& fn)
 as_value
 textsnapshot_getCount(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
     
     if (!ts->valid()) return as_value();
 
@@ -509,8 +565,7 @@ textsnapshot_getCount(const fn_call& fn)
 as_value
 textsnapshot_getSelected(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
 
     if (!ts->valid()) return as_value();
 
@@ -528,8 +583,7 @@ textsnapshot_getSelected(const fn_call& fn)
 as_value
 textsnapshot_getSelectedText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
 
     if (!ts->valid()) return as_value();
 
@@ -546,8 +600,7 @@ textsnapshot_getSelectedText(const fn_call& fn)
 as_value
 textsnapshot_getText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
 
     if (!ts->valid()) return as_value();
     
@@ -573,8 +626,7 @@ textsnapshot_getText(const fn_call& fn)
 as_value
 textsnapshot_hitTestTextNearPos(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
 
     if (!ts->valid()) return as_value();
 
@@ -586,8 +638,9 @@ textsnapshot_hitTestTextNearPos(const fn_call& fn)
 as_value
 textsnapshot_setSelectColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    UNUSED(ts);
 
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -598,8 +651,7 @@ textsnapshot_setSelectColor(const fn_call& fn)
 as_value
 textsnapshot_setSelected(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextSnapshot_as> ts =
-        ensureType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
 
     if (fn.nargs < 2 || fn.nargs > 3) {
         return as_value();
@@ -618,8 +670,12 @@ textsnapshot_setSelected(const fn_call& fn)
 as_value
 textsnapshot_ctor(const fn_call& fn)
 {
+    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+
     MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
-    return as_value(new TextSnapshot_as(mc));
+
+    ptr->setRelay(new TextSnapshot_as(mc));
+    return as_value();
 }
 
 size_t
