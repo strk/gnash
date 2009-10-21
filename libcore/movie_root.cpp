@@ -440,10 +440,9 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 		return false;
 	}
 
-	boost::intrusive_ptr<Movie> extern_movie;
-	extern_movie = md->createMovie();
-	if (extern_movie == NULL)
-	{
+	boost::intrusive_ptr<Movie> extern_movie = md->createMovie();
+
+	if (!extern_movie) {
 		log_error(_("can't create extern Movie for %s"),
                 url.str());
 		return false;
@@ -452,10 +451,9 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	// Parse query string
 	MovieClip::VariableMap vars;
 	url.parse_querystring(url.querystring(), vars);
-	extern_movie->setVariables(vars);
-
-	DisplayObject* ch = extern_movie.get();
-	ch->set_depth(num+DisplayObject::staticDepthOffset);
+	
+    extern_movie->setVariables(vars);
+	extern_movie->set_depth(num + DisplayObject::staticDepthOffset);
 
 	setLevel(num, extern_movie);
 
