@@ -32,6 +32,7 @@
 #include "Movie.h" 
 #include "ManualClock.h" // for composition
 #include "RunResources.h" // For initialization.
+#include "movie_root.h"
 
 #include <memory> // for auto_ptr
 #include <string> 
@@ -154,8 +155,8 @@ public:
 			int depth);
 
 	/// Get the topmost sprite instance of this movie
-	gnash::MovieClip* getRootMovie() {
-		return _movie;
+	const gnash::MovieClip* getRootMovie() {
+		return &_movie_root->getRootMovie();
 	}
 
 	/// Notify mouse pointer movement to the given coordinate
@@ -318,8 +319,6 @@ private:
 	gnash::movie_root* _movie_root;
 
 	gnash::movie_definition* _movie_def;
-
-	gnash::Movie* _movie;
 
     boost::shared_ptr<sound::sound_handler> _sound_handler;
 

@@ -60,7 +60,7 @@ main(int /*argc*/, char** /*argv*/)
 	//       I wouldn't want the first advance to be needed
 	tester.advance();
 
-	MovieClip* root = tester.getRootMovie();
+	const MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 1);

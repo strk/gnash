@@ -212,7 +212,7 @@ public:
 
     void operator() (const action_buffer& ab)
     {
-        _mr.pushAction(ab, boost::intrusive_ptr<DisplayObject>(_tp));
+        _mr.pushAction(ab, _tp);
         called = true;
     }
 
@@ -579,8 +579,7 @@ Button::mouseEvent(const event_id& event)
     }
 
     // Call conventional attached method.
-    boost::intrusive_ptr<as_function> method =
-        getUserDefinedEventHandler(event.functionKey());
+    as_function* method = getUserDefinedEventHandler(event.functionKey());
     if (method) {
         mr.pushAction(method, this, movie_root::apDOACTION);
     }

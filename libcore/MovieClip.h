@@ -85,6 +85,8 @@ class MovieClip : public DisplayObjectContainer
 
 public:
 
+    typedef std::map<std::string, std::string> MovieVariables;
+
     typedef std::list<const action_buffer*> ActionList;
 
     typedef movie_definition::PlayList PlayList;
@@ -740,10 +742,8 @@ public:
 
     /// @} Drawing API
 
-    typedef std::map<std::string, std::string> VariableMap;
-
     /// Set all variables in the given map with their corresponding values
-    DSOEXPORT void setVariables(VariableMap& vars);
+    DSOEXPORT void setVariables(const MovieVariables& vars);
 
     /// Enumerate child DisplayObjects
     //

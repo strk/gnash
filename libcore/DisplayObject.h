@@ -1012,8 +1012,7 @@ protected:
     /// A function if a member with the given name exists and
     /// casts to an as_function. A NULL pointer otherwise.
     ///
-    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(
-            const std::string& name) const;
+    as_function* getUserDefinedEventHandler(const std::string& name) const;
 
     /// Return a user defined event handler, if any
     //
@@ -1024,8 +1023,7 @@ protected:
     /// A function if a member with the given key exists and
     /// casts to an as_function. A NULL pointer otherwise.
     ///
-    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(
-            string_table::key key) const;
+    as_function* getUserDefinedEventHandler(string_table::key key) const;
 
     void set_event_handlers(const Events& copyfrom);
 

@@ -898,10 +898,8 @@ Gui::start()
         return;
     }
 
-    std::auto_ptr<Movie> mr ( _movieDef->createMovie() );
-    mr->setVariables(_flashVars);
-
-    _stage->setRootMovie( mr.release() ); // will construct the instance
+    // Initializes the stage with a Movie and the passed flash vars.
+    _stage->init(_movieDef.get(), _flashVars);
 
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);

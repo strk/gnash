@@ -668,8 +668,7 @@ as_value
 movieclip_swapDepths(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<MovieClip> movieclip =
-        ensureType<MovieClip>(fn.this_ptr);
+    MovieClip* movieclip = ensureType<MovieClip>(fn.this_ptr);
 
     const int this_depth = movieclip->get_depth();
 
@@ -785,7 +784,7 @@ movieclip_swapDepths(const fn_call& fn)
     }
 
     if (this_parent) {
-        this_parent->swapDepths(movieclip.get(), target_depth);
+        this_parent->swapDepths(movieclip, target_depth);
     }
     else {
         movie_root& root = getRoot(fn);

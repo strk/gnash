@@ -48,7 +48,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	MovieClip* root = tester.getRootMovie();
+	const MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	//const DisplayList& dl = root->getDisplayList();

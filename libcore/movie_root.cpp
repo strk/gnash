@@ -36,6 +36,7 @@
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
 #include "Global_as.h"
+#include "flash/ui/Keyboard_as.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -114,7 +115,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_time_remainder(0.0f),
 	m_drag_state(),
 	_movies(),
-	_rootMovie(),
+	_rootMovie(0),
 	_invalidated(true),
 	_disableScripts(false),
 	_processingActionLevel(movie_root::apSIZE),
@@ -182,6 +183,14 @@ movie_root::~movie_root()
 	clearIntervalTimers();
 
 	assert(testInvariant());
+}
+
+void
+movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
+{
+    Movie* mr = def->createMovie();
+    mr->setVariables(vars);
+    setRootMovie(mr);
 }
 
 void
@@ -255,7 +264,7 @@ movie_root::cleanupAndCollect()
 
 /* private */
 void
-movie_root::setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie)
+movie_root::setLevel(unsigned int num, Movie* movie)
 {
 	assert(movie != NULL);
 	assert(static_cast<unsigned int>(movie->get_depth()) ==
@@ -272,7 +281,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie)
 		// don't leak overloaded levels
 
 		LevelMovie lm = it->second;
-		if ( lm.get() == _rootMovie.get() )
+		if (lm == _rootMovie)
 		{
 			// NOTE: this is not enough to trigger
 			//       an application reset. Was tested
@@ -312,7 +321,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie)
 }
 
 void
-movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
+movie_root::swapLevels(MovieClip* movie, int depth)
 {
 	assert(movie);
 
@@ -326,7 +335,7 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
 		log_debug(" %d: %p (%s @ depth %d)", i->first,
-                (void*)(i->second.get()), i->second->getTarget(),
+                (void*)(i->second), i->second->getTarget(),
                 i->second->get_depth());
 	}
 #endif
@@ -372,7 +381,7 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	}
 	else
 	{
-		boost::intrusive_ptr<MovieClip> otherMovie = targetIt->second;
+		MovieClip* otherMovie = targetIt->second;
 		otherMovie->set_depth(oldDepth);
 		oldIt->second = otherMovie;
 		targetIt->second = movie;
@@ -383,7 +392,7 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
 		log_debug(" %d: %p (%s @ depth %d)", i->first, 
-                (void*)(i->second.get()), i->second->getTarget(),
+                (void*)(i->second), i->second->getTarget(),
                 i->second->get_depth());
 	}
 #endif
@@ -412,8 +421,8 @@ movie_root::dropLevel(int depth)
 		return;
 	}
 
-	MovieClip* mo = it->second.get();
-	if (mo == _rootMovie.get())
+	MovieClip* mo = it->second;
+	if (mo == _rootMovie)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Original root movie can't be removed"));
@@ -432,7 +441,7 @@ movie_root::dropLevel(int depth)
 bool
 movie_root::loadLevel(unsigned int num, const URL& url)
 {
-	boost::intrusive_ptr<movie_definition> md (
+	movie_definition* md (
             MovieFactory::makeMovie(url, _runResources));
 	if (!md)
 	{
@@ -440,7 +449,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 		return false;
 	}
 
-	boost::intrusive_ptr<Movie> extern_movie = md->createMovie();
+	Movie* extern_movie = md->createMovie();
 
 	if (!extern_movie) {
 		log_error(_("can't create extern Movie for %s"),
@@ -449,7 +458,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	}
 
 	// Parse query string
-	MovieClip::VariableMap vars;
+	MovieClip::MovieVariables vars;
 	url.parse_querystring(url.querystring(), vars);
 	
     extern_movie->setVariables(vars);
@@ -460,14 +469,16 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	return true;
 }
 
-boost::intrusive_ptr<Movie>
+Movie*
 movie_root::getLevel(unsigned int num) const
 {
-	Levels::const_iterator i = _movies.find(num+DisplayObject::staticDepthOffset);
+	Levels::const_iterator i = _movies.find(num +
+            DisplayObject::staticDepthOffset);
 	if ( i == _movies.end() ) return 0;
 
-	assert(boost::dynamic_pointer_cast<Movie>(i->second));
-	return boost::static_pointer_cast<Movie>(i->second);
+    // TODO: if this has to be a Movie, why isn't it stored as one?
+	assert(dynamic_cast<Movie*>(i->second));
+	return dynamic_cast<Movie*>(i->second);
 }
 
 void
@@ -782,7 +793,7 @@ movie_root::generate_mouse_button_events()
                 // all necessary events and removal of current focus.
                 // Do not set focus to NULL.
                 if (ms.activeEntity) {
-                    setFocus(ms.activeEntity);
+                    setFocus(ms.activeEntity.get());
 
 			        ms.activeEntity->mouseEvent(event_id::PRESS);
 			        need_redisplay=true;
@@ -1107,7 +1118,7 @@ movie_root::display()
 
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		boost::intrusive_ptr<MovieClip> movie = i->second;
+		MovieClip* movie = i->second;
 
 		movie->clear_invalidated();
 
@@ -1250,7 +1261,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 
 	// Now broadcast message for Mouse listeners
-	typedef boost::intrusive_ptr<as_object> ObjPtr;
+	typedef as_object* ObjPtr;
 	ObjPtr mouseObj = getMouseObject();
 	if ( mouseObj )
 	{
@@ -1280,7 +1291,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 }
 
-boost::intrusive_ptr<DisplayObject>
+DisplayObject*
 movie_root::getFocus()
 {
 	assert(testInvariant());
@@ -1288,14 +1299,14 @@ movie_root::getFocus()
 }
 
 bool
-movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
+movie_root::setFocus(DisplayObject* to)
 {
 
     // Nothing to do if current focus is the same as the new focus. 
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
     if (to == _currentFocus ||
-            to == static_cast<DisplayObject*>(_rootMovie.get())) {
+            to == static_cast<DisplayObject*>(_rootMovie)) {
         return false;
     }
 
@@ -1310,13 +1321,13 @@ movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
 
     // Store previous focus, as the focus needs to change before onSetFocus
     // is called and listeners are notified.
-    DisplayObject* from = _currentFocus.get();
+    DisplayObject* from = _currentFocus;
 
     if (from) {
 
         // Perform any actions required on killing focus (only TextField).
         from->killFocus();
-        from->callMethod(NSV::PROP_ON_KILL_FOCUS, to.get());
+        from->callMethod(NSV::PROP_ON_KILL_FOCUS, to);
     }
 
     _currentFocus = to;
@@ -1330,7 +1341,7 @@ movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
     /// Notify Selection listeners with previous and new focus as arguments.
     if (sel) {
         sel->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onSetFocus",
-                from, to.get());
+                from, to);
     }
 
 	assert(testInvariant());
@@ -1702,7 +1713,7 @@ movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 }
 
 void
-movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<DisplayObject> target, int lvl)
+movie_root::pushAction(const action_buffer& buf, DisplayObject* target, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
@@ -1716,8 +1727,8 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<DisplayObj
 }
 
 void
-movie_root::pushAction(boost::intrusive_ptr<as_function> func,
-        boost::intrusive_ptr<DisplayObject> target, int lvl)
+movie_root::pushAction(as_function* func,
+        DisplayObject* target, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
@@ -2012,7 +2023,7 @@ movie_root::cleanupDisplayList()
 }
 
 void
-movie_root::advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch)
+movie_root::advanceLiveChar(DisplayObject* ch)
 {
 	if (!ch->unloaded())
 	{
@@ -2080,7 +2091,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
 	//       root movie is replaced by a load to _level0... 
 	//       (but I guess we'd also drop loadMovie requests in that
 	//       case... just not tested)
-	as_object* o = _movies.begin()->second.get();
+	as_object* o = _movies.begin()->second;
 
 	std::string::size_type from = 0;
 	while (std::string::size_type to = tgtstr.find('.', from))
