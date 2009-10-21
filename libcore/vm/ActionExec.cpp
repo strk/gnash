@@ -757,12 +757,10 @@ ActionExec::getObjectMember(as_object& obj, const std::string& var,
 as_object*
 ActionExec::getTarget()
 {
-    if ( ! _withStack.empty() )
-    {
+    if (!_withStack.empty()) {
         return _withStack.back().object();
     }
-    else
-    {
+    else {
         return env.get_target();
     }
 }

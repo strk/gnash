@@ -3735,7 +3735,6 @@ SWFHandlers::ActionTry(ActionExec& thread)
 void
 SWFHandlers::ActionWith(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
@@ -3745,9 +3744,8 @@ SWFHandlers::ActionWith(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_WITH));
 #endif
 
-    as_value with_obj_val = convertToObject(*getGlobal(thread.env), env.pop());
-    boost::intrusive_ptr<as_object> with_obj =
-        convertToObject(*getGlobal(thread.env), with_obj_val);
+    const as_value& val = env.pop();
+    as_object* with_obj = val.to_object(*getGlobal(thread.env));
 
     ++pc; // skip tag code
 
@@ -3774,21 +3772,20 @@ SWFHandlers::ActionWith(ActionExec& thread)
     // now we should be on the first action of the 'with' body
     assert(thread.getNextPC() == pc);
 
-    if ( ! with_obj )
-    {
+    if (!with_obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("with(%s) : first argument doesn't cast to an object!"),
-            with_obj_val);
+            val);
         );
         // skip the full block
         thread.adjustNextPC(block_length);
         return;
     }
 
-    // where does the 'with' block ends ?
-    unsigned block_end = thread.getNextPC() + block_length;
+    // where does the 'with' block end?
+    const size_t block_end = thread.getNextPC() + block_length;
 
-    if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
+    if (!thread.pushWithEntry(with_stack_entry(with_obj, block_end)))
     {
         // skip the full block
         thread.adjustNextPC(block_length);
