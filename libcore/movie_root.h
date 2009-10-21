@@ -614,8 +614,6 @@ public:
     /// - Resources reachable by ActionQueue code (_actionQueue)
     /// - Key listeners (m_key_listeners)
     /// - Mouse listeners (m_mouse_listeners)
-    /// - global Key object (_keyobject)
-    /// - global Mouse object (_mouseobject)
     /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
@@ -1047,10 +1045,6 @@ private:
     /// Characters for listening key events
     KeyListeners m_key_listeners;
 
-    boost::intrusive_ptr<Keyboard_as> _keyobject;
-
-    boost::intrusive_ptr<as_object> _mouseobject;
-
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
@@ -1126,16 +1120,10 @@ private:
     void setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie);
 
     /// Return the global Key object 
-    //
-    /// @@ might be worth making public
-    ///
-    boost::intrusive_ptr<Keyboard_as> getKeyObject();
+    Keyboard_as* getKeyObject();
 
     /// Return the global Mouse object 
-    //
-    /// TODO: expose the Mouse as_object directly for faster calls ?
-    ///
-    boost::intrusive_ptr<as_object> getMouseObject();
+    as_object* getMouseObject();
 
     /// Boundaries of the Stage are always world boundaries
     /// and are only invalidated by changes in the background
