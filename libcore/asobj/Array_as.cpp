@@ -1419,8 +1419,6 @@ as_value
 array_new(const fn_call& fn)
 {
 
-    log_debug("Array: %s", fn.this_ptr);
-
     as_object* ao = fn.isInstantiation() ? ensureType<as_object>(fn.this_ptr) :
                                            getGlobal(fn)->createArray();
 
