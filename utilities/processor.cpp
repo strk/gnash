@@ -487,8 +487,8 @@ play_movie(const std::string& filename, const RunResources& runResources)
     MovieClip::MovieVariables v;
     m.init(md.get(), v);
 
-    if ( quitrequested )  // setRootMovie would execute actions in first frame
-    {
+    if (quitrequested) {
+        // setRootMovie would execute actions in first frame
         quitrequested = false;
         return md;
     }
