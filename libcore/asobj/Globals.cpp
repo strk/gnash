@@ -28,12 +28,12 @@
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "NativeFunction.h" 
-#include "Array_as.h"
 #include "AsBroadcaster.h"
 #include "Boolean_as.h"
 #include "Color_as.h"
 #include "CustomActions.h"
 #include "Date_as.h" 
+#include "Array_as.h" 
 #include "Error_as.h"
 #include "String_as.h"
 #include "Selection_as.h"
@@ -249,15 +249,21 @@ AVM1Global::createNumber(double d)
 
 }
 
-/// This serves the purpose of hiding the Array_as type from the
-/// implementation, which at least enforces good behaviour from users.
-//
-/// TODO: it could well already call the Array constructor.
+/// Construct an Array.
 as_object*
 AVM1Global::createArray()
 {
-    as_object* array = new Array_as;
-    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    as_object* array = new as_object(*this);
+
+    as_value ctor = getMember(NSV::CLASS_ARRAY);
+    array->init_member(NSV::PROP_CONSTRUCTOR, ctor);
+    as_object* obj = ctor.to_object(*this);
+    if (obj) {
+        array->set_prototype(obj->getMember(NSV::PROP_PROTOTYPE));
+    }
+    array->init_member(NSV::PROP_LENGTH, 0.0);
+
+    array->setArray();
     return array;
 }
 
@@ -322,7 +328,8 @@ AVM2Global::createBoolean(bool b)
 as_object*
 AVM2Global::createArray()
 {
-    as_object* array = new Array_as;
+    as_object* array = new as_object(*this);
+    array->setArray();
     array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
     return array;
 }

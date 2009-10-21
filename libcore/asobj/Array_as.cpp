@@ -814,38 +814,23 @@ IsStrictArray::accept(string_table::key key, const as_value& /*val*/)
     return false;
 }
 
-Array_as::Array_as()
-    :
-    as_object(getArrayInterface())
+void
+checkArrayLength(as_object& array, string_table::key name, const as_value& val,
+        string_table::key /*nsname*/)
 {
-    init_member(NSV::PROP_LENGTH, 0.0);
-}
-
-
-Array_as::~Array_as() 
-{
-}
-
-/* virtual public, overriding as_object::set_member */
-bool
-Array_as::set_member(string_table::key name, const as_value& val,
-        string_table::key nsname, bool ifFound)
-{
-
     if (name == NSV::PROP_LENGTH) {
-        resizeArray(*this, val.to_int());
+        resizeArray(array, val.to_int());
+        return;
     }
-    else {
-        int index = isIndex(getStringTable(*this).value(name));
-        // if we were sent a valid array index and not a normal member
-        if (index >= 0) {
-            if (static_cast<size_t>(index) >= arrayLength(*this)) {
-                setArrayLength(*this, index + 1);
-            }
+
+    const int index = isIndex(getStringTable(array).value(name));
+
+    // if we were sent a valid array index
+    if (index >= 0) {
+        if (static_cast<size_t>(index) >= arrayLength(array)) {
+            setArrayLength(array, index + 1);
         }
     }
-
-    return as_object::set_member(name,val, nsname, ifFound);
 }
 
 size_t
@@ -881,21 +866,20 @@ registerArrayNative(as_object& global)
 void
 array_class_init(as_object& where, const ObjectURI& uri)
 {
-    static as_object* cl = 0;
 
-    if (cl == NULL) {
+    // This is going to be the global Array "class"/"function"
+    VM& vm = getVM(where);
+    Global_as* gl = getGlobal(where);
 
-        // This is going to be the global Array "class"/"function"
-        VM& vm = getVM(where);
+    as_object* proto = gl->createObject();
 
-        as_object* proto = getArrayInterface();
-        cl = vm.getNative(252, 0);
-        cl->init_member(NSV::PROP_PROTOTYPE, proto);
-        proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+    as_object* cl = vm.getNative(252, 0);
 
-        // Attach static members
-        attachArrayStatics(*cl);
-    }
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
+    attachArrayInterface(*proto);
+    attachArrayStatics(*cl);
 
     const int flags = PropFlags::dontEnum; 
     where.init_member(getName(uri), cl, flags, getNamespace(uri));
@@ -938,20 +922,6 @@ attachArrayInterface(as_object& proto)
     proto.init_member("sort", vm.getNative(252, 10));
     proto.init_member("reverse", vm.getNative(252, 11));
     proto.init_member("sortOn", vm.getNative(252, 12));
-}
-
-as_object*
-getArrayInterface()
-{
-    static boost::intrusive_ptr<as_object> proto = NULL;
-    if ( proto == NULL )
-    {
-        proto = new as_object(getObjectInterface());
-        getVM(*proto).addStatic(proto.get());
-
-        attachArrayInterface(*proto);
-    }
-    return proto.get();
 }
 
 as_value
@@ -1448,15 +1418,18 @@ array_slice(const fn_call& fn)
 as_value
 array_new(const fn_call& fn)
 {
-    IF_VERBOSE_ACTION (
-        log_action(_("array_new called, nargs = %d"), fn.nargs);
-    );
 
-    // TODO: use the this_ptr
-    as_object* ao = new Array_as;
+    log_debug("Array: %s", fn.this_ptr);
+
+    as_object* ao = fn.isInstantiation() ? ensureType<as_object>(fn.this_ptr) :
+                                           getGlobal(fn)->createArray();
+
+    ao->setRelay(0);
+    ao->setArray();
+    ao->init_member(NSV::PROP_LENGTH, 0.0);
 
     if (fn.nargs == 0) {
-        return ao;
+        return as_value(ao);
     }
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
@@ -1465,13 +1438,14 @@ array_new(const fn_call& fn)
         else {
             ao->set_member(NSV::PROP_LENGTH, newSize);
         }
-        return ao;
+        return as_value(ao);
     }
 
     // Use the arguments as initializers.
     for (size_t i = 0; i < fn.nargs; i++) {
         ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
     }
+    
 
     return as_value(ao);
 }
@@ -1563,15 +1537,13 @@ resizeArray(as_object& o, const int size)
 }
 
 void
-setArrayLength(as_object& o, const int size)
+setArrayLength(as_object& array, const int size)
 {
-    Array_as* array = dynamic_cast<Array_as*>(&o);
-    if (!array) return;
+    if (!array.array()) return;
 
-    resizeArray(*array, size);
+    resizeArray(array, size);
 
-    // Do not call Array_as::set_member because that calls this!
-    array->as_object::set_member(NSV::PROP_LENGTH, size);
+    array.set_member(NSV::PROP_LENGTH, size);
 }
 
 int

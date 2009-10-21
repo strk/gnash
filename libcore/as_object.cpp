@@ -273,6 +273,7 @@ const int as_object::DefaultFlags;
 as_object::as_object(Global_as& gl)
 	:
     _displayObject(false),
+    _array(false),
     _relay(0),
 	_vm(getVM(gl)),
 	_members(_vm)
@@ -282,6 +283,7 @@ as_object::as_object(Global_as& gl)
 as_object::as_object()
 	:
     _displayObject(false),
+    _array(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -291,6 +293,7 @@ as_object::as_object()
 as_object::as_object(as_object* proto)
 	:
     _displayObject(false),
+    _array(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -301,6 +304,7 @@ as_object::as_object(as_object* proto)
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
     _displayObject(false),
+    _array(false),
     _relay(0),
 	_vm(VM::get()),
 	_members(_vm)
@@ -685,6 +689,10 @@ as_object::set_member(string_table::key key, const as_value& val,
         if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
         // We still need to set the member.
     }
+
+    // Handle the length property for arrays. NB: checkArrayLength() will
+    // call this function again...
+    if (array()) checkArrayLength(*this, key, val, nsname);
 
     const ObjectURI uri(key, nsname);
     

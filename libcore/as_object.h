@@ -962,6 +962,7 @@ public:
     /// MovieClip.createTextField(). As Relay objects are not available to
     /// ActionScript, this should never appear in built-in functions.
     void setRelay(Relay* p) {
+        _array = false;
         _relay.reset(p);
     }
 
@@ -977,6 +978,14 @@ public:
     /// implemented in ActionScript).
     Relay* relay() const {
         return _relay.get();
+    }
+
+    bool array() const {
+        return _array;
+    }
+
+    void setArray() {
+        _array = true;
     }
 
     /// Return true if this is a DisplayObject.
@@ -1075,6 +1084,8 @@ private:
     /// These magic properties are invoked in get_member only if the
     /// object is a DisplayObject
     bool _displayObject;
+
+    bool _array;
 
     /// The polymorphic Relay object for native types.
     //
