@@ -2809,10 +2809,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     
     Global_as* gl = getGlobal(env);
 
-    as_value result = gl->createArray();
-
-    as_object* ao = convertToObject(*getGlobal(thread.env), result);
-    assert(ao);
+    as_object* ao = gl->createArray();
 
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
@@ -2821,7 +2818,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
                 env.pop());
     }
 
-    env.push(result);
+    env.push(ao);
 
 }
 
