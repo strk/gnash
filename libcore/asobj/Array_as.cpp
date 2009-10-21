@@ -1422,6 +1422,7 @@ array_new(const fn_call& fn)
 
     ao->setRelay(0);
     ao->setArray();
+
     ao->init_member(NSV::PROP_LENGTH, 0.0);
 
     if (fn.nargs == 0) {
