@@ -265,7 +265,7 @@ as_value
 localconnection_new(const fn_call& fn)
 {
     // TODO: this doesn't happen on construction.
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new LocalConnection_as(obj));
     return as_value();
 }
@@ -274,9 +274,7 @@ localconnection_new(const fn_call& fn)
 as_value
 localconnection_close(const fn_call& fn)
 {
-    LocalConnection_as* relay =
-        ensureNativeType<LocalConnection_as>(fn.this_ptr);
-    
+    LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
     relay->close();
     return as_value();
 }
@@ -285,8 +283,7 @@ localconnection_close(const fn_call& fn)
 as_value
 localconnection_connect(const fn_call& fn)
 {
-    LocalConnection_as* relay =
-        ensureNativeType<LocalConnection_as>(fn.this_ptr);
+    LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
 
     // If already connected, don't try again until close() is called.
     if (relay->getconnected()) return false;
@@ -325,9 +322,7 @@ localconnection_connect(const fn_call& fn)
 as_value
 localconnection_domain(const fn_call& fn)
 {
-    LocalConnection_as* relay =
-        ensureNativeType<LocalConnection_as>(fn.this_ptr);
-
+    LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
     return as_value(relay->domain());
 }
 
@@ -337,9 +332,7 @@ localconnection_domain(const fn_call& fn)
 as_value
 localconnection_send(const fn_call& fn)
 {
-    LocalConnection_as* relay =
-        ensureNativeType<LocalConnection_as>(fn.this_ptr);
-
+    LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
     // At least 2 args (connection name, function) required.
 
    log_debug(_("The number of args is %d \n"), fn.nargs) ;

@@ -93,8 +93,7 @@ getLoaderInterface()
 as_value
 loader_load(const fn_call& fn)
 {
-    boost::intrusive_ptr<Loader_as> ptr =
-        ensureType<Loader_as>(fn.this_ptr);
+    Loader_as* ptr = ensure<ThisIs<Loader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -103,8 +102,7 @@ loader_load(const fn_call& fn)
 as_value
 loader_loadBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<Loader_as> ptr =
-        ensureType<Loader_as>(fn.this_ptr);
+    Loader_as* ptr = ensure<ThisIs<Loader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -113,8 +111,7 @@ loader_loadBytes(const fn_call& fn)
 as_value
 loader_unload(const fn_call& fn)
 {
-    boost::intrusive_ptr<Loader_as> ptr =
-        ensureType<Loader_as>(fn.this_ptr);
+    Loader_as* ptr = ensure<ThisIs<Loader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

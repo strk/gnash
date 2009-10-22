@@ -104,7 +104,7 @@ attachPointStaticProperties(as_object& o)
 as_value
 point_add(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -167,7 +167,7 @@ point_add(const fn_call& fn)
 as_value
 point_clone(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -179,7 +179,7 @@ point_clone(const fn_call& fn)
 as_value
 point_equals(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     if ( ! fn.nargs )
     {
@@ -225,7 +225,7 @@ point_equals(const fn_call& fn)
 as_value
 point_normalize(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value argval;
 
@@ -279,7 +279,7 @@ point_normalize(const fn_call& fn)
 as_value
 point_offset(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -305,7 +305,7 @@ point_offset(const fn_call& fn)
 as_value
 point_subtract(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -367,7 +367,7 @@ point_subtract(const fn_call& fn)
 as_value
 point_toString(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -386,7 +386,7 @@ point_toString(const fn_call& fn)
 as_value
 point_length(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     if ( ! fn.nargs ) // getter
     {
@@ -605,7 +605,7 @@ as_value
 point_ctor(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* obj = ensure<ValidThis>(fn);
 
     as_value x;
     as_value y;

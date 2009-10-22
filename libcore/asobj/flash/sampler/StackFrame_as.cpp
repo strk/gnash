@@ -93,8 +93,7 @@ getStackFrameInterface()
 as_value
 stackframe_file(const fn_call& fn)
 {
-    boost::intrusive_ptr<StackFrame_as> ptr =
-        ensureType<StackFrame_as>(fn.this_ptr);
+    StackFrame_as* ptr = ensure<ThisIs<StackFrame_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -103,8 +102,7 @@ stackframe_file(const fn_call& fn)
 as_value
 stackframe_line(const fn_call& fn)
 {
-    boost::intrusive_ptr<StackFrame_as> ptr =
-        ensureType<StackFrame_as>(fn.this_ptr);
+    StackFrame_as* ptr = ensure<ThisIs<StackFrame_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -113,8 +111,7 @@ stackframe_line(const fn_call& fn)
 as_value
 stackframe_name(const fn_call& fn)
 {
-    boost::intrusive_ptr<StackFrame_as> ptr =
-        ensureType<StackFrame_as>(fn.this_ptr);
+    StackFrame_as* ptr = ensure<ThisIs<StackFrame_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

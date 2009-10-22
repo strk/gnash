@@ -129,8 +129,7 @@ getURLStreamInterface()
 as_value
 urlstream_load(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -139,8 +138,7 @@ urlstream_load(const fn_call& fn)
 as_value
 urlstream_readBoolean(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -149,8 +147,7 @@ urlstream_readBoolean(const fn_call& fn)
 as_value
 urlstream_readByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -159,8 +156,7 @@ urlstream_readByte(const fn_call& fn)
 as_value
 urlstream_readBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -169,8 +165,7 @@ urlstream_readBytes(const fn_call& fn)
 as_value
 urlstream_readDouble(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -179,8 +174,7 @@ urlstream_readDouble(const fn_call& fn)
 as_value
 urlstream_readFloat(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -189,8 +183,7 @@ urlstream_readFloat(const fn_call& fn)
 as_value
 urlstream_readInt(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -199,8 +192,7 @@ urlstream_readInt(const fn_call& fn)
 as_value
 urlstream_readMultiByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -209,8 +201,7 @@ urlstream_readMultiByte(const fn_call& fn)
 as_value
 urlstream_readObject(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -219,8 +210,7 @@ urlstream_readObject(const fn_call& fn)
 as_value
 urlstream_readShort(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -229,8 +219,7 @@ urlstream_readShort(const fn_call& fn)
 as_value
 urlstream_readUnsignedByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -239,8 +228,7 @@ urlstream_readUnsignedByte(const fn_call& fn)
 as_value
 urlstream_readUnsignedInt(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -249,8 +237,7 @@ urlstream_readUnsignedInt(const fn_call& fn)
 as_value
 urlstream_readUnsignedShort(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -259,8 +246,7 @@ urlstream_readUnsignedShort(const fn_call& fn)
 as_value
 urlstream_readUTF(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -269,8 +255,7 @@ urlstream_readUTF(const fn_call& fn)
 as_value
 urlstream_readUTFBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -279,8 +264,7 @@ urlstream_readUTFBytes(const fn_call& fn)
 as_value
 urlstream_complete(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -289,8 +273,7 @@ urlstream_complete(const fn_call& fn)
 as_value
 urlstream_httpStatus(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -299,8 +282,7 @@ urlstream_httpStatus(const fn_call& fn)
 as_value
 urlstream_ioError(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -309,8 +291,7 @@ urlstream_ioError(const fn_call& fn)
 as_value
 urlstream_open(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -319,8 +300,7 @@ urlstream_open(const fn_call& fn)
 as_value
 urlstream_progress(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -329,8 +309,7 @@ urlstream_progress(const fn_call& fn)
 as_value
 urlstream_securityError(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLStream_as> ptr =
-        ensureType<URLStream_as>(fn.this_ptr);
+    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

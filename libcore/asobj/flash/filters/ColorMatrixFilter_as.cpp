@@ -61,7 +61,7 @@ attachColorMatrixFilterInterface(as_object& o)
 as_value
 colormatrixfilter_matrix(const fn_call& fn)
 {
-    ColorMatrixFilter_as* ptr = ensureNativeType<ColorMatrixFilter_as>(fn.this_ptr);
+    ColorMatrixFilter_as* ptr = ensure<ThisIsNative<ColorMatrixFilter_as> >(fn);
     UNUSED(ptr);
     return as_value();
 }
@@ -69,7 +69,7 @@ colormatrixfilter_matrix(const fn_call& fn)
 as_value
 colormatrixfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new ColorMatrixFilter_as);
     return as_value();
 }

@@ -353,7 +353,7 @@ LoadableObject::registerNative(as_object& o)
 as_value
 LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value bytesLoaded;
     string_table& st = getStringTable(fn);
@@ -364,7 +364,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 as_value
 LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value bytesTotal;
     string_table& st = getStringTable(fn);
@@ -472,7 +472,7 @@ namespace {
 as_value
 loadableobject_decode(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     if (!fn.nargs) return as_value(false);
 
@@ -521,7 +521,7 @@ loadableobject_decode(const fn_call& fn)
 as_value
 loadableobject_sendAndLoad(const fn_call& fn)
 {
-    LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
+    LoadableObject* ptr = ensure<ThisIsNative<LoadableObject> >(fn);
 
     if ( fn.nargs < 2 )
     {
@@ -573,7 +573,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 as_value
 loadableobject_load(const fn_call& fn)
 {
-    LoadableObject* obj = ensureNativeType<LoadableObject>(fn.this_ptr);
+    LoadableObject* obj = ensure<ThisIsNative<LoadableObject> >(fn);
 
     if ( fn.nargs < 1 )
     {
@@ -606,7 +606,7 @@ loadableobject_load(const fn_call& fn)
 as_value
 loadableobject_send(const fn_call& fn)
 {
-    LoadableObject* ptr = ensureNativeType<LoadableObject>(fn.this_ptr);
+    LoadableObject* ptr = ensure<ThisIsNative<LoadableObject> >(fn);
  
     std::ostringstream os;
     fn.dump_args(os);

@@ -47,31 +47,18 @@ namespace {
 
 }
 
-class Security_as : public as_object
-{
-
-public:
-
-    Security_as()
-        :
-        as_object(getSecurityInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void security_class_init(as_object& where, const ObjectURI& uri)
+void
+security_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as* gl = getGlobal(where);
-        as_object* proto = getSecurityInterface();
-        cl = gl->createClass(&security_ctor, proto);
-        attachSecurityStaticInterface(*cl);
-    }
+    Global_as* gl = getGlobal(where);
+    as_object* proto = gl->createObject();
+    as_object* cl = gl->createClass(&security_ctor, proto);
+    attachSecurityStaticInterface(*cl);
+    attachSecurityInterface(*proto);
 
     // Register _global.Security
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -95,83 +82,51 @@ attachSecurityStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getSecurityInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSecurityInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-security_allowInsecureDomain(const fn_call& fn)
+security_allowInsecureDomain(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-security_loadPolicyFile(const fn_call& fn)
+security_loadPolicyFile(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-security_showSettings(const fn_call& fn)
+security_showSettings(const fn_call&)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-security_LOCAL_TRUSTED(const fn_call& fn)
+security_LOCAL_TRUSTED(const fn_call&)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-security_LOCAL_WITH_FILE(const fn_call& fn)
+security_LOCAL_WITH_FILE(const fn_call&)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-security_LOCAL_WITH_NETWORK(const fn_call& fn)
+security_LOCAL_WITH_NETWORK(const fn_call&)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-security_REMOTE(const fn_call& fn)
+security_REMOTE(const fn_call&)
 {
-    boost::intrusive_ptr<Security_as> ptr =
-        ensureType<Security_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -179,9 +134,7 @@ security_REMOTE(const fn_call& fn)
 as_value
 security_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Security_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

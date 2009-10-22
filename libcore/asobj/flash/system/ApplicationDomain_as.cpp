@@ -88,8 +88,7 @@ getApplicationDomainInterface()
 as_value
 applicationdomain_hasDefinition(const fn_call& fn)
 {
-    boost::intrusive_ptr<ApplicationDomain_as> ptr =
-        ensureType<ApplicationDomain_as>(fn.this_ptr);
+    ApplicationDomain_as* ptr = ensure<ThisIs<ApplicationDomain_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

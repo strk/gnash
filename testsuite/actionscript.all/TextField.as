@@ -1210,7 +1210,7 @@ CTF = function () {
 
   // It is no longer an array.
   this[2] = 3;
-  xcheck_equals(this.length, 0);
+  check_equals(this.length, 0);
   check_equals(this[2], 3);
 
   this.__proto__.__constructor__ = Date;
@@ -1220,7 +1220,7 @@ CTF = function () {
 
   this.__proto__.__constructor__ = TextField;
   super();
-  xcheck_equals(typeof(this.getTime()), "undefined");
+  check_equals(typeof(this.getTime()), "undefined");
 
 };
 

@@ -288,7 +288,7 @@ camera_getCamera(const fn_call& fn)
 as_value
 camera_setmode(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
     
     const size_t nargs = fn.nargs;
 
@@ -310,7 +310,7 @@ as_value
 camera_setmotionlevel(const fn_call& fn)
 {
     log_unimpl ("Camera::motionLevel can be set, but it's not implemented");
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
         (fn.this_ptr);
     
     const size_t nargs = fn.nargs;
@@ -330,8 +330,7 @@ as_value
 camera_setquality(const fn_call& fn)
 {
     log_unimpl ("Camera::quality can be set, but it's not implemented");
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>
-        (fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     const size_t nargs = fn.nargs;
 
@@ -349,7 +348,7 @@ camera_setquality(const fn_call& fn)
 as_value
 camera_activitylevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::activityLevel only has default value");
@@ -366,7 +365,7 @@ camera_activitylevel(const fn_call& fn)
 as_value
 camera_bandwidth(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::bandwidth only has default value");
@@ -383,7 +382,7 @@ camera_bandwidth(const fn_call& fn)
 as_value
 camera_currentFps(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->currentFPS());
@@ -399,7 +398,7 @@ camera_currentFps(const fn_call& fn)
 as_value
 camera_fps(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->fps());
@@ -415,7 +414,7 @@ camera_fps(const fn_call& fn)
 as_value
 camera_height(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->height());
@@ -431,7 +430,7 @@ camera_height(const fn_call& fn)
 as_value
 camera_index(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) 
     {
@@ -454,7 +453,7 @@ camera_index(const fn_call& fn)
 as_value
 camera_motionLevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::motionLevel only has default value");
@@ -471,7 +470,7 @@ camera_motionLevel(const fn_call& fn)
 as_value
 camera_motionTimeout(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::motionTimeout");
@@ -488,7 +487,7 @@ camera_motionTimeout(const fn_call& fn)
 as_value
 camera_muted(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera.muted");
@@ -505,7 +504,7 @@ camera_muted(const fn_call& fn)
 as_value
 camera_name(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->name());
@@ -547,7 +546,7 @@ camera_names(const fn_call& fn)
 as_value
 camera_quality(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::quality has only default values");
@@ -570,7 +569,7 @@ camera_new(const fn_call& /*fn*/)
 as_value
 camera_setLoopback(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
     
     if (!fn.nargs) {
         // TODO: log AS error.
@@ -603,8 +602,7 @@ camera_setKeyFrameInterval(const fn_call& /*fn*/)
 as_value
 camera_width(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr =
-        ensureType<Camera_as>(fn.this_ptr);
+    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->width());

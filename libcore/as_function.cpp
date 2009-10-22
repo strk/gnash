@@ -272,8 +272,7 @@ function_apply(const fn_call& fn)
 {
 
 	// Get function body 
-	boost::intrusive_ptr<as_function> function_obj =
-        ensureType<as_function>(fn.this_ptr);
+	as_function* function_obj = ensure<ThisIs<as_function> >(fn);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -334,8 +333,7 @@ function_call(const fn_call& fn)
 {
 
 	// Get function body 
-	boost::intrusive_ptr<as_function> function_obj = 
-        ensureType<as_function>(fn.this_ptr);
+	as_function* function_obj = ensure<ThisIs<as_function> >(fn);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed

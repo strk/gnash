@@ -95,7 +95,7 @@ attachBevelFilterInterface(as_object& o)
 as_value
 bevelfilter_distance(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_distance );
     }
@@ -108,7 +108,7 @@ bevelfilter_distance(const fn_call& fn)
 as_value
 bevelfilter_angle(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_angle);
     }
@@ -120,7 +120,7 @@ bevelfilter_angle(const fn_call& fn)
 as_value
 bevelfilter_highlightColor(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_highlightColor );
     }
@@ -132,7 +132,7 @@ bevelfilter_highlightColor(const fn_call& fn)
 as_value
 bevelfilter_highlightAlpha(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_highlightAlpha );
     }
@@ -144,7 +144,7 @@ bevelfilter_highlightAlpha(const fn_call& fn)
 as_value
 bevelfilter_shadowColor(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_shadowColor );
     }
@@ -156,7 +156,7 @@ bevelfilter_shadowColor(const fn_call& fn)
 as_value
 bevelfilter_shadowAlpha(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_shadowAlpha );
     }
@@ -168,7 +168,7 @@ bevelfilter_shadowAlpha(const fn_call& fn)
 as_value
 bevelfilter_blurX(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
@@ -180,7 +180,7 @@ bevelfilter_blurX(const fn_call& fn)
 as_value
 bevelfilter_blurY(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
@@ -192,7 +192,7 @@ bevelfilter_blurY(const fn_call& fn)
 as_value
 bevelfilter_strength(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
@@ -204,7 +204,7 @@ bevelfilter_strength(const fn_call& fn)
 as_value
 bevelfilter_quality(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
@@ -216,7 +216,7 @@ bevelfilter_quality(const fn_call& fn)
 as_value
 bevelfilter_knockout(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
@@ -228,7 +228,7 @@ bevelfilter_knockout(const fn_call& fn)
 as_value
 bevelfilter_type(const fn_call& fn)
 {
-    BevelFilter_as* ptr = ensureNativeType<BevelFilter_as>(fn.this_ptr);
+    BevelFilter_as* ptr = ensure<ThisIsNative<BevelFilter_as> >(fn);
 
     if (fn.nargs == 0)
     {
@@ -272,7 +272,7 @@ bevelfilter_type(const fn_call& fn)
 as_value
 bevelfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new BevelFilter_as);
     return as_value();
 }

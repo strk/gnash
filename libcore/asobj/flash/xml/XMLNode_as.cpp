@@ -526,7 +526,7 @@ xmlnode_appendChild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-	boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+	boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
 	if ( ! fn.nargs )
 	{
@@ -556,7 +556,7 @@ xmlnode_appendChild(const fn_call& fn)
 as_value
 xmlnode_cloneNode(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
     bool deep = false;
     if (fn.nargs > 0) deep = fn.arg(0).to_bool();
@@ -569,7 +569,7 @@ xmlnode_cloneNode(const fn_call& fn)
 as_value
 xmlnode_insertBefore(const fn_call& fn)
 {
-	boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+	boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
 	if ( fn.nargs < 2 )
 	{
@@ -614,7 +614,7 @@ xmlnode_insertBefore(const fn_call& fn)
 as_value
 xmlnode_getNamespaceForPrefix(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     if (!fn.nargs) {
         return as_value();
     }
@@ -630,7 +630,7 @@ xmlnode_getNamespaceForPrefix(const fn_call& fn)
 as_value
 xmlnode_getPrefixForNamespace(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     if (!fn.nargs) {
         return as_value();
     }
@@ -657,7 +657,7 @@ xmlnode_getPrefixForNamespace(const fn_call& fn)
 as_value
 xmlnode_namespaceURI(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
     // Read-only property
     
@@ -694,7 +694,7 @@ xmlnode_namespaceURI(const fn_call& fn)
 as_value
 xmlnode_prefix(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
     // Read-only property
     
@@ -716,7 +716,7 @@ xmlnode_prefix(const fn_call& fn)
 as_value
 xmlnode_localName(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
     // Read-only property
     
@@ -741,7 +741,7 @@ xmlnode_localName(const fn_call& fn)
 as_value
 xmlnode_removeNode(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     
     ptr->removeNode();
     return as_value();
@@ -753,7 +753,7 @@ xmlnode_toString(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     
     std::stringstream ss;
     ptr->toString(ss);
@@ -765,7 +765,7 @@ xmlnode_toString(const fn_call& fn)
 as_value
 xmlnode_hasChildNodes(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     return as_value(ptr->hasChildNodes());
 }
 
@@ -773,7 +773,7 @@ xmlnode_hasChildNodes(const fn_call& fn)
 as_value
 xmlnode_nodeValue(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
     
@@ -793,7 +793,7 @@ xmlnode_nodeValue(const fn_call& fn)
 as_value
 xmlnode_nodeName(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
 
@@ -812,7 +812,7 @@ xmlnode_nodeName(const fn_call& fn)
 as_value
 xmlnode_nodeType(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     return as_value(ptr->nodeType());
 }
 
@@ -820,7 +820,7 @@ xmlnode_nodeType(const fn_call& fn)
 as_value
 xmlnode_attributes(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
 
     as_object* attrs = ptr->getAttributes();
     if (attrs) return as_value(attrs);
@@ -839,7 +839,7 @@ xmlnode_attributes(const fn_call& fn)
 as_value
 xmlnode_firstChild(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
 
@@ -861,7 +861,7 @@ xmlnode_firstChild(const fn_call& fn)
 as_value
 xmlnode_lastChild(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
 
@@ -878,7 +878,7 @@ xmlnode_nextSibling(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     XMLNode_as *node = ptr->nextSibling();
     if (node) {
 	rv = node;
@@ -893,7 +893,7 @@ xmlnode_previousSibling(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     XMLNode_as *node = ptr->previousSibling();
     if (node) {
 	rv = node;
@@ -908,7 +908,7 @@ xmlnode_parentNode(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
     XMLNode_as *node = ptr->getParent();
     if (node) {
 	rv = node;
@@ -920,7 +920,7 @@ xmlnode_parentNode(const fn_call& fn)
 as_value
 xmlnode_childNodes(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
  
     Global_as* gl = getGlobal(fn);
     as_object* ary = gl->createArray();

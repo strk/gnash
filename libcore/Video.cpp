@@ -384,7 +384,7 @@ attachPrototypeProperties(as_object& proto)
 as_value
 video_attach(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
 
 	if (fn.nargs < 1)
 	{
@@ -412,7 +412,7 @@ video_attach(const fn_call& fn)
 as_value
 video_deblocking(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
     UNUSED(video);
 
     log_unimpl("Video.deblocking");
@@ -422,7 +422,7 @@ video_deblocking(const fn_call& fn)
 as_value
 video_smoothing(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
 
     if (!fn.nargs) return as_value(video->smoothing());
 
@@ -436,21 +436,21 @@ video_smoothing(const fn_call& fn)
 as_value
 video_width(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
     return as_value(video->width());
 }
 
 as_value
 video_height(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
     return as_value(video->height());
 }
 
 as_value
 video_clear(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
 
     video->clear();
     return as_value();

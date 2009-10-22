@@ -90,8 +90,7 @@ getPrintJobInterface()
 as_value
 printjob_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<PrintJob_as> ptr =
-        ensureType<PrintJob_as>(fn.this_ptr);
+    PrintJob_as* ptr = ensure<ThisIs<PrintJob_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -100,8 +99,7 @@ printjob_send(const fn_call& fn)
 as_value
 printjob_start(const fn_call& fn)
 {
-    boost::intrusive_ptr<PrintJob_as> ptr =
-        ensureType<PrintJob_as>(fn.this_ptr);
+    PrintJob_as* ptr = ensure<ThisIs<PrintJob_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

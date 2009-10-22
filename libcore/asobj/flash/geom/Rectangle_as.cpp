@@ -124,7 +124,7 @@ Rectangle_clone(const fn_call& fn)
 {
     // The object will be interpreted as a rectangle. Any Rectangle
     // properties that the object has (width, height, x, y) are used.
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y, w, h;
 
@@ -148,7 +148,7 @@ Rectangle_contains(const fn_call& fn)
     //fn.arg(0) => x coordinate
     //fn.arg(1) => y coordinate
 
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value rect_x_as, rect_width_as, rect_y_as, rect_height_as;
 
@@ -231,7 +231,7 @@ Rectangle_contains(const fn_call& fn)
 as_value
 Rectangle_containsPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -240,7 +240,7 @@ Rectangle_containsPoint(const fn_call& fn)
 as_value
 Rectangle_containsRectangle(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -249,7 +249,7 @@ Rectangle_containsRectangle(const fn_call& fn)
 as_value
 Rectangle_equals(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -258,7 +258,7 @@ Rectangle_equals(const fn_call& fn)
 as_value
 Rectangle_inflate(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -267,7 +267,7 @@ Rectangle_inflate(const fn_call& fn)
 as_value
 Rectangle_inflatePoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -276,7 +276,7 @@ Rectangle_inflatePoint(const fn_call& fn)
 as_value
 Rectangle_intersection(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -285,7 +285,7 @@ Rectangle_intersection(const fn_call& fn)
 as_value
 Rectangle_intersects(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -294,7 +294,7 @@ Rectangle_intersects(const fn_call& fn)
 as_value
 Rectangle_isEmpty(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value w;
     ptr->get_member(NSV::PROP_WIDTH, &w);
@@ -318,7 +318,7 @@ Rectangle_isEmpty(const fn_call& fn)
 as_value
 Rectangle_offset(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -327,7 +327,7 @@ Rectangle_offset(const fn_call& fn)
 as_value
 Rectangle_offsetPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -336,7 +336,7 @@ Rectangle_offsetPoint(const fn_call& fn)
 as_value
 Rectangle_setEmpty(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -345,7 +345,7 @@ Rectangle_setEmpty(const fn_call& fn)
 as_value
 Rectangle_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y, w, h;
 
@@ -367,7 +367,7 @@ Rectangle_toString(const fn_call& fn)
 as_value
 Rectangle_union(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -376,7 +376,7 @@ Rectangle_union(const fn_call& fn)
 as_value
 Rectangle_bottom(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value ret;
 
@@ -405,8 +405,7 @@ Rectangle_bottom(const fn_call& fn)
 as_value
 Rectangle_bottomRight(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = 
-        ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     if (!fn.nargs) {
 
@@ -447,7 +446,7 @@ Rectangle_bottomRight(const fn_call& fn)
 as_value
 Rectangle_left(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value ret;
 
@@ -478,7 +477,7 @@ Rectangle_left(const fn_call& fn)
 as_value
 Rectangle_right(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value ret;
 
@@ -507,7 +506,7 @@ Rectangle_right(const fn_call& fn)
 as_value
 Rectangle_size(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value ret;
 
@@ -541,7 +540,7 @@ Rectangle_size(const fn_call& fn)
 as_value
 Rectangle_top(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value ret;
 
@@ -572,7 +571,7 @@ Rectangle_top(const fn_call& fn)
 as_value
 Rectangle_topLeft(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value ret;
 
@@ -609,7 +608,7 @@ as_value
 Rectangle_ctor(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* obj = ensure<ValidThis>(fn);
 
     as_value x;
     as_value y;

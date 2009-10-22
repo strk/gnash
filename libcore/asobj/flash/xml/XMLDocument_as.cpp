@@ -693,8 +693,7 @@ xml_new(const fn_call& fn)
 as_value
 xml_loaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLDocument_as> ptr =
-        ensureType<XMLDocument_as>(fn.this_ptr);
+    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
 
     if (!fn.nargs) {
         XMLDocument_as::LoadStatus ls = ptr->loaded();
@@ -709,8 +708,7 @@ xml_loaded(const fn_call& fn)
 as_value
 xml_status(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLDocument_as> ptr =
-        ensureType<XMLDocument_as>(fn.this_ptr);
+    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
     
     if (!fn.nargs) {
         return as_value(ptr->status());
@@ -799,7 +797,7 @@ as_value
 xml_parseXML(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<XMLDocument_as> ptr = ensureType<XMLDocument_as>(fn.this_ptr);
+    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -818,8 +816,7 @@ xml_parseXML(const fn_call& fn)
 as_value
 xml_xmlDecl(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLDocument_as> ptr =
-        ensureType<XMLDocument_as>(fn.this_ptr);
+    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
 
     if (!fn.nargs)
     {
@@ -841,7 +838,7 @@ xml_xmlDecl(const fn_call& fn)
 as_value
 xml_docTypeDecl(const fn_call& fn)
 {
-    boost::intrusive_ptr<XMLDocument_as> ptr = ensureType<XMLDocument_as>(fn.this_ptr);
+    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
 
     if (!fn.nargs)
     {

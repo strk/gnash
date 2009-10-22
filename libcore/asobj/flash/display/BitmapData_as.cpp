@@ -240,7 +240,7 @@ namespace {
 as_value
 bitmapdata_applyFilter(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -249,7 +249,7 @@ bitmapdata_applyFilter(const fn_call& fn)
 as_value
 bitmapdata_clone(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -258,7 +258,7 @@ bitmapdata_clone(const fn_call& fn)
 as_value
 bitmapdata_colorTransform(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -267,7 +267,7 @@ bitmapdata_colorTransform(const fn_call& fn)
 as_value
 bitmapdata_copyChannel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -276,7 +276,7 @@ bitmapdata_copyChannel(const fn_call& fn)
 as_value
 bitmapdata_copyPixels(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -287,7 +287,7 @@ bitmapdata_dispose(const fn_call& fn)
 {
     // Should free the memory storing the bitmap.
     // All properties afterwards are -1 (even the rectangle)
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     ptr->dispose();
 	return as_value();
 }
@@ -295,7 +295,7 @@ bitmapdata_dispose(const fn_call& fn)
 as_value
 bitmapdata_draw(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     std::ostringstream os;
     fn.dump_args(os);
@@ -337,7 +337,7 @@ bitmapdata_draw(const fn_call& fn)
 as_value
 bitmapdata_fillRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) return as_value();
     
@@ -378,7 +378,7 @@ bitmapdata_fillRect(const fn_call& fn)
 as_value
 bitmapdata_floodFill(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -387,7 +387,7 @@ bitmapdata_floodFill(const fn_call& fn)
 as_value
 bitmapdata_generateFilterRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -396,7 +396,7 @@ bitmapdata_generateFilterRect(const fn_call& fn)
 as_value
 bitmapdata_getColorBoundsRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -405,7 +405,7 @@ bitmapdata_getColorBoundsRect(const fn_call& fn)
 as_value
 bitmapdata_getPixel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2)
     {
@@ -423,7 +423,7 @@ bitmapdata_getPixel(const fn_call& fn)
 as_value
 bitmapdata_getPixel32(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2)
     {
@@ -442,7 +442,7 @@ bitmapdata_getPixel32(const fn_call& fn)
 as_value
 bitmapdata_hitTest(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -451,7 +451,7 @@ bitmapdata_hitTest(const fn_call& fn)
 as_value
 bitmapdata_merge(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -460,7 +460,7 @@ bitmapdata_merge(const fn_call& fn)
 as_value
 bitmapdata_noise(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -469,7 +469,7 @@ bitmapdata_noise(const fn_call& fn)
 as_value
 bitmapdata_paletteMap(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -478,7 +478,7 @@ bitmapdata_paletteMap(const fn_call& fn)
 as_value
 bitmapdata_perlinNoise(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -487,7 +487,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
 as_value
 bitmapdata_pixelDissolve(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -496,7 +496,7 @@ bitmapdata_pixelDissolve(const fn_call& fn)
 as_value
 bitmapdata_scroll(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -505,7 +505,7 @@ bitmapdata_scroll(const fn_call& fn)
 as_value
 bitmapdata_setPixel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -529,7 +529,7 @@ bitmapdata_setPixel(const fn_call& fn)
 as_value
 bitmapdata_setPixel32(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -553,7 +553,7 @@ bitmapdata_setPixel32(const fn_call& fn)
 as_value
 bitmapdata_threshold(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -562,7 +562,7 @@ bitmapdata_threshold(const fn_call& fn)
 as_value
 bitmapdata_height(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -576,7 +576,7 @@ bitmapdata_height(const fn_call& fn)
 as_value
 bitmapdata_rectangle(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
@@ -603,7 +603,7 @@ bitmapdata_rectangle(const fn_call& fn)
 as_value
 bitmapdata_transparent(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -616,7 +616,7 @@ bitmapdata_transparent(const fn_call& fn)
 as_value
 bitmapdata_width(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     // Read-only
     if (fn.nargs) return as_value();
@@ -631,7 +631,7 @@ bitmapdata_width(const fn_call& fn)
 as_value
 bitmapdata_loadBitmap(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensureNativeType<BitmapData_as>(fn.this_ptr);
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -653,7 +653,7 @@ get_flash_display_bitmap_data_constructor(const fn_call& fn)
 as_value
 bitmapdata_ctor(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 	if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
              log_aserror("BitmapData constructor requires at least two "

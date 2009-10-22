@@ -242,7 +242,7 @@ attachDisplayObjectProperties(as_object& /*o*/)
 as_value
 DisplayObject::blendMode(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject> ch = ensureType<DisplayObject>(fn.this_ptr);
+    boost::intrusive_ptr<DisplayObject> ch = ensure<ThisIs<DisplayObject> >(fn);
 
     // This is AS-correct, but doesn't do anything.
     // TODO: implement in the renderers!

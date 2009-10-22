@@ -126,7 +126,7 @@ EOF
           qq|\nstatic as_value\n$args{lc}_| .$m.
           qq|(const fn_call& fn)
 {
-	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensure<ThisIs<$args{lc}_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -158,7 +158,7 @@ EOF
           qq|\nstatic as_value\n$args{lc}_| .$m.
           qq|(const fn_call& fn)
 {
-	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensure<ThisIs<$args{lc}_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -189,7 +189,7 @@ EOF
           qq|\nstatic as_value\n$args{lc}_| .$p. "_getset" .
           qq|(const fn_call& fn)
 {
-	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensure<ThisIs<$args{lc}_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -220,7 +220,7 @@ EOF
           qq|\nstatic as_value\n$args{lc}_| .$p. "_getset" .
           qq|(const fn_call& fn)
 {
-	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensure<ThisIs<$args{lc}_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
