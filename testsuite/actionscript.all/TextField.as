@@ -1141,16 +1141,93 @@ _root._x = _root._y = 0;
 _root._xscale = _root._yscale = 100;
 
 
+// Check that "new _global.TextField()" is called in createTextField
+
+backup = _global.TextField;
+count = 0;
+args = 0;
+
+storedthis = undefined;
+
+_global.TextField = function() {
+    storedthis = this;
+    args = arguments.length;
+    count++;
+};
+
+TextField.prototype = {};
+TextField.prototype.toString = function() { return "Hoppla!"; };
+
+// The fact that createTextField works even when _global.TextField is
+// replaced shows that the native functions (making into a real TextField)
+// is done in createTextField.
+r = _root.createTextField("tfmo", 2, 2, 10, 10, 6);
+xcheck_equals(count, 1);
+check_equals(args, 0);
+check_equals(_root.tfmo._x, 2);
+
+/// The returned object is still the this pointer that our fake constructor
+/// worked on.
+xcheck_equals(_root.tfmo, storedthis);
+xcheck(_root.tfmo === storedthis);
+
+// Not sure why this isn't the case for version 6 or 7.
+#if OUTPUT_VERSION >= 8
+check_equals(r.toString(), "Hoppla!");
+#else
+check_equals(r.toString(), undefined);
+#endif
+
+_global.TextField = backup;
+
+// So if createTextField calls the TextField ctor, what does that constructor
+// do?
+
+// This only confirms that the TextField constructor a) removes the
+// array typing, b) doesn't remove the relay, and c) doesn't produce a
+// DisplayObject. We still don't have a way to check what happens
+// inside createTextField.
+
+CTF = function () {
+  backup = this;
+  this.__proto__.__constructor__ = Array;
+  super ();
+  check_equals(this.length, 0);
+
+  // It's not a proper TextField.
+  this.__proto__.__constructor__ = TextField;
+  super ();
+  check_equals(backup, this);
+  check_equals(this.length, 0);
+  check_equals(this._x, undefined);
+
+  // It is no longer an array.
+  this[2] = 3;
+  xcheck_equals(this.length, 0);
+  check_equals(this[2], 3);
+
+  this.__proto__.__constructor__ = Date;
+  this.getTime = Date.prototype.getTime;
+  super();
+  check_equals(typeof(this.getTime()), "number");
+
+  this.__proto__.__constructor__ = TextField;
+  check_equals(typeof(this.getTime()), "number");
+
+};
+
+o = new CTF();
+
 //------------------------------------------------------------
 // END OF TESTS
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(502);
+     check_totals(505);
 #elif OUTPUT_VERSION == 7
- check_totals(508);
+ check_totals(522);
 #elif OUTPUT_VERSION == 8
- check_totals(509);
+ check_totals(523);
 #endif
 
 #endif
