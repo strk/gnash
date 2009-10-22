@@ -1120,7 +1120,6 @@ array_sortOn(const fn_call& fn)
         return as_value(array);
     }
 
-#if 1
     // case: sortOn(["prop1", "prop2"] ...)
     if (fn.arg(0).is_object()) 
     {
@@ -1201,7 +1200,7 @@ array_sortOn(const fn_call& fn)
         return as_value(array);
 
     }
-#endif
+
     IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("SortOn called with invalid arguments."));
     )
