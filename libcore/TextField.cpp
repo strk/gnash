@@ -2335,15 +2335,18 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
 
     VM& vm = getVM(where);
     Global_as* gl = getGlobal(where);
-    as_object* proto = getSWFVersion(where) < 6 ? 0 : getTextFieldInterface(vm);
+    as_object* proto = getTextFieldInterface(vm);
     as_object* cl = gl->createClass(&textfield_ctor, proto);
 
-    // replicate static members to class, to be able to access
-    // all methods as static functions
     attachTextFieldStaticMembers(*cl);
              
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
+
+    // ASSetPropFlags is called on the TextField class.
+    string_table& st = getStringTable(where);
+    as_object* null = 0;
+    gl->callMethod(st.find("ASSetPropFlags"), cl, null, 131);
 }
 
 void
@@ -3666,36 +3669,31 @@ as_value
 textfield_ctor(const fn_call& fn)
 {
 
-    VM& vm = getVM(fn);
+    if (isAS3(fn)) {
+        SWFRect nullRect;
+        as_object* obj = new TextField(0, nullRect);
+        return as_value(obj);
+    }
 
-    as_object* proto = getTextFieldInterface(vm);
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* proto = obj->get_prototype();
+    if (proto) {
 
-    as_object* obj = 0;
-
-    if (!isAS3(fn)) {
         // We should attach more properties to the prototype on first
         // instantiation.
-        // TODO: this also attaches properties to the SWF5 prototype but makes
+        // TODO: this also attaches properties to the SWF5 prototype
+        // but makes
         // them invisible with prop flags. Is this correct?
         attachPrototypeProperties(*proto);
-
-        obj = new as_object(proto);
-    }
-    else {
-        SWFRect nullRect;
-        obj = new TextField(0, nullRect);
     }
 
-    return as_value(obj);
+    return as_value();
 }
 
 
 void
 attachTextFieldInterface(as_object& o)
 {
-    // TextField is an AsBroadcaster
-    AsBroadcaster::initialize(o);
-
     // SWF6 or higher
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
@@ -3712,7 +3710,15 @@ attachTextFieldInterface(as_object& o)
     const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
 
     o.init_member("replaceText",vm.getNative(104, 107), swf7Flags);
+    
+    // TextField is an AsBroadcaster
+    AsBroadcaster::initialize(o);
 
+    // Finally ASSetPropFlags is called on the prototype.
+    string_table& st = getStringTable(o);
+    Global_as* gl = getGlobal(o);
+    as_object* null = 0;
+    gl->callMethod(st.find("ASSetPropFlags"), &o, null, 131);
 }
 
 void
@@ -3736,18 +3742,9 @@ getTextFieldInterface(VM& vm)
 
     if ( proto == NULL )
     {
-        if (vm.getSWFVersion() < 6) {
-            /// The prototype for SWF5 is a simple as_object without
-            /// toString() or valueOf().
-            proto = new as_object();
-            vm.addStatic(proto.get());
-        }
-        else {
-            proto = new as_object(getObjectInterface());
-            vm.addStatic(proto.get());
-            attachTextFieldInterface(*proto);
-        }
-
+        proto = new as_object(getObjectInterface());
+        vm.addStatic(proto.get());
+        attachTextFieldInterface(*proto);
     }
     return proto.get();
 }
