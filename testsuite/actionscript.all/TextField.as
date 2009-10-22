@@ -1231,7 +1231,7 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(516);
+     check_totals(519);
 #elif OUTPUT_VERSION == 7
  check_totals(525);
 #elif OUTPUT_VERSION == 8
