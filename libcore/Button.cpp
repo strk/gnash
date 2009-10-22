@@ -1023,7 +1023,7 @@ namespace {
 as_value
 button_blendMode(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1031,7 +1031,7 @@ button_blendMode(const fn_call& fn)
 as_value
 button_cacheAsBitmap(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1039,7 +1039,7 @@ button_cacheAsBitmap(const fn_call& fn)
 as_value
 button_filters(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1047,7 +1047,7 @@ button_filters(const fn_call& fn)
 as_value
 button_scale9Grid(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1055,7 +1055,7 @@ button_scale9Grid(const fn_call& fn)
 as_value
 button_getTabIndex(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1063,7 +1063,7 @@ button_getTabIndex(const fn_call& fn)
 as_value
 button_setTabIndex(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1071,7 +1071,7 @@ button_setTabIndex(const fn_call& fn)
 as_value
 button_getDepth(const fn_call& fn)
 {
-    as_object* obj = ensureType<Button>(fn.this_ptr);
+    as_object* obj = ensure<ThisIs<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }

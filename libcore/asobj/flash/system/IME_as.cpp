@@ -90,8 +90,7 @@ getIMEInterface()
 as_value
 ime_setCompositionString(const fn_call& fn)
 {
-    boost::intrusive_ptr<IME_as> ptr =
-        ensureType<IME_as>(fn.this_ptr);
+    IME_as* ptr = ensure<ThisIs<IME_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -100,8 +99,7 @@ ime_setCompositionString(const fn_call& fn)
 as_value
 ime_imeComposition(const fn_call& fn)
 {
-    boost::intrusive_ptr<IME_as> ptr =
-        ensureType<IME_as>(fn.this_ptr);
+    IME_as* ptr = ensure<ThisIs<IME_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

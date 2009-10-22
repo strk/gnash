@@ -90,8 +90,7 @@ getFontInterface()
 as_value
 font_hasGlyphs(const fn_call& fn)
 {
-    boost::intrusive_ptr<Font_as> ptr =
-        ensureType<Font_as>(fn.this_ptr);
+    Font_as* ptr = ensure<ThisIs<Font_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -100,8 +99,7 @@ font_hasGlyphs(const fn_call& fn)
 as_value
 font_registerFont(const fn_call& fn)
 {
-    boost::intrusive_ptr<Font_as> ptr =
-        ensureType<Font_as>(fn.this_ptr);
+    Font_as* ptr = ensure<ThisIs<Font_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

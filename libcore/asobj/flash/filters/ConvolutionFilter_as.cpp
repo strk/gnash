@@ -86,7 +86,7 @@ attachConvolutionFilterInterface(as_object& o)
 as_value
 convolutionfilter_matrixX(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -95,7 +95,7 @@ convolutionfilter_matrixX(const fn_call& fn)
 as_value
 convolutionfilter_matrixY(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -104,7 +104,7 @@ convolutionfilter_matrixY(const fn_call& fn)
 as_value
 convolutionfilter_divisor(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -113,7 +113,7 @@ convolutionfilter_divisor(const fn_call& fn)
 as_value
 convolutionfilter_bias(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -122,7 +122,7 @@ convolutionfilter_bias(const fn_call& fn)
 as_value
 convolutionfilter_preserveAlpha(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -131,7 +131,7 @@ convolutionfilter_preserveAlpha(const fn_call& fn)
 as_value
 convolutionfilter_clamp(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -140,7 +140,7 @@ convolutionfilter_clamp(const fn_call& fn)
 as_value
 convolutionfilter_color(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -149,7 +149,7 @@ convolutionfilter_color(const fn_call& fn)
 as_value
 convolutionfilter_alpha(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -158,7 +158,7 @@ convolutionfilter_alpha(const fn_call& fn)
 as_value
 convolutionfilter_matrix(const fn_call& fn)
 {
-    ConvolutionFilter_as* ptr = ensureNativeType<ConvolutionFilter_as>(fn.this_ptr);
+    ConvolutionFilter_as* ptr = ensure<ThisIsNative<ConvolutionFilter_as> >(fn);
     UNUSED(ptr);
     log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
@@ -167,7 +167,7 @@ convolutionfilter_matrix(const fn_call& fn)
 as_value
 convolutionfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new ConvolutionFilter_as);
     return as_value();
 }

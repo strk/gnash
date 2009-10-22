@@ -142,7 +142,7 @@ attachColorTransformInterface(as_object& o)
 as_value
 colortransform_alphaMultiplier(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(relay->getAlphaMultiplier());
@@ -155,7 +155,7 @@ colortransform_alphaMultiplier(const fn_call& fn)
 as_value
 colortransform_alphaOffset(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
     if (!fn.nargs) {
         return as_value(relay->getAlphaOffset());
     }
@@ -167,7 +167,7 @@ colortransform_alphaOffset(const fn_call& fn)
 as_value
 colortransform_blueMultiplier(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
     if (!fn.nargs) {
         return as_value(relay->getBlueMultiplier());
     }
@@ -179,7 +179,7 @@ colortransform_blueMultiplier(const fn_call& fn)
 as_value
 colortransform_blueOffset(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
     if (!fn.nargs) {
         return as_value(relay->getBlueOffset());
     }
@@ -191,7 +191,7 @@ colortransform_blueOffset(const fn_call& fn)
 as_value
 colortransform_greenMultiplier(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
     if (!fn.nargs) {
         return as_value(relay->getGreenMultiplier());
     }
@@ -203,7 +203,7 @@ colortransform_greenMultiplier(const fn_call& fn)
 as_value
 colortransform_greenOffset(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
     
     if (!fn.nargs) {
         return as_value(relay->getGreenOffset());
@@ -216,7 +216,7 @@ colortransform_greenOffset(const fn_call& fn)
 as_value
 colortransform_redMultiplier(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(relay->getRedMultiplier());
@@ -229,7 +229,7 @@ colortransform_redMultiplier(const fn_call& fn)
 as_value
 colortransform_redOffset(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
     if (!fn.nargs)
     {
         // Getter
@@ -245,7 +245,7 @@ colortransform_redOffset(const fn_call& fn)
 as_value
 colortransform_concat(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
 	UNUSED(relay);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -255,7 +255,7 @@ as_value
 colortransform_toString(const fn_call& fn)
 {
 
-    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     string_table& st = getStringTable(fn);
 
@@ -293,7 +293,7 @@ colortransform_toString(const fn_call& fn)
 as_value
 colortransform_rgb(const fn_call& fn)
 {
-	ColorTransform_as* relay = ensureNativeType<ColorTransform_as>(fn.this_ptr);
+	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
 
     if (!fn.nargs)
     {
@@ -330,7 +330,7 @@ as_value
 colortransform_ctor(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* obj = ensure<ValidThis>(fn);
 
     // Default arguments.
     if (fn.nargs < 8)

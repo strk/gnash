@@ -157,7 +157,7 @@ attachStringInterface(as_object& o)
 as_value
 string_concat(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
 
     std::string str;
@@ -175,7 +175,7 @@ string_concat(const fn_call& fn)
 as_value
 string_slice(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -231,7 +231,7 @@ string_slice(const fn_call& fn)
 as_value
 string_split(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -347,7 +347,7 @@ string_split(const fn_call& fn)
 as_value
 string_lastIndexOf(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -384,7 +384,7 @@ string_lastIndexOf(const fn_call& fn)
 as_value
 string_substr(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -423,7 +423,7 @@ string_substr(const fn_call& fn)
 as_value
 string_substring(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -476,7 +476,7 @@ string_substring(const fn_call& fn)
 as_value
 string_indexOf(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
  
     /// Do not return before this, because the toString method should always
@@ -568,7 +568,7 @@ string_fromCharCode(const fn_call& fn)
 as_value
 string_charCodeAt(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -605,7 +605,7 @@ string_charCodeAt(const fn_call& fn)
 as_value
 string_charAt(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -640,7 +640,7 @@ string_charAt(const fn_call& fn)
 as_value
 string_toUpperCase(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
 
     std::string str;
@@ -678,7 +678,7 @@ string_toUpperCase(const fn_call& fn)
 as_value
 string_toLowerCase(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
     
     std::string str;
@@ -715,7 +715,7 @@ string_toLowerCase(const fn_call& fn)
 as_value
 string_oldToLower(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
 
     // This should use the C locale; extended DisplayObjects are
@@ -728,7 +728,7 @@ string_oldToLower(const fn_call& fn)
 as_value
 string_oldToUpper(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     as_value val(fn.this_ptr);
 
     // This should use the C locale; extended DisplayObjects are
@@ -750,7 +750,7 @@ string_valueOf(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    String_as* str = ensureNativeType<String_as>(fn.this_ptr);
+    String_as* str = ensure<ThisIsNative<String_as> >(fn);
     return as_value(str->value());
 }
 

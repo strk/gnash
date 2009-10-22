@@ -92,7 +92,7 @@ attachGradientBevelFilterInterface(as_object& o)
 as_value
 gradientbevelfilter_distance(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_distance );
     }
@@ -105,7 +105,7 @@ gradientbevelfilter_distance(const fn_call& fn)
 as_value
 gradientbevelfilter_angle(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_angle);
     }
@@ -117,7 +117,7 @@ gradientbevelfilter_angle(const fn_call& fn)
 as_value
 gradientbevelfilter_alphas(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     UNUSED(ptr);
     return as_value();
 }
@@ -125,7 +125,7 @@ gradientbevelfilter_alphas(const fn_call& fn)
 as_value
 gradientbevelfilter_colors(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     UNUSED(ptr);
     return as_value();
 }
@@ -133,7 +133,7 @@ gradientbevelfilter_colors(const fn_call& fn)
 as_value
 gradientbevelfilter_ratios(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     UNUSED(ptr);
     return as_value();
 }
@@ -141,7 +141,7 @@ gradientbevelfilter_ratios(const fn_call& fn)
 as_value
 gradientbevelfilter_blurX(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
@@ -153,7 +153,7 @@ gradientbevelfilter_blurX(const fn_call& fn)
 as_value
 gradientbevelfilter_blurY(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
@@ -165,7 +165,7 @@ gradientbevelfilter_blurY(const fn_call& fn)
 as_value
 gradientbevelfilter_strength(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
@@ -177,7 +177,7 @@ gradientbevelfilter_strength(const fn_call& fn)
 as_value
 gradientbevelfilter_quality(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
@@ -189,7 +189,7 @@ gradientbevelfilter_quality(const fn_call& fn)
 as_value
 gradientbevelfilter_knockout(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
@@ -201,7 +201,7 @@ gradientbevelfilter_knockout(const fn_call& fn)
 as_value
 gradientbevelfilter_type(const fn_call& fn)
 {
-    GradientBevelFilter_as* ptr = ensureNativeType<GradientBevelFilter_as>(fn.this_ptr);
+    GradientBevelFilter_as* ptr = ensure<ThisIsNative<GradientBevelFilter_as> >(fn);
 
     if (fn.nargs == 0)
     {
@@ -245,7 +245,7 @@ gradientbevelfilter_type(const fn_call& fn)
 as_value
 gradientbevelfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new GradientBevelFilter_as);
     return as_value();
 }

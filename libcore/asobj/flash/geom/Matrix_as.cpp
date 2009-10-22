@@ -131,7 +131,7 @@ attachMatrixInterface(as_object& o)
 as_object*
 instanceOfMatrix(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
 
     as_function* ctor = getClassConstructor(fn, "flash.geom.Matrix");
     if (obj->instanceOf(ctor)) return obj.get();
@@ -144,7 +144,7 @@ matrix_clone(const fn_call& fn)
 {
     // It doesn't matter whether it is a matrix or not; a new Matrix
     // is created using any Matrix properties the object may have.
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value a, b, c, d, tx, ty;
     ptr->get_member(NSV::PROP_A, &a);
@@ -174,7 +174,7 @@ as_value
 matrix_concat(const fn_call& fn)
 {
     // Doesn't have to be a Matrix.
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -242,7 +242,7 @@ as_value
 matrix_createBox(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     if (fn.nargs < 2)
     {
@@ -375,7 +375,7 @@ as_value
 matrix_deltaTransformPoint(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -438,7 +438,7 @@ as_value
 matrix_identity(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     ptr->set_member(NSV::PROP_A, 1.0);
     ptr->set_member(NSV::PROP_B, 0.0);
@@ -462,7 +462,7 @@ matrix_invert(const fn_call& fn)
 {
 
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     MatrixType currentMatrix;
     
@@ -652,7 +652,7 @@ as_value
 matrix_toString(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     as_value a, b, c, d, tx, ty;
 
@@ -681,7 +681,7 @@ as_value
 matrix_transformPoint(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -747,7 +747,7 @@ as_value
 matrix_translate(const fn_call& fn)
 {
     // Doesn't have to be a Matrix
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
     
     if (fn.nargs < 2)
     {
@@ -864,7 +864,7 @@ void fillMatrix(MatrixType& matrix,
 as_value
 matrix_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     
     as_value a, b, c, d, tx, ty;
 

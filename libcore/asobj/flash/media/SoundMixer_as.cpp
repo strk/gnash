@@ -90,8 +90,7 @@ getSoundMixerInterface()
 as_value
 soundmixer_computeSpectrum(const fn_call& fn)
 {
-    boost::intrusive_ptr<SoundMixer_as> ptr =
-        ensureType<SoundMixer_as>(fn.this_ptr);
+    SoundMixer_as* ptr = ensure<ThisIs<SoundMixer_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -100,8 +99,7 @@ soundmixer_computeSpectrum(const fn_call& fn)
 as_value
 soundmixer_stopAll(const fn_call& fn)
 {
-    boost::intrusive_ptr<SoundMixer_as> ptr =
-        ensureType<SoundMixer_as>(fn.this_ptr);
+    SoundMixer_as* ptr = ensure<ThisIs<SoundMixer_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

@@ -105,7 +105,7 @@ attachSelectionInterface(as_object& o)
 as_value
 selection_getBeginIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
     
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
@@ -127,7 +127,7 @@ selection_getBeginIndex(const fn_call& fn)
 as_value
 selection_getCaretIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
@@ -143,7 +143,7 @@ selection_getCaretIndex(const fn_call& fn)
 as_value
 selection_getEndIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
@@ -160,7 +160,7 @@ selection_getEndIndex(const fn_call& fn)
 as_value
 selection_getFocus(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
     
     movie_root& mr = getRoot(fn);
 
@@ -196,7 +196,7 @@ as_value
 selection_setFocus(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     /// Handle invalid arguments: must be one argument, or no action is
     /// taken.
@@ -243,7 +243,7 @@ selection_setFocus(const fn_call& fn)
 as_value
 selection_setSelection(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();

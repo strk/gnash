@@ -88,8 +88,7 @@ getSpriteInterface()
 as_value
 sprite_stopDrag(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sprite_as> ptr =
-        ensureType<Sprite_as>(fn.this_ptr);
+    Sprite_as* ptr = ensure<ThisIs<Sprite_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

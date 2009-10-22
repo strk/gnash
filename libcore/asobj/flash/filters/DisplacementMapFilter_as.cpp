@@ -89,8 +89,8 @@ attachDisplacementMapFilterInterface(as_object& o)
 as_value
 displacementmapfilter_clone(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -99,8 +99,8 @@ displacementmapfilter_clone(const fn_call& fn)
 as_value
 displacementmapfilter_alpha(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -109,8 +109,8 @@ displacementmapfilter_alpha(const fn_call& fn)
 as_value
 displacementmapfilter_color(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -119,8 +119,8 @@ displacementmapfilter_color(const fn_call& fn)
 as_value
 displacementmapfilter_componentX(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -129,8 +129,8 @@ displacementmapfilter_componentX(const fn_call& fn)
 as_value
 displacementmapfilter_componentY(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -139,8 +139,8 @@ displacementmapfilter_componentY(const fn_call& fn)
 as_value
 displacementmapfilter_mapBitmap(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -149,8 +149,8 @@ displacementmapfilter_mapBitmap(const fn_call& fn)
 as_value
 displacementmapfilter_mapPoint(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -159,8 +159,8 @@ displacementmapfilter_mapPoint(const fn_call& fn)
 as_value
 displacementmapfilter_mode(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -169,8 +169,8 @@ displacementmapfilter_mode(const fn_call& fn)
 as_value
 displacementmapfilter_scaleX(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -179,8 +179,8 @@ displacementmapfilter_scaleX(const fn_call& fn)
 as_value
 displacementmapfilter_scaleY(const fn_call& fn)
 {
-	DisplacementMapFilter_as* ptr = 
-        ensureNativeType<DisplacementMapFilter_as>(fn.this_ptr);
+	DisplacementMapFilter_as* ptr =
+        ensure<ThisIsNative<DisplacementMapFilter_as> >(fn);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -189,7 +189,7 @@ displacementmapfilter_scaleY(const fn_call& fn)
 as_value
 displacementmapfilter_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
 	obj->setRelay(new DisplacementMapFilter_as);
     return as_value(); 
 }

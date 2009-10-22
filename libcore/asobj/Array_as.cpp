@@ -933,7 +933,7 @@ attachArrayInterface(as_object& proto)
 as_value
 array_splice(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
     
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1010,7 +1010,7 @@ array_splice(const fn_call& fn)
 as_value
 array_sort(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
     
     const int version = getSWFVersion(*array);
     
@@ -1080,7 +1080,7 @@ array_sort(const fn_call& fn)
 as_value
 array_sortOn(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
@@ -1212,7 +1212,7 @@ array_sortOn(const fn_call& fn)
 as_value
 array_push(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
  
     if (!fn.nargs) return as_value();
 
@@ -1232,7 +1232,7 @@ as_value
 array_unshift(const fn_call& fn)
 {
 
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
  
     if (!fn.nargs) return as_value();
 
@@ -1265,7 +1265,7 @@ as_value
 array_pop(const fn_call& fn)
 {
 
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     const size_t size = arrayLength(*array);
     if (size < 1) return as_value();
@@ -1283,7 +1283,7 @@ array_pop(const fn_call& fn)
 as_value
 array_shift(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     const size_t size = arrayLength(*array);
     // An array with no elements has nothing to return.
@@ -1307,7 +1307,7 @@ array_shift(const fn_call& fn)
 as_value
 array_reverse(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     const size_t size = arrayLength(*array);
     // An array with 0 or 1 elements has nothing to reverse.
@@ -1329,7 +1329,7 @@ array_reverse(const fn_call& fn)
 as_value
 array_join(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     const int version = getSWFVersion(fn);
     const std::string separator =
@@ -1342,7 +1342,7 @@ array_join(const fn_call& fn)
 as_value
 array_toString(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
     return join(array, ",");
 }
 
@@ -1354,7 +1354,7 @@ array_toString(const fn_call& fn)
 as_value
 array_concat(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     Global_as* gl = getGlobal(fn);
     as_object* newarray = gl->createArray();
@@ -1392,7 +1392,7 @@ array_concat(const fn_call& fn)
 as_value
 array_slice(const fn_call& fn)
 {
-    as_object* array = ensureType<as_object>(fn.this_ptr);
+    as_object* array = ensure<ValidThis>(fn);
 
     if (fn.nargs > 2) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1422,7 +1422,7 @@ as_value
 array_new(const fn_call& fn)
 {
 
-    as_object* ao = fn.isInstantiation() ? ensureType<as_object>(fn.this_ptr) :
+    as_object* ao = fn.isInstantiation() ? ensure<ValidThis>(fn) :
                                            getGlobal(fn)->createArray();
 
     ao->setRelay(0);

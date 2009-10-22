@@ -429,18 +429,15 @@ system_resume(const fn_call& /*fn*/)
 as_value
 system_exactsettings(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
     // Getter
-    if (fn.nargs == 0)
-    {
+    if (fn.nargs == 0) {
         // Is always true until we implement it.
         return as_value(true);   
     }
     
     // Setter
-    else 
-    {
+    else {
         LOG_ONCE(log_unimpl ("System.exactSettings") );
         return as_value();
     }
@@ -453,9 +450,6 @@ system_exactsettings(const fn_call& fn)
 as_value
 system_usecodepage(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = 
-        ensureType<as_object>(fn.this_ptr);
-
     // Getter
     if (fn.nargs == 0)
     {

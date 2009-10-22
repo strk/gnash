@@ -92,7 +92,7 @@ attachDropShadowFilterInterface(as_object& o)
 as_value
 dropshadowfilter_distance(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_distance );
     }
@@ -105,7 +105,7 @@ dropshadowfilter_distance(const fn_call& fn)
 as_value
 dropshadowfilter_color(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_color);
     }
@@ -117,7 +117,7 @@ dropshadowfilter_color(const fn_call& fn)
 as_value
 dropshadowfilter_alpha(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_alpha);
     }
@@ -129,7 +129,7 @@ dropshadowfilter_alpha(const fn_call& fn)
 as_value
 dropshadowfilter_angle(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_angle);
     }
@@ -141,7 +141,7 @@ dropshadowfilter_angle(const fn_call& fn)
 as_value
 dropshadowfilter_blurX(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
@@ -153,7 +153,7 @@ dropshadowfilter_blurX(const fn_call& fn)
 as_value
 dropshadowfilter_blurY(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
@@ -165,7 +165,7 @@ dropshadowfilter_blurY(const fn_call& fn)
 as_value
 dropshadowfilter_strength(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
@@ -177,7 +177,7 @@ dropshadowfilter_strength(const fn_call& fn)
 as_value
 dropshadowfilter_quality(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
@@ -189,7 +189,7 @@ dropshadowfilter_quality(const fn_call& fn)
 as_value
 dropshadowfilter_knockout(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
@@ -201,7 +201,7 @@ dropshadowfilter_knockout(const fn_call& fn)
 as_value
 dropshadowfilter_inner(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_inner );
     }
@@ -214,7 +214,7 @@ dropshadowfilter_inner(const fn_call& fn)
 as_value
 dropshadowfilter_hideObject(const fn_call& fn)
 {
-    DropShadowFilter_as* ptr = ensureNativeType<DropShadowFilter_as>(fn.this_ptr);
+    DropShadowFilter_as* ptr = ensure<ThisIsNative<DropShadowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_hideObject );
     }
@@ -226,7 +226,7 @@ dropshadowfilter_hideObject(const fn_call& fn)
 as_value
 dropshadowfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new DropShadowFilter_as);
     return as_value();
 }

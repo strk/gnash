@@ -273,8 +273,7 @@ as_value
 moviecliploader_loadclip(const fn_call& fn)
 {
 
-	boost::intrusive_ptr<MovieClipLoader> ptr =
-        ensureType<MovieClipLoader>(fn.this_ptr);
+    MovieClipLoader* ptr = ensure<ThisIs<MovieClipLoader> >(fn);
   
 	if ( fn.nargs < 2 )
 	{
@@ -346,9 +345,6 @@ as_value
 moviecliploader_getprogress(const fn_call& fn)
 {
 
-	boost::intrusive_ptr<MovieClipLoader> ptr =
-        ensureType<MovieClipLoader>(fn.this_ptr);
-  
 	if ( ! fn.nargs )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

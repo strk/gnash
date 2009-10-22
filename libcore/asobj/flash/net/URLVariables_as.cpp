@@ -88,8 +88,7 @@ getURLVariablesInterface()
 as_value
 urlvariables_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLVariables_as> ptr =
-        ensureType<URLVariables_as>(fn.this_ptr);
+    URLVariables_as* ptr = ensure<ThisIs<URLVariables_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

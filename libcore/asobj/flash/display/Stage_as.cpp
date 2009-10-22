@@ -120,8 +120,6 @@ as_value
 stage_scalemode(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
-
     movie_root& m = getRoot(fn);
 
 	if ( fn.nargs == 0 ) // getter
@@ -151,7 +149,6 @@ stage_scalemode(const fn_call& fn)
 as_value
 stage_width(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
 	if ( fn.nargs > 0 ) // setter
 	{
@@ -169,7 +166,6 @@ stage_width(const fn_call& fn)
 as_value
 stage_height(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
 	if ( fn.nargs > 0 ) // setter
 	{
@@ -190,8 +186,6 @@ stage_height(const fn_call& fn)
 as_value
 stage_align(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr); 
- 
     movie_root& m = getRoot(fn);
     
 	if ( fn.nargs == 0 ) // getter
@@ -213,7 +207,6 @@ stage_align(const fn_call& fn)
 as_value
 stage_showMenu(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
     movie_root& m = getRoot(fn);
 
@@ -233,7 +226,6 @@ stage_showMenu(const fn_call& fn)
 as_value
 stage_displaystate(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
     movie_root& m = getRoot(fn);
 

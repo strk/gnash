@@ -118,8 +118,7 @@ getDisplayObjectInterface()
 as_value
 displayobject_getRect(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -128,8 +127,7 @@ displayobject_getRect(const fn_call& fn)
 as_value
 displayobject_globalToLocal(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -138,8 +136,7 @@ displayobject_globalToLocal(const fn_call& fn)
 as_value
 displayobject_hitTestObject(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -148,8 +145,7 @@ displayobject_hitTestObject(const fn_call& fn)
 as_value
 displayobject_hitTestPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -158,8 +154,7 @@ displayobject_hitTestPoint(const fn_call& fn)
 as_value
 displayobject_localToGlobal(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -168,8 +163,7 @@ displayobject_localToGlobal(const fn_call& fn)
 as_value
 displayobject_added(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -178,8 +172,7 @@ displayobject_added(const fn_call& fn)
 as_value
 displayobject_addedToStage(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -188,8 +181,7 @@ displayobject_addedToStage(const fn_call& fn)
 as_value
 displayobject_enterFrame(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -198,8 +190,7 @@ displayobject_enterFrame(const fn_call& fn)
 as_value
 displayobject_removed(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -208,8 +199,7 @@ displayobject_removed(const fn_call& fn)
 as_value
 displayobject_removedFromStage(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -218,8 +208,7 @@ displayobject_removedFromStage(const fn_call& fn)
 as_value
 displayobject_render(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject_as> ptr =
-        ensureType<DisplayObject_as>(fn.this_ptr);
+    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

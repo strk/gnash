@@ -103,8 +103,7 @@ getStyleSheetInterface()
 as_value
 stylesheet_getStyle(const fn_call& fn)
 {
-    boost::intrusive_ptr<StyleSheet_as> ptr =
-        ensureType<StyleSheet_as>(fn.this_ptr);
+    StyleSheet_as* ptr = ensure<ThisIs<StyleSheet_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -113,8 +112,7 @@ stylesheet_getStyle(const fn_call& fn)
 as_value
 stylesheet_parseCSS(const fn_call& fn)
 {
-    boost::intrusive_ptr<StyleSheet_as> ptr =
-        ensureType<StyleSheet_as>(fn.this_ptr);
+    StyleSheet_as* ptr = ensure<ThisIs<StyleSheet_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -123,8 +121,7 @@ stylesheet_parseCSS(const fn_call& fn)
 as_value
 stylesheet_setStyle(const fn_call& fn)
 {
-    boost::intrusive_ptr<StyleSheet_as> ptr =
-        ensureType<StyleSheet_as>(fn.this_ptr);
+    StyleSheet_as* ptr = ensure<ThisIs<StyleSheet_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -133,8 +130,7 @@ stylesheet_setStyle(const fn_call& fn)
 as_value
 stylesheet_transform(const fn_call& fn)
 {
-    boost::intrusive_ptr<StyleSheet_as> ptr =
-        ensureType<StyleSheet_as>(fn.this_ptr);
+    StyleSheet_as* ptr = ensure<ThisIs<StyleSheet_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

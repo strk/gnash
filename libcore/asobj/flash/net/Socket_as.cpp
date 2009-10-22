@@ -160,8 +160,7 @@ getSocketInterface()
 as_value
 socket_connect(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -170,8 +169,7 @@ socket_connect(const fn_call& fn)
 as_value
 socket_flush(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -180,8 +178,7 @@ socket_flush(const fn_call& fn)
 as_value
 socket_readBoolean(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -190,8 +187,7 @@ socket_readBoolean(const fn_call& fn)
 as_value
 socket_readByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -200,8 +196,7 @@ socket_readByte(const fn_call& fn)
 as_value
 socket_readBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -210,8 +205,7 @@ socket_readBytes(const fn_call& fn)
 as_value
 socket_readDouble(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -220,8 +214,7 @@ socket_readDouble(const fn_call& fn)
 as_value
 socket_readFloat(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -230,8 +223,7 @@ socket_readFloat(const fn_call& fn)
 as_value
 socket_readInt(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -240,8 +232,7 @@ socket_readInt(const fn_call& fn)
 as_value
 socket_readMultiByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -250,8 +241,7 @@ socket_readMultiByte(const fn_call& fn)
 as_value
 socket_readObject(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -260,8 +250,7 @@ socket_readObject(const fn_call& fn)
 as_value
 socket_readShort(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -270,8 +259,7 @@ socket_readShort(const fn_call& fn)
 as_value
 socket_readUnsignedByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -280,8 +268,7 @@ socket_readUnsignedByte(const fn_call& fn)
 as_value
 socket_readUnsignedInt(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -290,8 +277,7 @@ socket_readUnsignedInt(const fn_call& fn)
 as_value
 socket_readUnsignedShort(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -300,8 +286,7 @@ socket_readUnsignedShort(const fn_call& fn)
 as_value
 socket_readUTF(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -310,8 +295,7 @@ socket_readUTF(const fn_call& fn)
 as_value
 socket_readUTFBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -320,8 +304,7 @@ socket_readUTFBytes(const fn_call& fn)
 as_value
 socket_writeBoolean(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -330,8 +313,7 @@ socket_writeBoolean(const fn_call& fn)
 as_value
 socket_writeByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -340,8 +322,7 @@ socket_writeByte(const fn_call& fn)
 as_value
 socket_writeBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -350,8 +331,7 @@ socket_writeBytes(const fn_call& fn)
 as_value
 socket_writeDouble(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -360,8 +340,7 @@ socket_writeDouble(const fn_call& fn)
 as_value
 socket_writeFloat(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -370,8 +349,7 @@ socket_writeFloat(const fn_call& fn)
 as_value
 socket_writeInt(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -380,8 +358,7 @@ socket_writeInt(const fn_call& fn)
 as_value
 socket_writeMultiByte(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -390,8 +367,7 @@ socket_writeMultiByte(const fn_call& fn)
 as_value
 socket_writeObject(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -400,8 +376,7 @@ socket_writeObject(const fn_call& fn)
 as_value
 socket_writeShort(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -410,8 +385,7 @@ socket_writeShort(const fn_call& fn)
 as_value
 socket_writeUnsignedInt(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -420,8 +394,7 @@ socket_writeUnsignedInt(const fn_call& fn)
 as_value
 socket_writeUTF(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -430,8 +403,7 @@ socket_writeUTF(const fn_call& fn)
 as_value
 socket_writeUTFBytes(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -440,8 +412,7 @@ socket_writeUTFBytes(const fn_call& fn)
 as_value
 socket_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -450,8 +421,7 @@ socket_close(const fn_call& fn)
 as_value
 socket_ioError(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -460,8 +430,7 @@ socket_ioError(const fn_call& fn)
 as_value
 socket_securityError(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -470,8 +439,7 @@ socket_securityError(const fn_call& fn)
 as_value
 socket_socketData(const fn_call& fn)
 {
-    boost::intrusive_ptr<Socket_as> ptr =
-        ensureType<Socket_as>(fn.this_ptr);
+    Socket_as* ptr = ensure<ThisIs<Socket_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

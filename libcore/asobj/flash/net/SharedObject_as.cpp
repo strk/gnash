@@ -820,8 +820,7 @@ getSharedObjectInterface()
 as_value
 sharedobject_clear(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj = 
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
     UNUSED(obj);
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
@@ -832,8 +831,7 @@ sharedobject_clear(const fn_call& fn)
 as_value
 sharedobject_setdirty(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj = 
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
     UNUSED(obj);
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
@@ -845,8 +843,7 @@ as_value
 sharedobject_setproperty(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;    
-    boost::intrusive_ptr<SharedObject_as> obj = 
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
     UNUSED(obj);
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
@@ -859,8 +856,7 @@ sharedobject_connect(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;    
 
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -915,8 +911,7 @@ sharedobject_connect(const fn_call& fn)
 as_value
 sharedobject_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
 
     obj->close();
 
@@ -926,8 +921,7 @@ sharedobject_close(const fn_call& fn)
 as_value
 sharedobject_setFps(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.setFps"));
@@ -939,8 +933,7 @@ sharedobject_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
 
     if (obj->isConnected() == false) {
 	obj->connectToServer(obj->getURI());
@@ -954,8 +947,7 @@ sharedobject_flush(const fn_call& fn)
 {    
     GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
 
     IF_VERBOSE_ASCODING_ERRORS(
         if (fn.nargs > 1)
@@ -1073,8 +1065,7 @@ sharedobject_getRemote(const fn_call& fn)
 as_value
 sharedobject_deleteAll(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
 
     UNUSED(obj);
 
@@ -1089,8 +1080,7 @@ as_value
 sharedobject_getDiskUsage(const fn_call& fn)
 {
  //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
 
     UNUSED(obj);
 
@@ -1103,16 +1093,14 @@ as_value
 sharedobject_data(const fn_call& fn)
 { 
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
     return as_value(obj->data());
 }
 
 as_value
 sharedobject_getsize(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject_as> obj =
-        ensureType<SharedObject_as>(fn.this_ptr);
+    SharedObject_as* obj = ensure<ThisIs<SharedObject_as> >(fn);
     return as_value(obj->size());
 }
 

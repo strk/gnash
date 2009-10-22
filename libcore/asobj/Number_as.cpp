@@ -64,7 +64,7 @@ number_toString(const fn_call& fn)
 {
     // Number.toString must only work for number object, not generic ones.
     // This is so trace(Number.prototype) doesn't return 0 ...
-    Number_as* obj = ensureNativeType<Number_as>(fn.this_ptr);
+    Number_as* obj = ensure<ThisIsNative<Number_as> >(fn);
 
     double val = obj->value();
     unsigned radix = 10;
@@ -91,7 +91,7 @@ number_valueOf(const fn_call& fn)
 {
     // Number.valueOf must only work for number object, not generic ones.
     // This is so trace(Number.prototype == Object) return true in swf5 ?
-    Number_as* obj = ensureNativeType<Number_as>(fn.this_ptr);
+    Number_as* obj = ensure<ThisIsNative<Number_as> >(fn);
 
     return obj->value();
 }

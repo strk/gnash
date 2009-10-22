@@ -111,8 +111,7 @@ getURLLoaderInterface()
 as_value
 urlloader_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -121,8 +120,7 @@ urlloader_close(const fn_call& fn)
 as_value
 urlloader_load(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -131,8 +129,7 @@ urlloader_load(const fn_call& fn)
 as_value
 urlloader_complete(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -141,8 +138,7 @@ urlloader_complete(const fn_call& fn)
 as_value
 urlloader_httpStatus(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -151,8 +147,7 @@ urlloader_httpStatus(const fn_call& fn)
 as_value
 urlloader_ioError(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -161,8 +156,7 @@ urlloader_ioError(const fn_call& fn)
 as_value
 urlloader_open(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -171,8 +165,7 @@ urlloader_open(const fn_call& fn)
 as_value
 urlloader_progress(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -181,8 +174,7 @@ urlloader_progress(const fn_call& fn)
 as_value
 urlloader_securityError(const fn_call& fn)
 {
-    boost::intrusive_ptr<URLLoader_as> ptr =
-        ensureType<URLLoader_as>(fn.this_ptr);
+    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

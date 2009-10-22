@@ -121,8 +121,7 @@ getGraphicsInterface()
 as_value
 graphics_beginFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -131,8 +130,7 @@ graphics_beginFill(const fn_call& fn)
 as_value
 graphics_beginGradientFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -141,8 +139,7 @@ graphics_beginGradientFill(const fn_call& fn)
 as_value
 graphics_clear(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -151,8 +148,7 @@ graphics_clear(const fn_call& fn)
 as_value
 graphics_curveTo(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -161,8 +157,7 @@ graphics_curveTo(const fn_call& fn)
 as_value
 graphics_drawCircle(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -171,8 +166,7 @@ graphics_drawCircle(const fn_call& fn)
 as_value
 graphics_drawEllipse(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -181,8 +175,7 @@ graphics_drawEllipse(const fn_call& fn)
 as_value
 graphics_drawRect(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -191,8 +184,7 @@ graphics_drawRect(const fn_call& fn)
 as_value
 graphics_drawRoundRect(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -201,8 +193,7 @@ graphics_drawRoundRect(const fn_call& fn)
 as_value
 graphics_endFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -211,8 +202,7 @@ graphics_endFill(const fn_call& fn)
 as_value
 graphics_lineGradientStyle(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -221,8 +211,7 @@ graphics_lineGradientStyle(const fn_call& fn)
 as_value
 graphics_lineStyle(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -231,8 +220,7 @@ graphics_lineStyle(const fn_call& fn)
 as_value
 graphics_lineTo(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -241,8 +229,7 @@ graphics_lineTo(const fn_call& fn)
 as_value
 graphics_moveTo(const fn_call& fn)
 {
-    boost::intrusive_ptr<Graphics_as> ptr =
-        ensureType<Graphics_as>(fn.this_ptr);
+    Graphics_as* ptr = ensure<ThisIs<Graphics_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

@@ -131,7 +131,7 @@ getBitmapFilterConstructor(const fn_call& fn)
 as_value
 bitmapfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new BitmapFilter_as);
     return as_value();
 }
@@ -140,7 +140,7 @@ bitmapfilter_new(const fn_call& fn)
 as_value
 bitmapfilter_clone(const fn_call& fn)
 {
-    BitmapFilter_as* relay = ensureNativeType<BitmapFilter_as>(fn.this_ptr);
+    BitmapFilter_as* relay = ensure<ThisIsNative<BitmapFilter_as> >(fn);
     UNUSED(relay);
     return as_value();
 }

@@ -1220,7 +1220,7 @@ global_updateAfterEvent(const fn_call& /*fn*/)
 as_value
 local_errorConstructor(const fn_call& fn)
 {
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* obj = ensure<ValidThis>(fn);
     const as_value& arg = fn.nargs ? fn.arg(0) : as_value();
     string_table& st = getStringTable(fn);
     obj->set_member(st.find("message"), arg);

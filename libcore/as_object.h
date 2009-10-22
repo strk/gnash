@@ -984,12 +984,14 @@ public:
         return _relay.get();
     }
 
+    /// Return true if this object should be treated as an array.
     bool array() const {
         return _array;
     }
 
-    void setArray() {
-        _array = true;
+    /// Set whether this object should be treated as an array.
+    void setArray(bool array = true) {
+        _array = array;
     }
 
     /// Return true if this is a DisplayObject.
@@ -1199,33 +1201,6 @@ getNamespace(const ObjectURI& o)
     return o.ns;
 }
 
-
-/// Template which does a dynamic cast for as_object pointers.
-//
-/// It throws an exception if the dynamic cast fails.
-///
-/// @tparam T the class to which the obj pointer should be cast.
-/// @param obj the pointer to be cast.
-/// @return If the cast succeeds, the pointer cast to the requested type.
-template <typename T>
-T*
-ensureType(as_object* obj)
-{
-    T* ret = dynamic_cast<T*>(obj);
-
-    if (!ret) {
-        std::string target = typeName(ret);
-        std::string source = typeName(obj);
-
-        std::string msg = "builtin method or gettersetter for " +
-            target + " called from " + source + " instance.";
-
-        throw ActionTypeError(msg);
-    }
-    return ret;
-}
-
-
 /// Check whether the object is an instance of a known type.
 //
 /// This is used to check the type of certain objects when it can't be
@@ -1253,35 +1228,6 @@ isNativeType(as_object* obj, T*& relay)
 /// @param obj      The object whose DisplayObject part should be returned
 /// @return         The DisplayObject if the object is one, otherwise 0.
 DisplayObject* getDisplayObject(as_object* obj);
-
-/// Ensure that the object is of a particular native type.
-//
-/// This checks that the object's relay member is the expected type.
-/// If not, the function throws an exception, which results in an undefined
-/// value being returned from the AS function.
-/// @tparam T   The expected native type.
-/// @param obj  The object whose type should be tested.
-/// @return     If the cast succeeds, the pointer cast to the requested type,
-///             otherwise the function does not return.
-template<typename T>
-T*
-ensureNativeType(as_object* obj)
-{
-    if (!obj) throw ActionTypeError();
-
-    T* ret = dynamic_cast<T*>(obj->relay());
-
-    if (!ret) {
-        std::string target = typeName(ret);
-        std::string source = typeName(obj);
-
-        std::string msg = "Function for " + target + "object called from "
-            + source + " instance.";
-
-        throw ActionTypeError(msg);
-    }
-    return ret;
-}
 
 /// Get the VM from an as_object
 VM& getVM(const as_object& o);

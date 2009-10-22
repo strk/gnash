@@ -834,7 +834,7 @@ sound_start(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- start sound"));
     )
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
     int loop = 0;
     double secondOffset = 0;
 
@@ -859,7 +859,7 @@ sound_stop(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- stop sound "));
     )
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
     int si = -1;
 
@@ -912,7 +912,7 @@ sound_attachsound(const fn_call& fn)
         return as_value();
     }
 
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
     const std::string& name = fn.arg(0).to_string();
     if (name.empty()) {
@@ -960,7 +960,7 @@ sound_attachsound(const fn_call& fn)
 as_value
 sound_getbytesloaded(const fn_call& fn)
 {
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
     long loaded = so->getBytesLoaded();
     if (loaded < 0) return as_value();
     return as_value(loaded);
@@ -969,7 +969,7 @@ sound_getbytesloaded(const fn_call& fn)
 as_value
 sound_getbytestotal(const fn_call& fn)
 {
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
     long total = so->getBytesTotal();
     if (total < 0) return as_value();
     return as_value(total);
@@ -1021,7 +1021,7 @@ as_value
 sound_getvolume(const fn_call& fn)
 {
 
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
     if ( fn.nargs )
     {
@@ -1039,7 +1039,7 @@ sound_getvolume(const fn_call& fn)
 as_value
 sound_loadsound(const fn_call& fn)
 {
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
     if (!fn.nargs)
     {
@@ -1096,7 +1096,7 @@ sound_setvolume(const fn_call& fn)
         return as_value();
     }
 
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);    
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
     int volume = (int) fn.arg(0).to_number();
 
     so->setVolume(volume);
@@ -1106,7 +1106,7 @@ sound_setvolume(const fn_call& fn)
 as_value
 sound_duration(const fn_call& fn)
 {
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
     return as_value(so->getDuration());
 }
 
@@ -1133,7 +1133,7 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
 as_value
 sound_position(const fn_call& fn)
 {
-    Sound_as* so = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
     return as_value(so->getPosition());
 }
@@ -1142,7 +1142,7 @@ sound_position(const fn_call& fn)
 as_value
 sound_load(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1151,7 +1151,7 @@ sound_load(const fn_call& fn)
 as_value
 sound_play(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1160,7 +1160,7 @@ sound_play(const fn_call& fn)
 as_value
 sound_complete(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1169,7 +1169,7 @@ sound_complete(const fn_call& fn)
 as_value
 sound_id3(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1178,7 +1178,7 @@ sound_id3(const fn_call& fn)
 as_value
 sound_ioError(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1187,7 +1187,7 @@ sound_ioError(const fn_call& fn)
 as_value
 sound_open(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -1196,7 +1196,7 @@ sound_open(const fn_call& fn)
 as_value
 sound_progress(const fn_call& fn)
 {
-    Sound_as* ptr = ensureNativeType<Sound_as>(fn.this_ptr);
+    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

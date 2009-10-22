@@ -501,7 +501,7 @@ attachTextSnapshotInterface(as_object& o)
 as_value
 textsnapshot_getTextRunInfo(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
     
     if (!ts->valid()) return as_value();
 
@@ -523,7 +523,7 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
 as_value
 textsnapshot_findText(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
     
     if (!ts->valid()) return as_value();
 
@@ -547,7 +547,7 @@ textsnapshot_findText(const fn_call& fn)
 as_value
 textsnapshot_getCount(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
     
     if (!ts->valid()) return as_value();
 
@@ -565,7 +565,7 @@ textsnapshot_getCount(const fn_call& fn)
 as_value
 textsnapshot_getSelected(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
 
     if (!ts->valid()) return as_value();
 
@@ -583,7 +583,7 @@ textsnapshot_getSelected(const fn_call& fn)
 as_value
 textsnapshot_getSelectedText(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
 
     if (!ts->valid()) return as_value();
 
@@ -600,7 +600,7 @@ textsnapshot_getSelectedText(const fn_call& fn)
 as_value
 textsnapshot_getText(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
 
     if (!ts->valid()) return as_value();
     
@@ -626,7 +626,7 @@ textsnapshot_getText(const fn_call& fn)
 as_value
 textsnapshot_hitTestTextNearPos(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
 
     if (!ts->valid()) return as_value();
 
@@ -639,7 +639,7 @@ as_value
 textsnapshot_setSelectColor(const fn_call& fn)
 {
 
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
     UNUSED(ts);
 
     log_unimpl (__FUNCTION__);
@@ -651,7 +651,7 @@ textsnapshot_setSelectColor(const fn_call& fn)
 as_value
 textsnapshot_setSelected(const fn_call& fn)
 {
-    TextSnapshot_as* ts = ensureNativeType<TextSnapshot_as>(fn.this_ptr);
+    TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
 
     if (fn.nargs < 2 || fn.nargs > 3) {
         return as_value();
@@ -670,7 +670,7 @@ textsnapshot_setSelected(const fn_call& fn)
 as_value
 textsnapshot_ctor(const fn_call& fn)
 {
-    as_object* ptr = ensureType<as_object>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
 

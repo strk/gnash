@@ -109,8 +109,7 @@ getLoaderInfoInterface()
 as_value
 loaderinfo_complete(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -119,8 +118,7 @@ loaderinfo_complete(const fn_call& fn)
 as_value
 loaderinfo_httpStatus(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -129,8 +127,7 @@ loaderinfo_httpStatus(const fn_call& fn)
 as_value
 loaderinfo_init(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -139,8 +136,7 @@ loaderinfo_init(const fn_call& fn)
 as_value
 loaderinfo_ioError(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -149,8 +145,7 @@ loaderinfo_ioError(const fn_call& fn)
 as_value
 loaderinfo_open(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -159,8 +154,7 @@ loaderinfo_open(const fn_call& fn)
 as_value
 loaderinfo_progress(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -169,8 +163,7 @@ loaderinfo_progress(const fn_call& fn)
 as_value
 loaderinfo_unload(const fn_call& fn)
 {
-    boost::intrusive_ptr<LoaderInfo_as> ptr =
-        ensureType<LoaderInfo_as>(fn.this_ptr);
+    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

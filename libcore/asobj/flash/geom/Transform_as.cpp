@@ -116,7 +116,7 @@ transform_colorTransform(const fn_call& fn)
 
     const double factor = 256.0;
 
-    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
 
     if (!fn.nargs) {
 
@@ -201,7 +201,7 @@ transform_colorTransform(const fn_call& fn)
 as_value
 transform_concatenatedColorTransform(const fn_call& fn)
 {
-    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
     UNUSED(relay);
     LOG_ONCE(log_unimpl (__FUNCTION__));
     return as_value();
@@ -210,7 +210,7 @@ transform_concatenatedColorTransform(const fn_call& fn)
 as_value
 transform_concatenatedMatrix(const fn_call& fn)
 {
-    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
     UNUSED(relay);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -227,7 +227,7 @@ transform_matrix(const fn_call& fn)
     // would that work?)?
     // This should work by passing a new matrix, in which case we should just
     // set our _movieClip's matrix from the AS matrix.
-    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
 
     if (!fn.nargs)
     {
@@ -310,7 +310,7 @@ transform_matrix(const fn_call& fn)
 as_value
 transform_pixelBounds(const fn_call& fn)
 {
-    Transform_as* relay = ensureNativeType<Transform_as>(fn.this_ptr);
+    Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
     UNUSED(relay);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -321,6 +321,7 @@ transform_pixelBounds(const fn_call& fn)
 as_value
 transform_ctor(const fn_call& fn)
 {
+    as_object* obj = ensure<ValidThis>(fn);
 
     if (!fn.nargs) {
 
@@ -342,10 +343,11 @@ transform_ctor(const fn_call& fn)
     }
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
-    boost::intrusive_ptr<MovieClip> mc =
-        ensureType<MovieClip>(fn.arg(0).to_object(*getGlobal(fn)));
+    if (!fn.arg(0).is_object()) return as_value();
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    MovieClip* mc = fn.arg(0).to_object(*getGlobal(fn))->to_movie();
+    if (!mc) return as_value();
+
     obj->setRelay(new Transform_as(*mc));
 
     return as_value(); 

@@ -93,7 +93,7 @@ attachGradientGlowFilterInterface(as_object& o)
 as_value
 gradientglowfilter_distance(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_distance );
     }
@@ -106,7 +106,7 @@ gradientglowfilter_distance(const fn_call& fn)
 as_value
 gradientglowfilter_angle(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_angle);
     }
@@ -118,7 +118,7 @@ gradientglowfilter_angle(const fn_call& fn)
 as_value
 gradientglowfilter_colors(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
 
     UNUSED(ptr);
     return as_value();
@@ -127,7 +127,7 @@ gradientglowfilter_colors(const fn_call& fn)
 as_value
 gradientglowfilter_alphas(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     UNUSED(ptr);
     return as_value();
 }
@@ -135,7 +135,7 @@ gradientglowfilter_alphas(const fn_call& fn)
 as_value
 gradientglowfilter_ratios(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     UNUSED(ptr);
     return as_value();
 }
@@ -143,7 +143,7 @@ gradientglowfilter_ratios(const fn_call& fn)
 as_value
 gradientglowfilter_blurX(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
@@ -155,7 +155,7 @@ gradientglowfilter_blurX(const fn_call& fn)
 as_value
 gradientglowfilter_blurY(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
@@ -167,7 +167,7 @@ gradientglowfilter_blurY(const fn_call& fn)
 as_value
 gradientglowfilter_strength(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
@@ -179,7 +179,7 @@ gradientglowfilter_strength(const fn_call& fn)
 as_value
 gradientglowfilter_quality(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
@@ -191,7 +191,7 @@ gradientglowfilter_quality(const fn_call& fn)
 as_value
 gradientglowfilter_knockout(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
@@ -203,7 +203,7 @@ gradientglowfilter_knockout(const fn_call& fn)
 as_value
 gradientglowfilter_type(const fn_call& fn)
 {
-    GradientGlowFilter_as* ptr = ensureNativeType<GradientGlowFilter_as>(fn.this_ptr);
+    GradientGlowFilter_as* ptr = ensure<ThisIsNative<GradientGlowFilter_as> >(fn);
 
     if (fn.nargs == 0)
     {
@@ -247,7 +247,7 @@ gradientglowfilter_type(const fn_call& fn)
 as_value
 gradientglowfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
     obj->setRelay(new GradientGlowFilter_as);
     return as_value();
 }

@@ -138,12 +138,12 @@ getMicrophoneInterface()
 }
 
 #ifdef USE_GST
-class microphone_as_object: public as_object, public media::gst::AudioInputGst
+class Microphone_as: public as_object, public media::gst::AudioInputGst
 {
 
 public:
 
-	microphone_as_object()
+	Microphone_as()
 		:
 		as_object(getMicrophoneInterface())
 	{
@@ -156,12 +156,12 @@ public:
 // FIXME: this should be USE_FFMPEG, but Microphone has no ffmpeg
 // support yet.
 #ifndef USE_GST
-class microphone_as_object: public as_object, public media::AudioInput
+class Microphone_as: public as_object, public media::AudioInput
 {
 
 public:
 
-	microphone_as_object()
+	Microphone_as()
 		:
 		as_object(getMicrophoneInterface())
 	{
@@ -184,11 +184,11 @@ as_value
 microphone_get(const fn_call& /*fn*/)
 {
     static size_t newcount = 0;
-    static boost::intrusive_ptr<microphone_as_object> permaMicPtr;
-    boost::intrusive_ptr<microphone_as_object> ptr;
+    static boost::intrusive_ptr<Microphone_as> permaMicPtr;
+    boost::intrusive_ptr<Microphone_as> ptr;
     if (newcount == 0) {
         log_debug("creating a new microphone_as object");
-        ptr = new microphone_as_object;
+        ptr = new Microphone_as;
         newcount++;
         permaMicPtr = ptr;
         return as_value(ptr);
@@ -201,21 +201,19 @@ microphone_get(const fn_call& /*fn*/)
 as_value
 microphone_getMicrophone(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr
-        = ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     int numargs = fn.nargs;
     if (numargs > 0) {
         log_debug("%s: the mic is automatically chosen from gnashrc", __FUNCTION__);
     }
-    return as_value(ptr.get()); //will keep alive
+    return as_value(ptr); 
 }
 
 
 as_value 
 microphone_setgain(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     int numargs = fn.nargs;
     if (numargs != 1) {
@@ -264,8 +262,7 @@ microphone_setgain(const fn_call& fn)
 as_value
 microphone_setrate(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     int numargs = fn.nargs;
     const int32_t argument = fn.arg(0).to_int();
@@ -306,8 +303,7 @@ microphone_setrate(const fn_call& fn)
 as_value
 microphone_activityLevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -327,8 +323,7 @@ microphone_activityLevel(const fn_call& fn)
 as_value
 microphone_gain(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -341,7 +336,10 @@ microphone_gain(const fn_call& fn)
         gain = round(gain);
         return as_value(gain);
     }
+#else
+    UNUSED(ptr);
 #endif
+
         log_unimpl("FFMPEG not implemented. Returning a number");
         return as_value(50.0);
     }
@@ -358,8 +356,7 @@ microphone_gain(const fn_call& fn)
 as_value
 microphone_index(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     if ( fn.nargs == 0 ) // getter
     {
@@ -378,8 +375,7 @@ microphone_index(const fn_call& fn)
 as_value
 microphone_muted(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     if ( fn.nargs == 0 ) // getter
     {
@@ -399,8 +395,7 @@ microphone_muted(const fn_call& fn)
 as_value
 microphone_name(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -450,14 +445,14 @@ microphone_names(const fn_call& fn)
 as_value
 microphone_rate(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     if ( fn.nargs == 0 ) // getter
     {
 #ifdef USE_GST
         return as_value(ptr->get_rate()/1000);
 #else
+        UNUSED(ptr);
         log_unimpl("FFMPEG is unsupported, returning default val");
         return as_value(8);
 #endif
@@ -475,8 +470,7 @@ microphone_rate(const fn_call& fn)
 as_value
 microphone_silenceLevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -496,8 +490,7 @@ microphone_silenceLevel(const fn_call& fn)
 as_value
 microphone_silenceTimeout(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
     if ( fn.nargs == 0 ) // getter
     {
@@ -517,8 +510,7 @@ microphone_silenceTimeout(const fn_call& fn)
 as_value
 microphone_useEchoSuppression(const fn_call& fn)
 {
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     if ( fn.nargs == 0 ) // getter
     {
@@ -543,8 +535,7 @@ microphone_setsilencelevel(const fn_call& fn)
     log_unimpl ("Microphone::setSilenceLevel can be set, but it's not "
             "implemented");
 
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     int numargs = fn.nargs;
     if (numargs > 2) {
@@ -593,8 +584,7 @@ microphone_setuseechosuppression(const fn_call& fn)
 {
     log_unimpl ("Microphone::setUseEchoSuppression can be set, but it's not "
             "implemented");
-    boost::intrusive_ptr<microphone_as_object> ptr =
-        ensureType<microphone_as_object> (fn.this_ptr);
+    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
     int numargs = fn.nargs;
     if (numargs > 1) {

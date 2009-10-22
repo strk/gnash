@@ -88,8 +88,7 @@ getSoundChannelInterface()
 as_value
 soundchannel_soundComplete(const fn_call& fn)
 {
-    boost::intrusive_ptr<SoundChannel_as> ptr =
-        ensureType<SoundChannel_as>(fn.this_ptr);
+    SoundChannel_as* ptr = ensure<ThisIs<SoundChannel_as> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

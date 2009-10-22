@@ -176,7 +176,7 @@ as_value
 textformat_new(const fn_call& fn)
 {
 
-    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* obj = ensure<ValidThis>(fn);
 
     std::auto_ptr<TextFormat_as> tf(new TextFormat_as);
 
@@ -240,7 +240,7 @@ textformat_new(const fn_call& fn)
 as_value
 textformat_display(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -262,7 +262,7 @@ textformat_display(const fn_call& fn)
 as_value
 textformat_bullet(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -294,7 +294,7 @@ private:
 as_value
 textformat_tabStops(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 	
     if (!fn.nargs) {
 		LOG_ONCE( log_unimpl("Getter for textformat_tabStops") );
@@ -319,7 +319,7 @@ textformat_tabStops(const fn_call& fn)
 as_value
 textformat_blockIndent(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -341,7 +341,7 @@ textformat_blockIndent(const fn_call& fn)
 as_value
 textformat_leading(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -361,7 +361,7 @@ textformat_leading(const fn_call& fn)
 as_value
 textformat_indent(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -381,7 +381,7 @@ textformat_indent(const fn_call& fn)
 as_value
 textformat_rightMargin(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -401,7 +401,7 @@ textformat_rightMargin(const fn_call& fn)
 as_value
 textformat_leftMargin(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -423,7 +423,7 @@ textformat_leftMargin(const fn_call& fn)
 as_value
 textformat_align(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -445,7 +445,7 @@ textformat_align(const fn_call& fn)
 as_value
 textformat_underline(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -465,7 +465,7 @@ textformat_underline(const fn_call& fn)
 as_value
 textformat_italic(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -485,7 +485,7 @@ textformat_italic(const fn_call& fn)
 as_value
 textformat_bold(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -505,7 +505,7 @@ textformat_bold(const fn_call& fn)
 as_value
 textformat_target(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -525,7 +525,7 @@ textformat_target(const fn_call& fn)
 as_value
 textformat_url(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -545,7 +545,7 @@ textformat_url(const fn_call& fn)
 as_value
 textformat_color(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -567,7 +567,7 @@ textformat_color(const fn_call& fn)
 as_value
 textformat_size(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -587,7 +587,7 @@ textformat_size(const fn_call& fn)
 as_value
 textformat_font(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
@@ -608,7 +608,7 @@ textformat_font(const fn_call& fn)
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
-    TextFormat_as* relay = ensureNativeType<TextFormat_as>(fn.this_ptr);
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
     UNUSED(relay);
 	LOG_ONCE( log_unimpl("TextFormat.getTextExtent") );
 	return as_value();

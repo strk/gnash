@@ -134,10 +134,8 @@ Keyboard_as::get_last_key() const
 as_value
 key_is_accessible(const fn_call& fn)
 {
-
-    boost::intrusive_ptr<Keyboard_as> ko = 
-        ensureType<Keyboard_as>(fn.this_ptr);
-
+    Keyboard_as* ptr = ensure<ThisIs<Keyboard_as> >(fn);
+    UNUSED(ptr);
     log_unimpl("Key.isAccessible");
     return as_value();
 }
@@ -147,8 +145,7 @@ key_is_accessible(const fn_call& fn)
 as_value   
 key_get_ascii(const fn_call& fn)
 {
-    boost::intrusive_ptr<Keyboard_as> ko = 
-        ensureType<Keyboard_as>(fn.this_ptr);
+    Keyboard_as* ko = ensure<ThisIs<Keyboard_as> >(fn);
 
     int code = ko->get_last_key();
 
@@ -159,8 +156,7 @@ key_get_ascii(const fn_call& fn)
 as_value   
 key_get_code(const fn_call& fn)
 {
-    boost::intrusive_ptr<Keyboard_as> ko = 
-        ensureType<Keyboard_as>(fn.this_ptr);
+    Keyboard_as* ko = ensure<ThisIs<Keyboard_as> >(fn);
 
     int code = ko->get_last_key();
 
@@ -171,8 +167,7 @@ key_get_code(const fn_call& fn)
 as_value   
 key_is_down(const fn_call& fn)
 {
-    boost::intrusive_ptr<Keyboard_as> ko = 
-        ensureType<Keyboard_as>(fn.this_ptr);
+    Keyboard_as* ko = ensure<ThisIs<Keyboard_as> >(fn);
 
     if (fn.nargs < 1)
     {

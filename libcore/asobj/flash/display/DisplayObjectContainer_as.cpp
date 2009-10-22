@@ -125,8 +125,7 @@ attachDisplayObjectContainerInterface(as_object& o)
 as_value
 displayobjectcontainer_addChild(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
 
     as_value ret;
 
@@ -171,8 +170,7 @@ displayobjectcontainer_addChild(const fn_call& fn)
 as_value
 displayobjectcontainer_addChildAt(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
 
     as_value ret;
 
@@ -223,8 +221,7 @@ displayobjectcontainer_addChildAt(const fn_call& fn)
 as_value
 displayobjectcontainer_areInaccessibleObjectsUnderPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -233,8 +230,7 @@ displayobjectcontainer_areInaccessibleObjectsUnderPoint(const fn_call& fn)
 as_value
 displayobjectcontainer_contains(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -243,8 +239,7 @@ displayobjectcontainer_contains(const fn_call& fn)
 as_value
 displayobjectcontainer_getChildAt(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -253,8 +248,7 @@ displayobjectcontainer_getChildAt(const fn_call& fn)
 as_value
 displayobjectcontainer_getChildByName(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -263,16 +257,14 @@ displayobjectcontainer_getChildByName(const fn_call& fn)
 as_value
 displayobjectcontainer_numChildren(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     return as_value(ptr->numChildren());
 }
 
 as_value
 displayobjectcontainer_getChildIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -281,8 +273,7 @@ displayobjectcontainer_getChildIndex(const fn_call& fn)
 as_value
 displayobjectcontainer_getObjectsUnderPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -291,8 +282,7 @@ displayobjectcontainer_getObjectsUnderPoint(const fn_call& fn)
 as_value
 displayobjectcontainer_removeChild(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -301,8 +291,7 @@ displayobjectcontainer_removeChild(const fn_call& fn)
 as_value
 displayobjectcontainer_removeChildAt(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -311,8 +300,7 @@ displayobjectcontainer_removeChildAt(const fn_call& fn)
 as_value
 displayobjectcontainer_setChildIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -321,8 +309,7 @@ displayobjectcontainer_setChildIndex(const fn_call& fn)
 as_value
 displayobjectcontainer_swapChildren(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -331,8 +318,7 @@ displayobjectcontainer_swapChildren(const fn_call& fn)
 as_value
 displayobjectcontainer_swapChildrenAt(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObjectContainer> ptr =
-        ensureType<DisplayObjectContainer>(fn.this_ptr);
+    DisplayObjectContainer* ptr = ensure<ThisIs<DisplayObjectContainer> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

@@ -446,8 +446,7 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("XMLSocket.connect(%s) called"), ss.str());
 #endif
 
-    XMLSocket_as* ptr =
-        ensureNativeType<XMLSocket_as>(fn.this_ptr);
+    XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
 
     if (ptr->ready()) {
         log_error(_("XMLSocket.connect() called while already "
@@ -487,9 +486,7 @@ xmlsocket_connect(const fn_call& fn)
 as_value
 xmlsocket_send(const fn_call& fn)
 {
-    XMLSocket_as* ptr =
-        ensureNativeType<XMLSocket_as>(fn.this_ptr);
-
+    XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
     const std::string& str = fn.arg(0).to_string();
     ptr->send(str);
     return as_value();
@@ -504,8 +501,7 @@ xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    XMLSocket_as* ptr =
-        ensureNativeType<XMLSocket_as>(fn.this_ptr);
+    XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
 
     ptr->close();
     return as_value();

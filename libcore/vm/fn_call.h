@@ -263,8 +263,25 @@ private:
 
 };
 
+
+/// Check that the 'this' pointer is a particular type
+//
+/// NB: this function and is deprecated.
 template<typename T>
-struct Is
+struct ThisIs
+{
+    typedef T value_type;
+    value_type* operator()(as_object* o) const {
+        return dynamic_cast<value_type*>(o);
+    }
+};
+
+
+/// Check that the 'this' pointer has a particular native type ('Relay').
+//
+/// This is the most likely of the cases to reflect AS behaviour.
+template<typename T>
+struct ThisIsNative
 {
     typedef T value_type;
     value_type* operator()(as_object* o) const {
@@ -272,6 +289,8 @@ struct Is
     }
 };
 
+
+/// Check that the 'this' pointer is not null.
 struct ValidThis
 {
     typedef as_object value_type;
@@ -280,14 +299,32 @@ struct ValidThis
     }
 };
 
+/// Templated function to check the validity of a function call.
+//
+/// It throws an exception if the condition is not fulfilled, it throws
+/// an ActionTypeError, resulting in the function call being aborted and
+/// an undefined as_value returned.
+//
+/// Note that not carrying out a function because the this pointer is
+/// undefined is not ActionScript behaviour in most cases. To avoid
+/// spreading its usage outside AS function implementations, this function
+/// now takes a fn_call as an argument.
+//
+/// @tparam T       A struct defining a value_type and an operator() that
+///                 checks the as_object's validity. A pointer to the
+///                 value_type is returned on success, an exception thrown
+///                 on failure.
+/// @param fn       The function whose 'this' pointer should be checked.
+/// @return         If the cast succeeds, the pointer cast to the
+///                 requested type.
 template<typename T>
-T::value_type*
+typename T::value_type*
 ensure(const fn_call& fn)
 {
     as_object* obj = fn.this_ptr;
     if (!obj) throw ActionTypeError();
 
-    T::value_type* ret = T()(obj);
+    typename T::value_type* ret = T()(obj);
 
     if (!ret) {
         std::string target = typeName(ret);
