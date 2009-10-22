@@ -674,23 +674,27 @@ public:
 
     bool operator() (const as_value& a, const as_value& b)
     {
-        if ( _cmps.empty() ) return false;
+        if (_cmps.empty()) return false;
 
         std::vector<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
-        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
+        as_object* ao = a.to_object(*getGlobal(_obj));
+        as_object* bo = b.to_object(*getGlobal(_obj));
+
+        // TODO: this may not be correct, but it is better than accessing
+        // null pointers.
+        if (!ao || !bo) return false;
         
-        for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
-        {
+        for (Props::iterator pit = _prps.begin(), pend = _prps.end();
+                pit != pend; ++pit, ++cmp) {
             as_value av, bv;
 
             ao->get_member(*pit, &av);
             bo->get_member(*pit, &bv);
 
-            if ( (*cmp)(av, bv) ) return true;
-            if ( (*cmp)(bv, av) ) return false;
+            if ((*cmp)(av, bv)) return true;
+            if ((*cmp)(bv, av)) return false;
             // Note: for loop finishes only if a == b for
             // each requested comparison
             // (since *cmp(av,bv) == *cmp(bv,av) == false)
