@@ -164,12 +164,12 @@ Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
     ptr += length;
     
     // Extract the properties for this metadata object.
-    boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
-    if (el.get()) {
+    _metadata = amf.extractAMF(ptr, tooFar);
+    if (_metadata.get()) {
     	ptr += amf.totalsize();
-	    el->setName(name.c_str(), length);
+	    _metadata->setName(name.c_str(), length);
     }
-    return el;
+    return _metadata;
 }
 
 boost::shared_ptr<Flv::flv_audio_t>

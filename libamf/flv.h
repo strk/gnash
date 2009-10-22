@@ -26,6 +26,7 @@
 
 //#include "buffer.h"
 #include "element.h"
+#include "buffer.h"
 #include "dsodefs.h" // DSOEXPORT
 
 /// \namespace amf
@@ -257,6 +258,11 @@ class DSOEXPORT Flv {
     ///		The array of properties for this Flv file, which is
     ///		populated by the data from the first onMetaTag block.
     std::vector<boost::shared_ptr<amf::Element> > _properties;
+
+    /// \var _metadata
+    ///         The data contained in the first onMetaData tag from
+    ///         the FLV file.
+    boost::shared_ptr<amf::Element> _metadata;
     
 }; // end of class definition
 
