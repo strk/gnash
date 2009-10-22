@@ -1619,6 +1619,8 @@ o.sort();
 
 #if OUTPUT_VERSION > 5
 
+Empty = function() {};
+
 /// This checks that Array and relay objects are not compatible (unlike
 /// DisplayObjects).
 CA = function () {
@@ -1637,6 +1639,24 @@ CA = function () {
   check_equals(this.length, 3);
   this[6] = 3;
   check_equals(this.length, 3);
+
+
+  // Make into an array again.
+  this.__proto__.__constructor__ = Array;
+  super ();
+  check_equals(backup, this);
+  check_equals(this.length, 0);
+  this[2] = 3;
+  check_equals(this.length, 3);
+
+  // Array typing is not removed in all constructors.
+  this.__proto__.__constructor__ = Empty;
+  super();
+  check_equals(backup, this);
+  check_equals(this.length, 3);
+  this[5] = 77;
+  check_equals(this.length, 6);
+
 };
 
 o = new CA();
@@ -1705,8 +1725,8 @@ check_equals(ar.__proto__, "string");
  check_totals(538);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(616);
+  check_totals(622);
 # else
-  check_totals(626);
+  check_totals(632);
 # endif
 #endif
