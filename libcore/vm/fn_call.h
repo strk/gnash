@@ -263,6 +263,44 @@ private:
 
 };
 
+template<typename T>
+struct Is
+{
+    typedef T value_type;
+    value_type* operator()(as_object* o) const {
+        return dynamic_cast<value_type*>(o->relay());
+    }
+};
+
+struct ValidThis
+{
+    typedef as_object value_type;
+    value_type* operator()(as_object* o) const {
+        return o;
+    }
+};
+
+template<typename T>
+T::value_type*
+ensure(const fn_call& fn)
+{
+    as_object* obj = fn.this_ptr;
+    if (!obj) throw ActionTypeError();
+
+    T::value_type* ret = T()(obj);
+
+    if (!ret) {
+        std::string target = typeName(ret);
+        std::string source = typeName(obj);
+
+        std::string msg = "Function requiring " + target + " as 'this' "
+            "called from " + source + " instance.";
+
+        throw ActionTypeError(msg);
+    }
+    return ret;
+}
+
 /// Check whether the currently executing code is AS3 (ABC)
 //
 /// This is a non-member, non-friend function for better encapsulation.
