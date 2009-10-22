@@ -254,7 +254,7 @@ void
 TextField::init()
 {
     as_environment env(getVM(*this));
-    as_object* proto = env.find_object("TextField.prototype");
+    as_object* proto = env.find_object("_global.TextField.prototype");
     if (proto) {
         attachPrototypeProperties(*proto);
     }
@@ -2913,12 +2913,6 @@ textfield_createTextField(const fn_call& fn)
     //     assigning properties to the prototype).
     //  2. Make that object into a TextField and put it on the display list.
     DisplayObject* tf = new TextField(ptr.get(), bounds);
-
-    /// TODO: drop this when the above is implemented.
-    as_object* proto = tf->get_prototype();
-    if (proto) {
-        attachPrototypeProperties(*proto);
-    }
 
     // Give name and mark as dynamic
     tf->set_name(name);
