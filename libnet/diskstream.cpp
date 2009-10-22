@@ -364,7 +364,7 @@ DiskStream::loadToMem(off_t offset)
 boost::uint8_t *
 DiskStream::loadToMem(size_t filesize, off_t offset)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     log_debug("%s: offset is: %d", __FUNCTION__, offset);
 
@@ -463,9 +463,35 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	_seekptr = _dataptr + offset;
 	_state = OPEN;
     }
-    
-    return _seekptr;
-    
+
+    // FIXME: for now, assume all media files are in FLV format
+    _flv.reset(new amf::Flv);
+    boost::uint8_t *ptr = dataptr;
+    boost::shared_ptr<amf::Flv::flv_header_t> head = _flv->decodeHeader(ptr);
+    ptr += sizeof(amf::Flv::flv_header_t);
+    ptr += sizeof(amf::Flv::previous_size_t);
+    boost::shared_ptr<amf::Flv::flv_tag_t> tag  = _flv->decodeTagHeader(ptr);
+    ptr += sizeof(amf::Flv::flv_tag_t);
+    size_t bodysize = _flv->convert24(tag->bodysize);	    
+    if (tag->type == amf::Flv::TAG_METADATA) {
+	boost::shared_ptr<amf::Element> metadata = _flv->decodeMetaData(ptr, bodysize);
+	if (metadata) {
+	    metadata->dump();
+	}
+    }
+
+    return _seekptr;    
+}
+
+/// \brief Write the existing data to the Network.
+///
+/// @return true is the write suceeded, false if it failed.
+bool
+DiskStream::writeToNet(int start, int bytes)
+{
+    GNASH_REPORT_FUNCTION;
+
+    return false;
 }
 
 /// \brief Write the data in memory to disk
@@ -557,7 +583,7 @@ DiskStream::open(const string &filespec, int /*netfd*/)
 bool
 DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     // the file is already open
     if (_state == OPEN) {
@@ -783,9 +809,6 @@ DiskStream::determineFileType()
   return(determineFileType(_filespec));
 }
 
-
-
-
 // Get the file type, so we know how to set the
 // Content-type in the header.
 bool
@@ -962,6 +985,8 @@ DiskStream::dump()
     cerr << "File size is " <<  _filesize << endl;
     cerr << "Memory Page size is " << _pagesize << endl;
     cerr << "Memory Offset is " << _offset << endl;
+    cerr << "Base Memory Address is " << (void *)_dataptr << endl;
+    cerr << "Seek Pointer Memory Address is " << (void *)_seekptr << endl;
     
     // dump timing related data
     struct timespec now;
