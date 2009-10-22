@@ -1184,7 +1184,7 @@ _global.TextField = backup;
 // do?
 
 // This only confirms that the TextField constructor a) removes the
-// array typing, b) doesn't remove the relay, and c) doesn't produce a
+// array typing, b) removes the relay, and c) doesn't produce a
 // DisplayObject. We still don't have a way to check what happens
 // inside createTextField.
 
@@ -1200,6 +1200,8 @@ CTF = function () {
   check_equals(backup, this);
   check_equals(this.length, 0);
   check_equals(this._x, undefined);
+  check_equals(this._visible, undefined);
+  check_equals(this._width, undefined);
 
   // It is no longer an array.
   this[2] = 3;
@@ -1212,7 +1214,8 @@ CTF = function () {
   check_equals(typeof(this.getTime()), "number");
 
   this.__proto__.__constructor__ = TextField;
-  check_equals(typeof(this.getTime()), "number");
+  super();
+  check_equals(typeof(this.getTime()), "undefined");
 
 };
 
@@ -1223,11 +1226,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(505);
+     check_totals(518);
 #elif OUTPUT_VERSION == 7
- check_totals(522);
+ check_totals(524);
 #elif OUTPUT_VERSION == 8
- check_totals(523);
+ check_totals(525);
 #endif
 
 #endif
