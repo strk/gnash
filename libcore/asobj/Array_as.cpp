@@ -1148,7 +1148,7 @@ array_sortOn(const fn_call& fn)
 
             as_object* farray = fn.arg(1).to_object(*getGlobal(fn));
 
-            if (arrayLength(*farray) == optnum) {
+            if (farray->array() && arrayLength(*farray) == optnum) {
 
                 std::vector<boost::uint8_t> flgs;
                 GetMultiFlags mf(flgs);
@@ -1175,10 +1175,9 @@ array_sortOn(const fn_call& fn)
             }
         }
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
-        else if (fn.arg(1).is_number())
-        {
+        else {
             boost::uint8_t flags = 
-                static_cast<boost::uint8_t>(fn.arg(1).to_number());
+                static_cast<boost::uint8_t>(fn.arg(1).to_int());
             flags = flag_preprocess(flags, &do_unique, &do_index);
             as_cmp_fn c = get_basic_cmp(flags, version);
 
