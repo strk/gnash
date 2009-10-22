@@ -172,7 +172,8 @@ class DSOEXPORT Flv {
     /// @param buf a smart pointer to a Buffer containing the data.
     ///
     /// @return a smart pointer to data structure that contains the data.
-    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<amf::Buffer> buf);
+    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<amf::Buffer> buf) { return decodeHeader(buf->reference()); };
+    boost::shared_ptr<flv_header_t> decodeHeader(boost::uint8_t *data);
 
     /// \brief Decode a MetaData object.
     ///		This is after the header, but before all the other tags usually
@@ -211,7 +212,8 @@ class DSOEXPORT Flv {
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf);
+    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf) { return decodeTagHeader(buf->reference()); };
+    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::uint8_t *data);
 
     /// \brief Find the named property for this Object.
     ///
