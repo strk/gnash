@@ -3692,6 +3692,12 @@ textfield_ctor(const fn_call& fn)
     }
 
     as_object* obj = ensure<ValidThis>(fn);
+    
+    // It's not clear why this happens. Attaching a relay would have the
+    // same effect as both following statements.
+    obj->setArray(false);
+    obj->setRelay(0);
+
     as_object* proto = obj->get_prototype();
 
     if (proto) {
