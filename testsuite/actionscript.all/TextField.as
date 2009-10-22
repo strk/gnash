@@ -1189,6 +1189,11 @@ _global.TextField = backup;
 // inside createTextField.
 
 CTF = function () {
+
+  // We are called with 'new'.
+  fun = ASnative(2, 0);
+  xcheck_equals(fun(), true);
+
   backup = this;
   this.__proto__.__constructor__ = Array;
   super ();
@@ -1215,7 +1220,7 @@ CTF = function () {
 
   this.__proto__.__constructor__ = TextField;
   super();
-  check_equals(typeof(this.getTime()), "undefined");
+  xcheck_equals(typeof(this.getTime()), "undefined");
 
 };
 
@@ -1226,11 +1231,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(518);
+     check_totals(516);
 #elif OUTPUT_VERSION == 7
- check_totals(524);
-#elif OUTPUT_VERSION == 8
  check_totals(525);
+#elif OUTPUT_VERSION == 8
+ check_totals(526);
 #endif
 
 #endif
