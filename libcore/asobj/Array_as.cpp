@@ -1085,7 +1085,7 @@ array_sortOn(const fn_call& fn)
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
 
-    int version = getSWFVersion(fn);
+    const int version = getSWFVersion(fn);
     string_table& st = getStringTable(fn);
 
     if (fn.nargs == 0) return as_value();
@@ -1147,6 +1147,7 @@ array_sortOn(const fn_call& fn)
 
             as_object* farray = fn.arg(1).to_object(*getGlobal(fn));
 
+            // Only an array will do for this case.
             if (farray->array() && arrayLength(*farray) == optnum) {
 
                 std::vector<boost::uint8_t> flgs;
@@ -1189,8 +1190,7 @@ array_sortOn(const fn_call& fn)
         }
         as_value_multiprop avc(prp, cmp, *getGlobal(fn));
 
-        if (do_unique)
-        {
+        if (do_unique) {
             as_value_multiprop_eq ave(prp, eq, *getGlobal(fn));
             if (do_index) return sortIndexed(*array, avc, ave);
             return sort(*array, avc, ave) ? as_value(array) : as_value(0.0);
