@@ -228,7 +228,8 @@ bool sort(as_object& o, AVCMP avc, AVEQ ave)
 
 
 template <class AVCMP>
-void sort(as_object& o, AVCMP avc) 
+void
+sort(as_object& o, AVCMP avc) 
 {
 
     typedef std::list<as_value> SortContainer;
@@ -293,7 +294,8 @@ as_value sortIndexed(as_object& array, AVCMP avc, AVEQ ave)
 ///	boolean functor or function comparing two as_value& objects
 ///
 template <class AVCMP>
-as_object* sortIndexed(as_object& array, AVCMP avc)
+as_object*
+sortIndexed(as_object& array, AVCMP avc)
 {
     std::vector<indexed_as_value> v;
     getIndexedElements(array, v);
@@ -968,8 +970,9 @@ array_splice(const fn_call& fn)
     // Copy the original array values for reinsertion. It's not possible
     // to do a simple copy in-place without overwriting values that still
     // need to be shifted. The algorithm could certainly be improved though.
-    std::vector<as_value> v;
-    PushToContainer<std::vector<as_value> > pv(v);
+    typedef std::vector<as_value> TempContainer;
+    TempContainer v;
+    PushToContainer<TempContainer> pv(v);
     foreachArray(*array, pv);
 
     const size_t newelements = fn.nargs > 2 ? fn.nargs - 2 : 0;
