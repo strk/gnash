@@ -132,13 +132,14 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
 
 	int swfversion = getSWFVersion(env);
 
-	as_value proto;
-    bool has_proto = get_member(NSV::PROP_PROTOTYPE, &proto);
+    Property* proto = getOwnProperty(NSV::PROP_PROTOTYPE);
 		
     // Create an empty object, with a ref to the constructor's prototype.
-    // TODO: The prototype should not be converted to an object!
+    // The function's prototype property always becomes the new object's
+    // __proto__ member, regardless of whether it is an object and regardless
+    // of its visibility.
     as_object* newobj = new as_object();
-    if (has_proto) newobj->set_prototype(proto);
+    if (proto) newobj->set_prototype(proto->getValue(*this));
     
     // Add a __constructor__ member to the new object, but only for SWF6 up
     // (to be checked). NOTE that we assume the builtin constructors

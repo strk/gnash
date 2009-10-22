@@ -228,7 +228,8 @@ bool sort(as_object& o, AVCMP avc, AVEQ ave)
 
 
 template <class AVCMP>
-void sort(as_object& o, AVCMP avc) 
+void
+sort(as_object& o, AVCMP avc) 
 {
 
     typedef std::list<as_value> SortContainer;
@@ -293,7 +294,8 @@ as_value sortIndexed(as_object& array, AVCMP avc, AVEQ ave)
 ///	boolean functor or function comparing two as_value& objects
 ///
 template <class AVCMP>
-as_object* sortIndexed(as_object& array, AVCMP avc)
+as_object*
+sortIndexed(as_object& array, AVCMP avc)
 {
     std::vector<indexed_as_value> v;
     getIndexedElements(array, v);
@@ -672,23 +674,27 @@ public:
 
     bool operator() (const as_value& a, const as_value& b)
     {
-        if ( _cmps.empty() ) return false;
+        if (_cmps.empty()) return false;
 
         std::vector<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
-        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
+        as_object* ao = a.to_object(*getGlobal(_obj));
+        as_object* bo = b.to_object(*getGlobal(_obj));
+
+        // TODO: this may not be correct, but it is better than accessing
+        // null pointers.
+        if (!ao || !bo) return false;
         
-        for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
-        {
+        for (Props::iterator pit = _prps.begin(), pend = _prps.end();
+                pit != pend; ++pit, ++cmp) {
             as_value av, bv;
 
             ao->get_member(*pit, &av);
             bo->get_member(*pit, &bv);
 
-            if ( (*cmp)(av, bv) ) return true;
-            if ( (*cmp)(bv, av) ) return false;
+            if ((*cmp)(av, bv)) return true;
+            if ((*cmp)(bv, av)) return false;
             // Note: for loop finishes only if a == b for
             // each requested comparison
             // (since *cmp(av,bv) == *cmp(bv,av) == false)
@@ -968,8 +974,9 @@ array_splice(const fn_call& fn)
     // Copy the original array values for reinsertion. It's not possible
     // to do a simple copy in-place without overwriting values that still
     // need to be shifted. The algorithm could certainly be improved though.
-    std::vector<as_value> v;
-    PushToContainer<std::vector<as_value> > pv(v);
+    typedef std::vector<as_value> TempContainer;
+    TempContainer v;
+    PushToContainer<TempContainer> pv(v);
     foreachArray(*array, pv);
 
     const size_t newelements = fn.nargs > 2 ? fn.nargs - 2 : 0;
@@ -1078,7 +1085,7 @@ array_sortOn(const fn_call& fn)
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
 
-    int version = getSWFVersion(fn);
+    const int version = getSWFVersion(fn);
     string_table& st = getStringTable(fn);
 
     if (fn.nargs == 0) return as_value();
@@ -1113,7 +1120,6 @@ array_sortOn(const fn_call& fn)
         return as_value(array);
     }
 
-#if 1
     // case: sortOn(["prop1", "prop2"] ...)
     if (fn.arg(0).is_object()) 
     {
@@ -1141,7 +1147,8 @@ array_sortOn(const fn_call& fn)
 
             as_object* farray = fn.arg(1).to_object(*getGlobal(fn));
 
-            if (arrayLength(*farray) == optnum) {
+            // Only an array will do for this case.
+            if (farray->array() && arrayLength(*farray) == optnum) {
 
                 std::vector<boost::uint8_t> flgs;
                 GetMultiFlags mf(flgs);
@@ -1168,10 +1175,9 @@ array_sortOn(const fn_call& fn)
             }
         }
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
-        else if (fn.arg(1).is_number())
-        {
+        else {
             boost::uint8_t flags = 
-                static_cast<boost::uint8_t>(fn.arg(1).to_number());
+                static_cast<boost::uint8_t>(fn.arg(1).to_int());
             flags = flag_preprocess(flags, &do_unique, &do_index);
             as_cmp_fn c = get_basic_cmp(flags, version);
 
@@ -1184,8 +1190,7 @@ array_sortOn(const fn_call& fn)
         }
         as_value_multiprop avc(prp, cmp, *getGlobal(fn));
 
-        if (do_unique)
-        {
+        if (do_unique) {
             as_value_multiprop_eq ave(prp, eq, *getGlobal(fn));
             if (do_index) return sortIndexed(*array, avc, ave);
             return sort(*array, avc, ave) ? as_value(array) : as_value(0.0);
@@ -1195,7 +1200,7 @@ array_sortOn(const fn_call& fn)
         return as_value(array);
 
     }
-#endif
+
     IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("SortOn called with invalid arguments."));
     )

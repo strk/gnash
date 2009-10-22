@@ -83,9 +83,9 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_object* getTextFieldInterface(VM& vm);
     void attachPrototypeProperties(as_object& proto);
     void attachTextFieldStaticMembers(as_object& o);
+    void attachTextFieldInterface(as_object& o);
 
     as_value textfield_createTextField(const fn_call& fn);
 
@@ -253,10 +253,12 @@ TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
 void
 TextField::init()
 {
-
-    as_object* proto = getTextFieldInterface(getVM(*this));
-    attachPrototypeProperties(*proto);
- 
+    as_environment env(getVM(*this));
+    as_object* proto = env.find_object("_global.TextField.prototype");
+    if (proto) {
+        attachPrototypeProperties(*proto);
+    }
+     
     set_prototype(proto);
 
     as_object* ar = getGlobal(*this)->createArray();
@@ -2333,17 +2335,20 @@ void
 textfield_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    VM& vm = getVM(where);
     Global_as* gl = getGlobal(where);
-    as_object* proto = getSWFVersion(where) < 6 ? 0 : getTextFieldInterface(vm);
+    as_object* proto = gl->createObject();
     as_object* cl = gl->createClass(&textfield_ctor, proto);
 
-    // replicate static members to class, to be able to access
-    // all methods as static functions
+    attachTextFieldInterface(*proto);
     attachTextFieldStaticMembers(*cl);
              
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
+
+    // ASSetPropFlags is called on the TextField class.
+    string_table& st = getStringTable(where);
+    as_object* null = 0;
+    gl->callMethod(st.find("ASSetPropFlags"), cl, null, 131);
 }
 
 void
@@ -2903,7 +2908,10 @@ textfield_createTextField(const fn_call& fn)
     // Set textfield bounds
     SWFRect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
 
-    // Create an instance
+    // Tests in actionscript.all/TextField.as show that this function must:
+    //  1. Call "new _global.TextField()" (which takes care of
+    //     assigning properties to the prototype).
+    //  2. Make that object into a TextField and put it on the display list.
     DisplayObject* tf = new TextField(ptr.get(), bounds);
 
     // Give name and mark as dynamic
@@ -3661,41 +3669,42 @@ textfield_removeTextField(const fn_call& fn)
 }
 
 
-/// This is called for 'new TextField()' only
+/// This is called for 'new TextField()'
+//
+/// Note that MovieClip.createTextField must call this function (or anything
+/// that replaces it).
+//
+/// Tests in actionscript.all/TextField.as show that this constructor:
+///     1. Adds properties to the prototype.
+///     2. Removes array typing.
+///     3. Removes any Relay.
+///     4. Does not produce a DisplayObject.
+///     5. Operates on a 'this' pointer that createTextField turns into a
+///        real TextField.
 as_value
 textfield_ctor(const fn_call& fn)
 {
 
-    VM& vm = getVM(fn);
-
-    as_object* proto = getTextFieldInterface(vm);
-
-    as_object* obj = 0;
-
-    if (!isAS3(fn)) {
-        // We should attach more properties to the prototype on first
-        // instantiation.
-        // TODO: this also attaches properties to the SWF5 prototype but makes
-        // them invisible with prop flags. Is this correct?
-        attachPrototypeProperties(*proto);
-
-        obj = new as_object(proto);
-    }
-    else {
+    if (isAS3(fn)) {
         SWFRect nullRect;
-        obj = new TextField(0, nullRect);
+        as_object* obj = new TextField(0, nullRect);
+        return as_value(obj);
     }
 
-    return as_value(obj);
+    as_object* obj = ensureType<as_object>(fn.this_ptr);
+    as_object* proto = obj->get_prototype();
+
+    if (proto) {
+        attachPrototypeProperties(*proto);
+    }
+
+    return as_value();
 }
 
 
 void
 attachTextFieldInterface(as_object& o)
 {
-    // TextField is an AsBroadcaster
-    AsBroadcaster::initialize(o);
-
     // SWF6 or higher
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
@@ -3712,7 +3721,15 @@ attachTextFieldInterface(as_object& o)
     const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
 
     o.init_member("replaceText",vm.getNative(104, 107), swf7Flags);
+    
+    // TextField is an AsBroadcaster
+    AsBroadcaster::initialize(o);
 
+    // Finally ASSetPropFlags is called on the prototype.
+    string_table& st = getStringTable(o);
+    Global_as* gl = getGlobal(o);
+    as_object* null = 0;
+    gl->callMethod(st.find("ASSetPropFlags"), &o, null, 131);
 }
 
 void
@@ -3722,34 +3739,6 @@ attachTextFieldStaticMembers(as_object& o)
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
     VM& vm = getVM(o);
     o.init_member("getFontList", vm.getNative(104, 201), swf6Flags);
-}
-
-/// This is called when a prototype should be added
-//
-/// @note   This is called at different times, depending on the version.
-///         For SWF5 it is called only on first instantiation. For SWF6 it
-///         is called at the registration of _global.TextField.
-as_object*
-getTextFieldInterface(VM& vm)
-{
-    static boost::intrusive_ptr<as_object> proto;
-
-    if ( proto == NULL )
-    {
-        if (vm.getSWFVersion() < 6) {
-            /// The prototype for SWF5 is a simple as_object without
-            /// toString() or valueOf().
-            proto = new as_object();
-            vm.addStatic(proto.get());
-        }
-        else {
-            proto = new as_object(getObjectInterface());
-            vm.addStatic(proto.get());
-            attachTextFieldInterface(*proto);
-        }
-
-    }
-    return proto.get();
 }
 
 } // anonymous namespace

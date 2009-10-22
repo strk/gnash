@@ -931,6 +931,25 @@ check_equals(typeof(result), "string");
 check_equals(result, "udef");
 check_equals(resolveCalled, 4);
 
+/// Check __proto__ and prototype during construction
+
+TestO = function() {};
+TestO.prototype = {};
+TestO.prototype.toString = function() { return "hello there"; };
+
+// Set to invisible in all versions up to 9.
+ASSetPropFlags(TestO, null, 8193);
+check_equals(TestO.prototype, undefined);
+
+o = new TestO();
+
+/// prototype became __proto__
+check_equals(typeof(o.__proto__), "object");
+check_equals(o.toString(), "hello there");
+
+/// prototye is still invisible
+check_equals(TestO.prototype, undefined);
+
 /// Check DisplayObject property lookup.
 
 /// Apparently no DisplayObjects are included in the prototype
@@ -987,10 +1006,10 @@ o = new Object(b);
 check_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
-totals(130);
+totals(134);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(318);
+totals(322);
 #endif
 
