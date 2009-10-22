@@ -3683,7 +3683,7 @@ textfield_removeTextField(const fn_call& fn)
 /// Tests in actionscript.all/TextField.as show that this constructor:
 ///     1. Adds properties to the prototype.
 ///     2. Removes array typing.
-///     3. Does not remove any Relay.
+///     3. Removes any Relay.
 ///     4. Does not produce a DisplayObject.
 ///     5. Operates on a 'this' pointer that createTextField turns into a
 ///        real TextField.
