@@ -548,7 +548,7 @@ avm1Classes()
         (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM,
            NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 7))
+           NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,
            NSV::CLASS_OBJECT, NS_GLOBAL, 5));
@@ -1525,6 +1525,7 @@ registerNatives(as_object& global)
     registerTextFieldNative(global);
     registerButtonNative(global);
     registerVideoNative(global);
+    registerMovieClipLoaderNative(global);
     registerXMLSocketNative(global);
     registerSharedObjectNative(global);
     registerKeyboardNative(global);
