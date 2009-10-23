@@ -63,11 +63,11 @@ as_value microphone_useEchoSuppression(const fn_call& fn);
 void
 attachMicrophoneStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
     const int flags = 0;
 
-	o.init_member("get", gl->createFunction(microphone_get), flags);
+	o.init_member("get", gl.createFunction(microphone_get), flags);
  
     VM& vm = getVM(o);   
     NativeFunction* getset = vm.getNative(2102, 201);
@@ -77,36 +77,36 @@ attachMicrophoneStaticInterface(as_object& o)
 void
 attachMicrophoneAS3StaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
     o.init_member("getMicrophone",
-            gl->createFunction(microphone_getMicrophone));
+            gl.createFunction(microphone_getMicrophone));
 }
 
 // These are added to the AS2 prototype when get() is called.
 void
 attachMicrophoneProperties(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
     boost::intrusive_ptr<builtin_function> getset;
-    getset = gl->createFunction(microphone_activityLevel);
+    getset = gl.createFunction(microphone_activityLevel);
     o.init_property("activityLevel", *getset, *getset);
-    getset = gl->createFunction(microphone_gain);
+    getset = gl.createFunction(microphone_gain);
     o.init_property("gain", *getset, *getset);
-    getset = gl->createFunction(microphone_index);
+    getset = gl.createFunction(microphone_index);
     o.init_property("index", *getset, *getset);
-    getset = gl->createFunction(microphone_muted);
+    getset = gl.createFunction(microphone_muted);
     o.init_property("muted", *getset, *getset);
-    getset = gl->createFunction(microphone_name);
+    getset = gl.createFunction(microphone_name);
     o.init_property("name", *getset, *getset);
-    getset = gl->createFunction(microphone_rate);
+    getset = gl.createFunction(microphone_rate);
     o.init_property("rate", *getset, *getset);
-    getset = gl->createFunction(microphone_silenceLevel);
+    getset = gl.createFunction(microphone_silenceLevel);
     o.init_property("silenceLevel", *getset, *getset);
-    getset = gl->createFunction(microphone_silenceTimeout);
+    getset = gl.createFunction(microphone_silenceTimeout);
     o.init_property("silenceTimeout", *getset, *getset);
-    getset = gl->createFunction(microphone_useEchoSuppression);
+    getset = gl.createFunction(microphone_useEchoSuppression);
     o.init_property("useEchoSuppression", *getset, *getset);
 }
 
@@ -420,8 +420,8 @@ microphone_names(const fn_call& fn)
     
     size_t size = vect.size();
     
-    Global_as* gl = getGlobal(fn);
-    as_object* data = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* data = gl.createArray();
     
     for (size_t i=0; i < size; ++i) {
         data->callMethod(NSV::PROP_PUSH, vect[i]);
@@ -600,16 +600,16 @@ void
 microphone_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     
     as_object* proto = getMicrophoneInterface();
     as_object* cl;
 
     if (isAS3(getVM(where))) {
-        cl = gl->createClass(microphone_ctor, proto);
+        cl = gl.createClass(microphone_ctor, proto);
         attachMicrophoneAS3StaticInterface(*cl);
     } else {
-        cl = gl->createClass(microphone_ctor, proto);
+        cl = gl.createClass(microphone_ctor, proto);
         attachMicrophoneStaticInterface(*cl);
     }
         

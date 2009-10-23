@@ -302,8 +302,8 @@ void
 video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
-    Global_as* gl = getGlobal(global);
-    as_object* cl = gl->createClass(&video_ctor, getVideoInterface(global));
+    Global_as& gl = getGlobal(global);
+    as_object* cl = gl.createClass(&video_ctor, getVideoInterface(global));
 
 	// Register _global.Video
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -394,7 +394,7 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
+    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
 	NetStream_as* ns;
 
     if (isNativeType(obj, ns)) {

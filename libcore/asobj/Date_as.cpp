@@ -209,9 +209,9 @@ void
 date_class_init(as_object& global, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(global);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&date_new, proto);
+    Global_as& gl = getGlobal(global);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&date_new, proto);
     attachDateInterface(*proto);
     
     const int flags = PropFlags::readOnly;
@@ -416,8 +416,8 @@ date_new(const fn_call& fn)
     // The Date ctor called as a conversion function constructs a new
     // date.
     if (!fn.isInstantiation()) {
-        Global_as* gl = getGlobal(fn);
-        as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
+        Global_as& gl = getGlobal(fn);
+        as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_as_function();
         if (!ctor) return as_value();
         fn_call::Args args;
         return ctor->constructInstance(fn.env(), args);

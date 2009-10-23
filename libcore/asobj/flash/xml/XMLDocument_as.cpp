@@ -558,9 +558,9 @@ void
 XMLDocument_as::init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     as_object* proto = getXMLInterface();
-    as_object* cl = gl->createClass(&xml_new, proto);
+    as_object* cl = gl.createClass(&xml_new, proto);
     
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
@@ -598,25 +598,25 @@ attachXMLInterface(as_object& o)
 {
 
     VM& vm = getVM(o);
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
     const int flags = 0;
 
     // No flags:
-    o.init_member("addRequestHeader", gl->createFunction(
+    o.init_member("addRequestHeader", gl.createFunction(
                 LoadableObject::loadableobject_addRequestHeader), flags);
     o.init_member("createElement", vm.getNative(253, 10), flags);
     o.init_member("createTextNode", vm.getNative(253, 11), flags);
-    o.init_member("getBytesLoaded", gl->createFunction(
+    o.init_member("getBytesLoaded", gl.createFunction(
                 LoadableObject::loadableobject_getBytesLoaded), flags);
-    o.init_member("getBytesTotal", gl->createFunction(
+    o.init_member("getBytesTotal", gl.createFunction(
                 LoadableObject::loadableobject_getBytesTotal), flags);
     o.init_member("load", vm.getNative(301, 0), flags);
     o.init_member("parseXML", vm.getNative(253, 12), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
-    o.init_member("onData", gl->createFunction(xml_onData), flags);
-    o.init_member("onLoad", gl->createFunction(xml_onLoad), flags);
+    o.init_member("onData", gl.createFunction(xml_onData), flags);
+    o.init_member("onLoad", gl.createFunction(xml_onLoad), flags);
 
 }
 
@@ -626,8 +626,8 @@ getXMLInterface()
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL )
     {
-        Global_as* gl = VM::get().getGlobal();
-        as_function* ctor = gl->getMember(NSV::CLASS_XMLNODE).to_as_function();
+        Global_as& gl = *VM::get().getGlobal();
+        as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_as_function();
         if (!ctor) return 0;
 
         // XML.prototype is an XMLNode(1, "");
@@ -651,7 +651,7 @@ xml_new(const fn_call& fn)
 
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
-            as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
+            as_object* obj = fn.arg(0).to_object(getGlobal(fn));
             xml_obj = dynamic_cast<XMLDocument_as*>(obj);
 
             if (xml_obj) {

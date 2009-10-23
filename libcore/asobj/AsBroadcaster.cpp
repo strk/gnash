@@ -86,7 +86,7 @@ public:
     /// Call a method on the given value
     void operator()(const as_value& v)
     {
-        boost::intrusive_ptr<as_object> o = v.to_object(*getGlobal(_fn));
+        boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(_fn));
         if ( ! o ) return;
 
         as_value method;
@@ -116,11 +116,11 @@ public:
 void 
 AsBroadcaster::initialize(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
     // Find _global.AsBroadcaster.
     as_object* asb =
-        gl->getMember(NSV::CLASS_AS_BROADCASTER).to_object(*gl);
+        gl.getMember(NSV::CLASS_AS_BROADCASTER).to_object(gl);
 
     // If it's not an object, these are left undefined, but they are
     // always attached to the initialized object.
@@ -138,12 +138,12 @@ AsBroadcaster::initialize(as_object& o)
     
     // The function returned by ASnative(101, 12) is attached, even though
     // this may not exist (e.g. if _global.ASnative is altered)
-    const as_value& asn = gl->callMethod(NSV::PROP_AS_NATIVE, 101, 12);
+    const as_value& asn = gl.callMethod(NSV::PROP_AS_NATIVE, 101, 12);
     o.set_member(NSV::PROP_BROADCAST_MESSAGE, asn);
 
     // This corresponds to  "_listeners = [];", which is different from
     // _listeners = new Array();
-    o.set_member(NSV::PROP_uLISTENERS, gl->createArray());
+    o.set_member(NSV::PROP_uLISTENERS, gl.createArray());
  
     // This function should call ASSetPropFlags on these four properties.
     o.set_member_flags(NSV::PROP_BROADCAST_MESSAGE, flags);
@@ -160,14 +160,14 @@ attachAsBroadcasterStaticInterface(as_object& o)
                       PropFlags::dontDelete |
                       PropFlags::onlySWF6Up;
 
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
     o.init_member("initialize",
-            gl->createFunction(asbroadcaster_initialize), flags);
+            gl.createFunction(asbroadcaster_initialize), flags);
     o.init_member(NSV::PROP_ADD_LISTENER,
-            gl->createFunction(asbroadcaster_addListener), flags);
+            gl.createFunction(asbroadcaster_addListener), flags);
     o.init_member(NSV::PROP_REMOVE_LISTENER,
-            gl->createFunction(asbroadcaster_removeListener), flags);
+            gl.createFunction(asbroadcaster_removeListener), flags);
 
     VM& vm = getVM(o);
     o.init_member(NSV::PROP_BROADCAST_MESSAGE, vm.getNative(101, 12),
@@ -219,7 +219,7 @@ asbroadcaster_initialize(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> tgt = tgtval.to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> tgt = tgtval.to_object(getGlobal(fn));
     if ( ! tgt )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -270,7 +270,7 @@ asbroadcaster_addListener(const fn_call& fn)
         return as_value(false); 
     }
 
-    as_object* listeners = listenersValue.to_object(*getGlobal(fn));
+    as_object* listeners = listenersValue.to_object(getGlobal(fn));
 
     // We checked is_object() above.
     assert(listeners); 
@@ -314,7 +314,7 @@ asbroadcaster_removeListener(const fn_call& fn)
     }
 
     boost::intrusive_ptr<as_object> listeners =
-        listenersValue.to_object(*getGlobal(fn));
+        listenersValue.to_object(getGlobal(fn));
     assert(listeners);
 
     as_value listenerToRemove; 
@@ -377,7 +377,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
         return as_value(); // TODO: check this
     }
 
-    as_object* listeners = listenersValue.to_object(*getGlobal(fn));
+    as_object* listeners = listenersValue.to_object(getGlobal(fn));
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(

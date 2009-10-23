@@ -64,9 +64,9 @@ selection_class_init(as_object& where, const ObjectURI& uri)
 
     // All properties are protected using ASSetPropFlags.
     string_table& st = getStringTable(where);
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     as_object* null = 0;
-    gl->callMethod(st.find("ASSetPropFlags"), o, null, 7);
+    gl.callMethod(st.find("ASSetPropFlags"), o, null, 7);
 }
 
 void
@@ -227,7 +227,7 @@ selection_setFocus(const fn_call& fn)
     else {
         /// Try converting directly to DisplayObject.
         ch = dynamic_cast<DisplayObject*>(
-                focus.to_object(*getGlobal(fn)));
+                focus.to_object(getGlobal(fn)));
     }
 
     // If the argument does not resolve to a DisplayObject, do nothing.

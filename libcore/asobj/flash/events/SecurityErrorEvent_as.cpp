@@ -53,9 +53,9 @@ namespace {
 void
 attachSecurityErrorEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(securityerrorevent_toString));
-    o.init_member("SECURITY_ERROR", gl->createFunction(securityerrorevent_SECURITY_ERROR));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(securityerrorevent_toString));
+    o.init_member("SECURITY_ERROR", gl.createFunction(securityerrorevent_SECURITY_ERROR));
 }
 
 void

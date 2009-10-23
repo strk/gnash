@@ -65,8 +65,8 @@ namespace {
 void
 attachApplicationDomainInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("hasDefinition", gl->createFunction(applicationdomain_hasDefinition));
+    Global_as& gl = getGlobal(o);
+    o.init_member("hasDefinition", gl.createFunction(applicationdomain_hasDefinition));
 }
 
 void

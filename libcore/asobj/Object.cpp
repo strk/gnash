@@ -86,9 +86,9 @@ void
 object_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     as_object* proto = getObjectInterface();
-    boost::intrusive_ptr<as_object> cl = gl->createClass(object_ctor, proto);
+    boost::intrusive_ptr<as_object> cl = gl.createClass(object_ctor, proto);
 
     // The as_function ctor takes care of initializing these, but they
     // are different for the Object class.
@@ -144,11 +144,11 @@ attachObjectInterface(as_object& o)
 	VM& vm = getVM(o);
 
 	// We register natives despite swf version,
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
 	o.init_member("valueOf", vm.getNative(101, 3));
 	o.init_member("toString", vm.getNative(101, 4));
-	o.init_member("toLocaleString", gl->createFunction(object_toLocaleString));
+	o.init_member("toLocaleString", gl.createFunction(object_toLocaleString));
 
 	int swf6flags = PropFlags::dontEnum | 
         PropFlags::dontDelete | 
@@ -166,10 +166,10 @@ attachObjectInterface(as_object& o)
 as_value
 object_ctor(const fn_call& fn)
 {
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
 
 	if (fn.nargs == 1) {
-        as_object* obj = fn.arg(0).to_object(*gl);
+        as_object* obj = fn.arg(0).to_object(gl);
         if (obj) return as_value(obj);
 	}
 
@@ -183,7 +183,7 @@ object_ctor(const fn_call& fn)
         return new as_object();
     }
 
-    return gl->createObject();
+    return gl.createObject();
 }
 
 /// Object.toString returns one of two values: [type Function] if it is a 
@@ -448,7 +448,7 @@ object_isPrototypeOf(const fn_call& fn)
 		return as_value(false); 
 	}
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

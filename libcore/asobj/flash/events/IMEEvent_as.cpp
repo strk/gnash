@@ -53,9 +53,9 @@ namespace {
 void
 attachIMEEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(imeevent_toString));
-    o.init_member("IME_COMPOSITION", gl->createFunction(imeevent_IME_COMPOSITION));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(imeevent_toString));
+    o.init_member("IME_COMPOSITION", gl.createFunction(imeevent_IME_COMPOSITION));
 }
 
 void

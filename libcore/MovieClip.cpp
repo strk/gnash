@@ -815,7 +815,7 @@ MovieClip::get_path_element(string_table::key key)
         return tmp.toDisplayObject(true);
     }
 
-    return tmp.to_object(*getGlobal(*this));
+    return tmp.to_object(getGlobal(*this));
 }
 
 bool

@@ -281,7 +281,7 @@ as_value sortIndexed(as_object& array, AVCMP avc, AVEQ ave)
         return as_value(0.0);
     }
 
-    as_object* o = getGlobal(array)->createArray();
+    as_object* o = getGlobal(array).createArray();
     pushIndices(*o, v);
     return o;
 }
@@ -300,7 +300,7 @@ sortIndexed(as_object& array, AVCMP avc)
     std::vector<indexed_as_value> v;
     getIndexedElements(array, v);
     std::sort(v.begin(), v.end(), avc);
-    as_object* o = getGlobal(array)->createArray();
+    as_object* o = getGlobal(array).createArray();
     pushIndices(*o, v);
     return o;
 }
@@ -637,8 +637,8 @@ public:
         as_value av, bv;
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
-        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
+        boost::intrusive_ptr<as_object> ao = a.to_object(getGlobal(_obj));
+        boost::intrusive_ptr<as_object> bo = b.to_object(getGlobal(_obj));
         
         ao->get_member(_prop, &av);
         bo->get_member(_prop, &bv);
@@ -679,8 +679,8 @@ public:
         std::vector<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        as_object* ao = a.to_object(*getGlobal(_obj));
-        as_object* bo = b.to_object(*getGlobal(_obj));
+        as_object* ao = a.to_object(getGlobal(_obj));
+        as_object* bo = b.to_object(getGlobal(_obj));
 
         // TODO: this may not be correct, but it is better than accessing
         // null pointers.
@@ -722,10 +722,11 @@ public:
         Comps::const_iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(*getGlobal(_obj));
-        boost::intrusive_ptr<as_object> bo = b.to_object(*getGlobal(_obj));
+        as_object* ao = a.to_object(getGlobal(_obj));
+        as_object* bo = b.to_object(getGlobal(_obj));
 
-        for (Props::iterator pit = _prps.begin(), pend = _prps.end(); pit != pend; ++pit, ++cmp)
+        for (Props::iterator pit = _prps.begin(), pend = _prps.end();
+                pit != pend; ++pit, ++cmp)
         {
             as_value av, bv;
             ao->get_member(*pit, &av);
@@ -875,9 +876,9 @@ array_class_init(as_object& where, const ObjectURI& uri)
 
     // This is going to be the global Array "class"/"function"
     VM& vm = getVM(where);
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl->createObject();
+    as_object* proto = gl.createObject();
 
     as_object* cl = vm.getNative(252, 0);
 
@@ -968,8 +969,8 @@ array_splice(const fn_call& fn)
         remove = clamp<int>(remval, 0, size - start);
     }
 
-    Global_as* gl = getGlobal(fn);
-    as_object* ret = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* ret = gl.createArray();
 
     // Copy the original array values for reinsertion. It's not possible
     // to do a simple copy in-place without overwriting values that still
@@ -1102,11 +1103,11 @@ array_sortOn(const fn_call& fn)
         }
 
         as_value_prop avc(propField, get_basic_cmp(flags, version),
-                *getGlobal(fn));
+                getGlobal(fn));
 
         if (do_unique) {
             as_value_prop ave(propField, get_basic_eq(flags, version), 
-                    *getGlobal(fn));
+                    getGlobal(fn));
             if (do_index)
                 return sortIndexed(*array, avc, ave);
             return sort(*array, avc, ave) ? as_value(array) : as_value(0.0);
@@ -1123,7 +1124,7 @@ array_sortOn(const fn_call& fn)
     // case: sortOn(["prop1", "prop2"] ...)
     if (fn.arg(0).is_object()) 
     {
-        as_object* props = fn.arg(0).to_object(*getGlobal(fn));
+        as_object* props = fn.arg(0).to_object(getGlobal(fn));
         assert(props);
 
         std::vector<string_table::key> prp;
@@ -1145,7 +1146,7 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
         else if (fn.arg(1).is_object()) {
 
-            as_object* farray = fn.arg(1).to_object(*getGlobal(fn));
+            as_object* farray = fn.arg(1).to_object(getGlobal(fn));
 
             // Only an array will do for this case.
             if (farray->array() && arrayLength(*farray) == optnum) {
@@ -1188,10 +1189,10 @@ array_sortOn(const fn_call& fn)
                 eq.assign(optnum, e);
             }
         }
-        as_value_multiprop avc(prp, cmp, *getGlobal(fn));
+        as_value_multiprop avc(prp, cmp, getGlobal(fn));
 
         if (do_unique) {
-            as_value_multiprop_eq ave(prp, eq, *getGlobal(fn));
+            as_value_multiprop_eq ave(prp, eq, getGlobal(fn));
             if (do_index) return sortIndexed(*array, avc, ave);
             return sort(*array, avc, ave) ? as_value(array) : as_value(0.0);
         }
@@ -1356,8 +1357,8 @@ array_concat(const fn_call& fn)
 {
     as_object* array = ensure<ValidThis>(fn);
 
-    Global_as* gl = getGlobal(fn);
-    as_object* newarray = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* newarray = gl.createArray();
 
     PushToArray push(*newarray);
     foreachArray(*array, push);
@@ -1368,8 +1369,8 @@ array_concat(const fn_call& fn)
         // The type is checked using instanceOf.
         const as_value& arg = fn.arg(i);
 
-        Global_as* gl = getGlobal(fn);
-        as_object* other = arg.to_object(*gl);
+        Global_as& gl = getGlobal(fn);
+        as_object* other = arg.to_object(gl);
 
         if (other) {
             
@@ -1408,8 +1409,8 @@ array_slice(const fn_call& fn)
     int endindex = fn.nargs > 1 ? fn.arg(1).to_int() :
         std::numeric_limits<int>::max();
 
-    Global_as* gl = getGlobal(fn);
-    as_object* newarray = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* newarray = gl.createArray();
 
     PushToArray push(*newarray);
 
@@ -1423,7 +1424,7 @@ array_new(const fn_call& fn)
 {
 
     as_object* ao = fn.isInstantiation() ? ensure<ValidThis>(fn) :
-                                           getGlobal(fn)->createArray();
+                                           getGlobal(fn).createArray();
 
     ao->setRelay(0);
     ao->setArray();

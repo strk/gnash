@@ -84,40 +84,40 @@ namespace {
 void
 attachEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("formatToString", gl->createFunction(event_formatToString));
-    o.init_member("isDefaultPrevented", gl->createFunction(event_isDefaultPrevented));
-    o.init_member("preventDefault", gl->createFunction(event_preventDefault));
-    o.init_member("stopImmediatePropagation", gl->createFunction(event_stopImmediatePropagation));
-    o.init_member("stopPropagation", gl->createFunction(event_stopPropagation));
-    o.init_member("toString", gl->createFunction(event_toString));
-    o.init_member("ACTIVATE", gl->createFunction(event_ACTIVATE));
-    o.init_member("ADDED", gl->createFunction(event_ADDED));
-    o.init_member("ADDED_TO_STAGE", gl->createFunction(event_ADDED_TO_STAGE));
-    o.init_member("CANCEL", gl->createFunction(event_CANCEL));
-    o.init_member("CHANGE", gl->createFunction(event_CHANGE));
-    o.init_member("CLOSE", gl->createFunction(event_CLOSE));
-    o.init_member("COMPLETE", gl->createFunction(event_COMPLETE));
-    o.init_member("CONNECT", gl->createFunction(event_CONNECT));
-    o.init_member("DEACTIVATE", gl->createFunction(event_DEACTIVATE));
-    o.init_member("DISPLAYING", gl->createFunction(event_DISPLAYING));
-    o.init_member("ENTER_FRAME", gl->createFunction(event_ENTER_FRAME));
-    o.init_member("FULLSCREEN", gl->createFunction(event_FULLSCREEN));
-    o.init_member("ID3", gl->createFunction(event_ID3));
-    o.init_member("INIT", gl->createFunction(event_INIT));
-    o.init_member("MOUSE_LEAVE", gl->createFunction(event_MOUSE_LEAVE));
-    o.init_member("OPEN", gl->createFunction(event_OPEN));
-    o.init_member("REMOVED", gl->createFunction(event_REMOVED));
-    o.init_member("REMOVED_FROM_STAGE", gl->createFunction(event_REMOVED_FROM_STAGE));
-    o.init_member("RENDER", gl->createFunction(event_RENDER));
-    o.init_member("RESIZE", gl->createFunction(event_RESIZE));
-    o.init_member("SCROLL", gl->createFunction(event_SCROLL));
-    o.init_member("SELECT", gl->createFunction(event_SELECT));
-    o.init_member("SOUND_COMPLETE", gl->createFunction(event_SOUND_COMPLETE));
-    o.init_member("TAB_CHILDREN_CHANGE", gl->createFunction(event_TAB_CHILDREN_CHANGE));
-    o.init_member("TAB_ENABLED_CHANGE", gl->createFunction(event_TAB_ENABLED_CHANGE));
-    o.init_member("TAB_INDEX_CHANGE", gl->createFunction(event_TAB_INDEX_CHANGE));
-    o.init_member("UNLOAD", gl->createFunction(event_UNLOAD));
+    Global_as& gl = getGlobal(o);
+    o.init_member("formatToString", gl.createFunction(event_formatToString));
+    o.init_member("isDefaultPrevented", gl.createFunction(event_isDefaultPrevented));
+    o.init_member("preventDefault", gl.createFunction(event_preventDefault));
+    o.init_member("stopImmediatePropagation", gl.createFunction(event_stopImmediatePropagation));
+    o.init_member("stopPropagation", gl.createFunction(event_stopPropagation));
+    o.init_member("toString", gl.createFunction(event_toString));
+    o.init_member("ACTIVATE", gl.createFunction(event_ACTIVATE));
+    o.init_member("ADDED", gl.createFunction(event_ADDED));
+    o.init_member("ADDED_TO_STAGE", gl.createFunction(event_ADDED_TO_STAGE));
+    o.init_member("CANCEL", gl.createFunction(event_CANCEL));
+    o.init_member("CHANGE", gl.createFunction(event_CHANGE));
+    o.init_member("CLOSE", gl.createFunction(event_CLOSE));
+    o.init_member("COMPLETE", gl.createFunction(event_COMPLETE));
+    o.init_member("CONNECT", gl.createFunction(event_CONNECT));
+    o.init_member("DEACTIVATE", gl.createFunction(event_DEACTIVATE));
+    o.init_member("DISPLAYING", gl.createFunction(event_DISPLAYING));
+    o.init_member("ENTER_FRAME", gl.createFunction(event_ENTER_FRAME));
+    o.init_member("FULLSCREEN", gl.createFunction(event_FULLSCREEN));
+    o.init_member("ID3", gl.createFunction(event_ID3));
+    o.init_member("INIT", gl.createFunction(event_INIT));
+    o.init_member("MOUSE_LEAVE", gl.createFunction(event_MOUSE_LEAVE));
+    o.init_member("OPEN", gl.createFunction(event_OPEN));
+    o.init_member("REMOVED", gl.createFunction(event_REMOVED));
+    o.init_member("REMOVED_FROM_STAGE", gl.createFunction(event_REMOVED_FROM_STAGE));
+    o.init_member("RENDER", gl.createFunction(event_RENDER));
+    o.init_member("RESIZE", gl.createFunction(event_RESIZE));
+    o.init_member("SCROLL", gl.createFunction(event_SCROLL));
+    o.init_member("SELECT", gl.createFunction(event_SELECT));
+    o.init_member("SOUND_COMPLETE", gl.createFunction(event_SOUND_COMPLETE));
+    o.init_member("TAB_CHILDREN_CHANGE", gl.createFunction(event_TAB_CHILDREN_CHANGE));
+    o.init_member("TAB_ENABLED_CHANGE", gl.createFunction(event_TAB_ENABLED_CHANGE));
+    o.init_member("TAB_INDEX_CHANGE", gl.createFunction(event_TAB_INDEX_CHANGE));
+    o.init_member("UNLOAD", gl.createFunction(event_UNLOAD));
 }
 
 void

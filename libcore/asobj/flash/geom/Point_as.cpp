@@ -80,24 +80,24 @@ attachPointInterface(as_object& o)
 {
     const int fl = 0;
 
-    Global_as* gl = getGlobal(o);
-    o.init_member("add", gl->createFunction(point_add), fl);
-    o.init_member("clone", gl->createFunction(point_clone), fl);
-    o.init_member("equals", gl->createFunction(point_equals), fl);
-    o.init_member("normalize", gl->createFunction(point_normalize), fl);
-    o.init_member("offset", gl->createFunction(point_offset), fl);
-    o.init_member("subtract", gl->createFunction(point_subtract), fl);
-    o.init_member("toString", gl->createFunction(point_toString), fl);
+    Global_as& gl = getGlobal(o);
+    o.init_member("add", gl.createFunction(point_add), fl);
+    o.init_member("clone", gl.createFunction(point_clone), fl);
+    o.init_member("equals", gl.createFunction(point_equals), fl);
+    o.init_member("normalize", gl.createFunction(point_normalize), fl);
+    o.init_member("offset", gl.createFunction(point_offset), fl);
+    o.init_member("subtract", gl.createFunction(point_subtract), fl);
+    o.init_member("toString", gl.createFunction(point_toString), fl);
     o.init_property("length", point_length, point_length, fl);
 }
 
 void
 attachPointStaticProperties(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("distance", gl->createFunction(point_distance), 0);
-    o.init_member("interpolate", gl->createFunction(point_interpolate), 0);
-    o.init_member("polar", gl->createFunction(point_polar), 0);
+    Global_as& gl = getGlobal(o);
+    o.init_member("distance", gl.createFunction(point_distance), 0);
+    o.init_member("interpolate", gl.createFunction(point_interpolate), 0);
+    o.init_member("polar", gl.createFunction(point_polar), 0);
 }
 
 
@@ -128,7 +128,7 @@ point_add(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(*getGlobal(fn));
+        as_object* o = arg1.to_object(getGlobal(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -199,7 +199,7 @@ point_equals(const fn_call& fn)
         );
         return as_value(false);
     }
-    as_object* o = arg1.to_object(*getGlobal(fn));
+    as_object* o = arg1.to_object(getGlobal(fn));
     assert(o);
     if (!o->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -329,7 +329,7 @@ point_subtract(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(*getGlobal(fn));
+        as_object* o = arg1.to_object(getGlobal(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -438,7 +438,7 @@ point_distance(const fn_call& fn)
         );
         return as_value();
     }
-    as_object* o1 = arg1.to_object(*getGlobal(fn));
+    as_object* o1 = arg1.to_object(getGlobal(fn));
     assert(o1);
     if (!o1->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -450,7 +450,7 @@ point_distance(const fn_call& fn)
     }
 
     const as_value& arg2 = fn.arg(1);
-    as_object* o2 = arg2.to_object(*getGlobal(fn));
+    as_object* o2 = arg2.to_object(getGlobal(fn));
     assert(o2);
     // it seems there's no need to check arg2 (see actionscript.all/Point.as)
 
@@ -510,7 +510,7 @@ point_interpolate(const fn_call& fn)
         );
 
         const as_value& p0val = fn.arg(0);
-        as_object* p0 = p0val.to_object(*getGlobal(fn));
+        as_object* p0 = p0val.to_object(getGlobal(fn));
         if ( ! p0 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -525,7 +525,7 @@ point_interpolate(const fn_call& fn)
         }
 
         const as_value& p1val = fn.arg(1);
-        as_object* p1 = p1val.to_object(*getGlobal(fn));
+        as_object* p1 = p1val.to_object(getGlobal(fn));
         if ( ! p1 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -642,9 +642,9 @@ as_value
 get_flash_geom_point_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Point class");
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&point_ctor, proto);
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&point_ctor, proto);
     attachPointInterface(*proto);
     attachPointStaticProperties(*cl);
     return cl;

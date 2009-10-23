@@ -955,9 +955,9 @@ void
 button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
-    Global_as* gl = getGlobal(global);
+    Global_as& gl = getGlobal(global);
     as_object* proto = getButtonInterface();
-    as_object* cl = gl->createClass(&button_ctor, proto);
+    as_object* cl = gl.createClass(&button_ctor, proto);
 
     // Register _global.MovieClip
     global.init_member(getName(uri), cl, as_object::DefaultFlags,

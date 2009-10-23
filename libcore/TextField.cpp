@@ -261,7 +261,7 @@ TextField::init()
      
     set_prototype(proto);
 
-    as_object* ar = getGlobal(*this)->createArray();
+    as_object* ar = getGlobal(*this).createArray();
     ar->callMethod(NSV::PROP_PUSH, this);
     set_member(NSV::PROP_uLISTENERS, ar);
     
@@ -2335,9 +2335,9 @@ void
 textfield_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&textfield_ctor, proto);
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&textfield_ctor, proto);
 
     attachTextFieldInterface(*proto);
     attachTextFieldStaticMembers(*cl);
@@ -2348,7 +2348,7 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
     // ASSetPropFlags is called on the TextField class.
     string_table& st = getStringTable(where);
     as_object* null = 0;
-    gl->callMethod(st.find("ASSetPropFlags"), cl, null, 131);
+    gl.callMethod(st.find("ASSetPropFlags"), cl, null, 131);
 }
 
 void
@@ -2813,55 +2813,55 @@ attachPrototypeProperties(as_object& o)
     o.init_property(NSV::PROP_TEXT_HEIGHT,
             textfield_textHeight, textfield_textHeight);
 
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
-    getset = gl->createFunction(textfield_variable);
+    getset = gl.createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_background);
+    getset = gl.createFunction(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_text);
+    getset = gl.createFunction(textfield_text);
     o.init_property("text", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_backgroundColor);
+    getset = gl.createFunction(textfield_backgroundColor);
     o.init_property("backgroundColor", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_border);
+    getset = gl.createFunction(textfield_border);
     o.init_property("border", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_borderColor);
+    getset = gl.createFunction(textfield_borderColor);
     o.init_property("borderColor", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_textColor);
+    getset = gl.createFunction(textfield_textColor);
     o.init_property("textColor", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_embedFonts);
+    getset = gl.createFunction(textfield_embedFonts);
     o.init_property("embedFonts", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_autoSize);
+    getset = gl.createFunction(textfield_autoSize);
     o.init_property("autoSize", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_type);
+    getset = gl.createFunction(textfield_type);
     o.init_property("type", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_wordWrap);
+    getset = gl.createFunction(textfield_wordWrap);
     o.init_property("wordWrap", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_html);
+    getset = gl.createFunction(textfield_html);
     o.init_property("html", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_selectable);
+    getset = gl.createFunction(textfield_selectable);
     o.init_property("selectable", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_length);
+    getset = gl.createFunction(textfield_length);
     o.init_property("length", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_maxscroll);
+    getset = gl.createFunction(textfield_maxscroll);
     o.init_property("maxscroll", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_maxhscroll);
+    getset = gl.createFunction(textfield_maxhscroll);
     o.init_property("maxhscroll", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_maxChars);
+    getset = gl.createFunction(textfield_maxChars);
     o.init_property("maxChars", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_bottomScroll);
+    getset = gl.createFunction(textfield_bottomScroll);
     o.init_property("bottomScroll", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_scroll);
+    getset = gl.createFunction(textfield_scroll);
     o.init_property("scroll", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_hscroll);
+    getset = gl.createFunction(textfield_hscroll);
     o.init_property("hscroll", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_restrict);
+    getset = gl.createFunction(textfield_restrict);
     o.init_property("restrict", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_multiline);
+    getset = gl.createFunction(textfield_multiline);
     o.init_property("multiline", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_password);
+    getset = gl.createFunction(textfield_password);
     o.init_property("password", *getset, *getset, swf6Flags);
-    getset = gl->createFunction(textfield_htmlText);
+    getset = gl.createFunction(textfield_htmlText);
     o.init_property("htmlText", *getset, *getset, swf6Flags);
 }
 
@@ -3282,8 +3282,8 @@ textfield_getTextFormat(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
 
-    Global_as* gl = getGlobal(fn);
-    as_function* ctor = gl->getMember(NSV::CLASS_TEXT_FORMAT).to_as_function();
+    Global_as& gl = getGlobal(fn);
+    as_function* ctor = gl.getMember(NSV::CLASS_TEXT_FORMAT).to_as_function();
 
     if (!ctor) return as_value();
 
@@ -3346,7 +3346,7 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     TextFormat_as* tf;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), tf)) {
+    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), tf)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
@@ -3733,9 +3733,9 @@ attachTextFieldInterface(as_object& o)
 
     // Finally ASSetPropFlags is called on the prototype.
     string_table& st = getStringTable(o);
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     as_object* null = 0;
-    gl->callMethod(st.find("ASSetPropFlags"), &o, null, 131);
+    gl.callMethod(st.find("ASSetPropFlags"), &o, null, 131);
 }
 
 void

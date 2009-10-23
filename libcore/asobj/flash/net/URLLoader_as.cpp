@@ -65,9 +65,9 @@ void urlloader_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getURLLoaderInterface();
-        cl = gl->createClass(&urlloader_ctor, proto);
+        cl = gl.createClass(&urlloader_ctor, proto);
         attachURLLoaderStaticInterface(*cl);
     }
 
@@ -81,15 +81,15 @@ namespace {
 void
 attachURLLoaderInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("close", gl->createFunction(urlloader_close));
-    o.init_member("load", gl->createFunction(urlloader_load));
-    o.init_member("complete", gl->createFunction(urlloader_complete));
-    o.init_member("httpStatus", gl->createFunction(urlloader_httpStatus));
-    o.init_member("ioError", gl->createFunction(urlloader_ioError));
-    o.init_member("open", gl->createFunction(urlloader_open));
-    o.init_member("progress", gl->createFunction(urlloader_progress));
-    o.init_member("securityError", gl->createFunction(urlloader_securityError));
+    Global_as& gl = getGlobal(o);
+    o.init_member("close", gl.createFunction(urlloader_close));
+    o.init_member("load", gl.createFunction(urlloader_load));
+    o.init_member("complete", gl.createFunction(urlloader_complete));
+    o.init_member("httpStatus", gl.createFunction(urlloader_httpStatus));
+    o.init_member("ioError", gl.createFunction(urlloader_ioError));
+    o.init_member("open", gl.createFunction(urlloader_open));
+    o.init_member("progress", gl.createFunction(urlloader_progress));
+    o.init_member("securityError", gl.createFunction(urlloader_securityError));
 }
 
 void

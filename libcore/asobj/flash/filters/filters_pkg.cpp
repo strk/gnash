@@ -46,8 +46,8 @@ get_flash_filters_package(const fn_call& fn)
 {
 
     log_debug("Loading flash.filters package");
-    Global_as* gl = getGlobal(fn);
-    as_object* pkg = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* pkg = gl.createObject();
 
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;

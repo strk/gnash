@@ -80,7 +80,7 @@ deleteLocal(as_object* locals, const std::string& varname)
 as_object*
 getElement(as_object* obj, string_table::key key)
 {
-    //Global_as* gl = getGlobal(*obj); 
+    //Global_as& gl = getGlobal(*obj); 
     return obj->get_path_element(key);
 }
 
@@ -1035,10 +1035,10 @@ getRoot(const as_environment& env)
     return env.getVM().getRoot();
 }
 
-Global_as*
+Global_as&
 getGlobal(const as_environment& env)
 {
-    return env.getVM().getGlobal();
+    return *env.getVM().getGlobal();
 }
 
 int

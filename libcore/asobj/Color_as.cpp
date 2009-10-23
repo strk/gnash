@@ -72,7 +72,7 @@ color_class_init(as_object& where, const ObjectURI& uri)
             attachColorInterface, 0, uri);
 
     as_object* proto =
-        cl->getMember(NSV::PROP_PROTOTYPE).to_object(*getGlobal(where));
+        cl->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(where));
 
     if (!proto) return;
 
@@ -132,8 +132,8 @@ color_gettransform(const fn_call& fn)
 
 	// Convert to as_object
 
-    Global_as* gl = getGlobal(fn);
-	as_object* ret = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+	as_object* ret = gl.createObject();
 
 	ret->init_member("ra", double(cx.ra / 2.56));
 	ret->init_member("ga", double(cx.ga / 2.56));
@@ -193,7 +193,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object(*getGlobal(fn));
+	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object(getGlobal(fn));
 
     if (!trans) {
 		IF_VERBOSE_ASCODING_ERRORS(

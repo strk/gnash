@@ -85,28 +85,28 @@ namespace {
 void
 attachURLStreamInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("load", gl->createFunction(urlstream_load));
-    o.init_member("readBoolean", gl->createFunction(urlstream_readBoolean));
-    o.init_member("readByte", gl->createFunction(urlstream_readByte));
-    o.init_member("readBytes", gl->createFunction(urlstream_readBytes));
-    o.init_member("readDouble", gl->createFunction(urlstream_readDouble));
-    o.init_member("readFloat", gl->createFunction(urlstream_readFloat));
-    o.init_member("readInt", gl->createFunction(urlstream_readInt));
-    o.init_member("readMultiByte", gl->createFunction(urlstream_readMultiByte));
-    o.init_member("readObject", gl->createFunction(urlstream_readObject));
-    o.init_member("readShort", gl->createFunction(urlstream_readShort));
-    o.init_member("readUnsignedByte", gl->createFunction(urlstream_readUnsignedByte));
-    o.init_member("readUnsignedInt", gl->createFunction(urlstream_readUnsignedInt));
-    o.init_member("readUnsignedShort", gl->createFunction(urlstream_readUnsignedShort));
-    o.init_member("readUTF", gl->createFunction(urlstream_readUTF));
-    o.init_member("readUTFBytes", gl->createFunction(urlstream_readUTFBytes));
-    o.init_member("complete", gl->createFunction(urlstream_complete));
-    o.init_member("httpStatus", gl->createFunction(urlstream_httpStatus));
-    o.init_member("ioError", gl->createFunction(urlstream_ioError));
-    o.init_member("open", gl->createFunction(urlstream_open));
-    o.init_member("progress", gl->createFunction(urlstream_progress));
-    o.init_member("securityError", gl->createFunction(urlstream_securityError));
+    Global_as& gl = getGlobal(o);
+    o.init_member("load", gl.createFunction(urlstream_load));
+    o.init_member("readBoolean", gl.createFunction(urlstream_readBoolean));
+    o.init_member("readByte", gl.createFunction(urlstream_readByte));
+    o.init_member("readBytes", gl.createFunction(urlstream_readBytes));
+    o.init_member("readDouble", gl.createFunction(urlstream_readDouble));
+    o.init_member("readFloat", gl.createFunction(urlstream_readFloat));
+    o.init_member("readInt", gl.createFunction(urlstream_readInt));
+    o.init_member("readMultiByte", gl.createFunction(urlstream_readMultiByte));
+    o.init_member("readObject", gl.createFunction(urlstream_readObject));
+    o.init_member("readShort", gl.createFunction(urlstream_readShort));
+    o.init_member("readUnsignedByte", gl.createFunction(urlstream_readUnsignedByte));
+    o.init_member("readUnsignedInt", gl.createFunction(urlstream_readUnsignedInt));
+    o.init_member("readUnsignedShort", gl.createFunction(urlstream_readUnsignedShort));
+    o.init_member("readUTF", gl.createFunction(urlstream_readUTF));
+    o.init_member("readUTFBytes", gl.createFunction(urlstream_readUTFBytes));
+    o.init_member("complete", gl.createFunction(urlstream_complete));
+    o.init_member("httpStatus", gl.createFunction(urlstream_httpStatus));
+    o.init_member("ioError", gl.createFunction(urlstream_ioError));
+    o.init_member("open", gl.createFunction(urlstream_open));
+    o.init_member("progress", gl.createFunction(urlstream_progress));
+    o.init_member("securityError", gl.createFunction(urlstream_securityError));
 }
 
 void

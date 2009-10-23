@@ -72,8 +72,8 @@ namespace {
 void
 attachDisplacementMapFilterInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("clone", gl->createFunction(displacementmapfilter_clone));
+    Global_as& gl = getGlobal(o);
+    o.init_member("clone", gl.createFunction(displacementmapfilter_clone));
     o.init_property("alpha", displacementmapfilter_alpha, displacementmapfilter_alpha);
     o.init_property("color", displacementmapfilter_color, displacementmapfilter_color);
     o.init_property("componentX", displacementmapfilter_componentX, displacementmapfilter_componentX);

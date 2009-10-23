@@ -170,7 +170,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
 
             /// Read in our custom headers if they exist and are an
             /// array.
-            as_object* array = customHeaders.to_object(*getGlobal(target));
+            as_object* array = customHeaders.to_object(getGlobal(target));
             if (array) {
                 WriteHeaders wh(headers);
                 foreachArray(*array, wh);
@@ -382,11 +382,11 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     as_value customHeaders;
     as_object* array;
 
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
 
     if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object(*gl);
+        array = customHeaders.to_object(gl);
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -397,7 +397,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         }
     }
     else {
-        array = gl->createArray();
+        array = gl.createArray();
         // This property is always initialized on the first call to
         // addRequestHeaders. It has default properties.
         fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array);
@@ -417,7 +417,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     {
         // This must be an array (or something like it). Keys / values are
         // pushed in valid pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> headerArray = fn.arg(0).to_object(*gl);
+        boost::intrusive_ptr<as_object> headerArray = fn.arg(0).to_object(gl);
 
         if (!headerArray) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -552,7 +552,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
     // TODO: if this isn't an XML or LoadVars, it won't work, but we should
     // check how far things get before it fails.
     boost::intrusive_ptr<as_object> target =
-        fn.arg(1).to_object(*getGlobal(fn));
+        fn.arg(1).to_object(getGlobal(fn));
 
     // According to the Flash 8 Cookbook (Joey Lott, Jeffrey Bardzell), p 427,
     // this method sends by GET unless overridden, and always by GET in the

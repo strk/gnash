@@ -959,7 +959,7 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
             return true;
         case NSV::PROP_uGLOBAL:
             if (getSWFVersion(o) < 6) break;
-            val = getGlobal(o);
+            val = &getGlobal(o);
             return true;
     }
     

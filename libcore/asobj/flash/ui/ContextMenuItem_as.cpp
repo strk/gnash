@@ -56,8 +56,8 @@ attachContextMenuItemInterface(as_object& o)
                       PropFlags::dontDelete |
                       PropFlags::onlySWF7Up;
 
-    Global_as* gl = getGlobal(o);
-    o.init_member("copy", gl->createFunction(contextmenuitem_copy), flags);
+    Global_as& gl = getGlobal(o);
+    o.init_member("copy", gl.createFunction(contextmenuitem_copy), flags);
 }
 
 as_value
@@ -65,11 +65,11 @@ contextmenuitem_copy(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
     string_table& st = getStringTable(fn);
 
     as_function* ctor =
-        gl->getMember(st.find("ContextMenuItem")).to_as_function();
+        gl.getMember(st.find("ContextMenuItem")).to_as_function();
 
     if (!ctor) return as_value();
 

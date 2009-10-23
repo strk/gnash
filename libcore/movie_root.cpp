@@ -528,13 +528,16 @@ movie_root::clear()
 as_object*
 movie_root::getSelectionObject() const
 {
-    Global_as* global = _vm.getGlobal();
-    if (!global) return 0;
+    // This can never be null, though it is possible to override the
+    // reference to _global in AS2. If that makes a difference, we should
+    // look up the object by path (_global.Selection) rather than using
+    // the stored global object.
+    Global_as& gl = *_vm.getGlobal();
 
     as_value s;
-    if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
+    if (!gl.get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object(*global);
+    as_object* sel = s.to_object(gl);
    
     return sel;
 }
@@ -543,11 +546,10 @@ as_object*
 movie_root::getStageObject()
 {
 	as_value v;
-	assert ( VM::isInitialized() ); // return NULL;
-	Global_as* global = _vm.getGlobal();
-	if (!global) return 0;
-	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return 0;
-	return v.to_object(*global);
+	assert (VM::isInitialized()); 
+	Global_as& gl = *_vm.getGlobal();
+	if (!gl.get_member(NSV::PROP_iSTAGE, &v) ) return 0;
+	return v.to_object(gl);
 }
 		
 void
@@ -588,23 +590,23 @@ movie_root::notify_mouse_moved(int x, int y)
 Keyboard_as*
 movie_root::getKeyObject()
 {
-    Global_as* global = _vm.getGlobal();
+    Global_as& gl = *_vm.getGlobal();
 
     as_value kval;
-    if (!global->get_member(NSV::CLASS_KEY, &kval)) return 0;
+    if (!gl.get_member(NSV::CLASS_KEY, &kval)) return 0;
 
-    as_object* obj = kval.to_object(*global);
-    return dynamic_cast<Keyboard_as*>( obj );
+    as_object* obj = kval.to_object(gl);
+    return dynamic_cast<Keyboard_as*>(obj);
 }
 
 as_object*
 movie_root::getMouseObject()
 {
-    Global_as* global = _vm.getGlobal();
+    Global_as& gl = *_vm.getGlobal();
 
     as_value val;
-    if (!global->get_member(NSV::CLASS_MOUSE, &val)) return 0;
-    return val.to_object(*global);
+    if (!gl.get_member(NSV::CLASS_MOUSE, &val)) return 0;
+    return val.to_object(gl);
 }
 
 

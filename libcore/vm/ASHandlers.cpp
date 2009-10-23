@@ -1314,7 +1314,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 
     // Get the "instance"
     boost::intrusive_ptr<as_object> instance = 
-        convertToObject(*getGlobal(thread.env), env.top(0));
+        convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
     as_function* super = env.top(1).to_as_function();
@@ -1358,7 +1358,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     as_value objval = env.pop();
-    as_object *obj = convertToObject(*getGlobal(thread.env), objval);
+    as_object *obj = convertToObject(getGlobal(thread.env), objval);
     int count = static_cast<int>(env.pop().to_number());
     as_value a(1);
 
@@ -1379,7 +1379,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
         );
         return;
     }
-    obj = convertToObject(*getGlobal(thread.env), protoval);
+    obj = convertToObject(getGlobal(thread.env), protoval);
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1401,7 +1401,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
     {
         as_value ctorval = env.pop();
 
-        as_object* ctor = convertToObject(*getGlobal(thread.env), ctorval);
+        as_object* ctor = convertToObject(getGlobal(thread.env), ctorval);
         if ( ! ctor )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -1416,7 +1416,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
             );
             continue;
         }
-        as_object *inter = convertToObject(*getGlobal(thread.env), protoval);
+        as_object *inter = convertToObject(getGlobal(thread.env), protoval);
         if ( ! inter )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -2534,11 +2534,11 @@ SWFHandlers::ActionDelete(ActionExec& thread)
         }
         else {
             as_value target = thread.getVariable(path);
-            obj = convertToObject(*getGlobal(thread.env), target);
+            obj = convertToObject(getGlobal(thread.env), target);
             propertyname = var;
         }
     }
-    else obj = convertToObject(*getGlobal(thread.env), env.top(1));
+    else obj = convertToObject(getGlobal(thread.env), env.top(1));
 
     if (!obj)
     {
@@ -2580,7 +2580,7 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
     
     // Otherwise see if it's an object and delete it.
     as_value target = thread.getVariable(path);
-    boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), target);
+    boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), target);
 
     if (!obj)
     {
@@ -2638,7 +2638,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         log_error(_("ActionCallFunction: function name %s evaluated to "
                 "non-function value %s"), funcname, function);
         // Calling super ? 
-        as_object* obj = convertToObject(*getGlobal(thread.env), function);
+        as_object* obj = convertToObject(getGlobal(thread.env), function);
         this_ptr = thread.getThisPointer();
         if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
         {
@@ -2805,9 +2805,9 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     const int array_size = env.pop().to_int();
     assert(array_size >= 0); // TODO: trigger this !!
     
-    Global_as* gl = getGlobal(env);
+    Global_as& gl = getGlobal(env);
 
-    as_object* ao = gl->createArray();
+    as_object* ao = gl.createArray();
 
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
@@ -2837,10 +2837,10 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     const int nmembers = env.pop().to_int();
 
     // TODO: see if this could call the ASnative function(101, 9).
-    Global_as* gl = getGlobal(env);
-    as_object* obj = gl->createObject();
+    Global_as& gl = getGlobal(env);
+    as_object* obj = gl.createObject();
 
-    obj->init_member(NSV::PROP_CONSTRUCTOR, gl->getMember(NSV::CLASS_OBJECT));
+    obj->init_member(NSV::PROP_CONSTRUCTOR, gl.getMember(NSV::CLASS_OBJECT));
 
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
@@ -2909,7 +2909,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
     env.top(0).set_undefined();
 
-    const boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), variable);
+    const boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), variable);
     if ( !obj || !variable.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3019,7 +3019,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     as_value target = env.top(1);
 
     boost::intrusive_ptr<as_object> obj =
-        convertToObject(*getGlobal(thread.env), target);
+        convertToObject(getGlobal(thread.env), target);
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3064,7 +3064,7 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), env.top(2));
+    boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), env.top(2));
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
@@ -3151,7 +3151,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     bool hasMethodName = ((!method_name.is_undefined()) &&
             (!method_string.empty()) );
 
-    boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), obj_value);
+    boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), obj_value);
     if (!obj) {
         // SWF integrity check
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3282,7 +3282,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
         nargs = available_args;
     }
 
-    boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), obj_val);
+    boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), obj_val);
     if (!obj) {
         // SWF integrity check
         // FIXME, should this be log_swferror?  Or log_aserror?
@@ -3347,11 +3347,11 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "super" function
-    as_object* super = convertToObject(*getGlobal(thread.env), env.top(0));
+    as_object* super = convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "instance" (but avoid implicit conversion of primitive values!)
     as_object* instance = env.top(1).is_object() ?
-        convertToObject(*getGlobal(thread.env), env.top(1)) : NULL;
+        convertToObject(getGlobal(thread.env), env.top(1)) : NULL;
 
     // Invalid args!
     if (!super || ! instance) {
@@ -3384,7 +3384,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
     // as we copied that as_value.
     env.top(0).set_undefined();
 
-    const boost::intrusive_ptr<as_object> obj = convertToObject(*getGlobal(thread.env), obj_val);
+    const boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), obj_val);
     if ( !obj || !obj_val.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3657,11 +3657,11 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
         env.push(function_value);
     }
 #ifdef USE_DEBUGGER
-    // WARNING: convertToObject(*getGlobal(thread.env), function_value) can return a newly allocated
+    // WARNING: convertToObject(getGlobal(thread.env), function_value) can return a newly allocated
     //          thing into the intrusive_ptr, so the debugger
     //          will be left with a deleted object !!
     //          Rob: we don't want to use void pointers here..
-    boost::intrusive_ptr<as_object> o = convertToObject(*getGlobal(thread.env), function_value);
+    boost::intrusive_ptr<as_object> o = convertToObject(getGlobal(thread.env), function_value);
 #ifndef GNASH_USE_GC
     o->add_ref(); // this will leak, but at least debugger won't end up
                   // with a dangling reference...
@@ -3740,7 +3740,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 #endif
 
     const as_value& val = env.pop();
-    as_object* with_obj = val.to_object(*getGlobal(thread.env));
+    as_object* with_obj = val.to_object(getGlobal(thread.env));
 
     ++pc; // skip tag code
 
@@ -3855,11 +3855,11 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
         //env.set_member(name, function_value);
         thread.setVariable(name, function_value);
 #ifdef USE_DEBUGGER
-        // WARNING: convertToObject(*getGlobal(thread.env), new_obj) can return a newly allocated
+        // WARNING: convertToObject(getGlobal(thread.env), new_obj) can return a newly allocated
         //          thing into the intrusive_ptr, so the debugger
         //          will be left with a deleted object !!
         //          Rob: we don't want to use void pointers here..
-        boost::intrusive_ptr<as_object> o = convertToObject(*getGlobal(thread.env), function_value);
+        boost::intrusive_ptr<as_object> o = convertToObject(getGlobal(thread.env), function_value);
 #ifndef GNASH_USE_GC
         o->add_ref(); // this will leak, but at least debugger won't end up
                   // with a dandling reference...

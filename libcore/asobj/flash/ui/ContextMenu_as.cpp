@@ -79,10 +79,10 @@ attachContextMenuInterface(as_object& o)
                       PropFlags::dontEnum |
                       PropFlags::onlySWF7Up;
 
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     o.init_member("hideBuiltInItems",
-            gl->createFunction(contextmenu_hideBuiltInItems), flags);
-    o.init_member("copy", gl->createFunction(contextmenu_copy), flags);
+            gl.createFunction(contextmenu_hideBuiltInItems), flags);
+    o.init_member("copy", gl.createFunction(contextmenu_copy), flags);
 }
 
 as_value
@@ -91,8 +91,8 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
     string_table& st = getStringTable(fn);
 
-    Global_as* gl = getGlobal(fn);
-    as_object* builtIns = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* builtIns = gl.createObject();
     setBuiltInItems(*builtIns, false);
     ptr->set_member(st.find("builtInItems"), builtIns);
     return as_value();
@@ -103,9 +103,9 @@ contextmenu_copy(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
 
-    as_function* ctor = gl->getMember(NSV::CLASS_CONTEXTMENU).to_as_function();
+    as_function* ctor = gl.getMember(NSV::CLASS_CONTEXTMENU).to_as_function();
     if (!ctor) {
         return as_value();
     }
@@ -117,7 +117,7 @@ contextmenu_copy(const fn_call& fn)
     
     string_table& st = getStringTable(fn);
     as_value onSelect, builtInItems;
-    as_value customItems = gl->createArray();
+    as_value customItems = gl.createArray();
 
     ptr->get_member(NSV::PROP_ON_SELECT, &onSelect);
     ptr->get_member(st.find("builtInItems"), &builtInItems);
@@ -130,11 +130,11 @@ contextmenu_copy(const fn_call& fn)
 
     // The customItems object is a deep copy, but only of elements that are
     // instances of ContextMenuItem (have its prototype as a __proto__ member).
-    as_object* nc = gl->createArray();
+    as_object* nc = gl.createArray();
     as_object* customs;
 
     if (customItems.is_object() &&
-            (customs = customItems.to_object(*getGlobal(fn)))) {
+            (customs = customItems.to_object(getGlobal(fn)))) {
         // TODO: only copy properties that are ContextMenuItems.
         nc->copyProperties(*customs);
         customItems = nc;
@@ -156,13 +156,13 @@ contextmenu_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_ON_SELECT, callback);
     
     string_table& st = getStringTable(fn);
-    Global_as* gl = getGlobal(fn);
-    as_object* builtInItems = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* builtInItems = gl.createObject();
     setBuiltInItems(*builtInItems, true);
     obj->set_member(st.find("builtInItems"), builtInItems);
 
     // There is an empty customItems array.
-    as_object* customItems = gl->createArray();
+    as_object* customItems = gl.createArray();
     obj->set_member(st.find("customItems"), customItems);
 
     return as_value();

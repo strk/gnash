@@ -68,9 +68,9 @@ void displayobject_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getDisplayObjectInterface();
-        cl = gl->createClass(&displayobject_ctor, proto);
+        cl = gl.createClass(&displayobject_ctor, proto);
         attachDisplayObjectStaticInterface(*cl);
     }
 
@@ -84,19 +84,19 @@ namespace {
 void
 attachDisplayObjectInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
-    o.init_member("getRect", gl->createFunction(displayobject_getRect));
-    o.init_member("globalToLocal", gl->createFunction(displayobject_globalToLocal));
-    o.init_member("hitTestObject", gl->createFunction(displayobject_hitTestObject));
-    o.init_member("hitTestPoint", gl->createFunction(displayobject_hitTestPoint));
-    o.init_member("localToGlobal", gl->createFunction(displayobject_localToGlobal));
-    o.init_member("added", gl->createFunction(displayobject_added));
-    o.init_member("addedToStage", gl->createFunction(displayobject_addedToStage));
-    o.init_member("enterFrame", gl->createFunction(displayobject_enterFrame));
-    o.init_member("removed", gl->createFunction(displayobject_removed));
-    o.init_member("removedFromStage", gl->createFunction(displayobject_removedFromStage));
-    o.init_member("render", gl->createFunction(displayobject_render));
+    o.init_member("getRect", gl.createFunction(displayobject_getRect));
+    o.init_member("globalToLocal", gl.createFunction(displayobject_globalToLocal));
+    o.init_member("hitTestObject", gl.createFunction(displayobject_hitTestObject));
+    o.init_member("hitTestPoint", gl.createFunction(displayobject_hitTestPoint));
+    o.init_member("localToGlobal", gl.createFunction(displayobject_localToGlobal));
+    o.init_member("added", gl.createFunction(displayobject_added));
+    o.init_member("addedToStage", gl.createFunction(displayobject_addedToStage));
+    o.init_member("enterFrame", gl.createFunction(displayobject_enterFrame));
+    o.init_member("removed", gl.createFunction(displayobject_removed));
+    o.init_member("removedFromStage", gl.createFunction(displayobject_removedFromStage));
+    o.init_member("render", gl.createFunction(displayobject_render));
 }
 
 void

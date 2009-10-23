@@ -81,35 +81,35 @@ namespace {
 void
 attachByteArrayInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("readBoolean", gl->createFunction(bytearray_readBoolean));
-    o.init_member("readByte", gl->createFunction(bytearray_readByte));
-    o.init_member("readBytes", gl->createFunction(bytearray_readBytes));
-    o.init_member("readDouble", gl->createFunction(bytearray_readDouble));
-    o.init_member("readFloat", gl->createFunction(bytearray_readFloat));
-    o.init_member("readInt", gl->createFunction(bytearray_readInt));
-    o.init_member("readMultiByte", gl->createFunction(bytearray_readMultiByte));
-    o.init_member("readObject", gl->createFunction(bytearray_readObject));
-    o.init_member("readShort", gl->createFunction(bytearray_readShort));
-    o.init_member("readUnsignedByte", gl->createFunction(bytearray_readUnsignedByte));
-    o.init_member("readUnsignedInt", gl->createFunction(bytearray_readUnsignedInt));
-    o.init_member("readUnsignedShort", gl->createFunction(bytearray_readUnsignedShort));
-    o.init_member("readUTF", gl->createFunction(bytearray_readUTF));
-    o.init_member("readUTFBytes", gl->createFunction(bytearray_readUTFBytes));
-    o.init_member("toString", gl->createFunction(bytearray_toString));
-    o.init_member("uncompress", gl->createFunction(bytearray_uncompress));
-    o.init_member("writeBoolean", gl->createFunction(bytearray_writeBoolean));
-    o.init_member("writeByte", gl->createFunction(bytearray_writeByte));
-    o.init_member("writeBytes", gl->createFunction(bytearray_writeBytes));
-    o.init_member("writeDouble", gl->createFunction(bytearray_writeDouble));
-    o.init_member("writeFloat", gl->createFunction(bytearray_writeFloat));
-    o.init_member("writeInt", gl->createFunction(bytearray_writeInt));
-    o.init_member("writeMultiByte", gl->createFunction(bytearray_writeMultiByte));
-    o.init_member("writeObject", gl->createFunction(bytearray_writeObject));
-    o.init_member("writeShort", gl->createFunction(bytearray_writeShort));
-    o.init_member("writeUnsignedInt", gl->createFunction(bytearray_writeUnsignedInt));
-    o.init_member("writeUTF", gl->createFunction(bytearray_writeUTF));
-    o.init_member("writeUTFBytes", gl->createFunction(bytearray_writeUTFBytes));
+    Global_as& gl = getGlobal(o);
+    o.init_member("readBoolean", gl.createFunction(bytearray_readBoolean));
+    o.init_member("readByte", gl.createFunction(bytearray_readByte));
+    o.init_member("readBytes", gl.createFunction(bytearray_readBytes));
+    o.init_member("readDouble", gl.createFunction(bytearray_readDouble));
+    o.init_member("readFloat", gl.createFunction(bytearray_readFloat));
+    o.init_member("readInt", gl.createFunction(bytearray_readInt));
+    o.init_member("readMultiByte", gl.createFunction(bytearray_readMultiByte));
+    o.init_member("readObject", gl.createFunction(bytearray_readObject));
+    o.init_member("readShort", gl.createFunction(bytearray_readShort));
+    o.init_member("readUnsignedByte", gl.createFunction(bytearray_readUnsignedByte));
+    o.init_member("readUnsignedInt", gl.createFunction(bytearray_readUnsignedInt));
+    o.init_member("readUnsignedShort", gl.createFunction(bytearray_readUnsignedShort));
+    o.init_member("readUTF", gl.createFunction(bytearray_readUTF));
+    o.init_member("readUTFBytes", gl.createFunction(bytearray_readUTFBytes));
+    o.init_member("toString", gl.createFunction(bytearray_toString));
+    o.init_member("uncompress", gl.createFunction(bytearray_uncompress));
+    o.init_member("writeBoolean", gl.createFunction(bytearray_writeBoolean));
+    o.init_member("writeByte", gl.createFunction(bytearray_writeByte));
+    o.init_member("writeBytes", gl.createFunction(bytearray_writeBytes));
+    o.init_member("writeDouble", gl.createFunction(bytearray_writeDouble));
+    o.init_member("writeFloat", gl.createFunction(bytearray_writeFloat));
+    o.init_member("writeInt", gl.createFunction(bytearray_writeInt));
+    o.init_member("writeMultiByte", gl.createFunction(bytearray_writeMultiByte));
+    o.init_member("writeObject", gl.createFunction(bytearray_writeObject));
+    o.init_member("writeShort", gl.createFunction(bytearray_writeShort));
+    o.init_member("writeUnsignedInt", gl.createFunction(bytearray_writeUnsignedInt));
+    o.init_member("writeUTF", gl.createFunction(bytearray_writeUTF));
+    o.init_member("writeUTFBytes", gl.createFunction(bytearray_writeUTFBytes));
 }
 
 void

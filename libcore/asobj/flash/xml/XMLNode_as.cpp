@@ -436,9 +436,9 @@ XMLNode_as::registerNative(as_object& where)
 void
 XMLNode_as::init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     as_object* proto = getXMLNodeInterface();
-    as_object* cl = gl->createClass(&xmlnode_new, proto);
+    as_object* cl = gl.createClass(&xmlnode_new, proto);
 
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
@@ -537,7 +537,7 @@ xmlnode_appendChild(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> xml_obj = 
-        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(*getGlobal(fn)));
+        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(getGlobal(fn)));
 
 	if ( ! xml_obj )
 	{
@@ -582,7 +582,7 @@ xmlnode_insertBefore(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> newnode = 
-        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(*getGlobal(fn)));
+        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(getGlobal(fn)));
 
 	if (!newnode) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -594,7 +594,7 @@ xmlnode_insertBefore(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<XMLNode_as> pos = 
-        dynamic_cast<XMLNode_as*>(fn.arg(1).to_object(*getGlobal(fn)));
+        dynamic_cast<XMLNode_as*>(fn.arg(1).to_object(getGlobal(fn)));
 
 	if (!pos) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -922,8 +922,8 @@ xmlnode_childNodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode_as> ptr = ensure<ThisIs<XMLNode_as> >(fn);
  
-    Global_as* gl = getGlobal(fn);
-    as_object* ary = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* ary = gl.createArray();
 
     typedef XMLNode_as::Children Children;
 

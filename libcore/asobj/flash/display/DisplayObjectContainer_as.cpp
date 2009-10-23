@@ -63,9 +63,9 @@ displayobjectcontainer_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getDisplayObjectContainerInterface();
-        cl = gl->createClass(&displayobjectcontainer_ctor, proto);
+        cl = gl.createClass(&displayobjectcontainer_ctor, proto);
     }
 
     // Register _global.DisplayObjectContainer
@@ -89,33 +89,33 @@ namespace {
 void
 attachDisplayObjectContainerInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
-    o.init_member("addChildAt", gl->createFunction(
+    o.init_member("addChildAt", gl.createFunction(
                 displayobjectcontainer_addChildAt));
-    o.init_member("addChild", gl->createFunction(
+    o.init_member("addChild", gl.createFunction(
                 displayobjectcontainer_addChild));
-    o.init_member("areInaccessibleObjectsUnderPoint", gl->createFunction(
+    o.init_member("areInaccessibleObjectsUnderPoint", gl.createFunction(
                 displayobjectcontainer_areInaccessibleObjectsUnderPoint));
-    o.init_member("contains", gl->createFunction(
+    o.init_member("contains", gl.createFunction(
                 displayobjectcontainer_contains));
-    o.init_member("getChildAt", gl->createFunction(
+    o.init_member("getChildAt", gl.createFunction(
                 displayobjectcontainer_getChildAt));
-    o.init_member("getChildByName", gl->createFunction(
+    o.init_member("getChildByName", gl.createFunction(
                 displayobjectcontainer_getChildByName));
-    o.init_member("getChildIndex", gl->createFunction(
+    o.init_member("getChildIndex", gl.createFunction(
                 displayobjectcontainer_getChildIndex));
-    o.init_member("getObjectsUnderPoint", gl->createFunction(
+    o.init_member("getObjectsUnderPoint", gl.createFunction(
                 displayobjectcontainer_getObjectsUnderPoint));
-    o.init_member("removeChild", gl->createFunction(
+    o.init_member("removeChild", gl.createFunction(
                 displayobjectcontainer_removeChild));
-    o.init_member("removeChildAt", gl->createFunction(
+    o.init_member("removeChildAt", gl.createFunction(
                 displayobjectcontainer_removeChildAt));
-    o.init_member("setChildIndex", gl->createFunction(
+    o.init_member("setChildIndex", gl.createFunction(
                 displayobjectcontainer_setChildIndex));
-    o.init_member("swapChildren", gl->createFunction(
+    o.init_member("swapChildren", gl.createFunction(
                 displayobjectcontainer_swapChildren));
-    o.init_member("swapChildrenAt", gl->createFunction(
+    o.init_member("swapChildrenAt", gl.createFunction(
                 displayobjectcontainer_swapChildrenAt));
     o.init_readonly_property("numChildren",
             displayobjectcontainer_numChildren);
@@ -144,7 +144,7 @@ displayobjectcontainer_addChild(const fn_call& fn)
         );
     }
 
-    as_object* objArg = fn.arg(0).to_object(*getGlobal(fn));
+    as_object* objArg = fn.arg(0).to_object(getGlobal(fn));
     if (!objArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -189,7 +189,7 @@ displayobjectcontainer_addChildAt(const fn_call& fn)
         );
     }
 
-    as_object* objArg = fn.arg(0).to_object(*getGlobal(fn));
+    as_object* objArg = fn.arg(0).to_object(getGlobal(fn));
     if (!objArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);

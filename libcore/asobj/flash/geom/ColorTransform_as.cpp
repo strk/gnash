@@ -112,8 +112,8 @@ attachColorTransformInterface(as_object& o)
     /// These have no flags:
     VM& vm = getVM(o);
     o.init_member("concat", vm.getNative(1105, 1), flags);
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(colortransform_toString),
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(colortransform_toString),
             flags);
 
     /// These all have SWF8 visibility
@@ -375,9 +375,9 @@ as_value
 get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&colortransform_ctor, proto);
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&colortransform_ctor, proto);
     attachColorTransformInterface(*proto);
     return cl;
 }

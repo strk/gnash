@@ -143,7 +143,7 @@ MovieClipLoader::MovieClipLoader()
 	as_object(getMovieClipLoaderInterface())
 {
 
-	as_object* ar = getGlobal(*this)->createArray();
+	as_object* ar = getGlobal(*this).createArray();
 	ar->callMethod(NSV::PROP_PUSH, this);
 	set_member(NSV::PROP_uLISTENERS, ar);
 }
@@ -229,8 +229,8 @@ void
 moviecliploader_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Number "class"/"function"
-    Global_as* gl = getGlobal(global);
-    as_object* cl = gl->createClass(&moviecliploader_new,
+    Global_as& gl = getGlobal(global);
+    as_object* cl = gl.createClass(&moviecliploader_new,
                 getMovieClipLoaderInterface());
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri)); 
@@ -242,12 +242,12 @@ namespace {
 void
 attachMovieClipLoaderInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-  	o.init_member("loadClip", gl->createFunction(moviecliploader_loadclip));
+    Global_as& gl = getGlobal(o);
+  	o.init_member("loadClip", gl.createFunction(moviecliploader_loadclip));
 	o.init_member("unloadClip",
-            gl->createFunction(moviecliploader_unloadclip));
+            gl.createFunction(moviecliploader_unloadclip));
 	o.init_member("getProgress",
-            gl->createFunction(moviecliploader_getprogress));
+            gl.createFunction(moviecliploader_getprogress));
 
 	// NOTE: we want addListener/removeListener/broadcastMessage
 	//       but don't what the _listeners property here...
@@ -353,7 +353,7 @@ moviecliploader_getprogress(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(*getGlobal(fn));
+	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(getGlobal(fn));
   
 	if ( ! target.get() )
 	{

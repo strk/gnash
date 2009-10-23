@@ -149,9 +149,9 @@ void
 textsnapshot_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&textsnapshot_ctor, proto);
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&textsnapshot_ctor, proto);
     attachTextSnapshotStaticInterface(*cl);
     attachTextSnapshotInterface(*proto);
 
@@ -512,8 +512,8 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
     size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
     size_t end = std::max<boost::int32_t>(start + 1, fn.arg(1).to_int());
 
-    Global_as* gl = getGlobal(fn);
-    as_object* ri = gl->createArray();;
+    Global_as& gl = getGlobal(fn);
+    as_object* ri = gl.createArray();;
 
     ts->getTextRunInfo(start, end, *ri);
     

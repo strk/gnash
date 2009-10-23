@@ -65,20 +65,20 @@ namespace {
 void
 attachIDataInputInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("readByte", gl->createFunction(idatainput_readByte));
-    o.init_member("readBytes", gl->createFunction(idatainput_readBytes));
-    o.init_member("readDouble", gl->createFunction(idatainput_readDouble));
-    o.init_member("readFloat", gl->createFunction(idatainput_readFloat));
-    o.init_member("readInt", gl->createFunction(idatainput_readInt));
-    o.init_member("readMultiByte", gl->createFunction(idatainput_readMultiByte));
-    o.init_member("readObject", gl->createFunction(idatainput_readObject));
-    o.init_member("readShort", gl->createFunction(idatainput_readShort));
-    o.init_member("readUnsignedByte", gl->createFunction(idatainput_readUnsignedByte));
-    o.init_member("readUnsignedInt", gl->createFunction(idatainput_readUnsignedInt));
-    o.init_member("readUnsignedShort", gl->createFunction(idatainput_readUnsignedShort));
-    o.init_member("readUTF", gl->createFunction(idatainput_readUTF));
-    o.init_member("readUTFBytes", gl->createFunction(idatainput_readUTFBytes));
+    Global_as& gl = getGlobal(o);
+    o.init_member("readByte", gl.createFunction(idatainput_readByte));
+    o.init_member("readBytes", gl.createFunction(idatainput_readBytes));
+    o.init_member("readDouble", gl.createFunction(idatainput_readDouble));
+    o.init_member("readFloat", gl.createFunction(idatainput_readFloat));
+    o.init_member("readInt", gl.createFunction(idatainput_readInt));
+    o.init_member("readMultiByte", gl.createFunction(idatainput_readMultiByte));
+    o.init_member("readObject", gl.createFunction(idatainput_readObject));
+    o.init_member("readShort", gl.createFunction(idatainput_readShort));
+    o.init_member("readUnsignedByte", gl.createFunction(idatainput_readUnsignedByte));
+    o.init_member("readUnsignedInt", gl.createFunction(idatainput_readUnsignedInt));
+    o.init_member("readUnsignedShort", gl.createFunction(idatainput_readUnsignedShort));
+    o.init_member("readUTF", gl.createFunction(idatainput_readUTF));
+    o.init_member("readUTFBytes", gl.createFunction(idatainput_readUTFBytes));
 }
 
 void

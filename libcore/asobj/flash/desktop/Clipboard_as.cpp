@@ -44,10 +44,10 @@ namespace {
 // extern (used by Global.cpp)
 void clipboard_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     as_object* proto = getObjectInterface();
 
-    as_object* cl = gl->createClass(&clipboard_ctor, proto);
+    as_object* cl = gl.createClass(&clipboard_ctor, proto);
 
     attachClipboardInterface(*proto);
     attachClipboardStaticInterface(*cl);

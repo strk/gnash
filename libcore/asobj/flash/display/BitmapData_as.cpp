@@ -356,7 +356,7 @@ bitmapdata_fillRect(const fn_call& fn)
     }
 
     // This can be any object with the right properties.   
-    as_object* obj = arg.to_object(*getGlobal(fn));
+    as_object* obj = arg.to_object(getGlobal(fn));
     assert(obj);
     
     as_value x, y, w, h;
@@ -642,10 +642,10 @@ as_value
 get_flash_display_bitmap_data_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.display.BitmapData class");
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
     attachBitmapDataInterface(*proto);
-    as_object* cl = gl->createClass(&bitmapdata_ctor, proto);
+    as_object* cl = gl.createClass(&bitmapdata_ctor, proto);
     attachBitmapDataStaticProperties(*cl);
     return cl;
 }
@@ -699,34 +699,34 @@ bitmapdata_ctor(const fn_call& fn)
 void
 attachBitmapDataInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("applyFilter", gl->createFunction(bitmapdata_applyFilter));
-    o.init_member("clone", gl->createFunction(bitmapdata_clone));
-    o.init_member("colorTransform", gl->createFunction(
+    Global_as& gl = getGlobal(o);
+    o.init_member("applyFilter", gl.createFunction(bitmapdata_applyFilter));
+    o.init_member("clone", gl.createFunction(bitmapdata_clone));
+    o.init_member("colorTransform", gl.createFunction(
                 bitmapdata_colorTransform));
-    o.init_member("copyChannel", gl->createFunction(bitmapdata_copyChannel));
-    o.init_member("copyPixels", gl->createFunction(bitmapdata_copyPixels));
-    o.init_member("dispose", gl->createFunction(bitmapdata_dispose));
-    o.init_member("draw", gl->createFunction(bitmapdata_draw));
-    o.init_member("fillRect", gl->createFunction(bitmapdata_fillRect));
-    o.init_member("floodFill", gl->createFunction(bitmapdata_floodFill));
-    o.init_member("generateFilterRect", gl->createFunction(
+    o.init_member("copyChannel", gl.createFunction(bitmapdata_copyChannel));
+    o.init_member("copyPixels", gl.createFunction(bitmapdata_copyPixels));
+    o.init_member("dispose", gl.createFunction(bitmapdata_dispose));
+    o.init_member("draw", gl.createFunction(bitmapdata_draw));
+    o.init_member("fillRect", gl.createFunction(bitmapdata_fillRect));
+    o.init_member("floodFill", gl.createFunction(bitmapdata_floodFill));
+    o.init_member("generateFilterRect", gl.createFunction(
                 bitmapdata_generateFilterRect));
-    o.init_member("getColorBoundsRect", gl->createFunction(
+    o.init_member("getColorBoundsRect", gl.createFunction(
                 bitmapdata_getColorBoundsRect));
-    o.init_member("getPixel", gl->createFunction(bitmapdata_getPixel));
-    o.init_member("getPixel32", gl->createFunction(bitmapdata_getPixel32));
-    o.init_member("hitTest", gl->createFunction(bitmapdata_hitTest));
-    o.init_member("merge", gl->createFunction(bitmapdata_merge));
-    o.init_member("noise", gl->createFunction(bitmapdata_noise));
-    o.init_member("paletteMap", gl->createFunction(bitmapdata_paletteMap));
-    o.init_member("perlinNoise", gl->createFunction(bitmapdata_perlinNoise));
-    o.init_member("pixelDissolve", gl->createFunction(
+    o.init_member("getPixel", gl.createFunction(bitmapdata_getPixel));
+    o.init_member("getPixel32", gl.createFunction(bitmapdata_getPixel32));
+    o.init_member("hitTest", gl.createFunction(bitmapdata_hitTest));
+    o.init_member("merge", gl.createFunction(bitmapdata_merge));
+    o.init_member("noise", gl.createFunction(bitmapdata_noise));
+    o.init_member("paletteMap", gl.createFunction(bitmapdata_paletteMap));
+    o.init_member("perlinNoise", gl.createFunction(bitmapdata_perlinNoise));
+    o.init_member("pixelDissolve", gl.createFunction(
                 bitmapdata_pixelDissolve));
-    o.init_member("scroll", gl->createFunction(bitmapdata_scroll));
-    o.init_member("setPixel", gl->createFunction(bitmapdata_setPixel));
-    o.init_member("setPixel32", gl->createFunction(bitmapdata_setPixel32));
-    o.init_member("threshold", gl->createFunction(bitmapdata_threshold));
+    o.init_member("scroll", gl.createFunction(bitmapdata_scroll));
+    o.init_member("setPixel", gl.createFunction(bitmapdata_setPixel));
+    o.init_member("setPixel32", gl.createFunction(bitmapdata_setPixel32));
+    o.init_member("threshold", gl.createFunction(bitmapdata_threshold));
     o.init_property("height", bitmapdata_height, bitmapdata_height);
     o.init_property("rectangle", bitmapdata_rectangle, bitmapdata_rectangle);
     o.init_property("transparent", bitmapdata_transparent,
@@ -738,8 +738,8 @@ attachBitmapDataInterface(as_object& o)
 void
 attachBitmapDataStaticProperties(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("loadBitmap", gl->createFunction(bitmapdata_loadBitmap));
+    Global_as& gl = getGlobal(o);
+    o.init_member("loadBitmap", gl.createFunction(bitmapdata_loadBitmap));
 }
 
 } // anonymous namespace

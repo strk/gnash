@@ -82,26 +82,26 @@ namespace {
 void
 attachRectangleInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("clone", gl->createFunction(Rectangle_clone), 0);
-    o.init_member("contains", gl->createFunction(Rectangle_contains), 0);
+    Global_as& gl = getGlobal(o);
+    o.init_member("clone", gl.createFunction(Rectangle_clone), 0);
+    o.init_member("contains", gl.createFunction(Rectangle_contains), 0);
     o.init_member("containsPoint",
-            gl->createFunction(Rectangle_containsPoint), 0);
+            gl.createFunction(Rectangle_containsPoint), 0);
     o.init_member("containsRectangle",
-            gl->createFunction(Rectangle_containsRectangle), 0);
-    o.init_member("equals", gl->createFunction(Rectangle_equals), 0);
-    o.init_member("inflate", gl->createFunction(Rectangle_inflate), 0);
+            gl.createFunction(Rectangle_containsRectangle), 0);
+    o.init_member("equals", gl.createFunction(Rectangle_equals), 0);
+    o.init_member("inflate", gl.createFunction(Rectangle_inflate), 0);
     o.init_member("inflatePoint",
-            gl->createFunction(Rectangle_inflatePoint), 0);
+            gl.createFunction(Rectangle_inflatePoint), 0);
     o.init_member("intersection",
-            gl->createFunction(Rectangle_intersection), 0);
-    o.init_member("intersects", gl->createFunction(Rectangle_intersects), 0);
-    o.init_member("isEmpty", gl->createFunction(Rectangle_isEmpty), 0);
-    o.init_member("offset", gl->createFunction(Rectangle_offset), 0);
-    o.init_member("offsetPoint", gl->createFunction(Rectangle_offsetPoint), 0);
-    o.init_member("setEmpty", gl->createFunction(Rectangle_setEmpty), 0);
-    o.init_member("toString", gl->createFunction(Rectangle_toString), 0);
-    o.init_member("union", gl->createFunction(Rectangle_union), 0);
+            gl.createFunction(Rectangle_intersection), 0);
+    o.init_member("intersects", gl.createFunction(Rectangle_intersects), 0);
+    o.init_member("isEmpty", gl.createFunction(Rectangle_isEmpty), 0);
+    o.init_member("offset", gl.createFunction(Rectangle_offset), 0);
+    o.init_member("offsetPoint", gl.createFunction(Rectangle_offsetPoint), 0);
+    o.init_member("setEmpty", gl.createFunction(Rectangle_setEmpty), 0);
+    o.init_member("toString", gl.createFunction(Rectangle_toString), 0);
+    o.init_member("union", gl.createFunction(Rectangle_union), 0);
     o.init_property("bottom",
             Rectangle_bottom, Rectangle_bottom, 0);
     o.init_property("bottomRight", Rectangle_bottomRight,
@@ -653,10 +653,10 @@ as_value
 get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Rectangle class");
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
     attachRectangleInterface(*proto);
-    return gl->createClass(&Rectangle_ctor, proto);
+    return gl.createClass(&Rectangle_ctor, proto);
 }
 } // anonymous namespace
 } // end of gnash namespace

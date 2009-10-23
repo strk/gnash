@@ -51,10 +51,10 @@ attachFileReferenceListStaticInterface(as_object& /*o*/)
 static void
 attachFileReferenceListInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("addListener", gl->createFunction(filereferencelist_addListener));
-    o.init_member("browse", gl->createFunction(filereferencelist_browse));
-    o.init_member("removeListener", gl->createFunction(filereferencelist_removeListener));
+    Global_as& gl = getGlobal(o);
+    o.init_member("addListener", gl.createFunction(filereferencelist_addListener));
+    o.init_member("browse", gl.createFunction(filereferencelist_browse));
+    o.init_member("removeListener", gl.createFunction(filereferencelist_removeListener));
     o.init_property("fileList", filereferencelist_fileList_getset, filereferencelist_fileList_getset);
 }
 

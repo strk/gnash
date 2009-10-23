@@ -570,7 +570,7 @@ getVM(const as_environment& env)
 movie_root& getRoot(const as_environment& env);
 string_table& getStringTable(const as_environment& env);
 int getSWFVersion(const as_environment& env);
-Global_as* getGlobal(const as_environment &env);
+Global_as& getGlobal(const as_environment &env);
 
 } // end namespace gnash
 

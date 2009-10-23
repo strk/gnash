@@ -65,11 +65,11 @@ as_value camera_width(const fn_call& fn);
 void
 attachCameraStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     
     const int flags = 0;
 
-	o.init_member("get", gl->createFunction(camera_get), flags);
+	o.init_member("get", gl.createFunction(camera_get), flags);
 
     VM& vm = getVM(o);
     NativeFunction* getset = vm.getNative(2102, 201);
@@ -80,8 +80,8 @@ attachCameraStaticInterface(as_object& o)
 void
 attachCameraAS3StaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("getCamera", gl->createFunction(camera_getCamera));
+    Global_as& gl = getGlobal(o);
+    o.init_member("getCamera", gl.createFunction(camera_getCamera));
 }
 
 static void
@@ -104,32 +104,32 @@ attachCameraInterface(as_object& o)
 void
 attachCameraProperties(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     boost::intrusive_ptr<builtin_function> getset;
 
-    getset = gl->createFunction(camera_activitylevel);
+    getset = gl.createFunction(camera_activitylevel);
     o.init_property("activityLevel", *getset, *getset);
-    getset = gl->createFunction(camera_bandwidth);
+    getset = gl.createFunction(camera_bandwidth);
     o.init_property("bandwidth", *getset, *getset);
-    getset = gl->createFunction(camera_currentFps);
+    getset = gl.createFunction(camera_currentFps);
     o.init_property("currentFps", *getset, *getset);
-    getset = gl->createFunction(camera_fps);
+    getset = gl.createFunction(camera_fps);
     o.init_property("fps", *getset, *getset);
-    getset = gl->createFunction(camera_height);
+    getset = gl.createFunction(camera_height);
     o.init_property("height", *getset, *getset);
-    getset = gl->createFunction(camera_index);
+    getset = gl.createFunction(camera_index);
     o.init_property("index", *getset, *getset);
-    getset = gl->createFunction(camera_motionLevel);
+    getset = gl.createFunction(camera_motionLevel);
     o.init_property("motionLevel", *getset, *getset);
-    getset = gl->createFunction(camera_motionTimeout);
+    getset = gl.createFunction(camera_motionTimeout);
     o.init_property("motionTimeout", *getset, *getset);
-    getset = gl->createFunction(camera_muted);
+    getset = gl.createFunction(camera_muted);
     o.init_property("muted", *getset, *getset);
-    getset = gl->createFunction(camera_name);
+    getset = gl.createFunction(camera_name);
     o.init_property("name", *getset, *getset);
-    getset = gl->createFunction(camera_quality);
+    getset = gl.createFunction(camera_quality);
     o.init_property("quality", *getset, *getset);
-    getset = gl->createFunction(camera_width);
+    getset = gl.createFunction(camera_width);
     o.init_property("width", *getset, *getset);
 }
 
@@ -532,8 +532,8 @@ camera_names(const fn_call& fn)
     
     const size_t size = names.size();
     
-    Global_as* gl = getGlobal(fn);
-    as_object* data = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* data = gl.createArray();
 
     for (size_t i = 0; i < size; ++i) {
         data->callMethod(NSV::PROP_PUSH, names[i]);
@@ -621,7 +621,7 @@ void
 camera_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
     
     as_object* proto = getCameraInterface();
     
@@ -631,10 +631,10 @@ camera_class_init(as_object& where, const ObjectURI& uri)
     //for versions lower than 8, the ctor call was get(), for 9 and higher
     //the ctor was getCamera()
     if (isAS3(getVM(where))) {
-        cl = gl->createClass(&camera_new, proto);
+        cl = gl.createClass(&camera_new, proto);
         attachCameraAS3StaticInterface(*cl);
     } else {
-        cl = gl->createClass(&camera_new, proto);
+        cl = gl.createClass(&camera_new, proto);
         attachCameraStaticInterface(*cl);
     }
     
