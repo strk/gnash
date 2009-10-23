@@ -65,8 +65,8 @@ namespace {
 void
 attachSpriteInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("stopDrag", gl->createFunction(sprite_stopDrag));
+    Global_as& gl = getGlobal(o);
+    o.init_member("stopDrag", gl.createFunction(sprite_stopDrag));
 }
 
 void

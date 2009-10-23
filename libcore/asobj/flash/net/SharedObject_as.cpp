@@ -715,9 +715,9 @@ sharedobject_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
     
     if (cl == NULL) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getSharedObjectInterface();
-        cl = gl->createClass(&sharedobject_ctor, proto);
+        cl = gl.createClass(&sharedobject_ctor, proto);
         attachSharedObjectStaticInterface(*cl);
     }
     
@@ -791,11 +791,11 @@ attachSharedObjectStaticInterface(as_object& o)
 
     const int flags = 0;
 
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     o.init_member("getLocal", 
-            gl->createFunction(sharedobject_getLocal), flags);
+            gl.createFunction(sharedobject_getLocal), flags);
     o.init_member("getRemote",
-            gl->createFunction(sharedobject_getRemote), flags);
+            gl.createFunction(sharedobject_getRemote), flags);
 
     const int hiddenOnly = PropFlags::dontEnum;
 
@@ -879,7 +879,7 @@ sharedobject_connect(const fn_call& fn)
     }
     
     NetConnection_as* nc;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), nc)) {
+    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), nc)) {
         return as_value();
     }
 
@@ -1241,7 +1241,7 @@ readSOL(VM& vm, const std::string& filespec)
     log_debug("Read %d AMF objects from %s", els.size(), filespec);
 
     as_value as = getMember(NSV::PROP_DATA);
-    boost::intrusive_ptr<as_object> ptr = as.to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> ptr = as.to_object(getGlobal(fn));
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
         boost::shared_ptr<amf::Element> el = *it;
@@ -1285,7 +1285,7 @@ readSOL(VM& vm, const std::string& filespec)
             case Element::OBJECT_AMF0:
                 // TODO: implement!
                 log_unimpl("Reading OBJECT type from SharedObject");
-                //data.convert_to_object(*getGlobal(fn));
+                //data.convert_to_object(getGlobal(fn));
                 //ptr->set_member(st.string_table::find(el->name), data);
                 return false;
                 break;

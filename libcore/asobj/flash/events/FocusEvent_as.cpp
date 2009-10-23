@@ -56,12 +56,12 @@ namespace {
 void
 attachFocusEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(focusevent_toString));
-    o.init_member("FOCUS_IN", gl->createFunction(focusevent_FOCUS_IN));
-    o.init_member("FOCUS_OUT", gl->createFunction(focusevent_FOCUS_OUT));
-    o.init_member("KEY_FOCUS_CHANGE", gl->createFunction(focusevent_KEY_FOCUS_CHANGE));
-    o.init_member("MOUSE_FOCUS_CHANGE", gl->createFunction(focusevent_MOUSE_FOCUS_CHANGE));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(focusevent_toString));
+    o.init_member("FOCUS_IN", gl.createFunction(focusevent_FOCUS_IN));
+    o.init_member("FOCUS_OUT", gl.createFunction(focusevent_FOCUS_OUT));
+    o.init_member("KEY_FOCUS_CHANGE", gl.createFunction(focusevent_KEY_FOCUS_CHANGE));
+    o.init_member("MOUSE_FOCUS_CHANGE", gl.createFunction(focusevent_MOUSE_FOCUS_CHANGE));
 }
 
 void

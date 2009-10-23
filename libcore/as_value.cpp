@@ -1678,7 +1678,7 @@ as_value::as_value(const amf::Element& el)
     
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
-    Global_as* gl = vm.getGlobal();
+    Global_as& gl = *vm.getGlobal();
 
     switch (el.getType()) {
       case amf::Element::NOTYPE:
@@ -1789,7 +1789,7 @@ as_value::as_value(const amf::Element& el)
           log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
 #endif
 
-          as_object* obj = gl->createArray();
+          as_object* obj = gl.createArray();
 
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
@@ -1811,7 +1811,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
 #endif
-          as_object* obj = gl->createArray();
+          as_object* obj = gl.createArray();
           size_t len = el.propertySize();
           obj->set_member(NSV::PROP_LENGTH, len);
 
@@ -1924,7 +1924,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 		}
 	}
 
-    Global_as* gl = vm.getGlobal();
+    Global_as& gl = *vm.getGlobal();
 
 	switch (amf_type)
     {
@@ -2011,7 +2011,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
 		case amf::Element::STRICT_ARRAY_AMF0:
         {
-            as_object* array = gl->createArray();
+            as_object* array = gl.createArray();
             objRefs.push_back(array);
 
             boost::uint32_t li = readNetworkLong(b); b += 4;
@@ -2035,7 +2035,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
 		case amf::Element::ECMA_ARRAY_AMF0:
         {
-            as_object* obj = gl->createArray();
+            as_object* obj = gl.createArray();
             objRefs.push_back(obj);
 
             // set the value immediately, so if there's any problem parsing
@@ -2190,7 +2190,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			log_debug("amf0 read date: %e", dub);
 #endif
 
-            as_function* ctor = gl->getMember(NSV::CLASS_DATE).to_as_function();
+            as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_as_function();
             if (ctor) {
                 fn_call::Args args;
                 args += dub;

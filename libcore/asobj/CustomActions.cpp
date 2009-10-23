@@ -56,11 +56,11 @@ namespace {
 void
 attachCustomActionsInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-	o.init_member("get", gl->createFunction(customactions_get));
-	o.init_member("install", gl->createFunction(customactions_install));
-	o.init_member("list", gl->createFunction(customactions_list));
-	o.init_member("uninstall", gl->createFunction(customactions_uninstall));
+    Global_as& gl = getGlobal(o);
+	o.init_member("get", gl.createFunction(customactions_get));
+	o.init_member("install", gl.createFunction(customactions_install));
+	o.init_member("list", gl.createFunction(customactions_list));
+	o.init_member("uninstall", gl.createFunction(customactions_uninstall));
 }
 
 as_value

@@ -126,9 +126,9 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
             new as_object(getMovieClipAS3Interface());
         
         // TODO: fix AVM2Global::createClass to work for AVM2.
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         cl->init_member(NSV::PROP_CONSTRUCTOR,
-                gl->createFunction(movieclip_as3_ctor));
+                gl.createFunction(movieclip_as3_ctor));
 
         log_debug("AVM2 MovieClip, proto %s", cl);
 
@@ -139,9 +139,9 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getMovieClipAS2Interface();
-        cl = gl->createClass(&movieclip_as2_ctor, proto);
+        cl = gl.createClass(&movieclip_as2_ctor, proto);
         getVM(where).addStatic(cl.get());
     }
 
@@ -260,7 +260,7 @@ namespace {
 void
 attachMovieClipAS2Interface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     VM& vm = getVM(o);
     
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
@@ -295,11 +295,11 @@ attachMovieClipAS2Interface(as_object& o)
     o.init_member("attachBitmap", vm.getNative(900, 25), swf8Flags); 
     o.init_member("getRect", vm.getNative(900, 26), swf8Flags);
 
-    o.init_member("loadMovie", gl->createFunction(movieclip_loadMovie));
-    o.init_member("loadVariables", gl->createFunction(movieclip_loadVariables));
-    o.init_member("unloadMovie", gl->createFunction( movieclip_unloadMovie));
-    o.init_member("getURL", gl->createFunction(movieclip_getURL));
-    o.init_member("meth", gl->createFunction(movieclip_meth));
+    o.init_member("loadMovie", gl.createFunction(movieclip_loadMovie));
+    o.init_member("loadVariables", gl.createFunction(movieclip_loadVariables));
+    o.init_member("unloadMovie", gl.createFunction( movieclip_unloadMovie));
+    o.init_member("getURL", gl.createFunction(movieclip_getURL));
+    o.init_member("meth", gl.createFunction(movieclip_meth));
 
     o.init_member("enabled", true);
     o.init_member("useHandCursor", true);
@@ -345,7 +345,7 @@ attachMovieClipAS2Interface(as_object& o)
     // External functions.
     o.init_member("createTextField", vm.getNative(104, 200));
     o.init_member("getTextSnapshot", 
-            gl->createFunction(movieclip_getTextSnapshot), swf6Flags);
+            gl.createFunction(movieclip_getTextSnapshot), swf6Flags);
 
 }
 
@@ -563,7 +563,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::intrusive_ptr<as_object> initObj;
 
     if (fn.nargs > 3 ) {
-        initObj = fn.arg(3).to_object(*getGlobal(fn));
+        initObj = fn.arg(3).to_object(getGlobal(fn));
         if (!initObj) {
             // This is actually a valid thing to do,
             // the documented behaviour is to just NOT
@@ -603,7 +603,7 @@ movieclip_attachAudio(const fn_call& fn)
     }
 
     NetStream_as* ns;
-    if (!isNativeType(fn.arg(0).to_object(*getGlobal(fn)), ns))
+    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), ns))
     { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
@@ -818,7 +818,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     // Copy members from initObject
     if (fn.nargs == 3)
     {
-        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object(*getGlobal(fn));
+        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object(getGlobal(fn));
         ch = movieclip->duplicateMovieClip(newname, depthValue,
                 initObject.get());
     }
@@ -1236,7 +1236,7 @@ movieclip_meth(const fn_call& fn)
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
-    boost::intrusive_ptr<as_object> o = v.to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(fn));
     if ( ! o )
     {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
@@ -1350,7 +1350,7 @@ movieclip_globalToLocal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1412,7 +1412,7 @@ movieclip_localToGlobal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1484,7 +1484,7 @@ movieclip_setMask(const fn_call& fn)
     else
     {
 
-        boost::intrusive_ptr<as_object> obj ( arg.to_object(*getGlobal(fn)) );
+        boost::intrusive_ptr<as_object> obj ( arg.to_object(getGlobal(fn)) );
         DisplayObject* mask = dynamic_cast<DisplayObject*>(obj.get());
         if ( ! mask )
         {
@@ -1983,10 +1983,10 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     typedef boost::intrusive_ptr<as_object> ObjPtr;
 
-    ObjPtr colors = fn.arg(1).to_object(*getGlobal(fn));
-    ObjPtr alphas = fn.arg(2).to_object(*getGlobal(fn));
-    ObjPtr ratios = fn.arg(3).to_object(*getGlobal(fn));
-    ObjPtr matrixArg = fn.arg(4).to_object(*getGlobal(fn));
+    ObjPtr colors = fn.arg(1).to_object(getGlobal(fn));
+    ObjPtr alphas = fn.arg(2).to_object(getGlobal(fn));
+    ObjPtr ratios = fn.arg(3).to_object(getGlobal(fn));
+    ObjPtr matrixArg = fn.arg(4).to_object(getGlobal(fn));
 
     if ( ! colors || ! alphas || ! ratios || ! matrixArg )
     {
@@ -2320,7 +2320,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(*getGlobal(fn));
+    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
     BitmapData_as* bd;
 
     if (!isNativeType(obj, bd)) {
@@ -2414,15 +2414,15 @@ movieclip_as3_ctor(const fn_call& fn)
 void
 attachMovieClipAS3Interface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("gotoAndStop", gl->createFunction(movieclip_gotoAndStop));
-    o.init_member("nextFrame", gl->createFunction(movieclip_nextFrame));
-    o.init_member("nextScene", gl->createFunction(movieclip_nextScene));
-    o.init_member("play", gl->createFunction(movieclip_play));
-    o.init_member("prevFrame", gl->createFunction(movieclip_prevFrame));
-    o.init_member("prevScene", gl->createFunction(movieclip_prevScene));
-    o.init_member("stop", gl->createFunction(movieclip_stop));
-    o.init_member("addFrameScript", gl->createFunction(
+    Global_as& gl = getGlobal(o);
+    o.init_member("gotoAndStop", gl.createFunction(movieclip_gotoAndStop));
+    o.init_member("nextFrame", gl.createFunction(movieclip_nextFrame));
+    o.init_member("nextScene", gl.createFunction(movieclip_nextScene));
+    o.init_member("play", gl.createFunction(movieclip_play));
+    o.init_member("prevFrame", gl.createFunction(movieclip_prevFrame));
+    o.init_member("prevScene", gl.createFunction(movieclip_prevScene));
+    o.init_member("stop", gl.createFunction(movieclip_stop));
+    o.init_member("addFrameScript", gl.createFunction(
                 movieclip_addFrameScript));
 }
 

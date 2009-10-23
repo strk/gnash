@@ -922,7 +922,7 @@ global_assetpropflags(const fn_call& fn)
     );
     
     // object
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
     if ( ! obj ) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "
@@ -1001,8 +1001,8 @@ global_asconstructor(const fn_call& fn)
         return as_value();
     }
 
-    Global_as* gl = getGlobal(fn);
-    fun->init_member(NSV::PROP_PROTOTYPE, gl->createObject());
+    Global_as& gl = getGlobal(fn);
+    fun->init_member(NSV::PROP_PROTOTYPE, gl.createObject());
 
     return as_value(fun);
         
@@ -1072,9 +1072,9 @@ global_assetnative(const fn_call& fn)
         return as_value();
     }
 
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl);
+    as_object* targetObject = fn.arg(0).to_object(gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1143,9 +1143,9 @@ global_assetnativeaccessor(const fn_call& fn)
         return as_value();
     }
 
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
 
-    as_object* targetObject = fn.arg(0).to_object(*gl);
+    as_object* targetObject = fn.arg(0).to_object(gl);
     if (!targetObject) {
         return as_value();
     }
@@ -1240,7 +1240,7 @@ global_assetuperror(const fn_call& fn)
 
     std::string::const_iterator pos = errors.begin();
 
-    Global_as* gl = getGlobal(fn);
+    Global_as& gl = getGlobal(fn);
 
     // pos is always the position after the last located error.
     for (;;) {
@@ -1252,13 +1252,13 @@ global_assetuperror(const fn_call& fn)
 
         string_table& st = getStringTable(fn);
 
-        as_function* ctor = gl->getMember(NSV::CLASS_ERROR).to_as_function();
+        as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_as_function();
         if (ctor) {
             fn_call::Args args;
             as_object* proto = ctor->constructInstance(fn.env(), args).get();
 
             // Not really sure what the point of this is.
-            gl->createClass(local_errorConstructor, proto);
+            gl.createClass(local_errorConstructor, proto);
             proto->set_member(st.find("name"), err);
             proto->set_member(st.find("message"), err);
         }
@@ -1285,7 +1285,7 @@ global_setInterval(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -1358,7 +1358,7 @@ global_setTimeout(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
 	if (!obj) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
@@ -1544,7 +1544,7 @@ registerNatives(as_object& global)
 
     // LoadableObject has natives shared between LoadVars and XML, so 
     // should be registered first.
-    LoadableObject::registerNative(global);
+    registerLoadableNative(global);
     XMLDocument_as::registerNative(global);
     XMLNode_as::registerNative(global);
 

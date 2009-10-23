@@ -120,8 +120,8 @@ sound_class_init(as_object& where, const ObjectURI& uri)
 {
 
     as_object* iface = getSoundInterface();
-    Global_as* gl = getGlobal(where);
-    as_object* cl = gl->createClass(&sound_new, iface);
+    Global_as& gl = getGlobal(where);
+    as_object* cl = gl.createClass(&sound_new, iface);
     iface->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
 
     // Register _global.String
@@ -810,7 +810,7 @@ sound_new(const fn_call& fn)
         const as_value& arg0 = fn.arg(0);
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
-            as_object* obj = arg0.to_object(*getGlobal(fn));
+            as_object* obj = arg0.to_object(getGlobal(fn));
             DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
             IF_VERBOSE_ASCODING_ERRORS(
             if (!ch) {

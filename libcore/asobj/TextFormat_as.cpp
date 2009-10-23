@@ -153,9 +153,9 @@ void
 textformat_class_init(as_object& global, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(global);
-    as_object* proto = gl->createObject();;
-    as_object* cl = gl->createClass(&textformat_new, proto);
+    Global_as& gl = getGlobal(global);
+    as_object* proto = gl.createObject();;
+    as_object* cl = gl.createClass(&textformat_new, proto);
 
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
@@ -303,7 +303,7 @@ textformat_tabStops(const fn_call& fn)
         return null;
 	}
 	
-    as_object* arg = fn.arg(0).to_object(*getGlobal(fn));
+    as_object* arg = fn.arg(0).to_object(getGlobal(fn));
     if (!arg) return as_value();
 
 	std::vector<int> tabStops;

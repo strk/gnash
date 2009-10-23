@@ -372,10 +372,10 @@ getVM(const fn_call& fn)
     return fn.getVM();
 }
 
-inline Global_as*
+inline Global_as&
 getGlobal(const fn_call& fn)
 {
-    return fn.getVM().getGlobal();
+    return *fn.getVM().getGlobal();
 }
 
 } // namespace gnash

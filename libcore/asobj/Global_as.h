@@ -130,8 +130,8 @@ registerBuiltinObject(as_object& where, Global_as::Properties p,
 {
 
     // This is going to be the global Mouse "class"/"function"
-    Global_as* gl = getGlobal(where);
-    as_object* obj = gl->createObject();
+    Global_as& gl = getGlobal(where);
+    as_object* obj = gl.createObject();
     if (p) p(*obj);
     
     where.init_member(getName(uri), obj, as_object::DefaultFlags,
@@ -161,9 +161,9 @@ inline as_object*
 registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
         Global_as::Properties p, Global_as::Properties c, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(ctor, proto);
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(ctor, proto);
  
     // Attach class properties to class
     if (c) c(*cl);

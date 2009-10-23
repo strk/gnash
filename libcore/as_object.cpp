@@ -201,10 +201,10 @@ as_super::get_super(const char* fname)
 
 	// Our class prototype is __proto__.
 	as_object* proto = get_prototype(); 
-	if (!proto) return new as_super(*getGlobal(*this), 0);
+	if (!proto) return new as_super(getGlobal(*this), 0);
 
     if (!fname || getSWFVersion(*this) <= 6) {
-        return new as_super(*getGlobal(*this), proto);
+        return new as_super(getGlobal(*this), proto);
     }
 
     string_table& st = getStringTable(*this);
@@ -214,7 +214,7 @@ as_super::get_super(const char* fname)
     proto->findProperty(k, 0, &owner);
     if (!owner) return 0;
 
-    if (owner == proto) return new as_super(*getGlobal(*this), proto);
+    if (owner == proto) return new as_super(getGlobal(*this), proto);
 
     as_object* tmp = proto;
     while (tmp && tmp->get_prototype() != owner) {
@@ -229,8 +229,8 @@ as_super::get_super(const char* fname)
     // well, since we found the property, it must be somewhere!
     assert(tmp); 
 
-    if (tmp != proto) { return new as_super(*getGlobal(*this), tmp); }
-    return new as_super(*getGlobal(*this), owner);
+    if (tmp != proto) { return new as_super(getGlobal(*this), tmp); }
+    return new as_super(getGlobal(*this), owner);
 
 }
 
@@ -477,7 +477,7 @@ as_object::get_super(const char* fname)
 		if (owner != this) proto = owner; 
 	}
 
-	as_object* super = new as_super(*getGlobal(*this), proto);
+	as_object* super = new as_super(getGlobal(*this), proto);
 
 	return super;
 }
@@ -924,7 +924,7 @@ as_object::instanceOf(as_object* ctor)
 #endif
 		return false;
 	}
-	as_object* ctorProto = protoVal.to_object(*getGlobal(*this));
+	as_object* ctorProto = protoVal.to_object(getGlobal(*this));
 	if ( ! ctorProto )
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
@@ -1126,7 +1126,7 @@ as_object::get_prototype() const
 
 	as_value tmp = prop->getValue(*this);
 
-	return tmp.to_object(*getGlobal(*this));
+	return tmp.to_object(getGlobal(*this));
 }
 
 as_value
@@ -1254,7 +1254,7 @@ as_object::get_path_element(string_table::key key)
 		return NULL;
 	}
 
-	return tmp.to_object(*getGlobal(*this));
+	return tmp.to_object(getGlobal(*this));
 }
 
 void
@@ -1414,9 +1414,9 @@ getSWFVersion(const as_object& o)
     return o.vm().getSWFVersion();
 }
 
-Global_as* getGlobal(const as_object& o)
+Global_as& getGlobal(const as_object& o)
 {
-    return o.vm().getGlobal();
+    return *o.vm().getGlobal();
 }
 
 

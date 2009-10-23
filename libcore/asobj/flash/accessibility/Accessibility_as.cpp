@@ -51,14 +51,14 @@ void
 accessibility_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
 
     const int flags = as_object::DefaultFlags | PropFlags::readOnly;
 
     // This object has unusual properties.
-    as_object* obj = gl->createObject();
+    as_object* obj = gl.createObject();
     obj->set_member_flags(NSV::PROP_uuPROTOuu, flags);
-    obj->init_member(NSV::PROP_CONSTRUCTOR, gl->getMember(NSV::CLASS_OBJECT),
+    obj->init_member(NSV::PROP_CONSTRUCTOR, gl.getMember(NSV::CLASS_OBJECT),
             flags);
 
     attachAccessibilityStaticInterface(*obj);
@@ -82,8 +82,8 @@ namespace {
 void
 attachAccessibilityAS3StaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("active", gl->createFunction(accessibility_active));
+    Global_as& gl = getGlobal(o);
+    o.init_member("active", gl.createFunction(accessibility_active));
 }
 
 void

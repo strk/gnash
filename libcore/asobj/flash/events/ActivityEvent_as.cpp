@@ -55,9 +55,9 @@ namespace {
 void
 attachActivityEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(activityevent_toString));
-    o.init_member("ACTIVITY", gl->createFunction(activityevent_ACTIVITY));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(activityevent_toString));
+    o.init_member("ACTIVITY", gl.createFunction(activityevent_ACTIVITY));
 }
 
 void

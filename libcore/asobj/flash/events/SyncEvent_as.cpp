@@ -53,9 +53,9 @@ namespace {
 void
 attachSyncEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(syncevent_toString));
-    o.init_member("SYNC", gl->createFunction(syncevent_SYNC));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(syncevent_toString));
+    o.init_member("SYNC", gl.createFunction(syncevent_SYNC));
 }
 
 void

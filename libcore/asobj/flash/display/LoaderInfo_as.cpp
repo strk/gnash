@@ -64,9 +64,9 @@ void loaderinfo_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getLoaderInfoInterface();
-        cl = gl->createClass(&loaderinfo_ctor, proto);
+        cl = gl.createClass(&loaderinfo_ctor, proto);
         attachLoaderInfoStaticInterface(*cl);
     }
 
@@ -80,14 +80,14 @@ namespace {
 void
 attachLoaderInfoInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("complete", gl->createFunction(loaderinfo_complete));
-    o.init_member("httpStatus", gl->createFunction(loaderinfo_httpStatus));
-    o.init_member("init", gl->createFunction(loaderinfo_init));
-    o.init_member("ioError", gl->createFunction(loaderinfo_ioError));
-    o.init_member("open", gl->createFunction(loaderinfo_open));
-    o.init_member("progress", gl->createFunction(loaderinfo_progress));
-    o.init_member("unload", gl->createFunction(loaderinfo_unload));
+    Global_as& gl = getGlobal(o);
+    o.init_member("complete", gl.createFunction(loaderinfo_complete));
+    o.init_member("httpStatus", gl.createFunction(loaderinfo_httpStatus));
+    o.init_member("init", gl.createFunction(loaderinfo_init));
+    o.init_member("ioError", gl.createFunction(loaderinfo_ioError));
+    o.init_member("open", gl.createFunction(loaderinfo_open));
+    o.init_member("progress", gl.createFunction(loaderinfo_progress));
+    o.init_member("unload", gl.createFunction(loaderinfo_unload));
 }
 
 void

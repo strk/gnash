@@ -58,13 +58,13 @@ void attachFileReferenceStaticInterface(as_object& /*o*/)
 static void
 attachFileReferenceInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("addListener", gl->createFunction(filereference_addListener));
-    o.init_member("browse", gl->createFunction(filereference_browse));
-    o.init_member("cancel", gl->createFunction(filereference_cancel));
-    o.init_member("download", gl->createFunction(filereference_download));
-    o.init_member("removeListener", gl->createFunction(filereference_removeListener));
-    o.init_member("upload", gl->createFunction(filereference_upload));
+    Global_as& gl = getGlobal(o);
+    o.init_member("addListener", gl.createFunction(filereference_addListener));
+    o.init_member("browse", gl.createFunction(filereference_browse));
+    o.init_member("cancel", gl.createFunction(filereference_cancel));
+    o.init_member("download", gl.createFunction(filereference_download));
+    o.init_member("removeListener", gl.createFunction(filereference_removeListener));
+    o.init_member("upload", gl.createFunction(filereference_upload));
     o.init_property("creationDate", filereference_creationDate, filereference_creationDate);
     o.init_property("creator", filereference_creator, filereference_creator);
     o.init_property("modificationDate", filereference_modificationDate, filereference_modificationDate);

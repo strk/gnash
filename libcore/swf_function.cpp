@@ -59,7 +59,7 @@ swf_function::~swf_function()
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	as_function(*getGlobal(env)),
+	as_function(getGlobal(env)),
 	m_action_buffer(ab),
 	m_env(env),
 	_scopeStack(scopeStack),
@@ -72,7 +72,7 @@ swf_function::swf_function(const action_buffer& ab, as_environment& env,
 	assert( m_start_pc < m_action_buffer.size() );
 
     // We're stuck initializing our own prototype at the moment.
-    as_object* proto = getGlobal(env)->createObject();
+    as_object* proto = getGlobal(env).createObject();
     proto->init_member(NSV::PROP_CONSTRUCTOR, this); 
     init_member(NSV::PROP_PROTOTYPE, proto);
 	init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor());
@@ -368,7 +368,7 @@ getArguments(swf_function& callee, const fn_call& fn,
         as_object* caller)
 { 
 
-	as_object* arguments = getGlobal(fn)->createArray();
+	as_object* arguments = getGlobal(fn).createArray();
 	for (size_t i = 0; i < fn.nargs; ++i) {
 		arguments->callMethod(NSV::PROP_PUSH, fn.arg(i));
 	}

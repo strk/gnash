@@ -276,7 +276,7 @@ test_obj(const as_object* o)
     }
 
     as_value fooas, baras;
-    boost::intrusive_ptr<as_object> ao1 = as1.to_object(*getGlobal(*o));
+    boost::intrusive_ptr<as_object> ao1 = as1.to_object(getGlobal(*o));
 
     if (ao1 == 0) {
         notest= true;

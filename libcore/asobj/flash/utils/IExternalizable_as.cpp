@@ -53,8 +53,8 @@ namespace {
 void
 attachIExternalizableInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("writeExternal", gl->createFunction(iexternalizable_writeExternal));
+    Global_as& gl = getGlobal(o);
+    o.init_member("writeExternal", gl.createFunction(iexternalizable_writeExternal));
 }
 
 void

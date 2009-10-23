@@ -114,9 +114,9 @@ string_class_init(as_object& where, const ObjectURI& uri)
     // This is going to be the global String "class"/"function"
     
     VM& vm = getVM(where);
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl->createObject();
+    as_object* proto = gl.createObject();
     as_object* cl = vm.getNative(251, 0);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
@@ -239,8 +239,8 @@ string_split(const fn_call& fn)
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    Global_as* gl = getGlobal(fn);
-    as_object* array = gl->createArray();
+    Global_as& gl = getGlobal(fn);
+    as_object* array = gl.createArray();
 
     if (fn.nargs == 0)
     {

@@ -272,7 +272,7 @@ NetStream_as::getStatusObject(StatusCode code)
     // Enumerable and deletable.
     const int flags = 0;
 
-    as_object* o = getGlobal(owner())->createObject();
+    as_object* o = getGlobal(owner()).createObject();
     o->init_member("code",  info.first, flags);
     o->init_member("level", info.second, flags);
 
@@ -1580,7 +1580,7 @@ netstream_new(const fn_call& fn)
     if (fn.nargs) {
 
         NetConnection_as* nc;
-        if (isNativeType(fn.arg(0).to_object(*getGlobal(fn)), nc)) {
+        if (isNativeType(fn.arg(0).to_object(getGlobal(fn)), nc)) {
             ns->setNetCon(nc);
         }
         else {
@@ -1848,19 +1848,19 @@ netstream_liveDelay(const fn_call& fn)
 void
 attachNetStreamInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     VM& vm = getVM(o);
     
     o.init_member("close", vm.getNative(2101, 0));
-    o.init_member("pause", gl->createFunction(netstream_pause));
-    o.init_member("play", gl->createFunction(netstream_play));
-    o.init_member("seek", gl->createFunction(netstream_seek));
+    o.init_member("pause", gl.createFunction(netstream_pause));
+    o.init_member("play", gl.createFunction(netstream_play));
+    o.init_member("seek", gl.createFunction(netstream_seek));
     o.init_member("setBufferTime", vm.getNative(2101, 4));
     o.init_member("attachAudio", vm.getNative(2101, 1));
     o.init_member("attachVideo", vm.getNative(2101, 2));
-    o.init_member("publish", gl->createFunction(netstream_publish));
-    o.init_member("receiveAudio", gl->createFunction(netstream_receiveAudio));
-    o.init_member("receiveVideo", gl->createFunction(netstream_receiveVideo));
+    o.init_member("publish", gl.createFunction(netstream_publish));
+    o.init_member("receiveAudio", gl.createFunction(netstream_receiveAudio));
+    o.init_member("receiveVideo", gl.createFunction(netstream_receiveVideo));
     o.init_member("send", vm.getNative(2101, 3));
 
     // Properties

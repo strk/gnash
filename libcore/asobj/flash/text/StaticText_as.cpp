@@ -58,9 +58,9 @@ statictext_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getStaticTextInterface();
-        cl = gl->createClass(&statictext_ctor, proto);
+        cl = gl.createClass(&statictext_ctor, proto);
         attachStaticTextStaticInterface(*cl);
     }
 

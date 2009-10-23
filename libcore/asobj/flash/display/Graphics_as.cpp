@@ -70,9 +70,9 @@ void graphics_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getGraphicsInterface();
-        cl = gl->createClass(&graphics_ctor, proto);
+        cl = gl.createClass(&graphics_ctor, proto);
         attachGraphicsStaticInterface(*cl);
     }
 
@@ -86,20 +86,20 @@ namespace {
 void
 attachGraphicsInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("beginFill", gl->createFunction(graphics_beginFill));
-    o.init_member("beginGradientFill", gl->createFunction(graphics_beginGradientFill));
-    o.init_member("clear", gl->createFunction(graphics_clear));
-    o.init_member("curveTo", gl->createFunction(graphics_curveTo));
-    o.init_member("drawCircle", gl->createFunction(graphics_drawCircle));
-    o.init_member("drawEllipse", gl->createFunction(graphics_drawEllipse));
-    o.init_member("drawRect", gl->createFunction(graphics_drawRect));
-    o.init_member("drawRoundRect", gl->createFunction(graphics_drawRoundRect));
-    o.init_member("endFill", gl->createFunction(graphics_endFill));
-    o.init_member("lineGradientStyle", gl->createFunction(graphics_lineGradientStyle));
-    o.init_member("lineStyle", gl->createFunction(graphics_lineStyle));
-    o.init_member("lineTo", gl->createFunction(graphics_lineTo));
-    o.init_member("moveTo", gl->createFunction(graphics_moveTo));
+    Global_as& gl = getGlobal(o);
+    o.init_member("beginFill", gl.createFunction(graphics_beginFill));
+    o.init_member("beginGradientFill", gl.createFunction(graphics_beginGradientFill));
+    o.init_member("clear", gl.createFunction(graphics_clear));
+    o.init_member("curveTo", gl.createFunction(graphics_curveTo));
+    o.init_member("drawCircle", gl.createFunction(graphics_drawCircle));
+    o.init_member("drawEllipse", gl.createFunction(graphics_drawEllipse));
+    o.init_member("drawRect", gl.createFunction(graphics_drawRect));
+    o.init_member("drawRoundRect", gl.createFunction(graphics_drawRoundRect));
+    o.init_member("endFill", gl.createFunction(graphics_endFill));
+    o.init_member("lineGradientStyle", gl.createFunction(graphics_lineGradientStyle));
+    o.init_member("lineStyle", gl.createFunction(graphics_lineStyle));
+    o.init_member("lineTo", gl.createFunction(graphics_lineTo));
+    o.init_member("moveTo", gl.createFunction(graphics_moveTo));
 }
 
 void

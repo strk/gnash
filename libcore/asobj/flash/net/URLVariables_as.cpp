@@ -65,8 +65,8 @@ namespace {
 void
 attachURLVariablesInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(urlvariables_toString));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(urlvariables_toString));
 }
 
 void

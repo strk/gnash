@@ -1245,7 +1245,7 @@ const RunResources& getRunResources(const as_object& o);
 int getSWFVersion(const as_object& o);
 
 /// Get the Global object from an as_object
-Global_as* getGlobal(const as_object& o);
+Global_as& getGlobal(const as_object& o);
 
 
 } // namespace gnash

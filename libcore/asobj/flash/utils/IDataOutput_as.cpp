@@ -62,18 +62,18 @@ namespace {
 void
 attachIDataOutputInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("writeByte", gl->createFunction(idataoutput_writeByte));
-    o.init_member("writeBytes", gl->createFunction(idataoutput_writeBytes));
-    o.init_member("writeDouble", gl->createFunction(idataoutput_writeDouble));
-    o.init_member("writeFloat", gl->createFunction(idataoutput_writeFloat));
-    o.init_member("writeInt", gl->createFunction(idataoutput_writeInt));
-    o.init_member("writeMultiByte", gl->createFunction(idataoutput_writeMultiByte));
-    o.init_member("writeObject", gl->createFunction(idataoutput_writeObject));
-    o.init_member("writeShort", gl->createFunction(idataoutput_writeShort));
-    o.init_member("writeUnsignedInt", gl->createFunction(idataoutput_writeUnsignedInt));
-    o.init_member("writeUTF", gl->createFunction(idataoutput_writeUTF));
-    o.init_member("writeUTFBytes", gl->createFunction(idataoutput_writeUTFBytes));
+    Global_as& gl = getGlobal(o);
+    o.init_member("writeByte", gl.createFunction(idataoutput_writeByte));
+    o.init_member("writeBytes", gl.createFunction(idataoutput_writeBytes));
+    o.init_member("writeDouble", gl.createFunction(idataoutput_writeDouble));
+    o.init_member("writeFloat", gl.createFunction(idataoutput_writeFloat));
+    o.init_member("writeInt", gl.createFunction(idataoutput_writeInt));
+    o.init_member("writeMultiByte", gl.createFunction(idataoutput_writeMultiByte));
+    o.init_member("writeObject", gl.createFunction(idataoutput_writeObject));
+    o.init_member("writeShort", gl.createFunction(idataoutput_writeShort));
+    o.init_member("writeUnsignedInt", gl.createFunction(idataoutput_writeUnsignedInt));
+    o.init_member("writeUTF", gl.createFunction(idataoutput_writeUTF));
+    o.init_member("writeUTFBytes", gl.createFunction(idataoutput_writeUTFBytes));
 }
 
 void

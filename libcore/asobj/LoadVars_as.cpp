@@ -65,22 +65,20 @@ namespace {
 void
 attachLoadVarsInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     VM& vm = getVM(o);
 
-	o.init_member("addRequestHeader", gl->createFunction(
-	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", vm.getNative(301, 3));
-	o.init_member("getBytesLoaded", gl->createFunction(
-	            LoadableObject::loadableobject_getBytesLoaded));
-	o.init_member("getBytesTotal", gl->createFunction(
-                LoadableObject::loadableobject_getBytesTotal));
 	o.init_member("load", vm.getNative(301, 0));
 	o.init_member("send", vm.getNative(301, 1));
 	o.init_member("sendAndLoad", vm.getNative(301, 2));
-	o.init_member("toString", gl->createFunction(loadvars_tostring));
-	o.init_member("onData", gl->createFunction(loadvars_onData));
-	o.init_member("onLoad", gl->createFunction(loadvars_onLoad));
+
+    /// This handles getBytesLoaded, getBytesTotal, and addRequestHeader
+    attachLoadableInterface(o, as_object::DefaultFlags);
+
+    o.init_member("toString", gl.createFunction(loadvars_tostring));
+	o.init_member("onData", gl.createFunction(loadvars_onData));
+	o.init_member("onLoad", gl.createFunction(loadvars_onLoad));
     o.init_member("contentType", "application/x-www-form-urlencoded");
 }
 
@@ -131,7 +129,7 @@ loadvars_tostring(const fn_call& fn)
 
 	ptr->enumerateProperties(vars);
 
-    as_object* global = getGlobal(*ptr);
+    as_object* global = &getGlobal(*ptr);
     std::ostringstream o;
     
     // LoadVars.toString() calls _global.escape().
@@ -153,9 +151,6 @@ loadvars_ctor(const fn_call& fn)
 {
 
     if (!fn.isInstantiation()) return as_value();
-
-	as_object* obj = fn.this_ptr;
-    obj->setRelay(new LoadableObject(obj));
 
     IF_VERBOSE_ASCODING_ERRORS(
         if (fn.nargs) {

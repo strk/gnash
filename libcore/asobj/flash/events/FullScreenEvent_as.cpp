@@ -54,9 +54,9 @@ namespace {
 void
 attachFullScreenEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(fullscreenevent_toString));
-    o.init_member("FULL_SCREEN", gl->createFunction(fullscreenevent_FULL_SCREEN));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(fullscreenevent_toString));
+    o.init_member("FULL_SCREEN", gl.createFunction(fullscreenevent_FULL_SCREEN));
 }
 
 void

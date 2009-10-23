@@ -66,14 +66,14 @@ namespace {
 void
 attachVideoInterface(as_object& o)
 {
-    o.init_member("attachNetStream", gl->createFunction(video_attachNetStream));
-    o.init_member("clear", gl->createFunction(video_clear));
+    o.init_member("attachNetStream", gl.createFunction(video_attachNetStream));
+    o.init_member("clear", gl.createFunction(video_clear));
 }
 
 void
 attachVideoStaticInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
 }
 

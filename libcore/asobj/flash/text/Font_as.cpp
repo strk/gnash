@@ -66,9 +66,9 @@ namespace {
 void
 attachFontInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("hasGlyphs", gl->createFunction(font_hasGlyphs));
-    o.init_member("registerFont", gl->createFunction(font_registerFont));
+    Global_as& gl = getGlobal(o);
+    o.init_member("hasGlyphs", gl.createFunction(font_hasGlyphs));
+    o.init_member("registerFont", gl.createFunction(font_registerFont));
 }
 
 void

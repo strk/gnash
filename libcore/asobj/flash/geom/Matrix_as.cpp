@@ -110,22 +110,22 @@ attachMatrixInterface(as_object& o)
 {
     int fl = 0;
 
-    Global_as* gl = getGlobal(o);
-    o.init_member("clone", gl->createFunction(matrix_clone), fl);
-    o.init_member("concat", gl->createFunction(matrix_concat), fl);
-    o.init_member("createBox", gl->createFunction(matrix_createBox), fl);
+    Global_as& gl = getGlobal(o);
+    o.init_member("clone", gl.createFunction(matrix_clone), fl);
+    o.init_member("concat", gl.createFunction(matrix_concat), fl);
+    o.init_member("createBox", gl.createFunction(matrix_createBox), fl);
     o.init_member("createGradientBox",
-            gl->createFunction(matrix_createGradientBox), fl);
+            gl.createFunction(matrix_createGradientBox), fl);
     o.init_member("deltaTransformPoint",
-            gl->createFunction(matrix_deltaTransformPoint), fl);
-    o.init_member("identity", gl->createFunction(matrix_identity), fl);
-    o.init_member("invert", gl->createFunction(matrix_invert), fl);
-    o.init_member("rotate", gl->createFunction(matrix_rotate), fl);
-    o.init_member("scale", gl->createFunction(matrix_scale), fl);
-    o.init_member("toString", gl->createFunction(matrix_toString), fl);
+            gl.createFunction(matrix_deltaTransformPoint), fl);
+    o.init_member("identity", gl.createFunction(matrix_identity), fl);
+    o.init_member("invert", gl.createFunction(matrix_invert), fl);
+    o.init_member("rotate", gl.createFunction(matrix_rotate), fl);
+    o.init_member("scale", gl.createFunction(matrix_scale), fl);
+    o.init_member("toString", gl.createFunction(matrix_toString), fl);
     o.init_member("transformPoint",
-            gl->createFunction(matrix_transformPoint), fl);
-    o.init_member("translate", gl->createFunction(matrix_translate), fl);
+            gl.createFunction(matrix_transformPoint), fl);
+    o.init_member("translate", gl.createFunction(matrix_translate), fl);
 }
 
 as_object*
@@ -201,7 +201,7 @@ matrix_concat(const fn_call& fn)
     }
 
     // The object to concatenate doesn't have to be a matrix.    
-    as_object* obj = arg.to_object(*getGlobal(fn));
+    as_object* obj = arg.to_object(getGlobal(fn));
     assert(obj);
 
     MatrixType concatMatrix;
@@ -404,7 +404,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
 
     // It doesn't have to be a point. If it has x and y
     // properties, they will be used.    
-    as_object* obj = arg.to_object(*getGlobal(fn));
+    as_object* obj = arg.to_object(getGlobal(fn));
     assert(obj);
 
     const PointType& point = transformPoint(obj, ptr.get());
@@ -706,7 +706,7 @@ matrix_transformPoint(const fn_call& fn)
         return as_value();
     }
     
-    as_object* obj = arg.to_object(*getGlobal(fn));
+    as_object* obj = arg.to_object(getGlobal(fn));
     assert(obj);
     if (!obj->instanceOf(getClassConstructor(fn, "flash.geom.Point"))) {
         /// Isn't a point.
@@ -919,10 +919,10 @@ as_value
 get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
     attachMatrixInterface(*proto);
-    return gl->createClass(&matrix_ctor, proto);
+    return gl.createClass(&matrix_ctor, proto);
 }
 
 } // anonymous namespace

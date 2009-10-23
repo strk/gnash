@@ -67,10 +67,10 @@ namespace {
 void
 attachLoaderInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("load", gl->createFunction(loader_load));
-    o.init_member("loadBytes", gl->createFunction(loader_loadBytes));
-    o.init_member("unload", gl->createFunction(loader_unload));
+    Global_as& gl = getGlobal(o);
+    o.init_member("load", gl.createFunction(loader_load));
+    o.init_member("loadBytes", gl.createFunction(loader_loadBytes));
+    o.init_member("unload", gl.createFunction(loader_unload));
 }
 
 void

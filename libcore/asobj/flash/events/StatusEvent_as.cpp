@@ -53,9 +53,9 @@ namespace {
 void
 attachStatusEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(statusevent_toString));
-    o.init_member("STATUS", gl->createFunction(statusevent_STATUS));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(statusevent_toString));
+    o.init_member("STATUS", gl.createFunction(statusevent_STATUS));
 }
 
 void

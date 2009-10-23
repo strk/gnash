@@ -263,14 +263,14 @@ Keyboard_as::init(as_object& where, const ObjectURI& uri)
     // methods
 
     VM& vm = getVM(where);
-    Global_as* gl = getGlobal(where);
+    Global_as& gl = getGlobal(where);
 
     key_obj->init_member("getAscii", vm.getNative(800, 0), flags);
     key_obj->init_member("getCode", vm.getNative(800, 1), flags);
     key_obj->init_member("isDown", vm.getNative(800, 2), flags);
     key_obj->init_member("isToggled", vm.getNative(800, 3), flags);
     key_obj->init_member("isAccessible", 
-            gl->createFunction(key_is_accessible), flags);
+            gl.createFunction(key_is_accessible), flags);
 
     where.init_member(getName(uri), key_obj, as_object::DefaultFlags,
             getNamespace(uri));

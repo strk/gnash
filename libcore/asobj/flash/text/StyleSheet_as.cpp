@@ -61,9 +61,9 @@ void stylesheet_class_init(as_object& where, const ObjectURI& uri)
     static boost::intrusive_ptr<as_object> cl;
 
     if (!cl) {
-        Global_as* gl = getGlobal(where);
+        Global_as& gl = getGlobal(where);
         as_object* proto = getStyleSheetInterface();
-        cl = gl->createClass(&stylesheet_ctor, proto);
+        cl = gl.createClass(&stylesheet_ctor, proto);
         attachStyleSheetStaticInterface(*cl);
     }
 
@@ -77,11 +77,11 @@ namespace {
 void
 attachStyleSheetInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("getStyle", gl->createFunction(stylesheet_getStyle));
-    o.init_member("parseCSS", gl->createFunction(stylesheet_parseCSS));
-    o.init_member("setStyle", gl->createFunction(stylesheet_setStyle));
-    o.init_member("transform", gl->createFunction(stylesheet_transform));
+    Global_as& gl = getGlobal(o);
+    o.init_member("getStyle", gl.createFunction(stylesheet_getStyle));
+    o.init_member("parseCSS", gl.createFunction(stylesheet_parseCSS));
+    o.init_member("setStyle", gl.createFunction(stylesheet_setStyle));
+    o.init_member("transform", gl.createFunction(stylesheet_transform));
 }
 
 void

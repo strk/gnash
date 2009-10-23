@@ -736,7 +736,7 @@ NetConnection_as::notifyStatus(StatusCode code)
     getStatusCodeInfo(code, info);
 
     /// This is a new normal object each time (see NetConnection.as)
-    as_object* o = getGlobal(owner())->createObject();
+    as_object* o = getGlobal(owner()).createObject();
 
     const int flags = 0;
 
@@ -1042,7 +1042,7 @@ netconnection_call(const fn_call& fn)
     if (fn.nargs > 1) {
 
         if (fn.arg(1).is_object()) {
-            asCallback = (fn.arg(1).to_object(*getGlobal(fn)));
+            asCallback = (fn.arg(1).to_object(getGlobal(fn)));
         }
         else {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -1090,12 +1090,12 @@ netconnection_uri(const fn_call& fn)
 void
 attachNetConnectionInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
 
-    o.init_member("connect", gl->createFunction(netconnection_connect));
-    o.init_member("addHeader", gl->createFunction(netconnection_addHeader));
-    o.init_member("call", gl->createFunction(netconnection_call));
-    o.init_member("close", gl->createFunction(netconnection_close));
+    o.init_member("connect", gl.createFunction(netconnection_connect));
+    o.init_member("addHeader", gl.createFunction(netconnection_addHeader));
+    o.init_member("call", gl.createFunction(netconnection_call));
+    o.init_member("close", gl.createFunction(netconnection_close));
 }
 
 void

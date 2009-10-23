@@ -51,9 +51,9 @@ namespace {
 void
 security_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as* gl = getGlobal(where);
-    as_object* proto = gl->createObject();
-    as_object* cl = gl->createClass(&security_ctor, proto);
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&security_ctor, proto);
     attachSecurityStaticInterface(*cl);
     attachSecurityInterface(*proto);
 
@@ -67,14 +67,14 @@ namespace {
 void
 attachSecurityInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("allowInsecureDomain", gl->createFunction(security_allowInsecureDomain));
-    o.init_member("loadPolicyFile", gl->createFunction(security_loadPolicyFile));
-    o.init_member("showSettings", gl->createFunction(security_showSettings));
-    o.init_member("LOCAL_TRUSTED", gl->createFunction(security_LOCAL_TRUSTED));
-    o.init_member("LOCAL_WITH_FILE", gl->createFunction(security_LOCAL_WITH_FILE));
-    o.init_member("LOCAL_WITH_NETWORK", gl->createFunction(security_LOCAL_WITH_NETWORK));
-    o.init_member("REMOTE", gl->createFunction(security_REMOTE));
+    Global_as& gl = getGlobal(o);
+    o.init_member("allowInsecureDomain", gl.createFunction(security_allowInsecureDomain));
+    o.init_member("loadPolicyFile", gl.createFunction(security_loadPolicyFile));
+    o.init_member("showSettings", gl.createFunction(security_showSettings));
+    o.init_member("LOCAL_TRUSTED", gl.createFunction(security_LOCAL_TRUSTED));
+    o.init_member("LOCAL_WITH_FILE", gl.createFunction(security_LOCAL_WITH_FILE));
+    o.init_member("LOCAL_WITH_NETWORK", gl.createFunction(security_LOCAL_WITH_NETWORK));
+    o.init_member("REMOTE", gl.createFunction(security_REMOTE));
 }
 
 void

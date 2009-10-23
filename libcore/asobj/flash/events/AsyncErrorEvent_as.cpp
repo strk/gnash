@@ -53,9 +53,9 @@ namespace {
 void
 attachAsyncErrorEventInterface(as_object& o)
 {
-    Global_as* gl = getGlobal(o);
-    o.init_member("toString", gl->createFunction(asyncerrorevent_toString));
-    o.init_member("ASYNC_ERROR", gl->createFunction(asyncerrorevent_ASYNC_ERROR));
+    Global_as& gl = getGlobal(o);
+    o.init_member("toString", gl.createFunction(asyncerrorevent_toString));
+    o.init_member("ASYNC_ERROR", gl.createFunction(asyncerrorevent_ASYNC_ERROR));
 }
 
 void

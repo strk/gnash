@@ -540,8 +540,8 @@ xmlsocket_onData(const fn_call& fn)
     }
 
 
-    Global_as* gl = getGlobal(fn);
-    as_function* ctor = gl->getMember(NSV::CLASS_XML).to_as_function();
+    Global_as& gl = getGlobal(fn);
+    as_function* ctor = gl.getMember(NSV::CLASS_XML).to_as_function();
 
     fn_call::Args args;
     args += xmlin;
@@ -568,8 +568,8 @@ attachXMLSocketInterface(as_object& o)
     o.init_member("send", vm.getNative(400, 1));
     o.init_member("close", vm.getNative(400, 2));
 
-    Global_as* gl = getGlobal(o);
-    o.init_member("onData", gl->createFunction(xmlsocket_onData));
+    Global_as& gl = getGlobal(o);
+    o.init_member("onData", gl.createFunction(xmlsocket_onData));
 }
 
 } // anonymous namespace

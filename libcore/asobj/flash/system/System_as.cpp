@@ -126,12 +126,12 @@ attachSystemSecurityInterface(as_object& o)
     VM& vm = getVM(o);
     o.init_member("allowDomain", vm.getNative(12, 0));
 
-    Global_as* gl = getGlobal(o);
+    Global_as& gl = getGlobal(o);
     // TODO: only available when SWF >= 7 
     o.init_member("allowInsecureDomain",
-            gl->createFunction(system_security_allowinsecuredomain));
+            gl.createFunction(system_security_allowinsecuredomain));
     o.init_member("loadPolicyFile",
-            gl->createFunction(system_security_loadpolicyfile));
+            gl.createFunction(system_security_loadpolicyfile));
 }
 
 void
@@ -320,7 +320,7 @@ convertValue(const std::string& in, T& val)
 void
 attachSystemInterface(as_object& proto)
 {
-    Global_as* gl = getGlobal(proto);
+    Global_as& gl = getGlobal(proto);
 
     string_table& st = getStringTable(proto);
     registerBuiltinObject(proto, attachSystemSecurityInterface,
@@ -329,7 +329,7 @@ attachSystemInterface(as_object& proto)
             ObjectURI(st.find("capabilities"), 0));
 
 	proto.init_member("setClipboard", 
-            gl->createFunction(system_setClipboard));
+            gl.createFunction(system_setClipboard));
 	
     VM& vm = getVM(proto);
 	proto.init_member("showSettings", vm.getNative(2107, 0));

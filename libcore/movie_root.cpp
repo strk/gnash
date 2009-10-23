@@ -37,6 +37,9 @@
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "flash/ui/Keyboard_as.h"
+#include "utf8.h"
+#include "LoadableObject.h"
+#include "IOChannel.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -528,13 +531,16 @@ movie_root::clear()
 as_object*
 movie_root::getSelectionObject() const
 {
-    Global_as* global = _vm.getGlobal();
-    if (!global) return 0;
+    // This can never be null, though it is possible to override the
+    // reference to _global in AS2. If that makes a difference, we should
+    // look up the object by path (_global.Selection) rather than using
+    // the stored global object.
+    Global_as& gl = *_vm.getGlobal();
 
     as_value s;
-    if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
+    if (!gl.get_member(NSV::CLASS_SELECTION, &s)) return 0;
     
-    as_object* sel = s.to_object(*global);
+    as_object* sel = s.to_object(gl);
    
     return sel;
 }
@@ -543,11 +549,10 @@ as_object*
 movie_root::getStageObject()
 {
 	as_value v;
-	assert ( VM::isInitialized() ); // return NULL;
-	Global_as* global = _vm.getGlobal();
-	if (!global) return 0;
-	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return 0;
-	return v.to_object(*global);
+	assert (VM::isInitialized()); 
+	Global_as& gl = *_vm.getGlobal();
+	if (!gl.get_member(NSV::PROP_iSTAGE, &v) ) return 0;
+	return v.to_object(gl);
 }
 		
 void
@@ -588,23 +593,23 @@ movie_root::notify_mouse_moved(int x, int y)
 Keyboard_as*
 movie_root::getKeyObject()
 {
-    Global_as* global = _vm.getGlobal();
+    Global_as& gl = *_vm.getGlobal();
 
     as_value kval;
-    if (!global->get_member(NSV::CLASS_KEY, &kval)) return 0;
+    if (!gl.get_member(NSV::CLASS_KEY, &kval)) return 0;
 
-    as_object* obj = kval.to_object(*global);
-    return dynamic_cast<Keyboard_as*>( obj );
+    as_object* obj = kval.to_object(gl);
+    return dynamic_cast<Keyboard_as*>(obj);
 }
 
 as_object*
 movie_root::getMouseObject()
 {
-    Global_as* global = _vm.getGlobal();
+    Global_as& gl = *_vm.getGlobal();
 
     as_value val;
-    if (!global->get_member(NSV::CLASS_MOUSE, &val)) return 0;
-    return val.to_object(*global);
+    if (!gl.get_member(NSV::CLASS_MOUSE, &val)) return 0;
+    return val.to_object(gl);
 }
 
 
@@ -1673,6 +1678,13 @@ movie_root::flushHigherPriorityActionQueues()
 }
 
 void
+movie_root::addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str)
+{
+    boost::shared_ptr<IOChannel> io(str.release());
+    _loadCallbacks.push_back(std::make_pair(io, obj));
+}
+
+void
 movie_root::addAdvanceCallback(ActiveRelay* obj)
 {
     _objectCallbacks.insert(obj);
@@ -1745,16 +1757,21 @@ void
 movie_root::executeAdvanceCallbacks()
 {
 
-    if (_objectCallbacks.empty()) return;
+    if (!_objectCallbacks.empty()) {
 
-    // Copy it, as the call can change the original, which is not only 
-    // bad for invalidating iterators, but also allows infinite recursion.
-    std::vector<ActiveRelay*> currentCallbacks;
-    std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
-            std::back_inserter(currentCallbacks));
+        // Copy it, as the call can change the original, which is not only 
+        // bad for invalidating iterators, but also allows infinite recursion.
+        std::vector<ActiveRelay*> currentCallbacks;
+        std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
+                std::back_inserter(currentCallbacks));
 
-    std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
-            std::mem_fun(&ActiveRelay::update));
+        std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
+                std::mem_fun(&ActiveRelay::update));
+    }
+
+    if (!_loadCallbacks.empty()) {
+        _loadCallbacks.remove_if(processLoad);
+    }
 
     processActionQueue();
 }
@@ -1843,6 +1860,11 @@ movie_root::markReachableResources() const
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::mem_fun(&ActiveRelay::setReachable));
+
+    for (LoadCallbacks::const_iterator i = _loadCallbacks.begin(),
+            e = _loadCallbacks.end(); i != e; ++i) {
+        i->second->setReachable();
+    }
 
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)

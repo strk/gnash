@@ -156,7 +156,7 @@ transform_colorTransform(const fn_call& fn)
         );
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -271,7 +271,7 @@ transform_matrix(const fn_call& fn)
     }
 
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(*getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -343,7 +343,7 @@ transform_ctor(const fn_call& fn)
     }
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
-    as_object* o = fn.arg(0).to_object(*getGlobal(fn));
+    as_object* o = fn.arg(0).to_object(getGlobal(fn));
     if (!o) return as_value();
 
     MovieClip* mc = o->to_movie();
@@ -358,10 +358,10 @@ as_value
 get_flash_geom_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Transform class");
-    Global_as* gl = getGlobal(fn);
-    as_object* proto = gl->createObject();
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
     attachTransformInterface(*proto);
-    return gl->createClass(&transform_ctor, proto);
+    return gl.createClass(&transform_ctor, proto);
 }
 
 void
