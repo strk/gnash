@@ -86,6 +86,10 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
         return true;
     }
     
+
+    // TODO: I don't know what happens when there are more than 65535
+    // bytes, or if the whole input is not read at the first attempt.
+    // It seems unlikely that onData would be called with two half-replies
     const size_t chunk = 65535;
         
     boost::scoped_array<char> buf(new char[dataSize + 1]);
@@ -115,6 +119,10 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     as_value dataVal(bufptr); 
     
     obj->callMethod(NSV::PROP_ON_DATA, dataVal);
+
+    // We could try returning true if anything was read. Otherwise it
+    // may be necessary to implement a cache so that the whole reply is
+    // sent at once. The max length of a string in AS is 65535 characters.
     return lt->eof();
 
 }
