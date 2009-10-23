@@ -108,7 +108,7 @@ namespace gnash {
     class MovieClip;
     class VirtualClock;
     class Keyboard_as;
-    class LoadThread;
+    class IOChannel;
 }
 
 namespace gnash
@@ -145,7 +145,7 @@ class DSOEXPORT movie_root : boost::noncopyable
 
 public:
 
-    typedef std::pair<boost::shared_ptr<LoadThread>, as_object*> LoadCallback;
+    typedef std::pair<boost::shared_ptr<IOChannel>, as_object*> LoadCallback;
     typedef std::list<LoadCallback> LoadCallbacks;
 
     /// Default constructor

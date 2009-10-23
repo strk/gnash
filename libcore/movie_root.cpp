@@ -37,9 +37,9 @@
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "flash/ui/Keyboard_as.h"
-#include "LoadThread.h"
 #include "utf8.h"
 #include "LoadableObject.h"
+#include "IOChannel.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -1680,8 +1680,8 @@ movie_root::flushHigherPriorityActionQueues()
 void
 movie_root::addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str)
 {
-    boost::shared_ptr<LoadThread> lt(new LoadThread(str));
-    _loadCallbacks.push_back(std::make_pair(lt, obj));
+    boost::shared_ptr<IOChannel> io(str.release());
+    _loadCallbacks.push_back(std::make_pair(io, obj));
 }
 
 void

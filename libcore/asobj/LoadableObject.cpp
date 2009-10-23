@@ -32,7 +32,6 @@
 #include "fn_call.h"
 #include "GnashAlgorithm.h"
 #include "Global_as.h"
-#include "LoadThread.h"
 
 #include <sstream>
 #include <map>
@@ -79,30 +78,29 @@ registerLoadableNative(as_object& o)
 bool
 processLoad(movie_root::LoadCallbacks::value_type& v)
 {
-    LoadThread& lt = *v.first;
+    IOChannel* lt = v.first.get();
     as_object* obj = v.second;
 
-    if (lt.failed() || (lt.completed() && !lt.size())) {
+    if (!lt) {
         obj->callMethod(NSV::PROP_ON_DATA, as_value());
         return true;
     }
     
-    lt.download();
-
-    size_t dataSize = lt.getBytesTotal();
+    const size_t chunk = 65535;
         
     boost::scoped_array<char> buf(new char[dataSize + 1]);
-    size_t actuallyRead = lt.read(buf.get(), dataSize);
+    size_t actuallyRead = lt->read(buf.get(), chunk);
 
-    if (!actuallyRead) return false;
+    if (!actuallyRead && lt->eof()) {
+        obj->callMethod(NSV::PROP_ON_DATA, as_value());
+        return true;
+    }
 
-    // Do this before the BOM is stripped or dataSize will change.
+    // Do this before the BOM is stripped or actuallyRead will change.
     string_table& st = getStringTable(*obj);
     obj->set_member(st.find("_bytesLoaded"), actuallyRead);
-    obj->set_member(st.find("_bytesTotal"), dataSize);
+    obj->set_member(st.find("_bytesTotal"), lt->size());
     
-    log_debug("actuallyRead: %d, dataSize: %s", actuallyRead, dataSize);
-
     buf[actuallyRead] = '\0';
 
     // Strip BOM, if any.
@@ -117,7 +115,7 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     as_value dataVal(bufptr); 
     
     obj->callMethod(NSV::PROP_ON_DATA, dataVal);
-    return lt.completed();
+    return lt->eof();
 
 }
 
