@@ -672,14 +672,12 @@ xml_new(const fn_call& fn)
         else
         {
             xml_obj = new XMLDocument_as(xml_in);
-            xml_obj->setRelay(new LoadableObject(xml_obj));
             attachXMLProperties(*xml_obj);
             return as_value(xml_obj);
         }
     }
 
     xml_obj = new XMLDocument_as;
-    xml_obj->setRelay(new LoadableObject(xml_obj));
     attachXMLProperties(*xml_obj);
 
     return as_value(xml_obj);

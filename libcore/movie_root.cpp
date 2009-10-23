@@ -37,6 +37,8 @@
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "flash/ui/Keyboard_as.h"
+#include "LoadThread.h"
+#include "utf8.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -1675,6 +1677,13 @@ movie_root::flushHigherPriorityActionQueues()
 }
 
 void
+movie_root::addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str)
+{
+    boost::shared_ptr<LoadThread> lt(new LoadThread(str));
+    _loadCallbacks.push_back(std::make_pair(lt, obj));
+}
+
+void
 movie_root::addAdvanceCallback(ActiveRelay* obj)
 {
     _objectCallbacks.insert(obj);
@@ -1743,20 +1752,82 @@ movie_root::pushAction(as_function* func,
 	_actionQueue[lvl].push_back(code.release());
 }
 
+bool
+getData(std::pair<boost::shared_ptr<LoadThread>, as_object*>& v)
+{
+    LoadThread& lt = *v.first;
+    as_object* obj = v.second;
+    if (lt.failed() || (lt.completed() && !lt.size())) {
+        obj->callMethod(NSV::PROP_ON_DATA, as_value());
+        return true;
+    }
+    
+    if (lt.completed()) {
+        size_t dataSize = lt.getBytesTotal();
+        
+        // Do this before the BOM is stripped or dataSize will change.
+        string_table& st = getStringTable(*obj);
+        obj->set_member(st.find("_bytesLoaded"), dataSize);
+        obj->set_member(st.find("_bytesTotal"), dataSize);
+            
+        boost::scoped_array<char> buf(new char[dataSize + 1]);
+        size_t actuallyRead = lt.read(buf.get(), dataSize);
+        if (actuallyRead != dataSize) {
+            // This would be either a bug of LoadThread or an expected
+            // possibility which lacks documentation (thus a bug in
+            // documentation)
+            //
+        }
+        buf[actuallyRead] = '\0';
+
+        // Strip BOM, if any.
+        // See http://savannah.gnu.org/bugs/?19915
+        utf8::TextEncoding encoding;
+        // NOTE: the call below will possibly change 'xmlsize' parameter
+        char* bufptr = utf8::stripBOM(buf.get(), dataSize, encoding);
+        if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
+            log_unimpl("%s to utf8 conversion in LoadVars input parsing", 
+                    utf8::textEncodingName(encoding));
+        }
+        as_value dataVal(bufptr); 
+        
+        obj->callMethod(NSV::PROP_ON_DATA, dataVal);
+        return true;
+
+    }
+
+    const int bytesTotal = lt.getBytesTotal();
+    const int bytesLoaded = lt.getBytesLoaded();
+    
+    string_table& st = getStringTable(*obj);
+    obj->set_member(st.find("_bytesLoaded"), bytesLoaded);
+    // TODO: should this really be set on each iteration?
+    obj->set_member(st.find("_bytesTotal"), bytesTotal);
+    return false;
+
+}
+
 void
 movie_root::executeAdvanceCallbacks()
 {
 
-    if (_objectCallbacks.empty()) return;
+    if (!_objectCallbacks.empty()) {
 
-    // Copy it, as the call can change the original, which is not only 
-    // bad for invalidating iterators, but also allows infinite recursion.
-    std::vector<ActiveRelay*> currentCallbacks;
-    std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
-            std::back_inserter(currentCallbacks));
+        // Copy it, as the call can change the original, which is not only 
+        // bad for invalidating iterators, but also allows infinite recursion.
+        std::vector<ActiveRelay*> currentCallbacks;
+        std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
+                std::back_inserter(currentCallbacks));
 
-    std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
-            std::mem_fun(&ActiveRelay::update));
+        std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
+                std::mem_fun(&ActiveRelay::update));
+    }
+
+    if (!_loadCallbacks.empty()) {
+        _loadCallbacks.erase(std::remove_if(_loadCallbacks.begin(),
+                    _loadCallbacks.end(), getData), _loadCallbacks.end());
+
+    }
 
     processActionQueue();
 }
@@ -1845,6 +1916,11 @@ movie_root::markReachableResources() const
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::mem_fun(&ActiveRelay::setReachable));
+
+    for (LoadCallbacks::const_iterator i = _loadCallbacks.begin(),
+            e = _loadCallbacks.end(); i != e; ++i) {
+        i->second->setReachable();
+    }
 
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)

@@ -154,9 +154,6 @@ loadvars_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) return as_value();
 
-	as_object* obj = fn.this_ptr;
-    obj->setRelay(new LoadableObject(obj));
-
     IF_VERBOSE_ASCODING_ERRORS(
         if (fn.nargs) {
             std::ostringstream ss;

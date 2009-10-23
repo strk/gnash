@@ -108,6 +108,7 @@ namespace gnash {
     class MovieClip;
     class VirtualClock;
     class Keyboard_as;
+    class LoadThread;
 }
 
 namespace gnash
@@ -143,6 +144,9 @@ class DSOEXPORT movie_root : boost::noncopyable
 {
 
 public:
+
+    typedef std::pair<boost::shared_ptr<LoadThread>, as_object*> LoadCallback;
+    typedef std::vector<LoadCallback> LoadCallbacks;
 
     /// Default constructor
     //
@@ -319,6 +323,8 @@ public:
     ///         It will NEVER be zero.
     ///
     unsigned int add_interval_timer(std::auto_ptr<Timer> timer);
+
+    void addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str);
 
     void addAdvanceCallback(ActiveRelay* obj);
 
@@ -1132,6 +1138,8 @@ private:
     /// Objects requesting a callback on every movie_root::advance()
     typedef std::set<ActiveRelay*> ObjectCallbacks;
     ObjectCallbacks _objectCallbacks;
+
+    LoadCallbacks _loadCallbacks;
 
     typedef std::map<int, Timer*> TimerMap;
 

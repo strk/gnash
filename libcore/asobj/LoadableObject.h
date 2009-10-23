@@ -36,56 +36,13 @@ namespace gnash {
 /// It is a virtual base class because XML_as also inherits from XMLNode.
 //
 /// It may not be copied.
-class LoadableObject : public ActiveRelay
+class LoadableObject
 {
 public:
 
-    LoadableObject(as_object* owner);
-
-    virtual ~LoadableObject();
 
     /// Register methods as native for use by XML_as and LoadVars_as
     static void registerNative(as_object& global);
-
-    /// Carry out the AS send() operation
-    //
-    /// @param urlstr   The URI to send the data to
-    /// @param target   The target for the data (e.g. _self, _blank)
-    /// @param post     Whether the data should be posted or not.
-    //
-    /// The success of the operation is irrelevant to AS.
-    void send(const std::string& urlstr, const std::string& target,
-            bool post);
-
-    /// Carry out the AS sendAndLoad operation
-    //
-    /// @param urlstr   The URI to connect to for send and receive.
-    ///                 This function checks for permission to load the URL.
-    /// @param target   An as_object to load the data into using queueLoad,
-    ///                 which only LoadableObjects should have.
-    /// @param post     If true, POSTs data, otherwise GET.
-    void sendAndLoad(const std::string& urlstr, as_object& target, bool post);
-
-    /// Carry out the AS load operation
-    //
-    /// @param url      The URI to load from. Checks first for permission.
-    void load(const std::string& url);
-
-	size_t getBytesLoaded() const
-	{
-		return _bytesLoaded;
-	}
-
-	size_t getBytesTotal() const
-	{
-		return _bytesTotal;
-	}  
-
-    /// Begin loading from a stream
-    //
-    /// @param str      The stream to load from. It is destroyed when
-    ///                 we're finished with it.
-    void queueLoad(std::auto_ptr<IOChannel> str);
 
     /// Shared AS methods for XML and LoadVars, which can be used
     /// interchangeably with each object in ActionScript.
@@ -94,21 +51,6 @@ public:
     /// These functions return the value of _bytesTotal and _bytesLoaded
     static as_value loadableobject_getBytesLoaded(const fn_call& fn);
     static as_value loadableobject_getBytesTotal(const fn_call& fn);
-
-    /// Scan the LoadThread queue (_loadThreads) to see if any of
-    /// them completed. If any did, invoke the onData event
-    virtual void update();
-
-protected:
-
-    typedef std::list<LoadThread*> LoadThreadList;
-
-    /// Queue of load requests
-    LoadThreadList _loadThreads;
-
-    long _bytesLoaded;
-    
-    long _bytesTotal;
 
 };
 
