@@ -1757,53 +1757,43 @@ getData(std::pair<boost::shared_ptr<LoadThread>, as_object*>& v)
 {
     LoadThread& lt = *v.first;
     as_object* obj = v.second;
+
     if (lt.failed() || (lt.completed() && !lt.size())) {
         obj->callMethod(NSV::PROP_ON_DATA, as_value());
         return true;
     }
     
-    if (lt.completed()) {
-        size_t dataSize = lt.getBytesTotal();
+    lt.download();
+
+    size_t dataSize = lt.getBytesTotal();
         
-        // Do this before the BOM is stripped or dataSize will change.
-        string_table& st = getStringTable(*obj);
-        obj->set_member(st.find("_bytesLoaded"), dataSize);
-        obj->set_member(st.find("_bytesTotal"), dataSize);
-            
-        boost::scoped_array<char> buf(new char[dataSize + 1]);
-        size_t actuallyRead = lt.read(buf.get(), dataSize);
-        if (actuallyRead != dataSize) {
-            // This would be either a bug of LoadThread or an expected
-            // possibility which lacks documentation (thus a bug in
-            // documentation)
-            //
-        }
-        buf[actuallyRead] = '\0';
+    boost::scoped_array<char> buf(new char[dataSize + 1]);
+    size_t actuallyRead = lt.read(buf.get(), dataSize);
 
-        // Strip BOM, if any.
-        // See http://savannah.gnu.org/bugs/?19915
-        utf8::TextEncoding encoding;
-        // NOTE: the call below will possibly change 'xmlsize' parameter
-        char* bufptr = utf8::stripBOM(buf.get(), dataSize, encoding);
-        if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
-            log_unimpl("%s to utf8 conversion in LoadVars input parsing", 
-                    utf8::textEncodingName(encoding));
-        }
-        as_value dataVal(bufptr); 
-        
-        obj->callMethod(NSV::PROP_ON_DATA, dataVal);
-        return true;
+    if (!actuallyRead) return false;
 
-    }
-
-    const int bytesTotal = lt.getBytesTotal();
-    const int bytesLoaded = lt.getBytesLoaded();
-    
+    // Do this before the BOM is stripped or dataSize will change.
     string_table& st = getStringTable(*obj);
-    obj->set_member(st.find("_bytesLoaded"), bytesLoaded);
-    // TODO: should this really be set on each iteration?
-    obj->set_member(st.find("_bytesTotal"), bytesTotal);
-    return false;
+    obj->set_member(st.find("_bytesLoaded"), actuallyRead);
+    obj->set_member(st.find("_bytesTotal"), dataSize);
+    
+    log_debug("actuallyRead: %d, dataSize: %s", actuallyRead, dataSize);
+
+    buf[actuallyRead] = '\0';
+
+    // Strip BOM, if any.
+    // See http://savannah.gnu.org/bugs/?19915
+    utf8::TextEncoding encoding;
+    // NOTE: the call below will possibly change 'xmlsize' parameter
+    char* bufptr = utf8::stripBOM(buf.get(), actuallyRead, encoding);
+    if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
+        log_unimpl("%s to utf8 conversion in LoadVars input parsing", 
+                utf8::textEncodingName(encoding));
+    }
+    as_value dataVal(bufptr); 
+    
+    obj->callMethod(NSV::PROP_ON_DATA, dataVal);
+    return lt.completed();
 
 }
 
@@ -1824,8 +1814,7 @@ movie_root::executeAdvanceCallbacks()
     }
 
     if (!_loadCallbacks.empty()) {
-        _loadCallbacks.erase(std::remove_if(_loadCallbacks.begin(),
-                    _loadCallbacks.end(), getData), _loadCallbacks.end());
+        _loadCallbacks.remove_if(getData);
 
     }
 

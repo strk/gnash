@@ -61,7 +61,7 @@ public:
 	LoadThread(std::auto_ptr<IOChannel> str);
 
 	/// Stops the download if still running
-	~LoadThread();
+	~LoadThread() {}
 
 	/// Put read pointer at given position
 	//
@@ -120,6 +120,9 @@ public:
 	/// Request download cancel
 	void requestCancel();
 
+	/// The function that does the actual downloading
+	void download();
+
 private:
 
 	/// Return true if cancel was requested
@@ -128,29 +131,14 @@ private:
 	/// The thread function used to download from the stream
 	static void downloadThread(LoadThread* lt);
 
-	/// The function that does the actual downloading
-	void download();
-
-	/// Fills the cache at the begining
-	void setupCache();
-
-	/// Fills the cache when needed
-	void fillCache();
-
 	/// The stream/file we want to access
 	std::auto_ptr<IOChannel> _stream;
 
-	volatile bool _completed;
+	bool _completed;
 
-#ifdef THREADED_LOADS
-	mutable boost::mutex _mutex;
-
-	std::auto_ptr<boost::thread> _thread;
-#endif
-	
-	volatile long _loadPosition;
-	volatile long _userPosition;
-	volatile long _actualPosition;
+	long _loadPosition;
+	long _userPosition;
+	long _actualPosition;
 
 	// If true, download request was canceled
 	bool _cancelRequested;

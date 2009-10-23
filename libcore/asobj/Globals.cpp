@@ -1544,7 +1544,7 @@ registerNatives(as_object& global)
 
     // LoadableObject has natives shared between LoadVars and XML, so 
     // should be registered first.
-    LoadableObject::registerNative(global);
+    registerLoadableNative(global);
     XMLDocument_as::registerNative(global);
     XMLNode_as::registerNative(global);
 

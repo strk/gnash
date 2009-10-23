@@ -146,7 +146,7 @@ class DSOEXPORT movie_root : boost::noncopyable
 public:
 
     typedef std::pair<boost::shared_ptr<LoadThread>, as_object*> LoadCallback;
-    typedef std::vector<LoadCallback> LoadCallbacks;
+    typedef std::list<LoadCallback> LoadCallbacks;
 
     /// Default constructor
     //

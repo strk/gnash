@@ -44,6 +44,35 @@ namespace {
     as_value loadableobject_load(const fn_call& fn);
     as_value loadableobject_decode(const fn_call& fn);
     as_value loadableobject_sendAndLoad(const fn_call& fn);
+    as_value loadableobject_getBytesTotal(const fn_call& fn);
+    as_value loadableobject_getBytesLoaded(const fn_call& fn);
+    as_value loadableobject_addRequestHeader(const fn_call& fn);
+}
+
+void
+attachLoadableInterface(as_object& o, const int flags)
+{
+    Global_as& gl = getGlobal(o);
+
+	o.init_member("addRequestHeader", gl.createFunction(
+	            loadableobject_addRequestHeader), flags);
+	o.init_member("getBytesLoaded", gl.createFunction(
+	            loadableobject_getBytesLoaded),flags);
+	o.init_member("getBytesTotal", gl.createFunction(
+                loadableobject_getBytesTotal), flags);
+}
+
+void
+registerLoadableNative(as_object& o)
+{
+    VM& vm = getVM(o);
+
+    vm.registerNative(loadableobject_load, 301, 0);
+    vm.registerNative(loadableobject_send, 301, 1);
+    vm.registerNative(loadableobject_sendAndLoad, 301, 2);
+
+    /// This is only automatically used in LoadVars.
+    vm.registerNative(loadableobject_decode, 301, 3);
 }
 
 /// Functors for use with foreachArray
@@ -109,23 +138,8 @@ private:
     size_t _i;
 };
 
-}
-
-void
-LoadableObject::registerNative(as_object& o)
-{
-    VM& vm = getVM(o);
-
-    vm.registerNative(loadableobject_load, 301, 0);
-    vm.registerNative(loadableobject_send, 301, 1);
-    vm.registerNative(loadableobject_sendAndLoad, 301, 2);
-
-    /// This is only automatically used in LoadVars.
-    vm.registerNative(loadableobject_decode, 301, 3);
-}
-
 as_value
-LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
+loadableobject_getBytesLoaded(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
     as_value bytesLoaded;
@@ -135,7 +149,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 }
     
 as_value
-LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
+loadableobject_getBytesTotal(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
     as_value bytesTotal;
@@ -144,11 +158,10 @@ LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
     return bytesTotal;
 }
 
-
 /// Can take either a two strings as arguments or an array of strings,
 /// alternately header and value.
 as_value
-LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
+loadableobject_addRequestHeader(const fn_call& fn)
 {
     
     as_value customHeaders;
@@ -234,12 +247,6 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     
     return as_value();
 }
-
-
-/// These methods are accessed through the ASnative interface, so they
-/// do not need to be public methods of the LoadableObject class.
-namespace {
-
 /// Decode method (ASnative 301, 3) can be applied to any as_object.
 as_value
 loadableobject_decode(const fn_call& fn)

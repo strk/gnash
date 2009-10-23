@@ -603,15 +603,13 @@ attachXMLInterface(as_object& o)
     const int flags = 0;
 
     // No flags:
-    o.init_member("addRequestHeader", gl.createFunction(
-                LoadableObject::loadableobject_addRequestHeader), flags);
     o.init_member("createElement", vm.getNative(253, 10), flags);
     o.init_member("createTextNode", vm.getNative(253, 11), flags);
-    o.init_member("getBytesLoaded", gl.createFunction(
-                LoadableObject::loadableobject_getBytesLoaded), flags);
-    o.init_member("getBytesTotal", gl.createFunction(
-                LoadableObject::loadableobject_getBytesTotal), flags);
     o.init_member("load", vm.getNative(301, 0), flags);
+    
+    /// This handles getBytesLoaded, getBytesTotal, and addRequestHeader
+    attachLoadableInterface(o, flags);
+    
     o.init_member("parseXML", vm.getNative(253, 12), flags); 
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
