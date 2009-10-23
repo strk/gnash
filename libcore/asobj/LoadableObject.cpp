@@ -92,7 +92,7 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     // It seems unlikely that onData would be called with two half-replies
     const size_t chunk = 65535;
         
-    boost::scoped_array<char> buf(new char[dataSize + 1]);
+    boost::scoped_array<char> buf(new char[chunk + 1]);
     size_t actuallyRead = lt->read(buf.get(), chunk);
 
     if (!actuallyRead && lt->eof()) {
