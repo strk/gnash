@@ -83,7 +83,6 @@ libgnashbase_la_SOURCES = \
 	noseek_fd_adapter.cpp \
 	zlib_adapter.cpp \
 	URL.cpp \
-	LoadThread.cpp \
 	GC.cpp \
 	BitsReader.cpp \
 	arg_parser.cpp \
@@ -167,7 +166,6 @@ noinst_HEADERS = \
 	utf8.h \
 	noseek_fd_adapter.h \
 	zlib_adapter.h \
-	LoadThread.h \
 	BitsReader.h \
 	arg_parser.h \
 	getclocktime.hpp \
