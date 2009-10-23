@@ -324,6 +324,22 @@ public:
     ///
     unsigned int add_interval_timer(std::auto_ptr<Timer> timer);
 
+    /// Register an object for loading data to.
+    //
+    /// When complete, the object's onData function is called.
+    /// The callback is removed when the load is complete, including failed
+    /// loads.
+    //
+    /// There is no restriction on the type of as_object that can registered.
+    //
+    /// @param obj      The object to update when data is received.
+    /// @param str      The stream to load from.
+    //
+    /// TODO: this function could be improved, e.g. by handling the
+    /// URL checking and stream construction as well.
+    //
+    /// It may be possible for this function to handle all connections if
+    /// it also takes a callback function to call on each advance.
     void addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str);
 
     void addAdvanceCallback(ActiveRelay* obj);
