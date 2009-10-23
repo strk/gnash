@@ -353,7 +353,7 @@ LoadableObject::registerNative(as_object& o)
 as_value
 LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
 
     as_value bytesLoaded;
     string_table& st = getStringTable(fn);
@@ -364,7 +364,7 @@ LoadableObject::loadableobject_getBytesLoaded(const fn_call& fn)
 as_value
 LoadableObject::loadableobject_getBytesTotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
 
     as_value bytesTotal;
     string_table& st = getStringTable(fn);
@@ -417,7 +417,7 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
     {
         // This must be an array (or something like it). Keys / values are
         // pushed in valid pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> headerArray = fn.arg(0).to_object(gl);
+        as_object* headerArray = fn.arg(0).to_object(gl);
 
         if (!headerArray) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -472,7 +472,7 @@ namespace {
 as_value
 loadableobject_decode(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
 
     if (!fn.nargs) return as_value(false);
 
