@@ -170,24 +170,23 @@ moviecliploader_loadClip(const fn_call& fn)
 
     as_object* ptr = ensure<ValidThis>(fn);
   
-	if ( fn.nargs < 2 )
-	{
+	if ( fn.nargs < 2 ) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"),
-            ss.str());
-		);
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"),
+                ss.str());
+        );
 		return as_value(false);
 	}
 
-	as_value url_arg = fn.arg(0);
-	std::string str_url = url_arg.to_string(); 
+	const std::string& str_url = fn.arg(0).to_string(); 
 
 	as_value tgt_arg = fn.arg(1);
+
 	std::string tgt_str = tgt_arg.to_string();
 	DisplayObject* target = fn.env().find_target(tgt_str);
-	if ( ! target )
-	{
+
+	if (!target) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Could not find target %s (evaluated from %s)"),
 			tgt_str, tgt_arg);
@@ -203,8 +202,6 @@ moviecliploader_loadClip(const fn_call& fn)
 		);
 		return as_value(false);
 	}
-
-    // This is old loadClip()
 
     as_value targetVal(sprite);
 
@@ -222,7 +219,7 @@ moviecliploader_loadClip(const fn_call& fn)
         // was attempted (sandbox) or no status information is available
         // (supposedly the Adobe mozilla plugin).
 		as_value arg2(0.0);
-		ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError", targetVal,
+		ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError", sprite,
                 arg1, arg2);
 
 		return as_value(true);
@@ -302,8 +299,7 @@ moviecliploader_getProgress(const fn_call& fn)
 
 	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(getGlobal(fn));
   
-	if ( ! target.get() )
-	{
+	if (!target.get()) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
                 "not an object"), fn.arg(0));
@@ -312,8 +308,7 @@ moviecliploader_getProgress(const fn_call& fn)
 	}
 
 	MovieClip* sp = target->to_movie();
-	if ( ! sp )
-	{
+	if (!sp) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
                 "not an sprite"), fn.arg(0));
@@ -322,7 +317,7 @@ moviecliploader_getProgress(const fn_call& fn)
 	}
 
 
-	boost::intrusive_ptr<as_object> mcl_obj = new as_object;
+	as_object* mcl_obj = new as_object;
 
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();
@@ -333,7 +328,7 @@ moviecliploader_getProgress(const fn_call& fn)
 	mcl_obj->set_member(st.find("bytesLoaded"), bytesLoaded);
 	mcl_obj->set_member(st.find("bytesTotal"),  bytesTotal);
   
-	return as_value(mcl_obj.get()); // will keep alive
+	return as_value(mcl_obj); 
 }
 
 } // anonymous namespace
