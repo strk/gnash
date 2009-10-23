@@ -316,11 +316,8 @@ function_apply(const fn_call& fn)
                 PushFunctionArgs pa(new_fn_call);
                 foreachArray(*arg1, pa);
             }
-            else goto call_it;
 		}
 	}
-
-	call_it:
 
 	// Call the function 
 	as_value rv = function_obj->call(new_fn_call);
