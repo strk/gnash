@@ -19,6 +19,9 @@
 
 #ifndef GNASH_LOADABLE_OBJECT_H
 #define GNASH_LOADABLE_OBJECT_H
+
+#include "movie_root.h"
+
 namespace gnash {
     class as_object;
 }
@@ -32,6 +35,8 @@ void registerLoadableNative(as_object& global);
 //
 /// This implements built-in functions.
 void attachLoadableInterface(as_object& where, int flags);
+
+bool processLoad(movie_root::LoadCallbacks::value_type& v);
 
 }
 
