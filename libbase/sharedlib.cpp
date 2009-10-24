@@ -152,7 +152,7 @@ SharedLib::openLib (const std::string& filespec)
 SharedLib::initentry *
 SharedLib::getInitEntry (const std::string& symbol)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
     scoped_lock lock(_libMutex);
