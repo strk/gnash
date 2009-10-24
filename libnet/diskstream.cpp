@@ -460,7 +460,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
 	_dataptr = dataptr;
-	_seekptr = _dataptr + offset;
+	_seekptr = dataptr + offset;
 	_state = OPEN;
     }
 
@@ -479,6 +479,9 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	    metadata->dump();
 	}
     }
+
+    // The data pointer points to the real data past all the header bytes.
+    _dataptr = ptr;
 
     return _seekptr;    
 }

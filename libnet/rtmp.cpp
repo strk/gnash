@@ -378,6 +378,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf(new Buffer(1));
+    buf->clear();
     boost::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
@@ -435,17 +436,26 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 	// The type is a one byte field
 	*ptr = type;
 	ptr++;
-    }
-    
-    // Add the routing of the message if the header size is 12, the maximum.
-    if (head_size == HEADER_12) {
-        boost::uint32_t swapped = htonl(routing);
-        memcpy(ptr, &swapped, 4);
-        ptr += 4;
+	
+	// Add the routing of the message if the header size is 12, the maximum.
+	if (head_size == HEADER_12 && type != RTMP::USER) {
+	    if (type != RTMP::AUDIO_DATA && type != RTMP::VIDEO_DATA) {
+		// log_network(_("The routing is: 0x%x"), routing);
+		boost::uint32_t swapped = htonl(routing);
+		memcpy(ptr, &swapped, 4);
+	    } else {
+		// FIXME: I have no idea why these two empty messages
+		// don't handle the routing field for 12 byte headers
+		// the same as all the other types.
+		boost::uint8_t swapped = 0x1;
+		*ptr = swapped;
+	    }
+	    ptr += 4;
+	}
     }
     
     // Manually adjust the seek pointer since we added the data by
-    // walking ou own temporary pointer, so none of the regular ways
+    // walking our own temporary pointer, so none of the regular ways
     // of setting the seek pointer are appropriate.
     buf->setSeekPointer(buf->reference() + buf->size());
     
@@ -613,7 +623,14 @@ RTMP::decodePing(amf::Buffer &buf)
 }
 
 boost::shared_ptr<RTMP::user_event_t>
-RTMP::decodeUser(boost::uint8_t *data)
+RTMP::decodeUserControl(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    return decodeUserControl(buf.reference());
+}
+
+boost::shared_ptr<RTMP::user_event_t>
+RTMP::decodeUserControl(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -657,11 +674,55 @@ RTMP::decodeUser(boost::uint8_t *data)
 
     return user;
 }
-boost::shared_ptr<RTMP::user_event_t>
-RTMP::decodeUser(amf::Buffer &buf)
+
+// Stream Live -
+//   02 00 00 00 00 00 06 04 00 00 00 00   00 04 00 00 00 01
+// Stream Start -
+//   02 00 00 00 00 00 06 04 00 00 00 00   00 00 00 00 00 01
+boost::shared_ptr<amf::Buffer>
+RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
 {
 //    GNASH_REPORT_FUNCTION;
-    return decodeUser(buf.reference());
+
+    boost::uint32_t swapped = 0;
+    boost::shared_ptr<amf::Buffer> buf;
+    if (eventid == STREAM_BUFFER) {
+	buf.reset(new Buffer(sizeof(boost::uint16_t) * 5));
+    } else {
+	buf.reset(new Buffer(sizeof(boost::uint16_t) * 3));
+    }
+
+    // Set the type of this ping message
+    boost::uint16_t typefield = htons(eventid);
+    *buf = typefield;
+    
+    // All events have only 4 bytes of data, except Set Buffer, which
+    // uses 8 bytes. The 4 bytes is usually the Stream ID except for
+    // Ping and Pong events, which carry a time stamp instead. We
+    // don't actually do anything here, we just parse the data.
+    switch (eventid) {
+      case STREAM_START:
+      case STREAM_EOF:
+      case STREAM_NODATA:
+	  swapped = data;
+	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  *buf += swapped;
+	  break;
+      case STREAM_BUFFER:
+	  buf.reset(new Buffer(sizeof(boost::uint16_t) * 5));
+	  break;
+      case STREAM_LIVE:
+      case STREAM_PING:
+      case STREAM_PONG:
+	  swapped = data;
+	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  *buf += swapped;
+	  break;
+      default:
+	  break;
+    };
+
+    return buf;
 }
 
 boost::shared_ptr<RTMPMsg>
@@ -920,13 +981,15 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 {
 // GNASH_REPORT_FUNCTION;
     int ret = 0;
-    
+
+#if 0
     // We got some bogus parameters
-    if (total_size == 0) {
+    if (total_size || size 0) {
 	log_error("Bogus size parameter in %s!", __PRETTY_FUNCTION__);
 	return false;
     }
-
+#endif
+    
     // FIXME: This is a temporary hack to make it easier to read hex
     // dumps from network packet sniffing so all the data is in one
     // buffer. This matches the Adobe behaviour, but for Gnash/Cygnal,
@@ -968,6 +1031,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
     *bigbuf = head;
 #endif
 
+    // if (data && size) {
     // now send the data
     while (nbytes <= size) {
 	// The last bit of data is usually less than the packet size,
@@ -990,6 +1054,8 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	    *bigbuf += cont_head;
 #endif
 	}
+        // }
+    
 	// write the data to the client
 #if 0
 	ret = writeNet(fd, data + nbytes, partial);
@@ -1001,7 +1067,9 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 			ret, size-nbytes);
 	}
 #else
-	bigbuf->append(data + nbytes, partial);
+	if (data != 0) {
+	    bigbuf->append(data + nbytes, partial);
+	}
 #endif
 	// adjust the accumulator.
 	nbytes += _chunksize[channel];

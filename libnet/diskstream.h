@@ -228,7 +228,8 @@ public:
 
     /// \brief Get the base address for the memory page.
     ///
-    /// @return A real pointer to the base address.
+    /// @return A real pointer to the base address dat in the file, but after
+    /// the header bytes.
     boost::uint8_t *get() { return _dataptr; };
     
     /// \brief Get the size of the file.

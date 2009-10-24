@@ -321,9 +321,13 @@ public:
     // Decode
     boost::shared_ptr<rtmp_head_t> decodeHeader(boost::uint8_t *header);
     boost::shared_ptr<rtmp_head_t> decodeHeader(amf::Buffer &data);
-    boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index, rtmp_headersize_e head_size,
-			      size_t total_size, content_types_e type, RTMPMsg::rtmp_source_e routing);
-    boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index, rtmp_headersize_e head_size);
+    
+    boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index,
+					rtmp_headersize_e head_size,
+					size_t total_size, content_types_e type,
+					RTMPMsg::rtmp_source_e routing);
+    boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index,
+						rtmp_headersize_e head_size);
     
     void addProperty(amf::Element &el);
     void addProperty(char *name, amf::Element &el);
@@ -347,13 +351,15 @@ public:
     virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
     boost::shared_ptr<rtmp_ping_t> decodePing(amf::Buffer &buf);
     
-    virtual boost::shared_ptr<user_event_t> decodeUser(boost::uint8_t *data);
-    boost::shared_ptr<user_event_t> decodeUser(amf::Buffer &buf);
+    virtual boost::shared_ptr<user_event_t> decodeUserControl(boost::uint8_t *data);
+    boost::shared_ptr<user_event_t> decodeUserControl(amf::Buffer &buf);
+    virtual boost::shared_ptr<amf::Buffer> encodeUserControl(user_control_e, boost::uint32_t data);
+    
     
     // These are handlers for the various types
     virtual boost::shared_ptr<amf::Buffer> encodeChunkSize(int size);
     virtual void decodeChunkSize();
-    
+
     virtual boost::shared_ptr<amf::Buffer> encodeBytesRead();
     virtual void decodeBytesRead();
     virtual boost::shared_ptr<amf::Buffer> encodeServer();
