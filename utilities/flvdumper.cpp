@@ -189,7 +189,7 @@ main(int argc, char *argv[])
     Flv::previous_size_t   previous = 0;
     boost::shared_ptr<Flv::flv_tag_t> tag;
     
-    // Make sure it's an SOL file
+    // Make sure it's an FLV file
     if (stat(filespec.c_str(), &st) == 0) {
 	try {
             // Open the binary file
