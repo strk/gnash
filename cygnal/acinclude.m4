@@ -56,8 +56,6 @@ fi
 dnl Look for the various ways of blocking while waiting for I/O
 AC_CHECK_FUNCS(pselect ppoll)
 
-AC_CHECK_FUNCS(tmpnam tempnam)
-
 AC_TRY_COMPILE([#include <fcntl.h>], [
     splice(0, 0, 0, 0); ],
     has_splice=yes,
