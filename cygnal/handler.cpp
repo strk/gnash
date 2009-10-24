@@ -23,6 +23,8 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 #include <algorithm>
 #include <string>
@@ -47,9 +49,11 @@
 #include "utility.h"
 #include "dsodefs.h" //For DSOEXPORT.
 #include "handler.h"
-
+#include "diskstream.h"
 #include "rtmp.h"
 #include "http.h"
+#include "crc.h"
+#include "flv.h"
 
 using namespace gnash;
 using namespace std;
@@ -60,12 +64,18 @@ namespace cygnal
 
 map<int, Handler *> DSOEXPORT handlers;
 
+// The user config for Cygnal is loaded and parsed here:
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
+
 Handler::Handler()
-    : _streams(2),		// streams 0 and 1 appear to be
-				// reserved by the system.      
-      _in_fd(0)
+    : _diskstreams(new gnash::DiskStream[STREAMS_BLOCK]),
+      _streams(1),	// note that stream 0 is reserved by the system.
+      _in_fd(0),
+      _active_streams(false)
 {
 //    GNASH_REPORT_FUNCTION;
+    // reserve memory for the vector as it makes vector operations
+    // must faster.
 }
 
 Handler::~Handler()
@@ -118,7 +128,7 @@ Handler::setPlugin(Handler::cygnal_io_t /* read_ptr */, Handler::cygnal_io_t /* 
 boost::shared_ptr<Handler::cygnal_init_t>
 Handler::initModule(const std::string& module)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     SharedLib *sl;
     std::string symbol(module);
@@ -187,8 +197,7 @@ Handler::initModule(const std::string& module)
 size_t
 Handler::writeToPlugin(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
-
+    // GNASH_REPORT_FUNCTION;
     size_t ret = 0;
     if (_plugin) {
 	ret = _plugin->write_func(data, size);
@@ -200,7 +209,8 @@ Handler::writeToPlugin(boost::uint8_t *data, size_t size)
 boost::shared_ptr<amf::Buffer>
 Handler::readFromPlugin()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     boost::shared_ptr<amf::Buffer> buf;
     if (_plugin) {
 	buf = _plugin->read_func();
@@ -212,7 +222,7 @@ Handler::readFromPlugin()
 bool 
 Handler::initialized()
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     if (_files.empty()
 	&& (_clients.size() == 1)
 	&& !_local
@@ -224,41 +234,80 @@ Handler::initialized()
     return true;
 }
 
-int 
-Handler::createStream()
+// Find a stream in the vector or Disk Streams
+gnash::DiskStream &
+Handler::findStream(const std::string &filespec)
 {
-    // GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+    
+    for (int i; i < _streams; i++) {
+	if (_diskstreams[i].getFilespec() == filespec) {
+	    return _diskstreams[i];
+	}
+    }
 
-    return createStream("");
+    return _diskstreams[0];
 }
 
-int
-Handler::createStream(const std::string &filespec)
+// Create a new DiskStream
+double
+Handler::createStream(double transid)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _diskstreams[_streams].setState(DiskStream::CREATED);
+
+    return _streams;
+}
+
+// Create a new DiskStream
+double
+Handler::createStream(double transid, const std::string &filespec)
 {
     // GNASH_REPORT_FUNCTION;
-
-    int streamid = _streams;
 
     if (filespec.empty()) {
 	return -1;
     }
-    _streams++;
-    return streamid;
+    
+    _diskstreams[_streams].setState(DiskStream::CREATED);
+    _diskstreams[_streams].setFilespec(filespec);
+    
+    return _streams;
 }
 
-int
+bool
 Handler::playStream()
 {
     GNASH_REPORT_FUNCTION;
 
-    return -1;
+    // _diskstreams[int(streamid)]->setState(DiskStream::PLAY);
+
+    return false;
 }
 
-int
-Handler::playStream(const std::string &/* filespec */)
+bool
+Handler::playStream(const std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
-    return -1;
+
+    gnash::DiskStream &ds = _diskstreams[_streams];
+
+    string fullpath = crcfile.getDocumentRoot();
+    fullpath += "/";
+    fullpath += filespec;
+    log_debug("FILENAME: %s", fullpath);
+
+    // gnash::DiskStream &ds = findStream(filespec);
+    if (ds.getState() == DiskStream::CREATED) {
+	if (ds.open(fullpath)) {
+	    ds.loadToMem(4096); // FIXME: load only part of the whole file for now
+	    ds.setState(DiskStream::PLAY);
+	    return true;
+	}
+    }
+    
+    return false;
 }
 
 // Publish a live RTMP stream
@@ -266,6 +315,7 @@ int
 Handler::publishStream()
 {
     GNASH_REPORT_FUNCTION;
+    
     return publishStream("", Handler::LIVE);
 }
 
@@ -274,6 +324,9 @@ Handler::publishStream(const std::string &/*filespec */, Handler::pub_stream_e /
 									   */)
 {
     GNASH_REPORT_FUNCTION;
+
+    // _diskstreams[int(streamid)]->setState(DiskStream::PUBLISH);
+
     return -1;
 }
 
@@ -282,6 +335,8 @@ int
 Handler::seekStream()
 {
     GNASH_REPORT_FUNCTION;
+    // _diskstreams[int(streamid)]->setState(DiskStream::SEEK);
+    
     return -1;
 }
 
@@ -289,39 +344,70 @@ int
 Handler::seekStream(int /* offset */)
 {
     GNASH_REPORT_FUNCTION;
+    // _diskstreams[int(streamid)]->setState(DiskStream::SEEK);
+
     return -1;
 }
 
 // Pause the RTMP stream
 int
-Handler::pauseStream()
+Handler::pauseStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    _diskstreams[int(streamid)].setState(DiskStream::PAUSE);
+
     return -1;
 }
 
 // Pause the RTMP stream
 int
-Handler::togglePause()
+Handler::togglePause(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    if (_diskstreams[int(streamid)].getState() == DiskStream::PAUSE) {
+	_diskstreams[int(streamid)].setState(DiskStream::PLAY);
+    } if (_diskstreams[int(streamid)].getState() == DiskStream::PLAY) {
+	_diskstreams[int(streamid)].setState(DiskStream::PAUSE);
+    }
+
     return -1;
 }
 
 // Resume the paused RTMP stream
-int
-Handler::resumeStream()
+double
+Handler::resumeStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    togglePause(streamid);
+    
     return -1;
 }
 
 // Close the RTMP stream
-int
-Handler::closeStream()
+double
+Handler::closeStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    _diskstreams[int(streamid)].setState(DiskStream::CLOSED);
+
     return -1;
+}
+
+// Delete the RTMP stream
+double
+Handler::deleteStream(double streamid)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _diskstreams[int(streamid)].setState(DiskStream::NO_STATE);
+
+    _streams++;
+
+    return _streams;
 }
 
 // Dump internal data.

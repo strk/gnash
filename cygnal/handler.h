@@ -26,6 +26,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_ptr.hpp>
 //#include <boost/thread/condition.hpp>
 
 #include <vector>
@@ -52,6 +54,7 @@
 #include "diskstream.h"
 #include "sharedlib.h"
 #include "extension.h"
+#include "diskstream.h"
 
 #include "rtmp.h"
 #include "rtmp_msg.h"
@@ -61,6 +64,9 @@
 // _definst_ is the default instance name
 namespace cygnal
 {
+
+// The number of disk streams in the array.
+const size_t STREAMS_BLOCK = 1000;
 
 class Cygnal;
 
@@ -111,6 +117,11 @@ public:
     void setName(const std::string &x) { _name = x; };
     std::string &getName() { return _name; }
 
+    // Check the status of active disk streams
+    int getActiveDiskStreams() { return _streams; }
+    // Operate on a disk streaming inprogress
+    gnash::DiskStream &getDiskStream(int x) { return _diskstreams[x]; }
+
     void addSOL(boost::shared_ptr<amf::Element> x) {
 	_sol.push_back(x);
     };
@@ -124,6 +135,11 @@ public:
     /// \var getClients
     ///     Get the vector of file descriptors for this handler.
     std::vector<int> &getClients() { return _clients; };
+    /// \var getClient
+    ///     Get a client from the list of clients, we have too many
+    ///     arrays so using an operator isn't useful.
+    int getClient(int x) { return _clients[x]; };
+    
     gnash::Network::protocols_supported_e getProtocol(int x) { return _protocol[x]; };
     void setProtocol(int fd, gnash::Network::protocols_supported_e x) { _protocol[fd] = x; };
     
@@ -151,16 +167,16 @@ public:
     // These methods handle control of the file streaming 
 
     /// \fn     int createStream()
-    int createStream();
+    double createStream(double transid);
     /// \overload int createStream(const std::string &filespec)
     /// @param filespec The spec of the file to stream
-    int createStream(const std::string &filespec);
+    double createStream(double transid, const std::string &filespec);
 
     /// \fn playStream
     ///    Play the specified file as a stream
-    int playStream();
+    bool playStream();
     /// \overload int playStream(const std::string &filespec)
-    int playStream(const std::string &filespec);
+    bool playStream(const std::string &filespec);
 
     // Publish a live RTMP stream
     int publishStream();
@@ -171,15 +187,22 @@ public:
     int seekStream(int offset);
 
     // Pause the RTMP stream
-    int pauseStream();
+    int pauseStream(double transid);
+
+    // Find a stream in the vector or Disk Streams
+    gnash::DiskStream &findStream(const std::string &filespec);
+
     // Pause the RTMP stream
-    int togglePause();
+    int togglePause(double);
 
     // Resume the paused RTMP stream
-    int resumeStream();
+    double resumeStream(double transid);
 
     // Close the RTMP stream
-    int closeStream();
+    double closeStream(double transid);
+
+    // Delete the RTMP stream
+    double deleteStream(double transid);
 
     void setFCSubscribe(const std::string &x) { _fcsubscribe = x; };
     std::string &getFCSubscribe() { return _fcsubscribe; }
@@ -192,13 +215,18 @@ public:
     void dump();
     
 protected:
+    /// \var _diskstreams
+    ///   This is all the opened disk based files that are currently
+    ///   being streamed by the server.
+    // std::map<std::string &, boost::scoped_ptr<gnash::DiskStream> > _diskstreams;
+    boost::shared_array<gnash::DiskStream> _diskstreams;
     /// \var _streams
     ///    This is a counter of how many streams have been allocated
     ///    by the server.
-    int _streams;
+    int		_streams;
     /// \var _name
     ///	    The name of the path this handler is supporting.
-    std::string				_name;
+    std::string	_name;
     ///	    Each incoming request has one of 4 states the server has
     ///     to handle to send a response.
 
@@ -209,11 +237,11 @@ protected:
     /// \var _clients
     ///	    is the array of all clients connected to this server for
     ///     this application. This is where all the output goes.
-    std::vector<int>			_clients;
+    std::vector<int> _clients;
     /// \var _remote
     ///	    This is network connections to other processes,
     ///	    on other computers.
-    std::vector<int>			_remote;
+    std::vector<int> _remote;
 
     /// \var _local
     ///    These are local process we're responsible for
@@ -249,6 +277,10 @@ protected:
     ///    that is used to set up the connection. This has all the
     ///    file paths and other information needed by the server.
     boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
+
+    /// \var _active_streams
+    ///    This is a counter of the active diskstreams
+    int _active_streams;
 private:    
     boost::mutex			_mutex;
     
