@@ -450,6 +450,7 @@ main(int argc, char *argv[])
         docroot = crcfile.getDocumentRoot();
     } else {
         docroot = "/var/www/html/software/tests/";
+	crcfile.setDocumentRoot(docroot);
     }
     if (crcfile.getPortOffset()) {
       port_offset = crcfile.getPortOffset();
@@ -892,7 +893,7 @@ connection_handler(Network::thread_params_t *args)
 		return;
 	    }
 	    URL url(tcurl->to_string());
-	    std::string key = url.hostname() + url.path();
+	    string key = url.hostname() + url.path();
 	    boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
 	    if (!hand) {
 		log_network("Creating new %s Handler for: %s for fd %#d",
