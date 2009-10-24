@@ -227,7 +227,7 @@ RTMPServer::processClientHandShake(int fd)
     if (!encoding) {
 	// Send a onBWDone to the client to start the new NetConnection,
 	boost::shared_ptr<amf::Buffer> bwdone = encodeBWDone(2.0);
-	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_12,
+	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_8,
 			  bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
 	    log_network("Sent onBWDone to client");
 	} else {
@@ -1046,6 +1046,30 @@ RTMPServer::encodeBWDone(double id)
     return buf;
 }
 
+boost::shared_ptr<amf::Buffer>
+RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    boost::shared_ptr<amf::Buffer> buf;
+    
+    if (size) {
+	if (data) {
+	    buf.reset(new amf::Buffer(size));
+	    buf->copy(data, size);
+	}
+    }
+
+    return buf;
+}
+
+boost::shared_ptr<amf::Buffer>
+RTMPServer::encodeVideo(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+#if 0
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<boost::shared_ptr<amf::Element > >
@@ -1130,6 +1154,7 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
 
     return buf;
 }
+#endif
 
 // Create a new client ID, which appears to be a random double,
 // although I also see a temporary 8 character string used often as
@@ -1353,16 +1378,24 @@ rtmp_handler(Network::thread_params_t *args)
 //    boost::shared_ptr<amf::Buffer> buf;
 
     // If we have active disk streams, send those packets first.
-    // if (int i=0; i <= hand->getActiveDiskStreams(); i++) {
-    int i = 0;
-    boost::uint8_t *ptr = hand->getDiskStream(i).get();
-    int j = hand->getClient(i);
-    if (rtmp->sendMsg(j, 8,
-		      RTMP::HEADER_8, hand->getDiskStream(i).getFileSize(),
-		      RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
-		      ptr, hand->getDiskStream(i).getFileSize())) {
+    // 0 is a reserved stream, so we start with 1, as the reserved
+    // stream isn't one we care about here.
+    log_network("%d active disk streams", hand->getActiveDiskStreams());
+    for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
+	hand->getDiskStream(i).dump();
+	if (hand->getDiskStream(i).getState() == DiskStream::PLAY) {
+	    boost::uint8_t *ptr = hand->getDiskStream(i).get();
+	    if (ptr) {
+		if (rtmp->sendMsg(hand->getClient(i), 8,
+			RTMP::HEADER_8, 4096,
+			RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
+			ptr, 4096)) {
+		}
+	    } else {
+		log_network("ERROR: No stream for client %d", i);
+	    }
 	}
-    // }
+    }
     
     // This is the main message processing loop for rtmp. Most
     // messages received require a response.
@@ -1398,7 +1431,7 @@ rtmp_handler(Network::thread_params_t *args)
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
 			    if (qhead->type == RTMP::USER) {
 				boost::shared_ptr<RTMP::user_event_t> user
-				    = rtmp->decodeUser(tmpptr);
+				    = rtmp->decodeUserControl(tmpptr);
 				switch (user->type) {
 				  case RTMP::STREAM_START:
 				      log_unimpl("Stream Start");
@@ -1513,7 +1546,7 @@ rtmp_handler(Network::thread_params_t *args)
 
 			      if (hand->playStream(filespec)) {
 				  // Send the Set Chunk Size response
-#if 0
+#if 1
 				  response = rtmp->encodeChunkSize(4096);
 				  if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
 					RTMP::HEADER_12, response->allocated(),
@@ -1543,6 +1576,49 @@ rtmp_handler(Network::thread_params_t *args)
 					*response)) {
 				  }
 			      }
+			      sleep(1); // FIXME: debugging crap
+			      // Send the User Control - Stream Live
+			      response = rtmp->encodeUserControl(RTMP::STREAM_LIVE, 1);
+			      if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+					RTMP::HEADER_12, response->allocated(),
+					RTMP::USER, RTMPMsg::FROM_SERVER,
+					*response)) {
+			      }
+			      sleep(1); // FIXME: debugging crap
+			      // Send an empty Audio packet to get
+			      // things started.
+			      if (rtmp->sendMsg(args->netfd, 6,
+					RTMP::HEADER_12, 0,
+					RTMP::AUDIO_DATA, RTMPMsg::FROM_SERVER,
+					0, 0)) {
+			      }
+			      // Send an empty Video packet to get
+			      // things started.
+			      if (rtmp->sendMsg(args->netfd, 5,
+					RTMP::HEADER_12, 0,
+					RTMP::VIDEO_DATA, RTMPMsg::FROM_SERVER,
+					0, 0)) {
+			      }
+			      sleep(1); // FIXME: debugging crap
+			      // Send the User Control - Stream Start
+			      response = rtmp->encodeUserControl(RTMP::STREAM_START, 1);
+			      if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+					RTMP::HEADER_12, response->allocated(),
+					RTMP::USER, RTMPMsg::FROM_SERVER,
+					*response)) {
+			      }			      
+			      int active_stream = hand->getActiveDiskStreams();
+			      boost::uint8_t *ptr = hand->getDiskStream(active_stream).get();
+			      if (ptr) {
+				  log_network("Sending %s to client",
+					      hand->getDiskStream(active_stream).getFilespec());
+				  if (rtmp->sendMsg(args->netfd, 5,
+					RTMP::HEADER_12, 400,
+					RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
+					ptr, 400)) {
+				      log_network("Sent first page to client");
+				  }
+			      }  
 			  } else if (body->getMethodName() == "seek") {
 			      hand->seekStream();
 			  } else if (body->getMethodName() == "pause") {

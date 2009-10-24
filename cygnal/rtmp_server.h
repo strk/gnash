@@ -69,6 +69,9 @@ public:
     // Encode a Ping for the client
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
+    // boost::shared_ptr<amf::Buffer> encodeUser(user_control_e type, boost::uint32_t milliseconds);
+    boost::shared_ptr<amf::Buffer> encodeAudio(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<amf::Buffer> encodeVideo(boost::uint8_t *data, size_t size);
 
     // Encode a onBWDone message for the client
     boost::shared_ptr<amf::Buffer> encodeBWDone(double id);
