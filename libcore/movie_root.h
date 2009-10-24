@@ -883,8 +883,6 @@ public:
 	}
 	
 
-private:
-
     /// Set the root movie, replacing the current one if any.
     //
     /// This is needed for the cases in which the top-level movie
@@ -909,6 +907,8 @@ private:
     /// Must have a depth of 0.
     ///
     void setRootMovie(Movie* movie);
+private:
+
 
     const RunResources& _runResources; 
 
