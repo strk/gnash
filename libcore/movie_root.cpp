@@ -833,13 +833,13 @@ movie_root::fire_mouse_event()
     // Set _droptarget if dragging a sprite
     MovieClip* dragging = 0;
     DisplayObject* draggingChar = getDraggingCharacter();
-    if ( draggingChar ) dragging = draggingChar->to_movie();
-    if ( dragging )
+    if (draggingChar) dragging = draggingChar->to_movie();
+    if (dragging)
     {
         // TODO: optimize making findDropTarget and getTopmostMouseEntity
         //       use a single scan.
         const DisplayObject* dropChar = findDropTarget(x, y, dragging);
-        if ( dropChar )
+        if (dropChar)
         {
             // Use target of closest script DisplayObject containing this
             dropChar = dropChar->getClosestASReferenceableAncestor();
@@ -1330,24 +1330,28 @@ movie_root::setFocus(DisplayObject* to)
     DisplayObject* from = _currentFocus;
 
     if (from) {
-
         // Perform any actions required on killing focus (only TextField).
         from->killFocus();
-        from->callMethod(NSV::PROP_ON_KILL_FOCUS, to);
+
+        /// A valid focus must have an associated object.
+        assert(getObject(from));
+        getObject(from)->callMethod(NSV::PROP_ON_KILL_FOCUS, to);
     }
 
     _currentFocus = to;
 
     if (to) {
-        to->callMethod(NSV::PROP_ON_SET_FOCUS, from);
+        assert(getObject(to));
+        getObject(to)->callMethod(NSV::PROP_ON_SET_FOCUS, from);
     }
 
     as_object* sel = getSelectionObject();
 
-    /// Notify Selection listeners with previous and new focus as arguments.
+    // Notify Selection listeners with previous and new focus as arguments.
+    // Either argument may be null.
     if (sel) {
         sel->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onSetFocus",
-                from, to);
+                getObject(from), getObject(to));
     }
 
 	assert(testInvariant());
@@ -1482,7 +1486,7 @@ movie_root::getShowMenuState() const
 /// Sets the value of _showMenu and calls the gui handler to process the 
 /// fscommand to change the display of the context menu
 void
-movie_root::setShowMenuState( bool state )
+movie_root::setShowMenuState(bool state)
 {
 	_showMenu = state;
 	//FIXME: The gui code for show menu is semantically different than what
@@ -1511,7 +1515,7 @@ movie_root::getStageAlignMode() const
 void
 movie_root::setStageScaleMode(ScaleMode sm)
 {
-    if ( _scaleMode == sm ) return; // nothing to do
+    if (_scaleMode == sm) return; // nothing to do
 
     bool notifyResize = false;
     
@@ -1541,7 +1545,8 @@ movie_root::setStageScaleMode(ScaleMode sm)
         as_object* stage = getStageObject();
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
-            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
+            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE,
+                    "onResize");
         }
     }
 }
@@ -1734,14 +1739,13 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target, int lvl)
 			target->getTargetPath());
 #endif
 
-	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
+	std::auto_ptr<ExecutableCode> code(new GlobalCode(buf, target));
 
 	_actionQueue[lvl].push_back(code.release());
 }
 
 void
-movie_root::pushAction(as_function* func,
-        DisplayObject* target, int lvl)
+movie_root::pushAction(as_function* func, DisplayObject* target, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
@@ -1749,7 +1753,7 @@ movie_root::pushAction(as_function* func,
             target->getTargetPath());
 #endif
 
-	std::auto_ptr<ExecutableCode> code ( new FunctionCode(func, target) );
+	std::auto_ptr<ExecutableCode> code(new FunctionCode(func, target));
 
 	_actionQueue[lvl].push_back(code.release());
 }
@@ -1935,7 +1939,7 @@ movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
             i!=e; ++i) {
 		
         const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
-		if ( ret ) return ret;
+		if (ret) return ret;
 	}
 	return 0;
 }
@@ -1997,24 +2001,26 @@ movie_root::cleanupDisplayList()
 		for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
 		{
 			DisplayObject* ch = *i;
-			if ( ch->unloaded() )
-			{
+			if (ch->unloaded()) {
 				// the sprite might have been destroyed already
 				// by effect of an unload() call with no onUnload
 				// handlers available either in self or child
 				// DisplayObjects
-				if ( ! ch->isDestroyed() )
-				{
+				if (!ch->isDestroyed()) {
+
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
-					cout << ch->getTarget() << "(" << typeName(*ch) << ") was unloaded but not destroyed, destroying now" << endl;
+					cout << ch->getTarget() << "(" << typeName(*ch) <<
+                        ") was unloaded but not destroyed, destroying now" <<
+                        endl;
 #endif
 					ch->destroy();
-					needScan=true; // ->destroy() might mark already-scanned chars as unloaded
+                    // destroy() might mark already-scanned chars as unloaded
+					needScan = true; 
 				}
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
-				else
-				{
-					cout << ch->getTarget() << "(" << typeName(*ch) << ") was unloaded and destroyed" << endl;
+				else {
+					cout << ch->getTarget() << "(" << typeName(*ch) <<
+                        ") was unloaded and destroyed" << endl;
 				}
 #endif
 
@@ -2024,14 +2030,12 @@ movie_root::cleanupDisplayList()
 				cleaned++;
 #endif
 			}
-			else
-			{
-				++i;
-			}
+			else ++i; 
 		}
 
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
-		cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
+		cout << " Scan " << scansCount << " cleaned " << cleaned <<
+            " instances" << endl;
 #endif
 	} while (needScan);
 

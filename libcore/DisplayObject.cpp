@@ -82,7 +82,7 @@ DisplayObject::DisplayObject(as_object* owner, DisplayObject* parent)
     _parent(parent),
     m_invalidated(true),
     m_child_invalidated(true),
-    _owner(owner),
+    _object(owner),
     m_depth(0),
     _xscale(100),
     _yscale(100),
@@ -103,6 +103,14 @@ DisplayObject::DisplayObject(as_object* owner, DisplayObject* parent)
 
     // This informs the core that the object is a DisplayObject.
     setDisplayObject();
+}
+
+as_object*
+DisplayObject::object() const
+{
+    // TODO: important! Return the object, not this (it won't need a
+    // const_cast then either...)
+    return const_cast<DisplayObject*>(this);
 }
 
 std::string

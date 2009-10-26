@@ -956,6 +956,8 @@ public:
         return _yscale;
     }
 
+    as_object* object() const;
+
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
   
@@ -1077,7 +1079,7 @@ private:
     std::string computeTargetPath() const;
 
     /// The as_object to which this DisplayObject is attached.
-    as_object* _owner;
+    as_object* _object;
 
     int m_depth;
     cxform m_color_transform;
@@ -1133,6 +1135,16 @@ private:
     bool _dynamicallyCreated;
 
 };
+
+/// Return the as_object associated with a DisplayObject if it exists
+//
+/// @param d    The DisplayObject to check. May be null.
+/// @return     null if either the DisplayObject or the associated object is
+///             null. Otherwise the associated object.
+inline as_object* getObject(DisplayObject* d)
+{
+    return d ? d->object() : 0;
+}
 
 /// Stream operator for DisplayObject blend mode.
 std::ostream&
