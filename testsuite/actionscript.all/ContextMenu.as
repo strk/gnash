@@ -133,19 +133,19 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 
   f.customItems = 88;
   ff = f.copy();
-  xcheck_equals(typeof(ff.customItems), "object");
+  check_equals(typeof(ff.customItems), "object");
 
   f.customItems = {};
   f.customItems.p = "hello";
   ff = f.copy();
   check_equals(ff.customItems.length, 0);
-  xcheck_equals(ff.customItems.p, undefined);
+  check_equals(ff.customItems.p, undefined);
 
   f.customItems = new Array;
   f.customItems.push("hello");
   ff = f.copy();
   check_equals(ff.customItems.length, 1);
-  xcheck_equals(ff.customItems[0], undefined);
+  check_equals(ff.customItems[0], undefined);
 
   h = function() {};
 
@@ -165,12 +165,12 @@ rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
   check_equals(f.customItems[2].caption, "moo");
   ff = f.copy();
   check_equals(ff.customItems.length, 3);
-  xcheck_equals(ff.customItems[2].caption, undefined);
+  check_equals(ff.customItems[2].caption, undefined);
 
   // Properties are only copied properly if instanceOf ContextMenuItem;
   // otherwise they are undefined.
   c.__proto__ = ContextMenuItem.prototype;
-  xcheck_equals(ff.customItems[2].caption, undefined);
+  check_equals(ff.customItems[2].caption, undefined);
   ff = f.copy();
   check_equals(ff.customItems.length, 3);
   check_equals(ff.customItems[2].caption, "moo");

@@ -915,18 +915,15 @@ getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 ///    way to do it, but as it is done like this, this must be called here.
 ///    It will cause an infinite recursion otherwise.
 bool
-getDisplayObjectProperty(as_object& obj, string_table::key key,
+getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val)
 {
-    assert(obj.displayObject());
     
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
-    
-    DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     // Check _level0.._level9
-    movie_root& mr = getRoot(o);
+    movie_root& mr = getRoot(obj);
     unsigned int levelno;
     if (mr.isLevelTarget(propname, levelno)) {
         Movie* mo = mr.getLevel(levelno);
@@ -954,21 +951,19 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
         default:
             break;
         case NSV::PROP_uROOT:
-            if (getSWFVersion(o) < 5) break;
-            val = o.getAsRoot();
+            if (getSWFVersion(obj) < 5) break;
+            val = obj.getAsRoot();
             return true;
         case NSV::PROP_uGLOBAL:
-            if (getSWFVersion(o) < 6) break;
-            val = &getGlobal(o);
+            if (getSWFVersion(obj) < 6) break;
+            val = &getGlobal(obj);
             return true;
     }
-    
-
 
     // These magic properties are case insensitive in all versions!
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
 
-    if (doGet(noCaseKey, o, val)) return true;
+    if (doGet(noCaseKey, obj, val)) return true;
 
     // Check MovieClip such as TextField variables.
     // TODO: check if there's a better way to find these properties.
@@ -979,15 +974,14 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
     
 
 bool
-setDisplayObjectProperty(as_object& obj, string_table::key key, 
+setDisplayObjectProperty(DisplayObject& obj, string_table::key key, 
         const as_value& val)
 {
-    assert(obj.displayObject());
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
-    return doSet(noCaseKey, static_cast<DisplayObject&>(obj), val);
+    return doSet(noCaseKey, obj, val);
 }
 
 namespace {
