@@ -79,7 +79,7 @@ const int DisplayObject::noClipDepthValue;
 
 DisplayObject::DisplayObject(as_object* owner, DisplayObject* parent)
     :
-    m_parent(parent),
+    _parent(parent),
     m_invalidated(true),
     m_child_invalidated(true),
     _owner(owner),
@@ -119,10 +119,10 @@ SWFMatrix
 DisplayObject::getWorldMatrix(bool includeRoot) const
 {
 	SWFMatrix m;
-	if (m_parent) {
-	    m = m_parent->getWorldMatrix(includeRoot);
+	if (_parent) {
+	    m = _parent->getWorldMatrix(includeRoot);
 	}
-    if (m_parent || includeRoot) m.concatenate(getMatrix());
+    if (_parent || includeRoot) m.concatenate(getMatrix());
 
 	return m;
 }
@@ -131,9 +131,9 @@ int
 DisplayObject::getWorldVolume() const
 {
 	int volume=_volume;
-	if (m_parent != NULL)
+	if (_parent != NULL)
 	{
-	    volume = int(volume*m_parent->getVolume()/100.0);
+	    volume = int(volume*_parent->getVolume()/100.0);
 	}
 
 	return volume;
@@ -143,9 +143,9 @@ cxform
 DisplayObject::get_world_cxform() const
 {
 	cxform	m;
-	if (m_parent != NULL)
+	if (_parent != NULL)
 	{
-	    m = m_parent->get_world_cxform();
+	    m = _parent->get_world_cxform();
 	}
 	m.concatenate(get_cxform());
 
@@ -174,7 +174,7 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
 	// Set the invalidated-flag of the parent. Note this does not mean that
 	// the parent must re-draw itself, it just means that one of it's childs
 	// needs to be re-drawn.
-	if ( m_parent ) m_parent->set_child_invalidated(); 
+	if ( _parent ) _parent->set_child_invalidated(); 
   
 	// Ok, at this point the instance will change it's
 	// visual aspect after the
@@ -224,7 +224,7 @@ DisplayObject::set_child_invalidated()
   if ( ! m_child_invalidated ) 
   {
     m_child_invalidated=true;
-  	if ( m_parent ) m_parent->set_child_invalidated();
+  	if ( _parent ) _parent->set_child_invalidated();
   } 
 }
 
@@ -243,7 +243,7 @@ attachDisplayObjectProperties(as_object& /*o*/)
 as_value
 DisplayObject::blendMode(const fn_call& fn)
 {
-    boost::intrusive_ptr<DisplayObject> ch = ensure<ThisIs<DisplayObject> >(fn);
+    DisplayObject* ch = ensure<ThisIs<DisplayObject> >(fn);
 
     // This is AS-correct, but doesn't do anything.
     // TODO: implement in the renderers!
@@ -447,7 +447,7 @@ DisplayObject::get_event_handler(const event_id& id) const
 #ifndef GNASH_USE_GC
 	assert(get_ref_count() > 0);
 #endif // GNASH_USE_GC
-	boost::intrusive_ptr<DisplayObject> this_ptr = const_cast<DisplayObject*>(this);
+	DisplayObject* this_ptr = const_cast<DisplayObject*>(this);
 
 	handler.reset( new EventCode(this_ptr, it->second) );
 	return handler;
@@ -477,8 +477,7 @@ DisplayObject::queueEvent(const event_id& id, int lvl)
 {
 
 	movie_root& root = getRoot(*this);
-	std::auto_ptr<ExecutableCode> event(
-            new QueuedEvent(boost::intrusive_ptr<DisplayObject>(this), id));
+	std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
 	root.pushAction(event, lvl);
 }
 
@@ -740,7 +739,7 @@ DisplayObject::destroy()
 void
 DisplayObject::markDisplayObjectReachable() const
 {
-	if ( m_parent ) m_parent->setReachable();
+	if ( _parent ) _parent->setReachable();
 	if (_mask) _mask->setReachable();
 	if (_maskee) _maskee->setReachable();
 	markAsObjectReachable();
@@ -916,18 +915,15 @@ getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 ///    way to do it, but as it is done like this, this must be called here.
 ///    It will cause an infinite recursion otherwise.
 bool
-getDisplayObjectProperty(as_object& obj, string_table::key key,
+getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val)
 {
-    assert(obj.displayObject());
     
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
-    
-    DisplayObject& o = static_cast<DisplayObject&>(obj);
 
     // Check _level0.._level9
-    movie_root& mr = getRoot(o);
+    movie_root& mr = getRoot(obj);
     unsigned int levelno;
     if (mr.isLevelTarget(propname, levelno)) {
         Movie* mo = mr.getLevel(levelno);
@@ -955,21 +951,19 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
         default:
             break;
         case NSV::PROP_uROOT:
-            if (getSWFVersion(o) < 5) break;
-            val = o.getAsRoot();
+            if (getSWFVersion(obj) < 5) break;
+            val = obj.getAsRoot();
             return true;
         case NSV::PROP_uGLOBAL:
-            if (getSWFVersion(o) < 6) break;
-            val = &getGlobal(o);
+            if (getSWFVersion(obj) < 6) break;
+            val = &getGlobal(obj);
             return true;
     }
-    
-
 
     // These magic properties are case insensitive in all versions!
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
 
-    if (doGet(noCaseKey, o, val)) return true;
+    if (doGet(noCaseKey, obj, val)) return true;
 
     // Check MovieClip such as TextField variables.
     // TODO: check if there's a better way to find these properties.
@@ -980,15 +974,14 @@ getDisplayObjectProperty(as_object& obj, string_table::key key,
     
 
 bool
-setDisplayObjectProperty(as_object& obj, string_table::key key, 
+setDisplayObjectProperty(DisplayObject& obj, string_table::key key, 
         const as_value& val)
 {
-    assert(obj.displayObject());
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(obj);
     const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
-    return doSet(noCaseKey, static_cast<DisplayObject&>(obj), val);
+    return doSet(noCaseKey, obj, val);
 }
 
 namespace {

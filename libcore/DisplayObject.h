@@ -68,17 +68,15 @@ void attachDisplayObjectProperties(as_object& o);
 
 /// Set special properties
 //
-/// This will abort if called with a non DisplayObject. It sets the magic
-/// properties of DisplayObjects.
-bool setDisplayObjectProperty(as_object& obj, string_table::key key,
+/// This sets the magic properties of DisplayObjects.
+bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         const as_value& val);
 
 /// Get special properties
 //
-/// This will abort if called with a non DisplayObject. It gets the magic
-/// properties of DisplayObjects and handles special MovieClip properties
-/// such as DisplayList members.
-bool getDisplayObjectProperty(as_object& obj, string_table::key key,
+/// This gets the magic properties of DisplayObjects and handles special
+/// MovieClip properties such as DisplayList members.
+bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val);
 
 /// Get a property by its numeric index.
@@ -185,8 +183,8 @@ public:
         // MovieClip must override this
         // and any other DisplayObject will have
         // a parent!
-        assert(m_parent != NULL);
-        return m_parent->get_environment();
+        assert(_parent != NULL);
+        return _parent->get_environment();
     }
 
     /// \brief
@@ -194,7 +192,7 @@ public:
     /// the DisplayObject has no parent.
     DisplayObject* get_parent() const
     {
-        return m_parent.get();
+        return _parent;
     }
 
     /// Set the parent of this DisplayObject
@@ -203,7 +201,7 @@ public:
     /// a parent. In AS2, this is only used for external movies
     void set_parent(DisplayObject* parent)
     {
-        m_parent = parent;
+        _parent = parent;
     }
 
     int get_depth() const { return m_depth; }
@@ -687,8 +685,8 @@ public:
     DisplayObject* getClosestASReferenceableAncestor() 
     {
         if ( isActionScriptReferenceable() ) return this;
-        assert(m_parent);
-        return m_parent->getClosestASReferenceableAncestor();
+        assert(_parent);
+        return _parent->getClosestASReferenceableAncestor();
     }
 
     const DisplayObject* getClosestASReferenceableAncestor() const
@@ -1030,7 +1028,7 @@ protected:
     /// Name of this DisplayObject (if any)
     std::string _name;
 
-    boost::intrusive_ptr<DisplayObject> m_parent;
+    DisplayObject* _parent;
 
     /// look for '.', 'this',    '..', '_parent', '_level0' and '_root'
     //

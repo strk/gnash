@@ -188,12 +188,13 @@ movie_root::~movie_root()
 	assert(testInvariant());
 }
 
-void
+Movie*
 movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
 {
     Movie* mr = def->createMovie();
     mr->setVariables(vars);
     setRootMovie(mr);
+    return mr;
 }
 
 void

@@ -576,8 +576,7 @@ public:
     /// @param init_object
     ///     If not null, will be used to copy properties over.
     ///
-    boost::intrusive_ptr<MovieClip> duplicateMovieClip(
-        const std::string& newname,
+    MovieClip* duplicateMovieClip(const std::string& newname,
         int newdepth, as_object* init_object=NULL);
         
     /// Dispatch event handler(s), if any.
@@ -610,17 +609,6 @@ public:
     ///
     int getNextHighestDepth() const {
         return _displayList.getNextHighestDepth();
-    }
-
-    void testInvariant() const {
-        // _currentFrame may be 0, since this is our initial
-        // condition. Still, frame count might be 0 as well, and
-        // loaded frames too !
-        //assert(_currentFrame < _def->get_frame_count());
-#ifndef GNASH_USE_GC 
-        assert(get_ref_count() > 0); // or we're constructed but
-                                     // not stored in a boost::intrusive_ptr
-#endif
     }
 
     /// Set the currently playing m_sound_stream_id
@@ -806,7 +794,7 @@ protected:
 
 private:
 
-    typedef std::vector<boost::intrusive_ptr<TextField> > TextFields;
+    typedef std::vector<TextField*> TextFields;
 
     /// A container for textfields, indexed by their variable name
     typedef std::map<std::string, TextFields> TextFieldIndex;

@@ -2348,9 +2348,8 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
             getNamespace(uri));
 
     // ASSetPropFlags is called on the TextField class.
-    string_table& st = getStringTable(where);
     as_object* null = 0;
-    gl.callMethod(st.find("ASSetPropFlags"), cl, null, 131);
+    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, cl, null, 131);
 }
 
 void
@@ -3734,10 +3733,9 @@ attachTextFieldInterface(as_object& o)
     AsBroadcaster::initialize(o);
 
     // Finally ASSetPropFlags is called on the prototype.
-    string_table& st = getStringTable(o);
     Global_as& gl = getGlobal(o);
     as_object* null = 0;
-    gl.callMethod(st.find("ASSetPropFlags"), &o, null, 131);
+    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 131);
 }
 
 void

@@ -158,7 +158,17 @@ public:
 
     ~movie_root();
 
-    void init(movie_definition* def, const MovieClip::MovieVariables& variables);
+    /// Initialize movie_root with a parsed movie definition
+    //
+    /// The definition may be a SWF or Bitmap movie definition.
+    // 
+    /// The created Movie is returned; it is non-const so may be stored,
+    /// queried, and changed by the caller for debugging or manipulation.
+    /// Direct use of the pointer may result in unexpected behaviour during
+    /// SWF playback, so for normal playback this pointer should not be
+    /// used.
+    Movie* init(movie_definition* def,
+            const MovieClip::MovieVariables& variables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //

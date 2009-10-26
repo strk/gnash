@@ -473,13 +473,13 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
 
     gtk_widget_queue_resize (GTK_WIDGET(view));
 
-    view->movie.reset ( view->movie_definition->createMovie() );
+    //view->movie.reset (view->movie_definition->createMovie());
     
     std::map<std::string, std::string> variables;
     gnash::URL::parse_querystring(url.querystring(), variables);
-    view->movie->setVariables(variables);
 
-    view->stage->setRootMovie( view->movie.get() ); // will construct the instance
+    gnash::Movie* m = view->stage->init(view->movie_definition.get(), variables);
+    view->movie.reset(m);
 
     view->stage->set_background_alpha(1.0f);
 

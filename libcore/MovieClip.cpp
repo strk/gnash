@@ -507,7 +507,7 @@ MovieClip::getTextFieldVariables(string_table::key name_key, as_value& val)
         for (TextFields::const_iterator i=etc->begin(), e=etc->end();
                 i!=e; ++i)
         {
-            boost::intrusive_ptr<TextField> tf = i->get();
+            TextField* tf = *i;
             if ( tf->getTextDefined() )
             {
                 val = tf->get_text_value();
@@ -607,13 +607,12 @@ MovieClip::addDisplayListObject(DisplayObject* obj, int depth)
 }
 
 
-boost::intrusive_ptr<MovieClip> 
+MovieClip*
 MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         as_object* initObject)
 {
     DisplayObject* parent_ch = get_parent();
-    if ( ! parent_ch )
-    {
+    if (!parent_ch) {
         log_error(_("Can't clone root of the movie"));
         return NULL;
     }
@@ -624,8 +623,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         return NULL;
     }
 
-    boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(0, _def.get(),
-            _swf, parent);
+    MovieClip* newmovieclip = new MovieClip(0, _def.get(), _swf, parent);
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();
@@ -643,7 +641,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->_displayList.placeDisplayObject(newmovieclip.get(), depth, 
+    parent->_displayList.placeDisplayObject(newmovieclip, depth, 
             initObject);
     
     return newmovieclip; 
@@ -671,7 +669,6 @@ MovieClip::queueActions(ActionList& actions)
 bool
 MovieClip::notifyEvent(const event_id& id)
 {
-    testInvariant();
 
 #ifdef GNASH_DEBUG
     log_debug(_("Event %s invoked for movieclip %s"), id, getTarget());
@@ -708,7 +705,6 @@ MovieClip::notifyEvent(const event_id& id)
 
     // user-defined onInitialize is never called
     if ( id.id() == event_id::INITIALIZE ) {
-        testInvariant();
         return called;
     }
 
@@ -758,7 +754,6 @@ MovieClip::notifyEvent(const event_id& id)
                         "LOAD event (is not dynamic, has a parent, "
                         "no registered class and no clip events defined)"),
                         getTarget(), get_depth());
-            testInvariant();
 #endif
             return called;
         } while (0);
@@ -782,8 +777,6 @@ MovieClip::notifyEvent(const event_id& id)
     //             Verify if this is possible, in particular check order in
     //             which unload handlers of parent and childs is performed
     //             and wheter unload of child can access members of parent.
-
-    testInvariant();
 
     return called;
 }
@@ -966,8 +959,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
                 _currentFrame, getTarget());
 #endif
-        std::auto_ptr<ExecutableCode> code ( 
-                new GlobalCode(a, boost::intrusive_ptr<MovieClip>(this)) );
+        std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
         movie_root& root = getRoot(*this);
         root.pushAction(code, movie_root::apINIT);
@@ -1023,7 +1015,6 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
     // and has no frames.
     if (!_def) return;
 
-    testInvariant();
     assert(typeflags);
 
     const PlayList* playlist = _def->getPlaylist(frame);
@@ -1064,7 +1055,6 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
         }
     }
 
-    testInvariant();
 }
 
 void
