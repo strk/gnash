@@ -636,9 +636,9 @@ as_value
 movieclip_getDepth(const fn_call& fn)
 {
     // Unlike TextField.getDepth this works for any DisplayObject
-    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
+    DisplayObject* d = ensure<IsDisplayObject<> >(fn);
 
-    const int n = movieclip->get_depth();
+    const int n = d->get_depth();
 
     return as_value(n);
 }
