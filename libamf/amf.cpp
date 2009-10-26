@@ -182,11 +182,14 @@ AMF::encodeObject(const amf::Element &data)
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
-    //    log_debug("Encoded data size has %d properties", length);
+    log_debug("Encoded data size has %d properties", length);
     boost::shared_ptr<amf::Buffer> buf;
     if (length) {
 	buf.reset(new amf::Buffer);
+    } else {
+	return buf;
     }
+    
     *buf = Element::OBJECT_AMF0;
     if (data.propertySize() > 0) {
 	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
