@@ -40,6 +40,7 @@
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
 #include "ExecutableCode.h"
+#include "NativeFunction.h"
 
 #include <string>
 
@@ -50,12 +51,11 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value moviecliploader_loadclip(const fn_call& fn);
-    as_value moviecliploader_unloadclip(const fn_call& fn);
-    as_value moviecliploader_getprogress(const fn_call& fn);
+    as_value moviecliploader_loadClip(const fn_call& fn);
+    as_value moviecliploader_unloadClip(const fn_call& fn);
+    as_value moviecliploader_getProgress(const fn_call& fn);
     as_value moviecliploader_new(const fn_call& fn);
     void attachMovieClipLoaderInterface(as_object& o);
-    as_object* getMovieClipLoaderInterface();
 }
 
 /// This class is used to queue a function call action
@@ -116,123 +116,34 @@ private:
 
 };
 
-class MovieClipLoader: public as_object
-{
-public:
-
-	MovieClipLoader();
-
-	~MovieClipLoader() {}
-
-	/// MovieClip
-	bool loadClip(const std::string& url, MovieClip* target);
-
-	void unloadClip();
-
-protected:
-
-    void markReachableResources() const {
-        markAsObjectReachable();
-    }
-
-private:
-};
-
-MovieClipLoader::MovieClipLoader()
-	:
-	as_object(getMovieClipLoaderInterface())
-{
-
-	as_object* ar = getGlobal(*this).createArray();
-	ar->callMethod(NSV::PROP_PUSH, this);
-	set_member(NSV::PROP_uLISTENERS, ar);
-}
-
-bool
-MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
-{
-    
-    movie_root& mr = getRoot(*this);
-
-	URL url(url_str, mr.runResources().baseURL());
-	
-#if GNASH_DEBUG
-	log_debug(_(" resolved url: %s"), url.str());
-#endif
-			 
-	as_value targetVal(target);
-	log_debug("Target is %s", targetVal);
-
-	bool ret = target->loadMovie(url);
-	if ( ! ret ) 
-	{
-
-        // FIXME: docs suggest the string can be either "URLNotFound" or
-        // "LoadNeverCompleted". This is neither of them:
-		as_value arg1("Failed to load movie or jpeg");
-
-		// FIXME: The last argument is HTTP status, or 0 if no connection
-        // was attempted (sandbox) or no status information is available
-        // (supposedly the Adobe mozilla plugin).
-		as_value arg2(0.0);
-		callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError", targetVal,
-                arg1, arg2);
-
-		return false;
-	}
-
-    // this is to resolve the soft ref
-	MovieClip* newChar = targetVal.to_sprite(); 
-	if ( ! newChar )
-	{
-		// We could assert, but let's try to be nicer...
-		log_error("MovieClip::loadMovie destroyed self without replacing?");
-		return false;
-	}
-
-	// Dispatch onLoadStart
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart", targetVal);
-
-	// Dispatch onLoadProgress
-	size_t bytesLoaded = newChar->get_bytes_loaded();
-	size_t bytesTotal = newChar->get_bytes_total();
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress", targetVal,
-		bytesLoaded, bytesTotal);
-
-	// Dispatch onLoadComplete
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete", targetVal,
-		as_value(0.0)); // TODO: find semantic of last arg
-
-	/// This event must be dispatched when actions
-	/// in first frame of loaded clip have been executed.
-	///
-	/// Since MovieClip::loadMovie above will invoke stagePlacementCallback
-	/// and thus queue all actions in first frame, we'll queue the
-	/// onLoadInit call next, so it happens after the former.
-	std::auto_ptr<ExecutableCode> code(
-            new DelayedFunctionCall(this, NSV::PROP_BROADCAST_MESSAGE, 
-                "onLoadInit", targetVal));
-
-	getRoot(*this).pushAction(code, movie_root::apDOACTION);
-
-	return true;
-}
-
 void
-MovieClipLoader::unloadClip()
+registerMovieClipLoaderNative(as_object& global)
 {
-    GNASH_REPORT_FUNCTION;
+    VM& vm = getVM(global);
+    vm.registerNative(moviecliploader_loadClip, 112, 100);
+    vm.registerNative(moviecliploader_getProgress, 112, 101);
+    vm.registerNative(moviecliploader_unloadClip, 112, 102);
 }
 
 /// Extern.
 void
-moviecliploader_class_init(as_object& global, const ObjectURI& uri)
+moviecliploader_class_init(as_object& where, const ObjectURI& uri)
 {
-	// This is going to be the global Number "class"/"function"
-    Global_as& gl = getGlobal(global);
-    as_object* cl = gl.createClass(&moviecliploader_new,
-                getMovieClipLoaderInterface());
-	global.init_member(getName(uri), cl, as_object::DefaultFlags,
+	// This is going to be the where Number "class"/"function"
+    Global_as& gl = getGlobal(where);
+
+    as_object* proto = gl.createObject();;
+
+    as_object* cl = gl.createClass(&moviecliploader_new, proto);
+    attachMovieClipLoaderInterface(*proto);
+  
+	AsBroadcaster::initialize(*proto);
+
+    string_table& st = getStringTable(where);
+    as_object* null = 0;
+    gl.callMethod(st.find("ASSetPropFlags"), proto, null, 1027);
+
+	where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri)); 
 }
 
@@ -242,57 +153,40 @@ namespace {
 void
 attachMovieClipLoaderInterface(as_object& o)
 {
-    Global_as& gl = getGlobal(o);
-  	o.init_member("loadClip", gl.createFunction(moviecliploader_loadclip));
-	o.init_member("unloadClip",
-            gl.createFunction(moviecliploader_unloadclip));
-	o.init_member("getProgress",
-            gl.createFunction(moviecliploader_getprogress));
 
-	// NOTE: we want addListener/removeListener/broadcastMessage
-	//       but don't what the _listeners property here...
-	// TODO: add an argument to AsBroadcaster::initialize skip listeners ?
-	AsBroadcaster::initialize(o);
-	o.delProperty(NSV::PROP_uLISTENERS);
-  
-}
+    const int flags = PropFlags::onlySWF7Up;
 
-as_object*
-getMovieClipLoaderInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( o == NULL )
-	{
-		o = new as_object(getObjectInterface());
-		attachMovieClipLoaderInterface(*o);
-	}
-	return o.get();
+    VM& vm = getVM(o);
+
+  	o.init_member("loadClip", vm.getNative(112, 100), flags);
+	o.init_member("getProgress", vm.getNative(112, 101), flags);
+	o.init_member("unloadClip", vm.getNative(112, 102), flags);
+
 }
 
 as_value
-moviecliploader_loadclip(const fn_call& fn)
+moviecliploader_loadClip(const fn_call& fn)
 {
 
-    MovieClipLoader* ptr = ensure<ThisIs<MovieClipLoader> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
   
-	if ( fn.nargs < 2 )
-	{
+	if ( fn.nargs < 2 ) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"),
-            ss.str());
-		);
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"),
+                ss.str());
+        );
 		return as_value(false);
 	}
 
-	as_value url_arg = fn.arg(0);
-	std::string str_url = url_arg.to_string(); 
+	const std::string& str_url = fn.arg(0).to_string(); 
 
 	as_value tgt_arg = fn.arg(1);
+
 	std::string tgt_str = tgt_arg.to_string();
 	DisplayObject* target = fn.env().find_target(tgt_str);
-	if ( ! target )
-	{
+
+	if (!target) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Could not find target %s (evaluated from %s)"),
 			tgt_str, tgt_arg);
@@ -301,8 +195,7 @@ moviecliploader_loadclip(const fn_call& fn)
 	}
 
 	MovieClip* sprite = target->to_movie();
-	if ( ! sprite )
-	{
+	if (!sprite) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Target %s is not a sprite instance (%s)"),
 			target->getTarget(), typeName(*target));
@@ -310,20 +203,67 @@ moviecliploader_loadclip(const fn_call& fn)
 		return as_value(false);
 	}
 
-#if GNASH_DEBUG
-	log_debug(_("load clip: %s, target is: %p\n"),
-		str_url, (void*)sprite);
-#endif
+    as_value targetVal(sprite);
 
-	ptr->loadClip(str_url, sprite);
+    movie_root& mr = getRoot(*ptr);
+	URL url(str_url, mr.runResources().baseURL());
+	
+	bool ret = sprite->loadMovie(url);
+	if (!ret) {
 
-	// We always want to return true unless something went wrong
+        // FIXME: docs suggest the string can be either "URLNotFound" or
+        // "LoadNeverCompleted". This is neither of them:
+		as_value arg1("Failed to load movie or jpeg");
+
+		// FIXME: The last argument is HTTP status, or 0 if no connection
+        // was attempted (sandbox) or no status information is available
+        // (supposedly the Adobe mozilla plugin).
+		as_value arg2(0.0);
+		ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError", sprite,
+                arg1, arg2);
+
+		return as_value(true);
+	}
+
+    // this is to resolve the soft ref
+	MovieClip* newChar = targetVal.to_sprite(); 
+	if (!newChar) {
+		// We could assert, but let's try to be nicer...
+		log_error("MovieClip::loadMovie destroyed self without replacing?");
+		return as_value(true);
+	}
+
+	// Dispatch onLoadStart
+	ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart", targetVal);
+
+	// Dispatch onLoadProgress
+	size_t bytesLoaded = newChar->get_bytes_loaded();
+	size_t bytesTotal = newChar->get_bytes_total();
+	ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress", targetVal,
+		bytesLoaded, bytesTotal);
+
+	// Dispatch onLoadComplete
+	ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete", targetVal,
+		as_value(0.0)); // TODO: find semantic of last arg
+
+	/// This event must be dispatched when actions
+	/// in first frame of loaded clip have been executed.
+	///
+	/// Since MovieClip::loadMovie above will invoke stagePlacementCallback
+	/// and thus queue all actions in first frame, we'll queue the
+	/// onLoadInit call next, so it happens after the former.
+	std::auto_ptr<ExecutableCode> code(
+            new DelayedFunctionCall(ptr, NSV::PROP_BROADCAST_MESSAGE, 
+                "onLoadInit", targetVal));
+
+	getRoot(*ptr).pushAction(code, movie_root::apDOACTION);
+
 	return as_value(true);
 
 }
 
 as_value
-moviecliploader_unloadclip(const fn_call& fn)
+moviecliploader_unloadClip(const fn_call& fn)
 {
   const std::string filespec = fn.arg(0).to_string();
   log_unimpl (_("%s: %s"), __PRETTY_FUNCTION__, filespec);
@@ -331,18 +271,22 @@ moviecliploader_unloadclip(const fn_call& fn)
 }
 
 as_value
-moviecliploader_new(const fn_call& /* fn */)
+moviecliploader_new(const fn_call& fn)
 {
+    as_object* ptr = ensure<ValidThis>(fn);
+    Global_as& gl = getGlobal(fn);
 
-  as_object* mov_obj = new MovieClipLoader;
-
-  return as_value(mov_obj);
+    as_object* array = gl.createArray();
+    array->callMethod(NSV::PROP_PUSH, ptr);
+    ptr->set_member(NSV::PROP_uLISTENERS, array);
+    ptr->set_member_flags(NSV::PROP_uLISTENERS, as_object::DefaultFlags);
+    return as_value();
 }
 
 // Invoked every time the loading content is written to disk during
 // the loading process.
 as_value
-moviecliploader_getprogress(const fn_call& fn)
+moviecliploader_getProgress(const fn_call& fn)
 {
 
 	if ( ! fn.nargs )
@@ -355,8 +299,7 @@ moviecliploader_getprogress(const fn_call& fn)
 
 	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(getGlobal(fn));
   
-	if ( ! target.get() )
-	{
+	if (!target.get()) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
                 "not an object"), fn.arg(0));
@@ -365,8 +308,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	}
 
 	MovieClip* sp = target->to_movie();
-	if ( ! sp )
-	{
+	if (!sp) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
                 "not an sprite"), fn.arg(0));
@@ -375,7 +317,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	}
 
 
-	boost::intrusive_ptr<as_object> mcl_obj = new as_object;
+	as_object* mcl_obj = new as_object;
 
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();
@@ -386,7 +328,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	mcl_obj->set_member(st.find("bytesLoaded"), bytesLoaded);
 	mcl_obj->set_member(st.find("bytesTotal"),  bytesTotal);
   
-	return as_value(mcl_obj.get()); // will keep alive
+	return as_value(mcl_obj); 
 }
 
 } // anonymous namespace

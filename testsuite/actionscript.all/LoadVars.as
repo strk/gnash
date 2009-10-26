@@ -27,12 +27,12 @@ rcsid="$Id: LoadVars.as,v 1.29 2008/04/16 23:07:15 strk Exp $";
 
 #if OUTPUT_VERSION < 6
 
-xcheck_equals(typeof(LoadVars), 'function');
+check_equals(typeof(LoadVars), 'function');
 
 var loadvarsObj = new LoadVars;
 
 // test the LoadVars constuctor
-xcheck_equals (typeof(loadvarsObj), 'object');
+check_equals (typeof(loadvarsObj), 'object');
 
 check_totals(2);
 

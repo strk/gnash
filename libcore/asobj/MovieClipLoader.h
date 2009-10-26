@@ -27,6 +27,8 @@ class as_object;
 /// Initialize the global MovieClipLoader class
 void moviecliploader_class_init(as_object& global, const ObjectURI& uri);
 
+void registerMovieClipLoaderNative(as_object& global);
+
 } // end of gnash namespace
 
 // GNASH_MOVIECLIPLOADER_H
