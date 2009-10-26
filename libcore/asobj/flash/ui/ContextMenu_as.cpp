@@ -152,14 +152,24 @@ contextmenu_copy(const fn_call& fn)
 
     // The customItems object is a deep copy that works by calling
     // the copy property of each array member.
-    as_object* nc = gl.createArray();
-    as_object* customs;
 
-    if (customItems.is_object() &&
-            (customs = customItems.to_object(getGlobal(fn)))) {
-        string_table::key copykey = getStringTable(fn).find("copy");
-        CopyMenuItems c(copykey, *nc);
-        foreachArray(*customs, c);
+    as_value nc;
+
+    // Call new Array(), not []
+    as_function* arrayctor = getClassConstructor(fn, "Array");
+    if (arrayctor) {
+        fn_call::Args args;
+        as_object* arr = arrayctor->constructInstance(fn.env(), args).get();
+        if (arr) {
+            as_object* customs;
+            if (customItems.is_object() &&
+                    (customs = customItems.to_object(getGlobal(fn)))) {
+                string_table::key copykey = getStringTable(fn).find("copy");
+                CopyMenuItems c(copykey, *arr);
+                foreachArray(*customs, c);
+            }
+            nc = arr;
+        }
     }
 
     o->set_member(st.find("customItems"), nc);
