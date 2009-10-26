@@ -414,10 +414,10 @@ private:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(const movie_definition* const def, Movie* r,
-        DisplayObject* parent)
+MovieClip::MovieClip(as_object* owner, const movie_definition* const def,
+        Movie* r, DisplayObject* parent)
     :
-    DisplayObjectContainer(parent),
+    DisplayObjectContainer(owner, parent),
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
@@ -624,7 +624,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         return NULL;
     }
 
-    boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(_def.get(),
+    boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(0, _def.get(),
             _swf, parent);
     newmovieclip->set_name(newname);
 
@@ -1259,7 +1259,7 @@ MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
 void
 MovieClip::attachBitmap(BitmapData_as* bd, int depth)
 {
-    DisplayObject* ch = new Bitmap(bd, this);
+    DisplayObject* ch = new Bitmap(0, bd, this);
     attachCharacter(*ch, depth, 0);
 }
 
@@ -1287,7 +1287,8 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     
     if (existing_char) return NULL;
 
-    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
+    Global_as& gl = getGlobal(*this);
+    DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1315,8 +1316,8 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     ch->set_ratio(tag->getRatio());
     ch->set_clip_depth(tag->getClipDepth());
     
-    dlist.placeDisplayObject(ch.get(), tag->getDepth());
-    return ch.get();
+    dlist.placeDisplayObject(ch, tag->getDepth());
+    return ch;
 }
 
 void 
@@ -1365,7 +1366,8 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         return;
     }
 
-    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
+    Global_as& gl = getGlobal(*this);
+    DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?
@@ -1387,7 +1389,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
-    dlist.replaceDisplayObject(ch.get(), tag->getDepth(), 
+    dlist.replaceDisplayObject(ch, tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
 }
 

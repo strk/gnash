@@ -115,7 +115,7 @@ class DisplayObject : public as_object, boost::noncopyable
 {
 public:
 
-    DisplayObject(DisplayObject* parent);
+    DisplayObject(as_object* owner, DisplayObject* parent);
 
     virtual ~DisplayObject() {}
 
@@ -1069,7 +1069,6 @@ protected:
     /// Will be set by set_invalidated() and used by
     /// get_invalidated_bounds().
     InvalidatedRanges m_old_invalidated_ranges;
-    
 
 private:
 
@@ -1078,6 +1077,9 @@ private:
 
     /// Build the _target member recursive on parent
     std::string computeTargetPath() const;
+
+    /// The as_object to which this DisplayObject is attached.
+    as_object* _owner;
 
     int m_depth;
     cxform m_color_transform;

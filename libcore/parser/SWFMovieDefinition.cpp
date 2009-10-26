@@ -420,7 +420,7 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 Movie*
 SWFMovieDefinition::createMovie(DisplayObject* parent)
 {
-	return new SWFMovie(this, parent);
+	return new SWFMovie(0, this, parent);
 }
 
 

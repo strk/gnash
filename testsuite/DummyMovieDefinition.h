@@ -135,7 +135,7 @@ public:
 	/// Create a playable movie instance from a def.
 	virtual Movie* createMovie(DisplayObject* parent=NULL)
 	{
-		return new SWFMovie(this, parent);
+		return new SWFMovie(0, this, parent);
 	}
 	
 	virtual const PlayList& get_playlist(size_t frame_number) const

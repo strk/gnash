@@ -31,7 +31,7 @@ namespace gnash {
 Movie*
 BitmapMovieDefinition::createMovie(DisplayObject* parent)
 {
-    return new BitmapMovie(this, parent);
+    return new BitmapMovie(0, this, parent);
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
@@ -48,10 +48,11 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 }
 
 DisplayObject*
-BitmapMovieDefinition::createDisplayObject(DisplayObject* parent) const
+BitmapMovieDefinition::createDisplayObject(Global_as& gl,
+        DisplayObject* parent) const
 {
     /// What should we do if construction of the bitmap fails?
-    return new Bitmap(this, parent);
+    return new Bitmap(0, this, parent);
 }
 
 #ifdef GNASH_USE_GC

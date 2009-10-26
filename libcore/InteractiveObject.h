@@ -43,9 +43,9 @@ class InteractiveObject : public DisplayObject
 
 public:
 
-	InteractiveObject(DisplayObject* parent)
+	InteractiveObject(as_object* owner, DisplayObject* parent)
 		:
-		DisplayObject(parent)
+		DisplayObject(owner, parent)
 	{
 	}
 

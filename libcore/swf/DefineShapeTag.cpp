@@ -63,9 +63,10 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineShapeTag::createDisplayObject(DisplayObject* parent) const
+DefineShapeTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
+    const
 {
-	return new Shape(this, parent);
+	return new Shape(0, this, parent);
 }
     
 bool

@@ -290,9 +290,10 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent)
+Button::Button(as_object* owner, const SWF::DefineButtonTag* const def,
+        DisplayObject* parent)
     :
-    InteractiveObject(parent),
+    InteractiveObject(owner, parent),
     _lastMouseFlags(FLAG_IDLE),
     _mouseFlags(FLAG_IDLE),
     _mouseState(MOUSESTATE_UP),

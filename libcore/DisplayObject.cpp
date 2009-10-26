@@ -77,11 +77,12 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
-DisplayObject::DisplayObject(DisplayObject* parent)
+DisplayObject::DisplayObject(as_object* owner, DisplayObject* parent)
     :
     m_parent(parent),
     m_invalidated(true),
     m_child_invalidated(true),
+    _owner(owner),
     m_depth(0),
     _xscale(100),
     _yscale(100),

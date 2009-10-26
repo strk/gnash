@@ -43,9 +43,10 @@ class StaticText : public DisplayObject
 {
 public:
 
-	StaticText(const SWF::DefineTextTag* const def, DisplayObject* parent)
+	StaticText(as_object* owner, const SWF::DefineTextTag* const def,
+            DisplayObject* parent)
 		:
-        DisplayObject(parent),
+        DisplayObject(owner, parent),
         _def(def),
         _selectionColor(0, 255, 255, 255)
 	{

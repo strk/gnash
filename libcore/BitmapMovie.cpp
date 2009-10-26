@@ -20,17 +20,17 @@
 
 namespace gnash {
 
-BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
+BitmapMovie::BitmapMovie(as_object* owner, const BitmapMovieDefinition* def,
         DisplayObject* parent)
 	:
-	Movie(def, parent),
+	Movie(owner, def, parent),
     _def(def)
 {
     assert(def);
-    boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this);
+    DisplayObject* ch = def->createDisplayObject(getGlobal(*this), this);
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
-    placeDisplayObject(ch.get(), depth);
+    placeDisplayObject(ch, depth);
 }
 
 } // namespace gnash

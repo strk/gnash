@@ -390,7 +390,8 @@ public:
 	///
 	Movie* createMovie(DisplayObject* parent=0);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*) const {
+    virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
+        const {
         return 0;
     }
 

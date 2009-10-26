@@ -375,7 +375,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
 
     // TODO: improve MovieClip ctor (and don't use it here anyway).
     Movie* m = getRoot(fn).topLevelMovie();
-    MovieClip* mc = new MovieClip(0, m, ptr.get());
+    MovieClip* mc = new MovieClip(0, 0, m, ptr.get());
 
     mc->set_name(fn.arg(0).to_string());
     mc->setDynamic();
@@ -555,7 +555,8 @@ movieclip_attachMovie(const fn_call& fn)
     
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
-    DisplayObject* newch = exported_movie->createDisplayObject(movieclip);
+    Global_as& gl = getGlobal(fn);
+    DisplayObject* newch = exported_movie->createDisplayObject(gl, movieclip);
 
     newch->set_name(newname);
     newch->setDynamic();
@@ -2407,7 +2408,7 @@ movieclip_as3_ctor(const fn_call& fn)
     // a MovieClip.
     Movie* m = getRoot(fn).topLevelMovie();
 
-    return new MovieClip(0, m, 0);
+    return new MovieClip(0, 0, m, 0);
 }
 
 

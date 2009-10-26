@@ -133,9 +133,10 @@ DefineVideoStreamTag::addVideoFrameTag(
 }
 
 DisplayObject*
-DefineVideoStreamTag::createDisplayObject(DisplayObject* parent) const
+DefineVideoStreamTag::createDisplayObject(Global_as& gl,
+        DisplayObject* parent) const
 {
-	DisplayObject* ch = new Video(this, parent);
+	DisplayObject* ch = new Video(0, this, parent);
 	return ch;
 }
 

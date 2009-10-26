@@ -39,17 +39,19 @@ class Shape : public DisplayObject
 
 public:
 
-    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent)
+    Shape(as_object* owner, boost::shared_ptr<DynamicShape> sh,
+            DisplayObject* parent)
         :
-        DisplayObject(parent),
+        DisplayObject(owner, parent),
         _shape(sh)
     {
         assert(_shape.get());
     }
 
-	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent)
+	Shape(as_object* owner, const SWF::DefineShapeTag* const def,
+            DisplayObject* parent)
 		:
-		DisplayObject(parent),
+		DisplayObject(owner, parent),
 		_def(def)
 	{
 	    assert(_def);

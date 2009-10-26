@@ -122,7 +122,7 @@ public:
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
-    MovieClip(const movie_definition* const def, Movie* root,
+    MovieClip(as_object* owner, const movie_definition* const def, Movie* root,
             DisplayObject* parent);
 
     virtual ~MovieClip();

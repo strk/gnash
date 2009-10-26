@@ -128,9 +128,10 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
+TextField::TextField(as_object* owner, DisplayObject* parent,
+        const SWF::DefineEditTextTag& def)
     :
-    InteractiveObject(parent),
+    InteractiveObject(owner, parent),
     _tag(&def),
     _textDefined(def.hasText()),
     _htmlTextDefined(def.hasText()),
@@ -196,9 +197,10 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
 
 }
 
-TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
+TextField::TextField(as_object* owner, DisplayObject* parent,
+        const SWFRect& bounds)
     :
-    InteractiveObject(parent),
+    InteractiveObject(owner, parent),
     _textDefined(false),
     _htmlTextDefined(false),
     _restrictDefined(false),
@@ -2912,7 +2914,7 @@ textfield_createTextField(const fn_call& fn)
     //  1. Call "new _global.TextField()" (which takes care of
     //     assigning properties to the prototype).
     //  2. Make that object into a TextField and put it on the display list.
-    DisplayObject* tf = new TextField(ptr.get(), bounds);
+    DisplayObject* tf = new TextField(0, ptr.get(), bounds);
 
     // Give name and mark as dynamic
     tf->set_name(name);
@@ -3687,7 +3689,7 @@ textfield_ctor(const fn_call& fn)
 
     if (isAS3(fn)) {
         SWFRect nullRect;
-        as_object* obj = new TextField(0, nullRect);
+        as_object* obj = new TextField(0, 0, nullRect);
         return as_value(obj);
     }
 

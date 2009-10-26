@@ -28,6 +28,7 @@
 
 namespace gnash {
 	class DisplayObject;
+	class Global_as;
 	class SWFMatrix;
 	class SWFRect;
     namespace SWF {
@@ -45,12 +46,19 @@ public:
 
 	virtual ~DefinitionTag() {};
 	
-	/// Create a DisplayObject with the given parent and id
+	/// Create a DisplayObject with the given parent.
 	//
+    /// This function will determine the correct prototype and associated
+    /// object using the passed global.
+    //
+    /// @param gl       The global object used to set prototype and
+    ///                 associated object.
+    //
     /// Calling this function creates a new DisplayObject from the
     /// DefinitionTag and adds it as a child of the specified parent
     /// DisplayObject.
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const = 0;
+	virtual DisplayObject* createDisplayObject(Global_as& gl,
+            DisplayObject* parent) const = 0;
 	
 };
 

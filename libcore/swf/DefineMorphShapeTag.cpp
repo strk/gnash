@@ -55,9 +55,10 @@ DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
 }
 
 DisplayObject*
-DefineMorphShapeTag::createDisplayObject(DisplayObject* parent) const
+DefineMorphShapeTag::createDisplayObject(Global_as& gl,
+        DisplayObject* parent) const
 {
-    return new MorphShape(this, parent);
+    return new MorphShape(0, this, parent);
 }
 
 void

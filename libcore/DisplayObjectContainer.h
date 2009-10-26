@@ -48,9 +48,9 @@ class DisplayObjectContainer : public InteractiveObject
 
 public:
     
-    DisplayObjectContainer(DisplayObject* parent)
+    DisplayObjectContainer(as_object* owner, DisplayObject* parent)
         :
-        InteractiveObject(parent)
+        InteractiveObject(owner, parent)
     {}
 
     virtual ~DisplayObjectContainer();

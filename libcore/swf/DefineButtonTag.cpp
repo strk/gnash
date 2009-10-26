@@ -234,9 +234,10 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 }
 
 DisplayObject*
-DefineButtonTag::createDisplayObject(DisplayObject* parent) const
+DefineButtonTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
+    const
 {
-    DisplayObject* ch = new Button(this, parent);
+    DisplayObject* ch = new Button(0, this, parent);
     return ch;
 }
 
@@ -327,7 +328,9 @@ ButtonRecord::instantiate(Button* button, bool name) const
     assert(button);
     assert(_definitionTag);
 
-    DisplayObject* o = _definitionTag->createDisplayObject(button);
+    Global_as& gl = getGlobal(*button);
+
+    DisplayObject* o = _definitionTag->createDisplayObject(gl, button);
 
     o->setMatrix(_matrix, true);
     o->set_cxform(_cxform);
