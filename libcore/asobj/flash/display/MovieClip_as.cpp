@@ -813,21 +813,20 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
-    boost::intrusive_ptr<MovieClip> ch;
+    MovieClip* ch;
 
     // Copy members from initObject
     if (fn.nargs == 3)
     {
-        boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object(getGlobal(fn));
-        ch = movieclip->duplicateMovieClip(newname, depthValue,
-                initObject.get());
+        as_object* initObject = fn.arg(2).to_object(getGlobal(fn));
+        ch = movieclip->duplicateMovieClip(newname, depthValue, initObject);
     }
     else
     {
         ch = movieclip->duplicateMovieClip(newname, depthValue);
     }
 
-    return as_value(ch.get());
+    return as_value(ch);
 }
 
 as_value
@@ -1142,12 +1141,12 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 
     const int depth = fn.arg(0).to_int();
 
-    boost::intrusive_ptr<DisplayObject> ch = mc->getDisplayObjectAtDepth(depth);
+    DisplayObject* ch = mc->getDisplayObjectAtDepth(depth);
  
     // we want 'undefined', not 'null'
     if (!ch) return as_value();
 
-    return as_value(ch.get());
+    return as_value(ch);
 }
 
 /// MovieClip.getURL(url:String[, window:String[, method:String]])
@@ -1236,9 +1235,8 @@ movieclip_meth(const fn_call& fn)
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
-    boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(fn));
-    if ( ! o )
-    {
+    as_object* o = v.to_object(getGlobal(fn));
+    if (!o) {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
         return as_value(MovieClip::METHOD_NONE);
     }
