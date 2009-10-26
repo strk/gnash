@@ -799,14 +799,18 @@ MovieClip::pathElement(string_table::key key)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->get_member(key, &tmp, 0)) {
-        return 0;
+    if (!obj->as_object::get_member(key, &tmp, 0)) {
+        return NULL;
     }
     if (!tmp.is_object()) {
-        return 0;
+        return NULL;
+    }
+    if (tmp.is_sprite())
+    {
+        return getObject(tmp.toDisplayObject(true));
     }
 
-    return tmp.to_object(getGlobal(*obj));
+    return tmp.to_object(getGlobal(*this));
 }
 
 bool

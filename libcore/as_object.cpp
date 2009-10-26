@@ -272,7 +272,7 @@ const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(getVM(gl)),
@@ -282,7 +282,7 @@ as_object::as_object(Global_as& gl)
 
 as_object::as_object()
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(VM::get()),
@@ -292,7 +292,7 @@ as_object::as_object()
 
 as_object::as_object(as_object* proto)
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(VM::get()),
@@ -303,7 +303,7 @@ as_object::as_object(as_object* proto)
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(VM::get()),
