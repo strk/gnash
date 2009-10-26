@@ -64,7 +64,7 @@ public:
     DepthEquals(int depth) : _depth(depth) {}
 
     bool operator() (const DisplayItem& item) {
-        if ( ! item.get() ) return false;
+        if (!item) return false;
         return item->get_depth() == _depth;
     }
 
@@ -93,7 +93,7 @@ public:
     DepthGreaterOrEqual(int depth) : _depth(depth) {}
 
     bool operator() (const DisplayItem& item) {
-        if ( ! item.get() ) return false;
+        if (!item) return false;
         return item->get_depth() >= _depth;
     }
 private:
@@ -107,7 +107,7 @@ public:
     NameEquals(const std::string& name) : _name(name) {}
 
     bool operator() (const DisplayItem& item) {
-        if ( ! item.get() ) return false;
+        if (!item) return false;
         return item->get_name() == _name;
     }
 
@@ -122,7 +122,7 @@ public:
     NameEqualsNoCase(const std::string& name) : _name(name) {}
 
     bool operator() (const DisplayItem& item) {
-        if ( ! item.get() ) return false;
+        if (!item) return false;
         return _noCaseEquals(item->get_name(), _name);
     }
 
@@ -142,7 +142,7 @@ DisplayList::getNextHighestDepth() const
     for (const_iterator it = _charsByDepth.begin(),
             itEnd = _charsByDepth.end(); it != itEnd; ++it) {
 
-        DisplayObject* ch = it->get();
+        DisplayObject* ch = *it;
 
         int chdepth = ch->get_depth();
         if (chdepth >= nexthighestdepth) {
@@ -160,7 +160,7 @@ DisplayList::getDisplayObjectAtDepth(int depth)
     for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
         it != itEnd; ++it) {
 
-        DisplayObject* ch = it->get();
+        DisplayObject* ch = *it;
 
         // found
         if (ch->get_depth() == depth) return ch;
@@ -186,7 +186,7 @@ DisplayList::getDisplayObjectByName(const std::string& name)
 
     if (it == e) return 0;
     
-    return it->get();
+    return *it;
 
 }
 
@@ -202,7 +202,7 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 
     if ( it == e ) return NULL;
     
-    return it->get();
+    return *it;
 }
 
 void
@@ -227,7 +227,7 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
         (*it)->add_invalidated_bounds(old_ranges, true);    
 
         // make a copy (before replacing)
-        boost::intrusive_ptr<DisplayObject> oldCh = *it;
+        DisplayObject* oldCh = *it;
 
         // replace existing char (before calling unload!)
         *it = DisplayItem(ch);
@@ -288,7 +288,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
     }
     else {
         // Make a copy (before replacing)
-        boost::intrusive_ptr<DisplayObject> oldch = *it;
+        DisplayObject* oldch = *it;
 
         InvalidatedRanges old_ranges;
     
@@ -391,7 +391,7 @@ DisplayList::removeDisplayObject(int depth)
 
     if (it != _charsByDepth.end()) {
         // Make a copy (before erasing)
-        boost::intrusive_ptr<DisplayObject> oldCh = *it;
+        DisplayObject* oldCh = *it;
 
         // Erase (before calling unload)
         _charsByDepth.erase(it);
@@ -502,7 +502,7 @@ DisplayList::removeDisplayObjectAt(int index)
 
     if (it == _charsByDepth.end()) return 0;
    
-    DisplayObject* obj = it->get();
+    DisplayObject* obj = *it;
     _charsByDepth.erase(it);
     return obj;
 }
@@ -659,7 +659,7 @@ DisplayList::display(Renderer& renderer)
     iterator it = beginNonRemoved(_charsByDepth);
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
-        DisplayObject* ch = it->get();
+        DisplayObject* ch = *it;
 
         DisplayObject* mask = ch->getMask();
         if (mask && ch->visible() && ! mask->unloaded())
@@ -738,7 +738,7 @@ DisplayList::omit_display()
 {
     iterator it = beginNonRemoved(_charsByDepth);
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
-        DisplayObject* ch = it->get();
+        DisplayObject* ch = *it;
         ch->omit_display();
     }
 }
@@ -912,13 +912,13 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     {
         iterator itOldBackup = itOld;
         
-        boost::intrusive_ptr<DisplayObject> chOld = itOldBackup->get();
+        DisplayObject* chOld = *itOldBackup;
         int depthOld = chOld->get_depth();
 
         while (itNew != itNewEnd) {
             iterator itNewBackup = itNew;
             
-            boost::intrusive_ptr<DisplayObject> chNew = itNewBackup->get();
+            DisplayObject* chNew = *itNewBackup;
             int depthNew = chNew->get_depth();
             
             // depth in old list is occupied, and empty in new list.
@@ -986,7 +986,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     // unload remaining DisplayObjects directly.
     while((itOld != itOldEnd) && ((*itOld)->get_depth() < 0)) {
 
-        boost::intrusive_ptr<DisplayObject> chOld = itOld->get();
+        DisplayObject* chOld = *itOld;
         itOld = _charsByDepth.erase(itOld);
 
         if (chOld->unload()) reinsertRemovedCharacter(chOld);
@@ -1003,7 +1003,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     // old display list, and clear the new display list
     for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew) {
 
-        boost::intrusive_ptr<DisplayObject> chNew = itNew->get();
+        DisplayObject* chNew = *itNew;
         int depthNew = chNew->get_depth();
 
         if (chNew->unloaded()) {
@@ -1023,7 +1023,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     for (iterator i = newList._charsByDepth.begin(),
             e = newList._charsByDepth.end(); i != e; ++i) {
 
-        DisplayObject* ch = (*i).get();
+        DisplayObject* ch = *i;
         if (!ch->unloaded()) {
 
             iterator found =
@@ -1049,7 +1049,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
 
 void
-DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<DisplayObject> ch)
+DisplayList::reinsertRemovedCharacter(DisplayObject* ch)
 {
     assert(ch->unloaded());
     testInvariant();

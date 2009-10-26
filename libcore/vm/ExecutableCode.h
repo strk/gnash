@@ -50,11 +50,11 @@ public:
 };
 
 /// Global code (out of any function)
-class GlobalCode: public ExecutableCode {
+class GlobalCode : public ExecutableCode {
 
 public:
 
-    GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<DisplayObject> nTarget)
+    GlobalCode(const action_buffer& nBuffer, DisplayObject* nTarget)
         :
         buffer(nBuffer),
         target(nTarget)
@@ -67,14 +67,9 @@ public:
 
     virtual void execute()
     {
-        if ( ! target->unloaded() )
-        {
+        if (!target->unloaded()) {
             ActionExec exec(buffer, target->get_environment());
             exec();
-        }
-        else
-        {
-            //log_debug("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
         }
     }
 
@@ -84,9 +79,8 @@ public:
     /// Reachable resources are:
     ///  - the action target (target)
     ///
-    virtual void markReachableResources() const
-    {
-        if ( target ) target->setReachable();
+    virtual void markReachableResources() const {
+        if (target) target->setReachable();
     }
 #endif // GNASU_USE_GC
 
@@ -94,22 +88,22 @@ private:
 
     const action_buffer& buffer;
 
-    boost::intrusive_ptr<DisplayObject> target;
+    DisplayObject* target;
 };
 
 /// Event code 
-class EventCode: public ExecutableCode {
+class EventCode : public ExecutableCode {
 
 public:
 
     typedef std::vector<const action_buffer*> BufferList;
 
-    EventCode(boost::intrusive_ptr<DisplayObject> nTarget)
+    EventCode(DisplayObject* nTarget)
         :
         _target(nTarget)
     {}
 
-    EventCode(boost::intrusive_ptr<DisplayObject> nTarget, const BufferList& buffers)
+    EventCode(DisplayObject* nTarget, const BufferList& buffers)
         :
         _target(nTarget),
         _buffers(buffers)
@@ -132,8 +126,7 @@ public:
     {
         // don't push actions for destroyed DisplayObjects, 
         // our opcode guard is bogus at the moment.
-        if( ! _target->isDestroyed() )
-        {
+        if (!_target->isDestroyed()) {
             _buffers.push_back(&buffer);
         }
     }
@@ -145,7 +138,7 @@ public:
         {
             // onClipEvents code are guarded by isDestroyed(),
             // still might be also guarded by unloaded()
-            if( _target->isDestroyed() )  break;
+            if (_target->isDestroyed())  break;
 
             ActionExec exec(*(*it), _target->get_environment(), false);
             exec();
@@ -166,7 +159,7 @@ public:
 
 private:
 
-    boost::intrusive_ptr<DisplayObject> _target;
+    DisplayObject* _target;
 
     BufferList _buffers;
 
@@ -177,7 +170,7 @@ class QueuedEvent: public ExecutableCode {
 
 public:
 
-    QueuedEvent(boost::intrusive_ptr<DisplayObject> nTarget, const event_id& id)
+    QueuedEvent(DisplayObject* nTarget, const event_id& id)
         :
         _target(nTarget),
         _eventId(id)
@@ -212,7 +205,7 @@ public:
 
 private:
 
-    boost::intrusive_ptr<DisplayObject> _target;
+    DisplayObject* _target;
 
     const event_id _eventId;
 
@@ -223,7 +216,7 @@ class FunctionCode: public ExecutableCode {
 
 public:
 
-    FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<DisplayObject> nTarget)
+    FunctionCode(as_function* nFunc, DisplayObject* nTarget)
         :
         func(nFunc),
         target(nTarget)
@@ -236,8 +229,8 @@ public:
 
     virtual void execute()
     {
-        as_environment env(getVM(*func)); env.set_target(target.get());
-        func->call(fn_call(target.get(), env));
+        as_environment env(getVM(*func)); env.set_target(target);
+        func->call(fn_call(target, env));
     }
 
 #ifdef GNASH_USE_GC
@@ -249,16 +242,16 @@ public:
     ///
     virtual void markReachableResources() const
     {
-        if ( func ) func->setReachable();
-        if ( target ) target->setReachable();
+        if (func) func->setReachable();
+        if (target) target->setReachable();
     }
 #endif // GNASU_USE_GC
 
 private:
 
-    boost::intrusive_ptr<as_function> func;
+    as_function* func;
 
-    boost::intrusive_ptr<DisplayObject> target;
+    DisplayObject* target;
 };
 
 

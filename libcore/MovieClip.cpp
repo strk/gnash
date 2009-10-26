@@ -966,8 +966,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
                 _currentFrame, getTarget());
 #endif
-        std::auto_ptr<ExecutableCode> code ( 
-                new GlobalCode(a, boost::intrusive_ptr<MovieClip>(this)) );
+        std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
         movie_root& root = getRoot(*this);
         root.pushAction(code, movie_root::apINIT);
@@ -1287,7 +1286,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     
     if (existing_char) return NULL;
 
-    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
+    DisplayObject* ch = cdef->createDisplayObject(this);
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1365,7 +1364,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         return;
     }
 
-    boost::intrusive_ptr<DisplayObject> ch = cdef->createDisplayObject(this);
+    DisplayObject* ch = cdef->createDisplayObject(this);
 
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?

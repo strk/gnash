@@ -46,7 +46,7 @@ namespace gnash {
 namespace gnash {
 
 /// A DisplayItem is simply a DisplayObject object 
-typedef boost::intrusive_ptr<DisplayObject> DisplayItem;
+typedef DisplayObject* DisplayItem;
 
 /// A list of on-stage DisplayObjects, ordered by depth
 //
@@ -373,7 +373,7 @@ public:
 		for (const_iterator it = nonRemoved(),
                 itEnd = _charsByDepth.end(); it != itEnd; ++it) {
 
-			boost::intrusive_ptr<DisplayObject> ch = *it;
+			DisplayObject* ch = *it;
 			int depth = ch->get_depth();
 			if (!depths.insert(depth).second) {
 				log_debug("Depth %d is duplicated in DisplayList %p",
@@ -399,7 +399,7 @@ private:
 	///
 	/// TODO: inspect what should happen if the target depth is already
     /// occupied
-	void reinsertRemovedCharacter(boost::intrusive_ptr<DisplayObject> ch);
+	void reinsertRemovedCharacter(DisplayObject* ch);
 
 	container_type _charsByDepth;
 
@@ -415,7 +415,7 @@ DisplayList::visitForward(V& visitor)
 		it != itEnd; ++it) {
 
 		DisplayItem& di = *it;
-		if (!visitor(di.get())) break;
+		if (!visitor(di)) break;
 	}
 }
 
@@ -427,7 +427,7 @@ DisplayList::visitBackward(V& visitor)
 			itEnd = _charsByDepth.rend(); it != itEnd; ++it) {
 
 		DisplayItem& di = *it;
-		if (!visitor(di.get())) break;
+		if (!visitor(di)) break;
 	}
 }
 
@@ -439,7 +439,7 @@ DisplayList::visitBackward(V& visitor) const
 			itEnd = _charsByDepth.rend(); it != itEnd; ++it) {
 
 		const DisplayItem& di = *it;
-		if (!visitor(di.get())) break;
+		if (!visitor(di)) break;
 	}
 }
 
@@ -450,7 +450,7 @@ DisplayList::visitAll(V& visitor)
 	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
 		it != itEnd; ++it) {
 
-		visitor(it->get());
+		visitor(*it);
 	}
 }
 
@@ -461,7 +461,7 @@ DisplayList::visitAll(V& visitor) const
 	for (const_iterator it = _charsByDepth.begin(),
             itEnd = _charsByDepth.end(); it != itEnd; ++it) {
 
-		visitor(it->get());
+		visitor(*it);
 	}
 }
 

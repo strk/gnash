@@ -1236,9 +1236,8 @@ movieclip_meth(const fn_call& fn)
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
-    boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(fn));
-    if ( ! o )
-    {
+    as_object* o = v.to_object(getGlobal(fn));
+    if (!o) {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
         return as_value(MovieClip::METHOD_NONE);
     }
