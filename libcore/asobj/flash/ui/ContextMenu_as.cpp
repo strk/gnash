@@ -22,15 +22,15 @@
 #endif
 
 #include "ui/ContextMenu_as.h"
-#include "as_object.h" // for inheritance
+#include "as_object.h" 
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
-#include "Object.h" // for getObjectInterface
+#include "smart_ptr.h" 
+#include "builtin_function.h" 
+#include "Object.h" 
 #include "namedStrings.h"
+#include "Array_as.h"
 
 namespace gnash {
 
@@ -55,6 +55,27 @@ contextmenu_class_init(as_object& where, const ObjectURI& uri)
 
 
 namespace {
+
+/// Functor to implement ContextMenu.copy for the customItems array.
+//
+/// This pushes the return of copy() called on each array element to the new
+/// customItems array.
+class CopyMenuItems
+{
+public:
+    CopyMenuItems(string_table::key c, as_object& nc) : _c(c), _target(nc) {}
+
+    void operator()(const as_value& val) {
+        Global_as& gl = getGlobal(_target);
+        as_object* obj = val.to_object(gl);
+        as_value cp = obj ? obj->callMethod(_c) : as_value();
+        _target.callMethod(NSV::PROP_PUSH, cp);
+    }
+private:
+    const string_table::key _c;
+    as_object& _target;
+};
+
 
 void
 setBuiltInItems(as_object& o, bool setting)
@@ -98,6 +119,7 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
     return as_value();
 }
 
+
 as_value
 contextmenu_copy(const fn_call& fn)
 {
@@ -128,19 +150,19 @@ contextmenu_copy(const fn_call& fn)
     o->set_member(NSV::PROP_ON_SELECT, onSelect);
     o->set_member(st.find("builtInItems"), builtInItems);
 
-    // The customItems object is a deep copy, but only of elements that are
-    // instances of ContextMenuItem (have its prototype as a __proto__ member).
+    // The customItems object is a deep copy that works by calling
+    // the copy property of each array member.
     as_object* nc = gl.createArray();
     as_object* customs;
 
     if (customItems.is_object() &&
             (customs = customItems.to_object(getGlobal(fn)))) {
-        // TODO: only copy properties that are ContextMenuItems.
-        nc->copyProperties(*customs);
-        customItems = nc;
+        string_table::key copykey = getStringTable(fn).find("copy");
+        CopyMenuItems c(copykey, *nc);
+        foreachArray(*customs, c);
     }
 
-    o->set_member(st.find("customItems"), customItems);
+    o->set_member(st.find("customItems"), nc);
 
     return as_value(o);
 }
