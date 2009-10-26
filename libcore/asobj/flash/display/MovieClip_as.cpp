@@ -353,7 +353,7 @@ attachMovieClipAS2Interface(as_object& o)
 as_value
 movieclip_createEmptyMovieClip(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs != 2) {
         if (fn.nargs < 2) {
@@ -375,7 +375,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
 
     // TODO: improve MovieClip ctor (and don't use it here anyway).
     Movie* m = getRoot(fn).topLevelMovie();
-    MovieClip* mc = new MovieClip(0, 0, m, ptr.get());
+    MovieClip* mc = new MovieClip(0, 0, m, ptr);
 
     mc->set_name(fn.arg(0).to_string());
     mc->setDynamic();
@@ -391,7 +391,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
 as_value
 movieclip_play(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     movieclip->setPlayState(MovieClip::PLAYSTATE_PLAY);
     return as_value();
@@ -400,7 +400,7 @@ movieclip_play(const fn_call& fn)
 as_value
 movieclip_stop(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     movieclip->setPlayState(MovieClip::PLAYSTATE_STOP);
 
@@ -412,7 +412,7 @@ movieclip_stop(const fn_call& fn)
 as_value
 movieclip_removeMovieClip(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     movieclip->removeMovieClip();
     return as_value();
 }
@@ -421,7 +421,7 @@ movieclip_removeMovieClip(const fn_call& fn)
 as_value
 movieclip_cacheAsBitmap(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE( log_unimpl(_("MovieClip.cacheAsBitmap()")) );
     return as_value();
@@ -431,7 +431,7 @@ movieclip_cacheAsBitmap(const fn_call& fn)
 as_value
 movieclip_filters(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE(log_unimpl(_("MovieClip.filters()")));
     return as_value();
@@ -441,7 +441,7 @@ movieclip_filters(const fn_call& fn)
 as_value
 movieclip_forceSmoothing(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE(log_unimpl(_("MovieClip.forceSmoothing()")));
     return as_value();
@@ -451,7 +451,7 @@ movieclip_forceSmoothing(const fn_call& fn)
 as_value
 movieclip_opaqueBackground(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE(log_unimpl(_("MovieClip.opaqueBackground()")));
     return as_value();
@@ -461,7 +461,7 @@ movieclip_opaqueBackground(const fn_call& fn)
 as_value
 movieclip_scale9Grid(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE(log_unimpl(_("MovieClip.scale9Grid()")));
     return as_value();
@@ -471,7 +471,7 @@ movieclip_scale9Grid(const fn_call& fn)
 as_value
 movieclip_scrollRect(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE(log_unimpl(_("MovieClip.scrollRect()")));
     return as_value();
@@ -481,7 +481,7 @@ movieclip_scrollRect(const fn_call& fn)
 as_value
 movieclip_tabIndex(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
     LOG_ONCE(log_unimpl(_("MovieClip.tabIndex()")));
     return as_value();
@@ -493,7 +493,7 @@ movieclip_tabIndex(const fn_call& fn)
 as_value
 movieclip_attachMovie(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 3 || fn.nargs > 4)
     {
@@ -593,7 +593,7 @@ movieclip_attachMovie(const fn_call& fn)
 as_value
 movieclip_attachAudio(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (!fn.nargs)
     {
@@ -624,7 +624,7 @@ movieclip_attachAudio(const fn_call& fn)
 as_value
 movieclip_attachVideo(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
 
     LOG_ONCE( log_unimpl("MovieClip.attachVideo()") );
@@ -636,7 +636,7 @@ as_value
 movieclip_getDepth(const fn_call& fn)
 {
     // Unlike TextField.getDepth this works for any DisplayObject
-    DisplayObject* movieclip = ensure<ThisIs<DisplayObject> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     const int n = movieclip->get_depth();
 
@@ -650,7 +650,7 @@ as_value
 movieclip_swapDepths(const fn_call& fn)
 {
 
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     const int this_depth = movieclip->get_depth();
 
@@ -785,7 +785,7 @@ movieclip_swapDepths(const fn_call& fn)
 as_value
 movieclip_duplicateMovieClip(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     
     if (fn.nargs < 2)
     {
@@ -833,7 +833,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
 as_value
 movieclip_gotoAndPlay(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -862,7 +862,7 @@ movieclip_gotoAndPlay(const fn_call& fn)
 
 as_value movieclip_gotoAndStop(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -891,7 +891,7 @@ as_value movieclip_gotoAndStop(const fn_call& fn)
 
 as_value movieclip_nextFrame(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     const size_t frame_count = movieclip->get_frame_count();
     const size_t current_frame = movieclip->get_current_frame();
@@ -906,7 +906,7 @@ as_value movieclip_nextFrame(const fn_call& fn)
 as_value
 movieclip_prevFrame(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     const size_t current_frame = movieclip->get_current_frame();
     if (current_frame > 0)
@@ -920,7 +920,7 @@ movieclip_prevFrame(const fn_call& fn)
 as_value
 movieclip_getBytesLoaded(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     return as_value(movieclip->get_bytes_loaded());
 }
@@ -928,7 +928,7 @@ movieclip_getBytesLoaded(const fn_call& fn)
 as_value
 movieclip_getBytesTotal(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     // @@ horrible uh ?
     return as_value(movieclip->get_bytes_total());
@@ -941,7 +941,7 @@ movieclip_getBytesTotal(const fn_call& fn)
 as_value
 movieclip_loadMovie(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     as_value val;
     if (fn.nargs > 1) {
@@ -997,7 +997,7 @@ movieclip_loadMovie(const fn_call& fn)
 as_value
 movieclip_loadVariables(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     // This always calls MovieClip.meth, even when there are no
     // arguments.
@@ -1044,7 +1044,7 @@ movieclip_loadVariables(const fn_call& fn)
 as_value
 movieclip_unloadMovie(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     movieclip->unloadMovie();
 
@@ -1054,7 +1054,7 @@ movieclip_unloadMovie(const fn_call& fn)
 as_value
 movieclip_hitTest(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     switch (fn.nargs)
     {
@@ -1120,7 +1120,7 @@ movieclip_hitTest(const fn_call& fn)
 as_value
 movieclip_getNextHighestDepth(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     int nextdepth = movieclip->getNextHighestDepth();
     return as_value(static_cast<double>(nextdepth));
@@ -1130,7 +1130,7 @@ movieclip_getNextHighestDepth(const fn_call& fn)
 as_value
 movieclip_getInstanceAtDepth(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> mc = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* mc = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1159,7 +1159,7 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 as_value
 movieclip_getURL(const fn_call& fn)
 {
-    as_object* movieclip = ensure<ThisIs<as_object> >(fn);
+    as_object* movieclip = ensure<ValidThis>(fn);
 
     std::string urlstr;
     std::string target;
@@ -1256,7 +1256,7 @@ movieclip_meth(const fn_call& fn)
 as_value
 movieclip_getTextSnapshot(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> obj = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     // If not found, construction fails.
     as_value textSnapshot(fn.env().find_object("TextSnapshot"));
@@ -1273,7 +1273,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
 
     // Construct a flash.geom.Transform object with "this" as argument.
     fn_call::Args args;
-    args += obj.get();
+    args += movieclip;
 
     boost::intrusive_ptr<as_object> ts =
         tsCtor->constructInstance(fn.env(), args);
@@ -1286,7 +1286,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
 as_value
 movieclip_getBounds(const fn_call& fn)
 {
-    DisplayObject* movieclip = ensure<ThisIs<DisplayObject> >(fn);
+    DisplayObject* movieclip = ensure<IsDisplayObject<> >(fn);
 
     SWFRect bounds = movieclip->getBounds();
 
@@ -1337,7 +1337,7 @@ movieclip_getBounds(const fn_call& fn)
 as_value
 movieclip_globalToLocal(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     as_value ret;
 
@@ -1399,7 +1399,7 @@ movieclip_globalToLocal(const fn_call& fn)
 as_value
 movieclip_localToGlobal(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     as_value ret;
 
@@ -1462,9 +1462,9 @@ as_value
 movieclip_setMask(const fn_call& fn)
 {
     // swfdec/test/image/mask-textfield-6.swf shows that setMask should also
-    // work against TextFields, we have no tests for other DisplayObject types so
-    // we generalize it for any DisplayObject.
-    DisplayObject* maskee = ensure<ThisIs<DisplayObject> >(fn);
+    // work against TextFields, we have no tests for other DisplayObject
+    // types so we generalize it for any DisplayObject.
+    MovieClip* maskee = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( ! fn.nargs )
     {
@@ -1506,7 +1506,7 @@ movieclip_setMask(const fn_call& fn)
 as_value
 movieclip_endFill(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     IF_VERBOSE_ASCODING_ERRORS(
     if ( fn.nargs )
@@ -1526,7 +1526,7 @@ movieclip_endFill(const fn_call& fn)
 as_value
 movieclip_lineTo(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( fn.nargs < 2 )
     {
@@ -1580,7 +1580,7 @@ movieclip_lineTo(const fn_call& fn)
 as_value
 movieclip_moveTo(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( fn.nargs < 2 )
     {
@@ -1640,7 +1640,7 @@ movieclip_moveTo(const fn_call& fn)
 as_value
 movieclip_lineStyle(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( ! fn.nargs )
     {
@@ -1790,7 +1790,7 @@ movieclip_lineStyle(const fn_call& fn)
 as_value
 movieclip_curveTo(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( fn.nargs < 4 )
     {
@@ -1871,7 +1871,7 @@ movieclip_curveTo(const fn_call& fn)
 as_value
 movieclip_clear(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     IF_VERBOSE_ASCODING_ERRORS(
     if ( fn.nargs )
@@ -1893,7 +1893,7 @@ movieclip_clear(const fn_call& fn)
 as_value
 movieclip_beginFill(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( fn.nargs < 1 )
     {
@@ -1942,7 +1942,7 @@ movieclip_beginFill(const fn_call& fn)
 as_value
 movieclip_beginGradientFill(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if ( fn.nargs < 5 )
     {
@@ -2195,7 +2195,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 as_value
 movieclip_startDrag(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     drag_state st;
     st.setCharacter(movieclip);
@@ -2276,7 +2276,7 @@ movieclip_stopDrag(const fn_call& fn)
 as_value
 movieclip_beginBitmapFill(const fn_call& fn)
 {
-    MovieClip* ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2286,7 +2286,7 @@ movieclip_beginBitmapFill(const fn_call& fn)
 as_value
 movieclip_getRect(const fn_call& fn)
 {
-    MovieClip* ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2296,7 +2296,7 @@ movieclip_getRect(const fn_call& fn)
 as_value
 movieclip_lineGradientStyle(const fn_call& fn)
 {
-    MovieClip* ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2309,7 +2309,7 @@ movieclip_attachBitmap(const fn_call& fn)
 
     GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2349,7 +2349,7 @@ movieclip_as2_ctor(const fn_call& fn)
 as_value
 movieclip_transform(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     // If not found, construction fails.
     as_value transform(fn.env().find_object("flash.geom.Transform"));
@@ -2363,7 +2363,7 @@ movieclip_transform(const fn_call& fn)
 
     // Construct a flash.geom.Transform object with "this" as argument.
     fn_call::Args args;
-    args += ptr.get();
+    args += ptr;
 
     boost::intrusive_ptr<as_object> newTrans =
         transCtor->constructInstance(fn.env(), args);
@@ -2383,7 +2383,7 @@ movieclip_beginMeshFill(const fn_call& /*fn*/)
 as_value
 movieclip_lockroot(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->getLockRoot());
@@ -2428,7 +2428,7 @@ attachMovieClipAS3Interface(as_object& o)
 as_value
 movieclip_addFrameScript(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -2437,7 +2437,7 @@ movieclip_addFrameScript(const fn_call& fn)
 as_value
 movieclip_nextScene(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -2446,7 +2446,7 @@ movieclip_nextScene(const fn_call& fn)
 as_value
 movieclip_prevScene(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();

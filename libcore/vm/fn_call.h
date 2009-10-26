@@ -290,6 +290,19 @@ struct ThisIsNative
 };
 
 
+/// Check that the 'this' pointer is a DisplayObject
+//
+/// By default this just checks for any DisplayObject type.
+template<typename T = DisplayObject>
+struct IsDisplayObject
+{
+    typedef T value_type;
+    value_type* operator()(as_object* o) const {
+        if (!o) return 0;
+        return dynamic_cast<T*>(o->displayObject());
+    }
+};
+
 /// Check that the 'this' pointer is not null.
 struct ValidThis
 {
