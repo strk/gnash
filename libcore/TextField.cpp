@@ -2872,7 +2872,7 @@ attachPrototypeProperties(as_object& o)
 as_value
 textfield_createTextField(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     
     // name, depth, x, y, width, height
     if (fn.nargs < 6) {
@@ -2913,7 +2913,7 @@ textfield_createTextField(const fn_call& fn)
     //  1. Call "new _global.TextField()" (which takes care of
     //     assigning properties to the prototype).
     //  2. Make that object into a TextField and put it on the display list.
-    DisplayObject* tf = new TextField(0, ptr.get(), bounds);
+    DisplayObject* tf = new TextField(0, ptr, bounds);
 
     // Give name and mark as dynamic
     tf->set_name(name);
@@ -2935,7 +2935,7 @@ textfield_createTextField(const fn_call& fn)
 as_value
 textfield_background(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getDrawBackground());
@@ -2950,7 +2950,7 @@ textfield_background(const fn_call& fn)
 as_value
 textfield_border(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getDrawBorder());
@@ -2965,7 +2965,7 @@ textfield_border(const fn_call& fn)
 as_value
 textfield_backgroundColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getBackgroundColor().toRGB());
@@ -2982,7 +2982,7 @@ textfield_backgroundColor(const fn_call& fn)
 as_value
 textfield_borderColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getBorderColor().toRGB());
@@ -3000,7 +3000,7 @@ textfield_borderColor(const fn_call& fn)
 as_value
 textfield_textColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3018,7 +3018,7 @@ textfield_textColor(const fn_call& fn)
 as_value
 textfield_embedFonts(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3033,7 +3033,7 @@ textfield_embedFonts(const fn_call& fn)
 as_value
 textfield_wordWrap(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->doWordWrap());
@@ -3048,7 +3048,7 @@ textfield_wordWrap(const fn_call& fn)
 as_value
 textfield_html(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->doHtml());
@@ -3063,7 +3063,7 @@ textfield_html(const fn_call& fn)
 as_value
 textfield_selectable(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3080,7 +3080,7 @@ textfield_selectable(const fn_call& fn)
 as_value
 textfield_length(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3101,7 +3101,7 @@ textfield_length(const fn_call& fn)
 as_value
 textfield_textHeight(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3127,7 +3127,7 @@ textfield_textHeight(const fn_call& fn)
 as_value
 textfield_textWidth(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3153,7 +3153,7 @@ textfield_textWidth(const fn_call& fn)
 as_value
 textfield_autoSize(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3187,7 +3187,7 @@ textfield_autoSize(const fn_call& fn)
 as_value
 textfield_type(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3214,7 +3214,7 @@ textfield_type(const fn_call& fn)
 as_value
 textfield_variable(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3245,7 +3245,7 @@ as_value
 textfield_getDepth(const fn_call& fn)
 {
     // Unlike MovieClip.getDepth this works only for TextFields.
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     const int n = text->get_depth();
     return as_value(n);
 }
@@ -3253,7 +3253,7 @@ textfield_getDepth(const fn_call& fn)
 as_value
 textfield_getFontList(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.getFontList()"));
@@ -3264,7 +3264,7 @@ textfield_getFontList(const fn_call& fn)
 as_value
 textfield_getNewTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.getNewTextFormat()"));
@@ -3281,7 +3281,7 @@ textfield_getNewTextFormat(const fn_call& fn)
 as_value
 textfield_getTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     Global_as& gl = getGlobal(fn);
     as_function* ctor = gl.getMember(NSV::CLASS_TEXT_FORMAT).to_as_function();
@@ -3328,7 +3328,7 @@ as_value
 textfield_setTextFormat(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( ! fn.nargs )
     {
@@ -3393,20 +3393,18 @@ textfield_setTextFormat(const fn_call& fn)
 as_value
 textfield_setNewTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
-    //UNUSED(text);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
+    UNUSED(text);
 
     LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate "
                 "to setTextFormat") );
     return textfield_setTextFormat(fn);
-
-    //return as_value();
 }
 
 as_value
 textfield_password(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3421,7 +3419,7 @@ textfield_password(const fn_call& fn)
 as_value
 textfield_multiline(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3435,7 +3433,7 @@ textfield_multiline(const fn_call& fn)
 as_value
 textfield_restrict(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3455,7 +3453,7 @@ textfield_restrict(const fn_call& fn)
 as_value
 textfield_bottomScroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.bottomScroll is not complete"));
@@ -3475,7 +3473,7 @@ textfield_bottomScroll(const fn_call& fn)
 as_value
 textfield_maxhscroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
         LOG_ONCE(log_unimpl("TextField.maxhscroll is not complete"));
@@ -3501,7 +3499,7 @@ textfield_maxhscroll(const fn_call& fn)
 as_value
 textfield_maxChars(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3522,7 +3520,7 @@ textfield_maxChars(const fn_call& fn)
 as_value
 textfield_text(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
     if (!fn.nargs)
     {
         // Getter
@@ -3542,7 +3540,7 @@ textfield_text(const fn_call& fn)
 as_value
 textfield_htmlText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
     if (!fn.nargs)
     {
         // Getter
@@ -3568,7 +3566,7 @@ textfield_htmlText(const fn_call& fn)
 as_value
 textfield_replaceSel(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3594,7 +3592,7 @@ textfield_replaceSel(const fn_call& fn)
 as_value
 textfield_scroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     if (!fn.nargs)
@@ -3611,7 +3609,7 @@ textfield_scroll(const fn_call& fn)
 as_value
 textfield_hscroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField._hscroll is not complete"));
@@ -3630,7 +3628,7 @@ textfield_hscroll(const fn_call& fn)
 as_value
 textfield_maxscroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.maxscroll is not complete"));
@@ -3649,7 +3647,7 @@ textfield_maxscroll(const fn_call& fn)
 as_value
 textfield_replaceText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.replaceText()"));
@@ -3660,7 +3658,7 @@ textfield_replaceText(const fn_call& fn)
 as_value
 textfield_removeTextField(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     text->removeTextField();
 
@@ -3692,7 +3690,7 @@ textfield_ctor(const fn_call& fn)
         return as_value(obj);
     }
 
-    as_object* obj = ensure<ValidThis>(fn);
+    TextField* obj = ensure<IsDisplayObject<TextField> >(fn);
     
     // It's not clear why this happens. Attaching a relay would have the
     // same effect as both following statements.
