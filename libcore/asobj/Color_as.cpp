@@ -238,7 +238,7 @@ as_value
 color_ctor(const fn_call& fn)
 {
 	
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
     
     as_value target;
     if (fn.nargs) target = fn.arg(0);
@@ -246,6 +246,10 @@ color_ctor(const fn_call& fn)
     const int flags = as_object::DefaultFlags | PropFlags::readOnly;
 
     obj->init_member(NSV::PROP_TARGET, target, flags); 
+
+    Global_as& gl = getGlobal(fn);
+    as_object* null = 0;
+    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, obj, null, 7);
 
 	return as_value(); 
 }
