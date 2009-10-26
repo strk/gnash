@@ -187,6 +187,16 @@ public:
         return _parent->get_environment();
     }
 
+    /// Enumerate any non-proper properties
+    //
+    /// This function is called by enumerateProperties(as_environment&) 
+    /// to allow for enumeration of properties that are derived from the
+    /// DisplayObject type, e.g. DisplayList members.
+    ///
+    /// The default implementation adds nothing
+    ///
+    virtual void enumerateNonProperties(as_environment&) const {}
+
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
     /// the DisplayObject has no parent.
@@ -540,7 +550,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* get_path_element(string_table::key key);
+    virtual as_object* pathElement(string_table::key key);
 
     /// Advance this DisplayObject to next frame.
     //

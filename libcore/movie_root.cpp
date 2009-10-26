@@ -2118,13 +2118,19 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
 	//       root movie is replaced by a load to _level0... 
 	//       (but I guess we'd also drop loadMovie requests in that
 	//       case... just not tested)
-	as_object* o = _movies.begin()->second;
+	as_object* o = getObject(_movies.begin()->second);
+    assert(o);
 
 	std::string::size_type from = 0;
 	while (std::string::size_type to = tgtstr.find('.', from))
 	{
 		std::string part(tgtstr, from, to - from);
-		o = o->get_path_element(st.find(part));
+
+        // TODO: there is surely a cleaner way to implement path finding.
+        o = o->displayObject() ?
+            o->displayObject()->pathElement(st.find(part)) :
+            o->get_path_element(st.find(part));
+
 		if (!o) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
 			log_debug("Evaluating DisplayObject target path: element "

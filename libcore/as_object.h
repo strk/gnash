@@ -995,7 +995,7 @@ public:
     }
 
     /// Return true if this is a DisplayObject.
-    bool displayObject() const {
+    DisplayObject* displayObject() const {
         return _displayObject;
     }
 
@@ -1003,21 +1003,11 @@ public:
     //
     /// This enables DisplayObject properties such as _x and _y. A flag
     /// is used to avoid RTTI on every get and set of properties.
-    void setDisplayObject() {
-        _displayObject = true;
+    void setDisplayObject(DisplayObject* d) {
+        _displayObject = d;
     }
 
 protected:
-
-    /// Enumerate any non-proper properties
-    //
-    /// This function is called by enumerateProperties(as_environment&) 
-    /// to allow for enumeration of properties that are not "proper"
-    /// (not contained in the as_object PropertyList).
-    ///
-    /// The default implementation adds nothing
-    ///
-    virtual void enumerateNonProperties(as_environment&) const {}
 
     ///Get a member value at a given slot.
     //
@@ -1089,7 +1079,7 @@ private:
     //
     /// These magic properties are invoked in get_member only if the
     /// object is a DisplayObject
-    bool _displayObject;
+    DisplayObject* _displayObject;
 
     /// An array is a special type of object.
     //

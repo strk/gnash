@@ -102,7 +102,7 @@ DisplayObject::DisplayObject(as_object* owner, DisplayObject* parent)
     assert(m_old_invalidated_ranges.isNull());
 
     // This informs the core that the object is a DisplayObject.
-    setDisplayObject();
+    setDisplayObject(this);
 }
 
 as_object*
@@ -162,11 +162,14 @@ DisplayObject::get_world_cxform() const
 
 
 as_object*
-DisplayObject::get_path_element(string_table::key key)
+DisplayObject::pathElement(string_table::key key)
 {
-	string_table& st = getStringTable(*this);
-    if (key == st.find("..")) return get_parent();
-	if (key == st.find(".") || key == st.find("this")) return this;
+    as_object* obj = getObject(this);
+    if (!obj) return 0;
+
+	string_table& st = getStringTable(*obj);
+    if (key == st.find("..")) return getObject(get_parent());
+	if (key == st.find(".") || key == st.find("this")) return obj;
 	return 0;
 }
 
@@ -963,8 +966,10 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
             val = obj.getAsRoot();
             return true;
         case NSV::PROP_uGLOBAL:
-            if (getSWFVersion(obj) < 6) break;
-            val = &getGlobal(obj);
+            // TODO: clean up this mess.
+            assert(getObject(&obj));
+            if (getSWFVersion(*getObject(&obj)) < 6) break;
+            val = &getGlobal(*getObject(&obj));
             return true;
     }
 

@@ -782,33 +782,31 @@ MovieClip::notifyEvent(const event_id& id)
 }
 
 as_object*
-MovieClip::get_path_element(string_table::key key)
+MovieClip::pathElement(string_table::key key)
 {
-    as_object* obj = DisplayObject::get_path_element(key);
+    as_object* obj = DisplayObject::pathElement(key);
     if (obj) return obj;
 
     // See if we have a match on the display list.
-    DisplayObject* ch = getDisplayListObject(key);
-    if (ch) return ch;
+    obj = getObject(getDisplayListObject(key));
+    if (obj) return obj;
 
     std::string name = getStringTable(*this).value(key);
-    
+ 
+    obj = getObject(this);
+
+    assert(obj);
+
     // See if it's a member
     as_value tmp;
-    if ( !as_object::get_member(key, &tmp, 0) )
-    {
-        return NULL;
+    if (!obj->get_member(key, &tmp, 0)) {
+        return 0;
     }
-    if ( ! tmp.is_object() )
-    {
-        return NULL;
-    }
-    if ( tmp.is_sprite() )
-    {
-        return tmp.toDisplayObject(true);
+    if (!tmp.is_object()) {
+        return 0;
     }
 
-    return tmp.to_object(getGlobal(*this));
+    return tmp.to_object(getGlobal(*obj));
 }
 
 bool

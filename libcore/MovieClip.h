@@ -546,7 +546,7 @@ public:
     DisplayObject* getDisplayListObject(string_table::key name);
 
     /// Overridden to look in DisplayList for a match
-    as_object* get_path_element(string_table::key key);
+    as_object* pathElement(string_table::key key);
 
     /// Execute the actions for the specified frame. 
     //

@@ -80,7 +80,8 @@ deleteLocal(as_object* locals, const std::string& varname)
 as_object*
 getElement(as_object* obj, string_table::key key)
 {
-    //Global_as& gl = getGlobal(*obj); 
+    DisplayObject* d = obj->displayObject();
+    if (d) return d->pathElement(key);
     return obj->get_path_element(key);
 }
 

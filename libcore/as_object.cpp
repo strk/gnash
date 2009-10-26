@@ -398,8 +398,8 @@ as_object::get_member(string_table::key name, as_value* val,
 	Property* prop = pr.getProperty();
     if (!prop) {
         if (displayObject()) {
-            DisplayObject& d = static_cast<DisplayObject&>(*this);
-            if (getDisplayObjectProperty(d, name, *val)) return true;
+            DisplayObject* d = displayObject();
+            if (getDisplayObjectProperty(*d, name, *val)) return true;
         }
         while (pr()) {
             if ((prop = pr.getProperty())) break;
@@ -686,7 +686,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 
     bool tfVarFound = false;
     if (displayObject()) {
-        MovieClip* mc = dynamic_cast<MovieClip*>(this);
+        MovieClip* mc = dynamic_cast<MovieClip*>(displayObject());
         if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
         // We still need to set the member.
     }
@@ -706,8 +706,8 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if (!prop) { 
 
         if (displayObject()) {
-            DisplayObject& d = static_cast<DisplayObject&>(*this);
-            if (setDisplayObjectProperty(d, key, val)) return true;
+            DisplayObject* d = displayObject();
+            if (setDisplayObjectProperty(*d, key, val)) return true;
             // TODO: should we execute triggers?
         }
 
@@ -1069,7 +1069,7 @@ as_object::enumerateProperties(as_environment& env) const
 
     // Hack to handle MovieClips.
 	if (displayObject()) {
-        static_cast<const DisplayObject&>(*this).enumerateNonProperties(env);
+        displayObject()->enumerateNonProperties(env);
     }
 
 	// this set will keep track of visited objects,
@@ -1383,7 +1383,7 @@ DisplayObject*
 getDisplayObject(as_object* obj)
 {
     if (!obj || !obj->displayObject()) return 0;
-    return &static_cast<DisplayObject&>(*obj);
+    return obj->displayObject();
 }
 
 /// Get the VM from an as_object
