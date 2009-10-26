@@ -398,7 +398,8 @@ as_object::get_member(string_table::key name, as_value* val,
 	Property* prop = pr.getProperty();
     if (!prop) {
         if (displayObject()) {
-            if (getDisplayObjectProperty(*this, name, *val)) return true;
+            DisplayObject& d = static_cast<DisplayObject&>(*this);
+            if (getDisplayObjectProperty(d, name, *val)) return true;
         }
         while (pr()) {
             if ((prop = pr.getProperty())) break;
@@ -705,7 +706,8 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if (!prop) { 
 
         if (displayObject()) {
-            if (setDisplayObjectProperty(*this, key, val)) return true;
+            DisplayObject& d = static_cast<DisplayObject&>(*this);
+            if (setDisplayObjectProperty(d, key, val)) return true;
             // TODO: should we execute triggers?
         }
 
@@ -1065,7 +1067,10 @@ as_object::enumerateProperties(as_environment& env) const
 {
 	assert(env.top(0).is_undefined());
 
-	enumerateNonProperties(env);
+    // Hack to handle MovieClips.
+	if (displayObject()) {
+        static_cast<const DisplayObject&>(*this).enumerateNonProperties(env);
+    }
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops

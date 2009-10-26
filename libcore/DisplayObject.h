@@ -68,17 +68,15 @@ void attachDisplayObjectProperties(as_object& o);
 
 /// Set special properties
 //
-/// This will abort if called with a non DisplayObject. It sets the magic
-/// properties of DisplayObjects.
-bool setDisplayObjectProperty(as_object& obj, string_table::key key,
+/// This sets the magic properties of DisplayObjects.
+bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         const as_value& val);
 
 /// Get special properties
 //
-/// This will abort if called with a non DisplayObject. It gets the magic
-/// properties of DisplayObjects and handles special MovieClip properties
-/// such as DisplayList members.
-bool getDisplayObjectProperty(as_object& obj, string_table::key key,
+/// This gets the magic properties of DisplayObjects and handles special
+/// MovieClip properties such as DisplayList members.
+bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val);
 
 /// Get a property by its numeric index.
