@@ -28,6 +28,8 @@
 #include "SWFStream.h" // for use
 #include "GnashAlgorithm.h"
 #include "SWFParser.h"
+#include "namedStrings.h"
+#include "Global_as.h"
 
 #include <vector>
 #include <string>
@@ -47,7 +49,15 @@ sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
+
+    // Should not call MovieClip constructor (probably), but should
+    // attach MovieClip.prototype
+
+    as_function* ctor = gl.getMember(NSV::CLASS_MOVIE_CLIP).to_as_function();
+    as_object* proto = ctor ?
+        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
 	MovieClip* si = new MovieClip(0, this, parent->get_root(), parent);
+    si->set_prototype(proto);
 	return si;
 }
 
