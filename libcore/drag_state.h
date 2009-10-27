@@ -40,7 +40,7 @@ class drag_state
 	/// Coordinates in TWIPS.
 	SWFRect _bounds;
 
-	boost::intrusive_ptr<DisplayObject> _displayObject;
+	DisplayObject* _displayObject;
 
 	bool	_lock_centered;
 
@@ -103,7 +103,7 @@ public:
 
 	/// May return NULL !!
 	DisplayObject* getCharacter() const {
-		return _displayObject.get();
+		return _displayObject;
 	}
 
 	/// Stores DisplayObject in an intrusive pointer
@@ -132,7 +132,7 @@ public:
 	/// Mark DisplayObject as reachable (if any)
 	void markReachableResources() const
 	{
-		if ( _displayObject ) _displayObject->setReachable();
+		if (_displayObject) _displayObject->setReachable();
 	}
 };
 
