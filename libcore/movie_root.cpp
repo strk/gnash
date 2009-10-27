@@ -799,7 +799,7 @@ movie_root::generate_mouse_button_events()
                 // all necessary events and removal of current focus.
                 // Do not set focus to NULL.
                 if (ms.activeEntity) {
-                    setFocus(ms.activeEntity.get());
+                    setFocus(ms.activeEntity);
 
 			        ms.activeEntity->mouseEvent(event_id::PRESS);
 			        need_redisplay=true;
@@ -1358,7 +1358,7 @@ movie_root::setFocus(DisplayObject* to)
 DisplayObject*
 movie_root::getActiveEntityUnderPointer() const
 {
-	return m_mouse_button_state.activeEntity.get();
+	return m_mouse_button_state.activeEntity;
 }
 
 DisplayObject*

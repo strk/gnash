@@ -30,10 +30,10 @@ public:
     };  
 
 	/// entity that currently owns the mouse pointer
-	boost::intrusive_ptr<InteractiveObject> activeEntity;
+	InteractiveObject* activeEntity;
 
 	/// what's underneath the mouse right now
-	boost::intrusive_ptr<InteractiveObject> topmostEntity;
+	InteractiveObject* topmostEntity;
 
 	/// previous state of mouse button
 	bool previousButtonState;	
@@ -46,6 +46,8 @@ public:
 
 	MouseButtonState()
 		:
+        activeEntity(0),
+        topmostEntity(0),
 		previousButtonState(UP),
 		currentButtonState(UP),
 		wasInsideActiveEntity(false)
@@ -56,8 +58,8 @@ public:
 	/// Mark reachable objects (active and topmost entities)
 	void markReachableResources() const
 	{
-		if ( activeEntity.get() ) activeEntity->setReachable();
-		if ( topmostEntity.get() ) topmostEntity->setReachable();
+		if (activeEntity) activeEntity->setReachable();
+		if (topmostEntity) topmostEntity->setReachable();
 	}
 #endif // GNASH_USE_GC
 };
