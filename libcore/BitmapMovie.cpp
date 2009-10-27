@@ -17,6 +17,7 @@
 
 #include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
+#include "Bitmap.h"
 
 namespace gnash {
 
@@ -27,10 +28,10 @@ BitmapMovie::BitmapMovie(as_object* owner, const BitmapMovieDefinition* def,
     _def(def)
 {
     assert(def);
-    DisplayObject* ch = def->createDisplayObject(getGlobal(*this), this);
+    Bitmap* bm = new Bitmap(0, def, this);
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
-    placeDisplayObject(ch, depth);
+    placeDisplayObject(bm, depth);
 }
 
 } // namespace gnash

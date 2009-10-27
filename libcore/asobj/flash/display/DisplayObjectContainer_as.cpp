@@ -164,7 +164,7 @@ displayobjectcontainer_addChild(const fn_call& fn)
         return ret;
     }
 
-    return as_value(ptr->addChild(ch));
+    return as_value(getObject(ptr->addChild(ch)));
 }
 
 as_value
@@ -214,7 +214,7 @@ displayobjectcontainer_addChildAt(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_debug("TESTING: addChildAt(%s)", ss.str());
     
-    return as_value(ptr->addChildAt(ch, depth));
+    return as_value(getObject(ptr->addChildAt(ch, depth)));
 
 }
 

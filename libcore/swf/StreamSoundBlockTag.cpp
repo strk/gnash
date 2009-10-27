@@ -34,7 +34,7 @@ void
 StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
 
-	sound::sound_handler* handler = getRunResources(*m).soundHandler(); 
+	sound::sound_handler* handler = getRunResources(*getObject(m)).soundHandler(); 
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.

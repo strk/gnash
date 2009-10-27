@@ -328,7 +328,7 @@ ButtonRecord::instantiate(Button* button, bool name) const
     assert(button);
     assert(_definitionTag);
 
-    Global_as& gl = getGlobal(*button);
+    Global_as& gl = getGlobal(*getObject(button));
 
     DisplayObject* o = _definitionTag->createDisplayObject(gl, button);
 

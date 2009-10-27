@@ -67,15 +67,11 @@ public:
 
 protected:
 
-#ifdef GNASH_USE_GC
 	/// Mark reachable resources (for the GC)
-	void markReachableResources() const
+	virtual void markReachableResources() const
 	{
-		assert(isReachable());
         if (_def) _def->setReachable();
-		markDisplayObjectReachable();
 	}
-#endif
 
 private:
 	

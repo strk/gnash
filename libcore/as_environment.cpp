@@ -156,7 +156,7 @@ as_environment::get_variable(const std::string& varname,
             {
                 // ... but only if it resolves to a sprite
                 MovieClip* m = target->to_movie();
-                if ( m ) return as_value(m);
+                if (m) return as_value(getObject(m));
             }
         }
         return get_variable_raw(varname, scopeStack, retTarget);
@@ -225,21 +225,25 @@ as_environment::get_variable_raw(const std::string& varname,
     // Check current target members. TODO: shouldn't target be in scope stack ?
     if (m_target)
     {
-        if (m_target->get_member(key, &val)) {
+        as_object* obj = getObject(m_target);
+        assert(obj);
+        if (obj->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
             log_debug("Found %s in target %p", varname, m_target->getTarget());
 #endif
-            if ( retTarget ) *retTarget = m_target;
+            if ( retTarget ) *retTarget = obj;
             return val;
         }
     }
     else if ( _original_target ) // this only for swf5+ ?
     {
-        if (_original_target->get_member(key, &val)) {
+        as_object* obj = getObject(_original_target);
+        assert(obj);
+        if (obj->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
             log_debug("Found %s in original target %s", varname, _original_target->getTarget());
 #endif
-            if ( retTarget ) *retTarget = _original_target;
+            if ( retTarget ) *retTarget = obj;
             return val;
         }
     }
@@ -249,7 +253,7 @@ as_environment::get_variable_raw(const std::string& varname,
 #ifdef GNASH_DEBUG_GET_VARIABLE
         log_debug("Took %s as this, returning original target %s", varname, _original_target->getTarget());
 #endif
-        val.set_as_object(_original_target);
+        val.set_as_object(getObject(_original_target));
         if ( retTarget ) *retTarget = NULL; // correct ??
         return val;
     }
@@ -318,7 +322,7 @@ as_environment::delVariableRaw(const std::string& varname,
 
 
     // Try target
-    std::pair<bool,bool> ret = m_target->delProperty(varkey);
+    std::pair<bool,bool> ret = getObject(m_target)->delProperty(varkey);
     if ( ret.first )
     {
         return ret.second;
@@ -341,7 +345,7 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     );
 
     // Path lookup rigamarole.
-    as_object* target = m_target;
+    as_object* target = getObject(m_target);
     std::string path;
     std::string var;
     //log_debug(_("set_variable(%s, %s)"), varname, val);
@@ -422,8 +426,10 @@ as_environment::set_variable_raw(const std::string& varname,
     
     // TODO: shouldn't m_target be in the scope chain ?
     //assert(m_target);
-    if ( m_target ) m_target->set_member(varkey, val);
-    else if ( _original_target ) _original_target->set_member(varkey, val);
+    if (m_target) getObject(m_target)->set_member(varkey, val);
+    else if (_original_target) {
+        getObject(_original_target)->set_member(varkey, val);
+    }
     else
     {
         log_error("as_environment(%p)::set_variable_raw(%s, %s): "
@@ -575,7 +581,7 @@ as_environment::find_object(const std::string& path,
 #ifdef DEBUG_TARGET_FINDING 
         log_debug(_("Returning m_target (empty path)"));
 #endif
-        return m_target; // or should we return the *original* path ?
+        return getObject(m_target); // or should we return the *original* path ?
     }
     
     VM& vm = _vm;
@@ -583,7 +589,7 @@ as_environment::find_object(const std::string& path,
     int swfVersion = vm.getSWFVersion();
 
     as_object* env = 0;
-    env = m_target; 
+    env = getObject(m_target); 
 
     bool firstElementParsed = false;
     bool dot_allowed = true;
@@ -611,10 +617,10 @@ as_environment::find_object(const std::string& path,
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Path is '/', return the root (%p)"), (void*)root);
 #endif
-            return root; // that's all folks.. 
+            return getObject(root); // that's all folks.. 
         }
 
-        env = root;
+        env = getObject(root);
         firstElementParsed = true;
         dot_allowed = false;
 
@@ -705,7 +711,7 @@ as_environment::find_object(const std::string& path,
                 }
 
                 // Try current target  (if any)
-                assert(env == m_target);
+                assert(env == getObject(m_target));
                 if (env) {
                     element = getElement(env, subpartKey);
                     if (element) break;
@@ -1013,11 +1019,11 @@ void
 as_environment::markReachableResources() const
 {
     for (size_t i = 0; i < 4; ++i) {
-        m_global_register[i].setReachable();
+        //m_global_register[i].setReachable();
     }
 
-    if (m_target) m_target->setReachable();
-    if (_original_target) _original_target->setReachable();
+    if (m_target) getObject(m_target)->setReachable();
+    if (_original_target) getObject(_original_target)->setReachable();
 
     assert (_localFrames.empty());
     assert (_stack.empty());

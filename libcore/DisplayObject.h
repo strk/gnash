@@ -109,7 +109,7 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// dynamic DisplayObjects, but tags are not always stored. They are not
 /// stored in most InteractiveObjects because most properties can be
 /// overridden during SWF execution.
-class DisplayObject : public as_object, boost::noncopyable
+class DisplayObject : boost::noncopyable
 {
 public:
 
@@ -213,6 +213,8 @@ public:
     {
         _parent = parent;
     }
+
+    virtual MovieClip* to_movie() { return 0; }
 
     int get_depth() const { return m_depth; }
 
@@ -971,6 +973,8 @@ public:
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
   
+    void setReachable() const;
+
 protected:
 
     /// Register currently computable target as
@@ -984,27 +988,11 @@ protected:
         _origTarget=getTarget();
     }
 
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources, override from as_object.
+    /// Mark all reachable resources.
     //
-    /// The default implementation calls markDisplayObjectReachable().
-    ///
     /// If a derived class provides access to more GC-managed
-    /// resources, it should override this method and call 
-    /// markDisplayObjectReachableResources() as the last step.
-    ///
-    virtual void markReachableResources() const
-    {
-        markDisplayObjectReachable();
-    }
-
-    /// Mark DisplayObject-specific reachable resources
-    //
-    /// These are: the DisplayObject's parent, mask, maskee and the default
-    ///                         as_object reachable stuff.
-    ///
-    void markDisplayObjectReachable() const;
-#endif // GNASH_USE_GC
+    /// resources, it should override this method.
+    virtual void markReachableResources() const {}
 
     const Events& get_event_handlers() const
     {

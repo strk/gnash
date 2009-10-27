@@ -128,7 +128,7 @@ Bitmap::makeBitmap()
         }
     }
 
-    Renderer* renderer = getRunResources(*this).renderer();
+    Renderer* renderer = VM::get().getRoot().runResources().renderer();
     if (renderer) _bitmapInfo = renderer->createBitmapInfo(im);
 
 }

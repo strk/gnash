@@ -64,7 +64,7 @@ Video::Video(as_object* owner, const SWF::DefineVideoStreamTag* const def,
     _smoothing(false)
 {
 
-	set_prototype(getVideoInterface(*this));
+	getObject(this)->set_prototype(getVideoInterface(*getObject(this)));
 
     // TODO: For AS2 a genuine Video object can only be created from a 
     // SWF tag. 
@@ -74,7 +74,7 @@ Video::Video(as_object* owner, const SWF::DefineVideoStreamTag* const def,
         // once Video is a Relay.
 		initializeDecoder();
         
-        attachPrototypeProperties(*get_prototype());
+        attachPrototypeProperties(*getObject(this)->get_prototype());
 	}
 }
 
@@ -259,7 +259,7 @@ Video::stagePlacementCallback(as_object* initObj)
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live DisplayObject
-    getRoot(*this).addLiveChar(this);
+    getRoot(*getObject(this)).addLiveChar(this);
 }
 
 
@@ -330,16 +330,11 @@ Video::getBounds() const
 	return SWFRect();
 }
 
-#ifdef GNASH_USE_GC
 void
 Video::markReachableResources() const
 {
 	if (_ns) _ns->setReachable();
-
-	// Invoke DisplayObject's version of reachability mark
-	markDisplayObjectReachable();
 }
-#endif // GNASH_USE_GC
 
 namespace {
 
@@ -385,7 +380,7 @@ attachPrototypeProperties(as_object& proto)
 as_value
 video_attach(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
 
 	if (fn.nargs < 1)
 	{
@@ -413,7 +408,7 @@ video_attach(const fn_call& fn)
 as_value
 video_deblocking(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
     UNUSED(video);
 
     log_unimpl("Video.deblocking");
@@ -423,7 +418,7 @@ video_deblocking(const fn_call& fn)
 as_value
 video_smoothing(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
 
     if (!fn.nargs) return as_value(video->smoothing());
 
@@ -437,21 +432,21 @@ video_smoothing(const fn_call& fn)
 as_value
 video_width(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
     return as_value(video->width());
 }
 
 as_value
 video_height(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
     return as_value(video->height());
 }
 
 as_value
 video_clear(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
 
     video->clear();
     return as_value();

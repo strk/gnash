@@ -56,9 +56,11 @@ sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
     as_function* ctor = gl.getMember(NSV::CLASS_MOVIE_CLIP).to_as_function();
     as_object* proto = ctor ?
         ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
-	MovieClip* si = new MovieClip(0, this, parent->get_root(), parent);
-    si->set_prototype(proto);
-	return si;
+    as_object* o = gl.createObject();
+
+    DisplayObject* mc = new MovieClip(o, this, parent->get_root(), parent);
+    o->setDisplayObject(mc);
+	return mc;
 }
 
 sprite_definition::~sprite_definition()

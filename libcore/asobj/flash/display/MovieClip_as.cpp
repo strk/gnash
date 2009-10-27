@@ -224,13 +224,15 @@ registerMovieClipNative(as_object& where)
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
 void
-attachMovieClipAS2Properties(DisplayObject& o)
+attachMovieClipAS2Properties(as_object& o)
 {
 
     // This is a normal property, can be overridden, deleted and enumerated
     // See swfdec/test/trace/movieclip-version-#.swf for why we only
     // initialize this if we don't have a parent
-    if (!o.get_parent()) o.init_member("$version",
+    DisplayObject* d = o.displayObject();
+    assert(d);
+    if (!d->get_parent()) o.init_member("$version",
             getVM(o).getPlayerVersion(), 0); 
 
 }
@@ -373,9 +375,10 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
         )
     }
 
-    // TODO: improve MovieClip ctor (and don't use it here anyway).
     Movie* m = getRoot(fn).topLevelMovie();
-    MovieClip* mc = new MovieClip(0, 0, m, ptr);
+    as_object* o = getGlobal(fn).createObject();
+    MovieClip* mc = new MovieClip(o, 0, m, ptr);
+    o->setDisplayObject(mc);
 
     mc->set_name(fn.arg(0).to_string());
     mc->setDynamic();
@@ -384,7 +387,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
     DisplayObject* ch = ptr->addDisplayListObject(mc, fn.arg(1).to_int());
-    return as_value(ch);
+    return as_value(getObject(ch));
 }
 
 
@@ -585,7 +588,7 @@ movieclip_attachMovie(const fn_call& fn)
         return as_value();
     }
 
-    return as_value(newch);
+    return as_value(getObject(newch));
 }
 
 
@@ -827,7 +830,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
         ch = movieclip->duplicateMovieClip(newname, depthValue);
     }
 
-    return as_value(ch);
+    return as_value(getObject(ch));
 }
 
 as_value
@@ -945,9 +948,9 @@ movieclip_loadMovie(const fn_call& fn)
 
     as_value val;
     if (fn.nargs > 1) {
-        val = movieclip->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = getObject(movieclip)->callMethod(NSV::PROP_METH, fn.arg(1));
     }
-    else val = movieclip->callMethod(NSV::PROP_METH);
+    else val = getObject(movieclip)->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -985,7 +988,7 @@ movieclip_loadMovie(const fn_call& fn)
     // This is just an optimization if we aren't going
     // to send the data anyway. It might be wrong, though.
     if (method != MovieClip::METHOD_NONE) {
-        getURLEncodedVars(*movieclip, data);
+        getURLEncodedVars(*getObject(movieclip), data);
     }
  
     mr.loadMovie(urlstr, target, data, method);
@@ -1004,9 +1007,9 @@ movieclip_loadVariables(const fn_call& fn)
     as_value val;
     if (fn.nargs > 1)
     {
-        val = movieclip->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = getObject(movieclip)->callMethod(NSV::PROP_METH, fn.arg(1));
     }
-    else val = movieclip->callMethod(NSV::PROP_METH);
+    else val = getObject(movieclip)->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -1147,7 +1150,7 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
     // we want 'undefined', not 'null'
     if (!ch) return as_value();
 
-    return as_value(ch);
+    return as_value(getObject(ch));
 }
 
 /// MovieClip.getURL(url:String[, window:String[, method:String]])
@@ -1273,7 +1276,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
 
     // Construct a flash.geom.Transform object with "this" as argument.
     fn_call::Args args;
-    args += movieclip;
+    args += getObject(movieclip);
 
     boost::intrusive_ptr<as_object> ts =
         tsCtor->constructInstance(fn.env(), args);
@@ -2363,7 +2366,7 @@ movieclip_transform(const fn_call& fn)
 
     // Construct a flash.geom.Transform object with "this" as argument.
     fn_call::Args args;
-    args += ptr;
+    args += getObject(ptr);
 
     boost::intrusive_ptr<as_object> newTrans =
         transCtor->constructInstance(fn.env(), args);
@@ -2402,11 +2405,14 @@ movieclip_as3_ctor(const fn_call& fn)
 {
     assert(isAS3(fn));
 
+    as_object* obj = ensure<ValidThis>(fn);
+
     // TODO: currently it's necessary to have a top-level movie to initialize
     // a MovieClip.
     Movie* m = getRoot(fn).topLevelMovie();
 
-    return new MovieClip(0, 0, m, 0);
+    obj->setDisplayObject(new MovieClip(obj, 0, m, 0));
+    return as_value();
 }
 
 

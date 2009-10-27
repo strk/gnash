@@ -1134,7 +1134,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
         return;
     }
 
-    boost::intrusive_ptr<MovieClip> sprite = ch->to_movie();
+    MovieClip* sprite = ch->to_movie();
     if ( ! sprite )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1313,8 +1313,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "instance"
-    boost::intrusive_ptr<as_object> instance = 
-        convertToObject(getGlobal(thread.env), env.top(0));
+    as_object* instance = convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
     as_function* super = env.top(1).to_as_function();
@@ -2206,7 +2205,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //         no matter the target found on stack (which
         //         is the target to load the resource into).
         //
-        DisplayObject* curtgt = env.get_target();
+        as_object* curtgt = getObject(env.get_target());
         if (!curtgt) {
             log_error(_("CommonGetUrl: current target is undefined"));
             return;

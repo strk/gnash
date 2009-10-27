@@ -69,9 +69,7 @@ protected:
 	/// Mark reachable resources (for the GC)
 	void markReachableResources() const
 	{
-		assert(isReachable());
         _def->setReachable();
-		markDisplayObjectReachable();
 	}
 #endif
 

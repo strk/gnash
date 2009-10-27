@@ -19,7 +19,6 @@
 
 #include "GnashSystemIOHeaders.h" // write()
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "log.h"
 #include "MovieClip.h"
@@ -799,7 +798,7 @@ movie_root::generate_mouse_button_events()
                 // all necessary events and removal of current focus.
                 // Do not set focus to NULL.
                 if (ms.activeEntity) {
-                    setFocus(ms.activeEntity.get());
+                    setFocus(ms.activeEntity);
 
 			        ms.activeEntity->mouseEvent(event_id::PRESS);
 			        need_redisplay=true;
@@ -1335,14 +1334,14 @@ movie_root::setFocus(DisplayObject* to)
 
         /// A valid focus must have an associated object.
         assert(getObject(from));
-        getObject(from)->callMethod(NSV::PROP_ON_KILL_FOCUS, to);
+        getObject(from)->callMethod(NSV::PROP_ON_KILL_FOCUS, getObject(to));
     }
 
     _currentFocus = to;
 
     if (to) {
         assert(getObject(to));
-        getObject(to)->callMethod(NSV::PROP_ON_SET_FOCUS, from);
+        getObject(to)->callMethod(NSV::PROP_ON_SET_FOCUS, getObject(from));
     }
 
     as_object* sel = getSelectionObject();
@@ -1362,7 +1361,7 @@ movie_root::setFocus(DisplayObject* to)
 DisplayObject*
 movie_root::getActiveEntityUnderPointer() const
 {
-	return m_mouse_button_state.activeEntity.get();
+	return m_mouse_button_state.activeEntity;
 }
 
 DisplayObject*

@@ -40,6 +40,7 @@
 #include "ExportableResource.h"
 #include "GnashAlgorithm.h"
 #include "SWFParser.h"
+#include "Global_as.h"
 
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
@@ -420,7 +421,9 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 Movie*
 SWFMovieDefinition::createMovie(DisplayObject* parent)
 {
-	return new SWFMovie(0, this, parent);
+    Global_as& gl = *VM::get().getGlobal();
+    as_object* o = gl.createObject();
+	return new SWFMovie(o, this, parent);
 }
 
 

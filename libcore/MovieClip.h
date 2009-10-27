@@ -772,9 +772,7 @@ public:
 
 protected:
 
-#ifdef GNASH_USE_GC
-    /// Mark sprite-specific reachable resources and invoke
-    /// the parent's class version (markDisplayObjectReachable)
+    /// Mark sprite-specific reachable resources.
     //
     /// sprite-specific reachable resources are:
     ///     - DisplayList items (current, backup and frame0 ones)
@@ -785,7 +783,6 @@ protected:
     /// - Relative root of this instance (_swf)
     ///
     virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
     
     // Used by BitmapMovie.
     void placeDisplayObject(DisplayObject* ch, int depth) {       

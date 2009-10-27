@@ -42,7 +42,7 @@ as_object* getMovieClipAS3Interface();
 void registerMovieClipNative(as_object& where);
 
 /// Used by MovieClip's ctor to attach properties to MovieClip instances.
-void attachMovieClipAS2Properties(DisplayObject& d);
+void attachMovieClipAS2Properties(as_object& o);
 
 /// Get an as_object with the AS2 MovieClip interface.
 as_object* getMovieClipAS2Interface();

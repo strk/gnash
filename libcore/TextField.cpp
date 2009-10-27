@@ -182,7 +182,7 @@ TextField::TextField(as_object* owner, DisplayObject* parent,
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = getSWFVersion(*parent);
+    int version = getSWFVersion(*owner);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -255,17 +255,17 @@ TextField::TextField(as_object* owner, DisplayObject* parent,
 void
 TextField::init()
 {
-    as_environment env(getVM(*this));
+    as_environment env(getVM(*getObject(this)));
     as_object* proto = env.find_object("_global.TextField.prototype");
     if (proto) {
         attachPrototypeProperties(*proto);
     }
      
-    set_prototype(proto);
+    getObject(this)->set_prototype(proto);
 
-    as_object* ar = getGlobal(*this).createArray();
-    ar->callMethod(NSV::PROP_PUSH, this);
-    set_member(NSV::PROP_uLISTENERS, ar);
+    as_object* ar = getGlobal(*getObject(this)).createArray();
+    ar->callMethod(NSV::PROP_PUSH, getObject(this));
+    getObject(this)->set_member(NSV::PROP_uLISTENERS, ar);
     
     registerTextVariable();
 
@@ -546,7 +546,7 @@ void
 TextField::replaceSelection(const std::string& replace)
 {
 
-    const int version = getSWFVersion(*this);
+    const int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
     
     const size_t start = _selection.first;
@@ -588,7 +588,7 @@ TextField::notifyEvent(const event_id& ev)
     {
 		case event_id::PRESS:
 		{
-			movie_root& root = getRoot(*this);
+			movie_root& root = getRoot(*getObject(this));
 			
 			int x_mouse = pixelsToTwips(root.getXMouseLoc());
 			int y_mouse = pixelsToTwips(root.getYMouseLoc());
@@ -856,7 +856,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -877,7 +877,7 @@ TextField::updateText(const std::wstring& wstr)
 void
 TextField::updateHtmlText(const std::string& str)
 {
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateHtmlText(wstr);
 }
@@ -914,7 +914,7 @@ TextField::setHtmlTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*this);
+            int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -947,7 +947,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*this);
+            int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -974,7 +974,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -983,7 +983,7 @@ std::string
 TextField::get_htmltext_value() const
 {
     const_cast<TextField*>(this)->registerTextVariable();
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
     return utf8::encodeCanonicalString(_htmlText, version);
 }
 
@@ -2000,7 +2000,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     /// Why isn't get_environment const again ?
     as_environment& env = const_cast<TextField*>(this)->get_environment();
 
-    as_object* target = env.get_target();
+    as_object* target = getObject(env.get_target());
     if ( ! target )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -2042,7 +2042,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     }
 
     ret.first = target;
-    ret.second = getStringTable(*this).find(parsedName);
+    ret.second = getStringTable(*object()).find(parsedName);
 
     return ret;
 }
@@ -2091,7 +2091,7 @@ TextField::registerTextVariable()
     // in that case update text value
     as_value val;
     
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(this));
     
     if (target->get_member(key, &val) )
     {
@@ -2134,7 +2134,7 @@ TextField::registerTextVariable()
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
                 getStringTable(*this).value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(getStringTable(*this).value(key), this);
+        sprite->set_textfield_variable(getStringTable(*getObject(this)).value(key), this);
 
     }
     _text_variable_registered=true;
@@ -2715,9 +2715,8 @@ TextField::getTextAlignment()
 void
 TextField::onChanged()
 {
-    as_value met(PROPNAME("onChanged"));
-    as_value targetVal(this);
-    callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal);
+    as_object* obj = getObject(this);
+    obj->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onChanged", obj);
 }
 
 /// This is called by movie_root when focus is applied to this TextField.
@@ -2729,7 +2728,7 @@ bool
 TextField::handleFocus()
 {
 
-    if (getSWFVersion(*this) < 6) return false;
+    if (getSWFVersion(*getObject(this)) < 6) return false;
 
     set_invalidated();
 
@@ -2740,7 +2739,7 @@ TextField::handleFocus()
 
     // why should we add to the key listener list every time
     // we call setFocus()???
-    getRoot(*this).add_key_listener(this);
+    getRoot(*getObject(this)).add_key_listener(this);
 
     m_cursor = _text.size();
     format_text();
@@ -2757,7 +2756,7 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    movie_root& root = getRoot(*this);
+    movie_root& root = getRoot(*getObject(this));
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
@@ -2766,13 +2765,8 @@ TextField::killFocus()
 void
 TextField::markReachableResources() const
 {
-
     if (_tag) _tag->setReachable();
-
     if (_font) _font->setReachable();
-
-    // recurse to parent...
-    markDisplayObjectReachable();
 }
 
 void
@@ -2913,7 +2907,9 @@ textfield_createTextField(const fn_call& fn)
     //  1. Call "new _global.TextField()" (which takes care of
     //     assigning properties to the prototype).
     //  2. Make that object into a TextField and put it on the display list.
-    DisplayObject* tf = new TextField(0, ptr, bounds);
+    as_object* obj = getGlobal(fn).createObject();
+
+    DisplayObject* tf = new TextField(obj, ptr, bounds);
 
     // Give name and mark as dynamic
     tf->set_name(name);
@@ -2928,7 +2924,7 @@ textfield_createTextField(const fn_call& fn)
     DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
 
     // createTextField returns void, it seems
-    if (getSWFVersion(fn) > 7) return as_value(txt);
+    if (getSWFVersion(fn) > 7) return as_value(getObject(txt));
     return as_value(); 
 }
 
@@ -3530,7 +3526,7 @@ textfield_text(const fn_call& fn)
     }
 
     // Setter
-    int version = getSWFVersion(*ptr);
+    int version = getSWFVersion(*getObject(ptr));
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -3548,7 +3544,7 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    const int version = getSWFVersion(*ptr);
+    const int version = getSWFVersion(*getObject(ptr));
     
     ptr->setHtmlTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
@@ -3581,7 +3577,7 @@ textfield_replaceSel(const fn_call& fn)
     const std::string& replace = fn.arg(0).to_string();
 
     /// Do nothing if text is empty and version less than 8.
-    const int version = getSWFVersion(*text);
+    const int version = getSWFVersion(*getObject(text));
     if (version < 8 && replace.empty()) return as_value();
 
     text->replaceSelection(replace);
@@ -3685,9 +3681,10 @@ textfield_ctor(const fn_call& fn)
 {
 
     if (isAS3(fn)) {
+        as_object* obj = ensure<ValidThis>(fn);
         SWFRect nullRect;
-        as_object* obj = new TextField(0, 0, nullRect);
-        return as_value(obj);
+        obj->setDisplayObject(new TextField(obj, 0, nullRect));
+        return as_value();
     }
 
     as_object* obj = ensure<ValidThis>(fn);

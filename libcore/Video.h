@@ -106,15 +106,12 @@ public:
 
 protected:
     
-#ifdef GNASH_USE_GC
-	/// Mark video-specific reachable resources and invoke
-	/// the parent's class version (markDisplayObjectReachable)
+	/// Mark video-specific reachable resources.
 	//
 	/// video-specific reachable resources are:
 	///	- Associated NetStream if any (_ns) 
 	///
 	virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
 
 private:
 
