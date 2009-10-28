@@ -2763,7 +2763,7 @@ TextField::killFocus()
 }
 
 void
-TextField::markReachableResources() const
+TextField::markOwnResources() const
 {
     if (_tag) _tag->setReachable();
     if (_font) _font->setReachable();

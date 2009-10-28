@@ -782,7 +782,7 @@ protected:
     /// - Textfields having an associated variable registered in this instance.
     /// - Relative root of this instance (_swf)
     ///
-    virtual void markReachableResources() const;
+    virtual void markOwnResources() const;
     
     // Used by BitmapMovie.
     void placeDisplayObject(DisplayObject* ch, int depth) {       

@@ -486,6 +486,7 @@ DisplayObject::unload()
 void
 DisplayObject::queueEvent(const event_id& id, int lvl)
 {
+    if (!_object) return;
     assert(_object);
 	movie_root& root = getRoot(*_object);
 	std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
@@ -748,14 +749,13 @@ DisplayObject::destroy()
 }
 
 void
-DisplayObject::setReachable() const
+DisplayObject::markReachableResources() const
 {
-    return;
-    markReachableResources();
+    markOwnResources();
     if (_object) _object->setReachable();
-	if (_parent) getObject(_parent)->setReachable();
-	if (_mask) getObject(_mask)->setReachable();
-	if (_maskee) getObject(_maskee)->setReachable();
+	if (_parent) _parent->setReachable();
+	if (_mask) _mask->setReachable();
+	if (_maskee) _maskee->setReachable();
 }
 
 void

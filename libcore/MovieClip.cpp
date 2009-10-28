@@ -128,7 +128,7 @@ public:
     ///
     virtual void markReachableResources() const
     {
-        //getObject(_target)->setReachable();
+        _target->setReachable();
     }
 #endif // GNASH_USE_GC
 
@@ -2380,17 +2380,17 @@ MovieClip::cleanupDisplayList()
 struct ReachableMarker {
     void operator() (DisplayObject *ch)
     {
-        //ch->setReachable();
+        ch->setReachable();
     }
 };
 void
-MovieClip::markReachableResources() const
+MovieClip::markOwnResources() const
 {
     ReachableMarker marker;
 
     _displayList.visitAll(marker);
 
-    //_environment.markReachableResources();
+    _environment.markReachableResources();
 
     // Mark our own definition
     if (_def.get()) _def->setReachable();

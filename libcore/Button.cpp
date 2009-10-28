@@ -852,7 +852,7 @@ Button::stagePlacementCallback(as_object* initObj)
 
 #ifdef GNASH_USE_GC
 void
-Button::markReachableResources() const
+Button::markOwnResources() const
 {
 
     _def->setReachable();

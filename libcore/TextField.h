@@ -615,7 +615,7 @@ protected:
 	///  - Our definition
 	///  - Common DisplayObject resources
 	///
-	void markReachableResources() const;
+	void markOwnResources() const;
 
 private:
 

@@ -146,7 +146,7 @@ protected:
 	///	- the vector of state DisplayObjects (_stateCharacters)
 	///	- the vector of hit DisplayObjects (_hitCharacters)
 	///
-	void markReachableResources() const;
+	void markOwnResources() const;
 #endif // GNASH_USE_GC
 
 private:

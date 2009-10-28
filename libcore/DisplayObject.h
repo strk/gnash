@@ -109,7 +109,7 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// dynamic DisplayObjects, but tags are not always stored. They are not
 /// stored in most InteractiveObjects because most properties can be
 /// overridden during SWF execution.
-class DisplayObject : boost::noncopyable
+class DisplayObject : public GcResource, boost::noncopyable
 {
 public:
 
@@ -973,7 +973,13 @@ public:
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
   
-    void setReachable() const;
+    /// Mark all reachable resources.
+    //
+    /// If a derived class provides access to more GC-managed
+    /// resources, it should override this method.
+    virtual void markReachableResources() const;
+
+    virtual void markOwnResources() const {}
 
 protected:
 
@@ -988,11 +994,6 @@ protected:
         _origTarget=getTarget();
     }
 
-    /// Mark all reachable resources.
-    //
-    /// If a derived class provides access to more GC-managed
-    /// resources, it should override this method.
-    virtual void markReachableResources() const {}
 
     const Events& get_event_handlers() const
     {
