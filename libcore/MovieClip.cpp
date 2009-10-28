@@ -2206,22 +2206,9 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
 {
     assert(request.completed());
 
-    // TODO: consider adding a setVariables(std::map) for use by this
-    //             and by Player class when dealing with -P command-line switch
-
     string_table& st = getStringTable(*this);
-    LoadVariablesThread::ValuesMap& vals = request.getValues();
-    for (LoadVariablesThread::ValuesMap::const_iterator it=vals.begin(),
-            itEnd=vals.end();
-        it != itEnd; ++it)
-    {
-        const std::string name = PROPNAME(it->first);
-        const std::string& val = it->second;
-#ifdef DEBUG_LOAD_VARIABLES
-        log_debug(_("Setting variable '%s' to value '%s'"), name, val);
-#endif
-        set_member(st.find(name), val);
-    }
+    MovieVariables& vals = request.getValues();
+    setVariables(vals);
 
     // We want to call a clip-event too if available, see bug #22116
     notifyEvent(event_id::DATA);
