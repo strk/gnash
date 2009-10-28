@@ -2206,7 +2206,6 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
 {
     assert(request.completed());
 
-    string_table& st = getStringTable(*this);
     MovieVariables& vals = request.getValues();
     setVariables(vals);
 
