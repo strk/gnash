@@ -331,7 +331,7 @@ Video::getBounds() const
 }
 
 void
-Video::markReachableResources() const
+Video::markOwnResources() const
 {
 	if (_ns) _ns->setReachable();
 }
