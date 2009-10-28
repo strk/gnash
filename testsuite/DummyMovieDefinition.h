@@ -22,6 +22,7 @@
 #include "SWFRect.h" // for composition
 #include "SWFMovie.h" // for createMovie
 #include "Global_as.h"
+#include "namedStrings.h"
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -132,7 +133,8 @@ public:
 	/// Create a playable movie instance from a def.
 	virtual Movie* createMovie(DisplayObject* parent=NULL)
 	{
-        as_object* o = VM::get().getGlobal()->createObject();
+        Global_as& gl = *VM::get().getGlobal();
+        as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
 		return new SWFMovie(o, this, parent);
 	}
 	

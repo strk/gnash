@@ -38,7 +38,7 @@ using namespace gnash;
 using namespace std;
 
 std::auto_ptr<MovieTester> tester;
-boost::intrusive_ptr<MovieClip> root;
+MovieClip* root;
 
 MovieClip*
 getCoverArt()
@@ -94,7 +94,7 @@ main(int /*argc*/, char** /*argv*/)
 
 
 	root = tester->getRootMovie();
-	assert(root.get());
+	assert(root);
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
@@ -173,10 +173,10 @@ main(int /*argc*/, char** /*argv*/)
 	tester->releaseKey(key::SHIFT);
 
 	// Consistency checking
-	string_table& st = getStringTable(*root);
+	string_table& st = getStringTable(*getObject(root));
 	as_value eot;
 	// It's an swf6, so lowercase 'END_OF_TEST'
-	bool endOfTestFound = root->get_member(st.find("end_of_test"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(st.find("end_of_test"), &eot);
 	check(endOfTestFound);
 	if ( endOfTestFound )
 	{

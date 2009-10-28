@@ -53,7 +53,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	// for variables lookup (consistency checking)
-	string_table& st = getStringTable(*root);
+	string_table& st = getStringTable(*getObject(root));
 
 	rgba white(255, 255, 255, 255); // background color
 	rgba blue(0, 0, 255, 255);      // blue circles fill color
@@ -97,7 +97,7 @@ main(int /*argc*/, char** /*argv*/)
 		const MovieClip* loadedTarget = 0;
 		//const DisplayObject* ch = tester.findDisplayItemByName(*root, "loadedTarget");
 		const DisplayObject* ch = tester.findDisplayItemByDepth(*root, 30);
-		if ( ch ) loadedTarget = ch->to_movie();
+		if ( ch ) loadedTarget = const_cast<DisplayObject*>(ch)->to_movie();
 		if ( loadedTarget )
 		{
 			const DisplayObject* target100 = tester.findDisplayItemByName(*loadedTarget, "target100");
@@ -170,7 +170,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Consistency check !!
 	as_value eot;
 	// It's an swf6, so lowercase 'ENDOFTEST'
-	bool endOfTestFound = root->get_member(st.find("endoftest"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
 	check(endOfTestFound);
 	if ( endOfTestFound )
 	{

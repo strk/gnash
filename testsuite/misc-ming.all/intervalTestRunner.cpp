@@ -63,75 +63,75 @@ main(int /*argc*/, char** /*argv*/)
 
 	VM& vm = VM::get();
 	string_table& st = vm.getStringTable();
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 
 	tester.advanceClock(500); // "sleep" 500 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 
 	tester.advanceClock(600); // "sleep" 500 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 2);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 	tester.advanceClock(500); // "sleep" 500 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 3);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 	tester.advanceClock(520); // "sleep" 520 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 2);
 
 	tester.advanceClock(1020); // "sleep" 1020 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 3);
 
 	tester.advanceClock(1020); // "sleep" 1020 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 
 	tester.advanceClock(520); // "sleep" 520 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("this_counter"), &tmp);
+	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 5);
-	root->get_member(st.find("that_counter"), &tmp);
+	getObject(root)->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 
-	root->get_member(st.find("pushed_args"), &tmp);
+	getObject(root)->get_member(st.find("pushed_args"), &tmp);
 	as_environment env(vm); // needed for proper to_string()
 	check_equals(tmp.to_string(), std::string("8,9,10"));
 
 	tester.advanceClock(100); // "sleep" another 100 milliseconds
 	tester.advance(); // run expired timers
 
-	root->get_member(st.find("test_completed"), &tmp);
+	getObject(root)->get_member(st.find("test_completed"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 
