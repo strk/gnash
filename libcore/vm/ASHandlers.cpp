@@ -1038,7 +1038,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     {
         as_object* obj = thread.getTarget();
 
-        target = dynamic_cast<DisplayObject*>(obj);
+        target = obj ? obj->displayObject() : 0;
         if ( ! target )
         {
             log_error(_("ActionGetProperty(<empty>) called, but current "
