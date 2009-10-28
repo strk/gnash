@@ -118,12 +118,12 @@ main(int argc, char *argv[])
     movie_root stage(*md, clock, runResources);
 
     MovieClip::MovieVariables v;
-    stage.init(md, v);
+    Movie* m = stage.init(md, v);
 
     // run the tests
     test_isnan();
     test_el();
-    test_obj(&stage.getRootMovie());
+    test_obj(getObject(m));
     test_conversion();
    
 }
