@@ -253,7 +253,7 @@ attachDisplayObjectProperties(as_object& /*o*/)
 as_value
 DisplayObject::blendMode(const fn_call& fn)
 {
-    DisplayObject* ch = ensure<ThisIs<DisplayObject> >(fn);
+    DisplayObject* ch = ensure<IsDisplayObject<> >(fn);
 
     // This is AS-correct, but doesn't do anything.
     // TODO: implement in the renderers!
