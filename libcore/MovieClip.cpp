@@ -97,7 +97,7 @@ namespace {
 
 /// ConstructEvent, used for queuing construction
 //
-/// It's execution will call constructAsScriptObject() 
+/// Its execution will call constructAsScriptObject() 
 /// on the target movieclip
 ///
 class ConstructEvent: public ExecutableCode {
@@ -1930,7 +1930,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #endif
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
-        std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
+        std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
         getRoot(*this).pushAction(code, movie_root::apCONSTRUCT);
 
     }
@@ -1972,7 +1972,7 @@ MovieClip::constructAsScriptObject()
             // instance name will be needed for properly setting up
             // a reference to 'this' object for ActionScript actions.
             // If the instance doesn't have a name, it will NOT be
-            // an ActionScript referenciable object so we don't have
+            // an ActionScript referenceable object so we don't have
             // anything more to do.
             break;
         }
