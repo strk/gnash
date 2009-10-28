@@ -25,13 +25,15 @@
 #include "log.h"
 #include "Bitmap.h"
 #include "Renderer.h"
+#include "Global_as.h"
 
 namespace gnash {
 
 Movie*
 BitmapMovieDefinition::createMovie(DisplayObject* parent)
 {
-    return new BitmapMovie(0, this, parent);
+    as_object* o = VM::get().getGlobal()->createObject();
+    return new BitmapMovie(o, this, parent);
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
