@@ -32,6 +32,7 @@
 #include "filter_factory.h"
 #include "GnashKey.h" // for gnash::key::codeMap
 #include "GnashAlgorithm.h"
+#include "Global_as.h"
 
 namespace gnash {
 namespace SWF {
@@ -237,7 +238,8 @@ DisplayObject*
 DefineButtonTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
     const
 {
-    DisplayObject* ch = new Button(0, this, parent);
+    as_object* obj = gl.createObject();
+    DisplayObject* ch = new Button(obj, this, parent);
     return ch;
 }
 
