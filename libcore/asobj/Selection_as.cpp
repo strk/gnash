@@ -104,8 +104,6 @@ attachSelectionInterface(as_object& o)
 as_value
 selection_getBeginIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
-    
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
 
@@ -126,8 +124,6 @@ selection_getBeginIndex(const fn_call& fn)
 as_value
 selection_getCaretIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
-
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
 
@@ -142,8 +138,6 @@ selection_getCaretIndex(const fn_call& fn)
 as_value
 selection_getEndIndex(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
-
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
 
@@ -159,8 +153,6 @@ selection_getEndIndex(const fn_call& fn)
 as_value
 selection_getFocus(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
-    
     movie_root& mr = getRoot(fn);
 
     DisplayObject* ch = mr.getFocus();
@@ -195,8 +187,6 @@ as_value
 selection_setFocus(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
-
     /// Handle invalid arguments: must be one argument, or no action is
     /// taken.
     if (!fn.nargs || fn.nargs > 1) {
@@ -225,8 +215,8 @@ selection_setFocus(const fn_call& fn)
     }
     else {
         /// Try converting directly to DisplayObject.
-        ch = dynamic_cast<DisplayObject*>(
-                focus.to_object(getGlobal(fn)));
+        as_object* obj = focus.to_object(getGlobal(fn));
+        ch = obj ? obj->displayObject() : 0;
     }
 
     // If the argument does not resolve to a DisplayObject, do nothing.
@@ -242,7 +232,6 @@ selection_setFocus(const fn_call& fn)
 as_value
 selection_setSelection(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
 
     movie_root& mr = getRoot(fn);
     DisplayObject* focus = mr.getFocus();
