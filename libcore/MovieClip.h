@@ -115,13 +115,6 @@ public:
     /// @param parent
     ///     Parent of the created instance in the display list.
     ///     May be 0 for top-level movies (_level#).
-    ///
-    /// @param id
-    ///     Identifier of the DisplayObject definition this is an instance
-    ///     of. This is required by DisplayObject class, but probably
-    ///     to be deprecated if every instance has a reference to its
-    ///     definition, which should know its id...
-    ///
     MovieClip(const movie_definition* const def, Movie* root,
             DisplayObject* parent);
 
@@ -151,7 +144,6 @@ public:
     ///
     /// all sprites except mouse-insensitive dynamic masks are hitable.
     /// _visible property is ignored for hitable DisplayObjects.
-    ///
     virtual bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
 
     /// Return 0-based index to current frame
@@ -269,19 +261,16 @@ public:
     /// @return
     /// True if the frame_spec could be resolved to a frame number.
     /// False if the frame_spec was invalid.
-    ///
     bool get_frame_number(const as_value& frame_spec, size_t& frameno) const;
 
     /// MovieClip instances need to handle cxform specially 
     //
     /// This is to suppor the Color asobject class
-    ///
     cxform  get_world_cxform() const;
 
     /// Update user-defined color transform
     //
     /// This should only be used by the Color AS class
-    ///
     void set_user_cxform(const cxform& cx)
     {
         set_invalidated();
@@ -291,7 +280,6 @@ public:
     /// Return the user-defined color transform
     //
     /// This should only be used by the Color AS class
-    ///
     cxform get_user_cxform() const
     {
         return _userCxform;
@@ -308,7 +296,6 @@ public:
     /// Swap depth of the given DisplayObjects in the DisplayList
     //
     /// See DisplayList::swapDepths for more info
-    ///
     void swapDepths(DisplayObject* ch1, int newdepth)
     {
         _displayList.swapDepths(ch1, newdepth);
@@ -317,7 +304,6 @@ public:
     /// Return the DisplayObject at given depth in our DisplayList.
     //
     /// @return NULL if the specified depth is available (no chars there)
-    ///
     DisplayObject* getDisplayObjectAtDepth(int depth);
 
     /// Attach a DisplayObject at the specified depth.
@@ -343,7 +329,6 @@ public:
     ///
     /// @return
     ///     A pointer to the DisplayObject being added or NULL
-    ///
     DisplayObject* add_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
@@ -376,7 +361,6 @@ public:
     /// will be set to the old one.
     /// if false, the transformation SWFMatrix of the new DisplayObject will
     /// be untouched.
-    ///
     void replace_display_object(DisplayObject* ch, int depth,
         bool use_old_cxform, bool use_old_matrix);
 
@@ -390,7 +374,6 @@ public:
     /// (2)the id might be used for specifying a DisplayObject
     /// in the depth(think about multiple DisplayObjects within the same
     /// depth, not tested and a rare case)
-    ///
     void remove_display_object(int depth, int /* id */)
     {
         set_invalidated();
@@ -409,7 +392,6 @@ public:
     ///
     /// @return true on success, false on failure
     /// FIXME: currently never returns false !
-    ///
     bool attachCharacter(DisplayObject& newch, int depth, as_object* initObject);
 
     /// Handle placement event
@@ -425,7 +407,6 @@ public:
     //
     /// (1) Construct this instance as an ActionScript object.
     ///     See constructAsScriptObject() method.
-    ///
     virtual void stagePlacementCallback(as_object* initObj = 0);
 
     /// Unload all contents in the displaylist and this instance
@@ -447,7 +428,6 @@ public:
     /// 
     /// Note: this function will release most memory associated with
     /// the sprite as no members or drawable should be needed anymore.
-    ///
     void destroy();
         
     /// Add the given action buffer to the list of action
@@ -473,7 +453,6 @@ public:
     ///
     /// @param cid
     /// The referenced DisplayObject id
-    ///
     void execute_init_action_buffer(const action_buffer& a, int cid);
 
     /// Execute a single action buffer (DOACTION block)
@@ -500,7 +479,6 @@ public:
     ///  IF not NULL, use as the POST body for HTTP requests
     ///
     /// Return: true if it succeeded, false otherwise
-    ///
     bool loadMovie(const URL& url, const std::string* postdata=NULL);
 
     /// \brief
@@ -518,7 +496,6 @@ public:
     ///
     /// @param sendVarsMethod: The VariablesMethod to use. If METHOD_NONE,
     ///                        no data will be sent.
-    ///
     void loadVariables(const std::string& urlstr,
             VariablesMethod sendVarsMethod);
 
@@ -551,7 +528,6 @@ public:
     /// Execute the actions for the specified frame. 
     //
     /// The frame_spec could be an integer or a string.
-    ///
     virtual void call_frame_actions(const as_value& frame_spec);
 
     // delegates to movie_root 
@@ -575,7 +551,6 @@ public:
     ///
     /// @param init_object
     ///     If not null, will be used to copy properties over.
-    ///
     MovieClip* duplicateMovieClip(const std::string& newname,
         int newdepth, as_object* init_object=NULL);
         
@@ -592,7 +567,6 @@ public:
     //
     /// A TextField variable is a variable that acts
     /// as a setter/getter for a TextField 'text' member.
-    ///
     void set_textfield_variable(const std::string& name, TextField* ch);
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
@@ -606,7 +580,6 @@ public:
     /// Placing an object at the depth returned by
     /// this function should result in a DisplayObject
     /// that is displayd above all others
-    ///
     int getNextHighestDepth() const {
         return _displayList.getNextHighestDepth();
     }
@@ -614,7 +587,6 @@ public:
     /// Set the currently playing m_sound_stream_id
     // 
     // TODO: rename to setStreamingSoundId
-    //
     void setStreamSoundId(int id);
 
     /// Remove this sprite from the stage.
@@ -638,7 +610,6 @@ public:
     /// A testcases for this behaviour can be found in 
     ///
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
-    ///
     void removeMovieClip();
 
     /// Create a Bitmap DisplayObject at the specified depth.
@@ -756,7 +727,6 @@ public:
     /// definition, either MovieClip or any user-speficied one
     /// (see sprite_definition::registerClass). 
     /// It will also invoke the onClipConstruct and onConstruct handlers.
-    ///
     void constructAsScriptObject();
 
     /// Return true if getAsRoot() should return the *relative* root,
