@@ -151,11 +151,12 @@ as_environment::get_variable(const std::string& varname,
             varname.find(':') == std::string::npos)
         {
             // Consider it all a path ...
-                as_object* target = find_object(varname, &scopeStack); 
+            as_object* target = find_object(varname, &scopeStack); 
             if ( target ) 
             {
                 // ... but only if it resolves to a sprite
-                MovieClip* m = target->to_movie();
+                DisplayObject* d = target->displayObject();
+                MovieClip* m = d ? d->to_movie() : 0;
                 if (m) return as_value(getObject(m));
             }
         }
@@ -1019,11 +1020,11 @@ void
 as_environment::markReachableResources() const
 {
     for (size_t i = 0; i < 4; ++i) {
-        //m_global_register[i].setReachable();
+        m_global_register[i].setReachable();
     }
 
-    if (m_target) getObject(m_target)->setReachable();
-    if (_original_target) getObject(_original_target)->setReachable();
+    if (m_target) m_target->setReachable();
+    if (_original_target) _original_target->setReachable();
 
     assert (_localFrames.empty());
     assert (_stack.empty());

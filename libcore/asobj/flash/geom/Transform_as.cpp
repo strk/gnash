@@ -346,7 +346,7 @@ transform_ctor(const fn_call& fn)
     as_object* o = fn.arg(0).to_object(getGlobal(fn));
     if (!o) return as_value();
 
-    MovieClip* mc = o->to_movie();
+    MovieClip* mc = o->displayObject() ? o->displayObject()->to_movie() : 0;
     if (!mc) return as_value();
 
     obj->setRelay(new Transform_as(*mc));

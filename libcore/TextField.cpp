@@ -2124,7 +2124,8 @@ TextField::registerTextVariable()
 #endif
     }
 
-    MovieClip* sprite = target->to_movie();
+    MovieClip* sprite = target->displayObject() ?
+        target->displayObject()->to_movie() : 0;
 
     if ( sprite )
     {

@@ -431,6 +431,8 @@ MovieClip::MovieClip(as_object* owner, const movie_definition* const def,
 {
     assert(_swf);
 
+    assert(owner);
+
     if (!isAS3(getVM(*owner))) {
         owner->set_prototype(getMovieClipAS2Interface());
         attachMovieClipAS2Properties(*owner);
@@ -623,7 +625,9 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         return NULL;
     }
 
-    MovieClip* newmovieclip = new MovieClip(0, _def.get(), _swf, parent);
+    as_object* o = getGlobal(*getObject(this)).createObject();
+
+    MovieClip* newmovieclip = new MovieClip(o, _def.get(), _swf, parent);
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();

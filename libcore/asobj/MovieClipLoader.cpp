@@ -306,7 +306,8 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	MovieClip* sp = target->to_movie();
+	MovieClip* sp = target->displayObject() ?
+        target->displayObject()->to_movie() : 0;
 	if (!sp) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "

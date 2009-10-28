@@ -378,7 +378,6 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     Movie* m = getRoot(fn).topLevelMovie();
     as_object* o = getGlobal(fn).createObject();
     MovieClip* mc = new MovieClip(o, 0, m, ptr);
-    o->setDisplayObject(mc);
 
     mc->set_name(fn.arg(0).to_string());
     mc->setDynamic();
@@ -387,7 +386,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
     DisplayObject* ch = ptr->addDisplayListObject(mc, fn.arg(1).to_int());
-    return as_value(getObject(ch));
+    return as_value(o);
 }
 
 

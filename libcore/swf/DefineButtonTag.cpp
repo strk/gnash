@@ -33,6 +33,8 @@
 #include "GnashKey.h" // for gnash::key::codeMap
 #include "GnashAlgorithm.h"
 #include "Global_as.h"
+#include "namedStrings.h"
+#include "as_function.h"
 
 namespace gnash {
 namespace SWF {
@@ -239,6 +241,11 @@ DefineButtonTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
     const
 {
     as_object* obj = gl.createObject();
+
+    as_function* ctor = gl.getMember(NSV::CLASS_BUTTON).to_as_function();
+    as_object* proto = ctor ?
+        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
+    obj->set_prototype(proto);
     DisplayObject* ch = new Button(obj, this, parent);
     return ch;
 }
