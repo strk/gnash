@@ -111,7 +111,7 @@ protected:
 	/// video-specific reachable resources are:
 	///	- Associated NetStream if any (_ns) 
 	///
-	virtual void markReachableResources() const;
+	virtual void markOwnResources() const;
 
 private:
 
