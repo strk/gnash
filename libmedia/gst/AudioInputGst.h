@@ -113,14 +113,7 @@ class GnashAudio {
         ///      device (e.g. Built-In Microphone or HDA Intel).
         gchar* _productName;
 };
-
-GnashAudio::GnashAudio() {
-    _element = NULL;
-    _devLocation = NULL;
-    _gstreamerSrc = NULL;
-    _productName = NULL;
-}
-
+ 
 /// \class GnashAudioPrivate
 ///
 /// \brief This class is initialized once a hardware input device is chosen
@@ -230,21 +223,7 @@ class GnashAudioPrivate {
         /// element is currently in it's 'playing' state or not
         gboolean _pipelineIsPlaying;
 };
-
-GnashAudioPrivate::GnashAudioPrivate() {
-    audioSource = NULL;
-    audioEnc = NULL;
-    _audioDevice = NULL;
-    _deviceName = NULL;
-    _pipeline = NULL;
-    _audioMainBin = NULL;
-    _audioPlaybackBin = NULL;
-    _audioSourceBin = NULL;
-    _audioSaveBin = NULL;
-    _pipelineIsPlaying = false;
-    _mux = NULL;
-};
-
+ 
 /// \class AudioInputGst
 /// \brief The main AudioInputGst class, which actually doesn't store too
 /// much important information (most of that is stored in the GnashAudio
