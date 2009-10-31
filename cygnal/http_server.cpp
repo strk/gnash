@@ -87,7 +87,8 @@ HTTPServer::~HTTPServer()
 boost::shared_ptr<amf::Buffer>
 HTTPServer::processClientRequest(int fd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
     boost::shared_ptr<amf::Buffer> result;
     
@@ -190,35 +191,17 @@ HTTPServer::processGetRequest(int fd)
     writeNet(fd, reply);
 
     size_t filesize = filestream->getFileSize();
-    size_t bytes_read = 0;
-    int ret;
-    size_t page = 0;
+    // size_t bytes_read = 0;
+    // int ret;
+    // size_t page = 0;
     if (filesize) {
 #ifdef USE_STATS_CACHE
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif
-	size_t getbytes = 0;
-	if (filesize <= filestream->getPagesize()) {
-	    getbytes = filesize;
-	} else {
-	    getbytes = filestream->getPagesize();
-	}
-	if (filesize >= CACHE_LIMIT) {
-	    do {
-		filestream->loadToMem(page);
-		ret = writeNet(fd, filestream->get(), getbytes);
-		if (ret <= 0) {
-		    break;
-		}
-		bytes_read += ret;
-		page += filestream->getPagesize();
-	    } while (bytes_read <= filesize);
-	} else {
-	    filestream->loadToMem(filesize, 0);
-	    ret = writeNet(fd, filestream->get(), filesize);
-	}
-	filestream->close();
+	
+	filestream->play(fd);
+	
 #ifdef USE_STATS_CACHE
 	struct timespec end;
 	clock_gettime (CLOCK_REALTIME, &end);
@@ -228,8 +211,6 @@ HTTPServer::processGetRequest(int fd)
 	     << time << " seconds for net fd #" << fd << endl;
 #endif
     }
-
-    log_debug("http_handler all done transferring requested file \"%s\".", _filespec);
     
     return buf;
 }
@@ -964,23 +945,46 @@ http_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
-    string url, filespec, parameters;
-    HTTPServer *www = new HTTPServer;
-    bool result = false;
+    Handler *hand = reinterpret_cast<Handler *>(args->handler);
+    HTTPServer *www = reinterpret_cast<HTTPServer *>(args->entry);
+    // HTTPServer *www = new HTTPServer;
     
-//    Network *net = reinterpret_cast<Network *>(args->handler);
+    string url, parameters;
+    bool result = false;    
     bool done = false;
-//    www.setHandler(net);
 
     log_network(_("Starting HTTP Handler for fd #%d, tid %d"),
 	      args->netfd, args->tid);
     
     www->setDocRoot(crcfile.getDocumentRoot());
-
     log_network("Docroot for HTTP files is %s", crcfile.getDocumentRoot());
 
     log_network("Starting to wait for data in net for fd #%d", args->netfd);
 
+    // If we have active disk streams, send those packets first.
+    // 0 is a reserved stream, so we start with 1, as the reserved
+    // stream isn't one we care about here.
+    log_network("%d active disk streams", hand->getActiveDiskStreams());
+    for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
+	hand->getDiskStream(i).dump();
+	if (hand->getDiskStream(i).getState() == DiskStream::PLAY) {
+	    if (!hand->getDiskStream(i).play()) {
+	//     boost::uint8_t *ptr = hand->getDiskStream(i).get();
+	//     if (ptr) {
+	// 	// if (rtmp->sendMsg(hand->getClient(i), 8,
+	// 	// 	RTMP::HEADER_8, 4096,
+	// 	// 	RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
+	// 	// 	ptr, 4096)) {
+	// 	// }
+	    } else {
+		log_network("ERROR: No stream for client %d", i);
+	    }
+	    // if (hand->getDiskStream(i).getState() == DiskStream::DONE) {
+	    //     hand->removeDiskStream();
+	    //     return result;
+	}
+    }
+    
     // Wait for data, and when we get it, process it.
     do {
 	
@@ -991,15 +995,16 @@ http_handler(Network::thread_params_t *args)
 
 	// See if we have any messages waiting
 	if (www->recvMsg(args->netfd) == 0) {
+	    log_debug("Net HTTP server failed to read from fd #%d...", args->netfd);
+	    return false;
 	    done = true;
 	}
 
 	// Process incoming messages
 	if (!www->processClientRequest(args->netfd)) {
-//	    hand->die();	// tell all the threads for this connection to die
-//	    hand->notifyin();
-	    log_debug("Net HTTP server done for fd #%d...", args->netfd);
-//	    done = true;
+	    log_network("Net HTTP server done for fd #%d...", args->netfd);
+	    result = false;
+	    done = true;
 	}
 //	www->dump();
 	if ((www->getField("content-type") == "application/x-amf")
@@ -1031,7 +1036,6 @@ http_handler(Network::thread_params_t *args)
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
 	    result = true;
-//	    done = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
