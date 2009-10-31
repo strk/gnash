@@ -223,7 +223,7 @@ Cygnal::~Cygnal()
 bool
 Cygnal::loadPeersFile()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     loadPeersFile("./peers.conf");
 
@@ -823,11 +823,8 @@ connection_handler(Network::thread_params_t *args)
 	} else {
 	    log_network("*** New %s network connection for thread ID #%d, fd #%d ***",
 			proto_str[args->protocol], tid, fd);
+	    tids.increment();
 	}
-	
-	// struct pollfd fds;
-	// fds.fd = args->netfd;
-	// fds.events = POLLIN | POLLRDHUP;
 
 	// Each dispatch thread gets it's own argument data and
 	// network connection data.
@@ -836,47 +833,55 @@ connection_handler(Network::thread_params_t *args)
 	// Setup HTTP handler
 	//
 	if (args->protocol == Network::HTTP) {
-	    boost::shared_ptr<Handler> hand(new Handler);
-	    Network::thread_params_t *hargs = new Network::thread_params_t;
-	    HTTPServer *http = new HTTPServer;
+	    Network::thread_params_t hargs;
+	    // std::copy(args, args+sizeof(Network::thread_params_t), &hargs);
+	    hargs.protocol = args->protocol;
+	    hargs.netfd = args->netfd;
 #if 0
 	    http->recvMsg(args->netfd);
 	    boost::shared_ptr<amf::Buffer> buf(http->peekChunk());
-	    http->processHeaderFields(*buf);
-	    string hostname;
+	    http.processHeaderFields(*buf);
+	    string hostname, path;
 	    string::size_type pos = http->getField("host").find(":", 0);
 	    if (pos != string::npos) {
 		hostname += http->getField("host").substr(0, pos);
 	    } else {
 		hostname += "localhost";
 	    }
-	    hargs->filespec = hostname + http->getFilespec();
-#else
-	    hargs->filespec = docroot;
+	    path = http->getFilespec();
+	    string key = hostname + path;
 #endif
-	    hargs->netfd = args->netfd;
-	    hargs->protocol = args->protocol;
-	    hargs->entry = http;
-	    hargs->tid = tid;
-	    log_network("Starting new event handler thread for fd #%d, tid #%d",
-			args->netfd, tid);
-	    tids.increment();
-	    hand->addClient(hargs->netfd, Network::HTTP);
-	    hargs->handler = reinterpret_cast<void *>(hand.get());
-	    boost::bind(http_handler, hargs);
+	    Handler *hand = 0;
+	    if (!hand) {
+		hand = new Handler;		
+		log_network("Creating new %s Handler for fd #%d",
+			    proto_str[hargs.protocol], hargs.netfd);
+		hand->addClient(hargs.netfd, Network::HTTP);
+		hargs.handler = hand;
+		HTTPServer *http = new HTTPServer;
+		hargs.entry = http;
+		// cyg.addHandler(key, hand);
+	    } else {
+		log_network("Resuing %s Handler for fd #%d",
+			    proto_str[hargs.protocol], hargs.netfd);
+	    }
+	    // hargs->handler = reinterpret_cast<void *>(hand.get());
+	    // hargs.filespec = key;
+	    // log_network("Starting new event handler thread for fd #%d, tid #%d",
+	    // 		args->netfd, tid);
 
 	    // If in multi-threaded mode (the default), start a thread
 	    // with a connection_handler for each port we're interested
 	    // in. Each port of course has a different protocol.
-#if 0
+	    boost::bind(http_handler, &hargs);
 	    if (crcfile.getThreadingFlag() == true) {
-		boost::thread event_thread(boost::bind(&event_handler, hargs));
+		boost::thread event_thread(boost::bind(&event_handler, &hargs));
 	    } else {
-#endif
-		event_handler(hargs);
+		event_handler(&hargs);
 		// We're done, close this network connection
-		net.closeNet(args->netfd);
-	    // }
+		net.closeNet(hargs.netfd);
+		// hand->removeClient(hargs->netfd);
+	    }
 	    // delete http;
 	} // end of if HTTP
 	
@@ -900,7 +905,7 @@ connection_handler(Network::thread_params_t *args)
 			    proto_str[args->protocol], key, args->netfd);
 		hand.reset(new Handler);
 		cyg.addHandler(key, hand);
-		args->entry = rtmp;
+		// args->entry = rtmp;
 		hand->setNetConnection(rtmp->getNetConnection());
 		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
 		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
@@ -1050,22 +1055,29 @@ event_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
+    Network::thread_params_t largs;
+    // std::copy(args, args+sizeof(Network::thread_params_t), &largs);    
+    Handler *hand = reinterpret_cast<Handler *>(args->handler);
+    largs.protocol = args->protocol;
+    largs.netfd = args->netfd;
+    largs.port = args->port;
+    largs.entry = args->entry;
+    // Handler *hand = new Handler;
+
     Network net;
     int timeout = 30;
     bool done = false;
-    
-    Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    
+#if 0
     // Extract the hostname and path to the cgi-bin sandbox.
     string host;
     string path;
-    string::size_type pos = args->filespec.find("/", 0);
+    string::size_type pos = largs.filespec.find("/", 0);
     if (pos != string::npos) {
-	host = args->filespec.substr(0, pos);
-	path = args->filespec.substr(pos+1, args->filespec.size());
+	host = largs.filespec.substr(0, pos);
+	path = largs.filespec.substr(pos+1, largs.filespec.size());
     }
 
-    if (args->protocol != Network::HTTP) {
+    if (largs.protocol != Network::HTTP) {
 	if (host.empty()) {
 	    log_error("No hostname supplied for handler!");
 	    return;
@@ -1077,16 +1089,21 @@ event_handler(Network::thread_params_t *args)
     }
     
     hand->setName(path);
-#if 0
-    if (!hand->initialized()) {
-	log_network("Starting Handler for %s", path);
-    }
+    string fullpath = docroot + "/";
+    fullpath += host + "/";
+    fullpath += path;
+    log_network("Starting event_handler for %s", fullpath);
 #endif
+    
     do {
 	net.setTimeout(timeout);
 	fd_set hits;
 	// Wait for something from one of the file descriptors
 	hits = net.waitForNetData(hand->getClients());
+	if (FD_ISSET(0, &hits)) {
+	    log_network("Got no hits");
+	    return;
+	}   
 	int max = 0;
 	// We need to calculate the highest numbered file descriptor
 	// for select. We may want to do this elsewhere, as it could
@@ -1110,27 +1127,38 @@ event_handler(Network::thread_params_t *args)
 		      log_error("No protocol specified!");
 		      break;
 		  case Network::HTTP:
-		      args->netfd = i;
-		      args->filespec = path;
-		      if (!http_handler(args)) {
-			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, path);
+		      largs.netfd = i;
+		      // largs.filespec = fullpath;
+		      if (!http_handler(&largs)) {
+			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, largs.filespec);
+			  // hand->removeClient(args->netfd);
 			  return;
-		      }		      
+			  done = true;
+		      }   
 		      break;
 		  case Network::RTMP:
 		      args->netfd = i;
-		      args->filespec = path;
+		      // args->filespec = path;
 		      if (!rtmp_handler(args)) {
-			  log_network("Done with RTMP connection for fd #%d, CGI %s", i, path);
+			  log_network("Done with RTMP connection for fd #%d, CGI ", i, largs.filespec);
 			  return;
 		      }
 		      break;
 		  case Network::RTMPT:
 		      args->netfd = i;
-		      args->filespec = path;
-		      http_handler(args);
+		      // args->filespec = path;
+		      if (!http_handler(args)) {
+			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, largs.filespec);
+			  return;
+		      }		      
 		      break;		      
 		  case Network::RTMPTS:
+		      args->netfd = i;
+		      // args->filespec = path;
+		      if (!http_handler(args)) {
+			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, largs.filespec);
+			  return;
+		      }		      
 		      break;
 		  case Network::RTMPE:
 		      break;
@@ -1140,7 +1168,7 @@ event_handler(Network::thread_params_t *args)
 		      break;
 		  default:
 		      log_error("Unsupported network protocol for fd #%d, %d",
-				args->netfd, hand->getProtocol(i));
+				largs.netfd, hand->getProtocol(i));
 		      done = true;
 		      break;
 		}
