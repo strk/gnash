@@ -623,6 +623,8 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 // 	_pagesize = pageSize;
 //     }
     
+    _state = OPEN;
+    
     return true;
 }
 
@@ -645,18 +647,40 @@ DiskStream::play()
 bool
 DiskStream::play(int netfd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     _netfd = netfd;
-    _state = PLAY;
 
-    log_unimpl("%s", __PRETTY_FUNCTION__);
-    
     while (_state != DONE) {
         switch (_state) {
+	  case NO_STATE:
+	      log_network("No Diskstream open for %d", netfd);
+	      break;
+          case CREATED:
+          case OPEN:
           case PLAY:
-              _state = DONE;
-              break;
+	  {
+	      int ret;
+	      if ((_filesize - _offset) < _pagesize) {
+		  ret = sendfile(netfd, _filefd, &_offset, _filesize - _offset);
+		  log_debug("Done playing file %s, size was: %d", _filespec, _filesize);
+		  _state = DONE;
+	      } else {
+		  ret = sendfile(netfd, _filefd, &_offset, _pagesize);
+		  log_debug("Playing part of file %s, offset is: %d", _filespec, _offset);
+		  _state = PLAY;
+	      }
+	      switch (ret) {
+		case EINVAL:
+		case ENOSYS:
+		case EFAULT:
+		    log_network("ERROR: %s", strerror(errno));
+		    break;
+		default:
+		    break;
+	      }
+	      break;
+	  }
           case PREVIEW:
               break;
           case THUMBNAIL:
@@ -689,8 +713,6 @@ DiskStream::play(int netfd)
     _seekptr += nbytes;
 #endif
     
-    log_debug("Done...");
-	   
 #ifdef _WIN32
     UnmapViewOfFile(_dataptr);
 #elif defined(__amigaos4__)
