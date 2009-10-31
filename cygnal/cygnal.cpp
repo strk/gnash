@@ -865,10 +865,6 @@ connection_handler(Network::thread_params_t *args)
 		log_network("Resuing %s Handler for fd #%d",
 			    proto_str[hargs.protocol], hargs.netfd);
 	    }
-	    // hargs->handler = reinterpret_cast<void *>(hand.get());
-	    // hargs.filespec = key;
-	    // log_network("Starting new event handler thread for fd #%d, tid #%d",
-	    // 		args->netfd, tid);
 
 	    // If in multi-threaded mode (the default), start a thread
 	    // with a connection_handler for each port we're interested

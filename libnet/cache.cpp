@@ -89,14 +89,17 @@ Cache::addResponse(const std::string &name, const std::string &response)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(cache_mutex);
+
     _responses[name] = response;
 }
 
 void
 Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     boost::mutex::scoped_lock lock(cache_mutex);
+    log_network("Adding file %s to cache.", name);
     _files[name] = file;
 }
 
@@ -138,6 +141,8 @@ boost::shared_ptr<DiskStream>
 Cache::findFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
+
+    log_network("Trying to find %s in the cache.", name);
     boost::mutex::scoped_lock lock(cache_mutex);
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
