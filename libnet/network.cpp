@@ -1251,7 +1251,7 @@ Network::getEntry(int fd)
 boost::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
-  //    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
@@ -1435,7 +1435,10 @@ Network::waitForNetData(int limit, fd_set files)
 	FD_ZERO(&fdset);
     }
 
-    if (ret) {
+    if (ret < 0) {
+	log_error("select() got an error: %s.", strerror(errno));
+	FD_SET(0, &fdset);
+    } else {
 	log_network("select() saw activity on %d file descriptors.", ret);
     }
 
