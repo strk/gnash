@@ -636,7 +636,15 @@ DiskStream::play()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return play(_netfd);
+    return play(_netfd, true);
+}
+
+bool
+DiskStream::play(bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    return play(_netfd, flag);
 }
 
 /// \brief Stream the file that has been loaded,
@@ -645,13 +653,13 @@ DiskStream::play()
 ///
 /// @return True if the data was streamed sucessfully, false if not.
 bool
-DiskStream::play(int netfd)
+DiskStream::play(int netfd, bool flag)
 {
     GNASH_REPORT_FUNCTION;
 
     _netfd = netfd;
 
-    while (_state != DONE) {
+    while ((_state != DONE) || !flag) {
         switch (_state) {
 	  case NO_STATE:
 	      log_network("No Diskstream open for %d", netfd);

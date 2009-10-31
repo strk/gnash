@@ -114,9 +114,12 @@ public:
     ///
     /// @param netfd An optional file descriptor to read data from
     ///
+    /// @param flag True to play the entire file, false to play part.
+    ///
     /// @return True if the data was streamed sucessfully, false if not.
     bool play();
-    bool play(int netfd);
+    bool play(bool flag);
+    bool play(int netfd, bool flag);
     
     /// \brief Stream a preview of the file.
     ///		A preview is a series of video frames from

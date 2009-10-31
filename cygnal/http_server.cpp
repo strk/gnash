@@ -162,12 +162,13 @@ HTTPServer::processGetRequest(int fd)
 
     string url = _docroot + _filespec;
     // See if the file is in the cache and already opened.
-    boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
+    boost::shared_ptr<DiskStream> filestream(cache.findFile(_filespec));
     if (filestream) {
-	cerr << "FIXME: found file in cache!" << endl;
+	log_debug("FIXME: found file %s in cache!", _filespec);
     } else {
 	filestream.reset(new DiskStream);
-//	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
+	cache.addFile(_filespec, filestream);
+	cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
 	
 //	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
@@ -180,6 +181,7 @@ HTTPServer::processGetRequest(int fd)
 		formatErrorResponse(HTTPServer::NOT_FOUND);
 	    } else {
 		cache.addPath(_filespec, filestream->getFilespec());
+		cache.addFile(_filespec, filestream);
 	    }
 	}
     }
@@ -198,9 +200,8 @@ HTTPServer::processGetRequest(int fd)
 #ifdef USE_STATS_CACHE
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
-#endif
-	
-	filestream->play(fd);
+#endif	
+	filestream->play(fd, true);
 	
 #ifdef USE_STATS_CACHE
 	struct timespec end;
