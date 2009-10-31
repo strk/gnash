@@ -94,7 +94,8 @@ Handler::sync(int /* in_fd */)
 size_t
 Handler::addClient(int x, Network::protocols_supported_e proto)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+
     boost::mutex::scoped_lock lock(_mutex);
     _clients.push_back(x);
     _protocol[x] = proto;
@@ -105,9 +106,12 @@ Handler::addClient(int x, Network::protocols_supported_e proto)
 void
 Handler::removeClient(int x)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+
     boost::mutex::scoped_lock lock(_mutex);
-    _clients.erase(_clients.begin()+x);
+    if (_clients.size()) {
+	_clients.erase(_clients.begin()+x);
+    }
 }
 
 void 
@@ -251,7 +255,7 @@ Handler::findStream(const std::string &filespec)
 
 // Create a new DiskStream
 double
-Handler::createStream(double transid)
+Handler::createStream(double /* transid */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -262,9 +266,9 @@ Handler::createStream(double transid)
 
 // Create a new DiskStream
 double
-Handler::createStream(double transid, const std::string &filespec)
+Handler::createStream(double /* transid */, const std::string &filespec)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     if (filespec.empty()) {
 	return -1;
@@ -310,7 +314,7 @@ Handler::playStream(const std::string &filespec)
     return false;
 }
 
-// Publish a live RTMP stream
+// Publish a live stream
 int
 Handler::publishStream()
 {

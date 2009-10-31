@@ -117,8 +117,11 @@ public:
     void setName(const std::string &x) { _name = x; };
     std::string &getName() { return _name; }
 
-    // Check the status of active disk streams
-    int getActiveDiskStreams() { return _streams; }
+    // Check the status of active disk streams, which is one less than
+    // default as the Streams IDs start at 1.
+    int getActiveDiskStreams() { return _streams - 1; }
+    int removeDiskStream() { return --_streams; }
+    
     // Operate on a disk streaming inprogress
     gnash::DiskStream &getDiskStream(int x) { return _diskstreams[x]; }
 
