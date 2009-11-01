@@ -60,7 +60,7 @@ AC_DEFUN([GNASH_PATH_FIREFOX],
 
        elif test "x${NPAPI_INSTALL_POLICY}" = "xsystem"; then
 
-          for dir in /usr/lib/mozilla/plugins /usr/lib/firefox/plugins; do
+          for dir in /usr/lib64/mozilla/plugins /usr/lib/mozilla/plugins /usr/lib64/firefox/plugins /usr/lib/firefox/plugins; do
              if test -d $dir; then
                 FIREFOX_PLUGINS=$dir
                 break
