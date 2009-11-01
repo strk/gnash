@@ -2015,7 +2015,7 @@ if test "$media_handler" = "gst"; then
   dnl development, only the runtime. In these caes we often have the header
   dnl files but not the libraries.
   if test x"${has_gstreamer_plugins_base}" = xyes; then
-    GSTREAMER_LIBS="-lgstinterfaces-0.10 $(GSTREAMER_LIBS)"
+    GSTREAMER_LIBS="-lgstinterfaces-0.10 $GSTREAMER_LIBS"
     AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
   fi
   if test x"${media_handler_specified}" = xfalse; then
