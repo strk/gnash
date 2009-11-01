@@ -223,7 +223,11 @@ public:
     ///
     /// @return nothing.
     void setPagesize(size_t size) { _pagesize = size; };
-    
+
+    /// \brief copy another DiskStream into ourselves, so they share data
+    ///		in memory.
+    DiskStream &operator==(DiskStream &stream);
+
     /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
      void dump();
@@ -231,9 +235,11 @@ public:
 
     /// \brief Get the base address for the memory page.
     ///
-    /// @return A real pointer to the base address dat in the file, but after
+    /// @return A real pointer to the base address data in the file, but after
     /// the header bytes.
     boost::uint8_t *get() { return _dataptr; };
+    bool fullyPopulated();
+//    bool fullyPopulated() { return ((_seekptr - _filesize) == _dataptr); };
     
     /// \brief Get the size of the file.
     ///
@@ -300,7 +306,8 @@ private:
     size_t	_max_memload;
     
     /// \var DiskStream::_seekptr
-    ///		The current location within the current memory page.
+    ///		The current location within the current memory page where
+    ///		the data ends, which is in increments of the empry page size.
     boost::uint8_t *_seekptr;
 
     /// \var DiskStream::_filesize
