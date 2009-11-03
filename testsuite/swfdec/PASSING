@@ -310,6 +310,8 @@ crash-0.5.5-stylesheet-update-8.swf:73a61afbd582fabd2dbba360cc3763e4
 crash-0.5.90-empty-action.swf:c564ca09c4bc71fb89b042bc07d247eb
 crash-0.6.2-replaceText-5.swf:f9a3132918e7d3daaca3bb8122b8b847
 crash-0.6.2-replaceText-6.swf:26a8a906a7ab6dc2411d0c72d84cbdfa
+crash-0.6.2-replaceText-7.swf:da9ccc92ab99681f702edc62d143edf7
+crash-0.6.2-replaceText-8.swf:569cae4f87d6748fb8e10ef807bc43a5
 crash-0.6.2-try-and-exception-on-dispose-5.swf:8f84852b71f51a23f9e13ddfdfc2a2c5
 crash-0.6.2-try-and-exception-on-dispose-6.swf:d38fff4fefc1cdce2acd57e86fdce995
 crash-0.6.2-try-and-exception-on-dispose-7.swf:25f0b3acc112898018b1636cc1817cc9
@@ -352,6 +354,8 @@ crash-0.7.1-uncompressed-half-samples-7.swf:bd828f2702ae2d96c31f0ec74e8eb2d9
 crash-0.7.1-uncompressed-half-samples-8.swf:8043058b7c22459d2f8ef3f69884cf04
 crash-0.7.2-TextField-replace-infloop-5.swf:f36e906743e23c4918becdb34d6c08cf
 crash-0.7.2-TextField-replace-infloop-6.swf:a75b13bb89ab3f2fc673ba2af3fa856f
+crash-0.7.2-TextField-replace-infloop-7.swf:0ad8fff952c056d4cbbf2baeb449c1b7
+crash-0.7.2-TextField-replace-infloop-8.swf:9d5677d123c2b1b2ef48730214341404
 crash-0.7.5-draw-on-disposed-bitmap-5.swf:073596b26cce990e4a32088da6c19f4c
 crash-0.7.5-draw-on-disposed-bitmap-6.swf:63105692441eb2330261237f05b02d32
 crash-0.7.5-draw-on-disposed-bitmap-7.swf:b1b51478084d0c203e9c1b19ea1c8552

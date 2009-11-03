@@ -3647,10 +3647,78 @@ textfield_maxscroll(const fn_call& fn)
 as_value
 textfield_replaceText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
-    UNUSED(text);
+    using std::string;
+    using std::wstring;
 
-    LOG_ONCE(log_unimpl("TextField.replaceText()"));
+    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+
+    if ( fn.nargs < 3 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("TextField.replaceText() called with less than 3 args"));
+        )
+        return as_value();
+    }
+
+    int userEnd = fn.arg(1).to_int();
+    if ( userEnd < 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("TextField.replaceText(%s): negative endIndex"
+            " - doing nothing", ss.str());
+        );
+        return as_value();
+    }
+
+    wstring::size_type start = fn.arg(0).to_int();
+    wstring::size_type end = userEnd;
+
+    int version = getSWFVersion(*text);
+
+    // TODO: check if it's possible for SWF6 to use this function
+    //       and if it is whether to_string should be to_string_versioned
+    //       (affects the way undefined values are considered)
+    const wstring& replacement =
+        utf8::decodeCanonicalString(fn.arg(2).to_string(), version);
+
+    // TODO: drop this round uf8 encoding and decoding by exposing
+    //       a TextField::getTextValue ?
+    const wstring& subject =
+        utf8::decodeCanonicalString(text->get_text_value(), version);
+
+    if ( start > subject.length() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("TextField.replaceText(%s): beginIndex out of range"
+            " - doing nothing", ss.str());
+        );
+        return as_value();
+    }
+
+
+    // TODO: use STL proper
+    wstring newstring;
+    if ( start ) newstring = subject.substr(0, start);
+    newstring.append(replacement);
+
+    if ( end > subject.length() )
+    {
+        //log_aserror...
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("TextField.replaceText(%s): endIndex out of range"
+            " - taking as end of string", ss.str());
+        );
+    }
+    else
+    {
+        newstring.append(subject.substr(end));
+    }
+
+    // TODO: check if we should really be updating registered variables
+    text->setTextValue(newstring);
 
     return as_value();
 }
