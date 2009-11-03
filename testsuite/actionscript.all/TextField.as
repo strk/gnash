@@ -116,10 +116,12 @@ check_equals(typeof(TextField.getFontList), 'function');
 
 check_equals(typeof(TextField.prototype.getFontList), 'undefined');
 
+check(TextField.prototype.hasOwnProperty('replaceText'));
 #if OUTPUT_VERSION > 6
 check_equals(typeof(TextField.prototype.replaceText), 'function');
 #else
 check_equals(typeof(TextField.prototype.replaceText), 'undefined');
+// but exists!
 #endif
 
 tfObj = new TextField();
@@ -1231,11 +1233,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(519);
+     check_totals(520);
 #elif OUTPUT_VERSION == 7
- check_totals(525);
-#elif OUTPUT_VERSION == 8
  check_totals(526);
+#elif OUTPUT_VERSION == 8
+ check_totals(527);
 #endif
 
 #endif
