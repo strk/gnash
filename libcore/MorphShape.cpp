@@ -27,10 +27,10 @@ namespace gnash
 {
 
 
-MorphShape::MorphShape(const SWF::DefineMorphShapeTag* const def,
-        DisplayObject* parent)
+MorphShape::MorphShape(movie_root& mr, as_object* object,
+        const SWF::DefineMorphShapeTag* def, DisplayObject* parent)
     :
-    DisplayObject(parent),
+    DisplayObject(mr, object, parent),
     _def(def),
     _shape(_def->shape1())
 {

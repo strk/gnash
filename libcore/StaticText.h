@@ -43,9 +43,10 @@ class StaticText : public DisplayObject
 {
 public:
 
-	StaticText(const SWF::DefineTextTag* const def, DisplayObject* parent)
+	StaticText(movie_root& mr, as_object* object, const SWF::DefineTextTag* def,
+            DisplayObject* parent)
 		:
-        DisplayObject(parent),
+        DisplayObject(mr, object, parent),
         _def(def),
         _selectionColor(0, 255, 255, 255)
 	{
@@ -101,9 +102,7 @@ protected:
 	/// Mark reachable resources (for the GC)
 	void markReachableResources() const
 	{
-		assert(isReachable());
         _def->setReachable();
-		markDisplayObjectReachable();
 	}
 #endif
 

@@ -272,7 +272,7 @@ const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(getVM(gl)),
@@ -282,7 +282,7 @@ as_object::as_object(Global_as& gl)
 
 as_object::as_object()
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(VM::get()),
@@ -292,7 +292,7 @@ as_object::as_object()
 
 as_object::as_object(as_object* proto)
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(VM::get()),
@@ -303,7 +303,7 @@ as_object::as_object(as_object* proto)
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
-    _displayObject(false),
+    _displayObject(0),
     _array(false),
     _relay(0),
 	_vm(VM::get()),
@@ -398,8 +398,8 @@ as_object::get_member(string_table::key name, as_value* val,
 	Property* prop = pr.getProperty();
     if (!prop) {
         if (displayObject()) {
-            DisplayObject& d = static_cast<DisplayObject&>(*this);
-            if (getDisplayObjectProperty(d, name, *val)) return true;
+            DisplayObject* d = displayObject();
+            if (getDisplayObjectProperty(*d, name, *val)) return true;
         }
         while (pr()) {
             if ((prop = pr.getProperty())) break;
@@ -686,7 +686,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 
     bool tfVarFound = false;
     if (displayObject()) {
-        MovieClip* mc = dynamic_cast<MovieClip*>(this);
+        MovieClip* mc = dynamic_cast<MovieClip*>(displayObject());
         if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
         // We still need to set the member.
     }
@@ -706,8 +706,8 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if (!prop) { 
 
         if (displayObject()) {
-            DisplayObject& d = static_cast<DisplayObject&>(*this);
-            if (setDisplayObjectProperty(d, key, val)) return true;
+            DisplayObject* d = displayObject();
+            if (setDisplayObjectProperty(*d, key, val)) return true;
             // TODO: should we execute triggers?
         }
 
@@ -1069,7 +1069,7 @@ as_object::enumerateProperties(as_environment& env) const
 
     // Hack to handle MovieClips.
 	if (displayObject()) {
-        static_cast<const DisplayObject&>(*this).enumerateNonProperties(env);
+        displayObject()->enumerateNonProperties(env);
     }
 
 	// this set will keep track of visited objects,
@@ -1337,6 +1337,7 @@ as_object::markAsObjectReachable() const
 
     /// Proxy objects can contain references to other as_objects.
     if (_relay) _relay->setReachable();
+    if (_displayObject) _displayObject->setReachable();
 }
 #endif // GNASH_USE_GC
 
@@ -1379,11 +1380,16 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 	}
 }
 
-DisplayObject*
-getDisplayObject(as_object* obj)
+as_object*
+getObjectWithPrototype(Global_as& gl, string_table::key c)
 {
-    if (!obj || !obj->displayObject()) return 0;
-    return &static_cast<DisplayObject&>(*obj);
+    as_object* ctor = gl.getMember(c).to_object(gl);
+    as_object* proto = ctor ?
+        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
+
+    as_object* o = gl.createObject();
+    o->set_prototype(proto ? proto : as_value());
+    return o;
 }
 
 /// Get the VM from an as_object

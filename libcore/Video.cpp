@@ -52,29 +52,20 @@ namespace {
     as_value video_height(const fn_call& fn);
 }
 
-Video::Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent)
+Video::Video(as_object* object,
+        const SWF::DefineVideoStreamTag* def, DisplayObject* parent)
 	:
-	DisplayObject(parent),
+	DisplayObject(getRoot(*object), object, parent),
 	m_def(def),
 	_ns(0),
-	_embeddedStream(m_def ? true : false),
+	_embeddedStream(m_def),
 	_lastDecodedVideoFrameNum(-1),
 	_lastDecodedVideoFrame(),
     _smoothing(false)
 {
-
-	set_prototype(getVideoInterface(*this));
-
-    // TODO: For AS2 a genuine Video object can only be created from a 
-    // SWF tag. 
-	if (_embeddedStream)
-	{
-        // TODO: this should happen using the native creation function
-        // once Video is a Relay.
-		initializeDecoder();
-        
-        attachPrototypeProperties(*get_prototype());
-	}
+    assert(object);
+    assert(def);
+    initializeDecoder();
 }
 
 Video::~Video()
@@ -138,8 +129,6 @@ Video::clear()
 void
 Video::display(Renderer& renderer)
 {
-	// if m_def is NULL we've been constructed by 'new Video', in this
-	// case I think display() would never be invoked on us...
 	assert(m_def);
 
 	SWFMatrix m = getWorldMatrix();
@@ -258,7 +247,7 @@ Video::stagePlacementCallback(as_object* initObj)
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live DisplayObject
-    getRoot(*this).addLiveChar(this);
+    stage().addLiveChar(this);
 }
 
 
@@ -278,11 +267,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
 	ranges.add(m_old_invalidated_ranges);
 	
-	// NOTE: do not use m_def->boundss()
-
-	// if m_def is NULL we've been constructed by 'new Video', in this
-	// case I think add_invalidated_bouns would never be invoked on us...
-	assert ( m_def );
+	assert (m_def);
 
 	SWFRect bounds;	
 	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
@@ -303,7 +288,9 @@ video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* cl = gl.createClass(&video_ctor, getVideoInterface(global));
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&video_ctor, proto);
+    attachVideoInterface(*proto);
 
 	// Register _global.Video
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -329,32 +316,24 @@ Video::getBounds() const
 	return SWFRect();
 }
 
-#ifdef GNASH_USE_GC
 void
-Video::markReachableResources() const
+Video::markOwnResources() const
 {
 	if (_ns) _ns->setReachable();
-
-	// Invoke DisplayObject's version of reachability mark
-	markDisplayObjectReachable();
 }
-#endif // GNASH_USE_GC
-
-namespace {
 
 as_object*
-getVideoInterface(as_object& where)
+createVideoObject(Global_as& gl)
 {
-	static boost::intrusive_ptr<as_object> proto;
-	if ( proto == NULL )
-	{
-		proto = new as_object(getObjectInterface());
-		getVM(where).addStatic(proto.get());
-
-		attachVideoInterface(*proto);
-	}
-	return proto.get();
+    // TODO: how to use this for AS3 as well?
+    // Turn into constructBuiltin()
+    as_object* obj = getObjectWithPrototype(gl, NSV::CLASS_VIDEO);
+    as_object* proto = obj->get_prototype();
+    if (proto) attachPrototypeProperties(*proto);
+    return obj;
 }
+
+namespace {
 
 void
 attachVideoInterface(as_object& o)
@@ -384,7 +363,7 @@ attachPrototypeProperties(as_object& proto)
 as_value
 video_attach(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
 
 	if (fn.nargs < 1)
 	{
@@ -412,7 +391,7 @@ video_attach(const fn_call& fn)
 as_value
 video_deblocking(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
     UNUSED(video);
 
     log_unimpl("Video.deblocking");
@@ -422,7 +401,7 @@ video_deblocking(const fn_call& fn)
 as_value
 video_smoothing(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
 
     if (!fn.nargs) return as_value(video->smoothing());
 
@@ -436,21 +415,21 @@ video_smoothing(const fn_call& fn)
 as_value
 video_width(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
     return as_value(video->width());
 }
 
 as_value
 video_height(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
     return as_value(video->height());
 }
 
 as_value
 video_clear(const fn_call& fn)
 {
-	boost::intrusive_ptr<Video> video = ensure<ThisIs<Video> >(fn);
+	Video* video = ensure<IsDisplayObject<Video> >(fn);
 
     video->clear();
     return as_value();
@@ -459,7 +438,7 @@ video_clear(const fn_call& fn)
 as_value
 video_ctor(const fn_call& /* fn */)
 {
-	return as_value(); // will keep alive
+	return as_value();
 }
 
 } // anonymous namespace

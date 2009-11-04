@@ -945,7 +945,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     (chOld->get_ratio() == chNew->get_ratio());
 
                 if (!is_ratio_compatible || chOld->isDynamic() ||
-                        !chOld->isActionScriptReferenceable()) {
+                        !isReferenceable(*chOld)) {
                     // replace the DisplayObject in old list with
                     // corresponding DisplayObject in new list
                     _charsByDepth.insert(itOldBackup, *itNewBackup);

@@ -25,6 +25,7 @@
 #include "movie_definition.h"
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
+#include "Global_as.h"
 
 namespace gnash {
 namespace SWF {
@@ -133,9 +134,12 @@ DefineVideoStreamTag::addVideoFrameTag(
 }
 
 DisplayObject*
-DefineVideoStreamTag::createDisplayObject(DisplayObject* parent) const
+DefineVideoStreamTag::createDisplayObject(Global_as& gl,
+        DisplayObject* parent) const
 {
-	DisplayObject* ch = new Video(this, parent);
+
+    as_object* obj = createVideoObject(gl);
+	DisplayObject* ch = new Video(obj, this, parent);
 	return ch;
 }
 

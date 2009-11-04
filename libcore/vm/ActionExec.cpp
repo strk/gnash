@@ -761,7 +761,7 @@ ActionExec::getTarget()
         return _withStack.back().object();
     }
     else {
-        return env.get_target();
+        return getObject(env.get_target());
     }
 }
 
@@ -833,7 +833,7 @@ ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 as_object*
 ActionExec::getThisPointer()
 {
-    return _func ? _this_ptr.get() : env.get_original_target(); 
+    return _func ? _this_ptr.get() : getObject(env.get_original_target()); 
 }
 
 } // end of namespace gnash

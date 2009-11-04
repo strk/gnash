@@ -50,7 +50,7 @@ public:
             return;
         }
 
-		VM& vm = getVM(*m);
+		VM& vm = getVM(*getObject(m));
         
         log_debug("getting machine.");
 		Machine *mach = vm.getMachine();

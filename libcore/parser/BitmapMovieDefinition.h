@@ -60,7 +60,8 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, Renderer* renderer,
             const std::string& url);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*) const;
+    virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
+        const;
 
 	virtual int	get_version() const {
 		return _version;
@@ -104,7 +105,7 @@ public:
 	}
 	
 	/// Create a playable Movie from this def.
-	virtual Movie* createMovie(DisplayObject* parent=0);
+	virtual Movie* createMovie(Global_as& gl, DisplayObject* parent = 0);
 
 	virtual const std::string& get_url() const {
 		return _url;

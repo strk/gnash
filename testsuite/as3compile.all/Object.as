@@ -57,8 +57,8 @@ package main {
             check(!Object.prototype.hasOwnProperty("__proto__"));
             check(!Object.prototype.hasOwnProperty("prototype"));
 
-            xcheck(Object.prototype.isPrototypeOf(MovieClip));
-            xcheck(Object.prototype.isPrototypeOf(this));
+            check(Object.prototype.isPrototypeOf(MovieClip));
+            check(Object.prototype.isPrototypeOf(this));
 
             var a = new Object();
             xcheck_equals(a, "[object Object]");       

@@ -65,7 +65,7 @@ main(int /*argc*/, char** /*argv*/)
 	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-	VM& vm = getVM(*root);
+	VM& vm = getVM(*getObject(root));
 	string_table& st = vm.getStringTable();
 
 	//check_equals(root->get_frame_count(), 20);
@@ -104,9 +104,9 @@ main(int /*argc*/, char** /*argv*/)
 	int test = 0;
 	while (frame <= totalFrames) {
 		as_value testReady;
-		if (root->get_member(st.find("testReady"), &testReady))
+		if (getObject(root)->get_member(st.find("testReady"), &testReady))
 		{
-			root->delProperty(st.find("testReady"));
+			getObject(root)->delProperty(st.find("testReady"));
 			
 			// When a test is ready, check the result of the previous test.
 			if (testPasses[test]) {
@@ -134,7 +134,7 @@ main(int /*argc*/, char** /*argv*/)
 
     // Consistency checking
     as_value eot;
-    bool endOfTestFound = root->get_member(st.find("endoftest"), &eot);
+    bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
     check(endOfTestFound);
 
 }

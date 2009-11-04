@@ -49,9 +49,10 @@ class Movie : public MovieClip
 
 public:
 
-	Movie(const movie_definition* const def, DisplayObject* parent)
+	Movie(as_object* object, const movie_definition* def,
+            DisplayObject* parent)
         :
-        MovieClip(def, this, parent)
+        MovieClip(object, def, this, parent)
     {}
 
 	virtual ~Movie() {}

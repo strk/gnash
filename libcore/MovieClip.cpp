@@ -28,7 +28,6 @@
 #include "movie_definition.h"
 #include "as_value.h"
 #include "as_function.h"
-#include "Bitmap.h"
 #include "TextField.h"
 #include "ControlTag.h"
 #include "fn_call.h"
@@ -55,7 +54,6 @@
 #include "namedStrings.h"
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
-#include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
 #include "GnashNumeric.h"
@@ -414,31 +412,28 @@ private:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(const movie_definition* const def, Movie* r,
-        DisplayObject* parent)
+MovieClip::MovieClip(as_object* object, const movie_definition* def,
+        Movie* r, DisplayObject* parent)
     :
-    DisplayObjectContainer(parent),
+    DisplayObjectContainer(object, parent),
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
     _currentFrame(0),
     _hasLooped(false),
     _callingFrameActions(false),
-    _environment(getVM(*this)),
+    _environment(getVM(*object)),
     m_sound_stream_id(-1),
     _droptarget(),
     _lockroot(false)
 {
     assert(_swf);
+    assert(object);
 
-    if (!isAS3(getVM(*this))) {
-        set_prototype(getMovieClipAS2Interface());
-        attachMovieClipAS2Properties(*this);
+    if (!isAS3(getVM(*object)) && !get_parent()) {
+        object->init_member("$version", getVM(*object).getPlayerVersion(), 0); 
     }
-    else {
-        set_prototype(getMovieClipAS3Interface());
-    }
-            
+
     _environment.set_target(this);
 
 }
@@ -447,8 +442,8 @@ MovieClip::~MovieClip()
 {
     stopStreamSound();
 
-    getRoot(*this).remove_key_listener(this);
-    getRoot(*this).remove_mouse_listener(this);
+    stage().remove_key_listener(this);
+    stage().remove_mouse_listener(this);
 
     deleteAllChecked(_loadVariableRequests);
 }
@@ -498,7 +493,7 @@ bool
 MovieClip::getTextFieldVariables(string_table::key name_key, as_value& val)
 {
 
-    const std::string& name = getStringTable(*this).value(name_key);
+    const std::string& name = getStringTable(*getObject(this)).value(name_key);
 
     // Try textfield variables
     TextFields* etc = get_textfield_variable(name);
@@ -623,7 +618,10 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         return NULL;
     }
 
-    MovieClip* newmovieclip = new MovieClip(_def.get(), _swf, parent);
+    as_object* o = getObjectWithPrototype(getGlobal(*getObject(this)), 
+            NSV::CLASS_MOVIE_CLIP);
+
+    MovieClip* newmovieclip = new MovieClip(o, _def.get(), _swf, parent);
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();
@@ -650,8 +648,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
 void
 MovieClip::queueAction(const action_buffer& action)
 {
-    movie_root& root = getRoot(*this);
-    root.pushAction(action, this);
+    stage().pushAction(action, this);
 }
 
 void
@@ -768,7 +765,7 @@ MovieClip::notifyEvent(const event_id& id)
 
         if ( method )
         {
-            call_method0(as_value(method.get()), _environment, this);
+            call_method0(method.get(), _environment, getObject(this));
             called = true;
         }
     }
@@ -782,33 +779,35 @@ MovieClip::notifyEvent(const event_id& id)
 }
 
 as_object*
-MovieClip::get_path_element(string_table::key key)
+MovieClip::pathElement(string_table::key key)
 {
-    as_object* obj = DisplayObject::get_path_element(key);
+    as_object* obj = DisplayObject::pathElement(key);
     if (obj) return obj;
 
     // See if we have a match on the display list.
-    DisplayObject* ch = getDisplayListObject(key);
-    if (ch) return ch;
+    obj = getObject(getDisplayListObject(key));
+    if (obj) return obj;
 
-    std::string name = getStringTable(*this).value(key);
-    
+    std::string name = getStringTable(*getObject(this)).value(key);
+ 
+    obj = getObject(this);
+
+    assert(obj);
+
     // See if it's a member
     as_value tmp;
-    if ( !as_object::get_member(key, &tmp, 0) )
-    {
+    if (!obj->as_object::get_member(key, &tmp, 0)) {
         return NULL;
     }
-    if ( ! tmp.is_object() )
-    {
+    if (!tmp.is_object()) {
         return NULL;
     }
-    if ( tmp.is_sprite() )
+    if (tmp.is_sprite())
     {
-        return tmp.toDisplayObject(true);
+        return getObject(tmp.toDisplayObject(true));
     }
 
-    return tmp.to_object(getGlobal(*this));
+    return tmp.to_object(getGlobal(*getObject(this)));
 }
 
 bool
@@ -827,7 +826,7 @@ MovieClip::setTextFieldVariables(string_table::key name, const as_value& val,
     //                property (ie: have a textfield use _x as variable name and
     //                be scared)
     //
-    TextFields* etc = get_textfield_variable(getStringTable(*this).value(name));
+    TextFields* etc = get_textfield_variable(getStringTable(*getObject(this)).value(name));
     if ( etc )
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
@@ -961,8 +960,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
-        movie_root& root = getRoot(*this);
-        root.pushAction(code, movie_root::apINIT);
+        stage().pushAction(code, movie_root::apINIT);
     }
     else
     {
@@ -1246,13 +1244,6 @@ MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
     return std::auto_ptr<GnashImage>();
 }
 
-void
-MovieClip::attachBitmap(BitmapData_as* bd, int depth)
-{
-    DisplayObject* ch = new Bitmap(bd, this);
-    attachCharacter(*ch, depth, 0);
-}
-
 DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
@@ -1277,10 +1268,11 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     
     if (existing_char) return NULL;
 
-    DisplayObject* ch = cdef->createDisplayObject(this);
+    Global_as& gl = getGlobal(*getObject(this));
+    DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
     if (tag->hasName()) ch->set_name(tag->getName());
-    else if (ch->wantsInstanceName())
+    else if (isReferenceable(*ch))
     {
         std::string instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
@@ -1350,19 +1342,20 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
 
     // if the existing DisplayObject is not a shape, move it instead
     // of replacing.
-    if (existing_char->isActionScriptReferenceable()) {
+    if (isReferenceable(*existing_char)) {
         move_display_object(tag, dlist);
         return;
     }
 
-    DisplayObject* ch = cdef->createDisplayObject(this);
+    Global_as& gl = getGlobal(*getObject(this));
+    DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?
     if(tag->hasName()) {
         ch->set_name(tag->getName());
     }
-    else if (ch->wantsInstanceName()) {
+    else if (isReferenceable(*ch)) {
         std::string instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
     }
@@ -1421,9 +1414,9 @@ MovieClip::handleFocus()
 
     // For SWF6 and above: the MovieClip can always receive focus if
     // focusEnabled evaluates to true.
-    if (getSWFVersion(*this) > 5) {
+    if (getSWFVersion(*getObject(this)) > 5) {
         as_value focusEnabled;
-        if (get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
+        if (getObject(this)->get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
             if (focusEnabled.to_bool() == true) return true; 
         }
     }
@@ -1677,8 +1670,8 @@ bool
 MovieClip::trackAsMenu()
 {
     as_value track;
-    string_table& st = getStringTable(*this);
-    return (get_member(st.find("trackAsMenu"), &track) && track.to_bool());
+    string_table& st = getStringTable(*getObject(this));
+    return (getObject(this)->get_member(st.find("trackAsMenu"), &track) && track.to_bool());
 }
 
 bool
@@ -1723,13 +1716,13 @@ MovieClip::mouseEnabled() const
 void
 MovieClip::stop_drag()
 {
-    getRoot(*this).stop_drag();
+    stage().stop_drag();
 }
 
 void
 MovieClip::set_background_color(const rgba& color)
 {
-    getRoot(*this).set_background_color(color);
+    stage().set_background_color(color);
 }
 
 void
@@ -1781,11 +1774,11 @@ DisplayObject*
 MovieClip::getDisplayListObject(string_table::key key)
 {
 
-    const std::string& name = getStringTable(*this).value(key);
+    const std::string& name = getStringTable(*getObject(this)).value(key);
 
     // Try items on our display list.
     DisplayObject* ch;
-    if (getSWFVersion(*this) >= 7 ) {
+    if (getSWFVersion(*getObject(this)) >= 7 ) {
         ch = _displayList.getDisplayObjectByName(name);
     }
     else ch = _displayList.getDisplayObjectByName_i(name);
@@ -1795,7 +1788,7 @@ MovieClip::getDisplayListObject(string_table::key key)
 
     // If the object is an ActionScript referenciable one we
     // return it, otherwise we return ourselves
-    if (ch->isActionScriptReferenceable()) {
+    if (isReferenceable(*ch)) {
         return ch;
     }
     return this;
@@ -1842,8 +1835,8 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 void
 MovieClip::registerAsListener()
 {
-    getRoot(*this).add_key_listener(this);
-    getRoot(*this).add_mouse_listener(this);
+    stage().add_key_listener(this);
+    stage().add_mouse_listener(this);
 }
 
 
@@ -1863,7 +1856,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #endif
 
     // Register this movieclip as a live one
-    getRoot(*this).addLiveChar(this);
+    stage().addLiveChar(this);
   
 
     // Register this movieclip as a core broadcasters listener
@@ -1888,7 +1881,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
 
-        if (getSWFVersion(*this) > 5)
+        if (getSWFVersion(*getObject(this)) > 5)
         {
 #ifdef GNASH_DEBUG
             log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
@@ -1931,7 +1924,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
         std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
-        getRoot(*this).pushAction(code, movie_root::apCONSTRUCT);
+        stage().pushAction(code, movie_root::apCONSTRUCT);
 
     }
     else {
@@ -1940,7 +1933,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         // after the display list has been populated, so that _height and
         // _width (which depend on bounds) are correct.
         if (initObj) {
-            copyProperties(*initObj);
+            getObject(this)->copyProperties(*initObj);
         }
 
         constructAsScriptObject(); 
@@ -1996,14 +1989,14 @@ MovieClip::constructAsScriptObject()
         {
             // Set the new prototype *after* the constructor was called
             boost::intrusive_ptr<as_object> proto = ctor->getPrototype();
-            set_prototype(proto);
+            getObject(this)->set_prototype(proto);
 
             // Call event handlers *after* setting up the __proto__
             // but *before* calling the registered class constructor
             notifyEvent(event_id::CONSTRUCT);
             eventHandlersInvoked = true;
 
-            int swfversion = getSWFVersion(*this);
+            int swfversion = getSWFVersion(*getObject(this));
 
             // Set the '__constructor__' and 'constructor' members, as well
             // as calling the actual constructor.
@@ -2017,22 +2010,22 @@ MovieClip::constructAsScriptObject()
 
                 const int flags = PropFlags::dontEnum;
 
-                set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
-                set_member_flags(NSV::PROP_uuCONSTRUCTORuu, flags);
+                getObject(this)->set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
+                getObject(this)->set_member_flags(NSV::PROP_uuCONSTRUCTORuu, flags);
                 if ( swfversion == 6 )
                 {
-                    set_member(NSV::PROP_CONSTRUCTOR, ctor);
-                    set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
+                    getObject(this)->set_member(NSV::PROP_CONSTRUCTOR, ctor);
+                    getObject(this)->set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
                 }
 
                 // Provide a 'super' reference..
                 // Super is computed from the object we're constructing,
                 // It will work as long as we did set its __proto__ 
                 // and __constructor__ properties already.
-                as_object* super = get_super();
+                as_object* super = getObject(this)->get_super();
 
                 as_environment& env = get_environment();
-                fn_call call(this, env);
+                fn_call call(getObject(this), env);
                 call.super = super;
 
                     // we don't use the constructor return (should we?)
@@ -2086,22 +2079,22 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
             log_debug(_("Posting data '%s' to url '%s'"), postdata, url.str());
         }
         
-        const movie_root& mr = getRoot(*this);
+        const movie_root& mr = stage();
 
         boost::intrusive_ptr<movie_definition> md(
             MovieFactory::makeMovie(url, mr.runResources(), NULL, true, postdata));
 
-        if (!md)
-        {
+        if (!md) {
             log_error(_("can't create movie_definition for %s"),
                 url.str());
             return false;
         }
 
-        boost::intrusive_ptr<Movie> extern_movie;
-        extern_movie = md->createMovie(parent);
-        if (extern_movie == NULL)
-        {
+        as_object* us = getObject(this);
+        assert(us);
+
+        Movie* extern_movie = md->createMovie(getGlobal(*us), parent);
+        if (!extern_movie) {
             log_error(_("can't create extern Movie "
                 "for %s"), url.str());
             return false;
@@ -2135,21 +2128,15 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         }
         extern_movie->set_clip_depth(get_clip_depth());
     
-        parent_sp->replace_display_object(extern_movie.get(), get_depth(),
+        parent_sp->replace_display_object(extern_movie, get_depth(),
                      true, true);
     }
     else
     {
-        movie_root& root = getRoot(*this);
-        unsigned int level = get_depth()-DisplayObject::staticDepthOffset;
+        const size_t level = get_depth() - DisplayObject::staticDepthOffset;
         
-#ifndef GNASH_USE_GC
-        // Make sure we won't kill ourself !
-        assert(get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
-
         // how about lockRoot here ?
-        root.loadLevel(level, url); // extern_movie.get());
+        stage().loadLevel(level, url); // extern_movie.get());
     }
 
     return true;
@@ -2162,17 +2149,17 @@ MovieClip::loadVariables(const std::string& urlstr,
     // Host security check will be will be done by LoadVariablesThread
     // (down by getStream, that is)
     
-    const movie_root& mr = getRoot(*this);
+    const movie_root& mr = stage();
     URL url(urlstr, mr.runResources().baseURL());
 
     std::string postdata;
     
     // Encode our vars for sending.
-    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*this, postdata);
+    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*getObject(this), postdata);
 
     try 
     {
-        const StreamProvider& sp = getRunResources(*this).streamProvider();
+        const StreamProvider& sp = getRunResources(*getObject(this)).streamProvider();
         
         if (sendVarsMethod == METHOD_POST)
         {
@@ -2237,13 +2224,13 @@ MovieClip::processCompletedLoadVariableRequests()
 void
 MovieClip::setVariables(const MovieVariables& vars)
 {
-    string_table& st = getStringTable(*this);
+    string_table& st = getStringTable(*getObject(this));
     for (MovieVariables::const_iterator it=vars.begin(), itEnd=vars.end();
         it != itEnd; ++it)
     {
         const std::string& name = it->first;
         const std::string& val = it->second;
-        set_member(st.find(name), val);
+        getObject(this)->set_member(st.find(name), val);
     }
 }
 
@@ -2271,7 +2258,7 @@ MovieClip::removeMovieClip()
     else
     {
         // removing _level#
-        getRoot(*this).dropLevel(depth);
+        stage().dropLevel(depth);
         // I guess this can only happen if someone uses 
         // _swf.swapDepth([0..1048575])
     }
@@ -2296,7 +2283,7 @@ MovieClip::isEnabled() const
     as_value enabled;
     // const_cast needed due to get_member being non-const due to the 
     // possibility that a getter-setter would actually modify us ...
-    if (!const_cast<MovieClip*>(this)->get_member(NSV::PROP_ENABLED, &enabled))
+    if (!getObject(const_cast<MovieClip*>(this))->get_member(NSV::PROP_ENABLED, &enabled))
     {
          // We're enabled if there's no 'enabled' member...
          return true;
@@ -2310,7 +2297,7 @@ MovieClip::allowHandCursor() const
     as_value val;
     // const_cast needed due to get_member being non-const due to the 
     // possibility that a getter-setter would actually modify us ...
-    if (!const_cast<MovieClip*>(this)->get_member(
+    if (!getObject(const_cast<MovieClip*>(this))->get_member(
                 NSV::PROP_USEHANDCURSOR, &val))
     {
          // true if not found..
@@ -2367,7 +2354,7 @@ struct ReachableMarker {
     }
 };
 void
-MovieClip::markReachableResources() const
+MovieClip::markOwnResources() const
 {
     ReachableMarker marker;
 
@@ -2393,8 +2380,6 @@ MovieClip::markReachableResources() const
 
     // Mark our relative root
     _swf->setReachable();
-
-    markDisplayObjectReachable();
 
 }
 #endif // GNASH_USE_GC
@@ -2440,7 +2425,7 @@ MovieClip::getAsRoot()
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    int topSWFVersion = getRoot(*this).getRootMovie().version();
+    int topSWFVersion = stage().getRootMovie().version();
 
     if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;
@@ -2467,7 +2452,7 @@ MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-    sound::sound_handler* handler = getRunResources(*this).soundHandler();
+    sound::sound_handler* handler = getRunResources(*getObject(this)).soundHandler();
     if (handler)
     {
         handler->stop_sound(m_sound_stream_id);

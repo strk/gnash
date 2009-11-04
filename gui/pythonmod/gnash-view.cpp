@@ -68,7 +68,7 @@ struct _GnashView {
     std::auto_ptr<gnash::RunResources> run_info;
 
     std::auto_ptr<gnash::movie_definition> movie_definition;
-    boost::intrusive_ptr<gnash::Movie> movie;
+    gnash::Movie* movie;
     std::auto_ptr<gnash::movie_root> stage;
     std::auto_ptr<gnash::SystemClock> system_clock;
     std::auto_ptr<gnash::InterruptableVirtualClock> virtual_clock;
@@ -111,17 +111,19 @@ gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_dat
     gnash::string_table& st = vm.getStringTable();
 	gnash::as_value obj;
 
-    gnash::as_value func = view->movie->getMember(st.find(func_name));
+    gnash::as_value func = getObject(view->movie)->getMember(
+            st.find(func_name));
+
     if( !func.is_function() ) {
         return NULL;
     }
 
     gnash::as_value result;
     if( input_data ) {
-        result = view->movie->callMethod(st.find(func_name),
+        result = getObject(view->movie)->callMethod(st.find(func_name),
                                          gnash::as_value(input_data));
     } else {
-        result = view->movie->callMethod(st.find(func_name));
+        result = getObject(view->movie)->callMethod(st.find(func_name));
     }
     if( !result.is_string() ) {
         return NULL;
@@ -479,7 +481,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     gnash::URL::parse_querystring(url.querystring(), variables);
 
     gnash::Movie* m = view->stage->init(view->movie_definition.get(), variables);
-    view->movie.reset(m);
+    view->movie = m;
 
     view->stage->set_background_alpha(1.0f);
 

@@ -25,13 +25,16 @@
 #include "log.h"
 #include "Bitmap.h"
 #include "Renderer.h"
+#include "Global_as.h"
+#include "namedStrings.h"
 
 namespace gnash {
 
 Movie*
-BitmapMovieDefinition::createMovie(DisplayObject* parent)
+BitmapMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
 {
-    return new BitmapMovie(this, parent);
+    as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
+    return new BitmapMovie(o, this, parent);
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
@@ -48,10 +51,11 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 }
 
 DisplayObject*
-BitmapMovieDefinition::createDisplayObject(DisplayObject* parent) const
+BitmapMovieDefinition::createDisplayObject(Global_as& /*gl*/,
+        DisplayObject* /*parent*/) const
 {
-    /// What should we do if construction of the bitmap fails?
-    return new Bitmap(this, parent);
+    std::abort();
+    return 0;
 }
 
 #ifdef GNASH_USE_GC

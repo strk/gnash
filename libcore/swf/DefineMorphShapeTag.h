@@ -50,7 +50,8 @@ public:
 
     virtual ~DefineMorphShapeTag() {}
 
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const;
+	virtual DisplayObject* createDisplayObject(Global_as& gl,
+            DisplayObject* parent) const;
 
     virtual void display(Renderer& renderer, const MorphShape& inst) const;
 

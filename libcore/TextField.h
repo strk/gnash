@@ -92,14 +92,16 @@ public:
 	};
 
     /// Constructs a TextField as specified in a DefineEditText tag.
-	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def);
+	TextField(as_object* object, DisplayObject* parent,
+            const SWF::DefineEditTextTag& def);
 
     /// Constructs a TextField with default values and the specified bounds.
     //
     /// Notably, the default textHeight is 12pt (240 twips).
 	/// @param parent A pointer to the DisplayObject parent of this TextField
 	/// @param bounds A SWFRect specifying the bounds of this TextField
-    TextField(DisplayObject* parent, const SWFRect& bounds);
+    TextField(as_object* object, DisplayObject* parent, const SWFRect& bounds);
+
 
 	~TextField();
 
@@ -120,11 +122,6 @@ public:
     //
     /// TODO: work out what this means for dynamic TextFields.
     virtual int getDefinitionVersion() const;
-
-    bool wantsInstanceName() const
-	{
-		return true; // text fields can be referenced 
-	}	
 
 	/// This function is called as a user-input handler
 	bool notifyEvent(const event_id& id);	
@@ -614,7 +611,7 @@ protected:
 	///  - Our definition
 	///  - Common DisplayObject resources
 	///
-	void markReachableResources() const;
+	void markOwnResources() const;
 
 private:
 
@@ -858,6 +855,11 @@ private:
     std::pair<size_t, size_t> _selection;
 	
 };
+
+/// Native function to create a plain object with TextField properties
+//
+/// This function calls the TextField constructor.
+as_object* createTextFieldObject(Global_as& gl);
 
 /// Initialize the global TextField class
 void textfield_class_init(as_object& global, const ObjectURI& uri);

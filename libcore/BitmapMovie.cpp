@@ -17,20 +17,22 @@
 
 #include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
+#include "Bitmap.h"
 
 namespace gnash {
 
-BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
+BitmapMovie::BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
         DisplayObject* parent)
 	:
-	Movie(def, parent),
+	Movie(object, def, parent),
     _def(def)
 {
     assert(def);
-    boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this);
+    assert(object);
+    Bitmap* bm = new Bitmap(getRoot(*object), 0, def, this);
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
-    placeDisplayObject(ch.get(), depth);
+    placeDisplayObject(bm, depth);
 }
 
 } // namespace gnash

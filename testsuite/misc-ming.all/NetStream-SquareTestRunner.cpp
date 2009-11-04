@@ -68,7 +68,7 @@ main(int /*argc*/, char** /*argv*/)
 	string_table& st = VM::get().getStringTable();
 	string_table::key k = st.find("startNotified");
 	as_value tmp;
-	while (! root->get_member(k, &tmp) )
+	while (!getObject(root)->get_member(k, &tmp) )
 	{
 		tester.advance();
 
@@ -97,7 +97,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Consistency check 
 	as_value eot;
-	bool endOfTestFound = root->get_member(st.find("end_of_test"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(st.find("end_of_test"), &eot);
 	check(endOfTestFound);
 
 }

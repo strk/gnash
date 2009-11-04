@@ -20,6 +20,7 @@
 #include "movie_definition.h"
 #include "Font.h"
 #include "SWFStream.h"
+#include "Global_as.h"
 
 namespace gnash {
 namespace SWF {
@@ -39,11 +40,13 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineEditTextTag::createDisplayObject(DisplayObject* parent) const
+DefineEditTextTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
+    const
 {
 	// Resolve the font, if possible
 	getFont();
-	TextField* ch = new TextField(parent, *this);
+    as_object* obj = createTextFieldObject(gl);
+	TextField* ch = new TextField(obj, parent, *this);
 
 	// This gives an "instance name" to the TextField, but
 	// it is not really what we need.

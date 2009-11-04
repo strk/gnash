@@ -70,7 +70,11 @@ public:
 		MOUSESTATE_HIT
 	};
 
-	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent);
+    /// Construct a Button
+    //
+    /// A button should always have an associated object.
+	Button(as_object* object, const SWF::DefineButtonTag* def,
+            DisplayObject* parent);
 
 	~Button();
 	
@@ -95,11 +99,6 @@ public:
 	///
 	virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
-	
-	virtual bool wantsInstanceName() const
-	{
-		return true; // buttons can be referenced 
-	}
 	
 	virtual void mouseEvent(const event_id& event);
 
@@ -145,7 +144,7 @@ protected:
 	///	- the vector of state DisplayObjects (_stateCharacters)
 	///	- the vector of hit DisplayObjects (_hitCharacters)
 	///
-	void markReachableResources() const;
+	void markOwnResources() const;
 #endif // GNASH_USE_GC
 
 private:

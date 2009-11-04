@@ -39,17 +39,19 @@ class Shape : public DisplayObject
 
 public:
 
-    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent)
+    Shape(movie_root& mr, as_object* object, boost::shared_ptr<DynamicShape> sh,
+            DisplayObject* parent)
         :
-        DisplayObject(parent),
+        DisplayObject(mr, object, parent),
         _shape(sh)
     {
         assert(_shape.get());
     }
 
-	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent)
+	Shape(movie_root& mr, as_object* object, const SWF::DefineShapeTag* def,
+            DisplayObject* parent)
 		:
-		DisplayObject(parent),
+		DisplayObject(mr, object, parent),
 		_def(def)
 	{
 	    assert(_def);
@@ -61,19 +63,15 @@ public:
         return _def ? _def->bounds() : _shape->getBounds();
     }
     
-    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 protected:
 
-#ifdef GNASH_USE_GC
 	/// Mark reachable resources (for the GC)
-	void markReachableResources() const
+	virtual void markReachableResources() const
 	{
-		assert(isReachable());
         if (_def) _def->setReachable();
-		markDisplayObjectReachable();
 	}
-#endif
 
 private:
 	

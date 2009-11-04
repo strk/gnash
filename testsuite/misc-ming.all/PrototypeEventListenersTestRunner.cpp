@@ -51,7 +51,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	// for variables lookup (consistency checking)
-	string_table& st = getStringTable(*root);
+	string_table& st = getStringTable(*getObject(root));
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
@@ -72,7 +72,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Consistency check !!
 	as_value eot;
 	// It's an swf6, so lowercase 'ENDOFTEST'
-	bool endOfTestFound = root->get_member(st.find("endoftest"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
 	check(endOfTestFound);
 
 	if ( endOfTestFound )

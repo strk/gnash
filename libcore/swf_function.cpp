@@ -253,7 +253,7 @@ swf_function::operator()(const fn_call& fn)
 			DisplayObject* tgtch = m_env.get_target();
 			if (tgtch) {
 				// NOTE: _lockroot will be handled by getAsRoot()
-				as_object* r = tgtch->getAsRoot();
+				as_object* r = getObject(tgtch->getAsRoot());
 				m_env.setRegister(current_reg, as_value(r));
 				++current_reg;
 			}
@@ -262,7 +262,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_PARENT) {
 			DisplayObject* tgtch = m_env.get_target();
             if (tgtch) {
-                as_object* parent = tgtch->get_parent();
+                as_object* parent = getObject(tgtch->get_parent());
                 m_env.setRegister(current_reg, parent);
                 ++current_reg;
             }

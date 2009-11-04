@@ -21,6 +21,8 @@
 #include "SWFMovieDefinition.h" // for inheritance
 #include "SWFRect.h" // for composition
 #include "SWFMovie.h" // for createMovie
+#include "Global_as.h"
+#include "namedStrings.h"
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -49,10 +51,6 @@ class DummyMovieDefinition : public SWFMovieDefinition
 	std::string _url;
 
 public:
-
-    virtual DisplayObject* createDisplayObject(DisplayObject*) {
-        return 0;
-    }
 
 
 	/// Default constructor
@@ -133,9 +131,10 @@ public:
 	}
 	
 	/// Create a playable movie instance from a def.
-	virtual Movie* createMovie(DisplayObject* parent=NULL)
+	virtual Movie* createMovie(Global_as& gl, DisplayObject* parent=NULL)
 	{
-		return new SWFMovie(this, parent);
+        as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
+		return new SWFMovie(o, this, parent);
 	}
 	
 	virtual const PlayList& get_playlist(size_t frame_number) const

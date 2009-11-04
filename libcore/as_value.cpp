@@ -912,7 +912,7 @@ as_value::to_object(Global_as& global) const
 			return getFun();
 
 		case MOVIECLIP:
-			return toDisplayObject();
+			return getObject(toDisplayObject());
 
 		case STRING:
 			return global.createString(getStr());
@@ -992,7 +992,7 @@ as_value::set_as_object(as_object* obj)
     if (obj->displayObject()) {
         // The static cast is fine as long as the as_object is genuinely
         // a DisplayObject.
-		setDisplayObject(static_cast<DisplayObject&>(*obj));
+		setDisplayObject(*obj->displayObject());
 		return;
 	}
 	as_function* func = obj->to_function();

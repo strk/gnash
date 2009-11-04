@@ -28,6 +28,8 @@
 #include "SWFStream.h" // for use
 #include "GnashAlgorithm.h"
 #include "SWFParser.h"
+#include "namedStrings.h"
+#include "Global_as.h"
 
 #include <vector>
 #include <string>
@@ -41,13 +43,19 @@
 namespace gnash {
 
 DisplayObject*
-sprite_definition::createDisplayObject(DisplayObject* parent) const
+sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
+    const
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
-	MovieClip* si = new MovieClip(this, parent->get_root(), parent);
-	return si;
+
+    // Should not call MovieClip constructor (probably), but should
+    // attach MovieClip.prototype
+
+    as_object* obj = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
+    DisplayObject* mc = new MovieClip(obj, this, parent->get_root(), parent);
+	return mc;
 }
 
 sprite_definition::~sprite_definition()

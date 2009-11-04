@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
 	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-    VM& vm = getVM(*root);
+    VM& vm = getVM(*getObject(root));
     string_table& st = vm.getStringTable();
 
     const size_t framecount = root->get_frame_count();
@@ -62,7 +62,7 @@ main(int /*argc*/, char** /*argv*/)
         }
     }
     as_value eot;
-    xcheck(root->get_member(st.find("finished"), &eot));
+    xcheck(getObject(root)->get_member(st.find("finished"), &eot));
 
 }
 

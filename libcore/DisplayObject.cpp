@@ -77,11 +77,14 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
-DisplayObject::DisplayObject(DisplayObject* parent)
+DisplayObject::DisplayObject(movie_root& mr, as_object* object,
+        DisplayObject* parent)
     :
     _parent(parent),
     m_invalidated(true),
     m_child_invalidated(true),
+    _object(object),
+    _stage(mr),
     m_depth(0),
     _xscale(100),
     _yscale(100),
@@ -101,13 +104,20 @@ DisplayObject::DisplayObject(DisplayObject* parent)
     assert(m_old_invalidated_ranges.isNull());
 
     // This informs the core that the object is a DisplayObject.
-    setDisplayObject();
+    if (_object) _object->setDisplayObject(this);
+}
+
+as_object*
+DisplayObject::object() const
+{
+    return _object;
 }
 
 std::string
 DisplayObject::getNextUnnamedInstanceName()
 {
-    movie_root& mr = getRoot(*this);
+    assert(_object);
+    movie_root& mr = getRoot(*_object);
 	std::ostringstream ss;
 	ss << "instance" << mr.nextUnnamedInstance();
 	return ss.str();
@@ -153,11 +163,14 @@ DisplayObject::get_world_cxform() const
 
 
 as_object*
-DisplayObject::get_path_element(string_table::key key)
+DisplayObject::pathElement(string_table::key key)
 {
-	string_table& st = getStringTable(*this);
-    if (key == st.find("..")) return get_parent();
-	if (key == st.find(".") || key == st.find("this")) return this;
+    as_object* obj = getObject(this);
+    if (!obj) return 0;
+
+	string_table& st = getStringTable(*obj);
+    if (key == st.find("..")) return getObject(get_parent());
+	if (key == st.find(".") || key == st.find("this")) return obj;
 	return 0;
 }
 
@@ -242,7 +255,7 @@ attachDisplayObjectProperties(as_object& /*o*/)
 as_value
 DisplayObject::blendMode(const fn_call& fn)
 {
-    DisplayObject* ch = ensure<ThisIs<DisplayObject> >(fn);
+    DisplayObject* ch = ensure<IsDisplayObject<> >(fn);
 
     // This is AS-correct, but doesn't do anything.
     // TODO: implement in the renderers!
@@ -316,7 +329,8 @@ DisplayObject::set_visible(bool visible)
     // Remove focus from this DisplayObject if it changes from visible to
     // invisible (see Selection.as).
     if (_visible && !visible) {
-        movie_root& mr = getRoot(*this);
+        assert(_object);
+        movie_root& mr = getRoot(*_object);
         if (mr.getFocus() == this) {
             mr.setFocus(0);
         }
@@ -474,8 +488,9 @@ DisplayObject::unload()
 void
 DisplayObject::queueEvent(const event_id& id, int lvl)
 {
-
-	movie_root& root = getRoot(*this);
+    if (!_object) return;
+    assert(_object);
+	movie_root& root = getRoot(*_object);
 	std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
 	root.pushAction(event, lvl);
 }
@@ -493,19 +508,19 @@ DisplayObject::hasEventHandler(const event_id& id) const
 as_function*
 DisplayObject::getUserDefinedEventHandler(const std::string& name) const
 {
-	string_table::key key = getStringTable(*this).find(name);
+    if (!_object) return 0;
+	string_table::key key = getStringTable(*_object).find(name);
 	return getUserDefinedEventHandler(key);
 }
 
 as_function*
 DisplayObject::getUserDefinedEventHandler(string_table::key key) const 
 {
+    if (!_object) return 0;
+
 	as_value tmp;
 
-	// const cast is needed due to getter/setter members possibly
-	// modifying this object even when only get !
-	if (const_cast<DisplayObject*>(this)->get_member(key, &tmp))
-	{
+	if (_object->get_member(key, &tmp)) {
 		return tmp.to_as_function();
 	}
 	return 0;
@@ -630,7 +645,7 @@ DisplayObject::computeTargetPath() const
 	assert(topLevel);
 
 	if (path.empty()) {
-		if (&getRoot(*this).getRootMovie() == this) return "/";
+		if (&getRoot(*_object).getRootMovie() == this) return "/";
 		std::stringstream ss;
 		ss << "_level" << m_depth-DisplayObject::staticDepthOffset;
 		return ss.str();
@@ -638,7 +653,7 @@ DisplayObject::computeTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	if (topLevel != &getRoot(*this).getRootMovie()) {
+	if (topLevel != &getRoot(*_object).getRootMovie()) {
 		std::stringstream ss;
 		ss << "_level" << 
             topLevel->get_depth() - DisplayObject::staticDepthOffset;
@@ -729,19 +744,20 @@ DisplayObject::destroy()
     /// see new_child_in_unload_test.c)
 	/// We don't destroy ourself twice, right ?
 
-    clearProperties();
+    if (_object) _object->clearProperties();
 
 	assert(!_destroyed);
 	_destroyed = true;
 }
 
 void
-DisplayObject::markDisplayObjectReachable() const
+DisplayObject::markReachableResources() const
 {
-	if ( _parent ) _parent->setReachable();
+    markOwnResources();
+    if (_object) _object->setReachable();
+	if (_parent) _parent->setReachable();
 	if (_mask) _mask->setReachable();
 	if (_maskee) _maskee->setReachable();
-	markAsObjectReachable();
 }
 
 void
@@ -918,16 +934,16 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val)
 {
     
-    string_table& st = getStringTable(obj);
+    string_table& st = getStringTable(*getObject(&obj));
     const std::string& propname = st.value(key);
 
     // Check _level0.._level9
-    movie_root& mr = getRoot(obj);
+    movie_root& mr = getRoot(*getObject(&obj));
     unsigned int levelno;
     if (mr.isLevelTarget(propname, levelno)) {
         Movie* mo = mr.getLevel(levelno);
         if (mo) {
-            val = mo;
+            val = getObject(mo);
             return true;
         }
         return false;
@@ -937,7 +953,7 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     if (mc) {
         DisplayObject* ch = mc->getDisplayListObject(key);
         if (ch) {
-           val = ch;
+           val = getObject(ch);
            return true;
         }
     }
@@ -950,12 +966,14 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         default:
             break;
         case NSV::PROP_uROOT:
-            if (getSWFVersion(obj) < 5) break;
-            val = obj.getAsRoot();
+            if (getSWFVersion(*getObject(&obj)) < 5) break;
+            val = getObject(obj.getAsRoot());
             return true;
         case NSV::PROP_uGLOBAL:
-            if (getSWFVersion(obj) < 6) break;
-            val = &getGlobal(obj);
+            // TODO: clean up this mess.
+            assert(getObject(&obj));
+            if (getSWFVersion(*getObject(&obj)) < 6) break;
+            val = &getGlobal(*getObject(&obj));
             return true;
     }
 
@@ -977,7 +995,7 @@ setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         const as_value& val)
 {
     // These magic properties are case insensitive in all versions!
-    string_table& st = getStringTable(obj);
+    string_table& st = getStringTable(*getObject(&obj));
     const std::string& propname = st.value(key);
     const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
     return doSet(noCaseKey, obj, val);
@@ -988,7 +1006,7 @@ namespace {
 as_value
 getQuality(DisplayObject& o)
 {
-    movie_root& mr = getRoot(o);
+    movie_root& mr = getRoot(*getObject(&o));
     switch (mr.getQuality())
     {
         case QUALITY_BEST:
@@ -1008,7 +1026,7 @@ getQuality(DisplayObject& o)
 void
 setQuality(DisplayObject& o, const as_value& val)
 {
-    movie_root& mr = getRoot(o);
+    movie_root& mr = getRoot(*getObject(&o));
 
     if (!val.is_string()) return;
 
@@ -1039,7 +1057,7 @@ getURL(DisplayObject& o)
 as_value
 getHighQuality(DisplayObject& o)
 {
-    movie_root& mr = getRoot(o);
+    movie_root& mr = getRoot(*getObject(&o));
     switch (mr.getQuality())
     {
         case QUALITY_BEST:
@@ -1056,7 +1074,7 @@ getHighQuality(DisplayObject& o)
 void
 setHighQuality(DisplayObject& o, const as_value& val)
 {
-    movie_root& mr = getRoot(o);
+    movie_root& mr = getRoot(*getObject(&o));
 
     const double q = val.to_number();
 
@@ -1275,7 +1293,7 @@ getMouseX(DisplayObject& o)
 {
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y, buttons;
-	getRoot(o).get_mouse_state(x, y, buttons);
+	getRoot(*getObject(&o)).get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = o.getWorldMatrix();
     point a(pixelsToTwips(x), pixelsToTwips(y));
@@ -1289,7 +1307,7 @@ getMouseY(DisplayObject& o)
 {
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y, buttons;
-	getRoot(o).get_mouse_state(x, y, buttons);
+	getRoot(*getObject(&o)).get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = o.getWorldMatrix();
     point a(pixelsToTwips(x), pixelsToTwips(y));
@@ -1328,7 +1346,7 @@ setRotation(DisplayObject& o, const as_value& val)
 as_value
 getParent(DisplayObject& o)
 {
-    as_object* p = o.get_parent();
+    as_object* p = getObject(o.get_parent());
     return p ? p : as_value();
 }
 
@@ -1342,7 +1360,7 @@ as_value
 getNameProperty(DisplayObject& o)
 {
     const std::string& name = o.get_name();
-    if (getSWFVersion(o) < 6 && name.empty()) return as_value(); 
+    if (getSWFVersion(*getObject(&o)) < 6 && name.empty()) return as_value(); 
     return as_value(name);
 }
 

@@ -42,7 +42,8 @@ public:
     virtual void display(Renderer& renderer, const DisplayObject& inst) const;
 
     // Create a Shape DisplayObject.
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const;
+	virtual DisplayObject* createDisplayObject(Global_as& gl,
+            DisplayObject* parent) const;
 	
     /// Get cached bounds of this shape.
     const SWFRect& bounds() const { return _shape.getBounds(); }

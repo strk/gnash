@@ -50,8 +50,8 @@ class MorphShape : public DisplayObject
 
 public:
 
-    MorphShape(const SWF::DefineMorphShapeTag* const def, 
-            DisplayObject* parent);
+    MorphShape(movie_root& mr, as_object* object,
+            const SWF::DefineMorphShapeTag* def, DisplayObject* parent);
 
 	virtual void display(Renderer& renderer);
 
@@ -69,9 +69,7 @@ protected:
 	/// Mark reachable resources (for the GC)
 	void markReachableResources() const
 	{
-		assert(isReachable());
         _def->setReachable();
-		markDisplayObjectReachable();
 	}
 #endif
 

@@ -67,7 +67,8 @@ public:
 
     const SWFRect& bounds() const { return _rect; }
 
-    DisplayObject* createDisplayObject(DisplayObject* parent) const;
+    DisplayObject* createDisplayObject(Global_as& gl,
+            DisplayObject* parent) const;
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.

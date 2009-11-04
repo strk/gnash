@@ -23,7 +23,6 @@
 
 #include "VM.h"
 #include "DummyMovieDefinition.h"
-#include "DummyCharacter.h"
 #include "ManualClock.h"
 #include "movie_definition.h"
 #include "dejagnu.h"
@@ -118,12 +117,12 @@ main(int argc, char *argv[])
     movie_root stage(*md, clock, runResources);
 
     MovieClip::MovieVariables v;
-    stage.init(md, v);
+    Movie* m = stage.init(md, v);
 
     // run the tests
     test_isnan();
     test_el();
-    test_obj(&stage.getRootMovie());
+    test_obj(getObject(m));
     test_conversion();
    
 }

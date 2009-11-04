@@ -79,7 +79,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	string_table& st = VM::get().getStringTable();
 	as_value eot;
-	bool endOfTestFound = root->get_member(st.find("endoftest"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
 	check(endOfTestFound);
 	check(eot.is_bool());
 	check(eot.to_bool());

@@ -83,7 +83,8 @@ public:
 
 	~DefineVideoStreamTag();
 
-	DisplayObject* createDisplayObject(DisplayObject* parent) const;
+	DisplayObject* createDisplayObject(Global_as& gl, DisplayObject* parent)
+        const;
 
 	/// Read tag SWF::DEFINEVIDEOSTREAM 
 	//

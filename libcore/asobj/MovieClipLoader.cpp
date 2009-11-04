@@ -202,7 +202,7 @@ moviecliploader_loadClip(const fn_call& fn)
 		return as_value(false);
 	}
 
-    as_value targetVal(sprite);
+    as_value targetVal(getObject(sprite));
 
     movie_root& mr = getRoot(*ptr);
 	URL url(str_url, mr.runResources().baseURL());
@@ -218,8 +218,8 @@ moviecliploader_loadClip(const fn_call& fn)
         // was attempted (sandbox) or no status information is available
         // (supposedly the Adobe mozilla plugin).
 		as_value arg2(0.0);
-		ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError", sprite,
-                arg1, arg2);
+		ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
+                getObject(sprite), arg1, arg2);
 
 		return as_value(true);
 	}
@@ -296,9 +296,9 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(getGlobal(fn));
+	as_object* target = fn.arg(0).to_object(getGlobal(fn));
   
-	if (!target.get()) {
+	if (!target) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
                 "not an object"), fn.arg(0));
@@ -306,7 +306,7 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	MovieClip* sp = target->to_movie();
+	MovieClip* sp = get<MovieClip>(target);
 	if (!sp) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "

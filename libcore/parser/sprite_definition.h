@@ -235,7 +235,8 @@ public:
 	// the parent movie's display list.
 	//
 	// overloads from SWF::DefinitionTag
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent) const;
+	virtual DisplayObject* createDisplayObject(Global_as& gl,
+            DisplayObject* parent) const;
 
 	// See dox in movie_definition.h
 	virtual void addControlTag(SWF::ControlTag* c)

@@ -115,8 +115,8 @@ public:
     /// @param parent
     ///     Parent of the created instance in the display list.
     ///     May be 0 for top-level movies (_level#).
-    MovieClip(const movie_definition* const def, Movie* root,
-            DisplayObject* parent);
+    MovieClip(as_object* object, const movie_definition* def,
+            Movie* root, DisplayObject* parent);
 
     virtual ~MovieClip();
 
@@ -231,11 +231,6 @@ public:
         return _droptarget;
     }
     
-    virtual bool wantsInstanceName() const
-    {
-        return true; // sprites can be referenced 
-    }
-
     virtual void advance();
 
     /// Set the sprite state at the specified frame number.
@@ -523,7 +518,7 @@ public:
     DisplayObject* getDisplayListObject(string_table::key name);
 
     /// Overridden to look in DisplayList for a match
-    as_object* get_path_element(string_table::key key);
+    as_object* pathElement(string_table::key key);
 
     /// Execute the actions for the specified frame. 
     //
@@ -611,9 +606,6 @@ public:
     ///
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
     void removeMovieClip();
-
-    /// Create a Bitmap DisplayObject at the specified depth.
-    void attachBitmap(BitmapData_as* bd, int depth);
 
     /// Render this MovieClip to a GnashImage using the passed transform
     //
@@ -742,9 +734,7 @@ public:
 
 protected:
 
-#ifdef GNASH_USE_GC
-    /// Mark sprite-specific reachable resources and invoke
-    /// the parent's class version (markDisplayObjectReachable)
+    /// Mark sprite-specific reachable resources.
     //
     /// sprite-specific reachable resources are:
     ///     - DisplayList items (current, backup and frame0 ones)
@@ -754,8 +744,7 @@ protected:
     /// - Textfields having an associated variable registered in this instance.
     /// - Relative root of this instance (_swf)
     ///
-    virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
+    virtual void markOwnResources() const;
     
     // Used by BitmapMovie.
     void placeDisplayObject(DisplayObject* ch, int depth) {       

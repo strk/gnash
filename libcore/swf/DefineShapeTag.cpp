@@ -31,6 +31,7 @@
 #include "MovieClip.h"
 #include "SWF.h"
 #include "Renderer.h"
+#include "Global_as.h"
 
 #include <algorithm>
 
@@ -63,9 +64,10 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineShapeTag::createDisplayObject(DisplayObject* parent) const
+DefineShapeTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
+    const
 {
-	return new Shape(this, parent);
+	return new Shape(getRoot(gl), 0, this, parent);
 }
     
 bool

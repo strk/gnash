@@ -45,9 +45,11 @@ class Bitmap : public DisplayObject
 {
 public:
 
-	Bitmap(BitmapData_as* bd, DisplayObject* parent);
+	Bitmap(movie_root& mr, as_object* object, BitmapData_as* bd,
+            DisplayObject* parent);
 	
-    Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent);
+    Bitmap(movie_root& mr, as_object* object, const BitmapMovieDefinition* def,
+            DisplayObject* parent);
 
     ~Bitmap();
 

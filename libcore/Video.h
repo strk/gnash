@@ -48,7 +48,8 @@ class Video : public DisplayObject
 
 public:
 	
-	Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent);
+	Video(as_object* object, const SWF::DefineVideoStreamTag* def,
+            DisplayObject* parent);
 
 	~Video();
 
@@ -67,12 +68,6 @@ public:
 	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	void display(Renderer& renderer);
-
-	// For sure isActionScriptReferenceable...
-	bool wantsInstanceName() const
-	{
-		return true; // text fields can be referenced 
-	}	
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
@@ -105,15 +100,12 @@ public:
 
 protected:
     
-#ifdef GNASH_USE_GC
-	/// Mark video-specific reachable resources and invoke
-	/// the parent's class version (markDisplayObjectReachable)
+	/// Mark video-specific reachable resources.
 	//
 	/// video-specific reachable resources are:
 	///	- Associated NetStream if any (_ns) 
 	///
-	virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
+	virtual void markOwnResources() const;
 
 private:
 
@@ -146,6 +138,12 @@ private:
     /// Whether to request smoothing when the video is scaled
     bool _smoothing;
 };
+
+/// Native function to create a plain object with Video properties
+//
+/// This adds properties to the prototype, but does not add a Video
+/// DisplayObject.
+as_object* createVideoObject(Global_as& gl);
 
 void video_class_init(as_object& global, const ObjectURI& uri);
 

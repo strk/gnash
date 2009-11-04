@@ -15,6 +15,7 @@
 #include "Font.h"
 #include "StaticText.h"
 #include "GnashAlgorithm.h"
+#include "Global_as.h"
 
 #include <algorithm>
 #include <numeric>
@@ -40,9 +41,10 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineTextTag::createDisplayObject(DisplayObject* parent) const
+DefineTextTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
+    const
 {
-    return new StaticText(this, parent);
+    return new StaticText(getRoot(gl), 0, this, parent);
 }
 
 bool

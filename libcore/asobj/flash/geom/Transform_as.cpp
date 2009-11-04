@@ -344,9 +344,8 @@ transform_ctor(const fn_call& fn)
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
     as_object* o = fn.arg(0).to_object(getGlobal(fn));
-    if (!o) return as_value();
+    MovieClip* mc = get<MovieClip>(o);
 
-    MovieClip* mc = o->to_movie();
     if (!mc) return as_value();
 
     obj->setRelay(new Transform_as(*mc));

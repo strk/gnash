@@ -225,22 +225,19 @@ private:
 
 }
 
-// Forward declarations
-static as_object* getButtonInterface();
-
 namespace {
     void addInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
         const std::string& name = d->get_name();
         if (name.empty()) return;
-        b.init_member(name, d, 0);
+        getObject(&b)->init_member(name, getObject(d), 0);
     }
 
     void removeInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
         const std::string& name = d->get_name();
         if (name.empty()) return;
-        b.delProperty(getStringTable(b).find(name));
+        getObject(&b)->delProperty(getStringTable(*getObject(&b)).find(name));
     }
 }
 
@@ -290,27 +287,27 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent)
+Button::Button(as_object* object, const SWF::DefineButtonTag* def,
+        DisplayObject* parent)
     :
-    InteractiveObject(parent),
+    InteractiveObject(object, parent),
     _lastMouseFlags(FLAG_IDLE),
     _mouseFlags(FLAG_IDLE),
     _mouseState(MOUSESTATE_UP),
     _def(def)
 {
-
-    set_prototype(getButtonInterface());
+    assert(object);
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {
-        getRoot(*this).add_key_listener(this);
+        stage().add_key_listener(this);
     }
 
 }
 
 Button::~Button()
 {
-    getRoot(*this).remove_key_listener(this);
+    stage().remove_key_listener(this);
 }
 
 bool
@@ -318,8 +315,8 @@ Button::trackAsMenu()
 {
     // TODO: check whether the AS or the tag value takes precedence.
     as_value track;
-    string_table& st = getStringTable(*this);
-    if (get_member(st.find("trackAsMenu"), &track)) {
+    string_table& st = getStringTable(*getObject(this));
+    if (getObject(this)->get_member(st.find("trackAsMenu"), &track)) {
         return track.to_bool();
     }
     if (_def) return _def->trackAsMenu();
@@ -330,7 +327,7 @@ bool
 Button::isEnabled()
 {
     as_value enabled;
-    if (!get_member(NSV::PROP_ENABLED, &enabled)) return false;
+    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) return false;
 
     return enabled.to_bool();
 }
@@ -356,7 +353,7 @@ Button::notifyEvent(const event_id& id)
     // We only respond to valid key code (should we assert here?)
     if ( id.keyCode() == key::INVALID ) return false;
 
-    ButtonActionPusher xec(getRoot(*this), this); 
+    ButtonActionPusher xec(stage(), this); 
     _def->forEachTrigger(id, xec);
 
     return xec.called;
@@ -501,7 +498,7 @@ Button::mouseEvent(const event_id& event)
         if (!_def->hasSound()) break;
 
         // Check if there is a sound handler
-        sound::sound_handler* s = getRunResources(*this).soundHandler();
+        sound::sound_handler* s = getRunResources(*getObject(this)).soundHandler();
         if (!s) break;
 
         int bi; // button sound array index [0..3]
@@ -567,7 +564,7 @@ Button::mouseEvent(const event_id& event)
     // the action queue on mouse event.
     //
 
-    movie_root& mr = getRoot(*this);
+    movie_root& mr = stage();
 
     ButtonActionPusher xec(mr, this); 
     _def->forEachTrigger(event, xec);
@@ -802,7 +799,7 @@ Button::stagePlacementCallback(as_object* initObj)
     if (initObj) {
         log_unimpl("Button placed with an initObj. How did this happen? "
                 "We'll copy the properties anyway");
-        copyProperties(*initObj);
+        getObject(this)->copyProperties(*initObj);
     }
 
     saveOriginalTarget(); // for soft refs
@@ -851,9 +848,8 @@ Button::stagePlacementCallback(as_object* initObj)
 
 #ifdef GNASH_USE_GC
 void
-Button::markReachableResources() const
+Button::markOwnResources() const
 {
-    assert(isReachable());
 
     _def->setReachable();
 
@@ -867,10 +863,8 @@ Button::markReachableResources() const
 
     // Mark hit DisplayObjects as reachable
     std::for_each(_hitCharacters.begin(), _hitCharacters.end(),
-            std::mem_fun(&as_object::setReachable));
+            std::mem_fun(&DisplayObject::setReachable));
 
-    // DisplayObject class members
-    markDisplayObjectReachable();
 }
 #endif // GNASH_USE_GC
 
@@ -931,22 +925,8 @@ Button::getDefinitionVersion() const
     return _def->getSWFVersion();
 }
 
-static as_object*
-getButtonInterface()
-{
-  static boost::intrusive_ptr<as_object> proto;
-  if ( proto == NULL )
-  {
-    proto = new as_object(getObjectInterface());
-    VM::get().addStatic(proto.get());
-
-    attachButtonInterface(*proto);
-  }
-  return proto.get();
-}
-
 static as_value
-button_ctor(const fn_call& /* fn */)
+button_ctor(const fn_call& /*fn*/)
 {
     return as_value();
 }
@@ -956,8 +936,9 @@ button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* proto = getButtonInterface();
+    as_object* proto = gl.createObject();
     as_object* cl = gl.createClass(&button_ctor, proto);
+    attachButtonInterface(*proto);
 
     // Register _global.MovieClip
     global.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -1023,7 +1004,7 @@ namespace {
 as_value
 button_blendMode(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1031,7 +1012,7 @@ button_blendMode(const fn_call& fn)
 as_value
 button_cacheAsBitmap(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1039,7 +1020,7 @@ button_cacheAsBitmap(const fn_call& fn)
 as_value
 button_filters(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1047,7 +1028,7 @@ button_filters(const fn_call& fn)
 as_value
 button_scale9Grid(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1055,7 +1036,7 @@ button_scale9Grid(const fn_call& fn)
 as_value
 button_getTabIndex(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1063,7 +1044,7 @@ button_getTabIndex(const fn_call& fn)
 as_value
 button_setTabIndex(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }
@@ -1071,7 +1052,7 @@ button_setTabIndex(const fn_call& fn)
 as_value
 button_getDepth(const fn_call& fn)
 {
-    as_object* obj = ensure<ThisIs<Button> >(fn);
+    Button* obj = ensure<IsDisplayObject<Button> >(fn);
     UNUSED(obj);
     return as_value();
 }

@@ -1036,11 +1036,8 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     DisplayObject *target = NULL;
     if ( tgt_str.empty() )
     {
-        as_object* obj = thread.getTarget();
-
-        target = dynamic_cast<DisplayObject*>(obj);
-        if ( ! target )
-        {
+        target = get<DisplayObject>(thread.getTarget());
+        if (!target) {
             log_error(_("ActionGetProperty(<empty>) called, but current "
                         "target is not a DisplayObject"));
         }
@@ -1134,7 +1131,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
         return;
     }
 
-    boost::intrusive_ptr<MovieClip> sprite = ch->to_movie();
+    MovieClip* sprite = ch->to_movie();
     if ( ! sprite )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1313,8 +1310,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "instance"
-    boost::intrusive_ptr<as_object> instance = 
-        convertToObject(getGlobal(thread.env), env.top(0));
+    as_object* instance = convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
     as_function* super = env.top(1).to_as_function();
@@ -2097,9 +2093,9 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 // Reserved:4
 // LoadTargetFlag:1
 // LoadVariableFlag:1
+/// @param target        the target window, or _level1..10
 void
-SWFHandlers::CommonGetUrl(as_environment& env,
-        as_value target, // the target window, or _level1..10
+SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
         const std::string& url, boost::uint8_t method)
 {
 
@@ -2126,8 +2122,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         static_cast<MovieClip::VariablesMethod>(method & 3);
 
     std::string target_string;
-    if ( ! target.is_undefined() && ! target.is_null() )
-    {
+    if (!target.is_undefined() && !target.is_null()) {
         target_string = target.to_string();
     }
 
@@ -2206,7 +2201,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //         no matter the target found on stack (which
         //         is the target to load the resource into).
         //
-        DisplayObject* curtgt = env.get_target();
+        as_object* curtgt = getObject(env.get_target());
         if (!curtgt) {
             log_error(_("CommonGetUrl: current target is undefined"));
             return;
@@ -2326,12 +2321,10 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
     boost::uint8_t method = code[thread.getCurrentPC() + 3];
 
     as_value url_val = env.top(1);
-    if ( url_val.is_undefined() )
-    {
+    if (url_val.is_undefined()) {
         log_error(_("Undefined GetUrl2 url on stack, skipping"));
     }
-    else
-    {
+    else {
         const std::string& url = url_val.to_string();
         CommonGetUrl(env, env.top(0), url, method);
     }

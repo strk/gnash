@@ -128,9 +128,22 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
+as_object*
+createTextFieldObject(Global_as& gl)
+{
+    as_value tf(gl.getMember(NSV::CLASS_TEXT_FIELD));
+    as_function* ctor = tf.to_as_function();
+    if (!ctor) return 0;
+    fn_call::Args args;
+    as_environment env(getVM(gl));
+    return ctor->constructInstance(env, args).get();
+}
+
+
+TextField::TextField(as_object* object, DisplayObject* parent,
+        const SWF::DefineEditTextTag& def)
     :
-    InteractiveObject(parent),
+    InteractiveObject(object, parent),
     _tag(&def),
     _textDefined(def.hasText()),
     _htmlTextDefined(def.hasText()),
@@ -176,12 +189,15 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
     _bounds(def.bounds()),
     _selection(0, 0)
 {
+
+    assert(object);
+
     // WARNING! remember to set the font *before* setting text value!
     boost::intrusive_ptr<const Font> f = def.getFont();
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = getSWFVersion(*parent);
+    int version = getSWFVersion(*object);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -196,9 +212,10 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def)
 
 }
 
-TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
+TextField::TextField(as_object* object, DisplayObject* parent,
+        const SWFRect& bounds)
     :
-    InteractiveObject(parent),
+    InteractiveObject(object, parent),
     _textDefined(false),
     _htmlTextDefined(false),
     _restrictDefined(false),
@@ -253,18 +270,19 @@ TextField::TextField(DisplayObject* parent, const SWFRect& bounds)
 void
 TextField::init()
 {
-    as_environment env(getVM(*this));
+#if 0
+    as_environment env(getVM(*getObject(this)));
     as_object* proto = env.find_object("_global.TextField.prototype");
     if (proto) {
         attachPrototypeProperties(*proto);
     }
      
-    set_prototype(proto);
+    getObject(this)->set_prototype(proto);
 
-    as_object* ar = getGlobal(*this).createArray();
-    ar->callMethod(NSV::PROP_PUSH, this);
-    set_member(NSV::PROP_uLISTENERS, ar);
-    
+    as_object* ar = getGlobal(*getObject(this)).createArray();
+    ar->callMethod(NSV::PROP_PUSH, getObject(this));
+    getObject(this)->set_member(NSV::PROP_uLISTENERS, ar);
+#endif
     registerTextVariable();
 
     reset_bounding_box(0, 0);
@@ -544,7 +562,7 @@ void
 TextField::replaceSelection(const std::string& replace)
 {
 
-    const int version = getSWFVersion(*this);
+    const int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
     
     const size_t start = _selection.first;
@@ -579,6 +597,7 @@ TextField::setSelection(int start, int end)
 
     _selection = std::make_pair(start, end);
 }
+
 bool
 TextField::notifyEvent(const event_id& ev)
 {    
@@ -586,12 +605,12 @@ TextField::notifyEvent(const event_id& ev)
     {
 		case event_id::PRESS:
 		{
-			movie_root& root = getRoot(*this);
+			movie_root& root = stage();
 			
 			int x_mouse = pixelsToTwips(root.getXMouseLoc());
 			int y_mouse = pixelsToTwips(root.getYMouseLoc());
 			
-			SWFMatrix m = this->getMatrix();
+			SWFMatrix m = getMatrix();
 			
 			x_mouse -= m.get_x_translation();
 			y_mouse -= m.get_y_translation();
@@ -854,7 +873,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -875,7 +894,7 @@ TextField::updateText(const std::wstring& wstr)
 void
 TextField::updateHtmlText(const std::string& str)
 {
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateHtmlText(wstr);
 }
@@ -912,7 +931,7 @@ TextField::setHtmlTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*this);
+            int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -945,7 +964,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*this);
+            int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -972,7 +991,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -981,7 +1000,7 @@ std::string
 TextField::get_htmltext_value() const
 {
     const_cast<TextField*>(this)->registerTextVariable();
-    int version = getSWFVersion(*this);
+    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
     return utf8::encodeCanonicalString(_htmlText, version);
 }
 
@@ -1998,7 +2017,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     /// Why isn't get_environment const again ?
     as_environment& env = const_cast<TextField*>(this)->get_environment();
 
-    as_object* target = env.get_target();
+    as_object* target = getObject(env.get_target());
     if ( ! target )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -2040,7 +2059,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     }
 
     ret.first = target;
-    ret.second = getStringTable(*this).find(parsedName);
+    ret.second = getStringTable(*object()).find(parsedName);
 
     return ret;
 }
@@ -2054,16 +2073,14 @@ TextField::registerTextVariable()
     log_debug(_("registerTextVariable() called"));
 #endif
 
-    if ( _text_variable_registered )
-    {
+    if (_text_variable_registered) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("registerTextVariable() no-op call (already registered)"));
 #endif
         return;
     }
 
-    if ( _variable_name.empty() )
-    {
+    if (_variable_name.empty()) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("string is empty, consider as registered"));
 #endif
@@ -2073,8 +2090,7 @@ TextField::registerTextVariable()
 
     VariableRef varRef = parseTextVariableRef(_variable_name);
     as_object* target = varRef.first;
-    if ( ! target )
-    {
+    if (!target) {
         log_debug(_("VariableName associated to text field (%s) refer to "
                     "an unknown target. It is possible that the DisplayObject "
                     "will be instantiated later in the SWF stream. "
@@ -2083,56 +2099,51 @@ TextField::registerTextVariable()
         return;
     }
 
-    string_table::key key = varRef.second;
-
+    const string_table::key key = varRef.second;
+    as_object* obj = getObject(this);
+    const int version = getSWFVersion(*obj);
+    string_table& st = getStringTable(*obj);
+    
     // check if the VariableName already has a value,
     // in that case update text value
     as_value val;
-    
-    int version = getSWFVersion(*this);
-    
-    if (target->get_member(key, &val) )
-    {
+    if (target->get_member(key, &val) ) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target object (%s @ %p) does have a member named %s"),
-            typeName(*target), (void*)target, getStringTable(*this).value(key));
+            typeName(*target), (void*)target, st.value(key));
 #endif
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
         setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
     }
-    else if ( _textDefined )
-    {
+    else if (_textDefined) {
         as_value newVal = as_value(utf8::encodeCanonicalString(_text, version));
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s (no problem, we'll add it with value %s)"),
                     typeName(*target), (void*)target,
-                    getStringTable(*this).value(key), newVal);
+                    st.value(key), newVal);
 #endif
         target->set_member(key, newVal);
     }
-    else
-    {
+    else {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s, and we don't have text defined"),
-                    typeName(*target), (void*)target,
-                    getStringTable(*this).value(key));
+                    typeName(*target), (void*)target, st.value(key));
 #endif
     }
 
-    MovieClip* sprite = target->to_movie();
+    MovieClip* sprite = get<MovieClip>(target);
 
-    if ( sprite )
-    {
+    if (sprite) {
         // add the textfield variable to the target sprite
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
-                getStringTable(*this).value(key), sprite->getTarget());
+                st.value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(getStringTable(*this).value(key), this);
+        sprite->set_textfield_variable(st.value(key), this);
 
     }
     _text_variable_registered=true;
@@ -2713,9 +2724,8 @@ TextField::getTextAlignment()
 void
 TextField::onChanged()
 {
-    as_value met(PROPNAME("onChanged"));
-    as_value targetVal(this);
-    callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal);
+    as_object* obj = getObject(this);
+    obj->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onChanged", obj);
 }
 
 /// This is called by movie_root when focus is applied to this TextField.
@@ -2727,7 +2737,7 @@ bool
 TextField::handleFocus()
 {
 
-    if (getSWFVersion(*this) < 6) return false;
+    if (getSWFVersion(*getObject(this)) < 6) return false;
 
     set_invalidated();
 
@@ -2738,7 +2748,7 @@ TextField::handleFocus()
 
     // why should we add to the key listener list every time
     // we call setFocus()???
-    getRoot(*this).add_key_listener(this);
+    stage().add_key_listener(this);
 
     m_cursor = _text.size();
     format_text();
@@ -2755,22 +2765,16 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    movie_root& root = getRoot(*this);
-    root.remove_key_listener(this);
+    stage().remove_key_listener(this);
     format_text(); // is this needed ?
 
 }
 
 void
-TextField::markReachableResources() const
+TextField::markOwnResources() const
 {
-
     if (_tag) _tag->setReachable();
-
     if (_font) _font->setReachable();
-
-    // recurse to parent...
-    markDisplayObjectReachable();
 }
 
 void
@@ -2870,7 +2874,7 @@ attachPrototypeProperties(as_object& o)
 as_value
 textfield_createTextField(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = ensure<ThisIs<MovieClip> >(fn);
+    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     
     // name, depth, x, y, width, height
     if (fn.nargs < 6) {
@@ -2882,11 +2886,11 @@ textfield_createTextField(const fn_call& fn)
     }
 
     const std::string& name = fn.arg(0).to_string();
-    int depth = fn.arg(1).to_int();
-    int x = fn.arg(2).to_int();
-    int y = fn.arg(3).to_int();
+    const int depth = fn.arg(1).to_int();
+    const int x = fn.arg(2).to_int();
+    const int y = fn.arg(3).to_int();
+    
     int width = fn.arg(4).to_int();
-
     if (width < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("createTextField: negative width (%d)"
@@ -2911,7 +2915,9 @@ textfield_createTextField(const fn_call& fn)
     //  1. Call "new _global.TextField()" (which takes care of
     //     assigning properties to the prototype).
     //  2. Make that object into a TextField and put it on the display list.
-    DisplayObject* tf = new TextField(ptr.get(), bounds);
+    as_object* obj = createTextFieldObject(getGlobal(fn));
+
+    DisplayObject* tf = new TextField(obj, ptr, bounds);
 
     // Give name and mark as dynamic
     tf->set_name(name);
@@ -2923,17 +2929,16 @@ textfield_createTextField(const fn_call& fn)
     // update caches (although shouldn't be needed as we only set translation)
     tf->setMatrix(matrix, true); 
 
-    DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
+    ptr->addDisplayListObject(tf, depth);
 
-    // createTextField returns void, it seems
-    if (getSWFVersion(fn) > 7) return as_value(txt);
+    if (getSWFVersion(fn) > 7) return as_value(obj);
     return as_value(); 
 }
 
 as_value
 textfield_background(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getDrawBackground());
@@ -2948,7 +2953,7 @@ textfield_background(const fn_call& fn)
 as_value
 textfield_border(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getDrawBorder());
@@ -2963,7 +2968,7 @@ textfield_border(const fn_call& fn)
 as_value
 textfield_backgroundColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getBackgroundColor().toRGB());
@@ -2980,7 +2985,7 @@ textfield_backgroundColor(const fn_call& fn)
 as_value
 textfield_borderColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->getBorderColor().toRGB());
@@ -2998,7 +3003,7 @@ textfield_borderColor(const fn_call& fn)
 as_value
 textfield_textColor(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3016,7 +3021,7 @@ textfield_textColor(const fn_call& fn)
 as_value
 textfield_embedFonts(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3031,7 +3036,7 @@ textfield_embedFonts(const fn_call& fn)
 as_value
 textfield_wordWrap(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->doWordWrap());
@@ -3046,7 +3051,7 @@ textfield_wordWrap(const fn_call& fn)
 as_value
 textfield_html(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (fn.nargs == 0) {
         return as_value(ptr->doHtml());
@@ -3061,7 +3066,7 @@ textfield_html(const fn_call& fn)
 as_value
 textfield_selectable(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3078,7 +3083,7 @@ textfield_selectable(const fn_call& fn)
 as_value
 textfield_length(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3099,7 +3104,7 @@ textfield_length(const fn_call& fn)
 as_value
 textfield_textHeight(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3125,7 +3130,7 @@ textfield_textHeight(const fn_call& fn)
 as_value
 textfield_textWidth(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3151,7 +3156,7 @@ textfield_textWidth(const fn_call& fn)
 as_value
 textfield_autoSize(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs == 0 ) // getter
     {
@@ -3185,7 +3190,7 @@ textfield_autoSize(const fn_call& fn)
 as_value
 textfield_type(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3212,7 +3217,7 @@ textfield_type(const fn_call& fn)
 as_value
 textfield_variable(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3243,7 +3248,7 @@ as_value
 textfield_getDepth(const fn_call& fn)
 {
     // Unlike MovieClip.getDepth this works only for TextFields.
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     const int n = text->get_depth();
     return as_value(n);
 }
@@ -3251,7 +3256,7 @@ textfield_getDepth(const fn_call& fn)
 as_value
 textfield_getFontList(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.getFontList()"));
@@ -3262,7 +3267,7 @@ textfield_getFontList(const fn_call& fn)
 as_value
 textfield_getNewTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.getNewTextFormat()"));
@@ -3279,7 +3284,7 @@ textfield_getNewTextFormat(const fn_call& fn)
 as_value
 textfield_getTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     Global_as& gl = getGlobal(fn);
     as_function* ctor = gl.getMember(NSV::CLASS_TEXT_FORMAT).to_as_function();
@@ -3326,7 +3331,7 @@ as_value
 textfield_setTextFormat(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( ! fn.nargs )
     {
@@ -3391,20 +3396,18 @@ textfield_setTextFormat(const fn_call& fn)
 as_value
 textfield_setNewTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
-    //UNUSED(text);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
+    UNUSED(text);
 
     LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate "
                 "to setTextFormat") );
     return textfield_setTextFormat(fn);
-
-    //return as_value();
 }
 
 as_value
 textfield_password(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3419,7 +3422,7 @@ textfield_password(const fn_call& fn)
 as_value
 textfield_multiline(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3433,7 +3436,7 @@ textfield_multiline(const fn_call& fn)
 as_value
 textfield_restrict(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         // Getter
@@ -3453,7 +3456,7 @@ textfield_restrict(const fn_call& fn)
 as_value
 textfield_bottomScroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.bottomScroll is not complete"));
@@ -3473,7 +3476,7 @@ textfield_bottomScroll(const fn_call& fn)
 as_value
 textfield_maxhscroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
         LOG_ONCE(log_unimpl("TextField.maxhscroll is not complete"));
@@ -3499,7 +3502,7 @@ textfield_maxhscroll(const fn_call& fn)
 as_value
 textfield_maxChars(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs)
     {
@@ -3520,7 +3523,7 @@ textfield_maxChars(const fn_call& fn)
 as_value
 textfield_text(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
     if (!fn.nargs)
     {
         // Getter
@@ -3530,7 +3533,7 @@ textfield_text(const fn_call& fn)
     }
 
     // Setter
-    int version = getSWFVersion(*ptr);
+    const int version = getSWFVersion(fn);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -3540,7 +3543,7 @@ textfield_text(const fn_call& fn)
 as_value
 textfield_htmlText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> ptr = ensure<ThisIs<TextField> >(fn);
+    TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
     if (!fn.nargs)
     {
         // Getter
@@ -3548,7 +3551,7 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    const int version = getSWFVersion(*ptr);
+    const int version = getSWFVersion(fn);
     
     ptr->setHtmlTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
@@ -3566,7 +3569,7 @@ textfield_htmlText(const fn_call& fn)
 as_value
 textfield_replaceSel(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3581,7 +3584,7 @@ textfield_replaceSel(const fn_call& fn)
     const std::string& replace = fn.arg(0).to_string();
 
     /// Do nothing if text is empty and version less than 8.
-    const int version = getSWFVersion(*text);
+    const int version = getSWFVersion(fn);
     if (version < 8 && replace.empty()) return as_value();
 
     text->replaceSelection(replace);
@@ -3592,7 +3595,7 @@ textfield_replaceSel(const fn_call& fn)
 as_value
 textfield_scroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     if (!fn.nargs)
@@ -3609,7 +3612,7 @@ textfield_scroll(const fn_call& fn)
 as_value
 textfield_hscroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField._hscroll is not complete"));
@@ -3628,7 +3631,7 @@ textfield_hscroll(const fn_call& fn)
 as_value
 textfield_maxscroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.maxscroll is not complete"));
@@ -3650,7 +3653,7 @@ textfield_replaceText(const fn_call& fn)
     using std::string;
     using std::wstring;
 
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     if ( fn.nargs < 3 )
     {
@@ -3674,7 +3677,7 @@ textfield_replaceText(const fn_call& fn)
     wstring::size_type start = fn.arg(0).to_int();
     wstring::size_type end = userEnd;
 
-    int version = getSWFVersion(*text);
+    int version = getSWFVersion(fn);
 
     // TODO: check if it's possible for SWF6 to use this function
     //       and if it is whether to_string should be to_string_versioned
@@ -3726,7 +3729,7 @@ textfield_replaceText(const fn_call& fn)
 as_value
 textfield_removeTextField(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensure<ThisIs<TextField> >(fn);
+    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     text->removeTextField();
 
@@ -3753,9 +3756,10 @@ textfield_ctor(const fn_call& fn)
 {
 
     if (isAS3(fn)) {
+        as_object* obj = ensure<ValidThis>(fn);
         SWFRect nullRect;
-        as_object* obj = new TextField(0, nullRect);
-        return as_value(obj);
+        obj->setDisplayObject(new TextField(obj, 0, nullRect));
+        return as_value();
     }
 
     as_object* obj = ensure<ValidThis>(fn);
@@ -3771,6 +3775,9 @@ textfield_ctor(const fn_call& fn)
         attachPrototypeProperties(*proto);
     }
 
+    as_object* ar = getGlobal(fn).createArray();
+    ar->callMethod(NSV::PROP_PUSH, obj);
+    obj->set_member(NSV::PROP_uLISTENERS, ar);
     return as_value();
 }
 

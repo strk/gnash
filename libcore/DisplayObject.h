@@ -60,6 +60,11 @@ namespace gnash {
 
 namespace gnash {
 
+/// Returns true if the DisplayObject is referenceable in ActionScript
+//
+/// A DisplayObject is referenceable if it has an associated object.
+bool isReferenceable(DisplayObject& d);
+
 /// Attaches common DisplayObject properties such as _height, _x, _visible
 //
 /// This should be called by DisplayObject subclasses to ensure that
@@ -92,7 +97,13 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// DisplayObject is the base class for all DisplayList objects.
 //
 /// It represents a single active element in a movie. This class does not
-/// provide any interactivity.
+/// supply any interactivity. The hierarchy of DisplayObjects in a movie
+/// provides all visual elements in a SWF. The DisplayObject hierarchy
+/// is independent of ActionScript resources, but can be controlled via AS.
+//
+/// DisplayObjects that can be controlled through ActionScript have an
+/// associated as_object. DisplayObjects such as Shape, do not have an
+/// associated object and cannot be referenced in AS.
 //
 /// Derived classes include InteractiveObject, StaticText, Bitmap,
 /// Video, and Shape.
@@ -109,11 +120,21 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// dynamic DisplayObjects, but tags are not always stored. They are not
 /// stored in most InteractiveObjects because most properties can be
 /// overridden during SWF execution.
-class DisplayObject : public as_object, boost::noncopyable
+class DisplayObject : public GcResource, boost::noncopyable
 {
 public:
 
-    DisplayObject(DisplayObject* parent);
+    /// Construct a DisplayObject
+    //
+    /// @param mr       The movie_root containing the DisplayObject hierarchy.
+    ///                 All DisplayObjects may need movie_root resources.
+    /// @param object   An object to be associated with this DisplayObject.
+    ///                 If this is non-null, the DisplayObject will be
+    ///                 referenceable in ActionScript. Referenceable
+    ///                 DisplayObjects may access AS resources through their
+    ///                 associated object.
+    /// @param parent   The parent of the new DisplayObject. This may be null.
+    DisplayObject(movie_root& mr, as_object* object, DisplayObject* parent);
 
     virtual ~DisplayObject() {}
 
@@ -187,6 +208,16 @@ public:
         return _parent->get_environment();
     }
 
+    /// Enumerate any non-proper properties
+    //
+    /// This function is called by enumerateProperties(as_environment&) 
+    /// to allow for enumeration of properties that are derived from the
+    /// DisplayObject type, e.g. DisplayList members.
+    ///
+    /// The default implementation adds nothing
+    ///
+    virtual void enumerateNonProperties(as_environment&) const {}
+
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
     /// the DisplayObject has no parent.
@@ -203,6 +234,8 @@ public:
     {
         _parent = parent;
     }
+
+    virtual MovieClip* to_movie() { return 0; }
 
     int get_depth() const { return m_depth; }
 
@@ -540,7 +573,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* get_path_element(string_table::key key);
+    virtual as_object* pathElement(string_table::key key);
 
     /// Advance this DisplayObject to next frame.
     //
@@ -665,26 +698,10 @@ public:
         return 0;
     }
 
-    /// Returns true when the object (type) should get a instance name even 
-    /// if none is provided manually.
-    virtual bool wantsInstanceName() const
-    {
-        return false; 
-    }
-
-    /// Returns true when the object (type) can be referenced by ActionScipt
-    bool isActionScriptReferenceable() const
-    {
-        // The way around
-        // [ wantsInstanceName() returning isActionScriptReferenceable() ]
-        // would be cleaner, but I wouldn't want to touch all files now.
-        return wantsInstanceName();
-    }
-
     /// Returns the closest as-referenceable ancestor
     DisplayObject* getClosestASReferenceableAncestor() 
     {
-        if ( isActionScriptReferenceable() ) return this;
+        if (isReferenceable(*this)) return this;
         assert(_parent);
         return _parent->getClosestASReferenceableAncestor();
     }
@@ -956,10 +973,29 @@ public:
         return _yscale;
     }
 
+    as_object* object() const;
+
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
   
+    /// Mark all reachable resources.
+    //
+    /// Try not to override this function in derived classes. This always
+    /// marks the base class's resources and calls markOwnResources() to
+    /// take care of any further GC resources.
+    virtual void markReachableResources() const;
+
+    /// Called by markReachableResources()
+    //
+    /// DisplayObjects should mark their own resources in this function.
+    virtual void markOwnResources() const {}
+
 protected:
+
+    /// Get the movie_root to which this DisplayObject belongs.
+    movie_root& stage() {
+        return _stage;
+    }
 
     /// Register currently computable target as
     /// the "original" one. This will be used by
@@ -972,27 +1008,6 @@ protected:
         _origTarget=getTarget();
     }
 
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources, override from as_object.
-    //
-    /// The default implementation calls markDisplayObjectReachable().
-    ///
-    /// If a derived class provides access to more GC-managed
-    /// resources, it should override this method and call 
-    /// markDisplayObjectReachableResources() as the last step.
-    ///
-    virtual void markReachableResources() const
-    {
-        markDisplayObjectReachable();
-    }
-
-    /// Mark DisplayObject-specific reachable resources
-    //
-    /// These are: the DisplayObject's parent, mask, maskee and the default
-    ///                         as_object reachable stuff.
-    ///
-    void markDisplayObjectReachable() const;
-#endif // GNASH_USE_GC
 
     const Events& get_event_handlers() const
     {
@@ -1067,7 +1082,6 @@ protected:
     /// Will be set by set_invalidated() and used by
     /// get_invalidated_bounds().
     InvalidatedRanges m_old_invalidated_ranges;
-    
 
 private:
 
@@ -1076,6 +1090,12 @@ private:
 
     /// Build the _target member recursive on parent
     std::string computeTargetPath() const;
+
+    /// The as_object to which this DisplayObject is attached.
+    as_object* _object;
+
+    /// The movie_root to which this DisplayObject belongs.
+    movie_root& _stage;
 
     int m_depth;
     cxform m_color_transform;
@@ -1131,6 +1151,23 @@ private:
     bool _dynamicallyCreated;
 
 };
+
+inline bool
+isReferenceable(DisplayObject& d)
+{
+    return d.object();
+}
+
+/// Return the as_object associated with a DisplayObject if it exists
+//
+/// @param d    The DisplayObject to check. May be null.
+/// @return     null if either the DisplayObject or the associated object is
+///             null. Otherwise the associated object.
+inline as_object*
+getObject(DisplayObject* d)
+{
+    return d ? d->object() : 0;
+}
 
 /// Stream operator for DisplayObject blend mode.
 std::ostream&
