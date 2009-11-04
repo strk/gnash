@@ -2880,11 +2880,11 @@ textfield_createTextField(const fn_call& fn)
     }
 
     const std::string& name = fn.arg(0).to_string();
-    int depth = fn.arg(1).to_int();
-    int x = fn.arg(2).to_int();
-    int y = fn.arg(3).to_int();
+    const int depth = fn.arg(1).to_int();
+    const int x = fn.arg(2).to_int();
+    const int y = fn.arg(3).to_int();
+    
     int width = fn.arg(4).to_int();
-
     if (width < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("createTextField: negative width (%d)"
