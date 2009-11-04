@@ -2929,9 +2929,9 @@ textfield_createTextField(const fn_call& fn)
     // update caches (although shouldn't be needed as we only set translation)
     tf->setMatrix(matrix, true); 
 
-    DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
+    ptr->addDisplayListObject(tf, depth);
 
-    if (getSWFVersion(fn) > 7) return as_value(getObject(txt));
+    if (getSWFVersion(fn) > 7) return as_value(obj);
     return as_value(); 
 }
 

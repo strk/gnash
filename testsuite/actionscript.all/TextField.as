@@ -1205,13 +1205,13 @@ TextField.prototype.toString = function() { return "Hoppla!"; };
 // replaced shows that the native functions (making into a real TextField)
 // is done in createTextField.
 r = _root.createTextField("tfmo", 2, 2, 10, 10, 6);
-xcheck_equals(count, 1);
+check_equals(count, 1);
 check_equals(args, 0);
 check_equals(_root.tfmo._x, 2);
 
 /// The returned object is still the this pointer that our fake constructor
 /// worked on.
-xcheck_equals(_root.tfmo, storedthis);
+check_equals(_root.tfmo, storedthis);
 xcheck(_root.tfmo === storedthis);
 
 // Not sure why this isn't the case for version 6 or 7.
