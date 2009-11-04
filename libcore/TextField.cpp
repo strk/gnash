@@ -2060,16 +2060,14 @@ TextField::registerTextVariable()
     log_debug(_("registerTextVariable() called"));
 #endif
 
-    if ( _text_variable_registered )
-    {
+    if (_text_variable_registered) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("registerTextVariable() no-op call (already registered)"));
 #endif
         return;
     }
 
-    if ( _variable_name.empty() )
-    {
+    if (_variable_name.empty()) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("string is empty, consider as registered"));
 #endif
@@ -2079,8 +2077,7 @@ TextField::registerTextVariable()
 
     VariableRef varRef = parseTextVariableRef(_variable_name);
     as_object* target = varRef.first;
-    if ( ! target )
-    {
+    if (!target) {
         log_debug(_("VariableName associated to text field (%s) refer to "
                     "an unknown target. It is possible that the DisplayObject "
                     "will be instantiated later in the SWF stream. "
@@ -2089,42 +2086,38 @@ TextField::registerTextVariable()
         return;
     }
 
-    string_table::key key = varRef.second;
-
+    const string_table::key key = varRef.second;
+    as_object* obj = getObject(this);
+    const int version = getSWFVersion(*obj);
+    string_table& st = getStringTable(*obj);
+    
     // check if the VariableName already has a value,
     // in that case update text value
     as_value val;
-    
-    int version = getSWFVersion(*getObject(this));
-    
-    if (target->get_member(key, &val) )
-    {
+    if (target->get_member(key, &val) ) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target object (%s @ %p) does have a member named %s"),
-            typeName(*target), (void*)target, getStringTable(*this).value(key));
+            typeName(*target), (void*)target, st.value(key));
 #endif
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
         setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
     }
-    else if ( _textDefined )
-    {
+    else if (_textDefined) {
         as_value newVal = as_value(utf8::encodeCanonicalString(_text, version));
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s (no problem, we'll add it with value %s)"),
                     typeName(*target), (void*)target,
-                    getStringTable(*this).value(key), newVal);
+                    st.value(key), newVal);
 #endif
         target->set_member(key, newVal);
     }
-    else
-    {
+    else {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("target sprite (%s @ %p) does NOT have a member "
                     "named %s, and we don't have text defined"),
-                    typeName(*target), (void*)target,
-                    getStringTable(*this).value(key));
+                    typeName(*target), (void*)target, st.value(key));
 #endif
     }
 
@@ -2135,9 +2128,9 @@ TextField::registerTextVariable()
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
-                getStringTable(*this).value(key), sprite->getTarget());
+                st.value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(getStringTable(*getObject(this)).value(key), this);
+        sprite->set_textfield_variable(st.value(key), this);
 
     }
     _text_variable_registered=true;
