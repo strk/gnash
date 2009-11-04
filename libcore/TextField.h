@@ -122,11 +122,6 @@ public:
     /// TODO: work out what this means for dynamic TextFields.
     virtual int getDefinitionVersion() const;
 
-    bool wantsInstanceName() const
-	{
-		return true; // text fields can be referenced 
-	}	
-
 	/// This function is called as a user-input handler
 	bool notifyEvent(const event_id& id);	
 

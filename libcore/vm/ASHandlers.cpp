@@ -1036,11 +1036,8 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     DisplayObject *target = NULL;
     if ( tgt_str.empty() )
     {
-        as_object* obj = thread.getTarget();
-
-        target = obj ? obj->displayObject() : 0;
-        if ( ! target )
-        {
+        target = get<DisplayObject>(thread.getTarget());
+        if (!target) {
             log_error(_("ActionGetProperty(<empty>) called, but current "
                         "target is not a DisplayObject"));
         }

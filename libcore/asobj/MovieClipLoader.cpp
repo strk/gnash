@@ -296,9 +296,9 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object(getGlobal(fn));
+	as_object* target = fn.arg(0).to_object(getGlobal(fn));
   
-	if (!target.get()) {
+	if (!target) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
                 "not an object"), fn.arg(0));
@@ -306,8 +306,7 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	MovieClip* sp = target->displayObject() ?
-        target->displayObject()->to_movie() : 0;
+	MovieClip* sp = get<MovieClip>(target);
 	if (!sp) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "

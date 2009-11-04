@@ -1380,11 +1380,16 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 	}
 }
 
-DisplayObject*
-getDisplayObject(as_object* obj)
+as_object*
+getObjectWithPrototype(Global_as& gl, string_table::key c)
 {
-    if (!obj || !obj->displayObject()) return 0;
-    return obj->displayObject();
+    as_object* ctor = gl.getMember(c).to_object(gl);
+    as_object* proto = ctor ?
+        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
+
+    as_object* o = gl.createObject();
+    o->set_prototype(proto ? proto : as_value());
+    return o;
 }
 
 /// Get the VM from an as_object

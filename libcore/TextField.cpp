@@ -2124,11 +2124,9 @@ TextField::registerTextVariable()
 #endif
     }
 
-    MovieClip* sprite = target->displayObject() ?
-        target->displayObject()->to_movie() : 0;
+    MovieClip* sprite = get<MovieClip>(target);
 
-    if ( sprite )
-    {
+    if (sprite) {
         // add the textfield variable to the target sprite
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
@@ -3671,7 +3669,7 @@ textfield_replaceText(const fn_call& fn)
     wstring::size_type start = fn.arg(0).to_int();
     wstring::size_type end = userEnd;
 
-    int version = getSWFVersion(*text);
+    int version = getSWFVersion(fn);
 
     // TODO: check if it's possible for SWF6 to use this function
     //       and if it is whether to_string should be to_string_versioned

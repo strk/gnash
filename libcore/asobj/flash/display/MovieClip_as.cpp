@@ -385,7 +385,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    DisplayObject* ch = ptr->addDisplayListObject(mc, fn.arg(1).to_int());
+    ptr->addDisplayListObject(mc, fn.arg(1).to_int());
     return as_value(o);
 }
 
@@ -1466,7 +1466,7 @@ movieclip_setMask(const fn_call& fn)
     // swfdec/test/image/mask-textfield-6.swf shows that setMask should also
     // work against TextFields, we have no tests for other DisplayObject
     // types so we generalize it for any DisplayObject.
-    MovieClip* maskee = ensure<IsDisplayObject<MovieClip> >(fn);
+    DisplayObject* maskee = ensure<IsDisplayObject<> >(fn);
 
     if ( ! fn.nargs )
     {
@@ -1480,14 +1480,14 @@ movieclip_setMask(const fn_call& fn)
     if ( arg.is_null() || arg.is_undefined() )
     {
         // disable mask
-        maskee->setMask(NULL);
+        maskee->setMask(0);
     }
     else
     {
 
-        boost::intrusive_ptr<as_object> obj ( arg.to_object(getGlobal(fn)) );
-        DisplayObject* mask = dynamic_cast<DisplayObject*>(obj.get());
-        if ( ! mask )
+        as_object* obj = arg.to_object(getGlobal(fn));
+        DisplayObject* mask = get<DisplayObject>(obj);
+        if (!mask)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s.setMask(%s) : first argument is not a DisplayObject"),

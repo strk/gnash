@@ -97,11 +97,6 @@ public:
 	virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 	
-	virtual bool wantsInstanceName() const
-	{
-		return true; // buttons can be referenced 
-	}
-	
 	virtual void mouseEvent(const event_id& event);
 
     virtual bool handleFocus();

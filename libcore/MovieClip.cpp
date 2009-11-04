@@ -1287,7 +1287,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
     if (tag->hasName()) ch->set_name(tag->getName());
-    else if (ch->wantsInstanceName())
+    else if (isReferenceable(*ch))
     {
         std::string instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
@@ -1357,7 +1357,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
 
     // if the existing DisplayObject is not a shape, move it instead
     // of replacing.
-    if (existing_char->isActionScriptReferenceable()) {
+    if (isReferenceable(*existing_char)) {
         move_display_object(tag, dlist);
         return;
     }
@@ -1370,7 +1370,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     if(tag->hasName()) {
         ch->set_name(tag->getName());
     }
-    else if (ch->wantsInstanceName()) {
+    else if (isReferenceable(*ch)) {
         std::string instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
     }
@@ -1803,7 +1803,7 @@ MovieClip::getDisplayListObject(string_table::key key)
 
     // If the object is an ActionScript referenciable one we
     // return it, otherwise we return ourselves
-    if (ch->isActionScriptReferenceable()) {
+    if (isReferenceable(*ch)) {
         return ch;
     }
     return this;

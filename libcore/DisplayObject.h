@@ -60,6 +60,11 @@ namespace gnash {
 
 namespace gnash {
 
+/// Returns true if the DisplayObject is referenceable in ActionScript
+//
+/// A DisplayObject is referenceable if it has an associated object.
+bool isReferenceable(DisplayObject& d);
+
 /// Attaches common DisplayObject properties such as _height, _x, _visible
 //
 /// This should be called by DisplayObject subclasses to ensure that
@@ -677,26 +682,10 @@ public:
         return 0;
     }
 
-    /// Returns true when the object (type) should get a instance name even 
-    /// if none is provided manually.
-    virtual bool wantsInstanceName() const
-    {
-        return false; 
-    }
-
-    /// Returns true when the object (type) can be referenced by ActionScipt
-    bool isActionScriptReferenceable() const
-    {
-        // The way around
-        // [ wantsInstanceName() returning isActionScriptReferenceable() ]
-        // would be cleaner, but I wouldn't want to touch all files now.
-        return wantsInstanceName();
-    }
-
     /// Returns the closest as-referenceable ancestor
     DisplayObject* getClosestASReferenceableAncestor() 
     {
-        if ( isActionScriptReferenceable() ) return this;
+        if (isReferenceable(*this)) return this;
         assert(_parent);
         return _parent->getClosestASReferenceableAncestor();
     }
@@ -1135,12 +1124,19 @@ private:
 
 };
 
+inline bool
+isReferenceable(DisplayObject& d)
+{
+    return d.object();
+}
+
 /// Return the as_object associated with a DisplayObject if it exists
 //
 /// @param d    The DisplayObject to check. May be null.
 /// @return     null if either the DisplayObject or the associated object is
 ///             null. Otherwise the associated object.
-inline as_object* getObject(DisplayObject* d)
+inline as_object*
+getObject(DisplayObject* d)
 {
     return d ? d->object() : 0;
 }

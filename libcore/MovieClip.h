@@ -239,11 +239,6 @@ public:
         return _droptarget;
     }
     
-    virtual bool wantsInstanceName() const
-    {
-        return true; // sprites can be referenced 
-    }
-
     virtual void advance();
 
     /// Set the sprite state at the specified frame number.

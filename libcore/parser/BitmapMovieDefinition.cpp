@@ -50,7 +50,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 }
 
 DisplayObject*
-BitmapMovieDefinition::createDisplayObject(Global_as& gl,
+BitmapMovieDefinition::createDisplayObject(Global_as& /*gl*/,
         DisplayObject* parent) const
 {
     /// What should we do if construction of the bitmap fails?

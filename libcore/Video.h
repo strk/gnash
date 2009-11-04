@@ -69,12 +69,6 @@ public:
 
 	void display(Renderer& renderer);
 
-	// For sure isActionScriptReferenceable...
-	bool wantsInstanceName() const
-	{
-		return true; // text fields can be referenced 
-	}	
-
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
 	/// Set the input stream for this video

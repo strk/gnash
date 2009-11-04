@@ -344,7 +344,7 @@ ButtonRecord::instantiate(Button* button, bool name) const
     o->setMatrix(_matrix, true);
     o->set_cxform(_cxform);
     o->set_depth(_buttonLayer + DisplayObject::staticDepthOffset + 1);
-    if (name && o->wantsInstanceName()) {
+    if (name && isReferenceable(*o)) {
         o->set_name(button->getNextUnnamedInstanceName());
     }
     return o;
