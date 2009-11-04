@@ -97,7 +97,7 @@ namespace {
 
 /// ConstructEvent, used for queuing construction
 //
-/// It's execution will call constructAsScriptObject() 
+/// Its execution will call constructAsScriptObject() 
 /// on the target movieclip
 ///
 class ConstructEvent: public ExecutableCode {
@@ -1930,7 +1930,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #endif
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
-        std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
+        std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
         getRoot(*this).pushAction(code, movie_root::apCONSTRUCT);
 
     }
@@ -1972,7 +1972,7 @@ MovieClip::constructAsScriptObject()
             // instance name will be needed for properly setting up
             // a reference to 'this' object for ActionScript actions.
             // If the instance doesn't have a name, it will NOT be
-            // an ActionScript referenciable object so we don't have
+            // an ActionScript referenceable object so we don't have
             // anything more to do.
             break;
         }
@@ -2206,22 +2206,8 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
 {
     assert(request.completed());
 
-    // TODO: consider adding a setVariables(std::map) for use by this
-    //             and by Player class when dealing with -P command-line switch
-
-    string_table& st = getStringTable(*this);
-    LoadVariablesThread::ValuesMap& vals = request.getValues();
-    for (LoadVariablesThread::ValuesMap::const_iterator it=vals.begin(),
-            itEnd=vals.end();
-        it != itEnd; ++it)
-    {
-        const std::string name = PROPNAME(it->first);
-        const std::string& val = it->second;
-#ifdef DEBUG_LOAD_VARIABLES
-        log_debug(_("Setting variable '%s' to value '%s'"), name, val);
-#endif
-        set_member(st.find(name), val);
-    }
+    MovieVariables& vals = request.getValues();
+    setVariables(vals);
 
     // We want to call a clip-event too if available, see bug #22116
     notifyEvent(event_id::DATA);
