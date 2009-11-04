@@ -225,9 +225,6 @@ private:
 
 }
 
-// Forward declarations
-static as_object* getButtonInterface();
-
 namespace {
     void addInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
@@ -300,7 +297,6 @@ Button::Button(as_object* object, const SWF::DefineButtonTag* def,
     _def(def)
 {
     assert(object);
-    object->set_prototype(getButtonInterface());
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {
@@ -929,22 +925,8 @@ Button::getDefinitionVersion() const
     return _def->getSWFVersion();
 }
 
-static as_object*
-getButtonInterface()
-{
-  static boost::intrusive_ptr<as_object> proto;
-  if ( proto == NULL )
-  {
-    proto = new as_object(getObjectInterface());
-    VM::get().addStatic(proto.get());
-
-    attachButtonInterface(*proto);
-  }
-  return proto.get();
-}
-
 static as_value
-button_ctor(const fn_call& /* fn */)
+button_ctor(const fn_call& /*fn*/)
 {
     return as_value();
 }
@@ -954,8 +936,9 @@ button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* proto = getButtonInterface();
+    as_object* proto = gl.createObject();
     as_object* cl = gl.createClass(&button_ctor, proto);
+    attachButtonInterface(*proto);
 
     // Register _global.MovieClip
     global.init_member(getName(uri), cl, as_object::DefaultFlags,
