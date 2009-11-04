@@ -1194,6 +1194,7 @@ storedthis = undefined;
 
 _global.TextField = function() {
     storedthis = this;
+    this.bo = "stringo";
     args = arguments.length;
     count++;
 };
@@ -1213,6 +1214,9 @@ check_equals(_root.tfmo._x, 2);
 /// worked on.
 check_equals(_root.tfmo, storedthis);
 xcheck(_root.tfmo === storedthis);
+
+check_equals(_root.tfmo.bo, "stringo");
+check(_root.tfmo.hasOwnProperty("bo"));
 
 // Not sure why this isn't the case for version 6 or 7.
 #if OUTPUT_VERSION >= 8
@@ -1274,11 +1278,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(520);
+     check_totals(522);
 #elif OUTPUT_VERSION == 7
- check_totals(544);
+ check_totals(546);
 #elif OUTPUT_VERSION == 8
- check_totals(545);
+ check_totals(547);
 #endif
 
 #endif
