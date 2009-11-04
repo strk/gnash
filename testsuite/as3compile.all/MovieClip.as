@@ -35,8 +35,8 @@ package hello {
             // Check that this object is a MovieClip and has MovieClip
             // functions (no need to check them all).
             xcheck(this instanceof MovieClip);
-            check_equals(typeof(this.nextFrame), "function");
-            check_equals(typeof(this.play), "function");
+            xcheck_equals(typeof(this.nextFrame), "function");
+            xcheck_equals(typeof(this.play), "function");
             
             xcheck(MovieClip.prototype.hasOwnProperty("constructor"));
             
