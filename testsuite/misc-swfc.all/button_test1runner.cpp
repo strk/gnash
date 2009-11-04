@@ -64,7 +64,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 
 	MovieClip* root = tester.getRootMovie();
-	VM& vm = getVM(*root);
+	VM& vm = getVM(*getObject(root));
 	string_table& st = vm.getStringTable();
 
 	check_equals(root->get_frame_count(), 1);
@@ -158,7 +158,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	as_value eot;
         
-        root->get_member(st.find("testcompleted"), &eot);
+    getObject(root)->get_member(st.find("testcompleted"), &eot);
         
 	//cerr << "EOT is " << eot.to_debug_string() << endl;
 	check(eot.to_bool());
