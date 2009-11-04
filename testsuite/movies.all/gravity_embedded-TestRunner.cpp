@@ -71,7 +71,7 @@ main(int /*argc*/, char** /*argv*/)
 	string_table::key yscale = st.find("_yscale");
 	// we need a const_cast as get_member *might* eventually
 	// change the DisplayObject (fetching _x shouldn't change it though)
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(getObject(const_cast<DisplayObject*>(loaded))->get_member(xscale, &tmp));
 	check(tmp.strictly_equals(50));
 
 	check_equals(loaded->getBounds().height(), 2056);
@@ -87,31 +87,32 @@ main(int /*argc*/, char** /*argv*/)
 	check(!tester.isMouseOverMouseEntity());
 
 	// click some on the "smaller" button
+    as_object* obj = getObject(const_cast<DisplayObject*>(loaded));
 	tester.movePointerTo(474, 18);
 	check(tester.isMouseOverMouseEntity());
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "44");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 44);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 44);
 
 	// click some on the "larger" button
@@ -121,33 +122,33 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text->get_text_value()), "44");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 50);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 50);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "52");
-	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
+	check(obj->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 52);
-	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
+	check(obj->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 52);
 
 
