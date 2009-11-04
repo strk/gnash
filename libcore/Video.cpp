@@ -141,8 +141,6 @@ Video::clear()
 void
 Video::display(Renderer& renderer)
 {
-	// if m_def is NULL we've been constructed by 'new Video', in this
-	// case I think display() would never be invoked on us...
 	assert(m_def);
 
 	SWFMatrix m = getWorldMatrix();
@@ -281,11 +279,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
 	ranges.add(m_old_invalidated_ranges);
 	
-	// NOTE: do not use m_def->boundss()
-
-	// if m_def is NULL we've been constructed by 'new Video', in this
-	// case I think add_invalidated_bouns would never be invoked on us...
-	assert ( m_def );
+	assert (m_def);
 
 	SWFRect bounds;	
 	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
