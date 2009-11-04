@@ -72,8 +72,11 @@ main(int /*argc*/, char** /*argv*/)
     MovieClip* root = const_cast<Movie*>(&stage.getRootMovie());
 
 	// just a couple of DisplayObjects
-	boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(root) );
-	boost::intrusive_ptr<DisplayObject> ch2 ( new DummyCharacter(root) );
+    as_object* ob1 = getGlobal(*getObject(root)).createObject();
+    as_object* ob2 = getGlobal(*getObject(root)).createObject();
+
+	boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(ob1, root) );
+	boost::intrusive_ptr<DisplayObject> ch2 ( new DummyCharacter(ob2, root) );
 
 	dlist1.placeDisplayObject( ch1.get(), 1);
 	dlist1.placeDisplayObject( ch2.get(), 2);

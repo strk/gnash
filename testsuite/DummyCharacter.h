@@ -45,9 +45,9 @@ class DummyCharacter : public InteractiveObject
 
 public:
 
-	DummyCharacter(DisplayObject* parent)
+	DummyCharacter(as_object* object, DisplayObject* parent)
 		:
-		InteractiveObject(0, parent)
+		InteractiveObject(object, parent)
 	{
 	}
 

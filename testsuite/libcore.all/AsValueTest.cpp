@@ -23,7 +23,6 @@
 
 #include "VM.h"
 #include "DummyMovieDefinition.h"
-#include "DummyCharacter.h"
 #include "ManualClock.h"
 #include "movie_definition.h"
 #include "dejagnu.h"
