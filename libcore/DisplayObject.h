@@ -97,7 +97,13 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// DisplayObject is the base class for all DisplayList objects.
 //
 /// It represents a single active element in a movie. This class does not
-/// provide any interactivity.
+/// supply any interactivity. The hierarchy of DisplayObjects in a movie
+/// provides all visual elements in a SWF. The DisplayObject hierarchy
+/// is independent of ActionScript resources, but can be controlled via AS.
+//
+/// DisplayObjects that can be controlled through ActionScript have an
+/// associated as_object. DisplayObjects such as Shape, do not have an
+/// associated object and cannot be referenced in AS.
 //
 /// Derived classes include InteractiveObject, StaticText, Bitmap,
 /// Video, and Shape.
