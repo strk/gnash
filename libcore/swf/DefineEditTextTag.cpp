@@ -45,7 +45,7 @@ DefineEditTextTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
 {
 	// Resolve the font, if possible
 	getFont();
-    as_object* obj = gl.createObject();
+    as_object* obj = createTextFieldObject(gl);
 	TextField* ch = new TextField(obj, parent, *this);
 
 	// This gives an "instance name" to the TextField, but
