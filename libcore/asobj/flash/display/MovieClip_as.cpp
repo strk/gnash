@@ -1222,7 +1222,7 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    DisplayObject* o = getDisplayObject(fn.this_ptr);
+    DisplayObject* o = get<DisplayObject>(fn.this_ptr);
     if (!o) return as_value(-1);
     return as_value(o->getDefinitionVersion());
 }

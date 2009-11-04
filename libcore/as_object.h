@@ -1162,6 +1162,21 @@ public:
 void getURLEncodedVars(as_object& o, std::string& data);
 
 
+/// Extract the DisplayObject attached to an object
+//
+/// @return     0 if no DisplayObject is attached, or if it is not the
+///             requested type
+/// @param o    The object to check.
+template<typename T>
+T*
+get(as_object* o)
+{
+    if (!o) return 0;
+    return dynamic_cast<T*>(o->displayObject());
+}
+
+as_object* getObjectWithPrototype(Global_as& gl, string_table::key c);
+
 /// Comparator for ObjectURI so it can serve as a key in stdlib containers.
 inline bool
 operator<(const ObjectURI& a, const ObjectURI& b)
@@ -1205,12 +1220,6 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
-
-/// Return the DisplayObject part of an as_object
-//
-/// @param obj      The object whose DisplayObject part should be returned
-/// @return         The DisplayObject if the object is one, otherwise 0.
-DisplayObject* getDisplayObject(as_object* obj);
 
 /// Get the VM from an as_object
 VM& getVM(const as_object& o);
