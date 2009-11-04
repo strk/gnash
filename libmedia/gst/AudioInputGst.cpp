@@ -35,7 +35,29 @@ namespace {
 namespace gnash {
 namespace media {
 namespace gst {
-	AudioInputGst::AudioInputGst() 
+
+GnashAudio::GnashAudio() {
+    _element = NULL;
+    _devLocation = NULL;
+    _gstreamerSrc = NULL;
+    _productName = NULL;
+};
+
+GnashAudioPrivate::GnashAudioPrivate() {
+    audioSource = NULL;
+    audioEnc = NULL;
+    _audioDevice = NULL;
+    _deviceName = NULL;
+    _pipeline = NULL;
+    _audioMainBin = NULL;
+    _audioPlaybackBin = NULL;
+    _audioSourceBin = NULL;
+    _audioSaveBin = NULL;
+    _pipelineIsPlaying = false;
+    _mux = NULL;
+};
+
+AudioInputGst::AudioInputGst() 
     {
 		gst_init(NULL,NULL);
         

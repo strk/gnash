@@ -116,10 +116,12 @@ check_equals(typeof(TextField.getFontList), 'function');
 
 check_equals(typeof(TextField.prototype.getFontList), 'undefined');
 
+check(TextField.prototype.hasOwnProperty('replaceText'));
 #if OUTPUT_VERSION > 6
 check_equals(typeof(TextField.prototype.replaceText), 'function');
 #else
 check_equals(typeof(TextField.prototype.replaceText), 'undefined');
+// but exists!
 #endif
 
 tfObj = new TextField();
@@ -1099,6 +1101,47 @@ check_equals(Selection.getBeginIndex(), 2);
 check_equals(Selection.getEndIndex(), 5);
 
 //------------------------------------------------------------
+// Test TextField.replaceText
+//------------------------------------------------------------
+
+#if OUTPUT_VERSION > 6
+createTextField ("t", 0, 0, 0, 200, 150);
+check_equals(t.text, '');
+r = t.replaceText();
+check_equals(typeof(r), 'undefined');
+check_equals(t.text, '');
+r = t.replaceText(0, 0);
+check_equals(typeof(r), 'undefined');
+check_equals(t.text, '');
+r = t.replaceText(0, 0, 'a');
+check_equals(typeof(r), 'undefined');
+check_equals(t.text, 'a');
+r = t.replaceText(0, 0, 'b');
+check_equals(t.text, 'ba');
+t.replaceText(-1, 0, 'c');
+check_equals(t.text, 'ba');
+t.replaceText(0, 5, 'd');
+check_equals(t.text, 'd');
+t.replaceText(-1, 5, 'e');
+check_equals(t.text, 'd');
+t.replaceText(1, 5, 'f');
+check_equals(t.text, 'df');
+t.replaceText(0, 5, 'ϦeϦ');
+check_equals(t.text, 'ϦeϦ');
+t.replaceText(1, 1, 'h');
+check_equals(t.text, 'ϦheϦ');
+t.replaceText(4, 4, 'h');
+check_equals(t.text, 'ϦheϦh');
+t.replaceText(4, 4, undef);
+check_equals(t.text, 'ϦheϦundefinedh');
+t.replaceText(3, 10, 't');
+check_equals(t.text, 'Ϧhetnedh');
+t.replaceText(3, -1, 'y');
+check_equals(t.text, 'Ϧhetnedh');
+// TODO: check registered variables
+#endif
+
+//------------------------------------------------------------
 // Test properties
 //------------------------------------------------------------
 
@@ -1231,11 +1274,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(519);
+     check_totals(520);
 #elif OUTPUT_VERSION == 7
- check_totals(525);
+ check_totals(544);
 #elif OUTPUT_VERSION == 8
- check_totals(526);
+ check_totals(545);
 #endif
 
 #endif

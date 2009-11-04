@@ -22,10 +22,6 @@ BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
 
-# # YellowDog doesn't ship ffmpeg
-# %if %{distribution} != "ydl6"
-# BuildRequires:  ffmpeg-devel
-# %endif
 # Mandriva uses different names for the X11 library packages
 %if %{distribution} != "fc11"
 BuildRequires:  libx11_6-devel libxt_6-devel
@@ -43,10 +39,6 @@ Requires: libx11_6 libxt_6
 Requires: libX11 libXt 
 %endif
 Requires: agg boost libcurl SDL
-# # YellowDog doesn't ship ffmpeg
-# %if %{distribution} != "ydl6"
-# Requires: ffmpeg
-# %endif
 
 # BuildRequires:  scrollkeeper
 
@@ -149,7 +141,7 @@ RPM_TARGET=%{_target}
   CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
   # these are actually the default values, but this way they get added
   # to the build so they appear in "gnash --version".
-  GUI="--enable-gui=gtk,kde4"	# could be kde3, aqua, sdl
+  GUI="--enable-gui=gtk,kde4"	# could be kde3, kde4, aqua, sdl
   SOUND="--enable-media=gst"	# could be ffmpeg
   OTHER="--enable-jemalloc --enable-cygnal"
   RENDERER="--enable-renderer=agg"		# could be opengl or cairo
@@ -183,7 +175,7 @@ RPM_TARGET=%{_target}
 	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
-make $(MAKEFLAGS) dumpconfig all
+make $MAKEFLAGS dumpconfig all
 %else
 # uncommenting these will produce huge volumes of debug info from the
 # shell, but sometimes that's what you need to do.
@@ -210,7 +202,7 @@ make $(MAKEFLAGS) dumpconfig all
         # --with-kde4-appsdatadir=%{_prefix}/share/kde4/apps/klash \
         # --with-kde4-configdir=${_datadir}/config
 
-make $(MAKEFLAGS) dumpconfig all
+make $MAKEFLAGS dumpconfig all
 %endif
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
@@ -220,8 +212,8 @@ make $(MAKEFLAGS) dumpconfig all
 strip gui/.libs/*-gnash
 strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
-make $(MAKEFLAGS) install DESTDIR=$RPM_BUILD_ROOT
-make $(MAKEFLAGS) install-plugins DESTDIR=$RPM_BUILD_ROOT
+make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT
+make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
 
