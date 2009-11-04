@@ -128,6 +128,18 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
+as_object*
+createTextFieldObject(Global_as& gl)
+{
+    as_value tf(gl.getMember(NSV::CLASS_TEXT_FIELD));
+    as_function* ctor = tf.to_as_function();
+    if (!ctor) return 0;
+    fn_call::Args args;
+    as_environment env(getVM(gl));
+    return ctor->constructInstance(env, args).get();
+}
+
+
 TextField::TextField(as_object* object, DisplayObject* parent,
         const SWF::DefineEditTextTag& def)
     :
@@ -258,6 +270,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
 void
 TextField::init()
 {
+#if 0
     as_environment env(getVM(*getObject(this)));
     as_object* proto = env.find_object("_global.TextField.prototype");
     if (proto) {
@@ -269,7 +282,7 @@ TextField::init()
     as_object* ar = getGlobal(*getObject(this)).createArray();
     ar->callMethod(NSV::PROP_PUSH, getObject(this));
     getObject(this)->set_member(NSV::PROP_uLISTENERS, ar);
-    
+#endif
     registerTextVariable();
 
     reset_bounding_box(0, 0);
@@ -2902,7 +2915,7 @@ textfield_createTextField(const fn_call& fn)
     //  1. Call "new _global.TextField()" (which takes care of
     //     assigning properties to the prototype).
     //  2. Make that object into a TextField and put it on the display list.
-    as_object* obj = getGlobal(fn).createObject();
+    as_object* obj = createTextFieldObject(getGlobal(fn));
 
     DisplayObject* tf = new TextField(obj, ptr, bounds);
 
@@ -3762,6 +3775,9 @@ textfield_ctor(const fn_call& fn)
         attachPrototypeProperties(*proto);
     }
 
+    as_object* ar = getGlobal(fn).createArray();
+    ar->callMethod(NSV::PROP_PUSH, obj);
+    obj->set_member(NSV::PROP_uLISTENERS, ar);
     return as_value();
 }
 
