@@ -53,14 +53,8 @@ sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
     // Should not call MovieClip constructor (probably), but should
     // attach MovieClip.prototype
 
-    as_function* ctor = gl.getMember(NSV::CLASS_MOVIE_CLIP).to_as_function();
-    as_object* proto = ctor ?
-        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
-
-    as_object* o = gl.createObject();
-    o->set_prototype(proto);
-
-    DisplayObject* mc = new MovieClip(o, this, parent->get_root(), parent);
+    as_object* obj = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
+    DisplayObject* mc = new MovieClip(obj, this, parent->get_root(), parent);
 	return mc;
 }
 

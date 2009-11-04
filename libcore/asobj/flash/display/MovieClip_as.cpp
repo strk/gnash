@@ -118,47 +118,35 @@ namespace {
 }
 
 // extern (used by Global.cpp)
+// proto = getDisplayObjectContainerInterface();
+// proto = getDisplayObjectContainerInterface();
 void
 movieclip_class_init(as_object& where, const ObjectURI& uri)
 {
-    if (isAS3(getVM(where))) {
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
 
-        static boost::intrusive_ptr<as_object> cl =
-            new as_object(getMovieClipAS3Interface());
+    if (isAS3(getVM(where))) {
+        proto = gl.createObject();
+        as_object* cl = new as_object(proto);
+        attachMovieClipAS3Interface(*proto);
         
         // TODO: fix AVM2Global::createClass to work for AVM2.
-        Global_as& gl = getGlobal(where);
         cl->init_member(NSV::PROP_CONSTRUCTOR,
                 gl.createFunction(movieclip_as3_ctor));
 
         log_debug("AVM2 MovieClip, proto %s", cl);
 
-        where.init_member("MovieClip", cl);
+        where.init_member(getName(uri), cl, as_object::DefaultFlags,
+                getNamespace(uri));
         return;
     }
 
-    static boost::intrusive_ptr<as_object> cl;
+    as_object* cl = gl.createClass(&movieclip_as2_ctor, proto);
+    attachMovieClipAS2Interface(*proto);
 
-    if (!cl) {
-        Global_as& gl = getGlobal(where);
-        as_object* proto = getMovieClipAS2Interface();
-        cl = gl.createClass(&movieclip_as2_ctor, proto);
-        getVM(where).addStatic(cl.get());
-    }
-
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
-}
-
-as_object*
-getMovieClipAS3Interface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = getDisplayObjectContainerInterface();
-        attachMovieClipAS3Interface(*o);
-    }
-    return o.get();
 }
 
 void
@@ -222,36 +210,6 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_scale9Grid, 901, 12);
 
 }
-
-/// Properties (and/or methods) attached to every *instance* of a MovieClip 
-void
-attachMovieClipAS2Properties(as_object& o)
-{
-
-    // This is a normal property, can be overridden, deleted and enumerated
-    // See swfdec/test/trace/movieclip-version-#.swf for why we only
-    // initialize this if we don't have a parent
-    DisplayObject* d = o.displayObject();
-    assert(d);
-    if (!d->get_parent()) o.init_member("$version",
-            getVM(o).getPlayerVersion(), 0); 
-
-}
-
-as_object*
-getMovieClipAS2Interface()
-{
-    static boost::intrusive_ptr<as_object> proto;
-    if ( proto == NULL )
-    {
-        proto = new as_object(getObjectInterface());
-        VM& vm = VM::get();
-        vm.addStatic(proto.get());
-        attachMovieClipAS2Interface(*proto);
-    }
-    return proto.get();
-}
-
 
 namespace {
 
@@ -377,7 +335,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     }
 
     Movie* m = getRoot(fn).topLevelMovie();
-    as_object* o = getGlobal(fn).createObject();
+    as_object* o = getObjectWithPrototype(getGlobal(fn), NSV::CLASS_MOVIE_CLIP);
     MovieClip* mc = new MovieClip(o, 0, m, ptr);
 
     mc->set_name(fn.arg(0).to_string());
@@ -2415,7 +2373,8 @@ movieclip_as3_ctor(const fn_call& fn)
     // a MovieClip.
     Movie* m = getRoot(fn).topLevelMovie();
 
-    obj->setDisplayObject(new MovieClip(obj, 0, m, 0));
+    // Okay, this looks silly.
+    new MovieClip(obj, 0, m, 0);
     return as_value();
 }
 

@@ -428,17 +428,12 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     _lockroot(false)
 {
     assert(_swf);
-
     assert(object);
 
-    if (!isAS3(getVM(*object))) {
-        object->set_prototype(getMovieClipAS2Interface());
-        attachMovieClipAS2Properties(*object);
+    if (!isAS3(getVM(*object)) && !get_parent()) {
+        object->init_member("$version", getVM(*object).getPlayerVersion(), 0); 
     }
-    else {
-        object->set_prototype(getMovieClipAS3Interface());
-    }
-            
+
     _environment.set_target(this);
 
 }
@@ -623,7 +618,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         return NULL;
     }
 
-    as_object* o = getGlobal(*getObject(this)).createObject();
+    as_object* o = getObjectWithPrototype(getGlobal(*getObject(this)), 
+            NSV::CLASS_MOVIE_CLIP);
 
     MovieClip* newmovieclip = new MovieClip(o, _def.get(), _swf, parent);
     newmovieclip->set_name(newname);
