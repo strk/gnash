@@ -447,8 +447,8 @@ MovieClip::~MovieClip()
 {
     stopStreamSound();
 
-    getRoot(*getObject(this)).remove_key_listener(this);
-    getRoot(*getObject(this)).remove_mouse_listener(this);
+    stage().remove_key_listener(this);
+    stage().remove_mouse_listener(this);
 
     deleteAllChecked(_loadVariableRequests);
 }
@@ -1720,13 +1720,13 @@ MovieClip::mouseEnabled() const
 void
 MovieClip::stop_drag()
 {
-    getRoot(*getObject(this)).stop_drag();
+    stage().stop_drag();
 }
 
 void
 MovieClip::set_background_color(const rgba& color)
 {
-    getRoot(*getObject(this)).set_background_color(color);
+    stage().set_background_color(color);
 }
 
 void
@@ -1839,8 +1839,8 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 void
 MovieClip::registerAsListener()
 {
-    getRoot(*getObject(this)).add_key_listener(this);
-    getRoot(*getObject(this)).add_mouse_listener(this);
+    stage().add_key_listener(this);
+    stage().add_mouse_listener(this);
 }
 
 
@@ -1860,7 +1860,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #endif
 
     // Register this movieclip as a live one
-    getRoot(*getObject(this)).addLiveChar(this);
+    stage().addLiveChar(this);
   
 
     // Register this movieclip as a core broadcasters listener
@@ -2262,7 +2262,7 @@ MovieClip::removeMovieClip()
     else
     {
         // removing _level#
-        getRoot(*getObject(this)).dropLevel(depth);
+        stage().dropLevel(depth);
         // I guess this can only happen if someone uses 
         // _swf.swapDepth([0..1048575])
     }
@@ -2429,7 +2429,7 @@ MovieClip::getAsRoot()
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    int topSWFVersion = getRoot(*getObject(this)).getRootMovie().version();
+    int topSWFVersion = stage().getRootMovie().version();
 
     if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;
