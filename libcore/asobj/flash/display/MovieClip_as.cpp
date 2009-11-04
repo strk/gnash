@@ -127,7 +127,6 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
     as_object* proto = gl.createObject();
 
     if (isAS3(getVM(where))) {
-        proto = gl.createObject();
         as_object* cl = new as_object(proto);
         attachMovieClipAS3Interface(*proto);
         

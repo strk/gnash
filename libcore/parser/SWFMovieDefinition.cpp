@@ -423,12 +423,7 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 Movie*
 SWFMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
 {
-    as_object* o = gl.createObject();
-
-    as_function* ctor = gl.getMember(NSV::CLASS_MOVIE_CLIP).to_as_function();
-    as_object* proto = ctor ?
-        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
-    o->set_prototype(proto);
+    as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
 	return new SWFMovie(o, this, parent);
 }
 

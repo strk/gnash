@@ -26,13 +26,14 @@
 #include "Bitmap.h"
 #include "Renderer.h"
 #include "Global_as.h"
+#include "namedStrings.h"
 
 namespace gnash {
 
 Movie*
 BitmapMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
 {
-    as_object* o = gl.createObject();
+    as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
     return new BitmapMovie(o, this, parent);
 }
 

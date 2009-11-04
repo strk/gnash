@@ -30,7 +30,7 @@ package hello {
             xcheck_equals(MovieClip, "[class MovieClip]");
             xcheck_equals(MovieClip.prototype, "[object Object]");
             xcheck_equals(MovieClip.constructor, "[class Class]");
-            check(!MovieClip.hasOwnProperty("constructor"));
+            xcheck(!MovieClip.hasOwnProperty("constructor"));
 
             // Check that this object is a MovieClip and has MovieClip
             // functions (no need to check them all).
@@ -70,7 +70,7 @@ package hello {
             
             var m = new MovieClip();
             xcheck_equals(m.constructor, "[class MovieClip]");
-            check(!m.hasOwnProperty("constructor"));
+            xcheck(!m.hasOwnProperty("constructor"));
             
             // MovieClip properties
             xcheck(m.hasOwnProperty("nextFrame"));
