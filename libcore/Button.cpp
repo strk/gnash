@@ -307,7 +307,7 @@ Button::Button(as_object* object, const SWF::DefineButtonTag* def,
 
 Button::~Button()
 {
-    getRoot(*getObject(this)).remove_key_listener(this);
+    stage().remove_key_listener(this);
 }
 
 bool
@@ -353,7 +353,7 @@ Button::notifyEvent(const event_id& id)
     // We only respond to valid key code (should we assert here?)
     if ( id.keyCode() == key::INVALID ) return false;
 
-    ButtonActionPusher xec(getRoot(*getObject(this)), this); 
+    ButtonActionPusher xec(stage(), this); 
     _def->forEachTrigger(id, xec);
 
     return xec.called;
@@ -564,7 +564,7 @@ Button::mouseEvent(const event_id& event)
     // the action queue on mouse event.
     //
 
-    movie_root& mr = getRoot(*getObject(this));
+    movie_root& mr = stage();
 
     ButtonActionPusher xec(mr, this); 
     _def->forEachTrigger(event, xec);

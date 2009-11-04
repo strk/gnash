@@ -259,7 +259,7 @@ Video::stagePlacementCallback(as_object* initObj)
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live DisplayObject
-    getRoot(*getObject(this)).addLiveChar(this);
+    stage().addLiveChar(this);
 }
 
 
