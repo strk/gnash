@@ -2093,9 +2093,9 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 // Reserved:4
 // LoadTargetFlag:1
 // LoadVariableFlag:1
+/// @param target        the target window, or _level1..10
 void
-SWFHandlers::CommonGetUrl(as_environment& env,
-        as_value target, // the target window, or _level1..10
+SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
         const std::string& url, boost::uint8_t method)
 {
 
@@ -2122,8 +2122,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         static_cast<MovieClip::VariablesMethod>(method & 3);
 
     std::string target_string;
-    if ( ! target.is_undefined() && ! target.is_null() )
-    {
+    if (!target.is_undefined() && !target.is_null()) {
         target_string = target.to_string();
     }
 
@@ -2322,12 +2321,10 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
     boost::uint8_t method = code[thread.getCurrentPC() + 3];
 
     as_value url_val = env.top(1);
-    if ( url_val.is_undefined() )
-    {
+    if (url_val.is_undefined()) {
         log_error(_("Undefined GetUrl2 url on stack, skipping"));
     }
-    else
-    {
+    else {
         const std::string& url = url_val.to_string();
         CommonGetUrl(env, env.top(0), url, method);
     }

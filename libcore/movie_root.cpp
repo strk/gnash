@@ -2455,9 +2455,10 @@ movie_root::getCharacterTree(tree<StringPair>& tr,
 #endif
 
 void
-movie_root::handleFsCommand(const std::string& cmd, const std::string& arg) const
+movie_root::handleFsCommand(const std::string& cmd, const std::string& arg)
+    const
 {
-	if ( _fsCommandHandler ) _fsCommandHandler->notify(cmd, arg);
+	if (_fsCommandHandler) _fsCommandHandler->notify(cmd, arg);
 }
 
 void
