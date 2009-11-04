@@ -1002,14 +1002,17 @@ movieclip_loadVariables(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
+    as_object* obj = getObject(movieclip);
+    assert(obj);
+
     // This always calls MovieClip.meth, even when there are no
     // arguments.
     as_value val;
     if (fn.nargs > 1)
     {
-        val = getObject(movieclip)->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = obj->callMethod(NSV::PROP_METH, fn.arg(1));
     }
-    else val = getObject(movieclip)->callMethod(NSV::PROP_METH);
+    else val = obj->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
