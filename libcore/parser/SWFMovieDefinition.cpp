@@ -421,9 +421,8 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 }
 
 Movie*
-SWFMovieDefinition::createMovie(DisplayObject* parent)
+SWFMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
 {
-    Global_as& gl = *VM::get().getGlobal();
     as_object* o = gl.createObject();
 
     as_function* ctor = gl.getMember(NSV::CLASS_MOVIE_CLIP).to_as_function();

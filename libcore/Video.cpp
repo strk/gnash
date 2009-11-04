@@ -52,10 +52,10 @@ namespace {
     as_value video_height(const fn_call& fn);
 }
 
-Video::Video(as_object* owner, const SWF::DefineVideoStreamTag* const def,
-        DisplayObject* parent)
+Video::Video(as_object* object,
+        const SWF::DefineVideoStreamTag* def, DisplayObject* parent)
 	:
-	DisplayObject(owner, parent),
+	DisplayObject(getRoot(*object), object, parent),
 	m_def(def),
 	_ns(0),
 	_embeddedStream(m_def ? true : false),
@@ -63,6 +63,8 @@ Video::Video(as_object* owner, const SWF::DefineVideoStreamTag* const def,
 	_lastDecodedVideoFrame(),
     _smoothing(false)
 {
+
+    assert(object);
 
 	getObject(this)->set_prototype(getVideoInterface(*getObject(this)));
 

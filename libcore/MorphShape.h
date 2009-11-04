@@ -50,8 +50,8 @@ class MorphShape : public DisplayObject
 
 public:
 
-    MorphShape(as_object* owner, const SWF::DefineMorphShapeTag* def, 
-            DisplayObject* parent);
+    MorphShape(movie_root& mr, as_object* object,
+            const SWF::DefineMorphShapeTag* def, DisplayObject* parent);
 
 	virtual void display(Renderer& renderer);
 

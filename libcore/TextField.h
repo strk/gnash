@@ -92,7 +92,7 @@ public:
 	};
 
     /// Constructs a TextField as specified in a DefineEditText tag.
-	TextField(as_object* owner, DisplayObject* parent,
+	TextField(as_object* object, DisplayObject* parent,
             const SWF::DefineEditTextTag& def);
 
     /// Constructs a TextField with default values and the specified bounds.
@@ -100,7 +100,8 @@ public:
     /// Notably, the default textHeight is 12pt (240 twips).
 	/// @param parent A pointer to the DisplayObject parent of this TextField
 	/// @param bounds A SWFRect specifying the bounds of this TextField
-    TextField(as_object* owner, DisplayObject* parent, const SWFRect& bounds);
+    TextField(as_object* object, DisplayObject* parent, const SWFRect& bounds);
+
 
 	~TextField();
 

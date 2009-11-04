@@ -134,7 +134,7 @@ public:
 	/// SWFMovieDefinition is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
-	virtual Movie* createMovie(DisplayObject* /*parent*/=0)
+	virtual Movie* createMovie(Global_as& /*gl*/, DisplayObject* /*parent*/=0)
 	{
 		return NULL;
 	}

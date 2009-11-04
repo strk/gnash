@@ -39,19 +39,19 @@ class Shape : public DisplayObject
 
 public:
 
-    Shape(as_object* owner, boost::shared_ptr<DynamicShape> sh,
+    Shape(movie_root& mr, as_object* object, boost::shared_ptr<DynamicShape> sh,
             DisplayObject* parent)
         :
-        DisplayObject(owner, parent),
+        DisplayObject(mr, object, parent),
         _shape(sh)
     {
         assert(_shape.get());
     }
 
-	Shape(as_object* owner, const SWF::DefineShapeTag* const def,
+	Shape(movie_root& mr, as_object* object, const SWF::DefineShapeTag* def,
             DisplayObject* parent)
 		:
-		DisplayObject(owner, parent),
+		DisplayObject(mr, object, parent),
 		_def(def)
 	{
 	    assert(_def);
@@ -63,7 +63,7 @@ public:
         return _def ? _def->bounds() : _shape->getBounds();
     }
     
-    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 protected:
 

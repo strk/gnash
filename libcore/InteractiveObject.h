@@ -43,10 +43,14 @@ class InteractiveObject : public DisplayObject
 
 public:
 
-	InteractiveObject(as_object* owner, DisplayObject* parent)
+	InteractiveObject(as_object* object, DisplayObject* parent)
 		:
-		DisplayObject(owner, parent)
+		DisplayObject(getRoot(*object), object, parent)
 	{
+        // It's a bit too late for this assertion as we've already
+        // deferenced it. All InteractiveObjects are AS-referenceable,
+        // so they must have an object.
+        assert(object);
 	}
 
     virtual ~InteractiveObject() {}

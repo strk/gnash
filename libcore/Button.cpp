@@ -290,21 +290,21 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(as_object* owner, const SWF::DefineButtonTag* const def,
+Button::Button(as_object* object, const SWF::DefineButtonTag* def,
         DisplayObject* parent)
     :
-    InteractiveObject(owner, parent),
+    InteractiveObject(object, parent),
     _lastMouseFlags(FLAG_IDLE),
     _mouseFlags(FLAG_IDLE),
     _mouseState(MOUSESTATE_UP),
     _def(def)
 {
-
-    owner->set_prototype(getButtonInterface());
+    assert(object);
+    object->set_prototype(getButtonInterface());
 
     // check up presence Key events
     if (_def->hasKeyPressHandler()) {
-        getRoot(*owner).add_key_listener(this);
+        stage().add_key_listener(this);
     }
 
 }

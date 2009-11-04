@@ -124,7 +124,17 @@ class DisplayObject : public GcResource, boost::noncopyable
 {
 public:
 
-    DisplayObject(as_object* owner, DisplayObject* parent);
+    /// Construct a DisplayObject
+    //
+    /// @param mr       The movie_root containing the DisplayObject hierarchy.
+    ///                 All DisplayObjects may need movie_root resources.
+    /// @param object   An object to be associated with this DisplayObject.
+    ///                 If this is non-null, the DisplayObject will be
+    ///                 referenceable in ActionScript. Referenceable
+    ///                 DisplayObjects may access AS resources through their
+    ///                 associated object.
+    /// @param parent   The parent of the new DisplayObject. This may be null.
+    DisplayObject(movie_root& mr, as_object* object, DisplayObject* parent);
 
     virtual ~DisplayObject() {}
 
@@ -970,13 +980,22 @@ public:
   
     /// Mark all reachable resources.
     //
-    /// If a derived class provides access to more GC-managed
-    /// resources, it should override this method.
+    /// Try not to override this function in derived classes. This always
+    /// marks the base class's resources and calls markOwnResources() to
+    /// take care of any further GC resources.
     virtual void markReachableResources() const;
 
+    /// Called by markReachableResources()
+    //
+    /// DisplayObjects should mark their own resources in this function.
     virtual void markOwnResources() const {}
 
 protected:
+
+    /// Get the movie_root to which this DisplayObject belongs.
+    movie_root& stage() {
+        return _stage;
+    }
 
     /// Register currently computable target as
     /// the "original" one. This will be used by
@@ -1074,6 +1093,9 @@ private:
 
     /// The as_object to which this DisplayObject is attached.
     as_object* _object;
+
+    /// The movie_root to which this DisplayObject belongs.
+    movie_root& _stage;
 
     int m_depth;
     cxform m_color_transform;

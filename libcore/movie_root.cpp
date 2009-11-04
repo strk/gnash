@@ -190,7 +190,7 @@ movie_root::~movie_root()
 Movie*
 movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
 {
-    Movie* mr = def->createMovie();
+    Movie* mr = def->createMovie(*_vm.getGlobal());
     mr->setVariables(vars);
     setRootMovie(mr);
     return mr;
@@ -452,7 +452,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 		return false;
 	}
 
-	Movie* extern_movie = md->createMovie();
+	Movie* extern_movie = md->createMovie(*_vm.getGlobal());
 
 	if (!extern_movie) {
 		log_error(_("can't create extern Movie for %s"),

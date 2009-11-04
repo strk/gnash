@@ -29,6 +29,7 @@
 #include "MovieClip.h"
 #include "GnashNumeric.h"
 #include "RunResources.h"
+#include "Global_as.h"
 
 namespace gnash {
 namespace SWF {
@@ -58,7 +59,7 @@ DisplayObject*
 DefineMorphShapeTag::createDisplayObject(Global_as& gl,
         DisplayObject* parent) const
 {
-    return new MorphShape(0, this, parent);
+    return new MorphShape(getRoot(gl), 0, this, parent);
 }
 
 void

@@ -122,8 +122,8 @@ public:
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
-    MovieClip(as_object* owner, const movie_definition* const def, Movie* root,
-            DisplayObject* parent);
+    MovieClip(as_object* object, const movie_definition* def,
+            Movie* root, DisplayObject* parent);
 
     virtual ~MovieClip();
 
@@ -635,9 +635,6 @@ public:
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
     ///
     void removeMovieClip();
-
-    /// Create a Bitmap DisplayObject at the specified depth.
-    void attachBitmap(BitmapData_as* bd, int depth);
 
     /// Render this MovieClip to a GnashImage using the passed transform
     //

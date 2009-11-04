@@ -388,7 +388,7 @@ public:
 	/// The _root reference of the newly created movie_root
 	/// will be set to a newly created Movie.
 	///
-	Movie* createMovie(DisplayObject* parent=0);
+	Movie* createMovie(Global_as& gl, DisplayObject* parent = 0);
 
     virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
         const {

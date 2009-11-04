@@ -70,7 +70,10 @@ public:
 		MOUSESTATE_HIT
 	};
 
-	Button(as_object* owner, const SWF::DefineButtonTag* const def,
+    /// Construct a Button
+    //
+    /// A button should always have an associated object.
+	Button(as_object* object, const SWF::DefineButtonTag* def,
             DisplayObject* parent);
 
 	~Button();

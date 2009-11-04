@@ -128,10 +128,10 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(as_object* owner, DisplayObject* parent,
+TextField::TextField(as_object* object, DisplayObject* parent,
         const SWF::DefineEditTextTag& def)
     :
-    InteractiveObject(owner, parent),
+    InteractiveObject(object, parent),
     _tag(&def),
     _textDefined(def.hasText()),
     _htmlTextDefined(def.hasText()),
@@ -177,12 +177,15 @@ TextField::TextField(as_object* owner, DisplayObject* parent,
     _bounds(def.bounds()),
     _selection(0, 0)
 {
+
+    assert(object);
+
     // WARNING! remember to set the font *before* setting text value!
     boost::intrusive_ptr<const Font> f = def.getFont();
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = getSWFVersion(*owner);
+    int version = getSWFVersion(*object);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -197,10 +200,10 @@ TextField::TextField(as_object* owner, DisplayObject* parent,
 
 }
 
-TextField::TextField(as_object* owner, DisplayObject* parent,
+TextField::TextField(as_object* object, DisplayObject* parent,
         const SWFRect& bounds)
     :
-    InteractiveObject(owner, parent),
+    InteractiveObject(object, parent),
     _textDefined(false),
     _htmlTextDefined(false),
     _restrictDefined(false),
@@ -588,12 +591,12 @@ TextField::notifyEvent(const event_id& ev)
     {
 		case event_id::PRESS:
 		{
-			movie_root& root = getRoot(*getObject(this));
+			movie_root& root = stage();
 			
 			int x_mouse = pixelsToTwips(root.getXMouseLoc());
 			int y_mouse = pixelsToTwips(root.getYMouseLoc());
 			
-			SWFMatrix m = this->getMatrix();
+			SWFMatrix m = getMatrix();
 			
 			x_mouse -= m.get_x_translation();
 			y_mouse -= m.get_y_translation();
@@ -2738,7 +2741,7 @@ TextField::handleFocus()
 
     // why should we add to the key listener list every time
     // we call setFocus()???
-    getRoot(*getObject(this)).add_key_listener(this);
+    stage().add_key_listener(this);
 
     m_cursor = _text.size();
     format_text();
@@ -2755,8 +2758,7 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    movie_root& root = getRoot(*getObject(this));
-    root.remove_key_listener(this);
+    stage().remove_key_listener(this);
     format_text(); // is this needed ?
 
 }
@@ -3524,7 +3526,7 @@ textfield_text(const fn_call& fn)
     }
 
     // Setter
-    int version = getSWFVersion(*getObject(ptr));
+    const int version = getSWFVersion(fn);
     ptr->setTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
@@ -3542,7 +3544,7 @@ textfield_htmlText(const fn_call& fn)
     }
 
     // Setter
-    const int version = getSWFVersion(*getObject(ptr));
+    const int version = getSWFVersion(fn);
     
     ptr->setHtmlTextValue(
             utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
@@ -3575,7 +3577,7 @@ textfield_replaceSel(const fn_call& fn)
     const std::string& replace = fn.arg(0).to_string();
 
     /// Do nothing if text is empty and version less than 8.
-    const int version = getSWFVersion(*getObject(text));
+    const int version = getSWFVersion(fn);
     if (version < 8 && replace.empty()) return as_value();
 
     text->replaceSelection(replace);

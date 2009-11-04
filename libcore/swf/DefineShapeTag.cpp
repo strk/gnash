@@ -31,6 +31,7 @@
 #include "MovieClip.h"
 #include "SWF.h"
 #include "Renderer.h"
+#include "Global_as.h"
 
 #include <algorithm>
 
@@ -66,7 +67,7 @@ DisplayObject*
 DefineShapeTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
     const
 {
-	return new Shape(0, this, parent);
+	return new Shape(getRoot(gl), 0, this, parent);
 }
     
 bool

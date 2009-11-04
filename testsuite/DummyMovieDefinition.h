@@ -131,9 +131,8 @@ public:
 	}
 	
 	/// Create a playable movie instance from a def.
-	virtual Movie* createMovie(DisplayObject* parent=NULL)
+	virtual Movie* createMovie(Global_as& gl, DisplayObject* parent=NULL)
 	{
-        Global_as& gl = *VM::get().getGlobal();
         as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
 		return new SWFMovie(o, this, parent);
 	}

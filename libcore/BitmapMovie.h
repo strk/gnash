@@ -42,7 +42,7 @@ class BitmapMovie : public Movie
 
 public:
 
-	BitmapMovie(as_object* owner, const BitmapMovieDefinition* def,
+	BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
             DisplayObject* parent); 
 
 	virtual ~BitmapMovie() {}

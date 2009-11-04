@@ -48,7 +48,7 @@ class Video : public DisplayObject
 
 public:
 	
-	Video(as_object* owner, const SWF::DefineVideoStreamTag* const def, 
+	Video(as_object* object, const SWF::DefineVideoStreamTag* def,
             DisplayObject* parent);
 
 	~Video();

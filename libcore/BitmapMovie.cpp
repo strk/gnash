@@ -21,14 +21,15 @@
 
 namespace gnash {
 
-BitmapMovie::BitmapMovie(as_object* owner, const BitmapMovieDefinition* def,
+BitmapMovie::BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
         DisplayObject* parent)
 	:
-	Movie(owner, def, parent),
+	Movie(object, def, parent),
     _def(def)
 {
     assert(def);
-    Bitmap* bm = new Bitmap(0, def, this);
+    assert(object);
+    Bitmap* bm = new Bitmap(getRoot(*object), 0, def, this);
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
     placeDisplayObject(bm, depth);

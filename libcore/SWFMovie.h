@@ -41,7 +41,7 @@ class SWFMovie : public Movie
 
 public:
 
-	SWFMovie(as_object* owner, const SWFMovieDefinition* const def,
+	SWFMovie(as_object* object, const SWFMovieDefinition* def,
             DisplayObject* parent);
 
 	virtual ~SWFMovie() {}

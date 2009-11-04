@@ -29,12 +29,13 @@
 
 namespace gnash {
 
-SWFMovie::SWFMovie(as_object* owner, const SWFMovieDefinition* const def,
+SWFMovie::SWFMovie(as_object* object, const SWFMovieDefinition* def,
         DisplayObject* parent)
 	:
-	Movie(owner, def, parent),
+	Movie(object, def, parent),
 	_def(def)
 {
+    assert(object);
 }
 
 void

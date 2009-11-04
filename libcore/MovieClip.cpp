@@ -28,7 +28,6 @@
 #include "movie_definition.h"
 #include "as_value.h"
 #include "as_function.h"
-#include "Bitmap.h"
 #include "TextField.h"
 #include "ControlTag.h"
 #include "fn_call.h"
@@ -55,7 +54,6 @@
 #include "namedStrings.h"
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
-#include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
 #include "GnashNumeric.h"
@@ -414,31 +412,31 @@ private:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(as_object* owner, const movie_definition* const def,
+MovieClip::MovieClip(as_object* object, const movie_definition* def,
         Movie* r, DisplayObject* parent)
     :
-    DisplayObjectContainer(owner, parent),
+    DisplayObjectContainer(object, parent),
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
     _currentFrame(0),
     _hasLooped(false),
     _callingFrameActions(false),
-    _environment(getVM(*owner)),
+    _environment(getVM(*object)),
     m_sound_stream_id(-1),
     _droptarget(),
     _lockroot(false)
 {
     assert(_swf);
 
-    assert(owner);
+    assert(object);
 
-    if (!isAS3(getVM(*owner))) {
-        owner->set_prototype(getMovieClipAS2Interface());
-        attachMovieClipAS2Properties(*owner);
+    if (!isAS3(getVM(*object))) {
+        object->set_prototype(getMovieClipAS2Interface());
+        attachMovieClipAS2Properties(*object);
     }
     else {
-        owner->set_prototype(getMovieClipAS3Interface());
+        object->set_prototype(getMovieClipAS3Interface());
     }
             
     _environment.set_target(this);
@@ -654,8 +652,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
 void
 MovieClip::queueAction(const action_buffer& action)
 {
-    movie_root& root = getRoot(*getObject(this));
-    root.pushAction(action, this);
+    stage().pushAction(action, this);
 }
 
 void
@@ -967,8 +964,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
-        movie_root& root = getRoot(*getObject(this));
-        root.pushAction(code, movie_root::apINIT);
+        stage().pushAction(code, movie_root::apINIT);
     }
     else
     {
@@ -1250,13 +1246,6 @@ MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
             bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
-}
-
-void
-MovieClip::attachBitmap(BitmapData_as* bd, int depth)
-{
-    DisplayObject* ch = new Bitmap(0, bd, this);
-    attachCharacter(*ch, depth, 0);
 }
 
 DisplayObject*
@@ -1939,7 +1928,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
         std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
-        getRoot(*getObject(this)).pushAction(code, movie_root::apCONSTRUCT);
+        stage().pushAction(code, movie_root::apCONSTRUCT);
 
     }
     else {
@@ -2094,21 +2083,22 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
             log_debug(_("Posting data '%s' to url '%s'"), postdata, url.str());
         }
         
-        const movie_root& mr = getRoot(*getObject(this));
+        const movie_root& mr = stage();
 
         boost::intrusive_ptr<movie_definition> md(
             MovieFactory::makeMovie(url, mr.runResources(), NULL, true, postdata));
 
-        if (!md)
-        {
+        if (!md) {
             log_error(_("can't create movie_definition for %s"),
                 url.str());
             return false;
         }
 
-        Movie* extern_movie = md->createMovie(parent);
-        if (extern_movie == NULL)
-        {
+        as_object* us = getObject(this);
+        assert(us);
+
+        Movie* extern_movie = md->createMovie(getGlobal(*us), parent);
+        if (!extern_movie) {
             log_error(_("can't create extern Movie "
                 "for %s"), url.str());
             return false;
@@ -2147,16 +2137,10 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
     }
     else
     {
-        movie_root& root = getRoot(*getObject(this));
-        unsigned int level = get_depth()-DisplayObject::staticDepthOffset;
+        const size_t level = get_depth() - DisplayObject::staticDepthOffset;
         
-#ifndef GNASH_USE_GC
-        // Make sure we won't kill ourself !
-        assert(get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
-
         // how about lockRoot here ?
-        root.loadLevel(level, url); // extern_movie.get());
+        stage().loadLevel(level, url); // extern_movie.get());
     }
 
     return true;
@@ -2169,7 +2153,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     // Host security check will be will be done by LoadVariablesThread
     // (down by getStream, that is)
     
-    const movie_root& mr = getRoot(*getObject(this));
+    const movie_root& mr = stage();
     URL url(urlstr, mr.runResources().baseURL());
 
     std::string postdata;

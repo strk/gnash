@@ -37,6 +37,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
+#include "Bitmap.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -2334,7 +2335,8 @@ movieclip_attachBitmap(const fn_call& fn)
 
     int depth = fn.arg(1).to_int();
 
-    ptr->attachBitmap(bd, depth);
+    DisplayObject* bm = new Bitmap(getRoot(fn), 0, bd, ptr);
+    ptr->attachCharacter(*bm, depth, 0);
 
     return as_value();
 }
