@@ -2922,7 +2922,6 @@ textfield_createTextField(const fn_call& fn)
 
     DisplayObject* txt = ptr->addDisplayListObject(tf, depth);
 
-    // createTextField returns void, it seems
     if (getSWFVersion(fn) > 7) return as_value(getObject(txt));
     return as_value(); 
 }
