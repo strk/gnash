@@ -137,10 +137,9 @@ DisplayObject*
 DefineVideoStreamTag::createDisplayObject(Global_as& gl,
         DisplayObject* parent) const
 {
-    as_object* obj = gl.createObject();
 
+    as_object* obj = createVideoObject(gl);
 	DisplayObject* ch = new Video(obj, this, parent);
-    obj->setDisplayObject(ch);
 	return ch;
 }
 

@@ -58,26 +58,14 @@ Video::Video(as_object* object,
 	DisplayObject(getRoot(*object), object, parent),
 	m_def(def),
 	_ns(0),
-	_embeddedStream(m_def ? true : false),
+	_embeddedStream(m_def),
 	_lastDecodedVideoFrameNum(-1),
 	_lastDecodedVideoFrame(),
     _smoothing(false)
 {
-
     assert(object);
-
-	getObject(this)->set_prototype(getVideoInterface(*getObject(this)));
-
-    // TODO: For AS2 a genuine Video object can only be created from a 
-    // SWF tag. 
-	if (_embeddedStream)
-	{
-        // TODO: this should happen using the native creation function
-        // once Video is a Relay.
-		initializeDecoder();
-        
-        attachPrototypeProperties(*getObject(this)->get_prototype());
-	}
+    assert(def);
+    initializeDecoder();
 }
 
 Video::~Video()
@@ -300,7 +288,9 @@ video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* cl = gl.createClass(&video_ctor, getVideoInterface(global));
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&video_ctor, proto);
+    attachVideoInterface(*proto);
 
 	// Register _global.Video
 	global.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -332,21 +322,18 @@ Video::markOwnResources() const
 	if (_ns) _ns->setReachable();
 }
 
-namespace {
-
 as_object*
-getVideoInterface(as_object& where)
+createVideoObject(Global_as& gl)
 {
-	static boost::intrusive_ptr<as_object> proto;
-	if ( proto == NULL )
-	{
-		proto = new as_object(getObjectInterface());
-		getVM(where).addStatic(proto.get());
-
-		attachVideoInterface(*proto);
-	}
-	return proto.get();
+    // TODO: how to use this for AS3 as well?
+    // Turn into constructBuiltin()
+    as_object* obj = getObjectWithPrototype(gl, NSV::CLASS_VIDEO);
+    as_object* proto = obj->get_prototype();
+    if (proto) attachPrototypeProperties(*proto);
+    return obj;
 }
+
+namespace {
 
 void
 attachVideoInterface(as_object& o)
@@ -451,7 +438,7 @@ video_clear(const fn_call& fn)
 as_value
 video_ctor(const fn_call& /* fn */)
 {
-	return as_value(); // will keep alive
+	return as_value();
 }
 
 } // anonymous namespace
