@@ -41,14 +41,10 @@ if BUILD_DBUS_EXT
 OTHER_DIRS += dbus
 endif
 
-if BUILD_METOME_EXT
-OTHER_DIRS += metome
-endif
-
 if BUILD_GTK_EXT
 if BUILD_GTK_GUI
 OTHER_DIRS += # gtk2
 endif
 endif
-DIST_SUBDIRS = dejagnu fileio mysql gtk2 lirc dbus metome
+DIST_SUBDIRS = dejagnu fileio mysql gtk2 lirc dbus 
 SUBDIRS = $(OTHER_DIRS)
