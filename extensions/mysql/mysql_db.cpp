@@ -53,70 +53,74 @@ as_value mysql_free(const fn_call& fn);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
-class mysql_as_object : public as_object
+static void
+attachInterface(as_object& obj)
+{
+    Global_as& gl = getGlobal(obj);
+
+    obj.init_member("connect", gl.createFunction(mysql_connect));
+    obj.init_member("qetData", gl.createFunction(mysql_qetData));
+    obj.init_member("disconnect", gl.createFunction(mysql_disconnect));
+    obj.init_member("query", gl.createFunction(mysql_query));
+    obj.init_member("fetch_row", gl.createFunction(mysql_fetch));
+    obj.init_member("num_fields", gl.createFunction(mysql_fields));
+    obj.init_member("free_result", gl.createFunction(mysql_free));
+    obj.init_member("store_results", gl.createFunction(mysql_store));
+}
+
+class MySQL : public Relay
 {
 public:
-    MySQL obj;
+    typedef std::vector< std::vector<const char *> > query_t;
+    MySQL();
+    ~MySQL();
+    bool connect(const char *host, const char *dbname, const char *user, const char *passwd);
+    int getData(const char *sql, query_t &result);
+    bool disconnect();
+
+    // These are wrappers for the regular MySQL API
+    bool guery(MYSQL *db, const char *sql);
+    bool guery(const char *sql);
+    int num_fields();
+    int num_fields(MYSQL_RES *result);
+    MYSQL_ROW fetch_row();
+    MYSQL_ROW fetch_row(MYSQL_RES *result);
+    void free_result();
+    void free_result(MYSQL_RES *result);
+    MYSQL_RES *store_result();
+    MYSQL_RES *store_result(MYSQL *db);
+private:    
+    MYSQL *_db;
+    MYSQL_RES *_result;
+    MYSQL_ROW _row;
 };
 
-static void
-attachInterface(as_object *obj)
-{
-//    GNASH_REPORT_FUNCTION;
-    Global_as* gl = getGlobal(*obj);
-
-    obj->init_member("connect", gl->createFunction(mysql_connect));
-    obj->init_member("qetData", gl->createFunction(mysql_qetData));
-    obj->init_member("disconnect", gl->createFunction(mysql_disconnect));
-    obj->init_member("query", gl->createFunction(mysql_query));
-    obj->init_member("fetch_row", gl->createFunction(mysql_fetch));
-    obj->init_member("num_fields", gl->createFunction(mysql_fields));
-    obj->init_member("free_result", gl->createFunction(mysql_free));
-    obj->init_member("store_results", gl->createFunction(mysql_store));
-}
-
-static as_object*
-getInterface()
-{
-//    GNASH_REPORT_FUNCTION;
-
-    static boost::intrusive_ptr<as_object> o;
-    if (o == NULL) {
-	o = new as_object();
-    }
-    return o.get();
-}
-
 static as_value
-mysql_ctor(const fn_call& /*fn*/)
+mysql_ctor(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-
-    mysql_as_object* obj = new mysql_as_object();
-
-    attachInterface(obj);
-    return as_value(obj); // will keep alive
-//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
+    as_object* obj = ensure<ValidThis>(fn);
+    obj->setRelay(new MySQL());
+    return as_value(); 
 }
 
 
-MySQL::MySQL(): _db(NULL), _result(NULL), _row(NULL)
+MySQL::MySQL() :
+    _db(NULL),
+    _result(NULL),
+    _row(NULL)
 {
-//    GNASH_REPORT_FUNCTION;
 }
 
 MySQL::~MySQL()
 {
-//    GNASH_REPORT_FUNCTION;
     disconnect();
 }
 
 int
 MySQL::num_fields()
 {
-//    GNASH_REPORT_FUNCTION;
     if (_result) {
-	return num_fields(_result);
+        return num_fields(_result);
     }
     return -1;
 }
@@ -124,16 +128,14 @@ MySQL::num_fields()
 int
 MySQL::num_fields(MYSQL_RES *result)
 {
-//    GNASH_REPORT_FUNCTION;
     return mysql_num_fields(result);
 }
 
 MYSQL_ROW
 MySQL::fetch_row()
 {
-//    GNASH_REPORT_FUNCTION;
     if (_result) {
-	return fetch_row(_result);
+        return fetch_row(_result);
     }
     return NULL;
 }
@@ -141,32 +143,28 @@ MySQL::fetch_row()
 MYSQL_ROW
 MySQL::fetch_row(MYSQL_RES *result)
 {
-//    GNASH_REPORT_FUNCTION;
     return mysql_fetch_row(result);
 }
 
 void
 MySQL::free_result()
 {
-//    GNASH_REPORT_FUNCTION;
     if (_result) {
-	free_result(_result);
+        free_result(_result);
     }
 }
 
 void
 MySQL::free_result(MYSQL_RES *result)
 {
-//    GNASH_REPORT_FUNCTION;
     mysql_free_result(result);
 }
 
 MYSQL_RES *
 MySQL::store_result()
 {
-//    GNASH_REPORT_FUNCTION;
     if (_db) {
-	return store_result(_db);
+        return store_result(_db);
     }
     return NULL;
 }
@@ -174,7 +172,6 @@ MySQL::store_result()
 MYSQL_RES *
 MySQL::store_result(MYSQL *db)
 {
-//    GNASH_REPORT_FUNCTION;
     _result = mysql_store_result(db);
     return _result;
 }
@@ -189,8 +186,8 @@ MySQL::connect(const char* host, const char* dbname, const char* user, const cha
     disconnect();
     
     if ((_db = mysql_init(NULL)) == NULL ) {
-	log_error(_("Couldn't initialize database"));
-	return false;
+        log_error(_("Couldn't initialize database"));
+        return false;
     }
     
     if (mysql_real_connect(_db, host, user, passwd, dbname, 0, NULL, 0) == NULL) {
@@ -206,7 +203,7 @@ MySQL::guery(const char *sql)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_db) {
-	return guery(_db, sql);
+        return guery(_db, sql);
     }
     return -1;
 }
@@ -303,20 +300,19 @@ MySQL::disconnect()
 as_value
 mysql_connect(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
 
     if (fn.nargs == 4) {
-	string host = fn.arg(0).to_string();
-	string db = fn.arg(1).to_string();
-	string user = fn.arg(2).to_string();
-	string passwd = fn.arg(3).to_string();	
-	return as_value(ptr->obj.connect(host.c_str(), db.c_str(),
-					 user.c_str(), passwd.c_str()));
-    } else {
-	return as_value(false);
-    }
+        string host = fn.arg(0).to_string();
+        string db = fn.arg(1).to_string();
+        string user = fn.arg(2).to_string();
+        string passwd = fn.arg(3).to_string();	
+        return as_value(ptr->connect(host.c_str(), db.c_str(),
+                         user.c_str(), passwd.c_str()));
+    } 
+
+    return as_value(false);
 }
 
 as_value
@@ -324,27 +320,21 @@ mysql_qetData(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-
     if (fn.nargs > 0) {
-	string sql = fn.arg(0).to_string();
-	Array_as *arr = (Array_as *)fn.arg(1).to_object(*getGlobal(fn)).get();
-//	std::vector< std::vector<const char *> >
-	MySQL::query_t qresult;
-#if 0
-	// This clearly makes no sense...
-	return as_value(ptr->obj.getData(sql, qresult));
-#endif
-	for (size_t i=0; i<qresult.size(); i++) {
-	    vector<const char *> row;
-	    row = qresult[i];
-	    for (size_t j=0; j< row.size(); j++) {
-//		cerr << "ARR: " << i << ":" << j << " " << row[j] << endl;
-		as_value entry = row[j];
-		arr->push(entry);
-	    }
-	}
- 	return as_value(true);
+        string sql = fn.arg(0).to_string();
+	    as_object* arr = fn.arg(1).to_object(getGlobal(fn));
+
+        MySQL::query_t qresult;
+
+        for (size_t i=0; i<qresult.size(); i++) {
+            vector<const char *> row;
+            row = qresult[i];
+            for (size_t j=0; j< row.size(); j++) {
+                as_value entry = row[j];
+                arr->callMethod(NSV::PROP_PUSH, entry);
+            }
+        }
+        return as_value(true);
     }
     log_aserror("Mysql.getData(): missing arguments");
  	return as_value(false);
@@ -354,8 +344,8 @@ as_value
 mysql_free(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-    ptr->obj.free_result();
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
+    ptr->free_result();
     return as_value(true);
 }
 
@@ -363,22 +353,21 @@ as_value
 mysql_fields(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-    return as_value(ptr->obj.num_fields());
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
+    return as_value(ptr->num_fields());
 }
 
 as_value
 mysql_fetch(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
     if (fn.nargs > 0) {
-	boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-	assert(ptr);
-	MYSQL_ROW res = ptr->obj.fetch_row();
-	as_value aaa = *res;       
-	Array_as *arr = new Array_as;
-	arr->push(aaa);
-	return as_value(arr);
+        MYSQL_ROW res = ptr->fetch_row();
+        as_value aaa = *res;       
+        Global_as& gl = getGlobal(fn);
+        as_object* arr = gl.createArray();
+        arr->callMethod(NSV::PROP_PUSH, aaa);
+        return as_value(arr);
     }
     log_aserror("Mysql.fetch(): missing arguments");
     return as_value();
@@ -388,8 +377,8 @@ as_value
 mysql_store(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-    gnash::as_object *obj = reinterpret_cast<gnash::as_object	*>(ptr->obj.store_result());
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
+    as_object* obj = reinterpret_cast<as_object*>(ptr->store_result());
     return as_value(obj);
 }
 
@@ -397,10 +386,10 @@ as_value
 mysql_query(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
     if (fn.nargs > 0) {
-	string sql = fn.arg(0).to_string();
-	return as_value(ptr->obj.guery(sql.c_str()));
+        string sql = fn.arg(0).to_string();
+        return as_value(ptr->guery(sql.c_str()));
     }
     log_aserror("Missing arguments to MySQL.query");
     return as_value();
@@ -409,31 +398,22 @@ mysql_query(const fn_call& fn)
 as_value
 mysql_disconnect(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-    return as_value(ptr->obj.disconnect());
+    MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
+    return as_value(ptr->disconnect());
 }
 
 extern "C" {
-    void
-    mysql_class_init(as_object &obj)
-    {
-//	GNASH_REPORT_FUNCTION;
-	// This is going to be the global "class"/"function"
-	as_object *cl;
-	if (cl == NULL) {
-        Global_as* gl = getGlobal(obj);
-        as_object* proto = getInterface();
-        cl = gl->createClass(&mysql_ctor, proto);
-// 	    // replicate all interface to class, to be able to access
-// 	    // all methods as static functions
- 	    attachInterface(cl);
-	}	
+
+void mysql_class_init(as_object &obj)
+{
+    Global_as& gl = getGlobal(obj);
+    as_object* proto = gl.createObject();
+	as_object *cl = gl.createClass(&mysql_ctor, proto);
+    attachInterface(*proto);
 	obj.init_member("MySQL", cl);
-    }
-    
-} // end of extern C
+} 
+
+}
 
 } // end of gnash namespace
 
