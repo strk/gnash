@@ -41,6 +41,17 @@ namespace gnash
 
 as_value metome_ext_connect(const fn_call& fn);
 
+class Metome : public Relay
+{
+public:
+    Metome();
+    ~Metome();
+    void connect(const char *sock);
+private:
+    const char *_name;
+};
+
+
 Metome::Metome() 
     : _name(0)
 {
@@ -60,81 +71,51 @@ Metome::connect(const char *sock)
     _name = sock;
 }
 
-class metome_as_object : public as_object
-{
-public:
-    Metome obj;
-};
-
 static void
-attachInterface(as_object *obj)
+attachInterface(as_object& obj)
 {
     GNASH_REPORT_FUNCTION;
-    Global_as* gl = getGlobal(*obj);
-    obj->init_member("connect", gl->createFunction(metome_ext_connect));
-}
-
-static as_object*
-getInterface()
-{
-    GNASH_REPORT_FUNCTION;
-    static boost::intrusive_ptr<as_object> o;
-    if (o == NULL) {
-	o = new as_object();
-    }
-    return o.get();
+    Global_as& gl = getGlobal(obj);
+    obj.init_member("connect", gl.createFunction(metome_ext_connect));
 }
 
 static as_value
-metome_ctor(const fn_call& /* fn */)
+metome_ctor(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    metome_as_object* obj = new metome_as_object();
+    as_object* obj = ensure<ValidThis>(fn);
+    obj->setRelay(new Metome);
 
-    attachInterface(obj);
-    return as_value(obj); // will keep alive
-//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
+    return as_value(); 
 }
 
 as_value
 metome_ext_setsockname(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<metome_as_object> ptr = ensureType<metome_as_object>(fn.this_ptr);
+    Metome* ptr = ensure<ThisIsNative<Metome> >(fn);
     
     if (fn.nargs > 0) {
-	string text = fn.arg(0).to_string();
-	ptr->obj.connect(text.c_str());
-	return as_value(true);
+        string text = fn.arg(0).to_string();
+        ptr->connect(text.c_str());
+        return as_value(true);
     }
     return as_value(false);
 }
 
-std::auto_ptr<as_object>
-init_metome_instance()
-{
-    return std::auto_ptr<as_object>(new metome_as_object());
-}
-
 // const char *metome_setmode(struct metome_config *config, const char *mode);
 extern "C" {
-    void
-    metome_class_init(as_object &obj)
-    {
-//	GNASH_REPORT_FUNCTION;
+void
+metome_class_init(as_object &obj)
+{
 	// This is going to be the global "class"/"function"
-	as_object *cl;
-	if (cl == NULL) {
-        Global_as* gl = getGlobal(obj);
-        as_object* proto = getInterface();
-        cl = gl->createClass(&metome_ctor, proto);
-// 	    // replicate all interface to class, to be able to access
-// 	    // all methods as static functions
- 	    attachInterface(cl);
-	}
+    Global_as& gl = getGlobal(obj);
+    as_object* proto = gl.createObject();
+    attachInterface(*proto);
+    as_object* cl = gl.createClass(&metome_ctor, proto);
 	
 	obj.init_member("Metome", cl);
-    }
+}
 } // end of extern C
 
 
