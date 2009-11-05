@@ -80,6 +80,7 @@
 #include "RunResources.h" // for initialization
 #include "gnash.h" // Quality
 #include "MovieClip.h"
+#include "SimpleBuffer.h" // for LoadCallback
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -145,7 +146,16 @@ class DSOEXPORT movie_root : boost::noncopyable
 
 public:
 
-    typedef std::pair<boost::shared_ptr<IOChannel>, as_object*> LoadCallback;
+    struct LoadCallback {
+        boost::shared_ptr<IOChannel> stream;
+        as_object* obj;
+        SimpleBuffer buf;
+        LoadCallback(boost::shared_ptr<IOChannel> s, as_object* o)
+            : stream(s), obj(o) {}
+    };
+        
+    //typedef std::pair<boost::shared_ptr<IOChannel>, as_object*> LoadCallback;
+        
     typedef std::list<LoadCallback> LoadCallbacks;
 
     /// Default constructor

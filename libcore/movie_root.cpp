@@ -1686,7 +1686,7 @@ void
 movie_root::addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str)
 {
     boost::shared_ptr<IOChannel> io(str.release());
-    _loadCallbacks.push_back(std::make_pair(io, obj));
+    _loadCallbacks.push_back(LoadCallback(io, obj));
 }
 
 void
@@ -1867,7 +1867,7 @@ movie_root::markReachableResources() const
 
     for (LoadCallbacks::const_iterator i = _loadCallbacks.begin(),
             e = _loadCallbacks.end(); i != e; ++i) {
-        i->second->setReachable();
+        i->obj->setReachable();
     }
 
     // Mark resources reachable by queued action code

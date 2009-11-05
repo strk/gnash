@@ -75,11 +75,13 @@ registerLoadableNative(as_object& o)
     vm.registerNative(loadableobject_decode, 301, 3);
 }
 
+// TODO: make a member of movie_root::LoadCallback
 bool
 processLoad(movie_root::LoadCallbacks::value_type& v)
 {
-    IOChannel* lt = v.first.get();
-    as_object* obj = v.second;
+    IOChannel* lt = v.stream.get();
+    as_object* obj = v.obj;
+    SimpleBuffer& buf = v.buf;
 
     if (!lt) {
         obj->callMethod(NSV::PROP_ON_DATA, as_value());
@@ -91,32 +93,63 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     // bytes, or if the whole input is not read at the first attempt.
     // It seems unlikely that onData would be called with two half-replies
     const size_t chunk = 65535;
-        
-    boost::scoped_array<char> buf(new char[chunk + 1]);
-    size_t actuallyRead = lt->read(buf.get(), chunk);
 
-    if (!actuallyRead && lt->eof()) {
-        obj->callMethod(NSV::PROP_ON_DATA, as_value());
-        return true;
+    // Allocate chunksize + terminating NULL
+    // TODO only do on first call!
+    buf.reserve(chunk+1);
+        
+    size_t actuallyRead = lt->readNonBlocking(buf.data()+buf.size(),
+                                              chunk-buf.size());
+
+    string_table& st = getStringTable(*obj);
+
+    if ( actuallyRead )
+    {
+        buf.resize(buf.size()+actuallyRead);
+
+        // TODO: use namedString
+        obj->set_member(st.find("_bytesLoaded"), buf.size());
+        // TODO: do this only on first call ?
+        obj->set_member(st.find("_bytesTotal"), lt->size());
+
+        log_debug("LoadableObject Loaded %d bytes, reaching %d total",
+            actuallyRead, buf.size());
     }
 
-    // Do this before the BOM is stripped or actuallyRead will change.
-    string_table& st = getStringTable(*obj);
-    obj->set_member(st.find("_bytesLoaded"), actuallyRead);
-    obj->set_member(st.find("_bytesTotal"), lt->size());
+    // We haven't finished if ! EOF and we didn't fill chunk 
+    if ( buf.size() < chunk && ! lt->eof() )
+    {
+        return false;
+    }
+
+
+    log_debug("LoadableObject reached chunksize or EOF (%d), proceeding",
+                buf.size());
+
+    // Terminate the string
+    buf.appendByte('\0');
+
+    log_debug("LoadableObject: after append('0') size got to %d",
+                buf.size());
     
-    buf[actuallyRead] = '\0';
 
     // Strip BOM, if any.
     // See http://savannah.gnu.org/bugs/?19915
+    // TODO: do this *only* on first chunk!!
     utf8::TextEncoding encoding;
-    // NOTE: the call below will possibly change 'xmlsize' parameter
-    char* bufptr = utf8::stripBOM(buf.get(), actuallyRead, encoding);
+    // NOTE: the call below will possibly change 'size' parameter
+    size_t size = buf.size();
+    char* bufptr = utf8::stripBOM((char*)buf.data(), size, encoding);
     if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
-        log_unimpl("%s to utf8 conversion in LoadVars input parsing", 
+        log_unimpl("%s to utf8 conversion in LoadableObject input parsing", 
                 utf8::textEncodingName(encoding));
     }
+
     as_value dataVal(bufptr); 
+
+    // Clear the buffer for next iteration.
+    // Data should have been copied to dataVal by now.
+    buf.resize(0);
     
     obj->callMethod(NSV::PROP_ON_DATA, dataVal);
 
