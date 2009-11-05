@@ -75,7 +75,7 @@ registerLoadableNative(as_object& o)
     vm.registerNative(loadableobject_decode, 301, 3);
 }
 
-// TODO: make a member of movie_root::LoadCallback
+// TODO: make a member of movie_root::LoadCallback ? 
 bool
 processLoad(movie_root::LoadCallbacks::value_type& v)
 {
@@ -89,71 +89,65 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     }
     
 
-    // TODO: I don't know what happens when there are more than 65535
-    // bytes, or if the whole input is not read at the first attempt.
-    // It seems unlikely that onData would be called with two half-replies
-    const size_t chunk = 65535;
+    static const size_t chunksize = 65535;
+    uint8_t chunk[chunksize];
 
-    // Allocate chunksize + terminating NULL
-    // TODO only do on first call!
-    buf.reserve(chunk+1);
-        
-    size_t actuallyRead = lt->readNonBlocking(buf.data()+buf.size(),
-                                              chunk-buf.size());
+    size_t actuallyRead = lt->readNonBlocking(chunk, chunksize);
 
     if ( actuallyRead )
     {
-        buf.resize(buf.size()+actuallyRead);
+        if ( buf.empty() ) // set total size only on first read
+            obj->set_member(NSV::PROP_uBYTES_TOTAL, lt->size());
+
+        buf.append(chunk, actuallyRead);
 
         obj->set_member(NSV::PROP_uBYTES_LOADED, buf.size());
-        // TODO: do this only on first call ?
-        obj->set_member(NSV::PROP_uBYTES_TOTAL, lt->size());
 
-        log_debug("LoadableObject Loaded %d bytes, reaching %d total",
-            actuallyRead, buf.size());
+        log_debug("LoadableObject Loaded %d bytes, reaching %d/%d",
+            actuallyRead, buf.size(), lt->size());
     }
 
-    // We haven't finished if ! EOF and we didn't fill chunk 
-    if ( buf.size() < chunk && ! lt->eof() )
+    // We haven't finished till EOF 
+    if ( ! lt->eof() ) return false;
+
+
+    log_debug("LoadableObject reached EOF (%d/%d loaded)",
+                buf.size(), lt->size());
+
+    // got nothing, won't bother BOFs of nulls
+    if ( buf.empty() )
     {
-        return false;
+        obj->callMethod(NSV::PROP_ON_DATA, as_value());
+        return true;
     }
-
-
-    log_debug("LoadableObject reached chunksize or EOF (%d), proceeding",
-                buf.size());
 
     // Terminate the string
     buf.appendByte('\0');
 
-    log_debug("LoadableObject: after append('0') size got to %d",
-                buf.size());
-    
-
     // Strip BOM, if any.
     // See http://savannah.gnu.org/bugs/?19915
-    // TODO: do this *only* on first chunk!!
     utf8::TextEncoding encoding;
-    // NOTE: the call below will possibly change 'size' parameter
     size_t size = buf.size();
+    // NOTE: the call below will possibly change 'size' parameter
     char* bufptr = utf8::stripBOM((char*)buf.data(), size, encoding);
     if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
         log_unimpl("%s to utf8 conversion in LoadableObject input parsing", 
                 utf8::textEncodingName(encoding));
     }
 
+    // NOTE: Data copy here !!
     as_value dataVal(bufptr); 
 
-    // Clear the buffer for next iteration.
-    // Data should have been copied to dataVal by now.
-    buf.resize(0);
-    
+    // NOTE: we could release memory associated
+    // with the buffer here, before invoking a new method,
+    // but at the time of writing there's no method of SimpleBuffer
+    // providing memory release except destruction. Will be
+    // destroyed as soon as we return though...
+
+    // NOTE: Another data copy here !
     obj->callMethod(NSV::PROP_ON_DATA, dataVal);
 
-    // We could try returning true if anything was read. Otherwise it
-    // may be necessary to implement a cache so that the whole reply is
-    // sent at once. The max length of a string in AS is 65535 characters.
-    return lt->eof();
+    return true;
 
 }
 
