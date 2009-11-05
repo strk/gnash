@@ -74,7 +74,6 @@ SharedLib::SharedLib()
 
 SharedLib::SharedLib(const std::string& filespec)
 {
-    GNASH_REPORT_FUNCTION;
 }
 
 SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
