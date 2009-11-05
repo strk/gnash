@@ -41,8 +41,17 @@ namespace gnash
 
 as_value dbus_ext_setsockname(const fn_call& fn);
 
+class Dbus : public Relay
+{
+public:
+    Dbus();
+    ~Dbus();
+    void setSocketName(const char *sock);
+private:
+    std::string _name;
+};
+
 Dbus::Dbus() 
-    : _name(0)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -60,81 +69,50 @@ Dbus::setSocketName(const char *sock)
     _name = sock;
 }
 
-class dbus_as_object : public as_object
-{
-public:
-    Dbus obj;
-};
-
 static void
-attachInterface(as_object *obj)
+attachInterface(as_object& obj)
 {
     GNASH_REPORT_FUNCTION;
-    Global_as* gl = getGlobal(*obj);
-    obj->init_member("setSocketName", gl->createFunction(dbus_ext_setsockname));
-}
-
-static as_object*
-getInterface()
-{
-    GNASH_REPORT_FUNCTION;
-    static boost::intrusive_ptr<as_object> o;
-    if (o == NULL) {
-	o = new as_object();
-    }
-    return o.get();
+    Global_as& gl = getGlobal(obj);
+    obj.init_member("setSocketName", gl.createFunction(dbus_ext_setsockname));
 }
 
 static as_value
-dbus_ctor(const fn_call& /* fn */)
+dbus_ctor(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-    dbus_as_object* obj = new dbus_as_object();
+    as_object* obj = ensure<ValidThis>(fn);
+    obj->setRelay(new Dbus());
 
-    attachInterface(obj);
-    return as_value(obj); // will keep alive
-//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
+    return as_value(); 
 }
 
 as_value
 dbus_ext_setsockname(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<dbus_as_object> ptr = ensureType<dbus_as_object>(fn.this_ptr);
+    Dbus* ptr = ensure<ThisIsNative<Dbus> >(fn);
     
     if (fn.nargs > 0) {
-	string text = fn.arg(0).to_string();
-	ptr->obj.setSocketName(text.c_str());
-	return as_value(true);
+        const std::string& text = fn.arg(0).to_string();
+        ptr->setSocketName(text.c_str());
+        return as_value(true);
     }
     return as_value(false);
 }
 
-std::auto_ptr<as_object>
-init_dbus_instance()
-{
-    return std::auto_ptr<as_object>(new dbus_as_object());
-}
-
 // const char *dbus_setmode(struct dbus_config *config, const char *mode);
 extern "C" {
-    void
-    dbus_class_init(as_object &obj)
-    {
-//	GNASH_REPORT_FUNCTION;
-	// This is going to be the global "class"/"function"
-	as_object *cl;
-	if (cl == NULL) {
-        Global_as* gl = getGlobal(obj);
-        as_object* proto = getInterface();
-        cl = gl->createClass(&dbus_ctor, proto);
-// 	    // replicate all interface to class, to be able to access
-// 	    // all methods as static functions
- 	    attachInterface(cl);
-	}
+
+void
+dbus_class_init(as_object &obj)
+{
+    Global_as& gl = getGlobal(obj);
+    as_object* proto = gl.createObject();
+    attachInterface(*proto);
+    as_object* cl = gl.createClass(&dbus_ctor, proto);
 	
 	obj.init_member("Dbus", cl);
-    }
+}
 } // end of extern C
 
 

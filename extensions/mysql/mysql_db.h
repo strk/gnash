@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __MYSQL_DB_H__
-#define __MYSQL_DB_H__
+#ifndef GNASH_MYSQL_DB_H
+#define GNASH_MYSQL_DB_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -34,39 +34,9 @@
 namespace gnash
 {
 
-class MySQL
-{
-public:
-    typedef std::vector< std::vector<const char *> > query_t;
-    MySQL();
-    ~MySQL();
-    bool connect(const char *host, const char *dbname, const char *user, const char *passwd);
-    int getData(const char *sql, query_t &result);
-    bool disconnect();
-
-    // These are wrappers for the regular MySQL API
-    bool guery(MYSQL *db, const char *sql);
-    bool guery(const char *sql);
-    int num_fields();
-    int num_fields(MYSQL_RES *result);
-    MYSQL_ROW fetch_row();
-    MYSQL_ROW fetch_row(MYSQL_RES *result);
-    void free_result();
-    void free_result(MYSQL_RES *result);
-    MYSQL_RES *store_result();
-    MYSQL_RES *store_result(MYSQL *db);
-private:    
-    MYSQL *_db;
-    MYSQL_RES *_result;
-    MYSQL_ROW _row;
-};
-
 extern "C" {
     void mysql_class_init(as_object &obj);  
 }
-
-/// Return an  instance
-std::auto_ptr<as_object> init_mysql_instance();
 
 }
 

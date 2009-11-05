@@ -63,27 +63,13 @@ using namespace std;
 
 namespace gnash {
 
-SharedLib::SharedLib()
-{
-//    GNASH_REPORT_FUNCTION;
-#ifdef LT_DLMUTEX
-//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
-//                                 gnash_mutex_seterror, gnash_mutex_geterror);
-#endif
-}
-
 SharedLib::SharedLib(const std::string& filespec)
 {
-    GNASH_REPORT_FUNCTION;
+    _filespec = filespec;
 }
 
-SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
+SharedLib::SharedLib(const std::string& filespec, const std::string& envvar)
 {
-    GNASH_REPORT_FUNCTION;
-#ifdef LT_DLMUTEX
-//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
-//                                 gnash_mutex_seterror, gnash_mutex_geterror);
-#endif
     _filespec = filespec;
     scoped_lock lock(_libMutex);
     
@@ -91,8 +77,6 @@ SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
     int errors = lt_dlinit ();
     if (errors) {
         log_error (_("Couldn't initialize ltdl: %s"), lt_dlerror());
-//     } else {
-//         log_debug ("Initialized ltdl");
     }
     
     string pluginsdir;
@@ -103,14 +87,10 @@ SharedLib::SharedLib(const std::string &filespec, const std::string &envvar)
         pluginsdir = PLUGINSDIR;
     }
     
-    //lt_dladdsearchdir(pluginsdir.c_str());
 }
 
 SharedLib::~SharedLib()
 {
-    //   GNASH_REPORT_FUNCTION;
-//    closeLib();
-//    lt_dlexit();
 }
 
 bool
@@ -152,7 +132,6 @@ SharedLib::openLib (const std::string& filespec)
 SharedLib::initentry *
 SharedLib::getInitEntry (const std::string& symbol)
 {
-    GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
     scoped_lock lock(_libMutex);

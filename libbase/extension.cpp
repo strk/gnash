@@ -142,7 +142,6 @@ Extension::scanAndLoad(as_object& where)
 bool
 Extension::initModule(const std::string& module, as_object &where)
 {
-    GNASH_REPORT_FUNCTION;
 
     SharedLib *sl;
     std::string symbol(module);
@@ -171,8 +170,8 @@ Extension::initModule(const std::string& module, as_object &where)
 }
 
 bool
-Extension::initModuleWithFunc(const std::string& module, const std::string& func,
-    as_object &obj)
+Extension::initModuleWithFunc(const std::string& module,
+        const std::string& func, as_object &obj)
 {
     GNASH_REPORT_FUNCTION;
 
