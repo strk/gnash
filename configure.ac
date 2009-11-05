@@ -802,7 +802,6 @@ ext_fileio=no
 ext_gtk=no
 ext_lirc=no
 ext_dbus=no
-ext_metome=no
 ext_all=no
 ext_launcher=no
 AC_ARG_ENABLE(extensions,
@@ -859,11 +858,6 @@ AC_ARG_ENABLE(extensions,
         ext_dbus=yes
         nextensions=$((nextensions+1))
         ;;
-      metome|METOME)
-        AC_DEFINE(USE_METOME_EXT, [1], [Build the METOME extension])
-        ext_metome=yes
-        nextensions=$((nextensions+1))
-        ;;
       all|ALL)
         AC_DEFINE(USE_GTK_EXT, [1], [Build all the extensions])
         ext_dejagnu=yes
@@ -872,7 +866,6 @@ AC_ARG_ENABLE(extensions,
         ext_gtk=yes
         ext_lirc=yes
         ext_dbus=yes
-        ext_metome=yes
         ext_launcher=yes
         ext_all=yes
         nextensions=9
@@ -896,7 +889,6 @@ AM_CONDITIONAL(BUILD_LAUNCHER_EXT, [ test x$ext_launcher = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
-AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
@@ -2406,7 +2398,6 @@ extensions/fileio/Makefile
 extensions/gtk2/Makefile
 extensions/lirc/Makefile
 extensions/dbus/Makefile
-extensions/metome/Makefile
 plugin/Makefile
 plugin/xpcom/Makefile
 plugin/klash/Makefile
