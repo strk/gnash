@@ -15,58 +15,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __FILEIO_PLUGIN_H__
-#define __FILEIO_PLUGIN_H__
+#ifndef GNASH_FILEIO_PLUGIN_H
+#define GNASH_FILEIO_PLUGIN_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include <memory> // for auto_ptr
-#include "as_object.h"
 
-#include <cstdio>
-#include <string>
+namespace gnash {
 
-namespace gnash
-{
+class ObjectURI;
+class as_object;
 
-// TODO: Document this class !!
-class Fileio : public as_object {
-public:
-    Fileio();
-    ~Fileio();
-
-    bool fopen(const std::string &filespec, const std::string &mode);
-
-    int fread(std::string &str);
-    int fgetc();
-    std::string &fgets(std::string &str);
-    
-    int fwrite(const std::string &str);
-    bool fputc(int c);
-    bool fputs(const std::string &str);
-    int fclose();
-    int fflush();
-    void rewind();
-    int fseek(long offset);
-    int fseek(long offset, int whence);
-    long ftell();
-    bool asyncmode(bool async); 
-    bool feof();
-    bool unlink(const std::string &filespec);
-    void scandir(const std::string& dir, as_value* result);    
-private:
-    FILE        *_stream;
-    std::string _filespec;
-};
 
 extern "C" {
-    void fileio_class_init(as_object& global, const ObjectURI& uri);  
-    /// Return an  instance
-}
 
-std::auto_ptr<as_object> init_fileio_instance();
+void fileio_class_init(as_object& global, const ObjectURI& uri);  
+
+}
 
 } // end of gnash namespace
 
