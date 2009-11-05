@@ -135,6 +135,8 @@ enum NamedStrings {
         PROP_BOLD,
         PROP_BROADCAST_MESSAGE,
         PROP_BULLET,
+        PROP_uBYTES_TOTAL,
+        PROP_uBYTES_LOADED,
         PROP_C,
         PROP_CALLEE,
         PROP_CALLER,

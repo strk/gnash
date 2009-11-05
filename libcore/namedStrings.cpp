@@ -42,6 +42,8 @@ static string_table::svt preload_names[] =
 	string_table::svt( "bold", NSV::PROP_BOLD ),
 	string_table::svt( "broadcastMessage", NSV::PROP_BROADCAST_MESSAGE ),
 	string_table::svt( "bullet", NSV::PROP_BULLET ),
+	string_table::svt( "_bytesTotal", NSV::PROP_uBYTES_TOTAL ),
+	string_table::svt( "_bytesLoaded", NSV::PROP_uBYTES_LOADED ),
 	string_table::svt( "c", NSV::PROP_C ),
 	string_table::svt( "callee", NSV::PROP_CALLEE ),
 	string_table::svt( "caller", NSV::PROP_CALLER ),

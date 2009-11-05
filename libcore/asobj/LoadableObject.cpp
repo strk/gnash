@@ -101,16 +101,13 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     size_t actuallyRead = lt->readNonBlocking(buf.data()+buf.size(),
                                               chunk-buf.size());
 
-    string_table& st = getStringTable(*obj);
-
     if ( actuallyRead )
     {
         buf.resize(buf.size()+actuallyRead);
 
-        // TODO: use namedString
-        obj->set_member(st.find("_bytesLoaded"), buf.size());
+        obj->set_member(NSV::PROP_uBYTES_LOADED, buf.size());
         // TODO: do this only on first call ?
-        obj->set_member(st.find("_bytesTotal"), lt->size());
+        obj->set_member(NSV::PROP_uBYTES_TOTAL, lt->size());
 
         log_debug("LoadableObject Loaded %d bytes, reaching %d total",
             actuallyRead, buf.size());
@@ -228,8 +225,7 @@ loadableobject_getBytesLoaded(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
     as_value bytesLoaded;
-    string_table& st = getStringTable(fn);
-    ptr->get_member(st.find("_bytesLoaded"), &bytesLoaded);
+    ptr->get_member(NSV::PROP_uBYTES_LOADED, &bytesLoaded);
     return bytesLoaded;
 }
     
@@ -238,8 +234,7 @@ loadableobject_getBytesTotal(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
     as_value bytesTotal;
-    string_table& st = getStringTable(fn);
-    ptr->get_member(st.find("_bytesTotal"), &bytesTotal);
+    ptr->get_member(NSV::PROP_uBYTES_TOTAL, &bytesTotal);
     return bytesTotal;
 }
 
@@ -531,9 +526,8 @@ loadableobject_load(const fn_call& fn)
     movie_root& mr = getRoot(fn);
     mr.addLoadableObject(obj, str);
 
-    string_table& st = getStringTable(fn);
-    obj->set_member(st.find("_bytesLoaded"), 0.0);
-    obj->set_member(st.find("_bytesTotal"), as_value());
+    obj->set_member(NSV::PROP_uBYTES_LOADED, 0.0);
+    obj->set_member(NSV::PROP_uBYTES_TOTAL, as_value());
 
     return as_value(true);
 
