@@ -38,43 +38,39 @@ as_value dejagnu_pass(const fn_call& fn);
 as_value dejagnu_fail(const fn_call& fn);
 as_value dejagnu_totals(const fn_call& fn);
 
-class dejagnu_as_object : public as_object
+class DejaGnu : public Relay
 {
 public:
-    DejaGnu obj;
+    DejaGnu();
+    ~DejaGnu();
+    const char *pass (const char *msg);
+    const char *fail (const char *msg);
+    const char *xpass (const char *msg);
+    const char *xfail (const char *msg);
+    void totals ();
+private:
+    int passed;
+    int failed;
+    int xpassed;
+    int xfailed;
 };
 
 static void
-attachInterface(as_object *obj)
+attachInterface(as_object& obj)
 {
-//    GNASH_REPORT_FUNCTION;
-    Global_as* gl = getGlobal(*obj);
+    Global_as& gl = getGlobal(obj);
     
-    obj->init_member("pass", gl->createFunction(dejagnu_pass));
-    obj->init_member("fail", gl->createFunction(dejagnu_fail));
-    obj->init_member("totals", gl->createFunction(dejagnu_totals));
-}
-
-static as_object*
-getInterface()
-{
-//    GNASH_REPORT_FUNCTION;
-    static boost::intrusive_ptr<as_object> o;
-    if (o == NULL) {
-	o = new as_object();
-    }
-    return o.get();
+    obj.init_member("pass", gl.createFunction(dejagnu_pass));
+    obj.init_member("fail", gl.createFunction(dejagnu_fail));
+    obj.init_member("totals", gl.createFunction(dejagnu_totals));
 }
 
 static as_value
-dejagnu_ctor(const fn_call& /* fn */)
+dejagnu_ctor(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    dejagnu_as_object* obj = new dejagnu_as_object();
-
-    attachInterface(obj);
-    return as_value(obj); // will keep alive
-//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
+    as_object* obj = ensure<ValidThis>(fn);
+    obj->setRelay(new DejaGnu());
+    return as_value(); 
 }
 
 
@@ -92,8 +88,6 @@ DejaGnu::~DejaGnu()
 const char *
 DejaGnu::pass (const char *msg)
 {
-//    GNASH_REPORT_FUNCTION;
-
     passed++;
     log_debug("PASSED: %s\n", msg);
     return NULL;
@@ -102,8 +96,6 @@ DejaGnu::pass (const char *msg)
 const char *
 DejaGnu::fail (const char *msg)
 {
-//    GNASH_REPORT_FUNCTION;
-
     failed++;
     log_debug("FAILED: %s\n", msg);
     return NULL;
@@ -113,11 +105,11 @@ as_value
 dejagnu_pass(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<dejagnu_as_object> ptr = ensureType<dejagnu_as_object>(fn.this_ptr);
+    DejaGnu* ptr = ensure<ThisIsNative<DejaGnu> >(fn);
     
     if (fn.nargs > 0) {
 	string text = fn.arg(0).to_string();
-	return as_value(ptr->obj.pass(text.c_str()));
+	return as_value(ptr->pass(text.c_str()));
     }
 
     return as_value();
@@ -127,11 +119,11 @@ as_value
 dejagnu_fail(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<dejagnu_as_object> ptr = ensureType<dejagnu_as_object>(fn.this_ptr);
+    DejaGnu* ptr = ensure<ThisIsNative<DejaGnu> >(fn);
     
     if (fn.nargs > 0) {
-	string text = fn.arg(0).to_string();
-	return as_value(ptr->obj.fail(text.c_str()));
+        string text = fn.arg(0).to_string();
+        return as_value(ptr->fail(text.c_str()));
     }
 
     return as_value();
@@ -140,38 +132,25 @@ dejagnu_fail(const fn_call& fn)
 as_value
 dejagnu_totals(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<dejagnu_as_object> ptr = ensureType<dejagnu_as_object>(fn.this_ptr);
+    DejaGnu* ptr = ensure<ThisIsNative<DejaGnu> >(fn);
     
-    ptr->obj.totals();
+    ptr->totals();
     return as_value(true);
 }
 
     
-std::auto_ptr<as_object>
-init_dejagnu_instance()
-{
-    return std::auto_ptr<as_object>(new dejagnu_as_object());
-}
-
 extern "C" {
-    void
-    dejagnu_class_init(as_object &obj)
-    {
-//	GNASH_REPORT_FUNCTION;
-	// This is going to be the global "class"/"function"
-	as_object *cl;
-	if (cl == NULL) {
-        as_object* proto = getInterface();
-        Global_as* gl = getGlobal(obj);
-        cl = gl->createClass(&dejagnu_ctor, proto);
-// 	    // replicate all interface to class, to be able to access
-// 	    // all methods as static functions
- 	    attachInterface(cl);
-	}
+void
+dejagnu_class_init(as_object &obj)
+{
+    Global_as& gl = getGlobal(obj);
+    as_object* proto = gl.createObject();
+    attachInterface(*proto);
+
+    as_object* cl = gl.createClass(&dejagnu_ctor, proto);
 	
 	obj.init_member("DejaGnu", cl);
-    }
+}
 } // end of extern C
 
 
