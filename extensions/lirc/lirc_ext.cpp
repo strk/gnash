@@ -44,43 +44,31 @@ as_value lirc_ext_init(const fn_call& fn);
 as_value lirc_ext_getkey(const fn_call& fn);
 as_value lirc_ext_getbutton(const fn_call& fn);
 
-class lirc_as_object : public as_object
+class LircRelay : public Relay
 {
 public:
     Lirc obj;
 };
 
 static void
-attachInterface(as_object *obj)
+attachInterface(as_object& obj)
 {
     GNASH_REPORT_FUNCTION;
-    Global_as* gl = getGlobal(*obj);
+    Global_as& gl = getGlobal(obj);
 
-    obj->init_member("lirc_init", gl->createFunction(lirc_ext_init));
-    obj->init_member("lirc_getKey", gl->createFunction(lirc_ext_getkey));
-    obj->init_member("lirc_getButton", gl->createFunction(lirc_ext_getbutton));
-}
-
-static as_object*
-getInterface()
-{
-    GNASH_REPORT_FUNCTION;
-    static boost::intrusive_ptr<as_object> o;
-    if (o == NULL) {
-	o = new as_object();
-    }
-    return o.get();
+    obj.init_member("lirc_init", gl.createFunction(lirc_ext_init));
+    obj.init_member("lirc_getKey", gl.createFunction(lirc_ext_getkey));
+    obj.init_member("lirc_getButton", gl.createFunction(lirc_ext_getbutton));
 }
 
 static as_value
-lirc_ctor(const fn_call& /* fn */)
+lirc_ctor(const fn_call&  fn)
 {
-    GNASH_REPORT_FUNCTION;
-    lirc_as_object* obj = new lirc_as_object();
+    as_object* obj = ensure<ValidThis>(fn);
 
-    attachInterface(obj);
-    return as_value(obj); // will keep alive
-//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
+    obj->setRelay(new LircRelay());
+
+    return as_value();
 }
 
 
@@ -98,11 +86,11 @@ as_value
 lirc_ext_init(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<lirc_as_object> ptr = ensureType<lirc_as_object>(fn.this_ptr);
+    LircRelay* ptr = ensure<ThisIsNative<LircRelay> >(fn);
     
     if (fn.nargs > 0) {
-	string text = fn.arg(0).to_string();
-	return as_value(ptr->obj.init(text.c_str()));
+        const std::string& text = fn.arg(0).to_string();
+        return as_value(ptr->obj.init(text.c_str()));
     }
     return as_value(false);
 }
@@ -111,11 +99,11 @@ as_value
 lirc_ext_getkey(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<lirc_as_object> ptr = ensureType<lirc_as_object>(fn.this_ptr);
+    LircRelay* ptr = ensure<ThisIsNative<LircRelay> >(fn);
     
     if (fn.nargs == 0) {
-      key::code key = ptr->obj.getKey();
-      return as_value(key);
+        key::code key = ptr->obj.getKey();
+        return as_value(key);
     }
     return as_value(false);
 }
@@ -123,41 +111,21 @@ lirc_ext_getkey(const fn_call& fn)
 as_value
 lirc_ext_getbutton(const fn_call& fn)
 {
-  //    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<lirc_as_object> ptr = ensureType<lirc_as_object>(fn.this_ptr);
-    
-    if (fn.nargs == 0) {
-      const char *button = ptr->obj.getButton();
-      return as_value(button);
-    }
-    return as_value(false);
+    LircRelay* ptr = ensure<ThisIsNative<LircRelay> >(fn);
+    return as_value(ptr->obj.getButton());
 }
 
-std::auto_ptr<as_object>
-init_lirc_instance()
-{
-    return std::auto_ptr<as_object>(new lirc_as_object());
-}
-
-// const char *lirc_setmode(struct lirc_config *config, const char *mode);
 extern "C" {
-    void
-    lirc_class_init(as_object &obj)
-    {
-//	GNASH_REPORT_FUNCTION;
-	// This is going to be the global "class"/"function"
-	as_object *cl;
-	if (cl == NULL) {
-        Global_as* gl = getGlobal(obj);
-        as_object* proto = getInterface();
-        cl = gl->createClass(&lirc_ctor, proto);
-// 	    // replicate all interface to class, to be able to access
-// 	    // all methods as static functions
- 	    attachInterface(cl);
-	}
-	
+void
+lirc_class_init(as_object &obj)
+{
+
+    Global_as& gl = getGlobal(obj);
+    as_object* proto = gl.createObject();
+    attachInterface(*proto);
+	as_object* cl = gl.createClass(&lirc_ctor, proto);
 	obj.init_member("Lirc", cl);
-    }
+}
 } // end of extern C
 
 

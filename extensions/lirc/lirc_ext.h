@@ -15,14 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __LIRC_PLUGIN_H__
-#define __LIRC_PLUGIN_H__
+#ifndef GNASH_LIRC_PLUGIN_H
+#define GNASH_LIRC_PLUGIN_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include <memory> // for auto_ptr
 #include "as_object.h"
 
 namespace gnash
@@ -30,14 +29,10 @@ namespace gnash
 
 extern "C" {
     void lirc_class_init(as_object &obj);  
-    /// Return an  instance
 }
-
-std::auto_ptr<as_object> init_lirc_instance();
 
 } // end of gnash namespace
 
-// __LIRC_PLUGIN_H__
 #endif
 
 // Local Variables:
