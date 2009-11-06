@@ -873,7 +873,7 @@ public:
     /// Return true if this DisplayObject allows turning the cursor
     /// into an hand shape when it happens to be the one receiving
     /// mouse events.
-    virtual bool allowHandCursor() const { return true; }
+    bool allowHandCursor() const;
 
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair; 
@@ -1147,7 +1147,7 @@ isReferenceable(const DisplayObject& d)
 /// @return     null if either the DisplayObject or the associated object is
 ///             null. Otherwise the associated object.
 inline as_object*
-getObject(DisplayObject* d)
+getObject(const DisplayObject* d)
 {
     return d ? d->object() : 0;
 }

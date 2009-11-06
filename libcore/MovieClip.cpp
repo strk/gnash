@@ -2256,21 +2256,6 @@ MovieClip::isEnabled() const
     return enabled.to_bool();
 }
 
-bool
-MovieClip::allowHandCursor() const
-{
-    as_value val;
-    // const_cast needed due to get_member being non-const due to the 
-    // possibility that a getter-setter would actually modify us ...
-    if (!getObject(const_cast<MovieClip*>(this))->get_member(
-                NSV::PROP_USEHANDCURSOR, &val))
-    {
-         // true if not found..
-         return true;
-    }
-    return val.to_bool();
-}
-
 class EnumerateVisitor {
 
     as_environment& _env;

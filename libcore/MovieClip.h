@@ -797,9 +797,6 @@ private:
     /// are disabled, and automatic tab ordering won't include it.
     bool isEnabled() const;
 
-    // See dox in DisplayObject.h
-    bool allowHandCursor() const;
-
     /// Check whether a point hits our drawable shape.
     //
     /// This is possible because the drawable does not have its own
