@@ -60,23 +60,7 @@ public:
         KEY_UP,
         DATA,
         
-        // These are for the MoveClipLoader ActionScript only
-        LOAD_START,
-        LOAD_ERROR,
-        LOAD_PROGRESS,
-        LOAD_INIT,
-        
-        // These are for the XMLSocket ActionScript only
-        CLOSE,
-        CONNECT,
-        XML,
-        
-        // This is for setInterval
-        TIMER,
-
         CONSTRUCT,
-        SETFOCUS,
-        KILLFOCUS,
 
         EVENT_COUNT
     };

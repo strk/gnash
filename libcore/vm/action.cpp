@@ -121,17 +121,7 @@ event_id::functionName() const
 		(KEY_DOWN, "onKeyDown")
 		(KEY_UP, "onKeyUp")	
 		(DATA, "onData")
-		(LOAD_START, "onLoadStart")	
-		(LOAD_ERROR, "onLoadError")
-		(LOAD_PROGRESS, "onLoadProgress")	
-		(LOAD_INIT, "onLoadInit")
-		(CLOSE, "onClose")
-		(CONNECT, "onConnect")
-		(XML, "onXML")
-		(TIMER, "onTimer")
-		(CONSTRUCT, "onConstruct")
-		(SETFOCUS, "onSetFocus")
-		(KILLFOCUS, "onKillFocus");
+		(CONSTRUCT, "onConstruct");
 
     EventFunctionNameMap::const_iterator it = e.find(_id);
     assert(it != e.end());
@@ -161,17 +151,7 @@ event_id::functionKey() const
 		(KEY_DOWN, NSV::PROP_ON_KEY_DOWN)
 		(KEY_UP, NSV::PROP_ON_KEY_UP)
 		(DATA, NSV::PROP_ON_DATA)
-		(LOAD_START, NSV::PROP_ON_LOAD_START)
-		(LOAD_ERROR, NSV::PROP_ON_LOAD_ERROR)
-		(LOAD_PROGRESS, NSV::PROP_ON_LOAD_PROGRESS)
-		(LOAD_INIT, NSV::PROP_ON_LOAD_INIT)
-		(CLOSE, NSV::PROP_ON_CLOSE)
-		(CONNECT, NSV::PROP_ON_CONNECT)
-		(XML, NSV::PROP_ON_XML)
-		(TIMER, NSV::PROP_ON_TIMER)
-		(CONSTRUCT, NSV::PROP_ON_CONSTRUCT)
-		(SETFOCUS, NSV::PROP_ON_SET_FOCUS)
-		(KILLFOCUS, NSV::PROP_ON_KILL_FOCUS);
+		(CONSTRUCT, NSV::PROP_ON_CONSTRUCT);
 
     EventFunctionMap::const_iterator it = e.find(_id);
     assert(it != e.end());
