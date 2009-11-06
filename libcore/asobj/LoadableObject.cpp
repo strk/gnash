@@ -93,6 +93,7 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     uint8_t chunk[chunksize];
 
     size_t actuallyRead = lt->readNonBlocking(chunk, chunksize);
+    if (lt->bad()) return true;
 
     if ( actuallyRead )
     {
