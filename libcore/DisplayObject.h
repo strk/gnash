@@ -189,22 +189,11 @@ public:
     /// So, to recap:
     ///   1:  -32769 to -16385 are removed
     ///   2:  -16384 to      0 are statics
-    ///   3:  Max depth for a PlaceoObject call is 16384 (which becomes 
+    ///   3:  Max depth for a PlaceObject call is 16384 (which becomes 
     ///       0 in the statics)
     /// (all of the above correct?)
     static const int removedDepthOffset = -32769; 
 
-    static bool depthInRemovedZone(int depth)
-    {
-        return depth < staticDepthOffset;
-    }
-
-    /// Return true if this DisplayObject's depth is in the removed zone
-    bool depthInRemovedZone()
-    {
-        return depthInRemovedZone(get_depth());
-    }
-    
     /// This value is used for m_clip_depth when 
     /// the DisplayObject is not a layer mask.
     //
