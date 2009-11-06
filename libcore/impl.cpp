@@ -46,6 +46,7 @@
 #include <map>
 #include <memory> // for auto_ptr
 #include <algorithm>
+#include <boost/shared_ptr.hpp>
 
 namespace gnash
 {
@@ -76,21 +77,10 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
     try
     {
-        std::auto_ptr<GnashImage> im(
-                ImageInput::readImageData(imageData, type));
-
-        if (!im.get()) {
-            log_error(_("Can't read image file from %s"), url);
-            return NULL;
-        }
-
         Renderer* renderer = r.renderer();
-
         BitmapMovieDefinition* mdef =
-            new BitmapMovieDefinition(im, renderer, url);
-
+            new BitmapMovieDefinition(imageData, renderer, type, url);
         return mdef;
-
     }
     catch (ParserException& e)
     {

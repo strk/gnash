@@ -42,7 +42,7 @@ class BitmapMovie : public Movie
 
 public:
 
-	BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
+	BitmapMovie(as_object* object, BitmapMovieDefinition* def,
             DisplayObject* parent); 
 
 	virtual ~BitmapMovie() {}
@@ -50,7 +50,7 @@ public:
     /// BitmapMovies do need an advance method.
     //
     /// This may be for play() or other inherited methods.
-	virtual void advance() { MovieClip::advance(); }
+	virtual void advance();
 
     virtual float frameRate() const {
         return _def->get_frame_rate();
@@ -78,7 +78,7 @@ public:
 	
 private:
 	
-    const BitmapMovieDefinition* const _def;
+    BitmapMovieDefinition* _def;
 
 };
 

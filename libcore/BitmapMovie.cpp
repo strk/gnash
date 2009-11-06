@@ -21,7 +21,7 @@
 
 namespace gnash {
 
-BitmapMovie::BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
+BitmapMovie::BitmapMovie(as_object* object, BitmapMovieDefinition* def,
         DisplayObject* parent)
 	:
 	Movie(object, def, parent),
@@ -29,10 +29,20 @@ BitmapMovie::BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
 {
     assert(def);
     assert(object);
-    Bitmap* bm = new Bitmap(getRoot(*object), 0, def, this);
+}
 
-    const int depth = 1 + DisplayObject::staticDepthOffset;
-    placeDisplayObject(bm, depth);
+void
+BitmapMovie::advance()
+{
+    if ( ! _def->moreToLoad() )
+    {
+        Bitmap* bm = new Bitmap(getRoot(*object()), 0, _def, this);
+
+        const int depth = 1 + DisplayObject::staticDepthOffset;
+
+        placeDisplayObject(bm, depth);
+    }
+
 }
 
 } // namespace gnash
