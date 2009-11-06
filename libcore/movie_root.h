@@ -1038,8 +1038,6 @@ private:
     /// more info.
     bool fire_mouse_event();
 
-    bool generate_mouse_button_events();
-
     /// \brief
     /// Return the topmost entity covering the given point
     /// and enabled to receive mouse events.
@@ -1156,7 +1154,7 @@ private:
     float m_timer;
     int m_mouse_x, m_mouse_y, m_mouse_buttons;
 
-    MouseButtonState  m_mouse_button_state;
+    MouseButtonState  _mouseButtonState;
 
     /// Objects requesting a callback on every movie_root::advance()
     typedef std::set<ActiveRelay*> ObjectCallbacks;
