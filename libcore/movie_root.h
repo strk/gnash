@@ -154,8 +154,6 @@ public:
             : stream(s), obj(o) {}
     };
         
-    //typedef std::pair<boost::shared_ptr<IOChannel>, as_object*> LoadCallback;
-        
     typedef std::list<LoadCallback> LoadCallbacks;
 
     /// Default constructor
