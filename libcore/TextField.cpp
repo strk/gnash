@@ -608,7 +608,7 @@ TextField::notifyEvent(const event_id& ev)
 			movie_root& root = stage();
             int x_mouse, y_mouse;
             boost::int32_t buttons;
-            root.get_mouse_state(mouse_x, mouse_y, buttons);
+            root.get_mouse_state(x_mouse, y_mouse, buttons);
 			
 			SWFMatrix m = getMatrix();
 			
