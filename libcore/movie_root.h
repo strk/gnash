@@ -890,17 +890,6 @@ public:
     ///
     void addChildAt(DisplayObject* ch, int depth);
 	
-	int getXMouseLoc()
-	{
-		return m_mouse_x;
-	}
-	
-	int getYMouseLoc()
-	{
-		return m_mouse_y;
-	}
-	
-
 private:
 
     /// Set the root movie, replacing the current one if any.
