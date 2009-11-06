@@ -63,7 +63,7 @@ namespace gnash {
 /// Returns true if the DisplayObject is referenceable in ActionScript
 //
 /// A DisplayObject is referenceable if it has an associated object.
-bool isReferenceable(DisplayObject& d);
+bool isReferenceable(const DisplayObject& d);
 
 /// Attaches common DisplayObject properties such as _height, _x, _visible
 //
@@ -698,20 +698,6 @@ public:
         return 0;
     }
 
-    /// Returns the closest as-referenceable ancestor
-    DisplayObject* getClosestASReferenceableAncestor() 
-    {
-        if (isReferenceable(*this)) return this;
-        assert(_parent);
-        return _parent->getClosestASReferenceableAncestor();
-    }
-
-    const DisplayObject* getClosestASReferenceableAncestor() const
-    {
-        DisplayObject* nonconst_this = const_cast<DisplayObject*>(this);
-        return nonconst_this->getClosestASReferenceableAncestor();
-    }
-
     /// @}
 
     /// \brief
@@ -1153,7 +1139,7 @@ private:
 };
 
 inline bool
-isReferenceable(DisplayObject& d)
+isReferenceable(const DisplayObject& d)
 {
     return d.object();
 }
