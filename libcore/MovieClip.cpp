@@ -374,41 +374,6 @@ private:
     SWFRect& _bounds;
 };
 
-/// A DisplayList visitor used to extract script DisplayObjects
-//
-/// Script DisplayObjects are DisplayObjects created or transformed
-/// by ActionScript. 
-///
-class ScriptObjectsFinder
-{
-public:
-    ScriptObjectsFinder(std::vector<DisplayObject*>& dynamicChars,
-            std::vector<DisplayObject*>& staticChars)
-        :
-        _dynamicChars(dynamicChars),
-        _staticChars(staticChars)
-    {}
-
-    void operator() (DisplayObject* ch) {
-        // don't include bounds of unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
-
-        // TODO: Are script-transformed object to be kept ?
-        //             Need a testcase for this
-        //if ( ! ch->get_accept_anim_moves() )
-        //if ( ch->isDynamic() )
-        int depth = ch->get_depth();
-        if (depth < DisplayObject::lowerAccessibleBound || depth >= 0) {
-            _dynamicChars.push_back(ch);
-        }
-        else _staticChars.push_back(ch);
-    }
-
-private:
-    std::vector<DisplayObject*>& _dynamicChars;
-    std::vector<DisplayObject*>& _staticChars;
-};
-
 } // anonymous namespace
 
 
