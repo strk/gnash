@@ -184,7 +184,7 @@ event_id::is_key_event() const
 	switch (_id)
 	{
 		case event_id::KEY_DOWN:
-		case event_id::KEY_PRESS :
+		case event_id::KEY_PRESS:
 		case event_id::KEY_UP:
 			return true;
 		default:
@@ -198,7 +198,7 @@ event_id::is_button_event() const
 	switch (_id)
 	{
 		case event_id::PRESS:
-		case event_id::RELEASE :
+		case event_id::RELEASE:
 		case event_id::RELEASE_OUTSIDE:
 		case event_id::ROLL_OVER:
 		case event_id::ROLL_OUT:
