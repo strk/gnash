@@ -1095,7 +1095,7 @@ CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
 		// I guess an exception would be thrown in this case ?
 		log_error("curl adaptor's fillCacheNonBlocking set _error "
                 "rather then throwing an exception");
-		return -1; 
+		return 0; 
 	}
 
     std::streamsize actuallyRead = std::fread(dst, 1, bytes, _cache);
