@@ -872,10 +872,6 @@ void
 movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y,
         boost::int32_t& buttons)
 {
-//	    GNASH_REPORT_FUNCTION;
-
-//             log_debug ("X is %d, Y is %d, Button is %d", m_mouse_x,
-//			 m_mouse_y, m_mouse_buttons);
 
 	assert(testInvariant());
 
