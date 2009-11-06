@@ -29,6 +29,7 @@
 #include "SWFRect.h" // for composition (invalidated bounds)
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
+#include "dsodefs.h" //for DSOEXPORT
 #include "log.h"
 #include "snappingrange.h"
 #ifdef USE_SWFTREE
@@ -873,7 +874,7 @@ public:
     /// Return true if this DisplayObject allows turning the cursor
     /// into an hand shape when it happens to be the one receiving
     /// mouse events.
-    bool allowHandCursor() const;
+    bool DSOEXPORT allowHandCursor() const;
 
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair; 
