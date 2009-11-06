@@ -388,8 +388,6 @@ public:
         return (_maskee);
     }
 
-    DisplayObject* toDisplayObject() { return this; }
-
     /// Return the DisplayObject masking this instance (if any)
     DisplayObject* getMask() const
     {

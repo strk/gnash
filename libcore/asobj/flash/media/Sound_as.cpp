@@ -811,12 +811,12 @@ sound_new(const fn_call& fn)
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
             as_object* obj = arg0.to_object(getGlobal(fn));
-            DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
+            DisplayObject* ch = get<DisplayObject>(obj);
             IF_VERBOSE_ASCODING_ERRORS(
             if (!ch) {
                 std::stringstream ss; fn.dump_args(ss);
                 log_aserror("new Sound(%s) : first argument isn't null "
-                    "nor undefined, and doesn't cast to a DisplayObject. "
+                    "or undefined, and isn't a DisplayObject. "
                     "We'll take as an invalid DisplayObject ref.",
                     ss.str());
             }

@@ -810,13 +810,6 @@ public:
     /// Cast to a as_function, or return NULL
     virtual as_function* to_function() { return NULL; }
 
-    /// Cast to a DisplayObject, or return NULL
-    DisplayObject* toDisplayObject() { return displayObject(); }
-
-    const DisplayObject* toDisplayObject() const {
-        return const_cast<as_object*>(this)->displayObject();
-    }
-
     /// Return true if this is a 'super' object
     virtual bool isSuper() const { return false; }
 

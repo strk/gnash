@@ -2024,7 +2024,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
 		if (to == std::string::npos) break;
 		from = to + 1;
 	}
-	return o->toDisplayObject();
+	return get<DisplayObject>(o);
 }
 
 void
