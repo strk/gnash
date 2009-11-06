@@ -1077,17 +1077,11 @@ CurlStreamFile::read(void *dst, std::streamsize bytes)
 std::streamsize
 CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
 {
-	if ( eof() ) return 0;
-	if ( _error )
-	{
-		log_error("curl adaptor's readNonBlocking called while _error != 0 "
-                "- should we throw an exception?");
-		return 0;
-	}
-
 #ifdef GNASH_CURL_VERBOSE
 	log_debug ("readNonBlocking(%d) called", bytes);
 #endif
+
+	if ( eof() || _error ) return 0;
 
 	fillCacheNonBlocking();
 	if ( _error )
