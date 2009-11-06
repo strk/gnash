@@ -77,15 +77,6 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
-void
-copyMatrix(const DisplayObject& from, DisplayObject& to)
-{
-    to.setMatrix(from.getMatrix(), false);
-    to.set_x_scale(from.scaleX());
-    to.set_y_scale(from.scaleY());
-    to.set_rotation(from.rotation());
-}
-
 DisplayObject::DisplayObject(movie_root& mr, as_object* object,
         DisplayObject* parent)
     :
