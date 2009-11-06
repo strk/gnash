@@ -299,7 +299,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 
         if (use_old_matrix) {
             // Use the SWFMatrix from the old DisplayObject.
-            ch->copyMatrix(*oldch); // copy SWFMatrix and caches
+            copyMatrix(*oldch, *ch); 
         }
         
         // remember bounds of old char

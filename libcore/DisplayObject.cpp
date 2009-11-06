@@ -77,6 +77,15 @@ const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
 
+void
+copyMatrix(const DisplayObject& from, DisplayObject& to)
+{
+    to.setMatrix(from.getMatrix(), false);
+    to.set_x_scale(from.scaleX());
+    to.set_y_scale(from.scaleY());
+    to.set_rotation(from.rotation());
+}
+
 DisplayObject::DisplayObject(movie_root& mr, as_object* object,
         DisplayObject* parent)
     :
@@ -247,11 +256,6 @@ DisplayObject::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 	m_old_invalidated_ranges.add(ranges);
 }
 
-void
-attachDisplayObjectProperties(as_object& /*o*/)
-{
-}
-
 as_value
 DisplayObject::blendMode(const fn_call& fn)
 {
@@ -391,15 +395,6 @@ DisplayObject::setHeight(double newheight)
     const double xscale = m.get_x_scale();
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true);
-}
-
-void
-DisplayObject::copyMatrix(const DisplayObject& c)
-{
-	m_matrix = c.m_matrix;
-	_xscale = c._xscale;
-	_yscale = c._yscale;
-	_rotation = c._rotation;
 }
 
 void

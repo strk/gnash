@@ -635,7 +635,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->_drawable = _drawable;
     
     newmovieclip->set_cxform(get_cxform());    
-    newmovieclip->copyMatrix(*this); // copy SWFMatrix and caches
+    copyMatrix(*this, *newmovieclip); 
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     

@@ -65,15 +65,14 @@ namespace gnash {
 /// A DisplayObject is referenceable if it has an associated object.
 bool isReferenceable(const DisplayObject& d);
 
-/// Attaches common DisplayObject properties such as _height, _x, _visible
-//
-/// This should be called by DisplayObject subclasses to ensure that
-/// the correct properties are attached.
-void attachDisplayObjectProperties(as_object& o);
-
 /// Set special properties
 //
 /// This sets the magic properties of DisplayObjects.
+//
+/// @param key      The string table key of the property to set.
+/// @param obj      The DisplayObject whose property should be set
+/// @param val      An as_value representing the new value of the property.
+///                 Some values may be rejected.
 bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         const as_value& val);
 
@@ -81,18 +80,37 @@ bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 //
 /// This gets the magic properties of DisplayObjects and handles special
 /// MovieClip properties such as DisplayList members.
+//
+/// @param key      The string table key of the property to get.
+/// @param obj      The DisplayObject whose property should be got
+/// @param val      An as_value to be set to the value of the property.
 bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val);
 
 /// Get a property by its numeric index.
 //
-/// By ASHandlers to get the DisplayObject properties indexed by number
+/// Used by ASHandlers to get the DisplayObject properties indexed by number
+//
+/// @param index    The index of the property to get.
+/// @param o        The DisplayObject whose property should be got
+/// @param val      An as_value to be set to the value of the property.
 void getIndexedProperty(size_t index, DisplayObject& o, as_value& val);
 
 /// Set a property by its numeric index.
 //
-/// By ASHandlers to set the DisplayObject properties indexed by number
+/// Used by ASHandlers to set the DisplayObject properties indexed by number
+//
+/// @param index    The index of the property to set.
+/// @param o        The DisplayObject whose property should be set
+/// @param val      An as_value representing the new value of the property.
+///                 Some values may be rejected.
 void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
+
+/// Copy SWFMatrix and caches from given DisplayObjecta
+//
+/// @param from     The DisplayObject to copy from
+/// @param to       The DisplayObject to copy to.
+void copyMatrix(const DisplayObject& from, DisplayObject& to);
 
 /// DisplayObject is the base class for all DisplayList objects.
 //
@@ -176,7 +194,6 @@ public:
     /// (all of the above correct?)
     static const int removedDepthOffset = -32769; 
 
-    /// Return true if the given depth is in the removed zone
     static bool depthInRemovedZone(int depth)
     {
         return depth < staticDepthOffset;
@@ -281,9 +298,6 @@ public:
     /// @param factor scale factor, in percent
     ///
     void set_x_scale(double factor);
-
-    /// Copy SWFMatrix and caches from given DisplayObject
-    void copyMatrix(const DisplayObject& ch);
 
     /// Set the yscale value of current SWFMatrix
     //
@@ -391,13 +405,9 @@ public:
     /// Return the DisplayObject masking this instance (if any)
     DisplayObject* getMask() const
     {
-        if ( ! _mask ) return NULL;
-        if ( _mask->_maskee != this )
-        {
-            // TODO: fix this !
-            log_error("Our mask maskee is not us");
-            return NULL; 
-        }
+#if GNASH_PARANOIA_LEVEL > 1
+        if (_mask) assert(_mask->_maskee == this);
+#endif
         return _mask;
     }
 
