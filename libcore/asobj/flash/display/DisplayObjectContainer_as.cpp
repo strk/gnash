@@ -145,20 +145,12 @@ displayobjectcontainer_addChild(const fn_call& fn)
     }
 
     as_object* objArg = fn.arg(0).to_object(getGlobal(fn));
-    if (!objArg) {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("addChild(%s): first arg doesn't cast to an object",
-            ss.str());
-        );
-        return ret;
-    }
+    DisplayObject* ch = get<DisplayObject>(objArg);
 
-    DisplayObject* ch = objArg->toDisplayObject();
     if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("addChild(%s): first arg doesn't cast to a "
+        log_aserror("addChild(%s): first arg is not a "
             "DisplayObject", ss.str());
         );
         return ret;
@@ -190,20 +182,11 @@ displayobjectcontainer_addChildAt(const fn_call& fn)
     }
 
     as_object* objArg = fn.arg(0).to_object(getGlobal(fn));
-    if (!objArg) {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("addChildAt(%s): first arg doesn't cast to an object",
-            ss.str());
-        );
-        return ret;
-    }
-
-    DisplayObject* ch = objArg->toDisplayObject();
+    DisplayObject* ch = get<DisplayObject>(objArg);
     if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("addChildAt(%s): first arg doesn't cast to a "
+        log_aserror("addChildAt(%s): first arg is not a "
             "DisplayObject", ss.str());
         );
         return ret;

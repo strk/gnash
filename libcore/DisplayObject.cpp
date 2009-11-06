@@ -247,11 +247,6 @@ DisplayObject::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 	m_old_invalidated_ranges.add(ranges);
 }
 
-void
-attachDisplayObjectProperties(as_object& /*o*/)
-{
-}
-
 as_value
 DisplayObject::blendMode(const fn_call& fn)
 {
@@ -391,15 +386,6 @@ DisplayObject::setHeight(double newheight)
     const double xscale = m.get_x_scale();
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true);
-}
-
-void
-DisplayObject::copyMatrix(const DisplayObject& c)
-{
-	m_matrix = c.m_matrix;
-	_xscale = c._xscale;
-	_yscale = c._yscale;
-	_rotation = c._rotation;
 }
 
 void
@@ -758,6 +744,30 @@ DisplayObject::markReachableResources() const
 	if (_parent) _parent->setReachable();
 	if (_mask) _mask->setReachable();
 	if (_maskee) _maskee->setReachable();
+}
+
+/// Whether to use a hand cursor when the mouse is over this DisplayObject
+//
+/// This depends on the useHandCursor AS property, but:
+/// 1. Only AS-referenceable objects may use a hand cursor (TODO: check
+///    Video).
+/// 2. Only objects with a release event may use a hand cursor.
+/// 3. The default value (if the property is not defined) is true.
+bool
+DisplayObject::allowHandCursor() const
+{
+    if (!getObject(this)) return false;
+
+    if (!hasEventHandler(event_id::RELEASE)) return false;
+
+    as_value val;
+    // const_cast needed due to get_member being non-const due to the 
+    // possibility that a getter-setter would actually modify us ...
+    if (!getObject(const_cast<DisplayObject*>(this))->get_member(
+                NSV::PROP_USEHANDCURSOR, &val)) {
+         return true;
+    }
+    return val.to_bool();
 }
 
 void

@@ -140,7 +140,7 @@ swf_function::operator()(const fn_call& fn)
 		// See actionscript.all/setProperty.as
 		// 
 		if (fn.this_ptr) {
-			DisplayObject* ch = fn.this_ptr->toDisplayObject();
+			DisplayObject* ch = get<DisplayObject>(fn.this_ptr);
 			if (ch) {
 				target = ch;
 				orig_target = ch;

@@ -606,9 +606,9 @@ TextField::notifyEvent(const event_id& ev)
 		case event_id::PRESS:
 		{
 			movie_root& root = stage();
-			
-			int x_mouse = pixelsToTwips(root.getXMouseLoc());
-			int y_mouse = pixelsToTwips(root.getYMouseLoc());
+            int x_mouse, y_mouse;
+            boost::int32_t buttons;
+            root.get_mouse_state(x_mouse, y_mouse, buttons);
 			
 			SWFMatrix m = getMatrix();
 			

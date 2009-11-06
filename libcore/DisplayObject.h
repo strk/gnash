@@ -63,17 +63,16 @@ namespace gnash {
 /// Returns true if the DisplayObject is referenceable in ActionScript
 //
 /// A DisplayObject is referenceable if it has an associated object.
-bool isReferenceable(DisplayObject& d);
-
-/// Attaches common DisplayObject properties such as _height, _x, _visible
-//
-/// This should be called by DisplayObject subclasses to ensure that
-/// the correct properties are attached.
-void attachDisplayObjectProperties(as_object& o);
+bool isReferenceable(const DisplayObject& d);
 
 /// Set special properties
 //
 /// This sets the magic properties of DisplayObjects.
+//
+/// @param key      The string table key of the property to set.
+/// @param obj      The DisplayObject whose property should be set
+/// @param val      An as_value representing the new value of the property.
+///                 Some values may be rejected.
 bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         const as_value& val);
 
@@ -81,18 +80,37 @@ bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 //
 /// This gets the magic properties of DisplayObjects and handles special
 /// MovieClip properties such as DisplayList members.
+//
+/// @param key      The string table key of the property to get.
+/// @param obj      The DisplayObject whose property should be got
+/// @param val      An as_value to be set to the value of the property.
 bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val);
 
 /// Get a property by its numeric index.
 //
-/// By ASHandlers to get the DisplayObject properties indexed by number
+/// Used by ASHandlers to get the DisplayObject properties indexed by number
+//
+/// @param index    The index of the property to get.
+/// @param o        The DisplayObject whose property should be got
+/// @param val      An as_value to be set to the value of the property.
 void getIndexedProperty(size_t index, DisplayObject& o, as_value& val);
 
 /// Set a property by its numeric index.
 //
-/// By ASHandlers to set the DisplayObject properties indexed by number
+/// Used by ASHandlers to set the DisplayObject properties indexed by number
+//
+/// @param index    The index of the property to set.
+/// @param o        The DisplayObject whose property should be set
+/// @param val      An as_value representing the new value of the property.
+///                 Some values may be rejected.
 void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
+
+/// Copy SWFMatrix and caches from given DisplayObjecta
+//
+/// @param from     The DisplayObject to copy from
+/// @param to       The DisplayObject to copy to.
+void copyMatrix(const DisplayObject& from, DisplayObject& to);
 
 /// DisplayObject is the base class for all DisplayList objects.
 //
@@ -171,23 +189,11 @@ public:
     /// So, to recap:
     ///   1:  -32769 to -16385 are removed
     ///   2:  -16384 to      0 are statics
-    ///   3:  Max depth for a PlaceoObject call is 16384 (which becomes 
+    ///   3:  Max depth for a PlaceObject call is 16384 (which becomes 
     ///       0 in the statics)
     /// (all of the above correct?)
     static const int removedDepthOffset = -32769; 
 
-    /// Return true if the given depth is in the removed zone
-    static bool depthInRemovedZone(int depth)
-    {
-        return depth < staticDepthOffset;
-    }
-
-    /// Return true if this DisplayObject's depth is in the removed zone
-    bool depthInRemovedZone()
-    {
-        return depthInRemovedZone(get_depth());
-    }
-    
     /// This value is used for m_clip_depth when 
     /// the DisplayObject is not a layer mask.
     //
@@ -281,9 +287,6 @@ public:
     /// @param factor scale factor, in percent
     ///
     void set_x_scale(double factor);
-
-    /// Copy SWFMatrix and caches from given DisplayObject
-    void copyMatrix(const DisplayObject& ch);
 
     /// Set the yscale value of current SWFMatrix
     //
@@ -388,18 +391,12 @@ public:
         return (_maskee);
     }
 
-    DisplayObject* toDisplayObject() { return this; }
-
     /// Return the DisplayObject masking this instance (if any)
     DisplayObject* getMask() const
     {
-        if ( ! _mask ) return NULL;
-        if ( _mask->_maskee != this )
-        {
-            // TODO: fix this !
-            log_error("Our mask maskee is not us");
-            return NULL; 
-        }
+#if GNASH_PARANOIA_LEVEL > 1
+        if (_mask) assert(_mask->_maskee == this);
+#endif
         return _mask;
     }
 
@@ -698,20 +695,6 @@ public:
         return 0;
     }
 
-    /// Returns the closest as-referenceable ancestor
-    DisplayObject* getClosestASReferenceableAncestor() 
-    {
-        if (isReferenceable(*this)) return this;
-        assert(_parent);
-        return _parent->getClosestASReferenceableAncestor();
-    }
-
-    const DisplayObject* getClosestASReferenceableAncestor() const
-    {
-        DisplayObject* nonconst_this = const_cast<DisplayObject*>(this);
-        return nonconst_this->getClosestASReferenceableAncestor();
-    }
-
     /// @}
 
     /// \brief
@@ -890,7 +873,7 @@ public:
     /// Return true if this DisplayObject allows turning the cursor
     /// into an hand shape when it happens to be the one receiving
     /// mouse events.
-    virtual bool allowHandCursor() const { return true; }
+    bool allowHandCursor() const;
 
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair; 
@@ -1153,7 +1136,7 @@ private:
 };
 
 inline bool
-isReferenceable(DisplayObject& d)
+isReferenceable(const DisplayObject& d)
 {
     return d.object();
 }
@@ -1164,7 +1147,7 @@ isReferenceable(DisplayObject& d)
 /// @return     null if either the DisplayObject or the associated object is
 ///             null. Otherwise the associated object.
 inline as_object*
-getObject(DisplayObject* d)
+getObject(const DisplayObject* d)
 {
     return d ? d->object() : 0;
 }

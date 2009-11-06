@@ -374,41 +374,6 @@ private:
     SWFRect& _bounds;
 };
 
-/// A DisplayList visitor used to extract script DisplayObjects
-//
-/// Script DisplayObjects are DisplayObjects created or transformed
-/// by ActionScript. 
-///
-class ScriptObjectsFinder
-{
-public:
-    ScriptObjectsFinder(std::vector<DisplayObject*>& dynamicChars,
-            std::vector<DisplayObject*>& staticChars)
-        :
-        _dynamicChars(dynamicChars),
-        _staticChars(staticChars)
-    {}
-
-    void operator() (DisplayObject* ch) {
-        // don't include bounds of unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
-
-        // TODO: Are script-transformed object to be kept ?
-        //             Need a testcase for this
-        //if ( ! ch->get_accept_anim_moves() )
-        //if ( ch->isDynamic() )
-        int depth = ch->get_depth();
-        if (depth < DisplayObject::lowerAccessibleBound || depth >= 0) {
-            _dynamicChars.push_back(ch);
-        }
-        else _staticChars.push_back(ch);
-    }
-
-private:
-    std::vector<DisplayObject*>& _dynamicChars;
-    std::vector<DisplayObject*>& _staticChars;
-};
-
 } // anonymous namespace
 
 
@@ -635,7 +600,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->_drawable = _drawable;
     
     newmovieclip->set_cxform(get_cxform());    
-    newmovieclip->copyMatrix(*this); // copy SWFMatrix and caches
+    newmovieclip->setMatrix(getMatrix(), true); 
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
@@ -2289,21 +2254,6 @@ MovieClip::isEnabled() const
          return true;
     }
     return enabled.to_bool();
-}
-
-bool
-MovieClip::allowHandCursor() const
-{
-    as_value val;
-    // const_cast needed due to get_member being non-const due to the 
-    // possibility that a getter-setter would actually modify us ...
-    if (!getObject(const_cast<MovieClip*>(this))->get_member(
-                NSV::PROP_USEHANDCURSOR, &val))
-    {
-         // true if not found..
-         return true;
-    }
-    return val.to_bool();
 }
 
 class EnumerateVisitor {

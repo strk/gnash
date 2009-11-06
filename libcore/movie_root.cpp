@@ -77,9 +77,16 @@
 //
 //#define GNASH_DEBUG_DLIST_CLEANUP 1
 
-namespace gnash
-{
+namespace gnash {
 
+namespace {
+    bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
+    const DisplayObject* getNearestObject(const DisplayObject* o);
+}
+
+}
+
+namespace gnash {
 
 inline bool
 movie_root::testInvariant() const
@@ -700,120 +707,6 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 	return fire_mouse_event();
 }
 
-// Return whether any action triggered by this event requires display redraw.
-// See page about events_handling (in movie_interface.h)
-//
-/// TODO: make this code more readable !
-bool
-movie_root::generate_mouse_button_events()
-{
-
-    MouseButtonState& ms = m_mouse_button_state;
-
-	// Did this event trigger any action that needs redisplay ?
-	bool need_redisplay = false;
-
-    // TODO: have mouseEvent return
-    // whether the action must trigger
-    // a redraw.
-
-    switch (ms.previousButtonState)
-    {
-        case MouseButtonState::DOWN:
-	    {
-		    // TODO: Handle trackAsMenu dragOver
-		    // Handle onDragOut, onDragOver
-		    if (!ms.wasInsideActiveEntity) {
-
-			    if (ms.topmostEntity == ms.activeEntity) {
-
-				    // onDragOver
-				    if (ms.activeEntity) {
-					    ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
-					    need_redisplay=true;
-				    }
-				    ms.wasInsideActiveEntity = true;
-			    }
-		    }
-		    else if (ms.topmostEntity != ms.activeEntity) {
-			    // onDragOut
-			    if (ms.activeEntity) {
-				    ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
-				    need_redisplay=true;
-			    }
-			    ms.wasInsideActiveEntity = false;
-		    }
-
-		    // Handle onRelease, onReleaseOutside
-		    if (ms.currentButtonState == MouseButtonState::UP) {
-			    // Mouse button just went up.
-			    ms.previousButtonState = MouseButtonState::UP;
-
-			    if (ms.activeEntity) {
-				    if (ms.wasInsideActiveEntity) {
-					    // onRelease
-					    ms.activeEntity->mouseEvent(event_id::RELEASE);
-					    need_redisplay = true;
-				    }
-				    else {
-					    // TODO: Handle trackAsMenu 
-					    // onReleaseOutside
-					    ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
-					    // We got out of active entity
-					    ms.activeEntity = 0; // so we don't get RollOut next...
-					    need_redisplay = true;
-				    }
-			    }
-		    }
-	        return need_redisplay;
-	    }
-
-	    case MouseButtonState::UP:
-        {
-	        // New active entity is whatever is below the mouse right now.
-	        if (ms.topmostEntity != ms.activeEntity)
-	        {
-		        // onRollOut
-		        if (ms.activeEntity) {
-			        ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
-			        need_redisplay=true;
-		        }
-
-		        ms.activeEntity = ms.topmostEntity;
-
-		        // onRollOver
-		        if (ms.activeEntity) {
-			        ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
-			        need_redisplay=true;
-		        }
-
-		        ms.wasInsideActiveEntity = true;
-	        }
-
-	        // mouse button press
-	        if (ms.currentButtonState == MouseButtonState::DOWN) {
-		        // onPress
-
-                // Try setting focus on the new DisplayObject. This will handle
-                // all necessary events and removal of current focus.
-                // Do not set focus to NULL.
-                if (ms.activeEntity) {
-                    setFocus(ms.activeEntity);
-
-			        ms.activeEntity->mouseEvent(event_id::PRESS);
-			        need_redisplay=true;
-		        }
-
-		        ms.wasInsideActiveEntity = true;
-		        ms.previousButtonState = MouseButtonState::DOWN;
-	        }
-        }
-        default:
-      	    return need_redisplay;
-    }
-
-}
-
 
 bool
 movie_root::fire_mouse_event()
@@ -826,8 +719,8 @@ movie_root::fire_mouse_event()
     boost::int32_t y = pixelsToTwips(m_mouse_y);
 
     // Generate a mouse event
-    m_mouse_button_state.topmostEntity = getTopmostMouseEntity(x, y);
-    m_mouse_button_state.currentButtonState = (m_mouse_buttons & 1);
+    _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
+    _mouseButtonState.currentButtonState = (m_mouse_buttons & 1);
 
     // Set _droptarget if dragging a sprite
     MovieClip* dragging = 0;
@@ -841,7 +734,7 @@ movie_root::fire_mouse_event()
         if (dropChar)
         {
             // Use target of closest script DisplayObject containing this
-            dropChar = dropChar->getClosestASReferenceableAncestor();
+            dropChar = getNearestObject(dropChar);
             dragging->setDropTarget(dropChar->getTargetPath());
         }
         else dragging->setDropTarget("");
@@ -855,7 +748,7 @@ movie_root::fire_mouse_event()
 
     try
     {
-        need_redraw = generate_mouse_button_events();
+        need_redraw = generate_mouse_button_events(*this, _mouseButtonState);
         processActionQueue();
     }
     catch (ActionLimitException& al)
@@ -872,10 +765,6 @@ void
 movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y,
         boost::int32_t& buttons)
 {
-//	    GNASH_REPORT_FUNCTION;
-
-//             log_debug ("X is %d, Y is %d, Button is %d", m_mouse_x,
-//			 m_mouse_y, m_mouse_buttons);
 
 	assert(testInvariant());
 
@@ -1265,22 +1154,17 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		}
 	}
 
-	// Now broadcast message for Mouse listeners
-	typedef as_object* ObjPtr;
-	ObjPtr mouseObj = getMouseObject();
-	if ( mouseObj )
-	{
+	as_object* mouseObj = getMouseObject();
+	if (mouseObj) {
 
-        try
-        {
+        try {
             // Can throw an action limit exception if the stack limit is 0 or 1.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
 		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, 
                     event.functionName());
 		}
-	    catch (ActionLimitException &e)
-	    {
+	    catch (ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying mouse events: %s."),
                     e.what());
             clearActionQueue();
@@ -1361,7 +1245,7 @@ movie_root::setFocus(DisplayObject* to)
 DisplayObject*
 movie_root::getActiveEntityUnderPointer() const
 {
-	return m_mouse_button_state.activeEntity;
+	return _mouseButtonState.activeEntity;
 }
 
 DisplayObject*
@@ -1384,7 +1268,7 @@ bool
 movie_root::isMouseOverActiveEntity() const
 {
 	assert(testInvariant());
-    return (m_mouse_button_state.activeEntity);
+    return (_mouseButtonState.activeEntity);
 }
 
 void
@@ -1853,7 +1737,7 @@ movie_root::markReachableResources() const
     if ( _rootMovie ) _rootMovie->setReachable();
 
     // Mark mouse entities 
-    m_mouse_button_state.markReachableResources();
+    _mouseButtonState.markReachableResources();
     
     // Mark timer targets
     for (TimerMap::const_iterator i=_intervalTimers.begin(),
@@ -2140,7 +2024,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
 		if (to == std::string::npos) break;
 		from = to + 1;
 	}
-	return o->toDisplayObject();
+	return get<DisplayObject>(o);
 }
 
 void
@@ -2411,11 +2295,6 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     localIter = tr.append_child(it, StringPair("Rendered dimensions", os.str()));
 
 #if 0
-    /// Stage: pixel scale
-    os.str("");
-    os << m_pixel_scale;
-    localIter = tr.append_child(it, StringPair("Pixel scale", os.str()));
-
     /// Stage: scaling allowed.
     localIter = tr.append_child(it, StringPair("Scaling allowed",
                 _allowRescale ? yes : no));
@@ -2498,29 +2377,153 @@ stringToStageAlign(const std::string& str)
 
     // Easy enough to do bitwise - std::bitset is not
     // really necessary!
-    if (str.find_first_of("lL") != std::string::npos)
-    {
+    if (str.find_first_of("lL") != std::string::npos) {
         am |= 1 << movie_root::STAGE_ALIGN_L;
     } 
 
-    if (str.find_first_of("tT") != std::string::npos)
-    {
+    if (str.find_first_of("tT") != std::string::npos) {
         am |= 1 << movie_root::STAGE_ALIGN_T;
     } 
 
-    if (str.find_first_of("rR") != std::string::npos)
-    {
+    if (str.find_first_of("rR") != std::string::npos) {
         am |= 1 << movie_root::STAGE_ALIGN_R;
     } 
 
-    if (str.find_first_of("bB") != std::string::npos)
-    {
+    if (str.find_first_of("bB") != std::string::npos) {
         am |= 1 << movie_root::STAGE_ALIGN_B;
     }
 
     return am;
 
 }
+
+
+namespace {
+
+// Return whether any action triggered by this event requires display redraw.
+// See page about events_handling (in movie_interface.h)
+//
+/// TODO: make this code more readable !
+bool
+generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
+{
+
+	// Did this event trigger any action that needs redisplay ?
+	bool need_redisplay = false;
+
+    // TODO: have mouseEvent return
+    // whether the action must trigger
+    // a redraw.
+
+    switch (ms.previousButtonState)
+    {
+        case MouseButtonState::DOWN:
+	    {
+		    // TODO: Handle trackAsMenu dragOver
+		    // Handle onDragOut, onDragOver
+		    if (!ms.wasInsideActiveEntity) {
+
+			    if (ms.topmostEntity == ms.activeEntity) {
+
+				    // onDragOver
+				    if (ms.activeEntity) {
+					    ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
+					    need_redisplay=true;
+				    }
+				    ms.wasInsideActiveEntity = true;
+			    }
+		    }
+		    else if (ms.topmostEntity != ms.activeEntity) {
+			    // onDragOut
+			    if (ms.activeEntity) {
+				    ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
+				    need_redisplay=true;
+			    }
+			    ms.wasInsideActiveEntity = false;
+		    }
+
+		    // Handle onRelease, onReleaseOutside
+		    if (ms.currentButtonState == MouseButtonState::UP) {
+			    // Mouse button just went up.
+			    ms.previousButtonState = MouseButtonState::UP;
+
+			    if (ms.activeEntity) {
+				    if (ms.wasInsideActiveEntity) {
+					    // onRelease
+					    ms.activeEntity->mouseEvent(event_id::RELEASE);
+					    need_redisplay = true;
+				    }
+				    else {
+					    // TODO: Handle trackAsMenu 
+					    // onReleaseOutside
+					    ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
+					    // We got out of active entity
+					    ms.activeEntity = 0; // so we don't get RollOut next...
+					    need_redisplay = true;
+				    }
+			    }
+		    }
+	        return need_redisplay;
+	    }
+
+	    case MouseButtonState::UP:
+        {
+	        // New active entity is whatever is below the mouse right now.
+	        if (ms.topmostEntity != ms.activeEntity)
+	        {
+		        // onRollOut
+		        if (ms.activeEntity) {
+			        ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
+			        need_redisplay=true;
+		        }
+
+		        ms.activeEntity = ms.topmostEntity;
+
+		        // onRollOver
+		        if (ms.activeEntity) {
+			        ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
+			        need_redisplay=true;
+		        }
+
+		        ms.wasInsideActiveEntity = true;
+	        }
+
+	        // mouse button press
+	        if (ms.currentButtonState == MouseButtonState::DOWN) {
+		        // onPress
+
+                // Try setting focus on the new DisplayObject. This will handle
+                // all necessary events and removal of current focus.
+                // Do not set focus to NULL.
+                if (ms.activeEntity) {
+                    mr.setFocus(ms.activeEntity);
+
+			        ms.activeEntity->mouseEvent(event_id::PRESS);
+			        need_redisplay=true;
+		        }
+
+		        ms.wasInsideActiveEntity = true;
+		        ms.previousButtonState = MouseButtonState::DOWN;
+	        }
+        }
+        default:
+      	    return need_redisplay;
+    }
+
+}
+
+const DisplayObject*
+getNearestObject(const DisplayObject* o)
+{
+    while (1) {
+        assert(o);
+        if (isReferenceable(*o)) return o;
+        o = o->get_parent();
+    }
+}
+
+}
+
 
 } // namespace gnash
 

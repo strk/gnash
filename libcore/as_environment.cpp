@@ -565,8 +565,7 @@ DisplayObject*
 as_environment::find_target(const std::string& path_in) const
 {
     as_object* o = find_object(path_in);
-    if (o) return o->toDisplayObject(); 
-    return 0;
+    return get<DisplayObject>(o); 
 }
 
 
