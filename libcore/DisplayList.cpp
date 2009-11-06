@@ -961,7 +961,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     // replace the transformation SWFMatrix if the old
                     // DisplayObject accepts static transformation.
                     if (chOld->get_accept_anim_moves()) {
-                        chOld->copyMatrix(*chNew); // copy SWFMatrix and caches 
+                        copyMatrix(*chNew, *chOld); 
                         chOld->set_cxform(chNew->get_cxform());
                     }
                     chNew->unload();
