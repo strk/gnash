@@ -24,7 +24,6 @@
 #include "TagLoadersTable.h"
 #include "tag_loaders.h" 
 #include "ScriptLimitsTag.h"
-#include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
 #include "DefineShapeTag.h"
 #include "DefineButtonCxformTag.h"
