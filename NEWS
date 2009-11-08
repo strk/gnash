@@ -1,3 +1,64 @@
+2009-03-04 Rob Savoye  <rob@welcomehome.org>
+
+Due to better XML parsing compatibility and a minor fix to NetConnection,
+many more video sites work than in the last release. Support for new
+codecs keeps YouTube support up to date.
+
+XML parsing, Selection implementation, Sound and MovieClip fixes mean
+that many BBC Flash movies (not the BBC iPlayer) now work.
+
+Potlatch support is improved with better remoting compatibility and
+XML parsing.
+
+All of the Orisinal morning sunshine games now work due to support for
+Mixed SWF Versions runs.
+
+    * Support for saving streamed (FLV, H264, MP3 etc) and loaded (JPEG,
+      SWF, PNG, GIF) media to disk.
+    * Basic GUI warning messages when media decoding fails (usually
+      missing codecs).
+    * Added support for FLV parsing and decoding of H.264 video and
+      AAC audio.
+    * Scaled video smoothing implemented in AS and in default renderer
+      (AGG). YouTube video looks better when Gnash is running with high
+      quality or better.
+    * Support for _quality implemented with user-specified
+      override. (Presently only affects video smoothing in the default
+      renderer).
+    * Made NPAPI plugin quiet, except on plugin-specific errors (to
+      reduce .xsession-errors pollution).
+    * Implemented LoadVars.toString(), XML.send() and LoadVars.send().
+    * XML parsing made compatible (less strict), XML.xmlDecl and
+      XML.docTypeDecl implemented.
+    * XMLNode methods implemented: getPrefixForNamespace(),
+      getNamespaceForPrefix(), namespaceURI, localName, prefix. Handling
+      of attributes corrected.
+    * New GUI for KDE4 / Qt4 with SWF properties and Gnash preferences
+      dialog boxes.
+    * Corrected AS enumeration order.
+    * Fixed incorrect mouse event on double click (shouldn't exist).
+    * Implemented MovieClip.getURL(), MovieClip.attachBitmap().
+    * Implemented POST for send() and getURL() methods.
+    * Added support for parsing and decoding Speex audio in FLV files
+      using libspeex.
+    * __resolve property implemented. Fixes a Flickr Flash badge.
+    * Video.clear(), Video.width and Video.height implemented.
+    * Multiple NetStream.play() fixed.
+    * Fixed support of mixed-version swf runs.
+    * Fix decoding of RAW and UNCOMPRESSED audio with gstreamer media
+      handler
+    * Improve SWF4 compatibility.
+    * Improve compatibility in setting characters properties.
+    * NetConnection.isConnected and NetConnection connect events
+      implemented (fixes various video sites).
+    * Remoting support generally improved (NetConnection).
+    * Make initialization object available to MovieClip constructor
+      (attachMovie, duplicateMovieClip).
+    * Sound.getBytesLoaded, Sound.getBytesTotal implemented.
+    * Complete Selection class implemented. 
+
+--
+
 2008-10-13 Russ Nelson <nelson@crynwr.com>
 
 Sixth alpha release of Gnash (0.8.4).
