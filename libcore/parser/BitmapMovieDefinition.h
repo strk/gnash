@@ -25,8 +25,6 @@
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
 #include "GnashNumeric.h"
-#include "IOChannel.h"
-#include "gnash.h" // for FileType enum
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -61,21 +59,6 @@ public:
 	///
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, Renderer* renderer,
             const std::string& url);
-
-	/// Construct a BitmapMovieDefinition for the given input 
- 	//
- 	/// Will be initialized with the following values
- 	///
- 	///  - SWF version 6
- 	///  - Framesize 0x0 (to be updated after parsing)
- 	///  - Single frame (unlabeled)
- 	///  - 12 FPS
- 	///  - 0 bytes size (for get_bytes_loaded()/get_bytes_total())
- 	///  - provided url
- 	///
- 	BitmapMovieDefinition(boost::shared_ptr<IOChannel> image,
-	                      Renderer* renderer, FileType type,
-	                      const std::string& url);
 
     virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
         const;
@@ -141,9 +124,6 @@ public:
         return _bitmap.get();
     }
 
-    // Load more if needed, return false if finished loading all
-    bool moreToLoad();
-
 protected:
 
 #ifdef GNASH_USE_GC
@@ -167,12 +147,6 @@ private:
 	size_t _bytesTotal;
 
     boost::intrusive_ptr<BitmapInfo> _bitmap;
-
-    boost::shared_ptr<IOChannel> _inputStream;
-
-    FileType _inputFileType;
-
-    Renderer* _renderer;
 };
 
 } // namespace gnash
