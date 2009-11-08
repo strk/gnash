@@ -2199,7 +2199,7 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 }
 
 void
-movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
+movie_root::processLoadMovieRequest(LoadMovieRequest& r)
 {
     const std::string& target = r.getTarget();
     const URL& url = r.getURL();
@@ -2211,6 +2211,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
         MovieFactory::makeMovie(url, _runResources));
     r.setCompleted(md);
     bool completed = processCompletedLoadMovieRequest(r);
+    assert(completed);
 #else
 
     if (target.compare(0, 6, "_level") == 0 &&
@@ -2283,7 +2284,7 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
         unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
         log_debug(_("processLoadMovieRequest: Testing _level loading "
                     "(level %u)"), levelno);
-        // TODO: check if this should only replaceLevel instead !
+	    extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
         setLevel(levelno, extern_movie);
     }
     else
@@ -2328,7 +2329,7 @@ movie_root::processLoadMovieRequests()
     for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
             it != _loadMovieRequests.end(); )
     {
-        const LoadMovieRequest* lr=*it;
+        LoadMovieRequest* lr=*it;
         processLoadMovieRequest(*lr);
         it = _loadMovieRequests.erase(it);
         delete lr;

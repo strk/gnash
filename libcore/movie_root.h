@@ -1027,7 +1027,7 @@ private:
     void processLoadMovieRequests();
 
     /// Process a single load movie request
-    void processLoadMovieRequest(const LoadMovieRequest& r);
+    void processLoadMovieRequest(LoadMovieRequest& r);
 
     /// Check a LoadMovieRequest and process if completed.
     //
