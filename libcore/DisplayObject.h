@@ -809,6 +809,9 @@ public:
     ///
     virtual bool unload();
 
+    /// Accept a loaded Movie
+    virtual void getLoadedMovie(Movie* newMovie);
+
     /// Return true if this DisplayObject was unloaded from the stage
     bool unloaded() const { return _unloaded; }
 

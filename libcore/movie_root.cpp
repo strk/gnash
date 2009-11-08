@@ -186,10 +186,22 @@ movie_root::clearIntervalTimers()
 	_intervalTimers.clear();
 }
 
+void
+movie_root::clearLoadMovieRequests()
+{
+    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin(),
+            end = _loadMovieRequests.end(); it != end; ++it)
+    {
+        delete *it;
+    }
+    _loadMovieRequests.clear();
+}
+
 movie_root::~movie_root()
 {
 	clearActionQueue();
 	clearIntervalTimers();
+	clearLoadMovieRequests();
 
 	assert(testInvariant());
 }
@@ -287,7 +299,7 @@ movie_root::setLevel(unsigned int num, Movie* movie)
 		_movies[movie->get_depth()] = movie; 
 	}
 	else
-    	{
+    {
 		// don't leak overloaded levels
 
 		LevelMovie lm = it->second;
@@ -479,6 +491,21 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	return true;
 }
 
+void
+movie_root::replaceLevel(unsigned int num, Movie* extern_movie)
+{
+	extern_movie->set_depth(num + DisplayObject::staticDepthOffset);
+	Levels::iterator it = _movies.find(extern_movie->get_depth());
+    if ( it == _movies.end() )
+    {
+        log_error("TESTME: loadMovie called on level %d which is not available at load time, skipped placement for now");
+        return; // skip
+    }
+
+    // TODO: rework this to avoid the double scan 
+	setLevel(num, extern_movie);
+}
+
 Movie*
 movie_root::getLevel(unsigned int num) const
 {
@@ -519,6 +546,9 @@ movie_root::clear()
 
 	// remove all intervals
 	clearIntervalTimers();
+
+    // remove all loadMovie requests
+	clearLoadMovieRequests();
 
 	// remove key/mouse listeners
 	m_key_listeners.clear();
@@ -2163,7 +2193,9 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 
     /// POST: send variables using the POST method.
     if (method == MovieClip::METHOD_POST) postdata = &data;
-    _loadMovieRequests.push_front(LoadMovieRequest(url, target, postdata));
+    _loadMovieRequests.push_front(new LoadMovieRequest(url, target, postdata));
+
+    // TODO: start thread 
 }
 
 void
@@ -2173,6 +2205,13 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     const URL& url = r.getURL();
     bool usePost = r.usePost();
     const std::string& postData = r.getPostData();
+
+#if 0
+	boost::intrusive_ptr<movie_definition> md (
+        MovieFactory::makeMovie(url, _runResources));
+    r.setCompleted(md);
+    bool completed = processCompletedLoadMovieRequest(r);
+#else
 
     if (target.compare(0, 6, "_level") == 0 &&
             target.find_first_not_of("0123456789", 7) == std::string::npos)
@@ -2207,6 +2246,77 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     {
         sp->loadMovie(url);
     }
+#endif
+
+}
+
+/* private */
+bool
+movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
+{
+    GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<movie_definition> md;
+    if ( ! r.getCompleted(md) ) return false; // not completed yet
+    if ( ! md ) return true; // nothing to do, but completed
+
+    const URL& url = r.getURL();
+
+	Movie* extern_movie = md->createMovie(*_vm.getGlobal());
+	if (!extern_movie)
+    {
+		log_error(_("Can't create Movie instance "
+                    "for definition loaded from %s"), url);
+		return true; // completed in any case...
+	}
+
+	// Parse query string
+	MovieClip::MovieVariables vars;
+	url.parse_querystring(url.querystring(), vars);
+    extern_movie->setVariables(vars);
+
+    const std::string& target = r.getTarget();
+
+    if (target.compare(0, 6, "_level") == 0 &&
+            target.find_first_not_of("0123456789", 7) == std::string::npos)
+    {
+        unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
+        log_debug(_("processLoadMovieRequest: Testing _level loading "
+                    "(level %u)"), levelno);
+        // TODO: check if this should only replaceLevel instead !
+        setLevel(levelno, extern_movie);
+    }
+    else
+    {
+        DisplayObject* ch = findCharacterByTarget(target);
+        if (ch) ch->getLoadedMovie(extern_movie);
+        else {
+            log_debug("Target %s of a loadMovie request doesn't exist at "
+                    "processing time", target);
+        }
+
+    }
+
+    return true;
+
+}
+
+/* private */
+void
+movie_root::processCompletedLoadMovieRequests()
+{
+    GNASH_REPORT_FUNCTION;
+
+    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
+            it != _loadMovieRequests.end(); )
+    {
+        const LoadMovieRequest* lr=*it;
+        if ( processCompletedLoadMovieRequest(*lr) )
+        {
+            it = _loadMovieRequests.erase(it);
+            delete lr;
+        }
+    }
 }
 
 void
@@ -2218,9 +2328,10 @@ movie_root::processLoadMovieRequests()
     for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
             it != _loadMovieRequests.end(); )
     {
-        const LoadMovieRequest& lr=*it;
-        processLoadMovieRequest(lr);
+        const LoadMovieRequest* lr=*it;
+        processLoadMovieRequest(*lr);
         it = _loadMovieRequests.erase(it);
+        delete lr;
     }
 }
 

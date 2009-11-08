@@ -113,6 +113,13 @@ DisplayObject::object() const
     return _object;
 }
 
+void
+DisplayObject::getLoadedMovie(Movie* extern_movie)
+{
+    log_unimpl("loadMovie against a %s DisplayObject", typeName(*this));
+    UNUSED(extern_movie);
+}
+
 std::string
 DisplayObject::getNextUnnamedInstanceName()
 {
