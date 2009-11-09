@@ -2201,7 +2201,6 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 void
 movie_root::processLoadMovieRequest(LoadMovieRequest& r)
 {
-    const std::string& target = r.getTarget();
     const URL& url = r.getURL();
     bool usePost = r.usePost();
     const std::string* postdata = usePost ? &(r.getPostData()) : 0;
@@ -2242,25 +2241,24 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
     extern_movie->setVariables(vars);
 
     const std::string& target = r.getTarget();
-
-    if (target.compare(0, 6, "_level") == 0 &&
+    DisplayObject* targetDO = findCharacterByTarget(target);
+    if (targetDO)
+    {
+        targetDO->getLoadedMovie(extern_movie);
+    }
+    else if (target.compare(0, 6, "_level") == 0 &&
             target.find_first_not_of("0123456789", 7) == std::string::npos)
     {
         unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
-        log_debug(_("processLoadMovieRequest: Testing _level loading "
+        log_debug(_("processCompletedLoadMovieRequest: _level loading "
                     "(level %u)"), levelno);
 	    extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
         setLevel(levelno, extern_movie);
     }
     else
     {
-        DisplayObject* ch = findCharacterByTarget(target);
-        if (ch) ch->getLoadedMovie(extern_movie);
-        else {
-            log_debug("Target %s of a loadMovie request doesn't exist at "
-                    "processing time", target);
-        }
-
+        log_debug("Target %s of a loadMovie request doesn't exist at "
+                  "load init time", target);
     }
 
     return true;
