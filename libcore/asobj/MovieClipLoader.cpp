@@ -58,64 +58,6 @@ namespace {
     void attachMovieClipLoaderInterface(as_object& o);
 }
 
-/// This class is used to queue a function call action
-//
-/// Exact use is to queue onLoadInit, which should be invoked
-/// after actions of in first frame of a loaded movie are executed.
-/// Since those actions are queued the only way to execute something
-/// after them is to queue the function call as well.
-///
-/// The class might be made more general and accessible outside
-/// of the MovieClipLoader class. For now it only works for
-/// calling a function with a two argument.
-///
-class DelayedFunctionCall : public ExecutableCode
-{
-
-public:
-
-    DelayedFunctionCall(as_object* target, string_table::key name,
-            const as_value& arg1, const as_value& arg2)
-        :
-        _target(target),
-        _name(name),
-        _arg1(arg1),
-        _arg2(arg2)
-    {}
-
-
-    ExecutableCode* clone() const
-    {
-        return new DelayedFunctionCall(*this);
-    }
-
-    virtual void execute()
-    {
-        _target->callMethod(_name, _arg1, _arg2);
-    }
-
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the action target (_target)
-    ///
-    virtual void markReachableResources() const
-    {
-      _target->setReachable();
-      _arg1.setReachable();
-      _arg2.setReachable();
-    }
-#endif // GNASH_USE_GC
-
-private:
-
-    as_object* _target;
-    string_table::key _name;
-    as_value _arg1, _arg2;
-
-};
-
 void
 registerMovieClipLoaderNative(as_object& global)
 {
