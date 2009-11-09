@@ -395,10 +395,6 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     assert(_swf);
     assert(object);
 
-    if (!isAS3(getVM(*object)) && !get_parent()) {
-        object->init_member("$version", getVM(*object).getPlayerVersion(), 0); 
-    }
-
     _environment.set_target(this);
 
 }
@@ -1920,6 +1916,10 @@ MovieClip::constructAsScriptObject()
     log_debug(_("constructAsScriptObject called for movieclip %s"), 
             getTarget());
 #endif
+
+    if (!isAS3(getVM(*getObject(this))) && !get_parent()) {
+        getObject(this)->init_member("$version", getVM(*getObject(this)).getPlayerVersion(), 0); 
+    }
 
     bool eventHandlersInvoked = false;
 
