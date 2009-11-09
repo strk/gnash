@@ -2204,51 +2204,16 @@ movie_root::processLoadMovieRequest(LoadMovieRequest& r)
     const std::string& target = r.getTarget();
     const URL& url = r.getURL();
     bool usePost = r.usePost();
-    const std::string& postData = r.getPostData();
+    const std::string* postdata = usePost ? &(r.getPostData()) : 0;
 
-#if 0
+    // TODO: make this load asyncronous !!
 	boost::intrusive_ptr<movie_definition> md (
-        MovieFactory::makeMovie(url, _runResources));
+        MovieFactory::makeMovie(url, _runResources, NULL, true, postdata));
     r.setCompleted(md);
+
+
     bool completed = processCompletedLoadMovieRequest(r);
     assert(completed);
-#else
-
-    if (target.compare(0, 6, "_level") == 0 &&
-            target.find_first_not_of("0123456789", 7) == std::string::npos)
-    {
-        unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
-        log_debug(_("processLoadMovieRequest: Testing _level loading "
-                    "(level %u)"), levelno);
-        loadLevel(levelno, url);
-        return;
-    }
-
-    DisplayObject* ch = findCharacterByTarget(target);
-    if (!ch)
-    {
-        log_debug("Target %s of a loadMovie request doesn't exist at "
-                "processing time", target);
-        return;
-    }
-
-    MovieClip* sp = ch->to_movie();
-    if (!sp)
-    {
-        log_unimpl("loadMovie against a %s DisplayObject", typeName(*ch));
-        return;
-    }
-
-    if ( usePost )
-    {
-    	sp->loadMovie(url, &postData);
-    }
-    else
-    {
-        sp->loadMovie(url);
-    }
-#endif
-
 }
 
 /* private */
