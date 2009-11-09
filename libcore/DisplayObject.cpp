@@ -116,7 +116,13 @@ DisplayObject::object() const
 void
 DisplayObject::getLoadedMovie(Movie* extern_movie)
 {
-    log_unimpl("loadMovie against a %s DisplayObject", typeName(*this));
+    LOG_ONCE(
+    log_unimpl("loadMovie against a %s DisplayObject", typeName(*this))
+    );
+
+    // TODO: look at the MovieClip implementation, but most importantly
+    //       test all the event handlers copies etc..
+
     UNUSED(extern_movie);
 }
 

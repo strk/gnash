@@ -901,13 +901,13 @@ movieclip_getBytesTotal(const fn_call& fn)
 as_value
 movieclip_loadMovie(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
+    DisplayObject* dobj = ensure<IsDisplayObject<> >(fn);
 
     as_value val;
     if (fn.nargs > 1) {
-        val = getObject(movieclip)->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = getObject(dobj)->callMethod(NSV::PROP_METH, fn.arg(1));
     }
-    else val = getObject(movieclip)->callMethod(NSV::PROP_METH);
+    else val = getObject(dobj)->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -933,7 +933,7 @@ movieclip_loadMovie(const fn_call& fn)
     }
 
     movie_root& mr = getRoot(fn);
-    std::string target = movieclip->getTarget();
+    std::string target = dobj->getTarget();
 
     // TODO: if GET/POST should send variables of *this* movie,
     // no matter if the target will be replaced by another movie !!
@@ -945,7 +945,7 @@ movieclip_loadMovie(const fn_call& fn)
     // This is just an optimization if we aren't going
     // to send the data anyway. It might be wrong, though.
     if (method != MovieClip::METHOD_NONE) {
-        getURLEncodedVars(*getObject(movieclip), data);
+        getURLEncodedVars(*getObject(dobj), data);
     }
  
     mr.loadMovie(urlstr, target, data, method);
