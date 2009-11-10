@@ -2279,7 +2279,9 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
             getObject(targetDO));
 
         // Dispatch onLoadProgress
-        // FIXME: should be signalled every 65535 bytes ?
+        // FIXME: should be signalled on every readNonBlocking()
+        //        with a buffer size of 65535 bytes.
+        //
         size_t bytesLoaded = md->get_bytes_loaded();
         size_t bytesTotal = md->get_bytes_total();
         handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
