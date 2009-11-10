@@ -186,22 +186,6 @@ public:
     ///
     Movie* getLevel(unsigned int num) const;
 
-    /// Load movie at the specified URL in the given level 
-    //
-    /// Note that the display viewport will be updated to reflect
-    /// the new layout.
-    ///
-    /// @param num
-    /// The level number to load into.
-    ///
-    /// @param url
-    /// The url to load the movie from.
-    /// Can contain a query string, which would be parsed.
-    ///
-    /// @return false on error, true on success
-    ///
-    bool loadLevel(unsigned int num, const URL& url);
-
     /// Replace an existing level with a new movie
     //
     /// Depth will be assigned to external_movie by this function.
