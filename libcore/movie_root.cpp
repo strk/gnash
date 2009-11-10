@@ -2213,34 +2213,11 @@ movie_root::processLoadMovieRequest(LoadMovieRequest& r)
     const URL& url = r.getURL();
     bool usePost = r.usePost();
     const std::string* postdata = usePost ? &(r.getPostData()) : 0;
-    as_object* handler = r.getHandler();
-    const std::string& target = r.getTarget();
 
     // TODO: make this load asyncronous !!
 	boost::intrusive_ptr<movie_definition> md (
         MovieFactory::makeMovie(url, _runResources, NULL, true, postdata));
     r.setCompleted(md);
-
-    if ( handler )
-    {
-        // Dispatch onLoadStart
-        // FIXME: should be signalled before starting I guess
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
-            target);
-
-        // Dispatch onLoadProgress
-        // FIXME: should be signalled every 65535 bytes ?
-        size_t bytesLoaded = md->get_bytes_loaded();
-        size_t bytesTotal = md->get_bytes_total();
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
-            target, bytesLoaded, bytesTotal);
-
-        // Dispatch onLoadComplete
-        // FIXME: find semantic of last arg
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
-            target, as_value(0.0));
-    }
-
 
     bool completed = processCompletedLoadMovieRequest(r);
     assert(completed);
@@ -2304,23 +2281,47 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
     {
         targetDO->getLoadedMovie(extern_movie);
     }
-    else if (target.compare(0, 6, "_level") == 0 &&
-            target.find_first_not_of("0123456789", 7) == std::string::npos)
-    {
-        unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
-        log_debug(_("processCompletedLoadMovieRequest: _level loading "
-                    "(level %u)"), levelno);
-	    extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
-        setLevel(levelno, extern_movie);
-    }
     else
     {
-        log_debug("Target %s of a loadMovie request doesn't exist at "
-                  "load init time", target);
+        unsigned int levelno;
+        if (isLevelTarget(target, levelno))
+        {
+            log_debug(_("processCompletedLoadMovieRequest: _level loading "
+                    "(level %u)"), levelno);
+	        extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
+            setLevel(levelno, extern_movie);
+        }
+        else
+        {
+            log_debug("Target %s of a loadMovie request doesn't exist at "
+                  "load complete time", target);
+            return true;
+        }
     }
 
-    if (handler)
+    if (handler && targetDO)
     {
+        // Dispatch onLoadStart
+        // FIXME: should be signalled before starting to load
+        //        (0/-1 bytes loaded/total) but still with *new*
+        //        display object as target (ie: the target won't
+        //        contain members set either before or after loadClip.
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
+            getObject(targetDO));
+
+        // Dispatch onLoadProgress
+        // FIXME: should be signalled every 65535 bytes ?
+        size_t bytesLoaded = md->get_bytes_loaded();
+        size_t bytesTotal = md->get_bytes_total();
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
+            getObject(targetDO), bytesLoaded, bytesTotal);
+
+        // Dispatch onLoadComplete
+        // FIXME: find semantic of last arg
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
+            getObject(targetDO), as_value(0.0));
+
+
         // Displatch onLoadInit
         
         // This event must be dispatched when actions
@@ -2333,7 +2334,7 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
         //
         std::auto_ptr<ExecutableCode> code(
                 new DelayedFunctionCall(handler, NSV::PROP_BROADCAST_MESSAGE, 
-                    "onLoadInit", target));
+                    "onLoadInit", getObject(targetDO)));
 
         getRoot(*handler).pushAction(code, movie_root::apDOACTION);
     }
