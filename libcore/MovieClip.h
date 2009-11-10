@@ -465,22 +465,6 @@ public:
         METHOD_POST
     };
 
-    /// Load a movie in this sprite, replacing it
-    //
-    /// @param url
-    ///  The url to load the movie from. Can be a bitmap or an SWF.
-    ///
-    /// @param postdata
-    ///  IF not NULL, use as the POST body for HTTP requests
-    ///
-    /// Return: true if it succeeded, false otherwise
-    ///
-    /// @deprecated use movie_root::loadMovie instead to queue
-    ///             a load and getLoadedMovie to have objects of
-    ///             this class receive a loaded external movie
-    ///     
-    bool loadMovie(const URL& url, const std::string* postdata=NULL);
-
     // See dox in DisplayObject.h
     virtual void getLoadedMovie(Movie* newMovie);
 
