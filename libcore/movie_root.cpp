@@ -460,37 +460,6 @@ movie_root::dropLevel(int depth)
 	assert(testInvariant());
 }
 
-bool
-movie_root::loadLevel(unsigned int num, const URL& url)
-{
-	movie_definition* md (
-            MovieFactory::makeMovie(url, _runResources));
-	if (!md)
-	{
-		log_error(_("can't create movie_definition for %s"), url.str());
-		return false;
-	}
-
-	Movie* extern_movie = md->createMovie(*_vm.getGlobal());
-
-	if (!extern_movie) {
-		log_error(_("can't create extern Movie for %s"),
-                url.str());
-		return false;
-	}
-
-	// Parse query string
-	MovieClip::MovieVariables vars;
-	url.parse_querystring(url.querystring(), vars);
-	
-    extern_movie->setVariables(vars);
-	extern_movie->set_depth(num + DisplayObject::staticDepthOffset);
-
-	setLevel(num, extern_movie);
-
-	return true;
-}
-
 void
 movie_root::replaceLevel(unsigned int num, Movie* extern_movie)
 {
@@ -2310,7 +2279,9 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
             getObject(targetDO));
 
         // Dispatch onLoadProgress
-        // FIXME: should be signalled every 65535 bytes ?
+        // FIXME: should be signalled on every readNonBlocking()
+        //        with a buffer size of 65535 bytes.
+        //
         size_t bytesLoaded = md->get_bytes_loaded();
         size_t bytesTotal = md->get_bytes_total();
         handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
