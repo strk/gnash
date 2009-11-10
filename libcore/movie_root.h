@@ -100,6 +100,7 @@
 #include <set>
 #include <bitset>
 #include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -200,6 +201,17 @@ public:
     /// @return false on error, true on success
     ///
     bool loadLevel(unsigned int num, const URL& url);
+
+    /// Replace an existing level with a new movie
+    //
+    /// Depth will be assigned to external_movie by this function.
+    /// If the give level number doesn't exist an error is logged
+    /// and nothing else happens.
+    ///
+    /// This method is intended for use by xxx.loadMovie(yyy)
+    /// when 'xxx' is a top-level movie.
+    ///
+    void replaceLevel(unsigned int num, Movie* external_movie);
 
     /// Swap depth of a level (or two)
     //
@@ -705,8 +717,13 @@ public:
     ///                 key/value pairs
     /// @param method   The VariablesMethod to use for sending the data. If
     ///                 MovieClip::METHOD_NONE, no data will be sent.
+    /// @param handler  An object which will be signalled of load
+    ///                 events (onLoadStart, onLoadComplete, onLoadInit,
+    ///                 onLoadError). Can be null if caller doesn't care.
+    ///                 
     void loadMovie(const std::string& url, const std::string& target,
-            const std::string& data, MovieClip::VariablesMethod method);
+            const std::string& data, MovieClip::VariablesMethod method,
+            as_object* handler=0);
 
     /// Send a request to the hosting application (e.g. browser).
     //
@@ -936,17 +953,21 @@ private:
     AbstractFsCallback* _fsCommandHandler;
 
     /// A load movie request
-    class LoadMovieRequest {
+    class LoadMovieRequest : boost::noncopyable {
     public:
         /// @param postdata
         ///   If not null POST method will be used for HTTP.
         ///
         LoadMovieRequest(const URL& u, const std::string& t,
-                const std::string* postdata)
+                const std::string* postdata, as_object* handler)
                 :
                 _target(t),
                 _url(u),
-                _usePost(false)
+                _usePost(false),
+                _mdef(0),
+                _completed(false),
+                _mutex(),
+                _handler(handler)
         {
             if ( postdata )
             {
@@ -959,23 +980,74 @@ private:
         const URL& getURL() const { return _url; }
         const std::string& getPostData() const { return _postData; }
         bool usePost() const { return _usePost; }
+        as_object* getHandler() const { return _handler; }
+        void setReachable() const {
+            if (_handler) _handler->setReachable();
+        }
+
+        /// Get the loaded movie definition, if any
+        //
+        /// @param md the loaded movie_definition is copied here
+        ///           if it was impossible to create one.
+        ///
+        /// @return true if the request was completed, false otherwise.
+        ///
+        /// RULE: if return is FALSE param 'md' will be set to 0.
+        /// RULE: if return is TRUE  param 'md' may be set to 0 or non 0.
+        /// RULE: if parameter 'md' is set to non 0, TRUE must be returned.
+        ///
+        /// locks _mutex
+        ///
+        bool getCompleted(boost::intrusive_ptr<movie_definition>& md) const
+        {
+            boost::mutex::scoped_lock lock(_mutex);
+            md = _mdef;
+            return _completed;
+        }
+
+        /// Complete the request
+        //
+        /// @param md the loaded movie_definition, or 0 if
+        ///           it was impossible to create one.
+        ///
+        /// locks _mutex
+        ///
+        void setCompleted(boost::intrusive_ptr<movie_definition> md)
+        {
+            boost::mutex::scoped_lock lock(_mutex);
+            _mdef = md;
+            _completed = true;
+        }
 
     private:
         std::string _target;
         URL _url;
         bool _usePost;
         std::string _postData;
+        boost::intrusive_ptr<movie_definition> _mdef;
+        bool _completed;
+        mutable boost::mutex _mutex;
+        as_object* _handler;
     };
 
     /// Load movie requests
-    typedef std::list<LoadMovieRequest> LoadMovieRequests;
+    typedef std::list<LoadMovieRequest*> LoadMovieRequests;
     LoadMovieRequests _loadMovieRequests;
 
     /// Process all load movie requests
     void processLoadMovieRequests();
 
     /// Process a single load movie request
-    void processLoadMovieRequest(const LoadMovieRequest& r);
+    void processLoadMovieRequest(LoadMovieRequest& r);
+
+    /// Check a LoadMovieRequest and process if completed.
+    //
+    /// @return true if the request was completely processed.
+    ///
+    bool processCompletedLoadMovieRequest(const LoadMovieRequest& r);
+
+    /// Process all completed loadMovie requests.
+    void processCompletedLoadMovieRequests();
 
     /// Listeners container
     typedef std::list<DisplayObject*> CharacterList;
@@ -992,6 +1064,9 @@ private:
 
     /// Delete all elements on the timers list
     void clearIntervalTimers();
+
+    /// Delete all LoadMovieRequests
+    void clearLoadMovieRequests();
 
     /// Execute expired timers
     void executeAdvanceCallbacks();

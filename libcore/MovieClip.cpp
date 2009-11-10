@@ -395,10 +395,6 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     assert(_swf);
     assert(object);
 
-    if (!isAS3(getVM(*object)) && !get_parent()) {
-        object->init_member("$version", getVM(*object).getPlayerVersion(), 0); 
-    }
-
     _environment.set_target(this);
 
 }
@@ -1921,6 +1917,10 @@ MovieClip::constructAsScriptObject()
             getTarget());
 #endif
 
+    if (!isAS3(getVM(*getObject(this))) && !get_parent()) {
+        getObject(this)->init_member("$version", getVM(*getObject(this)).getPlayerVersion(), 0); 
+    }
+
     bool eventHandlersInvoked = false;
 
     do {
@@ -2030,6 +2030,52 @@ MovieClip::unload()
 
     return shouldKeepAlive;
 }
+
+void
+MovieClip::getLoadedMovie(Movie* extern_movie)
+{
+    DisplayObject* parent = get_parent();
+    if (parent)
+    {
+        extern_movie->set_parent(parent);
+
+        // Copy own lockroot value
+        extern_movie->setLockRoot(getLockRoot());
+
+        // Copy own event handlers
+        // see testsuite/misc-ming.all/loadMovieTest.swf
+        const Events& clipEvs = get_event_handlers();
+        // top-level movies can't have clip events, right ?
+        assert (extern_movie->get_event_handlers().empty());
+        extern_movie->set_event_handlers(clipEvs);
+
+        // Copy own name
+        // TODO: check empty != none...
+        const std::string& name = get_name();
+        if( !name.empty() ) extern_movie->set_name(name);
+
+        // Copy own clip depth (TODO: check this)
+        extern_movie->set_clip_depth(get_clip_depth());
+
+        // Replace ourselves in parent
+        // TODO: don't pretend our parent is a MovieClip,
+        //       could as well be a button I guess...
+        //       At most we should require it to be a
+        //       DisplayObjectContainer and log an error if it's not.
+        MovieClip* parent_sp = parent->to_movie();
+        assert(parent_sp);
+        parent_sp->replace_display_object(extern_movie, get_depth(),
+                     true, true);
+
+    }
+    else
+    {
+        // replaceLevel will set depth for us
+        stage().replaceLevel(get_depth() - DisplayObject::staticDepthOffset,
+                              extern_movie);
+    }
+}
+
 
 
 bool

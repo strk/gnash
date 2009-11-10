@@ -58,64 +58,6 @@ namespace {
     void attachMovieClipLoaderInterface(as_object& o);
 }
 
-/// This class is used to queue a function call action
-//
-/// Exact use is to queue onLoadInit, which should be invoked
-/// after actions of in first frame of a loaded movie are executed.
-/// Since those actions are queued the only way to execute something
-/// after them is to queue the function call as well.
-///
-/// The class might be made more general and accessible outside
-/// of the MovieClipLoader class. For now it only works for
-/// calling a function with a two argument.
-///
-class DelayedFunctionCall : public ExecutableCode
-{
-
-public:
-
-    DelayedFunctionCall(as_object* target, string_table::key name,
-            const as_value& arg1, const as_value& arg2)
-        :
-        _target(target),
-        _name(name),
-        _arg1(arg1),
-        _arg2(arg2)
-    {}
-
-
-    ExecutableCode* clone() const
-    {
-        return new DelayedFunctionCall(*this);
-    }
-
-    virtual void execute()
-    {
-        _target->callMethod(_name, _arg1, _arg2);
-    }
-
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the action target (_target)
-    ///
-    virtual void markReachableResources() const
-    {
-      _target->setReachable();
-      _arg1.setReachable();
-      _arg2.setReachable();
-    }
-#endif // GNASH_USE_GC
-
-private:
-
-    as_object* _target;
-    string_table::key _name;
-    as_value _arg1, _arg2;
-
-};
-
 void
 registerMovieClipLoaderNative(as_object& global)
 {
@@ -181,11 +123,14 @@ moviecliploader_loadClip(const fn_call& fn)
 	const std::string& str_url = fn.arg(0).to_string(); 
 
 	as_value tgt_arg = fn.arg(1);
+	const std::string& tgt_str = tgt_arg.to_string();
 
-	std::string tgt_str = tgt_arg.to_string();
+    movie_root& mr = getRoot(*ptr);
+
+    // TODO: check if this logic can be generic to movie_root::loadMovie
 	DisplayObject* target = fn.env().find_target(tgt_str);
-
-	if (!target) {
+    unsigned int junk;
+	if (!target && ! mr.isLevelTarget(tgt_str, junk) ) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Could not find target %s (evaluated from %s)"),
 			tgt_str, tgt_arg);
@@ -193,72 +138,9 @@ moviecliploader_loadClip(const fn_call& fn)
 		return as_value(false);
 	}
 
-	MovieClip* sprite = target->to_movie();
-	if (!sprite) {
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Target %s is not a sprite instance (%s)"),
-			target->getTarget(), typeName(*target));
-		);
-		return as_value(false);
-	}
-
-    as_value targetVal(getObject(sprite));
-
-    movie_root& mr = getRoot(*ptr);
-	URL url(str_url, mr.runResources().baseURL());
-	
-	bool ret = sprite->loadMovie(url);
-	if (!ret) {
-
-        // FIXME: docs suggest the string can be either "URLNotFound" or
-        // "LoadNeverCompleted". This is neither of them:
-		as_value arg1("Failed to load movie or jpeg");
-
-		// FIXME: The last argument is HTTP status, or 0 if no connection
-        // was attempted (sandbox) or no status information is available
-        // (supposedly the Adobe mozilla plugin).
-		as_value arg2(0.0);
-		ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
-                getObject(sprite), arg1, arg2);
-
-		return as_value(true);
-	}
-
-    // this is to resolve the soft ref
-	MovieClip* newChar = targetVal.to_sprite(); 
-	if (!newChar) {
-		// We could assert, but let's try to be nicer...
-		log_error("MovieClip::loadMovie destroyed self without replacing?");
-		return as_value(true);
-	}
-
-	// Dispatch onLoadStart
-	ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart", targetVal);
-
-	// Dispatch onLoadProgress
-	size_t bytesLoaded = newChar->get_bytes_loaded();
-	size_t bytesTotal = newChar->get_bytes_total();
-	ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress", targetVal,
-		bytesLoaded, bytesTotal);
-
-	// Dispatch onLoadComplete
-	ptr->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete", targetVal,
-		as_value(0.0)); // TODO: find semantic of last arg
-
-	/// This event must be dispatched when actions
-	/// in first frame of loaded clip have been executed.
-	///
-	/// Since MovieClip::loadMovie above will invoke stagePlacementCallback
-	/// and thus queue all actions in first frame, we'll queue the
-	/// onLoadInit call next, so it happens after the former.
-	std::auto_ptr<ExecutableCode> code(
-            new DelayedFunctionCall(ptr, NSV::PROP_BROADCAST_MESSAGE, 
-                "onLoadInit", targetVal));
-
-	getRoot(*ptr).pushAction(code, movie_root::apDOACTION);
-
-	return as_value(true);
-
+    // TODO: return code is based on target validity if I'm not wrong
+    mr.loadMovie(str_url, tgt_str, "", MovieClip::METHOD_NONE, ptr);
+    return as_value(true);
 }
 
 as_value

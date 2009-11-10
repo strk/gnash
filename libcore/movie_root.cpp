@@ -186,10 +186,22 @@ movie_root::clearIntervalTimers()
 	_intervalTimers.clear();
 }
 
+void
+movie_root::clearLoadMovieRequests()
+{
+    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin(),
+            end = _loadMovieRequests.end(); it != end; ++it)
+    {
+        delete *it;
+    }
+    _loadMovieRequests.clear();
+}
+
 movie_root::~movie_root()
 {
 	clearActionQueue();
 	clearIntervalTimers();
+	clearLoadMovieRequests();
 
 	assert(testInvariant());
 }
@@ -287,7 +299,7 @@ movie_root::setLevel(unsigned int num, Movie* movie)
 		_movies[movie->get_depth()] = movie; 
 	}
 	else
-    	{
+    {
 		// don't leak overloaded levels
 
 		LevelMovie lm = it->second;
@@ -479,6 +491,21 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	return true;
 }
 
+void
+movie_root::replaceLevel(unsigned int num, Movie* extern_movie)
+{
+	extern_movie->set_depth(num + DisplayObject::staticDepthOffset);
+	Levels::iterator it = _movies.find(extern_movie->get_depth());
+    if ( it == _movies.end() )
+    {
+        log_error("TESTME: loadMovie called on level %d which is not available at load time, skipped placement for now");
+        return; // skip
+    }
+
+    // TODO: rework this to avoid the double scan 
+	setLevel(num, extern_movie);
+}
+
 Movie*
 movie_root::getLevel(unsigned int num) const
 {
@@ -519,6 +546,9 @@ movie_root::clear()
 
 	// remove all intervals
 	clearIntervalTimers();
+
+    // remove all loadMovie requests
+	clearLoadMovieRequests();
 
 	// remove key/mouse listeners
 	m_key_listeners.clear();
@@ -1754,6 +1784,13 @@ movie_root::markReachableResources() const
         i->obj->setReachable();
     }
 
+    // Mark LoadMovieRequest handlers as reachable
+    for (LoadMovieRequests::const_iterator it=_loadMovieRequests.begin(),
+            end = _loadMovieRequests.end(); it != end; ++it)
+    {
+        (*it)->setReachable();
+    }
+
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)
     {
@@ -2139,7 +2176,8 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
 void
 movie_root::loadMovie(const std::string& urlstr, const std::string& target,
-        const std::string& data, MovieClip::VariablesMethod method)
+        const std::string& data, MovieClip::VariablesMethod method,
+        as_object* handler)
 {
 
     /// URL security is checked in StreamProvider::getStream() down the
@@ -2159,53 +2197,167 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 
     log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
 
-    const std::string* postdata = NULL;
+    const std::string* postdata = (method == MovieClip::METHOD_POST) ? &data
+                                                                     : 0;
 
-    /// POST: send variables using the POST method.
-    if (method == MovieClip::METHOD_POST) postdata = &data;
-    _loadMovieRequests.push_front(LoadMovieRequest(url, target, postdata));
+    _loadMovieRequests.push_front(
+        new LoadMovieRequest(url, target, postdata, handler)
+    );
+
+    // TODO: start thread 
 }
 
 void
-movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
+movie_root::processLoadMovieRequest(LoadMovieRequest& r)
 {
-    const std::string& target = r.getTarget();
     const URL& url = r.getURL();
     bool usePost = r.usePost();
-    const std::string& postData = r.getPostData();
+    const std::string* postdata = usePost ? &(r.getPostData()) : 0;
 
-    if (target.compare(0, 6, "_level") == 0 &&
-            target.find_first_not_of("0123456789", 7) == std::string::npos)
+    // TODO: make this load asyncronous !!
+	boost::intrusive_ptr<movie_definition> md (
+        MovieFactory::makeMovie(url, _runResources, NULL, true, postdata));
+    r.setCompleted(md);
+
+    bool completed = processCompletedLoadMovieRequest(r);
+    assert(completed);
+}
+
+/* private */
+bool
+movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
+{
+    GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<movie_definition> md;
+    if ( ! r.getCompleted(md) ) return false; // not completed yet
+
+    const std::string& target = r.getTarget();
+    DisplayObject* targetDO = findCharacterByTarget(target);
+    as_object* handler = r.getHandler();
+
+    if ( ! md )
     {
-        unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
-        log_debug(_("processLoadMovieRequest: Testing _level loading "
-                    "(level %u)"), levelno);
-        loadLevel(levelno, url);
-        return;
+
+        if ( targetDO && handler )
+        {
+            // Signal load error
+            // Tested not to happen if target isn't found at time of loading
+            //
+
+            as_value arg1(getObject(targetDO));
+
+            // FIXME: docs suggest the string can be either "URLNotFound" or
+            // "LoadNeverCompleted". This is neither of them:
+            as_value arg2("Failed to load movie or jpeg");
+
+            // FIXME: The last argument is HTTP status, or 0 if no connection
+            // was attempted (sandbox) or no status information is available
+            // (supposedly the Adobe mozilla plugin).
+            as_value arg3(0.0);
+
+            handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
+                    arg1, arg2, arg3);
+        }
+        return true; // nothing to do, but completed
     }
 
-    DisplayObject* ch = findCharacterByTarget(target);
-    if (!ch)
-    {
-        log_debug("Target %s of a loadMovie request doesn't exist at "
-                "processing time", target);
-        return;
-    }
+    const URL& url = r.getURL();
 
-    MovieClip* sp = ch->to_movie();
-    if (!sp)
+	Movie* extern_movie = md->createMovie(*_vm.getGlobal());
+	if (!extern_movie)
     {
-        log_unimpl("loadMovie against a %s DisplayObject", typeName(*ch));
-        return;
-    }
+		log_error(_("Can't create Movie instance "
+                    "for definition loaded from %s"), url);
+		return true; // completed in any case...
+	}
 
-    if ( usePost )
+	// Parse query string
+	MovieClip::MovieVariables vars;
+	url.parse_querystring(url.querystring(), vars);
+    extern_movie->setVariables(vars);
+
+    if (targetDO)
     {
-    	sp->loadMovie(url, &postData);
+        targetDO->getLoadedMovie(extern_movie);
     }
     else
     {
-        sp->loadMovie(url);
+        unsigned int levelno;
+        if (isLevelTarget(target, levelno))
+        {
+            log_debug(_("processCompletedLoadMovieRequest: _level loading "
+                    "(level %u)"), levelno);
+	        extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
+            setLevel(levelno, extern_movie);
+        }
+        else
+        {
+            log_debug("Target %s of a loadMovie request doesn't exist at "
+                  "load complete time", target);
+            return true;
+        }
+    }
+
+    if (handler && targetDO)
+    {
+        // Dispatch onLoadStart
+        // FIXME: should be signalled before starting to load
+        //        (0/-1 bytes loaded/total) but still with *new*
+        //        display object as target (ie: the target won't
+        //        contain members set either before or after loadClip.
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
+            getObject(targetDO));
+
+        // Dispatch onLoadProgress
+        // FIXME: should be signalled every 65535 bytes ?
+        size_t bytesLoaded = md->get_bytes_loaded();
+        size_t bytesTotal = md->get_bytes_total();
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
+            getObject(targetDO), bytesLoaded, bytesTotal);
+
+        // Dispatch onLoadComplete
+        // FIXME: find semantic of last arg
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
+            getObject(targetDO), as_value(0.0));
+
+
+        // Displatch onLoadInit
+        
+        // This event must be dispatched when actions
+        // in first frame of loaded clip have been executed.
+        //
+        // Since getLoadedMovie or setLevel above will invoke
+        // stagePlacementCallback and thus queue all actions in first
+        // frame, we'll queue the
+        // onLoadInit call next, so it happens after the former.
+        //
+        std::auto_ptr<ExecutableCode> code(
+                new DelayedFunctionCall(handler, NSV::PROP_BROADCAST_MESSAGE, 
+                    "onLoadInit", getObject(targetDO)));
+
+        getRoot(*handler).pushAction(code, movie_root::apDOACTION);
+    }
+
+    return true;
+
+}
+
+/* private */
+void
+movie_root::processCompletedLoadMovieRequests()
+{
+    GNASH_REPORT_FUNCTION;
+
+    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
+            it != _loadMovieRequests.end(); )
+    {
+        const LoadMovieRequest* lr=*it;
+        if ( processCompletedLoadMovieRequest(*lr) )
+        {
+            it = _loadMovieRequests.erase(it);
+            delete lr;
+        }
     }
 }
 
@@ -2218,9 +2370,10 @@ movie_root::processLoadMovieRequests()
     for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
             it != _loadMovieRequests.end(); )
     {
-        const LoadMovieRequest& lr=*it;
-        processLoadMovieRequest(lr);
+        LoadMovieRequest* lr=*it;
+        processLoadMovieRequest(*lr);
         it = _loadMovieRequests.erase(it);
+        delete lr;
     }
 }
 
