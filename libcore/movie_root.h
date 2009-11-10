@@ -717,8 +717,13 @@ public:
     ///                 key/value pairs
     /// @param method   The VariablesMethod to use for sending the data. If
     ///                 MovieClip::METHOD_NONE, no data will be sent.
+    /// @param handler  An object which will be signalled of load
+    ///                 events (onLoadStart, onLoadComplete, onLoadInit,
+    ///                 onLoadError). Can be null if caller doesn't care.
+    ///                 
     void loadMovie(const std::string& url, const std::string& target,
-            const std::string& data, MovieClip::VariablesMethod method);
+            const std::string& data, MovieClip::VariablesMethod method,
+            as_object* handler=0);
 
     /// Send a request to the hosting application (e.g. browser).
     //
@@ -954,14 +959,15 @@ private:
         ///   If not null POST method will be used for HTTP.
         ///
         LoadMovieRequest(const URL& u, const std::string& t,
-                const std::string* postdata)
+                const std::string* postdata, as_object* handler)
                 :
                 _target(t),
                 _url(u),
                 _usePost(false),
                 _mdef(0),
                 _completed(false),
-                _mutex()
+                _mutex(),
+                _handler(handler)
         {
             if ( postdata )
             {
@@ -974,6 +980,10 @@ private:
         const URL& getURL() const { return _url; }
         const std::string& getPostData() const { return _postData; }
         bool usePost() const { return _usePost; }
+        as_object* getHandler() const { return _handler; }
+        void setReachable() const {
+            if (_handler) _handler->setReachable();
+        }
 
         /// Get the loaded movie definition, if any
         //
@@ -1017,6 +1027,7 @@ private:
         boost::intrusive_ptr<movie_definition> _mdef;
         bool _completed;
         mutable boost::mutex _mutex;
+        as_object* _handler;
     };
 
     /// Load movie requests

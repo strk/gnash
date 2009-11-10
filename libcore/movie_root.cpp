@@ -1784,6 +1784,13 @@ movie_root::markReachableResources() const
         i->obj->setReachable();
     }
 
+    // Mark LoadMovieRequest handlers as reachable
+    for (LoadMovieRequests::const_iterator it=_loadMovieRequests.begin(),
+            end = _loadMovieRequests.end(); it != end; ++it)
+    {
+        (*it)->setReachable();
+    }
+
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)
     {
@@ -2169,7 +2176,8 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
 void
 movie_root::loadMovie(const std::string& urlstr, const std::string& target,
-        const std::string& data, MovieClip::VariablesMethod method)
+        const std::string& data, MovieClip::VariablesMethod method,
+        as_object* handler)
 {
 
     /// URL security is checked in StreamProvider::getStream() down the
@@ -2189,11 +2197,12 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 
     log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
 
-    const std::string* postdata = NULL;
+    const std::string* postdata = (method == MovieClip::METHOD_POST) ? &data
+                                                                     : 0;
 
-    /// POST: send variables using the POST method.
-    if (method == MovieClip::METHOD_POST) postdata = &data;
-    _loadMovieRequests.push_front(new LoadMovieRequest(url, target, postdata));
+    _loadMovieRequests.push_front(
+        new LoadMovieRequest(url, target, postdata, handler)
+    );
 
     // TODO: start thread 
 }
@@ -2204,11 +2213,33 @@ movie_root::processLoadMovieRequest(LoadMovieRequest& r)
     const URL& url = r.getURL();
     bool usePost = r.usePost();
     const std::string* postdata = usePost ? &(r.getPostData()) : 0;
+    as_object* handler = r.getHandler();
+    const std::string& target = r.getTarget();
 
     // TODO: make this load asyncronous !!
 	boost::intrusive_ptr<movie_definition> md (
         MovieFactory::makeMovie(url, _runResources, NULL, true, postdata));
     r.setCompleted(md);
+
+    if ( handler )
+    {
+        // Dispatch onLoadStart
+        // FIXME: should be signalled before starting I guess
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
+            target);
+
+        // Dispatch onLoadProgress
+        // FIXME: should be signalled every 65535 bytes ?
+        size_t bytesLoaded = md->get_bytes_loaded();
+        size_t bytesTotal = md->get_bytes_total();
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
+            target, bytesLoaded, bytesTotal);
+
+        // Dispatch onLoadComplete
+        // FIXME: find semantic of last arg
+        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
+            target, as_value(0.0));
+    }
 
 
     bool completed = processCompletedLoadMovieRequest(r);
@@ -2223,7 +2254,36 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
 
     boost::intrusive_ptr<movie_definition> md;
     if ( ! r.getCompleted(md) ) return false; // not completed yet
-    if ( ! md ) return true; // nothing to do, but completed
+
+    const std::string& target = r.getTarget();
+    DisplayObject* targetDO = findCharacterByTarget(target);
+    as_object* handler = r.getHandler();
+
+    if ( ! md )
+    {
+
+        if ( targetDO && handler )
+        {
+            // Signal load error
+            // Tested not to happen if target isn't found at time of loading
+            //
+
+            as_value arg1(getObject(targetDO));
+
+            // FIXME: docs suggest the string can be either "URLNotFound" or
+            // "LoadNeverCompleted". This is neither of them:
+            as_value arg2("Failed to load movie or jpeg");
+
+            // FIXME: The last argument is HTTP status, or 0 if no connection
+            // was attempted (sandbox) or no status information is available
+            // (supposedly the Adobe mozilla plugin).
+            as_value arg3(0.0);
+
+            handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
+                    arg1, arg2, arg3);
+        }
+        return true; // nothing to do, but completed
+    }
 
     const URL& url = r.getURL();
 
@@ -2240,8 +2300,6 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
 	url.parse_querystring(url.querystring(), vars);
     extern_movie->setVariables(vars);
 
-    const std::string& target = r.getTarget();
-    DisplayObject* targetDO = findCharacterByTarget(target);
     if (targetDO)
     {
         targetDO->getLoadedMovie(extern_movie);
@@ -2259,6 +2317,25 @@ movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
     {
         log_debug("Target %s of a loadMovie request doesn't exist at "
                   "load init time", target);
+    }
+
+    if (handler)
+    {
+        // Displatch onLoadInit
+        
+        // This event must be dispatched when actions
+        // in first frame of loaded clip have been executed.
+        //
+        // Since getLoadedMovie or setLevel above will invoke
+        // stagePlacementCallback and thus queue all actions in first
+        // frame, we'll queue the
+        // onLoadInit call next, so it happens after the former.
+        //
+        std::auto_ptr<ExecutableCode> code(
+                new DelayedFunctionCall(handler, NSV::PROP_BROADCAST_MESSAGE, 
+                    "onLoadInit", target));
+
+        getRoot(*handler).pushAction(code, movie_root::apDOACTION);
     }
 
     return true;
