@@ -13,9 +13,10 @@
 #include "ExecutableCode.h"
 
 #include <memory> // for auto_ptr
+#include <boost/bind.hpp>
 
-#define GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING 1
-#define GNASH_DEBUG_LOCKING 1
+//#define GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING 1
+//#define GNASH_DEBUG_LOCKING 1
 
 namespace gnash {
 
@@ -340,31 +341,17 @@ log_debug("processCompletedRequests: lock on requests: trying");
 log_debug("processCompletedRequests: lock on requests: obtained");
 #endif
 
-#if 1
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
     log_debug("Checking %d requests for completeness",
         _requests.size());
 #endif
-#endif
 
 
-    // TODO: substitute with find_if
-/*
-    #include <function> // for std::logical_not
+    Request* firstCompleted = 0;
     Requests::iterator endIt = _requests.end();
     Requests::iterator it = find_if(_requests.begin(), endIt,
-           boost::bind(std::logical_not, boost::bind(&Request::pending, _1)));
-*/
-    Request* firstCompleted = 0;
-    for (Requests::iterator it=_requests.begin();
-            it != _requests.end(); ++it)
-    {
-        if ( ! (*it)->pending() )
-        {
-            firstCompleted=*it;
-            break;
-        }
-    }
+                                    boost::bind(&Request::completed, _1));
+    if ( it != endIt ) firstCompleted=*it;
 
 #ifdef GNASH_DEBUG_LOCKING
     log_debug("processCompletedRequests: lock on requests: releasing");
