@@ -81,7 +81,7 @@
 #include "gnash.h" // Quality
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
-#include "ThreadedMovieLoader.h"
+#include "MovieLoader.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -1204,7 +1204,7 @@ private:
 
     size_t _unnamedInstance;
 
-    ThreadedMovieLoader _movieLoader;
+    MovieLoader _movieLoader;
 
 };
 

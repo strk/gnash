@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_THREADED_MOVIE_LOADER_H
-#define GNASH_THREADED_MOVIE_LOADER_H
+#ifndef GNASH_MOVIE_LOADER_H
+#define GNASH_MOVIE_LOADER_H
 
 #include "URL.h" // for Request composition
 #include "as_object.h" // for setReachable inline
@@ -39,16 +39,20 @@ namespace gnash {
 
 namespace gnash {
 
-/// Hides threading of movies loading
+/// Movie loader
+//
 /// All public functions are intended to be called by the main thread
+/// Hide the asynchonous mechanism of movies loading.
+/// Currently implemented using threads, could be refactored to use
+/// non-blocking reads.
 ///
-class DSOEXPORT ThreadedMovieLoader : boost::noncopyable {
+class DSOEXPORT MovieLoader : boost::noncopyable {
 
 public:
 
-    ThreadedMovieLoader(movie_root& mr);
+    MovieLoader(movie_root& mr);
 
-    ~ThreadedMovieLoader();
+    ~MovieLoader();
 
     /// Queue a request for loading a movie
     //
@@ -212,4 +216,4 @@ private:
 
 } // namespace gnash
 
-#endif // GNASH_THREADED_MOVIE_LOADER_H
+#endif // GNASH_MOVIE_LOADER_H

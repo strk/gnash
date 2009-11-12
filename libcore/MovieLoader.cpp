@@ -20,7 +20,7 @@
 
 namespace gnash {
 
-ThreadedMovieLoader::ThreadedMovieLoader(movie_root& mr)
+MovieLoader::MovieLoader(movie_root& mr)
     :
     _movieRoot(mr),
     _thread(0),
@@ -31,7 +31,7 @@ ThreadedMovieLoader::ThreadedMovieLoader(movie_root& mr)
 // private
 // runs in loader thread
 void
-ThreadedMovieLoader::processRequests()
+MovieLoader::processRequests()
 {
 	// let _thread assignment happen before going on
     _barrier.wait();
@@ -103,7 +103,7 @@ ThreadedMovieLoader::processRequests()
 // private
 // runs in loader thread
 void
-ThreadedMovieLoader::processRequest(Request& r)
+MovieLoader::processRequest(Request& r)
 {
     const URL& url = r.getURL();
     bool usePost = r.usePost();
@@ -129,7 +129,7 @@ ThreadedMovieLoader::processRequest(Request& r)
 // public
 // runs in main thread
 void
-ThreadedMovieLoader::clear()
+MovieLoader::clear()
 {
     if ( _thread.get() )
     {
@@ -188,7 +188,7 @@ log_debug("joined");
 // private, no locking
 // runs in main thread
 void
-ThreadedMovieLoader::clearRequests()
+MovieLoader::clearRequests()
 {
     for (Requests::iterator it=_requests.begin(),
             end = _requests.end(); it != end; ++it)
@@ -201,7 +201,7 @@ ThreadedMovieLoader::clearRequests()
 // private 
 // runs in main thread
 bool
-ThreadedMovieLoader::processCompletedRequest(const Request& r)
+MovieLoader::processCompletedRequest(const Request& r)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -324,7 +324,7 @@ ThreadedMovieLoader::processCompletedRequest(const Request& r)
 // private 
 // runs in main thread
 void
-ThreadedMovieLoader::processCompletedRequests()
+MovieLoader::processCompletedRequests()
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -401,7 +401,7 @@ log_debug("processCompletedRequests: lock on requests: obtained");
 // private
 // runs in loader thread
 bool
-ThreadedMovieLoader::killed()
+MovieLoader::killed()
 {
     boost::mutex::scoped_lock lock(_killMutex);
     return _killed;
@@ -410,7 +410,7 @@ ThreadedMovieLoader::killed()
 // public
 // runs in main thread
 void
-ThreadedMovieLoader::loadMovie(const std::string& urlstr,
+MovieLoader::loadMovie(const std::string& urlstr,
                                const std::string& target,
                                const std::string& data,
                                MovieClip::VariablesMethod method,
@@ -432,7 +432,7 @@ ThreadedMovieLoader::loadMovie(const std::string& urlstr,
         url.set_querystring(qs + varsToSend);
     }
 
-    log_debug("ThreadedMovieLoader::loadMovie(%s, %s)", url.str(), target);
+    log_debug("MovieLoader::loadMovie(%s, %s)", url.str(), target);
 
     const std::string* postdata = (method == MovieClip::METHOD_POST) ? &data
                                                                      : 0;
@@ -456,7 +456,7 @@ log_debug("loadMovie: lock on requests: obtained");
     {
         _killed=false;
         _thread.reset(new boost::thread(boost::bind(
-                        &ThreadedMovieLoader::processRequests, this)));
+                        &MovieLoader::processRequests, this)));
 	    _barrier.wait(); // let execution start before proceeding
     }
     else
@@ -472,7 +472,7 @@ log_debug("loadMovie: lock on requests: obtained");
 
 // public
 // runs in main thread
-ThreadedMovieLoader::~ThreadedMovieLoader()
+MovieLoader::~MovieLoader()
 {
     clear(); // will kill the thread
 }
@@ -480,7 +480,7 @@ ThreadedMovieLoader::~ThreadedMovieLoader()
 // public
 // runs in main thread
 void
-ThreadedMovieLoader::setReachable() const
+MovieLoader::setReachable() const
 {
 
 #ifdef GNASH_DEBUG_LOCKING
