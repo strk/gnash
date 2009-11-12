@@ -121,21 +121,15 @@ registerKeyboardNative(as_object& global)
     vm.registerNative(key_is_toggled, 800, 3);
 }
 
-// extern (used by Global.cpp)
 void
-Keyboard_as::init(as_object& where, const ObjectURI& uri)
+attachKeyboardInterface(as_object& o)
 {
-
-    // Create built-in key object.
-    // NOTE: _global.Key *is* an object, not a constructor
-    as_object* key_obj = getGlobal(where).createObject();
-    
     const int flags = PropFlags::readOnly |
                       PropFlags::dontDelete |
                       PropFlags::dontEnum;
 
     // constants
-#define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][key::KEY], flags)
+#define KEY_CONST(k) o.init_member(#k, key::codeMap[key::k][key::KEY], flags)
     KEY_CONST(BACKSPACE);
     KEY_CONST(CAPSLOCK);
     KEY_CONST(CONTROL);
@@ -158,25 +152,31 @@ Keyboard_as::init(as_object& where, const ObjectURI& uri)
 
     // methods
 
-    VM& vm = getVM(where);
-    Global_as& gl = getGlobal(where);
+    VM& vm = getVM(o);
+    Global_as& gl = getGlobal(o);
 
-    key_obj->init_member("getAscii", vm.getNative(800, 0), flags);
-    key_obj->init_member("getCode", vm.getNative(800, 1), flags);
-    key_obj->init_member("isDown", vm.getNative(800, 2), flags);
-    key_obj->init_member("isToggled", vm.getNative(800, 3), flags);
-    key_obj->init_member("isAccessible", 
+    o.init_member("getAscii", vm.getNative(800, 0), flags);
+    o.init_member("getCode", vm.getNative(800, 1), flags);
+    o.init_member("isDown", vm.getNative(800, 2), flags);
+    o.init_member("isToggled", vm.getNative(800, 3), flags);
+    o.init_member("isAccessible", 
             gl.createFunction(key_is_accessible), flags);
+}
 
-    where.init_member(getName(uri), key_obj, as_object::DefaultFlags,
-            getNamespace(uri));
+// extern (used by Global.cpp)
+void
+Keyboard_as::init(as_object& where, const ObjectURI& uri)
+{
+    as_object* key = registerBuiltinObject(where, attachKeyboardInterface,
+            uri);
 
     /// Handles addListener, removeListener, and _listeners.
-    AsBroadcaster::initialize(*key_obj);
+    AsBroadcaster::initialize(*key);
 
     // All properties are protected using ASSetPropFlags.
+    Global_as& gl = getGlobal(where);
     as_object* null = 0;
-    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, key_obj, null, 7);
+    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, key, null, 7);
 }
 
 } // gnash namespace
