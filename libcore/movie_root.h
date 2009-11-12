@@ -1071,7 +1071,7 @@ private:
     /// Erase unloaded DisplayObjects from the given listeners list
     static void cleanupUnloadedListeners(CharacterList& ll);
 
-    /// Cleanup references to unloaded DisplayObjects and run the garbage collector.
+    /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
 
     /// Push a DisplayObject listener to the front of given container, if not
@@ -1080,17 +1080,6 @@ private:
 
     /// Remove a listener from the list
     static void remove_listener(CharacterList& ll, DisplayObject* elem);
-
-    /// Return the current Stage object
-    //
-    /// Can return NULL if it's been deleted or not
-    /// yet initialized.
-    as_object* getStageObject();
-
-    /// Return the singleton Selection object
-    //
-    /// Can return 0 if it's been deleted.
-    as_object* getSelectionObject() const;
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -1136,12 +1125,6 @@ private:
     /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
     /// its name to _level<num>
     void setLevel(unsigned int num, Movie* movie);
-
-    /// Return the global Key object 
-    Keyboard_as* getKeyObject();
-
-    /// Return the global Mouse object 
-    as_object* getMouseObject();
 
     /// Boundaries of the Stage are always world boundaries
     /// and are only invalidated by changes in the background

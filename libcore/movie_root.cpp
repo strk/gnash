@@ -82,6 +82,8 @@ namespace gnash {
 namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
+    as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
+    Keyboard_as* getKeyObject(movie_root& mr);
 }
 
 }
@@ -533,33 +535,6 @@ movie_root::clear()
 	setInvalidated();
 }
 
-as_object*
-movie_root::getSelectionObject() const
-{
-    // This can never be null, though it is possible to override the
-    // reference to _global in AS2. If that makes a difference, we should
-    // look up the object by path (_global.Selection) rather than using
-    // the stored global object.
-    Global_as& gl = *_vm.getGlobal();
-
-    as_value s;
-    if (!gl.get_member(NSV::CLASS_SELECTION, &s)) return 0;
-    
-    as_object* sel = s.to_object(gl);
-   
-    return sel;
-}
-
-as_object*
-movie_root::getStageObject()
-{
-	as_value v;
-	assert (VM::isInitialized()); 
-	Global_as& gl = *_vm.getGlobal();
-	if (!gl.get_member(NSV::PROP_iSTAGE, &v) ) return 0;
-	return v.to_object(gl);
-}
-		
 void
 movie_root::set_display_viewport(int x0, int y0, int w, int h)
 {
@@ -572,7 +547,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 
 	if (_scaleMode == noScale) {
 		//log_debug("Rescaling disabled");
-		as_object* stage = getStageObject();
+		as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
 		if (stage) {
             log_debug("notifying Stage listeners about a resize");
             stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
@@ -595,28 +570,6 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-Keyboard_as*
-movie_root::getKeyObject()
-{
-    Global_as& gl = *_vm.getGlobal();
-
-    as_value kval;
-    if (!gl.get_member(NSV::CLASS_KEY, &kval)) return 0;
-
-    as_object* obj = kval.to_object(gl);
-    return dynamic_cast<Keyboard_as*>(obj);
-}
-
-as_object*
-movie_root::getMouseObject()
-{
-    Global_as& gl = *_vm.getGlobal();
-
-    as_value val;
-    if (!gl.get_member(NSV::CLASS_MOUSE, &val)) return 0;
-    return val.to_object(gl);
-}
-
 
 Keyboard_as*
 movie_root::notify_global_key(key::code k, bool down)
@@ -627,7 +580,7 @@ movie_root::notify_global_key(key::code k, bool down)
     //       which would need to query Key object.
     //       Testcase: http://www.ferryhalim.com/orisinal/g3/00dog.swf 
 
-	Keyboard_as* keyobject = getKeyObject();
+	Keyboard_as* keyobject = getKeyObject(*this);
 	if (keyobject) {
 		if (down) keyobject->set_key_down(k);
 		else keyobject->set_key_up(k);
@@ -1152,7 +1105,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		}
 	}
 
-	as_object* mouseObj = getMouseObject();
+	as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
 	if (mouseObj) {
 
         try {
@@ -1226,7 +1179,7 @@ movie_root::setFocus(DisplayObject* to)
         getObject(to)->callMethod(NSV::PROP_ON_SET_FOCUS, getObject(from));
     }
 
-    as_object* sel = getSelectionObject();
+    as_object* sel = getBuiltinObject(*this, NSV::CLASS_SELECTION);
 
     // Notify Selection listeners with previous and new focus as arguments.
     // Either argument may be null.
@@ -1423,7 +1376,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
     callInterface("Stage.align");    
 
     if (notifyResize) {
-        as_object* stage = getStageObject();
+        as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
             stage->callMethod(NSV::PROP_BROADCAST_MESSAGE,
@@ -1437,7 +1390,7 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
-    as_object* stage = getStageObject();
+    as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
     if (stage) {
         log_debug("notifying Stage listeners about fullscreen state");
         const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;
@@ -2644,6 +2597,29 @@ getNearestObject(const DisplayObject* o)
         o = o->get_parent();
     }
 }
+
+Keyboard_as*
+getKeyObject(movie_root& mr)
+{
+    Global_as& gl = *mr.getVM().getGlobal();
+
+    as_value kval;
+    if (!gl.get_member(NSV::CLASS_KEY, &kval)) return 0;
+
+    as_object* obj = kval.to_object(gl);
+    return dynamic_cast<Keyboard_as*>(obj);
+}
+
+as_object*
+getBuiltinObject(movie_root& mr, string_table::key cl)
+{
+    Global_as& gl = *mr.getVM().getGlobal();
+
+    as_value val;
+    if (!gl.get_member(cl, &val)) return 0;
+    return val.to_object(gl);
+}
+
 
 }
 
