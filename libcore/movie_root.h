@@ -875,22 +875,6 @@ public:
 
     const RunResources& runResources() const { return _runResources; }
 
-    /// Add a DisplayObject child on top depth
-    //
-    /// @param ch
-    ///     The child DisplayObject to add
-    void addChild(DisplayObject* ch);
-
-    /// Add a DisplayObject child at given depth
-    //
-    /// @param ch
-    ///     The child DisplayObject to add
-    ///
-    /// @param depth
-    ///     The depth to add the child to
-    ///
-    void addChildAt(DisplayObject* ch, int depth);
-	
 private:
 
     /// Set the root movie, replacing the current one if any.

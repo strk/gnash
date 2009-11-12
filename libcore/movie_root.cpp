@@ -2432,20 +2432,6 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 	return "<no iface to hosting app>";
 }
 
-void
-movie_root::addChild(DisplayObject* ch)
-{
-    setInvalidated();
-    _rootMovie->addChild(ch);
-}
-
-void
-movie_root::addChildAt(DisplayObject* ch, int depth)
-{
-    setInvalidated();
-    _rootMovie->addChildAt(ch, depth);
-}
-
 short
 stringToStageAlign(const std::string& str)
 {
