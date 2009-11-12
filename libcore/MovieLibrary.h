@@ -23,6 +23,7 @@
 
 #include <map>
 #include <algorithm>
+#include <boost/thread/thread.hpp>
 
 namespace gnash {
 
@@ -63,6 +64,7 @@ public:
     bool get(const std::string& key,
             boost::intrusive_ptr<movie_definition>* ret)
     {
+        boost::mutex::scoped_lock lock(_mapMutex);
         LibraryContainer::iterator it = _map.find(key);
         if (it == _map.end()) return false;
         
@@ -75,6 +77,7 @@ public:
     /// Mark all library elements as reachable (for GC)
     void markReachableResources() const
     {
+        boost::mutex::scoped_lock lock(_mapMutex);
         for (LibraryContainer::const_iterator i=_map.begin(), e=_map.end();
                 i!=e; ++i)
         {
@@ -95,11 +98,16 @@ public:
         temp.def = mov;
         temp.hitCount = 0;
 
+        boost::mutex::scoped_lock lock(_mapMutex);
         _map[key] = temp;
     }
   
 
-    void clear() { _map.clear(); }
+    void clear()
+    {
+        boost::mutex::scoped_lock lock(_mapMutex);
+        _map.clear();
+    }
   
 private:
 
@@ -120,11 +128,14 @@ private:
         }
 
         while (_map.size() > max) {
+            boost::mutex::scoped_lock lock(_mapMutex);
             _map.erase(std::min_element(_map.begin(), _map.end(),
                         &findWorstHitCount));
         }
     
     }
+
+	mutable boost::mutex _mapMutex;
   
 };
 

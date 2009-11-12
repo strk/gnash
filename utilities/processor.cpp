@@ -601,6 +601,9 @@ play_movie(const std::string& filename, const RunResources& runResources)
                 cl.elapsed(), localDelay);
         gnashSleep(localDelay);
     }
+
+    // clear movie_root (too early?)
+    m.clear();
  
     // Clear resources.
     gnash::clear();

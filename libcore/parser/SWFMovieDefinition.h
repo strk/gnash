@@ -63,13 +63,13 @@ namespace gnash
 /// SWFMovieDefinition helper class handling start and execution of
 /// an SWF loading thread
 ///
-class MovieLoader
+class SWFMovieLoader
 {
 public:
 
-	MovieLoader(SWFMovieDefinition& md);
+	SWFMovieLoader(SWFMovieDefinition& md);
 
-	~MovieLoader();
+	~SWFMovieLoader();
 
 	/// Start loading thread.
 	//
@@ -79,10 +79,10 @@ public:
 	///
 	bool start();
 
-	/// Return true if the MovieLoader thread was started
+	/// Return true if the loader thread was started
 	bool started() const;
 
-	/// Return true if called from the MovieLoader thread.
+	/// Return true if called from the loader thread.
 	bool isSelfThread() const;
 
 private:
@@ -98,7 +98,7 @@ private:
 	boost::barrier _barrier;
 
 	/// Entry point for the actual thread
-	static void execute(MovieLoader& ml, SWFMovieDefinition* md);
+	static void execute(SWFMovieLoader& ml, SWFMovieDefinition* md);
 
 };
 
@@ -512,7 +512,7 @@ private:
     size_t _swf_end_pos;
 
 	/// asyncronous SWF loader and parser
-	MovieLoader _loader;
+	SWFMovieLoader _loader;
 
 	/// \brief
 	/// Increment loaded frames count, signaling frame reached condition if

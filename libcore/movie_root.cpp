@@ -139,7 +139,8 @@ movie_root::movie_root(const movie_definition& def,
 	_timeoutLimit(15),
 	_movieAdvancementDelay(83), // ~12 fps by default
 	_lastMovieAdvancement(0),
-	_unnamedInstance(0)
+	_unnamedInstance(0),
+    _movieLoader(*this)
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
@@ -187,22 +188,11 @@ movie_root::clearIntervalTimers()
 	_intervalTimers.clear();
 }
 
-void
-movie_root::clearLoadMovieRequests()
-{
-    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin(),
-            end = _loadMovieRequests.end(); it != end; ++it)
-    {
-        delete *it;
-    }
-    _loadMovieRequests.clear();
-}
-
 movie_root::~movie_root()
 {
 	clearActionQueue();
 	clearIntervalTimers();
-	clearLoadMovieRequests();
+	_movieLoader.clear();
 
 	assert(testInvariant());
 }
@@ -518,7 +508,7 @@ movie_root::clear()
 	clearIntervalTimers();
 
     // remove all loadMovie requests
-	clearLoadMovieRequests();
+	_movieLoader.clear();
 
 	// remove key/mouse listeners
 	_keyListeners.clear();
@@ -888,7 +878,8 @@ movie_root::advanceMovie()
     // NOTE: processing loadMovie requests after advanceLiveChars
     //       is known to fix more tests in misc-mtasc.all/levels.swf
     //       to be checked if it keeps the swfdec testsuite safe
-    processLoadMovieRequests();
+    //
+    _movieLoader.processCompletedRequests();
 
     // Process queued actions
     // NOTE: can throw ActionLimitException
@@ -1676,11 +1667,7 @@ movie_root::markReachableResources() const
     }
 
     // Mark LoadMovieRequest handlers as reachable
-    for (LoadMovieRequests::const_iterator it=_loadMovieRequests.begin(),
-            end = _loadMovieRequests.end(); it != end; ++it)
-    {
-        (*it)->setReachable();
-    }
+    _movieLoader.setReachable();
 
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)
@@ -2065,210 +2052,6 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
 }
 
-void
-movie_root::loadMovie(const std::string& urlstr, const std::string& target,
-        const std::string& data, MovieClip::VariablesMethod method,
-        as_object* handler)
-{
-
-    /// URL security is checked in StreamProvider::getStream() down the
-    /// chain.
-    URL url(urlstr, _runResources.baseURL());
-
-    /// If the method is MovieClip::METHOD_NONE, we send no data.
-    if (method == MovieClip::METHOD_GET)
-    {
-        std::string varsToSend(urlstr);
-        /// GET: append data to query string.
-        std::string qs = url.querystring();
-        if ( qs.empty() ) varsToSend.insert(0, 1, '?');
-        else varsToSend.insert(0, 1, '&');
-        url.set_querystring(qs + varsToSend);
-    }
-
-    log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
-
-    const std::string* postdata = (method == MovieClip::METHOD_POST) ? &data
-                                                                     : 0;
-
-    _loadMovieRequests.push_front(
-        new LoadMovieRequest(url, target, postdata, handler)
-    );
-
-    // TODO: start thread 
-}
-
-void
-movie_root::processLoadMovieRequest(LoadMovieRequest& r)
-{
-    const URL& url = r.getURL();
-    bool usePost = r.usePost();
-    const std::string* postdata = usePost ? &(r.getPostData()) : 0;
-
-    // TODO: make this load asyncronous !!
-	boost::intrusive_ptr<movie_definition> md (
-        MovieFactory::makeMovie(url, _runResources, NULL, true, postdata));
-    r.setCompleted(md);
-
-    bool completed = processCompletedLoadMovieRequest(r);
-    assert(completed);
-}
-
-/* private */
-bool
-movie_root::processCompletedLoadMovieRequest(const LoadMovieRequest& r)
-{
-    GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<movie_definition> md;
-    if ( ! r.getCompleted(md) ) return false; // not completed yet
-
-    const std::string& target = r.getTarget();
-    DisplayObject* targetDO = findCharacterByTarget(target);
-    as_object* handler = r.getHandler();
-
-    if ( ! md )
-    {
-
-        if ( targetDO && handler )
-        {
-            // Signal load error
-            // Tested not to happen if target isn't found at time of loading
-            //
-
-            as_value arg1(getObject(targetDO));
-
-            // FIXME: docs suggest the string can be either "URLNotFound" or
-            // "LoadNeverCompleted". This is neither of them:
-            as_value arg2("Failed to load movie or jpeg");
-
-            // FIXME: The last argument is HTTP status, or 0 if no connection
-            // was attempted (sandbox) or no status information is available
-            // (supposedly the Adobe mozilla plugin).
-            as_value arg3(0.0);
-
-            handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
-                    arg1, arg2, arg3);
-        }
-        return true; // nothing to do, but completed
-    }
-
-    const URL& url = r.getURL();
-
-	Movie* extern_movie = md->createMovie(*_vm.getGlobal());
-	if (!extern_movie)
-    {
-		log_error(_("Can't create Movie instance "
-                    "for definition loaded from %s"), url);
-		return true; // completed in any case...
-	}
-
-	// Parse query string
-	MovieClip::MovieVariables vars;
-	url.parse_querystring(url.querystring(), vars);
-    extern_movie->setVariables(vars);
-
-    if (targetDO)
-    {
-        targetDO->getLoadedMovie(extern_movie);
-    }
-    else
-    {
-        unsigned int levelno;
-        if (isLevelTarget(target, levelno))
-        {
-            log_debug(_("processCompletedLoadMovieRequest: _level loading "
-                    "(level %u)"), levelno);
-	        extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
-            setLevel(levelno, extern_movie);
-        }
-        else
-        {
-            log_debug("Target %s of a loadMovie request doesn't exist at "
-                  "load complete time", target);
-            return true;
-        }
-    }
-
-    if (handler && targetDO)
-    {
-        // Dispatch onLoadStart
-        // FIXME: should be signalled before starting to load
-        //        (0/-1 bytes loaded/total) but still with *new*
-        //        display object as target (ie: the target won't
-        //        contain members set either before or after loadClip.
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
-            getObject(targetDO));
-
-        // Dispatch onLoadProgress
-        // FIXME: should be signalled on every readNonBlocking()
-        //        with a buffer size of 65535 bytes.
-        //
-        size_t bytesLoaded = md->get_bytes_loaded();
-        size_t bytesTotal = md->get_bytes_total();
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
-            getObject(targetDO), bytesLoaded, bytesTotal);
-
-        // Dispatch onLoadComplete
-        // FIXME: find semantic of last arg
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
-            getObject(targetDO), as_value(0.0));
-
-
-        // Displatch onLoadInit
-        
-        // This event must be dispatched when actions
-        // in first frame of loaded clip have been executed.
-        //
-        // Since getLoadedMovie or setLevel above will invoke
-        // stagePlacementCallback and thus queue all actions in first
-        // frame, we'll queue the
-        // onLoadInit call next, so it happens after the former.
-        //
-        std::auto_ptr<ExecutableCode> code(
-                new DelayedFunctionCall(handler, NSV::PROP_BROADCAST_MESSAGE, 
-                    "onLoadInit", getObject(targetDO)));
-
-        getRoot(*handler).pushAction(code, movie_root::apDOACTION);
-    }
-
-    return true;
-
-}
-
-/* private */
-void
-movie_root::processCompletedLoadMovieRequests()
-{
-    GNASH_REPORT_FUNCTION;
-
-    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
-            it != _loadMovieRequests.end(); )
-    {
-        const LoadMovieRequest* lr=*it;
-        if ( processCompletedLoadMovieRequest(*lr) )
-        {
-            it = _loadMovieRequests.erase(it);
-            delete lr;
-        }
-    }
-}
-
-void
-movie_root::processLoadMovieRequests()
-{
-#ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-    log_debug("Processing %d loadMovie requests", _loadMovieRequests.size());
-#endif
-    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
-            it != _loadMovieRequests.end(); )
-    {
-        LoadMovieRequest* lr=*it;
-        processLoadMovieRequest(*lr);
-        it = _loadMovieRequests.erase(it);
-        delete lr;
-    }
-}
 
 bool
 movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)

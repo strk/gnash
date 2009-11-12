@@ -130,6 +130,7 @@ libgnashcore_la_SOURCES = \
 	RGBA.cpp 	\
 	asClass.cpp \
 	asNamespace.cpp \
+	MovieLoader.cpp \
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
@@ -204,6 +205,7 @@ noinst_HEADERS = \
 	swf_function.h \
 	Timers.h \
 	Video.h \
+	MovieLoader.h \
 	$(NULL)
 
 if ENABLE_AVM2

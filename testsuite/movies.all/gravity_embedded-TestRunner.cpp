@@ -31,6 +31,7 @@
 #include "check.h"
 #include <string>
 #include <cassert>
+#include <unistd.h> // for usleep
 
 using namespace gnash;
 using namespace std;
@@ -56,8 +57,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_frame_count(), 1);
 
-	// give loader time to load the actual gravity.swf movie ?
-	//sleep(1);
+	// give loader time to load the actual gravity.swf movie 
+	usleep(5000);
+	tester.advance(); // have load processed
 
 	// used to get members
 	as_value tmp;

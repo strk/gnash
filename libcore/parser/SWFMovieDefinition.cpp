@@ -71,7 +71,7 @@ namespace {
     template<typename T> void markMappedResources(const T& t);
 }
 
-MovieLoader::MovieLoader(SWFMovieDefinition& md)
+SWFMovieLoader::SWFMovieLoader(SWFMovieDefinition& md)
 	:
 	_movie_def(md),
 	_thread(NULL),
@@ -79,7 +79,7 @@ MovieLoader::MovieLoader(SWFMovieDefinition& md)
 {
 }
 
-MovieLoader::~MovieLoader()
+SWFMovieLoader::~SWFMovieLoader()
 {
 	// we should assert _movie_def._loadingCanceled
 	// but we're not friend yet (anyone introduce us ?)
@@ -91,7 +91,7 @@ MovieLoader::~MovieLoader()
 }
 
 bool
-MovieLoader::started() const
+SWFMovieLoader::started() const
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -99,7 +99,7 @@ MovieLoader::started() const
 }
 
 bool
-MovieLoader::isSelfThread() const
+SWFMovieLoader::isSelfThread() const
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -117,19 +117,19 @@ MovieLoader::isSelfThread() const
 
 // static..
 void
-MovieLoader::execute(MovieLoader& ml, SWFMovieDefinition* md)
+SWFMovieLoader::execute(SWFMovieLoader& ml, SWFMovieDefinition* md)
 {
 	ml._barrier.wait(); // let _thread assignment happen before going on
 	md->read_all_swf();
 }
 
 bool
-MovieLoader::start()
+SWFMovieLoader::start()
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
     std::abort();
 #endif
-	// don't start MovieLoader thread() which rely
+	// don't start SWFMovieLoader thread() which rely
 	// on boost::thread() returning before they are executed. Therefore,
 	// we must employ locking.
 	// Those tests do seem a bit redundant, though...
