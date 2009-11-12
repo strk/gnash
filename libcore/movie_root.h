@@ -439,13 +439,13 @@ public:
     /// Push a new DisplayObject listener for key events
     void add_key_listener(DisplayObject* listener)
     {
-        add_listener(m_key_listeners, listener);
+        add_listener(_keyListeners, listener);
     }
 
     /// Remove a DisplayObject listener for key events
     void remove_key_listener(DisplayObject* listener)
     {
-        remove_listener(m_key_listeners, listener);
+        remove_listener(_keyListeners, listener);
     }
 
     /// Notify still loaded DisplayObject listeners for mouse events
@@ -454,13 +454,13 @@ public:
     /// Push a new DisplayObject listener for mouse events
     void add_mouse_listener(DisplayObject* listener)
     {
-        add_listener(m_mouse_listeners, listener);
+        add_listener(_mouseListeners, listener);
     }
 
     /// Remove a DisplayObject listener for mouse events
     void remove_mouse_listener(DisplayObject* listener)
     {
-        remove_listener(m_mouse_listeners, listener);
+        remove_listener(_mouseListeners, listener);
     }
 
     /// Get the DisplayObject having focus
@@ -625,8 +625,8 @@ public:
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
-    /// - Key listeners (m_key_listeners)
-    /// - Mouse listeners (m_mouse_listeners)
+    /// - Key listeners (_keyListeners)
+    /// - Mouse listeners (_mouseListeners)
     /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
@@ -1048,8 +1048,8 @@ private:
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
     {
-        cleanupUnloadedListeners(m_key_listeners);
-        cleanupUnloadedListeners(m_mouse_listeners);
+        cleanupUnloadedListeners(_keyListeners);
+        cleanupUnloadedListeners(_mouseListeners);
     }
 
     /// Erase unloaded DisplayObjects from the given listeners list
@@ -1194,10 +1194,10 @@ private:
     unsigned int _lastTimerId;
 
     /// Characters for listening key events
-    KeyListeners m_key_listeners;
+    KeyListeners _keyListeners;
 
     /// Objects listening for mouse events (down,up,move)
-    MouseListeners m_mouse_listeners;
+    MouseListeners _mouseListeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;

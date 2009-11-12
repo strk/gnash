@@ -521,8 +521,8 @@ movie_root::clear()
 	clearLoadMovieRequests();
 
 	// remove key/mouse listeners
-	m_key_listeners.clear();
-	m_mouse_listeners.clear();
+	_keyListeners.clear();
+	_mouseListeners.clear();
 
 	// Cleanup the stack.
 	_vm.getStack().clear();
@@ -1038,9 +1038,9 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
 	// log_debug("Notifying %d DisplayObject Key listeners", 
-	//  m_key_listeners.size());
+	//  _keyListeners.size());
 
-	KeyListeners copy = m_key_listeners;
+	KeyListeners copy = _keyListeners;
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
@@ -1094,7 +1094,7 @@ void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
-	CharacterList copy = m_mouse_listeners;
+	CharacterList copy = _mouseListeners;
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
@@ -1738,8 +1738,8 @@ movie_root::markReachableResources() const
     // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded
     // key listeners. The remaining ones should be marked by their parents
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=m_key_listeners.begin(),
-            e=m_key_listeners.end(); i!=e; ++i) {
+    for (LiveChars::const_iterator i=_keyListeners.begin(),
+            e=_keyListeners.end(); i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
@@ -1748,8 +1748,8 @@ movie_root::markReachableResources() const
     // unloaded mouse listeners. The remaining ones should be marked by
     // their parents
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i = m_mouse_listeners.begin(),
-            e = m_mouse_listeners.end(); i!=e; ++i) {
+    for (LiveChars::const_iterator i = _mouseListeners.begin(),
+            e = _mouseListeners.end(); i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
