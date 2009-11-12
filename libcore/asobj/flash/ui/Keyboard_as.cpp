@@ -37,14 +37,9 @@
 #include "GnashKey.h"
 #include "GnashException.h" // for ActionException
 
-namespace gnash {
+#include <bitset>
 
-Keyboard_as::Keyboard_as()
-    :
-    as_object(getObjectInterface())
-{
-    AsBroadcaster::initialize(*this);
-}
+namespace gnash {
 
 as_value
 key_is_accessible(const fn_call& /*fn*/)
@@ -165,7 +160,7 @@ attachKeyboardInterface(as_object& o)
 
 // extern (used by Global.cpp)
 void
-Keyboard_as::init(as_object& where, const ObjectURI& uri)
+keyboard_class_init(as_object& where, const ObjectURI& uri)
 {
     as_object* key = registerBuiltinObject(where, attachKeyboardInterface,
             uri);

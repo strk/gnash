@@ -24,27 +24,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "as_object.h" // for inheritance
-#include "GnashKey.h" // for key::code
-#include "dsodefs.h"
-#include <bitset>
-
 namespace gnash {
 
-// Forward declarations
-class event_id;
+class as_object;
+class ObjectURI;
 
-class Keyboard_as : public as_object
-{
-public:
-
-    Keyboard_as();	
-	static void init(as_object& where, const ObjectURI& uri);
-	    // Pass SWF keycode, returns true if currently pressed.
-private:
-};
-
+void keyboard_class_init(as_object& global, const ObjectURI& uri);
 void registerKeyboardNative(as_object& global);
 
 } // gnash namespace

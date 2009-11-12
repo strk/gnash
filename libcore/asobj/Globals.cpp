@@ -521,7 +521,8 @@ avm1Classes()
            NS_GLOBAL, 5))
         (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
-        (N(Keyboard_as::init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
+        (N(keyboard_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
@@ -679,7 +680,7 @@ avm2Classes(string_table& st)
         // UI classes
         (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 5))
-        (N(Keyboard_as::init, st.find("Keyboard"), NSV::CLASS_OBJECT,
+        (N(keyboard_class_init, st.find("Keyboard"), NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 5))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
            NSV::NS_FLASH_UI, 7))

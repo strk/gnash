@@ -44,6 +44,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <bitset>
 #include <typeinfo>
 #include <cassert>
 #include <functional> // std::bind2nd, std::equal_to
