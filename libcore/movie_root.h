@@ -1235,8 +1235,6 @@ private:
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;
 
-    float m_time_remainder;
-
     /// @todo fold this into m_mouse_button_state?
     drag_state m_drag_state;
 
