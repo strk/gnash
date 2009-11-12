@@ -45,12 +45,7 @@ Keyboard_as::Keyboard_as()
     _unreleasedKeys(0),
     _lastKeyEvent(0)
 {
-    // Key is a broadcaster only in SWF6 and up (correct?)
-    int swfversion = getSWFVersion(*this);
-    if ( swfversion > 5 )
-    {
-        AsBroadcaster::initialize(*this);
-    }
+    AsBroadcaster::initialize(*this);
 }
 
 bool
