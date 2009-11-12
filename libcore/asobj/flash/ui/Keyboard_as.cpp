@@ -128,8 +128,8 @@ Keyboard_as::init(as_object& where, const ObjectURI& uri)
 
     // Create built-in key object.
     // NOTE: _global.Key *is* an object, not a constructor
-    as_object* key_obj = new Keyboard_as;
-
+    as_object* key_obj = getGlobal(where).createObject();
+    
     const int flags = PropFlags::readOnly |
                       PropFlags::dontDelete |
                       PropFlags::dontEnum;
@@ -170,6 +170,13 @@ Keyboard_as::init(as_object& where, const ObjectURI& uri)
 
     where.init_member(getName(uri), key_obj, as_object::DefaultFlags,
             getNamespace(uri));
+
+    /// Handles addListener, removeListener, and _listeners.
+    AsBroadcaster::initialize(*key_obj);
+
+    // All properties are protected using ASSetPropFlags.
+    as_object* null = 0;
+    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, key_obj, null, 7);
 }
 
 } // gnash namespace

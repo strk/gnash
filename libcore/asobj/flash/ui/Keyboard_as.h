@@ -42,24 +42,6 @@ public:
     Keyboard_as();	
 	static void init(as_object& where, const ObjectURI& uri);
 	    // Pass SWF keycode, returns true if currently pressed.
-    bool is_key_down(int keycode);
-
-    // Pass gnash::key::code. Changes m_last_key_event
-    // and adds appropriate SWF keycode to bit array of keys
-    // pressed (_unreleasedKeys)
-    void set_key_down(key::code code);
-
-    // Pass gnash::key::code. Changes m_last_key_event
-    // and removes appropriate SWF keycode from bit array of keys
-    // pressed (_unreleasedKeys)
-    void set_key_up(key::code code);
-    
-    int get_last_key() const;
-
-    /// Responsible for user defined key events handlers only;
-    /// take over both DisplayObjects and non-DisplayObjects object.
-    void notify_listeners(const event_id& key_event_type);
-
 private:
 };
 

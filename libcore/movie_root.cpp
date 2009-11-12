@@ -575,7 +575,9 @@ movie_root::notify_key_event(key::code k, bool down)
 {
     _lastKeyEvent = k;
     const size_t keycode = key::codeMap[k][key::KEY];
-    _unreleasedKeys.set(keycode, down);
+    if (keycode < key::KEYCOUNT) {
+        _unreleasedKeys.set(keycode, down);
+    }
 
 	// Notify DisplayObject key listeners for clip key events
 	notify_key_listeners(k, down);
@@ -591,12 +593,10 @@ movie_root::notify_key_event(key::code k, bool down)
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
 		    if (down) {
-                key->callMethod(NSV::PROP_BROADCAST_MESSAGE,
-                        NSV::PROP_ON_KEY_DOWN);
+                key->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onKeyDown");
 		    }
 		    else {
-                key->callMethod(NSV::PROP_BROADCAST_MESSAGE,
-                        NSV::PROP_ON_KEY_UP);
+                key->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onKeyUp");
 	        }
 	    }
 	    catch (ActionLimitException &e)
@@ -1013,8 +1013,6 @@ void movie_root::cleanupUnloadedListeners(Listeners& ll)
 void
 movie_root::notify_key_listeners(key::code k, bool down)
 {
-	// log_debug("Notifying %d DisplayObject Key listeners", 
-	//  _keyListeners.size());
 
 	Listeners copy = _keyListeners;
 	for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
@@ -1022,17 +1020,14 @@ movie_root::notify_key_listeners(key::code k, bool down)
 	{
 		// sprite, button & input_edit_text DisplayObjects
 		DisplayObject* const ch = *iter;
-		if ( ! ch->unloaded() )
-		{
-			if(down)
-			{
+		if (!ch->unloaded()) {
+			if (down) {
 				// KEY_UP and KEY_DOWN events are unrelated to any key!
 				ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
 				// Pass the unique Gnash key code!
 				ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
 			}
-			else
-			{
+			else {
 				ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
 			}
 		}
@@ -1040,8 +1035,7 @@ movie_root::notify_key_listeners(key::code k, bool down)
 
     assert(testInvariant());
 
-    if ( ! copy.empty() )
-	{
+    if (!copy.empty()) {
 		// process actions queued in the above step
 		processActionQueue();
 	}
@@ -1355,8 +1349,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
         as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
-            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE,
-                    "onResize");
+            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
     }
 }
