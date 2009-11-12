@@ -987,7 +987,7 @@ movie_root::display()
 
 
 
-void movie_root::cleanupUnloadedListeners(CharacterList& ll)
+void movie_root::cleanupUnloadedListeners(Listeners& ll)
 {
     bool needScan;
 
@@ -1006,7 +1006,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
       needScan=false;
 
       // remove unloaded DisplayObject listeners from movie_root
-      for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
+      for (Listeners::iterator iter = ll.begin(); iter != ll.end(); )
       {
           DisplayObject* const ch = *iter;
           if ( ch->unloaded() )
@@ -1040,8 +1040,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 	// log_debug("Notifying %d DisplayObject Key listeners", 
 	//  _keyListeners.size());
 
-	KeyListeners copy = _keyListeners;
-	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
+	Listeners copy = _keyListeners;
+	for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
 		// sprite, button & input_edit_text DisplayObjects
@@ -1072,7 +1072,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 }
 
 void
-movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
+movie_root::add_listener(Listeners& ll, DisplayObject* listener)
 {
 	assert(listener);
 
@@ -1084,7 +1084,7 @@ movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
 
 
 void
-movie_root::remove_listener(CharacterList& ll, DisplayObject* listener)
+movie_root::remove_listener(Listeners& ll, DisplayObject* listener)
 {
 	assert(listener);
 	ll.remove_if(std::bind2nd(std::equal_to<DisplayObject*>(), listener));
@@ -1094,8 +1094,8 @@ void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
-	CharacterList copy = _mouseListeners;
-	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
+	Listeners copy = _mouseListeners;
+	for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
 		DisplayObject* const ch = *iter;

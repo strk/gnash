@@ -1018,11 +1018,7 @@ private:
     void processCompletedLoadMovieRequests();
 
     /// Listeners container
-    typedef std::list<DisplayObject*> CharacterList;
-
-    /// key and mouse listeners container
-    typedef CharacterList KeyListeners;
-    typedef CharacterList MouseListeners;
+    typedef std::list<DisplayObject*> Listeners;
 
     /// Take care of dragging, if needed
     void doMouseDrag();
@@ -1053,17 +1049,17 @@ private:
     }
 
     /// Erase unloaded DisplayObjects from the given listeners list
-    static void cleanupUnloadedListeners(CharacterList& ll);
+    static void cleanupUnloadedListeners(Listeners& ll);
 
     /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
 
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    static void add_listener(CharacterList& ll, DisplayObject* elem);
+    static void add_listener(Listeners& ll, DisplayObject* elem);
 
     /// Remove a listener from the list
-    static void remove_listener(CharacterList& ll, DisplayObject* elem);
+    static void remove_listener(Listeners& ll, DisplayObject* elem);
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -1194,10 +1190,10 @@ private:
     unsigned int _lastTimerId;
 
     /// Characters for listening key events
-    KeyListeners _keyListeners;
+    Listeners _keyListeners;
 
     /// Objects listening for mouse events (down,up,move)
-    MouseListeners _mouseListeners;
+    Listeners _mouseListeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;
