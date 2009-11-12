@@ -54,6 +54,7 @@
 
 #include <boost/thread/mutex.hpp>
 static boost::mutex io_mutex;
+static boost::mutex mem_mutex;
 
 using namespace gnash;
 using namespace std;
@@ -301,7 +302,7 @@ DiskStream::DiskStream(const string &str, int netfd)
 
 DiskStream::~DiskStream()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     if (_filefd) {
         ::close(_filefd);
     }
@@ -340,9 +341,9 @@ DiskStream::fullyPopulated()
 void
 DiskStream::close()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    log_debug("Closing %s on fd #%d", _filespec, _filefd);
+    log_debug("Closing %s on fd #%d, 0x%d", _filespec, _filefd, _dataptr);
 
     if (_filefd) {
         ::close(_filefd);
@@ -459,6 +460,10 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 // 	    size = _filesize;
 // 	}
 
+	// lock in case two threads try to load the same file at the
+	// same time.
+	boost::mutex::scoped_lock lock(mem_mutex);
+	
 #ifdef _WIN32
 	HANDLE handle = CreateFileMapping((HANDLE)_get_osfhandle(_filefd), NULL,
 					  PAGE_WRITECOPY, 0, 0, NULL);
@@ -737,9 +742,9 @@ DiskStream::play(int netfd, bool flag)
 #else
 		  ret = net.writeNet(netfd, (_dataptr + _offset), _pagesize);
 		  if (ret != _pagesize) {
-		      log_error("In %s(%d): couldn't write %d of bytes of data to net fd #%d!",
-				__FUNCTION__, __LINE__, _pagesize,
-				strerror(errno), netfd);
+		      log_error("In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s",
+				__FUNCTION__, __LINE__, _pagesize, netfd,
+				ret, strerror(errno));
 		  }
 		  _offset += _pagesize;
 #endif

@@ -145,7 +145,7 @@ public:
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
-    boost::uint8_t *processHeaderFields(amf::Buffer &buf);
+    boost::uint8_t *processHeaderFields(amf::Buffer *buf);
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
@@ -280,6 +280,8 @@ public:
     
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }
+    void keepAlive(bool x) { _keepalive = x; };
+    
     int getMaxRequests() { return _max_requests; }
     int getFileSize() { return _filesize; }
     std::string &getFilespec() { return _filespec; }
@@ -335,6 +337,8 @@ protected:
     int			_index;
     int			_max_requests;
     std::string		_docroot;
+
+    bool		_close;
 };  
 
 // This is the thread for all incoming HTTP connections for the server
