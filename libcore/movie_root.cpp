@@ -35,7 +35,6 @@
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
 #include "Global_as.h"
-#include "flash/ui/Keyboard_as.h"
 #include "utf8.h"
 #include "LoadableObject.h"
 #include "IOChannel.h"
@@ -83,7 +82,6 @@ namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
-    Keyboard_as* getKeyObject(movie_root& mr);
 }
 
 }
@@ -122,6 +120,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_mouse_y(0),
 	m_mouse_buttons(0),
 	_lastTimerId(0),
+	_lastKeyEvent(key::INVALID),
 	_currentFocus(0),
 	m_drag_state(),
 	_movies(),
@@ -571,63 +570,39 @@ movie_root::notify_mouse_moved(int x, int y)
 }
 
 
-Keyboard_as*
-movie_root::notify_global_key(key::code k, bool down)
-{
-    // NOTE: we don't check SWF version here
-    //       because even if the top-level movie was
-    //       an SWF4, it could have loaded an SWF5+
-    //       which would need to query Key object.
-    //       Testcase: http://www.ferryhalim.com/orisinal/g3/00dog.swf 
-
-	Keyboard_as* keyobject = getKeyObject(*this);
-	if (keyobject) {
-		if (down) keyobject->set_key_down(k);
-		else keyobject->set_key_up(k);
-	}
-	else
-	{
-		log_error("gnash::notify_key_event(): _global.Key doesn't "
-				"exist, or isn't the expected built-in");
-	}
-
-	return keyobject;
-}
-
 bool
 movie_root::notify_key_event(key::code k, bool down)
 {
-	//
-	// First of all, notify the _global.Key object about key event
-	//
-	Keyboard_as* global_key = notify_global_key(k, down);
+    _lastKeyEvent = k;
+    const size_t keycode = key::codeMap[k][key::KEY];
+    _unreleasedKeys.set(keycode, down);
 
 	// Notify DisplayObject key listeners for clip key events
 	notify_key_listeners(k, down);
 
 	// Notify both DisplayObject and non-DisplayObject Key listeners
-	//	for user defined handerlers.
-	if (global_key)
-	{
-	    try
-	    {
+	//	for user defined handers.
+    as_object* key = getBuiltinObject(*this, NSV::CLASS_KEY);
+	if (key) {
+
+	    try {
 	        // Can throw an action limit exception if the stack limit is 0 or 1,
 	        // i.e. if the stack is at the limit before it contains anything.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-		    if(down)
-		    {
-			    global_key->notify_listeners(event_id::KEY_DOWN);
-			    global_key->notify_listeners(event_id::KEY_PRESS);
+		    if (down) {
+                key->callMethod(NSV::PROP_BROADCAST_MESSAGE,
+                        NSV::PROP_ON_KEY_DOWN);
 		    }
-		    else
-		    {
-			    global_key->notify_listeners(event_id::KEY_UP);
+		    else {
+                key->callMethod(NSV::PROP_BROADCAST_MESSAGE,
+                        NSV::PROP_ON_KEY_UP);
 	        }
 	    }
 	    catch (ActionLimitException &e)
 	    {
-            log_error(_("ActionLimits hit notifying key listeners: %s."), e.what());
+            log_error(_("ActionLimits hit notifying key listeners: %s."),
+                    e.what());
             clearActionQueue();
 	    }
 	}
@@ -1035,7 +1010,8 @@ void movie_root::cleanupUnloadedListeners(Listeners& ll)
     
 }
 
-void movie_root::notify_key_listeners(key::code k, bool down)
+void
+movie_root::notify_key_listeners(key::code k, bool down)
 {
 	// log_debug("Notifying %d DisplayObject Key listeners", 
 	//  _keyListeners.size());
@@ -2582,18 +2558,6 @@ getNearestObject(const DisplayObject* o)
         if (isReferenceable(*o)) return o;
         o = o->get_parent();
     }
-}
-
-Keyboard_as*
-getKeyObject(movie_root& mr)
-{
-    Global_as& gl = *mr.getVM().getGlobal();
-
-    as_value kval;
-    if (!gl.get_member(NSV::CLASS_KEY, &kval)) return 0;
-
-    as_object* obj = kval.to_object(gl);
-    return dynamic_cast<Keyboard_as*>(obj);
 }
 
 as_object*

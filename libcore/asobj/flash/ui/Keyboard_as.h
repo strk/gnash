@@ -61,10 +61,6 @@ public:
     void notify_listeners(const event_id& key_event_type);
 
 private:
-    /// bit-array for recording the unreleased keys
-    std::bitset<key::KEYCOUNT> _unreleasedKeys;   
-
-    int _lastKeyEvent;
 };
 
 void registerKeyboardNative(as_object& global);

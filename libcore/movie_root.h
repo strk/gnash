@@ -157,6 +157,8 @@ public:
         
     typedef std::list<LoadCallback> LoadCallbacks;
 
+    typedef std::bitset<key::KEYCOUNT> Keys;
+
     /// Default constructor
     //
     /// Make sure to call setRootMovie() 
@@ -737,6 +739,13 @@ public:
     ///   returned
     bool isLevelTarget(const std::string& name, unsigned int& levelno);
 
+    key::code lastKeyEvent() const {
+        return _lastKeyEvent;
+    }
+
+    const std::bitset<key::KEYCOUNT>& unreleasedKeys() const {
+        return _unreleasedKeys;
+    }
 
     /// Set a filedescriptor to use for host application requests
     /// (for browser communication mostly)
@@ -1188,6 +1197,11 @@ private:
 
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
+
+    /// bit-array for recording the unreleased keys
+    std::bitset<key::KEYCOUNT> _unreleasedKeys;   
+
+    key::code _lastKeyEvent;
 
     /// Characters for listening key events
     Listeners _keyListeners;
