@@ -1,4 +1,15 @@
+20??-??-??  
+
+Gnash 0.8.6
+Improvements since 0.8.5 release are:
+
+ * Asynchronous load of all resources (XML, variables, movies, bitmaps)
+
+
 2009-03-04 Rob Savoye  <rob@welcomehome.org>
+
+Gnash 0.8.5 released !
+Improvements since 0.8.4 release are:
 
 Due to better XML parsing compatibility and a minor fix to NetConnection,
 many more video sites work than in the last release. Support for new
