@@ -47,14 +47,15 @@ public:
 
     // These are for the protocol itself
     boost::shared_ptr<amf::Buffer> processClientRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processGetRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processPostRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processPutRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processConnectRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processOptionsRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processHeadRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processTraceRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processClientRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processGetRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processPostRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processPutRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processConnectRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processOptionsRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processHeadRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processTraceRequest(int fd, amf::Buffer *buf);
 
     // Handle the response for the request.
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);

@@ -89,35 +89,47 @@ HTTPServer::processClientRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::shared_ptr<amf::Buffer> buf(_que.peek());
+    amf::Buffer *buf = new amf::Buffer;
     boost::shared_ptr<amf::Buffer> result;
+
+    result = processClientRequest(fd, buf);
+
+    return result;
+}
+
+boost::shared_ptr<amf::Buffer>
+HTTPServer::processClientRequest(int fd, amf::Buffer *buf)
+{
+    GNASH_REPORT_FUNCTION;
     
+    boost::shared_ptr<amf::Buffer> result;
+
     if (buf) {
 	_cmd = extractCommand(buf->reference());
 	switch (_cmd) {
 	  case HTTP::HTTP_GET:
-	      result = processGetRequest(fd);
+	      result = processGetRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_POST:
-	      result = processPostRequest(fd);
+	      result = processPostRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_HEAD:
-	      result = processHeadRequest(fd);
+	      result = processHeadRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_CONNECT:
-	      result = processConnectRequest(fd);
+	      result = processConnectRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_TRACE:
-	      result = processTraceRequest(fd);
+	      result = processTraceRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_OPTIONS:
-	      result = processOptionsRequest(fd);
+	      result = processOptionsRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_PUT:
-	      result = processPutRequest(fd);
+	      result = processPutRequest(fd, buf);
 	      break;
 	  case HTTP::HTTP_DELETE:
-	      result = processDeleteRequest(fd);
+	      result = processDeleteRequest(fd, buf);
 	      break;
 	  default:
 	      break;
@@ -129,7 +141,7 @@ HTTPServer::processClientRequest(int fd)
 
 // A GET request asks the server to send a file to the client
 boost::shared_ptr<amf::Buffer> 
-HTTPServer::processGetRequest(int fd)
+HTTPServer::processGetRequest(int fd, amf::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -140,37 +152,35 @@ HTTPServer::processGetRequest(int fd)
 //    _handler->wait();
 //    _handler->dump();
 
+    
     cerr << "QUE = " << _que.size() << endl;
-    boost::shared_ptr<amf::Buffer> buf;
     
-    if (_que.size() == 0) {
-	return buf;
-    }
-    
-    buf = _que.pop();
 //    cerr << "YYYYYYY: " << (char *)buf->reference() << endl;
 //    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
     if (buf == 0) {
      //	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	log_debug("Que empty, net connection dropped for fd #%d", fd);
+	boost::shared_ptr<amf::Buffer> buf;
 	return buf;
     }
     
     clearHeader();
-    processHeaderFields(*buf);
+    processHeaderFields(buf);
 
+    _docroot = crcfile.getDocumentRoot();
+    
     string url = _docroot + _filespec;
+
     // See if the file is in the cache and already opened.
     boost::shared_ptr<DiskStream> filestream(cache.findFile(_filespec));
     if (filestream) {
-	log_debug("FIXME: found file %s in cache!", _filespec);
+	log_debug("FIXME: found filestream %s in cache!", _filespec);
+	filestream->dump();
     } else {
 	filestream.reset(new DiskStream);
-	cache.addFile(_filespec, filestream);
-	cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
-	
-//	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
+	log_network("New filestream %s", _filespec);
+	// cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
 	// Oopen the file and read the first chunk into memory
 	if (filestream->open(url)) {
@@ -180,10 +190,15 @@ HTTPServer::processGetRequest(int fd)
 	    if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
 		formatErrorResponse(HTTPServer::NOT_FOUND);
 	    } else {
-		cache.addPath(_filespec, filestream->getFilespec());
-		cache.addFile(_filespec, filestream);
+		// cache.addPath(_filespec, filestream->getFilespec());
+		// cache.addFile(_filespec, filestream);
 	    }
 	}
+	// Close the file but least resident for now.
+	if (filestream->fullyPopulated()) {
+	    filestream->close();
+	}
+	cache.addFile(_filespec, filestream);
     }
     
     // Send the reply
@@ -213,14 +228,18 @@ HTTPServer::processGetRequest(int fd)
 #endif
     }
     
-    return buf;
+    boost::shared_ptr<amf::Buffer> result(new amf::Buffer(buf->size()));
+
+    *result = buf;
+    
+    return result;
 }
 
 // A POST request asks sends a data from the client to the server. After processing
 // the header like we normally do, we then read the amount of bytes specified by
 // the "content-length" field, and then write that data to disk, or decode the amf.
 boost::shared_ptr<amf::Buffer>
-HTTPServer::processPostRequest(int fd)
+HTTPServer::processPostRequest(int fd, amf::Buffer *bufFIXME)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -240,7 +259,7 @@ HTTPServer::processPostRequest(int fd)
 //    cerr << __FUNCTION__ << buf->allocated() << " : " << hexify(buf->reference(), buf->allocated(), true) << endl;
     
     clearHeader();
-    boost::uint8_t *data = processHeaderFields(*buf);
+    boost::uint8_t *data = processHeaderFields(buf.get());
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
     boost::shared_ptr<amf::Buffer> content(new amf::Buffer(length));
     int ret = 0;
@@ -312,7 +331,7 @@ HTTPServer::processPostRequest(int fd)
 }
 
 boost::shared_ptr<amf::Buffer>
-HTTPServer::processPutRequest(int /* fd */)
+HTTPServer::processPutRequest(int /* fd */, amf::Buffer */* buf */)
 {
     boost::shared_ptr<amf::Buffer> buf;
 //    GNASH_REPORT_FUNCTION;
@@ -322,7 +341,7 @@ HTTPServer::processPutRequest(int /* fd */)
 }
 
 boost::shared_ptr<amf::Buffer> 
-HTTPServer::processDeleteRequest(int /* fd */)
+HTTPServer::processDeleteRequest(int /* fd */, amf::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf;
@@ -332,7 +351,7 @@ HTTPServer::processDeleteRequest(int /* fd */)
 }
 
 boost::shared_ptr<amf::Buffer> 
-HTTPServer::processConnectRequest(int /* fd */)
+HTTPServer::processConnectRequest(int /* fd */, amf::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf;
@@ -342,7 +361,7 @@ HTTPServer::processConnectRequest(int /* fd */)
 }
 
 boost::shared_ptr<amf::Buffer>
-HTTPServer::processOptionsRequest(int /* fd */)
+HTTPServer::processOptionsRequest(int /* fd */, amf::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf;
@@ -352,7 +371,7 @@ HTTPServer::processOptionsRequest(int /* fd */)
 }
 
 boost::shared_ptr<amf::Buffer>
-HTTPServer::processHeadRequest(int /* fd */)
+HTTPServer::processHeadRequest(int /* fd */, amf::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf;
@@ -362,7 +381,7 @@ HTTPServer::processHeadRequest(int /* fd */)
 }
 
 boost::shared_ptr<amf::Buffer>
-HTTPServer::processTraceRequest(int /* fd */)
+HTTPServer::processTraceRequest(int /* fd */, amf::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf;
@@ -822,7 +841,7 @@ HTTPServer::extractCommand(boost::uint8_t *data)
 	    // This is fine as long as end is within the buffer.
 	    _filespec = std::string(start, end);
 	}
-	log_debug("Requesting file: \"%s\"", _filespec);
+	// log_debug("Requesting file: \"%s\"", _filespec);
 
 	// The third field is always the HTTP version
 	// The version is the last field and is the protocol name
@@ -831,7 +850,7 @@ HTTPServer::extractCommand(boost::uint8_t *data)
 	// in it. It's actually two separate integers.
 	_version.major = *(end+6) - '0';
 	_version.minor = *(end+8) - '0';
-	log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+	// log_debug (_("Version: %d.%d"), _version.major, _version.minor);
     }
 
     return cmd;
@@ -905,7 +924,7 @@ HTTPServer::processHeaderFields(amf::Buffer &buf)
 		    // in it. It's actually two separate integers.
 		    _version.major = i->at(pos+5) - '0';
 		    _version.minor = i->at(pos+7) - '0';
-		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+		    // log_debug (_("Version: %d.%d"), _version.major, _version.minor);
 		    // the filespec in the request is the middle field, deliminated
 		    // by a space on each end.
 		    if (params != string::npos) {
@@ -915,7 +934,7 @@ HTTPServer::processHeaderFields(amf::Buffer &buf)
 		    } else {
 			_filespec = i->substr(start+1, pos-start-2);
 		    }
-		    log_debug("Requesting file: \"%s\"", _filespec);
+		    // log_debug("Requesting file: \"%s\"", _filespec);
 
 		    // HTTP 1.1 enables persistant network connections
 		    // by default.
@@ -947,21 +966,18 @@ http_handler(Network::thread_params_t *args)
     GNASH_REPORT_FUNCTION;
 
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    HTTPServer *www = reinterpret_cast<HTTPServer *>(args->entry);
-    // HTTPServer *www = new HTTPServer;
+    amf::Buffer *buf = args->buffer;
+    boost::shared_ptr<HTTPServer> www(new HTTPServer); // = hand->getHTTPHandler(args->netfd);
     
     string url, parameters;
-    bool result = false;    
-    bool done = false;
+    // by default, only look once unless changed later
+    bool done = true;
 
-    log_network(_("Starting HTTP Handler for fd #%d, tid %d"),
-	      args->netfd, args->tid);
-    
-    www->setDocRoot(crcfile.getDocumentRoot());
-    log_network("Docroot for HTTP files is %s", crcfile.getDocumentRoot());
+    // www->setDocRoot(crcfile.getDocumentRoot());
+    // log_network("Docroot for HTTP files is %s", crcfile.getDocumentRoot());
+    log_network("Processing HTTP data for fd #%d", args->netfd);
 
-    log_network("Starting to wait for data in net for fd #%d", args->netfd);
-
+#if 0
     // If we have active disk streams, send those packets first.
     // 0 is a reserved stream, so we start with 1, as the reserved
     // stream isn't one we care about here.
@@ -985,6 +1001,7 @@ http_handler(Network::thread_params_t *args)
 	    //     return result;
 	}
     }
+#endif
     
     // Wait for data, and when we get it, process it.
     do {
@@ -993,19 +1010,21 @@ http_handler(Network::thread_params_t *args)
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif
-
-	// See if we have any messages waiting
-	if (www->recvMsg(args->netfd) == 0) {
-	    log_debug("Net HTTP server failed to read from fd #%d...", args->netfd);
-	    return false;
-	    done = true;
+	
+	if (buf->allocated()) {
+	    log_network("FIXME: Existing data in packet!");
+	} else {
+	    log_network("FIXME: No existing data in packet!");    
+	    // See if we have any messages waiting
+	    if (www->recvMsg(args->netfd) == 0) {
+		log_debug("Net HTTP server failed to read from fd #%d...", args->netfd);
+		return false;
+	    }
 	}
 
 	// Process incoming messages
-	if (!www->processClientRequest(args->netfd)) {
+	if (!www->processClientRequest(args->netfd, buf)) {
 	    log_network("Net HTTP server done for fd #%d...", args->netfd);
-	    result = false;
-	    done = true;
 	}
 //	www->dump();
 	if ((www->getField("content-type") == "application/x-amf")
@@ -1032,11 +1051,8 @@ http_handler(Network::thread_params_t *args)
 	// connection.
 	if (!www->keepAlive()) {
 	    log_debug("Keep-Alive is off", www->keepAlive());
-	    result = false;
-	    done = true;
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
-	    result = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
@@ -1047,11 +1063,9 @@ http_handler(Network::thread_params_t *args)
 #endif
     } while(done != true);
     
-//    hand->notify();
-    
     log_debug("http_handler all done now finally...");
 
-    return result;
+    return www->keepAlive();    
 } // end of httphandler
 } // end of extern C
     
