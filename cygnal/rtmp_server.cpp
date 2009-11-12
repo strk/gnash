@@ -1245,7 +1245,7 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
 	
 //	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
-	// Oopen the file and read the first chunk into memory
+	// Open the file and read the first chunk into memory
 	if (!filestream->open(filespec)) {
 	    return false;
 	} else {
