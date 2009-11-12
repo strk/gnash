@@ -202,19 +202,6 @@ key_is_toggled(const fn_call& /* fn */)
     return as_value(false);
 }
 
-#ifdef GNASH_USE_GC
-void
-Keyboard_as::markReachableResources() const
-{
-    markAsObjectReachable();
-    for (Listeners::const_iterator i=_listeners.begin(), e=_listeners.end();
-                i != e; ++i)
-    {
-        (*i)->setReachable();
-    }
-}
-#endif // def GNASH_USE_GC
-
 void
 registerKeyboardNative(as_object& global)
 {

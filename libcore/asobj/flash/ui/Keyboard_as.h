@@ -37,13 +37,6 @@ class event_id;
 
 class Keyboard_as : public as_object
 {
-protected:
-
-#ifdef GNASH_USE_GC
-    // Mark all key listeners as reachable
-    void markReachableResources() const;
-#endif // def GNASH_USE_GC
-
 public:
 
     Keyboard_as();	
@@ -70,9 +63,6 @@ public:
 private:
     /// bit-array for recording the unreleased keys
     std::bitset<key::KEYCOUNT> _unreleasedKeys;   
-
-    typedef std::list<boost::intrusive_ptr<as_object> > Listeners;
-    Listeners _listeners;
 
     int _lastKeyEvent;
 };
