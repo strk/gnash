@@ -109,7 +109,6 @@ namespace gnash {
     class Timer;
     class MovieClip;
     class VirtualClock;
-    class Keyboard_as;
     class IOChannel;
 }
 
@@ -1046,9 +1045,6 @@ private:
     
     /// Execute expired timers
     void executeTimers();
-
-    /// Notify the global Key ActionScript object about a key status change
-    Keyboard_as* notify_global_key(key::code k, bool down);
 
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
