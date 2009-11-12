@@ -61,14 +61,10 @@
 #include "DisplayObjectContainer.h"
 #include "Global_as.h"
 
-// TODO: get rid of this include.
-#include "flash/display/MovieClip_as.h"
-
 #include <vector>
 #include <string>
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
-//#include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 
 namespace gnash {

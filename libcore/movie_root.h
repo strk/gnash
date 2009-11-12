@@ -109,7 +109,6 @@ namespace gnash {
     class Timer;
     class MovieClip;
     class VirtualClock;
-    class Keyboard_as;
     class IOChannel;
 }
 
@@ -156,6 +155,8 @@ public:
     };
         
     typedef std::list<LoadCallback> LoadCallbacks;
+
+    typedef std::bitset<key::KEYCOUNT> Keys;
 
     /// Default constructor
     //
@@ -439,13 +440,13 @@ public:
     /// Push a new DisplayObject listener for key events
     void add_key_listener(DisplayObject* listener)
     {
-        add_listener(m_key_listeners, listener);
+        add_listener(_keyListeners, listener);
     }
 
     /// Remove a DisplayObject listener for key events
     void remove_key_listener(DisplayObject* listener)
     {
-        remove_listener(m_key_listeners, listener);
+        remove_listener(_keyListeners, listener);
     }
 
     /// Notify still loaded DisplayObject listeners for mouse events
@@ -454,13 +455,13 @@ public:
     /// Push a new DisplayObject listener for mouse events
     void add_mouse_listener(DisplayObject* listener)
     {
-        add_listener(m_mouse_listeners, listener);
+        add_listener(_mouseListeners, listener);
     }
 
     /// Remove a DisplayObject listener for mouse events
     void remove_mouse_listener(DisplayObject* listener)
     {
-        remove_listener(m_mouse_listeners, listener);
+        remove_listener(_mouseListeners, listener);
     }
 
     /// Get the DisplayObject having focus
@@ -625,8 +626,8 @@ public:
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
-    /// - Key listeners (m_key_listeners)
-    /// - Mouse listeners (m_mouse_listeners)
+    /// - Key listeners (_keyListeners)
+    /// - Mouse listeners (_mouseListeners)
     /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
@@ -737,6 +738,13 @@ public:
     ///   returned
     bool isLevelTarget(const std::string& name, unsigned int& levelno);
 
+    key::code lastKeyEvent() const {
+        return _lastKeyEvent;
+    }
+
+    const std::bitset<key::KEYCOUNT>& unreleasedKeys() const {
+        return _unreleasedKeys;
+    }
 
     /// Set a filedescriptor to use for host application requests
     /// (for browser communication mostly)
@@ -875,22 +883,6 @@ public:
 
     const RunResources& runResources() const { return _runResources; }
 
-    /// Add a DisplayObject child on top depth
-    //
-    /// @param ch
-    ///     The child DisplayObject to add
-    void addChild(DisplayObject* ch);
-
-    /// Add a DisplayObject child at given depth
-    //
-    /// @param ch
-    ///     The child DisplayObject to add
-    ///
-    /// @param depth
-    ///     The depth to add the child to
-    ///
-    void addChildAt(DisplayObject* ch, int depth);
-	
 private:
 
     /// Set the root movie, replacing the current one if any.
@@ -1034,11 +1026,7 @@ private:
     void processCompletedLoadMovieRequests();
 
     /// Listeners container
-    typedef std::list<DisplayObject*> CharacterList;
-
-    /// key and mouse listeners container
-    typedef CharacterList KeyListeners;
-    typedef CharacterList MouseListeners;
+    typedef std::list<DisplayObject*> Listeners;
 
     /// Take care of dragging, if needed
     void doMouseDrag();
@@ -1058,39 +1046,25 @@ private:
     /// Execute expired timers
     void executeTimers();
 
-    /// Notify the global Key ActionScript object about a key status change
-    Keyboard_as* notify_global_key(key::code k, bool down);
-
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
     {
-        cleanupUnloadedListeners(m_key_listeners);
-        cleanupUnloadedListeners(m_mouse_listeners);
+        cleanupUnloadedListeners(_keyListeners);
+        cleanupUnloadedListeners(_mouseListeners);
     }
 
     /// Erase unloaded DisplayObjects from the given listeners list
-    static void cleanupUnloadedListeners(CharacterList& ll);
+    static void cleanupUnloadedListeners(Listeners& ll);
 
-    /// Cleanup references to unloaded DisplayObjects and run the garbage collector.
+    /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
 
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    static void add_listener(CharacterList& ll, DisplayObject* elem);
+    static void add_listener(Listeners& ll, DisplayObject* elem);
 
     /// Remove a listener from the list
-    static void remove_listener(CharacterList& ll, DisplayObject* elem);
-
-    /// Return the current Stage object
-    //
-    /// Can return NULL if it's been deleted or not
-    /// yet initialized.
-    as_object* getStageObject();
-
-    /// Return the singleton Selection object
-    //
-    /// Can return 0 if it's been deleted.
-    as_object* getSelectionObject() const;
+    static void remove_listener(Listeners& ll, DisplayObject* elem);
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -1136,12 +1110,6 @@ private:
     /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
     /// its name to _level<num>
     void setLevel(unsigned int num, Movie* movie);
-
-    /// Return the global Key object 
-    Keyboard_as* getKeyObject();
-
-    /// Return the global Mouse object 
-    as_object* getMouseObject();
 
     /// Boundaries of the Stage are always world boundaries
     /// and are only invalidated by changes in the background
@@ -1226,16 +1194,19 @@ private:
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
 
+    /// bit-array for recording the unreleased keys
+    std::bitset<key::KEYCOUNT> _unreleasedKeys;   
+
+    key::code _lastKeyEvent;
+
     /// Characters for listening key events
-    KeyListeners m_key_listeners;
+    Listeners _keyListeners;
 
     /// Objects listening for mouse events (down,up,move)
-    MouseListeners m_mouse_listeners;
+    Listeners _mouseListeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;
-
-    float m_time_remainder;
 
     /// @todo fold this into m_mouse_button_state?
     drag_state m_drag_state;

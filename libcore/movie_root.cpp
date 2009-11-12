@@ -35,7 +35,6 @@
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
 #include "Global_as.h"
-#include "flash/ui/Keyboard_as.h"
 #include "utf8.h"
 #include "LoadableObject.h"
 #include "IOChannel.h"
@@ -45,6 +44,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <bitset>
 #include <typeinfo>
 #include <cassert>
 #include <functional> // std::bind2nd, std::equal_to
@@ -82,6 +82,7 @@ namespace gnash {
 namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
+    as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
 }
 
 }
@@ -120,8 +121,8 @@ movie_root::movie_root(const movie_definition& def,
 	m_mouse_y(0),
 	m_mouse_buttons(0),
 	_lastTimerId(0),
+	_lastKeyEvent(key::INVALID),
 	_currentFocus(0),
-	m_time_remainder(0.0f),
 	m_drag_state(),
 	_movies(),
 	_rootMovie(0),
@@ -520,8 +521,8 @@ movie_root::clear()
 	clearLoadMovieRequests();
 
 	// remove key/mouse listeners
-	m_key_listeners.clear();
-	m_mouse_listeners.clear();
+	_keyListeners.clear();
+	_mouseListeners.clear();
 
 	// Cleanup the stack.
 	_vm.getStack().clear();
@@ -534,33 +535,6 @@ movie_root::clear()
 	setInvalidated();
 }
 
-as_object*
-movie_root::getSelectionObject() const
-{
-    // This can never be null, though it is possible to override the
-    // reference to _global in AS2. If that makes a difference, we should
-    // look up the object by path (_global.Selection) rather than using
-    // the stored global object.
-    Global_as& gl = *_vm.getGlobal();
-
-    as_value s;
-    if (!gl.get_member(NSV::CLASS_SELECTION, &s)) return 0;
-    
-    as_object* sel = s.to_object(gl);
-   
-    return sel;
-}
-
-as_object*
-movie_root::getStageObject()
-{
-	as_value v;
-	assert (VM::isInitialized()); 
-	Global_as& gl = *_vm.getGlobal();
-	if (!gl.get_member(NSV::PROP_iSTAGE, &v) ) return 0;
-	return v.to_object(gl);
-}
-		
 void
 movie_root::set_display_viewport(int x0, int y0, int w, int h)
 {
@@ -573,7 +547,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 
 	if (_scaleMode == noScale) {
 		//log_debug("Rescaling disabled");
-		as_object* stage = getStageObject();
+		as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
 		if (stage) {
             log_debug("notifying Stage listeners about a resize");
             stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
@@ -596,86 +570,40 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-Keyboard_as*
-movie_root::getKeyObject()
-{
-    Global_as& gl = *_vm.getGlobal();
-
-    as_value kval;
-    if (!gl.get_member(NSV::CLASS_KEY, &kval)) return 0;
-
-    as_object* obj = kval.to_object(gl);
-    return dynamic_cast<Keyboard_as*>(obj);
-}
-
-as_object*
-movie_root::getMouseObject()
-{
-    Global_as& gl = *_vm.getGlobal();
-
-    as_value val;
-    if (!gl.get_member(NSV::CLASS_MOUSE, &val)) return 0;
-    return val.to_object(gl);
-}
-
-
-Keyboard_as*
-movie_root::notify_global_key(key::code k, bool down)
-{
-    // NOTE: we don't check SWF version here
-    //       because even if the top-level movie was
-    //       an SWF4, it could have loaded an SWF5+
-    //       which would need to query Key object.
-    //       Testcase: http://www.ferryhalim.com/orisinal/g3/00dog.swf 
-
-	Keyboard_as* keyobject = getKeyObject();
-	if (keyobject) {
-		if (down) keyobject->set_key_down(k);
-		else keyobject->set_key_up(k);
-	}
-	else
-	{
-		log_error("gnash::notify_key_event(): _global.Key doesn't "
-				"exist, or isn't the expected built-in");
-	}
-
-	return keyobject;
-}
 
 bool
 movie_root::notify_key_event(key::code k, bool down)
 {
-	//
-	// First of all, notify the _global.Key object about key event
-	//
-	Keyboard_as* global_key = notify_global_key(k, down);
+    _lastKeyEvent = k;
+    const size_t keycode = key::codeMap[k][key::KEY];
+    if (keycode < key::KEYCOUNT) {
+        _unreleasedKeys.set(keycode, down);
+    }
 
 	// Notify DisplayObject key listeners for clip key events
 	notify_key_listeners(k, down);
 
 	// Notify both DisplayObject and non-DisplayObject Key listeners
-	//	for user defined handerlers.
-	if (global_key)
-	{
-	    try
-	    {
+	//	for user defined handers.
+    as_object* key = getBuiltinObject(*this, NSV::CLASS_KEY);
+	if (key) {
+
+	    try {
 	        // Can throw an action limit exception if the stack limit is 0 or 1,
 	        // i.e. if the stack is at the limit before it contains anything.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-		    if(down)
-		    {
-			    global_key->notify_listeners(event_id::KEY_DOWN);
-			    global_key->notify_listeners(event_id::KEY_PRESS);
+		    if (down) {
+                key->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onKeyDown");
 		    }
-		    else
-		    {
-			    global_key->notify_listeners(event_id::KEY_UP);
+		    else {
+                key->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onKeyUp");
 	        }
 	    }
 	    catch (ActionLimitException &e)
 	    {
-            log_error(_("ActionLimits hit notifying key listeners: %s."), e.what());
+            log_error(_("ActionLimits hit notifying key listeners: %s."),
+                    e.what());
             clearActionQueue();
 	    }
 	}
@@ -1035,7 +963,7 @@ movie_root::display()
 
 
 
-void movie_root::cleanupUnloadedListeners(CharacterList& ll)
+void movie_root::cleanupUnloadedListeners(Listeners& ll)
 {
     bool needScan;
 
@@ -1054,7 +982,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
       needScan=false;
 
       // remove unloaded DisplayObject listeners from movie_root
-      for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
+      for (Listeners::iterator iter = ll.begin(); iter != ll.end(); )
       {
           DisplayObject* const ch = *iter;
           if ( ch->unloaded() )
@@ -1083,28 +1011,24 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
     
 }
 
-void movie_root::notify_key_listeners(key::code k, bool down)
+void
+movie_root::notify_key_listeners(key::code k, bool down)
 {
-	// log_debug("Notifying %d DisplayObject Key listeners", 
-	//  m_key_listeners.size());
 
-	KeyListeners copy = m_key_listeners;
-	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
+	Listeners copy = _keyListeners;
+	for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
 		// sprite, button & input_edit_text DisplayObjects
 		DisplayObject* const ch = *iter;
-		if ( ! ch->unloaded() )
-		{
-			if(down)
-			{
+		if (!ch->unloaded()) {
+			if (down) {
 				// KEY_UP and KEY_DOWN events are unrelated to any key!
 				ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
 				// Pass the unique Gnash key code!
 				ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
 			}
-			else
-			{
+			else {
 				ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
 			}
 		}
@@ -1112,15 +1036,14 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 
     assert(testInvariant());
 
-    if ( ! copy.empty() )
-	{
+    if (!copy.empty()) {
 		// process actions queued in the above step
 		processActionQueue();
 	}
 }
 
 void
-movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
+movie_root::add_listener(Listeners& ll, DisplayObject* listener)
 {
 	assert(listener);
 
@@ -1132,7 +1055,7 @@ movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
 
 
 void
-movie_root::remove_listener(CharacterList& ll, DisplayObject* listener)
+movie_root::remove_listener(Listeners& ll, DisplayObject* listener)
 {
 	assert(listener);
 	ll.remove_if(std::bind2nd(std::equal_to<DisplayObject*>(), listener));
@@ -1142,8 +1065,8 @@ void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
-	CharacterList copy = m_mouse_listeners;
-	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
+	Listeners copy = _mouseListeners;
+	for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
 		DisplayObject* const ch = *iter;
@@ -1153,7 +1076,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		}
 	}
 
-	as_object* mouseObj = getMouseObject();
+	as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
 	if (mouseObj) {
 
         try {
@@ -1227,7 +1150,7 @@ movie_root::setFocus(DisplayObject* to)
         getObject(to)->callMethod(NSV::PROP_ON_SET_FOCUS, getObject(from));
     }
 
-    as_object* sel = getSelectionObject();
+    as_object* sel = getBuiltinObject(*this, NSV::CLASS_SELECTION);
 
     // Notify Selection listeners with previous and new focus as arguments.
     // Either argument may be null.
@@ -1424,11 +1347,10 @@ movie_root::setStageScaleMode(ScaleMode sm)
     callInterface("Stage.align");    
 
     if (notifyResize) {
-        as_object* stage = getStageObject();
+        as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
-            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE,
-                    "onResize");
+            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
     }
 }
@@ -1438,7 +1360,7 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
-    as_object* stage = getStageObject();
+    as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
     if (stage) {
         log_debug("notifying Stage listeners about fullscreen state");
         const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;
@@ -1786,8 +1708,8 @@ movie_root::markReachableResources() const
     // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded
     // key listeners. The remaining ones should be marked by their parents
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=m_key_listeners.begin(),
-            e=m_key_listeners.end(); i!=e; ++i) {
+    for (LiveChars::const_iterator i=_keyListeners.begin(),
+            e=_keyListeners.end(); i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
@@ -1796,8 +1718,8 @@ movie_root::markReachableResources() const
     // unloaded mouse listeners. The remaining ones should be marked by
     // their parents
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i = m_mouse_listeners.begin(),
-            e = m_mouse_listeners.end(); i!=e; ++i) {
+    for (LiveChars::const_iterator i = _mouseListeners.begin(),
+            e = _mouseListeners.end(); i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
@@ -2480,20 +2402,6 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 	return "<no iface to hosting app>";
 }
 
-void
-movie_root::addChild(DisplayObject* ch)
-{
-    setInvalidated();
-    _rootMovie->addChild(ch);
-}
-
-void
-movie_root::addChildAt(DisplayObject* ch, int depth)
-{
-    setInvalidated();
-    _rootMovie->addChildAt(ch, depth);
-}
-
 short
 stringToStageAlign(const std::string& str)
 {
@@ -2645,6 +2553,17 @@ getNearestObject(const DisplayObject* o)
         o = o->get_parent();
     }
 }
+
+as_object*
+getBuiltinObject(movie_root& mr, string_table::key cl)
+{
+    Global_as& gl = *mr.getVM().getGlobal();
+
+    as_value val;
+    if (!gl.get_member(cl, &val)) return 0;
+    return val.to_object(gl);
+}
+
 
 }
 
