@@ -53,10 +53,6 @@ public:
     ///
     /// @@ this explanation/functionality could be clearer!
     ///
-    /// This calls add_ref() on the newly created definition; call
-    /// drop_ref() when you're done with it.
-    /// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
-    ///
     /// If real_url is given, the movie's url will be set to that value.
     ///
     /// @param url
