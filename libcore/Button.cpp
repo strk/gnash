@@ -205,18 +205,14 @@ class ButtonActionPusher {
 public:
     ButtonActionPusher(movie_root& mr, DisplayObject* this_ptr)
         :
-        called(false),
         _mr(mr),
         _tp(this_ptr)
     {}
 
-    void operator() (const action_buffer& ab)
+    void operator()(const action_buffer& ab)
     {
         _mr.pushAction(ab, _tp);
-        called = true;
     }
-
-    bool called;
 
 private:
     movie_root& _mr;
