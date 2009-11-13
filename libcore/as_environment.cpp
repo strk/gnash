@@ -205,8 +205,7 @@ as_environment::get_variable_raw(const std::string& varname,
     // Check the scope stack.
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
-        // const_cast needed due to non-const as_object::get_member 
-        as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
+        as_object* obj = scopeStack[i-1];
         if (obj && obj->get_member(key, &val))
         {
             // Found the var in with context.
@@ -303,8 +302,7 @@ as_environment::delVariableRaw(const std::string& varname,
     // Check the with-stack.
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
-        // const_cast needed due to non-const as_object::get_member 
-        as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
+        as_object* obj = scopeStack[i-1];
         if (obj)
         {
             std::pair<bool,bool> ret = obj->delProperty(varkey);
@@ -350,8 +348,8 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     std::string path;
     std::string var;
     //log_debug(_("set_variable(%s, %s)"), varname, val);
-    if ( parse_path(varname, path, var) )
-    {
+
+    if (parse_path(varname, path, var)) {
         target = find_object(path, &scopeStack); 
         if (target)
         {
@@ -385,19 +383,17 @@ as_environment::set_variable_raw(const std::string& varname,
     }
 
     VM& vm = _vm;
-    int swfVersion = vm.getSWFVersion();
+    const int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
     string_table::key varkey = st.find(varname);
 
-    if ( swfVersion < 6 ) 
-    {
+    if (swfVersion < 6) {
         // in SWF5 and lower, scope stack should just contain 'with' elements 
 
         // Check the with-stack.
         for (size_t i = scopeStack.size(); i > 0; --i)
         {
-            // const_cast needed due to non-const as_object::get_member 
-            as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
+            as_object* obj = scopeStack[i-1];
             if (obj && obj->set_member(varkey, val, 0, true) )
             {
                 return;
@@ -415,8 +411,7 @@ as_environment::set_variable_raw(const std::string& varname,
         //
         for (size_t i = scopeStack.size(); i > 0; --i)
         {
-            // const_cast needed due to non-const as_object::get_member 
-            as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
+            as_object* obj = scopeStack[i-1];
             if (obj && obj->set_member(varkey, val, 0, true))
             {
         return;
@@ -699,10 +694,7 @@ as_environment::find_object(const std::string& path,
                 if (scopeStack) {
                     for (size_t i = scopeStack->size(); i > 0; --i)
                     {
-                        // const_cast needed due to non-const 
-                        // as_object::get_member 
-                        as_object* obj = 
-                            const_cast<as_object*>((*scopeStack)[i-1]);
+                        as_object* obj = (*scopeStack)[i-1];
                         
                         element = getElement(obj, subpartKey);
                         if (element) break;
