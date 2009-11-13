@@ -500,29 +500,14 @@ DisplayObject::hasEventHandler(const event_id& id) const
 	Events::const_iterator it = _event_handlers.find(id);
 	if (it != _event_handlers.end()) return true;
 
-	as_function* method = getUserDefinedEventHandler(id.functionKey());
-    return (method);
-}
+    if (!_object) return false;
 
-as_function*
-DisplayObject::getUserDefinedEventHandler(const std::string& name) const
-{
-    if (!_object) return 0;
-	string_table::key key = getStringTable(*_object).find(name);
-	return getUserDefinedEventHandler(key);
-}
-
-as_function*
-DisplayObject::getUserDefinedEventHandler(string_table::key key) const 
-{
-    if (!_object) return 0;
-
-	as_value tmp;
-
-	if (_object->get_member(key, &tmp)) {
+    as_value tmp;
+	if (_object->get_member(id.functionKey(), &tmp)) {
 		return tmp.to_as_function();
 	}
-	return 0;
+	return false;
+
 }
 
 /// Set the real and cached x scale.

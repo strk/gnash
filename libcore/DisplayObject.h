@@ -997,30 +997,6 @@ protected:
         return _event_handlers;
     }
 
-    /// Return a user defined event handler, if any
-    //
-    /// @param name
-    ///     Function name to fetch. It will be converted to 
-    /// lowercase if current VM has been initialized against
-    /// an SWF version inferior to 7.
-    ///
-    /// @return
-    /// A function if a member with the given name exists and
-    /// casts to an as_function. A NULL pointer otherwise.
-    ///
-    as_function* getUserDefinedEventHandler(const std::string& name) const;
-
-    /// Return a user defined event handler, if any
-    //
-    /// @param key
-    ///     Function key to fetch. 
-    ///
-    /// @return
-    /// A function if a member with the given key exists and
-    /// casts to an as_function. A NULL pointer otherwise.
-    ///
-    as_function* getUserDefinedEventHandler(string_table::key key) const;
-
     void set_event_handlers(const Events& copyfrom);
 
     /// Name of this DisplayObject (if any)
