@@ -130,6 +130,7 @@ libgnashcore_la_SOURCES = \
 	RGBA.cpp 	\
 	asClass.cpp \
 	asNamespace.cpp \
+	MovieFactory.cpp \
 	MovieLoader.cpp \
 	$(FREETYPE_SOURCES) \
 	$(NULL)

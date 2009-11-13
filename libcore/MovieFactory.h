@@ -21,6 +21,8 @@
 
 #include "dsodefs.h"
 
+#include "MovieLibrary.h"
+
 #include <string>
 #include <memory>
 
@@ -109,6 +111,8 @@ public:
     static DSOEXPORT movie_definition* makeMovie(std::auto_ptr<IOChannel> in,
             const std::string& url, const RunResources& runResources,
             bool startLoaderThread);
+
+    static MovieLibrary movieLibrary;
 };
 
 } // namespace gnash

@@ -73,19 +73,6 @@ public:
         return true;
     }
 
-#ifdef GNASH_USE_GC
-    /// Mark all library elements as reachable (for GC)
-    void markReachableResources() const
-    {
-        boost::mutex::scoped_lock lock(_mapMutex);
-        for (LibraryContainer::const_iterator i=_map.begin(), e=_map.end();
-                i!=e; ++i)
-        {
-            i->second.def->setReachable();
-        }
-    }
-#endif
-
     void add(const std::string& key, movie_definition* mov)
     {
 
