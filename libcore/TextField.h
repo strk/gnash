@@ -124,7 +124,7 @@ public:
     virtual int getDefinitionVersion() const;
 
 	/// This function is called as a user-input handler
-	bool notifyEvent(const event_id& id);	
+	void notifyEvent(const event_id& id);	
 
 	const std::string& getVariableName() const
 	{

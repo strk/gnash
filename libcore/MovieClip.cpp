@@ -620,7 +620,7 @@ MovieClip::queueActions(ActionList& actions)
 
 }
 
-bool
+void
 MovieClip::notifyEvent(const event_id& id)
 {
 
@@ -629,38 +629,29 @@ MovieClip::notifyEvent(const event_id& id)
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
-    if ( id.id() == event_id::ENTER_FRAME && unloaded() )
-    {
+    if (id.id() == event_id::ENTER_FRAME && unloaded()) {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
 #endif
-        return false;
+        return;
     }
 
-    if ( id.is_button_event() && ! isEnabled() )
-    {
+    if (id.is_button_event() && ! isEnabled()) {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored button-like event %s as not 'enabled'"),
             getTarget(), id);
 #endif
-        return false;
+        return;
     }
 
-    bool called = false;
-            
-    std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
-    if ( code.get() )
-    {
+    std::auto_ptr<ExecutableCode> code (get_event_handler(id));
+    if (code.get()) {
         // Dispatch.
         code->execute();
-
-        called = true;
     }
 
     // user-defined onInitialize is never called
-    if ( id.id() == event_id::INITIALIZE ) {
-        return called;
-    }
+    if (id.id() == event_id::INITIALIZE) return;
 
     // NOTE: user-defined onLoad is not invoked for static
     //     clips on which no clip-events are defined.
@@ -676,8 +667,8 @@ MovieClip::notifyEvent(const event_id& id)
     //
     //     TODO: test the case in which it's MovieClip.prototype.onLoad
     //     defined !
-    if ( id.id() == event_id::LOAD )
-    {
+    if (id.id() == event_id::LOAD) {
+
         // TODO: we're likely making too much noise for nothing here,
         // there must be some action-execution-order related problem instead....
         // See testsuite/misc-ming.all/registerClassTest2.swf for an onLoad 
@@ -709,22 +700,14 @@ MovieClip::notifyEvent(const event_id& id)
                         "no registered class and no clip events defined)"),
                         getTarget(), get_depth());
 #endif
-            return called;
+            return;
         } while (0);
             
     }
 
     // Check for member function.
-    if (! id.is_key_event ())
-    {
-        boost::intrusive_ptr<as_function> method = 
-            getUserDefinedEventHandler(id.functionKey());
-
-        if ( method )
-        {
-            call_method0(method.get(), _environment, getObject(this));
-            called = true;
-        }
+    if (!id.is_key_event()) {
+        callMethod(getObject(this), id.functionKey());
     }
 
     // TODO: if this was UNLOAD release as much memory as possible ?
@@ -732,7 +715,6 @@ MovieClip::notifyEvent(const event_id& id)
     //             which unload handlers of parent and childs is performed
     //             and wheter unload of child can access members of parent.
 
-    return called;
 }
 
 as_object*

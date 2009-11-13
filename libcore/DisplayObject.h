@@ -647,13 +647,9 @@ public:
     // Return true if this DisplayObject should be rendered
     bool visible() const { return _visible; }
 
-    /// ActionScript event handler.    Returns true if a handler was called.
-    //
-    /// Must be overridden or will always return false.
-    ///
-    virtual bool notifyEvent(const event_id& /* id */)
+    /// Notify clip events (and also user-defined ones).
+    virtual void notifyEvent(const event_id& /*id*/)
     {
-        return false;
     }
 
     /// Queue event in the global action queue.

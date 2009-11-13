@@ -598,7 +598,7 @@ TextField::setSelection(int start, int end)
     _selection = std::make_pair(start, end);
 }
 
-bool
+void
 TextField::notifyEvent(const event_id& ev)
 {    
     switch (ev.id())
@@ -663,7 +663,7 @@ TextField::notifyEvent(const event_id& ev)
             switch (c)
             {
                 case key::BACKSPACE:
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     if (m_cursor > 0)
                     {
                         s.erase(m_cursor - 1, 1);
@@ -673,7 +673,7 @@ TextField::notifyEvent(const event_id& ev)
                     break;
 
                 case key::DELETEKEY:
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     if (_glyphcount > m_cursor)
                     {
                         s.erase(m_cursor, 1);
@@ -682,7 +682,7 @@ TextField::notifyEvent(const event_id& ev)
                     break;
 
                 case key::INSERT:        // TODO
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     break;
 
                 case key::HOME:
@@ -799,7 +799,7 @@ TextField::notifyEvent(const event_id& ev)
                     break;
                     
                 case key::ENTER:
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     if ( !multiline() )
                         break;
 
@@ -813,7 +813,7 @@ TextField::notifyEvent(const event_id& ev)
 						}
 					}
 					
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     wchar_t t = static_cast<wchar_t>(
                             gnash::key::codeMap[c][key::ASCII]);
                     if (t != 0)
@@ -846,9 +846,8 @@ TextField::notifyEvent(const event_id& ev)
         }
 
         default:
-            return false;
+            return;
     };
-    return true;
 }
 
 InteractiveObject*
