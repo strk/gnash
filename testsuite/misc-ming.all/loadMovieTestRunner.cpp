@@ -116,12 +116,18 @@ main(int /*argc*/, char** /*argv*/)
 	tester->movePointerTo(80, 80);
 	check(tester->isMouseOverMouseEntity());
 	tester->pressMouseButton();
-	usleep(5000); // give it some time... TODO: drop this test and use a self-containment instead
-	tester->advance(); // loads (should) happen on next advance
-	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
-	check(coverart != coverartch->to_movie());
+
+    // Wait for the movie to load
+    // TODO: drop this test and use a self-containment instead
+    do {
+	    usleep(500); // give it some time...
+	    tester->advance(); // loads (should) happen on next advance
+	    coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
+    } while (coverartch->to_movie() == coverart);
+
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_root()->url(), lynchURL.str());
+
 	tester->depressMouseButton();
 
 	// Check scribbling on the lynch
@@ -135,9 +141,15 @@ main(int /*argc*/, char** /*argv*/)
 	tester->movePointerTo(280, 80);
 	check(tester->isMouseOverMouseEntity());
 	tester->click();
-	usleep(5000); // give it some time... TODO: drop this test and use a self-containment instead
-	tester->advance(); // loads (should) happen on next advance
-	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
+
+    // Wait for the movie to load
+    // TODO: drop this test and use a self-containment instead
+    do {
+	    usleep(500); // give it some time... 
+	    tester->advance(); // loads (should) happen on next advance
+	    coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
+    } while (coverartch->to_movie() == coverart);
+
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_root()->url(), greenURL.str());
 	// TODO: find a way to test if the jpeg is really displayed
@@ -154,9 +166,15 @@ main(int /*argc*/, char** /*argv*/)
 	tester->movePointerTo(480, 80);
 	check(tester->isMouseOverMouseEntity());
 	tester->click();
-	usleep(5000); // give it some time... TODO: drop this test and use a self-containment instead
-	tester->advance(); // loads (should) happen on next advance
-	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
+
+    // Wait for the movie to load
+    // TODO: drop this test and use a self-containment instead
+    do {
+	    usleep(500); // give it some time... 
+	    tester->advance(); // loads (should) happen on next advance
+	    coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
+    } while (coverartch->to_movie() == coverart);
+
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_root()->url(), offspringURL.str());
 
