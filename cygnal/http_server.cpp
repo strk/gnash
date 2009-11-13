@@ -49,6 +49,7 @@
 //#include "handler.h"
 #include "utility.h"
 #include "buffer.h"
+#include "http.h"
 #include "diskstream.h"
 
 // Cygnal specific headers
@@ -84,20 +85,17 @@ HTTPServer::~HTTPServer()
 //    GNASH_REPORT_FUNCTION;
 }
 
-boost::shared_ptr<amf::Buffer>
+HTTP::http_method_e
 HTTPServer::processClientRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
     
     amf::Buffer *buf = new amf::Buffer;
-    boost::shared_ptr<amf::Buffer> result;
 
-    result = processClientRequest(fd, buf);
-
-    return result;
+    return processClientRequest(fd, buf);
 }
 
-boost::shared_ptr<amf::Buffer>
+HTTP::http_method_e
 HTTPServer::processClientRequest(int fd, amf::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
@@ -136,7 +134,7 @@ HTTPServer::processClientRequest(int fd, amf::Buffer *buf)
 	}
     }
 
-    return result;
+    return _cmd;
 }
 
 // A GET request asks the server to send a file to the client
@@ -194,7 +192,7 @@ HTTPServer::processGetRequest(int fd, amf::Buffer *buf)
 		// cache.addFile(_filespec, filestream);
 	    }
 	}
-	// Close the file but least resident for now.
+	// Close the file but leave resident for now.
 	if (filestream->fullyPopulated()) {
 	    filestream->close();
 	}
@@ -958,10 +956,8 @@ HTTPServer::dump()
 //    GNASH_REPORT_FUNCTION;
 }
 
-extern "C" {
-
 bool
-http_handler(Network::thread_params_t *args)
+HTTPServer::http_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -976,32 +972,6 @@ http_handler(Network::thread_params_t *args)
     // www->setDocRoot(crcfile.getDocumentRoot());
     // log_network("Docroot for HTTP files is %s", crcfile.getDocumentRoot());
     log_network("Processing HTTP data for fd #%d", args->netfd);
-
-#if 0
-    // If we have active disk streams, send those packets first.
-    // 0 is a reserved stream, so we start with 1, as the reserved
-    // stream isn't one we care about here.
-    log_network("%d active disk streams", hand->getActiveDiskStreams());
-    for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
-	hand->getDiskStream(i).dump();
-	if (hand->getDiskStream(i).getState() == DiskStream::PLAY) {
-	    if (!hand->getDiskStream(i).play()) {
-	//     boost::uint8_t *ptr = hand->getDiskStream(i).get();
-	//     if (ptr) {
-	// 	// if (rtmp->sendMsg(hand->getClient(i), 8,
-	// 	// 	RTMP::HEADER_8, 4096,
-	// 	// 	RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
-	// 	// 	ptr, 4096)) {
-	// 	// }
-	    } else {
-		log_network("ERROR: No stream for client %d", i);
-	    }
-	    // if (hand->getDiskStream(i).getState() == DiskStream::DONE) {
-	    //     hand->removeDiskStream();
-	    //     return result;
-	}
-    }
-#endif
     
     // Wait for data, and when we get it, process it.
     do {
@@ -1023,9 +993,11 @@ http_handler(Network::thread_params_t *args)
 	}
 
 	// Process incoming messages
-	if (!www->processClientRequest(args->netfd, buf)) {
+	HTTP::http_method_e cmd = www->processClientRequest(args->netfd, buf);
+	if (cmd != HTTP::HTTP_GET) {
 	    log_network("Net HTTP server done for fd #%d...", args->netfd);
 	}
+	
 //	www->dump();
 	if ((www->getField("content-type") == "application/x-amf")
 	    && (www->getField("content-type") == "application/x-amf")
@@ -1067,7 +1039,6 @@ http_handler(Network::thread_params_t *args)
 
     return www->keepAlive();    
 } // end of httphandler
-} // end of extern C
     
 } // end of gnash namespace
 

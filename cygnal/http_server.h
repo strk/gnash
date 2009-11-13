@@ -46,8 +46,8 @@ public:
     ~HTTPServer();
 
     // These are for the protocol itself
-    boost::shared_ptr<amf::Buffer> processClientRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processClientRequest(int fd, amf::Buffer *buf);
+    http_method_e processClientRequest(int fd);
+    http_method_e processClientRequest(int fd, amf::Buffer *buf);
     boost::shared_ptr<amf::Buffer> processGetRequest(int fd, amf::Buffer *buf);
     boost::shared_ptr<amf::Buffer> processPostRequest(int fd, amf::Buffer *buf);
     boost::shared_ptr<amf::Buffer> processPutRequest(int fd, amf::Buffer *buf);
@@ -96,16 +96,13 @@ public:
     gnash::amf::Buffer &formatEchoResponse(const std::string &num, uint8_t *data, size_t size);
 #endif
 
+    bool http_handler(gnash::Network::thread_params_t *args);
+
     void dump();
     
 private:
     
 };
-
-// This is the thread for all incoming HTTP connections
-extern "C" {
-    DSOEXPORT bool http_handler(gnash::Network::thread_params_t *args);
-}
 
 } // end of gnash namespace
 
