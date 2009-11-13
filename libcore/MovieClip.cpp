@@ -1637,14 +1637,7 @@ MovieClip::mouseEnabled() const
         const event_id &event = EH[i];
 
         // Check event handlers
-        if ( get_event_handler(event.id()).get() )
-        {
-            return true;
-        }
-
-        // Check user-defined event handlers
-        if ( getUserDefinedEventHandler(event.functionKey()) )
-        {
+        if (hasEventHandler(event.id())) {
             return true;
         }
     }

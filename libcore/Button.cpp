@@ -568,11 +568,7 @@ Button::mouseEvent(const event_id& event)
         mr.pushAction(code, movie_root::apDOACTION);
     }
 
-    // Call conventional attached method.
-    as_function* method = getUserDefinedEventHandler(event.functionKey());
-    if (method) {
-        mr.pushAction(method, this, movie_root::apDOACTION);
-    }
+    callMethod(getObject(this), event.functionKey());
 }
 
 
