@@ -1448,16 +1448,21 @@ Network::waitForNetData(int limit, fd_set files)
     
     if (ret == -1) {
 	log_error (_("Waiting for data for fdset, was never available for reading"));
+	FD_ZERO(&fdset);
+	FD_SET(0, &fdset);
+	return fdset;
     }
     
     if (ret == 0) {
 	// log_debug (_("Waiting for data for fdset, timed out waiting for data"));
 	FD_ZERO(&fdset);
+	FD_SET(0, &fdset);
 	return fdset;
     }
 
     if (ret < 0) {
 	log_error("select() got an error: %s.", strerror(errno));
+	FD_ZERO(&fdset);
 	FD_SET(0, &fdset);
     } else {
 	log_network("select() saw activity on %d file descriptors.", ret);
