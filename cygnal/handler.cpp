@@ -48,12 +48,16 @@
 #include "buffer.h"
 #include "utility.h"
 #include "dsodefs.h" //For DSOEXPORT.
+#include "URL.h"
 #include "handler.h"
 #include "diskstream.h"
 #include "rtmp.h"
 #include "http.h"
 #include "crc.h"
 #include "flv.h"
+
+#include "rtmp_server.h"
+#include "http_server.h"
 
 using namespace gnash;
 using namespace std;
@@ -68,10 +72,9 @@ map<int, Handler *> DSOEXPORT handlers;
 static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
 Handler::Handler()
-    : _diskstreams(new gnash::DiskStream[STREAMS_BLOCK]),
-      _streams(1),	// note that stream 0 is reserved by the system.
-      _in_fd(0),
-      _active_streams(false)
+    :_streams(1),	// note that stream 0 is reserved by the system.
+     _diskstreams(new gnash::DiskStream[STREAMS_BLOCK]),     
+     _in_fd(0)
 {
 //    GNASH_REPORT_FUNCTION;
     // reserve memory for the vector as it makes vector operations
@@ -92,25 +95,170 @@ Handler::sync(int /* in_fd */)
 }
 
 size_t
-Handler::addClient(int x, Network::protocols_supported_e proto)
+Handler::addClient(int fd, Network::protocols_supported_e proto)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     boost::mutex::scoped_lock lock(_mutex);
-    _clients.push_back(x);
-    _protocol[x] = proto;
+    
+    log_debug("Adding %d to the client array.", fd);
+    switch (proto) {
+      case Network::NONE:
+	  break;
+      case Network::HTTP:
+      {
+	  boost::shared_ptr<HTTPServer> http(new HTTPServer);
+	  _http[fd] = http;
+	  break;
+      }
+      case Network::HTTPS:
+	  break;
+      case Network::RTMP:
+      {
+	  boost::shared_ptr<RTMPServer> rtmp(new RTMPServer);
+	  _rtmp[fd] = rtmp;
+	  break;
+      }
+      case Network::RTMPT:
+      case Network::RTMPTS:
+      case Network::RTMPE:
+      case Network::RTMPS:
+      case Network::DTN:
+      default:
+	  log_unimpl("Protocol %d for Handler::AddClient()", proto);
+	  break;
+    }
+
+    _clients.push_back(fd);
+    _protocol[fd] = proto;
     
     return _clients.size();
+}
+
+// Parse the first nessages when starting a new message handler,
+// which is used to determine the name of the resource to
+// initialize, or load from the cache.
+amf::Buffer *
+Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
+{
+    GNASH_REPORT_FUNCTION;
+    string key;
+    Network net;
+    amf::Buffer *buf = 0;
+    boost::mutex::scoped_lock lock(_mutex);
+    
+    switch (proto) {
+      case Network::NONE:
+	  break;
+      case Network::HTTP:
+      {
+#if 0
+	  int ret = _http[fd]->readNet(fd, buf);
+	  if (ret) {
+	      _http[fd]->processHeaderFields(buf);
+	      string hostname, path;
+	      string::size_type pos = _http[fd]->getField("host").find(":", 0);
+	      if (pos != string::npos) {
+		  hostname += _http[fd]->getField("host").substr(0, pos);
+	      } else {
+		  hostname += "localhost";
+	      }
+	      path = _http[fd]->getFilespec();
+	      key = hostname + path;
+	      log_debug("HTTP key is: %s", key);
+	      _keys[fd] = key;
+	  } else {
+	      log_error("HTTP key couldn't be read!");
+	  }
+#else
+	  HTTPServer http;
+	  size_t bytes = http.sniffBytesReady(fd);
+	  if (bytes) {
+	      buf = new amf::Buffer(bytes);
+	  } else {
+	      return buf;
+	  }
+	  int ret = http.readNet(fd, buf);
+	  if (ret) {
+	      http.processHeaderFields(buf);
+	      string hostname, path;
+	      string::size_type pos = http.getField("host").find(":", 0);
+	      if (pos != string::npos) {
+		  hostname += http.getField("host").substr(0, pos);
+	      } else {
+		  hostname += "localhost";
+	      }
+	      path = http.getFilespec();
+	      key = hostname + path;
+	      log_debug("HTTP key is: %s", key);
+	      _keys[fd] = key;
+	  } else {
+	      log_error("HTTP key couldn't be read!");
+	  }	  
+#endif
+	  break;
+      }
+      case Network::HTTPS:
+	  break;
+      case Network::RTMP:
+      {
+	  // _rtmp[fd]->recvMsg(fd);
+	  break;
+      }
+      case Network::RTMPT:
+      case Network::RTMPTS:
+      case Network::RTMPE:
+      case Network::RTMPS:
+      case Network::DTN:
+      default:
+	  log_error("FD #%d has no protocol handler registered", fd);
+	  break;
+    };
+
+    return buf;
+}
+
+int
+Handler::recvMsg(int fd)
+{
+    // GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_mutex);
+
+    switch (_protocol[fd]) {
+      case Network::NONE:
+	  break;
+      case Network::HTTP:
+      {
+	  return _http[fd]->recvMsg(fd);
+	  break;
+      }
+      case Network::HTTPS:
+	  break;
+      case Network::RTMP:
+      case Network::RTMPT:
+      case Network::RTMPTS:
+      case Network::RTMPE:
+      case Network::RTMPS:
+      case Network::DTN:
+      default:
+	  log_error("FD #%d has no protocol handler registered", fd);
+	  break;
+    }
 };
 
 void
 Handler::removeClient(int x)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     boost::mutex::scoped_lock lock(_mutex);
-    if (_clients.size()) {
-	_clients.erase(_clients.begin()+x);
+
+    vector<int>::iterator it;
+    for (it = _clients.begin(); it < _clients.end(); ++it) {
+	if (*it == x) {
+	    log_debug("Removing %d from the client array.", *it);
+	    _clients.erase(it);
+	}
     }
 }
 
@@ -122,7 +270,7 @@ Handler::setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &/* init */)
 }
 
 void
-Handler::setPlugin(Handler::cygnal_io_t /* read_ptr */, Handler::cygnal_io_t /* write_ptr */)
+Handler::setPlugin(Handler::cygnal_io_read_t /* read_ptr */, Handler::cygnal_io_write_t /* write_ptr */)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -184,7 +332,7 @@ Handler::initModule(const std::string& module)
      // to the cgi-bin as a dynamically loadable plugin.
      symbol = module;
      symbol.append("_write_func");
-     Handler::cygnal_io_t write_symptr = reinterpret_cast<Handler::cygnal_io_t>
+     Handler::cygnal_io_write_t write_symptr = reinterpret_cast<Handler::cygnal_io_write_t>
 	(sl->getInitEntry(symbol));
 
      if (!write_symptr) {    
@@ -305,7 +453,7 @@ Handler::playStream(const std::string &filespec)
     // gnash::DiskStream &ds = findStream(filespec);
     if (ds.getState() == DiskStream::CREATED) {
 	if (ds.open(fullpath)) {
-	    ds.loadToMem(4096); // FIXME: load only part of the whole file for now
+	    ds.loadToMem(0); // FIXME: load only part of the whole file for now
 	    ds.setState(DiskStream::PLAY);
 	    return true;
 	}

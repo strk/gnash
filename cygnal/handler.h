@@ -58,7 +58,7 @@
 
 #include "rtmp.h"
 #include "rtmp_msg.h"
-#include "rtmp_server.h"
+#include "http.h"
 #include "network.h"
 
 // _definst_ is the default instance name
@@ -69,8 +69,10 @@ namespace cygnal
 const size_t STREAMS_BLOCK = 1000;
 
 class Cygnal;
+class HTTPServer;
+class RTMPServer;
 
-class Handler : public gnash::Extension
+class Handler : public gnash::Extension, gnash::Network
 {
 public:
     /// \enum admin_cmd_e
@@ -92,15 +94,18 @@ public:
     } pub_stream_e;
     /// This typedef is only used for the io function that must be
     /// supported by the plugin.
-    typedef size_t (*cygnal_io_t)(boost::uint8_t *data, size_t size);
+    typedef size_t (*cygnal_io_write_t)(boost::uint8_t *data, size_t size);
     typedef boost::shared_ptr<amf::Buffer> (*cygnal_io_read_t)();
     typedef struct {
-	const char *version;
-	const char *description;
+	std::string version;
+	std::string description;
+	std::string hostname;
+	std::string path;	
   	cygnal_io_read_t read_func;
-  	cygnal_io_t write_func;
+  	cygnal_io_write_t write_func;
 	gnash::Network::protocols_supported_e protocol;
     } cygnal_init_t;
+    
     /// This typedef is only used for the init function optionally
     /// supported by the plugin.
     typedef boost::shared_ptr<cygnal_init_t>(*cygnal_io_init_t)(boost::shared_ptr<gnash::RTMPMsg> &msg);
@@ -125,16 +130,19 @@ public:
     // Operate on a disk streaming inprogress
     gnash::DiskStream &getDiskStream(int x) { return _diskstreams[x]; }
 
+    /// Add a SharedObject
     void addSOL(boost::shared_ptr<amf::Element> x) {
 	_sol.push_back(x);
     };
 
     /// \method addClient
-    ///     Add a client to the list for output messages.
-    size_t addClient(int x, gnash::Network::protocols_supported_e proto);
+    ///     Add a client to the list for output messages for a
+    ///     resource. This also specifies the protocol handler
+    ///     required for data on this file descriptor.
+    size_t addClient(int fd, gnash::Network::protocols_supported_e proto);
     /// \method removeClient
     ///     Remove a client from the list for messages.
-    void removeClient(int x);
+    void removeClient(int fd);
     /// \var getClients
     ///     Get the vector of file descriptors for this handler.
     std::vector<int> &getClients() { return _clients; };
@@ -142,16 +150,23 @@ public:
     ///     Get a client from the list of clients, we have too many
     ///     arrays so using an operator isn't useful.
     int getClient(int x) { return _clients[x]; };
+
+    /// \brief Receive a message from the other end of the network connection.
+    ///
+    /// @param fd The file descriptor to read from
+    ///
+    /// @return The number of bytes sent
+    int recvMsg(int fd);
     
     gnash::Network::protocols_supported_e getProtocol(int x) { return _protocol[x]; };
     void setProtocol(int fd, gnash::Network::protocols_supported_e x) { _protocol[fd] = x; };
-    
+
     /// \method addRemote
     ///     Add a remote machine to the list for input messages.
     size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };
 
     void setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &init);
-    void setPlugin(Handler::cygnal_io_t read_ptr, Handler::cygnal_io_t write_ptr );
+    void setPlugin(Handler::cygnal_io_read_t read_ptr, Handler::cygnal_io_write_t write_ptr );
 
     /// Initialize the named module within Cygnal
     //
@@ -161,13 +176,16 @@ public:
     ///     See if any of the cgi-bins has been loaded.
     bool initialized();
 
+    /// This method reads raw data from a plugin.
     boost::shared_ptr<amf::Buffer> readFromPlugin();
 
+    /// This method writes raw data to a plugin.
     size_t writeToPlugin(amf::Buffer &buf) {
 	return writeToPlugin(buf.begin(), buf.allocated()); };
     size_t writeToPlugin(boost::uint8_t *data, size_t size);
 
-    // These methods handle control of the file streaming 
+    // These methods handle control of the file streaming, and are
+    // used by both HTTP and RTMP*
 
     /// \fn     int createStream()
     double createStream(double transid);
@@ -207,36 +225,59 @@ public:
     // Delete the RTMP stream
     double deleteStream(double transid);
 
+    // This is a site specific identifier of some kind.
     void setFCSubscribe(const std::string &x) { _fcsubscribe = x; };
     std::string &getFCSubscribe() { return _fcsubscribe; }
 
+#if 1
+    // FIXME: This holds the data from the first NetConnection packet,
+    // and shouldn't really be done here, but we're trying not to
+    // break things while refactoring.
     void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
     void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
     boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
+#endif
+    
+#if 1
+    boost::shared_ptr<HTTPServer> &getHTTPHandler(int fd)  { return _http[fd]; };
+    boost::shared_ptr<RTMPServer> getRTMPHandler(int fd)  { return _rtmp[fd]; };
+#endif
+    
+    // Parse the first nessages when starting a new message handler,
+    // which is used to determine the name of the resource to
+    // initialize, or load from the cache.
+    amf::Buffer *parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto);
+    
+    std::string &getKey(int x) { return _keys[x]; };
+    void setKey(int fd, std::string x) { _keys[fd] = x; };
     
     // Dump internal data.
     void dump();
     
 protected:
+    /// \var _name
+    ///	    The name of the path this handler is supporting.
+    std::string	_name; 
+    ///	    Each incoming request has one of 4 states the server has
+    ///     to handle to send a response.
+    /// \var _streams
+    ///    This is a counter of how many streams have been allocated
+    ///    by the server.
+    int		_streams;
     /// \var _diskstreams
     ///   This is all the opened disk based files that are currently
     ///   being streamed by the server.
     // std::map<std::string &, boost::scoped_ptr<gnash::DiskStream> > _diskstreams;
     boost::shared_array<gnash::DiskStream> _diskstreams;
-    /// \var _streams
-    ///    This is a counter of how many streams have been allocated
-    ///    by the server.
-    int		_streams;
-    /// \var _name
-    ///	    The name of the path this handler is supporting.
-    std::string	_name;
-    ///	    Each incoming request has one of 4 states the server has
-    ///     to handle to send a response.
-
+    // std::map<int, boost::shared_ptr<gnash::DiskStream> > _diskstreams;
     /// \var _protocol
     ///    this is the map of which protocol is being used by which
     ///    file descriptor.
     std::map<int, gnash::Network::protocols_supported_e> _protocol;
+#if 1
+    std::map<int, boost::shared_ptr<HTTPServer> > _http;
+    std::map<int, boost::shared_ptr<RTMPServer> > _rtmp;
+#endif
     /// \var _clients
     ///	    is the array of all clients connected to this server for
     ///     this application. This is where all the output goes.
@@ -274,16 +315,16 @@ protected:
     ///    appears to be a unique ID number.
     std::string				_fcsubscribe;
 
+#if 1
     /// \var _netconnect
     ///    This store the data from the NetConnection ActionScript
     ///    object we get as the final part of the handshake process
     ///    that is used to set up the connection. This has all the
     ///    file paths and other information needed by the server.
     boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
+#endif
 
-    /// \var _active_streams
-    ///    This is a counter of the active diskstreams
-    int _active_streams;
+    std::map<int, std::string> _keys;
 private:    
     boost::mutex			_mutex;
     
