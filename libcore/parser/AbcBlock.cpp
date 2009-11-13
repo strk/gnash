@@ -403,7 +403,6 @@ AbcBlock::setMultinameNames(MultiName *n, string_table::key ABCName)
 void
 AbcBlock::setNamespaceURI(Namespace *ns, string_table::key ABCName)
 {
-	ns->setAbcURI(ABCName);
 	std::string name = _stringPool[ABCName];
 	string_table::key global_key = _stringTable->find(name);
 	ns->setURI(global_key);
@@ -429,16 +428,9 @@ AbcBlock::locateClass(const std::string& className)
     for (std::vector<Namespace*>::iterator i = _namespacePool.begin();
             i != _namespacePool.end(); ++i) {
         
-        const size_t key = (*i)->getAbcURI();
+        const size_t key = (*i)->getURI();
 
-        log_abc("Namespace ABC uri: %s; global URI: %s, string: %s, "
-                "pool size: %s",
-            key, (*i)->getURI(), _stringTable->value((*i)->getURI()),
-            _stringPool.size());
-
-        assert(key < _stringPool.size());
-
-        if (_stringPool[key] == nsstr) {
+        if (key == _stringTable->find(nsstr)) {
             a.setNamespace(*i);
             break;
         }
