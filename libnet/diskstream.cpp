@@ -303,6 +303,8 @@ DiskStream::DiskStream(const string &str, int netfd)
 DiskStream::~DiskStream()
 {
     GNASH_REPORT_FUNCTION;
+    log_debug("Deleting %s on fd #%d", _filespec, _filefd);
+
     if (_filefd) {
         ::close(_filefd);
     }
@@ -343,18 +345,20 @@ DiskStream::close()
 {
     GNASH_REPORT_FUNCTION;
 
-    log_debug("Closing %s on fd #%d, 0x%d", _filespec, _filefd, _dataptr);
+    log_debug("Closing %s on fd #%d", _filespec, _filefd);
 
     if (_filefd) {
         ::close(_filefd);
     }
 
     // reset everything in case we get reopened.
-    _offset = 0;
     _filefd = 0;
-    _netfd = 0;
+    _seekptr = _dataptr;
+    _offset = 0;
     _state = CLOSED;
-    
+    _netfd = 0;
+
+#if 0				// FIXME: don't unmap the memory for debugging
 #ifdef _WIN32
     UnmapViewOfFile(_dataptr);
 #elif defined(__amigaos4__)
@@ -364,6 +368,7 @@ DiskStream::close()
 	munmap(_dataptr, _pagesize);
 //  	delete[] _dataptr;
     }
+#endif
 #endif
     
 }
@@ -392,7 +397,7 @@ DiskStream::loadToMem(off_t offset)
 boost::uint8_t *
 DiskStream::loadToMem(size_t filesize, off_t offset)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     log_debug("%s: offset is: %d", __FUNCTION__, offset);
 
@@ -489,7 +494,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 		   _filespec, strerror(errno));
 	return 0;
     } else {
-	close();
+	// close();
 	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
 	_dataptr = dataptr;
@@ -687,7 +692,9 @@ DiskStream::play(bool flag)
 
 /// \brief Stream the file that has been loaded,
 ///
-/// @param netfd An optional file descriptor to read data from
+/// @param netfd The file descriptor to use for operations
+///
+/// @param flag True to only send the first packet, False plays entire file.
 ///
 /// @return True if the data was streamed sucessfully, false if not.
 bool
@@ -776,7 +783,10 @@ DiskStream::play(int netfd, bool flag)
 	      log_debug("Restarting Disk Stream from the beginning");
 	      _offset = 0;
 	      _state = PLAY;
-              break;
+	      _seekptr = _dataptr;
+	      _filefd = 0;
+	      _netfd = 0;
+              continue;
           default:
               break;
         }

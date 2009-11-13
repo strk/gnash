@@ -137,7 +137,7 @@ Cache::findResponse(const std::string &name)
     return _responses[name];
 }
 
-boost::shared_ptr<DiskStream> 
+boost::shared_ptr<DiskStream> &
 Cache::findFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
