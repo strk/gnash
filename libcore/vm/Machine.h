@@ -34,7 +34,7 @@ namespace gnash {
     class DisplayObject;
     class as_object;
     class AbcBlock;
-    class asName;
+    class MultiName;
     class Property;
     class CodeStream;
 }
@@ -102,7 +102,7 @@ public:
 	/// @return
 	/// The number of stack elements used by the name.
 	/// At present, always 0, 1, or 2. These are not dropped.
-	int completeName(asName& name, int initial = 0);
+	int completeName(MultiName& name, int initial = 0);
 
 	/// Given a value v, find the class object of the superclass of v.
 	///
@@ -132,7 +132,7 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(asClass* pDefinition, asName& name, as_value& source);
+	void getMember(asClass* pDefinition, MultiName& name, as_value& source);
 
 	/// Set a member in an object.
 	///
@@ -150,9 +150,9 @@ public:
 	///
 	/// @return
 	/// Nothing.
-	void setMember(asClass*, asName&, as_value& target, as_value& val);
+	void setMember(asClass*, MultiName&, as_value& target, as_value& val);
 
-	asBinding* findProperty(asName&) { return NULL; }
+	asBinding* findProperty(MultiName&) { return NULL; }
 
 	void execute();
 
@@ -255,7 +255,7 @@ private:
 		unsigned int mScopeTotalSize;
 		bool mReturn;
 		CodeStream *mStream;
-		asNamespace *mDefaultXMLNamespace;
+		Namespace *mDefaultXMLNamespace;
 		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
 		as_object *mThis;
@@ -282,7 +282,7 @@ private:
 	void saveState();
 	void restoreState();
 
-	as_value find_prop_strict(asName multiname);
+	as_value find_prop_strict(MultiName multiname);
 
 	void print_stack();
 
@@ -355,7 +355,7 @@ private:
 
 	string_table& mST;
 
-	asNamespace* mDefaultXMLNamespace;
+	Namespace* mDefaultXMLNamespace;
 	as_object* mCurrentScope;
 	as_object* mGlobalScope;
 	as_object* mDefaultThis;

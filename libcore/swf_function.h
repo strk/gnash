@@ -42,46 +42,9 @@ namespace gnash {
 class swf_function : public as_function
 {
 
-private:
-
-	/// Action buffer containing the function definition
-	const action_buffer& m_action_buffer;
-
-	/// @@ might need some kind of ref count here, but beware cycles
-	as_environment& m_env;
-
-	typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
-
-	/// Scope stack on function definition.
-	ScopeStack _scopeStack;
-
-	/// \brief
-	/// Offset within the action_buffer where
-	/// start of the function is found.
-	size_t	m_start_pc;
-
-	/// Length of the function within the action_buffer
-	//
-	/// This is currently expressed in bytes as the
-	/// action_buffer is just a blog of memory corresponding
-	/// to a DoAction block
-	size_t m_length;
-
-	struct arg_spec
-	{
-		int m_register;
-		std::string m_name;
-	};
-	std::vector<arg_spec>	m_args;
-	bool	m_is_function2;
-	boost::uint8_t	m_local_register_count;
-
-	/// used by function2 to control implicit arg register assignments
-	// 
-	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
-	boost::uint16_t	m_function2_flags;
-
 public:
+
+	typedef std::vector<as_object*> ScopeStack;
 
 	enum SWFDefineFunction2Flags
 	{
@@ -111,14 +74,13 @@ public:
 
 		/// Bind one register to "_global" 
 		//
-		/// TODO: check this. See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+		/// TODO: check this.
+        /// See:
+        /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
 		///       Looks like flags would look swapped
 		PRELOAD_GLOBAL = 256 // 0x100
 
 	};
-
-
-	~swf_function();
 
 	/// \brief
 	/// Create an ActionScript function as defined in an
@@ -126,6 +88,8 @@ public:
 	//
 	swf_function(const action_buffer& ab, as_environment& env, size_t start,
 		const ScopeStack& with_stack);
+
+	virtual ~swf_function() {}
 
 	const ScopeStack& getScopeStack() const
 	{
@@ -152,13 +116,19 @@ public:
 		return m_is_function2;
 	}
 
-	void	set_is_function2() { m_is_function2 = true; }
+	void set_is_function2() { m_is_function2 = true; }
 
-	void	set_local_register_count(boost::uint8_t ct) { assert(m_is_function2); m_local_register_count = ct; }
+	void set_local_register_count(boost::uint8_t ct) {
+        assert(m_is_function2);
+        m_local_register_count = ct;
+    }
 
-	void	set_function2_flags(boost::uint16_t flags) { assert(m_is_function2); m_function2_flags = flags; }
+	void set_function2_flags(boost::uint16_t flags) {
+        assert(m_is_function2);
+        m_function2_flags = flags;
+    }
 
-	void	add_arg(int arg_register, const char* name)
+	void add_arg(int arg_register, const char* name)
 	{
 		assert(arg_register == 0 || m_is_function2 == true);
 		m_args.resize(m_args.size() + 1);
@@ -166,12 +136,10 @@ public:
 		m_args.back().m_name = PROPNAME(name);
 	}
 
-	void	set_length(int len);
+	void set_length(int len);
 
 	/// Dispatch.
-	as_value	operator()(const fn_call& fn);
-
-	//void	lazy_create_properties();
+	as_value operator()(const fn_call& fn);
 
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources. Override from as_function.
@@ -181,6 +149,44 @@ public:
 	///
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
+
+private:
+
+	/// Action buffer containing the function definition
+	const action_buffer& m_action_buffer;
+
+	/// @@ might need some kind of ref count here, but beware cycles
+	as_environment& m_env;
+
+	/// Scope stack on function definition.
+	ScopeStack _scopeStack;
+
+	/// \brief
+	/// Offset within the action_buffer where
+	/// start of the function is found.
+	size_t	m_start_pc;
+
+	/// Length of the function within the action_buffer
+	//
+	/// This is currently expressed in bytes as the
+	/// action_buffer is just a blog of memory corresponding
+	/// to a DoAction block
+	size_t m_length;
+
+	struct arg_spec
+	{
+		int m_register;
+		std::string m_name;
+	};
+	std::vector<arg_spec>	m_args;
+	bool m_is_function2;
+	boost::uint8_t m_local_register_count;
+
+	/// used by function2 to control implicit arg register assignments
+	// 
+	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+	boost::uint16_t	m_function2_flags;
+
 };
 
 

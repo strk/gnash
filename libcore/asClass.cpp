@@ -25,7 +25,7 @@
 #include "VM.h"
 #include "namedStrings.h"
 #include "as_value.h"
-#include "asNamespace.h"
+#include "Namespace.h"
 #include "Global_as.h"
 
 #ifdef ENABLE_AVM2
@@ -37,7 +37,7 @@ namespace gnash {
 
 #ifdef ENABLE_AVM2    
 bool
-asClass::addValue(string_table::key name, asNamespace *ns,
+asClass::addValue(string_table::key name, Namespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst,
         bool isstatic)
 {
@@ -65,14 +65,14 @@ asClass::addValue(string_table::key name, asNamespace *ns,
 	return true;
 }
 bool
-asClass::addMemberClass(string_table::key name, asNamespace *ns,
+asClass::addMemberClass(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, asClass *type, bool isstatic)
 {
 	return addSlot(name, ns, slotId, type, isstatic);
 }
 
 bool
-asClass::addSlotFunction(string_table::key name, asNamespace *ns,
+asClass::addSlotFunction(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, asMethod *method, bool isstatic)
 {
 	asClass a;
@@ -82,7 +82,7 @@ asClass::addSlotFunction(string_table::key name, asNamespace *ns,
 }
 
 bool
-asClass::addSlot(string_table::key name, asNamespace* ns,
+asClass::addSlot(string_table::key name, Namespace* ns,
         boost::uint32_t slotId, asClass* /*type*/, bool /*isstatic*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : 0;
@@ -98,7 +98,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns,
 }
 
     bool
-asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
+asClass::addMethod(string_table::key name, Namespace* /*ns*/,
         asMethod* method, bool /*isstatic*/)
 {
 	as_value val = new abc_function(method, getVM(*_prototype).getMachine());
@@ -113,7 +113,7 @@ asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
 
 
 bool
-asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
+asClass::addGetter(string_table::key name, Namespace *ns, asMethod *method,
 	bool isstatic)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -134,7 +134,7 @@ asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
 }
 
 bool
-asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
+asClass::addSetter(string_table::key name, Namespace *ns, asMethod *method,
 	bool isstatic)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -183,7 +183,7 @@ asClass::buildFromPrototype(as_object *o, string_table::key name,
 }
 
 bool
-asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
+asClass::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
 	asClass *type, as_value& val, bool isconst, bool isstatic,
 	ClassHierarchy *CH)
 {
@@ -196,7 +196,7 @@ asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotI
 }
 
 bool
-asClass::addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
+asClass::addSlot(string_table::key name, Namespace *ns, boost::uint32_t slotId,
 	asClass *type, bool isstatic, ClassHierarchy *CH)
 {
 	asBoundValue *bv = CH->newBoundValue();
@@ -207,7 +207,7 @@ asClass::addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId
 }
 
 bool
-asClass::addMethod(string_table::key name, asNamespace *ns, asMethod *method,
+asClass::addMethod(string_table::key name, Namespace *ns, asMethod *method,
 	bool isstatic)
 {
 	if (!isstatic)
@@ -217,7 +217,7 @@ asClass::addMethod(string_table::key name, asNamespace *ns, asMethod *method,
 }
 
 bool
-asClass::addMemberClass(string_table::key name, asNamespace *ns,
+asClass::addMemberClass(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, asClass *type, bool isstatic)
 {
 	if (!isstatic)
@@ -227,7 +227,7 @@ asClass::addMemberClass(string_table::key name, asNamespace *ns,
 
 // TODO: Figure out how this differs from addMethod
 bool
-asClass::addSlotFunction(string_table::key name, asNamespace *ns,
+asClass::addSlotFunction(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, asMethod *method, bool isstatic)
 {
 	if (!isstatic)

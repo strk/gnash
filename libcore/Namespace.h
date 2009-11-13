@@ -30,13 +30,20 @@ namespace gnash {
 
 namespace gnash {
 
-/// Represent an ActionScript namespace
-class asNamespace
+/// Represent an ActionScript Namespace
+//
+/// Namespaces are generally global resources, although private Namespaces
+/// are only visible inside a single AbcBlock.
+//
+/// Because there is no guarantee that a Namespace is private to an AbcBlock,
+/// they must never store any AbcBlock-internal information, particularly
+/// not the AbcURI.
+class Namespace
 {
 public:
 
 	/// Create an empty namespace
-	asNamespace()
+	Namespace()
         :
         _parent(0),
         _uri(0),
@@ -52,9 +59,9 @@ public:
     void markReachableResources() const { /* TODO */ }
 
 	/// Our parent (for protected)
-	void setParent(asNamespace* p) { _parent = p; }
+	void setParent(Namespace* p) { _parent = p; }
 
-	asNamespace* getParent() { return _parent; }
+	Namespace* getParent() { return _parent; }
 
 	/// Set the uri
 	void setURI(string_table::key name) { _uri = name; }
@@ -111,7 +118,7 @@ public:
 	
 private:
 
-	asNamespace* _parent;
+	Namespace* _parent;
 	string_table::key _uri;
 	string_table::key _prefix;
 

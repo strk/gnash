@@ -51,7 +51,6 @@ namespace gnash {
     class event_id;
     class movie_root;
     class asClass;
-    class asName;
     class RunResources;
     class Global_as;
 }

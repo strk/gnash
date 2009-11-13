@@ -236,7 +236,7 @@ ClassHierarchy::declareClass(const NativeClass& c)
 {
     // AS2 classes should be registered with namespace 0, so they all
     // appear in a single global namespace.
-    asNamespace *nso = findNamespace(c.namespace_name);
+    Namespace *nso = findNamespace(c.namespace_name);
 
     if (!nso) nso = addNamespace(c.namespace_name);
 

@@ -39,7 +39,7 @@
 namespace gnash {
 
 class as_function;
-class asNamespace;
+class Namespace;
 class asMethod;
 class asClass;
 typedef Property asBinding;
@@ -47,7 +47,7 @@ class asBoundValue;
 class asBoundAccessor;
 class ClassHierarchy;
 class Property;
-class asName;
+class MultiName;
 class Machine;
 class abc_function;
 
@@ -99,27 +99,27 @@ public:
 
 #ifdef ENABLE_AVM2
 
-	bool addValue(string_table::key name, asNamespace *ns,
+	bool addValue(string_table::key name, Namespace *ns,
             boost::uint32_t slotID, asClass *type, as_value& val,
             bool isconst, bool isstatic);
 
-	bool addSlot(string_table::key name, asNamespace *ns,
+	bool addSlot(string_table::key name, Namespace *ns,
             boost::uint32_t slotID, asClass *type, bool isstatic);
 
-	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method,
+	bool addMethod(string_table::key name, Namespace *ns, asMethod *method,
 		bool isstatic);
 
-	bool addGetter(string_table::key name, asNamespace *ns, asMethod *method,
+	bool addGetter(string_table::key name, Namespace *ns, asMethod *method,
 		bool isstatic);
 
-	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method,
+	bool addSetter(string_table::key name, Namespace *ns, asMethod *method,
 		bool isstatic);
 
-	bool addMemberClass(string_table::key name, asNamespace *ns,
+	bool addMemberClass(string_table::key name, Namespace *ns,
 		boost::uint32_t slotID, asClass *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
-	bool addSlotFunction(string_table::key name, asNamespace *ns,
+	bool addSlotFunction(string_table::key name, Namespace *ns,
 		boost::uint32_t slotID, asMethod *method, bool isstatic);
 
 	/// Is the class final?
@@ -162,10 +162,10 @@ public:
 	bool hasProtectedNs() const { return _protectedNs; }
 
 	/// Get the protected namespace.
-	asNamespace *getProtectedNs() { return _protectedNs; }
+	Namespace *getProtectedNs() { return _protectedNs; }
 
 	/// Set the protected namespace.
-	void setProtectedNs(asNamespace *n) { _protectedNs = n; }
+	void setProtectedNs(Namespace *n) { _protectedNs = n; }
 
 	string_table::key getName() const { return _name; }
 
@@ -209,8 +209,8 @@ public:
 		return &i->second;
 	}
 
-	asBinding* getGetBinding(as_value& v, asName& n);
-	asBinding* getSetBinding(as_value& v, asName& n);
+	asBinding* getGetBinding(as_value& v, MultiName& n);
+	asBinding* getSetBinding(as_value& v, MultiName& n);
     std::vector<abc::Trait> _traits;
 
 #endif
@@ -243,7 +243,7 @@ private:
 	bool _interface;
 	string_table::key _name;
 	std::list<asClass*> _interfaces;
-	asNamespace* _protectedNs;
+	Namespace* _protectedNs;
 	asClass* _super;
 	asMethod* _constructor;
 	asMethod* _staticConstructor;

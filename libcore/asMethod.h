@@ -120,22 +120,22 @@ public:
 	CodeStream *getBody() { return _body; }
 	void setBody(CodeStream *b) { _body = b; }
 
-	bool addValue(string_table::key name, asNamespace *ns,
+	bool addValue(string_table::key name, Namespace *ns,
             boost::uint32_t slotID, asClass *type, as_value& val, bool isconst);
 
-	bool addSlot(string_table::key name, asNamespace *ns,
+	bool addSlot(string_table::key name, Namespace *ns,
             boost::uint32_t slotID, asClass *type);
 
-	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method);
+	bool addMethod(string_table::key name, Namespace *ns, asMethod *method);
 
-	bool addGetter(string_table::key name, asNamespace *ns, asMethod *method);
+	bool addGetter(string_table::key name, Namespace *ns, asMethod *method);
 
-	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method);
+	bool addSetter(string_table::key name, Namespace *ns, asMethod *method);
 
-	bool addMemberClass(string_table::key name, asNamespace *ns,
+	bool addMemberClass(string_table::key name, Namespace *ns,
 		boost::uint32_t slotID, asClass *type);
 	
-	bool addSlotFunction(string_table::key name, asNamespace *ns,
+	bool addSlotFunction(string_table::key name, Namespace *ns,
 		boost::uint32_t slotID, asMethod *method);
 
 	/// \brief

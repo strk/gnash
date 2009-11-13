@@ -22,8 +22,8 @@
 #define GNASH_ABC_BLOCK_H
 
 #include "string_table.h"
-#include "asName.h"
-#include "asNamespace.h"
+#include "MultiName.h"
+#include "Namespace.h"
 #include "as_value.h"
 
 #include <vector>
@@ -68,7 +68,7 @@ public:
 	as_value _value;
 	string_table::key _name;
 	string_table::key _globalName;
-	asNamespace* _namespace;
+	Namespace* _namespace;
 	asMethod* _method;
 	bool _valueSet;
 
@@ -224,11 +224,11 @@ public:
 		POOL_NULL = 0x0C
 	};
     
-    typedef std::vector<asNamespace*> NamespaceSet;
+    typedef std::vector<Namespace*> NamespaceSet;
 
 	AbcBlock();
 
-    asClass* locateClass(asName &m);
+    asClass* locateClass(MultiName &m);
 
 	asClass* locateClass(const std::string& className);
 
@@ -272,7 +272,7 @@ public:
         return _methods[i];
     }
 
-    asName multinamePoolAt(size_t i) const {
+    MultiName multinamePoolAt(size_t i) const {
         checkBounds(i, _multinamePool);
         return _multinamePool[i];
     }
@@ -282,7 +282,7 @@ public:
         return _classes[i];
     }
 
-    asNamespace* namespacePoolAt(size_t i) const {
+    Namespace* namespacePoolAt(size_t i) const {
         checkBounds(i, _namespacePool);
         return _namespacePool[i];
     }
@@ -316,19 +316,19 @@ private:
 
 	void check_multiname_namespaceset(boost::uint32_t nsset);
 
-	void setMultinameNames(asName *n,string_table::key ABCName);
+	void setMultinameNames(MultiName *n,string_table::key ABCName);
 
-	void setNamespaceURI(asNamespace *ns,string_table::key ABCName);
+	void setNamespaceURI(Namespace *ns,string_table::key ABCName);
 
 	std::vector<boost::int32_t> _integerPool;
 	std::vector<boost::uint32_t> _uIntegerPool;
 	std::vector<double> _doublePool;
 	std::vector<std::string> _stringPool;
 	std::vector<string_table::key> _stringPoolTableIDs;
-	std::vector<asNamespace*> _namespacePool;
+	std::vector<Namespace*> _namespacePool;
 	std::vector<NamespaceSet> _namespaceSetPool;
 	std::vector<asMethod*> _methods;
-	std::vector<asName> _multinamePool;
+	std::vector<MultiName> _multinamePool;
 	std::vector<asClass*> _classes; 
 	std::vector<asClass*> _scripts;
 	std::vector<abc::Trait*> _traits;

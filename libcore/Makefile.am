@@ -129,7 +129,7 @@ libgnashcore_la_SOURCES = \
 	Timers.cpp \
 	RGBA.cpp 	\
 	asClass.cpp \
-	asNamespace.cpp \
+	Namespace.cpp \
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
@@ -262,7 +262,7 @@ EXTENSIONS_API = \
 	Geometry.h	\
 	Video.h \
 	asClass.h \
-	asNamespace.h \
+	Namespace.h \
 	$(NULL)
 
 # These makefile fragments build the ActionScript library for

@@ -19,7 +19,7 @@
 # include "gnashconfig.h"
 #endif
 
-#include "asNamespace.h"
+#include "Namespace.h"
 #include "VM.h"
 #include "ClassHierarchy.h"
 #include "string_table.h"
@@ -30,7 +30,7 @@
 namespace gnash {
 
 void
-asNamespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
+Namespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 {
 	asClass *pClass = ch.newClass();
 	pClass->setName(name);
@@ -38,7 +38,7 @@ asNamespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 }
 
 void
-asNamespace::dump(string_table& st)
+Namespace::dump(string_table& st)
 {
 #if ENABLE_AVM2
     std::ostringstream s;

@@ -45,7 +45,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
 #include "namedStrings.h"
-#include "asName.h"
 #include "asClass.h"
 
 
