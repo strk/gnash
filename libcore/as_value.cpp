@@ -1663,11 +1663,6 @@ as_value::as_value(as_object* obj)
 }
 
 
-/// Chad: Document this
-as_value::as_value(asNamespace &)
-{
-}
-
 /// Instantiate this value from an AMF element 
 as_value::as_value(const amf::Element& el)
 	:
