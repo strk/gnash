@@ -84,7 +84,7 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     SimpleBuffer& buf = v.buf;
 
     if (!lt) {
-        obj->callMethod(NSV::PROP_ON_DATA, as_value());
+        callMethod(obj, NSV::PROP_ON_DATA, as_value());
         return true;
     }
     
@@ -118,7 +118,7 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     // got nothing, won't bother BOFs of nulls
     if ( buf.empty() )
     {
-        obj->callMethod(NSV::PROP_ON_DATA, as_value());
+        callMethod(obj, NSV::PROP_ON_DATA, as_value());
         return true;
     }
 
@@ -146,7 +146,7 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     // destroyed as soon as we return though...
 
     // NOTE: Another data copy here !
-    obj->callMethod(NSV::PROP_ON_DATA, dataVal);
+    callMethod(obj, NSV::PROP_ON_DATA, dataVal);
 
     return true;
 
@@ -206,7 +206,7 @@ public:
         // Both elements apparently must be strings, or we move onto the 
         // next pair.
         if (!val.is_string() || !_key.is_string()) return;
-        _target.callMethod(NSV::PROP_PUSH, _key, val);
+        callMethod(&_target, NSV::PROP_PUSH, _key, val);
     }
 
 private:
@@ -318,7 +318,7 @@ loadableobject_addRequestHeader(const fn_call& fn)
         return as_value(); 
     }
 
-    array->callMethod(NSV::PROP_PUSH, name, val);
+    callMethod(array, NSV::PROP_PUSH, name, val);
     
     return as_value();
 }

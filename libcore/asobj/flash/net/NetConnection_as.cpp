@@ -435,7 +435,7 @@ HTTPRemotingHandler::advance()
                             log_debug("Calling NetConnection.%s(%s)",
                                     headerName, tmp);
 #endif
-                            _nc.owner().callMethod(key, tmp);
+                            callMethod(&_nc.owner(), key, tmp);
                         }
                     }
                 }
@@ -517,7 +517,7 @@ HTTPRemotingHandler::advance()
                             reply_start = b - reply.data();
 
                             // if actionscript specified a callback object, call it
-                            boost::intrusive_ptr<as_object> callback = pop_callback(id);
+                            as_object* callback = pop_callback(id);
                             if (callback) {
 
                                 string_table::key methodKey;
@@ -537,7 +537,7 @@ HTTPRemotingHandler::advance()
                                 log_debug("calling onResult callback");
 #endif
                                 // FIXME check if above line can fail and we have to react
-                                callback->callMethod(methodKey, reply_as_value);
+                                callMethod(callback, methodKey, reply_as_value);
 #ifdef GNASH_DEBUG_REMOTING
                                 log_debug("callback called");
 #endif
@@ -743,7 +743,7 @@ NetConnection_as::notifyStatus(StatusCode code)
     o->init_member("code", info.first, flags);
     o->init_member("level", info.second, flags);
 
-    owner().callMethod(NSV::PROP_ON_STATUS, o);
+    callMethod(&owner(), NSV::PROP_ON_STATUS, o);
 
 }
 

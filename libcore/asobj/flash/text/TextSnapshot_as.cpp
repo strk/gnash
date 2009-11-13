@@ -302,7 +302,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
-                ri.callMethod(NSV::PROP_PUSH, el);
+                callMethod(&ri, NSV::PROP_PUSH, el);
 
                 ++pos;
                 x += k->advance;

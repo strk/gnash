@@ -419,7 +419,7 @@ as_object::get_member(string_table::key name, as_value* val,
         log_debug("__resolve exists, calling with '%s'", undefinedName);
 
         // TODO: we've found the property, don't search for it again.
-        *val = callMethod(NSV::PROP_uuRESOLVE, undefinedName);
+        *val = callMethod(this, NSV::PROP_uuRESOLVE, undefinedName);
         return true;
     }
 
@@ -1142,96 +1142,102 @@ as_object::getMember(string_table::key name, string_table::key nsname)
 }
 
 as_value
-as_object::callMethod(string_table::key methodName)
+callMethod(as_object* obj, string_table::key methodName)
 {
+    if (!obj) return as_value();
+
 	as_value method;
 
-	if (! get_member(methodName, &method))
+	if (!obj->get_member(methodName, &method))
 	{
 		return as_value();
 	}
 
-	as_environment env(_vm);
+	as_environment env(getVM(*obj));
 
-	return call_method0(method, env, this);
+	return call_method0(method, env, obj);
 }
 
 as_value
-as_object::callMethod(string_table::key methodName, const as_value& arg0)
+callMethod(as_object* obj, string_table::key methodName, const as_value& arg0)
 {
+    if (!obj) return as_value();
 	as_value method;
 
-	if (!get_member(methodName, &method))
+	if (!obj->get_member(methodName, &method))
 	{
 		return as_value();
 	}
 
-	as_environment env(_vm);
+	as_environment env(getVM(*obj));
 
     fn_call::Args args;
     args += arg0;
 
-	return call_method(method, env, this, args);
+	return call_method(method, env, obj, args);
 }
 
 as_value
-as_object::callMethod(string_table::key methodName, const as_value& arg0,
+callMethod(as_object* obj, string_table::key methodName, const as_value& arg0,
         const as_value& arg1)
 {
+    if (!obj) return as_value();
 	as_value method;
 
-	if (! get_member(methodName, &method))
+	if (!obj->get_member(methodName, &method))
 	{
 		return as_value();
 	}
 
-	as_environment env(_vm);
+	as_environment env(getVM(*obj));
 
     fn_call::Args args;
     args += arg0, arg1;
 
-	return call_method(method, env, this, args);
+	return call_method(method, env, obj, args);
 }
 
 as_value
-as_object::callMethod(string_table::key methodName,
+callMethod(as_object* obj, string_table::key methodName,
 	const as_value& arg0, const as_value& arg1, const as_value& arg2)
 {
+    if (!obj) return as_value();
 	as_value ret;
 	as_value method;
 
-	if (! get_member(methodName, &method))
+	if (!obj->get_member(methodName, &method))
 	{
 		return ret;
 	}
 
-	as_environment env(_vm);
+	as_environment env(getVM(*obj));
 
     fn_call::Args args;
     args += arg0, arg1, arg2;
 
-	ret = call_method(method, env, this, args);
+	ret = call_method(method, env, obj, args);
 
 	return ret;
 }
 
 as_value
-as_object::callMethod(string_table::key methodName, const as_value& arg0,
+callMethod(as_object* obj, string_table::key methodName, const as_value& arg0,
         const as_value& arg1, const as_value& arg2, const as_value& arg3)
 {
+    if (!obj) return as_value();
 	as_value method;
 
-	if (! get_member(methodName, &method))
+	if (!obj->get_member(methodName, &method))
 	{
 		return as_value();
 	}
 
-	as_environment env(_vm);
+	as_environment env(getVM(*obj));
 
     fn_call::Args args;
     args += arg0, arg1, arg2, arg3;
 
-	return call_method(method, env, this, args);
+	return call_method(method, env, obj, args);
 
 }
 

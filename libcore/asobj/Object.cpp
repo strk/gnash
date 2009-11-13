@@ -527,8 +527,8 @@ object_unwatch(const fn_call& fn)
 as_value
 object_toLocaleString(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
-	return obj->callMethod(NSV::PROP_TO_STRING);
+    as_object* obj = ensure<ValidThis>(fn);
+	return callMethod(obj, NSV::PROP_TO_STRING);
 }
   
 } // anonymous namespace

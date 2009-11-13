@@ -383,7 +383,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         std::string escaped(nodeValue);
         XMLDocument_as::escape(escaped);
         const std::string& val = encode ? 
-            global->callMethod(NSV::PROP_ESCAPE, escaped).to_string() :
+            callMethod(global, NSV::PROP_ESCAPE, escaped).to_string() :
             escaped;
 
 	    xmlout << val;
@@ -932,7 +932,7 @@ xmlnode_childNodes(const fn_call& fn)
                     it != itEnd; ++it )
     {
         boost::intrusive_ptr<XMLNode_as> node = *it;
-        ary->callMethod(NSV::PROP_PUSH, node.get());
+        callMethod(ary, NSV::PROP_PUSH, node.get());
     }
 
     return as_value(ary);

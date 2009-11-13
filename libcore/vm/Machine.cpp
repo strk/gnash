@@ -1659,7 +1659,7 @@ Machine::execute()
 
                     as_object* arr = _global->createArray();
                     while (i--) {
-                        arr->callMethod(NSV::PROP_PUSH, pop_stack());
+                        callMethod(arr, NSV::PROP_PUSH, pop_stack());
                     }
                     push_stack(as_value(arr));
                     break;

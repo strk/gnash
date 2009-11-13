@@ -170,7 +170,7 @@ keyboard_class_init(as_object& where, const ObjectURI& uri)
     // All properties are protected using ASSetPropFlags.
     Global_as& gl = getGlobal(where);
     as_object* null = 0;
-    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, key, null, 7);
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, key, null, 7);
 }
 
 } // gnash namespace

@@ -287,7 +287,7 @@ public:
 
     virtual void execute()
     {
-        _target->callMethod(_name, _arg1, _arg2);
+        callMethod(_target, _name, _arg1, _arg2);
     }
 
 #ifdef GNASH_USE_GC

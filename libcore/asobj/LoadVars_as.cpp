@@ -98,7 +98,7 @@ loadvars_onData(const fn_call& fn)
 
 	if (src.is_undefined()) {
 		thisPtr->set_member(NSV::PROP_LOADED, false);
-		thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
+		callMethod(thisPtr, NSV::PROP_ON_LOAD, false);
     }
     else {
 		VM& vm = getVM(fn);
@@ -106,8 +106,8 @@ loadvars_onData(const fn_call& fn)
 		string_table::key decodeKey = st.find("decode"); 
 
 		thisPtr->set_member(NSV::PROP_LOADED, true);
-		thisPtr->callMethod(decodeKey, src);
-		thisPtr->callMethod(NSV::PROP_ON_LOAD, true);
+		callMethod(thisPtr, decodeKey, src);
+		callMethod(thisPtr, NSV::PROP_ON_LOAD, true);
 	}
 
 	return as_value();
@@ -140,9 +140,9 @@ loadvars_tostring(const fn_call& fn)
 
         if (it != vars.begin()) o << "&";
         const std::string& var = 
-            global->callMethod(NSV::PROP_ESCAPE, it->first).to_string();
+            callMethod(global, NSV::PROP_ESCAPE, it->first).to_string();
         const std::string& val = 
-            global->callMethod(NSV::PROP_ESCAPE, it->second).to_string();
+            callMethod(global, NSV::PROP_ESCAPE, it->second).to_string();
         o << var << "=" << val;
 	}
     return as_value(o.str()); 

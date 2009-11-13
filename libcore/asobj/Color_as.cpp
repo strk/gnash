@@ -249,7 +249,7 @@ color_ctor(const fn_call& fn)
 
     Global_as& gl = getGlobal(fn);
     as_object* null = 0;
-    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, obj, null, 7);
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, obj, null, 7);
 
 	return as_value(); 
 }

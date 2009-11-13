@@ -2021,7 +2021,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 {
                     return false;
                 }
-                array->callMethod(NSV::PROP_PUSH, arrayElement);
+                callMethod(array, NSV::PROP_PUSH, arrayElement);
             }
 
             ret.set_as_object(array);
