@@ -206,7 +206,7 @@ as_environment::get_variable_raw(const std::string& varname,
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
         // const_cast needed due to non-const as_object::get_member 
-        as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+        as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
         if (obj && obj->get_member(key, &val))
         {
             // Found the var in with context.
@@ -304,7 +304,7 @@ as_environment::delVariableRaw(const std::string& varname,
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
         // const_cast needed due to non-const as_object::get_member 
-        as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+        as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
         if (obj)
         {
             std::pair<bool,bool> ret = obj->delProperty(varkey);
@@ -397,7 +397,7 @@ as_environment::set_variable_raw(const std::string& varname,
         for (size_t i = scopeStack.size(); i > 0; --i)
         {
             // const_cast needed due to non-const as_object::get_member 
-            as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+            as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
             if (obj && obj->set_member(varkey, val, 0, true) )
             {
                 return;
@@ -416,7 +416,7 @@ as_environment::set_variable_raw(const std::string& varname,
         for (size_t i = scopeStack.size(); i > 0; --i)
         {
             // const_cast needed due to non-const as_object::get_member 
-            as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+            as_object* obj = const_cast<as_object*>(scopeStack[i-1]);
             if (obj && obj->set_member(varkey, val, 0, true))
             {
         return;
@@ -702,7 +702,7 @@ as_environment::find_object(const std::string& path,
                         // const_cast needed due to non-const 
                         // as_object::get_member 
                         as_object* obj = 
-                            const_cast<as_object*>((*scopeStack)[i-1].get());
+                            const_cast<as_object*>((*scopeStack)[i-1]);
                         
                         element = getElement(obj, subpartKey);
                         if (element) break;

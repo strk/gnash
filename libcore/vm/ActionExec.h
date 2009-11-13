@@ -180,7 +180,7 @@ private:
 	const swf_function* _func;
 
 	/// The 'this' pointer, if this is a function call
-	boost::intrusive_ptr<as_object> _this_ptr;
+	as_object* _this_ptr;
 
 	/// Stack size at start of execution
 	size_t _initialStackSize;

@@ -228,11 +228,10 @@ ActionExec::operator() ()
             }
 
             // Cleanup any expired "with" blocks.
-            while ( ! _withStack.empty() && pc >= _withStack.back().end_pc() )
-            {
+            while (!_withStack.empty() && pc >= _withStack.back().end_pc()) {
            
                 // Drop last stack element
-                assert(_withStack.back().object() == _scopeStack.back().get());
+                assert(_withStack.back().object() == _scopeStack.back());
                 _withStack.pop_back();
                 
                 // hopefully nothing gets after the 'with' stack.
@@ -833,7 +832,7 @@ ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 as_object*
 ActionExec::getThisPointer()
 {
-    return _func ? _this_ptr.get() : getObject(env.get_original_target()); 
+    return _func ? _this_ptr : getObject(env.get_original_target()); 
 }
 
 } // end of namespace gnash
