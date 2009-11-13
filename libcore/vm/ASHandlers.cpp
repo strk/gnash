@@ -2614,11 +2614,19 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     std::string function_name;
 
     // Let's consider it a as a string and lookup the function.
+    //
+    // Note: this produces the correct behaviour: Any as_value, including
+    // null or numbers, are converted to a string and the corresponding
+    // function is called. If it is undefined, nothing happens, even if
+    // there is a function called 'undefined'.
+    //
+    // Using to_string_versioned() would produce the wrong behaviour.
+    //
+    // In all cases, even undefined, the specified number of arguments
+    // is dropped from the stack.
     const std::string& funcname = env.pop().to_string();
     as_object* this_ptr = thread.getThisPointer();
     as_object* super = NULL;
-
-    //log_debug("ActionCallFunction: thread.getThisPointer returned %s @ %p", typeName(*this_ptr), (void*)this_ptr);
 
     as_value function = thread.getVariable(funcname, &this_ptr);
 
