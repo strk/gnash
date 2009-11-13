@@ -391,11 +391,7 @@ HTTP::processClientRequest(int fd)
 	}
     }
 
-    if (result) {
-	return _cmd;
-    } else {
-	return HTTP::HTTP_NONE;
-   }
+    return _cmd;
 }
 
 // A GET request asks the server to send a file to the client
@@ -1131,7 +1127,6 @@ HTTP::formatLastModified()
 
     return formatLastModified(date.str());
 }
-
 
 amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
