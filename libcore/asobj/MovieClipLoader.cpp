@@ -22,7 +22,6 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "action.h" // for call_method
 #include "as_value.h"
 #include "as_object.h" // for inheritance
 #include "movie_root.h"
