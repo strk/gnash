@@ -53,6 +53,7 @@
 #include "flash/display/DisplayObject_as.h"
 #include "flash/display/Stage_as.h"
 #include "flash/display/MovieClip_as.h"
+#include "flash/display/Shape_as.h"
 #include "flash/display/Sprite_as.h"
 #include "flash/display/Bitmap_as.h"
 #include "flash/events/Event_as.h"
@@ -589,6 +590,8 @@ avm2Classes(string_table& st)
            NSV::NS_FLASH_SYSTEM, 1))
 
         // Display classes
+        (N(shape_class_init, st.find("Shape"), NSV::CLASS_DISPLAYOBJECT,
+           NSV::NS_FLASH_DISPLAY, 3))
         (N(displayobject_class_init, NSV::CLASS_DISPLAYOBJECT,
            NSV::CLASS_EVENTDISPATCHER, NSV::NS_FLASH_DISPLAY, 3))
         (N(interactiveobject_class_init, NSV::CLASS_INTERACTIVEOBJECT,
