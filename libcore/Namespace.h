@@ -48,7 +48,6 @@ public:
         _parent(0),
         _uri(0),
         _prefix(0),
-        _abcURI(0),
         _classes(),
 		mRecursePrevent(false),
         _private(false),
@@ -68,9 +67,6 @@ public:
 
 	/// What is the Uri of the namespace?
 	string_table::key getURI() const { return _uri; }
-
-	string_table::key getAbcURI() const {return _abcURI;}
-	void setAbcURI(string_table::key n){ _abcURI = n; }
 
 	/// What is the XML prefix?
 	string_table::key getPrefix() const { return _prefix; }
@@ -121,8 +117,6 @@ private:
 	Namespace* _parent;
 	string_table::key _uri;
 	string_table::key _prefix;
-
-	string_table::key _abcURI;
 
 	typedef std::map<string_table::key, asClass*> container;
 	container _classes;

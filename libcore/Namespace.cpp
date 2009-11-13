@@ -50,8 +50,8 @@ Namespace::dump(string_table& st)
         s << st.value(t) << "(URI: " << t << "), ";
     }
 
-    log_debug("Classes in namespace %s (URI: %s, ABC: %s): %s",
-            st.value(_uri), _uri, _abcURI, s.str());
+    log_debug("Classes in namespace %s (URI: %s): %s",
+            st.value(_uri), _uri, s.str());
 #endif
 }
 
