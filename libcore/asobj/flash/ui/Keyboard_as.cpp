@@ -27,7 +27,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "movie_root.h"
-#include "action.h" // for call_method
 #include "VM.h" // for registerNative
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
