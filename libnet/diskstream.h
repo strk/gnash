@@ -226,7 +226,7 @@ public:
 
     /// \brief copy another DiskStream into ourselves, so they share data
     ///		in memory.
-    DiskStream &operator==(DiskStream &stream);
+    DiskStream &operator=(DiskStream *stream);
 
     /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
@@ -258,6 +258,9 @@ public:
 
     state_e getState() { return _state; };
     void setState(state_e state) { _state = state; };
+
+    int getFileFd() { return _filefd; };
+    int getNetFd() { return _netfd; };
     
 #ifdef USE_STATS_CACHE
     /// \brief Get the time of the first access.
@@ -349,7 +352,7 @@ private:
 #endif
 
     // The header, tag, and onMetaData from the FLV file.
-    boost::scoped_ptr<amf::Flv>    _flv;
+    boost::shared_ptr<amf::Flv>    _flv;
 };
 
 /// \brief Dump to the specified output stream.

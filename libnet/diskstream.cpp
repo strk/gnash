@@ -316,14 +316,16 @@ DiskStream::~DiskStream()
 /// \brief copy another DiskStream into ourselves, so they share data
 ///		in memory.
 DiskStream &
-DiskStream::operator==(DiskStream &stream)
+DiskStream::operator=(DiskStream *stream)
 {
-//    GNASH_REPORT_FUNCTION;
-    _filespec = stream.getFilespec();
-    _filetype = stream.getFileType();
-    // _filefd = stream.getFile
-    _dataptr = stream.get();
-    _state = stream.getState();
+    GNASH_REPORT_FUNCTION;
+    
+    _filespec = stream->getFilespec();
+    _filetype = stream->getFileType();
+    _filefd = stream->getFileFd();
+    _netfd = stream->getNetFd();
+    _dataptr = stream->get();
+    _state = stream->getState();
 
     return *this;
 }
@@ -356,7 +358,6 @@ DiskStream::close()
     _seekptr = _dataptr;
     _offset = 0;
     _state = CLOSED;
-    _netfd = 0;
 
 #if 0				// FIXME: don't unmap the memory for debugging
 #ifdef _WIN32
@@ -366,7 +367,6 @@ DiskStream::close()
 #else
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
-//  	delete[] _dataptr;
     }
 #endif
 #endif
@@ -494,7 +494,6 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 		   _filespec, strerror(errno));
 	return 0;
     } else {
-	// close();
 	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
 	_dataptr = dataptr;
@@ -522,6 +521,10 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	}
     }
 
+    if (filesize < _max_memload) {
+	close();
+    }
+    
     // The data pointer points to the real data past all the header bytes.
     _dataptr = ptr;
 
