@@ -942,14 +942,17 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         as_value& val)
 {
     
-    string_table& st = getStringTable(*getObject(&obj));
+    as_object* o = getObject(&obj);
+    assert(o);
+
+    string_table& st = getStringTable(*o);
     const std::string& propname = st.value(key);
 
     // Check _level0.._level9
-    movie_root& mr = getRoot(*getObject(&obj));
+    movie_root& mr = getRoot(*o);
     unsigned int levelno;
-    if (mr.isLevelTarget(propname, levelno)) {
-        Movie* mo = mr.getLevel(levelno);
+    if (isLevelTarget(getSWFVersion(*o), propname, levelno)) {
+        MovieClip* mo = mr.getLevel(levelno);
         if (mo) {
             val = getObject(mo);
             return true;
@@ -974,14 +977,14 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         default:
             break;
         case NSV::PROP_uROOT:
-            if (getSWFVersion(*getObject(&obj)) < 5) break;
+            if (getSWFVersion(*o) < 5) break;
             val = getObject(obj.getAsRoot());
             return true;
         case NSV::PROP_uGLOBAL:
             // TODO: clean up this mess.
             assert(getObject(&obj));
-            if (getSWFVersion(*getObject(&obj)) < 6) break;
-            val = &getGlobal(*getObject(&obj));
+            if (getSWFVersion(*o) < 6) break;
+            val = &getGlobal(*o);
             return true;
     }
 

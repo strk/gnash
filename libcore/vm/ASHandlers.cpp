@@ -2099,8 +2099,7 @@ SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
         const std::string& url, boost::uint8_t method)
 {
 
-    if (url.empty())
-    {
+    if (url.empty()) {
         log_error(_("Bogus empty GetUrl url in SWF file, skipping"));
         return;
     }
@@ -2112,8 +2111,7 @@ SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
     MovieClip::VariablesMethod sendVarsMethod;
 
     // handle malformed sendVarsMethod
-    if ((method & 3) == 3)
-    {
+    if ((method & 3) == 3) {
         log_error(_("Bogus GetUrl2 send vars method "
             " in SWF file (both GET and POST requested). Using GET"));
         sendVarsMethod = MovieClip::METHOD_GET;
@@ -2217,7 +2215,7 @@ SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
         if (!target_ch)
         {
             unsigned int levelno;
-            if (m.isLevelTarget(target_string, levelno))
+            if (isLevelTarget(getSWFVersion(env), target_string, levelno))
             {
                 log_debug(_("Testing _level loading (level %u)"), levelno);
  
@@ -2260,7 +2258,7 @@ SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
     }
 
     unsigned int levelno;
-    if (m.isLevelTarget(target_string, levelno))
+    if (isLevelTarget(getSWFVersion(env), target_string, levelno))
     {
         log_debug(_("Testing _level loading (level %u)"), levelno);
         m.loadMovie(url, target_string, varsToSend, sendVarsMethod);

@@ -44,10 +44,11 @@ class asClass;
 class Machine;
 
 namespace abc {
-
+ 
 class Trait
 {
 public:
+
 
     enum Kind
 	{
@@ -66,8 +67,11 @@ public:
 	boost::uint32_t _typeIndex;
 	boost::uint32_t _classInfoIndex;
 	as_value _value;
-	string_table::key _name;
+
+	URI _name;
+
 	string_table::key _globalName;
+
 	Namespace* _namespace;
 	asMethod* _method;
 	bool _valueSet;
@@ -316,9 +320,9 @@ private:
 
 	void check_multiname_namespaceset(boost::uint32_t nsset);
 
-	void setMultinameNames(MultiName *n,string_table::key ABCName);
+	void setMultinameNames(MultiName *n, abc::URI ABCName);
 
-	void setNamespaceURI(Namespace *ns,string_table::key ABCName);
+	void setNamespaceURI(Namespace *ns, abc::URI ABCName);
 
 	std::vector<boost::int32_t> _integerPool;
 	std::vector<boost::uint32_t> _uIntegerPool;

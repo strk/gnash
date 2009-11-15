@@ -186,7 +186,7 @@ public:
     /// POST CONDITIONS:
     /// - The returned DisplayObject has a depth equal to 'num'
     ///
-    Movie* getLevel(unsigned int num) const;
+    MovieClip* getLevel(unsigned int num) const;
 
     /// Put the given movie at the given level 
     //
@@ -739,17 +739,6 @@ public:
             const std::string& data, MovieClip::VariablesMethod method);
 
 
-    /// Return true if the given string can be interpreted as a _level name
-    //
-    /// @param name
-    ///   The target string.
-    ///   Will be considered case-insensitive if VM version is < 7.
-    ///
-    /// @param levelno
-    ///   Output parameter, will be set to the level number, if true is
-    ///   returned
-    bool isLevelTarget(const std::string& name, unsigned int& levelno);
-
     key::code lastKeyEvent() const {
         return _lastKeyEvent;
     }
@@ -1177,6 +1166,17 @@ private:
     MovieLoader _movieLoader;
 
 };
+
+/// Return true if the given string can be interpreted as a _level name
+//
+/// @param name
+///   The target string.
+///   Will be considered case-insensitive if VM version is < 7.
+///
+/// @param levelno
+///   Output parameter, will be set to the level number, if true is
+///   returned
+bool isLevelTarget(int version, const std::string& name, unsigned int& levelno);
 
 DSOEXPORT short stringToStageAlign(const std::string& s);
 
