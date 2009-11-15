@@ -87,18 +87,25 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
         obj->callMethod(NSV::PROP_ON_DATA, as_value());
         return true;
     }
-    
 
     static const size_t chunksize = 65535;
     uint8_t chunk[chunksize];
 
     size_t actuallyRead = lt->readNonBlocking(chunk, chunksize);
-    if (lt->bad()) return true;
 
-    if ( actuallyRead )
-    {
-        if ( buf.empty() ) // set total size only on first read
+    // We must still call onData if the stream is in error condition, e.g.
+    // when an HTTP 404 error is returned.
+    if (lt->bad()) {
+        obj->callMethod(NSV::PROP_ON_DATA, as_value());
+        return true;
+    }
+
+    if (actuallyRead) {
+
+        // set total size only on first read
+        if (buf.empty()) {
             obj->set_member(NSV::PROP_uBYTES_TOTAL, lt->size());
+        }
 
         buf.append(chunk, actuallyRead);
 
@@ -109,15 +116,13 @@ processLoad(movie_root::LoadCallbacks::value_type& v)
     }
 
     // We haven't finished till EOF 
-    if ( ! lt->eof() ) return false;
-
+    if (!lt->eof()) return false;
 
     log_debug("LoadableObject reached EOF (%d/%d loaded)",
                 buf.size(), lt->size());
 
     // got nothing, won't bother BOFs of nulls
-    if ( buf.empty() )
-    {
+    if (buf.empty()) {
         obj->callMethod(NSV::PROP_ON_DATA, as_value());
         return true;
     }
