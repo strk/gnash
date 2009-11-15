@@ -245,7 +245,7 @@ string_split(const fn_call& fn)
     if (fn.nargs == 0)
     {
         // Condition 1:
-        array->callMethod(NSV::PROP_PUSH, str);
+        callMethod(array, NSV::PROP_PUSH, str);
         return as_value(array);
     }
 
@@ -257,7 +257,7 @@ string_split(const fn_call& fn)
         (version >= 6 && fn.arg(0).is_undefined()))
     {
         // Condition 2:
-        array->callMethod(NSV::PROP_PUSH, str);
+        callMethod(array, NSV::PROP_PUSH, str);
         return as_value(array);
     }
 
@@ -281,7 +281,7 @@ string_split(const fn_call& fn)
         {
             // Condition 3 (plus a shortcut if the string itself
             // is empty).
-            array->callMethod(NSV::PROP_PUSH, str);
+            callMethod(array, NSV::PROP_PUSH, str);
             return as_value(array);            
         }
     }
@@ -293,7 +293,7 @@ string_split(const fn_call& fn)
             // If the string itself is empty, SWF6 returns a 0-sized
             // array only if the delimiter is also empty. Otherwise
             // it returns an array with 1 empty element.
-            if (delimiterSize) array->callMethod(NSV::PROP_PUSH, str);
+            if (delimiterSize) callMethod(array, NSV::PROP_PUSH, str);
             return as_value(array);
         }
 
@@ -314,7 +314,7 @@ string_split(const fn_call& fn)
         if (delim.empty()) {
             for (size_t i = 0, e = std::min<size_t>(wstr.size(), max);
                     i < e; ++i) {
-                array->callMethod(NSV::PROP_PUSH,
+                callMethod(array, NSV::PROP_PUSH,
                        utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
             return as_value(array);
@@ -328,7 +328,7 @@ string_split(const fn_call& fn)
     while (num < max) {
         pos = wstr.find(delim, pos);
 
-        array->callMethod(NSV::PROP_PUSH, utf8::encodeCanonicalString(
+        callMethod(array, NSV::PROP_PUSH, utf8::encodeCanonicalString(
                        wstr.substr(prevpos, pos - prevpos), version));
 
         if (pos == std::wstring::npos) break;

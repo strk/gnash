@@ -232,7 +232,7 @@ MovieLoader::processCompletedRequest(const Request& r)
             // (supposedly the Adobe mozilla plugin).
             as_value arg3(0.0);
 
-            handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
+            callMethod(handler, NSV::PROP_BROADCAST_MESSAGE, "onLoadError",
                     arg1, arg2, arg3);
         }
         return true; // nothing to do, but completed
@@ -282,7 +282,7 @@ MovieLoader::processCompletedRequest(const Request& r)
         //        (0/-1 bytes loaded/total) but still with *new*
         //        display object as target (ie: the target won't
         //        contain members set either before or after loadClip.
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
+        callMethod(handler, NSV::PROP_BROADCAST_MESSAGE, "onLoadStart",
             getObject(targetDO));
 
         // Dispatch onLoadProgress
@@ -291,12 +291,12 @@ MovieLoader::processCompletedRequest(const Request& r)
         //
         size_t bytesLoaded = md->get_bytes_loaded();
         size_t bytesTotal = md->get_bytes_total();
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
+        callMethod(handler, NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress",
             getObject(targetDO), bytesLoaded, bytesTotal);
 
         // Dispatch onLoadComplete
         // FIXME: find semantic of last arg
-        handler->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
+        callMethod(handler, NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete",
             getObject(targetDO), as_value(0.0));
 
 

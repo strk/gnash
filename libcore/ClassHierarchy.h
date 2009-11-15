@@ -26,7 +26,7 @@
 #include "as_object.h"
 #include "SafeStack.h"
 #include "asClass.h"
-#include "asNamespace.h"
+#include "Namespace.h"
 
 #ifdef ENABLE_AVM2
 # include "asBoundValues.h"
@@ -160,7 +160,7 @@ public:
 	/// Get the global namespace.  This is not the Global object -- it only
 	/// contains the classes, not any globally available functions or anything
 	/// else.
-	asNamespace* getGlobalNs() { return mGlobalNamespace; }
+	Namespace* getGlobalNs() { return mGlobalNamespace; }
 
 	// Chad: Document
 	as_object* newOfType(string_table::key /*whattype*/) { return NULL; }
@@ -169,7 +169,7 @@ public:
 	///
 	/// @return 
 	/// The namespace with the given uri or NULL if it doesn't exist.
-	asNamespace* findNamespace(string_table::key uri)
+	Namespace* findNamespace(string_table::key uri)
 	{
 		namespacesContainer::iterator i;
 		if (mNamespaces.empty())
@@ -186,10 +186,10 @@ public:
 	/// can't ever be found. (They must be kept and passed to the appropriate
 	/// objects.)
 	///
-	asNamespace* anonNamespace(string_table::key uri)
+	Namespace* anonNamespace(string_table::key uri)
 	{
 		mAnonNamespaces.grow(1); 
-		asNamespace *n = &mAnonNamespaces.top(0); 
+		Namespace *n = &mAnonNamespaces.top(0); 
 		n->setURI(uri); 
 		return n; 
 	}
@@ -198,9 +198,9 @@ public:
 	/// Add a namespace to the set. Don't use to add unnamed namespaces.
 	/// Will overwrite existing namespaces 'kind' and 'prefix' values. 
 	/// Returns the added space.
-	asNamespace* addNamespace(string_table::key uri)
+	Namespace* addNamespace(string_table::key uri)
 	{
-		asNamespace *n = findNamespace(uri);
+		Namespace *n = findNamespace(uri);
 		if (n) return n;
 		// The set should create it automatically here. TODO: Make sure
 		mNamespaces[uri].setURI(uri);
@@ -245,10 +245,10 @@ private:
 	as_object* mGlobal;
 	Extension* mExtension;
 
-	typedef std::map<string_table::key, asNamespace> namespacesContainer;
+	typedef std::map<string_table::key, Namespace> namespacesContainer;
 	namespacesContainer mNamespaces;
-	SafeStack<asNamespace> mAnonNamespaces;
-	asNamespace* mGlobalNamespace;
+	SafeStack<Namespace> mAnonNamespaces;
+	Namespace* mGlobalNamespace;
 	SafeStack<asClass> mClassMemory;
 
 #ifdef ENABLE_AVM2

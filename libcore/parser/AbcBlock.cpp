@@ -196,7 +196,7 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
 		log_error(_("ABC: Trait name must be fully qualified."));
 		return false;
 	}
-	asName multiname = pBlock->_multinamePool[name];
+	MultiName multiname = pBlock->_multinamePool[name];
 	_name = pBlock->_multinamePool[name].getABCName();
 	_globalName = pBlock->_multinamePool[name].getGlobalName();
 	_namespace = pBlock->_multinamePool[name].getNamespace();
@@ -388,7 +388,7 @@ AbcBlock::check_multiname_namespaceset(boost::uint32_t nsset)
 }
 
 void
-AbcBlock::setMultinameNames(asName *n, string_table::key ABCName)
+AbcBlock::setMultinameNames(MultiName *n, string_table::key ABCName)
 {
 	
 	n->setABCName(ABCName);
@@ -401,9 +401,8 @@ AbcBlock::setMultinameNames(asName *n, string_table::key ABCName)
 }
 
 void
-AbcBlock::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
+AbcBlock::setNamespaceURI(Namespace *ns, string_table::key ABCName)
 {
-	ns->setAbcURI(ABCName);
 	std::string name = _stringPool[ABCName];
 	string_table::key global_key = _stringTable->find(name);
 	ns->setURI(global_key);
@@ -416,7 +415,7 @@ AbcBlock::locateClass(const std::string& className)
 
     const std::string::size_type pos = className.rfind(".");
     
-    asName a;
+    MultiName a;
 
     const std::string& nsstr = (pos != std::string::npos) ? 
         className.substr(0, pos) : "";
@@ -426,19 +425,12 @@ AbcBlock::locateClass(const std::string& className)
     
     a.setGlobalName(_stringTable->find(clstr));
 
-    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
+    for (std::vector<Namespace*>::iterator i = _namespacePool.begin();
             i != _namespacePool.end(); ++i) {
         
-        const size_t key = (*i)->getAbcURI();
+        const size_t key = (*i)->getURI();
 
-        log_abc("Namespace ABC uri: %s; global URI: %s, string: %s, "
-                "pool size: %s",
-            key, (*i)->getURI(), _stringTable->value((*i)->getURI()),
-            _stringPool.size());
-
-        assert(key < _stringPool.size());
-
-        if (_stringPool[key] == nsstr) {
+        if (key == _stringTable->find(nsstr)) {
             a.setNamespace(*i);
             break;
         }
@@ -449,7 +441,7 @@ AbcBlock::locateClass(const std::string& className)
 }
 
 asClass*
-AbcBlock::locateClass(asName& m)
+AbcBlock::locateClass(MultiName& m)
 {
 	asClass* found = 0;
 
@@ -460,7 +452,7 @@ AbcBlock::locateClass(asName& m)
 	}
 	if (m.namespaceSet() && !m.namespaceSet()->empty())
 	{
-		std::vector<asNamespace*>::const_iterator i;
+		std::vector<Namespace*>::const_iterator i;
 		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i) {
 
 			found = (*i)->getClass(m.getGlobalName());
@@ -594,7 +586,7 @@ AbcBlock::read_namespaces()
 		else
 		{
             string_table::key gn = _stringTable->find(_stringPool[nameIndex]);
-			asNamespace *n = mCH->findNamespace(gn);
+			Namespace *n = mCH->findNamespace(gn);
 			if (!n) n = mCH->addNamespace(gn);
 			_namespacePool[i] = n;
 		}
@@ -648,7 +640,7 @@ AbcBlock::read_multinames()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-        asName::Kind kind = static_cast<asName::Kind>(_stream->read_u8());
+        MultiName::Kind kind = static_cast<MultiName::Kind>(_stream->read_u8());
 		boost::uint32_t ns = 0;
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
@@ -658,8 +650,8 @@ AbcBlock::read_multinames()
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
 		{
-            case asName::KIND_Qname:
-            case asName::KIND_QnameA:
+            case MultiName::KIND_Qname:
+            case MultiName::KIND_QnameA:
                 ns = _stream->read_V32();
                 check_multiname_namespace(ns);
                 name = _stream->read_V32();
@@ -668,26 +660,26 @@ AbcBlock::read_multinames()
                         ns, name, _stringPool[name]);
                 break;
             
-            case asName::KIND_RTQname:
-            case asName::KIND_RTQnameA:
+            case MultiName::KIND_RTQname:
+            case MultiName::KIND_RTQnameA:
                 name = _stream->read_V32();
                 check_multiname_name(name);
                 break;
             
-            case asName::KIND_RTQnameL:
-            case asName::KIND_RTQnameLA:
+            case MultiName::KIND_RTQnameL:
+            case MultiName::KIND_RTQnameLA:
                 break;
             
-            case asName::KIND_Multiname:
-            case asName::KIND_MultinameA:
+            case MultiName::KIND_Multiname:
+            case MultiName::KIND_MultinameA:
                 name = _stream->read_V32();
                 check_multiname_name(name);
                 nsset = _stream->read_V32();
                 check_multiname_namespaceset(nsset);
                 break;
             
-            case asName::KIND_MultinameL:
-            case asName::KIND_MultinameLA:
+            case MultiName::KIND_MultinameL:
+            case MultiName::KIND_MultinameLA:
                 nsset = _stream->read_V32();
                 check_multiname_namespaceset(nsset);
                 break;
@@ -960,7 +952,7 @@ AbcBlock::read_instances()
 			return false;
 		}
         
-        asName& multiname = _multinamePool[index];
+        MultiName& multiname = _multinamePool[index];
 		
         // This must be a QName.
 		if (!multiname.isQName()) {
@@ -1390,7 +1382,7 @@ void
 AbcBlock::update_global_name(unsigned int multiname_index)
 {
 	
-	asName* multiname = &_multinamePool[multiname_index];
+	MultiName* multiname = &_multinamePool[multiname_index];
 	string_table::key new_key = 
         _stringTable->find(_stringPool[multiname->getABCName()], false);
 	multiname->setGlobalName(new_key);	

@@ -68,8 +68,8 @@ public:
     void operator()(const as_value& val) {
         Global_as& gl = getGlobal(_target);
         as_object* obj = val.to_object(gl);
-        as_value cp = obj ? obj->callMethod(_c) : as_value();
-        _target.callMethod(NSV::PROP_PUSH, cp);
+        as_value cp = callMethod(obj, _c);
+        callMethod(&_target, NSV::PROP_PUSH, cp);
     }
 private:
     const string_table::key _c;

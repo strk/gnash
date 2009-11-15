@@ -143,7 +143,7 @@ NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
 
     string_table::key func = getStringTable(owner()).find(funcname);
 
-    owner().callMethod(func, as_value(info_obj));
+    callMethod(&owner(), func, as_value(info_obj));
 }
 
 
@@ -167,7 +167,7 @@ NetStream_as::processStatusNotifications()
     // Must be a new object every time.
     as_object* o = getStatusObject(code);
 
-    owner().callMethod(NSV::PROP_ON_STATUS, o);
+    callMethod(&owner(), NSV::PROP_ON_STATUS, o);
 }
 
 void
@@ -1913,7 +1913,7 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 	}
 
 	log_debug("Calling %s(%s)", funcName, arg);
-	thisPtr.callMethod(funcKey, arg);
+	callMethod(&thisPtr, funcKey, arg);
 }
 
 } // anonymous namespace

@@ -80,7 +80,7 @@ asMethod::setReturnType(asClass* /*type*/)
 }
 
 bool
-asMethod::addValue(string_table::key name, asNamespace *ns,
+asMethod::addValue(string_table::key name, Namespace *ns,
         boost::uint32_t slotId, asClass *type, as_value& val, bool isconst)
 {
     Global_as* g = VM::get().getGlobal();
@@ -105,7 +105,7 @@ asMethod::addValue(string_table::key name, asNamespace *ns,
 }
 
 bool
-asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
+asMethod::addGetter(string_table::key name, Namespace *ns, asMethod *method)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
@@ -123,7 +123,7 @@ asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
 }
 
 bool
-asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
+asMethod::addSetter(string_table::key name, Namespace *ns, asMethod *method)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
@@ -141,14 +141,14 @@ asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
 }
 
 bool
-asMethod::addMemberClass(string_table::key name, asNamespace *ns,
+asMethod::addMemberClass(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, asClass *type)
 {
 	return addSlot(name, ns, slotId, type);
 }
 
 bool
-asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
+asMethod::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
 	asClass */*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -159,7 +159,7 @@ asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotI
 }
 
 bool
-asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
+asMethod::addSlotFunction(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, asMethod *method)
 {
 	asClass a;
@@ -175,7 +175,7 @@ asMethod::initPrototype(Machine* machine)
 }
 
 bool
-asMethod::addMethod(string_table::key /*name*/, asNamespace* /*ns*/, asMethod*
+asMethod::addMethod(string_table::key /*name*/, Namespace* /*ns*/, asMethod*
         /*method*/)
 {
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);

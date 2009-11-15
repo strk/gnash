@@ -22,10 +22,18 @@
 namespace gnash {
 
 class as_object;
-class asNamespace;
+class Namespace;
 class Property;
 
-class asName
+
+/// An MultiName represents a single ABC multiname.
+//
+/// All MultiNames are internal to a single AbcBlock. Most are created during
+/// parsing, though the Machine can also create them for the lifetime of
+/// a single script run (which corresponds to an AbcBlock).
+//
+/// This means it is possible to store internal ABC URI of multiname here.
+class MultiName
 {
 public:
 	
@@ -43,7 +51,7 @@ public:
 		KIND_MultinameLA = 0x1C
 	};
 
-	asName()
+	MultiName()
         :
         _flags(0),
         _namespaceSet(0),
@@ -69,8 +77,8 @@ public:
 	bool isQName() { return _flags & FLAG_QNAME; }
 	void setQName() { _flags |= FLAG_QNAME; }
 
-	void setNamespace(asNamespace *ns) { _namespace = ns; }
-	asNamespace* getNamespace() const { return _namespace; }
+	void setNamespace(Namespace *ns) { _namespace = ns; }
+	Namespace* getNamespace() const { return _namespace; }
 
 	string_table::key getABCName() const { return _abcName; }
 	void setABCName(string_table::key n) { _abcName = n;}
@@ -84,11 +92,11 @@ public:
 
 	Property* findProperty();
     
-    void namespaceSet(std::vector<asNamespace*>* v) {
+    void namespaceSet(std::vector<Namespace*>* v) {
         _namespaceSet = v;
     }
 
-    const std::vector<asNamespace*>* namespaceSet() const {
+    const std::vector<Namespace*>* namespaceSet() const {
         return _namespaceSet;
     }
 
@@ -105,11 +113,11 @@ private:
 
     boost::uint8_t _flags;
 
-    std::vector<asNamespace*>* _namespaceSet;
+    std::vector<Namespace*>* _namespaceSet;
 
 	string_table::key _abcName;
 	string_table::key _globalName;
-	asNamespace* _namespace;
+	Namespace* _namespace;
 
 };
 

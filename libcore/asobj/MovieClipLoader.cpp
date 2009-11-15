@@ -22,7 +22,6 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "action.h" // for call_method
 #include "as_value.h"
 #include "as_object.h" // for inheritance
 #include "movie_root.h"
@@ -82,7 +81,7 @@ moviecliploader_class_init(as_object& where, const ObjectURI& uri)
 	AsBroadcaster::initialize(*proto);
 
     as_object* null = 0;
-    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, proto, null, 1027);
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, proto, null, 1027);
 
 	where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri)); 
@@ -158,7 +157,7 @@ moviecliploader_new(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
 
     as_object* array = gl.createArray();
-    array->callMethod(NSV::PROP_PUSH, ptr);
+    callMethod(array, NSV::PROP_PUSH, ptr);
     ptr->set_member(NSV::PROP_uLISTENERS, array);
     ptr->set_member_flags(NSV::PROP_uLISTENERS, as_object::DefaultFlags);
     return as_value();

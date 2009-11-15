@@ -51,7 +51,6 @@ namespace gnash {
     class event_id;
     class movie_root;
     class asClass;
-    class asName;
     class RunResources;
     class Global_as;
 }
@@ -674,29 +673,6 @@ public:
     ///
     as_value getMember(string_table::key name, string_table::key nsname = 0);
 
-    /// Call a method of this object in an AS-compatible way
-    //
-    /// @param name
-    ///    Name of the method. Will be converted to lowercase
-    ///    if the current VM is initialized for a  target
-    ///    up to SWF6.
-    ///
-    /// @param ...
-    ///    nargs as_value references
-    ///
-    /// @return value of the member (possibly undefined),
-    ///    or undefined if not found. Use get_member if you
-    ///    need to know wheter it was found or not.
-    ///
-    as_value callMethod(string_table::key name);
-    DSOEXPORT as_value callMethod(string_table::key name, const as_value& arg0);
-    as_value callMethod(string_table::key name, const as_value& arg0,
-            const as_value& arg1);
-    as_value callMethod(string_table::key name, const as_value& arg0,
-            const as_value& arg1, const as_value& arg2);
-    as_value callMethod(string_table::key name, const as_value& arg0,
-            const as_value& arg1, const as_value& arg2, const as_value& arg3);
-
     /// Delete a property of this object, unless protected from deletion.
     //
     /// This function does *not* recurse in this object's prototype.
@@ -1213,6 +1189,30 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
+/// Call a method of this object in an AS-compatible way
+//
+/// @param name
+///    Name of the method. Will be converted to lowercase
+///    if the current VM is initialized for a  target
+///    up to SWF6.
+///
+/// @param ...
+///    nargs as_value references
+///
+/// @return value of the member (possibly undefined),
+///    or undefined if not found. Use get_member if you
+///    need to know wheter it was found or not.
+///
+as_value callMethod(as_object* obj, string_table::key name);
+as_value callMethod(as_object* obj, string_table::key name,
+        const as_value& arg0);
+as_value callMethod(as_object* obj, string_table::key name,
+        const as_value& arg0, const as_value& arg1);
+as_value callMethod(as_object* obj, string_table::key name,
+        const as_value& arg0, const as_value& arg1, const as_value& arg2);
+as_value callMethod(as_object* obj, string_table::key name,
+        const as_value& arg0, const as_value& arg1, const as_value& arg2,
+        const as_value& arg3);
 
 /// Get the VM from an as_object
 VM& getVM(const as_object& o);

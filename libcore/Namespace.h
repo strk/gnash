@@ -30,18 +30,24 @@ namespace gnash {
 
 namespace gnash {
 
-/// Represent an ActionScript namespace
-class asNamespace
+/// Represent an ActionScript Namespace
+//
+/// Namespaces are generally global resources, although private Namespaces
+/// are only visible inside a single AbcBlock.
+//
+/// Because there is no guarantee that a Namespace is private to an AbcBlock,
+/// they must never store any AbcBlock-internal information, particularly
+/// not the AbcURI.
+class Namespace
 {
 public:
 
 	/// Create an empty namespace
-	asNamespace()
+	Namespace()
         :
         _parent(0),
         _uri(0),
         _prefix(0),
-        _abcURI(0),
         _classes(),
 		mRecursePrevent(false),
         _private(false),
@@ -52,18 +58,15 @@ public:
     void markReachableResources() const { /* TODO */ }
 
 	/// Our parent (for protected)
-	void setParent(asNamespace* p) { _parent = p; }
+	void setParent(Namespace* p) { _parent = p; }
 
-	asNamespace* getParent() { return _parent; }
+	Namespace* getParent() { return _parent; }
 
 	/// Set the uri
 	void setURI(string_table::key name) { _uri = name; }
 
 	/// What is the Uri of the namespace?
 	string_table::key getURI() const { return _uri; }
-
-	string_table::key getAbcURI() const {return _abcURI;}
-	void setAbcURI(string_table::key n){ _abcURI = n; }
 
 	/// What is the XML prefix?
 	string_table::key getPrefix() const { return _prefix; }
@@ -111,11 +114,9 @@ public:
 	
 private:
 
-	asNamespace* _parent;
+	Namespace* _parent;
 	string_table::key _uri;
 	string_table::key _prefix;
-
-	string_table::key _abcURI;
 
 	typedef std::map<string_table::key, asClass*> container;
 	container _classes;

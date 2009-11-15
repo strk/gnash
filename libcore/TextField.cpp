@@ -280,7 +280,7 @@ TextField::init()
     getObject(this)->set_prototype(proto);
 
     as_object* ar = getGlobal(*getObject(this)).createArray();
-    ar->callMethod(NSV::PROP_PUSH, getObject(this));
+    callMethod(ar, NSV::PROP_PUSH, getObject(this));
     getObject(this)->set_member(NSV::PROP_uLISTENERS, ar);
 #endif
     registerTextVariable();
@@ -598,7 +598,7 @@ TextField::setSelection(int start, int end)
     _selection = std::make_pair(start, end);
 }
 
-bool
+void
 TextField::notifyEvent(const event_id& ev)
 {    
     switch (ev.id())
@@ -663,7 +663,7 @@ TextField::notifyEvent(const event_id& ev)
             switch (c)
             {
                 case key::BACKSPACE:
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     if (m_cursor > 0)
                     {
                         s.erase(m_cursor - 1, 1);
@@ -673,7 +673,7 @@ TextField::notifyEvent(const event_id& ev)
                     break;
 
                 case key::DELETEKEY:
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     if (_glyphcount > m_cursor)
                     {
                         s.erase(m_cursor, 1);
@@ -682,7 +682,7 @@ TextField::notifyEvent(const event_id& ev)
                     break;
 
                 case key::INSERT:        // TODO
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     break;
 
                 case key::HOME:
@@ -799,7 +799,7 @@ TextField::notifyEvent(const event_id& ev)
                     break;
                     
                 case key::ENTER:
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     if ( !multiline() )
                         break;
 
@@ -813,7 +813,7 @@ TextField::notifyEvent(const event_id& ev)
 						}
 					}
 					
-                    if (isReadOnly()) return false;
+                    if (isReadOnly()) return;
                     wchar_t t = static_cast<wchar_t>(
                             gnash::key::codeMap[c][key::ASCII]);
                     if (t != 0)
@@ -846,9 +846,8 @@ TextField::notifyEvent(const event_id& ev)
         }
 
         default:
-            return false;
+            return;
     };
-    return true;
 }
 
 InteractiveObject*
@@ -2358,7 +2357,7 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
 
     // ASSetPropFlags is called on the TextField class.
     as_object* null = 0;
-    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, cl, null, 131);
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, cl, null, 131);
 }
 
 void
@@ -2725,7 +2724,7 @@ void
 TextField::onChanged()
 {
     as_object* obj = getObject(this);
-    obj->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onChanged", obj);
+    callMethod(obj, NSV::PROP_BROADCAST_MESSAGE, "onChanged", obj);
 }
 
 /// This is called by movie_root when focus is applied to this TextField.
@@ -3776,7 +3775,7 @@ textfield_ctor(const fn_call& fn)
     }
 
     as_object* ar = getGlobal(fn).createArray();
-    ar->callMethod(NSV::PROP_PUSH, obj);
+    callMethod(ar, NSV::PROP_PUSH, obj);
     obj->set_member(NSV::PROP_uLISTENERS, ar);
     return as_value();
 }
@@ -3808,7 +3807,7 @@ attachTextFieldInterface(as_object& o)
     // Finally ASSetPropFlags is called on the prototype.
     Global_as& gl = getGlobal(o);
     as_object* null = 0;
-    gl.callMethod(NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 131);
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 131);
 }
 
 void

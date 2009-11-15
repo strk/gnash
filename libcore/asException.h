@@ -28,7 +28,7 @@ public:
 	void setCatch(boost::uint32_t i) { mCatch = i; }
 	void catchAny() { mCatchAny = true; }
 	void setCatchType(asClass* p) { mCatchType = p; }
-	void setNamespace(asNamespace* n) { _namespace = n; }
+	void setNamespace(Namespace* n) { _namespace = n; }
 	void setName(string_table::key name) { _name = name; }
 
 private:
@@ -37,7 +37,7 @@ private:
 	boost::uint32_t mCatch;
 	bool mCatchAny;
 	asClass *mCatchType;
-	asNamespace *_namespace;
+	Namespace *_namespace;
 	string_table::key _name;
 };
 

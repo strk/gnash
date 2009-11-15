@@ -49,13 +49,6 @@ namespace {
             as_object* caller);
 }
 
-swf_function::~swf_function()
-{
-#ifndef GNASH_USE_GC
-	if ( _properties ) _properties->drop_ref();
-#endif 
-}
-
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
@@ -158,7 +151,7 @@ swf_function::operator()(const fn_call& fn)
 	///
 	TargetGuard targetGuard(m_env, target, orig_target);
 
-	if (m_is_function2 == false)
+	if (!m_is_function2)
 	{
 		// Conventional function.
 
@@ -370,7 +363,7 @@ getArguments(swf_function& callee, const fn_call& fn,
 
 	as_object* arguments = getGlobal(fn).createArray();
 	for (size_t i = 0; i < fn.nargs; ++i) {
-		arguments->callMethod(NSV::PROP_PUSH, fn.arg(i));
+		callMethod(arguments, NSV::PROP_PUSH, fn.arg(i));
 	}
 
 	arguments->init_member(NSV::PROP_CALLEE, &callee);

@@ -134,7 +134,7 @@ class PushToArray
 public:
     PushToArray(as_object& obj) : _obj(obj) {}
     void operator()(const as_value& val) {
-        _obj.callMethod(NSV::PROP_PUSH, val);
+        callMethod(&_obj, NSV::PROP_PUSH, val);
     }
 private:
     as_object& _obj;
@@ -985,7 +985,7 @@ array_splice(const fn_call& fn)
     // Push removed elements to the new array.
     for (size_t i = 0; i < remove; ++i) {
         const size_t key = getKey(fn, start + i);
-        ret->callMethod(NSV::PROP_PUSH, array->getMember(key));
+        callMethod(ret, NSV::PROP_PUSH, array->getMember(key));
     }
 
     // Shift elements in 'this' array by simple assignment, not delete
@@ -1382,7 +1382,7 @@ array_concat(const fn_call& fn)
                 continue;
             }
         }
-        newarray->callMethod(NSV::PROP_PUSH, fn.arg(i));
+        callMethod(newarray, NSV::PROP_PUSH, fn.arg(i));
     }
 
     return as_value(newarray);        
@@ -1446,7 +1446,7 @@ array_new(const fn_call& fn)
 
     // Use the arguments as initializers.
     for (size_t i = 0; i < fn.nargs; i++) {
-        ao->callMethod(NSV::PROP_PUSH, fn.arg(i));
+        callMethod(ao, NSV::PROP_PUSH, fn.arg(i));
     }
     
 
@@ -1513,7 +1513,7 @@ pushIndices(as_object& o, const std::vector<indexed_as_value>& elems)
 {
     for (std::vector<indexed_as_value>::const_iterator it = elems.begin();
         it != elems.end(); ++it) {
-        o.callMethod(NSV::PROP_PUSH, it->vec_index);
+        callMethod(&o, NSV::PROP_PUSH, it->vec_index);
     }
 }
 

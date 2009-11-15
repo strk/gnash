@@ -205,18 +205,14 @@ class ButtonActionPusher {
 public:
     ButtonActionPusher(movie_root& mr, DisplayObject* this_ptr)
         :
-        called(false),
         _mr(mr),
         _tp(this_ptr)
     {}
 
-    void operator() (const action_buffer& ab)
+    void operator()(const action_buffer& ab)
     {
         _mr.pushAction(ab, _tp);
-        called = true;
     }
-
-    bool called;
 
 private:
     movie_root& _mr;
@@ -333,30 +329,23 @@ Button::isEnabled()
 }
 
 
-bool
+void
 Button::notifyEvent(const event_id& id)
 {
-    if (unloaded())
-    {
+    if (unloaded()) {
         // We dont' respond to events while unloaded
         // See bug #22982
-#if 0 // debugging..
-        log_debug("Button %s received %s event while unloaded: ignored",
-            getTarget(), id);
-#endif
-        return false; 
+        return; 
     }
 
     // We only respond keypress events
-    if ( id.id() != event_id::KEY_PRESS ) return false;
+    if ( id.id() != event_id::KEY_PRESS ) return;
 
     // We only respond to valid key code (should we assert here?)
-    if ( id.keyCode() == key::INVALID ) return false;
+    if ( id.keyCode() == key::INVALID ) return;
 
     ButtonActionPusher xec(stage(), this); 
     _def->forEachTrigger(id, xec);
-
-    return xec.called;
 }
 
 bool
@@ -575,11 +564,7 @@ Button::mouseEvent(const event_id& event)
         mr.pushAction(code, movie_root::apDOACTION);
     }
 
-    // Call conventional attached method.
-    as_function* method = getUserDefinedEventHandler(event.functionKey());
-    if (method) {
-        mr.pushAction(method, this, movie_root::apDOACTION);
-    }
+    callMethod(getObject(this), event.functionKey());
 }
 
 

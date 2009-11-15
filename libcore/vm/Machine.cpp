@@ -110,7 +110,7 @@ pool_double(boost::uint32_t index, AbcBlock *pool)
     }
 }
 
-inline asNamespace*
+inline Namespace*
 pool_namespace(boost::uint32_t index, AbcBlock *pool)
 {
 	if (!pool) throw ASException();
@@ -148,12 +148,12 @@ pool_class(boost::uint32_t index, AbcBlock* pool)
 }
 
 // Don't make this a reference or you'll taint the pool.
-inline asName
+inline MultiName
 pool_name(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
 	try {
-        asName multiname = pool->multinamePoolAt(index);
+        MultiName multiname = pool->multinamePoolAt(index);
         return multiname;
     }
     catch (std::range_error& e) {
@@ -431,7 +431,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_GETSUPER:
                 {
                     // Get the name.
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     // Finish it, if necessary.
                     _stack.drop(completeName(a));
                     // Get the target object.
@@ -462,7 +462,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_SETSUPER:
                 {
                     // Get and finish the name.
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     as_value vobj = _stack.pop(); // The value
 
                     _stack.drop(completeName(a));
@@ -1143,11 +1143,18 @@ Machine::execute()
                 ///  ns -- Namespace object from namespace_pool[index]
                 case SWF::ABC_ACTION_PUSHNAMESPACE:
                 {
-                    asNamespace *ns = pool_namespace(mStream->read_V32(),
+#if 0
+                    Namespace *ns = pool_namespace(mStream->read_V32(),
                             mPoolObject);
                     _stack.grow(1);
+
+                    // Here we should probably construct a Namespace object,
+                    // but there is no need to do it using as_value's
+                    // constructor.
+
                     _stack.top(0) = *ns;
                     break;
+#endif
                 }
 
                 /// 0x32 ABC_ACTION_HASNEXT2
@@ -1341,7 +1348,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_CALLSUPER:
                 case SWF::ABC_ACTION_CALLSUPERVOID:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     boost::uint32_t argc = mStream->read_V32();
                     int dropsize = completeName(a);
                     ENSURE_OBJECT(_stack.top(argc + dropsize));
@@ -1391,7 +1398,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_CALLPROPVOID:
                 {
                     as_value result;
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     boost::uint32_t argc = mStream->read_V32();
 
                     fn_call::Args args;
@@ -1547,7 +1554,7 @@ Machine::execute()
                 {
                     print_stack();
                     as_environment env = as_environment(_vm);
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     
                     boost::uint32_t argc = mStream->read_V32();
                     fn_call::Args args;
@@ -1652,7 +1659,7 @@ Machine::execute()
 
                     as_object* arr = _global->createArray();
                     while (i--) {
-                        arr->callMethod(NSV::PROP_PUSH, pop_stack());
+                        callMethod(arr, NSV::PROP_PUSH, pop_stack());
                     }
                     push_stack(as_value(arr));
                     break;
@@ -1745,7 +1752,7 @@ Machine::execute()
                 /// descendants of a class.
                 case SWF::ABC_ACTION_GETDESCENDANTS:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     //as_value &v = _stack.top(0);
                     ENSURE_OBJECT(v);
                     _stack.drop(1);
@@ -1779,7 +1786,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_FINDPROPSTRICT:
                 case SWF::ABC_ACTION_FINDPROPERTY:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     if (a.isRuntime()) {
                         _stack.drop(completeName(a));
                     }
@@ -1810,7 +1817,7 @@ Machine::execute()
             ///  def -- The definition of the name at name_id.
                 case SWF::ABC_ACTION_FINDDEF:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     // The name is expected to be complete.
                     // TODO
                     break;
@@ -1823,7 +1830,7 @@ Machine::execute()
                 ///   + 0x66 (ABC_ACTION_GETPROPERTY)
                 case SWF::ABC_ACTION_GETLEX:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                 
                     as_value val = find_prop_strict(a);
 
@@ -1856,10 +1863,10 @@ Machine::execute()
                     string_table::key ns = 0;
                     string_table::key name = 0;
 
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     // TODO: If multiname is runtime we need to also pop
                     // namespace and name values off the stack.
-                    if (a.flags() == asName::KIND_MultinameL) {
+                    if (a.flags() == MultiName::KIND_MultinameL) {
                         log_abc("SETPROPERTY: name is a late runtime "
                                 "multiname");
                         as_value nameValue = pop_stack();
@@ -1946,10 +1953,10 @@ Machine::execute()
                 {
                     string_table::key ns = 0;
                     string_table::key name = 0;
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     // TODO: If multiname is runtime we need to also pop
                     // namespace and name values of the stack.
-                    if (a.flags() == asName::KIND_MultinameL) {
+                    if (a.flags() == MultiName::KIND_MultinameL) {
                         as_value nameValue = pop_stack();
                         name = mST.find(nameValue.to_string());
                     }
@@ -1998,7 +2005,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_INITPROPERTY:
                 {
                     boost::uint32_t index = mStream->read_V32();
-                    asName a = pool_name(index, mPoolObject);
+                    MultiName a = pool_name(index, mPoolObject);
                     as_value v = pop_stack();
                     // TODO: If multiname is a runtime mutiname we need to also
                     // pop name and namespace values.
@@ -2025,7 +2032,7 @@ Machine::execute()
                 ///           else False.
                 case SWF::ABC_ACTION_DELETEPROPERTY:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     _stack.drop(completeName(a));
                     as_object* obj = _stack.top(0).to_object(*_global);
 
@@ -2037,7 +2044,7 @@ Machine::execute()
                     }
 
                     // Look in the global namespace if there is none specified.
-                    asNamespace* n = a.getNamespace();
+                    Namespace* n = a.getNamespace();
                     const string_table::key ns = n ? n->getURI() : 0;
                     const string_table::key prop = a.getGlobalName();
 
@@ -2266,7 +2273,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_COERCE:
                 {
                     // TODO: handle runtime names?
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
 
                     as_value value = _stack.top(0);
                     log_abc("COERCE: object for conversion is %s, "
@@ -2322,7 +2329,7 @@ Machine::execute()
                 ///     otherwise Null
                 case SWF::ABC_ACTION_ASTYPE:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     as_value value = pop_stack();
                     //TODO: Make sure the value is of the correct type;
                     push_stack(value);
@@ -2685,7 +2692,7 @@ Machine::execute()
                 ///  truth -- Truth of "obj is of the type given in (resolve)'name_id'"
                 case SWF::ABC_ACTION_ISTYPE:
                 {
-                    asName a = pool_name(mStream->read_V32(), mPoolObject);
+                    MultiName a = pool_name(mStream->read_V32(), mPoolObject);
                     _stack.drop(completeName(a));
                     // TODO: Implement it.
                     //_stack.top(0).set_bool(_stack.top(0).conforms_to(a.getABCName()));
@@ -2898,7 +2905,7 @@ Machine::execute()
 } 
 
 void
-Machine::getMember(asClass* pDefinition, asName& name,
+Machine::getMember(asClass* pDefinition, MultiName& name,
 	as_value& instance)
 {
 	if (!instance.is_object())
@@ -2922,7 +2929,7 @@ UNUSED(name);
 }
 
 void
-Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
+Machine::setMember(asClass *pDefinition, MultiName& name, as_value& instance,
 	as_value& newvalue)
 {
 	if (!instance.is_object())
@@ -2954,7 +2961,7 @@ UNUSED(newvalue);
 }
 
 int
-Machine::completeName(asName& name, int offset)
+Machine::completeName(MultiName& name, int offset)
 {
     
     // TODO: implement this properly.
@@ -3243,7 +3250,7 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 }
 
 as_value
-Machine::find_prop_strict(asName multiname)
+Machine::find_prop_strict(MultiName multiname)
 {
 	
     log_abc("Looking for property %2% in namespace %1%",

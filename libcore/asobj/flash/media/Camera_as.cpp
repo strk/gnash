@@ -536,7 +536,7 @@ camera_names(const fn_call& fn)
     as_object* data = gl.createArray();
 
     for (size_t i = 0; i < size; ++i) {
-        data->callMethod(NSV::PROP_PUSH, names[i]);
+        callMethod(data, NSV::PROP_PUSH, names[i]);
     }
     
     return as_value(data);

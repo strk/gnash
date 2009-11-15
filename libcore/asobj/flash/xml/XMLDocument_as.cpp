@@ -875,12 +875,12 @@ xml_onData(const fn_call& fn)
 
     if (!src.is_undefined()) {
         thisPtr->set_member(NSV::PROP_LOADED, true);
-        thisPtr->callMethod(NSV::PROP_PARSE_XML, src);
-        thisPtr->callMethod(NSV::PROP_ON_LOAD, true);
+        callMethod(thisPtr, NSV::PROP_PARSE_XML, src);
+        callMethod(thisPtr, NSV::PROP_ON_LOAD, true);
     }
     else {
         thisPtr->set_member(NSV::PROP_LOADED, false);
-        thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
+        callMethod(thisPtr, NSV::PROP_ON_LOAD, false);
     }
 
     return as_value();

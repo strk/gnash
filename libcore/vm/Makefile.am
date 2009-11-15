@@ -57,7 +57,7 @@ endif
 noinst_HEADERS = \
 	ASHandlers.h \
 	CodeStream.h \
-	asName.h \
+	MultiName.h \
 	ActionExec.h \
 	ExecutableCode.h \
 	action.h \
@@ -74,7 +74,7 @@ EXTENSIONS_API = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
-	asName.h \
+	MultiName.h \
 	CodeStream.h \
 	Machine.h \
 	$(NULL)

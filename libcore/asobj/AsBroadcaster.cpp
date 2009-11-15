@@ -138,7 +138,7 @@ AsBroadcaster::initialize(as_object& o)
     
     // The function returned by ASnative(101, 12) is attached, even though
     // this may not exist (e.g. if _global.ASnative is altered)
-    const as_value& asn = gl.callMethod(NSV::PROP_AS_NATIVE, 101, 12);
+    const as_value& asn = callMethod(&gl, NSV::PROP_AS_NATIVE, 101, 12);
     o.set_member(NSV::PROP_BROADCAST_MESSAGE, asn);
 
     // This corresponds to  "_listeners = [];", which is different from
@@ -236,12 +236,13 @@ asbroadcaster_initialize(const fn_call& fn)
 as_value
 asbroadcaster_addListener(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+
+    as_object* obj = ensure<ValidThis>(fn);
 
     as_value newListener; assert(newListener.is_undefined());
     if ( fn.nargs ) newListener = fn.arg(0);
 
-    obj->callMethod(NSV::PROP_REMOVE_LISTENER, newListener);
+    callMethod(obj, NSV::PROP_REMOVE_LISTENER, newListener);
 
     as_value listenersValue;
 
@@ -275,7 +276,7 @@ asbroadcaster_addListener(const fn_call& fn)
     // We checked is_object() above.
     assert(listeners); 
 
-    listeners->callMethod(NSV::PROP_PUSH, newListener);
+    callMethod(listeners, NSV::PROP_PUSH, newListener);
 
     return as_value(true);
 
@@ -313,8 +314,7 @@ asbroadcaster_removeListener(const fn_call& fn)
         return as_value(false); // TODO: check this
     }
 
-    boost::intrusive_ptr<as_object> listeners =
-        listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = listenersValue.to_object(getGlobal(fn));
     assert(listeners);
 
     as_value listenerToRemove; 
@@ -335,7 +335,7 @@ asbroadcaster_removeListener(const fn_call& fn)
         as_value el =
             listeners->getMember(st.find(s.str()));
         if (el.equals(listenerToRemove)) {
-            listeners->callMethod(NSV::PROP_SPLICE, s.str(), 1);
+            callMethod(listeners, NSV::PROP_SPLICE, s.str(), 1);
             return as_value(true);
         }
         ++i;

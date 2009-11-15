@@ -50,8 +50,7 @@ namespace gnash {
 	class as_function;
 	class MovieClip;
 	class DisplayObject;
-	class asNamespace;
-	class asName;
+	class Namespace;
     class SimpleBuffer;
 }
 namespace amf {
@@ -168,9 +167,6 @@ public:
 
 	/// Construct a NUMBER value
 	as_value(double val);
-
-	/// Chad: Document this
-	as_value(asNamespace &);
 
 	/// Construct a value from an AMF element
 	as_value(const amf::Element& el);

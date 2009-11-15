@@ -542,7 +542,7 @@ public:
         int newdepth, as_object* init_object=NULL);
         
     /// Dispatch event handler(s), if any.
-    virtual bool notifyEvent(const event_id& id);
+    virtual void notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
     as_environment& get_environment() {

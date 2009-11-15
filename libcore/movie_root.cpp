@@ -540,7 +540,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 		as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
 		if (stage) {
             log_debug("notifying Stage listeners about a resize");
-            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
+            callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
 
 	}
@@ -584,10 +584,10 @@ movie_root::notify_key_event(key::code k, bool down)
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
 		    if (down) {
-                key->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onKeyDown");
+                callMethod(key, NSV::PROP_BROADCAST_MESSAGE, "onKeyDown");
 		    }
 		    else {
-                key->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onKeyUp");
+                callMethod(key, NSV::PROP_BROADCAST_MESSAGE, "onKeyUp");
 	        }
 	    }
 	    catch (ActionLimitException &e)
@@ -1074,7 +1074,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
             // Can throw an action limit exception if the stack limit is 0 or 1.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, 
+		    callMethod(mouseObj, NSV::PROP_BROADCAST_MESSAGE, 
                     event.functionName());
 		}
 	    catch (ActionLimitException &e) {
@@ -1131,14 +1131,14 @@ movie_root::setFocus(DisplayObject* to)
 
         /// A valid focus must have an associated object.
         assert(getObject(from));
-        getObject(from)->callMethod(NSV::PROP_ON_KILL_FOCUS, getObject(to));
+        callMethod(getObject(from), NSV::PROP_ON_KILL_FOCUS, getObject(to));
     }
 
     _currentFocus = to;
 
     if (to) {
         assert(getObject(to));
-        getObject(to)->callMethod(NSV::PROP_ON_SET_FOCUS, getObject(from));
+        callMethod(getObject(to), NSV::PROP_ON_SET_FOCUS, getObject(from));
     }
 
     as_object* sel = getBuiltinObject(*this, NSV::CLASS_SELECTION);
@@ -1146,7 +1146,7 @@ movie_root::setFocus(DisplayObject* to)
     // Notify Selection listeners with previous and new focus as arguments.
     // Either argument may be null.
     if (sel) {
-        sel->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onSetFocus",
+        callMethod(sel, NSV::PROP_BROADCAST_MESSAGE, "onSetFocus",
                 getObject(from), getObject(to));
     }
 
@@ -1341,7 +1341,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
         as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
-            stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
+            callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
     }
 }
@@ -1355,7 +1355,7 @@ movie_root::setStageDisplayState(const DisplayState ds)
     if (stage) {
         log_debug("notifying Stage listeners about fullscreen state");
         const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;
-        stage->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
+        callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
     }
 
 	if (!_interfaceHandler) return; // No registered callback
@@ -2051,7 +2051,6 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
 
 }
-
 
 bool
 movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)

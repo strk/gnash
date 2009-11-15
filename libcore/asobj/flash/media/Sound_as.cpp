@@ -204,7 +204,7 @@ Sound_as::probeAudio()
             stopProbeTimer();
 
             // dispatch onSoundComplete 
-            owner().callMethod(NSV::PROP_ON_SOUND_COMPLETE);
+            callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
         }
     }
     else

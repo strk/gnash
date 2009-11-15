@@ -905,9 +905,9 @@ movieclip_loadMovie(const fn_call& fn)
 
     as_value val;
     if (fn.nargs > 1) {
-        val = getObject(dobj)->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = callMethod(getObject(dobj), NSV::PROP_METH, fn.arg(1));
     }
-    else val = getObject(dobj)->callMethod(NSV::PROP_METH);
+    else val = callMethod(getObject(dobj), NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -967,9 +967,9 @@ movieclip_loadVariables(const fn_call& fn)
     as_value val;
     if (fn.nargs > 1)
     {
-        val = obj->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = callMethod(obj, NSV::PROP_METH, fn.arg(1));
     }
-    else val = obj->callMethod(NSV::PROP_METH);
+    else val = callMethod(obj, NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -1130,9 +1130,9 @@ movieclip_getURL(const fn_call& fn)
     as_value val;
     if (fn.nargs > 2)
     {
-        val = movieclip->callMethod(NSV::PROP_METH, fn.arg(2));
+        val = callMethod(movieclip, NSV::PROP_METH, fn.arg(2));
     }
-    else val = movieclip->callMethod(NSV::PROP_METH);
+    else val = callMethod(movieclip, NSV::PROP_METH);
 
     switch (fn.nargs)
     {
@@ -1205,7 +1205,7 @@ movieclip_meth(const fn_call& fn)
         return as_value(MovieClip::METHOD_NONE);
     }
 
-    as_value lc = o->callMethod(NSV::PROP_TO_LOWER_CASE);
+    as_value lc = callMethod(o, NSV::PROP_TO_LOWER_CASE);
 
     std::string s = lc.to_string();
 

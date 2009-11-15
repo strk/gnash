@@ -304,14 +304,14 @@ XMLSocket_as::update()
             // If connection failed, notify onConnect and stop callback.
             // This means update() will not be called again until
             // XMLSocket.connect() is invoked.
-            owner().callMethod(NSV::PROP_ON_CONNECT, false);
+            callMethod(&owner(), NSV::PROP_ON_CONNECT, false);
             getRoot(owner()).removeAdvanceCallback(this);
             return;    
         }
 
         // Connection succeeded.
         _ready = true;
-        owner().callMethod(NSV::PROP_ON_CONNECT, true);
+        callMethod(&owner(), NSV::PROP_ON_CONNECT, true);
     }
 
     // Now the connection is established we can receive data.
@@ -554,7 +554,7 @@ xmlsocket_onData(const fn_call& fn)
     // The built-in function calls:
     //
     //      this.onXML(new XML(src));
-    fn.this_ptr->callMethod(NSV::PROP_ON_XML, xml);
+    callMethod(fn.this_ptr, NSV::PROP_ON_XML, xml);
 
     return as_value();
 }
