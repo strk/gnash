@@ -37,20 +37,24 @@
 #endif
 
 namespace gnash {
+    namespace abc {
+        class Machine;
+        class MultiName;
+        class abc_function;
+    }
+    class as_function;
+    class Namespace;
+    class asMethod;
+    class asClass;
+    typedef Property asBinding;
+    class asBoundValue;
+    class asBoundAccessor;
+    class ClassHierarchy;
+    class Property;
+}
 
-class as_function;
-class Namespace;
-class asMethod;
-class asClass;
-typedef Property asBinding;
-class asBoundValue;
-class asBoundAccessor;
-class ClassHierarchy;
-class Property;
-class MultiName;
-class Machine;
-class abc_function;
-
+namespace gnash {
+ 
 /// A class to represent, abstractly, ActionScript prototypes.
 ///
 /// This class is intended to be able to capture the structure of an
@@ -209,8 +213,8 @@ public:
 		return &i->second;
 	}
 
-	asBinding* getGetBinding(as_value& v, MultiName& n);
-	asBinding* getSetBinding(as_value& v, MultiName& n);
+	asBinding* getGetBinding(as_value& v, abc::MultiName& n);
+	asBinding* getSetBinding(as_value& v, abc::MultiName& n);
     std::vector<abc::Trait> _traits;
 
 #endif

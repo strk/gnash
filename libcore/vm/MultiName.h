@@ -36,8 +36,6 @@ namespace abc {
 /// makes no sense whatsoever to use string_table::key to index them.   
 typedef size_t URI;
 
-}
-
 /// An MultiName represents a single ABC multiname.
 //
 /// All MultiNames are internal to a single AbcBlock. Most are created during
@@ -135,5 +133,6 @@ private:
 
 };
 
+} // namespace abc
 } // namespace gnash
 #endif 

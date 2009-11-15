@@ -50,7 +50,9 @@
 
 // Forward declarations
 namespace gnash {
-	class Machine;
+    namespace abc {
+        class Machine;
+    }
 	class VM;
 	class fn_call;
 }
@@ -120,7 +122,7 @@ public:
     //
     /// This takes a VM argument because most access to necessary
     /// resources is still through the VM.
-	AVM2Global(Machine& m, VM& vm);
+	AVM2Global(abc::Machine& m, VM& vm);
 	~AVM2Global() {}
     
     void registerClasses();

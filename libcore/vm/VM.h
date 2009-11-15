@@ -37,6 +37,9 @@
 
 // Forward declarations
 namespace gnash {
+    namespace abc {
+        class Machine;
+    }
 	class Global_as;
 	class VM;
 	class fn_call;
@@ -45,7 +48,6 @@ namespace gnash {
     class SharedObjectLibrary;
 	class as_value;
 	class as_object;
-	class Machine;
 	class VirtualClock;
 }
 
@@ -182,7 +184,7 @@ public:
 
 #ifdef ENABLE_AVM2
 	/// Get a pointer to the machine, if it exists.
-	Machine* getMachine() const { return _machine; }
+    abc::Machine* getMachine() const { return _machine; }
 #endif
 
 	/// Get version of the player, in a compatible representation
@@ -323,7 +325,7 @@ private:
 
 #ifdef ENABLE_AVM2
 	/// A running execution thread.
-	Machine *_machine;
+    abc::Machine *_machine;
 #endif
 
 	VirtualClock& _clock;

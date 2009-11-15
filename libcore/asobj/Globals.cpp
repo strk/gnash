@@ -164,7 +164,7 @@ namespace {
             string_table::key className);
 }
 
-AVM2Global::AVM2Global(Machine& /*machine*/, VM& vm)
+AVM2Global::AVM2Global(abc::Machine& /*machine*/, VM& vm)
     :
     _classes(this, 0),
     _vm(vm)

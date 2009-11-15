@@ -30,17 +30,21 @@
 #include "fn_call.h"
 
 namespace gnash {
+    namespace abc {
+        class AbcBlock;
+        class MultiName;
+    }
     class Global_as;
     class DisplayObject;
     class as_object;
-    class AbcBlock;
-    class MultiName;
     class Property;
     class CodeStream;
 }
 
 
 namespace gnash {
+
+namespace abc {
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
@@ -132,7 +136,8 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(asClass* pDefinition, MultiName& name, as_value& source);
+	void getMember(asClass* pDefinition, MultiName& name,
+            as_value& source);
 
 	/// Set a member in an object.
 	///
@@ -368,12 +373,12 @@ private:
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mExitWithReturn;
-	AbcBlock* mPoolObject; // Where all of the pools are stored.
+    AbcBlock* mPoolObject; // Where all of the pools are stored.
 
 	abc_function* mCurrentFunction;
 
 	VM& _vm;
 };
-
+} // namespace abc
 } // namespace gnash
 #endif 

@@ -22,6 +22,7 @@
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
 #include "AbcBlock.h"
+#include "MultiName.h"
 #include "fn_call.h"
 #include "abc_function.h"
 #include "action.h"
@@ -31,6 +32,8 @@
 #include "Global_as.h"
 
 namespace gnash {
+namespace abc {
+
 /// The type of exceptions thrown by ActionScript.
 class ASException
 {
@@ -314,24 +317,24 @@ private:
 }
 
 Machine::Machine(VM& vm)
-        :
-        _stack(),
-        _registers(),
-        _scopeStack(),
-        mStream(0),
-        mST(vm.getStringTable()),
-        mDefaultXMLNamespace(0),
-        mCurrentScope(0),
-        mGlobalScope(0),
-        mDefaultThis(0),
-        mThis(0),
-        _global(0),
-        mGlobalReturn(),
-        mIgnoreReturn(),
-        mExitWithReturn(false),
-        mPoolObject(0),
-        mCurrentFunction(0),
-        _vm(vm)
+    :
+    _stack(),
+    _registers(),
+    _scopeStack(),
+    mStream(0),
+    mST(vm.getStringTable()),
+    mDefaultXMLNamespace(0),
+    mCurrentScope(0),
+    mGlobalScope(0),
+    mDefaultThis(0),
+    mThis(0),
+    _global(0),
+    mGlobalReturn(),
+    mIgnoreReturn(),
+    mExitWithReturn(false),
+    mPoolObject(0),
+    mCurrentFunction(0),
+    _vm(vm)
 {
                
 }
@@ -3335,5 +3338,5 @@ Machine::clearRegisters(boost::uint32_t maxRegisters)
 }
 
 
-
-} // end of namespace gnash
+} // namespace abc
+} // namespace gnash

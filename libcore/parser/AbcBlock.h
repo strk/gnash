@@ -32,19 +32,19 @@
 #include <stdexcept>
 
 namespace gnash {
-	class SWFStream; // for read signature
+    namespace abc {
+        class AbcBlock;
+        class Machine;
+    }
+    class SWFStream; // for read signature
+    class ClassHierarchy;
+    class asMethod;
+    class asClass;
 }
 
 namespace gnash {
-
-class AbcBlock;
-class ClassHierarchy;
-class asMethod;
-class asClass;
-class Machine;
-
 namespace abc {
- 
+
 class Trait
 {
 public:
@@ -125,8 +125,6 @@ public:
 
 /// Output stream operator for abc::Trait::Kind
 std::ostream& operator<<(std::ostream& o, const Trait::Kind k);
-
-} // namespace abc
 
 namespace {
 
@@ -353,8 +351,9 @@ std::ostream& operator<<(std::ostream& o, AbcBlock::MethodConstant c);
 std::ostream& operator<<(std::ostream& o, AbcBlock::InstanceConstant c);
 std::ostream& operator<<(std::ostream& o, AbcBlock::PoolConstant c);
 
-} 
+} // namespace abc
+} // namespace gnash
 
 
-#endif /* GNASH_ABC_BLOCK_H */
+#endif 
 

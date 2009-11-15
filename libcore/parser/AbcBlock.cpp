@@ -314,10 +314,6 @@ operator<<(std::ostream& o, const Trait::Kind k)
     }
 }
 
-} // abc
-
-using namespace abc;
-
 AbcBlock::AbcBlock()
     :
     _stringTable(&VM::get().getStringTable())
@@ -1485,5 +1481,6 @@ operator<<(std::ostream& o, AbcBlock::PoolConstant c)
     }
 }
 
-} /* namespace gnash */
+} // namespace abc
+} // namespace gnash
 

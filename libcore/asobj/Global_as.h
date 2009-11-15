@@ -26,7 +26,6 @@
 // Forward declarations
 namespace gnash {
 	class builtin_function;
-	class Machine;
 	class as_value;
 	class VM;
 	class ClassHierarchy;
