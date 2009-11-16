@@ -50,7 +50,8 @@ public:
 		_timeout=to;
 	}
 	bool init(int, char ***) { return true; }
-	bool createWindow(const char* /*title*/, int /*width*/, int /*height*/)
+	bool createWindow(const char* /*title*/, int /*width*/, int /*height*/,
+	                  int /*yPosition*/, int /*xPosition*/)
 	{
 		return true;
 	}

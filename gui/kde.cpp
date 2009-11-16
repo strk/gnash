@@ -80,11 +80,23 @@ KdeGui::init(int argc, char **argv[])
 }
 
 bool
-KdeGui::createWindow(const char* windowtitle, int width, int height)
+KdeGui::createWindow(const char* windowtitle, int width, int height,
+                     int xPosition, int yPosition)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    _qwidget->setGeometry(0, 0, width, height);
+    // Move the window to correct position if requested by user.
+    if (xPosition > 1) {
+        if (yPosition > 1) {
+            _qwidget->setGeometry(xPosition, yPosition, width, height);
+            }
+        else {  // If only given X position by user
+            _qwidget->setGeometry(xPosition, 0, width, height);
+            }
+        }
+    else if (yPosition > 1) { // If only given Y position by user
+        _qwidget->setGeometry(0, yPosition, width, height);
+    }
     _qwidget->setCaption(windowtitle);
 
     _qapp->setMainWidget(_qwidget.get());

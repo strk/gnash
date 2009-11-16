@@ -749,12 +749,20 @@ GtkGui::createMenuAlt()
 }
 
 bool
-GtkGui::createWindow(const char *title, int width, int height)
+GtkGui::createWindow(const char *title, int width, int height,
+                     int xPosition, int yPosition)
 {
 // First call the old createWindow function and then set the title.
 // In case there's some need to not setting the title.
     bool ret = createWindow(width, height);
     gtk_window_set_title(GTK_WINDOW(_window), title);
+    
+    // Move the window to correct position if requested by user.
+    int x, y;
+    gtk_window_get_position(GTK_WINDOW(_window), &x, &y);
+    if (xPosition > -1) x = xPosition; // -1 so we can tell if user requested window move
+    if (yPosition > -1) y = yPosition; // as 0 is also a valid coordinate.
+    gtk_window_move(GTK_WINDOW(_window), x, y);
 
     if (!_xid) {
     

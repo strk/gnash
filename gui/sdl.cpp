@@ -194,7 +194,8 @@ SDLGui::init(int argc, char **argv[])
 
 
 bool
-SDLGui::createWindow(const char *title, int width, int height)
+SDLGui::createWindow(const char *title, int width, int height,
+                     int xPosition, int yPosition)
 {
     GNASH_REPORT_FUNCTION;
     _width = width;

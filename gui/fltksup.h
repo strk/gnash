@@ -48,7 +48,8 @@ public:
 
     virtual void setInterval(unsigned int);
     virtual void setTimeout(unsigned int) { }
-    virtual bool createWindow(const char* title, int width, int height);
+    virtual bool createWindow(const char *title, int width, int height,
+                              int xPosition = 0, int yPosition = 0);
     virtual void renderBuffer();
 
     virtual bool run();

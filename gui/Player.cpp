@@ -90,6 +90,8 @@ Player::Player()
     _delay(0),
     _width(0),
     _height(0),
+    _xPosition(-1),
+    _yPosition(-1),
     _windowID(0),
     _doLoop(true),
     _doRender(true),
@@ -418,7 +420,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _gui->setMovieDefinition(_movieDef.get());
 
     // Now that we know about movie size, create gui window.
-    _gui->createWindow(_url.c_str(), _width, _height);
+    _gui->createWindow(_url.c_str(), _width, _height, _xPosition, _yPosition);
 
     movie_root root(*_movieDef, _gui->getClock(), *_runResources);
     

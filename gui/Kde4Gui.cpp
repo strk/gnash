@@ -123,9 +123,9 @@ Kde4Gui::run()
 
 
 bool
-Kde4Gui::createWindow(const char* windowtitle, int width, int height)
+Kde4Gui::createWindow(const char* windowtitle, int width, int height,
+                     int xPosition, int yPosition)
 {
-
     _width = width;
     _height = height;
 
