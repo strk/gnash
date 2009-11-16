@@ -22,6 +22,8 @@
 #include "as_object.h" // for inheritance
 #include "Object.h"
 #include "fn_call.h"
+#include "GnashException.h"
+#include "as_function.h"
 
 // Forward declarations
 namespace gnash {
@@ -176,6 +178,41 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
     return cl;
 }
 
+/// Call an as_value on an as_object.
+//
+/// The call will fail harmlessly if the as_value is not a function.
+DSOEXPORT as_value
+invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
+        fn_call::Args& args, as_object* super = 0,
+        const movie_definition* callerDef = 0)
+{
+
+	as_value val;
+	fn_call call(this_ptr, env, args);
+	call.super = super;
+    call.callerDef = callerDef;
+
+	try {
+		if (as_function* func = method.to_function()) {
+            // Call function.
+		    val = (*func)(call);
+		}
+		else {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Attempt to call a value which is not "
+                    "a function (%s)", method);
+            );
+            return val;
+		}
+	}
+	catch (ActionTypeError& e) {
+		assert(val.is_undefined());
+		IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("%s", e.what());
+		);
+	}
+	return val;
+}
 
 /// Convenience function for finding a class constructor.
 //
@@ -184,7 +221,7 @@ inline as_function*
 getClassConstructor(const fn_call& fn, const std::string& s)
 {
     const as_value ctor(fn.env().find_object(s));
-    return ctor.to_as_function();
+    return ctor.to_function();
 }
 
 } // namespace gnash

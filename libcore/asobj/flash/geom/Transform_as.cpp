@@ -124,7 +124,7 @@ transform_colorTransform(const fn_call& fn)
         as_value colorTrans(fn.env().find_object("flash.geom.ColorTransform"));
 
         boost::intrusive_ptr<as_function> colorTransformCtor =
-            colorTrans.to_as_function();
+            colorTrans.to_function();
 
         if (!colorTransformCtor) {
             log_error("Failed to construct flash.geom.ColorTransform!");
@@ -235,7 +235,7 @@ transform_matrix(const fn_call& fn)
         // If it's not found, construction will fail.
         as_value matrix(fn.env().find_object("flash.geom.Matrix"));
 
-        boost::intrusive_ptr<as_function> matrixCtor = matrix.to_as_function();
+        boost::intrusive_ptr<as_function> matrixCtor = matrix.to_function();
 
         if (!matrixCtor) {
             log_error("Failed to construct flash.geom.Matrix!");

@@ -116,7 +116,7 @@ public:
                     !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu))
             {
                 us.to_object(gl)->set_prototype(
-                        super.to_as_function()->getPrototype());
+                        super.to_function()->getPrototype());
             }
             return us;
         }
@@ -177,7 +177,7 @@ public:
                     super.set_undefined();
                     return super;
                 }
-                assert(super.to_as_function());
+                assert(super.to_function());
             }
 
             Global_as& gl = getGlobal(fn);
@@ -190,7 +190,7 @@ public:
                     !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
                 
                 us.to_object(gl)->set_prototype(
-                        super.to_as_function()->getPrototype());
+                        super.to_function()->getPrototype());
             }
         }
         else

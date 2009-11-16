@@ -80,7 +80,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     // it, so entering infinite recursion, we'll cheat and assume that
     // the object 'where' is the filters package.
     as_function* constructor =
-        where.getMember(st.find("BitmapFilter")).to_as_function();
+        where.getMember(st.find("BitmapFilter")).to_function();
     
     as_object* proto;
     if (constructor) {

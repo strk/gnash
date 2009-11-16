@@ -1256,7 +1256,7 @@ global_assetuperror(const fn_call& fn)
 
         string_table& st = getStringTable(fn);
 
-        as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_as_function();
+        as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_function();
         if (ctor) {
             fn_call::Args args;
             as_object* proto = ctor->constructInstance(fn.env(), args).get();
@@ -1470,7 +1470,7 @@ constructObject(Global_as& gl, const T& arg, string_table::key className)
         throw ActionTypeError();
     }
     
-    as_function* ctor = clval.to_as_function();
+    as_function* ctor = clval.to_function();
 
     // This is also not properly tested.
     if (!ctor) throw ActionTypeError();

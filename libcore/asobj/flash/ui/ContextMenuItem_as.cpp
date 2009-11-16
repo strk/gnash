@@ -69,7 +69,7 @@ contextmenuitem_copy(const fn_call& fn)
     string_table& st = getStringTable(fn);
 
     as_function* ctor =
-        gl.getMember(st.find("ContextMenuItem")).to_as_function();
+        gl.getMember(st.find("ContextMenuItem")).to_function();
 
     if (!ctor) return as_value();
 

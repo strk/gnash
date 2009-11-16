@@ -244,7 +244,7 @@ object_addproperty(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_function* getter = fn.arg(1).to_as_function();
+	as_function* getter = fn.arg(1).to_function();
 	if (!getter)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -258,7 +258,7 @@ object_addproperty(const fn_call& fn)
 	const as_value& setterval = fn.arg(2);
 	if (!setterval.is_null())
 	{
-		setter = setterval.to_as_function();
+		setter = setterval.to_function();
 		if (!setter)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -313,7 +313,7 @@ object_registerClass(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_function* theclass = fn.arg(1).to_as_function();
+	as_function* theclass = fn.arg(1).to_function();
 	if ( ! theclass )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -492,7 +492,7 @@ object_watch(const fn_call& fn)
 
 	std::string propname = propval.to_string();
 	string_table::key propkey = st.find(propname);
-	as_function* trig = funcval.to_as_function();
+	as_function* trig = funcval.to_function();
 	as_value cust; if ( fn.nargs > 2 ) cust = fn.arg(2);
 
 	return as_value(obj->watch(propkey, *trig, cust));

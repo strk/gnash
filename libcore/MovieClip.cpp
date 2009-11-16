@@ -23,7 +23,7 @@
 
 #include "MovieFactory.h"
 #include "log.h" 
-#include "action.h" // for call_method_parsed (call_method_args)
+#include "action.h" // for invoke_parsed (invoke_args)
 #include "MovieClip.h"
 #include "movie_definition.h"
 #include "as_value.h"

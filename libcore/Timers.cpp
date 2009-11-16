@@ -23,7 +23,7 @@
 #include "fn_call.h"
 #include "VM.h"
 #include "movie_root.h"
-#include "action.h" // call_method
+#include "action.h" // invoke
 
 #include <limits> // for numeric_limits
 #include <functional>
@@ -120,7 +120,7 @@ Timer::execute()
             return;
         }
 
-        as_function* f = tmp.to_as_function();
+        as_function* f = tmp.to_function();
 
         if (!f) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -137,7 +137,7 @@ Timer::execute()
     // Copy args 
     fn_call::Args argsCopy(_args);
 
-    call_method(timer_method, env, _object, argsCopy, super);
+    invoke(timer_method, env, _object, argsCopy, super);
 
 }
 

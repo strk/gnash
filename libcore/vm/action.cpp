@@ -40,49 +40,6 @@
 namespace gnash {
 
 //
-// action stuff
-//
-
-//
-// Function/method dispatch.
-//
-
-/// @param this_ptr     this is ourself.
-as_value
-call_method(const as_value& method, const as_environment& env,
-        as_object* this_ptr, fn_call::Args& args, as_object* super,
-        const movie_definition* callerDef)
-{
-	as_value val;
-	fn_call call(this_ptr, env, args);
-	call.super = super;
-    call.callerDef = callerDef;
-
-	try {
-		if (as_function* func = method.to_as_function()) {
-            // Call function.
-		    val = (*func)(call);
-		}
-		else {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Attempt to call a value which is not "
-                    "a function (%s)", method);
-            );
-            return val;
-		}
-	}
-	catch (ActionTypeError& e) {
-		assert(val.is_undefined());
-		IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("%s", e.what());
-		);
-	}
-
-	return val;
-}
-
-
-//
 // event_id
 //
 

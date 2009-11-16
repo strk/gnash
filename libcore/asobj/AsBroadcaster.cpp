@@ -95,7 +95,7 @@ public:
 
         if (method.is_function()) {
             _fn.this_ptr = o.get();
-            method.to_as_function()->call(_fn);
+            method.to_function()->call(_fn);
         }
 
         ++_dispatched;

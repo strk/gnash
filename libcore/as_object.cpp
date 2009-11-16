@@ -486,7 +486,7 @@ as_object::get_constructor()
 		return NULL;
 	}
 	//log_debug("%p.__constructor__ is %s", ctorVal);
-	return ctorVal.to_as_function();
+	return ctorVal.to_function();
 }
 
 int
@@ -1150,7 +1150,7 @@ callMethod(as_object* obj, string_table::key methodName)
 	as_environment env(getVM(*obj));
     fn_call::Args args;
 
-	return call_method(method, env, obj, args);
+	return invoke(method, env, obj, args);
 }
 
 as_value
@@ -1169,7 +1169,7 @@ callMethod(as_object* obj, string_table::key methodName, const as_value& arg0)
     fn_call::Args args;
     args += arg0;
 
-	return call_method(method, env, obj, args);
+	return invoke(method, env, obj, args);
 }
 
 as_value
@@ -1189,7 +1189,7 @@ callMethod(as_object* obj, string_table::key methodName, const as_value& arg0,
     fn_call::Args args;
     args += arg0, arg1;
 
-	return call_method(method, env, obj, args);
+	return invoke(method, env, obj, args);
 }
 
 as_value
@@ -1210,7 +1210,7 @@ callMethod(as_object* obj, string_table::key methodName,
     fn_call::Args args;
     args += arg0, arg1, arg2;
 
-	ret = call_method(method, env, obj, args);
+	ret = invoke(method, env, obj, args);
 
 	return ret;
 }
@@ -1232,7 +1232,7 @@ callMethod(as_object* obj, string_table::key methodName, const as_value& arg0,
     fn_call::Args args;
     args += arg0, arg1, arg2, arg3;
 
-	return call_method(method, env, obj, args);
+	return invoke(method, env, obj, args);
 
 }
 

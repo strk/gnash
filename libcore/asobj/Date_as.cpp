@@ -417,7 +417,7 @@ date_new(const fn_call& fn)
     // date.
     if (!fn.isInstantiation()) {
         Global_as& gl = getGlobal(fn);
-        as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_as_function();
+        as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_function();
         if (!ctor) return as_value();
         fn_call::Args args;
         return ctor->constructInstance(fn.env(), args);

@@ -36,22 +36,6 @@ namespace gnash {
 	class as_value;
     class movie_definition;
 
-	/// Call a method, be it an as_function or a c_function. 
-	//
-	/// This is a thin wrapper around operator() and fn_call,
-	/// probably worth dropping.
-	///
-	DSOEXPORT as_value call_method(const as_value& method,
-            const as_environment& env,
-        // this is ourself
-		as_object* this_ptr,
-        fn_call::Args& args,
-        // the super object
-        as_object* super=0,
-        // the movie_definition containing caller code
-        // or 0 for spontaneous calls
-        const movie_definition* callerDef=0);
-
 
 }	// end namespace gnash
 

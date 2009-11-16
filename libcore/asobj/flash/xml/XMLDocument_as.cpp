@@ -625,7 +625,7 @@ getXMLInterface()
     if ( o == NULL )
     {
         Global_as& gl = *VM::get().getGlobal();
-        as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_as_function();
+        as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_function();
         if (!ctor) return 0;
 
         // XML.prototype is an XMLNode(1, "");

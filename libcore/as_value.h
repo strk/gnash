@@ -457,7 +457,7 @@ public:
 	/// \brief
 	/// Return value as an ActionScript function ptr
 	/// or NULL if it is not an ActionScript function.
-	as_function*	to_as_function() const;
+	as_function* to_function() const;
 
 	/// Return value as a primitive type
 	//

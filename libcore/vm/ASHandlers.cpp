@@ -1313,7 +1313,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     as_object* instance = convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
-    as_function* super = env.top(1).to_as_function();
+    as_function* super = env.top(1).to_function();
 
     // Invalid args!
     if (!super || ! instance)
@@ -2646,12 +2646,12 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
             )
         }
     }
-    else if ( function.to_as_function()->isSuper() )
+    else if ( function.to_function()->isSuper() )
     {
         this_ptr = thread.getThisPointer();
 
         // the new 'super' will be computed from the old one
-        as_function* oldSuper = function.to_as_function();
+        as_function* oldSuper = function.to_function();
         super = oldSuper->get_super();
     }
 
@@ -2678,7 +2678,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         args += env.pop();
     } 
 
-    as_value result = call_method(function, env, this_ptr,
+    as_value result = invoke(function, env, this_ptr,
                   args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
@@ -2744,7 +2744,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
     unsigned nargs = unsigned(env.pop().to_number());
 
     as_value constructorval = thread.getVariable(classname);
-    boost::intrusive_ptr<as_function> constructor = constructorval.to_as_function();
+    boost::intrusive_ptr<as_function> constructor = constructorval.to_function();
     if ( ! constructor )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3248,7 +3248,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         args += env.pop();
     } 
 
-    as_value result = call_method(method_val, env, this_ptr, 
+    as_value result = invoke(method_val, env, this_ptr, 
             args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
@@ -3313,7 +3313,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
         }
     }
 
-    boost::intrusive_ptr<as_function> method = method_val.to_as_function();
+    boost::intrusive_ptr<as_function> method = method_val.to_function();
     if (!method) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("ActionNewMethod: method name is undefined "
@@ -3525,8 +3525,8 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    as_function* super = env.top(0).to_as_function();
-    as_function* sub = env.top(1).to_as_function();
+    as_function* super = env.top(0).to_function();
+    as_function* sub = env.top(1).to_function();
 
     if ( ! super || ! sub )
     {

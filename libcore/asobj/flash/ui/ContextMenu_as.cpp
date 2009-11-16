@@ -127,7 +127,7 @@ contextmenu_copy(const fn_call& fn)
 
     Global_as& gl = getGlobal(fn);
 
-    as_function* ctor = gl.getMember(NSV::CLASS_CONTEXTMENU).to_as_function();
+    as_function* ctor = gl.getMember(NSV::CLASS_CONTEXTMENU).to_function();
     if (!ctor) {
         return as_value();
     }
