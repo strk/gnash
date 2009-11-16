@@ -345,7 +345,7 @@ DiskStream::fullyPopulated()
 void
 DiskStream::close()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     log_debug("Closing %s on fd #%d", _filespec, _filefd);
 
@@ -705,10 +705,13 @@ DiskStream::play(int netfd, bool flag)
 {
     GNASH_REPORT_FUNCTION;
     bool done = false;
+    if (!flag) {
+	done = true;
+    }
     
     _netfd = netfd;
 
-    while (!done || !flag) {
+    while (!done) {
         switch (_state) {
 	  case NO_STATE:
 	      log_network("No Diskstream open %s for %d", _filespec, netfd);
@@ -718,7 +721,7 @@ DiskStream::play(int netfd, bool flag)
 	      if (_dataptr) {
 		  log_network("Restarting Diskstream %s for %d", _filespec, netfd);
 	      }
-	      _state = PLAY;
+	      _state = DONE;
 	      continue;
           case OPEN:
 	      loadToMem(0);
@@ -735,13 +738,14 @@ DiskStream::play(int netfd, bool flag)
 #else
 		  ret = net.writeNet(netfd, (_dataptr + _offset), (_filesize - _offset));
 		  if (ret != (_filesize - _offset)) {
-		      log_error("In %s(%d): couldn't write %d bytes to net fd #%d!",
+		      log_error("In %s(%d): couldn't write %d bytes to net fd #%d! %s",
 				__FUNCTION__, __LINE__, (_filesize - _offset),
-				strerror(errno), netfd);
+				netfd, strerror(errno));
 		  }
 #endif
 		  log_debug("Done playing file %s, size was: %d", _filespec, _filesize);
 		  _state = DONE;
+		  close();
 		  done = true;
 		  // reset to the beginning of the file
 		  _offset = 0;
@@ -785,10 +789,10 @@ DiskStream::play(int netfd, bool flag)
           case DONE:
 	      log_debug("Restarting Disk Stream from the beginning");
 	      _offset = 0;
+	      _filefd = 0;
 	      _state = PLAY;
 	      _seekptr = _dataptr;
-	      _filefd = 0;
-	      _netfd = 0;
+	      _netfd = netfd;
               continue;
           default:
               break;
@@ -807,13 +811,15 @@ DiskStream::play(int netfd, bool flag)
     _bytes += nbytes;
     // _seekptr += nbytes;
 #endif
-    
+
+#if 0
 #ifdef _WIN32
     UnmapViewOfFile(_dataptr);
 #elif defined(__amigaos4__)
 	if (_dataptr) free(_dataptr);
 #else
     munmap(_dataptr, _filesize);
+#endif
 #endif
     
     return true;
@@ -984,9 +990,13 @@ DiskStream::determineFileType(const string &filespec)
   if (pos != string::npos) {
     string suffix = filespec.substr(pos+1, filespec.size());
     _filetype = FILETYPE_NONE;
-    if (suffix == "html") {
+    if (suffix == "htm") {
+      _filetype = FILETYPE_HTML;
+    } else if (suffix == "html") {
       _filetype = FILETYPE_HTML;
     } else if (suffix == "ogg") {
+      _filetype = FILETYPE_OGG;
+    } else if (suffix == "ogv") {
       _filetype = FILETYPE_OGG;
     } else if (suffix == "swf") {
       _filetype = FILETYPE_SWF;
@@ -1005,6 +1015,8 @@ DiskStream::determineFileType(const string &filespec)
     } else if (suffix == "xml") {
       _filetype = FILETYPE_XML;
     } else if (suffix == "mp4") {
+      _filetype = FILETYPE_MP4;
+    } else if (suffix == "mpeg") {
       _filetype = FILETYPE_MP4;
     } else if (suffix == "png") {
       _filetype = FILETYPE_PNG;
