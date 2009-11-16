@@ -31,11 +31,13 @@
 
 // Forward declarations
 namespace gnash {
+    namespace abc {
+        class Machine;
+        class abc_function;
+    }
     class CodeStream;
-    class Machine;
     class as_object;
     class asClass;
-    class abc_function;
 }
 
 namespace gnash {
@@ -61,7 +63,7 @@ public:
         _methodID = m;
     }
 
-	void initPrototype(Machine* machine);
+	void initPrototype(abc::Machine* machine);
 
 	boost::uint32_t getMaxRegisters() { return _maxRegisters;}
 
@@ -97,7 +99,7 @@ public:
         return _scopeDepth;
     }
 
-	abc_function* getPrototype() { return _prototype; }
+    abc::abc_function* getPrototype() { return _prototype; }
 
 	asBinding* getBinding(string_table::key name);
 
@@ -263,7 +265,7 @@ private:
 	
     boost::uint32_t _methodID;
 
-    abc_function* _prototype;
+    abc::abc_function* _prototype;
 	int _minArguments;
 	int _maxArguments;
 	boost::uint32_t _bodyLength;

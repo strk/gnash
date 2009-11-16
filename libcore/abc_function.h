@@ -32,6 +32,7 @@
 #include "asMethod.h"
 
 namespace gnash {
+namespace abc {
 
 class Machine;
 
@@ -64,8 +65,7 @@ private:
 
 };
 
+} // namespace abc
+} // gnash namespace
 
-} // end of gnash namespace
-
-// __GNASH_ABC_FUNCTION_H__
 #endif

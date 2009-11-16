@@ -53,7 +53,7 @@ public:
 		VM& vm = getVM(*getObject(m));
         
         log_debug("getting machine.");
-		Machine *mach = vm.getMachine();
+        abc::Machine *mach = vm.getMachine();
 		
         _abc->prepare(mach);
 
@@ -92,7 +92,7 @@ public:
 			in.read_string(name);
 		}
 
-        std::auto_ptr<AbcBlock> block(new AbcBlock());
+        std::auto_ptr<abc::AbcBlock> block(new abc::AbcBlock());
 		if (!block->read(in)) {
             log_error("ABC parsing error while processing DoABCTag. This "
                     "tag will never be executed");
@@ -112,9 +112,9 @@ public:
 
 private:
 
-	DoABCTag(AbcBlock* block) : _abc(block) {}
+	DoABCTag(abc::AbcBlock* block) : _abc(block) {}
 
-	AbcBlock* _abc;
+    abc::AbcBlock* _abc;
 	
 };
 

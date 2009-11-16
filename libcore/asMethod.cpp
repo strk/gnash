@@ -169,9 +169,9 @@ asMethod::addSlotFunction(string_table::key name, Namespace *ns,
 }
 
 void
-asMethod::initPrototype(Machine* machine)
+asMethod::initPrototype(abc::Machine* machine)
 {
-	_prototype = new abc_function(this,machine);
+	_prototype = new abc::abc_function(this,machine);
 }
 
 bool

@@ -32,22 +32,23 @@
 #include <stdexcept>
 
 namespace gnash {
-	class SWFStream; // for read signature
+    namespace abc {
+        class AbcBlock;
+        class Machine;
+    }
+    class SWFStream; // for read signature
+    class ClassHierarchy;
+    class asMethod;
+    class asClass;
 }
 
 namespace gnash {
-
-class AbcBlock;
-class ClassHierarchy;
-class asMethod;
-class asClass;
-class Machine;
-
 namespace abc {
 
 class Trait
 {
 public:
+
 
     enum Kind
 	{
@@ -66,8 +67,11 @@ public:
 	boost::uint32_t _typeIndex;
 	boost::uint32_t _classInfoIndex;
 	as_value _value;
-	string_table::key _name;
+
+	URI _name;
+
 	string_table::key _globalName;
+
 	Namespace* _namespace;
 	asMethod* _method;
 	bool _valueSet;
@@ -121,8 +125,6 @@ public:
 
 /// Output stream operator for abc::Trait::Kind
 std::ostream& operator<<(std::ostream& o, const Trait::Kind k);
-
-} // namespace abc
 
 namespace {
 
@@ -316,9 +318,9 @@ private:
 
 	void check_multiname_namespaceset(boost::uint32_t nsset);
 
-	void setMultinameNames(MultiName *n,string_table::key ABCName);
+	void setMultinameNames(MultiName *n, abc::URI ABCName);
 
-	void setNamespaceURI(Namespace *ns,string_table::key ABCName);
+	void setNamespaceURI(Namespace *ns, abc::URI ABCName);
 
 	std::vector<boost::int32_t> _integerPool;
 	std::vector<boost::uint32_t> _uIntegerPool;
@@ -349,8 +351,9 @@ std::ostream& operator<<(std::ostream& o, AbcBlock::MethodConstant c);
 std::ostream& operator<<(std::ostream& o, AbcBlock::InstanceConstant c);
 std::ostream& operator<<(std::ostream& o, AbcBlock::PoolConstant c);
 
-} 
+} // namespace abc
+} // namespace gnash
 
 
-#endif /* GNASH_ABC_BLOCK_H */
+#endif 
 

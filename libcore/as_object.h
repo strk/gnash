@@ -41,14 +41,15 @@
 
 // Forward declarations
 namespace gnash {
+    namespace abc {
+        class Machine;
+    }
     class as_function;
     class MovieClip;
     class DisplayObject;
     class as_environment;
     class VM;
-    class Machine;
     class IOChannel;
-    class event_id;
     class movie_root;
     class asClass;
     class RunResources;
@@ -164,7 +165,7 @@ struct ObjectURI
 class as_object : public GcResource
 {
     friend class asClass;
-    friend class Machine;
+    friend class abc::Machine;
 
     typedef std::set<std::pair<string_table::key, string_table::key> >
         propNameSet;

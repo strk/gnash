@@ -120,10 +120,10 @@ gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_dat
 
     gnash::as_value result;
     if( input_data ) {
-        result = getObject(view->movie)->callMethod(st.find(func_name),
-                                         gnash::as_value(input_data));
+        result = callMethod(getObject(view->movie),
+                st.find(func_name), gnash::as_value(input_data));
     } else {
-        result = getObject(view->movie)->callMethod(st.find(func_name));
+        result = callMethod(getObject(view->movie), st.find(func_name));
     }
     if( !result.is_string() ) {
         return NULL;

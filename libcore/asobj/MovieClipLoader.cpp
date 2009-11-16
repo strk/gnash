@@ -129,7 +129,7 @@ moviecliploader_loadClip(const fn_call& fn)
     // TODO: check if this logic can be generic to movie_root::loadMovie
 	DisplayObject* target = fn.env().find_target(tgt_str);
     unsigned int junk;
-	if (!target && ! mr.isLevelTarget(tgt_str, junk) ) {
+	if (!target && ! isLevelTarget(getSWFVersion(fn), tgt_str, junk) ) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Could not find target %s (evaluated from %s)"),
 			tgt_str, tgt_arg);

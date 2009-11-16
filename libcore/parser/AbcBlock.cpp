@@ -314,10 +314,6 @@ operator<<(std::ostream& o, const Trait::Kind k)
     }
 }
 
-} // abc
-
-using namespace abc;
-
 AbcBlock::AbcBlock()
     :
     _stringTable(&VM::get().getStringTable())
@@ -388,7 +384,7 @@ AbcBlock::check_multiname_namespaceset(boost::uint32_t nsset)
 }
 
 void
-AbcBlock::setMultinameNames(MultiName *n, string_table::key ABCName)
+AbcBlock::setMultinameNames(MultiName *n, abc::URI ABCName)
 {
 	
 	n->setABCName(ABCName);
@@ -401,7 +397,7 @@ AbcBlock::setMultinameNames(MultiName *n, string_table::key ABCName)
 }
 
 void
-AbcBlock::setNamespaceURI(Namespace *ns, string_table::key ABCName)
+AbcBlock::setNamespaceURI(Namespace *ns, abc::URI ABCName)
 {
 	std::string name = _stringPool[ABCName];
 	string_table::key global_key = _stringTable->find(name);
@@ -1485,5 +1481,6 @@ operator<<(std::ostream& o, AbcBlock::PoolConstant c)
     }
 }
 
-} /* namespace gnash */
+} // namespace abc
+} // namespace gnash
 

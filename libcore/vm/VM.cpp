@@ -73,7 +73,7 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
     gl->registerClasses();
 
 #ifdef ENABLE_AVM2
-	_singleton->_machine = new Machine(*_singleton);
+	_singleton->_machine = new abc::Machine(*_singleton);
     _singleton->_machine->init();
 #endif
 

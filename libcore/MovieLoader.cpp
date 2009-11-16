@@ -260,7 +260,8 @@ MovieLoader::processCompletedRequest(const Request& r)
     else
     {
         unsigned int levelno;
-        if (_movieRoot.isLevelTarget(target, levelno))
+        const int version = _movieRoot.getVM().getSWFVersion();
+        if (isLevelTarget(version, target, levelno))
         {
             log_debug(_("processCompletedRequest: _level loading "
                     "(level %u)"), levelno);

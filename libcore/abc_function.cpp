@@ -21,7 +21,8 @@
 #include "fn_call.h"
 #include "Machine.h"
 
-namespace gnash{
+namespace gnash {
+namespace abc {
 
 abc_function::abc_function(asMethod* methodInfo, Machine* machine)
     :
@@ -36,7 +37,6 @@ as_value
 abc_function::operator()(const fn_call& fn)
 {
 
-
 	log_abc("Calling an abc_function id=%u.", _methodInfo->methodID());
 	as_value val = _machine->executeFunction(_methodInfo,fn);
 	log_abc("Done calling abc_function id=%u value=%s",
@@ -45,5 +45,5 @@ abc_function::operator()(const fn_call& fn)
 
 }
 
-
-}
+} // namespace abc
+} // namespace gnash

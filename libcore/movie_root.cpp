@@ -466,16 +466,15 @@ movie_root::replaceLevel(unsigned int num, Movie* extern_movie)
 	setLevel(num, extern_movie);
 }
 
-Movie*
+MovieClip*
 movie_root::getLevel(unsigned int num) const
 {
-	Levels::const_iterator i = _movies.find(num +
-            DisplayObject::staticDepthOffset);
-	if ( i == _movies.end() ) return 0;
+	Levels::const_iterator i =
+        _movies.find(num + DisplayObject::staticDepthOffset);
 
-    // TODO: if this has to be a Movie, why isn't it stored as one?
-	assert(dynamic_cast<Movie*>(i->second));
-	return dynamic_cast<Movie*>(i->second);
+	if (i == _movies.end()) return 0;
+
+	return i->second;
 }
 
 void
@@ -2052,25 +2051,6 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
 }
 
-bool
-movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
-{
-  if ( _vm.getSWFVersion() > 6 )
-  {
-    if ( name.compare(0, 6, "_level") ) return false;
-  }
-  else
-  {
-    StringNoCaseEqual noCaseCmp;
-    if (!noCaseCmp(name.substr(0, 6), "_level")) return false;
-  }
-
-  if ( name.find_first_not_of("0123456789", 7) != std::string::npos ) return false;
-  levelno = strtoul(name.c_str()+6, NULL, 0); // getting 0 here for "_level" is intentional
-  return true;
-
-}
-
 void
 movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 {
@@ -2177,11 +2157,31 @@ movie_root::errorInterface(const std::string& msg) const
 std::string
 movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 {
-	if ( _interfaceHandler ) return _interfaceHandler->call(cmd, arg);
+	if (_interfaceHandler) return _interfaceHandler->call(cmd, arg);
 
 	log_error("Hosting application registered no callback for events/queries");
 
 	return "<no iface to hosting app>";
+}
+
+bool
+isLevelTarget(int version, const std::string& name, unsigned int& levelno)
+{
+    if (version > 6) {
+        if (name.compare(0, 6, "_level")) return false;
+    }
+    else {
+        StringNoCaseEqual noCaseCmp;
+        if (!noCaseCmp(name.substr(0, 6), "_level")) return false;
+    }
+
+    if (name.find_first_not_of("0123456789", 7) != std::string::npos) {
+        return false;
+    }
+    // getting 0 here for "_level" is intentional
+    levelno = std::strtoul(name.c_str() + 6, NULL, 0); 
+    return true;
+
 }
 
 short

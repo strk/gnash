@@ -25,6 +25,16 @@ class as_object;
 class Namespace;
 class Property;
 
+namespace abc {
+
+/// This type should always be used for the index of AbcBlocks' names.
+//
+/// It serves to distinguish them from global names, which are identified
+/// by a string_table::key. This identifies global names' position in the
+/// string_table. AbcBlock resources have nothing to do with the string_table
+/// and their URI does not correspond to a string_table entry, so it
+/// makes no sense whatsoever to use string_table::key to index them.   
+typedef size_t URI;
 
 /// An MultiName represents a single ABC multiname.
 //
@@ -80,8 +90,8 @@ public:
 	void setNamespace(Namespace *ns) { _namespace = ns; }
 	Namespace* getNamespace() const { return _namespace; }
 
-	string_table::key getABCName() const { return _abcName; }
-	void setABCName(string_table::key n) { _abcName = n;}
+    abc::URI getABCName() const { return _abcName; }
+	void setABCName(abc::URI n) { _abcName = n;}
 
 	string_table::key getGlobalName() const { return _globalName;}
 	void setGlobalName(string_table::key n) { _globalName = n;}
@@ -115,11 +125,14 @@ private:
 
     std::vector<Namespace*>* _namespaceSet;
 
-	string_table::key _abcName;
+    abc::URI _abcName;
+
 	string_table::key _globalName;
+
 	Namespace* _namespace;
 
 };
 
+} // namespace abc
 } // namespace gnash
 #endif 
