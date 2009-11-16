@@ -43,7 +43,6 @@ libgnashvm_la_SOURCES = \
 	ASHandlers.cpp \
 	ActionExec.cpp \
 	VM.cpp		\
-	action.cpp \
 	CallStack.cpp \
 	$(NULL)
 
@@ -60,7 +59,6 @@ noinst_HEADERS = \
 	MultiName.h \
 	ActionExec.h \
 	ExecutableCode.h \
-	action.h \
 	with_stack_entry.h \
 	$(NULL)
 
