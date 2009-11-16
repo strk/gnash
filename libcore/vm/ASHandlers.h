@@ -20,7 +20,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "action.h" // we should get rid of this probably
 #include "SWF.h"
 
 

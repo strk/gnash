@@ -27,7 +27,6 @@
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
-#include "action.h"
 #include "amf.h"
 #include "element.h"
 #include "sol.h"

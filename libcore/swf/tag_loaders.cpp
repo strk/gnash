@@ -24,7 +24,6 @@
 
 #include "IOChannel.h" // for StreamAdapter inheritance
 #include "utility.h"
-#include "action.h"
 #include "action_buffer.h"
 #include "Font.h"
 #include "log.h"

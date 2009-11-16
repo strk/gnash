@@ -26,7 +26,6 @@
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
-#include "action.h" // for invoke0
 #include "utility.h" // for typeName() 
 #include "GnashNumeric.h"
 #include "namedStrings.h"

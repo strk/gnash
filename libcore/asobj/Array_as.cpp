@@ -31,7 +31,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "GnashException.h"
-#include "action.h" 
 #include "VM.h" 
 #include "Object.h" 
 #include "GnashNumeric.h"
