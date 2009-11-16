@@ -990,6 +990,7 @@ event_handler(Network::thread_params_t *args)
 
     Network net;
     int timeout = 30;
+    int retries = 0;
     bool done = false;
 
     fd_set hits;
@@ -1002,43 +1003,47 @@ event_handler(Network::thread_params_t *args)
     // for select. We may want to do this elsewhere, as it could
     // be a performance hit as the number of file descriptors gets
     // larger.
-    log_debug("Handler has %d clients attached.", hand->getClients().size());
+    log_debug("Handler has %d clients attached, %d threads",
+	      hand->getClients().size(), tids.num_of_tids());
     
     int max = 0;
     for (size_t i = 0; i<hand->getClients().size(); i++) {
 	log_debug("Handler client[%d] is: %d", i, hand->getClient(i));
 	if (hand->getClient(i) >= max) {
 	    max = hand->getClient(i);
+	    // hand->dump();
 	}
     }
 
     do {
-
+	
 	// If we have active disk streams, send those packets first.
 	// 0 is a reserved stream, so we start with 1, as the reserved
 	// stream isn't one we care about here.
 	if (hand->getActiveDiskStreams()) {
-	    log_network("%d active disk streams", hand->getActiveDiskStreams());
+	    log_network("%d active disk streams",
+			hand->getActiveDiskStreams());
+	    // hand->dump();
 	}
-	for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
-	    hand->getDiskStream(i).dump();
-#if 1
-	    if (hand->getDiskStream(i).getState() == DiskStream::PLAY) {
-		if (!hand->getDiskStream(i).play()) {
-		    //     boost::uint8_t *ptr = hand->getDiskStream(i).get();
-		    //     if (ptr) {
-		    // 	// if (rtmp->sendMsg(hand->getClient(i), 8,
-		    // 	// 	RTMP::HEADER_8, 4096,
-		    // 	// 	RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
-		    // 	// 	ptr, 4096)) {
-		    // 	// }
-		} else {
-		    log_network("ERROR: No stream for client %d", i);
-		}
+#if 0
+	boost::shared_ptr<DiskStream> filestream(cache.findFile(args->filespec));
+	if (filestream) {
+	    filestream->dump();
+	}
+#else
+	cache.dump();
 #endif
-		// if (hand->getDiskStream(i).getState() == DiskStream::DONE) {
-		//     hand->removeDiskStream();
-		//     return result;
+	for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
+	    boost::shared_ptr<DiskStream> ds = hand->getDiskStream(i);
+	    if (ds) {
+		// hand->getDiskStream(i)->dump();
+		if ((ds->getState() == DiskStream::OPEN)
+		    || (ds->getState() == DiskStream::CLOSED)
+		    || (ds->getState() == DiskStream::PAUSE)
+		    || (ds->getState() == DiskStream::PLAY)) {
+		    // Only play the next chunk of the file.
+		    ds->play(i, true);
+		}
 	    }
 	}
     
@@ -1059,15 +1064,16 @@ event_handler(Network::thread_params_t *args)
 		      largs.netfd = i;
 		      // largs.filespec = fullpath;
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
-		      if (!http->http_handler(&largs)) {
+		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
 			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, args->filespec);
 			  net.closeNet(args->netfd);
 			  hand->removeClient(args->netfd);
 			  done = true;
 		      } else {
 			  log_network("Not Done with HTTP connection for fd #%d, it's a persistant connection.", i);
+			  
 		      }
-		      break;
+		      continue;
 		  }
 		  case Network::RTMP:
 		      args->netfd = i;
@@ -1083,7 +1089,7 @@ event_handler(Network::thread_params_t *args)
 		      args->netfd = i;
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      // args->filespec = path;
-		      if (!http->http_handler(args)) {
+		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
 			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, largs.filespec);
 			  return;
 		      }		      
@@ -1094,7 +1100,7 @@ event_handler(Network::thread_params_t *args)
 		      args->netfd = i;
 		      // args->filespec = path;
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
-		      if (!http->http_handler(args)) {
+		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
 			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, args->filespec);
 			  return;
 		      }		      
@@ -1112,18 +1118,26 @@ event_handler(Network::thread_params_t *args)
 		      done = true;
 		      break;
 		}
+		delete args->buffer;
 	    }
 	}
 
-	// Clear the current message so next time we read new data
-	largs.buffer->clear();
+	// // Clear the current message so next time we read new data
+	// args->buffer->clear();
+	// largs.buffer->clear();
 	
 	// Wait for something from one of the file descriptors
 	net.setTimeout(30);
 	hits = net.waitForNetData(hand->getClients());
 	if (FD_ISSET(0, &hits)) {
 	    FD_CLR(0, &hits);
-	    log_network("Got no hits");
+	    log_network("Got no hits, %d retries", retries);
+	    // net.closeNet(args->netfd);
+	    // hand->removeClient(args->netfd);
+	    // done = true;
+	}
+	retries++;
+	if (retries >= 10) {
 	    net.closeNet(args->netfd);
 	    hand->removeClient(args->netfd);
 	    done = true;
