@@ -23,7 +23,7 @@
 #include "fn_call.h"
 #include "VM.h"
 #include "movie_root.h"
-#include "action.h" // invoke
+#include "Global_as.h"
 
 #include <limits> // for numeric_limits
 #include <functional>
