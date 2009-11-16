@@ -1148,8 +1148,9 @@ callMethod(as_object* obj, string_table::key methodName)
 	}
 
 	as_environment env(getVM(*obj));
+    fn_call::Args args;
 
-	return call_method0(method, env, obj);
+	return call_method(method, env, obj, args);
 }
 
 as_value

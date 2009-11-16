@@ -36,14 +36,6 @@ namespace gnash {
 	class as_value;
     class movie_definition;
 
-	//
-	// Some handy helpers
-	//
-
-	// Dispatching methods from C++.
-	as_value call_method0(const as_value& method,
-            const as_environment& env, as_object* this_ptr);
-
 	/// Call a method, be it an as_function or a c_function. 
 	//
 	/// This is a thin wrapper around operator() and fn_call,

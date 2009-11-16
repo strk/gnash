@@ -81,14 +81,6 @@ call_method(const as_value& method, const as_environment& env,
 	return val;
 }
 
-as_value
-call_method0(const as_value& method, const as_environment& env,
-        as_object* this_ptr)
-{
-    fn_call::Args args;
-    return call_method(method, env, this_ptr, args);
-}
-
 
 //
 // event_id
