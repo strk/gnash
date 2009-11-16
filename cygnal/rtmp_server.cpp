@@ -1382,9 +1382,9 @@ rtmp_handler(Network::thread_params_t *args)
     // stream isn't one we care about here.
     log_network("%d active disk streams", hand->getActiveDiskStreams());
     for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
-	hand->getDiskStream(i).dump();
-	if (hand->getDiskStream(i).getState() == DiskStream::PLAY) {
-	    boost::uint8_t *ptr = hand->getDiskStream(i).get();
+	hand->getDiskStream(i)->dump();
+	if (hand->getDiskStream(i)->getState() == DiskStream::PLAY) {
+	    boost::uint8_t *ptr = hand->getDiskStream(i)->get();
 	    if (ptr) {
 		if (rtmp->sendMsg(hand->getClient(i), 8,
 			RTMP::HEADER_8, 4096,
@@ -1608,10 +1608,10 @@ rtmp_handler(Network::thread_params_t *args)
 					*response)) {
 			      }			      
 			      int active_stream = hand->getActiveDiskStreams();
-			      boost::uint8_t *ptr = hand->getDiskStream(active_stream).get();
+			      boost::uint8_t *ptr = hand->getDiskStream(active_stream)->get();
 			      if (ptr) {
 				  log_network("Sending %s to client",
-					      hand->getDiskStream(active_stream).getFilespec());
+					      hand->getDiskStream(active_stream)->getFilespec());
 				  if (rtmp->sendMsg(args->netfd, 5,
 					RTMP::HEADER_12, 400,
 					RTMP::NOTIFY, RTMPMsg::FROM_SERVER,

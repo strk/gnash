@@ -47,8 +47,8 @@ public:
 
     // These are for the protocol itself
     http_method_e processClientRequest(int fd);
-    http_method_e processClientRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processGetRequest(int fd, amf::Buffer *buf);
+    http_method_e processClientRequest(Handler *hand, int fd, amf::Buffer *buf);
+    amf::Buffer &processGetRequest(int fd, amf::Buffer *buf);
     boost::shared_ptr<amf::Buffer> processPostRequest(int fd, amf::Buffer *buf);
     boost::shared_ptr<amf::Buffer> processPutRequest(int fd, amf::Buffer *buf);
     boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd, amf::Buffer *buf);
@@ -96,12 +96,12 @@ public:
     gnash::amf::Buffer &formatEchoResponse(const std::string &num, uint8_t *data, size_t size);
 #endif
 
-    bool http_handler(gnash::Network::thread_params_t *args);
+    bool http_handler(Handler *hand, int netfd, amf::Buffer *buf);
+    boost::shared_ptr<gnash::DiskStream> getDiskStream() { return _diskstream; };
 
-    void dump();
-    
+    void dump();    
 private:
-    
+    boost::shared_ptr<gnash::DiskStream> _diskstream;
 };
 
 } // end of gnash namespace
