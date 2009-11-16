@@ -19,16 +19,17 @@
 #include "gnashconfig.h"
 #endif
 
-#include "asMethod.h"
-#include "asClass.h"
+#include "Method.h"
+#include "Class.h"
 #include "CodeStream.h"
 #include "abc_function.h"
 #include "Global_as.h"
 #include "VM.h"
 
 namespace gnash {
+namespace abc {
 
-asMethod::asMethod()
+Method::Method()
     :
     _methodID(0),
     _prototype(0),
@@ -48,7 +49,7 @@ asMethod::asMethod()
 }
 
 void
-asMethod::print_body()
+Method::print_body()
 {
 		if (!_body) {
 			log_parse("Method has no body.");
@@ -64,9 +65,9 @@ asMethod::print_body()
 }
 
 void
-asMethod::setOwner(asClass *pOwner)
+Method::setOwner(Class *pOwner)
 {
-	log_debug("asMethod::setOwner");
+	log_debug("Method::setOwner");
 	if (!_prototype) {
 		log_debug("ERROR _prototype is null.");
 	}
@@ -74,14 +75,14 @@ asMethod::setOwner(asClass *pOwner)
 }
 
 void
-asMethod::setReturnType(asClass* /*type*/)
+Method::setReturnType(Class* /*type*/)
 {
 	/* No-op */
 }
 
 bool
-asMethod::addValue(string_table::key name, Namespace *ns,
-        boost::uint32_t slotId, asClass *type, as_value& val, bool isconst)
+Method::addValue(string_table::key name, Namespace *ns,
+        boost::uint32_t slotId, Class *type, as_value& val, bool isconst)
 {
     Global_as* g = VM::get().getGlobal();
 	if (val.is_object()) {
@@ -105,7 +106,7 @@ asMethod::addValue(string_table::key name, Namespace *ns,
 }
 
 bool
-asMethod::addGetter(string_table::key name, Namespace *ns, asMethod *method)
+Method::addGetter(string_table::key name, Namespace *ns, Method *method)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
@@ -123,7 +124,7 @@ asMethod::addGetter(string_table::key name, Namespace *ns, asMethod *method)
 }
 
 bool
-asMethod::addSetter(string_table::key name, Namespace *ns, asMethod *method)
+Method::addSetter(string_table::key name, Namespace *ns, Method *method)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
@@ -141,15 +142,15 @@ asMethod::addSetter(string_table::key name, Namespace *ns, asMethod *method)
 }
 
 bool
-asMethod::addMemberClass(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, asClass *type)
+Method::addMemberClass(string_table::key name, Namespace *ns,
+	boost::uint32_t slotId, Class *type)
 {
 	return addSlot(name, ns, slotId, type);
 }
 
 bool
-asMethod::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
-	asClass */*type*/)
+Method::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
+	Class */*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	int flags = PropFlags::dontDelete;
@@ -159,33 +160,33 @@ asMethod::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
 }
 
 bool
-asMethod::addSlotFunction(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, asMethod *method)
+Method::addSlotFunction(string_table::key name, Namespace *ns,
+	boost::uint32_t slotId, Method *method)
 {
-	asClass a;
+	Class a;
 	a.setName(NSV::CLASS_FUNCTION);
 	as_value b(method->getPrototype());
 	return addValue(name, ns, slotId, &a, b, false);
 }
 
 void
-asMethod::initPrototype(abc::Machine* machine)
+Method::initPrototype(abc::Machine* machine)
 {
 	_prototype = new abc::abc_function(this,machine);
 }
 
 bool
-asMethod::addMethod(string_table::key /*name*/, Namespace* /*ns*/, asMethod*
+Method::addMethod(string_table::key /*name*/, Namespace* /*ns*/, Method*
         /*method*/)
 {
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	as_value val(method->getPrototype());
-// 	as value val = new as_value(abc_function(asMethod->getBody,getVM(_prototype).getMachine()));
+// 	as value val = new as_value(abc_function(Method->getBody,getVM(_prototype).getMachine()));
 // 	_prototype->init_member(name, val, PropFlags::readOnly |
 // 		PropFlags::dontDelete | PropFlags::dontEnum, nsname);
 // 	return true;
 return false;
 }
 
-
+} // namespace abc
 } // namespace gnash

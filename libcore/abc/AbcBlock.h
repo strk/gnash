@@ -35,11 +35,11 @@ namespace gnash {
     namespace abc {
         class AbcBlock;
         class Machine;
+        class Class;
+        class Method;
     }
     class SWFStream; // for read signature
     class ClassHierarchy;
-    class asMethod;
-    class asClass;
 }
 
 namespace gnash {
@@ -75,11 +75,11 @@ public:
 	string_table::key _globalName;
 
 	Namespace* _namespace;
-	asMethod* _method;
+	Method* _method;
 	bool _valueSet;
 
-	asClass* _classTarget;
-	asMethod* _methodTarget;
+	abc::Class* _classTarget;
+	Method* _methodTarget;
 	bool _static;
 
 	Trait()
@@ -102,16 +102,16 @@ public:
 
 	bool read(SWFStream* in, AbcBlock *pBlock);
 
-	bool finalize(AbcBlock* pBlock, asClass* pClass, bool do_static);
+	bool finalize(AbcBlock* pBlock, abc::Class* pClass, bool do_static);
 
-	bool finalize_mbody(AbcBlock* pBlock, asMethod* pMethod);
+	bool finalize_mbody(AbcBlock* pBlock, Method* pMethod);
 
-	void set_target(asClass* pClass, bool do_static) {
+	void set_target(abc::Class* pClass, bool do_static) {
         _classTarget = pClass;
         _static = do_static;
     }
 
-	void set_target(asMethod *pMethod) {
+	void set_target(Method *pMethod) {
         _classTarget = 0;
         _methodTarget = pMethod;
     }
@@ -233,9 +233,9 @@ public:
 
 	AbcBlock();
 
-    asClass* locateClass(MultiName &m);
+    abc::Class* locateClass(MultiName &m);
 
-	asClass* locateClass(const std::string& className);
+	abc::Class* locateClass(const std::string& className);
 
 	abc::Trait &newTrait()
 	{
@@ -248,7 +248,7 @@ public:
 
 	void update_global_name(unsigned int multiname_index);
 
-    const std::vector<asClass*>& scripts() const {
+    const std::vector<abc::Class*>& scripts() const {
         return _scripts;
     }
 
@@ -272,7 +272,7 @@ public:
         return _doublePool[i];
     }
 
-    asMethod* methodPoolAt(size_t i) const {
+    Method* methodPoolAt(size_t i) const {
         checkBounds(i, _methods);
         return _methods[i];
     }
@@ -282,7 +282,7 @@ public:
         return _multinamePool[i];
     }
 
-    asClass* classPoolAt(size_t i) const {
+    abc::Class* classPoolAt(size_t i) const {
         checkBounds(i, _classes);
         return _classes[i];
     }
@@ -332,16 +332,16 @@ private:
 	std::vector<string_table::key> _stringPoolTableIDs;
 	std::vector<Namespace*> _namespacePool;
 	std::vector<NamespaceSet> _namespaceSetPool;
-	std::vector<asMethod*> _methods;
+	std::vector<Method*> _methods;
 	std::vector<MultiName> _multinamePool;
-	std::vector<asClass*> _classes; 
-	std::vector<asClass*> _scripts;
-	std::vector<abc::Trait*> _traits;
+	std::vector<Class*> _classes; 
+	std::vector<Class*> _scripts;
+	std::vector<Trait*> _traits;
 
 	string_table* _stringTable;
 	SWFStream* _stream; // Not stored beyond one read.
 
-	asClass *mTheObject;
+	abc::Class *mTheObject;
 	ClassHierarchy *mCH;
 
 	boost::uint32_t mVersion;

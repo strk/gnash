@@ -130,7 +130,7 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
-	abc/asClass.cpp \
+	abc/Class.cpp \
 	MovieFactory.cpp \
 	MovieLoader.cpp \
 	Namespace.cpp \
@@ -140,7 +140,7 @@ libgnashcore_la_SOURCES = \
 if ENABLE_AVM2
 libgnashcore_la_SOURCES += \
 	abc/abc_function.cpp \
-	abc/asMethod.cpp \
+	abc/Method.cpp \
 	abc/AbcBlock.cpp \
 	$(NULL)
 endif
@@ -216,9 +216,9 @@ if ENABLE_AVM2
 noinst_HEADERS += \
 	swf/DoABCTag.h \
 	abc/abc_function.h \
-	abc/asMethod.h \
+	abc/Method.h \
 	abc/asException.h \
-	abc/asBoundValues.h \
+	abc/BoundValues.h \
 	abc/AbcBlock.h \
 	abc/MultiName.h \
 	$(NULL)
@@ -269,7 +269,7 @@ EXTENSIONS_API = \
 	RGBA.h	\
 	Geometry.h	\
 	Video.h \
-	abc/asClass.h \
+	abc/Class.h \
 	Namespace.h \
 	$(NULL)
 

@@ -24,7 +24,7 @@
 #include "VM.h"
 #include "log.h"
 #include "ClassHierarchy.h"
-#include "asClass.h"
+#include "Class.h"
 #include "namedStrings.h"
 #include "CodeStream.h"
 #include "action_buffer.h"
@@ -36,7 +36,7 @@ namespace gnash {
 namespace abc {
 
 bool
-Trait::finalize(AbcBlock *pBlock, asClass *pClass, bool do_static)
+Trait::finalize(AbcBlock *pBlock, abc::Class *pClass, bool do_static)
 {
 	log_abc("Finalize class %s (%s), trait kind: %s", 
             pBlock->_stringTable->value(pClass->getName()), pClass, _kind);
@@ -47,7 +47,7 @@ Trait::finalize(AbcBlock *pBlock, asClass *pClass, bool do_static)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		asClass *pType;
+		abc::Class *pType;
 		if (_typeIndex) {
 			log_abc("Trait type: %s", 
                 pBlock->_stringPool[
@@ -115,7 +115,7 @@ Trait::finalize(AbcBlock *pBlock, asClass *pClass, bool do_static)
 }
 
 bool
-Trait::finalize_mbody(AbcBlock *pBlock, asMethod *pMethod)
+Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 {
 	log_abc("Finalizing method trait: kind %s", _kind);
 	switch (_kind)
@@ -124,7 +124,7 @@ Trait::finalize_mbody(AbcBlock *pBlock, asMethod *pMethod)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		asClass *pType;
+		abc::Class *pType;
 		if (_typeIndex) {
 			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
         }
@@ -329,7 +329,7 @@ AbcBlock::prepare(Machine* mach)
 {
 
     std::for_each(_classes.begin(), _classes.end(),
-            std::mem_fun(&asClass::initPrototype));
+            std::mem_fun(&abc::Class::initPrototype));
 
     // The last (entry) script has Global as its prototype.
     // This can be deduced because the global classes are initialized with a
@@ -341,10 +341,10 @@ AbcBlock::prepare(Machine* mach)
     // scripts have Global as a target object (prototype), so for now we
     // will do that.
     std::for_each(_scripts.begin(), _scripts.end(),
-            boost::bind(&asClass::setPrototype, _1, mach->global()));
+            boost::bind(&abc::Class::setPrototype, _1, mach->global()));
  
     std::for_each(_methods.begin(), _methods.end(),
-            boost::bind(&asMethod::initPrototype, _1, mach));
+            boost::bind(&Method::initPrototype, _1, mach));
 
     std::for_each(_traits.begin(), _traits.end(),
             boost::bind(&Trait::finalize, _1, this));
@@ -405,7 +405,7 @@ AbcBlock::setNamespaceURI(Namespace *ns, abc::URI ABCName)
 	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
 
-asClass*
+abc::Class*
 AbcBlock::locateClass(const std::string& className)
 {
 
@@ -436,10 +436,10 @@ AbcBlock::locateClass(const std::string& className)
 
 }
 
-asClass*
+abc::Class*
 AbcBlock::locateClass(MultiName& m)
 {
-	asClass* found = 0;
+	abc::Class* found = 0;
 
 	if (m.getNamespace())
 	{
@@ -798,7 +798,7 @@ AbcBlock::read_method_infos()
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		log_abc(" Reading method %u", i);
-		asMethod *pMethod = mCH->newMethod();
+		Method *pMethod = mCH->newMethod();
 		pMethod->setMethodID(i);
 		_methods[i] = pMethod;
 		boost::uint32_t param_count = _stream->read_V32();
@@ -826,7 +826,7 @@ AbcBlock::read_method_infos()
             // TODO: this can be 'void', which clearly isn't a class, so this
             // seems bogus. As setReturnType is a no-op, we should log it
             // and ignore it.
-            asClass* rtClass = locateClass(_multinamePool[return_type]);
+            abc::Class* rtClass = locateClass(_multinamePool[return_type]);
             if (!rtClass) {
                 log_abc(_("ABC: Unknown return type."));
             }
@@ -851,7 +851,7 @@ AbcBlock::read_method_infos()
 			
             // A value of 0 is legitimate, meaning 'any (*)'. 
             if (ptype) {
-                asClass* param_type = locateClass(_multinamePool[ptype]);
+                abc::Class* param_type = locateClass(_multinamePool[ptype]);
 
                 if (!param_type) {
                     log_abc((_("ABC: Unknown parameter type.")));
@@ -939,7 +939,7 @@ AbcBlock::read_instances()
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
 	for (size_t i = 0; i < count; ++i) {
-		asClass* pClass;
+		abc::Class* pClass;
 		//Read multiname index.
 		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
@@ -996,7 +996,7 @@ AbcBlock::read_instances()
 			pClass->setSuper(mTheObject);
 		}
 		else {
-			asClass *pSuper = locateClass(_multinamePool[super_index]);
+			abc::Class *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
 				log_error(_("ABC: Super type not found (%s)"), 
@@ -1061,7 +1061,7 @@ AbcBlock::read_instances()
 				log_error(_("ABC: Bad name for interface."));
 				return false;
 			}
-			asClass *pInterface = locateClass(_multinamePool[i_index]);
+			abc::Class *pInterface = locateClass(_multinamePool[i_index]);
 			// These may be undefined still, so don't check interface just yet.
 			if (0) //!pInterface || !pInterface->isInterface())
 			{
@@ -1083,8 +1083,8 @@ AbcBlock::read_instances()
 		// Don't validate for previous owner.
 		pClass->setConstructor(_methods[offset]);
 
-		/*	Calling the asMethod::setOwner always results in a segmentation fault, 
-		since it tries to modify asMethod.mPrototype, which is never
+		/*	Calling the Method::setOwner always results in a segmentation fault, 
+		since it tries to modify Method.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
 //		_methods[offset]->setOwner(pClass);
 
@@ -1112,7 +1112,7 @@ AbcBlock::read_classes()
 	log_abc("There are %u classes.", count);
 	
     for (size_t i = 0; i < count; ++i) {
-		asClass* pClass = _classes[i];
+		abc::Class* pClass = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Class %u(%s) static constructor index=%u", i, pClass, offset);
 
@@ -1124,8 +1124,8 @@ AbcBlock::read_classes()
 		// Don't validate for previous owner.
 		pClass->setStaticConstructor(_methods[offset]);
 
-		/*	Calling the asMethod::setOwner always results in a segmentation fault, 
-		since it tries to modify asMethod.mPrototype, which is never
+		/*	Calling the Method::setOwner always results in a segmentation fault, 
+		since it tries to modify Method.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
 //		_methods[offset]->setOwner(pClass);
 		
@@ -1152,7 +1152,7 @@ AbcBlock::read_scripts()
 	_scripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		asClass* pScript = mCH->newClass();
+		abc::Class* pScript = mCH->newClass();
 		_scripts[i] = pScript;
 
 		boost::uint32_t offset = _stream->read_V32();
@@ -1164,8 +1164,8 @@ AbcBlock::read_scripts()
 			return false;
 		}
 
-		// Calling the asMethod::setOwner always results in a segmentation
-        // fault, since it tries to modify asMethod.mPrototype, which is never
+		// Calling the Method::setOwner always results in a segmentation
+        // fault, since it tries to modify Method.mPrototype, which is never
 		// initialized.  The parser seems to work ok without this call.
 		// Don't validate for previous owner.
 //		_methods[offset]->setOwner(pScript);
@@ -1208,7 +1208,7 @@ AbcBlock::read_method_bodies()
 			return false;
 		}
 
-        asMethod& method = *_methods[offset];
+        Method& method = *_methods[offset];
 
 		if (method.getBody()) {
 			log_error(_("ABC: Only one body per method."));
@@ -1260,7 +1260,7 @@ AbcBlock::read_method_bodies()
 				pExcept->catchAny();
 			}
 			else {
-				asClass *pType = locateClass(_multinamePool[catch_type]);
+				abc::Class *pType = locateClass(_multinamePool[catch_type]);
 				if (!pType) {
 
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 
@@ -1359,7 +1359,7 @@ AbcBlock::read(SWFStream& in)
 		IF_VERBOSE_PARSE(_methods[i]->print_body());
 	}
 /*	The loop below causes a segmentation fault, because it tries to modify 
-	asMethod.mPrototype, which is never initialized.  The parser seems 
+	Method.mPrototype, which is never initialized.  The parser seems 
 	to work ok without this call.*/
 /*	std::vector<Trait*>::iterator i = mTraits.begin();
 	for ( ; i != mTraits.end(); ++i)

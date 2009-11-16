@@ -43,6 +43,7 @@
 namespace gnash {
     namespace abc {
         class Machine;
+        class Class;
     }
     class as_function;
     class MovieClip;
@@ -51,7 +52,6 @@ namespace gnash {
     class VM;
     class IOChannel;
     class movie_root;
-    class asClass;
     class RunResources;
     class Global_as;
 }
@@ -164,7 +164,7 @@ struct ObjectURI
 ///
 class as_object : public GcResource
 {
-    friend class asClass;
+    friend class abc::Class;
     friend class abc::Machine;
 
     typedef std::set<std::pair<string_table::key, string_table::key> >

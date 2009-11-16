@@ -17,14 +17,14 @@
 
 #include "log.h"
 #include "abc_function.h"
-#include "asClass.h"
+#include "Class.h"
 #include "fn_call.h"
 #include "Machine.h"
 
 namespace gnash {
 namespace abc {
 
-abc_function::abc_function(asMethod* methodInfo, Machine* machine)
+abc_function::abc_function(Method* methodInfo, Machine* machine)
     :
     as_function(*machine->global()),
     _methodInfo(methodInfo),

@@ -28,8 +28,8 @@
 #include <iostream>
 #include "string_table.h"
 #include "as_value.h"
+#include "as_object.h"
 #include "Property.h"
-#include "as_function.h"
 
 #ifdef ENABLE_AVM2
 # include "CodeStream.h"
@@ -41,20 +41,19 @@ namespace gnash {
         class Machine;
         class MultiName;
         class abc_function;
+        class BoundValue;
+        class BoundAccessor;
+        class Method;
+        class Class;
+        typedef Property Binding;
     }
-    class as_function;
     class Namespace;
-    class asMethod;
-    class asClass;
-    typedef Property asBinding;
-    class asBoundValue;
-    class asBoundAccessor;
     class ClassHierarchy;
     class Property;
 }
 
 namespace gnash {
- 
+namespace abc {
 
 /// A class to represent, abstractly, ActionScript prototypes.
 ///
@@ -62,11 +61,11 @@ namespace gnash {
 /// ActionScript prototype as a type, rather than as an object. This is
 /// contrary to the spirit of ActionScript as a dynamic language, but it is
 /// incredibly helpful to an interpreter for that language.
-class asClass
+class Class
 {
 public:
 
-	asClass()
+	Class()
         :
         _prototype(0),
         _final(false),
@@ -105,27 +104,27 @@ public:
 #ifdef ENABLE_AVM2
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, asClass *type, as_value& val,
+            boost::uint32_t slotID, Class *type, as_value& val,
             bool isconst, bool isstatic);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, asClass *type, bool isstatic);
+            boost::uint32_t slotID, Class *type, bool isstatic);
 
-	bool addMethod(string_table::key name, Namespace *ns, asMethod *method,
+	bool addMethod(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
 
-	bool addGetter(string_table::key name, Namespace *ns, asMethod *method,
+	bool addGetter(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
 
-	bool addSetter(string_table::key name, Namespace *ns, asMethod *method,
+	bool addSetter(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
 
 	bool addMemberClass(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, asClass *type, bool isstatic);
+		boost::uint32_t slotID, Class *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
 	bool addSlotFunction(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, asMethod *method, bool isstatic);
+		boost::uint32_t slotID, Method *method, bool isstatic);
 
 	/// Is the class final?
 	bool isFinal() const { return _final; }
@@ -183,28 +182,28 @@ public:
     }
 
 	/// What is the type of our parent class?
-	asClass* getSuper() const { return _super; }
+	Class* getSuper() const { return _super; }
 
 	/// We implement this interface.
-	void pushInterface(asClass* p) { _interfaces.push_back(p); }
+	void pushInterface(Class* p) { _interfaces.push_back(p); }
 
 	/// This is our constructor.
-	void setConstructor(asMethod *m) { _constructor = m; }
-	asMethod *getConstructor() { return _constructor; }
+	void setConstructor(Method *m) { _constructor = m; }
+	Method *getConstructor() { return _constructor; }
 
-	void setStaticConstructor(asMethod *m) { _staticConstructor = m; }
+	void setStaticConstructor(Method *m) { _staticConstructor = m; }
 	
-    asMethod* getStaticConstructor() const { 
+    Method* getStaticConstructor() const { 
         return _staticConstructor;
     }
 
-	void setSuper(asClass *p) { _super = p; }
+	void setSuper(Class *p) { _super = p; }
 
-	/// Try to build an asClass object from just a prototype.
+	/// Try to build an Class object from just a prototype.
 	void buildFro_prototype(as_object *o, string_table::key name,
 		ClassHierarchy *);
 
-	asBinding *getBinding(string_table::key name)
+	Binding *getBinding(string_table::key name)
 	{
 		BindingContainer::iterator i;
 		if (_bindings.empty()) return NULL;
@@ -214,24 +213,24 @@ public:
 		return &i->second;
 	}
 
-	asBinding* getGetBinding(as_value& v, abc::MultiName& n);
-	asBinding* getSetBinding(as_value& v, abc::MultiName& n);
+	Binding* getGetBinding(as_value& v, abc::MultiName& n);
+	Binding* getSetBinding(as_value& v, abc::MultiName& n);
     std::vector<abc::Trait> _traits;
 
 #endif
 
 private:
 	
-	typedef std::map<string_table::key, asBinding> BindingContainer;
+	typedef std::map<string_table::key, Binding> BindingContainer;
 
     as_object *_prototype;
 
-	bool addBinding(string_table::key name, asBinding b)
+	bool addBinding(string_table::key name, Binding b)
 	{ _bindings[name] = b; return true; }
-	bool addStaticBinding(string_table::key name, asBinding b)
+	bool addStaticBinding(string_table::key name, Binding b)
 	{ _staticBindings[name] = b; return true; }
 
-	asBinding *getStaticBinding(string_table::key name)
+	Binding *getStaticBinding(string_table::key name)
 	{
 		BindingContainer::iterator i;
 		if (_staticBindings.empty())
@@ -247,11 +246,11 @@ private:
 	bool _dynamic;
 	bool _interface;
 	string_table::key _name;
-	std::list<asClass*> _interfaces;
+	std::list<Class*> _interfaces;
 	Namespace* _protectedNs;
-	asClass* _super;
-	asMethod* _constructor;
-	asMethod* _staticConstructor;
+	Class* _super;
+	Method* _constructor;
+	Method* _staticConstructor;
 
 	BindingContainer _bindings;
 	BindingContainer _staticBindings;
@@ -260,6 +259,7 @@ private:
 	bool _system;
 };
 
+} // namespace abc 
 } // namespace gnash
 
 #endif 

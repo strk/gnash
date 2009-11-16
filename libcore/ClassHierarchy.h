@@ -25,13 +25,13 @@
 
 #include "as_object.h"
 #include "SafeStack.h"
-#include "asClass.h"
+#include "Class.h"
 #include "Namespace.h"
 
 #ifdef ENABLE_AVM2
-# include "asBoundValues.h"
+# include "BoundValues.h"
 # include "asException.h"
-# include "asMethod.h"
+# include "Method.h"
 #endif
 
 #include <list>
@@ -207,8 +207,8 @@ public:
 		return &mNamespaces[uri];
 	}
 	
-    /// Create a new asClass object for use.
-	asClass* newClass() {
+    /// Create a new abc::Class object for use.
+    abc::Class* newClass() {
         mClassMemory.grow(1);
         return &mClassMemory.top(0);
     }
@@ -220,18 +220,18 @@ public:
         return &mExceptionMemory.top(0);
     }
 
-	/// Create a new asMethod object for use.
-	asMethod* newMethod() {
+	/// Create a new Method object for use.
+    abc::Method* newMethod() {
         mMethodMemory.grow(1);
         return &mMethodMemory.top(0);
     }
 
-	asBoundValue* newBoundValue() {
+    abc::BoundValue* newBoundValue() {
         mBoundValueMemory.grow(1);
         return &mBoundValueMemory.top(0);
     }
 
-	asBoundAccessor* newBoundAccessor() {
+    abc::BoundAccessor* newBoundAccessor() {
         mBoundAccessorMemory.grow(1);
         return &mBoundAccessorMemory.top(0);
     }
@@ -249,13 +249,13 @@ private:
 	namespacesContainer mNamespaces;
 	SafeStack<Namespace> mAnonNamespaces;
 	Namespace* mGlobalNamespace;
-	SafeStack<asClass> mClassMemory;
+	SafeStack<abc::Class> mClassMemory;
 
 #ifdef ENABLE_AVM2
 	SafeStack<asException> mExceptionMemory;
-	SafeStack<asMethod> mMethodMemory;
-	SafeStack<asBoundValue> mBoundValueMemory;
-	SafeStack<asBoundAccessor> mBoundAccessorMemory;
+	SafeStack<abc::Method> mMethodMemory;
+	SafeStack<abc::BoundValue> mBoundValueMemory;
+	SafeStack<abc::BoundAccessor> mBoundAccessorMemory;
 #endif
 };
 

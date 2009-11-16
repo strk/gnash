@@ -32,7 +32,7 @@ namespace gnash {
 void
 Namespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 {
-	asClass *pClass = ch.newClass();
+	abc::Class *pClass = ch.newClass();
 	pClass->setName(name);
 	addClass(name, pClass);
 }
