@@ -43,6 +43,8 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// ABC-only resources for parsing and execution.
 namespace abc {
 
 class Trait
