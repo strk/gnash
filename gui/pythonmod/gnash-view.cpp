@@ -38,6 +38,7 @@
 #include "SystemClock.h"
 #include "smart_ptr.h"
 #include "DisplayObject.h"
+#include "Global_as.h"
 
 #ifdef USE_FFMPEG
 # include "MediaHandlerFfmpeg.h"

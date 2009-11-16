@@ -22,21 +22,21 @@
 #include "gnashconfig.h"
 #endif
 
-#include "as_environment.h" // for inlines (arg)
-#include "as_object.h" // for dtor visibility by boost::intrusive_ptr
+#include "as_environment.h" 
+#include "as_object.h"
 #include "smart_ptr.h"
+#include "as_value.h"
 #include "VM.h"
 
-#include <cassert> // for inlines (arg)
-#include <ostream> // for inlines (dump_args)
-#include <sstream> // for inlines (dump_args)
+#include <cassert> 
+#include <ostream>
+#include <sstream>
+#include <algorithm>
 
 // Forward declarations
 namespace gnash {
     class as_environment;
     class as_function;
-    class as_object;
-    class as_value;
     class movie_definition;
 }
 
@@ -65,6 +65,12 @@ public:
 
     FunctionArgs() {}
 
+    /// The copy constructor copies all the arguments.
+    FunctionArgs(const FunctionArgs& other)
+        :
+        _v(other._v)
+    {}
+
     FunctionArgs& operator+=(const T& t) {
         _v.push_back(t);
         return *this;
@@ -73,6 +79,15 @@ public:
     FunctionArgs& operator,(const T& t) {
         _v.push_back(t);
         return *this;
+    }
+
+    /// Mark any reachable resources
+    //
+    /// This is only for cases where the lifetime of a FunctionArgs object
+    /// extends beyond a function call.
+    void setReachable() const {
+        std::for_each(_v.begin(), _v.end(),
+                std::mem_fun_ref(&as_value::setReachable));
     }
 
     void swap(std::vector<T>& to) {

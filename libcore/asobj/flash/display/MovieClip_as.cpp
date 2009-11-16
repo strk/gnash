@@ -1224,7 +1224,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
     // If not found, construction fails.
     as_value textSnapshot(fn.env().find_object("TextSnapshot"));
 
-    boost::intrusive_ptr<as_function> tsCtor = textSnapshot.to_as_function();
+    boost::intrusive_ptr<as_function> tsCtor = textSnapshot.to_function();
 
     if (!tsCtor) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2318,7 +2318,7 @@ movieclip_transform(const fn_call& fn)
     // If not found, construction fails.
     as_value transform(fn.env().find_object("flash.geom.Transform"));
 
-    boost::intrusive_ptr<as_function> transCtor = transform.to_as_function();
+    boost::intrusive_ptr<as_function> transCtor = transform.to_function();
 
     if (!transCtor) {
         log_error("Failed to construct flash.geom.Transform!");

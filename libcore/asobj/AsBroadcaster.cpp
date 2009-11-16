@@ -91,11 +91,11 @@ public:
 
         as_value method;
         o->get_member(_eventKey, &method);
-        _fn.super = o->get_super(_eventName.c_str());
+        _fn.super = o->get_super(_eventKey);
 
         if (method.is_function()) {
             _fn.this_ptr = o.get();
-            method.to_as_function()->call(_fn);
+            method.to_function()->call(_fn);
         }
 
         ++_dispatched;

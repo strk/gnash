@@ -25,7 +25,6 @@
 #include "MultiName.h"
 #include "fn_call.h"
 #include "abc_function.h"
-#include "action.h"
 #include "Object.h"
 #include "VM.h"
 #include "Globals.h"
@@ -1249,7 +1248,7 @@ Machine::execute()
                     boost::uint32_t argc = mStream->read_V32();
                     ENSURE_OBJECT(_stack.top(argc + 1)); // The func
                     ENSURE_OBJECT(_stack.top(argc)); // The 'this'
-                    as_function *f = _stack.top(argc + 1).to_as_function();
+                    as_function *f = _stack.top(argc + 1).to_function();
                     as_object *obj = _stack.top(argc).to_object(*_global);
                     // We start with argc + 2 values related to this call
                     // on the stack. We want to end with 1 value. We pass
@@ -1274,7 +1273,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_CONSTRUCT:
                 {
                     boost::uint32_t argc = mStream->read_V32();
-                    as_function *f = _stack.top(argc).to_as_function();
+                    as_function *f = _stack.top(argc).to_function();
                     if (!f) {
                         log_abc("CONSTRUCT: No function on stack!");
                         break;
@@ -1309,7 +1308,7 @@ Machine::execute()
                     else
 #endif
                     if (f->getValue(*obj).is_function())
-                        func = f->getValue(*obj).to_as_function();
+                        func = f->getValue(*obj).to_function();
                     else
                     {
                         // Definitely an error, and not the kind we can handle.
@@ -1369,7 +1368,7 @@ Machine::execute()
                     if (!b) throw ASReferenceError();
                     
                     as_function *f = // b->isGetterSetter() ? b->getGetter() :
-                        b->getValue(*super).to_as_function();
+                        b->getValue(*super).to_function();
 
                     if (opcode == SWF::ABC_ACTION_CALLSUPER) {
                         pushCall(f, super, _stack.top(argc), argc, 0);
@@ -1431,7 +1430,7 @@ Machine::execute()
                             log_abc("Calling method %s on object %s",
                                     property, object_val);
                             as_environment env = as_environment(_vm);
-                            result = call_method(property,env,object,args);
+                            result = invoke(property,env,object,args);
 
                         }
                         else {
@@ -1474,7 +1473,7 @@ Machine::execute()
 #endif
                     }
                     //else
-                        func = b->getValue(obj).to_as_function();
+                        func = b->getValue(obj).to_function();
 
                     if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
                         pushCall(func, obj, mIgnoreReturn, argc, -shift - 1);
@@ -1538,7 +1537,7 @@ Machine::execute()
                     }
 
                     as_value c = super->getMember(NSV::PROP_CONSTRUCTOR, 0);
-                    pushCall(c.to_as_function(), super, mIgnoreReturn,
+                    pushCall(c.to_function(), super, mIgnoreReturn,
                             argc, -1);
                     break;
                     
@@ -1586,7 +1585,7 @@ Machine::execute()
                     // TODO: don't do this. Classes should not be functions;
                     // we should always use the constructor member, most
                     // likely.
-                    boost::intrusive_ptr<as_function> ctor = c.to_as_function();
+                    boost::intrusive_ptr<as_function> ctor = c.to_function();
                     
                     if (ctor) {
                         boost::intrusive_ptr<as_object> newobj =
@@ -1609,7 +1608,7 @@ Machine::execute()
                             as_value val = c.to_object(*_global)->getMember(
                                     NSV::PROP_CONSTRUCTOR, 0);
 
-                            call_method(val, env, c.to_object(*_global), args);
+                            invoke(val, env, c.to_object(*_global), args);
 
                             // Push the constructed property
                             push_stack(c);
@@ -1734,7 +1733,7 @@ Machine::execute()
                             NSV::PROP_uuCONSTRUCTORuu, 0);
 
                     fn_call::Args args;
-                    as_value value = call_method(property, env, new_class,
+                    as_value value = invoke(property, env, new_class,
                             args);
 
                     log_abc("NEWCLASS(%2%) finished. Return: %1%", value,

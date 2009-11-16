@@ -1256,7 +1256,7 @@ global_assetuperror(const fn_call& fn)
 
         string_table& st = getStringTable(fn);
 
-        as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_as_function();
+        as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_function();
         if (ctor) {
             fn_call::Args args;
             as_object* proto = ctor->constructInstance(fn.env(), args).get();
@@ -1289,9 +1289,9 @@ global_setInterval(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
-	if ( ! obj )
-	{
+	as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+	if (!obj) {
+
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setInterval(%s) "
@@ -1301,12 +1301,12 @@ global_setInterval(const fn_call& fn)
 		return as_value();
 	}
 
-	std::string methodName;
+    string_table::key methodName(0);
 
 	// Get interval function
-	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
+	as_function* as_func = obj->to_function(); 
 	if (!as_func) {
-		methodName = fn.arg(1).to_string();
+		methodName = getStringTable(fn).find(fn.arg(1).to_string());
 		timer_arg = 2;
 	}
 
@@ -1327,19 +1327,18 @@ global_setInterval(const fn_call& fn)
 	// TODO: check validity of interval time number ?
 
 	// Parse arguments 
-	Timer::ArgsContainer args;
-	for (unsigned i=timer_arg+1; i<fn.nargs; ++i) {
-		args.push_back(fn.arg(i));
+    fn_call::Args args;
+	for (unsigned i = timer_arg + 1; i < fn.nargs; ++i) {
+		args += fn.arg(i);
 	}
 
-    std::auto_ptr<Timer> timer(new Timer);
+	std::auto_ptr<Timer> timer;
 	if (as_func) {
-		timer->setInterval(*as_func, ms, fn.this_ptr, args);
+		timer.reset(new Timer(*as_func, ms, fn.this_ptr, args));
 	}
 	else {
-		timer->setInterval(obj, methodName, ms, args);
+		timer.reset(new Timer(obj, methodName, ms, args));
 	}
-    
     
 	movie_root& root = getRoot(fn);
 	int id = root.add_interval_timer(timer);
@@ -1362,7 +1361,7 @@ global_setTimeout(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+	as_object* obj = fn.arg(0).to_object(getGlobal(fn));
 	if (!obj) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
@@ -1373,12 +1372,12 @@ global_setTimeout(const fn_call& fn)
 		return as_value();
 	}
 
-	std::string methodName;
+    string_table::key methodName(0);
 
 	// Get interval function
-	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
+	as_function* as_func = obj->to_function(); 
 	if (!as_func) {
-		methodName = fn.arg(1).to_string();
+		methodName = getStringTable(fn).find(fn.arg(1).to_string());
 		timer_arg = 2;
 	}
 
@@ -1397,19 +1396,18 @@ global_setTimeout(const fn_call& fn)
         static_cast<unsigned long>(fn.arg(timer_arg).to_number());
 
 	// Parse arguments 
-	Timer::ArgsContainer args;
-	for (unsigned i=timer_arg+1; i<fn.nargs; ++i) {
-		args.push_back(fn.arg(i));
+    fn_call::Args args;
+	for (unsigned i = timer_arg + 1; i < fn.nargs; ++i) {
+		args += fn.arg(i);
 	}
 
-	std::auto_ptr<Timer> timer(new Timer);
+	std::auto_ptr<Timer> timer;
 	if (as_func) {
-		timer->setInterval(*as_func, ms, fn.this_ptr, args, true);
+		timer.reset(new Timer(*as_func, ms, fn.this_ptr, args, true));
 	}
 	else {
-		timer->setInterval(obj, methodName, ms, args, true);
+		timer.reset(new Timer(obj, methodName, ms, args, true));
 	}
-    
     
 	movie_root& root = getRoot(fn);
 
@@ -1472,7 +1470,7 @@ constructObject(Global_as& gl, const T& arg, string_table::key className)
         throw ActionTypeError();
     }
     
-    as_function* ctor = clval.to_as_function();
+    as_function* ctor = clval.to_function();
 
     // This is also not properly tested.
     if (!ctor) throw ActionTypeError();

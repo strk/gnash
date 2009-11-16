@@ -31,7 +31,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "GnashException.h"
-#include "action.h" 
 #include "VM.h" 
 #include "Object.h" 
 #include "GnashNumeric.h"
@@ -612,7 +611,7 @@ public:
         as_value ret(0.0);
         fn_call::Args args;
         args += b, a;
-        ret = call_method(cmp_method, _env, _object, args);
+        ret = invoke(cmp_method, _env, _object, args);
 
         return (*_zeroCmp)(ret.to_int());
     }
@@ -1029,7 +1028,7 @@ array_sort(const fn_call& fn)
     }
     else if (fn.arg(0).is_function()) {
         // Get comparison function
-        as_function* as_func = fn.arg(0).to_as_function();
+        as_function* as_func = fn.arg(0).to_function();
 
         assert(as_func);
 

@@ -24,8 +24,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "as_object.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "action.h"
 #include "log.h"
 
 #include <list>

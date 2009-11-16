@@ -644,7 +644,7 @@ public:
     /// itself, or __proto__.__proto__ if this is not a prototype
     /// object. This is only conceptual however, and may be more
     /// convoluted to obtain the actual super.
-    virtual as_object* get_super(const char* fname=0);
+    virtual as_object* get_super(string_table::key fname = 0);
 
     /// Get the constructor for this object.
     ///
@@ -1189,31 +1189,6 @@ isNativeType(as_object* obj, T*& relay)
     relay = dynamic_cast<T*>(obj->relay());
     return relay;
 }
-
-/// Call a method of this object in an AS-compatible way
-//
-/// @param name
-///    Name of the method. Will be converted to lowercase
-///    if the current VM is initialized for a  target
-///    up to SWF6.
-///
-/// @param ...
-///    nargs as_value references
-///
-/// @return value of the member (possibly undefined),
-///    or undefined if not found. Use get_member if you
-///    need to know wheter it was found or not.
-///
-as_value callMethod(as_object* obj, string_table::key name);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0, const as_value& arg1);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0, const as_value& arg1, const as_value& arg2);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0, const as_value& arg1, const as_value& arg2,
-        const as_value& arg3);
 
 /// Get the VM from an as_object
 VM& getVM(const as_object& o);

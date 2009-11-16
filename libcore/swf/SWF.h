@@ -426,7 +426,7 @@ enum ActionType
     /// argument, call the method (function) of the object,
     /// push the returned value on the stack.
     ///
-    /// http://sswf.sourceforge.net/SWFalexref.html#action_call_method
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_invoke
     ///
     ACTION_CALLMETHOD              = 0x52,
 

@@ -26,7 +26,6 @@
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
-#include "action.h" // for call_method0
 #include "utility.h" // for typeName() 
 #include "GnashNumeric.h"
 #include "namedStrings.h"
@@ -568,7 +567,8 @@ as_value::to_primitive(AsType hint) const
 	assert(obj);
 
 	as_environment env(getVM(*obj));
-	as_value ret = call_method0(method, env, obj);
+    fn_call::Args args;
+	as_value ret = invoke(method, env, obj, args);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
 #endif
@@ -957,7 +957,7 @@ as_value::setDisplayObject(DisplayObject& sprite)
 // Return value as an ActionScript function.  Returns NULL if value is
 // not an ActionScript function.
 as_function*
-as_value::to_as_function() const
+as_value::to_function() const
 {
     if (m_type == AS_FUNCTION) {
 	    // OK.
@@ -2185,7 +2185,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			log_debug("amf0 read date: %e", dub);
 #endif
 
-            as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_as_function();
+            as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_function();
             if (ctor) {
                 fn_call::Args args;
                 args += dub;

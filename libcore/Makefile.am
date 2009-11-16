@@ -59,6 +59,7 @@ libgnashcore_la_SOURCES = \
 	ClassHierarchy.cpp \
 	as_environment.cpp \
 	as_function.cpp	\
+	event_id.cpp \
 	Relay.cpp \
 	as_object.cpp \
 	as_value.cpp \

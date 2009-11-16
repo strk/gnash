@@ -504,7 +504,7 @@ DisplayObject::hasEventHandler(const event_id& id) const
 
     as_value tmp;
 	if (_object->get_member(id.functionKey(), &tmp)) {
-		return tmp.to_as_function();
+		return tmp.to_function();
 	}
 	return false;
 

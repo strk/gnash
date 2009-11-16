@@ -584,7 +584,7 @@ bitmapdata_rectangle(const fn_call& fn)
 
     // If it's not found construction will fail.
     as_value rectangle(fn.env().find_object("flash.geom.Rectangle"));
-    boost::intrusive_ptr<as_function> rectCtor = rectangle.to_as_function();
+    boost::intrusive_ptr<as_function> rectCtor = rectangle.to_function();
 
     if (!rectCtor) {
         log_error("Failed to construct flash.geom.Rectangle!");

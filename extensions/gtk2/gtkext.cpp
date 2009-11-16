@@ -88,7 +88,7 @@ generic_callback(GtkWidget * /*widget*/, gpointer data)
     const char *event = (const char *)data;
 
     as_value handler = callbacks[event];
-    as_function *as_func = handler.to_as_function();
+    as_function *as_func = handler.to_function();
 
 //	start the debugger when this callback is activated.
 // 	debugger.enabled(true);
@@ -228,7 +228,7 @@ as_value gtkext_signal_connect(const fn_call& fn)
     if (fn.nargs > 0) {
 	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object(*getGlobal(fn)).get());
 	string name = fn.arg(1).to_string();
-	as_value func = fn.arg(2).to_as_function();
+	as_value func = fn.arg(2).to_function();
 	//int data = fn.arg(3).to_int();
 
 	dbglogfile << "Adding callback " << func.to_string()

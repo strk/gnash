@@ -18,17 +18,8 @@
 //
 
 
-#include "action.h"
-#include "as_object.h"
 #include "log.h"
-#include "as_function.h"
-#include "SWF.h"
-#include "GnashException.h"
-#include "as_environment.h"
-#include "fn_call.h"
 #include "event_id.h"
-#include "VM.h"
-#include "StringPredicates.h"
 #include "namedStrings.h"
 
 #include <string>
@@ -38,60 +29,6 @@
 #include <boost/assign/list_of.hpp>
 
 namespace gnash {
-
-//
-// action stuff
-//
-
-//
-// Function/method dispatch.
-//
-
-/// @param this_ptr     this is ourself.
-as_value
-call_method(const as_value& method, const as_environment& env,
-        as_object* this_ptr, fn_call::Args& args, as_object* super,
-        const movie_definition* callerDef)
-{
-	as_value val;
-	fn_call call(this_ptr, env, args);
-	call.super = super;
-    call.callerDef = callerDef;
-
-	try
-	{
-		if ( as_function* as_func = method.to_as_function() )
-		{
-		    // It's an ActionScript function.  Call it.
-		    val = (*as_func)(call);
-		}
-		else
-		{
-			boost::format fmt = boost::format(_("Attempt to call a "
-                        "value which is neither a C nor an ActionScript "
-                        "function (%s)")) % method;
-			throw ActionTypeError(fmt.str());
-		}
-	}
-	catch (ActionTypeError& e)
-	{
-		assert(val.is_undefined());
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("%s", e.what());
-		);
-	}
-
-	return val;
-}
-
-as_value
-call_method0(const as_value& method, const as_environment& env,
-        as_object* this_ptr)
-{
-    fn_call::Args args;
-    return call_method(method, env, this_ptr, args);
-}
-
 
 //
 // event_id

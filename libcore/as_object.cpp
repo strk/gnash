@@ -33,7 +33,6 @@
 #include "GnashException.h"
 #include "fn_call.h" 
 #include "Object.h" 
-#include "action.h" 
 #include "Array_as.h"
 #include "as_function.h"
 #include "Global_as.h" 
@@ -140,7 +139,7 @@ public:
 
 	virtual bool isSuper() const { return true; }
 
-	virtual as_object* get_super(const char* fname=0);
+	virtual as_object* get_super(string_table::key fname = 0);
 
 	// Fetching members from 'super' yelds a lookup on the associated prototype
 	virtual bool get_member(string_table::key name, as_value* val,
@@ -192,7 +191,7 @@ private:
 };
 
 as_object*
-as_super::get_super(const char* fname)
+as_super::get_super(string_table::key fname)
 {
 	// Super references the super class of our class prototype.
 	// Our class prototype is __proto__.
@@ -206,11 +205,8 @@ as_super::get_super(const char* fname)
         return new as_super(getGlobal(*this), proto);
     }
 
-    string_table& st = getStringTable(*this);
-    string_table::key k = st.find(fname);
-
     as_object* owner = 0;
-    proto->findProperty(k, 0, &owner);
+    proto->findProperty(fname, 0, &owner);
     if (!owner) return 0;
 
     if (owner == proto) return new as_super(getGlobal(*this), proto);
@@ -458,7 +454,7 @@ as_object::getByIndex(int index)
 }
 
 as_object*
-as_object::get_super(const char* fname)
+as_object::get_super(string_table::key fname)
 {
 	// Super references the super class of our class prototype.
 	// Our class prototype is __proto__.
@@ -467,12 +463,9 @@ as_object::get_super(const char* fname)
 	// Our class prototype is __proto__.
 	as_object* proto = get_prototype();
 
-	if ( fname && getSWFVersion(*this) > 6)
-	{
+	if (fname && getSWFVersion(*this) > 6) {
 		as_object* owner = 0;
-		string_table& st = getStringTable(*this);
-		string_table::key k = st.find(fname);
-		findProperty(k, 0, &owner);
+		findProperty(fname, 0, &owner);
         // should be 0 if findProperty returned 0
 		if (owner != this) proto = owner; 
 	}
@@ -492,7 +485,7 @@ as_object::get_constructor()
 		return NULL;
 	}
 	//log_debug("%p.__constructor__ is %s", ctorVal);
-	return ctorVal.to_as_function();
+	return ctorVal.to_function();
 }
 
 int
@@ -1139,106 +1132,6 @@ as_object::getMember(string_table::key name, string_table::key nsname)
 	as_value ret;
 	get_member(name, &ret, nsname);
 	return ret;
-}
-
-as_value
-callMethod(as_object* obj, string_table::key methodName)
-{
-    if (!obj) return as_value();
-
-	as_value method;
-
-	if (!obj->get_member(methodName, &method))
-	{
-		return as_value();
-	}
-
-	as_environment env(getVM(*obj));
-
-	return call_method0(method, env, obj);
-}
-
-as_value
-callMethod(as_object* obj, string_table::key methodName, const as_value& arg0)
-{
-    if (!obj) return as_value();
-	as_value method;
-
-	if (!obj->get_member(methodName, &method))
-	{
-		return as_value();
-	}
-
-	as_environment env(getVM(*obj));
-
-    fn_call::Args args;
-    args += arg0;
-
-	return call_method(method, env, obj, args);
-}
-
-as_value
-callMethod(as_object* obj, string_table::key methodName, const as_value& arg0,
-        const as_value& arg1)
-{
-    if (!obj) return as_value();
-	as_value method;
-
-	if (!obj->get_member(methodName, &method))
-	{
-		return as_value();
-	}
-
-	as_environment env(getVM(*obj));
-
-    fn_call::Args args;
-    args += arg0, arg1;
-
-	return call_method(method, env, obj, args);
-}
-
-as_value
-callMethod(as_object* obj, string_table::key methodName,
-	const as_value& arg0, const as_value& arg1, const as_value& arg2)
-{
-    if (!obj) return as_value();
-	as_value ret;
-	as_value method;
-
-	if (!obj->get_member(methodName, &method))
-	{
-		return ret;
-	}
-
-	as_environment env(getVM(*obj));
-
-    fn_call::Args args;
-    args += arg0, arg1, arg2;
-
-	ret = call_method(method, env, obj, args);
-
-	return ret;
-}
-
-as_value
-callMethod(as_object* obj, string_table::key methodName, const as_value& arg0,
-        const as_value& arg1, const as_value& arg2, const as_value& arg3)
-{
-    if (!obj) return as_value();
-	as_value method;
-
-	if (!obj->get_member(methodName, &method))
-	{
-		return as_value();
-	}
-
-	as_environment env(getVM(*obj));
-
-    fn_call::Args args;
-    args += arg0, arg1, arg2, arg3;
-
-	return call_method(method, env, obj, args);
-
 }
 
 as_object*

@@ -144,7 +144,7 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
 //    << _("  CTRL-A          Toggle antialiasing (doesn't work)") << endl
 //    << _("  CTRL-T          Debug.  Test the set_variable() function") << endl
 //    << _("  CTRL-G          Debug.  Test the get_variable() function") << endl
-//    << _("  CTRL-M          Debug.  Test the call_method() function") << endl
+//    << _("  CTRL-M          Debug.  Test the invoke() function") << endl
 
     << endl;
 }

@@ -743,7 +743,7 @@ public:
         return _lastKeyEvent;
     }
 
-    const std::bitset<key::KEYCOUNT>& unreleasedKeys() const {
+    const Keys& unreleasedKeys() const {
         return _unreleasedKeys;
     }
 
@@ -1088,7 +1088,7 @@ private:
     unsigned int _lastTimerId;
 
     /// bit-array for recording the unreleased keys
-    std::bitset<key::KEYCOUNT> _unreleasedKeys;   
+    Keys _unreleasedKeys;   
 
     key::code _lastKeyEvent;
 

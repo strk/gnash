@@ -352,7 +352,7 @@ XMLSocket_as::getEventHandler(const std::string& name)
 	as_value tmp;
 	string_table& st = getStringTable(owner());
 	if (!owner().get_member(st.find(name), &tmp) ) return ret;
-	ret = tmp.to_as_function();
+	ret = tmp.to_function();
 	return ret;
 }
 
@@ -541,7 +541,7 @@ xmlsocket_onData(const fn_call& fn)
 
 
     Global_as& gl = getGlobal(fn);
-    as_function* ctor = gl.getMember(NSV::CLASS_XML).to_as_function();
+    as_function* ctor = gl.getMember(NSV::CLASS_XML).to_function();
 
     fn_call::Args args;
     args += xmlin;
