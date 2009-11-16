@@ -73,7 +73,7 @@ static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
 Handler::Handler()
     :_streams(1),	// note that stream 0 is reserved by the system.
-     _diskstreams(new gnash::DiskStream[STREAMS_BLOCK]),     
+     // _diskstreams(new gnash::DiskStream[STREAMS_BLOCK]),     
      _in_fd(0)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -387,13 +387,13 @@ Handler::initialized()
 }
 
 // Find a stream in the vector or Disk Streams
-gnash::DiskStream &
+boost::shared_ptr<gnash::DiskStream>
 Handler::findStream(const std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     
     for (int i; i < _streams; i++) {
-	if (_diskstreams[i].getFilespec() == filespec) {
+	if (_diskstreams[i]->getFilespec() == filespec) {
 	    return _diskstreams[i];
 	}
     }
@@ -407,7 +407,7 @@ Handler::createStream(double /* transid */)
 {
     GNASH_REPORT_FUNCTION;
 
-    _diskstreams[_streams].setState(DiskStream::CREATED);
+    _diskstreams[_streams]->setState(DiskStream::CREATED);
 
     return _streams;
 }
@@ -422,8 +422,8 @@ Handler::createStream(double /* transid */, const std::string &filespec)
 	return -1;
     }
     
-    _diskstreams[_streams].setState(DiskStream::CREATED);
-    _diskstreams[_streams].setFilespec(filespec);
+    _diskstreams[_streams]->setState(DiskStream::CREATED);
+    _diskstreams[_streams]->setFilespec(filespec);
     
     return _streams;
 }
@@ -443,7 +443,7 @@ Handler::playStream(const std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
 
-    gnash::DiskStream &ds = _diskstreams[_streams];
+    boost::shared_ptr<gnash::DiskStream> ds = _diskstreams[_streams];
 
     string fullpath = crcfile.getDocumentRoot();
     fullpath += "/";
@@ -451,10 +451,10 @@ Handler::playStream(const std::string &filespec)
     log_debug("FILENAME: %s", fullpath);
 
     // gnash::DiskStream &ds = findStream(filespec);
-    if (ds.getState() == DiskStream::CREATED) {
-	if (ds.open(fullpath)) {
-	    ds.loadToMem(0); // FIXME: load only part of the whole file for now
-	    ds.setState(DiskStream::PLAY);
+    if (ds->getState() == DiskStream::CREATED) {
+	if (ds->open(fullpath)) {
+	    ds->loadToMem(0); // FIXME: load only part of the whole file for now
+	    ds->setState(DiskStream::PLAY);
 	    return true;
 	}
     }
@@ -507,7 +507,7 @@ Handler::pauseStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
 
-    _diskstreams[int(streamid)].setState(DiskStream::PAUSE);
+    _diskstreams[int(streamid)]->setState(DiskStream::PAUSE);
 
     return -1;
 }
@@ -518,10 +518,10 @@ Handler::togglePause(double streamid)
 {
     GNASH_REPORT_FUNCTION;
 
-    if (_diskstreams[int(streamid)].getState() == DiskStream::PAUSE) {
-	_diskstreams[int(streamid)].setState(DiskStream::PLAY);
-    } if (_diskstreams[int(streamid)].getState() == DiskStream::PLAY) {
-	_diskstreams[int(streamid)].setState(DiskStream::PAUSE);
+    if (_diskstreams[int(streamid)]->getState() == DiskStream::PAUSE) {
+	_diskstreams[int(streamid)]->setState(DiskStream::PLAY);
+    } if (_diskstreams[int(streamid)]->getState() == DiskStream::PLAY) {
+	_diskstreams[int(streamid)]->setState(DiskStream::PAUSE);
     }
 
     return -1;
@@ -544,7 +544,7 @@ Handler::closeStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
 
-    _diskstreams[int(streamid)].setState(DiskStream::CLOSED);
+    _diskstreams[int(streamid)]->setState(DiskStream::CLOSED);
 
     return -1;
 }
@@ -555,7 +555,7 @@ Handler::deleteStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
 
-    _diskstreams[int(streamid)].setState(DiskStream::NO_STATE);
+    _diskstreams[int(streamid)]->setState(DiskStream::NO_STATE);
 
     _streams++;
 
@@ -579,10 +579,23 @@ Handler::dump()
     };
 
 //    GNASH_REPORT_FUNCTION;
+    cerr << "Currently there are " <<_clients.size() << " clients connected."
+	 << endl;
     for (size_t i = 0; i < _clients.size(); i++) {
 	cerr << "Client on fd #" << _clients[i] << " is using  "
 	     << proto_str[_protocol[i]] << endl;
     }
+
+    cerr << "Currently there are " << dec <<_diskstreams.size() << " DiskStreams."
+	 << endl;
+    map<int, boost::shared_ptr<DiskStream> >::iterator it;
+    for (it = _diskstreams.begin(); it != _diskstreams.end(); ++it) {
+	if (it->second) {
+	    cerr << "DiskStream for fd #" << dec << it->first << endl;
+	    it->second->dump();
+	}
+    }
+    
 }
 
 } // end of gnash namespace

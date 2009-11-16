@@ -124,11 +124,12 @@ public:
 
     // Check the status of active disk streams, which is one less than
     // default as the Streams IDs start at 1.
-    int getActiveDiskStreams() { return _streams - 1; }
-    int removeDiskStream() { return --_streams; }
+    int getActiveDiskStreams() { return _diskstreams.size(); }
+    // int removeDiskStream(boost::shared_ptr<DiskStream> x);
     
     // Operate on a disk streaming inprogress
-    gnash::DiskStream &getDiskStream(int x) { return _diskstreams[x]; }
+    boost::shared_ptr<gnash::DiskStream> getDiskStream(int x) { return _diskstreams[x]; }
+    void setDiskStream(int x, boost::shared_ptr<gnash::DiskStream> y) { _diskstreams[x] = y; }
 
     /// Add a SharedObject
     void addSOL(boost::shared_ptr<amf::Element> x) {
@@ -211,7 +212,7 @@ public:
     int pauseStream(double transid);
 
     // Find a stream in the vector or Disk Streams
-    gnash::DiskStream &findStream(const std::string &filespec);
+    boost::shared_ptr<gnash::DiskStream> findStream(const std::string &filespec);
 
     // Pause the RTMP stream
     int togglePause(double);
@@ -267,9 +268,8 @@ protected:
     /// \var _diskstreams
     ///   This is all the opened disk based files that are currently
     ///   being streamed by the server.
-    // std::map<std::string &, boost::scoped_ptr<gnash::DiskStream> > _diskstreams;
-    boost::shared_array<gnash::DiskStream> _diskstreams;
-    // std::map<int, boost::shared_ptr<gnash::DiskStream> > _diskstreams;
+    //    boost::shared_array<gnash::DiskStream> _diskstreams;
+    std::map<int, boost::shared_ptr<gnash::DiskStream> > _diskstreams;
     /// \var _protocol
     ///    this is the map of which protocol is being used by which
     ///    file descriptor.
