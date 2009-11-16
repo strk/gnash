@@ -1192,18 +1192,14 @@ isNativeType(as_object* obj, T*& relay)
 
 /// Call a method of this object in an AS-compatible way
 //
-/// @param name
-///    Name of the method. Will be converted to lowercase
-///    if the current VM is initialized for a  target
-///    up to SWF6.
+/// @param obj          The object to call the method on. This may be null, in
+///                     which case the call is a no-op. This is because calling
+///                     methods on null or non-objects in AS is harmless.
+/// @param name         The name of the method. 
 ///
-/// @param ...
-///    nargs as_value references
+/// @param arg0..nargs  The arguments to pass
 ///
-/// @return value of the member (possibly undefined),
-///    or undefined if not found. Use get_member if you
-///    need to know wheter it was found or not.
-///
+/// @return             The return value of the call (possibly undefined).
 as_value callMethod(as_object* obj, string_table::key name);
 as_value callMethod(as_object* obj, string_table::key name,
         const as_value& arg0);
