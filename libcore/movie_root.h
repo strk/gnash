@@ -743,7 +743,7 @@ public:
         return _lastKeyEvent;
     }
 
-    Keys& unreleasedKeys() const {
+    const Keys& unreleasedKeys() const {
         return _unreleasedKeys;
     }
 
