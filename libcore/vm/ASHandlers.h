@@ -25,7 +25,8 @@
 
 // Forward declarations
 namespace gnash {
-	class ActionExec;
+    class ActionExec;
+    class as_environment;
 }
 
 namespace gnash {
@@ -119,21 +120,6 @@ public:
 private:
 
 	static container_type & get_handlers();
-
-	/// Common code for ActionGetUrl and ActionGetUrl2
-	//
-	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
-	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url
-	///
-	/// @param target
-	///	the target window or _level1 to _level10
-	///
-	/// @param method
-	///	0:NONE, 1:GET, 2:POST
-	///
-	static void CommonGetUrl(as_environment& env, 
-			as_value target, const std::string& url,
-			boost::uint8_t method);
 
 	/// Common code for SetTarget and SetTargetExpression
 	//

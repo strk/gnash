@@ -49,6 +49,8 @@
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "DisplayObject.h"
+#include "as_environment.h"
+#include "as_value.h"
 
 #include <string>
 #include <vector>
@@ -80,11 +82,23 @@ namespace {
     as_object* construct_object(as_function* ctor_as_func, as_environment& env,
             unsigned int nargs);
     as_object* convertToObject(Global_as& gl, const as_value& val);
+
+	/// Common code for ActionGetUrl and ActionGetUrl2
+	//
+	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
+	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url
+	///
+	/// @param target
+	///	the target window or _level1 to _level10
+	///
+	/// @param method
+	///	0:NONE, 1:GET, 2:POST
+	///
+	void commonGetURL(as_environment& env, as_value target,
+            const std::string& url, boost::uint8_t method);
 }
 
 namespace SWF { // gnash::SWF
-
-
 
 static void unsupported_action_handler(ActionExec& thread)
 {
@@ -541,14 +555,14 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
     
     // Will abort if code.read_string returns 0, but action
     // buffer should always have a null terminator at the
-    // end. This replaces an assertion in CommonGetUrl.
+    // end. This replaces an assertion in commonGetURL.
     const std::string target(code.read_string(pc + 3 + urlLength));
 
     IF_VERBOSE_ACTION (
         log_action(_("GetUrl: target=%s url=%s"), target, url);
     );
 
-    CommonGetUrl(env, target, url, 0u);
+    commonGetURL(env, target, url, 0u);
 }
 
 void
@@ -2070,209 +2084,6 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
     // @@ TODO range checks
 }
 
-// Common code for GetUrl and GetUrl2. See:
-// http://sswf.sourceforge.net/SWFalexref.html#action_get_url
-// http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
-//
-// Testcases:
-//
-// - http://www.garfield.com/comics/comics_todays.html
-//   lower_todayscomic.swf should render four flash files in its canvas
-//
-// - http://www.voiptalk.org
-//   pressing 'My Account' button should open
-//   https://www.voiptalk.org/products/login.php
-//   NOTE: this is affected by the GetUrl bug reported with an excerpt
-//         from Colin Moock book, see below. (won't work, and won't fix)
-//
-// - http://www.uptoten.com
-//   Should load in _level0, with loadTargetFlag set.
-//
-// Method isbBit-packed as follows:
-// SendVarsMethod:2 (0:NONE 1:GET 2:POST)
-// Reserved:4
-// LoadTargetFlag:1
-// LoadVariableFlag:1
-/// @param target        the target window, or _level1..10
-void
-SWFHandlers::CommonGetUrl(as_environment& env, as_value target,
-        const std::string& url, boost::uint8_t method)
-{
-
-    if (url.empty()) {
-        log_error(_("Bogus empty GetUrl url in SWF file, skipping"));
-        return;
-    }
-
-    // Parse the method bitfield
-    bool loadTargetFlag    = method & 64;
-    bool loadVariableFlag  = method & 128;
-
-    MovieClip::VariablesMethod sendVarsMethod;
-
-    // handle malformed sendVarsMethod
-    if ((method & 3) == 3) {
-        log_error(_("Bogus GetUrl2 send vars method "
-            " in SWF file (both GET and POST requested). Using GET"));
-        sendVarsMethod = MovieClip::METHOD_GET;
-    }
-    else sendVarsMethod =
-        static_cast<MovieClip::VariablesMethod>(method & 3);
-
-    std::string target_string;
-    if (!target.is_undefined() && !target.is_null()) {
-        target_string = target.to_string();
-    }
-
-    VM& vm = getVM(env);
-    movie_root& m = vm.getRoot();
- 
-    // If the url starts with "FSCommand:", then this is
-    // a message for the host app.
-    StringNoCaseEqual noCaseCompare;
-    if (noCaseCompare(url.substr(0, 10), "FSCommand:"))
-    {
-        m.handleFsCommand(url.substr(10), target_string);
-        return;
-    }
-
-    // If the url starts with "print:", then this is
-    // a print request.
-    if (noCaseCompare(url.substr(0, 6), "print:"))
-    {
-        log_unimpl("print: URL");
-        return;
-    }
-
-    //
-    // From "ActionScript: The Definitive Guide" by Colin Moock p. 470
-    // --------8<------------------------------------------------------
-    // In most browsers, getURL() relative links are resolved relative
-    // to the HTML file that contains the .swf file. In IE 4.5 and older
-    // versions on Macintosh, relative links are resolved relative to
-    // the location of the .swf file, not the HTML file, which causes
-    // problems when the two are in different directories. To avoid
-    // the problem, either place the .swf and the .html file in the
-    // same directory or use absolute URLs when invoking getURL().
-    // --------8<------------------------------------------------------
-    //
-    // We'll resolve relative to our "base url".
-    // The base url must be set with the set_base_url() command.
-    //
-
-    log_debug(_("get url: target=%s, url=%s, method=%x "
-                "(sendVars:%X, loadTarget:%d, loadVariable:%d)"),
-            target_string, url, static_cast<int>(method),
-            sendVarsMethod, loadTargetFlag, loadVariableFlag);
-
-    DisplayObject* target_ch = env.find_target(target.to_string());
-    MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
-
-    if (loadVariableFlag)
-    {
-        log_debug(_("getURL2 loadVariable"));
-
-        if (!target_ch)
-        {
-            log_error(_("getURL: target %s not found"), target_string);
-            // might want to invoke the external url opener here...
-            return;
-        }
-
-        if (!target_movie)
-        {
-            log_error(_("getURL: target %s is not a sprite"), target_string);
-            // might want to invoke the external url opener here...
-            return;
-        }
-
-        target_movie->loadVariables(url, sendVarsMethod);
-
-        return;
-    }
-
-    std::string varsToSend;
-    if (sendVarsMethod != MovieClip::METHOD_NONE)
-    {
-
-        // TESTED: variables sent are those in current target,
-        //         no matter the target found on stack (which
-        //         is the target to load the resource into).
-        //
-        as_object* curtgt = getObject(env.get_target());
-        if (!curtgt) {
-            log_error(_("CommonGetUrl: current target is undefined"));
-            return;
-        }
-        getURLEncodedVars(*curtgt, varsToSend);
-    }
-
-
-    if ( loadTargetFlag )
-    {
-        log_debug(_("getURL2 target load"));
-
-        if (!target_ch)
-        {
-            unsigned int levelno;
-            if (isLevelTarget(getSWFVersion(env), target_string, levelno))
-            {
-                log_debug(_("Testing _level loading (level %u)"), levelno);
- 
-                m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
-                return;
-            }
-
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Unknown loadMovie target: %s"),
-                target_string);
-            );
-
-            // TESTED: Even if the target is created right-after 
-            //         the load request, the player won't load
-            //         into it. In other words, the target MUST
-            //         exist at time of interpreting the GETURL2
-            //         tag with loadTarget flag.
-
-            return;
-        }
-
-        if (!target_movie)
-        {
-            log_error(_("get url: target %s is not a sprite"), target_string);
-            return;
-        }
-
-        std::string s = target_movie->getTarget(); // or getOrigTarget ?
-        if (s != target_movie->getOrigTarget())
-        {
-            log_debug(_("TESTME: target of a loadMovie changed its target "
-                        "path"));
-        }
-        
-        // TODO: try to trigger this !
-        assert(m.findCharacterByTarget(s) == target_movie );
-
-        m.loadMovie(url, s, varsToSend, sendVarsMethod); 
-        return;
-    }
-
-    unsigned int levelno;
-    if (isLevelTarget(getSWFVersion(env), target_string, levelno))
-    {
-        log_debug(_("Testing _level loading (level %u)"), levelno);
-        m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
-        return;
-    }
-
-    // Just plain getURL
-    // This should be the original URL string, as the hosting application
-    // will decide how to resolve the URL. If there is no hosting
-    // application, movie_root::getURL will resolve the URL.
-    m.getURL(url, target_string, varsToSend, sendVarsMethod);
-
-}
-
 // Common code for SetTarget and SetTargetExpression. See:
 // http://sswf.sourceforge.net/SWFalexref.html#action_set_target
 // http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
@@ -2324,7 +2135,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
     }
     else {
         const std::string& url = url_val.to_string();
-        CommonGetUrl(env, env.top(0), url, method);
+        commonGetURL(env, env.top(0), url, method);
     }
 
     env.drop(2);
@@ -3965,6 +3776,209 @@ construct_object(as_function* ctor_as_func, as_environment& env,
         args += env.pop();
     } 
     return ctor_as_func->constructInstance(env, args).get();
+}
+
+// Common code for GetUrl and GetUrl2. See:
+// http://sswf.sourceforge.net/SWFalexref.html#action_get_url
+// http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
+//
+// Testcases:
+//
+// - http://www.garfield.com/comics/comics_todays.html
+//   lower_todayscomic.swf should render four flash files in its canvas
+//
+// - http://www.voiptalk.org
+//   pressing 'My Account' button should open
+//   https://www.voiptalk.org/products/login.php
+//   NOTE: this is affected by the GetUrl bug reported with an excerpt
+//         from Colin Moock book, see below. (won't work, and won't fix)
+//
+// - http://www.uptoten.com
+//   Should load in _level0, with loadTargetFlag set.
+//
+// Method isbBit-packed as follows:
+// SendVarsMethod:2 (0:NONE 1:GET 2:POST)
+// Reserved:4
+// LoadTargetFlag:1
+// LoadVariableFlag:1
+/// @param target        the target window, or _level1..10
+void
+commonGetURL(as_environment& env, as_value target,
+        const std::string& url, boost::uint8_t method)
+{
+
+    if (url.empty()) {
+        log_error(_("Bogus empty GetUrl url in SWF file, skipping"));
+        return;
+    }
+
+    // Parse the method bitfield
+    bool loadTargetFlag    = method & 64;
+    bool loadVariableFlag  = method & 128;
+
+    MovieClip::VariablesMethod sendVarsMethod;
+
+    // handle malformed sendVarsMethod
+    if ((method & 3) == 3) {
+        log_error(_("Bogus GetUrl2 send vars method "
+            " in SWF file (both GET and POST requested). Using GET"));
+        sendVarsMethod = MovieClip::METHOD_GET;
+    }
+    else sendVarsMethod =
+        static_cast<MovieClip::VariablesMethod>(method & 3);
+
+    std::string target_string;
+    if (!target.is_undefined() && !target.is_null()) {
+        target_string = target.to_string();
+    }
+
+    VM& vm = getVM(env);
+    movie_root& m = vm.getRoot();
+ 
+    // If the url starts with "FSCommand:", then this is
+    // a message for the host app.
+    StringNoCaseEqual noCaseCompare;
+    if (noCaseCompare(url.substr(0, 10), "FSCommand:"))
+    {
+        m.handleFsCommand(url.substr(10), target_string);
+        return;
+    }
+
+    // If the url starts with "print:", then this is
+    // a print request.
+    if (noCaseCompare(url.substr(0, 6), "print:"))
+    {
+        log_unimpl("print: URL");
+        return;
+    }
+
+    //
+    // From "ActionScript: The Definitive Guide" by Colin Moock p. 470
+    // --------8<------------------------------------------------------
+    // In most browsers, getURL() relative links are resolved relative
+    // to the HTML file that contains the .swf file. In IE 4.5 and older
+    // versions on Macintosh, relative links are resolved relative to
+    // the location of the .swf file, not the HTML file, which causes
+    // problems when the two are in different directories. To avoid
+    // the problem, either place the .swf and the .html file in the
+    // same directory or use absolute URLs when invoking getURL().
+    // --------8<------------------------------------------------------
+    //
+    // We'll resolve relative to our "base url".
+    // The base url must be set with the set_base_url() command.
+    //
+
+    log_debug(_("get url: target=%s, url=%s, method=%x "
+                "(sendVars:%X, loadTarget:%d, loadVariable:%d)"),
+            target_string, url, static_cast<int>(method),
+            sendVarsMethod, loadTargetFlag, loadVariableFlag);
+
+    DisplayObject* target_ch = env.find_target(target.to_string());
+    MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
+
+    if (loadVariableFlag)
+    {
+        log_debug(_("getURL2 loadVariable"));
+
+        if (!target_ch)
+        {
+            log_error(_("getURL: target %s not found"), target_string);
+            // might want to invoke the external url opener here...
+            return;
+        }
+
+        if (!target_movie)
+        {
+            log_error(_("getURL: target %s is not a sprite"), target_string);
+            // might want to invoke the external url opener here...
+            return;
+        }
+
+        target_movie->loadVariables(url, sendVarsMethod);
+
+        return;
+    }
+
+    std::string varsToSend;
+    if (sendVarsMethod != MovieClip::METHOD_NONE)
+    {
+
+        // TESTED: variables sent are those in current target,
+        //         no matter the target found on stack (which
+        //         is the target to load the resource into).
+        //
+        as_object* curtgt = getObject(env.get_target());
+        if (!curtgt) {
+            log_error(_("commonGetURL: current target is undefined"));
+            return;
+        }
+        getURLEncodedVars(*curtgt, varsToSend);
+    }
+
+
+    if ( loadTargetFlag )
+    {
+        log_debug(_("getURL2 target load"));
+
+        if (!target_ch)
+        {
+            unsigned int levelno;
+            if (isLevelTarget(getSWFVersion(env), target_string, levelno))
+            {
+                log_debug(_("Testing _level loading (level %u)"), levelno);
+ 
+                m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
+                return;
+            }
+
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Unknown loadMovie target: %s"),
+                target_string);
+            );
+
+            // TESTED: Even if the target is created right-after 
+            //         the load request, the player won't load
+            //         into it. In other words, the target MUST
+            //         exist at time of interpreting the GETURL2
+            //         tag with loadTarget flag.
+
+            return;
+        }
+
+        if (!target_movie)
+        {
+            log_error(_("get url: target %s is not a sprite"), target_string);
+            return;
+        }
+
+        std::string s = target_movie->getTarget(); // or getOrigTarget ?
+        if (s != target_movie->getOrigTarget())
+        {
+            log_debug(_("TESTME: target of a loadMovie changed its target "
+                        "path"));
+        }
+        
+        // TODO: try to trigger this !
+        assert(m.findCharacterByTarget(s) == target_movie );
+
+        m.loadMovie(url, s, varsToSend, sendVarsMethod); 
+        return;
+    }
+
+    unsigned int levelno;
+    if (isLevelTarget(getSWFVersion(env), target_string, levelno))
+    {
+        log_debug(_("Testing _level loading (level %u)"), levelno);
+        m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
+        return;
+    }
+
+    // Just plain getURL
+    // This should be the original URL string, as the hosting application
+    // will decide how to resolve the URL. If there is no hosting
+    // application, movie_root::getURL will resolve the URL.
+    m.getURL(url, target_string, varsToSend, sendVarsMethod);
+
 }
 
 }
