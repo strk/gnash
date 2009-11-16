@@ -25,11 +25,11 @@
 #include "as_function.h"
 #include "as_value.h"
 #include "CodeStream.h"
-#include "asClass.h"
+#include "Class.h"
 #include "SafeStack.h"
 #include "as_object.h"
 #include "as_environment.h"
-#include "asMethod.h"
+#include "Method.h"
 
 namespace gnash {
 namespace abc {
@@ -41,7 +41,7 @@ class abc_function : public as_function
 {
 
 public:
-	abc_function(asMethod* methodInfo, Machine* machine);
+	abc_function(Method* methodInfo, Machine* machine);
 
 	as_value operator()(const fn_call& fn);
 
@@ -59,7 +59,7 @@ public:
 
 private:
 
-    asMethod* _methodInfo;
+    Method* _methodInfo;
 
     Machine* _machine;
 

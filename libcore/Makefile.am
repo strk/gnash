@@ -32,6 +32,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/abc \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libcore/parser \
@@ -129,7 +130,7 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
-	asClass.cpp \
+	abc/Class.cpp \
 	MovieFactory.cpp \
 	MovieLoader.cpp \
 	Namespace.cpp \
@@ -138,8 +139,9 @@ libgnashcore_la_SOURCES = \
 
 if ENABLE_AVM2
 libgnashcore_la_SOURCES += \
-	abc_function.cpp \
-	asMethod.cpp \
+	abc/abc_function.cpp \
+	abc/Method.cpp \
+	abc/AbcBlock.cpp \
 	$(NULL)
 endif
 
@@ -213,10 +215,12 @@ noinst_HEADERS = \
 if ENABLE_AVM2
 noinst_HEADERS += \
 	swf/DoABCTag.h \
-	abc_function.h \
-	asMethod.h \
-	asException.h \
-	asBoundValues.h \
+	abc/abc_function.h \
+	abc/Method.h \
+	abc/asException.h \
+	abc/BoundValues.h \
+	abc/AbcBlock.h \
+	abc/MultiName.h \
 	$(NULL)
 endif
 
@@ -265,7 +269,7 @@ EXTENSIONS_API = \
 	RGBA.h	\
 	Geometry.h	\
 	Video.h \
-	asClass.h \
+	abc/Class.h \
 	Namespace.h \
 	$(NULL)
 

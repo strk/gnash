@@ -125,7 +125,7 @@ pool_namespace(boost::uint32_t index, AbcBlock *pool)
 
 }
 
-inline asMethod*
+inline Method*
 pool_method(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
@@ -137,7 +137,7 @@ pool_method(boost::uint32_t index, AbcBlock* pool)
     }
 }
 
-inline asClass*
+inline Class*
 pool_class(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
@@ -1228,7 +1228,7 @@ Machine::execute()
                 {
                     boost::int32_t method_index = mStream->read_V32();
                     log_abc("Creating new abc_function: method index=%u",method_index);
-                    asMethod *m = pool_method(method_index, mPoolObject);
+                    Method *m = pool_method(method_index, mPoolObject);
                     abc_function* new_function = m->getPrototype();
                     
                     push_stack(as_value(new_function));
@@ -1328,7 +1328,7 @@ Machine::execute()
                 ///  ..., argN)
                 case SWF::ABC_ACTION_CALLSTATIC:
                 {
-                    asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
+                    Method *m = pool_method(mStream->read_V32(), mPoolObject);
                     boost::uint32_t argc = mStream->read_V32();
                     as_function *func = m->getPrototype();
                     ENSURE_OBJECT(_stack.top(argc));
@@ -1701,7 +1701,7 @@ Machine::execute()
                 {
                     boost::uint32_t cid = mStream->read_V32();
                     log_abc("Class index: %s", cid);
-                    asClass *c = pool_class(cid, mPoolObject);
+                    Class *c = pool_class(cid, mPoolObject);
                     log_abc("Creating new class id=%u name=%s", c->getName(),
                             mST.value(c->getName()));
                     
@@ -1712,7 +1712,7 @@ Machine::execute()
                     new_class->set_prototype(base_class);
                     
                     //Create the class.
-                    asMethod* scmethod = c->getStaticConstructor();
+                    Method* scmethod = c->getStaticConstructor();
                     // What if there isn't one?
                     assert(scmethod);
                     
@@ -2907,7 +2907,7 @@ Machine::execute()
 } 
 
 void
-Machine::getMember(asClass* pDefinition, MultiName& name,
+Machine::getMember(Class* pDefinition, MultiName& name,
 	as_value& instance)
 {
 	if (!instance.is_object())
@@ -2931,7 +2931,7 @@ UNUSED(name);
 }
 
 void
-Machine::setMember(asClass *pDefinition, MultiName& name, as_value& instance,
+Machine::setMember(Class *pDefinition, MultiName& name, as_value& instance,
 	as_value& newvalue)
 {
 	if (!instance.is_object())
@@ -2988,13 +2988,13 @@ Machine::completeName(MultiName& name, int offset)
 	return size;
 }
 
-asClass *
+Class *
 Machine::findSuper(as_value &v, bool find_for_primitive)
 {
 	if (v.is_undefined() || v.is_null()) return NULL;
 
 	if (v.is_object()) {
-		asClass *pProto = NULL; // TODO: v.to_object(*_global)->getClass();
+		Class *pProto = NULL; // TODO: v.to_object(*_global)->getClass();
 		return pProto ? pProto->getSuper() : NULL;
 	}
 
@@ -3135,9 +3135,9 @@ Machine::initMachine(AbcBlock* pool_block)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");
-	asClass* start_script = pool_block->scripts().back();
+	Class* start_script = pool_block->scripts().back();
 	log_debug("Getting constructor.");
-	asMethod* constructor = start_script->getConstructor();
+	Method* constructor = start_script->getConstructor();
 	clearRegisters(constructor->getMaxRegisters());
 	log_debug("Loading code stream.");
 	mStream = constructor->getBody();
@@ -3149,7 +3149,7 @@ Machine::initMachine(AbcBlock* pool_block)
 //TODO: There is probably a better way to do this, once we understand what the VM is supposed
 //todo, this should be fixed.
 as_value
-Machine::executeFunction(asMethod* method, const fn_call& fn)
+Machine::executeFunction(Method* method, const fn_call& fn)
 {
 	
     //TODO: Figure out a good way to use the State object to handle
@@ -3211,7 +3211,7 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 
     log_debug("instantiateClass: class name %s", className);
 
-	asClass* cl = mPoolObject->locateClass(className);
+	Class* cl = mPoolObject->locateClass(className);
     if (!cl)
     {
         /// This seems like a big error.
@@ -3219,7 +3219,7 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
         return;
     }
 	
-    asMethod* ctor = cl->getConstructor();
+    Method* ctor = cl->getConstructor();
 
     if (!ctor) {
         log_error("Class found has no constructor, can't instantiate "

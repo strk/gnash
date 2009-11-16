@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,35 +15,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "log.h"
-#include "abc_function.h"
-#include "asClass.h"
-#include "fn_call.h"
-#include "Machine.h"
+#ifndef GNASH_AS_EXCEPTION_H
+#define GNASH_AS_EXCEPTION_H
 
 namespace gnash {
-namespace abc {
 
-abc_function::abc_function(asMethod* methodInfo, Machine* machine)
-    :
-    as_function(*machine->global()),
-    _methodInfo(methodInfo),
-    _machine(machine)
+class asException
 {
-}
+public:
+	void setStart(boost::uint32_t i) { _start = i; }
+	void setEnd(boost::uint32_t i) { mEnd = i; }
+	void setCatch(boost::uint32_t i) { mCatch = i; }
+	void catchAny() { mCatchAny = true; }
+	void setCatchType(abc::Class* p) { mCatchType = p; }
+	void setNamespace(Namespace* n) { _namespace = n; }
+	void setName(string_table::key name) { _name = name; }
 
-// Dispatch.
-as_value
-abc_function::operator()(const fn_call& fn)
-{
+private:
+	boost::uint32_t _start;
+	boost::uint32_t mEnd;
+	boost::uint32_t mCatch;
+	bool mCatchAny;
+	abc::Class *mCatchType;
+	Namespace *_namespace;
+	string_table::key _name;
+};
 
-	log_abc("Calling an abc_function id=%u.", _methodInfo->methodID());
-	as_value val = _machine->executeFunction(_methodInfo,fn);
-	log_abc("Done calling abc_function id=%u value=%s",
-            _methodInfo->methodID(), val);
-	return val;
-
-}
-
-} // namespace abc
 } // namespace gnash
+#endif

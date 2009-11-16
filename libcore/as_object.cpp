@@ -44,7 +44,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
 #include "namedStrings.h"
-#include "asClass.h"
+#include "Class.h"
 
 
 namespace gnash {

@@ -19,43 +19,45 @@
 #define GNASH_AS_BOUND_VALUES_H
 
 namespace gnash {
+namespace abc {
 
-class asBoundValue;
+class BoundValue;
 
-class asBoundAccessor
+class BoundAccessor
 {
 public:
-	bool setGetter(asMethod *p) { mGetter = p; return true; }
-	bool setSetter(asMethod *p) { _setter = p; return true; }
-	bool setValue(asBoundValue *p) { mValue = p; return true; }
+	bool setGetter(Method *p) { mGetter = p; return true; }
+	bool setSetter(Method *p) { _setter = p; return true; }
+	bool setValue(BoundValue *p) { mValue = p; return true; }
 
-	asBoundValue* getValue() { return mValue; }
-	asMethod *getGetter() { return mGetter; }
-	asMethod *getSetter() { return _setter; }
+	BoundValue* getValue() { return mValue; }
+	Method *getGetter() { return mGetter; }
+	Method *getSetter() { return _setter; }
 
 private:
-	asMethod *mGetter;
-	asMethod *_setter;
-	asBoundValue *mValue;
+	Method *mGetter;
+	Method *_setter;
+	BoundValue *mValue;
 };
 
-class asBoundValue 
+class BoundValue 
 {
 public:
-	asBoundValue() : mConst(false), mValue()
+	BoundValue() : mConst(false), mValue()
 	{ mValue.set_undefined(); }
 	void setValue(as_value &v) { mValue = v; }
 	as_value getCurrentValue() { return mValue; }
 
-	void setType(asClass *t) { mType = t; }
-	asClass *getType() { return mType; }
+	void setType(Class *t) { mType = t; }
+	Class *getType() { return mType; }
 
 private:
 	bool mConst;
-	asClass *mType;
+	Class *mType;
 	as_value mValue;
 };
 
+} // namespace abc
 } // namespace gnash
 
 #endif

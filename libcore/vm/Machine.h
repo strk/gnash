@@ -23,7 +23,7 @@
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "asClass.h"
+#include "Class.h"
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
@@ -46,6 +46,8 @@ namespace gnash {
 
 namespace abc {
 
+/// The virtual machine for executing ABC (ActionScript Bytecode).
+//
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
 /// to make function calls, rather than calling them directly in C++.
@@ -97,7 +99,7 @@ public:
 	/// the stack.
 	///
 	/// @param name
-	/// A partially filled asBoundName, this should be the id
+	/// A partially filled MultiName, this should be the id
 	/// from the stream.
 	///
 	/// @param initial
@@ -118,7 +120,7 @@ public:
 	///
 	/// @return
 	/// Null if the superclass was not found, or the superclass.
-	asClass* findSuper(as_value& obj, bool find_primitive);
+	Class* findSuper(as_value& obj, bool find_primitive);
 
 	/// Get a member from an object.
 	///
@@ -136,7 +138,7 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(asClass* pDefinition, MultiName& name,
+	void getMember(Class* pDefinition, MultiName& name,
             as_value& source);
 
 	/// Set a member in an object.
@@ -155,9 +157,9 @@ public:
 	///
 	/// @return
 	/// Nothing.
-	void setMember(asClass*, MultiName&, as_value& target, as_value& val);
+	void setMember(Class*, MultiName&, as_value& target, as_value& val);
 
-	asBinding* findProperty(MultiName&) { return NULL; }
+	Binding* findProperty(MultiName&) { return NULL; }
 
 	void execute();
 
@@ -236,7 +238,7 @@ public:
 
 	void initMachine(AbcBlock* pool_block);
 
-	as_value executeFunction(asMethod* function, const fn_call& fn);
+	as_value executeFunction(Method* function, const fn_call& fn);
 
 	void instantiateClass(std::string className, as_object* global);
     /// Return the Global object for this Machine.

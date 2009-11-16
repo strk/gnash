@@ -23,7 +23,9 @@
 
 // Forward declarations
 namespace gnash {
-    class asClass;
+    namespace abc {
+        class Class;
+    }
     class ClassHierarchy;
     class string_table;
 }
@@ -73,7 +75,7 @@ public:
 
 	/// Add a class to the namespace. The namespace stores this, but
 	/// does not take ownership. (So don't delete it.)
-	bool addClass(string_table::key name, asClass *a)
+	bool addClass(string_table::key name, abc::Class *a)
 	{
 		if (getClassInternal(name)) return false;
 		_classes[static_cast<std::size_t>(name)] = a;
@@ -84,11 +86,11 @@ public:
 
 	/// Get the named class. Returns NULL if information is not known
 	/// about the class. (Stubbed classes still return NULL here.)
-	asClass* getClass(string_table::key name) 
+	abc::Class* getClass(string_table::key name) 
 	{
 		if (mRecursePrevent) return NULL;
 
-		asClass* found = getClassInternal(name);
+		abc::Class* found = getClassInternal(name);
 
 		if (found || !getParent()) return found;
 
@@ -118,7 +120,7 @@ private:
 	string_table::key _uri;
 	string_table::key _prefix;
 
-	typedef std::map<string_table::key, asClass*> container;
+	typedef std::map<string_table::key, abc::Class*> container;
 	container _classes;
 	mutable bool mRecursePrevent;
 
@@ -126,7 +128,7 @@ private:
 	bool _protected;
 	bool _package;
 
-	asClass* getClassInternal(string_table::key name) const
+	abc::Class* getClassInternal(string_table::key name) const
 	{
 		container::const_iterator i;
 		

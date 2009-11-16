@@ -34,26 +34,27 @@ namespace gnash {
     namespace abc {
         class Machine;
         class abc_function;
+	class Class;
     }
     class CodeStream;
     class as_object;
-    class asClass;
 }
 
 namespace gnash {
+namespace abc {
 
 typedef Property asBinding;
 
 /// A class to represent, abstractly, an ActionScript method.
 ///
 /// Methods are unnamed until they are bound to an object.
-class asMethod
+class Method
 {
 public:
 	
-    typedef std::list<asClass*> ArgumentList;
+    typedef std::list<Class*> ArgumentList;
 
-	asMethod();
+	Method();
 
     boost::uint32_t methodID() const {
         return _methodID;
@@ -63,7 +64,7 @@ public:
         _methodID = m;
     }
 
-	void initPrototype(abc::Machine* machine);
+	void initPrototype(Machine* machine);
 
 	boost::uint32_t getMaxRegisters() { return _maxRegisters;}
 
@@ -99,7 +100,7 @@ public:
         return _scopeDepth;
     }
 
-    abc::abc_function* getPrototype() { return _prototype; }
+    abc_function* getPrototype() { return _prototype; }
 
 	asBinding* getBinding(string_table::key name);
 
@@ -123,45 +124,45 @@ public:
 	void setBody(CodeStream *b) { _body = b; }
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, asClass *type, as_value& val, bool isconst);
+            boost::uint32_t slotID, Class *type, as_value& val, bool isconst);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, asClass *type);
+            boost::uint32_t slotID, Class *type);
 
-	bool addMethod(string_table::key name, Namespace *ns, asMethod *method);
+	bool addMethod(string_table::key name, Namespace *ns, Method *method);
 
-	bool addGetter(string_table::key name, Namespace *ns, asMethod *method);
+	bool addGetter(string_table::key name, Namespace *ns, Method *method);
 
-	bool addSetter(string_table::key name, Namespace *ns, asMethod *method);
+	bool addSetter(string_table::key name, Namespace *ns, Method *method);
 
 	bool addMemberClass(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, asClass *type);
+		boost::uint32_t slotID, Class *type);
 	
 	bool addSlotFunction(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, asMethod *method);
+		boost::uint32_t slotID, Method *method);
 
 	/// \brief
 	/// Set the owner of this method.
-	void setOwner(asClass* s);
+	void setOwner(Class* s);
 
 	/// \brief
 	/// Get the unique identifier for the return type. 0 is 'anything'.
 	/// (This is the value of any dynamic property.)
 	/// Id reference: Type
-	asClass* getReturnType() const;
+	Class* getReturnType() const;
 
 	/// Set the return type
     //
     /// TODO: This is currently a no-op, so find out what it's for and
     /// implement it.
     /// NB: the return type of a method can be * (any) or void, neither of
-    /// which are asClasses, so this may not be an appropriate way to
+    /// which are abc::Classes, so this may not be an appropriate way to
     /// handle return type.
-	void setReturnType(asClass* t);
+	void setReturnType(Class* t);
 
-	asMethod *getSuper();
+	Method *getSuper();
 
-	void setSuper(asMethod* s);
+	void setSuper(Method* s);
 
 	/// \brief
 	/// Is the method final? If so, it may not be overridden.
@@ -219,7 +220,7 @@ public:
 	/// Push an argument of type t into the method definition
     //
     /// A value of 0 stands for 'any'.
-	void pushArgument(asClass* t) { _arguments.push_back(t); }
+	void pushArgument(Class* t) { _arguments.push_back(t); }
 
 	/// Push an optional argument's default value.
 	void pushOptional(const as_value& v) { _optionalArguments.push_back(v); }
@@ -265,7 +266,7 @@ private:
 	
     boost::uint32_t _methodID;
 
-    abc::abc_function* _prototype;
+    abc_function* _prototype;
 	int _minArguments;
 	int _maxArguments;
 	boost::uint32_t _bodyLength;
@@ -285,6 +286,7 @@ private:
 
 };
 
+} // namespace abc
 } // namespace gnash
 
 #endif
