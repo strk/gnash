@@ -65,6 +65,12 @@ public:
 
     FunctionArgs() {}
 
+    /// The copy constructor copies all the arguments.
+    FunctionArgs(const FunctionArgs& other)
+        :
+        _v(other._v)
+    {}
+
     FunctionArgs& operator+=(const T& t) {
         _v.push_back(t);
         return *this;
