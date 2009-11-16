@@ -44,7 +44,8 @@ class RiscosGui : public Gui
     virtual ~RiscosGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
-    virtual bool createWindow(const char *title, int width, int height);
+    virtual bool createWindow(const char *title, int width, int height,
+                              int xPosition = 0, int yPosition = 0);
     virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();

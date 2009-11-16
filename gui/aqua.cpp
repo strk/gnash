@@ -156,7 +156,8 @@ void AquaGui::setCursor(gnash_cursor_type newcursor)
 }
 
 
-bool AquaGui::createWindow(const char* title, int width, int height)
+bool AquaGui::createWindow(const char* title, int width, int height,
+                           int xPosition, int yPosition)
 {
 	CFStringRef	windowTitle = NULL;
 	OSStatus	result;

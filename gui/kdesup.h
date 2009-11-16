@@ -87,7 +87,8 @@ public:
     KdeGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~KdeGui();
     virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(const char* windowtitle, int width, int height);
+    virtual bool createWindow(const char* windowtitle, int width, int height,
+                              int xPosition = 0, int yPosition = 0);
     virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();

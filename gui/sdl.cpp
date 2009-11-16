@@ -194,7 +194,8 @@ SDLGui::init(int argc, char **argv[])
 
 
 bool
-SDLGui::createWindow(const char *title, int width, int height)
+SDLGui::createWindow(const char *title, int width, int height,
+                     int /*xPosition*/, int /*yPosition*/)
 {
     GNASH_REPORT_FUNCTION;
     _width = width;
@@ -212,7 +213,7 @@ SDLGui::createWindow(const char *title, int width, int height)
 
     _glue.prepDrawingArea(_width, _height, sdl_flags);
 
-    _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
+    _runResources.setRenderer(_renderer);
 
     SDL_WM_SetCaption( title, title);
 

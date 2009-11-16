@@ -102,6 +102,12 @@ public:
 	void setHeight(size_t h) { _height = h; }
 	size_t getHeight() { return _height; }
 
+	void setXPosition(int xPos) { _xPosition = xPos; }
+	size_t getXPosition() { return _xPosition; }
+
+	void setYPosition(int yPos) { _yPosition = yPos; }
+	size_t getYPosition() { return _yPosition; }
+
 	void setWindowId(unsigned long x) { _windowID = x; }
 
 	void setDoLoop(bool b) { _doLoop = b; }
@@ -235,6 +241,10 @@ private:
 	size_t _width;
 
 	size_t _height;
+	
+	int _xPosition;
+
+	int _yPosition;
 
 	unsigned long _windowID;
 

@@ -19,7 +19,7 @@ Functions to implement:
 init(int argc, char **argv[]): 	
 This funtion is run first to initialize GUI-specific parameters/variables.
 
-createWindow(const char* title, int width, int height): 
+createWindow(const char* title, int width, int height, int xPosition, int yPosition): 
 Here we create a window-widget with calling parameters.
 
 setCursor(gnash_cursor_type newcursor):

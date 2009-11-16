@@ -429,7 +429,8 @@ void FBGui::renderBuffer()
 #endif
 }
 
-bool FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/)
+bool FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
+                     int /*xPosition*/, int /*yPosition*/)
 {
   // Framebuffer has no windows... :-)
 

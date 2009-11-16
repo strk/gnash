@@ -108,6 +108,8 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  -w,  --writelog          Produce the disk based debug log") << endl
     << _("  -j,  --width <width>     Set window width") << endl
     << _("  -k,  --height <height>   Set window height") << endl
+    << _("  -X,  --x-pos <x-pos>     Set window x position") << endl
+    << _("  -Y,  --y-pos <y-pos>     Set window y position") << endl
     << _("  -1,  --once              Exit when/if movie reaches the last frame") << endl
     << _("  -g,  --debugger          Turn on the SWF debugger") << endl
     << _("  -r,  --render-mode <0|1|2|3>") << endl
@@ -212,6 +214,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'w', "writelog",      Arg_parser::no  },
         { 'j', "width",         Arg_parser::yes },
         { 'k', "height",        Arg_parser::yes },
+        { 'X', "x-position",    Arg_parser::yes },
+        { 'Y', "y-position",    Arg_parser::yes },
         { 'u', "real-url",      Arg_parser::yes },
         { 'P', "param",         Arg_parser::yes },
         { 'U', "base-url",      Arg_parser::yes },  
@@ -235,6 +239,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     bool renderflag = false;
     bool plugin = false;
     bool widthGiven = false, heightGiven = false;
+    bool xPosGiven = false, yPosGiven = false;
 
 
     for( int i = 0; i < parser.arguments(); ++i )
@@ -337,6 +342,18 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setHeight ( parser.argument<long>(i));
                     gnash::log_debug(_("Setting height to %d"),
                             player.getHeight());
+                    break;
+                case 'X':
+                    xPosGiven = true;
+                    player.setXPosition ( parser.argument<int>(i));
+                    gnash::log_debug (_("Setting x position to %d"), 
+                            player.getXPosition());
+                    break;
+                case 'Y':
+                    yPosGiven = true;
+                    player.setYPosition ( parser.argument<int>(i));
+                    gnash::log_debug (_("Setting x position to %d"), 
+                            player.getYPosition());
                     break;
                 case 'x':
                     plugin = true;

@@ -119,7 +119,8 @@ RiscosGui::init(int argc, char **argv[])
 
 
 bool
-RiscosGui::createWindow(const char *title, int width, int height)
+RiscosGui::createWindow(const char *title, int width, int height,
+                     int xPosition, int yPosition)
 {
 //First call the old createWindow function and then set the title.
 //In case there's some need to not setting the title.

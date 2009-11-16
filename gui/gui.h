@@ -115,8 +115,11 @@ public:
      * @param title The window title.
      * @param width The desired window width in pixels.
      * @param height The desired window height in pixels.
+     * @param xPosition The desired window X position from the top left corner.
+     * @param yPosition The desired window Y position from the top left corner.
      */   
-    virtual bool createWindow(const char* title, int width, int height) = 0;
+    virtual bool createWindow(const char* title, int width, int height,
+                       int xPosition = 0, int yPosition = 0) = 0;
 
     /// Start main rendering loop.
     virtual bool run() = 0;

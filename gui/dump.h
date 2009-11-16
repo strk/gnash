@@ -41,7 +41,8 @@ class DSOEXPORT DumpGui : public Gui
     bool createMenu() { return true; }
     bool createMenuBar() { return true; }
     bool createWindow(int width, int height);
-    bool createWindow(const char* /*title*/, int width, int height)
+    bool createWindow(const char* /*title*/, int width, int height,
+            int /*x*/, int /*y*/)
         { return createWindow(width, height); }
     bool init(int argc, char **argv[]);
     void quit();

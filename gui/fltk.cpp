@@ -229,7 +229,8 @@ FltkGui::create()
 }
 
 bool
-FltkGui::createWindow(const char* title, int width, int height)
+FltkGui::createWindow(const char* title, int width, int height,
+                      int xPosition, int yPosition)
 {
     resize(width, _menu_height + height);
 
