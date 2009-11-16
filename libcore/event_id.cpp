@@ -22,6 +22,7 @@
 #include "event_id.h"
 #include "namedStrings.h"
 
+#include <map>
 #include <string>
 #include <algorithm>
 #include <boost/format.hpp>
